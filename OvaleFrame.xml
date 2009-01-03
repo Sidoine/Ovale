@@ -1,0 +1,56 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+  <Frame name="OvaleFrame" parent="UIParent" movable="true" hidden="false">
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeTo="UIParent">
+        <Offset>
+          <AbsDimension x="200" y="-100"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Size>
+      <AbsDimension x="64" y="64"/>
+    </Size>
+    <!--
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString name="$parent_Title" inherits="GameFontNormal" hidden="false" text="RaidStatus">
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="-5"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+          <Size>
+            <AbsDimension x="300" y="50"/>
+          </Size>
+        </FontString>
+      </Layer>
+    </Layers>
+    -->
+    <Scripts>
+      <OnMouseDown>OvaleFrame_OnMouseDown(self,button);</OnMouseDown>
+      <OnMouseUp>OvaleFrame_OnMouseUp(self,button);</OnMouseUp>
+      <OnLoad>OvaleFrame_OnLoad(self);</OnLoad>
+     <!-- <OnEvent>OvaleFrame_OnEvent(self,event);</OnEvent>-->
+      <OnUpdate>OvaleFrame_OnUpdate(self);</OnUpdate>
+    </Scripts>
+    <Frames>
+      <Button name="$parentOption" text="$parentType">
+        <Size>
+          <AbsDimension x="15" y="15" />
+        </Size>
+        <Anchors>
+          <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" />
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            self:SetNormalTexture("Interface\\Icons\\INV_Misc_Wrench_01")
+            self:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
+          </OnLoad>
+          <OnClick>Ovale:AfficherConfig()</OnClick>
+        </Scripts>
+      </Button>
+    </Frames>
+   </Frame>
+</Ui>

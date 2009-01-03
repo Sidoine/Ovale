@@ -1,0 +1,31 @@
+﻿## Interface: 30000
+## Title: Ovale
+## Notes: Affiche l'icône du prochain sort à lancer
+## Author: Sidoine
+## Version: 0.1
+## OptionalDeps: Ace3
+## SavedVariables: OvaleDB
+## SavedVariablesPerCharacter: OvaleDBPC
+## X-Category: Combat
+## X-Embeds: Ace3
+
+embeds.xml
+
+Locale-frFR.lua
+Ovale.lua
+Condition.lua
+OvaleIcone.lua
+OvaleIcone.xml
+OvaleFrame.lua
+OvaleSwing.lua
+OvaleCompile.lua
+defaut\Chaman.lua
+defaut\Chasseur.lua
+defaut\Demoniste.lua
+defaut\Druide.lua
+defaut\Guerrier.lua
+defaut\Mage.lua
+defaut\Paladin.lua
+defaut\Pretre.lua
+defaut\Voleur.lua
+
