@@ -25,6 +25,9 @@ Define(SLAMTALENT 2233)
 Define(CLEAVE 845)
 Define(HEROICSTRIKE 78)
 Define(SUNDER 7386)
+Define(CONCUSSIONBLOW 12809)
+Define(REND 772)
+Define(OVERPOWER 7384)
 
 if List(cri commandement) and BuffExpires(COMMANDSHOUT 3)
     Spell(COMMANDSHOUT)
@@ -57,7 +60,12 @@ if Stance(3) #berserker
 {
    Spell(VICTORY usable=1)
    
-   if TargetLifePercent(less 20) Spell(EXECUTE)
+  # if TargetLifePercent(less 20) Spell(EXECUTE)
+   Spell(EXECUTE usable=1)
+   
+   Spell(SHIELDSLAM usable=1)
+   Spell(SHOCKWAVE)
+   Spell(CONCUSSIONBLOW)
    
    Spell(BLOODTHIRST)
    if CheckBoxOn(tourbillon) Spell(WHIRLWIND)
@@ -65,20 +73,23 @@ if Stance(3) #berserker
    Spell(MORTALSTRIKE)
    Spell(DEVASTATE)
    
-   if Talent(SLAMTALENT more 1) and AfterWhiteHit(0.2)
-       Spell(SLAM)
-       
-   #todo execute par talent
+   if TalentPoints(SLAMTALENT more 1) and AfterWhiteHit(0.2)
+       Spell(SLAM)      
 }
 
 if Stance(1) #combat
 {
    Spell(VICTORY usable=1)
-   if TargetLifePercent(less 20) Spell(EXECUTE)
+   Spell(OVERPOWER usable=1)
    Spell(MORTALSTRIKE)
-   Spell(DEVASTATE)
    
-   #todo
+   Spell(REND)
+   
+   Spell(SHIELDSLAM usable=1)
+   Spell(SHOCKWAVE)
+   Spell(CONCUSSIONBLOW)
+   
+   Spell(DEVASTATE)
 }
 
 if Mana(more 50)

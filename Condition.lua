@@ -82,6 +82,7 @@ Ovale.conditions=
 	end,
 	-- Test if a buff is active
 	-- 1 : the buff spell id
+	-- stacks : minimum number of stacks
 	BuffPresent = function(condition)
 		if (not condition[1]) then
 			return nil
@@ -94,7 +95,15 @@ Ovale.conditions=
 				break
 			end
 			if (name == buffName and icon==buffIcon) then
-				return 0
+				if (condition.stacks) then
+					if (count>=condition.stacks) then
+						return 0
+					else
+						return nil
+					end
+				else 
+					return 0
+				end
 			end
 			i = i + 1;
 		end
@@ -126,6 +135,12 @@ Ovale.conditions=
 	ComboPoints = function(condition)
 		local points = GetComboPoints("player")
 		return compare(points, condition[1], condition[2])
+	end,
+	-- Compare with the player level
+	-- 1 : "less" or "more"
+	-- 2 : the limit
+	Level = function(condition)
+		return compare(UnitLevel("player"), condition[1], condition[2])
 	end,
 	-- Test if the player life is bellow/above a given value in percent
 	-- 1 : "less" or "more"

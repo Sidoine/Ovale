@@ -35,6 +35,25 @@ local options =
 	type = "group",
 	args = 
 	{
+		apparence =
+		{
+			name = "Apparence",
+			type = "group",
+			args =
+			{
+				combatUniquement =
+				{
+					type = "toggle",
+					name = "Afficher en combat uniquement",
+					get = function(info)
+						return Ovale.db.profile.apparence.enCombat
+					end,
+					set = function(info, v)
+						Ovale.db.profile.apparence.enCombat = v
+					end
+				}
+			}
+		},
 		code =
 		{
 			name = "Code",
@@ -170,9 +189,15 @@ function Ovale:OnEnable()
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
+	if (self.db.profile.apparence.enCombat) then
+		self.frame:Hide()
+	end
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
+	if (self.db.profile.apparence.enCombat) then
+		self.frame:Show()
+	end
 end
 
 function Ovale:OnDisable()
@@ -576,7 +601,8 @@ function Ovale:ChargerDefaut()
 			left = 0,
 			top = 0,
 			check = {},
-			list = {}
+			list = {},
+			apparence = {enCombat=false}
 		}
 	})
 end
