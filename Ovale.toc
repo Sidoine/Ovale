@@ -12,6 +12,7 @@
 embeds.xml
 
 Locale-frFR.lua
+Locale-enUS.lua
 Ovale.lua
 Condition.lua
 OvaleIcone.lua

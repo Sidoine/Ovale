@@ -97,42 +97,14 @@ local function ParseDefine(key, value)
 	return ""
 end
 
-function Ovale:CompileInputs(text)
-	self.casesACocher = {}
-	self.listes = {}
-	
-	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*%)", ParseAddListItem)
-	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*%)", ParseAddCheckBox)
-	
-	self:UpdateFrame()
-	return text
-end
-
-function Ovale:Compile(text)
-	self.bug = false
-	node = {}
-	defines = {}
-	
-	text = string.gsub(text, "#.-\n","")
-
-	text = string.gsub(text, "Define%s*%(%s*(%w+)%s+(%w+)%s*%)", ParseDefine)
-		
-	for k,v in pairs(defines) do
-		text = string.gsub(text, "([^%w])"..k.."([^%w])", "%1"..v.."%2")
-	end
-	
-	text = self:CompileInputs(text)
-	
-	text = string.gsub(text, "\n", " ")
-	text = string.gsub(text, "%s+", " ")
-	
+local function ParseAddIcon(text)
 	text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
 	text = subtest(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 	text = subtest(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 	
 	text = subtest(text, "{([^{}]*)}", ParseGroup)
 	
-	text = ParseGroup(text)
+	-- text = ParseGroup(text)
 	local masterNode
 	if (text) then
 		masterNode = string.match(text, "node(%d+)")
@@ -148,6 +120,62 @@ function Ovale:Compile(text)
 	end
 	masterNode = node[tonumber(masterNode)]
 	return masterNode
+end
+
+function Ovale:CompileInputs(text)
+	self.casesACocher = {}
+	self.listes = {}
+	
+	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*%)", ParseAddListItem)
+	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*%)", ParseAddCheckBox)
+	return text
+end
+
+local function ParseCanStopChannelling(text)
+	local spell = Ovale:GetSpellInfoOrNil(text)
+	if (spell) then
+		Ovale.canStopChannelling[spell] = true
+	else
+		Ovale:Print("CanStopChannelling with unknown spell "..text)
+	end
+end
+
+function Ovale:Compile(text)
+	self.bug = false
+	node = {}
+	defines = {}
+	
+	-- Suppression des commentaires
+	text = string.gsub(text, "#.-\n","")
+	text = string.gsub(text, "#.*$","")
+
+	-- Define(CONSTANTE valeur)
+	text = string.gsub(text, "Define%s*%(%s*(%w+)%s+(%w+)%s*%)", ParseDefine)
+	
+	-- On remplace les constantes par leur valeur
+	for k,v in pairs(defines) do
+		text = string.gsub(text, "([^%w])"..k.."([^%w])", "%1"..v.."%2")
+	end
+	
+	-- Options diverses
+	Ovale.canStopChannelling = {}
+	text = string.gsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
+		
+	
+	-- On vire les espaces en trop
+	text = string.gsub(text, "\n", " ")
+	text = string.gsub(text, "%s+", " ")
+	
+	-- On compile les AddCheckBox et AddListItem
+	text = self:CompileInputs(text)
+	
+	local masterNodes ={}
+	
+	-- On compile les AddIcon
+	for t in string.gmatch(text, "AddIcon%s*(%b{})") do
+		masterNodes[#masterNodes+1] = ParseAddIcon(t)
+	end
+	return masterNodes
 end
 
 function Ovale:DebugNode(node)

@@ -21,7 +21,7 @@ Ovale.listeTalentsRemplie = false
 Ovale.frame = nil
 Ovale.checkBoxes = {}
 Ovale.dropDowns = {}
-Ovale.masterNode = nil
+Ovale.masterNodes = nil
 Ovale.bug = false
 
 Ovale.arbre = {}
@@ -44,19 +44,38 @@ local options =
 				combatUniquement =
 				{
 					type = "toggle",
-					name = "Afficher en combat uniquement",
+					name = L["Afficher en combat uniquement"],
 					get = function(info)
 						return Ovale.db.profile.apparence.enCombat
 					end,
 					set = function(info, v)
 						Ovale.db.profile.apparence.enCombat = v
-					end
+					end,
+					width = full
+				},
+				iconWidth = 
+				{
+					type = "range",
+					name = L["Largeur des icônes"],
+					desc = L["La largeur des icônes"],
+					min = 16, max = 256, step = 1,
+					get = function(info) return Ovale.db.profile.apparence.iconWidth end,
+					set = function(info,value) Ovale.db.profile.apparence.iconWidth = value; Ovale:UpdateFrame() end
+				},
+				iconHeight = 
+				{
+					type = "range",
+					name = L["Hauteur des icônes"],
+					desc = L["La hauteur des icônes"],
+					min = 16, max = 256, step = 1,
+					get = function(info) return Ovale.db.profile.apparence.iconHeight end,
+					set = function(info,value) Ovale.db.profile.apparence.iconHeight = value; Ovale:UpdateFrame() end
 				}
 			}
 		},
 		code =
 		{
-			name = "Code",
+			name = L["Code"],
 			type = "group",
 			args = 
 			{
@@ -64,8 +83,9 @@ local options =
 				{
 					order = 2,
 					type = "input",
-					multiline = 20,
-					name = "Code",
+					multiline = 15,
+					name = L["Code"],
+					desc = L["BUGTEXT"],
 					get = function(info)
 						return Ovale.db.profile.code
 					end,
@@ -79,10 +99,10 @@ local options =
 				{
 					order = 1,
 					type = "execute",
-					name = "Compiler",
+					name = L["Compiler"],
 					func = function()
-						Ovale.masterNode = Ovale:Compile(Ovale.db.profile.code)
-						-- Ovale:Print(Ovale:DebugNode(Ovale.masterNode))
+						Ovale.masterNodes = Ovale:Compile(Ovale.db.profile.code)
+						Ovale:UpdateFrame()
 					end
 				}
 			}
@@ -120,7 +140,8 @@ end
 function Ovale:HandleProfileChanges()
 	if (self.firstInit) then
 		if (self.db.profile.code) then
-			self.masterNode = self:Compile(self.db.profile.code)
+			self.masterNodes = self:Compile(self.db.profile.code)
+			self:UpdateFrame()
 		end
 	end
 end
@@ -145,18 +166,18 @@ function Ovale:FirstInit()
 	
 	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
 
-	self.frame:SetWidth(64)
-	self.frame:SetHeight(64)
-	self.frame:SetPoint("TOPLEFT",self.db.profile.left,-self.db.profile.top)
+	self.frame:SetPoint("TOPLEFT",UIParent,"BOTTOMLEFT",self.db.profile.left,self.db.profile.top)
 
 	self.firstInit = true
 	
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	self.AceConfig:RegisterOptionsTable("Ovale", options.args.code, "Ovale")
 	self.AceConfig:RegisterOptionsTable("Ovale Profile", options.args.profile)
+	self.AceConfig:RegisterOptionsTable("Ovale Apparence", options.args.apparence)
 
 	self.AceConfigDialog:AddToBlizOptions("Ovale", "Ovale")
 	self.AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", "Ovale")
+	self.AceConfigDialog:AddToBlizOptions("Ovale Apparence", "Apparence", "Ovale")
 	
 	self.db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileReset", "HandleProfileChanges" )
@@ -165,12 +186,9 @@ function Ovale:FirstInit()
 
 	
 	if (self.db.profile.code) then
-		self.masterNode = self:Compile(self.db.profile.code)
+		self.masterNodes = self:Compile(self.db.profile.code)
 	end
-	
-	--self:UpdateFrame()
-	
-	self:Test()
+	self:UpdateFrame()
 end
 
 function Ovale:OnEnable()
@@ -598,11 +616,11 @@ function Ovale:ChargerDefaut()
 		profile = 
 		{
 			code = Ovale.defaut[englishClass],
-			left = 0,
-			top = 0,
+			left = 500,
+			top = 500,
 			check = {},
 			list = {},
-			apparence = {enCombat=false}
+			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64}
 		}
 	})
 end
@@ -623,6 +641,8 @@ end
 function Ovale:UpdateFrame()
 	self.frame:ReleaseChildren()
 
+	self.frame:UpdateIcons()
+	
 	self.checkBoxes = {}
 	
 	for k,v in pairs(self.casesACocher) do
@@ -658,9 +678,4 @@ end
 
 function Ovale:GetListValue(v)
 	return self.dropDowns[v] and self.dropDowns[v].value
-end
-
-function Ovale:Test()
-	this.node = {}
-	
 end

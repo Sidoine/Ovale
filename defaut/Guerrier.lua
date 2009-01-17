@@ -29,74 +29,89 @@ Define(CONCUSSIONBLOW 12809)
 Define(REND 772)
 Define(OVERPOWER 7384)
 
-if List(cri commandement) and BuffExpires(COMMANDSHOUT 3)
-    Spell(COMMANDSHOUT)
-   
-if List(cri guerre) and BuffExpires(BATTLESHOUT 3)
-    Spell(BATTLESHOUT)
- 
-if TargetClassification(worldboss) and CheckBoxOn(demo)
-      and TargetDebuffExpires(DEMOSHOUT 2)
-    Spell(DEMOSHOUT)
-    
-if Stance(2) #Defense
+AddIcon
 {
-   if TargetClassification(worldboss) and TargetDebuffExpires(THUNDERCLAP 2)
-      Spell(THUNDERCLAP)
-   
-   if CheckBoxOn(multi)
-   {
-        Spell(THUNDERCLAP)
+     if List(cri commandement) and
+       BuffExpires(COMMANDSHOUT 3)
+          Spell(COMMANDSHOUT)
+        
+     if List(cri guerre) and BuffExpires(BATTLESHOUT 3)
+          Spell(BATTLESHOUT)
+      
+     if TargetClassification(worldboss) 
+            and CheckBoxOn(demo)
+            and TargetDebuffExpires(DEMOSHOUT 2)
+          Spell(DEMOSHOUT)
+         
+     if Stance(2) #Defense
+     {
+        if TargetClassification(worldboss) 
+              and TargetDebuffExpires(THUNDERCLAP 2)
+            Spell(THUNDERCLAP)
+        
+        if CheckBoxOn(multi)
+        {
+               Spell(THUNDERCLAP)
+               Spell(SHOCKWAVE)
+        }
+        
+        Spell(REVENGE usable=1)
+        Spell(SHIELDSLAM)
+        
+        if Mana(more 10) Spell(DEVASTATE priority=2)
+     }
+
+     if Stance(3) #berserker
+     {
+        Spell(VICTORY usable=1)
+        
+       # if TargetLifePercent(less 20) Spell(EXECUTE)
+        Spell(EXECUTE usable=1)
+        
+        Spell(SHIELDSLAM usable=1)
         Spell(SHOCKWAVE)
-   }
-   
-   Spell(REVENGE usable=1)
-   Spell(SHIELDSLAM)
-   
-   if Mana(more 10) Spell(DEVASTATE priority=2)
+        Spell(CONCUSSIONBLOW)
+        
+        Spell(BLOODTHIRST)
+        if CheckBoxOn(tourbillon) Spell(WHIRLWIND)
+        if BuffPresent(SLAMBUFF) Spell(SLAM)
+        Spell(MORTALSTRIKE)
+        Spell(DEVASTATE)
+        
+        if TalentPoints(SLAMTALENT more 1)
+           and AfterWhiteHit(0.2)
+          Spell(SLAM)      
+     }
+
+     if Stance(1) #combat
+     {
+        Spell(VICTORY usable=1)
+        Spell(OVERPOWER usable=1)
+        Spell(MORTALSTRIKE)
+        
+        Spell(REND)
+        
+        Spell(SHIELDSLAM usable=1)
+        Spell(SHOCKWAVE)
+        Spell(CONCUSSIONBLOW)
+        
+        Spell(DEVASTATE)
+     }
+
+
+     if TargetDebuffExpires(SUNDER 5 stacks=5)
+        Spell(SUNDER)
 }
 
-if Stance(3) #berserker
+AddIcon
 {
-   Spell(VICTORY usable=1)
-   
-  # if TargetLifePercent(less 20) Spell(EXECUTE)
-   Spell(EXECUTE usable=1)
-   
-   Spell(SHIELDSLAM usable=1)
-   Spell(SHOCKWAVE)
-   Spell(CONCUSSIONBLOW)
-   
-   Spell(BLOODTHIRST)
-   if CheckBoxOn(tourbillon) Spell(WHIRLWIND)
-   if BuffPresent(SLAMBUFF) Spell(SLAM)
-   Spell(MORTALSTRIKE)
-   Spell(DEVASTATE)
-   
-   if TalentPoints(SLAMTALENT more 1) and AfterWhiteHit(0.2)
-       Spell(SLAM)      
+     if Mana(more 50)
+     {
+        if CheckBoxOn(multi)
+           Spell(CLEAVE doNotRepeat=1)
+        if CheckBoxOff(multi)
+          Spell(HEROICSTRIKE doNotRepeat=1)
+     }
 }
 
-if Stance(1) #combat
-{
-   Spell(VICTORY usable=1)
-   Spell(OVERPOWER usable=1)
-   Spell(MORTALSTRIKE)
-   
-   Spell(REND)
-   
-   Spell(SHIELDSLAM usable=1)
-   Spell(SHOCKWAVE)
-   Spell(CONCUSSIONBLOW)
-   
-   Spell(DEVASTATE)
-}
-
-if Mana(more 50)
-{
-   if CheckBoxOn(multi) Spell(CLEAVE doNotRepeat=1)
-   if CheckBoxOff(multi) Spell(HEROICSTRIKE doNotRepeat=1)
-}
-
-if TargetDebuffExpires(SUNDER 5 stacks=5) Spell(SUNDER)
 ]]

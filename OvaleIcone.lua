@@ -5,7 +5,7 @@
 		Ovale.traced = false
 	end
 		
-	local minAttente = Ovale:CalculerMeilleureAction(Ovale.masterNode)
+	local minAttente = Ovale:CalculerMeilleureAction(self.masterNode)
 	local meilleureAction = Ovale.retourAction
 	
 	if (Ovale.trace) then
@@ -29,7 +29,7 @@
 		end
 		
 		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
-		if (spell) then
+		if (spell and not Ovale.canStopChannelling[spell]) then
 			local attenteFinCast = endTime/1000 - Ovale.maintenant
 			if (attenteFinCast > minAttente) then
 				minAttente = attenteFinCast

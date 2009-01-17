@@ -27,7 +27,8 @@ Define(TALENTBACKDRAFT 1888)
 Define(CONFLAGRATE 17962)
 Define(DRAINSOUL 47855)
 
-
+AddIcon
+{
 if List(curse recklessness) and TargetDebuffExpires(CURSERECKLESSNESS 2) Spell(CURSERECKLESSNESS)
 if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) Spell(CURSEELEMENTS)
 if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)
@@ -40,10 +41,11 @@ if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1) Spell(UNSTABLEAFFLICTION d
 if TargetDebuffExpires(CORRUPTION 0 mine=1) Spell(CORRUPTION)
 if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
    and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE doNotRepeat=1)
-if TargetDebuffExpires(IMMOLATE 1.5 mine=1) Spell(IMMOLATE doNotRepeat=1)
+if TargetDebuffExpires(IMMOLATE 1.5 mine=1) and TargetLifePercent(more 25) Spell(IMMOLATE doNotRepeat=1)
 
 if TargetLifePercent(less 25) and Level(more 76) Spell(DRAINSOUL)
  
 if TalentPoints(TALENTEMBERSTORM more 0) Spell(SOULFIRE)
 Spell(SHADOWBOLT)
+}
 ]]

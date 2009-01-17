@@ -2,31 +2,52 @@ Ovale.defaut["PRIEST"] =
 [[AddCheckBox(etreinte "Étreinte vampirique")
 AddCheckBox(mort "Mot de l'ombre : Mort")
 
-# Mot de pouvoir : Robustesse
-if BuffExpires(1243 5) and BuffExpires(21562 5) Spell(1243)
-# Forme d'ombre
-if BuffExpires(15473 0) Spell(15473)
+Define(DEATH 32379)
+Define(FORTITUDE 1243)
+Define(PRAYERFORTITUDE 21562)
+Define(SHADOWFORM 15473)
+Define(VAMPIRICEMBRACE 15286)
+Define(VAMPIRICTOUCH 34914)
+Define(PAIN 589)
+Define(TALENTDIVINEFURY 1181)
+Define(MINDBLAST 8092)
+Define(MINDFLAY 15407)
+Define(HOLYFIRE 14914)
+Define(SMITE 585)
+Define(DEVOURINGPLAGUE 2944)
+Define(SHADOWWEAVE 15332)
 
-if CheckBoxOn(etreinte) and TargetDebuffExpires(15286 0 mine=1) 
-   Spell(15286 doNotRepeat=1)
+CanStopChannelling(MINDFLAY)
 
-#toucher vampirique
-if TargetDebuffExpires(34914 1 mine=1)
-   Spell(34914 doNotRepeat=1)
+AddIcon
+{
+     # Mot de pouvoir : Robustesse
+     if BuffExpires(FORTITUDE 5) and BuffExpires(PRAYERFORTITUDE 5) Spell(FORTITUDE)
+     # Forme d'ombre
+     if BuffExpires(SHADOWFORM 0) Spell(SHADOWFORM)
 
-#mot de l'ombre : douleur
-if TargetDebuffExpires(589 0 mine=1)
-   Spell(589)
-   
-if TalentPoints(1181 less 1) # Fureur divine
-   Spell(8092) # Attaque mentale
-   		
-if CheckBoxOn(mort) and LifePercent(more 95) Spell(32379)
+     if CheckBoxOn(etreinte) and TargetDebuffExpires(VAMPIRICEMBRACE 0 mine=1) 
+        Spell(VAMPIRICEMBRACE doNotRepeat=1)
 
-Spell(15407) #Fouet mental
+     if BuffPresent(SHADOWWEAVE stacks=5) and TargetDebuffExpires(PAIN 0 mine=1)
+        Spell(PAIN)
 
-if TargetDebuffExpires(14914 0 mine=1)
-    Spell(14914) #Flammes sacrées
+     if TargetDebuffExpires(VAMPIRICTOUCH 1 mine=1)
+        Spell(VAMPIRICTOUCH doNotRepeat=1)
+        
+     if TalentPoints(TALENTDIVINEFURY less 1) # Fureur divine
+        Spell(MINDBLAST) # Attaque mentale
+                  
+     if TargetDebuffExpires(DEVOURINGPLAGUE 0 mine=1)
+	    Spell(DEVOURINGPLAGUE doNotRepeat=1)
+	
+     if CheckBoxOn(mort) and LifePercent(more 95) Spell(DEATH)
 
-Spell(585) # châtiment
+     Spell(MINDFLAY priority=2)
+     
+     if TargetDebuffExpires(HOLYFIRE 0 mine=1)
+        Spell(HOLYFIRE)
+     
+     Spell(SMITE)
+}
 ]]

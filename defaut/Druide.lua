@@ -22,48 +22,68 @@ Define(ECLIPSESTARFIRE 48518)
 Define(ECLIPSEWRATH 48517)
 Define(TIGERSFURY 5217)
 
-if Stance(1)
+AddIcon
 {
-     if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFERAL 2)
-         Spell(FAERIEFERAL)
-         
+  if Stance(1)
+  {
+     if CheckBoxOn(lucioles) and 
+          TargetDebuffExpires(FAERIEFERAL 2)
+       Spell(FAERIEFERAL)
+        
      Spell(MANGLEBEAR)
-     
-     if CheckBoxOn(demo) and TargetDebuffExpires(DEMOROAR 2)
-         Spell(DEMOROAR)
-     
+    
+     if CheckBoxOn(demo) and 
+          TargetDebuffExpires(DEMOROAR 2)
+       Spell(DEMOROAR)
+    
      if CheckBoxOn(multi) Spell(SWIPE)    
-     
-     if CheckBoxOn(blood) and Mana(more 10) Spell(LACERATE)
-     if Mana(more 50) Spell(MAUL doNotRepeat=1)
-}
+    
+     if CheckBoxOn(blood) and Mana(more 10)
+      Spell(LACERATE)
+  }
 
-if Stance(3)
-{
-     if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFERAL 2)
-         Spell(FAERIEFERAL)
+  if Stance(3)
+  {
+     if CheckBoxOn(lucioles) and
+         TargetDebuffExpires(FAERIEFERAL 2)
+       Spell(FAERIEFERAL)
 
      Spell(TIGERSFURY)
-     
+    
      if ComboPoints(more 4) and Mana(more 70)
-         Spell(RIP)
-     
+       Spell(RIP)
+    
      if ComboPoints(less 5)
      {
-         if TargetDebuffExpires(MANGLECAT 0) Spell(MANGLECAT)
-         Spell(SHRED)
+       if TargetDebuffExpires(MANGLECAT 0)
+          Spell(MANGLECAT)
+       Spell(SHRED)
      }
+  }
+
+  unless Stance(1) or Stance(3)
+  {
+     if CheckBoxOn(lucioles) and 
+         TargetDebuffExpires(FAERIEFIRE 2)
+      Spell(FAERIEFIRE)
+       
+     if TargetDebuffExpires(INSECTSWARM 0)
+       Spell(INSECTSWARM)  
+     if TargetDebuffExpires(MOONFIRE 0)
+        Spell(MOONFIRE)
+     unless BuffPresent(ECLIPSEWRATH)
+        Spell(STARFIRE)
+     Spell(WRATH)
+  }
 }
 
-unless Stance(1) or Stance(3)
+AddIcon
 {
-     if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2)
-        Spell(FAERIEFIRE)
-        
-     if TargetDebuffExpires(INSECTSWARM 0) Spell(INSECTSWARM)     
-     if TargetDebuffExpires(MOONFIRE 0) Spell(MOONFIRE)
-     unless BuffPresent(ECLIPSEWRATH)
-          Spell(STARFIRE)
-     Spell(WRATH)
+  if Stance(1)
+  {  
+     if Mana(more 50)
+       Spell(MAUL doNotRepeat=1)
+  }
 }
+
 ]]

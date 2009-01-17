@@ -38,8 +38,31 @@ do
 	
 	local function frameOnMouseUp(this)
 		this:StopMovingOrSizing()
-		Ovale.db.profile.left = this:GetLeft()
-		Ovale.db.profile.top = this:GetTop()
+		if (Ovale.db.profile.left~=this:GetLeft() or Ovale.db.profile.top ~=this:GetTop()) then
+			Ovale.db.profile.left = this:GetLeft()
+			Ovale.db.profile.top = this:GetTop()
+		else
+			if (this.obj.content:IsShown()) then
+				this.obj.content:Hide()
+			else
+				this.obj.content:Show()
+			end
+		end
+	end
+	
+	local function frameOnEnter(this)
+		--for i,child in ipairs(this.obj.children) do
+		--	child.frame:Show()
+		--end
+	--	this.obj.content:Show()
+	end
+	
+	
+	local function frameOnLeave(this)
+		--for i,child in ipairs(this.obj.children) do
+		--	child.frame:Hide()
+		--end
+		--this.obj.content:Hide()
 	end
 	
 	local function titleOnMouseUp(this)
@@ -90,7 +113,6 @@ do
 	
 	local function OnAcquire(self)
 		self.frame:SetParent(UIParent)
-		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self:ApplyStatus()
 	end
 	
@@ -142,9 +164,43 @@ do
 		content.height = contentheight
 	end
 	
+	local function OnLayoutFinished(self, width, height)
+		-- self.content:SetWidth(width)
+		-- self.content:SetHeight(height)
+		if (not width) then
+			width = self.content:GetWidth()
+		end
+		self.content:SetWidth(width)
+		self.content:SetHeight(height+50)
+	end
+	
+	local function UpdateIcons(self)
+		for k, icon in pairs(self.icone) do
+			icon:Hide()
+		end
+		
+		for k,node in pairs(Ovale.masterNodes) do
+			if (not self.icone[k]) then
+				self.icone[k] = CreateFrame("Frame",nil,self.frame,"OvaleIcone");
+			end
+			self.icone[k].masterNode = node
+			self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",Ovale.db.profile.apparence.iconWidth*(k-1),0)
+			self.icone[k]:SetWidth(Ovale.db.profile.apparence.iconWidth)
+			self.icone[k]:SetHeight(Ovale.db.profile.apparence.iconHeight)
+			self.icone[k]:Show();
+		end
+		
+		self.frame:SetWidth(#Ovale.masterNodes * Ovale.db.profile.apparence.iconWidth)
+		self.frame:SetHeight(Ovale.db.profile.apparence.iconHeight)
+		self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",#Ovale.masterNodes * Ovale.db.profile.apparence.iconWidth,0)
+	end
+	
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
 		local self = {}
+		
+		-- self.optionsVisible = false
+		
 		self.type = "Frame"
 		
 		self.Hide = Hide
@@ -155,10 +211,13 @@ do
 		self.SetStatusText = SetStatusText
 		self.SetStatusTable = SetStatusTable
 		self.ApplyStatus = ApplyStatus
-		self.OnWidthSet = OnWidthSet
-		self.OnHeightSet = OnHeightSet
+	--	self.OnWidthSet = OnWidthSet
+	--	self.OnHeightSet = OnHeightSet
+		self.LayoutFinished = OnLayoutFinished
+		self.UpdateIcons = UpdateIcons
 		
 		self.localstatus = {}
+		self.icone = {}
 		
 		self.frame = frame
 		frame.obj = self
@@ -167,30 +226,26 @@ do
 		frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
 		frame:EnableMouse()
 		frame:SetMovable(true)
-		frame:SetResizable(true)
-		frame:SetFrameStrata("FULLSCREEN_DIALOG")
+		--frame:SetResizable(true)
+		frame:SetFrameStrata("BACKGROUND")
 		frame:SetScript("OnMouseDown", frameOnMouseDown)
 		-- title:SetScript("OnMouseDown",titleOnMouseDown)
 		frame:SetScript("OnMouseUp", frameOnMouseUp)
+		frame:SetScript("OnEnter", frameOnEnter)
+		frame:SetScript("OnLeave", frameOnLeave)
 		
-		--[[frame:SetBackdrop(FrameBackdrop)
-		frame:SetBackdropColor(0,0,0,1)]]--
 		frame:SetScript("OnHide",frameOnClose)
-		frame:SetMinResize(400,200)
-		frame:SetToplevel(true)
-
-		self.icone = CreateFrame("Frame",nil,frame,"OvaleIcone");
-		self.icone:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
-		self.icone:SetWidth(64)
-		self.icone:SetHeight(64)
-		self.icone:Show();
 		
 		--Container Support
 		local content = CreateFrame("Frame",nil,frame)
 		self.content = content
 		content.obj = self
-		content:SetPoint("TOPLEFT",frame,"TOPLEFT",64,0)
-		content:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
+		content.test = "test"
+		content:SetWidth(200)
+		content:SetHeight(100)
+		--content:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
+		-- content:EnableMouse()
+		content:Hide()
 		
 		AceGUI:RegisterAsContainer(self)
 
@@ -200,68 +255,3 @@ do
 	AceGUI:RegisterWidgetType(Type,Constructor,Version)
 end
 
-
-
---[[
-function OvaleFrame_OnLoad(self)
-	self.icone = CreateFrame("Frame",nil,self,"OvaleIcone");
-	self.icone:SetAllPoints(self)
-	self.icone:Show();
-	
-	--self.cases = {}
-	--local case = CreateFrame("Button", "OvaleCheck", self)
-	--case:SetPoint("TOPLEFT", 0, 0)
-	--self.cases[#self.cases] = case
-	self.checkBoxes = {}
-	
-	self.dropDowns = {};
-	local tf = LibStub("AceGUI-3.0"):Create("Frame")
-	tf:SetWidth(200)
-	tf:SetHeight(200)
-	local tl = LibStub("AceGUI-3.0"):Create("Label")
-		tl:SetText("Anfangstext")
-	local ti = LibStub("AceGUI-3.0"):Create("Icon")
-		ti:SetHeight(50)
-		ti:SetWidth(50)
-		
-	tf:AddChild(tl)
-	tf:AddChild(ti)
-end
-
-function OvaleFrame_Update(self)
-	for v,k in pairs(self.checkBoxes) do
-		k:Hide()
-	end
-	
-	for v,k in pairs(Ovale.casesACocher) do
-		if (not self.checkBoxes[v]) then
-			self.checkBoxes[v] = OvaleFrame_CreateCheckBox(self, v)
-		end
-		self.checkBoxes[v]:Show()
-		self.checkBoxes[v].text:SetText(k)
-	end
-	
-end
-
-
--- Idem. Liste déroulante
-
-
-
-
-
-function OvaleFrame_OnUpdate(self)
-
-end
-function OvaleFrame_OnMouseDown(self,button)
-	if ( button == "LeftButton") then
-		self:StartMoving();
-	end
-end
-
-function OvaleFrame_OnMouseUp(self, button)
-	if ( button == "LeftButton" ) then	
-		self:StopMovingOrSizing();
-	end
-end
-]]--
