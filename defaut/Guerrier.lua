@@ -1,11 +1,5 @@
 Ovale.defaut["WARRIOR"] =
-[[AddCheckBox(multi "Multicible")
-AddCheckBox(demo "Cri démoralisant")
-AddCheckBox(tourbillon "Tourbillon")
-AddListItem(cri aucun "Aucun cri")
-AddListItem(cri guerre "Cri de guerre")
-AddListItem(cri commandement "Cri de commandement")
-
+[[
 Define(THUNDERCLAP 6343)
 Define(SHOCKWAVE 46968)
 Define(DEMOSHOUT 1160)
@@ -29,13 +23,20 @@ Define(CONCUSSIONBLOW 12809)
 Define(REND 772)
 Define(OVERPOWER 7384)
 
+AddCheckBox(multi L(AOE))
+AddCheckBox(demo SpellName(DEMOSHOUT))
+AddCheckBox(whirlwind SpellName(WHIRLWIND))
+AddListItem(shout none L(None))
+AddListItem(shout battle SpellName(BATTLESHOUT))
+AddListItem(shout command SpellName(COMMANDSHOUT))
+
 AddIcon
 {
-     if List(cri commandement) and
+     if List(shout command) and
        BuffExpires(COMMANDSHOUT 3)
           Spell(COMMANDSHOUT)
         
-     if List(cri guerre) and BuffExpires(BATTLESHOUT 3)
+     if List(shout battle) and BuffExpires(BATTLESHOUT 3)
           Spell(BATTLESHOUT)
       
      if TargetClassification(worldboss) 
@@ -68,12 +69,12 @@ AddIcon
        # if TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(EXECUTE usable=1)
         
-        Spell(SHIELDSLAM usable=1)
+        if HasShield() Spell(SHIELDSLAM)
         Spell(SHOCKWAVE)
         Spell(CONCUSSIONBLOW)
         
         Spell(BLOODTHIRST)
-        if CheckBoxOn(tourbillon) Spell(WHIRLWIND)
+        if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
         if BuffPresent(SLAMBUFF) Spell(SLAM)
         Spell(MORTALSTRIKE)
         Spell(DEVASTATE)

@@ -136,6 +136,15 @@ Ovale.conditions=
 		local points = GetComboPoints("player")
 		return compare(points, condition[1], condition[2])
 	end,
+	HasShield = function(condition)
+		local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
+		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
+		if (itemLoc=="INVTYPE_SHIELD") then
+			return 0
+		else
+			return nil
+		end
+	end,
 	-- Compare with the player level
 	-- 1 : "less" or "more"
 	-- 2 : the limit

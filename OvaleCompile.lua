@@ -1,3 +1,5 @@
+local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+
 local node={}
 local defines = {}
 
@@ -138,6 +140,21 @@ local function ParseCanStopChannelling(text)
 	else
 		Ovale:Print("CanStopChannelling with unknown spell "..text)
 	end
+	return ""
+end
+
+local function ParseSpellName(text)
+	local spell = Ovale:GetSpellInfoOrNil(text)
+	if (spell) then
+		return '"'..spell..'"'
+	else
+		Ovale:Print("SpellName of "..text.." unknown")
+		return nil
+	end
+end
+
+local function ParseL(text)
+	return '"'..L[text]..'"'
 end
 
 function Ovale:Compile(text)
@@ -157,11 +174,14 @@ function Ovale:Compile(text)
 		text = string.gsub(text, "([^%w])"..k.."([^%w])", "%1"..v.."%2")
 	end
 	
+	-- Fonctions
+	text = string.gsub(text, "SpellName%s*%(%s*(%w+)%s*%)", ParseSpellName)
+	text = string.gsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
+	
 	-- Options diverses
 	Ovale.canStopChannelling = {}
 	text = string.gsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
-		
-	
+			
 	-- On vire les espaces en trop
 	text = string.gsub(text, "\n", " ")
 	text = string.gsub(text, "%s+", " ")

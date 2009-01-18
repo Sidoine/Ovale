@@ -9,3 +9,7 @@ L["Afficher en combat uniquement"] = "Show in combat only"
 L["Code"] = "Code"
 L["Compiler"] = "Compile"
 L["BUGTEXT"] = "Sometimes the button won't highlight when you try to confirm changes and the text will scroll if you click. Please, put the cursor at the bottom of the text before accepting the changes."
+L["AOE"] = "AOE"
+L["None"] = "None"
+L["Blood"] = true
+L["Melee"] = true

@@ -1,7 +1,5 @@
 Ovale.defaut["PRIEST"] =
-[[AddCheckBox(etreinte "Étreinte vampirique")
-AddCheckBox(mort "Mot de l'ombre : Mort")
-
+[[
 Define(DEATH 32379)
 Define(FORTITUDE 1243)
 Define(PRAYERFORTITUDE 21562)
@@ -17,13 +15,14 @@ Define(SMITE 585)
 Define(DEVOURINGPLAGUE 2944)
 Define(SHADOWWEAVE 15332)
 
+AddCheckBox(etreinte SpellName(VAMPIRICEMBRACE))
+AddCheckBox(mort SpellName(DEATH))
+
 CanStopChannelling(MINDFLAY)
 
 AddIcon
 {
-     # Mot de pouvoir : Robustesse
      if BuffExpires(FORTITUDE 5) and BuffExpires(PRAYERFORTITUDE 5) Spell(FORTITUDE)
-     # Forme d'ombre
      if BuffExpires(SHADOWFORM 0) Spell(SHADOWFORM)
 
      if CheckBoxOn(etreinte) and TargetDebuffExpires(VAMPIRICEMBRACE 0 mine=1) 

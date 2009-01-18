@@ -1,9 +1,5 @@
 Ovale.defaut["DRUID"] =
-[[AddCheckBox(multi "Multicible")
-AddCheckBox(blood "Saignement")
-AddCheckBox(demo "Rugissement démoralisant")
-AddCheckBox(lucioles "Lucioles")
-
+[[
 Define(FAERIEFIRE 770)
 Define(FAERIEFERAL 16857)
 Define(MANGLEBEAR 33878)
@@ -21,6 +17,11 @@ Define(WRATH 5176)
 Define(ECLIPSESTARFIRE 48518)
 Define(ECLIPSEWRATH 48517)
 Define(TIGERSFURY 5217)
+
+AddCheckBox(multi L(AOE))
+AddCheckBox(blood L(Blood))
+AddCheckBox(demo SpellName(DEMOROAR))
+AddCheckBox(lucioles SpellName(FAERIEFIRE))
 
 AddIcon
 {
