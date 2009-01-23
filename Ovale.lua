@@ -530,11 +530,15 @@ function Ovale:CalculerMeilleureAction(element)
 			self:Print(element.type)
 		end
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		if (tempsA~=nil) then
+		if (tempsA==0) then
 			return nil
 		end
 		local tempsB = Ovale:CalculerMeilleureAction(element.b)
-		return tempsB
+		if (tempsA==nil or tempsA>tempsB) then
+			return tempsB
+		else
+			return nil
+		end
 	elseif (element.type == "or") then
 		if (Ovale.trace) then
 			self:Print(element.type)
