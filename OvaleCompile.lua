@@ -3,7 +3,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local node={}
 local defines = {}
 
-local function ParseFunction(func, params)
+local function ParseParameters(params)
 	local paramList = {}
 	for k,v in string.gmatch(params, "(%w+)=(%w+)") do
 		if (string.match(v,"^%-?%d+%.?%d*$")) then
@@ -20,6 +20,11 @@ local function ParseFunction(func, params)
 		paramList[n+1] = w
 		n=n+1
 	end
+	return paramList
+end
+
+local function ParseFunction(func, params)
+	local paramList = ParseParameters(params)
 	local newNode = { type="function", func=func, params=paramList}
 	node[#node+1] = newNode
 	return "node"..#node
@@ -99,14 +104,13 @@ local function ParseDefine(key, value)
 	return ""
 end
 
-local function ParseAddIcon(text)
+local function ParseAddIcon(params, text)
 	text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
 	text = subtest(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 	text = subtest(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 	
 	text = subtest(text, "{([^{}]*)}", ParseGroup)
-	
-	-- text = ParseGroup(text)
+
 	local masterNode
 	if (text) then
 		masterNode = string.match(text, "node(%d+)")
@@ -115,12 +119,17 @@ local function ParseAddIcon(text)
 		self:Print("no master node")
 		return nil
 	end
+	
+	-- Si il reste autre chose que des espaces, c'est une erreur de syntaxe
 	text = string.gsub(text, "node%d+", "", 1)
 	if (string.match(text,"[^ ]")) then
 		self:Print("syntax error:"..text)
 		return nil
 	end
+	
+	-- On convertit le numéro de node en node
 	masterNode = node[tonumber(masterNode)]
+	masterNode.params = ParseParameters(params)
 	return masterNode
 end
 
@@ -192,8 +201,8 @@ function Ovale:Compile(text)
 	local masterNodes ={}
 	
 	-- On compile les AddIcon
-	for t in string.gmatch(text, "AddIcon%s*(%b{})") do
-		masterNodes[#masterNodes+1] = ParseAddIcon(t)
+	for p,t in string.gmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
+		masterNodes[#masterNodes+1] = ParseAddIcon(p,t)
 	end
 	return masterNodes
 end

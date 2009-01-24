@@ -16,6 +16,10 @@
 	if (Ovale.bug and not Ovale.traced) then
 		Ovale.trace = true
 	end
+	
+	if (self.masterNode.params.nocd == 1 and minAttente~=0) then
+		minAttente = nil
+	end
 		
 	if (minAttente~=nil and meilleureAction) then	
 	
@@ -58,9 +62,21 @@
 			self.cd:SetCooldown(self.debutAction, minAttente+(Ovale.maintenant-self.debutAction));
 		end
 		
+		-- Le temps restant
+		if (Ovale.db.profile.apparence.numeric) then
+			self.remains:SetText(string.format("%.1f", minAttente))
+			self.remains:Show()
+		else
+			self.remains:Hide()
+		end
+		
 		-- Le raccourcis clavier 
-		self.shortcut:Show()
-		self.shortcut:SetText(Ovale.shortCut[meilleureAction])
+		if (Ovale.db.profile.apparence.raccourcis) then
+			self.shortcut:Show()
+			self.shortcut:SetText(Ovale.shortCut[meilleureAction])
+		else
+			self.shortcut:Hide()
+		end
 		
 		-- L'indicateur de portée
 		self.aPortee:Show()
@@ -77,6 +93,7 @@
 		self.icone:Hide()
 		self.aPortee:Hide()
 		self.shortcut:Hide()
+		self.remains:Hide()
 	end
 end
 
@@ -93,6 +110,12 @@ function OvaleIcone_OnLoad(self)
 	self.shortcut:SetText("A");
 	self.shortcut:SetTextColor(1,1,1);
 	self.shortcut:Show();
+	
+	self.remains = self:CreateFontString(nil, "OVERLAY");
+	self.remains:SetFontObject("GameFontHighlightLarge");
+	self.remains:SetAllPoints(self);
+	self.remains:SetTextColor(1,1,1);
+	self.remains:Show();
 	
 	self.aPortee = self:CreateTexture();
 	self.aPortee:SetDrawLayer("OVERLAY")

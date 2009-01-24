@@ -179,20 +179,43 @@ do
 			icon:Hide()
 		end
 		
+		local left = 0
+		local maxHeight = 0
+		local maxWidth = 0
+		local top = 0
+		
 		for k,node in pairs(Ovale.masterNodes) do
 			if (not self.icone[k]) then
 				self.icone[k] = CreateFrame("Frame",nil,self.frame,"OvaleIcone");
 			end
 			self.icone[k].masterNode = node
-			self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",Ovale.db.profile.apparence.iconWidth*(k-1),0)
-			self.icone[k]:SetWidth(Ovale.db.profile.apparence.iconWidth)
-			self.icone[k]:SetHeight(Ovale.db.profile.apparence.iconHeight)
+			local width, height
+			if (node.params.size == "small") then
+				width = Ovale.db.profile.apparence.smallIconWidth
+				height = Ovale.db.profile.apparence.smallIconHeight
+			else
+				width = Ovale.db.profile.apparence.iconWidth
+				height = Ovale.db.profile.apparence.iconHeight
+			end
+			if (top + height > Ovale.db.profile.apparence.iconHeight) then
+				top = 0
+				left = maxWidth
+			end
+			self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",left,-top)
+			self.icone[k]:SetWidth(width)
+			self.icone[k]:SetHeight(height)
 			self.icone[k]:Show();
+			top = top + height
+			if (top> maxHeight) then
+				maxHeight = top
+			end
+			if (left + width > maxWidth) then
+				maxWidth = left + width
+			end
 		end
-		
-		self.frame:SetWidth(#Ovale.masterNodes * Ovale.db.profile.apparence.iconWidth)
-		self.frame:SetHeight(Ovale.db.profile.apparence.iconHeight)
-		self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",#Ovale.masterNodes * Ovale.db.profile.apparence.iconWidth,0)
+		self.frame:SetWidth(maxWidth)
+		self.frame:SetHeight(maxHeight)
+		self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth,0)
 	end
 	
 	local function Constructor()

@@ -43,8 +43,9 @@ local options =
 			{
 				combatUniquement =
 				{
+					order = 1,
 					type = "toggle",
-					name = L["Afficher en combat uniquement"],
+					name = L["En combat uniquement"],
 					get = function(info)
 						return Ovale.db.profile.apparence.enCombat
 					end,
@@ -55,22 +56,62 @@ local options =
 				},
 				iconWidth = 
 				{
+					order = 2,
 					type = "range",
 					name = L["Largeur des icônes"],
 					desc = L["La largeur des icônes"],
-					min = 16, max = 256, step = 1,
+					min = 16, max = 256, step = 2,
 					get = function(info) return Ovale.db.profile.apparence.iconWidth end,
 					set = function(info,value) Ovale.db.profile.apparence.iconWidth = value; Ovale:UpdateFrame() end
 				},
 				iconHeight = 
 				{
+					order = 3,
 					type = "range",
 					name = L["Hauteur des icônes"],
 					desc = L["La hauteur des icônes"],
-					min = 16, max = 256, step = 1,
+					min = 16, max = 256, step = 2,
 					get = function(info) return Ovale.db.profile.apparence.iconHeight end,
 					set = function(info,value) Ovale.db.profile.apparence.iconHeight = value; Ovale:UpdateFrame() end
-				}
+				},
+				smallIconWidth = 
+				{
+					order = 4,
+					type = "range",
+					name = L["Largeur des petites icônes"],
+					desc = L["La largeur des petites icônes"],
+					min = 16, max = 256, step = 2,
+					get = function(info) return Ovale.db.profile.apparence.smallIconWidth end,
+					set = function(info,value) Ovale.db.profile.apparence.smallIconWidth = value; Ovale:UpdateFrame() end
+				},
+				smallIconHeight = 
+				{
+					order = 5,
+					type = "range",
+					name = L["Hauteur des petites icônes"],
+					desc = L["La hauteur des petites icônes"],
+					min = 16, max = 256, step = 2,
+					get = function(info) return Ovale.db.profile.apparence.smallIconHeight end,
+					set = function(info,value) Ovale.db.profile.apparence.smallIconHeight = value; Ovale:UpdateFrame() end
+				},
+				raccourcis =
+				{
+					order = 6,
+					type = "toggle",
+					name = L["Raccourcis clavier"],
+					desc = L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"],
+					get = function(info) return Ovale.db.profile.apparence.raccourcis end,
+					set = function(info, value) Ovale.db.profile.apparence.raccourcis = value end
+				},
+				numeric =
+				{
+					order = 7,
+					type = "toggle",
+					name = L["Affichage numérique"],
+					desc = L["Affiche le temps de recharge sous forme numérique"],
+					get = function(info) return Ovale.db.profile.apparence.numeric end,
+					set = function(info, value) Ovale.db.profile.apparence.numeric = value end
+				}	
 			}
 		},
 		code =
@@ -624,7 +665,8 @@ function Ovale:ChargerDefaut()
 			top = 500,
 			check = {},
 			list = {},
-			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64}
+			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64,
+				smallIconWidth=32, smallIconHeight=32, raccourcis=true, numeric=false}
 		}
 	})
 end
