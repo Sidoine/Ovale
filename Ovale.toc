@@ -1,8 +1,9 @@
 ﻿## Interface: 30000
 ## Title: Ovale
-## Notes: Affiche l'icône du prochain sort à lancer
+## Notes: Show the icon of the next spell to cast
+## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 0.1
+## Version: 3.0.0
 ## OptionalDeps: Ace3
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
@@ -29,4 +30,4 @@ defaut\Mage.lua
 defaut\Paladin.lua
 defaut\Pretre.lua
 defaut\Voleur.lua
-
+defaut\Chevalier.lua
