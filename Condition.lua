@@ -219,11 +219,12 @@ Ovale.conditions=
 		end
 	end,
 	TargetCreatureType = function(condition)
-		if (UnitCreatureType("target") == LBCT[condition[1]]) then
-			return 0
-		else
-			return nil
-		end		
+		for _,v in pairs(condition) do
+			if (UnitCreatureType("target") == LBCT[v]) then
+				return 0
+			end
+		end
+		return nil
 	end,
 	-- Test if a debuff will expire on the target after a given time, or if there is less than the
 	-- given number of stacks (if stackable)
