@@ -1,3 +1,5 @@
+local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
+
 local function compare(a, comparison, b)
 	if (comparison == "more") then
 		if (not b or (a~=nil and a>b)) then
@@ -215,6 +217,13 @@ Ovale.conditions=
 		else
 			return nil
 		end
+	end,
+	TargetCreatureType = function(condition)
+		if (UnitCreatureType("target") == LBCT[condition[1]]) then
+			return 0
+		else
+			return nil
+		end		
 	end,
 	-- Test if a debuff will expire on the target after a given time, or if there is less than the
 	-- given number of stacks (if stackable)

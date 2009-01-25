@@ -17,7 +17,7 @@
 		Ovale.trace = true
 	end
 	
-	if (self.masterNode.params.nocd == 1 and minAttente~=0) then
+	if (self.masterNode.params.nocd == 1 and minAttente>1.5) then
 		minAttente = nil
 	end
 		

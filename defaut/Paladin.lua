@@ -17,6 +17,9 @@ Define(THEARTOFWAR 59578)
 Define(FLASHOFLIGHT 19750)
 Define(EXORCISM 879)
 Define(AVENGINGWRATH 31884)
+Define(SHIELDOFRIGHTEOUSNESS 53600)
+Define(HOLYSHIELD 20925)
+Define(HAMMEROFTHERIGHTEOUS 53595)
 
 AddListItem(sceau piete SpellName(SEALRIGHTEOUSNESS))
 AddListItem(sceau autorite SpellName(SEALCOMMAND))
@@ -43,12 +46,15 @@ AddIcon
      }
      if List(jugement lumiere) Spell(JUDGELIGHT)
      if List(jugement sagesse) Spell(JUDGEWISDOM)
-     if TargetLifePercent(less 35) Spell(HAMMEROFWRATH)
+     if TargetTargetIsPlayer(yes) Spell(HOLYSHIELD)
+     Spell(HAMMEROFTHERIGHTEOUS)
+     Spell(HAMMEROFWRATH usable=1)
      Spell(INQUISITION)
      if CheckBoxOn(tempete) Spell(DIVINESTORM)
      if CheckBoxOn(consecration) Spell(CONSECRATE)
      Spell(HOLYSHOCK) 
-     Spell(EXORCISM usable=1)
+     if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
+     if TargetCreatureType(Undead) Spell(EXORCISM usable=1)
      if BuffPresent(THEARTOFWAR) Spell(FLASHOFLIGHT priority=2)
 }
 AddIcon
