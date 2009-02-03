@@ -140,6 +140,10 @@ Ovale.conditions=
 	end,
 	HasShield = function(condition)
 		local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
+		if (not id) then
+			return nil
+		end
+		
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
 		if (itemLoc=="INVTYPE_SHIELD") then
 			return 0
