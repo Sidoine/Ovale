@@ -48,6 +48,12 @@ local function ParseAnd(a,b)
 	return "node"..#node
 end
 
+local function ParseBefore(a,b)
+	local newNode = {type="before", time=tonumber(a), a=node[tonumber(b)]}
+	node[#node+1] = newNode
+	return "node"..#node
+end
+
 local function ParseOr(a,b)
 	local newNode = {type="or", a=node[tonumber(a)], b=node[tonumber(b)]}
 	node[#node+1] = newNode
@@ -108,6 +114,7 @@ local function ParseAddIcon(params, text)
 	text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
 	text = subtest(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 	text = subtest(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
+	text = subtest(text, "(%d+.?%d*)s%s+before%s+node(%d+)", ParseBefore)
 	
 	text = subtest(text, "{([^{}]*)}", ParseGroup)
 

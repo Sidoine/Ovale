@@ -21,3 +21,6 @@ L["Raccourcis clavier"] = "Keyboard shortcuts"
 L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] = "Show keyboard shortcuts in the icon bottom-left corner"
 L["Affichage numérique"] = "Numeric display"
 L["Affiche le temps de recharge sous forme numérique"] = "Show the remaining time in numerical form"
+L["Si cible uniquement"] = "If has target"
+L["Verrouiller position"] = "Lock position"
+L["Vertical"] = true

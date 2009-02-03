@@ -23,6 +23,7 @@ Ovale.checkBoxes = {}
 Ovale.dropDowns = {}
 Ovale.masterNodes = nil
 Ovale.bug = false
+Ovale.enCombat = false
 
 Ovale.arbre = {}
 
@@ -51,6 +52,19 @@ local options =
 					end,
 					set = function(info, v)
 						Ovale.db.profile.apparence.enCombat = v
+					end,
+					width = full
+				},
+				targetOnly =
+				{
+					order = 1.5,
+					type = "toggle",
+					name = L["Si cible uniquement"],
+					get = function(info)
+						return Ovale.db.profile.apparence.avecCible
+					end,
+					set = function(info, v)
+						Ovale.db.profile.apparence.avecCible = v
 					end,
 					width = full
 				},
@@ -111,7 +125,24 @@ local options =
 					desc = L["Affiche le temps de recharge sous forme numérique"],
 					get = function(info) return Ovale.db.profile.apparence.numeric end,
 					set = function(info, value) Ovale.db.profile.apparence.numeric = value end
-				}	
+				},
+				verrouille =
+				{
+					order = 8,
+					type = "toggle",
+					name = L["Verrouiller position"],
+					get = function(info) return Ovale.db.profile.apparence.verrouille end,
+					set = function(info, value) Ovale.db.profile.apparence.verrouille = value end
+				},
+				vertical =
+				{
+					order = 9,
+					type = "toggle",
+					name = L["Vertical"],
+					get = function(info) return Ovale.db.profile.apparence.vertical end,
+					set = function(info, value) Ovale.db.profile.apparence.vertical = value; Ovale:UpdateFrame() end
+				},
+				
 			}
 		},
 		code =
@@ -248,15 +279,11 @@ function Ovale:OnEnable()
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
-	if (self.db.profile.apparence.enCombat) then
-		self.frame:Hide()
-	end
+	self.enCombat = false
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
-	if (self.db.profile.apparence.enCombat) then
-		self.frame:Show()
-	end
+	self.enCombat = true
 end
 
 function Ovale:OnDisable()
@@ -549,6 +576,18 @@ function Ovale:CalculerMeilleureAction(element)
 			end
 	 		return temps
 		end
+	elseif (element.type == "before") then
+		if (Ovale.trace) then
+			self:Print(element.time.."s before")
+		end
+		local tempsA = Ovale:CalculerMeilleureAction(element.a)
+		if (tempsA==nil) then
+			return nil
+		end
+		if (tempsA<element.time) then
+			return 0
+		end
+		return tempsA - element.time 
 	elseif (element.type == "and" or element.type == "if") then
 		if (Ovale.trace) then
 			self:Print(element.type)
@@ -587,7 +626,7 @@ function Ovale:CalculerMeilleureAction(element)
 		
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
 		local tempsB = Ovale:CalculerMeilleureAction(element.b)
-		if (tempsB==nil or tempsB>tempsA) then
+		if (tempsB==nil or (tempsA~=nil and tempsB>tempsA)) then
 			return tempsA
 		else
 			return tempsB
@@ -626,7 +665,7 @@ function Ovale:CalculerMeilleureAction(element)
 						-- que si il se lance au moins 1,5s avant
 						maxEcart = -self.gcd
 					else
-						maxEcart = 0
+						maxEcart = -0.01
 					end
 					if (nouveauTemps-meilleurTempsFils < maxEcart) then
 						remplacer = true
@@ -666,7 +705,8 @@ function Ovale:ChargerDefaut()
 			check = {},
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64,
-				smallIconWidth=32, smallIconHeight=32, raccourcis=true, numeric=false}
+				smallIconWidth=32, smallIconHeight=32, raccourcis=true, numeric=false, avecCible = false,
+				verrouille = false, vertical = false}
 		}
 	})
 end

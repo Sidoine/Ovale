@@ -27,17 +27,17 @@ do
 		this.obj:Hide()
 	end
 	
-	local function frameOnMouseDown(this)
-		this:StartMoving()
-		AceGUI:ClearFocus()
-	end
 	
-	local function titleOnMouseDown(this)
-		AceGUI:ClearFocus()
+	local function frameOnMouseDown(this)
+		if (not Ovale.db.profile.apparence.verrouille) then
+			this:StartMoving()
+			AceGUI:ClearFocus()
+		end
 	end
 	
 	local function frameOnMouseUp(this)
 		this:StopMovingOrSizing()
+		
 		if (Ovale.db.profile.left~=this:GetLeft() or Ovale.db.profile.top ~=this:GetTop()) then
 			Ovale.db.profile.left = this:GetLeft()
 			Ovale.db.profile.top = this:GetTop()
@@ -65,44 +65,6 @@ do
 		--this.obj.content:Hide()
 	end
 	
-	local function titleOnMouseUp(this)
-		--[[ local frame = this:GetParent()
-		frame:StopMovingOrSizing()
-		local self = frame.obj
-		local status = self.status or self.localstatus
-		status.width = frame:GetWidth()
-		status.height = frame:GetHeight()
-		status.top = frame:GetTop()
-		status.left = frame:GetLeft() ]]--
-	end
-	
-	local function sizerseOnMouseDown(this)
-		this:GetParent():StartSizing("BOTTOMRIGHT")
-		AceGUI:ClearFocus()
-	end
-	
-	local function sizersOnMouseDown(this)
-		this:GetParent():StartSizing("BOTTOM")
-		AceGUI:ClearFocus()
-	end
-	
-	local function sizereOnMouseDown(this)
-		this:GetParent():StartSizing("RIGHT")
-		AceGUI:ClearFocus()
-	end
-	
-	local function sizerOnMouseUp(this)
-		this:GetParent():StopMovingOrSizing()
-	end
-
-	local function SetTitle(self,title)
-		self.titletext:SetText(title)
-	end
-	
-	local function SetStatusText(self,text)
-		self.statustext:SetText(text)
-	end
-	
 	local function Hide(self)
 		self.frame:Hide()
 	end
@@ -113,34 +75,9 @@ do
 	
 	local function OnAcquire(self)
 		self.frame:SetParent(UIParent)
-		self:ApplyStatus()
 	end
 	
 	local function OnRelease(self)
-		self.status = nil
-		for k in pairs(self.localstatus) do
-			self.localstatus[k] = nil
-		end
-	end
-	
-	-- called to set an external table to store status in
-	local function SetStatusTable(self, status)
-		assert(type(status) == "table")
-		self.status = status
-		self:ApplyStatus()
-	end
-	
-	local function ApplyStatus(self)
-		local status = self.status or self.localstatus
-		local frame = self.frame
-		self:SetWidth(status.width or 700)
-		self:SetHeight(status.height or 500)
-		if status.top and status.left then
-			frame:SetPoint("TOP",UIParent,"BOTTOM",0,status.top)
-			frame:SetPoint("LEFT",UIParent,"LEFT",status.left,0)
-		else
-			frame:SetPoint("CENTER",UIParent,"CENTER")
-		end
 	end
 	
 	local function OnWidthSet(self, width)
@@ -201,7 +138,11 @@ do
 				top = 0
 				left = maxWidth
 			end
-			self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",left,-top)
+			if (Ovale.db.profile.apparence.vertical) then
+				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",top,-left)
+			else
+				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",left,-top)
+			end
 			self.icone[k]:SetWidth(width)
 			self.icone[k]:SetHeight(height)
 			self.icone[k]:Show();
@@ -213,9 +154,15 @@ do
 				maxWidth = left + width
 			end
 		end
-		self.frame:SetWidth(maxWidth)
-		self.frame:SetHeight(maxHeight)
-		self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth,0)
+		if (Ovale.db.profile.apparence.vertical) then
+			self.frame:SetWidth(maxHeight)
+			self.frame:SetHeight(maxWidth)
+			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxHeight,0)
+		else
+			self.frame:SetWidth(maxWidth)
+			self.frame:SetHeight(maxHeight)
+			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth,0)
+		end
 	end
 	
 	local function Constructor()
@@ -228,14 +175,9 @@ do
 		
 		self.Hide = Hide
 		self.Show = Show
-		self.SetTitle =  SetTitle
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
-		self.SetStatusText = SetStatusText
-		self.SetStatusTable = SetStatusTable
 		self.ApplyStatus = ApplyStatus
-	--	self.OnWidthSet = OnWidthSet
-	--	self.OnHeightSet = OnHeightSet
 		self.LayoutFinished = OnLayoutFinished
 		self.UpdateIcons = UpdateIcons
 		
@@ -252,7 +194,6 @@ do
 		--frame:SetResizable(true)
 		frame:SetFrameStrata("BACKGROUND")
 		frame:SetScript("OnMouseDown", frameOnMouseDown)
-		-- title:SetScript("OnMouseDown",titleOnMouseDown)
 		frame:SetScript("OnMouseUp", frameOnMouseUp)
 		frame:SetScript("OnEnter", frameOnEnter)
 		frame:SetScript("OnLeave", frameOnLeave)

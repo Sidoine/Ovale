@@ -21,3 +21,6 @@ L["Raccourcis clavier"] = true
 L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] = true
 L["Affichage numérique"] = true
 L["Affiche le temps de recharge sous forme numérique"] = true
+L["Si cible uniquement"] = true
+L["Verrouiller position"] = true
+L["Vertical"] = true

@@ -16,10 +16,10 @@ AddCheckBox(multi SpellName(MULTISHOT))
 AddIcon
 {
 	if TargetDebuffExpires(SERPENTSTING 0) Spell(SERPENTSTING)
+	Spell(EXPLOSIVESHOT)
 	Spell(ARCANESHOT)
 	#Spell(AIMEDSHOT)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
-	Spell(EXPLOSIVESHOT)
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
 	Spell(STEADYSHOT)
 }

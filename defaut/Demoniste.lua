@@ -22,6 +22,7 @@ Define(CONFLAGRATE 17962)
 Define(DRAINSOUL 47855)
 Define(SHADOWEMBRACE 32391)
 Define(TALENTSHADOWEMBRACE 1763)
+Define(METAMORPHOSIS 47241)
 
 AddListItem(curse recklessness SpellName(CURSERECKLESSNESS))
 AddListItem(curse elements SpellName(CURSEELEMENTS))
@@ -51,5 +52,10 @@ if TargetLifePercent(less 25) and Level(more 76) Spell(DRAINSOUL)
  
 if TalentPoints(TALENTEMBERSTORM more 0) Spell(SOULFIRE)
 Spell(SHADOWBOLT)
+}
+
+AddIcon
+{
+	Spell(METAMORPHOSIS)
 }
 ]]
