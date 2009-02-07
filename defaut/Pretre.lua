@@ -31,7 +31,7 @@ AddIcon
      if BuffPresent(SHADOWWEAVE stacks=5) and TargetDebuffExpires(PAIN 0 mine=1)
         Spell(PAIN)
 
-     if TargetDebuffExpires(VAMPIRICTOUCH 1 mine=1)
+     if TargetDebuffExpires(VAMPIRICTOUCH 1.5 mine=1 haste=spell)
         Spell(VAMPIRICTOUCH doNotRepeat=1)
         
      if TalentPoints(TALENTDIVINEFURY less 1) # Fureur divine

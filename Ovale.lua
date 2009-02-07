@@ -24,6 +24,8 @@ Ovale.dropDowns = {}
 Ovale.masterNodes = nil
 Ovale.bug = false
 Ovale.enCombat = false
+Ovale.spellHaste = 0
+Ovale.meleeHaste = 0
 
 Ovale.arbre = {}
 
@@ -209,6 +211,41 @@ function Ovale:UPDATE_BINDINGS()
 	self:RemplirActionIndexes()
 end
 
+function Ovale:UNIT_AURA(event, unit)
+	if (unit == "player") then
+		local hateBase = GetCombatRatingBonus(18)
+		local hateCommune=0;
+		local hateSorts = 0;
+		local hateCaC = 0;
+		local hateHero = 0
+		local hateClasse = 0
+		local i=1;
+		while (true) do
+			local name =  UnitBuff("player", i);
+			if (not name) then
+				break
+			end
+			if (name == self.RETRIBUTION_AURA or name == self.MOONKIN_AURA) then
+				hateCommune = 3
+			elseif (name == self.WRATH_OF_AIR_TOTEM) then
+				hateSorts = 5
+			elseif (name == self.WINDFURY_TOTEM and hateCaC == 0) then
+				hateCaC = 16
+			elseif (name == self.ICY_TALONS) then
+				hateCaC = 20
+			elseif (name == self.BLOODLUST or name == self.HEROISM) then
+				hateHero = 30
+			elseif (name == self.JUDGMENT_OF_THE_PURE) then
+				hateClasse = 15
+			end
+			i = i + 1;
+		end
+		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
+		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
+--		print("spellHaste = "..self.spellHaste)
+	end
+end
+
 function Ovale:HandleProfileChanges()
 	if (self.firstInit) then
 		if (self.db.profile.code) then
@@ -218,11 +255,23 @@ function Ovale:HandleProfileChanges()
 	end
 end
 
+function Ovale:ChercherNomsBuffs()
+	self.MOONKIN_AURA = self:GetSpellInfoOrNil(24907)
+	self.RETRIBUTION_AURA = self:GetSpellInfoOrNil(7294)
+	self.WRATH_OF_AIR_TOTEM = self:GetSpellInfoOrNil(3738)
+	self.WINDFURY_TOTEM = self:GetSpellInfoOrNil(8512)
+	self.ICY_TALONS = self:GetSpellInfoOrNil(50880)
+	self.BLOODLUST = self:GetSpellInfoOrNil(2825)
+	self.HEROISM = self:GetSpellInfoOrNil(32182)
+	self.JUDGMENT_OF_THE_PURE = self:GetSpellInfoOrNil(54153)
+end
+
 function Ovale:FirstInit()
 	self:RemplirListeSorts()
 	self:RemplirListeFormes()
 	self:RemplirActionIndexes()
 	self:RemplirListeTalents()
+	self:ChercherNomsBuffs()
 	-- self:InitEcranOption()
 	
 	local playerClass, englishClass = UnitClass("player")
@@ -271,11 +320,12 @@ function Ovale:OnEnable()
     self:RegisterEvent("CHARACTER_POINTS_CHANGED")
     self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
     self:RegisterEvent("UPDATE_BINDINGS");
+    self:RegisterEvent("UNIT_AURA");
 	
 	if (not self.firstInit) then
 		self:FirstInit()
 	end
-	
+	self:UNIT_AURA("","player")
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
@@ -294,6 +344,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("SPELLS_CHANGED")
     self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
     self:UnregisterEvent("UPDATE_BINDINGS")
+    self:UnregisterEvent("UNIT_AURA")
     self.frame:Hide()
 end
 

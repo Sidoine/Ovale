@@ -35,10 +35,10 @@ AddIcon
 {
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
 if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT doNotRepeat=1)
-if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1) Spell(UNSTABLEAFFLICTION doNotRepeat=1)
+if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) Spell(UNSTABLEAFFLICTION doNotRepeat=1)
 if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
    and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE doNotRepeat=1)
-if TargetDebuffExpires(IMMOLATE 1.5 mine=1) and TargetLifePercent(more 25) Spell(IMMOLATE doNotRepeat=1)
+if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and TargetLifePercent(more 25) Spell(IMMOLATE doNotRepeat=1)
 if List(curse recklessness) and TargetDebuffExpires(CURSERECKLESSNESS 2) Spell(CURSERECKLESSNESS)
 if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) Spell(CURSEELEMENTS)
 if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)

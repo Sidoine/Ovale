@@ -1,5 +1,17 @@
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 
+local function avecHate(temps, hate)
+	if (not hate) then
+		return temps
+	elseif (hate == "spell") then
+		return temps/(1+Ovale.spellHaste/100)
+	elseif (hate == "melee") then
+		return temps/(1+Ovale.meleeHaste/100)
+	else
+		return temps
+	end
+end
+
 local function compare(a, comparison, b)
 	if (comparison == "more") then
 		if (not b or (a~=nil and a>b)) then
@@ -64,7 +76,7 @@ Ovale.conditions=
 	-- 2 : expiration time 
 	BuffExpires = function(condition)
 		local buffName = Ovale:GetSpellInfoOrNil(condition[1])
-		i=1;
+		local i=1;
 		while (true) do
 			local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable =  UnitBuff("player", i);
 			if (not name) then
@@ -72,10 +84,11 @@ Ovale.conditions=
 			end
 			if (name == buffName) then
 				local timeLeft = expirationTime - Ovale.maintenant
-				if (timeLeft<condition[2]) then
+				local timeBefore = avecHate(condition[2], condition.haste)
+				if (timeLeft<timeBefore) then
 					return 0
 				else
-					return timeLeft-condition[2]
+					return timeLeft-timeBefore
 				end
 			end
 			i = i + 1;
@@ -247,12 +260,13 @@ Ovale.conditions=
 			if (not condition.mine or isMine) then
 				if (name == debuffName) then
 					local timeLeft = expirationTime - Ovale.maintenant
-					if (timeLeft<condition[2]) then
+					local tempsMax = avecHate(condition[2], condition.haste)
+					if (timeLeft<tempsMax) then
 						return 0
 					elseif (count~=0 and condition.stacks and count<condition.stacks) then
 						return 0
 					else
-						return timeLeft-condition[2]
+						return timeLeft-tempsMax
 					end
 				end
 			end
