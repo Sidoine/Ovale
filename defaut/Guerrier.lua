@@ -22,6 +22,12 @@ Define(SUNDER 7386)
 Define(CONCUSSIONBLOW 12809)
 Define(REND 772)
 Define(OVERPOWER 7384)
+Define(SHIELDBLOCK 2565)
+Define(SHIELDWALL 871)
+Define(LASTSTAND 12975)
+Define(DEATHWISH 12292)
+Define(RECKLESSNESS 1719)
+Define(BLADESTORM 46924)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(demo SpellName(DEMOSHOUT))
@@ -73,8 +79,8 @@ AddIcon
         Spell(SHOCKWAVE)
         Spell(CONCUSSIONBLOW)
         
-        Spell(BLOODTHIRST)
-        if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
+         if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
+       Spell(BLOODTHIRST)
         if BuffPresent(SLAMBUFF) Spell(SLAM)
         Spell(MORTALSTRIKE)
         Spell(DEVASTATE)
@@ -113,6 +119,25 @@ AddIcon
         if CheckBoxOff(multi)
           Spell(HEROICSTRIKE doNotRepeat=1)
      }
+}
+
+AddIcon
+{
+    if Stance(2) #Defense
+    {
+        Spell(SHIELDBLOCK)
+ 	Spell(LASTSTAND)
+	Spell(SHIELDWALL)
+    }
+    if Stance(3) #berserker
+    {
+	Spell(DEATHWISH)
+	Spell(RECKLESSNESS)
+    }
+    if Stance(1) #combat
+    {
+	Spell(BLADESTORM)
+    }
 }
 
 ]]

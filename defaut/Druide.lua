@@ -27,20 +27,19 @@ AddIcon
 {
   if Stance(1)
   {
-     if CheckBoxOn(lucioles) and 
-          TargetDebuffExpires(FAERIEFERAL 2)
+     if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFERAL 2)
        Spell(FAERIEFERAL)
+    
+     if CheckBoxOn(demo) and TargetDebuffExpires(DEMOROAR 2)
+       Spell(DEMOROAR)
         
      Spell(MANGLEBEAR)
+     
+     if CheckBoxOn(blood) and Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
+       Spell(LACERATE)
     
-     if CheckBoxOn(demo) and 
-          TargetDebuffExpires(DEMOROAR 2)
-       Spell(DEMOROAR)
-    
-     if CheckBoxOn(multi) Spell(SWIPE)    
-    
-     if CheckBoxOn(blood) and Mana(more 10)
-      Spell(LACERATE)
+     if CheckBoxOn(multi)
+       Spell(SWIPE)    
   }
 
   if Stance(3)
@@ -82,9 +81,9 @@ AddIcon
 {
   if Stance(1)
   {  
-     if Mana(more 50)
        Spell(MAUL doNotRepeat=1)
   }
 }
+
 
 ]]
