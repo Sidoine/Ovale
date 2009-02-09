@@ -25,7 +25,7 @@
 		minAttente = nil
 	end
 	
-	if (self.masterNode.params.nocd == 1 and minAttente>1.5) then
+	if (self.masterNode.params.nocd == 1 and minAttente~=nil and minAttente>1.5) then
 		minAttente = nil
 	end
 		
