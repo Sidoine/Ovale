@@ -72,8 +72,13 @@ AddIcon
      {
         Spell(VICTORY usable=1)
         
-       # if TargetLifePercent(less 20) Spell(EXECUTE)
-        Spell(EXECUTE usable=1)
+		if TargetLifePercent(less 20)
+		{
+			if Mana(more 39) Spell(WHIRLWIND)
+			if Mana(more 44) Spell(BLOODTHIRST)
+			if BuffPresent(SLAMBUFF) and Mana(more 29) Spell(SLAM)
+			Spell(EXECUTE)
+        }
         
         if HasShield() Spell(SHIELDSLAM)
         Spell(SHOCKWAVE)
@@ -112,7 +117,7 @@ AddIcon
 
 AddIcon
 {
-     if Mana(more 50)
+     if Mana(more 66)
      {
         if CheckBoxOn(multi)
            Spell(CLEAVE doNotRepeat=1)

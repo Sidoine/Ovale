@@ -121,6 +121,10 @@ do
 		local maxWidth = 0
 		local top = 0
 		
+		if (not Ovale.masterNodes) then
+			return;
+		end
+		
 		for k,node in pairs(Ovale.masterNodes) do
 			if (not self.icone[k]) then
 				self.icone[k] = CreateFrame("Frame",nil,self.frame,"OvaleIcone");
