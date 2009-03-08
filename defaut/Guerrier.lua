@@ -74,8 +74,8 @@ AddIcon
         
 		if TargetLifePercent(less 20)
 		{
-			if Mana(more 39) Spell(WHIRLWIND)
-			if Mana(more 44) Spell(BLOODTHIRST)
+			Spell(WHIRLWIND)
+			Spell(BLOODTHIRST)
 			if BuffPresent(SLAMBUFF) and Mana(more 29) Spell(SLAM)
 			Spell(EXECUTE)
         }
@@ -91,8 +91,7 @@ AddIcon
         Spell(DEVASTATE)
         
         if TalentPoints(SLAMTALENT more 1)
-           and AfterWhiteHit(0.2)
-          Spell(SLAM)      
+          Spell(SLAM)
      }
 
      if Stance(1) #combat
@@ -108,6 +107,9 @@ AddIcon
         Spell(CONCUSSIONBLOW)
         
         Spell(DEVASTATE)
+        
+        if TalentPoints(SLAMTALENT more 1)
+          Spell(SLAM)
      }
 
 

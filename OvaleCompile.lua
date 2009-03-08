@@ -114,7 +114,7 @@ local function ParseAddIcon(params, text)
 	text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
 	text = subtest(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 	text = subtest(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
-	text = subtest(text, "(%d+.?%d*)s%s+before%s+node(%d+)", ParseBefore)
+	text = subtest(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)
 	
 	text = subtest(text, "{([^{}]*)}", ParseGroup)
 

@@ -541,6 +541,21 @@ function Ovale:ChercherBouton(sort)
 	end
 end
 
+function Ovale:InitCalculerMeilleureAction()
+	self.attenteFinCast = 0
+	
+	-- On attend que le sort courant soit fini
+	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
+	if (spell) then
+		self.attenteFinCast = endTime/1000 - Ovale.maintenant
+	end
+	
+	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
+	if (spell and not Ovale.canStopChannelling[spell]) then
+		self.attenteFinCast = endTime/1000 - Ovale.maintenant
+	end
+end
+
 function Ovale:CalculerMeilleureAction(element)
 	if (self.bug and not self.trace) then
 		return nil
@@ -589,6 +604,9 @@ function Ovale:CalculerMeilleureAction(element)
 					restant = 0
 				else
 					restant = duration - (self.maintenant - start);
+				end
+				if (restant<self.attenteFinCast) then
+					restant = self.attenteFinCast
 				end
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." remains "..restant)

@@ -5,6 +5,7 @@
 		Ovale.traced = false
 	end
 		
+	Ovale:InitCalculerMeilleureAction()
 	local minAttente = Ovale:CalculerMeilleureAction(self.masterNode)
 	local meilleureAction = Ovale.retourAction
 	
@@ -32,23 +33,6 @@
 		
 	if (minAttente~=nil and meilleureAction) then	
 	
-		-- On attend que le sort courant soit fini
-		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
-		if (spell) then
-			local attenteFinCast = endTime/1000 - Ovale.maintenant
-			if (attenteFinCast > minAttente) then
-				minAttente = attenteFinCast
-			end
-		end
-		
-		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
-		if (spell and not Ovale.canStopChannelling[spell]) then
-			local attenteFinCast = endTime/1000 - Ovale.maintenant
-			if (attenteFinCast > minAttente) then
-				minAttente = attenteFinCast
-			end
-		end
-
 		if (meilleureAction~=self.actionCourante or self.ancienneAttente==nil or 
 			(minAttente~=0 and minAttente>self.ancienneAttente+0.01)) then
 			self.actionCourante = meilleureAction

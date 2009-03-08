@@ -124,6 +124,17 @@ Ovale.conditions=
 		end
 		return nil
 	end,
+	Casting = function(condition)
+		local spell = UnitCastingInfo("player")
+		if (not spell) then
+			return nil
+		end
+		if (Ovale:GetSpellInfoOrNil(condition[1])==spell) then
+			return 0
+		else
+			return nil
+		end
+	end,
 	-- Test if a list of checkboxes is off
 	-- 1,... : the checkboxes names
 	CheckBoxOff = function(condition)
