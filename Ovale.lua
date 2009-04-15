@@ -26,6 +26,9 @@ Ovale.bug = false
 Ovale.enCombat = false
 Ovale.spellHaste = 0
 Ovale.meleeHaste = 0
+Ovale.aura = { player = {}, target = {}}
+Ovale.possibleAura = { player = {}, target = {}}
+
 
 Ovale.arbre = {}
 
@@ -211,6 +214,32 @@ function Ovale:UPDATE_BINDINGS()
 	self:RemplirActionIndexes()
 end
 
+function Ovale:SaveAura(unit, filter)
+	local i=1
+	
+	for k, v in pairs(Ovale.aura[unit]) do
+		v.dispelled = true
+		v.isMine = false
+	end
+	
+	while (true) do
+		local name, rank, icon, count, debuffType, duration, expirationTime, isMine = UnitAura(unit, i, filter)
+		
+		if (not name) then
+			break
+		end
+		
+		if (not Ovale.aura[unit][name].isMine or not isMine) then
+			Ovale.aura[unit][name].icon = icon
+			Ovale.aura[unit][name].count = count
+			Ovale.aura[unit][name].duration = duration
+			Ovale.aura[unit][name].expirationTime = expirationTime
+			Ovale.aura[unit][name].isMine = isMine
+		end
+	end
+end
+
+
 function Ovale:UNIT_AURA(event, unit)
 	if (unit == "player") then
 		local hateBase = GetCombatRatingBonus(18)
@@ -220,11 +249,14 @@ function Ovale:UNIT_AURA(event, unit)
 		local hateHero = 0
 		local hateClasse = 0
 		local i=1;
+		
+		
 		while (true) do
 			local name =  UnitBuff("player", i);
 			if (not name) then
 				break
 			end
+			
 			if (name == self.RETRIBUTION_AURA or name == self.MOONKIN_AURA) then
 				hateCommune = 3
 			elseif (name == self.WRATH_OF_AIR_TOTEM) then

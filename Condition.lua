@@ -48,7 +48,8 @@ Ovale.conditions=
 {
 	-- Test if a white hit just occured
 	-- 1 : maximum time after a white hit
-	AfterWhiteHit = function(condition)
+	-- Not useful anymore. No widely used spell reset swing timer anyway
+	--[[AfterWhiteHit = function(condition)
 		local debut = OvaleSwing.starttime
 		local fin = OvaleSwing.duration + debut
 		local maintenant = GetTime()
@@ -59,7 +60,7 @@ Ovale.conditions=
 		else 
 			return 0.1
 		end 
-	end,
+	end,]]
 	-- Test how many armor set parts are equiped by the player
 	-- 1 : set number
 	-- 2 : "more" or "less"

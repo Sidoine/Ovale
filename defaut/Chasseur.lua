@@ -10,17 +10,20 @@ Define(KILLSHOT 53351)
 Define(RAPIDFIRE 3045)
 Define(KILLCOMMAND 34026)
 Define(BESTIALWRATH 19574)
+Define(HUNTERSMARK 53338)
 
 AddCheckBox(multi SpellName(MULTISHOT))
 
 AddIcon
 {
+	if TargetDebuffExpires(HUNTERSMARK 0) Spell(HUNTERSMARK)
 	if TargetDebuffExpires(SERPENTSTING 0) Spell(SERPENTSTING)
-	Spell(EXPLOSIVESHOT)
-	Spell(ARCANESHOT)
-	#Spell(AIMEDSHOT)
+	if TargetDebuffExpires(EXPLOSIVESHOT 0) Spell(EXPLOSIVESHOT)
+	Spell(AIMEDSHOT)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
+	Spell(ARCANESHOT)
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
+	if TargetDebuffExpires(HUNTERSMARK 2) Spell(HUNTERSMARK)
 	Spell(STEADYSHOT)
 }
 

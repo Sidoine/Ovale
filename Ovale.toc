@@ -1,4 +1,4 @@
-﻿## Interface: 30000
+﻿## Interface: 30100
 ## Title: Ovale
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
@@ -19,7 +19,6 @@ Condition.lua
 OvaleIcone.lua
 OvaleIcone.xml
 OvaleFrame.lua
-OvaleSwing.lua
 OvaleCompile.lua
 defaut\Chaman.lua
 defaut\Chasseur.lua

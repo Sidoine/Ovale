@@ -18,16 +18,19 @@
 	Modifed for Ovale
 ]]
 
+--[[ Not useful anymore 
+
 local autoshotname = GetSpellInfo(75)
 local resetspells = {
 	[GetSpellInfo(845)] = true, -- Cleave
 	[GetSpellInfo(78)] = true, -- Heroic Strike
 	[GetSpellInfo(6807)] = true, -- Maul
 	[GetSpellInfo(2973)] = true, -- Raptor Strike
+}
+local delayspells = {
 	[GetSpellInfo(1464)] = true, -- Slam
 }
 local resetautoshotspells = {
-	[GetSpellInfo(19434)] = true, -- Aimed Shot
 }
 local _, playerclass = UnitClass('player')
 local unpack = unpack
@@ -39,6 +42,7 @@ OvaleSwing = LibStub("AceAddon-3.0"):NewAddon("OvaleSwing", "AceEvent-3.0")
 OvaleSwing.swingmode=nil -- nil is none, 0 is meleeing, 1 is autoshooting
 OvaleSwing.starttime=0
 OvaleSwing.duration=0
+OvaleSwing.startdelay=0
 
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
@@ -52,7 +56,10 @@ function OvaleSwing:OnEnable()
 	
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	
+	self:RegisterEvent("UNIT_SPELLCAST_START")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_INTERRUPTED")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	
 	self:RegisterEvent("UNIT_ATTACK")
 end
@@ -109,10 +116,29 @@ do
 	end
 end
 
+function OvaleSwing:UNIT_SPELLCAST_START(unit, spell)
+	if self.swingmode == 0 then
+		if delayspells[spell] then
+			self.startdelay = GetTime()
+		end
+	end
+end
+
+function OvaleSwing:UNIT_SPELLCAST_INTERRUPTED(unit, spell)
+	if self.swingmode == 0 then
+		if delayspells[spell] then
+			self.duration = self.duration + GetTime() - self.startdelay
+		end
+	end
+end
+
 function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(unit, spell)
 	if self.swingmode == 0 then
 		if resetspells[spell] then
 			self:MeleeSwing()
+		end
+		if delayspells[spell] then
+			self.duration = self.duration + 
 		end
 	elseif self.swingmode == 1 then
 		if spell == autoshotname then
@@ -146,3 +172,4 @@ function OvaleSwing:Shoot()
 	self.duration = UnitRangedDamage('player')
 	self.starttime = GetTime()
 end
+]]

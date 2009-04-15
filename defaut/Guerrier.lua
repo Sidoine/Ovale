@@ -29,6 +29,9 @@ Define(DEATHWISH 12292)
 Define(RECKLESSNESS 1719)
 Define(BLADESTORM 46924)
 
+Define(DEMORALIZINGROAR 48560)
+Define(CURSEOFWEAKNESS 50511)
+
 AddCheckBox(multi L(AOE))
 AddCheckBox(demo SpellName(DEMOSHOUT))
 AddCheckBox(whirlwind SpellName(WHIRLWIND))
@@ -48,6 +51,8 @@ AddIcon
      if TargetClassification(worldboss) 
             and CheckBoxOn(demo)
             and TargetDebuffExpires(DEMOSHOUT 2)
+            and TargetDebuffExpires(DEMORALIZINGROAR 0)
+            and TargetDebuffExpires(CURSEOFWEAKNESS 0)
           Spell(DEMOSHOUT)
          
      if Stance(2) #Defense
@@ -64,6 +69,7 @@ AddIcon
         
         Spell(REVENGE usable=1)
         Spell(SHIELDSLAM)
+	Spell(BLOODTHIRST)
         
         if Mana(more 10) Spell(DEVASTATE priority=2)
      }
