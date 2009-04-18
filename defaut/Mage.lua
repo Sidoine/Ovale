@@ -28,44 +28,44 @@ AddCheckBox(scorch SpellName(SCORCH))
 
 AddIcon
 {
-	if TalentPoints(TALENTLIVINGBOMB more 0)
-	{
-		#Fire spec
-		if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
-		if TargetDebuffExpires(LIVINGBOMB 0 mine=1) Spell(LIVINGBOMB)
-		if TargetDebuffExpires(IMPROVEDSCORCH 2 stacks=5) and CheckBoxOn(scorch) Spell(SCORCH)
-		if TalentPoints(TALENTPIERCINGICE more 0)
-			Spell(FROSTFIREBOLT)
-		if TalentPoints(TALENTPIERCINGICE less 1)
-			Spell(FIREBALL)
-	}
-	
-	if TalentPoints(TALENTCHILLEDTOTHEBONES more 0)
-	{
-		#Frost spec
-		Spell(SUMMONWATERELEMENTAL)
-		Spell(FROSTBOLT)
-	}
-	
-	if TalentPoints(TALENTARCANEBARRAGE more 0)
-	{
-		#Arcane spec
-		unless BuffPresent(ARCANEBLAST stacks=3) or {BuffPresent(ARCANEBLAST stacks=2) and Casting(ARCANEBLAST)}
-			Spell(ARCANEBLAST)
-		Spell(ARCANEMISSILES)
-	}
+       if TalentPoints(TALENTLIVINGBOMB more 0)
+       {
+              #Fire spec
+              if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
+              if TargetDebuffExpires(LIVINGBOMB 0 mine=1) Spell(LIVINGBOMB)
+              if TargetDebuffExpires(IMPROVEDSCORCH 2 stacks=5) and CheckBoxOn(scorch) Spell(SCORCH)
+              if TalentPoints(TALENTPIERCINGICE more 0)
+                     Spell(FROSTFIREBOLT)
+              if TalentPoints(TALENTPIERCINGICE less 1)
+                     Spell(FIREBALL)
+       }
+       
+       if TalentPoints(TALENTCHILLEDTOTHEBONES more 0)
+       {
+              #Frost spec
+              Spell(SUMMONWATERELEMENTAL)
+              Spell(FROSTBOLT)
+       }
+       
+       if TalentPoints(TALENTARCANEBARRAGE more 0)
+       {
+              #Arcane spec
+              unless BuffPresent(ARCANEBLAST stacks=3) or {BuffPresent(ARCANEBLAST stacks=2) and Casting(ARCANEBLAST)}
+                     Spell(ARCANEBLAST)
+              Spell(ARCANEMISSILES)
+       }
 }
 
 AddIcon
 {
-	Spell(MIRRORIMAGE)
+       Spell(MIRRORIMAGE)
 }
 
 AddIcon
 {
-	Spell(COMBUSTION)
-	Spell(ICYVEINS)
-	Spell(PRESENCEOFMIND)
+       Spell(COMBUSTION)
+       Spell(ICYVEINS)
+       Spell(PRESENCEOFMIND)
 }
 
 ]]

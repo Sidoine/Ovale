@@ -123,14 +123,14 @@ local function ParseAddIcon(params, text)
 		masterNode = string.match(text, "node(%d+)")
 	end
 	if (not masterNode) then
-		self:Print("no master node")
+		Ovale:Print("no master node")
 		return nil
 	end
 	
 	-- Si il reste autre chose que des espaces, c'est une erreur de syntaxe
 	text = string.gsub(text, "node%d+", "", 1)
 	if (string.match(text,"[^ ]")) then
-		self:Print("syntax error:"..text)
+		Ovale:Print("syntax error:"..text)
 		return nil
 	end
 	
