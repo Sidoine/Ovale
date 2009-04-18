@@ -28,7 +28,7 @@ Ovale.spellHaste = 0
 Ovale.meleeHaste = 0
 Ovale.aura = { player = {}, target = {}}
 Ovale.possibleAura = { player = {}, target = {}}
-
+Ovale.targetGUID = nil
 
 Ovale.arbre = {}
 
@@ -214,31 +214,44 @@ function Ovale:UPDATE_BINDINGS()
 	self:RemplirActionIndexes()
 end
 
+--[[
 function Ovale:SaveAura(unit, filter)
 	local i=1
 	
 	for k, v in pairs(Ovale.aura[unit]) do
 		v.dispelled = true
-		v.isMine = false
+		v.unitCaster = nil
 	end
 	
 	while (true) do
-		local name, rank, icon, count, debuffType, duration, expirationTime, isMine = UnitAura(unit, i, filter)
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster = UnitAura(unit, i, filter)
 		
 		if (not name) then
 			break
 		end
 		
-		if (not Ovale.aura[unit][name].isMine or not isMine) then
-			Ovale.aura[unit][name].icon = icon
-			Ovale.aura[unit][name].count = count
-			Ovale.aura[unit][name].duration = duration
-			Ovale.aura[unit][name].expirationTime = expirationTime
-			Ovale.aura[unit][name].isMine = isMine
+		if (not Ovale.aura[unit][filter][name].isMine or not isMine) then
+			Ovale.aura[unit][filter][name].icon = icon
+			Ovale.aura[unit][filter][name].count = count
+			Ovale.aura[unit][filter][name].duration = duration
+			Ovale.aura[unit][filter][name].expirationTime = expirationTime
+			Ovale.aura[unit][filter][name].unitCaster  = unitCaster 
 		end
 	end
 end
 
+function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
+	if (
+	if (event 
+end
+
+function Ovale:PLAYER_TARGET_CHANGED()
+	Ovale.targetGUID = UnitGUID("target")
+	Ovale.aura.target.HELPFUL = {}
+	Ovale.aura.target.HARMFUL = {}
+end
+]]
 
 function Ovale:UNIT_AURA(event, unit)
 	if (unit == "player") then
@@ -353,6 +366,8 @@ function Ovale:OnEnable()
     self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
     self:RegisterEvent("UPDATE_BINDINGS");
     self:RegisterEvent("UNIT_AURA");
+    -- self:RegisterEvent("PLAYER_TARGET_CHANGED")
+    -- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	
 	if (not self.firstInit) then
 		self:FirstInit()
@@ -377,6 +392,8 @@ function Ovale:OnDisable()
     self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
     self:UnregisterEvent("UPDATE_BINDINGS")
     self:UnregisterEvent("UNIT_AURA")
+    -- self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+    -- self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self.frame:Hide()
 end
 

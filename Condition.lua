@@ -79,7 +79,7 @@ Ovale.conditions=
 		local buffName = Ovale:GetSpellInfoOrNil(condition[1])
 		local i=1;
 		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable =  UnitBuff("player", i);
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitBuff("player", i);
 			if (not name) then
 				break
 			end
@@ -106,7 +106,7 @@ Ovale.conditions=
 		local buffName, buffRank, buffIcon = Ovale:GetSpellInfoOrNil(condition[1])
 		i=1;
 		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable =  UnitBuff("player", i);
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitBuff("player", i);
 			if (not name) then
 				break
 			end
@@ -265,11 +265,11 @@ Ovale.conditions=
 		local debuffName = Ovale:GetSpellInfoOrNil(condition[1])
 		i=1;
 		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable =  UnitDebuff("target", i);
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitDebuff("target", i);
 			if (not name) then
 				break
 			end
-			if (not condition.mine or isMine) then
+			if (not condition.mine or unitCaster=="player") then
 				if (name == debuffName) then
 					local timeLeft = expirationTime - Ovale.maintenant
 					local tempsMax = avecHate(condition[2], condition.haste)
@@ -294,11 +294,11 @@ Ovale.conditions=
 		local debuffName = Ovale:GetSpellInfoOrNil(condition[1])
 		i=1;
 		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable =  UnitDebuff("target", i);
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitDebuff("target", i);
 			if (not name) then
 				break
 			end
-			if (not condition.mine or isMine) then
+			if (not condition.mine or unitCaster=="player") then
 				if (name == debuffName) then
 					local timeLeft = expirationTime - Ovale.maintenant
 					if (count~=0 and condition.stacks) then
