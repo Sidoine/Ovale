@@ -34,9 +34,17 @@
 	if (minAttente~=nil and meilleureAction) then	
 	
 		if (meilleureAction~=self.actionCourante or self.ancienneAttente==nil or 
-			(minAttente~=0 and minAttente>self.ancienneAttente+0.01)) then
+			(minAttente~=0 and minAttente>self.ancienneAttente+0.01) or
+			(Ovale.maintenant + minAttente < self.finAction-0.01)) then
 			self.actionCourante = meilleureAction
 			self.debutAction = Ovale.maintenant
+			self.finAction = minAttente + self.debutAction
+			if (minAttente == 0) then
+				self.cd:Hide()
+			else
+				self.cd:Show()
+				self.cd:SetCooldown(self.debutAction, self.finAction - self.debutAction);
+			end
 		end
 		
 		self.ancienneAttente = minAttente
@@ -51,8 +59,8 @@
 			self.icone:SetAlpha(0.25)
 		end
 		
-		if (minAttente~=0) then
-			self.cd:SetCooldown(self.debutAction, minAttente+(Ovale.maintenant-self.debutAction));
+		if (minAttente==0) then
+			self.cd:Hide()
 		end
 		
 		-- Le temps restant
