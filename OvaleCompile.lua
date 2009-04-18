@@ -61,8 +61,6 @@ local function ParseOr(a,b)
 end
 
 local function ParseGroup(text)
-	text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
-	text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
 	local nodes={}
 	
 	for w in string.gmatch(text, "node(%d+)") do
@@ -111,13 +109,21 @@ local function ParseDefine(key, value)
 end
 
 local function ParseAddIcon(params, text)
-	text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
-	text = subtest(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
-	text = subtest(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
-	text = subtest(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)
-	
-	text = subtest(text, "{([^{}]*)}", ParseGroup)
-
+	local original = text
+	while (1==1) do
+		local was = text
+		text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
+		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
+		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
+		text = string.gsub(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)
+		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
+		text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
+		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		if (was == text) then
+			break
+		end
+	end
+		
 	local masterNode
 	if (text) then
 		masterNode = string.match(text, "node(%d+)")
@@ -130,6 +136,7 @@ local function ParseAddIcon(params, text)
 	-- Si il reste autre chose que des espaces, c'est une erreur de syntaxe
 	text = string.gsub(text, "node%d+", "", 1)
 	if (string.match(text,"[^ ]")) then
+		Ovale:Print("Group:"..original)
 		Ovale:Print("syntax error:"..text)
 		return nil
 	end
@@ -238,7 +245,7 @@ function Ovale:DebugNode(node)
 	elseif (node.type == "and") then
 		text = self:DebugNode(node.a).." and "..self:DebugNode(node.b)
 	elseif (node.type == "or") then
-		text = self:DebugNode(node.a).." and "..self:DebugNode(node.b)
+		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
 	else
 		text = "#unknown node type#"
 	end

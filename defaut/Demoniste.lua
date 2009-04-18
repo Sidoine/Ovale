@@ -6,7 +6,6 @@ Define(CURSEAGONY 980)
 Define(CURSEDOOM 603)
 Define(CURSETONGUES 1714)
 Define(CURSEWEAKNESS 702)
-Define(SHIPHONLIFE 18265)
 Define(UNSTABLEAFFLICTION 30108)
 Define(CORRUPTION 172)
 Define(TALENTUNSTABLEAFFLICTION 1670)
@@ -46,7 +45,6 @@ if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUE
 if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)
 if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY)
 if TargetDebuffExpires(CORRUPTION 0 mine=1) Spell(CORRUPTION)
-if TargetDebuffExpires(SHIPHONLIFE 0 mine=1) Spell(SHIPHONLIFE)
 
 if TargetLifePercent(less 25) and Level(more 76) Spell(DRAINSOUL)
  
