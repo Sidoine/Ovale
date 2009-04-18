@@ -69,7 +69,7 @@ AddIcon
         
         Spell(REVENGE usable=1)
         Spell(SHIELDSLAM)
-	Spell(BLOODTHIRST)
+        Spell(BLOODTHIRST)
         
         if Mana(more 10) Spell(DEVASTATE priority=2)
      }
@@ -90,8 +90,8 @@ AddIcon
         Spell(SHOCKWAVE)
         Spell(CONCUSSIONBLOW)
         
-         if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
-       Spell(BLOODTHIRST)
+        if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
+        Spell(BLOODTHIRST)
         if BuffPresent(SLAMBUFF) Spell(SLAM)
         Spell(MORTALSTRIKE)
         Spell(DEVASTATE)

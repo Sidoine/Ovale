@@ -19,9 +19,9 @@ AddCheckBox(multi SpellName(MULTISHOT))
 AddIcon
 {
 	if TargetDebuffExpires(HUNTERSMARK 0) Spell(HUNTERSMARK)
-	if TargetDebuffExpires(BLACKARROW 0) Spell(BLACKARROW)
-	if TargetDebuffExpires(SERPENTSTING 0) Spell(SERPENTSTING)
-	if TargetDebuffExpires(EXPLOSIVESHOT 0) Spell(EXPLOSIVESHOT)
+	if TargetDebuffExpires(BLACKARROW 0 isMine=1) Spell(BLACKARROW)
+	if TargetDebuffExpires(SERPENTSTING 0 isMine=1) Spell(SERPENTSTING)
+	if TargetDebuffExpires(EXPLOSIVESHOT 0 isMine=1) Spell(EXPLOSIVESHOT)
 	Spell(AIMEDSHOT)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	Spell(ARCANESHOT)
