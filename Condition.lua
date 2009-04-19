@@ -1,5 +1,13 @@
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 
+local runeType = 
+{
+	blood = 1,
+	unholy = 2,
+	frost = 3,
+	death = 4
+}	
+
 local function avecHate(temps, hate)
 	if (not hate) then
 		return temps
@@ -211,6 +219,40 @@ Ovale.conditions=
 		local present = UnitExists("pet") and not UnitIsDead("pet")
 		return testbool(present, condition[1])
 	end,
+	Runes = function(condition)
+		local type = runeType[condition[1]]
+		local nombre = 0
+		local nombreCD = 0
+		local maxCD = nil
+		local minCD = nil
+		for i=1,6 do
+			if (GetRuneType(i) == type or GetRuneType(i) == 4) then
+				local start, duration, runeReady = GetRuneCooldown(i)
+				if (runeReady) then
+					nombre = nombre + 1
+				else
+					nombreCD = nombreCD + 1
+					if (maxCD == nil or start<maxCD) then
+						maxCD = start
+					end
+					if (minCD == nil or start>minCD) then
+						minCD = start
+					end
+				end
+			end
+		end
+		local wanted = condition[2]
+		if (nombre >= wanted) then
+			return 0
+		elseif (nombre + nombreCD < wanted) then
+			return nil
+		elseif (wanted == nombre + 1) then
+			return Ovale.maintenant - minCD
+		else
+			-- Il ne peut y avoir que deux runes sur CD de toute façon
+			return Ovale.maintenant - maxCD
+		end
+	end,
 	-- Test if the player is in a given stance
 	-- 1 : the stance
 	Stance = function(condition)
@@ -314,7 +356,7 @@ Ovale.conditions=
 			end
 			i = i + 1;
 		end
-		return 0
+		return nil
 	end,
 	-- Test if the target life is bellow/above a given value in percent
 	-- 1 : "less" or "more"
