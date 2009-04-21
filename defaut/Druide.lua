@@ -67,10 +67,11 @@ AddIcon
          TargetDebuffExpires(FAERIEFIRE 2)
       Spell(FAERIEFIRE)
        
-     if TargetDebuffExpires(INSECTSWARM 0)
-       Spell(INSECTSWARM)  
      if TargetDebuffExpires(MOONFIRE 0)
         Spell(MOONFIRE)
+     if TargetDebuffExpires(INSECTSWARM 0)
+       Spell(INSECTSWARM)  
+
      unless BuffPresent(ECLIPSEWRATH)
         Spell(STARFIRE)
      Spell(WRATH)

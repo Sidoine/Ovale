@@ -1,52 +1,75 @@
 Ovale.defaut["PRIEST"] =
 [[
-Define(DEATH 32379)
-Define(FORTITUDE 1243)
-Define(PRAYERFORTITUDE 21562)
-Define(SHADOWFORM 15473)
-Define(VAMPIRICEMBRACE 15286)
-Define(VAMPIRICTOUCH 34914)
-Define(PAIN 589)
-Define(TALENTDIVINEFURY 1181)
-Define(MINDBLAST 8092)
-Define(MINDFLAY 15407)
-Define(HOLYFIRE 14914)
-Define(SMITE 585)
-Define(DEVOURINGPLAGUE 2944)
-Define(SHADOWWEAVE 15332)
+# Define constants for easier addressing of spells
+Define(SWP 589) # Shadow Word: Pain
+Define(VT 34916) # Vampiric Touch
+Define(VE 15286) # Vampiric Embrace
+Define(SF 15473) # Shadowform
+Define(MF 15407) # Mind Flay
+Define(MB 8092) # Mind Blast
+Define(DP 2944) # Devouring Plague
+Define(SW 15257) # Shadow Weaving
+Define(IF 48168) # Inner Fire
+Define(Focus 14751) # Inner Focus
+Define(Dispersion 47585)
+Define(Shadowfiend 34433)
+CanStopChannelling(MF) # Mind Flay's channeling can be interrupted if needed
 
-AddCheckBox(etreinte SpellName(VAMPIRICEMBRACE))
-AddCheckBox(mort SpellName(DEATH))
+# Add main monitor
+AddIcon {
 
-CanStopChannelling(MINDFLAY)
+#Check shadowform is up
+if BuffExpires(SF 0)
+    Spell(SF)
+    
+# Refresh inner fire
+if BuffExpires(IF 60)
+    Spell(IF)
 
-AddIcon
+#if inner focus is active, cast mind blast
+if BuffPresent(Focus) 
+    Spell(MB doNotRepeat=1)
+    
+# Check if Shadow Weave is stacked 5 times
+# before suggesting Shadow Word: Pain
+if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1)
 {
-     if BuffExpires(FORTITUDE 5) and BuffExpires(PRAYERFORTITUDE 5) Spell(FORTITUDE)
-     if BuffExpires(SHADOWFORM 0) Spell(SHADOWFORM)
-
-     if CheckBoxOn(etreinte) and TargetDebuffExpires(VAMPIRICEMBRACE 0 mine=1) 
-        Spell(VAMPIRICEMBRACE doNotRepeat=1)
-
-     if BuffPresent(SHADOWWEAVE stacks=5) and TargetDebuffExpires(PAIN 0 mine=1)
-        Spell(PAIN)
-
-     if TargetDebuffExpires(VAMPIRICTOUCH 1.5 mine=1 haste=spell)
-        Spell(VAMPIRICTOUCH doNotRepeat=1)
-        
-     if TalentPoints(TALENTDIVINEFURY less 1) # Fureur divine
-        Spell(MINDBLAST) # Attaque mentale
-                  
-     if TargetDebuffExpires(DEVOURINGPLAGUE 0 mine=1)
-	    Spell(DEVOURINGPLAGUE doNotRepeat=1)
-	
-     if CheckBoxOn(mort) and LifePercent(more 95) Spell(DEATH)
-
-     Spell(MINDFLAY priority=2)
-     
-     if TargetDebuffExpires(HOLYFIRE 0 mine=1)
-        Spell(HOLYFIRE)
-     
-     Spell(SMITE)
+   Spell(SWP doNotRepeat=1)
 }
+
+#Refresh VT
+if TargetDebuffExpires(VT 1.4 mine=1 haste=spell)
+   Spell(VT doNotRepeat=1)
+  
+#cast MB if up
+Spell(MB doNotRepeat=1)
+  
+#Refresh devouring plague  
+if TargetDebuffExpires(DP 0 mine=1)
+    Spell(DP doNotRepeat=1)
+
+#cast Mind flay if nothing else can be done
+Spell(MF priority=2)
+
+} # End of main monitor    
+        
+# Add mana monitor
+AddIcon {
+
+#if up, launch focus (and then MB since it's the first priority)
+Spell(Focus doNotRepeat=1 usable=1)
+
+#Regain mana if needed and if shadowfiend is not already out
+if Mana(less 4000) and PetPresent(no)
+{
+    Spell(Shadowfiend usable=1)
+    unless TargetDebuffExpires(VT 6 mine=1 haste=spell) Spell(Dispersion usable=1)
+}
+}
+
+# Add icons to monitor debuffs (will show up 5 secs before elapsed)
+AddIcon size=small nocd=1 {if TargetDebuffExpires(VE 1 mine=1) Spell(VE) } # Vampiric Embrace
+AddIcon size=small nocd=1 {if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) Spell(VT) } # Vampiric Touch
+AddIcon size=small nocd=1 {if TargetDebuffExpires(SWP 1 mine=1) Spell(SWP) } # Shadow Word: Pain
+AddIcon size=small nocd=1 {if TargetDebuffExpires(DP 1 mine=1) Spell(DP) } 
 ]]
