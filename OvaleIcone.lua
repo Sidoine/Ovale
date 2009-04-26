@@ -59,6 +59,13 @@
 			self.icone:SetAlpha(0.25)
 		end
 		
+		local start, duration, enable = GetActionCooldown(meilleureAction)
+		if (Ovale.maintenant + minAttente > start + duration and minAttente > 0) then
+			self.icone:SetVertexColor(0.75,0,0)
+		else
+			self.icone:SetVertexColor(1,1,1)
+		end 
+		
 		if (minAttente==0) then
 			self.cd:Hide()
 		end
