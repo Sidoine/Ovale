@@ -54,7 +54,7 @@ AddIcon
      if CheckBoxOn(consecration) Spell(CONSECRATE)
      Spell(HOLYSHOCK) 
      if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
-     if TargetCreatureType(Undead Demon) Spell(EXORCISM usable=1)
+     Spell(EXORCISM)
      if BuffPresent(THEARTOFWAR) Spell(FLASHOFLIGHT priority=2)
 }
 AddIcon

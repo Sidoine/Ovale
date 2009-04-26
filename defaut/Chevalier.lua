@@ -46,6 +46,7 @@ AddIcon
 			if TalentPoints(TALENTDEATSTRIKE more 0) Spell(DEATHSTRIKE)
 			Spell(SCOURGESTRIKE)
 			Spell(OBLITERATE)
+			Spell(DEATHSTRIKE)
 		}
 		if Runes(blood 1)
 		{
