@@ -126,6 +126,8 @@ AddIcon
 
 AddIcon
 {
+	unless Stance(1)
+	{
      if Mana(more 66)
      {
         if CheckBoxOn(multi)
@@ -133,6 +135,7 @@ AddIcon
         if CheckBoxOff(multi)
           Spell(HEROICSTRIKE doNotRepeat=1)
      }
+    }
 }
 
 AddIcon
