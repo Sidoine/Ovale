@@ -28,6 +28,8 @@ Define(LASTSTAND 12975)
 Define(DEATHWISH 12292)
 Define(RECKLESSNESS 1719)
 Define(BLADESTORM 46924)
+Define(SUDDENDEATH 52437)
+Define(RETALIATION 20230)
 
 Define(DEMORALIZINGROAR 48560)
 Define(CURSEOFWEAKNESS 50511)
@@ -103,21 +105,20 @@ AddIcon
      if Stance(1) #combat
      {
         Spell(VICTORY usable=1)
-        Spell(OVERPOWER usable=1)
+        if TargetDebuffExpires(REND 0) Spell(REND)
+        if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(MORTALSTRIKE)
-        
-        Spell(REND)
-        
-        Spell(SHIELDSLAM usable=1)
+        Spell(OVERPOWER usable=1)
+        if TalentPoints(SLAMTALENT more 1)
+          Spell(SLAM priority=2)
+
+		#Some other specs stuff, just in case
+		Spell(BLOODTHIRST)
+        if HasShield() Spell(SHIELDSLAM)
         Spell(SHOCKWAVE)
         Spell(CONCUSSIONBLOW)
-        
         Spell(DEVASTATE)
-        
-        if TalentPoints(SLAMTALENT more 1)
-          Spell(SLAM)
      }
-
 
      if TargetDebuffExpires(SUNDER 5 stacks=5)
         Spell(SUNDER)
@@ -139,17 +140,18 @@ AddIcon
     if Stance(2) #Defense
     {
         Spell(SHIELDBLOCK)
- 	Spell(LASTSTAND)
-	Spell(SHIELDWALL)
+		Spell(LASTSTAND)
+		Spell(SHIELDWALL)
     }
     if Stance(3) #berserker
     {
-	Spell(DEATHWISH)
-	Spell(RECKLESSNESS)
+		Spell(DEATHWISH)
+		Spell(RECKLESSNESS)
     }
     if Stance(1) #combat
     {
-	Spell(BLADESTORM)
+		Spell(BLADESTORM)
+		Spell(RETALIATION)
     }
 }
 
