@@ -126,17 +126,22 @@ AddIcon
 
 AddIcon
 {
-	unless Stance(1)
+	if CheckBoxOff(multi)
 	{
-     if Mana(more 66)
-     {
-        if CheckBoxOn(multi)
-           Spell(CLEAVE doNotRepeat=1)
-        if CheckBoxOff(multi)
-          Spell(HEROICSTRIKE doNotRepeat=1)
-     }
-    }
-}
+		if Stance(2)
+		{
+			if Mana(more 66) 
+				Spell(HEROICSTRIKE doNotRepeat=1)
+		}
+		if Stance(3)
+		{
+			if Mana(more 66) and TargetLifePercent(more 20)
+				Spell(HEROICSTRIKE doNotRepeat=1)
+		}
+	}
+    if Mana(more 50) and CheckBoxOn(multi)
+		Spell(CLEAVE doNotRepeat=1)
+ }
 
 AddIcon
 {

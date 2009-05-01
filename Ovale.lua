@@ -203,6 +203,10 @@ function Ovale:CHARACTER_POINTS_CHANGED()
 	self:RemplirListeTalents()
 end
 
+function Ovale:PLAYER_TALENT_UPDATE()
+	self:RemplirListeTalents()
+end
+
 function Ovale:SPELLS_CHANGED()
 	self:RemplirListeSorts();
 	self:RemplirListeFormes()
@@ -362,6 +366,7 @@ function Ovale:OnEnable()
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
     self:RegisterEvent("PLAYER_REGEN_DISABLED");
     self:RegisterEvent("SPELLS_CHANGED")
+    self:RegisterEvent("PLAYER_TALENT_UPDATE")
     self:RegisterEvent("CHARACTER_POINTS_CHANGED")
     self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
     self:RegisterEvent("UPDATE_BINDINGS");
@@ -387,6 +392,7 @@ function Ovale:OnDisable()
     -- Called when the addon is disabled
     self:UnregisterEvent("PLAYER_REGEN_ENABLED")
     self:UnregisterEvent("PLAYER_REGEN_DISABLED")
+    self:UnregisterEvent("PLAYER_TALENT_UPDATE")
     self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
     self:UnregisterEvent("SPELLS_CHANGED")
     self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
