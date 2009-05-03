@@ -15,6 +15,11 @@ Define(Dispersion 47585)
 Define(Shadowfiend 34433)
 CanStopChannelling(MF) # Mind Flay's channeling can be interrupted if needed
 
+# Spells with cast time that add buff or debuff
+SpellAddTargetDebuff(VT SW=15 VT=15)
+SpellAddTargetDebuff(MF SW=15)
+SpellAddTargetDebuff(MB SW=15)
+
 # Add main monitor
 AddIcon {
 
@@ -34,19 +39,19 @@ if BuffPresent(Focus)
 # before suggesting Shadow Word: Pain
 if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1)
 {
-   Spell(SWP doNotRepeat=1)
+   Spell(SWP)
 }
 
 #Refresh VT
 if TargetDebuffExpires(VT 1.4 mine=1 haste=spell)
-   Spell(VT doNotRepeat=1)
+   Spell(VT)
   
 #cast MB if up
 Spell(MB doNotRepeat=1)
   
 #Refresh devouring plague  
 if TargetDebuffExpires(DP 0 mine=1)
-    Spell(DP doNotRepeat=1)
+    Spell(DP)
 
 #cast Mind flay if nothing else can be done
 Spell(MF priority=2)
