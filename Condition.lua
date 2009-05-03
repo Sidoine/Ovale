@@ -52,6 +52,39 @@ local function testbool(a, condition)
 	end
 end
 
+local function GetTargetAura(condition, filter, target)
+	local spellId = condition[1]
+	local auraName, auraRank, auraIcon = Ovale:GetSpellInfoOrNil(spellId)
+	local i=1;
+	local timeLeft = nil
+	local stacksLeft = nil
+	while (true) do
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitAura(target, i, filter);
+		if (not name) then
+			break
+		end
+		if (not condition.mine or unitCaster=="player") then
+			if (name == auraName and icon == auraIcon) then
+				timeLeft = expirationTime - Ovale.maintenant
+				stacksLeft = count
+				break
+			end
+		end
+		i = i + 1;
+	end
+	
+	if (Ovale.currentSpellInfo and spellId and Ovale.currentSpellInfo[target][filter] and
+		Ovale.currentSpellInfo[target][filter][spellId]) then
+		if (not timeLeft or timeLeft < Ovale.attenteFinCast) then
+			stacksLeft = 1
+		else
+			stacksLeft = stacksLeft + 1
+		end
+		timeLeft = Ovale.currentSpellInfo[target][filter][spellId] + Ovale.attenteFinCast
+	end
+	return timeLeft, stacksLeft
+end
+
 Ovale.conditions=
 {
 	-- Test if a white hit just occured
@@ -84,54 +117,25 @@ Ovale.conditions=
 	-- 1 : buff spell id
 	-- 2 : expiration time 
 	BuffExpires = function(condition)
-		local buffName = Ovale:GetSpellInfoOrNil(condition[1])
-		local i=1;
-		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitBuff("player", i);
-			if (not name) then
-				break
-			end
-			if (name == buffName) then
-				local timeLeft = expirationTime - Ovale.maintenant
-				local timeBefore = avecHate(condition[2], condition.haste)
-				if (timeLeft<timeBefore) then
-					return 0
-				else
-					return timeLeft-timeBefore
-				end
-			end
-			i = i + 1;
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HELPFUL", "player")
+		local timeBefore = avecHate(condition[2], condition.haste)
+		if (not timeLeft or timeLeft<timeBefore) then
+			return 0
+		else
+			return timeLeft-timeBefore
 		end
-		return 0
 	end,
 	-- Test if a buff is active
 	-- 1 : the buff spell id
 	-- stacks : minimum number of stacks
 	BuffPresent = function(condition)
-		if (not condition[1]) then
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HELPFUL", "player")
+		
+		if (timeLeft and (not condition.stacks or stacksLeft>=condition.stacks)) then
+			return 0
+		else
 			return nil
 		end
-		local buffName, buffRank, buffIcon = Ovale:GetSpellInfoOrNil(condition[1])
-		i=1;
-		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitBuff("player", i);
-			if (not name) then
-				break
-			end
-			if (name == buffName and icon==buffIcon) then
-				if (condition.stacks) then
-					if (count>=condition.stacks) then
-						return 0
-					else
-						return nil
-					end
-				else 
-					return 0
-				end
-			end
-			i = i + 1;
-		end
-		return nil
 	end,
 	Casting = function(condition)
 		local spell = UnitCastingInfo("player")
@@ -170,6 +174,17 @@ Ovale.conditions=
 	ComboPoints = function(condition)
 		local points = GetComboPoints("player")
 		return compare(points, condition[1], condition[2])
+	end,
+	DebuffExpires = function(condition)
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "player")
+		local tempsMax = avecHate(condition[2], condition.haste)
+		if (not timeLeft or timeLeft<tempsMax) then
+			return 0
+		elseif (stacksLeft~=0 and condition.stacks and stacksLeft<condition.stacks) then
+			return 0
+		else
+			return timeLeft-tempsMax
+		end
 	end,
 	HasShield = function(condition)
 		local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
@@ -212,6 +227,9 @@ Ovale.conditions=
 	-- 2 : the mana/energy/rage... limit
 	Mana = function(condition)
 		return compare(UnitPower("player"), condition[1], condition[2])
+	end,
+	ManaPercent = function(condition)
+		return compare(UnitPower("player")/UnitPowerMax("player"), condition[1], condition[2]/100)
 	end,
 	-- Test if any player pet is present (or not)
 	-- 1 : "yes" or "no"
@@ -304,59 +322,32 @@ Ovale.conditions=
 	-- stacks : how many stacks
 	-- mine : 1 means that if the debuff is not ours, the debuff is ignored
 	TargetDebuffExpires = function(condition)
-		local debuffName = Ovale:GetSpellInfoOrNil(condition[1])
-		i=1;
-		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitDebuff("target", i);
-			if (not name) then
-				break
-			end
-			if (not condition.mine or unitCaster=="player") then
-				if (name == debuffName) then
-					local timeLeft = expirationTime - Ovale.maintenant
-					local tempsMax = avecHate(condition[2], condition.haste)
-					if (timeLeft<tempsMax) then
-						return 0
-					elseif (count~=0 and condition.stacks and count<condition.stacks) then
-						return 0
-					else
-						return timeLeft-tempsMax
-					end
-				end
-			end
-			i = i + 1;
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "target")
+		local tempsMax = avecHate(condition[2], condition.haste)
+		if (not timeLeft or timeLeft<tempsMax) then
+			return 0
+		elseif (stacksLeft~=0 and condition.stacks and stacksLeft<condition.stacks) then
+			return 0
+		else
+			return timeLeft-tempsMax
 		end
-		return 0
 	end,
 	-- Test if a debuff is present on the target
 	-- 1 : debuff spell id
 	-- stacks : how many stacks
 	-- mine : 1 means that the debuff must be yours
 	TargetDebuffPresent = function(condition)
-		local debuffName = Ovale:GetSpellInfoOrNil(condition[1])
-		i=1;
-		while (true) do
-			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitDebuff("target", i);
-			if (not name) then
-				break
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "target")
+		
+		if (timeLeft and (condition[2]==nil or timeLeft>condition[2])) then
+			if (stacksLeft~=0 and condition.stacks and stacksLeft<condition.stacks) then
+				return nil
+			else
+				return 0
 			end
-			if (not condition.mine or unitCaster=="player") then
-				if (name == debuffName) then
-					local timeLeft = expirationTime - Ovale.maintenant
-					if (count~=0 and condition.stacks) then
-						if (count<condition.stacks) then
-							return nil
-						else
-							return 0
-						end
-					else
-						return 0
-					end
-				end
-			end
-			i = i + 1;
+		else
+			return nil
 		end
-		return nil
 	end,
 	-- Test if the target life is bellow/above a given value in percent
 	-- 1 : "less" or "more"

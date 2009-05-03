@@ -28,12 +28,6 @@ AddIcon
 			Spell(SLICEANDDICE)
 	}
 	
-	unless TargetDebuffPresent(RUPTURE)
-	{
-		if ComboPoints(more 3)
-			Spell(RUPTURE)
-	}
-	
 	if {TargetDebuffPresent(RUPTURE) or TargetDebuffPresent(DEEPWOUNDS) or TargetDebuffPresent(REND)
 		or TargetDebuffPresent(RIP)} and BuffExpires(HUNGERFORBLOOD 2)
 		Spell(HUNGERFORBLOOD)
@@ -46,6 +40,10 @@ AddIcon
 				Spell(ENVENOM)
 			Spell(SLICEANDDICE)
 		}
+
+		if TargetDebuffExpires(RUPTURE 0)
+			Spell(RUPTURE)
+		
 		if TalentPoints(TALENTVILEPOISONS more 0)
 			Spell(ENVENOM)
 		Spell(EVISCERATE)

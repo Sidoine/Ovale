@@ -29,6 +29,8 @@ Ovale.meleeHaste = 0
 Ovale.aura = { player = {}, target = {}}
 Ovale.possibleAura = { player = {}, target = {}}
 Ovale.targetGUID = nil
+Ovale.spellInfo = {}
+Ovale.currentSpellInfo = nil
 
 Ovale.arbre = {}
 
@@ -598,16 +600,19 @@ end
 
 function Ovale:InitCalculerMeilleureAction()
 	self.attenteFinCast = 0
+	self.currentSpellInfo = nil
 	
 	-- On attend que le sort courant soit fini
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
 	if (spell) then
 		self.attenteFinCast = endTime/1000 - Ovale.maintenant
+		self.currentSpellInfo = self.spellInfo[spell]
 	end
 	
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
 	if (spell and not Ovale.canStopChannelling[spell]) then
 		self.attenteFinCast = endTime/1000 - Ovale.maintenant
+		self.currentSpellInfo = self.spellInfo[spell]
 	end
 end
 

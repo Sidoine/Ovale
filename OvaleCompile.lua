@@ -8,6 +8,9 @@ local function ParseParameters(params)
 	for k,v in string.gmatch(params, "(%w+)=(%w+)") do
 		if (string.match(v,"^%-?%d+%.?%d*$")) then
 			v = tonumber(v)
+		end	
+		if (string.match(k,"^%-?%d+%.?%d*$")) then
+			k = tonumber(k)
 		end		
 		paramList[k] = v
 	end
@@ -28,6 +31,42 @@ local function ParseFunction(func, params)
 	local newNode = { type="function", func=func, params=paramList}
 	node[#node+1] = newNode
 	return "node"..#node
+end
+
+local function ParseSpellAddDebuff(params)
+	local paramList = ParseParameters(params)
+	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
+	if (spell) then
+		if (not Ovale.spellInfo[spell]) then
+			Ovale.spellInfo[spell] = { player = {}, target = {}}
+		end
+		Ovale.spellInfo[spell].player.HARMFUL = paramList
+	end
+	return ""
+end
+
+local function ParseSpellAddBuff(params)
+	local paramList = ParseParameters(params)
+	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
+	if (spell) then
+		if (not Ovale.spellInfo[spell]) then
+			Ovale.spellInfo[spell] = { player = {}, target = {} }
+		end
+		Ovale.spellInfo[spell].player.HELPFUL = paramList
+	end
+	return ""
+end
+
+local function ParseSpellAddTargetDebuff(params)
+	local paramList = ParseParameters(params)
+	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
+	if (spell) then
+		if (not Ovale.spellInfo[spell]) then
+			Ovale.spellInfo[spell] = { player = {}, target = {} }
+		end
+		Ovale.spellInfo[spell].target.HARMFUL = paramList
+	end
+	return ""
 end
 
 local function ParseIf(a, b)
@@ -194,7 +233,7 @@ function Ovale:Compile(text)
 	
 	-- On remplace les constantes par leur valeur
 	for k,v in pairs(defines) do
-		text = string.gsub(text, "([^%w])"..k.."([^%w])", "%1"..v.."%2")
+		text = subtest(text, "([^%w])"..k.."([^%w])", "%1"..v.."%2")
 	end
 	
 	-- Fonctions
@@ -204,6 +243,9 @@ function Ovale:Compile(text)
 	-- Options diverses
 	Ovale.canStopChannelling = {}
 	text = string.gsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
+	text = string.gsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
+	text = string.gsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
+	text = string.gsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
 			
 	-- On vire les espaces en trop
 	text = string.gsub(text, "\n", " ")

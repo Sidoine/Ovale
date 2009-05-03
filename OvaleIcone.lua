@@ -60,7 +60,8 @@
 		end
 		
 		local start, duration, enable = GetActionCooldown(meilleureAction)
-		if (Ovale.maintenant + minAttente > start + duration and minAttente > 0) then
+		if (Ovale.maintenant + minAttente > start + duration + 0.01 and minAttente > 0
+			and minAttente>Ovale.attenteFinCast) then
 			self.icone:SetVertexColor(0.75,0,0)
 		else
 			self.icone:SetVertexColor(1,1,1)
