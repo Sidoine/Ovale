@@ -13,6 +13,7 @@ Define(BESTIALWRATH 19574)
 Define(HUNTERSMARK 53338)
 Define(BLACKARROW 63668)
 Define(LOCKANDLOAD 56453)
+Define(TALENTEXPLOSIVESHOT 2145)
 
 AddCheckBox(multi SpellName(MULTISHOT))
 
@@ -24,10 +25,10 @@ AddIcon
 	if TargetDebuffExpires(EXPLOSIVESHOT 0 isMine=1) Spell(EXPLOSIVESHOT)
 	Spell(AIMEDSHOT)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
-	Spell(ARCANESHOT)
+	unless TalentPoints(TALENTEXPLOSIVESHOT more 0) Spell(ARCANESHOT)
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
 	if TargetDebuffExpires(HUNTERSMARK 2) Spell(HUNTERSMARK)
-	unless BuffPresent(LOCKANDLOAD) Spell(STEADYSHOT)
+	unless TargetDebuffPresent(EXPLOSIVESHOT isMine=1) and {2s before Spell(EXPLOSIVESHOT)} Spell(STEADYSHOT)
 }
 
 AddIcon
