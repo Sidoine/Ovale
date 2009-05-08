@@ -8,6 +8,14 @@ local runeType =
 	death = 4
 }	
 
+local totemType =
+{
+	fire = 1,
+	earth = 2,
+	water = 3,
+	air = 4
+}
+
 local function avecHate(temps, hate)
 	if (not hate) then
 		return temps
@@ -338,8 +346,9 @@ Ovale.conditions=
 	-- mine : 1 means that the debuff must be yours
 	TargetDebuffPresent = function(condition)
 		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "target")
+		local tempsMin = avecHate(condition[2], condition.haste)
 		
-		if (timeLeft and (condition[2]==nil or timeLeft>condition[2])) then
+		if (timeLeft and (condition[2]==nil or timeLeft>tempsMin)) then
 			if (stacksLeft~=0 and condition.stacks and stacksLeft<condition.stacks) then
 				return nil
 			else
@@ -372,5 +381,20 @@ Ovale.conditions=
 	-- 1 : "yes" (it should be the player) or "no"
 	TargetTargetIsPlayer = function(condition)
 		return testbool(UnitIsUnit("player","targettarget"), condition[1])
+	end,
+	TotemExpires = function(condition)
+		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])
+		if (totemName==nil) then
+			return 0
+		end
+		if (condition.totem and Ovale:GetSpellInfoOrNil(condition.totem)~=totemName) then
+			return 0
+		end
+		local timeLeft = duration - (Ovale.maintenant - startTime)
+		if (condition[2] and timeLeft<condition[2]) then
+			return 0
+		else
+			return timeLeft
+		end
 	end
 }

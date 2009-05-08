@@ -27,6 +27,7 @@ AddCheckBox(multi L(AOE))
 AddCheckBox(blood L(Blood))
 AddCheckBox(demo SpellName(DEMOROAR))
 AddCheckBox(lucioles SpellName(FAERIEFIRE))
+AddCheckBox(wrath SpellName(WRATH))
 
 AddIcon
 {
@@ -73,16 +74,25 @@ AddIcon
 	unless Stance(1) or Stance(3)
 	{
 		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2)
-		Spell(FAERIEFIRE)
+			Spell(FAERIEFIRE)
 
-		if TargetDebuffExpires(MOONFIRE 0)
-			Spell(MOONFIRE)
 		if TargetDebuffExpires(INSECTSWARM 0)
 			Spell(INSECTSWARM)  
+		if TargetDebuffExpires(MOONFIRE 0)
+			Spell(MOONFIRE)
 
-		unless BuffPresent(ECLIPSEWRATH)
+		if CheckBoxOff(wrath)
+		{
+			if BuffPresent(ECLIPSEWRATH)
+				Spell(WRATH)
 			Spell(STARFIRE)
-		Spell(WRATH)
+		}
+		if CheckBoxOn(wrath)
+		{
+			if BuffPresent(ECLIPSESTARFIRE)
+				Spell(STARFIRE)
+			Spell(WRATH)
+		}
 	}
 }
 
