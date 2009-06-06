@@ -16,6 +16,99 @@ local totemType =
 	air = 4
 }
 
+local fearSpellIdList = 
+{
+	5782, -- Fear
+	5484, -- Howl of terror
+	5246, -- Intimidating Shout 
+	8122, -- Psychic scream
+}
+local fearSpellList = nil
+
+local stunSpellIdList =
+{
+	5211, -- Bash
+	44415, -- Blackout
+	6409, -- Cheap Shot
+	22427, -- Concussion Blow
+	853, -- Hammer of Justice
+	408, -- Kidney Shot
+	12798, -- Revenge Stun
+}
+local stunSpellList = nil
+
+local incapacitateSpellIdList =
+{
+	6770, -- Sap
+	12540, -- Gouge
+	20066, -- Repentance
+}
+local incapacitateSpellList = nil
+
+local rootSpellIdList =
+{
+	23694, -- Improved Hamstring
+	339, -- Entangling Roots
+	122, -- Frost Nova
+	47168, -- Improved Wing Clip
+}
+local rootSpellList = nil
+
+local function buildRootSpellList()
+	if (rootSpellList) then
+		return
+	end
+	rootSpellList = {}
+	for k, v in pairs(rootSpellIdList) do
+		rootSpellList[Ovale:GetSpellInfoOrNil(v)] = true
+	end
+end
+
+local function buildStunSpellList()
+	if (stunSpellList) then
+		return
+	end
+	stunSpellList = {}
+	for k, v in pairs(stunSpellIdList) do
+		stunListList[Ovale:GetSpellInfoOrNil(v)] = true
+	end
+end
+
+local function buildIncapacitateSpellList()
+	if (incapacitateSpellList) then
+		return
+	end
+	incapacitateSpellList = {}
+	for k, v in pairs(incapacitateSpellIdList) do
+		incapacitateSpellList[Ovale:GetSpellInfoOrNil(v)] = true
+	end
+end
+
+local function buildFearSpellList()
+	if (fearSpellList) then
+		return
+	end
+	fearSpellList = {}
+	for k, v in pairs(fearSpellIdList) do
+		fearSpellList[Ovale:GetSpellInfoOrNil(v)] = true
+	end
+end
+
+local function isDebuffInList(list)
+	local i=1;
+	while (true) do
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitDebuff("player", i);
+		if (not name) then
+			break
+		end
+		if (list[name]) then
+			return true
+		end
+		i = i +1
+	end
+	return false
+end
+
 local function avecHate(temps, hate)
 	if (not hate) then
 		return temps
@@ -45,7 +138,7 @@ local function compare(a, comparison, b)
 end
 
 local function testbool(a, condition)
-	if (condition == "yes") then
+	if (condition == "yes" or not condition) then
 		if (a) then
 			return 0
 		else
@@ -57,6 +150,14 @@ local function testbool(a, condition)
 		else
 			return nil
 		end
+	end
+end
+
+local function getTarget(condition)
+	if (not condition) then
+		return "target"
+	else
+		return condition
 	end
 end
 
@@ -194,18 +295,33 @@ Ovale.conditions=
 			return timeLeft-tempsMax
 		end
 	end,
+	HasFullControl = function(condition)
+		return testbool(HasFullControl(), condition[1])
+	end,
 	HasShield = function(condition)
 		local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
 		if (not id) then
-			return nil
+			return testbool(false, condition[1])
 		end
 		
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
-		if (itemLoc=="INVTYPE_SHIELD") then
-			return 0
-		else
-			return nil
-		end
+		return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
+	end,
+	IsFeared = function(condition)
+		buildFearSpellList()
+		return testbool(not HasFullControl() and isDebuffInList(fearSpellList), condition[1])
+	end,
+	IsIncapacitated = function(condition)
+		buildIncapacitateSpellList()
+		return testbool(not HasFullControl() and isDebuffInList(incapacitateSpellList), condition[1])
+	end,
+	IsRooted = function(condition)
+		buildRootSpellList()
+		return testbool(not HasFullControl() and isDebuffInList(rootSpellList), condition[1])
+	end,
+	IsStunned = function(condition)
+		buildStunSpellList()
+		return testbool(not HasFullControl() and isDebuffInList(stunSpellList), condition[1])
 	end,
 	-- Compare with the player level
 	-- 1 : "less" or "more"
@@ -299,6 +415,9 @@ Ovale.conditions=
 		end
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
 	end,
+	TargetClass = function(condition)
+		return testbool(UnitClass("target") == condition[1], condition[2])
+	end,
 	-- Test the target classification
 	-- 1 : normal, elite, or worldboss
 	TargetClassification = function(condition)
@@ -358,11 +477,18 @@ Ovale.conditions=
 			return nil
 		end
 	end,
+	TargetInRange = function(condition)
+		return testbool(IsSpellInRange(Ovale:GetSpellInfoOrNil(condition[1]),getTarget(condition.target))==1,condition[2])
+	end,
+	TargetIsCasting = function(condition)
+		return testbool(UnitCastingInfo(getTarget(condition.target)), condition[1])
+	end,
 	-- Test if the target life is bellow/above a given value in percent
 	-- 1 : "less" or "more"
 	-- 2 : the limit, in percents
 	TargetLifePercent = function(condition)
-		return compare(UnitHealth("target")/UnitHealthMax("target"), condition[1], condition[2]/100)
+		local target = getTarget(condition.target)
+		return compare(UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2]/100)
 	end,
 	-- Test the target level difference with the player
 	-- 1 : "less" or "more"

@@ -288,6 +288,8 @@ function Ovale:DebugNode(node)
 		text = self:DebugNode(node.a).." and "..self:DebugNode(node.b)
 	elseif (node.type == "or") then
 		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
+	elseif (node.type == "before") then
+		text = node.time .. "s before "..self:DebufNode(node.b)
 	else
 		text = "#unknown node type#"
 	end

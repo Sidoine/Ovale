@@ -189,6 +189,10 @@ local options =
 	}
 }
 
+function Ovale:Debug()
+	self:Print(self:DebugNode(self.masterNodes[1]))
+end
+
 function Ovale:OnInitialize()
 	self.AceConfig = LibStub("AceConfig-3.0");
 	self.AceConfigDialog = LibStub("AceConfigDialog-3.0");
@@ -616,6 +620,14 @@ function Ovale:InitCalculerMeilleureAction()
 	end
 end
 
+local function printTime(temps)
+	if (temps == nil) then
+		Ovale:Print("> nil")
+	else
+		Ovale:Print("> "..temps)
+	end
+end
+
 function Ovale:CalculerMeilleureAction(element)
 	if (self.bug and not self.trace) then
 		return nil
@@ -756,8 +768,10 @@ function Ovale:CalculerMeilleureAction(element)
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
 		local tempsB = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsB==nil or (tempsA~=nil and tempsB>tempsA)) then
+			if (Ovale.trace) then printTime(tempsA) end
 			return tempsA
 		else
+			if (Ovale.trace) then printTime(tempsB) end
 			return tempsB
 		end
 	elseif (element.type == "group") then
@@ -808,7 +822,7 @@ function Ovale:CalculerMeilleureAction(element)
 			end
 		end
 		
-		if (meilleurFils) then
+		if (meilleurTempsFils) then
 			if (Ovale.trace) then
 				self:Print("Best action "..meilleurFils.." remains "..meilleurTempsFils)
 			end
@@ -816,6 +830,7 @@ function Ovale:CalculerMeilleureAction(element)
 			self.retourAction = meilleurFils
 			return meilleurTempsFils
 		else
+			if (Ovale.trace) then printTime(nil) end
 			return nil
 		end
 	end
