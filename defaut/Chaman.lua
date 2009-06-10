@@ -67,20 +67,20 @@ AddIcon
 	{
 	#	if BuffExpires(FLAMETHONG 2) Spell(FLAMETHONG)
 		if BuffExpires(WATERSHIELD 2) Spell(WATERSHIELD)
-		if TargetDebuffExpires(FLAMESHOCK 0) Spell(FLAMESHOCK)
+		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		Spell(LAVABURST doNotRepeat=1)
 		if CheckBoxOn(chain) Spell(CHAINLIGHTNING doNotRepeat=1)
 		Spell(LIGHTNINGBOLT)
 	}
 	if CheckBoxOn(melee)
 	{
-		if TargetDebuffExpires(FLAMESHOCK 0) Spell(FLAMESHOCK)
-		if TargetDebuffExpires(FLAMESHOCK 1.5 haste=spell) and 1.5s before Spell(LAVALASH)
+		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
+		if TargetDebuffExpires(FLAMESHOCK 1.5 haste=spell mine=1) and 1.5s before Spell(LAVALASH)
 			Spell(FLAMESHOCK)
-		if TargetDebuffPresent(FLAMESHOCK 5) Spell(EARTHSHOCK)
+		if TargetDebuffPresent(FLAMESHOCK 5 mine=1) Spell(EARTHSHOCK)
 		if BuffExpires(LIGHTNINGSHIELD 0) Spell(LIGHTNINGSHIELD)
 		Spell(STORMSTRIKE)
-		if TargetDebuffPresent(FLAMESHOCK 1.5 haste=spell) Spell(LAVALASH)
+		if TargetDebuffPresent(FLAMESHOCK 1.5 haste=spell mine=1) Spell(LAVALASH)
 		if CheckBoxOn(chain) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING doNotRepeat=1)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT doNotRepeat=1)
 	}

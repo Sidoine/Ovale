@@ -3,7 +3,7 @@
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 3.1.10
+## Version: 3.1.11
 ## OptionalDeps: Ace3
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
