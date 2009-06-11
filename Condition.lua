@@ -317,7 +317,7 @@ Ovale.conditions=
 	end,
 	IsRooted = function(condition)
 		buildRootSpellList()
-		return testbool(not HasFullControl() and isDebuffInList(rootSpellList), condition[1])
+		return testbool(isDebuffInList(rootSpellList), condition[1])
 	end,
 	IsStunned = function(condition)
 		buildStunSpellList()
@@ -416,7 +416,8 @@ Ovale.conditions=
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
 	end,
 	TargetClass = function(condition)
-		return testbool(UnitClass("target") == condition[1], condition[2])
+		local loc, noloc = UnitClass("target")
+		return testbool(noloc == condition[1], condition[2])
 	end,
 	-- Test the target classification
 	-- 1 : normal, elite, or worldboss

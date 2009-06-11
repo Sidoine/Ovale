@@ -160,30 +160,43 @@ local options =
 			{
 				code = 
 				{
-					order = 2,
+					order = 1,
 					type = "input",
 					multiline = 15,
 					name = L["Code"],
-					desc = L["BUGTEXT"],
 					get = function(info)
 						return Ovale.db.profile.code
 					end,
 					set = function(info,v)
 						Ovale.db.profile.code = v
+						Ovale.masterNodes = Ovale:Compile(Ovale.db.profile.code)
+						Ovale:UpdateFrame()
 						-- Ovale:Print("code change")
 					end,
 					width = "full"
 				},
-				compiler = 
+				show =
 				{
-					order = 1,
+					order = -1,
 					type = "execute",
-					name = L["Compiler"],
+					name = L["Afficher la fenêtre"],
+					guiHidden = true,
 					func = function()
-						Ovale.masterNodes = Ovale:Compile(Ovale.db.profile.code)
-						Ovale:UpdateFrame()
+						Ovale.db.profile.display = true
+						Ovale.frame:Show()	
 					end
-				}
+				},
+				hide =
+				{
+					order = -2,
+					type = "execute",
+					name = L["Cacher la fenêtre"],
+					guiHidden = true,
+					func = function()
+						Ovale.db.profile.display = false
+						Ovale.frame:Hide()	
+					end
+				},
 			}
 		}
 	}
@@ -365,6 +378,9 @@ function Ovale:FirstInit()
 		self.masterNodes = self:Compile(self.db.profile.code)
 	end
 	self:UpdateFrame()
+	if (not Ovale.db.profile.display) then
+		self.frame:Hide()
+	end
 end
 
 function Ovale:OnEnable()
@@ -384,6 +400,7 @@ function Ovale:OnEnable()
 		self:FirstInit()
 	end
 	self:UNIT_AURA("","player")
+	self.frame:Show()
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
@@ -843,6 +860,7 @@ function Ovale:ChargerDefaut()
 	{
 		profile = 
 		{
+			display = true,
 			code = Ovale.defaut[englishClass],
 			left = 500,
 			top = 500,
