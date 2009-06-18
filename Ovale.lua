@@ -4,10 +4,8 @@ Ovale = LibStub("AceAddon-3.0"):NewAddon("Ovale", "AceEvent-3.0", "AceConsole-3.
 
 Ovale.defaut = {}
 Ovale.action = {}
-Ovale.listeSorts = {}
 Ovale.casesACocher = {}
 Ovale.actionSort = {}
-Ovale.listeFormes = {}
 Ovale.listeTalents = {}
 Ovale.pointsTalent = {}
 Ovale.talentIdToName = {}
@@ -212,10 +210,16 @@ function Ovale:OnInitialize()
 end
 
 function Ovale:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
-	if (slot) then
+	if (slot == 0) then
+		self:RemplirActionIndexes()
+	elseif (slot) then
 	-- on reçoit aussi si c'est une macro avec mouseover à chaque fois que la souris passe sur une cible!
 		self:RemplirActionIndex(tonumber(slot))
 	end
+end
+
+function Ovale:ACTIONBAR_PAGE_CHANGED()
+	-- self:RemplirActionIndexes()
 end
 
 function Ovale:CHARACTER_POINTS_CHANGED()
@@ -227,10 +231,8 @@ function Ovale:PLAYER_TALENT_UPDATE()
 end
 
 function Ovale:SPELLS_CHANGED()
-	self:RemplirListeSorts();
-	self:RemplirListeFormes()
-	self:RemplirActionIndexes()
-	self:RemplirListeTalents()
+	-- self:RemplirActionIndexes()
+	-- self:RemplirListeTalents()
 end
 
 function Ovale:UPDATE_BINDINGS()
@@ -335,8 +337,6 @@ function Ovale:ChercherNomsBuffs()
 end
 
 function Ovale:FirstInit()
-	self:RemplirListeSorts()
-	self:RemplirListeFormes()
 	self:RemplirActionIndexes()
 	self:RemplirListeTalents()
 	self:ChercherNomsBuffs()
@@ -393,6 +393,8 @@ function Ovale:OnEnable()
     self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
     self:RegisterEvent("UPDATE_BINDINGS");
     self:RegisterEvent("UNIT_AURA");
+    self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+		
     -- self:RegisterEvent("PLAYER_TARGET_CHANGED")
     -- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	
@@ -413,6 +415,7 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
+    self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
     self:UnregisterEvent("PLAYER_REGEN_ENABLED")
     self:UnregisterEvent("PLAYER_REGEN_DISABLED")
     self:UnregisterEvent("PLAYER_TALENT_UPDATE")
@@ -544,42 +547,8 @@ function Ovale:RemplirActionIndexes()
 	self.actionMacro = {}
 	self.actionObjet = {}
 	self.shortCut = {}
-	
 	for i=1,120 do
 		self:RemplirActionIndex(i)
-	end
-end
-
-function Ovale:RemplirListeFormes()
-	self.listeFormes[0] = "Humanoïde";
-	local index=1;
-	while true do
-		local icon, name, active, castable = GetShapeshiftFormInfo(index);
-		if not icon then
-			break;
-		end
-		Ovale.listeFormes[index] = name;
-		index = index + 1
-	end
-end
-
-function Ovale:RemplirListeSorts()
-	local sorts = {};
-	local name, texture, offset, numSpells = GetSpellTabInfo(1);
-	local i=numSpells+1;
-	while true do
-		local spellName, spellRank = GetSpellName(i, BOOKTYPE_SPELL)
-		if not spellName then
-			break
-		end
-		-- DEFAULT_CHAT_FRAME:AddMessage(spellName);
-		local nom = spellName;
-		local a, b, numeroRang = string.find(spellRank, "(%d+)");
-		--if (not numeroRang or tonumber(numeroRang)==1) then
-			Ovale.listeSorts[nom] = nom;
-		--else
-		--end
-		i = i+1;
 	end
 end
 

@@ -415,6 +415,23 @@ Ovale.conditions=
 		end
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
 	end,
+	-- Test if a buff is present on the target
+	-- 1 : buff spell id
+	-- stacks : how many stacks
+	TargetBuffPresent = function(condition)
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HELPFUL", "target")
+		local tempsMin = avecHate(condition[2], condition.haste)
+		
+		if (timeLeft and (condition[2]==nil or timeLeft>tempsMin)) then
+			if (stacksLeft~=0 and condition.stacks and stacksLeft<condition.stacks) then
+				return nil
+			else
+				return 0
+			end
+		else
+			return nil
+		end
+	end,
 	TargetClass = function(condition)
 		local loc, noloc = UnitClass("target")
 		return testbool(noloc == condition[1], condition[2])
