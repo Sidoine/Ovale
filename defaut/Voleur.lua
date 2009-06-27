@@ -32,7 +32,7 @@ AddIcon
 		or TargetDebuffPresent(RIP)} and BuffExpires(HUNGERFORBLOOD 2)
 		Spell(HUNGERFORBLOOD)
 		
-	if ComboPoints(more 3)
+	if ComboPoints(more 3) and Mana(more 69)
 	{
 		if BuffExpires(SLICEANDDICE 12) 
 		{

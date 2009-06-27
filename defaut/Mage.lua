@@ -35,9 +35,9 @@ AddIcon
        if TalentPoints(TALENTLIVINGBOMB more 0)
        {
               #Fire spec
+              if TargetDebuffExpires(IMPROVEDSCORCH 6 stacks=5) and CheckBoxOn(scorch) Spell(SCORCH)
               if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
               if TargetDebuffExpires(LIVINGBOMB 0 mine=1) Spell(LIVINGBOMB)
-              if TargetDebuffExpires(IMPROVEDSCORCH 5.5 stacks=5) and CheckBoxOn(scorch) Spell(SCORCH)
               if TalentPoints(TALENTPIERCINGICE more 0)
                      Spell(FROSTFIREBOLT)
               if TalentPoints(TALENTPIERCINGICE less 1)
