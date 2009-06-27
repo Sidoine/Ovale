@@ -41,6 +41,7 @@ Define(STONESKINTOTEM 8071)
 Define(STRENGTHOFEARTHTOTEM 8075)
 Define(TREMORTOTEM 8143)
 
+AddCheckBox(aoe L(AOE))
 AddCheckBox(chain SpellName(CHAINLIGHTNING))
 AddCheckBox(melee L(Melee))
 AddListItem(fire wrath SpellName(TOTEMOFWRATH))
@@ -69,8 +70,15 @@ AddIcon
 		if BuffExpires(WATERSHIELD 2) Spell(WATERSHIELD)
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		Spell(LAVABURST doNotRepeat=1)
-		if CheckBoxOn(chain) Spell(CHAINLIGHTNING doNotRepeat=1)
-		Spell(LIGHTNINGBOLT)
+		if CheckBoxOn(aoe) Spell(CHAINLIGHTNING doNotRepeat=1)
+		
+		if CheckBoxOn(chain)
+		{
+			unless 1.4s before Spell(LAVABURST doNotRepeat=1) Spell(LIGHTNINGBOLT)
+
+			Spell(CHAINLIGHTNING)
+		}
+		if CheckBoxOff(chain) Spell(LIGHTNINGBOLT)
 	}
 	if CheckBoxOn(melee)
 	{
@@ -81,7 +89,7 @@ AddIcon
 		if BuffExpires(LIGHTNINGSHIELD 0) Spell(LIGHTNINGSHIELD)
 		Spell(STORMSTRIKE)
 		if TargetDebuffPresent(FLAMESHOCK 1.5 haste=spell mine=1) Spell(LAVALASH)
-		if CheckBoxOn(chain) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING doNotRepeat=1)
+		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING doNotRepeat=1)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT doNotRepeat=1)
 	}
 }
