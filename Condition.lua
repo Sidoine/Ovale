@@ -234,6 +234,24 @@ Ovale.conditions=
 			return timeLeft-timeBefore
 		end
 	end,
+	-- Test if a time has elapsed since the last buff gain
+	-- 1 : buff spell id
+	-- 2 : time since the buff gain
+	BuffGain = function(condition)
+		local spell, rank, icon = Ovale:GetSpellInfoOrNil(condition[1])
+		if (spell) then
+			if (not Ovale.buff[spell]) then
+				return 0
+			end
+			local timeGain = Ovale.buff[spell].gain
+			if (not timeGain or (Ovale.maintenant > timeGain + condition[2]) or Ovale.buff[spell].icon~=icon) then
+				return 0
+			else
+				return timeGain + condition[2] - Ovale.maintenant
+			end
+		end
+		return nil
+	end,
 	-- Test if a buff is active
 	-- 1 : the buff spell id
 	-- stacks : minimum number of stacks
@@ -350,6 +368,33 @@ Ovale.conditions=
 	-- 1 : "less" or "more"
 	-- 2 : the mana/energy/rage... limit
 	Mana = function(condition)
+		if (condition[1] == "more") then
+			local _,className = UnitClass("player")
+			if (className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3)) then
+				local current = UnitPower("player")
+				if (current > condition[2]) then
+					return 0
+				else
+					local rate= 10
+					if (className == "ROGUE") then
+						local i=1
+						local rush = Ovale:GetSpellInfoOrNil(13750)
+						while (true) do
+							local name = UnitBuff("player", i)
+							if (not name) then
+								break
+							end
+							if (name == rush) then
+								rate = rate * 2
+								break
+							end
+							i = i + 1
+						end
+					end
+					return (condition[2] - current) / rate
+				end
+			end
+		end
 		return compare(UnitPower("player"), condition[1], condition[2])
 	end,
 	ManaPercent = function(condition)

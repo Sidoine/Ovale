@@ -29,6 +29,7 @@ Ovale.possibleAura = { player = {}, target = {}}
 Ovale.targetGUID = nil
 Ovale.spellInfo = {}
 Ovale.currentSpellInfo = nil
+Ovale.buff = {}
 
 Ovale.arbre = {}
 
@@ -278,6 +279,7 @@ function Ovale:PLAYER_TARGET_CHANGED()
 end
 ]]
 
+
 function Ovale:UNIT_AURA(event, unit)
 	if (unit == "player") then
 		local hateBase = GetCombatRatingBonus(18)
@@ -288,12 +290,24 @@ function Ovale:UNIT_AURA(event, unit)
 		local hateClasse = 0
 		local i=1;
 		
-		
 		while (true) do
-			local name =  UnitBuff("player", i);
+			local name, rank, iconTexture, count, debuffType, duration, expirationTime, source =  UnitBuff("player", i);
 			if (not name) then
 				break
 			end
+			if (not self.buff[name]) then
+				self.buff[name] = {}
+			end
+			self.buff[name].icon = iconTexture
+			self.buff[name].count = count
+			self.buff[name].duration = duration
+			self.buff[name].expirationTime = expirationTime
+			self.buff[name].source = source
+			if (not self.buff[name].present) then
+				self.buff[name].gain = Ovale.maintenant
+			end
+			self.buff[name].lastSeen = Ovale.maintenant
+			self.buff[name].present = true
 			
 			if (name == self.RETRIBUTION_AURA or name == self.MOONKIN_AURA) then
 				hateCommune = 3
@@ -310,6 +324,13 @@ function Ovale:UNIT_AURA(event, unit)
 			end
 			i = i + 1;
 		end
+		
+		for k,v in pairs(self.buff) do
+			if (v.lastSeen ~= Ovale.maintenant) then
+				v.present = false
+			end
+		end
+		
 		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
 		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
 --		print("spellHaste = "..self.spellHaste)
@@ -394,7 +415,7 @@ function Ovale:OnEnable()
     self:RegisterEvent("UPDATE_BINDINGS");
     self:RegisterEvent("UNIT_AURA");
     self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-		
+    	
     -- self:RegisterEvent("PLAYER_TARGET_CHANGED")
     -- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	
@@ -415,7 +436,7 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
-    self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
+	self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
     self:UnregisterEvent("PLAYER_REGEN_ENABLED")
     self:UnregisterEvent("PLAYER_REGEN_DISABLED")
     self:UnregisterEvent("PLAYER_TALENT_UPDATE")

@@ -36,9 +36,12 @@
 		if (meilleureAction~=self.actionCourante or self.ancienneAttente==nil or 
 			(minAttente~=0 and minAttente>self.ancienneAttente+0.01) or
 			(Ovale.maintenant + minAttente < self.finAction-0.01)) then
+			if (meilleureAction~=self.actionCourante or self.ancienneAttente==nil or 
+					(minAttente~=0 and minAttente>self.ancienneAttente+0.01)) then
+				self.debutAction = Ovale.maintenant
+			end
 			self.actionCourante = meilleureAction
-			self.debutAction = Ovale.maintenant
-			self.finAction = minAttente + self.debutAction
+			self.finAction = minAttente + Ovale.maintenant
 			if (minAttente == 0) then
 				self.cd:Hide()
 			else
