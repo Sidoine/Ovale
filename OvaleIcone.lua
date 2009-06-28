@@ -110,7 +110,6 @@
 end
 
 local function SetSkinGroup(self, _skinGroup)
-	Ovale:Print("SetSkinGroup")
 	self.skinGroup = _skinGroup
 	self.skinGroup:AddButton(self)
 end
