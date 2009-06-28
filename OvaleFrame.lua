@@ -1,5 +1,6 @@
 ﻿local AceGUI = LibStub("AceGUI-3.0")
-
+local LBF = LibStub("LibButtonFacade", true)
+		
 ----------------
 -- Main Frame --
 ----------------
@@ -11,13 +12,6 @@
 do
 	local Type = "OvaleFrame"
 	local Version = 7
-
-	local FrameBackdrop = {
-		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
-		edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border", 
-		tile = true, tileSize = 32, edgeSize = 32, 
-		insets = { left = 8, right = 8, top = 8, bottom = 8 }
-	}
 
 	local function frameOnClose(this)
 		this.obj:Fire("OnClose")
@@ -35,18 +29,22 @@ do
 		end
 	end
 	
+	local function ToggleOptions(this)
+		if (this.content:IsShown()) then
+			this.content:Hide()
+		else
+			this.content:Show()
+		end
+	end
+	
 	local function frameOnMouseUp(this)
 		this:StopMovingOrSizing()
 		
 		if (Ovale.db.profile.left~=this:GetLeft() or Ovale.db.profile.top ~=this:GetTop()) then
 			Ovale.db.profile.left = this:GetLeft()
 			Ovale.db.profile.top = this:GetTop()
-		else
-			if (this.obj.content:IsShown()) then
-				this.obj.content:Hide()
-			else
-				this.obj.content:Show()
-			end
+	--	else
+	--		this.obj:ToggleOptions()
 		end
 	end
 	
@@ -55,6 +53,9 @@ do
 		--	child.frame:Show()
 		--end
 	--	this.obj.content:Show()
+		if (not Ovale.db.profile.apparence.verrouille) then
+			this.obj.barre:Show()
+		end
 	end
 	
 	
@@ -63,6 +64,7 @@ do
 		--	child.frame:Hide()
 		--end
 		--this.obj.content:Hide()
+		this.obj.barre:Hide()
 	end
 	
 	local function Hide(self)
@@ -111,6 +113,16 @@ do
 		self.content:SetHeight(height+50)
 	end
 	
+	local function OnSkinChanged(self, skinID, gloss, backdrop, colors)
+		-- for k, icon in pairs(self.icone) do
+		--	icon:UpdateSkin(skinID, gloss, backdrop, colors)
+		-- end
+		Ovale.db.profile.SkinID = skinID
+		Ovale.db.profile.Gloss = gloss
+		Ovale.db.profile.Backdrop = backdrop
+		Ovale.db.profile.Colors = colors
+	end
+	
 	local function UpdateIcons(self)
 		for k, icon in pairs(self.icone) do
 			icon:Hide()
@@ -125,30 +137,45 @@ do
 			return;
 		end
 		
+		local BARRE = 8
+		
+		local margin =  Ovale.db.profile.apparence.margin
+			
 		for k,node in pairs(Ovale.masterNodes) do
 			if (not self.icone[k]) then
-				self.icone[k] = CreateFrame("Frame",nil,self.frame,"OvaleIcone");
+				-- self.icone[k] = CreateFrame("Frame", "Icon"..k,self.frame,"OvaleIcone");
+				self.icone[k] = CreateFrame("CheckButton", "Icon"..k,self.frame,"OvaleIcone");
 			end
+			-- self.icone[k]:SetFrameLevel(1)
 			self.icone[k].masterNode = node
 			local width, height
 			if (node.params.size == "small") then
-				width = Ovale.db.profile.apparence.smallIconWidth
-				height = Ovale.db.profile.apparence.smallIconHeight
+				width = Ovale.db.profile.apparence.smallIconWidth + margin
+				height = Ovale.db.profile.apparence.smallIconHeight + margin
 			else
-				width = Ovale.db.profile.apparence.iconWidth
-				height = Ovale.db.profile.apparence.iconHeight
+				width = Ovale.db.profile.apparence.iconWidth + margin
+				height = Ovale.db.profile.apparence.iconHeight + margin
 			end
-			if (top + height > Ovale.db.profile.apparence.iconHeight) then
+			if (top + height > Ovale.db.profile.apparence.iconHeight + margin) then
 				top = 0
 				left = maxWidth
 			end
 			if (Ovale.db.profile.apparence.vertical) then
-				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",top,-left)
+				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",top,-left-BARRE-margin)
 			else
-				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",left,-top)
+				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",left,-top-BARRE-margin)
 			end
-			self.icone[k]:SetWidth(width)
-			self.icone[k]:SetHeight(height)
+			self.icone[k]:SetWidth(width - margin)
+			self.icone[k]:SetHeight(height - margin)
+			if (not LBF) then
+				self.icone[k].normalTexture:SetWidth((width - margin)*66/36)
+				self.icone[k].normalTexture:SetHeight((height - margin)*66/36)
+				self.icone[k].shortcut:SetWidth(width-margin)
+				self.icone[k].remains:SetWidth(width-margin)
+			end
+			if LBF then
+				self.icone[k]:SetSkinGroup(self.skinGroup)
+			end
 			self.icone[k]:Show();
 			top = top + height
 			if (top> maxHeight) then
@@ -158,13 +185,18 @@ do
 				maxWidth = left + width
 			end
 		end
+		
 		if (Ovale.db.profile.apparence.vertical) then
+			self.barre:SetWidth(maxHeight - margin)
+			self.barre:SetHeight(BARRE)
 			self.frame:SetWidth(maxHeight)
-			self.frame:SetHeight(maxWidth)
+			self.frame:SetHeight(maxWidth+BARRE+margin)
 			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxHeight,0)
 		else
+			self.barre:SetWidth(maxWidth - margin)
+			self.barre:SetHeight(BARRE)
 			self.frame:SetWidth(maxWidth)
-			self.frame:SetHeight(maxHeight)
+			self.frame:SetHeight(maxHeight+BARRE+margin)
 			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth,0)
 		end
 	end
@@ -184,6 +216,8 @@ do
 		self.ApplyStatus = ApplyStatus
 		self.LayoutFinished = OnLayoutFinished
 		self.UpdateIcons = UpdateIcons
+		self.OnSkinChanged = OnSkinChanged
+		self.ToggleOptions = ToggleOptions
 		
 		self.localstatus = {}
 		self.icone = {}
@@ -204,6 +238,11 @@ do
 		
 		frame:SetScript("OnHide",frameOnClose)
 		
+		self.barre = self.frame:CreateTexture();
+		self.barre:SetTexture(0,0.8,0)
+		self.barre:SetPoint("TOPLEFT",0,0)
+		self.barre:Hide()
+			
 		--Container Support
 		local content = CreateFrame("Frame",nil,frame)
 		self.content = content
@@ -216,6 +255,15 @@ do
 		content:Hide()
 		
 		AceGUI:RegisterAsContainer(self)
+
+		if LBF then
+			self.skinGroup = LBF:Group("Ovale")
+			self.skinGroup.SkinID = Ovale.db.profile.SkinID
+			self.skinGroup.Gloss = Ovale.db.profile.Gloss
+			self.skinGroup.Backdrop = Ovale.db.profile.Backdrop
+			self.skinGroup.Colors = Ovale.db.profile.Colors
+			LBF:RegisterSkinCallback("Ovale", self.OnSkinChanged, self)
+		end
 
 		return self	
 	end

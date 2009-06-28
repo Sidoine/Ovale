@@ -93,10 +93,10 @@
 		-- L'indicateur de portée
 		self.aPortee:Show()
 		if (IsActionInRange(meilleureAction,"target")==1) then
-			self.aPortee:SetTexture(1,1,1)
+			self.aPortee:SetVertexColor(0.6,0.6,0.6)
 			self.aPortee:Show()
 		elseif (IsActionInRange(meilleureAction,"target")==0) then
-			self.aPortee:SetTexture(1,0,0)
+			self.aPortee:SetVertexColor(1.0,0.1,0.1)
 			self.aPortee:Show()
 		else
 			self.aPortee:Hide()
@@ -109,33 +109,28 @@
 	end
 end
 
+local function SetSkinGroup(self, _skinGroup)
+	Ovale:Print("SetSkinGroup")
+	self.skinGroup = _skinGroup
+	self.skinGroup:AddButton(self)
+end
+
+function OvaleIcone_OnClick(self)
+	Ovale:ToggleOptions()
+	self:SetChecked(0)
+end
 
 function OvaleIcone_OnLoad(self)
-	self.icone = self:CreateTexture();
-	self.icone:SetDrawLayer("ARTWORK");
-	self.icone:SetAllPoints(self);
-	self.icone:Show();
-		
-	self.shortcut = self:CreateFontString(nil, "OVERLAY");
-	self.shortcut:SetFontObject("GameFontHighlightLarge");
-	self.shortcut:SetPoint("BOTTOMLEFT",0,0);
-	self.shortcut:SetText("A");
-	self.shortcut:SetTextColor(1,1,1);
-	self.shortcut:Show();
+	local name = self:GetName()
+	self.icone = _G[name.."Icon"]
+	self.shortcut = _G[name.."HotKey"]
+	self.remains = _G[name.."Name"]
+	self.aPortee = _G[name.."Count"]
+	self.aPortee:SetText(RANGE_INDICATOR)
+	self.cd = _G[name.."Cooldown"]
+	self.normalTexture = _G[name.."NormalTexture"]
 	
-	self.remains = self:CreateFontString(nil, "OVERLAY");
-	self.remains:SetFontObject("GameFontHighlightLarge");
-	self.remains:SetAllPoints(self);
-	self.remains:SetTextColor(1,1,1);
-	self.remains:Show();
-	
-	self.aPortee = self:CreateTexture();
-	self.aPortee:SetDrawLayer("OVERLAY")
-	self.aPortee:SetPoint("TOPRIGHT",self,"TOPRIGHT",-4,-4);
-	self.aPortee:SetHeight(self:GetHeight()/6);
-	self.aPortee:SetWidth(self:GetWidth()/6);
-	self.aPortee:SetTexture(0,0,1);
-	
-	self.cd = CreateFrame("Cooldown",nil,self,nil);
-	self.cd:SetAllPoints(self);
+	self:RegisterForClicks("LeftButtonUp")
+	self.SetSkinGroup = SetSkinGroup
+	self.UpdateSkin = UpdateSkin
 end

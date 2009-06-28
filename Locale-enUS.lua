@@ -24,3 +24,4 @@ L["Affiche le temps de recharge sous forme numérique"] = "Show the remaining ti
 L["Si cible uniquement"] = "If has target"
 L["Verrouiller position"] = "Lock position"
 L["Vertical"] = true
+L["Marge entre deux icônes"] = "Margin between icons"

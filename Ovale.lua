@@ -114,6 +114,15 @@ local options =
 					get = function(info) return Ovale.db.profile.apparence.smallIconHeight end,
 					set = function(info,value) Ovale.db.profile.apparence.smallIconHeight = value; Ovale:UpdateFrame() end
 				},
+				margin = 
+				{
+					order = 5.5,
+					type = "range",
+					name = L["Marge entre deux icônes"],
+					min = 0, max = 64, step = 1,
+					get = function(info) return Ovale.db.profile.apparence.margin end,
+					set = function(info,value) Ovale.db.profile.apparence.margin = value; Ovale:UpdateFrame() end
+				},
 				raccourcis =
 				{
 					order = 6,
@@ -379,6 +388,7 @@ function Ovale:FirstInit()
 	self.frame:SetPoint("TOPLEFT",UIParent,"BOTTOMLEFT",self.db.profile.left,self.db.profile.top)
 
 	self.firstInit = true
+	
 	
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	self.AceConfig:RegisterOptionsTable("Ovale", options.args.code, "Ovale")
@@ -856,9 +866,10 @@ function Ovale:ChargerDefaut()
 			top = 500,
 			check = {},
 			list = {},
-			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64,
-				smallIconWidth=32, smallIconHeight=32, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false}
+			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
+				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
+				verrouille = false, vertical = false},
+			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
 end
@@ -874,6 +885,10 @@ end
 
 local function OnDropDownValueChanged(widget)
 	Ovale.db.profile.list[widget.userdata.k] = widget.value
+end
+
+function Ovale:ToggleOptions()
+	self.frame:ToggleOptions()
 end
 
 function Ovale:UpdateFrame()

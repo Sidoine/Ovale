@@ -1,12 +1,10 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
 
-  <Frame name="OvaleIcone" virtual="true" hidden="false">
-    <Size>
-      <AbsDimension x="64" y="64"/>
-    </Size>
+  <CheckButton name="OvaleIcone" virtual="true" inherits="ActionButtonTemplate">
     <Scripts>
       <OnUpdate>OvaleIcone_OnUpdate(self);</OnUpdate>
       <OnLoad>OvaleIcone_OnLoad(self);</OnLoad>
+      <OnClick>OvaleIcone_OnClick(self)</OnClick>
     </Scripts>
-  </Frame>
+  </CheckButton>
 </Ui>

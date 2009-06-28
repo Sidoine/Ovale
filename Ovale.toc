@@ -1,10 +1,10 @@
-﻿## Interface: 30200
+﻿## Interface: 30100
 ## Title: Ovale
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 3.2.0
-## OptionalDeps: Ace3
+## Version: 3.1.14
+## OptionalDeps: Ace3, ButtonFacade
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
 ## X-Category: Combat
