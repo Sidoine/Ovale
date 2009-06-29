@@ -58,6 +58,7 @@ local options =
 					end,
 					set = function(info, v)
 						Ovale.db.profile.apparence.enCombat = v
+						Ovale:UpdateVisibility()
 					end,
 					width = full
 				},
@@ -71,6 +72,7 @@ local options =
 					end,
 					set = function(info, v)
 						Ovale.db.profile.apparence.avecCible = v
+						Ovale:UpdateVisibility()
 					end,
 					width = full
 				},
@@ -288,6 +290,16 @@ function Ovale:PLAYER_TARGET_CHANGED()
 end
 ]]
 
+function Ovale:PLAYER_TARGET_CHANGED()
+	if (Ovale.db.profile.apparence.avecCible) then
+		if not UnitExists("target") then
+			self.frame:Hide()
+		else
+			self.frame:Show()
+		end
+	end
+end
+
 
 function Ovale:UNIT_AURA(event, unit)
 	if (unit == "player") then
@@ -426,7 +438,7 @@ function Ovale:OnEnable()
     self:RegisterEvent("UNIT_AURA");
     self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
     	
-    -- self:RegisterEvent("PLAYER_TARGET_CHANGED")
+    self:RegisterEvent("PLAYER_TARGET_CHANGED")
     -- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	
 	if (not self.firstInit) then
@@ -438,10 +450,18 @@ end
 
 function Ovale:PLAYER_REGEN_ENABLED()
 	self.enCombat = false
+	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
+		self.frame:Hide()
+	end	
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
 	self.enCombat = true
+	
+	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
+		self.frame:Show()
+	end	
+	
 end
 
 function Ovale:OnDisable()
@@ -455,7 +475,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
     self:UnregisterEvent("UPDATE_BINDINGS")
     self:UnregisterEvent("UNIT_AURA")
-    -- self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+    self:UnregisterEvent("PLAYER_TARGET_CHANGED")
     -- self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self.frame:Hide()
 end
@@ -891,10 +911,24 @@ function Ovale:ToggleOptions()
 	self.frame:ToggleOptions()
 end
 
+function Ovale:UpdateVisibility()
+	self.frame:Show()
+	
+	if (Ovale.db.profile.apparence.avecCible and not UnitExists("target")) then
+		self.frame:Hide()
+	end
+	
+	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
+		self.frame:Hide()
+	end	
+end
+
 function Ovale:UpdateFrame()
 	self.frame:ReleaseChildren()
 
 	self.frame:UpdateIcons()
+	
+	self:UpdateVisibility()
 	
 	self.checkBoxes = {}
 	

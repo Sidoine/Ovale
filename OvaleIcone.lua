@@ -18,13 +18,6 @@
 		Ovale.trace = true
 	end
 	
-	if (Ovale.db.profile.apparence.avecCible and not UnitExists("target")) then
-		minAttente = nil
-	end
-	
-	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
-		minAttente = nil
-	end
 	
 	if (self.masterNode.params.nocd and 
 		self.masterNode.params.nocd == 1 and minAttente~=nil and minAttente>1.5) then
