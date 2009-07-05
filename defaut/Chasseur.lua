@@ -14,6 +14,7 @@ Define(HUNTERSMARK 53338)
 Define(BLACKARROW 3674)
 Define(LOCKANDLOAD 56453)
 Define(TALENTEXPLOSIVESHOT 2145)
+Define(CHIMERASHOT 53209)
 
 AddCheckBox(multi SpellName(MULTISHOT))
 
@@ -23,6 +24,7 @@ AddIcon
 	if TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
 	if TargetDebuffExpires(SERPENTSTING 0 mine=1) Spell(SERPENTSTING)
 	if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
+	if TargetDebuffPresent(SERPENTSTING) Spell(CHIMERASHOT)
 	Spell(AIMEDSHOT)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	unless TalentPoints(TALENTEXPLOSIVESHOT more 0) Spell(ARCANESHOT)
