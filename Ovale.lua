@@ -13,8 +13,6 @@ Ovale.talentNameToId = {}
 Ovale.firstInit = false
 Ovale.Inferieur = 1
 Ovale.Superieur = 2
-Ovale.retourPriorite = 0
-Ovale.retourAction = nil
 Ovale.listeTalentsRemplie = false
 Ovale.frame = nil
 Ovale.checkBoxes = {}
@@ -673,10 +671,7 @@ function Ovale:CalculerMeilleureAction(element)
 	if (not element) then
 		return nil
 	end
-
-	self.retourAction = nil
-	self.retourPriorite = nil
-				
+	
 	if (element.type=="function")then
 		if (element.func == "Spell" or element.func=="Macro" or element.func=="Item") then
 			local action
@@ -688,31 +683,57 @@ function Ovale:CalculerMeilleureAction(element)
 			elseif (element.func=="Item") then
 				action = self.actionObjet[element.params[1]]
 			end
-			if (not action) then
+			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable
+		
+			if (action) then
+				actionTexture = GetActionTexture(action)
+				actionInRange = IsActionInRange(action, "target")
+				actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
+				actionUsable = IsUsableAction(action)
+				actionShortcut = self.shortCut[action]
+				actionIsCurrent = IsCurrentAction(action)				
+			end
+			if (not actionTexture and element.func == "Spell") then
+				local sort = self:GetSpellInfoOrNil(element.params[1])
+				actionTexture = GetSpellTexture(sort)
+				actionInRange = IsSpellInRange(sort, "target")
+				actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(sort)
+				actionUsable = IsUsableSpell(sort)
+				actionShortcut = nil
+				local casting = UnitCastingInfo("player")
+				if (casting == sort) then
+					actionIsCurrent = 1
+				else
+					actionIsCurrent = nil
+				end
+				-- not quite the same as IsCurrentAction. Why did they remove IsCurrentCast?
+			end
+			
+			if (not actionTexture) then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not found")
 				end
 				return nil
 			end
-			if (element.params.usable==1 and not IsUsableAction(action)) then
+			if (element.params.usable==1 and not actionUsable) then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not usable")
 				end
 				return nil
 			end
-			if (element.params.doNotRepeat==1 and IsCurrentAction(action)) then
+			if (element.params.doNotRepeat==1 and actionIsCurrent) then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." is current action")
 				end
 				return nil
 			end
-			local start, duration, enable = GetActionCooldown(action)
-			local restant
-			if (enable>0) then
-				if (not duration or start==0) then
+			if (actionEnable>0) then
+				local restant
+				if (not actionCooldownDuration or actionCooldownStart==0) then
 					restant = 0
 				else
-					restant = duration - (self.maintenant - start);
+					restant = actionCooldownDuration - (self.maintenant - actionCooldownStart);
 				end
 				if (restant<self.attenteFinCast) then
 					restant = self.attenteFinCast
@@ -720,17 +741,16 @@ function Ovale:CalculerMeilleureAction(element)
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." remains "..restant)
 				end
-				self.retourAction = action
-				self.retourPriorite = element.params.priority
-				if (not self.retourPriorite) then
-					self.retourPriorite = 3
+				local retourPriorite = element.params.priority
+				if (not retourPriorite) then
+					retourPriorite = 3
 				end
-				return restant
+				return restant, retourPriorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+					actionUsable, actionShortcut
 			else
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not enabled")
 				end
-				return nil
 			end
 		else
 			local classe = Ovale.conditions[element.func]
@@ -749,10 +769,7 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 			end
 			
-			if (temps == nil) then
-				return nil
-			end
-	 		return temps
+			return temps
 		end
 	elseif (element.type == "before") then
 		if (Ovale.trace) then
@@ -764,8 +781,9 @@ function Ovale:CalculerMeilleureAction(element)
 		end
 		if (tempsA<element.time) then
 			return 0
+		else
+			return tempsA - element.time 
 		end
-		return tempsA - element.time 
 	elseif (element.type == "and" or element.type == "if") then
 		if (Ovale.trace) then
 			self:Print(element.type)
@@ -774,14 +792,17 @@ function Ovale:CalculerMeilleureAction(element)
 		if (tempsA==nil) then
 			return nil
 		end
-		local tempsB = Ovale:CalculerMeilleureAction(element.b)
+		local tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+			actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsB==nil) then
 			return nil
 		end
 		if (tempsB>tempsA) then
-			return tempsB
+			return  tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut
 		else
-			return tempsA
+			return  tempsA, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut
 		end
 	elseif (element.type == "unless") then
 		if (Ovale.trace) then
@@ -791,9 +812,11 @@ function Ovale:CalculerMeilleureAction(element)
 		if (tempsA==0) then
 			return nil
 		end
-		local tempsB = Ovale:CalculerMeilleureAction(element.b)
+		local tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+			actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsA==nil or tempsA>tempsB) then
-			return tempsB
+			return tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut
 		else
 			return nil
 		end
@@ -815,17 +838,26 @@ function Ovale:CalculerMeilleureAction(element)
 		local meilleurFils
 		local meilleurTempsFils
 		local meilleurePrioriteFils
+		local bestActionInRange
+		local bestActionCooldownStart
+		local bestActionCooldownDuration
+		local bestActionUsable
+		local bestActionShortCut
 		 
 		if (Ovale.trace) then
 			self:Print(element.type)
 		end
 		
 		for k, v in ipairs(element.nodes) do
-			local nouveauTemps = Ovale:CalculerMeilleureAction(v)
-			local action = self.retourAction
-			local priorite = self.retourPriorite
+			local nouveauTemps, priorite, action, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(v)
 			if (nouveauTemps) then
 				local remplacer
+				if (not action) then
+					self:Print("Internal error: "..v.type.." returned nouveauTemps="..nouveauTemps.." and action=nil")
+					self.bug = true
+					return nil
+				end
 				if (not meilleurTempsFils) then
 					remplacer = true
 				else
@@ -833,7 +865,7 @@ function Ovale:CalculerMeilleureAction(element)
 					local maxEcart
 					if (priorite and not meilleurePrioriteFils) then
 						self.bug = true
-						self:Print("meilleurePrioriteFils nil and priorite not nil")
+						self:Print("Internal error: meilleurePrioriteFils=nil and priorite="..priorite)
 						return nil
 					end
 					if (priorite and priorite > meilleurePrioriteFils) then
@@ -855,6 +887,11 @@ function Ovale:CalculerMeilleureAction(element)
 					meilleurTempsFils = nouveauTemps
 					meilleurFils = action
 					meilleurePrioriteFils = priorite
+					bestActionInRange = actionInRange
+					bestActionCooldownStart = actionCooldownStart
+					bestActionCooldownDuration = actionCooldownDuration
+					bestActionUsable = actionUsable
+					bestActionShortCut = actionShortcut
 				end
 			end
 		end
@@ -863,14 +900,14 @@ function Ovale:CalculerMeilleureAction(element)
 			if (Ovale.trace) then
 				self:Print("Best action "..meilleurFils.." remains "..meilleurTempsFils)
 			end
-			self.retourPriorite = meilleurePrioriteFils
-			self.retourAction = meilleurFils
-			return meilleurTempsFils
+			return meilleurTempsFils,meilleurePrioriteFils, meilleurFils, bestActionInRange, bestActionCooldownStart,
+						bestActionCooldownDuration, bestActionUsable, bestActionShortCut
 		else
 			if (Ovale.trace) then printTime(nil) end
 			return nil
 		end
 	end
+	return nil
 end
 
 function Ovale:ChargerDefaut()

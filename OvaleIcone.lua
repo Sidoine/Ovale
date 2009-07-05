@@ -6,8 +6,8 @@
 	end
 		
 	Ovale:InitCalculerMeilleureAction()
-	local minAttente = Ovale:CalculerMeilleureAction(self.masterNode)
-	local meilleureAction = Ovale.retourAction
+	local minAttente, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+		actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(self.masterNode)
 	
 	if (Ovale.trace) then
 		Ovale.trace=false
@@ -24,16 +24,16 @@
 		minAttente = nil
 	end
 		
-	if (minAttente~=nil and meilleureAction) then	
+	if (minAttente~=nil and actionTexture) then	
 	
-		if (meilleureAction~=self.actionCourante or self.ancienneAttente==nil or 
+		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
 			(minAttente~=0 and minAttente>self.ancienneAttente+0.01) or
 			(Ovale.maintenant + minAttente < self.finAction-0.01)) then
-			if (meilleureAction~=self.actionCourante or self.ancienneAttente==nil or 
+			if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
 					(minAttente~=0 and minAttente>self.ancienneAttente+0.01)) then
 				self.debutAction = Ovale.maintenant
 			end
-			self.actionCourante = meilleureAction
+			self.actionCourante = actionTexture
 			self.finAction = minAttente + Ovale.maintenant
 			if (minAttente == 0) then
 				self.cd:Hide()
@@ -47,16 +47,15 @@
 		
 		-- L'icône avec le cooldown
 		self.icone:Show()
-		self.icone:SetTexture(GetActionTexture(meilleureAction));
+		self.icone:SetTexture(actionTexture);
 		
-		if (IsUsableAction(meilleureAction)) then
+		if (actionUsable) then
 			self.icone:SetAlpha(1.0)
 		else
 			self.icone:SetAlpha(0.25)
 		end
 		
-		local start, duration, enable = GetActionCooldown(meilleureAction)
-		if (Ovale.maintenant + minAttente > start + duration + 0.01 and minAttente > 0
+		if (Ovale.maintenant + minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > 0
 			and minAttente>Ovale.attenteFinCast) then
 			self.icone:SetVertexColor(0.75,0,0)
 		else
@@ -78,17 +77,17 @@
 		-- Le raccourcis clavier 
 		if (Ovale.db.profile.apparence.raccourcis) then
 			self.shortcut:Show()
-			self.shortcut:SetText(Ovale.shortCut[meilleureAction])
+			self.shortcut:SetText(actionShortcut)
 		else
 			self.shortcut:Hide()
 		end
 		
 		-- L'indicateur de portée
 		self.aPortee:Show()
-		if (IsActionInRange(meilleureAction,"target")==1) then
+		if (actionInRange==1) then
 			self.aPortee:SetVertexColor(0.6,0.6,0.6)
 			self.aPortee:Show()
-		elseif (IsActionInRange(meilleureAction,"target")==0) then
+		elseif (actionInRange==0) then
 			self.aPortee:SetVertexColor(1.0,0.1,0.1)
 			self.aPortee:Show()
 		else
