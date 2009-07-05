@@ -17,6 +17,7 @@ Define(FIREBALL 133)
 Define(ARCANEBARRAGE 44425)
 Define(ARCANEMISSILES 5143)
 Define(ARCANEBLAST 30451)
+Define(ARCANEPOWER 12042)
 
 Define(COMBUSTION 11129)
 Define(ICYVEINS 12472)
@@ -67,6 +68,7 @@ AddIcon
 
 AddIcon
 {
+       if DebuffPresent(ARCANEBLAST stacks=2) Spell(ARCANEPOWER)
        Spell(COMBUSTION)
        Spell(ICYVEINS)
        Spell(PRESENCEOFMIND)

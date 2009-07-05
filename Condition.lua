@@ -1,4 +1,4 @@
-local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
+﻿local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 
 local runeType = 
 {
@@ -311,6 +311,15 @@ Ovale.conditions=
 			return 0
 		else
 			return timeLeft-tempsMax
+		end
+	end,
+	DebuffPresent = function(condition)
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "player")
+		
+		if (timeLeft and (not condition.stacks or stacksLeft>=condition.stacks)) then
+			return 0
+		else
+			return nil
 		end
 	end,
 	HasFullControl = function(condition)
