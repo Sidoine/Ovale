@@ -675,39 +675,61 @@ function Ovale:CalculerMeilleureAction(element)
 	if (element.type=="function")then
 		if (element.func == "Spell" or element.func=="Macro" or element.func=="Item") then
 			local action
-			if (element.func == "Spell" ) then
-				local sort = self:GetSpellInfoOrNil(element.params[1])
-				action = self.actionSort[sort]
-			elseif (element.func=="Macro") then
-				action = self.actionMacro[element.params[1]]
-			elseif (element.func=="Item") then
-				action = self.actionObjet[element.params[1]]
-			end
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable
 		
-			if (action) then
+			if (element.func == "Spell" ) then
+				local sort = self:GetSpellInfoOrNil(element.params[1])
+				action = self.actionSort[sort]
+				if (not action or not GetActionTexture(action)) then
+					actionTexture = GetSpellTexture(sort)
+					actionInRange = IsSpellInRange(sort, "target")
+					actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(sort)
+					actionUsable = IsUsableSpell(sort)
+					actionShortcut = nil
+					local casting = UnitCastingInfo("player")
+					if (casting == sort) then
+						actionIsCurrent = 1
+					else
+						actionIsCurrent = nil
+					end
+					-- not quite the same as IsCurrentAction. Why did they remove IsCurrentCast?
+				end
+			elseif (element.func=="Macro") then
+				action = self.actionMacro[element.params[1]]
+			elseif (element.func=="Item") then
+				local itemId
+				if (type(element.params[1]) == "number") then
+					itemId = element.params[1]
+				else
+					local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
+					itemId = tonumber(id)
+				end		
+				if (Ovale.trace) then
+					self:Print("Item "..itemId)
+				end
+				
+				actionUsable = (GetItemSpell(itemId)~=nil)
+				
+				action = self.actionObjet[itemId]
+				if (not action or not GetActionTexture(action)) then
+					actionTexture = GetItemIcon(itemId)
+					actionInRange = IsItemInRange(itemId, "target")
+					actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
+					actionShortcut = nil
+					actionIsCurrent = nil
+				end
+			end
+			
+			if (action and not actionTexture) then
 				actionTexture = GetActionTexture(action)
 				actionInRange = IsActionInRange(action, "target")
 				actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
-				actionUsable = IsUsableAction(action)
+				if (actionUsable == nil) then
+					actionUsable = IsUsableAction(action)
+				end
 				actionShortcut = self.shortCut[action]
 				actionIsCurrent = IsCurrentAction(action)				
-			end
-			if (not actionTexture and element.func == "Spell") then
-				local sort = self:GetSpellInfoOrNil(element.params[1])
-				actionTexture = GetSpellTexture(sort)
-				actionInRange = IsSpellInRange(sort, "target")
-				actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(sort)
-				actionUsable = IsUsableSpell(sort)
-				actionShortcut = nil
-				local casting = UnitCastingInfo("player")
-				if (casting == sort) then
-					actionIsCurrent = 1
-				else
-					actionIsCurrent = nil
-				end
-				-- not quite the same as IsCurrentAction. Why did they remove IsCurrentCast?
 			end
 			
 			if (not actionTexture) then
