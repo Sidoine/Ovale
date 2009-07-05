@@ -62,6 +62,8 @@ AddIcon
 	unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
 	Spell(BLADEFLURRY)
 	Spell(COLDBLOOD)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 	Spell(PREPARATION)
 }
 

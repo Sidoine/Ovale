@@ -38,6 +38,8 @@ AddIcon
 {
 	Spell(BESTIALWRATH usable=1)
 	Spell(KILLCOMMAND usable=1)
+    Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 	Spell(CALLOFTHEWILD usable=1)
 	Spell(RAPIDFIRE)
 }

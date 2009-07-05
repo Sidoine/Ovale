@@ -60,5 +60,7 @@ AddIcon
 AddIcon
 {
      Spell(AVENGINGWRATH)
+     Item(Trinket0Slot usable=1)
+     Item(Trinket1Slot usable=1)
 }
 ]]

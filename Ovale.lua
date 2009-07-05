@@ -875,11 +875,7 @@ function Ovale:CalculerMeilleureAction(element)
 				actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(v)
 			if (nouveauTemps) then
 				local remplacer
-				if (not action) then
-					self:Print("Internal error: "..v.type.." returned nouveauTemps="..nouveauTemps.." and action=nil")
-					self.bug = true
-					return nil
-				end
+			
 				if (not meilleurTempsFils) then
 					remplacer = true
 				else

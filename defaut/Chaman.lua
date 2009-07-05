@@ -98,6 +98,8 @@ AddIcon
 {
 	Spell(ELEMENTALMASTERY)
 	Spell(FERALSPIRIT)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 	Spell(FIREELEMENTALTOTEM)
 }
 

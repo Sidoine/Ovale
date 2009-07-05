@@ -133,7 +133,7 @@ AddIcon
 			if Mana(more 66) 
 				Spell(HEROICSTRIKE doNotRepeat=1)
 		}
-		if Stance(3)
+		unless Stance(2)
 		{
 			if Mana(more 66) and TargetLifePercent(more 20)
 				Spell(HEROICSTRIKE doNotRepeat=1)
@@ -161,6 +161,8 @@ AddIcon
 		Spell(BLADESTORM)
 		Spell(RETALIATION)
     }
+    Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 ]]

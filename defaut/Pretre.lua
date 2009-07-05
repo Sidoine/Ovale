@@ -57,6 +57,12 @@ if TargetDebuffExpires(DP 0 mine=1)
 Spell(MF priority=2)
 
 } # End of main monitor    
+
+AddIcon
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
         
 # Add mana monitor
 AddIcon {

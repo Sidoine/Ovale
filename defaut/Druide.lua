@@ -108,6 +108,8 @@ AddIcon
 {
 	Spell(FORCEOFNATURE)
 	Spell(BERSERK)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 ]]
