@@ -443,7 +443,7 @@ function Ovale:OnEnable()
 		self:FirstInit()
 	end
 	self:UNIT_AURA("","player")
-	self.frame:Show()
+	self:UpdateVisibility()
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()

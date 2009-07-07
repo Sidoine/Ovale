@@ -594,5 +594,29 @@ Ovale.conditions=
 		else
 			return timeLeft
 		end
-	end
+	end,
+	WeaponEnchantExpires = function(condition)
+		local hasMainHandEnchant, mainHandExpiration, mainHandCharges, hasOffHandEnchant, offHandExpiration, offHandCharges = GetWeaponEnchantInfo()
+		if (condition[1] == "mainhand") then
+			if (not hasMainHandEnchant) then
+				return 0
+			end
+			mainHandExpiration = mainHandExpiration/1000
+			if (condition[2] >= mainHandExpiration) then
+				return 0
+			else
+				return mainHandExpiration - condition[2]
+			end
+		else
+			if (not hasOffHandEnchant) then
+				return 0
+			end
+			offHandExpiration = offHandExpiration/1000
+			if (condition[2] >= offHandExpiration) then
+				return 0
+			else
+				return offHandExpiration - condition[2]
+			end
+		end
+	end,
 }
