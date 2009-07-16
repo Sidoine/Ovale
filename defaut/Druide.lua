@@ -50,14 +50,16 @@ AddIcon
 
 	if Stance(3) # cat
 	{
+		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR)
+	
 		if CheckBoxOn(lucioles) and	TargetDebuffExpires(FAERIEFERAL 2)
 			Spell(FAERIEFERAL)
 
-    
+    	if TargetDebuffExpires(RAKE 0) Spell(RAKE)
+	
 		if ComboPoints(more 4) and Mana(more 70)
 		{
 			if BuffExpires(SAVAGEROAR 5) Spell(SAVAGEROAR)
-			if TargetDebuffExpires(RAKE 0) Spell(RAKE)
 			if TargetDebuffExpires(RIP 0) Spell(RIP)
 			Spell(FEROCIOUSBITE)
 		}

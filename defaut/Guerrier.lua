@@ -37,6 +37,7 @@ Define(CURSEOFWEAKNESS 50511)
 AddCheckBox(multi L(AOE))
 AddCheckBox(demo SpellName(DEMOSHOUT))
 AddCheckBox(whirlwind SpellName(WHIRLWIND))
+AddCheckBox(sunder SpellName(SUNDER))
 AddListItem(shout none L(None))
 AddListItem(shout battle SpellName(BATTLESHOUT))
 AddListItem(shout command SpellName(COMMANDSHOUT))
@@ -91,16 +92,18 @@ AddIcon
         if HasShield() Spell(SHIELDSLAM)
         Spell(SHOCKWAVE)
         Spell(CONCUSSIONBLOW)
-        
+    
         if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
         Spell(BLOODTHIRST)
         if BuffPresent(SLAMBUFF) Spell(SLAM)
+     
         Spell(MORTALSTRIKE)
-        Spell(DEVASTATE)
-        
+   
         if TalentPoints(SLAMTALENT more 1)
-          Spell(SLAM)
-     }
+		    Spell(SLAM priority=2)
+
+        Spell(DEVASTATE)
+    }
 
      if Stance(1) #combat
      {
@@ -109,9 +112,10 @@ AddIcon
         if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(MORTALSTRIKE)
         Spell(OVERPOWER usable=1)
-        if TalentPoints(SLAMTALENT more 1)
-          Spell(SLAM priority=2)
-
+     
+         if TalentPoints(SLAMTALENT more 1)
+		    Spell(SLAM priority=2)
+ 
 		#Some other specs stuff, just in case
 		Spell(BLOODTHIRST)
         if HasShield() Spell(SHIELDSLAM)
@@ -120,7 +124,7 @@ AddIcon
         Spell(DEVASTATE)
      }
 
-     if TargetDebuffExpires(SUNDER 5 stacks=5)
+     if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 5 stacks=5)
         Spell(SUNDER)
 }
 

@@ -11,7 +11,7 @@ Define(JUDGEWISDOM 53408)
 Define(CONSECRATE 26573)
 Define(DIVINESTORM 53385)
 Define(HAMMEROFWRATH 24275)
-Define(INQUISITION 35395)
+Define(CRUSADERSTRIKE 35395)
 Define(HOLYSHOCK 20473)
 Define(THEARTOFWAR 59578)
 Define(FLASHOFLIGHT 19750)
@@ -20,6 +20,7 @@ Define(AVENGINGWRATH 31884)
 Define(SHIELDOFRIGHTEOUSNESS 53600)
 Define(HOLYSHIELD 20925)
 Define(HAMMEROFTHERIGHTEOUS 53595)
+Define(HOLYWRATH 2812)
 
 AddListItem(sceau piete SpellName(SEALRIGHTEOUSNESS))
 AddListItem(sceau autorite SpellName(SEALCOMMAND))
@@ -29,6 +30,7 @@ AddListItem(jugement lumiere SpellName(JUDGELIGHT))
 AddListItem(jugement sagesse SpellName(JUDGEWISDOM))
 AddCheckBox(consecration SpellName(CONSECRATE))
 AddCheckBox(tempete SpellName(DIVINESTORM))
+AddCheckBox(coleredivine SpellName(HOLYWRATH))
 
 AddIcon
 {
@@ -44,19 +46,23 @@ AddIcon
           if BuffExpires(SEALVENGEANCE 3) Spell(SEALVENGEANCE)
           if BuffExpires(SEALCORRUPTION 3) Spell(SEALCORRUPTION)
      }
-     if List(jugement lumiere) Spell(JUDGELIGHT)
-     if List(jugement sagesse) Spell(JUDGEWISDOM)
      if TargetTargetIsPlayer(yes) Spell(HOLYSHIELD)
      Spell(HAMMEROFTHERIGHTEOUS)
+     
+     Spell(CRUSADERSTRIKE)
      Spell(HAMMEROFWRATH usable=1)
-     Spell(INQUISITION)
+     if List(jugement lumiere) Spell(JUDGELIGHT)
+     if List(jugement sagesse) Spell(JUDGEWISDOM)
      if CheckBoxOn(tempete) Spell(DIVINESTORM)
      if CheckBoxOn(consecration) Spell(CONSECRATE)
+     Spell(EXORCISM)
+     if CheckBoxOn(coleredivine) Spell(HOLYWRATH)
+     
      Spell(HOLYSHOCK) 
      if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
-     Spell(EXORCISM)
      if BuffPresent(THEARTOFWAR) Spell(FLASHOFLIGHT priority=2)
 }
+
 AddIcon
 {
      Spell(AVENGINGWRATH)
