@@ -22,6 +22,7 @@ Define(RAKE 59886)
 Define(SAVAGEROAR 52610)
 Define(FEROCIOUSBITE 22568)
 Define(BERSERK 50334)
+Define(CLEARCASTING 16870)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(blood L(Blood))
@@ -54,23 +55,30 @@ AddIcon
 	
 		if CheckBoxOn(lucioles) and	TargetDebuffExpires(FAERIEFERAL 2)
 			Spell(FAERIEFERAL)
-
-    	if TargetDebuffExpires(RAKE 0) Spell(RAKE)
-	
+		
 		if ComboPoints(more 4) and Mana(more 70)
 		{
 			if BuffExpires(SAVAGEROAR 5) Spell(SAVAGEROAR)
 			if TargetDebuffExpires(RIP 0) Spell(RIP)
-			Spell(FEROCIOUSBITE)
-		}
-    
+		}    
+		
+		if {3s between BuffExpires(SAVAGEROAR 0) and TargetDebuffExpires(RIP 0)} and ComboPoints(more 2)
+			Spell(SAVAGEROAR)
+		
 		if ComboPoints(less 5)
 		{
-			if Mana(less 40) Spell(TIGERSFURY)
+			if Mana(less 30) Spell(TIGERSFURY)
 			if TargetDebuffExpires(MANGLECAT 0)
 				Spell(MANGLECAT)
+			if TargetDebuffExpires(RAKE 0) 
+				Spell(RAKE)
 			Spell(SHRED)
 		}
+
+		if BuffPresent(CLEARCASTING) Spell(SHRED)
+		
+		if ComboPoints(more 4) and BuffPresent(SAVAGEROAR 8) and TargetDebuffPresent(RIP 8)
+			Spell(FEROCIOUSBITE)
 	}
 
 	unless Stance(1) or Stance(3)

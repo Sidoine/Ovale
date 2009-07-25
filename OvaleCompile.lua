@@ -93,6 +93,12 @@ local function ParseBefore(a,b)
 	return "node"..#node
 end
 
+local function ParseBetween(t,a,b)
+	local newNode = {type="between", time=tonumber(t), a=node[tonumber(a)], b=node[tonumber(b)]}
+	node[#node+1] = newNode
+	return "node"..#node
+end
+
 local function ParseOr(a,b)
 	local newNode = {type="or", a=node[tonumber(a)], b=node[tonumber(b)]}
 	node[#node+1] = newNode
@@ -152,6 +158,7 @@ local function ParseAddIcon(params, text)
 	while (1==1) do
 		local was = text
 		text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
+		text = string.gsub(text, "(%d+%.?%d*)s%s+between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 		text = string.gsub(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)
@@ -289,7 +296,9 @@ function Ovale:DebugNode(node)
 	elseif (node.type == "or") then
 		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
 	elseif (node.type == "before") then
-		text = node.time .. "s before "..self:DebufNode(node.b)
+		text = node.time .. "s before "..self:DebugNode(node.a)
+	elseif (node.type == "between") then
+		text = node.time .. "s between "..self:DebugNode(node.a).." and "..self:DebugNode(node.b)
 	else
 		text = "#unknown node type#"
 	end

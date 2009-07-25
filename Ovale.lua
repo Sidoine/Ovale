@@ -806,6 +806,24 @@ function Ovale:CalculerMeilleureAction(element)
 		else
 			return tempsA - element.time 
 		end
+	elseif (element.type == "between") then
+		if (Ovale.trace) then
+			self:Print(element.time.."s between")
+		end
+		local tempsA = Ovale:CalculerMeilleureAction(element.a)
+		if (tempsA==nil) then
+			return nil
+		end
+		local tempsB = Ovale:CalculerMeilleureAction(element.b)
+		if (tempsB==nil) then
+			return nil
+		end
+		if (tempsA>tempsB and tempsA-tempsB<element.time) then
+			return 0
+		elseif (tempsB>tempsA and tempsB-tempsA<element.time) then
+			return 0
+		end
+		return nil
 	elseif (element.type == "and" or element.type == "if") then
 		if (Ovale.trace) then
 			self:Print(element.type)
