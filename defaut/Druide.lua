@@ -91,17 +91,20 @@ AddIcon
 		if TargetDebuffExpires(MOONFIRE 0)
 			Spell(MOONFIRE)
 
+		if BuffPresent(ECLIPSEWRATH)
+			Spell(WRATH)
+		if BuffPresent(ECLIPSESTARFIRE)
+			Spell(STARFIRE)
+
 		if CheckBoxOff(wrath)
 		{
-			if BuffPresent(ECLIPSEWRATH)
-				Spell(WRATH)
-			Spell(STARFIRE)
+			if BuffGain(ECLIPSEWRATH 30) Spell(STARFIRE)
+			Spell(WRATH)
 		}
 		if CheckBoxOn(wrath)
 		{
-			if BuffPresent(ECLIPSESTARFIRE)
-				Spell(STARFIRE)
-			Spell(WRATH)
+			if BuffGain(ECLIPSESTARFIRE 30) Spell(WRATH)
+			Spell(STARFIRE)
 		}
 	}
 }

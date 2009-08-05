@@ -2,8 +2,6 @@ Ovale.defaut["PALADIN"] =
 [[
 Define(SEALRIGHTEOUSNESS 21084)
 Define(SEALCOMMAND 20375)
-Define(SEALBLOOD 31892)
-Define(SEALMARTYR 53720)
 Define(SEALVENGEANCE 31801)
 Define(SEALCORRUPTION 53736)
 Define(JUDGELIGHT 20271)
@@ -24,7 +22,6 @@ Define(HOLYWRATH 2812)
 
 AddListItem(sceau piete SpellName(SEALRIGHTEOUSNESS))
 AddListItem(sceau autorite SpellName(SEALCOMMAND))
-AddListItem(sceau martyr SpellName(SEALMARTYR))
 AddListItem(sceau vengeance SpellName(SEALVENGEANCE))
 AddListItem(jugement lumiere SpellName(JUDGELIGHT))
 AddListItem(jugement sagesse SpellName(JUDGEWISDOM))
@@ -36,11 +33,6 @@ AddIcon
 {
      if List(sceau piete) and BuffExpires(SEALRIGHTEOUSNESS 3) Spell(SEALRIGHTEOUSNESS)
      if List(sceau autorite) and BuffExpires(SEALCOMMAND 3) Spell(SEALCOMMAND)
-     if List(sceau martyr)
-     {
-          if BuffExpires(SEALMARTYR 3) Spell(SEALMARTYR)
-          if BuffExpires(SEALBLOOD 3) Spell(SEALBLOOD)
-     }
      if List(sceau vengeance)
      {
           if BuffExpires(SEALVENGEANCE 3) Spell(SEALVENGEANCE)
@@ -55,7 +47,7 @@ AddIcon
      if List(jugement sagesse) Spell(JUDGEWISDOM)
      if CheckBoxOn(tempete) Spell(DIVINESTORM)
      if CheckBoxOn(consecration) Spell(CONSECRATE)
-     Spell(EXORCISM)
+     if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
      if CheckBoxOn(coleredivine) Spell(HOLYWRATH)
      
      Spell(HOLYSHOCK) 
