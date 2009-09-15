@@ -23,9 +23,10 @@ Define(SAVAGEROAR 52610)
 Define(FEROCIOUSBITE 22568)
 Define(BERSERK 50334)
 Define(CLEARCASTING 16870)
+Define(CLAW 16827)
 
 AddCheckBox(multi L(AOE))
-AddCheckBox(blood L(Blood))
+AddCheckBox(mangle SpellName(MANGLECAT))
 AddCheckBox(demo SpellName(DEMOROAR))
 AddCheckBox(lucioles SpellName(FAERIEFIRE))
 AddCheckBox(wrath SpellName(WRATH))
@@ -42,7 +43,7 @@ AddIcon
 
 		Spell(MANGLEBEAR)
 
-		if CheckBoxOn(blood) and Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
+		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
 			Spell(LACERATE)
 
 		if CheckBoxOn(multi)
@@ -59,7 +60,7 @@ AddIcon
 		if ComboPoints(more 4) and Mana(more 70)
 		{
 			if BuffExpires(SAVAGEROAR 5) Spell(SAVAGEROAR)
-			if TargetDebuffExpires(RIP 0) Spell(RIP)
+			if TargetDebuffExpires(RIP 0 mine=1) Spell(RIP)
 		}    
 		
 		if {3s between BuffExpires(SAVAGEROAR 0) and TargetDebuffExpires(RIP 0)} and ComboPoints(more 2)
@@ -68,16 +69,16 @@ AddIcon
 		if ComboPoints(less 5)
 		{
 			if Mana(less 30) Spell(TIGERSFURY)
-			if TargetDebuffExpires(MANGLECAT 0)
+			if TargetDebuffExpires(MANGLECAT 0 mine=1) and CheckBoxOn(mangle)
 				Spell(MANGLECAT)
-			if TargetDebuffExpires(RAKE 0) 
+			if TargetDebuffExpires(RAKE 0 mine=1) 
 				Spell(RAKE)
 			Spell(SHRED)
 		}
 
 		if BuffPresent(CLEARCASTING) Spell(SHRED)
 		
-		if ComboPoints(more 4) and BuffPresent(SAVAGEROAR 8) and TargetDebuffPresent(RIP 8)
+		if ComboPoints(more 4) and BuffPresent(SAVAGEROAR 8) and TargetDebuffPresent(RIP 8 mine=1)
 			Spell(FEROCIOUSBITE)
 	}
 

@@ -85,7 +85,6 @@ AddIcon
 		{
 			Spell(WHIRLWIND)
 			Spell(BLOODTHIRST)
-			if BuffPresent(SLAMBUFF) and Mana(more 29) Spell(SLAM)
 			Spell(EXECUTE)
         }
         
@@ -108,7 +107,7 @@ AddIcon
      if Stance(1) #combat
      {
         Spell(VICTORY usable=1)
-        if TargetDebuffExpires(REND 0) Spell(REND)
+        if TargetDebuffExpires(REND 0 mine=1) Spell(REND)
         if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(MORTALSTRIKE)
         Spell(OVERPOWER usable=1)

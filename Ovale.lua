@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+﻿local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 Ovale = LibStub("AceAddon-3.0"):NewAddon("Ovale", "AceEvent-3.0", "AceConsole-3.0")
 
@@ -677,13 +677,18 @@ function Ovale:CalculerMeilleureAction(element)
 			local action
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable
-		
+			
+			local target = element.params.target
+			if (not target) then
+				target = "target"
+			end
+
 			if (element.func == "Spell" ) then
 				local sort = self:GetSpellInfoOrNil(element.params[1])
 				action = self.actionSort[sort]
 				if (not action or not GetActionTexture(action)) then
 					actionTexture = GetSpellTexture(sort)
-					actionInRange = IsSpellInRange(sort, "target")
+					actionInRange = IsSpellInRange(sort, target)
 					actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(sort)
 					actionUsable = IsUsableSpell(sort)
 					actionShortcut = nil
@@ -714,7 +719,7 @@ function Ovale:CalculerMeilleureAction(element)
 				action = self.actionObjet[itemId]
 				if (not action or not GetActionTexture(action)) then
 					actionTexture = GetItemIcon(itemId)
-					actionInRange = IsItemInRange(itemId, "target")
+					actionInRange = IsItemInRange(itemId, target)
 					actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
 					actionShortcut = nil
 					actionIsCurrent = nil
@@ -723,7 +728,7 @@ function Ovale:CalculerMeilleureAction(element)
 			
 			if (action and not actionTexture) then
 				actionTexture = GetActionTexture(action)
-				actionInRange = IsActionInRange(action, "target")
+				actionInRange = IsActionInRange(action, target)
 				actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
 				if (actionUsable == nil) then
 					actionUsable = IsUsableAction(action)

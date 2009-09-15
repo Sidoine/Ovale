@@ -555,12 +555,20 @@ Ovale.conditions=
 	TargetIsCasting = function(condition)
 		return testbool(UnitCastingInfo(getTarget(condition.target)), condition[1])
 	end,
+	TargetLife = function(condition)
+		local target = getTarget(condition.target)
+		return compare(UnitHealth(target), condition[1], condition[2])
+	end,
 	-- Test if the target life is bellow/above a given value in percent
 	-- 1 : "less" or "more"
 	-- 2 : the limit, in percents
 	TargetLifePercent = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2]/100)
+	end,
+	TargetMana = function(condition)
+		local target = getTarget(condition.target)
+		return compare(UnitPower(target), condition[1], condition[2])
 	end,
 	-- Test the target level difference with the player
 	-- 1 : "less" or "more"
