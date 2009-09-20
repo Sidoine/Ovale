@@ -21,6 +21,11 @@ Define(DRAINSOUL 47855)
 Define(SHADOWEMBRACE 32391)
 Define(TALENTSHADOWEMBRACE 1763)
 Define(METAMORPHOSIS 47241)
+Define(TALENTDECIMATION 2261)
+Define(SOULSHARD 6265)
+Define(DEMONICEMPOWERMENT 47193)
+Define(INCINERATE 29722)
+Define(DECIMATION 63167)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -37,7 +42,9 @@ if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT doNotRepeat=1)
 if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) Spell(UNSTABLEAFFLICTION doNotRepeat=1)
 if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
    and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE doNotRepeat=1)
-if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and TargetLifePercent(more 25) Spell(IMMOLATE doNotRepeat=1)
+if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and
+		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} 
+			Spell(IMMOLATE doNotRepeat=1)
 if List(curse recklessness) and TargetDebuffExpires(CURSERECKLESSNESS 2) Spell(CURSERECKLESSNESS)
 if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)
 if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
@@ -45,15 +52,18 @@ if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAK
 if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY)
 if TargetDebuffExpires(CORRUPTION 0 mine=1) Spell(CORRUPTION)
 
-if TargetLifePercent(less 25) and Level(more 76) Spell(DRAINSOUL)
+if BuffPresent(DECIMATION) Spell(SOULFIRE)
+
+if TargetLifePercent(less 25) and Level(more 76) and {TalentPoints(TALENTDECIMATION less 1) or ItemCount(SOULSHARD less 16)} Spell(DRAINSOUL)
  
-if TalentPoints(TALENTEMBERSTORM more 0) Spell(SOULFIRE)
+if TalentPoints(TALENTEMBERSTORM more 0) Spell(INCINERATE)
 Spell(SHADOWBOLT)
 }
 
 AddIcon
 {
 	Spell(METAMORPHOSIS)
+	Spell(DEMONICEMPOWERMENT)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

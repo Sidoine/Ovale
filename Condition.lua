@@ -334,6 +334,9 @@ Ovale.conditions=
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
 		return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
 	end,
+	ItemCount = function(condition)
+		return compare(GetItemCount(condition[1]), condition[2], condition[3])
+	end,
 	IsFeared = function(condition)
 		buildFearSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(fearSpellList), condition[1])
