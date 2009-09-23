@@ -55,7 +55,7 @@ AddIcon
        if TalentPoints(TALENTARCANEBARRAGE more 0)
        {
               #Arcane spec
-              if DebuffExpires(ARCANEBLAST 0 stacks=3)
+              if DebuffExpires(ARCANEBLAST 0 stacks=4)
                      Spell(ARCANEBLAST)
               Spell(ARCANEMISSILES)
        }
