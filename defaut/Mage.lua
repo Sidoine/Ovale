@@ -68,7 +68,7 @@ AddIcon
 
 AddIcon
 {
-       if DebuffPresent(ARCANEBLAST stacks=2) Spell(ARCANEPOWER)
+       if DebuffPresent(ARCANEBLAST stacks=3) Spell(ARCANEPOWER)
        Spell(COMBUSTION)
        Spell(ICYVEINS)
        Spell(PRESENCEOFMIND)
