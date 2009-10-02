@@ -45,7 +45,6 @@ if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=
 if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and
 		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} 
 			Spell(IMMOLATE doNotRepeat=1)
-if List(curse recklessness) and TargetDebuffExpires(CURSERECKLESSNESS 2) Spell(CURSERECKLESSNESS)
 if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)
 if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
 if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)

@@ -258,11 +258,7 @@ Ovale.conditions=
 	BuffPresent = function(condition)
 		local timeLeft, stacksLeft = GetTargetAura(condition, "HELPFUL", "player")
 		
-		if (timeLeft and (not condition.stacks or stacksLeft>=condition.stacks)) then
-			return 0
-		else
-			return nil
-		end
+		return testbool(timeLeft and (not condition.stacks or stacksLeft>=condition.stacks),condition[2])
 	end,
 	Casting = function(condition)
 		local spell = UnitCastingInfo("player")
@@ -321,6 +317,17 @@ Ovale.conditions=
 		else
 			return nil
 		end
+	end,
+	Glyph = function(condition)
+		local present = false
+		for i = 1, GetNumGlyphSockets() do
+			local enalbled, glypType, glyphSpellID = GetGlyphSocketInfo(i)
+			if (glyphSpellID == condition[1]) then
+				present = true
+				break
+			end
+		end
+		return testbool(present, condition[2])
 	end,
 	HasFullControl = function(condition)
 		return testbool(HasFullControl(), condition[1])

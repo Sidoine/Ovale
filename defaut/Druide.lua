@@ -24,6 +24,7 @@ Define(FEROCIOUSBITE 22568)
 Define(BERSERK 50334)
 Define(CLEARCASTING 16870)
 Define(CLAW 16827)
+Define(STARFALL 48505)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(mangle SpellName(MANGLECAT))
@@ -87,9 +88,9 @@ AddIcon
 		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2)
 			Spell(FAERIEFIRE)
 
-		if TargetDebuffExpires(INSECTSWARM 0)
+		if TargetDebuffExpires(INSECTSWARM 0 mine=1)
 			Spell(INSECTSWARM)  
-		if TargetDebuffExpires(MOONFIRE 0)
+		if TargetDebuffExpires(MOONFIRE 0 mine=1)
 			Spell(MOONFIRE)
 
 		if BuffPresent(ECLIPSEWRATH)
@@ -120,6 +121,7 @@ AddIcon
 
 AddIcon
 {
+	unless Stance(1) or Stance(3) Spell(STARFALL)
 	Spell(FORCEOFNATURE)
 	Spell(BERSERK)
 	Item(Trinket0Slot usable=1)

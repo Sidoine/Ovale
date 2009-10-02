@@ -27,6 +27,12 @@ Define(DANCINGRUNEWEAPON 49028)
 Define(FROSTSTRIKE 49143)
 Define(HYSTERIA 49016)
 Define(SUMMONGARGOYLE 49206)
+Define(GLYPHDISEASE 63959)
+Define(ABOMINATIONMIGHT 53136)
+Define(TALENTABOMINATIONMIGHT 2105)
+Define(RAISEDEAD 46584)
+
+AddCheckBox(rolldes SpellName(GLYPHDISEASE))
 
 AddIcon
 {
@@ -54,12 +60,21 @@ AddIcon
 			Spell(BLOODSTRIKE)
 		}
 	}
+	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) and TargetDebuffExpires(FROSTFEVER 2 mine=1) and TargetDebuffPresent(FROSTFEVER mine=1) and
+		TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
+			Spell(PESTILENCE)
+			
+	if CheckBoxOn(rolldes) and TalentPoints(TALENTABOMINATIONMIGHT more 0) and BuffPresent(ABOMINATIONMIGHT no)
+		Spell(DEATHSTRIKE)
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
 		Spell(ICYTOUCH)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1)
 		Spell(PLAGUESTRIKE)
+	
 	Spell(FROSTSTRIKE usable=1)
 	Spell(DEATHCOIL usable=1)
+	
+	if PetPresent(no) Spell(RAISEDEAD)
 }
 
 AddIcon
