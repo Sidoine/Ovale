@@ -32,6 +32,12 @@ AddCheckBox(demo SpellName(DEMOROAR))
 AddCheckBox(lucioles SpellName(FAERIEFIRE))
 AddCheckBox(wrath SpellName(WRATH))
 
+ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP 
+		TIGERSFURY MANGLECAT RAKE SHRED FEROCIOUSBITE INSECTSWARM MOONFIRE
+		WRATH STARFIRE)
+		
+SpellInfo(MAUL toggle=1)
+
 AddIcon
 {
 	if Stance(1) # bear
@@ -115,7 +121,7 @@ AddIcon
 {
   if Stance(1)
   {  
-       Spell(MAUL doNotRepeat=1)
+       Spell(MAUL)
   }
 }
 

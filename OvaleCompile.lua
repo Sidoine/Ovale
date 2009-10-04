@@ -5,7 +5,7 @@ local defines = {}
 
 local function ParseParameters(params)
 	local paramList = {}
-	for k,v in string.gmatch(params, "(%w+)=(%w+)") do
+	for k,v in string.gmatch(params, "(%w+)=([-%w]+)") do
 		if (string.match(v,"^%-?%d+%.?%d*$")) then
 			v = tonumber(v)
 		end	
@@ -37,10 +37,7 @@ local function ParseSpellAddDebuff(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
-		if (not Ovale.spellInfo[spell]) then
-			Ovale.spellInfo[spell] = { player = {}, target = {}}
-		end
-		Ovale.spellInfo[spell].player.HARMFUL = paramList
+		Ovale:GetSpellInfo(spell).player.HARMFUL = paramList
 	end
 	return ""
 end
@@ -49,10 +46,7 @@ local function ParseSpellAddBuff(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
-		if (not Ovale.spellInfo[spell]) then
-			Ovale.spellInfo[spell] = { player = {}, target = {} }
-		end
-		Ovale.spellInfo[spell].player.HELPFUL = paramList
+		Ovale:GetSpellInfo(spell).player.HELPFUL = paramList
 	end
 	return ""
 end
@@ -61,12 +55,34 @@ local function ParseSpellAddTargetDebuff(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
-		if (not Ovale.spellInfo[spell]) then
-			Ovale.spellInfo[spell] = { player = {}, target = {} }
-		end
-		Ovale.spellInfo[spell].target.HARMFUL = paramList
+		Ovale:GetSpellInfo(spell).target.HARMFUL = paramList
 	end
 	return ""
+end
+
+local function ParseSpellInfo(params)
+	local paramList = ParseParameters(params)
+	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
+	if (spell) then
+		local spellInfo = Ovale:GetSpellInfo(spell)
+		for k,v in pairs(paramList) do
+			spellInfo[k] = v
+		end
+	end
+	return ""
+end
+
+local function ParseScoreSpells(params)
+	for v in string.gmatch(params, "(%d+)") do
+		v = tonumber(v)
+		
+		local spell = Ovale:GetSpellInfoOrNil(v)
+		if spell then
+			Ovale.scoreSpell[spell] = true
+		else
+			Ovale:Print("unknown spell "..v)
+		end
+	end
 end
 
 local function ParseIf(a, b)
@@ -205,7 +221,7 @@ end
 local function ParseCanStopChannelling(text)
 	local spell = Ovale:GetSpellInfoOrNil(text)
 	if (spell) then
-		Ovale.canStopChannelling[spell] = true
+		Ovale:GetSpellInfo(spell).canStopChannelling = true
 	else
 		Ovale:Print("CanStopChannelling with unknown spell "..text)
 	end
@@ -248,11 +264,13 @@ function Ovale:Compile(text)
 	text = string.gsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
 	
 	-- Options diverses
-	Ovale.canStopChannelling = {}
+	Ovale:ResetSpellInfo()
 	text = string.gsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
 	text = string.gsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
 	text = string.gsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
 	text = string.gsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
+	text = string.gsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
+	text = string.gsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
 			
 	-- On vire les espaces en trop
 	text = string.gsub(text, "\n", " ")

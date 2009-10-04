@@ -33,18 +33,24 @@ AddListItem(curse doom SpellName(CURSEDOOM))
 AddListItem(curse tongues SpellName(CURSETONGUES))
 AddListItem(curse weakness SpellName(CURSEWEAKNESS))
 
+SpellInfo(HAUNT cd=8)
+SpellInfo(CONFLAGRATE cd=10)
+SpellAddTargetDebuff(UNSTABLEAFFLICTION UNSTABLEAFFLICTION=15)
+SpellAddTargetDebuff(IMMOLATE IMMOLATE=15)
+ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRATE CURSEDOOM CURSETONGUES CURSEWEAKNESS
+	CURSEAGONY CORRUPTION SOULFIRE DRAINSOUL INCINERATE SHADOWBOLT)
 
 AddIcon
 {
 if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) Spell(CURSEELEMENTS)
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
-if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT doNotRepeat=1)
-if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) Spell(UNSTABLEAFFLICTION doNotRepeat=1)
+if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
+if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) Spell(UNSTABLEAFFLICTION)
 if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
-   and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE doNotRepeat=1)
+   and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
 if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and
 		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} 
-			Spell(IMMOLATE doNotRepeat=1)
+			Spell(IMMOLATE)
 if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)
 if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
 if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)

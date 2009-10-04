@@ -1,13 +1,11 @@
-﻿function OvaleIcone_OnUpdate(self)
-	Ovale.maintenant = GetTime();
-	
+﻿local LBF = LibStub("LibButtonFacade", true)
+
+local function Update(self, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut)
+				
 	if (not Ovale.bug) then
 		Ovale.traced = false
 	end
-		
-	Ovale:InitCalculerMeilleureAction()
-	local minAttente, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(self.masterNode)
 	
 	if (Ovale.trace) then
 		Ovale.trace=false
@@ -16,13 +14,7 @@
 	
 	if (Ovale.bug and not Ovale.traced) then
 		Ovale.trace = true
-	end
-	
-	
-	if (self.masterNode.params.nocd and 
-		self.masterNode.params.nocd == 1 and minAttente~=nil and minAttente>1.5) then
-		minAttente = nil
-	end
+	end	
 		
 	if (minAttente~=nil and actionTexture) then	
 	
@@ -52,12 +44,12 @@
 		if (actionUsable) then
 			self.icone:SetAlpha(1.0)
 		else
-			self.icone:SetAlpha(0.25)
+			self.icone:SetAlpha(0.33)
 		end
 		
 		if (Ovale.maintenant + minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > 0
 			and minAttente>Ovale.attenteFinCast) then
-			self.icone:SetVertexColor(0.75,0,0)
+			self.icone:SetVertexColor(0.75,0.2,0.2)
 		else
 			self.icone:SetVertexColor(1,1,1)
 		end 
@@ -99,11 +91,23 @@
 		self.shortcut:Hide()
 		self.remains:Hide()
 	end
+	return minAttente,element
 end
 
 local function SetSkinGroup(self, _skinGroup)
 	self.skinGroup = _skinGroup
 	self.skinGroup:AddButton(self)
+end
+
+local function SetSize(self, width, height)
+	self:SetWidth(width)
+	self:SetHeight(height)
+	if (not LBF) then
+		self.normalTexture:SetWidth(width*66/36)
+		self.normalTexture:SetHeight(height*66/36)
+		self.shortcut:SetWidth(width)
+		self.remains:SetWidth(width)
+	end
 end
 
 function OvaleIcone_OnClick(self)
@@ -123,5 +127,6 @@ function OvaleIcone_OnLoad(self)
 	
 	self:RegisterForClicks("LeftButtonUp")
 	self.SetSkinGroup = SetSkinGroup
-	self.UpdateSkin = UpdateSkin
+	self.Update = Update
+	self.SetSize = SetSize
 end

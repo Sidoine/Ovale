@@ -3,8 +3,8 @@
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 3.2.5
-## OptionalDeps: Ace3, ButtonFacade
+## Version: 3.2.6
+## OptionalDeps: Ace3, ButtonFacade, Recount
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
 ## X-Category: Combat
@@ -20,6 +20,7 @@ OvaleIcone.lua
 OvaleIcone.xml
 OvaleFrame.lua
 OvaleCompile.lua
+OvaleRecount.lua
 defaut\Chaman.lua
 defaut\Chasseur.lua
 defaut\Demoniste.lua

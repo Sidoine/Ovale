@@ -62,6 +62,13 @@ AddListItem(earth stone SpellName(STONESKINTOTEM))
 AddListItem(earth strength SpellName(STRENGTHOFEARTHTOTEM))
 AddListItem(earth tremor SpellName(TREMORTOTEM))
 
+SpellInfo(LAVABURST cd=8)
+SpellInfo(CHAINLIGHTNING cd=6)
+SpellAddBuff(LIGHTNINGBOLT MAELSTROMWEAPON=0)
+SpellAddBuff(CHAINLIGHTNING MAELSTROMWEAPON=0)
+ScoreSpells(WATERSHIELD FLAMESHOCK LAVABURST CHAINLIGHTNING LIGHTNINGBOLT LAVALASH EARTHSHOCK LIGHTNINGSHIELD
+	STORMSTRIKE)
+
 AddIcon
 {
 	unless CheckBoxOn(melee)
@@ -69,12 +76,12 @@ AddIcon
 	#	if BuffExpires(FLAMETHONG 2) Spell(FLAMETHONG)
 		if BuffExpires(WATERSHIELD 2) Spell(WATERSHIELD)
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
-		Spell(LAVABURST doNotRepeat=1)
-		if CheckBoxOn(aoe) Spell(CHAINLIGHTNING doNotRepeat=1)
+		Spell(LAVABURST)
+		if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
 		
 		if CheckBoxOn(chain)
 		{
-			unless 1.4s before Spell(LAVABURST doNotRepeat=1) Spell(LIGHTNINGBOLT)
+			unless 1.4s before Spell(LAVABURST) Spell(LIGHTNINGBOLT)
 
 			Spell(CHAINLIGHTNING)
 		}
@@ -89,8 +96,8 @@ AddIcon
 		if BuffExpires(LIGHTNINGSHIELD 0) Spell(LIGHTNINGSHIELD)
 		Spell(STORMSTRIKE)
 		if TargetDebuffPresent(FLAMESHOCK 1.5 haste=spell mine=1) Spell(LAVALASH)
-		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING doNotRepeat=1)
-		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT doNotRepeat=1)
+		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
+		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
 	}
 }
 

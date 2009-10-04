@@ -42,6 +42,19 @@ AddListItem(shout none L(None))
 AddListItem(shout battle SpellName(BATTLESHOUT))
 AddListItem(shout command SpellName(COMMANDSHOUT))
 
+SpellAddTargetDebuff(THUNDERCLAP THUNDERCLAP=30)
+SpellAddTargetDebuff(DEMOSHOUT DEMOSHOUT=45)
+SpellAddTargetDebuff(REND REND=15)
+SpellAddBuff(BATTLESHOUT BATTLESHOUT=120)
+SpellAddBuff(COMMANDSHOUT COMMANDSHOUT=120)
+SpellAddBuff(SLAM SLAMBUFF=0)
+SpellInfo(WHIRLWIND cd=8)
+SpellInfo(BLOODTHIRST cd=4)
+SpellInfo(DEATHWISH cd=180)
+SpellInfo(HEROICSTRIKE toggle=1)
+SpellInfo(CLEAVE toggle=1)
+ScoreSpells(WHIRLWIND BLOODTHIRST SLAM REND MORTALSTRIKE EXECUTE SHIELDSLAM REVENGE)
+
 AddIcon
 {
      if List(shout command) and
@@ -134,16 +147,16 @@ AddIcon
 		if Stance(2)
 		{
 			if Mana(more 66) 
-				Spell(HEROICSTRIKE doNotRepeat=1)
+				Spell(HEROICSTRIKE)
 		}
 		unless Stance(2)
 		{
 			if Mana(more 66) and TargetLifePercent(more 20)
-				Spell(HEROICSTRIKE doNotRepeat=1)
+				Spell(HEROICSTRIKE)
 		}
 	}
     if Mana(more 50) and CheckBoxOn(multi)
-		Spell(CLEAVE doNotRepeat=1)
+		Spell(CLEAVE)
  }
 
 AddIcon

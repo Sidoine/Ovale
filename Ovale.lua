@@ -1,6 +1,7 @@
 ﻿local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 Ovale = LibStub("AceAddon-3.0"):NewAddon("Ovale", "AceEvent-3.0", "AceConsole-3.0")
+local Recount = Recount
 
 Ovale.defaut = {}
 Ovale.action = {}
@@ -26,8 +27,11 @@ Ovale.aura = { player = {}, target = {}}
 Ovale.possibleAura = { player = {}, target = {}}
 Ovale.targetGUID = nil
 Ovale.spellInfo = {}
-Ovale.currentSpellInfo = nil
+Ovale.spellStack = {}
 Ovale.buff = {}
+Ovale.className = nil
+Ovale.state = {rune={}, cd = {}}
+Ovale.scoreSpell = {}
 
 Ovale.arbre = {}
 
@@ -156,6 +160,14 @@ local options =
 					name = L["Vertical"],
 					get = function(info) return Ovale.db.profile.apparence.vertical end,
 					set = function(info, value) Ovale.db.profile.apparence.vertical = value; Ovale:UpdateFrame() end
+				},
+				predictif =
+				{
+					order = 10,
+					type = "toggle",
+					name = "Predictive (EXPERIMENTAL)",
+					get = function(info) return Ovale.db.profile.apparence.predictif end,
+					set = function(info, value) Ovale.db.profile.apparence.predictif = value; Ovale:UpdateFrame() end
 				},
 				
 			}
@@ -298,7 +310,6 @@ function Ovale:PLAYER_TARGET_CHANGED()
 	end
 end
 
-
 function Ovale:UNIT_AURA(event, unit)
 	if (unit == "player") then
 		local hateBase = GetCombatRatingBonus(18)
@@ -352,6 +363,7 @@ function Ovale:UNIT_AURA(event, unit)
 		
 		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
 		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
+--		self.rangedHaste = hateBase + hateCommune + hateHero + hateClasse -- TODO ajouter le bidule du chasseur en spé bête
 --		print("spellHaste = "..self.spellHaste)
 	end
 end
@@ -383,10 +395,11 @@ function Ovale:FirstInit()
 	-- self:InitEcranOption()
 	
 	local playerClass, englishClass = UnitClass("player")
-	if (englishClass == "ROGUE") then
-		self.gcd = 1
-	else
-		self.gcd = 1.5
+	self.className = englishClass
+	if self.className == "DEATHKNIGHT" then
+		for i=1,6 do
+			self.state.rune[i] = {}
+		end
 	end
 	-- OvaleFrame_Update(OvaleFrame)
 	-- OvaleFrame:Show()
@@ -435,9 +448,8 @@ function Ovale:OnEnable()
     self:RegisterEvent("UPDATE_BINDINGS");
     self:RegisterEvent("UNIT_AURA");
     self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-    	
+    self:RegisterEvent("UNIT_SPELLCAST_SENT")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
-    -- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	
 	if (not self.firstInit) then
 		self:FirstInit()
@@ -446,15 +458,47 @@ function Ovale:OnEnable()
 	self:UpdateVisibility()
 end
 
+function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
+	-- self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
+	if unit=="player" and self.enCombat then
+		-- self.lastSpellCast=name
+		if (not self.spellInfo[name] or not self.spellInfo[name].toggle) and self.scoreSpell[name] then
+			local previousAmount = 0
+			if self.maxScore>0 then
+				previousAmount = self.score/self.maxScore*1000
+			end
+			local scored = self.frame:GetScore(name)
+			self.score = self.score + scored
+			self.maxScore = self.maxScore + 1
+			local newAmount = self.score/self.maxScore*1000
+			-- self:Print(scored .. " for "..name)
+			if Recount then
+				local source =Recount.db2.combatants[UnitName("player")]
+				if source then
+				--	self:Print(previousAmount)
+				--	self:Print(newAmount)
+				--	self:Print(newAmount-previousAmount)
+					Recount:AddAmount(source,"Ovale",newAmount-previousAmount)
+				end
+			end
+		end
+	end
+end
+
 function Ovale:PLAYER_REGEN_ENABLED()
 	self.enCombat = false
 	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
 		self.frame:Hide()
 	end	
+	-- if self.maxScore and self.maxScore > 0 then
+	-- 	self:Print((self.score/self.maxScore*100).."%")
+	-- end
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
 	self.enCombat = true
+	self.score = 0
+	self.maxScore = 0
 	
 	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
 		self.frame:Show()
@@ -473,6 +517,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
     self:UnregisterEvent("UPDATE_BINDINGS")
     self:UnregisterEvent("UNIT_AURA")
+    self:UnregisterEvent("UNIT_SPELLCAST_SENT")
     self:UnregisterEvent("PLAYER_TARGET_CHANGED")
     -- self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self.frame:Hide()
@@ -637,21 +682,113 @@ function Ovale:ChercherBouton(sort)
 	end
 end
 
+function Ovale:AddRune(time, type, value)
+	if value<0 then
+		for i=1,6 do
+			if (self.state.rune[i].type == type or self.state.rune[i].type==4)and self.state.rune[i].cd<=time then
+				self.state.rune[i].cd = time + 10
+			end
+		end
+	else
+	
+	end
+end
+
+function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
+	self.spellStack.length = self.spellStack.length + 1
+	if not self.spellStack[self.spellStack.length] then
+		self.spellStack[self.spellStack.length] = {}
+	end
+	local newSpell = self.spellStack[self.spellStack.length]
+	newSpell.attenteFinCast = endCast
+	if spellName then
+		newSpell.info = self.spellInfo[spellName]
+	else
+		newSpell.info = nil
+	end
+	self.currentSpellName = spellName
+	self.attenteFinCast = nextCast
+	if startCast>=0 then
+		if newSpell.info then
+			if newSpell.info.combo then
+				self.state.combo = self.state.combo + newSpell.info.combo
+				if self.state.combo<0 then
+					self.state.combo = 0
+				end
+			end
+			if newSpell.info.frost then
+				self:AddRune(startCast, 3, newSpell.info.frost)
+			end
+			if newSpell.info.death then
+				self:AddRune(startCast, 4, newSpell.info.death)
+			end
+			if newSpell.info.blood then
+				self:AddRune(startCast, 1, newSpell.info.blood)
+			end
+			if newSpell.info.unholy then
+				self:AddRune(startCast, 2, newSpell.info.unholy)
+			end
+		end
+	end
+			
+	if newSpell.info then
+		if newSpell.info.cd then
+			if not self.state.cd[spellName] then
+				self.state.cd[spellName] = {}
+			end
+			self.state.cd[spellName].start = startCast + self.maintenant
+			self.state.cd[spellName].duration = newSpell.info.cd
+			self.state.cd[spellName].enable = 1
+		end
+		if newSpell.info.toggle then
+			if not self.state.cd[spellName] then
+				self.state.cd[spellName] = {}
+			end
+			self.state.cd[spellName].toggled = 1
+		end
+	end
+end
+
+function Ovale:InitAllActions()
+	self.maintenant = GetTime();
+	self.gcd = self:GetGCD()
+end
+
 function Ovale:InitCalculerMeilleureAction()
 	self.attenteFinCast = 0
-	self.currentSpellInfo = nil
+	self.currentSpellName = nil
+	self.spellStack.length = 0
+	self.state.combo = GetComboPoints("player")
+	if self.className == "DEATHKNIGHT" then
+		for i=1,6 do
+			self.state.rune[i].type = GetRuneType(i)
+			local start, duration, runeReady = GetRuneCooldown(i)
+			if runeReady then
+				self.state.rune[i].cd = 0
+			else
+				self.state.rune[i].cd = duration - (self.maintenant - start)
+				if self.state.rune[i].cd<0 then
+					self.state.rune[i].cd = 0
+				end
+			end
+		end
+	end
+	for k,v in pairs(self.state.cd) do
+		v.start = nil
+		v.duration = nil
+		v.enable = 0
+		v.toggled = nil
+	end
 	
 	-- On attend que le sort courant soit fini
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
 	if (spell) then
-		self.attenteFinCast = endTime/1000 - Ovale.maintenant
-		self.currentSpellInfo = self.spellInfo[spell]
+		self:AddSpellToStack(spell, startTime - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
 	end
 	
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
-	if (spell and not Ovale.canStopChannelling[spell]) then
-		self.attenteFinCast = endTime/1000 - Ovale.maintenant
-		self.currentSpellInfo = self.spellInfo[spell]
+	if (spell) then
+		self:AddSpellToStack(spell, startTime - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
 	end
 end
 
@@ -663,6 +800,129 @@ local function printTime(temps)
 	end
 end
 
+function Ovale:GetGCD(spellName)
+	if spellName and self.spellInfo[spellName] then
+		if self.spellInfo[spellName].haste == "spell" then
+			local cd = self.spellInfo[spellName].gcd
+			if not cd then
+				cd = 1.5
+			end
+			cd = cd /(1+self.spellHaste/100)
+			if (cd<1) then
+				cd = 1
+			end
+			return cd
+		elseif self.spellInfo[spellName].gcd then
+			return self.spellInfo[spellName].gcd
+		end			
+	end
+	
+	-- Default value
+	if self.className == "ROGUE" or (self.className == "DRUID" and GetShapeshiftForm(true) == 3) then
+		return 1.0
+	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
+			(self.className == "DRUID" and GetShapeshiftForm(true) ~= 1) then
+		local cd = 1.5 /(1+self.spellHaste/100)
+		if (cd<1) then
+			cd = 1
+		end
+		return cd
+	else
+		return 1.5
+	end
+end
+
+function Ovale:GetActionInfo(element)
+	if not element then
+		return nil
+	end
+	
+	local spellName
+	local action
+	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable
+	
+	local target = element.params.target
+	if (not target) then
+		target = "target"
+	end
+
+	if (element.func == "Spell" ) then
+		spellName = self:GetSpellInfoOrNil(element.params[1])
+		action = self.actionSort[spellName]
+		if self.state.cd[spellName] and self.state.cd[spellName].start then
+			actionCooldownStart = self.state.cd[spellName].start
+			actionCooldownDuration = self.state.cd[spellName].duration
+			actionEnable = self.state.cd[spellName].enable
+		else
+			if self.spellInfo[spellName] and self.spellInfo[spellName].forcecd then
+				actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(GetSpellInfo(self.spellInfo[spellName].forcecd))
+			else
+				actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
+			end
+		end
+		
+		if (not action or not GetActionTexture(action)) then
+			actionTexture = GetSpellTexture(spellName)
+			actionInRange = IsSpellInRange(spellName, target)
+			actionUsable = IsUsableSpell(spellName)
+			actionShortcut = nil
+			local casting = UnitCastingInfo("player")
+			if (casting == spellName) then
+				actionIsCurrent = 1
+			else
+				actionIsCurrent = nil
+			end
+			-- not quite the same as IsCurrentAction. Why did they remove IsCurrentCast?
+		end
+	elseif (element.func=="Macro") then
+		action = self.actionMacro[element.params[1]]
+	elseif (element.func=="Item") then
+		local itemId
+		if (type(element.params[1]) == "number") then
+			itemId = element.params[1]
+		else
+			local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
+			itemId = tonumber(id)
+		end		
+		if (Ovale.trace) then
+			self:Print("Item "..itemId)
+		end
+		
+		spellName = GetItemSpell(itemId)
+		actionUsable = (spellName~=nil)
+		
+		action = self.actionObjet[itemId]
+		if (not action or not GetActionTexture(action)) then
+			actionTexture = GetItemIcon(itemId)
+			actionInRange = IsItemInRange(itemId, target)
+			actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
+			actionShortcut = nil
+			actionIsCurrent = nil
+		end
+	end
+	
+	if (action and not actionTexture) then
+		actionTexture = GetActionTexture(action)
+		actionInRange = IsActionInRange(action, target)
+		if not actionCooldownStart then
+			actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
+		end
+		if (actionUsable == nil) then
+			actionUsable = IsUsableAction(action)
+		end
+		actionShortcut = self.shortCut[action]
+		actionIsCurrent = IsCurrentAction(action)				
+	end
+	
+	if spellName and self.state.cd[spellName] and self.state.cd[spellName].toggle then
+		actionIsCurrent = 1
+	end
+	
+	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName
+end
+
 function Ovale:CalculerMeilleureAction(element)
 	if (self.bug and not self.trace) then
 		return nil
@@ -672,70 +932,12 @@ function Ovale:CalculerMeilleureAction(element)
 		return nil
 	end
 	
+	--TODO: créer un objet par type au lieu de ce if else if tout moche
 	if (element.type=="function")then
 		if (element.func == "Spell" or element.func=="Macro" or element.func=="Item") then
 			local action
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut, actionIsCurrent, actionEnable
-			
-			local target = element.params.target
-			if (not target) then
-				target = "target"
-			end
-
-			if (element.func == "Spell" ) then
-				local sort = self:GetSpellInfoOrNil(element.params[1])
-				action = self.actionSort[sort]
-				if (not action or not GetActionTexture(action)) then
-					actionTexture = GetSpellTexture(sort)
-					actionInRange = IsSpellInRange(sort, target)
-					actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(sort)
-					actionUsable = IsUsableSpell(sort)
-					actionShortcut = nil
-					local casting = UnitCastingInfo("player")
-					if (casting == sort) then
-						actionIsCurrent = 1
-					else
-						actionIsCurrent = nil
-					end
-					-- not quite the same as IsCurrentAction. Why did they remove IsCurrentCast?
-				end
-			elseif (element.func=="Macro") then
-				action = self.actionMacro[element.params[1]]
-			elseif (element.func=="Item") then
-				local itemId
-				if (type(element.params[1]) == "number") then
-					itemId = element.params[1]
-				else
-					local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
-					itemId = tonumber(id)
-				end		
-				if (Ovale.trace) then
-					self:Print("Item "..itemId)
-				end
-				
-				actionUsable = (GetItemSpell(itemId)~=nil)
-				
-				action = self.actionObjet[itemId]
-				if (not action or not GetActionTexture(action)) then
-					actionTexture = GetItemIcon(itemId)
-					actionInRange = IsItemInRange(itemId, target)
-					actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
-					actionShortcut = nil
-					actionIsCurrent = nil
-				end
-			end
-			
-			if (action and not actionTexture) then
-				actionTexture = GetActionTexture(action)
-				actionInRange = IsActionInRange(action, target)
-				actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
-				if (actionUsable == nil) then
-					actionUsable = IsUsableAction(action)
-				end
-				actionShortcut = self.shortCut[action]
-				actionIsCurrent = IsCurrentAction(action)				
-			end
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName = self:GetActionInfo(element)
 			
 			if (not actionTexture) then
 				if (Ovale.trace) then
@@ -749,7 +951,7 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 				return nil
 			end
-			if (element.params.doNotRepeat==1 and actionIsCurrent) then
+			if (spellName and self.spellInfo[spellName] and self.spellInfo[spellName].toggle and actionIsCurrent) then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." is current action")
 				end
@@ -762,7 +964,8 @@ function Ovale:CalculerMeilleureAction(element)
 				else
 					restant = actionCooldownDuration - (self.maintenant - actionCooldownStart);
 				end
-				if (restant<self.attenteFinCast) then
+				if restant<self.attenteFinCast and (spellName==self.currentSpellName or not self.spellInfo[self.currentSpellName] or
+							not self.spellInfo[self.currentSpellName].canStopChannelling) then
 					restant = self.attenteFinCast
 				end
 				if (Ovale.trace) then
@@ -772,8 +975,7 @@ function Ovale:CalculerMeilleureAction(element)
 				if (not retourPriorite) then
 					retourPriorite = 3
 				end
-				return restant, retourPriorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut
+				return restant, retourPriorite, element
 			else
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not enabled")
@@ -837,17 +1039,14 @@ function Ovale:CalculerMeilleureAction(element)
 		if (tempsA==nil) then
 			return nil
 		end
-		local tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-			actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(element.b)
+		local tempsB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsB==nil) then
 			return nil
 		end
 		if (tempsB>tempsA) then
-			return  tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut
+			return  tempsB, prioriteB, elementB
 		else
-			return  tempsA, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut
+			return  tempsA, prioriteB, elementB
 		end
 	elseif (element.type == "unless") then
 		if (Ovale.trace) then
@@ -857,11 +1056,9 @@ function Ovale:CalculerMeilleureAction(element)
 		if (tempsA==0) then
 			return nil
 		end
-		local tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-			actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(element.b)
+		local tempsB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsA==nil or tempsA>tempsB) then
-			return tempsB, priorite, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut
+			return tempsB, prioriteB, elementB
 		else
 			return nil
 		end
@@ -880,22 +1077,16 @@ function Ovale:CalculerMeilleureAction(element)
 			return tempsB
 		end
 	elseif (element.type == "group") then
-		local meilleurFils
 		local meilleurTempsFils
 		local meilleurePrioriteFils
-		local bestActionInRange
-		local bestActionCooldownStart
-		local bestActionCooldownDuration
-		local bestActionUsable
-		local bestActionShortCut
+		local bestElement
 		 
 		if (Ovale.trace) then
 			self:Print(element.type)
 		end
 		
 		for k, v in ipairs(element.nodes) do
-			local nouveauTemps, priorite, action, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut = Ovale:CalculerMeilleureAction(v)
+			local nouveauTemps, priorite, nouveauElement = Ovale:CalculerMeilleureAction(v)
 			if (nouveauTemps) then
 				local remplacer
 			
@@ -926,13 +1117,8 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 				if (remplacer) then
 					meilleurTempsFils = nouveauTemps
-					meilleurFils = action
 					meilleurePrioriteFils = priorite
-					bestActionInRange = actionInRange
-					bestActionCooldownStart = actionCooldownStart
-					bestActionCooldownDuration = actionCooldownDuration
-					bestActionUsable = actionUsable
-					bestActionShortCut = actionShortcut
+					bestElement = nouveauElement
 				end
 			end
 		end
@@ -941,8 +1127,7 @@ function Ovale:CalculerMeilleureAction(element)
 			if (Ovale.trace) then
 				self:Print("Best action "..meilleurFils.." remains "..meilleurTempsFils)
 			end
-			return meilleurTempsFils,meilleurePrioriteFils, meilleurFils, bestActionInRange, bestActionCooldownStart,
-						bestActionCooldownDuration, bestActionUsable, bestActionShortCut
+			return meilleurTempsFils,meilleurePrioriteFils, bestElement
 		else
 			if (Ovale.trace) then printTime(nil) end
 			return nil
@@ -966,7 +1151,7 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false},
+				verrouille = false, vertical = false, predictif=false},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
@@ -1043,4 +1228,15 @@ end
 
 function Ovale:GetListValue(v)
 	return self.dropDowns[v] and self.dropDowns[v].value
+end
+
+function Ovale:GetSpellInfo(spell)
+	if (not self.spellInfo[spell]) then
+		self.spellInfo[spell] = { player = {}, target = {}}
+	end
+	return self.spellInfo[spell]
+end
+
+function Ovale:ResetSpellInfo()
+	self.spellInfo = {}
 end

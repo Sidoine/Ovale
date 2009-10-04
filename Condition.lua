@@ -162,6 +162,12 @@ local function getTarget(condition)
 end
 
 local function GetTargetAura(condition, filter, target)
+	if (not target) then
+		target=condition.target
+		if (not target) then
+			target="target"
+		end
+	end
 	local spellId = condition[1]
 	local auraName, auraRank, auraIcon = Ovale:GetSpellInfoOrNil(spellId)
 	local i=1;
@@ -182,14 +188,23 @@ local function GetTargetAura(condition, filter, target)
 		i = i + 1;
 	end
 	
-	if (Ovale.currentSpellInfo and spellId and Ovale.currentSpellInfo[target][filter] and
-		Ovale.currentSpellInfo[target][filter][spellId]) then
-		if (not timeLeft or timeLeft < Ovale.attenteFinCast) then
-			stacksLeft = 1
-		else
-			stacksLeft = stacksLeft + 1
+	if spellId then
+		for k=1,Ovale.spellStack.length do
+			local newSpell = Ovale.spellStack[k]
+			if (newSpell.info and newSpell.info[target] and newSpell.info[target][filter] and newSpell.info[target][filter][spellId]) then
+				local duration = newSpell.info[target][filter][spellId]
+				if duration>0 then
+					if (not timeLeft or timeLeft < newSpell.attenteFinCast) then
+						stacksLeft = 1
+					else
+						stacksLeft = stacksLeft + 1
+					end
+					timeLeft = duration + newSpell.attenteFinCast
+				else
+					timeLeft = nil
+				end
+			end
 		end
-		timeLeft = Ovale.currentSpellInfo[target][filter][spellId] + Ovale.attenteFinCast
 	end
 	return timeLeft, stacksLeft
 end
@@ -295,7 +310,7 @@ Ovale.conditions=
 	-- 1 : "less" or "more"
 	-- 2 : the limit
 	ComboPoints = function(condition)
-		local points = GetComboPoints("player")
+		local points = Ovale.state.combo
 		return compare(points, condition[1], condition[2])
 	end,
 	DebuffExpires = function(condition)
@@ -432,17 +447,17 @@ Ovale.conditions=
 		local maxCD = nil
 		local minCD = nil
 		for i=1,6 do
-			if (GetRuneType(i) == type or GetRuneType(i) == 4) then
-				local start, duration, runeReady = GetRuneCooldown(i)
-				if (runeReady) then
+			local rune = Ovale.state.rune[i]
+			if (rune.type == type or rune.type == 4) then
+				if (rune.cd == 0) then
 					nombre = nombre + 1
 				else
 					nombreCD = nombreCD + 1
-					if (maxCD == nil or start<maxCD) then
-						maxCD = start
+					if (maxCD == nil or rune.cd>maxCD) then
+						maxCD = rune.cd
 					end
-					if (minCD == nil or start>minCD) then
-						minCD = start
+					if (minCD == nil or rune.cd<minCD) then
+						minCD = rune.cd
 					end
 				end
 			end
@@ -453,10 +468,10 @@ Ovale.conditions=
 		elseif (nombre + nombreCD < wanted) then
 			return nil
 		elseif (wanted == nombre + 1) then
-			return Ovale.maintenant - minCD
+			return minCD
 		else
 			-- Il ne peut y avoir que deux runes sur CD de toute façon
-			return Ovale.maintenant - maxCD
+			return maxCD
 		end
 	end,
 	-- Test if the player is in a given stance
@@ -483,7 +498,7 @@ Ovale.conditions=
 	-- 1 : buff spell id
 	-- stacks : how many stacks
 	TargetBuffPresent = function(condition)
-		local timeLeft, stacksLeft = GetTargetAura(condition, "HELPFUL", "target")
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HELPFUL")
 		local tempsMin = avecHate(condition[2], condition.haste)
 		
 		if (timeLeft and (condition[2]==nil or timeLeft>tempsMin)) then
@@ -531,7 +546,7 @@ Ovale.conditions=
 	-- stacks : how many stacks
 	-- mine : 1 means that if the debuff is not ours, the debuff is ignored
 	TargetDebuffExpires = function(condition)
-		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "target")
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL")
 		local tempsMax = avecHate(condition[2], condition.haste)
 		if (not timeLeft or timeLeft<tempsMax) then
 			return 0
@@ -546,7 +561,7 @@ Ovale.conditions=
 	-- stacks : how many stacks
 	-- mine : 1 means that the debuff must be yours
 	TargetDebuffPresent = function(condition)
-		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL", "target")
+		local timeLeft, stacksLeft = GetTargetAura(condition, "HARMFUL")
 		local tempsMin = avecHate(condition[2], condition.haste)
 		
 		if (timeLeft and (condition[2]==nil or timeLeft>tempsMin)) then

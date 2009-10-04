@@ -13,18 +13,28 @@ Define(IF 48168) # Inner Fire
 Define(Focus 14751) # Inner Focus
 Define(Dispersion 47585)
 Define(Shadowfiend 34433)
-CanStopChannelling(MF) # Mind Flay's channeling can be interrupted if needed
 
 # Spells with cast time that add buff or debuff
-SpellAddTargetDebuff(VT SW=15 VT=15)
-SpellAddTargetDebuff(MF SW=15)
-SpellAddTargetDebuff(MB SW=15)
+SpellAddTargetDebuff(SWP SWP=18)
+SpellAddBuff(SWP SW=15)
+SpellAddTargetDebuff(VT VT=15)
+SpellAddBuff(VT SW=15)
+SpellInfo(MF canStopChannelling=1)
+SpellAddBuff(MF SW=15)
+SpellInfo(MB cd=5.5)
+SpellAddBuff(MB SW=15)
+SpellAddBuff(IF IF=1800)
+SpellAddTargetDebuff(DP DP=24)
+SpellInfo(Focus cd=180)
+SpellInfo(Dispersion cd=120)
+SpellInfo(Shadowfiend cd=300)
+ScoreSpells(MB SWP VT DP MF)
 
 # Add main monitor
 AddIcon {
 
 #Check shadowform is up
-if BuffExpires(SF 0)
+unless BuffPresent(SF)
     Spell(SF)
     
 # Refresh inner fire
@@ -33,7 +43,7 @@ if BuffExpires(IF 60)
 
 #if inner focus is active, cast mind blast
 if BuffPresent(Focus) 
-    Spell(MB doNotRepeat=1)
+    Spell(MB)
     
 # Check if Shadow Weave is stacked 5 times
 # before suggesting Shadow Word: Pain
@@ -47,7 +57,7 @@ if TargetDebuffExpires(VT 1.4 mine=1 haste=spell)
    Spell(VT)
   
 #cast MB if up
-Spell(MB doNotRepeat=1)
+Spell(MB)
   
 #Refresh devouring plague  
 if TargetDebuffExpires(DP 0 mine=1)
@@ -68,7 +78,7 @@ AddIcon
 AddIcon {
 
 #if up, launch focus (and then MB since it's the first priority)
-Spell(Focus doNotRepeat=1 usable=1)
+Spell(Focus usable=1)
 
 #Regain mana if needed and if shadowfiend is not already out
 if Mana(less 4000) and PetPresent(no)

@@ -2,7 +2,7 @@
 
   <CheckButton name="OvaleIcone" virtual="true" inherits="ActionButtonTemplate">
     <Scripts>
-      <OnUpdate>OvaleIcone_OnUpdate(self);</OnUpdate>
+      <!--<OnUpdate>OvaleIcone_OnUpdate(self);</OnUpdate>-->
       <OnLoad>OvaleIcone_OnLoad(self);</OnLoad>
       <OnClick>OvaleIcone_OnClick(self)</OnClick>
     </Scripts>

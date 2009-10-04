@@ -21,7 +21,6 @@ do
 		this.obj:Hide()
 	end
 	
-	
 	local function frameOnMouseDown(this)
 		if (not Ovale.db.profile.apparence.verrouille) then
 			this:StartMoving()
@@ -43,28 +42,21 @@ do
 		if (Ovale.db.profile.left~=this:GetLeft() or Ovale.db.profile.top ~=this:GetTop()) then
 			Ovale.db.profile.left = this:GetLeft()
 			Ovale.db.profile.top = this:GetTop()
-	--	else
-	--		this.obj:ToggleOptions()
 		end
 	end
 	
 	local function frameOnEnter(this)
-		--for i,child in ipairs(this.obj.children) do
-		--	child.frame:Show()
-		--end
-	--	this.obj.content:Show()
 		if (not Ovale.db.profile.apparence.verrouille) then
 			this.obj.barre:Show()
 		end
 	end
 	
-	
 	local function frameOnLeave(this)
-		--for i,child in ipairs(this.obj.children) do
-		--	child.frame:Hide()
-		--end
-		--this.obj.content:Hide()
 		this.obj.barre:Hide()
+	end
+	
+	local function frameOnUpdate(self)
+		self.obj:OnUpdate()
 	end
 	
 	local function Hide(self)
@@ -104,8 +96,6 @@ do
 	end
 	
 	local function OnLayoutFinished(self, width, height)
-		-- self.content:SetWidth(width)
-		-- self.content:SetHeight(height)
 		if (not width) then
 			width = self.content:GetWidth()
 		end
@@ -114,18 +104,97 @@ do
 	end
 	
 	local function OnSkinChanged(self, skinID, gloss, backdrop, colors)
-		-- for k, icon in pairs(self.icone) do
-		--	icon:UpdateSkin(skinID, gloss, backdrop, colors)
-		-- end
 		Ovale.db.profile.SkinID = skinID
 		Ovale.db.profile.Gloss = gloss
 		Ovale.db.profile.Backdrop = backdrop
 		Ovale.db.profile.Colors = colors
 	end
 	
+	local function GetScore(self, spellName)
+		for k,action in pairs(self.actions) do
+			if action.spellName == spellName then
+				if not action.waitStart then
+					return 1
+				else
+					if Ovale.maintenant - action.waitStart>1.5 then
+						return 0
+					else
+						return 1-(Ovale.maintenant - action.waitStart)/1.5
+					end
+				end
+			end
+		end
+		return 0
+	end
+	
+	local function OnUpdate(self)
+		Ovale:InitAllActions()
+		for k,node in pairs(Ovale.masterNodes) do
+			Ovale:InitCalculerMeilleureAction()
+			local minAttente, priorite, element = Ovale:CalculerMeilleureAction(node)
+			
+			local action = self.actions[k]
+			
+			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName = Ovale:GetActionInfo(element)
+			
+			if (node.params.nocd and node.params.nocd == 1 and minAttente~=nil and minAttente>1.5) then
+				action.icons[1]:Update(nil)
+			else			
+				action.icons[1]:Update(minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName)
+			end
+			
+			action.spellName = spellName
+			
+			if minAttente == 0 and actionUsable then
+				if not action.waitStart then
+					action.waitStart = Ovale.maintenant
+				end
+			else
+				action.waitStart = nil
+			end
+			
+			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif) then
+				if minAttente then
+					local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
+					if top<0 then
+						top = 0
+					elseif top>1 then
+						top = 1
+					end
+					
+					action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + top*action.dx,action.top - top*action.dy)
+					action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (top+1)*action.dx,action.top - (top+1)*action.dy)
+					local castTime=0
+					if spellName then
+						local _, _, _, _, _, _, _castTime = GetSpellInfo(spellName)
+						if _castTime then
+							castTime = _castTime/1000
+						end
+					end
+					local gcd = Ovale:GetGCD(spellName)
+					local nextCast
+					if (castTime>gcd) then
+						nextCast = minAttente + castTime 
+					else
+						nextCast = minAttente + gcd
+					end					
+					Ovale:AddSpellToStack(spellName, minAttente, minAttente + castTime, nextCast)
+					minAttente, priorite, element = Ovale:CalculerMeilleureAction(node)
+					action.icons[2]:Update(minAttente, Ovale:GetActionInfo(element))
+				else
+					action.icons[2]:Update(nil)
+				end
+			end
+		end
+	end
+	
 	local function UpdateIcons(self)
-		for k, icon in pairs(self.icone) do
-			icon:Hide()
+		for k, action in pairs(self.actions) do
+			for i, icon in pairs(action.icons) do
+				icon:Hide()
+			end
 		end
 		
 		local left = 0
@@ -142,41 +211,61 @@ do
 		local margin =  Ovale.db.profile.apparence.margin
 			
 		for k,node in pairs(Ovale.masterNodes) do
-			if (not self.icone[k]) then
-				-- self.icone[k] = CreateFrame("Frame", "Icon"..k,self.frame,"OvaleIcone");
-				self.icone[k] = CreateFrame("CheckButton", "Icon"..k,self.frame,"OvaleIcone");
+			if not self.actions[k] then
+				self.actions[k] = {icons={}}
 			end
-			-- self.icone[k]:SetFrameLevel(1)
-			self.icone[k].masterNode = node
+			local action = self.actions[k]
+
 			local width, height
+			local nbIcons
 			if (node.params.size == "small") then
 				width = Ovale.db.profile.apparence.smallIconWidth + margin
 				height = Ovale.db.profile.apparence.smallIconHeight + margin
+				nbIcons = 1
 			else
 				width = Ovale.db.profile.apparence.iconWidth + margin
 				height = Ovale.db.profile.apparence.iconHeight + margin
+				if Ovale.db.profile.apparence.predictif then
+					nbIcons = 2
+				else
+					nbIcons = 1
+				end
 			end
 			if (top + height > Ovale.db.profile.apparence.iconHeight + margin) then
 				top = 0
 				left = maxWidth
 			end
+			
+			action.width = width - margin
+			action.height = height - margin
 			if (Ovale.db.profile.apparence.vertical) then
-				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",top,-left-BARRE-margin)
+				action.left = top
+				action.top = -left-BARRE-margin
+				action.dx = action.width
+				action.dy = 0
 			else
-				self.icone[k]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",left,-top-BARRE-margin)
+				action.left = left
+				action.top = -top-BARRE-margin
+				action.dx = 0
+				action.dy = action.height
 			end
-			self.icone[k]:SetWidth(width - margin)
-			self.icone[k]:SetHeight(height - margin)
-			if (not LBF) then
-				self.icone[k].normalTexture:SetWidth((width - margin)*66/36)
-				self.icone[k].normalTexture:SetHeight((height - margin)*66/36)
-				self.icone[k].shortcut:SetWidth(width-margin)
-				self.icone[k].remains:SetWidth(width-margin)
+					
+			for l=1,nbIcons do
+				if (not action.icons[l]) then
+					action.icons[l] = CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIcone");
+				end			
+				local icon = action.icons[l]
+				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (l-1)*action.dx,action.top - (l-1)*action.dy)
+				icon:SetSize(action.width, action.height)
+				
+				if LBF then
+					icon:SetSkinGroup(self.skinGroup)
+				end
+				if l==1 then
+					icon:Show();
+				end
 			end
-			if LBF then
-				self.icone[k]:SetSkinGroup(self.skinGroup)
-			end
-			self.icone[k]:Show();
+			
 			top = top + height
 			if (top> maxHeight) then
 				maxHeight = top
@@ -205,8 +294,6 @@ do
 		local frame = CreateFrame("Frame",nil,UIParent)
 		local self = {}
 		
-		-- self.optionsVisible = false
-		
 		self.type = "Frame"
 		
 		self.Hide = Hide
@@ -218,9 +305,11 @@ do
 		self.UpdateIcons = UpdateIcons
 		self.OnSkinChanged = OnSkinChanged
 		self.ToggleOptions = ToggleOptions
+		self.OnUpdate = OnUpdate
+		self.GetScore = GetScore
 		
 		self.localstatus = {}
-		self.icone = {}
+		self.actions = {}
 		
 		self.frame = frame
 		frame.obj = self
@@ -229,13 +318,12 @@ do
 		frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
 		frame:EnableMouse()
 		frame:SetMovable(true)
-		--frame:SetResizable(true)
 		frame:SetFrameStrata("BACKGROUND")
 		frame:SetScript("OnMouseDown", frameOnMouseDown)
 		frame:SetScript("OnMouseUp", frameOnMouseUp)
 		frame:SetScript("OnEnter", frameOnEnter)
 		frame:SetScript("OnLeave", frameOnLeave)
-		
+		frame:SetScript("OnUpdate", frameOnUpdate)		
 		frame:SetScript("OnHide",frameOnClose)
 		
 		self.barre = self.frame:CreateTexture();
@@ -247,11 +335,8 @@ do
 		local content = CreateFrame("Frame",nil,frame)
 		self.content = content
 		content.obj = self
-		content.test = "test"
 		content:SetWidth(200)
 		content:SetHeight(100)
-		--content:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
-		-- content:EnableMouse()
 		content:Hide()
 		
 		AceGUI:RegisterAsContainer(self)
