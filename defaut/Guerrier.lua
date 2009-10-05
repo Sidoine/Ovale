@@ -73,9 +73,13 @@ AddIcon
          
      if Stance(2) #Defense
      {
-        if TargetClassification(worldboss) 
-              and TargetDebuffExpires(THUNDERCLAP 2)
-            Spell(THUNDERCLAP)
+        if TargetClassification(worldboss)
+        {
+            if TargetDebuffExpires(THUNDERCLAP 2)
+				Spell(THUNDERCLAP)
+			Spell(CONCUSSIONBLOW)
+			Spell(SHOCKWAVE)
+		}
         
         if CheckBoxOn(multi)
         {

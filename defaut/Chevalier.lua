@@ -28,6 +28,7 @@ Define(FROSTSTRIKE 49143)
 Define(HYSTERIA 49016)
 Define(SUMMONGARGOYLE 49206)
 Define(GLYPHDISEASE 63959)
+Define(GLYPHHOWLINGBLAST 63961)
 Define(ABOMINATIONMIGHT 53136)
 Define(TALENTABOMINATIONMIGHT 2105)
 Define(RAISEDEAD 46584)
@@ -49,7 +50,12 @@ ScoreSpells(HOWLINGBLAST HEARTSTRIKE BLOODSTRIKE DEATHSTRIKE SCOURGESTRIKE OBLIT
 
 AddIcon
 {
-	if Runes(unholy 1) and Runes(frost 1) Spell(HOWLINGBLAST)
+	Spell(DANCINGRUNEWEAPON usable=1)
+	
+	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) and TargetDebuffExpires(FROSTFEVER 2 mine=1) and TargetDebuffPresent(FROSTFEVER mine=1) and
+		TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
+			Spell(PESTILENCE)
+	
 	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
 	{
 		if TalentPoints(TALENTBLOODYSTRIKES more 0)
@@ -60,7 +66,7 @@ AddIcon
 				Spell(BLOODSTRIKE)
 			}
 		}
-		if Runes(unholy 1) and Runes(frost 1)
+		if Runes(unholy 1 nodeath=1) and Runes(frost 1 nodeath=1)
 		{
 			if TalentPoints(TALENTDEATSTRIKE more 0) Spell(DEATHSTRIKE)
 			Spell(SCOURGESTRIKE)
@@ -73,25 +79,27 @@ AddIcon
 			Spell(BLOODSTRIKE)
 		}
 	}
-	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) and TargetDebuffExpires(FROSTFEVER 2 mine=1) and TargetDebuffPresent(FROSTFEVER mine=1) and
-		TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
-			Spell(PESTILENCE)
-			
+	
 	if CheckBoxOn(rolldes) and TalentPoints(TALENTABOMINATIONMIGHT more 0) and BuffPresent(ABOMINATIONMIGHT no)
 		Spell(DEATHSTRIKE)
+		
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
+	{
+		if Glyph(GLYPHHOWLINGBLAST) Spell(HOWLINGBLAST)
 		Spell(ICYTOUCH)
+	}
+	
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1)
 		Spell(PLAGUESTRIKE)
 	
 	Spell(FROSTSTRIKE usable=1)
-	Spell(DEATHCOIL usable=1)
-	
 	if PetPresent(no) Spell(RAISEDEAD)
+	Spell(DEATHCOIL usable=1)
 }
 
 AddIcon
 {
+	if Runes(unholy 1) and Runes(frost 1) Spell(HOWLINGBLAST)
 	if TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)
 		Spell(PESTILENCE usable=1)
 	Spell(DEATHANDECAY usable=1)
@@ -118,7 +126,6 @@ AddIcon size=small
 	{
 		Spell(SUMMONGARGOYLE)	
 		Spell(HYSTERIA)
-		Spell(DANCINGRUNEWEAPON)
 	}
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)

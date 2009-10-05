@@ -448,7 +448,7 @@ Ovale.conditions=
 		local minCD = nil
 		for i=1,6 do
 			local rune = Ovale.state.rune[i]
-			if (rune.type == type or rune.type == 4) then
+			if rune.type == type or (rune.type == 4 and not condition.nodeath) then
 				if (rune.cd == 0) then
 					nombre = nombre + 1
 				else
