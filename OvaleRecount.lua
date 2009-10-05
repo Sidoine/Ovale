@@ -3,10 +3,17 @@ local RL = LibStub("AceLocale-3.0"):GetLocale("Recount")
 
 local function DataModes(self,data, num)
 	if not data then return 0, 0 end
-	if num == 1 then
-		return (data.Fights[Recount.db.profile.CurDataSet].Ovale or 0)
+	local fight = data.Fights[Recount.db.profile.CurDataSet]
+	local score
+	if fight and fight.Ovale and fight.OvaleMax then
+		score = fight.Ovale*1000/fight.OvaleMax
+	else
+		score = 0
 	end
-	return (data.Fights[Recount.db.profile.CurDataSet].Ovale or 0), nil --{{}}
+	if num == 1 then
+		return score
+	end
+	return score, nil
 end
 
 local function TooltipFuncs(self,name,data)

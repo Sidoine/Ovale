@@ -463,22 +463,13 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 	if unit=="player" and self.enCombat then
 		-- self.lastSpellCast=name
 		if (not self.spellInfo[name] or not self.spellInfo[name].toggle) and self.scoreSpell[name] then
-			local previousAmount = 0
-			if self.maxScore>0 then
-				previousAmount = self.score/self.maxScore*1000
-			end
 			local scored = self.frame:GetScore(name)
-			self.score = self.score + scored
-			self.maxScore = self.maxScore + 1
-			local newAmount = self.score/self.maxScore*1000
 			-- self:Print(scored .. " for "..name)
 			if Recount then
 				local source =Recount.db2.combatants[UnitName("player")]
 				if source then
-				--	self:Print(previousAmount)
-				--	self:Print(newAmount)
-				--	self:Print(newAmount-previousAmount)
-					Recount:AddAmount(source,"Ovale",newAmount-previousAmount)
+					Recount:AddAmount(source,"Ovale",scored)
+					Recount:AddAmount(source,"OvaleMax",1)
 				end
 			end
 		end
@@ -957,7 +948,7 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 				return nil
 			end
-			if (actionEnable>0) then
+			if (actionEnable and actionEnable>0) then
 				local restant
 				if (not actionCooldownDuration or actionCooldownStart==0) then
 					restant = 0
@@ -1125,7 +1116,7 @@ function Ovale:CalculerMeilleureAction(element)
 		
 		if (meilleurTempsFils) then
 			if (Ovale.trace) then
-				self:Print("Best action "..meilleurFils.." remains "..meilleurTempsFils)
+				self:Print("Best action "..bestElement.params[1].." remains "..meilleurTempsFils)
 			end
 			return meilleurTempsFils,meilleurePrioriteFils, bestElement
 		else
