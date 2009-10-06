@@ -846,10 +846,9 @@ function Ovale:GetActionInfo(element)
 			actionCooldownDuration = self.state.cd[spellName].duration
 			actionEnable = self.state.cd[spellName].enable
 		else
+			actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
 			if self.spellInfo[spellName] and self.spellInfo[spellName].forcecd then
-				actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(GetSpellInfo(self.spellInfo[spellName].forcecd))
-			else
-				actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
+				actionCooldownStart, actionCooldownDuration = GetSpellCooldown(GetSpellInfo(self.spellInfo[spellName].forcecd))
 			end
 		end
 		
