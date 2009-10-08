@@ -26,6 +26,7 @@ Define(SOULSHARD 6265)
 Define(DEMONICEMPOWERMENT 47193)
 Define(INCINERATE 29722)
 Define(DECIMATION 63167)
+Define(CHAOSBOLT 50796)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -60,7 +61,8 @@ if TargetDebuffExpires(CORRUPTION 0 mine=1) Spell(CORRUPTION)
 if BuffPresent(DECIMATION) Spell(SOULFIRE)
 
 if TargetLifePercent(less 25) and Level(more 76) and {TalentPoints(TALENTDECIMATION less 1) or ItemCount(SOULSHARD less 16)} Spell(DRAINSOUL)
- 
+
+Spell(CHAOSBOLT)
 if TalentPoints(TALENTEMBERSTORM more 0) Spell(INCINERATE)
 Spell(SHADOWBOLT)
 }
