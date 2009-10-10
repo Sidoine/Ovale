@@ -16,7 +16,7 @@ local function ParseParameters(params)
 	end
 	params = string.gsub(params,"%w+=%w+","")
 	local n=0
-	for w in string.gmatch(params, "%w+") do
+	for w in string.gmatch(params, "[%w_]+") do
 		if (string.match(w,"^%-?%d+%.?%d*$")) then
 			w = tonumber(w)
 		end		

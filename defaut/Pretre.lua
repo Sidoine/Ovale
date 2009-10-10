@@ -16,10 +16,11 @@ Define(Shadowfiend 34433)
 
 # Spells with cast time that add buff or debuff
 SpellAddTargetDebuff(SWP SWP=18)
+SpellInfo(SWP duration=18)
 SpellAddBuff(SWP SW=15)
 SpellAddTargetDebuff(VT VT=15)
 SpellAddBuff(VT SW=15)
-SpellInfo(MF canStopChannelling=1)
+SpellInfo(MF canStopChannelling=3)
 SpellAddBuff(MF SW=15)
 SpellInfo(MB cd=5.5)
 SpellAddBuff(MB SW=15)
@@ -62,6 +63,9 @@ Spell(MB)
 #Refresh devouring plague  
 if TargetDebuffExpires(DP 0 mine=1)
     Spell(DP)
+
+if OtherDebuffExpires(SWP)
+	Texture(INV_Misc_Coin_01) 
 
 #cast Mind flay if nothing else can be done
 Spell(MF priority=2)

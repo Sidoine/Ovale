@@ -25,3 +25,4 @@ L["Si cible uniquement"] = "If has target"
 L["Verrouiller position"] = "Lock position"
 L["Vertical"] = true
 L["Marge entre deux icônes"] = "Margin between icons"
+L["Focus"] = true

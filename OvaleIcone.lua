@@ -1,7 +1,8 @@
 ﻿local LBF = LibStub("LibButtonFacade", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local function Update(self, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut)
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
 				
 	if (not Ovale.bug) then
 		Ovale.traced = false
@@ -85,11 +86,17 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 		else
 			self.aPortee:Hide()
 		end
+		if actionTarget=="focus" then
+			self.focusText:Show()
+		else
+			self.focusText:Hide()
+		end
 	else
 		self.icone:Hide()
 		self.aPortee:Hide()
 		self.shortcut:Hide()
 		self.remains:Hide()
+		self.focusText:Hide()
 	end
 	return minAttente,element
 end
@@ -124,6 +131,12 @@ function OvaleIcone_OnLoad(self)
 	self.aPortee:SetText(RANGE_INDICATOR)
 	self.cd = _G[name.."Cooldown"]
 	self.normalTexture = _G[name.."NormalTexture"]
+	
+	self.focusText = self:CreateFontString(nil, "OVERLAY");
+	self.focusText:SetFontObject("GameFontNormal");
+	self.focusText:SetAllPoints(self);
+	self.focusText:SetTextColor(1,1,1);
+	self.focusText:SetText(L["Focus"])
 	
 	self:RegisterForClicks("LeftButtonUp")
 	self.SetSkinGroup = SetSkinGroup

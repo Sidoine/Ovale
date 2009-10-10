@@ -434,6 +434,32 @@ Ovale.conditions=
 	ManaPercent = function(condition)
 		return compare(UnitPower("player")/UnitPowerMax("player"), condition[1], condition[2]/100)
 	end,
+	OtherDebuffExpires = function(condition)
+		Ovale:EnableOtherDebuffs()
+		local otherDebuff = Ovale.otherDebuffs[GetSpellInfo(condition[1])]
+		if otherDebuff then
+			local timeBefore = condition[2] or 0
+			local maxTime = condition[3] or 10
+			local minTime
+			for k,v in pairs(otherDebuff) do
+				local diff = v - Ovale.maintenant
+				if diff<-maxTime then
+					-- Ovale:Print("enlève obsolète sur "..k)
+					otherDebuff[k] = nil
+				elseif k~=UnitGUID("target") and (not minTime or diff<minTime) then
+					minTime = diff
+				end
+			end
+			if not minTime then
+				return nil
+			end
+			minTime = minTime - timeBefore
+			if minTime<0 then
+				minTime = 0
+			end
+			return minTime
+		end
+	end,
 	-- Test if any player pet is present (or not)
 	-- 1 : "yes" or "no"
 	PetPresent = function(condition)

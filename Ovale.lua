@@ -32,6 +32,7 @@ Ovale.buff = {}
 Ovale.className = nil
 Ovale.state = {rune={}, cd = {}}
 Ovale.scoreSpell = {}
+Ovale.otherDebuffs = {}
 
 Ovale.arbre = {}
 
@@ -261,6 +262,44 @@ function Ovale:UPDATE_BINDINGS()
 	self:RemplirActionIndexes()
 end
 
+function Ovale:GetOtherDebuffs(spellName)
+	if not self.otherDebuffs[spellName] then
+		self.otherDebuffs[spellName] = {}
+	end
+	return self.otherDebuffs[spellName]
+end
+
+function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	if self.otherDebuffsEnabled then
+		local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
+		-- self:Print("event="..event.." source="..sourceName.." destName="..destName)
+		if sourceName == UnitName("player") then
+			if string.find(event, "SPELL_AURA_") == 1 then
+				local spellId, spellName, spellSchool, auraType = select(9, ...)
+				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
+					local otherDebuff = self:GetOtherDebuffs(spellName)
+					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
+						otherDebuff[destGUID] = Ovale.maintenant + self.spellInfo[spellName].duration
+					--	self:Print("ajout de "..spellName.." à "..destGUID)
+					elseif event == "SPELL_AURA_REMOVED" then
+					--	otherDebuff[destGUID] = nil						
+					--	self:Print("suppression de "..spellName.." de "..destGUID)
+					end	
+				end
+			end
+		end
+		if event == "UNIT_DIED" then
+			for k,v in pairs(self.otherDebuffs) do
+				for j,w in pairs(v) do
+					if j==destGUID then
+						v[j] = nil
+					end
+				end
+			end
+		end
+	end
+end
+
 --[[
 function Ovale:SaveAura(unit, filter)
 	local i=1
@@ -287,11 +326,6 @@ function Ovale:SaveAura(unit, filter)
 	end
 end
 
-function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	if (
-	if (event 
-end
 
 function Ovale:PLAYER_TARGET_CHANGED()
 	Ovale.targetGUID = UnitGUID("target")
@@ -450,7 +484,8 @@ function Ovale:OnEnable()
     self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
     self:RegisterEvent("UNIT_SPELLCAST_SENT")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	    
 	if (not self.firstInit) then
 		self:FirstInit()
 	end
@@ -510,7 +545,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("UNIT_AURA")
     self:UnregisterEvent("UNIT_SPELLCAST_SENT")
     self:UnregisterEvent("PLAYER_TARGET_CHANGED")
-    -- self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self.frame:Hide()
 end
 
@@ -698,6 +733,7 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 		newSpell.info = nil
 	end
 	self.currentSpellName = spellName
+	self.startCast = startCast
 	self.attenteFinCast = nextCast
 	if startCast>=0 then
 		if newSpell.info then
@@ -774,12 +810,12 @@ function Ovale:InitCalculerMeilleureAction()
 	-- On attend que le sort courant soit fini
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
 	if (spell) then
-		self:AddSpellToStack(spell, startTime - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
+		self:AddSpellToStack(spell, startTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
 	end
 	
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
 	if (spell) then
-		self:AddSpellToStack(spell, startTime - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
+		self:AddSpellToStack(spell, startTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
 	end
 end
 
@@ -890,6 +926,12 @@ function Ovale:GetActionInfo(element)
 			actionShortcut = nil
 			actionIsCurrent = nil
 		end
+	elseif element.func=="Texture" then
+		actionTexture = "Interface\\Icons\\"..element.params[1]
+		actionCooldownStart = Ovale.maintenant
+		actionCooldownDuration = 0
+		actionEnable = 1
+		actionUsable = true
 	end
 	
 	if (action and not actionTexture) then
@@ -910,7 +952,7 @@ function Ovale:GetActionInfo(element)
 	end
 	
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, target
 end
 
 function Ovale:CalculerMeilleureAction(element)
@@ -924,7 +966,7 @@ function Ovale:CalculerMeilleureAction(element)
 	
 	--TODO: créer un objet par type au lieu de ce if else if tout moche
 	if (element.type=="function")then
-		if (element.func == "Spell" or element.func=="Macro" or element.func=="Item") then
+		if (element.func == "Spell" or element.func=="Macro" or element.func=="Item" or element.func=="Texture") then
 			local action
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName = self:GetActionInfo(element)
@@ -954,9 +996,28 @@ function Ovale:CalculerMeilleureAction(element)
 				else
 					restant = actionCooldownDuration - (self.maintenant - actionCooldownStart);
 				end
-				if restant<self.attenteFinCast and (spellName==self.currentSpellName or not self.spellInfo[self.currentSpellName] or
-							not self.spellInfo[self.currentSpellName].canStopChannelling) then
-					restant = self.attenteFinCast
+				
+				if restant<self.attenteFinCast then
+					if spellName==self.currentSpellName or not self.spellInfo[self.currentSpellName] or
+							not self.spellInfo[self.currentSpellName].canStopChannelling then
+						restant = self.attenteFinCast
+					else
+						--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
+						--ça tombera entre deux ticks
+						local ticks = self.spellInfo[self.currentSpellName].canStopChannelling
+						local tickLength = (self.attenteFinCast - self.startCast) / ticks
+						local tickTime = self.startCast + tickLength
+						if (Ovale.trace) then
+							self:Print("ticks = "..ticks.." tickLength="..tickLength.." tickTime="..tickTime)
+						end	
+						for i=1,ticks-1 do
+							if restant<=tickTime then
+								restant = tickTime
+								break
+							end
+							tickTime = tickTime + tickLength
+						end
+					end
 				end
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." remains "..restant)
@@ -1229,4 +1290,11 @@ end
 
 function Ovale:ResetSpellInfo()
 	self.spellInfo = {}
+end
+
+function Ovale:EnableOtherDebuffs()
+	if self.otherDebuffsEnabled then
+		return
+	end
+	self.otherDebuffsEnabled = true
 end

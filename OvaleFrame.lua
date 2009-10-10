@@ -136,13 +136,13 @@ do
 			local action = self.actions[k]
 			
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName = Ovale:GetActionInfo(element)
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget = Ovale:GetActionInfo(element)
 			
 			if (node.params.nocd and node.params.nocd == 1 and minAttente~=nil and minAttente>1.5) then
 				action.icons[1]:Update(nil)
 			else			
 				action.icons[1]:Update(minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName)
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
 			end
 			
 			action.spellName = spellName
