@@ -29,7 +29,7 @@ Define(DECIMATION 63167)
 Define(CHAOSBOLT 50796)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
-AddListItem(curse agony SpellName(CURSEAGONY))
+AddListItem(curse agony SpellName(CURSEAGONY) default)
 AddListItem(curse doom SpellName(CURSEDOOM))
 AddListItem(curse tongues SpellName(CURSETONGUES))
 AddListItem(curse weakness SpellName(CURSEWEAKNESS))

@@ -34,6 +34,7 @@ local stunSpellIdList =
 	853, -- Hammer of Justice
 	408, -- Kidney Shot
 	12798, -- Revenge Stun
+	46968, -- Shockwave
 }
 local stunSpellList = nil
 
@@ -207,6 +208,32 @@ local function GetTargetAura(condition, filter, target)
 		end
 	end
 	return timeLeft, stacksLeft
+end
+
+local lastSaved
+local savedHealth
+local targetGUID
+local lastSPD=0.0001
+
+local function getTargetDead()
+	local second = math.floor(Ovale.maintenant)
+	if targetGUID~=UnitGUID("target") then
+		lastSaved = nil
+		targetGUID = UnitGUID("target")
+		savedHealth = {}
+	end
+	local newHealth = UnitHealth("target")
+	if second~=lastSaved then
+		lastSaved = second
+		local mod10 = second % 10
+		local prevHealth = savedHealth[mod10]
+		savedHealth[mod10] = newHealth
+		if prevHealth then
+			lastSPD = 10/(newHealth-prevHealth)
+		end
+	end
+	-- Rough estimation
+	return newHealth * lastSPD
 end
 
 Ovale.conditions=
@@ -460,6 +487,18 @@ Ovale.conditions=
 			return minTime
 		end
 	end,
+	OtherDebuffPresent = function(condition)
+		Ovale:EnableOtherDebuffs()
+		local otherDebuff = Ovale.otherDebuffs[GetSpellInfo(condition[1])]
+		if otherDebuff then
+			for target,expireTime in pairs(otherDebuff) do
+				if target~=UnitGUID("target") and expireTime>Ovale.maintenant then
+					return 0
+				end
+			end
+		end
+		return nil
+	end,
 	-- Test if any player pet is present (or not)
 	-- 1 : "yes" or "no"
 	PetPresent = function(condition)
@@ -564,6 +603,9 @@ Ovale.conditions=
 			end
 		end
 		return nil
+	end,
+	TargetDeadIn = function(condition)
+		return compare(getTargetDead(), condition[1], condition[2])
 	end,
 	-- Test if a debuff will expire on the target after a given time, or if there is less than the
 	-- given number of stacks (if stackable)

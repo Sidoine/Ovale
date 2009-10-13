@@ -36,8 +36,8 @@ Define(CURSEOFWEAKNESS 50511)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(demo SpellName(DEMOSHOUT))
-AddCheckBox(whirlwind SpellName(WHIRLWIND))
-AddCheckBox(sunder SpellName(SUNDER))
+AddCheckBox(whirlwind SpellName(WHIRLWIND) default)
+AddCheckBox(sunder SpellName(SUNDER) default)
 AddListItem(shout none L(None))
 AddListItem(shout battle SpellName(BATTLESHOUT))
 AddListItem(shout command SpellName(COMMANDSHOUT))
@@ -141,7 +141,10 @@ AddIcon
      }
 
      if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 5 stacks=5)
+     {
+		Spell(DEVASTATE)
         Spell(SUNDER)
+     }
 }
 
 AddIcon

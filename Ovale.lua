@@ -47,7 +47,7 @@ local options =
 	{
 		apparence =
 		{
-			name = "Apparence",
+			name = L["Apparence"],
 			type = "group",
 			args =
 			{
@@ -204,7 +204,7 @@ local options =
 					guiHidden = true,
 					func = function()
 						Ovale.db.profile.display = true
-						Ovale.frame:Show()	
+						Ovale:UpdateVisibility()
 					end
 				},
 				hide =
@@ -335,13 +335,7 @@ end
 ]]
 
 function Ovale:PLAYER_TARGET_CHANGED()
-	if (Ovale.db.profile.apparence.avecCible) then
-		if not UnitExists("target") then
-			self.frame:Hide()
-		else
-			self.frame:Show()
-		end
-	end
+	self:UpdateVisibility()
 end
 
 function Ovale:UNIT_AURA(event, unit)
@@ -513,9 +507,7 @@ end
 
 function Ovale:PLAYER_REGEN_ENABLED()
 	self.enCombat = false
-	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
-		self.frame:Hide()
-	end	
+	self:UpdateVisibility()
 	-- if self.maxScore and self.maxScore > 0 then
 	-- 	self:Print((self.score/self.maxScore*100).."%")
 	-- end
@@ -526,10 +518,7 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.score = 0
 	self.maxScore = 0
 	
-	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
-		self.frame:Show()
-	end	
-	
+	self:UpdateVisibility()
 end
 
 function Ovale:OnDisable()
@@ -1226,6 +1215,11 @@ function Ovale:ToggleOptions()
 end
 
 function Ovale:UpdateVisibility()
+	if not Ovale.db.profile.display then
+		self.frame:Hide()
+		return
+	end
+
 	self.frame:Show()
 	
 	if (Ovale.db.profile.apparence.avecCible and not UnitExists("target")) then
@@ -1246,10 +1240,13 @@ function Ovale:UpdateFrame()
 	
 	self.checkBoxes = {}
 	
-	for k,v in pairs(self.casesACocher) do
+	for k,checkBox in pairs(self.casesACocher) do
 		self.checkBoxes[k] = LibStub("AceGUI-3.0"):Create("CheckBox");
 		self.frame:AddChild(self.checkBoxes[k])
-		self.checkBoxes[k]:SetLabel(v)
+		self.checkBoxes[k]:SetLabel(checkBox.text)
+		if self.db.profile.check[k]==nil then
+			self.db.profile.check[k] = checkBox.checked
+		end
 		if (self.db.profile.check[k]) then
 			self.checkBoxes[k]:SetValue(self.db.profile.check[k]);
 		end
@@ -1260,9 +1257,12 @@ function Ovale:UpdateFrame()
 	self.dropDowns = {}
 	
 	if (self.listes) then
-		for k,v in pairs(self.listes) do
+		for k,list in pairs(self.listes) do
 			self.dropDowns[k] = LibStub("AceGUI-3.0"):Create("Dropdown");
-			self.dropDowns[k]:SetList(v)
+			self.dropDowns[k]:SetList(list.items)
+			if not self.db.profile.list[k] then
+				self.db.profile.list[k] = list.default
+			end
 			if (self.db.profile.list[k]) then
 				self.dropDowns[k]:SetValue(self.db.profile.list[k]);
 			end

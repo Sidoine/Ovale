@@ -151,16 +151,22 @@ local function subtest(text, pattern, func)
 	return text
 end
 
-local function ParseAddListItem(list,item,text)
+local function ParseAddListItem(list,item,text, default)
 	if (not Ovale.listes[list]) then
-		Ovale.listes[list] = {}
+		Ovale.listes[list] = {items={},default=nil}
 	end
-	Ovale.listes[list][item] = text
+	Ovale.listes[list].items[item] = text
+	if default == "default" then
+		Ovale.listes[list].default=item
+	end
 	return ""
 end
 
-local function ParseAddCheckBox(item, text)
-	Ovale.casesACocher[item] = text
+local function ParseAddCheckBox(item, text, checked)
+	Ovale.casesACocher[item] = {text = text}
+	if checked=="checked" then
+		Ovale.casesACocher[item].checked = true
+	end
 	return ""
 end
 
@@ -212,9 +218,11 @@ end
 function Ovale:CompileInputs(text)
 	self.casesACocher = {}
 	self.listes = {}
+	self.defaultListes = {}
+	self.defaultCheck = {}
 	
-	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*%)", ParseAddListItem)
-	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*%)", ParseAddCheckBox)
+	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
+	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
 	return text
 end
 

@@ -27,9 +27,9 @@ Define(CLAW 16827)
 Define(STARFALL 48505)
 
 AddCheckBox(multi L(AOE))
-AddCheckBox(mangle SpellName(MANGLECAT))
-AddCheckBox(demo SpellName(DEMOROAR))
-AddCheckBox(lucioles SpellName(FAERIEFIRE))
+AddCheckBox(mangle SpellName(MANGLECAT) default)
+AddCheckBox(demo SpellName(DEMOROAR) default)
+AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
 AddCheckBox(wrath SpellName(WRATH))
 
 ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP 
@@ -42,16 +42,16 @@ AddIcon
 {
 	if Stance(1) # bear
 	{
+		Spell(MANGLEBEAR)
+		
+		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
+			Spell(LACERATE)
+
 		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFERAL 2)
 			Spell(FAERIEFERAL)
 
 		if CheckBoxOn(demo) and TargetDebuffExpires(DEMOROAR 2)
 			Spell(DEMOROAR)
-
-		Spell(MANGLEBEAR)
-
-		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
-			Spell(LACERATE)
 
 		if CheckBoxOn(multi)
 			Spell(SWIPE)    
