@@ -223,13 +223,14 @@ local function getTargetDead()
 		savedHealth = {}
 	end
 	local newHealth = UnitHealth("target")
-	if second~=lastSaved then
+	if second~=lastSaved and targetGUID then
 		lastSaved = second
 		local mod10 = second % 10
 		local prevHealth = savedHealth[mod10]
 		savedHealth[mod10] = newHealth
-		if prevHealth then
-			lastSPD = 10/(newHealth-prevHealth)
+		if prevHealth>newHealth then
+			lastSPD = 10/(prevHealth-newHealth)
+--			print("dps = " .. (1/lastSPD))
 		end
 	end
 	-- Rough estimation
