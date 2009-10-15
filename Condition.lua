@@ -228,7 +228,7 @@ local function getTargetDead()
 		local mod10 = second % 10
 		local prevHealth = savedHealth[mod10]
 		savedHealth[mod10] = newHealth
-		if prevHealth>newHealth then
+		if prevHealth and prevHealth>newHealth then
 			lastSPD = 10/(prevHealth-newHealth)
 --			print("dps = " .. (1/lastSPD))
 		end
