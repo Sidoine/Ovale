@@ -96,7 +96,6 @@ AddIcon
 
      if Stance(3) #berserker
      {
-        Spell(VICTORY usable=1)
         
 		if TargetLifePercent(less 20)
 		{
@@ -111,6 +110,7 @@ AddIcon
     
         if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
         Spell(BLOODTHIRST)
+        Spell(VICTORY usable=1)
         if BuffPresent(SLAMBUFF) Spell(SLAM)
      
         Spell(MORTALSTRIKE)
@@ -123,11 +123,11 @@ AddIcon
 
      if Stance(1) #combat
      {
-        Spell(VICTORY usable=1)
         if TargetDebuffExpires(REND 0 mine=1) Spell(REND)
         if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(MORTALSTRIKE)
         Spell(OVERPOWER usable=1)
+        Spell(VICTORY usable=1)
      
          if TalentPoints(SLAMTALENT more 1)
 		    Spell(SLAM priority=2)
