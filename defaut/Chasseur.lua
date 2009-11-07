@@ -20,7 +20,7 @@ Define(CHIMERASHOT 53209)
 AddCheckBox(multi SpellName(MULTISHOT))
 ScoreSpells(HUNTERSMARK BLACKARROW SERPENTSTING CHIMERASHOT AIMEDSHOT MULTISHOT ARCANESHOT KILLSHOT STEADYSHOT)
 
-AddIcon
+AddIcon help=main
 {
 	if TargetDebuffExpires(HUNTERSMARK 0) Spell(HUNTERSMARK)
 	if TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
@@ -35,7 +35,7 @@ AddIcon
 	unless TargetDebuffPresent(EXPLOSIVESHOT mine=1) and {2s before Spell(EXPLOSIVESHOT)} Spell(STEADYSHOT)
 }
 
-AddIcon
+AddIcon help=cd
 {
 	Spell(BESTIALWRATH usable=1)
 	Spell(KILLCOMMAND usable=1)

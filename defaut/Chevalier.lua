@@ -49,7 +49,7 @@ SpellInfo(OBLITERATE unholy=-1 frost=-1 forcecd=DEATHCOIL)
 ScoreSpells(HOWLINGBLAST HEARTSTRIKE BLOODSTRIKE DEATHSTRIKE SCOURGESTRIKE OBLITERATE HEARTSTRIKE 
 				PESTILENCE ICYTOUCH PLAGUESTRIKE FROSTSTRIKE DEATHCOIL RAISEDEAD)
 
-AddIcon
+AddIcon help=main
 {
 	Spell(DANCINGRUNEWEAPON usable=1)
 	
@@ -93,12 +93,15 @@ AddIcon
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1)
 		Spell(PLAGUESTRIKE)
 	
+	if BuffPresent(FROSTPRESENCE)
+		Spell(RUNESTRIKE usable=1)
+	
 	Spell(FROSTSTRIKE usable=1)
 	if PetPresent(no) Spell(RAISEDEAD)
 	Spell(DEATHCOIL usable=1)
 }
 
-AddIcon
+AddIcon help=aoe
 {
 	if Runes(unholy 1) and Runes(frost 1) Spell(HOWLINGBLAST)
 	if TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)
@@ -107,15 +110,7 @@ AddIcon
 	Spell(BLOODBOIL usable=1)
 }
 
-AddIcon size=small
-{
-	if BuffPresent(FROSTPRESENCE)
-	{
-		Spell(RUNESTRIKE usable=1)
-	}
-}
-
-AddIcon size=small
+AddIcon help=cd
 {
 	Spell(BONESHIELD)
 	if BuffPresent(FROSTPRESENCE)

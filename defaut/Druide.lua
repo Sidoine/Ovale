@@ -38,7 +38,7 @@ ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP
 		
 SpellInfo(MAUL toggle=1)
 
-AddIcon
+AddIcon help=main
 {
 	if Stance(1) # bear
 	{
@@ -117,7 +117,7 @@ AddIcon
 	}
 }
 
-AddIcon
+AddIcon help=offgcd
 {
   if Stance(1)
   {  
@@ -125,7 +125,7 @@ AddIcon
   }
 }
 
-AddIcon
+AddIcon help=cd
 {
 	unless Stance(1) or Stance(3) Spell(STARFALL)
 	Spell(FORCEOFNATURE)

@@ -55,7 +55,7 @@ SpellInfo(HEROICSTRIKE toggle=1)
 SpellInfo(CLEAVE toggle=1)
 ScoreSpells(WHIRLWIND BLOODTHIRST SLAM REND MORTALSTRIKE EXECUTE SHIELDSLAM REVENGE)
 
-AddIcon
+AddIcon help=main
 {
      if List(shout command) and
        BuffExpires(COMMANDSHOUT 3)
@@ -111,7 +111,12 @@ AddIcon
         if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
         Spell(BLOODTHIRST)
         Spell(VICTORY usable=1)
-        if BuffPresent(SLAMBUFF) Spell(SLAM)
+        if BuffPresent(SLAMBUFF)
+        {
+			if BuffExpires(SLAMBUFF 2)
+				Spell(SLAM)
+			Spell(SLAM priority=2)
+		}
      
         Spell(MORTALSTRIKE)
    
@@ -147,7 +152,7 @@ AddIcon
      }
 }
 
-AddIcon
+AddIcon help=offgcd
 {
 	if CheckBoxOff(multi)
 	{
@@ -166,7 +171,7 @@ AddIcon
 		Spell(CLEAVE)
  }
 
-AddIcon
+AddIcon help=cd
 {
     if Stance(2) #Defense
     {

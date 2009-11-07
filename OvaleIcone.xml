@@ -4,6 +4,8 @@
     <Scripts>
       <OnLoad>OvaleIcone_OnLoad(self);</OnLoad>
       <OnClick>OvaleIcone_OnClick(self)</OnClick>
+      <OnEnter>OvaleIcone_OnEnter(self)</OnEnter>
+      <OnLeave>OvaleIcone_OnLeave(self)</OnLeave>
     </Scripts>
   </CheckButton>
 </Ui>

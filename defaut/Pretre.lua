@@ -32,7 +32,8 @@ SpellInfo(Shadowfiend cd=300)
 ScoreSpells(MB SWP VT DP MF)
 
 # Add main monitor
-AddIcon {
+AddIcon help=main
+{
 
 #Check shadowform is up
 unless BuffPresent(SF)
@@ -72,14 +73,14 @@ Spell(MF priority=2)
 
 } # End of main monitor    
 
-AddIcon
+AddIcon help=cd
 {
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
         
 # Add mana monitor
-AddIcon {
+AddIcon help=mana {
 
 #if up, launch focus (and then MB since it's the first priority)
 Spell(Focus usable=1)

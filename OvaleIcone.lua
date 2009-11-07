@@ -91,13 +91,21 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 		else
 			self.focusText:Hide()
 		end
+		self:Show()
 	else
 		self.icone:Hide()
 		self.aPortee:Hide()
 		self.shortcut:Hide()
 		self.remains:Hide()
 		self.focusText:Hide()
+		if Ovale.db.profile.apparence.hideEmpty then
+			self:Hide()
+		else
+			self:Show()
+		end
 	end
+	
+	
 	return minAttente,element
 end
 
@@ -117,9 +125,32 @@ local function SetSize(self, width, height)
 	end
 end
 
+local function SetHelp(self, help)
+	self.help = help
+end
+
 function OvaleIcone_OnClick(self)
 	Ovale:ToggleOptions()
 	self:SetChecked(0)
+end
+
+function OvaleIcone_OnEnter(self)
+	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) then
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+		if self.help then
+			GameTooltip:SetText(L[self.help])
+		end
+		if next(Ovale.casesACocher) or next(Ovale.listes) then
+			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"],1,1,1)
+		end
+		GameTooltip:Show()
+	end
+end
+
+function OvaleIcone_OnLeave(self)
+	if self.help  or next(Ovale.casesACocher) or next(Ovale.listes)  then
+		GameTooltip:Hide()
+	end
 end
 
 function OvaleIcone_OnLoad(self)
@@ -142,4 +173,5 @@ function OvaleIcone_OnLoad(self)
 	self.SetSkinGroup = SetSkinGroup
 	self.Update = Update
 	self.SetSize = SetSize
+	self.SetHelp = SetHelp
 end

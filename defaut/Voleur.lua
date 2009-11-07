@@ -22,7 +22,7 @@ Define(CLOACKOFSHADOWS 31224)
 
 ScoreSpells(SLICEANDDICE HUNGERFORBLOOD ENVENOM RUPTURE EVISCERATE MUTILATE SINISTERSTRIKE)
 
-AddIcon
+AddIcon help=main
 {
 	unless BuffPresent(SLICEANDDICE)
 	{
@@ -58,7 +58,7 @@ AddIcon
 	} 
 }
 
-AddIcon
+AddIcon help=cd
 {
 	unless BuffPresent(KILLINGSPREE) Spell(ADRENALINERUSH)
 	unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)

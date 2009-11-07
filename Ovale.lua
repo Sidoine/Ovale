@@ -170,7 +170,22 @@ local options =
 					get = function(info) return Ovale.db.profile.apparence.predictif end,
 					set = function(info, value) Ovale.db.profile.apparence.predictif = value; Ovale:UpdateFrame() end
 				},
-				
+				hideEmpty =
+				{
+					order = 11,
+					type = "toggle",
+					name = L["Cacher bouton vide"],
+					get = function(info) return Ovale.db.profile.apparence.hideEmpty end,
+					set = function(info, value) Ovale.db.profile.apparence.hideEmpty = value; Ovale:UpdateFrame() end
+				},
+				targetHostileOnly = 
+				{
+					order = 11,
+					type = "toggle",
+					name = L["Cacher si cible amicale ou morte"],
+					get = function(info) return Ovale.db.profile.apparence.targetHostileOnly end,
+					set = function(info, value) Ovale.db.profile.apparence.targetHostileOnly = value; Ovale:UpdateFrame() end
+				},
 			}
 		},
 		code =
@@ -1229,6 +1244,10 @@ function Ovale:UpdateVisibility()
 	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
 		self.frame:Hide()
 	end	
+	
+	if Ovale.db.profile.apparence.targetHostileOnly and (UnitIsDead("target") or UnitCanCooperate("target", "player")) then
+		self.frame:Hide()
+	end
 end
 
 function Ovale:UpdateFrame()

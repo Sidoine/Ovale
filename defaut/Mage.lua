@@ -32,7 +32,7 @@ SpellAddTargetDebuff(SCORCH IMPROVEDSCORCH=30)
 SpellAddTargetDebuff(LIVINGBOMB LIVINGBOMB=12)
 ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMENTAL FROSTBOLT ARCANEBLAST ARCANEMISSILES)
 
-AddIcon
+AddIcon help=main
 {
        if TalentPoints(TALENTLIVINGBOMB more 0)
        {
@@ -62,13 +62,9 @@ AddIcon
        }
 }
 
-AddIcon
+AddIcon help=cd
 {
        Spell(MIRRORIMAGE)
-}
-
-AddIcon
-{
        if DebuffPresent(ARCANEBLAST stacks=3) Spell(ARCANEPOWER)
        Spell(COMBUSTION)
        Spell(ICYVEINS)

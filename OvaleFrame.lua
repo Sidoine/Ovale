@@ -53,6 +53,7 @@ do
 	
 	local function frameOnLeave(this)
 		this.obj.barre:Hide()
+
 	end
 	
 	local function frameOnUpdate(self)
@@ -257,6 +258,7 @@ do
 				local icon = action.icons[l]
 				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (l-1)*action.dx,action.top - (l-1)*action.dy)
 				icon:SetSize(action.width, action.height)
+				icon:SetHelp(node.params.help)
 				
 				if LBF then
 					icon:SetSkinGroup(self.skinGroup)

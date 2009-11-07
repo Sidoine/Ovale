@@ -17,6 +17,7 @@ Define(THUNDERSTORM 51490)
 Define(FERALSPIRIT 51533)
 Define(HEROISM 32182)
 Define(BLOODLUST 2825)
+Define(TALENTFLURRY 602)
 
 #Fire
 Define(TOTEMOFWRATH 30706)
@@ -43,7 +44,6 @@ Define(TREMORTOTEM 8143)
 
 AddCheckBox(aoe L(AOE))
 AddCheckBox(chain SpellName(CHAINLIGHTNING))
-AddCheckBox(melee L(Melee))
 AddListItem(fire wrath SpellName(TOTEMOFWRATH))
 AddListItem(fire nova SpellName(FIRENOVATOTEM))
 AddListItem(fire tong SpellName(FLAMETONGTOTEM))
@@ -69,15 +69,16 @@ SpellAddBuff(CHAINLIGHTNING MAELSTROMWEAPON=0)
 ScoreSpells(WATERSHIELD FLAMESHOCK LAVABURST CHAINLIGHTNING LIGHTNINGBOLT LAVALASH EARTHSHOCK LIGHTNINGSHIELD
 	STORMSTRIKE)
 
-AddIcon
+AddIcon help=main
 {
-	unless CheckBoxOn(melee)
+	unless TalentPoints(TALENTFLURRY more 0)
 	{
 	#	if BuffExpires(FLAMETHONG 2) Spell(FLAMETHONG)
 		if BuffExpires(WATERSHIELD 2) Spell(WATERSHIELD)
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		Spell(LAVABURST)
-		if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
+		if CheckBoxOn(aoe)
+			Spell(CHAINLIGHTNING)
 		
 		if CheckBoxOn(chain)
 		{
@@ -87,7 +88,7 @@ AddIcon
 		}
 		if CheckBoxOff(chain) Spell(LIGHTNINGBOLT)
 	}
-	if CheckBoxOn(melee)
+	if TalentPoints(TALENTFLURRY more 0)
 	{
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		if TargetDebuffExpires(FLAMESHOCK 1.5 haste=spell mine=1) and 1.5s before Spell(LAVALASH)
@@ -101,7 +102,7 @@ AddIcon
 	}
 }
 
-AddIcon
+AddIcon help=cd
 {
 	Spell(ELEMENTALMASTERY)
 	Spell(FERALSPIRIT)
@@ -110,7 +111,7 @@ AddIcon
 	Spell(FIREELEMENTALTOTEM)
 }
 
-AddIcon size=small
+AddIcon size=small help=mana
 {
 	if ManaPercent(less 25)
 		Spell(SHAMANISTICRAGE)
@@ -124,7 +125,7 @@ AddIcon size=small
 	Spell(BLOODLUST)	
 }
 
-AddIcon size=small
+AddIcon size=small nocd=1
 {
 	if TotemExpires(fire)
 	{
