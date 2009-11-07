@@ -1,5 +1,8 @@
 local Recount = Recount
-local RL = LibStub("AceLocale-3.0"):GetLocale("Recount")
+local RL 
+if Recount then
+	RL = LibStub("AceLocale-3.0"):GetLocale("Recount")
+end
 
 local function DataModes(self,data, num)
 	if not data then return 0, 0 end
