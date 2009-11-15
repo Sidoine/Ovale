@@ -19,6 +19,8 @@ Define(SHIELDOFRIGHTEOUSNESS 53600)
 Define(HOLYSHIELD 20925)
 Define(HAMMEROFTHERIGHTEOUS 53595)
 Define(HOLYWRATH 2812)
+Define(TALENTGUARDEDBYTHELIGHT 2194)
+Define(DIVINEPLEA 54428)
 
 AddListItem(sceau piete SpellName(SEALRIGHTEOUSNESS))
 AddListItem(sceau autorite SpellName(SEALCOMMAND))
@@ -48,12 +50,13 @@ AddIcon help=main
      if List(jugement lumiere) Spell(JUDGELIGHT)
      if List(jugement sagesse) Spell(JUDGEWISDOM)
      if CheckBoxOn(tempete) Spell(DIVINESTORM)
+     if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
+     if TalentPoints(TALENTGUARDEDBYTHELIGHT more 0) and BuffExpires(DIVINEPLEA 0) Spell(DIVINEPLEA)
      if CheckBoxOn(consecration) Spell(CONSECRATE)
      if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
      if CheckBoxOn(coleredivine) Spell(HOLYWRATH)
      
      Spell(HOLYSHOCK) 
-     if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
      if BuffPresent(THEARTOFWAR) Spell(FLASHOFLIGHT priority=2)
 }
 

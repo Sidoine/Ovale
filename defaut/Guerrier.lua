@@ -59,24 +59,24 @@ AddIcon help=main
 {
      if List(shout command) and
        BuffExpires(COMMANDSHOUT 3)
-          Spell(COMMANDSHOUT)
+          Spell(COMMANDSHOUT nored=1)
         
      if List(shout battle) and BuffExpires(BATTLESHOUT 3)
-          Spell(BATTLESHOUT)
+          Spell(BATTLESHOUT nored=1)
       
      if TargetClassification(worldboss) 
             and CheckBoxOn(demo)
             and TargetDebuffExpires(DEMOSHOUT 2)
             and TargetDebuffExpires(DEMORALIZINGROAR 0)
             and TargetDebuffExpires(CURSEOFWEAKNESS 0)
-          Spell(DEMOSHOUT)
+          Spell(DEMOSHOUT nored=1)
          
      if Stance(2) #Defense
      {
         if TargetClassification(worldboss)
         {
             if TargetDebuffExpires(THUNDERCLAP 2)
-				Spell(THUNDERCLAP)
+				Spell(THUNDERCLAP nored=1)
 			Spell(CONCUSSIONBLOW)
 			Spell(SHOCKWAVE)
 		}
@@ -114,10 +114,10 @@ AddIcon help=main
         if BuffPresent(SLAMBUFF)
         {
 			if BuffExpires(SLAMBUFF 2)
-				Spell(SLAM)
-			Spell(SLAM priority=2)
-		}
-     
+      			Spell(SLAM nored=1)
+      		Spell(SLAM priority=2)
+      	}
+	 
         Spell(MORTALSTRIKE)
    
         if TalentPoints(SLAMTALENT more 1)
@@ -145,10 +145,15 @@ AddIcon help=main
         Spell(DEVASTATE)
      }
 
-     if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 5 stacks=5)
+     if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 5 stacks=5) 
      {
-		Spell(DEVASTATE)
-        Spell(SUNDER)
+		if TargetDebuffPresent(SUNDER)
+		{
+			Spell(DEVASTATE)
+			Spell(SUNDER)
+		}
+	    Spell(DEVASTATE priority=2)
+		Spell(SUNDER priority=2)
      }
 }
 

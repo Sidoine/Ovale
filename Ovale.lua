@@ -33,6 +33,8 @@ Ovale.className = nil
 Ovale.state = {rune={}, cd = {}}
 Ovale.scoreSpell = {}
 Ovale.otherDebuffs = {}
+Ovale.score = 0
+Ovale.maxScore = 0
 
 Ovale.arbre = {}
 
@@ -494,6 +496,7 @@ function Ovale:OnEnable()
     self:RegisterEvent("UNIT_SPELLCAST_SENT")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("CHAT_MSG_ADDON")
 	    
 	if (not self.firstInit) then
 		self:FirstInit()
@@ -508,7 +511,8 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 		-- self.lastSpellCast=name
 		if (not self.spellInfo[name] or not self.spellInfo[name].toggle) and self.scoreSpell[name] then
 			local scored = self.frame:GetScore(name)
-			-- self:Print(scored .. " for "..name)
+			self.score = self.score + scored
+			self.maxScore = self.maxScore + 1
 			if Recount then
 				local source =Recount.db2.combatants[UnitName("player")]
 				if source then
@@ -520,6 +524,15 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 	end
 end
 
+function Ovale:CHAT_MSG_ADDON(prefix, msg, type, author)
+	if prefix ~= "Ovale" then return end
+	if type ~= "RAID" and type~= "PARTY" then return end
+
+    local value, max = strsplit(";", msg)
+    Recount:AddAmount(author, "Ovale", value)
+    Recount:AddAmount(author, "Ovale", max)
+end
+
 function Ovale:PLAYER_REGEN_ENABLED()
 	self.enCombat = false
 	self:UpdateVisibility()
@@ -529,6 +542,9 @@ function Ovale:PLAYER_REGEN_ENABLED()
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
+	if self.maxScore>0 then
+		SendAddonMessage("Ovale", self.score..";"..self.maxScore, "RAID")
+	end
 	self.enCombat = true
 	self.score = 0
 	self.maxScore = 0
@@ -550,6 +566,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("UNIT_SPELLCAST_SENT")
     self:UnregisterEvent("PLAYER_TARGET_CHANGED")
     self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self:UnregisterEvent("CHAT_MSG_ADDON")
     self.frame:Hide()
 end
 
@@ -956,7 +973,7 @@ function Ovale:GetActionInfo(element)
 	end
 	
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, target
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, target, element.params.nored
 end
 
 function Ovale:CalculerMeilleureAction(element)
@@ -1162,7 +1179,7 @@ function Ovale:CalculerMeilleureAction(element)
 					elseif (priorite and priorite < meilleurePrioriteFils) then
 						-- A l'inverse, si il est moins prioritaire que le précédent, on ne le lance
 						-- que si il se lance au moins 1,5s avant
-						maxEcart = -self.gcd
+						maxEcart = -self.gcd*0.75
 					else
 						maxEcart = -0.01
 					end

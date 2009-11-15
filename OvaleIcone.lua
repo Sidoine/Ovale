@@ -2,7 +2,7 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local function Update(self, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed)
 				
 	if (not Ovale.bug) then
 		Ovale.traced = false
@@ -16,6 +16,10 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 	if (Ovale.bug and not Ovale.traced) then
 		Ovale.trace = true
 	end	
+	
+	if noRed then
+		minAttente = actionCooldownStart + actionCooldownDuration - Ovale.maintenant
+	end
 		
 	if (minAttente~=nil and actionTexture) then	
 	
