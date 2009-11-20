@@ -63,6 +63,28 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 			self.cd:Hide()
 		end
 		
+		-- La latence
+		if minAttente>0 and Ovale.db.profile.apparence.highlightIcon then
+			local lag = 0.6
+			local newShouldClick
+			if minAttente<lag then
+				newShouldClick = true
+			else
+				newShouldClick = false
+			end
+			if self.shouldClick ~= newShouldClick then
+				if newShouldClick then
+					self:SetChecked(1)
+				else
+					self:SetChecked(0)
+				end
+				self.shouldClick = newShouldClick
+			end
+		elseif self.shouldClick then
+			self.shouldClick = false
+			self:SetChecked(0)
+		end
+		
 		-- Le temps restant
 		if (Ovale.db.profile.apparence.numeric) then
 			self.remains:SetText(string.format("%.1f", minAttente))
@@ -106,6 +128,10 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 			self:Hide()
 		else
 			self:Show()
+		end
+		if self.shouldClick then
+			self:SetChecked(0)
+			self.shouldClick = false
 		end
 	end
 	

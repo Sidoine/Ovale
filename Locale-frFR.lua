@@ -35,3 +35,5 @@ L["cd"] = "Techniques à longs temps de recharge.\nLancer dès que possible ou c
 L["aoe"] = "Attaque multi-cible"
 L["mana"] = "Regain de mana"
 L["Cliquer pour afficher/cacher les options"] = true
+L["Illuminer l'icône"] = true
+L["Illuminer l'icône quand la technique doit être spammée"] = true

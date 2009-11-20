@@ -35,3 +35,5 @@ L["cd"] = "Long cooldown abilities.\nCast as soon as possible or keep for multip
 L["aoe"] = "Multiple targets Attack"
 L["mana"] = "Mana gain"
 L["Cliquer pour afficher/cacher les options"] = "Click to hide/show options"
+L["Illuminer l'icône"] = "Highlight icon"
+L["Illuminer l'icône quand la technique doit être spammée"] = "Hightlight icon when ability should be spammed"

@@ -115,16 +115,27 @@ do
 		for k,action in pairs(self.actions) do
 			if action.spellName == spellName then
 				if not action.waitStart then
+					-- print("sort "..spellName.." parfait")
 					return 1
 				else
-					if Ovale.maintenant - action.waitStart>1.5 then
+					local lag = Ovale.maintenant - action.waitStart
+					if lag>5 then
+					-- 	print("sort "..spellName.." ignoré (>5s)")
+						return nil
+					elseif lag>1.5 then
+					-- 	print("sort "..spellName.." trop lent !")
 						return 0
+					elseif lag>0 then
+					-- 	print("sort "..spellName.." un peu lent "..lag)
+						return 1-lag/1.5
 					else
-						return 1-(Ovale.maintenant - action.waitStart)/1.5
+					-- 	print("sort "..spellName.." juste bon")
+						return 1
 					end
 				end
 			end
 		end
+		print("sort "..spellName.." incorrect")
 		return 0
 	end
 	

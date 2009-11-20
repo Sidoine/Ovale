@@ -6,6 +6,7 @@ Define(LAVABURST 51505)
 Define(WATERSHIELD 52127)
 Define(FLAMESHOCK 8050)
 Define(FLAMETHONG 8024)
+Define(WINDFURYWEAPON 8232)
 Define(EARTHSHOCK 8042)
 Define(STORMSTRIKE 17364)
 Define(LAVALASH 60103)
@@ -73,10 +74,10 @@ AddIcon help=main
 {
 	unless TalentPoints(TALENTFLURRY more 0)
 	{
-	#	if BuffExpires(FLAMETHONG 2) Spell(FLAMETHONG)
+		if WeaponEnchantExpires(mainhand 2) Spell(FLAMETHONG)
 		if BuffExpires(WATERSHIELD 2) Spell(WATERSHIELD)
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
-		Spell(LAVABURST)
+		unless TargetDebuffExpires(FLAMESHOCK 1.6 haste=spell mine=1) Spell(LAVABURST)
 		if CheckBoxOn(aoe)
 			Spell(CHAINLIGHTNING)
 		
@@ -90,6 +91,8 @@ AddIcon help=main
 	}
 	if TalentPoints(TALENTFLURRY more 0)
 	{
+		if WeaponEnchantExpires(mainhand 2) Spell(WINDFURYWEAPON)
+		if WeaponEnchantExpires(offhand 2) Spell(FLAMETHONG)
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		if TargetDebuffExpires(FLAMESHOCK 1.5 haste=spell mine=1) and 1.5s before Spell(LAVALASH)
 			Spell(FLAMESHOCK)

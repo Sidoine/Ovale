@@ -188,6 +188,15 @@ local options =
 					get = function(info) return Ovale.db.profile.apparence.targetHostileOnly end,
 					set = function(info, value) Ovale.db.profile.apparence.targetHostileOnly = value; Ovale:UpdateFrame() end
 				},
+				highlightIcon =
+				{
+					order = 11,
+					type = "toggle",
+					name = L["Illuminer l'icône"],
+					desc = L["Illuminer l'icône quand la technique doit être spammée"],
+					get = function(info) return Ovale.db.profile.apparence.highlightIcon end,
+					set = function(info, value) Ovale.db.profile.apparence.highlightIcon = value; Ovale:UpdateFrame() end
+				},
 			}
 		},
 		code =
@@ -511,13 +520,15 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 		-- self.lastSpellCast=name
 		if (not self.spellInfo[name] or not self.spellInfo[name].toggle) and self.scoreSpell[name] then
 			local scored = self.frame:GetScore(name)
-			self.score = self.score + scored
-			self.maxScore = self.maxScore + 1
-			if Recount then
-				local source =Recount.db2.combatants[UnitName("player")]
-				if source then
-					Recount:AddAmount(source,"Ovale",scored)
-					Recount:AddAmount(source,"OvaleMax",1)
+			if scored~=nil then
+				self.score = self.score + scored
+				self.maxScore = self.maxScore + 1
+				if Recount then
+					local source =Recount.db2.combatants[UnitName("player")]
+					if source then
+						Recount:AddAmount(source,"Ovale",scored)
+						Recount:AddAmount(source,"OvaleMax",1)
+					end
 				end
 			end
 		end
@@ -1223,7 +1234,7 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false},
+				verrouille = false, vertical = false, predictif=false, highlightIcon = true},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
