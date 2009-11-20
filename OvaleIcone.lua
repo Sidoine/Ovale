@@ -52,9 +52,11 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 			self.icone:SetAlpha(0.33)
 		end
 		
+		local red
 		if (Ovale.maintenant + minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > 0
 			and minAttente>Ovale.attenteFinCast) then
 			self.icone:SetVertexColor(0.75,0.2,0.2)
+			red = true
 		else
 			self.icone:SetVertexColor(1,1,1)
 		end 
@@ -64,7 +66,7 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 		end
 		
 		-- La latence
-		if minAttente>0 and Ovale.db.profile.apparence.highlightIcon then
+		if minAttente>0 and Ovale.db.profile.apparence.highlightIcon and not red then
 			local lag = 0.6
 			local newShouldClick
 			if minAttente<lag then
