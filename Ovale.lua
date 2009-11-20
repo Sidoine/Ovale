@@ -535,7 +535,7 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 	end
 end
 
-function Ovale:CHAT_MSG_ADDON(prefix, msg, type, author)
+function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 	if prefix ~= "Ovale" then return end
 	if type ~= "RAID" and type~= "PARTY" then return end
 
