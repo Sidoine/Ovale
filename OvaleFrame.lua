@@ -135,7 +135,7 @@ do
 				end
 			end
 		end
-		print("sort "..spellName.." incorrect")
+--		print("sort "..spellName.." incorrect")
 		return 0
 	end
 	

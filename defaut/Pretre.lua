@@ -49,20 +49,20 @@ if BuffPresent(Focus)
     
 # Check if Shadow Weave is stacked 5 times
 # before suggesting Shadow Word: Pain
-if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1)
+if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1) and TargetDeadIn(more 6)
 {
    Spell(SWP)
 }
 
 #Refresh VT
-if TargetDebuffExpires(VT 1.4 mine=1 haste=spell)
+if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) and TargetDeadIn(more 8)
    Spell(VT)
   
 #cast MB if up
 Spell(MB)
   
 #Refresh devouring plague  
-if TargetDebuffExpires(DP 0 mine=1)
+if TargetDebuffExpires(DP 0 mine=1) and TargetDeadIn(more 8)
     Spell(DP)
 
 if OtherDebuffExpires(SWP)

@@ -61,7 +61,7 @@ AddIcon help=main
 	{
 		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR)
 	
-		if CheckBoxOn(lucioles) and	TargetDebuffExpires(FAERIEFERAL 2)
+		if CheckBoxOn(lucioles) and	TargetDebuffExpires(FAERIEFERAL 2) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
 		
 		if ComboPoints(more 4) and Mana(more 70)
@@ -91,12 +91,12 @@ AddIcon help=main
 
 	unless Stance(1) or Stance(3)
 	{
-		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2)
+		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2) and TargetDeadIn(more 15)
 			Spell(FAERIEFIRE)
 
-		if TargetDebuffExpires(INSECTSWARM 0 mine=1)
+		if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
 			Spell(INSECTSWARM)  
-		if TargetDebuffExpires(MOONFIRE 0 mine=1)
+		if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
 			Spell(MOONFIRE)
 
 		if BuffPresent(ECLIPSEWRATH)

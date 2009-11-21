@@ -22,16 +22,16 @@ ScoreSpells(HUNTERSMARK BLACKARROW SERPENTSTING CHIMERASHOT AIMEDSHOT MULTISHOT 
 
 AddIcon help=main
 {
-	if TargetDebuffExpires(HUNTERSMARK 0) Spell(HUNTERSMARK)
+	if TargetDebuffExpires(HUNTERSMARK 0) and TargetDeadIn(more 8) Spell(HUNTERSMARK)
 	if TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
-	if TargetDebuffExpires(SERPENTSTING 0 mine=1) Spell(SERPENTSTING)
+	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
 	if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
 	if TargetDebuffPresent(SERPENTSTING) Spell(CHIMERASHOT)
 	Spell(AIMEDSHOT)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	unless TalentPoints(TALENTEXPLOSIVESHOT more 0) Spell(ARCANESHOT)
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
-	if TargetDebuffExpires(HUNTERSMARK 2) Spell(HUNTERSMARK)
+	if TargetDebuffExpires(HUNTERSMARK 2) Spell(HUNTERSMARK nored=1)
 	unless TargetDebuffPresent(EXPLOSIVESHOT mine=1) and {2s before Spell(EXPLOSIVESHOT)} Spell(STEADYSHOT)
 }
 

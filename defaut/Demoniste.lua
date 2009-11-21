@@ -44,20 +44,20 @@ ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRA
 
 AddIcon help=main
 {
-if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) Spell(CURSEELEMENTS)
+if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
 if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
-if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) Spell(UNSTABLEAFFLICTION)
+if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(UNSTABLEAFFLICTION)
 if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
    and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
 if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and
-		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} 
+		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} and TargetDeadIn(more 8)
 			Spell(IMMOLATE)
-if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)
+if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) and TargetDeadIn(more 60) Spell(CURSEDOOM)
 if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
 if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)
-if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY)
-if TargetDebuffExpires(CORRUPTION 0 mine=1) Spell(CORRUPTION)
+if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) and TargetDeadIn(more 10) Spell(CURSEAGONY)
+if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 
 if BuffPresent(DECIMATION) Spell(SOULFIRE)
 

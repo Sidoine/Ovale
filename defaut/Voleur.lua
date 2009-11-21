@@ -43,7 +43,7 @@ AddIcon help=main
 			Spell(SLICEANDDICE)
 		}
 
-		if TargetDebuffExpires(RUPTURE 0)
+		if TargetDebuffExpires(RUPTURE 0) and TargetDeadIn(more 6)
 			Spell(RUPTURE)
 		
 		if TalentPoints(TALENTVILEPOISONS more 0)
