@@ -67,7 +67,7 @@ AddIcon help=main
 		if ComboPoints(more 4) and Mana(more 70)
 		{
 			if BuffExpires(SAVAGEROAR 5) Spell(SAVAGEROAR)
-			if TargetDebuffExpires(RIP 0 mine=1) Spell(RIP)
+			if TargetDebuffExpires(RIP 0 mine=1) and TargetDeadIn(more 7) Spell(RIP)
 		}    
 		
 		if {3s between BuffExpires(SAVAGEROAR 0) and TargetDebuffExpires(RIP 0)} and ComboPoints(more 2)
@@ -85,8 +85,15 @@ AddIcon help=main
 
 		if BuffPresent(CLEARCASTING) Spell(SHRED)
 		
-		if ComboPoints(more 4) and BuffPresent(SAVAGEROAR 8) and TargetDebuffPresent(RIP 8 mine=1)
-			Spell(FEROCIOUSBITE)
+		if ComboPoints(more 4)
+		{
+			unless BuffExpires(SAVAGEROAR 8) or TargetDebuffExpires(RIP 8 mine=1)
+				Spell(FEROCIOUSBITE)
+			if TargetDeadIn(less 7)
+				Spell(FEROCIOUSBITE)
+			if Mana(more 90)
+				Spell(SHRED)
+		}
 	}
 
 	unless Stance(1) or Stance(3)
