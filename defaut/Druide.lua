@@ -78,14 +78,14 @@ AddIcon help=main
 			if Mana(less 30) Spell(TIGERSFURY)
 			if TargetDebuffExpires(MANGLECAT 0 mine=1) and CheckBoxOn(mangle)
 				Spell(MANGLECAT)
-			if TargetDebuffExpires(RAKE 0 mine=1) 
+			if TargetDebuffExpires(RAKE 0 mine=1) and Mana(more 34) 
 				Spell(RAKE)
-			Spell(SHRED)
+			if Mana(more 42) Spell(SHRED)
 		}
 
 		if BuffPresent(CLEARCASTING) Spell(SHRED)
 		
-		if ComboPoints(more 4)
+		if ComboPoints(more 4) and Mana(more 34)
 		{
 			unless BuffExpires(SAVAGEROAR 8) or TargetDebuffExpires(RIP 8 mine=1)
 				Spell(FEROCIOUSBITE)
