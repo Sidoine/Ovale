@@ -37,3 +37,7 @@ L["mana"] = "Regain de mana"
 L["Cliquer pour afficher/cacher les options"] = true
 L["Illuminer l'icône"] = true
 L["Illuminer l'icône quand la technique doit être spammée"] = true
+L["Prédictif"] = "Deux sorts"
+L["Affiche les deux prochains sorts et pas uniquement le suivant"] = true
+L["Défilement"] = true
+L["Les icônes se déplacent"] = true

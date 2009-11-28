@@ -24,7 +24,6 @@ Ovale.enCombat = false
 Ovale.spellHaste = 0
 Ovale.meleeHaste = 0
 Ovale.aura = { player = {}, target = {}}
-Ovale.possibleAura = { player = {}, target = {}}
 Ovale.targetGUID = nil
 Ovale.spellInfo = {}
 Ovale.spellStack = {}
@@ -35,6 +34,7 @@ Ovale.scoreSpell = {}
 Ovale.otherDebuffs = {}
 Ovale.score = 0
 Ovale.maxScore = 0
+Ovale.serial = 0
 
 Ovale.arbre = {}
 
@@ -168,13 +168,23 @@ local options =
 				{
 					order = 10,
 					type = "toggle",
-					name = "Predictive (EXPERIMENTAL)",
+					name = L["Prédictif"],
+					desc = L["Affiche les deux prochains sorts et pas uniquement le suivant"],
 					get = function(info) return Ovale.db.profile.apparence.predictif end,
 					set = function(info, value) Ovale.db.profile.apparence.predictif = value; Ovale:UpdateFrame() end
 				},
-				hideEmpty =
+				moving = 
 				{
 					order = 11,
+					type = "toggle",
+					name = L["Défilement"],
+					desc = L["Les icônes se déplacent"],
+					get = function(info) return Ovale.db.profile.apparence.moving end,
+					set = function(info, value) Ovale.db.profile.apparence.moving = value; Ovale:UpdateFrame() end
+				},
+				hideEmpty =
+				{
+					order = 12,
 					type = "toggle",
 					name = L["Cacher bouton vide"],
 					get = function(info) return Ovale.db.profile.apparence.hideEmpty end,
@@ -182,7 +192,7 @@ local options =
 				},
 				targetHostileOnly = 
 				{
-					order = 11,
+					order = 13,
 					type = "toggle",
 					name = L["Cacher si cible amicale ou morte"],
 					get = function(info) return Ovale.db.profile.apparence.targetHostileOnly end,
@@ -190,7 +200,7 @@ local options =
 				},
 				highlightIcon =
 				{
-					order = 11,
+					order = 14,
 					type = "toggle",
 					name = L["Illuminer l'icône"],
 					desc = L["Illuminer l'icône quand la technique doit être spammée"],
@@ -541,7 +551,7 @@ function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 
     local value, max = strsplit(";", msg)
     Recount:AddAmount(author, "Ovale", value)
-    Recount:AddAmount(author, "Ovale", max)
+    Recount:AddAmount(author, "OvaleMax", max)
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
@@ -559,6 +569,7 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.enCombat = true
 	self.score = 0
 	self.maxScore = 0
+	self.combatStartTime = self.maintenant
 	
 	self:UpdateVisibility()
 end
@@ -752,58 +763,143 @@ function Ovale:AddRune(time, type, value)
 	end
 end
 
+function Ovale:GetAura(target, filter, spellId)
+	if not self.aura[target] then
+		self.aura[target] = {}
+	end
+	if not self.aura[target][filter] then
+		self.aura[target][filter] = {}
+	end
+	if not self.aura[target][filter][spellId] then
+		self.aura[target][filter][spellId] = {}
+	end
+	local myAura = self.aura[target][filter][spellId]
+	if myAura.serial == Ovale.serial then
+		return myAura
+	end
+	
+	myAura.mine = false
+	myAura.start = nil
+	myAura.ending = nil
+	myAura.stacks = 0
+	myAura.serial = Ovale.serial
+	
+	local i = 1
+	local auraName, auraRank, auraIcon = self:GetSpellInfoOrNil(spellId)
+	
+	while (true) do
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitAura(target, i, filter);
+		if not name then
+			break
+		end
+		if (unitCaster=="player" or not myAura.mine) and name == auraName and icon==auraIcon then
+			myAura.mine = (unitCaster == "player")
+			myAura.start = expirationTime - duration
+			myAura.ending = expirationTime
+			if count and count>0 then
+				myAura.stacks = count
+			else
+				myAura.stacks = 1
+			end
+			if myAura.mine then
+				break
+			end
+		end
+		i = i + 1;
+	end
+	return myAura
+end
+
 function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
-	self.spellStack.length = self.spellStack.length + 1
-	if not self.spellStack[self.spellStack.length] then
-		self.spellStack[self.spellStack.length] = {}
-	end
-	local newSpell = self.spellStack[self.spellStack.length]
-	newSpell.attenteFinCast = endCast
+--	self.spellStack.length = self.spellStack.length + 1
+--	if not self.spellStack[self.spellStack.length] then
+--		self.spellStack[self.spellStack.length] = {}
+--	end
+--	local newSpell = self.spellStack[self.spellStack.length]
+--	newSpell.attenteFinCast = endCast
+--	if spellName then
+--		newSpell.info = self.spellInfo[spellName]
+--	else
+--		newSpell.info = nil
+--	end
+
+	local newSpellInfo = nil
 	if spellName then
-		newSpell.info = self.spellInfo[spellName]
-	else
-		newSpell.info = nil
+		newSpellInfo = self.spellInfo[spellName]
 	end
+	
+	self.attenteFinCast = nextCast
 	self.currentSpellName = spellName
 	self.startCast = startCast
-	self.attenteFinCast = nextCast
+	self.currentTime = nextCast
+	
+	if Ovale.trace then
+		Ovale:Print("add spell "..spellName.." at "..startCast.." currentTime = "..nextCast)
+	end
+	
 	if startCast>=0 then
-		if newSpell.info then
-			if newSpell.info.combo then
-				self.state.combo = self.state.combo + newSpell.info.combo
+		if newSpellInfo then
+			if newSpellInfo.combo then
+				self.state.combo = self.state.combo + newSpellInfo.combo
 				if self.state.combo<0 then
 					self.state.combo = 0
 				end
 			end
-			if newSpell.info.frost then
-				self:AddRune(startCast, 3, newSpell.info.frost)
+			if newSpellInfo.frost then
+				self:AddRune(startCast, 3, newSpellInfo.frost)
 			end
-			if newSpell.info.death then
-				self:AddRune(startCast, 4, newSpell.info.death)
+			if newSpellInfo.death then
+				self:AddRune(startCast, 4, newSpellInfo.death)
 			end
-			if newSpell.info.blood then
-				self:AddRune(startCast, 1, newSpell.info.blood)
+			if newSpellInfo.blood then
+				self:AddRune(startCast, 1, newSpellInfo.blood)
 			end
-			if newSpell.info.unholy then
-				self:AddRune(startCast, 2, newSpell.info.unholy)
+			if newSpellInfo.unholy then
+				self:AddRune(startCast, 2, newSpellInfo.unholy)
 			end
 		end
 	end
 			
-	if newSpell.info then
-		if newSpell.info.cd then
+	if newSpellInfo then
+		if newSpellInfo.cd then
 			if not self.state.cd[spellName] then
 				self.state.cd[spellName] = {}
 			end
-			self.state.cd[spellName].start = startCast + self.maintenant
-			self.state.cd[spellName].duration = newSpell.info.cd
+			self.state.cd[spellName].start = startCast
+			self.state.cd[spellName].duration = newSpellInfo.cd
 			self.state.cd[spellName].enable = 1
 		end
-		if newSpell.info.toggle then
+		if newSpellInfo.toggle then
 			if not self.state.cd[spellName] then
 				self.state.cd[spellName] = {}
 			end
 			self.state.cd[spellName].toggled = 1
+		end
+		if newSpellInfo.aura then
+			for target, targetInfo in pairs(newSpellInfo.aura) do
+				for filter, filterInfo in pairs(targetInfo) do
+					for spell, spellData in pairs(filterInfo) do
+						local newAura = self:GetAura(target, filter, spell)
+						newAura.mine = true
+						local duration = spellData
+						local spellName = self:GetSpellInfoOrNil(spell)
+						if spellName and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
+							duration = self.spellInfo[spellName].duration
+						end
+						if newAura.ending and newAura.ending >= endCast then
+							newAura.ending = endCast + duration
+							newAura.stacks = newAura.stacks + 1
+						else
+							newAura.start = endCast
+							newAura.ending = endCast + duration
+							newAura.stacks = 1
+						end
+						if Ovale.trace then
+							self:Print("adding aura "..spellName.." to "..target.." "..newAura.start..","..newAura.ending)
+						end
+					end
+				end
+			end
 		end
 	end
 end
@@ -814,8 +910,10 @@ function Ovale:InitAllActions()
 end
 
 function Ovale:InitCalculerMeilleureAction()
-	self.attenteFinCast = 0
+	self.serial = self.serial + 1
+	self.currentTime = Ovale.maintenant
 	self.currentSpellName = nil
+	self.attenteFinCast = Ovale.maintenant
 	self.spellStack.length = 0
 	self.state.combo = GetComboPoints("player")
 	if self.className == "DEATHKNIGHT" then
@@ -842,12 +940,12 @@ function Ovale:InitCalculerMeilleureAction()
 	-- On attend que le sort courant soit fini
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
 	if (spell) then
-		self:AddSpellToStack(spell, startTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
+		self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
 	end
 	
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
 	if (spell) then
-		self:AddSpellToStack(spell, startTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant, endTime/1000 - Ovale.maintenant)
+		self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
 	end
 end
 
@@ -987,6 +1085,30 @@ function Ovale:GetActionInfo(element)
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, target, element.params.nored
 end
 
+local function nilstring(text)
+	if text == nil then
+		return "nil"
+	else
+		return text
+	end
+end
+
+local function addTime(time1, duration)
+	if not time1 then
+		return nil
+	else
+		return time1 + duration
+	end
+end
+
+local function isBefore(time1, time2)
+	return time1 and (not time2 or time1<time2)
+end
+
+local function isAfter(time1, time2)
+	return not time1 or (time2 and time1>time2)
+end
+
 function Ovale:CalculerMeilleureAction(element)
 	if (self.bug and not self.trace) then
 		return nil
@@ -1026,7 +1148,7 @@ function Ovale:CalculerMeilleureAction(element)
 				if (not actionCooldownDuration or actionCooldownStart==0) then
 					restant = 0
 				else
-					restant = actionCooldownDuration - (self.maintenant - actionCooldownStart);
+					restant = actionCooldownDuration + actionCooldownStart
 				end
 				
 				if restant<self.attenteFinCast then
@@ -1058,7 +1180,7 @@ function Ovale:CalculerMeilleureAction(element)
 				if (not retourPriorite) then
 					retourPriorite = 3
 				end
-				return restant, retourPriorite, element
+				return restant, nil, retourPriorite, element
 			else
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not enabled")
@@ -1071,31 +1193,20 @@ function Ovale:CalculerMeilleureAction(element)
 				self:Print("Function "..element.func.." not found")
 				return nil
 			end
-			local temps = classe(element.params)
+			local start, ending = classe(element.params)
 			
 			if (Ovale.trace) then
-				if (temps==nil) then
-					self:Print("Function "..element.func.." returned nil")
-				else
-					self:Print("Function "..element.func.." returned "..temps)
-				end
+				self:Print("Function "..element.func.." returned "..nilstring(start)..","..nilstring(ending))
 			end
 			
-			return temps
+			return start, ending
 		end
 	elseif (element.type == "before") then
 		if (Ovale.trace) then
 			self:Print(element.time.."s before")
 		end
-		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		if (tempsA==nil) then
-			return nil
-		end
-		if (tempsA<element.time) then
-			return 0
-		else
-			return tempsA - element.time 
-		end
+		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
+		return addTime(startA, -element.time), addTime(endA, -element.time)
 	elseif (element.type == "between") then
 		if (Ovale.trace) then
 			self:Print(element.time.."s between")
@@ -1118,49 +1229,66 @@ function Ovale:CalculerMeilleureAction(element)
 		if (Ovale.trace) then
 			self:Print(element.type)
 		end
-		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		if (tempsA==nil) then
+		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
+		if (startA==nil) then
 			return nil
 		end
-		local tempsB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
-		if (tempsB==nil) then
+		local startB, endB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
+		if isAfter(startB, endA) or isAfter(startA, endB) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
-		if (tempsB>tempsA) then
-			return  tempsB, prioriteB, elementB
-		else
-			return  tempsA, prioriteB, elementB
+		if isBefore(startB, startA) then
+			startB = startA
 		end
+		if isAfter(endB, endA) then
+			endB = endA
+		end
+		if Ovale.trace then
+			Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB))
+		end
+		return startB, endB, prioriteB, elementB
 	elseif (element.type == "unless") then
 		if (Ovale.trace) then
 			self:Print(element.type)
 		end
-		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		if (tempsA==0) then
+		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
+		local startB, endB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
+		
+		if isBefore(startA, startB) and isAfter(endA, endB) then
 			return nil
 		end
-		local tempsB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
-		if (tempsA==nil or tempsA>tempsB) then
-			return tempsB, prioriteB, elementB
-		else
-			return nil
+		
+		if isAfter(startA, startB) and isBefore(endA, endB) then
+			return endA, endB, prioriteB, elementB
 		end
+		
+		if isAfter(startA, startB) and isBefore(startA, endB) then
+			endB = startA
+		end
+		
+		if isAfter(endA, startB) and isBefore(endA, endB) then
+			startB = endA
+		end
+					
+		return startB, endB, prioriteB, elementB
 	elseif (element.type == "or") then
 		if (Ovale.trace) then
 			self:Print(element.type)
 		end
 		
-		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		local tempsB = Ovale:CalculerMeilleureAction(element.b)
-		if (tempsB==nil or (tempsA~=nil and tempsB>tempsA)) then
-			if (Ovale.trace) then printTime(tempsA) end
-			return tempsA
-		else
-			if (Ovale.trace) then printTime(tempsB) end
-			return tempsB
+		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
+		local startB, endB = Ovale:CalculerMeilleureAction(element.b)
+		if isBefore(startA, startB) then
+			startB = startA
 		end
+		if isAfter(endA, endB) then
+			endB = endA
+		end
+		return startB, endB
 	elseif (element.type == "group") then
 		local meilleurTempsFils
+		local bestEnd
 		local meilleurePrioriteFils
 		local bestElement
 		 
@@ -1169,8 +1297,12 @@ function Ovale:CalculerMeilleureAction(element)
 		end
 		
 		for k, v in ipairs(element.nodes) do
-			local nouveauTemps, priorite, nouveauElement = Ovale:CalculerMeilleureAction(v)
-			if (nouveauTemps) then
+			local newStart, newEnd, priorite, nouveauElement = Ovale:CalculerMeilleureAction(v)
+			if newStart and newStart<Ovale.currentTime then
+				newStart = Ovale.currentTime
+			end
+			
+			if newStart and (not newEnd or newStart<=newEnd) then
 				local remplacer
 			
 				if (not meilleurTempsFils) then
@@ -1194,14 +1326,15 @@ function Ovale:CalculerMeilleureAction(element)
 					else
 						maxEcart = -0.01
 					end
-					if (nouveauTemps-meilleurTempsFils < maxEcart) then
+					if (newStart-meilleurTempsFils < maxEcart) then
 						remplacer = true
 					end
 				end
 				if (remplacer) then
-					meilleurTempsFils = nouveauTemps
+					meilleurTempsFils = newStart
 					meilleurePrioriteFils = priorite
 					bestElement = nouveauElement
+					bestEnd = newEnd
 				end
 			end
 		end
@@ -1210,7 +1343,7 @@ function Ovale:CalculerMeilleureAction(element)
 			if (Ovale.trace) then
 				self:Print("Best action "..bestElement.params[1].." remains "..meilleurTempsFils)
 			end
-			return meilleurTempsFils,meilleurePrioriteFils, bestElement
+			return meilleurTempsFils, bestEnd, meilleurePrioriteFils, bestElement
 		else
 			if (Ovale.trace) then printTime(nil) end
 			return nil
@@ -1330,7 +1463,7 @@ end
 
 function Ovale:GetSpellInfo(spell)
 	if (not self.spellInfo[spell]) then
-		self.spellInfo[spell] = { player = {}, target = {}}
+		self.spellInfo[spell] = { aura = {player = {}, target = {}} }
 	end
 	return self.spellInfo[spell]
 end

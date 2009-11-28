@@ -142,24 +142,27 @@ do
 	local function OnUpdate(self)
 		Ovale:InitAllActions()
 		for k,node in pairs(Ovale.masterNodes) do
+			if Ovale.trace then
+				Ovale:Print("****Master Node "..k)
+			end
 			Ovale:InitCalculerMeilleureAction()
-			local minAttente, priorite, element = Ovale:CalculerMeilleureAction(node)
+			local start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
 			
 			local action = self.actions[k]
 			
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed = Ovale:GetActionInfo(element)
 			
-			if (node.params.nocd and node.params.nocd == 1 and minAttente~=nil and minAttente>1.5) then
+			if (node.params.nocd and node.params.nocd == 1 and start~=nil and start>Ovale.maintenant+1.5) then
 				action.icons[1]:Update(nil)
 			else			
-				action.icons[1]:Update(minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				action.icons[1]:Update(start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed)
 			end
 			
 			action.spellName = spellName
 			
-			if minAttente == 0 and actionUsable then
+			if start == Ovale.maintenant and actionUsable then
 				if not action.waitStart then
 					action.waitStart = Ovale.maintenant
 				end
@@ -167,38 +170,62 @@ do
 				action.waitStart = nil
 			end
 			
-			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif) then
-				if minAttente then
-					local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
-					if top<0 then
-						top = 0
-					elseif top>1 then
-						top = 1
-					end
-					
-					action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + top*action.dx,action.top - top*action.dy)
+			if Ovale.db.profile.apparence.moving then
+				local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
+				if top<0 then
+					top = 0
+				elseif top>1 then
+					top = 1
+				end
+				action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + top*action.dx,action.top - top*action.dy)
+				if action.icons[2] then
 					action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (top+1)*action.dx,action.top - (top+1)*action.dy)
+				end
+			end
+								
+			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif) then
+				if start then
 					local castTime=0
 					if spellName then
 						local _, _, _, _, _, _, _castTime = GetSpellInfo(spellName)
-						if _castTime then
+						if _castTime and _castTime>0 then
 							castTime = _castTime/1000
 						end
 					end
 					local gcd = Ovale:GetGCD(spellName)
 					local nextCast
 					if (castTime>gcd) then
-						nextCast = minAttente + castTime 
+						nextCast = start + castTime 
 					else
-						nextCast = minAttente + gcd
+						nextCast = start + gcd
 					end					
-					Ovale:AddSpellToStack(spellName, minAttente, minAttente + castTime, nextCast)
-					minAttente, priorite, element = Ovale:CalculerMeilleureAction(node)
-					action.icons[2]:Update(minAttente, Ovale:GetActionInfo(element))
+					if Ovale.trace then
+						Ovale:Print("****Second icon")
+					end
+					Ovale:AddSpellToStack(spellName, start, start + castTime, nextCast)
+					start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
+					action.icons[2]:Update(start, Ovale:GetActionInfo(element))
 				else
 					action.icons[2]:Update(nil)
 				end
 			end
+		end
+		
+		if (not Ovale.bug) then
+			Ovale.traced = false
+		end
+		
+		if (Ovale.trace) then
+			Ovale.trace=false
+			Ovale.traced = true
+		end
+		
+		if (Ovale.bug and not Ovale.traced) then
+			Ovale.trace = true
+		end	
+		
+		if noRed then
+			minAttente = actionCooldownStart + actionCooldownDuration
 		end
 	end
 	

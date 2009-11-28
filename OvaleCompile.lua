@@ -37,7 +37,7 @@ local function ParseSpellAddDebuff(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
-		Ovale:GetSpellInfo(spell).player.HARMFUL = paramList
+		Ovale:GetSpellInfo(spell).aura.player.HARMFUL = paramList
 	end
 	return ""
 end
@@ -46,7 +46,7 @@ local function ParseSpellAddBuff(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
-		Ovale:GetSpellInfo(spell).player.HELPFUL = paramList
+		Ovale:GetSpellInfo(spell).aura.player.HELPFUL = paramList
 	end
 	return ""
 end
@@ -55,7 +55,7 @@ local function ParseSpellAddTargetDebuff(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
-		Ovale:GetSpellInfo(spell).target.HARMFUL = paramList
+		Ovale:GetSpellInfo(spell).aura.target.HARMFUL = paramList
 	end
 	return ""
 end

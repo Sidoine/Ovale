@@ -4,35 +4,19 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local function Update(self, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed)
 				
-	if (not Ovale.bug) then
-		Ovale.traced = false
-	end
-	
-	if (Ovale.trace) then
-		Ovale.trace=false
-		Ovale.traced = true
-	end
-	
-	if (Ovale.bug and not Ovale.traced) then
-		Ovale.trace = true
-	end	
-	
-	if noRed then
-		minAttente = actionCooldownStart + actionCooldownDuration - Ovale.maintenant
-	end
 		
 	if (minAttente~=nil and actionTexture) then	
 	
 		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-			(minAttente~=0 and minAttente>self.ancienneAttente+0.01) or
-			(Ovale.maintenant + minAttente < self.finAction-0.01)) then
+			(minAttente~=Ovale.maintenant and minAttente>self.ancienneAttente+0.01) or
+			(minAttente < self.finAction-0.01)) then
 			if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-					(minAttente~=0 and minAttente>self.ancienneAttente+0.01)) then
+					(minAttente~=Ovale.maintenant and minAttente>self.ancienneAttente+0.01)) then
 				self.debutAction = Ovale.maintenant
 			end
 			self.actionCourante = actionTexture
-			self.finAction = minAttente + Ovale.maintenant
-			if (minAttente == 0) then
+			self.finAction = minAttente
+			if (minAttente == Ovale.maintenant) then
 				self.cd:Hide()
 			else
 				self.cd:Show()
@@ -53,7 +37,7 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 		end
 		
 		local red
-		if (Ovale.maintenant + minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > 0
+		if (minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > Ovale.maintenant
 			and minAttente>Ovale.attenteFinCast) then
 			self.icone:SetVertexColor(0.75,0.2,0.2)
 			red = true
@@ -61,15 +45,15 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 			self.icone:SetVertexColor(1,1,1)
 		end 
 		
-		if (minAttente==0) then
+		if (minAttente==Ovale.maintenant) then
 			self.cd:Hide()
 		end
 		
 		-- La latence
-		if minAttente>0 and Ovale.db.profile.apparence.highlightIcon and not red then
+		if minAttente>Ovale.maintenant and Ovale.db.profile.apparence.highlightIcon and not red then
 			local lag = 0.6
 			local newShouldClick
-			if minAttente<lag then
+			if minAttente<Ovale.maintenant + lag then
 				newShouldClick = true
 			else
 				newShouldClick = false
