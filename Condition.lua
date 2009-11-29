@@ -470,31 +470,31 @@ Ovale.conditions=
 		if (condition[1] == "more") then
 			local _,className = UnitClass("player")
 			if (className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3)) then
-				local current = UnitPower("player")
+				local current = Ovale.state.mana
 				if (current > condition[2]) then
-					return 0
+					if condition[1]=="more"  then
+						return 0
+					else
+						return nil
+					end
 				else
 					local rate= 10
 					if (className == "ROGUE") then
-						local i=1
 						local rush = Ovale:GetSpellInfoOrNil(13750)
-						while (true) do
-							local name = UnitBuff("player", i)
-							if (not name) then
-								break
-							end
-							if (name == rush) then
-								rate = rate * 2
-								break
-							end
-							i = i + 1
+						if UnitBuff("player", rush) then
+							rate = rate * 2
 						end
 					end
-					return (condition[2] - current) / rate
+					local limit = math.ceil((condition[2] - current) / rate + Ovale.maintenant)
+					if condition[1]=="more" then
+						return limit
+					else
+						return 0, limit
+					end
 				end
 			end
 		end
-		return compare(UnitPower("player"), condition[1], condition[2])
+		return compare(Ovale.state.mana, condition[1], condition[2])
 	end,
 	ManaPercent = function(condition)
 		return compare(UnitPower("player")/UnitPowerMax("player"), condition[1], condition[2]/100)

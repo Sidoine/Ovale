@@ -848,6 +848,11 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 	if spellName then
 		newSpellInfo = self.spellInfo[spellName]
 	end
+
+	if startCast>Ovale.maintenant then
+		local _, _, _, cost = GetSpellInfo(spellName)
+		self.state.mana = self.state.mana - cost
+	end
 	
 	self.attenteFinCast = nextCast
 	self.currentSpellName = spellName
@@ -880,7 +885,7 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 			end
 		end
 	end
-			
+	
 	if newSpellInfo then
 		local cd = self:GetCD(spellName)
 		if cd then
@@ -932,6 +937,7 @@ function Ovale:InitCalculerMeilleureAction()
 	self.attenteFinCast = Ovale.maintenant
 	self.spellStack.length = 0
 	self.state.combo = GetComboPoints("player")
+	self.state.mana = UnitPower("player")
 	if self.className == "DEATHKNIGHT" then
 		for i=1,6 do
 			self.state.rune[i].type = GetRuneType(i)

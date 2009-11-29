@@ -16,6 +16,7 @@ Define(LOCKANDLOAD 56453)
 Define(TALENTEXPLOSIVESHOT 2145)
 Define(CALLOFTHEWILD 53434)
 Define(CHIMERASHOT 53209)
+Define(READINESS 23989)
 
 SpellAddTargetDebuff(EXPLOSIVESHOT EXPLOSIVESHOT=2)
 SpellInfo(EXPLOSIVESHOT cd=6)
@@ -28,6 +29,7 @@ SpellInfo(CHIMERASHOT cd=10)
 SpellInfo(RAPIDFIRE cd=300)
 SpellInfo(KILLCOMMAND cd=60)
 SpellInfo(BESTIALWRATH cd=120)
+SpellInfo(ARCANESHOT cd=6)
 SpellAddTargetDebuff(HUNTERSMARK HUNTERSMARK=300)
 
 AddCheckBox(multi SpellName(MULTISHOT))
@@ -56,5 +58,6 @@ AddIcon help=cd
 	Item(Trinket1Slot usable=1)
 	Spell(CALLOFTHEWILD usable=1)
 	Spell(RAPIDFIRE)
+	Spell(READINESS)
 }
 ]]

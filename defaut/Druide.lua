@@ -31,6 +31,7 @@ AddCheckBox(mangle SpellName(MANGLECAT) default)
 AddCheckBox(demo SpellName(DEMOROAR) default)
 AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
 AddCheckBox(wrath SpellName(WRATH))
+AddCheckBox(shred SpellName(SHRED) default)
 
 ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP 
 		TIGERSFURY MANGLECAT RAKE SHRED FEROCIOUSBITE INSECTSWARM MOONFIRE
@@ -46,6 +47,15 @@ SpellAddTargetDebuff(MANGLECAT MANGLECAT=12)
 SpellAddTargetDebuff(RAKE RAKE=9)
 SpellAddTargetDebuff(INSECTSWARM INSECTSWARM=12)
 SpellAddTargetDebuff(MOONFIRE MOONFIRE=12)
+SpellInfo(TIGERSFURY cd=30)
+SpellInfo(BERSERK cd=180)
+SpellInfo(FORCEOFNATURE cd=180)
+SpellInfo(MANGLECAT combo=1)
+SpellInfo(RAKE combo=1)
+SpellInfo(SHRED combo=1)
+SpellInfo(SAVAGEROAR combo=-5)
+SpellInfo(RIP combo=-5)
+SpellInfo(FEROCIOUSBITE combo=-5)
 
 AddIcon help=main
 {
@@ -89,10 +99,10 @@ AddIcon help=main
 				Spell(MANGLECAT)
 			if TargetDebuffExpires(RAKE 0 mine=1) and Mana(more 34) 
 				Spell(RAKE)
-			if Mana(more 42) Spell(SHRED)
+			if Mana(more 42) and CheckBoxOn(shred) Spell(SHRED)
 		}
 
-		if BuffPresent(CLEARCASTING) Spell(SHRED)
+		if BuffPresent(CLEARCASTING) and CheckBoxOn(shred) Spell(SHRED)
 		
 		if ComboPoints(more 4) and Mana(more 34)
 		{
@@ -100,7 +110,7 @@ AddIcon help=main
 				Spell(FEROCIOUSBITE)
 			if TargetDeadIn(less 7)
 				Spell(FEROCIOUSBITE)
-			if Mana(more 90)
+			if Mana(more 90) and CheckBoxOn(shred)
 				Spell(SHRED)
 		}
 	}

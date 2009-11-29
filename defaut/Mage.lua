@@ -17,6 +17,7 @@ Define(FIREBALL 133)
 Define(ARCANEBARRAGE 44425)
 Define(ARCANEMISSILES 5143)
 Define(ARCANEBLAST 30451)
+Define(DEEPFREEZE 44572)
 Define(ARCANEPOWER 12042)
 
 Define(COMBUSTION 11129)
@@ -27,9 +28,17 @@ Define(PRESENCEOFMIND 12043)
 
 AddCheckBox(scorch SpellName(SCORCH))
 
+SpellAddDebuff(PYROBLAST HOTSTREAK=0)
 SpellAddDebuff(ARCANEBLAST ARCANEBLAST=10)
+SpellAddDebuff(ARCANEMISSILES ARCANEBLAST=0)
 SpellAddTargetDebuff(SCORCH IMPROVEDSCORCH=30)
 SpellAddTargetDebuff(LIVINGBOMB LIVINGBOMB=12)
+SpellInfo(MIRRORIMAGE cd=180)
+SpellInfo(ARCANEPOWER cd=84)
+SpellInfo(COMBUSTION cd=180)
+SpellInfo(ICYVEINS cd=144)
+SpellInfo(SUMMONWATERELEMENTAL cd=180)
+
 ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMENTAL FROSTBOLT ARCANEBLAST ARCANEMISSILES)
 
 AddIcon help=main
@@ -38,6 +47,7 @@ AddIcon help=main
        {
               #Fire spec
               if TargetDebuffExpires(IMPROVEDSCORCH 6 stacks=5) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
+              #PTR if TargetDebuffExpires(IMPROVEDSCORCH 6) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
               if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
               if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
               if TalentPoints(TALENTPIERCINGICE more 0)
@@ -50,6 +60,7 @@ AddIcon help=main
        {
               #Frost spec
               Spell(SUMMONWATERELEMENTAL)
+              #PTR : Spell(DEEPFREEZE)
               Spell(FROSTBOLT)
        }
        
