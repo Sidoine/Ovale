@@ -1343,11 +1343,6 @@ function Ovale:CalculerMeilleureAction(element)
 					end
 				end
 				if (remplacer) then
-					if not nouveauElement then
-						self.bug = true
-						self:Print("Internal error: bestElement=nil and newStart="..newStart)
-						return nil
-					end
 					meilleurTempsFils = newStart
 					meilleurePrioriteFils = priorite
 					bestElement = nouveauElement
