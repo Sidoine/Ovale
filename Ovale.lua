@@ -810,6 +810,27 @@ function Ovale:GetAura(target, filter, spellId)
 	return myAura
 end
 
+function Ovale:GetCD(spellName)
+	if not spellName then
+		return nil
+	end
+	
+	if self.spellInfo[spellName] and self.spellInfo[spellName].cd then
+		local cdname
+		if self.spellInfo[spellName].sharedcd then
+			cdname = self.spellInfo[spellName].sharedcd
+		else
+			cdname = spellName
+		end
+		if not self.state.cd[cdname] then
+			self.state.cd[cdname] = {}
+		end
+		return self.state.cd[cdname]
+	else
+		return nil
+	end
+end
+
 function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 --	self.spellStack.length = self.spellStack.length + 1
 --	if not self.spellStack[self.spellStack.length] then
@@ -861,19 +882,14 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 	end
 			
 	if newSpellInfo then
-		if newSpellInfo.cd then
-			if not self.state.cd[spellName] then
-				self.state.cd[spellName] = {}
-			end
-			self.state.cd[spellName].start = startCast
-			self.state.cd[spellName].duration = newSpellInfo.cd
-			self.state.cd[spellName].enable = 1
+		local cd = self:GetCD(spellName)
+		if cd then
+			cd.start = startCast
+			cd.duration = newSpellInfo.cd
+			cd.enable = 1
 		end
 		if newSpellInfo.toggle then
-			if not self.state.cd[spellName] then
-				self.state.cd[spellName] = {}
-			end
-			self.state.cd[spellName].toggled = 1
+			cd.toggled = 1
 		end
 		if newSpellInfo.aura then
 			for target, targetInfo in pairs(newSpellInfo.aura) do
@@ -1016,10 +1032,11 @@ function Ovale:GetActionInfo(element)
 	if (element.func == "Spell" ) then
 		spellName = self:GetSpellInfoOrNil(element.params[1])
 		action = self.actionSort[spellName]
-		if self.state.cd[spellName] and self.state.cd[spellName].start then
-			actionCooldownStart = self.state.cd[spellName].start
-			actionCooldownDuration = self.state.cd[spellName].duration
-			actionEnable = self.state.cd[spellName].enable
+		local cd = self:GetCD(spellName)
+		if cd and cd.start then
+			actionCooldownStart = cd.start
+			actionCooldownDuration = cd.duration
+			actionEnable = cd.enable
 		else
 			actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
 			if self.spellInfo[spellName] and self.spellInfo[spellName].forcecd then
@@ -1087,7 +1104,8 @@ function Ovale:GetActionInfo(element)
 		actionIsCurrent = IsCurrentAction(action)				
 	end
 	
-	if spellName and self.state.cd[spellName] and self.state.cd[spellName].toggle then
+	local cd = self:GetCD(spellName)
+	if cd and cd.toggle then
 		actionIsCurrent = 1
 	end
 	
