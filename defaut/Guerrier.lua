@@ -45,6 +45,8 @@ AddListItem(shout command SpellName(COMMANDSHOUT))
 SpellAddTargetDebuff(THUNDERCLAP THUNDERCLAP=30)
 SpellAddTargetDebuff(DEMOSHOUT DEMOSHOUT=45)
 SpellAddTargetDebuff(REND REND=15)
+SpellAddTargetDebuff(DEVASTATE SUNDER=30)
+SpellAddTargetDebuff(SUNDER SUNDER=30)
 SpellAddBuff(BATTLESHOUT BATTLESHOUT=120)
 SpellAddBuff(COMMANDSHOUT COMMANDSHOUT=120)
 SpellAddBuff(SLAM SLAMBUFF=0)
@@ -115,7 +117,7 @@ AddIcon help=main
         {
 			if BuffExpires(SLAMBUFF 2)
       			Spell(SLAM nored=1)
-      		Spell(SLAM priority=2)
+      		Spell(SLAM priority=2 nored=1)
       	}
 	 
         Spell(MORTALSTRIKE)
@@ -149,11 +151,11 @@ AddIcon help=main
      {
 		if TargetDebuffPresent(SUNDER)
 		{
-			Spell(DEVASTATE)
-			Spell(SUNDER)
+			Spell(DEVASTATE nored=1)
+			Spell(SUNDER nored=1)
 		}
-	    Spell(DEVASTATE priority=2)
-		Spell(SUNDER priority=2)
+	    Spell(DEVASTATE priority=2 nored=1)
+		Spell(SUNDER priority=2 nored=1)
      }
 }
 

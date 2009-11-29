@@ -831,7 +831,7 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 	self.attenteFinCast = nextCast
 	self.currentSpellName = spellName
 	self.startCast = startCast
-	self.currentTime = nextCast
+	self.currentTime = startCast+0.1
 	
 	if Ovale.trace then
 		Ovale:Print("add spell "..spellName.." at "..startCast.." currentTime = "..nextCast)
@@ -989,6 +989,15 @@ function Ovale:GetGCD(spellName)
 	end
 end
 
+
+local function nilstring(text)
+	if text == nil then
+		return "nil"
+	else
+		return text
+	end
+end
+
 function Ovale:GetActionInfo(element)
 	if not element then
 		return nil
@@ -1040,9 +1049,10 @@ function Ovale:GetActionInfo(element)
 		else
 			local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
 			itemId = tonumber(id)
-		end		
+		end
+		
 		if (Ovale.trace) then
-			self:Print("Item "..itemId)
+			self:Print("Item "..nilstring(itemId))
 		end
 		
 		spellName = GetItemSpell(itemId)
@@ -1085,13 +1095,6 @@ function Ovale:GetActionInfo(element)
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, target, element.params.nored
 end
 
-local function nilstring(text)
-	if text == nil then
-		return "nil"
-	else
-		return text
-	end
-end
 
 local function addTime(time1, duration)
 	if not time1 then
@@ -1213,24 +1216,30 @@ function Ovale:CalculerMeilleureAction(element)
 		end
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
 		if (tempsA==nil) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
 		local tempsB = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsB==nil) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
 		if (tempsA>tempsB and tempsA-tempsB<element.time) then
+			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
 		elseif (tempsB>tempsA and tempsB-tempsA<element.time) then
+			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
 		end
 		return nil
 	elseif (element.type == "and" or element.type == "if") then
 		if (Ovale.trace) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			self:Print(element.type)
 		end
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		if (startA==nil) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
 		local startB, endB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
@@ -1256,10 +1265,12 @@ function Ovale:CalculerMeilleureAction(element)
 		local startB, endB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
 		
 		if isBefore(startA, startB) and isAfter(endA, endB) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
 		
 		if isAfter(startA, startB) and isBefore(endA, endB) then
+			if Ovale.trace then Ovale:Print(element.type.." return "..nilstring(endA)..","..nilstring(endB)) end
 			return endA, endB, prioriteB, elementB
 		end
 		
@@ -1271,6 +1282,7 @@ function Ovale:CalculerMeilleureAction(element)
 			startB = endA
 		end
 					
+		if Ovale.trace then Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB)) end
 		return startB, endB, prioriteB, elementB
 	elseif (element.type == "or") then
 		if (Ovale.trace) then
@@ -1298,7 +1310,7 @@ function Ovale:CalculerMeilleureAction(element)
 		
 		for k, v in ipairs(element.nodes) do
 			local newStart, newEnd, priorite, nouveauElement = Ovale:CalculerMeilleureAction(v)
-			if newStart and newStart<Ovale.currentTime then
+			if newStart~=nil and newStart<Ovale.currentTime then
 				newStart = Ovale.currentTime
 			end
 			
@@ -1331,6 +1343,11 @@ function Ovale:CalculerMeilleureAction(element)
 					end
 				end
 				if (remplacer) then
+					if not nouveauElement then
+						self.bug = true
+						self:Print("Internal error: bestElement=nil and newStart="..newStart)
+						return nil
+					end
 					meilleurTempsFils = newStart
 					meilleurePrioriteFils = priorite
 					bestElement = nouveauElement
@@ -1341,14 +1358,19 @@ function Ovale:CalculerMeilleureAction(element)
 		
 		if (meilleurTempsFils) then
 			if (Ovale.trace) then
-				self:Print("Best action "..bestElement.params[1].." remains "..meilleurTempsFils)
+				if bestElement then
+					self:Print("group best action "..bestElement.params[1].." remains "..meilleurTempsFils)
+				else
+					self:Print("group no best action")
+				end
 			end
 			return meilleurTempsFils, bestEnd, meilleurePrioriteFils, bestElement
 		else
-			if (Ovale.trace) then printTime(nil) end
+			if (Ovale.trace) then self:Print("group return nil") end
 			return nil
 		end
 	end
+	if (Ovale.trace) then self:Print("unknown element "..element.type..", return nil") end
 	return nil
 end
 

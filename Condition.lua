@@ -211,7 +211,7 @@ local function GetTargetAura(condition, filter, target)
 	if (not condition.mine or aura.mine) and aura.stacks>=stacks then
 		return aura.start, aura.ending
 	else
-		return nil, 0
+		return 0,0
 	end
 end
 
@@ -508,7 +508,7 @@ Ovale.conditions=
 			local minTime
 			for k,v in pairs(otherDebuff) do
 				local diff = v
-				if diff<-maxTime then
+				if Ovale.maintenant-maxTime>diff then
 					-- Ovale:Print("enlève obsolète sur "..k)
 					otherDebuff[k] = nil
 				elseif k~=UnitGUID("target") and (not minTime or diff<minTime) then
@@ -521,6 +521,7 @@ Ovale.conditions=
 			minTime = minTime - timeBefore
 			return minTime
 		end
+		return nil
 	end,
 	OtherDebuffPresent = function(condition)
 		Ovale:EnableOtherDebuffs()
