@@ -206,7 +206,7 @@ local function GetTargetAura(condition, filter, target)
 	local spellId = condition[1]
 	local aura = Ovale:GetAura(target, filter, spellId)
 	if Ovale.trace then
-		Ovale:Print("GetTargetAura = start = ".. nilstring(aura.start) .. " end = "..nilstring(aura.ending).." stacks = " ..nilstring(aura.stacks).."/"..stacks)
+	--	Ovale:Print("GetTargetAura = start = ".. nilstring(aura.start) .. " end = "..nilstring(aura.ending).." stacks = " ..nilstring(aura.stacks).."/"..stacks)
 	end
 	if (not condition.mine or aura.mine) and aura.stacks>=stacks then
 		return aura.start, aura.ending

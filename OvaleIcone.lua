@@ -73,7 +73,7 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 		
 		-- Le temps restant
 		if (Ovale.db.profile.apparence.numeric) then
-			self.remains:SetText(string.format("%.1f", minAttente))
+			self.remains:SetText(string.format("%.1f", minAttente - Ovale.maintenant))
 			self.remains:Show()
 		else
 			self.remains:Hide()

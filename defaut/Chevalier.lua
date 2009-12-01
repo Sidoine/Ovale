@@ -11,7 +11,7 @@ Define(BLOODSTRIKE 45902)
 Define(BLOODBOIL 48721)
 Define(BLOODPLAGUE 59879)
 Define(FROSTFEVER 59921)
-Define(PESTILENCE 50842)
+Define(PESTILENCE 50842)a
 Define(ICYTOUCH 45477)
 Define(PLAGUESTRIKE 45462)
 Define(HEARTSTRIKE 55050)
@@ -27,11 +27,12 @@ Define(DANCINGRUNEWEAPON 49028)
 Define(FROSTSTRIKE 49143)
 Define(HYSTERIA 49016)
 Define(SUMMONGARGOYLE 49206)
-Define(GLYPHDISEASE 63959)
+Define(GLYPHDISEASE 63334)
 Define(GLYPHHOWLINGBLAST 63961)
 Define(ABOMINATIONMIGHT 53136)
 Define(TALENTABOMINATIONMIGHT 2105)
 Define(RAISEDEAD 46584)
+Define(HORNOFWINTER 57330)
 
 AddCheckBox(rolldes SpellName(GLYPHDISEASE))
 
@@ -52,9 +53,12 @@ ScoreSpells(HOWLINGBLAST HEARTSTRIKE BLOODSTRIKE DEATHSTRIKE SCOURGESTRIKE OBLIT
 AddIcon help=main
 {
 	Spell(DANCINGRUNEWEAPON usable=1)
+
+	if BuffExpires(HORNOFWINTER 2) Spell(HORNOFWINTER)
 	
-	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) and TargetDebuffExpires(FROSTFEVER 2 mine=1) and TargetDebuffPresent(FROSTFEVER mine=1) and
-		TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
+	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) 
+		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and
+		{TargetDebuffExpires(FROSTFEVER 3 mine=1) or TargetDebuffExpires(BLOODPLAGUE 3 mine=1)}
 			Spell(PESTILENCE)
 	
 	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
@@ -81,7 +85,7 @@ AddIcon help=main
 		}
 	}
 	
-	if CheckBoxOn(rolldes) and TalentPoints(TALENTABOMINATIONMIGHT more 0) and BuffPresent(ABOMINATIONMIGHT no)
+	if CheckBoxOn(rolldes) and TalentPoints(TALENTABOMINATIONMIGHT more 0) and BuffExpires(ABOMINATIONMIGHT 0)
 		Spell(DEATHSTRIKE)
 		
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)

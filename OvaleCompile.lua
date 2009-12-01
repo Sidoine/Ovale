@@ -3,6 +3,12 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local node={}
 local defines = {}
 
+local function AddNode(newNode)
+	node[#node+1] = newNode
+	newNode.nodeId = #node
+	return "node"..#node
+end
+
 local function ParseParameters(params)
 	local paramList = {}
 	for k,v in string.gmatch(params, "(%w+)=([-%w]+)") do
@@ -29,8 +35,7 @@ end
 local function ParseFunction(func, params)
 	local paramList = ParseParameters(params)
 	local newNode = { type="function", func=func, params=paramList}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseSpellAddDebuff(params)
@@ -87,38 +92,32 @@ end
 
 local function ParseIf(a, b)
 	local newNode = {type="if", a=node[tonumber(a)], b=node[tonumber(b)]}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseUnless(a, b)
 	local newNode = {type="unless", a=node[tonumber(a)], b=node[tonumber(b)]}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseAnd(a,b)
 	local newNode = {type="and", a=node[tonumber(a)], b=node[tonumber(b)]}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseBefore(a,b)
 	local newNode = {type="before", time=tonumber(a), a=node[tonumber(b)]}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseBetween(t,a,b)
 	local newNode = {type="between", time=tonumber(t), a=node[tonumber(a)], b=node[tonumber(b)]}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseOr(a,b)
 	local newNode = {type="or", a=node[tonumber(a)], b=node[tonumber(b)]}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function ParseGroup(text)
@@ -136,8 +135,7 @@ local function ParseGroup(text)
 	end
 	
 	local newNode = {type="group", nodes=nodes}
-	node[#node+1] = newNode
-	return "node"..#node
+	return AddNode(newNode)
 end
 
 local function subtest(text, pattern, func)

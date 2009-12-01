@@ -943,9 +943,9 @@ function Ovale:InitCalculerMeilleureAction()
 			self.state.rune[i].type = GetRuneType(i)
 			local start, duration, runeReady = GetRuneCooldown(i)
 			if runeReady then
-				self.state.rune[i].cd = 0
+				self.state.rune[i].cd = start
 			else
-				self.state.rune[i].cd = duration - (self.maintenant - start)
+				self.state.rune[i].cd = duration + start
 				if self.state.rune[i].cd<0 then
 					self.state.rune[i].cd = 0
 				end
@@ -1230,7 +1230,7 @@ function Ovale:CalculerMeilleureAction(element)
 		end
 	elseif (element.type == "before") then
 		if (Ovale.trace) then
-			self:Print(element.time.."s before")
+			self:Print(element.time.."s before ["..element.nodeId.."]")
 		end
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		return addTime(startA, -element.time), addTime(endA, -element.time)
@@ -1258,17 +1258,20 @@ function Ovale:CalculerMeilleureAction(element)
 		return nil
 	elseif (element.type == "and" or element.type == "if") then
 		if (Ovale.trace) then
-			if Ovale.trace then Ovale:Print(element.type.." return nil") end
-			self:Print(element.type)
+			self:Print(element.type.." ["..element.nodeId.."]")
 		end
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		if (startA==nil) then
-			if Ovale.trace then Ovale:Print(element.type.." return nil") end
+			if Ovale.trace then Ovale:Print(element.type.." return nil  ["..element.nodeId.."]") end
+			return nil
+		end
+		if startA == endA then
+			if Ovale.trace then Ovale:Print(element.type.." return startA=endA  ["..element.nodeId.."]") end
 			return nil
 		end
 		local startB, endB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
 		if isAfter(startB, endA) or isAfter(startA, endB) then
-			if Ovale.trace then Ovale:Print(element.type.." return nil") end
+			if Ovale.trace then Ovale:Print(element.type.." return nil ["..element.nodeId.."]") end
 			return nil
 		end
 		if isBefore(startB, startA) then
@@ -1278,7 +1281,7 @@ function Ovale:CalculerMeilleureAction(element)
 			endB = endA
 		end
 		if Ovale.trace then
-			Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB))
+			Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB).." ["..element.nodeId.."]")
 		end
 		return startB, endB, prioriteB, elementB
 	elseif (element.type == "unless") then
@@ -1329,7 +1332,7 @@ function Ovale:CalculerMeilleureAction(element)
 		local bestElement
 		 
 		if (Ovale.trace) then
-			self:Print(element.type)
+			self:Print(element.type.." ["..element.nodeId.."]")
 		end
 		
 		for k, v in ipairs(element.nodes) do
@@ -1378,9 +1381,9 @@ function Ovale:CalculerMeilleureAction(element)
 		if (meilleurTempsFils) then
 			if (Ovale.trace) then
 				if bestElement then
-					self:Print("group best action "..bestElement.params[1].." remains "..meilleurTempsFils)
+					self:Print("group best action "..bestElement.params[1].." remains "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
 				else
-					self:Print("group no best action")
+					self:Print("group no best action returns "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
 				end
 			end
 			return meilleurTempsFils, bestEnd, meilleurePrioriteFils, bestElement
