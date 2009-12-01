@@ -96,6 +96,6 @@ AddIcon size=small nocd=1
 }
 AddIcon size=small nocd=1
 {
-	if TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY)
+	if TargetDebuffExpires(CORRUPTION 0 mine=1) Spell(CORRUPTION)
 }
 ]]
