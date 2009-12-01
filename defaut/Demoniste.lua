@@ -86,4 +86,16 @@ AddIcon help=cd
 	Item(Trinket1Slot usable=1)
 }
 
+AddIcon size=small nocd=1
+{
+	if TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY)
+}
+AddIcon size=small nocd=1
+{
+	if TargetDebuffExpires(CURSEDOOM 0 mine=1) Spell(CURSEDOOM)
+}
+AddIcon size=small nocd=1
+{
+	if TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY)
+}
 ]]
