@@ -29,8 +29,8 @@ Define(DECIMATION 63167)
 Define(CHAOSBOLT 50796)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
-AddListItem(curse agony SpellName(CURSEAGONY) default)
-AddListItem(curse doom SpellName(CURSEDOOM))
+AddListItem(curse agony SpellName(CURSEAGONY))
+AddListItem(curse doom SpellName(CURSEDOOM) default)
 AddListItem(curse tongues SpellName(CURSETONGUES))
 AddListItem(curse weakness SpellName(CURSEWEAKNESS))
 
@@ -58,15 +58,20 @@ if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=
 if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and
 		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} and TargetDeadIn(more 8)
 			Spell(IMMOLATE)
-if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1) and TargetDeadIn(more 60) Spell(CURSEDOOM)
+if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1)
+{
+	if TargetDeadIn(more 60) Spell(CURSEDOOM)
+	if TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY) 
+}
 if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
 if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)
 if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) and TargetDeadIn(more 10) Spell(CURSEAGONY)
-if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
+if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDeadIn(more 9) and TalentPoints(TALENTEMBERSTORM less 1) Spell(CORRUPTION)
 
 if BuffPresent(DECIMATION) Spell(SOULFIRE)
 
-if TargetLifePercent(less 25) and Level(more 76) and {TalentPoints(TALENTDECIMATION less 1) or ItemCount(SOULSHARD less 16)} Spell(DRAINSOUL)
+if TargetLifePercent(less 25) and Level(more 76) and {TalentPoints(TALENTDECIMATION less 1) or ItemCount(SOULSHARD less 16)}
+		 and TalentPoints(TALENTEMBERSTORM less 1) Spell(DRAINSOUL)
 
 Spell(CHAOSBOLT)
 if TalentPoints(TALENTEMBERSTORM more 0) Spell(INCINERATE)
