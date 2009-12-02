@@ -55,7 +55,7 @@ if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
 if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(UNSTABLEAFFLICTION)
 if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
    and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
-if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and
+if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and TargetDebuffExpires(UNSTABLEAFFLICTION 0 mine=1) and
 		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} and TargetDeadIn(more 8)
 			Spell(IMMOLATE)
 if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1)
