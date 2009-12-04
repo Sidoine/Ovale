@@ -152,12 +152,15 @@ do
 			
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed = Ovale:GetActionInfo(element)
+			if noRed then
+				start = actionCooldownStart + actionCooldownDuration
+			end
 			
 			if (node.params.nocd and node.params.nocd == 1 and start~=nil and start>Ovale.maintenant+1.5) then
 				action.icons[1]:Update(nil)
-			else			
+			else
 				action.icons[1]:Update(start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed)
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
 			end
 			
 			action.spellName = spellName
@@ -223,10 +226,6 @@ do
 		if (Ovale.bug and not Ovale.traced) then
 			Ovale.trace = true
 		end	
-		
-		if noRed then
-			minAttente = actionCooldownStart + actionCooldownDuration
-		end
 	end
 	
 	local function UpdateIcons(self)

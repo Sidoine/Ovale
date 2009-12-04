@@ -2,7 +2,7 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local function Update(self, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed)
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
 				
 		
 	if (minAttente~=nil and actionTexture) then	
