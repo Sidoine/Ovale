@@ -549,9 +549,11 @@ function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 	if prefix ~= "Ovale" then return end
 	if type ~= "RAID" and type~= "PARTY" then return end
 
-    local value, max = strsplit(";", msg)
-    Recount:AddAmount(author, "Ovale", value)
-    Recount:AddAmount(author, "OvaleMax", max)
+	if Recount then
+		local value, max = strsplit(";", msg)
+		Recount:AddAmount(author, "Ovale", value)
+		Recount:AddAmount(author, "OvaleMax", max)
+	end
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
