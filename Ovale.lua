@@ -1318,6 +1318,18 @@ function Ovale:CalculerMeilleureAction(element)
 		
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		local startB, endB = Ovale:CalculerMeilleureAction(element.b)
+		if isBefore(endA,self.currentTime) then
+			return startB,endB
+		elseif isBefore(endB,self.currentTime) then
+			return startA,endA
+		end		
+		
+		if isBefore(endA,startB) then
+			return startA,endA
+		elseif isBefore(endB,startA) then
+			return startB,endB
+		end
+				
 		if isBefore(startA, startB) then
 			startB = startA
 		end
