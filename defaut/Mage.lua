@@ -12,13 +12,16 @@ Define(PYROBLAST 11366)
 Define(LIVINGBOMB 44457)
 Define(SCORCH 2948)
 Define(FROSTFIREBOLT 44614)
-Define(FROSTBOLT 116)
 Define(FIREBALL 133)
+
+Define(FROSTBOLT 116)
+Define(DEEPFREEZE 44572)
+
 Define(ARCANEBARRAGE 44425)
 Define(ARCANEMISSILES 5143)
 Define(ARCANEBLAST 30451)
-Define(DEEPFREEZE 44572)
 Define(ARCANEPOWER 12042)
+Define(MISSILEBARRAGE 44401)
 
 Define(COMBUSTION 11129)
 Define(ICYVEINS 12472)
@@ -26,7 +29,8 @@ Define(MIRRORIMAGE 55342)
 Define(SUMMONWATERELEMENTAL 31687)
 Define(PRESENCEOFMIND 12043)
 
-AddCheckBox(scorch SpellName(SCORCH))
+AddCheckBox(scorch SpellName(SCORCH) default)
+AddCheckBox(abarr SpellName(ARCANEBARRAGE) default)
 
 SpellAddDebuff(PYROBLAST HOTSTREAK=0)
 SpellAddDebuff(ARCANEBLAST ARCANEBLAST=10)
@@ -46,8 +50,7 @@ AddIcon help=main
        if TalentPoints(TALENTLIVINGBOMB more 0)
        {
               #Fire spec
-              if TargetDebuffExpires(IMPROVEDSCORCH 6 stacks=5) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
-              #PTR if TargetDebuffExpires(IMPROVEDSCORCH 6) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
+              if TargetDebuffExpires(IMPROVEDSCORCH 6) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
               if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
               if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
               if TalentPoints(TALENTPIERCINGICE more 0)
@@ -60,16 +63,19 @@ AddIcon help=main
        {
               #Frost spec
               Spell(SUMMONWATERELEMENTAL)
-              #PTR : Spell(DEEPFREEZE)
+              if TargetClassification(worldboss) Spell(DEEPFREEZE)
               Spell(FROSTBOLT)
        }
        
        if TalentPoints(TALENTARCANEBARRAGE more 0)
        {
-              #Arcane spec
-              if DebuffExpires(ARCANEBLAST 0 stacks=4)
-                     Spell(ARCANEBLAST)
-              Spell(ARCANEMISSILES)
+				#Arcane spec
+				if DebuffExpires(ARCANEBLAST 0 stacks=4)
+					Spell(ARCANEBLAST)
+				if BuffPresent(MISSILEBARRAGE)
+					Spell(ARCANEMISSILES)
+				if CheckBoxOn(abarr) Spell(ARCANEBARRAGE)
+				Spell(ARCANEMISSILES)
        }
 }
 

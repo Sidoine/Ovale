@@ -516,22 +516,26 @@ Ovale.conditions=
 				end
 			end
 			if not minTime then
-				return nil
+				return 0
 			end
 			minTime = minTime - timeBefore
 			return minTime
 		end
-		return nil
+		return 0
 	end,
 	OtherDebuffPresent = function(condition)
 		Ovale:EnableOtherDebuffs()
 		local otherDebuff = Ovale.otherDebuffs[GetSpellInfo(condition[1])]
 		if otherDebuff then
+			local maxTime = 0
 			for target,expireTime in pairs(otherDebuff) do
 				if target~=UnitGUID("target") then
-					return 0, expireTime
+					if expireTime > maxTime then
+						maxTime = expireTime
+					end
 				end
 			end
+			return 0, addTime(maxTime, -condition[2])
 		end
 		return nil
 	end,
@@ -719,6 +723,19 @@ Ovale.conditions=
 		else
 			return timeLeft
 		end
+	end,
+	Tracking = function(condition)
+		local what = Ovale:GetSpellInfoOrNil(condition[1])
+		local numTrackingTypes = GetNumTrackingTypes()
+		local present = false
+		for i=1,numTrackingTypes do
+			local name, texture, active = GetTrackingInfo(i)
+			if name == what then
+				present = (active == 1)
+				break
+			end
+		end
+		return testbool(present, condition[2])
 	end,
 	WeaponEnchantExpires = function(condition)
 		local hasMainHandEnchant, mainHandExpiration, mainHandCharges, hasOffHandEnchant, offHandExpiration, offHandCharges = GetWeaponEnchantInfo()

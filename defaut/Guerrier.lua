@@ -98,20 +98,13 @@ AddIcon help=main
 
      if Stance(3) #berserker
      {
-        
-		if TargetLifePercent(less 20)
-		{
-			Spell(WHIRLWIND)
-			Spell(BLOODTHIRST)
-			Spell(EXECUTE)
-        }
-        
         if HasShield() Spell(SHIELDSLAM)
         Spell(SHOCKWAVE)
         Spell(CONCUSSIONBLOW)
     
         if CheckBoxOn(whirlwind) Spell(WHIRLWIND)
         Spell(BLOODTHIRST)
+        if TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(VICTORY usable=1)
         if BuffPresent(SLAMBUFF)
         {
@@ -130,10 +123,10 @@ AddIcon help=main
 
      if Stance(1) #combat
      {
-        if TargetDebuffExpires(REND 0 mine=1) Spell(REND)
-        if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
-        Spell(MORTALSTRIKE)
+        if TargetDebuffExpires(REND 0 mine=1) and TargetDeadIn(more 8) Spell(REND)
+        if TargetLifePercent(more 20) Spell(MORTALSTRIKE)
         Spell(OVERPOWER usable=1)
+        if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
         Spell(VICTORY usable=1)
      
          if TalentPoints(SLAMTALENT more 1)
@@ -168,9 +161,14 @@ AddIcon help=offgcd
 			if Mana(more 66) 
 				Spell(HEROICSTRIKE)
 		}
-		unless Stance(2)
+		if Stance(3)
 		{
-			if Mana(more 66) and TargetLifePercent(more 20)
+			if Mana(more 66)
+				Spell(HEROICSTRIKE)
+		}
+		if Stance(1)
+		{
+			if Mana(more 94)
 				Spell(HEROICSTRIKE)
 		}
 	}

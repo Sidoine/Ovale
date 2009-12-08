@@ -27,6 +27,7 @@ Define(DEMONICEMPOWERMENT 47193)
 Define(INCINERATE 29722)
 Define(DECIMATION 63167)
 Define(CHAOSBOLT 50796)
+Define(MOLTENCORE 47383)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -74,7 +75,7 @@ if TargetLifePercent(less 25) and Level(more 76) and {TalentPoints(TALENTDECIMAT
 		 and TalentPoints(TALENTEMBERSTORM less 1) Spell(DRAINSOUL)
 
 Spell(CHAOSBOLT)
-if TalentPoints(TALENTEMBERSTORM more 0) Spell(INCINERATE)
+if TalentPoints(TALENTEMBERSTORM more 0) or BuffPresent(MOLTENCORE) Spell(INCINERATE)
 Spell(SHADOWBOLT)
 }
 

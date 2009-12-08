@@ -34,7 +34,7 @@ Define(TALENTABOMINATIONMIGHT 2105)
 Define(RAISEDEAD 46584)
 Define(HORNOFWINTER 57330)
 
-AddCheckBox(rolldes SpellName(GLYPHDISEASE))
+AddCheckBox(rolldes SpellName(GLYPHDISEASE) default)
 
 SpellAddTargetDebuff(ICYTOUCH FROSTFEVER=15)
 SpellAddTargetDebuff(PLAGUESTRIKE BLOODPLAGUE=15)
@@ -85,7 +85,7 @@ AddIcon help=main
 		}
 	}
 	
-	if CheckBoxOn(rolldes) and TalentPoints(TALENTABOMINATIONMIGHT more 0) and BuffExpires(ABOMINATIONMIGHT 0)
+	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) and TalentPoints(TALENTABOMINATIONMIGHT more 0) and BuffExpires(ABOMINATIONMIGHT 0)
 		Spell(DEATHSTRIKE)
 		
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
