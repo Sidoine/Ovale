@@ -62,7 +62,7 @@ AddIcon help=main
        if TalentPoints(TALENTCHILLEDTOTHEBONES more 0)
        {
               #Frost spec
-              Spell(SUMMONWATERELEMENTAL)
+              if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
               if TargetClassification(worldboss) Spell(DEEPFREEZE)
               Spell(FROSTBOLT)
        }

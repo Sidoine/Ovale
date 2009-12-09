@@ -49,7 +49,7 @@ AddListItem(fire wrath SpellName(TOTEMOFWRATH))
 AddListItem(fire nova SpellName(FIRENOVATOTEM))
 AddListItem(fire tong SpellName(FLAMETONGTOTEM))
 AddListItem(fire frost SpellName(FROSTRESISTANCETOTEM))
-AddListItem(fire magma SpellName(MAGMATOTEM))
+AddListItem(fire magma SpellName(MAGMATOTEM) default)
 AddListItem(fire searing SpellName(SEARINGTOTEM))
 AddListItem(water clean SpellName(CLEANSINGTOTEM))
 AddListItem(water fire SpellName(FIRERESISTANCETOTEM))
@@ -99,15 +99,17 @@ AddIcon help=main
 	{
 		if WeaponEnchantExpires(mainhand 2) Spell(WINDFURYWEAPON)
 		if WeaponEnchantExpires(offhand 2) Spell(FLAMETHONG)
-		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
-		if TargetDebuffExpires(FLAMESHOCK 1.5 haste=spell mine=1) and 1.5s before Spell(LAVALASH)
-			Spell(FLAMESHOCK)
-		if TargetDebuffPresent(FLAMESHOCK 5 mine=1) Spell(EARTHSHOCK)
-		if BuffExpires(LIGHTNINGSHIELD 0) Spell(LIGHTNINGSHIELD)
-		Spell(STORMSTRIKE)
-		if TargetDebuffPresent(FLAMESHOCK 1.5 haste=spell mine=1) Spell(LAVALASH)
+		
 		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+		if TargetDebuffPresent(STORMSTRIKE) Spell(EARTHSHOCK)
+		Spell(STORMSTRIKE)
+		Spell(EARTHSHOCK)
+		if TotemExpires(fire) and List(fire magma) Spell(MAGMATOTEM)
+		if BuffExpires(LIGHTNINGSHIELD 0) Spell(LIGHTNINGSHIELD)
+		Spell(LAVALASH)
+		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=3) Spell(CHAINLIGHTNING priority=2)
+		if BuffPresent(MAELSTROMWEAPON stacks=3) Spell(LIGHTNINGBOLT priority=2)
 	}
 }
 

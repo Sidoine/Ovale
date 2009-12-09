@@ -905,11 +905,18 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 						local newAura = self:GetAura(target, filter, spell)
 						newAura.mine = true
 						local duration = spellData
+						local stacks = duration
 						local spellName = self:GetSpellInfoOrNil(spell)
 						if spellName and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
 							duration = self.spellInfo[spellName].duration
 						end
-						if newAura.ending and newAura.ending >= endCast then
+						if stacks<0 and newAura.ending then
+							newAura.stacks = newAura.stacks + stacks
+							if newAura.stacks<=0 then
+								newAura.stacks = 0
+								newAura.ending = 0
+							end 
+						elseif newAura.ending and newAura.ending >= endCast then
 							newAura.ending = endCast + duration
 							newAura.stacks = newAura.stacks + 1
 						else
