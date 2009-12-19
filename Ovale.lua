@@ -231,7 +231,15 @@ local options =
 						-- Ovale:Print("code change")
 					end,
 					width = "full"
-				},
+				}
+			}
+		},
+		actions =
+		{
+			name = "Actions",
+			type = "group",
+			args = 
+			{
 				show =
 				{
 					order = -1,
@@ -316,10 +324,10 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 					local otherDebuff = self:GetOtherDebuffs(spellName)
 					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
 						otherDebuff[destGUID] = Ovale.maintenant + self.spellInfo[spellName].duration
-					--	self:Print("ajout de "..spellName.." à "..destGUID)
+						self:Print("ajout de "..spellName.." à "..destGUID)
 					elseif event == "SPELL_AURA_REMOVED" then
-					--	otherDebuff[destGUID] = nil						
-					--	self:Print("suppression de "..spellName.." de "..destGUID)
+						otherDebuff[destGUID] = nil						
+						self:Print("suppression de "..spellName.." de "..destGUID)
 					end	
 				end
 			end
@@ -478,7 +486,8 @@ function Ovale:FirstInit()
 	
 	
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	self.AceConfig:RegisterOptionsTable("Ovale", options.args.code, "Ovale")
+	self.AceConfig:RegisterOptionsTable("Ovale", options.args.code)
+	self.AceConfig:RegisterOptionsTable("Ovale Actions", options.args.actions, "Ovale")
 	self.AceConfig:RegisterOptionsTable("Ovale Profile", options.args.profile)
 	self.AceConfig:RegisterOptionsTable("Ovale Apparence", options.args.apparence)
 
@@ -847,10 +856,12 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 --	end
 
 	local newSpellInfo = nil
-	if spellName then
-		newSpellInfo = self.spellInfo[spellName]
+	if not spellName then
+		return
 	end
-
+	
+	newSpellInfo = self.spellInfo[spellName]
+	
 	if startCast>Ovale.maintenant then
 		local _, _, _, cost = GetSpellInfo(spellName)
 		self.state.mana = self.state.mana - cost

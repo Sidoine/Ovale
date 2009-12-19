@@ -14,11 +14,14 @@ Define(Focus 14751) # Inner Focus
 Define(Dispersion 47585)
 Define(Shadowfiend 34433)
 
+AddCheckBox(multidot L(multidot))
+
 # Spells with cast time that add buff or debuff
 SpellAddTargetDebuff(SWP SWP=18)
 SpellInfo(SWP duration=18)
 SpellAddBuff(SWP SW=15)
 SpellAddTargetDebuff(VT VT=15)
+SpellInfo(VT duration=15)
 SpellAddBuff(VT SW=15)
 SpellInfo(MF canStopChannelling=3)
 SpellAddBuff(MF SW=15)
@@ -26,6 +29,7 @@ SpellInfo(MB cd=5.5)
 SpellAddBuff(MB SW=15)
 SpellAddBuff(IF IF=1800)
 SpellAddTargetDebuff(DP DP=24)
+SpellInfo(DP duration=24)
 SpellInfo(Focus cd=180)
 SpellInfo(Dispersion cd=120)
 SpellInfo(Shadowfiend cd=300)
@@ -55,17 +59,23 @@ if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1) and TargetDead
 }
 
 #Refresh VT
-if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) and TargetDeadIn(more 8)
-   Spell(VT)
+unless CheckBoxOn(multidot) and OtherDebuffPresent(VT)
+{
+	if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) and TargetDeadIn(more 8)
+		Spell(VT)
+}
   
 #cast MB if up
 Spell(MB)
   
 #Refresh devouring plague  
-if TargetDebuffExpires(DP 0 mine=1) and TargetDeadIn(more 8)
-    Spell(DP)
+unless CheckBoxOn(multidot) and OtherDebuffPresent(DP)
+{
+	if TargetDebuffExpires(DP 0 mine=1) and TargetDeadIn(more 8)
+		Spell(DP)
+}
 
-if OtherDebuffExpires(SWP)
+if CheckBoxOn(multidot) and OtherDebuffExpires(SWP)
 	Texture(INV_Misc_Coin_01) 
 
 #cast Mind flay if nothing else can be done

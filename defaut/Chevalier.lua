@@ -71,10 +71,12 @@ AddIcon help=main
 				Spell(BLOODSTRIKE)
 			}
 		}
+		if Runes(unholy 1) and Runes(frost 1)
+			Spell(SCOURGESTRIKE)
+			
 		if Runes(unholy 1 nodeath=1) and Runes(frost 1 nodeath=1)
 		{
 			if TalentPoints(TALENTDEATSTRIKE more 0) Spell(DEATHSTRIKE)
-			Spell(SCOURGESTRIKE)
 			Spell(OBLITERATE)
 			Spell(DEATHSTRIKE)
 		}
@@ -116,7 +118,7 @@ AddIcon help=aoe
 
 AddIcon help=cd
 {
-	Spell(BONESHIELD)
+	unless BuffPresent(BONESHIELD) Spell(BONESHIELD)
 	if BuffPresent(FROSTPRESENCE)
 	{
 		Spell(UNBREAKABLEARMOR)

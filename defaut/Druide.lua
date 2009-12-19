@@ -25,6 +25,7 @@ Define(BERSERK 50334)
 Define(CLEARCASTING 16870)
 Define(CLAW 16827)
 Define(STARFALL 48505)
+Define(TRAUMA 46856)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(mangle SpellName(MANGLECAT) default)
@@ -83,35 +84,34 @@ AddIcon help=main
 		if CheckBoxOn(lucioles) and	TargetDebuffExpires(FAERIEFERAL 2) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
 		
-		if ComboPoints(more 4) and Mana(more 70)
-		{
-			if BuffExpires(SAVAGEROAR 5) Spell(SAVAGEROAR)
-			if TargetDebuffExpires(RIP 0 mine=1) and TargetDeadIn(more 7) Spell(RIP)
-		}    
+		unless BuffPresent(BERSERK) if Mana(less 40) Spell(TIGERSFURY)
+			
+		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 1) Spell(SAVAGEROAR)
 		
-		if {3s between BuffExpires(SAVAGEROAR 0) and TargetDebuffExpires(RIP 0)} and ComboPoints(more 2)
-			Spell(SAVAGEROAR)
-		
-		if ComboPoints(less 5)
+		if ComboPoints(more 4)
 		{
-			if Mana(less 30) Spell(TIGERSFURY)
-			if TargetDebuffExpires(MANGLECAT 0 mine=1) and CheckBoxOn(mangle)
-				Spell(MANGLECAT)
-			if TargetDebuffExpires(RAKE 0 mine=1) and Mana(more 34) 
-				Spell(RAKE)
-			if Mana(more 42) and CheckBoxOn(shred) Spell(SHRED)
+			if BuffExpires(SAVAGEROAR 6) and Mana(more 70) and TargetDebuffPresent(RIP 5 mine=1) Spell(SAVAGEROAR)
+			if TargetDebuffExpires(RIP 0 mine=1) and TargetDeadIn(more 6) Spell(RIP)
+		
+			if Mana(more 34)
+			{
+				unless BuffPresent(BERSERK) and {BuffExpires(SAVAGEROAR 8) or TargetDebuffExpires(RIP 10 mine=1)}
+					Spell(FEROCIOUSBITE)
+				if TargetDeadIn(less 7)
+					Spell(FEROCIOUSBITE)
+			}
 		}
-
-		if BuffPresent(CLEARCASTING) and CheckBoxOn(shred) Spell(SHRED)
 		
-		if ComboPoints(more 4) and Mana(more 34)
+		if TargetDebuffExpires(MANGLECAT 0) and TargetDebuffExpires(MANGLEBEAR 0) and TargetDebuffExpires(TRAUMA 0) and CheckBoxOn(mangle)
+			Spell(MANGLECAT)
+		if TargetDebuffExpires(RAKE 0 mine=1) and Mana(more 34) and TargetDeadIn(more 10)
+			Spell(RAKE)
+	
+		if CheckBoxOn(shred)
 		{
-			unless BuffExpires(SAVAGEROAR 8) or TargetDebuffExpires(RIP 8 mine=1)
-				Spell(FEROCIOUSBITE)
-			if TargetDeadIn(less 7)
-				Spell(FEROCIOUSBITE)
-			if Mana(more 90) and CheckBoxOn(shred)
-				Spell(SHRED)
+			if Mana(more 69) or BuffPresent(CLEARCASTING) or TargetDeadIn(less 10) or BuffPresent(BERSERK) 
+					Spell(SHRED)
+			if ComboPoints(less 5) and TargetDebuffExpires(RIP 3 mine=1) Spell(SHRED)
 		}
 	}
 

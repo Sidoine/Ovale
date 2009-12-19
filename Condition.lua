@@ -270,6 +270,9 @@ local function getTargetDead()
 		savedHealth = {}
 	end
 	local newHealth = UnitHealth("target")
+	if UnitHealthMax("target")==1 then
+		return Ovale.maintenant + 10000
+	end
 	if second~=lastSaved and targetGUID then
 		lastSaved = second
 		local mod10 = second % 10
@@ -516,26 +519,37 @@ Ovale.conditions=
 				end
 			end
 			if not minTime then
-				return 0
+				return nil
 			end
 			minTime = minTime - timeBefore
 			return minTime
 		end
-		return 0
+		return nil
 	end,
 	OtherDebuffPresent = function(condition)
 		Ovale:EnableOtherDebuffs()
 		local otherDebuff = Ovale.otherDebuffs[GetSpellInfo(condition[1])]
 		if otherDebuff then
+		--	print("otherDebuff")
 			local maxTime = 0
+			local suppTime = condition[3] or 10
 			for target,expireTime in pairs(otherDebuff) do
+		--		print("target "..target.. " "..expireTime)
 				if target~=UnitGUID("target") then
-					if expireTime > maxTime then
+					if Ovale.maintenant - suppTime > expireTime then
+						otherDebuff[target] = nil
+					elseif expireTime > maxTime then
 						maxTime = expireTime
 					end
 				end
 			end
-			return 0, addTime(maxTime, -condition[2])
+		--	print("maxTime final "..maxTime)
+			if maxTime>0 then
+				local timeBefore = condition[2] or 0
+				return 0, addTime(maxTime, -timeBefore)
+			else
+				return nil
+			end
 		end
 		return nil
 	end,
@@ -711,18 +725,13 @@ Ovale.conditions=
 	end,
 	TotemExpires = function(condition)
 		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])
-		if (totemName==nil) then
+		if not startTime then
 			return 0
 		end
 		if (condition.totem and Ovale:GetSpellInfoOrNil(condition.totem)~=totemName) then
 			return 0
 		end
-		local timeLeft = duration - (Ovale.maintenant - startTime)
-		if (condition[2] and timeLeft<condition[2]) then
-			return 0
-		else
-			return timeLeft
-		end
+		return addTime(startTime + duration, -(condition[2] or 0))
 	end,
 	Tracking = function(condition)
 		local what = Ovale:GetSpellInfoOrNil(condition[1])

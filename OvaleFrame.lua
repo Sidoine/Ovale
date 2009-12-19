@@ -385,7 +385,7 @@ do
 			self.skinGroup.SkinID = Ovale.db.profile.SkinID
 			self.skinGroup.Gloss = Ovale.db.profile.Gloss
 			self.skinGroup.Backdrop = Ovale.db.profile.Backdrop
-			self.skinGroup.Colors = Ovale.db.profile.Colors
+			self.skinGroup.Colors = Ovale.db.profile.Colors or {}
 			LBF:RegisterSkinCallback("Ovale", self.OnSkinChanged, self)
 		end
 

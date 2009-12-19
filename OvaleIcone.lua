@@ -85,6 +85,7 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 			self.shortcut:SetText(actionShortcut)
 		else
 			self.shortcut:Hide()
+			self.shortcut:SetText("")
 		end
 		
 		-- L'indicateur de portée
