@@ -157,9 +157,9 @@ do
 			end
 			
 			if (node.params.nocd and node.params.nocd == 1 and start~=nil and start>Ovale.maintenant+1.5) then
-				action.icons[1]:Update(nil)
+				action.icons[1]:Update(element, nil)
 			else
-				action.icons[1]:Update(start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				action.icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
 			end
 			
@@ -207,9 +207,9 @@ do
 					end
 					Ovale:AddSpellToStack(spellName, start, start + castTime, nextCast)
 					start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
-					action.icons[2]:Update(start, Ovale:GetActionInfo(element))
+					action.icons[2]:Update(element, start, Ovale:GetActionInfo(element))
 				else
-					action.icons[2]:Update(nil)
+					action.icons[2]:Update(element, nil)
 				end
 			end
 		end

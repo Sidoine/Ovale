@@ -1,7 +1,7 @@
 ﻿local LBF = LibStub("LibButtonFacade", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
-local function Update(self, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
 				
 		
@@ -19,6 +19,7 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 			if (minAttente == Ovale.maintenant) then
 				self.cd:Hide()
 			else
+				self.lastSound = nil
 				self.cd:Show()
 				self.cd:SetCooldown(self.debutAction, self.finAction - self.debutAction);
 			end
@@ -47,6 +48,11 @@ local function Update(self, minAttente, actionTexture, actionInRange, actionCool
 		
 		if (minAttente==Ovale.maintenant) then
 			self.cd:Hide()
+			if element.params.sound and not self.lastSound then
+				self.lastSound = element.params.sound
+				print("Play" .. self.lastSound)
+				PlaySoundFile(self.lastSound)
+			end
 		end
 		
 		-- La latence
