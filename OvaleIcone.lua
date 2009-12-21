@@ -48,9 +48,13 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		
 		if (minAttente==Ovale.maintenant) then
 			self.cd:Hide()
-			if element.params.sound and not self.lastSound then
+		end
+
+		if element.params.sound and not self.lastSound then
+			local delay = self.soundtime or 0.5
+			if Ovale.maintenant>=minAttente - delay then
 				self.lastSound = element.params.sound
-				print("Play" .. self.lastSound)
+			--	print("Play" .. self.lastSound)
 				PlaySoundFile(self.lastSound)
 			end
 		end

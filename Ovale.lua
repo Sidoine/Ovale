@@ -324,10 +324,10 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 					local otherDebuff = self:GetOtherDebuffs(spellName)
 					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
 						otherDebuff[destGUID] = Ovale.maintenant + self.spellInfo[spellName].duration
-						self:Print("ajout de "..spellName.." à "..destGUID)
+					--	self:Print("ajout de "..spellName.." à "..destGUID)
 					elseif event == "SPELL_AURA_REMOVED" then
 						otherDebuff[destGUID] = nil						
-						self:Print("suppression de "..spellName.." de "..destGUID)
+					--	self:Print("suppression de "..spellName.." de "..destGUID)
 					end	
 				end
 			end
@@ -864,7 +864,9 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 	
 	if startCast>Ovale.maintenant then
 		local _, _, _, cost = GetSpellInfo(spellName)
-		self.state.mana = self.state.mana - cost
+		if cost then
+			self.state.mana = self.state.mana - cost
+		end
 	end
 	
 	self.attenteFinCast = nextCast
