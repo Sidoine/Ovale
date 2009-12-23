@@ -1489,7 +1489,7 @@ function Ovale:UpdateVisibility()
 		self.frame:Hide()
 	end	
 	
-	if Ovale.db.profile.apparence.targetHostileOnly and (UnitIsDead("target") or UnitCanCooperate("target", "player")) then
+	if Ovale.db.profile.apparence.targetHostileOnly and (UnitIsDead("target") or not UnitCanAttack("player", "target")) then
 		self.frame:Hide()
 	end
 end
