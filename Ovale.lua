@@ -806,7 +806,12 @@ function Ovale:GetAura(target, filter, spellId)
 		if (unitCaster=="player" or not myAura.mine) and name == auraName and icon==auraIcon then
 			myAura.mine = (unitCaster == "player")
 			myAura.start = expirationTime - duration
-			myAura.ending = expirationTime
+			if expirationTime>0 then
+				myAura.ending = expirationTime
+
+			else
+				myAura.ending = nil
+			end
 			if count and count>0 then
 				myAura.stacks = count
 			else
