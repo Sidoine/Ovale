@@ -204,7 +204,7 @@ local function GetTargetAura(condition, filter, target)
 		stacks = 1
 	end
 	local spellId = condition[1]
-	local aura = Ovale:GetAura(target, filter, spellId)
+	local aura = Ovale:GetAura(target, filter, spellId, condition.forceduration)
 	-- if Ovale.trace then
 	--	Ovale:Print("GetTargetAura = start = ".. nilstring(aura.start) .. " end = "..nilstring(aura.ending).." stacks = " ..nilstring(aura.stacks).."/"..stacks)
 	-- end
@@ -612,6 +612,10 @@ Ovale.conditions=
 			return nil
 		end
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
+	end,
+	TargetDispellableBuffPresent = function(condition)
+		
+		return nil
 	end,
 	-- Test if a buff is present on the target
 	-- 1 : buff spell id

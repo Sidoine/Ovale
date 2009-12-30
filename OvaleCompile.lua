@@ -143,8 +143,8 @@ local function ParseBefore(a,b)
 	return AddNode(newNode)
 end
 
-local function ParseBetween(t,a,b)
-	local newNode = {type="between", time=tonumber(t), a=node[tonumber(a)], b=node[tonumber(b)]}
+local function ParseBetween(comp,t,a,b)
+	local newNode = {type="between", comparison=comp, time=tonumber(t), a=node[tonumber(a)], b=node[tonumber(b)]}
 	return AddNode(newNode)
 end
 
@@ -211,7 +211,7 @@ local function ParseAddIcon(params, text)
 	while (1==1) do
 		local was = text
 		text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
-		text = string.gsub(text, "(%d+%.?%d*)s%s+between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
+		text = string.gsub(text, "([lesmor]+)%s+than%s+(%d+%.?%d*)s%s+between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 		text = string.gsub(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)

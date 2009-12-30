@@ -42,3 +42,4 @@ L["Affiche les deux prochains sorts et pas uniquement le suivant"] = true
 L["Défilement"] = true
 L["Les icônes se déplacent"] = true
 L["multidot"] = "Multicible pour DoTs"
+L["buff"] = "Améliorations"

@@ -59,7 +59,7 @@ SpellInfo(SHRED combo=1)
 SpellInfo(SAVAGEROAR combo=-5)
 SpellInfo(RIP combo=-5 duration=12)
 SpellInfo(FEROCIOUSBITE combo=-5)
-SpellInfo(RIP glyph=GLYPHOFSHRED forceduration=1 addduration=6)
+SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
 SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
 
 AddIcon help=main

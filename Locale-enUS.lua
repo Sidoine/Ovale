@@ -42,3 +42,4 @@ L["Affiche les deux prochains sorts et pas uniquement le suivant"] = "Display tw
 L["Défilement"] = "Scrolling"
 L["Les icônes se déplacent"] = "Scroll the icons"
 L["multidot"] = "Damage Over Time on multiple targets"
+L["buff"] = "Buffs"

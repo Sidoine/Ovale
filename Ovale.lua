@@ -782,7 +782,7 @@ function Ovale:AddRune(time, type, value)
 	end
 end
 
-function Ovale:GetAura(target, filter, spellId)
+function Ovale:GetAura(target, filter, spellId, forceduration)
 	if not self.aura[target] then
 		self.aura[target] = {}
 	end
@@ -815,8 +815,12 @@ function Ovale:GetAura(target, filter, spellId)
 			myAura.mine = (unitCaster == "player")
 			myAura.start = expirationTime - duration
 			
-			if self.spellInfo[name] and self.spellInfo[name].forceduration then
-				duration = self.spellInfo[name].duration
+			if self.spellInfo[name] and forceduration then
+				if self.spellInfo[name].duration then
+					duration = self.spellInfo[name].duration
+				else
+					duration = forceduration
+				end
 			end
 			
 			if expirationTime>0 then
@@ -1281,17 +1285,32 @@ function Ovale:CalculerMeilleureAction(element)
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
 		if (tempsA==nil) then
 			if Ovale.trace then Ovale:Print(element.type.." return nil") end
-			return nil
+			if element.comparison == "more"	then
+				return 0
+			else
+				return nil
+			end
 		end
 		local tempsB = Ovale:CalculerMeilleureAction(element.b)
 		if (tempsB==nil) then
 			if Ovale.trace then Ovale:Print(element.type.." return nil") end
-			return nil
+			if element.comparison == "more"	then
+				return 0
+			else
+				return nil
+			end
 		end
-		if (tempsA>tempsB and tempsA-tempsB<element.time) then
+		local diff
+		if tempsA>tempsB then
+			diff = tempsA - tempsB
+		else
+			diff = tempsB - tempsA
+		end
+		
+		if element.comparison == "more" and diff>element.time then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
-		elseif (tempsB>tempsA and tempsB-tempsA<element.time) then
+		elseif element.comparison == "less" and diff<element.time then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
 		end
