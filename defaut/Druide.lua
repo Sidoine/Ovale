@@ -26,6 +26,8 @@ Define(CLEARCASTING 16870)
 Define(CLAW 16827)
 Define(STARFALL 48505)
 Define(TRAUMA 46856)
+Define(GLYPHOFSHRED 54815)
+Define(GLYPHOFRIP 54818)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(mangle SpellName(MANGLECAT) default)
@@ -55,8 +57,10 @@ SpellInfo(MANGLECAT combo=1)
 SpellInfo(RAKE combo=1)
 SpellInfo(SHRED combo=1)
 SpellInfo(SAVAGEROAR combo=-5)
-SpellInfo(RIP combo=-5)
+SpellInfo(RIP combo=-5 duration=12)
 SpellInfo(FEROCIOUSBITE combo=-5)
+SpellInfo(RIP glyph=GLYPHOFSHRED forceduration=1 addduration=6)
+SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
 
 AddIcon help=main
 {

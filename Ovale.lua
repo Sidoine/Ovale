@@ -291,10 +291,14 @@ end
 
 function Ovale:CHARACTER_POINTS_CHANGED()
 	self:RemplirListeTalents()
+--	self:Print("CHARACTER_POINTS_CHANGED")
+	self:CompileAll()
 end
 
 function Ovale:PLAYER_TALENT_UPDATE()
 	self:RemplirListeTalents()
+--	self:Print("PLAYER_TALENT_UPDATE")
+	self:CompileAll()
 end
 
 function Ovale:SPELLS_CHANGED()
@@ -440,11 +444,15 @@ function Ovale:UNIT_AURA(event, unit)
 	end
 end
 
+function Ovale:CompileAll()
+	self.masterNodes = self:Compile(self.db.profile.code)
+	self:UpdateFrame()
+end
+
 function Ovale:HandleProfileChanges()
 	if (self.firstInit) then
 		if (self.db.profile.code) then
-			self.masterNodes = self:Compile(self.db.profile.code)
-			self:UpdateFrame()
+			self:CompileAll()
 		end
 	end
 end
@@ -806,8 +814,13 @@ function Ovale:GetAura(target, filter, spellId)
 		if (unitCaster=="player" or not myAura.mine) and name == auraName and icon==auraIcon then
 			myAura.mine = (unitCaster == "player")
 			myAura.start = expirationTime - duration
+			
+			if self.spellInfo[name] and self.spellInfo[name].forceduration then
+				duration = self.spellInfo[name].duration
+			end
+			
 			if expirationTime>0 then
-				myAura.ending = expirationTime
+				myAura.ending = myAura.start + duration
 
 			else
 				myAura.ending = nil

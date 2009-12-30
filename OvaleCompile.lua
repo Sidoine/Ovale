@@ -65,13 +65,46 @@ local function ParseSpellAddTargetDebuff(params)
 	return ""
 end
 
+local function HasGlyph(spellId)
+	for i = 1, GetNumGlyphSockets() do
+		local enalbled, glypType, glyphSpellID = GetGlyphSocketInfo(i)
+		if (glyphSpellID == spellId) then
+			return true
+		end
+	end
+	return false
+end
+
+local function HasTalent(talentId)
+	if not Ovale.listeTalentsRemplie then
+		Ovale:RemplirListeTalents()
+	end
+	if Ovale.listeTalentsRemplie then
+		return Ovale.pointsTalent[talentId]>0
+	else
+		return false
+	end
+end
+
 local function ParseSpellInfo(params)
 	local paramList = ParseParameters(params)
 	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
 	if (spell) then
+		if paramList.glyph and not HasGlyph(paramList.glyph) then
+			return ""
+		end
+		if paramList.talent and not HasTalent(paramList.talent) then
+			return ""
+		end
 		local spellInfo = Ovale:GetSpellInfo(spell)
 		for k,v in pairs(paramList) do
-			spellInfo[k] = v
+			if k == "addduration" then
+				spellInfo.duration = spellInfo.duration + v
+			elseif k == "addcd" then
+				spellInfo.cd = spellInfo.cd + v
+			else
+				spellInfo[k] = v
+			end
 		end
 	end
 	return ""

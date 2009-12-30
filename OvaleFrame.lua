@@ -350,6 +350,7 @@ do
 		self.localstatus = {}
 		self.actions = {}
 		
+		
 		self.frame = frame
 		frame.obj = self
 		frame:SetWidth(100)
@@ -362,8 +363,12 @@ do
 		frame:SetScript("OnMouseUp", frameOnMouseUp)
 		frame:SetScript("OnEnter", frameOnEnter)
 		frame:SetScript("OnLeave", frameOnLeave)
-		frame:SetScript("OnUpdate", frameOnUpdate)		
+	--	frame:SetScript("OnUpdate", frameOnUpdate)		
 		frame:SetScript("OnHide",frameOnClose)
+
+		self.updateFrame = CreateFrame("Frame")
+		self.updateFrame:SetScript("OnUpdate", frameOnUpdate)
+		self.updateFrame.obj = self
 		
 		self.barre = self.frame:CreateTexture();
 		self.barre:SetTexture(0,0.8,0)
