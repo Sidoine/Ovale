@@ -35,6 +35,7 @@ Ovale.otherDebuffs = {}
 Ovale.score = 0
 Ovale.maxScore = 0
 Ovale.serial = 0
+Ovale.counter = {}
 
 Ovale.arbre = {}
 
@@ -545,6 +546,18 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 	-- self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
 	if unit=="player" and self.enCombat then
 		-- self.lastSpellCast=name
+		if self.spellInfo[name] then
+			if self.spellInfo[name].resetcounter then
+				self.counter[self.spellInfo[name].resetcounter] = 0
+			end
+			if self.spellInfo[name].inccounter then
+				local cname = self.spellInfo[name].inccounter
+				if not self.counter[cname] then
+					self.counter[cname] = 0
+				end
+				self.counter[cname] = self.counter[cname] + 1
+			end
+		end
 		if (not self.spellInfo[name] or not self.spellInfo[name].toggle) and self.scoreSpell[name] then
 			local scored = self.frame:GetScore(name)
 			if scored~=nil then

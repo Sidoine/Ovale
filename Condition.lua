@@ -402,6 +402,9 @@ Ovale.conditions=
 		local points = Ovale.state.combo
 		return compare(points, condition[1], condition[2])
 	end,
+	Counter = function(condition)
+		return compare(Ovale.counter[condition[1]], condition[2], condition[3])
+	end,
 	DebuffExpires = function(condition)
 		local start, ending = GetTargetAura(condition, "HARMFUL", "player")
 		local tempsMax = avecHate(condition[2], condition.haste)
