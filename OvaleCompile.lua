@@ -143,13 +143,23 @@ local function ParseBefore(a,b)
 	return AddNode(newNode)
 end
 
-local function ParseBetween(comp,t,a,b)
-	local newNode = {type="between", comparison=comp, time=tonumber(t), a=node[tonumber(a)], b=node[tonumber(b)]}
+local function ParseBetween(a,b)
+	local newNode = {type="between", a=node[tonumber(a)], b=node[tonumber(b)]}
+	return AddNode(newNode)
+end
+
+local function ParseFromUntil(a,b)
+	local newNode = {type="fromuntil", a=node[tonumber(a)], b=node[tonumber(b)]}
 	return AddNode(newNode)
 end
 
 local function ParseOr(a,b)
 	local newNode = {type="or", a=node[tonumber(a)], b=node[tonumber(b)]}
+	return AddNode(newNode)
+end
+
+local function ParseCompare(comp,t,a)
+	local newNode = {type="compare", comparison=comp, time=tonumber(t), a=node[tonumber(a)]}
 	return AddNode(newNode)
 end
 
@@ -211,13 +221,17 @@ local function ParseAddIcon(params, text)
 	while (1==1) do
 		local was = text
 		text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
-		text = string.gsub(text, "([lesmor]+)%s+than%s+(%d+%.?%d*)s%s+between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
+		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
+		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
 		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 		text = string.gsub(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)
 		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
 		text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
 		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		text = string.gsub(text, "(more)%s+than%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)
+		text = string.gsub(text, "(less)%s+than%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)		
+		
 		if (was == text) then
 			break
 		end
@@ -355,7 +369,11 @@ function Ovale:DebugNode(node)
 	elseif (node.type == "before") then
 		text = node.time .. "s before "..self:DebugNode(node.a)
 	elseif (node.type == "between") then
-		text = node.time .. "s between "..self:DebugNode(node.a).." and "..self:DebugNode(node.b)
+		text = "between "..self:DebugNode(node.a).." and "..self:DebugNode(node.b)
+	elseif (node.type == "fromuntil") then
+		text = "from "..self:DebugNode(node.a).." until "..self:DebugNode(node.b)
+	elseif (node.type == "compare") then
+		text = node.comparison.." than "..node.time.."s "..self:DebugNode(node.a)
 	else
 		text = "#unknown node type#"
 	end

@@ -3,8 +3,8 @@
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 3.3.7
-## OptionalDeps: Ace3, ButtonFacade, Recount
+## Version: 3.3.8
+## OptionalDeps: Ace3, ButtonFacade, Recount, LibBabble-CreatureType-3.0
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
 ## X-Category: Combat

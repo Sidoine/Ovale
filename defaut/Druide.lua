@@ -66,7 +66,8 @@ AddIcon help=main
 {
 	if Stance(1) # bear
 	{
-		Spell(MANGLEBEAR)
+		unless TargetDebuffExpires(LACERATE 4) and TargetDebuffPresent(LACERATE)
+			Spell(MANGLEBEAR)
 		
 		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
 			Spell(LACERATE)

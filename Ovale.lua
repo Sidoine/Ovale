@@ -782,6 +782,12 @@ function Ovale:AddRune(time, type, value)
 	end
 end
 
+function Ovale:Log(text)
+	if self.trace then
+		self:Print(text)
+	end
+end
+
 function Ovale:GetAura(target, filter, spellId, forceduration)
 	if not self.aura[target] then
 		self.aura[target] = {}
@@ -815,17 +821,8 @@ function Ovale:GetAura(target, filter, spellId, forceduration)
 			myAura.mine = (unitCaster == "player")
 			myAura.start = expirationTime - duration
 			
-			if self.spellInfo[name] and forceduration then
-				if self.spellInfo[name].duration then
-					duration = self.spellInfo[name].duration
-				else
-					duration = forceduration
-				end
-			end
-			
 			if expirationTime>0 then
-				myAura.ending = myAura.start + duration
-
+				myAura.ending = expirationTime
 			else
 				myAura.ending = nil
 			end
@@ -1279,26 +1276,17 @@ function Ovale:CalculerMeilleureAction(element)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		return addTime(startA, -element.time), addTime(endA, -element.time)
 	elseif (element.type == "between") then
-		if (Ovale.trace) then
-			self:Print(element.time.."s between")
-		end
+		self:Log("between")
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		if (tempsA==nil) then
-			if Ovale.trace then Ovale:Print(element.type.." return nil") end
-			if element.comparison == "more"	then
-				return 0
-			else
-				return nil
-			end
-		end
 		local tempsB = Ovale:CalculerMeilleureAction(element.b)
-		if (tempsB==nil) then
+		if tempsB==nil and tempsA==nil then
+			Ovale:Log("diff returns 0 because the two nodes are nil")
+			return 0
+		end
+		
+		if tempsA==nil or tempsB==nil then
 			if Ovale.trace then Ovale:Print(element.type.." return nil") end
-			if element.comparison == "more"	then
-				return 0
-			else
-				return nil
-			end
+			return nil
 		end
 		local diff
 		if tempsA>tempsB then
@@ -1306,11 +1294,28 @@ function Ovale:CalculerMeilleureAction(element)
 		else
 			diff = tempsB - tempsA
 		end
-		
-		if element.comparison == "more" and diff>element.time then
+		Ovale:Log("diff returns "..diff)
+		return diff
+	elseif element.type == "fromuntil" then
+		self:Log("fromuntil")
+		local tempsA = Ovale:CalculerMeilleureAction(element.a)
+		if (tempsA==nil) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
+			return nil
+		end
+		local tempsB = Ovale:CalculerMeilleureAction(element.b)
+		if (tempsB==nil) then
+			if Ovale.trace then Ovale:Print(element.type.." return nil") end
+			return nil
+		end
+		return tempsB - tempsA
+	elseif element.type == "compare" then
+		self:Log("compare "..element.comparison.." "..element.time)
+		local tempsA = Ovale:CalculerMeilleureAction(element.a)
+		if element.comparison == "more" and (not tempsA or tempsA>element.time) then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
-		elseif element.comparison == "less" and diff<element.time then
+		elseif element.comparison == "less" and tempsA and tempsA<element.time then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
 		end

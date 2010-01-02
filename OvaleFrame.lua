@@ -156,7 +156,7 @@ do
 				start = actionCooldownStart + actionCooldownDuration
 			end
 			
-			if (node.params.nocd and node.params.nocd == 1 and start~=nil and start>Ovale.maintenant+1.5) then
+			if (node.params.nocd and start~=nil and Ovale.maintenant<start-node.params.nocd) then
 				action.icons[1]:Update(element, nil)
 			else
 				action.icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -173,7 +173,7 @@ do
 				action.waitStart = nil
 			end
 			
-			if Ovale.db.profile.apparence.moving then
+			if Ovale.db.profile.apparence.moving and start then
 				local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
 				if top<0 then
 					top = 0

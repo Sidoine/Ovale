@@ -204,12 +204,23 @@ local function GetTargetAura(condition, filter, target)
 		stacks = 1
 	end
 	local spellId = condition[1]
-	local aura = Ovale:GetAura(target, filter, spellId, condition.forceduration)
-	-- if Ovale.trace then
-	--	Ovale:Print("GetTargetAura = start = ".. nilstring(aura.start) .. " end = "..nilstring(aura.ending).." stacks = " ..nilstring(aura.stacks).."/"..stacks)
-	-- end
+	local aura = Ovale:GetAura(target, filter, spellId)
+	if Ovale.trace then
+		Ovale:Print("GetTargetAura = start = ".. nilstring(aura.start) .. " end = "..nilstring(aura.ending).." stacks = " ..nilstring(aura.stacks).."/"..stacks)
+	end
+	
 	if (not condition.mine or aura.mine) and aura.stacks>=stacks then
-		return aura.start, aura.ending
+		local ending
+		if condition.forceduration then
+			if Ovale.spellInfo[name] and Ovale.spellInfo[name].duration then
+				ending = aura.start + Ovale.spellInfo[name].duration
+			else
+				ending = aura.start + condition.forceduration
+			end
+		else
+			ending = aura.ending
+		end
+		return aura.start, ending
 	else
 		return 0,0
 	end
