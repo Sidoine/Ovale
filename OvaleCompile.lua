@@ -231,6 +231,8 @@ local function ParseAddIcon(params, text)
 		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
 		text = string.gsub(text, "(more)%s+than%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)
 		text = string.gsub(text, "(less)%s+than%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)		
+		text = string.gsub(text, "(at least)%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)
+		text = string.gsub(text, "(at most)%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)		
 		
 		if (was == text) then
 			break

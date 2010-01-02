@@ -1318,6 +1318,12 @@ function Ovale:CalculerMeilleureAction(element)
 		elseif element.comparison == "less" and tempsA and tempsA<element.time then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
+		elseif element.comparison == "at most" and tempsA and tempsA<=element.time then
+			if Ovale.trace then Ovale:Print(element.type.." return 0") end
+			return 0
+		elseif element.comparison == "at least" and tempsA and tempsA>=element.time then
+			if Ovale.trace then Ovale:Print(element.type.." return 0") end
+			return 0
 		end
 		return nil
 	elseif (element.type == "and" or element.type == "if") then
