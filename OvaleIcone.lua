@@ -1,5 +1,6 @@
 ﻿local LBF = LibStub("LibButtonFacade", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+local RANGE_INDICATOR = "●";
 
 local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
