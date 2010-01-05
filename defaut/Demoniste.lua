@@ -28,6 +28,7 @@ Define(INCINERATE 29722)
 Define(DECIMATION 63167)
 Define(CHAOSBOLT 50796)
 Define(MOLTENCORE 47383)
+Define(GLYPHOFCONFLAGRATE 56235)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -47,6 +48,8 @@ SpellAddTargetDebuff(IMMOLATE IMMOLATE=15)
 SpellAddBuff(SHADOWBOLT SHADOWEMBRACE=12)
 SpellAddBuff(INCINERATE MOLTENCORE=-1)
 SpellAddBuff(IMMOLATE MOLTENCORE=-1)
+SpellAddTargetDebuff(CONFLAGRATE IMMOLATE=0)
+SpellAddTargetDebuff(CONFLAGRATE glyph=GLYPHOFCONFLAGRATE)
 
 ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRATE CURSEDOOM CURSETONGUES CURSEWEAKNESS
 	CURSEAGONY CORRUPTION SOULFIRE DRAINSOUL INCINERATE SHADOWBOLT)
@@ -57,8 +60,12 @@ if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadI
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
 if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
 if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(UNSTABLEAFFLICTION)
-if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffExpires(IMMOLATE 3 mine=1)
-   and TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
+if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffPresent(IMMOLATE mine=1)
+{
+	if TargetDebuffExpires(IMMOLATE 3 mine=1) or Glyph(GLYPHOFCONFLAGRATE)
+		Spell(CONFLAGRATE)
+}
+
 if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and TargetDebuffExpires(UNSTABLEAFFLICTION 0 mine=1) and
 		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} and TargetDeadIn(more 8)
 			Spell(IMMOLATE)
