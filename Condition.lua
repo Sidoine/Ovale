@@ -189,6 +189,33 @@ local function nilstring(text)
 	end
 end
 
+local function GetManaTime(mana, withBerserker)
+	local _,className = UnitClass("player")
+	if (className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3)) then
+		local current = Ovale.state.mana
+		local rate= 10
+		if (className == "ROGUE") then
+			local rush = Ovale:GetSpellInfoOrNil(13750)
+			if UnitBuff("player", rush) then
+				rate = rate * 2
+			end
+		elseif withBerserker then
+			local berserk = Ovale:GetSpellInfoOrNil(50334)
+			if UnitBuff("player", berserk) then
+				mana = mana/2
+			end
+		end
+		local limit = math.ceil((mana - current) / rate + Ovale.currentTime)
+		return limit
+	else
+		if Ovale.state.mana>=mana then
+			return Ovale.currentTime
+		else
+			return nil
+		end
+	end
+end
+
 
 -- Recherche un aura sur la cible et récupère sa durée et le nombre de stacks
 -- return start, ending, stacks
@@ -415,6 +442,14 @@ Ovale.conditions=
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
 	end,
+	EffectiveMana = function(condition)
+		local limit = GetManaTime(condition[2], true)
+		if condition[1]=="more" then
+			return limit, nil
+		else
+			return 0,limit
+		end
+	end,
 	Glyph = function(condition)
 		local present = false
 		for i = 1, GetNumGlyphSockets() do
@@ -484,34 +519,12 @@ Ovale.conditions=
 	-- 1 : "less" or "more"
 	-- 2 : the mana/energy/rage... limit
 	Mana = function(condition)
-		if (condition[1] == "more") then
-			local _,className = UnitClass("player")
-			if (className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3)) then
-				local current = Ovale.state.mana
-				if (current > condition[2]) then
-					if condition[1]=="more"  then
-						return 0
-					else
-						return nil
-					end
-				else
-					local rate= 10
-					if (className == "ROGUE") then
-						local rush = Ovale:GetSpellInfoOrNil(13750)
-						if UnitBuff("player", rush) then
-							rate = rate * 2
-						end
-					end
-					local limit = math.ceil((condition[2] - current) / rate + Ovale.maintenant)
-					if condition[1]=="more" then
-						return limit
-					else
-						return 0, limit
-					end
-				end
-			end
+		local limit = GetManaTime(condition[2], false)
+		if condition[1]=="more" then
+			return limit, nil
+		else
+			return 0,limit
 		end
-		return compare(Ovale.state.mana, condition[1], condition[2])
 	end,
 	ManaPercent = function(condition)
 		return compare(UnitPower("player")/UnitPowerMax("player"), condition[1], condition[2]/100)
@@ -615,6 +628,9 @@ Ovale.conditions=
 		else
 			return nil
 		end
+	end,
+	Stealthed = function(condition)
+		return testbool(IsStealthed(), condition[1])
 	end,
 	-- Test how many talent points has been spent in a talent
 	-- 1 : the talent identifier (use /script print(Ovale.talentNameToId["Talent name"]) to retreive)

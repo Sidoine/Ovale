@@ -13,6 +13,8 @@ Define(IF 48168) # Inner Fire
 Define(Focus 14751) # Inner Focus
 Define(Dispersion 47585)
 Define(Shadowfiend 34433)
+Define(Bloodlust 2825)
+Define(Heroism 32182)
 
 AddCheckBox(multidot L(multidot))
 
@@ -46,6 +48,9 @@ unless BuffPresent(SF)
 # Refresh inner fire
 if BuffExpires(IF 60)
     Spell(IF)
+	
+if BuffExpires(VE 60) 
+	Spell(VE)
 
 #if inner focus is active, cast mind blast
 if BuffPresent(Focus) 
@@ -61,12 +66,13 @@ if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1) and TargetDead
 #Refresh VT
 unless CheckBoxOn(multidot) and OtherDebuffPresent(VT)
 {
-	if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) and TargetDeadIn(more 8)
+	if TargetDebuffExpires(VT 1 mine=1 haste=spell) and TargetDeadIn(more 8)
 		Spell(VT)
 }
   
 #cast MB if up
-Spell(MB)
+unless BuffPresent(Heroism) or BuffPresent(Bloodlust)
+	Spell(MB)
   
 #Refresh devouring plague  
 unless CheckBoxOn(multidot) and OtherDebuffPresent(DP)
@@ -104,7 +110,6 @@ if Mana(less 4000) and PetPresent(no)
 }
 
 # Add icons to monitor debuffs (will show up 5 secs before elapsed)
-AddIcon size=small nocd=1 {if TargetDebuffExpires(VE 1 mine=1) Spell(VE) } # Vampiric Embrace
 AddIcon size=small nocd=1 {if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) Spell(VT) } # Vampiric Touch
 AddIcon size=small nocd=1 {if TargetDebuffExpires(SWP 1 mine=1) Spell(SWP) } # Shadow Word: Pain
 AddIcon size=small nocd=1 {if TargetDebuffExpires(DP 1 mine=1) Spell(DP) } 
