@@ -19,6 +19,7 @@ Define(FERALSPIRIT 51533)
 Define(HEROISM 32182)
 Define(BLOODLUST 2825)
 Define(TALENTFLURRY 602)
+Define(TALENTCALLOFTHUNDER 562)
 Define(FIRENOVA 1535)
 
 #Fire
@@ -44,7 +45,7 @@ Define(STRENGTHOFEARTHTOTEM 8075)
 Define(TREMORTOTEM 8143)
 
 AddCheckBox(aoe L(AOE))
-AddCheckBox(chain SpellName(CHAINLIGHTNING) default)
+AddCheckBox(chain SpellName(CHAINLIGHTNING) default talent=TALENTCALLOFTHUNDER)
 AddCheckBox(firenova SpellName(MAGMATOTEM))
 
 SpellInfo(LAVABURST cd=8)

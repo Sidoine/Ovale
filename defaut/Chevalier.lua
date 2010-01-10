@@ -34,7 +34,7 @@ Define(TALENTABOMINATIONMIGHT 2105)
 Define(RAISEDEAD 46584)
 Define(HORNOFWINTER 57330)
 
-AddCheckBox(rolldes SpellName(GLYPHDISEASE) default)
+AddCheckBox(rolldes SpellName(GLYPHDISEASE) default glyph=GLYPHDISEASE)
 
 SpellAddTargetDebuff(ICYTOUCH FROSTFEVER=15)
 SpellAddTargetDebuff(PLAGUESTRIKE BLOODPLAGUE=15)
