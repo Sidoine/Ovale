@@ -396,11 +396,18 @@ Ovale.conditions=
 		if (not spell) then
 			return nil
 		end
-		if (Ovale:GetSpellInfoOrNil(condition[1])==spell) then
+		if Ovale:GetSpellInfoOrNil(condition[1])==spell then
 			return start/1000, ending/1000
 		else
 			return nil
 		end
+	end,
+	CastTime = function(condition)
+		local name, rank, icon, cost, isFunnel, powerType, castTime = Ovale:GetSpellInfoOrNil(condition[1])
+		if Ovale.trace then
+			Ovale:Print("castTime/1000 = " .. (castTime/1000) .. " " .. condition[2] .. " " .. condition[3])
+		end
+		return compare(castTime/1000, condition[2], condition[3])
 	end,
 	-- Test if a list of checkboxes is off
 	-- 1,... : the checkboxes names
@@ -787,7 +794,7 @@ Ovale.conditions=
 				return 0
 			end
 			mainHandExpiration = mainHandExpiration/1000
-			if (condition[2] >= mainHandExpiration) then
+			if ((condition[2] or 0) >= mainHandExpiration) then
 				return 0
 			else
 				return Ovale.maintenant + mainHandExpiration - condition[2]
@@ -797,7 +804,7 @@ Ovale.conditions=
 				return 0
 			end
 			offHandExpiration = offHandExpiration/1000
-			if (condition[2] >= offHandExpiration) then
+			if ((condition[2] or 0) >= offHandExpiration) then
 				return 0
 			else
 				return Ovale.maintenant + offHandExpiration - condition[2]

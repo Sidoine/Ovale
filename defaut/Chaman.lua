@@ -1,7 +1,7 @@
 Ovale.defaut["SHAMAN"] =
 [[
 Define(CHAINLIGHTNING 421)
-Define(LIGHTNINGBOLT 403)
+Define(LIGHTNINGBOLT 548)
 Define(LAVABURST 51505)
 Define(WATERSHIELD 52127)
 Define(FLAMESHOCK 8050)
@@ -79,7 +79,7 @@ AddIcon help=main
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		unless TargetDebuffExpires(FLAMESHOCK 1.6 haste=spell mine=1) Spell(LAVABURST)
 		
-		if CheckBoxOn(chain) and 1.4s before Spell(LAVABURST) 
+		if CheckBoxOn(chain) and 1.4s before Spell(LAVABURST) and CastTime(LIGHTNINGBOLT more 1.5)
 				Spell(CHAINLIGHTNING)
 		Spell(LIGHTNINGBOLT)
 	}

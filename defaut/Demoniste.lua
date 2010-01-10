@@ -29,6 +29,9 @@ Define(DECIMATION 63167)
 Define(CHAOSBOLT 50796)
 Define(MOLTENCORE 47383)
 Define(GLYPHOFCONFLAGRATE 56235)
+Define(FELARMOR 28176)
+Define(FIRESTONE 6366)
+Define(SPELLSTONE 2362)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -56,6 +59,13 @@ ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRA
 
 AddIcon help=main
 {
+if BuffExpires(FELARMOR) Spell(FELARMOR)
+if WeaponEnchantExpires(mainhand 5)
+{
+	if TalentPoints(TALENTEMBERSTORM more 0) Spell(FIRESTONE)
+	Spell(SPELLSTONE)
+	Spell(FIRESTONE)
+}
 if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
 if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
