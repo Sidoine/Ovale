@@ -11,6 +11,9 @@ end
 
 local function ParseParameters(params)
 	local paramList = {}
+	if not params then
+		return paramList
+	end
 	for k,v in string.gmatch(params, "(%w+)=([-%w\\_%.]+)") do
 		if (string.match(v,"^%-?%d+%.?%d*$")) then
 			v = tonumber(v)
@@ -202,7 +205,7 @@ local function ParseAddListItem(list,item,text, default)
 		Ovale.listes[list] = {items={},default=nil}
 	end
 	Ovale.listes[list].items[item] = text
-	if paramList[1] == "default" then
+	if paramList[1] and paramList[1] == "default" then
 		Ovale.listes[list].default=item
 	end
 	return ""
@@ -215,7 +218,7 @@ local function ParseAddCheckBox(item, text, params)
 		return ""
 	end
 	Ovale.casesACocher[item] = {text = text}
-	if paramList[1]=="checked" then
+	if  paramList[1] and paramList[1]=="checked" then
 		Ovale.casesACocher[item].checked = true
 	end
 	return ""
