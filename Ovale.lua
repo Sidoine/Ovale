@@ -263,6 +263,18 @@ local options =
 						Ovale.frame:Hide()	
 					end
 				},
+				config  =
+				{
+					name = "Configuration",
+					type = "execute",
+					func = function() Ovale:AfficherConfig() end
+				},
+				code  =
+				{
+					name = "Code",
+					type = "execute",
+					func = function() Ovale:AfficherCode() end
+				}
 			}
 		}
 	}
@@ -1513,6 +1525,11 @@ function Ovale:ChargerDefaut()
 end
 
 function Ovale:AfficherConfig()
+	self.AceConfigDialog:SetDefaultSize("Ovale Apparence", 500, 550)
+	self.AceConfigDialog:Open("Ovale Apparence", configFrame)
+end
+
+function Ovale:AfficherCode()
 	self.AceConfigDialog:SetDefaultSize("Ovale", 500, 550)
 	self.AceConfigDialog:Open("Ovale", configFrame)
 end

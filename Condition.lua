@@ -209,7 +209,7 @@ local function GetManaTime(mana, withBerserker)
 		return limit
 	else
 		if Ovale.state.mana>=mana then
-			return Ovale.currentTime
+			return Ovale.currentTime-1
 		else
 			return nil
 		end
