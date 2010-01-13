@@ -6,6 +6,7 @@ Define(TALENTCUTTOTHECHASE 2070)
 Define(SLICEANDDICE 5171)
 Define(RUPTURE 1943)
 Define(DEEPWOUNDS 12721)
+Define(GARROTE 703)
 Define(REND 772)
 Define(RIP 1079)
 Define(HUNGERFORBLOOD 51662)
@@ -31,7 +32,7 @@ AddIcon help=main
 	}
 	
 	if {TargetDebuffPresent(RUPTURE) or TargetDebuffPresent(DEEPWOUNDS) or TargetDebuffPresent(REND)
-		or TargetDebuffPresent(RIP)} and BuffExpires(HUNGERFORBLOOD 2)
+		or TargetDebuffPresent(RIP) or TargetDebuffPresent(GARROTE)} and BuffExpires(HUNGERFORBLOOD 2)
 		Spell(HUNGERFORBLOOD)
 		
 	if ComboPoints(more 3) and Mana(more 69)
