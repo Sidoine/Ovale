@@ -35,6 +35,7 @@ Define(RAISEDEAD 46584)
 Define(HORNOFWINTER 57330)
 
 AddCheckBox(rolldes SpellName(GLYPHDISEASE) default glyph=GLYPHDISEASE)
+AddCheckBox(horn SpellName(HORNOFWINTER) default)
 
 SpellAddTargetDebuff(ICYTOUCH FROSTFEVER=15)
 SpellAddTargetDebuff(PLAGUESTRIKE BLOODPLAGUE=15)
@@ -54,7 +55,7 @@ AddIcon help=main
 {
 	Spell(DANCINGRUNEWEAPON usable=1)
 
-	if BuffExpires(HORNOFWINTER 2) Spell(HORNOFWINTER)
+	if CheckBoxOn(horn) and BuffExpires(HORNOFWINTER 2) Spell(HORNOFWINTER)
 	
 	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) 
 		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and
@@ -99,12 +100,15 @@ AddIcon help=main
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1)
 		Spell(PLAGUESTRIKE)
 	
+	
 	if BuffPresent(FROSTPRESENCE)
 		Spell(RUNESTRIKE usable=1)
 	
 	Spell(FROSTSTRIKE usable=1)
 	if PetPresent(no) Spell(RAISEDEAD)
-	Spell(DEATHCOIL usable=1)
+	
+	if Mana(more 39) Spell(DEATHCOIL usable=1)
+	Spell(HORNOFWINTER priority=2)
 }
 
 AddIcon help=aoe
