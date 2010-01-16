@@ -100,16 +100,17 @@ AddIcon help=main
 	
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1)
 		Spell(PLAGUESTRIKE)
-	
-	
-	if BuffPresent(FROSTPRESENCE)
-		Spell(RUNESTRIKE usable=1)
-	
+		
 	Spell(FROSTSTRIKE usable=1)
 	if PetPresent(no) Spell(RAISEDEAD)
 	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
 	Spell(HORNOFWINTER priority=2)
+}
+
+AddIcon help=offgcd
+{
+	Spell(RUNESTRIKE usable=1)
 }
 
 AddIcon help=aoe
