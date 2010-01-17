@@ -189,10 +189,17 @@ local function nilstring(text)
 	end
 end
 
+local lastEnergyValue = nil
+local lastEnergyTime
+
 local function GetManaTime(mana, withBerserker)
 	local _,className = UnitClass("player")
 	if (className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3)) then
 		local current = Ovale.state.mana
+		if current~=lastEnergyValue then
+			lastEnergyValue = current
+			lastEnergyTime = Ovale.currentTime
+		end
 		local rate= 10
 		if (className == "ROGUE") then
 			local rush = Ovale:GetSpellInfoOrNil(13750)
@@ -205,7 +212,7 @@ local function GetManaTime(mana, withBerserker)
 				mana = mana/2
 			end
 		end
-		local limit = math.ceil((mana - current) / rate + Ovale.currentTime)
+		local limit = math.ceil((mana - lastEnergyValue) / rate + lastEnergyTime)
 		return limit
 	else
 		if Ovale.state.mana>=mana then

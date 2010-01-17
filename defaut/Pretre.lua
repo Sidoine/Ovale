@@ -64,7 +64,7 @@ if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1) and TargetDead
 }
 
 #Refresh VT
-unless CheckBoxOn(multidot) and OtherDebuffPresent(VT)
+unless CheckBoxOn(multidot)
 {
 	if TargetDebuffExpires(VT 1 mine=1 haste=spell) and TargetDeadIn(more 8)
 		Spell(VT)
