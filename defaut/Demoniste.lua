@@ -32,6 +32,8 @@ Define(GLYPHOFCONFLAGRATE 56235)
 Define(FELARMOR 28176)
 Define(FIRESTONE 6366)
 Define(SPELLSTONE 2362)
+Define(GLYPHLIFETAP 63320)
+Define(LIFETAP 1454)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -66,6 +68,7 @@ if WeaponEnchantExpires(mainhand 5)
 	Spell(SPELLSTONE)
 	Spell(FIRESTONE)
 }
+if Glyph(GLYPHLIFETAP) and BuffExpires(LIFETAP 0) Spell(LIFETAP)
 if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
 if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
@@ -95,6 +98,7 @@ if TargetLifePercent(less 25) and Level(more 76) and {TalentPoints(TALENTDECIMAT
 		 and TalentPoints(TALENTEMBERSTORM less 1) Spell(DRAINSOUL)
 
 Spell(CHAOSBOLT)
+if Glyph(GLYPHLIFETAP) and BuffExpires(LIFETAP 1) Spell(LIFETAP)
 if TalentPoints(TALENTEMBERSTORM more 0) or BuffPresent(MOLTENCORE) Spell(INCINERATE)
 Spell(SHADOWBOLT)
 }
