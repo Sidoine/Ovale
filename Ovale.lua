@@ -36,6 +36,8 @@ Ovale.score = 0
 Ovale.maxScore = 0
 Ovale.serial = 0
 Ovale.counter = {}
+Ovale.lastSpellName = nil
+Ovale.lastSpellTime = 0
 
 Ovale.arbre = {}
 
@@ -330,6 +332,21 @@ function Ovale:GetOtherDebuffs(spellName)
 	return self.otherDebuffs[spellName]
 end
 
+function Ovale:WithHaste(temps, hate)
+	if not temps then
+		temps = 0
+	end
+	if (not hate) then
+		return temps
+	elseif (hate == "spell") then
+		return temps/(1+self.spellHaste/100)
+	elseif (hate == "melee") then
+		return temps/(1+self.meleeHaste/100)
+	else
+		return temps
+	end
+end
+
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	if self.otherDebuffsEnabled then
 		local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
@@ -340,7 +357,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
 					local otherDebuff = self:GetOtherDebuffs(spellName)
 					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
-						otherDebuff[destGUID] = Ovale.maintenant + self.spellInfo[spellName].duration
+						otherDebuff[destGUID] = Ovale.maintenant + self:WithHaste(self.spellInfo[spellName].duration, self.spellInfo[spellName].durationhaste)
 					--	self:Print("ajout de "..spellName.." à "..destGUID)
 					elseif event == "SPELL_AURA_REMOVED" then
 						otherDebuff[destGUID] = nil						
@@ -555,9 +572,13 @@ function Ovale:OnEnable()
 end
 
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
-	-- self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
+--	self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
+	if unit=="player" then
+		self.lastSpellName = name
+		self.lastSpellTime = GetTime()
+	end
+	
 	if unit=="player" and self.enCombat then
-		-- self.lastSpellCast=name
 		if self.spellInfo[name] then
 			if self.spellInfo[name].resetcounter then
 				self.counter[self.spellInfo[name].resetcounter] = 0
@@ -1029,11 +1050,15 @@ function Ovale:InitCalculerMeilleureAction()
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
 	if (spell) then
 		self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
-	end
-	
-	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
-	if (spell) then
-		self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
+	else
+		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
+		if (spell) then
+			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
+		elseif self.lastSpellName then
+			if self.lastSpellName and self.maintenant - self.lastSpellTime<0.3 then
+				self:AddSpellToStack(self.lastSpellName, self.lastSpellTime, self.lastSpellTime, self.lastSpellTime)
+			end
+		end
 	end
 end
 
