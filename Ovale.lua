@@ -352,6 +352,12 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
 		-- self:Print("event="..event.." source="..sourceName.." destName="..destName)
 		if sourceName == UnitName("player") then
+			if string.find(event, "SPELL_") == 1 then
+				local spellId, spellName = select(9, ...)
+				if spellName == self.lastSpellName then
+					self.lastSpellName = nil
+				end
+			end
 			if string.find(event, "SPELL_AURA_") == 1 then
 				local spellId, spellName, spellSchool, auraType = select(9, ...)
 				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
@@ -1055,7 +1061,7 @@ function Ovale:InitCalculerMeilleureAction()
 		if (spell) then
 			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
 		elseif self.lastSpellName then
-			if self.lastSpellName and self.maintenant - self.lastSpellTime<0.3 then
+			if self.lastSpellName and self.maintenant - self.lastSpellTime<1 then
 				self:AddSpellToStack(self.lastSpellName, self.lastSpellTime, self.lastSpellTime, self.lastSpellTime)
 			end
 		end
