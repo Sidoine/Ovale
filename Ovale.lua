@@ -978,9 +978,9 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 			cd.start = startCast
 			cd.duration = newSpellInfo.cd
 			cd.enable = 1
-		end
-		if newSpellInfo.toggle then
-			cd.toggled = 1
+			if newSpellInfo.toggle then
+				cd.toggled = 1
+			end
 		end
 		if newSpellInfo.aura then
 			for target, targetInfo in pairs(newSpellInfo.aura) do
