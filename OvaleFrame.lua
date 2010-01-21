@@ -173,7 +173,7 @@ do
 				action.waitStart = nil
 			end
 			
-			if Ovale.db.profile.apparence.moving and start then
+			if Ovale.db.profile.apparence.moving and action.icons[1].debutAction and action.icons[1].finAction then
 				local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
 				if top<0 then
 					top = 0

@@ -1061,8 +1061,10 @@ function Ovale:InitCalculerMeilleureAction()
 		if (spell) then
 			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
 		elseif self.lastSpellName then
-			if self.lastSpellName and self.maintenant - self.lastSpellTime<1 then
-				self:AddSpellToStack(self.lastSpellName, self.lastSpellTime, self.lastSpellTime, self.lastSpellTime)
+			if not self.spellInfo[self.lastSpellName] or not self.spellInfo[self.lastSpellName].toggle then
+				if self.lastSpellName and self.maintenant - self.lastSpellTime<1 then
+					self:AddSpellToStack(self.lastSpellName, self.lastSpellTime, self.lastSpellTime, self.lastSpellTime)
+				end
 			end
 		end
 	end
