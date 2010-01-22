@@ -41,6 +41,13 @@ Ovale.lastSpellTime = 0
 
 Ovale.arbre = {}
 
+BINDING_HEADER_OVALE = "Ovale"
+BINDING_NAME_OVALE_CHECKBOX0 = L["Inverser la boîte à cocher "].."(1)"
+BINDING_NAME_OVALE_CHECKBOX1 = L["Inverser la boîte à cocher "].."(2)"
+BINDING_NAME_OVALE_CHECKBOX2 = L["Inverser la boîte à cocher "].."(3)"
+BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
+BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
+
 -- Ovale.trace=true
 local nouvelleCondition
 local nouveauSort
@@ -1666,4 +1673,14 @@ function Ovale:EnableOtherDebuffs()
 		return
 	end
 	self.otherDebuffsEnabled = true
+end
+
+function Ovale:ToggleCheckBox(v)
+	for k,checkBox in pairs(self.casesACocher) do
+		if v==0 then
+			self.checkBoxes[k]:SetValue(not self.checkBoxes[k]:GetValue())
+			break
+		end
+		v = v - 1
+	end
 end

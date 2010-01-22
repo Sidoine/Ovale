@@ -43,3 +43,4 @@ L["Défilement"] = true
 L["Les icônes se déplacent"] = true
 L["multidot"] = "Multicible pour DoTs"
 L["buff"] = "Améliorations"
+L["Inverser la boîte à cocher "] = true
