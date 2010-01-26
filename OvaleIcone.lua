@@ -202,4 +202,8 @@ function OvaleIcone_OnLoad(self)
 	self.Update = Update
 	self.SetSize = SetSize
 	self.SetHelp = SetHelp
+	if Ovale.db.profile.clickThru then
+		self:EnableMouse(false)
+	end
 end
+

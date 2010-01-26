@@ -235,6 +235,8 @@ do
 			end
 		end
 		
+		self.frame:EnableMouse(not Ovale.db.profile.apparence.clickThru)
+		
 		local left = 0
 		local maxHeight = 0
 		local maxWidth = 0
@@ -296,6 +298,7 @@ do
 				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (l-1)*action.dx,action.top - (l-1)*action.dy)
 				icon:SetSize(action.width, action.height)
 				icon:SetHelp(node.params.help)
+				icon:EnableMouse(not Ovale.db.profile.apparence.clickThru)
 				
 				if LBF then
 					icon:SetSkinGroup(self.skinGroup)
@@ -356,7 +359,9 @@ do
 		frame:SetWidth(100)
 		frame:SetHeight(100)
 		frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
-		frame:EnableMouse()
+		if not Ovale.db.profile.apparence.clickThru then
+			frame:EnableMouse()
+		end
 		frame:SetMovable(true)
 		frame:SetFrameStrata("BACKGROUND")
 		frame:SetScript("OnMouseDown", frameOnMouseDown)

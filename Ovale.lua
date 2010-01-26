@@ -36,8 +36,7 @@ Ovale.score = 0
 Ovale.maxScore = 0
 Ovale.serial = 0
 Ovale.counter = {}
-Ovale.lastSpellName = nil
-Ovale.lastSpellTime = 0
+Ovale.lastSpell = {}
 
 Ovale.arbre = {}
 
@@ -217,6 +216,14 @@ local options =
 					get = function(info) return Ovale.db.profile.apparence.highlightIcon end,
 					set = function(info, value) Ovale.db.profile.apparence.highlightIcon = value; Ovale:UpdateFrame() end
 				},
+				clickThru =
+				{
+					order = 15,
+					type = "toggle",
+					name = L["Ignorer les clics souris"],
+					get = function(info) return Ovale.db.profile.apparence.clickThru end,
+					set = function(info, value) Ovale.db.profile.apparence.clickThru = value; Ovale:UpdateFrame() end
+				}
 			}
 		},
 		code =
@@ -361,8 +368,12 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		if sourceName == UnitName("player") then
 			if string.find(event, "SPELL_") == 1 then
 				local spellId, spellName = select(9, ...)
-				if spellName == self.lastSpellName then
-					self.lastSpellName = nil
+				for i,v in ipairs(self.lastSpell) do
+					if v.name == spellName then
+						self:Print("on supprime " ..spellName.." a "..time)
+						table.remove(self.lastSpell, i)
+						break
+					end
 				end
 			end
 			if string.find(event, "SPELL_AURA_") == 1 then
@@ -587,8 +598,18 @@ end
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 --	self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
 	if unit=="player" then
-		self.lastSpellName = name
-		self.lastSpellTime = GetTime()
+		local newSpell = {}
+		newSpell.name = name
+		newSpell.time = GetTime()
+		local si = self.spellInfo[name]
+		
+		if si and si.buffnocd and UnitBuff("player", GetSpellInfo(si.buffnocd)) then
+			newSpell.nocd = true
+		else
+			newSpell.nocd = false
+		end
+		self.lastSpell[#self.lastSpell+1] = newSpell
+--		self:Print("on ajoute "..name.." a ".. GetTime())
 	end
 	
 	if unit=="player" and self.enCombat then
@@ -920,7 +941,15 @@ function Ovale:GetCD(spellName)
 	end
 end
 
-function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
+local function nilstring(text)
+	if text == nil then
+		return "nil"
+	else
+		return text
+	end
+end
+
+function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 --	self.spellStack.length = self.spellStack.length + 1
 --	if not self.spellStack[self.spellStack.length] then
 --		self.spellStack[self.spellStack.length] = {}
@@ -984,6 +1013,24 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 		if cd then
 			cd.start = startCast
 			cd.duration = newSpellInfo.cd
+			if nocd then
+				cd.duration = 0
+			end
+			if newSpellInfo.buffnocd and not nocd then
+				local buffAura = self:GetAura("player", "HELPFUL", newSpellInfo.buffnocd)
+				if self.traceAura then
+					if buffAura then
+						self:Print("buffAura stacks = "..buffAura.stacks.." start="..nilstring(buffAura.start).." ending = "..nilstring(buffAura.ending))
+						self:Print("startCast = "..startCast)
+					else
+						self:Print("buffAura = nil")
+					end
+					self.traceAura = false
+				end
+				if buffAura and buffAura.stacks>0 and buffAura.start and buffAura.start<=startCast and (not buffAura.ending or buffAura.ending>startCast) then
+					cd.duration = 0
+				end
+			end
 			cd.enable = 1
 			if newSpellInfo.toggle then
 				cd.toggled = 1
@@ -1016,7 +1063,11 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast)
 							newAura.stacks = 1
 						end
 						if Ovale.trace then
-							self:Print("adding aura "..spellName.." to "..target.." "..newAura.start..","..newAura.ending)
+							if spellName then
+								self:Print("adding aura "..spellName.." to "..target.." "..newAura.start..","..newAura.ending)
+							else
+								self:Print("adding nil aura")
+							end
 						end
 					end
 				end
@@ -1059,6 +1110,13 @@ function Ovale:InitCalculerMeilleureAction()
 		v.toggled = nil
 	end
 	
+	for i,v in ipairs(self.lastSpell) do
+		if not self.spellInfo[v.name] or not self.spellInfo[v.name].toggle then
+			if self.maintenant - v.time<1 then
+				self:AddSpellToStack(v.name, v.time, v.time, v.time, v.nocd)
+			end
+		end
+	end
 	-- On attend que le sort courant soit fini
 	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
 	if (spell) then
@@ -1067,12 +1125,6 @@ function Ovale:InitCalculerMeilleureAction()
 		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
 		if (spell) then
 			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
-		elseif self.lastSpellName then
-			if not self.spellInfo[self.lastSpellName] or not self.spellInfo[self.lastSpellName].toggle then
-				if self.lastSpellName and self.maintenant - self.lastSpellTime<1 then
-					self:AddSpellToStack(self.lastSpellName, self.lastSpellTime, self.lastSpellTime, self.lastSpellTime)
-				end
-			end
 		end
 	end
 end
@@ -1118,13 +1170,6 @@ function Ovale:GetGCD(spellName)
 end
 
 
-local function nilstring(text)
-	if text == nil then
-		return "nil"
-	else
-		return text
-	end
-end
 
 function Ovale:GetActionInfo(element)
 	if not element then
@@ -1558,7 +1603,7 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false, highlightIcon = true},
+				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})

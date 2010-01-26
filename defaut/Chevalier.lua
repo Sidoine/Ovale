@@ -94,7 +94,7 @@ AddIcon help=main
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
 	{
 		if Glyph(GLYPHHOWLINGBLAST) Spell(HOWLINGBLAST)
-		Spell(ICYTOUCH)
+		unless Glyph(GLYPHHOWLINGBLAST) Spell(ICYTOUCH)
 	}
 	
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1)
