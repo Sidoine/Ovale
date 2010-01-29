@@ -66,7 +66,7 @@ AddIcon help=main
 	{
 		if TalentPoints(TALENTBLOODYSTRIKES more 0)
 		{
-			if Runes(blood 1)
+			if Runes(blood 1) and {CheckBoxOff(rolldes) or Runes(blood 2)}
 			{	
 				Spell(HEARTSTRIKE)
 				Spell(BLOODSTRIKE)
@@ -81,7 +81,7 @@ AddIcon help=main
 			Spell(OBLITERATE)
 			Spell(DEATHSTRIKE)
 		}
-		if Runes(blood 1)
+		if Runes(blood 1) and {CheckBoxOff(rolldes) or Runes(blood 2)}
 		{
 			Spell(HEARTSTRIKE)
 			Spell(BLOODSTRIKE)

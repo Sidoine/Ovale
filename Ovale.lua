@@ -1196,6 +1196,17 @@ function Ovale:GetActionInfo(element)
 			actionEnable = cd.enable
 		else
 			actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
+			-- Les chevaliers de la mort ont des infos fausses sur le CD quand ils n'ont plus les runes
+			-- On force à 1,5s ou 1s en présence impie
+			if self.className=="DEATHKNIGHT" and actionCooldownDuration==10 and
+					(not self.spellInfo[spellName] or self.spellInfo[spellName].cd~=10) then
+				local impie = GetSpellInfo(48265)
+				if impie and UnitBuff("player", impie) then
+					actionCooldownDuration=1
+				else
+					actionCooldownDuration=1.5
+				end
+			end
 			if self.spellInfo[spellName] and self.spellInfo[spellName].forcecd then
 				actionCooldownStart, actionCooldownDuration = GetSpellCooldown(GetSpellInfo(self.spellInfo[spellName].forcecd))
 			end
