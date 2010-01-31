@@ -34,6 +34,7 @@ Define(FIRESTONE 6366)
 Define(SPELLSTONE 2362)
 Define(GLYPHLIFETAP 63320)
 Define(LIFETAP 1454)
+Define(SEEDOFCORRUPTION 27243)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse agony SpellName(CURSEAGONY))
@@ -91,7 +92,8 @@ if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1)
 if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
 if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)
 if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) and TargetDeadIn(more 10) Spell(CURSEAGONY)
-if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDeadIn(more 9) and TalentPoints(TALENTEMBERSTORM less 1) Spell(CORRUPTION)
+if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1)
+	and TargetDeadIn(more 9) and TalentPoints(TALENTEMBERSTORM less 1) Spell(CORRUPTION)
 
 if BuffPresent(DECIMATION) Spell(SOULFIRE)
 

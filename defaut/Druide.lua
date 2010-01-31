@@ -14,8 +14,8 @@ Define(INSECTSWARM 27013)
 Define(MOONFIRE 8921)
 Define(STARFIRE 2912)
 Define(WRATH 5176)
-Define(ECLIPSESTARFIRE 48518)
-Define(ECLIPSEWRATH 48517)
+Define(ECLIPSESTARFIRE 48518) #Critical strike chance of Starfire increased, fired by Wrath
+Define(ECLIPSEWRATH 48517) #Damage done by Wrath increased, fired by Starfire
 Define(TIGERSFURY 5217)
 Define(FORCEOFNATURE 33831)
 Define(RAKE 59886)
@@ -141,12 +141,12 @@ AddIcon help=main
 
 		if CheckBoxOff(wrath)
 		{
-			if BuffGain(ECLIPSEWRATH 30) Spell(STARFIRE)
+			if BuffGain(ECLIPSEWRATH 29) Spell(STARFIRE)
 			Spell(WRATH)
 		}
 		if CheckBoxOn(wrath)
 		{
-			if BuffGain(ECLIPSESTARFIRE 30) Spell(WRATH)
+			if BuffGain(ECLIPSESTARFIRE 29) Spell(WRATH)
 			Spell(STARFIRE)
 		}
 	}

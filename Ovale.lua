@@ -362,20 +362,19 @@ function Ovale:WithHaste(temps, hate)
 end
 
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	if self.otherDebuffsEnabled then
-		local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-		-- self:Print("event="..event.." source="..sourceName.." destName="..destName)
-		if sourceName == UnitName("player") then
-			if string.find(event, "SPELL_") == 1 then
-				local spellId, spellName = select(9, ...)
-				for i,v in ipairs(self.lastSpell) do
-					if v.name == spellName then
-						self:Print("on supprime " ..spellName.." a "..time)
-						table.remove(self.lastSpell, i)
-						break
-					end
+	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
+	-- self:Print("event="..event.." source="..sourceName.." destName="..destName)
+	if sourceName == UnitName("player") then
+		if string.find(event, "SPELL_") == 1 then
+			local spellId, spellName = select(9, ...)
+			for i,v in ipairs(self.lastSpell) do
+				if v.name == spellName then
+					table.remove(self.lastSpell, i)
+					break
 				end
 			end
+		end
+		if self.otherDebuffsEnabled then
 			if string.find(event, "SPELL_AURA_") == 1 then
 				local spellId, spellName, spellSchool, auraType = select(9, ...)
 				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
@@ -390,6 +389,8 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				end
 			end
 		end
+	end
+	if self.otherDebuffsEnabled then
 		if event == "UNIT_DIED" then
 			for k,v in pairs(self.otherDebuffs) do
 				for j,w in pairs(v) do
@@ -587,12 +588,41 @@ function Ovale:OnEnable()
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("CHAT_MSG_ADDON")
+	self:RegisterEvent("GLYPH_UPDATED")
+	self:RegisterEvent("GLYPH_ADDED")
 	    
 	if (not self.firstInit) then
 		self:FirstInit()
 	end
 	self:UNIT_AURA("","player")
 	self:UpdateVisibility()
+end
+
+function Ovale:OnDisable()
+    -- Called when the addon is disabled
+	self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
+    self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    self:UnregisterEvent("PLAYER_REGEN_DISABLED")
+    self:UnregisterEvent("PLAYER_TALENT_UPDATE")
+    self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
+    self:UnregisterEvent("SPELLS_CHANGED")
+    self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
+    self:UnregisterEvent("UPDATE_BINDINGS")
+    self:UnregisterEvent("UNIT_AURA")
+    self:UnregisterEvent("UNIT_SPELLCAST_SENT")
+    self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+    self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self:UnregisterEvent("CHAT_MSG_ADDON")
+    self:UnregisterEvent("GLYPH_UPDATED")	
+    self.frame:Hide()
+end
+
+function Ovale:GLYPH_ADDED(event)
+	self:Print("GLYPH_ADDED")
+end
+
+function Ovale:GLYPH_UPDATED(event)
+	self:Print("GLYPH_UPDATED")
 end
 
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
@@ -673,23 +703,6 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self:UpdateVisibility()
 end
 
-function Ovale:OnDisable()
-    -- Called when the addon is disabled
-	self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
-    self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-    self:UnregisterEvent("PLAYER_REGEN_DISABLED")
-    self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-    self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
-    self:UnregisterEvent("SPELLS_CHANGED")
-    self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
-    self:UnregisterEvent("UPDATE_BINDINGS")
-    self:UnregisterEvent("UNIT_AURA")
-    self:UnregisterEvent("UNIT_SPELLCAST_SENT")
-    self:UnregisterEvent("PLAYER_TARGET_CHANGED")
-    self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-    self:UnregisterEvent("CHAT_MSG_ADDON")
-    self.frame:Hide()
-end
 
 function Ovale_GetNomAction(i)
 	local actionText = GetActionText(i);
