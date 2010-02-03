@@ -30,6 +30,7 @@ Define(RECKLESSNESS 1719)
 Define(BLADESTORM 46924)
 Define(SUDDENDEATH 52437)
 Define(RETALIATION 20230)
+Define(TASTEFORBLOOD 56636)
 
 Define(DEMORALIZINGROAR 48560)
 Define(CURSEOFWEAKNESS 50511)
@@ -123,10 +124,14 @@ AddIcon help=main
 
      if Stance(1) #combat
      {
-        if TargetDebuffExpires(REND 0 mine=1) and TargetDeadIn(more 8) Spell(REND)
+		#Suggestions by wikiupd
+		if BuffExpires(TASTEFORBLOOD 1.5) and TargetDebuffExpires(REND 0 mine=1) Spell(OVERPOWER usable=1)
+		if TargetDebuffExpires(REND 0 mine=1) and TargetDeadIn(more 8) Spell(REND)
+		unless BuffPresent(TASTEFORBLOOD) Spell(OVERPOWER usable=1) # Dodge OP
+		if BuffExpires(TASTEFORBLOOD 4.5) Spell(OVERPOWER usable=1) # OP w/ less than 4.5 sec 
         if TargetLifePercent(more 20) Spell(MORTALSTRIKE)
-        Spell(OVERPOWER usable=1)
         if BuffPresent(SUDDENDEATH) or TargetLifePercent(less 20) Spell(EXECUTE)
+        Spell(OVERPOWER usable=1)
         Spell(VICTORY usable=1)
      
          if TalentPoints(SLAMTALENT more 1)

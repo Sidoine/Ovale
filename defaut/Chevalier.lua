@@ -33,6 +33,8 @@ Define(ABOMINATIONMIGHT 53136)
 Define(TALENTABOMINATIONMIGHT 2105)
 Define(RAISEDEAD 46584)
 Define(HORNOFWINTER 57330)
+Define(STRENGTHOFEARTHTOTEM 8075)
+
 
 AddCheckBox(rolldes SpellName(GLYPHDISEASE) default glyph=GLYPHDISEASE)
 
@@ -61,7 +63,7 @@ AddIcon help=main
 {
 	Spell(DANCINGRUNEWEAPON usable=1)
 
-	if BuffExpires(HORNOFWINTER 2) Spell(HORNOFWINTER)
+	if BuffExpires(HORNOFWINTER 2) and BuffExpires(STRENGTHOFEARTHTOTEM 0) Spell(HORNOFWINTER)
 	
 	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) 
 		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and

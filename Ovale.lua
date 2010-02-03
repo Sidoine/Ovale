@@ -389,6 +389,9 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				end
 			end
 		end
+		--if string.find(event, "SWING")==1 then
+		--	self:Print(select(1, ...))
+		--end
 	end
 	if self.otherDebuffsEnabled then
 		if event == "UNIT_DIED" then
@@ -618,11 +621,13 @@ function Ovale:OnDisable()
 end
 
 function Ovale:GLYPH_ADDED(event)
-	self:Print("GLYPH_ADDED")
+	-- self:Print("GLYPH_ADDED")
+	-- self:CompileAll()
 end
 
 function Ovale:GLYPH_UPDATED(event)
-	self:Print("GLYPH_UPDATED")
+	-- self:Print("GLYPH_UPDATED")
+	-- self:CompileAll()
 end
 
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
