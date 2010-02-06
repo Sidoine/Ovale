@@ -45,3 +45,4 @@ L["multidot"] = "Multicible pour DoTs"
 L["buff"] = "Améliorations"
 L["Inverser la boîte à cocher "] = true
 L["Ignorer les clics souris"] = true
+L["Correction de la latence"] = true

@@ -223,6 +223,14 @@ local options =
 					name = L["Ignorer les clics souris"],
 					get = function(info) return Ovale.db.profile.apparence.clickThru end,
 					set = function(info, value) Ovale.db.profile.apparence.clickThru = value; Ovale:UpdateFrame() end
+				},
+				latencyCorrection =
+				{
+					order = 16,
+					type = "toggle",
+					name = L["Correction de la latence"],
+					get = function(info) return Ovale.db.profile.apparence.latencyCorrection end,
+					set = function(info, value) Ovale.db.profile.apparence.latencyCorrection = value end
 				}
 			}
 		},
@@ -1128,10 +1136,12 @@ function Ovale:InitCalculerMeilleureAction()
 		v.toggled = nil
 	end
 	
-	for i,v in ipairs(self.lastSpell) do
-		if not self.spellInfo[v.name] or not self.spellInfo[v.name].toggle then
-			if self.maintenant - v.time<1 then
-				self:AddSpellToStack(v.name, v.time, v.time, v.time, v.nocd)
+	if (Ovale.db.profile.apparence.latencyCorrection) then
+		for i,v in ipairs(self.lastSpell) do
+			if not self.spellInfo[v.name] or not self.spellInfo[v.name].toggle then
+				if self.maintenant - v.time<1 then
+					self:AddSpellToStack(v.name, v.time, v.time, v.time, v.nocd)
+				end
 			end
 		end
 	end
@@ -1359,7 +1369,8 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 				
 				if restant<self.attenteFinCast then
-					if spellName==self.currentSpellName or not self.spellInfo[self.currentSpellName] or
+					if -- spellName==self.currentSpellName or 
+						not self.spellInfo[self.currentSpellName] or
 							not self.spellInfo[self.currentSpellName].canStopChannelling then
 						restant = self.attenteFinCast
 					else
@@ -1632,7 +1643,7 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false},
+				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, latencyCorrection=false},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})

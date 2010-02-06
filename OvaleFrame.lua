@@ -156,6 +156,11 @@ do
 				start = actionCooldownStart + actionCooldownDuration
 			end
 			
+			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
+			if start and Ovale.currentSpellName and Ovale.attenteFinCast and spellName == Ovale.currentSpellName and start<Ovale.attenteFinCast then
+				start = Ovale.attenteFinCast
+			end
+			
 			if (node.params.nocd and start~=nil and Ovale.maintenant<start-node.params.nocd) then
 				action.icons[1]:Update(element, nil)
 			else
