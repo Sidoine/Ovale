@@ -140,6 +140,13 @@ do
 	end
 	
 	local function OnUpdate(self)
+		if not Ovale.listeTalentsRemplie then
+			Ovale:RemplirListeTalents()
+		end
+		if Ovale.needCompile then
+			Ovale:CompileAll()
+			return
+		end
 		Ovale:InitAllActions()
 		for k,node in pairs(Ovale.masterNodes) do
 			if Ovale.trace then

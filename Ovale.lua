@@ -251,8 +251,8 @@ local options =
 					end,
 					set = function(info,v)
 						Ovale.db.profile.code = v
-						Ovale.masterNodes = Ovale:Compile(Ovale.db.profile.code)
-						Ovale:UpdateFrame()
+						self.needCompile = true
+						-- Ovale:UpdateFrame()
 						-- Ovale:Print("code change")
 					end,
 					width = "full"
@@ -304,6 +304,14 @@ local options =
 	}
 }
 
+local function nilstring(text)
+	if text == nil then
+		return "nil"
+	else
+		return text
+	end
+end
+
 function Ovale:Debug()
 	self:Print(self:DebugNode(self.masterNodes[1]))
 end
@@ -329,18 +337,17 @@ end
 function Ovale:CHARACTER_POINTS_CHANGED()
 	self:RemplirListeTalents()
 --	self:Print("CHARACTER_POINTS_CHANGED")
-	self:CompileAll()
 end
 
 function Ovale:PLAYER_TALENT_UPDATE()
 	self:RemplirListeTalents()
 --	self:Print("PLAYER_TALENT_UPDATE")
-	self:CompileAll()
 end
 
 function Ovale:SPELLS_CHANGED()
 	-- self:RemplirActionIndexes()
 	-- self:RemplirListeTalents()
+	self.needCompile = true
 end
 
 function Ovale:UPDATE_BINDINGS()
@@ -371,13 +378,16 @@ end
 
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	-- self:Print("event="..event.." source="..sourceName.." destName="..destName)
+	-- self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName))
 	if sourceName == UnitName("player") then
-		if string.find(event, "SPELL_") == 1 then
+		if string.find(event, "SPELL_AURA_APPLIED") == 1 or string.find(event, "SPELL_DAMAGE")==1 or 
+				string.find(event, "SPELL_MISSED") == 1 or string.find(event, "SPELL_AURA_REFRESH") == 1 
+				or string.find(event, "SPELL_CAST_FAILED") == 1 then
 			local spellId, spellName = select(9, ...)
 			for i,v in ipairs(self.lastSpell) do
 				if v.name == spellName then
 					table.remove(self.lastSpell, i)
+					-- self:Print("on supprime "..spellName.." a "..GetTime())
 					break
 				end
 			end
@@ -513,12 +523,13 @@ end
 function Ovale:CompileAll()
 	self.masterNodes = self:Compile(self.db.profile.code)
 	self:UpdateFrame()
+	self.needCompile = false
 end
 
 function Ovale:HandleProfileChanges()
 	if (self.firstInit) then
 		if (self.db.profile.code) then
-			self:CompileAll()
+			self.needCompile = true
 		end
 	end
 end
@@ -576,7 +587,7 @@ function Ovale:FirstInit()
 
 	
 	if (self.db.profile.code) then
-		self.masterNodes = self:Compile(self.db.profile.code)
+		self.needCompile = true
 	end
 	self:UpdateFrame()
 	if (not Ovale.db.profile.display) then
@@ -631,19 +642,28 @@ end
 function Ovale:GLYPH_ADDED(event)
 	-- self:Print("GLYPH_ADDED")
 	-- self:CompileAll()
+	self.needCompile = true
 end
 
 function Ovale:GLYPH_UPDATED(event)
 	-- self:Print("GLYPH_UPDATED")
 	-- self:CompileAll()
+	self.needCompile = true
 end
 
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
---	self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
+	-- self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
 	if unit=="player" then
 		local newSpell = {}
 		newSpell.name = name
-		newSpell.time = GetTime()
+		-- local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo("player")
+		local spell, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(name)
+		newSpell.start = GetTime()
+		if spell then 
+			newSpell.stop = newSpell.start + castTime/1000
+		else
+			newSpell.stop = newSpell.start
+		end
 		local si = self.spellInfo[name]
 		
 		if si and si.buffnocd and UnitBuff("player", GetSpellInfo(si.buffnocd)) then
@@ -652,7 +672,7 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 			newSpell.nocd = false
 		end
 		self.lastSpell[#self.lastSpell+1] = newSpell
---		self:Print("on ajoute "..name.." a ".. GetTime())
+		-- self:Print("on ajoute "..name.." a ".. newSpell.start)
 	end
 	
 	if unit=="player" and self.enCombat then
@@ -856,6 +876,7 @@ function Ovale:RemplirListeTalents()
 			self.talentNameToId[nameTalent] = talentId
 			self.pointsTalent[talentId] = currRank
 			self.listeTalentsRemplie = true
+			self.needCompile = true
 		end
 	end
 end
@@ -967,13 +988,6 @@ function Ovale:GetCD(spellName)
 	end
 end
 
-local function nilstring(text)
-	if text == nil then
-		return "nil"
-	else
-		return text
-	end
-end
 
 function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 --	self.spellStack.length = self.spellStack.length + 1
@@ -1139,20 +1153,34 @@ function Ovale:InitCalculerMeilleureAction()
 	if (Ovale.db.profile.apparence.latencyCorrection) then
 		for i,v in ipairs(self.lastSpell) do
 			if not self.spellInfo[v.name] or not self.spellInfo[v.name].toggle then
-				if self.maintenant - v.time<1 then
-					self:AddSpellToStack(v.name, v.time, v.time, v.time, v.nocd)
+				--[[local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
+				if spell and spell == v.name and startTime/1000 - v.start < 0.5 and v.stop~=endTime/1000 then
+					print("ancien = "..v.stop)
+					v.stop = endTime/1000
+					print("changement de v.stop en "..v.stop.." "..v.start)
+				end]]
+				
+				if self.maintenant - v.stop<3 then
+					self:AddSpellToStack(v.name, v.start, v.stop, v.stop, v.nocd)
 				end
 			end
 		end
-	end
-	-- On attend que le sort courant soit fini
-	local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
-	if (spell) then
-		self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
-	else
+		
 		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
 		if (spell) then
 			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
+		end
+			
+	else
+		-- On attend que le sort courant soit fini
+		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
+		if (spell) then
+			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
+		else
+			local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
+			if (spell) then
+				self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
+			end
 		end
 	end
 end
@@ -1643,7 +1671,7 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, latencyCorrection=false},
+				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, latencyCorrection=true},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
