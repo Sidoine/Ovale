@@ -251,7 +251,7 @@ local options =
 					end,
 					set = function(info,v)
 						Ovale.db.profile.code = v
-						self.needCompile = true
+						Ovale.needCompile = true
 						-- Ovale:UpdateFrame()
 						-- Ovale:Print("code change")
 					end,
@@ -1160,7 +1160,7 @@ function Ovale:InitCalculerMeilleureAction()
 					print("changement de v.stop en "..v.stop.." "..v.start)
 				end]]
 				
-				if self.maintenant - v.stop<3 then
+				if self.maintenant - v.stop<5 then
 					self:AddSpellToStack(v.name, v.start, v.stop, v.stop, v.nocd)
 				end
 			end
@@ -1382,6 +1382,14 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 				return nil
 			end
+			if spellName and self.spellInfo[spellName] and self.spellInfo[spellName].casttime then
+				element.castTime = self.spellInfo[spellName].casttime
+			elseif spellName then
+				local spell, rank, icon, cost, isFunnel, powerType, castTime = GetSpellInfo(spellName)
+				element.castTime = castTime
+			else
+				element.castTime = 0
+			end
 			if (spellName and self.spellInfo[spellName] and self.spellInfo[spellName].toggle and actionIsCurrent) then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." is current action")
@@ -1590,6 +1598,7 @@ function Ovale:CalculerMeilleureAction(element)
 		local bestEnd
 		local meilleurePrioriteFils
 		local bestElement
+		local bestCastTime
 		 
 		if (Ovale.trace) then
 			self:Print(element.type.." ["..element.nodeId.."]")
@@ -1600,9 +1609,18 @@ function Ovale:CalculerMeilleureAction(element)
 			if newStart~=nil and newStart<Ovale.currentTime then
 				newStart = Ovale.currentTime
 			end
+
 			
 			if newStart and (not newEnd or newStart<=newEnd) then
 				local remplacer
+
+				local newCastTime
+				if nouveauElement then
+					newCastTime = nouveauElement.castTime
+				end
+				if not newCastTime or newCastTime == 0 then
+					newCastTime = self.gcd
+				end
 			
 				if (not meilleurTempsFils) then
 					remplacer = true
@@ -1616,12 +1634,12 @@ function Ovale:CalculerMeilleureAction(element)
 					end
 					if (priorite and priorite > meilleurePrioriteFils) then
 						-- Si le nouveau sort est plus prioritaire que le précédent, on le lance
-						-- même si on doit attendre jusqu'à gcd secondes de plus
-						maxEcart = self.gcd
+						-- si caster le sort actuel repousse le nouveau sort
+						maxEcart = bestCastTime*0.75
 					elseif (priorite and priorite < meilleurePrioriteFils) then
 						-- A l'inverse, si il est moins prioritaire que le précédent, on ne le lance
-						-- que si il se lance au moins 1,5s avant
-						maxEcart = -self.gcd*0.75
+						-- que caster le nouveau sort ne repousse pas le meilleur
+						maxEcart = -newCastTime*0.75
 					else
 						maxEcart = -0.01
 					end
@@ -1634,6 +1652,7 @@ function Ovale:CalculerMeilleureAction(element)
 					meilleurePrioriteFils = priorite
 					bestElement = nouveauElement
 					bestEnd = newEnd
+					bestCastTime = newCastTime
 				end
 			end
 		end
