@@ -378,7 +378,7 @@ end
 
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	-- self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName))
+	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 	if sourceName == UnitName("player") then
 		if string.find(event, "SPELL_AURA_APPLIED") == 1 or string.find(event, "SPELL_DAMAGE")==1 or 
 				string.find(event, "SPELL_MISSED") == 1 or string.find(event, "SPELL_AURA_REFRESH") == 1 
@@ -387,7 +387,8 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			for i,v in ipairs(self.lastSpell) do
 				if v.name == spellName then
 					table.remove(self.lastSpell, i)
-					-- self:Print("on supprime "..spellName.." a "..GetTime())
+					--self:Print("on supprime "..spellName.." a "..GetTime())
+					--self:Print(UnitDebuff("target", "Etreinte de l'ombre"))
 					break
 				end
 			end
@@ -1019,7 +1020,11 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 	self.attenteFinCast = nextCast
 	self.currentSpellName = spellName
 	self.startCast = startCast
-	self.currentTime = startCast+0.1
+	if startCast>=self.maintenant then
+		self.currentTime = startCast+0.1
+	else
+		self.currentTime = self.maintenant
+	end
 	
 	if Ovale.trace then
 		Ovale:Print("add spell "..spellName.." at "..startCast.." currentTime = "..nextCast)
@@ -1399,7 +1404,7 @@ function Ovale:CalculerMeilleureAction(element)
 			if (actionEnable and actionEnable>0) then
 				local restant
 				if (not actionCooldownDuration or actionCooldownStart==0) then
-					restant = 0
+					restant = self.currentTime
 				else
 					restant = actionCooldownDuration + actionCooldownStart
 				end
@@ -1416,6 +1421,7 @@ function Ovale:CalculerMeilleureAction(element)
 						local tickLength = (self.attenteFinCast - self.startCast) / ticks
 						local tickTime = self.startCast + tickLength
 						if (Ovale.trace) then
+							self:Print(spellName.." restant = " .. restant)
 							self:Print("ticks = "..ticks.." tickLength="..tickLength.." tickTime="..tickTime)
 						end	
 						for i=1,ticks-1 do
@@ -1425,6 +1431,9 @@ function Ovale:CalculerMeilleureAction(element)
 							end
 							tickTime = tickTime + tickLength
 						end
+						if (Ovale.trace) then
+							self:Print(spellName.." restant = " .. restant)
+						end	
 					end
 				end
 				if (Ovale.trace) then
@@ -1638,7 +1647,7 @@ function Ovale:CalculerMeilleureAction(element)
 						maxEcart = bestCastTime*0.75
 					elseif (priorite and priorite < meilleurePrioriteFils) then
 						-- A l'inverse, si il est moins prioritaire que le précédent, on ne le lance
-						-- que caster le nouveau sort ne repousse pas le meilleur
+						-- que si caster le nouveau sort ne repousse pas le meilleur
 						maxEcart = -newCastTime*0.75
 					else
 						maxEcart = -0.01
