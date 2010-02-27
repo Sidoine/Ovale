@@ -94,7 +94,7 @@ AddIcon help=main
         Spell(SHIELDSLAM)
         Spell(BLOODTHIRST)
         
-        if Mana(more 10) Spell(DEVASTATE priority=2)
+        if Mana(more 10) Spell(DEVASTATE)
      }
 
      if Stance(3) #berserker

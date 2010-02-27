@@ -71,7 +71,7 @@ AddIcon help=main
        if TalentPoints(TALENTARCANEBARRAGE more 0)
        {
 				#Arcane spec
-				if DebuffExpires(ARCANEBLAST 0 stacks=4)
+				unless DebuffPresent(ARCANEBLAST stacks=3)
 					Spell(ARCANEBLAST)
 				if BuffPresent(MISSILEBARRAGE)
 					Spell(ARCANEMISSILES)

@@ -22,6 +22,7 @@ Define(HOLYWRATH 2812)
 Define(TALENTGUARDEDBYTHELIGHT 2194)
 Define(DIVINEPLEA 54428)
 
+AddListItem(sceau none L(None))
 AddListItem(sceau piete SpellName(SEALRIGHTEOUSNESS))
 AddListItem(sceau autorite SpellName(SEALCOMMAND))
 AddListItem(sceau vengeance SpellName(SEALVENGEANCE) default)

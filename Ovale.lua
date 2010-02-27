@@ -1249,6 +1249,9 @@ function Ovale:GetActionInfo(element)
 
 	if (element.func == "Spell" ) then
 		spellName = self:GetSpellInfoOrNil(element.params[1])
+		if not spellName then
+			return nil
+		end
 		action = self.actionSort[spellName]
 		local cd = self:GetCD(spellName)
 		if cd and cd.start then
@@ -1294,13 +1297,16 @@ function Ovale:GetActionInfo(element)
 			itemId = element.params[1]
 		else
 			local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
+			if not id then
+				return nil
+			end
 			itemId = tonumber(id)
 		end
 		
 		if (Ovale.trace) then
 			self:Print("Item "..nilstring(itemId))
 		end
-		
+
 		spellName = GetItemSpell(itemId)
 		actionUsable = (spellName~=nil)
 		
