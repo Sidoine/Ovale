@@ -380,8 +380,8 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
 	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 	if sourceName == UnitName("player") then
-		if string.find(event, "SPELL_AURA_APPLIED") == 1 or string.find(event, "SPELL_DAMAGE")==1 or 
-				string.find(event, "SPELL_MISSED") == 1 or string.find(event, "SPELL_AURA_REFRESH") == 1 
+		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
+				or string.find(event, "SPELL_MISSED") == 1 
 				or string.find(event, "SPELL_CAST_FAILED") == 1 then
 			local spellId, spellName = select(9, ...)
 			for i,v in ipairs(self.lastSpell) do
