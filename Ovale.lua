@@ -231,6 +231,14 @@ local options =
 					name = L["Correction de la latence"],
 					get = function(info) return Ovale.db.profile.apparence.latencyCorrection end,
 					set = function(info, value) Ovale.db.profile.apparence.latencyCorrection = value end
+				},
+				hideVehicule =
+				{
+					order = 17,
+					type = "toggle",
+					name = L["Cacher dans les véhicules"],
+					get = function(info) return Ovale.db.profile.apparence.hideVehicule end,
+					set = function(info, value) Ovale.db.profile.apparence.hideVehicule = value end
 				}
 			}
 		},
@@ -247,7 +255,7 @@ local options =
 					multiline = 15,
 					name = L["Code"],
 					get = function(info)
-						return Ovale.db.profile.code
+						return string.gsub(Ovale.db.profile.code, "\t", "    ")
 					end,
 					set = function(info,v)
 						Ovale.db.profile.code = v
@@ -1230,7 +1238,32 @@ function Ovale:GetGCD(spellName)
 	end
 end
 
-
+function Ovale:GetComputedSpellCD(spellName)
+	local actionCooldownStart, actionCooldownDuration, actionEnable
+	local cd = self:GetCD(spellName)
+	if cd and cd.start then
+		actionCooldownStart = cd.start
+		actionCooldownDuration = cd.duration
+		actionEnable = cd.enable
+	else
+		actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
+		-- Les chevaliers de la mort ont des infos fausses sur le CD quand ils n'ont plus les runes
+		-- On force à 1,5s ou 1s en présence impie
+		if self.className=="DEATHKNIGHT" and actionCooldownDuration==10 and
+				(not self.spellInfo[spellName] or self.spellInfo[spellName].cd~=10) then
+			local impie = GetSpellInfo(48265)
+			if impie and UnitBuff("player", impie) then
+				actionCooldownDuration=1
+			else
+				actionCooldownDuration=1.5
+			end
+		end
+		if self.spellInfo[spellName] and self.spellInfo[spellName].forcecd then
+			actionCooldownStart, actionCooldownDuration = GetSpellCooldown(GetSpellInfo(self.spellInfo[spellName].forcecd))
+		end
+	end
+	return actionCooldownStart, actionCooldownDuration, actionEnable
+end
 
 function Ovale:GetActionInfo(element)
 	if not element then
@@ -1253,28 +1286,7 @@ function Ovale:GetActionInfo(element)
 			return nil
 		end
 		action = self.actionSort[spellName]
-		local cd = self:GetCD(spellName)
-		if cd and cd.start then
-			actionCooldownStart = cd.start
-			actionCooldownDuration = cd.duration
-			actionEnable = cd.enable
-		else
-			actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellName)
-			-- Les chevaliers de la mort ont des infos fausses sur le CD quand ils n'ont plus les runes
-			-- On force à 1,5s ou 1s en présence impie
-			if self.className=="DEATHKNIGHT" and actionCooldownDuration==10 and
-					(not self.spellInfo[spellName] or self.spellInfo[spellName].cd~=10) then
-				local impie = GetSpellInfo(48265)
-				if impie and UnitBuff("player", impie) then
-					actionCooldownDuration=1
-				else
-					actionCooldownDuration=1.5
-				end
-			end
-			if self.spellInfo[spellName] and self.spellInfo[spellName].forcecd then
-				actionCooldownStart, actionCooldownDuration = GetSpellCooldown(GetSpellInfo(self.spellInfo[spellName].forcecd))
-			end
-		end
+		actionCooldownStart, actionCooldownDuration, actionEnable = self:GetComputedSpellCD(spellName)
 		
 		if (not action or not GetActionTexture(action)) then
 			actionTexture = GetSpellTexture(spellName)
@@ -1470,12 +1482,15 @@ function Ovale:CalculerMeilleureAction(element)
 			
 			return start, ending
 		end
+	elseif element.type == "time" then
+		return element.value
 	elseif (element.type == "before") then
 		if (Ovale.trace) then
 			self:Print(element.time.."s before ["..element.nodeId.."]")
 		end
+		local timeA = Ovale:CalculerMeilleurAction(element.time)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
-		return addTime(startA, -element.time), addTime(endA, -element.time)
+		return addTime(startA, -timeA), addTime(endA, -timeA)
 	elseif (element.type == "between") then
 		self:Log("between")
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
@@ -1509,20 +1524,23 @@ function Ovale:CalculerMeilleureAction(element)
 			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
+		Ovale:Log("fromuntil returns "..(tempsB - tempsA))
 		return tempsB - tempsA
 	elseif element.type == "compare" then
-		self:Log("compare "..element.comparison.." "..element.time)
+		self:Log("compare "..element.comparison)
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
-		if element.comparison == "more" and (not tempsA or tempsA>element.time) then
+		local timeB = Ovale:CalculerMeilleureAction(element.time)
+		self:Log(tempsA.." "..element.comparison.." "..timeB)
+		if element.comparison == "more" and (not tempsA or tempsA>timeB) then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
-		elseif element.comparison == "less" and tempsA and tempsA<element.time then
+		elseif element.comparison == "less" and tempsA and tempsA<timeB then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
-		elseif element.comparison == "at most" and tempsA and tempsA<=element.time then
+		elseif element.comparison == "at most" and tempsA and tempsA<=timeB then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
-		elseif element.comparison == "at least" and (not tempsA or tempsA>=element.time) then
+		elseif element.comparison == "at least" and (not tempsA or tempsA>=timeB) then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
 		end
@@ -1705,7 +1723,7 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, latencyCorrection=true},
+				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, latencyCorrection=true, hideVehicule=true},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
@@ -1740,12 +1758,16 @@ function Ovale:UpdateVisibility()
 	end
 
 	self.frame:Show()
-	
-	if (Ovale.db.profile.apparence.avecCible and not UnitExists("target")) then
+
+	if Ovale.db.profile.apparence.hideVehicule and UnitInVehicle("player") then
 		self.frame:Hide()
 	end
 	
-	if (Ovale.db.profile.apparence.enCombat and not Ovale.enCombat) then
+	if Ovale.db.profile.apparence.avecCible and not UnitExists("target") then
+		self.frame:Hide()
+	end
+	
+	if Ovale.db.profile.apparence.enCombat and not Ovale.enCombat then
 		self.frame:Hide()
 	end	
 	

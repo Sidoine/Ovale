@@ -35,6 +35,10 @@ local function ParseParameters(params)
 	return paramList
 end
 
+local function ParseTime(value)
+	return AddNode({type="time", value=tonumber(value)})
+end
+
 local function ParseFunction(func, params)
 	local paramList = ParseParameters(params)
 	local newNode = { type="function", func=func, params=paramList}
@@ -142,7 +146,7 @@ local function ParseAnd(a,b)
 end
 
 local function ParseBefore(a,b)
-	local newNode = {type="before", time=tonumber(a), a=node[tonumber(b)]}
+	local newNode = {type="before", time=node[tonumber(a)], a=node[tonumber(b)]}
 	return AddNode(newNode)
 end
 
@@ -162,7 +166,7 @@ local function ParseOr(a,b)
 end
 
 local function ParseCompare(comp,t,a)
-	local newNode = {type="compare", comparison=comp, time=tonumber(t), a=node[tonumber(a)]}
+	local newNode = {type="compare", comparison=comp, time=node[tonumber(t)], a=node[tonumber(a)]}
 	return AddNode(newNode)
 end
 
@@ -234,18 +238,19 @@ local function ParseAddIcon(params, text)
 	while (1==1) do
 		local was = text
 		text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
+		text = string.gsub(text, "(%d+%.?%d*)s", ParseTime)
 		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
 		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
-		text = string.gsub(text, "(%d+%.?%d*)s%s+before%s+node(%d+)", ParseBefore)
+		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
 		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
 		text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
 		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
-		text = string.gsub(text, "(more)%s+than%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)
-		text = string.gsub(text, "(less)%s+than%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)		
-		text = string.gsub(text, "(at least)%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)
-		text = string.gsub(text, "(at most)%s+(%d+%.?%d*)s%s+node(%d+)", ParseCompare)		
+		text = string.gsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
+		text = string.gsub(text, "(less)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)		
+		text = string.gsub(text, "(at least)%s+node(%d+)%s+node(%d+)", ParseCompare)
+		text = string.gsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
 		
 		if (was == text) then
 			break
@@ -382,13 +387,15 @@ function Ovale:DebugNode(node)
 	elseif (node.type == "or") then
 		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
 	elseif (node.type == "before") then
-		text = node.time .. "s before "..self:DebugNode(node.a)
+		text = self:DebugNode(node.time) .. " before "..self:DebugNode(node.a)
 	elseif (node.type == "between") then
 		text = "between "..self:DebugNode(node.a).." and "..self:DebugNode(node.b)
 	elseif (node.type == "fromuntil") then
 		text = "from "..self:DebugNode(node.a).." until "..self:DebugNode(node.b)
 	elseif (node.type == "compare") then
-		text = node.comparison.." than "..node.time.."s "..self:DebugNode(node.a)
+		text = node.comparison.." than "..self:DebugNode(node.time).." "..self:DebugNode(node.a)
+	elseif (node.type == "time") then
+		text = node.value.."s"
 	else
 		text = "#unknown node type#"
 	end

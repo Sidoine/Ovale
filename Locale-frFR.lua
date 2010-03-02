@@ -46,3 +46,4 @@ L["buff"] = "Améliorations"
 L["Inverser la boîte à cocher "] = true
 L["Ignorer les clics souris"] = true
 L["Correction de la latence"] = true
+L["Cacher dans les véhicules"] = true

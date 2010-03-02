@@ -63,13 +63,18 @@ ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRA
 
 AddIcon help=main
 {
-if BuffExpires(FELARMOR) Spell(FELARMOR)
-if WeaponEnchantExpires(mainhand 5)
+
+unless InCombat()
 {
-	if TalentPoints(TALENTEMBERSTORM more 0) Spell(FIRESTONE)
-	Spell(SPELLSTONE)
-	Spell(FIRESTONE)
+	if BuffExpires(FELARMOR 400) Spell(FELARMOR)
+	if WeaponEnchantExpires(mainhand 400)
+	{
+		if TalentPoints(TALENTEMBERSTORM more 0) Spell(FIRESTONE)
+		Spell(SPELLSTONE)
+		Spell(FIRESTONE)
+	}
 }
+
 if Glyph(GLYPHLIFETAP) and BuffExpires(LIFETAP 0) Spell(LIFETAP)
 if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
@@ -84,16 +89,18 @@ if TalentPoints(TALENTBACKDRAFT more 0) and TargetDebuffPresent(IMMOLATE mine=1)
 if TargetDebuffExpires(IMMOLATE 1.5 mine=1 haste=spell) and TargetDebuffExpires(UNSTABLEAFFLICTION 0 mine=1) and
 		{TargetLifePercent(more 25) or TalentPoints(TALENTDECIMATION more 0)} and TargetDeadIn(more 8)
 			Spell(IMMOLATE)
-if List(curse doom) and TargetDebuffExpires(CURSEDOOM 0 mine=1)
-{
-	if TargetDeadIn(more 60) Spell(CURSEDOOM)
-	if TargetDebuffExpires(CURSEAGONY 0 mine=1) Spell(CURSEAGONY) 
-}
-if List(curse tongues) and TargetDebuffExpires(CURSETONGUES 2) Spell(CURSETONGUES)
-if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) Spell(CURSEWEAKNESS)
-if List(curse agony) and TargetDebuffExpires(CURSEAGONY 0 mine=1) and TargetDeadIn(more 10) Spell(CURSEAGONY)
+
 if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1)
 	and TargetDeadIn(more 9) and TalentPoints(TALENTEMBERSTORM less 1) Spell(CORRUPTION)
+			
+if TargetDebuffExpires(CURSEDOOM 0) and TargetDebuffExpires(CURSETONGUES 2) and TargetDebuffExpires(CURSEWEAKNESS 2)
+	and TargetDebuffExpires(CURSEAGONY 0 mine=1) and TargetDebuffExpires(CURSEELEMENTS 2)
+{
+	if List(curse doom) and TargetDeadIn(more 60) Spell(CURSEDOOM)
+	if List(curse tongues) Spell(CURSETONGUES)
+	if List(curse weakness) Spell(CURSEWEAKNESS)
+	if TargetDeadIn(more 10) Spell(CURSEAGONY)
+}
 
 if BuffPresent(DECIMATION) Spell(SOULFIRE)
 

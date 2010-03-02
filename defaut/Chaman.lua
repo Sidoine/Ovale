@@ -68,7 +68,10 @@ AddIcon help=main
 {
 	unless TalentPoints(TALENTFLURRY more 0)
 	{
-		if WeaponEnchantExpires(mainhand 2) Spell(FLAMETHONG)
+		unless InCombat()
+		{
+			if WeaponEnchantExpires(mainhand 400) Spell(FLAMETHONG)
+		}
 		if BuffExpires(WATERSHIELD 2) Spell(WATERSHIELD)
 		if CheckBoxOn(firenova)
 		{
@@ -80,14 +83,17 @@ AddIcon help=main
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		unless TargetDebuffExpires(FLAMESHOCK 1.6 haste=spell mine=1) Spell(LAVABURST)
 		
-		if CheckBoxOn(chain) and 1.4s before Spell(LAVABURST) and CastTime(LIGHTNINGBOLT more 1.5)
+		if CheckBoxOn(chain) and CastTime(LIGHTNINGBOLT more 1.5) and at least 0s from Spell(LAVABURST) until EndCastTime(CHAINLIGHTNING)
 				Spell(CHAINLIGHTNING)
 		Spell(LIGHTNINGBOLT)
 	}
 	if TalentPoints(TALENTFLURRY more 0)
 	{
-		if WeaponEnchantExpires(mainhand 2) Spell(WINDFURYWEAPON)
-		if WeaponEnchantExpires(offhand 2) Spell(FLAMETHONG)
+		unless InCombat()
+		{
+			if WeaponEnchantExpires(mainhand 400) Spell(WINDFURYWEAPON)
+			if WeaponEnchantExpires(offhand 400) Spell(FLAMETHONG)
+		}
 		
 		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)

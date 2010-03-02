@@ -57,29 +57,33 @@ SpellInfo(AVENGINGWRATH cd=180)
 
 AddIcon help=main
 {
-     if List(sceau piete) and BuffExpires(SEALRIGHTEOUSNESS 3) Spell(SEALRIGHTEOUSNESS)
-     if List(sceau autorite) and BuffExpires(SEALCOMMAND 3) Spell(SEALCOMMAND)
-     if List(sceau vengeance)
-     {
-          if BuffExpires(SEALVENGEANCE 3) Spell(SEALVENGEANCE)
-          if BuffExpires(SEALCORRUPTION 3) Spell(SEALCORRUPTION)
-     }
-     if TargetTargetIsPlayer(yes) Spell(HOLYSHIELD)
-     Spell(HAMMEROFTHERIGHTEOUS)
+	unless InCombat()
+	{
+		if List(sceau piete) and BuffExpires(SEALRIGHTEOUSNESS 400) Spell(SEALRIGHTEOUSNESS)
+		if List(sceau autorite) and BuffExpires(SEALCOMMAND 400) Spell(SEALCOMMAND)
+		if List(sceau vengeance)
+		{
+			if BuffExpires(SEALVENGEANCE 400) Spell(SEALVENGEANCE)
+			if BuffExpires(SEALCORRUPTION 400) Spell(SEALCORRUPTION)
+		}
+	}
      
-     Spell(CRUSADERSTRIKE)
-     Spell(HAMMEROFWRATH usable=1)
-     if List(jugement lumiere) Spell(JUDGELIGHT)
-     if List(jugement sagesse) Spell(JUDGEWISDOM)
-     if CheckBoxOn(tempete) Spell(DIVINESTORM)
-     if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
-     if TalentPoints(TALENTGUARDEDBYTHELIGHT more 0) and BuffExpires(DIVINEPLEA 0) Spell(DIVINEPLEA)
-     if CheckBoxOn(consecration) Spell(CONSECRATE)
-     if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
-     if CheckBoxOn(coleredivine) Spell(HOLYWRATH)
+	if TargetTargetIsPlayer(yes) Spell(HOLYSHIELD)
+    Spell(HAMMEROFTHERIGHTEOUS)
      
-     Spell(HOLYSHOCK) 
-     if BuffPresent(THEARTOFWAR) Spell(FLASHOFLIGHT priority=2)
+	Spell(CRUSADERSTRIKE)
+	Spell(HAMMEROFWRATH usable=1)
+	if List(jugement lumiere) Spell(JUDGELIGHT)
+	if List(jugement sagesse) Spell(JUDGEWISDOM)
+	if CheckBoxOn(tempete) Spell(DIVINESTORM)
+	if HasShield() Spell(SHIELDOFRIGHTEOUSNESS)
+	if TalentPoints(TALENTGUARDEDBYTHELIGHT more 0) and BuffExpires(DIVINEPLEA 0) Spell(DIVINEPLEA)
+	if CheckBoxOn(consecration) Spell(CONSECRATE)
+	if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
+	if CheckBoxOn(coleredivine) Spell(HOLYWRATH)
+     
+	Spell(HOLYSHOCK) 
+	if BuffPresent(THEARTOFWAR) Spell(FLASHOFLIGHT priority=2)
 }
 
 AddIcon help=cd

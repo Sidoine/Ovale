@@ -30,6 +30,10 @@ Define(MIRRORIMAGE 55342)
 Define(SUMMONWATERELEMENTAL 31687)
 Define(PRESENCEOFMIND 12043)
 
+Define(MAGEARMOR 6117)
+Define(MOLTENARMOR 30482)
+Define(ICEARMOR 7302)
+
 AddCheckBox(scorch SpellName(SCORCH) default talent=TALENTIMPROVEDSCORSH)
 AddCheckBox(abarr SpellName(ARCANEBARRAGE) default talent=TALENTARCANEBARRAGE)
 
@@ -48,6 +52,12 @@ ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMEN
 
 AddIcon help=main
 {
+		unless InCombat()
+		{
+			if BuffExpires(MAGEARMOR 400) or BuffExpires(MOLTENARMOR 400) or BuffExpires(ICEARMOR 400)
+				Spell(MOLTENARMOR)
+		}
+		
        if TalentPoints(TALENTLIVINGBOMB more 0)
        {
               #Fire spec
@@ -71,7 +81,7 @@ AddIcon help=main
        if TalentPoints(TALENTARCANEBARRAGE more 0)
        {
 				#Arcane spec
-				unless DebuffPresent(ARCANEBLAST stacks=3)
+				unless DebuffPresent(ARCANEBLAST stacks=4)
 					Spell(ARCANEBLAST)
 				if BuffPresent(MISSILEBARRAGE)
 					Spell(ARCANEMISSILES)

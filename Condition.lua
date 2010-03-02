@@ -464,6 +464,15 @@ Ovale.conditions=
 			return 0,limit
 		end
 	end,
+	EndCastTime = function(condition)
+		local name, rank, icon, cost, isFunnel, powerType, castTime = Ovale:GetSpellInfoOrNil(condition[1])
+		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(name)
+		local startCast = actionCooldownStart + actionCooldownDuration
+		if startCast<Ovale.currentTime then
+			startCast = Ovale.currentTime
+		end
+		return startCast + castTime/1000
+	end,
 	Glyph = function(condition)
 		local present = false
 		for i = 1, GetNumGlyphSockets() do
@@ -486,6 +495,9 @@ Ovale.conditions=
 		
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
 		return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
+	end,
+	InCombat = function(condition)
+		return testbool(Ovale.enCombat, condition[1])
 	end,
 	ItemCount = function(condition)
 		return compare(GetItemCount(condition[1]), condition[2], condition[3])

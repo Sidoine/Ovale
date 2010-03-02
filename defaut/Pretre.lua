@@ -40,17 +40,19 @@ ScoreSpells(MB SWP VT DP MF)
 # Add main monitor
 AddIcon help=main
 {
-
-#Check shadowform is up
-unless BuffPresent(SF)
-    Spell(SF)
-    
-# Refresh inner fire
-if BuffExpires(IF 60)
-    Spell(IF)
-	
-if BuffExpires(VE 60) 
-	Spell(VE)
+unless InCombat()
+{
+	#Check shadowform is up
+	unless BuffPresent(SF)
+		Spell(SF)
+		
+	# Refresh inner fire
+	if BuffExpires(IF 400)
+		Spell(IF)
+		
+	if BuffExpires(VE 400) 
+		Spell(VE)
+}
 
 #if inner focus is active, cast mind blast
 if BuffPresent(Focus) 
