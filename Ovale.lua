@@ -1488,7 +1488,7 @@ function Ovale:CalculerMeilleureAction(element)
 		if (Ovale.trace) then
 			self:Print(element.time.."s before ["..element.nodeId.."]")
 		end
-		local timeA = Ovale:CalculerMeilleurAction(element.time)
+		local timeA = Ovale:CalculerMeilleureAction(element.time)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		return addTime(startA, -timeA), addTime(endA, -timeA)
 	elseif (element.type == "between") then
