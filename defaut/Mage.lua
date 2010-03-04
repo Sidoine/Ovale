@@ -54,7 +54,7 @@ AddIcon help=main
 {
 		unless InCombat()
 		{
-			if BuffExpires(MAGEARMOR 400) or BuffExpires(MOLTENARMOR 400) or BuffExpires(ICEARMOR 400)
+			if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400)
 				Spell(MOLTENARMOR)
 		}
 		
