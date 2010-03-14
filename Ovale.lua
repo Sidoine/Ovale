@@ -1409,7 +1409,7 @@ function Ovale:CalculerMeilleureAction(element)
 				element.castTime = self.spellInfo[spellName].casttime
 			elseif spellName then
 				local spell, rank, icon, cost, isFunnel, powerType, castTime = GetSpellInfo(spellName)
-				element.castTime = castTime
+				element.castTime = castTime/1000
 			else
 				element.castTime = 0
 			end
