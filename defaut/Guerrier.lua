@@ -74,6 +74,12 @@ AddIcon help=main
             and TargetDebuffExpires(CURSEOFWEAKNESS 0)
           Spell(DEMOSHOUT nored=1)
          
+	if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 2 stacks=5) and TargetDebuffPresent(SUNDER stacks=4)
+	{
+		Spell(DEVASTATE nored=1)
+		Spell(SUNDER nored=1)
+	}
+	
      if Stance(2) #Defense
      {
         if TargetClassification(worldboss)
@@ -145,16 +151,11 @@ AddIcon help=main
         Spell(DEVASTATE)
      }
 
-     if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 5 stacks=5) 
-     {
-		if TargetDebuffPresent(SUNDER)
-		{
-			Spell(DEVASTATE nored=1)
-			Spell(SUNDER nored=1)
-		}
+	if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDER 10 stacks=5)
+	{
 	    Spell(DEVASTATE priority=2 nored=1)
 		Spell(SUNDER priority=2 nored=1)
-     }
+    }
 }
 
 AddIcon help=offgcd

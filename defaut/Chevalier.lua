@@ -34,7 +34,8 @@ Define(TALENTABOMINATIONMIGHT 2105)
 Define(RAISEDEAD 46584)
 Define(HORNOFWINTER 57330)
 Define(STRENGTHOFEARTHTOTEM 8075)
-
+Define(GLYPHOFRAISEDEAD 60200)
+Define(BLOODTAP 45529)
 
 AddCheckBox(rolldes SpellName(GLYPHDISEASE) default glyph=GLYPHDISEASE)
 
@@ -110,10 +111,18 @@ AddIcon help=main
 		Spell(PLAGUESTRIKE)
 		
 	Spell(FROSTSTRIKE usable=1)
-	if PetPresent(no) Spell(RAISEDEAD)
+	if PetPresent(no) and Glyph(RAISEDEAD) Spell(RAISEDEAD)
 	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
 	Spell(HORNOFWINTER priority=2)
+
+	unless Runes(frost 1) and Runes(unholy 1) Spell(BLOODTAP)
+	
+	if Runes(blood 2 nodeath=1)
+	{
+		Spell(HEARTSTRIKE priority=2)
+		Spell(BLOODSTRIKE priority=2)
+	}
 }
 
 AddIcon help=offgcd

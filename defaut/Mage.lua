@@ -1,10 +1,12 @@
 Ovale.defaut["MAGE"]=
 [[
+#Modified by Arconer
 Define(TALENTLIVINGBOMB 1852)
 Define(TALENTPIERCINGICE 61)
 Define(TALENTCHILLEDTOTHEBONES 1856)
 Define(TALENTARCANEBARRAGE 1847)
 Define(TALENTIMPROVEDSCORSH 25)
+Define(TALENTBRAINFREEZE 1854)
 
 Define(HOTSTREAK 48108)
 Define(IMPROVEDSCORCH 22959)
@@ -17,6 +19,9 @@ Define(FIREBALL 133)
 
 Define(FROSTBOLT 116)
 Define(DEEPFREEZE 44572)
+Define(BRAINFREEZE 57761)
+Define(PUSHLIMIT 70753)
+Define(FINGERFROST 44544)
 
 Define(ARCANEBARRAGE 44425)
 Define(ARCANEMISSILES 5143)
@@ -52,53 +57,52 @@ ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMEN
 
 AddIcon help=main
 {
-		unless InCombat()
-		{
-			if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400)
-				Spell(MOLTENARMOR)
-		}
-		
-       if TalentPoints(TALENTLIVINGBOMB more 0)
-       {
-              #Fire spec
-              if TargetDebuffExpires(IMPROVEDSCORCH 6) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
-              if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
-              if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
-              if TalentPoints(TALENTPIERCINGICE more 0)
-                     Spell(FROSTFIREBOLT)
-              if TalentPoints(TALENTPIERCINGICE less 1)
-                     Spell(FIREBALL)
-       }
+	unless InCombat()
+	{
+		if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400)
+		Spell(MOLTENARMOR)
+	}
+
+	if TalentPoints(TALENTLIVINGBOMB more 0)
+	{
+		#Fire spec
+		if TargetDebuffExpires(IMPROVEDSCORCH 6) and CheckBoxOn(scorch) and TargetDeadIn(more 15) Spell(SCORCH)
+		if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
+		if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
+		if TalentPoints(TALENTPIERCINGICE more 0)
+			Spell(FROSTFIREBOLT)
+		if TalentPoints(TALENTPIERCINGICE less 1)
+			Spell(FIREBALL)
+	}
        
-       if TalentPoints(TALENTCHILLEDTOTHEBONES more 0)
-       {
-              #Frost spec
-              if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
-              if TargetClassification(worldboss) Spell(DEEPFREEZE)
-              Spell(FROSTBOLT)
-       }
+	if TalentPoints(TALENTCHILLEDTOTHEBONES more 0)
+	{
+		#Frost spec
+		if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
+		if BuffPresent(FINGERFROST) Spell(DEEPFREEZE)
+		if BuffPresent(BRAINFREEZE) and BuffExpires(PUSHLIMIT 1) Spell(FIREBALL)
+		Spell(FROSTBOLT)
+	}
        
-       if TalentPoints(TALENTARCANEBARRAGE more 0)
-       {
-				#Arcane spec
-				unless DebuffPresent(ARCANEBLAST stacks=4)
-					Spell(ARCANEBLAST)
-				if BuffPresent(MISSILEBARRAGE)
-					Spell(ARCANEMISSILES)
-				if CheckBoxOn(abarr) Spell(ARCANEBARRAGE)
-				Spell(ARCANEMISSILES)
-       }
+	if TalentPoints(TALENTARCANEBARRAGE more 0)
+    {
+            #Arcane spec
+                   
+            if BuffPresent(MISSILEBARRAGE) and DebuffPresent(ARCANEBLAST stacks=4)
+                Spell(ARCANEMISSILES)
+			Spell(ARCANEBLAST)
+    }
 }
 
 AddIcon help=cd
 {
-       Spell(MIRRORIMAGE)
-       if DebuffPresent(ARCANEBLAST stacks=3) Spell(ARCANEPOWER)
-       Spell(COMBUSTION)
-       Spell(ICYVEINS)
-       Spell(PRESENCEOFMIND)
-       Item(Trinket0Slot usable=1)
-       Item(Trinket1Slot usable=1)
+	Spell(MIRRORIMAGE)
+	if DebuffPresent(ARCANEBLAST stacks=3) Spell(ARCANEPOWER)
+	Spell(COMBUSTION)
+	Spell(ICYVEINS)
+	Spell(PRESENCEOFMIND)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 ]]
