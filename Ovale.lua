@@ -530,9 +530,11 @@ function Ovale:UNIT_AURA(event, unit)
 end
 
 function Ovale:CompileAll()
-	self.masterNodes = self:Compile(self.db.profile.code)
-	self:UpdateFrame()
-	self.needCompile = false
+	if self.db.profile.code then
+		self.masterNodes = self:Compile(self.db.profile.code)
+		self:UpdateFrame()
+		self.needCompile = false
+	end
 end
 
 function Ovale:HandleProfileChanges()
@@ -1409,7 +1411,11 @@ function Ovale:CalculerMeilleureAction(element)
 				element.castTime = self.spellInfo[spellName].casttime
 			elseif spellName then
 				local spell, rank, icon, cost, isFunnel, powerType, castTime = GetSpellInfo(spellName)
-				element.castTime = castTime/1000
+				if castTime then
+					element.castTime = castTime/1000
+				else
+					element.castTime = nil
+				end
 			else
 				element.castTime = 0
 			end
@@ -1651,7 +1657,7 @@ function Ovale:CalculerMeilleureAction(element)
 				if nouveauElement then
 					newCastTime = nouveauElement.castTime
 				end
-				if not newCastTime or newCastTime == 0 then
+				if not newCastTime or newCastTime < self.gcd then
 					newCastTime = self.gcd
 				end
 			
