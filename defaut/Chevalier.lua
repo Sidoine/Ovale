@@ -36,6 +36,8 @@ Define(HORNOFWINTER 57330)
 Define(STRENGTHOFEARTHTOTEM 8075)
 Define(GLYPHOFRAISEDEAD 60200)
 Define(BLOODTAP 45529)
+Define(FREEZINGFOG 59052)
+Define(KILLINGMACHINE 51124)
 
 AddCheckBox(rolldes SpellName(GLYPHDISEASE) default glyph=GLYPHDISEASE)
 
@@ -71,6 +73,8 @@ AddIcon help=main
 		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and
 		{TargetDebuffExpires(FROSTFEVER 3 mine=1) or TargetDebuffExpires(BLOODPLAGUE 3 mine=1)}
 			Spell(PESTILENCE)
+	
+	if BuffPresent(KILLINGMACHINE) Spell(FROSTSTRIKE usable=1)
 	
 	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
 	{
@@ -112,8 +116,10 @@ AddIcon help=main
 		
 	Spell(FROSTSTRIKE usable=1)
 	if PetPresent(no) and Glyph(RAISEDEAD) Spell(RAISEDEAD)
-	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
+	
+	if BuffPresent(FREEZINGFOG) Spell(HOWLINGBLAST)
+	
 	Spell(HORNOFWINTER priority=2)
 
 	unless Runes(frost 1) and Runes(unholy 1) Spell(BLOODTAP)

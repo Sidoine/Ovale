@@ -360,6 +360,13 @@ Ovale.conditions=
 		end
 		return compare(nombre, condition[2], condition[3])
 	end,
+	BuffDuration = function(condition)
+		local name, rank, icon, count, debuffType, duration = UnitBuff("player", Ovale:GetSpellInfoOrNil(condition[1]))
+		if not name then
+			return nil
+		end
+		return compare(duration, condition[2], condition[3])
+	end,
 	-- Test if a buff will expire on the player after a given time
 	-- 1 : buff spell id
 	-- 2 : expiration time 

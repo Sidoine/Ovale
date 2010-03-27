@@ -241,21 +241,29 @@ local function ParseAddIcon(params, text)
 		text = string.gsub(text, "(%d+%.?%d*)s", ParseTime)
 		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
-		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
-		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
-		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
-		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
-		text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
-		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
 		text = string.gsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
 		text = string.gsub(text, "(less)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)		
 		text = string.gsub(text, "(at least)%s+node(%d+)%s+node(%d+)", ParseCompare)
 		text = string.gsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
+		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
 		
 		if (was == text) then
 			break
 		end
 	end
+
+	while (1==1) do
+		local was = text
+		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
+		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
+		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
+		text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
+		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		if (was == text) then
+			break
+		end
+	end
+
 		
 	local masterNode
 	if (text) then

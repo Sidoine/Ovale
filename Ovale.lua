@@ -1362,6 +1362,13 @@ function Ovale:GetActionInfo(element)
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, target, element.params.nored
 end
 
+local function subTime(time1, duration)
+	if not time1 then
+		return nil
+	else
+		return time1 - duration
+	end
+end
 
 local function addTime(time1, duration)
 	if not time1 then

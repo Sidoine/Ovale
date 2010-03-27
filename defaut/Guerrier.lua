@@ -50,7 +50,7 @@ SpellAddTargetDebuff(DEVASTATE SUNDER=30)
 SpellAddTargetDebuff(SUNDER SUNDER=30)
 SpellAddBuff(BATTLESHOUT BATTLESHOUT=120)
 SpellAddBuff(COMMANDSHOUT COMMANDSHOUT=120)
-SpellAddBuff(SLAM SLAMBUFF=0)
+SpellAddBuff(SLAM SLAMBUFF=-1)
 SpellInfo(WHIRLWIND cd=8)
 SpellInfo(BLOODTHIRST cd=4)
 SpellInfo(DEATHWISH cd=180)
@@ -115,8 +115,10 @@ AddIcon help=main
         Spell(VICTORY usable=1)
         if BuffPresent(SLAMBUFF)
         {
-			if BuffExpires(SLAMBUFF 2)
+			if BuffExpires(SLAMBUFF 2.5)
       			Spell(SLAM nored=1)
+			if BuffDuration(SLAMBUFF more 6) and 1s before Spell(BLOODTHIRST) and 1s before Spell(WHIRLWIND)
+				Spell(SLAM)
       		Spell(SLAM priority=2 nored=1)
       	}
 	 
