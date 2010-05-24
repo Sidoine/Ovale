@@ -89,26 +89,33 @@ AddIcon help=main
 	}
 	if TalentPoints(TALENTFLURRY more 0)
 	{
+		#Changes by rsriv
 		unless InCombat()
 		{
 			if WeaponEnchantExpires(mainhand 400) Spell(WINDFURYWEAPON)
-			if WeaponEnchantExpires(offhand 400) Spell(FLAMETHONG)
+			if WeaponEnchantExpires(offhand 400) Spell(FLAMETONGUE)
 		}
-		
-		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
-		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
-		if TargetDebuffPresent(STORMSTRIKE) Spell(EARTHSHOCK)
-		Spell(STORMSTRIKE)
-		Spell(EARTHSHOCK)
-		if CheckBoxOn(firenova)
+
+		if CheckBoxOn(aoe)
 		{
 			if TotemExpires(fire) Spell(MAGMATOTEM)
 			unless TotemExpires(fire) Spell(FIRENOVA)
+			if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
 		}
-		if BuffExpires(LIGHTNINGSHIELD 0) Spell(LIGHTNINGSHIELD)
+
+		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+		if TargetDebuffExpires(FLAMESHOCK 2 haste=spell mine=1) Spell(FLAMESHOCK)
+		if TargetDebuffExpires(STORMSTRIKE) Spell(STORMSTRIKE)
+		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
+		if TotemExpires(fire) Spell(MAGMATOTEM)
+		Spell(FERALSPIRIT)
+		Spell(SHAMANISTICRAGE)
+		Spell(EARTHSHOCK)
+		Spell(STORMSTRIKE)
 		Spell(LAVALASH)
-		if CheckBoxOn(aoe) and BuffPresent(MAELSTROMWEAPON stacks=3) Spell(CHAINLIGHTNING priority=2)
-		if BuffPresent(MAELSTROMWEAPON stacks=3) Spell(LIGHTNINGBOLT priority=2)
+		Spell(FIRENOVA)
+		Spell(MAGMATOTEM priority=2)
+		Spell(LIGHTNINGSHIELD priority=2) 
 	}
 }
 
