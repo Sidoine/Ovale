@@ -783,6 +783,10 @@ Ovale.conditions=
 	TargetTargetIsPlayer = function(condition)
 		return testbool(UnitIsUnit("player","targettarget"), condition[1])
 	end,
+	Threat = function(condition)
+		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
+		return compare(threatpct, condition[1], condition[2])
+	end,
 	TimeInCombat = function(condition)
 		if condition[1] == "more" then
 			return Ovale.combatStartTime + condition[2]
