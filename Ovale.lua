@@ -999,37 +999,25 @@ function Ovale:GetCD(spellName)
 	end
 end
 
-
+-- Lance un sort dans le simulateur
+-- spellName : le nom du sort
+-- startCast : temps du cast
+-- endCast : fin du cast
+-- nextCast : temps auquel le prochain sort peut être lancé (>=endCast, avec le GCD)
+-- nocd : le sort ne déclenche pas son cooldown
 function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
---	self.spellStack.length = self.spellStack.length + 1
---	if not self.spellStack[self.spellStack.length] then
---		self.spellStack[self.spellStack.length] = {}
---	end
---	local newSpell = self.spellStack[self.spellStack.length]
---	newSpell.attenteFinCast = endCast
---	if spellName then
---		newSpell.info = self.spellInfo[spellName]
---	else
---		newSpell.info = nil
---	end
-
-	local newSpellInfo = nil
 	if not spellName then
 		return
 	end
 	
+	local newSpellInfo = nil
 	newSpellInfo = self.spellInfo[spellName]
 	
-	if startCast>Ovale.maintenant then
-		local _, _, _, cost = GetSpellInfo(spellName)
-		if cost then
-			self.state.mana = self.state.mana - cost
-		end
-	end
-	
+	--On enregistre les infos sur le sort en cours
 	self.attenteFinCast = nextCast
 	self.currentSpellName = spellName
 	self.startCast = startCast
+	--Temps actuel de la simulation : un peu après le dernier cast (ou maintenant si dans le passé)
 	if startCast>=self.maintenant then
 		self.currentTime = startCast+0.1
 	else
@@ -1040,14 +1028,23 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 		Ovale:Print("add spell "..spellName.." at "..startCast.." currentTime = "..nextCast)
 	end
 	
-	if startCast>=0 then
+	--Coût du sort (uniquement si dans le futur, dans le passé l'énergie est déjà dépensée)
+	if startCast > Ovale.maintenant then
+		--Mana
+		local _, _, _, cost = GetSpellInfo(spellName)
+		if cost then
+			self.state.mana = self.state.mana - cost
+		end
+
 		if newSpellInfo then
+			--Points de combo
 			if newSpellInfo.combo then
 				self.state.combo = self.state.combo + newSpellInfo.combo
 				if self.state.combo<0 then
 					self.state.combo = 0
 				end
 			end
+			--Runes
 			if newSpellInfo.frost then
 				self:AddRune(startCast, 3, newSpellInfo.frost)
 			end
@@ -1063,14 +1060,18 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 		end
 	end
 	
+	-- Effets du sort
 	if newSpellInfo then
+		-- Cooldown du sort
 		local cd = self:GetCD(spellName)
 		if cd then
 			cd.start = startCast
 			cd.duration = newSpellInfo.cd
+			--Pas de cooldown
 			if nocd then
 				cd.duration = 0
 			end
+			--On vérifie si le buff "buffnocd" est présent, auquel cas le CD du sort n'est pas déclenché
 			if newSpellInfo.buffnocd and not nocd then
 				local buffAura = self:GetAura("player", "HELPFUL", newSpellInfo.buffnocd)
 				if self.traceAura then
@@ -1091,6 +1092,8 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 				cd.toggled = 1
 			end
 		end
+
+		--Auras causés par le sort
 		if newSpellInfo.aura then
 			for target, targetInfo in pairs(newSpellInfo.aura) do
 				for filter, filterInfo in pairs(targetInfo) do
@@ -1099,16 +1102,21 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 						newAura.mine = true
 						local duration = spellData
 						local stacks = duration
-						local spellName = self:GetSpellInfoOrNil(spell)
-						if spellName and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
-							duration = self.spellInfo[spellName].duration
+						local auraSpellName = self:GetSpellInfoOrNil(spell)
+						--Optionnellement, on va regarder la durée du buff
+						if auraSpellName and self.spellInfo[auraSpellName] and self.spellInfo[auraSpellName].duration then
+							duration = self.spellInfo[auraSpellName].duration
 						end
 						if stacks<0 and newAura.ending then
 							newAura.stacks = newAura.stacks + stacks
+							if Ovale.trace then
+								self:Print("removing aura "..auraSpellName.." because of ".. spellName)
+							end
+							--Plus de stacks, on supprime l'aura
 							if newAura.stacks<=0 then
 								newAura.stacks = 0
 								newAura.ending = 0
-							end 
+							end
 						elseif newAura.ending and newAura.ending >= endCast then
 							newAura.ending = endCast + duration
 							newAura.stacks = newAura.stacks + 1
@@ -1118,8 +1126,8 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 							newAura.stacks = 1
 						end
 						if Ovale.trace then
-							if spellName then
-								self:Print("adding aura "..spellName.." to "..target.." "..newAura.start..","..newAura.ending)
+							if auraSpellName then
+								self:Print("adding "..stacks.." aura "..auraSpellName.." to "..target.." "..newAura.start..","..newAura.ending)
 							else
 								self:Print("adding nil aura")
 							end

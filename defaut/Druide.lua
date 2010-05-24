@@ -61,6 +61,7 @@ SpellInfo(RIP combo=-5 duration=12)
 SpellInfo(FEROCIOUSBITE combo=-5)
 SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
 SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
+SpellInfo(CLAW combo=1)
 
 AddIcon help=main
 {
@@ -122,6 +123,7 @@ AddIcon help=main
 			if ComboPoints(less 5) and TargetDebuffExpires(RIP 3 mine=1) Spell(SHRED)
 			if ComboPoints(less 1) and BuffExpires(SAVAGEROAR 2) Spell(SHRED)
 		}
+		if CheckBoxOff(shred) Spell(CLAW)
 	}
 
 	unless Stance(1) or Stance(3)

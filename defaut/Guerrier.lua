@@ -99,6 +99,7 @@ AddIcon help=main
         Spell(REVENGE usable=1)
         Spell(SHIELDSLAM)
         Spell(BLOODTHIRST)
+		Spell(MORTALSTRIKE)
         
         if Mana(more 10) Spell(DEVASTATE)
      }
@@ -117,8 +118,8 @@ AddIcon help=main
         {
 			if BuffExpires(SLAMBUFF 2.5)
       			Spell(SLAM nored=1)
-			if BuffDuration(SLAMBUFF more 6) and 1s before Spell(BLOODTHIRST) and 1s before Spell(WHIRLWIND)
-				Spell(SLAM)
+			if BuffDuration(SLAMBUFF more 6) and 1s before Spell(BLOODTHIRST) and { 1s before Spell(WHIRLWIND) or CheckBoxOff(whirlwind) }
+				Spell(SLAM nored=1)
       		Spell(SLAM priority=2 nored=1)
       	}
 	 
