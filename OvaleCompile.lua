@@ -288,6 +288,9 @@ local function ParseAddIcon(params, text)
 	-- On convertit le numéro de node en node
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
+	if masterNode.params.talent and not HasTalent(masterNode.params.talent) then
+		return nil
+	end
 	return masterNode
 end
 
@@ -367,7 +370,10 @@ function Ovale:Compile(text)
 	
 	-- On compile les AddIcon
 	for p,t in string.gmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
-		masterNodes[#masterNodes+1] = ParseAddIcon(p,t)
+		local newNode = ParseAddIcon(p,t)
+		if newNode then
+			masterNodes[#masterNodes+1] = newNode
+		end
 	end
 	return masterNodes
 end
