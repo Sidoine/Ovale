@@ -386,7 +386,7 @@ end
 
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
+	self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 	if sourceName == UnitName("player") then
 		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
 				or string.find(event, "SPELL_MISSED") == 1 
@@ -618,6 +618,7 @@ function Ovale:OnEnable()
     self:RegisterEvent("UNIT_AURA");
     self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
     self:RegisterEvent("UNIT_SPELLCAST_SENT")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("CHAT_MSG_ADDON")
@@ -647,6 +648,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:UnregisterEvent("CHAT_MSG_ADDON")
     self:UnregisterEvent("GLYPH_UPDATED")	
+	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
     self.frame:Hide()
 end
 
@@ -660,6 +662,18 @@ function Ovale:GLYPH_UPDATED(event)
 	-- self:Print("GLYPH_UPDATED")
 	-- self:CompileAll()
 	self.needCompile = true
+end
+
+function Ovale:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank)
+	if unit=="player" then
+		for i,v in ipairs(self.lastSpell) do
+			if v.name == name then
+				table.remove(self.lastSpell, i)
+				--self:Print("on supprime "..name)
+				break
+			end
+		end
+	end
 end
 
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
@@ -1029,7 +1043,7 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 	end
 	
 	--Coût du sort (uniquement si dans le futur, dans le passé l'énergie est déjà dépensée)
-	if startCast > Ovale.maintenant then
+	if startCast >= self.maintenant then
 		--Mana
 		local _, _, _, cost = GetSpellInfo(spellName)
 		if cost then
@@ -1108,15 +1122,17 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 							duration = self.spellInfo[auraSpellName].duration
 						end
 						if stacks<0 and newAura.ending then
-							newAura.stacks = newAura.stacks + stacks
-							if Ovale.trace then
-								self:Print("removing aura "..auraSpellName.." because of ".. spellName)
-							end
-							--Plus de stacks, on supprime l'aura
-							if newAura.stacks<=0 then
-								newAura.stacks = 0
-								newAura.ending = 0
-							end
+							--if filter~="HELPFUL" or target~="player" or startCast>=Ovale.maintenant then
+								newAura.stacks = newAura.stacks + stacks
+								if Ovale.trace then
+									self:Print("removing aura "..auraSpellName.." because of ".. spellName)
+								end
+								--Plus de stacks, on supprime l'aura
+								if newAura.stacks<=0 then
+									newAura.stacks = 0
+									newAura.ending = 0
+								end
+							--end
 						elseif newAura.ending and newAura.ending >= endCast then
 							newAura.ending = endCast + duration
 							newAura.stacks = newAura.stacks + 1
@@ -1127,7 +1143,7 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 						end
 						if Ovale.trace then
 							if auraSpellName then
-								self:Print("adding "..stacks.." aura "..auraSpellName.." to "..target.." "..newAura.start..","..newAura.ending)
+								self:Print(spellName.." adding "..stacks.." aura "..auraSpellName.." to "..target.." "..filter.." "..newAura.start..","..newAura.ending)
 							else
 								self:Print("adding nil aura")
 							end
