@@ -104,7 +104,7 @@ do
 		self.content:SetHeight(height+50)
 	end
 	
-	local function OnSkinChanged(self, skinID, gloss, backdrop, colors)
+	local function OnSkinChanged(self, skinID, gloss, backdrop, group, button, colors)
 		Ovale.db.profile.SkinID = skinID
 		Ovale.db.profile.Gloss = gloss
 		Ovale.db.profile.Backdrop = backdrop
