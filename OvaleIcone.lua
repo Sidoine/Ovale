@@ -47,9 +47,9 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			self.icone:SetVertexColor(1,1,1)
 		end 
 		
-		if (minAttente==Ovale.maintenant) then
-			self.cd:Hide()
-		end
+		--if (minAttente==Ovale.maintenant) then
+			--self.cd:Hide()
+		--end
 
 		if element.params.sound and not self.lastSound then
 			local delay = self.soundtime or 0.5
