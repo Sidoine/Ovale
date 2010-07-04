@@ -653,6 +653,9 @@ Ovale.conditions=
 			return maxCD
 		end
 	end,
+	Speed = function(condition)
+		return compare(GetUnitSpeed("player")*100/7, condition[1], condition[2])
+	end,
 	-- Test if the player is in a given stance
 	-- 1 : the stance
 	Stance = function(condition)
