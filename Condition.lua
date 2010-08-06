@@ -753,6 +753,10 @@ Ovale.conditions=
 	TargetIsCasting = function(condition)
 		return testbool(UnitCastingInfo(getTarget(condition.target)), condition[1])
 	end,
+	TargetIsInterruptible = function(condition)
+		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(getTarget(condition.target))
+		return testbool(protected ~= nil and not protected, condition[1])
+	end,
 	TargetLife = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitHealth(target), condition[1], condition[2])
