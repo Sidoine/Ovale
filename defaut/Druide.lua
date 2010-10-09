@@ -78,12 +78,12 @@ AddCheckBox(demo SpellName(DEMOROAR) default mastery=2)
 AddCheckBox(shred SpellName(SHRED) default mastery=2)
 
 ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP 
-		TIGERSFURY MANGLECAT RAKE SHRED FEROCIOUSBITE INSECTSWARM MOONFIRE
+		MANGLECAT RAKE SHRED FEROCIOUSBITE INSECTSWARM MOONFIRE
 		WRATH STARFIRE)
 
 AddIcon help=main mastery=1
 {
-	if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2) and TargetDeadIn(more 15)
+	if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2) and TargetDeadIn(more 15)
 		Spell(FAERIEFIRE)
 
 	if Speed(more 0)
@@ -137,7 +137,7 @@ AddIcon help=main mastery=2
 {
 	if Stance(1) # bear
 	{
-		unless TargetDebuffExpires(LACERATE 4) and TargetDebuffPresent(LACERATE)
+		unless TargetDebuffExpires(LACERATE 4) and TargetDebuffPresent(bleed)
 			Spell(MANGLEBEAR)
 		
 		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=3)
@@ -146,10 +146,10 @@ AddIcon help=main mastery=2
 		if TargetDebuffPresent(LACERATE stacks=3)
 			Spell(PULVERIZE)
 
-		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFERAL 2)
+		if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2)
 			Spell(FAERIEFERAL)
 
-		if CheckBoxOn(demo) and TargetDebuffExpires(DEMOROAR 2)
+		if CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2)
 			Spell(DEMOROAR)
 
 		if Mana(more 50) Spell(MAUL)
@@ -161,11 +161,11 @@ AddIcon help=main mastery=2
 	{
 		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR priority=4)
 	
-		if CheckBoxOn(lucioles) and	TargetDebuffExpires(FAERIEFERAL 2) and TargetDeadIn(more 15)
+		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
 
 		#De-synchronize Roar and Rip
-		if ComboPoints(more 2) and BuffExpires(SAVAGEROAR 6) and less than 6s between BuffExpires(ROAR) and TargetDebuffExpires(RIP mine=1 forceduration=22) 
+		if ComboPoints(more 2) and BuffExpires(SAVAGEROAR 6) and less than 6s between BuffExpires(SAVAGEROAR) and TargetDebuffExpires(RIP mine=1 forceduration=22) 
 		{
 			unless TargetDebuffExpires(RIP 6 mine=1) Spell(SAVAGEROAR priority=4)
 		}
@@ -184,7 +184,7 @@ AddIcon help=main mastery=2
 			}
 		}
 		
-		if TargetDebuffExpires(MANGLECAT 0) and TargetDebuffExpires(MANGLEBEAR 0) and TargetDebuffExpires(TRAUMA 0) and CheckBoxOn(mangle)
+		if TargetDebuffExpires(bleed 0) and CheckBoxOn(mangle)
 			Spell(MANGLECAT)
 		if TargetDebuffExpires(RAKE 0 mine=1) and TargetDeadIn(more 10)
 			Spell(RAKE)

@@ -208,7 +208,7 @@ local function ParseAddListItem(list,item,text, default)
 		(paramList.glyph and not HasGlyph(paramList.glyph)) then
 		return ""
 	end
-	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree(GetActiveTalentGroup(false, false)) then
+	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
 		return ""
 	end
 	if (not Ovale.listes[list]) then
@@ -227,7 +227,7 @@ local function ParseAddCheckBox(item, text, params)
 		(paramList.glyph and not HasGlyph(paramList.glyph)) then
 		return ""
 	end
-	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree(GetActiveTalentGroup(false, false)) then
+	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
 		return ""
 	end
 	Ovale.casesACocher[item] = {text = text}
