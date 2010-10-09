@@ -76,10 +76,6 @@ Define(ENRAGE 14202)
 Define(SLAMTALENT 2233)
 Define(SUDDENDEATH 52437)
 
-#Other classes buffs
-Define(DEMORALIZINGROAR 48560)
-Define(CURSEOFWEAKNESS 50511)
-
 AddCheckBox(multi L(AOE))
 AddCheckBox(demo SpellName(DEMOSHOUT))
 AddCheckBox(sunder SpellName(SUNDERARMOR) default)

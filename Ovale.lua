@@ -338,39 +338,6 @@ function Ovale:OnInitialize()
 	self.AceConfigDialog = LibStub("AceConfigDialog-3.0");
 end
 
-function Ovale:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
-	if (slot == 0) then
-		self:RemplirActionIndexes()
-	elseif (slot) then
-	-- on reçoit aussi si c'est une macro avec mouseover à chaque fois que la souris passe sur une cible!
-		self:RemplirActionIndex(tonumber(slot))
-	end
-end
-
-function Ovale:ACTIONBAR_PAGE_CHANGED()
-	-- self:RemplirActionIndexes()
-end
-
-function Ovale:CHARACTER_POINTS_CHANGED()
-	self:RemplirListeTalents()
---	self:Print("CHARACTER_POINTS_CHANGED")
-end
-
-function Ovale:PLAYER_TALENT_UPDATE()
-	self:RemplirListeTalents()
---	self:Print("PLAYER_TALENT_UPDATE")
-end
-
-function Ovale:SPELLS_CHANGED()
-	-- self:RemplirActionIndexes()
-	-- self:RemplirListeTalents()
-	self.needCompile = true
-end
-
-function Ovale:UPDATE_BINDINGS()
-	self:RemplirActionIndexes()
-end
-
 function Ovale:GetOtherDebuffs(spellName)
 	if not self.otherDebuffs[spellName] then
 		self.otherDebuffs[spellName] = {}
@@ -390,151 +357,6 @@ function Ovale:WithHaste(temps, hate)
 		return temps/(1+self.meleeHaste/100)
 	else
 		return temps
-	end
-end
-
-function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
-	if sourceName == UnitName("player") then
-		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
-				or string.find(event, "SPELL_MISSED") == 1 
-				or string.find(event, "SPELL_CAST_FAILED") == 1 then
-			local spellId, spellName = select(9, ...)
-			for i,v in ipairs(self.lastSpell) do
-				if v.name == spellName then
-					table.remove(self.lastSpell, i)
-					--self:Print("on supprime "..spellName.." a "..GetTime())
-					--self:Print(UnitDebuff("target", "Etreinte de l'ombre"))
-					break
-				end
-			end
-		end
-		if self.otherDebuffsEnabled then
-			if string.find(event, "SPELL_AURA_") == 1 then
-				local spellId, spellName, spellSchool, auraType = select(9, ...)
-				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
-					local otherDebuff = self:GetOtherDebuffs(spellName)
-					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
-						otherDebuff[destGUID] = Ovale.maintenant + self:WithHaste(self.spellInfo[spellName].duration, self.spellInfo[spellName].durationhaste)
-					--	self:Print("ajout de "..spellName.." à "..destGUID)
-					elseif event == "SPELL_AURA_REMOVED" then
-						otherDebuff[destGUID] = nil						
-					--	self:Print("suppression de "..spellName.." de "..destGUID)
-					end	
-				end
-			end
-		end
-		--if string.find(event, "SWING")==1 then
-		--	self:Print(select(1, ...))
-		--end
-	end
-	if self.otherDebuffsEnabled then
-		if event == "UNIT_DIED" then
-			for k,v in pairs(self.otherDebuffs) do
-				for j,w in pairs(v) do
-					if j==destGUID then
-						v[j] = nil
-					end
-				end
-			end
-		end
-	end
-end
-
---[[
-function Ovale:SaveAura(unit, filter)
-	local i=1
-	
-	for k, v in pairs(Ovale.aura[unit]) do
-		v.dispelled = true
-		v.unitCaster = nil
-	end
-	
-	while (true) do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster = UnitAura(unit, i, filter)
-		
-		if (not name) then
-			break
-		end
-		
-		if (not Ovale.aura[unit][filter][name].isMine or not isMine) then
-			Ovale.aura[unit][filter][name].icon = icon
-			Ovale.aura[unit][filter][name].count = count
-			Ovale.aura[unit][filter][name].duration = duration
-			Ovale.aura[unit][filter][name].expirationTime = expirationTime
-			Ovale.aura[unit][filter][name].unitCaster  = unitCaster 
-		end
-	end
-end
-
-
-function Ovale:PLAYER_TARGET_CHANGED()
-	Ovale.targetGUID = UnitGUID("target")
-	Ovale.aura.target.HELPFUL = {}
-	Ovale.aura.target.HARMFUL = {}
-end
-]]
-
-function Ovale:PLAYER_TARGET_CHANGED()
-	self:UpdateVisibility()
-end
-
-function Ovale:UNIT_AURA(event, unit)
-	if (unit == "player") then
-		local hateBase = GetCombatRatingBonus(18)
-		local hateCommune=0;
-		local hateSorts = 0;
-		local hateCaC = 0;
-		local hateHero = 0
-		local hateClasse = 0
-		local i=1;
-		
-		while (true) do
-			local name, rank, iconTexture, count, debuffType, duration, expirationTime, source =  UnitBuff("player", i);
-			if (not name) then
-				break
-			end
-			if (not self.buff[name]) then
-				self.buff[name] = {}
-			end
-			self.buff[name].icon = iconTexture
-			self.buff[name].count = count
-			self.buff[name].duration = duration
-			self.buff[name].expirationTime = expirationTime
-			self.buff[name].source = source
-			if (not self.buff[name].present) then
-				self.buff[name].gain = Ovale.maintenant
-			end
-			self.buff[name].lastSeen = Ovale.maintenant
-			self.buff[name].present = true
-			
-			if (name == self.RETRIBUTION_AURA or name == self.MOONKIN_AURA) then
-				hateCommune = 3
-			elseif (name == self.WRATH_OF_AIR_TOTEM) then
-				hateSorts = 5
-			elseif (name == self.WINDFURY_TOTEM and hateCaC == 0) then
-				hateCaC = 16
-			elseif (name == self.ICY_TALONS) then
-				hateCaC = 20
-			elseif (name == self.BLOODLUST or name == self.HEROISM) then
-				hateHero = 30
-			elseif (name == self.JUDGMENT_OF_THE_PURE) then
-				hateClasse = 15
-			end
-			i = i + 1;
-		end
-		
-		for k,v in pairs(self.buff) do
-			if (v.lastSeen ~= Ovale.maintenant) then
-				v.present = false
-			end
-		end
-		
-		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
-		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
---		self.rangedHaste = hateBase + hateCommune + hateHero + hateClasse -- TODO ajouter le bidule du chasseur en spé bête
---		print("spellHaste = "..self.spellHaste)
 	end
 end
 
@@ -662,6 +484,150 @@ function Ovale:OnDisable()
     self.frame:Hide()
 end
 
+function Ovale:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
+	if (slot == 0) then
+		self:RemplirActionIndexes()
+	elseif (slot) then
+	-- on reçoit aussi si c'est une macro avec mouseover à chaque fois que la souris passe sur une cible!
+		self:RemplirActionIndex(tonumber(slot))
+	end
+end
+
+function Ovale:ACTIONBAR_PAGE_CHANGED()
+	-- self:RemplirActionIndexes()
+end
+
+function Ovale:CHARACTER_POINTS_CHANGED()
+	self:RemplirListeTalents()
+--	self:Print("CHARACTER_POINTS_CHANGED")
+end
+
+function Ovale:PLAYER_TALENT_UPDATE()
+	self:RemplirListeTalents()
+--	self:Print("PLAYER_TALENT_UPDATE")
+end
+
+function Ovale:SPELLS_CHANGED()
+	-- self:RemplirActionIndexes()
+	-- self:RemplirListeTalents()
+	self.needCompile = true
+end
+
+function Ovale:UPDATE_BINDINGS()
+	self:RemplirActionIndexes()
+end
+
+function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
+	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
+	if sourceName == UnitName("player") then
+		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
+				or string.find(event, "SPELL_MISSED") == 1 
+				or string.find(event, "SPELL_CAST_FAILED") == 1 then
+			local spellId, spellName = select(9, ...)
+			for i,v in ipairs(self.lastSpell) do
+				if v.name == spellName then
+					table.remove(self.lastSpell, i)
+					--self:Print("on supprime "..spellName.." a "..GetTime())
+					--self:Print(UnitDebuff("target", "Etreinte de l'ombre"))
+					break
+				end
+			end
+		end
+		if self.otherDebuffsEnabled then
+			if string.find(event, "SPELL_AURA_") == 1 then
+				local spellId, spellName, spellSchool, auraType = select(9, ...)
+				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
+					local otherDebuff = self:GetOtherDebuffs(spellName)
+					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
+						otherDebuff[destGUID] = Ovale.maintenant + self:WithHaste(self.spellInfo[spellName].duration, self.spellInfo[spellName].durationhaste)
+					--	self:Print("ajout de "..spellName.." à "..destGUID)
+					elseif event == "SPELL_AURA_REMOVED" then
+						otherDebuff[destGUID] = nil						
+					--	self:Print("suppression de "..spellName.." de "..destGUID)
+					end	
+				end
+			end
+		end
+		--if string.find(event, "SWING")==1 then
+		--	self:Print(select(1, ...))
+		--end
+	end
+	if self.otherDebuffsEnabled then
+		if event == "UNIT_DIED" then
+			for k,v in pairs(self.otherDebuffs) do
+				for j,w in pairs(v) do
+					if j==destGUID then
+						v[j] = nil
+					end
+				end
+			end
+		end
+	end
+end
+
+function Ovale:PLAYER_TARGET_CHANGED()
+	self:UpdateVisibility()
+end
+
+function Ovale:UNIT_AURA(event, unit)
+	if (unit == "player") then
+		local hateBase = GetCombatRatingBonus(18)
+		local hateCommune=0;
+		local hateSorts = 0;
+		local hateCaC = 0;
+		local hateHero = 0
+		local hateClasse = 0
+		local i=1;
+		
+		while (true) do
+			local name, rank, iconTexture, count, debuffType, duration, expirationTime, source =  UnitBuff("player", i);
+			if (not name) then
+				break
+			end
+			if (not self.buff[name]) then
+				self.buff[name] = {}
+			end
+			self.buff[name].icon = iconTexture
+			self.buff[name].count = count
+			self.buff[name].duration = duration
+			self.buff[name].expirationTime = expirationTime
+			self.buff[name].source = source
+			if (not self.buff[name].present) then
+				self.buff[name].gain = Ovale.maintenant
+			end
+			self.buff[name].lastSeen = Ovale.maintenant
+			self.buff[name].present = true
+			
+			if (name == self.RETRIBUTION_AURA or name == self.MOONKIN_AURA) then
+				hateCommune = 3
+			elseif (name == self.WRATH_OF_AIR_TOTEM) then
+				hateSorts = 5
+			elseif (name == self.WINDFURY_TOTEM and hateCaC == 0) then
+				hateCaC = 16
+			elseif (name == self.ICY_TALONS) then
+				hateCaC = 20
+			elseif (name == self.BLOODLUST or name == self.HEROISM) then
+				hateHero = 30
+			elseif (name == self.JUDGMENT_OF_THE_PURE) then
+				hateClasse = 15
+			end
+			i = i + 1;
+		end
+		
+		for k,v in pairs(self.buff) do
+			if (v.lastSeen ~= Ovale.maintenant) then
+				v.present = false
+			end
+		end
+		
+		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
+		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
+--		self.rangedHaste = hateBase + hateCommune + hateHero + hateClasse -- TODO ajouter le bidule du chasseur en spé bête
+--		print("spellHaste = "..self.spellHaste)
+	end
+end
+
 function Ovale:GLYPH_ADDED(event)
 	-- self:Print("GLYPH_ADDED")
 	-- self:CompileAll()
@@ -745,9 +711,13 @@ function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 	if type ~= "RAID" and type~= "PARTY" then return end
 
 	if Recount then
-		local value, max = strsplit(";", msg)
-		Recount:AddAmount(author, "Ovale", value)
-		Recount:AddAmount(author, "OvaleMax", max)
+		local value, maxValue = strsplit(";", msg)
+		
+		local source = Recount.db2.combatants[author]
+		if source then
+			Recount:AddAmount(source, "Ovale", value)
+			Recount:AddAmount(source, "OvaleMax", maxValue)
+		end
 	end
 end
 
@@ -770,7 +740,6 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	
 	self:UpdateVisibility()
 end
-
 
 function Ovale_GetNomAction(i)
 	local actionText = GetActionText(i);
