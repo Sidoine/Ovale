@@ -1091,6 +1091,13 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 					self.state.eclipse = 100
 				end
 			end
+			if newSpellInfo.starsurge then
+				if self.state.eclipse < 0 then
+					self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
+				else
+					self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
+				end
+			end
 			if newSpellInfo.holy then
 				self.state.holy = self.state.holy + newSpellInfo.holy
 				if self.state.holy < 0 then
@@ -1544,7 +1551,11 @@ function Ovale:CalculerMeilleureAction(element)
 			local start, ending = classe(element.params)
 			
 			if (Ovale.trace) then
-				self:Print("Function "..element.func.." returned "..nilstring(start)..","..nilstring(ending))
+				local parameterList = element.func.."("
+				for k,v in pairs(element.params) do
+					parameterList = parameterList..k.."="..v..","
+				end
+				self:Print("Function "..parameterList.." returned "..nilstring(start)..","..nilstring(ending))
 			end
 			
 			return start, ending

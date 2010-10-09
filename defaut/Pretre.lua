@@ -51,7 +51,8 @@ AddIcon help=main mastery=3
  
 	if TargetDebuffExpires(SHADOWWORDPAIN 2 mine=1) and TargetDeadIn(more 6) Spell(SHADOWWORDPAIN)
 	if TargetDebuffExpires(VAMPIRICTOUCH 3 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(VAMPIRICTOUCH)
-	if BuffPresent(SHADOWORB stacks=3) Spell(MINDBLAST)
+	#if BuffPresent(SHADOWORB stacks=3) May need to uncomment this with high mastery rating
+	Spell(MINDBLAST)
   
 	unless CheckBoxOn(multidot) and OtherDebuffPresent(DEVOURINGPLAGUE)
 	{

@@ -47,8 +47,10 @@ Define(SHRED 5221) #cat behind
 Define(STARFALL 48505) #moonkin cd aoe
 Define(STARFIRE 2912) #moonkin
 	SpellInfo(STARFIRE eclipse=20)
-Define(STARSURGE 78674) #moonkin 10 lunar+solar
-	SpellInfo(STARSURGE cd=15)
+Define(STARSURGE 78674) #moonkin 15 lunar+solar
+	SpellInfo(STARSURGE cd=15 starsurge=15)
+Define(SUNFIRE 93402)
+	SpellAddTargetDebuff(SUNFIRE SUNFIRE=18)
 Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
 Define(SWIPEBEAR 779) #bear aoe
 Define(SWIPECAT 62078) #cat aoe
@@ -103,6 +105,8 @@ AddIcon help=main mastery=1
 	{
 		if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
 			Spell(INSECTSWARM)  
+		if TargetDebuffExpires(SUNFIRE 0 mine=1) and TargetDeadIn(more 6)
+			Spell(SUNFIRE)  
 		Spell(WRATH)
 	}
 
