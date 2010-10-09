@@ -1,92 +1,69 @@
 Ovale.defaut["PRIEST"] =
 [[
-# Define constants for easier addressing of spells
-Define(SWP 589) # Shadow Word: Pain
-Define(VT 34916) # Vampiric Touch
-Define(VE 15286) # Vampiric Embrace
-Define(SF 15473) # Shadowform
-Define(MF 15407) # Mind Flay
-Define(MB 8092) # Mind Blast
-Define(DP 2944) # Devouring Plague
-Define(SW 15257) # Shadow Weaving
-Define(IF 48168) # Inner Fire
-Define(Focus 14751) # Inner Focus
-Define(Dispersion 47585)
-Define(Shadowfiend 34433)
-Define(Bloodlust 2825)
-Define(Heroism 32182)
+#Spells
+Define(DEVOURINGPLAGUE 2944) # Devouring Plague
+	SpellInfo(DEVOURINGPLAGUE duration=24 durationhaste=spell)
+	SpellAddTargetDebuff(DEVOURINGPLAGUE DEVOURINGPLAGUE=24)
+Define(DISPERSION 47585)
+	SpellInfo(DISPERSION cd=120)
+Define(INNERFIRE 48168) # Inner Fire
+	SpellAddBuff(INNERFIRE INNERFIRE=1800)
+Define(MINDBLAST 8092) # Mind Blast
+	SpellInfo(MINDBLAST cd=5.5)
+	SpellAddBuff(MINDBLAST SHADOWORB=0)
+Define(MINDLFAY 15407) # Mind Flay
+	SpellInfo(MINDLFAY canStopChannelling=3)
+Define(SHADOWFIEND 34433)
+	SpellInfo(SHADOWFIEND cd=300)
+Define(SHADOWFORM 15473) # Shadowform
+Define(SHADOWWORDPAIN 589) # Shadow Word: Pain
+	SpellInfo(SHADOWWORDPAIN duration=18)
+	SpellAddTargetDebuff(SHADOWWORDPAIN SHADOWWORDPAIN=18)
+Define(VAMPIRICEMBRACE 15286) # Vampiric Embrace
+Define(VAMPIRICTOUCH 34914) # Vampiric Touch
+	SpellInfo(VAMPIRICTOUCH duration=15 durationhaste=spell)
+	SpellAddTargetDebuff(VAMPIRICTOUCH VAMPIRICTOUCH=15)
 
+#Buff
+Define(SHADOWORB 77487)
+	
 AddCheckBox(multidot L(multidot))
 
-# Spells with cast time that add buff or debuff
-SpellAddTargetDebuff(SWP SWP=18)
-SpellInfo(SWP duration=18)
-SpellAddBuff(SWP SW=15)
-SpellAddTargetDebuff(VT VT=15)
-SpellInfo(VT duration=15 durationhaste=spell)
-SpellAddBuff(VT SW=15)
-SpellInfo(MF canStopChannelling=3)
-SpellAddBuff(MF SW=15)
-SpellInfo(MB cd=5.5)
-SpellAddBuff(MB SW=15)
-SpellAddBuff(IF IF=1800)
-SpellAddTargetDebuff(DP DP=24)
-SpellInfo(DP duration=24 durationhaste=spell)
-SpellInfo(Focus cd=180)
-SpellInfo(Dispersion cd=120)
-SpellInfo(Shadowfiend cd=300)
-ScoreSpells(MB SWP VT DP MF)
+ScoreSpells(MINDBLAST SHADOWWORDPAIN VAMPIRICTOUCH DEVOURINGPLAGUE MINDLFAY)
 
 # Add main monitor
-AddIcon help=main
+AddIcon help=main mastery=3
 {
-unless InCombat()
-{
-	#Check shadowform is up
-	unless BuffPresent(SF)
-		Spell(SF)
-		
-	# Refresh inner fire
-	if BuffExpires(IF 400)
-		Spell(IF)
-		
-	if BuffExpires(VE 400) 
-		Spell(VE)
-}
+	unless InCombat()
+	{
+		#Check shadowform is up
+		unless BuffPresent(SHADOWFORM)
+			Spell(SHADOWFORM)
+			
+		# Refresh inner fire
+		if BuffExpires(INNERFIRE 400)
+			Spell(INNERFIRE)
+			
+		if BuffExpires(VAMPIRICEMBRACE 400) 
+			Spell(VAMPIRICEMBRACE)
+	}
 
-#if inner focus is active, cast mind blast
-if BuffPresent(Focus) 
-    Spell(MB)
-    
-# Check if Shadow Weave is stacked 5 times
-# before suggesting Shadow Word: Pain
-if BuffPresent(SW stacks=5) and TargetDebuffExpires(SWP 0 mine=1) and TargetDeadIn(more 6)
-{
-   Spell(SWP)
-}
-
-#Refresh VT
-if TargetDebuffExpires(VT 1 mine=1 haste=spell) and TargetDeadIn(more 8)
-	Spell(VT)
+ 
+	if TargetDebuffExpires(SHADOWWORDPAIN 2 mine=1) and TargetDeadIn(more 6) Spell(SHADOWWORDPAIN)
+	if TargetDebuffExpires(VAMPIRICTOUCH 3 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(VAMPIRICTOUCH)
+	if BuffPresent(SHADOWORB stacks=3) Spell(MINDBLAST)
   
-#cast MB if up
-unless BuffPresent(Heroism) or BuffPresent(Bloodlust)
-	Spell(MB)
-  
-#Refresh devouring plague  
-unless CheckBoxOn(multidot) and OtherDebuffPresent(DP)
-{
-	if TargetDebuffExpires(DP 0 mine=1) and TargetDeadIn(more 8)
-		Spell(DP)
+	unless CheckBoxOn(multidot) and OtherDebuffPresent(DEVOURINGPLAGUE)
+	{
+		if TargetDebuffExpires(DEVOURINGPLAGUE 2 mine=1) and TargetDeadIn(more 8)
+			Spell(DEVOURINGPLAGUE)
+	}
+
+	if CheckBoxOn(multidot) and OtherDebuffExpires(SHADOWWORDPAIN)
+		Texture(INV_Misc_Coin_01) 
+
+	Spell(MINDLFAY priority=2)
 }
-
-if CheckBoxOn(multidot) and OtherDebuffExpires(SWP)
-	Texture(INV_Misc_Coin_01) 
-
-#cast Mind flay if nothing else can be done
-Spell(MF priority=2)
-
-} # End of main monitor    
 
 AddIcon help=cd
 {
@@ -95,21 +72,18 @@ AddIcon help=cd
 }
         
 # Add mana monitor
-AddIcon help=mana {
-
-#if up, launch focus (and then MB since it's the first priority)
-Spell(Focus usable=1)
-
-#Regain mana if needed and if shadowfiend is not already out
-if Mana(less 4000) and PetPresent(no)
+AddIcon help=mana mastery=3
 {
-    Spell(Shadowfiend usable=1)
-    unless TargetDebuffExpires(VT 6 mine=1 haste=spell) Spell(Dispersion usable=1)
-}
+	#Regain mana if needed and if shadowfiend is not already out
+	if Mana(less 4000) and PetPresent(no)
+	{
+		Spell(SHADOWFIEND usable=1)
+		unless TargetDebuffExpires(VAMPIRICTOUCH 6 mine=1 haste=spell) Spell(DISPERSION usable=1)
+	}
 }
 
-# Add icons to monitor debuffs (will show up 5 secs before elapsed)
-AddIcon size=small nocd=1 {if TargetDebuffExpires(VT 1.4 mine=1 haste=spell) Spell(VT) } # Vampiric Touch
-AddIcon size=small nocd=1 {if TargetDebuffExpires(SWP 1 mine=1) Spell(SWP) } # Shadow Word: Pain
-AddIcon size=small nocd=1 {if TargetDebuffExpires(DP 1 mine=1) Spell(DP) } 
+# Add icons to monitor debuffs
+AddIcon size=small nocd=1 {if TargetDebuffExpires(VAMPIRICTOUCH 1.4 mine=1 haste=spell) Spell(VAMPIRICTOUCH) } # Vampiric Touch
+AddIcon size=small nocd=1 {if TargetDebuffExpires(SHADOWWORDPAIN 1 mine=1) Spell(SHADOWWORDPAIN) } # Shadow Word: Pain
+AddIcon size=small nocd=1 {if TargetDebuffExpires(DEVOURINGPLAGUE 1 mine=1) Spell(DEVOURINGPLAGUE) } 
 ]]

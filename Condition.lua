@@ -55,6 +55,59 @@ local rootSpellIdList =
 }
 local rootSpellList = nil
 
+local buffSpellList =
+{
+	strengthagility=
+	{
+		6673, -- Battle Shout
+		8076, -- Strength of Earth
+		79891 -- Horn of Winter
+	},
+	stamina =
+	{
+		21562, -- Fortitude TODO: vérifier
+		469, -- Commanding Shout
+		6307 -- Blood Pact
+	},
+	lowerarmor=
+	{
+		7386, -- Sunder Armor (x3)
+		8647, -- Expose Armor
+		770 -- Faerie Fire (x3)
+	},
+	magicaldamagetaken=
+	{
+		65142, -- Ebon Plague
+		60433, -- Earth and Moon
+		58410, -- Master Poisoner TODO: vérifier
+		1490 -- Curse of the Elements
+	},
+	-- physicaldamagetaken
+	lowerphysicaldamage=
+	{
+		99, -- Demoralizing Roar
+		702, -- Curse of Weakness
+		1160, -- Demoralizing Shout
+		67, -- Vindication
+		81130, -- Scarlet Fever
+	},
+	meleeslow=
+	{
+		45477, --Icy Touch
+		58179, --Infected Wounds
+		68055, --Judgments of the just
+		6343, --Thunderclap
+		8042 --Earth Shock
+	},
+	bleed=
+	{
+		33876, --Mangle cat
+		33878, --Mangle bear
+		46857, -- Trauma
+		16511 --Hemorrhage
+	}
+}
+
 local function buildRootSpellList()
 	if (rootSpellList) then
 		return
@@ -128,6 +181,12 @@ end
 local function compare(a, comparison, b)
 	if (comparison == "more") then
 		if (not b or (a~=nil and a>b)) then
+			return 0
+		else
+			return nil
+		end
+	elseif comparison == "equal" then
+		if b == a then
 			return 0
 		else
 			return nil
@@ -238,11 +297,25 @@ local function GetTargetAura(condition, filter, target)
 		stacks = 1
 	end
 	local spellId = condition[1]
-	local aura = Ovale:GetAura(target, filter, spellId)
+	local aura
+	if type(spellId) == "number" then
+		aura = Ovale:GetAura(target, filter, spellId)
+	elseif buffSpellList[spellId] then
+		for k,v in pairs(buffSpellList[spellId]) do
+			local newAura = Ovale:GetAura(target, filter, v)
+			if not aura or newAura.stacks>aura.stacks then
+				aura = newAura
+			end
+		end
+	else
+		Ovale:Print("unknown buff "..spellId)
+		Ovale.bug = true
+	end
+	
 	if Ovale.trace then
 		Ovale:Print("GetTargetAura = start = ".. nilstring(aura.start) .. " end = "..nilstring(aura.ending).." stacks = " ..nilstring(aura.stacks).."/"..stacks)
 	end
-	
+		
 	if (not condition.mine or aura.mine) and aura.stacks>=stacks then
 		local ending
 		if condition.forceduration then
@@ -463,6 +536,10 @@ Ovale.conditions=
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
 	end,
+	--Compare to eclipse power. <0 lunar, >0 solar
+	Eclipse = function(condition)
+		return compare(Ovale.state.eclipse, condition[1], condition[2])
+	end,
 	EffectiveMana = function(condition)
 		local limit = GetManaTime(condition[2], true)
 		if condition[1]=="more" then
@@ -502,6 +579,9 @@ Ovale.conditions=
 		
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
 		return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
+	end,
+	HolyPower = function(condition)
+		return compare(Ovale.state.holy, condition[1], condition[2])
 	end,
 	InCombat = function(condition)
 		return testbool(Ovale.enCombat, condition[1])
@@ -761,6 +841,10 @@ Ovale.conditions=
 		local target = getTarget(condition.target)
 		return compare(UnitHealth(target), condition[1], condition[2])
 	end,
+	TargetLifeMissing = function(condition)
+		local target = getTarget(condition.target)
+		return compare(UnitHealthMax(target)-UnitHealth(target), condition[1], condition[2])
+	end,
 	-- Test if the target life is bellow/above a given value in percent
 	-- 1 : "less" or "more"
 	-- 2 : the limit, in percents
@@ -795,7 +879,9 @@ Ovale.conditions=
 		return compare(threatpct, condition[1], condition[2])
 	end,
 	TimeInCombat = function(condition)
-		if condition[1] == "more" then
+		if not Ovale.combatStartTime then
+			return nil
+		elseif condition[1] == "more" then
 			return Ovale.combatStartTime + condition[2]
 		else
 			return 0, Ovale.combatStartTime + condition[2]

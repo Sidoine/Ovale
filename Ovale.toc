@@ -1,9 +1,9 @@
-﻿## Interface: 30300
+﻿## Interface: 40000
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 3.3.36
+## Version: 4.0.1
 ## OptionalDeps: Ace3, ButtonFacade, Recount, LibBabble-CreatureType-3.0
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC

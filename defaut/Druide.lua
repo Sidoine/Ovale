@@ -1,77 +1,146 @@
 Ovale.defaut["DRUID"] =
 [[
-Define(FAERIEFIRE 770)
-Define(FAERIEFERAL 16857)
-Define(MANGLEBEAR 33878)
-Define(DEMOROAR 99)
-Define(SWIPE 779)
-Define(LACERATE 33745)
-Define(MAUL 6807)
-Define(RIP 1079)
-Define(MANGLECAT 33876)
-Define(SHRED 5221)
-Define(INSECTSWARM 27013)
-Define(MOONFIRE 8921)
-Define(STARFIRE 2912)
-Define(WRATH 5176)
-Define(ECLIPSESTARFIRE 48518) #Critical strike chance of Starfire increased, fired by Wrath
-Define(ECLIPSEWRATH 48517) #Damage done by Wrath increased, fired by Starfire
-Define(TIGERSFURY 5217)
-Define(FORCEOFNATURE 33831)
-Define(RAKE 59886)
-Define(SAVAGEROAR 52610)
-Define(FEROCIOUSBITE 22568)
-Define(BERSERK 50334)
-Define(CLEARCASTING 16870)
-Define(CLAW 16827)
-Define(STARFALL 48505)
-Define(TRAUMA 46856)
+Define(BARKSKIN 22812)
+Define(BERSERK 50334) #cat+bear cd buff
+	SpellInfo(BERSERK cd=180)
+Define(CLAW 16827) #cat no positionning
+	SpellInfo(CLAW combo=1)
+Define(DEMOROAR 99) #bear
+	SpellAddTargetDebuff(DEMOROAR DEMOROAR=30)
+Define(ENRAGE 5229) #bear
+Define(FAERIEFIRE 770) #moonkin
+	SpellAddTargetDebuff(FAERIEFIRE FAERIEFIRE=300)
+Define(FAERIEFERAL 16857) #bear+cat
+	SpellAddTargetDebuff(FAERIEFERAL FAERIEFERAL=300)
+Define(FEROCIOUSBITE 22568) #cat finish 35-70 mana
+	SpellInfo(FEROCIOUSBITE combo=-5 mana=70)
+Define(FORCEOFNATURE 33831) #moonkin cd
+	SpellInfo(FORCEOFNATURE cd=180)
+Define(FRENZIEDREGENERATION 22842) #bear
+Define(INNERVATE 29166)
+Define(INSECTSWARM 5570) #moonkin
+	SpellAddTargetDebuff(INSECTSWARM INSECTSWARM=12)
+Define(LACERATE 33745) #bear bleed*3
+Define(MANGLECAT 33876) #cat bleed+debuff
+	SpellInfo(MANGLECAT combo=1)
+	SpellAddTargetDebuff(MANGLECAT MANGLECAT=12)
+Define(MANGLEBEAR 33878) #bear bleed+debuff
+Define(MAUL 6807) #bear
+Define(MOONFIRE 8921) #moonkin
+	SpellAddTargetDebuff(MOONFIRE MOONFIRE=12)
+Define(PULVERIZE 80313) #bear after lacerate*3
+Define(RAKE 1822) #cat bleed
+	SpellInfo(RAKE combo=1)
+	SpellAddTargetDebuff(RAKE RAKE=9)
+Define(RAVAGE 6785) #cat behind+(prowling or stampede)
+	SpellInfo(RAVAGE combo=1)
+Define(RIP 1079) #cat bleed
+	SpellInfo(RIP combo=-5 duration=12)
+	SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
+	SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
+	SpellAddTargetDebuff(RIP RIP=12)
+Define(SAVAGEROAR 52610) #cat damage buff
+	SpellInfo(SAVAGEROAR combo=-5)
+	SpellAddBuff(SAVAGEROAR SAVAGEROAR=14)
+Define(SHRED 5221) #cat behind
+	SpellInfo(SHRED combo=1)
+Define(STARFALL 48505) #moonkin cd aoe
+Define(STARFIRE 2912) #moonkin
+	SpellInfo(STARFIRE eclipse=20)
+Define(STARSURGE 78674) #moonkin 10 lunar+solar
+	SpellInfo(STARSURGE cd=15)
+Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
+Define(SWIPEBEAR 779) #bear aoe
+Define(SWIPECAT 62078) #cat aoe
+Define(TRASH 77758) #bear aoe bleed
+Define(TIGERSFURY 5217) #cat buff
+	SpellInfo(TIGERSFURY cd=30)
+Define(WRATH 5176) #moonkin
+	SpellInfo(WRATH eclipse=-13)
+
+#Glyphs
 Define(GLYPHOFSHRED 54815)
 Define(GLYPHOFRIP 54818)
 
+#Buff
+Define(CLEARCASTING 16870)
+Define(ECLIPSELUNAR 48518) #Increased by wrath
+Define(ECLIPSESOLAR 48517) #Increased by starfire
+Define(SHOOTINGSTARS 93400)
+
 AddCheckBox(multi L(AOE))
-AddCheckBox(mangle SpellName(MANGLECAT) default)
-AddCheckBox(demo SpellName(DEMOROAR) default)
 AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
-AddCheckBox(wrath SpellName(WRATH))
-AddCheckBox(shred SpellName(SHRED) default)
+AddCheckBox(wrath SpellName(WRATH) mastery=1)
+AddCheckBox(mangle SpellName(MANGLECAT) default mastery=2)
+AddCheckBox(demo SpellName(DEMOROAR) default mastery=2)
+AddCheckBox(shred SpellName(SHRED) default mastery=2)
 
 ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP 
 		TIGERSFURY MANGLECAT RAKE SHRED FEROCIOUSBITE INSECTSWARM MOONFIRE
 		WRATH STARFIRE)
-		
-SpellInfo(MAUL toggle=1)
-SpellAddTargetDebuff(FAERIEFERAL FAERIEFERAL=300)
-SpellAddTargetDebuff(FAERIEFIRE FAERIEFIRE=300)
-SpellAddTargetDebuff(DEMOROAR DEMOROAR=30)
-SpellAddBuff(SAVAGEROAR SAVAGEROAR=14)
-SpellAddTargetDebuff(RIP RIP=12)
-SpellAddTargetDebuff(MANGLECAT MANGLECAT=12)
-SpellAddTargetDebuff(RAKE RAKE=9)
-SpellAddTargetDebuff(INSECTSWARM INSECTSWARM=12)
-SpellAddTargetDebuff(MOONFIRE MOONFIRE=12)
-SpellInfo(TIGERSFURY cd=30)
-SpellInfo(BERSERK cd=180)
-SpellInfo(FORCEOFNATURE cd=180)
-SpellInfo(MANGLECAT combo=1)
-SpellInfo(RAKE combo=1)
-SpellInfo(SHRED combo=1)
-SpellInfo(SAVAGEROAR combo=-5)
-SpellInfo(RIP combo=-5 duration=12)
-SpellInfo(FEROCIOUSBITE combo=-5)
-SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
-SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
-SpellInfo(CLAW combo=1)
 
-AddIcon help=main
+AddIcon help=main mastery=1
+{
+	if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2) and TargetDeadIn(more 15)
+		Spell(FAERIEFIRE)
+
+	if Speed(more 0)
+	{
+		if BuffPresent(SHOOTINGSTARS) Spell(STARSURGE)
+		Spell(MOONFIRE)
+	}
+
+	if BuffPresent(SHOOTINGSTARS) and BuffExpires(SHOOTINGSTARS 3) Spell(STARSURGE)
+	
+	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100)
+	{
+		if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
+			Spell(MOONFIRE)
+		Spell(STARFIRE)
+	}
+	
+	if BuffPresent(ECLIPSESOLAR) or Eclipse(equal 100)
+	{
+		if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
+			Spell(INSECTSWARM)  
+		Spell(WRATH)
+	}
+
+	if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
+		Spell(INSECTSWARM)  
+
+	if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
+		Spell(MOONFIRE)
+
+	Spell(STARSURGE)
+		
+	if {Eclipse(equal 0) and CheckBoxOn(wrath)} or Eclipse(less 0)
+		Spell(WRATH)
+	
+	if {Eclipse(equal 0) and CheckBoxOff(wrath)} or Eclipse(more 0)
+		Spell(STARFIRE)
+}
+
+AddIcon help=cd mastery=1
+{
+	Spell(FORCEOFNATURE)
+    Spell(STARFALL)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+		
+AddIcon help=main mastery=2
 {
 	if Stance(1) # bear
 	{
 		unless TargetDebuffExpires(LACERATE 4) and TargetDebuffPresent(LACERATE)
 			Spell(MANGLEBEAR)
 		
-		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=5)
+		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=3)
 			Spell(LACERATE)
+			
+		if TargetDebuffPresent(LACERATE stacks=3)
+			Spell(PULVERIZE)
 
 		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFERAL 2)
 			Spell(FAERIEFERAL)
@@ -79,8 +148,9 @@ AddIcon help=main
 		if CheckBoxOn(demo) and TargetDebuffExpires(DEMOROAR 2)
 			Spell(DEMOROAR)
 
+		if Mana(more 50) Spell(MAUL)
 		if CheckBoxOn(multi)
-			Spell(SWIPE)    
+			Spell(SWIPEBEAR)    
 	}
 
 	if Stance(3) # cat
@@ -125,47 +195,10 @@ AddIcon help=main
 		}
 		if CheckBoxOff(shred) Spell(CLAW)
 	}
-
-	unless Stance(1) or Stance(3)
-	{
-		if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 2) and TargetDeadIn(more 15)
-			Spell(FAERIEFIRE)
-
-		if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
-			Spell(INSECTSWARM)  
-		if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
-			Spell(MOONFIRE)
-
-		if BuffPresent(ECLIPSEWRATH)
-			Spell(WRATH)
-		if BuffPresent(ECLIPSESTARFIRE)
-			Spell(STARFIRE)
-
-		if CheckBoxOff(wrath)
-		{
-			if BuffGain(ECLIPSEWRATH 29) Spell(STARFIRE)
-			Spell(WRATH)
-		}
-		if CheckBoxOn(wrath)
-		{
-			if BuffGain(ECLIPSESTARFIRE 29) Spell(WRATH)
-			Spell(STARFIRE)
-		}
-	}
 }
 
-AddIcon help=offgcd
+AddIcon help=cd mastery=2
 {
-  if Stance(1)
-  {  
-       Spell(MAUL)
-  }
-}
-
-AddIcon help=cd
-{
-	unless Stance(1) or Stance(3) Spell(STARFALL)
-	Spell(FORCEOFNATURE)
 	Spell(BERSERK)
 	unless BuffPresent(BERSERK) if Mana(less 40) Spell(TIGERSFURY)
 	Item(Trinket0Slot usable=1)

@@ -25,7 +25,7 @@ local function ParseParameters(params)
 	end
 	params = string.gsub(params,"%w+=%w+","")
 	local n=0
-	for w in string.gmatch(params, "[%w_\\%.]+") do
+	for w in string.gmatch(params, "[-%w_\\%.]+") do
 		if (string.match(w,"^%-?%d+%.?%d*$")) then
 			w = tonumber(w)
 		end		
@@ -208,6 +208,9 @@ local function ParseAddListItem(list,item,text, default)
 		(paramList.glyph and not HasGlyph(paramList.glyph)) then
 		return ""
 	end
+	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree(GetActiveTalentGroup(false, false)) then
+		return ""
+	end
 	if (not Ovale.listes[list]) then
 		Ovale.listes[list] = {items={},default=nil}
 	end
@@ -222,6 +225,9 @@ local function ParseAddCheckBox(item, text, params)
 	local paramList = ParseParameters(params)
 	if (paramList.talent and not HasTalent(paramList.talent)) or
 		(paramList.glyph and not HasGlyph(paramList.glyph)) then
+		return ""
+	end
+	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree(GetActiveTalentGroup(false, false)) then
 		return ""
 	end
 	Ovale.casesACocher[item] = {text = text}
@@ -289,6 +295,9 @@ local function ParseAddIcon(params, text)
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
 	if masterNode.params.talent and not HasTalent(masterNode.params.talent) then
+		return nil
+	end
+	if masterNode.params.mastery and masterNode.params.mastery~=GetPrimaryTalentTree() then
 		return nil
 	end
 	return masterNode

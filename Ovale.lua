@@ -306,6 +306,15 @@ local options =
 					name = "Code",
 					type = "execute",
 					func = function() Ovale:AfficherCode() end
+				},
+				debug =
+				{
+					name = "Debug",
+					type = "execute",
+					func = function() 
+						--for i=1,10 do Ovale:Print(i.."="..UnitPower("player", i)) end 
+						Ovale:Print(Ovale.state.eclipse)
+					end
 				}
 			}
 		}
@@ -629,6 +638,7 @@ function Ovale:OnEnable()
 		self:FirstInit()
 	end
 	self:UNIT_AURA("","player")
+	
 	self:UpdateVisibility()
 end
 
@@ -866,8 +876,10 @@ function Ovale:RemplirActionIndex(i)
 		local type, id = GetActionInfo(i);
 		if (type=="spell") then
 			if (id~=0) then
-				local spellName, spellRank = GetSpellName(id, BOOKTYPE_SPELL);
-				self.actionSort[spellName] = i
+				local spellName, spellRank = GetSpellInfo(id) -- GetSpellBookItemName(id, BOOKTYPE_SPELL);
+				if spellName then --TODO: bug avec le mécanisme solaire/lunaire du druide
+					self.actionSort[spellName] = i
+				end
 			end
 		elseif (type =="item") then
 			self.actionObjet[id] = i
@@ -1043,7 +1055,7 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 	end
 	
 	--Coût du sort (uniquement si dans le futur, dans le passé l'énergie est déjà dépensée)
-	if startCast >= self.maintenant then
+	if endCast >= self.maintenant then
 		--Mana
 		local _, _, _, cost = GetSpellInfo(spellName)
 		if cost then
@@ -1070,6 +1082,22 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 			end
 			if newSpellInfo.unholy then
 				self:AddRune(startCast, 2, newSpellInfo.unholy)
+			end
+			if newSpellInfo.eclipse then
+				self.state.eclipse = self.state.eclipse + newSpellInfo.eclipse
+				if self.state.eclipse < -100 then
+					self.state.eclipse = -100
+				elseif self.state.eclipse > 100 then
+					self.state.eclipse = 100
+				end
+			end
+			if newSpellInfo.holy then
+				self.state.holy = self.state.holy + newSpellInfo.holy
+				if self.state.holy < 0 then
+					self.state.holy = 0
+				elseif self.state.holy > 3 then
+					self.state.holy = 3
+				end
 			end
 		end
 	end
@@ -1168,6 +1196,8 @@ function Ovale:InitCalculerMeilleureAction()
 	self.spellStack.length = 0
 	self.state.combo = GetComboPoints("player")
 	self.state.mana = UnitPower("player")
+	self.state.eclipse = UnitPower("player", 8)
+	self.state.holy = UnitPower("player", 9)
 	if self.className == "DEATHKNIGHT" then
 		for i=1,6 do
 			self.state.rune[i].type = GetRuneType(i)
