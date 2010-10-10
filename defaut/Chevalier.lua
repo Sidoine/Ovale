@@ -73,6 +73,7 @@ Define(FROSTFEVER 59921)
 Define(KILLINGMACHINE 51124)
 
 AddCheckBox(rolldes SpellName(GLYPHDISEASE) default glyph=GLYPHDISEASE)
+AddCheckBox(horn SpellName(HORNOFWINTER))
 
 ScoreSpells(HOWLINGBLAST HEARTSTRIKE BLOODSTRIKE DEATHSTRIKE SCOURGESTRIKE OBLITERATE HEARTSTRIKE 
 				PESTILENCE ICYTOUCH PLAGUESTRIKE FROSTSTRIKE DEATHCOIL)
@@ -81,7 +82,7 @@ AddIcon help=main mastery=1
 {
 	Spell(DANCINGRUNEWEAPON usable=1)
 
-	if BuffExpires(strengthagility 2) Spell(HORNOFWINTER)
+	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
 	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) 
 		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and
@@ -100,12 +101,12 @@ AddIcon help=main mastery=1
 	if PetPresent(no) Spell(RAISEDEAD)
 	Spell(RUNESTRIKE usable=1)
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
-	Spell(HORNOFWINTER priority=2)
+	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 }
 
 AddIcon help=main mastery=2
 {	
-	if BuffExpires(strengthagility 2) Spell(HORNOFWINTER)
+	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
 	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) 
 		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and
@@ -128,7 +129,7 @@ AddIcon help=main mastery=2
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 	Spell(FROSTSTRIKE usable=1)
 	if PetPresent(no) Spell(RAISEDEAD)
-	Spell(HORNOFWINTER priority=2)
+	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 	unless Runes(frost 1) and Runes(unholy 1) Spell(BLOODTAP)
 	if Runes(blood 2 nodeath=1)
 	{
@@ -139,17 +140,16 @@ AddIcon help=main mastery=2
 
 AddIcon help=main mastery=3
 {
-	if BuffExpires(strengthagility 2) Spell(HORNOFWINTER)
+	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
 	if CheckBoxOn(rolldes) and Glyph(GLYPHDISEASE) 
 		and TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1) and
 		{TargetDebuffExpires(FROSTFEVER 3 mine=1) or TargetDebuffExpires(BLOODPLAGUE 3 mine=1)}
 			Spell(PESTILENCE)
 
-			if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
+	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
 	{
-		if Runes(unholy 1) and Runes(frost 1)
-			Spell(SCOURGESTRIKE)
+		if Runes(unholy 1) Spell(SCOURGESTRIKE)
 		if Runes(unholy 1 nodeath=1) and Runes(frost 1 nodeath=1) Spell(OBLITERATE)
 		if Runes(blood 1) and {CheckBoxOff(rolldes) or Runes(blood 2)} Spell(BLOODSTRIKE)
 	}
@@ -159,7 +159,7 @@ AddIcon help=main mastery=3
 	if PetPresent(no) Spell(RAISEDEAD)
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
 	
-	Spell(HORNOFWINTER priority=2)
+	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 	unless Runes(frost 1) and Runes(unholy 1) Spell(BLOODTAP)
 	if Runes(blood 2 nodeath=1)
 	{

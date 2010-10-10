@@ -47,7 +47,6 @@ AddIcon help=main mastery=3
 		if BuffExpires(VAMPIRICEMBRACE 400) 
 			Spell(VAMPIRICEMBRACE)
 	}
-
  
 	if TargetDebuffExpires(SHADOWWORDPAIN 2 mine=1) and TargetDeadIn(more 6) Spell(SHADOWWORDPAIN)
 	if TargetDebuffExpires(VAMPIRICTOUCH 3 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(VAMPIRICTOUCH)

@@ -3,43 +3,72 @@
 Ovale = LibStub("AceAddon-3.0"):NewAddon("Ovale", "AceEvent-3.0", "AceConsole-3.0")
 local Recount = Recount
 
+--Default scripts (see "defaut" directory)
 Ovale.defaut = {}
-Ovale.action = {}
+--The table of check boxes definition
 Ovale.casesACocher = {}
+--key: spell name / value: action icon id
 Ovale.actionSort = {}
-Ovale.listeTalents = {}
+--key: talentId / value: points in this talent
 Ovale.pointsTalent = {}
+--key: talentId / value: talent name (not used)
 Ovale.talentIdToName = {}
+--key: talent name / value: talent id
 Ovale.talentNameToId = {}
+--allows to do some initialization the first time the addon is enabled
 Ovale.firstInit = false
-Ovale.Inferieur = 1
-Ovale.Superieur = 2
+--allows to fill the player talent tables on first use
 Ovale.listeTalentsRemplie = false
+--the frame with the icons
 Ovale.frame = nil
+--check boxes GUI items
 Ovale.checkBoxes = {}
+--drop down GUI items
 Ovale.dropDowns = {}
+--master nodes of the current script (one node for each icon)
 Ovale.masterNodes = nil
+--set it if there was a bug, traces will be enabled on next frame
 Ovale.bug = false
+--trace next script function calls
+Ovale.trace=false
+--in combat?
 Ovale.enCombat = false
+--current computed spell haste
 Ovale.spellHaste = 0
+--current computed melee haste TODO: why I don't use character sheet value anyway?
 Ovale.meleeHaste = 0
+--current auras
 Ovale.aura = { player = {}, target = {}}
+--allow to track the current target
 Ovale.targetGUID = nil
+--spell info from the current script
 Ovale.spellInfo = {}
-Ovale.spellStack = {}
+--track when a buff was applied (used for the old eclipse mechanism, maybe this could be removed?)
 Ovale.buff = {}
+--player class
 Ovale.className = nil
+--the state in the current frame
+--TODO: really, the simulator should be in its own class
 Ovale.state = {rune={}, cd = {}}
+--spells that count for scoring
 Ovale.scoreSpell = {}
+--tracks debuffs on the units that are not the current target
 Ovale.otherDebuffs = {}
+--score in current combat
 Ovale.score = 0
+--maximal theoric score in current combat
 Ovale.maxScore = 0
+--increased at each frame, allows to know if the aura was updated this frame
+--TODO: aura should be tracked using combat log events or something like that
+--and it should be in its own class
 Ovale.serial = 0
+--spell counter (see Counter function)
 Ovale.counter = {}
+--the spells that the player has casted but that did not reach their target
+--the result is computed by the simulator, allowing to ignore lag or missile travel time
 Ovale.lastSpell = {}
 
-Ovale.arbre = {}
-
+--Key bindings
 BINDING_HEADER_OVALE = "Ovale"
 BINDING_NAME_OVALE_CHECKBOX0 = L["Inverser la boîte à cocher "].."(1)"
 BINDING_NAME_OVALE_CHECKBOX1 = L["Inverser la boîte à cocher "].."(2)"
@@ -47,10 +76,7 @@ BINDING_NAME_OVALE_CHECKBOX2 = L["Inverser la boîte à cocher "].."(3)"
 BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
--- Ovale.trace=true
-local nouvelleCondition
-local nouveauSort
-
+--GUI option
 local options = 
 { 
 	type = "group",
@@ -260,8 +286,6 @@ local options =
 					set = function(info,v)
 						Ovale.db.profile.code = v
 						Ovale.needCompile = true
-						-- Ovale:UpdateFrame()
-						-- Ovale:Print("code change")
 					end,
 					width = "full"
 				}
@@ -391,7 +415,6 @@ function Ovale:FirstInit()
 	self:RemplirActionIndexes()
 	self:RemplirListeTalents()
 	self:ChercherNomsBuffs()
-	-- self:InitEcranOption()
 	
 	local playerClass, englishClass = UnitClass("player")
 	self.className = englishClass
@@ -400,8 +423,6 @@ function Ovale:FirstInit()
 			self.state.rune[i] = {}
 		end
 	end
-	-- OvaleFrame_Update(OvaleFrame)
-	-- OvaleFrame:Show()
 	
 	self:ChargerDefaut()
 	
@@ -507,20 +528,25 @@ function Ovale:PLAYER_TALENT_UPDATE()
 --	self:Print("PLAYER_TALENT_UPDATE")
 end
 
+--The user learnt a new spell
 function Ovale:SPELLS_CHANGED()
 	-- self:RemplirActionIndexes()
 	-- self:RemplirListeTalents()
 	self.needCompile = true
 end
 
+--Called when the user changed his key bindings
 function Ovale:UPDATE_BINDINGS()
 	self:RemplirActionIndexes()
 end
 
+--Called for each combat log event
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
 	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 	if sourceName == UnitName("player") then
+		--Called when a missile reached or missed its target
+		--Update lastSpell accordingly
 		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
 				or string.find(event, "SPELL_MISSED") == 1 
 				or string.find(event, "SPELL_CAST_FAILED") == 1 then
@@ -535,6 +561,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			end
 		end
 		if self.otherDebuffsEnabled then
+			--Track debuffs on units that are not the current target
 			if string.find(event, "SPELL_AURA_") == 1 then
 				local spellId, spellName, spellSchool, auraType = select(9, ...)
 				if auraType == "DEBUFF" and self.spellInfo[spellName] and self.spellInfo[spellName].duration then
@@ -555,6 +582,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	end
 	if self.otherDebuffsEnabled then
 		if event == "UNIT_DIED" then
+			--Remove any dead unit from otherDebuffs
 			for k,v in pairs(self.otherDebuffs) do
 				for j,w in pairs(v) do
 					if j==destGUID then
@@ -566,10 +594,16 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	end
 end
 
+--Called when the player target change
+--Used to update the visibility e.g. if the user chose
+--to hide Ovale if a friendly unit is targeted
 function Ovale:PLAYER_TARGET_CHANGED()
 	self:UpdateVisibility()
 end
 
+--Called when a new aura is added to an unit
+--At this time it is not used to keep the aura list (may be used in the future for optimization)
+--It is only used to update haste
 function Ovale:UNIT_AURA(event, unit)
 	if (unit == "player") then
 		local hateBase = GetCombatRatingBonus(18)
@@ -599,6 +633,8 @@ function Ovale:UNIT_AURA(event, unit)
 			self.buff[name].lastSeen = Ovale.maintenant
 			self.buff[name].present = true
 			
+			--TODO: need to be updated to 4.0.0, altought I doubt computing haste is necessary
+			--because there is no longer any risk to clip DOTs
 			if (name == self.RETRIBUTION_AURA or name == self.MOONKIN_AURA) then
 				hateCommune = 3
 			elseif (name == self.WRATH_OF_AIR_TOTEM) then
@@ -628,18 +664,20 @@ function Ovale:UNIT_AURA(event, unit)
 	end
 end
 
+--Called when a glyph has been added
+--The script needs to be compiled
 function Ovale:GLYPH_ADDED(event)
-	-- self:Print("GLYPH_ADDED")
-	-- self:CompileAll()
 	self.needCompile = true
 end
 
+--Called when a glyph has been updated
+--The script needs to be compiled
 function Ovale:GLYPH_UPDATED(event)
-	-- self:Print("GLYPH_UPDATED")
-	-- self:CompileAll()
 	self.needCompile = true
 end
 
+--Called if the player interrupted early his cast
+--The spell is removed from the lastSpell table
 function Ovale:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank)
 	if unit=="player" then
 		for i,v in ipairs(self.lastSpell) do
@@ -652,9 +690,11 @@ function Ovale:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank)
 	end
 end
 
+--Called when a spell finished its cast
 function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 	-- self:Print("UNIT_SPELLCAST_SENT"..event.." unit="..unit.." name="..name.." tank="..rank.." target="..target)
 	if unit=="player" then
+		--The spell is added to the lastSpell table
 		local newSpell = {}
 		newSpell.name = name
 		-- local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo("player")
@@ -678,6 +718,7 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 	
 	if unit=="player" and self.enCombat then
 		if self.spellInfo[name] then
+			--Increase or reset the counter that is used by the Counter function
 			if self.spellInfo[name].resetcounter then
 				self.counter[self.spellInfo[name].resetcounter] = 0
 			end
@@ -690,6 +731,7 @@ function Ovale:UNIT_SPELLCAST_SENT(event,unit,name,rank,target)
 			end
 		end
 		if (not self.spellInfo[name] or not self.spellInfo[name].toggle) and self.scoreSpell[name] then
+			--Compute the player score
 			local scored = self.frame:GetScore(name)
 			if scored~=nil then
 				self.score = self.score + scored
@@ -868,12 +910,10 @@ end
 
 function Ovale:RemplirListeTalents()
 	local numTabs = GetNumTalentTabs();
-	self.listeTalents = {}
 	for t=1, numTabs do
 		local numTalents = GetNumTalents(t);
 		for i=1, numTalents do
 			local nameTalent, icon, tier, column, currRank, maxRank= GetTalentInfo(t,i);
-			self.listeTalents[nameTalent] = nameTalent
 			local link = GetTalentLink(t,i)
 			local a, b, talentId = string.find(link, "talent:(%d+)");
 			-- self:Print("talent = "..nameTalent.." id = ".. talentId)
@@ -1169,7 +1209,6 @@ function Ovale:InitCalculerMeilleureAction()
 	self.currentTime = Ovale.maintenant
 	self.currentSpellName = nil
 	self.attenteFinCast = Ovale.maintenant
-	self.spellStack.length = 0
 	self.state.combo = GetComboPoints("player")
 	self.state.mana = UnitPower("player")
 	self.state.eclipse = UnitPower("player", 8)

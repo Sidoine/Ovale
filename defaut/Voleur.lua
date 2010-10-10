@@ -1,40 +1,52 @@
 Ovale.defaut["ROGUE"] =
 [[
-Define(ENVENOM 32645)
-Define(TALENTVILEPOISONS 682)
-Define(TALENTCUTTOTHECHASE 2070)
-Define(SLICEANDDICE 5171)
-Define(RUPTURE 1943)
-Define(DEEPWOUNDS 12721)
-Define(GARROTE 703)
-Define(REND 772)
-Define(RIP 1079)
-Define(HUNGERFORBLOOD 51662)
-Define(EVISCERATE 2098)
-Define(MUTILATE 1329)
-Define(SINISTERSTRIKE 1752)
+#Abilities
 Define(ADRENALINERUSH 13750)
-Define(KILLINGSPREE 51690)
+	SpellInfo(ADRENALINERUSH cd=180)
+	SpellAddBuff(ADRENALINERUSH ADRENALINERUSH=15)
 Define(BLADEFLURRY 13877)
-Define(COLDBLOOD 14177)
-Define(PREPARATION 14185)
-Define(TRICKSOFTHETRADE 57934)
+	SpellAddBuff(BLADEFLURRY BLADEFLURRY=15 cd=30)
 Define(CLOACKOFSHADOWS 31224)
+	SpellInfo(CLOACKOFSHADOWS cd=90)
+Define(COLDBLOOD 14177)
+	SpellInfo(COLDBLOOD cd=120)
+Define(ENVENOM 32645)
+	SpellInfo(ENVENOM combo=-5)
+Define(EVISCERATE 2098)
+	SpellInfo(EVISCERATE combo=-5)
+Define(KILLINGSPREE 51690)
+	SpellInfo(KILLINGSPREE cd=120)
+	SpellAddBuff(KILLINGSPREE KILLINGSPREE=2)
+Define(GARROTE 703)
+	SpellAddTargetDebuff(GARROTE GARROTE=18)
+Define(MUTILATE 1329)
+	SpellInfo(MUTILATE combo=1)
+Define(PREPARATION 14185)
+	SpellInfo(PREPARATION cd=300)
+Define(RUPTURE 1943)
+	SpellInfo(RUPTURE combo=-5)
+	SpellAddTargetDebuff(RUPTURE RUPTURE=8)
+Define(SINISTERSTRIKE 1752)
+	SpellInfo(SINISTERSTRIKE combo=1)
+Define(SLICEANDDICE 5171)
+	SpellInfo(SLICEANDDICE combo=-5)
+	SpellAddBuff(SLICEANDDICE SLICEANDDICE=10)
+Define(TRICKSOFTHETRADE 57934)
+	SpellInfo(TRICKSOFTHETRADE cd=30)
+Define(VENDETTA 79140)
+	SpellInfo(VENDETTA cd=120)
+	SpellAddTargetDebuff(VENDETTA VENDETTA=30)
+	
+#Talents
+Define(TALENTCUTTOTHECHASE 2070)
 
 ScoreSpells(SLICEANDDICE HUNGERFORBLOOD ENVENOM RUPTURE EVISCERATE MUTILATE SINISTERSTRIKE)
 
-AddIcon help=main
+AddIcon help=main mastery=1
 {
-	unless BuffPresent(SLICEANDDICE)
-	{
-		if ComboPoints(more 2)
-			Spell(SLICEANDDICE)
-	}
+	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
+	if TargetDebuffExpires(VENDETTA) and TargetDeadIn(more 20) Spell(VENDETTA)
 	
-	if {TargetDebuffPresent(RUPTURE) or TargetDebuffPresent(DEEPWOUNDS) or TargetDebuffPresent(REND)
-		or TargetDebuffPresent(RIP) or TargetDebuffPresent(GARROTE)} and BuffExpires(HUNGERFORBLOOD 2)
-		Spell(HUNGERFORBLOOD)
-		
 	if ComboPoints(more 3) and Mana(more 69)
 	{
 		if BuffExpires(SLICEANDDICE 12) 
@@ -43,20 +55,43 @@ AddIcon help=main
 				Spell(ENVENOM)
 			Spell(SLICEANDDICE)
 		}
-
 		if TargetDebuffExpires(RUPTURE 0) and TargetDeadIn(more 6)
 			Spell(RUPTURE)
+		Spell(ENVENOM)
+	}
+	if ComboPoints(less 4) Spell(MUTILATE)
+}
+
+AddIcon help=main mastery=2
+{
+	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
+	
+	if ComboPoints(more 3) and Mana(more 69)
+	{
+		if BuffExpires(SLICEANDDICE 12) Spell(SLICEANDDICE)
 		
-		if TalentPoints(TALENTVILEPOISONS more 0)
-			Spell(ENVENOM)
+		if TargetDebuffExpires(RUPTURE 0) and TargetDeadIn(more 6)
+			Spell(RUPTURE)
 		Spell(EVISCERATE)
 	}
 	
-	if ComboPoints(less 4)
+	if ComboPoints(less 4) Spell(SINISTERSTRIKE)
+}
+
+AddIcon help=main mastery=3
+{
+	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
+	
+	if ComboPoints(more 3) and Mana(more 69)
 	{
-		Spell(MUTILATE)
-		Spell(SINISTERSTRIKE)
-	} 
+		if BuffExpires(SLICEANDDICE 12) Spell(SLICEANDDICE)
+		
+		if TargetDebuffExpires(RUPTURE 0) and TargetDeadIn(more 6)
+			Spell(RUPTURE)
+		Spell(EVISCERATE)
+	}
+	
+	if ComboPoints(less 4) Spell(SINISTERSTRIKE)
 }
 
 AddIcon help=cd
@@ -64,7 +99,7 @@ AddIcon help=cd
 	unless BuffPresent(KILLINGSPREE) Spell(ADRENALINERUSH)
 	unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
 	Spell(BLADEFLURRY)
-	Spell(COLDBLOOD)
+	if Mana(less 70) Spell(COLDBLOOD)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	Spell(PREPARATION)
