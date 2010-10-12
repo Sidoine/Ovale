@@ -99,16 +99,8 @@ AddIcon help=main mastery=1
 	Spell(COLOSSUSSMASH)
 	Spell(MORTALSTRIKE)
 	Spell(OVERPOWER usable=1)
-	if CheckBoxOn(multi) Spell(CLEAVE)
     if TargetLifePercent(less 20) Spell(EXECUTE)
-	if Mana(more 60) Spell(HEROICSTRIKE)
 	Spell(SLAM)
-}
-
-AddIcon help=cd mastery=1
-{
-    Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddIcon help=main mastery=2
@@ -125,18 +117,9 @@ AddIcon help=main mastery=2
     Spell(VICTORYRUSH usable=1)
 	if BuffPresent(BLOODSURGE) Spell(SLAM)
     if TargetLifePercent(less 20) Spell(EXECUTE)
-	if CheckBoxOn(multi) Spell(CLEAVE)
-	if Mana(more 60) Spell(HEROICSTRIKE)
 	if BuffExpires(DEATHWISH) and BuffExpires(RECKLESSNESS) and BuffExpires(ENRAGE) Spell(BERSERKERRAGE)
 }
 
-AddIcon help=cd mastery=2
-{
-	Spell(DEATHWISH)
-	Spell(RECKLESSNESS)
-    Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
 
 AddIcon help=main mastery=3
 {
@@ -149,14 +132,32 @@ AddIcon help=main mastery=3
 		if TargetDebuffExpires(REND mine=1) Spell(REND)
 		Spell(THUNDERCLAP)
 		Spell(SHOCKWAVE)
-		Spell(CLEAVE)
 	}
 	Spell(SHIELDSLAM)
-	if Mana(more 60) and CheckBoxOff(multi) Spell(HEROICSTRIKE)
 	Spell(REVENGE usable=1)
 	if TargetDebuffExpires(meleeslow) Spell(THUNDERCLAP)
 	Spell(VICTORYRUSH usable=1)
 	Spell(DEVASTATE)
+}
+
+AddIcon help=offgcd
+{
+	if Mana(more 60) and CheckBoxOn(multi) Spell(CLEAVE)
+	if Mana(more 60) and CheckBoxOff(multi) Spell(HEROICSTRIKE)
+}
+
+AddIcon help=cd mastery=1
+{
+    Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddIcon help=cd mastery=2
+{
+	Spell(DEATHWISH)
+	Spell(RECKLESSNESS)
+    Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddIcon help=cd mastery=3
