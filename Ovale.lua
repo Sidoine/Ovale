@@ -1563,7 +1563,7 @@ function Ovale:CalculerMeilleureAction(element)
 				for k,v in pairs(element.params) do
 					parameterList = parameterList..k.."="..v..","
 				end
-				self:Print("Function "..parameterList.." returned "..nilstring(start)..","..nilstring(ending))
+				self:Print("Function "..parameterList..") returned "..nilstring(start)..","..nilstring(ending))
 			end
 			
 			return start, ending
@@ -1572,7 +1572,7 @@ function Ovale:CalculerMeilleureAction(element)
 		return element.value
 	elseif (element.type == "before") then
 		if (Ovale.trace) then
-			self:Print(element.time.."s before ["..element.nodeId.."]")
+			--self:Print(nilstring(element.time).."s before ["..element.nodeId.."]")
 		end
 		local timeA = Ovale:CalculerMeilleureAction(element.time)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
@@ -1616,7 +1616,7 @@ function Ovale:CalculerMeilleureAction(element)
 		self:Log("compare "..element.comparison)
 		local tempsA = Ovale:CalculerMeilleureAction(element.a)
 		local timeB = Ovale:CalculerMeilleureAction(element.time)
-		self:Log(tempsA.." "..element.comparison.." "..timeB)
+		self:Log(nilstring(tempsA).." "..element.comparison.." "..nilstring(timeB))
 		if element.comparison == "more" and (not tempsA or tempsA>timeB) then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0

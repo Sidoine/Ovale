@@ -308,8 +308,9 @@ local function GetTargetAura(condition, filter, target)
 			end
 		end
 	else
-		Ovale:Print("unknown buff "..spellId)
+		Ovale:Print("ERROR: unknown buff "..spellId)
 		Ovale.bug = true
+		return 0,0
 	end
 	
 	if Ovale.trace then
