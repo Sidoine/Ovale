@@ -1101,10 +1101,18 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 				end
 			end
 			if newSpellInfo.starsurge then
-				if self.state.eclipse < 0 then
+				local buffAura = self:GetAura("player", "HELPFUL", 48517) --Solar
+				if buffAura.stacks>0 then
 					self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
 				else
-					self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
+					buffAura = self:GetAura("player", "HELPFUL", 48518) --Lunar
+					if buffAura.stacks>0 then
+						self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
+					elseif self.state.eclipse < 0 then
+						self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
+					else
+						self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
+					end
 				end
 			end
 			if newSpellInfo.holy then

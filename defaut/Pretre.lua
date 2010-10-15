@@ -1,72 +1,125 @@
 Ovale.defaut["PRIEST"] =
 [[
+#Buff
+Define(ORB 77487)
+Define(MSEFFECT 87178)
+Define(EVANGELISM 87118)
+Define(DA 87153)
+Define(MM 81292)
+
 #Spells
-Define(DEVOURINGPLAGUE 2944) # Devouring Plague
-	SpellInfo(DEVOURINGPLAGUE duration=24 durationhaste=spell)
-	SpellAddTargetDebuff(DEVOURINGPLAGUE DEVOURINGPLAGUE=24)
+Define(DP 2944) # Devouring Plague
+	SpellInfo(DP duration=24 durationhaste=spell)
+	SpellAddTargetDebuff(DP DP=24)
+	
 Define(DISPERSION 47585)
 	SpellInfo(DISPERSION cd=120)
+	SpellInfo(DISPERSION addcd=-45 glyph=63229)
+	
 Define(INNERFIRE 48168) # Inner Fire
 	SpellAddBuff(INNERFIRE INNERFIRE=1800)
-Define(MINDBLAST 8092) # Mind Blast
-	SpellInfo(MINDBLAST cd=5.5)
-	SpellAddBuff(MINDBLAST SHADOWORB=0)
-Define(MINDLFAY 15407) # Mind Flay
-	SpellInfo(MINDLFAY canStopChannelling=3)
-Define(SHADOWFIEND 34433)
-	SpellInfo(SHADOWFIEND cd=300)
-Define(SHADOWFORM 15473) # Shadowform
-Define(SHADOWWORDPAIN 589) # Shadow Word: Pain
-	SpellInfo(SHADOWWORDPAIN duration=18)
-	SpellAddTargetDebuff(SHADOWWORDPAIN SHADOWWORDPAIN=18)
-Define(VAMPIRICEMBRACE 15286) # Vampiric Embrace
-Define(VAMPIRICTOUCH 34914) # Vampiric Touch
-	SpellInfo(VAMPIRICTOUCH duration=15 durationhaste=spell)
-	SpellAddTargetDebuff(VAMPIRICTOUCH VAMPIRICTOUCH=15)
-
-#Buff
-Define(SHADOWORB 77487)
 	
-AddCheckBox(multidot L(multidot))
+Define(MB 8092) # Mind Blast
+	SpellInfo(MB cd=5.5)
+	SpellAddBuff(MB ORB=0)
+	
+Define(MF 15407) # Mind Flay
+	
+Define(FIEND 34433)
+	SpellInfo(FIEND cd=300)
+	
+Define(SHADOWFORM 15473) # Shadowform
 
-ScoreSpells(MINDBLAST SHADOWWORDPAIN VAMPIRICTOUCH DEVOURINGPLAGUE MINDLFAY)
+Define(SWP 589) # Shadow Word: Pain
+	SpellInfo(SWP duration=18)	
+	SpellAddTargetDebuff(SWP SWP=18)
+	
+Define(VE 15286) # Vampiric Embrace
+
+Define(VT 34914) # Vampiric Touch
+	SpellInfo(VT duration=15 durationhaste=spell)
+	SpellAddTargetDebuff(VT VT=15)
+	
+Define(MS 73510) # Mind Spike
+	# TODO : add talent condition for MM
+	SpellAddBuff(MS MSEFFECT=12 MM=6)
+	
+Define(SWD 32379) # Shadow Word : Death
+
+Define(ARCHANGEL 87151) #Archangel
+	SpellInfo(ARCHANGEL cd=90)
+	SpellAddBuff(ARCHANGEL DA=18)
+
+### end defines ###
+
+ScoreSpells(MB SWP VT DP MF SWD MS)
 
 # Add main monitor
 AddIcon help=main mastery=3
 {
+	#Check shadowform is up
+	unless BuffPresent(SHADOWFORM) Spell(SHADOWFORM)
+			
 	unless InCombat()
 	{
-		#Check shadowform is up
-		unless BuffPresent(SHADOWFORM)
-			Spell(SHADOWFORM)
-			
-		# Refresh inner fire
-		if BuffExpires(INNERFIRE 400)
-			Spell(INNERFIRE)
-			
-		if BuffExpires(VAMPIRICEMBRACE 400) 
-			Spell(VAMPIRICEMBRACE)
+		# Refresh inner fire  and vampiric embrace 10 minutes before it drops when out of combat
+		if BuffExpires(INNERFIRE 600) Spell(INNERFIRE)			
+		if BuffExpires(VE 600) Spell(VE)
+	}
+	
+	# Refresh inner fire and vampiric embrace if they drop during the fight
+	if BuffExpires(INNERFIRE 0) Spell(INNERFIRE)
+		
+	if BuffExpires(VE 0) Spell(VE)
+		
+	#if your rotation isn't set up and the target has few seconds to live, use MS instead of normal rotation	
+	#TODO : adapt the target life
+	if TargetDebuffExpires(SWP 0 mine=1) and TargetDeadIn(less 10)
+	{
+		if BuffPresent(MS stacks=3) or BuffPresent(MM stacks=2) Spell(MB)
+		Spell(MS)
 	}
  
-	if TargetDebuffExpires(SHADOWWORDPAIN 2 mine=1) and TargetDeadIn(more 6) Spell(SHADOWWORDPAIN)
-	if TargetDebuffExpires(VAMPIRICTOUCH 3 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(VAMPIRICTOUCH)
-	#if BuffPresent(SHADOWORB stacks=3) May need to uncomment this with high mastery rating
-	Spell(MINDBLAST)
-  
-	unless CheckBoxOn(multidot) and OtherDebuffPresent(DEVOURINGPLAGUE)
+	if BuffPresent(DA) #specific DD-based rotation when under Dark Archangel
 	{
-		if TargetDebuffExpires(DEVOURINGPLAGUE 2 mine=1) and TargetDeadIn(more 8)
-			Spell(DEVOURINGPLAGUE)
+		#Use SWD if we have enough life left
+		if LifePercent(more 20) Spell(SWD)
+		
+		#Use MB on CD
+		Spell(MB)
+		
+		#Fill with MF
+		Spell(MF priority=2)
+		
 	}
 
-	if CheckBoxOn(multidot) and OtherDebuffExpires(SHADOWWORDPAIN)
-		Texture(INV_Misc_Coin_01) 
-
-	Spell(MINDLFAY priority=2)
+	#Set up / refresh the dots
+	if TargetDebuffExpires(SWP 0 mine=1) and TargetDeadIn(more 6) Spell(SWP)
+	if TargetDebuffExpires(SWP 2 mine=1) and TargetDeadIn(more 6) Spell(MF)
+	if TargetDebuffExpires(VT 3 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(VT)
+		
+	# refresh DP only if it is not ticking on another mob
+	unless OtherDebuffPresent(DP)
+	{
+		if TargetDebuffExpires(DP 2 mine=1) and TargetDeadIn(more 8) Spell(DP)
+	}
+		
+	# Launch the fiend
+	Spell(FIEND)
+		
+	#Use SWD if we have enough life left and it is more useful than MB
+	if LifePercent(more 20) Spell(SWD)
+		
+	#Use MB on CD
+	Spell(MB)
+		
+	#Fill with MF
+	Spell(MF priority=2)
 }
 
 AddIcon help=cd
 {
+	if BuffPresent(EVANGELISM stacks=5) Spell(ARCHANGEL)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -74,16 +127,7 @@ AddIcon help=cd
 # Add mana monitor
 AddIcon help=mana mastery=3
 {
-	#Regain mana if needed and if shadowfiend is not already out
-	if Mana(less 4000) and PetPresent(no)
-	{
-		Spell(SHADOWFIEND usable=1)
-		unless TargetDebuffExpires(VAMPIRICTOUCH 6 mine=1 haste=spell) Spell(DISPERSION usable=1)
-	}
+	if ManaPercent(less 5) Spell(DISPERSION)
 }
 
-# Add icons to monitor debuffs
-AddIcon size=small nocd=1 {if TargetDebuffExpires(VAMPIRICTOUCH 1.4 mine=1 haste=spell) Spell(VAMPIRICTOUCH) } # Vampiric Touch
-AddIcon size=small nocd=1 {if TargetDebuffExpires(SHADOWWORDPAIN 1 mine=1) Spell(SHADOWWORDPAIN) } # Shadow Word: Pain
-AddIcon size=small nocd=1 {if TargetDebuffExpires(DEVOURINGPLAGUE 1 mine=1) Spell(DEVOURINGPLAGUE) } 
 ]]
