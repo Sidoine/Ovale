@@ -34,6 +34,7 @@ Define(RAKE 1822) #cat bleed
 	SpellAddTargetDebuff(RAKE RAKE=9)
 Define(RAVAGE 6785) #cat behind+(prowling or stampede)
 	SpellInfo(RAVAGE combo=1)
+	SpellAddBuff(RAVAGE STAMPEDE=0)
 Define(RIP 1079) #cat bleed
 	SpellInfo(RIP combo=-5 duration=12)
 	SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
@@ -51,7 +52,7 @@ Define(STARSURGE 78674) #moonkin 15 lunar+solar
 	SpellInfo(STARSURGE cd=15 starsurge=15)
 Define(SUNFIRE 93402)
 	SpellAddTargetDebuff(SUNFIRE SUNFIRE=18)
-Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
+Define(SURVIVALINSTINCTS wssss61336) #cat+bear surv cd
 Define(SWIPEBEAR 779) #bear aoe
 Define(SWIPECAT 62078) #cat aoe
 Define(TRASH 77758) #bear aoe bleed
@@ -69,6 +70,7 @@ Define(CLEARCASTING 16870)
 Define(ECLIPSELUNAR 48518) #Increased by wrath
 Define(ECLIPSESOLAR 48517) #Increased by starfire
 Define(SHOOTINGSTARS 93400)
+Define(STAMPEDE 81022)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
@@ -158,6 +160,8 @@ AddIcon help=main mastery=2
 
 	if Stance(3) # cat
 	{
+		if BuffPresent(STAMPEDE) Spell(RAVAGE)
+		
 		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR priority=4)
 	
 		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2) and TargetDeadIn(more 15)
