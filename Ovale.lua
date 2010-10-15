@@ -336,8 +336,18 @@ local options =
 					name = "Debug",
 					type = "execute",
 					func = function() 
-						--for i=1,10 do Ovale:Print(i.."="..UnitPower("player", i)) end 
+						for i=1,10 do Ovale:Print(i.."="..UnitPower("player", i)) end 
 						Ovale:Print(Ovale.state.eclipse)
+					end
+				},
+				talent =
+				{
+					name = "Talent",
+					type = "execute",
+					func = function() 
+						for k,v in pairs(Ovale.talentNameToId) do
+							Ovale:Print(k.."="..v)
+						end
 					end
 				}
 			}
@@ -916,7 +926,6 @@ function Ovale:RemplirListeTalents()
 			local nameTalent, icon, tier, column, currRank, maxRank= GetTalentInfo(t,i);
 			local link = GetTalentLink(t,i)
 			local a, b, talentId = string.find(link, "talent:(%d+)");
-			-- self:Print("talent = "..nameTalent.." id = ".. talentId)
 			talentId = tonumber(talentId)
 			self.talentIdToName[talentId] = nameTalent
 			self.talentNameToId[nameTalent] = talentId
@@ -1103,16 +1112,25 @@ function Ovale:AddSpellToStack(spellName, startCast, endCast, nextCast, nocd)
 			if newSpellInfo.starsurge then
 				local buffAura = self:GetAura("player", "HELPFUL", 48517) --Solar
 				if buffAura.stacks>0 then
+					self:Log("starsurge with solar buff = " .. (- newSpellInfo.starsurge))
 					self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
 				else
 					buffAura = self:GetAura("player", "HELPFUL", 48518) --Lunar
 					if buffAura.stacks>0 then
+						self:Log("starsurge with lunar buff = " .. newSpellInfo.starsurge)
 						self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
 					elseif self.state.eclipse < 0 then
+						self:Log("starsurge with eclipse < 0 = " .. (- newSpellInfo.starsurge))
 						self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
 					else
+						self:Log("starsurge with eclipse > 0 = " .. newSpellInfo.starsurge)
 						self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
 					end
+				end
+				if self.state.eclipse < -100 then
+					self.state.eclipse = -100
+				elseif self.state.eclipse > 100 then
+					self.state.eclipse = 100
 				end
 			end
 			if newSpellInfo.holy then

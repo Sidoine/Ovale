@@ -45,7 +45,8 @@ Define(SILENCINGSHOT 34490)
 Define(LOCKANDLOAD 56453)
 Define(FRENZYEFFECT 19615)
 Define(IMPROVEDSTEADYSHOT 53224)
-Define(MARKEDFORDEATH 53243)
+Define(MARKEDFORDEATH 88691)
+Define(FIRE 82926)
 
 #Talents
 Define(TALENTCHIMSHOT 2135)
@@ -80,15 +81,15 @@ AddIcon help=main mastery=1
 
 AddIcon help=main mastery=2
 {
-	if Mana(less 43) or Counter(ss equal 1) Spell(STEADYSHOT)
-	if TargetDebuffPresent(SERPENTSTING) Spell(CHIMERASHOT)
-	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-	Spell(AIMEDSHOT)
-	Spell(ARCANESHOT)
-	if CheckBoxOn(multi) Spell(MULTISHOT)
-	if TargetLifePercent(less 20) Spell(KILLSHOT)
-	Spell(KILLCOMMAND)
-	unless 0.25s before Spell(CHIMERASHOT) Spell(STEADYSHOT)
+    if TargetLifePercent(less 20) Spell(KILLSHOT)
+    if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
+    if TargetDebuffPresent(SERPENTSTING) Spell(CHIMERASHOT)
+    if BuffPresent(FIRE) Spell(AIMEDSHOT)
+    if Mana(less 44) or Counter(ss equal 1) Spell(STEADYSHOT)
+    unless 1.6s before Spell(CHIMERASHOT) Spell(ARCANESHOT)
+    if CheckBoxOn(multi) Spell(MULTISHOT)
+    if Mana(more 66) Spell(ARCANESHOT)
+    unless 0.25s before Spell(CHIMERASHOT) Spell(STEADYSHOT)
 }
 
 AddIcon help=main mastery=3

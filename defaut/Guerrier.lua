@@ -71,6 +71,7 @@ Define(WHIRLWIND 1680)
 Define(BLOODSURGE 46916)
 Define(TASTEFORBLOOD 56636)
 Define(ENRAGE 14202)
+Define(EXECUTIONER 90806)
 
 #Talents
 Define(SLAMTALENT 2233)
@@ -112,9 +113,11 @@ AddIcon help=main mastery=2
 	
 	if CheckBoxOn(multi) Spell(WHIRLWIND)
 	Spell(COLOSSUSSMASH)
+    if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 0 stacks=5) Spell(EXECUTE)
+	Spell(BLOODTHIRST)
 	Spell(RAGINGBLOW usable=1)
-    Spell(BLOODTHIRST)
     Spell(VICTORYRUSH usable=1)
+	if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 3) Spell(EXECUTE)
 	if BuffPresent(BLOODSURGE) Spell(SLAM)
     if TargetLifePercent(less 20) Spell(EXECUTE)
 	if BuffExpires(DEATHWISH) and BuffExpires(RECKLESSNESS) and BuffExpires(ENRAGE) Spell(BERSERKERRAGE)

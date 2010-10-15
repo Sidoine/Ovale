@@ -40,10 +40,7 @@ Define(FINGERSOFFROST 83074) #frost boost ice lance/deep freeze
 Define(HOTSTREAK 48108) #fire instant pyroblast
 
 #Talent
-Define(FIRESTARTERTALENT 1849)
-
-AddCheckBox(scorch SpellName(SCORCH) default talent=TALENTIMPROVEDSCORSH)
-AddCheckBox(abarr SpellName(ARCANEBARRAGE) default talent=TALENTARCANEBARRAGE)
+Define(FIRESTARTERTALENT 11431)
 
 ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMENTAL FROSTBOLT ARCANEBLAST ARCANEMISSILES ARCANEBARRAGE
 			DEEPFREEZE ICELANCE)
@@ -74,7 +71,7 @@ AddIcon help=main mastery=3
 	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
 
 	if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
-	If BuffPresent(FINGERSOFFROST) or Speed(more 0) {Spell(DEEPFREEZE) Spell(ICELANCE)}
+	if BuffPresent(FINGERSOFFROST) or Speed(more 0) {Spell(DEEPFREEZE) Spell(ICELANCE)}
 	if BuffPresent(BRAINFREEZE) Spell(FROSTFIREBOLT)
 	Spell(FROSTBOLT)
 }

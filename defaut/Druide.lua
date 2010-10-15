@@ -93,7 +93,7 @@ AddIcon help=main mastery=1
 		Spell(MOONFIRE)
 	}
 
-	if BuffPresent(SHOOTINGSTARS) and BuffExpires(SHOOTINGSTARS 3) Spell(STARSURGE)
+	Spell(STARSURGE)
 	
 	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100)
 	{
@@ -117,8 +117,6 @@ AddIcon help=main mastery=1
 	if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
 		Spell(MOONFIRE)
 
-	Spell(STARSURGE)
-		
 	if {Eclipse(equal 0) and CheckBoxOn(wrath)} or Eclipse(less 0)
 		Spell(WRATH)
 	

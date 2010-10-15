@@ -24,6 +24,7 @@ Define(HOLYWRATH 2812)
 	SpellInfo(HOLYWRATH cd=30)
 Define(INQUISITION 84963)
 Define(JUDGEMENT 20271)
+Define(RIGHTEOUSFURY 25780)
 Define(SEALRIGHTEOUSNESS 20154)
 	SpellAddBuff(SEALRIGHTEOUSNESS SEALRIGHTEOUSNESS=1800)
 Define(SEALOFTRUTH 31801)
@@ -43,17 +44,24 @@ AddCheckBox(aoe L(AOE))
 
 AddIcon help=main mastery=2
 {
+	if BuffExpires(RIGHTEOUSFURY) Spell(RIGHTEOUSFURY)
 	unless InCombat() if BuffExpires(SEALRIGHTEOUSNESS 400) and BuffExpires(SEALOFTRUTH 400) Spell(SEALOFTRUTH)
 	
-	if HolyPower(more 2) Spell(SHIELDOFTHERIGHTEOUS)
-	Spell(JUDGEMENT)
-	Spell(AVENGERSSHIELD)
-	Spell(HAMMEROFTHERIGHTEOUS)
 	if CheckBoxOn(aoe)
 	{
+		Spell(HAMMEROFTHERIGHTEOUS)
+		if HolyPower(more 0) and BuffExpires(INQUISITION) Spell(INQUISITION)
 		Spell(HOLYWRATH)
 		Spell(CONSECRATE)
 	}
+	if CheckBoxOff(aoe)
+	{
+		if HolyPower(more 2) Spell(SHIELDOFTHERIGHTEOUS)
+		Spell(CRUSADERSTRIKE)
+	}
+	Spell(JUDGEMENT)
+	Spell(HOLYWRATH)
+	Spell(AVENGERSSHIELD)
 }
 
 AddIcon help=cd mastery=2
@@ -71,16 +79,19 @@ AddIcon help=main mastery=3
 		if BuffExpires(SEALRIGHTEOUSNESS 400) and BuffExpires(SEALOFTRUTH 400) Spell(SEALOFTRUTH)
 	}
     
-	if HolyPower(more 2) Spell(ZEALOTRY)
+	if HolyPower(more 2) and TargetDeadIn(more 20) Spell(ZEALOTRY)
     if HolyPower(more 0) and BuffExpires(INQUISITION) Spell(INQUISITION)
-	if CheckBoxOff(aoe) and HolyPower(more 2) Spell(TEMPLARSVERDICT)
-	if CheckBoxOn(aoe) and HolyPower(more 2) Spell(DIVINESTORM)
-	if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
-	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
-	Spell(JUDGEMENT)
-	Spell(CRUSADERSTRIKE)
-	if CheckBoxOn(aoe) Spell(CONSECRATE)
-	if CheckBoxOn(aoe) Spell(HOLYWRATH)
+    if CheckBoxOff(aoe) and HolyPower(more 2) Spell(TEMPLARSVERDICT)
+    if CheckBoxOn(aoe) and HolyPower(more 2) Spell(DIVINESTORM)
+    Spell(CRUSADERSTRIKE)
+    unless 0.5s before Spell(CRUSADERSTRIKE)
+	{
+   		if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
+   		if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
+   		Spell(JUDGEMENT)   
+   		Spell(HOLYWRATH)
+	}
+    if CheckBoxOn(aoe) Spell(CONSECRATE)
 }
 
 AddIcon help=cd mastery=3
