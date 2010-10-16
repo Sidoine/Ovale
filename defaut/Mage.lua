@@ -43,6 +43,9 @@ Define(FINGERSOFFROST 83074) #frost boost ice lance/deep freeze
 Define(HOTSTREAK 48108) #fire instant pyroblast
 Define(ARCANEBLASTDEBUFF 36032)
 
+#Debuff
+Define(IGNITE 12654)
+
 #Talent
 Define(FIRESTARTERTALENT 11431)
 
@@ -101,7 +104,9 @@ AddIcon help=cd mastery=1
 
 AddIcon help=cd mastery=2
 {
-	Spell(COMBUSTION)
+	if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1)
+			and TargetDebuffPresent(PYROBLAST mine=1)
+		Spell(COMBUSTION)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	Spell(MIRRORIMAGE)
