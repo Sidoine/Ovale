@@ -66,11 +66,11 @@ Define(VAMPIRICBLOOD 55233) #blood
 Define(GLYPHHOWLINGBLAST 63335)
 
 #Buffs and debuffs
-Define(BLOODPLAGUE 59879)
-Define(FROSTFEVER 59921)
+Define(BLOODPLAGUE 55078)
+Define(FROSTFEVER 55095)
 Define(KILLINGMACHINE 51124)
-Define(SHADOWINFUSION 49572)
-Define(SUDDENDOOM 49530)
+Define(SHADOWINFUSION 91342)
+Define(SUDDENDOOM 81340)
 
 AddCheckBox(horn SpellName(HORNOFWINTER))
 
@@ -133,7 +133,7 @@ AddIcon help=main mastery=3
 	
 	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
 	{
-		if TargetBuffPresent(SHADOWINFUSION stacks=5 target=pet) Spell(DARKTRANSFORMATION)
+		if Runes(unholy 1) and TargetBuffPresent(SHADOWINFUSION stacks=5 target=pet) Spell(DARKTRANSFORMATION)
 		if BuffPresent(SUDDENDOOM mine=1) Spell(DEATHCOIL usable=1)
 		if Mana(more 90) Spell(DEATHCOIL usable=1)
 		if Runes(unholy 1) Spell(SCOURGESTRIKE)
