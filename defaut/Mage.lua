@@ -73,7 +73,7 @@ AddIcon help=main mastery=2
 {
 	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
 
-	if Talent(FIRESTARTERTALENT) and Speed(more 0) Spell(SCORCH)
+	if TalentPoints(FIRESTARTERTALENT more 0) and Speed(more 0) Spell(SCORCH)
 	if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
 	if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
 	if TargetDebuffExpires(PYROBLAST 2.5 haste=spell mine=1) Spell(PYROBLAST)
