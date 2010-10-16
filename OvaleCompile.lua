@@ -47,30 +47,30 @@ end
 
 local function ParseSpellAddDebuff(params)
 	local paramList = ParseParameters(params)
-	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
-	if (spell) then
+	local spellId = paramList[1]
+	if spellId then
 		paramList[1] = nil
-		Ovale:GetSpellInfo(spell).aura.player.HARMFUL = paramList
+		Ovale:GetSpellInfo(spellId).aura.player.HARMFUL = paramList
 	end
 	return ""
 end
 
 local function ParseSpellAddBuff(params)
 	local paramList = ParseParameters(params)
-	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
-	if (spell) then
+	local spellId = paramList[1]
+	if spellId then
 		paramList[1] = nil
-		Ovale:GetSpellInfo(spell).aura.player.HELPFUL = paramList
+		Ovale:GetSpellInfo(spellId).aura.player.HELPFUL = paramList
 	end
 	return ""
 end
 
 local function ParseSpellAddTargetDebuff(params)
 	local paramList = ParseParameters(params)
-	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
-	if (spell) then
+	local spellId = paramList[1]
+	if spellId then
 		paramList[1] = nil
-		Ovale:GetSpellInfo(spell).aura.target.HARMFUL = paramList
+		Ovale:GetSpellInfo(spellId).aura.target.HARMFUL = paramList
 	end
 	return ""
 end
@@ -98,15 +98,15 @@ end
 
 local function ParseSpellInfo(params)
 	local paramList = ParseParameters(params)
-	local spell = Ovale:GetSpellInfoOrNil(paramList[1])
-	if (spell) then
+	local spellId = paramList[1]
+	if spellId then
 		if paramList.glyph and not HasGlyph(paramList.glyph) then
 			return ""
 		end
 		if paramList.talent and not HasTalent(paramList.talent) then
 			return ""
 		end
-		local spellInfo = Ovale:GetSpellInfo(spell)
+		local spellInfo = Ovale:GetSpellInfo(spellId)
 		for k,v in pairs(paramList) do
 			if k == "addduration" then
 				spellInfo.duration = spellInfo.duration + v
@@ -122,11 +122,9 @@ end
 
 local function ParseScoreSpells(params)
 	for v in string.gmatch(params, "(%d+)") do
-		v = tonumber(v)
-		
-		local spell = Ovale:GetSpellInfoOrNil(v)
-		if spell then
-			Ovale.scoreSpell[spell] = true
+		local spellId = tonumber(v)
+		if spellId then
+			Ovale.scoreSpell[spellId] = true
 		else
 			Ovale:Print("unknown spell "..v)
 		end
@@ -150,6 +148,11 @@ end
 
 local function ParseBefore(a,b)
 	local newNode = {type="before", time=node[tonumber(a)], a=node[tonumber(b)]}
+	return AddNode(newNode)
+end
+
+local function ParseAfter(a,b)
+	local newNode = {type="after", time=node[tonumber(a)], a=node[tonumber(b)]}
 	return AddNode(newNode)
 end
 
@@ -202,7 +205,7 @@ local function subtest(text, pattern, func)
 	return text
 end
 
-local function ParseAddListItem(list,item,text, default)
+local function ParseAddListItem(list, item, text, default)
 	local paramList = ParseParameters(params)
 	if (paramList.talent and not HasTalent(paramList.talent)) or
 		(paramList.glyph and not HasGlyph(paramList.glyph)) then
@@ -255,6 +258,7 @@ local function ParseAddIcon(params, text)
 		text = string.gsub(text, "(at least)%s+node(%d+)%s+node(%d+)", ParseCompare)
 		text = string.gsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
 		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
+		text = string.gsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
 		
 		if (was == text) then
 			break
@@ -315,11 +319,11 @@ function Ovale:CompileInputs(text)
 end
 
 local function ParseCanStopChannelling(text)
-	local spell = Ovale:GetSpellInfoOrNil(text)
-	if (spell) then
-		Ovale:GetSpellInfo(spell).canStopChannelling = true
+	local spellId = tonumber(text)
+	if spellId then
+		Ovale:GetSpellInfo(spellId).canStopChannelling = true
 	else
-		Ovale:Print("CanStopChannelling with unknown spell "..text)
+		Ovale:Print("CanStopChannelling with unknown spell "..spellId)
 	end
 	return ""
 end

@@ -27,9 +27,11 @@ Define(FELARMOR 28176)
 Define(FELFLAME 77799)
 Define(HANDOFGULDAN 71521)
 	SpellInfo(HANDOFGULDAN cd=12)
+	SpellAddTargetDebuff(HANDOFGULDAN IMMOLATE=refresh)
 Define(HAUNT 48181)
 	SpellInfo(HAUNT cd=8)
 Define(IMMOLATE 348)
+	SpellInfo(IMMOLATE duration=15)
 	SpellAddTargetDebuff(IMMOLATE IMMOLATE=15)
 	SpellAddBuff(IMMOLATE MOLTENCORE=-1)
 Define(INCINERATE 29722)
@@ -49,13 +51,11 @@ Define(UNSTABLEAFFLICTION 30108)
 
 
 #Buff
-Define(SHADOWEMBRACE 32386)
 Define(DECIMATION 63167)
 Define(MOLTENCORE 71165)
-Define(EMPOWEREDIMP 47221)
+Define(EMPOWEREDIMP 47283)
 
 #Talent	
-Define(TALENTSHADOWEMBRACE 1763)
 	
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse tongues SpellName(CURSETONGUES))
@@ -75,7 +75,6 @@ AddIcon help=main mastery=1
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
 	if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
-	if TalentPoints(TALENTSHADOWEMBRACE more 0) and TargetDebuffExpires(SHADOWEMBRACE 0) Spell(SHADOWBOLT)
 	if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(UNSTABLEAFFLICTION)
 	if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
@@ -103,13 +102,13 @@ AddIcon help=main mastery=2
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(IMMOLATE)
+	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
 	if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
 		if List(curse doom) and TargetDeadIn(more 60) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
-	Spell(HANDOFGULDAN)
 	if BuffPresent(DECIMATION) Spell(SOULFIRE)
 	if BuffPresent(MOLTENCORE) Spell(INCINERATE)
 	Spell(SHADOWBOLT)
@@ -132,7 +131,7 @@ AddIcon help=main mastery=3
 	if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
-	if TargetDebuffPresent(IMMOLATE mine=1)	Spell(CONFLAGRATE)
+	if 1s after TargetDebuffPresent(IMMOLATE mine=1)	Spell(CONFLAGRATE)
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(IMMOLATE)
 	if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)

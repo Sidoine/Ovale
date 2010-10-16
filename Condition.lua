@@ -114,7 +114,7 @@ local function buildRootSpellList()
 	end
 	rootSpellList = {}
 	for k, v in pairs(rootSpellIdList) do
-		rootSpellList[Ovale:GetSpellInfoOrNil(v)] = true
+		rootSpellList[v] = true
 	end
 end
 
@@ -124,7 +124,7 @@ local function buildStunSpellList()
 	end
 	stunSpellList = {}
 	for k, v in pairs(stunSpellIdList) do
-		stunListList[Ovale:GetSpellInfoOrNil(v)] = true
+		stunListList[v] = true
 	end
 end
 
@@ -134,7 +134,7 @@ local function buildIncapacitateSpellList()
 	end
 	incapacitateSpellList = {}
 	for k, v in pairs(incapacitateSpellIdList) do
-		incapacitateSpellList[Ovale:GetSpellInfoOrNil(v)] = true
+		incapacitateSpellList[v] = true
 	end
 end
 
@@ -144,18 +144,18 @@ local function buildFearSpellList()
 	end
 	fearSpellList = {}
 	for k, v in pairs(fearSpellIdList) do
-		fearSpellList[Ovale:GetSpellInfoOrNil(v)] = true
+		fearSpellList[v] = true
 	end
 end
 
 local function isDebuffInList(list)
 	local i=1;
 	while (true) do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitDebuff("player", i);
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId =  UnitDebuff("player", i);
 		if (not name) then
 			break
 		end
-		if (list[name]) then
+		if (list[spellId]) then
 			return true
 		end
 		i = i +1
@@ -232,6 +232,17 @@ local function addTime(time1, duration)
 	end
 end
 
+--Return time2-time1
+local function diffTime(time1, time2)
+	if not time1 then
+		return 0
+	end
+	if not time2 then
+		return nil
+	end
+	return time2 - time1
+end
+
 local function addOrSubTime(time1, operator, duration)
 	if operator == "more" then
 		return addTime(time1, -duration)
@@ -261,13 +272,13 @@ local function GetManaTime(mana, withBerserker)
 		end
 		local rate= 10
 		if (className == "ROGUE") then
-			local rush = Ovale:GetSpellInfoOrNil(13750)
-			if UnitBuff("player", rush) then
+			local rush = Ovale:GetAura("player", "HELPFUL", 13750)
+			if rush.stacks>0 then
 				rate = rate * 2
 			end
 		elseif withBerserker then
-			local berserk = Ovale:GetSpellInfoOrNil(50334)
-			if UnitBuff("player", berserk) then
+			local berserk = Ovale:GetAura("player", "HELPFUL", 50334)
+			if berserk.stacks>0 then
 				mana = mana/2
 			end
 		end
@@ -320,8 +331,8 @@ local function GetTargetAura(condition, filter, target)
 	if (not condition.mine or aura.mine) and aura.stacks>=stacks then
 		local ending
 		if condition.forceduration then
-			if Ovale.spellInfo[name] and Ovale.spellInfo[name].duration then
-				ending = aura.start + Ovale.spellInfo[name].duration
+			if Ovale.spellInfo[spellId] and Ovale.spellInfo[spellId].duration then
+				ending = aura.start + Ovale.spellInfo[spellId].duration
 			else
 				ending = aura.start + condition.forceduration
 			end
@@ -333,48 +344,6 @@ local function GetTargetAura(condition, filter, target)
 		return 0,0
 	end
 end
-
---[[	local auraName, auraRank, auraIcon = Ovale:GetSpellInfoOrNil(spellId)
-	local i=1;
-	local startTime = nil
-	local endTime = nil
-	local stacksLeft = nil
-	while (true) do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable =  UnitAura(target, i, filter);
-		if (not name) then
-			break
-		end
-		if (not condition.mine or unitCaster=="player") then
-			if (name == auraName and icon == auraIcon) then
-				startTime = expirationTime - duration
-				endTime = expirationTime - Ovale.maintenant
-				stacksLeft = count
-				break
-			end
-		end
-		i = i + 1;
-	end
-	
-	if spellId then
-		for k=1,Ovale.spellStack.length do
-			local newSpell = Ovale.spellStack[k]
-			if (newSpell.info and newSpell.info[target] and newSpell.info[target][filter] and newSpell.info[target][filter][spellId]) then
-				local duration = newSpell.info[target][filter][spellId]
-				if duration>0 then
-					if (not endTime or endTime < newSpell.attenteFinCast) then
-						stacksLeft = 1
-					else
-						stacksLeft = stacksLeft + 1
-					end
-					endTime = duration + newSpell.attenteFinCast
-				else
-					endTime = nil
-				end
-			end
-		end
-	end
-	return endTime, stacksLeft
-end]]
 
 local lastSaved
 local savedHealth
@@ -435,11 +404,12 @@ Ovale.conditions=
 		return compare(nombre, condition[2], condition[3])
 	end,
 	BuffDuration = function(condition)
-		local name, rank, icon, count, debuffType, duration = UnitBuff("player", Ovale:GetSpellInfoOrNil(condition[1]))
-		if not name then
-			return nil
-		end
-		return compare(duration, condition[2], condition[3])
+		--local name, rank, icon, count, debuffType, duration = UnitBuff("player", Ovale:GetSpellInfoOrNil(condition[1]))
+		--if not name then
+--			return nil
+	--	end
+		local start, ending = GetTargetAura(condition, "HELPFUL", "player")
+		return compare(diffTime(start, ending), condition[2], condition[3])
 	end,
 	-- Test if a buff will expire on the player after a given time
 	-- 1 : buff spell id
@@ -448,8 +418,8 @@ Ovale.conditions=
 		local start, ending = GetTargetAura(condition, "HELPFUL", "player")
 		local timeBefore = avecHate(condition[2], condition.haste)
 		if Ovale.trace then
-			Ovale:Print("timeBefore = " .. timeBefore)
-			Ovale:Print("start = " .. ending)
+			Ovale:Print("timeBefore = " .. nilstring(timeBefore))
+			Ovale:Print("start = " .. nilstring(ending))
 		end
 		return addTime(ending, -timeBefore)
 	end,
@@ -457,13 +427,13 @@ Ovale.conditions=
 	-- 1 : buff spell id
 	-- 2 : time since the buff gain
 	BuffGain = function(condition)
-		local spell, rank, icon = Ovale:GetSpellInfoOrNil(condition[1])
+		local spellId = condition[1]
 		if (spell) then
-			if (not Ovale.buff[spell]) then
+			if (not Ovale.buff[spellId]) then
 				return 0
 			end
-			local timeGain = Ovale.buff[spell].gain
-			if (not timeGain or Ovale.buff[spell].icon~=icon) then
+			local timeGain = Ovale.buff[spellId].gain
+			if not timeGain then
 				timeGain = 0
 			end
 			
@@ -480,12 +450,8 @@ Ovale.conditions=
 		return start, addTime(ending, -timeBefore)
 	end,
 	Casting = function(condition)
-		local spell, rank, name, icon, start, ending = UnitCastingInfo("player")
-		if (not spell) then
-			return nil
-		end
-		if Ovale:GetSpellInfoOrNil(condition[1])==spell then
-			return start/1000, ending/1000
+		if Ovale.currentSpellId == condition[1] then
+			return Ovale.startCast, Ovale.endCast
 		else
 			return nil
 		end
@@ -551,7 +517,7 @@ Ovale.conditions=
 	end,
 	EndCastTime = function(condition)
 		local name, rank, icon, cost, isFunnel, powerType, castTime = Ovale:GetSpellInfoOrNil(condition[1])
-		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(name)
+		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(condition[1])
 		local startCast = actionCooldownStart + actionCooldownDuration
 		if startCast<Ovale.currentTime then
 			startCast = Ovale.currentTime
@@ -645,7 +611,7 @@ Ovale.conditions=
 	end,
 	OtherDebuffExpires = function(condition)
 		Ovale:EnableOtherDebuffs()
-		local otherDebuff = Ovale.otherDebuffs[GetSpellInfo(condition[1])]
+		local otherDebuff = Ovale.otherDebuffs[condition[1]]
 		if otherDebuff then
 			local timeBefore = condition[2] or 0
 			local maxTime = condition[3] or 10
@@ -669,7 +635,7 @@ Ovale.conditions=
 	end,
 	OtherDebuffPresent = function(condition)
 		Ovale:EnableOtherDebuffs()
-		local otherDebuff = Ovale.otherDebuffs[GetSpellInfo(condition[1])]
+		local otherDebuff = Ovale.otherDebuffs[condition[1]]
 		if otherDebuff then
 		--	print("otherDebuff")
 			local maxTime = 0
@@ -829,7 +795,7 @@ Ovale.conditions=
 		return start, addTime(ending, -tempsMin)
 	end,
 	TargetInRange = function(condition)
-		return testbool(IsSpellInRange(Ovale:GetSpellInfoOrNil(condition[1]),getTarget(condition.target))==1,condition[2])
+		return testbool(IsSpellInRange(condition[1],getTarget(condition.target))==1,condition[2])
 	end,
 	TargetIsCasting = function(condition)
 		return testbool(UnitCastingInfo(getTarget(condition.target)), condition[1])

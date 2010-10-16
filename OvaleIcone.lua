@@ -3,9 +3,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local RANGE_INDICATOR = "●";
 
 local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
 				
-	self.spellName = spellName
+	self.spellId = spellId
 	if (minAttente~=nil and actionTexture) then	
 	
 		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
@@ -163,13 +163,13 @@ function OvaleIcone_OnClick(self)
 end
 
 function OvaleIcone_OnEnter(self)
-	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.spellName then
+	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.spellId then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 		if self.help then
 			GameTooltip:SetText(L[self.help])
 		end
-		if self.spellName then
-			GameTooltip:AddLine(self.spellName,0.5,1,0.75)
+		if self.spellId then
+			GameTooltip:AddLine(GetSpellInfo(self.spellId),0.5,1,0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
 			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"],1,1,1)

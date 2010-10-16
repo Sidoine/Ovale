@@ -52,8 +52,9 @@ Define(STARSURGE 78674) #moonkin 15 lunar+solar
 	SpellInfo(STARSURGE cd=15 starsurge=15)
 Define(SUNFIRE 93402)
 	SpellAddTargetDebuff(SUNFIRE SUNFIRE=18)
-Define(SURVIVALINSTINCTS wssss61336) #cat+bear surv cd
+Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
 Define(SWIPEBEAR 779) #bear aoe
+	SpellInfo(SWIPEBEAR cd=6)
 Define(SWIPECAT 62078) #cat aoe
 Define(TRASH 77758) #bear aoe bleed
 Define(TIGERSFURY 5217) #cat buff
@@ -155,7 +156,9 @@ AddIcon help=main mastery=2
 
 		if Mana(more 50) Spell(MAUL)
 		if CheckBoxOn(multi)
-			Spell(SWIPEBEAR)    
+			Spell(SWIPEBEAR)
+		Spell(MANGLEBEAR)
+		Spell(LACERATE)		
 	}
 
 	if Stance(3) # cat

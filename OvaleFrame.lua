@@ -111,31 +111,31 @@ do
 		Ovale.db.profile.Colors = colors
 	end
 	
-	local function GetScore(self, spellName)
+	local function GetScore(self, spellId)
 		for k,action in pairs(self.actions) do
-			if action.spellName == spellName then
+			if action.spellId == spellId then
 				if not action.waitStart then
-					-- print("sort "..spellName.." parfait")
+					-- print("sort "..spellId.." parfait")
 					return 1
 				else
 					local lag = Ovale.maintenant - action.waitStart
 					if lag>5 then
-					-- 	print("sort "..spellName.." ignoré (>5s)")
+					-- 	print("sort "..spellId.." ignoré (>5s)")
 						return nil
 					elseif lag>1.5 then
-					-- 	print("sort "..spellName.." trop lent !")
+					-- 	print("sort "..spellId.." trop lent !")
 						return 0
 					elseif lag>0 then
-					-- 	print("sort "..spellName.." un peu lent "..lag)
+					-- 	print("sort "..spellId.." un peu lent "..lag)
 						return 1-lag/1.5
 					else
-					-- 	print("sort "..spellName.." juste bon")
+					-- 	print("sort "..spellId.." juste bon")
 						return 1
 					end
 				end
 			end
 		end
---		print("sort "..spellName.." incorrect")
+--		print("sort "..spellId.." incorrect")
 		return 0
 	end
 	
@@ -158,13 +158,13 @@ do
 			local action = self.actions[k]
 			
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget, noRed = Ovale:GetActionInfo(element)
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = Ovale:GetActionInfo(element)
 			if noRed then
 				start = actionCooldownStart + actionCooldownDuration
 			end
 			
 			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-			if start and Ovale.currentSpellName and Ovale.attenteFinCast and spellName == Ovale.currentSpellName and start<Ovale.attenteFinCast then
+			if start and Ovale.currentSpellId and Ovale.attenteFinCast and spellId == Ovale.currentSpellId and start<Ovale.attenteFinCast then
 				start = Ovale.attenteFinCast
 			end
 			
@@ -172,10 +172,10 @@ do
 				action.icons[1]:Update(element, nil)
 			else
 				action.icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellName, actionTarget)
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
 			end
 			
-			action.spellName = spellName
+			action.spellId = spellId
 			
 			if start == Ovale.maintenant and actionUsable then
 				if not action.waitStart then
@@ -201,13 +201,13 @@ do
 			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif) then
 				if start then
 					local castTime=0
-					if spellName then
-						local _, _, _, _, _, _, _castTime = GetSpellInfo(spellName)
+					if spellId then
+						local _, _, _, _, _, _, _castTime = GetSpellInfo(spellId)
 						if _castTime and _castTime>0 then
 							castTime = _castTime/1000
 						end
 					end
-					local gcd = Ovale:GetGCD(spellName)
+					local gcd = Ovale:GetGCD(spellId)
 					local nextCast
 					if (castTime>gcd) then
 						nextCast = start + castTime 
@@ -217,7 +217,7 @@ do
 					if Ovale.trace then
 						Ovale:Print("****Second icon")
 					end
-					Ovale:AddSpellToStack(spellName, start, start + castTime, nextCast)
+					Ovale:AddSpellToStack(spellId, start, start + castTime, nextCast)
 					start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
 					action.icons[2]:Update(element, start, Ovale:GetActionInfo(element))
 				else
