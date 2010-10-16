@@ -64,7 +64,6 @@ Define(WRATH 5176) #moonkin
 
 #Glyphs
 Define(GLYPHOFSHRED 54815)
-Define(GLYPHOFRIP 54818)
 
 #Buff
 Define(CLEARCASTING 16870)
@@ -178,7 +177,7 @@ AddIcon help=main mastery=2
 		}
 
 		#Extends Rip with shred if glyph
-		if Glyph(GLYPHOFRIP) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and Counter(ripshreds less 3) Spell(SHRED)
+		if Glyph(GLYPHOFSHRED) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and Counter(ripshreds less 3) Spell(SHRED)
 
 		if ComboPoints(more 4)
 		{

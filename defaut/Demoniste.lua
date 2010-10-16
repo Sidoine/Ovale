@@ -44,6 +44,7 @@ Define(SHADOWBOLT 686)
 	SpellAddTargetDebuff(SHADOWBOLT SHADOWEMBRACE=12)
 Define(SHADOWBURN 17877)
 Define(SOULFIRE 6353)
+	SpellAddBuff(SOULFIRE IMPROVEDSOULFIREBUFF=15)
 Define(SOULBURN 74434)
 Define(SUMMONFELGUARD 18540)
 Define(UNSTABLEAFFLICTION 30108)
@@ -54,8 +55,10 @@ Define(UNSTABLEAFFLICTION 30108)
 Define(DECIMATION 63167)
 Define(MOLTENCORE 71165)
 Define(EMPOWEREDIMP 47283)
+Define(IMPROVEDSOULFIREBUFF 85383)
 
 #Talent	
+Define(IMPROVEDSOULFIRE 11197)
 	
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse tongues SpellName(CURSETONGUES))
@@ -76,7 +79,7 @@ AddIcon help=main mastery=1
 
 	if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
 	if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(UNSTABLEAFFLICTION)
-	if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
+	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
 		if List(curse doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
@@ -89,7 +92,6 @@ AddIcon help=main mastery=1
 AddIcon help=cd mastery=1
 {
 	Spell(SUMMONFELGUARD)
-	Spell(SOULBURN usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -103,7 +105,7 @@ AddIcon help=main mastery=2
 
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(IMMOLATE)
 	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
-	if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
+	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
 		if List(curse doom) and TargetDeadIn(more 60) Spell(BANEOFDOOM)
@@ -119,7 +121,6 @@ AddIcon help=cd mastery=2
 	Spell(METAMORPHOSIS)
 	Spell(DEMONICEMPOWERMENT)
 	Spell(SUMMONFELGUARD)
-	Spell(SOULBURN usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -131,9 +132,11 @@ AddIcon help=main mastery=3
 	if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
-	if 1s after TargetDebuffPresent(IMMOLATE mine=1)	Spell(CONFLAGRATE)
+	if TalentPoints(IMPROVEDSOULFIRE more 0) and TargetLifePercent(more 80) and
+			BuffExpires(IMPROVEDSOULFIREBUFF) Spell(SOULFIRE)
+	if 1s after TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(IMMOLATE)
-	if TargetDebuffExpires(CORRUPTION 0 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
+	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
 		if List(curse doom) and TargetDeadIn(more 60) Spell(BANEOFDOOM)
@@ -147,9 +150,13 @@ AddIcon help=main mastery=3
 AddIcon help=cd mastery=3
 {
 	Spell(SUMMONFELGUARD)
-	Spell(SOULBURN usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
+}
+
+AddIcon size=small
+{
+	Spell(SOULBURN usable=1)
 }
 
 ]]
