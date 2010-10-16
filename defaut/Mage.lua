@@ -2,16 +2,19 @@ Ovale.defaut["MAGE"]=
 [[
 #Spells
 Define(ARCANEBARRAGE 44425) #arcane instant
+	SpellAddDebuff(ARCANEBARRAGE ARCANEBLASTDEBUFF=0)
 Define(ARCANEBLAST 30451) #arcane stacks*4 cost increased
-	SpellAddDebuff(ARCANEBLAST ARCANEBLAST=10)
+	SpellAddDebuff(ARCANEBLAST ARCANEBLASTDEBUFF=10)
 Define(ARCANEMISSILES 5143) #arcane channel
-	SpellAddDebuff(ARCANEMISSILES ARCANEBLAST=0)
+	SpellAddDebuff(ARCANEMISSILES ARCANEBLASTDEBUFF=0)
 Define(ARCANEPOWER 12042) #arcane cd 
 	SpellInfo(ARCANEPOWER cd=84)
 Define(COLDSNAP 11958) #frost reset cd
 Define(COMBUSTION 11129) #fire cd consume dot
 	SpellInfo(COMBUSTION cd=180)
 Define(DEEPFREEZE 44572) #frost instant
+Define(EVOCATION 12051)
+	SpellInfo(EVOCATION cd=240)
 Define(FIREBLAST 2136) #fire instant
 Define(FIREBALL 133) #fire 2.5
 Define(FROSTBOLT 116) #frost
@@ -38,6 +41,7 @@ Define(SUMMONWATERELEMENTAL 31687) #frost pet
 Define(BRAINFREEZE 57761) #frost (instant fireball/frostfire bolt)
 Define(FINGERSOFFROST 83074) #frost boost ice lance/deep freeze
 Define(HOTSTREAK 48108) #fire instant pyroblast
+Define(ARCANEBLASTDEBUFF 36032)
 
 #Talent
 Define(FIRESTARTERTALENT 11431)
@@ -47,12 +51,22 @@ ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMEN
 
 AddIcon help=main mastery=1
 {
-	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
+	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MAGEARMOR)
 	
 	if Speed(more 0) Spell(ARCANEBARRAGE)
-	if DebuffPresent(ARCANEBLAST stacks=4)
-		Spell(ARCANEMISSILES)
-	Spell(ARCANEBLAST)
+	unless 15s before Spell(EVOCATION)
+	{
+		#Mana conserve
+		if DebuffPresent(ARCANEBLASTDEBUFF stacks=4) {Spell(ARCANEMISSILES usable=1) Spell(ARCANEBARRAGE)}
+		if ManaPercent(less 90) and DebuffPresent(ARCANEBLASTDEBUFF stacks=3) {Spell(ARCANEMISSILES usable=1) Spell(ARCANEBARRAGE)}
+		if ManaPercent(less 85) and DebuffPresent(ARCANEBLASTDEBUFF stacks=2) {Spell(ARCANEMISSILES usable=1) Spell(ARCANEBARRAGE)}
+		Spell(ARCANEBLAST)
+	}
+	if 15s before Spell(EVOCATION)
+	{
+		Spell(ARCANEBLAST)
+		if ManaPercent(less 40) Spell(EVOCATION)
+	}
 }
 
 AddIcon help=main mastery=2

@@ -149,7 +149,7 @@ AddIcon help=main mastery=2
 		if TargetDebuffPresent(LACERATE stacks=3)
 			Spell(PULVERIZE)
 
-		if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2)
+		if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2) and TargetDebuffExpires(FAERIEFIREDEBUFF stacks=3)
 			Spell(FAERIEFERAL)
 
 		if CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2)
@@ -168,7 +168,7 @@ AddIcon help=main mastery=2
 		
 		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR priority=4)
 	
-		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2) and TargetDeadIn(more 15)
+		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2) and TargetDebuffExpires(FAERIEFIREDEBUFF stacks=3) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
 
 		#De-synchronize Roar and Rip

@@ -94,7 +94,7 @@ local buffSpellList =
 	meleeslow=
 	{
 		45477, --Icy Touch
-		58179, --Infected Wounds
+		58179, --Infected Wounds rank 1
 		58180, --Infected Wounds rank 2
 		68055, --Judgments of the just
 		6343, --Thunderclap
