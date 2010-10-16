@@ -71,9 +71,9 @@ local buffSpellList =
 	},
 	lowerarmor=
 	{
-		7386, -- Sunder Armor (x3)
+		58567, -- Sunder Armor (x3)
 		8647, -- Expose Armor
-		770 -- Faerie Fire (x3)
+		91565 -- Faerie Fire (x3)
 	},
 	magicaldamagetaken=
 	{

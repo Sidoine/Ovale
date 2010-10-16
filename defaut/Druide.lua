@@ -9,9 +9,9 @@ Define(DEMOROAR 99) #bear
 	SpellAddTargetDebuff(DEMOROAR DEMOROAR=30)
 Define(ENRAGE 5229) #bear
 Define(FAERIEFIRE 770) #moonkin
-	SpellAddTargetDebuff(FAERIEFIRE FAERIEFIRE=300)
+	SpellAddTargetDebuff(FAERIEFIRE FAERIEFIREDEBUFF=300)
 Define(FAERIEFERAL 16857) #bear+cat
-	SpellAddTargetDebuff(FAERIEFERAL FAERIEFERAL=300)
+	SpellAddTargetDebuff(FAERIEFERAL FAERIEFIREDEBUFF=300)
 Define(FEROCIOUSBITE 22568) #cat finish 35-70 mana
 	SpellInfo(FEROCIOUSBITE combo=-5 mana=70)
 Define(FORCEOFNATURE 33831) #moonkin cd
@@ -72,6 +72,7 @@ Define(ECLIPSELUNAR 48518) #Increased by wrath
 Define(ECLIPSESOLAR 48517) #Increased by starfire
 Define(SHOOTINGSTARS 93400)
 Define(STAMPEDE 81022)
+Define(FAERIEFIREDEBUFF 91565)
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
