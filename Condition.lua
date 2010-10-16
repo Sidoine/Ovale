@@ -61,7 +61,7 @@ local buffSpellList =
 	{
 		6673, -- Battle Shout
 		8076, -- Strength of Earth
-		79891 -- Horn of Winter
+		57330 -- Horn of Winter
 	},
 	stamina =
 	{
@@ -79,7 +79,7 @@ local buffSpellList =
 	{
 		65142, -- Ebon Plague
 		60433, -- Earth and Moon
-		58410, -- Master Poisoner TODO: vérifier
+		93068, -- Master Poisoner 
 		1490 -- Curse of the Elements
 	},
 	-- physicaldamagetaken
@@ -88,13 +88,14 @@ local buffSpellList =
 		99, -- Demoralizing Roar
 		702, -- Curse of Weakness
 		1160, -- Demoralizing Shout
-		67, -- Vindication
+		26017, -- Vindication
 		81130, -- Scarlet Fever
 	},
 	meleeslow=
 	{
 		45477, --Icy Touch
 		58179, --Infected Wounds
+		58180, --Infected Wounds rank 2
 		68055, --Judgments of the just
 		6343, --Thunderclap
 		8042 --Earth Shock
@@ -103,7 +104,8 @@ local buffSpellList =
 	{
 		33876, --Mangle cat
 		33878, --Mangle bear
-		46857, -- Trauma
+		46856, -- Trauma rank 1
+		46857, -- Trauma rank 2
 		16511 --Hemorrhage
 	}
 }
