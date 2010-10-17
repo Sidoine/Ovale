@@ -29,7 +29,7 @@ Define(PREPARATION 14185)
 	SpellInfo(PREPARATION cd=300)
 Define(REVEALINGSTRIKE 84617)
 	SpellInfo(REVEALINGSTRIKE combo=1)
-	SpellAddBuff(REVEALINGSTRIKE REVEALINGSTRIKE=15)
+	SpellAddTargetDebuff(REVEALINGSTRIKE REVEALINGSTRIKE=15)
 Define(RUPTURE 1943)
 	SpellInfo(RUPTURE combo=-5)
 	SpellAddTargetDebuff(RUPTURE RUPTURE=8)
@@ -77,7 +77,7 @@ AddIcon help=main mastery=2
 {
 	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
 	
-	if BuffPresent(REVEALINGSTRIKE) and Mana(more 69)
+	if TargetDebuffPresent(REVEALINGSTRIKE) and Mana(more 69)
 	{
 		if BuffExpires(SLICEANDDICE 12) Spell(SLICEANDDICE)
 		
