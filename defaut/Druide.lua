@@ -165,28 +165,34 @@ AddIcon help=main mastery=2
 	{
 		if BuffPresent(STAMPEDE) Spell(RAVAGE)
 		
-		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR priority=4)
-	
 		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2) and TargetDebuffExpires(FAERIEFIREDEBUFF stacks=3) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
 
-		#De-synchronize Roar and Rip
-		if ComboPoints(more 2) and BuffExpires(SAVAGEROAR 6) and less than 6s between BuffExpires(SAVAGEROAR) and TargetDebuffExpires(RIP mine=1 forceduration=22) 
-		{
-			unless TargetDebuffExpires(RIP 6 mine=1) Spell(SAVAGEROAR priority=4)
-		}
+		#De-synchronize Roar and Rip if are both present but will expire with less than 6 seconds between
+		#TODO: don't work correctly, I think
+		#if ComboPoints(more 2) and BuffPresent(SAVAGEROAR 6) and TargetDebuffPresent(RIP 6 mine=1) and 
+		#		less than 6s between BuffExpires(SAVAGEROAR) and TargetDebuffExpires(RIP mine=1 forceduration=22) 
+		#{
+		#	Spell(RIP)
+		#}
 
 		#Extends Rip with shred if glyph
 		if Glyph(GLYPHOFSHRED) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and Counter(ripshreds less 3) Spell(SHRED)
 
+		#Enter fury before applying rip
+		
 		if ComboPoints(more 4)
 		{
 			if TargetDeadIn(less 7) Spell(FEROCIOUSBITE priority=4)
-			if TargetDebuffExpires(RIP 0 mine=1) Spell(RIP priority=4)
-			if TargetDebuffPresent(RIP 10 mine=1) and BuffPresent(SAVAGEROAR 6)
+			#Rip has priority over Savage Roar
+			if BuffExpires(BERSERK 0) and TargetDebuffExpires(RIP 1 mine=1) Spell(TIGERSFURY)
+			if TargetDebuffExpires(RIP 0 mine=1) Spell(RIP)
+			if BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR)
+			#If both are already present for at least 6 seconds, try Ferocious bite
+			if {TargetDebuffPresent(RIP 10 mine=1) and BuffPresent(SAVAGEROAR 6)} or TargetLifePercent(less 25)
 			{
-				if BuffExpires(BERSERK 0) or {BuffPresent(BERSERK) and Mana(less 20)}
-					Spell(FEROCIOUSBITE)
+				#if BuffExpires(BERSERK 0) or {BuffPresent(BERSERK) and Mana(less 20)} I don't know what is the point of this
+				Spell(FEROCIOUSBITE)
 			}
 		}
 		
@@ -201,7 +207,7 @@ AddIcon help=main mastery=2
 			if BuffPresent(CLEARCASTING) or TargetDeadIn(less 10) or BuffPresent(BERSERK) 
 					Spell(SHRED)
 			if ComboPoints(less 5) and TargetDebuffExpires(RIP 3 mine=1) Spell(SHRED)
-			if ComboPoints(less 1) and BuffExpires(SAVAGEROAR 2) Spell(SHRED)
+			#if ComboPoints(less 1) and BuffExpires(SAVAGEROAR 2) Spell(SHRED) no longer necessary, savage roar upkeeping is less important
 		}
 		if CheckBoxOff(shred) Spell(CLAW)
 	}
@@ -209,8 +215,7 @@ AddIcon help=main mastery=2
 
 AddIcon help=cd mastery=2
 {
-	Spell(BERSERK)
-	unless BuffPresent(BERSERK) if Mana(less 40) Spell(TIGERSFURY)
+	unless BuffPresent(TIGERSFURY) Spell(BERSERK)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

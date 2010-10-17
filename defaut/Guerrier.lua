@@ -115,13 +115,13 @@ AddIcon help=main mastery=2
 	if CheckBoxOn(multi) Spell(WHIRLWIND)
 	Spell(COLOSSUSSMASH)
     if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 0 stacks=5) Spell(EXECUTE)
-	Spell(BLOODTHIRST)
 	Spell(RAGINGBLOW usable=1)
-    Spell(VICTORYRUSH usable=1)
-	if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 3) Spell(EXECUTE)
+    if TargetLifePercent(less 20) Spell(EXECUTE) #Just spam execute
+	Spell(BLOODTHIRST)
+	Spell(VICTORYRUSH usable=1)
+	#if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 3) Spell(EXECUTE)
 	if BuffPresent(BLOODSURGE) Spell(SLAM)
-    if TargetLifePercent(less 20) Spell(EXECUTE)
-	if BuffExpires(DEATHWISH) and BuffExpires(RECKLESSNESS) and BuffExpires(ENRAGE) Spell(BERSERKERRAGE)
+    if BuffExpires(DEATHWISH) and BuffExpires(RECKLESSNESS) and BuffExpires(ENRAGE) Spell(BERSERKERRAGE)
 }
 
 
