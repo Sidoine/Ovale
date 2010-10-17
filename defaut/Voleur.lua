@@ -4,6 +4,8 @@ Ovale.defaut["ROGUE"] =
 Define(ADRENALINERUSH 13750)
 	SpellInfo(ADRENALINERUSH cd=180)
 	SpellAddBuff(ADRENALINERUSH ADRENALINERUSH=15)
+Define(BACKSTAB 53)
+	SpellInfo(BACKSTAB combo=1)
 Define(BLADEFLURRY 13877)
 	SpellAddBuff(BLADEFLURRY BLADEFLURRY=15 cd=30)
 Define(CLOACKOFSHADOWS 31224)
@@ -14,6 +16,8 @@ Define(ENVENOM 32645)
 	SpellInfo(ENVENOM combo=-5)
 Define(EVISCERATE 2098)
 	SpellInfo(EVISCERATE combo=-5)
+Define(HEMORRHAGE 16511)
+	SpellInfo(HEMORRHAGE combo=1)
 Define(KILLINGSPREE 51690)
 	SpellInfo(KILLINGSPREE cd=120)
 	SpellAddBuff(KILLINGSPREE KILLINGSPREE=2)
@@ -23,6 +27,9 @@ Define(MUTILATE 1329)
 	SpellInfo(MUTILATE combo=1)
 Define(PREPARATION 14185)
 	SpellInfo(PREPARATION cd=300)
+Define(REVEALINGSTRIKE 84617)
+	SpellInfo(REVEALINGSTRIKE combo=1)
+	SpellAddBuff(REVEALINGSTRIKE REVEALINGSTRIKE=15)
 Define(RUPTURE 1943)
 	SpellInfo(RUPTURE combo=-5)
 	SpellAddTargetDebuff(RUPTURE RUPTURE=8)
@@ -59,14 +66,18 @@ AddIcon help=main mastery=1
 			Spell(RUPTURE)
 		Spell(ENVENOM)
 	}
-	if ComboPoints(less 4) Spell(MUTILATE)
+	if ComboPoints(less 4)
+	{
+		if TargetLifePercent(less 35) Spell(BACKSTAB)
+		Spell(MUTILATE)
+	}
 }
 
 AddIcon help=main mastery=2
 {
 	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
 	
-	if ComboPoints(more 3) and Mana(more 69)
+	if BuffPresent(REVEALINGSTRIKE) and Mana(more 69)
 	{
 		if BuffExpires(SLICEANDDICE 12) Spell(SLICEANDDICE)
 		
@@ -75,6 +86,7 @@ AddIcon help=main mastery=2
 		Spell(EVISCERATE)
 	}
 	
+	if ComboPoints(more 3) Spell(REVEALINGSTRIKE)	
 	if ComboPoints(less 4) Spell(SINISTERSTRIKE)
 }
 
@@ -82,7 +94,7 @@ AddIcon help=main mastery=3
 {
 	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
 	
-	if ComboPoints(more 3) and Mana(more 69)
+	if ComboPoints(more 4) and Mana(more 69)
 	{
 		if BuffExpires(SLICEANDDICE 12) Spell(SLICEANDDICE)
 		
@@ -91,7 +103,11 @@ AddIcon help=main mastery=3
 		Spell(EVISCERATE)
 	}
 	
-	if ComboPoints(less 4) Spell(SINISTERSTRIKE)
+	if ComboPoints(less 4)
+	{
+		if TargetDebuffExpires(bleed 0) Spell(HEMORRHAGE)
+		Spell(BACKSTAB)
+	}
 }
 
 AddIcon help=cd

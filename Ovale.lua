@@ -383,6 +383,24 @@ local options =
 							if spellId then	Ovale:Print(name..": "..spellId.." ("..tostring(enabled)..")") end
 						end
 					end
+				},
+				spell =
+				{
+					order = -8,
+					name = "List player spells",
+					type = "execute",
+					func = function()
+						local i=1
+						while true do
+							local skillType, spellId = GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
+							if not spellId then
+								break
+							end
+							local spellName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+							Ovale:Print(spellName..": "..spellId)
+							i = i + 1
+						end
+					end					
 				}
 			}
 		}
@@ -604,8 +622,8 @@ end
 --Called for each combat log event
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 	if sourceName == UnitName("player") then
+		self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 		--Called when a missile reached or missed its target
 		--Update lastSpell accordingly
 		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
@@ -758,7 +776,7 @@ function Ovale:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spell
 end
 
 function Ovale:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
---	self:Print("UNIT_SPELLCAST_SUCCEEDED "..event.." name="..name.." lineId="..lineId.." spellId="..spellId)
+	self:Print("UNIT_SPELLCAST_SUCCEEDED "..event.." name="..name.." lineId="..lineId.." spellId="..spellId.. " time="..GetTime())
 end
 
 function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
