@@ -1163,8 +1163,8 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 					cd.duration = 0
 				end
 			end
-			if newSpellInfo.targetlifepercentnocd and not nocd then
-				if UnitHealth("target")/UnitHealthMax("target")*100<newSpellInfo.targetlifepercentnocd then
+			if newSpellInfo.targetlifenocd and not nocd then
+				if UnitHealth("target")/UnitHealthMax("target")*100<newSpellInfo.targetlifenocd then
 					cd.duration = 0
 				end
 			end

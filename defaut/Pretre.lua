@@ -46,7 +46,7 @@ Define(MS 73510) # Mind Spike
 	
 Define(SWD 32379) # Shadow Word : Death
 	SpellInfo(SWD cd=10)
-	SpellInfo(SWD targetlifepercentnocd=25 glyph=GLYPHSHADOWWORDDEATH)
+	SpellInfo(SWD targetlifenocd=25 glyph=GLYPHSHADOWWORDDEATH)
 
 Define(ARCHANGEL 87151) #Archangel
 	SpellInfo(ARCHANGEL cd=90)
