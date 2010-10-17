@@ -75,7 +75,7 @@ AddIcon help=main mastery=1
 {
 	if InCombat(no) and BuffExpires(FELARMOR 400) Spell(FELARMOR)
 
-	if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
+	if List(curse elements) and TargetDebuffExpires(magicaldamagetaken 0) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
 	if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
@@ -101,7 +101,7 @@ AddIcon help=main mastery=2
 {	
 	if InCombat(no) and BuffExpires(FELARMOR 400) Spell(FELARMOR)
 
-	if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
+	if List(curse elements) and TargetDebuffExpires(magicaldamagetaken 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(IMMOLATE)
@@ -130,7 +130,7 @@ AddIcon help=main mastery=3
 {
 	if InCombat(no) and BuffExpires(FELARMOR 400) Spell(FELARMOR)
 	
-	if List(curse elements) and TargetDebuffExpires(CURSEELEMENTS 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
+	if List(curse elements) and TargetDebuffExpires(magicaldamagetaken 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
 	if TalentPoints(IMPROVEDSOULFIRE more 0) and TargetLifePercent(more 80) and
