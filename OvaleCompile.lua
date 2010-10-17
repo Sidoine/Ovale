@@ -124,6 +124,7 @@ local function ParseScoreSpells(params)
 	for v in string.gmatch(params, "(%d+)") do
 		local spellId = tonumber(v)
 		if spellId then
+			--Ovale:Print("Add spell to score "..spellId)
 			Ovale.scoreSpell[spellId] = true
 		else
 			Ovale:Print("unknown spell "..v)
@@ -234,7 +235,7 @@ local function ParseAddCheckBox(item, text, params)
 		return ""
 	end
 	Ovale.casesACocher[item] = {text = text}
-	if  paramList[1] and paramList[1]=="checked" then
+	if  paramList[1] and paramList[1]=="default" then
 		Ovale.casesACocher[item].checked = true
 	end
 	return ""

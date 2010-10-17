@@ -427,6 +427,7 @@ function Ovale:DebugListAura(target, filter)
 			break
 		end
 		Ovale:Print(name..": "..spellId)
+		i = i + 1
 	end
 end
 
@@ -777,6 +778,16 @@ end
 
 function Ovale:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
 	--self:Print("UNIT_SPELLCAST_SUCCEEDED "..event.." name="..name.." lineId="..lineId.." spellId="..spellId.. " time="..GetTime())
+	if unit == "player" then
+		for i,v in ipairs(self.lastSpell) do
+			if v.lineId == lineId then
+				--Already added in UNIT_SPELLCAST_START
+				return
+			end
+		end
+		local now = GetTime()
+		self:AddSpellToList(spellId, lineId, now, now, false)
+	end
 end
 
 function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
@@ -792,6 +803,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 	
 	if self.spellInfo[spellId] then
 		local si = self.spellInfo[spellId]
+		--self:Print("spellInfo found")
 		if si and si.buffnocd and UnitBuff("player", GetSpellInfo(si.buffnocd)) then
 			newSpell.nocd = true
 		else
@@ -800,6 +812,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 		--Increase or reset the counter that is used by the Counter function
 		if si.resetcounter then
 			self.counter[si.resetcounter] = 0
+			--self:Print("reset counter "..si.resetcounter)
 		end
 		if si.inccounter then
 			local cname = si.inccounter
@@ -807,19 +820,23 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 				self.counter[cname] = 0
 			end
 			self.counter[cname] = self.counter[cname] + 1
+			--self:Print("inc counter "..cname.." to "..self.counter[cname])
 		end
 	end
 	
 	if self.enCombat then
+		--self:Print(tostring(self.scoreSpell[spellId]))
 		if (not self.spellInfo[spellId] or not self.spellInfo[spellId].toggle) and self.scoreSpell[spellId] then
 			--Compute the player score
 			local scored = self.frame:GetScore(spellId)
+			--self:Print("Scored "..scored)
 			if scored~=nil then
 				self.score = self.score + scored
 				self.maxScore = self.maxScore + 1
 				if Recount then
 					local source =Recount.db2.combatants[UnitName("player")]
 					if source then
+						--self:Print("Record score "..scored)
 						Recount:AddAmount(source,"Ovale",scored)
 						Recount:AddAmount(source,"OvaleMax",1)
 					end
