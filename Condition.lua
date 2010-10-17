@@ -529,7 +529,7 @@ Ovale.conditions=
 	Glyph = function(condition)
 		local present = false
 		for i = 1, GetNumGlyphSockets() do
-			local enalbled, glypType, glyphSpellID = GetGlyphSocketInfo(i)
+			local enabled, glypType, glyphTooltipIndex, glyphSpellID = GetGlyphSocketInfo(i)
 			if (glyphSpellID == condition[1]) then
 				present = true
 				break

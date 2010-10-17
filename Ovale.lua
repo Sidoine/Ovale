@@ -333,6 +333,7 @@ local options =
 				},
 				debug =
 				{
+					order = -3,
 					name = "Debug",
 					type = "execute",
 					func = function() 
@@ -342,11 +343,44 @@ local options =
 				},
 				talent =
 				{
-					name = "Talent",
+					order = -4,
+					name = "List talent id",
 					type = "execute",
 					func = function() 
 						for k,v in pairs(Ovale.talentNameToId) do
 							Ovale:Print(k.."="..v)
+						end
+					end
+				},
+				targetbuff =
+				{
+					order = -5,
+					name = "List target buff and debuff spell id",
+					type = "execute",
+					func = function()
+						Ovale:DebugListAura("target", "HELPFUL")
+						Ovale:DebugListAura("target", "HARMFUL")
+					end
+				},
+				buff =
+				{
+					order = -6,
+					name = "List player buff and debuff spell id",
+					type = "execute",
+					func = function()
+						Ovale:DebugListAura("player", "HELPFUL")
+						Ovale:DebugListAura("player", "HARMFUL")
+					end
+				},
+				glyph =
+				{
+					order = -7,
+					name = "List player glyphs",
+					type = "execute",
+					func = function()
+						for i=1,GetNumGlyphs() do
+							local name, level, enabled, texture, spellId = GetGlyphInfo(i)
+							if spellId then	Ovale:Print(name..": "..spellId.." ("..tostring(enabled)..")") end
 						end
 					end
 				}
@@ -365,6 +399,17 @@ end
 
 function Ovale:Debug()
 	self:Print(self:DebugNode(self.masterNodes[1]))
+end
+
+function Ovale:DebugListAura(target, filter)
+	local i = 1
+	while true do
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId =  UnitAura(target, i, filter)
+		if not name then
+			break
+		end
+		Ovale:Print(name..": "..spellId)
+	end
 end
 
 function Ovale:OnInitialize()
@@ -1115,6 +1160,11 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 					self.traceAura = false
 				end
 				if buffAura and buffAura.stacks>0 and buffAura.start and buffAura.start<=startCast and (not buffAura.ending or buffAura.ending>startCast) then
+					cd.duration = 0
+				end
+			end
+			if newSpellInfo.targetlifepercentnocd and not nocd then
+				if UnitHealth("target")/UnitHealthMax("target")*100<newSpellInfo.targetlifepercentnocd then
 					cd.duration = 0
 				end
 			end
