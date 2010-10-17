@@ -36,7 +36,7 @@ Define(RAVAGE 6785) #cat behind+(prowling or stampede)
 	SpellInfo(RAVAGE combo=1)
 	SpellAddBuff(RAVAGE STAMPEDE=0)
 Define(RIP 1079) #cat bleed
-	SpellInfo(RIP combo=-5 duration=12)
+	SpellInfo(RIP combo=-5 duration=12 resetcounter=ripshreds)
 	SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
 	SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
 	SpellAddTargetDebuff(RIP RIP=12)
@@ -44,7 +44,7 @@ Define(SAVAGEROAR 52610) #cat damage buff
 	SpellInfo(SAVAGEROAR combo=-5)
 	SpellAddBuff(SAVAGEROAR SAVAGEROAR=14)
 Define(SHRED 5221) #cat behind
-	SpellInfo(SHRED combo=1)
+	SpellInfo(SHRED combo=1 inccounter=ripshreds)
 Define(STARFALL 48505) #moonkin cd aoe
 Define(STARFIRE 2912) #moonkin
 	SpellInfo(STARFIRE eclipse=20)
