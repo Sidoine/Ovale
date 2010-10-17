@@ -797,7 +797,8 @@ Ovale.conditions=
 		return start, addTime(ending, -tempsMin)
 	end,
 	TargetInRange = function(condition)
-		return testbool(IsSpellInRange(condition[1],getTarget(condition.target))==1,condition[2])
+		local spellName = GetSpellInfo(condition[1])
+		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,
 	TargetIsCasting = function(condition)
 		return testbool(UnitCastingInfo(getTarget(condition.target)), condition[1])
