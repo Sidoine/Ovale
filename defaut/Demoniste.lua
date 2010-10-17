@@ -83,7 +83,7 @@ AddIcon help=main mastery=1
 	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
-		if List(curse doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
+		if List(bane doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
 	if TargetLifePercent(less 25) Spell(DRAINSOUL)
@@ -109,7 +109,7 @@ AddIcon help=main mastery=2
 	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 5 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
-		if List(curse doom) and TargetDeadIn(more 15) Spell(BANEOFDOOM)
+		if List(bane doom) and TargetDeadIn(more 15) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
 	if BuffPresent(MOLTENCORE) Spell(INCINERATE)
@@ -140,7 +140,7 @@ AddIcon help=main mastery=3
 	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
-		if List(curse doom) and TargetDeadIn(more 60) Spell(BANEOFDOOM)
+		if List(bane doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) unless List(cure havoc) Spell(BANEOFAGONY)
 	}
 	if BuffPresent(EMPOWEREDIMP) or BuffPresent(SOULBURN) Spell(SOULFIRE)
