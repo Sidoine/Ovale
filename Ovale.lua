@@ -2,6 +2,7 @@
 
 Ovale = LibStub("AceAddon-3.0"):NewAddon("Ovale", "AceEvent-3.0", "AceConsole-3.0")
 local Recount = Recount
+local Skada = Skada
 
 --Default scripts (see "defaut" directory)
 Ovale.defaut = {}
@@ -790,6 +791,27 @@ function Ovale:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId
 	end
 end
 
+function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
+	if Recount then
+		local source = Recount.db2.combatants[name]
+		if source then
+			Recount:AddAmount(source,"Ovale",scored)
+			Recount:AddAmount(source,"OvaleMax",scoreMax)
+		end
+	end
+	if Skada then
+		if not guid then return end
+		local player = Skada:get_player(Skada.current, guid, name)
+		if not player.ovale then player.ovale = 0 end
+		if not player.ovaleMax then player.ovaleMax = 0 end
+		player.ovale = player.ovale + scored
+		player.ovaleMax = player.ovaleMax + scoreMax
+		player = Skada:get_player(Skada.total, guid, name)
+		player.ovale = player.ovale + scored
+		player.ovaleMax = player.ovaleMax + scoreMax
+	end
+end
+
 function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 	local newSpell = {}
 	newSpell.spellId = spellId
@@ -833,14 +855,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 			if scored~=nil then
 				self.score = self.score + scored
 				self.maxScore = self.maxScore + 1
-				if Recount then
-					local source =Recount.db2.combatants[UnitName("player")]
-					if source then
-						--self:Print("Record score "..scored)
-						Recount:AddAmount(source,"Ovale",scored)
-						Recount:AddAmount(source,"OvaleMax",1)
-					end
-				end
+				self:SendScoreToDamageMeter(UnitName("player"), UnitGUID("player"), scored, 1)
 			end
 		end
 	end
@@ -871,15 +886,8 @@ function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 	if prefix ~= "Ovale" then return end
 	if type ~= "RAID" and type~= "PARTY" then return end
 
-	if Recount then
-		local value, maxValue = strsplit(";", msg)
-		
-		local source = Recount.db2.combatants[author]
-		if source then
-			Recount:AddAmount(source, "Ovale", value)
-			Recount:AddAmount(source, "OvaleMax", maxValue)
-		end
-	end
+	local value, maxValue, guid = strsplit(";", msg)
+	self:SendScoreToDamageMeter(author, guid, value, maxValue)
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
@@ -892,7 +900,7 @@ end
 
 function Ovale:PLAYER_REGEN_DISABLED()
 	if self.maxScore>0 then
-		SendAddonMessage("Ovale", self.score..";"..self.maxScore, "RAID")
+		SendAddonMessage("Ovale", self.score..";"..self.maxScore..";"..UnitGUID("player"), "RAID")
 	end
 	self.enCombat = true
 	self.score = 0
@@ -1422,13 +1430,13 @@ function Ovale:GetActionInfo(element)
 		action = self.actionSort[spellId]
 		actionCooldownStart, actionCooldownDuration, actionEnable = self:GetComputedSpellCD(spellId)
 		
-		if (not action or not GetActionTexture(action)) then
+		--if (not action or not GetActionTexture(action)) then
 			actionTexture = GetSpellTexture(spellId)
 			local spellName = GetSpellInfo(spellId)
 			actionInRange = IsSpellInRange(spellName, target)
 			actionUsable = IsUsableSpell(spellId)
 			actionShortcut = nil
-		end
+		--end
 	elseif (element.func=="Macro") then
 		action = self.actionMacro[element.params[1]]
 	elseif (element.func=="Item") then
@@ -1451,13 +1459,13 @@ function Ovale:GetActionInfo(element)
 		actionUsable = (spellName~=nil)
 		
 		action = self.actionObjet[itemId]
-		if (not action or not GetActionTexture(action)) then
+		--if (not action or not GetActionTexture(action)) then
 			actionTexture = GetItemIcon(itemId)
 			actionInRange = IsItemInRange(itemId, target)
 			actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
 			actionShortcut = nil
 			actionIsCurrent = nil
-		end
+		--end
 	elseif element.func=="Texture" then
 		actionTexture = "Interface\\Icons\\"..element.params[1]
 		actionCooldownStart = Ovale.maintenant
@@ -1466,7 +1474,7 @@ function Ovale:GetActionInfo(element)
 		actionUsable = true
 	end
 	
-	if (action and not actionTexture) then
+	--[[if action and not actionTexture then
 		actionTexture = GetActionTexture(action)
 		actionInRange = IsActionInRange(action, target)
 		if not actionCooldownStart then
@@ -1477,6 +1485,13 @@ function Ovale:GetActionInfo(element)
 		end
 		actionShortcut = self.shortCut[action]
 		actionIsCurrent = IsCurrentAction(action)				
+	end]]
+	if action then 
+		if actionUsable == nil then
+			actionUsable = IsUsableAction(action)
+		end
+		actionShortcut = self.shortCut[action]
+		actionIsCurrent = IsCurrentAction(action)
 	end
 	
 	local cd = self:GetCD(spellId)
