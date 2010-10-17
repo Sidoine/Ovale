@@ -623,7 +623,7 @@ end
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
 	if sourceName == UnitName("player") then
-		self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
+		--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 		--Called when a missile reached or missed its target
 		--Update lastSpell accordingly
 		if string.find(event, "SPELL_CAST_SUCCESS") == 1 or string.find(event, "SPELL_DAMAGE")==1 
@@ -776,7 +776,7 @@ function Ovale:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spell
 end
 
 function Ovale:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
-	self:Print("UNIT_SPELLCAST_SUCCEEDED "..event.." name="..name.." lineId="..lineId.." spellId="..spellId.. " time="..GetTime())
+	--self:Print("UNIT_SPELLCAST_SUCCEEDED "..event.." name="..name.." lineId="..lineId.." spellId="..spellId.. " time="..GetTime())
 end
 
 function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
