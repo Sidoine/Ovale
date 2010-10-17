@@ -205,7 +205,7 @@ local function subtest(text, pattern, func)
 	return text
 end
 
-local function ParseAddListItem(list, item, text, default)
+local function ParseAddListItem(list, item, text, params)
 	local paramList = ParseParameters(params)
 	if (paramList.talent and not HasTalent(paramList.talent)) or
 		(paramList.glyph and not HasGlyph(paramList.glyph)) then

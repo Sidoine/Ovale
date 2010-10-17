@@ -63,9 +63,10 @@ Define(IMPROVEDSOULFIRE 11197)
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse tongues SpellName(CURSETONGUES))
 AddListItem(curse weakness SpellName(CURSEWEAKNESS))
+AddListItem(curse none L(None) default)
 AddListItem(bane agony SpellName(BANEOFAGONY))
-AddListItem(bane doom SpellName(BANEOFDOOM))
-AddListItem(bane havoc SpellName(BANEOFHAVOC))
+AddListItem(bane doom SpellName(BANEOFDOOM) default)
+AddListItem(bane havoc SpellName(BANEOFHAVOC) mastery=3)
 
 ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRATE CURSEWEAKNESS
 	BANEOFAGONY CORRUPTION SOULFIRE DRAINSOUL INCINERATE SHADOWBOLT CHAOSBOLT)
@@ -106,20 +107,20 @@ AddIcon help=main mastery=2
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(IMMOLATE)
 	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
 	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
-	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
+	if TargetDebuffExpires(BANEOFDOOM 5 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
-		if List(curse doom) and TargetDeadIn(more 60) Spell(BANEOFDOOM)
+		if List(curse doom) and TargetDeadIn(more 15) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
-	if BuffPresent(DECIMATION) Spell(SOULFIRE)
 	if BuffPresent(MOLTENCORE) Spell(INCINERATE)
+	if BuffPresent(DECIMATION) Spell(SOULFIRE)
+	
 	Spell(SHADOWBOLT)
 }
 
 AddIcon help=cd mastery=2
 {
 	Spell(METAMORPHOSIS)
-	Spell(DEMONICEMPOWERMENT)
 	Spell(SUMMONFELGUARD)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
