@@ -1235,17 +1235,19 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 								newAura.ending = endCast + duration
 							end
 						elseif stacks<0 and newAura.ending then
-							--if filter~="HELPFUL" or target~="player" or startCast>=Ovale.maintenant then
+							--Buff are immediatly removed when the cast ended, do not need to do it again
+							if filter~="HELPFUL" or target~="player" or endCast>=Ovale.maintenant then
 								newAura.stacks = newAura.stacks + stacks
 								if Ovale.trace then
-									self:Print("removing aura "..auraSpellId.." because of ".. spellId)
+									self:Print("removing one stack of "..auraSpellId.." because of ".. spellId.." to ".. newAura.stacks)
 								end
 								--Plus de stacks, on supprime l'aura
 								if newAura.stacks<=0 then
+									self:Log("Aura is completly removed")
 									newAura.stacks = 0
 									newAura.ending = 0
 								end
-							--end
+							end
 						elseif newAura.ending and newAura.ending >= endCast then
 							newAura.ending = endCast + duration
 							newAura.stacks = newAura.stacks + 1

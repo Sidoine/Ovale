@@ -23,7 +23,7 @@ local function ParseParameters(params)
 		end		
 		paramList[k] = v
 	end
-	params = string.gsub(params,"%w+=%w+","")
+	params = string.gsub(params,"%w+=[-%w\\_%.]+","")
 	local n=0
 	for w in string.gmatch(params, "[-%w_\\%.]+") do
 		if (string.match(w,"^%-?%d+%.?%d*$")) then
