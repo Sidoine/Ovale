@@ -26,6 +26,10 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			end
 		end
 		
+		if not Ovale.db.profile.apparence.flashIcon and minAttente<=Ovale.maintenant then
+			self.cd:Hide()
+		end
+		
 		self.ancienneAttente = minAttente
 		
 		-- L'icône avec le cooldown

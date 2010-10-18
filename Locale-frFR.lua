@@ -47,3 +47,4 @@ L["Inverser la boîte à cocher "] = true
 L["Ignorer les clics souris"] = true
 L["Correction de la latence"] = true
 L["Cacher dans les véhicules"] = true
+L["Illuminer l'icône quand le temps de recharge est écoulé"] = true

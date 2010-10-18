@@ -266,6 +266,14 @@ local options =
 					name = L["Cacher dans les véhicules"],
 					get = function(info) return Ovale.db.profile.apparence.hideVehicule end,
 					set = function(info, value) Ovale.db.profile.apparence.hideVehicule = value end
+				},
+				flashIcon =
+				{
+					order = 18,
+					type = "toggle",
+					name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
+					get = function(info) return Ovale.db.profile.apparence.flashIcon end,
+					set = function(info, value) Ovale.db.profile.apparence.flashIcon = value; Ovale:UpdateFrame() end
 				}
 			}
 		},
@@ -1888,7 +1896,8 @@ function Ovale:ChargerDefaut()
 			list = {},
 			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
 				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, latencyCorrection=true, hideVehicule=true},
+				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
+				latencyCorrection=true, hideVehicule=true, flashIcon=true},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
