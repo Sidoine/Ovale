@@ -39,7 +39,7 @@ Define(SUMMONWATERELEMENTAL 31687) #frost pet
 
 #Buff
 Define(BRAINFREEZE 57761) #frost (instant fireball/frostfire bolt)
-Define(FINGERSOFFROST 83074) #frost boost ice lance/deep freeze
+Define(FINGERSOFFROST 44544) #frost boost ice lance/deep freeze
 Define(HOTSTREAK 48108) #fire instant pyroblast
 Define(ARCANEBLASTDEBUFF 36032)
 

@@ -54,13 +54,13 @@ ScoreSpells(FOCUSFIRE KILLCOMMAND ARCANESHOT KILLSHOT STEADYSHOT SERPENTSTING
 
 AddIcon help=main mastery=1
 {
+	if TargetLifePercent(less 20) Spell(KILLSHOT)
 	if Mana(less 40) {Spell(FERVOR) Spell(STEADYSHOT)}
 	if TargetBuffPresent(FRENZYEFFECT stacks=5 target=pet) Spell(FOCUSFIRE)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
 	Spell(KILLCOMMAND)
 	Spell(ARCANESHOT)
-	if TargetLifePercent(less 20) Spell(KILLSHOT)
 	Spell(STEADYSHOT)
 }
 
@@ -79,15 +79,19 @@ AddIcon help=main mastery=2
 
 AddIcon help=main mastery=3
 {
-	if Mana(less 44) and BuffExpires(LOCKANDLOAD) Spell(STEADYSHOT)
-	if Mana(more 44) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
-	if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-	if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
-	if CheckBoxOn(multi) Spell(MULTISHOT)
-	if TargetLifePercent(less 20) Spell(KILLSHOT)
-	Spell(KILLCOMMAND)
-	unless 1.5s before Spell(EXPLOSIVESHOT) Spell(STEADYSHOT)
+    if TargetLifePercent(less 20) Spell(KILLSHOT)
+    if Mana(less 35) and BuffExpires(LOCKANDLOAD) Spell(STEADYSHOT)
+    if Mana(more 35) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
+    if Mana(more 25) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
+    if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
+    if BuffPresent(LOCKANDLOAD) Spell (KILLCOMMAND)
+    if BuffPresent(LOCKANDLOAD) Spell (EXPLOSIVESHOT)
+    unless 1.5s before Spell(BLACKARROW) Spell(STEADYSHOT)
+    if CheckBoxOn(multi) Spell(MULTISHOT)
+    if Mana(more 57) Spell(ARCANESHOT)
+    unless 1.5s before Spell(EXPLOSIVESHOT) Spell(STEADYSHOT)
 }
+
 
 AddIcon help=cd
 {

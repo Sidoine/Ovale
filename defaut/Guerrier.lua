@@ -43,7 +43,7 @@ Define(RAGINGBLOW 85288)
 	SpellInfo(RAGINGBLOW cd=6)
 Define(RECKLESSNESS 1719)
 Define(REND 772)
-	SpellAddTargetDebuff(REND REND=15)
+	SpellAddTargetDebuff(REND RENDDEBUFF=15)
 Define(RETALIATION 20230)
 Define(REVENGE 6572)
 	SpellInfo(REVENGE cd=5)
@@ -73,6 +73,7 @@ Define(TASTEFORBLOOD 56636)
 Define(ENRAGE 14202)
 Define(EXECUTIONER 90806)
 Define(SUNDERARMORDEBUFF 58567)
+Define(RENDDEBUFF 94009)
 
 #Talents
 Define(SLAMTALENT 2233)
@@ -96,7 +97,7 @@ AddIcon help=main mastery=1
 	if TargetDebuffExpires(SUNDERARMORDEBUFF 2 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2) Spell(SUNDERARMOR nored=1)
 
 	if Mana(less 20) Spell(DEADLYCALM)
-	if TargetDebuffExpires(REND) Spell(REND)
+	if TargetDebuffExpires(RENDDEBUFF) Spell(REND)
 	if CheckBoxOn(multi) Spell(BLADESTORM)
 	Spell(COLOSSUSSMASH)
 	Spell(MORTALSTRIKE)
@@ -133,7 +134,7 @@ AddIcon help=main mastery=3
 
 	if CheckBoxOn(multi)
 	{
-		if TargetDebuffExpires(REND mine=1) Spell(REND)
+		if TargetDebuffExpires(RENDDEBUFF mine=1) Spell(REND)
 		Spell(THUNDERCLAP)
 		Spell(SHOCKWAVE)
 	}
