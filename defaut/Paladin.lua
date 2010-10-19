@@ -39,6 +39,7 @@ Define(ZEALOTRY 85696)
 #Buff
 Define(THEARTOFWAR 59578)
 Define(JUDGEMENTSOFTHEPURE 53655)
+Define(HANDOFLIGHT 90174)
 
 ScoreSpells(SHIELDOFTHERIGHTEOUS JUDGEMENT AVENGERSSHIELD HAMMEROFTHERIGHTEOUS CONSECRATE HOLYWRATH
 	ZEALOTRY  INQUISITION TEMPLARSVERDICT DIVINESTORM EXORCISM HAMMEROFWRATH JUDGEMENT CRUSADERSTRIKE)
@@ -99,10 +100,13 @@ AddIcon help=main mastery=3
 		if BuffExpires(SEALRIGHTEOUSNESS 400) and BuffExpires(SEALOFTRUTH 400) Spell(SEALOFTRUTH)
 	}
     
-	if HolyPower(more 2) and TargetDeadIn(more 20) Spell(ZEALOTRY)
-    if HolyPower(more 0) and BuffExpires(INQUISITION) Spell(INQUISITION)
-    if CheckBoxOff(aoe) and HolyPower(more 2) Spell(TEMPLARSVERDICT)
-    if CheckBoxOn(aoe) and HolyPower(more 2) Spell(DIVINESTORM)
+	if HolyPower(more 2) and BuffExpires(HANDOFLIGHT) and TargetDeadIn(more 20) Spell(ZEALOTRY)
+    if {HolyPower(more 0) or BuffPresent(HANDOFLIGHT)} and BuffExpires(INQUISITION) Spell(INQUISITION)
+	if  HolyPower(more 2) or BuffPresent(HANDOFLIGHT)
+	{
+		if CheckBoxOff(aoe)  Spell(TEMPLARSVERDICT)
+		if CheckBoxOn(aoe) Spell(DIVINESTORM)
+	}
     Spell(CRUSADERSTRIKE)
     unless 0.5s before Spell(CRUSADERSTRIKE)
 	{

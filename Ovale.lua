@@ -14,6 +14,7 @@ Ovale.actionSort = {}
 Ovale.pointsTalent = {}
 --key: talentId / value: talent name (not used)
 Ovale.talentIdToName = {}
+Ovale.spellList = {}
 --key: talent name / value: talent id
 Ovale.talentNameToId = {}
 --allows to do some initialization the first time the addon is enabled
@@ -498,6 +499,7 @@ function Ovale:FirstInit()
 	self:RemplirActionIndexes()
 	self:RemplirListeTalents()
 	self:ChercherNomsBuffs()
+	self:FillSpellList()
 	
 	local playerClass, englishClass = UnitClass("player")
 	self.className = englishClass
@@ -621,6 +623,7 @@ end
 function Ovale:SPELLS_CHANGED()
 	-- self:RemplirActionIndexes()
 	-- self:RemplirListeTalents()
+	self:FillSpellList()
 	self.needCompile = true
 end
 
@@ -829,7 +832,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 	newSpell.channeled = channeled
 		
 	self.lastSpell[#self.lastSpell+1] = newSpell
-	--self:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..self.maintenant..")")
+	--self:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..self.maintenant..")" ..#self.lastSpell)
 	
 	if self.spellInfo[spellId] then
 		local si = self.spellInfo[spellId]
@@ -975,6 +978,22 @@ function Ovale:RemplirActionIndexes()
 	self.shortCut = {}
 	for i=1,120 do
 		self:RemplirActionIndex(i)
+	end
+end
+
+function Ovale:FillSpellList()
+	self.spellList = {}
+	local i=1
+	while true do
+		local skillType, spellId = GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
+		if not spellId then
+			break
+		end
+		if skillType~="FUTURESPELL" then
+			local spellName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+			self.spellList[spellId] = spellName
+		end
+		i = i + 1
 	end
 end
 
@@ -1325,6 +1344,8 @@ function Ovale:InitCalculerMeilleureAction()
 				self:Log("self.maintenant = " ..self.maintenant.." spellId="..v.spellId.." v.stop="..v.stop)
 				if self.maintenant - v.stop<5 then
 					self:AddSpellToStack(v.spellId, v.start, v.stop, v.stop, v.nocd)
+				else
+					table.remove(self.lastSpell, i)
 				end
 			end
 		end
@@ -1431,18 +1452,18 @@ function Ovale:GetActionInfo(element)
 	end
 
 	if (element.func == "Spell" ) then
-		--Test spell availability
-		local spellName = self:GetSpellInfoOrNil(spellId)
-		if not self:GetSpellInfoOrNil(spellName) then 
+		if not self.spellList[spellId] then 
+			self:Log("Spell "..spellId.." not learnt")
 			return nil
 		end
+		
 		--Get spell info
 		action = self.actionSort[spellId]
 		actionCooldownStart, actionCooldownDuration, actionEnable = self:GetComputedSpellCD(spellId)
 		
 		--if (not action or not GetActionTexture(action)) then
+			spellName = self.spellList[spellId]
 			actionTexture = GetSpellTexture(spellId)
-			local spellName = GetSpellInfo(spellId)
 			actionInRange = IsSpellInRange(spellName, target)
 			actionUsable = IsUsableSpell(spellId)
 			actionShortcut = nil
