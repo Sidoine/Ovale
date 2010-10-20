@@ -59,7 +59,7 @@ AddIcon help=main mastery=1
 	if TargetBuffPresent(FRENZYEFFECT stacks=5 target=pet) Spell(FOCUSFIRE)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-	Spell(KILLCOMMAND)
+	if Speed(equal 0 target=pet) Spell(KILLCOMMAND)
 	Spell(ARCANESHOT)
 	Spell(STEADYSHOT)
 }

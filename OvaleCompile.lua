@@ -90,7 +90,12 @@ local function HasTalent(talentId)
 		Ovale:RemplirListeTalents()
 	end
 	if Ovale.listeTalentsRemplie then
-		return Ovale.pointsTalent[talentId]>0
+		if Ovale.pointsTalent[talentId]~=nil then
+			return Ovale.pointsTalent[talentId]>0
+		else
+			Ovale:Print("Unknown talent "..talentId)
+			return false
+		end
 	else
 		return false
 	end
