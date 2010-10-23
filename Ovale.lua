@@ -1004,13 +1004,15 @@ function Ovale:RemplirListeTalents()
 		for i=1, numTalents do
 			local nameTalent, icon, tier, column, currRank, maxRank = GetTalentInfo(t,i);
 			local link = GetTalentLink(t,i)
-			local a, b, talentId = string.find(link, "talent:(%d+)");
-			talentId = tonumber(talentId)
-			self.talentIdToName[talentId] = nameTalent
-			self.talentNameToId[nameTalent] = talentId
-			self.pointsTalent[talentId] = currRank
-			self.listeTalentsRemplie = true
-			self.needCompile = true
+			if link then
+				local a, b, talentId = string.find(link, "talent:(%d+)");
+				talentId = tonumber(talentId)
+				self.talentIdToName[talentId] = nameTalent
+				self.talentNameToId[nameTalent] = talentId
+				self.pointsTalent[talentId] = currRank
+				self.listeTalentsRemplie = true
+				self.needCompile = true
+			end
 		end
 	end
 end

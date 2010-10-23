@@ -77,7 +77,7 @@ AddIcon help=main mastery=2
 {
 	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
 	
-	if TargetDebuffPresent(REVEALINGSTRIKE) and Mana(more 69)
+	if ComboPoints(more 4) and Mana(more 69)
 	{
 		if BuffExpires(SLICEANDDICE 12) Spell(SLICEANDDICE)
 		
@@ -86,7 +86,7 @@ AddIcon help=main mastery=2
 		Spell(EVISCERATE)
 	}
 	
-	if ComboPoints(more 3) Spell(REVEALINGSTRIKE)	
+	if ComboPoints(equal 4) Spell(REVEALINGSTRIKE)	
 	if ComboPoints(less 4) Spell(SINISTERSTRIKE)
 }
 

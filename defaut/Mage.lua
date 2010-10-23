@@ -6,21 +6,26 @@ Define(ARCANEBARRAGE 44425) #arcane instant
 Define(ARCANEBLAST 30451) #arcane stacks*4 cost increased
 	SpellAddDebuff(ARCANEBLAST ARCANEBLASTDEBUFF=10)
 Define(ARCANEMISSILES 5143) #arcane channel
-	SpellAddDebuff(ARCANEMISSILES ARCANEBLASTDEBUFF=0)
+	SpellAddDebuff(ARCANEMISSILES ARCANEBLASTDEBUFF=0 ARCANEMISSILEBUFF=0)
 Define(ARCANEPOWER 12042) #arcane cd 
 	SpellInfo(ARCANEPOWER cd=84)
 Define(COLDSNAP 11958) #frost reset cd
 Define(COMBUSTION 11129) #fire cd consume dot
 	SpellInfo(COMBUSTION cd=180)
 Define(DEEPFREEZE 44572) #frost instant
+	SpellAddBuff(DEEPFREEZE FINGERSOFFROST=-1)
 Define(EVOCATION 12051)
 	SpellInfo(EVOCATION cd=240)
 Define(FIREBLAST 2136) #fire instant
 Define(FIREBALL 133) #fire 2.5
+Define(FLAMEORB 82731)
+	SpellInfo(FLAMEORB cd=60)
 Define(FROSTBOLT 116) #frost
 Define(FROSTFIREBOLT 44614) #frost+fire
+	SpellAddBuff(FROSTFIREBOLT BRAINFREEZE=-1 FINGERSOFFROST=-1)
 Define(ICEARMOR 7302)
 Define(ICELANCE 30455) #frost instant
+	SpellAddBuff(ICELANCE FINGERSOFFROST=-1)
 Define(ICYVEINS 12472) #frost cd
 	SpellInfo(ICYVEINS cd=144)
 Define(LIVINGBOMB 44457) #fire dot
@@ -42,6 +47,10 @@ Define(BRAINFREEZE 57761) #frost (instant fireball/frostfire bolt)
 Define(FINGERSOFFROST 44544) #frost boost ice lance/deep freeze
 Define(HOTSTREAK 48108) #fire instant pyroblast
 Define(ARCANEBLASTDEBUFF 36032)
+Define(ARCANEMISSILEBUFF 79683)
+
+#Item
+Define(MANAGEMITEM 36799)
 
 #Debuff
 Define(IGNITE 12654)
@@ -56,19 +65,25 @@ AddIcon help=main mastery=1
 {
 	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MAGEARMOR)
 	
+	Spell(FLAMEORB)
 	if Speed(more 0) Spell(ARCANEBARRAGE)
 	unless 15s before Spell(EVOCATION)
 	{
 		#Mana conserve
-		if DebuffPresent(ARCANEBLASTDEBUFF stacks=4) {Spell(ARCANEMISSILES usable=1) Spell(ARCANEBARRAGE)}
-		if ManaPercent(less 90) and DebuffPresent(ARCANEBLASTDEBUFF stacks=3) {Spell(ARCANEMISSILES usable=1) Spell(ARCANEBARRAGE)}
-		if ManaPercent(less 85) and DebuffPresent(ARCANEBLASTDEBUFF stacks=2) {Spell(ARCANEMISSILES usable=1) Spell(ARCANEBARRAGE)}
+		if DebuffPresent(ARCANEBLASTDEBUFF stacks=4) or
+			{ManaPercent(less 90) and DebuffPresent(ARCANEBLASTDEBUFF stacks=3)} or
+			{ManaPercent(less 85) and DebuffPresent(ARCANEBLASTDEBUFF stacks=2)}
+		{
+			if BuffPresent(ARCANEMISSILEBUFF) Spell(ARCANEMISSILES usable=1) 
+			Spell(ARCANEBARRAGE)
+		}
+		if ManaPercent(less 60) Item(MANAGEMITEM usable=1)
 		Spell(ARCANEBLAST)
 	}
 	if 15s before Spell(EVOCATION)
 	{
-		Spell(ARCANEBLAST)
 		if ManaPercent(less 40) Spell(EVOCATION)
+		Spell(ARCANEBLAST)
 	}
 }
 
@@ -76,6 +91,7 @@ AddIcon help=main mastery=2
 {
 	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
 
+	Spell(FLAMEORB)
 	if TalentPoints(FIRESTARTERTALENT more 0) and Speed(more 0) Spell(SCORCH)
 	if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
 	if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
@@ -87,6 +103,7 @@ AddIcon help=main mastery=3
 {
 	unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
 
+	Spell(FLAMEORB)
 	if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
 	if BuffPresent(FINGERSOFFROST) or Speed(more 0) {Spell(DEEPFREEZE) Spell(ICELANCE)}
 	if BuffPresent(BRAINFREEZE) Spell(FROSTFIREBOLT)
