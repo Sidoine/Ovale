@@ -2,9 +2,9 @@ Ovale.defaut["HUNTER"] =
 [[
 #Spells
 Define(AIMEDSHOT 19434)
-	SpellInfo(AIMEDSHOT cd=10 resetcounter=ss)
+	SpellInfo(AIMEDSHOT resetcounter=ss)
 Define(ARCANESHOT 3044)
-	SpellInfo(ARCANESHOT cd=6 resetcounter=ss)
+	SpellInfo(ARCANESHOT resetcounter=ss)
 Define(ASPECTOFTHEFOX 82661)
 Define(ASPECTOFTHEHAWK 13165)
 Define(BESTIALWRATH 19574)
@@ -21,6 +21,7 @@ Define(EXPLOSIVESHOT 53301)
 	SpellAddTargetDebuff(EXPLOSIVESHOT EXPLOSIVESHOT=2)
 	SpellAddBuff(EXPLOSIVESHOT LOCKANDLOAD=-1)
 Define(FERVOR 82726)
+	Spellinfo(FERVOR mana=-50)
 Define(FOCUSFIRE 82692)
 Define(KILLCOMMAND 34026)
 	SpellInfo(KILLCOMMAND cd=60 resetcounter=ss)
@@ -37,10 +38,13 @@ Define(SERPENTSTING 1978)
 	SpellInfo(SERPENTSTING resetcounter=ss)
 	SpellAddTargetDebuff(SERPENTSTING SERPENTSTING=15)
 Define(STEADYSHOT 56641)
-	SpellInfo(STEADYSHOT inccounter=ss)
+	SpellInfo(STEADYSHOT inccounter=ss mana=-9)
 Define(SILENCINGSHOT 34490)
 	SpellInfo(SILENCINGSHOT resetcounter=ss)
 
+#Pet spells
+Define(GROWL 2649)
+	
 #Buffs
 Define(LOCKANDLOAD 56453)
 Define(FRENZYEFFECT 19615)
@@ -59,7 +63,7 @@ AddIcon help=main mastery=1
 	if TargetBuffPresent(FRENZYEFFECT stacks=5 target=pet) Spell(FOCUSFIRE)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-	if Speed(equal 0 target=pet) Spell(KILLCOMMAND)
+	if TargetInRange(GROWL) Spell(KILLCOMMAND)
 	Spell(ARCANESHOT)
 	Spell(STEADYSHOT)
 }

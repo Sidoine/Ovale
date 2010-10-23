@@ -266,13 +266,16 @@ local lastEnergyTime
 
 local function GetManaTime(mana, withBerserker)
 	local _,className = UnitClass("player")
-	if (className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3)) then
-		local current = Ovale.state.mana
-		if current~=lastEnergyValue then
-			lastEnergyValue = current
-			lastEnergyTime = Ovale.currentTime
-		end
-		local rate= 10
+	local current = Ovale.state.mana
+	if current~=lastEnergyValue then
+		lastEnergyValue = current
+		lastEnergyTime = Ovale.currentTime
+	end
+	
+	local rate
+	
+	if className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3) then
+		rate = 10 * (100 + Ovale.meleeHaste)/100
 		if (className == "ROGUE") then
 			local rush = Ovale:GetAura("player", "HELPFUL", 13750)
 			if rush.stacks>0 then
@@ -284,6 +287,13 @@ local function GetManaTime(mana, withBerserker)
 				mana = mana/2
 			end
 		end
+	elseif className == "HUNTER" then
+		rate = 4.08 * (100 + Ovale.meleeHaste) /100
+	else
+		rate = 0
+	end
+	
+	if rate > 0 then
 		local limit = math.ceil((mana - lastEnergyValue) / rate + lastEnergyTime)
 		return limit
 	else
@@ -291,7 +301,7 @@ local function GetManaTime(mana, withBerserker)
 			return Ovale.currentTime-1
 		else
 			return nil
-		end
+		end	
 	end
 end
 
