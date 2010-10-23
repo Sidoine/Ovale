@@ -757,13 +757,18 @@ Ovale.conditions=
 	-- Test the target classification
 	-- 1 : normal, elite, or worldboss
 	TargetClassification = function(condition)
-		local classification = UnitClassification("target");
-		if (classification == "rareelite") then
-			classification = "elite"
-		elseif (classification == "rare") then
-			classification = "normal"
+		local classification
+		if UnitLevel("target")==-1 then
+			classification = "worldboss"
+		else
+			classification = UnitClassification("target");
+			if (classification == "rareelite") then
+				classification = "elite"
+			elseif (classification == "rare") then
+				classification = "normal"
+			end
 		end
-
+		
 		if (condition[1]==classification) then
 			return 0
 		else
