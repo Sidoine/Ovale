@@ -70,10 +70,10 @@ AddIcon help=main mastery=2
 	
 	if CheckBoxOn(aoe)
 	{
-		Spell(HAMMEROFTHERIGHTEOUS)
 		if HolyPower(more 0) and BuffExpires(INQUISITION) Spell(INQUISITION)
-		Spell(HOLYWRATH)
+		Spell(HAMMEROFTHERIGHTEOUS)
 		Spell(CONSECRATE)
+		Spell(HOLYWRATH)
 	}
 	if CheckBoxOff(aoe)
 	{
@@ -81,8 +81,9 @@ AddIcon help=main mastery=2
 		Spell(CRUSADERSTRIKE)
 	}
 	Spell(JUDGEMENT)
-	Spell(HOLYWRATH)
 	Spell(AVENGERSSHIELD)
+	Spell(HOLYWRATH)
+	Spell(CONSECRATE priority=2)
 }
 
 AddIcon help=cd mastery=2

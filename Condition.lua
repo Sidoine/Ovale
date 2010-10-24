@@ -713,7 +713,7 @@ Ovale.conditions=
 		end
 	end,
 	Speed = function(condition)
-		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
+		return compare(GetUnitSpeed("player")*100/7, condition[1], condition[2])
 	end,
 	-- Test if the player is in a given stance
 	-- 1 : the stance
@@ -853,6 +853,9 @@ Ovale.conditions=
 		end
 
 		return compare(difference, condition[1], condition[2])
+	end,
+	TargetSpeed = function(condition)
+		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
 	end,
 	-- Test if the target's target is the player (or is not)
 	-- 1 : "yes" (it should be the player) or "no"

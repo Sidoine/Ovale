@@ -66,13 +66,17 @@ Define(VAMPIRICBLOOD 55233) #blood
 Define(GLYPHHOWLINGBLAST 63335)
 
 #Buffs and debuffs
+Define(SCARLETFEVER 81130)
 Define(BLOODPLAGUE 55078)
+	SpellInfo(BLOODPLAGUE duration=15)
 Define(FROSTFEVER 55095)
+	SpellInfo(FROSTFEVER duration=15)
 Define(KILLINGMACHINE 51124)
 Define(SHADOWINFUSION 91342)
 Define(SUDDENDOOM 81340)
 
 AddCheckBox(horn SpellName(HORNOFWINTER))
+AddCheckBox(scarlet SpellName(SCARLETFEVER) mastery=1 default)
 
 ScoreSpells(HOWLINGBLAST HEARTSTRIKE BLOODSTRIKE DEATHSTRIKE SCOURGESTRIKE OBLITERATE HEARTSTRIKE 
 				PESTILENCE ICYTOUCH PLAGUESTRIKE FROSTSTRIKE DEATHCOIL)
@@ -82,20 +86,39 @@ AddIcon help=main mastery=1
 	Spell(DANCINGRUNEWEAPON usable=1)
 
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
-	
-	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
-	{
-		if Runes(blood 1) and {CheckBoxOff(rolldes) or Runes(blood 2)} Spell(HEARTSTRIKE)
-		if Runes(unholy 1 nodeath=1) and Runes(frost 1 nodeath=1) Spell(DEATHSTRIKE)
-	}
-
-	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
-	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
-	
-	if PetPresent(no) Spell(RAISEDEAD)
+	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
+		Spell(BLOODBOIL)
 	Spell(RUNESTRIKE usable=1)
+	
+	if Runes(unholy 1) and Runes(frost 1) Spell(DEATHSTRIKE)
+	if Runes(blood 1) Spell(HEARTSTRIKE)
+	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
+}
+
+AddIcon help=aoe mastery=1
+{
+	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
+	Spell(RUNESTRIKE usable=1)
+
+	if Runes(unholy 1) Spell(DEATHANDECAY usable=1)
+	
+	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
+	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
+
+	if {OtherDebuffPresent(BLOODPLAGUE) or OtherDebuffPresent(FROSTFEVER)} and {TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)}
+		if Runes(blood 1) Spell(BLOODBOIL usable=1)
+	if TargetDebuffPresent(BLOODPLAGUE) and TargetDebuffPresent(FROSTFEVER) 
+	{
+		if Runes(blood 1)
+			unless OtherDebuffPresent(BLOODPLAGUE) and OtherDebuffPresent(FROSTFEVER)
+				Spell(PESTILENCE usable=1)
+		if Runes(unholy 1) and Runes(frost 1) Spell(DEATHSTRIKE)
+		if Runes(blood 1) Spell(HEARTSTRIKE)
+	}
+	
+	if Mana(more 39) Spell(DEATHCOIL usable=1)
 }
 
 AddIcon help=main mastery=2
@@ -127,9 +150,25 @@ AddIcon help=main mastery=2
 	}
 }
 
+AddIcon help=aoe mastery=2
+{
+	if Runes(unholy 1) and Runes(frost 1) Spell(HOWLINGBLAST)
+	if Runes(unholy 1) Spell(DEATHANDECAY usable=1)
+	if Runes(blood 1)
+	{
+		if TargetDebuffPresent(BLOODPLAGUE) and TargetDebuffPresent(FROSTFEVER)
+			unless OtherDebuffPresent(BLOODPLAGUE) and OtherDebuffPresent(FROSTFEVER)
+				Spell(PESTILENCE usable=1)
+		if {TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)} 
+				and {OtherDebuffPresent(BLOODPLAGUE) or OtherDebuffPresent(FROSTFEVER)}
+			Spell(BLOODBOIL usable=1)
+	}
+}
+
 AddIcon help=main mastery=3
 {
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
+	if PetPresent(no) Spell(RAISEDEAD)
 	
 	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
 	{
@@ -142,19 +181,23 @@ AddIcon help=main mastery=3
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 	
-	if PetPresent(no) Spell(RAISEDEAD)
 	if Mana(more 34) Spell(DEATHCOIL usable=1)
 	
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 }
 
-AddIcon help=aoe
+AddIcon help=aoe mastery=3
 {
-	if Runes(unholy 1) and Runes(frost 1) Spell(HOWLINGBLAST)
-	if TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)
-		Spell(PESTILENCE usable=1)
-	Spell(DEATHANDECAY usable=1)
-	Spell(BLOODBOIL usable=1)
+	if Runes(unholy 1) Spell(DEATHANDECAY usable=1)
+	if Runes(blood 1)
+	{
+		if TargetDebuffPresent(BLOODPLAGUE) and TargetDebuffPresent(FROSTFEVER)
+			unless OtherDebuffPresent(BLOODPLAGUE) and OtherDebuffPresent(FROSTFEVER)
+				Spell(PESTILENCE usable=1)
+		if {TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)} 
+				and {OtherDebuffPresent(BLOODPLAGUE) or OtherDebuffPresent(FROSTFEVER)}
+			Spell(BLOODBOIL usable=1)
+	}
 }
 
 AddIcon help=cd
@@ -167,6 +210,7 @@ AddIcon help=cd
 		Spell(UNBREAKABLEARMOR)
 		Spell(ICEBOUNDFORTITUDE)
 	}
+	if PetPresent(no) Spell(RAISEDEAD)
 	Spell(SUMMONGARGOYLE)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
