@@ -1,5 +1,8 @@
 ﻿local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 
+local runes = {}
+local runesCD = {}
+		
 local runeType = 
 {
 	blood = 1,
@@ -10,6 +13,7 @@ local runeType =
 
 local totemType =
 {
+	ghoul = 1,
 	fire = 1,
 	earth = 2,
 	water = 3,
@@ -679,38 +683,67 @@ Ovale.conditions=
 		return testbool(present, condition[1])
 	end,
 	Runes = function(condition)
-		local type = runeType[condition[1]]
 		local nombre = 0
 		local nombreCD = 0
 		local maxCD = nil
-		local minCD = nil
+		
+		for i=1,4 do
+			runes[i] = 0
+			runesCD[i] = 0
+		end
+		
+		local k=1
+		while true do
+			local type = runeType[condition[k*2-1]]
+			if not type then
+				break
+			end
+			local howMany = condition[k*2]
+			runes[type] = runes[type] + howMany
+			k = k + 1 
+		end
+		
 		for i=1,6 do
 			local rune = Ovale.state.rune[i]
-			if rune.type == type or (rune.type == 4 and not condition.nodeath) then
-				if (rune.cd == 0) then
-					nombre = nombre + 1
-				else
-					nombreCD = nombreCD + 1
-					if (maxCD == nil or rune.cd>maxCD) then
-						maxCD = rune.cd
-					end
-					if (minCD == nil or rune.cd<minCD) then
-						minCD = rune.cd
+			if runes[rune.type] > 0 then
+				runes[rune.type] = runes[rune.type] - 1
+				if rune.cd > runesCD[rune.type] then
+					runesCD[rune.type] = rune.cd
+				end
+			elseif rune.cd < runesCD[rune.type] then
+				runesCD[rune.type] = rune.cd
+			end
+		end
+		
+		if not condition.nodeath then
+			for i=1,6 do
+				local rune = Ovale.state.rune[i]
+				if rune.type == 4 then
+					for j=1,3 do
+						if runes[j]>0 then
+							runes[j] = runes[j] - 1
+							if rune.cd > runesCD[j] then
+								runesCD[j] = rune.cd
+							end
+							break
+						elseif rune.cd < runesCD[j] then
+							runesCD[j] = rune.cd
+							break
+						end
 					end
 				end
 			end
 		end
-		local wanted = condition[2]
-		if (nombre >= wanted) then
-			return 0
-		elseif (nombre + nombreCD < wanted) then
-			return nil
-		elseif (wanted == nombre + 1) then
-			return minCD
-		else
-			-- Il ne peut y avoir que deux runes sur CD de toute façon
-			return maxCD
+		
+		for i=1,4 do
+			if runes[i]> 0 then
+				return nil
+			end
+			if not maxCD or runesCD[i]>maxCD then
+				maxCD = runesCD[i]
+			end
 		end
+		return maxCD
 	end,
 	Speed = function(condition)
 		return compare(GetUnitSpeed("player")*100/7, condition[1], condition[2])
@@ -816,10 +849,16 @@ Ovale.conditions=
 		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,
 	TargetIsCasting = function(condition)
-		return testbool(UnitCastingInfo(getTarget(condition.target)), condition[1])
+		local casting
+		local target = getTarget(condition.target)
+		return testbool(UnitCastingInfo(target) or UnitChannelInfo(target), condition[1])
 	end,
 	TargetIsInterruptible = function(condition)
-		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(getTarget(condition.target))
+		local target = getTarget(condition.target)
+		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(target)
+		if not spell then
+			spell, rank, name, icon, start, ending, isTradeSkill, protected = UnitChannelInfo(target)
+		end
 		return testbool(protected ~= nil and not protected, condition[1])
 	end,
 	TargetLife = function(condition)
@@ -884,6 +923,16 @@ Ovale.conditions=
 			return 0
 		end
 		return addTime(startTime + duration, -(condition[2] or 0))
+	end,
+	TotemPresent = function(condition)
+		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])
+		if not startTime then
+			return nil
+		end
+		if (condition.totem and Ovale:GetSpellInfoOrNil(condition.totem)~=totemName) then
+			return nil
+		end
+		return startTime, startTime + duration
 	end,
 	Tracking = function(condition)
 		local what = Ovale:GetSpellInfoOrNil(condition[1])

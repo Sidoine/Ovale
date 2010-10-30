@@ -13,6 +13,7 @@ Define(DANCINGRUNEWEAPON 49028) #blood
 Define(DARKTRANSFORMATION 63560) #unholy
 Define(DEATHANDECAY 43265)
 Define(DEATHCOIL 47541)
+Define(DEATHPACT 48743)
 Define(DEATHSTRIKE 49998)
 	SpellInfo(DEATHSTRIKE unholy=-1 frost=-1)
 Define(EMPOWERRUNEWEAPON 47568)
@@ -66,6 +67,7 @@ Define(VAMPIRICBLOOD 55233) #blood
 Define(GLYPHHOWLINGBLAST 63335)
 
 #Buffs and debuffs
+Define(BLOODSWARM 81141)
 Define(SCARLETFEVER 81130)
 Define(BLOODPLAGUE 55078)
 	SpellInfo(BLOODPLAGUE duration=15)
@@ -87,10 +89,10 @@ AddIcon help=main mastery=1
 
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
-		Spell(BLOODBOIL)
+		if Runes(blood1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
 	Spell(RUNESTRIKE usable=1)
 	
-	if Runes(unholy 1) and Runes(frost 1) Spell(DEATHSTRIKE)
+	if Runes(unholy 1 frost 1) Spell(DEATHSTRIKE)
 	if Runes(blood 1) Spell(HEARTSTRIKE)
 	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
@@ -108,13 +110,13 @@ AddIcon help=aoe mastery=1
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 
 	if {OtherDebuffPresent(BLOODPLAGUE) or OtherDebuffPresent(FROSTFEVER)} and {TargetDebuffPresent(BLOODPLAGUE) or TargetDebuffPresent(FROSTFEVER)}
-		if Runes(blood 1) Spell(BLOODBOIL usable=1)
+		if Runes(blood 1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL usable=1)
 	if TargetDebuffPresent(BLOODPLAGUE) and TargetDebuffPresent(FROSTFEVER) 
 	{
 		if Runes(blood 1)
 			unless OtherDebuffPresent(BLOODPLAGUE) and OtherDebuffPresent(FROSTFEVER)
 				Spell(PESTILENCE usable=1)
-		if Runes(unholy 1) and Runes(frost 1) Spell(DEATHSTRIKE)
+		if Runes(unholy 1 frost 1) Spell(DEATHSTRIKE)
 		if Runes(blood 1) Spell(HEARTSTRIKE)
 	}
 	
@@ -129,8 +131,8 @@ AddIcon help=main mastery=2
 
 	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
 	{
-        if Runes(unholy 1 nodeath=1) and Runes(frost 1 nodeath=1) Spell(OBLITERATE)
-		if Runes(blood 1) and {CheckBoxOff(rolldes) or Runes(blood 2)} Spell(BLOODSTRIKE)
+        if Runes(unholy 1 frost 1 nodeath=1) Spell(OBLITERATE)
+		if Runes(blood 1) Spell(BLOODSTRIKE)
 	}
 	
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
@@ -142,7 +144,7 @@ AddIcon help=main mastery=2
 	Spell(FROSTSTRIKE usable=1)
 	if PetPresent(no) Spell(RAISEDEAD)
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
-	unless Runes(frost 1) and Runes(unholy 1) Spell(BLOODTAP)
+	unless Runes(frost 1 unholy 1) Spell(BLOODTAP)
 	if Runes(blood 2 nodeath=1)
 	{
 		Spell(HEARTSTRIKE priority=2)
@@ -152,7 +154,7 @@ AddIcon help=main mastery=2
 
 AddIcon help=aoe mastery=2
 {
-	if Runes(unholy 1) and Runes(frost 1) Spell(HOWLINGBLAST)
+	if Runes(unholy 1 frost 1) Spell(HOWLINGBLAST)
 	if Runes(unholy 1) Spell(DEATHANDECAY usable=1)
 	if Runes(blood 1)
 	{
@@ -176,7 +178,7 @@ AddIcon help=main mastery=3
 		if BuffPresent(SUDDENDOOM mine=1) Spell(DEATHCOIL usable=1)
 		if Mana(more 90) Spell(DEATHCOIL usable=1)
 		if Runes(unholy 1) Spell(SCOURGESTRIKE)
-        if Runes(blood 1 nodeath=1) and Runes(frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
+        if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
 	}
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
@@ -205,6 +207,7 @@ AddIcon help=cd
 	unless BuffPresent(BONESHIELD) Spell(BONESHIELD)
 	if BuffPresent(BLOODPRESENCE)
 	{
+		if TotemPresent(ghoul) Spell(DEATHPACT)
 		Spell(VAMPIRICBLOOD)
 		Spell(RUNETAP)
 		Spell(UNBREAKABLEARMOR)

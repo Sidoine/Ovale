@@ -1,5 +1,7 @@
 Ovale.defaut["PRIEST"] =
 [[
+### defines ###
+
 #Buff
 Define(ORB 77487)
 Define(MSEFFECT 87178)
@@ -45,14 +47,10 @@ Define(MS 73510) # Mind Spike
 	SpellAddBuff(MS MSEFFECT=12 MM=6)
 	
 Define(SWD 32379) # Shadow Word : Death
-	SpellInfo(SWD cd=10)
-	SpellInfo(SWD targetlifenocd=25 glyph=GLYPHSHADOWWORDDEATH)
 
 Define(ARCHANGEL 87151) #Archangel
 	SpellInfo(ARCHANGEL cd=90)
 	SpellAddBuff(ARCHANGEL DA=18)
-
-Define(GLYPHSHADOWWORDDEATH 55682)
 
 ### end defines ###
 
@@ -87,10 +85,10 @@ AddIcon help=main mastery=3
 	if BuffPresent(DA) #specific DD-based rotation when under Dark Archangel
 	{
 		#Use SWD if we have enough life left
-		if LifePercent(more 20) Spell(SWD)
+		if TargetLifePercent(less 25) and LifePercent(more 20) Spell(SWD)
 		
 		#Use MB on CD
-		Spell(MB)
+		if BuffPresent(ORB stacks=3) Spell(MB)
 		
 		#Fill with MF
 		Spell(MF priority=2)
@@ -112,11 +110,11 @@ AddIcon help=main mastery=3
 	Spell(FIEND)
 		
 	#Use SWD if we have enough life left and it is more useful than MB
-	if LifePercent(more 20) Spell(SWD)
+	if TargetLifePercent(less 25) and LifePercent(more 20) Spell(SWD)
 		
-	#Use MB on CD
-	Spell(MB)
-		
+        #Use MB when orbs are at 3 stacks
+	if BuffPresent(ORB stacks=3) Spell(MB)
+				
 	#Fill with MF
 	Spell(MF priority=2)
 }
@@ -131,7 +129,21 @@ AddIcon help=cd
 # Add mana monitor
 AddIcon help=mana mastery=3
 {
-	if ManaPercent(less 5) Spell(DISPERSION)
+	if LifePercent(less 10) 
+	{
+		Spell(DISPERSION)
+		Item(36892) #Health stone
+		Item(36893)
+		Item(36894)
+		Item(33447) #Life potion (lvl 80)
+
+	}
+	if ManaPercent(less 5) 
+	{
+		Spell(DISPERSION)
+		Item(33448) #Mana potion (lvl 80)
+	}
 }
+
 
 ]]

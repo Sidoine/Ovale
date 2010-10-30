@@ -87,38 +87,49 @@ ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP
 
 AddIcon help=main mastery=1
 {
+	#Contributed by Grabielz
 	if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2) and TargetDeadIn(more 15)
-		Spell(FAERIEFIRE)
+		Spell(FAERIEFIRE nored=1)
 
 	if Speed(more 0)
 	{
 		if BuffPresent(SHOOTINGSTARS) Spell(STARSURGE)
+		if TargetDebuffExpires(INSECTSWARM 10 mine=1) and TargetDeadIn(more 6)
+			Spell(INSECTSWARM)
+		if BuffPresent(ECLIPSESOLAR)
+			Spell(SUNFIRE)
 		Spell(MOONFIRE)
+	}
+
+	
+	if TargetDebuffExpires(INSECTSWARM 1 mine=1) and TargetDeadIn(more 6)
+		Spell(INSECTSWARM nored=1)  
+		
+	if TargetDebuffExpires(INSECTSWARM 3 mine=1) and TargetDeadIn(more 6) and BuffPresent(ECLIPSESOLAR) and Eclipse(less 16)
+		Spell(INSECTSWARM nored=1)  
+		
+	if TargetDebuffExpires(MOONFIRE 1 mine=1) and TargetDebuffExpires(SUNFIRE 1 mine=1) and TargetDeadIn(more 6)
+	{
+		if BuffPresent(ECLIPSESOLAR)
+			Spell(SUNFIRE nored=1)
+		Spell(MOONFIRE nored=1)
 	}
 
 	Spell(STARSURGE)
 	
 	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100)
 	{
-		if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
-			Spell(MOONFIRE)
 		Spell(STARFIRE)
 	}
 	
 	if BuffPresent(ECLIPSESOLAR) or Eclipse(equal 100)
 	{
-		if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
-			Spell(INSECTSWARM)  
-		if TargetDebuffExpires(SUNFIRE 0 mine=1) and TargetDeadIn(more 6)
-			Spell(SUNFIRE)  
 		Spell(WRATH)
 	}
 
 	if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
 		Spell(INSECTSWARM)  
 
-	if TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDeadIn(more 6)
-		Spell(MOONFIRE)
 
 	if {Eclipse(equal 0) and CheckBoxOn(wrath)} or Eclipse(less 0)
 		Spell(WRATH)

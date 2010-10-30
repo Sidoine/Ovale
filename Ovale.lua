@@ -1455,7 +1455,7 @@ function Ovale:GetActionInfo(element)
 	end
 
 	if (element.func == "Spell" ) then
-		if not self.spellList[spellId] then 
+		if not self.spellList[spellId] and not self.actionSort[spellId] then 
 			self:Log("Spell "..spellId.." not learnt")
 			return nil
 		end
@@ -1466,6 +1466,9 @@ function Ovale:GetActionInfo(element)
 		
 		--if (not action or not GetActionTexture(action)) then
 			spellName = self.spellList[spellId]
+			if not spellName then
+				spellName = GetSpellInfo(spellId)
+			end
 			actionTexture = GetSpellTexture(spellId)
 			actionInRange = IsSpellInRange(spellName, target)
 			actionUsable = IsUsableSpell(spellId)
