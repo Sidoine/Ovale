@@ -111,6 +111,13 @@ local buffSpellList =
 		46856, -- Trauma rank 1
 		46857, -- Trauma rank 2
 		16511 --Hemorrhage
+	},
+	heroism=
+	{
+		2825, --Bloodlust
+		32182, --Heroism
+		80353, --Time warp
+		90355 -- Ancient Hysteria
 	}
 }
 

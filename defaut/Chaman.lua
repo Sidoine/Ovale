@@ -105,20 +105,24 @@ AddIcon help=main mastery=2
 	if CheckBoxOn(aoe)
 	{
 		if TotemExpires(fire) Spell(MAGMATOTEM)
-		unless TotemExpires(fire) Spell(FIRENOVA)
+		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
+		if TotemPresent(fire) Spell(FIRENOVA)
 	}
-
-	if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
-	if TargetDebuffExpires(FLAMESHOCK 2 haste=spell mine=1) Spell(FLAMESHOCK)
-	if TargetDebuffExpires(STORMSTRIKE) Spell(STORMSTRIKE)
-	if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
-	if TotemExpires(fire) Spell(SEARINGTOTEM)
-	Spell(FERALSPIRIT)
-	Spell(SHAMANISTICRAGE)
-	Spell(EARTHSHOCK)
+	
+	if CheckBoxOff(aoe)
+	{
+		if TotemExpires(fire) Spell(SEARINGTOTEM)
+		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
+		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+	}
+	
 	Spell(STORMSTRIKE)
 	Spell(LAVALASH)
+	if TargetDebuffExpires(FLAMESHOCK 2 haste=spell mine=1) Spell(FLAMESHOCK)
+	Spell(EARTHSHOCK)
+	Spell(SHAMANISTICRAGE priority=2)
+	Spell(FERALSPIRIT priority=2)
 }
 
 AddIcon help=cd
