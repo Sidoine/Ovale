@@ -3,6 +3,7 @@ Ovale.defaut["DEATHKNIGHT"] = [[
 Define(ARMYOFTHEDEAD 42650)
 	SpellInfo(ARMYOFTHEDEAD cd=600)
 Define(BLOODBOIL 48721)
+	SpellAddTargetDebuff(BLOODBOIL SCARLETFEVER=30)
 Define(BLOODPRESENCE 48263)
 Define(BLOODSTRIKE 45902)
 	SpellInfo(BLOODSTRIKE blood=-1)
@@ -90,10 +91,10 @@ AddIcon help=main mastery=1
 
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
-		if Runes(blood1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
+		if Runes(blood 1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
 	Spell(RUNESTRIKE usable=1)
 	
-	if Runes(unholy 1 frost 1) and BuffExpires(BLOODSHIELD) Spell(DEATHSTRIKE)
+	if Runes(unholy 1 frost 1) and {BuffExpires(BLOODSHIELD) or TargetTargetIsPlayer(no)} Spell(DEATHSTRIKE)
 	if Runes(blood 1) Spell(HEARTSTRIKE)
 	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
@@ -209,7 +210,7 @@ AddIcon help=cd
 	unless BuffPresent(BONESHIELD) Spell(BONESHIELD)
 	if BuffPresent(BLOODPRESENCE)
 	{
-		if TotemPresent(ghoul) Spell(DEATHPACT)
+		if TotemPresent(ghoul) and LifePercent(less 61) and Mana(more 39) Spell(DEATHPACT) 
 		Spell(VAMPIRICBLOOD)
 		Spell(RUNETAP)
 		Spell(UNBREAKABLEARMOR)
