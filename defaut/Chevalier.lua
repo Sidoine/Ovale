@@ -67,6 +67,7 @@ Define(VAMPIRICBLOOD 55233) #blood
 Define(GLYPHHOWLINGBLAST 63335)
 
 #Buffs and debuffs
+Define(BLOODSHIELD 77535)
 Define(BLOODSWARM 81141)
 Define(SCARLETFEVER 81130)
 Define(BLOODPLAGUE 55078)
@@ -92,10 +93,11 @@ AddIcon help=main mastery=1
 		if Runes(blood1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
 	Spell(RUNESTRIKE usable=1)
 	
-	if Runes(unholy 1 frost 1) Spell(DEATHSTRIKE)
+	if Runes(unholy 1 frost 1) and BuffExpires(BLOODSHIELD) Spell(DEATHSTRIKE)
 	if Runes(blood 1) Spell(HEARTSTRIKE)
 	
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
+	unless Runes(blood 1) Spell(BLOODTAP usable=1 priority=2)
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 }
 
