@@ -77,14 +77,16 @@ local buffSpellList =
 	{
 		58567, -- Sunder Armor (x3)
 		8647, -- Expose Armor
-		91565 -- Faerie Fire (x3)
+		91565, -- Faerie Fire (x3)
+		35387 --Corrosive Spit (x3)
 	},
 	magicaldamagetaken=
 	{
 		65142, -- Ebon Plague
 		60433, -- Earth and Moon
 		93068, -- Master Poisoner 
-		1490 -- Curse of the Elements
+		1490, -- Curse of the Elements
+		34889 --Fire Breath (Dragonhawk)
 	},
 	-- physicaldamagetaken
 	lowerphysicaldamage=
@@ -94,6 +96,7 @@ local buffSpellList =
 		1160, -- Demoralizing Shout
 		26017, -- Vindication
 		81130, -- Scarlet Fever
+		50256 --Demoralizing Roar (Bear)
 	},
 	meleeslow=
 	{
@@ -102,7 +105,8 @@ local buffSpellList =
 		58180, --Infected Wounds rank 2
 		68055, --Judgments of the just
 		6343, --Thunderclap
-		8042 --Earth Shock
+		8042, --Earth Shock
+		50285 --Dust Cloud (Tallstrider)
 	},
 	bleed=
 	{
@@ -110,7 +114,8 @@ local buffSpellList =
 		33878, --Mangle bear
 		46856, -- Trauma rank 1
 		46857, -- Trauma rank 2
-		16511 --Hemorrhage
+		16511, --Hemorrhage
+		50271 --Tendon Rip
 	},
 	heroism=
 	{
