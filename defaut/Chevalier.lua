@@ -28,12 +28,14 @@ Define(HORNOFWINTER 57330)
 	SpellInfo(HORNOFWINTER cd=20)
 Define(HOWLINGBLAST 49184) #frost
 	SpellInfo(HOWLINGBLAST frost=-1 cd=8)
+	SpellAddBuff(HOWLINGBLAST FREEZINGFOG=0)
 	SpellAddTargetDebuff(HOWLINGBLAST FROSTFEVER=15 glyph=GLYPHHOWLINGBLAST)
 Define(ICEBOUNDFORTITUDE 48792)
 	SpellAddBuff(ICEBOUNDFORTITUDE ICEBOUNDFORTITUDE=18)
 Define(ICYTOUCH 45477)
 	SpellInfo(ICYTOUCH frost=-1)
 	SpellAddTargetDebuff(ICYTOUCH FROSTFEVER=15)
+	SpellAddBuff(ICYTOUCH FREEZINGFOG=0)
 Define(OBLITERATE 49020)
 	SpellInfo(OBLITERATE unholy=-1 frost=-1)
 Define(OUTBREAK 77575)
@@ -73,6 +75,7 @@ Define(BLOODSWARM 81141)
 Define(SCARLETFEVER 81130)
 Define(BLOODPLAGUE 55078)
 	SpellInfo(BLOODPLAGUE duration=15)
+Define(FREEZINGFOG 59052)
 Define(FROSTFEVER 55095)
 	SpellInfo(FROSTFEVER duration=15)
 Define(KILLINGMACHINE 51124)
@@ -130,29 +133,24 @@ AddIcon help=main mastery=2
 {	
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
-	if BuffPresent(KILLINGMACHINE) Spell(FROSTSTRIKE usable=1)
-
-	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
-	{
-        if Runes(unholy 1 frost 1 nodeath=1) Spell(OBLITERATE)
-		if Runes(blood 1) Spell(BLOODSTRIKE)
-	}
-	
+	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
 	{
 		if Glyph(GLYPHHOWLINGBLAST) Spell(HOWLINGBLAST)
 		unless Glyph(GLYPHHOWLINGBLAST) Spell(ICYTOUCH)
 	}
-	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
+	
+	if Runes(unholy 2 frost 2 nodeath=1) or Runes(death 2) Spell(OBLITERATE)
+	if BuffPresent(KILLINGMACHINE) and Runes(unholy 1 frost 1) Spell(OBLITERATE)
+	if Runes(blood 2) Spell(BLOODSTRIKE)
 	Spell(FROSTSTRIKE usable=1)
-	if PetPresent(no) Spell(RAISEDEAD)
+	if BuffPresent(FREEZINGFOG) Spell(HOWLINGBLAST)
+	if Runes(unholy 1 frost 1) Spell(OBLITERATE)
+	if Runes(blood 1) Spell(BLOODSTRIKE)
+		
+	if PetPresent(no) Spell(RAISEDEAD priority=2)
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
-	unless Runes(frost 1 unholy 1) Spell(BLOODTAP)
-	if Runes(blood 2 nodeath=1)
-	{
-		Spell(HEARTSTRIKE priority=2)
-		Spell(BLOODSTRIKE priority=2)
-	}
+	unless Runes(frost 1 unholy 1) Spell(BLOODTAP priority=2)
 }
 
 AddIcon help=aoe mastery=2
