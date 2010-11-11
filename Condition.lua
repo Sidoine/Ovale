@@ -65,7 +65,8 @@ local buffSpellList =
 	{
 		6673, -- Battle Shout
 		8076, -- Strength of Earth
-		57330 -- Horn of Winter
+		57330, -- Horn of Winter
+		93435 --Roar of Courage (Cat, Spirit Beast)
 	},
 	stamina =
 	{
@@ -78,7 +79,8 @@ local buffSpellList =
 		58567, -- Sunder Armor (x3)
 		8647, -- Expose Armor
 		91565, -- Faerie Fire (x3)
-		35387 --Corrosive Spit (x3)
+		35387, --Corrosive Spit (x3 Serpent)
+		50498 --Tear Armor (x3 Raptor)
 	},
 	magicaldamagetaken=
 	{
@@ -86,7 +88,8 @@ local buffSpellList =
 		60433, -- Earth and Moon
 		93068, -- Master Poisoner 
 		1490, -- Curse of the Elements
-		34889 --Fire Breath (Dragonhawk)
+		34889, --Fire Breath (Dragonhawk)
+		24844 --Lightning Breath (Wind serpent)
 	},
 	-- physicaldamagetaken
 	lowerphysicaldamage=
@@ -115,14 +118,15 @@ local buffSpellList =
 		46856, -- Trauma rank 1
 		46857, -- Trauma rank 2
 		16511, --Hemorrhage
-		50271 --Tendon Rip
+		50271, --Tendon Rip (Hyena)
+		35290 --Gore (Boar)
 	},
 	heroism=
 	{
 		2825, --Bloodlust
 		32182, --Heroism
 		80353, --Time warp
-		90355 -- Ancient Hysteria
+		90355 -- Ancient Hysteria (Core Hound)
 	}
 }
 
