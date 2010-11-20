@@ -146,19 +146,27 @@ local function SetSkinGroup(self, _skinGroup)
 	self.skinGroup:AddButton(self)
 end
 
-local function SetSize(self, width, height)
-	self:SetWidth(width)
-	self:SetHeight(height)
-	if (not LBF) then
-		self.normalTexture:SetWidth(width*66/36)
-		self.normalTexture:SetHeight(height*66/36)
-		self.shortcut:SetWidth(width)
-		self.remains:SetWidth(width)
-	end
+local function SetSize(self, scale)
+--	if not LBF then
+--		self:SetWidth(width)
+--		self:SetHeight(height)
+--		self.normalTexture:SetWidth(width*66/36)
+--		self.normalTexture:SetHeight(height*66/36)
+--		
+--		self.remains:SetWidth(width)
+--	else
+		--self:SetScale(width/32)
+--	end
 end
 
 local function SetHelp(self, help)
 	self.help = help
+end
+
+local function SetFontScale(self, scale)
+	self.fontScale = scale
+	self.shortcut:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
+	self.aPortee:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 end
 
 function OvaleIcone_OnClick(self)
@@ -198,6 +206,11 @@ function OvaleIcone_OnLoad(self)
 	self.cd = _G[name.."Cooldown"]
 	self.normalTexture = _G[name.."NormalTexture"]
 	
+	local fontName, fontHeight, fontFlags = self.shortcut:GetFont()
+	self.fontName = fontName
+	self.fontHeight = fontHeight
+	self.fontFlags = fontFlags
+	
 	self.focusText = self:CreateFontString(nil, "OVERLAY");
 	self.focusText:SetFontObject("GameFontNormal");
 	self.focusText:SetAllPoints(self);
@@ -209,6 +222,7 @@ function OvaleIcone_OnLoad(self)
 	self.Update = Update
 	self.SetSize = SetSize
 	self.SetHelp = SetHelp
+	self.SetFontScale = SetFontScale
 	if Ovale.db.profile.clickThru then
 		self:EnableMouse(false)
 	end

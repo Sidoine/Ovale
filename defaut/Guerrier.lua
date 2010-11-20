@@ -94,7 +94,7 @@ AddIcon help=main mastery=1
 	if List(shout command) and {Mana(less 20) or BuffExpires(stamina 3)} Spell(COMMANDINGSHOUT nored=1)
     if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
-	if TargetDebuffExpires(SUNDERARMORDEBUFF 2 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2) Spell(SUNDERARMOR nored=1)
+	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 
 	if Mana(less 20) Spell(DEADLYCALM)
 	if TargetDebuffExpires(RENDDEBUFF) Spell(REND)
@@ -111,7 +111,7 @@ AddIcon help=main mastery=2
 	if List(shout command) and {Mana(less 20) or BuffExpires(stamina 3)} Spell(COMMANDINGSHOUT nored=1)
     if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
-	if TargetDebuffExpires(SUNDERARMORDEBUFF 2 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2) Spell(SUNDERARMOR nored=1)
+	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 	
 	if CheckBoxOn(multi) Spell(WHIRLWIND)
 	Spell(COLOSSUSSMASH)

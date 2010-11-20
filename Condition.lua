@@ -20,122 +20,17 @@ local totemType =
 	air = 4
 }
 
-local fearSpellIdList = 
-{
-	5782, -- Fear
-	5484, -- Howl of terror
-	5246, -- Intimidating Shout 
-	8122, -- Psychic scream
-}
 local fearSpellList = nil
-
-local stunSpellIdList =
-{
-	5211, -- Bash
-	44415, -- Blackout
-	6409, -- Cheap Shot
-	22427, -- Concussion Blow
-	853, -- Hammer of Justice
-	408, -- Kidney Shot
-	12798, -- Revenge Stun
-	46968, -- Shockwave
-}
 local stunSpellList = nil
-
-local incapacitateSpellIdList =
-{
-	6770, -- Sap
-	12540, -- Gouge
-	20066, -- Repentance
-}
 local incapacitateSpellList = nil
-
-local rootSpellIdList =
-{
-	23694, -- Improved Hamstring
-	339, -- Entangling Roots
-	122, -- Frost Nova
-	47168, -- Improved Wing Clip
-}
 local rootSpellList = nil
-
-local buffSpellList =
-{
-	strengthagility=
-	{
-		6673, -- Battle Shout
-		8076, -- Strength of Earth
-		57330, -- Horn of Winter
-		93435 --Roar of Courage (Cat, Spirit Beast)
-	},
-	stamina =
-	{
-		21562, -- Fortitude TODO: vérifier
-		469, -- Commanding Shout
-		6307 -- Blood Pact
-	},
-	lowerarmor=
-	{
-		58567, -- Sunder Armor (x3)
-		8647, -- Expose Armor
-		91565, -- Faerie Fire (x3)
-		35387, --Corrosive Spit (x3 Serpent)
-		50498 --Tear Armor (x3 Raptor)
-	},
-	magicaldamagetaken=
-	{
-		65142, -- Ebon Plague
-		60433, -- Earth and Moon
-		93068, -- Master Poisoner 
-		1490, -- Curse of the Elements
-		34889, --Fire Breath (Dragonhawk)
-		24844 --Lightning Breath (Wind serpent)
-	},
-	-- physicaldamagetaken
-	lowerphysicaldamage=
-	{
-		99, -- Demoralizing Roar
-		702, -- Curse of Weakness
-		1160, -- Demoralizing Shout
-		26017, -- Vindication
-		81130, -- Scarlet Fever
-		50256 --Demoralizing Roar (Bear)
-	},
-	meleeslow=
-	{
-		45477, --Icy Touch
-		58179, --Infected Wounds rank 1
-		58180, --Infected Wounds rank 2
-		68055, --Judgments of the just
-		6343, --Thunderclap
-		8042, --Earth Shock
-		50285 --Dust Cloud (Tallstrider)
-	},
-	bleed=
-	{
-		33876, --Mangle cat
-		33878, --Mangle bear
-		46856, -- Trauma rank 1
-		46857, -- Trauma rank 2
-		16511, --Hemorrhage
-		50271, --Tendon Rip (Hyena)
-		35290 --Gore (Boar)
-	},
-	heroism=
-	{
-		2825, --Bloodlust
-		32182, --Heroism
-		80353, --Time warp
-		90355 -- Ancient Hysteria (Core Hound)
-	}
-}
 
 local function buildRootSpellList()
 	if (rootSpellList) then
 		return
 	end
 	rootSpellList = {}
-	for k, v in pairs(rootSpellIdList) do
+	for k, v in pairs(Ovale.buffSpellList.fear) do
 		rootSpellList[v] = true
 	end
 end
@@ -145,7 +40,7 @@ local function buildStunSpellList()
 		return
 	end
 	stunSpellList = {}
-	for k, v in pairs(stunSpellIdList) do
+	for k, v in pairs(Ovale.buffSpellList.stun) do
 		stunListList[v] = true
 	end
 end
@@ -155,7 +50,7 @@ local function buildIncapacitateSpellList()
 		return
 	end
 	incapacitateSpellList = {}
-	for k, v in pairs(incapacitateSpellIdList) do
+	for k, v in pairs(Ovale.buffSpellList.incapacitate) do
 		incapacitateSpellList[v] = true
 	end
 end
@@ -165,7 +60,7 @@ local function buildFearSpellList()
 		return
 	end
 	fearSpellList = {}
-	for k, v in pairs(fearSpellIdList) do
+	for k, v in pairs(Ovale.buffSpellList.fear) do
 		fearSpellList[v] = true
 	end
 end
@@ -340,16 +235,20 @@ local function GetTargetAura(condition, filter, target)
 		stacks = 1
 	end
 	local spellId = condition[1]
+	
+	
 	local aura
 	if type(spellId) == "number" then
 		aura = Ovale:GetAura(target, filter, spellId)
-	elseif buffSpellList[spellId] then
-		for k,v in pairs(buffSpellList[spellId]) do
+	elseif Ovale.buffSpellList[spellId] then
+		for k,v in pairs(Ovale.buffSpellList[spellId]) do
 			local newAura = Ovale:GetAura(target, filter, v)
 			if not aura or newAura.stacks>aura.stacks then
 				aura = newAura
 			end
 		end
+	elseif spellId == "Magic" or spellId == "Disease" or spellId=="Curse" or spellId=="Poison" then
+		aura = Ovale:GetAura(target, filter, spellId)
 	else
 		Ovale:Print("ERROR: unknown buff "..spellId)
 		Ovale.bug = true
@@ -360,7 +259,7 @@ local function GetTargetAura(condition, filter, target)
 		Ovale:Print("GetTargetAura = start=".. nilstring(aura.start) .. " end="..nilstring(aura.ending).." stacks=" ..nilstring(aura.stacks).."/"..stacks)
 	end
 		
-	if (not condition.mine or aura.mine) and aura.stacks>=stacks then
+	if (not condition.mine or (aura.mine and condition.mine==1) or (not aura.mine and condition.mine==0)) and aura.stacks>=stacks then
 		local ending
 		if condition.forceduration then
 			if Ovale.spellInfo[spellId] and Ovale.spellInfo[spellId].duration then
@@ -867,7 +766,13 @@ Ovale.conditions=
 	TargetIsCasting = function(condition)
 		local casting
 		local target = getTarget(condition.target)
-		return testbool(UnitCastingInfo(target) or UnitChannelInfo(target), condition[1])
+		local spellId = condition.spell
+		if not spellId then
+			return testbool(UnitCastingInfo(target) or UnitChannelInfo(target), condition[1])
+		else
+			local spellName = GetSpellInfo(spellId)
+			return testbool(UnitCastingInfo(target)==spellName or UnitChannelInfo(target) == spellName, condition[1])
+		end
 	end,
 	TargetIsInterruptible = function(condition)
 		local target = getTarget(condition.target)

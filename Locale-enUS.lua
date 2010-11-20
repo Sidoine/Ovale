@@ -1,14 +1,12 @@
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("Ovale", "enUS", true)
 if not L then return end
-L["Largeur des icônes"] = "Icon width"
-L["La largeur des icônes"] = "The icons width"
-L["Hauteur des icônes"] = "Icon height"
-L["La hauteur des icônes"] = "The icons height"
-L["Largeur des petites icônes"] = "Small icon width"
-L["La largeur des petites icônes"] = "The small icons width"
-L["Hauteur des petites icônes"] = "Small icon height"
-L["La hauteur des petites icônes"] = "The small icons height"
+L["Taille des icônes"] = "Icon scale"
+L["La taille des icônes"] = "The icons scale"
+L["Taille des petites icônes"] = "Small icon scale"
+L["La taille des petites icônes"] = "The small icons scale"
+L["Taille des polices"] = "Font scale"
+L["La taille des polices"] = "The font scale"
 L["En combat uniquement"] = "Show in combat only"
 L["Code"] = "Code"
 L["Afficher la fenêtre"] = "Show Ovale"

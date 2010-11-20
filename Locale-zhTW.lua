@@ -1,14 +1,12 @@
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("Ovale", "zhTW", true)
 if not L then return end
-L["Largeur des icônes"] = "圖示寬度"
-L["La largeur des icônes"] = "調整圖示寬度"
-L["Hauteur des icônes"] = "圖示高度"
-L["La hauteur des icônes"] = "調整圖示高度"
-L["Largeur des petites icônes"] = "小圖示寬度"
-L["La largeur des petites icônes"] = "調整小圖示寬度"
-L["Hauteur des petites icônes"] = "小圖示高度"
-L["La hauteur des petites icônes"] = "調整小圖示高度"
+L["Taille des icônes"] = "圖示寬度"
+L["La taille des icônes"] = "調整圖示寬度"
+L["Taille des petites icônes"] = "小圖示寬度"
+L["La taille des petites icônes"] = "調整小圖示寬度"
+L["Taille des polices"] = "Font scale"
+L["La taille des polices"] = "The font scale"
 L["En combat uniquement"] = "在戰鬥中顯示"
 L["Code"] = "守則"
 L["Afficher la fenêtre"] = "顯示窗口"

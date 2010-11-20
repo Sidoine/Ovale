@@ -137,6 +137,15 @@ local function ParseScoreSpells(params)
 	end
 end
 
+local function ParseSpellList(name, params)
+	Ovale.buffSpellList[name] = {}
+	local i = 1
+	for v in string.gmatch(params, "(%d+)") do
+		Ovale.buffSpellList[name][i] = tonumber(v)
+		i = i + 1
+	end
+end
+
 local function ParseIf(a, b)
 	local newNode = {type="if", a=node[tonumber(a)], b=node[tonumber(b)]}
 	return AddNode(newNode)
@@ -377,6 +386,7 @@ function Ovale:Compile(text)
 	text = string.gsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
 	text = string.gsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
 	text = string.gsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
+	text = string.gsub(text, "SpellList%s*%(%s*(%w+)%s*(.-)%)", ParseSpellList)
 			
 	-- On vire les espaces en trop
 	text = string.gsub(text, "\n", " ")

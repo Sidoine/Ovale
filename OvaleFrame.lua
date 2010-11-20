@@ -192,9 +192,9 @@ do
 				elseif top>1 then
 					top = 1
 				end
-				action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + top*action.dx,action.top - top*action.dy)
+				action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
 				if action.icons[2] then
-					action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (top+1)*action.dx,action.top - (top+1)*action.dy)
+					action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
 				end
 			end
 								
@@ -268,38 +268,39 @@ do
 			end
 			local action = self.actions[k]
 
-			local width, height
+			local width, height, newScale
 			local nbIcons
 			if (node.params.size == "small") then
-				width = Ovale.db.profile.apparence.smallIconWidth + margin
-				height = Ovale.db.profile.apparence.smallIconHeight + margin
+				newScale = Ovale.db.profile.apparence.smallIconScale
+				width = newScale * 36 + margin
+				height = newScale * 36 + margin
 				nbIcons = 1
 			else
-				width = Ovale.db.profile.apparence.iconWidth + margin
-				height = Ovale.db.profile.apparence.iconHeight + margin
+				newScale = Ovale.db.profile.apparence.iconScale
+				width =newScale * 36 + margin
+				height = newScale * 36 + margin
 				if Ovale.db.profile.apparence.predictif then
 					nbIcons = 2
 				else
 					nbIcons = 1
 				end
 			end
-			if (top + height > Ovale.db.profile.apparence.iconHeight + margin) then
+			if (top + height > Ovale.db.profile.apparence.iconScale * 36 + margin) then
 				top = 0
 				left = maxWidth
 			end
 			
-			action.width = width - margin
-			action.height = height - margin
+			action.scale = newScale
 			if (Ovale.db.profile.apparence.vertical) then
 				action.left = top
 				action.top = -left-BARRE-margin
-				action.dx = action.width
+				action.dx = width
 				action.dy = 0
 			else
 				action.left = left
 				action.top = -top-BARRE-margin
 				action.dx = 0
-				action.dy = action.height
+				action.dy = height
 			end
 					
 			for l=1,nbIcons do
@@ -307,8 +308,9 @@ do
 					action.icons[l] = CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIcone");
 				end			
 				local icon = action.icons[l]
-				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",action.left + (l-1)*action.dx,action.top - (l-1)*action.dy)
-				icon:SetSize(action.width, action.height)
+				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/action.scale,(action.top - (l-1)*action.dy)/action.scale)
+				icon:SetScale(action.scale)
+				icon:SetFontScale(Ovale.db.profile.apparence.fontScale)
 				icon:SetHelp(node.params.help)
 				icon:EnableMouse(not Ovale.db.profile.apparence.clickThru)
 				

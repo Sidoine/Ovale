@@ -70,6 +70,108 @@ Ovale.counter = {}
 --the result is computed by the simulator, allowing to ignore lag or missile travel time
 Ovale.lastSpell = {}
 
+Ovale.buffSpellList =
+{
+	fear =
+	{
+		5782, -- Fear
+		5484, -- Howl of terror
+		5246, -- Intimidating Shout 
+		8122, -- Psychic scream
+	},
+	root =
+	{
+		23694, -- Improved Hamstring
+		339, -- Entangling Roots
+		122, -- Frost Nova
+		47168, -- Improved Wing Clip
+	},
+	incapacitate = 
+	{
+		6770, -- Sap
+		12540, -- Gouge
+		20066, -- Repentance
+	},
+	stun = 
+	{
+		5211, -- Bash
+		44415, -- Blackout
+		6409, -- Cheap Shot
+		22427, -- Concussion Blow
+		853, -- Hammer of Justice
+		408, -- Kidney Shot
+		46968, -- Shockwave
+	},
+	strengthagility=
+	{
+		6673, -- Battle Shout
+		8076, -- Strength of Earth
+		57330, -- Horn of Winter
+		93435 --Roar of Courage (Cat, Spirit Beast)
+	},
+	stamina =
+	{
+		21562, -- Fortitude TODO: vérifier
+		469, -- Commanding Shout
+		6307 -- Blood Pact
+	},
+	lowerarmor=
+	{
+		58567, -- Sunder Armor (x3)
+		8647, -- Expose Armor
+		91565, -- Faerie Fire (x3)
+		35387, --Corrosive Spit (x3 Serpent)
+		50498 --Tear Armor (x3 Raptor)
+	},
+	magicaldamagetaken=
+	{
+		65142, -- Ebon Plague
+		60433, -- Earth and Moon
+		93068, -- Master Poisoner 
+		1490, -- Curse of the Elements
+		34889, --Fire Breath (Dragonhawk)
+		24844 --Lightning Breath (Wind serpent)
+	},
+	-- physicaldamagetaken
+	lowerphysicaldamage=
+	{
+		99, -- Demoralizing Roar
+		702, -- Curse of Weakness
+		1160, -- Demoralizing Shout
+		26017, -- Vindication
+		81130, -- Scarlet Fever
+		50256 --Demoralizing Roar (Bear)
+	},
+	meleeslow=
+	{
+		45477, --Icy Touch
+		58179, --Infected Wounds rank 1
+		58180, --Infected Wounds rank 2
+		68055, --Judgments of the just
+		6343, --Thunderclap
+		8042, --Earth Shock
+		50285 --Dust Cloud (Tallstrider)
+	},
+	bleed=
+	{
+		33876, --Mangle cat
+		33878, --Mangle bear
+		46856, -- Trauma rank 1
+		46857, -- Trauma rank 2
+		16511, --Hemorrhage
+		50271, --Tendon Rip (Hyena)
+		35290 --Gore (Boar)
+	},
+	heroism=
+	{
+		2825, --Bloodlust
+		32182, --Heroism
+		80353, --Time warp
+		90355 -- Ancient Hysteria (Core Hound)
+	}
+}
+
+
 --Key bindings
 BINDING_HEADER_OVALE = "Ovale"
 BINDING_NAME_OVALE_CHECKBOX0 = L["Inverser la boîte à cocher "].."(1)"
@@ -102,7 +204,7 @@ local options =
 						Ovale.db.profile.apparence.enCombat = v
 						Ovale:UpdateVisibility()
 					end,
-					width = full
+					width = "full"
 				},
 				targetOnly =
 				{
@@ -116,39 +218,39 @@ local options =
 						Ovale.db.profile.apparence.avecCible = v
 						Ovale:UpdateVisibility()
 					end,
-					width = full
+					width = "full"
 				},
-				iconWidth = 
+				iconScale = 
 				{
 					order = 2,
 					type = "range",
-					name = L["Largeur des icônes"],
-					desc = L["La largeur des icônes"],
-					min = 16, max = 256, step = 2,
-					get = function(info) return Ovale.db.profile.apparence.iconWidth end,
-					set = function(info,value) Ovale.db.profile.apparence.iconWidth = value; Ovale:UpdateFrame() end
+					name = L["Taille des icônes"],
+					desc = L["La taille des icônes"],
+					min = 0.1, max = 16, step = 0.1,
+					get = function(info) return Ovale.db.profile.apparence.iconScale end,
+					set = function(info,value) Ovale.db.profile.apparence.iconScale = value; Ovale:UpdateFrame() end
 				},
-				iconHeight = 
+				fontScale = 
 				{
 					order = 3,
 					type = "range",
-					name = L["Hauteur des icônes"],
-					desc = L["La hauteur des icônes"],
-					min = 16, max = 256, step = 2,
-					get = function(info) return Ovale.db.profile.apparence.iconHeight end,
-					set = function(info,value) Ovale.db.profile.apparence.iconHeight = value; Ovale:UpdateFrame() end
+					name = L["Taille des polices"],
+					desc = L["La taille des polices"],
+					min = 0.1, max = 2, step = 0.1,
+					get = function(info) return Ovale.db.profile.apparence.fontScale end,
+					set = function(info,value) Ovale.db.profile.apparence.fontScale = value; Ovale:UpdateFrame() end
 				},
-				smallIconWidth = 
+				smallIconScale = 
 				{
 					order = 4,
 					type = "range",
-					name = L["Largeur des petites icônes"],
-					desc = L["La largeur des petites icônes"],
-					min = 16, max = 256, step = 2,
-					get = function(info) return Ovale.db.profile.apparence.smallIconWidth end,
-					set = function(info,value) Ovale.db.profile.apparence.smallIconWidth = value; Ovale:UpdateFrame() end
+					name = L["Taille des petites icônes"],
+					desc = L["La taille des petites icônes"],
+					min = 0.1, max = 16, step = 0.1,
+					get = function(info) return Ovale.db.profile.apparence.smallIconScale end,
+					set = function(info,value) Ovale.db.profile.apparence.smallIconScale = value; Ovale:UpdateFrame() end
 				},
-				smallIconHeight = 
+				--[[smallIconHeight = 
 				{
 					order = 5,
 					type = "range",
@@ -157,7 +259,7 @@ local options =
 					min = 16, max = 256, step = 2,
 					get = function(info) return Ovale.db.profile.apparence.smallIconHeight end,
 					set = function(info,value) Ovale.db.profile.apparence.smallIconHeight = value; Ovale:UpdateFrame() end
-				},
+				},]]
 				margin = 
 				{
 					order = 5.5,
@@ -718,11 +820,11 @@ function Ovale:UNIT_AURA(event, unit)
 			self.buff[spellId].lastSeen = Ovale.maintenant
 			self.buff[spellId].present = true
 			
-			if spellId == 24907 or 2895 then --moonkin aura / wrath of air
+			if spellId == 24907 or spellId == 2895 then --moonkin aura / wrath of air
 				hateSorts = 5 --add shadow form?
 			elseif spellId == 8515 or spellId == 55610 or spellId == 53290 then --windfury / improved icy talons / hunting party
 				hateCaC = 10
-			elseif spellId == 2825 or 32182 then --bloodlust / heroism
+			elseif spellId == 2825 or spellId == 32182 then --bloodlust / heroism
 				hateHero = 30
 			elseif spellId == 53657 then --judgements of the pure
 				hateClasse = 9
@@ -800,13 +902,14 @@ function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
 		end
 	end
 	if Skada then
-		if not guid then return end
-		local player = Skada:get_player(Skada.current, guid, name)
+		if not guid or not Skada.current or not Skada.total then return end
+		local player = Skada:get_player(Skada.current, guid, nil)
+		if not player then return end
 		if not player.ovale then player.ovale = 0 end
 		if not player.ovaleMax then player.ovaleMax = 0 end
 		player.ovale = player.ovale + scored
 		player.ovaleMax = player.ovaleMax + scoreMax
-		player = Skada:get_player(Skada.total, guid, name)
+		player = Skada:get_player(Skada.total, guid, nil)
 		player.ovale = player.ovale + scored
 		player.ovaleMax = player.ovaleMax + scoreMax
 	end
@@ -1059,7 +1162,7 @@ function Ovale:GetAura(target, filter, spellId, forceduration)
 		if not name then
 			break
 		end
-		if (unitCaster=="player" or not myAura.mine) and spellId == thisSpellId then
+		if (unitCaster=="player" or not myAura.mine) and (spellId == thisSpellId or spellId == debuffType) then
 			myAura.mine = (unitCaster == "player")
 			myAura.start = expirationTime - duration
 			
@@ -1921,8 +2024,8 @@ function Ovale:ChargerDefaut()
 			top = 500,
 			check = {},
 			list = {},
-			apparence = {enCombat=false, iconWidth = 64, iconHeight = 64, margin = 4,
-				smallIconWidth=28, smallIconHeight=28, raccourcis=true, numeric=false, avecCible = false,
+			apparence = {enCombat=false, iconScale = 2, margin = 4, fontScale = 0.5,
+				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
 				latencyCorrection=true, hideVehicule=true, flashIcon=true},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
