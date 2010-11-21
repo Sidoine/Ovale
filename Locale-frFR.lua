@@ -46,3 +46,5 @@ L["Ignorer les clics souris"] = true
 L["Correction de la latence"] = true
 L["Cacher dans les véhicules"] = true
 L["Illuminer l'icône quand le temps de recharge est écoulé"] = true
+L["Caractère de portée"] = "Range indicator"
+L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"] = "This text is displayed on the icon to show if the target is in range"

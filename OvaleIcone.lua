@@ -1,6 +1,5 @@
 ﻿local LBF = LibStub("LibButtonFacade", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
-local RANGE_INDICATOR = "●";
 
 local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
@@ -196,13 +195,17 @@ function OvaleIcone_OnLeave(self)
 	end
 end
 
+local function SetRangeIndicator(self, text)
+	self.aPortee:SetText(text)
+end
+
 function OvaleIcone_OnLoad(self)
 	local name = self:GetName()
 	self.icone = _G[name.."Icon"]
 	self.shortcut = _G[name.."HotKey"]
 	self.remains = _G[name.."Name"]
 	self.aPortee = _G[name.."Count"]
-	self.aPortee:SetText(RANGE_INDICATOR)
+	self.aPortee:SetText(Ovale.db.profile.apparence.targetText)
 	self.cd = _G[name.."Cooldown"]
 	self.normalTexture = _G[name.."NormalTexture"]
 	
@@ -223,6 +226,7 @@ function OvaleIcone_OnLoad(self)
 	self.SetSize = SetSize
 	self.SetHelp = SetHelp
 	self.SetFontScale = SetFontScale
+	self.SetRangeIndicator = SetRangeIndicator
 	if Ovale.db.profile.clickThru then
 		self:EnableMouse(false)
 	end

@@ -312,6 +312,7 @@ do
 				icon:SetScale(action.scale)
 				icon:SetFontScale(Ovale.db.profile.apparence.fontScale)
 				icon:SetHelp(node.params.help)
+				icon:SetRangeIndicator(Ovale.db.profile.apparence.targetText)
 				icon:EnableMouse(not Ovale.db.profile.apparence.clickThru)
 				
 				if LBF then

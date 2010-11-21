@@ -250,16 +250,6 @@ local options =
 					get = function(info) return Ovale.db.profile.apparence.smallIconScale end,
 					set = function(info,value) Ovale.db.profile.apparence.smallIconScale = value; Ovale:UpdateFrame() end
 				},
-				--[[smallIconHeight = 
-				{
-					order = 5,
-					type = "range",
-					name = L["Hauteur des petites icônes"],
-					desc = L["La hauteur des petites icônes"],
-					min = 16, max = 256, step = 2,
-					get = function(info) return Ovale.db.profile.apparence.smallIconHeight end,
-					set = function(info,value) Ovale.db.profile.apparence.smallIconHeight = value; Ovale:UpdateFrame() end
-				},]]
 				margin = 
 				{
 					order = 5.5,
@@ -377,6 +367,15 @@ local options =
 					name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
 					get = function(info) return Ovale.db.profile.apparence.flashIcon end,
 					set = function(info, value) Ovale.db.profile.apparence.flashIcon = value; Ovale:UpdateFrame() end
+				},
+				targetText =
+				{
+					order = 19,
+					type = "input",
+					name = L["Caractère de portée"],
+					desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
+					get = function(info) return Ovale.db.profile.apparence.targetText end,
+					set = function(info, value) Ovale.db.profile.apparence.targetText = value; Ovale:UpdateFrame() end
 				}
 			}
 		},
@@ -2027,7 +2026,7 @@ function Ovale:ChargerDefaut()
 			apparence = {enCombat=false, iconScale = 2, margin = 4, fontScale = 0.5,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
-				latencyCorrection=true, hideVehicule=true, flashIcon=true},
+				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●"},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
