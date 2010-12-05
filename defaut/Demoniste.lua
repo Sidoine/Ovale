@@ -105,6 +105,7 @@ AddIcon help=main mastery=1
 AddIcon help=cd mastery=1
 {
 	if BuffPresent(heroism) Spell(SUMMONFELGUARD)
+	Spell(DEMONSOUL)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -137,6 +138,7 @@ AddIcon help=main mastery=2
 AddIcon help=cd mastery=2
 {
 	Spell(METAMORPHOSIS)
+	Spell(DEMONSOUL)
 	if BuffPresent(METAMORPHOSIS) Spell(SUMMONINFERNAL)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)

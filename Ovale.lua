@@ -113,7 +113,8 @@ Ovale.buffSpellList =
 	{
 		21562, -- Fortitude TODO: vérifier
 		469, -- Commanding Shout
-		6307 -- Blood Pact
+		6307, -- Blood Pact
+		90364 -- Qiraji Fortitude
 	},
 	lowerarmor=
 	{

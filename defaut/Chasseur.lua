@@ -59,12 +59,13 @@ ScoreSpells(FOCUSFIRE KILLCOMMAND ARCANESHOT KILLSHOT STEADYSHOT SERPENTSTING
 AddIcon help=main mastery=1
 {
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
-	if Mana(less 40) {Spell(FERVOR) Spell(STEADYSHOT)}
+	if Mana(less 40) {Spell(FERVOR) Spell(COBRASHOT) Spell(STEADYSHOT)}
 	if TargetBuffPresent(FRENZYEFFECT stacks=5 target=pet) Spell(FOCUSFIRE)
 	if CheckBoxOn(multi) Spell(MULTISHOT)
 	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
 	if TargetInRange(GROWL) Spell(KILLCOMMAND)
 	Spell(ARCANESHOT)
+	Spell(COBRASHOT)
 	Spell(STEADYSHOT)
 }
 
@@ -84,16 +85,16 @@ AddIcon help=main mastery=2
 AddIcon help=main mastery=3
 {
     if TargetLifePercent(less 20) Spell(KILLSHOT)
-    if Mana(less 35) and BuffExpires(LOCKANDLOAD) Spell(STEADYSHOT)
+    if Mana(less 35) and BuffExpires(LOCKANDLOAD) {Spell(COBRASHOT) Spell(STEADYSHOT)}
     if Mana(more 35) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
     if Mana(more 25) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
     if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
     if BuffPresent(LOCKANDLOAD) Spell (KILLCOMMAND)
     if BuffPresent(LOCKANDLOAD) Spell (EXPLOSIVESHOT)
-    unless 1.5s before Spell(BLACKARROW) Spell(STEADYSHOT)
+    unless 1.5s before Spell(BLACKARROW) {Spell(COBRASHOT) Spell(STEADYSHOT)}
     if CheckBoxOn(multi) Spell(MULTISHOT)
     if Mana(more 57) Spell(ARCANESHOT)
-    unless 1.5s before Spell(EXPLOSIVESHOT) Spell(STEADYSHOT)
+    unless 1.5s before Spell(EXPLOSIVESHOT) {Spell(COBRASHOT) Spell(STEADYSHOT)}
 }
 
 

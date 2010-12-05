@@ -95,6 +95,7 @@ AddIcon help=main mastery=1
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
 		if Runes(blood 1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
+	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
 	Spell(RUNESTRIKE usable=1)
 	
 	if Runes(unholy 1 frost 1) and {BuffExpires(BLOODSHIELD) or TargetTargetIsPlayer(no)} Spell(DEATHSTRIKE)
@@ -108,10 +109,10 @@ AddIcon help=main mastery=1
 AddIcon help=aoe mastery=1
 {
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
-	Spell(RUNESTRIKE usable=1)
 
 	if Runes(unholy 1) Spell(DEATHANDECAY usable=1)
 	
+	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 
@@ -122,10 +123,11 @@ AddIcon help=aoe mastery=1
 		if Runes(blood 1)
 			unless OtherDebuffPresent(BLOODPLAGUE) and OtherDebuffPresent(FROSTFEVER)
 				Spell(PESTILENCE usable=1)
+		Spell(RUNESTRIKE usable=1)
 		if Runes(unholy 1 frost 1) Spell(DEATHSTRIKE)
 		if Runes(blood 1) Spell(HEARTSTRIKE)
 	}
-	
+	Spell(RUNESTRIKE usable=1)
 	if Mana(more 39) Spell(DEATHCOIL usable=1)
 }
 
@@ -133,6 +135,7 @@ AddIcon help=main mastery=2
 {	
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
+	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
 	{
@@ -181,6 +184,7 @@ AddIcon help=main mastery=3
 		if Runes(unholy 1) Spell(SCOURGESTRIKE)
         if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
 	}
+	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
 	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 	

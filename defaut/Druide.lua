@@ -56,7 +56,7 @@ Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
 Define(SWIPEBEAR 779) #bear aoe
 	SpellInfo(SWIPEBEAR cd=6)
 Define(SWIPECAT 62078) #cat aoe
-Define(TRASH 77758) #bear aoe bleed
+Define(THRASH 77758) #bear aoe bleed
 Define(TIGERSFURY 5217) #cat buff
 	SpellInfo(TIGERSFURY cd=30)
 Define(WRATH 5176) #moonkin
@@ -167,7 +167,10 @@ AddIcon help=main mastery=2
 
 		if Mana(more 50) Spell(MAUL)
 		if CheckBoxOn(multi)
+		{
+			Spell(THRASH)
 			Spell(SWIPEBEAR)
+		}
 		Spell(MANGLEBEAR)
 		Spell(LACERATE)		
 	}

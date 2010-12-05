@@ -41,6 +41,7 @@ Define(WINDFURYWEAPON 8232)
 
 #Buff
 Define(MAELSTROMWEAPON 53817)
+Define(UNLEASHWIND 73681)
 
 #Fire
 Define(FIREELEMENTALTOTEM 2894)
@@ -84,6 +85,7 @@ AddIcon help=main mastery=1
 		if ManaPercent(less 90) Spell(THUNDERSTORM)
 	}
 	if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
+	Spell(UNLEASHELEMENTS)
 	if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 	unless TargetDebuffExpires(FLAMESHOCK 1.6 haste=spell mine=1) Spell(LAVABURST)
 	
@@ -101,17 +103,19 @@ AddIcon help=main mastery=2
 		if WeaponEnchantExpires(mainhand 400) Spell(WINDFURYWEAPON)
 		if WeaponEnchantExpires(offhand 400) Spell(FLAMETHONGWEAPON)
 	}
-
+	
 	if CheckBoxOn(aoe)
 	{
 		if TotemExpires(fire) Spell(MAGMATOTEM)
 		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
 		if TotemPresent(fire) Spell(FIRENOVA)
+		Spell(UNLEASHELEMENTS)
 	}
 	
 	if CheckBoxOff(aoe)
 	{
+		Spell(UNLEASHELEMENTS)
 		if TotemExpires(fire) Spell(SEARINGTOTEM)
 		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
