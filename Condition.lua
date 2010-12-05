@@ -774,6 +774,9 @@ Ovale.conditions=
 			return testbool(UnitCastingInfo(target)==spellName or UnitChannelInfo(target) == spellName, condition[1])
 		end
 	end,
+	TargetIsFriend = function(condition)
+		return testbool(UnitIsFriend("player", getTarget(condition.target)), condition[1])
+	end,
 	TargetIsInterruptible = function(condition)
 		local target = getTarget(condition.target)
 		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(target)
