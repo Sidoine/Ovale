@@ -660,6 +660,9 @@ Ovale.conditions=
 		end
 		return maxCD
 	end,
+	SoulShards = function(condition)
+		return compare(Ovale.state.shard, condition[1], condition[2])
+	end,
 	Speed = function(condition)
 		return compare(GetUnitSpeed("player")*100/7, condition[1], condition[2])
 	end,

@@ -1308,6 +1308,14 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 					self.state.holy = 3
 				end
 			end
+			if newSpellInfo.shard then
+				self.state.shard = self.state.shard + newSpellInfo.shard
+				if self.state.shard < 0 then
+					self.state.shard = 0
+				elseif self.state.shard > 3 then
+					self.state.shard = 3
+				end
+			end
 		end
 	end
 	
@@ -1414,6 +1422,7 @@ function Ovale:InitCalculerMeilleureAction()
 	self.attenteFinCast = Ovale.maintenant
 	self.state.combo = GetComboPoints("player")
 	self.state.mana = UnitPower("player")
+	self.state.shard = UnitPower("player", 7)
 	self.state.eclipse = UnitPower("player", 8)
 	self.state.holy = UnitPower("player", 9)
 	if self.className == "DEATHKNIGHT" then
