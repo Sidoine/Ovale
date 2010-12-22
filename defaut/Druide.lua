@@ -94,7 +94,7 @@ AddIcon help=main mastery=1
 	if Speed(more 0)
 	{
 		if BuffPresent(SHOOTINGSTARS) Spell(STARSURGE)
-		if TargetDebuffExpires(INSECTSWARM 10 mine=1) and TargetDeadIn(more 6)
+		if TargetDebuffExpires(INSECTSWARM 4 mine=1) and TargetDeadIn(more 6)
 			Spell(INSECTSWARM)
 		if BuffPresent(ECLIPSESOLAR)
 			Spell(SUNFIRE)

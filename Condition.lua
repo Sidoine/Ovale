@@ -689,9 +689,22 @@ Ovale.conditions=
 		end
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
 	end,
-	TargetDispellableBuffPresent = function(condition)
-		
-		return nil
+	TargetBuffStealable = function(condition)
+		local i = 1
+		local stealable = false
+		local target = getTarget(condition.target)
+		while true do
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable = UnitBuff(target, i)
+			if not name then
+				break
+			end
+			if isStealable then
+				stealable = true
+				break
+			end
+			i = i + 1
+		end
+		return testbool(stealable, condition[1])
 	end,
 	-- Test if a buff is present on the target
 	-- 1 : buff spell id
