@@ -69,6 +69,8 @@ Ovale.counter = {}
 --the spells that the player has casted but that did not reach their target
 --the result is computed by the simulator, allowing to ignore lag or missile travel time
 Ovale.lastSpell = {}
+--the damage of the last spell or dot (by id)
+Ovale.spellDamage = {}
 
 Ovale.buffSpellList =
 {
@@ -133,6 +135,11 @@ Ovale.buffSpellList =
 		34889, --Fire Breath (Dragonhawk)
 		24844 --Lightning Breath (Wind serpent)
 	},
+	magicalcrittaken=
+    {
+        17800, -- Shadow and Flame
+        22959 -- Critical Mass
+    },
 	-- physicaldamagetaken
 	lowerphysicaldamage=
 	{
@@ -502,15 +509,23 @@ local options =
 					name = "List player spells",
 					type = "execute",
 					func = function()
-						local i=1
+						local book=BOOKTYPE_SPELL
 						while true do
-							local skillType, spellId = GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
-							if not spellId then
+							local i=1
+							while true do
+								local skillType, spellId = GetSpellBookItemInfo(i, book)
+								if not spellId then
+									break
+								end
+								local spellName = GetSpellBookItemName(i, book)
+								Ovale:Print(spellName..": "..spellId)
+								i = i + 1
+							end
+							if book == BOOKTYPE_SPELL then
+								book = BOOKTYPE_PET
+							else
 								break
 							end
-							local spellName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
-							Ovale:Print(spellName..": "..spellId)
-							i = i + 1
 						end
 					end					
 				}
@@ -727,9 +742,16 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
 	if sourceName == UnitName("player") then
 		--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
+		
+		if string.find(event, "SPELL_PERIODIC_DAMAGE")==1 or string.find(event, "SPELL_DAMAGE")==1 then
+			local spellId, spellName, spellSchool, amount = select(9, ...)
+			self.spellDamage[spellId] = amount
+		end
+		
 		--Called when a missile reached or missed its target
 		--Update lastSpell accordingly
 		--Do not use SPELL_CAST_SUCCESS because it is sent when the missile has not reached the target
+		
 		if 
 				string.find(event, "SPELL_AURA_APPLIED")==1
 				or string.find(event, "SPELL_DAMAGE")==1 
@@ -1057,8 +1079,8 @@ end
 
 function Ovale:RemplirActionIndex(i)
 	self.shortCut[i] = self:ChercherShortcut(i)
-	local actionText = GetActionText(i);
-	if (actionText) then
+	local actionText = GetActionText(i)
+	if actionText then
 		self.actionMacro[actionText] = i
 	else
 		local type, spellId = GetActionInfo(i);
@@ -1082,17 +1104,25 @@ end
 
 function Ovale:FillSpellList()
 	self.spellList = {}
-	local i=1
+	local book=BOOKTYPE_SPELL
 	while true do
-		local skillType, spellId = GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
-		if not spellId then
+		local i=1
+		while true do
+			local skillType, spellId = GetSpellBookItemInfo(i, book)
+			if not spellId then
+				break
+			end
+			if skillType~="FUTURESPELL" then
+				local spellName = GetSpellBookItemName(i, book)
+				self.spellList[spellId] = spellName
+			end
+			i = i + 1
+		end
+		if book==BOOKTYPE_SPELL then
+			book = BOOKTYPE_PET
+		else
 			break
 		end
-		if skillType~="FUTURESPELL" then
-			local spellName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
-			self.spellList[spellId] = spellName
-		end
-		i = i + 1
 	end
 end
 
@@ -1588,6 +1618,16 @@ function Ovale:GetActionInfo(element)
 		--end
 	elseif (element.func=="Macro") then
 		action = self.actionMacro[element.params[1]]
+		if action then
+			actionTexture = GetActionTexture(action)
+			actionInRange = IsActionInRange(action, target)
+			actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
+			actionUsable = IsUsableAction(action)
+			actionShortcut = self.shortCut[action]
+			actionIsCurrent = IsCurrentAction(action)
+		else
+			Ovale:Log("Unknown macro "..element.params[1])
+		end
 	elseif (element.func=="Item") then
 		local itemId
 		if (type(element.params[1]) == "number") then
@@ -1623,18 +1663,6 @@ function Ovale:GetActionInfo(element)
 		actionUsable = true
 	end
 	
-	--[[if action and not actionTexture then
-		actionTexture = GetActionTexture(action)
-		actionInRange = IsActionInRange(action, target)
-		if not actionCooldownStart then
-			actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
-		end
-		if (actionUsable == nil) then
-			actionUsable = IsUsableAction(action)
-		end
-		actionShortcut = self.shortCut[action]
-		actionIsCurrent = IsCurrentAction(action)				
-	end]]
 	if action then 
 		if actionUsable == nil then
 			actionUsable = IsUsableAction(action)
@@ -1668,8 +1696,16 @@ local function addTime(time1, duration)
 	end
 end
 
+local function isBeforeEqual(time1, time2)
+	return time1 and (not time2 or time1<=time2)
+end
+
 local function isBefore(time1, time2)
 	return time1 and (not time2 or time1<time2)
+end
+
+local function isAfterEqual(time1, time2)
+	return not time1 or (time2 and time1>=time2)
 end
 
 local function isAfter(time1, time2)
@@ -1692,13 +1728,13 @@ function Ovale:CalculerMeilleureAction(element)
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
 			
-			if (not actionTexture) then
+			if not actionTexture then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not found")
 				end
 				return nil
 			end
-			if (element.params.usable==1 and not actionUsable) then
+			if element.params.usable==1 and not actionUsable then
 				if (Ovale.trace) then
 					self:Print("Action "..element.params[1].." not usable")
 				end
@@ -1723,7 +1759,7 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 				return nil
 			end
-			if (actionEnable and actionEnable>0) then
+			if actionEnable and actionEnable>0 then
 				local restant
 				if (not actionCooldownDuration or actionCooldownStart==0) then
 					restant = self.currentTime
@@ -1892,12 +1928,12 @@ function Ovale:CalculerMeilleureAction(element)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
 		local startB, endB, prioriteB, elementB = Ovale:CalculerMeilleureAction(element.b)
 		
-		if isBefore(startA, startB) and isAfter(endA, endB) then
+		if isBeforeEqual(startA, startB) and isAfterEqual(endA, endB) then
 			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
 		end
 		
-		if isAfter(startA, startB) and isBefore(endA, endB) then
+		if isAfterEqual(startA, startB) and isBefore(endA, endB) then
 			if Ovale.trace then Ovale:Print(element.type.." return "..nilstring(endA)..","..nilstring(endB)) end
 			return endA, endB, prioriteB, elementB
 		end

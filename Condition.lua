@@ -503,6 +503,13 @@ Ovale.conditions=
 		buildStunSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(stunSpellList), condition[1])
 	end,
+	LastSpellDamage = function(condition)
+		local spellId = condition[1]
+		if not Ovale.spellDamage[spellId] then
+			return nil
+		end
+		return compare(Ovale.spellDamage[spellId], condition[2], condition[3])
+	end,
 	-- Compare with the player level
 	-- 1 : "less" or "more"
 	-- 2 : the limit

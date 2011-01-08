@@ -42,6 +42,7 @@ Define(SEARINGPAIN 5676)
 Define(SEEDOFCORRUPTION 27243)
 Define(SHADOWBOLT 686)
 	SpellAddTargetDebuff(SHADOWBOLT SHADOWEMBRACE=12)
+	SpellAddTargetDebuff(SHADOWBOLT SHADOWANDFLAMEDEBUFF=30)
 Define(SHADOWBURN 17877)
 Define(SOULFIRE 6353)
 	SpellAddBuff(SOULFIRE IMPROVEDSOULFIREBUFF=15)
@@ -64,10 +65,12 @@ Define(MOLTENCORE 71165)
 Define(EMPOWEREDIMP 47283)
 Define(IMPROVEDSOULFIREBUFF 85383)
 Define(SHADOWTRANCE 17941)
+Define(SHADOWANDFLAMEDEBUFF 17800)
 
 #Talent	
 Define(IMPROVEDSOULFIRE 11197)
-	
+Define(SHADOWANDFLAMETALENT 10936)
+
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse tongues SpellName(CURSETONGUES))
 AddListItem(curse weakness SpellName(CURSEWEAKNESS))
@@ -161,8 +164,9 @@ AddIcon help=main mastery=3
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 3) Spell(IMMOLATE)
 	if 1s after TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
 	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
-	Spell(CHAOSBOLT)
 	if BuffPresent(EMPOWEREDIMP) or BuffPresent(SOULBURN) Spell(SOULFIRE)
+    if TalentPoints(SHADOWANDFLAMETALENT more 0) and TargetDebuffExpires(magicalcrittaken) Spell(SHADOWBOLT)
+	Spell(CHAOSBOLT)
 	Spell(INCINERATE)
 }
 

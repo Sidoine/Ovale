@@ -81,6 +81,7 @@ Define(FROSTFEVER 55095)
 Define(KILLINGMACHINE 51124)
 Define(SHADOWINFUSION 91342)
 Define(SUDDENDOOM 81340)
+Define(RUNICCORRUPTION 51459)
 
 AddCheckBox(horn SpellName(HORNOFWINTER))
 AddCheckBox(scarlet SpellName(SCARLETFEVER) mastery=1 default)
@@ -90,13 +91,13 @@ ScoreSpells(HOWLINGBLAST HEARTSTRIKE BLOODSTRIKE DEATHSTRIKE SCOURGESTRIKE OBLIT
 
 AddIcon help=main mastery=1
 {
-	Spell(DANCINGRUNEWEAPON usable=1)
 
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
 		if Runes(blood 1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
 	Spell(RUNESTRIKE usable=1)
+	Spell(DANCINGRUNEWEAPON usable=1)
 	
 	if Runes(unholy 1 frost 1) and {BuffExpires(BLOODSHIELD) or TargetTargetIsPlayer(no)} Spell(DEATHSTRIKE)
 	if Runes(blood 1) Spell(HEARTSTRIKE)
@@ -171,26 +172,26 @@ AddIcon help=aoe mastery=2
 	}
 }
 
+#Contributed by vitos
 AddIcon help=main mastery=3
 {
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
-	if PetPresent(no) Spell(RAISEDEAD)
-	
-	if TargetDebuffPresent(FROSTFEVER mine=1) and TargetDebuffPresent(BLOODPLAGUE mine=1)
-	{
-		if Runes(unholy 1) and TargetBuffPresent(SHADOWINFUSION stacks=5 target=pet) Spell(DARKTRANSFORMATION)
-		if BuffPresent(SUDDENDOOM mine=1) Spell(DEATHCOIL usable=1)
-		if Mana(more 90) Spell(DEATHCOIL usable=1)
-		if Runes(unholy 1) Spell(SCOURGESTRIKE)
-        if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
-	}
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
-	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
-	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
-	
-	if Mana(more 34) Spell(DEATHCOIL usable=1)
-	
-	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
+	if Runes(unholy 1) and TargetBuffPresent(SHADOWINFUSION stacks=5 target=pet) Spell(DARKTRANSFORMATION)
+	if Runes(blood 2 frost 2 nodeath=1) Spell(FESTERINGSTRIKE)
+	if Runes(death 4) or Runes(unholy 2) Spell(DEATHANDECAY)
+	if Runes(death 4) or Runes(unholy 2) Spell(SCOURGESTRIKE)
+	unless BuffPresent(RUNICCORRUPTION mine=1)
+	{
+		if BuffPresent(SUDDENDOOM mine=1) Spell(DEATHCOIL usable=1)
+		if Mana(more 80) Spell(DEATHCOIL usable=1)
+	}        
+	if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
+	if Runes(unholy 1) Spell(DEATHANDECAY)
+	if Runes(unholy 1) Spell(SCOURGESTRIKE)
+
+	if Mana(more 54) Spell(DEATHCOIL usable=1)
+	Spell(HORNOFWINTER)
 }
 
 AddIcon help=aoe mastery=3
