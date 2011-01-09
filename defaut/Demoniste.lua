@@ -121,7 +121,7 @@ AddIcon help=main mastery=2
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
 	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
-	if BuffPresent(METAMORPHOSIS) Spell(SOULBURN)
+	if BuffPresent(METAMORPHOSIS) Spell(SOULBURN usable=1)
 	if BuffPresent(SOULBURN) Spell(SOULFIRE)
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 4) Spell(IMMOLATE)
 	if TargetDebuffExpires(BANEOFDOOM 5 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
