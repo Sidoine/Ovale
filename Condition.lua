@@ -135,7 +135,7 @@ end
 
 local function getTarget(condition)
 	if (not condition) then
-		return "target"
+		return "player"
 	else
 		return condition
 	end
@@ -179,7 +179,7 @@ end
 local lastEnergyValue = nil
 local lastEnergyTime
 
-local function GetManaTime(mana, withBerserker)
+local function GetManaAndRate(withBerserker)
 	local _,className = UnitClass("player")
 	local current = Ovale.state.mana
 	if current~=lastEnergyValue then
@@ -203,10 +203,16 @@ local function GetManaTime(mana, withBerserker)
 			end
 		end
 	elseif className == "HUNTER" then
-		rate = 4.08 * (100 + Ovale.meleeHaste) /100
+		rate = 4 * (100 + Ovale.meleeHaste) /100
 	else
 		rate = 0
 	end
+	
+	return lastEnergyValue, lastEnergyTime, rate
+end
+
+local function GetManaTime(mana, withBerserker)
+	local lastEnergyValue, lastEnergyTime, rate = GetManaAndRate(withBerserker)
 	
 	if rate > 0 then
 		local limit = math.ceil((mana - lastEnergyValue) / rate + lastEnergyTime)
@@ -276,34 +282,37 @@ local function GetTargetAura(condition, filter, target)
 	end
 end
 
-local lastSaved
-local savedHealth
-local targetGUID
-local lastSPD=0.0001
+local lastSaved = {}
+local savedHealth = {}
+local targetGUID = {}
+local lastSPD = {}
 
-local function getTargetDead()
+local function getTargetDead(target)
 	local second = math.floor(Ovale.maintenant)
-	if targetGUID~=UnitGUID("target") then
-		lastSaved = nil
-		targetGUID = UnitGUID("target")
-		savedHealth = {}
+	if targetGUID[target] ~=UnitGUID(target) then
+		lastSaved[target] = nil
+		targetGUID[target] = UnitGUID(target)
+		savedHealth[target] = {}
 	end
-	local newHealth = UnitHealth("target")
-	if UnitHealthMax("target")==1 then
+	local newHealth = UnitHealth(target)
+	if UnitHealthMax(target)==1 then
 		return Ovale.maintenant + 10000
 	end
-	if second~=lastSaved and targetGUID then
-		lastSaved = second
+	if second~=lastSaved[target] and targetGUID[target] then
+		lastSaved[target] = second
 		local mod10 = second % 10
-		local prevHealth = savedHealth[mod10]
-		savedHealth[mod10] = newHealth
+		local prevHealth = savedHealth[target][mod10]
+		savedHealth[target][mod10] = newHealth
 		if prevHealth and prevHealth>newHealth then
-			lastSPD = 10/(prevHealth-newHealth)
+			lastSPD[target] = 10/(prevHealth-newHealth)
 --			print("dps = " .. (1/lastSPD))
 		end
 	end
+	if not lastSPD[target] then
+		lastSPD[target] = 0.001
+	end
 	-- Rough estimation
-	return Ovale.maintenant + newHealth * lastSPD
+	return Ovale.maintenant + newHealth * lastSPD[target]
 end
 
 Ovale.conditions=
@@ -329,7 +338,7 @@ Ovale.conditions=
 	-- 3 : limit 
 	ArmorSetParts = function(condition)
 		local nombre = 0
-		if (OvaleEquipement.nombre[condition[1]]) then
+		if OvaleEquipement.nombre[condition[1]] then
 			nombre = OvaleEquipement.nombre[condition[1]]
 		end
 		return compare(nombre, condition[2], condition[3])
@@ -354,6 +363,14 @@ Ovale.conditions=
 		end
 		return addTime(ending, -timeBefore)
 	end,
+	buffExpires = function(condition)
+		local start, ending = GetTargetAura(condition, "HELPFUL", getTarget(condition.target))
+		if ending then
+			return ending - start, start, -1
+		else
+			return nil
+		end
+	end,
 	-- Test if a time has elapsed since the last buff gain
 	-- 1 : buff spell id
 	-- 2 : time since the buff gain
@@ -376,9 +393,26 @@ Ovale.conditions=
 	-- 1 : the buff spell id
 	-- stacks : minimum number of stacks
 	BuffPresent = function(condition)
-		local start, ending = GetTargetAura(condition, "HELPFUL", "player")
+		local start, ending = GetTargetAura(condition, "HELPFUL", getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
+	end,
+	BuffStealable = function(condition)
+		local i = 1
+		local stealable = false
+		local target = getTarget(condition.target)
+		while true do
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable = UnitBuff(target, i)
+			if not name then
+				break
+			end
+			if isStealable then
+				stealable = true
+				break
+			end
+			i = i + 1
+		end
+		return testbool(stealable, condition[1])
 	end,
 	Casting = function(condition)
 		if Ovale.currentSpellId == condition[1] then
@@ -393,6 +427,10 @@ Ovale.conditions=
 			Ovale:Print("castTime/1000 = " .. (castTime/1000) .. " " .. condition[2] .. " " .. condition[3])
 		end
 		return compare(castTime/1000, condition[2], condition[3])
+	end,
+	castTime = function(condition)
+		local name, rank, icon, cost, isFunnel, powerType, castTime = Ovale:GetSpellInfoOrNil(condition[1])
+		return castTime/1000, 0, 0
 	end,
 	-- Test if a list of checkboxes is off
 	-- 1,... : the checkboxes names
@@ -414,6 +452,32 @@ Ovale.conditions=
 		end
 		return 0
 	end,
+		Class = function(condition)
+		local loc, noloc = UnitClass(getTarget(condition.target))
+		return testbool(noloc == condition[1], condition[2])
+	end,
+	-- Test the target classification
+	-- 1 : normal, elite, or worldboss
+	Classification = function(condition)
+		local classification
+		local target = getTarget(condition.target)
+		if UnitLevel(target)==-1 then
+			classification = "worldboss"
+		else
+			classification = UnitClassification(target);
+			if (classification == "rareelite") then
+				classification = "elite"
+			elseif (classification == "rare") then
+				classification = "normal"
+			end
+		end
+		
+		if (condition[1]==classification) then
+			return 0
+		else
+			return nil
+		end
+	end,
 	-- Test how many combo points a feral druid or a rogue has
 	-- 1 : "less" or "more"
 	-- 2 : the limit
@@ -424,13 +488,43 @@ Ovale.conditions=
 	Counter = function(condition)
 		return compare(Ovale.counter[condition[1]], condition[2], condition[3])
 	end,
+	CreatureType = function(condition)
+		for _,v in pairs(condition) do
+			if (UnitCreatureType(getTarget(condition.target)) == LBCT[v]) then
+				return 0
+			end
+		end
+		return nil
+	end,
+	DeadIn = function(condition)
+		local deadAt = getTargetDead(getTarget(condition.target))
+		if condition[1] == "more" then
+			return 0, addTime(deadAt, -condition[2])
+		else
+			return addTime(deadAt, -condition[2]), nil
+		end
+	end,
+	-- Test if a debuff will expire on the target after a given time, or if there is less than the
+	-- given number of stacks (if stackable)
+	-- 1 : buff spell id
+	-- 2 : expiration time 
+	-- stacks : how many stacks
+	-- mine : 1 means that if the debuff is not ours, the debuff is ignored
 	DebuffExpires = function(condition)
-		local start, ending = GetTargetAura(condition, "HARMFUL", "player")
+		local start, ending = GetTargetAura(condition, "HARMFUL", getTarget(condition.target))
 		local tempsMax = avecHate(condition[2], condition.haste)
 		return addTime(ending, -tempsMax)
 	end,
+	debuffExpires = function(condition)
+		local start, ending = GetTargetAura(condition, "HARMFUL", getTarget(condition.target))
+		if ending then
+			return ending - start, start, -1
+		else
+			return nil
+		end
+	end,
 	DebuffPresent = function(condition)
-		local start, ending = GetTargetAura(condition, "HARMFUL", "player")
+		local start, ending = GetTargetAura(condition, "HARMFUL", getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
 	end,
@@ -484,16 +578,42 @@ Ovale.conditions=
 	InCombat = function(condition)
 		return testbool(Ovale.enCombat, condition[1])
 	end,
+	TargetInRange = function(condition)
+		local spellName = GetSpellInfo(condition[1])
+		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
+	end,
 	ItemCount = function(condition)
 		return compare(GetItemCount(condition[1]), condition[2], condition[3])
+	end,
+	IsCasting = function(condition)
+		local casting
+		local target = getTarget(condition.target)
+		local spellId = condition.spell
+		if not spellId then
+			return testbool(UnitCastingInfo(target) or UnitChannelInfo(target), condition[1])
+		else
+			local spellName = GetSpellInfo(spellId)
+			return testbool(UnitCastingInfo(target)==spellName or UnitChannelInfo(target) == spellName, condition[1])
+		end
 	end,
 	IsFeared = function(condition)
 		buildFearSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(fearSpellList), condition[1])
 	end,
+	IsFriend = function(condition)
+		return testbool(UnitIsFriend("player", getTarget(condition.target)), condition[1])
+	end,
 	IsIncapacitated = function(condition)
 		buildIncapacitateSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(incapacitateSpellList), condition[1])
+	end,
+	IsInterruptible = function(condition)
+		local target = getTarget(condition.target)
+		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(target)
+		if not spell then
+			spell, rank, name, icon, start, ending, isTradeSkill, protected = UnitChannelInfo(target)
+		end
+		return testbool(protected ~= nil and not protected, condition[1])
 	end,
 	IsRooted = function(condition)
 		buildRootSpellList()
@@ -502,6 +622,19 @@ Ovale.conditions=
 	IsStunned = function(condition)
 		buildStunSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(stunSpellList), condition[1])
+	end,
+	-- Test the target level difference with the player
+	-- 1 : "less" or "more"
+	-- 2 : [target level]-[player level] limit
+	TargetRelativeLevel = function(condition)
+		local difference
+		if (UnitLevel("target") == -1) then
+			difference = 3
+		else
+			difference = UnitLevel("target") - UnitLevel("player")
+		end
+
+		return compare(difference, condition[1], condition[2])
 	end,
 	LastSpellDamage = function(condition)
 		local spellId = condition[1]
@@ -514,13 +647,22 @@ Ovale.conditions=
 	-- 1 : "less" or "more"
 	-- 2 : the limit
 	Level = function(condition)
-		return compare(UnitLevel("player"), condition[1], condition[2])
+		return compare(UnitLevel(getTarget(condition.target)), condition[1], condition[2])
+	end,
+	Life = function(condition)
+		local target = getTarget(condition.target)
+		return compare(UnitHealth(target), condition[1], condition[2])
+	end,
+	LifeMissing = function(condition)
+		local target = getTarget(condition.target)
+		return compare(UnitHealthMax(target)-UnitHealth(target), condition[1], condition[2])
 	end,
 	-- Test if the player life is bellow/above a given value in percent
 	-- 1 : "less" or "more"
 	-- 2 : the limit, in percent
 	LifePercent = function(condition)
-		return compare(UnitHealth("player")/UnitHealthMax("player"), condition[1], condition[2]/100)
+		local target = getTarget(condition.target)
+		return compare(UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2]/100)
 	end,
 	-- Test if a list item is selected
 	-- 1 : the list name
@@ -537,15 +679,28 @@ Ovale.conditions=
 	-- 1 : "less" or "more"
 	-- 2 : the mana/energy/rage... limit
 	Mana = function(condition)
-		local limit = GetManaTime(condition[2], false)
-		if condition[1]=="more" then
-			return limit, nil
+		local target = getTarget(condition.target)
+		if target == "player" then
+			local limit = GetManaTime(condition[2], false)
+			if condition[1]=="more" then
+				return limit, nil
+			else
+				return 0,limit
+			end
 		else
-			return 0,limit
+			return compare(UnitPower(target), condition[1], condition[2])
 		end
+	end,
+	mana = function(condition)
+		return GetManaAndRate(false)
 	end,
 	ManaPercent = function(condition)
 		return compare(UnitPower("player")/UnitPowerMax("player"), condition[1], condition[2]/100)
+	end,
+	manaPercent = function(condition)
+		local value, t, rate = GetManaAndRate(false)
+		local conversion = 100/UnitPowerMax("player")
+		return value * conversion, t, rate * conversion
 	end,
 	OtherDebuffExpires = function(condition)
 		Ovale:EnableOtherDebuffs()
@@ -671,9 +826,13 @@ Ovale.conditions=
 		return compare(Ovale.state.shard, condition[1], condition[2])
 	end,
 	Speed = function(condition)
-		return compare(GetUnitSpeed("player")*100/7, condition[1], condition[2])
+		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
 	end,
-	-- Test if the player is in a given stance
+	spell = function(condition)
+		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(condition[1])
+		return actionCooldownDuration, actionCooldownStart, -1
+	end,
+-- Test if the player is in a given stance
 	-- 1 : the stance
 	Stance = function(condition)
 		if (GetShapeshiftForm(true) == condition[1]) then
@@ -696,157 +855,10 @@ Ovale.conditions=
 		end
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
 	end,
-	TargetBuffStealable = function(condition)
-		local i = 1
-		local stealable = false
-		local target = getTarget(condition.target)
-		while true do
-			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable = UnitBuff(target, i)
-			if not name then
-				break
-			end
-			if isStealable then
-				stealable = true
-				break
-			end
-			i = i + 1
-		end
-		return testbool(stealable, condition[1])
-	end,
-	-- Test if a buff is present on the target
-	-- 1 : buff spell id
-	-- stacks : how many stacks
-	TargetBuffPresent = function(condition)
-		local start, ending = GetTargetAura(condition, "HELPFUL")
-		local tempsMin = avecHate(condition[2], condition.haste)
-		return start, addTime(ending, -tempsMin)
-	end,
-	TargetClass = function(condition)
-		local loc, noloc = UnitClass("target")
-		return testbool(noloc == condition[1], condition[2])
-	end,
-	-- Test the target classification
-	-- 1 : normal, elite, or worldboss
-	TargetClassification = function(condition)
-		local classification
-		if UnitLevel("target")==-1 then
-			classification = "worldboss"
-		else
-			classification = UnitClassification("target");
-			if (classification == "rareelite") then
-				classification = "elite"
-			elseif (classification == "rare") then
-				classification = "normal"
-			end
-		end
-		
-		if (condition[1]==classification) then
-			return 0
-		else
-			return nil
-		end
-	end,
-	TargetCreatureType = function(condition)
-		for _,v in pairs(condition) do
-			if (UnitCreatureType("target") == LBCT[v]) then
-				return 0
-			end
-		end
-		return nil
-	end,
-	TargetDeadIn = function(condition)
-		local deadAt = getTargetDead()
-		if condition[1] == "more" then
-			return 0, addTime(deadAt, -condition[2])
-		else
-			return addTime(deadAt, -condition[2]), nil
-		end
-	end,
-	-- Test if a debuff will expire on the target after a given time, or if there is less than the
-	-- given number of stacks (if stackable)
-	-- 1 : buff spell id
-	-- 2 : expiration time 
-	-- stacks : how many stacks
-	-- mine : 1 means that if the debuff is not ours, the debuff is ignored
-	TargetDebuffExpires = function(condition)
-		local start, ending = GetTargetAura(condition, "HARMFUL")
-		local tempsMax = avecHate(condition[2], condition.haste)
-		return addTime(ending, -tempsMax)
-	end,
-	-- Test if a debuff is present on the target
-	-- 1 : debuff spell id
-	-- stacks : how many stacks
-	-- mine : 1 means that the debuff must be yours
-	TargetDebuffPresent = function(condition)
-		local start, ending = GetTargetAura(condition, "HARMFUL")
-		local tempsMin = avecHate(condition[2], condition.haste)
-		return start, addTime(ending, -tempsMin)
-	end,
-	TargetInRange = function(condition)
-		local spellName = GetSpellInfo(condition[1])
-		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
-	end,
-	TargetIsCasting = function(condition)
-		local casting
-		local target = getTarget(condition.target)
-		local spellId = condition.spell
-		if not spellId then
-			return testbool(UnitCastingInfo(target) or UnitChannelInfo(target), condition[1])
-		else
-			local spellName = GetSpellInfo(spellId)
-			return testbool(UnitCastingInfo(target)==spellName or UnitChannelInfo(target) == spellName, condition[1])
-		end
-	end,
-	TargetIsFriend = function(condition)
-		return testbool(UnitIsFriend("player", getTarget(condition.target)), condition[1])
-	end,
-	TargetIsInterruptible = function(condition)
-		local target = getTarget(condition.target)
-		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(target)
-		if not spell then
-			spell, rank, name, icon, start, ending, isTradeSkill, protected = UnitChannelInfo(target)
-		end
-		return testbool(protected ~= nil and not protected, condition[1])
-	end,
-	TargetLife = function(condition)
-		local target = getTarget(condition.target)
-		return compare(UnitHealth(target), condition[1], condition[2])
-	end,
-	TargetLifeMissing = function(condition)
-		local target = getTarget(condition.target)
-		return compare(UnitHealthMax(target)-UnitHealth(target), condition[1], condition[2])
-	end,
-	-- Test if the target life is bellow/above a given value in percent
-	-- 1 : "less" or "more"
-	-- 2 : the limit, in percents
-	TargetLifePercent = function(condition)
-		local target = getTarget(condition.target)
-		return compare(UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2]/100)
-	end,
-	TargetMana = function(condition)
-		local target = getTarget(condition.target)
-		return compare(UnitPower(target), condition[1], condition[2])
-	end,
-	-- Test the target level difference with the player
-	-- 1 : "less" or "more"
-	-- 2 : [target level]-[player level] limit
-	TargetRelativeLevel = function(condition)
-		local difference
-		if (UnitLevel("target") == -1) then
-			difference = 3
-		else
-			difference = UnitLevel("target") - UnitLevel("player")
-		end
-
-		return compare(difference, condition[1], condition[2])
-	end,
-	TargetSpeed = function(condition)
-		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
-	end,
 	-- Test if the target's target is the player (or is not)
 	-- 1 : "yes" (it should be the player) or "no"
-	TargetTargetIsPlayer = function(condition)
-		return testbool(UnitIsUnit("player","targettarget"), condition[1])
+	TargetIsPlayer = function(condition)
+		return testbool(UnitIsUnit("player",getTarget(condition.target).."target"), condition[1])
 	end,
 	Threat = function(condition)
 		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
@@ -860,6 +872,9 @@ Ovale.conditions=
 		else
 			return 0, Ovale.combatStartTime + condition[2]
 		end
+	end,
+	timeToDie = function(condition)
+		return 0, getTargetDead(getTarget(condition.target)), -1
 	end,
 	TotemExpires = function(condition)
 		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])

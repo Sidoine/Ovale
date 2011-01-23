@@ -39,8 +39,21 @@ local function ParseTime(value)
 	return AddNode({type="time", value=tonumber(value)})
 end
 
-local function ParseFunction(func, params)
+local function ParseNumber(dummy, value)
+	return dummy..AddNode({type="time", value=tonumber(value)})
+end
+
+local function ParseFunction(prefix, func, params)
 	local paramList = ParseParameters(params)
+	if func ~= "" then
+		paramList.target = prefix
+	else
+		func = prefix
+	end
+	if string.find(func, "Target") == 1 then
+		paramList.target = "target"
+		func = string.sub(func, 7)
+	end
 	local newNode = { type="function", func=func, params=paramList}
 	return AddNode(newNode)
 end
@@ -186,6 +199,11 @@ local function ParseOr(a,b)
 	return AddNode(newNode)
 end
 
+local function ParseOp(a, op, b)
+	local newNode = {type="operator", operator=op, a=node[tonumber(a)], b=node[tonumber(b)]}
+	return AddNode(newNode)
+end
+
 local function ParseCompare(comp,t,a)
 	local newNode = {type="compare", comparison=comp, time=node[tonumber(t)], a=node[tonumber(a)]}
 	return AddNode(newNode)
@@ -264,7 +282,7 @@ local function ParseAddIcon(params, text)
 	local original = text
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "(%w+)%s*%((.-)%)", ParseFunction)
+		text = string.gsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
 		text = string.gsub(text, "(%d+%.?%d*)s", ParseTime)
 		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
@@ -274,7 +292,7 @@ local function ParseAddIcon(params, text)
 		text = string.gsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
 		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
 		text = string.gsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
-		
+		text = string.gsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
 		if (was == text) then
 			break
 		end
@@ -282,6 +300,7 @@ local function ParseAddIcon(params, text)
 
 	while (1==1) do
 		local was = text
+		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/%>%<])%s*node(%d+)", ParseOp)
 		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)

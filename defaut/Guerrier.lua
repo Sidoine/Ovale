@@ -26,6 +26,7 @@ Define(DEMOSHOUT 1160)
 Define(DEVASTATE 20243)
 	SpellAddTargetDebuff(DEVASTATE SUNDERARMORDEBUFF=30)
 Define(EXECUTE 5308)
+	SpellAddBuff(EXECUTE EXECUTIONER=9)
 Define(HEROICLEAP 6544)
 Define(HEROICSTRIKE 78)
 	SpellInfo(HEROICSTRIKE cd=3)
@@ -69,11 +70,14 @@ Define(WHIRLWIND 1680)
 
 #Buffs
 Define(BLOODSURGE 46916)
-Define(TASTEFORBLOOD 56636)
+Define(TASTEFORBLOOD 60503)
 Define(ENRAGE 14202)
 Define(EXECUTIONER 90806)
 Define(SUNDERARMORDEBUFF 58567)
 Define(RENDDEBUFF 94009)
+Define(INCITE 86627)
+Define(BATTLETRANCE 12964)
+Define(SLAUGHTER 84584)
 
 #Talents
 Define(SLAMTALENT 2233)
@@ -97,13 +101,22 @@ AddIcon help=main mastery=1
 	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 
 	if Mana(less 20) Spell(DEADLYCALM)
+	if CheckBoxOn(multi)
+	{
+		Spell(SWEEPINGSTRIKES)
+		if BuffExpires(SWEEPINGSTRIKES) and BuffExpires(DEADLYCALM) Spell(BLADESTORM)
+		Spell(CLEAVE)
+	}
+	if BuffExpires(TASTEFORBLOOD 1.5) Spell(OVERPOWER)
 	if TargetDebuffExpires(RENDDEBUFF) Spell(REND)
-	if CheckBoxOn(multi) Spell(BLADESTORM)
 	Spell(COLOSSUSSMASH)
 	Spell(MORTALSTRIKE)
-	Spell(OVERPOWER usable=1)
+	#overpower,if=!buff.lambs_to_the_slaughter.up&rage>35&target.health_pct<20
+	if BuffExpires(SLAUGHTER 0) and Mana(more 35) and TargetLifePercent(less 20)
+		Spell(OVERPOWER)
     if TargetLifePercent(less 20) Spell(EXECUTE)
-	Spell(SLAM)
+	Spell(OVERPOWER)
+	unless 1.5s before Spell(MORTALSTRIKE) Spell(SLAM)
 }
 
 AddIcon help=main mastery=2
@@ -113,16 +126,19 @@ AddIcon help=main mastery=2
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
 	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 	
+	if BuffExpires(EXECUTIONER 1.5 stacks=5) and TargetLifePercent(less 20) Spell(EXECUTE)
+	
 	if CheckBoxOn(multi) Spell(WHIRLWIND)
 	Spell(COLOSSUSSMASH)
-    if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 0 stacks=5) Spell(EXECUTE)
-	Spell(RAGINGBLOW usable=1)
-    if TargetLifePercent(less 20) Spell(EXECUTE) #Just spam execute
-	Spell(BLOODTHIRST)
+	if TargetDebuffPresent(COLOSSUSSMASH mine=1) and TargetLifePercent(less 20) Spell(EXECUTE)
+	if BuffExpires(DEATHWISH 0) and BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
+		1s before Spell(RAGINGBLOW) Spell(BERSERKERRAGE)
+	if {BuffPresent(DEATHWISH) or BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)}
+		and TargetLifePercent(more 20) Spell(RAGINGBLOW)
+	
+    Spell(BLOODTHIRST)
 	Spell(VICTORYRUSH usable=1)
-	#if TargetLifePercent(less 20) and BuffExpires(EXECUTIONER 3) Spell(EXECUTE)
 	if BuffPresent(BLOODSURGE) Spell(SLAM)
-    if BuffExpires(DEATHWISH) and BuffExpires(RECKLESSNESS) and BuffExpires(ENRAGE) Spell(BERSERKERRAGE)
 }
 
 
@@ -145,10 +161,27 @@ AddIcon help=main mastery=3
 	Spell(DEVASTATE)
 }
 
-AddIcon help=offgcd
+AddIcon help=offgcd mastery=1
 {
-	if Mana(more 60) and CheckBoxOn(multi) Spell(CLEAVE)
-	if Mana(more 60) and CheckBoxOff(multi) Spell(HEROICSTRIKE)
+	if target.IsInterruptible() Spell(PUMMEL)
+	if CheckBoxOn(multi) Spell(CLEAVE) 
+	if Mana(more 65) or BuffPresent(DEADLYCALM) or BuffPresent(INCITE) or BuffPresent(BATTLETRANCE)
+		Spell(HEROICSTRIKE)
+}
+
+AddIcon help=offgcd mastery=2
+{
+	if target.IsInterruptible() Spell(PUMMEL)
+	if CheckBoxOn(multi) Spell(CLEAVE) 
+	if {Mana(more 60) or BuffPresent(BATTLETRANCE) or BuffPresent(INCITE)} and TargetLifePercent(more 20)
+		Spell(HEROICSTRIKE)
+}
+
+AddIcon help=offgcd mastery=3
+{
+	if target.IsInterruptible() Spell(SHIELDBASH)
+	if CheckBoxOn(multi) Spell(CLEAVE)
+	if Mana(more 60) Spell(HEROICSTRIKE)
 }
 
 AddIcon help=cd mastery=1

@@ -59,6 +59,7 @@ Define(SWIPECAT 62078) #cat aoe
 Define(THRASH 77758) #bear aoe bleed
 Define(TIGERSFURY 5217) #cat buff
 	SpellInfo(TIGERSFURY cd=30)
+Define(TYPHOON 50516)
 Define(WRATH 5176) #moonkin
 	SpellInfo(WRATH eclipse=-13)
 
@@ -72,6 +73,7 @@ Define(ECLIPSESOLAR 48517) #Increased by starfire
 Define(SHOOTINGSTARS 93400)
 Define(STAMPEDE 81022)
 Define(FAERIEFIREDEBUFF 91565)
+Define(STRENGTHOFTHEPANTHER 90166) #feral T11 4-pieces bonus
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
@@ -88,11 +90,12 @@ ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP
 AddIcon help=main mastery=1
 {
 	#Contributed by Grabielz
-	if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2) and TargetDeadIn(more 15)
+	if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 3 mine=1 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDeadIn(more 15)
 		Spell(FAERIEFIRE nored=1)
 
 	if Speed(more 0)
 	{
+		Spell(TYPHOON)
 		if BuffPresent(SHOOTINGSTARS) Spell(STARSURGE)
 		if TargetDebuffExpires(INSECTSWARM 4 mine=1) and TargetDeadIn(more 6)
 			Spell(INSECTSWARM)
@@ -101,6 +104,12 @@ AddIcon help=main mastery=1
 		Spell(MOONFIRE)
 	}
 
+	if TargetDebuffExpires(MOONFIRE 1 mine=1) and TargetDebuffExpires(SUNFIRE 1 mine=1) and TargetDeadIn(more 6)
+	{
+		if BuffPresent(ECLIPSESOLAR)
+			Spell(SUNFIRE nored=1)
+		Spell(MOONFIRE nored=1)
+	}
 	
 	if TargetDebuffExpires(INSECTSWARM 1 mine=1) and TargetDeadIn(more 6)
 		Spell(INSECTSWARM nored=1)  
@@ -108,13 +117,6 @@ AddIcon help=main mastery=1
 	if TargetDebuffExpires(INSECTSWARM 3 mine=1) and TargetDeadIn(more 6) and BuffPresent(ECLIPSESOLAR) and Eclipse(less 16)
 		Spell(INSECTSWARM nored=1)  
 		
-	if TargetDebuffExpires(MOONFIRE 1 mine=1) and TargetDebuffExpires(SUNFIRE 1 mine=1) and TargetDeadIn(more 6)
-	{
-		if BuffPresent(ECLIPSESOLAR)
-			Spell(SUNFIRE nored=1)
-		Spell(MOONFIRE nored=1)
-	}
-
 	Spell(STARSURGE)
 	
 	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100)
@@ -177,59 +179,88 @@ AddIcon help=main mastery=2
 
 	if Stance(3) # cat
 	{
-		if BuffPresent(STAMPEDE) Spell(RAVAGE)
+		#tigers_fury,if=energy<=26
+		if Mana(less 27) Spell(TIGERSFURY)
+	
+		#mangle_cat,if=set_bonus.tier11_4pc_melee&(buff.t11_4pc_melee.stack<3|buff.t11_4pc_melee.remains<3)
+		if ArmorSetParts(T11 more 3) and BuffExpires(STRENGTHOFTHEPANTHER 3 stacks=3) Spell(MANGLECAT)
 		
+		#faerie_fire_feral,if=debuff.faerie_fire.stack<3|!(debuff.sunder_armor.up|debuff.expose_armor.up)
 		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDebuffExpires(FAERIEFIREDEBUFF 3 stacks=3) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
-
-		#De-synchronize Roar and Rip if are both present but will expire with less than 6 seconds between
-		#TODO: don't work correctly, I think
-		#if ComboPoints(more 2) and BuffPresent(SAVAGEROAR 6) and TargetDebuffPresent(RIP 6 mine=1) and 
-		#		less than 6s between BuffExpires(SAVAGEROAR) and TargetDebuffExpires(RIP mine=1 forceduration=22) 
-		#{
-		#	Spell(RIP)
-		#}
-
-		#Extends Rip with shred if glyph
-		if Glyph(GLYPHOFSHRED) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and Counter(ripshreds less 3) Spell(SHRED)
-
-		#Enter fury before applying rip
 		
-		if ComboPoints(more 4)
-		{
-			if TargetDeadIn(less 7) Spell(FEROCIOUSBITE priority=4)
-			#Rip has priority over Savage Roar
-			if BuffExpires(BERSERK 0) and TargetDebuffExpires(RIP 1 mine=1) Spell(TIGERSFURY)
-			if TargetDebuffExpires(RIP 0 mine=1) Spell(RIP)
-			if BuffExpires(SAVAGEROAR 2) Spell(SAVAGEROAR)
-			#If both are already present for at least 6 seconds, try Ferocious bite
-			if {TargetDebuffPresent(RIP 10 mine=1) and BuffPresent(SAVAGEROAR 6)} or TargetLifePercent(less 25)
-			{
-				#if BuffExpires(BERSERK 0) or {BuffPresent(BERSERK) and Mana(less 20)} I don't know what is the point of this
-				Spell(FEROCIOUSBITE)
-			}
-		}
-		
+		#mangle_cat,if=debuff.mangle.remains<=2&(!debuff.mangle.up|debuff.mangle.remains>=0.0)
 		if TargetDebuffExpires(bleed 0) and CheckBoxOn(mangle)
 			Spell(MANGLECAT)
-		if TargetDebuffExpires(RAKE 0 mine=1) and TargetDeadIn(more 10)
+			
+		#ravage,if=buff.stampede_cat.up&buff.stampede_cat.remains<=1
+		if BuffPresent(STAMPEDE) and BuffExpires(STAMPEDE 1) Spell(RAVAGE)
+		
+		#berserk,if=time_to_max_energy>=2.0&!buff.tigers_fury.up&cooldown.tigers_fury.remains>15
+		if 2s before Mana(more 99) and BuffExpires(TIGERSFURY) and 15s before Spell(TIGERSFURY) Spell(BERSERK)
+		
+		#ferocious_bite,if=buff.combo_points.stack>=1&dot.rip.ticking&dot.rip.remains<=1&target.health_pct<=25
+		if ComboPoints(more 0) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 1 mine=1) and TargetLifePercent(less 25)
+			Spell(FEROCIOUSBITE)
+		
+		#ferocious_bite,if=buff.combo_points.stack>=5&dot.rip.ticking&target.health_pct<=25
+		if ComboPoints(more 4) and TargetDebuffPresent(RIP mine=1) and TargetLifePercent(less 25)
+			Spell(FEROCIOUSBITE)
+		
+		#rip,if=buff.combo_points.stack>=5&target.time_to_die>=6&dot.rip.remains<2.0&(buff.berserk.up|dot.rip.remains<=cooldown.tigers_fury.remains)
+		if ComboPoints(more 4) and TargetDeadIn(more 6) and TargetDebuffExpires(RIP 2 mine=1) and 
+				{BuffPresent(BERSERK) or {target.debuffExpires(RIP mine=1)<spell(TIGERSFURY)}}
+			Spell(RIP)
+			
+		#rake,if=target.time_to_die>=8.5&buff.tigers_fury.up&dot.rake.remains<9.0&(!dot.rake.ticking|dot.rake.multiplier<multiplier)
+		#not sure what this multiplier is
+		if TargetDeadIn(more 8.5) and BuffPresent(TIGERSFURY) and TargetDebuffExpires(RAKE 0 mine=1)
 			Spell(RAKE)
-	
-		if CheckBoxOn(shred)
-		{
-			if Mana(more 69) Spell(SHRED priority=2)
-			if BuffPresent(CLEARCASTING) or TargetDeadIn(less 10) or BuffPresent(BERSERK) 
-					Spell(SHRED)
-			if ComboPoints(less 5) and TargetDebuffExpires(RIP 3 mine=1) Spell(SHRED)
-			#if ComboPoints(less 1) and BuffExpires(SAVAGEROAR 2) Spell(SHRED) no longer necessary, savage roar upkeeping is less important
-		}
-		if CheckBoxOff(shred) Spell(CLAW)
+		#rake,if=target.time_to_die>=dot.rake.remains&dot.rake.remains<3.0&(buff.berserk.up|energy>=71|(cooldown.tigers_fury.remains+0.8)>=dot.rake.remains)
+		if {target.timeToDie()>target.debuffExpires(RAKE mine=1)} and TargetDebuffExpires(RAKE 3 mine=1) and {BuffPresent(BERSERK) or Mana(more 70) or
+				{{spell(TIGERSFURY)+0.8}>target.debuffExpires(RAKE mine=1)}}
+			Spell(RAKE)
+		
+		#shred,if=buff.omen_of_clarity.react
+		if BuffPresent(CLEARCASTING) Spell(SHRED)
+		
+		#savage_roar,if=buff.combo_points.stack>=1&buff.savage_roar.remains<=1
+		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 1) Spell(SAVAGEROAR)
+		
+		#savage_roar,if=target.time_to_die>=9&buff.combo_points.stack>=5&dot.rip.ticking&dot.rip.remains<=12&@(dot.rip.remains-buff.savage_roar.remains)<=3
+		if TargetDeadIn(more 9) and ComboPoints(more 4) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 12 mine=1)
+				and {{target.debuffExpires(RIP mine=1) - buffExpires(SAVAGEROAR)}<3}
+			Spell(SAVAGEROAR)
+		
+		#ferocious_bite,if=(target.time_to_die<=4&buff.combo_points.stack>=5)|target.time_to_die<=1
+		if {TargetDeadIn(less 4) and ComboPoints(more 4)} or TargetDeadIn(less 1) Spell(FEROCIOUSBITE)
+		#ferocious_bite,if=level>80&buff.combo_points.stack>=5&dot.rip.remains>=14.0&buff.savage_roar.remains>=10.0
+		if ComboPoints(more 4) and TargetDebuffPresent(RIP 14 mine=1) and BuffPresent(SAVAGEROAR 10) Spell(FEROCIOUSBITE)
+		#shred,extend_rip=1,if=dot.rip.ticking&dot.rip.remains<=4&target.health_pct>25
+		if Glyph(GLYPHOFSHRED) and Counter(ripshreds less 3) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and TargetLifePercent(more 25) Spell(SHRED)
+
+		#ravage,if=buff.stampede_cat.up&!buff.omen_of_clarity.react&buff.tigers_fury.up
+		if BuffPresent(STAMPEDE) and BuffExpires(CLEARCASTING) and BuffPresent(TIGERSFURY) Spell(RAVAGE)
+		#mangle_cat,if=set_bonus.tier11_4pc_melee&buff.t11_4pc_melee.stack<3
+		if ArmorSetParts(T11 more 3) and BuffExpires(STRENGTHOFTHEPANTHER 0 stacks=3) Spell(MANGLECAT)
+		
+		#shred,if=buff.combo_points.stack<=4&dot.rake.remains>3.0&dot.rip.remains>3.0&(time_to_max_energy<=2.0|(buff.berserk.up&energy>=20))
+		if ComboPoints(less 5) and TargetDebuffPresent(RAKE 3 mine=1) and TargetDebuffPresent(RIP 3 mine=1) and {2s before Mana(more 99) or {BuffPresent(BERSERK) and Mana(more 20)}}
+			Spell(SHRED)
+		#shred,if=cooldown.tigers_fury.remains<=3.0
+		if 3s before Spell(TIGERSFURY) Spell(SHRED)
+		#shred,if=target.time_to_die<=dot.rake.duration
+		if target.timeToDie()<target.debuffExpires(RAKE mine=1) Spell(SHRED)
+		#shred,if=buff.combo_points.stack=0&(buff.savage_roar.remains<=2.0|dot.rake.remains>=5.0)
+		if ComboPoints(less 1) and {BuffExpires(SAVAGEROAR 2) or TargetDebuffPresent(RAKE 5 mine=1)} Spell(SHRED)
+		#shred,if=!dot.rip.ticking|time_to_max_energy<=1.0
+		if TargetDebuffExpires(RIP 0 mine=1) or 1s before Mana(more 99) Spell(SHRED)
 	}
 }
 
 AddIcon help=cd mastery=2
 {
-	unless BuffPresent(TIGERSFURY) Spell(BERSERK)
+	#unless BuffPresent(TIGERSFURY) Spell(BERSERK)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

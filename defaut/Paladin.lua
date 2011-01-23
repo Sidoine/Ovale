@@ -16,6 +16,7 @@ Define(DIVINEPROTECTION 498)
 Define(DIVINESTORM 53385)
 Define(EXORCISM 879)
 	SpellAddBuff(EXORCISM THEARTOFWAR=0)
+Define(GUARDIANOFANCIENTKINGS 86150)
 Define(HAMMEROFWRATH 24275)
 	SpellInfo(HAMMEROFWRATH cd=6)
 Define(HAMMEROFTHERIGHTEOUS 53595)
@@ -57,6 +58,7 @@ AddIcon help=main mastery=1
 
 AddIcon help=cd mastery=1
 {
+	Spell(GUARDIANOFANCIENTKINGS)
 	Spell(AVENGINGWRATH)
 	Spell(DIVINEFAVOR)
 	Item(Trinket0Slot usable=1)
@@ -88,6 +90,7 @@ AddIcon help=main mastery=2
 
 AddIcon help=cd mastery=2
 {
+	Spell(GUARDIANOFANCIENTKINGS)
 	Spell(AVENGINGWRATH)
 	Spell(DIVINEPROTECTION)
     Item(Trinket0Slot usable=1)
@@ -101,27 +104,43 @@ AddIcon help=main mastery=3
 		if BuffExpires(SEALRIGHTEOUSNESS 400) and BuffExpires(SEALOFTRUTH 400) Spell(SEALOFTRUTH)
 	}
     
-	if HolyPower(more 2) and BuffExpires(HANDOFLIGHT) and TargetDeadIn(more 20) Spell(ZEALOTRY)
-    if {HolyPower(more 0) or BuffPresent(HANDOFLIGHT)} and BuffExpires(INQUISITION) Spell(INQUISITION)
-	if  HolyPower(more 2) or BuffPresent(HANDOFLIGHT)
+	#judgement,if=buff.judgements_of_the_pure.down
+	if BuffExpires(JUDGEMENTSOFTHEPURE 0) Spell(JUDGEMENT)
+	#inquisition,if=(buff.inquisition.down|buff.inquisition.remains<5)&(buff.holy_power.react==3|buff.hand_of_light.react)
+	if BuffExpires(INQUISITION 5) and {HolyPower(equal 3) or BuffPresent(HANDOFLIGHT)} Spell(INQUISITION)
+	#exorcism,if=buff.the_art_of_war.react
+	if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
+	#hammer_of_wrath
+	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
+	#templars_verdict,if=buff.holy_power.react==3
+	if HolyPower(more 2) {if CheckBoxOn(aoe) Spell(DIVINESTORM) Spell(TEMPLARSVERDICT)}
+	#crusader_strike,if=buff.hand_of_light.react&(buff.hand_of_light.remains>2)&(buff.holy_power.react<3)
+	if BuffPresent(HANDOFLIGHT 3) and HolyPower(less 3) Spell(CRUSADERSTRIKE)
+	#templars_verdict,if=buff.hand_of_light.react
+	if BuffPresent(HANDOFLIGHT) {if CheckBoxOn(aoe) Spell(DIVINESTORM) Spell(TEMPLARSVERDICT)}
+	#crusader_strike
+	Spell(CRUSADERSTRIKE)
+	#judgement,if=buff.judgements_of_the_pure.remains<2
+	if BuffExpires(JUDGEMENTSOFTHEPURE 2) Spell(JUDGEMENT)
+	#wait,sec=0.1,if=cooldown.crusader_strike.remains<0.75
+	unless 0.75 before Spell(CRUSADERSTRIKE)
 	{
-		if CheckBoxOff(aoe)  Spell(TEMPLARSVERDICT)
-		if CheckBoxOn(aoe) Spell(DIVINESTORM)
+		#judgement
+		Spell(JUDGEMENT)
+		#holy_wrath
+		Spell(HOLYWRATH)
+		#consecration
+		if CheckBoxOn(aoe) Spell(CONSECRATE)
+		#divine_plea
+		Spell(DIVINEPLEA)
 	}
-    Spell(CRUSADERSTRIKE)
-    unless 0.5s before Spell(CRUSADERSTRIKE)
-	{
-   		if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
-   		if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
-   		Spell(JUDGEMENT)   
-   		Spell(HOLYWRATH)
-	}
-    if CheckBoxOn(aoe) Spell(CONSECRATE)
 }
 
 AddIcon help=cd mastery=3
 {
-	Spell(AVENGINGWRATH)
+	Spell(GUARDIANOFANCIENTKINGS)
+	if BuffExpires(ZEALOTRY)
+		Spell(AVENGINGWRATH)
     Item(Trinket0Slot usable=1)
     Item(Trinket1Slot usable=1)
 }

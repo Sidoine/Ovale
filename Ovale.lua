@@ -1814,7 +1814,7 @@ function Ovale:CalculerMeilleureAction(element)
 				self:Print("Function "..element.func.." not found")
 				return nil
 			end
-			local start, ending = classe(element.params)
+			local start, ending, rate = classe(element.params)
 			
 			if (Ovale.trace) then
 				local parameterList = element.func.."("
@@ -1824,10 +1824,10 @@ function Ovale:CalculerMeilleureAction(element)
 				self:Print("Function "..parameterList..") returned "..nilstring(start)..","..nilstring(ending))
 			end
 			
-			return start, ending
+			return start, ending, rate
 		end
 	elseif element.type == "time" then
-		return element.value
+		return element.value, 0, 0
 	elseif element.type == "after" then
 		local timeA = Ovale:CalculerMeilleureAction(element.time)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
@@ -1974,6 +1974,83 @@ function Ovale:CalculerMeilleureAction(element)
 			endB = endA
 		end
 		return startB, endB
+	elseif element.type == "operator" then
+		local a,b,c = self:CalculerMeilleureAction(element.a)
+		local x,y,z = self:CalculerMeilleureAction(element.b)
+
+		if not a or not x then
+			self:Log("operator: a or x is nil")
+			return nil
+		end
+		
+		self:Log(a.."+(t-"..b..")*"..c.. element.operator..x.."+(t-"..y..")*"..z)
+		
+		if element.operator == "*" then
+			if c == 0 then
+				return a*x, y, a*z
+			elseif z == 0 then
+				return x*a, b, x*c
+			else
+				self:Print("ERROR: at least one value must be constant when multiplying")
+				self.bug = true
+			end
+		elseif element.operator == "+" then
+			if c+z == 0 then
+				return a+x, 0, 0
+			else
+				return a+x, (b*c+y*z)/(c+z), c+z
+			end
+		elseif element.operator == '-' then
+			if c-z == 0 then
+				return a-x, 0, 0
+			else
+				return a-x, (b*c-y*z)/(c-z), c-z
+			end
+		elseif element.operator == '/' then
+			if z == 0 then
+				return a/x, b, c/x
+			else
+				self:Print("ERROR: second operator of / must be constant")
+				self.bug = true
+			end
+		elseif element.operator == '<' then
+			-- a + (t-b)*c = x + (t-y)*z
+			-- (t-b)*c - (t-y)*z = x - a
+			-- t*c - b*c - t*z + y*z = x - a
+			-- t*(c-z) = x - a + b*c + y*z
+			-- t = (x-a + b*c + y*z)/(c-z)
+			if c == z then
+				if a-b*c < x-y*z then
+					return 0
+				else
+					return nil
+				end
+			else
+				local t = (x-a + b*c + y*z)/(c-z)
+				if c > z then
+					return 0, t
+				else
+					return t, nil
+				end
+			end
+		elseif element.operator == '>' then
+			if c == z then
+				self:Log("> with c==z")
+				if a-b*c > x-y*z then
+					self:Log("a>x")
+					return 0
+				else
+					return nil
+				end
+			else
+				local t = (x-a + b*c + y*z)/(c-z)
+				if c < z then
+					return 0, t
+				else
+					return t, nil
+				end
+			end
+		end
 	elseif (element.type == "group") then
 		local meilleurTempsFils
 		local bestEnd

@@ -136,25 +136,30 @@ AddIcon help=main mastery=2
 {	
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
-	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
-	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
-	if TargetDebuffExpires(FROSTFEVER 0 mine=1) and Runes(frost 1)
+	Spell(PILLAROFFROST)
+	if BuffPresent(FREEZINGFOG) Spell(HOWLINGBLAST)
+	
+	if TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and TargetDebuffExpires(FROSTFEVER 2 mine=1) Spell(OUTBREAK)
+	if TargetDebuffExpires(FROSTFEVER 2 mine=1) and Runes(frost 1)
 	{
 		if Glyph(GLYPHHOWLINGBLAST) Spell(HOWLINGBLAST)
 		unless Glyph(GLYPHHOWLINGBLAST) Spell(ICYTOUCH)
 	}
 	
+	if PetPresent(no) Spell(RAISEDEAD priority=2)
+	
+	if TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
+	
 	if Runes(unholy 2 frost 2 nodeath=1) or Runes(death 2) Spell(OBLITERATE)
 	if BuffPresent(KILLINGMACHINE) and Runes(unholy 1 frost 1) Spell(OBLITERATE)
-	if Runes(blood 2) Spell(BLOODSTRIKE)
 	Spell(FROSTSTRIKE usable=1)
-	if BuffPresent(FREEZINGFOG) Spell(HOWLINGBLAST)
+	if Runes(blood 2) Spell(BLOODSTRIKE)
 	if Runes(unholy 1 frost 1) Spell(OBLITERATE)
 	if Runes(blood 1) Spell(BLOODSTRIKE)
 		
-	if PetPresent(no) Spell(RAISEDEAD priority=2)
-	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 	unless Runes(frost 1 unholy 1) Spell(BLOODTAP priority=2)
+	Spell(EMPOWERRUNEWEAPON priority=2)
+	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 }
 
 AddIcon help=aoe mastery=2
@@ -176,21 +181,24 @@ AddIcon help=aoe mastery=2
 AddIcon help=main mastery=3
 {
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
-	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
+	#if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
+	if TargetDebuffExpires(BLOODPLAGUE 3 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
+	if TargetDebuffExpires(FROSTFEVER 3 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
 	if Runes(unholy 1) and TargetBuffPresent(SHADOWINFUSION stacks=5 target=pet) Spell(DARKTRANSFORMATION)
-	if Runes(blood 2 frost 2 nodeath=1) Spell(FESTERINGSTRIKE)
-	if Runes(death 4) or Runes(unholy 2) Spell(DEATHANDECAY)
 	if Runes(death 4) or Runes(unholy 2) Spell(SCOURGESTRIKE)
+	if Runes(blood 2 frost 2 nodeath=1) Spell(FESTERINGSTRIKE)
+#	if Runes(death 4) or Runes(unholy 2) Spell(DEATHANDECAY)
 	unless BuffPresent(RUNICCORRUPTION mine=1)
 	{
 		if BuffPresent(SUDDENDOOM mine=1) Spell(DEATHCOIL usable=1)
-		if Mana(more 80) Spell(DEATHCOIL usable=1)
+		if Mana(more 90) Spell(DEATHCOIL usable=1)
 	}        
-	if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
-	if Runes(unholy 1) Spell(DEATHANDECAY)
 	if Runes(unholy 1) Spell(SCOURGESTRIKE)
-
+	if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
+#	if Runes(unholy 1) Spell(DEATHANDECAY)
 	if Mana(more 54) Spell(DEATHCOIL usable=1)
+	unless Runes(unholy 1) Spell(BLOODTAP priority=2)
+	unless Runes(unholy 1) Spell(EMPOWERRUNEWEAPON priority=2)
 	Spell(HORNOFWINTER)
 }
 

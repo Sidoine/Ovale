@@ -50,6 +50,7 @@ Define(LOCKANDLOAD 56453)
 Define(FRENZYEFFECT 19615)
 Define(MARKEDFORDEATH 88691)
 Define(FIRE 82926)
+Define(BEASTWITHIN 34692)
 
 AddCheckBox(multi SpellName(MULTISHOT))
 ScoreSpells(FOCUSFIRE KILLCOMMAND ARCANESHOT KILLSHOT STEADYSHOT SERPENTSTING
@@ -58,25 +59,27 @@ ScoreSpells(FOCUSFIRE KILLCOMMAND ARCANESHOT KILLSHOT STEADYSHOT SERPENTSTING
 
 AddIcon help=main mastery=1
 {
+	if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
-	if Mana(less 40) {Spell(FERVOR) Spell(COBRASHOT) Spell(STEADYSHOT)}
-	if TargetBuffPresent(FRENZYEFFECT stacks=5 target=pet) Spell(FOCUSFIRE)
-	if CheckBoxOn(multi) Spell(MULTISHOT)
-	if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-	if TargetInRange(GROWL) Spell(KILLCOMMAND)
-	Spell(ARCANESHOT)
+	if Mana(less 20) Spell(FERVOR)
+	if TargetBuffPresent(FRENZYEFFECT stacks=5 target=pet) and BuffExpires(BEASTWITHIN 0) Spell(FOCUSFIRE)
+	if Mana(more 56)
+	{
+		if CheckBoxOn(multi) Spell(MULTISHOT)
+		Spell(ARCANESHOT)
+	}
 	Spell(COBRASHOT)
 	Spell(STEADYSHOT)
 }
 
 AddIcon help=main mastery=2
 {
+    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
+    if TargetDebuffPresent(SERPENTSTING) and Mana(more 49) Spell(CHIMERASHOT)
     if TargetLifePercent(less 20) Spell(KILLSHOT)
+	if BuffPresent(FIRE) Spell(AIMEDSHOT)
+    if Mana(less 40) or Counter(ss equal 1) Spell(STEADYSHOT)
     if CheckBoxOn(multi) Spell(MULTISHOT)
-    if TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-    if TargetDebuffPresent(SERPENTSTING) Spell(CHIMERASHOT)
-    if BuffPresent(FIRE) Spell(AIMEDSHOT)
-    if Mana(less 44) or Counter(ss equal 1) Spell(STEADYSHOT)
     unless 1.6s before Spell(CHIMERASHOT) Spell(ARCANESHOT)
     if Mana(more 66) Spell(ARCANESHOT)
     unless 0.25s before Spell(CHIMERASHOT) Spell(STEADYSHOT)
@@ -84,33 +87,29 @@ AddIcon help=main mastery=2
 
 AddIcon help=main mastery=3
 {
-    if TargetLifePercent(less 20) Spell(KILLSHOT)
-    if Mana(less 35) and BuffExpires(LOCKANDLOAD) {Spell(COBRASHOT) Spell(STEADYSHOT)}
-    if Mana(more 35) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
-    if Mana(more 25) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
+    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
     if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
-    if BuffPresent(LOCKANDLOAD) Spell (KILLCOMMAND)
-    if BuffPresent(LOCKANDLOAD) Spell (EXPLOSIVESHOT)
-    unless 1.5s before Spell(BLACKARROW) {Spell(COBRASHOT) Spell(STEADYSHOT)}
-    if CheckBoxOn(multi) Spell(MULTISHOT)
-    if Mana(more 57) Spell(ARCANESHOT)
-    unless 1.5s before Spell(EXPLOSIVESHOT) {Spell(COBRASHOT) Spell(STEADYSHOT)}
+    if Mana(more 35) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
+    if TargetLifePercent(less 20) Spell(KILLSHOT)
+    if Mana(more 70) and BuffExpires(LOCKANDLOAD) 
+	{
+		if CheckBoxOn(multi) Spell(MULTISHOT)
+		Spell(ARCANESHOT)
+	}
+    Spell(COBRASHOT) 
+	Spell(STEADYSHOT)
 }
 
 
 AddIcon help=cd
 {
-	unless BuffPresent(ASPECTOFTHEHAWK) Spell(ASPECTOFTHEHAWK)
-	if TalentPoints(TALENTTRACKING more 0) and Tracking(TRACKBEASTS no) and Tracking(TRACKDEMONS no) and Tracking(TRACKDRAGONKIN no)
-			and Tracking(TRACKELEMENTALS no) and Tracking(TRACKGIANTS no) and Tracking(TRACKHUMANOIDS no) and Tracking(TRACKUNDEAD no)
-				Spell(TRACKBEASTS)
-	
+	unless BuffPresent(ASPECTOFTHEHAWK) or BuffPresent(ASPECTOFTHEFOX) Spell(ASPECTOFTHEHAWK)
 	if TargetDebuffExpires(HUNTERSMARK 2) and TargetDebuffExpires(MARKEDFORDEATH 0) and TargetDeadIn(more 20) Spell(HUNTERSMARK nored=1)
 	Spell(BESTIALWRATH usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	Spell(CALLOFTHEWILD usable=1)
-	Spell(RAPIDFIRE)
+	unless BuffPresent(heroism) Spell(RAPIDFIRE)
 	Spell(READINESS)
 }
 ]]

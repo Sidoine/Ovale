@@ -17,6 +17,7 @@ Locale-enUS.lua
 Locale-zhTW.lua
 Ovale.lua
 Condition.lua
+OvaleEquipement.lua
 OvaleIcone.lua
 OvaleIcone.xml
 OvaleFrame.lua

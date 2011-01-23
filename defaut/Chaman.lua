@@ -78,20 +78,21 @@ AddIcon help=main mastery=1
 		if WeaponEnchantExpires(mainhand 400) Spell(FLAMETHONG)
 	}
 	if BuffExpires(LIGHTNINGSHIELD 2) Spell(LIGHTNINGSHIELD)
-	if CheckBoxOn(aoe)
-	{
-		if TotemExpires(fire) Spell(MAGMATOTEM)
-		unless TotemExpires(fire) Spell(FIRENOVA)
-		if ManaPercent(less 90) Spell(THUNDERSTORM)
-	}
-	if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
-	Spell(UNLEASHELEMENTS)
+#	if CheckBoxOn(aoe)
+#	{
+#		if TotemExpires(fire) Spell(MAGMATOTEM)
+#		unless TotemExpires(fire) Spell(FIRENOVA)
+#		if ManaPercent(less 90) Spell(THUNDERSTORM)
+#	}
 	if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 	unless TargetDebuffExpires(FLAMESHOCK 1.6 haste=spell mine=1) Spell(LAVABURST)
+	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)
+	if TotemExpires(fire) Spell(SEARINGTOTEM)
+	if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
+#	Spell(UNLEASHELEMENTS)
 	
-	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)	
-	if CheckBoxOn(chain) and CastTime(LIGHTNINGBOLT more 1.5) and at least 0s from Spell(LAVABURST) until EndCastTime(CHAINLIGHTNING)
-			Spell(CHAINLIGHTNING)
+#	if CheckBoxOn(chain) and CastTime(LIGHTNINGBOLT more 1.5) and at least 0s from Spell(LAVABURST) until EndCastTime(CHAINLIGHTNING)
+#			Spell(CHAINLIGHTNING)
 
 	Spell(LIGHTNINGBOLT)
 }
@@ -104,27 +105,39 @@ AddIcon help=main mastery=2
 		if WeaponEnchantExpires(offhand 400) Spell(FLAMETHONGWEAPON)
 	}
 	
+	if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
+	
 	if CheckBoxOn(aoe)
 	{
-		if TotemExpires(fire) Spell(MAGMATOTEM)
-		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
+		if TotemExpires(fire) Spell(MAGMATOTEM)
 		if TotemPresent(fire) Spell(FIRENOVA)
+		Spell(LAVALASH)
+		if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(CHAINLIGHTNING)
 		Spell(UNLEASHELEMENTS)
+		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
+		Spell(EARTHSHOCK)
+		Spell(STORMSTRIKE)
+		Spell(FIRENOVA)
+		if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(CHAINLIGHTNING)
+		Spell(LAVABURST)
 	}
 	
 	if CheckBoxOff(aoe)
 	{
-		Spell(UNLEASHELEMENTS)
-		if TotemExpires(fire) Spell(SEARINGTOTEM)
-		if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+		if TotemExpires(fire) Spell(SEARINGTOTEM)
+		Spell(LAVALASH)
+		if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(LIGHTNINGBOLT)
+		Spell(UNLEASHELEMENTS)
+		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
+		Spell(EARTHSHOCK)
+		Spell(STORMSTRIKE)
+		Spell(FIRENOVA)
+		if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(LIGHTNINGBOLT)
+		Spell(LAVABURST)
 	}
-	
-	Spell(STORMSTRIKE)
-	Spell(LAVALASH)
-	if TargetDebuffExpires(FLAMESHOCK 2 haste=spell mine=1) Spell(FLAMESHOCK)
-	Spell(EARTHSHOCK)
+		
 	Spell(SHAMANISTICRAGE priority=2)
 	Spell(FERALSPIRIT priority=2)
 }
