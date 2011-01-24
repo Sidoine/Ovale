@@ -55,7 +55,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		--end
 
 		if element.params.sound and not self.lastSound then
-			local delay = self.soundtime or 0.5
+			local delay = element.params.soundtime or 0.5
 			if Ovale.maintenant>=minAttente - delay then
 				self.lastSound = element.params.sound
 			--	print("Play" .. self.lastSound)

@@ -51,7 +51,9 @@ local function ParseFunction(prefix, func, params)
 		func = prefix
 	end
 	if string.find(func, "Target") == 1 then
-		paramList.target = "target"
+		if not paramList.target then
+			paramList.target = "target"
+		end
 		func = string.sub(func, 7)
 	end
 	local newNode = { type="function", func=func, params=paramList}

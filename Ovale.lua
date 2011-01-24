@@ -132,6 +132,8 @@ Ovale.buffSpellList =
 		60433, -- Earth and Moon
 		93068, -- Master Poisoner 
 		1490, -- Curse of the Elements
+		85547, -- Jinx 1
+		86105, -- Jinx 2
 		34889, --Fire Breath (Dragonhawk)
 		24844 --Lightning Breath (Wind serpent)
 	},
@@ -2274,6 +2276,7 @@ function Ovale:ToggleCheckBox(v)
 	for k,checkBox in pairs(self.casesACocher) do
 		if v==0 then
 			self.checkBoxes[k]:SetValue(not self.checkBoxes[k]:GetValue())
+			self.db.profile.check[k] = self.checkBoxes[k]:GetValue()
 			break
 		end
 		v = v - 1

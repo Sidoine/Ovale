@@ -79,7 +79,7 @@ AddIcon help=main mastery=1
 		if WeaponEnchantExpires(offhand 400) Item(DEADLYPOISON)
 	}
 	
-	if BuffPresent(STEALTHED) Spell(GARROTE)
+	if BuffPresent(STEALTH) Spell(GARROTE)
 	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
 	if TargetDebuffExpires(VENDETTA) and TargetDeadIn(more 20) Spell(VENDETTA)
 	

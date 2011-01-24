@@ -578,7 +578,7 @@ Ovale.conditions=
 	InCombat = function(condition)
 		return testbool(Ovale.enCombat, condition[1])
 	end,
-	TargetInRange = function(condition)
+	InRange = function(condition)
 		local spellName = GetSpellInfo(condition[1])
 		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,

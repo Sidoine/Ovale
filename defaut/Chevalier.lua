@@ -184,7 +184,7 @@ AddIcon help=main mastery=3
 	#if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
 	if TargetDebuffExpires(BLOODPLAGUE 3 mine=1) and Runes(unholy 1) Spell(PLAGUESTRIKE)
 	if TargetDebuffExpires(FROSTFEVER 3 mine=1) and Runes(frost 1) Spell(ICYTOUCH)
-	if Runes(unholy 1) and TargetBuffPresent(SHADOWINFUSION stacks=5 target=pet) Spell(DARKTRANSFORMATION)
+	if Runes(unholy 1) and pet.BuffPresent(SHADOWINFUSION stacks=5) Spell(DARKTRANSFORMATION)
 	if Runes(death 4) or Runes(unholy 2) Spell(SCOURGESTRIKE)
 	if Runes(blood 2 frost 2 nodeath=1) Spell(FESTERINGSTRIKE)
 #	if Runes(death 4) or Runes(unholy 2) Spell(DEATHANDECAY)
