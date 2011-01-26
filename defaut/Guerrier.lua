@@ -107,15 +107,15 @@ AddIcon help=main mastery=1
 		if BuffExpires(SWEEPINGSTRIKES) and BuffExpires(DEADLYCALM) Spell(BLADESTORM)
 		Spell(CLEAVE)
 	}
-	if BuffExpires(TASTEFORBLOOD 1.5) Spell(OVERPOWER)
+	if BuffExpires(TASTEFORBLOOD 1.5) and BuffPresent(TASTEFORBLOOD) Spell(OVERPOWER)
 	if TargetDebuffExpires(RENDDEBUFF) Spell(REND)
 	Spell(COLOSSUSSMASH)
 	Spell(MORTALSTRIKE)
 	#overpower,if=!buff.lambs_to_the_slaughter.up&rage>35&target.health_pct<20
 	if BuffExpires(SLAUGHTER 0) and Mana(more 35) and TargetLifePercent(less 20)
-		Spell(OVERPOWER)
+		Spell(OVERPOWER usable=1)
     if TargetLifePercent(less 20) Spell(EXECUTE)
-	Spell(OVERPOWER)
+	Spell(OVERPOWER usable=1)
 	unless 1.5s before Spell(MORTALSTRIKE) Spell(SLAM)
 }
 

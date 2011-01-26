@@ -130,7 +130,7 @@ AddIcon help=main mastery=3
 AddIcon help=cd
 {
         #Check that you won't have to reapply dots during DA
-	if BuffPresent(EVANGELISM stacks=5) and TargetDebuffPresent(DEVOURINGPLAGUE 18 mine=1) and TargetDebuffPresent(VAMPIRICTOUCH 18 mine=1) Spell(ARCHANGEL)
+	if BuffPresent(EVANGELISM stacks=5) and TargetDebuffPresent(DEVOURINGPLAGUE 18 mine=1) and TargetDebuffPresent(VAMPIRICTOUCH 13 mine=1) Spell(ARCHANGEL)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

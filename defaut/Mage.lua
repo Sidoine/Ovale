@@ -69,6 +69,8 @@ Define(SHADOWANDFLAME 17800)
 
 #Talent
 Define(FIRESTARTERTALENT 11431)
+Define(CRITICALMASSTALENT 10541)
+Define(IMPROVEDSCORCH 10547)
 
 #CheckBoxes
 AddListItem(fb fb SpellName(FIREBALL) default)
@@ -106,7 +108,7 @@ AddIcon help=main mastery=2
 {
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
 
-    if TargetDebuffExpires(CRITICALMASS) and TargetDebuffExpires(SHADOWANDFLAME) Spell(SCORCH)
+    if TalentPoints(CRITICALMASSTALENT more 0) and TargetDebuffExpires(CRITICALMASS) and TargetDebuffExpires(SHADOWANDFLAME) Spell(SCORCH)
     if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1)
             and TargetDebuffPresent(PYROBLAST mine=1)
         Spell(COMBUSTION)
@@ -118,12 +120,12 @@ AddIcon help=main mastery=2
     if List(fb ffb) and TargetDeadIn(less 60) Spell(FROSTFIREBOLT)
     if List(fb fb) and ManaPercent(more 39) Spell(FIREBALL)
     if List(fb ffb) and ManaPercent(more 39) Spell(FROSTFIREBOLT)
-    if ManaPercent(less 95)
+    if ManaPercent(less 95) and TalentPoints(IMPROVEDSCORCH more 0)
     {
            unless 60s before Spell(EVOCATION) Spell(SCORCH)
     }
     Spell(EVOCATION)
-    Spell(SCORCH)
+    if TalentPoints(IMPROVEDSCORCH more 0) Spell(SCORCH)
 }
 
 AddIcon help=main mastery=3

@@ -2272,6 +2272,17 @@ function Ovale:EnableOtherDebuffs()
 	self.otherDebuffsEnabled = true
 end
 
+function Ovale:SetCheckBox(v,on)
+	for k,checkBox in pairs(self.casesACocher) do
+		if v==0 then
+			self.checkBoxes[k]:SetValue(on)
+			self.db.profile.check[k] = on
+			break
+		end
+		v = v - 1
+	end
+end
+
 function Ovale:ToggleCheckBox(v)
 	for k,checkBox in pairs(self.casesACocher) do
 		if v==0 then
