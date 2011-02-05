@@ -137,6 +137,7 @@ AddIcon help=main mastery=2
 		and TargetLifePercent(more 20) Spell(RAGINGBLOW)
 	
     Spell(BLOODTHIRST)
+	if TargetLifePercent(less 20) Spell(EXECUTE)
 	Spell(VICTORYRUSH usable=1)
 	if BuffPresent(BLOODSURGE) Spell(SLAM)
 }
@@ -148,6 +149,7 @@ AddIcon help=main mastery=3
     if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
 
+	if LifePercent(less 75) Spell(VICTORYRUSH usable=1)
 	if CheckBoxOn(multi)
 	{
 		if TargetDebuffExpires(RENDDEBUFF mine=1) Spell(REND)

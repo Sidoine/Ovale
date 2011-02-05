@@ -90,7 +90,7 @@ ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP
 AddIcon help=main mastery=1
 {
 	#Contributed by Grabielz
-	if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIRE 3 mine=1 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDeadIn(more 15)
+	if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIREDEBUFF 3 mine=1 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDeadIn(more 15)
 		Spell(FAERIEFIRE nored=1)
 
 	if Speed(more 0)
@@ -186,7 +186,7 @@ AddIcon help=main mastery=2
 		if ArmorSetParts(T11 more 3) and BuffExpires(STRENGTHOFTHEPANTHER 3 stacks=3) Spell(MANGLECAT)
 		
 		#faerie_fire_feral,if=debuff.faerie_fire.stack<3|!(debuff.sunder_armor.up|debuff.expose_armor.up)
-		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDebuffExpires(FAERIEFIREDEBUFF 3 stacks=3) and TargetDeadIn(more 15)
+		if CheckBoxOn(lucioles) and	TargetDebuffExpires(lowerarmor 0 mine=0) and TargetDebuffExpires(FAERIEFIREDEBUFF 2 stacks=3) and TargetDeadIn(more 15)
 			Spell(FAERIEFERAL)
 		
 		#mangle_cat,if=debuff.mangle.remains<=2&(!debuff.mangle.up|debuff.mangle.remains>=0.0)
@@ -233,7 +233,7 @@ AddIcon help=main mastery=2
 			Spell(SAVAGEROAR)
 		
 		#ferocious_bite,if=(target.time_to_die<=4&buff.combo_points.stack>=5)|target.time_to_die<=1
-		if {TargetDeadIn(less 4) and ComboPoints(more 4)} or TargetDeadIn(less 1) Spell(FEROCIOUSBITE)
+		if {TargetDeadIn(less 4) and ComboPoints(more 4)} or {TargetDeadIn(less 1) and ComboPoints(more 0)} Spell(FEROCIOUSBITE)
 		#ferocious_bite,if=level>80&buff.combo_points.stack>=5&dot.rip.remains>=14.0&buff.savage_roar.remains>=10.0
 		if ComboPoints(more 4) and TargetDebuffPresent(RIP 14 mine=1) and BuffPresent(SAVAGEROAR 10) Spell(FEROCIOUSBITE)
 		#shred,extend_rip=1,if=dot.rip.ticking&dot.rip.remains<=4&target.health_pct>25
@@ -246,7 +246,7 @@ AddIcon help=main mastery=2
 		
 		#shred,if=buff.combo_points.stack<=4&dot.rake.remains>3.0&dot.rip.remains>3.0&(time_to_max_energy<=2.0|(buff.berserk.up&energy>=20))
 		if ComboPoints(less 5) and TargetDebuffPresent(RAKE 3 mine=1) and TargetDebuffPresent(RIP 3 mine=1) and {2s before Mana(more 99) or {BuffPresent(BERSERK) and Mana(more 20)}}
-			Spell(SHRED)
+			{Spell(SHRED) Spell(MANGLECAT)}
 		#shred,if=cooldown.tigers_fury.remains<=3.0
 		if 3s before Spell(TIGERSFURY) Spell(SHRED)
 		#shred,if=target.time_to_die<=dot.rake.duration

@@ -159,7 +159,7 @@ AddIcon help=main mastery=3
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
 		if List(bane doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
-		if TargetDeadIn(more 10) unless List(cure havoc) Spell(BANEOFAGONY)
+		if TargetDeadIn(more 10) unless List(bane havoc) Spell(BANEOFAGONY)
 	}
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 3) Spell(IMMOLATE)
 	if 1s after TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
