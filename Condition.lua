@@ -623,19 +623,6 @@ Ovale.conditions=
 		buildStunSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(stunSpellList), condition[1])
 	end,
-	-- Test the target level difference with the player
-	-- 1 : "less" or "more"
-	-- 2 : [target level]-[player level] limit
-	TargetRelativeLevel = function(condition)
-		local difference
-		if (UnitLevel("target") == -1) then
-			difference = 3
-		else
-			difference = UnitLevel("target") - UnitLevel("player")
-		end
-
-		return compare(difference, condition[1], condition[2])
-	end,
 	LastSpellDamage = function(condition)
 		local spellId = condition[1]
 		if not Ovale.spellDamage[spellId] then
@@ -821,6 +808,20 @@ Ovale.conditions=
 			end
 		end
 		return maxCD
+	end,
+	-- Test the target level difference with the player
+	-- 1 : "less" or "more"
+	-- 2 : [target level]-[player level] limit
+	RelativeLevel = function(condition)
+		local difference
+		local target = getTarget(condition.target)
+		if (UnitLeveltarget) == -1) then
+			difference = 3
+		else
+			difference = UnitLevel(target) - UnitLevel("player")
+		end
+
+		return compare(difference, condition[1], condition[2])
 	end,
 	SoulShards = function(condition)
 		return compare(Ovale.state.shard, condition[1], condition[2])
