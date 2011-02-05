@@ -815,7 +815,7 @@ Ovale.conditions=
 	RelativeLevel = function(condition)
 		local difference
 		local target = getTarget(condition.target)
-		if (UnitLeveltarget) == -1) then
+		if UnitLeveltarget(target) == -1 then
 			difference = 3
 		else
 			difference = UnitLevel(target) - UnitLevel("player")
