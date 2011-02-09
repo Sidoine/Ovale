@@ -133,10 +133,10 @@ AddIcon help=main mastery=3
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
 
     if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
-    if BuffPresent(FINGERSOFFROST stacks=1)  Spell(DEEPFREEZE)
+    if BuffPresent(FINGERSOFFROST stacks=1) Spell(DEEPFREEZE)
     if BuffPresent(BRAINFREEZE) and BuffPresent(FINGERSOFFROST) Spell(FROSTFIREBOLT)
     if BuffPresent(FINGERSOFFROST stacks=2) Spell(ICELANCE)
-    Spell(PETFREEZE)
+    unless BuffPresent(FINGERSOFFROST) Spell(PETFREEZE)
     if BuffPresent(FINGERSOFFROST stacks=2) Spell(ICELANCE)
     if BuffPresent(MOLTENARMOR) and {{manaPercent()*8} < target.timeToDie()} Spell(MAGEARMOR)
     if ManaPercent(less 5) and TargetDeadIn(less 60) Spell(EVOCATION)
