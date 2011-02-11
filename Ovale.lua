@@ -265,7 +265,7 @@ local options =
 					order = 5.5,
 					type = "range",
 					name = L["Marge entre deux icônes"],
-					min = 0, max = 64, step = 1,
+					min = -16, max = 64, step = 1,
 					get = function(info) return Ovale.db.profile.apparence.margin end,
 					set = function(info,value) Ovale.db.profile.apparence.margin = value; Ovale:UpdateFrame() end
 				},
