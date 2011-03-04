@@ -34,6 +34,7 @@ Define(STORMSTRIKE 17364)
 	SpellInfo(STORMSTRIKE cd=8)
 Define(THUNDERSTORM 51490)
 Define(UNLEASHELEMENTS 73680)
+Define(UNLEASHFLAME 73683)
 Define(WATERSHIELD 52127)
 	SpellAddBuff(WATERSHIELD WATERSHIELD=600)
 Define(WINDSHEAR 57994)
@@ -66,7 +67,7 @@ Define(STRENGTHOFEARTHTOTEM 8075)
 Define(TREMORTOTEM 8143)
 
 ScoreSpells(LIGHTNINGSHIELD CHAINLIGHTNING FLAMESHOCK LAVABURST EARTHSHOCK LIGHTNINGBOLT
-			STORMSTRIKE LAVALASH)
+			STORMSTRIKE LAVALASH UNLEASHELEMENTS)
 
 AddCheckBox(aoe L(AOE))
 AddCheckBox(chain SpellName(CHAINLIGHTNING) default mastery=1)
@@ -75,25 +76,30 @@ AddIcon help=main mastery=1
 {
 	unless InCombat()
 	{
+		#/flametongue_weapon,weapon=main
 		if WeaponEnchantExpires(mainhand 400) Spell(FLAMETHONG)
 	}
+	#/lightning_shield
 	if BuffExpires(LIGHTNINGSHIELD 2) Spell(LIGHTNINGSHIELD)
-#	if CheckBoxOn(aoe)
-#	{
-#		if TotemExpires(fire) Spell(MAGMATOTEM)
-#		unless TotemExpires(fire) Spell(FIRENOVA)
-#		if ManaPercent(less 90) Spell(THUNDERSTORM)
-#	}
-	if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
-	unless TargetDebuffExpires(FLAMESHOCK 1.6 haste=spell mine=1) Spell(LAVABURST)
-	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)
-	if TotemExpires(fire) Spell(SEARINGTOTEM)
-	if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
-#	Spell(UNLEASHELEMENTS)
 	
-#	if CheckBoxOn(chain) and CastTime(LIGHTNINGBOLT more 1.5) and at least 0s from Spell(LAVABURST) until EndCastTime(CHAINLIGHTNING)
-#			Spell(CHAINLIGHTNING)
-
+	#/unleash_elements,moving=1
+	if Speed(more 0) Spell(UNLEASHELEMENTS)
+	
+	#/flame_shock,if=!ticking|ticks_remain<3
+	if TargetDebuffExpires(FLAMESHOCK 3 mine=1) Spell(FLAMESHOCK)
+	#/lava_burst,if=(dot.flame_shock.remains-cast_time)>=0.05
+	if target.debuffExpires(FLAMESHOCK mine=1) - castTime(LAVABURST) > 0.05 Spell(LAVABURST)
+	#/earth_shock,if=buff.lightning_shield.stack=9
+	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)
+	#/earth_shock,if=buff.lightning_shield.stack>6&dot.flame_shock.remains>cooldown&dot.flame_shock.remains<cooldown+action.flame_shock.tick_time
+	if BuffPresent(LIGHTNINGSHIELD stacks=7) and { target.debuffExpires(FLAMESHOCK mine=1) > spell(LAVABURST) }
+			and { target.debuffExpires(FLAMESHOCK mine=1) < spell(LAVABURST) + timeWithHaste(3) } Spell(LAVABURST)
+	
+	if TotemExpires(fire) Spell(SEARINGTOTEM)
+	#/spiritwalkers_grace,moving=1
+	#/chain_lightning,if=target.adds>2
+	if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
+	#/lightning_bolt
 	Spell(LIGHTNINGBOLT)
 }
 
@@ -101,10 +107,13 @@ AddIcon help=main mastery=2
 {
 	unless InCombat()
 	{
+		#/windfury_weapon,weapon=main
 		if WeaponEnchantExpires(mainhand 400) Spell(WINDFURYWEAPON)
+		#/flametongue_weapon,weapon=off
 		if WeaponEnchantExpires(offhand 400) Spell(FLAMETHONGWEAPON)
 	}
 	
+	#/lightning_shield
 	if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 	
 	if CheckBoxOn(aoe)
@@ -125,17 +134,26 @@ AddIcon help=main mastery=2
 	
 	if CheckBoxOff(aoe)
 	{
-		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+		#/searing_totem
 		if TotemExpires(fire) Spell(SEARINGTOTEM)
+		#/lava_lash
 		Spell(LAVALASH)
-		if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(LIGHTNINGBOLT)
+		#/lightning_bolt,if=buff.maelstrom_weapon.stack=5&buff.maelstrom_weapon.react
+		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+		#/unleash_elements
 		Spell(UNLEASHELEMENTS)
-		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
+		#/flame_shock,if=!ticking|(buff.unleash_flame.up&ticks_remain<=2)
+		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) or {BuffPresent(UNLEASHFLAME) and TargetDebuffExpires(FLAMESHOCK 2 mine=1)}
+			Spell(FLAMESHOCK)
+		#/earth_shock
 		Spell(EARTHSHOCK)
+		#/stormstrike
 		Spell(STORMSTRIKE)
-		Spell(FIRENOVA)
-		if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(LIGHTNINGBOLT)
-		Spell(LAVABURST)
+		#/fire_nova
+		if TotemPresent(fire totem=MAGMATOTEM) or TotemPresent(fire totem=FIREELEMENTALTOTEM) or TotemPresent(fire totem=FLAMETHONGTOTEM)
+			Spell(FIRENOVA)
+		#/lightning_bolt,if=buff.maelstrom_weapon.stack=4&buff.maelstrom_weapon.react
+		if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(LIGHTNINGBOLT)
 	}
 		
 	Spell(SHAMANISTICRAGE priority=2)

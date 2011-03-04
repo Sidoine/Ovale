@@ -865,7 +865,7 @@ Ovale.conditions=
 		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(condition[1])
 		return actionCooldownDuration, actionCooldownStart, -1
 	end,
--- Test if the player is in a given stance
+	-- Test if the player is in a given stance
 	-- 1 : the stance
 	Stance = function(condition)
 		if (GetShapeshiftForm(true) == condition[1]) then
@@ -908,6 +908,9 @@ Ovale.conditions=
 	end,
 	timeToDie = function(condition)
 		return 0, getTargetDead(getTarget(condition.target)), -1
+	end,
+	timeWithHaste = function(condition)
+		return avecHate(condition[1], "spell")
 	end,
 	TotemExpires = function(condition)
 		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])
