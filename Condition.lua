@@ -488,6 +488,9 @@ Ovale.conditions=
 	Counter = function(condition)
 		return compare(Ovale.counter[condition[1]], condition[2], condition[3])
 	end,
+	CreatureFamily = function(condition)
+		return testbool(UnitCreatureFamily(getTarget(condition.target)) == LBCT[condition[1]], condition[2])
+	end,
 	CreatureType = function(condition)
 		for _,v in pairs(condition) do
 			if (UnitCreatureType(getTarget(condition.target)) == LBCT[v]) then
