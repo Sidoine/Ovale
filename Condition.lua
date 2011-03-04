@@ -1,5 +1,5 @@
 ﻿local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
-
+local LRC = LibStub("LibRangeCheck-2.0", true)
 local runes = {}
 local runesCD = {}
 		
@@ -376,8 +376,8 @@ Ovale.conditions=
 	-- 2 : time since the buff gain
 	BuffGain = function(condition)
 		local spellId = condition[1]
-		if (spell) then
-			if (not Ovale.buff[spellId]) then
+		if spellId then
+			if not Ovale.buff[spellId] then
 				return 0
 			end
 			local timeGain = Ovale.buff[spellId].gain
@@ -527,6 +527,28 @@ Ovale.conditions=
 		local start, ending = GetTargetAura(condition, "HARMFUL", getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
+	end,
+	Distance = function(condition)
+		if LRC then
+			local target = getTarget(condition.target)
+			local minRange, maxRange = LRC:GetRange(target)
+			if maxRange == nil or minRange == nil then
+				return nil
+			end
+			if condition[1] == "more" then
+				if condition[2]~=nil and maxRange>condition[2] then
+					return 0
+				else
+					return nil
+				end
+			else
+				if condition[2]~=nil and minRange<condition[2] then
+					return 0
+				else
+					return nil
+				end
+			end
+		end
 	end,
 	--Compare to eclipse power. <0 lunar, >0 solar
 	Eclipse = function(condition)
@@ -688,6 +710,13 @@ Ovale.conditions=
 		local value, t, rate = GetManaAndRate(false)
 		local conversion = 100/UnitPowerMax("player")
 		return value * conversion, t, rate * conversion
+	end,
+	MaxHealth = function(condition)
+		local target = getTarget(condition.target)
+		return compare(UnitMaxHealth(target), condition[1], condition[2])
+	end,
+	maxHealth = function(condition)
+		return UnitMaxHealth(getTarget(condition.target))
 	end,
 	OtherDebuffExpires = function(condition)
 		Ovale:EnableOtherDebuffs()
