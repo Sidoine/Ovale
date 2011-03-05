@@ -21,6 +21,7 @@ Define(DEMONARMOR 687)
 Define(DEMONICEMPOWERMENT 47193)
 Define(DEMONSOUL 77801)
 Define(DRAINLIFE 689)
+	SpellInfo(DRAINLIFE canStopChannelling=3)
 Define(DRAINSOUL 1120)
 	SpellInfo(DRAINSOUL canStopChannelling=5)
 Define(FELARMOR 28176)
@@ -34,6 +35,8 @@ Define(IMMOLATE 348)
 	SpellInfo(IMMOLATE duration=15)
 	SpellAddTargetDebuff(IMMOLATE IMMOLATE=15)
 	SpellAddBuff(IMMOLATE MOLTENCORE=-1)
+Define(IMMOLATIONAURA 50589)
+	SpellInfo(IMMOLATIONAURA cd=30)
 Define(INCINERATE 29722)
 	SpellAddBuff(INCINERATE MOLTENCORE=-1)
 Define(LIFETAP 1454)
@@ -44,6 +47,7 @@ Define(SHADOWBOLT 686)
 	SpellAddTargetDebuff(SHADOWBOLT SHADOWEMBRACE=12)
 	SpellAddTargetDebuff(SHADOWBOLT SHADOWANDFLAMEDEBUFF=30)
 Define(SHADOWBURN 17877)
+Define(SHADOWFLAME 47897)
 Define(SOULFIRE 6353)
 	SpellAddBuff(SOULFIRE IMPROVEDSOULFIREBUFF=15)
 Define(SOULBURN 74434)
@@ -70,6 +74,12 @@ Define(SHADOWANDFLAMEDEBUFF 17800)
 #Talent	
 Define(IMPROVEDSOULFIRE 11197)
 Define(SHADOWANDFLAMETALENT 10936)
+Define(BANETALENT 10938)
+Define(EMBERSTORMTALENT 11181)
+
+#Glyph
+Define(GLYPHOFLASHOFPAIN 70947)
+Define(GLYPHOFIMP 56248)
 
 AddListItem(curse elements SpellName(CURSEELEMENTS))
 AddListItem(curse tongues SpellName(CURSETONGUES))
@@ -78,8 +88,7 @@ AddListItem(curse none L(None) default)
 AddListItem(bane agony SpellName(BANEOFAGONY))
 AddListItem(bane doom SpellName(BANEOFDOOM) default)
 AddListItem(bane havoc SpellName(BANEOFHAVOC) mastery=3)
-AddListItem(afflic shadow SpellName(SHADOWBOLT) default mastery=1)
-AddListItem(afflic drain SpellName(DRAINLIFE) mastery=1)
+AddCheckBox(shadowflame SpellName(SHADOWFLAME) default)
 
 ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRATE CURSEWEAKNESS
 	BANEOFAGONY CORRUPTION SOULFIRE DRAINSOUL INCINERATE SHADOWBOLT CHAOSBOLT)
@@ -91,23 +100,72 @@ AddIcon help=main mastery=1
 	if List(curse elements) and TargetDebuffExpires(magicaldamagetaken 0) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
-	if TargetDebuffExpires(HAUNT 1.5 mine=1) Spell(HAUNT)
+	#unless Glyph(GLYPHOFLASHOFPAIN) Spell(DEMONSOUL)
+	#/corruption,if=(!ticking|remains<tick_time)&miss_reac
+	if TargetDebuffExpires(CORRUPTION 3 haste=spell mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) Spell(CORRUPTION)
+	#/unstable_affliction,if=(!ticking|remains<(cast_time+tick_time))&target.time_to_die>=5&miss_react
+	if TargetDebuffExpires(UNSTABLEAFFLICTION 4.5 mine=1 haste=spell) and TargetDeadIn(more 5) Spell(UNSTABLEAFFLICTION)
+	#/bane_of_doom,if=target.time_to_die>15&!ticking&miss_react
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
-		if List(bane doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
+		if List(bane doom) and TargetDeadIn(more 15) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
-	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
-	if TargetDebuffExpires(UNSTABLEAFFLICTION 1.5 mine=1 haste=spell) and TargetDeadIn(more 8) Spell(UNSTABLEAFFLICTION)
+	#/haunt
+	if TargetDebuffExpires(HAUNT 1.5 mine=1 haste=spell) Spell(HAUNT)
+	#/fel_flame,if=buff.tier11_4pc_caster.react&dot.unstable_affliction.remains<8
+	if ArmorSetParts(T11 more 3) and TargetDebuffExpires(UNSTABLEAFFLICTION 8) Spell(FELFLAME)
+	#/shadowflame
+	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
+	#/drain_soul,interrupt=1,if=target.health_pct<=25
 	if TargetLifePercent(less 25) Spell(DRAINSOUL)
-	if List(afflic drain) and BuffPresent(SHADOWTRANCE) Spell(SHADOWBOLT)
-    if List(afflic shadow) Spell(SHADOWBOLT)
-    if List(afflic drain) Spell(DRAINLIFE)
+	
+	if TalentPoints(BANETALENT more 2)
+	{
+		#/life_tap,mana_percentage<=35
+		if ManaPercent(less 35) and LifePercent(more 75) Spell(LIFETAP)
+		#/soulburn
+		if SoulShards(more 0) Spell(SOULBURN)
+		if TalentPoints(EMBERSTORMTALENT more 0) and TalentPoints(IMPROVEDSOULFIRE more 0)
+		{
+			#/soul_fire,if=buff.improved_soul_fire.cooldown_remains<(cast_time+travel_time)&buff.bloodlust.down&!in_flight
+			if BuffExpires(IMPROVEDSOULFIREBUFF 4) and BuffExpires(heroism) Spell(SOULFIRE)
+		}
+		if TalentPoints(EMBERSTORMTALENT less 1) or TalentPoints(IMPROVEDSOULFIRE less 1)
+		{
+			#/soul_fire,if=buff.soulburn.up
+			if BuffPresent(SOULBURN) Spell(SOULFIRE)
+		}
+		#if Glyph(GLYPHOFLASHOFPAIN) Spell(DEMONSOUL)
+		Spell(SHADOWBOLT)
+	}
+	if TalentPoints(BANETALENT less 3)
+	{
+		if SoulShards(more 0) Spell(SOULBURN)
+		#/soul_fire,if=buff.soulburn.up
+		if BuffPresent(SOULBURN) Spell(SOULFIRE)
+		#/demon_soul,if=buff.shadow_trance.react
+		#if BuffPresent(SHADOWTRANCE) Spell(DEMONSOUL)
+		#/shadow_bolt,if=buff.shadow_trance.react
+		if BuffPresent(SHADOWTRANCE) Spell(SHADOWBOLT)
+		#/life_tap,mana_percentage<=5
+		if ManaPercent(less 5) and LifePercent(more 75) Spell(LIFETAP)
+		if TalentPoints(IMPROVEDSOULFIRE more 0)
+		{
+			#/soul_fire,if=buff.improved_soul_fire.cooldown_remains<(cast_time+travel_time)&buff.bloodlust.down&!in_flight
+			if TalentPoints(EMBERSTORMTALENT more 0) if BuffExpires(IMPROVEDSOULFIREBUFF 4) and BuffExpires(heroism) Spell(SOULFIRE)
+			#/soul_fire,if=buff.soulburn.up
+			if TalentPoints(EMBERSTORMTALENT less 1) if BuffPresent(SOULBURN) Spell(SOULFIRE)
+		}
+		#/drain_life,interrupt=1
+		Spell(DRAINLIFE)
+	}
 }
 
 AddIcon help=cd mastery=1
 {
-	if BuffPresent(heroism) Spell(SUMMONFELGUARD)
+	#/summon_infernal
+	Spell(SUMMONINFERNAL)
 	Spell(DEMONSOUL)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
@@ -120,21 +178,43 @@ AddIcon help=main mastery=2
 	if List(curse elements) and TargetDebuffExpires(magicaldamagetaken 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
-	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
-	if BuffPresent(METAMORPHOSIS) Spell(SOULBURN usable=1)
-	if BuffPresent(SOULBURN) Spell(SOULFIRE)
-	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 4) Spell(IMMOLATE)
-	if TargetDebuffExpires(BANEOFDOOM 5 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
+	#unless Glyph(GLYPHOFLASHOFPAIN) or Glyph(GLYPHOFIMP) Spell(DEMONSOUL)
+	#/immolation,if=buff.metamorphosis.remains>10
+	if BuffPresent(METAMORPHOSIS 10) Spell(IMMOLATIONAURA)
+	#/bane_of_doom,if=!ticking&target.time_to_die>=15&miss_react
+	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
 		if List(bane doom) and TargetDeadIn(more 15) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
-	Spell(HANDOFGULDAN)
-	if BuffPresent(METAMORPHOSIS 10) and BuffExpires(METAMORPHOSIS 16) Spell(IMMOLATE)
-	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
+	#/immolate,if=!ticking&target.time_to_die>=4&miss_react
+	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 4) Spell(IMMOLATE)
+	#/corruption,if=(remains<tick_time|!ticking)&target.time_to_die>=6&miss_react
+	if TargetDebuffExpires(CORRUPTION 2 mine=1 haste=spell) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 6) Spell(CORRUPTION)
+	#/fel_flame,if=buff.tier11_4pc_caster.react
+	if ArmorSetParts(T11 more 3) Spell(FELFLAME)
+	#/shadowflame
+	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
+	#/demon_soul
+	#if Glyph(GLYPHOFIMP) Spell(DEMONSOUL)
+	#/hand_of_guldan
+	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
+	#/incinerate,if=buff.molten_core.react
 	if BuffPresent(MOLTENCORE) Spell(INCINERATE)
-	if BuffPresent(DECIMATION) Spell(SOULFIRE)
-	
+	#/soulburn
+	if SoulShards(more 0) Spell(SOULBURN)
+	if TalentPoints(IMPROVEDSOULFIRE more 0)
+	{
+		#/soul_fire,if=buff.improved_soul_fire.cooldown_remains<(cast_time+travel_time)&buff.bloodlust.down&!in_flight&miss_react
+		if BuffExpires(IMPROVEDSOULFIREBUFF 4) and BuffExpires(heroism) Spell(SOULFIRE)
+	}
+	if TalentPoints(IMPROVEDSOULFIRE less 1)
+	{
+		#/soul_fire,if=buff.decimation.react|buff.soulburn.up
+		if BuffPresent(DECIMATION) or BuffPresent(SOULBURN) Spell(SOULFIRE)
+	}
+	#/life_tap,if=mana_pct<=50&buff.bloodlust.down&buff.metamorphosis.down
+	if ManaPercent(less 50) and BuffExpires(heroism) and BuffExpires(METAMORPHOSIS) Spell(LIFETAP)
 	Spell(SHADOWBOLT)
 }
 
@@ -154,19 +234,38 @@ AddIcon help=main mastery=3
 	if List(curse elements) and TargetDebuffExpires(magicaldamagetaken 2) and TargetDeadIn(more 8) Spell(CURSEELEMENTS)
 	if List(curse weakness) and TargetDebuffExpires(CURSEWEAKNESS 2) and TargetDeadIn(more 8) Spell(CURSEWEAKNESS)
 
-	if TalentPoints(IMPROVEDSOULFIRE more 0) and TargetLifePercent(more 80) and
-			BuffExpires(IMPROVEDSOULFIREBUFF) Spell(SOULFIRE)
+	#/soul_fire,if=buff.soulburn.up
+	if BuffPresent(SOULBURN) Spell(SOULFIRE)
+	#/fel_flame,if=buff.tier11_4pc_caster.react&dot.immolate.remains<8
+	if ArmorSetParts(T11 more 3) and TargetDebuffExpires(IMMOLATE 8 mine=1) Spell(FELFLAME)
+	#/immolate,if=(remains<cast_time+gcd|!ticking)&target.time_to_die>=4&miss_react
+	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 4) Spell(IMMOLATE)
+	#/conflagrate
+	if 1s after TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
+	#/bane_of_doom,if=!ticking&target.time_to_die>=15&miss_react
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
-		if List(bane doom) and TargetDeadIn(more 20) Spell(BANEOFDOOM)
+		if List(bane doom) and TargetDeadIn(more 15) Spell(BANEOFDOOM)
 		if TargetDeadIn(more 10) unless List(bane havoc) Spell(BANEOFAGONY)
 	}
-	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 3) Spell(IMMOLATE)
-	if 1s after TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
-	if TargetDebuffExpires(CORRUPTION 2 mine=1) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
-	if BuffPresent(EMPOWEREDIMP) or BuffPresent(SOULBURN) Spell(SOULFIRE)
-    if TalentPoints(SHADOWANDFLAMETALENT more 0) and TargetDebuffExpires(magicalcrittaken) Spell(SHADOWBOLT)
+	#/corruption,if=(!ticking|dot.corruption.remains<tick_time)&miss_react
+	if TargetDebuffExpires(CORRUPTION 2 mine=1 haste=spell) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
+	#/shadowflame
+	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
+	#/soul_fire,if=buff.empowered_imp.react&buff.empowered_imp.remains<(buff.improved_soul_fire.remains+action.soul_fire.travel_time)
+	if TalentPoints(IMPROVEDSOULFIRE more 0) and BuffExpires(IMPROVEDSOULFIREBUFF) and BuffExpires(EMPOWEREDIMP 0) Spell(SOULFIRE)
+	#/chaos_bolt
 	Spell(CHAOSBOLT)
+	#/soulburn,if=buff.bloodlust.down
+	if SoulShards(more 0) and BuffExpires(heroism) Spell(SOULBURN)
+	#/soul_fire,if=buff.improved_soul_fire.remains<(cast_time+travel_time+action.incinerate.cast_time+gcd)&!in_flight
+	if TalentPoints(IMPROVEDSOULFIRE more 0)
+	{
+		if buffExpires(IMPROVEDSOULFIREBUFF)< {castTime(SOULFIRE)+castTime(INCINERATE)+timeWithHaste(1.5)+1} Spell(SOULFIRE)
+	}
+	#/shadowburn
+	Spell(SHADOWBURN usable=1)
+    if TalentPoints(SHADOWANDFLAMETALENT more 0) and TargetDebuffExpires(magicalcrittaken) Spell(SHADOWBOLT)
 	Spell(INCINERATE)
 }
 
@@ -180,7 +279,7 @@ AddIcon help=cd mastery=3
 
 AddIcon size=small
 {
-	Spell(SOULBURN usable=1)
+	if SoulShards(more 0) Spell(SOULBURN usable=1)
 }
 
 AddIcon size=small mastery=1

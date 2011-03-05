@@ -52,6 +52,9 @@ Define(MARKEDFORDEATH 88691)
 Define(FIRE 82926)
 Define(BEASTWITHIN 34692)
 
+#Glyphs
+Define(GLYPHOFARCANESHOT 56841)
+
 AddCheckBox(multi SpellName(MULTISHOT))
 ScoreSpells(FOCUSFIRE KILLCOMMAND ARCANESHOT KILLSHOT STEADYSHOT SERPENTSTING
 			CHIMERASHOT AIMEDSHOT
@@ -84,6 +87,7 @@ AddIcon help=main mastery=1
 
 AddIcon help=offgcd mastery=1
 {
+	Spell(CALLOFTHEWILD usable=1)
 	#/focus_fire,five_stacks=1,if=!buff.beast_within.up
 	if pet.BuffPresent(FRENZYEFFECT stacks=5) and BuffExpires(BEASTWITHIN 0) Spell(FOCUSFIRE)
 }
@@ -91,6 +95,7 @@ AddIcon help=offgcd mastery=1
 AddIcon help=cd mastery=1
 {
 	unless BuffPresent(ASPECTOFTHEHAWK) or BuffPresent(ASPECTOFTHEFOX) Spell(ASPECTOFTHEHAWK)
+	if TargetDebuffExpires(HUNTERSMARK 2) and TargetDebuffExpires(MARKEDFORDEATH 0) and TargetDeadIn(more 20) Spell(HUNTERSMARK nored=1)
 	#/bestial_wrath,if=focus>60
 	if Mana(more 60) Spell(BESTIALWRATH usable=1)
 	#/rapid_fire,if=!buff.bloodlust.up&!buff.beast_within.up
@@ -110,37 +115,67 @@ AddIcon help=main mastery=2
 	}
 	
 	#/serpent_sting,if=!ticking&target.health_pct<=80
-    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) and TargetLifePercent(less 90) Spell(SERPENTSTING)
-	if TargetDebuffPresent(SERPENTSTING) and Mana(more 49) Spell(CHIMERASHOT)
-    if TargetLifePercent(less 20) Spell(KILLSHOT)
+    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) and TargetLifePercent(less 80) Spell(SERPENTSTING)
+	#/chimera_shot,if=target.health_pct<=80
+	if Mana(more 49) and TargetLifePercent(less 80) Spell(CHIMERASHOT)
+	#/steady_shot,if=buff.pre_improved_steady_shot.up&buff.improved_steady_shot.remains<3
+	if Mana(less 40) or Counter(ss equal 1) Spell(STEADYSHOT)
+	#/kill_shot
+	if TargetLifePercent(less 20) Spell(KILLSHOT)
+	#/aimed_shot,if=buff.master_marksman_fire.react
 	if BuffPresent(FIRE) Spell(AIMEDSHOT)
-    if Mana(less 40) or Counter(ss equal 1) Spell(STEADYSHOT)
-    if CheckBoxOn(multi) Spell(MULTISHOT)
-    unless 1.6s before Spell(CHIMERASHOT) Spell(ARCANESHOT)
-    if Mana(more 66) Spell(ARCANESHOT)
-    unless 0.25s before Spell(CHIMERASHOT) Spell(STEADYSHOT)
+	if Glyph(GLYPHOFARCANESHOT)
+	{
+		#/aimed_shot,if=target.health_pct>80|buff.rapid_fire.up|buff.bloodlust.up
+		if TargetLifePercent(more 80) or BuffPresent(RAPIDFIRE) or BuffPresent(heroism) if Mana(more 49) Spell(AIMEDSHOT)
+        #/arcane_shot,if=(focus>=66|cooldown.chimera_shot.remains>=5)&(target.health_pct<80&!buff.rapid_fire.up&!buff.bloodlust.up)
+		if {Mana(more 65) or spell(CHIMERASHOT)>5} and {TargetLifePercent(less 80) and BuffExpires(RAPIDFIRE) and BuffExpires(heroism)}
+			if Mana(more 24) Spell(ARCANESHOT)
+	}
+	else
+	{
+		#/aimed_shot,if=cooldown.chimera_shot.remains>5|focus>=80|buff.rapid_fire.up|buff.bloodlust.up|target.health_pct>80
+		if spell(CHIMERASHOT)>5 or Mana(more 79) or BuffPresent(RAPIDFIRE) or BuffPresent(heroism) or TargetLifePercent(more 80)
+			if Mana(more 49) Spell(AIMEDSHOT)
+	}
+	#/steady_shot
+	Spell(STEADYSHOT)
 }
 
-AddIcon help=cd mastery=1
+AddIcon help=cd mastery=2
 {
 	unless BuffPresent(ASPECTOFTHEHAWK) or BuffPresent(ASPECTOFTHEFOX) Spell(ASPECTOFTHEHAWK)
-	#/rapid_fire
-	Spell(RAPIDFIRE)
+	if TargetDebuffExpires(HUNTERSMARK 2) and TargetDebuffExpires(MARKEDFORDEATH 0) and TargetDeadIn(more 20) Spell(HUNTERSMARK nored=1)
+	#/rapid_fire,if=!buff.bloodlust.up|target.time_to_die<=30
+	unless BuffPresent(heroism) or BuffPresent(RAPIDFIRE) Spell(RAPIDFIRE)
+	#/readiness,wait_for_rapid_fire=1
+	if BuffPresent(RAPIDFIRE) Spell(READINESS)
+	Spell(CALLOFTHEWILD usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
 AddIcon help=main mastery=3
 {
-    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
-    if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
-    if Mana(more 35) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
-    if TargetLifePercent(less 20) Spell(KILLSHOT)
-    if Mana(more 70) and BuffExpires(LOCKANDLOAD) 
+ 	if CheckBoxOn(multi)
 	{
-		if CheckBoxOn(multi) Spell(MULTISHOT)
-		Spell(ARCANESHOT)
+		#/multi_shot,if=target.adds>5
+		if Mana(more 56) Spell(MULTISHOT)
+		#/cobra_shot,if=target.adds>5
+		Spell(STEADYSHOT)
 	}
+
+	#/serpent_sting,if=!ticking
+	if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) Spell(SERPENTSTING)
+	#/explosive_shot,if=!ticking&!in_flight
+    if TargetDebuffExpires(EXPLOSIVESHOT 0 mine=1) Spell(EXPLOSIVESHOT)
+	#/black_arrow,if=!ticking
+    if Mana(more 35) and TargetDebuffExpires(BLACKARROW 0 mine=1) Spell(BLACKARROW)
+	#/kill_shot
+    if TargetLifePercent(less 20) Spell(KILLSHOT)
+	#/arcane_shot,if=focus>=70&buff.lock_and_load.down
+    if Mana(more 69) and BuffExpires(LOCKANDLOAD) Spell(ARCANESHOT)
+	#/cobra_shot
     Spell(COBRASHOT) 
 	Spell(STEADYSHOT)
 }
@@ -150,10 +185,9 @@ AddIcon help=cd mastery=3
 {
 	unless BuffPresent(ASPECTOFTHEHAWK) or BuffPresent(ASPECTOFTHEFOX) Spell(ASPECTOFTHEHAWK)
 	if TargetDebuffExpires(HUNTERSMARK 2) and TargetDebuffExpires(MARKEDFORDEATH 0) and TargetDeadIn(more 20) Spell(HUNTERSMARK nored=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 	Spell(CALLOFTHEWILD usable=1)
 	unless BuffPresent(heroism) Spell(RAPIDFIRE)
-	Spell(READINESS)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 ]]

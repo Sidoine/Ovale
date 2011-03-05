@@ -295,6 +295,7 @@ local function ParseAddIcon(params, text)
 		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
 		text = string.gsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
 		text = string.gsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
+		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/%>%<])%s*node(%d+)", ParseOp)
 		if (was == text) then
 			break
 		end

@@ -14,6 +14,7 @@ Define(COLDSNAP 11958) #frost reset cd
     SpellInfo(COLDSNAP cd=384)
 Define(COMBUSTION 11129) #fire cd consume dot
     SpellInfo(COMBUSTION cd=180)
+Define(CONJUREMANAGEM 759)
 Define(COUNTERSPELL 2139)
     SpellInfo(COUNTERSPELL cd=24)
 Define(DEEPFREEZE 44572) #frost instant
@@ -85,23 +86,57 @@ AddIcon help=main mastery=1
 {
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MAGEARMOR)
     
-    if BuffPresent(PRESENCEOFMIND) Spell(ARCANEBLAST)
-    if TargetDeadIn(less 34) and ManaPercent(more 5) Spell(ARCANEBLAST)
-    if BuffPresent(CLEARCASTING) and DebuffPresent(ARCANEBLASTDEBUFF stacks=2) Spell(ARCANEBLAST)
-
-    if 26s before Spell(EVOCATION) and ManaPercent(more 26) Spell(ARCANEBLAST)
-    if ManaPercent(more 94) Spell(ARCANEBLAST)
-    if DebuffPresent(ARCANEBLASTDEBUFF) unless DebuffPresent(ARCANEBLASTDEBUFF stacks=4) or BuffPresent(heroism) 
-		Spell(ARCANEBLAST)
-    
-	if DebuffPresent(ARCANEBLASTDEBUFF) and BuffPresent(heroism) unless DebuffPresent(ARCANEBLASTDEBUFF stacks=3)
-        Spell(ARCANEBLAST)
-    
+	#/arcane_blast,if=target.time_to_die<40&mana_pct>5
+	if TargetDeadIn(less 40) and ManaPercent(more 5) Spell(ARCANEBLAST)
+	#/arcane_blast,if=cooldown.evocation.remains<30&mana_pct>26
+	if {spell(EVOCATION)<30} and ManaPercent(more 26) Spell(ARCANEBLAST)
+	#/evocation,if=target.time_to_die>=31
 	if TargetDeadIn(more 31) Spell(EVOCATION)
-    Spell(ARCANEMISSILES)
-    Spell(ARCANEBARRAGE)
-    if Speed(more 0) Spell(FIREBLAST)
-    if Speed(more 0) Spell(ICELANCE)
+	#/sequence,name=conserve:arcane_blast:arcane_blast:arcane_blast:arcane_blast,if=!buff.bloodlust.up
+	unless DebuffPresent(ARCANEBLASTDEBUFF stacks=4) or BuffPresent(heroism) 
+		Spell(ARCANEBLAST)
+	if BuffPresent(ARCANEMISSILEBUFF) Spell(ARCANEMISSILES)
+    #action_list_str += "/arcane_barrage,if=buff.arcane_blast.stack>0"; // when AM hasn't procced
+	Spell(ARCANEBARRAGE)
+    if Speed(more 0) 
+	{
+		Spell(ARCANEBARRAGE)
+		Spell(FIREBLAST)
+		Spell(ICELANCE)
+	}
+}
+
+AddIcon help=cd mastery=1
+{
+    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
+    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
+	
+	#/conjure_mana_gem,if=cooldown.evocation.remains<44&target.time_to_die<44&mana_gem_charges=0
+	if ItemCount(MANAGEMITEM less 1 charges=1) and {spell(EVOCATION)<44} and TargetDieIn(less 44)}
+		Spell(CONJUREMANAGEM)
+	#if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|cooldown.evocation.remains>90|target.time_to_die<40
+	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLAST stacks=4)} or {spell(EVOCATION)>90} or TargetDieIn(less 40)
+	{
+		Item(Trinket0Slot usable=1)
+		Item(Trinket1Slot usable=1)
+		#if ItemCount(VOLCANICPOTION more 0) Item(VOLCANICPOTION)
+	}
+	
+	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLAST stacks=4)} or TargetDieIn(less 40)
+	{
+		#action_list_str += "/arcane_power,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
+		Spell(ARCANEPOWER)
+		#action_list_str += "/mana_gem,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
+		Spell(MANAGEM)
+	}
+	
+    #action_list_str += "/mirror_image,if=buff.arcane_power.up|(cooldown.arcane_power.remains>20&target.time_to_die>15)";
+    if BuffPresent(ARCANEPOWER) or {{spell(ARCANEPOWER)>0} and TargetDieIn(more 15)} Spell(MIRRORIMAGE)
+	#/flame_orb,if=target.time_to_die>=10
+    if TargetDeadIn(more 10) Spell(FLAMEORB)
+	#/presence_of_mind,arcane_blast
+    Spell(PRESENCEOFMIND)
+    
 }
 
 AddIcon help=main mastery=2
@@ -128,6 +163,18 @@ AddIcon help=main mastery=2
     if TalentPoints(IMPROVEDSCORCH more 0) Spell(SCORCH)
 }
 
+AddIcon help=cd mastery=2
+{
+    if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
+    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
+    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
+    if ManaPercent(less 85) Item(MANAGEMITEM)
+    if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
+    if TargetDeadIn(more 11) Spell(FLAMEORB)
+    Item(Trinket0Slot usable=1)
+    Item(Trinket1Slot usable=1)
+}
+
 AddIcon help=main mastery=3
 {
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
@@ -144,40 +191,6 @@ AddIcon help=main mastery=3
     if List(frb ffb) Spell(FROSTFIREBOLT)
     if Speed(more 0) Spell(ICELANCE)
     if Speed(more 0) Spell(FIREBLAST)
-}
-
-AddIcon help=cd mastery=1
-{
-    if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
-    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
-    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
-    if TargetDeadIn(more 29) Spell(MIRRORIMAGE)
-    if TargetDeadIn(less 34) Spell(ARCANEPOWER)
-    if 26s before Spell(EVOCATION)
-    {
-          if DebuffPresent(ARCANEBLAST stacks=3) or DebuffPresent(ARCANEBLAST stacks=4) Spell(ARCANEPOWER)
-    }
-    if TargetDeadIn(less 35) Item(MANAGEMITEM)
-    if 26s before Spell(EVOCATION)
-    {
-          if DebuffPresent(ARCANEBLASTDEBUFF stacks=3) Item(MANAGEMITEM)
-    }
-    if TargetDeadIn(more 14) Spell(FLAMEORB)
-    Spell(PRESENCEOFMIND)
-    Item(Trinket0Slot usable=1)
-    Item(Trinket1Slot usable=1)
-}
-
-AddIcon help=cd mastery=2
-{
-    if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
-    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
-    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
-    if ManaPercent(less 85) Item(MANAGEMITEM)
-    if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
-    if TargetDeadIn(more 11) Spell(FLAMEORB)
-    Item(Trinket0Slot usable=1)
-    Item(Trinket1Slot usable=1)
 }
 
 AddIcon help=cd mastery=3

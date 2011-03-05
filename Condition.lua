@@ -608,7 +608,11 @@ Ovale.conditions=
 		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,
 	ItemCount = function(condition)
-		return compare(GetItemCount(condition[1]), condition[2], condition[3])
+		if condition.charges == 1 then
+			return compare(GetItemCount(condition[1], false, true), condition[2], condition[3])
+		else
+			return compare(GetItemCount(condition[1]), condition[2], condition[3])
+		end
 	end,
 	IsCasting = function(condition)
 		local casting
@@ -910,7 +914,7 @@ Ovale.conditions=
 		return 0, getTargetDead(getTarget(condition.target)), -1
 	end,
 	timeWithHaste = function(condition)
-		return avecHate(condition[1], "spell")
+		return avecHate(condition[1], "spell"),0,0
 	end,
 	TotemExpires = function(condition)
 		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])

@@ -152,29 +152,23 @@ AddIcon help=main mastery=2
 {
 	if Stance(1) # bear
 	{
-		unless TargetDebuffExpires(LACERATE 4) and TargetDebuffPresent(bleed)
-			Spell(MANGLEBEAR)
-		
-		if Mana(more 10) and TargetDebuffExpires(LACERATE 4 stacks=3)
-			Spell(LACERATE)
-			
-		if TargetDebuffPresent(LACERATE stacks=3)
-			Spell(PULVERIZE)
-
-		if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDebuffExpires(FAERIEFIREDEBUFF 3 stacks=3)
-			Spell(FAERIEFERAL)
-
+		#/mangle_bear
+		Spell(MANGLEBEAR)
+		#/demoralizing_roar,if=!debuff.demoralizing_roar.up
 		if CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2)
 			Spell(DEMOROAR)
-
-		if Mana(more 50) Spell(MAUL)
-		if CheckBoxOn(multi)
-		{
-			Spell(THRASH)
-			Spell(SWIPEBEAR)
-		}
-		Spell(MANGLEBEAR)
-		Spell(LACERATE)		
+		#/lacerate,if=!ticking
+		if TargetDebuffExpires(LACERATE 0) Spell(LACERATE)
+		#/thrash
+		Spell(THRASH)
+		if CheckBoxOn(multi) Spell(SWIPEBEAR)
+		#/pulverize,if=buff.lacerate.stack=3&buff.pulverize.remains<=2
+		if TargetDebuffPresent(LACERATE stacks=3) and BuffExpires(PULVERIZE 2) Spell(PULVERIZE)
+		#/lacerate,if=buff.lacerate.stack<3
+		if TargetDebuffExpires(LACERATE 4 stacks=3)	Spell(LACERATE)
+		#/faerie_fire_feral
+		if CheckBoxOn(lucioles) and TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDebuffExpires(FAERIEFIREDEBUFF 3 stacks=3)
+			Spell(FAERIEFERAL)
 	}
 
 	if Stance(3) # cat
@@ -234,28 +228,21 @@ AddIcon help=main mastery=2
 		
 		#ferocious_bite,if=(target.time_to_die<=4&buff.combo_points.stack>=5)|target.time_to_die<=1
 		if {TargetDeadIn(less 4) and ComboPoints(more 4)} or {TargetDeadIn(less 1) and ComboPoints(more 0)} Spell(FEROCIOUSBITE)
-		#ferocious_bite,if=level>80&buff.combo_points.stack>=5&dot.rip.remains>=14.0&buff.savage_roar.remains>=10.0
+		#/ferocious_bite,if=buff.combo_points.stack>=5&dot.rip.remains>=14.0&buff.savage_roar.remains>=10.0
 		if ComboPoints(more 4) and TargetDebuffPresent(RIP 14 mine=1) and BuffPresent(SAVAGEROAR 10) Spell(FEROCIOUSBITE)
 		#shred,extend_rip=1,if=dot.rip.ticking&dot.rip.remains<=4&target.health_pct>25
 		if Glyph(GLYPHOFSHRED) and Counter(ripshreds less 3) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and TargetLifePercent(more 25) Spell(SHRED)
 
 		#ravage,if=buff.stampede_cat.up&!buff.omen_of_clarity.react&buff.tigers_fury.up
 		if BuffPresent(STAMPEDE) and BuffExpires(CLEARCASTING) and BuffPresent(TIGERSFURY) Spell(RAVAGE)
-		#mangle_cat,if=set_bonus.tier11_4pc_melee&buff.t11_4pc_melee.stack<3
-		if ArmorSetParts(T11 more 3) and BuffExpires(STRENGTHOFTHEPANTHER 0 stacks=3) Spell(MANGLECAT)
-		
-		#shred,if=buff.combo_points.stack<=4&dot.rake.remains>3.0&dot.rip.remains>3.0&(time_to_max_energy<=2.0|(buff.berserk.up&energy>=20))
-		if ComboPoints(less 5) and TargetDebuffPresent(RAKE 3 mine=1) and TargetDebuffPresent(RIP 3 mine=1) and {2s before Mana(more 99) or {BuffPresent(BERSERK) and Mana(more 20)}}
-			{Spell(SHRED) Spell(MANGLECAT)}
-		#shred,if=cooldown.tigers_fury.remains<=3.0
-		if 3s before Spell(TIGERSFURY) Spell(SHRED)
-		#shred,if=target.time_to_die<=dot.rake.duration
-		if target.timeToDie()<target.debuffExpires(RAKE mine=1) Spell(SHRED)
-		#shred,if=buff.combo_points.stack=0&(buff.savage_roar.remains<=2.0|dot.rake.remains>=5.0)
-		if ComboPoints(less 1) and {BuffExpires(SAVAGEROAR 2) or TargetDebuffPresent(RAKE 5 mine=1)} Spell(SHRED)
-		#shred,if=!dot.rip.ticking|time_to_max_energy<=1.0
-		if TargetDebuffExpires(RIP 0 mine=1) or 1s before Mana(more 99) Spell(SHRED)
+		Spell(SHRED)
 	}
+}
+
+AddIcon help=offgcd mastery=2
+{
+	#/maul,if=rage>=75
+	if Stance(1) and Mana(more 74) Spell(MAUL)
 }
 
 AddIcon help=cd mastery=2
