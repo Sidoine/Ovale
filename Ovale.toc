@@ -3,7 +3,7 @@
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 4.0.26
+## Version: 4.0.27
 ## OptionalDeps: Ace3, ButtonFacade, Recount, Skada, LibBabble-CreatureType-3.0, LibRangeCheck-2.0
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
@@ -15,6 +15,7 @@ embeds.xml
 Locale-frFR.lua
 Locale-enUS.lua
 Locale-zhTW.lua
+Locale-ruRU.lua
 Ovale.lua
 Condition.lua
 OvaleEquipement.lua
