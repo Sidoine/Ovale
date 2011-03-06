@@ -18,31 +18,22 @@
 	Modifed for Ovale
 ]]
 
---[[ Not useful anymore 
-
 local autoshotname = GetSpellInfo(75)
 local resetspells = {
-	[GetSpellInfo(845)] = true, -- Cleave
-	[GetSpellInfo(78)] = true, -- Heroic Strike
-	[GetSpellInfo(6807)] = true, -- Maul
-	[GetSpellInfo(2973)] = true, -- Raptor Strike
 }
 local delayspells = {
 	[GetSpellInfo(1464)] = true, -- Slam
 }
 local resetautoshotspells = {
 }
+
 local _, playerclass = UnitClass('player')
 local unpack = unpack
 local math_abs = math.abs
 local GetTime = GetTime
 
 OvaleSwing = LibStub("AceAddon-3.0"):NewAddon("OvaleSwing", "AceEvent-3.0")
-
-OvaleSwing.swingmode=nil -- nil is none, 0 is meleeing, 1 is autoshooting
-OvaleSwing.starttime=0
-OvaleSwing.duration=0
-OvaleSwing.startdelay=0
+OvaleSwing.ohNext = false
 
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
@@ -70,89 +61,69 @@ end
 function OvaleSwing:PLAYER_ENTER_COMBAT()
 	local _,_,offhandlow, offhandhigh = UnitDamage('player')
 	if math_abs(offhandlow - offhandhigh) <= 0.1 or playerclass == "DRUID" then
-		self.swingmode = 0 -- shouldn't be dual-wielding
+		self.dual = false
+	else
+		self.dual = true
 	end
+	--print("Enter combat")
 end
 
 function OvaleSwing:PLAYER_LEAVE_COMBAT()
-	if not self.swingmode or self.swingmode == 0 then
-		self.swingmode = nil
-	end
+	self.ohNext = false
+	self.ohStartTime = nil
+	self.ohDuration = nil
+	self.duration = nil
+	self.starttime = nil
+	self.delay = 0
 end
 
 function OvaleSwing:START_AUTOREPEAT_SPELL()
-	self.swingmode = 1
 end
 
 function OvaleSwing:STOP_AUTOREPEAT_SPELL()
-	if not self.swingmode or self.swingmode == 1 then
-		self.swingmode = nil
-	end
 end
 
--- blizzard screws that global up, double usage in CombatLog.lua and GlobalStrings.lua, so we create it ourselves
-local COMBATLOG_FILTER_ME = bit.bor(
-				COMBATLOG_OBJECT_AFFILIATION_MINE or 0x00000001,
-				COMBATLOG_OBJECT_REACTION_FRIENDLY or 0x00000010,
-				COMBATLOG_OBJECT_CONTROL_PLAYER or 0x00000100,
-				COMBATLOG_OBJECT_TYPE_PLAYER or 0x00000400
-				)
-
-do
-	local swordspecproc = false
-	function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(timestamp, event, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
-		if (event == "SPELL_EXTRA_ATTACKS") and (select(2, ...) == "Sword Specialization") 
-				and (bit.band(srcFlags, COMBATLOG_FILTER_ME) == COMBATLOG_FILTER_ME) then
-			swordspecproc = true
-		elseif (event == "SWING_DAMAGE" or event == "SWING_MISSED") 
-				and (bit.band(srcFlags, COMBATLOG_FILTER_ME) == COMBATLOG_FILTER_ME) 
-				and self.swingmode == 0 then
-			if (swordspecproc) then
-				swordspecproc = false
-			else
-				self:MeleeSwing()
-			end
+function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
+	if srcName == UnitName("player") then
+		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
+			self:MeleeSwing(timestamp)
 		end
 	end
 end
 
-function OvaleSwing:UNIT_SPELLCAST_START(unit, spell)
-	if self.swingmode == 0 then
-		if delayspells[spell] then
-			self.startdelay = GetTime()
-		end
+function OvaleSwing:UNIT_SPELLCAST_START(event, unit, spell)
+	if delayspells[spell] and unit=="player" then
+		self.startdelay = GetTime()
+		local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spell)
+		self.delay = castTime
 	end
 end
 
-function OvaleSwing:UNIT_SPELLCAST_INTERRUPTED(unit, spell)
-	if self.swingmode == 0 then
-		if delayspells[spell] then
-			self.duration = self.duration + GetTime() - self.startdelay
-		end
+function OvaleSwing:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
+	if unit == "player" and delayspells[spell] and self.startdelay then
+		self.delay = GetTime() - self.startdelay
 	end
 end
 
-function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(unit, spell)
-	if self.swingmode == 0 then
+function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
+	if unit == "player" then
 		if resetspells[spell] then
-			self:MeleeSwing()
+			self:MeleeSwing(GetTime())
 		end
-		if delayspells[spell] then
-			self.duration = self.duration + 
+		if delayspells[spell] and self.startdelay then
+			self.delay = GetTime() - self.startdelay
 		end
-	elseif self.swingmode == 1 then
 		if spell == autoshotname then
 			self:Shoot()
 		end
-	end
-	if resetautoshotspells[spell] then
-		self.swingmode = 1
-		self:Shoot()
+		if resetautoshotspells[spell] then
+			self:Shoot()
+		end
 	end
 end
 
-function OvaleSwing:UNIT_ATTACK(unit)
-	if unit == 'player' then
+function OvaleSwing:UNIT_ATTACK(event, unit)
+	--[[if unit == 'player' then
 		if not self.swingmode then
 			return
 		elseif self.swingmode == 0 then
@@ -160,16 +131,69 @@ function OvaleSwing:UNIT_ATTACK(unit)
 		else
 			self.duration = UnitRangedDamage('player')
 		end
-	end
+	end]]
 end
 
-function OvaleSwing:MeleeSwing()
-	self.duration = UnitAttackSpeed('player')
-	self.starttime = GetTime()
+function OvaleSwing:MeleeSwing(timestamp)
+	if self.dual and self.ohNext then
+		--[[if self.ohDuration then
+			local prediction = self.ohDuration+self.ohStartTime+self.delay
+			print("Prediction oh = "  .. prediction .. " diff=" .. (timestamp-prediction))
+		end]]
+		self.ohDuration = UnitAttackSpeed('player')
+		self.ohStartTime = timestamp
+		--print("MeleeSwing oh = " .. self.ohStartTime)
+		self.ohNext = false
+	else
+		--[[if self.duration then
+			local prediction = self.duration+self.starttime+self.delay
+			print("Prediction mh = " .. prediction .. " diff=" .. (timestamp-prediction))
+		end]]
+		self.duration = UnitAttackSpeed('player')
+		self.starttime = timestamp
+		--print("MeleeSwing mh = " .. self.starttime)
+		self.ohNext = true
+		if self.ohStartTime == nil then
+			self.ohStartTime = self.starttime - self.duration/2
+			self.ohDuration = self.duration
+		end
+	end
+	self.delay = 0
 end
 
 function OvaleSwing:Shoot()
+	--[[if self.duration then
+		print("Prediction = " ..(self.duration+self.starttime))
+	end]]
 	self.duration = UnitRangedDamage('player')
 	self.starttime = GetTime()
+	--print("Shoot " .. self.starttime)
 end
-]]
+
+function OvaleSwing:GetLast(which)
+	if which == "main" then
+		return self.starttime
+	elseif which == "off" then
+		return self.ohStartTime
+	else
+		if self.dual and self.ohNext then
+			return self.starttime
+		else
+			return self.ohStartTime
+		end
+	end
+end
+
+function OvaleSwing:GetNext(which)
+	if which == "main" then
+		return self.duration + self.starttime + self.delay
+	elseif which == "off" then
+		return self.ohDuration + self.ohStartTime + self.delay
+	else
+		if self.dual and self.ohNext then
+			return self.ohDuration + self.ohStartTime + self.delay
+		else
+			return self.duration + self.starttime + self.delay
+		end
+	end
+end

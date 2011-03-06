@@ -555,11 +555,11 @@ Ovale.conditions=
 	end,
 	--Compare to eclipse power. <0 lunar, >0 solar
 	Eclipse = function(condition)
-		if condition.now==1 then
+		--if condition.now==1 then
 			return compare(Ovale.state.eclipse, condition[1], condition[2])
-		else
-			return compare(Ovale.state.nextEclipse, condition[1], condition[2])
-		end
+		--else
+		--	return compare(Ovale.state.nextEclipse, condition[1], condition[2])
+		--end
 	end,
 	EffectiveMana = function(condition)
 		local limit = GetManaTime(condition[2], true)
@@ -663,6 +663,16 @@ Ovale.conditions=
 		end
 		return compare(Ovale.spellDamage[spellId], condition[2], condition[3])
 	end,
+	LastSwing = function(condition)
+		local ret = OvaleSwing:GetLast(condition[1])
+		if condition[2] then
+			ret = ret + condition[2]
+		end
+		return ret
+	end,
+	lastSwing = function(condition)
+		return OvaleSwing:GetLast(condition[1]), 0, -1
+	end,
 	-- Compare with the player level
 	-- 1 : "less" or "more"
 	-- 2 : the limit
@@ -728,6 +738,16 @@ Ovale.conditions=
 	end,
 	maxHealth = function(condition)
 		return UnitMaxHealth(getTarget(condition.target))
+	end,
+	NextSwing = function(condition)
+		local ret = OvaleSwing:GetNext(condition[1])
+		if condition[2] then
+			ret = ret - condition[2]
+		end
+		return ret
+	end,
+	nextSwing = function(condition)
+		return OvaleSwing:GetNext(condition[1]), 0, -1
 	end,
 	OtherDebuffExpires = function(condition)
 		Ovale:EnableOtherDebuffs()

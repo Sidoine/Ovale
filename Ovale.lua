@@ -1302,45 +1302,6 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 			if newSpellInfo.unholy then
 				self:AddRune(startCast, 2, newSpellInfo.unholy)
 			end
-			if newSpellInfo.eclipse then
-				--[[self.state.eclipse = self.state.eclipse + newSpellInfo.eclipse
-				if self.state.eclipse < -100 then
-					self.state.eclipse = -100
-				elseif self.state.eclipse > 100 then
-					self.state.eclipse = 100
-				end]]
-				self.state.nextEclipse = self.state.eclipse + newSpellInfo.eclipse
-				if self.state.nextEclipse < -100 then
-					self.state.nextEclipse = -100
-				elseif self.state.nextEclipse > 100 then
-					self.state.nextEclipse = 100
-				end
-				self.state.nextEclipseTime = endCast + 0.5
-			end
-			if newSpellInfo.starsurge then
-				local buffAura = self:GetAura("player", "HELPFUL", 48517) --Solar
-				if buffAura.stacks>0 then
-					self:Log("starsurge with solar buff = " .. (- newSpellInfo.starsurge))
-					self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
-				else
-					buffAura = self:GetAura("player", "HELPFUL", 48518) --Lunar
-					if buffAura.stacks>0 then
-						self:Log("starsurge with lunar buff = " .. newSpellInfo.starsurge)
-						self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
-					elseif self.state.eclipse < 0 then
-						self:Log("starsurge with eclipse < 0 = " .. (- newSpellInfo.starsurge))
-						self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
-					else
-						self:Log("starsurge with eclipse > 0 = " .. newSpellInfo.starsurge)
-						self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
-					end
-				end
-				if self.state.eclipse < -100 then
-					self.state.eclipse = -100
-				elseif self.state.eclipse > 100 then
-					self.state.eclipse = 100
-				end
-			end
 			if newSpellInfo.holy then
 				self.state.holy = self.state.holy + newSpellInfo.holy
 				if self.state.holy < 0 then
@@ -1398,6 +1359,46 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 			end
 		end
 
+		if newSpellInfo.eclipse then
+			self.state.eclipse = self.state.eclipse + newSpellInfo.eclipse
+			if self.state.eclipse < -100 then
+				self.state.eclipse = -100
+			elseif self.state.eclipse > 100 then
+				self.state.eclipse = 100
+			end
+			--[[self.state.nextEclipse = self.state.eclipse + newSpellInfo.eclipse
+			if self.state.nextEclipse < -100 then
+				self.state.nextEclipse = -100
+			elseif self.state.nextEclipse > 100 then
+				self.state.nextEclipse = 100
+			end
+			self.state.nextEclipseTime = endCast + 0.5]]
+		end
+		if newSpellInfo.starsurge then
+			local buffAura = self:GetAura("player", "HELPFUL", 48517) --Solar
+			if buffAura.stacks>0 then
+				self:Log("starsurge with solar buff = " .. (- newSpellInfo.starsurge))
+				self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
+			else
+				buffAura = self:GetAura("player", "HELPFUL", 48518) --Lunar
+				if buffAura.stacks>0 then
+					self:Log("starsurge with lunar buff = " .. newSpellInfo.starsurge)
+					self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
+				elseif self.state.eclipse < 0 then
+					self:Log("starsurge with eclipse < 0 = " .. (- newSpellInfo.starsurge))
+					self.state.eclipse = self.state.eclipse - newSpellInfo.starsurge
+				else
+					self:Log("starsurge with eclipse > 0 = " .. newSpellInfo.starsurge)
+					self.state.eclipse = self.state.eclipse + newSpellInfo.starsurge
+				end
+			end
+			if self.state.eclipse < -100 then
+				self.state.eclipse = -100
+			elseif self.state.eclipse > 100 then
+				self.state.eclipse = 100
+			end
+		end
+			
 		--Auras causés par le sort
 		if newSpellInfo.aura then
 			for target, targetInfo in pairs(newSpellInfo.aura) do

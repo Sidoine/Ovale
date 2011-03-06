@@ -25,6 +25,7 @@ OvaleFrame.lua
 OvaleCompile.lua
 OvaleRecount.lua
 OvaleSkada.lua
+OvaleSwing.lua
 defaut\Chaman.lua
 defaut\Chasseur.lua
 defaut\Demoniste.lua
