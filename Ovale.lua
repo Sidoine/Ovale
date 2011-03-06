@@ -1251,6 +1251,8 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 	
 	local newSpellInfo = self.spellInfo[spellId]
 	
+	self.state.eclipse = self.state.nextEclipse
+	
 	--On enregistre les infos sur le sort en cours
 	self.attenteFinCast = nextCast
 	self.currentSpellId = spellId
@@ -1301,12 +1303,19 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 				self:AddRune(startCast, 2, newSpellInfo.unholy)
 			end
 			if newSpellInfo.eclipse then
-				self.state.eclipse = self.state.eclipse + newSpellInfo.eclipse
+				--[[self.state.eclipse = self.state.eclipse + newSpellInfo.eclipse
 				if self.state.eclipse < -100 then
 					self.state.eclipse = -100
 				elseif self.state.eclipse > 100 then
 					self.state.eclipse = 100
+				end]]
+				self.state.nextEclipse = self.state.eclipse + newSpellInfo.eclipse
+				if self.state.nextEclipse < -100 then
+					self.state.nextEclipse = -100
+				elseif self.state.nextEclipse > 100 then
+					self.state.nextEclipse = 100
 				end
+				self.state.nextEclipseTime = endCast + 0.5
 			end
 			if newSpellInfo.starsurge then
 				local buffAura = self:GetAura("player", "HELPFUL", 48517) --Solar
@@ -1456,6 +1465,8 @@ function Ovale:InitCalculerMeilleureAction()
 	self.state.mana = UnitPower("player")
 	self.state.shard = UnitPower("player", 7)
 	self.state.eclipse = UnitPower("player", 8)
+	self.state.nextEclipse = self.state.eclipse
+	self.state.nextEclipseTime = self.currentTime
 	self.state.holy = UnitPower("player", 9)
 	if self.className == "DEATHKNIGHT" then
 		for i=1,6 do

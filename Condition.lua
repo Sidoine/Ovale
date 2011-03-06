@@ -555,7 +555,11 @@ Ovale.conditions=
 	end,
 	--Compare to eclipse power. <0 lunar, >0 solar
 	Eclipse = function(condition)
-		return compare(Ovale.state.eclipse, condition[1], condition[2])
+		if condition.now==1 then
+			return compare(Ovale.state.eclipse, condition[1], condition[2])
+		else
+			return compare(Ovale.state.nextEclipse, condition[1], condition[2])
+		end
 	end,
 	EffectiveMana = function(condition)
 		local limit = GetManaTime(condition[2], true)
