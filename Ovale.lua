@@ -386,6 +386,16 @@ local options =
 					desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
 					get = function(info) return Ovale.db.profile.apparence.targetText end,
 					set = function(info, value) Ovale.db.profile.apparence.targetText = value; Ovale:UpdateFrame() end
+				},
+				controlDX =
+				{
+					order = 20,
+					type = "range",
+					name = L["Position horizontale des contrôles"],
+					desc = L["Décalage entre les icônes et les listes et les boîtes à cocher"],
+					min = 1, max = 100, step = 1,
+					get = function(info) return Ovale.db.profile.apparence.fontScale end,
+					set = function(info,value) Ovale.db.profile.apparence.fontScale = value; Ovale:UpdateFrame() end
 				}
 			}
 		},
