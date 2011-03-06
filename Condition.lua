@@ -665,10 +665,10 @@ Ovale.conditions=
 	end,
 	LastSwing = function(condition)
 		local ret = OvaleSwing:GetLast(condition[1])
-		if condition[2] then
+		if condition[2] and ret then
 			ret = ret + condition[2]
 		end
-		return ret
+		return 0, ret
 	end,
 	lastSwing = function(condition)
 		return OvaleSwing:GetLast(condition[1]), 0, -1
@@ -741,7 +741,7 @@ Ovale.conditions=
 	end,
 	NextSwing = function(condition)
 		local ret = OvaleSwing:GetNext(condition[1])
-		if condition[2] then
+		if condition[2] and ret then
 			ret = ret - condition[2]
 		end
 		return ret

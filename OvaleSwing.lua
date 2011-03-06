@@ -86,7 +86,7 @@ end
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
 	if srcName == UnitName("player") then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
-			self:MeleeSwing(timestamp)
+			self:MeleeSwing(Ovale.maintenant)
 		end
 	end
 end
@@ -108,7 +108,7 @@ end
 function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
 	if unit == "player" then
 		if resetspells[spell] then
-			self:MeleeSwing(GetTime())
+			self:MeleeSwing(Ovale.maintenant)
 		end
 		if delayspells[spell] and self.startdelay then
 			self.delay = GetTime() - self.startdelay
@@ -171,6 +171,9 @@ function OvaleSwing:Shoot()
 end
 
 function OvaleSwing:GetLast(which)
+	if not self.duration then
+		return nil
+	end
 	if which == "main" then
 		return self.starttime
 	elseif which == "off" then
@@ -185,6 +188,9 @@ function OvaleSwing:GetLast(which)
 end
 
 function OvaleSwing:GetNext(which)
+	if not self.duration then
+		return nil
+	end
 	if which == "main" then
 		return self.duration + self.starttime + self.delay
 	elseif which == "off" then
