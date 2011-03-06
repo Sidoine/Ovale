@@ -112,7 +112,7 @@ AddIcon help=cd mastery=1
     if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
 	
 	#/conjure_mana_gem,if=cooldown.evocation.remains<44&target.time_to_die<44&mana_gem_charges=0
-	if ItemCount(MANAGEMITEM less 1 charges=1) and {spell(EVOCATION)<44} and TargetDieIn(less 44)}
+	if ItemCount(MANAGEMITEM less 1 charges=1) and {spell(EVOCATION)<44} and TargetDieIn(less 44)
 		Spell(CONJUREMANAGEM)
 	#if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|cooldown.evocation.remains>90|target.time_to_die<40
 	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLAST stacks=4)} or {spell(EVOCATION)>90} or TargetDieIn(less 40)
