@@ -33,11 +33,11 @@ local math_abs = math.abs
 local GetTime = GetTime
 
 OvaleSwing = LibStub("AceAddon-3.0"):NewAddon("OvaleSwing", "AceEvent-3.0")
-OvaleSwing.ohNext = false
 
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
 function OvaleSwing:OnEnable()
+	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")
 	self:RegisterEvent("PLAYER_LEAVE_COMBAT")

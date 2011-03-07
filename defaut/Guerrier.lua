@@ -140,7 +140,7 @@ AddIcon help=main mastery=1
 	#/execute
 	if TargetLifePercent(less 20) Spell(EXECUTE)
 	#/slam,if=(cooldown.mortal_strike.remains>=1.5&(rage>=35|swing.mh.remains<1.1|buff.deadly_calm.up|buff.colossus_smash.up))|(cooldown.mortal_strike.remains>=1.2&buff.colossus_smash.remains>0.5&rage>=35)
-	if {{spell(MORTALSTRIKE)>1.5} and {Mana(more 34) or BuffPresent(DEADLYCALM) or BuffPresent(COLOSSUSSMASH)} or {spell(MORTALSTRIKE)>1.2 and BuffPresent(COLOSSUSSMASH 0.5) and Mana(more 34)}
+	if {{spell(MORTALSTRIKE)>1.5} and {Mana(more 34) or NextSwing(main 1.1) or BuffPresent(DEADLYCALM) or BuffPresent(COLOSSUSSMASH)}} or {spell(MORTALSTRIKE)>1.2 and BuffPresent(COLOSSUSSMASH 0.5) and Mana(more 34)}
 		Spell(SLAM)
 	#/battle_shout,if=rage<20
 	if Mana(less 20) Spell(BATTLESHOUT priority=2)
@@ -162,7 +162,7 @@ AddIcon help=cd mastery=1
 		#/stance,choose=berserker,if=cooldown.recklessness.remains=0&rage<=50&((target.health_pct>20&target.time_to_die>320)|target.health_pct<=20)
 		if Stance(1) and Spell(RECKLESSNESS) and Mana(less 50) Spell(BERSERKERSTANCE)
 		#/recklessness,if=((target.health_pct>20&target.time_to_die>320)|target.health_pct<=20)
-		Spell(RECKLESSNESS)
+		if Stance(3) Spell(RECKLESSNESS)
 	}
     Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)

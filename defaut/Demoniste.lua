@@ -22,6 +22,7 @@ Define(DEMONICEMPOWERMENT 47193)
 Define(DEMONSOUL 77801)
 Define(DRAINLIFE 689)
 	SpellInfo(DRAINLIFE canStopChannelling=3)
+	SpellAddBuff(DRAINLIFE SOULBURN=0)
 Define(DRAINSOUL 1120)
 	SpellInfo(DRAINSOUL canStopChannelling=5)
 Define(FELARMOR 28176)
@@ -50,6 +51,7 @@ Define(SHADOWBURN 17877)
 Define(SHADOWFLAME 47897)
 Define(SOULFIRE 6353)
 	SpellAddBuff(SOULFIRE IMPROVEDSOULFIREBUFF=15)
+	SpellAddBuff(SOULFIRE SOULBURN=0)
 Define(SOULBURN 74434)
 	SpellInfo(SOULBURN cd=45)
 	SpellAddBuff(SOULBURN SOULBURN=15)
@@ -112,7 +114,7 @@ AddIcon help=main mastery=1
 		if TargetDeadIn(more 10) Spell(BANEOFAGONY)
 	}
 	#/haunt
-	if TargetDebuffExpires(HAUNT 1.5 mine=1 haste=spell) Spell(HAUNT)
+	Spell(HAUNT)
 	#/fel_flame,if=buff.tier11_4pc_caster.react&dot.unstable_affliction.remains<8
 	if ArmorSetParts(T11 more 3) and TargetDebuffExpires(UNSTABLEAFFLICTION 8) Spell(FELFLAME)
 	#/shadowflame
@@ -165,8 +167,8 @@ AddIcon help=main mastery=1
 AddIcon help=cd mastery=1
 {
 	#/summon_infernal
-	Spell(SUMMONINFERNAL)
 	Spell(DEMONSOUL)
+	Spell(SUMMONINFERNAL)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -271,8 +273,8 @@ AddIcon help=main mastery=3
 
 AddIcon help=cd mastery=3
 {
-	if BuffPresent(heroism) Spell(SUMMONFELGUARD)
 	Spell(DEMONSOUL)
+	if BuffPresent(heroism) Spell(SUMMONFELGUARD)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

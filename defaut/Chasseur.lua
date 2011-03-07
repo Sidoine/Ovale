@@ -75,7 +75,7 @@ AddIcon help=main mastery=1
 	#/kill_shot
 	if TargetLifePercent(less 20) Spell(KILLSHOT)
 	#/kill_command
-	if TargetInRange(GROWL) Spell(KILLCOMMAND)
+	if TargetInRange(GROWL) and Mana(more 39) Spell(KILLCOMMAND)
 	#/fervor,if=focus<=20
 	if Mana(less 20) Spell(FERVOR)
 	#/arcane_shot,if=focus>=90|buff.beast_within.up
