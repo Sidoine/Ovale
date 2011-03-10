@@ -117,10 +117,10 @@ AddIcon help=main mastery=1
 	Spell(HAUNT)
 	#/fel_flame,if=buff.tier11_4pc_caster.react&dot.unstable_affliction.remains<8
 	if ArmorSetParts(T11 more 3) and TargetDebuffExpires(UNSTABLEAFFLICTION 8) Spell(FELFLAME)
-	#/shadowflame
-	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
 	#/drain_soul,interrupt=1,if=target.health_pct<=25
 	if TargetLifePercent(less 25) Spell(DRAINSOUL)
+	#/shadowflame
+	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
 	
 	if TalentPoints(BANETALENT more 2)
 	{

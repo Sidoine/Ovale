@@ -2,6 +2,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local node={}
 local defines = {}
+local customFunctions = {}
 
 local function AddNode(newNode)
 	node[#node+1] = newNode
@@ -44,6 +45,10 @@ local function ParseNumber(dummy, value)
 end
 
 local function ParseFunction(prefix, func, params)
+	if not prefix and not params and customFunctions[func] then
+		return customFunctions[func]
+	end
+	
 	local paramList = ParseParameters(params)
 	if func ~= "" then
 		paramList.target = prefix
@@ -280,7 +285,7 @@ local function ParseDefine(key, value)
 	return ""
 end
 
-local function ParseAddIcon(params, text)
+local function ParseCommands(text)
 	local original = text
 	while (1==1) do
 		local was = text
@@ -331,8 +336,12 @@ local function ParseAddIcon(params, text)
 		Ovale:Print("syntax error:"..text)
 		return nil
 	end
-	
+	return masterNode
+end
+
+local function ParseAddIcon(params, text)
 	-- On convertit le numéro de node en node
+	local masterNode = ParseCommands(text)
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
 	if masterNode.params.talent and not HasTalent(masterNode.params.talent) then
@@ -416,6 +425,13 @@ function Ovale:Compile(text)
 	
 	-- On compile les AddCheckBox et AddListItem
 	text = self:CompileInputs(text)
+	
+	for p,t in string.gmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
+		local newNode = ParseCommands(t)
+		if newNode then
+			customFunction[p] = newNode
+		end
+	end
 	
 	local masterNodes ={}
 	

@@ -79,6 +79,7 @@ Define(RENDDEBUFF 94009)
 Define(INCITE 86627)
 Define(BATTLETRANCE 12964)
 Define(SLAUGHTER 84584)
+Define(THUNDERSTRUCK 87096)
 
 #Talents
 Define(SLAMTALENT 2233)
@@ -248,7 +249,7 @@ AddIcon help=main mastery=3
 		Spell(SHOCKWAVE)
 	}
 	Spell(REVENGE usable=1)
-	#Spell(SHOCKWAVE)
+	#if BuffPresent(THUNDERSTRUCK) Spell(SHOCKWAVE)
 	Spell(SHIELDSLAM)
 	if TargetDebuffExpires(meleeslow) Spell(THUNDERCLAP)
 	Spell(VICTORYRUSH usable=1)

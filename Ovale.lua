@@ -1269,7 +1269,8 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 		Ovale:Print("add spell "..spellId.." at "..startCast.." currentTime = "..self.currentTime.. " nextCast="..self.attenteFinCast)
 	end
 	
-	--Coût du sort (uniquement si dans le futur, dans le passé l'énergie est déjà dépensée)
+	--Effet du sort au moment où il est lancé
+	--(donc si il est déjà lancé, on n'en tient pas compte)
 	if endCast >= self.maintenant then
 		--Mana
 		local _, _, _, cost = GetSpellInfo(spellId)
@@ -1321,7 +1322,7 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 		end
 	end
 	
-	-- Effets du sort
+	-- Effets du sort au moment où il atteint sa cible
 	if newSpellInfo then
 		-- Cooldown du sort
 		local cd = self:GetCD(spellId)
