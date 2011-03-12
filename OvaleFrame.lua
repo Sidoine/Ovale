@@ -335,15 +335,15 @@ do
 		if (Ovale.db.profile.apparence.vertical) then
 			self.barre:SetWidth(maxHeight - margin)
 			self.barre:SetHeight(BARRE)
-			self.frame:SetWidth(maxHeight)
-			self.frame:SetHeight(maxWidth+BARRE+margin)
-			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxHeight,0)
+			self.frame:SetWidth(maxHeight + Ovale.db.profile.apparence.iconShiftY)
+			self.frame:SetHeight(maxWidth+BARRE+margin + Ovale.db.profile.apparence.iconShiftX)
+			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxHeight + Ovale.db.profile.apparence.iconShiftX,Ovale.db.profile.apparence.iconShiftY)
 		else
 			self.barre:SetWidth(maxWidth - margin)
 			self.barre:SetHeight(BARRE)
-			self.frame:SetWidth(maxWidth)
-			self.frame:SetHeight(maxHeight+BARRE+margin)
-			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth,0)
+			self.frame:SetWidth(maxWidth) -- + Ovale.db.profile.apparence.iconShiftX
+			self.frame:SetHeight(maxHeight+BARRE+margin) -- + Ovale.db.profile.apparence.iconShiftY
+			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth + Ovale.db.profile.apparence.iconShiftX,Ovale.db.profile.apparence.iconShiftY)
 		end
 	end
 	

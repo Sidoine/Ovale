@@ -74,10 +74,10 @@ Define(SHOOTINGSTARS 93400)
 Define(STAMPEDE 81022)
 Define(FAERIEFIREDEBUFF 91565)
 Define(STRENGTHOFTHEPANTHER 90166) #feral T11 4-pieces bonus
+Define(ASTRALALIGNMENT 90164) #balance T11 4-pieces bonus
 
 AddCheckBox(multi L(AOE))
 AddCheckBox(lucioles SpellName(FAERIEFIRE) default)
-AddCheckBox(wrath SpellName(WRATH) mastery=1)
 AddCheckBox(mangle SpellName(MANGLECAT) default mastery=2)
 AddCheckBox(demo SpellName(DEMOROAR) default mastery=2)
 AddCheckBox(shred SpellName(SHRED) default mastery=2)
@@ -89,12 +89,13 @@ ScoreSpells(FAERIEFERAL DEMOROAR MANGLEBEAR LACERATE SAVAGEROAR RIP
 
 AddIcon help=main mastery=1
 {
-	#Contributed by Grabielz
+	#/faerie_fire,if=debuff.faerie_fire.stack<3&!(debuff.sunder_armor.up|debuff.expose_armor.up)
 	if CheckBoxOn(lucioles) and TargetDebuffExpires(FAERIEFIREDEBUFF 3 mine=1 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) and TargetDeadIn(more 15)
 		Spell(FAERIEFIRE nored=1)
 
 	if Speed(more 0)
 	{
+		#/typhoon,moving=1
 		Spell(TYPHOON)
 		if BuffPresent(SHOOTINGSTARS) Spell(STARSURGE)
 		if TargetDebuffExpires(INSECTSWARM 4 mine=1) and TargetDeadIn(more 6)
@@ -103,47 +104,43 @@ AddIcon help=main mastery=1
 			Spell(SUNFIRE)
 		Spell(MOONFIRE)
 	}
-
+	
+	#/insect_swarm,if=!ticking
+	if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
+		Spell(INSECTSWARM nored=1)  
+	
 	if TargetDebuffExpires(MOONFIRE 1 mine=1) and TargetDebuffExpires(SUNFIRE 1 mine=1) and TargetDeadIn(more 6)
+			and BuffExpires(ASTRALALIGNMENT)
 	{
+		#/sunfire,if=!ticking&buff.t11_4pc_caster.down&!dot.moonfire.remains>0
 		if BuffPresent(ECLIPSESOLAR)
 			Spell(SUNFIRE nored=1)
+		#/moonfire,if=!ticking&buff.t11_4pc_caster.down&!dot.sunfire.remains>0
 		Spell(MOONFIRE nored=1)
 	}
-	
-	if TargetDebuffExpires(INSECTSWARM 1 mine=1) and TargetDeadIn(more 6)
-		Spell(INSECTSWARM nored=1)  
 		
-	if TargetDebuffExpires(INSECTSWARM 3 mine=1) and TargetDeadIn(more 6) and BuffPresent(ECLIPSESOLAR) and Eclipse(less 16)
-		Spell(INSECTSWARM nored=1)  
+	#/starsurge,if=!((eclipse<=-87&eclipse_dir=-1)|(eclipse>=80&eclipse_dir=1))
+	unless {Eclipse(less -88) and BuffExpires(ECLIPSELUNAR)} or {Eclipse(more 79) and BuffExpires(ECLIPSESOLAR)}
+		Spell(STARSURGE)
 		
-	Spell(STARSURGE)
-	
-	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100)
-	{
-		Spell(STARFIRE)
-	}
-	
-	if BuffPresent(ECLIPSESOLAR) or Eclipse(equal 100)
-	{
-		Spell(WRATH)
-	}
-
-	if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
-		Spell(INSECTSWARM)  
-
-
-	if {Eclipse(equal 0) and CheckBoxOn(wrath)} or Eclipse(less 0)
-		Spell(WRATH)
-	
-	if {Eclipse(equal 0) and CheckBoxOff(wrath)} or Eclipse(more 0)
-		Spell(STARFIRE)
+	#/innervate,if=mana_pct<50
+	if ManaPercent(less 50) Spell(INNERVATE)
+	#/starfire,if=eclipse_dir=1
+	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100) Spell(STARFIRE)
+	#/wrath,if=eclipse_dir=-1
+	if BuffPresent(ECLIPSESOLAR) or Eclipse(equal 100) Spell(WRATH)
+	if Eclipse(more 0) Spell(STARFIRE)
+	if Eclipse(less 0) Spell(WRATH)
+	#/starfire
+	Spell(STARFIRE)
 }
 
 AddIcon help=cd mastery=1
 {
-	Spell(FORCEOFNATURE)
-    Spell(STARFALL)
+	#/starfall,if=buff.lunar_eclipse.up&buff.t11_4pc_caster.down
+	if BuffPresent(ECLIPSELUNAR) and BuffExpires(ASTRALALIGNMENT) Spell(STARFALL)
+	#/treants,time>=5
+	if TimeInCombat(more 5) Spell(FORCEOFNATURE)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

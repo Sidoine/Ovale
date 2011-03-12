@@ -269,6 +269,24 @@ local options =
 					get = function(info) return Ovale.db.profile.apparence.margin end,
 					set = function(info,value) Ovale.db.profile.apparence.margin = value; Ovale:UpdateFrame() end
 				},
+				iconShiftX =
+				{
+					order = 5.6,
+					type = "range",
+					name = L["Décalage horizontal des options"],
+					min = -256, max = 256, step = 1,
+					get = function(info) return Ovale.db.profile.apparence.iconShiftX end,
+					set = function(info,value) Ovale.db.profile.apparence.iconShiftX = value; Ovale:UpdateFrame() end
+				},
+				iconShiftY =
+				{
+					order = 5.7,
+					type = "range",
+					name = L["Décalage vertical des options"],
+					min = -256, max = 256, step = 1,
+					get = function(info) return Ovale.db.profile.apparence.iconShiftY end,
+					set = function(info,value) Ovale.db.profile.apparence.iconShiftY = value; Ovale:UpdateFrame() end
+				},
 				raccourcis =
 				{
 					order = 6,
@@ -2066,6 +2084,10 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 			end
 		end
+	elseif element.type == "lua" then
+		local ret = loadstring(element.lua)()
+		self:Log("lua "..nilstring(ret))
+		return ret, 0, 0
 	elseif (element.type == "group") then
 		local meilleurTempsFils
 		local bestEnd
@@ -2075,6 +2097,10 @@ function Ovale:CalculerMeilleureAction(element)
 		 
 		if (Ovale.trace) then
 			self:Print(element.type.." ["..element.nodeId.."]")
+		end
+		
+		if #element.nodes == 1 then
+			return Ovale:CalculerMeilleureAction(element.nodes[1])
 		end
 		
 		for k, v in ipairs(element.nodes) do
@@ -2161,7 +2187,7 @@ function Ovale:ChargerDefaut()
 			top = 500,
 			check = {},
 			list = {},
-			apparence = {enCombat=false, iconScale = 2, margin = 4, fontScale = 0.5,
+			apparence = {enCombat=false, iconScale = 2, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
 				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●"},

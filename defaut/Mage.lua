@@ -73,11 +73,9 @@ Define(FIRESTARTERTALENT 11431)
 Define(CRITICALMASSTALENT 10541)
 Define(IMPROVEDSCORCH 10547)
 
-#CheckBoxes
-AddListItem(fb fb SpellName(FIREBALL) default)
-AddListItem(fb ffb SpellName(FROSTFIREBOLT) mastery=2)
-AddListItem(frb frb SpellName(FROSTBOLT) default)
-AddListItem(frb ffb SpellName(FROSTFIREBOLT) mastery=3)
+#Glyphs
+Define(GLYPHOFFROSTFIRE 61205)
+Define(GLYPHOFFROSTBOLT 56370)
 
 ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMENTAL PETFREEZE FROSTBOLT ARCANEBLAST ARCANEMISSILES ARCANEBARRAGE
             DEEPFREEZE ICELANCE)
@@ -136,40 +134,41 @@ AddIcon help=cd mastery=1
     if TargetDeadIn(more 10) Spell(FLAMEORB)
 	#/presence_of_mind,arcane_blast
     Spell(PRESENCEOFMIND)
-    
 }
 
 AddIcon help=main mastery=2
 {
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
-
-    if TalentPoints(CRITICALMASSTALENT more 0) and TargetDebuffExpires(CRITICALMASS) and TargetDebuffExpires(SHADOWANDFLAME) Spell(SCORCH)
-    if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1)
-            and TargetDebuffPresent(PYROBLAST mine=1)
+	#/scorch,debuff=1
+    if TalentPoints(CRITICALMASSTALENT more 0) and TargetDebuffExpires(magicalcrittaken 0) Spell(SCORCH)
+	#/combustion,if=dot.living_bomb.ticking&dot.ignite.ticking&dot.pyroblast.ticking
+    if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1) and TargetDebuffPresent(PYROBLAST mine=1)
         Spell(COMBUSTION)
+	#/living_bomb,if=!ticking
     if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
+	#/pyroblast_hs,if=buff.hot_streak.react
     if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
+	#/mage_armor,if=mana_pct<5
+	if BuffExpires(MAGEARMOR 0) and ManaPercent(less 5) Spell(MAGEARMOR)
     if TalentPoints(FIRESTARTERTALENT more 0) and Speed(more 0) Spell(SCORCH)
-    if ManaPercent(less 5) Spell(SCORCH)
-    if List(fb fb) and TargetDeadIn(less 60) Spell(FIREBALL)
-    if List(fb ffb) and TargetDeadIn(less 60) Spell(FROSTFIREBOLT)
-    if List(fb fb) and ManaPercent(more 39) Spell(FIREBALL)
-    if List(fb ffb) and ManaPercent(more 39) Spell(FROSTFIREBOLT)
-    if ManaPercent(less 95) and TalentPoints(IMPROVEDSCORCH more 0)
-    {
-           unless 60s before Spell(EVOCATION) Spell(SCORCH)
-    }
-    Spell(EVOCATION)
-    if TalentPoints(IMPROVEDSCORCH more 0) Spell(SCORCH)
+	#/frostfire_bolt
+    if Glyph(GLYPHOFFROSTFIRE) Spell(FROSTFIREBOLT usable=1)
+	#/fireball
+	Spell(FIREBALL usable=1)
+    Spell(SCORCH)
 }
 
 AddIcon help=cd mastery=2
 {
-    if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
-    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
+	if TargetBuffStealable(yes) Spell(SPELLSTEAL)
     if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
+    
+	#if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
+    #/mana_gem,if=mana_deficit>12500
     if ManaPercent(less 85) Item(MANAGEMITEM)
-    if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
+	#/mirror_image,if=target.time_to_die>=25
+	if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
+    #/flame_orb,if=target.time_to_die>=12
     if TargetDeadIn(more 11) Spell(FLAMEORB)
     Item(Trinket0Slot usable=1)
     Item(Trinket1Slot usable=1)
@@ -178,37 +177,54 @@ AddIcon help=cd mastery=2
 AddIcon help=main mastery=3
 {
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
-
     if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
-    if BuffPresent(FINGERSOFFROST stacks=1) Spell(DEEPFREEZE)
-    if BuffPresent(BRAINFREEZE) and BuffPresent(FINGERSOFFROST) Spell(FROSTFIREBOLT)
+	
+	#/deep_freeze
+    Spell(DEEPFREEZE)
+	#/frostfire_bolt,if=buff.brain_freeze.react&buff.fingers_of_frost.react
+    if BuffPresent(BRAINFREEZE) and BuffPresent(FINGERSOFFROST) {Spell(FROSTFIREBOLT) Spell(FIREBALL)}
+	#/ice_lance,if=buff.fingers_of_frost.stack>1
     if BuffPresent(FINGERSOFFROST stacks=2) Spell(ICELANCE)
+	#/ice_lance,if=buff.fingers_of_frost.react&pet.water_elemental.cooldown.freeze.remains<gcd
     unless BuffPresent(FINGERSOFFROST) Spell(PETFREEZE)
-    if BuffPresent(FINGERSOFFROST stacks=2) Spell(ICELANCE)
-    if BuffPresent(MOLTENARMOR) and {{manaPercent()*8} < target.timeToDie()} Spell(MAGEARMOR)
-    if ManaPercent(less 5) and TargetDeadIn(less 60) Spell(EVOCATION)
-    if List(frb frb) Spell(FROSTBOLT)
-    if List(frb ffb) Spell(FROSTFIREBOLT)
+	#/mage_armor,if=(mana_pct*12)<target.time_to_die
+    if Glyph(GLYPHOFFROSTBOLT) and BuffPresent(MOLTENARMOR) and {{manaPercent()*12} < target.timeToDie()} Spell(MAGEARMOR)
+	#/mage_armor,if=(mana_pct*15)<target.time_to_die
+	if Glyph(GLYPHOFFROSTBOLT no) and BuffPresent(MOLTENARMOR) and {{manaPercent()*15} < target.timeToDie()} Spell(MAGEARMOR)
+	#/evocation,if=mana_pct<5&target.time_to_die>60
+    if ManaPercent(less 5) and TargetDeadIn(more 60) Spell(EVOCATION)
+	#/ice_lance,moving=1
     if Speed(more 0) Spell(ICELANCE)
+	#/fire_blast,moving=1
     if Speed(more 0) Spell(FIREBLAST)
+	#/frostbolt
+	if Glyph(GLYPHOFFROSTBOLT) Spell(FROSTBOLT)
+    if Glyph(GLYPHOFFROSTBOLT no)
+	{
+		#/frostbolt,if=!cooldown.early_frost.remains
+		if castTime(FROSTBOLT) < timeWithHaste(1.5) Spell(FROSTBOLT)
+		#/frostfire_bolt
+		Spell(FROSTFIREBOLT)
+		Spell(FROSTBOLT)
+	}
 }
 
 AddIcon help=cd mastery=3
 {
-    if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
+    #if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
     if TargetBuffStealable(yes) Spell(SPELLSTEAL)
     if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
+	
+	#/mana_gem,if=mana_deficit>12500
     if ManaPercent(less 85) Item(MANAGEMITEM)
-    unless 15s before Spell(DEEPFREEZE)
-    {
-          unless 30s before Spell(FLAMEORB)
-          {
-               unless 30s before Spell(ICYVEINS)  Spell(COLDSNAP)
-          }
-    }
+	#/cold_snap,if=cooldown.deep_freeze.remains>15&cooldown.frostfire_orb.remains>30&cooldown.icy_veins.remains>30
+    unless 15s before Spell(DEEPFREEZE) or 30s before Spell(FLAMEORB) or 30s before Spell(ICYVEINS) Spell(COLDSNAP)
+	#/frostfire_orb,if=target.time_to_die>=12
     if TargetDeadIn(more 11) Spell(FLAMEORB)
+	#/mirror_image,if=target.time_to_die>=25
     if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
-    unless BuffPresent(ICYVEINS) Spell(ICYVEINS)
+	#/icy_veins,if=buff.icy_veins.down&buff.bloodlust.down
+    if BuffExpires(ICYVEINS 0) and BuffExpires(heroism 0) Spell(ICYVEINS)
     Item(Trinket0Slot usable=1)
     Item(Trinket1Slot usable=1)
 }

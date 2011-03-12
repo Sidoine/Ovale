@@ -45,22 +45,24 @@ local function ParseNumber(dummy, value)
 end
 
 local function ParseFunction(prefix, func, params)
-	if not prefix and not params and customFunctions[func] then
-		return customFunctions[func]
-	end
-	
 	local paramList = ParseParameters(params)
 	if func ~= "" then
 		paramList.target = prefix
 	else
 		func = prefix
 	end
+	
 	if string.find(func, "Target") == 1 then
 		if not paramList.target then
 			paramList.target = "target"
 		end
 		func = string.sub(func, 7)
 	end
+	
+	if customFunctions[func] then
+		return customFunctions[func]
+	end
+	
 	local newNode = { type="function", func=func, params=paramList}
 	return AddNode(newNode)
 end
@@ -285,8 +287,14 @@ local function ParseDefine(key, value)
 	return ""
 end
 
+local function ParseLua(text)
+	local newNode = {type="lua", lua = string.sub(text, 2, string.len(text)-1)}
+	return AddNode(newNode)
+end
+
 local function ParseCommands(text)
 	local original = text
+	text = string.gsub(text,"(%b[])", ParseLua)
 	while (1==1) do
 		local was = text
 		text = string.gsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
@@ -429,7 +437,7 @@ function Ovale:Compile(text)
 	for p,t in string.gmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
 		local newNode = ParseCommands(t)
 		if newNode then
-			customFunction[p] = newNode
+			customFunctions[p] = "node"..newNode
 		end
 	end
 	
@@ -480,6 +488,10 @@ function Ovale:DebugNode(node)
 		text = node.comparison.." than "..self:DebugNode(node.time).." "..self:DebugNode(node.a)
 	elseif (node.type == "time") then
 		text = node.value.."s"
+	elseif node.type == "operator" then
+		text = self:DebugNode(node.a)..node.operator..self:DebugNode(node.b)
+	elseif node.type == "lua" then
+		text = "["..node.lua.."]"
 	else
 		text = "#unknown node type#"
 	end
