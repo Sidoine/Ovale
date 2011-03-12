@@ -126,8 +126,6 @@ AddIcon help=main mastery=1
 	{
 		#/life_tap,mana_percentage<=35
 		if ManaPercent(less 35) and LifePercent(more 75) Spell(LIFETAP)
-		#/soulburn
-		if SoulShards(more 0) Spell(SOULBURN)
 		if TalentPoints(EMBERSTORMTALENT more 0) and TalentPoints(IMPROVEDSOULFIRE more 0)
 		{
 			#/soul_fire,if=buff.improved_soul_fire.cooldown_remains<(cast_time+travel_time)&buff.bloodlust.down&!in_flight
@@ -143,9 +141,6 @@ AddIcon help=main mastery=1
 	}
 	if TalentPoints(BANETALENT less 3)
 	{
-		if SoulShards(more 0) Spell(SOULBURN)
-		#/soul_fire,if=buff.soulburn.up
-		if BuffPresent(SOULBURN) Spell(SOULFIRE)
 		#/demon_soul,if=buff.shadow_trance.react
 		#if BuffPresent(SHADOWTRANCE) Spell(DEMONSOUL)
 		#/shadow_bolt,if=buff.shadow_trance.react
@@ -203,8 +198,6 @@ AddIcon help=main mastery=2
 	if TargetDebuffPresent(IMMOLATE) Spell(HANDOFGULDAN)
 	#/incinerate,if=buff.molten_core.react
 	if BuffPresent(MOLTENCORE) Spell(INCINERATE)
-	#/soulburn
-	if SoulShards(more 0) Spell(SOULBURN)
 	if TalentPoints(IMPROVEDSOULFIRE more 0)
 	{
 		#/soul_fire,if=buff.improved_soul_fire.cooldown_remains<(cast_time+travel_time)&buff.bloodlust.down&!in_flight&miss_react
@@ -258,8 +251,6 @@ AddIcon help=main mastery=3
 	if TalentPoints(IMPROVEDSOULFIRE more 0) and BuffExpires(IMPROVEDSOULFIREBUFF) and BuffExpires(EMPOWEREDIMP 0) Spell(SOULFIRE)
 	#/chaos_bolt
 	Spell(CHAOSBOLT)
-	#/soulburn,if=buff.bloodlust.down
-	if SoulShards(more 0) and BuffExpires(heroism) Spell(SOULBURN)
 	#/soul_fire,if=buff.improved_soul_fire.remains<(cast_time+travel_time+action.incinerate.cast_time+gcd)&!in_flight
 	if TalentPoints(IMPROVEDSOULFIRE more 0)
 	{
@@ -302,4 +293,5 @@ AddIcon size=small mastery=3
 {
     unless PetPresent() Spell(SUMMONIMP)
 }
+
 ]]
