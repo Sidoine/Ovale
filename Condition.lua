@@ -452,7 +452,7 @@ Ovale.conditions=
 		end
 		return 0
 	end,
-		Class = function(condition)
+	Class = function(condition)
 		local loc, noloc = UnitClass(getTarget(condition.target))
 		return testbool(noloc == condition[1], condition[2])
 	end,
@@ -671,7 +671,7 @@ Ovale.conditions=
 		return 0, ret
 	end,
 	lastSwing = function(condition)
-		return OvaleSwing:GetLast(condition[1]), 0, -1
+		return Ovale.currentTime - OvaleSwing:GetLast(condition[1]), 0, 1
 	end,
 	-- Compare with the player level
 	-- 1 : "less" or "more"
@@ -750,7 +750,7 @@ Ovale.conditions=
 		return ret
 	end,
 	nextSwing = function(condition)
-		return OvaleSwing:GetNext(condition[1]), 0, -1
+		return OvaleSwing:GetNext(condition[1]) - Ovale.currentTime, 0, -1
 	end,
 	OtherDebuffExpires = function(condition)
 		Ovale:EnableOtherDebuffs()
