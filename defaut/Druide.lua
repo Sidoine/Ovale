@@ -105,18 +105,32 @@ AddIcon help=main mastery=1
 		Spell(MOONFIRE)
 	}
 	
-	#/insect_swarm,if=!ticking
-	if TargetDebuffExpires(INSECTSWARM 0 mine=1) and TargetDeadIn(more 6)
-		Spell(INSECTSWARM nored=1)  
-	
-	if TargetDebuffExpires(MOONFIRE 1 mine=1) and TargetDebuffExpires(SUNFIRE 1 mine=1) and TargetDeadIn(more 6)
-			and BuffExpires(ASTRALALIGNMENT)
+	#/insect_swarm,if=ticks_remain<2|(dot.insect_swarm.remains<4&buff.solar_eclipse.up&eclipse<15)";
+	if TargetDebuffExpires(INSECTSWARM 2 mine=1) or {TargetDebuffExpires(INSECTSWARM 4 mine=1) and 
+			BuffPresent(ECLIPSESOLAR) and Eclipse(less 15)}
+			Spell(INSECTSWARM nored=1)  
+
+	if BuffPresent(ASTRALALIGNMENT)
 	{
-		#/sunfire,if=!ticking&buff.t11_4pc_caster.down&!dot.moonfire.remains>0
-		if BuffPresent(ECLIPSESOLAR)
+		#/starsurge,if=buff.t11_4pc_caster.up
+		Spell(STARSURGE)
+		#/starfire,if=buff.t11_4pc_caster.up&buff.lunar_eclipse.up
+		if BuffPresent(ECLIPSELUNAR) Spell(STARFIRE)
+		#/wrath,if=buff.t11_4pc_caster.up
+		Spell(WRATH)
+	}
+	
+    #action_list_str += "/wild_mushroom_detonate,moving=1,if=buff.wild_mushroom.stack=3";
+    #action_list_str += "/wild_mushroom_detonate,moving=0,if=buff.wild_mushroom.stack>0&buff.solar_eclipse.up";
+
+	if TargetDeadIn(more 6)	and BuffExpires(ASTRALALIGNMENT)
+	{
+		#/sunfire,if=(!ticking|ticks_remain<2)&buff.t11_4pc_caster.down&!dot.moonfire.remains>0
+		if BuffPresent(ECLIPSESOLAR) and TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDebuffExpires(SUNFIRE 2 mine=1)
 			Spell(SUNFIRE nored=1)
 		#/moonfire,if=!ticking&buff.t11_4pc_caster.down&!dot.sunfire.remains>0
-		Spell(MOONFIRE nored=1)
+		if TargetDebuffExpires(MOONFIRE 2 mine=1) and TargetDebuffExpires(SUNFIRE 0 mine=1)
+			Spell(MOONFIRE nored=1)
 	}
 		
 	#/starsurge,if=!((eclipse<=-87&eclipse_dir=-1)|(eclipse>=80&eclipse_dir=1))
@@ -125,6 +139,13 @@ AddIcon help=main mastery=1
 		
 	#/innervate,if=mana_pct<50
 	if ManaPercent(less 50) Spell(INNERVATE)
+	
+	#The following lines should not be useful for Ovale
+	#/starfire,if=eclipse_dir=1&eclipse<80
+	#/starfire,prev=wrath,if=eclipse_dir=-1&eclipse<-87
+    #/wrath,if=eclipse_dir=-1&eclipse>=-87";
+    #/wrath,prev=starfire,if=eclipse_dir=1&eclipse>=80";
+
 	#/starfire,if=eclipse_dir=1
 	if BuffPresent(ECLIPSELUNAR) or Eclipse(equal -100) Spell(STARFIRE)
 	#/wrath,if=eclipse_dir=-1

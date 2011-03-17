@@ -204,8 +204,8 @@ AddIcon help=aoe mastery=2
 
 AddIcon help=cd mastery=2
 {
-	#/raise_dead,time>=5
-	unless TotemPresent(ghoul) if TimeInCombat(more 5) Spell(RAISEDEAD priority=2)
+	#/raise_dead,time>=15
+	unless TotemPresent(ghoul) if TimeInCombat(more 15) Spell(RAISEDEAD priority=2)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
