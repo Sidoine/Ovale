@@ -3,6 +3,7 @@ Ovale.defaut["HUNTER"] =
 #Spells
 Define(AIMEDSHOT 19434)
 	SpellInfo(AIMEDSHOT resetcounter=ss)
+	SpellAddBuff(AIMEDSHOT FIRE=0)
 Define(ARCANESHOT 3044)
 	SpellInfo(ARCANESHOT resetcounter=ss)
 Define(ASPECTOFTHEFOX 82661)
