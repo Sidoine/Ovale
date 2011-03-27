@@ -99,7 +99,7 @@ AddIcon help=main mastery=1
 	unless InCombat()
 	{
 		#/flametongue_weapon,weapon=main
-		if WeaponEnchantExpires(mainhand 400) Spell(FLAMETHONG)
+		if WeaponEnchantExpires(mainhand 400) Spell(FLAMETHONGWEAPON)
 	}
 	#/lightning_shield
 	if BuffExpires(LIGHTNINGSHIELD 2) Spell(LIGHTNINGSHIELD)
@@ -115,7 +115,7 @@ AddIcon help=main mastery=1
 	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)
 	#/earth_shock,if=buff.lightning_shield.stack>6&dot.flame_shock.remains>cooldown&dot.flame_shock.remains<cooldown+action.flame_shock.tick_time
 	if BuffPresent(LIGHTNINGSHIELD stacks=7) and { target.debuffExpires(FLAMESHOCK mine=1) > spell(LAVABURST) }
-			and { target.debuffExpires(FLAMESHOCK mine=1) < spell(LAVABURST) + timeWithHaste(3) } Spell(LAVABURST)
+			and { target.debuffExpires(FLAMESHOCK mine=1) < spell(LAVABURST) + timeWithHaste(3) } Spell(EARTHSHOCK)
 	
 	if TotemExpires(fire) Spell(SEARINGTOTEM)
 	#/spiritwalkers_grace,moving=1
