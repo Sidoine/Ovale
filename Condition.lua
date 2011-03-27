@@ -694,6 +694,10 @@ Ovale.conditions=
 		local target = getTarget(condition.target)
 		return compare(UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2]/100)
 	end,
+	lifePercent = function(condition)
+		local target = getTarget(condition.target)
+		return 100 * UnitHealth(target)/UnitHealthMax(target), 0, 0
+	end
 	-- Test if a list item is selected
 	-- 1 : the list name
 	-- 2 : the item name
