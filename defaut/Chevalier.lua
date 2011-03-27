@@ -148,8 +148,6 @@ AddIcon help=main mastery=2
 {	
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
 	
-	#/pillar_of_frost
-	if Runes(frost 1) Spell(PILLAROFFROST)
 	#/outbreak,if=dot.frost_fever.remains<=2|dot.blood_plague.remains<=2
 	if TargetDebuffExpires(BLOODPLAGUE 2 mine=1) and TargetDebuffExpires(FROSTFEVER 2 mine=1) Spell(OUTBREAK)
 	#/howling_blast,if=dot.frost_fever.remains<=2
@@ -204,6 +202,8 @@ AddIcon help=aoe mastery=2
 
 AddIcon help=cd mastery=2
 {
+	#/pillar_of_frost
+	if Runes(frost 1) Spell(PILLAROFFROST)
 	#/raise_dead,time>=15
 	unless TotemPresent(ghoul) if TimeInCombat(more 15) Spell(RAISEDEAD priority=2)
 	Item(Trinket0Slot usable=1)

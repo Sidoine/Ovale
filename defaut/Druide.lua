@@ -50,6 +50,7 @@ Define(STARFIRE 2912) #moonkin
 	SpellInfo(STARFIRE eclipse=20)
 Define(STARSURGE 78674) #moonkin 15 lunar+solar
 	SpellInfo(STARSURGE cd=15 starsurge=15)
+	SpellAddBuff(STARSURGE SHOOTINGSTARS=0)
 Define(SUNFIRE 93402)
 	SpellAddTargetDebuff(SUNFIRE SUNFIRE=18)
 Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
