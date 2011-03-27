@@ -154,13 +154,18 @@ do
 			end
 			Ovale:InitCalculerMeilleureAction()
 			local start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
-			
+			if start then
+				Ovale:Log("CalculerMeilleureAction start = "..start)
+			end
 			local action = self.actions[k]
 			
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = Ovale:GetActionInfo(element)
 			if noRed then
 				start = actionCooldownStart + actionCooldownDuration
+				if start < Ovale.currentTime then
+					start = Ovale.currentTime
+				end
 			end
 			
 			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
@@ -215,7 +220,7 @@ do
 						nextCast = start + gcd
 					end					
 					if Ovale.trace then
-						Ovale:Print("****Second icon")
+						Ovale:Print("****Second icon " .. start)
 					end
 					Ovale:AddSpellToStack(spellId, start, start + castTime, nextCast)
 					start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)

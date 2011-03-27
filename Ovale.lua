@@ -51,7 +51,7 @@ Ovale.buff = {}
 Ovale.className = nil
 --the state in the current frame
 --TODO: really, the simulator should be in its own class
-Ovale.state = {rune={}, cd = {}}
+Ovale.state = {rune={}, cd = {}, counter={}}
 --spells that count for scoring
 Ovale.scoreSpell = {}
 --tracks debuffs on the units that are not the current target
@@ -1006,6 +1006,16 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 	end
 end
 
+function Ovale:GetCounterValue(id)
+	if self.state.counter[id] then
+		return self.state.counter[id]
+	elseif self.counter[id] then
+		return self.counter[id]
+	else
+		return 0
+	end
+end
+
 function Ovale:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineId, spellId)
 	if unit=="player" then
 		--self:Print("UNIT_SPELLCAST_CHANNEL_START "..event.." name="..name.." lineId="..lineId.." spellId="..spellId)
@@ -1256,6 +1266,13 @@ function Ovale:GetCD(spellId)
 	end
 end
 
+function Ovale:AddEclipse(endCast, spellId)
+	local newAura = self:GetAura("player", "HELPFUL", spellId)
+	newAura.start = endCast + 0.5
+	newAura.stacks = 1
+	newAura.ending = nil
+end
+
 -- Cast a spell in the simulator
 -- spellId : the spell id
 -- startCast : temps du cast
@@ -1284,7 +1301,22 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 	end
 	
 	if Ovale.trace then
-		Ovale:Print("add spell "..spellId.." at "..startCast.." currentTime = "..self.currentTime.. " nextCast="..self.attenteFinCast)
+		Ovale:Print("add spell "..spellId.." at "..startCast.." currentTime = "..self.currentTime.. " nextCast="..self.attenteFinCast .. " endCast="..endCast)
+	end
+	
+	--Effet du sort au moment du début du cast
+	--(donc si cast déjà commencé, on n'en tient pas compte)
+	if startCast >= self.maintenant then
+		if newSpellInfo then
+			if newSpellInfo.inccounter then
+				local id = newSpellInfo.inccounter
+				self.state.counter[id] = self:GetCounterValue(id) + 1
+			end
+			
+			if newSpellInfo.resetcounter then
+				self.state.counter[newSpellInfo.resetcounter] = 0
+			end
+		end
 	end
 	
 	--Effet du sort au moment où il est lancé
@@ -1297,6 +1329,7 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 		end
 
 		if newSpellInfo then
+		
 			if newSpellInfo.mana then
 				self.state.mana = self.state.mana - newSpellInfo.mana
 			end
@@ -1382,16 +1415,11 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 			self.state.eclipse = self.state.eclipse + newSpellInfo.eclipse
 			if self.state.eclipse < -100 then
 				self.state.eclipse = -100
+				self:AddEclipse(endCast, 48518)
 			elseif self.state.eclipse > 100 then
 				self.state.eclipse = 100
+				self:AddEclipse(endCast, 48517)
 			end
-			--[[self.state.nextEclipse = self.state.eclipse + newSpellInfo.eclipse
-			if self.state.nextEclipse < -100 then
-				self.state.nextEclipse = -100
-			elseif self.state.nextEclipse > 100 then
-				self.state.nextEclipse = 100
-			end
-			self.state.nextEclipseTime = endCast + 0.5]]
 		end
 		if newSpellInfo.starsurge then
 			local buffAura = self:GetAura("player", "HELPFUL", 48517) --Solar
@@ -1413,8 +1441,10 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 			end
 			if self.state.eclipse < -100 then
 				self.state.eclipse = -100
+				self:AddEclipse(endCast, 48518)
 			elseif self.state.eclipse > 100 then
 				self.state.eclipse = 100
+				self:AddEclipse(endCast, 48517)
 			end
 		end
 			
@@ -1430,6 +1460,8 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 						--Optionnellement, on va regarder la durée du buff
 						if auraSpellId and self.spellInfo[auraSpellId] and self.spellInfo[auraSpellId].duration then
 							duration = self.spellInfo[auraSpellId].duration
+						elseif stacks~="refresh" and stacks > 0 then
+							stacks = 1
 						end
 						if stacks=="refresh" then
 							if newAura.ending then
@@ -1451,11 +1483,11 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 							end
 						elseif newAura.ending and newAura.ending >= endCast then
 							newAura.ending = endCast + duration
-							newAura.stacks = newAura.stacks + 1
+							newAura.stacks = newAura.stacks + stacks
 						else
 							newAura.start = endCast
 							newAura.ending = endCast + duration
-							newAura.stacks = 1
+							newAura.stacks = stacks
 						end
 						if Ovale.trace then
 							if auraSpellId then
@@ -1509,41 +1541,27 @@ function Ovale:InitCalculerMeilleureAction()
 		v.toggled = nil
 	end
 	
---	if (Ovale.db.profile.apparence.latencyCorrection) then
-		for i,v in ipairs(self.lastSpell) do
-			if not self.spellInfo[v.spellId] or not self.spellInfo[v.spellId].toggle then
-				--[[local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
-				if spell and spell == v.name and startTime/1000 - v.start < 0.5 and v.stop~=endTime/1000 then
-					print("ancien = "..v.stop)
-					v.stop = endTime/1000
-					print("changement de v.stop en "..v.stop.." "..v.start)
-				end]]
-				self:Log("self.maintenant = " ..self.maintenant.." spellId="..v.spellId.." v.stop="..v.stop)
-				if self.maintenant - v.stop<5 then
-					self:AddSpellToStack(v.spellId, v.start, v.stop, v.stop, v.nocd)
-				else
-					--self:Print("Removing obsolete "..v.spellId)
-					table.remove(self.lastSpell, i)
-				end
+	for k,v in pairs(self.state.counter) do
+		self.state.counter[k] = self.counter[k]
+	end
+	
+	for i,v in ipairs(self.lastSpell) do
+		if not self.spellInfo[v.spellId] or not self.spellInfo[v.spellId].toggle then
+			--[[local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
+			if spell and spell == v.name and startTime/1000 - v.start < 0.5 and v.stop~=endTime/1000 then
+				print("ancien = "..v.stop)
+				v.stop = endTime/1000
+				print("changement de v.stop en "..v.stop.." "..v.start)
+			end]]
+			self:Log("self.maintenant = " ..self.maintenant.." spellId="..v.spellId.." v.stop="..v.stop)
+			if self.maintenant - v.stop<5 then
+				self:AddSpellToStack(v.spellId, v.start, v.stop, v.stop, v.nocd)
+			else
+				--self:Print("Removing obsolete "..v.spellId)
+				table.remove(self.lastSpell, i)
 			end
 		end
-		
-		--local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
-		--if (spell) then
-		--	self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
-		--end
-	--[[else
-		-- On attend que le sort courant soit fini
-		local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitCastingInfo("player")
-		if (spell) then
-			self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
-		else
-			local spell, rank, displayName, icon, startTime, endTime, isTradeSkill = UnitChannelInfo("player")
-			if (spell) then
-				self:AddSpellToStack(spell, startTime/1000, endTime/1000, endTime/1000)
-			end
-		end
-	end]]
+	end
 end
 
 local function printTime(temps)

@@ -7,38 +7,42 @@ Define(ADRENALINERUSH 13750)
 Define(AMBUSH 8676)
 	SpellInfo(AMBUSH combo=2 mana=60)
 Define(BACKSTAB 53)
-	SpellInfo(BACKSTAB combo=1)
+	SpellInfo(BACKSTAB combo=1 mana=60)
 Define(BLADEFLURRY 13877)
-	SpellAddBuff(BLADEFLURRY BLADEFLURRY=15 cd=30)
+	SpellAddBuff(BLADEFLURRY BLADEFLURRY=1000 cd=10)
 Define(CLOACKOFSHADOWS 31224)
 	SpellInfo(CLOACKOFSHADOWS cd=90)
 Define(COLDBLOOD 14177)
 	SpellInfo(COLDBLOOD cd=120)
+	SpellAddBuff(COLDBLOOD COLDBLOOD=100)
 Define(ENVENOM 32645)
 	SpellInfo(ENVENOM combo=-5)
+	SpellAddBuff(ENVENOM ENVENOM=5 mana=35)
 Define(EVISCERATE 2098)
-	SpellInfo(EVISCERATE combo=-5)
+	SpellInfo(EVISCERATE combo=-5 mana=35)
 Define(HEMORRHAGE 16511)
-	SpellInfo(HEMORRHAGE combo=1)
+	SpellInfo(HEMORRHAGE combo=1 mana=35)
+	SpellAddTargetDebuff(HEMORRHAGE HEMORRHAGE=60)
 Define(KILLINGSPREE 51690)
 	SpellInfo(KILLINGSPREE cd=120)
 	SpellAddBuff(KILLINGSPREE KILLINGSPREE=2)
 Define(GARROTE 703)
+	SpellInfo(GARROTE combo=1 mana=45)
 	SpellAddTargetDebuff(GARROTE GARROTE=18)
 Define(MUTILATE 1329)
-	SpellInfo(MUTILATE combo=1)
+	SpellInfo(MUTILATE combo=1 mana=60)
 Define(PREMEDITATION 14183)
-	SpellInfo(PREMEDITATION cd=20)
+	SpellInfo(PREMEDITATION cd=20 combo=2)
 Define(PREPARATION 14185)
 	SpellInfo(PREPARATION cd=300)
 Define(REVEALINGSTRIKE 84617)
-	SpellInfo(REVEALINGSTRIKE combo=1)
+	SpellInfo(REVEALINGSTRIKE combo=1 mana=40)
 	SpellAddTargetDebuff(REVEALINGSTRIKE REVEALINGSTRIKE=15)
 Define(RUPTURE 1943)
-	SpellInfo(RUPTURE combo=-5)
+	SpellInfo(RUPTURE combo=-5 mana=25)
 	SpellAddTargetDebuff(RUPTURE RUPTURE=8)
 Define(SINISTERSTRIKE 1752)
-	SpellInfo(SINISTERSTRIKE combo=1)
+	SpellInfo(SINISTERSTRIKE combo=1 mana=45)
 Define(SHADOWDANCE 51713)
 	SpellInfo(SHADOWDANCE cd=60)
 	SpellAddBuff(SHADOWDANCE SHADOWDANCE=6)
@@ -46,7 +50,7 @@ Define(SHADOWSTEP 36554)
 	SpellInfo(SHADOWSTEP cd=20)
 	SpellAddBuff(SHADOWSTEP SHADOWSTEPBUFF=10)
 Define(SLICEANDDICE 5171)
-	SpellInfo(SLICEANDDICE combo=-5)
+	SpellInfo(SLICEANDDICE combo=-5 mana=25)
 	SpellAddBuff(SLICEANDDICE SLICEANDDICE=10)
 Define(STEALTH 1784)
 Define(TRICKSOFTHETRADE 57934)
@@ -141,18 +145,18 @@ AddIcon help=main mastery=2
 	if ComboPoints(less 5) Spell(SINISTERSTRIKE)
 }
 
+AddIcon help=aoe mastery=2
+{
+	Spell(BLADEFLURRY)
+	unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
+}
+
 AddIcon help=cd mastery=2
 {
 	#adrenaline_rush,if=energy<20
 	unless BuffPresent(KILLINGSPREE) if Mana(less 20) Spell(ADRENALINERUSH)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
-}
-
-AddIcon help=aoe mastery=2
-{
-	Spell(BLADEFLURRY)
-	unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
 }
 
 AddIcon help=main mastery=3

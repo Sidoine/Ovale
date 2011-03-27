@@ -3,6 +3,7 @@ Ovale.defaut["MAGE"]=
 #Contributed by Hinalover
 #Spells
 Define(ARCANEBARRAGE 44425) #arcane instant
+	SpellInfo(ARCANEBARRAGE cd=4)
     SpellAddDebuff(ARCANEBARRAGE ARCANEBLASTDEBUFF=0)
 Define(ARCANEBLAST 30451) #arcane stacks*4 cost increased
     SpellAddDebuff(ARCANEBLAST ARCANEBLASTDEBUFF=10)
@@ -10,25 +11,31 @@ Define(ARCANEMISSILES 5143) #arcane channel
     SpellAddDebuff(ARCANEMISSILES ARCANEBLASTDEBUFF=0 ARCANEMISSILEBUFF=0)
 Define(ARCANEPOWER 12042) #arcane cd
     SpellInfo(ARCANEPOWER cd=84)
+	SpellAddBuff(ARCANEPOWER ARCANEPOWER=15)
 Define(COLDSNAP 11958) #frost reset cd
     SpellInfo(COLDSNAP cd=384)
 Define(COMBUSTION 11129) #fire cd consume dot
-    SpellInfo(COMBUSTION cd=180)
+    SpellInfo(COMBUSTION cd=120)
 Define(CONJUREMANAGEM 759)
+	SpellInfo(CONJUREMANAGEM cd=10) #fake
 Define(COUNTERSPELL 2139)
     SpellInfo(COUNTERSPELL cd=24)
 Define(DEEPFREEZE 44572) #frost instant
+	SpellInfo(DEEPFREEZE cd=30)
     SpellAddBuff(DEEPFREEZE FINGERSOFFROST=-1)
 Define(EVOCATION 12051)
     SpellInfo(EVOCATION cd=240)
 Define(FIREBLAST 2136) #fire instant
+	SpellInfo(FIREBLAST cd=8)
 Define(FIREBALL 133) #fire 2.5
 Define(FLAMEORB 82731)
     SpellInfo(FLAMEORB cd=60)
 Define(FROSTBOLT 116) #frost
 Define(FROSTFIREBOLT 44614) #frost+fire
+	SpellAddTargetDebuff(FROSTFIREBOLT FROSTFIREBOLT=9)
     SpellAddBuff(FROSTFIREBOLT BRAINFREEZE=-1 FINGERSOFFROST=-1)
 Define(ICEARMOR 7302)
+	SpellAddBuff(ICEARMOR ICEARMOR=1800)
 Define(ICELANCE 30455) #frost instant
     SpellAddBuff(ICELANCE FINGERSOFFROST=-1)
 Define(ICYVEINS 12472) #frost cd
@@ -36,9 +43,11 @@ Define(ICYVEINS 12472) #frost cd
 Define(LIVINGBOMB 44457) #fire dot
     SpellAddTargetDebuff(LIVINGBOMB LIVINGBOMB=12)
 Define(MAGEARMOR 6117)
+	SpellAddBuff(MAGEARMOR MAGEARMOR=1800)
 Define(MIRRORIMAGE 55342)
     SpellInfo(MIRRORIMAGE cd=180)
 Define(MOLTENARMOR 30482)
+	SpellAddBuff(MOLTENARMOR MOLTENARMOR=1800)
 Define(PYROBLAST 11366) #fire dot
     SpellAddTargetDebuff(PYROBLAST PYROBLAST=12)
     SpellAddBuff(PYROBLAST HOTSTREAK=0)
@@ -49,10 +58,12 @@ Define(SUMMONWATERELEMENTAL 31687) #frost pet
 
 Define(PETFREEZE 33395) #Frost pet freeze ability
     SpellInfo(PETFREEZE cd=25)
-
+	SpellAddBuff(PETFREEZE FINGERSOFFROST=2)
+	
 #Buff
 Define(BRAINFREEZE 57761) #frost (instant fireball/frostfire bolt)
 Define(FINGERSOFFROST 44544) #frost boost ice lance/deep freeze
+	SpellInfo(FINGERSOFFROST duration=14)
 Define(HOTSTREAK 48108) #fire instant pyroblast
 Define(ARCANEBLASTDEBUFF 36032)
 Define(ARCANEMISSILEBUFF 79683)
@@ -125,7 +136,7 @@ AddIcon help=cd mastery=1
 		#action_list_str += "/arcane_power,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
 		Spell(ARCANEPOWER)
 		#action_list_str += "/mana_gem,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
-		Spell(MANAGEM)
+		Item(MANAGEMITEM)
 	}
 	
     #action_list_str += "/mirror_image,if=buff.arcane_power.up|(cooldown.arcane_power.remains>20&target.time_to_die>15)";

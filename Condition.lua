@@ -486,7 +486,7 @@ Ovale.conditions=
 		return compare(points, condition[1], condition[2])
 	end,
 	Counter = function(condition)
-		return compare(Ovale.counter[condition[1]], condition[2], condition[3])
+		return compare(Ovale:GetCounterValue(condition[1]), condition[2], condition[3])
 	end,
 	CreatureFamily = function(condition)
 		return testbool(UnitCreatureFamily(getTarget(condition.target)) == LBCT[condition[1]], condition[2])

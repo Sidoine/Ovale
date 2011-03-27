@@ -1,64 +1,84 @@
 Ovale.defaut["DEATHKNIGHT"] = [[
 #Abilities
 Define(ARMYOFTHEDEAD 42650)
-	SpellInfo(ARMYOFTHEDEAD cd=600)
+	SpellInfo(ARMYOFTHEDEAD cd=600 mana=-15)
 Define(BLOODBOIL 48721)
+	SpellInfo(BLOODBOIL blood=-1 mana=-10)
 	SpellAddTargetDebuff(BLOODBOIL SCARLETFEVER=30)
 Define(BLOODPRESENCE 48263)
 Define(BLOODSTRIKE 45902)
-	SpellInfo(BLOODSTRIKE blood=-1)
+	SpellInfo(BLOODSTRIKE blood=-1 mana=-10)
 Define(BLOODTAP 45529)
+	SpellInfo(BLOODTAP cd=60 mana=-10)
 Define(BONESHIELD 49222) #blood
+	SpellInfo(BONESHIELD unholy=-1 mana=-10)
 	SpellAddBuff(BONESHIELD BONESHIELD=300)
 Define(DANCINGRUNEWEAPON 49028) #blood
+	SpellInfo(DANCINGRUNEWEAPON cd=90)
 Define(DARKTRANSFORMATION 63560) #unholy
+	SpellInfo(DARKTRANSFORMATION unholy=-1 cd=30 mana=-10) #fake cd
 Define(DEATHANDDECAY 43265)
+	SpellInfo(DEATHANDDECAY unholy=-1 cd=30 mana=-10)
 Define(DEATHCOIL 47541)
+	SpellInfo(DEATHCOIL mana=40)
 Define(DEATHPACT 48743)
+	SpellInfo(DEATHPACT cd=120 mana=40)
 Define(DEATHSTRIKE 49998)
-	SpellInfo(DEATHSTRIKE unholy=-1 frost=-1)
+	SpellInfo(DEATHSTRIKE unholy=-1 frost=-1 mana=-15)
 Define(EMPOWERRUNEWEAPON 47568)
+	SpellInfo(EMPOWERRUNEWEAPON cd=300 unholy=1 frost=1 blood=1 mana=-25)
 Define(FESTERINGSTRIKE 85948) #1 frost 1 blood
+	SpellInfo(FESTERINGSTRIKE blood=-1 frost=-1 mana=-15)
+	SpellAddTargetDebuff(FESTERINGSTRIKE BLOODPLAGUE=refresh FROSTFEVER=refresh)
 Define(FROSTPRESENCE 48266)
 Define(FROSTSTRIKE 49143) #frost
 	SpellInfo(FROSTSTRIKE mana=40)
 Define(HEARTSTRIKE 55050) #blood
-	SpellInfo(HEARTSTRIKE blood=-1)
+	SpellInfo(HEARTSTRIKE blood=-1 mana=-10)
 Define(HORNOFWINTER 57330)
-	SpellInfo(HORNOFWINTER cd=20)
+	SpellInfo(HORNOFWINTER cd=20 mana=-10)
 Define(HOWLINGBLAST 49184) #frost
-	SpellInfo(HOWLINGBLAST frost=-1 cd=8)
+	SpellInfo(HOWLINGBLAST frost=-1 mana=-10)
 	SpellAddBuff(HOWLINGBLAST FREEZINGFOG=0)
 	SpellAddTargetDebuff(HOWLINGBLAST FROSTFEVER=15 glyph=GLYPHHOWLINGBLAST)
 Define(ICEBOUNDFORTITUDE 48792)
+	SpellInfo(ICEBOUNDFORTITUDE cd=180)
 	SpellAddBuff(ICEBOUNDFORTITUDE ICEBOUNDFORTITUDE=18)
 Define(ICYTOUCH 45477)
-	SpellInfo(ICYTOUCH frost=-1)
+	SpellInfo(ICYTOUCH frost=-1 mana=-10)
 	SpellAddTargetDebuff(ICYTOUCH FROSTFEVER=15)
 	SpellAddBuff(ICYTOUCH FREEZINGFOG=0)
 Define(OBLITERATE 49020)
-	SpellInfo(OBLITERATE unholy=-1 frost=-1)
+	SpellInfo(OBLITERATE unholy=-1 frost=-1 mana=-15)
 Define(OUTBREAK 77575)
+	SpellInfo(OUTBREAK cd=60)
+	SpellAddTargetDebuff(OUTBREAK FROSTFEVER=15 BLOODPLAGUE=15)
 Define(PESTILENCE 50842)
+	SpellInfo(PESTILENCE blood=-1 mana=-10)
 Define(PILLAROFFROST 51271) #frost
+	SpellInfo(PILLAROFFROST frost=-1 mana=-10)
+	SpellAddBuff(PILLAROFFROST PILLAROFFROST=20)
 Define(PLAGUESTRIKE 45462)
-	SpellInfo(PLAGUESTRIKE unholy=-1)
+	SpellInfo(PLAGUESTRIKE unholy=-1 mana=-10)
 	SpellAddTargetDebuff(PLAGUESTRIKE BLOODPLAGUE=15)
 Define(RAISEDEAD 46584)
+	SpellInfo(RAISEDEAD cd=180)
 Define(RUNESTRIKE 56815)
-	SpellInfo(RUNESTRIKE mana=20)
+	SpellInfo(RUNESTRIKE mana=30 cd=6) #fake cd, not usable two times in a row
 Define(RUNETAP 48982) #blood
-	SpellInfo(RUNETAP blood=-1)
+	SpellInfo(RUNETAP blood=-1 cd=30 mana=-10)
 Define(SCOURGESTRIKE 55090) #unholy
-	SpellInfo(SCOURGESTRIKE unholy=-1)
+	SpellInfo(SCOURGESTRIKE unholy=-1 mana=-10)
 Define(SUMMONGARGOYLE 49206) #unholy
-	SpellInfo(SUMMONGARGOYLE cd=180)
+	SpellInfo(SUMMONGARGOYLE cd=180 mana=60)
 Define(UNHOLYBLIGHT 49194)
 Define(UNHOLYFRENZY 49016)
 	SpellInfo(UNHOLYFRENZY cd=300)
+	SpellAddBuff(UNHOLYFRENZY UNHOLYFRENZY=30)
 Define(UNHOLYPRESENCE 48265)
 Define(VAMPIRICBLOOD 55233) #blood
-	SpellInfo(VAMPIRICBLOOD blood=-1)
+	SpellInfo(VAMPIRICBLOOD cd=60)
+	SpellAddBuff(VAMPIRICBLOOD VAMPIRICBLOOD=10)
 
 #Talents
 #Define(TALENTDEATSTRIKE 2259)

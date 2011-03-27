@@ -1,13 +1,16 @@
 Ovale.defaut["DRUID"] =
 [[
 Define(BARKSKIN 22812)
+	SpellInfo(BARKSKIN cd=60)
+	SpellAddBuff(BARKSKIN BARKSKIN=12)
 Define(BERSERK 50334) #cat+bear cd buff
 	SpellInfo(BERSERK cd=180)
 Define(CLAW 16827) #cat no positionning
-	SpellInfo(CLAW combo=1)
+	SpellInfo(CLAW combo=1 mana=25)
 Define(DEMOROAR 99) #bear
 	SpellAddTargetDebuff(DEMOROAR DEMOROAR=30)
 Define(ENRAGE 5229) #bear
+	SpellInfo(ENRAGE cd=60)
 Define(FAERIEFIRE 770) #moonkin
 	SpellAddTargetDebuff(FAERIEFIRE FAERIEFIREDEBUFF=300)
 Define(FAERIEFERAL 16857) #bear+cat
@@ -17,50 +20,68 @@ Define(FEROCIOUSBITE 22568) #cat finish 35-70 mana
 Define(FORCEOFNATURE 33831) #moonkin cd
 	SpellInfo(FORCEOFNATURE cd=180)
 Define(FRENZIEDREGENERATION 22842) #bear
+	SpellInfo(FRENZIEDREGENERATION cd=180)
+	SpellAddBuff(FRENZIEDREGENERATION FRENZIEDREGENERATION=20)
 Define(INNERVATE 29166)
+	SpellInfo(INNERVATE cd=180)
+	SpellAddBuff(INNERVATE INNERVATE=10)
 Define(INSECTSWARM 5570) #moonkin
 	SpellAddTargetDebuff(INSECTSWARM INSECTSWARM=12)
 Define(LACERATE 33745) #bear bleed*3
+	SpellInfo(LACERATE mana=15)
+	SpellAddTargetDebuff(LACERATE LACERATE=15)
 Define(MANGLECAT 33876) #cat bleed+debuff
-	SpellInfo(MANGLECAT combo=1)
-	SpellAddTargetDebuff(MANGLECAT MANGLECAT=12)
+	SpellInfo(MANGLECAT combo=1 mana=35)
+	SpellAddTargetDebuff(MANGLECAT MANGLECAT=60)
 Define(MANGLEBEAR 33878) #bear bleed+debuff
+	SpellInfo(MANGLEBEAR cd=6 mana=15)
+	SpellAddTargetDebuff(MANGLEBEAR MANGLEBEAR=60)
 Define(MAUL 6807) #bear
+	SpellInfo(MAUL cd=3 mana=30)
 Define(MOONFIRE 8921) #moonkin
 	SpellAddTargetDebuff(MOONFIRE MOONFIRE=12)
 Define(PULVERIZE 80313) #bear after lacerate*3
+	SpellInfo(PULVERIZE mana=15)
+	SpellAddTargetDebuff(PULVERIZE LACERATE=0)
 Define(RAKE 1822) #cat bleed
-	SpellInfo(RAKE combo=1)
+	SpellInfo(RAKE combo=1 mana=35)
 	SpellAddTargetDebuff(RAKE RAKE=9)
 Define(RAVAGE 6785) #cat behind+(prowling or stampede)
-	SpellInfo(RAVAGE combo=1)
+	SpellInfo(RAVAGE combo=1 mana=60)
 	SpellAddBuff(RAVAGE STAMPEDE=0)
 Define(RIP 1079) #cat bleed
-	SpellInfo(RIP combo=-5 duration=12 resetcounter=ripshreds)
+	SpellInfo(RIP combo=-5 duration=16 resetcounter=ripshreds)
 	SpellInfo(RIP glyph=GLYPHOFSHRED addduration=6)
-	SpellInfo(RIP glyph=GLYPHOFRIP addduration=4)
-	SpellAddTargetDebuff(RIP RIP=12)
+	SpellAddTargetDebuff(RIP RIP=16)
 Define(SAVAGEROAR 52610) #cat damage buff
-	SpellInfo(SAVAGEROAR combo=-5)
-	SpellAddBuff(SAVAGEROAR SAVAGEROAR=14)
+	SpellInfo(SAVAGEROAR combo=-5 mana=25)
+	SpellAddBuff(SAVAGEROAR SAVAGEROAR=9)
 Define(SHRED 5221) #cat behind
-	SpellInfo(SHRED combo=1 inccounter=ripshreds)
+	SpellInfo(SHRED mana=40 combo=1 inccounter=ripshreds)
 Define(STARFALL 48505) #moonkin cd aoe
+	SpellInfo(STARFALL cd=90)
+	SpellAddBuff(STARFALL STARFALL=10)
 Define(STARFIRE 2912) #moonkin
 	SpellInfo(STARFIRE eclipse=20)
 Define(STARSURGE 78674) #moonkin 15 lunar+solar
 	SpellInfo(STARSURGE cd=15 starsurge=15)
 	SpellAddBuff(STARSURGE SHOOTINGSTARS=0)
 Define(SUNFIRE 93402)
-	SpellAddTargetDebuff(SUNFIRE SUNFIRE=18)
+	SpellAddTargetDebuff(SUNFIRE SUNFIRE=12)
 Define(SURVIVALINSTINCTS 61336) #cat+bear surv cd
+	SpellInfo(SURVIVALINSTINCTS cd=180)
+	SpellAddBuff(SURVIVALINSTINCTS SURVIVALINSTINCTS=12)
 Define(SWIPEBEAR 779) #bear aoe
 	SpellInfo(SWIPEBEAR cd=6)
 Define(SWIPECAT 62078) #cat aoe
 Define(THRASH 77758) #bear aoe bleed
+	SpellInfo(THRASH cd=6 mana=25)
+	SpellAddTargetDebuff(THRASH THRASH=6)
 Define(TIGERSFURY 5217) #cat buff
 	SpellInfo(TIGERSFURY cd=30)
+	SpellAddBuff(TIGERSFURY TIGERSFURY=6)
 Define(TYPHOON 50516)
+	SpellInfo(TYPHOON cd=20)
 Define(WRATH 5176) #moonkin
 	SpellInfo(WRATH eclipse=-13)
 
@@ -130,7 +151,7 @@ AddIcon help=main mastery=1
 		if BuffPresent(ECLIPSESOLAR) and TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDebuffExpires(SUNFIRE 2 mine=1)
 			Spell(SUNFIRE nored=1)
 		#/moonfire,if=!ticking&buff.t11_4pc_caster.down&!dot.sunfire.remains>0
-		if TargetDebuffExpires(MOONFIRE 2 mine=1) and TargetDebuffExpires(SUNFIRE 0 mine=1)
+		if TargetDebuffExpires(MOONFIRE 2 mine=1) and TargetDebuffExpires(SUNFIRE 0 mine=1) and BuffExpires(ECLIPSESOLAR)
 			Spell(MOONFIRE nored=1)
 	}
 		
