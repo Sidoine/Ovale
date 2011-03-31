@@ -178,6 +178,17 @@ Ovale.buffSpellList =
 		32182, --Heroism
 		80353, --Time warp
 		90355 -- Ancient Hysteria (Core Hound)
+	},
+	meleehaste =
+	{
+		8515, -- Windfury
+		55610, -- Improved Icy Talons
+		53290 -- Hunting Party
+	},
+	spellhaste = 
+	{
+		24907, -- Moonkin aura
+		2895 -- Wrath of Air Totem
 	}
 }
 
@@ -320,6 +331,24 @@ local options =
 					name = L["Vertical"],
 					get = function(info) return Ovale.db.profile.apparence.vertical end,
 					set = function(info, value) Ovale.db.profile.apparence.vertical = value; Ovale:UpdateFrame() end
+				},
+				alpha =
+				{
+					order = 9.5,
+					type = "range",
+					name = L["Opacité des icônes"],
+					min = 0, max = 100, step = 5,
+					get = function(info) return Ovale.db.profile.apparence.alpha * 100 end,
+					set = function(info, value) Ovale.db.profile.apparence.alpha = value/100; Ovale.frame.frame:SetAlpha(value/100) end
+				},
+				optionsAlpha =
+				{
+					order = 9.5,
+					type = "range",
+					name = L["Opacité des options"],
+					min = 0, max = 100, step = 5,
+					get = function(info) return Ovale.db.profile.apparence.optionsAlpha * 100 end,
+					set = function(info, value) Ovale.db.profile.apparence.optionsAlpha = value/100; Ovale.frame.content:SetAlpha(value/100) end
 				},
 				predictif =
 				{
@@ -862,11 +891,11 @@ function Ovale:UNIT_AURA(event, unit)
 			self.buff[spellId].lastSeen = Ovale.maintenant
 			self.buff[spellId].present = true
 			
-			if spellId == 24907 or spellId == 2895 then --moonkin aura / wrath of air
+			if self.buffSpellList.spellhaste[spellId] then --moonkin aura / wrath of air
 				hateSorts = 5 --add shadow form?
-			elseif spellId == 8515 or spellId == 55610 or spellId == 53290 then --windfury / improved icy talons / hunting party
+			elseif self.buffSpellList.meleehaste[spellId] then 
 				hateCaC = 10
-			elseif spellId == 2825 or spellId == 32182 then --bloodlust / heroism
+			elseif self.buffSpellList.heroism[spellId] then
 				hateHero = 30
 			elseif spellId == 53657 then --judgements of the pure
 				hateClasse = 9
@@ -2208,7 +2237,8 @@ function Ovale:ChargerDefaut()
 			apparence = {enCombat=false, iconScale = 2, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
-				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●"},
+				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●", alpha = 1,
+				optionsAlpha = 1},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})

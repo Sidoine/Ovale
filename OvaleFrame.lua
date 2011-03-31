@@ -105,10 +105,10 @@ do
 	end
 	
 	local function OnSkinChanged(self, skinID, gloss, backdrop, group, button, colors)
-		Ovale.db.profile.SkinID = skinID
-		Ovale.db.profile.Gloss = gloss
-		Ovale.db.profile.Backdrop = backdrop
-		Ovale.db.profile.Colors = colors
+		Ovale.db.profile.skin.SkinID = skinID
+		Ovale.db.profile.skin.Gloss = gloss
+		Ovale.db.profile.skin.Backdrop = backdrop
+		Ovale.db.profile.skin.Colors = colors
 	end
 	
 	local function GetScore(self, spellId)
@@ -390,7 +390,8 @@ do
 		frame:SetScript("OnLeave", frameOnLeave)
 	--	frame:SetScript("OnUpdate", frameOnUpdate)		
 		frame:SetScript("OnHide",frameOnClose)
-
+		frame:SetAlpha(Ovale.db.profile.apparence.alpha)
+		
 		self.updateFrame = CreateFrame("Frame")
 		self.updateFrame:SetScript("OnUpdate", frameOnUpdate)
 		self.updateFrame.obj = self
@@ -407,15 +408,24 @@ do
 		content:SetWidth(200)
 		content:SetHeight(100)
 		content:Hide()
+		content:SetAlpha(Ovale.db.profile.apparence.optionsAlpha)
 		
 		AceGUI:RegisterAsContainer(self)
 
 		if LBF then
 			self.skinGroup = LBF:Group("Ovale")
-			self.skinGroup.SkinID = Ovale.db.profile.SkinID
-			self.skinGroup.Gloss = Ovale.db.profile.Gloss
-			self.skinGroup.Backdrop = Ovale.db.profile.Backdrop
-			self.skinGroup.Colors = Ovale.db.profile.Colors or {}
+			if Ovale.db.profile.SkinID then
+				-- Import old values
+				Ovale.db.profile.skin.SkinID = Ovale.db.profile.SkinID
+				Ovale.db.profile.skin.Gloss = Ovale.db.profile.Gloss
+				Ovale.db.profile.skin.Backdrop = Ovale.db.profile.Backdrop
+				Ovale.db.profile.skin.Colors = Ovale.db.profile.Colors
+				Ovale.db.profile.SkinID = nil
+			end
+			self.skinGroup.SkinID = Ovale.db.profile.skin.SkinID or "Blizzard"
+			self.skinGroup.Gloss = Ovale.db.profile.skin.Gloss
+			self.skinGroup.Backdrop = Ovale.db.profile.skin.Backdrop
+			self.skinGroup.Colors = Ovale.db.profile.skin.Colors or {}
 			LBF:RegisterSkinCallback("Ovale", self.OnSkinChanged, self)
 		end
 
