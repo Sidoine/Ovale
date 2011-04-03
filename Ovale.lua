@@ -71,6 +71,8 @@ Ovale.counter = {}
 Ovale.lastSpell = {}
 --the damage of the last spell or dot (by id)
 Ovale.spellDamage = {}
+Ovale.numberOfEnemies = nil
+Ovale.enemies = {}
 
 Ovale.buffSpellList =
 {
@@ -161,6 +163,15 @@ Ovale.buffSpellList =
 		6343, --Thunderclap
 		8042, --Earth Shock
 		50285 --Dust Cloud (Tallstrider)
+	},
+	castslow =
+	{
+		1714, --Curse of Tongues
+        58604, --Lava Breath (Core Hound)
+        50274, --Spore Cloud (Sporebat)
+        5761, --Mind-numbing Poison
+        73975, --Necrotic Strike
+        31589 --Slow
 	},
 	bleed=
 	{
@@ -838,6 +849,31 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		--	self:Print(select(1, ...))
 		--end
 	end
+	
+	if self.numberOfEnemies then
+		if event == "UNIT_DIED" then
+			for k,v in pairs(self.enemies) do
+				if k==destGUID then
+					self.enemies[v] = nil
+					self.numberOfEnemies = self.numberOfEnemies - 1
+					--self:Print("enemy die")
+				end
+			end
+		elseif sourceFlags and not self.enemies[sourceGUID] and bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0 
+					and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
+				destFlags and bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
+			self.enemies[sourceGUID] = true
+			--self:Print("new ennemy source=".. sourceName)
+			self.numberOfEnemies = self.numberOfEnemies + 1
+		elseif destGUID and not self.enemies[destGUID] and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0 
+					and bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
+				sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
+			self.enemies[destGUID] = true
+			--self:Print("new ennemy dest=".. destName)
+			self.numberOfEnemies = self.numberOfEnemies + 1
+		end
+	end
+	
 	if self.otherDebuffsEnabled then
 		if event == "UNIT_DIED" then
 			--Remove any dead unit from otherDebuffs
@@ -926,6 +962,13 @@ end
 --The script needs to be compiled
 function Ovale:GLYPH_UPDATED(event)
 	self.needCompile = true
+end
+
+function Ovale:GetNumberOfEnemies()
+	if not self.numberOfEnemies then
+		self.numberOfEnemies = 0
+	end
+	return self.numberOfEnemies
 end
 
 function Ovale:RemoveSpellFromList(spellId, lineId)
@@ -1097,7 +1140,10 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.score = 0
 	self.maxScore = 0
 	self.combatStartTime = self.maintenant
-	
+	if self.numberOfEnemies then
+		self.numberOfEnemies = 0
+		self.enemies = {}
+	end
 	self:UpdateVisibility()
 end
 

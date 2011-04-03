@@ -578,6 +578,9 @@ Ovale.conditions=
 		end
 		return startCast + castTime/1000
 	end,
+	enemies = function(condition)
+		return Ovale:GetNumberOfEnemies(), 0, 0
+	end,
 	Exists = function(condition)
 		return testbool(UnitExists(getTarget(condition.target)) == 1, condition[1])
 	end,
