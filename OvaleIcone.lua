@@ -20,8 +20,10 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 				self.cd:Hide()
 			else
 				self.lastSound = nil
-				self.cd:Show()
-				self.cd:SetCooldown(self.debutAction, self.finAction - self.debutAction);
+				if self.cdShown then
+					self.cd:Show()
+					self.cd:SetCooldown(self.debutAction, self.finAction - self.debutAction);
+				end
 			end
 		end
 		
@@ -227,6 +229,7 @@ function OvaleIcone_OnLoad(self)
 	self.SetHelp = SetHelp
 	self.SetFontScale = SetFontScale
 	self.SetRangeIndicator = SetRangeIndicator
+	self.cdShown = true
 	if Ovale.db.profile.clickThru then
 		self:EnableMouse(false)
 	end

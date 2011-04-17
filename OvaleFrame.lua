@@ -330,7 +330,7 @@ do
 				icon:SetHelp(node.params.help)
 				icon:SetRangeIndicator(Ovale.db.profile.apparence.targetText)
 				icon:EnableMouse(not Ovale.db.profile.apparence.clickThru)
-				
+				icon.cdShown = (l == 1)
 				if LBF then
 					icon:SetSkinGroup(self.skinGroup)
 				end
