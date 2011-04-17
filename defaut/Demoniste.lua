@@ -233,7 +233,7 @@ AddIcon help=main mastery=2
 		if BuffPresent(DECIMATION) or BuffPresent(SOULBURN) Spell(SOULFIRE)
 	}
 	#/life_tap,if=mana_pct<=50&buff.bloodlust.down&buff.metamorphosis.down
-	if ManaPercent(less 50) and BuffExpires(heroism) and BuffExpires(METAMORPHOSIS) Spell(LIFETAP)
+	if ManaPercent(less 50) and BuffExpires(heroism) and BuffExpires(METAMORPHOSIS) and LifePercent(more 75) Spell(LIFETAP)
 	Spell(SHADOWBOLT)
 }
 

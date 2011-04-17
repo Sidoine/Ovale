@@ -1,6 +1,8 @@
 ﻿local AceGUI = LibStub("AceGUI-3.0")
 local LBF = LibStub("LibButtonFacade", true)
 		
+local GetTime = GetTime		
+
 ----------------
 -- Main Frame --
 ----------------
@@ -147,6 +149,15 @@ do
 			Ovale:CompileAll()
 			return
 		end
+		
+		local now = GetTime()
+		
+		if not Ovale.refreshNeeded and self.lastUpdate and now < self.lastUpdate + Ovale.db.profile.apparence.updateInterval then
+			return
+		end
+		Ovale.refreshNeeded = false
+		self.lastUpdate = now
+
 		Ovale:InitAllActions()
 		for k,node in pairs(Ovale.masterNodes) do
 			if Ovale.trace then

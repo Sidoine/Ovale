@@ -73,6 +73,7 @@ Ovale.lastSpell = {}
 Ovale.spellDamage = {}
 Ovale.numberOfEnemies = nil
 Ovale.enemies = {}
+Ovale.refreshNeeded = false
 
 Ovale.buffSpellList =
 {
@@ -648,6 +649,7 @@ end
 function Ovale:CompileAll()
 	if self.db.profile.code then
 		self.masterNodes = self:Compile(self.db.profile.code)
+		self.refreshNeeded = true
 		self:UpdateFrame()
 		self.needCompile = false
 	end
@@ -822,6 +824,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				if v.spellId == spellId then
 					if not v.channeled then
 						table.remove(self.lastSpell, i)
+						self.refreshNeeded = true
 						--self:Print("LOG_EVENT on supprime "..spellId.." a "..GetTime())
 					end
 					--self:Print(UnitDebuff("target", "Etreinte de l'ombre"))
@@ -837,9 +840,11 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 					local otherDebuff = self:GetOtherDebuffs(spellId)
 					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
 						otherDebuff[destGUID] = Ovale.maintenant + self:WithHaste(self.spellInfo[spellId].duration, self.spellInfo[spellId].durationhaste)
+						self.refreshNeeded = true
 					--	self:Print("ajout de "..spellName.." à "..destGUID)
 					elseif event == "SPELL_AURA_REMOVED" then
-						otherDebuff[destGUID] = nil						
+						otherDebuff[destGUID] = nil
+						self.refreshNeeded = true
 					--	self:Print("suppression de "..spellName.." de "..destGUID)
 					end	
 				end
@@ -856,6 +861,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				if k==destGUID then
 					self.enemies[v] = nil
 					self.numberOfEnemies = self.numberOfEnemies - 1
+					self.refreshNeeded = true
 					--self:Print("enemy die")
 				end
 			end
@@ -865,12 +871,14 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			self.enemies[sourceGUID] = true
 			--self:Print("new ennemy source=".. sourceName)
 			self.numberOfEnemies = self.numberOfEnemies + 1
+			self.refreshNeeded = true
 		elseif destGUID and not self.enemies[destGUID] and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0 
 					and bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 				sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 			self.enemies[destGUID] = true
 			--self:Print("new ennemy dest=".. destName)
 			self.numberOfEnemies = self.numberOfEnemies + 1
+			self.refreshNeeded = true
 		end
 	end
 	
@@ -881,6 +889,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				for j,w in pairs(v) do
 					if j==destGUID then
 						v[j] = nil
+						self.refreshNeeded = true
 					end
 				end
 			end
@@ -892,6 +901,7 @@ end
 --Used to update the visibility e.g. if the user chose
 --to hide Ovale if a friendly unit is targeted
 function Ovale:PLAYER_TARGET_CHANGED()
+	self.refreshNeeded = true
 	self:UpdateVisibility()
 end
 
@@ -947,6 +957,8 @@ function Ovale:UNIT_AURA(event, unit)
 		
 		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
 		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
+		
+		self.refreshNeeded = true
 --		self.rangedHaste = hateBase + hateCommune + hateHero + hateClasse -- TODO ajouter le bidule du chasseur en spé bête
 --		print("spellHaste = "..self.spellHaste)
 	end
@@ -979,6 +991,7 @@ function Ovale:RemoveSpellFromList(spellId, lineId)
 			break
 		end
 	end
+	self.refreshNeeded = true
 end
 
 --Called if the player interrupted early his cast
@@ -1076,6 +1089,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 			end
 		end
 	end
+	self.refreshNeeded = true
 end
 
 function Ovale:GetCounterValue(id)
@@ -2284,7 +2298,7 @@ function Ovale:ChargerDefaut()
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
 				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●", alpha = 1,
-				optionsAlpha = 1},
+				optionsAlpha = 1, updateInterval=0.1},
 			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
 		}
 	})
