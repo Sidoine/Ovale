@@ -201,7 +201,7 @@ AddIcon help=main mastery=2
 
 	#unless Glyph(GLYPHOFLASHOFPAIN) or Glyph(GLYPHOFIMP) Spell(DEMONSOUL)
 	#/immolation,if=buff.metamorphosis.remains>10
-	if BuffPresent(METAMORPHOSIS 10) Spell(IMMOLATIONAURA)
+	if BuffPresent(METAMORPHOSIS 10) and TargetInRange(DEATHCOIL) Spell(IMMOLATIONAURA)
 	#/bane_of_doom,if=!ticking&target.time_to_die>=15&miss_react
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
@@ -215,7 +215,7 @@ AddIcon help=main mastery=2
 	#/fel_flame,if=buff.tier11_4pc_caster.react
 	if ArmorSetParts(T11 more 3) Spell(FELFLAME)
 	#/shadowflame
-	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
+	if CheckBoxOn(shadowflame) and TargetInRange(DEATHCOIL) Spell(SHADOWFLAME)
 	#/demon_soul
 	#if Glyph(GLYPHOFIMP) Spell(DEMONSOUL)
 	#/hand_of_guldan

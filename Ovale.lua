@@ -35,10 +35,10 @@ Ovale.bug = false
 Ovale.trace=false
 --in combat?
 Ovale.enCombat = false
---current computed spell haste
-Ovale.spellHaste = 0
+--current computed spell haste. "2" means 2 times faster
+Ovale.spellHaste = 1
 --current computed melee haste TODO: why I don't use character sheet value anyway?
-Ovale.meleeHaste = 0
+Ovale.meleeHaste = 1
 --current auras
 Ovale.aura = { player = {}, target = {}}
 --allow to track the current target
@@ -638,9 +638,9 @@ function Ovale:WithHaste(temps, hate)
 	if (not hate) then
 		return temps
 	elseif (hate == "spell") then
-		return temps/(1+self.spellHaste/100)
+		return temps/self.spellHaste
 	elseif (hate == "melee") then
-		return temps/(1+self.meleeHaste/100)
+		return temps/self.meleeHaste
 	else
 		return temps
 	end
@@ -955,8 +955,8 @@ function Ovale:UNIT_AURA(event, unit)
 			end
 		end
 		
-		self.spellHaste = hateBase + hateCommune + hateSorts + hateHero + hateClasse
-		self.meleeHaste = hateBase + hateCommune + hateCaC + hateHero + hateClasse
+		self.spellHaste = 1 + (hateBase + hateCommune + hateSorts + hateHero + hateClasse)/100
+		self.meleeHaste = 1 + (hateBase + hateCommune + hateCaC + hateHero + hateClasse)/100
 		
 		self.refreshNeeded = true
 --		self.rangedHaste = hateBase + hateCommune + hateHero + hateClasse -- TODO ajouter le bidule du chasseur en spé bête
@@ -1668,7 +1668,7 @@ function Ovale:GetGCD(spellId)
 			if not cd then
 				cd = 1.5
 			end
-			cd = cd /(1+self.spellHaste/100)
+			cd = cd / self.spellHaste
 			if (cd<1) then
 				cd = 1
 			end
@@ -1683,7 +1683,7 @@ function Ovale:GetGCD(spellId)
 		return 1.0
 	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
 			(self.className == "DRUID" and GetShapeshiftForm(true) ~= 1) then
-		local cd = 1.5 /(1+self.spellHaste/100)
+		local cd = 1.5 / self.spellHaste
 		if (cd<1) then
 			cd = 1
 		end
@@ -1915,7 +1915,7 @@ function Ovale:CalculerMeilleureAction(element)
 					else
 						--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
 						--ça tombera entre deux ticks
-						local ticks = self.spellInfo[self.currentSpellId].canStopChannelling
+						local ticks = floor(self.spellHaste * self.spellInfo[self.currentSpellId].canStopChannelling + 0.5)
 						local tickLength = (self.attenteFinCast - self.startCast) / ticks
 						local tickTime = self.startCast + tickLength
 						if (Ovale.trace) then

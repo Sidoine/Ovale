@@ -23,6 +23,7 @@ Define(EVISCERATE 2098)
 Define(HEMORRHAGE 16511)
 	SpellInfo(HEMORRHAGE combo=1 mana=35)
 	SpellAddTargetDebuff(HEMORRHAGE HEMORRHAGE=60)
+Define(KICK 1766)
 Define(KILLINGSPREE 51690)
 	SpellInfo(KILLINGSPREE cd=120)
 	SpellAddBuff(KILLINGSPREE KILLINGSPREE=2)
@@ -65,6 +66,10 @@ Define(VENDETTA 79140)
 #Buffs
 Define(SHADOWSTEPBUFF 36563)	
 Define(VANISHBUFF 11327)
+Define(SHALLOWINSIGHT 84745)
+Define(MODERATEINSIGHT 84746)
+Define(DEEPINSIGHT 84747)
+Define(OVERKILL 58426)
 
 #Items
 Define(INSTANTPOISON 6947)
@@ -73,88 +78,121 @@ Define(DEADLYPOISON 2892)
 #Talents
 Define(TALENTCUTTOTHECHASE 2070)
 
+SpellList(insight 84745 84746 84747)
+
 ScoreSpells(SLICEANDDICE HUNGERFORBLOOD ENVENOM RUPTURE EVISCERATE MUTILATE SINISTERSTRIKE)
 
 AddIcon help=main mastery=1
 {
 	unless InCombat()
 	{
-		if WeaponEnchantExpires(mainhand 400) Item(INSTANTPOISON)
-		if WeaponEnchantExpires(offhand 400) Item(DEADLYPOISON)
+		if WeaponEnchantExpires(mainhand 300) Item(INSTANTPOISON)
+		if WeaponEnchantExpires(offhand 300) Item(DEADLYPOISON)
 	}
-	
+
+	#actions+=/garrote
 	if BuffPresent(STEALTH) Spell(GARROTE)
+
+	#actions+=/slice_and_dice,if=buff.slice_and_dice.down
 	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
+
+	#actions+=/vendetta
 	if TargetDebuffExpires(VENDETTA) and TargetDeadIn(more 20) Spell(VENDETTA)
-	
+
 	if ComboPoints(more 3)
 	{
-		#rupture,if=!ticking&combo_points>=4&target.time_to_die>15&buff.slice_and_dice.remains>6
-		if TargetDebuffExpires(RUPTURE 0 mine=1) and TargetDeadIn(more 15) and BuffPresent(SLICEANDDICE 6)
+		#actions+=/rupture,if=!ticking&time<6
+		#actions+=/rupture,if=!ticking&buff.slice_and_dice.remains>6
+		if TargetDebuffExpires(RUPTURE 0 mine=1) and BuffPresent(SLICEANDDICE 6) 
 			Spell(RUPTURE)
-		#envenom,if=combo_points>=4&buff.envenom.down
-		#envenom,if=combo_points>=4&energy>90
+		#actions+=/envenom,if=combo_points>=4&buff.envenom.down
+		#actions+=/envenom,if=combo_points>=4&energy>90
 		if BuffExpires(ENVENOM 0) or Mana(more 89) Spell(ENVENOM)
 	}
-	
-	#envenom,if=combo_points>=2&buff.slice_and_dice.remains<2
-	if TalentPoints(TALENTCUTTOTHECHASE more 0) and ComboPoints(more 1) and BuffExpires(SLICEANDDICE 2)
+
+	#actions+=/cold_blood,sync=envenom
+	#if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 6) and TargedDebuffPresent(RUPTURE 5)
+	#	Spell(COLDBLOOD)
+
+	#actions+=/envenom,if=combo_points>=2&buff.slice_and_dice.remains<3
+	if TalentPoints(TALENTCUTTOTHECHASE more 0) and ComboPoints(more 1) and BuffExpires(SLICEANDDICE 3)
 		Spell(ENVENOM)
+
+	#actions+=/backstab,if=combo_points<5&target.health_pct<35
+	if ComboPoints(less 5) and TargetLifePercent(less 35) Spell(BACKSTAB)
+	#actions+=/mutilate,if=combo_points<4&target.health_pct>=35
+	if ComboPoints(less 4) and TargetLifePercent(more 35) Spell(MUTILATE)
 	
-	if ComboPoints(less 4)
-	{
-		#backstab,if=combo_points<4&target.health_pct<35
-		if TargetLifePercent(less 35) Spell(BACKSTAB)
-		Spell(MUTILATE)
-	}
 }
 
 AddIcon help=cd mastery=1
 {
+	#actions+=/kick
+	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
 	if Mana(less 70) Spell(COLDBLOOD)
+	#actions+=/vanish,if=time>30&energy>50
+	if {spell(VANISH)>30} and Mana(more 50) unless BuffPresent(OVERKILL) Spell(VANISH)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
-	if Mana(more 50) Spell(VANISH)
 }
 
 AddIcon help=main mastery=2
 {
 	unless InCombat()
 	{
-		if WeaponEnchantExpires(mainhand 400) Item(INSTANTPOISON)
-		if WeaponEnchantExpires(offhand 400) Item(DEADLYPOISON)
+		if WeaponEnchantExpires(mainhand 300) Item(INSTANTPOISON)
+		if WeaponEnchantExpires(offhand 300) Item(DEADLYPOISON)
 	}
 
-	#slice_and_dice,if=buff.slice_and_dice.down&time<4
-	#slice_and_dice,if=buff.slice_and_dice.remains<2&combo_points>=3
-	if {BuffExpires(SLICEANDDICE 0) and ComboPoints(more 0)} or {BuffExpires(SLICEANDDICE 2) and ComboPoints(more 2)}
+	#actions+=/slice_and_dice,if=buff.slice_and_dice.down
+	#actions+=/slice_and_dice,if=buff.slice_and_dice.remains<2
+	if {BuffExpires(SLICEANDDICE 0) and ComboPoints(more 0)} or {BuffExpires(SLICEANDDICE 2) and ComboPoints(more 1)}
 		Spell(SLICEANDDICE)
-	
-	#rupture,if=!ticking&combo_points=5&target.time_to_die>10
+
+	#actions+=/killing_spree,if=energy<35&buff.slice_and_dice.remains>4&buff.adrenaline_rush.down
+	unless BuffPresent(ADRENALINERUSH) if Mana(less 35) and BuffPresent(SLICEANDDICE 4) and BuffPresent(DEEPINSIGHT 5) Spell(KILLINGSPREE)
+
+	#actions+=/adrenaline_rush,if=energy<35
+	unless BuffPresent(KILLINGSPREE) if Mana(less 20) Spell(ADRENALINERUSH)
+
+	#actions+=/eviscerate,if=combo_points=5&buff.bandits_guile.stack>=12
+	if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 4) and BuffPresent(insight)
+		{
+			if TargetDebuffPresent(bleed) and TargetDebuffExpires(RUPTURE 0 mine=1) Spell(RUPTURE)
+			Spell(EVISCERATE)
+		}
+
+	#actions+=/rupture,if=!ticking&combo_points=5&target.time_to_die>10
 	if ComboPoints(more 4) and TargetDebuffExpires(RUPTURE 0 mine=1) and TargetDeadIn(more 10) Spell(RUPTURE)
-	#eviscerate,if=combo_points=5&buff.slice_and_dice.remains>7&dot.rupture.remains>6
-	if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 7) and TargetDebuffPresent(RUPTURE 6 mine=1) Spell(EVISCERATE)
-	#eviscerate,if=combo_points>=4&buff.slice_and_dice.remains>4&energy>40&dot.rupture.remains>5
-	if ComboPoints(more 3) and BuffPresent(SLICEANDDICE 4) and Mana(more 40) and TargetDebuffPresent(RUPTURE 5 mine=1)
-		Spell(EVISCERATE)
-	#eviscerate,if=combo_points=5&target.time_to_die<10
-	if ComboPoints(more 4) and TargetDeadIn(less 10) Spell(EVISCERATE)
-	#revealing_strike,if=combo_points=4&buff.slice_and_dice.remains>8
-	if ComboPoints(equal 4) and BuffPresent(SLICEANDDICE 8) Spell(REVEALINGSTRIKE)
-	#sinister_strike,if=combo_points<5
+
+	#actions+=/eviscerate,if=combo_points=5
+	if ComboPoints(equal 5) Spell(EVISCERATE)
+
+	#actions+=/revealing_strike,if=combo_points=4&buff.revealing_strike.down
+	if ComboPoints(equal 4) and TargetDebuffExpires(REVEALINGSTRIKE 0 mine=1) Spell(REVEALINGSTRIKE)
+
+	#actions+=/sinister_strike,if=combo_points<5
 	if ComboPoints(less 5) Spell(SINISTERSTRIKE)
 }
 
 AddIcon help=aoe mastery=2
 {
 	Spell(BLADEFLURRY)
-	unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
+	if BuffPresent(insight)
+	{
+		unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
+	}
 }
 
 AddIcon help=cd mastery=2
 {
+	#actions+=/kick
+	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
 	#adrenaline_rush,if=energy<20
-	unless BuffPresent(KILLINGSPREE) if Mana(less 20) Spell(ADRENALINERUSH)
+	if BuffPresent(insight)
+	{
+		unless BuffPresent(KILLINGSPREE) if Mana(less 20) Spell(ADRENALINERUSH)
+	}
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -193,6 +231,8 @@ AddIcon help=main mastery=3
 
 AddIcon help=cd mastery=3
 {
+	#actions+=/kick
+	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
 	#shadow_dance,if=time>10&energy>75&combo_points<=1&cooldown.shadowstep.remains<=0
 	if Mana(more 75) and ComboPoints(less 2) and Spell(SHADOWSTEP) Spell(SHADOWDANCE)
 	#vanish,if=time>10&energy>60&combo_points<=1&cooldown.shadowstep.remains<=0&!buff.shadow_dance.up

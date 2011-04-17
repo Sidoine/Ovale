@@ -87,9 +87,9 @@ local function avecHate(temps, hate)
 	if (not hate) then
 		return temps
 	elseif (hate == "spell") then
-		return temps/(1+Ovale.spellHaste/100)
+		return temps/Ovale.spellHaste
 	elseif (hate == "melee") then
-		return temps/(1+Ovale.meleeHaste/100)
+		return temps/Ovale.meleeHaste
 	else
 		return temps
 	end
@@ -190,7 +190,7 @@ local function GetManaAndRate(withBerserker)
 	local rate
 	
 	if className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3) then
-		rate = 10 * (100 + Ovale.meleeHaste)/100
+		rate = 10 * Ovale.meleeHaste
 		if (className == "ROGUE") then
 			local rush = Ovale:GetAura("player", "HELPFUL", 13750)
 			if rush.stacks>0 then
@@ -203,7 +203,7 @@ local function GetManaAndRate(withBerserker)
 			end
 		end
 	elseif className == "HUNTER" then
-		rate = 4 * (100 + Ovale.meleeHaste) /100
+		rate = 4 * Ovale.meleeHaste
 	else
 		rate = 0
 	end
