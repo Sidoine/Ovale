@@ -1922,7 +1922,7 @@ function Ovale:CalculerMeilleureAction(element)
 							self:Print(spellName.." restant = " .. restant)
 							self:Print("ticks = "..ticks.." tickLength="..tickLength.." tickTime="..tickTime)
 						end	
-						for i=1,ticks-1 do
+						for i=1,ticks do
 							if restant<=tickTime then
 								restant = tickTime
 								break
