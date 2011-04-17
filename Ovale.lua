@@ -675,6 +675,7 @@ function Ovale:FirstInit()
 			self.state.rune[i] = {}
 		end
 	end
+	self.playerGuid = UnitGUID("player")
 	
 	self:ChargerDefaut()
 	
@@ -802,8 +803,9 @@ end
 --Called for each combat log event
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
-	if sourceName == UnitName("player") then
-		--self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
+	
+	if sourceGUID == self.playerGuid then
+		-- self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 		
 		if string.find(event, "SPELL_PERIODIC_DAMAGE")==1 or string.find(event, "SPELL_DAMAGE")==1 then
 			local spellId, spellName, spellSchool, amount = select(9, ...)
@@ -816,13 +818,16 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		
 		if 
 				string.find(event, "SPELL_AURA_APPLIED")==1
+				or string.find(event, "SPELL_AURA_REFRESH")==1
 				or string.find(event, "SPELL_DAMAGE")==1 
 				or string.find(event, "SPELL_MISSED") == 1 
+				or string.find(event, "SPELL_CAST_SUCCESS") == 1
 				or string.find(event, "SPELL_CAST_FAILED") == 1 then
 			local spellId, spellName = select(9, ...)
 			for i,v in ipairs(self.lastSpell) do
-				if v.spellId == spellId then
-					if not v.channeled then
+				if (v.spellId == spellId or v.auraSpellId == spellId) and v.allowRemove then
+					if not v.channeled and (v.removeOnSuccess or 
+								string.find(event, "SPELL_CAST_SUCCESS") ~= 1) then
 						table.remove(self.lastSpell, i)
 						self.refreshNeeded = true
 						--self:Print("LOG_EVENT on supprime "..spellId.." a "..GetTime())
@@ -1009,13 +1014,14 @@ function Ovale:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId
 		for i,v in ipairs(self.lastSpell) do
 			if v.lineId == lineId then
 				--Already added in UNIT_SPELLCAST_START
+				v.allowRemove = true
 				return
 			end
 		end
 		if not UnitChannelInfo("player") then
 			--A UNIT_SPELLCAST_SUCCEEDED is received when channeling a spell, with a different lineId!
 			local now = GetTime()
-			self:AddSpellToList(spellId, lineId, now, now, false)
+			self:AddSpellToList(spellId, lineId, now, now, false, true)
 		end
 	end
 end
@@ -1042,19 +1048,37 @@ function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
 	end
 end
 
-function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
+function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled, allowRemove)
 	local newSpell = {}
 	newSpell.spellId = spellId
 	newSpell.lineId = lineId
 	newSpell.start = startTime
 	newSpell.stop = endTime
 	newSpell.channeled = channeled
+	newSpell.allowRemove = allowRemove
 		
 	self.lastSpell[#self.lastSpell+1] = newSpell
 	--self:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..self.maintenant..")" ..#self.lastSpell)
 	
 	if self.spellInfo[spellId] then
 		local si = self.spellInfo[spellId]
+		
+		if si.aura then
+			for target, targetInfo in pairs(si.aura) do
+				for filter, filterInfo in pairs(targetInfo) do
+					for auraSpellId, spellData in pairs(filterInfo) do
+						if spellData and spellData > 0 then
+							newSpell.auraSpellId = auraSpellId
+							if target == "player" then
+								newSpell.removeOnSuccess = true
+							end
+							break
+						end
+					end
+				end
+			end
+		end
+		
 		--self:Print("spellInfo found")
 		if si and si.buffnocd and UnitBuff("player", GetSpellInfo(si.buffnocd)) then
 			newSpell.nocd = true
@@ -1074,6 +1098,8 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled)
 			self.counter[cname] = self.counter[cname] + 1
 			--self:Print("inc counter "..cname.." to "..self.counter[cname])
 		end
+	else
+		newSpell.removeOnSuccess = true
 	end
 	
 	if self.enCombat then
@@ -1107,7 +1133,7 @@ function Ovale:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineId, spe
 		--self:Print("UNIT_SPELLCAST_CHANNEL_START "..event.." name="..name.." lineId="..lineId.." spellId="..spellId)
 		local _,_,_,_,startTime, endTime = UnitChannelInfo("player")
 		--self:Print("startTime = " ..startTime.." endTime = "..endTime)
-		self:AddSpellToList(spellId, lineId, startTime/1000, endTime/1000, true)
+		self:AddSpellToList(spellId, lineId, startTime/1000, endTime/1000, true, false)
 	end
 end
 
@@ -1126,7 +1152,7 @@ function Ovale:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spellId)
 		--local spell, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spellId)
 		--local startTime =  GetTime()
 		--self:AddSpellToList(spellId, lineId, startTime, startTime + castTime/1000)
-		self:AddSpellToList(spellId, lineId, startTime/1000, endTime/1000)
+		self:AddSpellToList(spellId, lineId, startTime/1000, endTime/1000, false, false)
 	end
 end
 
@@ -1643,7 +1669,7 @@ function Ovale:InitCalculerMeilleureAction()
 				print("changement de v.stop en "..v.stop.." "..v.start)
 			end]]
 			self:Log("self.maintenant = " ..self.maintenant.." spellId="..v.spellId.." v.stop="..v.stop)
-			if self.maintenant - v.stop<5 then
+			if self.maintenant - v.stop < 5 then
 				self:AddSpellToStack(v.spellId, v.start, v.stop, v.stop, v.nocd)
 			else
 				--self:Print("Removing obsolete "..v.spellId)
