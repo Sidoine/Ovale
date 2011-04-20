@@ -1067,7 +1067,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled, al
 			for target, targetInfo in pairs(si.aura) do
 				for filter, filterInfo in pairs(targetInfo) do
 					for auraSpellId, spellData in pairs(filterInfo) do
-						if spellData and spellData > 0 then
+						if spellData and spellData ~= "refresh" and spellData > 0 then
 							newSpell.auraSpellId = auraSpellId
 							if target == "player" then
 								newSpell.removeOnSuccess = true
