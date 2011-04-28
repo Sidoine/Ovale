@@ -713,6 +713,7 @@ end
 
 function Ovale:OnEnable()
     -- Called when the addon is enabled
+	RegisterAddonMessagePrefix("Ovale")
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
     self:RegisterEvent("PLAYER_REGEN_DISABLED");
     self:RegisterEvent("SPELLS_CHANGED")
@@ -802,13 +803,13 @@ end
 
 --Called for each combat log event
 function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local time, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
+	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1, ...)
 	
 	if sourceGUID == self.playerGuid then
 		-- self:Print("event="..event.." source="..nilstring(sourceName).." destName="..nilstring(destName).." " ..GetTime())
 		
 		if string.find(event, "SPELL_PERIODIC_DAMAGE")==1 or string.find(event, "SPELL_DAMAGE")==1 then
-			local spellId, spellName, spellSchool, amount = select(9, ...)
+			local spellId, spellName, spellSchool, amount = select(10, ...)
 			self.spellDamage[spellId] = amount
 		end
 		
@@ -823,7 +824,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				or string.find(event, "SPELL_MISSED") == 1 
 				or string.find(event, "SPELL_CAST_SUCCESS") == 1
 				or string.find(event, "SPELL_CAST_FAILED") == 1 then
-			local spellId, spellName = select(9, ...)
+			local spellId, spellName = select(10, ...)
 			for i,v in ipairs(self.lastSpell) do
 				if (v.spellId == spellId or v.auraSpellId == spellId) and v.allowRemove then
 					if not v.channeled and (v.removeOnSuccess or 
@@ -840,7 +841,7 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		if self.otherDebuffsEnabled then
 			--Track debuffs on units that are not the current target
 			if string.find(event, "SPELL_AURA_") == 1 then
-				local spellId, spellName, spellSchool, auraType = select(9, ...)
+				local spellId, spellName, spellSchool, auraType = select(10, ...)
 				if auraType == "DEBUFF" and self.spellInfo[spellId] and self.spellInfo[spellId].duration then
 					local otherDebuff = self:GetOtherDebuffs(spellId)
 					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
