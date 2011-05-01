@@ -177,8 +177,8 @@ AddIcon help=main mastery=1
 	Spell(OVERPOWER usable=1)
 	#/execute
 	if TargetLifePercent(less 20) Spell(EXECUTE)
-	#/slam,if=(cooldown.mortal_strike.remains>=1.5&(rage>=35|swing.mh.remains<1.1|buff.deadly_calm.up|buff.colossus_smash.up))|(cooldown.mortal_strike.remains>=1.2&buff.colossus_smash.remains>0.5&rage>=35)
-	if {{spell(MORTALSTRIKE)>1.5} and {Mana(more 34) or NextSwing(main 1.1) or BuffPresent(DEADLYCALM) or BuffPresent(COLOSSUSSMASH)}} or {spell(MORTALSTRIKE)>1.2 and BuffPresent(COLOSSUSSMASH 0.5) and Mana(more 34)}
+	#/slam,if=(cooldown.mortal_strike.remains>=1.5&(rage>=35|buff.deadly_calm.up|buff.colossus_smash.up))|(cooldown.mortal_strike.remains>=1.2&buff.colossus_smash.remains>0.5&rage>=35)
+	if {{spell(MORTALSTRIKE)>1.5} and {Mana(more 34) or BuffPresent(DEADLYCALM) or BuffPresent(COLOSSUSSMASH)}} or {spell(MORTALSTRIKE)>1.2 and BuffPresent(COLOSSUSSMASH 0.5) and Mana(more 34)}
 		Spell(SLAM)
 	#/battle_shout,if=rage<20
 	if Mana(less 20) Spell(BATTLESHOUT priority=2)
@@ -188,8 +188,8 @@ AddIcon help=offgcd mastery=1
 {
 	if target.IsInterruptible() Spell(PUMMEL)
 	if CheckBoxOn(multi) Spell(CLEAVE)
-	#/heroic_strike,if=(rage>70|buff.deadly_calm.up|buff.incite.up|buff.battle_trance.up)
-	if Mana(more 70) or BuffPresent(DEADLYCALM) or BuffPresent(INCITE) or BuffPresent(BATTLETRANCE)
+	#/heroic_strike,if=(rage>85|buff.deadly_calm.up|buff.incite.up|buff.battle_trance.up)
+	if Mana(more 85) or BuffPresent(DEADLYCALM) or BuffPresent(INCITE) or BuffPresent(BATTLETRANCE)
 		Spell(HEROICSTRIKE)
 }
 

@@ -147,11 +147,14 @@ AddIcon help=main mastery=1
 
 	if TargetDeadIn(more 6)	and BuffExpires(ASTRALALIGNMENT)
 	{
-		#/sunfire,if=(!ticking|ticks_remain<2)&buff.t11_4pc_caster.down&!dot.moonfire.remains>0
-		if BuffPresent(ECLIPSESOLAR) and TargetDebuffExpires(MOONFIRE 0 mine=1) and TargetDebuffExpires(SUNFIRE 2 mine=1)
+		#/sunfire,if=(!ticking|ticks_remain<2|(dot.sunfire.remains<4&buff.solar_eclipse.up&eclipse<15))&!dot.moonfire.remains>0";
+        if BuffPresent(ECLIPSESOLAR) and {TargetDebuffExpires(SUNFIRE 2 mine=1) or {TargetDebuffExpires(SUNFIRE 4 mine=1) and Eclipse(less 15)}}
+				and TargetDebuffExpires(MOONFIRE 0 mine=1)
 			Spell(SUNFIRE nored=1)
-		#/moonfire,if=!ticking&buff.t11_4pc_caster.down&!dot.sunfire.remains>0
-		if TargetDebuffExpires(MOONFIRE 2 mine=1) and TargetDebuffExpires(SUNFIRE 0 mine=1) and BuffExpires(ECLIPSESOLAR)
+		
+		#/moonfire,if=(!ticking|ticks_remain<2|(dot.moonfire.remains<4&buff.lunar_eclipse.up&eclipse>-20))
+		if BuffExpires(ECLIPSELUNAR 0) and {TargetDebuffExpires(MOONFIRE 2 mine=1) or {TargetDebuffExpires(MOONFIRE 4 mine=1) and Eclipse(more -20)}}
+				and TargetDebuffExpires(SUNFIRE 0 mine=1)
 			Spell(MOONFIRE nored=1)
 	}
 		

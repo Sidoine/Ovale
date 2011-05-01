@@ -102,6 +102,7 @@ Define(KILLINGMACHINE 51124)
 Define(SHADOWINFUSION 91342)
 Define(SUDDENDOOM 81340)
 Define(RUNICCORRUPTION 51459)
+Define(UNHOLYSTRENGTHBUFF 53365)
 
 AddCheckBox(horn SpellName(HORNOFWINTER))
 AddCheckBox(scarlet SpellName(SCARLETFEVER) mastery=1 default)
@@ -185,24 +186,33 @@ AddIcon help=main mastery=2
 	if Runes(unholy 2 frost 2 nodeath=1) or Runes(death 2) Spell(OBLITERATE)
 	#/obliterate,if=buff.killing_machine.react
 	if BuffPresent(KILLINGMACHINE) and Runes(unholy 1 frost 1) Spell(OBLITERATE)
-	#/blood_tap
-	unless Runes(frost 1 unholy 1) Spell(BLOODTAP priority=2)
-	#/blood_strike,if=blood=2
-	if Runes(blood 2) Spell(BLOODSTRIKE)
-	#/frost_strike,if=runic_power>=90
-	if Mana(more 89) Spell(FROSTSTRIKE)
-	#/howling_blast,if=buff.rime.react
+    #/frost_strike,if=runic_power>=90&!buff.bloodlust.react
+	if Mana(more 89) and BuffExpires(heroism) Spell(FROSTSTRIKE)
+    #/frost_strike,if=runic_power>=95
+	if Mana(more 94) Spell(FORSTSTRIKE)
+    #/howling_blast,if=buff.rime.react
 	if BuffPresent(FREEZINGFOG) Spell(HOWLINGBLAST)
-	#/obliterate
+    #/howling_blast,if=(death+unholy)=0&!buff.bloodlust.react
+	unless Runes(unholy 1 nodeath=1) or Runes(death 1) or BuffPresent(heroism)
+		if Runes(frost 1) Spell(HOWLINGBLAST)
+    #/obliterate
 	if Runes(unholy 1 frost 1) Spell(OBLITERATE)
-	#/blood_strike
-	if Runes(blood 1) Spell(BLOODSTRIKE)
-	#/frost_strike
+    #/empower_rune_weapon,if=target.time_to_die<=45
+	if TargetDeadIn(less 45) Spell(EMPOWERRUNEWEAPON priority=2)
+    #/frost_strike
 	Spell(FROSTSTRIKE usable=1)
-	#/empower_rune_weapon
-	Spell(EMPOWERRUNEWEAPON priority=2)
+    #/howling_blast
+	if Runes(frost 1) Spell(HOWLINGBLAST)
 	#/horn_of_winter
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
+}
+
+AddIcon help=offgcd mastery=2
+{
+    #/blood_tap
+	Spell(BLOODTAP)
+	#/empower_rune_weapon
+	Spell(EMPOWERRUNEWEAPON)
 }
 
 AddIcon help=aoe mastery=2
@@ -224,8 +234,13 @@ AddIcon help=cd mastery=2
 {
 	#/pillar_of_frost
 	if Runes(frost 1) Spell(PILLAROFFROST)
+	#/blood_tap,if=death!=2
+	unless Runes(death 2) Spell(BLOODTAP)
+	#/raise_dead,if=buff.rune_of_the_fallen_crusader.react
 	#/raise_dead,time>=15
-	unless TotemPresent(ghoul) if TimeInCombat(more 15) Spell(RAISEDEAD priority=2)
+	unless TotemPresent(ghoul) if TimeInCombat(more 15) or BuffPresent(UNHOLYSTRENGTHBUFF) Spell(RAISEDEAD priority=2)
+	#/empower_rune_weapon,if=target.time_to_die<=120&buff.killing_machine.react
+	if TargetDeadIn(less 120) and BuffPresent(KILLINGMACHINE) Spell(EMPOWERRUNEWEAPON)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -265,12 +280,16 @@ AddIcon help=main mastery=3
 	if Runes(blood 1 frost 1 nodeath=1) Spell(FESTERINGSTRIKE)
 	#/death_coil
 	if Mana(more 54) Spell(DEATHCOIL usable=1)
+	#/horn_of_winter
+	Spell(HORNOFWINTER)
+}
+
+AddIcon help=offgcd mastery=3
+{
 	#/blood_tap,if=unholy=0&inactive_death=1
 	unless Runes(unholy 1) Spell(BLOODTAP priority=2)
 	#/empower_rune_weapon,if=unholy=0
 	unless Runes(unholy 1) Spell(EMPOWERRUNEWEAPON priority=2)
-	#/horn_of_winter
-	Spell(HORNOFWINTER)
 }
 
 AddIcon help=aoe mastery=3

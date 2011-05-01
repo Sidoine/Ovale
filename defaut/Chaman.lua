@@ -109,8 +109,16 @@ AddIcon help=main mastery=1
 	
 	#/flame_shock,if=!ticking|ticks_remain<3
 	if TargetDebuffExpires(FLAMESHOCK 3 mine=1) Spell(FLAMESHOCK)
+
+	if CheckBoxOn(aoe)
+	{
+		Spell(EARTHQUAKE)
+		if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
+	}
+
 	#/lava_burst,if=(dot.flame_shock.remains-cast_time)>=0.05
 	if target.debuffExpires(FLAMESHOCK mine=1) - castTime(LAVABURST) > 0.05 Spell(LAVABURST)
+	
 	#/earth_shock,if=buff.lightning_shield.stack=9
 	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)
 	#/earth_shock,if=buff.lightning_shield.stack>6&dot.flame_shock.remains>cooldown&dot.flame_shock.remains<cooldown+action.flame_shock.tick_time
@@ -149,7 +157,6 @@ AddIcon help=main mastery=2
 		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
 		Spell(EARTHSHOCK)
 		Spell(STORMSTRIKE)
-		Spell(FIRENOVA)
 		if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(CHAINLIGHTNING)
 		Spell(LAVABURST)
 	}
@@ -172,8 +179,7 @@ AddIcon help=main mastery=2
 		#/stormstrike
 		Spell(STORMSTRIKE)
 		#/fire_nova
-		if TotemPresent(fire totem=MAGMATOTEM) or TotemPresent(fire totem=FIREELEMENTALTOTEM) or TotemPresent(fire totem=FLAMETHONGTOTEM)
-			Spell(FIRENOVA)
+		if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
 		#/lightning_bolt,if=buff.maelstrom_weapon.stack=4&buff.maelstrom_weapon.react
 		if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(LIGHTNINGBOLT)
 	}

@@ -102,10 +102,10 @@ AddIcon help=main mastery=1
 	#/evocation,if=target.time_to_die>=31
 	if TargetDeadIn(more 31) Spell(EVOCATION)
 	#/sequence,name=conserve:arcane_blast:arcane_blast:arcane_blast:arcane_blast,if=!buff.bloodlust.up
-	unless DebuffPresent(ARCANEBLASTDEBUFF stacks=4) or BuffPresent(heroism) 
+	unless DebuffPresent(ARCANEBLASTDEBUFF stacks=4) or BuffPresent(heroism) or ManaPercent(less 26)
 		Spell(ARCANEBLAST)
 	if BuffPresent(ARCANEMISSILEBUFF) Spell(ARCANEMISSILES)
-    #action_list_str += "/arcane_barrage,if=buff.arcane_blast.stack>0"; // when AM hasn't procced
+    #/arcane_barrage,if=buff.arcane_blast.stack>0; // when AM hasn't procced
 	Spell(ARCANEBARRAGE)
     if Speed(more 0) 
 	{
@@ -113,6 +113,7 @@ AddIcon help=main mastery=1
 		Spell(FIREBLAST)
 		Spell(ICELANCE)
 	}
+	Spell(ARCANEBLAST)
 }
 
 AddIcon help=cd mastery=1
@@ -120,24 +121,26 @@ AddIcon help=cd mastery=1
     if TargetBuffStealable(yes) Spell(SPELLSTEAL)
     if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
 	
-	#/conjure_mana_gem,if=cooldown.evocation.remains<44&target.time_to_die<44&mana_gem_charges=0
-	if ItemCount(MANAGEMITEM less 1 charges=1) and {spell(EVOCATION)<44} and TargetDeadIn(less 44)
+	#/conjure_mana_gem,if=cooldown.evocation.remains<44&target.time_to_die>20&mana_gem_charges=0
+	if ItemCount(MANAGEMITEM less 1 charges=1) and {spell(EVOCATION)<44} and TargetDeadIn(more 20)
 		Spell(CONJUREMANAGEM)
 	#if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|cooldown.evocation.remains>90|target.time_to_die<40
-	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLAST stacks=4)} or {spell(EVOCATION)>90} or TargetDeadIn(less 40)
+	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLASTDEBUFF stacks=4)} or {spell(EVOCATION)>90} or TargetDeadIn(less 40)
 	{
 		Item(Trinket0Slot usable=1)
 		Item(Trinket1Slot usable=1)
 		#if ItemCount(VOLCANICPOTION more 0) Item(VOLCANICPOTION)
 	}
 	
-	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLAST stacks=4)} or TargetDeadIn(less 40)
+	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLASTDEBUFF stacks=4)} or TargetDeadIn(less 40)
 	{
 		#action_list_str += "/arcane_power,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
 		Spell(ARCANEPOWER)
 		#action_list_str += "/mana_gem,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
-		Item(MANAGEMITEM)
+		if ManaPercent(less 85) Item(MANAGEMITEM)
 	}
+	
+	if ManaPercent(less 10) Item(MANAGEMITEM)
 	
     #action_list_str += "/mirror_image,if=buff.arcane_power.up|(cooldown.arcane_power.remains>20&target.time_to_die>15)";
     if BuffPresent(ARCANEPOWER) or {{spell(ARCANEPOWER)>0} and TargetDeadIn(more 15)} Spell(MIRRORIMAGE)

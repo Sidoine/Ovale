@@ -187,7 +187,7 @@ AddIcon help=cd mastery=1
 {
 	#/summon_infernal
 	Spell(DEMONSOUL)
-	Spell(SUMMONINFERNAL)
+	Spell(SUMMONDOOMGUARD)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -241,7 +241,7 @@ AddIcon help=cd mastery=2
 {
 	Spell(METAMORPHOSIS)
 	Spell(DEMONSOUL)
-	if BuffPresent(METAMORPHOSIS) Spell(SUMMONINFERNAL)
+	if BuffPresent(METAMORPHOSIS) Spell(SUMMONDOOMGUARD)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -289,7 +289,7 @@ AddIcon help=main mastery=3
 AddIcon help=cd mastery=3
 {
 	Spell(DEMONSOUL)
-	if BuffPresent(heroism) Spell(SUMMONFELGUARD)
+	if BuffPresent(heroism) Spell(SUMMONDOOMGUARD)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -303,14 +303,20 @@ AddIcon size=small mastery=1
 {
     unless PetPresent()
     {
-        if List(afflic shadow) Spell(SUMMONSUCCUBUS)
-        if List(afflic drain) Spell(SUMMONIMP)
+        if Glyph(GLYPHOFLASHOFPAIN) Spell(SUMMONSUCCUBUS)
+        if Glyph(GLYPHOFIMP) Spell(SUMMONIMP)
+		Spell(SUMMONFELHUNTER)
     }
 }
 
 AddIcon size=small mastery=2
 {
-    unless PetPresent() Spell(SUMMONFELGUARD)
+    unless PetPresent()
+	{
+		if Glyph(GLYPHOFLASHOFPAIN) Spell(SUMMONSUCCUBUS)
+        if Glyph(GLYPHOFIMP) Spell(SUMMONIMP)
+		Spell(SUMMONFELGUARD)
+	}
 }
 
 AddIcon size=small mastery=3
