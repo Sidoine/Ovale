@@ -226,10 +226,10 @@ AddIcon help=main mastery=2
 	if TalentPoints(TITANSGRIPTALENT more 0)
 	{
 		#/berserker_rage,if=!(buff.death_wish.up|buff.enrage.up|buff.unholy_frenzy.up)&rage>15&cooldown.raging_blow.remains<1
-		if BuffExpires(DEATHWISH 0) and BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
+		if BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
 			1s before Spell(RAGINGBLOW) Spell(BERSERKERRAGE)
 		#/raging_blow
-		if BuffPresent(DEATHWISH) or BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)
+		if BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)
 			Spell(RAGINGBLOW)
 	}
 	#/slam,if=buff.bloodsurge.react
@@ -239,10 +239,10 @@ AddIcon help=main mastery=2
 	if TalentPoints(TITANSGRIPTALENT less 1)
 	{
 		#/berserker_rage,if=!(buff.death_wish.up|buff.enrage.up|buff.unholy_frenzy.up)&rage>15&cooldown.raging_blow.remains<1
-		if BuffExpires(DEATHWISH 0) and BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
+		if BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
 			1s before Spell(RAGINGBLOW) Spell(BERSERKERRAGE)
 		#/raging_blow
-		if BuffPresent(DEATHWISH) or BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)
+		if BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)
 			Spell(RAGINGBLOW)
 	}
 	

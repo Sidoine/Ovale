@@ -1,8 +1,10 @@
 Ovale.defaut["WARLOCK"]=
 [[
 Define(BANEOFAGONY 980)
+	Spellinfo(BANEOFAGONY duration=24)
 	SpellAddTargetDebuff(BANEOFAGONY BANEOFAGONY=24)
 Define(BANEOFDOOM 603)
+	SpellInfo(BANEOFDOOM duration=60)
 	SpellAddTargetDebuff(BANEOFDOOM BANEOFDOOM=60)
 Define(BANEOFHAVOC 80240)
 	SpellAddTargetDebuff(BANEOFHAVOC BANEOFHAVOC=300)

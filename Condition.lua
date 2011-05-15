@@ -348,14 +348,14 @@ Ovale.conditions=
 		--if not name then
 --			return nil
 	--	end
-		local start, ending = GetTargetAura(condition, "HELPFUL", "player")
+		local start, ending = GetTargetAura(condition, "HELPFUL", getTarget(condition.target))
 		return compare(diffTime(start, ending), condition[2], condition[3])
 	end,
 	-- Test if a buff will expire on the player after a given time
 	-- 1 : buff spell id
 	-- 2 : expiration time 
 	BuffExpires = function(condition)
-		local start, ending = GetTargetAura(condition, "HELPFUL", "player")
+		local start, ending = GetTargetAura(condition, "HELPFUL", getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		if Ovale.trace then
 			Ovale:Print("timeBefore = " .. nilstring(timeBefore))

@@ -2343,10 +2343,16 @@ end
 
 local function OnCheckBoxValueChanged(widget)
 	Ovale.db.profile.check[widget.userdata.k] = widget:GetValue()
+	if Ovale.casesACocher[widget.userdata.k].compile then
+		Ovale.needCompile = true
+	end
 end
 
 local function OnDropDownValueChanged(widget)
 	Ovale.db.profile.list[widget.userdata.k] = widget.value
+	if Ovale.listes[widget.userdata.k].compile then
+		Ovale.needCompile = true
+	end
 end
 
 function Ovale:ToggleOptions()

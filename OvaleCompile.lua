@@ -247,13 +247,53 @@ local function subtest(text, pattern, func)
 	return text
 end
 
-local function ParseAddListItem(list, item, text, params)
-	local paramList = ParseParameters(params)
-	if (paramList.talent and not HasTalent(paramList.talent)) or
-		(paramList.glyph and not HasGlyph(paramList.glyph)) then
-		return ""
+local function TestConditions(paramList)
+	if paramList.glyph and not HasGlyph(paramList.glyph) then
+		return false
 	end
 	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
+		return false
+	end
+	if paramList.talent and not HasTalent(paramList.talent) then
+		return false
+	end
+	if paramList.checkboxon then
+		local cb = paramList.checkboxon
+		if not Ovale.casesACocher[cb] then
+			Ovale.casesACocher[cb] = {}
+		end
+		Ovale.casesACocher[cb].compile = true
+		if not Ovale.db.profile.check[cb] then
+			return false
+		end
+	end
+	if paramList.checkboxoff then
+		local cb = paramList.checkboxoff
+		if not Ovale.casesACocher[cb] then
+			Ovale.casesACocher[cb] = {}
+		end
+		Ovale.casesACocher[cb].compile = true
+		if Ovale.db.profile.check[cb] then
+			return false
+		end
+	end
+	if paramList.list and paramList.item then
+		local list = paramList.list
+		local key = paramList.item
+		if not Ovale.listes[list] then
+			Ovale.listes[list] = { items = {}}
+		end
+		Ovale.listes[list].compile = true
+		if Ovale.db.profile.list[list] ~= key then
+			return false
+		end
+	end
+	return true
+end
+
+local function ParseAddListItem(list, item, text, params)
+	local paramList = ParseParameters(params)
+	if not TestConditions(paramList) then
 		return ""
 	end
 	if (not Ovale.listes[list]) then
@@ -266,16 +306,16 @@ local function ParseAddListItem(list, item, text, params)
 	return ""
 end
 
+
 local function ParseAddCheckBox(item, text, params)
 	local paramList = ParseParameters(params)
-	if (paramList.talent and not HasTalent(paramList.talent)) or
-		(paramList.glyph and not HasGlyph(paramList.glyph)) then
+	if not TestConditions(paramList) then
 		return ""
 	end
-	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
-		return ""
+	if not Ovale.casesACocher[item] then
+		Ovale.casesACocher[item] = {}
 	end
-	Ovale.casesACocher[item] = {text = text}
+	Ovale.casesACocher[item].text = text
 	if  paramList[1] and paramList[1]=="default" then
 		Ovale.casesACocher[item].checked = true
 	end
@@ -352,10 +392,7 @@ local function ParseAddIcon(params, text)
 	local masterNode = ParseCommands(text)
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
-	if masterNode.params.talent and not HasTalent(masterNode.params.talent) then
-		return nil
-	end
-	if masterNode.params.mastery and masterNode.params.mastery~=GetPrimaryTalentTree() then
+	if not TestConditions(masterNode.params) then
 		return nil
 	end
 	return masterNode
