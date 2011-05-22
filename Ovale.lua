@@ -201,6 +201,15 @@ Ovale.buffSpellList =
 	{
 		24907, -- Moonkin aura
 		2895 -- Wrath of Air Totem
+	},
+	enrage =
+	{
+		49016, -- Unholy Frenzy
+		18499, -- Berserker Rage
+		12292, -- Death Wish
+		12880, -- Enrage (rank 1)
+		14201, -- Enrage (rank 2)
+		14202, -- Enrage (rank 3)
 	}
 }
 

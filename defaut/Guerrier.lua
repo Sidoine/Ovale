@@ -108,7 +108,6 @@ Define(WHIRLWIND 1680)
 #Buffs
 Define(BLOODSURGE 46916)
 Define(TASTEFORBLOOD 60503)
-Define(ENRAGE 14202)
 Define(EXECUTIONER 90806)
 Define(SUNDERARMORDEBUFF 58567)
 Define(RENDDEBUFF 94009)
@@ -129,6 +128,7 @@ Define(GLYPHOFBERSERKERRAGE 58096)
 AddCheckBox(multi L(AOE))
 AddCheckBox(demo SpellName(DEMOSHOUT))
 AddCheckBox(sunder SpellName(SUNDERARMOR) default)
+AddCheckBox(dancing SpellName(BERSERKERSTANCE) default mastery=1)
 AddListItem(shout none L(None))
 AddListItem(shout battle SpellName(BATTLESHOUT) default)
 AddListItem(shout command SpellName(COMMANDINGSHOUT))
@@ -143,8 +143,6 @@ AddIcon help=main mastery=1
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
 	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 
-	#/stance,choose=battle,if=(cooldown.recklessness.remains>0&rage<=50)
-	if Stance(3) and Mana(less 50) unless Spell(RECKLESSNESS) Spell(BATTLESTANCE)
 	#/berserker_rage,if=!buff.deadly_calm.up&rage<70
 	if Glyph(GLYPHOFBERSERKERRAGE) and BuffExpires(DEADLYCALM) and Mana(less 71) Spell(BERSERKERRAGE)
 	#/deadly_calm,if=rage<30&((target.health_pct>20&target.time_to_die>130)|(target.health_pct<=20&buff.recklessness.up))
@@ -166,7 +164,7 @@ AddIcon help=main mastery=1
 	#/execute,if=buff.battle_trance.up
 	if BuffPresent(BATTLETRANCE) and TargetLifePercent(less 20) Spell(EXECUTE)
 	#/rend,if=!ticking
-	if TargetDebuffExpires(RENDDEBUFF) Spell(REND)
+	if Stance(1) and TargetDebuffExpires(RENDDEBUFF) Spell(REND)
 	#/colossus_smash,if=buff.colossus_smash.remains<0.5
 	if BuffExpires(COLOSSUSSMASH 0.5) Spell(COLOSSUSSMASH)
 	#/execute,if=(buff.deadly_calm.up|buff.recklessness.up)
@@ -187,6 +185,15 @@ AddIcon help=main mastery=1
 AddIcon help=offgcd mastery=1
 {
 	if target.IsInterruptible() Spell(PUMMEL)
+	if CheckBoxOn(dancing)
+	{
+		#/stance,choose=berserker,if=(buff.taste_for_blood.down&rage<75)
+		if Stance(1) and TargetDebuffPresent(RENDDEBUFF mine=1) and BuffExpires(TASTEFORBLOOD 0) and Mana(less 75) Spell(BERSERKERSTANCE)
+		#/stance,choose=battle,if=(dot.rend.remains=0|(buff.taste_for_blood.up&cooldown.mortal_strike.remains>1)&rage<=75)
+		if Stance(3) and {TargetDebuffExpires(RENDDEBUFF 0 mine=1) or {BuffPresent(TASTEFORBLOOD) and {spell(MORTALSTRIKE)>1}}}
+			and Mana(less 75) Spell(BATTLESTANCE)
+	}
+
 	if CheckBoxOn(multi) Spell(CLEAVE)
 	#/heroic_strike,if=(rage>85|buff.deadly_calm.up|buff.incite.up|buff.battle_trance.up)
 	if Mana(more 85) or BuffPresent(DEADLYCALM) or BuffPresent(INCITE) or BuffPresent(BATTLETRANCE)
@@ -197,8 +204,6 @@ AddIcon help=cd mastery=1
 {
 	if {TargetLifePercent(more 20) and TargetDeadIn(more 320)} or TargetLifePercent(less 20)
 	{
-		#/stance,choose=berserker,if=cooldown.recklessness.remains=0&rage<=50&((target.health_pct>20&target.time_to_die>320)|target.health_pct<=20)
-		if Stance(1) and Spell(RECKLESSNESS) and Mana(less 50) Spell(BERSERKERSTANCE)
 		#/recklessness,if=((target.health_pct>20&target.time_to_die>320)|target.health_pct<=20)
 		if Stance(3) Spell(RECKLESSNESS)
 	}
@@ -226,10 +231,10 @@ AddIcon help=main mastery=2
 	if TalentPoints(TITANSGRIPTALENT more 0)
 	{
 		#/berserker_rage,if=!(buff.death_wish.up|buff.enrage.up|buff.unholy_frenzy.up)&rage>15&cooldown.raging_blow.remains<1
-		if BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
+		if BuffExpires(enrage 0) and Mana(more 15) and
 			1s before Spell(RAGINGBLOW) Spell(BERSERKERRAGE)
 		#/raging_blow
-		if BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)
+		if BuffPresent(enrage)
 			Spell(RAGINGBLOW)
 	}
 	#/slam,if=buff.bloodsurge.react
@@ -239,10 +244,10 @@ AddIcon help=main mastery=2
 	if TalentPoints(TITANSGRIPTALENT less 1)
 	{
 		#/berserker_rage,if=!(buff.death_wish.up|buff.enrage.up|buff.unholy_frenzy.up)&rage>15&cooldown.raging_blow.remains<1
-		if BuffExpires(RECKLESSNESS 0) and BuffExpires(ENRAGE 0) and Mana(less 15) and
+		if BuffExpires(enrage 0) and Mana(more 15) and
 			1s before Spell(RAGINGBLOW) Spell(BERSERKERRAGE)
 		#/raging_blow
-		if BuffPresent(RECKLESSNESS) or BuffPresent(ENRAGE) or BuffPresent(BERSERKERRAGE)
+		if BuffPresent(enrage)
 			Spell(RAGINGBLOW)
 	}
 	
