@@ -194,7 +194,7 @@ AddIcon help=main mastery=3
     if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
 	
 	#/deep_freeze
-    Spell(DEEPFREEZE)
+    Spell(DEEPFREEZE usable=1)
 	#/frostfire_bolt,if=buff.brain_freeze.react&buff.fingers_of_frost.react
     if BuffPresent(BRAINFREEZE) and BuffPresent(FINGERSOFFROST) {Spell(FROSTFIREBOLT) Spell(FIREBALL)}
 	#/ice_lance,if=buff.fingers_of_frost.stack>1

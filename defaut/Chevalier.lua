@@ -115,9 +115,9 @@ AddIcon help=main mastery=1
 {
 
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
-	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
-		if Runes(blood 1) or BuffPresent(BLOODSWARM) Spell(BLOODBOIL)
 	if TargetDebuffExpires(BLOODPLAGUE 0 mine=1) and TargetDebuffExpires(FROSTFEVER 0 mine=1) Spell(OUTBREAK)
+	if TargetDebuffExpires(lowerphysicaldamage) and CheckBoxOn(scarlet) and TargetClassification(worldboss)
+		if Runes(unholy 1) Spell(PLAGUESTRIKE)
 	Spell(RUNESTRIKE usable=1)
 	Spell(DANCINGRUNEWEAPON usable=1)
 	
