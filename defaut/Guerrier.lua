@@ -143,11 +143,20 @@ AddIcon help=main mastery=1
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
 	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 
+	if CheckBoxOn(dancing)
+	{
+		#/stance,choose=berserker,if=(buff.taste_for_blood.down&rage<75)
+		if Stance(1) and TargetDebuffPresent(RENDDEBUFF mine=1) and BuffExpires(TASTEFORBLOOD 0) and Mana(less 75) Spell(BERSERKERSTANCE)
+		#/stance,choose=battle,if=(dot.rend.remains=0|((buff.overpower.up|buff.taste_for_blood.up)&cooldown.mortal_strike.remains>1)&rage<=75)
+		if Stance(3) and {TargetDebuffExpires(RENDDEBUFF 0 mine=1) or {BuffPresent(TASTEFORBLOOD) and {spell(MORTALSTRIKE)>1}}}
+			and Mana(less 75) Spell(BATTLESTANCE)
+	}
+
 	#/berserker_rage,if=!buff.deadly_calm.up&rage<70
 	if Glyph(GLYPHOFBERSERKERRAGE) and BuffExpires(DEADLYCALM) and Mana(less 71) Spell(BERSERKERRAGE)
 	#/deadly_calm,if=rage<30&((target.health_pct>20&target.time_to_die>130)|(target.health_pct<=20&buff.recklessness.up))
 	if Mana(less 30) and {{TargetLifePercent(more 20) and TargetDeadIn(more 130)} or {TargetLifePercent(less 20) and BuffPresent(RECKLESSNESS)}} Spell(DEADLYCALM)
-	
+
 	if CheckBoxOn(multi)
 	{
 		#/sweeping_strikes,if=target.adds>0
@@ -166,7 +175,7 @@ AddIcon help=main mastery=1
 	#/rend,if=!ticking
 	if Stance(1) and TargetDebuffExpires(RENDDEBUFF) Spell(REND)
 	#/colossus_smash,if=buff.colossus_smash.remains<0.5
-	if BuffExpires(COLOSSUSSMASH 0.5) Spell(COLOSSUSSMASH)
+	if TargetDebuffExpires(COLOSSUSSMASH 0.5 mine=1) Spell(COLOSSUSSMASH)
 	#/execute,if=(buff.deadly_calm.up|buff.recklessness.up)
 	if BuffPresent(DEADLYCALM) or BuffPresent(RECKLESSNESS) if TargetLifePercent(less 20) Spell(EXECUTE)
 	#/mortal_strike
@@ -176,7 +185,7 @@ AddIcon help=main mastery=1
 	#/execute
 	if TargetLifePercent(less 20) Spell(EXECUTE)
 	#/slam,if=(cooldown.mortal_strike.remains>=1.5&(rage>=35|buff.deadly_calm.up|buff.colossus_smash.up))|(cooldown.mortal_strike.remains>=1.2&buff.colossus_smash.remains>0.5&rage>=35)
-	if {{spell(MORTALSTRIKE)>1.5} and {Mana(more 34) or BuffPresent(DEADLYCALM) or BuffPresent(COLOSSUSSMASH)}} or {spell(MORTALSTRIKE)>1.2 and BuffPresent(COLOSSUSSMASH 0.5) and Mana(more 34)}
+	if {{spell(MORTALSTRIKE)>1.5} and {Mana(more 34) or BuffPresent(DEADLYCALM) or TargetDebuffPresent(COLOSSUSSMASH mine=1)}} or {spell(MORTALSTRIKE)>1.2 and TargetDebuffPresent(COLOSSUSSMASH 0.5) and Mana(more 34)}
 		Spell(SLAM)
 	#/battle_shout,if=rage<20
 	if Mana(less 20) Spell(BATTLESHOUT priority=2)
@@ -185,18 +194,12 @@ AddIcon help=main mastery=1
 AddIcon help=offgcd mastery=1
 {
 	if target.IsInterruptible() Spell(PUMMEL)
-	if CheckBoxOn(dancing)
-	{
-		#/stance,choose=berserker,if=(buff.taste_for_blood.down&rage<75)
-		if Stance(1) and TargetDebuffPresent(RENDDEBUFF mine=1) and BuffExpires(TASTEFORBLOOD 0) and Mana(less 75) Spell(BERSERKERSTANCE)
-		#/stance,choose=battle,if=(dot.rend.remains=0|(buff.taste_for_blood.up&cooldown.mortal_strike.remains>1)&rage<=75)
-		if Stance(3) and {TargetDebuffExpires(RENDDEBUFF 0 mine=1) or {BuffPresent(TASTEFORBLOOD) and {spell(MORTALSTRIKE)>1}}}
-			and Mana(less 75) Spell(BATTLESTANCE)
-	}
-
+	
 	if CheckBoxOn(multi) Spell(CLEAVE)
-	#/heroic_strike,if=(rage>85|buff.deadly_calm.up|buff.incite.up|buff.battle_trance.up)
-	if Mana(more 85) or BuffPresent(DEADLYCALM) or BuffPresent(INCITE) or BuffPresent(BATTLETRANCE)
+	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
+	if {Mana(more 85) and TargetLifePercent(more 20)}
+		or BuffPresent(BATTLETRANCE) 
+		or {{BuffPresent(INCITE) or TargetDebuffPresent(COLOSSUSSMASH mine=1)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
 		Spell(HEROICSTRIKE)
 }
 
@@ -261,9 +264,9 @@ AddIcon help=offgcd mastery=2
 	if target.IsInterruptible() Spell(PUMMEL)
 	#/cleave,if=target.adds>0
 	if CheckBoxOn(multi) Spell(CLEAVE) 
-	#/heroic_strike,if=((rage>85&target.health_pct>=20)|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
-	if {Mana(more 85) and TargetLifePercent(more 20)} or BuffPresent(BATTLETRANCE) or 
-			{{BuffPresent(INCITE) or BuffPresent(COLOSSUSSMASH)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
+	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
+	if {Mana(more 84) and TargetLifePercent(more 20)} or BuffPresent(BATTLETRANCE) or 
+			{{BuffPresent(INCITE) or TargetDebuffPresent(COLOSSUSSMASH mine=1)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
 		Spell(HEROICSTRIKE)
 }
 
