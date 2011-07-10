@@ -139,8 +139,8 @@ AddIcon help=main mastery=3
 	if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
 	#judgement,if=buff.judgements_of_the_pure.remains<2
 	if BuffExpires(JUDGEMENTSOFTHEPURE 2) Spell(JUDGEMENT)
-	#wait,sec=0.1,if=cooldown.crusader_strike.remains<0.75
-	unless 0.75 before Spell(CRUSADERSTRIKE)
+	#wait,sec=0.1,if=cooldown.crusader_strike.remains<0.5
+	unless 0.5 before Spell(CRUSADERSTRIKE)
 	{
 		#judgement
 		Spell(JUDGEMENT)
@@ -155,15 +155,14 @@ AddIcon help=main mastery=3
 
 AddIcon help=cd mastery=3
 {
-	#/guardian_of_ancient_kings
-	Spell(GUARDIANOFANCIENTKINGS)
-	#/avenging_wrath,if=buff.zealotry.down
-	if BuffExpires(ZEALOTRY)
+	#/zealotry
+	Spell(ZEALOTRY)
+    #/guardian_of_ancient_kings,if=buff.zealotry.remains<31|cooldown.zealotry.remains>60
+	if BuffExpires(ZEALOTRY 31) or {spell(ZEALOTRY)>60}	Spell(GUARDIANOFANCIENTKINGS)
+	#/avenging_wrath,if=buff.zealotry.remains<21
+	if BuffExpires(ZEALOTRY 21)
 		Spell(AVENGINGWRATH)
-	#/zealotry,if=buff.avenging_wrath.down
-	if BuffExpires(AVENGINGWRATH)
-		Spell(ZEALOTRY)
-    Item(Trinket0Slot usable=1)
+	Item(Trinket0Slot usable=1)
     Item(Trinket1Slot usable=1)
 }
 ]]

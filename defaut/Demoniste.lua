@@ -284,8 +284,7 @@ AddIcon help=main mastery=3
 	}
 	#/shadowburn
 	Spell(SHADOWBURN usable=1)
-    if TalentPoints(SHADOWANDFLAMETALENT more 0) and TargetDebuffExpires(magicalcrittaken) Spell(SHADOWBOLT)
-	Spell(INCINERATE)
+    Spell(INCINERATE)
 }
 
 AddIcon help=cd mastery=3

@@ -191,12 +191,14 @@ AddIcon help=cd mastery=2
 AddIcon help=main mastery=3
 {
     unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
+	if BuffPresent(MAGEARMOR) and ManaPercent(more 45) Spell(MOLTENARMOR)
+	
     if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
 	
 	#/deep_freeze
     Spell(DEEPFREEZE usable=1)
-	#/frostfire_bolt,if=buff.brain_freeze.react&buff.fingers_of_frost.react
-    if BuffPresent(BRAINFREEZE) and BuffPresent(FINGERSOFFROST) {Spell(FROSTFIREBOLT) Spell(FIREBALL)}
+	#/frostfire_bolt,if=buff.brain_freeze.react
+    if BuffPresent(BRAINFREEZE) {Spell(FROSTFIREBOLT) Spell(FIREBALL)}
 	#/ice_lance,if=buff.fingers_of_frost.stack>1
     if BuffPresent(FINGERSOFFROST stacks=2) Spell(ICELANCE)
 	#/ice_lance,if=buff.fingers_of_frost.react&pet.water_elemental.cooldown.freeze.remains<gcd

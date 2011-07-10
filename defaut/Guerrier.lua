@@ -196,9 +196,9 @@ AddIcon help=offgcd mastery=1
 	if target.IsInterruptible() Spell(PUMMEL)
 	
 	if CheckBoxOn(multi) Spell(CLEAVE)
-	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
+	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.deadly_calm.up|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
 	if {Mana(more 85) and TargetLifePercent(more 20)}
-		or BuffPresent(BATTLETRANCE) 
+		or BuffPresent(DEADLYCALM) or BuffPresent(BATTLETRANCE)
 		or {{BuffPresent(INCITE) or TargetDebuffPresent(COLOSSUSSMASH mine=1)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
 		Spell(HEROICSTRIKE)
 }

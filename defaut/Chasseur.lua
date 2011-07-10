@@ -127,11 +127,11 @@ AddIcon help=main mastery=2
 		Spell(STEADYSHOT)
 	}
 	
-	#/serpent_sting,if=!ticking&target.health_pct<=80
-    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) #and TargetLifePercent(less 80) 
+	#/serpent_sting,if=!ticking&target.health_pct<=90
+    if Mana(more 24) and TargetDebuffExpires(SERPENTSTING 0 mine=1) and TargetDeadIn(more 8) #and TargetLifePercent(less 90) 
 			Spell(SERPENTSTING)
-	#/chimera_shot,if=target.health_pct<=80
-	if Mana(more 49) #and TargetLifePercent(less 80) 
+	#/chimera_shot,if=target.health_pct<=90
+	if Mana(more 49) #and TargetLifePercent(less 90) 
 		Spell(CHIMERASHOT)
 	#/steady_shot,if=buff.pre_improved_steady_shot.up&buff.improved_steady_shot.remains<3
 	if Mana(less 40) or Counter(ss equal 1) Spell(STEADYSHOT)
@@ -144,15 +144,15 @@ AddIcon help=main mastery=2
 		#/aimed_shot,if=target.health_pct>80|buff.rapid_fire.up|buff.bloodlust.up
 		if TargetLifePercent(more 80) or 
 			BuffPresent(RAPIDFIRE) or BuffPresent(heroism) if Mana(more 49) Spell(AIMEDSHOT)
-        #/arcane_shot,if=(focus>=66|cooldown.chimera_shot.remains>=5)&(target.health_pct<80&!buff.rapid_fire.up&!buff.bloodlust.up)
-		if {Mana(more 65) or spell(CHIMERASHOT)>5} and {TargetLifePercent(less 80) and 
+        #/arcane_shot,if=(focus>=66|cooldown.chimera_shot.remains>=5)&(target.health_pct<90&!buff.rapid_fire.up&!buff.bloodlust.up)
+		if {Mana(more 65) or spell(CHIMERASHOT)>5} and {TargetLifePercent(less 90) and 
 					BuffExpires(RAPIDFIRE) and BuffExpires(heroism)}
 			if Mana(more 24) Spell(ARCANESHOT)
 	}
 	unless Glyph(GLYPHOFARCANESHOT)
 	{
-		#/aimed_shot,if=cooldown.chimera_shot.remains>5|focus>=80|buff.rapid_fire.up|buff.bloodlust.up|target.health_pct>80
-		if {spell(CHIMERASHOT)>5} or Mana(more 79) or BuffPresent(RAPIDFIRE) or BuffPresent(heroism) #or TargetLifePercent(more 80)
+		#/aimed_shot,if=cooldown.chimera_shot.remains>5|focus>=80|buff.rapid_fire.up|buff.bloodlust.up|target.health_pct>90
+		if {spell(CHIMERASHOT)>5} or Mana(more 79) or BuffPresent(RAPIDFIRE) or BuffPresent(heroism) #or TargetLifePercent(more 90)
 			if Mana(more 49) Spell(AIMEDSHOT)
 	}
 	#/steady_shot
