@@ -51,6 +51,9 @@ Define(MOLTENARMOR 30482)
 Define(PYROBLAST 11366) #fire dot
     SpellAddTargetDebuff(PYROBLAST PYROBLAST=12)
     SpellAddBuff(PYROBLAST HOTSTREAK=0)
+Define(PYROBLASTBANG 92315)
+	SpellAddTargetDebuff(PYROBLASTBANG PYROBLASTBANG=12)
+	SpellAddBuff(PYROBLASTBANG HOTSTREAK=0)
 Define(SCORCH 2948) #fire 1.5 (cast while moving with firestarter talent)
 Define(SPELLSTEAL 30449)
 Define(SUMMONWATERELEMENTAL 31687) #frost pet
@@ -156,7 +159,8 @@ AddIcon help=main mastery=2
 	#/scorch,debuff=1
     if TalentPoints(CRITICALMASSTALENT more 0) and TargetDebuffExpires(magicalcrittaken 0) Spell(SCORCH)
 	#/combustion,if=dot.living_bomb.ticking&dot.ignite.ticking&dot.pyroblast.ticking
-    if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1) and TargetDebuffPresent(PYROBLAST mine=1)
+    if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1) and 
+		{TargetDebuffPresent(PYROBLAST mine=1) or TargetDebuffPresent(PYROBLASTBANG mine=1)}
         Spell(COMBUSTION)
 	#/living_bomb,if=!ticking
     if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
