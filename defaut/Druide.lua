@@ -153,7 +153,7 @@ AddIcon help=main mastery=1
 			Spell(SUNFIRE nored=1)
 		
 		#/moonfire,if=(!ticking|ticks_remain<2|(dot.moonfire.remains<4&buff.lunar_eclipse.up&eclipse>-20))
-		if BuffExpires(ECLIPSELUNAR 0) and {TargetDebuffExpires(MOONFIRE 2 mine=1) or {TargetDebuffExpires(MOONFIRE 4 mine=1) and Eclipse(more -20)}}
+		if {TargetDebuffExpires(MOONFIRE 2 mine=1) or {TargetDebuffExpires(MOONFIRE 4 mine=1) and Eclipse(more -20)}}
 				and TargetDebuffExpires(SUNFIRE 0 mine=1)
 			Spell(MOONFIRE nored=1)
 	}
@@ -234,7 +234,7 @@ AddIcon help=main mastery=2
 			Spell(MANGLECAT)
 			
 		#ravage,if=buff.stampede_cat.up&buff.stampede_cat.remains<=1
-		if BuffPresent(STAMPEDE) and BuffExpires(STAMPEDE 1) Spell(RAVAGE)
+		if BuffPresent(STAMPEDE) and BuffExpires(STAMPEDE 1) and CheckBoxOn(shred) Spell(RAVAGE)
 		
 		#ferocious_bite,if=buff.combo_points.stack>=1&dot.rip.ticking&dot.rip.remains<=1&target.health_pct<=25
 		if ComboPoints(more 0) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 1 mine=1) and TargetLifePercent(less 25)
@@ -245,7 +245,7 @@ AddIcon help=main mastery=2
 			Spell(FEROCIOUSBITE)
 		
 		#/shred,extend_rip=1,if=dot.rip.ticking&dot.rip.remains<=4&target.health_pct>25  TODO: extend_rip=1?
-		if TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and TargetLifePercent(more 25) Spell(SHRED)
+		if TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and TargetLifePercent(more 25) and CheckBoxOn(shred) Spell(SHRED)
 		
 		#rip,if=buff.combo_points.stack>=5&target.time_to_die>=6&dot.rip.remains<2.0&(buff.berserk.up|dot.rip.remains<=cooldown.tigers_fury.remains)
 		if ComboPoints(more 4) and TargetDeadIn(more 6) and TargetDebuffExpires(RIP 2 mine=1) and 
@@ -265,7 +265,7 @@ AddIcon help=main mastery=2
 			Spell(RAKE)
 		
 		#shred,if=buff.omen_of_clarity.react
-		if BuffPresent(CLEARCASTING) Spell(SHRED)
+		if CheckBoxOn(shred) and BuffPresent(CLEARCASTING) Spell(SHRED)
 		
 		#savage_roar,if=buff.combo_points.stack>=1&buff.savage_roar.remains<=1
 		if ComboPoints(more 0) and BuffExpires(SAVAGEROAR 1) Spell(SAVAGEROAR)
@@ -274,18 +274,22 @@ AddIcon help=main mastery=2
 		if {TargetDeadIn(less 4) and ComboPoints(more 4)} or {TargetDeadIn(less 1) and ComboPoints(more 0)} Spell(FEROCIOUSBITE)
 		#/ferocious_bite,if=buff.combo_points.stack>=5&dot.rip.remains>=14.0&buff.savage_roar.remains>=10.0
 		if ComboPoints(more 4) and TargetDebuffPresent(RIP 14 mine=1) and BuffPresent(SAVAGEROAR 10) Spell(FEROCIOUSBITE)
-		#ravage,if=buff.stampede_cat.up&!buff.omen_of_clarity.react&buff.tigers_fury.up
-		if BuffPresent(STAMPEDE) and BuffExpires(CLEARCASTING) and BuffPresent(TIGERSFURY) Spell(RAVAGE)
-		#/shred,if=buff.tigers_fury.up|buff.berserk.up
-		if BuffPresent(TIGERSFURY) or BuffPresent(BERSERK) Spell(SHRED)
-        #/shred,if=(buff.combo_points.stack<5&dot.rip.remains<3.0)|(buff.combo_points.stack=0&buff.savage_roar.remains<2
-		if {ComboPoints(less 5) and TargetDebuffExpires(RIP 3 mine=1)} or {ComboPoints(less 1) and BuffExpires(SAVAGEROAR 2)} Spell(SHRED)
-        #/shred,if=cooldown.tigers_fury.remains<=3.0
-		if spell(TIGERSFURY) < 3 Spell(SHRED)
-        #/shred,if=target.time_to_die<=8.5
-		if TargetDeadIn(less 8.5) Spell(SHRED)
-        #/shred,if=time_to_max_energy<=1.0
-		if 1s before Mana(more 99) Spell(SHRED)
+		if CheckBoxOn(shred)
+		{
+			#ravage,if=buff.stampede_cat.up&!buff.omen_of_clarity.react&buff.tigers_fury.up
+			if BuffPresent(STAMPEDE) and BuffExpires(CLEARCASTING) and BuffPresent(TIGERSFURY) Spell(RAVAGE)
+			#/shred,if=buff.tigers_fury.up|buff.berserk.up
+			if BuffPresent(TIGERSFURY) or BuffPresent(BERSERK) Spell(SHRED)
+			#/shred,if=(buff.combo_points.stack<5&dot.rip.remains<3.0)|(buff.combo_points.stack=0&buff.savage_roar.remains<2
+			if {ComboPoints(less 5) and TargetDebuffExpires(RIP 3 mine=1)} or {ComboPoints(less 1) and BuffExpires(SAVAGEROAR 2)} Spell(SHRED)
+			#/shred,if=cooldown.tigers_fury.remains<=3.0
+			if spell(TIGERSFURY) < 3 Spell(SHRED)
+			#/shred,if=target.time_to_die<=8.5
+			if TargetDeadIn(less 8.5) Spell(SHRED)
+			#/shred,if=time_to_max_energy<=1.0
+			if 1s before Mana(more 99) Spell(SHRED)
+		}
+		if CheckBoxOff(shred) and ComboPoints(less 5) Spell(MANGLE)
 	}
 }
 

@@ -142,7 +142,7 @@ AddIcon help=main mastery=2
 	if Glyph(GLYPHOFARCANESHOT)
 	{
 		#/aimed_shot,if=target.health_pct>80|buff.rapid_fire.up|buff.bloodlust.up
-		if TargetLifePercent(more 80) or 
+		if TargetLifePercent(more 90) or 
 			BuffPresent(RAPIDFIRE) or BuffPresent(heroism) if Mana(more 49) Spell(AIMEDSHOT)
         #/arcane_shot,if=(focus>=66|cooldown.chimera_shot.remains>=5)&(target.health_pct<90&!buff.rapid_fire.up&!buff.bloodlust.up)
 		if {Mana(more 65) or spell(CHIMERASHOT)>5} and {TargetLifePercent(less 90) and 

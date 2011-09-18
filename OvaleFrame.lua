@@ -324,8 +324,12 @@ do
 					action.icons[l] = CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIcone");
 				end			
 				local icon = action.icons[l]
-				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/action.scale,(action.top - (l-1)*action.dy)/action.scale)
-				icon:SetScale(action.scale)
+				local scale = action.scale
+				if l> 1 then
+					scale = scale  * Ovale.db.profile.apparence.secondIconScale
+				end
+				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/scale,(action.top - (l-1)*action.dy)/scale)
+				icon:SetScale(scale)
 				icon:SetFontScale(Ovale.db.profile.apparence.fontScale)
 				icon:SetHelp(node.params.help)
 				icon:SetRangeIndicator(Ovale.db.profile.apparence.targetText)

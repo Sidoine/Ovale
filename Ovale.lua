@@ -210,6 +210,9 @@ Ovale.buffSpellList =
 		12880, -- Enrage (rank 1)
 		14201, -- Enrage (rank 2)
 		14202, -- Enrage (rank 3)
+		5229, -- Enrage (Bear)
+        52610, -- Savage Roar (Cat)
+        76691, -- Vengeance (All Tank Specs)
 	}
 }
 
@@ -271,6 +274,15 @@ local options =
 					min = 0.1, max = 16, step = 0.1,
 					get = function(info) return Ovale.db.profile.apparence.iconScale end,
 					set = function(info,value) Ovale.db.profile.apparence.iconScale = value; Ovale:UpdateFrame() end
+				},
+				secondIconScale =
+				{
+					order = 2.5,
+					type = "range",
+					name = L["Taille du second icône"],
+					min = 0.2, max = 1, step = 0.1,
+					get = function(info) return Ovale.db.profile.apparence.secondIconScale end,
+					set = function(info,value) Ovale.db.profile.apparence.secondIconScale = value; Ovale:UpdateFrame() end
 				},
 				fontScale = 
 				{
@@ -1997,7 +2009,7 @@ function Ovale:CalculerMeilleureAction(element)
 				for k,v in pairs(element.params) do
 					parameterList = parameterList..k.."="..v..","
 				end
-				self:Print("Function "..parameterList..") returned "..nilstring(start)..","..nilstring(ending))
+				self:Print("Function "..parameterList..") returned "..nilstring(start)..","..nilstring(ending)..","..nilstring(rate))
 			end
 			
 			return start, ending, rate
@@ -2330,7 +2342,7 @@ function Ovale:ChargerDefaut()
 			top = 500,
 			check = {},
 			list = {},
-			apparence = {enCombat=false, iconScale = 2, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
+			apparence = {enCombat=false, iconScale = 2, secondIconScale = 1, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
 				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●", alpha = 1,

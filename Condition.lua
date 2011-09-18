@@ -630,9 +630,26 @@ Ovale.conditions=
 		local spellId = condition.spell
 		if not spellId then
 			return testbool(UnitCastingInfo(target) or UnitChannelInfo(target), condition[1])
-		else
+		elseif type(spellId) == "number" then
 			local spellName = GetSpellInfo(spellId)
 			return testbool(UnitCastingInfo(target)==spellName or UnitChannelInfo(target) == spellName, condition[1])
+		elseif Ovale.buffSpellList[spellId] then
+			local castSpellName = UnitCastingInfo(target) or UnitChannelInfo(target)
+			local found = false
+			for k,v in pairs(Ovale.buffSpellList[spellId]) do
+				local spellName = GetSpellInfo(v)
+				if spellName == castSpellName then
+					found = true
+					break
+				end
+			end
+			return testbool(found, condition[1])
+		elseif spellId == "harmful" then
+			local castSpellName = UnitCastingInfo(target) or UnitChannelInfo(target)
+			return testbool(castSpellName and IsHarmfulSpell(castSpellName), condition[1])
+		elseif spellId == "helpful" then
+			local castSpellName = UnitCastingInfo(target) or UnitChannelInfo(target)
+			return testbool(castSpellName and IsHelpfulSpell(castSpellName), condition[1])
 		end
 	end,
 	IsFeared = function(condition)
@@ -895,6 +912,13 @@ Ovale.conditions=
 		end
 
 		return compare(difference, condition[1], condition[2])
+	end,
+	remainingCastTime = function(condition)
+		local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill, castID, notInterruptible = UnitCastingInfo(getTarget(condition.target))
+		if not endTime then
+			return nil
+		end
+		return 0, endTime/1000, -1
 	end,
 	SoulShards = function(condition)
 		return compare(Ovale.state.shard, condition[1], condition[2])

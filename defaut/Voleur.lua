@@ -83,6 +83,7 @@ Define(DEADLYPOISON 2892)
 #Talents
 Define(TALENTCUTTOTHECHASE 2070)
 Define(TALENTENERGETICRECOVERY 11665)
+Define(TALENTHEMORRHAGE 681)
 
 SpellList(insight 84745 84746 84747)
 
@@ -226,10 +227,16 @@ AddIcon help=main mastery=3
 	#/eviscerate,if=combo_points=5&dot.rupture.remains>1
 	if ComboPoints(more 4) and TargetDebuffPresent(RUPTURE 1 mine=1) Spell(EVISCERATE)
 	
-	#/backstab,if=combo_points<3&energy>60";
-	if ComboPoints(less 3) and Mana(more 60) Spell(BACKSTAB)
+	if TalentPoints(TALENTHEMORRHAGE more 0)
+	{
+		#/hemorrhage,if=combo_points<4&energy>40&dot.hemorrhage.remains<4";
+		if CombotPoints(less 4) and Mana(more 40) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
+        #/hemorrhage,if=combo_points<5&energy>80&dot.hemorrhage.remains<4";
+		if CombotPoints(less 5) and Mana(more 80) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
+	}
+		
 	#/backstab,if=combo_points<4&energy>40&energy<80";
-	if ComboPoints(less 4) and Mana(more 40) and Mana(less 80) Spell(BACKSTAB)
+	if ComboPoints(less 4) and Mana(more 40) Spell(BACKSTAB)
 	#/backstab,if=combo_points<5&energy>80
 	if ComboPoints(less 5) and Mana(more 80) Spell(BACKSTAB)
 }

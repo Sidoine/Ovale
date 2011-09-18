@@ -76,8 +76,6 @@ Define(REVENGE 6572)
 Define(SHATTERINGTHROW 64382)
 	SpellInfo(SHATTERINGTHROW cd=300)
 	SpellAddTargetDebuff(SHATTERINGTHROW SHATTERINGTHROW=10)
-Define(SHIELDBASH 72)
-	SpellInfo(SHIELDBASH cd=12)
 Define(SHIELDBLOCK 2565)
 	SpellInfo(SHIELDBLOCK cd=60)
 	SpellAddBuff(SHIELDBLOCK SHIELDBLOCK=10)
@@ -303,7 +301,7 @@ AddIcon help=main mastery=3
 
 AddIcon help=offgcd mastery=3
 {
-	if target.IsInterruptible() Spell(SHIELDBASH)
+	if target.IsInterruptible() Spell(PUMMEL)
 	if CheckBoxOn(multi) Spell(CLEAVE)
 	if Mana(more 35) Spell(HEROICSTRIKE)
 }
