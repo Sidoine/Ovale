@@ -230,9 +230,9 @@ AddIcon help=main mastery=3
 	if TalentPoints(TALENTHEMORRHAGE more 0)
 	{
 		#/hemorrhage,if=combo_points<4&energy>40&dot.hemorrhage.remains<4";
-		if CombotPoints(less 4) and Mana(more 40) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
+		if ComboPoints(less 4) and Mana(more 40) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
         #/hemorrhage,if=combo_points<5&energy>80&dot.hemorrhage.remains<4";
-		if CombotPoints(less 5) and Mana(more 80) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
+		if ComboPoints(less 5) and Mana(more 80) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
 	}
 		
 	#/backstab,if=combo_points<4&energy>40&energy<80";
