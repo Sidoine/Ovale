@@ -278,11 +278,13 @@ AddIcon help=cd mastery=2
 	Item(Trinket1Slot usable=1)
 }
 
+# Protection warrior rotation from EJ for 4.2:
+# http://elitistjerks.com/f81/t110315-cataclysm_protection_warrior/#post1813079
 AddIcon help=main mastery=3
 {
+	if Stance(3) Spell(DEFENSIVESTANCE)
 	if List(shout command) and {Mana(less 20) or BuffExpires(stamina 3)} Spell(COMMANDINGSHOUT nored=1)
-    if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
-	if CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
+	if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 
 	if LifePercent(less 75) and BuffPresent(VICTORIOUS) Spell(VICTORYRUSH usable=1)
 	if CheckBoxOn(multi)
@@ -290,27 +292,46 @@ AddIcon help=main mastery=3
 		if TargetDebuffExpires(RENDDEBUFF mine=1) Spell(REND)
 		Spell(THUNDERCLAP)
 		Spell(SHOCKWAVE)
+		Spell(REVENGE usable=1)
 	}
-	Spell(REVENGE usable=1)
-	#if BuffPresent(THUNDERSTRUCK) Spell(SHOCKWAVE)
-	Spell(SHIELDSLAM)
-	if TargetDebuffExpires(meleeslow) Spell(THUNDERCLAP)
+	if CheckBoxOn(sunder) and CheckBoxOff(multi) and TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(DEVASTATE)
+
+	if 1s before Spell(SHIELDSLAM) Spell(SHIELDSLAM usable=1)
+
+	if CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 4) Spell(DEMOSHOUT)
+	if TargetDebuffExpires(meleeslow 2) Spell(THUNDERCLAP)
+
 	Spell(VICTORYRUSH usable=1)
+	Spell(REVENGE usable=1)
+
+	# A single Rend application is only worth using on a 30%-bleed debuffed single target if it ticks at
+	# least four times. Unbuffed, it must tick all six times. Never refresh an existing Rend -- always
+	# wait for it to run its full duration or else you lose the initial application tick.
+	#
+	unless TargetDebuffPresent(RENDDEBUFF mine=1) {
+		if TargetDebuffPresent(bleed) and TargetDeadIn(more 9) or TargetDeadIn(more 15) {
+			Spell(REND)
+		}
+	}
 	Spell(DEVASTATE)
 }
 
 AddIcon help=offgcd mastery=3
 {
 	if target.IsInterruptible() Spell(PUMMEL)
-	if CheckBoxOn(multi) Spell(CLEAVE)
-	if Mana(more 35) Spell(HEROICSTRIKE)
+	if CheckBoxOn(multi) and Mana(more 44) Spell(CLEAVE)
+	if Mana(more 44) Spell(HEROICSTRIKE)
 }
 
 AddIcon help=cd mastery=3
 {
-	Spell(SHIELDBLOCK)
-	Spell(SHIELDWALL)
-	Spell(LASTSTAND)
+	if Stance(2)
+	{
+		Spell(SHIELDBLOCK usable=1)
+		Spell(SHIELDWALL usable=1)
+		Spell(LASTSTAND)
+	}
+	if Stance(1) Spell(RECKLESSNESS)
     Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
