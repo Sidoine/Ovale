@@ -181,7 +181,7 @@ AddIcon help=main mastery=2
 
 AddIcon help=aoe mastery=2
 {
-	Spell(BLADEFLURRY)
+	unless BuffPresent(BLADEFLURRY) Spell(BLADEFLURRY)
 	if BuffPresent(insight)
 	{
 		unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
