@@ -715,10 +715,16 @@ Ovale.conditions=
 	-- 2 : the limit, in percent
 	LifePercent = function(condition)
 		local target = getTarget(condition.target)
+		if UnitHealthMax(target) == nil or UnitHealthMax(target) == 0 then
+			return nil
+		end
 		return compare(UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2]/100)
 	end,
 	lifePercent = function(condition)
 		local target = getTarget(condition.target)
+		if UnitHealthMax(target) == nil or UnitHealthMax(target) == 0 then
+			return nil
+		end
 		return 100 * UnitHealth(target)/UnitHealthMax(target), 0, 0
 	end,
 	-- Test if a list item is selected
@@ -752,11 +758,19 @@ Ovale.conditions=
 		return GetManaAndRate(false)
 	end,
 	ManaPercent = function(condition)
-		return compare(UnitPower("player")/UnitPowerMax("player"), condition[1], condition[2]/100)
+		local target = getTarget(condition.target)
+		if UnitPowerMax(target) == 0 then
+			return nil
+		end
+		return compare(UnitPower(target)/UnitPowerMax(target), condition[1], condition[2]/100)
 	end,
 	manaPercent = function(condition)
+		local target = getTarget(condition.target)
+		if UnitPowerMax(target) == 0 then
+			return nil
+		end
 		local value, t, rate = GetManaAndRate(false)
-		local conversion = 100/UnitPowerMax("player")
+		local conversion = 100/UnitPowerMax(target)
 		return value * conversion, t, rate * conversion
 	end,
 	MaxHealth = function(condition)
