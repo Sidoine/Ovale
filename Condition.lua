@@ -343,6 +343,9 @@ Ovale.conditions=
 		end
 		return compare(nombre, condition[2], condition[3])
 	end,
+	attackPower = function(condition)
+		return UnitAttackPower("player"), 0, 0 
+	end,
 	BuffDuration = function(condition)
 		--local name, rank, icon, count, debuffType, duration = UnitBuff("player", Ovale:GetSpellInfoOrNil(condition[1]))
 		--if not name then
@@ -376,11 +379,12 @@ Ovale.conditions=
 	-- 2 : time since the buff gain
 	BuffGain = function(condition)
 		local spellId = condition[1]
+		local target = getTarget(condition.target)
 		if spellId then
-			if not Ovale.buff[spellId] then
+			if not Ovale.buff[target][spellId] then
 				return 0
 			end
-			local timeGain = Ovale.buff[spellId].gain
+			local timeGain = Ovale.buff[target][spellId].gain
 			if not timeGain then
 				timeGain = 0
 			end
@@ -686,6 +690,12 @@ Ovale.conditions=
 		end
 		return compare(Ovale.spellDamage[spellId], condition[2], condition[3])
 	end,
+	lastSpellAttackPower = function(condition)
+		return Ovale.lastSpellAP[condition[1]], 0, 0 
+	end,
+	lastSpellSpellPower = function(condition)
+		return Ovale.lastSpellSP[condition[1]], 0, 0 
+	end,
 	LastSwing = function(condition)
 		local ret = OvaleSwing:GetLast(condition[1])
 		if condition[2] and ret then
@@ -844,6 +854,10 @@ Ovale.conditions=
 		end
 		return nil
 	end,
+	Present = function(condition)
+		local present = UnitExists(getTarget(condition.target)) and not UnitIsDead(getTarget(condition.target))
+		return testbool(present, condition[1])
+	end,
 	-- Test if any player pet is present (or not)
 	-- 1 : "yes" or "no"
 	PetPresent = function(condition)
@@ -945,6 +959,9 @@ Ovale.conditions=
 	spell = function(condition)
 		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(condition[1])
 		return actionCooldownDuration, actionCooldownStart, -1
+	end,
+	spellPower = function(condition)
+		return GetSpellBonusDamage("player", 0, 0)
 	end,
 	-- Test if the player is in a given stance
 	-- 1 : the stance

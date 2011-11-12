@@ -71,6 +71,9 @@ Ovale.counter = {}
 Ovale.lastSpell = {}
 --the damage of the last spell or dot (by id)
 Ovale.spellDamage = {}
+--the attack power of the last spell
+Ovale.lastSpellAP = {}
+Ovale.lastSpellSP = {}
 Ovale.numberOfEnemies = nil
 Ovale.enemies = {}
 Ovale.refreshNeeded = false
@@ -936,7 +939,7 @@ end
 --At this time it is not used to keep the aura list (may be used in the future for optimization)
 --It is only used to update haste
 function Ovale:UNIT_AURA(event, unit)
-	if (unit == "player") then
+	if unit == "player" or unit == "pet" then
 		local hateBase = GetCombatRatingBonus(18)
 		local hateCommune=0;
 		local hateSorts = 0;
@@ -945,45 +948,55 @@ function Ovale:UNIT_AURA(event, unit)
 		local hateClasse = 0
 		local i=1;
 		
-		while (true) do
-			local name, rank, iconTexture, count, debuffType, duration, expirationTime, source, stealable, consolidate, spellId =  UnitBuff("player", i);
+		if not self.buff[unit] then
+			self.buff[unit] = {}
+		end
+		
+		local buff = self.buff[unit]
+		
+		while true do
+			local name, rank, iconTexture, count, debuffType, duration, expirationTime, source, stealable, consolidate, spellId =  UnitBuff(unit, i);
 			if (not name) then
 				break
 			end
-			if (not self.buff[spellId]) then
-				self.buff[spellId] = {}
+			if (not buff[spellId]) then
+				buff[spellId] = {}
 			end
-			self.buff[spellId].icon = iconTexture
-			self.buff[spellId].count = count
-			self.buff[spellId].duration = duration
-			self.buff[spellId].expirationTime = expirationTime
-			self.buff[spellId].source = source
-			if (not self.buff[spellId].present) then
-				self.buff[spellId].gain = Ovale.maintenant
+			buff[spellId].icon = iconTexture
+			buff[spellId].count = count
+			buff[spellId].duration = duration
+			buff[spellId].expirationTime = expirationTime
+			buff[spellId].source = source
+			if (not buff[spellId].present) then
+				buff[spellId].gain = Ovale.maintenant
 			end
-			self.buff[spellId].lastSeen = Ovale.maintenant
-			self.buff[spellId].present = true
+			buff[spellId].lastSeen = Ovale.maintenant
+			buff[spellId].present = true
 			
-			if self.buffSpellList.spellhaste[spellId] then --moonkin aura / wrath of air
-				hateSorts = 5 --add shadow form?
-			elseif self.buffSpellList.meleehaste[spellId] then 
-				hateCaC = 10
-			elseif self.buffSpellList.heroism[spellId] then
-				hateHero = 30
-			elseif spellId == 53657 then --judgements of the pure
-				hateClasse = 9
+			if unit == "player" then
+				if self.buffSpellList.spellhaste[spellId] then --moonkin aura / wrath of air
+					hateSorts = 5 --add shadow form?
+				elseif self.buffSpellList.meleehaste[spellId] then 
+					hateCaC = 10
+				elseif self.buffSpellList.heroism[spellId] then
+					hateHero = 30
+				elseif spellId == 53657 then --judgements of the pure
+					hateClasse = 9
+				end
 			end
 			i = i + 1;
 		end
 		
-		for k,v in pairs(self.buff) do
+		for k,v in pairs(buff) do
 			if (v.lastSeen ~= Ovale.maintenant) then
 				v.present = false
 			end
 		end
 		
-		self.spellHaste = 1 + (hateBase + hateCommune + hateSorts + hateHero + hateClasse)/100
-		self.meleeHaste = 1 + (hateBase + hateCommune + hateCaC + hateHero + hateClasse)/100
+		if unit == "player" then
+			self.spellHaste = 1 + (hateBase + hateCommune + hateSorts + hateHero + hateClasse)/100
+			self.meleeHaste = 1 + (hateBase + hateCommune + hateCaC + hateHero + hateClasse)/100
+		end
 		
 		self.refreshNeeded = true
 --		self.rangedHaste = hateBase + hateCommune + hateHero + hateClasse -- TODO ajouter le bidule du chasseur en spé bête
@@ -1079,6 +1092,8 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled, al
 	newSpell.channeled = channeled
 	newSpell.allowRemove = allowRemove
 		
+	self.lastSpellAP[spellId] = UnitAttackPower("player")
+	self.lastSpellSP[spellId] = GetSpellBonusDamage(2)
 	self.lastSpell[#self.lastSpell+1] = newSpell
 	--self:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..self.maintenant..")" ..#self.lastSpell)
 	
