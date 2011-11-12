@@ -15,8 +15,9 @@ embeds.xml
 Locale-frFR.lua
 Locale-deDE.lua
 Locale-enUS.lua
-Locale-zhTW.lua
+Locale-ptBR.lua
 Locale-ruRU.lua
+Locale-zhTW.lua
 Ovale.lua
 Condition.lua
 OvaleEquipement.lua

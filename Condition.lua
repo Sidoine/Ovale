@@ -859,20 +859,22 @@ Ovale.conditions=
 		
 		for i=1,6 do
 			local rune = Ovale.state.rune[i]
-			if runes[rune.type] > 0 then
-				runes[rune.type] = runes[rune.type] - 1
-				if rune.cd > runesCD[rune.type] then
+			if rune then
+				if runes[rune.type] > 0 then
+					runes[rune.type] = runes[rune.type] - 1
+					if rune.cd > runesCD[rune.type] then
+						runesCD[rune.type] = rune.cd
+					end
+				elseif rune.cd < runesCD[rune.type] then
 					runesCD[rune.type] = rune.cd
 				end
-			elseif rune.cd < runesCD[rune.type] then
-				runesCD[rune.type] = rune.cd
 			end
 		end
 		
 		if not condition.nodeath then
 			for i=1,6 do
 				local rune = Ovale.state.rune[i]
-				if rune.type == 4 then
+				if rune and rune.type == 4 then
 					for j=1,3 do
 						if runes[j]>0 then
 							runes[j] = runes[j] - 1
