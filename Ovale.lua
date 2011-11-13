@@ -1460,8 +1460,6 @@ function Ovale:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd)
 	
 	local newSpellInfo = self.spellInfo[spellId]
 	
-	self.state.eclipse = self.state.nextEclipse
-	
 	--On enregistre les infos sur le sort en cours
 	self.attenteFinCast = nextCast
 	self.currentSpellId = spellId
@@ -1691,8 +1689,6 @@ function Ovale:InitCalculerMeilleureAction()
 	self.state.mana = UnitPower("player")
 	self.state.shard = UnitPower("player", 7)
 	self.state.eclipse = UnitPower("player", 8)
-	self.state.nextEclipse = self.state.eclipse
-	self.state.nextEclipseTime = self.currentTime
 	self.state.holy = UnitPower("player", 9)
 	if self.className == "DEATHKNIGHT" then
 		for i=1,6 do
