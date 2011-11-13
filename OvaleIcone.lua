@@ -6,9 +6,10 @@ local function SetValue(self, value, actionTexture)
 	self.icone:SetTexture(actionTexture);
 	self.icone:SetAlpha(1.0)
 	self.cd:Hide()
+	self.focusText:Hide()
 	self.aPortee:Hide()	
 	self.shortcut:Hide()
-	self.remains:SetText("TOTO") --string.format("%.1f", value))
+	self.remains:SetText(string.format("%.1f", value))
 	self.remains:Show()
 	self:Show()
 end

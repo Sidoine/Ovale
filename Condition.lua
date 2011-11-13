@@ -503,6 +503,35 @@ Ovale.conditions=
 		end
 		return nil
 	end,
+	damage = function(condition)
+		local spellInfo = Ovale:GetSpellInfo(condition[1])
+		if not spellInfo then
+			return nil
+		end
+		local ret = (spellInfo.base or 0)
+		if spellInfo.bonuscp then
+			ret = ret + (Ovale.state.combo * spellInfo.bonuscp)
+		end
+		if spellInfo.bonusholy then
+			ret = ret + (Ovale.state.holy * spellInfo.bonusholy)
+		end
+		if spellInfo.bonusap then
+			ret = ret + spellInfo.bonusap * UnitAttackPower("player")
+		end
+		if spellInfo.bonusapcp then
+			ret = ret + spellInfo.bonusapcp * UnitAttackPower("player") * Ovale.state.combo
+		end
+		if spellInfo.bonusapholy then
+			ret = ret + spellInfo.bonusapholy * UnitAttackPower("player") * Ovale.state.holy
+		end
+		if spellInfo.bonussp then
+			ret = ret + spellInfo.bonussp * GetSpellBonusDamage(2)
+		end
+		if spellInfo.bonusspholy then
+			ret = ret + spellInfo.bonusspholy * GetSpellBonusDamage(2) * Ovale.state.holy
+		end
+		return ret * Ovale.damageMultiplier
+	end,
 	damageMultiplier = function(condition)
 		return self.damageMultiplier, 0, 0
 	end,
@@ -963,7 +992,7 @@ Ovale.conditions=
 		return actionCooldownDuration, actionCooldownStart, -1
 	end,
 	spellPower = function(condition)
-		return GetSpellBonusDamage("player", 0, 0)
+		return GetSpellBonusDamage(2), 0, 0
 	end,
 	-- Test if the player is in a given stance
 	-- 1 : the stance

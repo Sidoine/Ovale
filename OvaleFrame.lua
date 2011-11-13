@@ -303,7 +303,7 @@ do
 				newScale = Ovale.db.profile.apparence.iconScale
 				width =newScale * 36 + margin
 				height = newScale * 36 + margin
-				if Ovale.db.profile.apparence.predictif then
+				if Ovale.db.profile.apparence.predictif and node.params.type ~= "value" then
 					nbIcons = 2
 				else
 					nbIcons = 1
