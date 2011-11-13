@@ -74,9 +74,25 @@ Ovale.spellDamage = {}
 --the attack power of the last spell
 Ovale.lastSpellAP = {}
 Ovale.lastSpellSP = {}
+Ovale.lastSpellDM = {}
+Ovale.damageMultiplier = 1
 Ovale.numberOfEnemies = nil
 Ovale.enemies = {}
 Ovale.refreshNeeded = false
+
+-- List haste buff that does not appear in the character sheet and that are not raid wide buffs
+Ovale.selfHasteBuff =
+{
+	[53657] = 9, -- Judgement of the pure
+	[49016] = 20 -- Unholy Frenzy
+}
+
+-- List temporary damage multiplier
+Ovale.selfDamageBuff =
+{
+	[5217] = 1.15, -- Tiger's fury
+	[57933] = 1.15 -- Tricks of the trade
+}
 
 Ovale.buffSpellList =
 {
@@ -946,6 +962,7 @@ function Ovale:UNIT_AURA(event, unit)
 		local hateCaC = 0;
 		local hateHero = 0
 		local hateClasse = 0
+		local damageMultiplier = 1
 		local i=1;
 		
 		if not self.buff[unit] then
@@ -974,14 +991,17 @@ function Ovale:UNIT_AURA(event, unit)
 			buff[spellId].present = true
 			
 			if unit == "player" then
-				if self.buffSpellList.spellhaste[spellId] then --moonkin aura / wrath of air
-					hateSorts = 5 --add shadow form?
+				if self.buffSpellList.spellhaste[spellId] then
+					hateSorts = 5
 				elseif self.buffSpellList.meleehaste[spellId] then 
 					hateCaC = 10
 				elseif self.buffSpellList.heroism[spellId] then
 					hateHero = 30
-				elseif spellId == 53657 then --judgements of the pure
-					hateClasse = 9
+				elseif self.selfHasteBuff[spellId] then
+					hateClasse = self.selfHasteBuff[spellId]
+				end
+				if self.selfDamageBuff[spellId] then
+					damageMultiplier = damageMultiplier * self.selfDamageBuff[spellId]
 				end
 			end
 			i = i + 1;
@@ -996,6 +1016,7 @@ function Ovale:UNIT_AURA(event, unit)
 		if unit == "player" then
 			self.spellHaste = 1 + (hateBase + hateCommune + hateSorts + hateHero + hateClasse)/100
 			self.meleeHaste = 1 + (hateBase + hateCommune + hateCaC + hateHero + hateClasse)/100
+			self.damageMultiplier = damageMultiplier
 		end
 		
 		self.refreshNeeded = true
@@ -1094,6 +1115,7 @@ function Ovale:AddSpellToList(spellId, lineId, startTime, endTime, channeled, al
 		
 	self.lastSpellAP[spellId] = UnitAttackPower("player")
 	self.lastSpellSP[spellId] = GetSpellBonusDamage(2)
+	self.lastSpellDM[spellId] = self.damageMultiplier
 	self.lastSpell[#self.lastSpell+1] = newSpell
 	--self:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..self.maintenant..")" ..#self.lastSpell)
 	

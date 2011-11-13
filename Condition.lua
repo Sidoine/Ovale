@@ -503,6 +503,9 @@ Ovale.conditions=
 		end
 		return nil
 	end,
+	damageMultiplier = function(condition)
+		return self.damageMultiplier, 0, 0
+	end,
 	DeadIn = function(condition)
 		local deadAt = getTargetDead(getTarget(condition.target))
 		if condition[1] == "more" then
@@ -689,6 +692,9 @@ Ovale.conditions=
 			return nil
 		end
 		return compare(Ovale.spellDamage[spellId], condition[2], condition[3])
+	end,
+	lastSpellDamageMultiplier = function(condition)
+		return Ovale.lastSpellDM[condition[1]], 0, 0
 	end,
 	lastSpellAttackPower = function(condition)
 		return Ovale.lastSpellAP[condition[1]], 0, 0 
