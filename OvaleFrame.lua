@@ -169,7 +169,6 @@ do
 				Ovale:Log("CalculerMeilleureAction start = "..start)
 			end
 			local action = self.actions[k]
-			Ovale:Log("node.params.type = " .. node.params.type)
 			if node.params.type == "value" then
 				local actionTexture
 				if node.params.texture then
