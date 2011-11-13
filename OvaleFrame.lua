@@ -169,52 +169,60 @@ do
 				Ovale:Log("CalculerMeilleureAction start = "..start)
 			end
 			local action = self.actions[k]
-			
-			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = Ovale:GetActionInfo(element)
-			if noRed then
-				start = actionCooldownStart + actionCooldownDuration
-				if start < Ovale.currentTime then
-					start = Ovale.currentTime
+			Ovale:Log("node.params.type = " .. node.params.type)
+			if node.params.type == "value" then
+				local actionTexture
+				if node.params.texture then
+					actionTexture = GetSpellTexture(node.params.texture)
 				end
-			end
-			
-			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-			if start and Ovale.currentSpellId and Ovale.attenteFinCast and spellId == Ovale.currentSpellId and start<Ovale.attenteFinCast then
-				start = Ovale.attenteFinCast
-			end
-			
-			if (node.params.nocd and start~=nil and Ovale.maintenant<start-node.params.nocd) then
-				action.icons[1]:Update(element, nil)
+				action.icons[1]:SetValue(start, actionTexture)
 			else
-				action.icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
-			end
-			
-			action.spellId = spellId
-			
-			if start == Ovale.maintenant and actionUsable then
-				if not action.waitStart then
-					action.waitStart = Ovale.maintenant
+				local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+						actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = Ovale:GetActionInfo(element)
+				if noRed then
+					start = actionCooldownStart + actionCooldownDuration
+					if start < Ovale.currentTime then
+						start = Ovale.currentTime
+					end
 				end
-			else
-				action.waitStart = nil
-			end
-			
-			if Ovale.db.profile.apparence.moving and action.icons[1].debutAction and action.icons[1].finAction then
-				local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
-				if top<0 then
-					top = 0
-				elseif top>1 then
-					top = 1
+				
+				-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
+				if start and Ovale.currentSpellId and Ovale.attenteFinCast and spellId == Ovale.currentSpellId and start<Ovale.attenteFinCast then
+					start = Ovale.attenteFinCast
 				end
-				action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
-				if action.icons[2] then
-					action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
+				
+				if (node.params.nocd and start~=nil and Ovale.maintenant<start-node.params.nocd) then
+					action.icons[1]:Update(element, nil)
+				else
+					action.icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+						actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
+				end
+				
+				action.spellId = spellId
+				
+				if start == Ovale.maintenant and actionUsable then
+					if not action.waitStart then
+						action.waitStart = Ovale.maintenant
+					end
+				else
+					action.waitStart = nil
+				end
+				
+				if Ovale.db.profile.apparence.moving and action.icons[1].debutAction and action.icons[1].finAction then
+					local top=1-(Ovale.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
+					if top<0 then
+						top = 0
+					elseif top>1 then
+						top = 1
+					end
+					action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
+					if action.icons[2] then
+						action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
+					end
 				end
 			end
 								
-			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif) then
+			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif and node.params.type ~= "value") then
 				if start then
 					local castTime=0
 					if spellId then
@@ -331,6 +339,7 @@ do
 				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/scale,(action.top - (l-1)*action.dy)/scale)
 				icon:SetScale(scale)
 				icon:SetFontScale(Ovale.db.profile.apparence.fontScale)
+				icon:SetParams(node.params)
 				icon:SetHelp(node.params.help)
 				icon:SetRangeIndicator(Ovale.db.profile.apparence.targetText)
 				icon:EnableMouse(not Ovale.db.profile.apparence.clickThru)

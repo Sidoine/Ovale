@@ -1,6 +1,18 @@
 ﻿local LBF = LibStub("LibButtonFacade", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
+local function SetValue(self, value, actionTexture)
+	self.icone:Show()
+	self.icone:SetTexture(actionTexture);
+	self.icone:SetAlpha(1.0)
+	self.cd:Hide()
+	self.aPortee:Hide()	
+	self.shortcut:Hide()
+	self.remains:SetText("TOTO") --string.format("%.1f", value))
+	self.remains:Show()
+	self:Show()
+end
+
 local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
 				
@@ -88,7 +100,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- Le temps restant
-		if (Ovale.db.profile.apparence.numeric and minAttente > Ovale.maintenant) then
+		if ((Ovale.db.profile.apparence.numeric or self.params.text == "always") and minAttente > Ovale.maintenant) then
 			self.remains:SetText(string.format("%.1f", minAttente - Ovale.maintenant))
 			self.remains:Show()
 		else
@@ -164,6 +176,10 @@ local function SetHelp(self, help)
 	self.help = help
 end
 
+local function SetParams(self, params)
+	self.params = params
+end
+
 local function SetFontScale(self, scale)
 	self.fontScale = scale
 	self.shortcut:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
@@ -227,8 +243,10 @@ function OvaleIcone_OnLoad(self)
 	self.Update = Update
 	self.SetSize = SetSize
 	self.SetHelp = SetHelp
+	self.SetParams = SetParams
 	self.SetFontScale = SetFontScale
 	self.SetRangeIndicator = SetRangeIndicator
+	self.SetValue = SetValue
 	self.cdShown = true
 	if Ovale.db.profile.clickThru then
 		self:EnableMouse(false)
