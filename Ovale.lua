@@ -219,7 +219,8 @@ Ovale.buffSpellList =
 	spellhaste = 
 	{
 		24907, -- Moonkin aura
-		2895 -- Wrath of Air Totem
+		2895, -- Wrath of Air Totem
+		49868 -- Mind Quickening
 	},
 	enrage =
 	{

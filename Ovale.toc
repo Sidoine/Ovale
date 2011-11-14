@@ -15,6 +15,7 @@ embeds.xml
 Locale-frFR.lua
 Locale-deDE.lua
 Locale-enUS.lua
+Locale-koKR.lua
 Locale-ptBR.lua
 Locale-ruRU.lua
 Locale-zhTW.lua
