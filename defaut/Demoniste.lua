@@ -234,8 +234,8 @@ AddIcon help=main mastery=2
 	if BuffPresent(DECIMATION) Spell(SOULFIRE)
 	#/life_tap,if=mana_pct<=30&buff.bloodlust.down&buff.metamorphosis.down&buff.demon_soul_felguard.down
 	if ManaPercent(less 30) and BuffExpires(heroism) and BuffExpires(METAMORPHOSIS) and BuffExpires(DEMONSOULFELGUARD) and LifePercent(more 75) Spell(LIFETAP)
-	if TalentPoints(BANETALENT more 0) Spell(INCINERATE)
-	Spell(SHADOWBOLT)
+	if TalentPoints(BANETALENT more 0) Spell(SHADOWBOLT)
+	Spell(INCINERATE)
 }
 
 AddIcon help=cd mastery=2

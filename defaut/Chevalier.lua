@@ -134,6 +134,11 @@ AddIcon help=main mastery=1
 	if CheckBoxOn(horn) Spell(HORNOFWINTER priority=2)
 }
 
+AddIcon help=offgcd checkboxon=mindfreeze mastery=1
+{
+	if target.IsInterruptible() Spell(MINDFREEZE)
+}
+
 AddIcon help=aoe mastery=1
 {
 	if BuffExpires(strengthagility 2) and CheckBoxOn(horn) Spell(HORNOFWINTER)
@@ -216,6 +221,7 @@ AddIcon help=main mastery=2
 
 AddIcon help=offgcd mastery=2
 {
+	if target.IsInterruptible() Spell(MINDFREEZE)
     #/blood_tap
 	Spell(BLOODTAP)
 	#/empower_rune_weapon
@@ -295,6 +301,7 @@ AddIcon help=main mastery=3
 
 AddIcon help=offgcd mastery=3
 {
+	if target.IsInterruptible() Spell(MINDFREEZE)
 	#/blood_tap,if=unholy=0&inactive_death=1
 	unless Runes(unholy 1) Spell(BLOODTAP priority=2)
 	#/empower_rune_weapon,if=unholy=0
@@ -322,11 +329,6 @@ AddIcon help=cd mastery=3
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	Spell(ARMYOFTHEDEAD)
-}
-
-AddIcon checkboxon=mindfreeze
-{
-	if target.IsInterruptible() Spell(MINDFREEZE)
 }
 
 ]]
