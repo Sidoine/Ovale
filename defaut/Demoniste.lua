@@ -241,7 +241,7 @@ AddIcon help=main mastery=2
 AddIcon help=cd mastery=2
 {
 	#/summon_felguard,if=cooldown.demon_soul.remains<5&cooldown.metamorphosis.remains<5&!pet.felguard.active
-	if {spell(DEMONSOUL)<5} and {spell(METAMORPHOSIS)<5} unless pet.CreatureFamily(Felguard) Spell(SUMMONFELGUARD)
+	if CheckBoxOn(petswap) and {spell(DEMONSOUL)<5} and {spell(METAMORPHOSIS)<5} unless pet.CreatureFamily(Felguard) Spell(SUMMONFELGUARD)
 	#/metamorphosis,if=pet.felguard.active
 	if pet.Present() and pet.CreatureFamily(Felguard) Spell(METAMORPHOSIS)
 	#/demon_soul,if=buff.metamorphosis.up
