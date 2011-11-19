@@ -174,7 +174,14 @@ do
 				if node.params.texture then
 					actionTexture = GetSpellTexture(node.params.texture)
 				end
-				action.icons[1]:SetValue(start, actionTexture)
+				local value
+				if ending and priorite and start then
+					value = start + (Ovale.maintenant - ending) * priorite
+				end
+				action.icons[1]:SetValue(value, actionTexture)
+				if #action.icons > 1 then
+					action.icons[2]:Update(element, nil)
+				end
 			else
 				local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 						actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = Ovale:GetActionInfo(element)
@@ -219,32 +226,32 @@ do
 						action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
 					end
 				end
-			end
 								
-			if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif and node.params.type ~= "value") then
-				if start then
-					local castTime=0
-					if spellId then
-						local _, _, _, _, _, _, _castTime = GetSpellInfo(spellId)
-						if _castTime and _castTime>0 then
-							castTime = _castTime/1000
+				if (node.params.size ~= "small" and not node.params.nocd and Ovale.db.profile.apparence.predictif) then
+					if start then
+						local castTime=0
+						if spellId then
+							local _, _, _, _, _, _, _castTime = GetSpellInfo(spellId)
+							if _castTime and _castTime>0 then
+								castTime = _castTime/1000
+							end
 						end
-					end
-					local gcd = Ovale:GetGCD(spellId)
-					local nextCast
-					if (castTime>gcd) then
-						nextCast = start + castTime 
+						local gcd = Ovale:GetGCD(spellId)
+						local nextCast
+						if (castTime>gcd) then
+							nextCast = start + castTime 
+						else
+							nextCast = start + gcd
+						end					
+						if Ovale.trace then
+							Ovale:Print("****Second icon " .. start)
+						end
+						Ovale:AddSpellToStack(spellId, start, start + castTime, nextCast)
+						start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
+						action.icons[2]:Update(element, start, Ovale:GetActionInfo(element))
 					else
-						nextCast = start + gcd
-					end					
-					if Ovale.trace then
-						Ovale:Print("****Second icon " .. start)
+						action.icons[2]:Update(element, nil)
 					end
-					Ovale:AddSpellToStack(spellId, start, start + castTime, nextCast)
-					start, ending, priorite, element = Ovale:CalculerMeilleureAction(node)
-					action.icons[2]:Update(element, start, Ovale:GetActionInfo(element))
-				else
-					action.icons[2]:Update(element, nil)
 				end
 			end
 		end

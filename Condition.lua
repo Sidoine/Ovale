@@ -489,8 +489,14 @@ Ovale.conditions=
 		local points = Ovale.state.combo
 		return compare(points, condition[1], condition[2])
 	end,
+	comboPoints = function(condition)
+		return Ovale.state.combo, 0, 0
+	end,
 	Counter = function(condition)
 		return compare(Ovale:GetCounterValue(condition[1]), condition[2], condition[3])
+	end,
+	counter = function(condition)
+		return Ovale:GetCounterValue(condition[1]), 0, 0
 	end,
 	CreatureFamily = function(condition)
 		return testbool(UnitCreatureFamily(getTarget(condition.target)) == LBCT[condition[1]], condition[2])
@@ -530,7 +536,7 @@ Ovale.conditions=
 		if spellInfo.bonusspholy then
 			ret = ret + spellInfo.bonusspholy * GetSpellBonusDamage(2) * Ovale.state.holy
 		end
-		return ret * Ovale.damageMultiplier
+		return ret * Ovale.damageMultiplier, 0, 0
 	end,
 	damageMultiplier = function(condition)
 		return self.damageMultiplier, 0, 0
@@ -542,6 +548,9 @@ Ovale.conditions=
 		else
 			return addTime(deadAt, -condition[2]), nil
 		end
+	end,
+	deadIn = function(condition)
+		return getTargetDead(getTarget(condition.target)), 0, -1
 	end,
 	-- Test if a debuff will expire on the target after a given time, or if there is less than the
 	-- given number of stacks (if stackable)
@@ -589,9 +598,19 @@ Ovale.conditions=
 			end
 		end
 	end,
+	distance = function(condition)
+		if LRC then
+			return LRC:GetRange(getTarget(condition.target))
+		else
+			return nil
+		end		
+	end,
 	--Compare to eclipse power. <0 lunar, >0 solar
 	Eclipse = function(condition)
 		return compare(Ovale.state.eclipse, condition[1], condition[2])
+	end,
+	eclipse = function(condition)
+		return Ovale.state.eclipse
 	end,
 	EffectiveMana = function(condition)
 		local limit = GetManaTime(condition[2], true)
@@ -600,6 +619,9 @@ Ovale.conditions=
 		else
 			return 0,limit
 		end
+	end,
+	effectiveMana = function(condition)
+		return GetManaAndRate(true)
 	end,
 	EndCastTime = function(condition)
 		local name, rank, icon, cost, isFunnel, powerType, castTime = Ovale:GetSpellInfoOrNil(condition[1])
@@ -642,6 +664,9 @@ Ovale.conditions=
 	HolyPower = function(condition)
 		return compare(Ovale.state.holy, condition[1], condition[2])
 	end,
+	holyPower = function(condition)
+		return Ovale.state.holy, 0, 0
+	end,
 	InCombat = function(condition)
 		return testbool(Ovale.enCombat, condition[1])
 	end,
@@ -654,6 +679,13 @@ Ovale.conditions=
 			return compare(GetItemCount(condition[1], false, true), condition[2], condition[3])
 		else
 			return compare(GetItemCount(condition[1]), condition[2], condition[3])
+		end
+	end,
+	itemCount = function(condition)
+		if condition.charges == 1 then
+			return GetItemCount(condition[1], false, true), 0, 0
+		else
+			return GetItemCount(condition[1]), 0, 0
 		end
 	end,
 	IsCasting = function(condition)
@@ -718,6 +750,9 @@ Ovale.conditions=
 		end
 		return compare(Ovale.spellDamage[spellId], condition[2], condition[3])
 	end,
+	lastSpellDamage = function(condition)
+		return Ovale.spellDamage(condition[1])
+	end,
 	lastSpellDamageMultiplier = function(condition)
 		return Ovale.lastSpellDM[condition[1]], 0, 0
 	end,
@@ -743,13 +778,24 @@ Ovale.conditions=
 	Level = function(condition)
 		return compare(UnitLevel(getTarget(condition.target)), condition[1], condition[2])
 	end,
+	level = function(condition)
+		return UnitLevel(condition.target)
+	end,
 	Life = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitHealth(target), condition[1], condition[2])
 	end,
+	life = function(condition)
+		local target = getTarget(condition.target)
+		return UnitHealth(target), 0, 0
+	end,
 	LifeMissing = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitHealthMax(target)-UnitHealth(target), condition[1], condition[2])
+	end,
+	lifeMissing = function(condition)
+		local target = getTarget(condition.target)
+		return UnitHealthMax(target)-UnitHealth(target), 0, 0
 	end,
 	-- Test if the player life is bellow/above a given value in percent
 	-- 1 : "less" or "more"
@@ -984,8 +1030,14 @@ Ovale.conditions=
 	SoulShards = function(condition)
 		return compare(Ovale.state.shard, condition[1], condition[2])
 	end,
+	soulShards = function(condition)
+		return Ovale.state.shard
+	end,
 	Speed = function(condition)
 		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
+	end,
+	speed = function(condition)
+		return GetUnitSpeed(getTarget(condition.target))*100/7
 	end,
 	spell = function(condition)
 		local actionCooldownStart, actionCooldownDuration, actionEnable = Ovale:GetComputedSpellCD(condition[1])
@@ -1017,6 +1069,13 @@ Ovale.conditions=
 		end
 		return compare(Ovale.pointsTalent[condition[1]], condition[2], condition[3])
 	end,
+	talentPoints = function(condition)
+		if (not Ovale.listeTalentsRemplie) then
+			Ovale:RemplirListeTalents()
+			return nil
+		end
+		return Ovale.pointsTalent[condition[1]], 0, 0
+	end,
 	-- Test if the target's target is the player (or is not)
 	-- 1 : "yes" (it should be the player) or "no"
 	TargetIsPlayer = function(condition)
@@ -1026,6 +1085,10 @@ Ovale.conditions=
 		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
 		return compare(threatpct, condition[1], condition[2])
 	end,
+	threat = function(condition)
+		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
+		return threatpct
+	end,
 	TimeInCombat = function(condition)
 		if not Ovale.combatStartTime then
 			return nil
@@ -1034,6 +1097,9 @@ Ovale.conditions=
 		else
 			return 0, Ovale.combatStartTime + condition[2]
 		end
+	end,
+	timeInCombat = function(condition)
+		return Ovale.maintenant - Ovale.combatStartTime, Ovale.maintenant, 1
 	end,
 	timeToDie = function(condition)
 		return 0, getTargetDead(getTarget(condition.target)), -1
@@ -1099,3 +1165,9 @@ Ovale.conditions=
 		end
 	end,
 }
+
+Ovale.conditions.health = Ovale.conditions.life
+Ovale.conditions.Health = Ovale.conditions.Life
+Ovale.conditions.healthPercent = Ovale.conditions.lifePercent
+Ovale.conditions.HealthPercent = Ovale.conditions.LifePercent
+Ovale.conditions.HealthMissing = Ovale.conditions.LifeMissing

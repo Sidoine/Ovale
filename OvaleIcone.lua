@@ -9,7 +9,16 @@ local function SetValue(self, value, actionTexture)
 	self.focusText:Hide()
 	self.aPortee:Hide()	
 	self.shortcut:Hide()
-	self.remains:SetText(string.format("%.1f", value))
+	if value then
+		if value<10 then
+			value = string.format("%.1f", value)
+		else
+			value = string.format("%d", value)
+		end
+		self.remains:SetText(value)
+	else
+		self.remains:SetText()
+	end
 	self.remains:Show()
 	self:Show()
 end
