@@ -121,7 +121,7 @@ AddListItem(bane agony SpellName(BANEOFAGONY))
 AddListItem(bane doom SpellName(BANEOFDOOM) default)
 AddListItem(bane havoc SpellName(BANEOFHAVOC) mastery=3)
 AddCheckBox(shadowflame SpellName(SHADOWFLAME) default)
-AddCheckBox(petswap SpellName(SUMMONFELGUARD))
+AddCheckBox(petswap SpellName(SUMMONFELGUARD) mastery=2)
 
 ScoreSpells(CURSEELEMENTS SHADOWBOLT HAUNT UNSTABLEAFFLICTION IMMOLATE CONFLAGRATE CURSEWEAKNESS
 	BANEOFAGONY CORRUPTION SOULFIRE DRAINSOUL INCINERATE SHADOWBOLT CHAOSBOLT)
@@ -276,6 +276,8 @@ AddIcon help=main mastery=3
 	if TargetDebuffExpires(IMMOLATE 2 mine=1 haste=spell) and TargetDeadIn(more 4) Spell(IMMOLATE)
 	#/conflagrate
 	if 1s after TargetDebuffPresent(IMMOLATE mine=1) Spell(CONFLAGRATE)
+	#/immolate,if=buff.bloodlust.react&buff.bloodlust.remains>32&cooldown.conflagrate.remains<=3&remains<12
+	if BuffPresent(heroism 32) and {spell(CONFLAGRATE)<3} and TargetDebuffExpires(IMMOLATE 12 mine=1) Spell(IMMOLATE)
 	#/bane_of_doom,if=!ticking&target.time_to_die>=15&miss_react
 	if TargetDebuffExpires(BANEOFDOOM 0 mine=1) and TargetDebuffExpires(BANEOFAGONY 0 mine=1)
 	{
@@ -286,14 +288,16 @@ AddIcon help=main mastery=3
 	if TargetDebuffExpires(CORRUPTION 2 mine=1 haste=spell) and TargetDebuffExpires(SEEDOFCORRUPTION 0 mine=1) and TargetDeadIn(more 9) Spell(CORRUPTION)
 	#/shadowflame
 	if CheckBoxOn(shadowflame) Spell(SHADOWFLAME)
-	#/soul_fire,if=buff.empowered_imp.react&buff.empowered_imp.remains<(buff.improved_soul_fire.remains+action.soul_fire.travel_time)
-	if TalentPoints(IMPROVEDSOULFIRE more 0) and BuffExpires(IMPROVEDSOULFIREBUFF 0) and BuffExpires(EMPOWEREDIMP 0) Spell(SOULFIRE)
-	#/chaos_bolt
-	Spell(CHAOSBOLT)
-	#/soul_fire,if=buff.improved_soul_fire.remains<(cast_time+travel_time+action.incinerate.cast_time+gcd)&!in_flight
+	#/chaos_bolt,if=cast_time>0.9
+	if {castTime(CHAOSBOLT) > 0.9} Spell(CHAOSBOLT)
 	if TalentPoints(IMPROVEDSOULFIRE more 0)
 	{
-		if buffExpires(IMPROVEDSOULFIREBUFF)< {castTime(SOULFIRE)+castTime(INCINERATE)+timeWithHaste(1.5)+1} Spell(SOULFIRE)
+		#((buff.empowered_imp.react&buff.empowered_imp.remains<(buff.improved_soul_fire.remains+action.soul_fire.travel_time))
+		if BuffPresent(EMPOWEREDIMP) and {buffExpires(EMPOWEREDIMP) < {buffExpires(IMPROVEDSOULFIREBUFF) + 1}}
+			Spell(SOULFIRE)
+		#|buff.improved_soul_fire.remains<(cast_time+travel_time+action.incinerate.cast_time+gcd))
+		if buffExpires(IMPROVEDSOULFIREBUFF)< {castTime(SOULFIRE)+ 1 +castTime(INCINERATE)+timeWithHaste(1.5)} 
+			Spell(SOULFIRE)
 	}
 	#/shadowburn
 	Spell(SHADOWBURN usable=1)

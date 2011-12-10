@@ -18,10 +18,10 @@ Define(CLEAVE 845)
 	SpellInfo(CLEAVE cd=3)
 Define(COLOSSUSSMASH 86346)
 	SpellInfo(COLOSSUSSMASH cd=20)
-	SpellAddTargetDebuff(COLOSSUSSMASH COLOSSUSSMASH=6)
+	SpellAddTargetDebuff(COLOSSUSSMASH COLOSSUSSMASH=6 SUNDERARMORDEBUFF=30)
 Define(COMMANDINGSHOUT 469)
 	SpellInfo(COMMANDINGSHOUT cd=30)
-	SpellAddBuff(COMMANDINGSHOUT cd=60 COMMANDINGSHOUT=120)
+	SpellAddBuff(COMMANDINGSHOUT COMMANDINGSHOUT=120)
 Define(CONCUSSIONBLOW 12809)
 	SpellInfo(CONCUSSIONBLOW cd=30)
 Define(DEADLYCALM 85730)
@@ -123,7 +123,7 @@ Define(TITANSGRIPTALENT 9658)
 #Glyphs
 Define(GLYPHOFBERSERKERRAGE 58096)
 
-AddCheckBox(multi L(AOE))
+AddCheckBox(aoe L(AOE) default)
 AddCheckBox(demo SpellName(DEMOSHOUT))
 AddCheckBox(sunder SpellName(SUNDERARMOR) default)
 AddCheckBox(dancing SpellName(BERSERKERSTANCE) default mastery=1)
@@ -139,7 +139,7 @@ AddIcon help=main mastery=1
 	if List(shout command) and {Mana(less 20) or BuffExpires(stamina 3)} Spell(COMMANDINGSHOUT nored=1)
     if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
-	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
+	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=2) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 
 	if CheckBoxOn(dancing)
 	{
@@ -155,13 +155,6 @@ AddIcon help=main mastery=1
 	#/deadly_calm,if=rage<30&((target.health_pct>20&target.time_to_die>130)|(target.health_pct<=20&buff.recklessness.up))
 	if Mana(less 30) and {{TargetLifePercent(more 20) and TargetDeadIn(more 130)} or {TargetLifePercent(less 20) and BuffPresent(RECKLESSNESS)}} Spell(DEADLYCALM)
 
-	if CheckBoxOn(multi)
-	{
-		#/sweeping_strikes,if=target.adds>0
-		Spell(SWEEPINGSTRIKES)
-		#/bladestorm,if=target.adds>0&!buff.deadly_calm.up&!buff.sweeping_strikes.up
-		if BuffExpires(SWEEPINGSTRIKES) and BuffExpires(DEADLYCALM) Spell(BLADESTORM)
-	}
 	#/inner_rage,if=!buff.deadly_calm.up&rage>80&cooldown.deadly_calm.remains>15
 	if BuffExpires(DEADLYCALM) and Mana(more 80) and {spell(DEADLYCALM)>15} Spell(INNERRAGE)
 	#/overpower,if=buff.taste_for_blood.remains<=1.5
@@ -193,12 +186,21 @@ AddIcon help=offgcd mastery=1
 {
 	if target.IsInterruptible() Spell(PUMMEL)
 	
-	if CheckBoxOn(multi) Spell(CLEAVE)
 	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.deadly_calm.up|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
 	if {Mana(more 85) and TargetLifePercent(more 20)}
 		or BuffPresent(DEADLYCALM) or BuffPresent(BATTLETRANCE)
 		or {{BuffPresent(INCITE) or TargetDebuffPresent(COLOSSUSSMASH mine=1)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
 		Spell(HEROICSTRIKE)
+}
+
+AddIcon help=aoe mastery=1 checkboxon=aoe
+{
+	#/sweeping_strikes,if=target.adds>0
+	Spell(SWEEPINGSTRIKES)
+	#/bladestorm,if=target.adds>0&!buff.deadly_calm.up&!buff.sweeping_strikes.up
+	if BuffExpires(SWEEPINGSTRIKES) and BuffExpires(DEADLYCALM) Spell(BLADESTORM)
+	if Stance(3) Spell(WHIRLWIND)
+	Spell(CLEAVE)
 }
 
 AddIcon help=cd mastery=1
@@ -217,14 +219,13 @@ AddIcon help=main mastery=2
 	if List(shout command) and {Mana(less 20) or BuffExpires(stamina 3)} Spell(COMMANDINGSHOUT nored=1)
     if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 	if TargetClassification(worldboss) and CheckBoxOn(demo) and TargetDebuffExpires(lowerphysicaldamage 2) Spell(DEMOSHOUT nored=1)
-	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
+	if TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=2) and CheckBoxOn(sunder) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(SUNDERARMOR nored=1)
 	
-	#/whirlwind,if=target.adds>0
-	if CheckBoxOn(multi) Spell(WHIRLWIND)
 	#/execute,if=buff.executioner_talent.remains<1.5
 	if BuffExpires(EXECUTIONER 1.5) and TargetLifePercent(less 20) Spell(EXECUTE)
 	#/colossus_smash
 	Spell(COLOSSUSSMASH)
+
 	#/execute,if=buff.executioner_talent.stack<5
 	if BuffExpires(EXECUTIONER 0 stacks=5) and TargetLifePercent(less 20) Spell(EXECUTE)
 	#/bloodthirst
@@ -260,12 +261,18 @@ AddIcon help=main mastery=2
 AddIcon help=offgcd mastery=2
 {
 	if target.IsInterruptible() Spell(PUMMEL)
-	#/cleave,if=target.adds>0
-	if CheckBoxOn(multi) Spell(CLEAVE) 
 	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
 	if {Mana(more 84) and TargetLifePercent(more 20)} or BuffPresent(BATTLETRANCE) or 
 			{{BuffPresent(INCITE) or TargetDebuffPresent(COLOSSUSSMASH mine=1)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
 		Spell(HEROICSTRIKE)
+}
+
+AddIcon help=aoe mastery=2 checkboxon=aoe
+{
+	#/whirlwind,if=target.adds>0
+	Spell(WHIRLWIND)
+	#/cleave,if=target.adds>0
+	Spell(CLEAVE) 
 }
 
 AddIcon help=cd mastery=2
@@ -287,14 +294,8 @@ AddIcon help=main mastery=3
 	if List(shout battle) and {Mana(less 20) or BuffExpires(strengthagility 3)} Spell(BATTLESHOUT nored=1)
 
 	if LifePercent(less 75) and BuffPresent(VICTORIOUS) Spell(VICTORYRUSH usable=1)
-	if CheckBoxOn(multi)
-	{
-		if TargetDebuffExpires(RENDDEBUFF mine=1) Spell(REND)
-		Spell(THUNDERCLAP)
-		Spell(SHOCKWAVE)
-		Spell(REVENGE usable=1)
-	}
-	if CheckBoxOn(sunder) and CheckBoxOff(multi) and TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(DEVASTATE)
+
+	if CheckBoxOn(sunder) and TargetDebuffExpires(SUNDERARMORDEBUFF 3 stacks=3) and TargetDebuffExpires(lowerarmor 2 mine=0) Spell(DEVASTATE)
 
 	if 1s before Spell(SHIELDSLAM) Spell(SHIELDSLAM usable=1)
 
@@ -319,8 +320,15 @@ AddIcon help=main mastery=3
 AddIcon help=offgcd mastery=3
 {
 	if target.IsInterruptible() Spell(PUMMEL)
-	if CheckBoxOn(multi) and Mana(more 44) Spell(CLEAVE)
 	if Mana(more 44) Spell(HEROICSTRIKE)
+}
+
+AddIcon help=aoe mastery=3 checkboxon=aoe
+{
+	if TargetDebuffExpires(RENDDEBUFF mine=1) Spell(REND)
+	Spell(THUNDERCLAP)
+	Spell(SHOCKWAVE)
+	Spell(CLEAVE)
 }
 
 AddIcon help=cd mastery=3
