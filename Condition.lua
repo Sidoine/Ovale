@@ -865,10 +865,10 @@ Ovale.conditions=
 		return compare(UnitMaxHealth(target), condition[1], condition[2])
 	end,
 	maxHealth = function(condition)
-		return UnitMaxHealth(getTarget(condition.target))
+		return UnitMaxHealth(getTarget(condition.target)), 0, 0
 	end,
 	maxMana = function(condition)
-		return UnitPowerMax(getTarget(condition.target))
+		return UnitPowerMax(getTarget(condition.target)), 0, 0
 	end,
 	NextSwing = function(condition)
 		local ret = OvaleSwing:GetNext(condition[1])
