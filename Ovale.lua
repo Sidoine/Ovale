@@ -2204,8 +2204,8 @@ function Ovale:CalculerMeilleureAction(element)
 		end
 		return startB, endB
 	elseif element.type == "operator" then
-		local startA, endA, elementA = self:CalculerMeilleureAction(element.a)
-		local startB, endB, elementB = self:CalculerMeilleureAction(element.b)
+		local startA, endA, prioA, elementA = self:CalculerMeilleureAction(element.a)
+		local startB, endB, prioB, elementB = self:CalculerMeilleureAction(element.b)
 		local a = elementA.value
 		local b = elementA.origin
 		local c = elementA.rate
