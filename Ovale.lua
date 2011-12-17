@@ -2047,7 +2047,14 @@ function Ovale:CalculerMeilleureAction(element)
 			end
 			
 			if rate then
-				return 0, nil, 3, {value=start, origin=ending, rate=rate, type="value"}
+				if not element.result then
+					element.result = { type = "value" }
+				end
+				local result = element.result
+				result.value = start
+				result.origin = ending
+				result.rate = rate
+				return 0, nil, 3, result
 			else
 				return start, ending
 			end
@@ -2290,11 +2297,25 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 			end
 		end
-		return startA, endA, 3, { value = l, origin = m, rate = n, type = "time" }
+		if not element.result then
+			element.result = { type = "value" }
+		end
+		local result = element.result
+		result.value = l
+		result.origin = m
+		result.rate = n
+		return startA, endA, 3, result
 	elseif element.type == "lua" then
 		local ret = loadstring(element.lua)()
 		self:Log("lua "..nilstring(ret))
-		return 0, nil, 3, { type="value", value=ret, origin=0, rate=0}
+		if not element.result then
+			element.result = { type = "value" }
+		end
+		local result = element.result
+		result.value = ret
+		result.origin = 0
+		result.rate = 0
+		return 0, nil, 3, result
 	elseif (element.type == "group") then
 		local meilleurTempsFils
 		local bestEnd
