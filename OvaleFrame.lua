@@ -169,14 +169,14 @@ do
 				Ovale:Log("CalculerMeilleureAction start = "..start)
 			end
 			local action = self.actions[k]
-			if node.params.type == "value" then
+			if element and element.type == "value" then
 				local actionTexture
 				if node.params.texture then
 					actionTexture = GetSpellTexture(node.params.texture)
 				end
 				local value
-				if ending and priorite and start then
-					value = start + (Ovale.maintenant - ending) * priorite
+				if element.value and element.origin and element.rate then
+					value = element.value + (Ovale.maintenant - element.origin) * element.rate
 				end
 				action.icons[1]:SetValue(value, actionTexture)
 				if #action.icons > 1 then

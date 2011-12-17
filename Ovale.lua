@@ -2046,10 +2046,17 @@ function Ovale:CalculerMeilleureAction(element)
 				self:Print("Function "..parameterList..") returned "..nilstring(start)..","..nilstring(ending)..","..nilstring(rate))
 			end
 			
-			return start, ending, rate
+			if rate then
+				return 0, nil, 3, {value=start, origin=ending, rate=rate, type="value"}
+			else
+				return start, ending
+			end
 		end
 	elseif element.type == "time" then
-		return element.value, 0, 0
+		return element.value
+	elseif element.type == "value" then
+		Ovale:Log("value " .. element.value)
+		return 0, nil, 3, element
 	elseif element.type == "after" then
 		local timeA = Ovale:CalculerMeilleureAction(element.time)
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
@@ -2115,7 +2122,7 @@ function Ovale:CalculerMeilleureAction(element)
 			return 0
 		end
 		return nil
-	elseif (element.type == "and" or element.type == "if") then
+	elseif element.type == "and" or element.type == "if" then
 		if (Ovale.trace) then
 			self:Print(element.type.." ["..element.nodeId.."]")
 		end
@@ -2143,8 +2150,8 @@ function Ovale:CalculerMeilleureAction(element)
 			Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB).." ["..element.nodeId.."]")
 		end
 		return startB, endB, prioriteB, elementB
-	elseif (element.type == "unless") then
-		if (Ovale.trace) then
+	elseif element.type == "unless" then
+		if Ovale.trace then
 			self:Print(element.type)
 		end
 		local startA, endA = Ovale:CalculerMeilleureAction(element.a)
@@ -2197,9 +2204,15 @@ function Ovale:CalculerMeilleureAction(element)
 		end
 		return startB, endB
 	elseif element.type == "operator" then
-		local a,b,c = self:CalculerMeilleureAction(element.a)
-		local x,y,z = self:CalculerMeilleureAction(element.b)
-
+		local startA, endA, elementA = self:CalculerMeilleureAction(element.a)
+		local startB, endB, elementB = self:CalculerMeilleureAction(element.b)
+		local a = elementA.value
+		local b = elementA.origin
+		local c = elementA.rate
+		local x = elementB.value
+		local y = elementB.origin
+		local z = elementB.rate
+		
 		if not a or not x then
 			self:Log("operator: a or x is nil")
 			return nil
@@ -2207,30 +2220,34 @@ function Ovale:CalculerMeilleureAction(element)
 		
 		self:Log(a.."+(t-"..b..")*"..c.. element.operator..x.."+(t-"..y..")*"..z)
 		
+		local l, m, n
+		
 		if element.operator == "*" then
 			if c == 0 then
-				return a*x, y, a*z
+				l = a*x
+				m = y
+				n = a*z
 			elseif z == 0 then
-				return x*a, b, x*c
+				l = x*a; m = b; n = x*c
 			else
 				self:Print("ERROR: at least one value must be constant when multiplying")
 				self.bug = true
 			end
 		elseif element.operator == "+" then
 			if c+z == 0 then
-				return a+x, 0, 0
+				l = a+x; m = 0; n = 0
 			else
-				return a+x, (b*c+y*z)/(c+z), c+z
+				l = a+x; m = (b*c+y*z)/(c+z); n = c+z
 			end
 		elseif element.operator == '-' then
 			if c-z == 0 then
-				return a-x, 0, 0
+				l = a-x; m = 0; n = 0
 			else
-				return a-x, (b*c-y*z)/(c-z), c-z
+				l = a-x; m = (b*c-y*z)/(c-z); n = c-z
 			end
 		elseif element.operator == '/' then
 			if z == 0 then
-				return a/x, b, c/x
+				l = a/x; m = b; n = c/x
 			else
 				self:Print("ERROR: second operator of / must be constant")
 				self.bug = true
@@ -2273,10 +2290,11 @@ function Ovale:CalculerMeilleureAction(element)
 				end
 			end
 		end
+		return startA, endA, 3, { value = l, origin = m, rate = n, type = "time" }
 	elseif element.type == "lua" then
 		local ret = loadstring(element.lua)()
 		self:Log("lua "..nilstring(ret))
-		return ret, 0, 0
+		return 0, nil, 3, { type="value", value=ret, origin=0, rate=0}
 	elseif (element.type == "group") then
 		local meilleurTempsFils
 		local bestEnd

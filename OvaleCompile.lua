@@ -41,7 +41,7 @@ local function ParseTime(value)
 end
 
 local function ParseNumber(dummy, value)
-	return dummy..AddNode({type="time", value=tonumber(value)})
+	return dummy..AddNode({type="value", value=tonumber(value), origin=0, rate=0})
 end
 
 local function ParseFunction(prefix, func, params)
@@ -529,6 +529,8 @@ function Ovale:DebugNode(node)
 		text = self:DebugNode(node.a)..node.operator..self:DebugNode(node.b)
 	elseif node.type == "lua" then
 		text = "["..node.lua.."]"
+	elseif node.type == "value" then
+		text = node.value
 	else
 		text = "#unknown node type#"
 	end
