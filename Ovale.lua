@@ -2213,6 +2213,10 @@ function Ovale:CalculerMeilleureAction(element)
 	elseif element.type == "operator" then
 		local startA, endA, prioA, elementA = self:CalculerMeilleureAction(element.a)
 		local startB, endB, prioB, elementB = self:CalculerMeilleureAction(element.b)
+		if not elementA or not elementB then
+			self:Log("operator: a or x is nil")
+			return nil
+		end
 		local a = elementA.value
 		local b = elementA.origin
 		local c = elementA.rate
