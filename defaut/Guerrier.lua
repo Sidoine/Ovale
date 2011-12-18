@@ -321,6 +321,7 @@ AddIcon help=offgcd mastery=3
 {
 	if target.IsInterruptible() Spell(PUMMEL)
 	if Mana(more 44) Spell(HEROICSTRIKE)
+	if Mana(more 80) Spell(INNERRAGE)
 }
 
 AddIcon help=aoe mastery=3 checkboxon=aoe
