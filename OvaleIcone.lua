@@ -1,5 +1,4 @@
-﻿local LBF = LibStub("LibButtonFacade", true)
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+﻿local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local function SetValue(self, value, actionTexture)
 	self.icone:Show()
@@ -164,24 +163,6 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 	return minAttente,element
 end
 
-local function SetSkinGroup(self, _skinGroup)
-	self.skinGroup = _skinGroup
-	self.skinGroup:AddButton(self)
-end
-
-local function SetSize(self, scale)
---	if not LBF then
---		self:SetWidth(width)
---		self:SetHeight(height)
---		self.normalTexture:SetWidth(width*66/36)
---		self.normalTexture:SetHeight(height*66/36)
---		
---		self.remains:SetWidth(width)
---	else
-		--self:SetScale(width/32)
---	end
-end
-
 local function SetHelp(self, help)
 	self.help = help
 end
@@ -251,7 +232,6 @@ function OvaleIcone_OnLoad(self)
 	self:RegisterForClicks("LeftButtonUp")
 	self.SetSkinGroup = SetSkinGroup
 	self.Update = Update
-	self.SetSize = SetSize
 	self.SetHelp = SetHelp
 	self.SetParams = SetParams
 	self.SetFontScale = SetFontScale

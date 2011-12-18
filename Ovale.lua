@@ -2418,9 +2418,8 @@ function Ovale:ChargerDefaut()
 			apparence = {enCombat=false, iconScale = 2, secondIconScale = 1, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
-				latencyCorrection=true, hideVehicule=true, flashIcon=true, targetText = "●", alpha = 1,
-				optionsAlpha = 1, updateInterval=0.1},
-			skin = {SkinID="Blizzard", Backdrop = true, Gloss = false, Colors = {}}
+				latencyCorrection=true, hideVehicule=false, flashIcon=true, targetText = "●", alpha = 1,
+				optionsAlpha = 1, updateInterval=0.1}
 		}
 	})
 end

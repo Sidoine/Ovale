@@ -1,5 +1,5 @@
 ﻿local AceGUI = LibStub("AceGUI-3.0")
-local LBF = LibStub("LibButtonFacade", true)
+local Masque = LibStub("Masque", true)
 		
 local GetTime = GetTime		
 
@@ -105,14 +105,7 @@ do
 		self.content:SetWidth(width)
 		self.content:SetHeight(height+50)
 	end
-	
-	local function OnSkinChanged(self, skinID, gloss, backdrop, group, button, colors)
-		Ovale.db.profile.skin.SkinID = skinID
-		Ovale.db.profile.skin.Gloss = gloss
-		Ovale.db.profile.skin.Backdrop = backdrop
-		Ovale.db.profile.skin.Colors = colors
-	end
-	
+		
 	local function GetScore(self, spellId)
 		for k,action in pairs(self.actions) do
 			if action.spellId == spellId then
@@ -350,8 +343,8 @@ do
 				icon:SetRangeIndicator(Ovale.db.profile.apparence.targetText)
 				icon:EnableMouse(not Ovale.db.profile.apparence.clickThru)
 				icon.cdShown = (l == 1)
-				if LBF then
-					icon:SetSkinGroup(self.skinGroup)
+				if Masque then
+					self.skinGroup:AddButton(icon)
 				end
 				if l==1 then
 					icon:Show();
@@ -442,21 +435,8 @@ do
 		
 		AceGUI:RegisterAsContainer(self)
 
-		if LBF then
-			self.skinGroup = LBF:Group("Ovale")
-			if Ovale.db.profile.SkinID then
-				-- Import old values
-				Ovale.db.profile.skin.SkinID = Ovale.db.profile.SkinID
-				Ovale.db.profile.skin.Gloss = Ovale.db.profile.Gloss
-				Ovale.db.profile.skin.Backdrop = Ovale.db.profile.Backdrop
-				Ovale.db.profile.skin.Colors = Ovale.db.profile.Colors
-				Ovale.db.profile.SkinID = nil
-			end
-			self.skinGroup.SkinID = Ovale.db.profile.skin.SkinID or "Blizzard"
-			self.skinGroup.Gloss = Ovale.db.profile.skin.Gloss
-			self.skinGroup.Backdrop = Ovale.db.profile.skin.Backdrop
-			self.skinGroup.Colors = Ovale.db.profile.skin.Colors or {}
-			LBF:RegisterSkinCallback("Ovale", self.OnSkinChanged, self)
+		if Masque then
+			self.skinGroup = Masque:Group("Ovale")
 		end
 
 		return self	
