@@ -114,12 +114,6 @@ AddIcon help=main mastery=1
 	#/flame_shock,if=!ticking|ticks_remain<3
 	if TargetDebuffExpires(FLAMESHOCK 3 mine=1) Spell(FLAMESHOCK)
 
-	if CheckBoxOn(aoe)
-	{
-		Spell(EARTHQUAKE)
-		if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
-	}
-
 	#/lava_burst,if=dot.flame_shock.remains>(cast_time+travel_time)
 	if target.debuffExpires(FLAMESHOCK mine=1) > {castTime(LAVABURST) + 1 } Spell(LAVABURST)
 	
@@ -131,10 +125,16 @@ AddIcon help=main mastery=1
 	
 	if TotemExpires(fire) Spell(SEARINGTOTEM)
 	#/spiritwalkers_grace,moving=1
-	#/chain_lightning,if=target.adds>2
-	if CheckBoxOn(aoe) Spell(CHAINLIGHTNING)
+	if Speed(more 0) Spell(SPIRITWALKERSGRACE)
 	#/lightning_bolt
 	Spell(LIGHTNINGBOLT)
+}
+
+AddIcon help=aoe mastery=1 checkboxon=aoe
+{
+	Spell(EARTHQUAKE)
+	if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
+	Spell(CHAINLIGHTNING)
 }
 
 AddIcon help=main mastery=2
@@ -150,46 +150,43 @@ AddIcon help=main mastery=2
 	#/lightning_shield
 	if BuffExpires(LIGHTNINGSHIELD) Spell(LIGHTNINGSHIELD)
 	
-	if CheckBoxOn(aoe)
-	{
-		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
-		if TotemExpires(fire) Spell(MAGMATOTEM)
-		if TotemPresent(fire) Spell(FIRENOVA)
-		Spell(LAVALASH)
-		if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(CHAINLIGHTNING)
-		Spell(UNLEASHELEMENTS)
-		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
-		Spell(EARTHSHOCK)
-		Spell(STORMSTRIKE)
-		if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(CHAINLIGHTNING)
-		Spell(LAVABURST)
-	}
-	
-	if CheckBoxOff(aoe)
-	{
-		#/searing_totem
-		if TotemExpires(fire) Spell(SEARINGTOTEM)
-		#/stormstrike
-		Spell(STORMSTRIKE)
-		#/lava_lash
-		Spell(LAVALASH)
-		#/lightning_bolt,if=buff.maelstrom_weapon.react=5
-		if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
-		#/unleash_elements
-		Spell(UNLEASHELEMENTS)
-		#/flame_shock,if=!ticking|buff.unleash_flame.up
-		if TargetDebuffExpires(FLAMESHOCK 0 mine=1) or BuffPresent(UNLEASHFLAME)
-			Spell(FLAMESHOCK)
-		#/earth_shock
-		Spell(EARTHSHOCK)
-		#/fire_nova,if=target.adds>1
-		#if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
-		#/lightning_bolt,if=buff.maelstrom_weapon.react>1
-		if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(LIGHTNINGBOLT)
-	}
+	#/searing_totem
+	if TotemExpires(fire) Spell(SEARINGTOTEM)
+	#/stormstrike
+	Spell(STORMSTRIKE)
+	#/lava_lash
+	Spell(LAVALASH)
+	#/lightning_bolt,if=buff.maelstrom_weapon.react=5
+	if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(LIGHTNINGBOLT)
+	#/unleash_elements
+	Spell(UNLEASHELEMENTS)
+	#/flame_shock,if=!ticking|buff.unleash_flame.up
+	if TargetDebuffExpires(FLAMESHOCK 0 mine=1) or BuffPresent(UNLEASHFLAME)
+		Spell(FLAMESHOCK)
+	#/earth_shock
+	Spell(EARTHSHOCK)
+	#/fire_nova,if=target.adds>1
+	#if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
+	#/lightning_bolt,if=buff.maelstrom_weapon.react>1
+	if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(LIGHTNINGBOLT)
 		
 	Spell(SHAMANISTICRAGE priority=2)
 	Spell(FERALSPIRIT priority=2)
+}
+
+AddIcon help=aoe mastery=2 checkboxon=aoe
+{
+	if BuffPresent(MAELSTROMWEAPON stacks=5) Spell(CHAINLIGHTNING)
+	if TotemExpires(fire) Spell(MAGMATOTEM)
+	if TotemPresent(fire) Spell(FIRENOVA)
+	Spell(LAVALASH)
+	if BuffPresent(MAELSTROMWEAPON stacks=4) Spell(CHAINLIGHTNING)
+	Spell(UNLEASHELEMENTS)
+	if TargetDebuffExpires(FLAMESHOCK 0 mine=1) Spell(FLAMESHOCK)
+	Spell(EARTHSHOCK)
+	Spell(STORMSTRIKE)
+	if BuffPresent(MAELSTROMWEAPON stacks=2) Spell(CHAINLIGHTNING)
+	Spell(LAVABURST)
 }
 
 AddIcon help=cd

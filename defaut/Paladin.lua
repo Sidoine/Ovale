@@ -22,12 +22,16 @@ Define(DIVINESTORM 53385)
 	SpellInfo(DIVINESTORM cd=4.5)
 Define(EXORCISM 879)
 	SpellAddBuff(EXORCISM THEARTOFWAR=0)
+Define(FLASHOFLIGHT 19750)
 Define(GUARDIANOFANCIENTKINGS 86150)
 	SpellInfo(GUARDIANOFANCIENTKINGS cd=300)
 Define(HAMMEROFWRATH 24275)
 	SpellInfo(HAMMEROFWRATH cd=6)
 Define(HAMMEROFTHERIGHTEOUS 53595)
 	SpellInfo(HAMMEROFTHERIGHTEOUS cd=4.5 holy=1)
+Define(HOLYLIGHT 635)
+Define(HOLYRADIANCE 82327)
+	SpellInfo(HOLYRADIANCE holy=1)
 Define(HOLYSHIELD 20925)
 	SpellInfo(HOLYSHIELD  cd=30)
 	SpellAddBuff(HOLYSHIELD HOLYSHIELD=10)
@@ -40,7 +44,13 @@ Define(INQUISITION 84963)
 	SpellAddBuff(INQUISITION INQUISITION=12 DIVINEPURPOSE=0)
 Define(JUDGEMENT 20271)
 	SpellInfo(JUDGEMENT cd=8)
+Define(LIGHTOFDAWN 85222)
+	SpellInfo(LIGHTOFDAWN holy=-3)
+Define(REBUKE 96231)
+	SpellInfo(REBUKE cd=10)
 Define(RIGHTEOUSFURY 25780)
+Define(SEALOFINSIGHT 20165)
+	SpellAddBuff(SEALOFINSIGHT SEALOFINSIGHT=1800)
 Define(SEALRIGHTEOUSNESS 20154)
 	SpellAddBuff(SEALRIGHTEOUSNESS SEALRIGHTEOUSNESS=1800)
 Define(SEALOFTRUTH 31801)
@@ -61,6 +71,7 @@ Define(ZEALOTRY 85696)
 Define(THEARTOFWAR 59578)
 Define(JUDGEMENTSOFTHEPURE 53655)
 Define(DIVINEPURPOSE 90174)
+Define(INFUSIONOFLIGHT 54149)
 
 ScoreSpells(SHIELDOFTHERIGHTEOUS JUDGEMENT AVENGERSSHIELD HAMMEROFTHERIGHTEOUS CONSECRATE HOLYWRATH
 	ZEALOTRY  INQUISITION TEMPLARSVERDICT DIVINESTORM EXORCISM HAMMEROFWRATH JUDGEMENT CRUSADERSTRIKE)
@@ -69,20 +80,37 @@ AddCheckBox(aoe L(AOE))
 
 AddIcon help=main mastery=1
 {
-	if HolyPower(more 0) and BuffExpires(INQUISITION) Spell(INQUISITION)
-	if ManaPercent(less 90) Spell(DIVINEPLEA)
-	if BuffExpires(JUDGEMENTSOFTHEPURE 2) Spell(JUDGEMENT)
+	unless InCombat()
+	{
+		if BuffExpires(SEALOFINSIGHT 400) Spell(SEALOFINSIGHT)
+	}
+ 
+	if HolyPower(more 2) Spell(WORDOFGLORY)
 	Spell(HOLYSHOCK)
-	Spell(EXORCISM)
+	Spell(JUDGEMENT)
+	if TargetInRange(CRUSADERSTRIKE) Spell(CRUSADERSTRIKE)
+	if BuffPresent(INFUSIONOFLIGHT) Spell(FLASHOFLIGHT)
+	Spell(HOLYLIGHT priority=2)
+}
+
+AddIcon help=aoe mastery=1
+{
+	if HolyPower(more 2) Spell(LIGHTOFDAWN)
+	Spell(HOLYRADIANCE)
 }
 
 AddIcon help=cd mastery=1
 {
-	Spell(GUARDIANOFANCIENTKINGS)
 	Spell(AVENGINGWRATH)
 	Spell(DIVINEFAVOR)
 	Item(Trinket0Slot usable=1)
     Item(Trinket1Slot usable=1)
+	Spell(GUARDIANOFANCIENTKINGS)
+}
+
+AddIcon help=mana size=small mastery=1
+{
+	if ManaPercent(less 88) Spell(DIVINEPLEA priority=2)
 }
 
 AddIcon help=main mastery=2
@@ -90,23 +118,27 @@ AddIcon help=main mastery=2
 	if BuffExpires(RIGHTEOUSFURY) Spell(RIGHTEOUSFURY)
 	unless InCombat() if BuffExpires(SEALRIGHTEOUSNESS 400) and BuffExpires(SEALOFTRUTH 400) Spell(SEALOFTRUTH)
 	
-	if CheckBoxOn(aoe)
-	{
-		if HolyPower(more 0) and BuffExpires(INQUISITION 0) Spell(INQUISITION)
-		Spell(HAMMEROFTHERIGHTEOUS)
-		Spell(CONSECRATE)
-		Spell(HOLYWRATH)
-	}
-	if CheckBoxOff(aoe)
-	{
-		if HolyPower(more 2) Spell(SHIELDOFTHERIGHTEOUS)
-		Spell(CRUSADERSTRIKE)
-	}
+	if HolyPower(more 2) Spell(SHIELDOFTHERIGHTEOUS)
+	Spell(CRUSADERSTRIKE)
+
 	Spell(JUDGEMENT)
 	Spell(AVENGERSSHIELD)
 	Spell(HOLYWRATH)
 	Spell(CONSECRATE priority=2)
 	Spell(DIVINEPLEA priority=2)
+}
+
+AddIcon help=offgcd mastery=2
+{
+	if target.IsInterruptible() Spell(REBUKE)
+}
+
+AddIcon help=aoe mastery=2
+{
+	if HolyPower(more 0) and BuffExpires(INQUISITION 0) Spell(INQUISITION)
+	Spell(HAMMEROFTHERIGHTEOUS)
+	Spell(CONSECRATE)
+	Spell(HOLYWRATH)
 }
 
 AddIcon help=cd mastery=2
@@ -138,7 +170,6 @@ AddIcon help=main mastery=3
 	#templars_verdict,if=buff.hand_of_light.react
 	if BuffPresent(DIVINEPURPOSE) Spell(TEMPLARSVERDICT)
 	#crusader_strike
-	if CheckBoxOn(aoe) Spell(DIVINESTORM)
 	Spell(CRUSADERSTRIKE)
 	#hammer_of_wrath
 	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
@@ -153,11 +184,21 @@ AddIcon help=main mastery=3
 		Spell(JUDGEMENT)
 		#holy_wrath
 		Spell(HOLYWRATH)
-		#consecration
-		if CheckBoxOn(aoe) Spell(CONSECRATE)
 		#divine_plea
 		Spell(DIVINEPLEA)
 	}
+}
+
+AddIcon help=offgcd mastery=3
+{
+	if target.IsInterruptible() Spell(REBUKE)
+}
+
+AddIcon help=aoe mastery=3 checkboxon=aoe
+{
+	Spell(DIVINESTORM)
+	#consecration
+	Spell(CONSECRATE)
 }
 
 AddIcon help=cd mastery=3

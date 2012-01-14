@@ -674,6 +674,11 @@ Ovale.conditions=
 		local spellName = GetSpellInfo(condition[1])
 		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,
+	item = function(condition)
+		local itemId = element.params[1]
+		local actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
+		return actionCooldownDuration, actionCooldownStart, -1
+	end,
 	ItemCount = function(condition)
 		if condition.charges == 1 then
 			return compare(GetItemCount(condition[1], false, true), condition[2], condition[3])

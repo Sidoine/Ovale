@@ -140,7 +140,7 @@ AddIcon help=mana mastery=3
 }
 
 #    Add Focus Target Monitor for Multi Dotting
-AddIcon mastery =3
+AddIcon mastery=3
 {
         if TargetDebuffExpires(SHADOWWORDPAIN 1.5 mine=1 target=focus ) and TargetDeadIn(more 10) Spell(SHADOWWORDPAIN target=focus)
         if TargetDebuffExpires(VAMPIRICTOUCH 3 mine=1 haste=spell target=focus) and TargetDeadIn(more 8) Spell(VAMPIRICTOUCH target=focus)    
