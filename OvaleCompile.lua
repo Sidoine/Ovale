@@ -339,6 +339,16 @@ local function ParseCommands(text)
 		local was = text
 		text = string.gsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
 		text = string.gsub(text, "(%d+%.?%d*)s", ParseTime)
+		text = string.gsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
+		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/])%s*node(%d+)", ParseOp)
+		if was == text then
+			break
+		end
+	end
+	
+	while (1==1) do
+		local was = text
+		text = string.gsub(text, "node(%d+)%s*([%>%<])%s*node(%d+)", ParseOp)
 		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
 		text = string.gsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
@@ -347,8 +357,6 @@ local function ParseCommands(text)
 		text = string.gsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
 		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
 		text = string.gsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
-		text = string.gsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
-		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/%>%<])%s*node(%d+)", ParseOp)
 		if (was == text) then
 			break
 		end

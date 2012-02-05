@@ -176,6 +176,105 @@ local function nilstring(text)
 	end
 end
 
+-- Get the expiration time of a debuff
+-- that can be on any unit except the target
+-- Returns the first to expires, the last to expires
+-- Returns nil if the debuff is not present
+local function getOtherAura(spellId, suppTime)
+	Ovale:EnableOtherAuras()
+	local otherAura = Ovale.otherAura[spellId]
+	if otherAura then
+	--	print("otherAura")
+		local maxTime = 0
+		local minTime = nil
+		suppTime = suppTime or 10
+		for target,expireTime in pairs(otherAura) do
+	--		print("target "..target.. " "..expireTime)
+			if target~=UnitGUID("target") then
+				if Ovale.maintenant - suppTime > expireTime then
+					otherAura[target] = nil
+				else
+					if expireTime > maxTime then
+						maxTime = expireTime
+					end
+					if not minTime or diff<minTime then
+						minTime = diff
+					end
+				end	
+			end
+		end
+	--	print("maxTime final "..maxTime)
+		return minTime, maxTime
+	end
+	return nil
+end
+
+local function GetRune(condition)
+	local nombre = 0
+	local nombreCD = 0
+	local maxCD = nil
+	
+	for i=1,4 do
+		runes[i] = 0
+		runesCD[i] = 0
+	end
+	
+	local k=1
+	while true do
+		local type = runeType[condition[k*2-1]]
+		if not type then
+			break
+		end
+		local howMany = condition[k*2]
+		runes[type] = runes[type] + howMany
+		k = k + 1 
+	end
+	
+	for i=1,6 do
+		local rune = Ovale.state.rune[i]
+		if rune then
+			if runes[rune.type] > 0 then
+				runes[rune.type] = runes[rune.type] - 1
+				if rune.cd > runesCD[rune.type] then
+					runesCD[rune.type] = rune.cd
+				end
+			elseif rune.cd < runesCD[rune.type] then
+				runesCD[rune.type] = rune.cd
+			end
+		end
+	end
+	
+	if not condition.nodeath then
+		for i=1,6 do
+			local rune = Ovale.state.rune[i]
+			if rune and rune.type == 4 then
+				for j=1,3 do
+					if runes[j]>0 then
+						runes[j] = runes[j] - 1
+						if rune.cd > runesCD[j] then
+							runesCD[j] = rune.cd
+						end
+						break
+					elseif rune.cd < runesCD[j] then
+						runesCD[j] = rune.cd
+						break
+					end
+				end
+			end
+		end
+	end
+	
+	for i=1,4 do
+		if runes[i]> 0 then
+			return nil
+		end
+		if not maxCD or runesCD[i]>maxCD then
+			maxCD = runesCD[i]
+		end
+	end
+	return maxCD
+end
+
 local lastEnergyValue = nil
 local lastEnergyTime
 
@@ -295,8 +394,12 @@ local function getTargetDead(target)
 		savedHealth[target] = {}
 	end
 	local newHealth = UnitHealth(target)
+	if newHealth then
+		Ovale:Log("newHealth = " .. newHealth)
+	end
 	if UnitHealthMax(target)==1 then
-		return Ovale.maintenant + 10000
+		Ovale:Log("Dummy, return in the future")
+		return nil
 	end
 	if second~=lastSaved[target] and targetGUID[target] then
 		lastSaved[target] = second
@@ -305,14 +408,21 @@ local function getTargetDead(target)
 		savedHealth[target][mod10] = newHealth
 		if prevHealth and prevHealth>newHealth then
 			lastSPD[target] = 10/(prevHealth-newHealth)
---			print("dps = " .. (1/lastSPD))
+			if lastSPD[target] > 0 then
+				Ovale:Log("dps = " .. (1/lastSPD[target]))
+			end
 		end
 	end
-	if not lastSPD[target] then
-		lastSPD[target] = 0.001
+	if not lastSPD[target] or lastSPD[target]<1 then
+		return nil
 	end
 	-- Rough estimation
-	return Ovale.maintenant + newHealth * lastSPD[target]
+	local duration = newHealth * lastSPD[target]
+	if duration < 10000 then
+		return Ovale.maintenant + duration
+	else
+		return nil
+	end
 end
 
 Ovale.conditions=
@@ -886,55 +996,26 @@ Ovale.conditions=
 		return OvaleSwing:GetNext(condition[1]) - Ovale.currentTime, 0, -1
 	end,
 	OtherDebuffExpires = function(condition)
-		Ovale:EnableOtherDebuffs()
-		local otherDebuff = Ovale.otherDebuffs[condition[1]]
-		if otherDebuff then
+		local minTime, maxTime = getOtherAura(condition[1], condition[3])
+		if minTime then
 			local timeBefore = condition[2] or 0
-			local maxTime = condition[3] or 10
-			local minTime
-			for k,v in pairs(otherDebuff) do
-				local diff = v
-				if Ovale.maintenant-maxTime>diff then
-					-- Ovale:Print("enlève obsolète sur "..k)
-					otherDebuff[k] = nil
-				elseif k~=UnitGUID("target") and (not minTime or diff<minTime) then
-					minTime = diff
-				end
-			end
-			if not minTime then
-				return nil
-			end
-			minTime = minTime - timeBefore
-			return minTime
+			return minTime - timeBefore
 		end
 		return nil
 	end,
 	OtherDebuffPresent = function(condition)
-		Ovale:EnableOtherDebuffs()
-		local otherDebuff = Ovale.otherDebuffs[condition[1]]
-		if otherDebuff then
-		--	print("otherDebuff")
-			local maxTime = 0
-			local suppTime = condition[3] or 10
-			for target,expireTime in pairs(otherDebuff) do
-		--		print("target "..target.. " "..expireTime)
-				if target~=UnitGUID("target") then
-					if Ovale.maintenant - suppTime > expireTime then
-						otherDebuff[target] = nil
-					elseif expireTime > maxTime then
-						maxTime = expireTime
-					end
-				end
-			end
-		--	print("maxTime final "..maxTime)
-			if maxTime>0 then
-				local timeBefore = condition[2] or 0
-				return 0, addTime(maxTime, -timeBefore)
-			else
-				return nil
-			end
+		local minTime, maxTime = getOtherAura(condition[1], condition[3])
+		if maxTime and maxTime>0 then
+			local timeBefore = condition[2] or 0
+			return 0, addTime(maxTime, -timeBefore)
 		end
 		return nil
+	end,
+	OtherAuraExpires = OtherDebuffExpires,
+	OtherAuraPresent = OtherDebuffPresent,
+	otherAura = function(condition)
+		local minTime, maxTime = getOtherAura(condition[1])
+		return 0, maxTime, -1 
 	end,
 	Present = function(condition)
 		local present = UnitExists(getTarget(condition.target)) and not UnitIsDead(getTarget(condition.target))
@@ -945,71 +1026,6 @@ Ovale.conditions=
 	PetPresent = function(condition)
 		local present = UnitExists("pet") and not UnitIsDead("pet")
 		return testbool(present, condition[1])
-	end,
-	Runes = function(condition)
-		local nombre = 0
-		local nombreCD = 0
-		local maxCD = nil
-		
-		for i=1,4 do
-			runes[i] = 0
-			runesCD[i] = 0
-		end
-		
-		local k=1
-		while true do
-			local type = runeType[condition[k*2-1]]
-			if not type then
-				break
-			end
-			local howMany = condition[k*2]
-			runes[type] = runes[type] + howMany
-			k = k + 1 
-		end
-		
-		for i=1,6 do
-			local rune = Ovale.state.rune[i]
-			if rune then
-				if runes[rune.type] > 0 then
-					runes[rune.type] = runes[rune.type] - 1
-					if rune.cd > runesCD[rune.type] then
-						runesCD[rune.type] = rune.cd
-					end
-				elseif rune.cd < runesCD[rune.type] then
-					runesCD[rune.type] = rune.cd
-				end
-			end
-		end
-		
-		if not condition.nodeath then
-			for i=1,6 do
-				local rune = Ovale.state.rune[i]
-				if rune and rune.type == 4 then
-					for j=1,3 do
-						if runes[j]>0 then
-							runes[j] = runes[j] - 1
-							if rune.cd > runesCD[j] then
-								runesCD[j] = rune.cd
-							end
-							break
-						elseif rune.cd < runesCD[j] then
-							runesCD[j] = rune.cd
-							break
-						end
-					end
-				end
-			end
-		end
-		
-		for i=1,4 do
-			if runes[i]> 0 then
-				return nil
-			end
-			if not maxCD or runesCD[i]>maxCD then
-				maxCD = runesCD[i]
-			end
-		end
-		return maxCD
 	end,
 	-- Test the target level difference with the player
 	-- 1 : "less" or "more"
@@ -1031,6 +1047,19 @@ Ovale.conditions=
 			return nil
 		end
 		return 0, endTime/1000, -1
+	end,
+	Runes = function(condition)
+		return GetRune(condition)
+	end,
+	runes = function(condition)
+		local ret = GetRune(condition)
+		if not ret then
+			return nil
+		end
+		if ret < Ovale.maintenant then
+			ret = Ovale.maintenant
+		end
+		return 0, ret, -1
 	end,
 	SoulShards = function(condition)
 		return compare(Ovale.state.shard, condition[1], condition[2])
@@ -1113,7 +1142,11 @@ Ovale.conditions=
 		return avecHate(condition[1], "spell"),0,0
 	end,
 	TotemExpires = function(condition)
-		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])
+		if type(condition[1]) ~= "number" then
+			condition[1] = totemType[condition[1]]
+		end
+		
+		local haveTotem, totemName, startTime, duration = GetTotemInfo(condition[1])
 		if not startTime then
 			return 0
 		end
@@ -1123,7 +1156,11 @@ Ovale.conditions=
 		return addTime(startTime + duration, -(condition[2] or 0))
 	end,
 	TotemPresent = function(condition)
-		local haveTotem, totemName, startTime, duration = GetTotemInfo(totemType[condition[1]])
+		if type(condition[1]) ~= "number" then
+			condition[1] = totemType[condition[1]]
+		end
+
+		local haveTotem, totemName, startTime, duration = GetTotemInfo(condition[1])
 		if not startTime then
 			return nil
 		end

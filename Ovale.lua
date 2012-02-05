@@ -55,7 +55,7 @@ Ovale.state = {rune={}, cd = {}, counter={}}
 --spells that count for scoring
 Ovale.scoreSpell = {}
 --tracks debuffs on the units that are not the current target
-Ovale.otherDebuffs = {}
+Ovale.otherAura = {}
 --score in current combat
 Ovale.score = 0
 --maximal theoric score in current combat
@@ -665,11 +665,11 @@ function Ovale:OnInitialize()
 	self.AceConfigDialog = LibStub("AceConfigDialog-3.0");
 end
 
-function Ovale:GetOtherDebuffs(spellId)
-	if not self.otherDebuffs[spellId] then
-		self.otherDebuffs[spellId] = {}
+function Ovale:GetOtherAura(spellId)
+	if not self.otherAura[spellId] then
+		self.otherAura[spellId] = {}
 	end
-	return self.otherDebuffs[spellId]
+	return self.otherAura[spellId]
 end
 
 function Ovale:WithHaste(temps, hate)
@@ -879,12 +879,13 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				end
 			end
 		end
-		if self.otherDebuffsEnabled then
+		if self.otherAurasEnabled then
 			--Track debuffs on units that are not the current target
 			if string.find(event, "SPELL_AURA_") == 1 then
 				local spellId, spellName, spellSchool, auraType = select(12, ...)
-				if auraType == "DEBUFF" and self.spellInfo[spellId] and self.spellInfo[spellId].duration then
-					local otherDebuff = self:GetOtherDebuffs(spellId)
+				-- auraType == "DEBUFF" and
+				if self.spellInfo[spellId] and self.spellInfo[spellId].duration then
+					local otherDebuff = self:GetOtherAura(spellId)
 					if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
 						otherDebuff[destGUID] = Ovale.maintenant + self:WithHaste(self.spellInfo[spellId].duration, self.spellInfo[spellId].durationhaste)
 						self.refreshNeeded = true
@@ -929,10 +930,10 @@ function Ovale:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		end
 	end
 	
-	if self.otherDebuffsEnabled then
+	if self.otherAurasEnabled then
 		if event == "UNIT_DIED" then
-			--Remove any dead unit from otherDebuffs
-			for k,v in pairs(self.otherDebuffs) do
+			--Remove any dead unit from otherAura
+			for k,v in pairs(self.otherAura) do
 				for j,w in pairs(v) do
 					if j==destGUID then
 						v[j] = nil
@@ -2214,7 +2215,7 @@ function Ovale:CalculerMeilleureAction(element)
 		local startA, endA, prioA, elementA = self:CalculerMeilleureAction(element.a)
 		local startB, endB, prioB, elementB = self:CalculerMeilleureAction(element.b)
 		if not elementA or not elementB then
-			self:Log("operator: a or x is nil")
+			self:Log("operator " .. element.operator .. ": elementA or elementB is nil")
 			return nil
 		end
 		local a = elementA.value
@@ -2225,7 +2226,7 @@ function Ovale:CalculerMeilleureAction(element)
 		local z = elementB.rate
 		
 		if not a or not x then
-			self:Log("operator: a or x is nil")
+			self:Log("operator " .. element.operator .. ": a or x is nil")
 			return nil
 		end
 		
@@ -2308,6 +2309,7 @@ function Ovale:CalculerMeilleureAction(element)
 		result.value = l
 		result.origin = m
 		result.rate = n
+		self:Log("result = " .. l .." + "..m.."*"..n)
 		return startA, endA, 3, result
 	elseif element.type == "lua" then
 		local ret = loadstring(element.lua)()
@@ -2542,11 +2544,11 @@ function Ovale:ResetSpellInfo()
 	self.spellInfo = {}
 end
 
-function Ovale:EnableOtherDebuffs()
-	if self.otherDebuffsEnabled then
+function Ovale:EnableOtherAuras()
+	if self.otherAurasEnabled then
 		return
 	end
-	self.otherDebuffsEnabled = true
+	self.otherAurasEnabled = true
 end
 
 function Ovale:SetCheckBox(v,on)

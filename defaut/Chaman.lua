@@ -111,17 +111,18 @@ AddIcon help=main mastery=1
 	#/unleash_elements,moving=1
 	if Speed(more 0) and Glyph(GLYPHOFUNLEASHEDLIGHTNING no) Spell(UNLEASHELEMENTS)
 	
-	#/flame_shock,if=!ticking|ticks_remain<3
-	if TargetDebuffExpires(FLAMESHOCK 3 mine=1) Spell(FLAMESHOCK)
+	#/flame_shock,if=!ticking|ticks_remain<2|((buff.bloodlust.react|buff.elemental_mastery.up)&ticks_remain<3)
+	if TargetDebuffExpires(FLAMESHOCK 3 haste=spell mine=1) or {{BuffPresent(heroism) or BuffPresent(ELEMENTALMASTERY)} and TargetDebuffExpires(FLAMESHOCK 6 haste=spell mine=1)}
+		Spell(FLAMESHOCK)
 
-	#/lava_burst,if=dot.flame_shock.remains>(cast_time+travel_time)
-	if target.debuffExpires(FLAMESHOCK mine=1) > {castTime(LAVABURST) + 1 } Spell(LAVABURST)
+	#/lava_burst,if=dot.flame_shock.remains>cast_time
+	if target.debuffExpires(FLAMESHOCK mine=1) > castTime(LAVABURST) Spell(LAVABURST)
 	
 	#/earth_shock,if=buff.lightning_shield.stack=9
 	if BuffPresent(LIGHTNINGSHIELD stacks=9) Spell(EARTHSHOCK)
 	#/earth_shock,if=buff.lightning_shield.stack>6&dot.flame_shock.remains>cooldown&dot.flame_shock.remains<cooldown+action.flame_shock.tick_time
-	if BuffPresent(LIGHTNINGSHIELD stacks=7) and { target.debuffExpires(FLAMESHOCK mine=1) > spell(LAVABURST) }
-			and { target.debuffExpires(FLAMESHOCK mine=1) < spell(LAVABURST) + timeWithHaste(3) } Spell(EARTHSHOCK)
+	if BuffPresent(LIGHTNINGSHIELD stacks=7) and { target.debuffExpires(FLAMESHOCK mine=1) > spell(EARTHSHOCK) }
+			and { target.debuffExpires(FLAMESHOCK mine=1) < spell(EARTHSHOCK) + timeWithHaste(3) } Spell(EARTHSHOCK)
 	
 	if TotemExpires(fire) Spell(SEARINGTOTEM)
 	#/spiritwalkers_grace,moving=1
@@ -135,6 +136,14 @@ AddIcon help=aoe mastery=1 checkboxon=aoe
 	Spell(EARTHQUAKE)
 	if TargetDebuffPresent(FLAMESHOCK mine=1) Spell(FIRENOVA)
 	Spell(CHAINLIGHTNING)
+}
+
+AddIcon help=cd mastery=1
+{
+	Spell(ELEMENTALMASTERY)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+	Spell(FIREELEMENTALTOTEM)
 }
 
 AddIcon help=main mastery=2
@@ -189,27 +198,12 @@ AddIcon help=aoe mastery=2 checkboxon=aoe
 	Spell(LAVABURST)
 }
 
-AddIcon help=cd
+AddIcon help=cd mastery=2
 {
-	Spell(ELEMENTALMASTERY)
 	Spell(FERALSPIRIT)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	Spell(FIREELEMENTALTOTEM)
-}
-
-AddIcon size=small help=mana
-{
-	if ManaPercent(less 25)
-		Spell(SHAMANISTICRAGE)
-	if ManaPercent(less 50)
-		Spell(THUNDERSTORM)
-}
-
-AddIcon size=small
-{
-	Spell(HEROISM)
-	Spell(BLOODLUST)	
 }
 
 ]]

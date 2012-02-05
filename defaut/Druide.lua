@@ -82,6 +82,8 @@ Define(TIGERSFURY 5217) #cat buff
 	SpellAddBuff(TIGERSFURY TIGERSFURY=6)
 Define(TYPHOON 50516)
 	SpellInfo(TYPHOON cd=20)
+Define(WILDMUSHROOM 88747)
+Define(WILDMUSHROOMDETONATE 88751)
 Define(WRATH 5176) #moonkin
 	SpellInfo(WRATH eclipse=-13)
 
@@ -179,6 +181,12 @@ AddIcon help=main mastery=1
 	if Eclipse(less 0) Spell(WRATH)
 	#/starfire
 	Spell(STARFIRE)
+}
+
+AddIcon help=aoe mastery=1
+{
+	if TotemPresent(1) and TotemPresent(2) and TotemPresent(3) Spell(WILDMUSHROOMDETONATE)
+	if TotemExpires(1) or TotemExpires(2) or TotemExpires(3) Spell(WILDMUSHROOM)
 }
 
 AddIcon help=cd mastery=1

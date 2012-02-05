@@ -72,6 +72,8 @@ Define(THEARTOFWAR 59578)
 Define(JUDGEMENTSOFTHEPURE 53655)
 Define(DIVINEPURPOSE 90174)
 Define(INFUSIONOFLIGHT 54149)
+Define(SACREDDUTY 85433)
+Define(GRANDCRUSADER 85416)
 
 ScoreSpells(SHIELDOFTHERIGHTEOUS JUDGEMENT AVENGERSSHIELD HAMMEROFTHERIGHTEOUS CONSECRATE HOLYWRATH
 	ZEALOTRY  INQUISITION TEMPLARSVERDICT DIVINESTORM EXORCISM HAMMEROFWRATH JUDGEMENT CRUSADERSTRIKE)
@@ -118,14 +120,32 @@ AddIcon help=main mastery=2
 	if BuffExpires(RIGHTEOUSFURY) Spell(RIGHTEOUSFURY)
 	unless InCombat() if BuffExpires(SEALRIGHTEOUSNESS 400) and BuffExpires(SEALOFTRUTH 400) Spell(SEALOFTRUTH)
 	
-	if HolyPower(more 2) Spell(SHIELDOFTHERIGHTEOUS)
-	Spell(CRUSADERSTRIKE)
-
+	#shield_of_the_righteous,if=holy_power=3&(buff.sacred_duty.up|buff.inquisition.up)
+	if HolyPower(more 2) and {BuffPresent(SACREDDUTY) or BuffPresent(INQUISITION)} Spell(SHIELDOFTHERIGHTEOUS)
+	#judgement,if=holy_power=3
+	if HolyPower(more 2) Spell(JUDGEMENT)
+	#inquisition,if=holy_power=3&(buff.inquisition.down|buff.inquisition.remains<5)
+	if HolyPower(more 2) and BuffExpires(INQUISITION 5) Spell(INQUISITION)
+	#divine_plea,if=holy_power<2
+	if HolyPower(less 2) Spell(DIVINEPLEA)
+	#avengers_shield,if=buff.grand_crusader.up&holy_power<3
+	if BuffPresent(GRANDCRUSADER) and HolyPower(less 3) Spell(AVENGERSSHIELD)
+	#judgement,if=buff.judgements_of_the_pure.down
+	if BuffExpires(JUDGEMENTSOFTHEPURE) Spell(JUDGEMENT)
+	#crusader_strike,if=holy_power<3
+	if HolyPower(less 3) Spell(CRUSADERSTRIKE)
+	#hammer_of_wrath
+	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
+	#avengers_shield,if=cooldown.crusader_strike.remains>=0.2
+	if spell(CRUSADERSTRIKE)>0.2 Spell(AVENGERSSHIELD)
+	#judgement
 	Spell(JUDGEMENT)
-	Spell(AVENGERSSHIELD)
+	#consecration
+	Spell(CONSECRATE)
+	#holy_wrath
 	Spell(HOLYWRATH)
-	Spell(CONSECRATE priority=2)
-	Spell(DIVINEPLEA priority=2)
+	#divine_plea,if=holy_power<1
+	if HolyPower(less 1) Spell(DIVINEPLEA)
 }
 
 AddIcon help=offgcd mastery=2
@@ -161,27 +181,25 @@ AddIcon help=main mastery=3
     
 	#judgement,if=buff.judgements_of_the_pure.down
 	if BuffExpires(JUDGEMENTSOFTHEPURE 0) Spell(JUDGEMENT)
-	#inquisition,if=(buff.inquisition.down|buff.inquisition.remains<5)&(buff.holy_power.react==3|buff.hand_of_light.react)
-	if BuffExpires(INQUISITION 5) and {HolyPower(equal 3) or BuffPresent(DIVINEPURPOSE)} Spell(INQUISITION)
-	#templars_verdict,if=buff.holy_power.react==3
-	if HolyPower(more 2) Spell(TEMPLARSVERDICT)
-	#crusader_strike,if=buff.hand_of_light.react&(buff.hand_of_light.remains>2)&(buff.holy_power.react<3)
-	if BuffPresent(DIVINEPURPOSE 3) and HolyPower(less 3) Spell(CRUSADERSTRIKE)
-	#templars_verdict,if=buff.hand_of_light.react
+	#crusader_strike,if=holy_power<3
+	if HolyPower(less 3) Spell(CRUSADERSTRIKE)
+	#judgement,if=buff.zealotry.down&holy_power<3
+	if BuffExpires(ZEALOTRY) and HolyPower(less 3) Spell(JUDGEMENT)
+	#inquisition,if=(buff.inquisition.down|buff.inquisition.remains<=2)&(holy_power>=3|buff.divine_purpose.react)
+	if BuffExpires(INQUISITION 2) and {HolyPower(equal 3) or BuffPresent(DIVINEPURPOSE)} Spell(INQUISITION)
+	#templars_verdict,if=buff.divine_purpose.react
 	if BuffPresent(DIVINEPURPOSE) Spell(TEMPLARSVERDICT)
-	#crusader_strike
-	Spell(CRUSADERSTRIKE)
-	#hammer_of_wrath
-	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
+	#templars_verdict,if=holy_power=3
+	if HolyPower(more 2) Spell(TEMPLARSVERDICT)
 	#exorcism,if=buff.the_art_of_war.react
 	if BuffPresent(THEARTOFWAR) Spell(EXORCISM)
-	#judgement,if=buff.judgements_of_the_pure.remains<2
-	if BuffExpires(JUDGEMENTSOFTHEPURE 2) Spell(JUDGEMENT)
+	#hammer_of_wrath
+	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
+	#judgement,if=set_bonus.tier13_2pc_melee&buff.zealotry.up&holy_power<3
+	if ArmorSetParts(T13 more 1) and BuffPresent(ZEALOTRY) and HolyPower(less 3) Spell(JUDGEMENT)
 	#wait,sec=0.1,if=cooldown.crusader_strike.remains<0.5
-	unless 0.5 before Spell(CRUSADERSTRIKE)
+	if spell(CRUSADERSTRIKE) > 0.5
 	{
-		#judgement
-		Spell(JUDGEMENT)
 		#holy_wrath
 		Spell(HOLYWRATH)
 		#divine_plea
@@ -203,12 +221,12 @@ AddIcon help=aoe mastery=3 checkboxon=aoe
 
 AddIcon help=cd mastery=3
 {
-	#/zealotry
-	Spell(ZEALOTRY)
-    #/guardian_of_ancient_kings,if=buff.zealotry.remains<31|cooldown.zealotry.remains>60
-	if BuffExpires(ZEALOTRY 31) or {spell(ZEALOTRY)>60}	Spell(GUARDIANOFANCIENTKINGS)
-	#/avenging_wrath,if=buff.zealotry.remains<21
-	if BuffExpires(ZEALOTRY 21)
+    #/guardian_of_ancient_kings,if=cooldown.zealotry.remains<10
+	if spell(ZEALOTRY)<10 Spell(GUARDIANOFANCIENTKINGS)
+	#/zealotry,if=cooldown.guardian_of_ancient_kings.remains>0&cooldown.guardian_of_ancient_kings.remains<292
+	if {spell(GUARDIANOFANCIENTKINGS)>0} and {spell(GUARDIANOFANCIENTKINGS)<292} Spell(ZEALOTRY)
+	#/avenging_wrath,if=buff.zealotry.up
+	if BuffPresent(ZEALOTRY)
 		Spell(AVENGINGWRATH)
 	Item(Trinket0Slot usable=1)
     Item(Trinket1Slot usable=1)
