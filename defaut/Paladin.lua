@@ -135,7 +135,7 @@ AddIcon help=main mastery=2
 	#crusader_strike,if=holy_power<3
 	if HolyPower(less 3) Spell(CRUSADERSTRIKE)
 	#hammer_of_wrath
-	if TargetLifePercent(less 20) or BuffPresent(AVENGINGWRATH) Spell(HAMMEROFWRATH)
+	if TargetLifePercent(less 20) Spell(HAMMEROFWRATH)
 	#avengers_shield,if=cooldown.crusader_strike.remains>=0.2
 	if spell(CRUSADERSTRIKE)>0.2 Spell(AVENGERSSHIELD)
 	#judgement

@@ -2225,7 +2225,7 @@ function Ovale:CalculerMeilleureAction(element)
 		local y = elementB.origin
 		local z = elementB.rate
 		
-		if not a or not x then
+		if not a or not x or not b or not y then
 			self:Log("operator " .. element.operator .. ": a or x is nil")
 			return nil
 		end
