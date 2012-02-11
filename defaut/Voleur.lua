@@ -71,10 +71,10 @@ Define(SHADOWSTEPBUFF 36563)
 Define(VANISHBUFF 11327)
 Define(SHALLOWINSIGHT 84745)
 Define(MODERATEINSIGHT 84746)
-Define(DEEPINSIGHT 84747)
 Define(OVERKILL 58426)
 Define(MASTEROFSUBTLETY 31223)
 Define(FINDWEAKNESS 91023)
+SpellList(DEEPINSIGHT 84745 84746 84747)
 
 #Items
 Define(INSTANTPOISON 6947)
@@ -85,7 +85,6 @@ Define(TALENTCUTTOTHECHASE 2070)
 Define(TALENTENERGETICRECOVERY 11665)
 Define(TALENTHEMORRHAGE 681)
 
-SpellList(insight 84745 84746 84747)
 
 ScoreSpells(SLICEANDDICE HUNGERFORBLOOD ENVENOM RUPTURE EVISCERATE MUTILATE SINISTERSTRIKE)
 
@@ -148,41 +147,40 @@ AddIcon help=main mastery=2
 		if WeaponEnchantExpires(offhand 300) Item(DEADLYPOISON)
 	}
 
-	#actions+=/slice_and_dice,if=buff.slice_and_dice.down
-	#actions+=/slice_and_dice,if=buff.slice_and_dice.remains<2
-	if {BuffExpires(SLICEANDDICE 0) and ComboPoints(more 0)} or {BuffExpires(SLICEANDDICE 2) and ComboPoints(more 1)}
+	#slice_and_dice,if=buff.slice_and_dice.down
+	#slice_and_dice,if=buff.slice_and_dice.remains<2
+	if BuffExpires(SLICEANDDICE 2) and ComboPoints(more 0)
 		Spell(SLICEANDDICE)
 
-	#actions+=/killing_spree,if=energy<35&buff.slice_and_dice.remains>4&buff.adrenaline_rush.down
-	unless BuffPresent(ADRENALINERUSH) if Mana(less 35) and BuffPresent(SLICEANDDICE 4) and BuffPresent(DEEPINSIGHT 5) Spell(KILLINGSPREE)
+	#killing_spree,if=energy<35&buff.slice_and_dice.remains>4&buff.adrenaline_rush.down
+	if Mana(less 35) and BuffPresent(SLICEANDDICE 4) and BuffExpires(ADRENALINERUSH) 
+		Spell(KILLINGSPREE)
 
-	#actions+=/adrenaline_rush,if=energy<35
-	unless BuffPresent(KILLINGSPREE) if Mana(less 20) Spell(ADRENALINERUSH)
+	#adrenaline_rush,if=energy<35
+	unless BuffPresent(KILLINGSPREE) if Mana(less 35) Spell(ADRENALINERUSH)
 
-	#actions+=/eviscerate,if=combo_points=5&buff.bandits_guile.stack>=12
-	if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 4) and BuffPresent(insight)
-	{
-		if TargetDebuffPresent(bleed) and TargetDebuffExpires(RUPTURE 0 mine=1) Spell(RUPTURE)
+	#eviscerate,if=combo_points=5&buff.bandits_guile.stack>=12
+	if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 4) and BuffPresent(DEEPINSIGHT 12)
 		Spell(EVISCERATE)
-	}
 
-	#actions+=/rupture,if=!ticking&combo_points=5&target.time_to_die>10
-	if ComboPoints(more 4) and TargetDebuffExpires(RUPTURE 0 mine=1) and TargetDeadIn(more 10) Spell(RUPTURE)
+	#rupture,if=!ticking&combo_points=5&target.time_to_die>10
+	if TargetDebuffExpires(RUPTURE 0 mine=1) and ComboPoints(more 4) and TargetDeadIn(more 10)
+		Spell(RUPTURE)
 
-	#actions+=/eviscerate,if=combo_points=5
+	#eviscerate,if=combo_points=5
 	if ComboPoints(equal 5) Spell(EVISCERATE)
 
-	#actions+=/revealing_strike,if=combo_points=4&buff.revealing_strike.down
+	#revealing_strike,if=combo_points=4&buff.revealing_strike.down
 	if ComboPoints(equal 4) and TargetDebuffExpires(REVEALINGSTRIKE 0 mine=1) Spell(REVEALINGSTRIKE)
 
-	#actions+=/sinister_strike,if=combo_points<5
+	#sinister_strike,if=combo_points<5
 	if ComboPoints(less 5) Spell(SINISTERSTRIKE)
 }
 
 AddIcon help=aoe mastery=2
 {
 	unless BuffPresent(BLADEFLURRY) Spell(BLADEFLURRY)
-	if BuffPresent(insight)
+	if BuffPresent(DEEPINSIGHT)
 	{
 		unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
 	}
@@ -192,11 +190,6 @@ AddIcon help=cd mastery=2
 {
 	#actions+=/kick
 	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
-	#adrenaline_rush,if=energy<20
-	if BuffPresent(insight)
-	{
-		unless BuffPresent(KILLINGSPREE) if Mana(less 20) Spell(ADRENALINERUSH)
-	}
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }

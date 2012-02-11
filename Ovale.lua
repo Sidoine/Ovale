@@ -164,7 +164,17 @@ Ovale.buffSpellList =
         17800, -- Shadow and Flame
         22959 -- Critical Mass
     },
-	-- physicaldamagetaken
+	physicaldamagetaken=
+	{
+		30069, -- Blood Frenzy (rank 1)
+		30070, -- Blood Frenzy (rank 2)
+		81327, -- Brittle Bones (rank 1)
+		81328, -- Brittle Bones (rank 2)
+		58684, -- Savage Combat (rank 1)
+		58683, -- Savage Combat (rank 2)
+		55749, -- Acid Spit (Worm)
+		50518, -- Ravage (Ravager)
+	},
 	lowerphysicaldamage=
 	{
 		99, -- Demoralizing Roar
@@ -172,7 +182,8 @@ Ovale.buffSpellList =
 		1160, -- Demoralizing Shout
 		26017, -- Vindication
 		81130, -- Scarlet Fever
-		50256 --Demoralizing Roar (Bear)
+		50256, --Demoralizing Roar (Bear)
+		24423, -- Demoralizing Screech (Carrion Bird)
 	},
 	meleeslow=
 	{
@@ -182,7 +193,8 @@ Ovale.buffSpellList =
 		68055, --Judgments of the just
 		6343, --Thunderclap
 		8042, --Earth Shock
-		50285 --Dust Cloud (Tallstrider)
+		54404, --Dust Cloud (Tallstrider)
+		90315, -- Tailspin (Fox)
 	},
 	castslow =
 	{
@@ -233,6 +245,17 @@ Ovale.buffSpellList =
 		5229, -- Enrage (Bear)
         52610, -- Savage Roar (Cat)
         76691, -- Vengeance (All Tank Specs)
+	},
+	criticalstrike =
+	{
+		51740, -- Elemental Oath
+		51698, -- Honor Among Thieves (rank 1)
+		51700, -- Honor Among Thieves (rank 2)
+		51701, -- Honor Among Thieves (rank 3)
+		17007, -- Leader of the Pack
+		29801, -- Rampage
+		24604, -- Furious Howl (Wolf)
+		90309, -- Terrifying Roar (Devilsaur)
 	}
 }
 

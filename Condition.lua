@@ -454,7 +454,8 @@ Ovale.conditions=
 		return compare(nombre, condition[2], condition[3])
 	end,
 	attackPower = function(condition)
-		return UnitAttackPower("player"), 0, 0 
+		local base, posBuff, negBuff = UnitAttackPower("player")
+		return base + posBuff + negBuff, 0, 0 
 	end,
 	BuffDuration = function(condition)
 		--local name, rank, icon, count, debuffType, duration = UnitBuff("player", Ovale:GetSpellInfoOrNil(condition[1]))
