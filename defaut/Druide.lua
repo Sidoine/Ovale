@@ -202,9 +202,15 @@ AddIcon help=cd mastery=1
 AddFunction AddCombo
 {
 	if CheckBoxOn(shred) Spell(SHRED)
-	if CheckBoxOff(shred) Spell(MANGLE)
+	if CheckBoxOff(shred) Spell(MANGLECAT)
 }
 		
+AddFunction	BITWHP
+{
+	if ArmorSetParts(T13 more 1) 60
+	25
+}
+	
 AddIcon help=main mastery=2
 {
 	if Stance(1) # bear
@@ -230,8 +236,15 @@ AddIcon help=main mastery=2
 
 	if Stance(3) # cat
 	{
-		#tigers_fury,if=energy<=35
-		if Mana(less 36) Spell(TIGERSFURY)
+		#tigers_fury,if=energy<=35&(!buff.omen_of_clarity.react)
+		if ArmorSetParts(T13 more 3)
+		{
+			if Mana(less 46) and BuffExpires(CLEARCASTING) Spell(TIGERSFURY)
+		}
+		if ArmorSetParts(T13 less 4)
+		{
+			if Mana(less 36) and BuffExpires(CLEARCASTING) Spell(TIGERSFURY)
+		}
 		
 		#/berserk,if=buff.tigers_fury.up|(target.time_to_die<15&cooldown.tigers_fury.remains>6
 		if BuffPresent(TIGERSFURY) or {TargetDeadIn(less 15) and 6s before Spell(TIGERSFURY)} Spell(BERSERK)
@@ -247,19 +260,19 @@ AddIcon help=main mastery=2
 		if TargetDebuffExpires(bleed 0) and CheckBoxOn(mangle)
 			Spell(MANGLECAT)
 			
-		#ravage,if=buff.stampede_cat.up&buff.stampede_cat.remains<=1
+		#ravage,if=(buff.stampede_cat.up|buff.t13_4pc_melee.up)&(buff.stampede_cat.remains<=1|buff.t13_4pc_melee.remains<=1)
 		if BuffPresent(STAMPEDE) and BuffExpires(STAMPEDE 1) Spell(RAVAGE)
 		
 		#ferocious_bite,if=buff.combo_points.stack>=1&dot.rip.ticking&dot.rip.remains<=1&target.health_pct<=25
-		if ComboPoints(more 0) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 1 mine=1) and TargetLifePercent(less 25)
+		if ComboPoints(more 0) and TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 1 mine=1) and target.lifePercent()<BITWHP()
 			Spell(FEROCIOUSBITE)
 		
 		#ferocious_bite,if=buff.combo_points.stack>=5&dot.rip.ticking&target.health_pct<=25
-		if ComboPoints(more 4) and TargetDebuffPresent(RIP mine=1) and TargetLifePercent(less 25)
+		if ComboPoints(more 4) and TargetDebuffPresent(RIP mine=1) and target.lifePercent()<BITWHP()
 			Spell(FEROCIOUSBITE)
 		
 		#/shred,extend_rip=1,if=dot.rip.ticking&dot.rip.remains<=4&target.health_pct>25  TODO: extend_rip=1?
-		if TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and TargetLifePercent(more 25) AddCombo()
+		if TargetDebuffPresent(RIP mine=1) and TargetDebuffExpires(RIP 4 mine=1) and target.lifePercent()>BITWHP() AddCombo()
 		
 		#rip,if=buff.combo_points.stack>=5&target.time_to_die>=6&dot.rip.remains<2.0&(buff.berserk.up|dot.rip.remains<=cooldown.tigers_fury.remains)
 		if ComboPoints(more 4) and TargetDeadIn(more 6) and TargetDebuffExpires(RIP 2 mine=1) and 
