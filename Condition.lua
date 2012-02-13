@@ -184,12 +184,13 @@ local function getOtherAura(spellId, suppTime)
 	Ovale:EnableOtherAuras()
 	local otherAura = Ovale.otherAura[spellId]
 	if otherAura then
-	--	print("otherAura")
+		Ovale:Log("otherAura")
+		
 		local maxTime = 0
 		local minTime = nil
 		suppTime = suppTime or 10
 		for target,expireTime in pairs(otherAura) do
-	--		print("target "..target.. " "..expireTime)
+			Ovale:Log("target "..target.. " "..expireTime)
 			if target~=UnitGUID("target") then
 				if Ovale.maintenant - suppTime > expireTime then
 					otherAura[target] = nil
@@ -203,7 +204,7 @@ local function getOtherAura(spellId, suppTime)
 				end	
 			end
 		end
-	--	print("maxTime final "..maxTime)
+		Ovale:Log("maxTime final "..maxTime)
 		return minTime, maxTime
 	end
 	return nil
@@ -413,7 +414,7 @@ local function getTargetDead(target)
 			end
 		end
 	end
-	if not lastSPD[target] or lastSPD[target]<1 then
+	if not lastSPD[target] or lastSPD[target]<=0 then
 		return nil
 	end
 	-- Rough estimation
@@ -1000,9 +1001,9 @@ Ovale.conditions=
 		local minTime, maxTime = getOtherAura(condition[1], condition[3])
 		if minTime then
 			local timeBefore = condition[2] or 0
-			return minTime - timeBefore
+			return minTime - timeBefore, nil
 		end
-		return nil
+		return 0, nil
 	end,
 	OtherDebuffPresent = function(condition)
 		local minTime, maxTime = getOtherAura(condition[1], condition[3])
