@@ -721,7 +721,7 @@ function Ovale:CompileAll()
 end
 
 function Ovale:HandleProfileChanges()
-	if (self.firstInit) then
+	if self.firstInit then
 		if (self.db.profile.code) then
 			self.needCompile = true
 		end
@@ -767,16 +767,20 @@ function Ovale:FirstInit()
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
 	
-	if (self.db.profile.code) then
+	if self.db.profile.code then
 		self.needCompile = true
 	end
 	self:UpdateFrame()
-	if (not Ovale.db.profile.display) then
+	if not Ovale.db.profile.display then
 		self.frame:Hide()
 	end
 end
 
 function Ovale:OnEnable()
+	if not self.firstInit then
+		self:FirstInit()
+	end
+
     -- Called when the addon is enabled
 	RegisterAddonMessagePrefix("Ovale")
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -800,9 +804,6 @@ function Ovale:OnEnable()
 	self:RegisterEvent("GLYPH_ADDED")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	    
-	if (not self.firstInit) then
-		self:FirstInit()
-	end
 	self:UNIT_AURA("","player")
 	
 	self:UpdateVisibility()

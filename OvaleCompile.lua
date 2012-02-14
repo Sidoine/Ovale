@@ -37,6 +37,32 @@ local function ParseParameters(params)
 end
 
 
+local function HasGlyph(spellId)
+	for i = 1, GetNumGlyphSockets() do
+		local enalbled, glypType, glyphSpellID = GetGlyphSocketInfo(i)
+		if (glyphSpellID == spellId) then
+			return true
+		end
+	end
+	return false
+end
+
+local function HasTalent(talentId)
+	if not Ovale.listeTalentsRemplie then
+		Ovale:RemplirListeTalents()
+	end
+	if Ovale.listeTalentsRemplie then
+		if Ovale.pointsTalent[talentId]~=nil then
+			return Ovale.pointsTalent[talentId]>0
+		else
+			Ovale:Print("Unknown talent "..talentId)
+			return false
+		end
+	else
+		return false
+	end
+end
+
 local function TestConditions(paramList)
 	if paramList.glyph and not HasGlyph(paramList.glyph) then
 		return false
@@ -154,31 +180,6 @@ local function ParseSpellAddTargetDebuff(params)
 	return ""
 end
 
-local function HasGlyph(spellId)
-	for i = 1, GetNumGlyphSockets() do
-		local enalbled, glypType, glyphSpellID = GetGlyphSocketInfo(i)
-		if (glyphSpellID == spellId) then
-			return true
-		end
-	end
-	return false
-end
-
-local function HasTalent(talentId)
-	if not Ovale.listeTalentsRemplie then
-		Ovale:RemplirListeTalents()
-	end
-	if Ovale.listeTalentsRemplie then
-		if Ovale.pointsTalent[talentId]~=nil then
-			return Ovale.pointsTalent[talentId]>0
-		else
-			Ovale:Print("Unknown talent "..talentId)
-			return false
-		end
-	else
-		return false
-	end
-end
 
 local function ParseSpellInfo(params)
 	local paramList = ParseParameters(params)

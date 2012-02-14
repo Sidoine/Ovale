@@ -144,11 +144,7 @@ do
 		end
 		
 		local now = GetTime()
-		
-		if not Ovale.masterNodes then
-			return
-		end
-		
+				
 		if not Ovale.refreshNeeded and self.lastUpdate and now < self.lastUpdate + Ovale.db.profile.apparence.updateInterval then
 			return
 		end
