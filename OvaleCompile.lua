@@ -36,6 +36,63 @@ local function ParseParameters(params)
 	return paramList
 end
 
+
+local function TestConditions(paramList)
+	if paramList.glyph and not HasGlyph(paramList.glyph) then
+		return false
+	end
+	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
+		return false
+	end
+	if paramList.talent and not HasTalent(paramList.talent) then
+		return false
+	end
+	if paramList.checkboxon then
+		local cb = paramList.checkboxon
+		if not Ovale.casesACocher[cb] then
+			Ovale.casesACocher[cb] = {}
+		end
+		Ovale.casesACocher[cb].compile = true
+		if not Ovale.db.profile.check[cb] then
+			return false
+		end
+	end
+	if paramList.checkboxoff then
+		local cb = paramList.checkboxoff
+		if not Ovale.casesACocher[cb] then
+			Ovale.casesACocher[cb] = {}
+		end
+		Ovale.casesACocher[cb].compile = true
+		if Ovale.db.profile.check[cb] then
+			return false
+		end
+	end
+	if paramList.list and paramList.item then
+		local list = paramList.list
+		local key = paramList.item
+		if not Ovale.listes[list] then
+			Ovale.listes[list] = { items = {}}
+		end
+		Ovale.listes[list].compile = true
+		if Ovale.db.profile.list[list] ~= key then
+			return false
+		end
+	end
+	if paramList.itemset and paramList.itemcount then
+		local set = paramList.itemset
+		local count = paramList.itemcount
+		local nombre = 0
+		Ovale.compileOnItems = true
+		if OvaleEquipement.nombre[set] then
+			nombre = OvaleEquipement.nombre[set]
+		end
+		if nombre<=count then
+			return false
+		end
+	end
+	return true
+end
+
 local function ParseTime(value)
 	return AddNode({type="time", value=tonumber(value)})
 end
@@ -127,10 +184,7 @@ local function ParseSpellInfo(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
 	if spellId then
-		if paramList.glyph and not HasGlyph(paramList.glyph) then
-			return ""
-		end
-		if paramList.talent and not HasTalent(paramList.talent) then
+		if not TestConditions(paramList) then
 			return ""
 		end
 		local spellInfo = Ovale:GetSpellInfo(spellId)
@@ -247,49 +301,6 @@ local function subtest(text, pattern, func)
 	return text
 end
 
-local function TestConditions(paramList)
-	if paramList.glyph and not HasGlyph(paramList.glyph) then
-		return false
-	end
-	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
-		return false
-	end
-	if paramList.talent and not HasTalent(paramList.talent) then
-		return false
-	end
-	if paramList.checkboxon then
-		local cb = paramList.checkboxon
-		if not Ovale.casesACocher[cb] then
-			Ovale.casesACocher[cb] = {}
-		end
-		Ovale.casesACocher[cb].compile = true
-		if not Ovale.db.profile.check[cb] then
-			return false
-		end
-	end
-	if paramList.checkboxoff then
-		local cb = paramList.checkboxoff
-		if not Ovale.casesACocher[cb] then
-			Ovale.casesACocher[cb] = {}
-		end
-		Ovale.casesACocher[cb].compile = true
-		if Ovale.db.profile.check[cb] then
-			return false
-		end
-	end
-	if paramList.list and paramList.item then
-		local list = paramList.list
-		local key = paramList.item
-		if not Ovale.listes[list] then
-			Ovale.listes[list] = { items = {}}
-		end
-		Ovale.listes[list].compile = true
-		if Ovale.db.profile.list[list] ~= key then
-			return false
-		end
-	end
-	return true
-end
 
 local function ParseAddListItem(list, item, text, params)
 	local paramList = ParseParameters(params)
@@ -442,6 +453,7 @@ local function ParseL(text)
 end
 
 function Ovale:Compile(text)
+	self.compileOnItems = false
 	self.bug = false
 	node = {}
 	defines = {}

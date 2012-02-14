@@ -79,6 +79,7 @@ Ovale.damageMultiplier = 1
 Ovale.numberOfEnemies = nil
 Ovale.enemies = {}
 Ovale.refreshNeeded = false
+Ovale.compileOnItems = false
 
 -- List haste buff that does not appear in the character sheet and that are not raid wide buffs
 Ovale.selfHasteBuff =
@@ -797,6 +798,7 @@ function Ovale:OnEnable()
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("GLYPH_UPDATED")
 	self:RegisterEvent("GLYPH_ADDED")
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	    
 	if (not self.firstInit) then
 		self:FirstInit()
@@ -808,6 +810,7 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
+	self:UnregisterEvent("UNIT_INVENTORY_CHANGED")
 	self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
     self:UnregisterEvent("PLAYER_REGEN_ENABLED")
     self:UnregisterEvent("PLAYER_REGEN_DISABLED")
@@ -858,6 +861,13 @@ function Ovale:SPELLS_CHANGED()
 	-- self:RemplirListeTalents()
 	self:FillSpellList()
 	self.needCompile = true
+end
+
+function Ovale:UNIT_INVENTORY_CHANGED()
+	self.needCompile = self.compileOnItems
+	if not self.needCompile then
+		self.refreshNeeded = true
+	end
 end
 
 --Called when the user changed his key bindings
