@@ -865,8 +865,9 @@ function Ovale:SPELLS_CHANGED()
 end
 
 function Ovale:UNIT_INVENTORY_CHANGED()
-	self.needCompile = self.compileOnItems
-	if not self.needCompile then
+	if self.compileOnItems then
+		self.needCompile = true
+	else
 		self.refreshNeeded = true
 	end
 end
