@@ -119,8 +119,6 @@ AddIcon help=main mastery=1
 
 	if Speed(more 0)
 	{
-		#/typhoon,moving=1
-		Spell(TYPHOON)
 		if BuffPresent(SHOOTINGSTARS) Spell(STARSURGE)
 		if TargetDebuffExpires(INSECTSWARM 4 mine=1) and TargetDeadIn(more 6)
 			Spell(INSECTSWARM)
@@ -187,6 +185,8 @@ AddIcon help=aoe mastery=1
 {
 	if TotemPresent(1) and TotemPresent(2) and TotemPresent(3) Spell(WILDMUSHROOMDETONATE)
 	if TotemExpires(1) or TotemExpires(2) or TotemExpires(3) Spell(WILDMUSHROOM)
+	#/typhoon,moving=1
+	if Speed(more 0) Spell(TYPHOON)
 }
 
 AddIcon help=cd mastery=1
