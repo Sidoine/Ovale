@@ -688,6 +688,23 @@ Ovale.conditions=
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
 	end,
+	debuffTick = function(condition)
+		local start, ending = GetTargetAura(condition, "HARMFUL", getTarget(condition.target))
+		local si = Ovale.spellInfo[condition[1]]
+		if not si or not si.duration then
+			return nil
+		end
+		local ticks = floor(Ovale.spellHaste * (si.duration/(si.tick or 3)) + 0.5)
+		local tickLength = (ending - start) / ticks
+		local tickTime = start + tickLength
+		for i=1,ticks do
+			if Ovale.currentTime<=tickTime then
+				break
+			end
+			tickTime = tickTime + tickLength
+		end
+		return tickTime, 0, -1
+	end,
 	Distance = function(condition)
 		if LRC then
 			local target = getTarget(condition.target)
