@@ -120,6 +120,7 @@ Define(ENRAGEWRECKINGCREW 57519)
 Define(SLAMTALENT 2233)
 Define(SUDDENDEATH 52437)
 Define(TITANSGRIPTALENT 9658)
+Define(EXECUTIONERTALENT 9644)
 
 #Glyphs
 Define(GLYPHOFBERSERKERRAGE 58096)
@@ -128,6 +129,8 @@ AddCheckBox(aoe L(AOE) default)
 AddCheckBox(demo SpellName(DEMOSHOUT))
 AddCheckBox(sunder SpellName(SUNDERARMOR) default)
 AddCheckBox(dancing SpellName(BERSERKERSTANCE) default mastery=1)
+AddCheckBox(leap SpellName(HEROICLEAP) mastery=1)
+AddCheckBox(leap SpellName(HEROICLEAP) mastery=2)
 AddListItem(shout none L(None))
 AddListItem(shout battle SpellName(BATTLESHOUT) default)
 AddListItem(shout command SpellName(COMMANDINGSHOUT))
@@ -153,15 +156,24 @@ AddIcon help=main mastery=1
 	}
 
 	#/rend,if=!ticking
-	if TargetDebuffExpires(RENDDEBUFF mine=1) and TargetDeadIn(more 15) Spell(REND)
+	if TargetDebuffExpires(RENDDEBUFF mine=1) and TargetDeadIn(more 10) Spell(REND)
 	#/mortal_strike,if=target.health_pct>20
 	if TargetLifePercent(more 20) Spell(MORTALSTRIKE)
 	#/colossus_smash,if=buff.colossus_smash.down
 	if TargetDebuffExpires(COLOSSUSSMASH mine=1) Spell(COLOSSUSSMASH)
-	#/mortal_strike,if=target.health_pct<=20&(buff.colossus_smash.down|dot.rend.remains<3|buff.wrecking_crew.down|rage<30)
+	if TalentPoints(EXECUTIONERTALENT more 0)
+	{
+		#/execute,if=buff.executioner_talent.remains<1.5
+		if BuffExpires(EXECUTIONER 1.5) and TargetLifePercent(less 20) Spell(EXECUTE)
+	}
+	
+	#/mortal_strike,if=target.health_pct<=20&(buff.colossus_smash.down|dot.rend.remains<3|buff.wrecking_crew.down|rage<=25|rage>=35)
 	if TargetLifePercent(less 20) and {TargetDebuffExpires(COLOSSUSSMASH mine=1) or
-		TargetDebuffExpires(REND 3 mine=1) or BuffExpires(ENRAGEWRECKINGCREW) or Mana(less 30)}
+		TargetDebuffExpires(REND 3 mine=1) or BuffExpires(ENRAGEWRECKINGCREW) or Mana(less 26) or Mana(more 34)}
 		Spell(MORTALSTRIKE)
+	#/execute,if=rage>90
+	if Mana(more 90) and TargetLifePercent(less 20) Spell(EXECUTE)
+	
 	if CheckBoxOn(dancing)
 	{
 		#/stance,choose=battle,if=target.health_pct>20&(buff.taste_for_blood.up|buff.overpower.up)&rage<=75&cooldown.mortal_strike.remains>=1.5,use_off_gcd=1
@@ -172,10 +184,10 @@ AddIcon help=main mastery=1
 	if BuffPresent(TASTEFORBLOOD) Spell(OVERPOWER)
 	#/overpower
 	Spell(OVERPOWER usable=1)
-	#/execute,if=buff.battle_trance.up
-	if BuffPresent(BATTLETRANCE) and TargetLifePercent(less 20) Spell(EXECUTE)
-	#/colossus_smash,if=buff.colossus_smash.remains<=1.5&buff.inner_rage.down
-	if TargetDebuffExpires(COLOSSUSSMASH 1.5 mine=1) and BuffExpires(INNERRAGE)
+	#/execute
+	if TargetLifePercent(less 20) Spell(EXECUTE)
+	#/colossus_smash,if=buff.colossus_smash.remains<=1.5
+	if TargetDebuffExpires(COLOSSUSSMASH 1.5 mine=1)
 		Spell(COLOSSUSSMASH)
 	#/slam,if=rage>=35|buff.battle_trance.up&buff.inner_rage.down
 	if Mana(more 34) or {BuffPresent(BATTLETRANCE) and BuffExpires(INNERRAGE)} Spell(SLAM)
@@ -187,8 +199,11 @@ AddIcon help=offgcd mastery=1
 {
 	if target.IsInterruptible() Spell(PUMMEL)
 	
-	#/berserker_rage,if=rage<=95,use_off_gcd=1
-	if Glyph(GLYPHOFBERSERKERRAGE) and Mana(less 96) Spell(BERSERKERRAGE)
+	#/heroic_leap,use_off_gcd=1,if=buff.colossus_smash.up
+	if CheckBoxOn(leap) and TargetDebuffPresent(COLOSSUSSMASH) Spell(HEROICLEAP)
+	
+	#/berserker_rage,if=buff.deadly_calm.down&cooldown.deadly_calm.remains>1.5&rage<=95,use_off_gcd=1
+	if Glyph(GLYPHOFBERSERKERRAGE) and BuffExpires(DEADLYCALM) and {spell(DEADLYCALM)>1.5} and Mana(less 96) Spell(BERSERKERRAGE)
 	#/deadly_calm,use_off_gcd=1
 	Spell(DEADLYCALM)
 	#/inner_rage,if=buff.deadly_calm.down&cooldown.deadly_calm.remains>15,use_off_gcd=1
@@ -301,6 +316,8 @@ AddIcon help=main mastery=2
 AddIcon help=offgcd mastery=2
 {
 	if target.IsInterruptible() Spell(PUMMEL)
+	#/heroic_leap,use_off_gcd=1,if=buff.colossus_smash.up
+	if CheckBoxOn(leap) and TargetDebuffPresent(COLOSSUSSMASH) Spell(HEROICLEAP)
 	#/heroic_strike,if=((rage>=85&target.health_pct>=20)|buff.battle_trance.up|((buff.incite.up|buff.colossus_smash.up)&((rage>=50&target.health_pct>=20)|(rage>=75&target.health_pct<20))))
 	if {Mana(more 84) and TargetLifePercent(more 20)} or BuffPresent(BATTLETRANCE) or 
 			{{BuffPresent(INCITE) or TargetDebuffPresent(COLOSSUSSMASH mine=1)} and {{Mana(more 49) and TargetLifePercent(more 20)} or {Mana(more 74) and TargetLifePercent(less 20)}}}
