@@ -18,6 +18,22 @@
 	Modifed for Ovale
 ]]
 
+OvaleSwing = LibStub("AceAddon-3.0"):NewAddon("OvaleSwing", "AceEvent-3.0")
+
+--<public-static-properties>
+OvaleSwing.ohNext = nil
+OvaleSwing.dual = false
+OvaleSwing.starttime = nil
+OvaleSwing.duration = nil
+OvaleSwing.ohStartTime = nil
+OvaleSwing.ohDuration = nil
+OvaleSwing.delay = nil
+OvaleSwing.startdelay = nil
+OvaleSwing.swingmode = nil
+
+--</public-static-properties>
+
+--<private-static-properties>
 local autoshotname = GetSpellInfo(75)
 local resetspells = {
 }
@@ -31,11 +47,10 @@ local _, playerclass = UnitClass('player')
 local unpack = unpack
 local math_abs = math.abs
 local GetTime = GetTime
-
-OvaleSwing = LibStub("AceAddon-3.0"):NewAddon("OvaleSwing", "AceEvent-3.0")
-
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
+--</private-static-properties>
 
+--<public-static-methods>
 function OvaleSwing:OnEnable()
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
@@ -86,7 +101,7 @@ end
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
 	if srcName == UnitName("player") then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
-			self:MeleeSwing(Ovale.maintenant)
+			self:MeleeSwing(OvaleState.maintenant)
 		end
 	end
 end
@@ -108,7 +123,7 @@ end
 function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
 	if unit == "player" then
 		if resetspells[spell] then
-			self:MeleeSwing(Ovale.maintenant)
+			self:MeleeSwing(OvaleState.maintenant)
 		end
 		if delayspells[spell] and self.startdelay then
 			self.delay = GetTime() - self.startdelay
@@ -203,3 +218,4 @@ function OvaleSwing:GetNext(which)
 		end
 	end
 end
+--</public-static-methods>

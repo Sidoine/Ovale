@@ -1,6 +1,10 @@
 OvaleEquipement = LibStub("AceAddon-3.0"):NewAddon("OvaleEquipement", "AceEvent-3.0")
 
+--<public-static-properties>
 OvaleEquipement.nombre = {}
+--</public-static-properties>
+
+--<public-static-methods>
 
 function OvaleEquipement:OnEnable()
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
@@ -266,3 +270,6 @@ end
 function OvaleEquipement:PLAYER_ENTERING_WORLD(event)
 	self:Refresh()
 end
+
+--</public-static-methods>
+

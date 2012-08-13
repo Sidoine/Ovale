@@ -1,9 +1,14 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
+OvaleCompile = {}
+
+--<private-static-properties>
 local node={}
 local defines = {}
 local customFunctions = {}
+--</private-static-properties>
 
+--<private-static-methods>
 local function AddNode(newNode)
 	node[#node+1] = newNode
 	newNode.nodeId = #node
@@ -48,12 +53,12 @@ local function HasGlyph(spellId)
 end
 
 local function HasTalent(talentId)
-	if not Ovale.listeTalentsRemplie then
-		Ovale:RemplirListeTalents()
+	if not OvaleData.listeTalentsRemplie then
+		OvaleData:RemplirListeTalents()
 	end
-	if Ovale.listeTalentsRemplie then
-		if Ovale.pointsTalent[talentId]~=nil then
-			return Ovale.pointsTalent[talentId]>0
+	if OvaleData.listeTalentsRemplie then
+		if OvaleData.pointsTalent[talentId]~=nil then
+			return OvaleData.pointsTalent[talentId]>0
 		else
 			Ovale:Print("Unknown talent "..talentId)
 			return false
@@ -79,7 +84,7 @@ local function TestConditions(paramList)
 			Ovale.casesACocher[cb] = {}
 		end
 		Ovale.casesACocher[cb].compile = true
-		if not Ovale.db.profile.check[cb] then
+		if not OvaleOptions:GetProfile().check[cb] then
 			return false
 		end
 	end
@@ -89,7 +94,7 @@ local function TestConditions(paramList)
 			Ovale.casesACocher[cb] = {}
 		end
 		Ovale.casesACocher[cb].compile = true
-		if Ovale.db.profile.check[cb] then
+		if OvaleOptions:GetProfile().check[cb] then
 			return false
 		end
 	end
@@ -100,7 +105,7 @@ local function TestConditions(paramList)
 			Ovale.listes[list] = { items = {}}
 		end
 		Ovale.listes[list].compile = true
-		if Ovale.db.profile.list[list] ~= key then
+		if OvaleOptions:GetProfile().list[list] ~= key then
 			return false
 		end
 	end
@@ -155,7 +160,7 @@ local function ParseSpellAddDebuff(params)
 	local spellId = paramList[1]
 	if spellId then
 		paramList[1] = nil
-		Ovale:GetSpellInfo(spellId).aura.player.HARMFUL = paramList
+		OvaleData:GetSpellInfo(spellId).aura.player.HARMFUL = paramList
 	end
 	return ""
 end
@@ -165,7 +170,7 @@ local function ParseSpellAddBuff(params)
 	local spellId = paramList[1]
 	if spellId then
 		paramList[1] = nil
-		Ovale:GetSpellInfo(spellId).aura.player.HELPFUL = paramList
+		OvaleData:GetSpellInfo(spellId).aura.player.HELPFUL = paramList
 	end
 	return ""
 end
@@ -175,7 +180,7 @@ local function ParseSpellAddTargetDebuff(params)
 	local spellId = paramList[1]
 	if spellId then
 		paramList[1] = nil
-		Ovale:GetSpellInfo(spellId).aura.target.HARMFUL = paramList
+		OvaleData:GetSpellInfo(spellId).aura.target.HARMFUL = paramList
 	end
 	return ""
 end
@@ -188,7 +193,7 @@ local function ParseSpellInfo(params)
 		if not TestConditions(paramList) then
 			return ""
 		end
-		local spellInfo = Ovale:GetSpellInfo(spellId)
+		local spellInfo = OvaleData:GetSpellInfo(spellId)
 		for k,v in pairs(paramList) do
 			if k == "addduration" then
 				spellInfo.duration = spellInfo.duration + v
@@ -207,7 +212,7 @@ local function ParseScoreSpells(params)
 		local spellId = tonumber(v)
 		if spellId then
 			--Ovale:Print("Add spell to score "..spellId)
-			Ovale.scoreSpell[spellId] = true
+			OvaleData.scoreSpell[spellId] = true
 		else
 			Ovale:Print("unknown spell "..v)
 		end
@@ -215,10 +220,10 @@ local function ParseScoreSpells(params)
 end
 
 local function ParseSpellList(name, params)
-	Ovale.buffSpellList[name] = {}
+	OvaleData.buffSpellList[name] = {}
 	local i = 1
 	for v in string.gmatch(params, "(%d+)") do
-		Ovale.buffSpellList[name][i] = tonumber(v)
+		OvaleData.buffSpellList[name][i] = tonumber(v)
 		i = i + 1
 	end
 end
@@ -418,21 +423,10 @@ local function ParseAddIcon(params, text)
 	return masterNode
 end
 
-function Ovale:CompileInputs(text)
-	self.casesACocher = {}
-	self.listes = {}
-	self.defaultListes = {}
-	self.defaultCheck = {}
-	
-	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
-	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
-	return text
-end
-
 local function ParseCanStopChannelling(text)
 	local spellId = tonumber(text)
 	if spellId then
-		Ovale:GetSpellInfo(spellId).canStopChannelling = true
+		OvaleData:GetSpellInfo(spellId).canStopChannelling = true
 	else
 		Ovale:Print("CanStopChannelling with unknown spell "..spellId)
 	end
@@ -440,7 +434,7 @@ local function ParseCanStopChannelling(text)
 end
 
 local function ParseSpellName(text)
-	local spell = Ovale:GetSpellInfoOrNil(text)
+	local spell = OvaleData:GetSpellInfoOrNil(text)
 	if (spell) then
 		return '"'..spell..'"'
 	else
@@ -452,10 +446,21 @@ end
 local function ParseL(text)
 	return '"'..L[text]..'"'
 end
+--</private-static-methods>
 
-function Ovale:Compile(text)
-	self.compileOnItems = false
-	self.bug = false
+--<public-static-methods>
+function OvaleCompile:CompileInputs(text)
+	Ovale.casesACocher = {}
+	Ovale.listes = {}
+	
+	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
+	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
+	return text
+end
+
+function OvaleCompile:Compile(text)
+	Ovale.compileOnItems = false
+	Ovale.bug = false
 	node = {}
 	defines = {}
 	
@@ -476,7 +481,7 @@ function Ovale:Compile(text)
 	text = string.gsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
 	
 	-- Options diverses
-	Ovale:ResetSpellInfo()
+	OvaleData:ResetSpellInfo()
 	text = string.gsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
 	text = string.gsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
 	text = string.gsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
@@ -511,7 +516,7 @@ function Ovale:Compile(text)
 	return masterNodes
 end
 
-function Ovale:DebugNode(node)
+function OvaleCompile:DebugNode(node)
 	local text
 	if (not node) then
 		return "#nil"
@@ -558,3 +563,4 @@ function Ovale:DebugNode(node)
 	
 	return text
 end
+--</public-static-methods>

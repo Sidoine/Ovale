@@ -3,7 +3,7 @@
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 4.3.11
+## Version: 4.3.12
 ## OptionalDeps: Ace3, Masque, Recount, Skada, LibBabble-CreatureType-3.0, LibRangeCheck-2.0
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
@@ -15,6 +15,7 @@ embeds.xml
 Locale-frFR.lua
 Locale-deDE.lua
 Locale-enUS.lua
+Locale-esES.lua
 Locale-itIT.lua
 Locale-koKR.lua
 Locale-ptBR.lua
@@ -22,14 +23,24 @@ Locale-ruRU.lua
 Locale-zhCN.lua
 Locale-zhTW.lua
 Ovale.lua
-Condition.lua
+OvaleActionBar.lua
+OvaleAura.lua
+OvaleBestAction.lua
+OvaleCompile.lua
+OvaleCondition.lua
+OvaleData.lua
 OvaleEquipement.lua
+OvaleEnemies.lua
+OvaleFrame.lua
+OvaleFuture.lua
+OvaleGUID.lua
 OvaleIcone.lua
 OvaleIcone.xml
-OvaleFrame.lua
-OvaleCompile.lua
+OvaleOptions.lua
 OvaleRecount.lua
 OvaleSkada.lua
+OvaleSpellDamage.lua
+OvaleState.lua
 OvaleSwing.lua
 defaut\Chaman.lua
 defaut\Chasseur.lua

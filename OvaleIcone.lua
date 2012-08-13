@@ -1,5 +1,8 @@
 ﻿local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
+--inherits ActionButtonTemplate
+
+--<public-methods>
 local function SetValue(self, value, actionTexture)
 	self.icone:Show()
 	self.icone:SetTexture(actionTexture);
@@ -29,15 +32,15 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 	if (minAttente~=nil and actionTexture) then	
 	
 		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-			(minAttente~=Ovale.maintenant and minAttente>self.ancienneAttente+0.01) or
+			(minAttente~=OvaleState.maintenant and minAttente>self.ancienneAttente+0.01) or
 			(minAttente < self.finAction-0.01)) then
 			if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-					(minAttente~=Ovale.maintenant and minAttente>self.ancienneAttente+0.01)) then
-				self.debutAction = Ovale.maintenant
+					(minAttente~=OvaleState.maintenant and minAttente>self.ancienneAttente+0.01)) then
+				self.debutAction = OvaleState.maintenant
 			end
 			self.actionCourante = actionTexture
 			self.finAction = minAttente
-			if (minAttente == Ovale.maintenant) then
+			if (minAttente == OvaleState.maintenant) then
 				self.cd:Hide()
 			else
 				self.lastSound = nil
@@ -48,7 +51,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			end
 		end
 		
-		if not Ovale.db.profile.apparence.flashIcon and minAttente<=Ovale.maintenant then
+		if not OvaleOptions:GetApparence().flashIcon and minAttente<=OvaleState.maintenant then
 			self.cd:Hide()
 		end
 		
@@ -65,21 +68,21 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		local red
-		if (minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > Ovale.maintenant
-			and minAttente>Ovale.attenteFinCast) then
+		if (minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > OvaleState.maintenant
+			and minAttente>OvaleState.attenteFinCast) then
 			self.icone:SetVertexColor(0.75,0.2,0.2)
 			red = true
 		else
 			self.icone:SetVertexColor(1,1,1)
 		end 
 		
-		--if (minAttente==Ovale.maintenant) then
+		--if (minAttente==OvaleState.maintenant) then
 			--self.cd:Hide()
 		--end
 
 		if element.params.sound and not self.lastSound then
 			local delay = element.params.soundtime or 0.5
-			if Ovale.maintenant>=minAttente - delay then
+			if OvaleState.maintenant>=minAttente - delay then
 				self.lastSound = element.params.sound
 			--	print("Play" .. self.lastSound)
 				PlaySoundFile(self.lastSound)
@@ -87,10 +90,10 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- La latence
-		if minAttente>Ovale.maintenant and Ovale.db.profile.apparence.highlightIcon and not red then
+		if minAttente>OvaleState.maintenant and OvaleOptions:GetApparence().highlightIcon and not red then
 			local lag = 0.6
 			local newShouldClick
-			if minAttente<Ovale.maintenant + lag then
+			if minAttente<OvaleState.maintenant + lag then
 				newShouldClick = true
 			else
 				newShouldClick = false
@@ -109,15 +112,15 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- Le temps restant
-		if ((Ovale.db.profile.apparence.numeric or self.params.text == "always") and minAttente > Ovale.maintenant) then
-			self.remains:SetText(string.format("%.1f", minAttente - Ovale.maintenant))
+		if ((OvaleOptions:GetApparence().numeric or self.params.text == "always") and minAttente > OvaleState.maintenant) then
+			self.remains:SetText(string.format("%.1f", minAttente - OvaleState.maintenant))
 			self.remains:Show()
 		else
 			self.remains:Hide()
 		end
 		
 		-- Le raccourcis clavier 
-		if (Ovale.db.profile.apparence.raccourcis) then
+		if (OvaleOptions:GetApparence().raccourcis) then
 			self.shortcut:Show()
 			self.shortcut:SetText(actionShortcut)
 		else
@@ -148,7 +151,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		self.shortcut:Hide()
 		self.remains:Hide()
 		self.focusText:Hide()
-		if Ovale.db.profile.apparence.hideEmpty then
+		if OvaleOptions:GetApparence().hideEmpty then
 			self:Hide()
 		else
 			self:Show()
@@ -177,6 +180,11 @@ local function SetFontScale(self, scale)
 	self.aPortee:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 end
 
+local function SetRangeIndicator(self, text)
+	self.aPortee:SetText(text)
+end
+--</public-methods>
+
 function OvaleIcone_OnClick(self)
 	Ovale:ToggleOptions()
 	self:SetChecked(0)
@@ -204,26 +212,36 @@ function OvaleIcone_OnLeave(self)
 	end
 end
 
-local function SetRangeIndicator(self, text)
-	self.aPortee:SetText(text)
-end
-
 function OvaleIcone_OnLoad(self)
 	local name = self:GetName()
+	
+--<public-properties>
 	self.icone = _G[name.."Icon"]
 	self.shortcut = _G[name.."HotKey"]
 	self.remains = _G[name.."Name"]
 	self.aPortee = _G[name.."Count"]
-	self.aPortee:SetText(Ovale.db.profile.apparence.targetText)
+	self.aPortee:SetText(OvaleOptions:GetApparence().targetText)
 	self.cd = _G[name.."Cooldown"]
 	self.normalTexture = _G[name.."NormalTexture"]
-	
 	local fontName, fontHeight, fontFlags = self.shortcut:GetFont()
 	self.fontName = fontName
 	self.fontHeight = fontHeight
 	self.fontFlags = fontFlags
-	
 	self.focusText = self:CreateFontString(nil, "OVERLAY");
+	self.cdShown = true
+	self.shouldClick = false
+	self.help = nil
+	self.spellId = nil
+	self.fontScale = nil
+	self.lastSound = nil
+	self.ancienneAttente = nil
+	self.finAction = nil
+	self.debutAction = nil
+	self.actionCourante = nil
+	self.params = nil
+--</public-properties>	
+	
+	
 	self.focusText:SetFontObject("GameFontNormal");
 	self.focusText:SetAllPoints(self);
 	self.focusText:SetTextColor(1,1,1);
@@ -237,8 +255,7 @@ function OvaleIcone_OnLoad(self)
 	self.SetFontScale = SetFontScale
 	self.SetRangeIndicator = SetRangeIndicator
 	self.SetValue = SetValue
-	self.cdShown = true
-	if Ovale.db.profile.clickThru then
+	if OvaleOptions:GetProfile().clickThru then
 		self:EnableMouse(false)
 	end
 end
