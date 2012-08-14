@@ -73,7 +73,7 @@ OvaleData.buffSpellList =
 	},
 	stamina =
 	{
-		21562, -- Fortitude TODO: vérifier
+		79105, -- Power Word: Fortitude
 		469, -- Commanding Shout
 		6307, -- Blood Pact
 		90364 -- Qiraji Fortitude
