@@ -733,8 +733,7 @@ OvaleCondition.conditions=
 		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,
 	item = function(condition)
-		local itemId = element.params[1]
-		local actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
+		local actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(condition[1])
 		return actionCooldownDuration, actionCooldownStart, -1
 	end,
 	ItemCount = function(condition)
