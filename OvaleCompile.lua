@@ -44,7 +44,7 @@ end
 
 local function HasGlyph(spellId)
 	for i = 1, GetNumGlyphSockets() do
-		local enalbled, glypType, glyphSpellID = GetGlyphSocketInfo(i)
+		local enabled, glyphType, glyphTooltipIndex, glyphSpellID = GetGlyphSocketInfo(i)
 		if (glyphSpellID == spellId) then
 			return true
 		end
