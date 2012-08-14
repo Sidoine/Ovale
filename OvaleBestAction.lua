@@ -474,8 +474,8 @@ function OvaleBestAction:Compute(element)
 			-- a + (t-b)*c = x + (t-y)*z
 			-- (t-b)*c - (t-y)*z = x - a
 			-- t*c - b*c - t*z + y*z = x - a
-			-- t*(c-z) = x - a + b*c + y*z
-			-- t = (x-a + b*c + y*z)/(c-z)
+			-- t*(c-z) = x - a + b*c - y*z
+			-- t = (x-a + b*c - y*z)/(c-z)
 			if c == z then
 				if a-b*c < x-y*z then
 					return 0
@@ -483,7 +483,7 @@ function OvaleBestAction:Compute(element)
 					return nil
 				end
 			else
-				local t = (x-a + b*c + y*z)/(c-z)
+				local t = (x-a + b*c - y*z)/(c-z)
 				if c > z then
 					return 0, t
 				else
@@ -500,7 +500,7 @@ function OvaleBestAction:Compute(element)
 					return nil
 				end
 			else
-				local t = (x-a + b*c + y*z)/(c-z)
+				local t = (x-a + b*c - y*z)/(c-z)
 				if c < z then
 					return 0, t
 				else
