@@ -204,16 +204,6 @@ function Ovale:Log(text)
 	end
 end
 
-function Ovale:AfficherConfig()
-	self.AceConfigDialog:SetDefaultSize("Ovale Apparence", 500, 550)
-	self.AceConfigDialog:Open("Ovale Apparence", configFrame)
-end
-
-function Ovale:AfficherCode()
-	self.AceConfigDialog:SetDefaultSize("Ovale", 500, 550)
-	self.AceConfigDialog:Open("Ovale", configFrame)
-end
-
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then

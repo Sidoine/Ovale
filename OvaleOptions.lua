@@ -321,13 +321,13 @@ local options =
 				{
 					name = "Configuration",
 					type = "execute",
-					func = function() Ovale:AfficherConfig() end
+					func = function() AceConfigDialog:SetDefaultSize("Ovale Apparence", 500, 550); AceConfigDialog:Open("Ovale Apparence") end
 				},
 				code  =
 				{
 					name = "Code",
 					type = "execute",
-					func = function() Ovale:AfficherCode() end
+					func = function() AceConfigDialog:SetDefaultSize("Ovale", 500, 550); AceConfigDialog:Open("Ovale") end
 				},
 				debug =
 				{
