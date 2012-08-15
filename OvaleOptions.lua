@@ -276,6 +276,16 @@ local options =
 						Ovale.needCompile = true
 					end,
 					width = "full"
+				},
+				restore =
+				{
+					order = 2,
+					type = "execute",
+					name = L["Restaurer le défaut"],
+					func = function()
+						OvaleOptions.db.profile.code = OvaleOptions.db.defaults.profile.code
+						Ovale.needCompile = true
+					end,
 				}
 			}
 		},
