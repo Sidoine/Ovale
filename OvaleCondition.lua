@@ -235,12 +235,12 @@ local function GetManaAndRate(withBerserker)
 	if className == "ROGUE" or (className == "DRUID" and GetShapeshiftForm(true) == 3) then
 		rate = 10 * OvaleAura.meleeHaste
 		if (className == "ROGUE") then
-			local rush = OvaleState:GetAura("player", 13750)
+			local rush = OvaleState:GetAura("player", 13750, true)
 			if rush and rush.stacks>0 then
 				rate = rate * 2
 			end
 		elseif withBerserker then
-			local berserk = OvaleState:GetAura("player", 50334)
+			local berserk = OvaleState:GetAura("player", 50334, true)
 			if berserk and berserk.stacks>0 then
 				mana = mana/2
 			end
@@ -438,7 +438,7 @@ OvaleCondition.conditions=
 		local spellId = condition[1]
 		local target = getTarget(condition.target)
 		if spellId then
-			local aura = OvaleState:GetAura(target,spellId)
+			local aura = OvaleState:GetAura(target,spellId, true)
 			if not aura then
 				return 0
 			end
