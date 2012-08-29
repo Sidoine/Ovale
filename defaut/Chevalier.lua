@@ -11,6 +11,9 @@ Define(blood_tap 45529)
 Define(dark_transformation 63560)
   SpellInfo(dark_transformation duration=30 unholy=1 runicpower=-100 xxx=0 )
   SpellAddBuff(dark_transformation dark_transformation=1)
+Define(death_and_decay 43265)
+  SpellInfo(death_and_decay duration=10 unholy=1 runicpower=-100 xxx=0 cd=30 )
+  SpellAddBuff(death_and_decay death_and_decay=1)
 Define(death_coil 47541)
   SpellInfo(death_coil runicpower=400 )
 Define(empower_rune_weapon 47568)
@@ -31,6 +34,7 @@ Define(howling_blast 49184)
   SpellInfo(howling_blast frost=1 runicpower=-100 xxx=0 )
 Define(icy_touch 45477)
   SpellInfo(icy_touch frost=1 runicpower=-100 xxx=0 )
+Define(killing_machine 51128)
 Define(mogu_power_potion_aura 105706)
   SpellInfo(mogu_power_potion_aura duration=25 cd=1 )
   SpellAddBuff(mogu_power_potion_aura mogu_power_potion_aura=1)
@@ -56,6 +60,9 @@ Define(sudden_doom 49530)
 Define(summon_gargoyle 49206)
   SpellInfo(summon_gargoyle duration=40 runicpower=600 cd=180 )
   SpellAddBuff(summon_gargoyle summon_gargoyle=1)
+Define(unholy_blight 115989)
+  SpellInfo(unholy_blight duration=10 cd=90 )
+  SpellAddBuff(unholy_blight unholy_blight=1)
 Define(unholy_frenzy 49016)
   SpellInfo(unholy_frenzy duration=30 cd=180 )
   SpellAddBuff(unholy_frenzy unholy_frenzy=1)
@@ -63,29 +70,33 @@ Define(unholy_presence 48265)
   SpellAddBuff(unholy_presence unholy_presence=1)
 Define(blood_tap_talent 13)
 Define(plague_leech_talent 2)
+Define(unholy_blight_talent 3)
 AddIcon mastery=2 help=main
 {
 	if not InCombat() 
 	{
-		Spell(horn_of_winter)
 		unless Stance(2) Spell(frost_presence)
+		Spell(horn_of_winter)
 	}
-	if target.DebuffRemains(frost_fever) <=0 or target.DebuffRemains(blood_plague) <=0 Spell(outbreak)
+	if target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 Spell(outbreak)
 	if not target.DebuffPresent(frost_fever) Spell(howling_blast)
 	if not target.DebuffPresent(blood_plague) Spell(plague_strike)
-	if TalentPoints(plague_leech_talent) and {{SpellCooldown(outbreak) <1 } or {BuffPresent(rime) and target.DebuffRemains(blood_plague) <3 and {RuneCount(unholy) >=1 or RuneCount(death) >=1 } } } Spell(plague_leech)
+	if TalentPoints(plague_leech_talent) and not {{BuffPresent(killing_machine) and RunicPower() <10 } or {RuneCount(unholy) ==2 or RuneCount(frost) ==2 or RuneCount(death) ==2 } } Spell(plague_leech)
 	if BuffPresent(rime) Spell(howling_blast)
-	if RunicPower() >=76 Spell(frost_strike)
-	if RuneCount(unholy) >=1 Spell(obliterate)
+	if RunicPower() >=88 Spell(frost_strike)
+	if BuffPresent(killing_machine) Spell(frost_strike)
+	if BuffPresent(killing_machine) and RunicPower() <10 Spell(obliterate)
+	if {RuneCount(unholy) ==2 or RuneCount(frost) ==2 or RuneCount(death) ==2 } Spell(obliterate)
 	Spell(howling_blast)
 	Spell(frost_strike)
-	Spell(obliterate)
+	Spell(death_and_decay)
+	Spell(plague_strike)
 	Spell(horn_of_winter)
 }
 AddIcon mastery=2 help=offgcd
 {
 	Spell(pillar_of_frost)
-	if target.HealthPercent() <=35 Spell(soul_reaper)
+	if target.HealthPercent() <=35 or {{target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } } <=35 } Spell(soul_reaper)
 	if TalentPoints(blood_tap_talent) Spell(blood_tap)
 }
 AddIcon mastery=2 help=cd
@@ -95,8 +106,9 @@ AddIcon mastery=2 help=cd
 		Spell(army_of_the_dead)
 	}
 	if TimeInCombat() >=10 Spell(blood_fury)
-	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if {RuneCount(frost) >=1 or RuneCount(death) >=1 }  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(raise_dead)
+	if TalentPoints(unholy_blight_talent) and {target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 } Spell(unholy_blight)
 	if target.DeadIn() <=60 and BuffPresent(mogu_power_potion_aura) Spell(empower_rune_weapon)
 	Spell(empower_rune_weapon)
 }
@@ -104,8 +116,8 @@ AddIcon mastery=3 help=main
 {
 	if not InCombat() 
 	{
-		Spell(horn_of_winter)
 		unless Stance(3) Spell(unholy_presence)
+		Spell(horn_of_winter)
 	}
 	if target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 Spell(outbreak)
 	if not target.DebuffPresent(frost_fever) Spell(icy_touch)
@@ -123,7 +135,7 @@ AddIcon mastery=3 help=main
 }
 AddIcon mastery=3 help=offgcd
 {
-	if target.HealthPercent() <=35.5 Spell(soul_reaper)
+	if target.HealthPercent() <=35 or {{target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } } <=35 } Spell(soul_reaper)
 	if TalentPoints(blood_tap_talent) Spell(blood_tap)
 }
 AddIcon mastery=3 help=cd
@@ -136,6 +148,7 @@ AddIcon mastery=3 help=cd
 	if TimeInCombat() >=2 Spell(blood_fury)
 	if TimeInCombat() >=4 Spell(unholy_frenzy)
 	if TimeInCombat() >=4  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if TalentPoints(unholy_blight_talent) and {target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 } Spell(unholy_blight)
 	Spell(summon_gargoyle)
 	if target.DeadIn() <=60 and BuffPresent(mogu_power_potion_aura) Spell(empower_rune_weapon)
 	Spell(empower_rune_weapon)

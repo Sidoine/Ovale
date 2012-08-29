@@ -14,15 +14,11 @@ Define(execution_sentence 114916)
   SpellAddTargetDebuff(execution_sentence execution_sentence=1)
 Define(exorcism 879)
   SpellInfo(exorcism holy=-1 cd=15 )
-Define(glyph_word_of_glory 115522)
-  SpellInfo(glyph_word_of_glory duration=6 )
-  SpellAddBuff(glyph_word_of_glory glyph_word_of_glory=1)
 Define(guardian_of_ancient_kings 86659)
   SpellInfo(guardian_of_ancient_kings duration=12 cd=180 )
   SpellAddBuff(guardian_of_ancient_kings guardian_of_ancient_kings=1)
 Define(hammer_of_wrath 24275)
   SpellInfo(hammer_of_wrath holy=-0 cd=6 )
-Define(harsh_word 130552)
 Define(inquisition 84963)
   SpellInfo(inquisition duration=10 holy=1 )
   SpellAddBuff(inquisition inquisition=1)
@@ -49,6 +45,7 @@ AddIcon mastery=3 help=main
 	if {BuffExpires(inquisition) or BuffRemains(inquisition) <=2 } and {HolyPower() >=3 } Spell(inquisition)
 	if HolyPower() ==5 Spell(templars_verdict)
 	Spell(hammer_of_wrath usable=1)
+	if SpellCooldown(hammer_of_wrath) >0 and SpellCooldown(hammer_of_wrath) <=0.2 Texture(Spell_nature_timestop) 
 	Spell(exorcism)
 	Spell(crusader_strike)
 	Spell(judgment)
@@ -57,13 +54,12 @@ AddIcon mastery=3 help=main
 AddIcon mastery=3 help=offgcd
 {
 	if target.IsInterruptible() Spell(rebuke)
-	if {BuffExpires(glyph_word_of_glory) } and {HolyPower() >=3 } Spell(harsh_word)
 	if BuffPresent(inquisition) Spell(execution_sentence)
 }
 AddIcon mastery=3 help=cd
 {
-	if BuffPresent(inquisition) Spell(avenging_wrath)
 	if BuffPresent(inquisition) and BuffPresent(avenging_wrath) Spell(guardian_of_ancient_kings)
+	if BuffPresent(inquisition) Spell(avenging_wrath)
 	if BuffPresent(inquisition)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 ]]

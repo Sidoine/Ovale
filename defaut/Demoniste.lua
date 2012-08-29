@@ -75,8 +75,8 @@ Define(seed_of_corruption 27243)
   SpellAddTargetDebuff(seed_of_corruption seed_of_corruption=1)
 Define(service_felguard 111898)
   SpellInfo(service_felguard cd=120 )
-Define(service_succubus 111896)
-  SpellInfo(service_succubus cd=120 )
+Define(service_felhunter 111897)
+  SpellInfo(service_felhunter cd=120 )
 Define(shadow_bolt 686)
   SpellInfo(shadow_bolt demonicfury=40 )
 Define(shadowburn 17877)
@@ -95,10 +95,10 @@ Define(summon_doomguard 18540)
   SpellInfo(summon_doomguard cd=600 )
 Define(summon_felguard 30146)
   SpellInfo(summon_felguard demonicfury=0 )
+Define(summon_felhunter 691)
+  SpellInfo(summon_felhunter demonicfury=0 )
 Define(summon_infernal 1122)
   SpellInfo(summon_infernal cd=600 )
-Define(summon_succubus 712)
-  SpellInfo(summon_succubus demonicfury=0 )
 Define(touch_of_chaos 103964)
   SpellInfo(touch_of_chaos demonicfury=40 stance=1)
 Define(unstable_affliction 30108)
@@ -117,11 +117,11 @@ AddIcon mastery=1 help=main
 	if not InCombat() 
 	{
 		if not BuffPresent(spell_power_multiplier) Spell(dark_intent)
-		unless pet.CreatureFamily(Succubus) Spell(summon_succubus)
+		unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	}
 	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
-	if TalentPoints(grimoire_of_service_talent) Spell(service_succubus)
-	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Succubus) Spell(summon_succubus)
+	if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
+	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	if Enemies() >3 
 	{
 		if {BuffExpires(soulburn) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption) } or {BuffPresent(soulburn) and not target.DebuffPresent(soulburn_seed_of_corruption) and not InFlightToTarget(soulburn_seed_of_corruption) } Spell(seed_of_corruption)
@@ -130,12 +130,12 @@ AddIcon mastery=1 help=main
 		if not InFlightToTarget(fel_flame) Spell(fel_flame)
 	}
 	if BuffPresent(soulburn) Spell(soul_swap)
-	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <target.NextTick(haunt) +1 +CastTime(haunt) and SoulShards() Spell(haunt)
-	if Enemies() >1 and TimeInCombat() <10 Spell(soul_swap)
-	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <target.NextTick(haunt) +1 +CastTime(haunt) and SoulShards() >1 Spell(haunt)
+	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <TickTime(haunt) +1 +CastTime(haunt) and SoulShards() Spell(haunt)
+	if Enemies() >1 and TimeInCombat() <10 and Glyph(56226) Spell(soul_swap)
+	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <TickTime(haunt) +1 +CastTime(haunt) and SoulShards() >1 Spell(haunt)
 	if {not target.DebuffPresent(agony) or target.DebuffRemains(agony) <=TickTime(drain_soul) *2 } and target.DeadIn() >=8 Spell(agony)
-	if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <target.NextTick(corruption) } and target.DeadIn() >=6 Spell(corruption)
-	if {not target.DebuffPresent(unstable_affliction) or target.DebuffRemains(unstable_affliction) <{CastTime(unstable_affliction) +target.NextTick(unstable_affliction) } } and target.DeadIn() >=5 Spell(unstable_affliction)
+	if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <TickTime(corruption) } and target.DeadIn() >=6 Spell(corruption)
+	if {not target.DebuffPresent(unstable_affliction) or target.DebuffRemains(unstable_affliction) <{CastTime(unstable_affliction) +TickTime(unstable_affliction) } } and target.DeadIn() >=5 Spell(unstable_affliction)
 	if TicksRemain(agony) <Ticks(agony) /2 and target.DeadIn() >=8 Spell(agony)
 	if TicksRemain(corruption) <Ticks(corruption) /2 and target.DeadIn() >=6 Spell(corruption)
 	if TicksRemain(unstable_affliction) <Ticks(unstable_affliction) /2 +1 and target.DeadIn() >=5 Spell(unstable_affliction)
@@ -150,7 +150,8 @@ AddIcon mastery=1 help=offgcd
 	{
 		if BuffExpires(soulburn) and not target.DebuffPresent(soulburn_seed_of_corruption) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() Spell(soulburn)
 	}
-	if BuffPresent(dark_soul) and {BuffRemains(dark_soul) >=18.5 or BuffRemains(dark_soul) <=1.5 } and SoulShards() Spell(soulburn)
+	if BuffPresent(dark_soul) and SoulShards() Spell(soulburn)
+	if {target.TicksRemain(unstable_affliction) <Ticks(unstable_affliction) /2 or target.TicksRemain(corruption) <Ticks(corruption) /2 or target.TicksRemain(agony) <Ticks(agony) /2 } and target.HealthPercent() <=20 and SoulShards() Spell(soulburn)
 }
 AddIcon mastery=1 help=moving
 {
@@ -188,14 +189,14 @@ AddIcon mastery=2 help=main
 	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felguard) Spell(summon_felguard)
 	if Enemies() >5 
 	{
-		if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <target.NextTick(corruption) } and target.DeadIn() >=6 Spell(corruption)
+		if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <TickTime(corruption) } and target.DeadIn() >=6 Spell(corruption)
 		Spell(hand_of_guldan)
 		if {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <40 } and target.DeadIn() >30 Spell(doom)
 		if TalentPoints(harvest_life_talent) Spell(harvest_life)
 		Spell(life_tap)
 	}
-	if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <target.NextTick(corruption) } and target.DeadIn() >=6 Spell(corruption)
-	if {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <target.NextTick(doom) or {TicksRemain(doom) +1 <{target.TicksRemain(doom) + Ticks(doom) } and BuffPresent(dark_soul) } } and target.DeadIn() >=30 Spell(doom)
+	if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <TickTime(corruption) } and target.DeadIn() >=6 Spell(corruption)
+	if {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <TickTime(doom) or {TicksRemain(doom) +1 <{target.TicksRemain(doom) + Ticks(doom) } and BuffPresent(dark_soul) } } and target.DeadIn() >=30 Spell(doom)
 	if target.DebuffRemains(corruption) >20 and BuffExpires(dark_soul) and DemonicFury() <=750 and target.DeadIn() >30 if Stance(1) cancel.Texture(Spell_shadow_demonform)
 	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemains(shadowflame) <1 +CastTime(shadow_bolt) Spell(hand_of_guldan)
 	if target.DebuffRemains(corruption) <20 Spell(touch_of_chaos)
@@ -248,11 +249,11 @@ AddIcon mastery=3 help=main
 	if not InCombat() 
 	{
 		if not BuffPresent(spell_power_multiplier) Spell(dark_intent)
-		unless pet.CreatureFamily(Succubus) Spell(summon_succubus)
+		unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	}
 	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
-	if TalentPoints(grimoire_of_service_talent) Spell(service_succubus)
-	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Succubus) Spell(summon_succubus)
+	if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
+	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	if Enemies() >2 
 	{
 		if BuffPresent(fire_and_brimstone) and not target.DebuffPresent(immolate) Spell(immolate)
@@ -262,10 +263,11 @@ AddIcon mastery=3 help=main
 	}
 	if Enemies() >1 focus.Spell(havoc)
 	if BurningEmbers() if target.HealthPercent(less 20) Spell(shadowburn)
-	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } Spell(chaos_bolt)
-	if BuffExpires(backdraft) Spell(conflagrate)
 	if TicksRemain(immolate) <Ticks(immolate) /2 and target.DeadIn() >=5 Spell(immolate)
+	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {BurningEmbers() >3.5 or BuffRemains(dark_soul) >CastTime(chaos_bolt) } and ManaPercent() <=80 Spell(chaos_bolt)
+	Spell(conflagrate)
 	Spell(incinerate)
+	if BurningEmbers() >2 and ManaPercent() <10 Spell(chaos_bolt)
 }
 AddIcon mastery=3 help=offgcd
 {

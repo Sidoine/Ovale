@@ -107,12 +107,11 @@ AddIcon mastery=1 help=main
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
 	if BuffPresent(alter_time) and BuffPresent(presence_of_mind) Spell(arcane_blast)
-	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
 	if BuffExpires(rune_of_power) and BuffExpires(alter_time) Spell(rune_of_power)
 	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
 	if ManaPercent() >92 Spell(arcane_blast)
-	if BuffPresent(arcane_charge) and BuffExpires(arcane_power) and BuffExpires(alter_time) and target.DeadIn() >25 and {ManaPercent() <92 or SpellCooldown(mana_gem) >10 or ItemCharges(36799) ==0 } Spell(arcane_barrage)
-	if BuffStacks(arcane_charge) ==6 and BuffExpires(arcane_missiles_aura) and target.DeadIn() >25 Spell(arcane_barrage)
+	if BuffPresent(arcane_charge) and BuffExpires(arcane_power) and BuffExpires(alter_time) and target.DeadIn() >25 and {SpellCooldown(mana_gem) >10 or ItemCharges(36799) ==0 } Spell(arcane_barrage)
+	if BuffStacks(arcane_charge) >=4 and BuffExpires(arcane_missiles_aura) and target.DeadIn() >25 Spell(arcane_barrage)
 	Spell(arcane_blast)
 }
 AddIcon mastery=1 help=offgcd
@@ -195,6 +194,7 @@ AddIcon mastery=3 help=main
 	if BuffPresent(fingers_of_frost_aura) and BuffRemains(fingers_of_frost_aura) <5 Spell(ice_lance)
 	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 and SpellCooldown(icy_veins) <GCD() and BuffRemains(invocation) >20 and BuffExpires(alter_time) Spell(frozen_orb)
 	if BuffPresent(fingers_of_frost_aura) and BuffRemains(fingers_of_frost_aura) <2 Spell(ice_lance)
+	if target.DebuffStacks(frostbolt) <3 Spell(frostbolt)
 	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(frostfire_bolt)
 	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(ice_lance)
 	if BuffPresent(fingers_of_frost_aura) Spell(ice_lance)

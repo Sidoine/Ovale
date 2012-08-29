@@ -1147,8 +1147,10 @@ OvaleCondition.conditions=
 		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
 	end,
 	-- Check if the spell is usable
+	-- 1: spell Id
+	-- return: bool
 	spellusable = function(condition)
-		return testbool(IsUsableSpell(spellId), condition[1], condition[2])
+		return testbool(IsUsableSpell(condition[1]), condition[2], condition[3])
 	end,
 	-- Get the spell cooldown
 	-- 1: spell ID
@@ -1157,7 +1159,7 @@ OvaleCondition.conditions=
 		if type(condition[1]) == "string" then
 			local sharedCd = OvaleState.state.cd[condition[1]]
 			if sharedCd then
-				return 0, nil, sharedCD.duration, sharedCD.start, -1
+				return 0, nil, sharedCd.duration, sharedCd.start, -1
 			else
 				return nil
 			end
@@ -1346,7 +1348,7 @@ OvaleCondition.conditions=
 			if ((condition[2] or 0) >= mainHandExpiration) then
 				return 0
 			else
-				return OvaleState.maintenant + mainHandExpiration - condition[2]
+				return OvaleState.maintenant + mainHandExpiration - (condition[2] or 60)
 			end
 		else
 			if (not hasOffHandEnchant) then
@@ -1356,7 +1358,7 @@ OvaleCondition.conditions=
 			if ((condition[2] or 0) >= offHandExpiration) then
 				return 0
 			else
-				return OvaleState.maintenant + offHandExpiration - condition[2]
+				return OvaleState.maintenant + offHandExpiration - (condition[2] or 60)
 			end
 		end
 	end,

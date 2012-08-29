@@ -53,13 +53,12 @@ AddIcon mastery=3 help=main
 		Spell(shadowform)
 	}
 	Spell(shadowform)
-	if BuffPresent(surge_of_darkness) and PreviousSpell(mind_blast) >=1 Spell(mind_spike)
 	if ShadowOrbs() ==3 Spell(devouring_plague)
 	if SpellCooldown(mind_blast) Spell(mind_blast)
 	if BuffPresent(surge_of_darkness) Spell(mind_spike)
-	if {not target.DebuffPresent(shadow_word_pain) or target.DebuffRemains(shadow_word_pain) <target.NextTick(shadow_word_pain) } Spell(shadow_word_pain)
+	if {not target.DebuffPresent(shadow_word_pain) or target.DebuffRemains(shadow_word_pain) <TickTime(shadow_word_pain) } Spell(shadow_word_pain)
 	if target.HealthPercent(less 20) Spell(shadow_word_death)
-	if {not target.DebuffPresent(vampiric_touch) or target.DebuffRemains(vampiric_touch) <CastTime(vampiric_touch) +target.NextTick(vampiric_touch) } Spell(vampiric_touch)
+	if {not target.DebuffPresent(vampiric_touch) or target.DebuffRemains(vampiric_touch) <CastTime(vampiric_touch) +TickTime(vampiric_touch) } Spell(vampiric_touch)
 	Spell(halo_damage)
 	Spell(mind_flay)
 }

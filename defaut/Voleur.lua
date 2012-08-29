@@ -99,7 +99,7 @@ AddIcon mastery=1 help=cd
 	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
-	if TimeInCombat() >10 and not BuffPresent(stealthed) Spell(vanish)
+	if TimeInCombat() >10 and not BuffPresent(stealthed) and not BuffPresent(shadow_blades) Spell(vanish)
 	if {BuffPresent(bloodlust) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
 	Spell(vendetta)
 }
@@ -113,10 +113,9 @@ AddIcon mastery=2 help=main
 	if BuffRemains(slice_and_dice) <2 Spell(slice_and_dice)
 	if TicksRemain(rupture) <2 and ComboPoints() ==5 and BuffPresent(deep_insight) and target.DeadIn() >10 Spell(rupture)
 	if ComboPoints() ==5 and BuffPresent(deep_insight) Spell(eviscerate)
-	if TicksRemain(rupture) <2 and ComboPoints() ==5 and target.DeadIn() >10 Spell(rupture)
-	if ComboPoints() ==5 Spell(eviscerate)
-	if ComboPoints() <5 and TicksRemain(revealing_strike) <2 Spell(revealing_strike)
-	if ComboPoints() <5 Spell(sinister_strike)
+	if BuffStacks(anticipation) ==5 Spell(eviscerate)
+	if BuffStacks(anticipation) <5 and TicksRemain(revealing_strike) <2 Spell(revealing_strike)
+	if {not BuffPresent(shadow_blades) and BuffStacks(anticipation) <4 } or BuffStacks(anticipation) <5 Spell(sinister_strike)
 }
 AddIcon mastery=2 help=offgcd
 {
@@ -132,7 +131,7 @@ AddIcon mastery=2 help=cd
 	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
-	if TimeInCombat() >10 and not BuffPresent(stealthed) Spell(vanish)
+	if TimeInCombat() >10 and not BuffPresent(stealthed) and not BuffPresent(shadow_blades) Spell(vanish)
 	if {BuffPresent(bloodlust) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
 	if Energy() <35 and BuffRemains(slice_and_dice) >4 and BuffExpires(adrenaline_rush) Spell(killing_spree)
 	if Energy() <35 Spell(adrenaline_rush)
