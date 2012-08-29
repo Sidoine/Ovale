@@ -320,4 +320,9 @@ function Ovale:ToggleCheckBox(v)
 		v = v - 1
 	end
 end
+
+function Ovale:Error(text)
+	self:Print("Fatal error: " .. text)
+	self.bug = true
+end
 --</public-static-methods>

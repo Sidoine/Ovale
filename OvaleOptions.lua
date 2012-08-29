@@ -388,23 +388,8 @@ local options =
 					name = "List player spells",
 					type = "execute",
 					func = function()
-						local book=BOOKTYPE_SPELL
-						while true do
-							local i=1
-							while true do
-								local skillType, spellId = GetSpellBookItemInfo(i, book)
-								if not spellId then
-									break
-								end
-								local spellName = GetSpellBookItemName(i, book)
-								Ovale:Print(spellName..": "..spellId)
-								i = i + 1
-							end
-							if book == BOOKTYPE_SPELL then
-								book = BOOKTYPE_PET
-							else
-								break
-							end
+						for k,v in pairs(OvaleData.spellList) do
+							Ovale:Print(k ..":" .. v)
 						end
 					end					
 				}

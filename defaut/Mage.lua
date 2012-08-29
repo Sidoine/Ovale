@@ -1,252 +1,240 @@
-Ovale.defaut["MAGE"]=
-[[
-#Contributed by Hinalover
-#Spells
-Define(ARCANEBARRAGE 44425) #arcane instant
-	SpellInfo(ARCANEBARRAGE cd=4)
-    SpellAddDebuff(ARCANEBARRAGE ARCANEBLASTDEBUFF=0)
-Define(ARCANEBLAST 30451) #arcane stacks*4 cost increased
-    SpellAddDebuff(ARCANEBLAST ARCANEBLASTDEBUFF=10)
-Define(ARCANEMISSILES 5143) #arcane channel
-    SpellAddDebuff(ARCANEMISSILES ARCANEBLASTDEBUFF=0 ARCANEMISSILEBUFF=0)
-Define(ARCANEPOWER 12042) #arcane cd
-    SpellInfo(ARCANEPOWER cd=84)
-	SpellAddBuff(ARCANEPOWER ARCANEPOWER=15)
-Define(COLDSNAP 11958) #frost reset cd
-    SpellInfo(COLDSNAP cd=384)
-Define(COMBUSTION 11129) #fire cd consume dot
-    SpellInfo(COMBUSTION cd=120)
-Define(CONJUREMANAGEM 759)
-	SpellInfo(CONJUREMANAGEM cd=10) #fake
-Define(COUNTERSPELL 2139)
-    SpellInfo(COUNTERSPELL cd=24)
-Define(DEEPFREEZE 44572) #frost instant
-	SpellInfo(DEEPFREEZE cd=30)
-    SpellAddBuff(DEEPFREEZE FINGERSOFFROST=-1)
-Define(EVOCATION 12051)
-    SpellInfo(EVOCATION cd=240)
-Define(FIREBLAST 2136) #fire instant
-	SpellInfo(FIREBLAST cd=8)
-Define(FIREBALL 133) #fire 2.5
-Define(FLAMEORB 82731)
-    SpellInfo(FLAMEORB cd=60)
-Define(FROSTBOLT 116) #frost
-Define(FROSTFIREBOLT 44614) #frost+fire
-	SpellAddTargetDebuff(FROSTFIREBOLT FROSTFIREBOLT=9)
-    SpellAddBuff(FROSTFIREBOLT BRAINFREEZE=-1 FINGERSOFFROST=-1)
-Define(ICEARMOR 7302)
-	SpellAddBuff(ICEARMOR ICEARMOR=1800)
-Define(ICELANCE 30455) #frost instant
-    SpellAddBuff(ICELANCE FINGERSOFFROST=-1)
-Define(ICYVEINS 12472) #frost cd
-    SpellInfo(ICYVEINS cd=144)
-Define(LIVINGBOMB 44457) #fire dot
-    SpellAddTargetDebuff(LIVINGBOMB LIVINGBOMB=12)
-Define(MAGEARMOR 6117)
-	SpellAddBuff(MAGEARMOR MAGEARMOR=1800)
-Define(MIRRORIMAGE 55342)
-    SpellInfo(MIRRORIMAGE cd=180)
-Define(MOLTENARMOR 30482)
-	SpellAddBuff(MOLTENARMOR MOLTENARMOR=1800)
-Define(PYROBLAST 11366) #fire dot
-    SpellAddTargetDebuff(PYROBLAST PYROBLAST=12)
-    SpellAddBuff(PYROBLAST HOTSTREAK=0)
-Define(PYROBLASTBANG 92315)
-	SpellAddTargetDebuff(PYROBLASTBANG PYROBLASTBANG=12)
-	SpellAddBuff(PYROBLASTBANG HOTSTREAK=0)
-Define(SCORCH 2948) #fire 1.5 (cast while moving with firestarter talent)
-Define(SPELLSTEAL 30449)
-Define(SUMMONWATERELEMENTAL 31687) #frost pet
-    SpellInfo(SUMMONWATERELEMENTAL cd=180)
-
-Define(PETFREEZE 33395) #Frost pet freeze ability
-    SpellInfo(PETFREEZE cd=25)
-	SpellAddBuff(PETFREEZE FINGERSOFFROST=2)
-	
-#Buff
-Define(BRAINFREEZE 57761) #frost (instant fireball/frostfire bolt)
-Define(FINGERSOFFROST 44544) #frost boost ice lance/deep freeze
-	SpellInfo(FINGERSOFFROST duration=14)
-Define(HOTSTREAK 48108) #fire instant pyroblast
-Define(ARCANEBLASTDEBUFF 36032)
-Define(ARCANEMISSILEBUFF 79683)
-Define(PRESENCEOFMIND 12043) #arcane next spell instant
-Define(CLEARCASTING 12536)
-
-#Item
-Define(MANAGEMITEM 36799)
-Define(VOLCANICPOTION 58091)
-
-#Debuff
-Define(IGNITE 12654)
-Define(CRITICALMASS 22959)
-Define(SHADOWANDFLAME 17800)
-
-#Talent
-Define(FIRESTARTERTALENT 11431)
-Define(CRITICALMASSTALENT 10541)
-Define(IMPROVEDSCORCH 10547)
-
-#Glyphs
-Define(GLYPHOFFROSTFIRE 61205)
-Define(GLYPHOFFROSTBOLT 56370)
-
-ScoreSpells(SCORCH PYROBLAST LIVINGBOMB FROSTFIREBOLT FIREBALL SUMMONWATERELEMENTAL PETFREEZE FROSTBOLT ARCANEBLAST ARCANEMISSILES ARCANEBARRAGE
-            DEEPFREEZE ICELANCE)
-
-AddIcon help=main mastery=1
+Ovale.defaut["MAGE"] = [[Define(alter_time 110909)
+  SpellInfo(alter_time duration=6 )
+  SpellAddBuff(alter_time alter_time=1)
+Define(alter_time_activate 108978)
+  SpellInfo(alter_time_activate duration=10 cd=180 )
+Define(arcane_barrage 44425)
+  SpellInfo(arcane_barrage cd=3 )
+Define(arcane_blast 30451)
+Define(arcane_brilliance 1459)
+  SpellInfo(arcane_brilliance duration=3600 )
+  SpellAddBuff(arcane_brilliance arcane_brilliance=1)
+Define(arcane_charge 36032)
+  SpellInfo(arcane_charge duration=10 )
+  SpellAddBuff(arcane_charge arcane_charge=1)
+Define(arcane_missiles 7268)
+Define(arcane_missiles_aura 79683)
+  SpellInfo(arcane_missiles_aura duration=20 )
+  SpellAddBuff(arcane_missiles_aura arcane_missiles_aura=1)
+Define(arcane_power 12042)
+  SpellInfo(arcane_power duration=15 cd=90 )
+  SpellAddBuff(arcane_power arcane_power=1)
+Define(berserking 26297)
+  SpellInfo(berserking duration=10 cd=180 )
+  SpellAddBuff(berserking berserking=1)
+Define(blood_fury 20572)
+  SpellInfo(blood_fury duration=15 cd=120 )
+  SpellAddBuff(blood_fury blood_fury=1)
+Define(brain_freeze 44549)
+Define(cold_snap 11958)
+  SpellInfo(cold_snap cd=180 )
+Define(combustion 11129)
+  SpellInfo(combustion cd=45 )
+Define(conjure_mana_gem 759)
+Define(counterspell 2139)
+  SpellInfo(counterspell duration=6 cd=24 )
+Define(evocation 12051)
+  SpellInfo(evocation duration=6 cd=120 )
+  SpellAddBuff(evocation evocation=1)
+Define(fingers_of_frost_aura 44544)
+  SpellInfo(fingers_of_frost_aura duration=15 )
+  SpellAddBuff(fingers_of_frost_aura fingers_of_frost_aura=1)
+Define(fire_blast 2136)
+  SpellInfo(fire_blast cd=8 )
+Define(fireball 133)
+Define(frost_armor 7302)
+  SpellAddBuff(frost_armor frost_armor=1)
+Define(frost_bomb 113092)
+  SpellInfo(frost_bomb duration=2 )
+  SpellAddBuff(frost_bomb frost_bomb=1)
+Define(frostbolt 116)
+  SpellInfo(frostbolt duration=15 )
+  SpellAddBuff(frostbolt frostbolt=1)
+Define(frostfire_bolt 44614)
+  SpellInfo(frostfire_bolt duration=8 )
+  SpellAddBuff(frostfire_bolt frostfire_bolt=1)
+Define(frozen_orb 84714)
+  SpellInfo(frozen_orb duration=10 cd=60 )
+Define(heating_up 48107)
+  SpellInfo(heating_up duration=10 )
+  SpellAddBuff(heating_up heating_up=1)
+Define(ice_lance 30455)
+Define(icy_veins 12472)
+  SpellInfo(icy_veins duration=20 cd=180 )
+  SpellAddBuff(icy_veins icy_veins=1)
+Define(ignite 12654)
+  SpellInfo(ignite duration=4 tick=2 )
+  SpellAddTargetDebuff(ignite ignite=1)
+Define(inferno_blast 108853)
+  SpellInfo(inferno_blast cd=8 )
+Define(invocation 114003)
+Define(mage_armor 6117)
+  SpellAddBuff(mage_armor mage_armor=1)
+Define(mana_gem 56597)
+Define(mirror_image 55342)
+  SpellInfo(mirror_image duration=30 cd=180 )
+  SpellAddBuff(mirror_image mirror_image=1)
+Define(molten_armor 30482)
+  SpellAddBuff(molten_armor molten_armor=1)
+Define(nether_tempest 114923)
+  SpellInfo(nether_tempest duration=12 tick=1 )
+  SpellAddTargetDebuff(nether_tempest nether_tempest=1)
+Define(presence_of_mind 12043)
+  SpellInfo(presence_of_mind cd=90 )
+  SpellAddBuff(presence_of_mind presence_of_mind=1)
+Define(pyroblast 11366)
+  SpellInfo(pyroblast duration=18 tick=3 )
+  SpellAddTargetDebuff(pyroblast pyroblast=1)
+Define(pyroblast_aura 48108)
+  SpellInfo(pyroblast_aura duration=15 )
+  SpellAddBuff(pyroblast_aura pyroblast_aura=1)
+Define(rune_of_power 116011)
+  SpellInfo(rune_of_power duration=60 cd=6 )
+Define(time_warp 35346)
+  SpellInfo(time_warp duration=6 cd=15 )
+  SpellAddBuff(time_warp time_warp=1)
+Define(water_elemental 63859)
+Define(water_elemental_freeze 33395)
+  SpellInfo(water_elemental_freeze duration=8 cd=25 )
+  SpellAddBuff(water_elemental_freeze water_elemental_freeze=1)
+AddIcon mastery=1 help=main
 {
-    unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MAGEARMOR)
-    
-	#/arcane_blast,if=target.time_to_die<40&mana_pct>5
-	if TargetDeadIn(less 40) and ManaPercent(more 5) Spell(ARCANEBLAST)
-	#/arcane_blast,if=cooldown.evocation.remains<30&mana_pct>26
-	if {spell(EVOCATION)<30} and ManaPercent(more 26) Spell(ARCANEBLAST)
-	#/evocation,if=target.time_to_die>=31
-	if TargetDeadIn(more 31) Spell(EVOCATION)
-	#/sequence,name=conserve:arcane_blast:arcane_blast:arcane_blast:arcane_blast,if=!buff.bloodlust.up
-	unless DebuffPresent(ARCANEBLASTDEBUFF stacks=4) or BuffPresent(heroism) or ManaPercent(less 26)
-		Spell(ARCANEBLAST)
-	if BuffPresent(ARCANEMISSILEBUFF) Spell(ARCANEMISSILES)
-    #/arcane_barrage,if=buff.arcane_blast.stack>0; // when AM hasn't procced
-	Spell(ARCANEBARRAGE)
-    if Speed(more 0) 
+	if not InCombat() 
 	{
-		Spell(ARCANEBARRAGE)
-		Spell(FIREBLAST)
-		Spell(ICELANCE)
+		Spell(arcane_brilliance)
+		Spell(mage_armor)
+		Spell(rune_of_power)
 	}
-	Spell(ARCANEBLAST)
+	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
+	if BuffPresent(alter_time) and BuffPresent(presence_of_mind) Spell(arcane_blast)
+	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
+	if BuffExpires(rune_of_power) and BuffExpires(alter_time) Spell(rune_of_power)
+	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
+	if ManaPercent() >92 Spell(arcane_blast)
+	if BuffPresent(arcane_charge) and BuffExpires(arcane_power) and BuffExpires(alter_time) and target.DeadIn() >25 and {ManaPercent() <92 or SpellCooldown(mana_gem) >10 or ItemCharges(36799) ==0 } Spell(arcane_barrage)
+	if BuffStacks(arcane_charge) ==6 and BuffExpires(arcane_missiles_aura) and target.DeadIn() >25 Spell(arcane_barrage)
+	Spell(arcane_blast)
 }
-
-AddIcon help=cd mastery=1
+AddIcon mastery=1 help=offgcd
 {
-    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
-    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
-	
-	#/conjure_mana_gem,if=cooldown.evocation.remains<44&target.time_to_die>20&mana_gem_charges=0
-	if ItemCount(MANAGEMITEM less 1 charges=1) and {spell(EVOCATION)<44} and TargetDeadIn(more 20)
-		Spell(CONJUREMANAGEM)
-	#if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|cooldown.evocation.remains>90|target.time_to_die<40
-	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLASTDEBUFF stacks=4)} or {spell(EVOCATION)>90} or TargetDeadIn(less 40)
+	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
+	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
+	if BuffExpires(alter_time) and BuffPresent(arcane_power) and BuffStacks(arcane_missiles_aura) ==2 and BuffStacks(arcane_charge) >3 and BuffRemains(rune_of_power) >6 Spell(alter_time)
+	if BuffPresent(alter_time) or BuffStacks(arcane_missiles_aura) ==2 Spell(arcane_missiles)
+	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
+	if BuffPresent(arcane_missiles_aura) and {SpellCooldown(alter_time_activate) >4 or target.DeadIn() <10 } Spell(arcane_missiles)
+}
+AddIcon mastery=1 help=moving
+{
+	Spell(arcane_barrage)
+	Spell(fire_blast)
+	Spell(ice_lance)
+}
+AddIcon mastery=1 help=cd
+{
+	if target.DeadIn() <18 Spell(arcane_power)
+	if target.DeadIn() <18 Spell(berserking)
+	Spell(mirror_image)
+	if BuffRemains(rune_of_power) >15 and BuffExpires(alter_time) and BuffStacks(arcane_charge) >1 Spell(arcane_power)
+	if BuffRemains(rune_of_power) >10 and BuffExpires(alter_time) and BuffStacks(arcane_charge) >2 Spell(berserking)
+	if BuffExpires(alter_time) Spell(presence_of_mind)
+}
+AddIcon mastery=2 help=main
+{
+	if not InCombat() 
 	{
-		Item(Trinket0Slot usable=1)
-		Item(Trinket1Slot usable=1)
-		#if ItemCount(VOLCANICPOTION more 0) Item(VOLCANICPOTION)
+		Spell(arcane_brilliance)
+		Spell(molten_armor)
 	}
-	
-	if {{spell(EVOCATION)<30} and DebuffPresent(ARCANEBLASTDEBUFF stacks=4)} or TargetDeadIn(less 40)
+	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
+	if BuffPresent(pyroblast_aura) and {SpellCooldown(alter_time_activate) >4 or BuffPresent(heating_up) } Spell(pyroblast)
+	if BuffPresent(presence_of_mind) and SpellCooldown(alter_time_activate) >4 Spell(pyroblast)
+	if BuffPresent(heating_up) and BuffExpires(pyroblast_aura) Spell(inferno_blast)
+	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
+	Spell(fireball)
+}
+AddIcon mastery=2 help=offgcd
+{
+	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
+	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
+	if target.DeadIn() <12 Spell(combustion)
+	if ArmorSetParts(T14 more 4) and target.DebuffPresent(ignite) and target.DebuffPresent(pyroblast_aura) Spell(combustion)
+	if not ArmorSetParts(T14 more 4) and LastSpellDamage(ignite) >=12000 and target.DebuffPresent(pyroblast_aura) Spell(combustion)
+	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
+	if BuffExpires(alter_time) and BuffPresent(pyroblast_aura) and BuffRemains(invocation) >6 Spell(alter_time)
+}
+AddIcon mastery=2 help=moving
+{
+	Spell(inferno_blast)
+	Spell(ice_lance)
+}
+AddIcon mastery=2 help=cd
+{
+	if not InCombat() 
 	{
-		#action_list_str += "/arcane_power,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
-		Spell(ARCANEPOWER)
-		#action_list_str += "/mana_gem,if=(cooldown.evocation.remains<30&buff.arcane_blast.stack=4)|target.time_to_die<40";
-		if ManaPercent(less 85) Item(MANAGEMITEM)
+		Spell(evocation)
 	}
-	
-	if ManaPercent(less 10) Item(MANAGEMITEM)
-	
-    #action_list_str += "/mirror_image,if=buff.arcane_power.up|(cooldown.arcane_power.remains>20&target.time_to_die>15)";
-    if BuffPresent(ARCANEPOWER) or {{spell(ARCANEPOWER)>0} and TargetDeadIn(more 15)} Spell(MIRRORIMAGE)
-	#/flame_orb,if=target.time_to_die>=10
-    if TargetDeadIn(more 10) Spell(FLAMEORB)
-	#/presence_of_mind,arcane_blast
-    Spell(PRESENCEOFMIND)
+	if BuffRemains(invocation) >10 and BuffExpires(alter_time) and ManaPercent() >28 Spell(berserking)
+	if BuffExpires(invocation) and BuffExpires(alter_time) Spell(evocation)
+	if target.DeadIn() <18 Spell(berserking)
+	if ManaPercent() <10 and target.DeadIn() >=30 Spell(evocation)
+	Spell(mirror_image)
+	if BuffExpires(alter_time) Spell(presence_of_mind)
 }
-
-AddIcon help=main mastery=2
+AddIcon mastery=3 help=main
 {
-    unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
-	#/scorch,debuff=1
-    if TalentPoints(CRITICALMASSTALENT more 0) and TargetDebuffExpires(magicalcrittaken 0) Spell(SCORCH)
-	#/combustion,if=dot.living_bomb.ticking&dot.ignite.ticking&dot.pyroblast.ticking
-    if TargetDebuffPresent(LIVINGBOMB mine=1) and TargetDebuffPresent(IGNITE mine=1) and 
-		{TargetDebuffPresent(PYROBLAST mine=1) or TargetDebuffPresent(PYROBLASTBANG mine=1)}
-        Spell(COMBUSTION)
-	#/living_bomb,if=!ticking
-    if TargetDebuffExpires(LIVINGBOMB 0 mine=1) and TargetDeadIn(more 12) Spell(LIVINGBOMB)
-	#/pyroblast_hs,if=buff.hot_streak.react
-    if BuffPresent(HOTSTREAK) Spell(PYROBLAST)
-	#/mage_armor,if=mana_pct<5
-	if BuffExpires(MAGEARMOR 0) and ManaPercent(less 5) Spell(MAGEARMOR)
-    if TalentPoints(FIRESTARTERTALENT more 0) and Speed(more 0) Spell(SCORCH)
-	#/frostfire_bolt
-    if Glyph(GLYPHOFFROSTFIRE) Spell(FROSTFIREBOLT usable=1)
-	#/fireball
-	Spell(FIREBALL usable=1)
-    Spell(SCORCH)
-}
-
-AddIcon help=cd mastery=2
-{
-	if TargetBuffStealable(yes) Spell(SPELLSTEAL)
-    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
-    
-	#if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
-    #/mana_gem,if=mana_deficit>12500
-    if ManaPercent(less 85) Item(MANAGEMITEM)
-	#/mirror_image,if=target.time_to_die>=25
-	if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
-    #/flame_orb,if=target.time_to_die>=12
-    if TargetDeadIn(more 11) Spell(FLAMEORB)
-    Item(Trinket0Slot usable=1)
-    Item(Trinket1Slot usable=1)
-}
-
-AddIcon help=main mastery=3
-{
-    unless InCombat() if BuffExpires(MAGEARMOR 400) and BuffExpires(MOLTENARMOR 400) and BuffExpires(ICEARMOR 400) Spell(MOLTENARMOR)
-	if BuffPresent(MAGEARMOR) and ManaPercent(more 45) Spell(MOLTENARMOR)
-	
-    if PetPresent(no) Spell(SUMMONWATERELEMENTAL)
-	
-	#/deep_freeze
-    Spell(DEEPFREEZE usable=1)
-	#/frostfire_bolt,if=buff.brain_freeze.react
-    if BuffPresent(BRAINFREEZE) {Spell(FROSTFIREBOLT) Spell(FIREBALL)}
-	#/ice_lance,if=buff.fingers_of_frost.stack>1
-    if BuffPresent(FINGERSOFFROST stacks=2) Spell(ICELANCE)
-	#/ice_lance,if=buff.fingers_of_frost.react&pet.water_elemental.cooldown.freeze.remains<gcd
-    unless BuffPresent(FINGERSOFFROST) Spell(PETFREEZE)
-	#/mage_armor,if=(mana_pct*12)<target.time_to_die
-    if Glyph(GLYPHOFFROSTBOLT) and BuffPresent(MOLTENARMOR) and {{manaPercent()*12} < target.timeToDie()} Spell(MAGEARMOR)
-	#/mage_armor,if=(mana_pct*15)<target.time_to_die
-	if Glyph(GLYPHOFFROSTBOLT no) and BuffPresent(MOLTENARMOR) and {{manaPercent()*15} < target.timeToDie()} Spell(MAGEARMOR)
-	#/evocation,if=mana_pct<5&target.time_to_die>60
-    if ManaPercent(less 5) and TargetDeadIn(more 60) Spell(EVOCATION)
-	#/ice_lance,moving=1
-    if Speed(more 0) Spell(ICELANCE)
-	#/fire_blast,moving=1
-    if Speed(more 0) Spell(FIREBLAST)
-	#/frostbolt
-	if Glyph(GLYPHOFFROSTBOLT) Spell(FROSTBOLT)
-    if Glyph(GLYPHOFFROSTBOLT no)
+	if not InCombat() 
 	{
-		#/frostbolt,if=!cooldown.early_frost.remains
-		if castTime(FROSTBOLT) < timeWithHaste(1.5) Spell(FROSTBOLT)
-		#/frostfire_bolt
-		Spell(FROSTFIREBOLT)
-		Spell(FROSTBOLT)
+		Spell(arcane_brilliance)
+		Spell(frost_armor)
 	}
+	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
+	if BuffPresent(alter_time) and BuffPresent(brain_freeze) Spell(frostfire_bolt)
+	if BuffPresent(alter_time) and BuffPresent(fingers_of_frost_aura) Spell(ice_lance)
+	if BuffPresent(alter_time) and BuffPresent(presence_of_mind) Spell(frostbolt)
+	if BuffPresent(fingers_of_frost_aura) and BuffRemains(fingers_of_frost_aura) <5 Spell(ice_lance)
+	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 and SpellCooldown(icy_veins) <GCD() and BuffRemains(invocation) >20 and BuffExpires(alter_time) Spell(frozen_orb)
+	if BuffPresent(fingers_of_frost_aura) and BuffRemains(fingers_of_frost_aura) <2 Spell(ice_lance)
+	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(frostfire_bolt)
+	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(ice_lance)
+	if BuffPresent(fingers_of_frost_aura) Spell(ice_lance)
+	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 Spell(frozen_orb)
+	Spell(frostbolt)
 }
-
-AddIcon help=cd mastery=3
+AddIcon mastery=3 help=offgcd
 {
-    #if BuffPresent(heroism) or TargetDeadIn(less 40) Item(VOLCANICPOTION)
-    if TargetBuffStealable(yes) Spell(SPELLSTEAL)
-    if TargetIsInterruptible(yes) Spell(COUNTERSPELL)
-	
-	#/mana_gem,if=mana_deficit>12500
-    if ManaPercent(less 85) Item(MANAGEMITEM)
-	#/cold_snap,if=cooldown.deep_freeze.remains>15&cooldown.frostfire_orb.remains>30&cooldown.icy_veins.remains>30
-    unless 15s before Spell(DEEPFREEZE) or 30s before Spell(FLAMEORB) or 30s before Spell(ICYVEINS) Spell(COLDSNAP)
-	#/frostfire_orb,if=target.time_to_die>=12
-    if TargetDeadIn(more 11) Spell(FLAMEORB)
-	#/mirror_image,if=target.time_to_die>=25
-    if TargetDeadIn(more 24) Spell(MIRRORIMAGE)
-	#/icy_veins,if=buff.icy_veins.down&buff.bloodlust.down
-    if BuffExpires(ICYVEINS 0) and BuffExpires(heroism 0) Spell(ICYVEINS)
-    Item(Trinket0Slot usable=1)
-    Item(Trinket1Slot usable=1)
+	if not InCombat() 
+	{
+		Spell(water_elemental)
+	}
+	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
+	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
+	if BuffExpires(alter_time) and BuffStacks(fingers_of_frost_aura) <2 Spell(water_elemental_freeze)
+	if not target.DebuffPresent(frost_bomb) Spell(frost_bomb)
+	if BuffExpires(alter_time) and BuffPresent(brain_freeze) and BuffPresent(fingers_of_frost_aura) and BuffRemains(invocation) >6 Spell(alter_time)
+	if BuffExpires(alter_time) and BuffPresent(brain_freeze) and BuffPresent(fingers_of_frost_aura) Spell(alter_time)
+	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
 }
-
+AddIcon mastery=3 help=moving
+{
+	Spell(fire_blast)
+	Spell(ice_lance)
+}
+AddIcon mastery=3 help=cd
+{
+	if not InCombat() 
+	{
+		Spell(evocation)
+	}
+	if Health() <30 Spell(cold_snap)
+	if BuffExpires(alter_time) Spell(presence_of_mind)
+	if target.DeadIn() <22 Spell(icy_veins)
+	if target.DeadIn() <12 Spell(blood_fury)
+	if ArmorSetParts(T14 more 4) and BuffRemains(invocation) >20 and BuffExpires(alter_time) Spell(icy_veins)
+	if not ArmorSetParts(T14 more 4) and target.DebuffPresent(frozen_orb) Spell(icy_veins)
+	if target.DebuffPresent(frozen_orb) and BuffExpires(alter_time) Spell(icy_veins)
+	Spell(mirror_image)
+	if BuffExpires(invocation) and BuffExpires(alter_time) Spell(evocation)
+	if BuffRemains(invocation) >15 and BuffExpires(alter_time) and ManaPercent() >28 Spell(blood_fury)
+}
 ]]

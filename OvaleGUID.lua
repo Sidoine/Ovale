@@ -16,8 +16,7 @@ function OvaleGUID:OnEnable()
 	self:Update("player")
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("UNIT_TARGET")
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED")
-	self:RegisterEvent("RAID_ROSTER_UPDATE")
+	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	self:RegisterEvent("UNIT_PET")
 	self:RegisterEvent("ARENA_OPPONENT_UPDATE")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
@@ -28,8 +27,7 @@ end
 function OvaleGUID:OnDisable()
 	self:UnregisterEvent("PLAYER_LOGIN")
 	self:UnregisterEvent("UNIT_TARGET")
-	self:UnregisterEvent("PARTY_MEMBERS_CHANGED")
-	self:UnregisterEvent("RAID_ROSTER_UPDATE")
+	self:UnregisterEvent("GROUP_ROSTER_UPDATE")
 	self:UnregisterEvent("UNIT_PET")
 	self:UnregisterEvent("ARENA_OPPONENT_UPDATE")
 	self:UnregisterEvent("PLAYER_FOCUS_CHANGED")
@@ -86,15 +84,8 @@ function OvaleGUID:UNIT_TARGET(event, unitId)
 	self:Update(unitId .. "target")
 end
 
-function OvaleGUID:PARTY_MEMBERS_CHANGED(event)
-	for i=1, GetNumPartyMembers() do
-		self:UpdateWithTarget("party"..i)
-		self:UpdateWithTarget("partypet"..i)
-	end
-end
-
-function OvaleGUID:RAID_ROSTER_UPDATE(event)
-	for i=1, GetNumRaidMembers() do
+function OvaleGUID:GROUP_ROSTER_UPDATE(event)
+	for i=1, GetNumGroupMembers() do
 		self:UpdateWithTarget("raid"..i)
 		self:UpdateWithTarget("raidpet"..i)
 	end

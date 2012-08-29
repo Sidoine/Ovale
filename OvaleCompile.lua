@@ -20,7 +20,7 @@ local function ParseParameters(params)
 	if not params then
 		return paramList
 	end
-	for k,v in string.gmatch(params, "(%w+)=([-%w\\_%.]+)") do
+	for k,v in string.gmatch(params, "([%w_]+)=([-%w\\_%.]+)") do
 		if (string.match(v,"^%-?%d+%.?%d*$")) then
 			v = tonumber(v)
 		end	
@@ -29,7 +29,7 @@ local function ParseParameters(params)
 		end		
 		paramList[k] = v
 	end
-	params = string.gsub(params,"%w+=[-%w\\_%.]+","")
+	params = string.gsub(params,"[%w_]+=[-%w\\_%.]+","")
 	local n=0
 	for w in string.gmatch(params, "[-%w_\\%.]+") do
 		if (string.match(w,"^%-?%d+%.?%d*$")) then
@@ -72,7 +72,7 @@ local function TestConditions(paramList)
 	if paramList.glyph and not HasGlyph(paramList.glyph) then
 		return false
 	end
-	if paramList.mastery and paramList.mastery~=GetPrimaryTalentTree() then
+	if paramList.mastery and paramList.mastery~=GetSpecialization() then
 		return false
 	end
 	if paramList.talent and not HasTalent(paramList.talent) then
@@ -150,6 +150,8 @@ local function ParseFunction(prefix, func, params)
 	if customFunctions[func] then
 		return customFunctions[func]
 	end
+	
+	func = string.lower(func)
 	
 	local newNode = { type="function", func=func, params=paramList}
 	return AddNode(newNode)
@@ -240,6 +242,11 @@ end
 
 local function ParseAnd(a,b)
 	local newNode = {type="and", a=node[tonumber(a)], b=node[tonumber(b)]}
+	return AddNode(newNode)
+end
+
+local function ParseNot(a)
+	local newNode = {type="not", a=node[tonumber(a)]}
 	return AddNode(newNode)
 end
 
@@ -357,7 +364,9 @@ local function ParseCommands(text)
 		text = string.gsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
 		text = string.gsub(text, "(%d+%.?%d*)s", ParseTime)
 		text = string.gsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
-		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/])%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
 		if was == text then
 			break
 		end
@@ -365,7 +374,17 @@ local function ParseCommands(text)
 	
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "node(%d+)%s*([%>%<])%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "node(%d+)%s*([%>%<]=?)%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "node(%d+)%s*(==)%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		if was == text then
+			break
+		end
+	end
+		
+	while (1==1) do
+		local was = text
+		text = string.gsub(text, "not%s+node(%d+)", ParseNot)
 		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
 		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
 		text = string.gsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
@@ -381,7 +400,8 @@ local function ParseCommands(text)
 
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/%>%<])%s*node(%d+)", ParseOp)
+		text = string.gsub(text, "not%s+node(%d+)", ParseNot)
+		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/%>%<]=?|==)%s*node(%d+)", ParseOp)
 		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
 		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
@@ -412,11 +432,13 @@ local function ParseCommands(text)
 	return masterNode
 end
 
-local function ParseAddIcon(params, text)
+local function ParseAddIcon(params, text, secure)
 	-- On convertit le numéro de node en node
 	local masterNode = ParseCommands(text)
+	if not masterNode then return nil end
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
+	masterNode.secure = secure
 	if not TestConditions(masterNode.params) then
 		return nil
 	end
@@ -453,8 +475,8 @@ function OvaleCompile:CompileInputs(text)
 	Ovale.casesACocher = {}
 	Ovale.listes = {}
 	
-	text = string.gsub(text, "AddListItem%s*%(%s*(%w+)%s+(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
-	text = string.gsub(text, "AddCheckBox%s*%(%s*(%w+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
+	text = string.gsub(text, "AddListItem%s*%(%s*([%w_]+)%s+([%w_]+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
+	text = string.gsub(text, "AddCheckBox%s*%(%s*([%w_]+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
 	return text
 end
 
@@ -469,11 +491,11 @@ function OvaleCompile:Compile(text)
 	text = string.gsub(text, "#.*$","")
 
 	-- Define(CONSTANTE valeur)
-	text = string.gsub(text, "Define%s*%(%s*(%w+)%s+(%w+)%s*%)", ParseDefine)
+	text = string.gsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
 	
 	-- On remplace les constantes par leur valeur
 	for k,v in pairs(defines) do
-		text = subtest(text, "([^%w])"..k.."([^%w])", "%1"..v.."%2")
+		text = subtest(text, "([^%w_])"..k.."([^%w_])", "%1"..v.."%2")
 	end
 	
 	-- Fonctions
@@ -507,6 +529,13 @@ function OvaleCompile:Compile(text)
 	local masterNodes ={}
 	
 	-- On compile les AddIcon
+	for p,t in string.gmatch(text, "AddActionIcon%s*(.-)%s*(%b{})") do
+		local newNode = ParseAddIcon(p,t,true)
+		if newNode then
+			masterNodes[#masterNodes+1] = newNode
+		end
+	end
+	
 	for p,t in string.gmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
 		local newNode = ParseAddIcon(p,t)
 		if newNode then

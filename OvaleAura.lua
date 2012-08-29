@@ -149,9 +149,9 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 			end
 			
 			if unitId == "player" then
-				if OvaleData.buffSpellList.spellhaste[spellId] then
+				if OvaleData.buffSpellList.spell_haste[spellId] then
 					hateSorts = 5
-				elseif OvaleData.buffSpellList.meleehaste[spellId] then 
+				elseif OvaleData.buffSpellList.melee_haste[spellId] then 
 					hateCaC = 10
 				elseif OvaleData.buffSpellList.heroism[spellId] then
 					hateHero = 30
@@ -231,28 +231,53 @@ function OvaleAura:GetAura(unitId, spellId, mine)
 	return self:GetAuraByGUID(UnitGUID(unitId), spellId, mine, unitId)
 end
 
--- Look for the last of my aura on any targt that will expires.
--- Returns its expiration time
-function OvaleAura:GetExpirationTimeOnAnyTarget(spellId)
-	local ending = nil
-	local starting = nil
+function OvaleAura:GetStealable(unitId)
+	local auraTable = self.aura[UnitGUID(unitId)]
+	if not auraTable then
+		return nil
+	end
+	local starting,ending
 	
-	for unitId,auraTable in pairs(self.aura) do
-		if auraTable[spellId] then
-			local aura = auraTable[spellId].mine
-			if aura then
-				local newEnding = aura.ending
-				local newStarting = aura.start
-				if newStarting and (not staring or newStarting < starting) then
-					starting = newStarting
-				end
-				if newEnding and (not ending or newEnding > ending) then
-					ending = newEnding
-				end
+	for spellId, ownerTable in pairs(auraTable) do
+		local aura = ownerTable.other
+		if aura and aura.stealable then
+			if not starting or aura.start < starting then
+				starting = aura.start
 			end
-		end		
+			if not ending or aura.ending > ending then
+				ending = aura.ending
+			end
+		end
 	end
 	return starting, ending
+end
+
+-- Look for the last of my aura on any targt that will expires.
+-- Returns its expiration time
+function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
+	local ending = nil
+	local starting = nil
+	local count = 0
+	
+	for unitId,auraTable in pairs(self.aura) do
+		if unitId ~= excludingTarget then
+			if auraTable[spellId] then
+				local aura = auraTable[spellId].mine
+				if aura then
+					local newEnding = aura.ending
+					local newStarting = aura.start
+					if newStarting and (not staring or newStarting < starting) then
+						starting = newStarting
+					end
+					if newEnding and (not ending or newEnding > ending) then
+						ending = newEnding
+					end
+					count = count + 1
+				end
+			end		
+		end
+	end
+	return starting, ending, count
 end
 
 function OvaleAura:Debug()

@@ -1,266 +1,177 @@
-Ovale.defaut["ROGUE"] =
-[[
-#Abilities
-Define(ADRENALINERUSH 13750)
-	SpellInfo(ADRENALINERUSH cd=180)
-	SpellAddBuff(ADRENALINERUSH ADRENALINERUSH=15)
-Define(AMBUSH 8676)
-	SpellInfo(AMBUSH combo=2 mana=60)
-Define(BACKSTAB 53)
-	SpellInfo(BACKSTAB combo=1 mana=60)
-Define(BLADEFLURRY 13877)
-	SpellAddBuff(BLADEFLURRY BLADEFLURRY=1000 cd=10)
-Define(CLOACKOFSHADOWS 31224)
-	SpellInfo(CLOACKOFSHADOWS cd=90)
-Define(COLDBLOOD 14177)
-	SpellInfo(COLDBLOOD cd=120)
-	SpellAddBuff(COLDBLOOD COLDBLOOD=100)
-Define(ENVENOM 32645)
-	SpellInfo(ENVENOM combo=-5)
-	SpellAddBuff(ENVENOM ENVENOM=5 mana=35)
-Define(EVISCERATE 2098)
-	SpellInfo(EVISCERATE combo=-5 mana=35)
-Define(HEMORRHAGE 16511)
-	SpellInfo(HEMORRHAGE combo=1 mana=35)
-	SpellAddTargetDebuff(HEMORRHAGE HEMORRHAGE=60)
-Define(KICK 1766)
-Define(KILLINGSPREE 51690)
-	SpellInfo(KILLINGSPREE cd=120)
-	SpellAddBuff(KILLINGSPREE KILLINGSPREE=2)
-Define(GARROTE 703)
-	SpellInfo(GARROTE combo=1 mana=45)
-	SpellAddTargetDebuff(GARROTE GARROTE=18)
-Define(MUTILATE 1329)
-	SpellInfo(MUTILATE combo=1 mana=60)
-Define(PREMEDITATION 14183)
-	SpellInfo(PREMEDITATION cd=20 combo=2)
-Define(PREPARATION 14185)
-	SpellInfo(PREPARATION cd=300)
-Define(RECUPERATE 73651)
-	SpellInfo(RECUPERATE combo=-5 mana=30)
-	SpellAddBuff(RECUPERATE RECUPERATE=30)
-Define(REVEALINGSTRIKE 84617)
-	SpellInfo(REVEALINGSTRIKE combo=1 mana=40)
-	SpellAddTargetDebuff(REVEALINGSTRIKE REVEALINGSTRIKE=15)
-Define(RUPTURE 1943)
-	SpellInfo(RUPTURE combo=-5 mana=25)
-	SpellAddTargetDebuff(RUPTURE RUPTURE=8)
-Define(SINISTERSTRIKE 1752)
-	SpellInfo(SINISTERSTRIKE combo=1 mana=45)
-Define(SHADOWDANCE 51713)
-	SpellInfo(SHADOWDANCE cd=60)
-	SpellAddBuff(SHADOWDANCE SHADOWDANCE=6)
-Define(SHADOWSTEP 36554)
-	SpellInfo(SHADOWSTEP cd=20)
-	SpellAddBuff(SHADOWSTEP SHADOWSTEPBUFF=10)
-Define(SLICEANDDICE 5171)
-	SpellInfo(SLICEANDDICE combo=-5 mana=25)
-	SpellAddBuff(SLICEANDDICE SLICEANDDICE=10)
-Define(STEALTH 1784)
-Define(TRICKSOFTHETRADE 57934)
-	SpellInfo(TRICKSOFTHETRADE cd=30)
-Define(VANISH 1856)
-	SpellInfo(VANISH cd=180)
-	SpellAddBuff(VANISH VANISHBUFF=3)
-Define(VENDETTA 79140)
-	SpellInfo(VENDETTA cd=120)
-	SpellAddTargetDebuff(VENDETTA VENDETTA=30)
-	
-#Buffs
-Define(SHADOWSTEPBUFF 36563)	
-Define(VANISHBUFF 11327)
-Define(SHALLOWINSIGHT 84745)
-Define(MODERATEINSIGHT 84746)
-Define(OVERKILL 58426)
-Define(MASTEROFSUBTLETY 31223)
-Define(FINDWEAKNESS 91023)
-SpellList(DEEPINSIGHT 84745 84746 84747)
-
-#Items
-Define(INSTANTPOISON 6947)
-Define(DEADLYPOISON 2892)
-
-#Talents
-Define(TALENTCUTTOTHECHASE 2070)
-Define(TALENTENERGETICRECOVERY 11665)
-Define(TALENTHEMORRHAGE 681)
-
-
-ScoreSpells(SLICEANDDICE HUNGERFORBLOOD ENVENOM RUPTURE EVISCERATE MUTILATE SINISTERSTRIKE)
-
-AddIcon help=main mastery=1
+Ovale.defaut["ROGUE"] = [[Define(adrenaline_rush 13750)
+  SpellInfo(adrenaline_rush duration=15 cd=180 )
+  SpellAddBuff(adrenaline_rush adrenaline_rush=1)
+Define(ambush 8676)
+  SpellInfo(ambush energy=60 combo=2 )
+Define(anticipation 114015)
+Define(backstab 53)
+  SpellInfo(backstab energy=35 combo=1 )
+Define(berserking 26297)
+  SpellInfo(berserking duration=10 cd=180 )
+  SpellAddBuff(berserking berserking=1)
+Define(deep_insight 84747)
+  SpellInfo(deep_insight duration=15 )
+  SpellAddBuff(deep_insight deep_insight=1)
+Define(dispatch 111240)
+  SpellInfo(dispatch energy=30 combo=1 )
+Define(envenom 32645)
+  SpellInfo(envenom duration=1 combo=0 energy=35 )
+  SpellAddBuff(envenom envenom=1)
+Define(eviscerate 2098)
+  SpellInfo(eviscerate combo=0 energy=35 )
+Define(find_weakness 91021)
+  SpellInfo(find_weakness duration=10 )
+  SpellAddBuff(find_weakness find_weakness=1)
+Define(hemorrhage 16511)
+  SpellInfo(hemorrhage energy=30 combo=1 )
+Define(honor_among_thieves 51701)
+Define(kick 1766)
+  SpellInfo(kick duration=5 energy=15 cd=15 )
+Define(killing_spree 51690)
+  SpellInfo(killing_spree duration=3 cd=120 )
+  SpellAddBuff(killing_spree killing_spree=1)
+Define(master_of_subtlety 31223)
+Define(mutilate 1329)
+  SpellInfo(mutilate energy=55 combo=2 )
+Define(premeditation 14183)
+  SpellInfo(premeditation duration=20 combo=2 cd=20 )
+Define(preparation 14185)
+  SpellInfo(preparation cd=300 )
+Define(revealing_strike 84617)
+  SpellInfo(revealing_strike duration=18 energy=40 combo=1 )
+  SpellAddBuff(revealing_strike revealing_strike=1)
+Define(rupture 1943)
+  SpellInfo(rupture duration=4 combo=0 energy=25 )
+  SpellAddTargetDebuff(rupture rupture=1)
+Define(shadow_blades 121471)
+  SpellInfo(shadow_blades duration=12 cd=180 )
+  SpellAddBuff(shadow_blades shadow_blades=1)
+Define(shadow_dance 51713)
+  SpellInfo(shadow_dance duration=8 cd=60 )
+  SpellAddBuff(shadow_dance shadow_dance=1)
+Define(sinister_strike 1752)
+  SpellInfo(sinister_strike energy=40 combo=0 )
+Define(slice_and_dice 5171)
+  SpellInfo(slice_and_dice duration=6 combo=0 energy=25 )
+  SpellAddBuff(slice_and_dice slice_and_dice=1)
+Define(stealth 63880)
+Define(stealthed 1784)
+  SpellInfo(stealthed cd=6 )
+  SpellAddBuff(stealthed stealthed=1)
+Define(tricks_of_the_trade 57933)
+  SpellInfo(tricks_of_the_trade duration=6 )
+  SpellAddBuff(tricks_of_the_trade tricks_of_the_trade=1)
+Define(vanish 1856)
+  SpellInfo(vanish cd=180 )
+  SpellAddBuff(vanish vanish=1)
+Define(vendetta 79140)
+  SpellInfo(vendetta duration=20 cd=120 )
+  SpellAddBuff(vendetta vendetta=1)
+Define(preparation_talent 10)
+AddIcon mastery=1 help=main
 {
-	unless InCombat()
+	if not InCombat() 
 	{
-		if WeaponEnchantExpires(mainhand 300) Item(INSTANTPOISON)
-		if WeaponEnchantExpires(offhand 300) Item(DEADLYPOISON)
+		if WeaponEnchantExpires(mainhand 300) Item(6497) 
 	}
-
-	#actions+=/garrote
-	if BuffPresent(STEALTH) Spell(GARROTE)
-
-	#actions+=/slice_and_dice,if=buff.slice_and_dice.down
-	unless BuffPresent(SLICEANDDICE) if ComboPoints(more 0)	Spell(SLICEANDDICE)
-
-	#/rupture,if=!ticking&time<6
-	if TargetDebuffExpires(RUPTURE mine=1) and TimeInCombat(less 6) and ComboPoints(more 0) Spell(RUPTURE)
-	#/vendetta
-	if TargetDebuffExpires(VENDETTA) and TargetDeadIn(more 20) Spell(VENDETTA)
-	
-	#actions+=/rupture,if=!ticking&buff.slice_and_dice.remains>6
-	if TargetDebuffExpires(RUPTURE 0 mine=1) and BuffPresent(SLICEANDDICE 6) and ComboPoints(more 0)
-		Spell(RUPTURE)
-
-	#actions+=/cold_blood,sync=envenom ??
-	#if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 6) and TargedDebuffPresent(RUPTURE 5)
-	#	Spell(COLDBLOOD)
-
-	#/envenom,if=combo_points>=4&buff.envenom.down
-	#/envenom,if=combo_points>=4&energy>90
-	if ComboPoints(more 3) and {BuffExpires(ENVENOM) or Mana(more 89)} Spell(ENVENOM)
-	#/envenom,if=combo_points>=2&buff.slice_and_dice.remains<3
-	if TalentPoints(TALENTCUTTOTHECHASE more 0) and ComboPoints(more 1) and BuffExpires(SLICEANDDICE 3) Spell(ENVENOM)
-	
-	#/backstab,if=combo_points<5&target.health_pct<35
-	if ComboPoints(less 5) and TargetLifePercent(less 35) Spell(BACKSTAB)
-	#/mutilate,if=combo_points<4&target.health_pct>=35
-	if ComboPoints(less 4) and TargetLifePercent(more 35) Spell(MUTILATE)
-	
+	Spell(ambush usable=1)
+	if BuffExpires(slice_and_dice) Spell(slice_and_dice)
+	if target.TicksRemain(rupture) <2 and Energy() >90 Spell(dispatch usable=1)
+	if target.TicksRemain(rupture) <2 and Energy() >90 Spell(mutilate)
+	if TicksRemain(rupture) <2 or {ComboPoints() ==5 and TicksRemain(rupture) <3 } Spell(rupture)
+	if ComboPoints() >=4 and TicksRemain(envenom) <2 Spell(envenom)
+	if ComboPoints() >4 Spell(envenom)
+	if ComboPoints() >=2 and BuffRemains(slice_and_dice) <3 Spell(envenom)
+	if ComboPoints() <5 Spell(dispatch usable=1)
+	Spell(mutilate)
 }
-
-AddIcon help=cd mastery=1
+AddIcon mastery=1 help=offgcd
 {
-	#actions+=/kick
-	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
-	if Mana(less 70) Spell(COLDBLOOD)
-	#actions+=/vanish,if=time>30&energy>50
-	if {spell(VANISH)>30} and Mana(more 50) unless BuffPresent(OVERKILL) Spell(VANISH)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
-AddIcon help=main mastery=2
-{
-	unless InCombat()
+	if not InCombat() 
 	{
-		if WeaponEnchantExpires(mainhand 300) Item(INSTANTPOISON)
-		if WeaponEnchantExpires(offhand 300) Item(DEADLYPOISON)
+		Spell(stealth)
 	}
-
-	#slice_and_dice,if=buff.slice_and_dice.down
-	#slice_and_dice,if=buff.slice_and_dice.remains<2
-	if BuffExpires(SLICEANDDICE 2) and ComboPoints(more 0)
-		Spell(SLICEANDDICE)
-
-	#killing_spree,if=energy<35&buff.slice_and_dice.remains>4&buff.adrenaline_rush.down
-	if Mana(less 35) and BuffPresent(SLICEANDDICE 4) and BuffExpires(ADRENALINERUSH) 
-		Spell(KILLINGSPREE)
-
-	#adrenaline_rush,if=energy<35
-	unless BuffPresent(KILLINGSPREE) if Mana(less 35) Spell(ADRENALINERUSH)
-
-	#eviscerate,if=combo_points=5&buff.bandits_guile.stack>=12
-	if ComboPoints(more 4) and BuffPresent(SLICEANDDICE 4) and BuffPresent(DEEPINSIGHT 12)
-		Spell(EVISCERATE)
-
-	#rupture,if=!ticking&combo_points=5&target.time_to_die>10
-	if TargetDebuffExpires(RUPTURE 0 mine=1) and ComboPoints(more 4) and TargetDeadIn(more 10)
-		Spell(RUPTURE)
-
-	#eviscerate,if=combo_points=5
-	if ComboPoints(equal 5) Spell(EVISCERATE)
-
-	#revealing_strike,if=combo_points=4&buff.revealing_strike.down
-	if ComboPoints(equal 4) and TargetDebuffExpires(REVEALINGSTRIKE 0 mine=1) Spell(REVEALINGSTRIKE)
-
-	#sinister_strike,if=combo_points<5
-	if ComboPoints(less 5) Spell(SINISTERSTRIKE)
+	if target.IsInterruptible() Spell(kick)
+	Spell(tricks_of_the_trade)
 }
-
-AddIcon help=aoe mastery=2
+AddIcon mastery=1 help=cd
 {
-	unless BuffPresent(BLADEFLURRY) Spell(BLADEFLURRY)
-	if BuffPresent(DEEPINSIGHT)
+	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
+	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	Spell(berserking)
+	if TimeInCombat() >10 and not BuffPresent(stealthed) Spell(vanish)
+	if {BuffPresent(bloodlust) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
+	Spell(vendetta)
+}
+AddIcon mastery=2 help=main
+{
+	if not InCombat() 
 	{
-		unless BuffPresent(ADRENALINERUSH) Spell(KILLINGSPREE)
+		if WeaponEnchantExpires(mainhand 300) Item(6497) 
 	}
+	Spell(ambush usable=1)
+	if BuffRemains(slice_and_dice) <2 Spell(slice_and_dice)
+	if TicksRemain(rupture) <2 and ComboPoints() ==5 and BuffPresent(deep_insight) and target.DeadIn() >10 Spell(rupture)
+	if ComboPoints() ==5 and BuffPresent(deep_insight) Spell(eviscerate)
+	if TicksRemain(rupture) <2 and ComboPoints() ==5 and target.DeadIn() >10 Spell(rupture)
+	if ComboPoints() ==5 Spell(eviscerate)
+	if ComboPoints() <5 and TicksRemain(revealing_strike) <2 Spell(revealing_strike)
+	if ComboPoints() <5 Spell(sinister_strike)
 }
-
-AddIcon help=cd mastery=2
+AddIcon mastery=2 help=offgcd
 {
-	#actions+=/kick
-	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
-AddIcon help=main mastery=3
-{
-	unless InCombat()
+	if not InCombat() 
 	{
-		if WeaponEnchantExpires(mainhand 400) Item(INSTANTPOISON)
-		if WeaponEnchantExpires(offhand 400) Item(DEADLYPOISON)
+		Spell(stealth)
 	}
-
-	if BuffPresent(STEALTH) or BuffPresent(VANISHBUFF)
+	if target.IsInterruptible() Spell(kick)
+	Spell(tricks_of_the_trade)
+}
+AddIcon mastery=2 help=cd
+{
+	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
+	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	Spell(berserking)
+	if TimeInCombat() >10 and not BuffPresent(stealthed) Spell(vanish)
+	if {BuffPresent(bloodlust) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
+	if Energy() <35 and BuffRemains(slice_and_dice) >4 and BuffExpires(adrenaline_rush) Spell(killing_spree)
+	if Energy() <35 Spell(adrenaline_rush)
+}
+AddIcon mastery=3 help=main
+{
+	if not InCombat() 
 	{
-		#/premeditation,if=(combo_points<=3&cooldown.honor_among_thieves.remains>1.75)|combo_points<=2
-		if ComboPoints(less 3) Spell(PREMEDITATION)
-		#Spell(GARROTE)
-		#/ambush,if=combo_points<=4
-		if ComboPoints(less 5) Spell(AMBUSH)
+		if WeaponEnchantExpires(mainhand 300) Item(6497) 
+		Spell(slice_and_dice)
 	}
-	
-	#/slice_and_dice,if=buff.slice_and_dice.remains<3&combo_points=5
-	if BuffExpires(SLICEANDDICE 3) and ComboPoints(more 4) Spell(SLICEANDDICE)
-	#/rupture,if=combo_points=5&!ticking
-	if ComboPoints(more 4) and TargetDebuffExpires(RUPTURE 0 mine=1) Spell(RUPTURE)
-	#/recuperate,if=combo_points=5&remains<3
-	if TalentPoints(TALENTENERGETICRECOVERY more 2) and ComboPoints(more 4) and BuffExpires(RECUPERATE 3) Spell(RECUPERATE)
-	#/eviscerate,if=combo_points=5&dot.rupture.remains>1
-	if ComboPoints(more 4) and TargetDebuffPresent(RUPTURE 1 mine=1) Spell(EVISCERATE)
-	
-	if TalentPoints(TALENTHEMORRHAGE more 0)
+	if ComboPoints() <=5 and BuffStacks(anticipation) ==0 Spell(ambush usable=1)
+	if BuffRemains(slice_and_dice) <3 and ComboPoints() ==5 Spell(slice_and_dice)
+	if ComboPoints() ==5 and target.DebuffRemains(rupture) <5 Spell(rupture)
+	if BuffStacks(anticipation) <3 and BuffRemains(shadow_dance) <=2 Spell(ambush usable=1)
+	if ComboPoints() ==5 Spell(eviscerate)
+	if ComboPoints() <4 and {target.DebuffRemains(hemorrhage) <4 or target.TargetIsPlayer() } Spell(hemorrhage)
+	if ComboPoints() <5 and Energy() >80 and {target.DebuffRemains(hemorrhage) <4 or target.TargetIsPlayer() } Spell(hemorrhage)
+	if ComboPoints() <4 and {SpellCooldown(shadow_dance) >7 or {SpellCooldown(shadow_dance) ==0 and TimeInCombat() <=9 } } Spell(backstab)
+	if ComboPoints() <5 and Energy() >80 and SpellCooldown(shadow_dance) >=2 Spell(backstab)
+}
+AddIcon mastery=3 help=offgcd
+{
+	if not InCombat() 
 	{
-		#/hemorrhage,if=combo_points<4&energy>40&dot.hemorrhage.remains<4";
-		if ComboPoints(less 4) and Mana(more 40) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
-        #/hemorrhage,if=combo_points<5&energy>80&dot.hemorrhage.remains<4";
-		if ComboPoints(less 5) and Mana(more 80) and TargetDebuffExpires(HEMORRHAGE 4 mine=1) Spell(HEMORRHAGE)
+		Spell(stealth)
+		Spell(premeditation)
 	}
-		
-	#/backstab,if=combo_points<4&energy>40&energy<80";
-	if ComboPoints(less 4) and Mana(more 40) Spell(BACKSTAB)
-	#/backstab,if=combo_points<5&energy>80
-	if ComboPoints(less 5) and Mana(more 80) Spell(BACKSTAB)
+	if target.IsInterruptible() Spell(kick)
+	if Energy() >=75 and BuffExpires(stealthed) and not target.DebuffPresent(find_weakness) Spell(shadow_dance)
+	if {ComboPoints() <=3 and SpellCooldown(honor_among_thieves) >1.75 } or ComboPoints() <=2 Spell(premeditation)
+	Spell(tricks_of_the_trade)
 }
-
-AddIcon help=cd mastery=3
+AddIcon mastery=3 help=cd
 {
-	#actions+=/kick
-	if TargetIsInterruptible(yes) and TargetInRange(KICK) Spell(KICK)
-	
-	#/shadow_dance,if=energy>85&combo_points<5&buff.stealthed.down
-	if Mana(more 84) and ComboPoints(less 5) and BuffExpires(STEALTH) Spell(SHADOWDANCE)
-	#/vanish,if=time>10&energy>60&combo_points<=1&cooldown.shadowstep.remains<=0&!buff.shadow_dance.up
-	#/vanish,if=time>10&energy>60&combo_points<=1&cooldown.shadowstep.remains<=0&!buff.shadow_dance.up&!buff.master_of_subtlety.up&!buff.find_weakness.up
-	if TimeInCombat(more 10) and Mana(more 60) and ComboPoints(less 2) and Spell(SHADOWSTEP) and BuffExpires(SHADOWDANCE) and BuffExpires(MASTEROFSUBTLETY) and TargetDebuffExpires(FINDWEAKNESS mine=1)
-			Spell(VANISH)
-	#/shadowstep,if=buff.stealthed.up|buff.shadow_dance.up
-	if BuffPresent(STEALTH) or BuffPresent(SHADOWDANCE) or BuffPresent(VANISHBUFF) Spell(SHADOWSTEP)
-	#/preparation,if=cooldown.vanish.remains>60
-	unless 60s before Spell(VANISH) Spell(PREPARATION)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
+	Spell(shadow_blades)
+	if BuffPresent(shadow_dance)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if BuffPresent(shadow_dance) Spell(berserking)
+	if TimeInCombat() >10 and Energy() >=45 and Energy() <=75 and ComboPoints() <=3 and not BuffPresent(shadow_dance) and not BuffPresent(master_of_subtlety) and not target.DebuffPresent(find_weakness) Spell(vanish)
 }
-
-AddIcon size=small
-{
-	Spell(TRICKSOFTHETRADE)
-}
-
-AddIcon size=small
-{
-	Spell(CLOACKOFSHADOWS)
-}
-
 ]]

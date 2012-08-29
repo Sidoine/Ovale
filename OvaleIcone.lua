@@ -139,7 +139,8 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		else
 			self.aPortee:Hide()
 		end
-		if actionTarget=="focus" then
+		if actionTarget and actionTarget~="target" then
+			self.focusText:SetText(actionTarget)
 			self.focusText:Show()
 		else
 			self.focusText:Hide()
@@ -170,8 +171,25 @@ local function SetHelp(self, help)
 	self.help = help
 end
 
-local function SetParams(self, params)
+local function SetParams(self, params, secure)
 	self.params = params
+	
+	self.actionButton = false
+	if secure then
+		for k,v in pairs(params) do
+			local f = string.find(k, "spell")
+			if f then
+				local prefix = string.sub(k, 1, f-1)
+				local suffix = string.sub(k, f + 5)
+				local param
+				Ovale:Print(prefix.."type"..suffix)
+				self:SetAttribute(prefix.."type"..suffix, "spell")
+				self:SetAttribute("unit", self.params.target or "target")
+				self:SetAttribute(k, OvaleData.spellList[v])
+				self.actionButton = true
+			end
+		end
+	end
 end
 
 local function SetFontScale(self, scale)
@@ -185,9 +203,11 @@ local function SetRangeIndicator(self, text)
 end
 --</public-methods>
 
-function OvaleIcone_OnClick(self)
-	Ovale:ToggleOptions()
-	self:SetChecked(0)
+function OvaleIcone_OnMouseUp(self)
+	if not self.actionButton then
+		Ovale:ToggleOptions()
+	end
+	self:SetChecked(1)
 end
 
 function OvaleIcone_OnEnter(self)
@@ -239,15 +259,18 @@ function OvaleIcone_OnLoad(self)
 	self.debutAction = nil
 	self.actionCourante = nil
 	self.params = nil
+	self.actionButton = false
 --</public-properties>	
 	
+	self:SetScript("OnMouseUp", OvaleIcone_OnMouseUp)
 	
-	self.focusText:SetFontObject("GameFontNormal");
+	self.focusText:SetFontObject("GameFontNormalSmall");
 	self.focusText:SetAllPoints(self);
 	self.focusText:SetTextColor(1,1,1);
 	self.focusText:SetText(L["Focus"])
 	
-	self:RegisterForClicks("LeftButtonUp")
+	--self:RegisterForClicks("LeftButtonUp")
+	self:RegisterForClicks("AnyUp")
 	self.SetSkinGroup = SetSkinGroup
 	self.Update = Update
 	self.SetHelp = SetHelp

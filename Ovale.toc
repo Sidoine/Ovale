@@ -1,9 +1,10 @@
-﻿## Interface: 40300
+﻿## Interface: 50001
+## X-Min-Interface: 50000
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
-## Version: 4.3.13
+## Version: 5.0.0
 ## OptionalDeps: Ace3, Masque, Recount, Skada, LibBabble-CreatureType-3.0, LibRangeCheck-2.0
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
@@ -51,4 +52,5 @@ defaut\Mage.lua
 defaut\Paladin.lua
 defaut\Pretre.lua
 defaut\Voleur.lua
+defaut\Moine.lua
 defaut\Chevalier.lua

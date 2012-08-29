@@ -4,7 +4,6 @@
 OvaleData.spellList = {}
 OvaleData.firstInit = false
 OvaleData.className = nil
-OvaleData.spellInfo = {}
 --allows to fill the player talent tables on first use
 OvaleData.listeTalentsRemplie = false
 --key: talentId / value: points in this talent
@@ -17,6 +16,24 @@ OvaleData.talentNameToId = {}
 OvaleData.spellInfo = {}
 --spells that count for scoring
 OvaleData.scoreSpell = {}
+
+OvaleData.power =
+{
+	mana = {id=0, mini=0},
+	rage = {id=1, mini=0, maxi=100},
+	focus ={id=2, mini=0, maxi=100},
+	energy = {id=3, mini=0, maxi=100},
+	runicpower = {id=6, mini=0, maxi=100},
+	shards = {id=7, mini=0, maxi=3},
+	eclipse = {id=8, mini=-100, maxi=100},
+	holy = {id=9, mini=0, maxi=5},
+	chi = {id=12, mini=0, maxi=4 }, 
+	shadoworbs = {id=13, mini=0, maxi=3},
+	burningembers = {id=14, mini=0},
+	demonicfury = {id=15, mini=0}
+}
+OvaleData.secondaryPower = {"focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
+OvaleData.powerType = {}
 
 -- List haste buff that does not appear in the character sheet and that are not raid wide buffs
 OvaleData.selfHasteBuff =
@@ -64,77 +81,75 @@ OvaleData.buffSpellList =
 		408, -- Kidney Shot
 		46968, -- Shockwave
 	},
-	strengthagility=
+	
+	str_agi_int =
 	{
-		6673, -- Battle Shout
-		8076, -- Strength of Earth
-		57330, -- Horn of Winter
-		93435 --Roar of Courage (Cat, Spirit Beast)
+		20217, -- Blessing of Kings
+		1126, -- Mark of the Wild
+		-- Monk
 	},
 	stamina =
 	{
-		79105, -- Power Word: Fortitude
+		21562, -- Power Word: Fortitude
 		469, -- Commanding Shout
 		6307, -- Blood Pact
 		90364 -- Qiraji Fortitude
 	},
-	lowerarmor=
+	attack_power_multiplier=
 	{
-		58567, -- Sunder Armor (x3)
-		8647, -- Expose Armor
-		91565, -- Faerie Fire (x3)
-		35387, --Corrosive Spit (x3 Serpent)
-		50498 --Tear Armor (x3 Raptor)
+		6673, -- Battle Shout
+		57330, -- Horn of Winter
+		-- Hunter?
 	},
-	magicaldamagetaken=
+	spell_power_multiplier = 
 	{
-		65142, -- Ebon Plague
-		60433, -- Earth and Moon
-		93068, -- Master Poisoner 
-		1490, -- Curse of the Elements
-		85547, -- Jinx 1
-		86105, -- Jinx 2
-		34889, --Fire Breath (Dragonhawk)
-		24844 --Lightning Breath (Wind serpent)
+		109773,  -- Dark Intent
+		-- Shaman?
+		1459 -- Arcane Brillance
 	},
-	magicalcrittaken=
-    {
-        17800, -- Shadow and Flame
-        22959 -- Critical Mass
-    },
-	physicaldamagetaken=
+	melee_haste =
 	{
-		30069, -- Blood Frenzy (rank 1)
-		30070, -- Blood Frenzy (rank 2)
-		81327, -- Brittle Bones (rank 1)
-		81328, -- Brittle Bones (rank 2)
-		58684, -- Savage Combat (rank 1)
-		58683, -- Savage Combat (rank 2)
+	  -- Frost and Unholy death knights, any rogue, Enhancement shaman
+	},
+	spell_haste = 
+	{
+		24907, -- Moonkin aura
+		49868, -- Mind Quickening
+		-- Elemental  shaman
+	},
+	critical_strike =
+	{
+		--Guardian and Feral druids, any hunter, any mage
+		1459 -- Arcane Brillance
+	},
+	mastery =
+	{
+		93435, --Roar of Courage (Cat, Spirit Beast)
+		116956, -- Grace of Air
+		19740 -- Blessing of Might
+	},
+	-- weakened_armor
+	physical_vulnerability=
+	{
+		55749, -- Physical Vulnaribility
 		55749, -- Acid Spit (Worm)
 		50518, -- Ravage (Ravager)
 	},
-	lowerphysicaldamage=
+	magic_vulnerability=
 	{
-		99, -- Demoralizing Roar
-		702, -- Curse of Weakness
-		1160, -- Demoralizing Shout
+		93068, -- Master Poisoner 
+		1490, -- Curse of the Elements
+		34889, --Fire Breath (Dragonhawk)
+		24844 --Lightning Breath (Wind serpent)
+	},
+	lower_physical_damage=
+	{
+		115798, -- Weakened blows
 		26017, -- Vindication
-		81130, -- Scarlet Fever
 		50256, --Demoralizing Roar (Bear)
 		24423, -- Demoralizing Screech (Carrion Bird)
 	},
-	meleeslow=
-	{
-		55095, --Icy Touch
-		58179, --Infected Wounds rank 1
-		58180, --Infected Wounds rank 2
-		68055, --Judgments of the just
-		6343, --Thunderclap
-		8042, --Earth Shock
-		54404, --Dust Cloud (Tallstrider)
-		90315, -- Tailspin (Fox)
-	},
-	castslow =
+	cast_slow =
 	{
 		1714, --Curse of Tongues
         58604, --Lava Breath (Core Hound)
@@ -143,15 +158,9 @@ OvaleData.buffSpellList =
         73975, --Necrotic Strike
         31589 --Slow
 	},
-	bleed=
+	healing_reduced =
 	{
-		33876, --Mangle cat
-		33878, --Mangle bear
-		46856, -- Trauma rank 1
-		46857, -- Trauma rank 2
-		16511, --Hemorrhage
-		50271, --Tendon Rip (Hyena)
-		35290 --Gore (Boar)
+		--Arms or Fury warrior, any rogue, any hunter
 	},
 	heroism=
 	{
@@ -160,20 +169,9 @@ OvaleData.buffSpellList =
 		80353, --Time warp
 		90355 -- Ancient Hysteria (Core Hound)
 	},
-	meleehaste =
-	{
-		8515, -- Windfury
-		55610, -- Improved Icy Talons
-		53290 -- Hunting Party
-	},
-	spellhaste = 
-	{
-		24907, -- Moonkin aura
-		2895, -- Wrath of Air Totem
-		49868 -- Mind Quickening
-	},
 	enrage =
 	{
+		--TODO update
 		49016, -- Unholy Frenzy
 		18499, -- Berserker Rage
 		12292, -- Death Wish
@@ -184,18 +182,12 @@ OvaleData.buffSpellList =
         52610, -- Savage Roar (Cat)
         76691, -- Vengeance (All Tank Specs)
 	},
-	criticalstrike =
+	ranged_vulnerability =
 	{
-		51740, -- Elemental Oath
-		51698, -- Honor Among Thieves (rank 1)
-		51700, -- Honor Among Thieves (rank 2)
-		51701, -- Honor Among Thieves (rank 3)
-		17007, -- Leader of the Pack
-		29801, -- Rampage
-		24604, -- Furious Howl (Wolf)
-		90309, -- Terrifying Roar (Devilsaur)
-	}
+		1130, -- Hunter's Mark
+	},
 }
+OvaleData.buffSpellList.bloodlust = OvaleData.buffSpellList.heroism
 --</public-static-properties>
 
 --<private-static-properties>
@@ -207,13 +199,19 @@ local rootSpellList = nil
 
 --<public-static-methods>
 function OvaleData:OnEnable()
+	for k,v in pairs(self.power) do
+		self.powerType[v.id] = k
+	end
+	
 	self:FirstInit()
     self:RegisterEvent("PLAYER_TALENT_UPDATE")
     self:RegisterEvent("CHARACTER_POINTS_CHANGED")
 	self:RegisterEvent("SPELLS_CHANGED")
+	self:RegisterEvent("UNIT_PET")
 end
 
 function OvaleData:OnDisable()
+	self:UnregisterEvent("UNIT_PET")
     self:UnregisterEvent("SPELLS_CHANGED")
     self:UnregisterEvent("PLAYER_TALENT_UPDATE")
     self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
@@ -227,6 +225,10 @@ end
 function OvaleData:PLAYER_TALENT_UPDATE()
 	self:RemplirListeTalents()
 --	Ovale:Print("PLAYER_TALENT_UPDATE")
+end
+
+function OvaleData:UNIT_PET()
+	self:FillPetSpellList()
 end
 
 --The user learnt a new spell
@@ -288,47 +290,61 @@ function OvaleData:GetSpellInfoOrNil(spell)
 	end
 end
 
-function OvaleData:FillSpellList()
-	self.spellList = {}
-	local book=BOOKTYPE_SPELL
-	while true do
-		local i=1
-		while true do
-			local skillType, spellId = GetSpellBookItemInfo(i, book)
-			if not spellId then
-				break
-			end
-			if skillType~="FUTURESPELL" then
-				local spellName = GetSpellBookItemName(i, book)
-				self.spellList[spellId] = spellName
-			end
-			i = i + 1
+function OvaleData:FillPetSpellList()
+	--TODO pas moyen d'avoir le nombre de skills pour le pet
+	local book=BOOKTYPE_PET
+	local numSpells, _ = HasPetSpells()
+	if not numSpells then return end
+	local i=1
+	while i <= numSpells do
+		local skillType, spellId = GetSpellBookItemInfo(i, book)
+		if skillType~="FUTURESPELL" and spellId then
+			local spellName = GetSpellBookItemName(i, book)
+			self.spellList[spellId] = spellName
 		end
-		if book==BOOKTYPE_SPELL then
-			book = BOOKTYPE_PET
-		else
-			break
-		end
+		i = i + 1
 	end
 end
 
-function OvaleData:RemplirListeTalents()
-	local numTabs = GetNumTalentTabs();
-	for t=1, numTabs do
-		local numTalents = GetNumTalents(t);
-		for i=1, numTalents do
-			local nameTalent, icon, tier, column, currRank, maxRank = GetTalentInfo(t,i);
-			local link = GetTalentLink(t,i)
-			if link then
-				local a, b, talentId = string.find(link, "talent:(%d+)");
-				talentId = tonumber(talentId)
-				self.talentIdToName[talentId] = nameTalent
-				self.talentNameToId[nameTalent] = talentId
-				self.pointsTalent[talentId] = currRank
-				self.listeTalentsRemplie = true
-				Ovale.needCompile = true
-			end
+function OvaleData:FillSpellList()
+	self.spellList = {}
+	
+	--TODO pas moyen d'avoir le nombre de skills pour le pet
+	local book=BOOKTYPE_SPELL
+	local name, texture, offset, numSpells, isGuild = GetSpellTabInfo(2)
+	
+	numSpells = numSpells + offset
+	
+	local i=1
+	while i <= numSpells do
+		local skillType, spellId = GetSpellBookItemInfo(i, book)
+		if skillType~="FUTURESPELL" and spellId then
+			local spellName = GetSpellBookItemName(i, book)
+			self.spellList[spellId] = spellName
 		end
+		i = i + 1
+	end
+	self:FillPetSpellList()
+end
+
+function OvaleData:RemplirListeTalents()
+	local talentId = 1
+	while true do
+		local name, texture, tier, column, selected, available = GetTalentInfo(talentId)
+		if not name then
+			break
+		end
+		talentId = tonumber(talentId)
+		self.talentIdToName[talentId] = name
+		self.talentNameToId[name] = talentId
+		if selected then
+			self.pointsTalent[talentId] = 1
+		else
+			self.pointsTalent[talentId] = 0
+		end		
+		self.listeTalentsRemplie = true
+		Ovale.needCompile = true
+		talentId = talentId + 1
 	end
 end
 
@@ -409,6 +425,7 @@ function OvaleData:GetComputedSpellCD(spellId)
 		actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellId)
 		-- Les chevaliers de la mort ont des infos fausses sur le CD quand ils n'ont plus les runes
 		-- On force à 1,5s ou 1s en présence impie
+		-- TODO: is it still the case in MoP?
 		if self.className=="DEATHKNIGHT" and actionCooldownDuration==10 and
 				(not self.spellInfo[spellId] or self.spellInfo[spellId].cd~=10) then
 			local impie = GetSpellInfo(48265)

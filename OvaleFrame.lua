@@ -145,6 +145,8 @@ do
 		if not next(Ovale.refreshNeeded) and not forceRefresh then
 			return
 		end
+		if not Ovale.masterNodes then return end
+		
 		self.lastUpdate = now
 
 		OvaleState:StartNewFrame()
@@ -162,6 +164,12 @@ do
 					Ovale:Log("Compute start = "..start)
 				end
 				local action = self.actions[k]
+				local icons
+				if action.secure then
+					icons = action.secureIcons
+				else
+					icons = action.icons
+				end
 				if element and element.type == "value" then
 					local actionTexture
 					if node.params.texture then
@@ -171,9 +179,9 @@ do
 					if element.value and element.origin and element.rate then
 						value = element.value + (OvaleState.maintenant - element.origin) * element.rate
 					end
-					action.icons[1]:SetValue(value, actionTexture)
-					if #action.icons > 1 then
-						action.icons[2]:Update(element, nil)
+					icons[1]:SetValue(value, actionTexture)
+					if #icons > 1 then
+						icons[2]:Update(element, nil)
 					end
 				else
 					local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -191,9 +199,9 @@ do
 					end
 					
 					if (node.params.nocd and start~=nil and OvaleState.maintenant<start-node.params.nocd) then
-						action.icons[1]:Update(element, nil)
+						icons[1]:Update(element, nil)
 					else
-						action.icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+						icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 							actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
 					end
 					
@@ -207,16 +215,16 @@ do
 						action.waitStart = nil
 					end
 					
-					if OvaleOptions:GetApparence().moving and action.icons[1].debutAction and action.icons[1].finAction then
-						local top=1-(OvaleState.maintenant - action.icons[1].debutAction)/(action.icons[1].finAction-action.icons[1].debutAction)
+					if OvaleOptions:GetApparence().moving and icons[1].debutAction and icons[1].finAction then
+						local top=1-(OvaleState.maintenant - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
 						if top<0 then
 							top = 0
 						elseif top>1 then
 							top = 1
 						end
-						action.icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
-						if action.icons[2] then
-							action.icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
+						icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
+						if icons[2] then
+							icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
 						end
 					end
 									
@@ -245,9 +253,9 @@ do
 							end
 							OvaleState:AddSpellToStack(spellId, start, start + castTime, nextCast, false, UnitGUID(spellTarget))
 							start, ending, priorite, element = OvaleBestAction:Compute(node)
-							action.icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
+							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
 						else
-							action.icons[2]:Update(element, nil)
+							icons[2]:Update(element, nil)
 						end
 					end
 				end
@@ -275,6 +283,9 @@ do
 			for i, icon in pairs(action.icons) do
 				icon:Hide()
 			end
+			for i, icon in pairs(action.secureIcons) do
+				icon:Hide()
+			end
 		end
 		
 		self.frame:EnableMouse(not OvaleOptions:GetApparence().clickThru)
@@ -294,7 +305,7 @@ do
 			
 		for k,node in pairs(Ovale.masterNodes) do
 			if not self.actions[k] then
-				self.actions[k] = {icons={}}
+				self.actions[k] = {icons={}, secureIcons={}}
 			end
 			local action = self.actions[k]
 
@@ -332,12 +343,21 @@ do
 				action.dx = 0
 				action.dy = height
 			end
+			action.secure = node.secure
 					
 			for l=1,nbIcons do
-				if (not action.icons[l]) then
-					action.icons[l] = CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIcone");
-				end			
-				local icon = action.icons[l]
+				local icon
+				if not node.secure then
+					if not action.icons[l] then
+						action.icons[l] = CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIconTemplate");
+					end			
+					icon = action.icons[l]
+				else
+					if not action.secureIcons[l] then
+						action.secureIcons[l] = CreateFrame("CheckButton", "SecureIcon"..k.."n"..l,self.frame,"SecureOvaleIconTemplate");
+					end			
+					icon = action.secureIcons[l]
+				end
 				local scale = action.scale
 				if l> 1 then
 					scale = scale  * OvaleOptions:GetApparence().secondIconScale
