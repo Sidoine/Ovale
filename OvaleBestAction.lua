@@ -556,12 +556,11 @@ function OvaleBestAction:Compute(element)
 				l = a-x; m = (b*c-y*z)/(c-z); n = c-z
 			end
 		elseif element.operator == '/' then
-			if z == 0 then
-				l = a/x; m = b; n = c/x
-			else
-				Ovale:Print("ERROR: second value of / must be constant")
-				Ovale.bug = true
+			if z ~= 0 then
+				-- To allow constructs like target.Health()/target.DeadIn()
+				x = x + (OvaleState.currentTime - y) * z
 			end
+			l = a/x; m = b; n = c/x
 		elseif element.operator == '%' then
 			if c == 0 and z == 0 then
 				l = c % z; m = 0; n = 0
