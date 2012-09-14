@@ -6,6 +6,7 @@ OvaleCompile = {}
 local node={}
 local defines = {}
 local customFunctions = {}
+local unknownSpellNodes = {}
 --</private-static-properties>
 
 --<private-static-methods>
@@ -152,9 +153,27 @@ local function ParseFunction(prefix, func, params)
 	end
 	
 	func = string.lower(func)
-	
+
 	local newNode = { type="function", func=func, params=paramList}
-	return AddNode(newNode)
+	local newNodeName = AddNode(newNode)
+
+	-- For the spell() and spellcooldown() functions, check if the spell ID
+	-- is a variant of a spell with the same name as one already in the
+	-- spellbook.  If it is, then add that variant spell ID to our spellList.
+	if func == "spell" or func == "spellcooldown" then
+		local spellId = paramList[1]
+		if spellId and not OvaleData.spellList[spellId] then
+			local spellName = GetSpellInfo(spellId)
+			if spellName == GetSpellInfo(spellName) then
+				--Ovale:Print("Learning spell "..spellName.." with ID "..spellId)
+				OvaleData.spellList[spellId] = spellName
+			else
+				unknownSpellNodes[newNode.nodeId] = spellId
+			end
+		end
+	end
+
+	return newNodeName
 end
 
 local function ParseSpellAddDebuff(params)
@@ -485,6 +504,7 @@ function OvaleCompile:Compile(text)
 	Ovale.bug = false
 	node = {}
 	defines = {}
+	unknownSpellNodes = {}
 	
 	-- Suppression des commentaires
 	text = string.gsub(text, "#.-\n","")
@@ -558,7 +578,11 @@ function OvaleCompile:DebugNode(node)
 		text = text .. "}\n"
 	elseif (node.type == "function") then
 		text = node.func.."("
+		local spellId = unknownSpellNodes[node.nodeId]
 		for k,p in pairs(node.params) do
+			if spellId and p == spellId then
+				p = p .. ":unknown"
+			end
 			text = text .. k.."=" .. p .. " "
 		end
 		text = text .. ")"
@@ -570,6 +594,8 @@ function OvaleCompile:DebugNode(node)
 		text = self:DebugNode(node.a).." and "..self:DebugNode(node.b)
 	elseif (node.type == "or") then
 		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
+	elseif (node.type == "not") then
+		text = "not "..self:DebugNode(node.a)
 	elseif (node.type == "before") then
 		text = self:DebugNode(node.time) .. " before "..self:DebugNode(node.a)
 	elseif (node.type == "between") then
