@@ -79,7 +79,7 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 		count = 1
 	end
 	
-	if not aura.ending or aura.ending < expirationTime or aura.stacks < count then
+	if not aura.ending or aura.ending < expirationTime or aura.stacks ~= count then
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
