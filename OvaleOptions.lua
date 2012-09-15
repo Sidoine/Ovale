@@ -282,6 +282,9 @@ local options =
 					order = 2,
 					type = "execute",
 					name = L["Restaurer le défaut"],
+					disabled = function()
+						return OvaleOptions.db.profile.code == OvaleOptions.db.defaults.profile.code
+					end,
 					func = function()
 						OvaleOptions.db.profile.code = OvaleOptions.db.defaults.profile.code
 						Ovale.needCompile = true
