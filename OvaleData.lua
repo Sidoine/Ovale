@@ -46,7 +46,9 @@ OvaleData.selfHasteBuff =
 OvaleData.selfDamageBuff =
 {
 	[5217] = 1.15, -- Tiger's fury
-	[57933] = 1.15 -- Tricks of the trade
+	[57933] = 1.15, -- Tricks of the trade
+	[124974] = 1.20, -- Nature's Vigil
+	[127538] = 1.30, -- Savage Roar
 }
 
 OvaleData.buffSpellList =
@@ -371,7 +373,11 @@ end
 
 function OvaleData:GetSpellInfo(spellId)
 	if (not self.spellInfo[spellId]) then
-		self.spellInfo[spellId] = { aura = {player = {}, target = {}} }
+		self.spellInfo[spellId] =
+		{
+			aura = {player = {}, target = {}},
+			damageAura = {},
+		}
 	end
 	return self.spellInfo[spellId]
 end

@@ -13,6 +13,7 @@ OvaleFuture.lastSpellId = nil
 OvaleFuture.lastSpellAP = {}
 OvaleFuture.lastSpellSP = {}
 OvaleFuture.lastSpellDM = {}
+OvaleFuture.lastSpellMastery = {}
 OvaleFuture.playerGUID = nil
 OvaleFuture.nextSpellTarget = nil
 OvaleFuture.nextSpellLineID = nil
@@ -213,7 +214,12 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	self.lastSpellId = spellId
 	self.lastSpellAP[spellId] = UnitAttackPower("player")
 	self.lastSpellSP[spellId] = GetSpellBonusDamage(2)
-	self.lastSpellDM[spellId] = OvaleAura.damageMultiplier
+	self.lastSpellDM[spellId] = OvaleAura:GetDamageMultiplier(spellId)
+	if UnitLevel("player") < 80 then
+		self.lastSpellMastery[spellId] = 0
+	else
+		self.lastSpellMastery[spellId] = GetMasteryEffect()
+	end
 	self.lastSpell[#self.lastSpell+1] = newSpell
 	--Ovale:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..tostring(OvaleState.maintenant)..")" ..#self.lastSpell .. " " ..tostring(newSpell.target))
 	

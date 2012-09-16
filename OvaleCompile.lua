@@ -206,6 +206,25 @@ local function ParseSpellAddTargetDebuff(params)
 	return ""
 end
 
+local function ParseSpellDamageBuff(params)
+	local paramList = ParseParameters(params)
+	local spellId = paramList[1]
+	if spellId then
+		paramList[1] = nil
+		OvaleData:GetSpellInfo(spellId).damageAura.HELPFUL = paramList
+	end
+	return ""
+end
+
+local function ParseSpellDamageDebuff(params)
+	local paramList = ParseParameters(params)
+	local spellId = paramList[1]
+	if spellId then
+		paramList[1] = nil
+		OvaleData:GetSpellInfo(spellId).damageAura.HARMFUL = paramList
+	end
+	return ""
+end
 
 local function ParseSpellInfo(params)
 	local paramList = ParseParameters(params)
@@ -528,6 +547,8 @@ function OvaleCompile:Compile(text)
 	text = string.gsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
 	text = string.gsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
 	text = string.gsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
+	text = string.gsub(text, "SpellDamageBuff%s*%((.-)%)", ParseSpellDamageBuff)
+	text = string.gsub(text, "SpellDamageDebuff%s*%((.-)%)", ParseSpellDamageDebuff)
 	text = string.gsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
 	text = string.gsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
 	text = string.gsub(text, "SpellList%s*%(%s*(%w+)%s*(.-)%)", ParseSpellList)

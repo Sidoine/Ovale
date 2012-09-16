@@ -8,9 +8,12 @@ OvaleAura.aura = {}
 OvaleAura.serial = 0
 OvaleAura.spellHaste = 1
 OvaleAura.meleeHaste = 1
-OvaleAura.damageMultiplier = 1
 OvaleAura.playerGUID = nil
 --</public-static-properties>
+
+--<private-static-properties>
+local baseDamageMultiplier = 1
+--</private-static-properties>
 
 -- Events
 --<public-static-methods>
@@ -190,7 +193,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	if unitId == "player" then
 		self.spellHaste = 1 + (hateBase + hateCommune + hateSorts + hateHero + hateClasse)/100
 		self.meleeHaste = 1 + (hateBase + hateCommune + hateCaC + hateHero + hateClasse)/100
-		self.damageMultiplier = damageMultiplier
+		baseDamageMultiplier = damageMultiplier
 	end
 	
 	Ovale.refreshNeeded[unitId] = true
@@ -278,6 +281,27 @@ function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
 		end
 	end
 	return starting, ending, count
+end
+
+function OvaleAura:GetDamageMultiplier(spellId)
+	local damageMultiplier = baseDamageMultiplier
+	if spellId then
+		local si = OvaleData:GetSpellInfo(spellId)
+		if si and si.damageAura then
+			self:UpdateAuras("player", self.playerGUID)
+			auraTable = self.aura[self.playerGUID]
+			if auraTable then
+				for filter, filterInfo in pairs(si.damageAura) do
+					for auraSpellId, multiplier in pairs(filterInfo) do
+						if auraTable[auraSpellId] then
+							damageMultiplier = damageMultiplier * multiplier
+						end
+					end
+				end
+			end
+		end
+	end
+	return damageMultiplier
 end
 
 function OvaleAura:Debug()

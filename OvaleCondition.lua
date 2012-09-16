@@ -703,13 +703,13 @@ OvaleCondition.conditions=
 		if spellInfo.bonusspholy then
 			ret = ret + spellInfo.bonusspholy * GetSpellBonusDamage(2) * OvaleState.state.holy
 		end
-		return 0, nil, ret * OvaleAura.damageMultiplier, 0, 0
+		return 0, nil, ret * OvaleAura:GetDamageMultiplier(condition[1]), 0, 0
 	end,
 	-- Get the current damage multiplier
 	-- TODO: use OvaleState
 	-- returns: number
 	damagemultiplier = function(condition)
-		local ret = OvaleAura.damageMultiplier
+		local ret = OvaleAura:GetDamageMultiplier(condition[1])
 		if condition[1] then
 			local si = OvaleData:GetSpellInfo(condition[1])
 			if si and si.combo == 0 then
@@ -915,6 +915,12 @@ OvaleCondition.conditions=
 	lastspellspellpower = function(condition)
 		return compare(OvaleFuture.lastSpellSP[condition[1]], condition[2], condition[3])
 	end,
+	-- Get the last spell mastery
+	-- 1: the spell id
+	-- returns: number or bool
+	lastspellmastery = function(condition)
+		return compare(OvaleFuture.lastSpellMastery[condition[1]], condition[2], condition[3])
+	end,
 	-- Get the time elasped since the last swing
 	-- 1: main or off
 	-- returns: number
@@ -984,6 +990,15 @@ OvaleCondition.conditions=
 		else
 			return compare(UnitPower(target, 0)*100/powerMax, condition[1], condition[2])
 		end
+	end,
+	-- Get the mastery
+	-- returns : bool or number
+	mastery = function(condition)
+		local mastery = 0
+		if UnitLevel("player") >= 80 then
+			mastery = GetMasteryEffect()
+		end
+		return compare(mastery, condition[1], condition[2])
 	end,
 	-- Get the target maximum health
 	-- return: bool or number
@@ -1169,6 +1184,20 @@ OvaleCondition.conditions=
 			local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleData:GetComputedSpellCD(condition[1])
 			return 0, nil, actionCooldownDuration, actionCooldownStart, -1
 		end
+	end,
+	-- Get the spell data listed in SpellInfo()
+	-- 1: spell ID
+	-- 2: key
+	-- return: number
+	spelldata = function(condition)
+		local si = OvaleData.spellInfo[condition[1]]
+		if si then
+			local ret = si[condition[2]]
+			if ret then
+				return 0, nil, ret, 0, 0
+			end
+		end
+		return nil
 	end,
 	-- Get the spell power
 	-- return: number or bool
