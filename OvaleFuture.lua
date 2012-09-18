@@ -13,6 +13,7 @@ OvaleFuture.lastSpellId = nil
 OvaleFuture.lastSpellAP = {}
 OvaleFuture.lastSpellSP = {}
 OvaleFuture.lastSpellDM = {}
+OvaleFuture.lastSpellCombo = {}
 OvaleFuture.lastSpellMastery = {}
 OvaleFuture.playerGUID = nil
 OvaleFuture.nextSpellTarget = nil
@@ -226,12 +227,11 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	if si then
 		if si.combo == 0 then
 			local comboPoints = GetComboPoints("player")
-			--Ovale:Print("combo point " .. comboPoints)
 			if comboPoints > 0 then
-				self.lastSpellDM[spellId] = self.lastSpellDM[spellId] * comboPoints
+				self.lastSpellCombo[spellId] = comboPoints
 			end
 		end
-		
+
 		if si.aura then
 			for target, targetInfo in pairs(si.aura) do
 				for filter, filterInfo in pairs(targetInfo) do
@@ -249,7 +249,7 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 		end
 		
 		--Ovale:Print("spellInfo found")
-		if si and si.buffnocd and UnitBuff("player", GetSpellInfo(si.buffnocd)) then
+		if si.buffnocd and UnitBuff("player", GetSpellInfo(si.buffnocd)) then
 			newSpell.nocd = true
 		else
 			newSpell.nocd = false

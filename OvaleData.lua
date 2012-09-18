@@ -450,4 +450,29 @@ function OvaleData:GetComputedSpellCD(spellId)
 	end
 	return actionCooldownStart, actionCooldownDuration, actionEnable
 end
+
+--Compute the damage of the given spell.
+function OvaleData:GetDamage(spellId, combo, attackPower, spellpower)
+	local si = self.spellInfo[spellId]
+	if not si then
+		return nil
+	end
+	combo = combo or 0
+	attackPower = attackPower or 0
+	spellpower = spellpower or 0
+	local ret = si.base or 0
+	if si.bonuscp then
+		ret = ret + si.bonuscp * combo
+	end
+	if si.bonusap then
+		ret = ret + si.bonusap * attackPower
+	end
+	if si.bonusapcp then
+		ret = ret + si.bonusapcp * attackPower * combo
+	end
+	if si.bonussp then
+		ret = ret + si.bonussp * spellpower
+	end
+	return ret
+end
 --</public-static-methods>

@@ -677,46 +677,15 @@ OvaleCondition.conditions=
 	-- 1: spell id
 	-- returns: number
 	damage = function(condition)
-		local spellInfo = OvaleData:GetSpellInfo(condition[1])
-		if not spellInfo then
-			return nil
-		end
-		local ret = (spellInfo.base or 0)
-		if spellInfo.bonuscp then
-			ret = ret + (OvaleState.state.combo * spellInfo.bonuscp)
-		end
-		if spellInfo.bonusholy then
-			ret = ret + (OvaleState.state.holy * spellInfo.bonusholy)
-		end
-		if spellInfo.bonusap then
-			ret = ret + spellInfo.bonusap * UnitAttackPower("player")
-		end
-		if spellInfo.bonusapcp then
-			ret = ret + spellInfo.bonusapcp * UnitAttackPower("player") * OvaleState.state.combo
-		end
-		if spellInfo.bonusapholy then
-			ret = ret + spellInfo.bonusapholy * UnitAttackPower("player") * OvaleState.state.holy
-		end
-		if spellInfo.bonussp then
-			ret = ret + spellInfo.bonussp * GetSpellBonusDamage(2)
-		end
-		if spellInfo.bonusspholy then
-			ret = ret + spellInfo.bonusspholy * GetSpellBonusDamage(2) * OvaleState.state.holy
-		end
-		return 0, nil, ret * OvaleAura:GetDamageMultiplier(condition[1]), 0, 0
+		local spellId = condition[1]
+		local ret = OvaleData:GetDamage(spellId, OvaleState.state.combo, UnitAttackPower("player"), GetSpellBonusDamage(2))
+		return 0, nil, ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
 	end,
 	-- Get the current damage multiplier
 	-- TODO: use OvaleState
 	-- returns: number
 	damagemultiplier = function(condition)
-		local ret = OvaleAura:GetDamageMultiplier(condition[1])
-		if condition[1] then
-			local si = OvaleData:GetSpellInfo(condition[1])
-			if si and si.combo == 0 then
-				ret = ret * OvaleState.state.combo
-			end
-		end
-		return 0, nil, ret, 0, 0
+		return 0, nil, OvaleAura:GetDamageMultiplier(condition[1]), 0, 0
 	end,
 	-- Get the remaining time until the target is dead
 	-- returns: bool or number
@@ -897,6 +866,14 @@ OvaleCondition.conditions=
 		end
 		return compare(OvaleSpellDamage:Get(spellId), condition[2], condition[3])
 	end,
+	-- Get the last spell estimated damage
+	-- 1: spell id
+	-- returns: number
+	lastspellestimateddamage = function(condition)
+		local spellId = condition[1]
+		local ret = OvaleData:GetDamage(spellId, OvaleFuture.lastSpellCombo[spellId], OvaleFuture.lastSpellAP[spellId], OvaleFuture.lastSpellSP[spellId])
+		return 0, nil, ret * (OvaleFuture.lastSpellDM[spellId] or 0), 0, 0
+	end,
 	-- Get the last spell damage multiplier
 	-- 1: the spell id
 	-- returns: number or bool
@@ -914,6 +891,12 @@ OvaleCondition.conditions=
 	-- returns: number or bool
 	lastspellspellpower = function(condition)
 		return compare(OvaleFuture.lastSpellSP[condition[1]], condition[2], condition[3])
+	end,
+	-- Get the number of combo points consumed by the last spell
+	-- 1: the spell id
+	-- returns: number or bool
+	lastspellcombopoints = function(condition)
+		return compare(OvaleFuture.lastSpellCombo[condition[1]], condition[2], condition[3])
 	end,
 	-- Get the last spell mastery
 	-- 1: the spell id
