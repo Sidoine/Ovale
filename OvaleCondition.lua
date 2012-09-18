@@ -817,6 +817,11 @@ OvaleCondition.conditions=
 	itemcharges = function(condition)
 		return compare(GetItemCount(condition[1], false, true), condition[2], condition[3])
 	end,
+	-- Check if the target is aggroed to the player
+	-- returns: bool
+	isaggroed = function(condition)
+		return testbool(UnitDetailedThreatSituation("player", getTarget(condition.target)), condition[1])
+	end,
 	-- Check if the player is feared
 	-- returns: bool
 	isfeared = function(condition)
