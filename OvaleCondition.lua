@@ -1150,6 +1150,23 @@ OvaleCondition.conditions=
 	spellusable = function(condition)
 		return testbool(IsUsableSpell(condition[1]), condition[2], condition[3])
 	end,
+	-- Get the number of spell charges
+	-- returns: bool or number
+	spellcharges = function(condition)
+		local charges = GetSpellCharges(condition[1])
+		return compare(charges, condition[2], condition[3])
+	end,
+	-- Get the cooldown on spell charges
+	-- 1: spell ID
+	-- return: number
+	spellchargecooldown = function(condition)
+		local charges, maxCharges, cooldownStart, cooldownDuration = GetSpellCharges(condition[1])
+		if charges < maxCharges then
+			return 0, nil, cooldownDuration, cooldownStart, -1
+		else
+			return 0, nil, 0, 0, 0
+		end
+	end,
 	-- Get the spell cooldown
 	-- 1: spell ID
 	-- return: number
