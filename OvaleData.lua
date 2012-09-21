@@ -1,4 +1,13 @@
-﻿OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
+﻿--[[--------------------------------------------------------------------
+    Ovale Spell Priority
+    Copyright (C) 2012 Sidoine, Johnny C. Lam
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License in the LICENSE
+    file accompanying this program.
+----------------------------------------------------------------------]]
+
+OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
 
 --<public-static-properties>
 OvaleData.spellList = {}

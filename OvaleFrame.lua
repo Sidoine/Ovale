@@ -1,4 +1,13 @@
-﻿--inherits Frame
+﻿--[[--------------------------------------------------------------------
+    Ovale Spell Priority
+    Copyright (C) 2009, 2010, 2011, 2012 Sidoine
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License in the LICENSE
+    file accompanying this program.
+----------------------------------------------------------------------]]
+
+--inherits Frame
 do
 --<private-static-properties>
 	local AceGUI = LibStub("AceGUI-3.0")

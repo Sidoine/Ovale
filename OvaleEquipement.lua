@@ -1,3 +1,12 @@
+--[[--------------------------------------------------------------------
+    Ovale Spell Priority
+    Copyright (C) 2011, 2012 Sidoine
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License in the LICENSE
+    file accompanying this program.
+----------------------------------------------------------------------]]
+
 OvaleEquipement = LibStub("AceAddon-3.0"):NewAddon("OvaleEquipement", "AceEvent-3.0")
 
 --<public-static-properties>

@@ -1,3 +1,12 @@
+--[[--------------------------------------------------------------------
+    Ovale Spell Priority
+    Copyright (C) 2012 Sidoine
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License in the LICENSE
+    file accompanying this program.
+----------------------------------------------------------------------]]
+
 -- Keep data about the player action bars (key bindings mostly)
 OvaleActionBar = LibStub("AceAddon-3.0"):NewAddon("OvaleActionBar", "AceEvent-3.0")
 
