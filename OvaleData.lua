@@ -47,12 +47,13 @@ OvaleData.selfHasteBuff =
 OvaleData.selfDamageBuff =
 {
 	[5217] = 1.15, -- Tiger's Fury (druid)
+	[52610] = 1.3, -- Savage Roar, glyphed (druid)
 	[57933] = 1.15, -- Tricks of the Trade (rogue)
 	[84745] = 1.1, -- Shallow Insight (rogue)
 	[84746] = 1.2, -- Moderate Insight (rogue)
 	[84747] = 1.3, -- Deep Insight (rogue)
-	[124974] = 1.20, -- Nature's Vigil (druid)
-	[127538] = 1.30, -- Savage Roar (druid)
+	[124974] = 1.2, -- Nature's Vigil (druid)
+	[127538] = 1.3, -- Savage Roar (druid)
 }
 
 OvaleData.buffSpellList =
