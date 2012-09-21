@@ -191,8 +191,8 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	
 	--Update player haste 
 	if unitId == "player" then
-		self.spellHaste = 1 + (hateBase + hateCommune + hateSorts + hateHero + hateClasse)/100
-		self.meleeHaste = 1 + (hateBase + hateCommune + hateCaC + hateHero + hateClasse)/100
+		self.spellHaste = (1 + hateBase/100) * (1 + hateCommune/100) * (1 + hateSorts/100) * (1 + hateHero/100) * (1 + hateClasse/100)
+		self.meleeHaste = (1 + hateBase/100) * (1 + hateCommune/100) * (1 + hateCaC/100) * (1 + hateHero/100) * (1 + hateClasse/100)
 		baseDamageMultiplier = damageMultiplier
 	end
 	
