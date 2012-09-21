@@ -454,27 +454,71 @@ function OvaleData:GetComputedSpellCD(spellId)
 end
 
 --Compute the damage of the given spell.
-function OvaleData:GetDamage(spellId, combo, attackPower, spellpower)
+function OvaleData:GetDamage(spellId, state)
 	local si = self.spellInfo[spellId]
 	if not si then
 		return nil
 	end
-	combo = combo or 0
-	attackPower = attackPower or 0
-	spellpower = spellpower or 0
-	local ret = si.base or 0
+	local damage = si.base or 0
+	local combo, attackpower, spellpower = 1, 0, 0
+	if state then
+		combo = state.combo or combo
+		attackpower = state.attackpower or attackpower
+		spellpower = state.spellpower or spellpower
+	end
 	if si.bonuscp then
-		ret = ret + si.bonuscp * combo
+		damage = damage + si.bonuscp * combo
 	end
 	if si.bonusap then
-		ret = ret + si.bonusap * attackPower
+		damage = damage + si.bonusap * attackpower
 	end
 	if si.bonusapcp then
-		ret = ret + si.bonusapcp * attackPower * combo
+		damage = damage + si.bonusapcp * attackpower * combo
 	end
 	if si.bonussp then
-		ret = ret + si.bonussp * spellpower
+		damage = damage + si.bonussp * spellpower
 	end
-	return ret
+	return damage
+end
+
+function OvaleData:GetDuration(spellId, state)
+	local si = self.spellInfo[spellId]
+	if si and si.duration then
+		local duration = si.duration
+		local combo, holy, spellHaste = 1, 1, 1
+		if state then
+			combo = state.combo or combo
+			holy = state.holy or holy
+			spellHaste = state.spellHaste or spellHaste
+		end
+		if si.adddurationcp then
+			duration = duration + si.adddurationcp * (combo - 1)
+		end
+		if si.adddurationholy then
+			duration = duration + si.adddurationholy * (holy - 1)
+		end
+		if si.tick then	-- DoT
+			--DoT duration is tickLength * numberOfTicks.
+			local tickLength = self:GetTickLength(spellId, spellHaste)
+			local numTicks = floor(duration / tickLength + 0.5)
+			duration = tickLength * numTicks
+		end
+		return duration
+	else
+		return nil
+	end
+end
+
+function OvaleData:GetTickLength(spellId, spellHaste)
+	local si = self.spellInfo[spellId]
+	if si and si.tick then
+		if si.haste ~= "spell" then
+			return si.tick
+		else
+			return si.tick / spellHaste
+		end
+	else
+		return nil
+	end
 end
 --</public-static-methods>

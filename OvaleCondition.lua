@@ -280,7 +280,7 @@ local function testValue(comparator, limit, value, atTime, rate)
 end
 
 -- Recherche un aura sur la cible et récupère sa durée et le nombre de stacks
--- return start, ending, stacks
+-- return start, ending, stacks, spellHaste
 local function GetTargetAura(condition, target)
 	if (not target) then
 		target=condition.target
@@ -313,12 +313,12 @@ local function GetTargetAura(condition, target)
 		aura = OvaleState:GetAura(target, spellId, mine)
 	else
 		Ovale:Error("unknown buff "..spellId)
-		return 0,0,0
+		return 0,0,0,0
 	end
 	
 	if not aura then
 		Ovale:Log("Aura "..spellId.." not found")
-		return 0,0,0
+		return 0,0,0,0
 	end	
 	
 	if Ovale.trace then
@@ -328,6 +328,7 @@ local function GetTargetAura(condition, target)
 	if (not condition.mine or (aura.mine and condition.mine==1) or (not aura.mine and condition.mine==0)) and aura.stacks>=stacks then
 		local ending
 		if condition.forceduration then
+			--TODO: this is incorrect.
 			if OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].duration then
 				ending = aura.start + OvaleData.spellInfo[spellId].duration
 			else
@@ -336,9 +337,9 @@ local function GetTargetAura(condition, target)
 		else
 			ending = aura.ending
 		end
-		return aura.start, ending, aura.stacks
+		return aura.start, ending, aura.stacks, aura.spellHaste
 	else
-		return 0,0,0
+		return 0,0,0,0
 	end
 end
 
@@ -678,7 +679,12 @@ OvaleCondition.conditions=
 	-- returns: number
 	damage = function(condition)
 		local spellId = condition[1]
-		local ret = OvaleData:GetDamage(spellId, OvaleState.state.combo, UnitAttackPower("player"), GetSpellBonusDamage(2))
+		local ret = OvaleData:GetDamage(spellId,
+		{
+			combo = OvaleState.state.combo,
+			attackpower = UnitAttackPower("player"),
+			spellpower = GetSpellBonusDamage(2)
+		})
 		return 0, nil, ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
 	end,
 	-- Get the current damage multiplier
@@ -876,7 +882,12 @@ OvaleCondition.conditions=
 	-- returns: number
 	lastspellestimateddamage = function(condition)
 		local spellId = condition[1]
-		local ret = OvaleData:GetDamage(spellId, OvaleFuture.lastSpellCombo[spellId], OvaleFuture.lastSpellAP[spellId], OvaleFuture.lastSpellSP[spellId])
+		local ret = OvaleData:GetDamage(spellId,
+		{
+			combo = OvaleFuture.lastSpellCombo[spellId],
+			attackpower = OvaleFuture.lastSpellAP[spellId],
+			spellpower = OvaleFuture.lastSpellSP[spellId]
+		})
 		return 0, nil, ret * (OvaleFuture.lastSpellDM[spellId] or 0), 0, 0
 	end,
 	-- Get the last spell damage multiplier
@@ -1009,21 +1020,15 @@ OvaleCondition.conditions=
 	-- 1: spell id
 	-- return: number
 	nexttick = function(condition)
-		local start, ending = GetTargetAura(condition, getTarget(condition.target))
-		local si = OvaleData.spellInfo[condition[1]]
-		if not si or not si.duration then
-			return nil
-		end
-		local ticks = floor(OvaleAura.spellHaste * (si.duration/(si.tick or 3)) + 0.5)
-		local tickLength = (ending - start) / ticks
-		local tickTime = start + tickLength
-		for i=1,ticks do
-			if OvaleState.currentTime<=tickTime then
-				break
+		local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
+		local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
+		if tickLength then
+			while ending - tickLength > OvaleState.currentTime do
+				ending = ending - tickLength
 			end
-			tickTime = tickTime + tickLength
+			return 0, nil, ending, 0, -1
 		end
-		return 0, nil, tickTime, 0, -1
+		return nil
 	end,
 	-- Check if the aura is not on any other unit than the current target
 	-- 1: spell id
@@ -1245,52 +1250,51 @@ OvaleCondition.conditions=
 	-- 1: spell Id
 	-- return: bool or number
 	ticks = function(condition)
-		local si = OvaleData.spellInfo[condition[1]]
-		if not si or not si.duration then return nil end
-		local baseTickTime = si.tick or 3
-		local haste = OvaleAura.spellHaste
-		local d = si.duration
-		local t = floor(( baseTickTime * haste ) + 0.5 )
-		local n = d/t
-		local num
-		-- banker's rounding
-		if n - 0.5 == floor(n) and floor(n) % 2 == 0 then
-			num = ceil(n - 0.5)
-		else
-			num = floor(n + 0.5)
+		local spellId = condition[1]
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.duration then
+			local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
+			if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
+				spellHaste = OvaleAura.spellHaste
+			end
+			local tickLength = OvaleData:GetTickLength(spellId, spellHaste)
+			if tickLength then
+				local numTicks = floor(duration / tickLength + 0.5)
+				return compare(numTicks, condition[2], condition[3])
+			end
 		end
-		return compare(num, condition[2], condition[3])
+		return nil
 	end,
 	-- Get the remaining number of ticks
 	-- 1: spell Id
 	-- return: bool or number
 	ticksremain = function(condition)
-		local start, ending = GetTargetAura(condition, getTarget(condition.target))
-		local si = OvaleData.spellInfo[condition[1]]
-		if not si or not si.duration then
-			return nil
-		end
-		local ticks = floor(OvaleAura.spellHaste * (si.duration/(si.tick or 3)) + 0.5)
-		local tickLength = (ending - start) / ticks
-		local tickTime = start + tickLength
-		local remain = ticks - 1
-		for i=1,ticks do
-			if OvaleState.currentTime<=tickTime then
-				break
+		local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
+		local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
+		if tickLength then
+			local remain = 1
+			local tickTime = ending
+			while tickTime - tickLength > OvaleState.currentTime do
+				remain = remain + 1
+				tickTime = tickTime - tickLength
 			end
-			tickTime = tickTime + tickLength
-			remain = remain - 1
+			return start, ending, remain, tickTime, -1/tickLength
 		end
-		return start, ending, remain, tickTime, -1/tickLength
+		return nil
 	end,
 	-- Get the duration of a tick
 	-- 1: spell id
 	-- return: number or bool
 	ticktime = function(condition)
-		--TODO not correct
-		local si = OvaleData.spellInfo[condition[1]]
-		if not si then return nil end
-		return compare(avecHate(si.tick or 3, "spell"), condition[2], condition[3])
+		local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
+		if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
+			spellHaste = OvaleAura.spellHaste
+		end
+		local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
+		if tickLength then
+			return compare(tickLength, condition[2], condition[3])
+		end
+		return nil
 	end,
 	-- Get the time in combat
 	-- return: number or bool
