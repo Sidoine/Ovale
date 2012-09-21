@@ -286,7 +286,7 @@ end
 function OvaleAura:GetDamageMultiplier(spellId)
 	local damageMultiplier = baseDamageMultiplier
 	if spellId then
-		local si = OvaleData:GetSpellInfo(spellId)
+		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
 			self:UpdateAuras("player", self.playerGUID)
 			auraTable = self.aura[self.playerGUID]
