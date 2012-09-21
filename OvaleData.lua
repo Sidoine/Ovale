@@ -511,6 +511,7 @@ function OvaleData:GetDuration(spellId, state)
 			local tickLength = self:GetTickLength(spellId, spellHaste)
 			local numTicks = floor(duration / tickLength + 0.5)
 			duration = tickLength * numTicks
+			return duration, tickLength
 		end
 		return duration
 	else

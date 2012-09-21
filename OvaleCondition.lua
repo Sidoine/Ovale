@@ -1258,19 +1258,18 @@ OvaleCondition.conditions=
 	-- Get the number of ticks of a DOT
 	-- 1: spell Id
 	-- return: bool or number
+	-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
 	ticks = function(condition)
 		local spellId = condition[1]
-		local si = OvaleData.spellInfo[spellId]
-		if si and si.duration then
-			local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
-			if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
-				spellHaste = OvaleAura.spellHaste
-			end
-			local tickLength = OvaleData:GetTickLength(spellId, spellHaste)
-			if tickLength then
-				local numTicks = floor(duration / tickLength + 0.5)
-				return compare(numTicks, condition[2], condition[3])
-			end
+		local duration, tickLength = OvaleData:GetDuration(spellId,
+		{
+			combo = Ovale.state.combo,
+			holy = Ovale.state.holy,
+			spellHaste = OvaleAura.spellHaste,
+		})
+		if tickLength then
+			local numTicks = floor(duration / tickLength + 0.5)
+			return compare(numTicks, condition[2], condition[3])
 		end
 		return nil
 	end,
