@@ -38,8 +38,9 @@ OvaleData.powerType = {}
 -- List haste buff that does not appear in the character sheet and that are not raid wide buffs
 OvaleData.selfHasteBuff =
 {
-	[53657] = 9, -- Judgement of the pure
-	[49016] = 20 -- Unholy Frenzy
+	[13750] = 20, -- Adrenaline Rush (rogue)
+	[49016] = 20, -- Unholy Frenzy (death knight)
+	[53657] = 9, -- Judgement of the Pure (paladin)
 }
 
 -- List temporary damage multiplier
