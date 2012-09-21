@@ -1263,8 +1263,8 @@ OvaleCondition.conditions=
 		local spellId = condition[1]
 		local duration, tickLength = OvaleData:GetDuration(spellId,
 		{
-			combo = Ovale.state.combo,
-			holy = Ovale.state.holy,
+			combo = OvaleState.state.combo,
+			holy = OvaleState.state.holy,
 			spellHaste = OvaleAura.spellHaste,
 		})
 		if tickLength then
