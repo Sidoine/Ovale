@@ -100,90 +100,112 @@ OvaleData.buffSpellList =
 	
 	str_agi_int =
 	{
-		20217, -- Blessing of Kings
-		1126, -- Mark of the Wild
-		-- Monk
+		1126, -- Mark of the Wild (druid)
+		20217, -- Blessing of Kings (paladin)
+		90363, -- Embrace of the Shale Spider (shale spider)
+		117667, -- Legacy of the Emporer (monk)
 	},
 	stamina =
 	{
-		21562, -- Power Word: Fortitude
-		469, -- Commanding Shout
-		6307, -- Blood Pact
-		90364 -- Qiraji Fortitude
+		469, -- Commanding Shout (warrior)
+		6307, -- Blood Pact (imp)
+		21562, -- Power Word: Fortitude (priest)
+		90364, -- Qiraji Fortitude (silithid)
 	},
 	attack_power_multiplier=
 	{
-		6673, -- Battle Shout
-		57330, -- Horn of Winter
-		-- Hunter?
+		6673, -- Battle Shout (warrior)
+		19506, -- Trueshot Aura (hunter)
+		57330, -- Horn of Winter (death knight)
 	},
 	spell_power_multiplier = 
 	{
-		109773,  -- Dark Intent
-		-- Shaman?
-		1459 -- Arcane Brillance
+		1459, -- Arcane Brillance
+		61316, -- Dalaran Brilliance (mage)
+		77747, -- Burning Wrath (shaman)
+		109773,  -- Dark Intent (warlock)
+		126309, -- Still Water (waterstrider)
 	},
 	melee_haste =
 	{
-	  -- Frost and Unholy death knights, any rogue, Enhancement shaman
+		30809, -- Unleashed Rage (enhancement shaman)
+		55610, -- Unholy Aura (frost & unholy death knights)
+		113742, -- Swiftblade's Cunning (rogue)
+		128432, -- Cackling Howl (hyena)
+		128433, -- Serpent's Swiftness (serpent)
 	},
 	spell_haste = 
 	{
-		24907, -- Moonkin aura
-		49868, -- Mind Quickening
-		-- Elemental  shaman
+		24907, -- Moonkin aura (balance druid)
+		49868, -- Mind Quickening (shadow priest, sporebat)
+		51470, -- Elemental Oath (elemental shaman)
 	},
 	critical_strike =
 	{
 		--Guardian and Feral druids, any hunter, any mage
-		1459 -- Arcane Brillance
+		1459, -- Arcane Brillance (mage)
+		24604, -- Furious Howl (wolf)
+		24932, -- Leader of the Pack (feral & guardian druids)
+		61316, -- Dalaran Brilliance (mage)
+		90309, -- Terrifying Roar (devilsaur)
+		97229, -- Bellowing Roar (hydra)
+		116781, -- Legacy of the White Tiger (windwalker monk)
+		126309, -- Still Water (waterstrider)
+		126373, -- Fearless Roar (quilen)
 	},
 	mastery =
 	{
-		93435, --Roar of Courage (Cat, Spirit Beast)
-		116956, -- Grace of Air
-		19740 -- Blessing of Might
+		19740, -- Blessing of Might (paladin)
+		93435, -- Roar of Courage (cat)
+		116956, -- Grace of Air (shaman)
+		128997, -- Spirit Beast Blessing (spirit beast)
 	},
 	-- weakened_armor
 	physical_vulnerability=
 	{
-		55749, -- Physical Vulnaribility
-		55749, -- Acid Spit (Worm)
-		50518, -- Ravage (Ravager)
+		35290, -- Gore (boar)
+		50518, -- Ravage (ravager)
+		55749, -- Acid Spit (worm)
+		57386, -- Stampede (rhino)
+		81326, -- Physical Vulnerability (frost & unholy death knights, retribution paladin, arms & fury warriors)
 	},
 	magic_vulnerability=
 	{
-		93068, -- Master Poisoner 
-		1490, -- Curse of the Elements
-		34889, --Fire Breath (Dragonhawk)
-		24844 --Lightning Breath (Wind serpent)
+		1490, -- Curse of the Elements (warlock)
+		24844, -- Lightning Breath (wind serpent)
+		34889, -- Fire Breath (dragonhawk)
+		93068, -- Master Poisoner (rogue)
 	},
 	lower_physical_damage=
 	{
-		115798, -- Weakened blows
-		26017, -- Vindication
-		50256, --Demoralizing Roar (Bear)
-		24423, -- Demoralizing Screech (Carrion Bird)
+		24423, -- Demoralizing Screech (carrion bird)
+		50256, -- Demoralizing Roar (bear)
+		115798, -- Weakened Blows (all tank specs, feral druid, retribution paladin, shaman, warlock, warrior)
 	},
 	cast_slow =
 	{
-		1714, --Curse of Tongues
-        58604, --Lava Breath (Core Hound)
-        50274, --Spore Cloud (Sporebat)
-        5761, --Mind-numbing Poison
-        73975, --Necrotic Strike
-        31589 --Slow
+		5760, -- Mind-numbing Poison (rogue)
+		31589, -- Slow (arcane mage)
+		50274, -- Spore Cloud (sporebat)
+		58604, -- Lava Breath (core hound)
+		73975, -- Necrotic Strike (death knight)
+		90315, -- Tailspin (fox)
+		109466, -- Curse of Enfeeblement (warlock)
+		126406, -- Trample (goat)
 	},
 	healing_reduced =
 	{
-		--Arms or Fury warrior, any rogue, any hunter
+		8680, -- Wound Poison (rogue)
+		54680, -- Monstrous Bite (devilsaur)
+		82654, -- Widow Venom (hunter)
+		115804, -- Mortal Wounds (arms & fury warriors, windwalker monk)
 	},
-	heroism=
+	burst_haste =
 	{
-		2825, --Bloodlust
-		32182, --Heroism
-		80353, --Time warp
-		90355 -- Ancient Hysteria (Core Hound)
+		2825, --Bloodlust (Horde shaman)
+		32182, --Heroism (Alliance shaman)
+		80353, --Time Warp (mage)
+		90355, -- Ancient Hysteria (core hound)
 	},
 	enrage =
 	{
@@ -203,7 +225,8 @@ OvaleData.buffSpellList =
 		1130, -- Hunter's Mark
 	},
 }
-OvaleData.buffSpellList.bloodlust = OvaleData.buffSpellList.heroism
+OvaleData.buffSpellList.bloodlust = OvaleData.buffSpellList.burst_haste
+OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 --</public-static-properties>
 
 --<private-static-properties>
