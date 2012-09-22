@@ -469,7 +469,7 @@ function OvaleData:GetDamage(spellId, state)
 		return nil
 	end
 	local damage = si.base or 0
-	local combo, attackpower, spellpower = 1, 0, 0
+	local combo, attackpower, spellpower = 0, 0, 0
 	if state then
 		combo = state.combo or combo
 		attackpower = state.attackpower or attackpower
@@ -494,14 +494,14 @@ function OvaleData:GetDuration(spellId, state)
 	local si = self.spellInfo[spellId]
 	if si and si.duration then
 		local duration = si.duration
-		local combo, holy, spellHaste = 1, 1, 1
+		local combo, holy, spellHaste = 0, 1, 1
 		if state then
 			combo = state.combo or combo
 			holy = state.holy or holy
 			spellHaste = state.spellHaste or spellHaste
 		end
 		if si.adddurationcp then
-			duration = duration + si.adddurationcp * (combo - 1)
+			duration = duration + si.adddurationcp * combo
 		end
 		if si.adddurationholy then
 			duration = duration + si.adddurationholy * (holy - 1)
