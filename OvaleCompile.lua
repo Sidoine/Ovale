@@ -127,7 +127,7 @@ local function TestConditions(paramList)
 		if OvaleEquipement.nombre[set] then
 			nombre = OvaleEquipement.nombre[set]
 		end
-		if nombre<=count then
+		if nombre < count then
 			return false
 		end
 	end
