@@ -560,7 +560,7 @@ function OvaleCompile:Compile(text)
 	text = string.gsub(text, "SpellDamageDebuff%s*%((.-)%)", ParseSpellDamageDebuff)
 	text = string.gsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
 	text = string.gsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
-	text = string.gsub(text, "SpellList%s*%(%s*(%w+)%s*(.-)%)", ParseSpellList)
+	text = string.gsub(text, "SpellList%s*%(%s*([%w_]+)%s*(.-)%)", ParseSpellList)
 			
 	-- On vire les espaces en trop
 	text = string.gsub(text, "\n", " ")
