@@ -50,9 +50,9 @@ AddIcon mastery=3 help=main
 	{
 		if not BuffPresent(stamina) Spell(power_word_fortitude)
 		if BuffExpires(inner_fire) and BuffExpires(inner_will) Spell(inner_fire)
-		Spell(shadowform)
+		if BuffExpires(shadowform) Spell(shadowform)
 	}
-	Spell(shadowform)
+	if BuffExpires(shadowform) Spell(shadowform)
 	if ShadowOrbs() ==3 and {SpellCooldown(mind_blast) <2 or target.HealthPercent() <20 } Spell(devouring_plague)
 	if SpellCooldown(mind_blast) Spell(mind_blast)
 	if {not target.DebuffPresent(shadow_word_pain) or target.DebuffRemains(shadow_word_pain) <TickTime(shadow_word_pain) } Spell(shadow_word_pain)
