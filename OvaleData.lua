@@ -56,6 +56,7 @@ OvaleData.selfHasteBuff =
 OvaleData.selfDamageBuff =
 {
 	[5217] = 1.15, -- Tiger's Fury (druid)
+	[31665] = 1.1, -- Master of Subtlety (rogue)
 	[52610] = 1.3, -- Savage Roar, glyphed (druid)
 	[57933] = 1.15, -- Tricks of the Trade (rogue)
 	[84745] = 1.1, -- Shallow Insight (rogue)
