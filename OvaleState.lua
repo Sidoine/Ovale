@@ -192,6 +192,10 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 					self.state.combo = 0
 				else
 					self.state.combo = self.state.combo + newSpellInfo.combo
+					if self:GetAura("player", 121471, true) then
+						-- Shadow Blades generates an extra combo point.
+						self.state.combo = self.state.combo + 1
+					end
 				end
 				if self.state.combo<0 then
 					self.state.combo = 0
