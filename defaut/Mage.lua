@@ -12,7 +12,8 @@ Define(arcane_brilliance 1459)
 Define(arcane_charge 36032)
   SpellInfo(arcane_charge duration=10 )
   SpellAddBuff(arcane_charge arcane_charge=1)
-Define(arcane_missiles 7268)
+Define(arcane_missiles 5143)
+  SpellInfo(arcane_missiles duration=2 )
 Define(arcane_missiles_aura 79683)
   SpellInfo(arcane_missiles_aura duration=20 )
   SpellAddBuff(arcane_missiles_aura arcane_missiles_aura=1)
@@ -107,9 +108,11 @@ AddIcon mastery=1 help=main
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
 	if BuffPresent(alter_time) and BuffPresent(presence_of_mind) Spell(arcane_blast)
+	if BuffPresent(alter_time) or BuffStacks(arcane_missiles_aura) ==2 Spell(arcane_missiles)
 	if BuffExpires(rune_of_power) and BuffExpires(alter_time) Spell(rune_of_power)
 	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
 	if ManaPercent() >92 Spell(arcane_blast)
+	if BuffPresent(arcane_missiles_aura) and {SpellCooldown(alter_time_activate) >4 or target.DeadIn() <10 } Spell(arcane_missiles)
 	if BuffPresent(arcane_charge) and BuffExpires(arcane_power) and BuffExpires(alter_time) and target.DeadIn() >25 and {SpellCooldown(mana_gem) >10 or ItemCharges(36799) ==0 } Spell(arcane_barrage)
 	if BuffStacks(arcane_charge) >=4 and BuffExpires(arcane_missiles_aura) and target.DeadIn() >25 Spell(arcane_barrage)
 	Spell(arcane_blast)
@@ -119,9 +122,7 @@ AddIcon mastery=1 help=offgcd
 	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
 	if BuffExpires(alter_time) and BuffPresent(arcane_power) and BuffStacks(arcane_missiles_aura) ==2 and BuffStacks(arcane_charge) >3 and BuffRemains(rune_of_power) >6 Spell(alter_time)
-	if BuffPresent(alter_time) or BuffStacks(arcane_missiles_aura) ==2 Spell(arcane_missiles)
 	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
-	if BuffPresent(arcane_missiles_aura) and {SpellCooldown(alter_time_activate) >4 or target.DeadIn() <10 } Spell(arcane_missiles)
 }
 AddIcon mastery=1 help=moving
 {

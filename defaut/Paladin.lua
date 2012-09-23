@@ -9,6 +9,9 @@ Define(blessing_of_might 19740)
   SpellAddBuff(blessing_of_might blessing_of_might=1)
 Define(crusader_strike 35395)
   SpellInfo(crusader_strike holy=-1 cd=4.5 )
+Define(darkmist_vortex 126657)
+  SpellInfo(darkmist_vortex duration=20 )
+  SpellAddBuff(darkmist_vortex darkmist_vortex=1)
 Define(execution_sentence 114916)
   SpellInfo(execution_sentence duration=10 tick=1 )
   SpellAddTargetDebuff(execution_sentence execution_sentence=1)
@@ -24,6 +27,9 @@ Define(inquisition 84963)
   SpellAddBuff(inquisition inquisition=1)
 Define(judgment 20271)
   SpellInfo(judgment cd=6 )
+Define(lei_shins_final_orders 126582)
+  SpellInfo(lei_shins_final_orders duration=20 )
+  SpellAddBuff(lei_shins_final_orders lei_shins_final_orders=1)
 Define(rebuke 96231)
   SpellInfo(rebuke duration=4 cd=15 )
 Define(seal_of_insight 20165)
@@ -41,7 +47,7 @@ AddIcon mastery=3 help=main
 		unless Stance(1) Spell(seal_of_truth)
 	}
 	if ManaPercent() >=90 or Stance(0) unless Stance(1) Spell(seal_of_truth)
-	if ManaPercent() <=20 unless Stance(4) Spell(seal_of_insight)
+	if ManaPercent() <=30 unless Stance(4) Spell(seal_of_insight)
 	if {BuffExpires(inquisition) or BuffRemains(inquisition) <=2 } and {HolyPower() >=3 } Spell(inquisition)
 	if HolyPower() ==5 Spell(templars_verdict)
 	Spell(hammer_of_wrath usable=1)
@@ -58,8 +64,8 @@ AddIcon mastery=3 help=offgcd
 }
 AddIcon mastery=3 help=cd
 {
+	if BuffPresent(inquisition) and {BuffPresent(darkmist_vortex) or BuffPresent(lei_shins_final_orders) } Spell(avenging_wrath)
 	if BuffPresent(inquisition) and BuffPresent(avenging_wrath) Spell(guardian_of_ancient_kings)
-	if BuffPresent(inquisition) Spell(avenging_wrath)
 	if BuffPresent(inquisition)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 ]]
