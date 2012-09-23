@@ -41,7 +41,7 @@ OvaleData.power =
 	burningembers = {id=14, mini=0},
 	demonicfury = {id=15, mini=0}
 }
-OvaleData.secondaryPower = {"focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
+OvaleData.secondaryPower = {"rage", "focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
 OvaleData.powerType = {}
 
 -- List haste buff that does not appear in the character sheet and that are not raid wide buffs

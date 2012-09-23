@@ -24,6 +24,12 @@ Define(colossus_smash 86346)
 Define(deadly_calm 85730)
   SpellInfo(deadly_calm duration=9 cd=60 )
   SpellAddBuff(deadly_calm deadly_calm=1)
+Define(defensive_stance 71)
+  SpellInfo(defensive_stance cd=3 )
+Define(demoralizing_shout 1160)
+  SpellInfo(demoralizing_shout duration=10 cd=60 )
+  SpellAddTargetDebuff(demoralizing_shout demoralizing_shout=1)
+Define(devastate 20243)
 Define(dragon_roar 118000)
   SpellInfo(dragon_roar cd=60 )
 Define(enrage 5229)
@@ -52,6 +58,18 @@ Define(raging_blow_aura 131116)
 Define(recklessness 1719)
   SpellInfo(recklessness duration=12 cd=300 )
   SpellAddBuff(recklessness recklessness=1)
+Define(revenge 6572)
+  SpellInfo(revenge rage=-15 cd=9 )
+Define(shield_barrier 112048)
+  SpellInfo(shield_barrier duration=6 cd=1.5 )
+  SpellAddBuff(shield_barrier shield_barrier=1)
+Define(shield_block 2565)
+  SpellInfo(shield_block cd=1.5 )
+Define(shield_slam 23922)
+  SpellInfo(shield_slam rage=-20 cd=6 )
+Define(shield_wall 871)
+  SpellInfo(shield_wall duration=12 cd=300 )
+  SpellAddBuff(shield_wall shield_wall=1)
 Define(shockwave 46968)
   SpellInfo(shockwave cd=20 )
   SpellAddBuff(shockwave shockwave=1)
@@ -60,6 +78,13 @@ Define(storm_bolt 107570)
   SpellInfo(storm_bolt cd=30 )
   SpellAddBuff(storm_bolt storm_bolt=1)
 Define(taste_for_blood 56638)
+Define(thunder_clap 6343)
+  SpellInfo(thunder_clap cd=6 )
+  SpellAddTargetDebuff(thunder_clap weakened_blows=1)
+Define(ultimatum 122509)
+Define(weakened_blows 115798)
+  SpellInfo(weakened_blows duration=30 )
+  SpellAddBuff(weakened_blows weakened_blows=1)
 Define(wild_strike 100130)
   SpellAddBuff(wild_strike bloodsurge=-1)
   SpellAddTargetDebuff(wild_strike wild_strike=1)
@@ -70,6 +95,7 @@ Define(dragon_roar_talent 12)
 Define(impending_victory_talent 6)
 Define(shockwave_talent 11)
 Define(storm_bolt_talent 18)
+AddCheckBox(showwait L(showwait) default)
 AddIcon mastery=1 help=main
 {
 	if not InCombat() 
@@ -115,7 +141,7 @@ AddIcon mastery=2 help=main
 	}
 	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } Spell(bloodthirst)
 	if BuffPresent(bloodsurge) and target.HealthPercent() >=20 and SpellCooldown(bloodthirst) <=1 Spell(wild_strike)
-	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } and SpellCooldown(bloodthirst) <=1 Texture(Spell_nature_timestop) 
+	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } and SpellCooldown(bloodthirst) <=1 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
 	Spell(colossus_smash)
 	if target.HealthPercent(less 20) Spell(execute)
 	if TalentPoints(storm_bolt_talent) Spell(storm_bolt)
@@ -146,5 +172,30 @@ AddIcon mastery=2 help=cd
 {
 	if {{target.DebuffRemains(colossus_smash) >=5 or SpellCooldown(colossus_smash) <=4 } and {{not TalentPoints(avatar_talent) or not ArmorSetParts(T14 more 4) } and {{target.HealthPercent() <20 or target.DeadIn() >315 or {target.DeadIn() >165 and ArmorSetParts(T14 more 4) } } } or {TalentPoints(avatar_talent) and ArmorSetParts(T14 more 4) and BuffPresent(avatar) } } } or target.DeadIn() <=18 Spell(recklessness)
 	if TalentPoints(avatar_talent) and {{{SpellCooldown(recklessness) >=180 or BuffPresent(recklessness) } or {target.HealthPercent() >=20 and target.DeadIn() >195 } or {target.HealthPercent() <20 and ArmorSetParts(T14 more 4) } } or target.DeadIn() <=20 } Spell(avatar)
+}
+AddIcon mastery=3 help=main
+{
+	if not InCombat() 
+	{
+		unless Stance(3) Spell(defensive_stance)
+	}
+	if Rage() <85 Spell(shield_slam)
+	if Rage() <90 Spell(revenge)
+	if BuffExpires(weakened_blows) Spell(thunder_clap)
+	if Rage() <70 Spell(battle_shout)
+	Spell(devastate)
+}
+AddIcon mastery=3 help=offgcd
+{
+	Spell(berserker_rage)
+	Spell(shield_block)
+	if BuffExpires(shield_barrier) and Rage() >80 Spell(shield_barrier)
+	Spell(demoralizing_shout)
+	if BuffPresent(ultimatum) Spell(heroic_strike)
+}
+AddIcon mastery=3 help=cd
+{
+	if TalentPoints(avatar_talent) Spell(avatar)
+	if BuffExpires(shield_block) Spell(shield_wall)
 }
 ]]

@@ -38,6 +38,7 @@ Define(seal_of_truth 31801)
   SpellAddBuff(seal_of_truth seal_of_truth=1)
 Define(templars_verdict 85256)
   SpellInfo(templars_verdict holy=3 )
+AddCheckBox(showwait L(showwait) default)
 AddIcon mastery=3 help=main
 {
 	if not InCombat() 
@@ -51,7 +52,7 @@ AddIcon mastery=3 help=main
 	if {BuffExpires(inquisition) or BuffRemains(inquisition) <=2 } and {HolyPower() >=3 } Spell(inquisition)
 	if HolyPower() ==5 Spell(templars_verdict)
 	Spell(hammer_of_wrath usable=1)
-	if SpellCooldown(hammer_of_wrath) >0 and SpellCooldown(hammer_of_wrath) <=0.2 Texture(Spell_nature_timestop) 
+	if SpellCooldown(hammer_of_wrath) >0 and SpellCooldown(hammer_of_wrath) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
 	Spell(exorcism)
 	Spell(crusader_strike)
 	Spell(judgment)
