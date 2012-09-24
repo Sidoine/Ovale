@@ -545,11 +545,11 @@ end
 
 function OvaleData:GetTickLength(spellId, spellHaste)
 	local si = self.spellInfo[spellId]
-	if si and si.tick then
+	if si then
 		if si.haste ~= "spell" then
-			return si.tick
+			return si.tick or 3
 		else
-			return si.tick / spellHaste
+			return (si.tick or 3) / spellHaste
 		end
 	else
 		return nil

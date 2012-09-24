@@ -112,7 +112,7 @@ AddIcon mastery=1 help=main
 	if BuffExpires(rune_of_power) and BuffExpires(alter_time) Spell(rune_of_power)
 	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
 	if ManaPercent() >92 Spell(arcane_blast)
-	if BuffPresent(arcane_missiles_aura) and {SpellCooldown(alter_time_activate) >4 or target.DeadIn() <10 } Spell(arcane_missiles)
+	if BuffStacks(arcane_missiles_aura) and {SpellCooldown(alter_time_activate) >4 or target.DeadIn() <10 } Spell(arcane_missiles)
 	if BuffPresent(arcane_charge) and BuffExpires(arcane_power) and BuffExpires(alter_time) and target.DeadIn() >25 and {SpellCooldown(mana_gem) >10 or ItemCharges(36799) ==0 } Spell(arcane_barrage)
 	if BuffStacks(arcane_charge) >=4 and BuffExpires(arcane_missiles_aura) and target.DeadIn() >25 Spell(arcane_barrage)
 	Spell(arcane_blast)
@@ -147,9 +147,9 @@ AddIcon mastery=2 help=main
 		Spell(molten_armor)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
-	if BuffPresent(pyroblast_aura) and {SpellCooldown(alter_time_activate) >4 or BuffPresent(heating_up) } Spell(pyroblast)
+	if BuffStacks(pyroblast_aura) and {SpellCooldown(alter_time_activate) >4 or BuffStacks(heating_up) } Spell(pyroblast)
 	if BuffPresent(presence_of_mind) and SpellCooldown(alter_time_activate) >4 Spell(pyroblast)
-	if BuffPresent(heating_up) and BuffExpires(pyroblast_aura) Spell(inferno_blast)
+	if BuffStacks(heating_up) and BuffExpires(pyroblast_aura) Spell(inferno_blast)
 	if not target.DebuffPresent(nether_tempest) Spell(nether_tempest)
 	Spell(fireball)
 }
@@ -161,7 +161,7 @@ AddIcon mastery=2 help=offgcd
 	if ArmorSetParts(T14 more 4) and target.DebuffPresent(ignite) and target.DebuffPresent(pyroblast_aura) Spell(combustion)
 	if not ArmorSetParts(T14 more 4) and LastSpellDamage(ignite) >=12000 and target.DebuffPresent(pyroblast_aura) Spell(combustion)
 	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
-	if BuffExpires(alter_time) and BuffPresent(pyroblast_aura) and BuffRemains(invocation) >6 Spell(alter_time)
+	if BuffExpires(alter_time) and BuffStacks(pyroblast_aura) and BuffRemains(invocation) >6 Spell(alter_time)
 }
 AddIcon mastery=2 help=moving
 {
@@ -196,9 +196,9 @@ AddIcon mastery=3 help=main
 	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 and SpellCooldown(icy_veins) <GCD() and BuffRemains(invocation) >20 and BuffExpires(alter_time) Spell(frozen_orb)
 	if BuffPresent(fingers_of_frost_aura) and BuffRemains(fingers_of_frost_aura) <2 Spell(ice_lance)
 	if target.DebuffStacks(frostbolt) <3 Spell(frostbolt)
-	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(frostfire_bolt)
-	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(ice_lance)
-	if BuffPresent(fingers_of_frost_aura) Spell(ice_lance)
+	if BuffStacks(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(frostfire_bolt)
+	if BuffStacks(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(ice_lance)
+	if BuffStacks(fingers_of_frost_aura) Spell(ice_lance)
 	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 Spell(frozen_orb)
 	Spell(frostbolt)
 }
@@ -212,8 +212,8 @@ AddIcon mastery=3 help=offgcd
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
 	if BuffExpires(alter_time) and BuffStacks(fingers_of_frost_aura) <2 Spell(water_elemental_freeze)
 	if not target.DebuffPresent(frost_bomb) Spell(frost_bomb)
-	if BuffExpires(alter_time) and BuffPresent(brain_freeze) and BuffPresent(fingers_of_frost_aura) and BuffRemains(invocation) >6 Spell(alter_time)
-	if BuffExpires(alter_time) and BuffPresent(brain_freeze) and BuffPresent(fingers_of_frost_aura) Spell(alter_time)
+	if BuffExpires(alter_time) and BuffStacks(brain_freeze) and BuffStacks(fingers_of_frost_aura) and BuffRemains(invocation) >6 Spell(alter_time)
+	if BuffExpires(alter_time) and BuffStacks(brain_freeze) and BuffStacks(fingers_of_frost_aura) Spell(alter_time)
 	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
 }
 AddIcon mastery=3 help=moving

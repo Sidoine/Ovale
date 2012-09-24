@@ -140,13 +140,13 @@ AddIcon mastery=2 help=main
 		unless Stance(1) Spell(battle_stance)
 	}
 	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } Spell(bloodthirst)
-	if BuffPresent(bloodsurge) and target.HealthPercent() >=20 and SpellCooldown(bloodthirst) <=1 Spell(wild_strike)
+	if BuffStacks(bloodsurge) and target.HealthPercent() >=20 and SpellCooldown(bloodthirst) <=1 Spell(wild_strike)
 	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } and SpellCooldown(bloodthirst) <=1 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
 	Spell(colossus_smash)
 	if target.HealthPercent(less 20) Spell(execute)
 	if TalentPoints(storm_bolt_talent) Spell(storm_bolt)
-	if BuffPresent(raging_blow_aura) Spell(raging_blow)
-	if BuffPresent(bloodsurge) and target.HealthPercent() >=20 Spell(wild_strike)
+	if BuffStacks(raging_blow_aura) Spell(raging_blow)
+	if BuffStacks(bloodsurge) and target.HealthPercent() >=20 Spell(wild_strike)
 	Spell(heroic_throw)
 	if Rage() <70 and not target.DebuffPresent(colossus_smash) Spell(battle_shout)
 	if target.DebuffPresent(colossus_smash) and target.HealthPercent() >=20 Spell(wild_strike)
@@ -157,7 +157,7 @@ AddIcon mastery=2 help=main
 AddIcon mastery=2 help=offgcd
 {
 	if TalentPoints(bloodbath_talent) and {{{SpellCooldown(recklessness) >=10 or BuffPresent(recklessness) } or {target.HealthPercent() >=20 and {target.DeadIn() <=165 or {target.DeadIn() <=315 and not ArmorSetParts(T14 more 4) } } and target.DeadIn() >75 } } or target.DeadIn() <=19 } Spell(bloodbath)
-	if not {BuffPresent(enrage) or {BuffPresent(raging_blow_aura) ==2 and target.HealthPercent() >=20 } } Spell(berserker_rage)
+	if not {BuffStacks(enrage) or {BuffStacks(raging_blow_aura) ==2 and target.HealthPercent() >=20 } } Spell(berserker_rage)
 	if target.DebuffPresent(colossus_smash) if CheckBoxOn(heroic_leap_check) Spell(heroic_leap)
 	if Rage() >=40 Spell(deadly_calm)
 	if {{{target.DebuffPresent(colossus_smash) and Rage() >=40 } or {BuffPresent(deadly_calm) and Rage() >=30 } } and target.HealthPercent() >=20 } or Rage() >=110 Spell(heroic_strike)

@@ -93,7 +93,7 @@ AddIcon mastery=1 help=main
 	if not InCombat() 
 	{
 		if target.DeadIn() >=21 and not target.DebuffPresent(ranged_vulnerability any=1) Spell(hunters_mark)
-		Spell(call_pet_1)
+		unless pet.Present() Spell(call_pet_1)
 	}
 	if BuffStacks(pet_frenzy any=1)>4 Spell(focus_fire)
 	if not target.DebuffPresent(serpent_sting_aura) Spell(serpent_sting)
@@ -105,7 +105,7 @@ AddIcon mastery=1 help=main
 	if SpellUsable(barrage) Spell(barrage)
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(blink_strike) Spell(blink_strike)
-	if BuffPresent(thrill_of_the_hunt) Spell(arcane_shot)
+	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
 	if not target.DebuffPresent(focus_fire) and not BuffPresent(beast_within) if BuffStacks(pet_frenzy any=1)>4 Spell(focus_fire)
 	if target.DebuffRemains(serpent_sting_aura) <6 Spell(cobra_shot)
 	if Focus() >=61 or BuffPresent(beast_within) Spell(arcane_shot)
@@ -141,7 +141,7 @@ AddIcon mastery=2 help=main
 	if not InCombat() 
 	{
 		if target.DeadIn() >=21 and not target.DebuffPresent(ranged_vulnerability any=1) Spell(hunters_mark)
-		Spell(call_pet_1)
+		unless pet.Present() Spell(call_pet_1)
 	}
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(barrage) Spell(barrage)
@@ -152,10 +152,10 @@ AddIcon mastery=2 help=main
 	if SpellUsable(dire_beast) Spell(dire_beast)
 	if PreviousSpell(steady_shot) and BuffRemains(steady_focus) <3 Spell(steady_shot)
 	if target.HealthPercent(less 20) Spell(kill_shot)
-	if BuffPresent(master_marksman_fire) Spell(aimed_shot)
-	if BuffPresent(thrill_of_the_hunt) Spell(arcane_shot)
-	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffPresent(bloodlust) Spell(aimed_shot)
-	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffPresent(bloodlust) } Spell(arcane_shot)
+	if BuffStacks(master_marksman_fire) Spell(aimed_shot)
+	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
+	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(aimed_shot)
+	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffStacks(bloodlust any=1) } Spell(arcane_shot)
 	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	Spell(steady_shot)
 }
@@ -188,10 +188,10 @@ AddIcon mastery=3 help=main
 	if not InCombat() 
 	{
 		if target.DeadIn() >=21 and not target.DebuffPresent(ranged_vulnerability any=1) Spell(hunters_mark)
-		Spell(call_pet_1)
+		unless pet.Present() Spell(call_pet_1)
 	}
 	if SpellUsable(blink_strike) Spell(blink_strike)
-	if BuffPresent(lock_and_load) Spell(explosive_shot)
+	if BuffStacks(lock_and_load) Spell(explosive_shot)
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(barrage) Spell(barrage)
 	if Enemies() >2 Spell(cobra_shot)
@@ -221,7 +221,7 @@ AddIcon mastery=3 help=aoe
 {
 	Spell(explosive_trap)
 	Spell(multi_shot)
-	if BuffPresent(thrill_of_the_hunt) Spell(multi_shot)
+	if BuffStacks(thrill_of_the_hunt) Spell(multi_shot)
 }
 AddIcon mastery=3 help=cd
 {

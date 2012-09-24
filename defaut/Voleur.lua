@@ -40,7 +40,7 @@ Define(preparation 14185)
   SpellInfo(preparation cd=300 )
 Define(revealing_strike 84617)
   SpellInfo(revealing_strike duration=18 energy=40 combo=1 )
-  SpellAddBuff(revealing_strike revealing_strike=1)
+  SpellAddTargetDebuff(revealing_strike revealing_strike=1)
 Define(rupture 1943)
   SpellInfo(rupture duration=4 combo=0 energy=25 )
   SpellAddTargetDebuff(rupture rupture=1)
@@ -51,7 +51,7 @@ Define(shadow_dance 51713)
   SpellInfo(shadow_dance duration=8 cd=60 )
   SpellAddBuff(shadow_dance shadow_dance=1)
 Define(sinister_strike 1752)
-  SpellInfo(sinister_strike energy=40 combo=0 )
+  SpellInfo(sinister_strike energy=40 combo=1 )
 Define(slice_and_dice 5171)
   SpellInfo(slice_and_dice duration=6 combo=0 energy=25 )
   SpellAddBuff(slice_and_dice slice_and_dice=1)
@@ -79,7 +79,7 @@ AddIcon mastery=1 help=main
 	if BuffRemains(slice_and_dice) <2 Spell(slice_and_dice)
 	if target.TicksRemain(rupture) <2 and Energy() >90 Spell(dispatch usable=1)
 	if target.TicksRemain(rupture) <2 and Energy() >90 Spell(mutilate)
-	if TicksRemain(rupture) <2 or {ComboPoints() ==5 and TicksRemain(rupture) <3 } Spell(rupture)
+	if target.TicksRemain(rupture) <2 or {ComboPoints() ==5 and target.TicksRemain(rupture) <3 } Spell(rupture)
 	if ComboPoints() >=4 and BuffRemains(envenom) <1 Spell(envenom)
 	if ComboPoints() >4 Spell(envenom)
 	if ComboPoints() >=2 and BuffRemains(slice_and_dice) <3 Spell(envenom)
@@ -101,7 +101,7 @@ AddIcon mastery=1 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
 	if TimeInCombat() >10 and not BuffPresent(stealthed) and not BuffPresent(shadow_blades) Spell(vanish)
-	if {BuffPresent(bloodlust) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
+	if {BuffStacks(bloodlust any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
 	Spell(vendetta)
 }
 AddIcon mastery=2 help=main
@@ -112,10 +112,10 @@ AddIcon mastery=2 help=main
 	}
 	Spell(ambush usable=1)
 	if BuffRemains(slice_and_dice) <2 or {BuffRemains(slice_and_dice) <15 and BuffStacks(bandits_guile) ==11 and ComboPoints() >=4 } Spell(slice_and_dice)
-	if TicksRemain(rupture) <2 and ComboPoints() ==5 and BuffPresent(deep_insight) and target.DeadIn() >10 Spell(rupture)
+	if target.TicksRemain(rupture) <2 and ComboPoints() ==5 and BuffPresent(deep_insight) and target.DeadIn() >10 Spell(rupture)
 	if {ComboPoints() ==5 and BuffPresent(deep_insight) } or BuffStacks(anticipation) >=4 Spell(eviscerate)
-	if TicksRemain(rupture) <2 and ComboPoints() ==5 and target.DeadIn() >10 Spell(rupture)
-	if {{BuffExpires(deep_insight) and BuffStacks(anticipation) <5 } or {BuffPresent(deep_insight) and ComboPoints() <5 } } and TicksRemain(revealing_strike) <2 Spell(revealing_strike)
+	if target.TicksRemain(rupture) <2 and ComboPoints() ==5 and target.DeadIn() >10 Spell(rupture)
+	if {{BuffExpires(deep_insight) and BuffStacks(anticipation) <5 } or {BuffPresent(deep_insight) and ComboPoints() <5 } } and target.TicksRemain(revealing_strike) <2 Spell(revealing_strike)
 	if {BuffExpires(deep_insight) and BuffStacks(anticipation) <5 } or {BuffPresent(deep_insight) and ComboPoints() <5 } Spell(sinister_strike)
 }
 AddIcon mastery=2 help=offgcd
@@ -133,7 +133,7 @@ AddIcon mastery=2 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
 	if TimeInCombat() >10 and not BuffPresent(shadow_blades) and not BuffPresent(adrenaline_rush) and Energy() <20 and {{BuffPresent(deep_insight) and ComboPoints() <4 } or BuffStacks(anticipation) <4 } Spell(vanish)
-	if {BuffPresent(bloodlust) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
+	if {BuffStacks(bloodlust any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
 	if Energy() <35 and BuffRemains(slice_and_dice) >4 and BuffExpires(adrenaline_rush) Spell(killing_spree)
 	if Energy() <35 or BuffPresent(shadow_blades) Spell(adrenaline_rush)
 }

@@ -123,7 +123,7 @@ AddIcon mastery=1 help=moving
 	if not target.DebuffPresent(sunfire) Spell(moonfire)
 	if not target.DebuffPresent(moonfire) Spell(sunfire)
 	if BuffStacks(wild_mushroom) <5 Spell(wild_mushroom)
-	if BuffPresent(shooting_stars) Spell(starsurge)
+	if BuffStacks(shooting_stars) Spell(starsurge)
 	if BuffPresent(lunar_eclipse) Spell(moonfire)
 	Spell(sunfire)
 }
@@ -164,8 +164,8 @@ AddIcon mastery=2 help=main
 	if target.DeadIn() >=8.5 and BuffPresent(dream_of_cenarius_damage) and {LastSpellDamageMultiplier(rake) <=DamageMultiplier(rake) } and not PreviousSpell(rake) Spell(rake)
 	if target.DeadIn() >=8.5 and target.DebuffRemains(rake) <9.0 and not TalentPoints(dream_of_cenarius_talent) and BuffPresent(tigers_fury) and {LastSpellDamageMultiplier(rake) <DamageMultiplier(rake) } Spell(rake)
 	if target.DeadIn() >=8.5 and target.DebuffRemains(rake) <3.0 and {BuffPresent(berserk) or {SpellCooldown(tigers_fury) +0.8 } >=target.DebuffRemains(rake) } Spell(rake)
-	if BuffPresent(omen_of_clarity) Spell(ravage usable=1)
-	if BuffPresent(omen_of_clarity) Spell(shred)
+	if BuffStacks(omen_of_clarity) Spell(ravage usable=1)
+	if BuffStacks(omen_of_clarity) Spell(shred)
 	if {target.DeadIn() <=4 and ComboPoints() >=5 } or target.DeadIn() <=1 Spell(ferocious_bite)
 	if BuffPresent(predatory_swiftness) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and {{{ComboPoints() >=5 and target.DebuffRemains(rip) >={8.0 +SpellCooldown(healing_touch) } and BuffRemains(savage_roar) >={SpellCooldown(healing_touch) } } } } Spell(healing_touch)
 	if ComboPoints() >=5 and target.DebuffRemains(rip) >=8.0 and BuffPresent(savage_roar) Spell(ferocious_bite)
@@ -183,12 +183,12 @@ AddIcon mastery=2 help=main
 }
 AddIcon mastery=2 help=offgcd
 {
-	if Energy() <=35 and not BuffPresent(omen_of_clarity) Spell(tigers_fury)
+	if Energy() <=35 and not BuffStacks(omen_of_clarity) Spell(tigers_fury)
 	if not BuffPresent(predatory_swiftness) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and TalentPoints(natures_swiftness_talent) and {{{ComboPoints() >=5 and target.DebuffRemains(rip) >SpellCooldown(healing_touch) and target.HealthPercent() <=25 } } } Spell(natures_swiftness)
 	if not BuffPresent(predatory_swiftness) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and TalentPoints(natures_swiftness_talent) and target.HealthPercent() >25 and {{{ComboPoints() >=5 and target.DeadIn() >={6 +SpellCooldown(healing_touch) } and target.DebuffRemains(rip) <{2 +SpellCooldown(healing_touch) } and {BuffPresent(berserk) or target.DebuffRemains(rip) <=SpellCooldown(tigers_fury) } } } } Spell(natures_swiftness)
 	if not BuffPresent(predatory_swiftness) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and {target.HealthPercent() <=25 or {target.DebuffRemains(rip) >4 and ArmorSetParts(T14 more 4) } } and {{{target.DeadIn() >={8.5 +SpellCooldown(healing_touch) } and BuffPresent(tigers_fury) } } } Spell(natures_swiftness)
 	if not BuffPresent(predatory_swiftness) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and {target.HealthPercent() <=25 or {target.DebuffRemains(rip) >4 and ArmorSetParts(T14 more 4) } } and {{{target.DeadIn() >={8.5 +SpellCooldown(healing_touch) } and target.DebuffRemains(rake) <{3.0 +SpellCooldown(healing_touch) } and {BuffRemains(berserk) >SpellCooldown(healing_touch) or {SpellCooldown(tigers_fury) +0.8 } >=target.DebuffRemains(rake) } } } } Spell(natures_swiftness)
-	if BuffPresent(omen_of_clarity) and target.DebuffRemains(thrash) <3 Spell(thrash)
+	if BuffStacks(omen_of_clarity) and target.DebuffRemains(thrash) <3 Spell(thrash)
 }
 AddIcon mastery=2 help=cd
 {

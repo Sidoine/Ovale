@@ -60,13 +60,13 @@ AddIcon mastery=3 help=main
 	if {not target.DebuffPresent(vampiric_touch) or target.DebuffRemains(vampiric_touch) <CastTime(vampiric_touch) +TickTime(vampiric_touch) } Spell(vampiric_touch)
 	if ShadowOrbs() ==3 Spell(devouring_plague)
 	Spell(halo_damage)
-	if BuffPresent(surge_of_darkness) Spell(mind_spike)
+	if BuffStacks(surge_of_darkness) Spell(mind_spike)
 	Spell(mind_flay)
 }
 AddIcon mastery=3 help=moving
 {
 	if target.HealthPercent(less 20) Spell(shadow_word_death)
-	if BuffPresent(divine_insight_shadow) and SpellCooldown(mind_blast) Spell(mind_blast)
+	if BuffStacks(divine_insight_shadow) and SpellCooldown(mind_blast) Spell(mind_blast)
 	Spell(shadow_word_pain)
 }
 AddIcon mastery=3 help=aoe

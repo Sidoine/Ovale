@@ -256,7 +256,10 @@ do
 							if Ovale.trace then
 								Ovale:Print("****Second icon " .. start)
 							end
-							local spellTarget = element.params.target
+							local spellTarget 
+							if element then
+								spellTarget = element.params.target
+							end
 							if spellTarget == "target" or not spellTarget then
 								spellTarget = target
 							end

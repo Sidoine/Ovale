@@ -45,7 +45,9 @@ Define(lightning_bolt 403)
 Define(lightning_shield 324)
   SpellInfo(lightning_shield duration=3600 )
   SpellAddBuff(lightning_shield lightning_shield=1)
-Define(maelstrom_weapon 51530)
+Define(maelstrom_weapon 53817)
+  SpellInfo(maelstrom_weapon duration=30 )
+  SpellAddBuff(maelstrom_weapon maelstrom_weapon=1)
 Define(magma_totem 8187)
 Define(searing_totem 3599)
   SpellInfo(searing_totem duration=60 )
@@ -86,11 +88,11 @@ AddIcon mastery=1 help=main
 	
 	{
 		if TalentPoints(unleashed_fury_talent) and not BuffPresent(ascendance) Spell(unleash_elements)
-		if not BuffPresent(ascendance) and {not target.DebuffPresent(flame_shock) or TicksRemain(flame_shock) <2 or {{BuffPresent(bloodlust_aura any=1) or BuffPresent(elemental_mastery) } and TicksRemain(flame_shock) <3 } } Spell(flame_shock)
+		if not BuffPresent(ascendance) and {not target.DebuffPresent(flame_shock) or target.TicksRemain(flame_shock) <2 or {{BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) } and target.TicksRemain(flame_shock) <3 } } Spell(flame_shock)
 		if target.DebuffRemains(flame_shock) >CastTime(lava_burst) and {BuffPresent(ascendance) or SpellCooldown(lava_burst) } Spell(lava_burst)
 		if TalentPoints(elemental_blast_talent) and not BuffPresent(ascendance) Spell(elemental_blast)
-		if BuffPresent(lightning_shield) ==0 Spell(earth_shock)
-		if BuffPresent(lightning_shield) >3 and target.DebuffRemains(flame_shock) >SpellCooldown(earth_shock) and target.DebuffRemains(flame_shock) <SpellCooldown(earth_shock) +TickTime(flame_shock) Spell(earth_shock)
+		if BuffStacks(lightning_shield) ==0 Spell(earth_shock)
+		if BuffStacks(lightning_shield) >3 and target.DebuffRemains(flame_shock) >SpellCooldown(earth_shock) and target.DebuffRemains(flame_shock) <SpellCooldown(earth_shock) +TickTime(flame_shock) Spell(earth_shock)
 		if not TotemPresent(fire) Spell(searing_totem)
 		Spell(lightning_bolt)
 	}
@@ -130,12 +132,12 @@ AddIcon mastery=1 help=cd
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(bloodlust)
 	
 	{
-		if {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } or BuffPresent(ascendance) or BuffPresent(bloodlust) or TotemPresent(fire)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
-		if BuffPresent(bloodlust_aura any=1) or BuffPresent(ascendance) or {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } Spell(blood_fury)
-		if TalentPoints(elemental_mastery_talent) and TimeInCombat() >15 and {{not BuffPresent(bloodlust_aura any=1) and TimeInCombat() <120 } or {not BuffPresent(berserking) and not BuffPresent(bloodlust_aura any=1) and BuffPresent(ascendance) } or {TimeInCombat() >=200 and {SpellCooldown(ascendance) >30 or Level() <87 } } } Spell(elemental_mastery)
+		if {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } or BuffPresent(ascendance) or BuffPresent(bloodlust any=1) or TotemPresent(fire)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+		if BuffPresent(bloodlust any=1) or BuffPresent(ascendance) or {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } Spell(blood_fury)
+		if TalentPoints(elemental_mastery_talent) and TimeInCombat() >15 and {{not BuffPresent(bloodlust any=1) and TimeInCombat() <120 } or {not BuffPresent(berserking) and not BuffPresent(bloodlust any=1) and BuffPresent(ascendance) } or {TimeInCombat() >=200 and {SpellCooldown(ascendance) >30 or Level() <87 } } } Spell(elemental_mastery)
 		if not TotemPresent(fire) Spell(fire_elemental_totem)
-		if target.DebuffRemains(flame_shock) >0 and {target.DeadIn() <20 or BuffPresent(bloodlust_aura any=1) or TimeInCombat() >=180 } Spell(ascendance)
-		if not and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
+		if target.DebuffRemains(flame_shock) >0 and {target.DeadIn() <20 or BuffPresent(bloodlust any=1) or TimeInCombat() >=180 } Spell(ascendance)
+		if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
 		Spell(spiritwalkers_grace)
 	}
 	if Enemies() >1 
@@ -147,7 +149,7 @@ AddIcon mastery=2 help=main
 {
 	if not InCombat() 
 	{
-		main.Spell(windfury_weapon)
+		if WeaponEnchantExpires(mainhand) main.Spell(windfury_weapon)
 		if WeaponEnchantExpires(offhand) off.Spell(flametongue_weapon)
 		if not BuffPresent(lightning_shield) Spell(lightning_shield)
 	}
@@ -156,31 +158,31 @@ AddIcon mastery=2 help=main
 		if not TotemPresent(fire) Spell(searing_totem)
 		if TalentPoints(unleashed_fury_talent) Spell(unleash_elements)
 		if TalentPoints(elemental_blast_talent) Spell(elemental_blast)
-		if BuffPresent(maelstrom_weapon) ==5 or {ArmorSetParts(T13 more 4) ==1 and BuffPresent(maelstrom_weapon) >=4 and False() } Spell(lightning_bolt)
+		if BuffStacks(maelstrom_weapon) ==5 or {ArmorSetParts(T13 more 4) ==1 and BuffStacks(maelstrom_weapon) >=4 and False() } Spell(lightning_bolt)
 		Spell(stormblast)
 		if BuffPresent(unleash_flame) and not target.DebuffPresent(flame_shock) Spell(flame_shock)
 		Spell(stormstrike)
 		Spell(lava_lash)
 		Spell(unleash_elements)
-		if BuffPresent(maelstrom_weapon) >=3 and target.DebuffPresent(unleashed_fury_ft) and not BuffPresent(ascendance) Spell(lightning_bolt)
+		if BuffStacks(maelstrom_weapon) >=3 and target.DebuffPresent(unleashed_fury_ft) and not BuffPresent(ascendance) Spell(lightning_bolt)
 		if BuffPresent(ancestral_swiftness) Spell(lightning_bolt)
 		if BuffPresent(unleash_flame) and target.DebuffRemains(flame_shock) <=3 Spell(flame_shock)
 		Spell(earth_shock)
-		if BuffPresent(maelstrom_weapon) >1 and not BuffPresent(ascendance) Spell(lightning_bolt)
+		if BuffStacks(maelstrom_weapon) >1 and not BuffPresent(ascendance) Spell(lightning_bolt)
 	}
 	if Enemies() >1 
 	{
 		if not TotemPresent(fire) Spell(searing_totem)
 		if {DebuffCount(flame_shock) ==Enemies() } or DebuffCount(flame_shock) >=5 Spell(fire_nova)
 		if target.DebuffPresent(flame_shock) Spell(lava_lash)
-		if Enemies() >2 and BuffPresent(maelstrom_weapon) >=3 Spell(chain_lightning)
+		if Enemies() >2 and BuffStacks(maelstrom_weapon) >=3 Spell(chain_lightning)
 		Spell(unleash_elements)
 		if not target.DebuffPresent(flame_shock) Spell(flame_shock)
 		Spell(stormblast)
 		Spell(stormstrike)
-		if BuffPresent(maelstrom_weapon) ==5 and SpellCooldown(chain_lightning) >=2 Spell(lightning_bolt)
-		if Enemies() >2 and BuffPresent(maelstrom_weapon) >1 Spell(chain_lightning)
-		if BuffPresent(maelstrom_weapon) >1 Spell(lightning_bolt)
+		if BuffStacks(maelstrom_weapon) ==5 and SpellCooldown(chain_lightning) >=2 Spell(lightning_bolt)
+		if Enemies() >2 and BuffStacks(maelstrom_weapon) >1 Spell(chain_lightning)
+		if BuffStacks(maelstrom_weapon) >1 Spell(lightning_bolt)
 	}
 }
 AddIcon mastery=2 help=offgcd
@@ -188,7 +190,7 @@ AddIcon mastery=2 help=offgcd
 	if target.IsInterruptible() Spell(wind_shear)
 	
 	{
-		if TalentPoints(ancestral_swiftness_talent) and BuffPresent(maelstrom_weapon) <2 Spell(ancestral_swiftness)
+		if TalentPoints(ancestral_swiftness_talent) and BuffStacks(maelstrom_weapon) <2 Spell(ancestral_swiftness)
 	}
 	if Enemies() >1 
 	{
@@ -203,17 +205,17 @@ AddIcon mastery=2 help=cd
 	{
 		Spell(blood_fury)
 		if TalentPoints(elemental_mastery_talent) Spell(elemental_mastery)
-		if not TotemPresent(fire) and {BuffPresent(bloodlust_aura any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
+		if not TotemPresent(fire) and {BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
 		if SpellCooldown(strike) >=3 Spell(ascendance)
 		Spell(feral_spirit)
-		if not and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
+		if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
 		Spell(spiritwalkers_grace)
 	}
 	if Enemies() >1 
 	{
 		Spell(blood_fury)
 		if SpellCooldown(strike) >=3 Spell(ascendance)
-		if not TotemPresent(fire) and {BuffPresent(bloodlust_aura any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
+		if not TotemPresent(fire) and {BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
 		Spell(feral_spirit)
 	}
 }

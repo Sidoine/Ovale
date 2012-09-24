@@ -380,15 +380,15 @@ local function getTargetDead(target)
 		end
 	end
 	if not lastSPD[target] or lastSPD[target]<=0 then
-		return nil
+		return OvaleState.currentTime + 3600
 	end
 	-- Rough estimation
 	local duration = newHealth * lastSPD[target]
-	if duration < 10000 then
+	--if duration < 10000 then
 		return OvaleState.maintenant + duration
-	else
-		return nil
-	end
+	--else
+--		return nil
+	--end
 end
 
 local function isSameSpell(spellIdA, spellIdB, spellNameB)

@@ -150,11 +150,11 @@ local function ParseFunction(prefix, func, params)
 		func = prefix
 	end
 	
-	if string.find(func, "Target") == 1 then
-		if not paramList.target then
+	if not paramList.target then
+		if string.find(func, "Target") == 1 then
 			paramList.target = "target"
+			func = string.sub(func, 7)
 		end
-		func = string.sub(func, 7)
 	end
 	
 	if customFunctions[func] then

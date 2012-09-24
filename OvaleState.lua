@@ -317,6 +317,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								newAura.ending = 0
 								newAura.stacks = 0
 							elseif stacks == "refresh" then
+								Ovale:Log("Aura is refreshed")
 								newAura.start = previousAura.start
 								newAura.stacks = previousAura.stacks
 								if isDoT then
@@ -328,8 +329,9 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								else
 									newAura.ending = endCast + duration
 								end
-							elseif newAura.ending then
+							elseif newAura.ending and newAura.ending >= endCast then
 								if stacks < 0 then
+									Ovale:Log("Aura lose stacks")
 									--Buff are immediatly removed when the cast ended, do not need to do it again
 									if filter ~= "HELPFUL" or target ~= "player" or endCast >= self.maintenant then
 										newAura.stacks = newAura.stacks + stacks
@@ -343,7 +345,8 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 											newAura.ending = 0
 										end
 									end
-								elseif newAura.ending >= endCast then
+								else
+									Ovale:Log("Aura gain stacks")
 									if isDoT then
 										local tickLength = OvaleData:GetTickLength(auraSpellId, newAura.spellHaste)
 										local k = floor((newAura.ending - endCast) / tickLength)
@@ -355,6 +358,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 									newAura.stacks = newAura.stacks + stacks
 								end
 							else
+								Ovale:Log("New aura at " .. endCast)
 								newAura.start = endCast
 								newAura.ending = endCast + duration
 								newAura.stacks = stacks
