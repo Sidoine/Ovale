@@ -1,4 +1,8 @@
 -
     type: markdown
     input-file: README.md
-    output-page: main
+    output-page: Main
+-
+    type: luadoc
+	input-file: OvaleCondition.lua
+	output-page: Conditions
