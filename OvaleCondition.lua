@@ -421,11 +421,12 @@ OvaleCondition.conditions=
 		end 
 	end,]]
 --- Get how many pieces of an armor set, e.g., Tier 14 set, are equipped by the player.
--- @paramsig setName [operator number]
+-- @name ArmorSetParts
+-- @paramsig
 -- @param setName The name of the armor set. Valid values are: T11, T12, T13.
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
--- @returns A number or a boolean value.
+-- @return A number or a boolean value.
 -- @usage
 -- if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
 --     Spell(ferocious_bite)
