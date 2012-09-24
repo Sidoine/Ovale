@@ -43,8 +43,8 @@ AddIcon mastery=3 help=main
 {
 	if not InCombat() 
 	{
-		if not BuffPresent(str_agi_int) Spell(blessing_of_kings)
-		if not BuffPresent(mastery) and not BuffPresent(str_agi_int) Spell(blessing_of_might)
+		if not BuffPresent(str_agi_int any=1) Spell(blessing_of_kings)
+		if not BuffPresent(mastery any=1) and not BuffPresent(str_agi_int any=1) Spell(blessing_of_might)
 		unless Stance(1) Spell(seal_of_truth)
 	}
 	if ManaPercent() >=90 or Stance(0) unless Stance(1) Spell(seal_of_truth)

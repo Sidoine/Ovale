@@ -181,7 +181,7 @@ AddIcon mastery=3 help=main
 	}
 	if Rage() <85 Spell(shield_slam)
 	if Rage() <90 Spell(revenge)
-	if BuffExpires(weakened_blows) Spell(thunder_clap)
+	if BuffExpires(weakened_blows any=1) Spell(thunder_clap)
 	if Rage() <70 Spell(battle_shout)
 	Spell(devastate)
 }

@@ -48,7 +48,7 @@ AddIcon mastery=3 help=main
 {
 	if not InCombat() 
 	{
-		if not BuffPresent(stamina) Spell(power_word_fortitude)
+		if not BuffPresent(stamina any=1) Spell(power_word_fortitude)
 		if BuffExpires(inner_fire) and BuffExpires(inner_will) Spell(inner_fire)
 		if BuffExpires(shadowform) Spell(shadowform)
 	}

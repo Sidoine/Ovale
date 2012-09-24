@@ -120,7 +120,7 @@ AddIcon mastery=1 help=main
 {
 	if not InCombat() 
 	{
-		if not BuffPresent(spell_power_multiplier) Spell(dark_intent)
+		if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
 		unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	}
 	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
@@ -182,7 +182,7 @@ AddIcon mastery=2 help=main
 {
 	if not InCombat() 
 	{
-		if not BuffPresent(spell_power_multiplier) Spell(dark_intent)
+		if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
 		unless pet.CreatureFamily(Felguard) Spell(summon_felguard)
 	}
 	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
@@ -249,7 +249,7 @@ AddIcon mastery=3 help=main
 {
 	if not InCombat() 
 	{
-		if not BuffPresent(spell_power_multiplier) Spell(dark_intent)
+		if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
 		unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	}
 	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
