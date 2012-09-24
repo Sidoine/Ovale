@@ -165,7 +165,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 					hateSorts = 5
 				elseif OvaleData.buffSpellList.melee_haste[spellId] then 
 					hateCaC = 10
-				elseif OvaleData.buffSpellList.heroism[spellId] then
+				elseif OvaleData.buffSpellList.burst_haste[spellId] then
 					hateHero = 30
 				elseif OvaleData.selfHasteBuff[spellId] then
 					hateClasse = OvaleData.selfHasteBuff[spellId]
