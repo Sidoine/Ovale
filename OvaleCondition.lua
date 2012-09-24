@@ -422,15 +422,16 @@ OvaleCondition.conditions=
 	end,]]
 --- Get how many pieces of an armor set, e.g., Tier 14 set, are equipped by the player.
 -- @name ArmorSetParts
--- @paramsig
+-- @paramsig ArmorSetParts(setName [operator number])
 -- @param setName The name of the armor set. Valid values are: T11, T12, T13.
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
 -- @returns A number or a boolean value.
--- @usage ArmorSetParts(setName [operator number])
---
--- if ArmorSetParts(T13) >=2 and target.HealthPercent() <60 Spell(ferocious_bite)
--- if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60) Spell(ferocious_bite)
+-- @usage
+-- if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
+--	Spell(ferocious_bite)
+-- if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60)
+--	Spell(ferocious_bite)
 	armorsetparts = function(condition)
 		local nombre = 0
 		if OvaleEquipement.nombre[condition[1]] then
