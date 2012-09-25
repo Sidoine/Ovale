@@ -420,13 +420,15 @@ OvaleCondition.conditions=
 			return 0.1
 		end 
 	end,]]
+
 --- Get how many pieces of an armor set, e.g., Tier 14 set, are equipped by the player.
 -- @name ArmorSetParts
 -- @paramsig
--- @param setName The name of the armor set. Valid values are: T11, T12, T13.
+-- @param name The name of the armor set.
+-- Valid names: T11, T12, T13.
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
--- @return A number or a boolean value.
+-- @return The number of pieces of the named set that are equipped by the player, or a boolean value based on the result of the comparison.
 -- @usage
 -- if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
 --     Spell(ferocious_bite)
@@ -439,28 +441,56 @@ OvaleCondition.conditions=
 		end
 		return compare(nombre, condition[2], condition[3])
 	end,
-	-- Get the attack power
-	-- returns : bool or number
+
+--- Get the attack power of the player.
+-- @name AttackPower
+-- @paramsig
+-- @param operator (Optional) Comparison operator: equal, less, more.
+-- @param number (Optional) The number to compare against.
+-- @return The attack power of the player, or a boolean value based on the result of the comparison.
+-- @usage
+-- if AttackPower() >10000 Spell(rake)
+-- if AttackPower(more 10000) Spell(rake)
 	attackpower = function(condition)
 		local base, posBuff, negBuff = UnitAttackPower("player")
 		return compare(base + posBuff + negBuff, condition[1], condition[2])
 	end,
+
 	buffcount = function(condition)
 		return OvaleState:GetExpirationTimeOnAnyTarget(condition[1]), 0, 0
 	end,
-	-- Get the aura total duration (not only the remaining time)
-	-- 1 : spell id
-	-- returns : bool or number
-	-- alias: debuffduration
+
+--- Get the total duration of the aura from when it was first applied to when it ended.
+-- @name BuffDuration
+-- @paramsig
+-- @param id Aura spell ID.
+-- @param operator (Optional) Comparison operator: equal, less, more.
+-- @param number (Optional) The number to compare against.
+-- @param target=value (Optional) The target to check. Defaults to target=player. Valid values: player, target, focus, pet. The target may also be specified as a prefix to the condition.
+-- @return The total duration of the aura, or a boolean value based on the result of the comparison.
+-- @see DebuffDuration
 	buffduration = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		return compare(diffTime(start, ending), condition[2], condition[3])
 	end,
-	-- Test if a buff will expire on the player after a given time
-	-- 1 : aura spell id
-	-- 2 : expiration time 
-	-- returns : bool
-	-- alias: debuffexpires
+
+--- Test if an aura is expired, or will expire after a given number of seconds.
+-- @name BuffExpires
+-- @paramsig
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param seconds (Optional) The maximum number of seconds before the buff should expire. Defaults to zero.
+-- @param any=1 (Optional) The aura that is tested must have been applied by the player. If the aura can be applied by anyone, then set any=1.
+-- @param haste=value (Optional) If seconds should be lengthed or shortened due to spell haste, then set haste=spell.
+-- Valid values: spell, none
+-- Default value: none
+-- @param target=value (Optional) The target to check. The target may also be specified as a prefix to the condition.
+-- Valid values: player, target, focus, pet.
+-- Default value: player.
+-- @return True if the remaining time on the aura is less than the specified number of seconds.
+-- @see DebuffExpires
+-- @usage
+-- if BuffExpires(stamina any=1) Spell(power_word_fortitude)
+-- if target.DebuffExpires(rake 2) Spell(rake)
 	buffexpires = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
@@ -470,10 +500,18 @@ OvaleCondition.conditions=
 		end
 		return addTime(ending, -timeBefore)
 	end,
-	-- Get the aura remaining time
-	-- 1 : aura spell id
-	-- returns : number
-	-- alias: debuffremains
+
+--- Get the remaining time in seconds on an aura.
+-- @name BuffRemains
+-- @paramsig
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param target=value (Optional) The target to check. The target may also be specified as a prefix to the condition.
+-- Valid values: player, target, focus, pet.
+-- Default value: player.
+-- @return The number of seconds remaining on the aura.
+-- @see DebuffRemains
+-- @usage
+-- if BuffRemains(slice_and_dice) <2 Spell(slice_and_dice)
 	buffremains = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		if ending then
@@ -482,6 +520,7 @@ OvaleCondition.conditions=
 			return nil
 		end
 	end,
+
 	-- Returns the time elapsed since the last buff gain
 	-- TODO won't work because the aura is not kept in cache
 	-- 1 : aura spell id
@@ -503,16 +542,30 @@ OvaleCondition.conditions=
 		end
 		return 0, nil, 0, timeGain, 1
 	end,
-	-- Test if a buff is active
-	-- 1 : the buff spell id
-	-- stacks : minimum number of stacks
-	-- returns : bool
-	-- alias: debuffpresent
+
+--- Test if an aura is present or will be present for at least a given number of seconds.
+-- @name BuffPresent
+-- @paramsig
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param seconds (Optional) The maximum number of seconds before the buff should expire. Defaults to zero.
+-- @param any=1 (Optional) The aura that is tested must have been applied by the player. If the aura can be applied by anyone, then set any=1.
+-- @param haste=value (Optional) If seconds should be lengthed or shortened due to spell haste, then set haste=spell.
+-- Valid values: spell, none
+-- Default value: none
+-- @param target=value (Optional) The target to check. The target may also be specified as a prefix to the condition.
+-- Valid values: player, target, focus, pet.
+-- Default value: player.
+-- @return True if the remaining time on the aura is more than the specified number of seconds.
+-- @see DebuffPresent
+-- @usage
+-- if not BuffPresent(stamina any=1) Spell(power_word_fortitude)
+-- if not target.DebuffPresent(rake 2) Spell(rake)
 	buffpresent = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
 	end,
+
 	-- Get a buff stack size
 	-- 1: the buff spell id
 	-- returns: number
