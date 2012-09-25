@@ -423,7 +423,7 @@ OvaleCondition.conditions=
 
 --- Get how many pieces of an armor set, e.g., Tier 14 set, are equipped by the player.
 -- @name ArmorSetParts
--- @paramsig
+-- @paramsig number or boolean
 -- @param name The name of the armor set.
 -- Valid names: T11, T12, T13.
 -- @param operator (Optional) Comparison operator: equal, less, more.
@@ -445,7 +445,7 @@ OvaleCondition.conditions=
 
 --- Get the attack power of the player.
 -- @name AttackPower
--- @paramsig
+-- @paramsig number or boolean
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
 -- @return The attack power of the player.
@@ -464,7 +464,7 @@ OvaleCondition.conditions=
 
 --- Get the total duration of the aura from when it was first applied to when it ended.
 -- @name BuffDuration
--- @paramsig
+-- @paramsig number or boolean
 -- @param id Aura spell ID.
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
@@ -481,7 +481,7 @@ OvaleCondition.conditions=
 
 --- Test if an aura is expired, or will expire after a given number of seconds.
 -- @name BuffExpires
--- @paramsig
+-- @paramsig boolean
 -- @param id The spell ID of the aura or the name of a spell list.
 -- @param seconds (Optional) The maximum number of seconds before the buff should expire.
 --     Defaults to 0 (zero).
@@ -511,7 +511,7 @@ OvaleCondition.conditions=
 
 --- Get the remaining time in seconds on an aura.
 -- @name BuffRemains
--- @paramsig
+-- @paramsig number
 -- @param id The spell ID of the aura or the name of a spell list.
 -- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -553,7 +553,7 @@ OvaleCondition.conditions=
 
 --- Test if an aura is present or will be present for at least a given number of seconds.
 -- @name BuffPresent
--- @paramsig
+-- @paramsig boolean
 -- @param id The spell ID of the aura or the name of a spell list.
 -- @param seconds (Optional) The mininum number of seconds before the buff should expire.
 --     Defaults to 0 (zero).
