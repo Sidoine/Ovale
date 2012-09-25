@@ -428,7 +428,8 @@ OvaleCondition.conditions=
 -- Valid names: T11, T12, T13.
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
--- @return The number of pieces of the named set that are equipped by the player, or a boolean value based on the result of the comparison.
+-- @return The number of pieces of the named set that are equipped by the player.
+-- @return A boolean value for the result of the comparison.
 -- @usage
 -- if ArmorSetParts(T13) >=2 and target.HealthPercent() <60
 --     Spell(ferocious_bite)
@@ -447,7 +448,8 @@ OvaleCondition.conditions=
 -- @paramsig
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
--- @return The attack power of the player, or a boolean value based on the result of the comparison.
+-- @return The attack power of the player.
+-- @return A boolean value for the result of the comparison.
 -- @usage
 -- if AttackPower() >10000 Spell(rake)
 -- if AttackPower(more 10000) Spell(rake)
@@ -466,11 +468,11 @@ OvaleCondition.conditions=
 -- @param id Aura spell ID.
 -- @param operator (Optional) Comparison operator: equal, less, more.
 -- @param number (Optional) The number to compare against.
--- @param target (Optional) The target to check. The target may also be specified as a prefix to the condition.
--- Set as: target=value
--- Valid values: player, target, focus, pet.
--- Default value: player.
--- @return The total duration of the aura, or a boolean value based on the result of the comparison.
+-- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The total duration of the aura.
+-- @return A boolean value for the result of the comparison.
 -- @see DebuffDuration
 	buffduration = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
@@ -481,20 +483,18 @@ OvaleCondition.conditions=
 -- @name BuffExpires
 -- @paramsig
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param seconds (Optional) The maximum number of seconds before the buff should expire. Defaults to zero.
--- @param any (Optional) The aura that is tested must have been applied by the player. If the aura can be applied by anyone, then set any=1.
--- Set as: any=value.
--- Valid values: 0, 1
--- Default value: 0
--- @param haste (Optional) If seconds should be lengthed or shortened due to spell haste, then set haste=spell.
--- Set as: haste=value
--- Valid values: spell, none
--- Default value: none
--- @param target (Optional) The target to check. The target may also be specified as a prefix to the condition.
--- Set as: target=value
--- Valid values: player, target, focus, pet.
--- Default value: player.
--- @return True if the remaining time on the aura is less than the specified number of seconds.
+-- @param seconds (Optional) The maximum number of seconds before the buff should expire.
+--     Defaults to 0 (zero).
+-- @param any (Optional) Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param haste (Optional) Sets whether "seconds" should be lengthed or shortened due to spell haste.
+--     Defaults to haste=none.
+--     Valid values: spell, none.
+-- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return True if the remaining time on the aura is less than the given number of seconds.
 -- @see DebuffExpires
 -- @usage
 -- if BuffExpires(stamina any=1) Spell(power_word_fortitude)
@@ -513,10 +513,9 @@ OvaleCondition.conditions=
 -- @name BuffRemains
 -- @paramsig
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param target (Optional) The target to check. The target may also be specified as a prefix to the condition.
--- Set as: target=value
--- Valid values: player, target, focus, pet.
--- Default value: player.
+-- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
 -- @return The number of seconds remaining on the aura.
 -- @see DebuffRemains
 -- @usage
@@ -556,20 +555,18 @@ OvaleCondition.conditions=
 -- @name BuffPresent
 -- @paramsig
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param seconds (Optional) The maximum number of seconds before the buff should expire. Defaults to zero.
--- @param any (Optional) The aura that is tested must have been applied by the player. If the aura can be applied by anyone, then set any=1.
--- Set as: any=value.
--- Valid values: 0, 1
--- Default value: 0
--- @param haste (Optional) If seconds should be lengthed or shortened due to spell haste, then set haste=spell.
--- Set as: haste=value
--- Valid values: spell, none
--- Default value: none
--- @param target (Optional) The target to check. The target may also be specified as a prefix to the condition.
--- Set as: target=value
--- Valid values: player, target, focus, pet.
--- Default value: player.
--- @return True if the remaining time on the aura is more than the specified number of seconds.
+-- @param seconds (Optional) The mininum number of seconds before the buff should expire.
+--     Defaults to 0 (zero).
+-- @param any (Optional) Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param haste (Optional) Sets whether "seconds" should be lengthed or shortened due to spell haste.
+--     Defaults to haste=none.
+--     Valid values: spell, none.
+-- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return True if the remaining time on the aura is more than the given number of seconds.
 -- @see DebuffPresent
 -- @usage
 -- if not BuffPresent(stamina any=1) Spell(power_word_fortitude)
