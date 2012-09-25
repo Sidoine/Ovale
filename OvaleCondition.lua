@@ -426,8 +426,8 @@ OvaleCondition.conditions=
 -- @paramsig number or boolean
 -- @param name The name of the armor set.
 -- Valid names: T11, T12, T13.
--- @param operator (Optional) Comparison operator: equal, less, more.
--- @param number (Optional) The number to compare against.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
 -- @return The number of pieces of the named set that are equipped by the player.
 -- @return A boolean value for the result of the comparison.
 -- @usage
@@ -446,8 +446,8 @@ OvaleCondition.conditions=
 --- Get the attack power of the player.
 -- @name AttackPower
 -- @paramsig number or boolean
--- @param operator (Optional) Comparison operator: equal, less, more.
--- @param number (Optional) The number to compare against.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
 -- @return The attack power of the player.
 -- @return A boolean value for the result of the comparison.
 -- @usage
@@ -466,9 +466,9 @@ OvaleCondition.conditions=
 -- @name BuffDuration
 -- @paramsig number or boolean
 -- @param id Aura spell ID.
--- @param operator (Optional) Comparison operator: equal, less, more.
--- @param number (Optional) The number to compare against.
--- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The total duration of the aura.
@@ -483,15 +483,15 @@ OvaleCondition.conditions=
 -- @name BuffExpires
 -- @paramsig boolean
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param seconds (Optional) The maximum number of seconds before the buff should expire.
+-- @param seconds Optional. The maximum number of seconds before the buff should expire.
 --     Defaults to 0 (zero).
--- @param any (Optional) Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 --     Defaults to any=0.
 --     Valid values: 0, 1.
--- @param haste (Optional) Sets whether "seconds" should be lengthed or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthed or shortened due to spell haste.
 --     Defaults to haste=none.
 --     Valid values: spell, none.
--- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+-- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return True if the remaining time on the aura is less than the given number of seconds.
@@ -513,7 +513,7 @@ OvaleCondition.conditions=
 -- @name BuffRemains
 -- @paramsig number
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+-- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The number of seconds remaining on the aura.
@@ -555,15 +555,15 @@ OvaleCondition.conditions=
 -- @name BuffPresent
 -- @paramsig boolean
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param seconds (Optional) The mininum number of seconds before the buff should expire.
+-- @param seconds Optional. The mininum number of seconds before the buff should expire.
 --     Defaults to 0 (zero).
--- @param any (Optional) Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 --     Defaults to any=0.
 --     Valid values: 0, 1.
--- @param haste (Optional) Sets whether "seconds" should be lengthed or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthed or shortened due to spell haste.
 --     Defaults to haste=none.
 --     Valid values: spell, none.
--- @param target (Optional) The target to check. The target may also be given as a prefix to the condition.
+-- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return True if the remaining time on the aura is more than the given number of seconds.
