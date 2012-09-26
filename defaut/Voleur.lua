@@ -101,7 +101,7 @@ AddIcon mastery=1 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
 	if TimeInCombat() >10 and not BuffPresent(stealthed) and not BuffPresent(shadow_blades) Spell(vanish)
-	if {BuffStacks(bloodlust any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
+	if {BuffStacks(burst_haste any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
 	Spell(vendetta)
 }
 AddIcon mastery=2 help=main
@@ -133,7 +133,7 @@ AddIcon mastery=2 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
 	if TimeInCombat() >10 and not BuffPresent(shadow_blades) and not BuffPresent(adrenaline_rush) and Energy() <20 and {{BuffPresent(deep_insight) and ComboPoints() <4 } or BuffStacks(anticipation) <4 } Spell(vanish)
-	if {BuffStacks(bloodlust any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
+	if {BuffStacks(burst_haste any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
 	if Energy() <35 and BuffRemains(slice_and_dice) >4 and BuffExpires(adrenaline_rush) Spell(killing_spree)
 	if Energy() <35 or BuffPresent(shadow_blades) Spell(adrenaline_rush)
 }

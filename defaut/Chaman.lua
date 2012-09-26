@@ -36,6 +36,9 @@ Define(flame_shock 8050)
   SpellInfo(flame_shock duration=24 tick=3 sharedcd=shock cd=6 )
   SpellAddTargetDebuff(flame_shock flame_shock=1)
 Define(flametongue_weapon 8024)
+Define(heroism 32182)
+  SpellInfo(heroism duration=40 cd=300 )
+  SpellAddBuff(heroism heroism=1)
 Define(lava_beam 114074)
 Define(lava_burst 51505)
   SpellInfo(lava_burst cd=8 )
@@ -78,6 +81,11 @@ Define(ancestral_swiftness_talent 11)
 Define(elemental_blast_talent 18)
 Define(elemental_mastery_talent 10)
 Define(unleashed_fury_talent 16)
+AddFunction Bloodlust
+{
+	Spell(bloodlust)
+	Spell(heroism)
+}
 AddIcon mastery=1 help=main
 {
 	if not InCombat() 
@@ -88,7 +96,7 @@ AddIcon mastery=1 help=main
 	
 	{
 		if TalentPoints(unleashed_fury_talent) and not BuffPresent(ascendance) Spell(unleash_elements)
-		if not BuffPresent(ascendance) and {not target.DebuffPresent(flame_shock) or target.TicksRemain(flame_shock) <2 or {{BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) } and target.TicksRemain(flame_shock) <3 } } Spell(flame_shock)
+		if not BuffPresent(ascendance) and {not target.DebuffPresent(flame_shock) or target.TicksRemain(flame_shock) <2 or {{BuffPresent(burst_haste any=1) or BuffPresent(elemental_mastery) } and target.TicksRemain(flame_shock) <3 } } Spell(flame_shock)
 		if target.DebuffRemains(flame_shock) >CastTime(lava_burst) and {BuffPresent(ascendance) or SpellCooldown(lava_burst) } Spell(lava_burst)
 		if TalentPoints(elemental_blast_talent) and not BuffPresent(ascendance) Spell(elemental_blast)
 		if BuffStacks(lightning_shield) ==0 Spell(earth_shock)
@@ -129,14 +137,14 @@ AddIcon mastery=1 help=moving
 }
 AddIcon mastery=1 help=cd
 {
-	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(bloodlust)
+	if target.HealthPercent() <25 or TimeInCombat() >5 Bloodlust()
 	
 	{
-		if {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } or BuffPresent(ascendance) or BuffPresent(bloodlust any=1) or TotemPresent(fire)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
-		if BuffPresent(bloodlust any=1) or BuffPresent(ascendance) or {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } Spell(blood_fury)
-		if TalentPoints(elemental_mastery_talent) and TimeInCombat() >15 and {{not BuffPresent(bloodlust any=1) and TimeInCombat() <120 } or {not BuffPresent(berserking) and not BuffPresent(bloodlust any=1) and BuffPresent(ascendance) } or {TimeInCombat() >=200 and {SpellCooldown(ascendance) >30 or Level() <87 } } } Spell(elemental_mastery)
+		if {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } or BuffPresent(ascendance) or BuffPresent(burst_haste any=1) or TotemPresent(fire)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+		if BuffPresent(burst_haste any=1) or BuffPresent(ascendance) or {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } Spell(blood_fury)
+		if TalentPoints(elemental_mastery_talent) and TimeInCombat() >15 and {{not BuffPresent(burst_haste any=1) and TimeInCombat() <120 } or {not BuffPresent(berserking) and not BuffPresent(burst_haste any=1) and BuffPresent(ascendance) } or {TimeInCombat() >=200 and {SpellCooldown(ascendance) >30 or Level() <87 } } } Spell(elemental_mastery)
 		if not TotemPresent(fire) Spell(fire_elemental_totem)
-		if target.DebuffRemains(flame_shock) >0 and {target.DeadIn() <20 or BuffPresent(bloodlust any=1) or TimeInCombat() >=180 } Spell(ascendance)
+		if target.DebuffRemains(flame_shock) >0 and {target.DeadIn() <20 or BuffPresent(burst_haste any=1) or TimeInCombat() >=180 } Spell(ascendance)
 		if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
 		Spell(spiritwalkers_grace)
 	}
@@ -199,13 +207,13 @@ AddIcon mastery=2 help=offgcd
 }
 AddIcon mastery=2 help=cd
 {
-	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(bloodlust)
+	if target.HealthPercent() <25 or TimeInCombat() >5 Bloodlust()
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	
 	{
 		Spell(blood_fury)
 		if TalentPoints(elemental_mastery_talent) Spell(elemental_mastery)
-		if not TotemPresent(fire) and {BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
+		if not TotemPresent(fire) and {BuffPresent(burst_haste any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
 		if SpellCooldown(strike) >=3 Spell(ascendance)
 		Spell(feral_spirit)
 		if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
@@ -215,7 +223,7 @@ AddIcon mastery=2 help=cd
 	{
 		Spell(blood_fury)
 		if SpellCooldown(strike) >=3 Spell(ascendance)
-		if not TotemPresent(fire) and {BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
+		if not TotemPresent(fire) and {BuffPresent(burst_haste any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
 		Spell(feral_spirit)
 	}
 }

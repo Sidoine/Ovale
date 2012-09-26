@@ -154,8 +154,8 @@ AddIcon mastery=2 help=main
 	if target.HealthPercent(less 20) Spell(kill_shot)
 	if BuffStacks(master_marksman_fire) Spell(aimed_shot)
 	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
-	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(aimed_shot)
-	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffStacks(bloodlust any=1) } Spell(arcane_shot)
+	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffStacks(burst_haste any=1) Spell(aimed_shot)
+	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffStacks(burst_haste any=1) } Spell(arcane_shot)
 	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	Spell(steady_shot)
 }
