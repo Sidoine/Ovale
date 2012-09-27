@@ -425,7 +425,7 @@ OvaleCondition.conditions=
 -- @name ArmorSetParts
 -- @paramsig number or boolean
 -- @param name The name of the armor set.
--- Valid names: T11, T12, T13.
+--     Valid names: T11, T12, T13.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of pieces of the named set that are equipped by the player.
@@ -435,6 +435,7 @@ OvaleCondition.conditions=
 --     Spell(ferocious_bite)
 -- if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60)
 --     Spell(ferocious_bite)
+
 	armorsetparts = function(condition)
 		local nombre = 0
 		if OvaleEquipement.nombre[condition[1]] then
@@ -443,37 +444,48 @@ OvaleCondition.conditions=
 		return compare(nombre, condition[2], condition[3])
 	end,
 
---- Get the attack power of the player.
+--- Get the current attack power of the player.
 -- @name AttackPower
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
--- @return The attack power of the player.
+-- @return The current attack power.
 -- @return A boolean value for the result of the comparison.
+-- @see LastSpellAttackPower
 -- @usage
 -- if AttackPower() >10000 Spell(rake)
 -- if AttackPower(more 10000) Spell(rake)
+
 	attackpower = function(condition)
 		local base, posBuff, negBuff = UnitAttackPower("player")
 		return compare(base + posBuff + negBuff, condition[1], condition[2])
 	end,
 
+--- Get the total count of the given aura across all targets.
+-- @name BuffCount
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @return The total aura count.
+-- @see DebuffCount
+
 	buffcount = function(condition)
-		return OvaleState:GetExpirationTimeOnAnyTarget(condition[1]), 0, 0
+		local start, ending, count = OvaleState:GetExpirationTimeOnAnyTarget(condition[1])
+		return start, ending, count, 0, 0
 	end,
 
 --- Get the total duration of the aura from when it was first applied to when it ended.
 -- @name BuffDuration
 -- @paramsig number or boolean
--- @param id Aura spell ID.
+-- @param id The aura spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
--- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The total duration of the aura.
 -- @return A boolean value for the result of the comparison.
 -- @see DebuffDuration
+
 	buffduration = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		return compare(diffTime(start, ending), condition[2], condition[3])
@@ -491,14 +503,17 @@ OvaleCondition.conditions=
 -- @param haste Optional. Sets whether "seconds" should be lengthed or shortened due to spell haste.
 --     Defaults to haste=none.
 --     Valid values: spell, none.
--- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
--- @return True if the remaining time on the aura is less than the given number of seconds.
+-- @return A boolean value.
 -- @see DebuffExpires
 -- @usage
--- if BuffExpires(stamina any=1) Spell(power_word_fortitude)
--- if target.DebuffExpires(rake 2) Spell(rake)
+-- if BuffExpires(stamina any=1)
+--     Spell(power_word_fortitude)
+-- if target.DebuffExpires(rake 2)
+--     Spell(rake)
+
 	buffexpires = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
@@ -513,13 +528,18 @@ OvaleCondition.conditions=
 -- @name BuffRemains
 -- @paramsig number
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The number of seconds remaining on the aura.
 -- @see DebuffRemains
 -- @usage
--- if BuffRemains(slice_and_dice) <2 Spell(slice_and_dice)
+-- if BuffRemains(slice_and_dice) <2
+--     Spell(slice_and_dice)
+
 	buffremains = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		if ending then
@@ -551,7 +571,7 @@ OvaleCondition.conditions=
 		return 0, nil, 0, timeGain, 1
 	end,
 
---- Test if an aura is present or will be present for at least a given number of seconds.
+--- Test if an aura is present or if the remaining time on the aura is more than the given number of seconds.
 -- @name BuffPresent
 -- @paramsig boolean
 -- @param id The spell ID of the aura or the name of a spell list.
@@ -563,38 +583,76 @@ OvaleCondition.conditions=
 -- @param haste Optional. Sets whether "seconds" should be lengthed or shortened due to spell haste.
 --     Defaults to haste=none.
 --     Valid values: spell, none.
--- @param target Optional. The target to check. The target may also be given as a prefix to the condition.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
--- @return True if the remaining time on the aura is more than the given number of seconds.
+-- @return A boolean value.
 -- @see DebuffPresent
 -- @usage
--- if not BuffPresent(stamina any=1) Spell(power_word_fortitude)
--- if not target.DebuffPresent(rake 2) Spell(rake)
+-- if not BuffPresent(stamina any=1)
+--     Spell(power_word_fortitude)
+-- if not target.DebuffPresent(rake 2)
+--     Spell(rake)
+
 	buffpresent = function(condition)
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		return start, addTime(ending, -timeBefore)
 	end,
 
-	-- Get a buff stack size
-	-- 1: the buff spell id
-	-- returns: number
-	-- alias: debuffstacks
+--- Get the number of stacks of an aura on the target.
+-- @name BuffStacks
+-- @paramsig number
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of stacks of the aura.
+-- @see DebuffStacks
+-- @usage
+-- if BuffStacks(pet_frenzy any=1) ==5
+--     Spell(focus_fire)
+-- if target.DebuffStacks(weakened_armor) <3
+--     Spell(faerie_fire)
+
 	buffstacks = function(condition)
 		local start, ending, stacks = GetTargetAura(condition, getTarget(condition.target))
 		return start, ending, stacks, 0, 0
 	end,
-	-- Is there a stealable buff on the target?
-	-- returns: bool
+
+--- Test if there is a stealable buff on the target.
+-- @name BuffStealable
+-- @paramsig boolean
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.BuffStealable()
+--     Spell(spellsteal)
+
 	buffstealable = function(condition)
 		return OvaleAura:GetStealable(getTarget(condition.target))
 	end,
-	-- Get many burning embers count
-	-- returns: bool or number
+
+--- Get the current number of Burning Embers for destruction warlocks.
+-- @name BurningEmbers
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of Burning Embers.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if BurningEmbers() >10 Spell(chaos_bolt)
+-- if BurningEmbers(more 10) Spell(chaos_bolt)
+
 	burningembers = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.burningembers, OvaleState.currentTime, OvaleState.powerRate.burningembers)
 	end,
+
 	-- Check if the player can cast (cooldown is down)
 	-- 1: spellId
 	-- returns: bool
@@ -608,9 +666,23 @@ OvaleCondition.conditions=
 		--TODO why + castTime?
 		return startCast + castTime/1000
 	end,
-	-- Is the target casting a spell?
-	-- 1: the spell id, spell name, spell list, "harmful", or "helpful"
-	-- returns: bool
+
+--- Test if the target is casting the given spell.
+-- The spell may be specified either by spell ID, localized spell name, spell list name (as defined in SpellList),
+-- "harmful" for any harmful spell, or "helpful" for any helpful spell.
+-- @name Casting
+-- @paramsig boolean
+-- @param spell The spell to check.
+--     Valid values: spell ID, spell name, spell list name, harmful, helpful
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- Define(maloriak_release_aberrations 77569)
+-- if target.Casting(maloriak_release_aberrations)
+--     Spell(pummel)
+
 	casting = function(condition)
 		local casting
 		local target = getTarget(condition.target)
@@ -665,9 +737,23 @@ OvaleCondition.conditions=
 			end
 		end
 	end,
-	-- Get the spell casting time
-	-- 1: the spell id
-	-- returns: bool or number
+
+--- Get the cast time in seconds of the spell for the player, taking into account current haste effects.
+-- @name CastTime
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
+-- @see RemainingCastTime
+-- @usage
+-- if target.DebuffRemains(flame_shock) < CastTime(lava_burst)
+--     Spell(lava_burst)
+
 	casttime = function(condition)
 		local name, rank, icon, cost, isFunnel, powerType, castTime = OvaleData:GetSpellInfoOrNil(condition[1])
 		if Ovale.trace then
@@ -675,9 +761,18 @@ OvaleCondition.conditions=
 		end
 		return compare(castTime/1000, condition[2], condition[3])
 	end,
-	-- Test if a list of checkboxes is off
-	-- 1,... : the checkboxes names
-	-- returns: bool
+
+--- Test if all of the listed checkboxes are off.
+-- @name CheckBoxOff
+-- @paramsig boolean
+-- @param id The name of a checkbox. It should match one defined by AddCheckBox(...).
+-- @param ... Optional. Additional checkbox names.
+-- @return A boolean value.
+-- @see CheckBoxOn
+-- @usage
+-- AddCheckBox(opt_black_arrow "Black Arrow" default)
+-- if CheckBoxOff(opt_black_arrow) Spell(explosive_trap)
+
 	checkboxoff = function(condition)
 		for k,v in pairs(condition) do
 			if (Ovale:IsChecked(v)) then
@@ -686,9 +781,18 @@ OvaleCondition.conditions=
 		end
 		return 0
 	end,
-	-- Test if a list of checkboxes is on
-	-- 1,... : the checkboxes names
-	-- returns: bool
+
+--- Test if all of the listed checkboxes are on.
+-- @name CheckBoxOn
+-- @paramsig boolean
+-- @param id The name of a checkbox. It should match one defined by AddCheckBox(...).
+-- @param ... Optional. Additional checkbox names.
+-- @return A boolean value.
+-- @see CheckBoxOff
+-- @usage
+-- AddCheckBox(opt_black_arrow "Black Arrow" default)
+-- if CheckBoxOn(opt_black_arrow) Spell(black_arrow)
+
 	checkboxon = function(condition)
 		for k,v in pairs(condition) do
 			if (not Ovale:IsChecked(v)) then
@@ -697,20 +801,57 @@ OvaleCondition.conditions=
 		end
 		return 0
 	end,
-	-- Get the chi
+
+--- Get the current amount of stored Chi for monks.
+-- @name Chi
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The amount of stored Chi.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Chi() ==4 Spell(chi_burst)
+-- if Chi(equal 4) Spell(chi_burst)
+
 	chi = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.chi, OvaleState.currentTime, OvaleState.powerRate.chi)
 	end,
-	-- Check the class of the target
-	-- 1: the class to check
-	-- returns: bool
+
+--- Test whether the target's class matches the given class.
+-- @name Class
+-- @paramsig boolean
+-- @param class The class to check.
+--     Valid values: DEATHKNIGHT, DRUID, HUNTER, MAGE, MONK, PALADIN, PRIEST, ROGUE, SHAMAN, WARLOCK, WARRIOR.
+-- @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.Class(PRIEST) Spell(cheap_shot)
+
 	class = function(condition)
 		local loc, noloc = UnitClass(getTarget(condition.target))
 		return testbool(noloc == condition[1], condition[2])
 	end,
-	-- Test the target classification
-	-- 1 : normal, elite, or worldboss
-	-- returns: bool
+
+--- Test whether the target's classification matches the given classification.
+-- @name Classification
+-- @paramsig boolean
+-- @param classification The unit classification to check.
+--     Valid values: normal, elite, worldboss.
+-- @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.Classification(worldboss) Item(virmens_bite_potion)
+
 	classification = function(condition)
 		local classification
 		local target = getTarget(condition.target)
@@ -724,29 +865,81 @@ OvaleCondition.conditions=
 				classification = "normal"
 			end
 		end
-		
 		return testbool(condition[1]==classification, condition[2])
 	end,
-	-- Test how many combo points a feral druid or a rogue has
-	-- returns: bool or number
+
+--- Get the number of combo points on the currently selected target for a feral druid or a rogue.
+-- @name ComboPoints
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of combo points.
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellComboPoints
+-- @usage
+-- if ComboPoints() >=1 Spell(savage_roar)
+-- if ComboPoints(more 0) Spell(savage_roar)
+
 	combopoints = function(condition)
 		return compare(OvaleState.state.combo, condition[1], condition[2])
 	end,
-	-- Get a counter value
-	-- 1: the counter name
-	-- returns: bool or number
+
+--- Get the current value of a script counter.
+-- @name Counter
+-- @paramsig number or boolean
+-- @param id The name of the counter. It should match one that's defined by inccounter=xxx in SpellInfo(...).
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current value the counter.
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellComboPoints
+-- @usage
+-- if ComboPoints() >=1 Spell(savage_roar)
+-- if ComboPoints(more 0) Spell(savage_roar)
+
 	counter = function(condition)
 		return compare(OvaleState:GetCounterValue(condition[1]), condition[2], condition[3])
 	end,
-	-- Check the target creature family
-	-- 1: the family
-	-- returns: bool
+
+--- Test whether the target's creature family matches the given name.
+-- Applies only to beasts that can be taken as hunter pets (e.g., cats, worms, and ravagers but not zhevras, talbuks and pterrordax),
+-- demons that can be summoned by Warlocks (e.g., imps and felguards, but not demons that require enslaving such as infernals
+-- and doomguards or world demons such as pit lords and armored voidwalkers), and Death Knight's pets (ghouls)
+-- @name CreatureFamily
+-- @paramsig boolean
+-- @param name The English name of the creature family to check.
+--     Valid values: Bat, Beast, Felguard, Imp, Ravager, etc.
+-- @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if pet.CreatureFamily(Felguard)
+--     Spell(summon_felhunter)
+-- if target.CreatureFamily(Dragonkin)
+--     Spell(hibernate)
+
 	creaturefamily = function(condition)
 		return testbool(UnitCreatureFamily(getTarget(condition.target)) == LBCT[condition[1]], condition[2])
 	end,
-	-- Check the target has any of the creature type 
-	-- 1,...: a creature type
-	-- returns: bool
+
+--- Test if the target is any of the listed creature types.
+-- @name CreatureType
+-- @paramsig boolean
+-- @param name The English name of a creature type.
+--     Valid values: Beast, Humanoid, Undead, etc.
+-- @param ... Optional. Additional creature types.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.CreatureType(Humanoid Critter)
+--     Spell(polymorph)
+
 	creaturetype = function(condition)
 		local creatureType = UnitCreatureType(getTarget(condition.target))
 		for _,v in pairs(condition) do
@@ -756,9 +949,20 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
-	-- Get a spell damage
-	-- 1: spell id
-	-- returns: number
+
+--- Get the current estimated damage of a spell.
+-- The calculated damage takes into account the current attack power, spellpower and combo points (if used).
+-- The damage is computed from information for the spell set via SpellInfo(...):
+-- damage = base + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
+-- @name Damage
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The estimated damage of the given spell.
+-- @see LastSpellDamage, LastSpellEstimatedDamage
+-- @usage
+-- if {Damage(rake) / LastSpellEstimateDamage(rake)} >1.1
+--     Spell(rake)
+
 	damage = function(condition)
 		local spellId = condition[1]
 		local ret = OvaleData:GetDamage(spellId,
@@ -769,24 +973,72 @@ OvaleCondition.conditions=
 		})
 		return 0, nil, ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
 	end,
-	-- Get the current damage multiplier
-	-- TODO: use OvaleState
-	-- returns: number
+
+--- Get the current damage multiplier of a spell.
+-- This currently does not take into account increased damage due to mastery.
+-- @name DamageMultiplier
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The current damage multiplier of the given spell.
+-- @see LastSpellDamageMultiplier
+-- @usage
+-- if {DamageMultiplier(rupture) / LastSpellDamageMultiplier(rupture)} >1.1
+--     Spell(rupture)
+
 	damagemultiplier = function(condition)
+		-- TODO: use OvaleState
 		return 0, nil, OvaleAura:GetDamageMultiplier(condition[1]), 0, 0
 	end,
-	-- Get the remaining time until the target is dead
-	-- returns: bool or number
+
+--- Get the estimated number of seconds remaining before the target is dead.
+-- @name DeadIn
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if target.DeadIn() <2 and ComboPoints() >0 Spell(eviscerate)
+-- if target.DeadIn(less 2) and ComboPoints() >0 Spell(eviscerate)
+
 	deadin = function(condition)
 		return testValue(condition[1], condition[2], 0, getTargetDead(getTarget(condition.target)), -1)
 	end,
-	-- Get the demonic fury
-	-- returns: bool or number
+
+--- Get the current amount of demonic fury for demonology warlocks.
+-- @name DemonicFury
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The amount of demonic fury.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if DemonicFury() >=1000 Spell(metamorphosis)
+-- if DemonicFury(more 999) Spell(metamorphosis)
+
 	demonicfury = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.demonicfury, OvaleState.currentTime, OvaleState.powerRate.demonicfury)
 	end,
-	-- Get the distance to the target
-	-- returns: bool or number
+
+--- Get the distance in yards to the target.
+-- The distances are from LibRangeCheck-2.0, which determines distance based on spell range checks, so results are approximate.
+-- You should not test for equality.
+-- @name Distance
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The distance to the target.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if target.Distance(less 25)
+--     Texture(ability_rogue_sprint)
+
 	distance = function(condition)
 		if LRC then
 			return compare(LRC:GetRange(getTarget(condition.target)), condition[1], condition[2])
@@ -808,37 +1060,97 @@ OvaleCondition.conditions=
 	effectivemana = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
 	end,
-	-- Get the number of enemies
-	-- returns: bool or number
+
+--- Get the number of hostile enemies on the battlefield.
+-- @name Enemies
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of enemies.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Enemies() >4 Spell(fan_of_knives)
+-- if Enemies(more 4) Spell(fan_of_knives)
+
 	enemies = function(condition)
 		return compare(OvaleEnemies:GetNumberOfEnemies(), condition[1], condition[2])
 	end,
-	-- Get the energy
-	-- returns: bool or number
+
+--- Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
+-- @name Energy
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current energy.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Energy() >70 Spell(vanish)
+-- if Energy(more 70) Spell(vanish)
+
 	energy = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.energy, OvaleState.currentTime, OvaleState.powerRate.energy)
 	end,
-	-- Checks if the target exists
-	-- returns: bool
+
+--- Test if the target exists. The target may be alive or dead.
+-- @name Exists
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @see Present
+-- @usage
+-- if pet.Exists(no) Spell(summon_imp)
+
 	exists = function(condition)
 		return testbool(UnitExists(getTarget(condition.target)) == 1, condition[1])
 	end,
+
+--- A condition that always returns false.
+-- @name False
+-- @paramsig boolean
+-- @return A boolean value.
+
 	["false"] = function(condition)
 		return nil
 	end,
-	-- Get the focus
-	-- returns: bool or number
+
+--- Get the current amount of focus for hunters.
+-- @name Focus
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current focus.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Focus() >70 Spell(arcane_shot)
+-- if Focus(more 70) Spell(arcane_shot)
+
 	focus = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.focus, OvaleState.currentTime, OvaleState.powerRate.focus)
 	end,
+
 	-- Get the global countdown
 	-- returns: bool or number
 	gcd = function(condition)
 		return compare(OvaleState.gcd, condition[1], condition[2])
 	end,
-	-- Check if a glyph is active
-	-- 1: the glyph spell id
-	-- returns: bool
+
+--- Test if the given glyph is active.
+-- @name Glyph
+-- @paramsig boolean
+-- @param id The glyph spell ID.
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if InCombat(no) and Glyph(glyph_of_savagery)
+--     Spell(savage_roar)
+
 	glyph = function(condition)
 		local present = false
 		for i = 1, GetNumGlyphSockets() do
@@ -850,13 +1162,31 @@ OvaleCondition.conditions=
 		end
 		return testbool(present, condition[2])
 	end,
-	-- Check if the player has full control of his character
-	-- returns: bool
+
+--- Test if the player has full control, i.e., isn't feared, charmed, etc.
+-- @name HasFullControl
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if HasFullControl(no) Spell(barkskin)
+
 	hasfullcontrol = function(condition)
 		return testbool(HasFullControl(), condition[1])
 	end,
-	-- Check if a shield is equipped
-	-- returns: bool
+
+--- Test if the player has a shield equipped.
+-- @name HasShield
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if HasShield() Spell(shield_wall)
+
 	hasshield = function(condition)
 		local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
 		if (not id) then
@@ -866,69 +1196,194 @@ OvaleCondition.conditions=
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
 		return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
 	end,
-	-- Get the holy power
-	-- returns: bool or number
+
+--- Get the current amount of holy power for a paladin.
+-- @name HolyPower
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The amount of holy power.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if HolyPower() >=3 Spell(word_of_glory)
+-- if HolyPower(more 2) Spell(word_of_glory)
+
 	holypower = function(condition)
 		return compare(OvaleState.state.holy, condition[1], condition[2])
 	end,
-	-- Check if the player is in combat
-	-- returns: bool
+
+--- Test if the player is in combat.
+-- @name InCombat
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if InCombat(no) and Stealthed(no) Spell(stealth)
+
 	incombat = function(condition)
 		return testbool(Ovale.enCombat, condition[1])
 	end,
-	-- Check if the spell is flying to the target
-	-- 1: spell id
-	-- returns: bool
+
+--- Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
+-- @name InFlightToTarget
+-- @paramsig boolean
+-- @param id The spell ID.
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if target.DebuffRemains(haunt) <3 and not InFlightToTarget(haunt)
+--     Spell(haunt)
+
 	inflighttotarget = function(condition)
 		return testbool(OvaleFuture:InFlight(condition[1] or OvaleState.currentSpellId == condition[1]), condition[2])
 	end,
-	-- Check if the target is in the spell range
-	-- 1: spell id
-	-- returns: bool
+
+--- Test if the distance from the player to the target is within the spell's range.
+-- @name InRange
+-- @paramsig boolean
+-- @param id The spell ID.
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if target.IsInterruptible() and target.InRange(kick)
+--     Spell(kick)
+
 	inrange = function(condition)
 		--TODO is IsSpellInRange using spell id now?
 		local spellName = GetSpellInfo(condition[1])
 		return testbool(IsSpellInRange(spellName,getTarget(condition.target))==1,condition[2])
 	end,
-	-- Get an item cooldown time
+
+--- Get the cooldown time in seconds of an item, e.g., trinket.
+-- @name ItemCooldown
+-- @paramsig number
+-- @param id The item ID.
+-- @return The number of seconds.
+-- @usage
+-- if not ItemCooldown(ancient_petrified_seed) >0
+--     Spell(berserk_cat)
+
 	itemcooldown = function(condition)
 		local actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(condition[1])
 		return 0, nil, actionCooldownDuration, actionCooldownStart, -1
 	end,
-	-- Get an item count
-	-- returns: bool or number
+
+--- Get the current number of the given item in the player's inventory.
+-- Items with more than one charge count as one item.
+-- @name ItemCount
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The count of the item.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if ItemCount(mana_gem) ==0 Spell(conjure_mana_gem)
+-- if ItemCount(mana_gem equal 0) Spell(conjure_mana_gem)
+
 	itemcount = function(condition)
 		return compare(GetItemCount(condition[1]), condition[2], condition[3])
 	end,
-	-- Get an item charges
-	-- returns: bool or number
+
+--- Get the current number of charges of the given item in the player's inventory.
+-- @name ItemCharges
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of charges.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if ItemCount(mana_gem) ==0 or ItemCharges(mana_gem) <3
+--     Spell(conjure_mana_gem)
+-- if ItemCount(mana_gem equal 0) or ItemCharges(mana_gem less 3)
+--     Spell(conjure_mana_gem)
+
 	itemcharges = function(condition)
 		return compare(GetItemCount(condition[1], false, true), condition[2], condition[3])
 	end,
-	-- Check if the target is aggroed to the player
-	-- returns: bool
+
+--- Test if the target's primary aggro is on the player.
+-- Even if the target briefly targets and casts a spell on another raid member,
+-- this condition returns true as long as the player is highest on the threat table.
+-- @name IsAggroed
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target is aggroed. If no, then return true if it isn't aggroed.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.IsAggroed() Spell(feign_death)
+
 	isaggroed = function(condition)
 		return testbool(UnitDetailedThreatSituation("player", getTarget(condition.target)), condition[1])
 	end,
-	-- Check if the player is feared
-	-- returns: bool
+
+--- Test if the player is feared.
+-- @name IsFeared
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if feared. If no, then return true if it not feared.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- if IsFeared() Spell(every_man_for_himself)
+
 	isfeared = function(condition)
 		local fearSpellList = OvaleData:GetFearSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(fearSpellList), condition[1])
 	end,
-	-- Check if the target is a friend
-	-- returns: bool
+
+--- Test if the target is friendly to the player.
+-- @name IsFriend
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target is interruptible. If no, then return true if it isn't interruptible.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.IsFriend() Spell(healing_touch)
+
 	isfriend = function(condition)
 		return testbool(UnitIsFriend("player", getTarget(condition.target)), condition[1])
 	end,
-	-- Check if the player is incapacited
-	-- returns: bool
+
+--- Test if the player is incapacitated.
+-- @name IsCapacitated
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if incapacitated. If no, then return true if it not incapacitated.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- if IsIncapacitated() Spell(every_man_for_himself)
+
 	isincapacitated = function(condition)
 		local incapacitateSpellList = OvaleData:GetIncapacitateSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(incapacitateSpellList), condition[1])
 	end,
-	-- Check if the target is interruptible
-	-- returns: bool
+
+--- Test if the target is currently casting an interruptible spell.
+-- @name IsInterruptible
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target is interruptible. If no, then return true if it isn't interruptible.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.IsInterruptible() Spell(kick)
+
 	isinterruptible = function(condition)
 		local target = getTarget(condition.target)
 		local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = UnitCastingInfo(target)
@@ -937,21 +1392,49 @@ OvaleCondition.conditions=
 		end
 		return testbool(protected ~= nil and not protected, condition[1])
 	end,
-	-- Check if the player is rooted
-	-- returns: bool
+
+--- Test if the player is rooted.
+-- @name IsRooted
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if rooted. If no, then return true if it not rooted.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- if IsRooted() Item(Trinket0Slot usable=1)
+
 	isrooted = function(condition)
 		local rootSpellList = OvaleData:GetRootSpellList()
 		return testbool(isDebuffInList(rootSpellList), condition[1])
 	end,
-	-- Check if the player is stunned
-	-- returns: bool
+
+--- Test if the player is stunned.
+-- @name IsStunned
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if stunned. If no, then return true if it not stunned.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- if IsStunned() Item(Trinket0Slot usable=1)
+
 	isstunned = function(condition)
 		local stunSpellList = OvaleData:GetStunSpellList()
 		return testbool(not HasFullControl() and isDebuffInList(stunSpellList), condition[1])
 	end,
-	-- Get the last spell damage value
-	-- 1: the spell id
-	-- returns: number or bool
+
+--- Get the damage done by the most recent damage event for the given spell.
+-- If the spell is a damage-over-time (DoT) aura, then it gives the damage done by the most recent tick.
+-- @name LastSpellDamage
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The damage done.
+-- @return A boolean value for the result of the comparison.
+-- @see Damage, LastSpellEstimatedDamage
+-- @usage
+-- if LastDamage(ignite) >10000 Spell(combustion)
+-- if LastDamage(ignite more 10000) Spell(combustion)
+
 	lastspelldamage = function(condition)
 		local spellId = condition[1]
 		if not OvaleSpellDamage:Get(spellId) then
@@ -959,9 +1442,20 @@ OvaleCondition.conditions=
 		end
 		return compare(OvaleSpellDamage:Get(spellId), condition[2], condition[3])
 	end,
-	-- Get the last spell estimated damage
-	-- 1: spell id
-	-- returns: number
+
+--- Get the estimated damage of the most recent cast of a spell.
+-- The calculated damage takes into account the values of attack power, spellpower and combo points (if used) at the time the spell was most recent cast.
+-- The damage is computed from information for the spell set via SpellInfo(...):
+-- damage = base + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
+-- @name LastSpellEstimatedDamage
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The estimated damage of the most recent cast of the given spell.
+-- @see Damage, LastSpellDamage
+-- @usage
+-- if {Damage(rake) / LastSpellEstimateDamage(rake)} >1.1
+--     Spell(rake)
+
 	lastspellestimateddamage = function(condition)
 		local spellId = condition[1]
 		local ret = OvaleData:GetDamage(spellId,
@@ -972,61 +1466,179 @@ OvaleCondition.conditions=
 		})
 		return 0, nil, ret * (OvaleFuture.lastSpellDM[spellId] or 0), 0, 0
 	end,
-	-- Get the last spell damage multiplier
-	-- 1: the spell id
-	-- returns: number or bool
+
+--- Get the damage multiplier of the most recent cast of a spell.
+-- This currently does not take into account increased damage due to mastery.
+-- @name DamageMultiplier
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The previous damage multiplier.
+-- @return A boolean value for the result of the comparison.
+-- @see DamageMultiplier
+-- @usage
+-- if {DamageMultiplier(rupture) / LastSpellDamageMultiplier(rupture)} >1.1
+--     Spell(rupture)
+
 	lastspelldamagemultiplier = function(condition)
 		return compare(OvaleFuture.lastSpellDM[condition[1]], condition[2], condition[3])
 	end,
-	-- Get the last spell attack power
-	-- 1: the spell id
-	-- returns: number or bool
+
+--- Get the attack power of the player during the most recent cast of a spell.
+-- @name LastSpellAttackPower
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The previous attack power.
+-- @return A boolean value for the result of the comparison.
+-- @see AttackPower
+-- @usage
+-- if {Attackpower() / LastSpellAttackPower(hemorrhage)} >1.25
+--     Spell(hemorrhage)
+
 	lastspellattackpower = function(condition)
 		return compare(OvaleFuture.lastSpellAP[condition[1]], condition[2], condition[3])
 	end,
-	-- Get the last spell spell power
-	-- 1: the spell id
-	-- returns: number or bool
+
+--- Get the spellpower of the player during the most recent cast of a spell.
+-- @name LastSpellSpellpower
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The previous spellpower.
+-- @return A boolean value for the result of the comparison.
+-- @see Spellpower
+-- @usage
+-- if {Spellpower() / LastSpellSpellpower(living_bomb)} >1.25
+--     Spell(living_bomb)
+
 	lastspellspellpower = function(condition)
 		return compare(OvaleFuture.lastSpellSP[condition[1]], condition[2], condition[3])
 	end,
-	-- Get the number of combo points consumed by the last spell
-	-- 1: the spell id
-	-- returns: number or bool
+
+--- Get the number of combo points consumed by the most recent cast of a spell for a feral druid or a rogue.
+-- @name LastSpellComboPoints
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of combo points.
+-- @return A boolean value for the result of the comparison.
+-- @see ComboPoints
+-- @usage
+-- if ComboPoints() >3 and LastComboPoints(rip) <3
+--     Spell(rip)
+
 	lastspellcombopoints = function(condition)
 		return compare(OvaleFuture.lastSpellCombo[condition[1]], condition[2], condition[3])
 	end,
-	-- Get the last spell mastery
-	-- 1: the spell id
-	-- returns: number or bool
+
+--- Get the mastery effect of the player during the most recent cast of a spell.
+-- Mastery effect is the effect of the player's mastery, typically a percent-increase to damage
+-- or a percent-increase to chance to trigger some effect.
+-- @name LastSpellMastery
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The previous mastery effect.
+-- @return A boolean value for the result of the comparison.
+-- @see Mastery
+-- @usage
+-- if {Mastery(shadow_bolt) - LastSpellMastery(shadow_bolt)} > 1000
+--     Spell(metamorphosis)
+
 	lastspellmastery = function(condition)
 		return compare(OvaleFuture.lastSpellMastery[condition[1]], condition[2], condition[3])
 	end,
-	-- Get the time elasped since the last swing
-	-- 1: main or off
-	-- returns: number
+
+--- Get the time elapsed in seconds since the player's previous melee swing (white attack).
+-- @name LastSwing
+-- @paramsig number
+-- @param hand Optional. Sets which hand weapon's melee swing.
+--     If no hand is specified, then return the time elapsed since the previous swing of either hand's weapon.
+--     Valid values: main, off.
+-- @return The number of seconds.
+-- @see NextSwing
+
 	lastswing = function(condition)
 		return 0, nil, 0, OvaleSwing:GetLast(condition[1]), 1
 	end,
-	-- Get the target level
-	-- returns: bool or number
+
+--- Get the level of the target.
+-- @name Level
+-- @paramsig number or boolean
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The level of the target.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Level() >=34 Spell(tiger_palm)
+-- if Level(more 33) Spell(tiger_palm)
+
 	level = function(condition)
 		return compare(UnitLevel(getTarget(condition.target)), condition[1], condition[2])
 	end,
-	-- Get the target hit points
-	-- returns: bool or number
+
+--- Get the current amount of health points of the target.
+-- @name Life
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current health.
+-- @return A boolean value for the result of the comparison.
+-- @see Health
+-- @usage
+-- if Life() <10000 Spell(last_stand)
+-- if Life(less 10000) Spell(last_stand)
+
 	life = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitHealth(target), condition[1], condition[2])
 	end,
-	-- Get the target missing hit points
-	-- returns: bool or number
+
+--- Get the number of health points away from full health of the target.
+-- @name LifeMissing
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current missing health.
+-- @return A boolean value for the result of the comparison.
+-- @see HealthMissing
+-- @usage
+-- if LifeMissing() <20000 Item(healthstone)
+-- if LifeMissing(less 20000) Item(healthstone)
+
 	lifemissing = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitHealthMax(target)-UnitHealth(target), condition[1], condition[2])
 	end,
-	-- Get the target health percent
-	-- returns: bool or number
+
+--- Get the current percent level of health of the target.
+-- @name LifePercent
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current health percent.
+-- @return A boolean value for the result of the comparison.
+-- @see HealthPercent
+-- @usage
+-- if LifePercent() <20 Spell(last_stand)
+-- if target.LifePercent(less 25) Spell(kill_shot)
+
 	lifepercent = function(condition)
 		--TODO: use prediction based on the DPS on the target
 		local target = getTarget(condition.target)
@@ -1035,6 +1647,7 @@ OvaleCondition.conditions=
 		end
 		return compare(100*UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2])
 	end,
+
 	-- Test if a list item is selected
 	-- 1 : the list name
 	-- 2 : the item name
@@ -1047,8 +1660,20 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
-	-- Get the target mana
-	-- returns: bool or number
+
+--- Get the current level of mana of the target.
+-- @name Mana
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current mana.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
+
 	mana = function(condition)
 		local target = getTarget(condition.target)
 		if target == "player" then
@@ -1057,8 +1682,21 @@ OvaleCondition.conditions=
 			return compare(UnitPower(target), condition[1], condition[2])
 		end
 	end,
-	-- Get the target current mana percent
-	-- return: bool or number
+
+--- Get the current percent level of mana (between 0 and 100) of the target.
+-- @name Mana
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current mana percent.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if ManaPercent() >90 Spell(arcane_blast)
+-- if ManaPercent(more 90) Spell(arcane_blast)
+
 	manapercent = function(condition)
 		local target = getTarget(condition.target)
 		local powerMax = UnitPowerMax(target, 0)
@@ -1072,8 +1710,21 @@ OvaleCondition.conditions=
 			return compare(UnitPower(target, 0)*100/powerMax, condition[1], condition[2])
 		end
 	end,
-	-- Get the mastery
-	-- returns : bool or number
+
+--- Get the current mastery effect of the player.
+-- Mastery effect is the effect of the player's mastery, typically a percent-increase to damage
+-- or a percent-increase to chance to trigger some effect.
+-- @name Mastery
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current mastery effect.
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellMastery
+-- @usage
+-- if {DamageMultiplier(rake) * {1 + Mastery()/100}} >1.8
+--     Spell(rake)
+
 	mastery = function(condition)
 		local mastery = 0
 		if UnitLevel("player") >= 80 then
@@ -1081,26 +1732,66 @@ OvaleCondition.conditions=
 		end
 		return compare(mastery, condition[1], condition[2])
 	end,
-	-- Get the target maximum health
-	-- return: bool or number
+
+--- Get the amount of health points of the target when it is at full health.
+-- @name MaxHealth
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum health.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if MaxHealth() >10000000 Item(mogu_power_potion)
+-- if MaxHealth(more 10000000) Item(mogu_power_potion)
+
 	maxhealth = function(condition)
 		local target = getTarget(condition.target)
 		return compare(UnitMaxHealth(target), condition[1], condition[2])
 	end,
-	-- Get the target maximum mana
-	-- return: bool or number
+
+--- Get the level of mana of the target when it is at full mana.
+-- @name MaxMana
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum mana.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
+
 	maxmana = function(condition)
 		return compare(UnitPowerMax(getTarget(condition.target)), condition[1], condition[2])
 	end,
-	-- Get the time until the next swing
-	-- 1: main or off
-	-- return: number
+
+--- Get the time in seconds until the player's next melee swing (white attack).
+-- @name NextSwing
+-- @paramsig number
+-- @param hand Optional. Sets which hand weapon's melee swing.
+--     If no hand is specified, then return the time until the next swing of either hand's weapon.
+--     Valid values: main, off.
+-- @return The number of seconds
+-- @see LastSwing
+
 	nextswing = function(condition)
 		return 0, nil, 0, OvaleSwing:GetNext(condition[1]), 0, -1
 	end,
-	-- Get the time until the next tick
-	-- 1: spell id
-	-- return: number
+
+--- Get the number of seconds until the next tick of a damage-over-time (DoT) aura on the target.
+-- @name NextTick
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @see Ticks, TicksRemain, TickTime
+
 	nexttick = function(condition)
 		local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
 		local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
@@ -1112,6 +1803,7 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
+
 	-- Check if the aura is not on any other unit than the current target
 	-- 1: spell id
 	-- return: bool
@@ -1141,31 +1833,78 @@ OvaleCondition.conditions=
 		local minTime, maxTime = getOtherAura(condition[1])
 		return 0, nil, 0, maxTime, -1 
 	end,
-	-- Check if the unit is present and alive
-	-- return: bool
+
+--- Test if the target exists and is alive.
+-- @name Present
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @see Exists
+-- @usage
+-- if target.IsInterruptible() and pet.Present(yes)
+--     Spell(pet_pummel)
+
 	present = function(condition)
 		local present = UnitExists(getTarget(condition.target)) and not UnitIsDead(getTarget(condition.target))
 		return testbool(present, condition[1])
 	end,
-	-- Check what was the previous spell cast
-	-- 1: the spell to check
-	-- return: bool
+
+--- Test if the previous spell cast matches the given spell.
+-- @name PreviousSpell
+-- @paramsig boolean
+-- @param id The spell ID.
+-- @param yesno Optional. If yes, then return true if there is a match. If no, then return true if it doesn't match.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+
 	previousspell = function(condition)
 		return testbool(condition[1] == OvaleState.lastSpellId, condition[2])
 	end,
+
 	-- Check if the pet is present and alive
 	-- return: bool
 	petpresent = function(condition)
 		local present = UnitExists("pet") and not UnitIsDead("pet")
 		return testbool(present, condition[1])
 	end,
-	-- Get the rage
-	-- return: bool or number
+
+--- Get the current amount of rage for guardian druids and warriors.
+-- @name Rage
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current rage.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Rage() >70 Spell(heroic_strike)
+-- if Rage(more 70) Spell(heroic_strike)
+
 	rage = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.rage, OvaleState.currentTime, OvaleState.powerRate.rage)
 	end,
-	-- Get [target level]-[player level]
-	-- return: number or bool
+
+--- Get the result of the target's level minus the player's level. This number may be negative.
+-- @name RelativeLevel
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The difference in levels.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if target.RelativeLevel() >3
+--     Texture(ability_rogue_sprint)
+-- if target.RelativeLevel(more 3)
+--     Texture(ability_rogue_sprint)
+
 	relativelevel = function(condition)
 		local difference
 		local target = getTarget(condition.target)
@@ -1176,7 +1915,19 @@ OvaleCondition.conditions=
 		end
 		return compare(difference, condition[1], condition[2])
 	end,
-	-- Get the remaining cast time
+
+--- Get the remaining cast time in seconds of the target's current spell cast.
+-- @name RemainingCastTime
+-- @paramsig number
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @see CastTime
+-- @usage
+-- if target.Casting(hour_of_twilight) and target.RemainingCastTime() <2
+--     Spell(cloak_of_shadows)
+
 	remainingcasttime = function(condition)
 		local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill, castID, notInterruptible = UnitCastingInfo(getTarget(condition.target))
 		if not endTime then
@@ -1184,28 +1935,61 @@ OvaleCondition.conditions=
 		end
 		return 0, nil, 0, endTime/1000, -1
 	end,
-	-- Check if the runes are ready
-	-- 1: frost, death, unholy, or blood
-	-- 2: rune number
-	-- ...
-	-- nodeath: if 1, death runes are not allowed
-	-- return: bool
+
+--- Test if the current rune count meets the minimum rune requirements set out in the parameters.
+-- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
+-- E.g., Runes(blood 1 frost 1 unholy 1) means at least one blood, one frost, and one unholy rune is available, death runes included.
+-- @name Runes
+-- @paramsig boolean
+-- @param type The type of rune.
+--     Valid values: blood, frost, unholy, death
+-- @param number The number of runes
+-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
+-- @param nodeath Sets whether death runes can fulfill the rune count requirements. If set to 0, then death runes are allowed.
+--     Defaults to nodeath=0 (zero).
+--     Valid values: 0, 1.
+-- @return A boolean value.
+-- @usage
+-- if Runes(frost 1) Spell(howling_blast)
+
 	runes = function(condition)
 		return GetRune(condition)
 	end,
-	-- Get the number of runes
-	-- 1: frost, death, unholy, or blood
-	-- death: if 1, death runes are allowed
-	-- return: bool
+
+--- Get the current number of runes of the given type for death knights.
+-- @name Runes
+-- @paramsig number
+-- @param type The type of rune.
+--     Valid values: blood, frost, unholy, death
+-- @param death Sets whether death runes can fulfill the rune count requirements. If set to 1, then death runes are allowed.
+--     Defaults to death=0 (zero).
+--     Valid values: 0, 1.
+-- @return The number of runes.
+-- @usage
+-- if RuneCount(unholy) ==2 or RuneCount(frost) ==2 or RuneCount(death) ==2
+--     Spell(obliterate)
+
 	runecount = function(condition)
 		return 0, nil, GetRuneCount(condition[1], condition.death)
 	end,
-	-- Get the remaining cooldown until the runes are ready
-	-- 1: frost, death, unholy, or blood
-	-- 2: rune number
-	-- ...
-	-- nodeath: if 1, death runes are not allowed
-	-- return: number
+
+--- Get the number of seconds before the rune conditions are met.
+-- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
+-- E.g., RunesCooldown(blood 1 frost 1 unholy 1) returns the number of seconds before
+-- there are at least one blood, one frost, and one unholy rune, death runes included.
+-- @name Runes
+-- @paramsig number
+-- @param type The type of rune.
+--     Valid values: blood, frost, unholy, death
+-- @param number The number of runes
+-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
+-- @param nodeath Sets whether death runes can fulfill the rune count requirements. If set to 0, then death runes are allowed.
+--     Defaults to nodeath=0 (zero).
+--     Valid values: 0, 1.
+-- @return The number of seconds.
+-- @usage
+-- if Runes(frost 1) Spell(howling_blast)
+
 	runescooldown = function(condition)
 		local ret = GetRune(condition)
 		if not ret then
@@ -1216,41 +2000,106 @@ OvaleCondition.conditions=
 		end
 		return 0, nil, 0, ret, -1
 	end,
-	-- Get the runic power
-	-- returns: bool or number
+
+--- Get the current amount of runic power for death knights.
+-- @name RunicPower
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current runic power.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if RunicPower() >70 Spell(frost_strike)
+-- if RunicPower(more 70) Spell(frost_strike)
+
 	runicpower = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.runicpower, OvaleState.currentTime, OvaleState.powerRate.runicpower)
 	end,
-	-- Get the shadow orbs count
-	-- returns: bool or number
+
+--- Get the current number of Shadow Orbs for shadow priests.
+-- @name ShadowOrbs
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of Shadow Orbs.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if ShadowOrbs() >2 Spell(mind_blast)
+-- if ShadowOrbs(more 2) Spell(mind_blast)
+
 	shadoworbs = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.shadoworbs, OvaleState.currentTime, OvaleState.powerRate.shadoworbs)
 	end,
-	-- Get the number of soul shards
-	-- return: number or bool
+
+--- Get the current number of Soul Shards for warlocks.
+-- @name BurningEmbers
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of Soul Shards.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if SoulShards() >0 Spell(summon_felhunter)
+-- if SoulShards(more 0) Spell(summon_felhunter)
+
 	soulshards = function(condition)
 		return compare(OvaleState.state.shards, condition[1], condition[2])
 	end,
-	-- Get the unit speed (100 is runing speed)
-	-- return: number or bool
+
+--- Get the current speed of the target.
+-- If the target is not moving, then this condition returns 0 (zero).
+-- If the target is at running speed, then this condition returns 100.
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The speed of the target.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Speed(more 0) and not BuffPresent(aspect_of_the_fox)
+--     Spell(aspect_of_the_fox)
+
 	speed = function(condition)
 		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
 	end,
+
 	-- Check if the spell is usable
 	-- 1: spell Id
 	-- return: bool
 	spellusable = function(condition)
 		return testbool(IsUsableSpell(condition[1]), condition[2], condition[3])
 	end,
-	-- Get the number of spell charges
-	-- returns: bool or number
+
+--- Get the number of charges of the spell.
+-- @name SpellCharges
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of charges.
+-- @return A boolean value for the result of the comparison.
+-- @see SpellChargeCooldown
+-- @usage
+-- if SpellCharges(savage_defense) >1
+--     Spell(savage_defense)
+
 	spellcharges = function(condition)
 		local charges = GetSpellCharges(condition[1])
 		return compare(charges, condition[2], condition[3])
 	end,
-	-- Get the cooldown on spell charges
-	-- 1: spell ID
-	-- return: number
+
+--- Get the cooldown in seconds on a spell before it gains another charge.
+-- @name SpellChargeCooldown
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The number of seconds.
+-- @see SpellCharges
+-- @usage
+-- if SpellChargeCooldown(roll) <2
+--     Spell(roll usable=1)
+
 	spellchargecooldown = function(condition)
 		local charges, maxCharges, cooldownStart, cooldownDuration = GetSpellCharges(condition[1])
 		if charges < maxCharges then
@@ -1259,9 +2108,16 @@ OvaleCondition.conditions=
 			return 0, nil, 0, 0, 0
 		end
 	end,
-	-- Get the spell cooldown
-	-- 1: spell ID
-	-- return: number
+
+--- Get the cooldown in seconds before a spell is ready for use.
+-- @name SpellCooldown
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The number of seconds.
+-- @usage
+-- if ShadowOrbs() ==3 and SpellCooldown(mind_blast) <2
+--     Spell(devouring_plague)
+
 	spellcooldown = function(condition)
 		if type(condition[1]) == "string" then
 			local sharedCd = OvaleState.state.cd[condition[1]]
@@ -1277,6 +2133,7 @@ OvaleCondition.conditions=
 			return 0, nil, actionCooldownDuration, actionCooldownStart, -1
 		end
 	end,
+
 	-- Get the spell data listed in SpellInfo()
 	-- 1: spell ID
 	-- 2: key
@@ -1291,14 +2148,32 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
-	-- Get the spell power
-	-- return: number or bool
+
+--- Get the current spellpower of the player.
+-- @name Spellpower
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current spellpower.
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellSpellpower
+-- @usage
+-- if {Spellpower() / LastSpellSpellpower(living_bomb)} >1.25
+--     Spell(living_bomb)
+
 	spellpower = function(condition)
 		return compare(GetSpellBonusDamage(2), condition[1], condition[2])
 	end,
-	-- Test if the player is in a given stance
-	-- 1 : the stance
-	-- return: bool
+
+--- Test if the player is in a given stance.
+-- @name Stance
+-- @paramsig boolean
+-- @param stance A number representing the stance index.
+-- @return A boolean value.
+-- @usage
+-- unless Stance(1) Spell(bear_form)
+
 	stance = function(condition)
 		if (GetShapeshiftForm() == condition[1]) then
 			return 0
@@ -1306,19 +2181,53 @@ OvaleCondition.conditions=
 			return nil
 		end
 	end,
-	-- Check if the player is stealthed
-	-- return: bool
+
+--- Test if the player is currently stealthed.
+-- The player is stealthed if rogue Stealth, druid Prowl, or a similar ability is active.
+-- Note that the rogue Vanish buff causes this condition to return false,
+-- but as soon as the buff disappears and the rogue is stealthed, this condition will return true.
+-- @name Stealthed
+-- @paramsig
+-- @param yesno Optional. If yes, then return true if stealthed. If no, then return true if it not stealthed.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if Stealthed() or BuffPresent(vanish_buff) or BuffPresent(shadow_dance)
+--     Spell(ambush)
+
 	stealthed = function(condition)
 		return testbool(IsStealthed(), condition[1])
 	end,
-	-- Get the number of talents points (1 or 0)
-	-- 1 : the talent identifier (1 is the first talent in the first row, 2, the second, etc.) (use /script print(OvaleData.talentNameToId["Talent name"]) to retreive)
-	-- return: number or bool
+
+--- Get the number of points spent in a talent (0 or 1)
+-- @name TalentPoints
+-- @paramsig number or boolean
+-- @param talent Talent to inspect.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of talent points.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if TalentPoints(blood_tap_talent) Spell(blood_tap)
+
 	talentpoints = function(condition)
 		return compare(OvaleData:GetTalentPoints(condition[1]), condition[2], condition[3])
 	end,
-	-- Test if the unit target is the player (or is not)
-	-- return: bool
+
+--- Test if the player is the in-game target of the target.
+-- @name TargetIsPlayer
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if target.TargetIsPlayer() Spell(feign_death)
+
 	targetisplayer = function(condition)
 		return testbool(UnitIsUnit("player",getTarget(condition.target).."target"), condition[1])
 	end,
@@ -1328,11 +2237,19 @@ OvaleCondition.conditions=
 		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
 		return compare(threatpct, condition[1], condition[2])
 	end,
-	-- Get the number of ticks of a DOT
-	-- 1: spell Id
-	-- return: bool or number
-	-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
+
+--- Get the estimated total number of ticks of a damage-over-time (DoT) aura.
+-- @name Ticks
+-- @paramsig number or boolean
+-- @param id The aura spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of ticks.
+-- @return A boolean value for the result of the comparison.
+-- @see NextTick, TicksRemain, TickTime
+
 	ticks = function(condition)
+		-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
 		local spellId = condition[1]
 		local duration, tickLength = OvaleData:GetDuration(spellId,
 		{
@@ -1346,9 +2263,20 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
-	-- Get the remaining number of ticks
-	-- 1: spell Id
-	-- return: bool or number
+
+--- Get the remaining number of ticks of a damage-over-time (DoT) aura on a target.
+-- @name TicksRemain
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of ticks.
+-- @see NextTick, Ticks, TickTime
+-- @usage
+-- if target.TicksRemain(shadow_word_pain) <2
+--     Spell(shadow_word_pain)
+
 	ticksremain = function(condition)
 		local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
 		local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
@@ -1363,9 +2291,20 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
-	-- Get the duration of a tick
-	-- 1: spell id
-	-- return: number or bool
+
+--- Get the number of seconds between ticsk of a damage-over-time (DoT) aura on a target.
+-- @name TickTime
+-- @paramsig number or boolean
+-- @param id The aura spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
+-- @see NextTick, Ticks, TicksRemain
+
 	ticktime = function(condition)
 		local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
 		if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
@@ -1377,32 +2316,71 @@ OvaleCondition.conditions=
 		end
 		return nil
 	end,
-	-- Get the time in combat
-	-- return: number or bool
+
+--- Get the number of seconds elapsed since the player entered combat.
+-- @name TimeInCombat
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if TimeInCombat(more 5) Spell(bloodlust)
+
 	timeincombat = function(condition)
 		return testValue(condition[1], condition[2], 0, Ovale.combatStartTime, 1)
 	end,
-	-- Get the time until the unit dies
-	-- return: number
+
+--- Get the estimated number of seconds remaining before the target is dead.
+-- @name TimeToDie
+-- @paramsig number
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @see DeadIn
+-- @usage
+-- if TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
+
 	timetodie = function(condition)
 		return 0, nil, 0, getTargetDead(getTarget(condition.target)), -1
 	end,
-	-- Get the energy
-	-- returns: bool or number
-	-- TODO: temp, need to allow function calls in functions call to do things link TimeTo(Energy() == 100) which would be TimeTo(Equal(Energy(), 100))
+
+--- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
+-- @name TimeToMaxEnergy
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if TimeInToMaxEnergy() < 1.2 Spell(sinister_strike)
+-- if TimeInToMaxEnergy(less 1.2) Spell(sinister_strike)
+
 	timetomaxenergy = function(condition)
+	-- TODO: temp, need to allow function calls in functions call to do things link TimeTo(Energy() == 100) which would be TimeTo(Equal(Energy(), 100))
+	-- TODO: This incorrect for class specializations that can exceed 100 energy.
 		local t = OvaleState.currentTime + OvaleState.powerRate.energy * (100 - OvaleState.state.energy)
 		return 0, nil, 0, t, -1
 	end,
+
 	-- Multiply a time by the current spell haste
 	-- 1: the time
 	-- return: number
 	timewithhaste = function(condition)
 		return 0, nil, avecHate(condition[1], "spell"),0,0
 	end,
-	-- Check if a totem is not there
-	-- 1: the totem
-	-- return: bool
+
+--- Test if the totem for shamans or the ghoul for death knights has expired.
+-- @name TotemExpires
+-- @paramsig boolean
+-- @param id The NPC id of the totem or ghoul, or the type of totem.
+--     Valid types: fire, water, air, earth, ghoul.
+-- @return A boolean value.
+-- @see TotemPresent
+-- @usage
+-- if TotemExpires(fire) Spell(searing_totem)
+
 	totemexpires = function(condition)
 		if type(condition[1]) ~= "number" then
 			condition[1] = totemType[condition[1]]
@@ -1417,9 +2395,17 @@ OvaleCondition.conditions=
 		end
 		return addTime(startTime + duration, -(condition[2] or 0))
 	end,
-	-- Check if a totem is present
-	-- 1: the totem
-	-- return: bool
+
+--- Test if the totem for shamans or the ghoul for death knights is present.
+-- @name TotemPresent
+-- @paramsig boolean
+-- @param id The NPC id of the totem or ghoul, or the type of totem.
+--     Valid types: fire, water, air, earth, ghoul.
+-- @return A boolean value.
+-- @see TotemExpires
+-- @usage
+-- if not TotemPresent(fire) Spell(searing_totem)
+
 	totempresent = function(condition)
 		if type(condition[1]) ~= "number" then
 			condition[1] = totemType[condition[1]]
@@ -1434,6 +2420,7 @@ OvaleCondition.conditions=
 		end
 		return startTime, startTime + duration
 	end,
+
 	-- Check if a tracking is enabled
 	-- 1: the spell id
 	-- return bool
@@ -1450,13 +2437,27 @@ OvaleCondition.conditions=
 		end
 		return testbool(present, condition[2])
 	end,
+
+--- A condition that always returns true.
+-- @name True
+-- @paramsig boolean
+-- @return A boolean value.
+
 	["true"] = function(condition)
 		return 0, nil
 	end,
-	-- Check if a weapon enchant is not present
-	-- 1: mainhand or offhand
-	-- [2]: the maximum time the weapon enchant should be present
-	-- return bool
+
+--- Test if the weapon imbue on the given weapon has expired or will expire after a given number of seconds.
+-- @name WeaponEnchantExpires
+-- @paramsig boolean
+-- @param hand Sets which hand weapon.
+--     Valid values: mainhand, offhand.
+-- @param seconds Optional. The maximum number of seconds before the weapon imbue should expire.
+--     Defaults to 0 (zero).
+-- @return A boolean value.
+-- @usage
+-- if WeaponEnchantExpires(mainhand) Spell(windfury_weapon)
+
 	weaponenchantexpires = function(condition)
 		local hasMainHandEnchant, mainHandExpiration, mainHandCharges, hasOffHandEnchant, offHandExpiration, offHandCharges = GetWeaponEnchantInfo()
 		if (condition[1] == "mainhand") then
