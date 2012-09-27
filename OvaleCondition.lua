@@ -2049,6 +2049,7 @@ OvaleCondition.conditions=
 --- Get the current speed of the target.
 -- If the target is not moving, then this condition returns 0 (zero).
 -- If the target is at running speed, then this condition returns 100.
+-- @name Speed
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
