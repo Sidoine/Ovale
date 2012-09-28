@@ -104,7 +104,7 @@ OvaleData.buffSpellList =
 		1126, -- Mark of the Wild (druid)
 		20217, -- Blessing of Kings (paladin)
 		90363, -- Embrace of the Shale Spider (shale spider)
-		117667, -- Legacy of the Emporer (monk)
+		117666, -- Legacy of the Emporer (monk)
 	},
 	stamina =
 	{
