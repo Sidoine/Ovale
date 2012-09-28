@@ -2176,7 +2176,7 @@ OvaleCondition.conditions=
 -- unless Stance(1) Spell(bear_form)
 
 	stance = function(condition)
-		if (GetShapeshiftForm() == condition[1]) then
+		if (OvaleAura.stance == condition[1]) then
 			return 0
 		else
 			return nil

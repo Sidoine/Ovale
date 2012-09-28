@@ -14,6 +14,8 @@ OvaleAura = LibStub("AceAddon-3.0"):NewAddon("OvaleAura", "AceEvent-3.0")
 
 --<public-static-properties>
 OvaleAura.aura = {}
+OvaleAura.mastery = nil
+OvaleAura.stance = 0
 OvaleAura.serial = 0
 OvaleAura.spellHaste = 1
 OvaleAura.meleeHaste = 1
@@ -28,11 +30,23 @@ local baseDamageMultiplier = 1
 --<public-static-methods>
 function OvaleAura:OnEnable()
 	self.playerGUID = UnitGUID("player")
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 end
 
 function OvaleAura:OnDisable()
+	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
+	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+end
+
+function OvaleAura:ACTIVE_TALENT_GROUP_CHANGED(event)
+	self.mastery = GetSpecialization()
 end
 
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
@@ -62,6 +76,19 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			Ovale.refreshNeeded[unitId] = true
 		end
 	end
+end
+
+function OvaleAura:PLAYER_ENTERING_WORLD(event)
+	self.mastery = GetSpecialization()
+	self.stance = GetShapeshiftForm()
+end
+
+function OvaleAura:UPDATE_SHAPESHIFT_FORM(event)
+	self.stance = GetShapeshiftForm()
+end
+
+function OvaleAura:UPDATE_SHAPESHIFT_FORMS(event)
+	self.stance = GetShapeshiftForm()
 end
 
 function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)

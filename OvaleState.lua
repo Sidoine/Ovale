@@ -59,8 +59,14 @@ function OvaleState:UpdatePowerRates()
 	end
 	
 	self.powerRate.energy = 10 * OvaleAura.meleeHaste
-	
-	if OvaleState:GetAura("player", 13750, true) then
+
+	-- Stance of the Sturdy Ox (brewmaster monk)
+	if OvaleData.className == "MONK" and OvaleAura.mastery == 1 and OvaleAura.stance == 1 then
+		self.powerRate.energy = self.powerRate.energy * 1.1
+	end
+
+	-- Adrenaline Rush (rogue)
+	if OvaleData.className == "ROGUE" and OvaleState:GetAura("player", 13750, true) then
 		self.powerRate.energy = self.powerRate.energy * 2
 	end
 	
@@ -164,6 +170,16 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 		end
 
 		if newSpellInfo then
+			-- Monks in Stance of the Fierce Tiger generate one extra Chi per Jab and Expel Harm.
+			if OvaleData.className == "MONK" then
+				if OvaleAura.stance == 2 or (OvaleAura.mastery ~= 2 and OvaleAura.stance == 1) then
+					if spellId == 100780 or spellId == 115072 then
+						self.state.chi = self.state.chi + 1
+					end
+				end
+			end
+
+			-- Update power state, except for eclipse, combo, and runes.
 			for k,v in pairs(OvaleData.power) do
 				-- eclipse cost is on hit
 				if newSpellInfo[k] and k ~= "eclipse" then
@@ -185,7 +201,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 					end
 				end
 			end
-			
+
 			--Points de combo
 			if newSpellInfo.combo then
 				if newSpellInfo.combo == 0 then
@@ -204,6 +220,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 					self.state.combo = 5
 				end
 			end
+
 			--Runes
 			if newSpellInfo.frost then
 				self:AddRune(startCast, 3, newSpellInfo.frost)
