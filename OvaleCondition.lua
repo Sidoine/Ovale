@@ -2361,7 +2361,7 @@ OvaleCondition.conditions=
 	timetomaxenergy = function(condition)
 	-- TODO: temp, need to allow function calls in functions call to do things link TimeTo(Energy() == 100) which would be TimeTo(Equal(Energy(), 100))
 	-- TODO: This incorrect for class specializations that can exceed 100 energy.
-		local t = OvaleState.currentTime + OvaleState.powerRate.energy * (100 - OvaleState.state.energy)
+		local t = OvaleState.currentTime + (100 - OvaleState.state.energy) / OvaleState.powerRate.energy
 		return 0, nil, 0, t, -1
 	end,
 
