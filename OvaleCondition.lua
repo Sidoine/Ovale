@@ -1000,6 +1000,7 @@ OvaleCondition.conditions=
 --     Valid values: player, target, focus, pet.
 -- @return The number of seconds.
 -- @return A boolean value for the result of the comparison.
+-- @see TimeToDie
 -- @usage
 -- if target.DeadIn() <2 and ComboPoints() >0 Spell(eviscerate)
 -- if target.DeadIn(less 2) and ComboPoints() >0 Spell(eviscerate)
@@ -1358,7 +1359,7 @@ OvaleCondition.conditions=
 	end,
 
 --- Test if the player is incapacitated.
--- @name IsCapacitated
+-- @name IsIncapacitated
 -- @paramsig boolean
 -- @param yesno Optional. If yes, then return true if incapacitated. If no, then return true if it not incapacitated.
 --     Default is yes.
@@ -1469,7 +1470,7 @@ OvaleCondition.conditions=
 
 --- Get the damage multiplier of the most recent cast of a spell.
 -- This currently does not take into account increased damage due to mastery.
--- @name DamageMultiplier
+-- @name LastSpellDamageMultiplier
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -1684,7 +1685,7 @@ OvaleCondition.conditions=
 	end,
 
 --- Get the current percent level of mana (between 0 and 100) of the target.
--- @name Mana
+-- @name ManaPercent
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
@@ -1957,7 +1958,7 @@ OvaleCondition.conditions=
 	end,
 
 --- Get the current number of runes of the given type for death knights.
--- @name Runes
+-- @name RuneCount
 -- @paramsig number
 -- @param type The type of rune.
 --     Valid values: blood, frost, unholy, death
@@ -1977,7 +1978,7 @@ OvaleCondition.conditions=
 -- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
 -- E.g., RunesCooldown(blood 1 frost 1 unholy 1) returns the number of seconds before
 -- there are at least one blood, one frost, and one unholy rune, death runes included.
--- @name Runes
+-- @name RunesCooldown
 -- @paramsig number
 -- @param type The type of rune.
 --     Valid values: blood, frost, unholy, death
