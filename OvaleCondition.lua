@@ -1097,6 +1097,20 @@ OvaleCondition.conditions=
 		return testValue(condition[1], condition[2], OvaleState.state.energy, OvaleState.currentTime, OvaleState.powerRate.energy)
 	end,
 
+--- Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
+-- @name EnergyRegen
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current rate of energy regeneration.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if EnergyRegen() >11 Spell(stance_of_the_sturdy_ox)
+
+	energyregen = function(condition)
+		return compare(OvaleState.powerRate.energy, condition[1], condition[2])
+	end,
+
 --- Test if the target exists. The target may be alive or dead.
 -- @name Exists
 -- @paramsig boolean
@@ -1137,6 +1151,20 @@ OvaleCondition.conditions=
 
 	focus = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.focus, OvaleState.currentTime, OvaleState.powerRate.focus)
+	end,
+
+--- Get the amount of regenerated focus per second for hunters.
+-- @name FocusRegen
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current rate of focus regeneration.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if FocusRegen() >20 Spell(arcane_shot)
+
+	focusregen = function(condition)
+		return compare(OvaleState.powerRate.focus, condition[1], condition[2])
 	end,
 
 	-- Get the global countdown
