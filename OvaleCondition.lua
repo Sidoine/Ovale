@@ -26,7 +26,11 @@ local runeType =
 
 local totemType =
 {
+	-- Death Knights
 	ghoul = 1,
+	-- Monks
+	statue = 1,
+	-- Shamans
 	fire = 1,
 	earth = 2,
 	water = 3,
@@ -2376,11 +2380,11 @@ OvaleCondition.conditions=
 		return 0, nil, avecHate(condition[1], "spell"),0,0
 	end,
 
---- Test if the totem for shamans or the ghoul for death knights has expired.
+--- Test if the totem for shamans, the ghoul for death knights, or the statue for monks has expired.
 -- @name TotemExpires
 -- @paramsig boolean
--- @param id The NPC id of the totem or ghoul, or the type of totem.
---     Valid types: fire, water, air, earth, ghoul.
+-- @param id The NPC id of the totem, ghoul or statue, or the type of totem.
+--     Valid types: fire, water, air, earth, ghoul, statue.
 -- @return A boolean value.
 -- @see TotemPresent
 -- @usage
@@ -2401,11 +2405,11 @@ OvaleCondition.conditions=
 		return addTime(startTime + duration, -(condition[2] or 0))
 	end,
 
---- Test if the totem for shamans or the ghoul for death knights is present.
+--- Test if the totem for shamans, the ghoul for death knights, or the statue for monks is present.
 -- @name TotemPresent
 -- @paramsig boolean
--- @param id The NPC id of the totem or ghoul, or the type of totem.
---     Valid types: fire, water, air, earth, ghoul.
+-- @param id The NPC id of the totem, ghoul or statue, or the type of totem.
+--     Valid types: fire, water, air, earth, ghoul, statue.
 -- @return A boolean value.
 -- @see TotemExpires
 -- @usage
