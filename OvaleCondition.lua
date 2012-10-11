@@ -645,7 +645,7 @@ OvaleCondition.conditions=
 --- Get the current number of Burning Embers for destruction warlocks.
 -- @name BurningEmbers
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of Burning Embers.
 -- @return A boolean value for the result of the comparison.
@@ -809,7 +809,7 @@ OvaleCondition.conditions=
 --- Get the current amount of stored Chi for monks.
 -- @name Chi
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The amount of stored Chi.
 -- @return A boolean value for the result of the comparison.
@@ -998,7 +998,7 @@ OvaleCondition.conditions=
 --- Get the estimated number of seconds remaining before the target is dead.
 -- @name DeadIn
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1017,7 +1017,7 @@ OvaleCondition.conditions=
 --- Get the current amount of demonic fury for demonology warlocks.
 -- @name DemonicFury
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The amount of demonic fury.
 -- @return A boolean value for the result of the comparison.
@@ -1052,14 +1052,17 @@ OvaleCondition.conditions=
 			return nil
 		end
 	end,
+
 	--Compare to eclipse power. <0 lunar, >0 solar
 	-- returns: bool or number
 	eclipse = function(condition)
 		return compare(OvaleState.state.eclipse, condition[1], condition[2])
-	end,
+	end
+
 	eclipsedir = function(condition)
 		return compare(OvaleState:GetEclipseDir(), condition[1], condition[2])
 	end,
+
 	-- Get the effective mana (e.g. if spell cost is divided by two, will returns the mana multiplied by two)
 	-- TODO: not working
 	-- returns: bool or number
@@ -1085,7 +1088,7 @@ OvaleCondition.conditions=
 --- Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
 -- @name Energy
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The current energy.
 -- @return A boolean value for the result of the comparison.
@@ -1141,7 +1144,7 @@ OvaleCondition.conditions=
 --- Get the current amount of focus for hunters.
 -- @name Focus
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The current focus.
 -- @return A boolean value for the result of the comparison.
@@ -1727,7 +1730,7 @@ OvaleCondition.conditions=
 --- Get the current level of mana of the target.
 -- @name Mana
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1749,7 +1752,7 @@ OvaleCondition.conditions=
 --- Get the current percent level of mana (between 0 and 100) of the target.
 -- @name ManaPercent
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1940,7 +1943,7 @@ OvaleCondition.conditions=
 --- Get the current amount of rage for guardian druids and warriors.
 -- @name Rage
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The current rage.
 -- @return A boolean value for the result of the comparison.
@@ -2067,7 +2070,7 @@ OvaleCondition.conditions=
 --- Get the current amount of runic power for death knights.
 -- @name RunicPower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The current runic power.
 -- @return A boolean value for the result of the comparison.
@@ -2082,7 +2085,7 @@ OvaleCondition.conditions=
 --- Get the current number of Shadow Orbs for shadow priests.
 -- @name ShadowOrbs
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of Shadow Orbs.
 -- @return A boolean value for the result of the comparison.
@@ -2384,7 +2387,7 @@ OvaleCondition.conditions=
 --- Get the number of seconds elapsed since the player entered combat.
 -- @name TimeInCombat
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of seconds.
 -- @return A boolean value for the result of the comparison.
