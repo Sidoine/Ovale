@@ -1149,7 +1149,7 @@ OvaleCondition.conditions=
 -- @name Glyph
 -- @paramsig boolean
 -- @param id The glyph spell ID.
--- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+-- @param yesno Optional. If yes, then return true if the glyph is active. If no, then return true if it isn't active.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
@@ -1186,7 +1186,7 @@ OvaleCondition.conditions=
 --- Test if the player has a shield equipped.
 -- @name HasShield
 -- @paramsig boolean
--- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+-- @param yesno Optional. If yes, then return true if a shield is equipped. If no, then return true if it isn't equipped.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
@@ -1201,6 +1201,33 @@ OvaleCondition.conditions=
 		
 		local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
 		return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
+	end,
+
+--- Test if the player has a weapon equipped.
+-- @name HasWeapon
+-- @paramsig boolean
+-- @param hand Sets which hand weapon.
+--     Valid values: mainhand, offhand.
+-- @param yesno Optional. If yes, then return true if the weapon is equipped. If no, then return true if it isn't equipped.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if HasWeapon(offhand) and BuffStacks(killing_machine) Spell(frost_strike)
+
+	hasweapon = function(condition)
+		if condition[1] == "offhand" then
+			return testbool(OffhandHasWeapon(), condition[2])
+		elseif condition[1] == "mainhand" then
+			local itemId = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
+			if not itemId then
+				return testbool(false, condition[2])
+			end
+			local invType = select(9, GetItemInfo(itemId))
+			return testbool(invType == "INVTYPE_WEAPON" or invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_WEAPONMAINHAND", condition[2])
+		else
+			return testbool(false, condition[2])
+		end
 	end,
 
 --- Get the current amount of holy power for a paladin.
@@ -1221,7 +1248,7 @@ OvaleCondition.conditions=
 --- Test if the player is in combat.
 -- @name InCombat
 -- @paramsig boolean
--- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+-- @param yesno Optional. If yes, then return true if the player is in combat. If no, then return true if the player isn't in combat.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
@@ -1236,7 +1263,7 @@ OvaleCondition.conditions=
 -- @name InFlightToTarget
 -- @paramsig boolean
 -- @param id The spell ID.
--- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+-- @param yesno Optional. If yes, then return true if the spell is in flight. If no, then return true if it isn't in flight.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
@@ -1252,7 +1279,7 @@ OvaleCondition.conditions=
 -- @name InRange
 -- @paramsig boolean
 -- @param id The spell ID.
--- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+-- @param yesno Optional. If yes, then return true if the target is in range. If no, then return true if it isn't in range.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
