@@ -953,6 +953,7 @@ OvaleCondition.conditions=
 --- Get the current estimated damage of a spell.
 -- The calculated damage takes into account the current attack power, spellpower and combo points (if used).
 -- The damage is computed from information for the spell set via SpellInfo(...):
+--
 -- damage = base + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
 -- @name Damage
 -- @paramsig number
@@ -1445,8 +1446,10 @@ OvaleCondition.conditions=
 	end,
 
 --- Get the estimated damage of the most recent cast of a spell.
--- The calculated damage takes into account the values of attack power, spellpower and combo points (if used) at the time the spell was most recent cast.
+-- The calculated damage takes into account the values of attack power, spellpower and combo points (if used)
+-- at the time the spell was most recent cast.
 -- The damage is computed from information for the spell set via SpellInfo(...):
+--
 -- damage = base + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
 -- @name LastSpellEstimatedDamage
 -- @paramsig number
