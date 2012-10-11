@@ -723,7 +723,11 @@ function OvaleBestAction:Compute(element)
 		if (meilleurTempsFils) then
 			if (Ovale.trace) then
 				if bestElement then
-					Ovale:Print("group best action "..bestElement.params[1].." remains "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
+					local id = bestElement.value
+					if bestElement.params then
+						id = bestElement.params[1]
+					end
+					Ovale:Print("group best action "..tostring(id).." remains "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
 				else
 					Ovale:Print("group no best action returns "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
 				end
