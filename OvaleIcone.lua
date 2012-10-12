@@ -11,6 +11,10 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 --inherits ActionButtonTemplate
 
+--<private-static-properties>
+local strfind, strformat, strsub = string.find, string.format, string.sub
+--</private-static-properties>
+
 --<public-methods>
 local function SetValue(self, value, actionTexture)
 	self.icone:Show()
@@ -22,9 +26,9 @@ local function SetValue(self, value, actionTexture)
 	self.shortcut:Hide()
 	if value then
 		if value<10 then
-			value = string.format("%.1f", value)
+			value = strformat("%.1f", value)
 		else
-			value = string.format("%d", value)
+			value = strformat("%d", value)
 		end
 		self.remains:SetText(value)
 	else
@@ -122,7 +126,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		
 		-- Le temps restant
 		if ((OvaleOptions:GetApparence().numeric or self.params.text == "always") and minAttente > OvaleState.maintenant) then
-			self.remains:SetText(string.format("%.1f", minAttente - OvaleState.maintenant))
+			self.remains:SetText(strformat("%.1f", minAttente - OvaleState.maintenant))
 			self.remains:Show()
 		else
 			self.remains:Hide()
@@ -186,10 +190,10 @@ local function SetParams(self, params, secure)
 	self.actionButton = false
 	if secure then
 		for k,v in pairs(params) do
-			local f = string.find(k, "spell")
+			local f = strfind(k, "spell")
 			if f then
-				local prefix = string.sub(k, 1, f-1)
-				local suffix = string.sub(k, f + 5)
+				local prefix = strsub(k, 1, f-1)
+				local suffix = strsub(k, f + 5)
 				local param
 				Ovale:Print(prefix.."type"..suffix)
 				self:SetAttribute(prefix.."type"..suffix, "spell")

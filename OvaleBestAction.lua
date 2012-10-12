@@ -10,7 +10,12 @@
 OvaleBestAction = {}
 
 --<private-static-properties>
-local tostring = tostring
+local floor, ipairs, loadstring, pairs = math.floor, ipairs, loadstring, pairs
+local strfind, tonumber, tostring = string.find, tonumber, tostring
+local GetActionCooldown, GetActionTexture, GetInventorySlotInfo = GetActionCooldown, GetActionTexture, GetInventorySlotInfo
+local GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellInfo = GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellInfo
+local GetSpellTexture, IsActionInRange, IsCurrentAction = GetSpellTexture, IsActionInRange, IsCurrentAction
+local IsItemInRange, IsSpellInRange, IsUsableAction, IsUsableSpell = IsItemInRange, IsSpellInRange, IsUsableAction, IsUsableSpell
 --</private-static-properties>
 
 --<private-static-methods>
@@ -141,7 +146,7 @@ function OvaleBestAction:GetActionInfo(element)
 		if (type(element.params[1]) == "number") then
 			itemId = element.params[1]
 		else
-			local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
+			local _,_,id = strfind(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
 			if not id then
 				return nil
 			end

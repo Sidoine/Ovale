@@ -10,6 +10,10 @@
 -- Keep data about the player action bars (key bindings mostly)
 OvaleActionBar = LibStub("AceAddon-3.0"):NewAddon("OvaleActionBar", "AceEvent-3.0")
 
+--<private-static-properties>
+local GetActionInfo, GetActionText = GetActionInfo, GetActionText
+--</private-static-properties>
+
 --<public-static-properties>
 --key: spell name / value: action icon id
 OvaleActionBar.actionSort = {}

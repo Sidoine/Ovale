@@ -16,6 +16,9 @@ do
 
 	local Type = "OvaleFrame"
 	local Version = 7
+
+	local pairs = pairs
+	local CreateFrame, GetSpellInfo = CreateFrame, GetSpellInfo
 --</private-static-properties>
 
 --<public-methods>

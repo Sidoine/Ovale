@@ -11,6 +11,13 @@
 
 OvaleFuture = LibStub("AceAddon-3.0"):NewAddon("OvaleFuture", "AceEvent-3.0")
 
+--<private-static-properties>
+local ipairs, pairs, strfind, tremove = ipairs, pairs, string.find, table.remove
+local GetComboPoints, GetMasteryEffect, GetSpellBonusDamage = GetComboPoints, GetMasteryEffect, GetSpellBonusDamage
+local GetSpellInfo, UnitAttackPower, UnitBuff = GetSpellInfo, UnitAttackPower, UnitBuff
+local UnitGUID = UnitGUID
+--</private-static-properties>
+
 --<public-static-properties>
 --spell counter (see Counter function)
 OvaleFuture.counter = {}
@@ -169,7 +176,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		--Do not use SPELL_CAST_SUCCESS because it is sent when the missile has not reached the target
 		
 			--Ovale:Print("SPELL_CAST_START " .. GetTime())
-		--if string.find(event, "SPELL") == 1 then
+		--if strfind(event, "SPELL") == 1 then
 		--	local spellId, spellName = select(12, ...)
 		--	Ovale:Print(event .. " " ..spellName .. " " ..GetTime())
 		--end
@@ -180,18 +187,18 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		--end
 		
 		if 
-				string.find(event, "SPELL_AURA_APPLIED")==1
-				or string.find(event, "SPELL_AURA_REFRESH")==1
-				or string.find(event, "SPELL_DAMAGE")==1 
-				or string.find(event, "SPELL_MISSED") == 1 
-				or string.find(event, "SPELL_CAST_SUCCESS") == 1
-				or string.find(event, "SPELL_CAST_FAILED") == 1 then
+				strfind(event, "SPELL_AURA_APPLIED")==1
+				or strfind(event, "SPELL_AURA_REFRESH")==1
+				or strfind(event, "SPELL_DAMAGE")==1 
+				or strfind(event, "SPELL_MISSED") == 1 
+				or strfind(event, "SPELL_CAST_SUCCESS") == 1
+				or strfind(event, "SPELL_CAST_FAILED") == 1 then
 			local spellId, spellName = select(12, ...)
 			for i,v in ipairs(self.lastSpell) do
 				if (v.spellId == spellId or v.auraSpellId == spellId) and v.allowRemove then
 					if not v.channeled and (v.removeOnSuccess or 
-								string.find(event, "SPELL_CAST_SUCCESS") ~= 1) then
-						table.remove(self.lastSpell, i)
+								strfind(event, "SPELL_CAST_SUCCESS") ~= 1) then
+						tremove(self.lastSpell, i)
 						Ovale.refreshNeeded["player"] = true
 						--Ovale:Print("LOG_EVENT on supprime "..spellId.." a "..GetTime())
 					end 
@@ -300,7 +307,7 @@ end
 function OvaleFuture:RemoveSpellFromList(spellId, lineId)
 	for i,v in ipairs(self.lastSpell) do
 		if v.lineId == lineId then
-			table.remove(self.lastSpell, i)
+			tremove(self.lastSpell, i)
 			--Ovale:Print("RemoveSpellFromList on supprime "..spellId)
 			break
 		end
@@ -323,7 +330,7 @@ function OvaleFuture:Apply()
 				OvaleState:AddSpellToStack(v.spellId, v.start, v.stop, v.stop, v.nocd, v.target)
 			else
 				--Ovale:Print("Removing obsolete "..v.spellId)
-				table.remove(self.lastSpell, i)
+				tremove(self.lastSpell, i)
 			end
 		end
 	end

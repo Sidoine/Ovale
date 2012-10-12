@@ -16,6 +16,11 @@ local node={}
 local defines = {}
 local customFunctions = {}
 local unknownSpellNodes = {}
+
+local ipairs, pairs, tonumber = ipairs, pairs, tonumber
+local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
+local strlen, strlower, strmatch, strsub = string.len, string.lower, string.match, string.sub
+local GetGlyphSocketInfo, GetNumGlyphSockets, GetSpecialization = GetGlyphSocketInfo, GetNumGlyphSockets, GetSpecialization
 --</private-static-properties>
 
 --<private-static-methods>
@@ -30,19 +35,19 @@ local function ParseParameters(params)
 	if not params then
 		return paramList
 	end
-	for k,v in string.gmatch(params, "([%w_]+)=([-%w\\_%.]+)") do
-		if (string.match(v,"^%-?%d+%.?%d*$")) then
+	for k,v in strgmatch(params, "([%w_]+)=([-%w\\_%.]+)") do
+		if (strmatch(v,"^%-?%d+%.?%d*$")) then
 			v = tonumber(v)
 		end	
-		if (string.match(k,"^%-?%d+%.?%d*$")) then
+		if (strmatch(k,"^%-?%d+%.?%d*$")) then
 			k = tonumber(k)
 		end		
 		paramList[k] = v
 	end
-	params = string.gsub(params,"[%w_]+=[-%w\\_%.]+","")
+	params = strgsub(params,"[%w_]+=[-%w\\_%.]+","")
 	local n=0
-	for w in string.gmatch(params, "[-%w_\\%.]+") do
-		if (string.match(w,"^%-?%d+%.?%d*$")) then
+	for w in strgmatch(params, "[-%w_\\%.]+") do
+		if (strmatch(w,"^%-?%d+%.?%d*$")) then
 			w = tonumber(w)
 		end		
 		paramList[n+1] = w
@@ -151,9 +156,9 @@ local function ParseFunction(prefix, func, params)
 	end
 	
 	if not paramList.target then
-		if string.find(func, "Target") == 1 then
+		if strfind(func, "Target") == 1 then
 			paramList.target = "target"
-			func = string.sub(func, 7)
+			func = strsub(func, 7)
 		end
 	end
 	
@@ -161,7 +166,7 @@ local function ParseFunction(prefix, func, params)
 		return customFunctions[func]
 	end
 	
-	func = string.lower(func)
+	func = strlower(func)
 
 	local newNode = { type="function", func=func, params=paramList}
 	local newNodeName = AddNode(newNode)
@@ -257,7 +262,7 @@ local function ParseSpellInfo(params)
 end
 
 local function ParseScoreSpells(params)
-	for v in string.gmatch(params, "(%d+)") do
+	for v in strgmatch(params, "(%d+)") do
 		local spellId = tonumber(v)
 		if spellId then
 			--Ovale:Print("Add spell to score "..spellId)
@@ -271,7 +276,7 @@ end
 local function ParseSpellList(name, params)
 	OvaleData.buffSpellList[name] = {}
 	local i = 1
-	for v in string.gmatch(params, "(%d+)") do
+	for v in strgmatch(params, "(%d+)") do
 		OvaleData.buffSpellList[name][i] = tonumber(v)
 		i = i + 1
 	end
@@ -335,13 +340,13 @@ end
 local function ParseGroup(text)
 	local nodes={}
 	
-	for w in string.gmatch(text, "node(%d+)") do
+	for w in strgmatch(text, "node(%d+)") do
 		nodes[#nodes+1] = node[tonumber(w)]
 	end
 	
-	text = string.gsub(text, "node%d+", "")
+	text = strgsub(text, "node%d+", "")
 
-	if (string.match(text,"[^ ]")) then
+	if (strmatch(text,"[^ ]")) then
 		Ovale:Print("syntax error:"..text)
 		return nil
 	end
@@ -353,7 +358,7 @@ end
 local function subtest(text, pattern, func)
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, pattern, func)
+		text = strgsub(text, pattern, func)
 		if (was == text) then
 			break
 		end
@@ -399,21 +404,21 @@ local function ParseDefine(key, value)
 end
 
 local function ParseLua(text)
-	local newNode = {type="lua", lua = string.sub(text, 2, string.len(text)-1)}
+	local newNode = {type="lua", lua = strsub(text, 2, strlen(text)-1)}
 	return AddNode(newNode)
 end
 
 local function ParseCommands(text)
 	local original = text
-	text = string.gsub(text,"(%b[])", ParseLua)
+	text = strgsub(text,"(%b[])", ParseLua)
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
-		text = string.gsub(text, "(%d+%.?%d*)s", ParseTime)
-		text = string.gsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
-		text = string.gsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
-		text = string.gsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
-		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		text = strgsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
+		text = strgsub(text, "(%d+%.?%d*)s", ParseTime)
+		text = strgsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
+		text = strgsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
+		text = strgsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
+		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
 		if was == text then
 			break
 		end
@@ -421,9 +426,9 @@ local function ParseCommands(text)
 	
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "node(%d+)%s*([%>%<]=?)%s*node(%d+)", ParseOp)
-		text = string.gsub(text, "node(%d+)%s*(==)%s*node(%d+)", ParseOp)
-		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		text = strgsub(text, "node(%d+)%s*([%>%<]=?)%s*node(%d+)", ParseOp)
+		text = strgsub(text, "node(%d+)%s*(==)%s*node(%d+)", ParseOp)
+		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
 		if was == text then
 			break
 		end
@@ -431,15 +436,15 @@ local function ParseCommands(text)
 		
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "not%s+node(%d+)", ParseNot)
-		text = string.gsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
-		text = string.gsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
-		text = string.gsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
-		text = string.gsub(text, "(less)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)		
-		text = string.gsub(text, "(at least)%s+node(%d+)%s+node(%d+)", ParseCompare)
-		text = string.gsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
-		text = string.gsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
-		text = string.gsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
+		text = strgsub(text, "not%s+node(%d+)", ParseNot)
+		text = strgsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
+		text = strgsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
+		text = strgsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
+		text = strgsub(text, "(less)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)		
+		text = strgsub(text, "(at least)%s+node(%d+)%s+node(%d+)", ParseCompare)
+		text = strgsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
+		text = strgsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
+		text = strgsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
 		if (was == text) then
 			break
 		end
@@ -447,13 +452,13 @@ local function ParseCommands(text)
 
 	while (1==1) do
 		local was = text
-		text = string.gsub(text, "not%s+node(%d+)", ParseNot)
-		text = string.gsub(text, "node(%d+)%s*([%*%+%-%/%>%<]=?|==)%s*node(%d+)", ParseOp)
-		text = string.gsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
-		text = string.gsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
-		text = string.gsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
-		text = string.gsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
-		text = string.gsub(text, "{([node%d ]*)}", ParseGroup)
+		text = strgsub(text, "not%s+node(%d+)", ParseNot)
+		text = strgsub(text, "node(%d+)%s*([%*%+%-%/%>%<]=?|==)%s*node(%d+)", ParseOp)
+		text = strgsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
+		text = strgsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
+		text = strgsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
+		text = strgsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
+		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
 		if (was == text) then
 			break
 		end
@@ -462,7 +467,7 @@ local function ParseCommands(text)
 		
 	local masterNode
 	if (text) then
-		masterNode = string.match(text, "node(%d+)")
+		masterNode = strmatch(text, "node(%d+)")
 	end
 	if (not masterNode) then
 		Ovale:Print("no master node")
@@ -470,8 +475,8 @@ local function ParseCommands(text)
 	end
 	
 	-- Si il reste autre chose que des espaces, c'est une erreur de syntaxe
-	text = string.gsub(text, "node%d+", "", 1)
-	if (string.match(text,"[^ ]")) then
+	text = strgsub(text, "node%d+", "", 1)
+	if (strmatch(text,"[^ ]")) then
 		Ovale:Print("Group:"..original)
 		Ovale:Print("syntax error:"..text)
 		return nil
@@ -522,8 +527,8 @@ function OvaleCompile:CompileInputs(text)
 	Ovale.casesACocher = {}
 	Ovale.listes = {}
 	
-	text = string.gsub(text, "AddListItem%s*%(%s*([%w_]+)%s+([%w_]+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
-	text = string.gsub(text, "AddCheckBox%s*%(%s*([%w_]+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
+	text = strgsub(text, "AddListItem%s*%(%s*([%w_]+)%s+([%w_]+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddListItem)
+	text = strgsub(text, "AddCheckBox%s*%(%s*([%w_]+)%s+\"(.-)\"%s*(.-)%s*%)", ParseAddCheckBox)
 	return text
 end
 
@@ -535,11 +540,11 @@ function OvaleCompile:Compile(text)
 	unknownSpellNodes = {}
 	
 	-- Suppression des commentaires
-	text = string.gsub(text, "#.-\n","")
-	text = string.gsub(text, "#.*$","")
+	text = strgsub(text, "#.-\n","")
+	text = strgsub(text, "#.*$","")
 
 	-- Define(CONSTANTE valeur)
-	text = string.gsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
+	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
 	
 	-- On remplace les constantes par leur valeur
 	for k,v in pairs(defines) do
@@ -547,29 +552,29 @@ function OvaleCompile:Compile(text)
 	end
 	
 	-- Fonctions
-	text = string.gsub(text, "SpellName%s*%(%s*(%w+)%s*%)", ParseSpellName)
-	text = string.gsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
+	text = strgsub(text, "SpellName%s*%(%s*(%w+)%s*%)", ParseSpellName)
+	text = strgsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
 	
 	-- Options diverses
 	OvaleData:ResetSpellInfo()
-	text = string.gsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
-	text = string.gsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
-	text = string.gsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
-	text = string.gsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
-	text = string.gsub(text, "SpellDamageBuff%s*%((.-)%)", ParseSpellDamageBuff)
-	text = string.gsub(text, "SpellDamageDebuff%s*%((.-)%)", ParseSpellDamageDebuff)
-	text = string.gsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
-	text = string.gsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
-	text = string.gsub(text, "SpellList%s*%(%s*([%w_]+)%s*(.-)%)", ParseSpellList)
+	text = strgsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
+	text = strgsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
+	text = strgsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
+	text = strgsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
+	text = strgsub(text, "SpellDamageBuff%s*%((.-)%)", ParseSpellDamageBuff)
+	text = strgsub(text, "SpellDamageDebuff%s*%((.-)%)", ParseSpellDamageDebuff)
+	text = strgsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
+	text = strgsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
+	text = strgsub(text, "SpellList%s*%(%s*([%w_]+)%s*(.-)%)", ParseSpellList)
 			
 	-- On vire les espaces en trop
-	text = string.gsub(text, "\n", " ")
-	text = string.gsub(text, "%s+", " ")
+	text = strgsub(text, "\n", " ")
+	text = strgsub(text, "%s+", " ")
 	
 	-- On compile les AddCheckBox et AddListItem
 	text = self:CompileInputs(text)
 	
-	for p,t in string.gmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
+	for p,t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
 		local newNode = ParseCommands(t)
 		if newNode then
 			customFunctions[p] = "node"..newNode
@@ -579,14 +584,14 @@ function OvaleCompile:Compile(text)
 	local masterNodes ={}
 	
 	-- On compile les AddIcon
-	for p,t in string.gmatch(text, "AddActionIcon%s*(.-)%s*(%b{})") do
+	for p,t in strgmatch(text, "AddActionIcon%s*(.-)%s*(%b{})") do
 		local newNode = ParseAddIcon(p,t,true)
 		if newNode then
 			masterNodes[#masterNodes+1] = newNode
 		end
 	end
 	
-	for p,t in string.gmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
+	for p,t in strgmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
 		local newNode = ParseAddIcon(p,t)
 		if newNode then
 			masterNodes[#masterNodes+1] = newNode

@@ -24,6 +24,9 @@ OvaleAura.playerGUID = nil
 
 --<private-static-properties>
 local baseDamageMultiplier = 1
+
+local pairs, select, strfind = pairs, select, string.find
+local GetSpecialization, GetShapeshiftForm, UnitAura = GetSpecialization, GetShapeshiftForm, UnitAura
 --</private-static-properties>
 
 -- Events
@@ -52,7 +55,7 @@ end
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 
-	if string.find(event, "SPELL_AURA_") == 1 then
+	if strfind(event, "SPELL_AURA_") == 1 then
 		local spellId, spellName, spellSchool, auraType = select(12, ...)
 	
 		local unitId = OvaleGUID:GetUnitId(destGUID)

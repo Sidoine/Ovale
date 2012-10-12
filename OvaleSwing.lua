@@ -42,11 +42,12 @@ local delayspells = {
 }
 local resetautoshotspells = {
 }
-
 local _, playerclass = UnitClass('player')
+
 local unpack = unpack
 local math_abs = math.abs
-local GetTime = GetTime
+local GetSpellInfo, GetTime, UnitAttackSpeed = GetSpellInfo, GetTime, UnitAttackSpeed
+local UnitDamage, UnitRangedDamage = UnitDamage, UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 --</private-static-properties>
 

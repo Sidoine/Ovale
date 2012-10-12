@@ -9,6 +9,11 @@
 
 OvaleEquipement = LibStub("AceAddon-3.0"):NewAddon("OvaleEquipement", "AceEvent-3.0")
 
+--<private-static-properties>
+local strfind, tonumber = string.find, tonumber
+local GetInventoryItemLink = GetInventoryItemLink
+--</private-static-properties>
+
 --<public-static-properties>
 OvaleEquipement.nombre = {}
 --</public-static-properties>
@@ -28,7 +33,7 @@ end
 function OvaleEquipement:GetItemId(slot)
 	local link = GetInventoryItemLink("player", GetInventorySlotInfo(slot))
 	if not link then return nil end
-	local a, b, itemId = string.find(link, "item:(%d+)");
+	local a, b, itemId = strfind(link, "item:(%d+)");
 	return tonumber(itemId);
 end
 

@@ -11,6 +11,10 @@
 
 OvaleOptions = LibStub("AceAddon-3.0"):NewAddon("OvaleOptions", "AceEvent-3.0", "AceConsole-3.0")
 
+--<private-static-properties>
+local strgsub = string.gsub
+--</private-static-properties>
+
 --<public-static-properties>
 OvaleOptions.firstInit = false
 OvaleOptions.db = nil
@@ -278,7 +282,7 @@ local options =
 					multiline = 15,
 					name = L["Code"],
 					get = function(info)
-						return string.gsub(OvaleOptions.db.profile.code, "\t", "    ")
+						return strgsub(OvaleOptions.db.profile.code, "\t", "    ")
 					end,
 					set = function(info,v)
 						OvaleOptions.db.profile.code = v

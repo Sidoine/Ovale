@@ -13,6 +13,10 @@ Ovale = LibStub("AceAddon-3.0"):NewAddon("Ovale", "AceEvent-3.0", "AceConsole-3.
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local Recount = Recount
 local Skada = Skada
+
+local pairs, strsplit = pairs, string.split
+local SendAddonMessage, UnitAura, UnitCanAttack = SendAddonMessage, UnitAura, UnitCanAttack
+local UnitExists, UnitInVehicle, UnitIsDead = UnitExists, UnitInVehicle, UnitIsDead
 --</private-static-properties>
 
 --<public-static-properties>

@@ -34,8 +34,10 @@ OvaleState.lastSpellId = nil
 --</public-static-properties>
 
 --<private-static-properties>
-local UnitGUID = UnitGUID
-local tostring = tostring
+local floor, pairs, tostring = math.floor, pairs, tostring
+local GetComboPoints, GetRuneCooldown, GetRuneType = GetComboPoints, GetRuneCooldown, GetRuneType
+local GetSpellInfo, UnitGUID, UnitHealth = GetSpellInfo, UnitGUID, UnitHealth
+local UnitHealthMax, UnitPower, UnitPowerMax = UnitHealthMax, UnitPower, UnitPowerMax
 --</private-static-properties>
 
 --<public-static-methods>

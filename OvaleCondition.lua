@@ -42,7 +42,20 @@ local savedHealth = {}
 local targetGUID = {}
 local lastSPD = {}
 
-local tostring = tostring
+local floor, pairs, select, strfind, tostring = math.floor, pairs, select, string.find, tostring
+local GetGlyphSocketInfo, GetInventoryItemID, GetInventoryItemLink = GetGlyphSocketInfo, GetInventoryItemID, GetInventoryItemLink
+local GetInventorySlotInfo, GetItemCooldown, GetItemCount = GetInventorySlotInfo, GetItemCooldown, GetItemCount
+local GetItemInfo, GetMasteryEffect, GetRune = GetItemInfo, GetMasteryEffect, GetRune
+local GetRuneCount, GetSpellBonusDamage, GetSpellCharges = GetRuneCount, GetSpellBonusDamage, GetSpellCharges
+local GetSpellInfo, GetTotemInfo, GetTrackingInfo = GetSpellInfo, GetTotemInfo, GetTrackingInfo
+local GetUnitSpeed, HasFullControl, IsSpellInRange = GetUnitSpeed, HasFullControl, IsSpellInRange
+local IsStealthed, IsUsableSpell, UnitAttackPower = IsStealthed, IsUsableSpell, UnitAttackPower
+local UnitCastingInfo, UnitChannelInfo, UnitClass = UnitCastingInfo, UnitChannelInfo, UnitClass
+local UnitClassification, UnitCreatureFamily, UnitCreatureType = UnitClassification, UnitCreatureFamily, UnitCreatureType
+local UnitDebuff, UnitDetailedThreatSituation, UnitExists = UnitDebuff, UnitDetailedThreatSituation, UnitExists
+local UnitHealth, UnitHealthMax, UnitIsDead = UnitHealth, UnitHealthMax, UnitIsDead
+local UnitIsFriend, UnitIsUnit, UnitLevel = UnitIsFriend, UnitIsUnit, UnitLevel
+local UnitPower, UnitPowerMax = UnitPower, UnitPowerMax
 
 --</private-static-properties>
 
@@ -1051,7 +1064,7 @@ OvaleCondition.conditions=
 	-- returns: bool or number
 	eclipse = function(condition)
 		return compare(OvaleState.state.eclipse, condition[1], condition[2])
-	end
+	end,
 
 	eclipsedir = function(condition)
 		return compare(OvaleState:GetEclipseDir(), condition[1], condition[2])
@@ -1219,7 +1232,7 @@ OvaleCondition.conditions=
 -- if HasShield() Spell(shield_wall)
 
 	hasshield = function(condition)
-		local _,_,id = string.find(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
+		local _,_,id = strfind(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
 		if (not id) then
 			return testbool(false, condition[1])
 		end

@@ -12,6 +12,11 @@
 
 OvaleGUID = LibStub("AceAddon-3.0"):NewAddon("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
 
+--<private-static-properties>
+local strfind, strsub = string.find, string.sub
+local GetNumGroupMembers, UnitGUID, UnitName = GetNumGroupMembers, UnitGUID, UnitName
+--</private-static-properties>
+
 --<public-static-properties>
 OvaleGUID.unitId = {}
 OvaleGUID.guid = {}
@@ -101,11 +106,11 @@ function OvaleGUID:GROUP_ROSTER_UPDATE(event)
 end
 
 function OvaleGUID:UNIT_PET(event, unitId)
-	if string.find(unitId, "party") == 0 then
-		local petId = "partypet" .. string.sub(unitId, 6)
+	if strfind(unitId, "party") == 0 then
+		local petId = "partypet" .. strsub(unitId, 6)
 		self:UpdateWithTarget(petId)
-	elseif string.find(unitId, "raid") == 0 then
-		local petId = "raidpet" .. string.sub(unitId, 5)
+	elseif strfind(unitId, "raid") == 0 then
+		local petId = "raidpet" .. strsub(unitId, 5)
 		self:UpdateWithTarget(petId)
 	elseif unitId == "player" then
 		self:UpdateWithTarget("pet")

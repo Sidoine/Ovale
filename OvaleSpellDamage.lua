@@ -11,6 +11,11 @@
 
 OvaleSpellDamage = LibStub("AceAddon-3.0"):NewAddon("OvaleSpellDamage", "AceEvent-3.0")
 
+--<private-static-properties>
+local select, strfind = select, string.find
+local UnitGUID = UnitGUID
+--</private-static-properties>
+
 --<public-static-properties>
 OvaleSpellDamage.value = {}
 OvaleSpellDamage.playerGUID = nil
@@ -31,7 +36,7 @@ function OvaleSpellDamage:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 
 	if sourceGUID == self.playerGUID then
-		if string.find(event, "SPELL_PERIODIC_DAMAGE")==1 or string.find(event, "SPELL_DAMAGE")==1 then
+		if strfind(event, "SPELL_PERIODIC_DAMAGE")==1 or strfind(event, "SPELL_DAMAGE")==1 then
 			local spellId, spellName, spellSchool, amount = select(12, ...)
 			self.value[spellId] = amount
 		end
