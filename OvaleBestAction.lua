@@ -9,15 +9,11 @@
 
 OvaleBestAction = {}
 
---<private-static-methods>
-local function nilstring(text)
-	if text == nil then
-		return "nil"
-	else
-		return text
-	end
-end
+--<private-static-properties>
+local tostring = tostring
+--</private-static-properties>
 
+--<private-static-methods>
 local function printTime(temps)
 	if (temps == nil) then
 		Ovale:Print("> nil")
@@ -153,7 +149,7 @@ function OvaleBestAction:GetActionInfo(element)
 		end
 		
 		if (Ovale.trace) then
-			Ovale:Print("Item "..nilstring(itemId))
+			Ovale:Print("Item "..tostring(itemId))
 		end
 
 		local spellName = GetItemSpell(itemId)
@@ -254,7 +250,7 @@ function OvaleBestAction:Compute(element)
 				else
 					restant = actionCooldownDuration + actionCooldownStart
 				end
-				Ovale:Log("restant = "..restant.." attenteFinCast="..nilstring(OvaleState.attenteFinCast))
+				Ovale:Log("restant = "..restant.." attenteFinCast="..tostring(OvaleState.attenteFinCast))
 				if restant<OvaleState.attenteFinCast then
 					if	not OvaleData.spellInfo[OvaleState.currentSpellId] or
 							not OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling then
@@ -308,7 +304,7 @@ function OvaleBestAction:Compute(element)
 				for k,v in pairs(element.params) do
 					parameterList = parameterList..k.."="..v..","
 				end
-				Ovale:Print("Function "..parameterList..") returned "..nilstring(start)..","..nilstring(ending)..","..nilstring(value)..","..nilstring(origin)..","..nilstring(rate))
+				Ovale:Print("Function "..parameterList..") returned "..tostring(start)..","..tostring(ending)..","..tostring(value)..","..tostring(origin)..","..tostring(rate))
 			end
 			
 			if value  then
@@ -335,7 +331,7 @@ function OvaleBestAction:Compute(element)
 		return addTime(startA, timeA), addTime(endA, timeA)
 	elseif (element.type == "before") then
 		if (Ovale.trace) then
-			--Ovale:Print(nilstring(element.time).."s before ["..element.nodeId.."]")
+			--Ovale:Print(tostring(element.time).."s before ["..element.nodeId.."]")
 		end
 		local timeA = self:Compute(element.time)
 		local startA, endA = self:Compute(element.a)
@@ -379,7 +375,7 @@ function OvaleBestAction:Compute(element)
 		Ovale:Log("compare "..element.comparison)
 		local tempsA = self:Compute(element.a)
 		local timeB = self:Compute(element.time)
-		Ovale:Log(nilstring(tempsA).." "..element.comparison.." "..nilstring(timeB))
+		Ovale:Log(tostring(tempsA).." "..element.comparison.." "..tostring(timeB))
 		if element.comparison == "more" and (not tempsA or tempsA>timeB) then
 			if Ovale.trace then Ovale:Print(element.type.." return 0") end
 			return 0
@@ -425,7 +421,7 @@ function OvaleBestAction:Compute(element)
 			endB = endA
 		end
 		if Ovale.trace then
-			Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB).." ["..element.nodeId.."]")
+			Ovale:Print(element.type.." return "..tostring(startB)..","..tostring(endB).." ["..element.nodeId.."]")
 		end
 		return startB, endB, prioriteB, elementB
 	elseif element.type == "unless" then
@@ -441,7 +437,7 @@ function OvaleBestAction:Compute(element)
 		end
 		
 		if isAfterEqual(startA, startB) and isBefore(endA, endB) then
-			if Ovale.trace then Ovale:Print(element.type.." return "..nilstring(endA)..","..nilstring(endB)) end
+			if Ovale.trace then Ovale:Print(element.type.." return "..tostring(endA)..","..tostring(endB)) end
 			return endA, endB, prioriteB, elementB
 		end
 		
@@ -453,7 +449,7 @@ function OvaleBestAction:Compute(element)
 			startB = endA
 		end
 					
-		if Ovale.trace then Ovale:Print(element.type.." return "..nilstring(startB)..","..nilstring(endB)) end
+		if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startB)..","..tostring(endB)) end
 		return startB, endB, prioriteB, elementB
 	elseif element.type == "not" then
 		local startA, endA = self:ComputeBool(element.a)
@@ -643,7 +639,7 @@ function OvaleBestAction:Compute(element)
 		return startA, endA, 3, result
 	elseif element.type == "lua" then
 		local ret = loadstring(element.lua)()
-		Ovale:Log("lua "..nilstring(ret))
+		Ovale:Log("lua "..tostring(ret))
 		if not element.result then
 			element.result = { type = "value" }
 		end
@@ -727,9 +723,9 @@ function OvaleBestAction:Compute(element)
 					if bestElement.params then
 						id = bestElement.params[1]
 					end
-					Ovale:Print("group best action "..tostring(id).." remains "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
+					Ovale:Print("group best action "..tostring(id).." remains "..meilleurTempsFils..","..tostring(bestEnd).." ["..element.nodeId.."]")
 				else
-					Ovale:Print("group no best action returns "..meilleurTempsFils..","..nilstring(bestEnd).." ["..element.nodeId.."]")
+					Ovale:Print("group no best action returns "..meilleurTempsFils..","..tostring(bestEnd).." ["..element.nodeId.."]")
 				end
 			end
 			return meilleurTempsFils, bestEnd, meilleurePrioriteFils, bestElement

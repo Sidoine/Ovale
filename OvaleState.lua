@@ -35,17 +35,8 @@ OvaleState.lastSpellId = nil
 
 --<private-static-properties>
 local UnitGUID = UnitGUID
+local tostring = tostring
 --</private-static-properties>
-
---<private-static-methods>
-local function nilstring(text)
-	if text == nil then
-		return "nil"
-	else
-		return text
-	end
-end
---</private-static-methods>
 
 --<public-static-methods>
 function OvaleState:StartNewFrame()
@@ -253,7 +244,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 				local buffAura = self:GetAura("player", newSpellInfo.buffnocd, true)
 				if self.traceAura then
 					if buffAura then
-						Ovale:Print("buffAura stacks = "..buffAura.stacks.." start="..nilstring(buffAura.start).." ending = "..nilstring(buffAura.ending))
+						Ovale:Print("buffAura stacks = "..buffAura.stacks.." start="..tostring(buffAura.start).." ending = "..tostring(buffAura.ending))
 						Ovale:Print("startCast = "..startCast)
 					else
 						Ovale:Print("buffAura = nil")

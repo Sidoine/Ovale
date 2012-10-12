@@ -42,6 +42,8 @@ local savedHealth = {}
 local targetGUID = {}
 local lastSPD = {}
 
+local tostring = tostring
+
 --</private-static-properties>
 
 --<private-static-methods>
@@ -151,14 +153,6 @@ local function addOrSubTime(time1, operator, duration)
 		return addTime(time1, -duration)
 	else
 		return addTime(time1, duration)
-	end
-end
-
-local function nilstring(text)
-	if text == nil then
-		return "nil"
-	else
-		return text
 	end
 end
 
@@ -335,7 +329,7 @@ local function GetTargetAura(condition, target)
 	end	
 	
 	if Ovale.trace then
-		Ovale:Print("GetTargetAura = start=".. nilstring(aura.start) .. " end="..nilstring(aura.ending).." stacks=" ..nilstring(aura.stacks).."/"..stacks)
+		Ovale:Print("GetTargetAura = start=".. tostring(aura.start) .. " end="..tostring(aura.ending).." stacks=" ..tostring(aura.stacks).."/"..stacks)
 	end
 		
 	if (not condition.mine or (aura.mine and condition.mine==1) or (not aura.mine and condition.mine==0)) and aura.stacks>=stacks then
@@ -522,8 +516,8 @@ OvaleCondition.conditions=
 		local start, ending = GetTargetAura(condition, getTarget(condition.target))
 		local timeBefore = avecHate(condition[2], condition.haste)
 		if Ovale.trace then
-			Ovale:Print("timeBefore = " .. nilstring(timeBefore))
-			Ovale:Print("start = " .. nilstring(ending))
+			Ovale:Print("timeBefore = " .. tostring(timeBefore))
+			Ovale:Print("start = " .. tostring(ending))
 		end
 		return addTime(ending, -timeBefore)
 	end,
