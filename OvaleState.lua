@@ -163,15 +163,6 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 		end
 
 		if newSpellInfo then
-			-- Monks in Stance of the Fierce Tiger generate one extra Chi per Jab and Expel Harm.
-			if OvaleData.className == "MONK" then
-				if OvaleAura.stance == 2 or (OvaleAura.mastery ~= 2 and OvaleAura.stance == 1) then
-					if spellId == 100780 or spellId == 115072 then
-						self.state.chi = self.state.chi + 1
-					end
-				end
-			end
-
 			-- Update power state, except for eclipse, combo, and runes.
 			for k,v in pairs(OvaleData.power) do
 				-- eclipse cost is on hit

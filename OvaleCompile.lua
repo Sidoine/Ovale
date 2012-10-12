@@ -90,6 +90,12 @@ local function TestConditions(paramList)
 	if paramList.mastery and paramList.mastery~=GetSpecialization() then
 		return false
 	end
+	if paramList.if_stance then
+		Ovale.compileOnStances = true
+		if paramList.if_stance ~= GetShapeshiftForm() then
+			return false
+		end
+	end
 	if paramList.talent and not HasTalent(paramList.talent) then
 		return false
 	end
@@ -534,6 +540,7 @@ end
 
 function OvaleCompile:Compile(text)
 	Ovale.compileOnItems = false
+	Ovale.compileOnStances = false
 	Ovale.bug = false
 	node = {}
 	defines = {}
