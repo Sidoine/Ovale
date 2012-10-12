@@ -822,7 +822,7 @@ OvaleCondition.conditions=
 -- @return A boolean value for the result of the comparison.
 -- @usage
 -- if Chi() ==4 Spell(chi_burst)
--- if Chi(equal 4) Spell(chi_burst)
+-- if Chi(more 3) Spell(chi_burst)
 
 	chi = function(condition)
 		return testValue(condition[1], condition[2], OvaleState.state.chi, OvaleState.currentTime, OvaleState.powerRate.chi)
@@ -1060,11 +1060,37 @@ OvaleCondition.conditions=
 		end
 	end,
 
-	--Compare to eclipse power. <0 lunar, >0 solar
-	-- returns: bool or number
+--- Get the current amount of Eclipse power for balance druids.
+-- A negative amount of power signifies being closer to Lunar Eclipse.
+-- A positive amount of power signifies being closer to Solar Eclipse.
+-- @name Eclipse
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The amount of Eclipse power.
+-- @return A boolean value for the result of the comparison.
+-- @see EclipseDir
+-- @usage
+-- if Eclipse() < 0-70 and EclipseDir() <0 Spell(wrath)
+-- if Eclipse(less -70) and EclipseDir(less 0) Spell(wrath)
+
 	eclipse = function(condition)
 		return compare(OvaleState.state.eclipse, condition[1], condition[2])
 	end,
+
+--- Get the current direction of the Eclipse status on the Eclipse bar for balance druids.
+-- A negative number means heading toward Lunar Eclipse.
+-- A positive number means heading toward Solar Eclipse.
+-- @name EclipseDir
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current direction.
+-- @return A boolean value for the result of the comparison.
+-- @see Eclipse
+-- @usage
+-- if Eclipse() < 0-70 and EclipseDir() <0 Spell(wrath)
+-- if Eclipse(less -70) and EclipseDir(less 0) Spell(wrath)
 
 	eclipsedir = function(condition)
 		return compare(OvaleState:GetEclipseDir(), condition[1], condition[2])
@@ -1172,13 +1198,23 @@ OvaleCondition.conditions=
 -- @return A boolean value for the result of the comparison.
 -- @usage
 -- if FocusRegen() >20 Spell(arcane_shot)
+-- if FocusRegen(more 20) Spell(arcane_shot)
 
 	focusregen = function(condition)
 		return compare(OvaleState.powerRate.focus, condition[1], condition[2])
 	end,
 
-	-- Get the global countdown
-	-- returns: bool or number
+--- Get the player's global cooldown in seconds.
+-- @name GCD
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if GCD() <1.1 Spell(frostfire_bolt)
+-- if GCD(less 1.1) Spell(frostfire_bolt)
+
 	gcd = function(condition)
 		return compare(OvaleState.gcd, condition[1], condition[2])
 	end,
@@ -1721,10 +1757,17 @@ OvaleCondition.conditions=
 		return compare(100*UnitHealth(target)/UnitHealthMax(target), condition[1], condition[2])
 	end,
 
-	-- Test if a list item is selected
-	-- 1 : the list name
-	-- 2 : the item name
-	-- returns: bool
+--- Test if a list is currently set to the given value.
+-- @name List
+-- @paramsig boolean
+-- @param id The name of a list. It should match one defined by AddListItem(...).
+-- @param value The value to test.
+-- @return A boolean value.
+-- @usage
+-- AddListItem(opt_curse coe "Curse of the Elements" default)
+-- AddListItem(opt_curse cot "Curse of Tongues")
+-- if List(opt_curse coe) Spell(curse_of_the_elements)
+
 	list = function(condition)
 		if (condition[1]) then
 			if (Ovale:GetListValue(condition[1]) == condition[2]) then
@@ -1817,12 +1860,12 @@ OvaleCondition.conditions=
 -- @return The maximum health.
 -- @return A boolean value for the result of the comparison.
 -- @usage
--- if MaxHealth() >10000000 Item(mogu_power_potion)
--- if MaxHealth(more 10000000) Item(mogu_power_potion)
+-- if target.MaxHealth() >10000000 Item(mogu_power_potion)
+-- if target.MaxHealth(more 10000000) Item(mogu_power_potion)
 
 	maxhealth = function(condition)
 		local target = getTarget(condition.target)
-		return compare(UnitMaxHealth(target), condition[1], condition[2])
+		return compare(UnitHealthMax(target), condition[1], condition[2])
 	end,
 
 --- Get the level of mana of the target when it is at full mana.
@@ -1940,8 +1983,19 @@ OvaleCondition.conditions=
 		return testbool(condition[1] == OvaleState.lastSpellId, condition[2])
 	end,
 
-	-- Check if the pet is present and alive
-	-- return: bool
+--- Test if the pet exists and is alive.
+-- PetPresent() is equivalent to pet.Present().
+-- @name PetPresent
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target exists. If no, then return true if it doesn't exist.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @see Present
+-- @usage
+-- if target.IsInterruptible() and PetPresent(yes)
+--     Spell(pet_pummel)
+
 	petpresent = function(condition)
 		local present = UnitExists("pet") and not UnitIsDead("pet")
 		return testbool(present, condition[1])
@@ -2139,11 +2193,20 @@ OvaleCondition.conditions=
 		return compare(GetUnitSpeed(getTarget(condition.target))*100/7, condition[1], condition[2])
 	end,
 
-	-- Check if the spell is usable
-	-- 1: spell Id
-	-- return: bool
+--- Test if the given spell is usable.
+-- A spell is usable if the player has learned the spell and has the resources required to cast the spell.
+-- @name SpellUsable
+-- @paramsig boolean
+-- @param id The spell ID.
+-- @param yesno Optional. If yes, then return true if the target is aggroed. If no, then return true if it isn't aggroed.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- if SpellUsable(tigers_fury) Spell(berserk_cat)
+
 	spellusable = function(condition)
-		return testbool(IsUsableSpell(condition[1]), condition[2], condition[3])
+		return testbool(IsUsableSpell(condition[1]), condition[2])
 	end,
 
 --- Get the number of charges of the spell.
@@ -2208,10 +2271,17 @@ OvaleCondition.conditions=
 		end
 	end,
 
-	-- Get the spell data listed in SpellInfo()
-	-- 1: spell ID
-	-- 2: key
-	-- return: number
+--- Get data for the given spell defined by SpellInfo(...)
+-- @name SpellData
+-- @paramsig number
+-- @param id The spell ID.
+-- @param key The name of the data set by SpellInfo(...).
+--     Valid values are any alphanumeric string.
+-- @return The number data associated with the given key.
+-- @usage
+-- if BuffRemains(slice_and_dice) >= SpellData(shadow_blades duration)
+--     Spell(shadow_blades)
+
 	spelldata = function(condition)
 		local si = OvaleData.spellInfo[condition[1]]
 		if si then
@@ -2305,8 +2375,19 @@ OvaleCondition.conditions=
 	targetisplayer = function(condition)
 		return testbool(UnitIsUnit("player",getTarget(condition.target).."target"), condition[1])
 	end,
-	-- Get the threat value (0 to 100)
-	-- return: number
+
+--- Get the amount of threat on the current target relative to the its primary aggro target, scaled to between 0 (zero) and 100.
+-- This is a number between 0 (no threat) and 100 (will become the primary aggro target).
+-- @name Threat
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The amount of threat.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Threat() >90 Spell(fade)
+-- if Threat(more 90) Spell(fade)
+
 	threat = function(condition)
 		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
 		return compare(threatpct, condition[1], condition[2])
