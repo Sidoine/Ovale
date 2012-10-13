@@ -374,8 +374,8 @@ local function getTargetDead(target)
 	if newHealth then
 		Ovale:Log("newHealth = " .. newHealth)
 	end
-	if UnitHealthMax(target)==1 then
-		Ovale:Log("Dummy, return in the future")
+	if UnitHealthMax(target) <= 2 then
+		Ovale:Log("Training Dummy, return in the future")
 		return OvaleState.currentTime + 3600
 	end
 	if second~=lastSaved[target] and targetGUID[target] then
