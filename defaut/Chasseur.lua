@@ -98,7 +98,6 @@ AddIcon mastery=1 help=main
 	if BuffStacks(pet_frenzy any=1)>4 Spell(focus_fire)
 	if not target.DebuffPresent(serpent_sting_aura) Spell(serpent_sting)
 	if SpellUsable(fervor) and not target.DebuffPresent(fervor) and Focus() <=65 Spell(fervor)
-	if Enemies() >5 Spell(cobra_shot)
 	if target.HealthPercent(less 20) Spell(kill_shot)
 	Spell(kill_command)
 	if SpellUsable(dire_beast) and Focus() <=90 Spell(dire_beast)
@@ -118,16 +117,20 @@ AddIcon mastery=1 help=offgcd
 		Spell(trueshot_aura)
 	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
-	unless Stance(2) Spell(aspect_of_the_fox)
 	if Focus() >60 and not BuffPresent(beast_within) Spell(bestial_wrath)
 	Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
 }
+AddIcon mastery=1 help=moving
+{
+	unless Stance(2) Spell(aspect_of_the_fox)
+}
 AddIcon mastery=1 help=aoe
 {
 	Spell(explosive_trap)
 	Spell(multi_shot)
+	Spell(cobra_shot)
 }
 AddIcon mastery=1 help=cd
 {
@@ -146,7 +149,6 @@ AddIcon mastery=2 help=main
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(barrage) Spell(barrage)
 	if SpellUsable(blink_strike) Spell(blink_strike)
-	if Enemies() >5 Spell(steady_shot)
 	if not target.DebuffPresent(serpent_sting_aura) and target.HealthPercent() <=90 Spell(serpent_sting)
 	if target.HealthPercent() <=90 Spell(chimera_shot)
 	if SpellUsable(dire_beast) Spell(dire_beast)
@@ -154,8 +156,8 @@ AddIcon mastery=2 help=main
 	if target.HealthPercent(less 20) Spell(kill_shot)
 	if BuffStacks(master_marksman_fire) Spell(aimed_shot)
 	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
-	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffStacks(burst_haste any=1) Spell(aimed_shot)
-	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffStacks(burst_haste any=1) } Spell(arcane_shot)
+	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(aimed_shot)
+	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffStacks(bloodlust any=1) } Spell(arcane_shot)
 	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	Spell(steady_shot)
 }
@@ -166,15 +168,19 @@ AddIcon mastery=2 help=offgcd
 		Spell(trueshot_aura)
 	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
-	unless Stance(2) Spell(aspect_of_the_fox)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
 	Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
+}
+AddIcon mastery=2 help=moving
+{
+	unless Stance(2) Spell(aspect_of_the_fox)
 }
 AddIcon mastery=2 help=aoe
 {
 	Spell(explosive_trap)
 	Spell(multi_shot)
+	Spell(steady_shot)
 }
 AddIcon mastery=2 help=cd
 {
@@ -194,11 +200,12 @@ AddIcon mastery=3 help=main
 	if BuffStacks(lock_and_load) Spell(explosive_shot)
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(barrage) Spell(barrage)
-	if Enemies() >2 Spell(cobra_shot)
 	if not target.DebuffPresent(serpent_sting_aura) and target.DeadIn() >=10 Spell(serpent_sting)
 	if SpellCooldown(explosive_shot) Spell(explosive_shot)
 	if target.HealthPercent(less 20) Spell(kill_shot)
 	if not target.DebuffPresent(black_arrow) and target.DeadIn() >=8 Spell(black_arrow)
+	if BuffStacks(thrill_of_the_hunt) and target.DebuffRemains(serpent_sting_aura) <2 Spell(multi_shot)
+	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
 	if SpellUsable(dire_beast) Spell(dire_beast)
 	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	if target.DebuffRemains(serpent_sting_aura) <6 Spell(cobra_shot)
@@ -212,16 +219,19 @@ AddIcon mastery=3 help=offgcd
 		Spell(trueshot_aura)
 	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
-	unless Stance(2) Spell(aspect_of_the_fox)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
 	Spell(stampede)
+}
+AddIcon mastery=3 help=moving
+{
+	unless Stance(2) Spell(aspect_of_the_fox)
 }
 AddIcon mastery=3 help=aoe
 {
 	Spell(explosive_trap)
 	Spell(multi_shot)
-	if BuffStacks(thrill_of_the_hunt) Spell(multi_shot)
+	Spell(cobra_shot)
 }
 AddIcon mastery=3 help=cd
 {

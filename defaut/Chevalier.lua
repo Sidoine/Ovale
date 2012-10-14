@@ -108,8 +108,8 @@ AddIcon mastery=2 help=cd
 		Spell(army_of_the_dead)
 	}
 	if TimeInCombat() >=10 Spell(blood_fury)
-	if {RuneCount(frost) >=1 or RuneCount(death) >=1 }  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(raise_dead)
+	if {RuneCount(frost) >=1 or RuneCount(death) >=1 }  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if TalentPoints(unholy_blight_talent) and {target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 } Spell(unholy_blight)
 	if target.DeadIn() <=60 and BuffPresent(mogu_power_potion_aura) Spell(empower_rune_weapon)
 	Spell(empower_rune_weapon)

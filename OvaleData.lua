@@ -235,7 +235,9 @@ OvaleData.buffSpellList =
 	},
 }
 OvaleData.buffSpellList.bloodlust_aura = OvaleData.buffSpellList.burst_haste
+OvaleData.buffSpellList.bloodlust = OvaleData.buffSpellList.burst_haste
 OvaleData.buffSpellList.heroism_aura = OvaleData.buffSpellList.burst_haste
+OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 --</public-static-properties>
 
 --<private-static-properties>

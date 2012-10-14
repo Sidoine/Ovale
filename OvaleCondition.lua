@@ -2419,6 +2419,16 @@ OvaleCondition.conditions=
 		return nil
 	end,
 
+--- Get the number of ticks that would be added if the dot is refreshed.
+-- Not implemented, always returns 0.
+-- @name TicksAdded
+-- @paramsig number
+-- @param id The aura spell ID
+-- @return The number of added ticks.
+	ticksadded = function(condition)
+		return 0, nil, 0, 0, 0
+	end,
+	
 --- Get the remaining number of ticks of a damage-over-time (DoT) aura on a target.
 -- @name TicksRemain
 -- @paramsig number
