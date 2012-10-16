@@ -16,7 +16,7 @@ local Skada = Skada
 
 local pairs, strsplit = pairs, string.split
 local SendAddonMessage, UnitAura, UnitCanAttack = SendAddonMessage, UnitAura, UnitCanAttack
-local UnitExists, UnitInVehicle, UnitIsDead = UnitExists, UnitInVehicle, UnitIsDead
+local UnitExists, UnitHasVehicleUI, UnitIsDead = UnitExists, UnitHasVehicleUI, UnitIsDead
 --</private-static-properties>
 
 --<public-static-properties>
@@ -265,7 +265,7 @@ function Ovale:UpdateVisibility()
 
 	self.frame:Show()
 
-	if OvaleOptions:GetApparence().hideVehicule and UnitInVehicle("player") then
+	if OvaleOptions:GetApparence().hideVehicule and UnitHasVehicleUI("player") then
 		self.frame:Hide()
 	end
 	
