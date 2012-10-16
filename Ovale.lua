@@ -61,16 +61,6 @@ BINDING_NAME_OVALE_CHECKBOX2 = L["Inverser la boîte à cocher "].."(3)"
 BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
---<private-static-methods>
-local function ShapeshiftEventHandler()
-	if Ovale.compileOnStances then
-		Ovale.needCompile = true
-	else
-		Ovale.refreshNeeded.player = true
-	end
-end
---</private-static-methods>
-
 --<public-static-methods>
 function Ovale:Debug()
 	self:Print(OvaleCompile:DebugNode(self.masterNodes[1]))
@@ -128,8 +118,7 @@ function Ovale:OnEnable()
 	self:RegisterEvent("GLYPH_UPDATED")
 	self:RegisterEvent("GLYPH_ADDED")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
-	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
-	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	self:RegisterMessage("Ovale_UpdateShapeshiftForm")
 
 	self:UpdateVisibility()
 end
@@ -143,8 +132,7 @@ function Ovale:OnDisable()
     self:UnregisterEvent("GLYPH_UPDATED")	
     self:UnregisterEvent("GLYPH_ADDED")
 	self:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
-	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	self:UnregisterMessage("Ovale_UpdateShapeshiftForm")
     self.frame:Hide()
 end
 
@@ -156,12 +144,12 @@ function Ovale:UNIT_INVENTORY_CHANGED()
 	end
 end
 
-function Ovale:UPDATE_SHAPESHIFT_FORM()
-	ShapeshiftEventHandler()
-end
-
-function Ovale:UPDATE_SHAPESHIFT_FORMS()
-	ShapeshiftEventHandler()
+function Ovale:Ovale_UpdateShapeshiftForm()
+	if Ovale.compileOnStances then
+		Ovale.needCompile = true
+	else
+		Ovale.refreshNeeded.player = true
+	end
 end
 
 --Called when the player target change

@@ -87,11 +87,11 @@ function OvaleAura:PLAYER_ENTERING_WORLD(event)
 end
 
 function OvaleAura:UPDATE_SHAPESHIFT_FORM(event)
-	self.stance = GetShapeshiftForm()
+	self:ShapeshiftEventHandler()
 end
 
 function OvaleAura:UPDATE_SHAPESHIFT_FORMS(event)
-	self.stance = GetShapeshiftForm()
+	self:ShapeshiftEventHandler()
 end
 
 function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
@@ -141,6 +141,14 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 end
 
 -- Private methods
+function OvaleAura:ShapeshiftEventHandler()
+	local newStance = GetShapeshiftForm()
+	if self.stance ~= newStance then
+		self.stance = newStance
+		self:SendMessage("Ovale_UpdateShapeshiftForm")
+	end
+end
+
 function OvaleAura:UpdateAuras(unitId, unitGUID)
 	self.serial = self.serial + 1
 	
