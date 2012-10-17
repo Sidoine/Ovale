@@ -92,11 +92,17 @@ while (defined($r = readdir(DIR)))
 			}
 		}
 		
-		if ($content =~ m/$class\s*=\s*LibStub/)
+		if ($content =~ m/$class\s*=\s*LibStub\(([^)]+)\)/)
 		{
-			$pm{'RegisterEvent'} = true;
-			$pm{'UnregisterEvent'} = true;
-			$m{$class}{Print} = true;
+			if ($1 =~ m/AceAddon/)
+			{
+				$m{$class}{Print} = true;
+				$m{$class}{RegisterEvent} = true;
+				$m{$class}{UnregisterEvent} = true;
+				$m{$class}{RegisterMessage} = true;
+				$m{$class}{UnregisterMessage} = true;
+				$m{$class}{SendMessage} = true;
+			}
 		}
 		
 		if ($content =~ m/<private-static-properties>(.*)<\/private-static-properties>/s)
