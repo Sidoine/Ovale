@@ -121,7 +121,7 @@ function OvaleBestAction:GetActionInfo(element)
 			end
 		end
 		
-		spellName = OvaleData.spellList[spellId]
+		local spellName = OvaleData.spellList[spellId]
 		if not spellName then
 			spellName = GetSpellInfo(spellId)
 		end
