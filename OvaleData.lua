@@ -284,7 +284,7 @@ end
 --The user learnt a new spell
 function OvaleData:SPELLS_CHANGED()
 	self:FillSpellList()
-	Ovale.needCompile = true
+	Ovale.needCompile = Ovale.needCompile or "quick"
 end
 
 function OvaleData:GetRootSpellList()
@@ -393,7 +393,7 @@ function OvaleData:RemplirListeTalents()
 			self.pointsTalent[talentId] = 0
 		end		
 		self.listeTalentsRemplie = true
-		Ovale.needCompile = true
+		Ovale.needCompile = Ovale.needCompile or "quick"
 		talentId = talentId + 1
 	end
 end

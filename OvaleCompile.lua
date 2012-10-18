@@ -497,9 +497,6 @@ local function ParseAddIcon(params, text, secure)
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
 	masterNode.secure = secure
-	if not TestConditions(masterNode.params) then
-		return nil
-	end
 	return masterNode
 end
 
@@ -538,18 +535,7 @@ function OvaleCompile:CompileInputs(text)
 	return text
 end
 
-function OvaleCompile:Compile(text)
-	Ovale.compileOnItems = false
-	Ovale.compileOnStances = false
-	Ovale.bug = false
-	node = {}
-	defines = {}
-	unknownSpellNodes = {}
-	
-	-- Suppression des commentaires
-	text = strgsub(text, "#.-\n","")
-	text = strgsub(text, "#.*$","")
-
+function OvaleCompile:CompileDeclarations(text)
 	-- Define(CONSTANTE valeur)
 	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
 	
@@ -573,14 +559,40 @@ function OvaleCompile:Compile(text)
 	text = strgsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
 	text = strgsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
 	text = strgsub(text, "SpellList%s*%(%s*([%w_]+)%s*(.-)%)", ParseSpellList)
-			
+
 	-- On vire les espaces en trop
 	text = strgsub(text, "\n", " ")
 	text = strgsub(text, "%s+", " ")
 	
+	return text
+end
+
+function OvaleCompile:UpdateNodesEnabled(masterNodes, enabledTbl)
+	if masterNodes then
+		for k, node in pairs(masterNodes) do
+			enabledTbl[k] = TestConditions(node.params)
+		end
+	end
+end
+
+function OvaleCompile:Compile(text)
+	Ovale.compileOnItems = false
+	Ovale.compileOnStances = false
+	Ovale.bug = false
+	node = {}
+	defines = {}
+	unknownSpellNodes = {}
+
+	-- Suppression des commentaires
+	text = strgsub(text, "#.-\n","")
+	text = strgsub(text, "#.*$","")
+
+	-- Compile non-function and non-icon declarations.
+	text = self:CompileDeclarations(text)
+
 	-- On compile les AddCheckBox et AddListItem
 	text = self:CompileInputs(text)
-	
+
 	for p,t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
 		local newNode = ParseCommands(t)
 		if newNode then
