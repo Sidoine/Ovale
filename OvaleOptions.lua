@@ -12,7 +12,7 @@
 OvaleOptions = LibStub("AceAddon-3.0"):NewAddon("OvaleOptions", "AceEvent-3.0", "AceConsole-3.0")
 
 --<private-static-properties>
-local strgsub = string.gsub
+local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring
 --</private-static-properties>
 
 --<public-static-properties>
@@ -286,6 +286,7 @@ local options =
 					end,
 					set = function(info,v)
 						OvaleOptions.db.profile.code = v
+						Ovale.debugPrint("compile", "accepting script")
 						Ovale.needCompile = true
 					end,
 					width = "full"
@@ -300,6 +301,7 @@ local options =
 					end,
 					func = function()
 						OvaleOptions.db.profile.code = OvaleOptions.db.defaults.profile.code
+						Ovale.debugPrint("compile", "restoring default script")
 						Ovale.needCompile = true
 					end,
 				}
@@ -354,6 +356,39 @@ local options =
 						for i=1,10 do Ovale:Print(i.."="..UnitPower("player", i)) end 
 						Ovale:Print(OvaleState.state.eclipse)
 					end
+				},
+				debugflags =
+				{
+					name = "List debug flags",
+					type = "execute",
+					func = function()
+						local flags
+						for flag in pairs(Ovale.debugFlags) do
+							if flags then
+								flags = flags .. ", " .. flag
+							else
+								flags = flag
+							end
+						end
+						if flags then
+							Ovale:Print(flags)
+						end
+					end
+				},
+				toggledebug =
+				{
+					name = "Toggle debug flag",
+					type = "input",
+					set = function(info, value)
+						for flag in strgmatch(value, "[%w_]+") do
+							if Ovale.debugFlags[flag] then
+								Ovale.debugFlags[flag] = nil
+							else
+								Ovale.debugFlags[flag] = true
+							end
+						end
+					end,
+					get = nil,
 				},
 				talent =
 				{
@@ -462,6 +497,7 @@ function OvaleOptions:FirstInit()
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 	
 	if self.db.profile.code then
+		Ovale.debugPrint("compile", "setting script during addon initialization")
 		Ovale.needCompile = true
 	end
 end
@@ -469,6 +505,7 @@ end
 function OvaleOptions:HandleProfileChanges()
 	if self.firstInit then
 		if (self.db.profile.code) then
+			Ovale.debugPrint("compile", "changing profiles")
 			Ovale.needCompile = true
 		end
 	end

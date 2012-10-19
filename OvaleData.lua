@@ -282,7 +282,8 @@ function OvaleData:UNIT_PET()
 end
 
 --The user learnt a new spell
-function OvaleData:SPELLS_CHANGED()
+function OvaleData:SPELLS_CHANGED(event)
+	Ovale.debugPrint("compile", event)
 	self:FillSpellList()
 	Ovale.needCompile = Ovale.needCompile or "quick"
 end
@@ -379,6 +380,7 @@ end
 
 function OvaleData:RemplirListeTalents()
 	local talentId = 1
+	local needCompile = false
 	while true do
 		local name, texture, tier, column, selected, available = GetTalentInfo(talentId)
 		if not name then
@@ -393,8 +395,12 @@ function OvaleData:RemplirListeTalents()
 			self.pointsTalent[talentId] = 0
 		end		
 		self.listeTalentsRemplie = true
-		Ovale.needCompile = Ovale.needCompile or "quick"
+		needCompile = Ovale.needCompile or "quick"
 		talentId = talentId + 1
+	end
+	if needCompile then
+		Ovale.debugPrint("compile", "filling talent list")
+		Ovale.needCompile = needCompile
 	end
 end
 

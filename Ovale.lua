@@ -53,6 +53,8 @@ Ovale.combatStartTime = nil
 --needCompile is true, false, or "quick"
 Ovale.needCompile = false
 Ovale.listes = {}
+--debug flags
+Ovale.debugFlags = {}
 --</public-static-properties>
 
 --Key bindings
@@ -64,6 +66,12 @@ BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<public-static-methods>
+function Ovale:debugPrint(flag, ...)
+	if self.debugFlags[flag] then
+		self:Print("[" .. flag .. "]", ...)
+	end
+end
+
 function Ovale:Debug()
 	self:Print(OvaleCompile:DebugNode(self.masterNodes[1]))
 end
@@ -84,9 +92,11 @@ function Ovale:CompileAll()
 	local code = OvaleOptions:GetProfile().code
 	if code then
 		if self.needCompile == "quick" then
+			self.debugPrint("compile", "quick compile")
 			code = OvaleCompile:CompileDeclarations(code)
 			code = OvaleCompile:CompileInputs(code)
 		elseif self.needCompile then
+			self.debugPrint("compile", "FULL compile")
 			self.masterNodes = OvaleCompile:Compile(code)
 		end
 		OvaleCompile:UpdateNodesEnabled(self.masterNodes, self.masterNodesEnabled)
@@ -144,19 +154,21 @@ function Ovale:OnDisable()
     self.frame:Hide()
 end
 
-function Ovale:UNIT_INVENTORY_CHANGED()
+function Ovale:UNIT_INVENTORY_CHANGED(event)
 	if self.compileOnItems then
+		self:debugPrint("compile", event)
 		self.needCompile = self.needCompile or "quick"
 	else
 		self.refreshNeeded.player = true
 	end
 end
 
-function Ovale:Ovale_UpdateShapeshiftForm()
+function Ovale:Ovale_UpdateShapeshiftForm(event)
 	if Ovale.compileOnStances then
-		Ovale.needCompile = self.needCompile or "quick"
+		self:debugPrint("compile", event)
+		self.needCompile = self.needCompile or "quick"
 	else
-		Ovale.refreshNeeded.player = true
+		self.refreshNeeded.player = true
 	end
 end
 
@@ -171,12 +183,14 @@ end
 --Called when a glyph has been added
 --The script needs to be compiled
 function Ovale:GLYPH_ADDED(event)
+	self:debugPrint("compile", event)
 	self.needCompile = self.needCompile or "quick"
 end
 
 --Called when a glyph has been updated
 --The script needs to be compiled
 function Ovale:GLYPH_UPDATED(event)
+	self:debugPrint("compile", event)
 	self.needCompile = self.needCompile or "quick"
 end
 
@@ -238,6 +252,7 @@ end
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
+		Ovale.debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
 		Ovale.needCompile = Ovale.needCompile or "quick"
 	end
 end
@@ -245,6 +260,7 @@ end
 local function OnDropDownValueChanged(widget)
 	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
 	if Ovale.listes[widget.userdata.k].compile then
+		Ovale.debugPrint("compile", "list value changed: " .. widget.userdata.k)
 		Ovale.needCompile = Ovale.needCompile or "quick"
 	end
 end
