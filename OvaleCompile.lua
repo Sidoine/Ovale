@@ -361,18 +361,6 @@ local function ParseGroup(text)
 	return AddNode(newNode)
 end
 
-local function subtest(text, pattern, func)
-	while (1==1) do
-		local was = text
-		text = strgsub(text, pattern, func)
-		if (was == text) then
-			break
-		end
-	end
-	return text
-end
-
-
 local function ParseAddListItem(list, item, text, params)
 	local paramList = ParseParameters(params)
 	if not TestConditions(paramList) then
@@ -387,7 +375,6 @@ local function ParseAddListItem(list, item, text, params)
 	end
 	return ""
 end
-
 
 local function ParseAddCheckBox(item, text, params)
 	local paramList = ParseParameters(params)
@@ -407,6 +394,10 @@ end
 local function ParseDefine(key, value)
 	defines[key] = value
 	return ""
+end
+
+local function ReplaceDefine(key)
+	return defines[key]
 end
 
 local function ParseLua(text)
@@ -540,9 +531,7 @@ function OvaleCompile:CompileDeclarations(text)
 	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
 	
 	-- On remplace les constantes par leur valeur
-	for k,v in pairs(defines) do
-		text = subtest(text, "([^%w_])"..k.."([^%w_])", "%1"..v.."%2")
-	end
+	text = strgsub(text, "([%w_]+)", ReplaceDefine)
 	
 	-- Fonctions
 	text = strgsub(text, "SpellName%s*%(%s*(%w+)%s*%)", ParseSpellName)
