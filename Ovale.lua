@@ -252,7 +252,7 @@ end
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
-		Ovaleself:debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
+		Ovale:debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
 		Ovale.needCompile = Ovale.needCompile or "quick"
 	end
 end
@@ -260,7 +260,7 @@ end
 local function OnDropDownValueChanged(widget)
 	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
 	if Ovale.listes[widget.userdata.k].compile then
-		Ovaleself:debugPrint("compile", "list value changed: " .. widget.userdata.k)
+		Ovale:debugPrint("compile", "list value changed: " .. widget.userdata.k)
 		Ovale.needCompile = Ovale.needCompile or "quick"
 	end
 end
