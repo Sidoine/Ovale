@@ -221,12 +221,12 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	for spellId,whoseTable in pairs(auraList) do
 		for whose,aura in pairs(whoseTable) do
 			if aura.serial ~= self.serial then
-				-- Ovale:Print("Removing "..aura.name.." from "..whose .. " self.serial = " ..self.serial .. " aura.serial = " ..aura.serial)
+				Ovale:debugPrint("aura", "Removing "..aura.name.." from "..whose .. " self.serial = " ..self.serial .. " aura.serial = " ..aura.serial)
 				whoseTable[whose] = nil
 			end
 		end
 		if not next(whoseTable) then
-			--Ovale:Print("Removing "..spellId)
+			Ovale:debugPrint("aura", "Removing "..spellId)
 			auraList[spellId] = nil
 		end
 	end

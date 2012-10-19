@@ -286,7 +286,7 @@ local options =
 					end,
 					set = function(info,v)
 						OvaleOptions.db.profile.code = v
-						Ovale.debugPrint("compile", "accepting script")
+						Ovale:debugPrint("compile", "accepting script")
 						Ovale.needCompile = true
 					end,
 					width = "full"
@@ -301,7 +301,7 @@ local options =
 					end,
 					func = function()
 						OvaleOptions.db.profile.code = OvaleOptions.db.defaults.profile.code
-						Ovale.debugPrint("compile", "restoring default script")
+						Ovale:debugPrint("compile", "restoring default script")
 						Ovale.needCompile = true
 					end,
 				}
@@ -497,7 +497,7 @@ function OvaleOptions:FirstInit()
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 	
 	if self.db.profile.code then
-		Ovale.debugPrint("compile", "setting script during addon initialization")
+		Ovale:debugPrint("compile", "setting script during addon initialization")
 		Ovale.needCompile = true
 	end
 end
@@ -505,7 +505,7 @@ end
 function OvaleOptions:HandleProfileChanges()
 	if self.firstInit then
 		if (self.db.profile.code) then
-			Ovale.debugPrint("compile", "changing profiles")
+			Ovale:debugPrint("compile", "changing profiles")
 			Ovale.needCompile = true
 		end
 	end

@@ -67,7 +67,7 @@ function OvaleGUID:Update(unitId)
 			if not self.unitId[guid] then
 				self.unitId[guid] = {}
 			end
-			-- Ovale:Print("GUID "..guid.." is ".. unitId)
+			Ovale:debugPrint("guid", "GUID "..guid.." is ".. unitId)
 			self.unitId[guid][unitId] = true
 		end
 		local name = UnitName(unitId)

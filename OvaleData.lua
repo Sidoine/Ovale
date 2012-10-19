@@ -283,7 +283,7 @@ end
 
 --The user learnt a new spell
 function OvaleData:SPELLS_CHANGED(event)
-	Ovale.debugPrint("compile", event)
+	Ovale:debugPrint("compile", event)
 	self:FillSpellList()
 	Ovale.needCompile = Ovale.needCompile or "quick"
 end
@@ -399,7 +399,7 @@ function OvaleData:RemplirListeTalents()
 		talentId = talentId + 1
 	end
 	if needCompile then
-		Ovale.debugPrint("compile", "filling talent list")
+		Ovale:debugPrint("compile", "filling talent list")
 		Ovale.needCompile = needCompile
 	end
 end

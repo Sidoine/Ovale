@@ -92,11 +92,11 @@ function Ovale:CompileAll()
 	local code = OvaleOptions:GetProfile().code
 	if code then
 		if self.needCompile == "quick" then
-			self.debugPrint("compile", "quick compile")
+			self:debugPrint("compile", "quick compile")
 			code = OvaleCompile:CompileDeclarations(code)
 			code = OvaleCompile:CompileInputs(code)
 		elseif self.needCompile then
-			self.debugPrint("compile", "FULL compile")
+			self:debugPrint("compile", "FULL compile")
 			self.masterNodes = OvaleCompile:Compile(code)
 		end
 		OvaleCompile:UpdateNodesEnabled(self.masterNodes, self.masterNodesEnabled)
@@ -252,7 +252,7 @@ end
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
-		Ovale.debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
+		Ovaleself:debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
 		Ovale.needCompile = Ovale.needCompile or "quick"
 	end
 end
@@ -260,7 +260,7 @@ end
 local function OnDropDownValueChanged(widget)
 	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
 	if Ovale.listes[widget.userdata.k].compile then
-		Ovale.debugPrint("compile", "list value changed: " .. widget.userdata.k)
+		Ovaleself:debugPrint("compile", "list value changed: " .. widget.userdata.k)
 		Ovale.needCompile = Ovale.needCompile or "quick"
 	end
 end

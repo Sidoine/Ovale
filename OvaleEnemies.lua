@@ -43,21 +43,21 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				self.enemies[v] = nil
 				self.numberOfEnemies = self.numberOfEnemies - 1
 				Ovale.refreshNeeded["player"] = true
-				--Ovale:Print("enemy die")
+				Ovale:debugPrint("enemy", "enemy die")
 			end
 		end
 	elseif sourceFlags and not self.enemies[sourceGUID] and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
 				and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 			destFlags and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		self.enemies[sourceGUID] = true
-		--Ovale:Print("new ennemy source=".. sourceName)
+		Ovale:debugPrint("enemy", "new enemy source=" .. sourceName)
 		self.numberOfEnemies = self.numberOfEnemies + 1
 		Ovale.refreshNeeded["player"] = true
 	elseif destGUID and not self.enemies[destGUID] and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
 				and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 			sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		self.enemies[destGUID] = true
-		--Ovale:Print("new ennemy dest=".. destName)
+		Ovale:debugPrint("enemy", "new enemy dest=".. destName)
 		self.numberOfEnemies = self.numberOfEnemies + 1
 		Ovale.refreshNeeded["player"] = true
 	end
