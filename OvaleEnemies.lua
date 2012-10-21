@@ -12,7 +12,7 @@
 OvaleEnemies = LibStub("AceAddon-3.0"):NewAddon("OvaleEnemies", "AceEvent-3.0")
 
 --<private-static-properties>
-local bit_band, pairs, select = bit.band, pairs, select
+local bit_band, pairs, select, tostring = bit.band, pairs, select, tostring
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
 --</private-static-properties>
@@ -50,14 +50,14 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 			destFlags and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		self.enemies[sourceGUID] = true
-		Ovale:debugPrint("enemy", "new enemy source=" .. sourceName)
+		Ovale:debugPrint("enemy", "new enemy source=" .. tostring(sourceName))
 		self.numberOfEnemies = self.numberOfEnemies + 1
 		Ovale.refreshNeeded["player"] = true
 	elseif destGUID and not self.enemies[destGUID] and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
 				and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 			sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		self.enemies[destGUID] = true
-		Ovale:debugPrint("enemy", "new enemy dest=".. destName)
+		Ovale:debugPrint("enemy", "new enemy dest=".. tostring(destName))
 		self.numberOfEnemies = self.numberOfEnemies + 1
 		Ovale.refreshNeeded["player"] = true
 	end
