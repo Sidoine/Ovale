@@ -82,6 +82,8 @@ while (defined($r = readdir(DIR)))
 				$m{$class}{RegisterForClicks} = true;
 				$m{$class}{EnableMouse} = true;
 				$m{$class}{GetName} = true;
+				$m{$class}{SetAttribute} = true;
+				$m{$class}{SetScript} = true;
 			}
 			if ($1 eq 'Frame')
 			{
@@ -89,6 +91,8 @@ while (defined($r = readdir(DIR)))
 				$m{$class}{StopMovingOrSizing} = true;
 				$m{$class}{GetLeft} = true;
 				$m{$class}{GetTop} = true;
+				$m{$class}{SetAttribute} = true;
+				$m{$class}{SetScript} = true;
 			}
 		}
 		
