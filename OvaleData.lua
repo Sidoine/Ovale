@@ -272,9 +272,10 @@ function OvaleData:CHARACTER_POINTS_CHANGED()
 --	Ovale:Print("CHARACTER_POINTS_CHANGED")
 end
 
-function OvaleData:PLAYER_TALENT_UPDATE()
+function OvaleData:PLAYER_TALENT_UPDATE(event)
+	Ovale:debugPrint("compile", event)
 	self:RemplirListeTalents()
---	Ovale:Print("PLAYER_TALENT_UPDATE")
+	Ovale.needCompile = "full"
 end
 
 function OvaleData:UNIT_PET()
