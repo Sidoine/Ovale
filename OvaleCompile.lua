@@ -184,11 +184,15 @@ local function ParseFunction(prefix, func, params)
 		local spellId = paramList[1]
 		if spellId and not OvaleData.spellList[spellId] then
 			local spellName = GetSpellInfo(spellId)
-			if spellName == GetSpellInfo(spellName) then
-				--Ovale:Print("Learning spell "..spellName.." with ID "..spellId)
-				OvaleData.spellList[spellId] = spellName
+			if spellName then
+				if spellName == GetSpellInfo(spellName) then
+					Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
+					OvaleData.spellList[spellId] = spellName
+				else
+					unknownSpellNodes[newNode.nodeId] = spellId
+				end
 			else
-				unknownSpellNodes[newNode.nodeId] = spellId
+				Ovale:Print("Unknown spell with ID "..spellId)
 			end
 		end
 	end
