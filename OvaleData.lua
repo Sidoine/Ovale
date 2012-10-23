@@ -275,7 +275,7 @@ end
 function OvaleData:PLAYER_TALENT_UPDATE(event)
 	Ovale:debugPrint("compile", event)
 	self:RemplirListeTalents()
-	Ovale.needCompile = "full"
+	Ovale.needCompile = true
 end
 
 function OvaleData:UNIT_PET()
