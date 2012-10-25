@@ -21,6 +21,7 @@ local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 OvaleData.spellList = {}
 OvaleData.firstInit = false
 OvaleData.className = nil
+OvaleData.level = nil
 --allows to fill the player talent tables on first use
 OvaleData.listeTalentsRemplie = false
 --key: talentId / value: points in this talent
@@ -254,22 +255,33 @@ function OvaleData:OnEnable()
 	end
 	
 	self:FirstInit()
-    self:RegisterEvent("PLAYER_TALENT_UPDATE")
-    self:RegisterEvent("CHARACTER_POINTS_CHANGED")
+	self:RegisterEvent("CHARACTER_POINTS_CHANGED")
+	self:RegisterEvent("PLAYER_LEVEL_UP")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE")
 	self:RegisterEvent("SPELLS_CHANGED")
 	self:RegisterEvent("UNIT_PET")
 end
 
 function OvaleData:OnDisable()
 	self:UnregisterEvent("UNIT_PET")
-    self:UnregisterEvent("SPELLS_CHANGED")
-    self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-    self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
+	self:UnregisterEvent("SPELLS_CHANGED")
+	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
+	self:UnregisterEvent("PLAYER_LEVEL_UP")
+	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
 end
 
 function OvaleData:CHARACTER_POINTS_CHANGED()
 	self:RemplirListeTalents()
 --	Ovale:Print("CHARACTER_POINTS_CHANGED")
+end
+
+function OvaleData:PLAYER_LEVEL_UP(event, level, ...)
+	level = tonumber(level)
+	if level then
+		self.level = level
+	else
+		self.level = self.level + 1
+	end
 end
 
 function OvaleData:PLAYER_TALENT_UPDATE(event)
@@ -414,6 +426,7 @@ function OvaleData:FirstInit()
 
 	local playerClass, englishClass = UnitClass("player")
 	self.className = englishClass
+	self.level = UnitLevel("player")
 	
 	self:RemplirListeTalents()
 	self:FillSpellList()

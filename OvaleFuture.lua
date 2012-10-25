@@ -232,7 +232,7 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	self.lastSpellAP[spellId] = UnitAttackPower("player")
 	self.lastSpellSP[spellId] = GetSpellBonusDamage(2)
 	self.lastSpellDM[spellId] = OvaleAura:GetDamageMultiplier(spellId)
-	if UnitLevel("player") < 80 then
+	if OvaleData.level < 80 then
 		self.lastSpellMastery[spellId] = 0
 	else
 		self.lastSpellMastery[spellId] = GetMasteryEffect()

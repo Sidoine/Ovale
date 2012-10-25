@@ -1690,7 +1690,14 @@ OvaleCondition.conditions=
 -- if Level(more 33) Spell(tiger_palm)
 
 	level = function(condition)
-		return compare(UnitLevel(getTarget(condition.target)), condition[1], condition[2])
+		local level
+		local target = getTarget(condition.target)
+		if target == "player" then
+			level = OvaleData.level
+		else
+			level = UnitLevel(target)
+		end
+		return compare(level, condition[1], condition[2])
 	end,
 
 --- Get the current amount of health points of the target.
@@ -1843,7 +1850,7 @@ OvaleCondition.conditions=
 
 	mastery = function(condition)
 		local mastery = 0
-		if UnitLevel("player") >= 80 then
+		if OvaleData.level >= 80 then
 			mastery = GetMasteryEffect()
 		end
 		return compare(mastery, condition[1], condition[2])
@@ -2035,10 +2042,11 @@ OvaleCondition.conditions=
 	relativelevel = function(condition)
 		local difference
 		local target = getTarget(condition.target)
-		if UnitLevel(target) == -1 then
+		local targetLevel = UnitLevel(target)
+		if targetLevel < 0 then
 			difference = 3
 		else
-			difference = UnitLevel(target) - UnitLevel("player")
+			difference = targetLevel - OvaleData.level
 		end
 		return compare(difference, condition[1], condition[2])
 	end,
