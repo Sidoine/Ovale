@@ -10,7 +10,7 @@
 OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
 
 --<private-static-properties>
-local pairs, tonumber = pairs, tonumber
+local pairs, tonumber, tostring = pairs, tonumber, tostring
 local GetShapeshiftForm, GetSpellBookItemInfo, GetSpellBookItemName = GetShapeshiftForm, GetSpellBookItemInfo, GetSpellBookItemName
 local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
 local HasPetSpells, UnitBuff, UnitClass = HasPetSpells, UnitBuff, UnitClass
