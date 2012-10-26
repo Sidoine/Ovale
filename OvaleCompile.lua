@@ -177,22 +177,34 @@ local function ParseFunction(prefix, func, params)
 	local newNode = { type="function", func=func, params=paramList}
 	local newNodeName = AddNode(newNode)
 
-	-- For the spell() and spellcooldown() functions, check if the spell ID
-	-- is a variant of a spell with the same name as one already in the
-	-- spellbook.  If it is, then add that variant spell ID to our spellList.
-	if func == "spell" or func == "spellcooldown" then
-		local spellId = paramList[1]
-		if spellId and not OvaleData.spellList[spellId] then
-			local spellName = GetSpellInfo(spellId)
-			if spellName then
-				if spellName == GetSpellInfo(spellName) then
-					Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
-					OvaleData.spellList[spellId] = spellName
-				else
-					unknownSpellNodes[newNode.nodeId] = spellId
+	local mine = true
+	if paramList.any then
+		mine = false
+	end
+
+	local spellId = paramList[1]
+	if spellId then
+		-- For the spell() and spellcooldown() functions, check if the spell ID
+		-- is a variant of a spell with the same name as one already in the
+		-- spellbook.  If it is, then add that variant spell ID to our spellList.
+		if type(spellId) == "number" then
+			if not OvaleData.spellList[spellId] and not OvaleData.missingSpellList[spellId] then
+				if func == "spell" or func == "spellcooldown" then
+					local spellName = GetSpellInfo(spellId)
+					if spellName then
+						if spellName == GetSpellInfo(spellName) then
+							Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
+							OvaleData.missingSpellList[spellId] = spellName
+						else
+							unknownSpellNodes[newNode.nodeId] = spellId
+						end
+					end
 				end
-			else
-				Ovale:Print("Unknown spell with ID "..spellId)
+			end
+			OvaleData:AddSpellToFilter(spellId, mine)
+		elseif OvaleData.buffSpellList[spellId] then
+			for _, v in pairs(OvaleData.buffSpellList[spellId]) do
+				OvaleData:AddSpellToFilter(v, mine)
 			end
 		end
 	end
@@ -521,6 +533,12 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleCompile:CompileComments(text)
+	text = strgsub(text, "#.-\n","")
+	text = strgsub(text, "#.*$","")
+	return text
+end
+
 function OvaleCompile:CompileInputs(text)
 	Ovale.casesACocher = {}
 	Ovale.listes = {}
@@ -577,14 +595,15 @@ function OvaleCompile:Compile(text)
 	unknownSpellNodes = {}
 
 	-- Suppression des commentaires
-	text = strgsub(text, "#.-\n","")
-	text = strgsub(text, "#.*$","")
+	text = self:CompileComments(text)
 
 	-- Compile non-function and non-icon declarations.
 	text = self:CompileDeclarations(text)
 
 	-- On compile les AddCheckBox et AddListItem
 	text = self:CompileInputs(text)
+
+	OvaleData:ResetSpellFilter()
 
 	for p,t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
 		local newNode = ParseCommands(t)

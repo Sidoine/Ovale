@@ -19,6 +19,7 @@ local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 
 --<public-static-properties>
 OvaleData.spellList = {}
+OvaleData.missingSpellList = {}
 OvaleData.firstInit = false
 OvaleData.className = nil
 OvaleData.level = nil
@@ -34,6 +35,8 @@ OvaleData.talentNameToId = {}
 OvaleData.spellInfo = {}
 --spells that count for scoring
 OvaleData.scoreSpell = {}
+--spells that should be tracked
+OvaleData.spellFilter = { any = {}, mine = {} }
 
 OvaleData.power =
 {
@@ -370,6 +373,12 @@ function OvaleData:FillPetSpellList()
 	end
 end
 
+function OvaleData:FillMissingSpells()
+	for k, v in pairs(self.missingSpellList) do
+		self.spellList[k] = v
+	end
+end
+
 function OvaleData:FillSpellList()
 	self.spellList = {}
 	
@@ -388,6 +397,7 @@ function OvaleData:FillSpellList()
 		end
 		i = i + 1
 	end
+	self:FillMissingSpells()
 	self:FillPetSpellList()
 end
 
@@ -452,6 +462,19 @@ end
 
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
+end
+
+function OvaleData:ResetSpellFilter()
+	self.spellFilter.any = {}
+	self.spellFilter.mine = {}
+end
+
+function OvaleData:AddSpellToFilter(spellId, mine)
+	if mine then
+		self.spellFilter.mine[spellId] = true
+	else
+		self.spellFilter.any[spellId] = true
+	end
 end
 
 function OvaleData:GetGCD(spellId)

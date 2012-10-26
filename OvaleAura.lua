@@ -57,13 +57,19 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 
 	if strfind(event, "SPELL_AURA_") == 1 then
 		local spellId, spellName, spellSchool, auraType = select(12, ...)
-	
+
+		if sourceGUID == self.playerGUID and not OvaleData.spellFilter.mine[spellId] then
+			return
+		elseif not OvaleData.spellFilter.any[spellId] then
+			return
+		end
+
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-	
+
 		if unitId then
 			self:UpdateAuras(unitId, destGUID)
 		end
-		
+
 		if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
 			local aura = self:GetAuraByGUID(destGUID, spellId, true)
 			if aura then
@@ -71,7 +77,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			end
 		end
 	end
-	
+
 	if event == "UNIT_DIED" then
 		self.aura[destGUID] = nil
 		local unitId = OvaleGUID:GetUnitId(destGUID)

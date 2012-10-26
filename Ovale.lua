@@ -93,12 +93,14 @@ function Ovale:CompileAll()
 	if code then
 		if self.needCompile == "quick" then
 			self:debugPrint("compile", "quick compile")
+			code = OvaleCompile:CompileComments(code)
 			code = OvaleCompile:CompileDeclarations(code)
 			code = OvaleCompile:CompileInputs(code)
 		elseif self.needCompile then
 			self:debugPrint("compile", "FULL compile")
 			self.masterNodes = OvaleCompile:Compile(code)
 		end
+		OvaleData:FillMissingSpells()
 		OvaleCompile:UpdateNodesEnabled(self.masterNodes, self.masterNodesEnabled)
 		self.refreshNeeded.player = true
 		self.needCompile = false
