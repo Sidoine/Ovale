@@ -573,7 +573,7 @@ function OvaleData:GetTickLength(spellId, spellHaste)
 		if si.haste ~= "spell" then
 			return si.tick or 3
 		else
-			return (si.tick or 3) / spellHaste
+			return (si.tick or 3) / (spellHaste or 1)
 		end
 	else
 		return nil
