@@ -55,7 +55,7 @@ local UnitClassification, UnitCreatureFamily, UnitCreatureType = UnitClassificat
 local UnitDebuff, UnitDetailedThreatSituation, UnitExists = UnitDebuff, UnitDetailedThreatSituation, UnitExists
 local UnitHealth, UnitHealthMax, UnitIsDead = UnitHealth, UnitHealthMax, UnitIsDead
 local UnitIsFriend, UnitIsUnit, UnitLevel = UnitIsFriend, UnitIsUnit, UnitLevel
-local UnitPower, UnitPowerMax = UnitPower, UnitPowerMax
+local UnitPower, UnitPowerMax, UnitAura = UnitPower, UnitPowerMax, UnitAura
 
 --</private-static-properties>
 
@@ -2389,6 +2389,33 @@ OvaleCondition.conditions=
 	threat = function(condition)
 		local isTanking, status, threatpct = UnitDetailedThreatSituation("player", getTarget(condition.target))
 		return compare(threatpct, condition[1], condition[2])
+	end,
+
+--- Get the current tick value of a damage-over-time (DoT) aura on the target.
+-- @name TickValue
+-- @paramsig number or boolean
+-- @param id The aura spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The tick value.
+-- @return A boolean value for the result of the comparison.
+-- @see TicksRemain
+-- @usage
+-- if DebuffRemains(light_stagger) >0 and TickValue(light_stagger) >10000
+--     Spell(purifying_brew)
+
+	tickvalue = function(condition)
+		local target = getTarget(condition.target)
+		local name = GetSpellInfo(condition[1])
+		local value = select(14, UnitAura(target, name, "", "HARMFUL"))
+		if not value then
+			value = select(14, UnitAura(target, name, "", "HELPFUL"))
+		end
+		value = value or 0
+		return compare(value, condition[2], condition[3])
 	end,
 
 --- Get the estimated total number of ticks of a damage-over-time (DoT) aura.
