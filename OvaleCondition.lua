@@ -977,12 +977,7 @@ OvaleCondition.conditions=
 
 	damage = function(condition)
 		local spellId = condition[1]
-		local ret = OvaleData:GetDamage(spellId,
-		{
-			combo = OvaleState.state.combo,
-			attackpower = UnitAttackPower("player"),
-			spellpower = GetSpellBonusDamage(2)
-		})
+		local ret = OvaleData:GetDamage(spellId, UnitAttackPower("player"), GetSpellBonusDamage(2), OvaleState.state.combo)
 		return 0, nil, ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
 	end,
 
@@ -1567,12 +1562,7 @@ OvaleCondition.conditions=
 
 	lastspellestimateddamage = function(condition)
 		local spellId = condition[1]
-		local ret = OvaleData:GetDamage(spellId,
-		{
-			combo = OvaleFuture.lastSpellCombo[spellId],
-			attackpower = OvaleFuture.lastSpellAP[spellId],
-			spellpower = OvaleFuture.lastSpellSP[spellId]
-		})
+		local ret = OvaleData:GetDamage(spellId, OvaleFuture.lastSpellAP[spellId], OvaleFuture.lastSpellSP[spellId], OvaleFuture.lastSpellCombo[spellId])
 		return 0, nil, ret * (OvaleFuture.lastSpellDM[spellId] or 0), 0, 0
 	end,
 
@@ -2414,12 +2404,7 @@ OvaleCondition.conditions=
 	ticks = function(condition)
 		-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
 		local spellId = condition[1]
-		local duration, tickLength = OvaleData:GetDuration(spellId,
-		{
-			combo = OvaleState.state.combo,
-			holy = OvaleState.state.holy,
-			spellHaste = OvaleAura.spellHaste,
-		})
+		local duration, tickLength = OvaleData:GetDuration(spellId, OvaleAura.spellHaste, OvaleState.state.combo, OvaleState.state.holy)
 		if tickLength then
 			local numTicks = floor(duration / tickLength + 0.5)
 			return compare(numTicks, condition[2], condition[3])

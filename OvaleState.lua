@@ -118,7 +118,6 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 	end
 	
 	local newSpellInfo = OvaleData.spellInfo[spellId]
-	local oldState = { combo = self.state.combo, holy = self.state.holy }
 	
 	self.lastSpellId = spellId
 	--On enregistre les infos sur le sort en cours
@@ -310,8 +309,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 							newAura.mine = true
 							--Optionnellement, on va regarder la durée du buff
 							if auraSpellInfo and auraSpellInfo.duration then
-								oldState.spellHaste = OvaleAura.spellHaste
-								duration = OvaleData:GetDuration(auraSpellId, oldState)
+								duration = OvaleData:GetDuration(auraSpellId, OvaleAura.spellHaste, self.state.combo, self.state.holy)
 							elseif stacks ~= "refresh" and stacks > 0 then
 								stacks = 1
 							end

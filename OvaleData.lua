@@ -517,18 +517,15 @@ function OvaleData:GetComputedSpellCD(spellId)
 end
 
 --Compute the damage of the given spell.
-function OvaleData:GetDamage(spellId, state)
+function OvaleData:GetDamage(spellId, attackpower, spellpower, combo)
 	local si = self.spellInfo[spellId]
 	if not si then
 		return nil
 	end
 	local damage = si.base or 0
-	local combo, attackpower, spellpower = 0, 0, 0
-	if state then
-		combo = state.combo or combo
-		attackpower = state.attackpower or attackpower
-		spellpower = state.spellpower or spellpower
-	end
+	combo = combo or 0
+	attackpower = attackpower or 0
+	spellpower = spellpower or 0
 	if si.bonuscp then
 		damage = damage + si.bonuscp * combo
 	end
@@ -544,16 +541,13 @@ function OvaleData:GetDamage(spellId, state)
 	return damage
 end
 
-function OvaleData:GetDuration(spellId, state)
+function OvaleData:GetDuration(spellId, spellHaste, combo, holy)
 	local si = self.spellInfo[spellId]
 	if si and si.duration then
 		local duration = si.duration
-		local combo, holy, spellHaste = 0, 1, 1
-		if state then
-			combo = state.combo or combo
-			holy = state.holy or holy
-			spellHaste = state.spellHaste or spellHaste
-		end
+		spellHaste = spellHaste or 1
+		combo = combo or 0
+		holy = holy or 1
 		if si.adddurationcp then
 			duration = duration + si.adddurationcp * combo
 		end
