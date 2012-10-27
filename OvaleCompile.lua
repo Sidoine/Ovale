@@ -184,27 +184,37 @@ local function ParseFunction(prefix, func, params)
 
 	local spellId = paramList[1]
 	if spellId then
-		-- For the spell() and spellcooldown() functions, check if the spell ID
+		-- For the conditions that refer to player's spells, check if the spell ID
 		-- is a variant of a spell with the same name as one already in the
 		-- spellbook.  If it is, then add that variant spell ID to our spellList.
-		if type(spellId) == "number" then
+		if OvaleCondition.spellbookConditions[func] then
 			if not OvaleData.spellList[spellId] and not OvaleData.missingSpellList[spellId] then
-				if func == "spell" or func == "spellcooldown" then
-					local spellName = GetSpellInfo(spellId)
-					if spellName then
-						if spellName == GetSpellInfo(spellName) then
-							Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
-							OvaleData.missingSpellList[spellId] = spellName
-						else
-							unknownSpellNodes[newNode.nodeId] = spellId
-						end
+				local spellName
+				if type(spellId) == "number" then
+					spellName = GetSpellInfo(spellId)
+				end
+				if spellName then
+					if spellName == GetSpellInfo(spellName) then
+						Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
+						OvaleData.missingSpellList[spellId] = spellName
+					else
+						unknownSpellNodes[newNode.nodeId] = spellId
 					end
+				else
+					Ovale:Print("Unknown spell with ID "..spellId)
 				end
 			end
-			OvaleData:AddSpellToFilter(spellId, mine)
-		elseif OvaleData.buffSpellList[spellId] then
-			for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-				OvaleData:AddSpellToFilter(v, mine)
+		end
+
+		-- For the conditions that refer to aura spell IDs, add those spell IDs to
+		-- the list of auras OvaleAura should be tracking.
+		if OvaleCondition.auraConditions[func] then
+			if type(spellId) == "number" then
+				OvaleData:AddSpellToFilter(spellId, mine)
+			elseif OvaleData.buffSpellList[spellId] then
+				for _, v in pairs(OvaleData.buffSpellList[spellId]) do
+					OvaleData:AddSpellToFilter(v, mine)
+				end
 			end
 		end
 	end

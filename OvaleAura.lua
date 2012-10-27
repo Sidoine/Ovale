@@ -34,16 +34,18 @@ local GetSpecialization, GetShapeshiftForm, UnitAura = GetSpecialization, GetSha
 function OvaleAura:OnEnable()
 	self.playerGUID = UnitGUID("player")
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	--self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("UNIT_AURA")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 end
 
 function OvaleAura:OnDisable()
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
 end
@@ -55,25 +57,23 @@ end
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 
+	-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
 	if strfind(event, "SPELL_AURA_") == 1 then
 		local spellId, spellName, spellSchool, auraType = select(12, ...)
 
-		if sourceGUID == self.playerGUID and not OvaleData.spellFilter.mine[spellId] then
-			return
-		elseif not OvaleData.spellFilter.any[spellId] then
-			return
-		end
+		if (sourceGUID == self.playerGUID and OvaleData.spellFilter.mine[spellId]) or OvaleData.spellFilter.any[spellId] then
+			local unitId = OvaleGUID:GetUnitId(destGUID)
 
-		local unitId = OvaleGUID:GetUnitId(destGUID)
+			-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
+			if unitId and unitId ~= "target" and strfind(unitId, "target") then
+				self:UpdateAuras(unitId, destGUID)
+			end
 
-		if unitId then
-			self:UpdateAuras(unitId, destGUID)
-		end
-
-		if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-			local aura = self:GetAuraByGUID(destGUID, spellId, true)
-			if aura then
-				aura.spellHaste = self.spellHaste
+			if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
+				local aura = self:GetAuraByGUID(destGUID, spellId, true)
+				if aura then
+					aura.spellHaste = self.spellHaste
+				end
 			end
 		end
 	end
@@ -90,6 +90,16 @@ end
 function OvaleAura:PLAYER_ENTERING_WORLD(event)
 	self.mastery = GetSpecialization()
 	self.stance = GetShapeshiftForm()
+end
+
+function OvaleAura:UNIT_AURA(event, unitId)
+	local guid
+	if unitId == "player" then
+		guid = self.playerGUID
+	else
+		guid = UnitGUID(unitId)
+	end
+	self:UpdateAuras(unitId, guid)
 end
 
 function OvaleAura:UPDATE_SHAPESHIFT_FORM(event)
@@ -177,7 +187,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	end
 		
 	if not unitGUID then
-		unitGUID = UnitGUID(unitId)
+		if unitId == "player" then
+			unitGUID = self.playerGUID
+		else
+			unitGUID = UnitGUID(unitId)
+		end
 	end
 
 	if not self.aura[unitGUID] then
@@ -197,11 +211,13 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 				break
 			end
 		else
-			self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
-			if debuffType then
-				-- TODO: not very clean
-				-- should be computed by OvaleState:GetAura
-				self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
+			if (unitCaster == "player" and OvaleData.spellFilter.mine[spellId]) or OvaleData.spellFilter.any[spellId] then
+				self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
+				if debuffType then
+					-- TODO: not very clean
+					-- should be computed by OvaleState:GetAura
+					self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
+				end
 			end
 			
 			if unitId == "player" then

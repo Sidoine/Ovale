@@ -471,9 +471,11 @@ end
 
 function OvaleData:AddSpellToFilter(spellId, mine)
 	if mine then
-		self.spellFilter.mine[spellId] = true
-	else
-		self.spellFilter.any[spellId] = true
+		if not self.spellFilter.mine[spellId] then
+			self.spellFilter.mine[spellId] = GetSpellInfo(spellId)
+		end
+	elseif not self.spellFilter.any[spellId] then
+		self.spellFilter.any[spellId] = GetSpellInfo(spellId)
 	end
 end
 
