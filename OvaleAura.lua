@@ -34,7 +34,7 @@ local GetSpecialization, GetShapeshiftForm, UnitAura = GetSpecialization, GetSha
 function OvaleAura:OnEnable()
 	self.playerGUID = UnitGUID("player")
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	--self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
@@ -43,7 +43,7 @@ end
 
 function OvaleAura:OnDisable()
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
@@ -93,13 +93,11 @@ function OvaleAura:PLAYER_ENTERING_WORLD(event)
 end
 
 function OvaleAura:UNIT_AURA(event, unitId)
-	local guid
 	if unitId == "player" then
-		guid = self.playerGUID
+		self:UpdateAuras("player", self.playerGUID)
 	else
-		guid = UnitGUID(unitId)
+		self:UpdateAuras(unitId)
 	end
-	self:UpdateAuras(unitId, guid)
 end
 
 function OvaleAura:UPDATE_SHAPESHIFT_FORM(event)
@@ -175,7 +173,9 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	local hateHero
 	local hateClasse
 	local damageMultiplier
-	
+
+	if not unitId then return end
+
 	if unitId == "player" then
 		hateBase = GetCombatRatingBonus(18)
 		hateCommune = 0
@@ -186,12 +186,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 		damageMultiplier = 1
 	end
 		
+	if not unitGUID and unitId == "player" then
+		unitGUID = self.playerGUID
+	end
 	if not unitGUID then
-		if unitId == "player" then
-			unitGUID = self.playerGUID
-		else
-			unitGUID = UnitGUID(unitId)
-		end
+		unitGUID = UnitGUID(unitId)
 	end
 
 	if not self.aura[unitGUID] then
