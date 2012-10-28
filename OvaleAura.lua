@@ -175,7 +175,18 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	local hateClasse
 	local damageMultiplier
 
-	if not unitId then return end
+	if not unitId then
+		return
+	end
+	if not unitGUID and unitId == "player" then
+		unitGUID = self.playerGUID
+	end
+	if not unitGUID then
+		unitGUID = UnitGUID(unitId)
+	end
+	if not unitGUID then
+		return
+	end
 
 	if unitId == "player" then
 		hateBase = GetCombatRatingBonus(18)
@@ -185,13 +196,6 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 		hateHero = 0
 		hateClasse = 0
 		damageMultiplier = 1
-	end
-		
-	if not unitGUID and unitId == "player" then
-		unitGUID = self.playerGUID
-	end
-	if not unitGUID then
-		unitGUID = UnitGUID(unitId)
 	end
 
 	if not self.aura[unitGUID] then
