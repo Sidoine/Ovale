@@ -95,7 +95,7 @@ end
 function OvaleAura:UNIT_AURA(event, unitId)
 	if unitId == "player" then
 		self:UpdateAuras("player", self.playerGUID)
-	else
+	elseif unitId then
 		self:UpdateAuras(unitId)
 	end
 end
