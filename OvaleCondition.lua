@@ -299,6 +299,36 @@ local function testValue(comparator, limit, value, atTime, rate)
 	end
 end
 
+local function getAura(target, spellId, mine)
+	local aura
+	if type(spellId) == "number" then
+		aura = OvaleState:GetAura(target, spellId, mine)
+	elseif OvaleData.buffSpellList[spellId] then
+		local newAura
+		for k,v in pairs(OvaleData.buffSpellList[spellId]) do
+			newAura = OvaleState:GetAura(target, v, mine)
+			if newAura and (not aura or newAura.stacks > aura.stacks) then
+				aura = newAura
+			end
+		end
+	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
+		aura = OvaleState:GetAura(target, spellId, mine)
+	end
+	return aura
+end
+
+local function getMine(condition)
+	local mine = true
+	if condition.any then
+		if condition.any == 0 then
+			mine = true
+		else
+			mine = false
+		end
+	end
+	return mine
+end
+
 -- Recherche un aura sur la cible et récupère sa durée et le nombre de stacks
 -- return start, ending, stacks, spellHaste
 local function GetTargetAura(condition, target)
@@ -313,34 +343,13 @@ local function GetTargetAura(condition, target)
 		stacks = 1
 	end
 	local spellId = condition[1]
+	local mine = getMine(condition)
 	
-	local mine = true
-	if condition.any then
-		mine = false
-	end
-	
-	local aura
-	if type(spellId) == "number" then
-		aura = OvaleState:GetAura(target, spellId, mine)
-	elseif OvaleData.buffSpellList[spellId] then
-		for k,v in pairs(OvaleData.buffSpellList[spellId]) do
-			local newAura = OvaleState:GetAura(target, v, mine)
-			if newAura and (not aura or newAura.stacks>aura.stacks) then
-				aura = newAura
-			end
-		end
-	elseif spellId == "Magic" or spellId == "Disease" or spellId=="Curse" or spellId=="Poison" then
-		aura = OvaleState:GetAura(target, spellId, mine)
-	else
-		Ovale:Error("unknown buff "..spellId)
-		return 0,0,0,0
-	end
-	
+	local aura = getAura(target, spellId, mine)
 	if not aura then
 		Ovale:Log("Aura "..spellId.." not found")
 		return 0,0,0,0
-	end	
-	
+	end
 	if Ovale.trace then
 		Ovale:Print("GetTargetAura = start=".. tostring(aura.start) .. " end="..tostring(aura.ending).." stacks=" ..tostring(aura.stacks).."/"..stacks)
 	end
@@ -2445,13 +2454,11 @@ end
 --     Spell(purifying_brew)
 
 OvaleCondition.conditions.tickvalue = function(condition)
-	local target = getTarget(condition.target)
-	local name = GetSpellInfo(condition[1])
-	local value = select(14, UnitAura(target, name, "", "HARMFUL"))
-	if not value then
-		value = select(14, UnitAura(target, name, "", "HELPFUL"))
+	local value = 0
+	local aura = getAura(getTarget(condition.target), condition[1], getMine(condition))
+	if aura then
+		value = aura.value or 0
 	end
-	value = value or 0
 	return compare(value, condition[2], condition[3])
 end
 OvaleCondition.auraConditions.tickvalue = true

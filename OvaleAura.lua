@@ -108,7 +108,7 @@ function OvaleAura:UPDATE_SHAPESHIFT_FORMS(event)
 	self:ShapeshiftEventHandler()
 end
 
-function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
+function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
 	local auraList = self.aura[unitGUID]
 
 	if not auraList[spellId] then
@@ -151,6 +151,7 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 		aura.mine = mine
 		aura.source = unitCaster
 		aura.name = name
+		aura.value = value
 	end
 end
 
@@ -200,8 +201,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	local i = 1
 	
 	local mode = "HELPFUL"
+	local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
+	local canApplyAura, isBossDebuff, value1, value2, value3
 	while (true) do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId =  UnitAura(unitId, i, mode)
+		name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
+			canApplyAura, isBossDebuff, value1, value2, value3 = UnitAura(unitId, i, mode)
 		if not name then
 			if mode == "HELPFUL" then
 				mode = "HARMFUL"
@@ -211,11 +215,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 			end
 		else
 			if (unitCaster == "player" and OvaleData.spellFilter.mine[spellId]) or OvaleData.spellFilter.any[spellId] then
-				self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
+				self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 				if debuffType then
 					-- TODO: not very clean
 					-- should be computed by OvaleState:GetAura
-					self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name)
+					self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 				end
 			end
 			
