@@ -291,7 +291,6 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 						local isDoT = auraSpellInfo and auraSpellInfo.tick
 						local duration = spellData
 						local stacks = duration
-						local previousAura
 						local auraGUID
 						if target == "target" then
 							auraGUID = targetGUID
@@ -299,29 +298,35 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 							auraGUID = UnitGUID(target)
 						end
 
-						if stacks == "refresh" or isDoT then
-							previousAura = self:GetAuraByGUID(auraGUID, auraSpellId, true, target)
+						-- Set the duration to the proper length if it's a DoT.
+						if auraSpellInfo and auraSpellInfo.duration then
+							duration = OvaleData:GetDuration(auraSpellId, OvaleAura.spellHaste, self.state.combo, self.state.holy)
 						end
 
-						if stacks ~= "refresh" or previousAura then
-							local newAura = self:NewAura(auraGUID, auraSpellId)
+						-- If aura is specified with a duration, then assume stacks == 1.
+						if stacks ~= "refresh" and stacks > 0 then
+							stacks = 1
+						end
 
-							newAura.mine = true
-							--Optionnellement, on va regarder la durée du buff
-							if auraSpellInfo and auraSpellInfo.duration then
-								duration = OvaleData:GetDuration(auraSpellId, OvaleAura.spellHaste, self.state.combo, self.state.holy)
-							elseif stacks ~= "refresh" and stacks > 0 then
-								stacks = 1
-							end
+						local previousAura = self:GetAuraByGUID(auraGUID, auraSpellId, true, target)
+						local newAura = self:NewAura(auraGUID, auraSpellId)
 
-							if stacks ~= "refresh" and stacks == 0 then
-								Ovale:Log("Aura "..auraSpellId.." is completely removed")
-								newAura.ending = 0
-								newAura.stacks = 0
-							elseif stacks == "refresh" then
-								Ovale:Log("Aura is refreshed")
+						newAura.mine = true
+
+						if stacks ~= "refresh" and stacks == 0 then
+							Ovale:Log("Aura "..auraSpellId.." is completely removed")
+							newAura.stacks = 0
+							newAura.ending = 0	-- self.currentTime?
+						elseif previousAura and previousAura.ending and previousAura.ending >= endCast then
+							if stacks == "refresh" or stacks > 0 then
+								if stacks == "refresh" then
+									Ovale:Log("Aura "..auraSpellId.." is refreshed")
+									newAura.stacks = previousAura.stacks
+								else -- if stacks > 0
+									Ovale:Log("Aura "..auraSpellId.." gain stacks")
+									newAura.stacks = newAura.stacks + stacks
+								end
 								newAura.start = previousAura.start
-								newAura.stacks = previousAura.stacks
 								if isDoT then
 									-- TODO: check that refreshed DoTs take a new snapshot of player stats.
 									local tickLength = OvaleData:GetTickLength(auraSpellId, previousAura.spellHaste)
@@ -331,49 +336,27 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								else
 									newAura.ending = endCast + duration
 								end
-							elseif newAura.ending and newAura.ending >= endCast then
-								if stacks < 0 then
-									Ovale:Log("Aura lose stacks")
-									--Buff are immediatly removed when the cast ended, do not need to do it again
-									if filter ~= "HELPFUL" or target ~= "player" or endCast >= self.maintenant then
-										newAura.stacks = newAura.stacks + stacks
-										if Ovale.trace then
-											Ovale:Print("removing one stack of "..auraSpellId.." because of ".. spellId.." to ".. newAura.stacks)
-										end
-										--Plus de stacks, on supprime l'aura
-										if newAura.stacks <= 0 then
-											Ovale:Log("Aura is completly removed")
-											newAura.stacks = 0
-											newAura.ending = 0
-										end
-									end
-								else
-									Ovale:Log("Aura gain stacks")
-									if isDoT then
-										local tickLength = OvaleData:GetTickLength(auraSpellId, newAura.spellHaste)
-										local k = floor((newAura.ending - endCast) / tickLength)
-										newAura.ending = newAura.ending - tickLength * k + duration
-										newAura.spellHaste = OvaleAura.spellHaste
-									else
-										newAura.ending = endCast + duration
-									end
-									newAura.stacks = newAura.stacks + stacks
+							elseif stacks < 0 then
+								Ovale:Log("Aura "..auraSpellId.." loses stacks")
+								newAura.stacks = previousAura.stacks + stacks
+								if Ovale.trace then
+									Ovale:Print("removing one stack of "..auraSpellId.." because of ".. spellId.." to ".. newAura.stacks)
 								end
-							else
-								Ovale:Log("New aura at " .. endCast)
-								newAura.start = endCast
-								newAura.ending = endCast + duration
-								newAura.stacks = stacks
-								if isDoT then
-									newAura.spellHaste = OvaleAura.spellHaste
+								newAura.start = previousAura.start
+								newAura.ending = previousAura.ending
+								if newAura.stacks <= 0 then
+									Ovale:Log("Aura is completely removed")
+									newAura.stacks = 0
+									newAura.ending = 0	-- self.currentTime?
 								end
 							end
-							if Ovale.trace then
-								if auraSpellId then
-									Ovale:Print(spellId.." adding "..stacks.." aura "..auraSpellId.." to "..target.." "..filter.." "..newAura.start..","..newAura.ending)
-								else 
-									Ovale:Print("adding nil aura")
-								end
+						else
+							Ovale:Log("New aura "..auraSpellId.." at " .. endCast)
+							newAura.stacks = stacks
+							newAura.start = endCast
+							newAura.ending = endCast + duration
+							if isDoT then
+								newAura.spellHaste = OvaleAura.spellHaste
 							end
 						end
 					end
