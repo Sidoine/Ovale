@@ -514,6 +514,9 @@ local function ParseAddIcon(params, text, secure)
 	masterNode = node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
 	masterNode.secure = secure
+	if not TestConditions(masterNode.params) then
+		return nil
+	end
 	return masterNode
 end
 
@@ -586,14 +589,6 @@ function OvaleCompile:CompileDeclarations(text)
 	text = strgsub(text, "%s+", " ")
 	
 	return text
-end
-
-function OvaleCompile:UpdateNodesEnabled(masterNodes, enabledTbl)
-	if masterNodes then
-		for k, node in pairs(masterNodes) do
-			enabledTbl[k] = TestConditions(node.params)
-		end
-	end
 end
 
 function OvaleCompile:Compile(text)

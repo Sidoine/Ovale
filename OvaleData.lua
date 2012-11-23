@@ -301,7 +301,7 @@ end
 function OvaleData:SPELLS_CHANGED(event)
 	Ovale:debugPrint("compile", event)
 	self:FillSpellList()
-	Ovale.needCompile = Ovale.needCompile or "quick"
+	Ovale.needCompile = true
 end
 
 function OvaleData:GetRootSpellList()
@@ -418,7 +418,7 @@ function OvaleData:RemplirListeTalents()
 			self.pointsTalent[talentId] = 0
 		end		
 		self.listeTalentsRemplie = true
-		needCompile = Ovale.needCompile or "quick"
+		needCompile = true
 		talentId = talentId + 1
 	end
 	if needCompile then

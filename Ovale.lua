@@ -34,7 +34,6 @@ Ovale.checkBoxes = {}
 Ovale.dropDowns = {}
 --master nodes of the current script (one node for each icon)
 Ovale.masterNodes = nil
-Ovale.masterNodesEnabled = {}
 --set it if there was a bug, traces will be enabled on next frame
 Ovale.bug = false
 Ovale.traced = false
@@ -50,7 +49,6 @@ Ovale.refreshNeeded = {}
 Ovale.compileOnItems = false
 Ovale.compileOnStances = false
 Ovale.combatStartTime = nil
---needCompile is true, false, or "quick"
 Ovale.needCompile = false
 Ovale.listes = {}
 --debug flags
@@ -91,20 +89,14 @@ end
 function Ovale:CompileAll()
 	local code = OvaleOptions:GetProfile().code
 	if code then
-		if self.needCompile == "quick" then
-			self:debugPrint("compile", "quick compile")
-			code = OvaleCompile:CompileComments(code)
-			code = OvaleCompile:CompileDeclarations(code)
-			code = OvaleCompile:CompileInputs(code)
-		elseif self.needCompile then
+		if self.needCompile then
 			self:debugPrint("compile", "FULL compile")
 			self.masterNodes = OvaleCompile:Compile(code)
 		end
 		OvaleData:FillMissingSpells()
-		OvaleCompile:UpdateNodesEnabled(self.masterNodes, self.masterNodesEnabled)
 		self.refreshNeeded.player = true
-		self.needCompile = false
 		self:UpdateFrame()
+		self.needCompile = false
 	end
 end
 
@@ -159,7 +151,7 @@ end
 function Ovale:UNIT_INVENTORY_CHANGED(event)
 	if self.compileOnItems then
 		self:debugPrint("compile", event)
-		self.needCompile = self.needCompile or "quick"
+		self.needCompile = true
 	else
 		self.refreshNeeded.player = true
 	end
@@ -168,7 +160,7 @@ end
 function Ovale:Ovale_UpdateShapeshiftForm(event)
 	if Ovale.compileOnStances then
 		self:debugPrint("compile", event)
-		self.needCompile = self.needCompile or "quick"
+		self.needCompile = true
 	else
 		self.refreshNeeded.player = true
 	end
@@ -186,14 +178,14 @@ end
 --The script needs to be compiled
 function Ovale:GLYPH_ADDED(event)
 	self:debugPrint("compile", event)
-	self.needCompile = self.needCompile or "quick"
+	self.needCompile = true
 end
 
 --Called when a glyph has been updated
 --The script needs to be compiled
 function Ovale:GLYPH_UPDATED(event)
 	self:debugPrint("compile", event)
-	self.needCompile = self.needCompile or "quick"
+	self.needCompile = true
 end
 
 function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
@@ -255,7 +247,7 @@ local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
 		Ovale:debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
-		Ovale.needCompile = Ovale.needCompile or "quick"
+		Ovale.needCompile = true
 	end
 end
 
@@ -263,7 +255,7 @@ local function OnDropDownValueChanged(widget)
 	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
 	if Ovale.listes[widget.userdata.k].compile then
 		Ovale:debugPrint("compile", "list value changed: " .. widget.userdata.k)
-		Ovale.needCompile = Ovale.needCompile or "quick"
+		Ovale.needCompile = true
 	end
 end
 
