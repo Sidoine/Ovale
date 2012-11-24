@@ -324,7 +324,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 									newAura.stacks = previousAura.stacks
 								else -- if stacks > 0
 									Ovale:Log("Aura "..auraSpellId.." gain stacks")
-									newAura.stacks = newAura.stacks + stacks
+									newAura.stacks = previousAura.stacks + stacks
 								end
 								newAura.start = previousAura.start
 								if isDoT then
