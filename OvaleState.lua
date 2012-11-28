@@ -50,12 +50,19 @@ function OvaleState:UpdatePowerRates()
 	for k,v in pairs(OvaleData.power) do
 		self.powerRate[k] = 0
 	end
-	
+
 	self.powerRate.energy = 10 * OvaleAura.meleeHaste
 
-	-- Stance of the Sturdy Ox (brewmaster monk)
-	if OvaleData.className == "MONK" and OvaleAura.mastery == 1 and OvaleAura.stance == 1 then
-		self.powerRate.energy = self.powerRate.energy * 1.1
+	if OvaleData.className == "MONK" then
+		-- Ascension (monk)
+		if OvaleData:GetTalentPoints(8) > 0 then
+			self.powerRate.energy = self.powerRate.energy * 1.15
+		end
+
+		-- Stance of the Sturdy Ox (brewmaster monk)
+		if OvaleAura.mastery == 1 and OvaleAura.stance == 1 then
+			self.powerRate.energy = self.powerRate.energy * 1.1
+		end
 	end
 
 	-- Adrenaline Rush (rogue)
