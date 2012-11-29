@@ -209,7 +209,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	local canApplyAura, isBossDebuff, value1, value2, value3
 	while (true) do
 		name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
-			canApplyAura, isBossDebuff, value1, value2, value3 = UnitAura(unitId, i, mode)
+			canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = UnitAura(unitId, i, mode)
 		if not name then
 			if mode == "HELPFUL" then
 				mode = "HARMFUL"
