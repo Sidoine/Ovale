@@ -206,7 +206,7 @@ local function ParseFunction(prefix, func, params)
 						unknownSpellNodes[newNode.nodeId] = spellId
 					end
 				else
-					Ovale:Print("Unknown spell with ID "..spellId)
+					Ovale:debugPrint("unknown_spells", "Unknown spell with ID "..spellId)
 				end
 			end
 		end
