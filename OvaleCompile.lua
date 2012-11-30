@@ -96,6 +96,11 @@ local function TestConditions(paramList)
 			return false
 		end
 	end
+	if paramList.if_spell then
+		if not OvaleData.spellList[paramList.if_spell] then
+			return false
+		end
+	end
 	if paramList.talent and not HasTalent(paramList.talent) then
 		return false
 	end
