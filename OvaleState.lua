@@ -35,9 +35,10 @@ OvaleState.lastSpellId = nil
 
 --<private-static-properties>
 local floor, pairs, tostring = math.floor, pairs, tostring
-local GetComboPoints, GetRuneCooldown, GetRuneType = GetComboPoints, GetRuneCooldown, GetRuneType
+local GetRuneCooldown, GetRuneType = GetRuneCooldown, GetRuneType
 local GetSpellInfo, UnitGUID, UnitHealth = GetSpellInfo, UnitGUID, UnitHealth
 local UnitHealthMax, UnitPower, UnitPowerMax = UnitHealthMax, UnitPower, UnitPowerMax
+local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 --</private-static-properties>
 
 --<public-static-methods>
@@ -79,7 +80,7 @@ function OvaleState:Reset()
 	self.currentTime = self.maintenant
 	self.currentSpellId = nil
 	self.attenteFinCast = self.maintenant
-	self.state.combo = GetComboPoints("player")
+	self.state.combo = OvaleComboPoints.combo
 	for k,v in pairs(OvaleData.power) do
 		self.state[k] = UnitPower("player", v.id)
 	end
@@ -192,6 +193,10 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 				end
 			end
 
+			--[[
+				This section is not needed since self.state.combo tracks OvaleComboPoints, which updates
+				the number of combo points even before the spell has been "successfully" cast.
+
 			--Points de combo
 			if newSpellInfo.combo then
 				if newSpellInfo.combo == 0 then
@@ -206,10 +211,11 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 				if self.state.combo < 0 then
 					self.state.combo = 0
 				end
-				if self.state.combo > 5 then
-					self.state.combo = 5
+				if self.state.combo > MAX_COMBO_POINTS then
+					self.state.combo = MAX_COMBO_POINTS
 				end
 			end
+			]]--
 
 			--Runes
 			if newSpellInfo.frost then

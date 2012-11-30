@@ -27,6 +27,7 @@ Ovale.lua
 OvaleActionBar.lua
 OvaleAura.lua
 OvaleBestAction.lua
+OvaleComboPoints.lua
 OvaleCompile.lua
 OvaleCondition.lua
 OvaleData.lua

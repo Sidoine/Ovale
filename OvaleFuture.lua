@@ -13,7 +13,7 @@ OvaleFuture = LibStub("AceAddon-3.0"):NewAddon("OvaleFuture", "AceEvent-3.0")
 
 --<private-static-properties>
 local ipairs, pairs, strfind, tremove = ipairs, pairs, string.find, table.remove
-local GetComboPoints, GetMasteryEffect, GetSpellBonusDamage = GetComboPoints, GetMasteryEffect, GetSpellBonusDamage
+local GetMasteryEffect, GetSpellBonusDamage = GetMasteryEffect, GetSpellBonusDamage
 local GetSpellInfo, UnitAttackPower, UnitBuff = GetSpellInfo, UnitAttackPower, UnitBuff
 local UnitGUID = UnitGUID
 --</private-static-properties>
@@ -242,7 +242,8 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	
 	if si then
 		if si.combo == 0 then
-			local comboPoints = GetComboPoints("player")
+			-- This spell is a CP-finisher, so save the number of CPs used.
+			local comboPoints = OvaleComboPoints.combo
 			if comboPoints > 0 then
 				self.lastSpellCombo[spellId] = comboPoints
 			end
@@ -302,7 +303,6 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	end
 	Ovale.refreshNeeded["player"] = true
 end
-
 
 function OvaleFuture:RemoveSpellFromList(spellId, lineId)
 	for i,v in ipairs(self.lastSpell) do
