@@ -189,7 +189,6 @@ local function GetRuneCount(type, death)
 		local rune = OvaleState.state.rune[i]
 		if rune and (rune.type == type or (rune.type == 4 and death==1)) then
 			if rune.cd > OvaleState.currentTime then
-				onCd = true
 				if not atTime or rune.cd < atTime then
 					atTime = rune.cd
 					rate = 1/rune.duration

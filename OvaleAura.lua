@@ -365,7 +365,7 @@ function OvaleAura:GetDamageMultiplier(spellId)
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
 			self:UpdateAuras("player", self.playerGUID)
-			auraTable = self.aura[self.playerGUID]
+			local auraTable = self.aura[self.playerGUID]
 			if auraTable then
 				for filter, filterInfo in pairs(si.damageAura) do
 					for auraSpellId, multiplier in pairs(filterInfo) do
