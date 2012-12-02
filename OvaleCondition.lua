@@ -2313,7 +2313,7 @@ OvaleCondition.conditions.spellcooldown = function(condition)
 		return 0, nil, actionCooldownDuration, actionCooldownStart, -1
 	end
 end
-OvaleCondition.spellbookConditions.spellcooldown = true
+-- OvaleCondition.spellbookConditions.spellcooldown = true / may be a sharedcd
 
 --- Get data for the given spell defined by SpellInfo(...)
 -- @name SpellData

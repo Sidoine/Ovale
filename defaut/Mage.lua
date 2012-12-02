@@ -90,7 +90,7 @@ Define(pyroblast_aura 48108)
   SpellInfo(pyroblast_aura duration=15 )
   SpellAddBuff(pyroblast_aura pyroblast_aura=1)
 Define(rune_of_power 116011)
-  SpellInfo(rune_of_power duration=60 cd=6 )
+  SpellInfo(rune_of_power duration=60 )
 Define(time_warp 35346)
   SpellInfo(time_warp duration=6 cd=15 )
   SpellAddBuff(time_warp time_warp=1)
@@ -102,7 +102,7 @@ AddIcon mastery=1 help=main
 {
 	if not InCombat() 
 	{
-		Spell(arcane_brilliance)
+		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
 		Spell(mage_armor)
 		Spell(rune_of_power)
 	}
@@ -120,6 +120,7 @@ AddIcon mastery=1 help=main
 AddIcon mastery=1 help=offgcd
 {
 	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
+	cancel.Spell(alter_time)
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
 	if BuffExpires(alter_time) and BuffPresent(arcane_power) and BuffStacks(arcane_missiles_aura) ==2 and BuffStacks(arcane_charge) >3 and BuffRemains(rune_of_power) >6 Spell(alter_time)
 	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
@@ -143,7 +144,7 @@ AddIcon mastery=2 help=main
 {
 	if not InCombat() 
 	{
-		Spell(arcane_brilliance)
+		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
 		Spell(molten_armor)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
@@ -156,6 +157,7 @@ AddIcon mastery=2 help=main
 AddIcon mastery=2 help=offgcd
 {
 	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
+	cancel.Spell(alter_time)
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
 	if target.DeadIn() <12 Spell(combustion)
 	if ArmorSetParts(T14 more 4) and target.DebuffPresent(ignite) and target.DebuffPresent(pyroblast_aura) Spell(combustion)
@@ -185,8 +187,8 @@ AddIcon mastery=3 help=main
 {
 	if not InCombat() 
 	{
-		Spell(arcane_brilliance)
-		Spell(frost_armor)
+		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
+		if BuffExpires(frost_armor) Spell(frost_armor)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
 	if BuffPresent(alter_time) and BuffPresent(brain_freeze) Spell(frostfire_bolt)
@@ -209,6 +211,7 @@ AddIcon mastery=3 help=offgcd
 		Spell(water_elemental)
 	}
 	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
+	cancel.Spell(alter_time)
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
 	if BuffExpires(alter_time) and BuffStacks(fingers_of_frost_aura) <2 Spell(water_elemental_freeze)
 	if not target.DebuffPresent(frost_bomb) Spell(frost_bomb)

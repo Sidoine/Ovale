@@ -340,7 +340,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 										Ovale:Log("Aura "..auraSpellId.." is refreshed")
 										newAura.stacks = previousAura.stacks
 									else -- if stacks > 0
-										Ovale:Log("Aura "..auraSpellId.." gain stacks")
+										Ovale:Log("Aura "..auraSpellId.." gain stacks (ending was " .. tostring(newAura.ending)..")")
 										newAura.stacks = previousAura.stacks + stacks
 									end
 									newAura.start = previousAura.start
@@ -353,6 +353,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 									else
 										newAura.ending = endCast + duration
 									end
+									Ovale:Log("Aura "..auraSpellId.." ending is now "..newAura.ending)
 								elseif stacks < 0 then
 									Ovale:Log("Aura "..auraSpellId.." loses stacks")
 									newAura.stacks = previousAura.stacks + stacks

@@ -1,5 +1,5 @@
 Ovale.defaut["WARRIOR"] = [[Define(avatar 107574)
-  SpellInfo(avatar duration=20 cd=180 )
+  SpellInfo(avatar duration=24 cd=180 )
   SpellAddBuff(avatar avatar=1)
 Define(battle_shout 6673)
   SpellInfo(battle_shout duration=300 cd=60 )
@@ -77,6 +77,10 @@ Define(shield_barrier 112048)
   SpellAddBuff(shield_barrier shield_barrier=1)
 Define(shield_block 2565)
   SpellInfo(shield_block rage=60 cd=1.5 )
+  SpellAddTargetDebuff(shield_block shield_block_aura=1)
+Define(shield_block_aura 132404)
+  SpellInfo(shield_block_aura duration=6 )
+  SpellAddBuff(shield_block_aura shield_block_aura=1)
 Define(shield_slam 23922)
   SpellInfo(shield_slam rage=-20 cd=6 )
 Define(shield_wall 871)
@@ -159,6 +163,7 @@ AddIcon mastery=1 help=cd
 {
 	if {{target.DebuffRemains(colossus_smash) >=5 or SpellCooldown(colossus_smash) <=4 } and {{not TalentPoints(avatar_talent) or not ArmorSetParts(T14 more 4) } and {{target.HealthPercent() <20 or target.DeadIn() >315 or {target.DeadIn() >165 and ArmorSetParts(T14 more 4) } } } or {TalentPoints(avatar_talent) and ArmorSetParts(T14 more 4) and BuffPresent(avatar) } } } or target.DeadIn() <=18 Spell(recklessness)
 	if TalentPoints(avatar_talent) and {{{SpellCooldown(recklessness) >=180 or BuffPresent(recklessness) } or {target.HealthPercent() >=20 and target.DeadIn() >195 } or {target.HealthPercent() <20 and ArmorSetParts(T14 more 4) } } or target.DeadIn() <=20 } Spell(avatar)
+	if not TalentPoints(bloodbath_talent) or {TalentPoints(bloodbath_talent) and BuffPresent(bloodbath) }  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if TalentPoints(bladestorm_talent) and SpellCooldown(colossus_smash) >=5 and not target.DebuffPresent(colossus_smash) and SpellCooldown(bloodthirst) >=2 and target.HealthPercent() >=20 Spell(bladestorm)
 }
 AddIcon mastery=2 help=main
@@ -169,28 +174,28 @@ AddIcon mastery=2 help=main
 	}
 	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } Spell(bloodthirst)
 	if BuffStacks(bloodsurge) and target.HealthPercent() >=20 and SpellCooldown(bloodthirst) <=1 Spell(wild_strike)
-	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } and SpellCooldown(bloodthirst) <=1 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
+	if not {target.HealthPercent() <20 and target.DebuffPresent(colossus_smash) and Rage() >=30 } and SpellCooldown(bloodthirst) <=1 and SpellCooldown(bloodthirst) if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
 	Spell(colossus_smash)
+	if TalentPoints(dragon_roar_talent) and {not target.DebuffPresent(colossus_smash) and BuffPresent(bloodbath) } Spell(dragon_roar)
 	if target.HealthPercent(less 20) Spell(execute)
 	if TalentPoints(storm_bolt_talent) Spell(storm_bolt)
-	if BuffStacks(raging_blow_aura) Spell(raging_blow)
+	if BuffStacks(raging_blow_aura) ==2 or {BuffStacks(raging_blow_aura) and {target.HealthPercent() <=20 or target.DebuffPresent(colossus_smash) or BuffPresent(bloodbath) or BuffPresent(recklessness) or SpellCooldown(colossus_smash) >=6 or {SpellCooldown(bloodthirst) >=1 and BuffRemains(raging_blow_aura) <=6 } } } Spell(raging_blow)
 	if BuffStacks(bloodsurge) and target.HealthPercent() >=20 Spell(wild_strike)
 	if TalentPoints(shockwave_talent) Spell(shockwave)
-	if TalentPoints(dragon_roar_talent) Spell(dragon_roar)
 	Spell(heroic_throw)
 	if Rage() <70 and not target.DebuffPresent(colossus_smash) Spell(battle_shout)
 	if target.DebuffPresent(colossus_smash) and target.HealthPercent() >=20 Spell(wild_strike)
 	if TalentPoints(impending_victory_talent) and target.HealthPercent() >=20 Spell(impending_victory)
-	if SpellCooldown(colossus_smash) >=1 and Rage() >=60 and target.HealthPercent() >=20 Spell(wild_strike)
+	if SpellCooldown(colossus_smash) >=1 and Rage() >=80 and target.HealthPercent() >=20 Spell(wild_strike)
 	if Rage() <70 Spell(battle_shout)
 }
 AddIcon mastery=2 help=offgcd
 {
 	if target.IsInterruptible() Spell(pummel)
-	if TalentPoints(bloodbath_talent) and {{{SpellCooldown(recklessness) >=10 or BuffPresent(recklessness) } or {target.HealthPercent() >=20 and {target.DeadIn() <=165 or {target.DeadIn() <=315 and not ArmorSetParts(T14 more 4) } } and target.DeadIn() >75 } } or target.DeadIn() <=19 } Spell(bloodbath)
-	if not {BuffStacks(enrage) or {BuffStacks(raging_blow_aura) ==2 and target.HealthPercent() >=20 } } Spell(berserker_rage)
+	if TalentPoints(bloodbath_talent) and {target.DebuffRemains(colossus_smash) >=5 and {target.DeadIn() >79 or {target.DeadIn() <79 and target.HealthPercent() <20 and {BuffPresent(recklessness) or SpellCooldown(recklessness) >={target.DeadIn() -25 } } } } } Spell(bloodbath)
+	if not {BuffStacks(enrage) or {BuffStacks(raging_blow_aura) ==2 and target.HealthPercent() >=20 } } or {BuffRemains(recklessness) >=10 and not BuffStacks(raging_blow_aura) } Spell(berserker_rage)
+	if {not TalentPoints(bloodbath_talent) and Rage() >=40 } or {TalentPoints(bloodbath_talent) and BuffPresent(bloodbath) and Rage() >=40 } Spell(deadly_calm)
 	if target.DebuffPresent(colossus_smash) if CheckBoxOn(heroic_leap_check) Spell(heroic_leap)
-	if Rage() >=40 Spell(deadly_calm)
 	if {{{target.DebuffPresent(colossus_smash) and Rage() >=40 } or {BuffPresent(deadly_calm) and Rage() >=30 } } and target.HealthPercent() >=20 } or Rage() >=110 Spell(heroic_strike)
 }
 AddIcon mastery=2 help=aoe
@@ -198,7 +203,7 @@ AddIcon mastery=2 help=aoe
 	
 	Spell(dragon_roar)
 	Spell(shockwave)
-	if BuffStacks(meat_cleaver) Spell(raging_blow)
+	if BuffStacks(meat_cleaver) and BuffStacks(raging_blow_aura) Spell(raging_blow)
 	Spell(whirlwind)
 	if Rage() >=90 Spell(cleave)
 	Spell(bloodthirst)
@@ -206,8 +211,9 @@ AddIcon mastery=2 help=aoe
 }
 AddIcon mastery=2 help=cd
 {
-	if {{target.DebuffRemains(colossus_smash) >=5 or SpellCooldown(colossus_smash) <=4 } and {{not TalentPoints(avatar_talent) or not ArmorSetParts(T14 more 4) } and {{target.HealthPercent() <20 or target.DeadIn() >315 or {target.DeadIn() >165 and ArmorSetParts(T14 more 4) } } } or {TalentPoints(avatar_talent) and ArmorSetParts(T14 more 4) and BuffPresent(avatar) } } } or target.DeadIn() <=18 Spell(recklessness)
+	if {{target.DebuffRemains(colossus_smash) >=5 or SpellCooldown(colossus_smash) <=4 } and {{not TalentPoints(avatar_talent) or not ArmorSetParts(T14 more 4) } and {{target.HealthPercent() <20 or target.DeadIn() >315 or {target.DeadIn() >165 and ArmorSetParts(T14 more 4) } } } or {TalentPoints(avatar_talent) and ArmorSetParts(T14 more 4) and BuffPresent(avatar) } } } and {not TalentPoints(bloodbath_talent) or SpellCooldown(bloodbath) <=3 or {{target.DeadIn() >315 and target.DeadIn() <{315 +SpellCooldown(bloodbath) } } or {ArmorSetParts(T14 more 4) and target.DeadIn() >165 and target.DeadIn() <{165 +SpellCooldown(bloodbath) } } } } or target.DeadIn() <=18 Spell(recklessness)
 	if TalentPoints(avatar_talent) and {{{SpellCooldown(recklessness) >=180 or BuffPresent(recklessness) } or {target.HealthPercent() >=20 and target.DeadIn() >195 } or {target.HealthPercent() <20 and ArmorSetParts(T14 more 4) } } or target.DeadIn() <=20 } Spell(avatar)
+	if not TalentPoints(bloodbath_talent) or {TalentPoints(bloodbath_talent) and BuffPresent(bloodbath) }  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if TalentPoints(bladestorm_talent) and SpellCooldown(colossus_smash) >=5 and not target.DebuffPresent(colossus_smash) and SpellCooldown(bloodthirst) >=2 and target.HealthPercent() >=20 Spell(bladestorm)
 }
 AddIcon mastery=3 help=main
@@ -228,7 +234,7 @@ AddIcon mastery=3 help=offgcd
 	if target.IsInterruptible() Spell(pummel)
 	Spell(berserker_rage)
 	if BuffPresent(ultimatum) Spell(heroic_strike)
-	if BuffExpires(shield_block) Spell(shield_block)
+	if BuffExpires(shield_block_aura) Spell(shield_block)
 	if BuffExpires(shield_barrier) and Rage() >80 Spell(shield_barrier)
 	Spell(demoralizing_shout)
 }
@@ -248,6 +254,6 @@ AddIcon mastery=3 help=cd
 	if Health() <130000 Spell(last_stand)
 	if TalentPoints(avatar_talent) Spell(avatar)
 	Spell(recklessness)
-	if BuffExpires(shield_block) Spell(shield_wall)
+	if BuffExpires(shield_block_aura) Spell(shield_wall)
 }
 ]]

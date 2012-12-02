@@ -1,5 +1,5 @@
 Ovale.defaut["SHAMAN"] = [[Define(ancestral_swiftness 16188)
-  SpellInfo(ancestral_swiftness cd=60 )
+  SpellInfo(ancestral_swiftness cd=90 )
   SpellAddBuff(ancestral_swiftness ancestral_swiftness=1)
 Define(ascendance 114049)
   SpellInfo(ascendance cd=180 )
@@ -90,10 +90,10 @@ AddIcon mastery=1 help=main
 	}
 	
 	if TalentPoints(unleashed_fury_talent) and not BuffPresent(ascendance) Spell(unleash_elements)
-	if not BuffPresent(ascendance) and {not target.DebuffPresent(flame_shock) or target.TicksRemain(flame_shock) <2 or {{BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) } and target.TicksRemain(flame_shock) <3 } } Spell(flame_shock)
 	if target.DebuffRemains(flame_shock) >CastTime(lava_burst) and {BuffPresent(ascendance) or SpellCooldown(lava_burst) } Spell(lava_burst)
-	if TalentPoints(elemental_blast_talent) and not BuffPresent(ascendance) Spell(elemental_blast)
-	if BuffStacks(lightning_shield) ==0 Spell(earth_shock)
+	if target.TicksRemain(flame_shock) <3 and {target.TicksRemain(flame_shock) <2 or BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) } Spell(flame_shock)
+	if TalentPoints(elemental_blast_talent) Spell(elemental_blast)
+	if BuffStacks(lightning_shield) ==7 Spell(earth_shock)
 	if BuffStacks(lightning_shield) >3 and target.DebuffRemains(flame_shock) >SpellCooldown(earth_shock) and target.DebuffRemains(flame_shock) <SpellCooldown(earth_shock) +TickTime(flame_shock) Spell(earth_shock)
 	if SpellCooldown(fire_elemental_totem) >15 and not TotemPresent(fire) Spell(searing_totem)
 	Spell(lightning_bolt)
@@ -102,9 +102,6 @@ AddIcon mastery=1 help=main
 AddIcon mastery=1 help=offgcd
 {
 	if target.IsInterruptible() Spell(wind_shear)
-	
-	if TalentPoints(ancestral_swiftness_talent) and not BuffPresent(ascendance) Spell(ancestral_swiftness)
-
 }
 AddIcon mastery=1 help=moving
 {
@@ -118,8 +115,8 @@ AddIcon mastery=1 help=aoe
 	Spell(lava_beam)
 	if not TotemPresent(fire) Spell(magma_totem)
 	if Enemies() <=2 and not TotemPresent(fire) Spell(searing_totem)
-	if not target.DebuffPresent(flame_shock) and Enemies() <3 Spell(flame_shock)
 	if Enemies() <3 and target.DebuffRemains(flame_shock) >CastTime(lava_burst) and SpellCooldown(lava_burst) Spell(lava_burst)
+	if not target.DebuffPresent(flame_shock) and Enemies() <3 Spell(flame_shock)
 	Spell(earthquake)
 	if ManaPercent() <80 Spell(thunderstorm)
 	if ManaPercent() >10 Spell(chain_lightning)
@@ -136,6 +133,7 @@ AddIcon mastery=1 help=cd
 	if TalentPoints(elemental_mastery_talent) and TimeInCombat() >15 and {{not BuffPresent(bloodlust any=1) and TimeInCombat() <120 } or {not BuffPresent(berserking) and not BuffPresent(bloodlust any=1) and BuffPresent(ascendance) } or {TimeInCombat() >=200 and {SpellCooldown(ascendance) >30 or Level() <87 } } } Spell(elemental_mastery)
 	if not TotemPresent(fire) Spell(fire_elemental_totem)
 	if target.DebuffRemains(flame_shock) >0 and {target.DeadIn() <20 or BuffPresent(bloodlust any=1) or TimeInCombat() >=180 } and SpellCooldown(lava_burst) >0 Spell(ascendance)
+	if TalentPoints(ancestral_swiftness_talent) and not BuffPresent(ascendance) Spell(ancestral_swiftness)
 	if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
 	Spell(spiritwalkers_grace)
 
@@ -157,10 +155,10 @@ AddIcon mastery=2 help=main
 	Spell(stormstrike)
 	if BuffPresent(unleash_flame) and not target.DebuffPresent(flame_shock) Spell(flame_shock)
 	Spell(lava_lash)
+	if BuffPresent(unleash_flame) Spell(flame_shock)
 	Spell(unleash_elements)
 	if BuffStacks(maelstrom_weapon) >=3 and not BuffPresent(ascendance) Spell(lightning_bolt)
 	if BuffPresent(ancestral_swiftness) Spell(lightning_bolt)
-	if BuffPresent(unleash_flame) and target.DebuffRemains(flame_shock) <=3 Spell(flame_shock)
 	Spell(earth_shock)
 	if BuffStacks(maelstrom_weapon) >1 and not BuffPresent(ascendance) Spell(lightning_bolt)
 
@@ -168,9 +166,6 @@ AddIcon mastery=2 help=main
 AddIcon mastery=2 help=offgcd
 {
 	if target.IsInterruptible() Spell(wind_shear)
-	
-	if TalentPoints(ancestral_swiftness_talent) and BuffStacks(maelstrom_weapon) <2 Spell(ancestral_swiftness)
-
 }
 AddIcon mastery=2 help=aoe
 {
@@ -199,6 +194,7 @@ AddIcon mastery=2 help=cd
 	if TalentPoints(elemental_mastery_talent) Spell(elemental_mastery)
 	if not TotemPresent(fire) and {BuffPresent(bloodlust any=1) or BuffPresent(elemental_mastery) or target.DeadIn() <=0 +10 or {TalentPoints(elemental_mastery_talent) and {SpellCooldown(elemental_mastery) ==0 or SpellCooldown(elemental_mastery) >80 } or TimeInCombat() >=60 } } Spell(fire_elemental_totem)
 	if SpellCooldown(strike) >=3 Spell(ascendance)
+	if TalentPoints(ancestral_swiftness_talent) and BuffStacks(maelstrom_weapon) <2 Spell(ancestral_swiftness)
 	Spell(feral_spirit)
 	if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
 	Spell(spiritwalkers_grace)

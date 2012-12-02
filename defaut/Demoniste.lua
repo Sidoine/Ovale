@@ -6,12 +6,13 @@ Define(blood_fury 20572)
   SpellInfo(blood_fury duration=15 cd=120 )
   SpellAddBuff(blood_fury blood_fury=1)
 Define(chaos_bolt 116858)
-  SpellInfo(chaos_bolt burningembers=10 )
+  SpellInfo(chaos_bolt burningembers=10 tick=1 )
+  SpellAddTargetDebuff(chaos_bolt chaos_bolt=1)
 Define(conflagrate 17962)
   SpellInfo(conflagrate duration=5 )
   SpellAddBuff(conflagrate conflagrate=1)
 Define(corruption 172)
-  SpellInfo(corruption duration=18 tick=2 )
+  SpellInfo(corruption duration=18 tick=2 stance=0)
   SpellAddTargetDebuff(corruption corruption=1)
 Define(curse_of_the_elements 1490)
   SpellInfo(curse_of_the_elements duration=300 )
@@ -35,9 +36,10 @@ Define(fire_and_brimstone 108683)
   SpellInfo(fire_and_brimstone burningembers=10 cd=1 )
   SpellAddBuff(fire_and_brimstone fire_and_brimstone=1)
 Define(grimoire_of_sacrifice 108503)
-  SpellInfo(grimoire_of_sacrifice duration=3600 cd=120 )
+  SpellInfo(grimoire_of_sacrifice duration=3600 cd=30 )
   SpellAddBuff(grimoire_of_sacrifice grimoire_of_sacrifice=1)
 Define(hand_of_guldan 105174)
+  SpellInfo(hand_of_guldan stance=0)
 Define(harvest_life 108371)
   SpellInfo(harvest_life duration=6 demonicfury=30 tick=1 )
   SpellAddTargetDebuff(harvest_life harvest_life=1)
@@ -82,7 +84,7 @@ Define(service_felguard 111898)
 Define(service_felhunter 111897)
   SpellInfo(service_felhunter cd=120 )
 Define(shadow_bolt 686)
-  SpellInfo(shadow_bolt demonicfury=40 )
+  SpellInfo(shadow_bolt demonicfury=40 stance=0)
 Define(shadowburn 17877)
   SpellInfo(shadowburn burningembers=10 )
 Define(shadowflame 47960)
@@ -139,6 +141,7 @@ AddIcon mastery=1 help=main
 }
 AddIcon mastery=1 help=offgcd
 {
+	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	if BuffPresent(dark_soul) and SoulShards() Spell(soulburn)
 	if {target.TicksRemain(unstable_affliction) <Ticks(unstable_affliction) /2 or target.TicksRemain(corruption) <Ticks(corruption) /2 or target.TicksRemain(agony) <Ticks(agony) /2 } and target.HealthPercent() <=20 and SoulShards() Spell(soulburn)
 }
@@ -151,6 +154,8 @@ AddIcon mastery=1 help=aoe
 {
 	
 	if BuffExpires(soulburn) and not target.DebuffPresent(soulburn_seed_of_corruption) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() Spell(soulburn)
+	if BuffPresent(soulburn) and not target.DebuffPresent(agony) and not target.DebuffPresent(corruption) Spell(soul_swap)
+	if BuffPresent(soulburn) and target.DebuffPresent(corruption) and not target.DebuffPresent(agony) Spell(soul_swap)
 	if {BuffExpires(soulburn) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption) } or {BuffPresent(soulburn) and not target.DebuffPresent(soulburn_seed_of_corruption) and not InFlightToTarget(soulburn_seed_of_corruption) } Spell(seed_of_corruption)
 	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 and SoulShards() Spell(haunt)
 	if ManaPercent() <70 Spell(life_tap)
@@ -163,7 +168,6 @@ AddIcon mastery=1 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(blood_fury)
 	Spell(dark_soul)
-	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	Spell(summon_doomguard)
 }
 AddIcon mastery=2 help=main
@@ -177,7 +181,7 @@ AddIcon mastery=2 help=main
 	if TalentPoints(grimoire_of_service_talent) Spell(service_felguard)
 	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felguard) Spell(summon_felguard)
 	if {not target.DebuffPresent(corruption) or target.DebuffRemains(corruption) <TickTime(corruption) } and target.DeadIn() >=6 Spell(corruption)
-	if {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <TickTime(doom) or {target.TicksRemain(doom) +1 <{target.TicksRemain(doom) + Ticks(doom) } and BuffPresent(dark_soul) } } and target.DeadIn() >=30 Spell(doom)
+	if {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <TickTime(doom) or {target.TicksRemain(doom) +1 <Ticks(doom) and BuffPresent(dark_soul) } } and target.DeadIn() >=30 Spell(doom)
 	if target.DebuffRemains(corruption) >20 and BuffExpires(dark_soul) and DemonicFury() <=750 and target.DeadIn() >30 if Stance(1) cancel.Texture(Spell_shadow_demonform)
 	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemains(shadowflame) <1 +CastTime(shadow_bolt) Spell(hand_of_guldan)
 	if target.DebuffRemains(corruption) <20 Spell(touch_of_chaos)
@@ -189,6 +193,7 @@ AddIcon mastery=2 help=main
 }
 AddIcon mastery=2 help=offgcd
 {
+	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	Spell(melee)
 	Spell(felstorm)
 	Spell(wrathstorm)
@@ -218,7 +223,6 @@ AddIcon mastery=2 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(blood_fury)
 	Spell(dark_soul)
-	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	Spell(summon_doomguard)
 }
 AddIcon mastery=3 help=main
@@ -238,6 +242,10 @@ AddIcon mastery=3 help=main
 	Spell(incinerate)
 	if BurningEmbers() >2 and ManaPercent() <10 Spell(chaos_bolt)
 }
+AddIcon mastery=3 help=offgcd
+{
+	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
+}
 AddIcon mastery=3 help=aoe
 {
 	
@@ -255,7 +263,6 @@ AddIcon mastery=3 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(blood_fury)
 	Spell(dark_soul)
-	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	Spell(summon_doomguard)
 }
 ]]

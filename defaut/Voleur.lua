@@ -27,7 +27,7 @@ Define(hemorrhage 16511)
   SpellInfo(hemorrhage energy=30 combo=1 )
 Define(honor_among_thieves 51701)
 Define(kick 1766)
-  SpellInfo(kick duration=5 energy=15 cd=15 )
+  SpellInfo(kick duration=5 energy=10 cd=15 )
 Define(killing_spree 51690)
   SpellInfo(killing_spree duration=3 cd=120 )
   SpellAddBuff(killing_spree killing_spree=1)
@@ -158,11 +158,11 @@ AddIcon mastery=3 help=offgcd
 	if not InCombat() 
 	{
 		Spell(stealth)
-		Spell(premeditation)
+		Spell(premeditation usable=1)
 	}
 	if target.IsInterruptible() Spell(kick)
 	if Energy() >=75 and BuffExpires(stealthed) and not target.DebuffPresent(find_weakness) Spell(shadow_dance)
-	if {ComboPoints() <=3 and SpellCooldown(honor_among_thieves) >1.75 } or ComboPoints() <=2 Spell(premeditation)
+	if {ComboPoints() <=3 and SpellCooldown(honor_among_thieves) >1.75 } or ComboPoints() <=2 Spell(premeditation usable=1)
 	Spell(tricks_of_the_trade)
 }
 AddIcon mastery=3 help=cd

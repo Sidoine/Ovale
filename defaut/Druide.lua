@@ -19,6 +19,11 @@ Define(faerie_fire 770)
 Define(ferocious_bite 22568)
   SpellInfo(ferocious_bite combo=0 energy=25 )
 Define(healing_touch 5185)
+Define(heart_of_the_wild 108288)
+  SpellInfo(heart_of_the_wild duration=45 cd=360 )
+Define(hurricane 16914)
+  SpellInfo(hurricane duration=10 )
+  SpellAddBuff(hurricane hurricane=1)
 Define(incarnation 106731)
   SpellInfo(incarnation duration=30 cd=180 )
 Define(lunar_eclipse 48518)
@@ -71,8 +76,8 @@ Define(sunfire 93402)
   SpellInfo(sunfire duration=14 tick=2 )
   SpellAddTargetDebuff(sunfire sunfire=1)
 Define(thrash 106832)
-Define(thrash 106830)
-  SpellInfo(thrash duration=15 energy=50 tick=3 )
+Define(thrash 77758)
+  SpellInfo(thrash duration=16 tick=2 cd=6 )
   SpellAddTargetDebuff(thrash thrash=1)
 Define(tigers_fury 5217)
   SpellInfo(tigers_fury duration=6 energy=-60 cd=30 )
@@ -104,14 +109,14 @@ AddIcon mastery=1 help=main
 		unless Stance(5) Spell(moonkin_form)
 	}
 	if TalentPoints(force_of_nature_talent) Spell(treants)
-	if not BuffPresent(dream_of_cenarius_damage) and TalentPoints(dream_of_cenarius_talent) Spell(healing_touch)
-	if Eclipse() <=0-70 and EclipseDir() <=0 Spell(wrath)
-	if Eclipse() >=60 and EclipseDir() >=0 Spell(starfire)
+	if TalentPoints(dream_of_cenarius_talent) and not BuffPresent(dream_of_cenarius_damage) and ManaPercent() >25 Spell(healing_touch)
 	if BuffPresent(lunar_eclipse) and {target.DebuffRemains(moonfire) <{BuffRemains(natures_grace) -2 +2 *ArmorSetParts(T14 more 4) } } Spell(moonfire)
-	if BuffPresent(solar_eclipse) and not BuffPresent(celestial_alignment) and {target.DebuffRemains(sunfire) <{BuffRemains(natures_grace) -2 +2 *ArmorSetParts(T14 more 4) } } Spell(sunfire)
-	if not target.DebuffPresent(moonfire) and not BuffPresent(celestial_alignment) and {BuffPresent(dream_of_cenarius_damage) or not TalentPoints(dream_of_cenarius_talent) } Spell(moonfire)
-	if not target.DebuffPresent(sunfire) and not BuffPresent(celestial_alignment) and {BuffPresent(dream_of_cenarius_damage) or not TalentPoints(dream_of_cenarius_talent) } Spell(sunfire)
-	Spell(starsurge)
+	if BuffPresent(solar_eclipse) and {target.DebuffRemains(sunfire) <{BuffRemains(natures_grace) -2 +2 *ArmorSetParts(T14 more 4) } } Spell(sunfire)
+	if {target.DebuffRemains(moonfire) <{BuffRemains(natures_grace) -2 +2 *ArmorSetParts(T14 more 4) } } Spell(moonfire)
+	if {target.DebuffRemains(sunfire) <{BuffRemains(natures_grace) -2 +2 *ArmorSetParts(T14 more 4) } } Spell(sunfire)
+	if BuffPresent(lunar_eclipse) and target.TicksRemain(moonfire) <2 Spell(moonfire)
+	if BuffPresent(solar_eclipse) and target.TicksRemain(sunfire) <2 Spell(sunfire)
+	if SpellCooldown(starsurge) Spell(starsurge)
 	if BuffPresent(celestial_alignment) and CastTime(starfire) <BuffRemains(celestial_alignment) Spell(starfire)
 	if BuffPresent(celestial_alignment) and CastTime(wrath) <BuffRemains(celestial_alignment) Spell(wrath)
 	if EclipseDir() ==1 or {EclipseDir() ==0 and Eclipse() >0 } Spell(starfire)
@@ -120,24 +125,30 @@ AddIcon mastery=1 help=main
 AddIcon mastery=1 help=offgcd
 {
 	if BuffStacks(wild_mushroom) >0 and BuffPresent(solar_eclipse) Spell(wild_mushroom_detonate)
-	if TalentPoints(dream_of_cenarius_talent) and TalentPoints(natures_swiftness_talent) Spell(natures_swiftness)
+	if TalentPoints(natures_swiftness_talent) and TalentPoints(dream_of_cenarius_talent) Spell(natures_swiftness)
 }
 AddIcon mastery=1 help=moving
 {
-	if not target.DebuffPresent(sunfire) Spell(moonfire)
-	if not target.DebuffPresent(moonfire) Spell(sunfire)
+	if target.TicksRemain(moonfire) <2 Spell(moonfire)
+	if target.TicksRemain(sunfire) <2 Spell(sunfire)
 	if BuffStacks(wild_mushroom) <5 Spell(wild_mushroom)
 	if BuffStacks(shooting_stars) Spell(starsurge)
 	if BuffPresent(lunar_eclipse) Spell(moonfire)
 	Spell(sunfire)
 }
+AddIcon mastery=1 help=aoe
+{
+	if BuffPresent(solar_eclipse) and BuffPresent(natures_grace) Spell(hurricane)
+	if BuffPresent(solar_eclipse) and ManaPercent() >25 Spell(hurricane)
+	if BuffPresent(solar_eclipse) and ManaPercent() >25 Spell(hurricane)
+}
 AddIcon mastery=1 help=cd
 {
 	if not BuffPresent(starfall) Spell(starfall)
-	Spell(berserking)
+	if BuffPresent(celestial_alignment) Spell(berserking)
 	if TalentPoints(incarnation_talent) and {BuffPresent(lunar_eclipse) or BuffPresent(solar_eclipse) } Spell(incarnation)
-	if {{EclipseDir() ==0-1 and Eclipse() <=0 } or {EclipseDir() ==1 and Eclipse() >=0 } } and {BuffPresent(chosen_of_elune) or not TalentPoints(incarnation_talent) } Spell(celestial_alignment)
-	if {{TalentPoints(incarnation_talent) and BuffPresent(chosen_of_elune) } or {not TalentPoints(incarnation_talent) and BuffPresent(celestial_alignment) } } and TalentPoints(natures_vigil_talent) Spell(natures_vigil)
+	if {not BuffPresent(lunar_eclipse) and not BuffPresent(solar_eclipse) } and {BuffPresent(chosen_of_elune) or not TalentPoints(incarnation_talent) or SpellCooldown(incarnation) >10 } Spell(celestial_alignment)
+	if TalentPoints(natures_vigil_talent) and {{TalentPoints(incarnation_talent) and BuffPresent(chosen_of_elune) } or {not TalentPoints(incarnation_talent) and BuffPresent(celestial_alignment) } } Spell(natures_vigil)
 }
 AddIcon mastery=2 help=main
 {
@@ -149,6 +160,7 @@ AddIcon mastery=2 help=main
 		Spell(savage_roar)
 		if TalentPoints(force_of_nature_talent) Spell(treants)
 	}
+	
 	if target.DebuffStacks(weakened_armor) <3 Spell(faerie_fire)
 	if BuffExpires(savage_roar) Spell(savage_roar)
 	if target.IsInterruptible() Spell(skull_bash_cat)
@@ -186,24 +198,29 @@ AddIcon mastery=2 help=main
 	if SpellCooldown(tigers_fury) <=3.0 Spell(shred)
 	if TimeToMaxEnergy() <=1.0 Spell(shred)
 	if TalentPoints(force_of_nature_talent) Spell(treants)
+
 }
 AddIcon mastery=2 help=offgcd
 {
+	
 	if Energy() <=35 and not BuffStacks(omen_of_clarity) Spell(tigers_fury)
 	if BuffStacks(omen_of_clarity) and target.DebuffRemains(thrash) <3 and BuffExpires(dream_of_cenarius_damage) Spell(thrash)
-	if TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and BuffExpires(predatory_swiftness) and ComboPoints() >=5 and target.HealthPercent() <=25 Spell(natures_swiftness)
-	if TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and BuffExpires(predatory_swiftness) and ComboPoints() >=5 and target.DebuffRemains(rip) <3 and {BuffPresent(berserk) or target.DebuffRemains(rip) <=SpellCooldown(tigers_fury) } and target.HealthPercent() >25 Spell(natures_swiftness)
+	if TalentPoints(natures_swiftness_talent) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and BuffExpires(predatory_swiftness) and ComboPoints() >=5 and target.HealthPercent() <=25 Spell(natures_swiftness)
+	if TalentPoints(natures_swiftness_talent) and TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_damage) and BuffExpires(predatory_swiftness) and ComboPoints() >=5 and target.DebuffRemains(rip) <3 and {BuffPresent(berserk) or target.DebuffRemains(rip) <=SpellCooldown(tigers_fury) } and target.HealthPercent() >25 Spell(natures_swiftness)
 	if BuffStacks(omen_of_clarity) and target.DebuffRemains(thrash) <3 Spell(thrash)
 	if ComboPoints() >=5 and target.DebuffRemains(thrash) <6 and {BuffPresent(tigers_fury) or BuffPresent(berserk) } Spell(thrash)
 	if ComboPoints() >=5 and target.DebuffRemains(thrash) <6 and SpellCooldown(tigers_fury) <=3.0 Spell(thrash)
 	if ComboPoints() >=5 and target.DebuffRemains(thrash) <6 and TimeToMaxEnergy() <=1.0 Spell(thrash)
+
 }
 AddIcon mastery=2 help=cd
 {
+	
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if BuffPresent(tigers_fury) or {target.DeadIn() <15 and SpellCooldown(tigers_fury) >6 } Spell(berserk)
 	if BuffPresent(berserk) and TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 	if BuffPresent(berserk) and TalentPoints(incarnation_talent) Spell(incarnation)
 	Spell(berserking)
+
 }
 ]]

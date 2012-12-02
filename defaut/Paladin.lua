@@ -9,9 +9,6 @@ Define(blessing_of_might 19740)
   SpellAddBuff(blessing_of_might blessing_of_might=1)
 Define(crusader_strike 35395)
   SpellInfo(crusader_strike holy=-1 cd=4.5 )
-Define(darkmist_vortex 126657)
-  SpellInfo(darkmist_vortex duration=20 )
-  SpellAddBuff(darkmist_vortex darkmist_vortex=1)
 Define(execution_sentence 114916)
   SpellInfo(execution_sentence duration=10 tick=1 )
   SpellAddTargetDebuff(execution_sentence execution_sentence=1)
@@ -27,9 +24,6 @@ Define(inquisition 84963)
   SpellAddBuff(inquisition inquisition=1)
 Define(judgment 20271)
   SpellInfo(judgment cd=6 )
-Define(lei_shins_final_orders 126582)
-  SpellInfo(lei_shins_final_orders duration=20 )
-  SpellAddBuff(lei_shins_final_orders lei_shins_final_orders=1)
 Define(rebuke 96231)
   SpellInfo(rebuke duration=4 cd=15 )
 Define(seal_of_insight 20165)
@@ -54,6 +48,7 @@ AddIcon mastery=3 help=main
 	Spell(hammer_of_wrath usable=1)
 	if SpellCooldown(hammer_of_wrath) >0 and SpellCooldown(hammer_of_wrath) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
 	Spell(exorcism)
+	if target.HealthPercent() <=20 or BuffPresent(avenging_wrath) Spell(judgment)
 	Spell(crusader_strike)
 	Spell(judgment)
 	if HolyPower() >=3 Spell(templars_verdict)
@@ -61,12 +56,12 @@ AddIcon mastery=3 help=main
 AddIcon mastery=3 help=offgcd
 {
 	if target.IsInterruptible() Spell(rebuke)
-	if BuffPresent(inquisition) Spell(execution_sentence)
+	if BuffPresent(inquisition) and TimeInCombat() >10 Spell(execution_sentence)
 }
 AddIcon mastery=3 help=cd
 {
-	if BuffPresent(inquisition) and {BuffPresent(darkmist_vortex) or BuffPresent(lei_shins_final_orders) } Spell(avenging_wrath)
-	if BuffPresent(inquisition) and BuffPresent(avenging_wrath) Spell(guardian_of_ancient_kings)
-	if BuffPresent(inquisition)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if BuffPresent(inquisition) Spell(avenging_wrath)
+	if BuffPresent(avenging_wrath) Spell(guardian_of_ancient_kings)
+	if BuffPresent(inquisition) and TimeInCombat() >10  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 ]]

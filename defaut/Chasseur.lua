@@ -3,9 +3,6 @@ Define(aimed_shot 19434)
   SpellInfo(aimed_shot focus=50 )
 Define(arcane_shot 3044)
   SpellInfo(arcane_shot focus=20 )
-Define(aspect_of_the_fox 82661)
-  SpellInfo(aspect_of_the_fox cd=1 )
-  SpellAddBuff(aspect_of_the_fox aspect_of_the_fox=1)
 Define(aspect_of_the_hawk 13165)
   SpellInfo(aspect_of_the_hawk cd=1 )
   SpellAddBuff(aspect_of_the_hawk aspect_of_the_hawk=1)
@@ -54,8 +51,9 @@ Define(kill_command 34026)
 Define(kill_shot 53351)
   SpellInfo(kill_shot cd=10 )
 Define(lock_and_load 56343)
-Define(lynx_rush 120697)
-  SpellInfo(lynx_rush duration=4 cd=90 )
+Define(lynx_rush 120699)
+  SpellInfo(lynx_rush duration=15 tick=3 )
+  SpellAddTargetDebuff(lynx_rush lynx_rush=1)
 Define(master_marksman_fire 82926)
   SpellInfo(master_marksman_fire duration=10 )
   SpellAddBuff(master_marksman_fire master_marksman_fire=1)
@@ -86,8 +84,6 @@ Define(steady_shot 56641)
 Define(thrill_of_the_hunt 34720)
   SpellInfo(thrill_of_the_hunt duration=15 )
   SpellAddBuff(thrill_of_the_hunt thrill_of_the_hunt=1)
-Define(trueshot_aura 19506)
-  SpellAddBuff(trueshot_aura trueshot_aura=1)
 AddIcon mastery=1 help=main
 {
 	if not InCombat() 
@@ -112,19 +108,12 @@ AddIcon mastery=1 help=main
 }
 AddIcon mastery=1 help=offgcd
 {
-	if not InCombat() 
-	{
-		Spell(trueshot_aura)
-	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
 	if Focus() >60 and not BuffPresent(beast_within) Spell(bestial_wrath)
-	Spell(stampede)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
-}
-AddIcon mastery=1 help=moving
-{
-	unless Stance(2) Spell(aspect_of_the_fox)
+	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 }
 AddIcon mastery=1 help=aoe
 {
@@ -136,7 +125,6 @@ AddIcon mastery=1 help=cd
 {
 	Spell(blood_fury)
 	if not BuffPresent(rapid_fire) Spell(rapid_fire)
-	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 	if BuffPresent(rapid_fire) Spell(readiness)
 }
 AddIcon mastery=2 help=main
@@ -147,34 +135,37 @@ AddIcon mastery=2 help=main
 		unless pet.Present() Spell(call_pet_1)
 	}
 	if SpellUsable(powershot) Spell(powershot)
-	if SpellUsable(barrage) Spell(barrage)
 	if SpellUsable(blink_strike) Spell(blink_strike)
-	if not target.DebuffPresent(serpent_sting_aura) and target.HealthPercent() <=90 Spell(serpent_sting)
-	if target.HealthPercent() <=90 Spell(chimera_shot)
+	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	if SpellUsable(dire_beast) Spell(dire_beast)
-	if PreviousSpell(steady_shot) and BuffRemains(steady_focus) <3 Spell(steady_shot)
+	if target.HealthPercent() >90 
+	{
+		if not target.DebuffPresent(serpent_sting_aura) Spell(serpent_sting)
+		Spell(chimera_shot)
+		if PreviousSpell(steady_shot) and BuffRemains(steady_focus) <6 Spell(steady_shot)
+		if BuffStacks(master_marksman_fire) Spell(aimed_shot)
+		Spell(aimed_shot)
+		Spell(steady_shot)
+	}
+	if SpellUsable(barrage) Spell(barrage)
+	if PreviousSpell(steady_shot) and BuffRemains(steady_focus) <=5 Spell(steady_shot)
+	if not target.DebuffPresent(serpent_sting_aura) Spell(serpent_sting)
+	Spell(chimera_shot)
+	if BuffRemains(steady_focus) <{CastTime(steady_shot) +1 } and not InFlightToTarget(steady_shot) Spell(steady_shot)
 	if target.HealthPercent(less 20) Spell(kill_shot)
 	if BuffStacks(master_marksman_fire) Spell(aimed_shot)
 	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
-	if target.HealthPercent() >90 or BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(aimed_shot)
-	if {Focus() >=66 or SpellCooldown(chimera_shot) >=5 } and {target.HealthPercent() <90 and not BuffPresent(rapid_fire) and not BuffStacks(bloodlust any=1) } Spell(arcane_shot)
-	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(aimed_shot)
+	if Focus() >=60 or {Focus() >=43 and {SpellCooldown(chimera_shot) >=CastTime(steady_shot) } } and {not BuffPresent(rapid_fire) and not BuffStacks(bloodlust any=1) } Spell(arcane_shot)
 	Spell(steady_shot)
 }
 AddIcon mastery=2 help=offgcd
 {
-	if not InCombat() 
-	{
-		Spell(trueshot_aura)
-	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
-	if SpellUsable(glaive_toss) Spell(glaive_toss)
-	Spell(stampede)
+	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
-}
-AddIcon mastery=2 help=moving
-{
-	unless Stance(2) Spell(aspect_of_the_fox)
+	if SpellUsable(glaive_toss) Spell(glaive_toss)
 }
 AddIcon mastery=2 help=aoe
 {
@@ -185,9 +176,12 @@ AddIcon mastery=2 help=aoe
 AddIcon mastery=2 help=cd
 {
 	Spell(blood_fury)
-	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 	if not BuffPresent(rapid_fire) Spell(rapid_fire)
-	if BuffPresent(rapid_fire) Spell(readiness)
+	if target.HealthPercent() >90 
+	{
+		Spell(readiness)
+	}
+	Spell(readiness)
 }
 AddIcon mastery=3 help=main
 {
@@ -214,18 +208,11 @@ AddIcon mastery=3 help=main
 }
 AddIcon mastery=3 help=offgcd
 {
-	if not InCombat() 
-	{
-		Spell(trueshot_aura)
-	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
+	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
-	Spell(stampede)
-}
-AddIcon mastery=3 help=moving
-{
-	unless Stance(2) Spell(aspect_of_the_fox)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(stampede)
 }
 AddIcon mastery=3 help=aoe
 {
@@ -236,7 +223,6 @@ AddIcon mastery=3 help=aoe
 AddIcon mastery=3 help=cd
 {
 	Spell(blood_fury)
-	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 	if not BuffPresent(rapid_fire) Spell(rapid_fire)
 	if BuffPresent(rapid_fire) Spell(readiness)
 }
