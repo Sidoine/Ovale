@@ -129,7 +129,7 @@ AddIcon mastery=1 help=main
 	if target.DebuffRemains(colossus_smash) <=1.5 Spell(colossus_smash)
 	if target.HealthPercent(less 20) Spell(execute)
 	if TalentPoints(storm_bolt_talent) Spell(storm_bolt)
-	if BuffPresent(overpower) Spell(overpower usable=1)
+	if SpellUsable(overpower) Spell(overpower usable=1)
 	if TalentPoints(shockwave_talent) Spell(shockwave)
 	if TalentPoints(dragon_roar_talent) Spell(dragon_roar)
 	if {Rage() >=70 or target.DebuffPresent(colossus_smash) } and target.HealthPercent() >=20 Spell(slam)
@@ -146,7 +146,7 @@ AddIcon mastery=1 help=offgcd
 	if not BuffPresent(enrage) Spell(berserker_rage)
 	if target.DebuffPresent(colossus_smash) if CheckBoxOn(heroic_leap_check) Spell(heroic_leap)
 	if Rage() >=40 Spell(deadly_calm)
-	if {{BuffPresent(taste_for_blood) and BuffRemains(taste_for_blood) <=2 } or {BuffStacks(taste_for_blood) ==5 and BuffPresent(overpower) } or {BuffPresent(taste_for_blood) and target.DebuffRemains(colossus_smash) <=2 and not SpellCooldown(colossus_smash) ==0 } or BuffPresent(deadly_calm) or Rage() >110 } and target.HealthPercent() >=20 and target.DebuffPresent(colossus_smash) Spell(heroic_strike)
+	if {{BuffPresent(taste_for_blood) and BuffRemains(taste_for_blood) <=2 } or {BuffStacks(taste_for_blood) ==5 and SpellUsable(overpower) } or {BuffPresent(taste_for_blood) and target.DebuffRemains(colossus_smash) <=2 and not SpellCooldown(colossus_smash) ==0 } or BuffPresent(deadly_calm) or Rage() >110 } and target.HealthPercent() >=20 and target.DebuffPresent(colossus_smash) Spell(heroic_strike)
 }
 AddIcon mastery=1 help=aoe
 {
