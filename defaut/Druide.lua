@@ -161,7 +161,7 @@ AddIcon mastery=2 help=main
 		if TalentPoints(force_of_nature_talent) Spell(treants)
 	}
 	
-	if target.DebuffStacks(weakened_armor) <3 Spell(faerie_fire)
+	if target.DebuffStacks(weakened_armor any=1) <3 Spell(faerie_fire)
 	if BuffExpires(savage_roar) Spell(savage_roar)
 	if target.IsInterruptible() Spell(skull_bash_cat)
 	if TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness) and ComboPoints() >=4 and BuffStacks(dream_of_cenarius_damage) <2 Spell(healing_touch)

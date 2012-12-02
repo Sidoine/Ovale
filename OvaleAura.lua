@@ -278,6 +278,7 @@ end
 -- Public methods
 function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 	if not guid then
+		Ovale:Log(tostring(guid) .. " does not exists in OvaleAura")
 		return nil
 	end
 	local auraTable = self.aura[guid]
@@ -286,12 +287,14 @@ function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 			unitId = OvaleGUID:GetUnitId(guid)
 		end
 		if not unitId then
+			Ovale:Log("Unable to get unitId from " .. tostring(guid))
 			return nil
 		end
 		self:UpdateAuras(unitId, guid)
 		auraTable = self.aura[guid]
 		if not auraTable then
 			-- no aura on target
+			Ovale:Log("Target " .. guid .. " has no aura")
 			return nil
 		end
 	end

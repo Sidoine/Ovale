@@ -346,11 +346,11 @@ local function GetTargetAura(condition, target)
 	
 	local aura = getAura(target, spellId, mine)
 	if not aura then
-		Ovale:Log("Aura "..spellId.." not found")
+		Ovale:Log("Aura "..spellId.." not found on " .. target .. " mine=" .. tostring(mine))
 		return 0,0,0,0
 	end
 	if Ovale.trace then
-		Ovale:Print("GetTargetAura = start=".. tostring(aura.start) .. " end="..tostring(aura.ending).." stacks=" ..tostring(aura.stacks).."/"..stacks)
+		Ovale:Print("GetTargetAura = start=".. tostring(aura.start) .. " end="..tostring(aura.ending).." stacks=" ..tostring(aura.stacks).."/"..stacks .. " target="..target)
 	end
 		
 	if (not condition.mine or (aura.mine and condition.mine==1) or (not aura.mine and condition.mine==0)) and aura.stacks>=stacks then

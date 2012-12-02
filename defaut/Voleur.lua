@@ -20,6 +20,9 @@ Define(envenom 32645)
   SpellAddBuff(envenom envenom=1)
 Define(eviscerate 2098)
   SpellInfo(eviscerate combo=0 energy=35 )
+Define(expose_armor 8647)
+  SpellInfo(expose_armor energy=25 combo=1 )
+  AddCheckBox(expose_armor_check SpellName(expose_armor))
 Define(find_weakness 91021)
   SpellInfo(find_weakness duration=10 )
   SpellAddBuff(find_weakness find_weakness=1)
@@ -68,6 +71,9 @@ Define(vanish 1856)
 Define(vendetta 79140)
   SpellInfo(vendetta duration=20 cd=120 )
   SpellAddBuff(vendetta vendetta=1)
+Define(weakened_armor 113746)
+  SpellInfo(weakened_armor duration=30 )
+  SpellAddBuff(weakened_armor weakened_armor=1)
 Define(preparation_talent 10)
 AddIcon mastery=1 help=main
 {
@@ -75,6 +81,7 @@ AddIcon mastery=1 help=main
 	{
 		if WeaponEnchantExpires(mainhand 300) Item(6497) 
 	}
+	if {target.DebuffStacks(weakened_armor any=1) <3 or target.DebuffRemains(weakened_armor any=1) <3 } and ComboPoints() <5 if CheckBoxOn(expose_armor_check) Spell(expose_armor)
 	Spell(ambush usable=1)
 	if BuffRemains(slice_and_dice) <2 Spell(slice_and_dice)
 	if target.TicksRemain(rupture) <2 and Energy() >90 Spell(dispatch usable=1)
@@ -109,6 +116,7 @@ AddIcon mastery=2 help=main
 	{
 		if WeaponEnchantExpires(mainhand 300) Item(6497) 
 	}
+	if {target.DebuffStacks(weakened_armor any=1) <3 or target.DebuffRemains(weakened_armor any=1) <3 } and ComboPoints() <5 if CheckBoxOn(expose_armor_check) Spell(expose_armor)
 	Spell(ambush usable=1)
 	if BuffRemains(slice_and_dice) <2 or {BuffRemains(slice_and_dice) <15 and BuffStacks(bandits_guile) ==11 and ComboPoints() >=4 } Spell(slice_and_dice)
 	if target.TicksRemain(rupture) <2 and ComboPoints() ==5 and BuffPresent(deep_insight) and target.DeadIn() >10 Spell(rupture)
@@ -143,6 +151,7 @@ AddIcon mastery=3 help=main
 		if WeaponEnchantExpires(mainhand 300) Item(6497) 
 		Spell(slice_and_dice)
 	}
+	if {target.DebuffStacks(weakened_armor any=1) <3 or target.DebuffRemains(weakened_armor any=1) <3 } and ComboPoints() <5 if CheckBoxOn(expose_armor_check) Spell(expose_armor)
 	if ComboPoints() <=5 and BuffStacks(anticipation) ==0 Spell(ambush usable=1)
 	if BuffRemains(slice_and_dice) <3 and ComboPoints() ==5 Spell(slice_and_dice)
 	if ComboPoints() ==5 and target.DebuffRemains(rupture) <5 Spell(rupture)

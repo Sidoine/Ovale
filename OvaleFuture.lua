@@ -99,10 +99,16 @@ end
 
 function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineId)
 	if unit == "player" then
-		local targetGUID = OvaleGUID.nameToGUID[target]
+		local targetGUID 
+		--The UNIT_TARGET event may come a bit late
+		if target == UnitName("target") then
+			targetGUID = UnitGUID("target")
+		else
+			targetGUID = OvaleGUID.nameToGUID[target]
+		end
 		self.nextSpellTarget = targetGUID
 		self.nextSpellLineID = lineId
-		--Ovale:Print(target)
+		-- Ovale:Print("UNIT_SPELLCAST_SENT " .. lineId .. " targetGUID = " .. targetGUID)
 		for i,v in ipairs(self.lastSpell) do
 			if v.lineId == lineId then
 				v.target = targetGUID
@@ -221,6 +227,7 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	newSpell.allowRemove = allowRemove
 	--TODO unable to know what is the real target
 	if lineId == self.nextSpellLineID and self.nextSpellTarget then
+		-- Ovale:Print("found lineId " .. lineId .. " target is " .. self.nextSpellTarget)
 		newSpell.target = self.nextSpellTarget
 	else
 		newSpell.target = UnitGUID("target")

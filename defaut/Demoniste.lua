@@ -236,7 +236,7 @@ AddIcon mastery=3 help=main
 	if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
 	if TalentPoints(grimoire_of_sacrifice_talent) and BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
 	if BurningEmbers() if target.HealthPercent(less 20) Spell(shadowburn)
-	if target.TicksRemain(immolate) <Ticks(immolate) /2 and target.DeadIn() >=5 Spell(immolate)
+	if {target.TicksRemain(immolate) <Ticks(immolate) /2 or target.DebuffExpires(immolate) } and target.DeadIn() >=5 Spell(immolate)
 	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {BurningEmbers() >3.5 or BuffRemains(dark_soul) >CastTime(chaos_bolt) } and ManaPercent() <=80 Spell(chaos_bolt)
 	Spell(conflagrate)
 	Spell(incinerate)

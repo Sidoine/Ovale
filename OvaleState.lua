@@ -78,6 +78,7 @@ function OvaleState:Reset()
 	self.lastSpellId = OvaleFuture.lastSpellId
 	self.serial = self.serial + 1
 	self.currentTime = self.maintenant
+	Ovale:Log("Reset state with current time = " .. self.currentTime)
 	self.currentSpellId = nil
 	self.attenteFinCast = self.maintenant
 	self.state.combo = OvaleComboPoints.combo
@@ -141,7 +142,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 	end
 	
 	if Ovale.trace then
-		Ovale:Print("add spell "..spellId.." at "..startCast.." currentTime = "..self.currentTime.. " nextCast="..self.attenteFinCast .. " endCast="..endCast)
+		Ovale:Print("add spell "..spellId.." at "..startCast.." currentTime = "..self.currentTime.. " nextCast="..self.attenteFinCast .. " endCast="..endCast .. " targetGUID = " .. tostring(targetGUID))
 	end
 	
 	--Effet du sort au moment du début du cast
@@ -344,7 +345,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 										newAura.stacks = previousAura.stacks + stacks
 									end
 									newAura.start = previousAura.start
-									if isDoT then
+									if isDoT and previousAura.ending > newAura.start then
 										-- TODO: check that refreshed DoTs take a new snapshot of player stats.
 										local tickLength = OvaleData:GetTickLength(auraSpellId, previousAura.spellHaste)
 										local k = floor((previousAura.ending - endCast) / tickLength)
@@ -369,7 +370,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 									end
 								end
 							else
-								Ovale:Log("New aura "..auraSpellId.." at " .. endCast)
+								Ovale:Log("New aura "..auraSpellId.." at " .. endCast .." on " .. target .. " " .. auraGUID)
 								newAura.stacks = stacks
 								newAura.start = endCast
 								newAura.ending = endCast + duration
@@ -435,8 +436,10 @@ end
 
 function OvaleState:GetAuraByGUID(guid, spellId, mine, target)
 	if self.aura[guid] and self.aura[guid][spellId] and self.aura[guid][spellId].serial == self.serial then
+		Ovale:Log("Found aura " .. spellId .. " on " .. tostring(guid))
 		return self.aura[guid][spellId]
 	else
+		Ovale:Log("Aura " .. spellId .. " not found in state for " .. tostring(guid))
 		return OvaleAura:GetAuraByGUID(guid, spellId, mine, target)
 	end
 end

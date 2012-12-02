@@ -50,6 +50,7 @@ function OvaleGUID:OnDisable()
 end
 
 function OvaleGUID:Update(unitId)
+	--self:Print("Update " .. unitId)
 	local guid = UnitGUID(unitId)
 	local previousGuid = self.guid[unitId]
 	if unitId == "player" then
@@ -70,12 +71,12 @@ function OvaleGUID:Update(unitId)
 			Ovale:debugPrint("guid", "GUID "..guid.." is ".. unitId)
 			self.unitId[guid][unitId] = true
 		end
-		local name = UnitName(unitId)
-		if name and (not self.nameToGUID[name] or unitId == "target" 
-				or self.nameToUnit[name] == "mouseover") then
-			self.nameToGUID[name] = guid
-			self.nameToUnit[name] = unitId
-		end
+	end
+	local name = UnitName(unitId)
+	if name and (not self.nameToGUID[name] or unitId == "target" 
+			or self.nameToUnit[name] == "mouseover") then
+		self.nameToGUID[name] = guid
+		self.nameToUnit[name] = unitId
 	end
 end
 
@@ -96,6 +97,9 @@ end
 
 function OvaleGUID:UNIT_TARGET(event, unitId)
 	self:Update(unitId .. "target")
+	if unitId == "player" then
+		self:Update("target")
+	end
 end
 
 function OvaleGUID:GROUP_ROSTER_UPDATE(event)
