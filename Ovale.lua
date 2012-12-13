@@ -14,7 +14,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local Recount = Recount
 local Skada = Skada
 
-local pairs, strsplit = pairs, string.split
+local ipairs, pairs, strsplit, tinsert, tsort = ipairs, pairs, string.split, table.insert, table.sort
 local SendAddonMessage, UnitAura, UnitCanAttack = SendAddonMessage, UnitAura, UnitCanAttack
 local UnitExists, UnitHasVehicleUI, UnitIsDead = UnitExists, UnitHasVehicleUI, UnitIsDead
 --</private-static-properties>
@@ -74,15 +74,21 @@ function Ovale:Debug()
 	self:Print(OvaleCompile:DebugNode(self.masterNodes[1]))
 end
 
+-- Print the auras matching the filter on the target in alphabetical order.
 function Ovale:DebugListAura(target, filter)
 	local i = 1
+	local array = {}
 	while true do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId =  UnitAura(target, i, filter)
+		local name, _, _, _, _, _, _, _, _, _, spellId =  UnitAura(target, i, filter)
 		if not name then
 			break
 		end
-		Ovale:Print(name..": "..spellId)
+		tinsert(array, name .. ": " .. spellId)
 		i = i + 1
+	end
+	tsort(array)
+	for _, v in ipairs(array) do
+		Ovale:Print(v)
 	end
 end
 

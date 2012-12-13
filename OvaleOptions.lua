@@ -439,9 +439,7 @@ local options =
 					name = "List player spells",
 					type = "execute",
 					func = function()
-						for k,v in pairs(OvaleData.spellList) do
-							Ovale:Print(k ..":" .. v)
-						end
+						OvaleData:DebugSpellList()
 					end					
 				}
 			}

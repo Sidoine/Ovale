@@ -10,7 +10,7 @@
 OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
 
 --<private-static-properties>
-local pairs, tonumber, tostring = pairs, tonumber, tostring
+local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
 local GetShapeshiftForm, GetSpellBookItemInfo, GetSpellBookItemName = GetShapeshiftForm, GetSpellBookItemInfo, GetSpellBookItemName
 local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
 local HasPetSpells, UnitBuff, UnitClass = HasPetSpells, UnitBuff, UnitClass
@@ -511,7 +511,6 @@ function OvaleData:GetGCD(spellId)
 	end
 end
 
-
 --Compute the spell Cooldown
 function OvaleData:GetComputedSpellCD(spellId)
 	local actionCooldownStart, actionCooldownDuration, actionEnable
@@ -602,6 +601,18 @@ function OvaleData:GetTickLength(spellId, spellHaste)
 		end
 	else
 		return nil
+	end
+end
+
+-- Print out the list of known spells in alphabetical order.
+function OvaleData:DebugSpellList()
+	local array = {}
+	for k, v in pairs(self.spellList) do
+		tinsert(array, v .. ": " .. k)
+	end
+	tsort(array)
+	for _, v in ipairs(array) do
+		Ovale:Print(v)
 	end
 end
 --</public-static-methods>
