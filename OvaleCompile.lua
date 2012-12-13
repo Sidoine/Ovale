@@ -329,6 +329,11 @@ local function ParseUnless(a, b)
 	return AddNode(newNode)
 end
 
+local function ParseWait(a)
+	local newNode = {type="wait", a=node[tonumber(a)]}
+	return AddNode(newNode)
+end
+
 local function ParseAnd(a,b)
 	local newNode = {type="and", a=node[tonumber(a)], b=node[tonumber(b)]}
 	return AddNode(newNode)
@@ -486,6 +491,7 @@ local function ParseCommands(text)
 		text = strgsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
 		text = strgsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
 		text = strgsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
+		text = strgsub(text, "wait%s+node(%d+)",ParseWait)
 		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
 		if (was == text) then
 			break
@@ -666,6 +672,8 @@ function OvaleCompile:DebugNode(node)
 		text = "if "..self:DebugNode(node.a).." "..self:DebugNode(node.b)
 	elseif (node.type == "unless") then
 		text = "unless "..self:DebugNode(node.a).." "..self:DebugNode(node.b)
+	elseif (node.type == "wait") then
+		text = "wait "..self:DebugNode(node.a)
 	elseif (node.type == "and") then
 		text = self:DebugNode(node.a).." and "..self:DebugNode(node.b)
 	elseif (node.type == "or") then

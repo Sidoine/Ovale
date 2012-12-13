@@ -456,6 +456,17 @@ function OvaleBestAction:Compute(element)
 					
 		if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startB)..","..tostring(endB)) end
 		return startB, endB, prioriteB, elementB
+	elseif element.type == "wait" then
+		if (Ovale.trace) then
+			Ovale:Print(element.type.." ["..element.nodeId.."]")
+		end
+		local startA, endA, prioriteA, elementA = self:Compute(element.a)
+		-- Special priority value as signal for group Compute().
+		if prioriteA then
+			prioriteA = -1 * prioriteA
+		end
+		if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startA)..","..tostring(endA).." ["..element.nodeId.."]") end
+		return startA, endA, prioriteA, elementA
 	elseif element.type == "not" then
 		local startA, endA = self:ComputeBool(element.a)
 		if startA then
@@ -670,6 +681,10 @@ function OvaleBestAction:Compute(element)
 		
 		for k, v in ipairs(element.nodes) do
 			local newStart, newEnd, priorite, nouveauElement = self:Compute(v)
+			local wait = priorite and priorite < 0
+			if wait then
+				priorite = -1 * priorite
+			end
 			if newStart~=nil and newStart<OvaleState.currentTime then
 				newStart = OvaleState.currentTime
 			end
@@ -719,6 +734,8 @@ function OvaleBestAction:Compute(element)
 					bestCastTime = newCastTime
 				end
 			end
+			-- If the node is a "wait" node, then skip the remaining nodes.
+			if wait then break end
 		end
 		
 		if (meilleurTempsFils) then
