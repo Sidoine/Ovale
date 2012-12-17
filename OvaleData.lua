@@ -220,6 +220,13 @@ OvaleData.buffSpellList =
 		80353, --Time Warp (mage)
 		90355, -- Ancient Hysteria (core hound)
 	},
+	burst_haste_debuff =
+	{
+		57723, -- Exhaustion (Heroism)
+		57724, -- Sated (Bloodlust)
+		80354, -- Temporal Displacement (Time Warp)
+		95809, -- Insanity (Ancient Hysteria)
+	},
 	enrage =
 	{
 		--TODO update
