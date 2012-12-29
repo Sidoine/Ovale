@@ -105,7 +105,9 @@ Define(taste_for_blood 56638)
 Define(thunder_clap 6343)
   SpellInfo(thunder_clap rage=20 cd=6 )
   SpellAddTargetDebuff(thunder_clap weakened_blows=1)
-Define(ultimatum 122509)
+Define(ultimatum 122510)
+  SpellInfo(ultimatum duration=10 )
+  SpellAddBuff(ultimatum ultimatum=1)
 Define(weakened_armor 113746)
   SpellInfo(weakened_armor duration=30 )
   SpellAddBuff(weakened_armor weakened_armor=1)
@@ -231,9 +233,9 @@ AddIcon mastery=3 help=main
 	{
 		unless Stance(2) Spell(defensive_stance)
 	}
-	if Rage() <90 Spell(shield_slam)
-	if Rage() <100 Spell(revenge)
-	if Rage() <100 Spell(battle_shout)
+	if Rage() <80 Spell(shield_slam)
+	if Rage() <85 Spell(revenge)
+	if Rage() <90 Spell(battle_shout)
 	if target.DebuffExpires(weakened_blows) Spell(thunder_clap)
 	if target.HealthPercent(less 20) Spell(execute)
 	Spell(devastate)
@@ -241,8 +243,8 @@ AddIcon mastery=3 help=main
 AddIcon mastery=3 help=offgcd
 {
 	if target.IsInterruptible() Spell(pummel)
-	Spell(berserker_rage)
 	if BuffPresent(ultimatum) Spell(heroic_strike)
+	if Rage() <90 Spell(berserker_rage)
 	if BuffExpires(shield_block_aura) Spell(shield_block)
 	if BuffExpires(shield_barrier) and Rage() >80 Spell(shield_barrier)
 	Spell(demoralizing_shout)

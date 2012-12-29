@@ -73,7 +73,7 @@ AddIcon mastery=3 help=main
 AddIcon mastery=3 help=offgcd
 {
 	if TalentPoints(power_strikes_talent) and BuffStacks(chi_sphere) and Chi() <4 Spell(chi_sphere)
-	if not BuffPresent(tigereye_brew_use) and BuffStacks(tigereye_brew) ==10 Spell(tigereye_brew_use)
+	if not BuffPresent(tigereye_brew_use) and BuffStacks(tigereye_brew) ==10 Spell(tigereye_brew)
 	if TimeToMaxEnergy() >5 Spell(energizing_brew)
 }
 AddIcon mastery=3 help=aoe

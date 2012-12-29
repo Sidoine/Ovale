@@ -56,12 +56,12 @@ AddIcon mastery=3 help=main
 AddIcon mastery=3 help=offgcd
 {
 	if target.IsInterruptible() Spell(rebuke)
-	if BuffPresent(inquisition) and TimeInCombat() >10 Spell(execution_sentence)
+	if BuffPresent(inquisition) Spell(execution_sentence)
 }
 AddIcon mastery=3 help=cd
 {
 	if BuffPresent(inquisition) Spell(avenging_wrath)
 	if BuffPresent(avenging_wrath) Spell(guardian_of_ancient_kings)
-	if BuffPresent(inquisition) and TimeInCombat() >10  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if BuffPresent(inquisition)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 ]]

@@ -108,9 +108,13 @@ AddIcon mastery=1 help=main
 }
 AddIcon mastery=1 help=offgcd
 {
+	if not InCombat() 
+	{
+		unless Stance(1) Spell(aspect_of_the_hawk)
+	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
 	if Focus() >60 and not BuffPresent(beast_within) Spell(bestial_wrath)
-	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(stampede)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) or target.DeadIn() <=25 Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
 	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
@@ -161,9 +165,13 @@ AddIcon mastery=2 help=main
 }
 AddIcon mastery=2 help=offgcd
 {
+	if not InCombat() 
+	{
+		unless Stance(1) Spell(aspect_of_the_hawk)
+	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
 	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
-	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(stampede)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) or target.DeadIn() <=25 Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
 }
@@ -208,11 +216,15 @@ AddIcon mastery=3 help=main
 }
 AddIcon mastery=3 help=offgcd
 {
+	if not InCombat() 
+	{
+		unless Stance(1) Spell(aspect_of_the_hawk)
+	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
-	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) Spell(stampede)
+	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) or target.DeadIn() <=25 Spell(stampede)
 }
 AddIcon mastery=3 help=aoe
 {
