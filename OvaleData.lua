@@ -328,7 +328,7 @@ function OvaleData:GetStunSpellList()
 	end
 	stunSpellList = {}
 	for k, v in pairs(self.buffSpellList.stun) do
-		stunListList[v] = true
+		stunSpellList[v] = true
 	end
 	return stunSpellList
 end
