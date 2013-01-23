@@ -2610,10 +2610,13 @@ end
 -- @paramsig boolean
 -- @param id The NPC id of the totem, ghoul or statue, or the type of totem.
 --     Valid types: fire, water, air, earth, ghoul, statue.
+-- @param seconds Optional. The maximum number of seconds before the totem should expire.
+--     Defaults to 0 (zero).
 -- @return A boolean value.
 -- @see TotemPresent
 -- @usage
 -- if TotemExpires(fire) Spell(searing_totem)
+-- if TotemExpires(water 3) Spell(totemic_recall)
 
 OvaleCondition.conditions.totemexpires = function(condition)
 	if type(condition[1]) ~= "number" then
