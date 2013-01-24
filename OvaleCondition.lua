@@ -2608,15 +2608,17 @@ end
 --- Test if the totem for shamans, the ghoul for death knights, or the statue for monks has expired.
 -- @name TotemExpires
 -- @paramsig boolean
--- @param id The NPC id of the totem, ghoul or statue, or the type of totem.
+-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
 --     Valid types: fire, water, air, earth, ghoul, statue.
 -- @param seconds Optional. The maximum number of seconds before the totem should expire.
 --     Defaults to 0 (zero).
+-- @param totem Optional. Sets the specific totem to check of given totem ID type.
+--     Valid values: any totem spell ID
 -- @return A boolean value.
 -- @see TotemPresent
 -- @usage
 -- if TotemExpires(fire) Spell(searing_totem)
--- if TotemExpires(water 3) Spell(totemic_recall)
+-- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
 OvaleCondition.conditions.totemexpires = function(condition)
 	if type(condition[1]) ~= "number" then
@@ -2636,12 +2638,15 @@ end
 --- Test if the totem for shamans, the ghoul for death knights, or the statue for monks is present.
 -- @name TotemPresent
 -- @paramsig boolean
--- @param id The NPC id of the totem, ghoul or statue, or the type of totem.
+-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
 --     Valid types: fire, water, air, earth, ghoul, statue.
+-- @param totem Optional. Sets the specific totem to check of given totem ID type.
+--     Valid values: any totem spell ID
 -- @return A boolean value.
 -- @see TotemExpires
 -- @usage
 -- if not TotemPresent(fire) Spell(searing_totem)
+-- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
 OvaleCondition.conditions.totempresent = function(condition)
 	if type(condition[1]) ~= "number" then
