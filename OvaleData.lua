@@ -221,6 +221,7 @@ OvaleData.buffSpellList =
 		24844, -- Lightning Breath (wind serpent)
 		34889, -- Fire Breath (dragonhawk)
 		93068, -- Master Poisoner (rogue)
+		104225, -- Soulburn: Curse of the Elements (warlock)
 	},
 	physical_vulnerability=
 	{
