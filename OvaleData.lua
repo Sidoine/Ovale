@@ -80,6 +80,7 @@ OvaleData.selfDamageBuff =
 
 OvaleData.buffSpellList =
 {
+	-- Debuffs
 	fear =
 	{
 		5782, -- Fear
@@ -87,18 +88,18 @@ OvaleData.buffSpellList =
 		5246, -- Intimidating Shout 
 		8122, -- Psychic scream
 	},
+	incapacitate =
+	{
+		6770, -- Sap
+		12540, -- Gouge
+		20066, -- Repentance
+	},
 	root =
 	{
 		23694, -- Improved Hamstring
 		339, -- Entangling Roots
 		122, -- Frost Nova
 		47168, -- Improved Wing Clip
-	},
-	incapacitate = 
-	{
-		6770, -- Sap
-		12540, -- Gouge
-		20066, -- Repentance
 	},
 	stun = 
 	{
@@ -110,48 +111,13 @@ OvaleData.buffSpellList =
 		408, -- Kidney Shot
 		46968, -- Shockwave
 	},
-	
-	str_agi_int =
-	{
-		1126, -- Mark of the Wild (druid)
-		20217, -- Blessing of Kings (paladin)
-		90363, -- Embrace of the Shale Spider (shale spider)
-		117666, -- Legacy of the Emporer (monk)
-	},
-	stamina =
-	{
-		469, -- Commanding Shout (warrior)
-		6307, -- Blood Pact (imp)
-		21562, -- Power Word: Fortitude (priest)
-		90364, -- Qiraji Fortitude (silithid)
-	},
+
+	-- Raid buffs
 	attack_power_multiplier=
 	{
 		6673, -- Battle Shout (warrior)
 		19506, -- Trueshot Aura (hunter)
 		57330, -- Horn of Winter (death knight)
-	},
-	spell_power_multiplier = 
-	{
-		1459, -- Arcane Brillance
-		61316, -- Dalaran Brilliance (mage)
-		77747, -- Burning Wrath (shaman)
-		109773,  -- Dark Intent (warlock)
-		126309, -- Still Water (waterstrider)
-	},
-	melee_haste =
-	{
-		30809, -- Unleashed Rage (enhancement shaman)
-		55610, -- Unholy Aura (frost & unholy death knights)
-		113742, -- Swiftblade's Cunning (rogue)
-		128432, -- Cackling Howl (hyena)
-		128433, -- Serpent's Swiftness (serpent)
-	},
-	spell_haste = 
-	{
-		24907, -- Moonkin aura (balance druid)
-		49868, -- Mind Quickening (shadow priest, sporebat)
-		51470, -- Elemental Oath (elemental shaman)
 	},
 	critical_strike =
 	{
@@ -173,28 +139,44 @@ OvaleData.buffSpellList =
 		116956, -- Grace of Air (shaman)
 		128997, -- Spirit Beast Blessing (spirit beast)
 	},
-	-- weakened_armor
-	physical_vulnerability=
+	melee_haste =
 	{
-		35290, -- Gore (boar)
-		50518, -- Ravage (ravager)
-		55749, -- Acid Spit (worm)
-		57386, -- Stampede (rhino)
-		81326, -- Physical Vulnerability (frost & unholy death knights, retribution paladin, arms & fury warriors)
+		30809, -- Unleashed Rage (enhancement shaman)
+		55610, -- Unholy Aura (frost & unholy death knights)
+		113742, -- Swiftblade's Cunning (rogue)
+		128432, -- Cackling Howl (hyena)
+		128433, -- Serpent's Swiftness (serpent)
 	},
-	magic_vulnerability=
+	spell_power_multiplier = 
 	{
-		1490, -- Curse of the Elements (warlock)
-		24844, -- Lightning Breath (wind serpent)
-		34889, -- Fire Breath (dragonhawk)
-		93068, -- Master Poisoner (rogue)
+		1459, -- Arcane Brillance
+		61316, -- Dalaran Brilliance (mage)
+		77747, -- Burning Wrath (shaman)
+		109773,  -- Dark Intent (warlock)
+		126309, -- Still Water (waterstrider)
 	},
-	lower_physical_damage=
+	stamina =
 	{
-		24423, -- Demoralizing Screech (carrion bird)
-		50256, -- Demoralizing Roar (bear)
-		115798, -- Weakened Blows (all tank specs, feral druid, retribution paladin, shaman, warlock, warrior)
+		469, -- Commanding Shout (warrior)
+		6307, -- Blood Pact (imp)
+		21562, -- Power Word: Fortitude (priest)
+		90364, -- Qiraji Fortitude (silithid)
 	},
+	str_agi_int =
+	{
+		1126, -- Mark of the Wild (druid)
+		20217, -- Blessing of Kings (paladin)
+		90363, -- Embrace of the Shale Spider (shale spider)
+		117666, -- Legacy of the Emporer (monk)
+	},
+	spell_haste = 
+	{
+		24907, -- Moonkin aura (balance druid)
+		49868, -- Mind Quickening (shadow priest, sporebat)
+		51470, -- Elemental Oath (elemental shaman)
+	},
+
+	-- Target debuffs
 	cast_slow =
 	{
 		5760, -- Mind-numbing Poison (rogue)
@@ -213,20 +195,33 @@ OvaleData.buffSpellList =
 		82654, -- Widow Venom (hunter)
 		115804, -- Mortal Wounds (arms & fury warriors, windwalker monk)
 	},
-	burst_haste =
+	lower_physical_damage=
 	{
-		2825, --Bloodlust (Horde shaman)
-		32182, --Heroism (Alliance shaman)
-		80353, --Time Warp (mage)
-		90355, -- Ancient Hysteria (core hound)
+		24423, -- Demoralizing Screech (carrion bird)
+		50256, -- Demoralizing Roar (bear)
+		115798, -- Weakened Blows (all tank specs, feral druid, retribution paladin, shaman, warlock, warrior)
 	},
-	burst_haste_debuff =
+	magic_vulnerability=
 	{
-		57723, -- Exhaustion (Heroism)
-		57724, -- Sated (Bloodlust)
-		80354, -- Temporal Displacement (Time Warp)
-		95809, -- Insanity (Ancient Hysteria)
+		1490, -- Curse of the Elements (warlock)
+		24844, -- Lightning Breath (wind serpent)
+		34889, -- Fire Breath (dragonhawk)
+		93068, -- Master Poisoner (rogue)
 	},
+	physical_vulnerability=
+	{
+		35290, -- Gore (boar)
+		50518, -- Ravage (ravager)
+		55749, -- Acid Spit (worm)
+		57386, -- Stampede (rhino)
+		81326, -- Physical Vulnerability (frost & unholy death knights, retribution paladin, arms & fury warriors)
+	},
+	ranged_vulnerability =
+	{
+		1130, -- Hunter's Mark
+	},
+
+	-- Target buffs
 	enrage =
 	{
 		--TODO update
@@ -240,9 +235,21 @@ OvaleData.buffSpellList =
         52610, -- Savage Roar (Cat)
         76691, -- Vengeance (All Tank Specs)
 	},
-	ranged_vulnerability =
+
+	-- Raid buffs (short term)
+	burst_haste =
 	{
-		1130, -- Hunter's Mark
+		2825, --Bloodlust (Horde shaman)
+		32182, --Heroism (Alliance shaman)
+		80353, --Time Warp (mage)
+		90355, -- Ancient Hysteria (core hound)
+	},
+	burst_haste_debuff =
+	{
+		57723, -- Exhaustion (Heroism)
+		57724, -- Sated (Bloodlust)
+		80354, -- Temporal Displacement (Time Warp)
+		95809, -- Insanity (Ancient Hysteria)
 	},
 }
 OvaleData.buffSpellList.bloodlust_aura = OvaleData.buffSpellList.burst_haste
