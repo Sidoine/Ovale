@@ -177,6 +177,20 @@ OvaleData.buffSpellList =
 	},
 
 	-- Target debuffs
+	bleed =
+	{
+		1079, -- Rip (feral druid)
+		1822, -- Rake (cat druid)
+		9007, -- Pounce Bleed (cat druid)
+		33745, -- Lacerate (bear druid)
+		63468, -- Piercing Shots (marksmanship hunter)
+		77758, -- Thrash (bear druid)
+		103830, -- Thrash (cat druid)
+		113344, -- Bloodbath (warrior)
+		115767, -- Deep Wounds (warrior)
+		120699, -- Lynx Rush (hunter)
+		122233, -- Crimson Tempest (rogue)
+	},
 	cast_slow =
 	{
 		5760, -- Mind-numbing Poison (rogue)
