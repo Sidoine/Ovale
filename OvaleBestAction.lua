@@ -59,6 +59,10 @@ local function minTime(time1, time2)
 	end
 end
 
+local function isBetween(checkTime, startTime, endTime)
+	return isBeforeEqual(startTime, checkTime) and isAfterEqual(endTime, checkTime)
+end
+
 local function maxTime(time1, time2)
 	if isAfter(time1, time2) then
 		return time1
@@ -415,6 +419,10 @@ function OvaleBestAction:Compute(element)
 		else
 			startB, endB, prioriteB, elementB = self:ComputeBool(element.b)
 		end
+		-- If the "then" clause is a "wait" node, then only wait if the conditions are true.
+		if elementB and elementB.wait and not isBetween(OvaleState.currentTime, startA, endA) then
+			elementB.wait = nil
+		end
 		if isAfter(startB, endA) or isAfter(startA, endB) then
 			if Ovale.trace then Ovale:Print(element.type.." return nil ["..element.nodeId.."]") end
 			return nil
@@ -436,6 +444,11 @@ function OvaleBestAction:Compute(element)
 		local startA, endA = self:ComputeBool(element.a)
 		local startB, endB, prioriteB, elementB = self:Compute(element.b)
 		
+		-- If the "then" clause is a "wait" node, then only wait if the conditions are false.
+		if elementB and elementB.wait and isBetween(OvaleState.currentTime, startA, endA) then
+			elementB.wait = nil
+		end
+
 		if isBeforeEqual(startA, startB) and isAfterEqual(endA, endB) then
 			if Ovale.trace then Ovale:Print(element.type.." return nil") end
 			return nil
@@ -453,7 +466,7 @@ function OvaleBestAction:Compute(element)
 		if isAfter(endA, startB) and isBefore(endA, endB) then
 			startB = endA
 		end
-					
+
 		if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startB)..","..tostring(endB)) end
 		return startB, endB, prioriteB, elementB
 	elseif element.type == "wait" then
@@ -461,10 +474,7 @@ function OvaleBestAction:Compute(element)
 			Ovale:Print(element.type.." ["..element.nodeId.."]")
 		end
 		local startA, endA, prioriteA, elementA = self:Compute(element.a)
-		-- Special priority value as signal for group Compute().
-		if prioriteA then
-			prioriteA = -1 * prioriteA
-		end
+		elementA.wait = true
 		if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startA)..","..tostring(endA).." ["..element.nodeId.."]") end
 		return startA, endA, prioriteA, elementA
 	elseif element.type == "not" then
@@ -681,18 +691,13 @@ function OvaleBestAction:Compute(element)
 		
 		for k, v in ipairs(element.nodes) do
 			local newStart, newEnd, priorite, nouveauElement = self:Compute(v)
-			local wait = priorite and priorite < 0
-			if wait then
-				priorite = -1 * priorite
-			end
+
 			if newStart~=nil and newStart<OvaleState.currentTime then
 				newStart = OvaleState.currentTime
 			end
 
-			
 			if newStart and (not newEnd or newStart<=newEnd) then
-				local remplacer
-
+				-- The node has a valid time interval.
 				local newCastTime
 				if nouveauElement then
 					newCastTime = nouveauElement.castTime
@@ -700,7 +705,8 @@ function OvaleBestAction:Compute(element)
 				if not newCastTime or newCastTime < OvaleState.gcd then
 					newCastTime = OvaleState.gcd
 				end
-			
+
+				local remplacer
 				if (not meilleurTempsFils) then
 					remplacer = true
 				else
@@ -726,6 +732,7 @@ function OvaleBestAction:Compute(element)
 						remplacer = true
 					end
 				end
+
 				if (remplacer) then
 					meilleurTempsFils = newStart
 					meilleurePrioriteFils = priorite
@@ -735,7 +742,7 @@ function OvaleBestAction:Compute(element)
 				end
 			end
 			-- If the node is a "wait" node, then skip the remaining nodes.
-			if wait then break end
+			if nouveauElement and nouveauElement.wait then break end
 		end
 		
 		if (meilleurTempsFils) then
