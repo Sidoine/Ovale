@@ -576,13 +576,13 @@ function OvaleBestAction:Compute(element)
 			end
 		elseif element.operator == "+" then
 			if c+z == 0 then
-				l = a+x; m = 0; n = 0
+				l = (a+x) - (b-y)*c; m = 0; n = 0
 			else
 				l = a+x; m = (b*c+y*z)/(c+z); n = c+z
 			end
 		elseif element.operator == '-' then
 			if c-z == 0 then
-				l = a-x; m = 0; n = 0
+				l = (a-x) - (b-y)*c; m = 0; n = 0
 			else
 				l = a-x; m = (b*c-y*z)/(c-z); n = c-z
 			end

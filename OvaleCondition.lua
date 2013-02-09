@@ -1950,7 +1950,7 @@ OvaleCondition.conditions.nexttick = function(condition)
 		while ending - tickLength > OvaleState.currentTime do
 			ending = ending - tickLength
 		end
-		return 0, nil, ending, 0, -1
+		return 0, nil, 0, ending, -1
 	end
 	return nil
 end
