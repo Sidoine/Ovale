@@ -1480,7 +1480,7 @@ end
 --- Test if the target is friendly to the player.
 -- @name IsFriend
 -- @paramsig boolean
--- @param yesno Optional. If yes, then return true if the target is interruptible. If no, then return true if it isn't interruptible.
+-- @param yesno Optional. If yes, then return true if the target is friendly (able to help in combat). If no, then return true if it isn't friendly.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
@@ -2525,7 +2525,7 @@ OvaleCondition.conditions.ticksremain = function(condition)
 end
 OvaleCondition.auraConditions.ticksremain = true
 
---- Get the number of seconds between ticsk of a damage-over-time (DoT) aura on a target.
+--- Get the number of seconds between ticks of a damage-over-time (DoT) aura on a target.
 -- @name TickTime
 -- @paramsig number or boolean
 -- @param id The aura spell ID.
@@ -2574,7 +2574,7 @@ end
 -- @return The number of seconds.
 -- @see DeadIn
 -- @usage
--- if TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
+-- if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
 
 OvaleCondition.conditions.timetodie = function(condition)
 	return 0, nil, 0, getTargetDead(getTarget(condition.target)), -1
