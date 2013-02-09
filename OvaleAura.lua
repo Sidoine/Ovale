@@ -348,7 +348,7 @@ function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
 				if aura then
 					local newEnding = aura.ending
 					local newStarting = aura.start
-					if newStarting and (not staring or newStarting < starting) then
+					if newStarting and (not starting or newStarting < starting) then
 						starting = newStarting
 					end
 					if newEnding and (not ending or newEnding > ending) then
