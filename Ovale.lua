@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2009, 2010, 2011, 2012 Sidoine
+    Copyright (C) 2009, 2010, 2011, 2012, 2013 Sidoine, Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -99,7 +99,6 @@ function Ovale:CompileAll()
 			self:debugPrint("compile", "FULL compile")
 			self.masterNodes = OvaleCompile:Compile(code)
 		end
-		OvaleData:FillMissingSpells()
 		self.refreshNeeded.player = true
 		self:UpdateFrame()
 		self.needCompile = false

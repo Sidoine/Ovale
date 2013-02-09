@@ -19,7 +19,6 @@ local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 
 --<public-static-properties>
 OvaleData.spellList = {}
-OvaleData.missingSpellList = {}
 OvaleData.firstInit = false
 OvaleData.className = nil
 OvaleData.level = nil
@@ -402,12 +401,6 @@ function OvaleData:FillPetSpellList()
 	end
 end
 
-function OvaleData:FillMissingSpells()
-	for k, v in pairs(self.missingSpellList) do
-		self.spellList[k] = v
-	end
-end
-
 function OvaleData:FillSpellList()
 	self.spellList = {}
 	
@@ -426,7 +419,6 @@ function OvaleData:FillSpellList()
 		end
 		i = i + 1
 	end
-	self:FillMissingSpells()
 	self:FillPetSpellList()
 end
 

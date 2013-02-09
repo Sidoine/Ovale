@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2009, 2010, 2011, 2012 Sidoine
+    Copyright (C) 2009, 2010, 2011, 2012, 2013 Sidoine, Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -16,6 +16,7 @@ local node={}
 local defines = {}
 local customFunctions = {}
 local unknownSpellNodes = {}
+local missingSpellList = {}
 
 local ipairs, pairs, tonumber = ipairs, pairs, tonumber
 local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
@@ -193,7 +194,7 @@ local function ParseFunction(prefix, func, params)
 		-- is a variant of a spell with the same name as one already in the
 		-- spellbook.  If it is, then add that variant spell ID to our spellList.
 		if OvaleCondition.spellbookConditions[func] then
-			if not OvaleData.spellList[spellId] and not OvaleData.missingSpellList[spellId] then
+			if not OvaleData.spellList[spellId] and not missingSpellList[spellId] then
 				local spellName
 				if type(spellId) == "number" then
 					spellName = GetSpellInfo(spellId)
@@ -201,7 +202,7 @@ local function ParseFunction(prefix, func, params)
 				if spellName then
 					if spellName == GetSpellInfo(spellName) then
 						Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
-						OvaleData.missingSpellList[spellId] = spellName
+						missingSpellList[spellId] = spellName
 					else
 						unknownSpellNodes[newNode.nodeId] = spellId
 					end
@@ -609,6 +610,7 @@ function OvaleCompile:Compile(text)
 	node = {}
 	defines = {}
 	unknownSpellNodes = {}
+	missingSpellList = {}
 
 	-- Suppression des commentaires
 	text = self:CompileComments(text)
@@ -644,6 +646,12 @@ function OvaleCompile:Compile(text)
 			masterNodes[#masterNodes+1] = newNode
 		end
 	end
+
+	-- Add any missing spells found while compiling the script into the spellbook.
+	for k, v in pairs(missingSpellList) do
+		OvaleData.spellList[k] = v
+	end
+
 	return masterNodes
 end
 
