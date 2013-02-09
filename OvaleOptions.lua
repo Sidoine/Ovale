@@ -1,6 +1,6 @@
 ﻿--[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2012 Sidoine
+    Copyright (C) 2012, 2013 Sidoine, Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -307,6 +307,30 @@ local options =
 				}
 			}
 		},
+		debug =
+		{
+			name = "Debug",
+			type = "group",
+			args =
+			{
+				debug =
+				{
+					type = "multiselect",
+					name = "Debug",
+					values =
+					{
+						["aura"] = L["Debug aura"],
+						["compile"] = L["Debug compile"],
+						["enemy"] = L["Debug enemies"],
+						["guid"] = L["Debug GUID"],
+						["missing_spells"] = L["Debug missing spells"],
+						["unknown_spells"] = L["Debug unknown spells"],
+					},
+					get = function(info, key) return OvaleOptions.db.profile.debug[key] end,
+					set = function(info, key, state) OvaleOptions.db.profile.debug[key] = state end,
+				}
+			},
+		},
 		actions =
 		{
 			name = "Actions",
@@ -349,46 +373,19 @@ local options =
 				},
 				debug =
 				{
-					order = -3,
 					name = "Debug",
+					type = "execute",
+					func = function() AceConfigDialog:SetDefaultSize("Ovale", 500, 550); AceConfigDialog:Open("Ovale Debug") end
+				},
+				power =
+				{
+					order = -3,
+					name = "Power",
 					type = "execute",
 					func = function() 
 						for i=1,10 do Ovale:Print(i.."="..UnitPower("player", i)) end 
 						Ovale:Print(OvaleState.state.eclipse)
 					end
-				},
-				debugflags =
-				{
-					name = "List debug flags",
-					type = "execute",
-					func = function()
-						local flags
-						for flag in pairs(Ovale.debugFlags) do
-							if flags then
-								flags = flags .. ", " .. flag
-							else
-								flags = flag
-							end
-						end
-						if flags then
-							Ovale:Print(flags)
-						end
-					end
-				},
-				toggledebug =
-				{
-					name = "Toggle debug flag",
-					type = "input",
-					set = function(info, value)
-						for flag in strgmatch(value, "[%w_]+") do
-							if Ovale.debugFlags[flag] then
-								Ovale.debugFlags[flag] = nil
-							else
-								Ovale.debugFlags[flag] = true
-							end
-						end
-					end,
-					get = nil,
 				},
 				talent =
 				{
@@ -471,6 +468,7 @@ function OvaleOptions:FirstInit()
 			top = 500,
 			check = {},
 			list = {},
+			debug = {},
 			apparence = {enCombat=false, iconScale = 2, secondIconScale = 1, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
@@ -484,10 +482,12 @@ function OvaleOptions:FirstInit()
 	AceConfig:RegisterOptionsTable("Ovale Actions", options.args.actions, "Ovale")
 	AceConfig:RegisterOptionsTable("Ovale Profile", options.args.profile)
 	AceConfig:RegisterOptionsTable("Ovale Apparence", options.args.apparence)
+	AceConfig:RegisterOptionsTable("Ovale Debug", options.args.debug)
 
 	AceConfigDialog:AddToBlizOptions("Ovale", "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Apparence", "Apparence", "Ovale")
+	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", "Ovale")
 	
 	self.db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileReset", "HandleProfileChanges" )

@@ -51,8 +51,6 @@ Ovale.compileOnStances = false
 Ovale.combatStartTime = nil
 Ovale.needCompile = false
 Ovale.listes = {}
---debug flags
-Ovale.debugFlags = {}
 --</public-static-properties>
 
 --Key bindings
@@ -65,7 +63,8 @@ BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<public-static-methods>
 function Ovale:debugPrint(flag, ...)
-	if self.debugFlags[flag] then
+	local profile = OvaleOptions:GetProfile()
+	if profile and profile.debug and profile.debug[flag] then
 		self:Print("[" .. flag .. "]", ...)
 	end
 end
