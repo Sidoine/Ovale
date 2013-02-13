@@ -438,7 +438,16 @@ local options =
 					func = function()
 						OvaleData:DebugSpellList()
 					end					
-				}
+				},
+				stance =
+				{
+					order = -9,
+					name = "List stances",
+					type = "execute",
+					func = function()
+						OvaleStance:DebugStances()
+					end
+				},
 			}
 		}
 	}

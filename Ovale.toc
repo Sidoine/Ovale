@@ -42,6 +42,7 @@ OvaleOptions.lua
 OvaleRecount.lua
 OvaleSkada.lua
 OvaleSpellDamage.lua
+OvaleStance.lua
 OvaleState.lua
 OvaleSwing.lua
 defaut\Chaman.lua

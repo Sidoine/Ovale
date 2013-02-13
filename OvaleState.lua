@@ -61,7 +61,7 @@ function OvaleState:UpdatePowerRates()
 		end
 
 		-- Stance of the Sturdy Ox (brewmaster monk)
-		if OvaleAura.mastery == 1 and OvaleAura.stance == 1 then
+		if OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
 			self.powerRate.energy = self.powerRate.energy * 1.1
 		end
 	end

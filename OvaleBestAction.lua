@@ -105,7 +105,7 @@ function OvaleBestAction:GetActionInfo(element)
 		
 		local si = OvaleData:GetSpellInfo(spellId)
 		if si then
-			if si.stance and OvaleAura.stance ~= si.stance then
+			if si.stance and not OvaleStance:IsStance(si.stance) then
 				return nil
 			end
 			

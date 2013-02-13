@@ -13,6 +13,7 @@ OvaleCondition = {}
 
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 local LRC = LibStub("LibRangeCheck-2.0", true)
+
 local runes = {}
 local runesCD = {}
 		
@@ -2356,13 +2357,13 @@ end
 --- Test if the player is in a given stance.
 -- @name Stance
 -- @paramsig boolean
--- @param stance A number representing the stance index.
+-- @param stance The stance name or a number representing the stance index.
 -- @return A boolean value.
 -- @usage
--- unless Stance(1) Spell(bear_form)
+-- unless Stance(druid_bear_form) Spell(bear_form)
 
 OvaleCondition.conditions.stance = function(condition)
-	if (OvaleAura.stance == condition[1]) then
+	if OvaleStance:IsStance(condition[1]) then
 		return 0
 	else
 		return nil

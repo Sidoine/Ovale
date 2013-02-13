@@ -7,11 +7,11 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
-
 OvaleCompile = {}
 
 --<private-static-properties>
+local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+
 local node={}
 local defines = {}
 local customFunctions = {}
@@ -88,19 +88,17 @@ local function TestConditions(paramList)
 	if paramList.glyph and not HasGlyph(paramList.glyph) then
 		return false
 	end
-	if paramList.mastery and paramList.mastery~=GetSpecialization() then
+	if paramList.mastery and not OvaleStance:IsSpecialization(paramList.mastery) then
 		return false
 	end
 	if paramList.if_stance then
 		Ovale.compileOnStances = true
-		if paramList.if_stance ~= GetShapeshiftForm() then
+		if not OvaleStance:IsStance(paramList.if_stance) then
 			return false
 		end
 	end
-	if paramList.if_spell then
-		if not OvaleData.spellList[paramList.if_spell] then
-			return false
-		end
+	if paramList.if_spell and not OvaleData.spellList[paramList.if_spell] then
+		return false
 	end
 	if paramList.talent and not HasTalent(paramList.talent) then
 		return false
