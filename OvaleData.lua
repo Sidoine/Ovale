@@ -238,16 +238,12 @@ OvaleData.buffSpellList =
 	-- Target buffs
 	enrage =
 	{
-		--TODO update
-		49016, -- Unholy Frenzy
-		18499, -- Berserker Rage
-		12292, -- Death Wish
-		12880, -- Enrage (rank 1)
-		14201, -- Enrage (rank 2)
-		14202, -- Enrage (rank 3)
-		5229, -- Enrage (Bear)
-        52610, -- Savage Roar (Cat)
-        76691, -- Vengeance (All Tank Specs)
+		12292, -- Bloodbath (warrior)
+		12880, -- Enrage (warrior)
+		18499, -- Berserker Rage (warrior)
+		49016, -- Unholy Frenzy (death knight)
+		76691, -- Vengeance (all tank specs)
+		132365, -- Vengeance (all tank specs)
 	},
 
 	-- Raid buffs (short term)
