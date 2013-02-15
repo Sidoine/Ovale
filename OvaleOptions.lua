@@ -313,23 +313,46 @@ local options =
 			type = "group",
 			args =
 			{
-				debug =
+				-- Node names must match the names of the debug flags.
+				aura =
 				{
-					type = "multiselect",
-					name = "Debug",
-					values =
-					{
-						["aura"] = L["Debug aura"],
-						["compile"] = L["Debug compile"],
-						["enemy"] = L["Debug enemies"],
-						["guid"] = L["Debug GUID"],
-						["missing_spells"] = L["Debug missing spells"],
-						["unknown_spells"] = L["Debug unknown spells"],
-					},
-					get = function(info, key) return OvaleOptions.db.profile.debug[key] end,
-					set = function(info, key, state) OvaleOptions.db.profile.debug[key] = state end,
-				}
+					name = "Auras",
+					desc = L["Debug aura"],
+					type = "toggle",
+				},
+				compile =
+				{
+					name = "Compile",
+					desc = L["Debug compile"],
+					type = "toggle",
+				},
+				enemy =
+				{
+					name = "Enemies",
+					desc = L["Debug enemies"],
+					type = "toggle",
+				},
+				guid =
+				{
+					name = "GUIDs",
+					desc = L["Debug GUID"],
+					type = "toggle",
+				},
+				missing_spells =
+				{
+					name = "Missing spells",
+					desc = L["Debug missing spells"],
+					type = "toggle",
+				},
+				unknown_spells =
+				{
+					name = "Unknown spells",
+					desc = L["Debug unknown spells"],
+					type = "toggle",
+				},
 			},
+			get = function(info) return OvaleOptions.db.profile.debug[info[#info]] end,
+			set = function(info, value) OvaleOptions.db.profile.debug[info[#info]] = value end,
 		},
 		actions =
 		{
