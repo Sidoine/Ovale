@@ -102,6 +102,9 @@ function OvaleBestAction:GetActionInfo(element)
 		end
 		
 		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleData:GetComputedSpellCD(spellId)
+		if not actionCooldownStart or not actionCooldownDuration then
+			Ovale:debugPrint("unknown_spells", "No cooldown data for spell "..spellId)
+		end
 		
 		local si = OvaleData:GetSpellInfo(spellId)
 		if si then
@@ -117,10 +120,12 @@ function OvaleBestAction:GetActionInfo(element)
 					return nil
 				end
 			end
-			if si.blood or si.frost or si.unholy or si.death then
-				local runecd = OvaleState:GetRunes(si.blood, si.frost, si.unholy, si.death, false)
-				if runecd > actionCooldownStart + actionCooldownDuration then
-					actionCooldownDuration = runecd - actionCooldownStart
+			if actionCooldownStart and actionCooldownDuration then
+				if si.blood or si.frost or si.unholy or si.death then
+					local runecd = OvaleState:GetRunes(si.blood, si.frost, si.unholy, si.death, false)
+					if runecd > actionCooldownStart + actionCooldownDuration then
+						actionCooldownDuration = runecd - actionCooldownStart
+					end
 				end
 			end
 		end
@@ -474,8 +479,10 @@ function OvaleBestAction:Compute(element)
 			Ovale:Print(element.type.." ["..element.nodeId.."]")
 		end
 		local startA, endA, prioriteA, elementA = self:Compute(element.a)
-		elementA.wait = true
-		if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startA)..","..tostring(endA).." ["..element.nodeId.."]") end
+		if elementA then
+			elementA.wait = true
+			if Ovale.trace then Ovale:Print(element.type.." return "..tostring(startA)..","..tostring(endA).." ["..element.nodeId.."]") end
+		end
 		return startA, endA, prioriteA, elementA
 	elseif element.type == "not" then
 		local startA, endA = self:ComputeBool(element.a)
