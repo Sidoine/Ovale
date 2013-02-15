@@ -1,6 +1,3 @@
-**It is still buggy at this time, depending on your spec.**  **None of the tank specs is available.** 
-It takes a **lot** of work to update it to Mists of Pandaria and the process is not done.  Please be patient.  Thank you!
-
 [Ovale Spell Priority][ovale] shows you what spell or ability you should use in order to maximize your damage.
 
   [ovale]: http://www.curse.com/addons/wow/ovale
@@ -10,7 +7,7 @@ It displays one or more icons that show the cooldown of an action.  The action i
   [Corruption]: http://www.wowhead.com/spell=172
   [Shadow Bolt]: http://www.wowhead.com/spell=686
 
-Default scripts are available for all dps and tank classes and specs, based on [SimulationCraft][].  There is an [online tool][wowdps] to import your [SimulationCraft][] profile (Mists of Pandaria only).  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
+Default scripts are available for all dps classes and specs, based on [SimulationCraft][].  There is an [online tool][wowdps] to import your [SimulationCraft][] profile (Mists of Pandaria only).  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
@@ -28,7 +25,7 @@ See the [video of a survival hunter][ovale-video] using [Ovale][ovale] during Wr
 Features
 ========
 
-- Default scripts for every class and talent specialization (except healers).
+- Default scripts for every DPS class and talent specialization.
 - Tracks DoTs, buffs, debuffs, cooldowns, combo points, runes, mana, everything that a player would need to choose what to do.
 - Adapts to your talent points and glyphs.
 - Change quickly the configuration at any time with configurable checkboxes and drop-down lists that can be shown/hidden by clicking on the icons, e.g. switching between single and multi target damage, setting the curse or the judgment to cast.
@@ -73,6 +70,5 @@ Custom scripts
 - [SimulationCraft profile importer][wowdps]
 - [Ovale Spell Priority forums][ovale-forums]
 - [Nerien's Ovale Scripts][]
-- [The Fluid Druid kitty forums](http://fluiddruid.net/forum/viewforum.php?f=3)
 
   [Nerien's Ovale Scripts]: http://www.curse.com/addons/wow/nerien-ovale-scripts
