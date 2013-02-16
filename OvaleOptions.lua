@@ -314,6 +314,12 @@ local options =
 			args =
 			{
 				-- Node names must match the names of the debug flags.
+				action_bar =
+				{
+					name = "Action bars",
+					desc = L["Debug action bars"],
+					type = "toggle",
+				},
 				aura =
 				{
 					name = "Auras",

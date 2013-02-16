@@ -11,7 +11,11 @@
 OvaleActionBar = LibStub("AceAddon-3.0"):NewAddon("OvaleActionBar", "AceEvent-3.0")
 
 --<private-static-properties>
-local GetActionInfo, GetActionText = GetActionInfo, GetActionText
+local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
+
+local GetActionInfo = GetActionInfo
+local GetActionText = GetActionText
+local tonumber = tonumber
 --</private-static-properties>
 
 --<public-static-properties>
@@ -24,31 +28,50 @@ OvaleActionBar.shortCut = {}
 
 --<public-static-methods>
 function OvaleActionBar:OnEnable()
-    self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-    self:RegisterEvent("UPDATE_BINDINGS")
-	self:FillActionIndexes()
+	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE")
+	self:RegisterEvent("UPDATE_BINDINGS")
 end
 	
 function OvaleActionBar:OnDisable()
-    self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
-    self:UnregisterEvent("UPDATE_BINDINGS")
+	self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
+	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
+	self:UnregisterEvent("UPDATE_BINDINGS")
 end
 	
 function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
 	if (slot == 0) then
-		self:FillActionIndexes()
+		self:FillActionIndexes(event)
 	elseif (slot) then
 	-- on reçoit aussi si c'est une macro avec mouseover à chaque fois que la souris passe sur une cible!
 		self:FillActionIndex(tonumber(slot))
+		Ovale:debugPrint("action_bar", "Mapping button " ..tonumber(slot).." to spell/macro")
 	end
 end
 
---Called when the user changed his key bindings
-function OvaleActionBar:UPDATE_BINDINGS()
-	self:FillActionIndexes()
+function OvaleActionBar:ACTIVE_TALENT_GROUP_CHANGED(event)
+	self:FillActionIndexes(event)
 end
 
-function OvaleActionBar:FillActionIndexes()
+function OvaleActionBar:PLAYER_ENTERING_WORLD(event)
+	self:FillActionIndexes(event)
+end
+
+function OvaleActionBar:PLAYER_TALENT_UPDATE(event)
+	self:FillActionIndexes(event)
+end
+
+--Called when the user changed his key bindings
+function OvaleActionBar:UPDATE_BINDINGS(event)
+	self:FillActionIndexes(event)
+end
+
+function OvaleActionBar:FillActionIndexes(event)
+	Ovale:debugPrint("action_bar", "Mapping buttons to spells/macros for " ..event)
 	self.actionSort = {}
 	self.actionMacro = {}
 	self.actionObjet = {}
