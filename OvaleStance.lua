@@ -37,6 +37,11 @@ local spellIdToStance = {
 	[GetSpellInfo(24858)] = "druid_moonkin_form",
 	[GetSpellInfo(33943)] = "druid_flight_form",
 	[GetSpellInfo(40120)] = "druid_swift_flight_form",
+	-- Hunter
+	[GetSpellInfo(5118)] = "hunter_aspect_of_the_cheetah",
+	[GetSpellInfo(13159)] = "hunter_aspect_of_the_pack",
+	[GetSpellInfo(13165)] = "hunter_aspect_of_the_hawk",
+	[GetSpellInfo(109260)] = "hunter_asepct_of_the_iron_hawk",
 	-- Monk
 	[GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
 	[GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
@@ -87,12 +92,11 @@ end
 
 function OvaleStance:ACTIVE_TALENT_GROUP_CHANGED(event)
 	specialization = GetSpecialization()
+	self:PLAYER_TALENT_UPDATE(event)
 end
 
 function OvaleStance:PLAYER_ENTERING_WORLD(event)
-	self:CreateStanceList()
 	self:ACTIVE_TALENT_GROUP_CHANGED(event)
-	self:ShapeshiftEventHandler()
 end
 
 function OvaleStance:PLAYER_TALENT_UPDATE(event)
