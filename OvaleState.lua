@@ -52,7 +52,7 @@ function OvaleState:UpdatePowerRates()
 		self.powerRate[k] = 0
 	end
 
-	self.powerRate.energy = 10 * OvaleAura.meleeHaste
+	self.powerRate.energy = 10 * OvalePaperDoll.meleeHaste
 
 	if OvaleData.className == "MONK" then
 		-- Ascension (monk)
@@ -71,7 +71,7 @@ function OvaleState:UpdatePowerRates()
 		self.powerRate.energy = self.powerRate.energy * 2
 	end
 	
-	self.powerRate.focus = 4 * OvaleAura.meleeHaste
+	self.powerRate.focus = 4 * OvalePaperDoll.meleeHaste
 end
 
 function OvaleState:Reset()
@@ -318,7 +318,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 
 							-- Set the duration to the proper length if it's a DoT.
 							if auraSpellInfo and auraSpellInfo.duration then
-								duration = OvaleData:GetDuration(auraSpellId, OvaleAura.spellHaste, self.state.combo, self.state.holy)
+								duration = OvaleData:GetDuration(auraSpellId, OvalePaperDoll.spellHaste, self.state.combo, self.state.holy)
 							end
 
 							-- If aura is specified with a duration, then assume stacks == 1.
@@ -350,7 +350,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 										local tickLength = OvaleData:GetTickLength(auraSpellId, previousAura.spellHaste)
 										local k = floor((previousAura.ending - endCast) / tickLength)
 										newAura.ending = previousAura.ending - tickLength * k + duration
-										newAura.spellHaste = OvaleAura.spellHaste
+										newAura.spellHaste = OvalePaperDoll.spellHaste
 									else
 										newAura.ending = endCast + duration
 									end
@@ -375,7 +375,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								newAura.start = endCast
 								newAura.ending = endCast + duration
 								if isDoT then
-									newAura.spellHaste = OvaleAura.spellHaste
+									newAura.spellHaste = OvalePaperDoll.spellHaste
 								end
 							end
 						end

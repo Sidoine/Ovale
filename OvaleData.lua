@@ -503,7 +503,7 @@ function OvaleData:GetGCD(spellId)
 			if not cd then
 				cd = 1.5
 			end
-			cd = cd / OvaleAura.spellHaste
+			cd = cd / (1 + OvalePaperDoll.spellHaste)
 			if (cd<1) then
 				cd = 1
 			end
@@ -518,7 +518,7 @@ function OvaleData:GetGCD(spellId)
 		return 1.0
 	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
 			(self.className == "DRUID" and GetShapeshiftForm(true) ~= 1) then
-		local cd = 1.5 / OvaleAura.spellHaste
+		local cd = 1.5 / (1 + OvalePaperDoll.spellHaste)
 		if (cd<1) then
 			cd = 1
 		end
@@ -586,7 +586,7 @@ function OvaleData:GetDuration(spellId, spellHaste, combo, holy)
 	local si = self.spellInfo[spellId]
 	if si and si.duration then
 		local duration = si.duration
-		spellHaste = spellHaste or 1
+		spellHaste = spellHaste or 0
 		combo = combo or 0
 		holy = holy or 1
 		if si.adddurationcp then
@@ -611,10 +611,12 @@ end
 function OvaleData:GetTickLength(spellId, spellHaste)
 	local si = self.spellInfo[spellId]
 	if si then
-		if si.haste ~= "spell" then
-			return si.tick or 3
+		local tick = si.tick or 3
+		local haste = spellHaste or 0
+		if si.haste == "spell" then
+			return tick / (1 + haste)
 		else
-			return (si.tick or 3) / (spellHaste or 1)
+			return tick
 		end
 	else
 		return nil

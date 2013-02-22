@@ -12,9 +12,12 @@
 OvaleFuture = LibStub("AceAddon-3.0"):NewAddon("OvaleFuture", "AceEvent-3.0")
 
 --<private-static-properties>
-local ipairs, pairs, strfind, tremove = ipairs, pairs, string.find, table.remove
-local GetMasteryEffect, GetSpellBonusDamage = GetMasteryEffect, GetSpellBonusDamage
-local GetSpellInfo, UnitAttackPower, UnitBuff = GetSpellInfo, UnitAttackPower, UnitBuff
+local ipairs = ipairs
+local pairs = pairs
+local strfind = string.find
+local tremove = table.remove
+local GetSpellInfo = GetSpellInfo
+local UnitBuff = UnitBuff
 local UnitGUID = UnitGUID
 --</private-static-properties>
 
@@ -236,14 +239,10 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	local si = OvaleData.spellInfo[spellId]
 		
 	self.lastSpellId = spellId
-	self.lastSpellAP[spellId] = UnitAttackPower("player")
-	self.lastSpellSP[spellId] = GetSpellBonusDamage(2)
+	self.lastSpellAP[spellId] = OvalePaperDoll.attackPower
+	self.lastSpellSP[spellId] = OvalePaperDoll.spellBonusDamage
 	self.lastSpellDM[spellId] = OvaleAura:GetDamageMultiplier(spellId)
-	if OvaleData.level < 80 then
-		self.lastSpellMastery[spellId] = 0
-	else
-		self.lastSpellMastery[spellId] = GetMasteryEffect()
-	end
+	self.lastSpellMastery[spellId] = OvalePaperDoll.masteryEffect
 	self.lastSpell[#self.lastSpell+1] = newSpell
 	--Ovale:Print("on ajoute "..spellId..": ".. newSpell.start.." to "..newSpell.stop.." ("..tostring(OvaleState.maintenant)..")" ..#self.lastSpell .. " " ..tostring(newSpell.target))
 	

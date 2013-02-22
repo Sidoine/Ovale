@@ -15,8 +15,6 @@ OvaleAura = LibStub("AceAddon-3.0"):NewAddon("OvaleAura", "AceEvent-3.0")
 --<public-static-properties>
 OvaleAura.aura = {}
 OvaleAura.serial = 0
-OvaleAura.spellHaste = 1
-OvaleAura.meleeHaste = 1
 OvaleAura.playerGUID = nil
 --</public-static-properties>
 
@@ -58,7 +56,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
 				local aura = self:GetAuraByGUID(destGUID, spellId, true)
 				if aura then
-					aura.spellHaste = self.spellHaste
+					aura.spellHaste = OvalePaperDoll.spellHaste
 				end
 			end
 		end
@@ -132,12 +130,6 @@ end
 function OvaleAura:UpdateAuras(unitId, unitGUID)
 	self.serial = self.serial + 1
 	
-	local hateBase
-	local hateCommune
-	local hateSorts
-	local hateCaC
-	local hateHero
-	local hateClasse
 	local damageMultiplier
 
 	if not unitId then
@@ -154,12 +146,6 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	end
 
 	if unitId == "player" then
-		hateBase = GetCombatRatingBonus(18)
-		hateCommune = 0
-		hateSorts = 0
-		hateCaC = 0
-		hateHero = 0
-		hateClasse = 0
 		damageMultiplier = 1
 	end
 
@@ -193,15 +179,6 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 			end
 			
 			if unitId == "player" then
-				if OvaleData.buffSpellList.spell_haste[spellId] then
-					hateSorts = 5
-				elseif OvaleData.buffSpellList.melee_haste[spellId] then 
-					hateCaC = 10
-				elseif OvaleData.buffSpellList.burst_haste[spellId] then
-					hateHero = 30
-				elseif OvaleData.selfHasteBuff[spellId] then
-					hateClasse = OvaleData.selfHasteBuff[spellId]
-				end
 				if OvaleData.selfDamageBuff[spellId] then
 					damageMultiplier = damageMultiplier * OvaleData.selfDamageBuff[spellId]
 				end
@@ -230,10 +207,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 		self.aura[unitGUID] = nil
 	end
 	
-	--Update player haste 
 	if unitId == "player" then
-		self.spellHaste = (1 + hateBase/100) * (1 + hateCommune/100) * (1 + hateSorts/100) * (1 + hateHero/100) * (1 + hateClasse/100)
-		self.meleeHaste = (1 + hateBase/100) * (1 + hateCommune/100) * (1 + hateCaC/100) * (1 + hateHero/100) * (1 + hateClasse/100)
 		baseDamageMultiplier = damageMultiplier
 	end
 	

@@ -272,7 +272,7 @@ function OvaleBestAction:Compute(element)
 					else
 						--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
 						--ça tombera entre deux ticks
-						local ticks = floor(OvaleAura.spellHaste * OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling + 0.5)
+						local ticks = floor(OvalePaperDoll.spellHaste * OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling + 0.5)
 						local tickLength = (OvaleState.attenteFinCast - OvaleState.startCast) / ticks
 						local tickTime = OvaleState.startCast + tickLength
 						if (Ovale.trace) then

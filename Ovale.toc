@@ -39,6 +39,7 @@ OvaleGUID.lua
 OvaleIcone.lua
 OvaleIcone.xml
 OvaleOptions.lua
+OvalePaperDoll.lua
 OvaleRecount.lua
 OvaleSkada.lua
 OvaleSpellDamage.lua

@@ -46,11 +46,11 @@ local lastSPD = {}
 local floor, pairs, select, strfind, tostring = math.floor, pairs, select, string.find, tostring
 local GetGlyphSocketInfo, GetInventoryItemID, GetInventoryItemLink = GetGlyphSocketInfo, GetInventoryItemID, GetInventoryItemLink
 local GetInventorySlotInfo, GetItemCooldown, GetItemCount = GetInventorySlotInfo, GetItemCooldown, GetItemCount
-local GetItemInfo, GetMasteryEffect, GetRune = GetItemInfo, GetMasteryEffect, GetRune
-local GetRuneCount, GetSpellBonusDamage, GetSpellCharges = GetRuneCount, GetSpellBonusDamage, GetSpellCharges
+local GetItemInfo, GetRune = GetItemInfo, GetRune
+local GetRuneCount, GetSpellCharges = GetRuneCount, GetSpellCharges
 local GetSpellInfo, GetTotemInfo, GetTrackingInfo = GetSpellInfo, GetTotemInfo, GetTrackingInfo
 local GetUnitSpeed, HasFullControl, IsSpellInRange = GetUnitSpeed, HasFullControl, IsSpellInRange
-local IsStealthed, IsUsableSpell, UnitAttackPower = IsStealthed, IsUsableSpell, UnitAttackPower
+local IsStealthed, IsUsableSpell = IsStealthed, IsUsableSpell
 local UnitCastingInfo, UnitChannelInfo, UnitClass = UnitCastingInfo, UnitChannelInfo, UnitClass
 local UnitClassification, UnitCreatureFamily, UnitCreatureType = UnitClassification, UnitCreatureFamily, UnitCreatureType
 local UnitDebuff, UnitDetailedThreatSituation, UnitExists = UnitDebuff, UnitDetailedThreatSituation, UnitExists
@@ -83,9 +83,9 @@ local function avecHate(temps, hate)
 	if (not hate) then
 		return temps
 	elseif (hate == "spell") then
-		return temps/OvaleAura.spellHaste
+		return temps/(1 + OvalePaperDoll.spellHaste)
 	elseif (hate == "melee") then
-		return temps/OvaleAura.meleeHaste
+		return temps/(1 + OvalePaperDoll.meleeHaste)
 	else
 		return temps
 	end
@@ -478,8 +478,7 @@ end
 -- if AttackPower(more 10000) Spell(rake)
 
 OvaleCondition.conditions.attackpower = function(condition)
-	local base, posBuff, negBuff = UnitAttackPower("player")
-	return compare(base + posBuff + negBuff, condition[1], condition[2])
+	return compare(OvalePaperDoll.attackPower, condition[1], condition[2])
 end
 
 --- Get the total count of the given aura across all targets.
@@ -1009,7 +1008,7 @@ end
 
 OvaleCondition.conditions.damage = function(condition)
 	local spellId = condition[1]
-	local ret = OvaleData:GetDamage(spellId, UnitAttackPower("player"), GetSpellBonusDamage(2), OvaleState.state.combo)
+	local ret = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
 	return 0, nil, ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
 end
 
@@ -1874,11 +1873,7 @@ end
 --     Spell(rake)
 
 OvaleCondition.conditions.mastery = function(condition)
-	local mastery = 0
-	if OvaleData.level >= 80 then
-		mastery = GetMasteryEffect()
-	end
-	return compare(mastery, condition[1], condition[2])
+	return compare(OvalePaperDoll.masteryEffect, condition[1], condition[2])
 end
 
 --- Get the amount of health points of the target when it is at full health.
@@ -2347,7 +2342,7 @@ end
 --     Spell(living_bomb)
 
 OvaleCondition.conditions.spellpower = function(condition)
-	return compare(GetSpellBonusDamage(2), condition[1], condition[2])
+	return compare(OvalePaperDoll.spellBonusDamage, condition[1], condition[2])
 end
 
 --- Test if the player is in a given stance.
@@ -2472,7 +2467,7 @@ OvaleCondition.auraConditions.tickvalue = true
 OvaleCondition.conditions.ticks = function(condition)
 	-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
 	local spellId = condition[1]
-	local duration, tickLength = OvaleData:GetDuration(spellId, OvaleAura.spellHaste, OvaleState.state.combo, OvaleState.state.holy)
+	local duration, tickLength = OvaleData:GetDuration(spellId, OvalePaperDoll.spellHaste, OvaleState.state.combo, OvaleState.state.holy)
 	if tickLength then
 		local numTicks = floor(duration / tickLength + 0.5)
 		return compare(numTicks, condition[2], condition[3])
@@ -2538,7 +2533,7 @@ OvaleCondition.auraConditions.ticksremain = true
 OvaleCondition.conditions.ticktime = function(condition)
 	local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
 	if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
-		spellHaste = OvaleAura.spellHaste
+		spellHaste = OvalePaperDoll.spellHaste
 	end
 	local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
 	if tickLength then
