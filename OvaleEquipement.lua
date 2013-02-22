@@ -10,35 +10,19 @@
 OvaleEquipement = LibStub("AceAddon-3.0"):NewAddon("OvaleEquipement", "AceEvent-3.0")
 
 --<private-static-properties>
-local strfind, tonumber = string.find, tonumber
+local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
+
+local pairs = pairs
+local strfind = string.find
+local tonumber = tonumber
+local wipe = wipe
 local GetInventoryItemLink = GetInventoryItemLink
---</private-static-properties>
+local GetInventorySlotInfo = GetInventorySlotInfo
 
---<public-static-properties>
-OvaleEquipement.nombre = {}
---</public-static-properties>
-
---<public-static-methods>
-
-function OvaleEquipement:OnEnable()
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function OvaleEquipement:OnDisable()
-	self:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function OvaleEquipement:GetItemId(slot)
-	local link = GetInventoryItemLink("player", GetInventorySlotInfo(slot))
-	if not link then return nil end
-	local a, b, itemId = strfind(link, "item:(%d+)");
-	return tonumber(itemId);
-end
-
-local itemTier = 
-{
+-- count of equipped pieces of an armor set: armorSetCount[armorSetName] = equippedCount
+local armorSetCount = {}
+-- database of armor set items: armorSet[itemId] = armorSetName
+local armorSet = {
 	-- Death Knight
 	[85314] = "T14_tank",
 	[85315] = "T14_tank",
@@ -511,35 +495,65 @@ local itemTier =
 	[87200] = "T14_tank",
 	[87201] = "T14_tank",
 }
+--</private-static-properties>
 
-local itemSlots = {"HeadSlot", "ShoulderSlot", "ChestSlot", "HandsSlot", "LegsSlot"}
-
-function OvaleEquipement:Refresh()
-	self.nombre = {}
-	for i=1,#itemSlots do
-		local itemId = self:GetItemId(itemSlots[i])
-		if itemId then
-			local tier = itemTier[itemId]
-			if tier~=nil then
-				if not self.nombre[tier] then
-					self.nombre[tier] = 1
-				else
-					self.nombre[tier] = self.nombre[tier] + 1
-				end
-			end
-		end
-	end	
+--<public-static-methods>
+function OvaleEquipement:OnEnable()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
-function OvaleEquipement:UNIT_INVENTORY_CHANGED(event, arg1)
-	if (arg1 == "player") then
-		self:Refresh()
-	end
+function OvaleEquipement:OnDisable()
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+end
+
+function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slot, hasItem)
+	self:Refresh()
 end
 
 function OvaleEquipement:PLAYER_ENTERING_WORLD(event)
 	self:Refresh()
 end
 
---</public-static-methods>
+function OvaleEquipement:GetArmorSetCount(name)
+	if not armorSetCount[name] then
+		return 0
+	else
+		return armorSetCount[name]
+	end
+end
 
+function OvaleEquipement:Debug()
+	for k, v in pairs(armorSetCount) do
+		Ovale:Print("Player has " ..v.. "piece(s) of " ..k.. " armor set")
+	end
+end
+
+function OvaleEquipement:GetItemId(slot)
+	local link = GetInventoryItemLink("player", GetInventorySlotInfo(slot))
+	if not link then return nil end
+	local a, b, itemId = strfind(link, "item:(%d+)");
+	return tonumber(itemId);
+end
+
+-- slots that can contain pieces from armor sets
+local itemSlots = { "HeadSlot", "ShoulderSlot", "ChestSlot", "HandsSlot", "LegsSlot" }
+
+function OvaleEquipement:Refresh()
+	wipe(armorSetCount)
+	for i = 1, #itemSlots do
+		local itemId = self:GetItemId(itemSlots[i])
+		if itemId then
+			local name = armorSet[itemId]
+			if name then
+				if not armorSetCount[name] then
+					armorSetCount[name] = 1
+				else
+					armorSetCount[name] = armorSetCount[name] + 1
+				end
+			end
+		end
+	end	
+end
+--</public-static-methods>

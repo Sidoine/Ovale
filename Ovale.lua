@@ -127,13 +127,13 @@ function Ovale:OnEnable()
 
     -- Called when the addon is enabled
 	RegisterAddonMessagePrefix("Ovale")
-    self:RegisterEvent("PLAYER_REGEN_ENABLED");
-    self:RegisterEvent("PLAYER_REGEN_DISABLED");
-    self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED");
+	self:RegisterEvent("PLAYER_REGEN_DISABLED");
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("GLYPH_UPDATED")
 	self:RegisterEvent("GLYPH_ADDED")
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	self:RegisterMessage("Ovale_UpdateShapeshiftForm")
 
 	self:UpdateVisibility()
@@ -141,18 +141,18 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
+	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-    self:UnregisterEvent("PLAYER_REGEN_DISABLED")
-    self:UnregisterEvent("PLAYER_TARGET_CHANGED")
-    self:UnregisterEvent("CHAT_MSG_ADDON")
-    self:UnregisterEvent("GLYPH_UPDATED")	
-    self:UnregisterEvent("GLYPH_ADDED")
-	self:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
+	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+	self:UnregisterEvent("CHAT_MSG_ADDON")
+	self:UnregisterEvent("GLYPH_UPDATED")
+	self:UnregisterEvent("GLYPH_ADDED")
 	self:UnregisterMessage("Ovale_UpdateShapeshiftForm")
-    self.frame:Hide()
+	self.frame:Hide()
 end
 
-function Ovale:UNIT_INVENTORY_CHANGED(event)
+function Ovale:PLAYER_EQUIPMENT_CHANGED(event, slot, hasItem)
 	if self.compileOnItems then
 		self:debugPrint("compile", event)
 		self.needCompile = true

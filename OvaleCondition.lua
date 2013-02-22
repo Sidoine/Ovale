@@ -462,11 +462,7 @@ OvaleCondition.spellbookConditions = { spell = true }
 --     Spell(ferocious_bite)
 
 OvaleCondition.conditions.armorsetparts = function(condition)
-	local nombre = 0
-	if OvaleEquipement.nombre[condition[1]] then
-		nombre = OvaleEquipement.nombre[condition[1]]
-	end
-	return compare(nombre, condition[2], condition[3])
+	return compare(OvaleEquipement:GetArmorSetCount(condition[1]), condition[2], condition[3])
 end
 
 --- Get the current attack power of the player.

@@ -135,14 +135,9 @@ local function TestConditions(paramList)
 		end
 	end
 	if paramList.itemset and paramList.itemcount then
-		local set = paramList.itemset
-		local count = paramList.itemcount
-		local nombre = 0
+		local equippedCount = OvaleEquipement:GetArmorSetCount(paramList.itemset)
 		Ovale.compileOnItems = true
-		if OvaleEquipement.nombre[set] then
-			nombre = OvaleEquipement.nombre[set]
-		end
-		if nombre < count then
+		if equippedCount < paramList.itemcount then
 			return false
 		end
 	end
