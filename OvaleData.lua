@@ -11,7 +11,7 @@ OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
 
 --<private-static-properties>
 local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
-local GetShapeshiftForm, GetSpellBookItemInfo, GetSpellBookItemName = GetShapeshiftForm, GetSpellBookItemInfo, GetSpellBookItemName
+local GetSpellBookItemInfo, GetSpellBookItemName = GetSpellBookItemInfo, GetSpellBookItemName
 local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
 local HasPetSpells, UnitBuff, UnitClass = HasPetSpells, UnitBuff, UnitClass
 local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
@@ -514,10 +514,10 @@ function OvaleData:GetGCD(spellId)
 	end
 	
 	-- Default value
-	if self.className == "ROGUE" or (self.className == "DRUID" and GetShapeshiftForm(true) == 3) then
+	if self.className == "ROGUE" or (self.className == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
 		return 1.0
 	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
-			(self.className == "DRUID" and GetShapeshiftForm(true) ~= 1) then
+			(self.className == "DRUID" and not OvaleStance:IsStance("druid_bear_form")) then
 		local cd = 1.5 / (1 + OvalePaperDoll.spellHaste)
 		if (cd<1) then
 			cd = 1
