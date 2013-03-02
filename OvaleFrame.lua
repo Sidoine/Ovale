@@ -34,7 +34,7 @@ do
 	end
 	
 	local function frameOnMouseDown(self)
-		if (not OvaleOptions:GetApparence().verrouille) then
+		if (not OvaleOptions:GetProfile().apparence.verrouille) then
 			self:StartMoving()
 			AceGUI:ClearFocus()
 		end
@@ -59,7 +59,7 @@ do
 	end
 	
 	local function frameOnEnter(self)
-		if (not OvaleOptions:GetApparence().verrouille) then
+		if (not OvaleOptions:GetProfile().apparence.verrouille) then
 			self.obj.barre:Show()
         end
 	end
@@ -155,7 +155,8 @@ do
 		end
 		
 		local now = GetTime()
-		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + OvaleOptions:GetApparence().updateInterval)
+		local profile = OvaleOptions:GetProfile()
+		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
 		
 		if not next(Ovale.refreshNeeded) and not forceRefresh then
 			return
@@ -227,7 +228,7 @@ do
 						action.waitStart = nil
 					end
 
-					if OvaleOptions:GetApparence().moving and icons[1].debutAction and icons[1].finAction then
+					if profile.apparence.moving and icons[1].debutAction and icons[1].finAction then
 						local top=1-(OvaleState.maintenant - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
 						if top<0 then
 							top = 0
@@ -240,7 +241,7 @@ do
 						end
 					end
 
-					if (node.params.size ~= "small" and not node.params.nocd and OvaleOptions:GetApparence().predictif) then
+					if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
 						if start then
 							local castTime=0
 							if spellId then
@@ -302,8 +303,8 @@ do
 				icon:Hide()
 			end
 		end
-		
-		self.frame:EnableMouse(not OvaleOptions:GetApparence().clickThru)
+		local profile = OvaleOptions:GetProfile()
+		self.frame:EnableMouse(not profile.apparence.clickThru)
 		
 		local left = 0
 		local maxHeight = 0
@@ -316,7 +317,7 @@ do
 		
 		local BARRE = 8
 		
-		local margin =  OvaleOptions:GetApparence().margin
+		local margin = profile.apparence.margin
 			
 		for k,node in pairs(Ovale.masterNodes) do
 			if not self.actions[k] then
@@ -327,27 +328,27 @@ do
 			local width, height, newScale
 			local nbIcons
 			if (node.params.size == "small") then
-				newScale = OvaleOptions:GetApparence().smallIconScale
+				newScale = profile.apparence.smallIconScale
 				width = newScale * 36 + margin
 				height = newScale * 36 + margin
 				nbIcons = 1
 			else
-				newScale = OvaleOptions:GetApparence().iconScale
+				newScale = profile.apparence.iconScale
 				width =newScale * 36 + margin
 				height = newScale * 36 + margin
-				if OvaleOptions:GetApparence().predictif and node.params.type ~= "value" then
+				if profile.apparence.predictif and node.params.type ~= "value" then
 					nbIcons = 2
 				else
 					nbIcons = 1
 				end
 			end
-			if (top + height > OvaleOptions:GetApparence().iconScale * 36 + margin) then
+			if (top + height > profile.apparence.iconScale * 36 + margin) then
 				top = 0
 				left = maxWidth
 			end
 
 			action.scale = newScale
-			if (OvaleOptions:GetApparence().vertical) then
+			if (profile.apparence.vertical) then
 				action.left = top
 				action.top = -left-BARRE-margin
 				action.dx = width
@@ -375,15 +376,15 @@ do
 				end
 				local scale = action.scale
 				if l> 1 then
-					scale = scale  * OvaleOptions:GetApparence().secondIconScale
+					scale = scale * profile.apparence.secondIconScale
 				end
 				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/scale,(action.top - (l-1)*action.dy)/scale)
 				icon:SetScale(scale)
-				icon:SetFontScale(OvaleOptions:GetApparence().fontScale)
+				icon:SetFontScale(profile.apparence.fontScale)
 				icon:SetParams(node.params)
 				icon:SetHelp(node.params.help)
-				icon:SetRangeIndicator(OvaleOptions:GetApparence().targetText)
-				icon:EnableMouse(not OvaleOptions:GetApparence().clickThru)
+				icon:SetRangeIndicator(profile.apparence.targetText)
+				icon:EnableMouse(not profile.apparence.clickThru)
 				icon.cdShown = (l == 1)
 				if Masque then
 					self.skinGroup:AddButton(icon)
@@ -402,25 +403,25 @@ do
 			end
 		end
 		
-		if (OvaleOptions:GetApparence().vertical) then
+		if (profile.apparence.vertical) then
 			self.barre:SetWidth(maxHeight - margin)
 			self.barre:SetHeight(BARRE)
-			self.frame:SetWidth(maxHeight + OvaleOptions:GetApparence().iconShiftY)
-			self.frame:SetHeight(maxWidth+BARRE+margin + OvaleOptions:GetApparence().iconShiftX)
-			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxHeight + OvaleOptions:GetApparence().iconShiftX,OvaleOptions:GetApparence().iconShiftY)
+			self.frame:SetWidth(maxHeight + profile.apparence.iconShiftY)
+			self.frame:SetHeight(maxWidth+BARRE+margin + profile.apparence.iconShiftX)
+			self.content:SetPoint("TOPLEFT", self.frame, "TOPLEFT", maxHeight + profile.apparence.iconShiftX, profile.apparence.iconShiftY)
 		else
 			self.barre:SetWidth(maxWidth - margin)
 			self.barre:SetHeight(BARRE)
-			self.frame:SetWidth(maxWidth) -- + OvaleOptions:GetApparence().iconShiftX
-			self.frame:SetHeight(maxHeight+BARRE+margin) -- + OvaleOptions:GetApparence().iconShiftY
-			self.content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",maxWidth + OvaleOptions:GetApparence().iconShiftX,OvaleOptions:GetApparence().iconShiftY)
+			self.frame:SetWidth(maxWidth) -- + profile.apparence.iconShiftX
+			self.frame:SetHeight(maxHeight+BARRE+margin) -- + profile.apparence.iconShiftY
+			self.content:SetPoint("TOPLEFT", self.frame, "TOPLEFT", maxWidth + profile.apparence.iconShiftX, profile.apparence.iconShiftY)
 		end
 	end
 	
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
 		local self = {}
-		
+		local profile = OvaleOptions:GetProfile()
 		
 		self.Hide = Hide
 		self.Show = Show
@@ -455,7 +456,7 @@ do
 		frame:SetWidth(100)
 		frame:SetHeight(100)
 		frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
-		if not OvaleOptions:GetApparence().clickThru then
+		if not profile.apparence.clickThru then
 			frame:EnableMouse()
 		end
 		frame:SetMovable(true)
@@ -466,7 +467,7 @@ do
 		frame:SetScript("OnLeave", frameOnLeave)
 	--	frame:SetScript("OnUpdate", frameOnUpdate)		
 		frame:SetScript("OnHide",frameOnClose)
-		frame:SetAlpha(OvaleOptions:GetApparence().alpha)
+		frame:SetAlpha(profile.apparence.alpha)
 		
 		self.updateFrame:SetScript("OnUpdate", frameOnUpdate)
 		self.updateFrame.obj = self
@@ -481,10 +482,9 @@ do
 		content:SetWidth(200)
 		content:SetHeight(100)
 		content:Hide()
-		content:SetAlpha(OvaleOptions:GetApparence().optionsAlpha)
+		content:SetAlpha(profile.apparence.optionsAlpha)
 		
 		AceGUI:RegisterAsContainer(self)
-
 
 		return self	
 	end

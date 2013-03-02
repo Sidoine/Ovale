@@ -43,6 +43,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
 				
 	self.spellId = spellId
+	local profile = OvaleOptions:GetProfile()
 	if (minAttente~=nil and actionTexture) then	
 	
 		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
@@ -65,7 +66,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			end
 		end
 		
-		if not OvaleOptions:GetApparence().flashIcon and minAttente<=OvaleState.maintenant then
+		if not profile.apparence.flashIcon and minAttente<=OvaleState.maintenant then
 			self.cd:Hide()
 		end
 		
@@ -104,7 +105,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- La latence
-		if minAttente>OvaleState.maintenant and OvaleOptions:GetApparence().highlightIcon and not red then
+		if minAttente>OvaleState.maintenant and profile.apparence.highlightIcon and not red then
 			local lag = 0.6
 			local newShouldClick
 			if minAttente<OvaleState.maintenant + lag then
@@ -126,7 +127,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- Le temps restant
-		if ((OvaleOptions:GetApparence().numeric or self.params.text == "always") and minAttente > OvaleState.maintenant) then
+		if ((profile.apparence.numeric or self.params.text == "always") and minAttente > OvaleState.maintenant) then
 			self.remains:SetText(strformat("%.1f", minAttente - OvaleState.maintenant))
 			self.remains:Show()
 		else
@@ -134,7 +135,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- Le raccourcis clavier 
-		if (OvaleOptions:GetApparence().raccourcis) then
+		if (profile.apparence.raccourcis) then
 			self.shortcut:Show()
 			self.shortcut:SetText(actionShortcut)
 		else
@@ -166,7 +167,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		self.shortcut:Hide()
 		self.remains:Hide()
 		self.focusText:Hide()
-		if OvaleOptions:GetApparence().hideEmpty then
+		if profile.apparence.hideEmpty then
 			self:Hide()
 		else
 			self:Show()
@@ -176,8 +177,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			self.shouldClick = false
 		end
 	end
-	
-	
+
 	return minAttente,element
 end
 
@@ -248,13 +248,14 @@ end
 
 function OvaleIcone_OnLoad(self)
 	local name = self:GetName()
-	
+	local profile = OvaleOptions:GetProfile()
+
 --<public-properties>
 	self.icone = _G[name.."Icon"]
 	self.shortcut = _G[name.."HotKey"]
 	self.remains = _G[name.."Name"]
 	self.aPortee = _G[name.."Count"]
-	self.aPortee:SetText(OvaleOptions:GetApparence().targetText)
+	self.aPortee:SetText(profile.apparence.targetText)
 	self.cd = _G[name.."Cooldown"]
 	self.normalTexture = _G[name.."NormalTexture"]
 	local fontName, fontHeight, fontFlags = self.shortcut:GetFont()
@@ -292,7 +293,7 @@ function OvaleIcone_OnLoad(self)
 	self.SetFontScale = SetFontScale
 	self.SetRangeIndicator = SetRangeIndicator
 	self.SetValue = SetValue
-	if OvaleOptions:GetProfile().clickThru then
+	if profile.clickThru then
 		self:EnableMouse(false)
 	end
 end

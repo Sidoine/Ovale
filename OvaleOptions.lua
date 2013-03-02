@@ -532,10 +532,6 @@ function OvaleOptions:HandleProfileChanges()
 	end
 end
 
-function OvaleOptions:GetApparence()
-	return self.db.profile.apparence
-end
-
 function OvaleOptions:GetProfile()
 	return self.db.profile
 end
