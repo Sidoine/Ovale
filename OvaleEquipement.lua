@@ -554,5 +554,6 @@ function OvaleEquipement:Refresh()
 			end
 		end
 	end	
+	self:SendMessage("Ovale_EquipmentChanged")
 end
 --</public-static-methods>

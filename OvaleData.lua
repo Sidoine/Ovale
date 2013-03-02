@@ -300,19 +300,17 @@ function OvaleData:OnEnable()
 	self.className = select(2, UnitClass("player"))
 	self.level = UnitLevel("player")
 	
-	self:RemplirListeTalents()
-	self:FillSpellList()
-
-	self:RegisterEvent("CHARACTER_POINTS_CHANGED")
-	self:RegisterEvent("GLYPH_ADDED")
-	self:RegisterEvent("GLYPH_DISABLED")
-	self:RegisterEvent("GLYPH_ENABLED")
-	self:RegisterEvent("GLYPH_REMOVED")
-	self:RegisterEvent("GLYPH_UPDATED")
+	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "RemplirListeTalents")
+	self:RegisterEvent("GLYPH_ADDED", "UpdateGlyphs")
+	self:RegisterEvent("GLYPH_DISABLED", "UpdateGlyphs")
+	self:RegisterEvent("GLYPH_ENABLED", "UpdateGlyphs")
+	self:RegisterEvent("GLYPH_REMOVED", "UpdateGlyphs")
+	self:RegisterEvent("GLYPH_UPDATED", "UpdateGlyphs")
+	self:RegisterEvent("PLAYER_ALIVE")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
-	self:RegisterEvent("PLAYER_TALENT_UPDATE")
-	self:RegisterEvent("SPELLS_CHANGED")
-	self:RegisterEvent("UNIT_PET")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", "RemplirListeTalents")
+	self:RegisterEvent("SPELLS_CHANGED", "FillSpellList")
+	self:RegisterEvent("UNIT_PET", "FillPetSpellList")
 end
 
 function OvaleData:OnDisable()
@@ -322,35 +320,18 @@ function OvaleData:OnDisable()
 	self:UnregisterEvent("GLYPH_ENABLED")
 	self:UnregisterEvent("GLYPH_REMOVED")
 	self:UnregisterEvent("GLYPH_UPDATED")
+	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_LEVEL_UP")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("SPELLS_CHANGED")
 	self:UnregisterEvent("UNIT_PET")
 end
 
-function OvaleData:CHARACTER_POINTS_CHANGED()
+-- Talent information is available to the UI when PLAYER_ALIVE fires.
+function OvaleData:PLAYER_ALIVE(event)
 	self:RemplirListeTalents()
---	Ovale:Print("CHARACTER_POINTS_CHANGED")
-end
-
-function OvaleData:GLYPH_ADDED(event)
 	self:UpdateGlyphs()
-end
-
-function OvaleData:GLYPH_DISABLED(event)
-	self:UpdateGlyphs()
-end
-
-function OvaleData:GLYPH_ENABLED(event)
-	self:UpdateGlyphs()
-end
-
-function OvaleData:GLYPH_REMOVED(event)
-	self:UpdateGlyphs()
-end
-
-function OvaleData:GLYPH_UPDATED(event)
-	self:UpdateGlyphs()
+	self:FillSpellList()
 end
 
 function OvaleData:PLAYER_LEVEL_UP(event, level, ...)
@@ -360,23 +341,6 @@ function OvaleData:PLAYER_LEVEL_UP(event, level, ...)
 	else
 		self.level = self.level + 1
 	end
-end
-
-function OvaleData:PLAYER_TALENT_UPDATE(event)
-	Ovale:debugPrint("compile", event)
-	self:RemplirListeTalents()
-	Ovale.needCompile = true
-end
-
-function OvaleData:UNIT_PET()
-	self:FillPetSpellList()
-end
-
---The user learnt a new spell
-function OvaleData:SPELLS_CHANGED(event)
-	Ovale:debugPrint("compile", event)
-	self:FillSpellList()
-	Ovale.needCompile = true
 end
 
 function OvaleData:GetRootSpellList()
@@ -467,11 +431,12 @@ function OvaleData:FillSpellList()
 		i = i + 1
 	end
 	self:FillPetSpellList()
+	self:SendMessage("Ovale_SpellsChanged")
 end
 
 function OvaleData:RemplirListeTalents()
 	local talentId = 1
-	local needCompile = false
+	local talentsChanged = false
 	while true do
 		local name, texture, tier, column, selected, available = GetTalentInfo(talentId)
 		if not name then
@@ -486,12 +451,11 @@ function OvaleData:RemplirListeTalents()
 			self.pointsTalent[talentId] = 0
 		end		
 		self.listeTalentsRemplie = true
-		needCompile = true
+		talentsChanged = true
 		talentId = talentId + 1
 	end
-	if needCompile then
-		Ovale:debugPrint("compile", "filling talent list")
-		Ovale.needCompile = needCompile
+	if talentsChanged then
+		self:SendMessage("Ovale_TalentsChanged")
 	end
 end
 
@@ -521,8 +485,7 @@ function OvaleData:UpdateGlyphs()
 			self.glyphs[glyphSpell] = true
 		end
 	end
-	Ovale:debugPrint("compile", event)
-	Ovale.needCompile = true
+	self:SendMessage("Ovale_GlyphsChanged")
 end
 
 function OvaleData:DebugGlyphs()

@@ -165,7 +165,7 @@ function OvaleStance:ShapeshiftEventHandler()
 	local newStance = GetShapeshiftForm()
 	if stance ~= newStance then
 		stance = newStance
-		self:SendMessage("Ovale_UpdateShapeshiftForm")
+		self:SendMessage("Ovale_StanceChanged")
 	end
 end
 --</public-static-methods>

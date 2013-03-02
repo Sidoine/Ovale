@@ -10,7 +10,7 @@
 -- Ovale options and UI
 
 local _, Ovale = ...
-OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0")
+OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent-3.0")
 
 --<private-static-properties>
 local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring
@@ -286,8 +286,7 @@ local options =
 					end,
 					set = function(info,v)
 						OvaleOptions.db.profile.code = v
-						Ovale:debugPrint("compile", "accepting script")
-						Ovale.needCompile = true
+						self:SendMessage("Ovale_ScriptChanged")
 					end,
 					width = "full"
 				},
@@ -301,8 +300,7 @@ local options =
 					end,
 					func = function()
 						OvaleOptions.db.profile.code = OvaleOptions.db.defaults.profile.code
-						Ovale:debugPrint("compile", "restoring default script")
-						Ovale.needCompile = true
+						self:SendMessage("Ovale_ScriptChanged")
 					end,
 				}
 			}
@@ -519,16 +517,12 @@ function OvaleOptions:OnInitialize()
 	self.db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 	
-	if self.db.profile.code then
-		Ovale:debugPrint("compile", "setting script during addon initialization")
-		Ovale.needCompile = true
-	end
+	self:HandleProfileChanges()
 end
 
 function OvaleOptions:HandleProfileChanges()
-	if (self.db.profile.code) then
-		Ovale:debugPrint("compile", "changing profiles")
-		Ovale.needCompile = true
+	if self.db.profile.code then
+		self:SendMessage("Ovale_ScriptChanged")
 	end
 end
 

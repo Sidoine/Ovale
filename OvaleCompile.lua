@@ -8,12 +8,12 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-OvaleCompile = {}
+OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
 
 --<private-static-properties>
 local L = Ovale.L
 
-local node={}
+local node = {}
 local defines = {}
 local customFunctions = {}
 local unknownSpellNodes = {}
@@ -23,6 +23,13 @@ local ipairs, pairs, tonumber = ipairs, pairs, tonumber
 local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
 local strlen, strlower, strmatch, strsub = string.len, string.lower, string.match, string.sub
 --</private-static-properties>
+
+--<public-static-properties>
+--master nodes of the current script (one node for each icon)
+OvaleCompile.masterNodes = {}
+OvaleCompile.compileOnItems = false
+OvaleCompile.compileOnStances = false
+--</public-static-properties>
 
 --<private-static-methods>
 local function AddNode(newNode)
@@ -81,7 +88,7 @@ local function TestConditions(paramList)
 		return false
 	end
 	if paramList.if_stance then
-		Ovale.compileOnStances = true
+		OvaleCompile.compileOnStances = true
 		if not OvaleStance:IsStance(paramList.if_stance) then
 			return false
 		end
@@ -125,7 +132,7 @@ local function TestConditions(paramList)
 	end
 	if paramList.itemset and paramList.itemcount then
 		local equippedCount = OvaleEquipement:GetArmorSetCount(paramList.itemset)
-		Ovale.compileOnItems = true
+		OvaleCompile.compileOnItems = true
 		if equippedCount < paramList.itemcount then
 			return false
 		end
@@ -537,16 +544,16 @@ end
 local function ParseL(text)
 	return '"'..L[text]..'"'
 end
---</private-static-methods>
 
---<public-static-methods>
-function OvaleCompile:CompileComments(text)
+-- Suppression des commentaires
+local function CompileComments(text)
 	text = strgsub(text, "#.-\n","")
 	text = strgsub(text, "#.*$","")
 	return text
 end
 
-function OvaleCompile:CompileInputs(text)
+-- On compile les AddCheckBox et AddListItem
+local function CompileInputs(text)
 	Ovale.casesACocher = {}
 	Ovale.listes = {}
 	
@@ -555,7 +562,8 @@ function OvaleCompile:CompileInputs(text)
 	return text
 end
 
-function OvaleCompile:CompileDeclarations(text)
+-- Compile non-function and non-icon declarations.
+local function CompileDeclarations(text)
 	-- Define(CONSTANTE valeur)
 	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
 	
@@ -585,23 +593,19 @@ function OvaleCompile:CompileDeclarations(text)
 	return text
 end
 
-function OvaleCompile:Compile(text)
-	Ovale.compileOnItems = false
-	Ovale.compileOnStances = false
+local function CompileScript(text)
+	OvaleCompile.compileOnItems = false
+	OvaleCompile.compileOnStances = false
 	Ovale.bug = false
-	node = {}
-	defines = {}
-	unknownSpellNodes = {}
-	missingSpellList = {}
 
-	-- Suppression des commentaires
-	text = self:CompileComments(text)
+	wipe(node)
+	wipe(defines)
+	wipe(unknownSpellNodes)
+	wipe(missingSpellList)
 
-	-- Compile non-function and non-icon declarations.
-	text = self:CompileDeclarations(text)
-
-	-- On compile les AddCheckBox et AddListItem
-	text = self:CompileInputs(text)
+	text = CompileComments(text)
+	text = CompileDeclarations(text)
+	text = CompileInputs(text)
 
 	OvaleData:ResetSpellFilter()
 
@@ -612,8 +616,9 @@ function OvaleCompile:Compile(text)
 		end
 	end
 	
-	local masterNodes ={}
-	
+	local masterNodes = OvaleCompile.masterNodes
+	wipe(masterNodes)
+
 	-- On compile les AddIcon
 	for p,t in strgmatch(text, "AddActionIcon%s*(.-)%s*(%b{})") do
 		local newNode = ParseAddIcon(p,t,true)
@@ -633,8 +638,58 @@ function OvaleCompile:Compile(text)
 	for k, v in pairs(missingSpellList) do
 		OvaleData.spellList[k] = v
 	end
+end
+--</private-static-methods>
 
-	return masterNodes
+--<public-static-methods>
+function OvaleCompile:OnEnable()
+	self:RegisterMessage("Ovale_CheckBoxValueChanged", "EventHandler")
+	self:RegisterMessage("Ovale_EquipmentChanged")
+	self:RegisterMessage("Ovale_GlyphsChanged", "EventHandler")
+	self:RegisterMessage("Ovale_ListValueChanged", "EventHandler")
+	self:RegisterMessage("Ovale_ScriptChanged", "EventHandler")
+	self:RegisterMessage("Ovale_SpellsChanged", "EventHandler")
+	self:RegisterMessage("Ovale_StanceChanged")
+	self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
+end
+
+function OvaleCompile:OnDisable()
+	self:UnregisterMessage("Ovale_CheckBoxValueChanged")
+	self:UnregisterMessage("Ovale_EquipmentChanged")
+	self:UnregisterMessage("Ovale_GlyphsChanged")
+	self:UnregisterMessage("Ovale_ListValueChanged")
+	self:UnregisterMessage("Ovale_ScriptChanged")
+	self:UnregisterMessage("Ovale_SpellsChanged")
+	self:UnregisterMessage("Ovale_StanceChanged")
+	self:UnregisterMessage("Ovale_TalentsChanged")
+end
+
+function OvaleCompile:EventHandler(event)
+	Ovale:debugPrint("compile", event)
+	self:Compile()
+end
+
+function OvaleCompile:Ovale_EquipmentChanged(event)
+	if OvaleCompile.compileOnItems then
+		self:EventHandler(event)
+	end
+	Ovale.refreshNeeded.player = true
+end
+
+function OvaleCompile:Ovale_StanceChanged(event)
+	if OvaleCompile.compileOnStances then
+		self:EventHandler(event)
+	end
+	Ovale.refreshNeeded.player = true
+end
+
+function OvaleCompile:Compile()
+	local code = OvaleOptions:GetProfile().code
+	if code then
+		CompileScript(code)
+		Ovale.refreshNeeded.player = true
+		Ovale:UpdateFrame()
+	end
 end
 
 function OvaleCompile:DebugNode(node)

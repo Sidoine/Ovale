@@ -32,8 +32,6 @@ Ovale.frame = nil
 Ovale.checkBoxes = {}
 --drop down GUI items
 Ovale.dropDowns = {}
---master nodes of the current script (one node for each icon)
-Ovale.masterNodes = nil
 --set it if there was a bug, traces will be enabled on next frame
 Ovale.bug = false
 Ovale.traced = false
@@ -46,10 +44,7 @@ Ovale.score = 0
 --maximal theoric score in current combat
 Ovale.maxScore = 0
 Ovale.refreshNeeded = {}
-Ovale.compileOnItems = false
-Ovale.compileOnStances = false
 Ovale.combatStartTime = nil
-Ovale.needCompile = false
 Ovale.listes = {}
 --</public-static-properties>
 
@@ -70,7 +65,7 @@ function Ovale:debugPrint(flag, ...)
 end
 
 function Ovale:Debug()
-	self:Print(OvaleCompile:DebugNode(self.masterNodes[1]))
+	self:Print(OvaleCompile:DebugNode(OvaleCompile.masterNodes[1]))
 end
 
 -- Print the auras matching the filter on the target in alphabetical order.
@@ -91,28 +86,13 @@ function Ovale:DebugListAura(target, filter)
 	end
 end
 
-function Ovale:CompileAll()
-	local code = OvaleOptions:GetProfile().code
-	if code then
-		if self.needCompile then
-			self:debugPrint("compile", "FULL compile")
-			self.masterNodes = OvaleCompile:Compile(code)
-		end
-		self.refreshNeeded.player = true
-		self:UpdateFrame()
-		self.needCompile = false
-	end
-end
-
 function Ovale:OnEnable()
     -- Called when the addon is enabled
 	RegisterAddonMessagePrefix("Ovale")
-	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("CHAT_MSG_ADDON")
-	self:RegisterMessage("Ovale_UpdateShapeshiftForm")
 
 	local profile = OvaleOptions:GetProfile()
 	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
@@ -122,31 +102,11 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
-	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterEvent("CHAT_MSG_ADDON")
-	self:UnregisterMessage("Ovale_UpdateShapeshiftForm")
 	self.frame:Hide()
-end
-
-function Ovale:PLAYER_EQUIPMENT_CHANGED(event, slot, hasItem)
-	if self.compileOnItems then
-		self:debugPrint("compile", event)
-		self.needCompile = true
-	else
-		self.refreshNeeded.player = true
-	end
-end
-
-function Ovale:Ovale_UpdateShapeshiftForm(event)
-	if Ovale.compileOnStances then
-		self:debugPrint("compile", event)
-		self.needCompile = true
-	else
-		self.refreshNeeded.player = true
-	end
 end
 
 --Called when the player target change
@@ -207,16 +167,14 @@ end
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
-		Ovale:debugPrint("compile", "checkbox value changed: " .. widget.userdata.k)
-		Ovale.needCompile = true
+		self:SendMessage("Ovale_CheckBoxValueChanged")
 	end
 end
 
 local function OnDropDownValueChanged(widget)
 	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
 	if Ovale.listes[widget.userdata.k].compile then
-		Ovale:debugPrint("compile", "list value changed: " .. widget.userdata.k)
-		Ovale.needCompile = true
+		self:SendMessage("Ovale_ListValueChanged")
 	end
 end
 

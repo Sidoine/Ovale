@@ -146,14 +146,6 @@ do
 	end
 	
 	local function OnUpdate(self)
-		if not OvaleData.listeTalentsRemplie then
-			OvaleData:RemplirListeTalents()
-		end
-		if Ovale.needCompile then
-			Ovale:CompileAll()
-			return
-		end
-		
 		local now = GetTime()
 		local profile = OvaleOptions:GetProfile()
 		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
@@ -161,12 +153,12 @@ do
 		if not next(Ovale.refreshNeeded) and not forceRefresh then
 			return
 		end
-		if not Ovale.masterNodes then return end
+		if not OvaleCompile.masterNodes then return end
 		
 		self.lastUpdate = now
 
 		OvaleState:StartNewFrame()
-		for k,node in pairs(Ovale.masterNodes) do
+		for k,node in pairs(OvaleCompile.masterNodes) do
 			local target = node.params.target or "target"
 			OvaleCondition.defaultTarget = target
 
@@ -311,7 +303,7 @@ do
 		local maxWidth = 0
 		local top = 0
 		
-		if (not Ovale.masterNodes) then
+		if (not OvaleCompile.masterNodes) then
 			return;
 		end
 		
@@ -319,7 +311,7 @@ do
 		
 		local margin = profile.apparence.margin
 			
-		for k,node in pairs(Ovale.masterNodes) do
+		for k,node in pairs(OvaleCompile.masterNodes) do
 			if not self.actions[k] then
 				self.actions[k] = {icons={}, secureIcons={}}
 			end
