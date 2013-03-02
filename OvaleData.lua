@@ -18,6 +18,19 @@ local GetSpellBookItemInfo, GetSpellBookItemName = GetSpellBookItemInfo, GetSpel
 local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
 local HasPetSpells, UnitBuff, UnitClass = HasPetSpells, UnitBuff, UnitClass
 local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
+local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
+local SPELL_POWER_BURNING_EMBERS = SPELL_POWER_BURNING_EMBERS
+local SPELL_POWER_CHI = SPELL_POWER_CHI
+local SPELL_POWER_DEMONIC_FURY = SPELL_POWER_DEMONIC_FURY
+local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
+local SPELL_POWER_ENERGY = SPELL_POWER_ENERGY
+local SPELL_POWER_FOCUS = SPELL_POWER_FOCUS
+local SPELL_POWER_HOLY_POWER = SPELL_POWER_HOLY_POWER
+local SPELL_POWER_MANA = SPELL_POWER_MANA
+local SPELL_POWER_RAGE = SPELL_POWER_RAGE
+local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
+local SPELL_POWER_SHADOW_ORBS = SPELL_POWER_SHADOW_ORBS
+local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 --</private-static-properties>
 
 --<public-static-properties>
@@ -43,18 +56,19 @@ OvaleData.spellFilter = { any = {}, mine = {} }
 
 OvaleData.power =
 {
-	mana = {id=0, mini=0},
-	rage = {id=1, mini=0, maxi=100},
-	focus ={id=2, mini=0, maxi=100},
-	energy = {id=3, mini=0, maxi=100},
-	runicpower = {id=6, mini=0, maxi=100},
-	shards = {id=7, mini=0, maxi=3},
-	eclipse = {id=8, mini=-100, maxi=100},
-	holy = {id=9, mini=0, maxi=5},
-	chi = {id=12, mini=0, maxi=4 }, 
-	shadoworbs = {id=13, mini=0, maxi=3},
-	burningembers = {id=14, mini=0},
-	demonicfury = {id=15, mini=0}
+	mana = { id = SPELL_POWER_MANA, mini = 0 },
+	rage = { id = SPELL_POWER_RAGE, mini = 0, maxi = 100 },
+	focus = { id = SPELL_POWER_FOCUS, mini = 0, maxi = 100 },
+	energy = { id = SPELL_POWER_ENERGY, mini = 0, maxi = 100 },
+	runicpower = { id = SPELL_POWER_RUNIC_POWER, mini = 0, maxi = 100 },
+	shards = { id = SPELL_POWER_SOUL_SHARDS, mini = 0, segments = true },
+	eclipse = { id = SPELL_POWER_ECLIPSE, mini = -100, maxi = 100 },
+	holy = { id = SPELL_POWER_HOLY_POWER, mini = 0, maxi = 5 },
+	alternate = { id = SPELL_POWER_ALTERNATE_POWER, mini = 0 },
+	chi = { id = SPELL_POWER_CHI, mini = 0, maxi = 4 },
+	shadoworbs = { id = SPELL_POWER_SHADOW_ORBS, mini = 0, maxi = 3 },
+	burningembers = { id = SPELL_POWER_BURNING_EMBERS, mini = 0, segments = true },
+	demonicfury = { id = SPELL_POWER_DEMONIC_FURY, mini = 0 }
 }
 OvaleData.secondaryPower = {"rage", "focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
 OvaleData.powerType = {}

@@ -84,7 +84,7 @@ function OvaleState:Reset()
 	self.attenteFinCast = self.maintenant
 	self.state.combo = OvaleComboPoints.combo
 	for k,v in pairs(OvaleData.power) do
-		self.state[k] = UnitPower("player", v.id)
+		self.state[k] = UnitPower("player", v.id, v.segments)
 	end
 	
 	self:UpdatePowerRates()
@@ -187,7 +187,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 					if v.maxi and self.state[k] > v.maxi then
 						self.state[k] = v.maxi
 					else
-						local maxi = UnitPowerMax("player", v.id)
+						local maxi = UnitPowerMax("player", v.id, v.segments)
 						if maxi and self.state[k] > maxi then
 							self.state[k] = maxi
 						end
