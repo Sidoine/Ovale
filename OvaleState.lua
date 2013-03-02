@@ -195,29 +195,26 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 				end
 			end
 
-			--[[
-				This section is not needed since self.state.combo tracks OvaleComboPoints, which updates
-				the number of combo points even before the spell has been "successfully" cast.
-
-			--Points de combo
+			-- Combo points
 			if newSpellInfo.combo then
 				if newSpellInfo.combo == 0 then
 					self.state.combo = 0
-				else
+				elseif newSpellInfo.combo > 0 then
 					self.state.combo = self.state.combo + newSpellInfo.combo
 					if OvaleData.className == "ROGUE" and self:GetAura("player", 121471, true) then
 						-- Shadow Blades generates an extra combo point.
 						self.state.combo = self.state.combo + 1
 					end
-				end
-				if self.state.combo < 0 then
-					self.state.combo = 0
-				end
-				if self.state.combo > MAX_COMBO_POINTS then
-					self.state.combo = MAX_COMBO_POINTS
+					if self.state.combo > MAX_COMBO_POINTS then
+						self.state.combo = MAX_COMBO_POINTS
+					end
+				else -- newSpellInfo.combo < 0
+					self.state.combo = self.state.combo + newSpellInfo.combo
+					if self.state.combo < 0 then
+						self.state.combo = 0
+					end
 				end
 			end
-			]]--
 
 			--Runes
 			if newSpellInfo.frost then
