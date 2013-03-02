@@ -275,32 +275,65 @@ local options =
 			type = "group",
 			args = 
 			{
+				source = {
+					order = 0,
+					type = "select",
+					name = L["Script"],
+					width = "double",
+					values = function(info)
+						return OvaleScripts:GetDescriptions()
+					end,
+					get = function(info)
+						return OvaleOptions.db.profile.source
+					end,
+					set = function(info, v)
+						local oldSource = OvaleOptions.db.profile.source
+						if oldSource ~= v then
+							OvaleOptions.db.profile.source = v
+							OvaleOptions:SendMessage("Ovale_ScriptChanged")
+						end
+					end,
+				},
 				code = 
 				{
 					order = 1,
 					type = "input",
 					multiline = 15,
 					name = L["Code"],
+					width = "full",
+					disabled = function()
+						return OvaleOptions.db.profile.source ~= "custom"
+					end,
 					get = function(info)
-						return strgsub(OvaleOptions.db.profile.code, "\t", "    ")
+						local source = OvaleOptions.db.profile.source
+						local code = OvaleScripts.script[OvaleData.className][source].code
+						return strgsub(code, "\t", "    ")
 					end,
-					set = function(info,v)
+					set = function(info, v)
+						OvaleScripts:RegisterScript(OvaleData.className, "custom", "Custom script", v)
 						OvaleOptions.db.profile.code = v
-						self:SendMessage("Ovale_ScriptChanged")
+						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
-					width = "full"
 				},
-				restore =
+				copy =
 				{
 					order = 2,
 					type = "execute",
-					name = L["Restaurer le défaut"],
+					name = "Copy to Custom script",
 					disabled = function()
-						return OvaleOptions.db.profile.code == OvaleOptions.db.defaults.profile.code
+						return OvaleOptions.db.profile.source == "custom"
+					end,
+					confirm = function()
+						return "Overwrite existing Custom script?"
 					end,
 					func = function()
-						OvaleOptions.db.profile.code = OvaleOptions.db.defaults.profile.code
-						self:SendMessage("Ovale_ScriptChanged")
+						local class = OvaleData.className
+						local source = OvaleOptions.db.profile.source
+						local code = OvaleScripts.script[class][source].code
+						OvaleScripts.script[class]["custom"].code = code
+						OvaleOptions.db.profile.source = "custom"
+						OvaleOptions.db.profile.code = code
+						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
 				}
 			}
@@ -480,13 +513,13 @@ local options =
 
 --<public-static-methods>
 function OvaleOptions:OnInitialize()
-	local localizedClass, englishClass = UnitClass("player")
 	self.db = LibStub("AceDB-3.0"):New("OvaleDB",
 	{
 		profile = 
 		{
 			display = true,
-			code = Ovale.defaut[englishClass],
+			source = "Ovale",
+			code = "",
 			left = 500,
 			top = 500,
 			check = {},
@@ -499,7 +532,7 @@ function OvaleOptions:OnInitialize()
 				optionsAlpha = 1, updateInterval=0.1}
 		}
 	})
-	
+
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	AceConfig:RegisterOptionsTable("Ovale", options.args.code)
 	AceConfig:RegisterOptionsTable("Ovale Actions", options.args.actions, "Ovale")
@@ -511,19 +544,18 @@ function OvaleOptions:OnInitialize()
 	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Apparence", "Apparence", "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", "Ovale")
-	
+
 	self.db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileReset", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
-	
+
+	OvaleScripts:RegisterScript(OvaleData.className, "custom", "Custom script", self.db.profile.code)
 	self:HandleProfileChanges()
 end
 
 function OvaleOptions:HandleProfileChanges()
-	if self.db.profile.code then
-		self:SendMessage("Ovale_ScriptChanged")
-	end
+	self:SendMessage("Ovale_ScriptChanged")
 end
 
 function OvaleOptions:GetProfile()

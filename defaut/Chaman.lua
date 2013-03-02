@@ -1,4 +1,5 @@
-Ovale.defaut["SHAMAN"] = [[Define(ancestral_swiftness 16188)
+local code = [[
+Define(ancestral_swiftness 16188)
   SpellInfo(ancestral_swiftness cd=90 )
   SpellAddBuff(ancestral_swiftness ancestral_swiftness=1)
 Define(ascendance 114049)
@@ -211,3 +212,5 @@ AddIcon mastery=2 help=cd
 
 }
 ]]
+
+OvaleScripts:RegisterScript("SHAMAN", "Ovale", "[5.1] Ovale: Elemental, Enhancement", code)

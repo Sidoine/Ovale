@@ -1,4 +1,5 @@
-Ovale.defaut["WARLOCK"] = [[Define(agony 980)
+local code = [[
+Define(agony 980)
   SpellInfo(agony duration=24 tick=2 )
   SpellAddTargetDebuff(agony agony=1)
 Define(backdraft 117896)
@@ -287,3 +288,5 @@ AddIcon mastery=3 help=cd
 	Spell(summon_doomguard)
 }
 ]]
+
+OvaleScripts:RegisterScript("WARLOCK", "Ovale", "[5.1] Ovale: Affliction, Demonology, Destruction", code)

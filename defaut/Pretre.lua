@@ -1,4 +1,5 @@
-Ovale.defaut["PRIEST"] = [[Define(berserking 26297)
+local code = [[
+Define(berserking 26297)
   SpellInfo(berserking duration=10 cd=180 )
   SpellAddBuff(berserking berserking=1)
 Define(cascade 120785)
@@ -116,3 +117,5 @@ AddIcon mastery=3 help=cd
 	Spell(dispersion)
 }
 ]]
+
+OvaleScripts:RegisterScript("PRIEST", "Ovale", "[5.1] Ovale: Shadow", code)

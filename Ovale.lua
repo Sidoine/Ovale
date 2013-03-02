@@ -22,8 +22,6 @@ local damageMeterModules = {}
 
 --<public-static-properties>
 Ovale.L = L
---Default scripts (see "defaut" directory)
-Ovale.defaut = {}
 --The table of check boxes definition
 Ovale.casesACocher = {}
 --the frame with the icons

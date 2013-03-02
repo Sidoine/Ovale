@@ -1,4 +1,5 @@
-Ovale.defaut["MONK"] = [[Define(berserking 26297)
+local code = [[
+Define(berserking 26297)
   SpellInfo(berserking duration=10 cd=180 )
   SpellAddBuff(berserking berserking=1)
 Define(blackout_kick 100784)
@@ -90,3 +91,5 @@ AddIcon mastery=3 help=cd
 	if TalentPoints(invoke_xuen_talent) Spell(invoke_xuen)
 }
 ]]
+
+OvaleScripts:RegisterScript("MONK", "Ovale", "[5.1] Ovale: Windwalker", code)

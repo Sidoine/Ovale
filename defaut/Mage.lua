@@ -1,4 +1,5 @@
-Ovale.defaut["MAGE"] = [[Define(alter_time 110909)
+local code = [[
+Define(alter_time 110909)
   SpellInfo(alter_time duration=6 )
   SpellAddBuff(alter_time alter_time=1)
 Define(alter_time_activate 108978)
@@ -247,3 +248,5 @@ AddIcon mastery=3 help=cd
 	if BuffRemains(invokers_energy) >10 and BuffExpires(alter_time) and ManaPercent() >28 Spell(berserking)
 }
 ]]
+
+OvaleScripts:RegisterScript("MAGE", "Ovale", "[5.1] Ovale: Arcane, Fire, Frost", code)

@@ -1,4 +1,5 @@
-Ovale.defaut["PALADIN"] = [[Define(avenging_wrath 31884)
+local code = [[
+Define(avenging_wrath 31884)
   SpellInfo(avenging_wrath duration=20 cd=180 )
   SpellAddBuff(avenging_wrath avenging_wrath=1)
 Define(blessing_of_kings 20217)
@@ -69,3 +70,5 @@ AddIcon mastery=3 help=cd
 	if BuffPresent(inquisition)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 ]]
+
+OvaleScripts:RegisterScript("PALADIN", "Ovale", "[5.1] Ovale: Retribution", code)

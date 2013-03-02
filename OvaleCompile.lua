@@ -684,12 +684,12 @@ function OvaleCompile:Ovale_StanceChanged(event)
 end
 
 function OvaleCompile:Compile()
-	local code = OvaleOptions:GetProfile().code
-	if code then
-		CompileScript(code)
-		Ovale.refreshNeeded.player = true
-		Ovale:UpdateFrame()
-	end
+	local profile = OvaleOptions:GetProfile()
+	local source = profile.source
+	local code = OvaleScripts.script[OvaleData.className][source].code
+	CompileScript(code)
+	Ovale.refreshNeeded.player = true
+	Ovale:UpdateFrame()
 end
 
 function OvaleCompile:DebugNode(node)

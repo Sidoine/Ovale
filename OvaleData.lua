@@ -291,13 +291,13 @@ local rootSpellList = nil
 
 --<public-static-methods>
 function OvaleData:OnInitialize()
+	self.className = select(2, UnitClass("player"))
 	for k,v in pairs(self.power) do
 		self.powerType[v.id] = k
 	end
 end
 
 function OvaleData:OnEnable()
-	self.className = select(2, UnitClass("player"))
 	self.level = UnitLevel("player")
 	
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "RemplirListeTalents")

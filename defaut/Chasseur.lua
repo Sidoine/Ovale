@@ -1,4 +1,5 @@
-Ovale.defaut["HUNTER"] = [[Define(a_murder_of_crows 131900)
+local code = [[
+Define(a_murder_of_crows 131900)
 Define(aimed_shot 19434)
   SpellInfo(aimed_shot focus=50 )
 Define(arcane_shot 3044)
@@ -238,3 +239,5 @@ AddIcon mastery=3 help=cd
 	if BuffPresent(rapid_fire) Spell(readiness)
 }
 ]]
+
+OvaleScripts:RegisterScript("HUNTER", "Ovale", "[5.1] Ovale: Beast Mastery, Marksmanship, Survival", code)

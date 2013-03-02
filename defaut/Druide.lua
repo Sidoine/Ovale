@@ -1,4 +1,5 @@
-Ovale.defaut["DRUID"] = [[Define(berserk 50334)
+local code = [[
+Define(berserk 50334)
   SpellInfo(berserk duration=10 cd=180 )
   SpellAddBuff(berserk berserk=1)
 Define(berserking 26297)
@@ -271,3 +272,5 @@ AddIcon mastery=2 help=cd
 	if BuffPresent(tigers_fury) or {target.DeadIn() <18 and SpellCooldown(tigers_fury) >6 } Spell(berserk)
 }
 ]]
+
+OvaleScripts:RegisterScript("DRUID", "Ovale", "[5.1] Ovale: Balance, Feral", code)

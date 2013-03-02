@@ -1,4 +1,5 @@
-Ovale.defaut["ROGUE"] = [[Define(adrenaline_rush 13750)
+local code = [[
+Define(adrenaline_rush 13750)
   SpellInfo(adrenaline_rush duration=15 cd=180 )
   SpellAddBuff(adrenaline_rush adrenaline_rush=1)
 Define(ambush 8676)
@@ -198,3 +199,5 @@ AddIcon mastery=3 help=cd
 	if TimeInCombat() >10 and Energy() >=45 and Energy() <=75 and ComboPoints() <=3 and not BuffPresent(shadow_dance) and not BuffPresent(master_of_subtlety) and not target.DebuffPresent(find_weakness) Spell(vanish)
 }
 ]]
+
+OvaleScripts:RegisterScript("ROGUE", "Ovale", "[5.1] Ovale: Assassination, Combat, Subtlety", code)

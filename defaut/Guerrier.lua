@@ -1,4 +1,5 @@
-Ovale.defaut["WARRIOR"] = [[Define(avatar 107574)
+local code = [[
+Define(avatar 107574)
   SpellInfo(avatar duration=24 cd=180 )
   SpellAddBuff(avatar avatar=1)
 Define(battle_shout 6673)
@@ -273,3 +274,5 @@ AddIcon mastery=3 help=cd
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 ]]
+
+OvaleScripts:RegisterScript("WARRIOR", "Ovale", "[5.1] Ovale: Arms, Fury, Protection", code)
