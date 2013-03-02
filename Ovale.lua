@@ -11,13 +11,13 @@ local _, Ovale = ...
 _G.Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, "Ovale", "AceConsole-3.0", "AceEvent-3.0")
 
 --<private-static-properties>
-local Recount = Recount
-local Skada = Skada
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local ipairs, pairs, strsplit, tinsert, tsort = ipairs, pairs, string.split, table.insert, table.sort
 local SendAddonMessage, UnitAura, UnitCanAttack = SendAddonMessage, UnitAura, UnitCanAttack
 local UnitExists, UnitHasVehicleUI, UnitIsDead = UnitExists, UnitHasVehicleUI, UnitIsDead
+
+local damageMeterModules = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -184,25 +184,17 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self:UpdateVisibility()
 end
 
+function Ovale:AddDamageMeter(name, module)
+	damageMeterModules[name] = module
+end
+
+function Ovale:RemoveDamageMeter(name)
+	damageMeterModules[name] = nil
+end
+
 function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	if Recount then
-		local source = Recount.db2.combatants[name]
-		if source then
-			Recount:AddAmount(source,"Ovale",scored)
-			Recount:AddAmount(source,"OvaleMax",scoreMax)
-		end
-	end
-	if Skada then
-		if not guid or not Skada.current or not Skada.total then return end
-		local player = Skada:get_player(Skada.current, guid, nil)
-		if not player then return end
-		if not player.ovale then player.ovale = 0 end
-		if not player.ovaleMax then player.ovaleMax = 0 end
-		player.ovale = player.ovale + scored
-		player.ovaleMax = player.ovaleMax + scoreMax
-		player = Skada:get_player(Skada.total, guid, nil)
-		player.ovale = player.ovale + scored
-		player.ovaleMax = player.ovaleMax + scoreMax
+	for _, module in pairs(damageMeterModules) do
+		module:SendScoreToDamageMeter(name, guid, scored, scoreMax)
 	end
 end
 
