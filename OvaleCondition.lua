@@ -44,7 +44,7 @@ local targetGUID = {}
 local lastSPD = {}
 
 local floor, pairs, select, strfind, tostring = math.floor, pairs, select, string.find, tostring
-local GetGlyphSocketInfo, GetInventoryItemID, GetInventoryItemLink = GetGlyphSocketInfo, GetInventoryItemID, GetInventoryItemLink
+local GetInventoryItemID, GetInventoryItemLink = GetInventoryItemID, GetInventoryItemLink
 local GetInventorySlotInfo, GetItemCooldown, GetItemCount = GetInventorySlotInfo, GetItemCooldown, GetItemCount
 local GetItemInfo, GetRune = GetItemInfo, GetRune
 local GetRuneCount, GetSpellCharges = GetRuneCount, GetSpellCharges
@@ -1286,15 +1286,7 @@ end
 --     Spell(savage_roar)
 
 OvaleCondition.conditions.glyph = function(condition)
-	local present = false
-	for i = 1, GetNumGlyphSockets() do
-		local enabled, glypType, glyphTooltipIndex, glyphSpellID = GetGlyphSocketInfo(i)
-		if (glyphSpellID == condition[1]) then
-			present = true
-			break
-		end
-	end
-	return testbool(present, condition[2])
+	return testbool(OvaleData.glyphs[condition[1]], condition[2])
 end
 
 --- Test if the player has full control, i.e., isn't feared, charmed, etc.

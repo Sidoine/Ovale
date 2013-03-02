@@ -10,6 +10,7 @@
 OvaleCompile = {}
 
 --<private-static-properties>
+local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 
 local node={}
@@ -21,7 +22,6 @@ local missingSpellList = {}
 local ipairs, pairs, tonumber = ipairs, pairs, tonumber
 local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
 local strlen, strlower, strmatch, strsub = string.len, string.lower, string.match, string.sub
-local GetGlyphSocketInfo, GetNumGlyphSockets, GetSpecialization = GetGlyphSocketInfo, GetNumGlyphSockets, GetSpecialization
 --</private-static-properties>
 
 --<private-static-methods>
@@ -57,17 +57,6 @@ local function ParseParameters(params)
 	return paramList
 end
 
-
-local function HasGlyph(spellId)
-	for i = 1, GetNumGlyphSockets() do
-		local enabled, glyphType, glyphTooltipIndex, glyphSpellID = GetGlyphSocketInfo(i)
-		if (glyphSpellID == spellId) then
-			return true
-		end
-	end
-	return false
-end
-
 local function HasTalent(talentId)
 	if not OvaleData.listeTalentsRemplie then
 		OvaleData:RemplirListeTalents()
@@ -85,7 +74,7 @@ local function HasTalent(talentId)
 end
 
 local function TestConditions(paramList)
-	if paramList.glyph and not HasGlyph(paramList.glyph) then
+	if paramList.glyph and not OvaleData.glyphs[paramList.glyph] then
 		return false
 	end
 	if paramList.mastery and not OvaleStance:IsSpecialization(paramList.mastery) then

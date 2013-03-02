@@ -453,10 +453,7 @@ local options =
 					name = "List player glyphs",
 					type = "execute",
 					func = function()
-						for i=1,GetNumGlyphs() do
-							local name, level, enabled, texture, spellId = GetGlyphInfo(i)
-							if spellId then	Ovale:Print(name..": "..spellId.." ("..tostring(enabled)..")") end
-						end
+						OvaleData:DebugGlyphs()
 					end
 				},
 				spell =

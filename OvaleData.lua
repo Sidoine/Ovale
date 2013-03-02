@@ -10,7 +10,11 @@
 OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
 
 --<private-static-properties>
+local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
+
 local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
+local GetNumGlyphSockets = GetNumGlyphSockets
+local GetGlyphSocketInfo = GetGlyphSocketInfo
 local GetSpellBookItemInfo, GetSpellBookItemName = GetSpellBookItemInfo, GetSpellBookItemName
 local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
 local HasPetSpells, UnitBuff, UnitClass = HasPetSpells, UnitBuff, UnitClass
@@ -30,6 +34,8 @@ OvaleData.pointsTalent = {}
 OvaleData.talentIdToName = {}
 --key: talent name / value: talent id
 OvaleData.talentNameToId = {}
+--active glyphs: self.glyphs[glyphId] is true if the given glyphId is active
+OvaleData.glyphs = {}
 --spell info from the current script (by spellId)
 OvaleData.spellInfo = {}
 --spells that count for scoring
@@ -287,6 +293,11 @@ function OvaleData:OnEnable()
 	
 	self:FirstInit()
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED")
+	self:RegisterEvent("GLYPH_ADDED")
+	self:RegisterEvent("GLYPH_DISABLED")
+	self:RegisterEvent("GLYPH_ENABLED")
+	self:RegisterEvent("GLYPH_REMOVED")
+	self:RegisterEvent("GLYPH_UPDATED")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE")
 	self:RegisterEvent("SPELLS_CHANGED")
@@ -294,16 +305,41 @@ function OvaleData:OnEnable()
 end
 
 function OvaleData:OnDisable()
-	self:UnregisterEvent("UNIT_PET")
-	self:UnregisterEvent("SPELLS_CHANGED")
-	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-	self:UnregisterEvent("PLAYER_LEVEL_UP")
 	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
+	self:UnregisterEvent("GLYPH_ADDED")
+	self:UnregisterEvent("GLYPH_DISABLED")
+	self:UnregisterEvent("GLYPH_ENABLED")
+	self:UnregisterEvent("GLYPH_REMOVED")
+	self:UnregisterEvent("GLYPH_UPDATED")
+	self:UnregisterEvent("PLAYER_LEVEL_UP")
+	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
+	self:UnregisterEvent("SPELLS_CHANGED")
+	self:UnregisterEvent("UNIT_PET")
 end
 
 function OvaleData:CHARACTER_POINTS_CHANGED()
 	self:RemplirListeTalents()
 --	Ovale:Print("CHARACTER_POINTS_CHANGED")
+end
+
+function OvaleData:GLYPH_ADDED(event)
+	self:UpdateGlyphs()
+end
+
+function OvaleData:GLYPH_DISABLED(event)
+	self:UpdateGlyphs()
+end
+
+function OvaleData:GLYPH_ENABLED(event)
+	self:UpdateGlyphs()
+end
+
+function OvaleData:GLYPH_REMOVED(event)
+	self:UpdateGlyphs()
+end
+
+function OvaleData:GLYPH_UPDATED(event)
+	self:UpdateGlyphs()
 end
 
 function OvaleData:PLAYER_LEVEL_UP(event, level, ...)
@@ -479,6 +515,29 @@ function OvaleData:GetSpellInfo(spellId)
 		}
 	end
 	return self.spellInfo[spellId]
+end
+
+function OvaleData:UpdateGlyphs()
+	wipe(self.glyphs)
+	for i = 1, GetNumGlyphSockets() do
+		local enabled, _, _, glyphSpell, _ = GetGlyphSocketInfo(i)
+		if enabled and glyphSpell then
+			self.glyphs[glyphSpell] = true
+		end
+	end
+	Ovale:debugPrint("compile", event)
+	Ovale.needCompile = true
+end
+
+function OvaleData:DebugGlyphs()
+	local array = {}
+	for glyphId in pairs(self.glyphs) do
+		tinsert(array, GetSpellInfo(glyphId) .. ": " .. glyphId)
+	end
+	tsort(array)
+	for _, v in ipairs(array) do
+		Ovale:Print(v)
+	end
 end
 
 function OvaleData:ResetSpellInfo()

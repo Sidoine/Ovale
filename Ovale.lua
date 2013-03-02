@@ -132,8 +132,6 @@ function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("CHAT_MSG_ADDON")
-	self:RegisterEvent("GLYPH_UPDATED")
-	self:RegisterEvent("GLYPH_ADDED")
 	self:RegisterMessage("Ovale_UpdateShapeshiftForm")
 
 	self:UpdateVisibility()
@@ -146,8 +144,6 @@ function Ovale:OnDisable()
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterEvent("CHAT_MSG_ADDON")
-	self:UnregisterEvent("GLYPH_UPDATED")
-	self:UnregisterEvent("GLYPH_ADDED")
 	self:UnregisterMessage("Ovale_UpdateShapeshiftForm")
 	self.frame:Hide()
 end
@@ -176,20 +172,6 @@ end
 function Ovale:PLAYER_TARGET_CHANGED()
 	self.refreshNeeded.target = true
 	self:UpdateVisibility()
-end
-
---Called when a glyph has been added
---The script needs to be compiled
-function Ovale:GLYPH_ADDED(event)
-	self:debugPrint("compile", event)
-	self.needCompile = true
-end
-
---Called when a glyph has been updated
---The script needs to be compiled
-function Ovale:GLYPH_UPDATED(event)
-	self:debugPrint("compile", event)
-	self.needCompile = true
 end
 
 function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
