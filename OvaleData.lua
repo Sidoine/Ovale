@@ -261,6 +261,10 @@ OvaleData.buffSpellList =
 		80354, -- Temporal Displacement (Time Warp)
 		95809, -- Insanity (Ancient Hysteria)
 	},
+	raid_movement =
+	{
+		106898, -- Stampeding Roar
+	}
 }
 OvaleData.buffSpellList.bloodlust_aura = OvaleData.buffSpellList.burst_haste
 OvaleData.buffSpellList.bloodlust = OvaleData.buffSpellList.burst_haste

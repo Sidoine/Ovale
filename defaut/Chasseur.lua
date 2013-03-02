@@ -142,12 +142,11 @@ AddIcon mastery=2 help=main
 	if SpellUsable(blink_strike) Spell(blink_strike)
 	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	if SpellUsable(dire_beast) Spell(dire_beast)
-	if target.HealthPercent() >90 
+	if target.HealthPercent() >80 
 	{
 		if not target.DebuffPresent(serpent_sting_aura) Spell(serpent_sting)
 		Spell(chimera_shot)
 		if PreviousSpell(steady_shot) and BuffRemains(steady_focus) <6 Spell(steady_shot)
-		if BuffStacks(master_marksman_fire) Spell(aimed_shot)
 		Spell(aimed_shot)
 		Spell(steady_shot)
 	}
@@ -185,7 +184,7 @@ AddIcon mastery=2 help=cd
 {
 	Spell(blood_fury)
 	if not BuffPresent(rapid_fire) Spell(rapid_fire)
-	if target.HealthPercent() >90 
+	if target.HealthPercent() >80 
 	{
 		Spell(readiness)
 	}

@@ -74,7 +74,10 @@ Define(vendetta 79140)
 Define(weakened_armor 113746)
   SpellInfo(weakened_armor duration=30 )
   SpellAddBuff(weakened_armor weakened_armor=1)
+Define(anticipation_talent 18)
 Define(preparation_talent 10)
+Define(shadow_focus_talent 3)
+Define(subterfuge_talent 2)
 AddIcon mastery=1 help=main
 {
 	if not InCombat() 
@@ -119,11 +122,21 @@ AddIcon mastery=2 help=main
 	if {target.DebuffStacks(weakened_armor any=1) <3 or target.DebuffRemains(weakened_armor any=1) <3 } and ComboPoints() <5 if CheckBoxOn(expose_armor_check) Spell(expose_armor)
 	Spell(ambush usable=1)
 	if BuffRemains(slice_and_dice) <2 or {BuffRemains(slice_and_dice) <15 and BuffStacks(bandits_guile) ==11 and ComboPoints() >=4 } Spell(slice_and_dice)
-	if target.TicksRemain(rupture) <2 and ComboPoints() ==5 and BuffPresent(deep_insight) and target.DeadIn() >10 Spell(rupture)
-	if {ComboPoints() ==5 and BuffPresent(deep_insight) } or BuffStacks(anticipation) >=4 Spell(eviscerate)
-	if target.TicksRemain(rupture) <2 and ComboPoints() ==5 and target.DeadIn() >10 Spell(rupture)
-	if {{BuffExpires(deep_insight) and BuffStacks(anticipation) <5 } or {BuffPresent(deep_insight) and ComboPoints() <5 } } and target.TicksRemain(revealing_strike) <2 Spell(revealing_strike)
-	if {BuffExpires(deep_insight) and BuffStacks(anticipation) <5 } or {BuffPresent(deep_insight) and ComboPoints() <5 } Spell(sinister_strike)
+	if ComboPoints() <5 or not target.DebuffPresent(revealing_strike) 
+	{
+		if target.TicksRemain(revealing_strike) <2 Spell(revealing_strike)
+		Spell(sinister_strike)
+	}
+	if not TalentPoints(anticipation_talent) or BuffPresent(deep_insight) or SpellCooldown(shadow_blades) <=11 or BuffStacks(anticipation) >=4 or {BuffPresent(shadow_blades) and BuffStacks(anticipation) >=3 } 
+	{
+		if target.TicksRemain(rupture) <2 and target.DeadIn() >=26 Spell(rupture)
+		Spell(eviscerate)
+	}
+	if Energy() >60 or BuffExpires(deep_insight) or BuffRemains(deep_insight) >5 -ComboPoints() 
+	{
+		if target.TicksRemain(revealing_strike) <2 Spell(revealing_strike)
+		Spell(sinister_strike)
+	}
 }
 AddIcon mastery=2 help=offgcd
 {
@@ -132,17 +145,19 @@ AddIcon mastery=2 help=offgcd
 		Spell(stealth)
 	}
 	if target.IsInterruptible() Spell(kick)
-	Spell(tricks_of_the_trade)
 }
 AddIcon mastery=2 help=cd
 {
 	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
-	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
-	Spell(berserking)
-	if TimeInCombat() >10 and not BuffPresent(shadow_blades) and not BuffPresent(adrenaline_rush) and Energy() <20 and {{BuffPresent(deep_insight) and ComboPoints() <4 } or BuffStacks(anticipation) <4 } Spell(vanish)
-	if {BuffStacks(bloodlust any=1) or TimeInCombat() >60 } and BuffRemains(slice_and_dice) >=12000 Spell(shadow_blades)
-	if Energy() <35 and BuffRemains(slice_and_dice) >4 and BuffExpires(adrenaline_rush) Spell(killing_spree)
-	if Energy() <35 or BuffPresent(shadow_blades) Spell(adrenaline_rush)
+	if TimeInCombat() ==0 or BuffPresent(shadow_blades)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if TimeInCombat() ==0 or BuffPresent(shadow_blades) Spell(berserking)
+	if TimeInCombat() >10 and {ComboPoints() <3 or {TalentPoints(anticipation_talent) and BuffStacks(anticipation) <3 } or {BuffExpires(shadow_blades) and {ComboPoints() <4 or {TalentPoints(anticipation_talent) and BuffStacks(anticipation) <4 } } } } and {{TalentPoints(shadow_focus_talent) and BuffExpires(adrenaline_rush) and Energy() <20 } or {TalentPoints(subterfuge_talent) and Energy() >=90 } or {not TalentPoints(shadow_focus_talent) and not TalentPoints(subterfuge_talent) and Energy() >=60 } } Spell(vanish)
+	if not ArmorSetParts(T14 more 4) and TimeInCombat() >5 Spell(shadow_blades)
+	if not ArmorSetParts(T14 more 4) and Energy() <35 and BuffExpires(adrenaline_rush) Spell(killing_spree)
+	if not ArmorSetParts(T14 more 4) and {Energy() <35 or BuffPresent(shadow_blades) } Spell(adrenaline_rush)
+	if ArmorSetParts(T14 more 4) and {{SpellCooldown(killing_spree) >30.5 and SpellCooldown(adrenaline_rush) <=9 } or {Energy() <35 and {SpellCooldown(killing_spree) ==0 or SpellCooldown(adrenaline_rush) ==0 } } } Spell(shadow_blades)
+	if ArmorSetParts(T14 more 4) and {{BuffPresent(shadow_blades) and BuffExpires(adrenaline_rush) and {Energy() <35 or BuffRemains(shadow_blades) <=3.5 } } or {BuffExpires(shadow_blades) and SpellCooldown(shadow_blades) >30 } } Spell(killing_spree)
+	if ArmorSetParts(T14 more 4) and BuffPresent(shadow_blades) and {Energy() <35 or BuffRemains(shadow_blades) <=15 } Spell(adrenaline_rush)
 }
 AddIcon mastery=3 help=main
 {

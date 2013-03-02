@@ -804,6 +804,20 @@ OvaleCondition.conditions.casttime = function(condition)
 	return compare(castTime/1000, condition[2], condition[3])
 end
 
+--- Get the number of charges on a spell with multiple charges.
+-- @name Charges
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The number of charges
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.charges = function(condition)
+	local currentCharges, maxCharges, timeLastCast, cooldownDuration = GetSpellCharges(condition[1])
+	return compare(currentCharges, condition[2], condition[3])
+end
+
 --- Test if all of the listed checkboxes are off.
 -- @name CheckBoxOff
 -- @paramsig boolean
@@ -992,6 +1006,20 @@ OvaleCondition.conditions.creaturetype = function(condition)
 	return nil
 end
 
+--- Get the current estimated damage of a spell if it is a critical damage.
+-- @name CritDamage
+-- @name Damage
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The estimated damage of the given spell.
+-- @see CritDamage
+
+OvaleCondition.conditions.critdamage = function(condition)
+	local spellId = condition[1]
+	local ret = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
+	return 0, nil, 2 * ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
+end
+
 --- Get the current estimated damage of a spell.
 -- The calculated damage takes into account the current attack power, spellpower and combo points (if used).
 -- The damage is computed from information for the spell set via SpellInfo(...):
@@ -1001,7 +1029,7 @@ end
 -- @paramsig number
 -- @param id The spell ID.
 -- @return The estimated damage of the given spell.
--- @see LastSpellDamage, LastSpellEstimatedDamage
+-- @see CritDamage, LastSpellDamage, LastSpellEstimatedDamage
 -- @usage
 -- if {Damage(rake) / LastSpellEstimateDamage(rake)} >1.1
 --     Spell(rake)
@@ -2030,6 +2058,16 @@ end
 OvaleCondition.conditions.petpresent = function(condition)
 	local present = UnitExists("pet") and not UnitIsDead("pet")
 	return testbool(present, condition[1])
+end
+
+--- Test if the game is on a PTR server
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then returns true if it is a PTR realm. If no, return true if it is a live realm.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value
+OvaleCondition.conditions.ptr = function(condition)
+	return testbool(GetBuildInfo() == "5.2.0", condition[1])
 end
 
 --- Get the current amount of rage for guardian druids and warriors.
