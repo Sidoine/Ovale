@@ -8,11 +8,10 @@
 ----------------------------------------------------------------------]]
 
 -- Keep data about the player action bars (key bindings mostly)
-OvaleActionBar = LibStub("AceAddon-3.0"):NewAddon("OvaleActionBar", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0")
 
 --<private-static-properties>
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
-
 local GetActionInfo = GetActionInfo
 local GetActionText = GetActionText
 local tonumber = tonumber

@@ -9,7 +9,8 @@
 
 -- Ovale options and UI
 
-OvaleOptions = LibStub("AceAddon-3.0"):NewAddon("OvaleOptions", "AceEvent-3.0", "AceConsole-3.0")
+local _, Ovale = ...
+OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0")
 
 --<private-static-properties>
 local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring

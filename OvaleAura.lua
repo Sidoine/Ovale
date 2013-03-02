@@ -10,7 +10,8 @@
 -- This addon keep the list of all the aura for all the units
 -- Fore each aura, it saves the state of the player when it was refreshed
 
-OvaleAura = LibStub("AceAddon-3.0"):NewAddon("OvaleAura", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 
 --<public-static-properties>
 OvaleAura.aura = {}

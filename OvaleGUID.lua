@@ -10,7 +10,8 @@
 -- This addon translates a GUID to a target name
 -- Usage: OvaleGUID:GetUnitId(guid)
 
-OvaleGUID = LibStub("AceAddon-3.0"):NewAddon("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
+local _, Ovale = ...
+OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
 
 --<private-static-properties>
 local strfind, strsub = string.find, string.sub

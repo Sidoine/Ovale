@@ -9,11 +9,10 @@
 
 -- This addon tracks the player's stats as available on the in-game paper doll.
 
-OvalePaperDoll = LibStub("AceAddon-3.0"):NewAddon("OvalePaperDoll", "AceEvent-3.0")
+local _, Ovale = ...
+OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 
 --<private-static-properties>
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
-
 local GetMasteryEffect = GetMasteryEffect
 local GetMeleeHaste = GetMeleeHaste
 local GetSpellBonusDamage = GetSpellBonusDamage

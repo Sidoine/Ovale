@@ -7,6 +7,7 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
+local _, Ovale = ...
 OvaleBestAction = {}
 
 --<private-static-properties>

@@ -9,7 +9,8 @@
 
 -- The travelling missiles or spells that have been cast but whose effects were not still not applied
 
-OvaleFuture = LibStub("AceAddon-3.0"):NewAddon("OvaleFuture", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleFuture = Ovale:NewModule("OvaleFuture", "AceEvent-3.0")
 
 --<private-static-properties>
 local ipairs = ipairs

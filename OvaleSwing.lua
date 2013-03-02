@@ -18,7 +18,8 @@
 	Modifed for Ovale
 ]]
 
-OvaleSwing = LibStub("AceAddon-3.0"):NewAddon("OvaleSwing", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")
 
 --<public-static-properties>
 OvaleSwing.ohNext = nil

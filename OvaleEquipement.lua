@@ -7,11 +7,10 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
-OvaleEquipement = LibStub("AceAddon-3.0"):NewAddon("OvaleEquipement", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleEquipement = Ovale:NewModule("OvaleEquipement", "AceEvent-3.0")
 
 --<private-static-properties>
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
-
 local pairs = pairs
 local strfind = string.find
 local tonumber = tonumber

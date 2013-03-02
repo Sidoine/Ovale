@@ -7,11 +7,11 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
+local _, Ovale = ...
 OvaleCompile = {}
 
 --<private-static-properties>
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+local L = Ovale.L
 
 local node={}
 local defines = {}

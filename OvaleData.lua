@@ -7,11 +7,10 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
-OvaleData = LibStub("AceAddon-3.0"):NewAddon("OvaleData", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleData = Ovale:NewModule("OvaleData", "AceEvent-3.0")
 
 --<private-static-properties>
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
-
 local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
 local GetNumGlyphSockets = GetNumGlyphSockets
 local GetGlyphSocketInfo = GetGlyphSocketInfo

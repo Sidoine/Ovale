@@ -9,6 +9,7 @@
 
 -- Keep the current state in the simulation
 
+local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
 OvaleState = {}
 
 --<public-static-properties>

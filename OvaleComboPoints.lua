@@ -9,7 +9,8 @@
 
 -- This addon tracks the number of combo points by the player on the current target.
 
-OvaleComboPoints = LibStub("AceAddon-3.0"):NewAddon("OvaleComboPoints", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 
 --<private-static-properties>
 local strfind = string.find

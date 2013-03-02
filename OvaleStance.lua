@@ -9,11 +9,10 @@
 
 -- This addon tracks the player's current stance.
 
-OvaleStance = LibStub("AceAddon-3.0"):NewAddon("OvaleStance", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleStance = Ovale:NewModule("OvaleStance", "AceEvent-3.0")
 
 --<private-static-properties>
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
-
 local ipairs = ipairs
 local pairs = pairs
 local strfind = string.find

@@ -7,11 +7,12 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+local _, Ovale = ...
 
 --inherits ActionButtonTemplate
 
 --<private-static-properties>
+local L = Ovale.L
 local strfind, strformat, strsub = string.find, string.format, string.sub
 --</private-static-properties>
 

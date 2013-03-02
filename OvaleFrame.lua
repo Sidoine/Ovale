@@ -7,18 +7,21 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
+local _, Ovale = ...
+
 --inherits Frame
 do
 --<private-static-properties>
 	local AceGUI = LibStub("AceGUI-3.0")
 	local Masque = LibStub("Masque", true)
-	local GetTime = GetTime		
+	local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
 
 	local Type = "OvaleFrame"
 	local Version = 7
 
 	local pairs = pairs
 	local CreateFrame, GetSpellInfo = CreateFrame, GetSpellInfo
+	local GetTime = GetTime		
 --</private-static-properties>
 
 --<public-methods>

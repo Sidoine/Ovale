@@ -9,7 +9,8 @@
 
 -- Gather information about ennemies
 
-OvaleEnemies = LibStub("AceAddon-3.0"):NewAddon("OvaleEnemies", "AceEvent-3.0")
+local _, Ovale = ...
+OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0")
 
 --<private-static-properties>
 local bit_band, pairs, select, tostring = bit.band, pairs, select, tostring

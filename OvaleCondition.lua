@@ -7,10 +7,10 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
+local _, Ovale = ...
 OvaleCondition = {}
 
 --<private-static-properties>
-
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 local LRC = LibStub("LibRangeCheck-2.0", true)
 
