@@ -42,7 +42,7 @@ FAQ
 ===
 
 ##### Why does it not work for me?
-Try to reset your Profile in the [Ovale] settings, or press the `Restore default` button in the code window.  Most problems come from faulty scripts.
+Try to reset your Profile in the [Ovale] settings.  Most problems come from faulty scripts.
 
 ##### Why is the key binding displayed for an action wrong?
 The action may be in several action bars, e.g., the bars that you can cycle through or the bars that appear in special cases like [Shadowform][] or [Cat Form][].
