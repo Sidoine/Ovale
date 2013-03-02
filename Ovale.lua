@@ -26,8 +26,6 @@ Ovale.L = L
 Ovale.defaut = {}
 --The table of check boxes definition
 Ovale.casesACocher = {}
---allows to do some initialization the first time the addon is enabled
-Ovale.firstInit = false
 --the frame with the icons
 Ovale.frame = nil
 --check boxes GUI items
@@ -106,27 +104,7 @@ function Ovale:CompileAll()
 	end
 end
 
-function Ovale:FirstInit()
-	self.firstInit = true
-
-	OvaleData:FirstInit()
-	
-	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
-
-	local profile = OvaleOptions:GetProfile()
-	
-	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
-	self:UpdateFrame()
-	if not profile.display then
-		self.frame:Hide()
-	end
-end
-
 function Ovale:OnEnable()
-	if not self.firstInit then
-		self:FirstInit()
-	end
-
     -- Called when the addon is enabled
 	RegisterAddonMessagePrefix("Ovale")
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
@@ -136,7 +114,10 @@ function Ovale:OnEnable()
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterMessage("Ovale_UpdateShapeshiftForm")
 
-	self:UpdateVisibility()
+	local profile = OvaleOptions:GetProfile()
+	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
+	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
+	self:UpdateFrame()
 end
 
 function Ovale:OnDisable()
@@ -252,26 +233,27 @@ function Ovale:ToggleOptions()
 end
 
 function Ovale:UpdateVisibility()
-	if not OvaleOptions:GetProfile().display then
+	local profile = OvaleOptions:GetProfile()
+
+	if not profile.display then
 		self.frame:Hide()
 		return
 	end
 
 	self.frame:Show()
-
-	if OvaleOptions:GetApparence().hideVehicule and UnitHasVehicleUI("player") then
+	if profile.apparence.hideVehicule and UnitHasVehicleUI("player") then
 		self.frame:Hide()
 	end
 	
-	if OvaleOptions:GetApparence().avecCible and not UnitExists("target") then
+	if profile.apparence.avecCible and not UnitExists("target") then
 		self.frame:Hide()
 	end
 	
-	if OvaleOptions:GetApparence().enCombat and not Ovale.enCombat then
+	if profile.apparence.enCombat and not Ovale.enCombat then
 		self.frame:Hide()
 	end	
 	
-	if OvaleOptions:GetApparence().targetHostileOnly and (UnitIsDead("target") or not UnitCanAttack("player", "target")) then
+	if profile.apparence.targetHostileOnly and (UnitIsDead("target") or not UnitCanAttack("player", "target")) then
 		self.frame:Hide()
 	end
 end

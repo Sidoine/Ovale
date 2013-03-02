@@ -17,13 +17,12 @@ local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring
 --</private-static-properties>
 
 --<public-static-properties>
-OvaleOptions.firstInit = false
 OvaleOptions.db = nil
 --</public-static-properties>
 
 --<private-static-properties>
-local AceConfig = LibStub("AceConfig-3.0");
-local AceConfigDialog = LibStub("AceConfigDialog-3.0");
+local AceConfig = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 	
 --GUI option
@@ -483,16 +482,6 @@ local options =
 
 --<public-static-methods>
 function OvaleOptions:OnInitialize()
-	
-end
-
-function OvaleOptions:FirstInit()
-	if self.firstInit then
-		return
-	end
-	
-	self.firstInit = true
-
 	local localizedClass, englishClass = UnitClass("player")
 	self.db = LibStub("AceDB-3.0"):New("OvaleDB",
 	{
@@ -537,26 +526,17 @@ function OvaleOptions:FirstInit()
 end
 
 function OvaleOptions:HandleProfileChanges()
-	if self.firstInit then
-		if (self.db.profile.code) then
-			Ovale:debugPrint("compile", "changing profiles")
-			Ovale.needCompile = true
-		end
+	if (self.db.profile.code) then
+		Ovale:debugPrint("compile", "changing profiles")
+		Ovale.needCompile = true
 	end
 end
 
-function OvaleOptions:OnEnable()
-	self:FirstInit()
-	
-end
-
 function OvaleOptions:GetApparence()
-	self:FirstInit()
 	return self.db.profile.apparence
 end
 
 function OvaleOptions:GetProfile()
-	self:FirstInit()
 	return self.db.profile
 end
 

@@ -22,7 +22,6 @@ local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 
 --<public-static-properties>
 OvaleData.spellList = {}
-OvaleData.firstInit = false
 OvaleData.className = nil
 OvaleData.level = nil
 --allows to fill the player talent tables on first use
@@ -277,12 +276,19 @@ local rootSpellList = nil
 --</private-static-properties>
 
 --<public-static-methods>
-function OvaleData:OnEnable()
+function OvaleData:OnInitialize()
 	for k,v in pairs(self.power) do
 		self.powerType[v.id] = k
 	end
+end
+
+function OvaleData:OnEnable()
+	self.className = select(2, UnitClass("player"))
+	self.level = UnitLevel("player")
 	
-	self:FirstInit()
+	self:RemplirListeTalents()
+	self:FillSpellList()
+
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED")
 	self:RegisterEvent("GLYPH_ADDED")
 	self:RegisterEvent("GLYPH_DISABLED")
@@ -473,21 +479,6 @@ function OvaleData:RemplirListeTalents()
 		Ovale:debugPrint("compile", "filling talent list")
 		Ovale.needCompile = needCompile
 	end
-end
-
-function OvaleData:FirstInit()
-	if self.firstInit then
-		return
-	end
-	
-	self.firstInit = true
-
-	local playerClass, englishClass = UnitClass("player")
-	self.className = englishClass
-	self.level = UnitLevel("player")
-	
-	self:RemplirListeTalents()
-	self:FillSpellList()
 end
 
 function OvaleData:GetTalentPoints(talentId)
