@@ -310,7 +310,7 @@ local options =
 						return strgsub(code, "\t", "    ")
 					end,
 					set = function(info, v)
-						OvaleScripts:RegisterScript(OvaleData.className, "custom", "Custom script", v)
+						OvaleScripts:RegisterScript(OvaleData.className, "custom", L["Script personnalisé"], v)
 						OvaleOptions.db.profile.code = v
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
@@ -319,12 +319,12 @@ local options =
 				{
 					order = 2,
 					type = "execute",
-					name = "Copy to Custom script",
+					name = L["Copier sur Script personnalisé"],
 					disabled = function()
 						return OvaleOptions.db.profile.source == "custom"
 					end,
 					confirm = function()
-						return "Overwrite existing Custom script?"
+						return L["Ecraser le Script personnalisé préexistant?"]
 					end,
 					func = function()
 						local class = OvaleData.className
@@ -550,7 +550,7 @@ function OvaleOptions:OnInitialize()
 	self.db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
-	OvaleScripts:RegisterScript(OvaleData.className, "custom", "Custom script", self.db.profile.code)
+	OvaleScripts:RegisterScript(OvaleData.className, "custom", L["Script personnalisé"], self.db.profile.code)
 	self:HandleProfileChanges()
 end
 
