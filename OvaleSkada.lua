@@ -20,7 +20,7 @@ local tostring = tostring
 --</private-static-properties>
 
 --<public-static-properties>
-OvaleSkada.module = Skada and Skada:NewModule("Ovale Spell Priority", SkadaModule) or nil
+OvaleSkada.module = nil
 --</public-static-properties>
 
 --<private-static-methods>
@@ -91,10 +91,14 @@ end
 function SkadaModule:GetSetSummary(set)
 	return getValue(set)
 end
+
+-- Initialize OvaleSkada.module after SkadaModule prototype has been fully defined.
+OvaleSkada.module = Skada and Skada:NewModule("Ovale Spell Priority", SkadaModule) or nil
 --</private-static-methods>
 
 --<public-static-methods>
 function OvaleSkada:OnEnable()
+	if not Skada then return end
 	Ovale:AddDamageMeter("OvaleSkada", self)
 	if not self.module:IsEnabled() then
 		self.module:Enable()
@@ -102,6 +106,7 @@ function OvaleSkada:OnEnable()
 end
 
 function OvaleSkada:OnDisable()
+	if not Skada then return end
 	Ovale:RemoveDamageMeter("OvaleSkada")
 	if self.module:IsEnabled() then
 		self.module:Disable()
