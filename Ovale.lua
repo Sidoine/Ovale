@@ -165,14 +165,14 @@ end
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
-		self:SendMessage("Ovale_CheckBoxValueChanged")
+		Ovale:SendMessage("Ovale_CheckBoxValueChanged")
 	end
 end
 
 local function OnDropDownValueChanged(widget)
 	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
 	if Ovale.listes[widget.userdata.k].compile then
-		self:SendMessage("Ovale_ListValueChanged")
+		Ovale:SendMessage("Ovale_ListValueChanged")
 	end
 end
 
