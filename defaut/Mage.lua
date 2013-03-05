@@ -249,4 +249,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("MAGE", "Ovale", "[5.1] Ovale: Arcane, Fire, Frost", code)
+OvaleScripts:RegisterScript("MAGE", "Ovale", "[5.2] Ovale: Arcane, Fire, Frost", code)

@@ -92,4 +92,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("MONK", "Ovale", "[5.1] Ovale: Windwalker", code)
+OvaleScripts:RegisterScript("MONK", "Ovale", "[5.2] Ovale: Windwalker", code)

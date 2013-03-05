@@ -200,4 +200,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("ROGUE", "Ovale", "[5.1] Ovale: Assassination, Combat, Subtlety", code)
+OvaleScripts:RegisterScript("ROGUE", "Ovale", "[5.2] Ovale: Assassination, Combat, Subtlety", code)

@@ -187,4 +187,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("DEATHKNIGHT", "Ovale", "[5.1] Ovale: Frost, Unholy", code)
+OvaleScripts:RegisterScript("DEATHKNIGHT", "Ovale", "[5.2] Ovale: Frost, Unholy", code)

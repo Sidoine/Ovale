@@ -213,4 +213,4 @@ AddIcon mastery=2 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("SHAMAN", "Ovale", "[5.1] Ovale: Elemental, Enhancement", code)
+OvaleScripts:RegisterScript("SHAMAN", "Ovale", "[5.2] Ovale: Elemental, Enhancement", code)

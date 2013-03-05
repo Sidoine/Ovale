@@ -275,4 +275,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("WARRIOR", "Ovale", "[5.1] Ovale: Arms, Fury, Protection", code)
+OvaleScripts:RegisterScript("WARRIOR", "Ovale", "[5.2] Ovale: Arms, Fury, Protection", code)

@@ -289,4 +289,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("WARLOCK", "Ovale", "[5.1] Ovale: Affliction, Demonology, Destruction", code)
+OvaleScripts:RegisterScript("WARLOCK", "Ovale", "[5.2] Ovale: Affliction, Demonology, Destruction", code)

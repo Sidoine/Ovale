@@ -118,4 +118,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("PRIEST", "Ovale", "[5.1] Ovale: Shadow", code)
+OvaleScripts:RegisterScript("PRIEST", "Ovale", "[5.2] Ovale: Shadow", code)

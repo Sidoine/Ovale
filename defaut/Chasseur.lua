@@ -240,4 +240,4 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("HUNTER", "Ovale", "[5.1] Ovale: Beast Mastery, Marksmanship, Survival", code)
+OvaleScripts:RegisterScript("HUNTER", "Ovale", "[5.2] Ovale: Beast Mastery, Marksmanship, Survival", code)
