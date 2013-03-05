@@ -67,9 +67,21 @@ function OvaleState:UpdatePowerRates()
 		end
 	end
 
-	-- Adrenaline Rush (rogue)
-	if OvaleData.className == "ROGUE" and OvaleState:GetAura("player", 13750, true) then
-		self.powerRate.energy = self.powerRate.energy * 2
+	if OvaleData.className == "ROGUE" then
+		-- Blade Flurry (combat rogue)
+		if OvaleState:GetAura("player", 13877, true) then
+			self.powerRate.energy = self.powerRate.energy * 0.8
+		end
+
+		-- Vitality (combat rogue)
+		if OvaleStance:IsSpecialization(2) then
+			self.powerRate.energy = self.powerRate.energy * 1.2
+		end
+
+		-- Adrenaline Rush (rogue)
+		if OvaleState:GetAura("player", 13750, true) then
+			self.powerRate.energy = self.powerRate.energy * 2
+		end
 	end
 	
 	self.powerRate.focus = 4 * OvalePaperDoll.meleeHaste
