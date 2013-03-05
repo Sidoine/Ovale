@@ -96,7 +96,7 @@ function OvaleState:Reset()
 	self.attenteFinCast = self.maintenant
 	self.state.combo = OvaleComboPoints.combo
 	for k,v in pairs(OvaleData.power) do
-		self.state[k] = UnitPower("player", v.id, v.segments)
+		self.state[k] = UnitPower("player", v.id, v.segments) / (v.segments and 10 or 1)
 	end
 	
 	self:UpdatePowerRates()
