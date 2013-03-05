@@ -62,7 +62,7 @@ OvaleData.power =
 	focus = { id = SPELL_POWER_FOCUS, mini = 0, maxi = 100 },
 	energy = { id = SPELL_POWER_ENERGY, mini = 0, maxi = 100 },
 	runicpower = { id = SPELL_POWER_RUNIC_POWER, mini = 0, maxi = 100 },
-	shards = { id = SPELL_POWER_SOUL_SHARDS, mini = 0, segments = true },
+	shards = { id = SPELL_POWER_SOUL_SHARDS, mini = 0 },
 	eclipse = { id = SPELL_POWER_ECLIPSE, mini = -100, maxi = 100 },
 	holy = { id = SPELL_POWER_HOLY_POWER, mini = 0, maxi = 5 },
 	alternate = { id = SPELL_POWER_ALTERNATE_POWER, mini = 0 },

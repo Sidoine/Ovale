@@ -254,7 +254,7 @@ AddIcon mastery=3 help=main
 	if {target.TicksRemain(immolate) <Ticks(immolate) /2 or target.DebuffExpires(immolate) } and target.DeadIn() >=5 Spell(immolate)
 	if Charges(conflagrate) ==2 Spell(conflagrate)
 	if not target.DebuffPresent(rain_of_fire) and not InFlightToTarget(rain_of_fire) Spell(rain_of_fire)
-	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {BurningEmbers() >3.5 or BuffRemains(dark_soul) >CastTime(chaos_bolt) or BuffRemains(skull_banner) >CastTime(chaos_bolt) } Spell(chaos_bolt)
+	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {BurningEmbers() >35 or BuffRemains(dark_soul) >CastTime(chaos_bolt) or BuffRemains(skull_banner) >CastTime(chaos_bolt) } Spell(chaos_bolt)
 	Spell(conflagrate)
 	Spell(incinerate)
 }
@@ -269,8 +269,8 @@ AddIcon mastery=3 help=aoe
 {
 	
 	if not target.DebuffPresent(rain_of_fire) and not InFlightToTarget(rain_of_fire) Spell(rain_of_fire)
-	if BurningEmbers() >=3.5 and BurningEmbers() and target.HealthPercent() <=20 focus.Spell(havoc)
-	if BurningEmbers() >=3.5 and BurningEmbers() and BuffStacks(havoc) >=1 if target.HealthPercent(less 20) Spell(shadowburn)
+	if BurningEmbers() >=35 and BurningEmbers() and target.HealthPercent() <=20 focus.Spell(havoc)
+	if BurningEmbers() >=35 and BurningEmbers() and BuffStacks(havoc) >=1 if target.HealthPercent(less 20) Spell(shadowburn)
 	if BurningEmbers() and BuffExpires(fire_and_brimstone) Spell(fire_and_brimstone)
 	if BuffPresent(fire_and_brimstone) and not target.DebuffPresent(immolate) Spell(immolate)
 	if BuffPresent(fire_and_brimstone) Spell(conflagrate)
