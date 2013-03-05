@@ -1323,6 +1323,37 @@ OvaleCondition.conditions.hasshield = function(condition)
 	return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
 end
 
+--- Test if the player has a particular trinket equipped.
+-- @name HasTrinket
+-- @paramsig boolean
+-- @param id The item ID of the trinket or the name of an item list.
+-- @param yesno Optional. If yes, then return true if the trinket is equipped. If no, then return true if it isn't equipped.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @usage
+-- ItemList(rune_of_reorigination 94532 95802 96546)
+-- if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
+--     Spell(rake)
+
+OvaleCondition.conditions.hastrinket = function(condition)
+	local trinketZero = GetInventoryItemID("player", GetInventorySlotInfo("Trinket0Slot"))
+	local trinketOne = GetInventoryItemID("player", GetInventorySlotInfo("Trinket1Slot"))
+	local trinketId = condition[1]
+	if type(trinketId) == "number" then
+		if (trinketZero and trinketZero == trinketId) or (trinketOne and trinketOne == trinketId) then
+			return testbool(true, condition[2])
+		end
+	elseif OvaleData.itemList[trinketId] then
+		for _, v in pairs(OvaleData.itemList[trinketId]) do
+			if (trinketZero and trinketZero == v) or (trinketOne and trinketOne == v) then
+				return testbool(true, condition[2])
+			end
+		end
+	end
+	return testbool(false, condition[2])
+end
+
 --- Test if the player has a weapon equipped.
 -- @name HasWeapon
 -- @paramsig boolean
