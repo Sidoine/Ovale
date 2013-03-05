@@ -35,6 +35,7 @@ local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 
 --<public-static-properties>
 OvaleData.spellList = {}
+OvaleData.itemList = {}
 OvaleData.className = nil
 OvaleData.level = nil
 --allows to fill the player talent tables on first use

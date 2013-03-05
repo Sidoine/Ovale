@@ -22,6 +22,7 @@ local missingSpellList = {}
 local ipairs, pairs, tonumber = ipairs, pairs, tonumber
 local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
 local strlen, strlower, strmatch, strsub = string.len, string.lower, string.match, string.sub
+local tinsert = table.insert
 --</private-static-properties>
 
 --<public-static-properties>
@@ -309,6 +310,15 @@ local function ParseSpellList(name, params)
 	end
 end
 
+local function ParseItemList(name, params)
+	OvaleData.itemList[name] = {}
+	local i = 1
+	for v in strgmatch(params, "(%d+)") do
+		OvaleData.itemList[name][i] = tonumber(v)
+		i = i + 1
+	end
+end
+
 local function ParseIf(a, b)
 	local newNode = {type="if", a=node[tonumber(a)], b=node[tonumber(b)]}
 	return AddNode(newNode)
@@ -585,6 +595,7 @@ local function CompileDeclarations(text)
 	text = strgsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
 	text = strgsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
 	text = strgsub(text, "SpellList%s*%(%s*([%w_]+)%s*(.-)%)", ParseSpellList)
+	text = strgsub(text, "ItemList%s*%(%s*([%w_]+)%s*(.-)%)", ParseItemList)
 
 	-- On vire les espaces en trop
 	text = strgsub(text, "\n", " ")
