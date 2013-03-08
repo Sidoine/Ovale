@@ -537,7 +537,9 @@ function OvaleData:GetGCD(spellId)
 	end
 	
 	-- Default value
-	if self.className == "MONK" or self.className == "ROGUE" or
+	if self.className == "ROGUE" or
+		(self.className == "MONK" and
+			(OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") or OvaleStance:IsStance("monk_stance_of_the_fierce_tiger"))) or
 		(self.className == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
 		return 1.0
 	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
