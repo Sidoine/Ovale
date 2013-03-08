@@ -886,6 +886,30 @@ local armorSet = {
 }
 --</private-static-properties>
 
+--<public-static-properties>
+-- type of equipped mainhand
+OvaleEquipement.mainHandWeaponType = nil
+-- type of equipped offhand
+OvaleEquipement.offHandWeaponType = nil
+--</public-static-properties>
+
+--<private-static-methods>
+local function GetEquippedWeaponType(slot)
+	local link = GetInventoryItemLink("player", GetInventorySlotInfo(slot))
+	if not link then return nil end
+	local _, _, itemId = strfind(link, "item:(%d+)");
+	local invType = select(9, GetItemInfo(itemId))
+	return invType
+end
+
+local function GetItemId(slot)
+	local link = GetInventoryItemLink("player", GetInventorySlotInfo(slot))
+	if not link then return nil end
+	local a, b, itemId = strfind(link, "item:(%d+)");
+	return tonumber(itemId);
+end
+--</private-static-methods>
+
 --<public-static-methods>
 function OvaleEquipement:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -919,20 +943,18 @@ function OvaleEquipement:Debug()
 	end
 end
 
-function OvaleEquipement:GetItemId(slot)
-	local link = GetInventoryItemLink("player", GetInventorySlotInfo(slot))
-	if not link then return nil end
-	local a, b, itemId = strfind(link, "item:(%d+)");
-	return tonumber(itemId);
-end
-
 -- slots that can contain pieces from armor sets
 local itemSlots = { "HeadSlot", "ShoulderSlot", "ChestSlot", "HandsSlot", "LegsSlot" }
 
 function OvaleEquipement:Refresh()
+	-- Update weapon types.
+	self.mainHandWeaponType = GetEquippedWeaponType("MainHandSlot")
+	self.offHandWeaponType = GetEquippedWeaponType("SecondaryHandSlot")
+
+	-- Update armor set counts.
 	wipe(armorSetCount)
 	for i = 1, #itemSlots do
-		local itemId = self:GetItemId(itemSlots[i])
+		local itemId = GetItemId(itemSlots[i])
 		if itemId then
 			local name = armorSet[itemId]
 			if name then

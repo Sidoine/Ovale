@@ -143,6 +143,18 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.spirit = UnitStat(unitId, 5)
 end
 
+function OvalePaperDoll:GetSpellHasteMultiplier()
+	return 1 + self.spellHaste / 100
+end
+
+function OvalePaperDoll:GetMeleeHasteMultiplier()
+	return 1 + self.meleeHaste / 100
+end
+
+function OvalePaperDoll:GetMasteryMultiplier()
+	return 1 + self.masteryEffect / 100
+end
+
 function OvalePaperDoll:Debug()
 	Ovale:Print("Agility: " ..self.agility)
 	Ovale:Print("Intellect: " ..self.intellect)

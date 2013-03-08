@@ -83,9 +83,9 @@ local function avecHate(temps, hate)
 	if (not hate) then
 		return temps
 	elseif (hate == "spell") then
-		return temps/(1 + OvalePaperDoll.spellHaste)
+		return temps / OvalePaperDoll:GetSpellHasteMultiplier()
 	elseif (hate == "melee") then
-		return temps/(1 + OvalePaperDoll.meleeHaste)
+		return temps / OvalePaperDoll:GetMeleeHasteMultiplier()
 	else
 		return temps
 	end
@@ -330,7 +330,7 @@ local function getMine(condition)
 end
 
 -- Recherche un aura sur la cible et récupère sa durée et le nombre de stacks
--- return start, ending, stacks, spellHaste
+-- return start, ending, stacks, spellHasteMultiplier
 local function GetTargetAura(condition, target)
 	if (not target) then
 		target=condition.target
@@ -366,7 +366,7 @@ local function GetTargetAura(condition, target)
 		else
 			ending = aura.ending
 		end
-		return aura.start, ending, aura.stacks, aura.spellHaste
+		return aura.start, ending, aura.stacks, aura.spellHasteMultiplier
 	else
 		return 0,0,0,0
 	end
@@ -1314,13 +1314,8 @@ end
 -- if HasShield() Spell(shield_wall)
 
 OvaleCondition.conditions.hasshield = function(condition)
-	local _,_,id = strfind(GetInventoryItemLink("player",GetInventorySlotInfo("SecondaryHandSlot")) or "","(item:%d+:%d+:%d+:%d+)")
-	if (not id) then
-		return testbool(false, condition[1])
-	end
-
-	local _,_,_,_,_,_,_,_,itemLoc = GetItemInfo(id)
-	return testbool(itemLoc=="INVTYPE_SHIELD", condition[1])
+	local itemType = OvaleEquipement.offHandWeaponType
+	return testbool(itemType == "INVTYPE_SHIELD", condition[1])
 end
 
 --- Test if the player has a particular trinket equipped.
@@ -1370,12 +1365,8 @@ OvaleCondition.conditions.hasweapon = function(condition)
 	if condition[1] == "offhand" then
 		return testbool(OffhandHasWeapon(), condition[2])
 	elseif condition[1] == "mainhand" then
-		local itemId = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
-		if not itemId then
-			return testbool(false, condition[2])
-		end
-		local invType = select(9, GetItemInfo(itemId))
-		return testbool(invType == "INVTYPE_WEAPON" or invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_WEAPONMAINHAND", condition[2])
+		local itemType = OvaleEquipement.mainHandWeaponType
+		return testbool(itemType == "INVTYPE_WEAPON" or itemType == "INVTYPE_2HWEAPON" or itemType == "INVTYPE_WEAPONMAINHAND", condition[2])
 	else
 		return testbool(false, condition[2])
 	end
@@ -1991,8 +1982,8 @@ end
 -- @see Ticks, TicksRemain, TickTime
 
 OvaleCondition.conditions.nexttick = function(condition)
-	local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
-	local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
+	local start, ending, _, spellHasteMultiplier = GetTargetAura(condition, getTarget(condition.target))
+	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
 	if tickLength then
 		while ending - tickLength > OvaleState.currentTime do
 			ending = ending - tickLength
@@ -2532,7 +2523,7 @@ OvaleCondition.auraConditions.tickvalue = true
 OvaleCondition.conditions.ticks = function(condition)
 	-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
 	local spellId = condition[1]
-	local duration, tickLength = OvaleData:GetDuration(spellId, OvalePaperDoll.spellHaste, OvaleState.state.combo, OvaleState.state.holy)
+	local duration, tickLength = OvaleData:GetDuration(spellId, OvalePaperDoll:GetSpellHasteMultiplier(), OvaleState.state.combo, OvaleState.state.holy)
 	if tickLength then
 		local numTicks = floor(duration / tickLength + 0.5)
 		return compare(numTicks, condition[2], condition[3])
@@ -2567,8 +2558,8 @@ OvaleCondition.auraConditions.ticksadded = true
 --     Spell(shadow_word_pain)
 
 OvaleCondition.conditions.ticksremain = function(condition)
-	local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
-	local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
+	local start, ending, _, spellHasteMultiplier = GetTargetAura(condition, getTarget(condition.target))
+	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
 	if tickLength then
 		local remain = 1
 		local tickTime = ending
@@ -2596,11 +2587,11 @@ OvaleCondition.auraConditions.ticksremain = true
 -- @see NextTick, Ticks, TicksRemain
 
 OvaleCondition.conditions.ticktime = function(condition)
-	local start, ending, _, spellHaste = GetTargetAura(condition, getTarget(condition.target))
+	local start, ending, _, spellHasteMultiplier = GetTargetAura(condition, getTarget(condition.target))
 	if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
-		spellHaste = OvalePaperDoll.spellHaste
+		spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 	end
-	local tickLength = OvaleData:GetTickLength(condition[1], spellHaste)
+	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
 	if tickLength then
 		return compare(tickLength, condition[2], condition[3])
 	end

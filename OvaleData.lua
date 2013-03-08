@@ -526,7 +526,7 @@ function OvaleData:GetGCD(spellId)
 			if not cd then
 				cd = 1.5
 			end
-			cd = cd / (1 + OvalePaperDoll.spellHaste)
+			cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
 			if (cd<1) then
 				cd = 1
 			end
@@ -544,7 +544,7 @@ function OvaleData:GetGCD(spellId)
 		return 1.0
 	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
 			(self.className == "DRUID" and not OvaleStance:IsStance("druid_bear_form")) then
-		local cd = 1.5 / (1 + OvalePaperDoll.spellHaste)
+		local cd = 1.5 / OvalePaperDoll:GetSpellHasteMultiplier()
 		if (cd<1) then
 			cd = 1
 		end
@@ -608,11 +608,11 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, combo)
 	return damage
 end
 
-function OvaleData:GetDuration(spellId, spellHaste, combo, holy)
+function OvaleData:GetDuration(spellId, spellHasteMultiplier, combo, holy)
 	local si = self.spellInfo[spellId]
 	if si and si.duration then
 		local duration = si.duration
-		spellHaste = spellHaste or 0
+		spellHasteMultiplier = spellHasteMultiplier or 1
 		combo = combo or 0
 		holy = holy or 1
 		if si.adddurationcp then
@@ -623,7 +623,7 @@ function OvaleData:GetDuration(spellId, spellHaste, combo, holy)
 		end
 		if si.tick then	-- DoT
 			--DoT duration is tickLength * numberOfTicks.
-			local tickLength = self:GetTickLength(spellId, spellHaste)
+			local tickLength = self:GetTickLength(spellId, spellHasteMultiplier)
 			local numTicks = floor(duration / tickLength + 0.5)
 			duration = tickLength * numTicks
 			return duration, tickLength
@@ -634,13 +634,13 @@ function OvaleData:GetDuration(spellId, spellHaste, combo, holy)
 	end
 end
 
-function OvaleData:GetTickLength(spellId, spellHaste)
+function OvaleData:GetTickLength(spellId, spellHasteMultiplier)
 	local si = self.spellInfo[spellId]
 	if si then
 		local tick = si.tick or 3
-		local haste = spellHaste or 0
+		spellHasteMultiplier = spellHasteMultiplier or 1
 		if si.haste == "spell" then
-			return tick / (1 + haste)
+			return tick / spellHasteMultiplier
 		else
 			return tick
 		end

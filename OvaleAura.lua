@@ -57,7 +57,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
 				local aura = self:GetAuraByGUID(destGUID, spellId, true)
 				if aura then
-					aura.spellHaste = OvalePaperDoll.spellHaste
+					aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 				end
 			end
 		end

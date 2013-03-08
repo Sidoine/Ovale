@@ -53,9 +53,15 @@ function OvaleState:UpdatePowerRates()
 		self.powerRate[k] = 0
 	end
 
-	self.powerRate.energy = 10 * OvalePaperDoll.meleeHaste
+	self.powerRate.energy = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
 
 	if OvaleData.className == "MONK" then
+		-- Way of the Monk (monk)
+		if OvaleEquipement.mainHandWeaponType == "INVTYPE_2HWEAPON" then
+			-- Strip off 40% melee attack speed bonus for two-handed weapon.
+			self.powerRate.energy = self.powerRate.energy / 1.4
+		end
+
 		-- Ascension (monk)
 		if OvaleData:GetTalentPoints(8) > 0 then
 			self.powerRate.energy = self.powerRate.energy * 1.15
@@ -84,7 +90,7 @@ function OvaleState:UpdatePowerRates()
 		end
 	end
 	
-	self.powerRate.focus = 4 * OvalePaperDoll.meleeHaste
+	self.powerRate.focus = 4 * OvalePaperDoll:GetMeleeHasteMultiplier()
 end
 
 function OvaleState:Reset()
@@ -336,7 +342,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 
 							-- Set the duration to the proper length if it's a DoT.
 							if auraSpellInfo and auraSpellInfo.duration then
-								duration = OvaleData:GetDuration(auraSpellId, OvalePaperDoll.spellHaste, self.state.combo, self.state.holy)
+								duration = OvaleData:GetDuration(auraSpellId, OvalePaperDoll:GetSpellHasteMultiplier(), self.state.combo, self.state.holy)
 							end
 
 							-- If aura is specified with a duration, then assume stacks == 1.
@@ -365,10 +371,10 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 									newAura.start = previousAura.start
 									if isDoT and previousAura.ending > newAura.start then
 										-- TODO: check that refreshed DoTs take a new snapshot of player stats.
-										local tickLength = OvaleData:GetTickLength(auraSpellId, previousAura.spellHaste)
+										local tickLength = OvaleData:GetTickLength(auraSpellId, previousAura.spellHasteMultiplier)
 										local k = floor((previousAura.ending - endCast) / tickLength)
 										newAura.ending = previousAura.ending - tickLength * k + duration
-										newAura.spellHaste = OvalePaperDoll.spellHaste
+										newAura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 									else
 										newAura.ending = endCast + duration
 									end
@@ -393,7 +399,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								newAura.start = endCast
 								newAura.ending = endCast + duration
 								if isDoT then
-									newAura.spellHaste = OvalePaperDoll.spellHaste
+									newAura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 								end
 							end
 						end
