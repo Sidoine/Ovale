@@ -450,7 +450,8 @@ OvaleCondition.spellbookConditions = { spell = true }
 -- @name ArmorSetParts
 -- @paramsig number or boolean
 -- @param name The name of the armor set.
---     Valid names: T11, T12, T13.
+--     Valid names: T11, T12, T13, T14, T15.
+--     Valid names for hybrid classes: append _caster, _heal, _melee, _tank.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of pieces of the named set that are equipped by the player.
@@ -526,7 +527,7 @@ OvaleCondition.auraConditions.debuffduration = true
 -- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 --     Defaults to any=0.
 --     Valid values: 0, 1.
--- @param haste Optional. Sets whether "seconds" should be lengthed or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
 --     Defaults to haste=none.
 --     Valid values: spell, none.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
@@ -615,7 +616,7 @@ OvaleCondition.auraConditions.debuffgain = true
 -- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 --     Defaults to any=0.
 --     Valid values: 0, 1.
--- @param haste Optional. Sets whether "seconds" should be lengthed or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
 --     Defaults to haste=none.
 --     Valid values: spell, none.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
@@ -1006,13 +1007,12 @@ OvaleCondition.conditions.creaturetype = function(condition)
 	return nil
 end
 
---- Get the current estimated damage of a spell if it is a critical damage.
+--- Get the current estimated damage of a spell if it is a critical strike.
 -- @name CritDamage
--- @name Damage
 -- @paramsig number
 -- @param id The spell ID.
--- @return The estimated damage of the given spell.
--- @see CritDamage
+-- @return The estimated critical strike damage of the given spell.
+-- @see Damage, LastSpellDamage, LastSpellEstimatedDamage
 
 OvaleCondition.conditions.critdamage = function(condition)
 	local spellId = condition[1]
@@ -1517,6 +1517,7 @@ end
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
+-- @usage
 -- if IsFeared() Spell(every_man_for_himself)
 
 OvaleCondition.conditions.isfeared = function(condition)
@@ -1548,6 +1549,7 @@ end
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
+-- @usage
 -- if IsIncapacitated() Spell(every_man_for_himself)
 
 OvaleCondition.conditions.isincapacitated = function(condition)
@@ -1584,6 +1586,7 @@ end
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
+-- @usage
 -- if IsRooted() Item(Trinket0Slot usable=1)
 
 OvaleCondition.conditions.isrooted = function(condition)
@@ -1598,6 +1601,7 @@ end
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
+-- @usage
 -- if IsStunned() Item(Trinket0Slot usable=1)
 
 OvaleCondition.conditions.isstunned = function(condition)
@@ -2252,7 +2256,7 @@ OvaleCondition.conditions.shadoworbs = function(condition)
 end
 
 --- Get the current number of Soul Shards for warlocks.
--- @name BurningEmbers
+-- @name SoulShards
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
