@@ -1333,7 +1333,7 @@ OvaleCondition.conditions.hastrinket = function(condition)
 		return testbool(OvaleEquipement:HasTrinket(trinketId), condition[2])
 	elseif OvaleData.itemList[trinketId] then
 		for _, v in pairs(OvaleData.itemList[trinketId]) do
-			if OvaleEquipement:HasTrinket(trinketId) then
+			if OvaleEquipement:HasTrinket(v) then
 				return testbool(true, condition[2])
 			end
 		end
