@@ -44,10 +44,8 @@ local targetGUID = {}
 local lastSPD = {}
 
 local floor, pairs, select, strfind, tostring = math.floor, pairs, select, string.find, tostring
-local GetInventoryItemID, GetInventoryItemLink = GetInventoryItemID, GetInventoryItemLink
-local GetInventorySlotInfo, GetItemCooldown, GetItemCount = GetInventorySlotInfo, GetItemCooldown, GetItemCount
-local GetItemInfo, GetRune = GetItemInfo, GetRune
-local GetRuneCount, GetSpellCharges = GetRuneCount, GetSpellCharges
+local GetItemCooldown, GetItemCount = GetItemCooldown, GetItemCount
+local GetSpellCharges = GetSpellCharges
 local GetSpellInfo, GetTotemInfo, GetTrackingInfo = GetSpellInfo, GetTotemInfo, GetTrackingInfo
 local GetUnitSpeed, HasFullControl, IsSpellInRange = GetUnitSpeed, HasFullControl, IsSpellInRange
 local IsStealthed, IsUsableSpell = IsStealthed, IsUsableSpell
@@ -56,8 +54,7 @@ local UnitClassification, UnitCreatureFamily, UnitCreatureType = UnitClassificat
 local UnitDebuff, UnitDetailedThreatSituation, UnitExists = UnitDebuff, UnitDetailedThreatSituation, UnitExists
 local UnitHealth, UnitHealthMax, UnitIsDead = UnitHealth, UnitHealthMax, UnitIsDead
 local UnitIsFriend, UnitIsUnit, UnitLevel = UnitIsFriend, UnitIsUnit, UnitLevel
-local UnitPower, UnitPowerMax, UnitAura = UnitPower, UnitPowerMax, UnitAura
-
+local UnitPower, UnitPowerMax = UnitPower, UnitPowerMax
 --</private-static-properties>
 
 --<private-static-methods>
@@ -1314,8 +1311,7 @@ end
 -- if HasShield() Spell(shield_wall)
 
 OvaleCondition.conditions.hasshield = function(condition)
-	local itemType = OvaleEquipement.offHandWeaponType
-	return testbool(itemType == "INVTYPE_SHIELD", condition[1])
+	return testbool(OvaleEquipement:HasShield(), condition[1])
 end
 
 --- Test if the player has a particular trinket equipped.
@@ -1332,16 +1328,12 @@ end
 --     Spell(rake)
 
 OvaleCondition.conditions.hastrinket = function(condition)
-	local trinketZero = GetInventoryItemID("player", GetInventorySlotInfo("Trinket0Slot"))
-	local trinketOne = GetInventoryItemID("player", GetInventorySlotInfo("Trinket1Slot"))
 	local trinketId = condition[1]
 	if type(trinketId) == "number" then
-		if (trinketZero and trinketZero == trinketId) or (trinketOne and trinketOne == trinketId) then
-			return testbool(true, condition[2])
-		end
+		return testbool(OvaleEquipement:HasTrinket(trinketId), condition[2])
 	elseif OvaleData.itemList[trinketId] then
 		for _, v in pairs(OvaleData.itemList[trinketId]) do
-			if (trinketZero and trinketZero == v) or (trinketOne and trinketOne == v) then
+			if OvaleEquipement:HasTrinket(trinketId) then
 				return testbool(true, condition[2])
 			end
 		end
@@ -1363,10 +1355,9 @@ end
 
 OvaleCondition.conditions.hasweapon = function(condition)
 	if condition[1] == "offhand" then
-		return testbool(OffhandHasWeapon(), condition[2])
+		return testbool(OvaleEquipement:HasOffHandWeapon(), condition[2])
 	elseif condition[1] == "mainhand" then
-		local itemType = OvaleEquipement.mainHandWeaponType
-		return testbool(itemType == "INVTYPE_WEAPON" or itemType == "INVTYPE_2HWEAPON" or itemType == "INVTYPE_WEAPONMAINHAND", condition[2])
+		return testbool(OvaleEquipement:HasMainHandWeapon(), condition[2])
 	else
 		return testbool(false, condition[2])
 	end

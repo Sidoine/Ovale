@@ -57,7 +57,7 @@ function OvaleState:UpdatePowerRates()
 
 	if OvaleData.className == "MONK" then
 		-- Way of the Monk (monk)
-		if OvaleEquipement.mainHandWeaponType == "INVTYPE_2HWEAPON" then
+		if OvaleEquipement:HasTwoHandedWeapon() then
 			-- Strip off 40% melee attack speed bonus for two-handed weapon.
 			self.powerRate.energy = self.powerRate.energy / 1.4
 		end
