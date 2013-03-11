@@ -54,6 +54,14 @@ function OvaleState:UpdatePowerRates()
 	end
 
 	self.powerRate.energy = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
+	self.powerRate.focus = 4 * OvalePaperDoll:GetRangedHasteMultiplier()
+
+	-- Strip off 10% ranged attack speed bonus that doesn't count toward focus regeneration.
+	for _, v in pairs(OvaleData.buffSpellList.melee_haste) do
+		if OvaleState:GetAura("player", v) then
+			self.powerRate.focus = self.powerRate.focus / 1.1
+		end
+	end
 
 	if OvaleData.className == "MONK" then
 		-- Way of the Monk (monk)
@@ -89,8 +97,6 @@ function OvaleState:UpdatePowerRates()
 			self.powerRate.energy = self.powerRate.energy * 2
 		end
 	end
-	
-	self.powerRate.focus = 4 * OvalePaperDoll:GetMeleeHasteMultiplier()
 end
 
 function OvaleState:Reset()
