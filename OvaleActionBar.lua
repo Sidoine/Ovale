@@ -28,10 +28,10 @@ OvaleActionBar.shortCut = {}
 --<public-static-methods>
 function OvaleActionBar:OnEnable()
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_TALENT_UPDATE")
-	self:RegisterEvent("UPDATE_BINDINGS")
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "FillActionIndexes")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "FillActionIndexes")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", "FillActionIndexes")
+	self:RegisterEvent("UPDATE_BINDINGS", "FillActionIndexes")
 end
 	
 function OvaleActionBar:OnDisable()
@@ -50,23 +50,6 @@ function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
 		self:FillActionIndex(tonumber(slot))
 		Ovale:debugPrint("action_bar", "Mapping button " ..tonumber(slot).." to spell/macro")
 	end
-end
-
-function OvaleActionBar:ACTIVE_TALENT_GROUP_CHANGED(event)
-	self:FillActionIndexes(event)
-end
-
-function OvaleActionBar:PLAYER_ENTERING_WORLD(event)
-	self:FillActionIndexes(event)
-end
-
-function OvaleActionBar:PLAYER_TALENT_UPDATE(event)
-	self:FillActionIndexes(event)
-end
-
---Called when the user changed his key bindings
-function OvaleActionBar:UPDATE_BINDINGS(event)
-	self:FillActionIndexes(event)
 end
 
 function OvaleActionBar:FillActionIndexes(event)
