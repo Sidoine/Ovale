@@ -780,7 +780,7 @@ end
 OvaleCondition.conditions.casttime = function(condition)
 	local name, rank, icon, cost, isFunnel, powerType, castTime = OvaleData:GetSpellInfoOrNil(condition[1])
 	if Ovale.trace then
-		Ovale:Print("castTime/1000 = " .. (castTime/1000) .. " " .. condition[2] .. " " .. condition[3])
+		Ovale:Print("castTime/1000 = " .. (castTime/1000) .. " " .. tostring(condition[2]) .. " " .. tostring(condition[3]))
 	end
 	return compare(castTime/1000, condition[2], condition[3])
 end
