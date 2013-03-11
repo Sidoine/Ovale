@@ -15,6 +15,7 @@ OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 --<private-static-properties>
 local GetMasteryEffect = GetMasteryEffect
 local GetMeleeHaste = GetMeleeHaste
+local GetRangedHaste = GetRangedHaste
 local GetSpellBonusDamage = GetSpellBonusDamage
 local GetSpellBonusHealing = GetSpellBonusHealing
 local UnitAttackPower = UnitAttackPower
@@ -39,6 +40,8 @@ OvalePaperDoll.rangedAttackPower = 0
 OvalePaperDoll.masteryEffect = 0
 -- percent increase to melee haste
 OvalePaperDoll.meleeHaste = 0
+-- percent increase to ranged haste
+OvalePaperDoll.rangedHaste = 0
 -- percent increase to spell haste
 OvalePaperDoll.spellHaste = 0
 -- spellpower
@@ -51,6 +54,7 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("MASTERY_UPDATE")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
+	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_SPELL_POWER")
@@ -61,6 +65,7 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("MASTERY_UPDATE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
+	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_SPELL_HASTE")
 	self:UnregisterEvent("UNIT_SPELL_POWER")
@@ -88,6 +93,11 @@ function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	if unitId ~= "player" then return end
 	local base, posBuff, negBuff = UnitAttackPower(unitId)
 	self.attackPower = base + posBuff + negBuff
+end
+
+function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
+	if unitId ~= "player" then return end
+	self.rangedHaste = GetRangedHaste()
 end
 
 function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
@@ -143,16 +153,20 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.spirit = UnitStat(unitId, 5)
 end
 
-function OvalePaperDoll:GetSpellHasteMultiplier()
-	return 1 + self.spellHaste / 100
+function OvalePaperDoll:GetMasteryMultiplier()
+	return 1 + self.masteryEffect / 100
 end
 
 function OvalePaperDoll:GetMeleeHasteMultiplier()
 	return 1 + self.meleeHaste / 100
 end
 
-function OvalePaperDoll:GetMasteryMultiplier()
-	return 1 + self.masteryEffect / 100
+function OvalePaperDoll:GetRangedHasteMultiplier()
+	return 1 + self.rangedHaste / 100
+end
+
+function OvalePaperDoll:GetSpellHasteMultiplier()
+	return 1 + self.spellHaste / 100
 end
 
 function OvalePaperDoll:Debug()
@@ -167,6 +181,7 @@ function OvalePaperDoll:Debug()
 	Ovale:Print("Spell bonus healing: " ..self.spellBonusHealing)
 	Ovale:Print("Spell haste effect: " ..self.spellHaste.. "%")
 	Ovale:Print("Melee haste effect: " ..self.meleeHaste.. "%")
+	Ovale:Print("Ranged haste effect: " ..self.rangedHaste.. "%")
 	Ovale:Print("Mastery effect: " ..self.masteryEffect.. "%")
 end
 --</public-static-methods>
