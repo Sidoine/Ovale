@@ -2532,13 +2532,7 @@ OvaleCondition.conditions.ticksremain = function(condition)
 	local start, ending, _, spellHasteMultiplier = GetTargetAura(condition, getTarget(condition.target))
 	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
 	if tickLength then
-		local remain = 1
-		local tickTime = ending
-		while tickTime - tickLength > OvaleState.currentTime do
-			remain = remain + 1
-			tickTime = tickTime - tickLength
-		end
-		return start, ending, remain, tickTime, -1/tickLength
+		return 0, nil, 1, ending, -1/tickLength
 	end
 	return nil
 end
