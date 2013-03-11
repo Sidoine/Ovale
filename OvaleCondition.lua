@@ -422,8 +422,6 @@ end
 --<public-static-properties>
 -- Script conditions.
 OvaleCondition.conditions = {}
--- List of script conditions that take an aura spell ID as a parameter.
-OvaleCondition.auraConditions = {}
 -- List of script conditions that refer to a castable spell from the player's spellbook.
 OvaleCondition.spellbookConditions = { spell = true }
 
@@ -491,8 +489,6 @@ OvaleCondition.conditions.buffcount = function(condition)
 	return start, ending, count, 0, 0
 end
 OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
-OvaleCondition.auraConditions.buffcount = true
-OvaleCondition.auraConditions.debuffcount = true
 
 --- Get the total duration of the aura from when it was first applied to when it ended.
 -- @name BuffDuration
@@ -512,8 +508,6 @@ OvaleCondition.conditions.buffduration = function(condition)
 	return compare(diffTime(start, ending), condition[2], condition[3])
 end
 OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduration
-OvaleCondition.auraConditions.buffduration = true
-OvaleCondition.auraConditions.debuffduration = true
 
 --- Test if an aura is expired, or will expire after a given number of seconds.
 -- @name BuffExpires
@@ -548,8 +542,6 @@ OvaleCondition.conditions.buffexpires = function(condition)
 	return addTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
-OvaleCondition.auraConditions.buffexpires = true
-OvaleCondition.auraConditions.debuffexpires = true
 
 --- Get the remaining time in seconds on an aura.
 -- @name BuffRemains
@@ -576,8 +568,6 @@ OvaleCondition.conditions.buffremains = function(condition)
 	end
 end
 OvaleCondition.conditions.debuffremains = OvaleCondition.conditions.buffremains
-OvaleCondition.auraConditions.buffremains = true
-OvaleCondition.auraConditions.debuffremains = true
 
 	-- Returns the time elapsed since the last buff gain
 	-- TODO won't work because the aura is not kept in cache
@@ -601,8 +591,6 @@ OvaleCondition.conditions.buffgain = function(condition)
 	return 0, nil, 0, timeGain, 1
 end
 OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
-OvaleCondition.auraConditions.buffgain = true
-OvaleCondition.auraConditions.debuffgain = true
 
 --- Test if an aura is present or if the remaining time on the aura is more than the given number of seconds.
 -- @name BuffPresent
@@ -633,8 +621,6 @@ OvaleCondition.conditions.buffpresent = function(condition)
 	return start, addTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
-OvaleCondition.auraConditions.buffpresent = true
-OvaleCondition.auraConditions.debuffpresent = true
 
 --- Get the number of stacks of an aura on the target.
 -- @name BuffStacks
@@ -659,8 +645,6 @@ OvaleCondition.conditions.buffstacks = function(condition)
 	return start, ending, stacks, 0, 0
 end
 OvaleCondition.conditions.debuffstacks = OvaleCondition.conditions.buffstacks
-OvaleCondition.auraConditions.buffstacks = true
-OvaleCondition.auraConditions.debuffstacks = true
 
 --- Test if there is a stealable buff on the target.
 -- @name BuffStealable
@@ -676,7 +660,6 @@ OvaleCondition.auraConditions.debuffstacks = true
 OvaleCondition.conditions.buffstealable = function(condition)
 	return OvaleAura:GetStealable(getTarget(condition.target))
 end
-OvaleCondition.auraConditions.buffstealable = true
 
 --- Get the current number of Burning Embers for destruction warlocks.
 -- @name BurningEmbers
@@ -2499,7 +2482,6 @@ OvaleCondition.conditions.tickvalue = function(condition)
 	end
 	return compare(value, condition[2], condition[3])
 end
-OvaleCondition.auraConditions.tickvalue = true
 
 --- Get the estimated total number of ticks of a damage-over-time (DoT) aura.
 -- @name Ticks
@@ -2521,7 +2503,6 @@ OvaleCondition.conditions.ticks = function(condition)
 	end
 	return nil
 end
-OvaleCondition.auraConditions.ticks = true
 
 --- Get the number of ticks that would be added if the dot is refreshed.
 -- Not implemented, always returns 0.
@@ -2533,7 +2514,6 @@ OvaleCondition.auraConditions.ticks = true
 OvaleCondition.conditions.ticksadded = function(condition)
 	return 0, nil, 0, 0, 0
 end
-OvaleCondition.auraConditions.ticksadded = true
 
 --- Get the remaining number of ticks of a damage-over-time (DoT) aura on a target.
 -- @name TicksRemain
@@ -2562,7 +2542,6 @@ OvaleCondition.conditions.ticksremain = function(condition)
 	end
 	return nil
 end
-OvaleCondition.auraConditions.ticksremain = true
 
 --- Get the number of seconds between ticks of a damage-over-time (DoT) aura on a target.
 -- @name TickTime
@@ -2588,7 +2567,6 @@ OvaleCondition.conditions.ticktime = function(condition)
 	end
 	return nil
 end
-OvaleCondition.auraConditions.ticktime = true
 
 --- Get the number of seconds elapsed since the player entered combat.
 -- @name TimeInCombat

@@ -46,19 +46,17 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	if strfind(event, "SPELL_AURA_") == 1 then
 		local spellId, spellName, spellSchool, auraType = select(12, ...)
 
-		if (sourceGUID == self.playerGUID and OvaleData.spellFilter.mine[spellId]) or OvaleData.spellFilter.any[spellId] then
-			local unitId = OvaleGUID:GetUnitId(destGUID)
+		local unitId = OvaleGUID:GetUnitId(destGUID)
 
-			-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
-			if unitId and unitId ~= "target" and strfind(unitId, "target") then
-				self:UpdateAuras(unitId, destGUID)
-			end
+		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
+		if unitId and unitId ~= "target" and strfind(unitId, "target") then
+			self:UpdateAuras(unitId, destGUID)
+		end
 
-			if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-				local aura = self:GetAuraByGUID(destGUID, spellId, true)
-				if aura then
-					aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
-				end
+		if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
+			local aura = self:GetAuraByGUID(destGUID, spellId, true)
+			if aura then
+				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 			end
 		end
 	end
@@ -170,13 +168,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 				break
 			end
 		else
-			if (unitCaster == "player" and OvaleData.spellFilter.mine[spellId]) or OvaleData.spellFilter.any[spellId] then
-				self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
-				if debuffType then
-					-- TODO: not very clean
-					-- should be computed by OvaleState:GetAura
-					self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
-				end
+			self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			if debuffType then
+				-- TODO: not very clean
+				-- should be computed by OvaleState:GetAura
+				self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			end
 			
 			if unitId == "player" then

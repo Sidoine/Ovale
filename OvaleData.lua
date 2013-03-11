@@ -52,8 +52,6 @@ OvaleData.glyphs = {}
 OvaleData.spellInfo = {}
 --spells that count for scoring
 OvaleData.scoreSpell = {}
---spells that should be tracked
-OvaleData.spellFilter = { any = {}, mine = {} }
 
 OvaleData.power =
 {
@@ -502,21 +500,6 @@ end
 
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
-end
-
-function OvaleData:ResetSpellFilter()
-	self.spellFilter.any = {}
-	self.spellFilter.mine = {}
-end
-
-function OvaleData:AddSpellToFilter(spellId, mine)
-	if mine then
-		if not self.spellFilter.mine[spellId] then
-			self.spellFilter.mine[spellId] = GetSpellInfo(spellId)
-		end
-	elseif not self.spellFilter.any[spellId] then
-		self.spellFilter.any[spellId] = GetSpellInfo(spellId)
-	end
 end
 
 function OvaleData:GetGCD(spellId)

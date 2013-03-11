@@ -201,18 +201,6 @@ local function ParseFunction(prefix, func, params)
 				end
 			end
 		end
-
-		-- For the conditions that refer to aura spell IDs, add those spell IDs to
-		-- the list of auras OvaleAura should be tracking.
-		if OvaleCondition.auraConditions[func] then
-			if type(spellId) == "number" then
-				OvaleData:AddSpellToFilter(spellId, mine)
-			elseif OvaleData.buffSpellList[spellId] then
-				for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-					OvaleData:AddSpellToFilter(v, mine)
-				end
-			end
-		end
 	end
 
 	return newNodeName
@@ -617,8 +605,6 @@ local function CompileScript(text)
 	text = CompileComments(text)
 	text = CompileDeclarations(text)
 	text = CompileInputs(text)
-
-	OvaleData:ResetSpellFilter()
 
 	for p,t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
 		local newNode = ParseCommands(t)
