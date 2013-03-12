@@ -14,9 +14,10 @@ OvaleData = Ovale:NewModule("OvaleData", "AceEvent-3.0")
 local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
 local GetNumGlyphSockets = GetNumGlyphSockets
 local GetGlyphSocketInfo = GetGlyphSocketInfo
+local GetSpellCooldown = GetSpellCooldown
 local GetSpellBookItemInfo, GetSpellBookItemName = GetSpellBookItemInfo, GetSpellBookItemName
 local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
-local HasPetSpells, UnitBuff, UnitClass = HasPetSpells, UnitBuff, UnitClass
+local HasPetSpells = HasPetSpells
 local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
 local SPELL_POWER_BURNING_EMBERS = SPELL_POWER_BURNING_EMBERS
@@ -505,15 +506,16 @@ function OvaleData:GetGCD(spellId)
 	
 	-- Default value
 	local class = OvalePaperDoll.class
-	if class == "ROGUE" or
-		(class == "MONK" and
-			(OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") or OvaleStance:IsStance("monk_stance_of_the_fierce_tiger"))) or
-		(class == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
+	if class == "DEATHKNIGHT" or class == "ROGUE"
+		or (class == "MONK"
+			and (OvaleStance:IsStance("monk_stance_of_the_sturdy_ox")
+				or OvaleStance:IsStance("monk_stance_of_the_fierce_tiger")))
+		or (class == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
 		return 1.0
 	elseif class == "MAGE" or class == "WARLOCK" or class == "PRIEST" or
 			(class == "DRUID" and not OvaleStance:IsStance("druid_bear_form")) then
 		local cd = 1.5 / OvalePaperDoll:GetSpellHasteMultiplier()
-		if (cd<1) then
+		if cd < 1 then
 			cd = 1
 		end
 		return cd
@@ -523,30 +525,10 @@ function OvaleData:GetGCD(spellId)
 end
 
 --Compute the spell Cooldown
-function OvaleData:GetComputedSpellCD(spellId)
-	local actionCooldownStart, actionCooldownDuration, actionEnable
-	local cd = OvaleState:GetCD(spellId)
-	if cd and cd.start then
-		actionCooldownStart = cd.start
-		actionCooldownDuration = cd.duration
-		actionEnable = cd.enable
-	else
-		actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellId)
-		-- Les chevaliers de la mort ont des infos fausses sur le CD quand ils n'ont plus les runes
-		-- On force à 1,5s ou 1s en présence impie
-		-- TODO: is it still the case in MoP?
-		if OvalePaperDoll.class == "DEATHKNIGHT" and actionCooldownDuration == 10 and
-				(not self.spellInfo[spellId] or self.spellInfo[spellId].cd~=10) then
-			local impie = GetSpellInfo(48265)
-			if impie and UnitBuff("player", impie) then
-				actionCooldownDuration=1
-			else
-				actionCooldownDuration=1.5
-			end
-		end
-		if self.spellInfo[spellId] and self.spellInfo[spellId].forcecd then
-			actionCooldownStart, actionCooldownDuration = GetSpellCooldown(self.spellInfo[spellId].forcecd)
-		end
+function OvaleData:GetSpellCD(spellId)
+	local actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellId)
+	if self.spellInfo[spellId] and self.spellInfo[spellId].forcecd then
+		actionCooldownStart, actionCooldownDuration = GetSpellCooldown(self.spellInfo[spellId].forcecd)
 	end
 	return actionCooldownStart, actionCooldownDuration, actionEnable
 end

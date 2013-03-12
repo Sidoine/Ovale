@@ -718,7 +718,7 @@ end
 	-- returns: bool
 OvaleCondition.conditions.cancast = function(condition)
 	local name, rank, icon, cost, isFunnel, powerType, castTime = OvaleData:GetSpellInfoOrNil(condition[1])
-	local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleData:GetComputedSpellCD(condition[1])
+	local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(condition[1])
 	local startCast = actionCooldownStart + actionCooldownDuration
 	if startCast<OvaleState.currentTime then
 		startCast = OvaleState.currentTime
@@ -2372,7 +2372,7 @@ OvaleCondition.conditions.spellcooldown = function(condition)
 	elseif not OvaleData.spellList[condition[1]] then
 		return 0, nil, 0, OvaleState.currentTime + 3600, -1
 	else
-		local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleData:GetComputedSpellCD(condition[1])
+		local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(condition[1])
 		return 0, nil, actionCooldownDuration, actionCooldownStart, -1
 	end
 end

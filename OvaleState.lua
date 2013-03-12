@@ -465,6 +465,20 @@ function OvaleState:GetCD(spellId)
 	end
 end
 
+--Compute the spell Cooldown
+function OvaleState:GetComputedSpellCD(spellId)
+	local actionCooldownStart, actionCooldownDuration, actionEnable
+	local cd = self:GetCD(spellId)
+	if cd and cd.start then
+		actionCooldownStart = cd.start
+		actionCooldownDuration = cd.duration
+		actionEnable = cd.enable
+	else
+		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleData:GetSpellCD(spellId)
+	end
+	return actionCooldownStart, actionCooldownDuration, actionEnable
+end
+
 function OvaleState:AddEclipse(endCast, spellId)
 	local newAura = self:NewAura(OvaleGUID.player, spellId)
 	newAura.start = endCast + 0.5
