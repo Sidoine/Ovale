@@ -26,15 +26,20 @@ Locale-zhTW.lua
 
 Ovale.lua
 
+# Modules with no dependencies
 OvaleActionBar.lua
 OvaleEnemies.lua
 OvaleEquipement.lua
 OvaleGUID.lua
 OvalePaperDoll.lua
+OvaleRecount.lua
+OvaleSkada.lua
 OvaleSpellDamage.lua
 OvaleStance.lua
+OvaleSwing.lua
+
+# First tier of modules with dependencies
 OvaleData.lua
-OvaleComboPoints.lua
 OvaleScripts.lua
 defaut\Chaman.lua
 defaut\Chasseur.lua
@@ -48,16 +53,19 @@ defaut\Voleur.lua
 defaut\Moine.lua
 defaut\Chevalier.lua
 
+# Second tier of modules with dependencies
 OvaleAura.lua
-OvaleBestAction.lua
-OvaleCompile.lua
-OvaleCondition.lua
-OvaleFrame.lua
+OvaleComboPoints.lua
 OvaleFuture.lua
+OvaleState.lua
+
+# Third tier of modules with dependencies
+OvaleCondition.lua
+OvaleBestAction.lua
+OvaleOptions.lua
+
+# Fourth tier of modules with dependencies
 OvaleIcone.lua
 OvaleIcone.xml
-OvaleOptions.lua
-OvaleRecount.lua
-OvaleSkada.lua
-OvaleState.lua
-OvaleSwing.lua
+OvaleCompile.lua
+OvaleFrame.lua
