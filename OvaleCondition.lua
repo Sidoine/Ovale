@@ -420,7 +420,44 @@ end
 --</private-static-methods>
 
 --<public-static-properties>
--- Script conditions.
+--[[----------------------------------------------------------------------------
+	Script conditions.
+
+	A script condition must have a name that is lowercase.  Script function
+	names are always converted to lowercase before comparing against the
+	conditions in the OvaleCondition.conditions table.
+
+	A script condition can return in two different ways:
+
+	(1) start, ending
+		This returns a time interval representing when the condition is true
+		and is used by conditions that return only a time interval.
+
+	(2) start, ending, value, origin, rate
+		This returns a function f(t) = value + (t - origin) * rate that is
+		valid for start < t < ending.  This return method is used by
+		conditions that return a value that is used in numerical comparisons
+		or operations.
+
+	The endpoint of a time interval must be between 0 and infinity, where
+	infinity is represented by "nil".  Time is a value such as returned by
+	the API function GetTime().
+
+	Examples:
+
+	(1)	(0, nil) means the condition is always true.  This can be shortened
+		to just return 0.
+
+	(2)	(nil, nil) means the condition is always false.  This can be shorted
+		to just return nil.
+
+	(3)	(0, nil, constant, 0, 0) means the condition has a constant value.
+
+	(4)	(start, ending, ending - start, start, -1) means the condition has a
+		value of f(t) = ending - t, at time t between start and ending.  This
+		basically returns how much time is left within the time interval.
+--]]----------------------------------------------------------------------------
+
 OvaleCondition.conditions = {}
 -- List of script conditions that refer to a castable spell from the player's spellbook.
 OvaleCondition.spellbookConditions = { spell = true }
