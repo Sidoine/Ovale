@@ -36,8 +36,6 @@ local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 --<public-static-properties>
 OvaleData.spellList = {}
 OvaleData.itemList = {}
-OvaleData.className = nil
-OvaleData.level = nil
 --allows to fill the player talent tables on first use
 OvaleData.listeTalentsRemplie = false
 --key: talentId / value: points in this talent
@@ -290,15 +288,12 @@ local rootSpellList = nil
 
 --<public-static-methods>
 function OvaleData:OnInitialize()
-	self.className = select(2, UnitClass("player"))
 	for k,v in pairs(self.power) do
 		self.powerType[v.id] = k
 	end
 end
 
 function OvaleData:OnEnable()
-	self.level = UnitLevel("player")
-	
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "RemplirListeTalents")
 	self:RegisterEvent("GLYPH_ADDED", "UpdateGlyphs")
 	self:RegisterEvent("GLYPH_DISABLED", "UpdateGlyphs")
@@ -306,7 +301,6 @@ function OvaleData:OnEnable()
 	self:RegisterEvent("GLYPH_REMOVED", "UpdateGlyphs")
 	self:RegisterEvent("GLYPH_UPDATED", "UpdateGlyphs")
 	self:RegisterEvent("PLAYER_ALIVE")
-	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "RemplirListeTalents")
 	self:RegisterEvent("SPELLS_CHANGED", "FillSpellList")
 	self:RegisterEvent("UNIT_PET", "FillPetSpellList")
@@ -320,7 +314,6 @@ function OvaleData:OnDisable()
 	self:UnregisterEvent("GLYPH_REMOVED")
 	self:UnregisterEvent("GLYPH_UPDATED")
 	self:UnregisterEvent("PLAYER_ALIVE")
-	self:UnregisterEvent("PLAYER_LEVEL_UP")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("SPELLS_CHANGED")
 	self:UnregisterEvent("UNIT_PET")
@@ -331,15 +324,6 @@ function OvaleData:PLAYER_ALIVE(event)
 	self:RemplirListeTalents()
 	self:UpdateGlyphs()
 	self:FillSpellList()
-end
-
-function OvaleData:PLAYER_LEVEL_UP(event, level, ...)
-	level = tonumber(level)
-	if level then
-		self.level = level
-	else
-		self.level = self.level + 1
-	end
 end
 
 function OvaleData:GetRootSpellList()
@@ -520,13 +504,14 @@ function OvaleData:GetGCD(spellId)
 	end
 	
 	-- Default value
-	if self.className == "ROGUE" or
-		(self.className == "MONK" and
+	local class = OvalePaperDoll.class
+	if class == "ROGUE" or
+		(class == "MONK" and
 			(OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") or OvaleStance:IsStance("monk_stance_of_the_fierce_tiger"))) or
-		(self.className == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
+		(class == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
 		return 1.0
-	elseif self.className == "MAGE" or self.className == "WARLOCK" or self.className == "PRIEST" or
-			(self.className == "DRUID" and not OvaleStance:IsStance("druid_bear_form")) then
+	elseif class == "MAGE" or class == "WARLOCK" or class == "PRIEST" or
+			(class == "DRUID" and not OvaleStance:IsStance("druid_bear_form")) then
 		local cd = 1.5 / OvalePaperDoll:GetSpellHasteMultiplier()
 		if (cd<1) then
 			cd = 1
@@ -550,7 +535,7 @@ function OvaleData:GetComputedSpellCD(spellId)
 		-- Les chevaliers de la mort ont des infos fausses sur le CD quand ils n'ont plus les runes
 		-- On force à 1,5s ou 1s en présence impie
 		-- TODO: is it still the case in MoP?
-		if self.className=="DEATHKNIGHT" and actionCooldownDuration==10 and
+		if OvalePaperDoll.class == "DEATHKNIGHT" and actionCooldownDuration == 10 and
 				(not self.spellInfo[spellId] or self.spellInfo[spellId].cd~=10) then
 			local impie = GetSpellInfo(48265)
 			if impie and UnitBuff("player", impie) then

@@ -306,11 +306,11 @@ local options =
 					end,
 					get = function(info)
 						local source = OvaleOptions.db.profile.source
-						local code = OvaleScripts.script[OvaleData.className][source].code
+						local code = OvaleScripts.script[OvalePaperDoll.class][source].code
 						return strgsub(code, "\t", "    ")
 					end,
 					set = function(info, v)
-						OvaleScripts:RegisterScript(OvaleData.className, "custom", L["Script personnalisé"], v)
+						OvaleScripts:RegisterScript(OvalePaperDoll.class, "custom", L["Script personnalisé"], v)
 						OvaleOptions.db.profile.code = v
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
@@ -327,7 +327,7 @@ local options =
 						return L["Ecraser le Script personnalisé préexistant?"]
 					end,
 					func = function()
-						local class = OvaleData.className
+						local class = OvalePaperDoll.class
 						local source = OvaleOptions.db.profile.source
 						local code = OvaleScripts.script[class][source].code
 						OvaleScripts.script[class]["custom"].code = code
@@ -550,7 +550,7 @@ function OvaleOptions:OnInitialize()
 	self.db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
-	OvaleScripts:RegisterScript(OvaleData.className, "custom", L["Script personnalisé"], self.db.profile.code)
+	OvaleScripts:RegisterScript(OvalePaperDoll.class, "custom", L["Script personnalisé"], self.db.profile.code)
 	self:HandleProfileChanges()
 end
 

@@ -13,6 +13,9 @@ local _, Ovale = ...
 OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 
 --<private-static-properties>
+local select = select
+local tonumber = tonumber
+
 local GetMasteryEffect = GetMasteryEffect
 local GetMeleeHaste = GetMeleeHaste
 local GetRangedHaste = GetRangedHaste
@@ -20,12 +23,18 @@ local GetSpellBonusDamage = GetSpellBonusDamage
 local GetSpellBonusHealing = GetSpellBonusHealing
 local UnitAttackPower = UnitAttackPower
 local UnitClass = UnitClass
+local UnitLevel = UnitLevel
 local UnitRangedAttackPower = UnitRangedAttackPower
 local UnitSpellHaste = UnitSpellHaste
 local UnitStat = UnitStat
 --</private-static-properties>
 
 --<public-static-properties>
+-- player's class token
+OvalePaperDoll.class = select(2, UnitClass("player"))
+-- player's level
+OvalePaperDoll.level = UnitLevel("player")
+
 -- primary stats
 OvalePaperDoll.agility = 0
 OvalePaperDoll.intellect = 0
@@ -52,8 +61,11 @@ OvalePaperDoll.spellBonusHealing = 0
 --<public-static-methods>
 function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("MASTERY_UPDATE")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_ALIVE")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "PLAYER_ALIVE")
+	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
+	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
@@ -63,8 +75,11 @@ end
 
 function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("MASTERY_UPDATE")
+	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_LEVEL_UP")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
+	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_SPELL_HASTE")
@@ -73,26 +88,36 @@ function OvalePaperDoll:OnDisable()
 end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
-	if OvaleData.level < 80 then
+	if self.level < 80 then
 		self.masteryEffect = 0
 	else
 		self.masteryEffect = GetMasteryEffect()
 	end
 end
 
-function OvalePaperDoll:PLAYER_ENTERING_WORLD(event)
+function OvalePaperDoll:PLAYER_ALIVE(event)
 	self:MASTERY_UPDATE(event)
 	self:UNIT_ATTACK_POWER(event, "player")
+	self:UNIT_RANGEDDAMAGE(event, "player")
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_SPELL_POWER(event, "player")
 	self:UNIT_STATS(event, "player")
 end
 
+function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
+	self.level = tonumber(level) or UnitLevel("player")
+end
+
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	if unitId ~= "player" then return end
 	local base, posBuff, negBuff = UnitAttackPower(unitId)
 	self.attackPower = base + posBuff + negBuff
+end
+
+function OvalePaperDoll:UNIT_LEVEL(event, unitId)
+	if unitId ~= "player" then return end
+	self.level = UnitLevel(unitId)
 end
 
 function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
@@ -112,7 +137,6 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 	self.spellHaste = UnitSpellHaste(unitId)
 end
 
-local _, className = UnitClass("player")
 local classToSchool = {
 	DEATHKNIGHT = 4, -- Nature
 	DRUID = 4, -- Nature
@@ -136,8 +160,8 @@ local isHealingClass = {
 
 function OvalePaperDoll:UNIT_SPELL_POWER(event, unitId)
 	if unitId ~= "player" then return end
-	self.spellBonusDamage = GetSpellBonusDamage(classToSchool[className])
-	if isHealingClass[className] then
+	self.spellBonusDamage = GetSpellBonusDamage(classToSchool[self.class])
+	if isHealingClass[self.class] then
 		self.spellBonusHealing = GetSpellBonusHealing()
 	else
 		self.spellBonusHealing = self.spellBonusDamage

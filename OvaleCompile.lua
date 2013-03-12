@@ -683,7 +683,7 @@ end
 function OvaleCompile:Compile()
 	local profile = OvaleOptions:GetProfile()
 	local source = profile.source
-	local code = OvaleScripts.script[OvaleData.className][source].code
+	local code = OvaleScripts.script[OvalePaperDoll.class][source].code
 	CompileScript(code)
 	Ovale.refreshNeeded.player = true
 	Ovale:UpdateFrame()

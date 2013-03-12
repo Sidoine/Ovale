@@ -36,7 +36,7 @@ OvaleScripts.script = {
 -- Return a table of script descriptions indexed by source.
 function OvaleScripts:GetDescriptions()
 	local descriptionsTable = {}
-	for src, tbl in pairs(self.script[OvaleData.className]) do
+	for src, tbl in pairs(self.script[OvalePaperDoll.class]) do
 		descriptionsTable[src] = tbl.desc
 	end
 	return descriptionsTable

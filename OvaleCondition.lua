@@ -1768,10 +1768,10 @@ end
 -- if Level(more 33) Spell(tiger_palm)
 
 OvaleCondition.conditions.level = function(condition)
-	local level
 	local target = getTarget(condition.target)
+	local level
 	if target == "player" then
-		level = OvaleData.level
+		level = OvalePaperDoll.level
 	else
 		level = UnitLevel(target)
 	end
@@ -2131,13 +2131,17 @@ end
 --     Texture(ability_rogue_sprint)
 
 OvaleCondition.conditions.relativelevel = function(condition)
-	local difference
+	local difference, level
 	local target = getTarget(condition.target)
-	local targetLevel = UnitLevel(target)
-	if targetLevel < 0 then
+	if target == "player" then
+		level = OvalePaperDoll.level
+	else
+		level = UnitLevel(target)
+	end
+	if level < 0 then
 		difference = 3
 	else
-		difference = targetLevel - OvaleData.level
+		difference = level - OvalePaperDoll.level
 	end
 	return compare(difference, condition[1], condition[2])
 end

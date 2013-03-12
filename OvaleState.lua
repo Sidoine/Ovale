@@ -63,7 +63,7 @@ function OvaleState:UpdatePowerRates()
 		end
 	end
 
-	if OvaleData.className == "MONK" then
+	if OvalePaperDoll.class == "MONK" then
 		-- Way of the Monk (monk)
 		if OvaleEquipement:HasTwoHandedWeapon() then
 			-- Strip off 40% melee attack speed bonus for two-handed weapon.
@@ -81,7 +81,7 @@ function OvaleState:UpdatePowerRates()
 		end
 	end
 
-	if OvaleData.className == "ROGUE" then
+	if OvalePaperDoll.class == "ROGUE" then
 		-- Blade Flurry (combat rogue)
 		if OvaleState:GetAura("player", 13877, true) then
 			self.powerRate.energy = self.powerRate.energy * 0.8
@@ -113,7 +113,7 @@ function OvaleState:Reset()
 	
 	self:UpdatePowerRates()
 	
-	if OvaleData.className == "DEATHKNIGHT" then
+	if OvalePaperDoll.class == "DEATHKNIGHT" then
 		for i=1,6 do
 			self.state.rune[i].type = GetRuneType(i)
 			local start, duration, runeReady = GetRuneCooldown(i)
