@@ -30,9 +30,6 @@ Define(combustion 11129)
 Define(conjure_mana_gem 759)
 Define(counterspell 2139)
   SpellInfo(counterspell duration=6 cd=24 )
-Define(evocation 12051)
-  SpellInfo(evocation duration=6 cd=120 )
-  SpellAddBuff(evocation evocation=1)
 Define(fingers_of_frost_aura 44544)
   SpellInfo(fingers_of_frost_aura duration=15 )
   SpellAddBuff(fingers_of_frost_aura fingers_of_frost_aura=1)
@@ -64,9 +61,6 @@ Define(ignite 12654)
   SpellAddTargetDebuff(ignite ignite=1)
 Define(inferno_blast 108853)
   SpellInfo(inferno_blast cd=8 )
-Define(invokers_energy 116257)
-  SpellInfo(invokers_energy duration=40 )
-  SpellAddBuff(invokers_energy invokers_energy=1)
 Define(living_bomb 44457)
   SpellInfo(living_bomb duration=12 tick=3 )
   SpellAddTargetDebuff(living_bomb living_bomb=1)
@@ -94,9 +88,6 @@ Define(time_warp 35346)
   SpellInfo(time_warp duration=6 cd=15 )
   SpellAddBuff(time_warp time_warp=1)
 Define(water_elemental 63859)
-Define(water_elemental_freeze 33395)
-  SpellInfo(water_elemental_freeze duration=8 cd=25 )
-  SpellAddBuff(water_elemental_freeze water_elemental_freeze=1)
 AddIcon mastery=1 help=main
 {
 	if not InCombat() 
@@ -106,27 +97,27 @@ AddIcon mastery=1 help=main
 		Spell(rune_of_power)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
+	if BuffRemains(rune_of_power) <CastTime(rune_of_power) Spell(rune_of_power)
+	if SpellCooldown(arcane_power) ==0 and BuffRemains(rune_of_power) <BuffDuration(arcane_power) Spell(rune_of_power)
 	if BuffPresent(alter_time) and BuffRemains(alter_time) <2 Spell(arcane_barrage)
-	if BuffPresent(alter_time) or BuffStacks(arcane_missiles_aura) ==2 Spell(arcane_missiles)
-	if BuffRemains(rune_of_power) <=2 and BuffExpires(alter_time) Spell(rune_of_power)
+	if BuffPresent(alter_time) Spell(arcane_missiles)
+	if BuffPresent(alter_time) Spell(arcane_blast)
+	if {BuffStacks(arcane_missiles_aura) ==2 and SpellCooldown(arcane_power) >0 } or {BuffStacks(arcane_charge) >=4 and SpellCooldown(arcane_power) >8 } Spell(arcane_missiles)
 	if {not target.DebuffPresent(living_bomb) or target.DebuffRemains(living_bomb) <TickTime(living_bomb) } and target.DeadIn() >TickTime(living_bomb) *3 Spell(living_bomb)
-	if ManaPercent() >92 or BuffPresent(alter_time) or BuffRemains(arcane_charge) <3 Spell(arcane_blast)
-	if BuffStacks(arcane_missiles_aura) and {SpellCooldown(alter_time_activate) >4 or target.DeadIn() <10 } Spell(arcane_missiles)
-	if {SpellCooldown(mana_gem) <=9 and not ManaPercent() <=80 } or target.DeadIn() <30 Spell(arcane_blast)
-	if BuffExpires(alter_time) Spell(scorch)
+	if BuffStacks(arcane_charge) >=4 and ManaPercent() <95 Spell(arcane_barrage)
+	Spell(arcane_blast)
 }
 AddIcon mastery=1 help=offgcd
 {
 	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
 	cancel.Spell(alter_time)
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
-	if BuffExpires(alter_time) and BuffPresent(arcane_power) and BuffStacks(arcane_missiles_aura) ==2 and BuffStacks(arcane_charge) >3 and BuffRemains(rune_of_power) >6 Spell(alter_time)
 	if ManaPercent() <80 and BuffExpires(alter_time) Spell(mana_gem)
+	if BuffExpires(alter_time) and BuffPresent(arcane_power) Spell(alter_time)
 }
 AddIcon mastery=1 help=moving
 {
-	if BuffPresent(arcane_charge) and BuffRemains(arcane_charge) <=2 Spell(arcane_barrage)
-	Spell(scorch)
+	Spell(arcane_barrage)
 	Spell(fire_blast)
 	Spell(ice_lance)
 }
@@ -136,13 +127,11 @@ AddIcon mastery=1 help=cd
 	{
 		Spell(mirror_image)
 	}
-	if target.DeadIn() <18 Spell(arcane_power)
-	if target.DeadIn() <18 Spell(berserking)
-	if BuffExpires(alter_time)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
-	if SpellCooldown(alter_time_activate) >45 or target.DeadIn() <25 and BuffRemains(rune_of_power) >20  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(mirror_image)
-	if BuffRemains(rune_of_power) >15 and BuffExpires(alter_time) and BuffStacks(arcane_charge) >1 Spell(arcane_power)
-	if BuffRemains(rune_of_power) >10 and BuffExpires(alter_time) and BuffStacks(arcane_charge) >2 Spell(berserking)
+	if {BuffRemains(rune_of_power) >=BuffDuration(arcane_power) and BuffStacks(arcane_missiles_aura) ==2 and BuffStacks(arcane_charge) >2 } or target.DeadIn() <BuffDuration(arcane_power) +5 Spell(arcane_power)
+	if BuffExpires(alter_time) and {BuffPresent(arcane_power) or target.DeadIn() <18 } Spell(berserking)
+	if BuffExpires(alter_time)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
+	if {SpellCooldown(alter_time_activate) >45 or target.DeadIn() <25 } and BuffRemains(rune_of_power) >20  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 }
 AddIcon mastery=2 help=main
 {
@@ -150,10 +139,12 @@ AddIcon mastery=2 help=main
 	{
 		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
 		Spell(molten_armor)
+		Spell(rune_of_power)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
-	if BuffStacks(pyroblast_aura) and {SpellCooldown(alter_time_activate) >4 or BuffStacks(heating_up) } Spell(pyroblast)
-	if BuffPresent(presence_of_mind) and SpellCooldown(alter_time_activate) >4 Spell(pyroblast)
+	if BuffRemains(rune_of_power) <CastTime(rune_of_power) and BuffExpires(alter_time) Spell(rune_of_power)
+	if SpellCooldown(alter_time_activate) ==0 and BuffRemains(rune_of_power) <6 Spell(rune_of_power)
+	if BuffStacks(pyroblast_aura) or BuffPresent(presence_of_mind) Spell(pyroblast)
 	if BuffStacks(heating_up) and BuffExpires(pyroblast_aura) Spell(inferno_blast)
 	if {not target.DebuffPresent(living_bomb) or target.DebuffRemains(living_bomb) <TickTime(living_bomb) } and target.DeadIn() >TickTime(living_bomb) *3 Spell(living_bomb)
 	if not target.DebuffPresent(pyroblast_aura) Spell(pyroblast)
@@ -166,29 +157,22 @@ AddIcon mastery=2 help=offgcd
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
 	if target.DeadIn() <22 Spell(combustion)
 	if LastSpellDamage(ignite) >={{CritDamage(fireball) +CritDamage(inferno_blast) +Damage(pyroblast) } *{Mastery() /100} *0.5 } and target.DebuffPresent(pyroblast_aura) Spell(combustion)
-	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
-	if BuffExpires(alter_time) and BuffStacks(pyroblast_aura) and BuffRemains(invokers_energy) >6 Spell(alter_time)
+	if BuffExpires(alter_time) and BuffStacks(pyroblast_aura) Spell(alter_time)
 }
 AddIcon mastery=2 help=moving
 {
-	Spell(inferno_blast)
-	Spell(ice_lance)
+	Spell(scorch)
 }
 AddIcon mastery=2 help=cd
 {
 	if not InCombat() 
 	{
-		Spell(evocation)
 		Spell(mirror_image)
 	}
-	if BuffRemains(invokers_energy) >10 and BuffExpires(alter_time) and ManaPercent() >28 Spell(berserking)
-	if BuffExpires(invokers_energy) and BuffExpires(alter_time) Spell(evocation)
-	if target.DeadIn() <18 Spell(berserking)
-	if BuffExpires(alter_time)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
-	if SpellCooldown(alter_time_activate) >45 or target.DeadIn() <25 and BuffRemains(invokers_energy) >20  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
-	if ManaPercent() <10 and target.DeadIn() >=30 Spell(evocation)
-	Spell(mirror_image)
+	if BuffExpires(alter_time) and target.DeadIn() <18 Spell(berserking)
+	if BuffExpires(alter_time) Spell(berserking)
 	if BuffExpires(alter_time) Spell(presence_of_mind)
+	if SpellCooldown(alter_time) >30 or target.DeadIn() <15 Spell(presence_of_mind)
 }
 AddIcon mastery=3 help=main
 {
@@ -196,18 +180,17 @@ AddIcon mastery=3 help=main
 	{
 		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
 		if BuffExpires(frost_armor) Spell(frost_armor)
+		Spell(rune_of_power)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
+	if BuffRemains(rune_of_power) <CastTime(rune_of_power) and BuffExpires(alter_time) Spell(rune_of_power)
+	if SpellCooldown(icy_veins) ==0 and BuffRemains(rune_of_power) <20 Spell(rune_of_power)
+	if not BuffStacks(fingers_of_frost_aura) Spell(frozen_orb)
 	if BuffPresent(alter_time) and BuffPresent(brain_freeze) Spell(frostfire_bolt)
-	if BuffPresent(alter_time) and BuffStacks(fingers_of_frost_aura) Spell(ice_lance)
-	if BuffPresent(alter_time) and BuffPresent(presence_of_mind) Spell(frostbolt)
-	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 and SpellCooldown(icy_veins) <GCD() and BuffRemains(invokers_energy) >20 and BuffExpires(alter_time) Spell(frozen_orb)
-	if BuffPresent(brain_freeze) and {{target.DebuffPresent(frost_bomb) and target.DebuffRemains(frost_bomb) <2 } or BuffRemains(brain_freeze) <2 } Spell(frostfire_bolt)
-	if BuffStacks(fingers_of_frost_aura) and BuffRemains(fingers_of_frost_aura) <2 Spell(ice_lance)
+	if BuffPresent(alter_time) and BuffPresent(fingers_of_frost_aura) Spell(ice_lance)
 	if target.DebuffStacks(frostbolt) <3 Spell(frostbolt)
-	if BuffStacks(fingers_of_frost_aura) Spell(ice_lance)
-	if BuffPresent(brain_freeze) and {BuffPresent(alter_time) or SpellCooldown(alter_time_activate) >4 } Spell(frostfire_bolt)
-	if target.DeadIn() >=4 and BuffStacks(fingers_of_frost_aura) <2 Spell(frozen_orb)
+	if BuffStacks(brain_freeze) and SpellCooldown(icy_veins) >2 Spell(frostfire_bolt)
+	if BuffStacks(fingers_of_frost_aura) and SpellCooldown(icy_veins) >2 Spell(ice_lance)
 	Spell(frostbolt)
 }
 AddIcon mastery=3 help=offgcd
@@ -219,11 +202,8 @@ AddIcon mastery=3 help=offgcd
 	if target.IsInterruptible() if target.IsInterruptible() Spell(counterspell)
 	cancel.Spell(alter_time)
 	if target.HealthPercent() <25 or TimeInCombat() >5 Spell(time_warp)
-	if BuffExpires(alter_time) and BuffStacks(fingers_of_frost_aura) <2 Spell(water_elemental_freeze)
-	if not target.DebuffPresent(frost_bomb) and target.DeadIn() >CastTime(frost_bomb) +TickTime(frost_bomb) Spell(frost_bomb)
-	if BuffExpires(alter_time) and BuffPresent(brain_freeze) and BuffStacks(fingers_of_frost_aura) and BuffRemains(invokers_energy) >6 Spell(alter_time)
-	if BuffExpires(alter_time) and BuffPresent(brain_freeze) and BuffStacks(fingers_of_frost_aura) Spell(alter_time)
-	if ManaPercent() <84 and BuffExpires(alter_time) Spell(mana_gem)
+	if BuffExpires(alter_time) and BuffPresent(icy_veins) Spell(alter_time)
+	if target.DeadIn() >CastTime(frost_bomb) +TickTime(frost_bomb) Spell(frost_bomb)
 }
 AddIcon mastery=3 help=moving
 {
@@ -234,18 +214,12 @@ AddIcon mastery=3 help=cd
 {
 	if not InCombat() 
 	{
-		Spell(evocation)
 		Spell(mirror_image)
 	}
-	if BuffExpires(alter_time) Spell(presence_of_mind)
-	if target.DeadIn() <22 Spell(icy_veins)
-	if target.DeadIn() <18 Spell(berserking)
-	if ArmorSetParts(T14 more 4) and BuffRemains(invokers_energy) >20 and BuffExpires(alter_time) Spell(icy_veins)
-	if not ArmorSetParts(T14 more 4) and target.DebuffPresent(frozen_orb) Spell(icy_veins)
-	if target.DebuffPresent(frozen_orb) and BuffExpires(alter_time) Spell(icy_veins)
 	Spell(mirror_image)
-	if BuffExpires(invokers_energy) and BuffExpires(alter_time) Spell(evocation)
-	if BuffRemains(invokers_energy) >10 and BuffExpires(alter_time) and ManaPercent() >28 Spell(berserking)
+	if {target.DebuffStacks(frostbolt) >=3 and {BuffStacks(brain_freeze) or BuffStacks(fingers_of_frost_aura) } } or target.DeadIn() <22 Spell(icy_veins)
+	if BuffPresent(icy_veins) or target.DeadIn() <18 Spell(berserking)
+	if BuffPresent(icy_veins) or SpellCooldown(icy_veins) >15 or target.DeadIn() <15 Spell(presence_of_mind)
 }
 ]]
 

@@ -45,7 +45,7 @@ Define(natures_swiftness 132158)
   SpellInfo(natures_swiftness cd=60 )
   SpellAddBuff(natures_swiftness natures_swiftness=1)
 Define(natures_vigil 124974)
-  SpellInfo(natures_vigil duration=30 cd=180 )
+  SpellInfo(natures_vigil duration=30 cd=90 )
   SpellAddBuff(natures_vigil natures_vigil=1)
 Define(omen_of_clarity 16864)
   SpellAddBuff(omen_of_clarity omen_of_clarity=1)
@@ -149,8 +149,7 @@ AddIcon mastery=1 help=cd
 	if BuffPresent(celestial_alignment) or SpellCooldown(celestial_alignment) >30  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if TalentPoints(incarnation_talent) and {BuffPresent(lunar_eclipse) or BuffPresent(solar_eclipse) } Spell(incarnation)
 	if {not BuffPresent(lunar_eclipse) and not BuffPresent(solar_eclipse) } and {BuffPresent(chosen_of_elune) or not TalentPoints(incarnation_talent) or SpellCooldown(incarnation) >10 } Spell(celestial_alignment)
-	if PTR() ==1 and TalentPoints(natures_vigil_talent) Spell(natures_vigil)
-	if not PTR() ==1 and TalentPoints(natures_vigil_talent) and {{TalentPoints(incarnation_talent) and BuffPresent(chosen_of_elune) } or {not TalentPoints(incarnation_talent) and BuffPresent(celestial_alignment) } } Spell(natures_vigil)
+	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 AddIcon mastery=2 help=main
 {
@@ -273,4 +272,4 @@ AddIcon mastery=2 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("DRUID", "Ovale", "[5.1] Ovale: Balance, Feral", code)
+OvaleScripts:RegisterScript("DRUID", "Ovale", "[5.2] Ovale: Balance, Feral", code)

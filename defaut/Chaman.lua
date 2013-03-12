@@ -25,7 +25,7 @@ Define(earthquake 61882)
 Define(elemental_blast 117014)
   SpellInfo(elemental_blast cd=12 )
 Define(elemental_mastery 16166)
-  SpellInfo(elemental_mastery duration=20 cd=120 )
+  SpellInfo(elemental_mastery duration=20 cd=90 )
   SpellAddBuff(elemental_mastery elemental_mastery=1)
 Define(feral_spirit 51533)
   SpellInfo(feral_spirit duration=30 cd=120 )
@@ -34,7 +34,7 @@ Define(fire_elemental_totem 2894)
 Define(fire_nova 1535)
   SpellInfo(fire_nova cd=4 )
 Define(flame_shock 8050)
-  SpellInfo(flame_shock duration=24 tick=3 sharedcd=shock cd=6 )
+  SpellInfo(flame_shock duration=30 tick=3 sharedcd=shock cd=6 )
   SpellAddTargetDebuff(flame_shock flame_shock=1)
 Define(flametongue_weapon 8024)
 Define(heroism 32182)
@@ -46,8 +46,8 @@ Define(lava_burst 51505)
 Define(lava_lash 60103)
   SpellInfo(lava_lash cd=10 )
 Define(lava_surge 77756)
-Define(lifeblood 55503)
-  SpellInfo(lifeblood cd=120 )
+Define(lifeblood 138724)
+  SpellInfo(lifeblood mana=-9935 )
   SpellAddBuff(lifeblood lifeblood=1)
 Define(lightning_bolt 403)
 Define(lightning_shield 324)
@@ -71,6 +71,8 @@ Define(stormlash_totem 120668)
 Define(stormstrike 17364)
   SpellInfo(stormstrike duration=15 sharedcd=strike cd=8 )
   SpellAddBuff(stormstrike stormstrike=1)
+Define(strike 138537)
+  SpellInfo(strike energy=40 )
 Define(thunderstorm 51490)
   SpellInfo(thunderstorm duration=5 cd=45 )
   SpellAddBuff(thunderstorm thunderstorm=1)
@@ -101,7 +103,7 @@ AddIcon mastery=1 help=main
 	if BuffStacks(lightning_shield) ==7 Spell(earth_shock)
 	if BuffStacks(lightning_shield) >3 and target.DebuffRemains(flame_shock) >SpellCooldown(earth_shock) and target.DebuffRemains(flame_shock) <SpellCooldown(earth_shock) +TickTime(flame_shock) Spell(earth_shock)
 	if TimeInCombat() >60 and target.DebuffRemains(flame_shock) <=BuffDuration(ascendance) and SpellCooldown(ascendance) +BuffDuration(ascendance) <BuffDuration(flame_shock) Spell(flame_shock)
-	if SpellCooldown(fire_elemental_totem) >15 and not TotemPresent(fire) Spell(searing_totem)
+	if SpellCooldown(fire_elemental_totem) >20 and not TotemPresent(fire) Spell(searing_totem)
 	Spell(lightning_bolt)
 
 }
@@ -113,6 +115,7 @@ AddIcon mastery=1 help=moving
 {
 	
 	if not Glyph(101052) Spell(unleash_elements)
+	if not Glyph(101052) and target.DebuffRemains(flame_shock) >SpellCooldown(earth_shock) Spell(earth_shock)
 
 }
 AddIcon mastery=1 help=aoe
@@ -140,8 +143,8 @@ AddIcon mastery=1 help=cd
 	
 	if {{SpellCooldown(ascendance) >10 or Level() <87 } and SpellCooldown(fire_elemental_totem) >10 } or BuffPresent(ascendance) or BuffPresent(bloodlust any=1) or TotemPresent(fire)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if TalentPoints(ancestral_swiftness_talent) and not BuffPresent(ascendance) Spell(ancestral_swiftness)
-	if ArmorSetParts(T14 more 4) and {not BuffPresent(bloodlust any=1) or target.DeadIn() <25 } Spell(spiritwalkers_grace)
-	if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=50 Spell(earth_elemental_totem)
+	if BuffPresent(ascendance) Spell(spiritwalkers_grace)
+	if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=60 Spell(earth_elemental_totem)
 	if Glyph(101052) and {{TalentPoints(elemental_blast_talent) and SpellCooldown(elemental_blast) ==0 } or {SpellCooldown(lava_burst) ==0 and not BuffStacks(lava_surge) } } or {BuffDuration(raid_movement) >=SpellCooldown(unleash_elements) +SpellCooldown(earth_shock) } Spell(spiritwalkers_grace)
 
 }
@@ -163,11 +166,11 @@ AddIcon mastery=2 help=main
 	if BuffPresent(unleash_flame) and not target.DebuffPresent(flame_shock) Spell(flame_shock)
 	Spell(lava_lash)
 	if ArmorSetParts(T15 more 2) ==1 and BuffStacks(maelstrom_weapon) >=4 and not BuffPresent(ascendance) Spell(lightning_bolt)
-	if not Glyph(55447) and {BuffPresent(unleash_flame) or {not BuffPresent(unleash_flame) and not target.DebuffPresent(flame_shock) and SpellCooldown(unleash_elements) >5 } } Spell(flame_shock)
+	if BuffPresent(unleash_flame) or {not BuffPresent(unleash_flame) and not target.DebuffPresent(flame_shock) and SpellCooldown(unleash_elements) >5 } Spell(flame_shock)
 	Spell(unleash_elements)
 	if BuffStacks(maelstrom_weapon) >=3 and not BuffPresent(ascendance) Spell(lightning_bolt)
 	if BuffPresent(ancestral_swiftness) Spell(lightning_bolt)
-	if Glyph(55447) and BuffPresent(unleash_flame) and target.DebuffRemains(flame_shock) <=3 Spell(flame_shock)
+	if BuffPresent(unleash_flame) and target.DebuffRemains(flame_shock) <=3 Spell(flame_shock)
 	Spell(earth_shock)
 	if BuffStacks(maelstrom_weapon) >1 and not BuffPresent(ascendance) Spell(lightning_bolt)
 

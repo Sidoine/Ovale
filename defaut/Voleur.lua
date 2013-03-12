@@ -31,7 +31,7 @@ Define(hemorrhage 16511)
   SpellInfo(hemorrhage energy=30 combo=1 buff_combo=shadow_blades )
 Define(honor_among_thieves 51701)
 Define(kick 1766)
-  SpellInfo(kick duration=5 energy=10 cd=15 )
+  SpellInfo(kick duration=5 cd=15 )
 Define(killing_spree 51690)
   SpellInfo(killing_spree duration=3 cd=120 )
   SpellAddBuff(killing_spree killing_spree=1)
@@ -67,7 +67,7 @@ Define(tricks_of_the_trade 57933)
   SpellInfo(tricks_of_the_trade duration=6 )
   SpellAddBuff(tricks_of_the_trade tricks_of_the_trade=1)
 Define(vanish 1856)
-  SpellInfo(vanish cd=180 )
+  SpellInfo(vanish cd=120 )
   SpellAddBuff(vanish vanish=1)
 Define(vendetta 79140)
   SpellInfo(vendetta duration=20 cd=120 )
@@ -76,7 +76,6 @@ Define(weakened_armor 113746)
   SpellInfo(weakened_armor duration=30 )
   SpellAddBuff(weakened_armor weakened_armor=1)
 Define(anticipation_talent 18)
-Define(preparation_talent 10)
 Define(shadow_focus_talent 3)
 Define(subterfuge_talent 2)
 AddIcon mastery=1 help=main
@@ -107,7 +106,7 @@ AddIcon mastery=1 help=offgcd
 }
 AddIcon mastery=1 help=cd
 {
-	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
+	if not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(berserking)
 	if TimeInCombat() >10 and not BuffPresent(stealthed) and not BuffPresent(shadow_blades) Spell(vanish)
@@ -149,7 +148,7 @@ AddIcon mastery=2 help=offgcd
 }
 AddIcon mastery=2 help=cd
 {
-	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
+	if not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
 	if TimeInCombat() ==0 or BuffPresent(shadow_blades)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if TimeInCombat() ==0 or BuffPresent(shadow_blades) Spell(berserking)
 	if TimeInCombat() >10 and {ComboPoints() <3 or {TalentPoints(anticipation_talent) and BuffStacks(anticipation) <3 } or {BuffExpires(shadow_blades) and {ComboPoints() <4 or {TalentPoints(anticipation_talent) and BuffStacks(anticipation) <4 } } } } and {{TalentPoints(shadow_focus_talent) and BuffExpires(adrenaline_rush) and Energy() <20 } or {TalentPoints(subterfuge_talent) and Energy() >=90 } or {not TalentPoints(shadow_focus_talent) and not TalentPoints(subterfuge_talent) and Energy() >=60 } } Spell(vanish)
@@ -192,7 +191,7 @@ AddIcon mastery=3 help=offgcd
 }
 AddIcon mastery=3 help=cd
 {
-	if TalentPoints(preparation_talent) and not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
+	if not BuffPresent(vanish) and SpellCooldown(vanish) >60 Spell(preparation)
 	Spell(shadow_blades)
 	if BuffPresent(shadow_dance)  { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	if BuffPresent(shadow_dance) Spell(berserking)

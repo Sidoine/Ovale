@@ -94,7 +94,6 @@ AddIcon mastery=1 help=main
 	}
 	if BuffStacks(pet_frenzy any=1)>4 Spell(focus_fire)
 	if not target.DebuffPresent(serpent_sting_aura) Spell(serpent_sting)
-	if SpellUsable(fervor) and not target.DebuffPresent(fervor) and Focus() <=65 Spell(fervor)
 	if target.HealthPercent(less 20) Spell(kill_shot)
 	Spell(kill_command)
 	if SpellUsable(dire_beast) and Focus() <=90 Spell(dire_beast)
@@ -114,6 +113,7 @@ AddIcon mastery=1 help=offgcd
 		unless Stance(1) Spell(aspect_of_the_hawk)
 	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
+	if SpellUsable(fervor) and not target.DebuffPresent(fervor) and Focus() <=65 Spell(fervor)
 	if Focus() >60 and not BuffPresent(beast_within) Spell(bestial_wrath)
 	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) or target.DeadIn() <=25 Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
@@ -141,7 +141,6 @@ AddIcon mastery=2 help=main
 	}
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(blink_strike) Spell(blink_strike)
-	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	if SpellUsable(dire_beast) Spell(dire_beast)
 	if target.HealthPercent() >80 
 	{
@@ -171,6 +170,7 @@ AddIcon mastery=2 help=offgcd
 	}
 	unless Stance(1) Spell(aspect_of_the_hawk)
 	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
+	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) or target.DeadIn() <=25 Spell(stampede)
 	if SpellUsable(a_murder_of_crows) and not target.DebuffPresent(a_murder_of_crows) Spell(a_murder_of_crows)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
@@ -209,7 +209,6 @@ AddIcon mastery=3 help=main
 	if BuffStacks(thrill_of_the_hunt) and target.DebuffRemains(serpent_sting_aura) <2 Spell(multi_shot)
 	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
 	if SpellUsable(dire_beast) Spell(dire_beast)
-	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 	if target.DebuffRemains(serpent_sting_aura) <6 Spell(cobra_shot)
 	if Focus() >=67 Spell(arcane_shot)
 	Spell(cobra_shot)
@@ -225,6 +224,7 @@ AddIcon mastery=3 help=offgcd
 	if SpellUsable(lynx_rush) and not target.DebuffPresent(lynx_rush) Spell(lynx_rush)
 	if SpellUsable(glaive_toss) Spell(glaive_toss)
 	if BuffPresent(rapid_fire) or BuffStacks(bloodlust any=1) or target.DeadIn() <=25 Spell(stampede)
+	if SpellUsable(fervor) and Focus() <=50 Spell(fervor)
 }
 AddIcon mastery=3 help=aoe
 {
