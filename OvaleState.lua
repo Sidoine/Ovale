@@ -140,6 +140,14 @@ function OvaleState:Reset()
 	end
 end
 
+-- Apply the effects of spells that are being cast or are in flight, allowing us to
+-- ignore lag or missile travel time.
+function OvaleState:ApplySpells()
+	for spellId, _, startCast, endCast, nextCast, nocd, target in OvaleFuture:InFlightSpells(self.maintenant) do
+		OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd, target)
+	end
+end
+
 -- Cast a spell in the simulator
 -- spellId : the spell id
 -- startCast : temps du cast

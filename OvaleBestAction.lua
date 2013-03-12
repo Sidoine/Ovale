@@ -77,7 +77,7 @@ end
 --<public-static-methods>
 function OvaleBestAction:StartNewAction()
 	OvaleState:Reset()
-	OvaleFuture:Apply()
+	OvaleState:ApplySpells()
 end
 
 function OvaleBestAction:GetActionInfo(element)
