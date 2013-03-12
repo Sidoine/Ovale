@@ -286,10 +286,10 @@ local function testValue(comparator, limit, value, atTime, rate)
 			else
 				Ovale:Error("Unknown operator "..comparator)
 			end
-		elseif comparator == "more" then
-			return (limit-value)/rate + atTime
-		elseif comparator == "less" then
-			return 0, (limit-value)/rate + atTime
+		elseif (comparator == "more" and rate > 0) or (comparator == "less" and rate < 0) then
+			return (limit - value) / rate + atTime
+		elseif (comparator == "more" and rate < 0) or (comparator == "less" and rate > 0) then
+			return 0, (limit - value) / rate + atTime
 		else
 			Ovale:Error("Unknown operator "..comparator)
 		end
