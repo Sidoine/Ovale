@@ -62,10 +62,6 @@ function Ovale:debugPrint(flag, ...)
 	end
 end
 
-function Ovale:Debug()
-	self:Print(OvaleCompile:DebugNode(OvaleCompile.masterNodes[1]))
-end
-
 -- Print the auras matching the filter on the target in alphabetical order.
 function Ovale:DebugListAura(target, filter)
 	local i = 1

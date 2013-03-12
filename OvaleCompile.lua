@@ -689,6 +689,10 @@ function OvaleCompile:Compile()
 	Ovale:UpdateFrame()
 end
 
+function OvaleCompile:Debug()
+	Ovale:Print(self:DebugNode(self.masterNodes[1]))
+end
+
 function OvaleCompile:DebugNode(node)
 	local text
 	if (not node) then
