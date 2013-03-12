@@ -146,7 +146,9 @@ do
 	end
 	
 	local function OnUpdate(self)
-		local now = GetTime()
+		-- Update current time.
+		Ovale.now = GetTime()
+
 		local profile = OvaleOptions:GetProfile()
 		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
 		

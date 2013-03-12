@@ -103,14 +103,14 @@ end
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
 	if srcName == UnitName("player") then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
-			self:MeleeSwing(OvaleState.maintenant)
+			self:MeleeSwing(Ovale.now)
 		end
 	end
 end
 
 function OvaleSwing:UNIT_SPELLCAST_START(event, unit, spell)
 	if delayspells[spell] and unit=="player" then
-		self.startdelay = GetTime()
+		self.startdelay = Ovale.now
 		local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spell)
 		self.delay = castTime
 	end
@@ -125,7 +125,7 @@ end
 function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
 	if unit == "player" then
 		if resetspells[spell] then
-			self:MeleeSwing(OvaleState.maintenant)
+			self:MeleeSwing(Ovale.now)
 		end
 		if delayspells[spell] and self.startdelay then
 			self.delay = GetTime() - self.startdelay

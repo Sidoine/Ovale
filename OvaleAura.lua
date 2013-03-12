@@ -89,12 +89,12 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 	local aura
 	if mine then
 		if not auraList[spellId].mine then
-			auraList[spellId].mine = { gain = OvaleState.maintenant }
+			auraList[spellId].mine = { gain = Ovale.now }
 		end
 		aura = auraList[spellId].mine
 	else
 		if not auraList[spellId].other then
-			auraList[spellId].other = { gain = OvaleState.maintenant }
+			auraList[spellId].other = { gain = Ovale.now }
 		end
 		aura = auraList[spellId].other
 	end

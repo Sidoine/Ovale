@@ -44,7 +44,7 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 --<public-static-methods>
 function OvaleState:StartNewFrame()
-	self.maintenant = GetTime()
+	self.maintenant = Ovale.now
 	self.gcd = OvaleData:GetGCD()
 end
 

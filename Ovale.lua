@@ -22,6 +22,8 @@ local damageMeterModules = {}
 
 --<public-static-properties>
 Ovale.L = L
+--The current time, updated once per frame refresh.
+Ovale.now = GetTime()
 --The table of check boxes definition
 Ovale.casesACocher = {}
 --the frame with the icons
@@ -134,7 +136,7 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.enCombat = true
 	self.score = 0
 	self.maxScore = 0
-	self.combatStartTime = OvaleState.maintenant
+	self.combatStartTime = Ovale.now
 	self:UpdateVisibility()
 end
 
