@@ -21,8 +21,15 @@ Define(curse_of_the_elements 1490)
 Define(dark_intent 109773)
   SpellInfo(dark_intent duration=3600 )
   SpellAddBuff(dark_intent dark_intent=1)
-Define(dark_soul 77801)
-  SpellInfo(dark_soul cd=120 )
+Define(dark_soul_instability 113858)
+  SpellInfo(dark_soul_instability duration=20 cd=120 )
+  SpellAddBuff(dark_soul_instability dark_soul_instability=1)
+Define(dark_soul_knowledge 113861)
+  SpellInfo(dark_soul_knowledge duration=20 cd=120 )
+  SpellAddBuff(dark_soul_knowledge dark_soul_knowledge=1)
+Define(dark_soul_misery 113860)
+  SpellInfo(dark_soul_misery duration=20 cd=120 )
+  SpellAddBuff(dark_soul_misery dark_soul_misery=1)
 Define(doom 603)
   SpellInfo(doom duration=60 demonicfury=60 tick=15 stance=1)
   SpellAddTargetDebuff(doom doom=1)
@@ -129,20 +136,20 @@ AddIcon mastery=1 help=main
 	if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
 	if BuffPresent(soulburn) Spell(soul_swap)
 	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 +TickTime(haunt) and SoulShards() and target.HealthPercent() <=20 Spell(haunt)
-	if BuffExpires(dark_soul) and BuffExpires(bloodlust any=1) and ManaPercent() <10 and target.HealthPercent() <=20 Spell(life_tap)
+	if BuffExpires(dark_soul_misery) and BuffExpires(bloodlust any=1) and ManaPercent() <10 and target.HealthPercent() <=20 Spell(life_tap)
 	if target.HealthPercent() <=20 Spell(drain_soul)
 	if target.HealthPercent() <=20 Spell(life_tap)
-	if target.DebuffRemains(agony) <GCD() and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul) Spell(agony)
-	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 +TickTime(haunt) and {SoulShards() >2 or SpellCooldown(dark_soul) >35 or {SoulShards() >1 and SpellCooldown(dark_soul) <CastTime(haunt) } } and SoulShards() Spell(haunt)
-	if target.DebuffRemains(corruption) <GCD() and target.DebuffRemains(corruption) <SpellCooldown(dark_soul) Spell(corruption)
-	if target.DebuffRemains(unstable_affliction) <GCD() +CastTime(unstable_affliction) and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul) Spell(unstable_affliction)
-	if target.TicksRemain(agony) <=2 and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul) Spell(agony)
-	if target.TicksRemain(corruption) <=2 and target.DebuffRemains(corruption) <SpellCooldown(dark_soul) Spell(corruption)
-	if {target.DebuffRemains(unstable_affliction) -CastTime(unstable_affliction) } /{BuffDuration(unstable_affliction) /Ticks(unstable_affliction) } <=2 and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul) Spell(unstable_affliction)
-	if SpellPower() >LastSpellSpellPower(agony) and target.TicksRemain(agony) <Ticks(agony) /2 and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul) Spell(agony)
-	if SpellPower() >LastSpellSpellPower(corruption) and target.TicksRemain(corruption) <Ticks(corruption) /2 and target.DebuffRemains(corruption) <SpellCooldown(dark_soul) Spell(corruption)
-	if SpellPower() >LastSpellSpellPower(unstable_affliction) and target.TicksRemain(unstable_affliction) <Ticks(unstable_affliction) /2 and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul) Spell(unstable_affliction)
-	if BuffExpires(dark_soul) and BuffExpires(bloodlust any=1) and ManaPercent() <50 Spell(life_tap)
+	if target.DebuffRemains(agony) <GCD() and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul_misery) Spell(agony)
+	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 +TickTime(haunt) and {SoulShards() >2 or SpellCooldown(dark_soul_misery) >35 or {SoulShards() >1 and SpellCooldown(dark_soul_misery) <CastTime(haunt) } } and SoulShards() Spell(haunt)
+	if target.DebuffRemains(corruption) <GCD() and target.DebuffRemains(corruption) <SpellCooldown(dark_soul_misery) Spell(corruption)
+	if target.DebuffRemains(unstable_affliction) <GCD() +CastTime(unstable_affliction) and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul_misery) Spell(unstable_affliction)
+	if target.TicksRemain(agony) <=2 and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul_misery) Spell(agony)
+	if target.TicksRemain(corruption) <=2 and target.DebuffRemains(corruption) <SpellCooldown(dark_soul_misery) Spell(corruption)
+	if {target.DebuffRemains(unstable_affliction) -CastTime(unstable_affliction) } /{BuffDuration(unstable_affliction) /Ticks(unstable_affliction) } <=2 and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul_misery) Spell(unstable_affliction)
+	if SpellPower() >LastSpellSpellPower(agony) and target.TicksRemain(agony) <Ticks(agony) /2 and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul_misery) Spell(agony)
+	if SpellPower() >LastSpellSpellPower(corruption) and target.TicksRemain(corruption) <Ticks(corruption) /2 and target.DebuffRemains(corruption) <SpellCooldown(dark_soul_misery) Spell(corruption)
+	if SpellPower() >LastSpellSpellPower(unstable_affliction) and target.TicksRemain(unstable_affliction) <Ticks(unstable_affliction) /2 and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul_misery) Spell(unstable_affliction)
+	if BuffExpires(dark_soul_misery) and BuffExpires(bloodlust any=1) and ManaPercent() <50 Spell(life_tap)
 	Spell(malefic_grasp)
 	Spell(life_tap)
 }
@@ -152,7 +159,7 @@ AddIcon mastery=1 help=offgcd
 	{
 		if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	}
-	if BuffPresent(dark_soul) and {target.TicksRemain(agony) <=Ticks(agony) /2 or target.TicksRemain(corruption) <=Ticks(corruption) /2 or target.TicksRemain(unstable_affliction) <=Ticks(unstable_affliction) /2 } and SoulShards() Spell(soulburn)
+	if BuffPresent(dark_soul_misery) and {target.TicksRemain(agony) <=Ticks(agony) /2 or target.TicksRemain(corruption) <=Ticks(corruption) /2 or target.TicksRemain(unstable_affliction) <=Ticks(unstable_affliction) /2 } and SoulShards() Spell(soulburn)
 	if {target.TicksRemain(unstable_affliction) <=1 or target.TicksRemain(corruption) <=1 or target.TicksRemain(agony) <=1 } and SoulShards() and target.HealthPercent() <=20 Spell(soulburn)
 	if SpellPower() >LastSpellSpellPower(unstable_affliction) and target.TicksRemain(unstable_affliction) <=Ticks(unstable_affliction) /2 and SoulShards() and target.HealthPercent() <=20 Spell(soulburn)
 }
@@ -177,7 +184,7 @@ AddIcon mastery=1 help=cd
 {
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(blood_fury)
-	Spell(dark_soul)
+	Spell(dark_soul_misery)
 	Spell(summon_doomguard)
 }
 AddIcon mastery=2 help=main
@@ -191,14 +198,14 @@ AddIcon mastery=2 help=main
 	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
 	if TalentPoints(grimoire_of_service_talent) Spell(service_felguard)
 	if BuffPresent(metamorphosis) and target.DebuffPresent(corruption) and target.DebuffRemains(corruption) <1.5 Spell(touch_of_chaos)
-	if BuffPresent(metamorphosis) and {target.TicksRemain(doom) <=1 or {target.TicksRemain(doom) +1 <Ticks(doom) and BuffPresent(dark_soul) } } and target.DeadIn() >=30 Spell(doom)
+	if BuffPresent(metamorphosis) and {target.TicksRemain(doom) <=1 or {target.TicksRemain(doom) +1 <Ticks(doom) and BuffPresent(dark_soul_knowledge) } } and target.DeadIn() >=30 Spell(doom)
 	if BuffPresent(metamorphosis) and target.DebuffPresent(corruption) and target.DebuffRemains(corruption) <20 Spell(touch_of_chaos)
-	if BuffPresent(metamorphosis) and BuffExpires(dark_soul) and DemonicFury() <=650 and target.DeadIn() >30 if Stance(1) cancel.Texture(Spell_shadow_demonform)
-	if BuffPresent(metamorphosis) and BuffStacks(molten_core) and {BuffRemains(dark_soul) <CastTime(shadow_bolt) or BuffRemains(dark_soul) >CastTime(soul_fire) } Spell(soul_fire)
+	if BuffPresent(metamorphosis) and BuffExpires(dark_soul_knowledge) and DemonicFury() <=650 and target.DeadIn() >30 if Stance(1) cancel.Texture(Spell_shadow_demonform)
+	if BuffPresent(metamorphosis) and BuffStacks(molten_core) and {BuffRemains(dark_soul_knowledge) <CastTime(shadow_bolt) or BuffRemains(dark_soul_knowledge) >CastTime(soul_fire) } Spell(soul_fire)
 	if BuffPresent(metamorphosis) Spell(touch_of_chaos)
 	if not target.DebuffPresent(corruption) and target.DeadIn() >=6 Spell(corruption)
 	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemains(shadowflame) <1 +CastTime(shadow_bolt) Spell(hand_of_guldan)
-	if BuffStacks(molten_core) and {BuffRemains(dark_soul) <CastTime(shadow_bolt) or BuffRemains(dark_soul) >CastTime(soul_fire) } Spell(soul_fire)
+	if BuffStacks(molten_core) and {BuffRemains(dark_soul_knowledge) <CastTime(shadow_bolt) or BuffRemains(dark_soul_knowledge) >CastTime(soul_fire) } Spell(soul_fire)
 	if ManaPercent() <60 Spell(life_tap)
 	Spell(shadow_bolt)
 	Spell(life_tap)
@@ -212,7 +219,7 @@ AddIcon mastery=2 help=offgcd
 	Spell(melee)
 	Spell(felstorm)
 	Spell(wrathstorm)
-	if {BuffPresent(dark_soul) and DemonicFury() /32 >BuffRemains(dark_soul) } or target.DebuffRemains(corruption) <5 or not target.DebuffPresent(doom) or DemonicFury() >=950 or DemonicFury() /32 >target.DeadIn() unless Stance(1) Spell(metamorphosis)
+	if {BuffPresent(dark_soul_knowledge) and DemonicFury() /32 >BuffRemains(dark_soul_knowledge) } or target.DebuffRemains(corruption) <5 or not target.DebuffPresent(doom) or DemonicFury() >=950 or DemonicFury() /32 >target.DeadIn() unless Stance(1) Spell(metamorphosis)
 }
 AddIcon mastery=2 help=moving
 {
@@ -221,14 +228,14 @@ AddIcon mastery=2 help=moving
 AddIcon mastery=2 help=aoe
 {
 	
-	if BuffPresent(metamorphosis) and target.DebuffRemains(corruption) >10 and DemonicFury() <=650 and BuffExpires(dark_soul) and not target.DebuffPresent(immolation_aura) if Stance(1) cancel.Texture(Spell_shadow_demonform)
+	if BuffPresent(metamorphosis) and target.DebuffRemains(corruption) >10 and DemonicFury() <=650 and BuffExpires(dark_soul_knowledge) and not target.DebuffPresent(immolation_aura) if Stance(1) cancel.Texture(Spell_shadow_demonform)
 	if BuffPresent(metamorphosis) Spell(immolation_aura)
 	if BuffPresent(metamorphosis) and target.DebuffRemains(corruption) <10 Spell(void_ray)
-	if BuffPresent(metamorphosis) and {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <TickTime(doom) or {target.TicksRemain(doom) +1 <Ticks(doom) and BuffPresent(dark_soul) } } and target.DeadIn() >=30 Spell(doom)
+	if BuffPresent(metamorphosis) and {not target.DebuffPresent(doom) or target.DebuffRemains(doom) <TickTime(doom) or {target.TicksRemain(doom) +1 <Ticks(doom) and BuffPresent(dark_soul_knowledge) } } and target.DeadIn() >=30 Spell(doom)
 	if BuffPresent(metamorphosis) Spell(void_ray)
 	if not target.DebuffPresent(corruption) and target.DeadIn() >30 Spell(corruption)
 	Spell(hand_of_guldan)
-	if target.DebuffRemains(corruption) <10 or BuffPresent(dark_soul) or DemonicFury() >=950 or DemonicFury() /32 >target.DeadIn() unless Stance(1) Spell(metamorphosis)
+	if target.DebuffRemains(corruption) <10 or BuffPresent(dark_soul_knowledge) or DemonicFury() >=950 or DemonicFury() /32 >target.DeadIn() unless Stance(1) Spell(metamorphosis)
 	Spell(hellfire)
 	Spell(life_tap)
 
@@ -237,7 +244,7 @@ AddIcon mastery=2 help=cd
 {
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(blood_fury)
-	Spell(dark_soul)
+	Spell(dark_soul_knowledge)
 	Spell(summon_doomguard)
 }
 AddIcon mastery=3 help=main
@@ -254,7 +261,7 @@ AddIcon mastery=3 help=main
 	if {target.TicksRemain(immolate) <Ticks(immolate) /2 or target.DebuffExpires(immolate) } and target.DeadIn() >=5 Spell(immolate)
 	if Charges(conflagrate) ==2 Spell(conflagrate)
 	if not target.DebuffPresent(rain_of_fire) and not InFlightToTarget(rain_of_fire) Spell(rain_of_fire)
-	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {{BurningEmbers() / 10} >3.5 or BuffRemains(dark_soul) >CastTime(chaos_bolt) or BuffRemains(skull_banner) >CastTime(chaos_bolt) } Spell(chaos_bolt)
+	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {{BurningEmbers() / 10} >3.5 or BuffRemains(dark_soul_instability) >CastTime(chaos_bolt) or BuffRemains(skull_banner) >CastTime(chaos_bolt) } Spell(chaos_bolt)
 	Spell(conflagrate)
 	Spell(incinerate)
 }
@@ -284,7 +291,7 @@ AddIcon mastery=3 help=cd
 {
 	 { Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) } 
 	Spell(blood_fury)
-	Spell(dark_soul)
+	Spell(dark_soul_instability)
 	Spell(summon_doomguard)
 }
 ]]
