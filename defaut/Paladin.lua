@@ -17,6 +17,8 @@ Define(execution_sentence 114916)
   SpellAddTargetDebuff(execution_sentence execution_sentence=1)
 Define(exorcism 879)
   SpellInfo(exorcism holy=-1 cd=15 )
+Define(exorcism_glyphed 122032)
+  SpellInfo(exorcism_glyphed holy=-1 cd=15)
 Define(glyph_of_double_jeopardy 121027)
   SpellInfo(glyph_of_double_jeopardy duration=10 )
   SpellAddBuff(glyph_of_double_jeopardy glyph_of_double_jeopardy=1)
@@ -40,6 +42,7 @@ Define(seal_of_truth 31801)
   SpellAddBuff(seal_of_truth seal_of_truth=1)
 Define(templars_verdict 85256)
   SpellInfo(templars_verdict holy=3 )
+Define(glyph_of_mass_exorcism 122028)
 AddCheckBox(showwait L(showwait) default)
 AddIcon mastery=3 help=main
 {
@@ -53,8 +56,16 @@ AddIcon mastery=3 help=main
 	if HolyPower() ==5 Spell(templars_verdict)
 	Spell(hammer_of_wrath usable=1)
 	if SpellCooldown(hammer_of_wrath) >0 and SpellCooldown(hammer_of_wrath) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
-	Spell(exorcism)
-	if SpellCooldown(exorcism) >0 and SpellCooldown(exorcism) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
+	if Glyph(glyph_of_mass_exorcism no)
+	{
+		Spell(exorcism)
+		if SpellCooldown(exorcism) >0 and SpellCooldown(exorcism) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
+	}
+	if Glyph(glyph_of_mass_exorcism)
+	{
+		Spell(exorcism_glyphed)
+		if SpellCooldown(exorcism_glyphed) >0 and SpellCooldown(exorcism_glyphed) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
+	}
 	if not {ArmorSetParts(T15 more 4) } and {target.HealthPercent() <=20 or BuffPresent(avenging_wrath) } Spell(judgment)
 	Spell(crusader_strike)
 	if SpellCooldown(crusader_strike) >0 and SpellCooldown(crusader_strike) <=0.2 if CheckBoxOn(showwait) Texture(Spell_nature_timestop) 
