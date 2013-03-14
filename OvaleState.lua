@@ -60,6 +60,7 @@ function OvaleState:UpdatePowerRates()
 	for _, v in pairs(OvaleData.buffSpellList.melee_haste) do
 		if OvaleState:GetAura("player", v) then
 			self.powerRate.focus = self.powerRate.focus / 1.1
+			break
 		end
 	end
 
