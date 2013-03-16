@@ -15,13 +15,14 @@ Ovale.bestActionModule = OvaleBestAction
 local OvaleActionBar = Ovale:GetModule("OvaleActionBar")
 local OvaleCondition = Ovale.conditionModule
 local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleEquipement = Ovale:GetModule("OvaleEquipement")
 local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
 local OvaleStance = Ovale:GetModule("OvaleStance")
 local OvaleState = Ovale.stateModule
 
 local floor, ipairs, loadstring, pairs = math.floor, ipairs, loadstring, pairs
 local strfind, tonumber, tostring = string.find, tonumber, tostring
-local GetActionCooldown, GetActionTexture, GetInventorySlotInfo = GetActionCooldown, GetActionTexture, GetInventorySlotInfo
+local GetActionCooldown, GetActionTexture = GetActionCooldown, GetActionTexture
 local GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellInfo = GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellInfo
 local GetSpellTexture, IsActionInRange, IsCurrentAction = GetSpellTexture, IsActionInRange, IsCurrentAction
 local IsItemInRange, IsSpellInRange, IsUsableAction, IsUsableSpell = IsItemInRange, IsSpellInRange, IsUsableAction, IsUsableSpell
@@ -160,15 +161,12 @@ function OvaleBestAction:GetActionInfo(element)
 			Ovale:Log("Unknown macro "..element.params[1])
 		end
 	elseif (element.func=="item") then
-		local itemId
-		if (type(element.params[1]) == "number") then
-			itemId = element.params[1]
-		else
-			local _,_,id = strfind(GetInventoryItemLink("player",GetInventorySlotInfo(element.params[1])) or "","item:(%d+):%d+:%d+:%d+")
-			if not id then
-				return nil
-			end
-			itemId = tonumber(id)
+		local itemId = element.params[1]
+		if itemId and type(itemId) ~= "number" then
+			itemId = OvaleEquipement:GetEquippedItem(itemId)
+		end
+		if not itemId then
+			return nil
 		end
 		
 		if (Ovale.trace) then
