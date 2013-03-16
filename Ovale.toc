@@ -32,6 +32,7 @@ OvaleEnemies.lua
 OvaleEquipement.lua
 OvaleGUID.lua
 OvalePaperDoll.lua
+OvalePool.lua
 OvaleRecount.lua
 OvaleSkada.lua
 OvaleSpellDamage.lua
