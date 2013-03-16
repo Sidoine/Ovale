@@ -92,10 +92,8 @@ function Ovale:OnEnable()
 	self:RegisterEvent("CHAT_MSG_ADDON")
 
 	OvaleOptions = Ovale:GetModule("OvaleOptions")
-	local profile = OvaleOptions:GetProfile()
 
 	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
-	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
 	self:UpdateFrame()
 end
 
@@ -208,6 +206,9 @@ function Ovale:UpdateVisibility()
 end
 
 function Ovale:UpdateFrame()
+	local profile = OvaleOptions:GetProfile()
+	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
+
 	self.frame:ReleaseChildren()
 
 	self.frame:UpdateIcons()
@@ -215,8 +216,6 @@ function Ovale:UpdateFrame()
 	self:UpdateVisibility()
 	
 	self.checkBoxes = {}
-	
-	local profile = OvaleOptions:GetProfile()
 	
 	for k,checkBox in pairs(self.casesACocher) do
 		self.checkBoxes[k] = LibStub("AceGUI-3.0"):Create("CheckBox");
