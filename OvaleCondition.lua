@@ -297,21 +297,26 @@ local function testValue(comparator, limit, value, atTime, rate)
 end
 
 local function getAura(target, spellId, mine)
-	local aura
 	if type(spellId) == "number" then
-		aura = OvaleState:GetAura(target, spellId, mine)
+		return OvaleState:GetAura(target, spellId, mine)
 	elseif OvaleData.buffSpellList[spellId] then
-		local newAura
-		for k,v in pairs(OvaleData.buffSpellList[spellId]) do
-			newAura = OvaleState:GetAura(target, v, mine)
-			if newAura and (not aura or newAura.stacks > aura.stacks) then
-				aura = newAura
+		local newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		local start, ending, stacks, spellHasteMultiplier, value, gain
+		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
+			start, ending, stacks, spellHasteMultiplier, value, gain = OvaleState:GetAura(target, v, mine)
+			if start and (not newStart or stacks > newStacks) then
+				newStart = start
+				newEnding = ending
+				newStacks = stacks
+				newSpellHasteMultiplier = spellHasteMultiplier
+				newValue = value
+				newGain = gain
 			end
 		end
+		return newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
 	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
-		aura = OvaleState:GetAura(target, spellId, mine)
+		return OvaleState:GetAura(target, spellId, mine)
 	end
-	return aura
 end
 
 local function getMine(condition)
@@ -341,29 +346,29 @@ local function GetTargetAura(condition, target)
 	end
 	local spellId = condition[1]
 	local mine = getMine(condition)
-	
-	local aura = getAura(target, spellId, mine)
-	if not aura then
+
+	local auraStart, auraEnding, auraStacks, auraSpellHasteMultiplier, auraValue, auraGain = getAura(target, spellId, mine)
+	if not auraStart then
 		Ovale:Log("Aura "..spellId.." not found on " .. target .. " mine=" .. tostring(mine))
 		return 0,0,0,0
 	end
 	if Ovale.trace then
-		Ovale:Print("GetTargetAura = start=".. tostring(aura.start) .. " end="..tostring(aura.ending).." stacks=" ..tostring(aura.stacks).."/"..stacks .. " target="..target)
+		Ovale:Print("GetTargetAura = start=".. tostring(auraStart) .. " end="..tostring(auraEnding).." stacks=" ..tostring(auraStacks).."/"..stacks .. " target="..target)
 	end
 		
-	if (not condition.mine or (aura.mine and condition.mine==1) or (not aura.mine and condition.mine==0)) and aura.stacks>=stacks then
+	if (not condition.mine or (mine and condition.mine == 1) or (not mine and condition.mine == 0)) and auraStacks >= stacks then
 		local ending
 		if condition.forceduration then
 			--TODO: this is incorrect.
 			if OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].duration then
-				ending = aura.start + OvaleData.spellInfo[spellId].duration
+				ending = auraStart + OvaleData.spellInfo[spellId].duration
 			else
-				ending = aura.start + condition.forceduration
+				ending = auraStart + condition.forceduration
 			end
 		else
-			ending = aura.ending
+			ending = auraEnding
 		end
-		return aura.start, ending, aura.stacks, aura.spellHasteMultiplier
+		return auraStart, ending, auraStacks, auraSpellHasteMultiplier
 	else
 		return 0,0,0,0
 	end
@@ -617,15 +622,8 @@ OvaleCondition.conditions.buffgain = function(condition)
 	local spellId = condition[1]
 	if not spellId then Ovale:Error("buffgain parameter spellId is not optional"); return end
 	local target = getTarget(condition.target)
-	local aura = OvaleState:GetAura(target,spellId,true)
-	if not aura then
-		return 0, nil, 0, 0, 1
-	end
-	local timeGain = aura.gain
-	if not timeGain then
-		return 0, nil, 0, 0, 1
-	end
-	return 0, nil, 0, timeGain, 1
+	local gain = select(6, OvaleState:GetAura(target, spellId, true)) or 0
+	return 0, nil, 0, 0, 1
 end
 OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
 
@@ -2516,11 +2514,7 @@ end
 --     Spell(purifying_brew)
 
 OvaleCondition.conditions.tickvalue = function(condition)
-	local value = 0
-	local aura = getAura(getTarget(condition.target), condition[1], getMine(condition))
-	if aura then
-		value = aura.value or 0
-	end
+	local value = select(5, getAura(getTarget(condition.target), condition[1], getMine(condition))) or 0
 	return compare(value, condition[2], condition[3])
 end
 

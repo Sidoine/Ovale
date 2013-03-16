@@ -19,10 +19,14 @@ OvaleAura.serial = 0
 --</public-static-properties>
 
 --<private-static-properties>
+local OvalePool = Ovale.poolPrototype
+
 local baseDamageMultiplier = 1
 local playerGUID = nil
+local auraPool = OvalePool:NewPool("OvaleAura_auraPool")
 
 local pairs, select, strfind = pairs, select, string.find
+local wipe = wipe
 local UnitAura = UnitAura
 local UnitGUID = UnitGUID
 --</private-static-properties>
@@ -55,15 +59,25 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		end
 
 		if sourceGUID == playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-			local aura = self:GetAuraByGUID(destGUID, spellId, true)
-			if aura then
+			if self:GetAuraByGUID(destGUID, spellId, true) then
+				local aura = self.aura[destGUID][spellId].mine
 				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 			end
 		end
 	end
 
 	if event == "UNIT_DIED" then
+		-- Return all auras from the dead unit to the aura pool.
+		for spellId, whoseTable in pairs(self.aura[destGUID]) do
+			for whose, aura in pairs(whoseTable) do
+				-- Return the aura to the aura pool.
+				whoseTable[whose] = nil
+				auraPool:Release(aura)
+			end
+			self.aura[destGUID][spellId] = nil
+		end
 		self.aura[destGUID] = nil
+
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		if unitId then
 			Ovale.refreshNeeded[unitId] = true
@@ -90,12 +104,16 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 	local aura
 	if mine then
 		if not auraList[spellId].mine then
-			auraList[spellId].mine = { gain = Ovale.now }
+			aura = auraPool:Get()
+			aura.gain = Ovale.now
+			auraList[spellId].mine = aura
 		end
 		aura = auraList[spellId].mine
 	else
 		if not auraList[spellId].other then
-			auraList[spellId].other = { gain = Ovale.now }
+			aura = auraPool:Get()
+			aura.gain = Ovale.now
+			auraList[spellId].other = aura
 		end
 		aura = auraList[spellId].other
 	end
@@ -185,13 +203,14 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 		end
 	end
 	
+	--Removes expired auras
 	local auraList = self.aura[unitGUID]
-	--Removes expired aura
 	for spellId,whoseTable in pairs(auraList) do
 		for whose,aura in pairs(whoseTable) do
 			if aura.serial ~= self.serial then
 				Ovale:debugPrint("aura", "Removing "..aura.name.." from "..whose .. " self.serial = " ..self.serial .. " aura.serial = " ..aura.serial)
 				whoseTable[whose] = nil
+				auraPool:Release(aura)
 			end
 		end
 		if not next(whoseTable) then
@@ -235,15 +254,18 @@ function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 			return nil
 		end
 	end
-	local aura = auraTable[spellId]
-	if not aura then return nil end
+	local whoseTable = auraTable[spellId]
+	if not whoseTable then return nil end
+	local aura
 	if mine or mine == 1 then
-		return aura.mine
-	elseif aura.other then
-		return aura.other
+		aura = whoseTable.mine
+	elseif whoseTable.other then
+		aura = whoseTable.other
 	else
-		return aura.mine
+		aura = whoseTable.mine
 	end
+	if not aura then return nil end
+	return aura.start, aura.ending, aura.stacks, aura.spellHasteMultiplier, aura.value, aura.gain
 end
 
 function OvaleAura:GetAura(unitId, spellId, mine)
@@ -321,7 +343,7 @@ function OvaleAura:GetDamageMultiplier(spellId)
 end
 
 function OvaleAura:Debug()
-	Ovale:Print("------")
+	auraPool:Debug()
 	for guid,auraTable in pairs(self.aura) do
 		Ovale:Print("***"..guid)
 		for spellId,whoseTable in pairs(auraTable) do
@@ -330,5 +352,6 @@ function OvaleAura:Debug()
 			end
 		end
 	end
+	Ovale:Print("------")
 end
 --</public-static-methods>

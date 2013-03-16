@@ -286,17 +286,17 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 			end
 			--On vérifie si le buff "buffnocd" est présent, auquel cas le CD du sort n'est pas déclenché
 			if newSpellInfo.buffnocd and not nocd then
-				local buffAura = self:GetAura("player", newSpellInfo.buffnocd, true)
+				local buffStart, buffEnding, buffStacks = self:GetAura("player", newSpellInfo.buffnocd, true)
 				if self.traceAura then
-					if buffAura then
-						Ovale:Print("buffAura stacks = "..buffAura.stacks.." start="..tostring(buffAura.start).." ending = "..tostring(buffAura.ending))
+					if buffStart then
+						Ovale:Print("buffnocd stacks = "..tostring(buffStacks).." start="..tostring(buffStart).." ending = "..tostring(buffEnding))
 						Ovale:Print("startCast = "..startCast)
 					else
-						Ovale:Print("buffAura = nil")
+						Ovale:Print("buffnocd not present")
 					end
 					self.traceAura = false
 				end
-				if buffAura and buffAura.stacks>0 and buffAura.start and buffAura.start<=startCast and (not buffAura.ending or buffAura.ending>startCast) then
+				if buffStacks and buffStacks > 0 and buffStart and buffStart <= startCast and (not buffEnding or buffEnding > startCast) then
 					cd.duration = 0
 				end
 			end
@@ -365,7 +365,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								stacks = 1
 							end
 
-							local previousAura = self:GetAuraByGUID(auraGUID, auraSpellId, true, target)
+							local oldStart, oldEnding, oldStacks, oldSpellHasteMultiplier = self:GetAuraByGUID(auraGUID, auraSpellId, true, target)
 							local newAura = self:NewAura(auraGUID, auraSpellId)
 
 							newAura.mine = true
@@ -374,21 +374,21 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 								Ovale:Log("Aura "..auraSpellId.." is completely removed")
 								newAura.stacks = 0
 								newAura.ending = 0	-- self.currentTime?
-							elseif previousAura and previousAura.ending and previousAura.ending >= endCast then
+							elseif oldEnding and oldEnding >= endCast then
 								if stacks == "refresh" or stacks > 0 then
 									if stacks == "refresh" then
 										Ovale:Log("Aura "..auraSpellId.." is refreshed")
-										newAura.stacks = previousAura.stacks
+										newAura.stacks = oldStacks
 									else -- if stacks > 0
 										Ovale:Log("Aura "..auraSpellId.." gain stacks (ending was " .. tostring(newAura.ending)..")")
-										newAura.stacks = previousAura.stacks + stacks
+										newAura.stacks = oldStacks + stacks
 									end
-									newAura.start = previousAura.start
-									if isDoT and previousAura.ending > newAura.start then
+									newAura.start = oldStart
+									if isDoT and oldEnding > newAura.start then
 										-- TODO: check that refreshed DoTs take a new snapshot of player stats.
-										local tickLength = OvaleData:GetTickLength(auraSpellId, previousAura.spellHasteMultiplier)
-										local k = floor((previousAura.ending - endCast) / tickLength)
-										newAura.ending = previousAura.ending - tickLength * k + duration
+										local tickLength = OvaleData:GetTickLength(auraSpellId, oldSpellHasteMultiplier)
+										local k = floor((oldEnding - endCast) / tickLength)
+										newAura.ending = oldEnding - tickLength * k + duration
 										newAura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 									else
 										newAura.ending = endCast + duration
@@ -396,12 +396,12 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 									Ovale:Log("Aura "..auraSpellId.." ending is now "..newAura.ending)
 								elseif stacks < 0 then
 									Ovale:Log("Aura "..auraSpellId.." loses stacks")
-									newAura.stacks = previousAura.stacks + stacks
+									newAura.stacks = oldStacks + stacks
 									if Ovale.trace then
 										Ovale:Print("removing one stack of "..auraSpellId.." because of ".. spellId.." to ".. newAura.stacks)
 									end
-									newAura.start = previousAura.start
-									newAura.ending = previousAura.ending
+									newAura.start = oldStart
+									newAura.ending = oldEnding
 									if newAura.stacks <= 0 then
 										Ovale:Log("Aura is completely removed")
 										newAura.stacks = 0
@@ -490,7 +490,8 @@ end
 function OvaleState:GetAuraByGUID(guid, spellId, mine, target)
 	if self.aura[guid] and self.aura[guid][spellId] and self.aura[guid][spellId].serial == self.serial then
 		Ovale:Log("Found aura " .. spellId .. " on " .. tostring(guid))
-		return self.aura[guid][spellId]
+		local aura = self.aura[guid][spellId]
+		return aura.start, aura.ending, aura.stacks, aura.spellHasteMultiplier, aura.value, aura.gain
 	else
 		Ovale:Log("Aura " .. spellId .. " not found in state for " .. tostring(guid))
 		return OvaleAura:GetAuraByGUID(guid, spellId, mine, target)
@@ -538,21 +539,19 @@ end
 
 
 function OvaleState:GetEclipseDir()
-	local value
-	local buffAura = self:GetAura("player", 48517) --Solar
-	if buffAura and buffAura.stacks>0 then
-		value = -1
+	local stacks = select(3, self:GetAura("player", 48517)) -- Solar
+	if stacks and stacks > 0 then
+		return -1
 	else
-		buffAura = self:GetAura("player", 48518) --Lunar
-		if buffAura and buffAura.stacks>0 then
-			value =1
+		stacks = select(3, self:GetAura("player", 48518)) --Lunar
+		if stacks and stacks > 0 then
+			return 1
 		elseif self.state.eclipse < 0 then
-			value = -1
+			return -1
 		else
-			value = 1
+			return 1
 		end
 	end
-	return value
 end
 
 local runes = {}
