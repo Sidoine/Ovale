@@ -19,6 +19,10 @@ local customFunctions = {}
 local unknownSpellNodes = {}
 local missingSpellList = {}
 
+-- Whether to trigger a script compilation if items or stances change.
+local compileOnItems = false
+local compileOnStances = false
+
 local ipairs, pairs, tonumber = ipairs, pairs, tonumber
 local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
 local strlen, strlower, strmatch, strsub = string.len, string.lower, string.match, string.sub
@@ -28,8 +32,6 @@ local tinsert = table.insert
 --<public-static-properties>
 --master nodes of the current script (one node for each icon)
 OvaleCompile.masterNodes = {}
-OvaleCompile.compileOnItems = false
-OvaleCompile.compileOnStances = false
 --</public-static-properties>
 
 --<private-static-methods>
@@ -89,7 +91,7 @@ local function TestConditions(paramList)
 		return false
 	end
 	if paramList.if_stance then
-		OvaleCompile.compileOnStances = true
+		compileOnStances = true
 		if not OvaleStance:IsStance(paramList.if_stance) then
 			return false
 		end
@@ -133,7 +135,7 @@ local function TestConditions(paramList)
 	end
 	if paramList.itemset and paramList.itemcount then
 		local equippedCount = OvaleEquipement:GetArmorSetCount(paramList.itemset)
-		OvaleCompile.compileOnItems = true
+		compileOnItems = true
 		if equippedCount < paramList.itemcount then
 			return false
 		end
@@ -593,8 +595,8 @@ local function CompileDeclarations(text)
 end
 
 local function CompileScript(text)
-	OvaleCompile.compileOnItems = false
-	OvaleCompile.compileOnStances = false
+	compileOnItems = false
+	compileOnStances = false
 	Ovale.bug = false
 
 	wipe(node)
@@ -667,14 +669,14 @@ function OvaleCompile:EventHandler(event)
 end
 
 function OvaleCompile:Ovale_EquipmentChanged(event)
-	if OvaleCompile.compileOnItems then
+	if compileOnItems then
 		self:EventHandler(event)
 	end
 	Ovale.refreshNeeded.player = true
 end
 
 function OvaleCompile:Ovale_StanceChanged(event)
-	if OvaleCompile.compileOnStances then
+	if compileOnStances then
 		self:EventHandler(event)
 	end
 	Ovale.refreshNeeded.player = true

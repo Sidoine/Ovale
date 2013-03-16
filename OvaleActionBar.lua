@@ -12,18 +12,18 @@ local _, Ovale = ...
 OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0")
 
 --<private-static-properties>
+local tonumber = tonumber
+local wipe = wipe
+
 local GetActionInfo = GetActionInfo
 local GetActionText = GetActionText
-local tonumber = tonumber
---</private-static-properties>
 
---<public-static-properties>
 --key: spell name / value: action icon id
-OvaleActionBar.actionSort = {}
-OvaleActionBar.actionMacro = {}
-OvaleActionBar.actionObjet = {}
-OvaleActionBar.shortCut = {}
---</public-static-properties>
+actionSpell = {}
+actionMacro = {}
+actionItem = {}
+keybind = {}
+--</private-static-properties>
 
 --<public-static-methods>
 function OvaleActionBar:OnEnable()
@@ -54,26 +54,26 @@ end
 
 function OvaleActionBar:FillActionIndexes(event)
 	Ovale:debugPrint("action_bar", "Mapping buttons to spells/macros for " ..event)
-	self.actionSort = {}
-	self.actionMacro = {}
-	self.actionObjet = {}
-	self.shortCut = {}
+	wipe(actionSpell)
+	wipe(actionMacro)
+	wipe(actionItem)
+	wipe(keybind)
 	for i=1,120 do
 		self:FillActionIndex(i)
 	end
 end
 
 function OvaleActionBar:FillActionIndex(i)
-	self.shortCut[i] = self:FindKeyBinding(i)
+	keybind[i] = self:FindKeyBinding(i)
 	local actionText = GetActionText(i)
 	if actionText then
-		self.actionMacro[actionText] = i
+		actionMacro[actionText] = i
 	else
 		local type, spellId = GetActionInfo(i);
 		if (type=="spell") then
-			self.actionSort[spellId] = i
+			actionSpell[spellId] = i
 		elseif (type =="item") then
-			self.actionObjet[spellId] = i
+			actionItem[spellId] = i
 		end
 	end
 end
@@ -107,20 +107,20 @@ end
 
 -- Get the action id that match a spell id
 function OvaleActionBar:GetForSpell(spellId)
-	return self.actionSort[spellId]
+	return actionSpell[spellId]
 end
 
 -- Get the action id that match a macro id
 function OvaleActionBar:GetForMacro(macroId)
-	return self.actionMacro[macroId]
+	return actionMacro[macroId]
 end
 
 -- Get the action id that match an item id
 function OvaleActionBar:GetForItem(itemId)
-	return self.actionObjet[itemId]
+	return actionItem[itemId]
 end
 
 function OvaleActionBar:GetBinding(actionId)
-	return self.shortCut[actionId]
+	return keybind[actionId]
 end
 --</public-static-methods>

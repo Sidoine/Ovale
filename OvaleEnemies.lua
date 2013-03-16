@@ -14,17 +14,16 @@ OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0")
 
 --<private-static-properties>
 local bit_band, pairs, select, tostring = bit.band, pairs, select, tostring
+local wipe = wipe
+
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
+
+numberOfEnemies = 0
+enemies = {}
 --</private-static-properties>
 
---<public-static-properties>
-OvaleEnemies.numberOfEnemies = 0
-OvaleEnemies.enemies = {}
---</public-static-properties>
-
 --<public-static-methods>
--- Events
 function OvaleEnemies:OnEnable()
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -39,43 +38,43 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 
 	if event == "UNIT_DIED" then
-		for k,v in pairs(self.enemies) do
+		for k,v in pairs(enemies) do
 			if k==destGUID then
-				self.enemies[v] = nil
-				self.numberOfEnemies = self.numberOfEnemies - 1
+				enemies[v] = nil
+				numberOfEnemies = numberOfEnemies - 1
 				Ovale.refreshNeeded["player"] = true
 				Ovale:debugPrint("enemy", "enemy die")
 			end
 		end
-	elseif sourceFlags and not self.enemies[sourceGUID] and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
+	elseif sourceFlags and not enemies[sourceGUID] and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
 				and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 			destFlags and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
-		self.enemies[sourceGUID] = true
+		enemies[sourceGUID] = true
 		Ovale:debugPrint("enemy", "new enemy source=" .. tostring(sourceName))
-		self.numberOfEnemies = self.numberOfEnemies + 1
+		numberOfEnemies = numberOfEnemies + 1
 		Ovale.refreshNeeded["player"] = true
-	elseif destGUID and not self.enemies[destGUID] and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
+	elseif destGUID and not enemies[destGUID] and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE)>0
 				and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and
 			sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
-		self.enemies[destGUID] = true
+		enemies[destGUID] = true
 		Ovale:debugPrint("enemy", "new enemy dest=".. tostring(destName))
-		self.numberOfEnemies = self.numberOfEnemies + 1
+		numberOfEnemies = numberOfEnemies + 1
 		Ovale.refreshNeeded["player"] = true
 	end
 end
 
 function OvaleEnemies:PLAYER_REGEN_DISABLED()
-	if self.numberOfEnemies then
-		self.numberOfEnemies = 0
-		self.enemies = {}
+	if numberOfEnemies then
+		numberOfEnemies = 0
+		wipe(enemies)
 	end
 end
 
 function OvaleEnemies:GetNumberOfEnemies()
-	if not self.numberOfEnemies then
-		self.numberOfEnemies = 0
+	if not numberOfEnemies then
+		numberOfEnemies = 0
 	end
-	return self.numberOfEnemies
+	return numberOfEnemies
 end
 --</public-static-methods>
 

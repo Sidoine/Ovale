@@ -12,16 +12,12 @@ OvaleSkada = Ovale:NewModule("OvaleSkada")
 
 --<private-static-properties>
 local Skada	= LibStub("AceAddon-3.0"):GetAddon("Skada", true)
-local SkadaModule = {}
+local SkadaModule = Skada and Skada:NewModule("Ovale Spell Priority", SkadaModule) or { noSkada = true }
 
 local ipairs = ipairs
 local math = math
 local tostring = tostring
 --</private-static-properties>
-
---<public-static-properties>
-OvaleSkada.module = nil
---</public-static-properties>
 
 --<private-static-methods>
 local function getValue(set)
@@ -31,7 +27,9 @@ local function getValue(set)
 		return nil
 	end
 end
+--</private-static-methods>
 
+--<public-static-methods>
 function SkadaModule:OnEnable()
 	self.metadata = { showspots = true }
 	Skada:AddMode(self)
@@ -92,35 +90,30 @@ function SkadaModule:GetSetSummary(set)
 	return getValue(set)
 end
 
--- Initialize OvaleSkada.module after SkadaModule prototype has been fully defined.
-OvaleSkada.module = Skada and Skada:NewModule("Ovale Spell Priority", SkadaModule) or nil
---</private-static-methods>
-
---<public-static-methods>
 function OvaleSkada:OnEnable()
-	if not Skada then return end
+	if SkadaModule.noSkada then return end
 	Ovale:AddDamageMeter("OvaleSkada", self)
-	if not self.module:IsEnabled() then
-		self.module:Enable()
+	if not SkadaModule:IsEnabled() then
+		SkadaModule:Enable()
 	end
 end
 
 function OvaleSkada:OnDisable()
-	if not Skada then return end
+	if SkadaModule.noSkada then return end
 	Ovale:RemoveDamageMeter("OvaleSkada")
-	if self.module:IsEnabled() then
-		self.module:Disable()
+	if SkadaModule:IsEnabled() then
+		SkadaModule:Disable()
 	end
 end
 
 function OvaleSkada:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	if not Skada then return end
+	if SkadaModule.noSkada then return end
 	if not guid or not Skada.current or not Skada.total then return end
 
 	local player = Skada:get_player(Skada.current, guid, nil)
 	if not player then return end
 
-	self.module:AddPlayerAttributes(player)
+	SkadaModule:AddPlayerAttributes(player)
 	player.ovale = player.ovale + scored
 	player.ovaleMax = player.ovaleMax + scoreMax
 	player = Skada:get_player(Skada.total, guid, nil)
