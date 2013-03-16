@@ -45,6 +45,29 @@ local INVSLOT_WRIST = INVSLOT_WRIST
 
 -- item IDs of equipped items, indexed by slot ID
 local equippedItems = {}
+-- equipment slot names
+local slotName = {
+	AmmoSlot = true,
+	BackSlot = true,
+	ChestSlot = true,
+	FeetSlot = true,
+	Finger0Slot = true,
+	Finger1Slot = true,
+	HandsSlot = true,
+	HeadSlot = true,
+	LegsSlot = true,
+	MainHandSlot = true,
+	NeckSlot = true,
+	RangedSlot = true,
+	SecondaryHandSlot = true,
+	ShirtSlot = true,
+	ShoulderSlot = true,
+	TabardSlot = true,
+	Trinket0Slot = true,
+	Trinket1Slot = true,
+	WaistSlot = true,
+	WristSlot = true,
+}
 -- type of main-hand item equipped
 local mainHandItemType
 -- type of off-hand item equipped
@@ -976,6 +999,7 @@ end
 
 function OvaleEquipement:GetEquippedItem(slotId)
 	if type(slotId) ~= "number" then
+		if not slotName[slotId] then return nil end
 		slotId = GetInventorySlotInfo(slotId)
 		if not slotId then return nil end
 	end
