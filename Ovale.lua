@@ -57,7 +57,7 @@ BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<public-static-methods>
-function Ovale:debugPrint(flag, ...)
+function Ovale:DebugPrint(flag, ...)
 	local profile = OvaleOptions:GetProfile()
 	if profile and profile.debug and profile.debug[flag] then
 		self:Print("[" .. flag .. "]", ...)

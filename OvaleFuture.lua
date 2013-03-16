@@ -17,6 +17,7 @@ local ipairs = ipairs
 local pairs = pairs
 local select = select
 local strfind = string.find
+local tinsert = table.insert
 local tremove = table.remove
 
 local GetSpellInfo = GetSpellInfo
@@ -274,7 +275,7 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 	self.lastSpellSP[spellId] = OvalePaperDoll.spellBonusDamage
 	self.lastSpellDM[spellId] = OvaleAura:GetDamageMultiplier(spellId)
 	self.lastSpellMastery[spellId] = OvalePaperDoll.masteryEffect
-	lastSpell[#lastSpell+1] = newSpell
+	tinsert(lastSpell, newSpell)
 	
 	local si = OvaleData.spellInfo[spellId]
 	if si then

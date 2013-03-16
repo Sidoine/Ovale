@@ -18,7 +18,6 @@ local node = {}
 local nodePool = OvalePool:NewPool("OvaleCompile_nodePool")
 local defines = {}
 local customFunctions = {}
-local unknownSpellNodes = {}
 local missingSpellList = {}
 
 -- Whether to trigger a script compilation if items or stances change.
@@ -40,8 +39,7 @@ OvaleCompile.masterNodes = {}
 --<private-static-methods>
 local function AddNode(newNode)
 	tinsert(node, newNode)
-	newNode.nodeId = #node
-	return "node" .. newNode.nodeId
+	return "node" .. #node
 end
 
 local function ParseParameters(params)
@@ -207,13 +205,11 @@ local function ParseFunction(prefix, func, params)
 				end
 				if spellName then
 					if spellName == GetSpellInfo(spellName) then
-						Ovale:debugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
+						Ovale:DebugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
 						missingSpellList[spellId] = spellName
-					else
-						unknownSpellNodes[newNode.nodeId] = spellId
 					end
 				else
-					Ovale:debugPrint("unknown_spells", "Unknown spell with ID "..spellId)
+					Ovale:DebugPrint("unknown_spells", "Unknown spell with ID "..spellId)
 				end
 			end
 		end
@@ -654,7 +650,6 @@ local function CompileScript(text)
 	Ovale.bug = false
 
 	wipe(defines)
-	wipe(unknownSpellNodes)
 	wipe(missingSpellList)
 
 	-- Return all existing nodes to the node pool.
@@ -727,7 +722,7 @@ function OvaleCompile:OnDisable()
 end
 
 function OvaleCompile:EventHandler(event)
-	Ovale:debugPrint("compile", event)
+	Ovale:DebugPrint("compile", event)
 	self:Compile()
 end
 
@@ -772,11 +767,7 @@ function OvaleCompile:DebugNode(node)
 		text = text .. "}\n"
 	elseif (node.type == "function") then
 		text = node.func.."("
-		local spellId = unknownSpellNodes[node.nodeId]
 		for k,p in pairs(node.params) do
-			if spellId and p == spellId then
-				p = p .. ":unknown"
-			end
 			text = text .. k.."=" .. p .. " "
 		end
 		text = text .. ")"

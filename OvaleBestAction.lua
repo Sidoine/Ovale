@@ -104,7 +104,7 @@ function OvaleBestAction:GetActionInfo(element)
 		
 		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(spellId)
 		if not actionCooldownStart or not actionCooldownDuration then
-			Ovale:debugPrint("unknown_spells", "No cooldown data for spell "..spellId)
+			Ovale:DebugPrint("unknown_spells", "No cooldown data for spell "..spellId)
 		end
 		
 		local si = OvaleData:GetSpellInfo(spellId)
