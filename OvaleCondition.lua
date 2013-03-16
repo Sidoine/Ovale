@@ -1195,7 +1195,7 @@ end
 -- if Enemies(more 4) Spell(fan_of_knives)
 
 OvaleCondition.conditions.enemies = function(condition)
-	return compare(OvaleEnemies:GetNumberOfEnemies(), condition[1], condition[2])
+	return compare(OvaleEnemies.activeEnemies, condition[1], condition[2])
 end
 
 --- Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
