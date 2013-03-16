@@ -102,19 +102,33 @@ function RemoveAurasForGUID(guid)
 		Ovale.refreshNeeded[unitId] = true
 	end
 end
+
+function RemoveAurasForMissingUnits()
+	-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
+	-- i.e., not in the group or not targeted by anyone in the group or focus.
+	for guid in pairs(OvaleAura_aura) do
+		if not OvaleGUID:GetUnitId(guid) then
+			RemoveAurasForGUID(guid)
+		end
+	end
+end
 --</private-static-methods>
 
 --<public-static-methods>
 function OvaleAura:OnEnable()
 	playerGUID = OvaleGUID.player
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
+	self:RegisterMessage("Ovale_GroupChanged", RemoveAurasForMissingUnits)
 	self:RegisterMessage("Ovale_InactiveUnit", RemoveAurasForGUID)
 end
 
 function OvaleAura:OnDisable()
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("UNIT_AURA")
+	self:UnregisterMessage("Ovale_GroupChanged")
 	self:UnregisterMessage("Ovale_InactiveUnit")
 end
 
@@ -142,6 +156,11 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	end
 end
 
+function OvaleAura:PLAYER_ENTERING_WORLD(event)
+	RemoveAurasForMissingUnits()
+	auraPool:Drain()
+end
+
 function OvaleAura:UNIT_AURA(event, unitId)
 	if unitId == "player" then
 		self:UpdateAuras("player", playerGUID)
@@ -150,7 +169,6 @@ function OvaleAura:UNIT_AURA(event, unitId)
 	end
 end
 
--- Private methods
 function OvaleAura:UpdateAuras(unitId, unitGUID)
 	OvaleAura_serial = OvaleAura_serial + 1
 	

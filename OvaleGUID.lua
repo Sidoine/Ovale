@@ -108,6 +108,7 @@ function OvaleGUID:GROUP_ROSTER_UPDATE(event)
 		self:UpdateWithTarget("raid"..i)
 		self:UpdateWithTarget("raidpet"..i)
 	end
+	self:SendMessage("Ovale_GroupChanged")
 end
 
 function OvaleGUID:UNIT_PET(event, unitId)
@@ -120,6 +121,7 @@ function OvaleGUID:UNIT_PET(event, unitId)
 	elseif unitId == "player" then
 		self:UpdateWithTarget("pet")
 	end
+	self:SendMessage("Ovale_GroupChanged")
 end
 
 function OvaleGUID:ARENA_OPPONENT_UPDATE(event)
