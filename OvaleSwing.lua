@@ -35,25 +35,24 @@ OvaleSwing.swingmode = nil
 --</public-static-properties>
 
 --<private-static-properties>
-local autoshotname = GetSpellInfo(75)
-local resetspells = {
-}
-local delayspells = {
-	[GetSpellInfo(1464)] = true, -- Slam
-}
-local resetautoshotspells = {
-}
-local _, playerclass = UnitClass('player')
-
 local unpack = unpack
 local math_abs = math.abs
 local GetSpellInfo, GetTime, UnitAttackSpeed = GetSpellInfo, GetTime, UnitAttackSpeed
 local UnitDamage, UnitRangedDamage = UnitDamage, UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
+
+local playerGUID = nil
+local autoshotname = GetSpellInfo(75)
+local resetspells = {}
+local delayspells = {
+	[GetSpellInfo(1464)] = true, -- Slam
+}
+local resetautoshotspells = {}
 --</private-static-properties>
 
 --<public-static-methods>
 function OvaleSwing:OnEnable()
+	playerGUID = OvaleGUID.player
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")
@@ -77,7 +76,7 @@ end
 
 function OvaleSwing:PLAYER_ENTER_COMBAT()
 	local _,_,offhandlow, offhandhigh = UnitDamage('player')
-	if math_abs(offhandlow - offhandhigh) <= 0.1 or playerclass == "DRUID" then
+	if math_abs(offhandlow - offhandhigh) <= 0.1 or OvalePaperDoll.class == "DRUID" then
 		self.dual = false
 	else
 		self.dual = true
@@ -101,7 +100,7 @@ function OvaleSwing:STOP_AUTOREPEAT_SPELL()
 end
 
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
-	if srcName == UnitName("player") then
+	if srcGUID == playerGUID then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
 			self:MeleeSwing(Ovale.now)
 		end

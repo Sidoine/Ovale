@@ -13,24 +13,22 @@ local _, Ovale = ...
 OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 
 --<private-static-properties>
-local strfind = string.find
 local GetComboPoints = GetComboPoints
-local UnitClass, UnitGUID = UnitClass, UnitGUID
+local UnitGUID = UnitGUID
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
-local _, className = UnitClass("player")
+local playerGUID = nil
+local targetGUID = nil
 --</private-static-properties>
 
 --<public-static-properties>
 OvaleComboPoints.combo = 0
-OvaleComboPoints.playerGUID = nil
-OvaleComboPoints.targetGUID = nil
 --</public-static-properties>
 
 --<public-static-methods>
 function OvaleComboPoints:OnEnable()
-	self.playerGUID = UnitGUID("player")
-	if className == "ROGUE" or className == "DRUID" then
+	playerGUID = OvaleGUID.player
+	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterEvent("PLAYER_ENTERING_WORLD")
 		self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -39,16 +37,12 @@ function OvaleComboPoints:OnEnable()
 end
 
 function OvaleComboPoints:OnDisable()
-	if className == "ROGUE" or className == "DRUID" then
+	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 		self:UnregisterEvent("UNIT_COMBO_POINTS")
 	end
-end
-
-function OvaleComboPoints:Refresh()
-	self.combo = GetComboPoints("player") or 0
 end
 
 --[[
@@ -65,7 +59,7 @@ the number of extra combo points to add, e.g., critcombo=1.
 --]]
 function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local _, event, _, sourceGUID, _, _, _,	destGUID = ...
-	if sourceGUID == self.playerGUID and destGUID == self.targetGUID then
+	if sourceGUID == playerGUID and destGUID == targetGUID then
 		if event == "SPELL_DAMAGE" then
 			local spellId, _, _, _, _, _, _, _, _, critical = select(12, ...)
 			local si = OvaleData.spellInfo[spellId]
@@ -84,7 +78,7 @@ function OvaleComboPoints:PLAYER_ENTERING_WORLD(event)
 end
 
 function OvaleComboPoints:PLAYER_TARGET_CHANGED(event)
-	self.targetGUID = UnitGUID("target")
+	targetGUID = UnitGUID("target")
 	self:Refresh()
 end
 
@@ -93,5 +87,13 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, ...)
 	if unitId == "player" then
 		self:Refresh()
 	end
+end
+
+function OvaleComboPoints:Refresh()
+	self.combo = GetComboPoints("player") or 0
+end
+
+function OvaleComboPoints:Debug()
+	Ovale:Print("Player has " .. self.combo .. " combo points on target " ..targetGUID.. ".")
 end
 --</public-static-methods>

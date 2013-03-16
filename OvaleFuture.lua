@@ -25,9 +25,12 @@ local UnitBuff = UnitBuff
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 local UnitGUID = UnitGUID
+local UnitName = UnitName
 
 -- The spells that the player is casting or has cast but are still in-flight toward their targets.
 local lastSpell = {}
+local playerGUID = nil
+local playerName = nil
 --</private-static-properties>
 
 --<public-static-properties>
@@ -40,7 +43,6 @@ OvaleFuture.lastSpellSP = {}
 OvaleFuture.lastSpellDM = {}
 OvaleFuture.lastSpellCombo = {}
 OvaleFuture.lastSpellMastery = {}
-OvaleFuture.playerGUID = nil
 OvaleFuture.nextSpellTarget = nil
 OvaleFuture.nextSpellLineID = nil
 -- Debugging: spell ID to trace
@@ -50,7 +52,8 @@ OvaleFuture.traceSpellId = nil
 -- Events
 --<public-static-methods>
 function OvaleFuture:OnEnable()
-	self.playerGUID = UnitGUID("player")
+	playerGUID = OvaleGUID.player
+	playerName = UnitName("player")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -198,7 +201,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	SPELL_PERIODIC_DAMAGE
 	SPELL_PERIODIC_DAMAGE]]
 	
-	if sourceGUID == self.playerGUID then
+	if sourceGUID == playerGUID then
 		--Called when a missile reached or missed its target
 		--Update lastSpell accordingly
 		--Do not use SPELL_CAST_SUCCESS because it is sent when the missile has not reached the target
@@ -329,7 +332,7 @@ function OvaleFuture:AddSpellToList(spellId, lineId, startTime, endTime, channel
 			if scored~=nil then
 				Ovale.score = Ovale.score + scored
 				Ovale.maxScore = Ovale.maxScore + 1
-				Ovale:SendScoreToDamageMeter(UnitName("player"), OvaleAura.playerGUID, scored, 1)
+				Ovale:SendScoreToDamageMeter(playerName, playerGUID, scored, 1)
 			end
 		end
 	end

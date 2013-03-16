@@ -16,20 +16,21 @@ OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 --<public-static-properties>
 OvaleAura.aura = {}
 OvaleAura.serial = 0
-OvaleAura.playerGUID = nil
 --</public-static-properties>
 
 --<private-static-properties>
 local baseDamageMultiplier = 1
+local playerGUID = nil
 
 local pairs, select, strfind = pairs, select, string.find
 local UnitAura = UnitAura
+local UnitGUID = UnitGUID
 --</private-static-properties>
 
 -- Events
 --<public-static-methods>
 function OvaleAura:OnEnable()
-	self.playerGUID = UnitGUID("player")
+	playerGUID = OvaleGUID.player
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("UNIT_AURA")
 end
@@ -53,7 +54,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			self:UpdateAuras(unitId, destGUID)
 		end
 
-		if sourceGUID == self.playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
+		if sourceGUID == playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
 			local aura = self:GetAuraByGUID(destGUID, spellId, true)
 			if aura then
 				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
@@ -72,7 +73,7 @@ end
 
 function OvaleAura:UNIT_AURA(event, unitId)
 	if unitId == "player" then
-		self:UpdateAuras("player", self.playerGUID)
+		self:UpdateAuras("player", playerGUID)
 	elseif unitId then
 		self:UpdateAuras(unitId)
 	end
@@ -135,7 +136,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 		return
 	end
 	if not unitGUID and unitId == "player" then
-		unitGUID = self.playerGUID
+		unitGUID = playerGUID
 	end
 	if not unitGUID then
 		unitGUID = UnitGUID(unitId)
@@ -303,8 +304,8 @@ function OvaleAura:GetDamageMultiplier(spellId)
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
-			self:UpdateAuras("player", self.playerGUID)
-			local auraTable = self.aura[self.playerGUID]
+			self:UpdateAuras("player", playerGUID)
+			local auraTable = self.aura[playerGUID]
 			if auraTable then
 				for filter, filterInfo in pairs(si.damageAura) do
 					for auraSpellId, multiplier in pairs(filterInfo) do
