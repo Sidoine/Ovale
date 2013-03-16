@@ -8,9 +8,17 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-OvaleBestAction = {}
+local OvaleBestAction = {}
+Ovale.bestActionModule = OvaleBestAction
 
 --<private-static-properties>
+local OvaleActionBar = Ovale:GetModule("OvaleActionBar")
+local OvaleCondition = Ovale.conditionModule
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+local OvaleStance = Ovale:GetModule("OvaleStance")
+local OvaleState = Ovale.stateModule
+
 local floor, ipairs, loadstring, pairs = math.floor, ipairs, loadstring, pairs
 local strfind, tonumber, tostring = string.find, tonumber, tostring
 local GetActionCooldown, GetActionTexture, GetInventorySlotInfo = GetActionCooldown, GetActionTexture, GetInventorySlotInfo

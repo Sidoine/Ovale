@@ -1,3 +1,6 @@
+local _, Ovale = ...
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+
 local code = [[
 Define(adrenaline_rush 13750)
   SpellInfo(adrenaline_rush duration=15 cd=180 )

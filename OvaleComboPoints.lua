@@ -10,9 +10,13 @@
 -- This addon tracks the number of combo points by the player on the current target.
 
 local _, Ovale = ...
-OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
+local OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 
 --<private-static-properties>
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleGUID = Ovale:GetModule("OvaleGUID")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+
 local GetComboPoints = GetComboPoints
 local UnitGUID = UnitGUID
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS

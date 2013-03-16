@@ -13,6 +13,10 @@ local _, Ovale = ...
 
 --<private-static-properties>
 local L = Ovale.L
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleOptions = Ovale:GetModule("OvaleOptions")
+local OvaleState = Ovale.stateModule
+
 local strfind, strformat, strsub = string.find, string.format, string.sub
 --</private-static-properties>
 

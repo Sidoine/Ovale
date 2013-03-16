@@ -10,9 +10,10 @@
 -- This addon is a script repository.
 
 local _, Ovale = ...
-OvaleScripts = Ovale:NewModule("OvaleScripts")
+local OvaleScripts = Ovale:NewModule("OvaleScripts")
 
 --<private-static-properties>
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
 --</private-static-properties>
 
 --<public-static-properties>

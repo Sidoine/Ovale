@@ -1,3 +1,6 @@
+local _, Ovale = ...
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+
 local code = [[
 Define(avenging_wrath 31884)
   SpellInfo(avenging_wrath duration=20 cd=180 )

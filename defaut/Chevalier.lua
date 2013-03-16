@@ -1,3 +1,6 @@
+local _, Ovale = ...
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+
 local code = [[
 Define(army_of_the_dead 42650)
   SpellInfo(army_of_the_dead duration=4 frost=1 blood=1 unholy=1 runicpower=-300 cd=600 )

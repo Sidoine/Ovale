@@ -19,7 +19,7 @@
 ]]
 
 local _, Ovale = ...
-OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")
+local OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")
 
 --<public-static-properties>
 OvaleSwing.ohNext = nil
@@ -31,10 +31,12 @@ OvaleSwing.ohDuration = nil
 OvaleSwing.delay = nil
 OvaleSwing.startdelay = nil
 OvaleSwing.swingmode = nil
-
 --</public-static-properties>
 
 --<private-static-properties>
+local OvaleGUID = Ovale:GetModule("OvaleGUID")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+
 local unpack = unpack
 local math_abs = math.abs
 local GetSpellInfo, GetTime, UnitAttackSpeed = GetSpellInfo, GetTime, UnitAttackSpeed

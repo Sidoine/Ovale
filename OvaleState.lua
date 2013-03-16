@@ -9,8 +9,9 @@
 
 -- Keep the current state in the simulation
 
-local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
+local _, Ovale = ...
 OvaleState = {}
+Ovale.stateModule = OvaleState
 
 --<public-static-properties>
 --the state in the current frame
@@ -35,6 +36,15 @@ OvaleState.lastSpellId = nil
 --</public-static-properties>
 
 --<private-static-properties>
+local OvaleAura = Ovale:GetModule("OvaleAura")
+local OvaleComboPoints = Ovale:GetModule("OvaleComboPoints")
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleEquipement = Ovale:GetModule("OvaleEquipement")
+local OvaleFuture = Ovale:GetModule("OvaleFuture")
+local OvaleGUID = Ovale:GetModule("OvaleGUID")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+local OvaleStance = Ovale:GetModule("OvaleStance")
+
 local floor, pairs, tostring = math.floor, pairs, tostring
 local GetRuneCooldown, GetRuneType = GetRuneCooldown, GetRuneType
 local GetSpellInfo, UnitGUID, UnitHealth = GetSpellInfo, UnitGUID, UnitHealth

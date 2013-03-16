@@ -14,7 +14,12 @@ do
 --<private-static-properties>
 	local AceGUI = LibStub("AceGUI-3.0")
 	local Masque = LibStub("Masque", true)
-	local Ovale = LibStub("AceAddon-3.0"):GetAddon("Ovale")
+	local OvaleBestAction = Ovale.bestActionModule
+	local OvaleCompile = Ovale:GetModule("OvaleCompile")
+	local OvaleCondition = Ovale.conditionModule
+	local OvaleData = Ovale:GetModule("OvaleData")
+	local OvaleOptions = Ovale:GetModule("OvaleOptions")
+	local OvaleState = Ovale.stateModule
 
 	local Type = "OvaleFrame"
 	local Version = 7

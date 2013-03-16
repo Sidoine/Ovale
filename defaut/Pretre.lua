@@ -1,3 +1,6 @@
+local _, Ovale = ...
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+
 local code = [[
 Define(berserking 26297)
   SpellInfo(berserking duration=10 cd=180 )

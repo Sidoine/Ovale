@@ -10,7 +10,7 @@
 -- Gather information about ennemies
 
 local _, Ovale = ...
-OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0")
+local OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0")
 
 --<private-static-properties>
 local bit_band, pairs, select, tostring = bit.band, pairs, select, tostring

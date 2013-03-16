@@ -8,7 +8,7 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-OvaleSkada = Ovale:NewModule("OvaleSkada")
+local OvaleSkada = Ovale:NewModule("OvaleSkada")
 
 --<private-static-properties>
 local Skada	= LibStub("AceAddon-3.0"):GetAddon("Skada", true)

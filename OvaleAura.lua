@@ -11,7 +11,7 @@
 -- Fore each aura, it saves the state of the player when it was refreshed
 
 local _, Ovale = ...
-OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
+local OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 
 --<public-static-properties>
 OvaleAura.aura = {}
@@ -19,6 +19,9 @@ OvaleAura.serial = 0
 --</public-static-properties>
 
 --<private-static-properties>
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleGUID = Ovale:GetModule("OvaleGUID")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
 local OvalePool = Ovale.poolPrototype
 
 local baseDamageMultiplier = 1

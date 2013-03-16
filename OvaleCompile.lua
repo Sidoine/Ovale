@@ -8,11 +8,18 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
+local OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
 
 --<private-static-properties>
 local L = Ovale.L
+local OvaleCondition = Ovale.conditionModule
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleEquipement = Ovale:GetModule("OvaleEquipement")
+local OvaleOptions = Ovale:GetModule("OvaleOptions")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
 local OvalePool = Ovale.poolPrototype
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleStance = Ovale:GetModule("OvaleStance")
 
 local node = {}
 local nodePool = OvalePool:NewPool("OvaleCompile_nodePool")

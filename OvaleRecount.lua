@@ -8,7 +8,7 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-OvaleRecount = Ovale:NewModule("OvaleRecount")
+local OvaleRecount = Ovale:NewModule("OvaleRecount")
 
 --<private-static-properties>
 local Recount = LibStub("AceAddon-3.0"):GetAddon("Recount", true)

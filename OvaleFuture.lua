@@ -10,9 +10,15 @@
 -- The travelling missiles or spells that have been cast but whose effects were not still not applied
 
 local _, Ovale = ...
-OvaleFuture = Ovale:NewModule("OvaleFuture", "AceEvent-3.0")
+local OvaleFuture = Ovale:NewModule("OvaleFuture", "AceEvent-3.0")
 
 --<private-static-properties>
+local OvaleAura = Ovale:GetModule("OvaleAura")
+local OvaleComboPoints = Ovale:GetModule("OvaleComboPoints")
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvaleGUID = Ovale:GetModule("OvaleGUID")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+
 local ipairs = ipairs
 local pairs = pairs
 local select = select

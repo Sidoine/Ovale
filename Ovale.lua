@@ -12,6 +12,7 @@ _G.Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, "Ovale", "AceConsole-3.0", "A
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+local OvaleOptions = nil
 
 local ipairs, pairs, strsplit, tinsert, tsort = ipairs, pairs, string.split, table.insert, table.sort
 local SendAddonMessage, UnitAura, UnitCanAttack = SendAddonMessage, UnitAura, UnitCanAttack
@@ -90,7 +91,9 @@ function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 
+	OvaleOptions = Ovale:GetModule("OvaleOptions")
 	local profile = OvaleOptions:GetProfile()
+
 	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
 	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
 	self:UpdateFrame()

@@ -10,9 +10,15 @@
 -- Ovale options and UI
 
 local _, Ovale = ...
-OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent-3.0")
+local OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent-3.0")
 
 --<private-static-properties>
+local OvaleData = Ovale:GetModule("OvaleData")
+local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleStance = Ovale:GetModule("OvaleStance")
+local OvaleState = Ovale.stateModule
+
 local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring
 --</private-static-properties>
 

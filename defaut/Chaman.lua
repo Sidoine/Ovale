@@ -1,3 +1,6 @@
+local _, Ovale = ...
+local OvaleScripts = Ovale:GetModule("OvaleScripts")
+
 local code = [[
 Define(ancestral_swiftness 16188)
   SpellInfo(ancestral_swiftness cd=90 )

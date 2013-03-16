@@ -10,9 +10,11 @@
 -- Add-on that registers how many damage made the last spell cast by the player
 
 local _, Ovale = ...
-OvaleSpellDamage = Ovale:NewModule("OvaleSpellDamage", "AceEvent-3.0")
+local OvaleSpellDamage = Ovale:NewModule("OvaleSpellDamage", "AceEvent-3.0")
 
 --<private-static-properties>
+local OvaleGUID = Ovale:GetModule("OvaleGUID")
+
 local select = select
 local strfind = string.find
 

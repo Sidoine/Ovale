@@ -35,9 +35,7 @@ OvalePaperDoll.lua
 OvalePool.lua
 OvaleRecount.lua
 OvaleSkada.lua
-OvaleSpellDamage.lua
 OvaleStance.lua
-OvaleSwing.lua
 
 # First tier of modules with dependencies
 OvaleData.lua
@@ -53,6 +51,8 @@ defaut\Pretre.lua
 defaut\Voleur.lua
 defaut\Moine.lua
 defaut\Chevalier.lua
+OvaleSpellDamage.lua
+OvaleSwing.lua
 
 # Second tier of modules with dependencies
 OvaleAura.lua
@@ -62,11 +62,13 @@ OvaleState.lua
 
 # Third tier of modules with dependencies
 OvaleCondition.lua
-OvaleBestAction.lua
 OvaleOptions.lua
 
 # Fourth tier of modules with dependencies
+OvaleBestAction.lua
+OvaleCompile.lua
 OvaleIcone.lua
 OvaleIcone.xml
-OvaleCompile.lua
+
+# Fifth tier of modules with dependencies
 OvaleFrame.lua

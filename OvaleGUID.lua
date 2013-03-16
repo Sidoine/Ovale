@@ -11,7 +11,7 @@
 -- Usage: OvaleGUID:GetUnitId(guid)
 
 local _, Ovale = ...
-OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
+local OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
 
 --<private-static-properties>
 local strfind, strsub = string.find, string.sub
