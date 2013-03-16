@@ -13,11 +13,6 @@
 local _, Ovale = ...
 local OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 
---<public-static-properties>
-OvaleAura.aura = {}
-OvaleAura.serial = 0
---</public-static-properties>
-
 --<private-static-properties>
 local OvaleData = Ovale:GetModule("OvaleData")
 local OvaleGUID = Ovale:GetModule("OvaleGUID")
@@ -27,82 +22,26 @@ local OvalePool = Ovale.poolPrototype
 local baseDamageMultiplier = 1
 local playerGUID = nil
 local auraPool = OvalePool:NewPool("OvaleAura_auraPool")
+local OvaleAura_aura = {}
+local OvaleAura_serial = 0
 
-local pairs, select, strfind = pairs, select, string.find
+local pairs = pairs
+local select = select
+local strfind = string.find
 local wipe = wipe
 local UnitAura = UnitAura
 local UnitGUID = UnitGUID
 --</private-static-properties>
 
--- Events
---<public-static-methods>
-function OvaleAura:OnEnable()
-	playerGUID = OvaleGUID.player
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("UNIT_AURA")
-end
-
-function OvaleAura:OnDisable()
-	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:UnregisterEvent("UNIT_AURA")
-end
-
-function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-
-	-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
-	if strfind(event, "SPELL_AURA_") == 1 then
-		local spellId, spellName, spellSchool, auraType = select(12, ...)
-
-		local unitId = OvaleGUID:GetUnitId(destGUID)
-
-		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
-		if unitId and unitId ~= "target" and strfind(unitId, "target") then
-			self:UpdateAuras(unitId, destGUID)
-		end
-
-		if sourceGUID == playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-			if self:GetAuraByGUID(destGUID, spellId, true) then
-				local aura = self.aura[destGUID][spellId].mine
-				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
-			end
-		end
-	end
-
-	if event == "UNIT_DIED" then
-		-- Return all auras from the dead unit to the aura pool.
-		for spellId, whoseTable in pairs(self.aura[destGUID]) do
-			for whose, aura in pairs(whoseTable) do
-				-- Return the aura to the aura pool.
-				whoseTable[whose] = nil
-				auraPool:Release(aura)
-			end
-			self.aura[destGUID][spellId] = nil
-		end
-		self.aura[destGUID] = nil
-
-		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId then
-			Ovale.refreshNeeded[unitId] = true
-		end
-	end
-end
-
-function OvaleAura:UNIT_AURA(event, unitId)
-	if unitId == "player" then
-		self:UpdateAuras("player", playerGUID)
-	elseif unitId then
-		self:UpdateAuras(unitId)
-	end
-end
-
-function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
-	local auraList = self.aura[unitGUID]
-
+--<private-static-methods>
+function AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
+	local auraList = OvaleAura_aura[unitGUID]
 	if not auraList[spellId] then
 		auraList[spellId] = {}
 	end
-		
+
+	-- Re-use existing aura by updating its serial number and adding new information
+	-- if it differs from the old aura.
 	local mine = (unitCaster == "player")
 	local aura
 	if mine then
@@ -120,13 +59,12 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 		end
 		aura = auraList[spellId].other
 	end
-	
-	aura.serial = self.serial
-	
+
+	aura.serial = OvaleAura_serial
 	if count == 0 then
 		count = 1
 	end
-	
+
 	if not aura.ending or aura.ending < expirationTime or aura.stacks ~= count then
 		aura.icon = icon
 		aura.stacks = count
@@ -147,9 +85,74 @@ function OvaleAura:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffTyp
 	end
 end
 
+function RemoveAurasForGUID(guid)
+	-- Return all auras for the given GUID to the aura pool.
+	if not guid or not OvaleAura_aura[guid] then return end
+	for spellId, whoseTable in pairs(OvaleAura_aura[guid]) do
+		for whose, aura in pairs(whoseTable) do
+			whoseTable[whose] = nil
+			auraPool:Release(aura)
+		end
+		OvaleAura_aura[guid][spellId] = nil
+	end
+	OvaleAura_aura[guid] = nil
+
+	local unitId = OvaleGUID:GetUnitId(guid)
+	if unitId then
+		Ovale.refreshNeeded[unitId] = true
+	end
+end
+--</private-static-methods>
+
+--<public-static-methods>
+function OvaleAura:OnEnable()
+	playerGUID = OvaleGUID.player
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("UNIT_AURA")
+	self:RegisterMessage("Ovale_InactiveUnit", RemoveAurasForGUID)
+end
+
+function OvaleAura:OnDisable()
+	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:UnregisterEvent("UNIT_AURA")
+	self:UnregisterMessage("Ovale_InactiveUnit")
+end
+
+function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+
+	if event == "UNIT_DIED" then
+		RemoveAurasForGUID(destGUID)
+	elseif strfind(event, "SPELL_AURA_") == 1 then
+		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
+		local spellId, spellName, spellSchool, auraType = select(12, ...)
+
+		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
+		local unitId = OvaleGUID:GetUnitId(destGUID)
+		if unitId and unitId ~= "target" and strfind(unitId, "target") then
+			self:UpdateAuras(unitId, destGUID)
+		end
+
+		if sourceGUID == playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
+			if self:GetAuraByGUID(destGUID, spellId, true) then
+				local aura = OvaleAura_aura[destGUID][spellId].mine
+				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+			end
+		end
+	end
+end
+
+function OvaleAura:UNIT_AURA(event, unitId)
+	if unitId == "player" then
+		self:UpdateAuras("player", playerGUID)
+	elseif unitId then
+		self:UpdateAuras(unitId)
+	end
+end
+
 -- Private methods
 function OvaleAura:UpdateAuras(unitId, unitGUID)
-	self.serial = self.serial + 1
+	OvaleAura_serial = OvaleAura_serial + 1
 	
 	local damageMultiplier
 
@@ -170,8 +173,8 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 		damageMultiplier = 1
 	end
 
-	if not self.aura[unitGUID] then
-		self.aura[unitGUID] = {}
+	if not OvaleAura_aura[unitGUID] then
+		OvaleAura_aura[unitGUID] = {}
 	end
 	
 	local i = 1
@@ -190,11 +193,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 				break
 			end
 		else
-			self:AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			if debuffType then
 				-- TODO: not very clean
 				-- should be computed by OvaleState:GetAura
-				self:AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+				AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			end
 			
 			if unitId == "player" then
@@ -207,11 +210,11 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	end
 	
 	--Removes expired auras
-	local auraList = self.aura[unitGUID]
+	local auraList = OvaleAura_aura[unitGUID]
 	for spellId,whoseTable in pairs(auraList) do
 		for whose,aura in pairs(whoseTable) do
-			if aura.serial ~= self.serial then
-				Ovale:DebugPrint("aura", "Removing "..aura.name.." from "..whose .. " self.serial = " ..self.serial .. " aura.serial = " ..aura.serial)
+			if aura.serial ~= OvaleAura_serial then
+				Ovale:DebugPrint("aura", "Removing "..aura.name.." from "..whose .. " OvaleAura_serial = " ..OvaleAura_serial .. " aura.serial = " ..aura.serial)
 				whoseTable[whose] = nil
 				auraPool:Release(aura)
 			end
@@ -224,7 +227,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	
 	--Clear unit if all aura have been deleted
 	if not next(auraList) then
-		self.aura[unitGUID] = nil
+		OvaleAura_aura[unitGUID] = nil
 	end
 	
 	if unitId == "player" then
@@ -240,7 +243,7 @@ function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 		Ovale:Log(tostring(guid) .. " does not exists in OvaleAura")
 		return nil
 	end
-	local auraTable = self.aura[guid]
+	local auraTable = OvaleAura_aura[guid]
 	if not auraTable then 
 		if not unitId then
 			unitId = OvaleGUID:GetUnitId(guid)
@@ -250,7 +253,7 @@ function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 			return nil
 		end
 		self:UpdateAuras(unitId, guid)
-		auraTable = self.aura[guid]
+		auraTable = OvaleAura_aura[guid]
 		if not auraTable then
 			-- no aura on target
 			Ovale:Log("Target " .. guid .. " has no aura")
@@ -276,7 +279,7 @@ function OvaleAura:GetAura(unitId, spellId, mine)
 end
 
 function OvaleAura:GetStealable(unitId)
-	local auraTable = self.aura[UnitGUID(unitId)]
+	local auraTable = OvaleAura_aura[UnitGUID(unitId)]
 	if not auraTable then
 		return nil
 	end
@@ -303,7 +306,7 @@ function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
 	local starting = nil
 	local count = 0
 	
-	for unitId,auraTable in pairs(self.aura) do
+	for unitId,auraTable in pairs(OvaleAura_aura) do
 		if unitId ~= excludingTarget then
 			if auraTable[spellId] then
 				local aura = auraTable[spellId].mine
@@ -330,7 +333,7 @@ function OvaleAura:GetDamageMultiplier(spellId)
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
 			self:UpdateAuras("player", playerGUID)
-			local auraTable = self.aura[playerGUID]
+			local auraTable = OvaleAura_aura[playerGUID]
 			if auraTable then
 				for filter, filterInfo in pairs(si.damageAura) do
 					for auraSpellId, multiplier in pairs(filterInfo) do
@@ -347,7 +350,7 @@ end
 
 function OvaleAura:Debug()
 	auraPool:Debug()
-	for guid,auraTable in pairs(self.aura) do
+	for guid,auraTable in pairs(OvaleAura_aura) do
 		Ovale:Print("***"..guid)
 		for spellId,whoseTable in pairs(auraTable) do
 			for whose,aura in pairs(whoseTable) do
