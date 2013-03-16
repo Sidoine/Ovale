@@ -89,7 +89,7 @@ function OvaleState:UpdatePowerRates()
 		end
 
 		-- Vitality (combat rogue)
-		if OvaleStance:IsSpecialization(2) then
+		if OvalePaperDoll.specialization == 2 then
 			self.powerRate.energy = self.powerRate.energy * 1.2
 		end
 

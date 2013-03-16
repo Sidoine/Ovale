@@ -19,6 +19,7 @@ local tonumber = tonumber
 local GetMasteryEffect = GetMasteryEffect
 local GetMeleeHaste = GetMeleeHaste
 local GetRangedHaste = GetRangedHaste
+local GetSpecialization = GetSpecialization
 local GetSpellBonusDamage = GetSpellBonusDamage
 local GetSpellBonusHealing = GetSpellBonusHealing
 local UnitAttackPower = UnitAttackPower
@@ -34,6 +35,8 @@ local UnitStat = UnitStat
 OvalePaperDoll.class = select(2, UnitClass("player"))
 -- player's level
 OvalePaperDoll.level = UnitLevel("player")
+-- Player's current specialization.
+OvalePaperDoll.specialization = nil
 
 -- primary stats
 OvalePaperDoll.agility = 0
@@ -60,10 +63,12 @@ OvalePaperDoll.spellBonusHealing = 0
 
 --<public-static-methods>
 function OvalePaperDoll:OnEnable()
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStats")
 	self:RegisterEvent("MASTERY_UPDATE")
-	self:RegisterEvent("PLAYER_ALIVE")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "PLAYER_ALIVE")
+	self:RegisterEvent("PLAYER_ALIVE", "UpdateStats")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStats")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
@@ -74,10 +79,12 @@ function OvalePaperDoll:OnEnable()
 end
 
 function OvalePaperDoll:OnDisable()
+	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("MASTERY_UPDATE")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_LEVEL_UP")
+	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
@@ -93,16 +100,6 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 	else
 		self.masteryEffect = GetMasteryEffect()
 	end
-end
-
-function OvalePaperDoll:PLAYER_ALIVE(event)
-	self:MASTERY_UPDATE(event)
-	self:UNIT_ATTACK_POWER(event, "player")
-	self:UNIT_RANGEDDAMAGE(event, "player")
-	self:UNIT_RANGED_ATTACK_POWER(event, "player")
-	self:UNIT_SPELL_HASTE(event, "player")
-	self:UNIT_SPELL_POWER(event, "player")
-	self:UNIT_STATS(event, "player")
 end
 
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
@@ -177,6 +174,18 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.spirit = UnitStat(unitId, 5)
 end
 
+function OvalePaperDoll:UpdateStats(event)
+	self.specialization = GetSpecialization()
+	self:MASTERY_UPDATE(event)
+	self:UNIT_ATTACK_POWER(event, "player")
+	self:UNIT_RANGEDDAMAGE(event, "player")
+	self:UNIT_RANGED_ATTACK_POWER(event, "player")
+	self:UNIT_SPELL_HASTE(event, "player")
+	self:UNIT_SPELL_POWER(event, "player")
+	self:UNIT_STATS(event, "player")
+end
+
+
 function OvalePaperDoll:GetMasteryMultiplier()
 	return 1 + self.masteryEffect / 100
 end
@@ -194,6 +203,9 @@ function OvalePaperDoll:GetSpellHasteMultiplier()
 end
 
 function OvalePaperDoll:Debug()
+	Ovale:Print("Class: " .. self.class)
+	Ovale:Print("Level: " .. self.level)
+	Ovale:Print("Specialization: " .. self.specialization)
 	Ovale:Print("Agility: " ..self.agility)
 	Ovale:Print("Intellect: " ..self.intellect)
 	Ovale:Print("Spirit: " ..self.spirit)

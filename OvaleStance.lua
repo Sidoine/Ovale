@@ -20,7 +20,6 @@ local tinsert = table.insert
 local tsort = table.sort
 local GetNumShapeshiftForms = GetNumShapeshiftForms
 local GetShapeshiftForm = GetShapeshiftForm
-local GetSpecialization = GetSpecialization
 local GetSpellInfo = GetSpellInfo
 
 local spellIdToStance = {
@@ -68,39 +67,25 @@ local spellIdToStance = {
 local stanceList
 -- Player's current stance.
 local stance
--- Player's current specialization/mastery.
-local specialization
 --</private-static-properties>
 
 --<public-static-methods>
 function OvaleStance:OnEnable()
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_TALENT_UPDATE")
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStances")
+	self:RegisterEvent("PLAYER_ALIVE", "UpdateStances")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStances")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStances")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 end
 
 function OvaleStance:OnDisable()
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
-end
-
-function OvaleStance:ACTIVE_TALENT_GROUP_CHANGED(event)
-	specialization = GetSpecialization()
-	self:PLAYER_TALENT_UPDATE(event)
-end
-
-function OvaleStance:PLAYER_ENTERING_WORLD(event)
-	self:ACTIVE_TALENT_GROUP_CHANGED(event)
-end
-
-function OvaleStance:PLAYER_TALENT_UPDATE(event)
-	self:CreateStanceList()
-	self:ShapeshiftEventHandler()
 end
 
 function OvaleStance:UPDATE_SHAPESHIFT_FORM(event)
@@ -142,13 +127,6 @@ end
 
 function OvaleStance:Debug()
 	Ovale:Print("current stance: " .. stance)
-	Ovale:Print("current specialization: " .. specialization)
-end
-
--- Return true if the current specialization matches the given name.
-function OvaleStance:IsSpecialization(name)
-	if not name then return false end
-	return name == specialization
 end
 
 -- Return true if the current stance matches the given name.
@@ -167,5 +145,10 @@ function OvaleStance:ShapeshiftEventHandler()
 		stance = newStance
 		self:SendMessage("Ovale_StanceChanged")
 	end
+end
+
+function OvaleStance:UpdateStances()
+	self:CreateStanceList()
+	self:ShapeshiftEventHandler()
 end
 --</public-static-methods>

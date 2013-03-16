@@ -85,7 +85,7 @@ local function TestConditions(paramList)
 	if paramList.glyph and not OvaleData.glyphs[paramList.glyph] then
 		return false
 	end
-	if paramList.mastery and not OvaleStance:IsSpecialization(paramList.mastery) then
+	if paramList.mastery and OvalePaperDoll.specialization ~= paramList.mastery then
 		return false
 	end
 	if paramList.if_stance then
