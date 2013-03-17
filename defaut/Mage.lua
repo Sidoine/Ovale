@@ -99,8 +99,8 @@ AddIcon mastery=1 help=main
 {
 	if not InCombat() 
 	{
-		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
-		Spell(mage_armor)
+		if BuffExpires(spell_power_multiplier any=1) or BuffExpires(critical_strike any=1) Spell(arcane_brilliance)
+		if BuffExpires(mage_armor) Spell(mage_armor)
 		Spell(rune_of_power)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
@@ -144,8 +144,8 @@ AddIcon mastery=2 help=main
 {
 	if not InCombat() 
 	{
-		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
-		Spell(molten_armor)
+		if BuffExpires(spell_power_multiplier any=1) or BuffExpires(critical_strike any=1) Spell(arcane_brilliance)
+		if BuffExpires(molten_armor) Spell(molten_armor)
 		Spell(rune_of_power)
 	}
 	if ItemCharges(36799) <3 and False() Spell(conjure_mana_gem)
@@ -185,7 +185,7 @@ AddIcon mastery=3 help=main
 {
 	if not InCombat() 
 	{
-		if BuffExpires(arcane_brilliance) Spell(arcane_brilliance)
+		if BuffExpires(spell_power_multiplier any=1) or BuffExpires(critical_strike any=1) Spell(arcane_brilliance)
 		if BuffExpires(frost_armor) Spell(frost_armor)
 		Spell(rune_of_power)
 	}
