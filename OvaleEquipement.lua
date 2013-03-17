@@ -953,12 +953,14 @@ end
 
 --<public-static-methods>
 function OvaleEquipement:OnEnable()
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
+	self:RegisterEvent("PLAYER_ALIVE", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
 function OvaleEquipement:OnDisable()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
@@ -979,12 +981,6 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 		end
 	end
 
-	self:UpdateArmorSetCount()
-	self:SendMessage("Ovale_EquipmentChanged")
-end
-
-function OvaleEquipement:PLAYER_ENTERING_WORLD(event)
-	self:UpdateEquippedItems()
 	self:UpdateArmorSetCount()
 	self:SendMessage("Ovale_EquipmentChanged")
 end
@@ -1048,11 +1044,22 @@ function OvaleEquipement:UpdateArmorSetCount()
 end
 
 function OvaleEquipement:UpdateEquippedItems()
+	local changed = false
+	local item
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		equippedItems[slotId] = GetInventoryItemID("player", slotId)
+		item = GetInventoryItemID("player", slotId)
+		if item ~= equippedItems[slotId] then
+			equippedItems[slotId] = GetInventoryItemID("player", slotId)
+			changed = true
+		end
 	end
 	mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
 	offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
+
+	if changed then
+		self:UpdateArmorSetCount()
+		self:SendMessage("Ovale_EquipmentChanged")
+	end
 end
 
 function OvaleEquipement:Debug()
