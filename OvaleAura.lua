@@ -88,6 +88,7 @@ end
 function RemoveAurasForGUID(guid)
 	-- Return all auras for the given GUID to the aura pool.
 	if not guid or not OvaleAura_aura[guid] then return end
+	Ovale:DebugPrint("aura", "Removing auras for guid " .. guid)
 	for spellId, whoseTable in pairs(OvaleAura_aura[guid]) do
 		for whose, aura in pairs(whoseTable) do
 			whoseTable[whose] = nil
@@ -121,7 +122,7 @@ function OvaleAura:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterMessage("Ovale_GroupChanged", RemoveAurasForMissingUnits)
-	self:RegisterMessage("Ovale_InactiveUnit", RemoveAurasForGUID)
+	self:RegisterMessage("Ovale_InactiveUnit")
 end
 
 function OvaleAura:OnDisable()
@@ -167,6 +168,10 @@ function OvaleAura:UNIT_AURA(event, unitId)
 	elseif unitId then
 		self:UpdateAuras(unitId)
 	end
+end
+
+function OvaleAura:Ovale_InactiveUnit(event, guid)
+	RemoveAurasForGUID(guid)
 end
 
 function OvaleAura:UpdateAuras(unitId, unitGUID)
@@ -232,7 +237,7 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	for spellId,whoseTable in pairs(auraList) do
 		for whose,aura in pairs(whoseTable) do
 			if aura.serial ~= OvaleAura_serial then
-				Ovale:DebugPrint("aura", "Removing "..aura.name.." from "..whose .. " OvaleAura_serial = " ..OvaleAura_serial .. " aura.serial = " ..aura.serial)
+				Ovale:DebugPrint("aura", "Removing "..aura.name.." from "..whose .. ", serial = " ..OvaleAura_serial.. " aura.serial = " ..aura.serial)
 				whoseTable[whose] = nil
 				auraPool:Release(aura)
 			end
