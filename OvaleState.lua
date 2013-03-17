@@ -59,55 +59,65 @@ function OvaleState:StartNewFrame()
 end
 
 function OvaleState:UpdatePowerRates()
+	local class = OvalePaperDoll.class
+
 	for k,v in pairs(OvaleData.power) do
 		self.powerRate[k] = 0
 	end
 
-	self.powerRate.energy = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
-	self.powerRate.focus = 4 * OvalePaperDoll:GetRangedHasteMultiplier()
+	-- Base power regeneration for all classes, based on power type.
+	local energyRegen = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
+	local focusRegen = 4 * OvalePaperDoll:GetRangedHasteMultiplier()
 
-	-- Strip off 10% ranged attack speed bonus that doesn't count toward focus regeneration.
-	for _, v in pairs(OvaleData.buffSpellList.melee_haste) do
-		if OvaleState:GetAura("player", v) then
-			self.powerRate.focus = self.powerRate.focus / 1.1
-			break
+	-- Strip off 10% attack speed bonus that doesn't count toward power regeneration.
+	if class == "HUNTER" then
+		-- Strip off 10% attack speed bonus that doesn't count toward focus regeneration.
+		for _, v in pairs(OvaleData.buffSpellList.melee_haste) do
+			if OvaleState:GetAura("player", v) then
+				focusRegen = focusRegen / 1.1
+				break
+			end
 		end
-	end
-
-	if OvalePaperDoll.class == "MONK" then
+	elseif class == "MONK" then
 		-- Way of the Monk (monk)
 		if OvaleEquipement:HasTwoHandedWeapon() then
 			-- Strip off 40% melee attack speed bonus for two-handed weapon.
-			self.powerRate.energy = self.powerRate.energy / 1.4
+			energyRegen = energyRegen / 1.4
 		end
 
 		-- Ascension (monk)
 		if OvaleData:GetTalentPoints(8) > 0 then
-			self.powerRate.energy = self.powerRate.energy * 1.15
+			energyRegen = energyRegen * 1.15
 		end
 
 		-- Stance of the Sturdy Ox (brewmaster monk)
 		if OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
-			self.powerRate.energy = self.powerRate.energy * 1.1
+			energyRegen = energyRegen * 1.1
 		end
-	end
+	elseif class == "ROGUE" then
+		-- Rogue attack-speed self-buff incorrectly counts towards its melee haste.
+		if OvalePaperDoll.level >= 30 then
+			energyRegen = energyRegen / 1.1
+		end
 
-	if OvalePaperDoll.class == "ROGUE" then
 		-- Blade Flurry (combat rogue)
 		if OvaleState:GetAura("player", 13877, true) then
-			self.powerRate.energy = self.powerRate.energy * 0.8
+			energyRegen = energyRegen * 0.8
 		end
 
 		-- Vitality (combat rogue)
 		if OvalePaperDoll.specialization == 2 then
-			self.powerRate.energy = self.powerRate.energy * 1.2
+			energyRegen = energyRegen * 1.2
 		end
 
 		-- Adrenaline Rush (rogue)
 		if OvaleState:GetAura("player", 13750, true) then
-			self.powerRate.energy = self.powerRate.energy * 2
+			energyRegen = energyRegen * 2
 		end
 	end
+
+	self.powerRate.energy = energyRegen
+	self.powerRate.focus = focusRegen
 end
 
 function OvaleState:Reset()
