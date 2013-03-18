@@ -18,6 +18,7 @@ local pairs = pairs
 local strfind = string.find
 local tinsert = table.insert
 local tsort = table.sort
+local wipe = table.wipe
 local GetNumShapeshiftForms = GetNumShapeshiftForms
 local GetShapeshiftForm = GetShapeshiftForm
 local GetSpellInfo = GetSpellInfo
@@ -64,7 +65,7 @@ local spellIdToStance = {
 }
 
 -- List of available stances, populated by CreateStanceList()
-local stanceList
+local stanceList = {}
 -- Player's current stance.
 local stance
 --</private-static-properties>
@@ -98,7 +99,7 @@ end
 
 -- Fill stanceList with stance bar index <-> Ovale stance name mappings.
 function OvaleStance:CreateStanceList()
-	stanceList = {}
+	wipe(stanceList)
 	local name, stanceName
 	for i = 1, GetNumShapeshiftForms() do
 		_, name = GetShapeshiftFormInfo(i)
@@ -131,7 +132,7 @@ end
 
 -- Return true if the current stance matches the given name.
 function OvaleStance:IsStance(name)
-	if not name then return false end
+	if not name or not stance then return false end
 	if type(name) == "number" then
 		return name == stance
 	else
