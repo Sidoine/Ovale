@@ -198,6 +198,19 @@ local function ParseFunction(prefix, func, params)
 	
 	func = strlower(func)
 
+	-- "debuff" and "buff" conditions implicitly set their aura filter.
+	if not paramList.filter then
+		if strfind(func, "debuff") == 1 then
+			paramList.filter = "debuff"
+		elseif strfind(func, "buff") == 1 then
+			paramList.filter = "buff"
+		elseif strfind(func, "otherdebuff") == 1 then
+			paramList.filter = "debuff"
+		elseif strfind(func, "otherbuff") == 1 then
+			paramList.filter = "buff"
+		end
+	end
+
 	local node = self_pool:Get()
 	node.type = "function"
 	node.func = func

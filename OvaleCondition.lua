@@ -178,6 +178,17 @@ local function getTarget(condition)
 	end
 end
 
+local function getFilter(condition)
+	if condition.filter then
+		if condition.filter == "debuff" then
+			return "HARMFUL"
+		elseif condition.filter == "buff" then
+			return "HELPFUL"
+		end
+	end
+	return nil
+end
+
 local function addTime(time1, duration)
 	if not time1 then
 		return nil
@@ -209,11 +220,11 @@ end
 -- that can be on any unit except the target
 -- Returns the first to expires, the last to expires
 -- Returns nil if the debuff is not present
-local function getOtherAura(spellId, suppTime, excludingTarget)
+local function getOtherAura(spellId, filter, suppTime, excludingTarget)
 	if excludingTarget then
 		excludingTarget = OvaleGUID:GetGUID(excludingTarget)
 	end
-	return OvaleState:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
+	return OvaleState:GetExpirationTimeOnAnyTarget(spellId, filter, excludingTarget)
 end
 
 local function GetRuneCount(type, death)
@@ -283,14 +294,14 @@ local function testValue(comparator, limit, value, atTime, rate)
 	end
 end
 
-local function getAura(target, spellId, mine)
+local function getAura(target, spellId, filter, mine)
 	if type(spellId) == "number" then
-		return OvaleState:GetAura(target, spellId, mine)
+		return OvaleState:GetAura(target, spellId, filter, mine)
 	elseif OvaleData.buffSpellList[spellId] then
 		local newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
 		local start, ending, stacks, spellHasteMultiplier, value, gain
 		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-			start, ending, stacks, spellHasteMultiplier, value, gain = OvaleState:GetAura(target, v, mine)
+			start, ending, stacks, spellHasteMultiplier, value, gain = OvaleState:GetAura(target, v, filter, mine)
 			if start and (not newStart or stacks > newStacks) then
 				newStart = start
 				newEnding = ending
@@ -302,7 +313,7 @@ local function getAura(target, spellId, mine)
 		end
 		return newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
 	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
-		return OvaleState:GetAura(target, spellId, mine)
+		return OvaleState:GetAura(target, spellId, filter, mine)
 	end
 end
 
@@ -334,7 +345,7 @@ local function GetTargetAura(condition, target)
 	local spellId = condition[1]
 	local mine = getMine(condition)
 
-	local auraStart, auraEnding, auraStacks, auraSpellHasteMultiplier, auraValue, auraGain = getAura(target, spellId, mine)
+	local auraStart, auraEnding, auraStacks, auraSpellHasteMultiplier, auraValue, auraGain = getAura(target, spellId, getFilter(condition), mine)
 	if not auraStart then
 		Ovale:Log("Aura "..spellId.." not found on " .. target .. " mine=" .. tostring(mine))
 		return 0,0,0,0
@@ -515,7 +526,7 @@ end
 -- @see DebuffCount
 
 OvaleCondition.conditions.buffcount = function(condition)
-	local start, ending, count = OvaleState:GetExpirationTimeOnAnyTarget(condition[1])
+	local start, ending, count = OvaleState:GetExpirationTimeOnAnyTarget(condition[1], getFilter(condition))
 	return start, ending, count, 0, 0
 end
 OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
@@ -1598,7 +1609,7 @@ OvaleCondition.conditions.isstunned = function(condition)
 end
 
 --- Get the damage done by the most recent damage event for the given spell.
--- If the spell is a damage-over-time (DoT) aura, then it gives the damage done by the most recent tick.
+-- If the spell is a periodic aura, then it gives the damage done by the most recent tick.
 -- @name LastSpellDamage
 -- @paramsig number or boolean
 -- @param id The spell ID.
@@ -1969,10 +1980,13 @@ OvaleCondition.conditions.nextswing = function(condition)
 	return 0, nil, 0, OvaleSwing:GetNext(condition[1]), 0, -1
 end
 
---- Get the number of seconds until the next tick of a damage-over-time (DoT) aura on the target.
+--- Get the number of seconds until the next tick of a periodic aura on the target.
 -- @name NextTick
 -- @paramsig number
 -- @param id The aura spell ID.
+-- @param filter Optional. The type of aura to check.
+--     Default is any.
+--     Valid values: any, buff, debuff
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -1995,35 +2009,39 @@ end
 	-- 1: spell id
 	-- return: bool
 	-- alias: otherauraexpires
-OvaleCondition.conditions.otherdebuffexpires = function(condition)
-	local minTime, maxTime = getOtherAura(condition[1], condition[3], "target")
+OvaleCondition.conditions.otherauraexpires = function(condition)
+	local minTime, maxTime = getOtherAura(condition[1], getFilter(condition), condition[3], "target")
 	if minTime then
 		local timeBefore = condition[2] or 0
 		return minTime - timeBefore, nil
 	end
 	return 0, nil
 end
-OvaleCondition.conditions.otherauraexpires = OvaleCondition.conditions.otherdebuffexpires
+OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherauraexpires
+OvaleCondition.conditions.otherdebuffexpires = OvaleCondition.conditions.otherauraexpires
 
 	-- Check if the aura is present on any other unit than the current target
 	-- return: bool
 	-- alias: otheraurapresent
-OvaleCondition.conditions.otherdebuffpresent = function(condition)
-	local minTime, maxTime = getOtherAura(condition[1], condition[3], "target")
+OvaleCondition.conditions.otheraurapresent = function(condition)
+	local minTime, maxTime = getOtherAura(condition[1], getFilter(condition), condition[3], "target")
 	if maxTime and maxTime>0 then
 		local timeBefore = condition[2] or 0
 		return 0, addTime(maxTime, -timeBefore)
 	end
 	return nil
 end
-OvaleCondition.conditions.otheraurapresent = OvaleCondition.conditions.otherdebuffpresent
+OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otheraurapresent
+OvaleCondition.conditions.otherdebuffpresent = OvaleCondition.conditions.otheraurapresent
 
 	-- Get the maximum aura remaining duration on any target
 	-- return: number
 OvaleCondition.conditions.otherauraremains = function(condition)
-	local minTime, maxTime = getOtherAura(condition[1])
+	local minTime, maxTime = getOtherAura(condition[1], getFilter(condition))
 	return 0, nil, 0, maxTime, -1
 end
+OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherauraremains
+OvaleCondition.conditions.otherdebuffremains = OvaleCondition.conditions.otherauraremains
 
 --- Test if the target exists and is alive.
 -- @name Present
@@ -2486,11 +2504,14 @@ OvaleCondition.conditions.threat = function(condition)
 	return compare(threatpct, condition[1], condition[2])
 end
 
---- Get the current tick value of a damage-over-time (DoT) aura on the target.
+--- Get the current tick value of a periodic aura on the target.
 -- @name TickValue
 -- @paramsig number or boolean
 -- @param id The aura spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
+-- @param filter Optional. The type of aura to check.
+--     Default is any.
+--     Valid values: any, buff, debuff
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2503,11 +2524,11 @@ end
 --     Spell(purifying_brew)
 
 OvaleCondition.conditions.tickvalue = function(condition)
-	local value = select(5, getAura(getTarget(condition.target), condition[1], getMine(condition))) or 0
+	local value = select(5, getAura(getTarget(condition.target), condition[1], getFilter(condition), getMine(condition))) or 0
 	return compare(value, condition[2], condition[3])
 end
 
---- Get the estimated total number of ticks of a damage-over-time (DoT) aura.
+--- Get the estimated total number of ticks of a periodic aura.
 -- @name Ticks
 -- @paramsig number or boolean
 -- @param id The aura spell ID.
@@ -2539,10 +2560,13 @@ OvaleCondition.conditions.ticksadded = function(condition)
 	return 0, nil, 0, 0, 0
 end
 
---- Get the remaining number of ticks of a damage-over-time (DoT) aura on a target.
+--- Get the remaining number of ticks of a periodic aura on a target.
 -- @name TicksRemain
 -- @paramsig number
 -- @param id The aura spell ID.
+-- @param filter Optional. The type of aura to check.
+--     Default is any.
+--     Valid values: any, buff, debuff
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -2561,12 +2585,15 @@ OvaleCondition.conditions.ticksremain = function(condition)
 	return nil
 end
 
---- Get the number of seconds between ticks of a damage-over-time (DoT) aura on a target.
+--- Get the number of seconds between ticks of a periodic aura on a target.
 -- @name TickTime
 -- @paramsig number or boolean
 -- @param id The aura spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param filter Optional. The type of aura to check.
+--     Default is any.
+--     Valid values: any, buff, debuff
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.

@@ -23,17 +23,22 @@ local OvalePool = Ovale.OvalePool
 local pairs = pairs
 local select = select
 local strfind = string.find
+local API_IsHarmfulSpell = IsHarmfulSpell
 local API_UnitAura = UnitAura
 
 local self_baseDamageMultiplier = 1
 local self_pool = OvalePool:NewPool("OvaleAura_pool")
+-- self_aura[guid][filter][spellId]["mine" or "other"] = { aura properties }
 local self_aura = {}
 local self_serial = 0
 --</private-static-properties>
 
 --<private-static-methods>
-local function AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
-	local auraList = self_aura[unitGUID]
+local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
+	if not self_aura[unitGUID][filter] then
+		self_aura[unitGUID][filter] = {}
+	end
+	local auraList = self_aura[unitGUID][filter]
 	if not auraList[spellId] then
 		auraList[spellId] = {}
 	end
@@ -87,12 +92,15 @@ local function RemoveAurasForGUID(guid)
 	-- Return all auras for the given GUID to the aura pool.
 	if not guid or not self_aura[guid] then return end
 	Ovale:DebugPrint("aura", "Removing auras for guid " .. guid)
-	for spellId, whoseTable in pairs(self_aura[guid]) do
-		for whose, aura in pairs(whoseTable) do
-			whoseTable[whose] = nil
-			self_pool:Release(aura)
+	for filter, auraList in pairs(self_aura[guid]) do
+		for spellId, whoseTable in pairs(auraList) do
+			for whose, aura in pairs(whoseTable) do
+				whoseTable[whose] = nil
+				self_pool:Release(aura)
+			end
+			auraList[spellId] = nil
 		end
-		self_aura[guid][spellId] = nil
+		self_aura[guid][filter] = nil
 	end
 	self_aura[guid] = nil
 
@@ -131,7 +139,7 @@ function OvaleAura:OnDisable()
 end
 
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 
 	if event == "UNIT_DIED" then
 		RemoveAurasForGUID(destGUID)
@@ -146,8 +154,12 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		end
 
 		if sourceGUID == OvaleGUID:GetGUID("player") and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-			if self:GetAuraByGUID(destGUID, spellId, true) then
-				local aura = self_aura[destGUID][spellId].mine
+			local filter = "HELPFUL"
+			if API_IsHarmfulSpell(spellName) then
+				filter = "HARMFUL"
+			end
+			if self:GetAuraByGUID(destGUID, spellId, filter, true) then
+				local aura = self_aura[destGUID][filter][spellId].mine
 				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
 			end
 		end
@@ -196,25 +208,25 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	
 	local i = 1
 	
-	local mode = "HELPFUL"
+	local filter = "HELPFUL"
 	local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
 	local canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3
 	while (true) do
 		name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
-			canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, mode)
+			canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, filter)
 		if not name then
-			if mode == "HELPFUL" then
-				mode = "HARMFUL"
+			if filter == "HELPFUL" then
+				filter = "HARMFUL"
 				i = 1
 			else
 				break
 			end
 		else
-			AddAura(unitGUID, spellId, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			if debuffType then
 				-- TODO: not very clean
 				-- should be computed by OvaleState:GetAura
-				AddAura(unitGUID, debuffType, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+				AddAura(unitGUID, debuffType, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			end
 			
 			if unitId == "player" then
@@ -225,28 +237,29 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 			i = i + 1
 		end
 	end
-	
+
 	--Removes expired auras
-	local auraList = self_aura[unitGUID]
-	for spellId,whoseTable in pairs(auraList) do
-		for whose,aura in pairs(whoseTable) do
-			if aura.serial ~= self_serial then
-				Ovale:DebugPrint("aura", "Removing "..aura.name.." from "..whose .. ", serial = " ..self_serial.. " aura.serial = " ..aura.serial)
-				whoseTable[whose] = nil
-				self_pool:Release(aura)
+	for filter, auraList in pairs(self_aura[unitGUID]) do
+		for spellId, whoseTable in pairs(auraList) do
+			for whose, aura in pairs(whoseTable) do
+				if aura.serial ~= self_serial then
+					Ovale:DebugPrint("aura", "Removing " ..filter.. " " ..aura.name.. " from " ..whose.. ", serial = " ..self_serial.. " aura.serial = " ..aura.serial)
+					whoseTable[whose] = nil
+					self_pool:Release(aura)
+				end
+			end
+			if not next(whoseTable) then
+				auraList[spellId] = nil
 			end
 		end
-		if not next(whoseTable) then
-			Ovale:DebugPrint("aura", "Removing "..spellId)
-			auraList[spellId] = nil
+		if not next(auraList) then
+			self_aura[unitGUID][filter] = nil
 		end
 	end
-	
-	--Clear unit if all aura have been deleted
-	if not next(auraList) then
+	if not next(self_aura[unitGUID]) then
 		self_aura[unitGUID] = nil
 	end
-	
+
 	if unitId == "player" then
 		self_baseDamageMultiplier = damageMultiplier
 	end
@@ -255,11 +268,12 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 end
 
 -- Public methods
-function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
+function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	if not guid then
 		Ovale:Log(tostring(guid) .. " does not exists in OvaleAura")
 		return nil
 	end
+
 	local auraTable = self_aura[guid]
 	if not auraTable then 
 		if not unitId then
@@ -277,71 +291,92 @@ function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 			return nil
 		end
 	end
-	local whoseTable = auraTable[spellId]
-	if not whoseTable then return nil end
-	local aura
-	if mine or mine == 1 then
-		aura = whoseTable.mine
-	elseif whoseTable.other then
-		aura = whoseTable.other
+
+	local whose, aura
+	if filter then
+		if auraTable[filter] then
+			local whoseTable = auraTable[filter][spellId]
+			if whoseTable then
+				if mine then
+					aura = whoseTable.mine
+				else
+					whose, aura = next(whoseTable)
+				end
+			end
+		end
 	else
-		aura = whoseTable.mine
+		local whoseTable
+		for _, auraList in pairs(auraTable) do
+			whoseTable = auraList[spellId]
+			if whoseTable then
+				if mine then
+					aura = whoseTable.mine
+				else
+					whose, aura = next(whoseTable)
+				end
+				if aura then break end
+			end
+		end
 	end
 	if not aura then return nil end
 	return aura.start, aura.ending, aura.stacks, aura.spellHasteMultiplier, aura.value, aura.gain
 end
 
-function OvaleAura:GetAura(unitId, spellId, mine)
-	return self:GetAuraByGUID(OvaleGUID:GetGUID(unitId), spellId, mine, unitId)
+function OvaleAura:GetAura(unitId, spellId, filter, mine)
+	return self:GetAuraByGUID(OvaleGUID:GetGUID(unitId), spellId, filter, mine, unitId)
 end
 
 function OvaleAura:GetStealable(unitId)
 	local auraTable = self_aura[OvaleGUID:GetGUID(unitId)]
-	if not auraTable then
-		return nil
-	end
-	local starting,ending
-	
-	for spellId, ownerTable in pairs(auraTable) do
-		local aura = ownerTable.other
+	if not auraTable then return nil end
+
+	-- only buffs are stealable
+	local auraList = auraTable.HELPFUL
+	if not auraList then return nil end
+
+	local start, ending
+	for spellId, whoseTable in pairs(auraList) do
+		local aura = whoseTable.other
 		if aura and aura.stealable then
-			if not starting or aura.start < starting then
-				starting = aura.start
+			if aura.start and (not start or aura.start < start) then
+				start = aura.start
 			end
-			if not ending or aura.ending > ending then
+			if aura.ending and (not ending or aura.ending > ending) then
 				ending = aura.ending
 			end
 		end
 	end
-	return starting, ending
+	return start, ending
 end
 
 -- Look for the last of my aura on any targt that will expires.
 -- Returns its expiration time
-function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
-	local ending = nil
-	local starting = nil
+function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, filter, excludingTarget)
+	local start, ending
 	local count = 0
-	
-	for unitId,auraTable in pairs(self_aura) do
-		if unitId ~= excludingTarget then
-			if auraTable[spellId] then
-				local aura = auraTable[spellId].mine
-				if aura then
-					local newEnding = aura.ending
-					local newStarting = aura.start
-					if newStarting and (not starting or newStarting < starting) then
-						starting = newStarting
+
+	local aura
+	for guid, auraTable in pairs(self_aura) do
+		if guid ~= excludingTarget then
+			for auraFilter, auraList in pairs(auraTable) do
+				if not filter or auraFilter == filter then
+					if auraList[spellId] then
+						aura = auraList[spellId].mine
+						if aura then
+							if aura.start and (not start or aura.start < start) then
+								start = aura.start
+							end
+							if aura.ending and (not ending or aura.ending > ending) then
+								ending = aura.ending
+							end
+							count = count + 1
+						end
 					end
-					if newEnding and (not ending or newEnding > ending) then
-						ending = newEnding
-					end
-					count = count + 1
 				end
-			end		
+			end
 		end
 	end
-	return starting, ending, count
+	return start, ending, count
 end
 
 function OvaleAura:GetDamageMultiplier(spellId)
@@ -355,7 +390,7 @@ function OvaleAura:GetDamageMultiplier(spellId)
 			if auraTable then
 				for filter, filterInfo in pairs(si.damageAura) do
 					for auraSpellId, multiplier in pairs(filterInfo) do
-						if auraTable[auraSpellId] then
+						if auraTable[filter] and auraTable[filter][auraSpellId] then
 							damageMultiplier = damageMultiplier * multiplier
 						end
 					end
@@ -368,14 +403,14 @@ end
 
 function OvaleAura:Debug()
 	self_pool:Debug()
-	for guid,auraTable in pairs(self_aura) do
-		Ovale:Print("***"..guid)
-		for spellId,whoseTable in pairs(auraTable) do
-			for whose,aura in pairs(whoseTable) do
-				Ovale:Print(guid.." "..whose.." "..spellId .. " "..aura.name .. " stacks ="..aura.stacks)
+	for guid, auraTable in pairs(self_aura) do
+		for filter, auraList in pairs(auraTable) do
+			for spellId, whoseTable in pairs(auraList) do
+				for whose, aura in pairs(whoseTable) do
+					Ovale:Print(guid.. " " ..filter.. " " ..whose.. " " ..spellId.. " " ..aura.name.. " stacks=" ..aura.stacks)
+				end
 			end
 		end
 	end
-	Ovale:Print("------")
 end
 --</public-static-methods>
