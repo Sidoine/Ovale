@@ -19,6 +19,7 @@ local pairs = pairs
 local strsplit = string.split
 local tinsert = table.insert
 local tsort = table.sort
+local wipe = table.wipe
 local API_GetTime = GetTime
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
@@ -225,7 +226,7 @@ function Ovale:UpdateFrame()
 	
 	self:UpdateVisibility()
 	
-	self.checkBoxes = {}
+	wipe(self.checkBoxes)
 	
 	for k,checkBox in pairs(self.casesACocher) do
 		self.checkBoxes[k] = LibStub("AceGUI-3.0"):Create("CheckBox");
@@ -241,7 +242,7 @@ function Ovale:UpdateFrame()
 		self.checkBoxes[k]:SetCallback("OnValueChanged",OnCheckBoxValueChanged)
 	end
 	
-	self.dropDowns = {}
+	wipe(self.dropDowns)
 	
 	if (self.listes) then
 		for k,list in pairs(self.listes) do

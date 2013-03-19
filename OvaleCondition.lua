@@ -28,8 +28,8 @@ local OvaleSwing = Ovale.OvaleSwing
 local floor = floor
 local pairs = pairs
 local select = select
-local strfind = string.dinf
 local tostring = tostring
+local wipe = table.wipe
 local API_GetBuildInfo = GetBuildInfo
 local API_GetItemCooldown = GetItemCooldown
 local API_GetItemCount = GetItemCount
@@ -417,7 +417,11 @@ local function getTargetDead(target)
 	if self_targetGUID[target] ~= API_UnitGUID(target) then
 		self_lastSaved[target] = nil
 		self_targetGUID[target] = API_UnitGUID(target)
-		self_savedHealth[target] = {}
+		if self_savedHealth[target] then
+			wipe(self_savedHealth[target])
+		else
+			self_savedHealth[target] = {}
+		end
 	end
 	local newHealth = API_UnitHealth(target)
 	if newHealth then

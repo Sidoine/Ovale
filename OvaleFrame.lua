@@ -280,7 +280,7 @@ do
 			end
 		end
 
-		Ovale.refreshNeeded = {}
+		wipe(Ovale.refreshNeeded)
 		
 		if (not Ovale.bug) then
 			Ovale.traced = false
