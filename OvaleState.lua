@@ -35,8 +35,8 @@ local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
-local runes = {}
-local runesCD = {}
+local self_runes = {}
+local self_runesCD = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -583,30 +583,31 @@ function OvaleState:GetEclipseDir()
 	end
 end
 
-function OvaleState:GetRunes(blood, frost, unholy, death, nodeath)
+-- Returns the cooldown time before all of the required runes are available.
+function OvaleState:GetRunesCooldown(blood, frost, unholy, death, nodeath)
 	local nombre = 0
 	local nombreCD = 0
 	local maxCD = nil
 	
 	for i=1,4 do
-		runesCD[i] = 0
+		self_runesCD[i] = 0
 	end
 	
-	runes[1] = blood or 0
-	runes[2] = frost or 0
-	runes[3] = unholy or 0
-	runes[4] = death or 0
+	self_runes[1] = blood or 0
+	self_runes[2] = frost or 0
+	self_runes[3] = unholy or 0
+	self_runes[4] = death or 0
 		
 	for i=1,6 do
 		local rune = self.state.rune[i]
 		if rune then
-			if runes[rune.type] > 0 then
-				runes[rune.type] = runes[rune.type] - 1
-				if rune.cd > runesCD[rune.type] then
-					runesCD[rune.type] = rune.cd
+			if self_runes[rune.type] > 0 then
+				self_runes[rune.type] = self_runes[rune.type] - 1
+				if rune.cd > self_runesCD[rune.type] then
+					self_runesCD[rune.type] = rune.cd
 				end
-			elseif rune.cd < runesCD[rune.type] then
-				runesCD[rune.type] = rune.cd
+			elseif rune.cd < self_runesCD[rune.type] then
+				self_runesCD[rune.type] = rune.cd
 			end
 		end
 	end
@@ -616,14 +617,14 @@ function OvaleState:GetRunes(blood, frost, unholy, death, nodeath)
 			local rune = self.state.rune[i]
 			if rune and rune.type == 4 then
 				for j=1,3 do
-					if runes[j]>0 then
-						runes[j] = runes[j] - 1
-						if rune.cd > runesCD[j] then
-							runesCD[j] = rune.cd
+					if self_runes[j]>0 then
+						self_runes[j] = self_runes[j] - 1
+						if rune.cd > self_runesCD[j] then
+							self_runesCD[j] = rune.cd
 						end
 						break
-					elseif rune.cd < runesCD[j] then
-						runesCD[j] = rune.cd
+					elseif rune.cd < self_runesCD[j] then
+						self_runesCD[j] = rune.cd
 						break
 					end
 				end
@@ -632,11 +633,11 @@ function OvaleState:GetRunes(blood, frost, unholy, death, nodeath)
 	end
 	
 	for i=1,4 do
-		if runes[i]> 0 then
+		if self_runes[i]> 0 then
 			return nil
 		end
-		if not maxCD or runesCD[i]>maxCD then
-			maxCD = runesCD[i]
+		if not maxCD or self_runesCD[i]>maxCD then
+			maxCD = self_runesCD[i]
 		end
 	end
 	return maxCD

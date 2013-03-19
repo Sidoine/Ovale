@@ -66,7 +66,6 @@ local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 
 local self_runes = {}
-local self_runesCD = {}
 
 local self_lastSaved = {}
 local self_savedHealth = {}
@@ -241,70 +240,19 @@ local function GetRuneCount(type, death)
 	end
 end
 
-local function GetRune(condition)
-	local nombre = 0
-	local nombreCD = 0
-	local maxCD = nil
-	
-	for i=1,4 do
-		self_runes[i] = 0
-		self_runesCD[i] = 0
+local function GetRunesCooldown(condition)
+	for k in pairs(OVALE_RUNETYPE) do
+		self_runes[k] = 0
 	end
-	
-	local k=1
+
+	local k = 1
 	while true do
-		local type = OVALE_RUNETYPE[condition[k*2-1]]
-		if not type then
-			break
-		end
-		local howMany = condition[k*2]
-		self_runes[type] = self_runes[type] + howMany
-		k = k + 1 
+		local type = condition[2 * k - 1]
+		if not OVALE_RUNETYPE[type] then break end
+		self_runes[type] = self_runes[type] + condition[2 * k]
+		k = k + 1
 	end
-	
-	for i=1,6 do
-		local rune = OvaleState.state.rune[i]
-		if rune then
-			if self_runes[rune.type] > 0 then
-				self_runes[rune.type] = self_runes[rune.type] - 1
-				if rune.cd > self_runesCD[rune.type] then
-					self_runesCD[rune.type] = rune.cd
-				end
-			elseif rune.cd < self_runesCD[rune.type] then
-				self_runesCD[rune.type] = rune.cd
-			end
-		end
-	end
-	
-	if not condition.nodeath then
-		for i=1,6 do
-			local rune = OvaleState.state.rune[i]
-			if rune and rune.type == 4 then
-				for j=1,3 do
-					if self_runes[j]>0 then
-						self_runes[j] = self_runes[j] - 1
-						if rune.cd > self_runesCD[j] then
-							self_runesCD[j] = rune.cd
-						end
-						break
-					elseif rune.cd < self_runesCD[j] then
-						self_runesCD[j] = rune.cd
-						break
-					end
-				end
-			end
-		end
-	end
-	
-	for i=1,4 do
-		if self_runes[i]> 0 then
-			return nil
-		end
-		if not maxCD or self_runesCD[i]>maxCD then
-			maxCD = self_runesCD[i]
-		end
-	end
-	return maxCD
+	return OvaleState:GetRunesCooldown(self_runes.blood, self_runes.frost, self_runes.unholy, self_runes.death, condition.nodeath)
 end
 
 local lastEnergyValue = nil
@@ -2224,7 +2172,7 @@ end
 -- if Runes(frost 1) Spell(howling_blast)
 
 OvaleCondition.conditions.runes = function(condition)
-	return GetRune(condition)
+	return GetRunesCooldown(condition)
 end
 
 --- Get the current number of runes of the given type for death knights.
@@ -2262,7 +2210,7 @@ end
 -- if Runes(frost 1) Spell(howling_blast)
 
 OvaleCondition.conditions.runescooldown = function(condition)
-	local ret = GetRune(condition)
+	local ret = GetRunesCooldown(condition)
 	if not ret then
 		return nil
 	end
