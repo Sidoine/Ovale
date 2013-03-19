@@ -65,13 +65,14 @@ local API_UnitLevel = UnitLevel
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 
+-- static property for GetRunesCooldown(), indexed by rune name
 local self_runes = {}
 
-local self_lastSaved = {}
-local self_savedHealth = {}
-local self_targetGUID = {}
-local self_lastSPD = {}
-		
+-- static properties for TimeToDie(), indexed by unit ID
+local self_lastTTDTime = {}
+local self_lastTTDHealth = {}
+local self_lastTTDguid = {}
+
 local OVALE_RUNETYPE =
 {
 	blood = 1,
@@ -360,47 +361,44 @@ local function GetTargetAura(condition, target)
 	end
 end
 
-local function getTargetDead(target)
-	local second = math.floor(OvaleState.maintenant)
-	if self_targetGUID[target] ~= OvaleGUID:GetGUID(target) then
-		self_lastSaved[target] = nil
-		self_targetGUID[target] = OvaleGUID:GetGUID(target)
-		if self_savedHealth[target] then
-			wipe(self_savedHealth[target])
+local function TimeToDie(unitId)
+	if self_lastTTDguid[unitId] ~= OvaleGUID:GetGUID(unitId) then
+		self_lastTTDguid[unitId] = OvaleGUID:GetGUID(unitId)
+		self_lastTTDTime[unitId] = nil
+		if self_lastTTDHealth[unitId] then
+			wipe(self_lastTTDHealth[unitId])
 		else
-			self_savedHealth[target] = {}
+			self_lastTTDHealth[unitId] = {}
 		end
 	end
-	local newHealth = API_UnitHealth(target)
+	local newHealth = API_UnitHealth(unitId)
 	if newHealth then
 		Ovale:Log("newHealth = " .. newHealth)
 	end
-	if API_UnitHealthMax(target) <= 2 then
+	if API_UnitHealthMax(unitId) <= 2 then
 		Ovale:Log("Training Dummy, return in the future")
 		return OvaleState.currentTime + 3600
 	end
-	if second~=self_lastSaved[target] and self_targetGUID[target] then
-		self_lastSaved[target] = second
+
+	local second = floor(OvaleState.maintenant)
+	local dps = 0
+	if self_lastTTDTime[unitId] ~= second and self_lastTTDguid[unitId] then
+		self_lastTTDTime[unitId] = second
 		local mod10 = second % 10
-		local prevHealth = self_savedHealth[target][mod10]
-		self_savedHealth[target][mod10] = newHealth
+		local prevHealth = self_lastTTDHealth[unitId][mod10]
+		self_lastTTDHealth[unitId][mod10] = newHealth
 		if prevHealth and prevHealth>newHealth then
-			self_lastSPD[target] = 10/(prevHealth-newHealth)
-			if self_lastSPD[target] > 0 then
-				Ovale:Log("dps = " .. (1/self_lastSPD[target]))
+			dps = (prevHealth - newHealth) / 10
+			if dps > 0 then
+				Ovale:Log("dps = " .. dps)
 			end
 		end
 	end
-	if not self_lastSPD[target] or self_lastSPD[target]<=0 then
-		return OvaleState.currentTime + 3600
-	end
-	-- Rough estimation
-	local duration = newHealth * self_lastSPD[target]
-	--if duration < 10000 then
+	if dps > 0 then
+		local duration = newHealth / dps
 		return OvaleState.maintenant + duration
-	--else
---		return nil
-	--end
+	end
+	return OvaleState.currentTime + 3600
 end
 
 local function isSameSpell(spellIdA, spellIdB, spellNameB)
@@ -1077,7 +1075,7 @@ end
 -- if target.DeadIn(less 2) and ComboPoints() >0 Spell(eviscerate)
 
 OvaleCondition.conditions.deadin = function(condition)
-	return testValue(condition[1], condition[2], 0, getTargetDead(getTarget(condition.target)), -1)
+	return testValue(condition[1], condition[2], 0, TimeToDie(getTarget(condition.target)), -1)
 end
 
 --- Get the current amount of demonic fury for demonology warlocks.
@@ -2614,7 +2612,7 @@ end
 -- if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
 
 OvaleCondition.conditions.timetodie = function(condition)
-	return 0, nil, 0, getTargetDead(getTarget(condition.target)), -1
+	return 0, nil, 0, TimeToDie(getTarget(condition.target)), -1
 end
 
 --- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
