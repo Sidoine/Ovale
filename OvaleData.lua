@@ -9,11 +9,11 @@
 
 local _, Ovale = ...
 local OvaleData = Ovale:NewModule("OvaleData", "AceEvent-3.0")
+Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
-local OvaleStance = Ovale:GetModule("OvaleStance")
+local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleStance = Ovale.OvaleStance
 
 local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
 local GetNumGlyphSockets = GetNumGlyphSockets

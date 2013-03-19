@@ -9,6 +9,7 @@
 
 local _, Ovale = ...
 local OvaleEquipement = Ovale:NewModule("OvaleEquipement", "AceEvent-3.0")
+Ovale.OvaleEquipement = OvaleEquipement
 
 --<private-static-properties>
 local pairs = pairs

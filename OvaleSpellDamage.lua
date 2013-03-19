@@ -11,9 +11,10 @@
 
 local _, Ovale = ...
 local OvaleSpellDamage = Ovale:NewModule("OvaleSpellDamage", "AceEvent-3.0")
+Ovale.OvaleSpellDamage = OvaleSpellDamage
 
 --<private-static-properties>
-local OvaleGUID = Ovale:GetModule("OvaleGUID")
+local OvaleGUID = Ovale.OvaleGUID
 
 local select = select
 local strfind = string.find

@@ -12,6 +12,7 @@
 
 local _, Ovale = ...
 local OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
+Ovale.OvaleGUID = OvaleGUID
 
 --<private-static-properties>
 local strfind, strsub = string.find, string.sub

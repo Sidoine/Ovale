@@ -11,6 +11,7 @@
 
 local _, Ovale = ...
 local OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0", "AceTimer-3.0")
+Ovale.OvaleEnemies = OvaleEnemies
 
 --<private-static-properties>
 local bit_band = bit.band

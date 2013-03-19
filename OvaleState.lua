@@ -11,7 +11,24 @@
 
 local _, Ovale = ...
 OvaleState = {}
-Ovale.stateModule = OvaleState
+Ovale.OvaleState = OvaleState
+
+--<private-static-properties>
+local OvaleAura = Ovale.OvaleAura
+local OvaleComboPoints = Ovale.OvaleComboPoints
+local OvaleData = Ovale.OvaleData
+local OvaleEquipement = Ovale.OvaleEquipement
+local OvaleFuture = Ovale.OvaleFuture
+local OvaleGUID = Ovale.OvaleGUID
+local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleStance = Ovale.OvaleStance
+
+local floor, pairs, tostring = math.floor, pairs, tostring
+local GetRuneCooldown, GetRuneType = GetRuneCooldown, GetRuneType
+local GetSpellInfo, UnitGUID, UnitHealth = GetSpellInfo, UnitGUID, UnitHealth
+local UnitHealthMax, UnitPower, UnitPowerMax = UnitHealthMax, UnitPower, UnitPowerMax
+local MAX_COMBO_POINTS = MAX_COMBO_POINTS
+--</private-static-properties>
 
 --<public-static-properties>
 --the state in the current frame
@@ -34,23 +51,6 @@ OvaleState.gcd = 1.5
 OvaleState.powerRate = {}
 OvaleState.lastSpellId = nil
 --</public-static-properties>
-
---<private-static-properties>
-local OvaleAura = Ovale:GetModule("OvaleAura")
-local OvaleComboPoints = Ovale:GetModule("OvaleComboPoints")
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvaleEquipement = Ovale:GetModule("OvaleEquipement")
-local OvaleFuture = Ovale:GetModule("OvaleFuture")
-local OvaleGUID = Ovale:GetModule("OvaleGUID")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
-local OvaleStance = Ovale:GetModule("OvaleStance")
-
-local floor, pairs, tostring = math.floor, pairs, tostring
-local GetRuneCooldown, GetRuneType = GetRuneCooldown, GetRuneType
-local GetSpellInfo, UnitGUID, UnitHealth = GetSpellInfo, UnitGUID, UnitHealth
-local UnitHealthMax, UnitPower, UnitPowerMax = UnitHealthMax, UnitPower, UnitPowerMax
-local MAX_COMBO_POINTS = MAX_COMBO_POINTS
---</private-static-properties>
 
 --<public-static-methods>
 function OvaleState:StartNewFrame()

@@ -11,13 +11,14 @@
 
 local _, Ovale = ...
 local OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent-3.0")
+Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
-local OvaleStance = Ovale:GetModule("OvaleStance")
-local OvaleState = Ovale.stateModule
+local OvaleData = Ovale.OvaleData
+local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleScripts = Ovale.OvaleScripts
+local OvaleStance = Ovale.OvaleStance
+local OvaleState = Ovale.OvaleState
 
 local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring
 --</private-static-properties>

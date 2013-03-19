@@ -12,12 +12,13 @@
 
 local _, Ovale = ...
 local OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
+Ovale.OvaleAura = OvaleAura
 
 --<private-static-properties>
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvaleGUID = Ovale:GetModule("OvaleGUID")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
-local OvalePool = Ovale.poolPrototype
+local OvaleData = Ovale.OvaleData
+local OvaleGUID = Ovale.OvaleGUID
+local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvalePool = Ovale.OvalePool
 
 local baseDamageMultiplier = 1
 local playerGUID = nil

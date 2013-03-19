@@ -10,7 +10,7 @@
 -- Simple resource pool.
 local _, Ovale = ...
 local OvalePool = {}
-Ovale.poolPrototype = OvalePool
+Ovale.OvalePool = OvalePool
 
 --<private-static-properties>
 OvalePool.name = "OvalePool"

@@ -11,6 +11,7 @@
 
 local _, Ovale = ...
 local OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
+Ovale.OvalePaperDoll = OvalePaperDoll
 
 --<private-static-properties>
 local select = select

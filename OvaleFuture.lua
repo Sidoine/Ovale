@@ -11,13 +11,14 @@
 
 local _, Ovale = ...
 local OvaleFuture = Ovale:NewModule("OvaleFuture", "AceEvent-3.0")
+Ovale.OvaleFuture = OvaleFuture
 
 --<private-static-properties>
-local OvaleAura = Ovale:GetModule("OvaleAura")
-local OvaleComboPoints = Ovale:GetModule("OvaleComboPoints")
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvaleGUID = Ovale:GetModule("OvaleGUID")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+local OvaleAura = Ovale.OvaleAura
+local OvaleComboPoints = Ovale.OvaleComboPoints
+local OvaleData = Ovale.OvaleData
+local OvaleGUID = Ovale.OvaleGUID
+local OvalePaperDoll = Ovale.OvalePaperDoll
 
 local ipairs = ipairs
 local pairs = pairs

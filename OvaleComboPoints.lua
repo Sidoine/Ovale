@@ -11,11 +11,12 @@
 
 local _, Ovale = ...
 local OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
+Ovale.OvaleComboPoints = OvaleComboPoints
 
 --<private-static-properties>
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvaleGUID = Ovale:GetModule("OvaleGUID")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+local OvaleData = Ovale.OvaleData
+local OvaleGUID = Ovale.OvaleGUID
+local OvalePaperDoll = Ovale.OvalePaperDoll
 
 local GetComboPoints = GetComboPoints
 local UnitGUID = UnitGUID

@@ -9,21 +9,21 @@
 
 local _, Ovale = ...
 local OvaleCondition = {}
-Ovale.conditionModule = OvaleCondition
+Ovale.OvaleCondition = OvaleCondition
 
 --<private-static-properties>
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 local LRC = LibStub("LibRangeCheck-2.0", true)
-local OvaleAura = Ovale:GetModule("OvaleAura")
-local OvaleData = Ovale:GetModule("OvaleData")
-local OvaleEnemies = Ovale:GetModule("OvaleEnemies")
-local OvaleEquipement = Ovale:GetModule("OvaleEquipement")
-local OvaleFuture = Ovale:GetModule("OvaleFuture")
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
-local OvaleSpellDamage = Ovale:GetModule("OvaleSpellDamage")
-local OvaleStance = Ovale:GetModule("OvaleStance")
-local OvaleState = Ovale.stateModule
-local OvaleSwing = Ovale:GetModule("OvaleSwing")
+local OvaleAura = Ovale.OvaleAura
+local OvaleData = Ovale.OvaleData
+local OvaleEnemies = Ovale.OvaleEnemies
+local OvaleEquipement = Ovale.OvaleEquipement
+local OvaleFuture = Ovale.OvaleFuture
+local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleSpellDamage = Ovale.OvaleSpellDamage
+local OvaleStance = Ovale.OvaleStance
+local OvaleState = Ovale.OvaleState
+local OvaleSwing = Ovale.OvaleSwing
 
 local runes = {}
 local runesCD = {}

@@ -10,6 +10,7 @@
 -- Keep data about the player action bars (key bindings mostly)
 local _, Ovale = ...
 local OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0")
+Ovale.OvaleActionBar = OvaleActionBar
 
 --<private-static-properties>
 local tonumber = tonumber
