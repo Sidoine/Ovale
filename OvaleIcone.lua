@@ -17,7 +17,9 @@ local OvaleData = Ovale.OvaleData
 local OvaleOptions = Ovale.OvaleOptions
 local OvaleState = Ovale.OvaleState
 
-local strfind, strformat, strsub = string.find, string.format, string.sub
+local strfind = string.find
+local strformat = string.format
+local strsub = string.sub
 --</private-static-properties>
 
 --<public-methods>

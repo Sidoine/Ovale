@@ -25,8 +25,11 @@ do
 	local Version = 7
 
 	local pairs = pairs
-	local CreateFrame, GetSpellInfo = CreateFrame, GetSpellInfo
-	local GetTime = GetTime		
+	local wipe = table.wipe
+	local API_CreateFrame = CreateFrame
+	local API_GetSpellInfo = GetSpellInfo
+	local API_GetTime = GetTime
+	local API_UnitGUID = UnitGUID
 --</private-static-properties>
 
 --<public-methods>
@@ -152,7 +155,7 @@ do
 	
 	local function OnUpdate(self)
 		-- Update current time.
-		Ovale.now = GetTime()
+		Ovale.now = API_GetTime()
 
 		local profile = OvaleOptions:GetProfile()
 		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
@@ -244,7 +247,7 @@ do
 						if start then
 							local castTime=0
 							if spellId then
-								local _, _, _, _, _, _, _castTime = GetSpellInfo(spellId)
+								local _, _, _, _, _, _, _castTime = API_GetSpellInfo(spellId)
 								if _castTime and _castTime>0 then
 									castTime = _castTime/1000
 								end
@@ -266,7 +269,7 @@ do
 							if spellTarget == "target" or not spellTarget then
 								spellTarget = target
 							end
-							OvaleState:AddSpellToStack(spellId, start, start + castTime, nextCast, false, UnitGUID(spellTarget))
+							OvaleState:AddSpellToStack(spellId, start, start + castTime, nextCast, false, API_UnitGUID(spellTarget))
 							start, ending, priorite, element = OvaleBestAction:Compute(node)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
 						else
@@ -364,12 +367,12 @@ do
 				local icon
 				if not node.secure then
 					if not action.icons[l] then
-						action.icons[l] = CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIconTemplate");
+						action.icons[l] = API_CreateFrame("CheckButton", "Icon"..k.."n"..l,self.frame,"OvaleIconTemplate");
 					end
 					icon = action.icons[l]
 				else
 					if not action.secureIcons[l] then
-						action.secureIcons[l] = CreateFrame("CheckButton", "SecureIcon"..k.."n"..l,self.frame,"SecureOvaleIconTemplate");
+						action.secureIcons[l] = API_CreateFrame("CheckButton", "SecureIcon"..k.."n"..l,self.frame,"SecureOvaleIconTemplate");
 					end
 					icon = action.secureIcons[l]
 				end
@@ -418,7 +421,7 @@ do
 	end
 	
 	local function Constructor()
-		local frame = CreateFrame("Frame",nil,UIParent)
+		local frame = API_CreateFrame("Frame",nil,UIParent)
 		local self = {}
 		local profile = OvaleOptions:GetProfile()
 		
@@ -439,9 +442,9 @@ do
 		self.localstatus = {}
 		self.actions = {}
 		self.frame = frame
-		self.updateFrame = CreateFrame("Frame")
+		self.updateFrame = API_CreateFrame("Frame")
 		self.barre = self.frame:CreateTexture();
-		self.content = CreateFrame("Frame",nil,frame)
+		self.content = API_CreateFrame("Frame",nil,frame)
 		if Masque then
 			self.skinGroup = Masque:Group("Ovale")
 		end

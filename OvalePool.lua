@@ -12,12 +12,12 @@ local _, Ovale = ...
 local OvalePool = {}
 Ovale.OvalePool = OvalePool
 
---<private-static-properties>
+--<public-static-properties>
 OvalePool.name = "OvalePool"
 OvalePool.pool = nil
 OvalePool.size = 0
 OvalePool.unused = 0
---</private-static-properties>
+--</public-static-properties>
 
 --<public-static-methods>
 function OvalePool:NewPool(name)

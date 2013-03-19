@@ -20,55 +20,56 @@ local strfind = string.find
 local tinsert = table.insert
 local tsort = table.sort
 local wipe = table.wipe
-local GetNumShapeshiftForms = GetNumShapeshiftForms
-local GetShapeshiftForm = GetShapeshiftForm
-local GetSpellInfo = GetSpellInfo
-
-local spellIdToStance = {
-	-- Death Knight
-	[GetSpellInfo(48263)] = "death_knight_blood_presence",
-	[GetSpellInfo(48265)] = "death_knight_unholy_presence",
-	[GetSpellInfo(48266)] = "death_knight_frost_presence",
-	-- Druid
-	[GetSpellInfo(768)] = "druid_cat_form",
-	[GetSpellInfo(783)] = "druid_travel_form",
-	[GetSpellInfo(1066)] = "druid_aquatic_form",
-	[GetSpellInfo(5487)] = "druid_bear_form",
-	[GetSpellInfo(24858)] = "druid_moonkin_form",
-	[GetSpellInfo(33943)] = "druid_flight_form",
-	[GetSpellInfo(40120)] = "druid_swift_flight_form",
-	-- Hunter
-	[GetSpellInfo(5118)] = "hunter_aspect_of_the_cheetah",
-	[GetSpellInfo(13159)] = "hunter_aspect_of_the_pack",
-	[GetSpellInfo(13165)] = "hunter_aspect_of_the_hawk",
-	[GetSpellInfo(109260)] = "hunter_asepct_of_the_iron_hawk",
-	-- Monk
-	[GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
-	[GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
-	[GetSpellInfo(115070)] = "monk_stance_of_the_wise_serpent",
-	-- Paladin
-	[GetSpellInfo(20154)] = "paladin_seal_of_righteousness",
-	[GetSpellInfo(20164)] = "paladin_seal_of_justice",
-	[GetSpellInfo(20165)] = "paladin_seal_of_insight",
-	[GetSpellInfo(31801)] = "paladin_seal_of_truth",
-	[GetSpellInfo(105361)] = "paladin_seal_of_command",
-	-- Priest
-	[GetSpellInfo(15473)] = "priest_shadowform",
-	-- Rogue
-	[GetSpellInfo(1784)] = "rogue_stealth",
-	[GetSpellInfo(51713)] = "rogue_shadow_dance",
-	-- Warlock
-	[GetSpellInfo(103958)] = "warlock_metamorphosis",
-	-- Warrior
-	[GetSpellInfo(71)] = "warrior_defensive_stance",
-	[GetSpellInfo(2457)] = "warrior_battle_stance",
-	[GetSpellInfo(2458)] = "warrior_berserker_stance",
-}
+local API_GetNumShapeshiftForms = GetNumShapeshiftForms
+local API_GetShapeshiftForm = GetShapeshiftForm
+local API_GetShapeshiftFormInfo = GetShapeshiftFormInfo
+local API_GetSpellInfo = GetSpellInfo
 
 -- List of available stances, populated by CreateStanceList()
-local stanceList = {}
+local self_stanceList = {}
 -- Player's current stance.
-local stance
+local self_stance = nil
+
+local OVALE_SPELLID_TO_STANCE = {
+	-- Death Knight
+	[API_GetSpellInfo(48263)] = "death_knight_blood_presence",
+	[API_GetSpellInfo(48265)] = "death_knight_unholy_presence",
+	[API_GetSpellInfo(48266)] = "death_knight_frost_presence",
+	-- Druid
+	[API_GetSpellInfo(768)] = "druid_cat_form",
+	[API_GetSpellInfo(783)] = "druid_travel_form",
+	[API_GetSpellInfo(1066)] = "druid_aquatic_form",
+	[API_GetSpellInfo(5487)] = "druid_bear_form",
+	[API_GetSpellInfo(24858)] = "druid_moonkin_form",
+	[API_GetSpellInfo(33943)] = "druid_flight_form",
+	[API_GetSpellInfo(40120)] = "druid_swift_flight_form",
+	-- Hunter
+	[API_GetSpellInfo(5118)] = "hunter_aspect_of_the_cheetah",
+	[API_GetSpellInfo(13159)] = "hunter_aspect_of_the_pack",
+	[API_GetSpellInfo(13165)] = "hunter_aspect_of_the_hawk",
+	[API_GetSpellInfo(109260)] = "hunter_asepct_of_the_iron_hawk",
+	-- Monk
+	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
+	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
+	[API_GetSpellInfo(115070)] = "monk_stance_of_the_wise_serpent",
+	-- Paladin
+	[API_GetSpellInfo(20154)] = "paladin_seal_of_righteousness",
+	[API_GetSpellInfo(20164)] = "paladin_seal_of_justice",
+	[API_GetSpellInfo(20165)] = "paladin_seal_of_insight",
+	[API_GetSpellInfo(31801)] = "paladin_seal_of_truth",
+	[API_GetSpellInfo(105361)] = "paladin_seal_of_command",
+	-- Priest
+	[API_GetSpellInfo(15473)] = "priest_shadowform",
+	-- Rogue
+	[API_GetSpellInfo(1784)] = "rogue_stealth",
+	[API_GetSpellInfo(51713)] = "rogue_shadow_dance",
+	-- Warlock
+	[API_GetSpellInfo(103958)] = "warlock_metamorphosis",
+	-- Warrior
+	[API_GetSpellInfo(71)] = "warrior_defensive_stance",
+	[API_GetSpellInfo(2457)] = "warrior_battle_stance",
+	[API_GetSpellInfo(2458)] = "warrior_berserker_stance",
+}
 --</private-static-properties>
 
 --<public-static-methods>
@@ -98,15 +99,15 @@ function OvaleStance:UPDATE_SHAPESHIFT_FORMS(event)
 	self:ShapeshiftEventHandler()
 end
 
--- Fill stanceList with stance bar index <-> Ovale stance name mappings.
+-- Fill self_stanceList with stance bar index <-> Ovale stance name mappings.
 function OvaleStance:CreateStanceList()
-	wipe(stanceList)
-	local name, stanceName
-	for i = 1, GetNumShapeshiftForms() do
-		_, name = GetShapeshiftFormInfo(i)
-		stanceName = spellIdToStance[name]
+	wipe(self_stanceList)
+	local _, name, stanceName
+	for i = 1, API_GetNumShapeshiftForms() do
+		_, name = API_GetShapeshiftFormInfo(i)
+		stanceName = OVALE_SPELLID_TO_STANCE[name]
 		if stanceName then
-			stanceList[i] = stanceName
+			self_stanceList[i] = stanceName
 		end
 	end
 end
@@ -114,8 +115,8 @@ end
 -- Print out the list of stances in alphabetical order.
 function OvaleStance:DebugStances()
 	local array = {}
-	for k, v in pairs(stanceList) do
-		if stance == k then
+	for k, v in pairs(self_stanceList) do
+		if self_stance == k then
 			tinsert(array, v .. " (active)")
 		else
 			tinsert(array, v)
@@ -128,23 +129,23 @@ function OvaleStance:DebugStances()
 end
 
 function OvaleStance:Debug()
-	Ovale:Print("current stance: " .. stance)
+	Ovale:Print("current stance: " .. self_stance)
 end
 
 -- Return true if the current stance matches the given name.
 function OvaleStance:IsStance(name)
-	if not name or not stance then return false end
+	if not name or not self_stance then return false end
 	if type(name) == "number" then
-		return name == stance
+		return name == self_stance
 	else
-		return name == stanceList[stance]
+		return name == self_stanceList[self_stance]
 	end
 end
 
 function OvaleStance:ShapeshiftEventHandler()
-	local newStance = GetShapeshiftForm()
-	if stance ~= newStance then
-		stance = newStance
+	local newStance = API_GetShapeshiftForm()
+	if self_stance ~= newStance then
+		self_stance = newStance
 		self:SendMessage("Ovale_StanceChanged")
 	end
 end

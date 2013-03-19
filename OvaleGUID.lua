@@ -15,8 +15,11 @@ local OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0", "AceConsole-3.0")
 Ovale.OvaleGUID = OvaleGUID
 
 --<private-static-properties>
-local strfind, strsub = string.find, string.sub
-local GetNumGroupMembers, UnitGUID, UnitName = GetNumGroupMembers, UnitGUID, UnitName
+local strfind = string.find
+local strsub = string.sub
+local API_GetNumGroupMembers = GetNumGroupMembers
+local API_UnitGUID = UnitGUID
+local API_UnitName = UnitName
 --</private-static-properties>
 
 --<public-static-properties>
@@ -53,7 +56,7 @@ end
 
 function OvaleGUID:Update(unitId)
 	--self:Print("Update " .. unitId)
-	local guid = UnitGUID(unitId)
+	local guid = API_UnitGUID(unitId)
 	local previousGuid = self.guid[unitId]
 	if unitId == "player" then
 		self.player = guid
@@ -74,7 +77,7 @@ function OvaleGUID:Update(unitId)
 			self.unitId[guid][unitId] = true
 		end
 	end
-	local name = UnitName(unitId)
+	local name = API_UnitName(unitId)
 	if name and (not self.nameToGUID[name] or unitId == "target" 
 			or self.nameToUnit[name] == "mouseover") then
 		self.nameToGUID[name] = guid
@@ -105,7 +108,7 @@ function OvaleGUID:UNIT_TARGET(event, unitId)
 end
 
 function OvaleGUID:GROUP_ROSTER_UPDATE(event)
-	for i=1, GetNumGroupMembers() do
+	for i=1, API_GetNumGroupMembers() do
 		self:UpdateWithTarget("raid"..i)
 		self:UpdateWithTarget("raidpet"..i)
 	end

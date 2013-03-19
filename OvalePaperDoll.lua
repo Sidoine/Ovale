@@ -16,26 +16,46 @@ Ovale.OvalePaperDoll = OvalePaperDoll
 --<private-static-properties>
 local select = select
 local tonumber = tonumber
+local API_GetMasteryEffect = GetMasteryEffect
+local API_GetMeleeHaste = GetMeleeHaste
+local API_GetRangedHaste = GetRangedHaste
+local API_GetSpecialization = GetSpecialization
+local API_GetSpellBonusDamage = GetSpellBonusDamage
+local API_GetSpellBonusHealing = GetSpellBonusHealing
+local API_UnitAttackPower = UnitAttackPower
+local API_UnitClass = UnitClass
+local API_UnitLevel = UnitLevel
+local API_UnitRangedAttackPower = UnitRangedAttackPower
+local API_UnitSpellHaste = UnitSpellHaste
+local API_UnitStat = UnitStat
 
-local GetMasteryEffect = GetMasteryEffect
-local GetMeleeHaste = GetMeleeHaste
-local GetRangedHaste = GetRangedHaste
-local GetSpecialization = GetSpecialization
-local GetSpellBonusDamage = GetSpellBonusDamage
-local GetSpellBonusHealing = GetSpellBonusHealing
-local UnitAttackPower = UnitAttackPower
-local UnitClass = UnitClass
-local UnitLevel = UnitLevel
-local UnitRangedAttackPower = UnitRangedAttackPower
-local UnitSpellHaste = UnitSpellHaste
-local UnitStat = UnitStat
+local OVALE_SPELLDAMAGE_SCHOOL = {
+	DEATHKNIGHT = 4, -- Nature
+	DRUID = 4, -- Nature
+	HUNTER = 4, -- Nature
+	MAGE = 5, -- Frost
+	MONK = 4, -- Nature
+	PALADIN = 2, -- Holy
+	PRIEST = 2, -- Holy
+	ROGUE = 4, -- Nature
+	SHAMAN = 4, -- Nature
+	WARLOCK = 6, -- Shadow
+	WARRIOR = 4, -- Nature
+}
+local OVALE_HEALING_CLASS = {
+	DRUID = true,
+	MONK = true,
+	PALADIN = true,
+	PRIEST = true,
+	SHAMAN = true,
+}
 --</private-static-properties>
 
 --<public-static-properties>
 -- player's class token
-OvalePaperDoll.class = select(2, UnitClass("player"))
+OvalePaperDoll.class = select(2, API_UnitClass("player"))
 -- player's level
-OvalePaperDoll.level = UnitLevel("player")
+OvalePaperDoll.level = API_UnitLevel("player")
 -- Player's current specialization.
 OvalePaperDoll.specialization = nil
 
@@ -99,68 +119,47 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 	if self.level < 80 then
 		self.masteryEffect = 0
 	else
-		self.masteryEffect = GetMasteryEffect()
+		self.masteryEffect = API_GetMasteryEffect()
 	end
 end
 
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
-	self.level = tonumber(level) or UnitLevel("player")
+	self.level = tonumber(level) or API_UnitLevel("player")
 end
 
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	if unitId ~= "player" then return end
-	local base, posBuff, negBuff = UnitAttackPower(unitId)
+	local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 	self.attackPower = base + posBuff + negBuff
 end
 
 function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId ~= "player" then return end
-	self.level = UnitLevel(unitId)
+	self.level = API_UnitLevel(unitId)
 end
 
 function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId ~= "player" then return end
-	self.rangedHaste = GetRangedHaste()
+	self.rangedHaste = API_GetRangedHaste()
 end
 
 function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 	if unitId ~= "player" then return end
-	local base, posBuff, negBuff = UnitRangedAttackPower(unitId)
+	local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
 	self.rangedAttackPower = base + posBuff + negBuff
 end
 
 function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 	if unitId ~= "player" then return end
-	self.meleeHaste = GetMeleeHaste()
-	self.spellHaste = UnitSpellHaste(unitId)
+	self.meleeHaste = API_GetMeleeHaste()
+	self.spellHaste = API_UnitSpellHaste(unitId)
 end
-
-local classToSchool = {
-	DEATHKNIGHT = 4, -- Nature
-	DRUID = 4, -- Nature
-	HUNTER = 4, -- Nature
-	MAGE = 5, -- Frost
-	MONK = 4, -- Nature
-	PALADIN = 2, -- Holy 
-	PRIEST = 2, -- Holy 
-	ROGUE = 4, -- Nature
-	SHAMAN = 4, -- Nature
-	WARLOCK = 6, -- Shadow
-	WARRIOR = 4, -- Nature
-}
-local isHealingClass = {
-	DRUID = true,
-	MONK = true,
-	PALADIN = true,
-	PRIEST = true,
-	SHAMAN = true,
-}
 
 function OvalePaperDoll:UNIT_SPELL_POWER(event, unitId)
 	if unitId ~= "player" then return end
-	self.spellBonusDamage = GetSpellBonusDamage(classToSchool[self.class])
-	if isHealingClass[self.class] then
-		self.spellBonusHealing = GetSpellBonusHealing()
+	self.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+	if OVALE_HEALING_CLASS[self.class] then
+		self.spellBonusHealing = API_GetSpellBonusHealing()
 	else
 		self.spellBonusHealing = self.spellBonusDamage
 	end
@@ -168,15 +167,15 @@ end
 
 function OvalePaperDoll:UNIT_STATS(event, unitId)
 	if unitId ~= "player" then return end
-	self.strength = UnitStat(unitId, 1)
-	self.agility = UnitStat(unitId, 2)
-	self.stamina = UnitStat(unitId, 3)
-	self.intellect = UnitStat(unitId, 4)
-	self.spirit = UnitStat(unitId, 5)
+	self.strength = API_UnitStat(unitId, 1)
+	self.agility = API_UnitStat(unitId, 2)
+	self.stamina = API_UnitStat(unitId, 3)
+	self.intellect = API_UnitStat(unitId, 4)
+	self.spirit = API_UnitStat(unitId, 5)
 end
 
 function OvalePaperDoll:UpdateStats(event)
-	self.specialization = GetSpecialization()
+	self.specialization = API_GetSpecialization()
 	self:MASTERY_UPDATE(event)
 	self:UNIT_ATTACK_POWER(event, "player")
 	self:UNIT_RANGEDDAMAGE(event, "player")
@@ -185,7 +184,6 @@ function OvalePaperDoll:UpdateStats(event)
 	self:UNIT_SPELL_POWER(event, "player")
 	self:UNIT_STATS(event, "player")
 end
-
 
 function OvalePaperDoll:GetMasteryMultiplier()
 	return 1 + self.masteryEffect / 100

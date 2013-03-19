@@ -23,11 +23,21 @@ local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleStance = Ovale.OvaleStance
 
-local floor, pairs, tostring = math.floor, pairs, tostring
-local GetRuneCooldown, GetRuneType = GetRuneCooldown, GetRuneType
-local GetSpellInfo, UnitGUID, UnitHealth = GetSpellInfo, UnitGUID, UnitHealth
-local UnitHealthMax, UnitPower, UnitPowerMax = UnitHealthMax, UnitPower, UnitPowerMax
+local floor = math.floor
+local pairs = pairs
+local tostring = tostring
+local API_GetRuneCooldown = GetRuneCooldown
+local API_GetRuneType = GetRuneType
+local API_GetSpellInfo = GetSpellInfo
+local API_UnitGUID = UnitGUID
+local API_UnitHealth = UnitHealth
+local API_UnitHealthMax = UnitHealthMax
+local API_UnitPower = UnitPower
+local API_UnitPowerMax = UnitPowerMax
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
+
+local runes = {}
+local runesCD = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -129,15 +139,15 @@ function OvaleState:Reset()
 	self.attenteFinCast = self.maintenant
 	self.state.combo = OvaleComboPoints.combo
 	for k,v in pairs(OvaleData.power) do
-		self.state[k] = UnitPower("player", v.id, v.segments)
+		self.state[k] = API_UnitPower("player", v.id, v.segments)
 	end
 	
 	self:UpdatePowerRates()
 	
 	if OvalePaperDoll.class == "DEATHKNIGHT" then
 		for i=1,6 do
-			self.state.rune[i].type = GetRuneType(i)
-			local start, duration, runeReady = GetRuneCooldown(i)
+			self.state.rune[i].type = API_GetRuneType(i)
+			local start, duration, runeReady = API_GetRuneCooldown(i)
 			self.state.rune[i].duration = duration
 			if runeReady then
 				self.state.rune[i].cd = start
@@ -218,7 +228,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 	--(donc si il est déjà lancé, on n'en tient pas compte)
 	if endCast >= self.maintenant then
 		--Mana
-		local _, _, _, cost, _, powerType = GetSpellInfo(spellId)
+		local _, _, _, cost, _, powerType = API_GetSpellInfo(spellId)
 		local power = OvaleData.powerType[powerType]
 		if cost and power and (not newSpellInfo or not newSpellInfo[power]) then
 			self.state[power] = self.state[power] - cost
@@ -247,7 +257,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 					if v.maxi and self.state[k] > v.maxi then
 						self.state[k] = v.maxi
 					else
-						local maxi = UnitPowerMax("player", v.id, v.segments)
+						local maxi = API_UnitPowerMax("player", v.id, v.segments)
 						if maxi and self.state[k] > maxi then
 							self.state[k] = maxi
 						end
@@ -322,7 +332,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 			end
 			if newSpellInfo.targetlifenocd and not nocd then
 				--TODO
-				if UnitHealth("target")/UnitHealthMax("target")*100<newSpellInfo.targetlifenocd then
+				if API_UnitHealth("target") / API_UnitHealthMax("target") * 100 < newSpellInfo.targetlifenocd then
 					cd.duration = 0
 				end
 			end
@@ -372,7 +382,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 							if target == "target" then
 								auraGUID = targetGUID
 							else
-								auraGUID = UnitGUID(target)
+								auraGUID = API_UnitGUID(target)
 							end
 
 							-- Set the duration to the proper length if it's a DoT.
@@ -519,7 +529,7 @@ function OvaleState:GetAuraByGUID(guid, spellId, mine, target)
 end
 
 function OvaleState:GetAura(target, spellId, mine)
-	return self:GetAuraByGUID(UnitGUID(target), spellId, mine, target)
+	return self:GetAuraByGUID(API_UnitGUID(target), spellId, mine, target)
 end
 
 function OvaleState:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
@@ -573,9 +583,6 @@ function OvaleState:GetEclipseDir()
 		end
 	end
 end
-
-local runes = {}
-local runesCD = {}
 
 function OvaleState:GetRunes(blood, frost, unholy, death, nodeath)
 	local nombre = 0

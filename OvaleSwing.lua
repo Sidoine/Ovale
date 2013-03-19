@@ -22,6 +22,28 @@ local _, Ovale = ...
 local OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")
 Ovale.OvaleSwing = OvaleSwing
 
+--<private-static-properties>
+local OvaleGUID = Ovale.OvaleGUID
+local OvalePaperDoll = Ovale.OvalePaperDoll
+
+local math_abs = math.abs
+local unpack = unpack
+local API_GetSpellInfo = GetSpellInfo
+local API_UnitAttackSpeed = UnitAttackSpeed
+local API_UnitDamage = UnitDamage
+local API_UnitRangedDamage = UnitRangedDamage
+local BOOKTYPE_SPELL = BOOKTYPE_SPELL
+
+local self_playerGUID = nil
+
+local OVALE_AUTOSHOT_NAME = API_GetSpellInfo(75)
+local OVALE_RESET_SPELLS = {}
+local OVALE_DELAY_SPELLS = {
+	[API_GetSpellInfo(1464)] = true, -- Slam
+}
+local OVALE_RESET_AUTOSHOT_SPELLS = {}
+--</private-static-properties>
+
 --<public-static-properties>
 OvaleSwing.ohNext = nil
 OvaleSwing.dual = false
@@ -34,28 +56,9 @@ OvaleSwing.startdelay = nil
 OvaleSwing.swingmode = nil
 --</public-static-properties>
 
---<private-static-properties>
-local OvaleGUID = Ovale.OvaleGUID
-local OvalePaperDoll = Ovale.OvalePaperDoll
-
-local unpack = unpack
-local math_abs = math.abs
-local GetSpellInfo, GetTime, UnitAttackSpeed = GetSpellInfo, GetTime, UnitAttackSpeed
-local UnitDamage, UnitRangedDamage = UnitDamage, UnitRangedDamage
-local BOOKTYPE_SPELL = BOOKTYPE_SPELL
-
-local playerGUID = nil
-local autoshotname = GetSpellInfo(75)
-local resetspells = {}
-local delayspells = {
-	[GetSpellInfo(1464)] = true, -- Slam
-}
-local resetautoshotspells = {}
---</private-static-properties>
-
 --<public-static-methods>
 function OvaleSwing:OnEnable()
-	playerGUID = OvaleGUID.player
+	self_playerGUID = OvaleGUID.player
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")
@@ -78,7 +81,7 @@ function OvaleSwing:OnDisable()
 end
 
 function OvaleSwing:PLAYER_ENTER_COMBAT()
-	local _,_,offhandlow, offhandhigh = UnitDamage('player')
+	local _,_,offhandlow, offhandhigh = API_UnitDamage('player')
 	if math_abs(offhandlow - offhandhigh) <= 0.1 or OvalePaperDoll.class == "DRUID" then
 		self.dual = false
 	else
@@ -103,7 +106,7 @@ function OvaleSwing:STOP_AUTOREPEAT_SPELL()
 end
 
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
-	if srcGUID == playerGUID then
+	if srcGUID == self_playerGUID then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
 			self:MeleeSwing(Ovale.now)
 		end
@@ -111,31 +114,31 @@ function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, src
 end
 
 function OvaleSwing:UNIT_SPELLCAST_START(event, unit, spell)
-	if delayspells[spell] and unit=="player" then
+	if OVALE_DELAY_SPELLS[spell] and unit=="player" then
 		self.startdelay = Ovale.now
-		local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spell)
+		local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = API_GetSpellInfo(spell)
 		self.delay = castTime
 	end
 end
 
 function OvaleSwing:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
-	if unit == "player" and delayspells[spell] and self.startdelay then
-		self.delay = GetTime() - self.startdelay
+	if unit == "player" and OVALE_DELAY_SPELLS[spell] and self.startdelay then
+		self.delay = Ovale.now - self.startdelay
 	end
 end
 
 function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
 	if unit == "player" then
-		if resetspells[spell] then
+		if OVALE_RESET_SPELLS[spell] then
 			self:MeleeSwing(Ovale.now)
 		end
-		if delayspells[spell] and self.startdelay then
-			self.delay = GetTime() - self.startdelay
+		if OVALE_DELAY_SPELLS[spell] and self.startdelay then
+			self.delay = Ovale.now - self.startdelay
 		end
-		if spell == autoshotname then
+		if spell == OVALE_AUTOSHOT_NAME then
 			self:Shoot()
 		end
-		if resetautoshotspells[spell] then
+		if OVALE_RESET_AUTOSHOT_SPELLS[spell] then
 			self:Shoot()
 		end
 	end
@@ -146,9 +149,9 @@ function OvaleSwing:UNIT_ATTACK(event, unit)
 		if not self.swingmode then
 			return
 		elseif self.swingmode == 0 then
-			self.duration = UnitAttackSpeed('player')
+			self.duration = API_UnitAttackSpeed('player')
 		else
-			self.duration = UnitRangedDamage('player')
+			self.duration = API_UnitRangedDamage('player')
 		end
 	end]]
 end
@@ -159,7 +162,7 @@ function OvaleSwing:MeleeSwing(timestamp)
 			local prediction = self.ohDuration+self.ohStartTime+self.delay
 			print("Prediction oh = "  .. prediction .. " diff=" .. (timestamp-prediction))
 		end]]
-		self.ohDuration = UnitAttackSpeed('player')
+		self.ohDuration = API_UnitAttackSpeed('player')
 		self.ohStartTime = timestamp
 		--print("MeleeSwing oh = " .. self.ohStartTime)
 		self.ohNext = false
@@ -168,7 +171,7 @@ function OvaleSwing:MeleeSwing(timestamp)
 			local prediction = self.duration+self.starttime+self.delay
 			print("Prediction mh = " .. prediction .. " diff=" .. (timestamp-prediction))
 		end]]
-		self.duration = UnitAttackSpeed('player')
+		self.duration = API_UnitAttackSpeed('player')
 		self.starttime = timestamp
 		--print("MeleeSwing mh = " .. self.starttime)
 		self.ohNext = true
@@ -184,8 +187,8 @@ function OvaleSwing:Shoot()
 	--[[if self.duration then
 		print("Prediction = " ..(self.duration+self.starttime))
 	end]]
-	self.duration = UnitRangedDamage('player')
-	self.starttime = GetTime()
+	self.duration = API_UnitRangedDamage('player')
+	self.starttime = Ovale.now
 	--print("Shoot " .. self.starttime)
 end
 

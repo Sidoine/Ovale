@@ -20,7 +20,9 @@ local OvaleScripts = Ovale.OvaleScripts
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
 
-local strgmatch, strgsub, tostring = string.gmatch, string.gsub, tostring
+local strgmatch = string.gmatch
+local strgsub = string.gsub
+local tostring = tostring
 --</private-static-properties>
 
 --<public-static-properties>
@@ -34,7 +36,7 @@ local LibDualSpec = LibStub("LibDualSpec-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 	
 --GUI option
-local options = 
+local self_options = 
 { 
 	type = "group",
 	args = 
@@ -541,17 +543,17 @@ function OvaleOptions:OnInitialize()
 		}
 	})
 
-	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
 	-- Add dual-spec support
 	LibDualSpec:EnhanceDatabase(self.db, "Ovale")
-	LibDualSpec:EnhanceOptions(options.args.profile, self.db)
+	LibDualSpec:EnhanceOptions(self_options.args.profile, self.db)
 
-	AceConfig:RegisterOptionsTable("Ovale", options.args.code)
-	AceConfig:RegisterOptionsTable("Ovale Actions", options.args.actions, "Ovale")
-	AceConfig:RegisterOptionsTable("Ovale Profile", options.args.profile)
-	AceConfig:RegisterOptionsTable("Ovale Apparence", options.args.apparence)
-	AceConfig:RegisterOptionsTable("Ovale Debug", options.args.debug)
+	AceConfig:RegisterOptionsTable("Ovale", self_options.args.code)
+	AceConfig:RegisterOptionsTable("Ovale Actions", self_options.args.actions, "Ovale")
+	AceConfig:RegisterOptionsTable("Ovale Profile", self_options.args.profile)
+	AceConfig:RegisterOptionsTable("Ovale Apparence", self_options.args.apparence)
+	AceConfig:RegisterOptionsTable("Ovale Debug", self_options.args.debug)
 
 	AceConfigDialog:AddToBlizOptions("Ovale", "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", "Ovale")

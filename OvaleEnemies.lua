@@ -17,19 +17,17 @@ Ovale.OvaleEnemies = OvaleEnemies
 local bit_band = bit.band
 local pairs = pairs
 local select = select
-local time = time
 local tostring = tostring
 local wipe = table.wipe
-
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
 
--- enemyLastSeen[guid] = timestamp
-local enemyLastSeen = {}
--- enemyName[guid] = name
-local enemyName = {}
+-- self_enemyLastSeen[guid] = timestamp
+local self_enemyLastSeen = {}
+-- self_enemyName[guid] = name
+local self_enemyName = {}
 -- timer for reaper function to remove inactive enemies
-local reaperTimer = nil
+local self_reaperTimer = nil
 local REAP_INTERVAL = 3
 --</private-static-properties>
 
@@ -38,11 +36,11 @@ OvaleEnemies.activeEnemies = 0
 --</public-static-properties>
 
 --<private-static-methods>
-function AddEnemy(guid, name, timestamp)
+local function AddEnemy(guid, name, timestamp)
 	if not guid then return end
-	local seen = enemyLastSeen[guid]
-	enemyLastSeen[guid] = timestamp
-	enemyName[guid] = name
+	local seen = self_enemyLastSeen[guid]
+	self_enemyLastSeen[guid] = timestamp
+	self_enemyName[guid] = name
 	if not seen then
 		OvaleEnemies.activeEnemies = OvaleEnemies.activeEnemies + 1
 		Ovale:DebugPrint("enemy", "New enemy (" .. OvaleEnemies.activeEnemies .. " total): " .. guid .. "(" .. tostring(name) .. ")")
@@ -50,11 +48,11 @@ function AddEnemy(guid, name, timestamp)
 	end
 end
 
-function RemoveEnemy(guid, isDead)
+local function RemoveEnemy(guid, isDead)
 	if not guid then return end
-	local seen = enemyLastSeen[guid]
-	local name = enemyName[guid]
-	enemyLastSeen[guid] = nil
+	local seen = self_enemyLastSeen[guid]
+	local name = self_enemyName[guid]
+	self_enemyLastSeen[guid] = nil
 	if seen then
 		if OvaleEnemies.activeEnemies > 0 then
 			OvaleEnemies.activeEnemies = OvaleEnemies.activeEnemies - 1
@@ -72,17 +70,17 @@ end
 
 --<public-static-methods>
 function OvaleEnemies:OnEnable()
-	if not reaperTimer then
-		reaperTimer = self:ScheduleRepeatingTimer("RemoveInactiveEnemies", REAP_INTERVAL)
+	if not self_reaperTimer then
+		self_reaperTimer = self:ScheduleRepeatingTimer("RemoveInactiveEnemies", REAP_INTERVAL)
 	end
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 end
 
 function OvaleEnemies:OnDisable()
-	if not reaperTimer then
-		self:CancelTimer(reaperTimer)
-		reaperTimer = nil
+	if not self_reaperTimer then
+		self:CancelTimer(self_reaperTimer)
+		self_reaperTimer = nil
 	end
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
@@ -106,8 +104,8 @@ end
 
 function OvaleEnemies:PLAYER_REGEN_DISABLED()
 	-- Reset enemy tracking when combat starts.
-	wipe(enemyLastSeen)
-	wipe(enemyName)
+	wipe(self_enemyLastSeen)
+	wipe(self_enemyName)
 	self.activeEnemies = 0
 end
 
@@ -115,7 +113,7 @@ end
 -- These enemies are not in combat with your group, out of range, or
 -- incapacitated and shouldn't count toward the number of active enemies.
 function OvaleEnemies:RemoveInactiveEnemies()
-	for guid, timestamp in pairs(enemyLastSeen) do
+	for guid, timestamp in pairs(self_enemyLastSeen) do
 		if Ovale.now - timestamp > REAP_INTERVAL then
 			RemoveEnemy(guid)
 		end
@@ -123,8 +121,8 @@ function OvaleEnemies:RemoveInactiveEnemies()
 end
 
 function OvaleEnemies:Debug()
-	for guid, timestamp in pairs(enemyLastSeen) do
-		Ovale:Print("enemy " .. guid .. " (" .. tostring(enemyName[guid]) .. ") last seen at " .. timestamp)
+	for guid, timestamp in pairs(self_enemyLastSeen) do
+		Ovale:Print("enemy " .. guid .. " (" .. tostring(self_enemyName[guid]) .. ") last seen at " .. timestamp)
 	end	
 end
 --</public-static-methods>

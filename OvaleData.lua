@@ -15,13 +15,22 @@ Ovale.OvaleData = OvaleData
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleStance = Ovale.OvaleStance
 
-local ipairs, pairs, tinsert, tonumber, tostring, tsort = ipairs, pairs, table.insert, tonumber, tostring, table.sort
-local GetNumGlyphSockets = GetNumGlyphSockets
-local GetGlyphSocketInfo = GetGlyphSocketInfo
-local GetSpellCooldown = GetSpellCooldown
-local GetSpellBookItemInfo, GetSpellBookItemName = GetSpellBookItemInfo, GetSpellBookItemName
-local GetSpellInfo, GetSpellTabInfo, GetTalentInfo = GetSpellInfo, GetSpellTabInfo, GetTalentInfo
-local HasPetSpells = HasPetSpells
+local ipairs = ipairs
+local pairs = pairs
+local tinsert = table.insert
+local tonumber = tonumber
+local tostring = tostring
+local tsort = table.sort
+local wipe = table.wipe
+local API_GetNumGlyphSockets = GetNumGlyphSockets
+local API_GetGlyphSocketInfo = GetGlyphSocketInfo
+local API_GetSpellCooldown = GetSpellCooldown
+local API_GetSpellBookItemInfo = GetSpellBookItemInfo
+local API_GetSpellBookItemName = GetSpellBookItemName
+local API_GetSpellInfo = GetSpellInfo
+local API_GetSpellTabInfo = GetSpellTabInfo
+local API_GetTalentInfo = GetTalentInfo
+local API_HasPetSpells = HasPetSpells
 local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
 local SPELL_POWER_BURNING_EMBERS = SPELL_POWER_BURNING_EMBERS
@@ -379,7 +388,7 @@ end
 
 function OvaleData:GetSpellInfoOrNil(spell)
 	if (spell) then
-		return GetSpellInfo(spell)
+		return API_GetSpellInfo(spell)
 	else
 		return nil
 	end
@@ -388,13 +397,13 @@ end
 function OvaleData:FillPetSpellList()
 	--TODO pas moyen d'avoir le nombre de skills pour le pet
 	local book=BOOKTYPE_PET
-	local numSpells, _ = HasPetSpells()
+	local numSpells, _ = API_HasPetSpells()
 	if not numSpells then return end
 	local i=1
 	while i <= numSpells do
-		local skillType, spellId = GetSpellBookItemInfo(i, book)
+		local skillType, spellId = API_GetSpellBookItemInfo(i, book)
 		if skillType~="FUTURESPELL" and spellId then
-			local spellName = GetSpellBookItemName(i, book)
+			local spellName = API_GetSpellBookItemName(i, book)
 			self.spellList[spellId] = spellName
 		end
 		i = i + 1
@@ -406,15 +415,15 @@ function OvaleData:FillSpellList()
 	
 	--TODO pas moyen d'avoir le nombre de skills pour le pet
 	local book=BOOKTYPE_SPELL
-	local name, texture, offset, numSpells, isGuild = GetSpellTabInfo(2)
+	local name, texture, offset, numSpells, isGuild = API_GetSpellTabInfo(2)
 	
 	numSpells = numSpells + offset
 	
 	local i=1
 	while i <= numSpells do
-		local skillType, spellId = GetSpellBookItemInfo(i, book)
+		local skillType, spellId = API_GetSpellBookItemInfo(i, book)
 		if skillType~="FUTURESPELL" and spellId then
-			local spellName = GetSpellBookItemName(i, book)
+			local spellName = API_GetSpellBookItemName(i, book)
 			self.spellList[spellId] = spellName
 		end
 		i = i + 1
@@ -427,7 +436,7 @@ function OvaleData:RemplirListeTalents()
 	local talentId = 1
 	local talentsChanged = false
 	while true do
-		local name, texture, tier, column, selected, available = GetTalentInfo(talentId)
+		local name, texture, tier, column, selected, available = API_GetTalentInfo(talentId)
 		if not name then
 			break
 		end
@@ -468,8 +477,8 @@ end
 
 function OvaleData:UpdateGlyphs()
 	wipe(self.glyphs)
-	for i = 1, GetNumGlyphSockets() do
-		local enabled, _, _, glyphSpell, _ = GetGlyphSocketInfo(i)
+	for i = 1, API_GetNumGlyphSockets() do
+		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
 		if enabled and glyphSpell then
 			self.glyphs[glyphSpell] = true
 		end
@@ -480,7 +489,7 @@ end
 function OvaleData:DebugGlyphs()
 	local array = {}
 	for glyphId in pairs(self.glyphs) do
-		tinsert(array, GetSpellInfo(glyphId) .. ": " .. glyphId)
+		tinsert(array, API_GetSpellInfo(glyphId) .. ": " .. glyphId)
 	end
 	tsort(array)
 	for _, v in ipairs(array) do
@@ -531,9 +540,9 @@ end
 
 --Compute the spell Cooldown
 function OvaleData:GetSpellCD(spellId)
-	local actionCooldownStart, actionCooldownDuration, actionEnable = GetSpellCooldown(spellId)
+	local actionCooldownStart, actionCooldownDuration, actionEnable = API_GetSpellCooldown(spellId)
 	if self.spellInfo[spellId] and self.spellInfo[spellId].forcecd then
-		actionCooldownStart, actionCooldownDuration = GetSpellCooldown(self.spellInfo[spellId].forcecd)
+		actionCooldownStart, actionCooldownDuration = API_GetSpellCooldown(self.spellInfo[spellId].forcecd)
 	end
 	return actionCooldownStart, actionCooldownDuration, actionEnable
 end

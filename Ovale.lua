@@ -8,23 +8,33 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-_G.Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, "Ovale", "AceConsole-3.0", "AceEvent-3.0")
+local OvaleAddon = LibStub("AceAddon-3.0"):NewAddon(Ovale, "Ovale", "AceConsole-3.0", "AceEvent-3.0")
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local OvaleOptions = nil
 
-local ipairs, pairs, strsplit, tinsert, tsort = ipairs, pairs, string.split, table.insert, table.sort
-local SendAddonMessage, UnitAura, UnitCanAttack = SendAddonMessage, UnitAura, UnitCanAttack
-local UnitExists, UnitHasVehicleUI, UnitIsDead = UnitExists, UnitHasVehicleUI, UnitIsDead
+local ipairs = ipairs
+local pairs = pairs
+local strsplit = string.split
+local tinsert = table.insert
+local tsort = table.sort
+local API_GetTime = GetTime
+local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
+local API_SendAddonMessage = SendAddonMessage
+local API_UnitAura = UnitAura
+local API_UnitCanAttack = UnitCanAttack
+local API_UnitExists = UnitExists
+local API_UnitHasVehicleUI = UnitHasVehicleUI
+local API_UnitIsDead = UnitIsDead
 
-local damageMeterModules = {}
+local self_damageMeterModules = {}
 --</private-static-properties>
 
 --<public-static-properties>
 Ovale.L = L
 --The current time, updated once per frame refresh.
-Ovale.now = GetTime()
+Ovale.now = API_GetTime()
 --The table of check boxes definition
 Ovale.casesACocher = {}
 --the frame with the icons
@@ -70,7 +80,7 @@ function Ovale:DebugListAura(target, filter)
 	local i = 1
 	local array = {}
 	while true do
-		local name, _, _, _, _, _, _, _, _, _, spellId =  UnitAura(target, i, filter)
+		local name, _, _, _, _, _, _, _, _, _, spellId =  API_UnitAura(target, i, filter)
 		if not name then
 			break
 		end
@@ -85,7 +95,7 @@ end
 
 function Ovale:OnEnable()
     -- Called when the addon is enabled
-	RegisterAddonMessagePrefix("Ovale")
+	API_RegisterAddonMessagePrefix("Ovale")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -132,7 +142,7 @@ end
 
 function Ovale:PLAYER_REGEN_DISABLED()
 	if self.maxScore>0 then
-		SendAddonMessage("Ovale", self.score..";"..self.maxScore..";"..UnitGUID("player"), "RAID")
+		API_SendAddonMessage("Ovale", self.score..";"..self.maxScore..";"..UnitGUID("player"), "RAID")
 	end
 	self.enCombat = true
 	self.score = 0
@@ -142,15 +152,15 @@ function Ovale:PLAYER_REGEN_DISABLED()
 end
 
 function Ovale:AddDamageMeter(name, module)
-	damageMeterModules[name] = module
+	self_damageMeterModules[name] = module
 end
 
 function Ovale:RemoveDamageMeter(name)
-	damageMeterModules[name] = nil
+	self_damageMeterModules[name] = nil
 end
 
 function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	for _, module in pairs(damageMeterModules) do
+	for _, module in pairs(self_damageMeterModules) do
 		module:SendScoreToDamageMeter(name, guid, scored, scoreMax)
 	end
 end
@@ -188,11 +198,11 @@ function Ovale:UpdateVisibility()
 	end
 
 	self.frame:Show()
-	if profile.apparence.hideVehicule and UnitHasVehicleUI("player") then
+	if profile.apparence.hideVehicule and API_UnitHasVehicleUI("player") then
 		self.frame:Hide()
 	end
 	
-	if profile.apparence.avecCible and not UnitExists("target") then
+	if profile.apparence.avecCible and not API_UnitExists("target") then
 		self.frame:Hide()
 	end
 	
@@ -200,7 +210,7 @@ function Ovale:UpdateVisibility()
 		self.frame:Hide()
 	end	
 	
-	if profile.apparence.targetHostileOnly and (UnitIsDead("target") or not UnitCanAttack("player", "target")) then
+	if profile.apparence.targetHostileOnly and (API_UnitIsDead("target") or not API_UnitCanAttack("player", "target")) then
 		self.frame:Hide()
 	end
 end

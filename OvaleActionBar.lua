@@ -14,16 +14,16 @@ Ovale.OvaleActionBar = OvaleActionBar
 
 --<private-static-properties>
 local tonumber = tonumber
-local wipe = wipe
-
-local GetActionInfo = GetActionInfo
-local GetActionText = GetActionText
+local wipe = table.wipe
+local API_GetActionInfo = GetActionInfo
+local API_GetActionText = GetActionText
+local API_GetBindingKey = GetBindingKey
 
 --key: spell name / value: action icon id
-actionSpell = {}
-actionMacro = {}
-actionItem = {}
-keybind = {}
+self_actionSpell = {}
+self_actionMacro = {}
+self_actionItem = {}
+self_keybind = {}
 --</private-static-properties>
 
 --<public-static-methods>
@@ -55,26 +55,26 @@ end
 
 function OvaleActionBar:FillActionIndexes(event)
 	Ovale:DebugPrint("action_bar", "Mapping buttons to spells/macros for " ..event)
-	wipe(actionSpell)
-	wipe(actionMacro)
-	wipe(actionItem)
-	wipe(keybind)
+	wipe(self_actionSpell)
+	wipe(self_actionMacro)
+	wipe(self_actionItem)
+	wipe(self_keybind)
 	for i=1,120 do
 		self:FillActionIndex(i)
 	end
 end
 
 function OvaleActionBar:FillActionIndex(i)
-	keybind[i] = self:FindKeyBinding(i)
-	local actionText = GetActionText(i)
+	self_keybind[i] = self:FindKeyBinding(i)
+	local actionText = API_GetActionText(i)
 	if actionText then
-		actionMacro[actionText] = i
+		self_actionMacro[actionText] = i
 	else
-		local type, spellId = GetActionInfo(i);
+		local type, spellId = API_GetActionInfo(i);
 		if (type=="spell") then
-			actionSpell[spellId] = i
+			self_actionSpell[spellId] = i
 		elseif (type =="item") then
-			actionItem[spellId] = i
+			self_actionItem[spellId] = i
 		end
 	end
 end
@@ -97,7 +97,7 @@ function OvaleActionBar:FindKeyBinding(id)
 	else
 		name = "MULTIACTIONBAR1BUTTON"..(id-60);
 	end
-	local key = GetBindingKey(name);
+	local key = API_GetBindingKey(name);
 --[[	if (not key) then
 		DEFAULT_CHAT_FRAME:AddMessage(id.."=>"..name.." introuvable")
 	else
@@ -108,20 +108,20 @@ end
 
 -- Get the action id that match a spell id
 function OvaleActionBar:GetForSpell(spellId)
-	return actionSpell[spellId]
+	return self_actionSpell[spellId]
 end
 
 -- Get the action id that match a macro id
 function OvaleActionBar:GetForMacro(macroId)
-	return actionMacro[macroId]
+	return self_actionMacro[macroId]
 end
 
 -- Get the action id that match an item id
 function OvaleActionBar:GetForItem(itemId)
-	return actionItem[itemId]
+	return self_actionItem[itemId]
 end
 
 function OvaleActionBar:GetBinding(actionId)
-	return keybind[actionId]
+	return self_keybind[actionId]
 end
 --</public-static-methods>

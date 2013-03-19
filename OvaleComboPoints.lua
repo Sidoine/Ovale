@@ -18,12 +18,12 @@ local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 
-local GetComboPoints = GetComboPoints
-local UnitGUID = UnitGUID
+local API_GetComboPoints = GetComboPoints
+local API_UnitGUID = UnitGUID
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
-local playerGUID = nil
-local targetGUID = nil
+local self_playerGUID = nil
+local self_targetGUID = nil
 --</private-static-properties>
 
 --<public-static-properties>
@@ -32,7 +32,7 @@ OvaleComboPoints.combo = 0
 
 --<public-static-methods>
 function OvaleComboPoints:OnEnable()
-	playerGUID = OvaleGUID.player
+	self_playerGUID = OvaleGUID.player
 	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -64,7 +64,7 @@ the number of extra combo points to add, e.g., critcombo=1.
 --]]
 function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local _, event, _, sourceGUID, _, _, _,	destGUID = ...
-	if sourceGUID == playerGUID and destGUID == targetGUID then
+	if sourceGUID == self_playerGUID and destGUID == self_targetGUID then
 		if event == "SPELL_DAMAGE" then
 			local spellId, _, _, _, _, _, _, _, _, critical = select(12, ...)
 			local si = OvaleData.spellInfo[spellId]
@@ -83,7 +83,7 @@ function OvaleComboPoints:PLAYER_ENTERING_WORLD(event)
 end
 
 function OvaleComboPoints:PLAYER_TARGET_CHANGED(event)
-	targetGUID = UnitGUID("target")
+	self_targetGUID = API_UnitGUID("target")
 	self:Refresh()
 end
 
@@ -95,10 +95,10 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, ...)
 end
 
 function OvaleComboPoints:Refresh()
-	self.combo = GetComboPoints("player") or 0
+	self.combo = API_GetComboPoints("player") or 0
 end
 
 function OvaleComboPoints:Debug()
-	Ovale:Print("Player has " .. self.combo .. " combo points on target " ..targetGUID.. ".")
+	Ovale:Print("Player has " .. self.combo .. " combo points on target " ..self_targetGUID.. ".")
 end
 --</public-static-methods>

@@ -15,12 +15,11 @@ Ovale.OvaleEquipement = OvaleEquipement
 local pairs = pairs
 local select = select
 local tostring = tostring
-local wipe = wipe
+local wipe = table.wipe
 
-local GetInventoryItemID = GetInventoryItemID
-local GetInventorySlotInfo = GetInventorySlotInfo
-local GetItemInfo = GetItemInfo
-
+local API_GetInventoryItemID = GetInventoryItemID
+local API_GetInventorySlotInfo = GetInventorySlotInfo
+local API_GetItemInfo = GetItemInfo
 local INVSLOT_AMMO = INVSLOT_AMMO
 local INVSLOT_BACK = INVSLOT_BACK
 local INVSLOT_BODY = INVSLOT_BODY
@@ -45,9 +44,16 @@ local INVSLOT_WAIST = INVSLOT_WAIST
 local INVSLOT_WRIST = INVSLOT_WRIST
 
 -- item IDs of equipped items, indexed by slot ID
-local equippedItems = {}
+local self_equippedItems = {}
+-- type of main-hand item equipped
+local self_mainHandItemType
+-- type of off-hand item equipped
+local self_offHandItemType
+-- count of equipped pieces of an armor set: self_armorSetCount[armorSetName] = equippedCount
+local self_armorSetCount = {}
+
 -- equipment slot names
-local slotName = {
+local OVALE_SLOTNAME = {
 	AmmoSlot = true,
 	BackSlot = true,
 	ChestSlot = true,
@@ -69,16 +75,10 @@ local slotName = {
 	WaistSlot = true,
 	WristSlot = true,
 }
--- type of main-hand item equipped
-local mainHandItemType
--- type of off-hand item equipped
-local offHandItemType
 -- slots that can contain pieces from armor sets
-local armorSetSlotIDs = { INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LEGS, INVSLOT_SHOULDER }
--- count of equipped pieces of an armor set: armorSetCount[armorSetName] = equippedCount
-local armorSetCount = {}
--- database of armor set items: armorSet[itemId] = armorSetName
-local armorSet = {
+local OVALE_ARMORSET_SLOT_IDS = { INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LEGS, INVSLOT_SHOULDER }
+-- database of armor set items: OVALE_ARMORSET[itemId] = armorSetName
+local OVALE_ARMORSET = {
 	-- Death Knight
 	[85314] = "T14_tank",
 	[85315] = "T14_tank",
@@ -947,7 +947,7 @@ local armorSet = {
 local function GetEquippedItemType(slotId)
 	local itemId = OvaleEquipement:GetEquippedItem(slotId)
 	if not itemId then return nil end
-	local inventoryType = select(9, GetItemInfo(itemId))
+	local inventoryType = select(9, API_GetItemInfo(itemId))
 	return inventoryType
 end
 --</private-static-methods>
@@ -967,18 +967,18 @@ end
 
 function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 	if hasItem then
-		equippedItems[slotId] = GetInventoryItemID("player", slotId)
+		self_equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
 		if slotId == INVSLOT_MAINHAND then
-			mainHandItemType = GetEquippedItemType(slotId)
+			self_mainHandItemType = GetEquippedItemType(slotId)
 		elseif slotId == INVSLOT_OFFHAND then
-			offHandItemType = GetEquippedItemType(slotId)
+			self_offHandItemType = GetEquippedItemType(slotId)
 		end
 	else
-		equippedItems[slotId] = nil
+		self_equippedItems[slotId] = nil
 		if slotId == INVSLOT_MAINHAND then
-			mainHandItemType = nil
+			self_mainHandItemType = nil
 		elseif slotId == INVSLOT_OFFHAND then
-			offHandItemType = nil
+			self_offHandItemType = nil
 		end
 	end
 
@@ -987,35 +987,35 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 end
 
 function OvaleEquipement:GetArmorSetCount(name)
-	if not armorSetCount[name] then
+	if not self_armorSetCount[name] then
 		return 0
 	else
-		return armorSetCount[name]
+		return self_armorSetCount[name]
 	end
 end
 
 function OvaleEquipement:GetEquippedItem(slotId)
 	if type(slotId) ~= "number" then
-		if not slotName[slotId] then return nil end
-		slotId = GetInventorySlotInfo(slotId)
+		if not OVALE_SLOTNAME[slotId] then return nil end
+		slotId = API_GetInventorySlotInfo(slotId)
 		if not slotId then return nil end
 	end
-	return equippedItems[slotId]
+	return self_equippedItems[slotId]
 end
 
 function OvaleEquipement:HasMainHandWeapon()
-	return mainHandItemType == "INVTYPE_WEAPON"
-		or mainHandItemType == "INVTYPE_WEAPONMAINHAND"
-		or mainHandItemType == "INVTYPE_2HWEAPON"
+	return self_mainHandItemType == "INVTYPE_WEAPON"
+		or self_mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+		or self_mainHandItemType == "INVTYPE_2HWEAPON"
 end
 
 function OvaleEquipement:HasOffHandWeapon()
-	return offHandItemType == "INVTYPE_WEAPON"
-		or offHandItemType == "INVTYPE_WEAPONOFFHAND"
+	return self_offHandItemType == "INVTYPE_WEAPON"
+		or self_offHandItemType == "INVTYPE_WEAPONOFFHAND"
 end
 
 function OvaleEquipement:HasShield()
-	return offHandItemType == "INVTYPE_SHIELD"
+	return self_offHandItemType == "INVTYPE_SHIELD"
 end
 
 function OvaleEquipement:HasTrinket(itemId)
@@ -1024,20 +1024,20 @@ function OvaleEquipement:HasTrinket(itemId)
 end
 
 function OvaleEquipement:HasTwoHandedWeapon()
-	return mainHandItemType == "INVTYPE_2HWEAPON"
+	return self_mainHandItemType == "INVTYPE_2HWEAPON"
 end
 
 function OvaleEquipement:UpdateArmorSetCount()
-	wipe(armorSetCount)
-	for i = 1, #armorSetSlotIDs do
-		local itemId = self:GetEquippedItem(armorSetSlotIDs[i])
+	wipe(self_armorSetCount)
+	for i = 1, #OVALE_ARMORSET_SLOT_IDS do
+		local itemId = self:GetEquippedItem(OVALE_ARMORSET_SLOT_IDS[i])
 		if itemId then
-			local name = armorSet[itemId]
+			local name = OVALE_ARMORSET[itemId]
 			if name then
-				if not armorSetCount[name] then
-					armorSetCount[name] = 1
+				if not self_armorSetCount[name] then
+					self_armorSetCount[name] = 1
 				else
-					armorSetCount[name] = armorSetCount[name] + 1
+					self_armorSetCount[name] = self_armorSetCount[name] + 1
 				end
 			end
 		end
@@ -1048,14 +1048,14 @@ function OvaleEquipement:UpdateEquippedItems()
 	local changed = false
 	local item
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		item = GetInventoryItemID("player", slotId)
-		if item ~= equippedItems[slotId] then
-			equippedItems[slotId] = GetInventoryItemID("player", slotId)
+		item = API_GetInventoryItemID("player", slotId)
+		if item ~= self_equippedItems[slotId] then
+			self_equippedItems[slotId] = item
 			changed = true
 		end
 	end
-	mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
-	offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
+	self_mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
+	self_offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
 
 	if changed then
 		self:UpdateArmorSetCount()
@@ -1067,9 +1067,9 @@ function OvaleEquipement:Debug()
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
 		Ovale:Print("Slot " ..slotId.. " = " .. tostring(self:GetEquippedItem(slotId)))
 	end
-	Ovale:Print("Main-hand item type: " .. tostring(mainHandItemType))
-	Ovale:Print("Off-hand item type: " .. tostring(offHandItemType))
-	for k, v in pairs(armorSetCount) do
+	Ovale:Print("Main-hand item type: " .. tostring(self_mainHandItemType))
+	Ovale:Print("Off-hand item type: " .. tostring(self_offHandItemType))
+	for k, v in pairs(self_armorSetCount) do
 		Ovale:Print("Player has " ..v.. "piece(s) of " ..k.. " armor set")
 	end
 end

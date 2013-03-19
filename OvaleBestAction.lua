@@ -20,12 +20,26 @@ local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
 
-local floor, ipairs, loadstring, pairs = math.floor, ipairs, loadstring, pairs
-local strfind, tonumber, tostring = string.find, tonumber, tostring
-local GetActionCooldown, GetActionTexture = GetActionCooldown, GetActionTexture
-local GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellInfo = GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellInfo
-local GetSpellTexture, IsActionInRange, IsCurrentAction = GetSpellTexture, IsActionInRange, IsCurrentAction
-local IsItemInRange, IsSpellInRange, IsUsableAction, IsUsableSpell = IsItemInRange, IsSpellInRange, IsUsableAction, IsUsableSpell
+local floor = math.floor
+local ipairs = ipairs
+local loadstring = loadstring
+local pairs = pairs
+local strfind = string.find
+local tonumber = tonumber
+local tostring = tostring
+local API_GetActionCooldown = GetActionCooldown
+local API_GetActionTexture = GetActionTexture
+local API_GetItemIcon = GetItemIcon
+local API_GetItemCooldown = GetItemCooldown
+local API_GetItemSpell = GetItemSpell
+local API_GetSpellInfo = GetSpellInfo
+local API_GetSpellTexture = GetSpellTexture
+local API_IsActionInRange = IsActionInRange
+local API_IsCurrentAction = IsCurrentAction
+local API_IsItemInRange = IsItemInRange
+local API_IsSpellInRange = IsSpellInRange
+local API_IsUsableAction = IsUsableAction
+local API_IsUsableSpell = IsUsableSpell
 --</private-static-properties>
 
 --<private-static-methods>
@@ -142,21 +156,21 @@ function OvaleBestAction:GetActionInfo(element)
 		
 		local spellName = OvaleData.spellList[spellId]
 		if not spellName then
-			spellName = GetSpellInfo(spellId)
+			spellName = API_GetSpellInfo(spellId)
 		end
-		actionTexture = GetSpellTexture(spellId)
-		actionInRange = IsSpellInRange(spellName, target)
-		actionUsable = IsUsableSpell(spellId)
+		actionTexture = API_GetSpellTexture(spellId)
+		actionInRange = API_IsSpellInRange(spellName, target)
+		actionUsable = API_IsUsableSpell(spellId)
 		actionShortcut = nil
 	elseif (element.func=="macro") then
 		action = OvaleActionBar:GetForMacro(element.params[1])
 		if action then
-			actionTexture = GetActionTexture(action)
-			actionInRange = IsActionInRange(action, target)
-			actionCooldownStart, actionCooldownDuration, actionEnable = GetActionCooldown(action)
-			actionUsable = IsUsableAction(action)
+			actionTexture = API_GetActionTexture(action)
+			actionInRange = API_IsActionInRange(action, target)
+			actionCooldownStart, actionCooldownDuration, actionEnable = API_GetActionCooldown(action)
+			actionUsable = API_IsUsableAction(action)
 			actionShortcut = OvaleActionBar:GetBinding(action)
-			actionIsCurrent = IsCurrentAction(action)
+			actionIsCurrent = API_IsCurrentAction(action)
 		else
 			Ovale:Log("Unknown macro "..element.params[1])
 		end
@@ -173,13 +187,13 @@ function OvaleBestAction:GetActionInfo(element)
 			Ovale:Print("Item "..tostring(itemId))
 		end
 
-		local spellName = GetItemSpell(itemId)
+		local spellName = API_GetItemSpell(itemId)
 		actionUsable = (spellName~=nil)
 		
 		action = OvaleActionBar:GetForItem(itemId)
-		actionTexture = GetItemIcon(itemId)
-		actionInRange = IsItemInRange(itemId, target)
-		actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
+		actionTexture = API_GetItemIcon(itemId)
+		actionInRange = API_IsItemInRange(itemId, target)
+		actionCooldownStart, actionCooldownDuration, actionEnable = API_GetItemCooldown(itemId)
 		actionShortcut = nil
 		actionIsCurrent = nil
 	elseif element.func=="texture" then
@@ -192,10 +206,10 @@ function OvaleBestAction:GetActionInfo(element)
 	
 	if action then 
 		if actionUsable == nil then
-			actionUsable = IsUsableAction(action)
+			actionUsable = API_IsUsableAction(action)
 		end
 		actionShortcut = OvaleActionBar:GetBinding(action)
-		actionIsCurrent = IsCurrentAction(action)
+		actionIsCurrent = API_IsCurrentAction(action)
 	end
 	
 	local cd = OvaleState:GetCD(spellId)
@@ -248,7 +262,7 @@ function OvaleBestAction:Compute(element)
 			if spellId and OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].casttime then
 				element.castTime = OvaleData.spellInfo[spellId].casttime
 			elseif spellId then
-				local spell, rank, icon, cost, isFunnel, powerType, castTime = GetSpellInfo(spellId)
+				local spell, rank, icon, cost, isFunnel, powerType, castTime = API_GetSpellInfo(spellId)
 				if castTime then
 					element.castTime = castTime/1000
 				else

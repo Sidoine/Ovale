@@ -22,21 +22,30 @@ local OvalePool = Ovale.OvalePool
 local OvaleScripts = Ovale.OvaleScripts
 local OvaleStance = Ovale.OvaleStance
 
-local node = {}
-local nodePool = OvalePool:NewPool("OvaleCompile_nodePool")
-local defines = {}
-local customFunctions = {}
-local missingSpellList = {}
-
--- Whether to trigger a script compilation if items or stances change.
-local compileOnItems = false
-local compileOnStances = false
-
-local ipairs, pairs, tonumber = ipairs, pairs, tonumber
-local strfind, strgmatch, strgsub = string.find, string.gmatch, string.gsub
-local strlen, strlower, strmatch, strsub = string.len, string.lower, string.match, string.sub
+local ipairs = ipairs
+local pairs = pairs
+local tonumber = tonumber
+local strfind = string.find
+local strgmatch = string.gmatch
+local strgsub = string.gsub
+local strlen = string.len
+local strlower = string.lower
+local strmatch = string.match
+local strsub = string.sub
 local tinsert = table.insert
 local tremove = table.remove
+local wipe = table.wipe
+local API_GetSpellInfo = GetSpellInfo
+
+local self_node = {}
+local self_pool = OvalePool:NewPool("OvaleCompile_pool")
+local self_defines = {}
+local self_customFunctions = {}
+local self_missingSpellList = {}
+
+-- Whether to trigger a script compilation if items or stances change.
+local self_compileOnItems = false
+local self_compileOnStances = false
 --</private-static-properties>
 
 --<public-static-properties>
@@ -45,9 +54,9 @@ OvaleCompile.masterNodes = {}
 --</public-static-properties>
 
 --<private-static-methods>
-local function AddNode(newNode)
-	tinsert(node, newNode)
-	return "node" .. #node
+local function AddNode(node)
+	tinsert(self_node, node)
+	return "node" .. #self_node
 end
 
 local function ParseParameters(params)
@@ -100,7 +109,7 @@ local function TestConditions(paramList)
 		return false
 	end
 	if paramList.if_stance then
-		compileOnStances = true
+		self_compileOnStances = true
 		if not OvaleStance:IsStance(paramList.if_stance) then
 			return false
 		end
@@ -144,7 +153,7 @@ local function TestConditions(paramList)
 	end
 	if paramList.itemset and paramList.itemcount then
 		local equippedCount = OvaleEquipement:GetArmorSetCount(paramList.itemset)
-		compileOnItems = true
+		self_compileOnItems = true
 		if equippedCount < paramList.itemcount then
 			return false
 		end
@@ -153,19 +162,19 @@ local function TestConditions(paramList)
 end
 
 local function ParseTime(value)
-	local newNode = nodePool:Get()
-	newNode.type = "time"
-	newNode.value = tonumber(value)
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "time"
+	node.value = tonumber(value)
+	return AddNode(node)
 end
 
 local function ParseNumber(dummy, value)
-	local newNode = nodePool:Get()
-	newNode.type = "value"
-	newNode.value = tonumber(value)
-	newNode.origin = 0
-	newNode.rate = 0
-	return dummy..AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "value"
+	node.value = tonumber(value)
+	node.origin = 0
+	node.rate = 0
+	return dummy..AddNode(node)
 end
 
 local function ParseFunction(prefix, func, params)
@@ -183,17 +192,17 @@ local function ParseFunction(prefix, func, params)
 		end
 	end
 	
-	if customFunctions[func] then
-		return customFunctions[func]
+	if self_customFunctions[func] then
+		return self_customFunctions[func]
 	end
 	
 	func = strlower(func)
 
-	local newNode = nodePool:Get()
-	newNode.type = "function"
-	newNode.func = func
-	newNode.params = paramList
-	local newNodeName = AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "function"
+	node.func = func
+	node.params = paramList
+	local nodeName = AddNode(node)
 
 	local mine = true
 	if paramList.any then
@@ -206,15 +215,15 @@ local function ParseFunction(prefix, func, params)
 		-- is a variant of a spell with the same name as one already in the
 		-- spellbook.  If it is, then add that variant spell ID to our spellList.
 		if OvaleCondition.spellbookConditions[func] then
-			if not OvaleData.spellList[spellId] and not missingSpellList[spellId] then
+			if not OvaleData.spellList[spellId] and not self_missingSpellList[spellId] then
 				local spellName
 				if type(spellId) == "number" then
-					spellName = GetSpellInfo(spellId)
+					spellName = API_GetSpellInfo(spellId)
 				end
 				if spellName then
-					if spellName == GetSpellInfo(spellName) then
+					if spellName == API_GetSpellInfo(spellName) then
 						Ovale:DebugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
-						missingSpellList[spellId] = spellName
+						self_missingSpellList[spellId] = spellName
 					end
 				else
 					Ovale:DebugPrint("unknown_spells", "Unknown spell with ID "..spellId)
@@ -223,7 +232,7 @@ local function ParseFunction(prefix, func, params)
 		end
 	end
 
-	return newNodeName
+	return nodeName
 end
 
 local function ParseSpellAddDebuff(params)
@@ -328,106 +337,106 @@ local function ParseItemList(name, params)
 end
 
 local function ParseIf(a, b)
-	local newNode = nodePool:Get()
-	newNode.type = "if"
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "if"
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseUnless(a, b)
-	local newNode = nodePool:Get()
-	newNode.type = "unless"
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "unless"
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseWait(a)
-	local newNode = nodePool:Get()
-	newNode.type = "wait"
-	newNode.a = node[tonumber(a)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "wait"
+	node.a = self_node[tonumber(a)]
+	return AddNode(node)
 end
 
 local function ParseAnd(a,b)
-	local newNode = nodePool:Get()
-	newNode.type = "and"
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "and"
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseNot(a)
-	local newNode = nodePool:Get()
-	newNode.type = "not"
-	newNode.a = node[tonumber(a)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "not"
+	node.a = self_node[tonumber(a)]
+	return AddNode(node)
 end
 
 local function ParseBefore(t,a)
-	local newNode = nodePool:Get()
-	newNode.type = "before"
-	newNode.time = node[tonumber(t)]
-	newNode.a = node[tonumber(a)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "before"
+	node.time = self_node[tonumber(t)]
+	node.a = self_node[tonumber(a)]
+	return AddNode(node)
 end
 
 local function ParseAfter(t,a)
-	local newNode = nodePool:Get()
-	newNode.type = "after"
-	newNode.time = node[tonumber(t)]
-	newNode.a = node[tonumber(a)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "after"
+	node.time = self_node[tonumber(t)]
+	node.a = self_node[tonumber(a)]
+	return AddNode(node)
 end
 
 local function ParseBetween(a,b)
-	local newNode = nodePool:Get()
-	newNode.type = "between"
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "between"
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseFromUntil(a,b)
-	local newNode = nodePool:Get()
-	newNode.type = "fromuntil"
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "fromuntil"
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseOr(a,b)
-	local newNode = nodePool:Get()
-	newNode.type = "or"
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "or"
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseOp(a, op, b)
-	local newNode = nodePool:Get()
-	newNode.type = "operator"
-	newNode.operator = op
-	newNode.a = node[tonumber(a)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "operator"
+	node.operator = op
+	node.a = self_node[tonumber(a)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseCompare(comp,t,a)
-	local newNode = nodePool:Get()
-	newNode.type = "compare"
-	newNode.comparison = comp
-	newNode.time = node[tonumber(t)]
-	newNode.b = node[tonumber(b)]
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "compare"
+	node.comparison = comp
+	node.time = self_node[tonumber(t)]
+	node.b = self_node[tonumber(b)]
+	return AddNode(node)
 end
 
 local function ParseGroup(text)
 	local nodes = {}
 	
 	for w in strgmatch(text, "node(%d+)") do
-		tinsert(nodes, node[tonumber(w)])
+		tinsert(nodes, self_node[tonumber(w)])
 	end
 	
 	text = strgsub(text, "node%d+", "")
@@ -437,10 +446,10 @@ local function ParseGroup(text)
 		return nil
 	end
 	
-	local newNode = nodePool:Get()
-	newNode.type = "group"
-	newNode.nodes = nodes
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "group"
+	node.nodes = nodes
+	return AddNode(node)
 end
 
 local function ParseAddListItem(list, item, text, params)
@@ -474,19 +483,19 @@ local function ParseAddCheckBox(item, text, params)
 end
 
 local function ParseDefine(key, value)
-	defines[key] = value
+	self_defines[key] = value
 	return ""
 end
 
 local function ReplaceDefine(key)
-	return defines[key]
+	return self_defines[key]
 end
 
 local function ParseLua(text)
-	local newNode = nodePool:Get()
-	newNode.type = "lua"
-	newNode.lua = strsub(text, 2, strlen(text)-1)
-	return AddNode(newNode)
+	local node = self_pool:Get()
+	node.type = "lua"
+	node.lua = strsub(text, 2, strlen(text)-1)
+	return AddNode(node)
 end
 
 local function ParseCommands(text)
@@ -570,7 +579,7 @@ local function ParseAddIcon(params, text, secure)
 	-- On convertit le numéro de node en node
 	local masterNode = ParseCommands(text)
 	if not masterNode then return nil end
-	masterNode = node[tonumber(masterNode)]
+	masterNode = self_node[tonumber(masterNode)]
 	masterNode.params = ParseParameters(params)
 	masterNode.secure = secure
 	if not TestConditions(masterNode.params) then
@@ -653,30 +662,30 @@ local function CompileDeclarations(text)
 end
 
 local function CompileScript(text)
-	compileOnItems = false
-	compileOnStances = false
+	self_compileOnItems = false
+	self_compileOnStances = false
 	Ovale.bug = false
 
-	wipe(defines)
-	wipe(missingSpellList)
+	wipe(self_defines)
+	wipe(self_missingSpellList)
 
 	-- Return all existing nodes to the node pool.
-	local oldNode 
+	local node 
 	while true do
-		oldNode = tremove(node)
-		if not oldNode then break end
-		nodePool:Release(oldNode)
+		node = tremove(self_node)
+		if not node then break end
+		self_pool:Release(node)
 	end
-	wipe(node)
+	wipe(self_node)
 
 	text = CompileComments(text)
 	text = CompileDeclarations(text)
 	text = CompileInputs(text)
 
 	for p,t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
-		local newNode = ParseCommands(t)
-		if newNode then
-			customFunctions[p] = "node"..newNode
+		local node = ParseCommands(t)
+		if node then
+			self_customFunctions[p] = "node"..node
 		end
 	end
 	
@@ -685,21 +694,21 @@ local function CompileScript(text)
 
 	-- On compile les AddIcon
 	for p,t in strgmatch(text, "AddActionIcon%s*(.-)%s*(%b{})") do
-		local newNode = ParseAddIcon(p,t,true)
-		if newNode then
-			tinsert(masterNodes, newNode)
+		local node = ParseAddIcon(p,t,true)
+		if node then
+			tinsert(masterNodes, node)
 		end
 	end
 	
 	for p,t in strgmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
-		local newNode = ParseAddIcon(p,t)
-		if newNode then
-			tinsert(masterNodes, newNode)
+		local node = ParseAddIcon(p,t)
+		if node then
+			tinsert(masterNodes, node)
 		end
 	end
 
 	-- Add any missing spells found while compiling the script into the spellbook.
-	for k, v in pairs(missingSpellList) do
+	for k, v in pairs(self_missingSpellList) do
 		OvaleData.spellList[k] = v
 	end
 end
@@ -726,7 +735,7 @@ function OvaleCompile:OnDisable()
 	self:UnregisterMessage("Ovale_SpellsChanged")
 	self:UnregisterMessage("Ovale_StanceChanged")
 	self:UnregisterMessage("Ovale_TalentsChanged")
-	nodePool:Drain()
+	self_pool:Drain()
 end
 
 function OvaleCompile:EventHandler(event)
@@ -735,14 +744,14 @@ function OvaleCompile:EventHandler(event)
 end
 
 function OvaleCompile:Ovale_EquipmentChanged(event)
-	if compileOnItems then
+	if self_compileOnItems then
 		self:EventHandler(event)
 	end
 	Ovale.refreshNeeded.player = true
 end
 
 function OvaleCompile:Ovale_StanceChanged(event)
-	if compileOnStances then
+	if self_compileOnStances then
 		self:EventHandler(event)
 	end
 	Ovale.refreshNeeded.player = true
@@ -758,7 +767,7 @@ function OvaleCompile:Compile()
 end
 
 function OvaleCompile:Debug()
-	nodePool:Debug()
+	self_pool:Debug()
 	Ovale:Print(self:DebugNode(self.masterNodes[1]))
 end
 
