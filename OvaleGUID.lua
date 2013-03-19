@@ -20,75 +20,86 @@ local strsub = string.sub
 local API_GetNumGroupMembers = GetNumGroupMembers
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
---</private-static-properties>
 
---<public-static-properties>
-OvaleGUID.unitId = {}
-OvaleGUID.guid = {}
-OvaleGUID.player = nil
-OvaleGUID.nameToGUID = {}
-OvaleGUID.nameToUnit = {}
---</public-static-properties>
+self_unitId = {}
+self_guid = {}
+self_nameToGUID = {}
+self_nameToUnit = {}
+--</private-static-properties>
 
 --<public-static-methods>
 function OvaleGUID:OnEnable()
 	self:Update("player")
-	self:RegisterEvent("PLAYER_LOGIN")
-	self:RegisterEvent("UNIT_TARGET")
-	self:RegisterEvent("GROUP_ROSTER_UPDATE")
-	self:RegisterEvent("UNIT_PET")
 	self:RegisterEvent("ARENA_OPPONENT_UPDATE")
-	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
-	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	self:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
+	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
+	self:RegisterEvent("PLAYER_LOGIN")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterEvent("UNIT_PET")
+	self:RegisterEvent("UNIT_TARGET")
+	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 end
 
 function OvaleGUID:OnDisable()
-	self:UnregisterEvent("PLAYER_LOGIN")
-	self:UnregisterEvent("UNIT_TARGET")
-	self:UnregisterEvent("GROUP_ROSTER_UPDATE")
-	self:UnregisterEvent("UNIT_PET")
 	self:UnregisterEvent("ARENA_OPPONENT_UPDATE")
-	self:UnregisterEvent("PLAYER_FOCUS_CHANGED")
-	self:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
+	self:UnregisterEvent("GROUP_ROSTER_UPDATE")
 	self:UnregisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
+	self:UnregisterEvent("PLAYER_FOCUS_CHANGED")
+	self:UnregisterEvent("PLAYER_LOGIN")
+	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+	self:UnregisterEvent("UNIT_PET")
+	self:UnregisterEvent("UNIT_TARGET")
+	self:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
 end
 
 function OvaleGUID:Update(unitId)
 	--self:Print("Update " .. unitId)
 	local guid = API_UnitGUID(unitId)
-	local previousGuid = self.guid[unitId]
-	if unitId == "player" then
-		self.player = guid
-	end
+	local previousGuid = self_guid[unitId]
 	if previousGuid ~= guid then
 		if previousGuid then
-			self.unitId[previousGuid][unitId] = nil
-			if not next(self.unitId[previousGuid]) then
-				self.unitId[previousGuid] = nil
+			self_unitId[previousGuid][unitId] = nil
+			if not next(self_unitId[previousGuid]) then
+				self_unitId[previousGuid] = nil
 			end
 		end
-		self.guid[unitId] = guid
+		self_guid[unitId] = guid
 		if guid then
-			if not self.unitId[guid] then
-				self.unitId[guid] = {}
+			if not self_unitId[guid] then
+				self_unitId[guid] = {}
 			end
 			Ovale:DebugPrint("guid", "GUID "..guid.." is ".. unitId)
-			self.unitId[guid][unitId] = true
+			self_unitId[guid][unitId] = true
 		end
 	end
 	local name = API_UnitName(unitId)
-	if name and (not self.nameToGUID[name] or unitId == "target" 
-			or self.nameToUnit[name] == "mouseover") then
-		self.nameToGUID[name] = guid
-		self.nameToUnit[name] = unitId
+	if name and (not self_nameToGUID[name] or unitId == "target" 
+			or self_nameToUnit[name] == "mouseover") then
+		self_nameToGUID[name] = guid
+		self_nameToUnit[name] = unitId
 	end
 end
 
+function OvaleGUID:GetGUID(unitId)
+	if not self_guid[unitId] then
+		self_guid[unitId] = API_UnitGUID(unitId)
+	end
+	return self_guid[unitId]
+end
+
+function OvaleGUID:GetGUIDForName(name)
+	return self_nameToGUID[name]
+end
+
 function OvaleGUID:GetUnitId(guid)
-	local unitIdTable = self.unitId[guid]
+	local unitIdTable = self_unitId[guid]
 	if not unitIdTable then return nil end
 	return next(unitIdTable)
+end
+
+function OvaleGUID:GetUnitIdForName(name)
+	return self_nameToUnit[name]
 end
 
 function OvaleGUID:UpdateWithTarget(unitId)
@@ -98,6 +109,10 @@ end
 
 function OvaleGUID:PLAYER_LOGIN(event)
 	self:Update("player")
+end
+
+function OvaleGUID:PLAYER_TARGET_CHANGED(event)
+	self:UNIT_TARGET(event, "player")
 end
 
 function OvaleGUID:UNIT_TARGET(event, unitId)

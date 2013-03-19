@@ -18,8 +18,6 @@ local OvaleGUID = Ovale.OvaleGUID
 
 local select = select
 local strfind = string.find
-
-local self_playerGUID = nil
 --</private-static-properties>
 
 --<public-static-properties>
@@ -29,7 +27,6 @@ OvaleSpellDamage.value = {}
 -- Events
 --<public-static-methods>
 function OvaleSpellDamage:OnEnable()
-	self_playerGUID = OvaleGUID.player
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
@@ -40,7 +37,7 @@ end
 function OvaleSpellDamage:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 
-	if sourceGUID == self_playerGUID then
+	if sourceGUID == OvaleGUID:GetGUID("player") then
 		if strfind(event, "SPELL_PERIODIC_DAMAGE")==1 or strfind(event, "SPELL_DAMAGE")==1 then
 			local spellId, spellName, spellSchool, amount = select(12, ...)
 			self.value[spellId] = amount

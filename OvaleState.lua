@@ -29,7 +29,6 @@ local tostring = tostring
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetSpellInfo = GetSpellInfo
-local API_UnitGUID = UnitGUID
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local API_UnitPower = UnitPower
@@ -382,7 +381,7 @@ function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd,
 							if target == "target" then
 								auraGUID = targetGUID
 							else
-								auraGUID = API_UnitGUID(target)
+								auraGUID = OvaleGUID:GetGUID(target)
 							end
 
 							-- Set the duration to the proper length if it's a DoT.
@@ -511,7 +510,7 @@ function OvaleState:GetComputedSpellCD(spellId)
 end
 
 function OvaleState:AddEclipse(endCast, spellId)
-	local newAura = self:NewAura(OvaleGUID.player, spellId)
+	local newAura = self:NewAura(OvaleGUID:GetGUID("player"), spellId)
 	newAura.start = endCast + 0.5
 	newAura.stacks = 1
 	newAura.ending = nil
@@ -529,7 +528,7 @@ function OvaleState:GetAuraByGUID(guid, spellId, mine, target)
 end
 
 function OvaleState:GetAura(target, spellId, mine)
-	return self:GetAuraByGUID(API_UnitGUID(target), spellId, mine, target)
+	return self:GetAuraByGUID(OvaleGUID:GetGUID(target), spellId, mine, target)
 end
 
 function OvaleState:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)

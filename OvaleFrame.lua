@@ -18,6 +18,7 @@ do
 	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleData = Ovale.OvaleData
+	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleOptions = Ovale.OvaleOptions
 	local OvaleState = Ovale.OvaleState
 
@@ -29,7 +30,6 @@ do
 	local API_CreateFrame = CreateFrame
 	local API_GetSpellInfo = GetSpellInfo
 	local API_GetTime = GetTime
-	local API_UnitGUID = UnitGUID
 --</private-static-properties>
 
 --<public-methods>
@@ -269,7 +269,7 @@ do
 							if spellTarget == "target" or not spellTarget then
 								spellTarget = target
 							end
-							OvaleState:AddSpellToStack(spellId, start, start + castTime, nextCast, false, API_UnitGUID(spellTarget))
+							OvaleState:AddSpellToStack(spellId, start, start + castTime, nextCast, false, OvaleGUID:GetGUID(spellTarget))
 							start, ending, priorite, element = OvaleBestAction:Compute(node)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
 						else

@@ -19,11 +19,7 @@ local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 
 local API_GetComboPoints = GetComboPoints
-local API_UnitGUID = UnitGUID
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
-
-local self_playerGUID = nil
-local self_targetGUID = nil
 --</private-static-properties>
 
 --<public-static-properties>
@@ -32,11 +28,8 @@ OvaleComboPoints.combo = 0
 
 --<public-static-methods>
 function OvaleComboPoints:OnEnable()
-	self_playerGUID = OvaleGUID.player
 	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-		self:RegisterEvent("PLAYER_ENTERING_WORLD")
-		self:RegisterEvent("PLAYER_TARGET_CHANGED")
 		self:RegisterEvent("UNIT_COMBO_POINTS")
 	end
 end
@@ -44,8 +37,6 @@ end
 function OvaleComboPoints:OnDisable()
 	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 		self:UnregisterEvent("UNIT_COMBO_POINTS")
 	end
 end
@@ -64,7 +55,7 @@ the number of extra combo points to add, e.g., critcombo=1.
 --]]
 function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local _, event, _, sourceGUID, _, _, _,	destGUID = ...
-	if sourceGUID == self_playerGUID and destGUID == self_targetGUID then
+	if sourceGUID == OvaleGUID:GetGUID("player") and destGUID == OvaleGUID:GetGUID("target") then
 		if event == "SPELL_DAMAGE" then
 			local spellId, _, _, _, _, _, _, _, _, critical = select(12, ...)
 			local si = OvaleData.spellInfo[spellId]
@@ -76,15 +67,6 @@ function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			end
 		end
 	end
-end
-
-function OvaleComboPoints:PLAYER_ENTERING_WORLD(event)
-	self:PLAYER_TARGET_CHANGED(event)
-end
-
-function OvaleComboPoints:PLAYER_TARGET_CHANGED(event)
-	self_targetGUID = API_UnitGUID("target")
-	self:Refresh()
 end
 
 function OvaleComboPoints:UNIT_COMBO_POINTS(event, ...)
@@ -99,6 +81,6 @@ function OvaleComboPoints:Refresh()
 end
 
 function OvaleComboPoints:Debug()
-	Ovale:Print("Player has " .. self.combo .. " combo points on target " ..self_targetGUID.. ".")
+	Ovale:Print("Player has " .. self.combo .. " combo points on target " .. OvaleGUID:GetGUID("target") .. ".")
 end
 --</public-static-methods>

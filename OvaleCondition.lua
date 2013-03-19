@@ -18,6 +18,7 @@ local OvaleAura = Ovale.OvaleAura
 local OvaleData = Ovale.OvaleData
 local OvaleEnemies = Ovale.OvaleEnemies
 local OvaleEquipement = Ovale.OvaleEquipement
+local OvaleGUID = Ovale.OvaleGUID
 local OvaleFuture = Ovale.OvaleFuture
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
@@ -55,7 +56,6 @@ local API_UnitCreatureType = UnitCreatureType
 local API_UnitDebuff = UnitDebuff
 local API_UnitDetailedThreatSituation = UnitDetailedThreatSituation
 local API_UnitExists = UnitExists
-local API_UnitGUID = UnitGUID
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local API_UnitIsDead = UnitIsDead
@@ -211,7 +211,7 @@ end
 -- Returns nil if the debuff is not present
 local function getOtherAura(spellId, suppTime, excludingTarget)
 	if excludingTarget then
-		excludingTarget = API_UnitGUID(excludingTarget)
+		excludingTarget = OvaleGUID:GetGUID(excludingTarget)
 	end
 	return OvaleState:GetExpirationTimeOnAnyTarget(spellId, excludingTarget)
 end
@@ -414,9 +414,9 @@ end
 
 local function getTargetDead(target)
 	local second = math.floor(OvaleState.maintenant)
-	if self_targetGUID[target] ~= API_UnitGUID(target) then
+	if self_targetGUID[target] ~= OvaleGUID:GetGUID(target) then
 		self_lastSaved[target] = nil
-		self_targetGUID[target] = API_UnitGUID(target)
+		self_targetGUID[target] = OvaleGUID:GetGUID(target)
 		if self_savedHealth[target] then
 			wipe(self_savedHealth[target])
 		else

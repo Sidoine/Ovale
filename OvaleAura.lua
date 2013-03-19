@@ -24,10 +24,8 @@ local pairs = pairs
 local select = select
 local strfind = string.find
 local API_UnitAura = UnitAura
-local API_UnitGUID = UnitGUID
 
 local self_baseDamageMultiplier = 1
-local self_playerGUID = nil
 local self_pool = OvalePool:NewPool("OvaleAura_pool")
 local self_aura = {}
 local self_serial = 0
@@ -117,7 +115,6 @@ end
 
 --<public-static-methods>
 function OvaleAura:OnEnable()
-	self_playerGUID = OvaleGUID.player
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
@@ -148,7 +145,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			self:UpdateAuras(unitId, destGUID)
 		end
 
-		if sourceGUID == self_playerGUID and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
+		if sourceGUID == OvaleGUID:GetGUID("player") and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
 			if self:GetAuraByGUID(destGUID, spellId, true) then
 				local aura = self_aura[destGUID][spellId].mine
 				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
@@ -164,7 +161,7 @@ end
 
 function OvaleAura:UNIT_AURA(event, unitId)
 	if unitId == "player" then
-		self:UpdateAuras("player", self_playerGUID)
+		self:UpdateAuras("player", OvaleGUID:GetGUID("player"))
 	elseif unitId then
 		self:UpdateAuras(unitId)
 	end
@@ -182,11 +179,8 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	if not unitId then
 		return
 	end
-	if not unitGUID and unitId == "player" then
-		unitGUID = self_playerGUID
-	end
 	if not unitGUID then
-		unitGUID = API_UnitGUID(unitId)
+		unitGUID = OvaleGUID:GetGUID(unitId)
 	end
 	if not unitGUID then
 		return
@@ -298,11 +292,11 @@ function OvaleAura:GetAuraByGUID(guid, spellId, mine, unitId)
 end
 
 function OvaleAura:GetAura(unitId, spellId, mine)
-	return self:GetAuraByGUID(API_UnitGUID(unitId), spellId, mine, unitId)
+	return self:GetAuraByGUID(OvaleGUID:GetGUID(unitId), spellId, mine, unitId)
 end
 
 function OvaleAura:GetStealable(unitId)
-	local auraTable = self_aura[API_UnitGUID(unitId)]
+	local auraTable = self_aura[OvaleGUID:GetGUID(unitId)]
 	if not auraTable then
 		return nil
 	end
@@ -355,8 +349,9 @@ function OvaleAura:GetDamageMultiplier(spellId)
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
-			self:UpdateAuras("player", self_playerGUID)
-			local auraTable = self_aura[self_playerGUID]
+			local guid = OvaleGUID:GetGUID("player")
+			self:UpdateAuras("player", guid)
+			local auraTable = self_aura[guid]
 			if auraTable then
 				for filter, filterInfo in pairs(si.damageAura) do
 					for auraSpellId, multiplier in pairs(filterInfo) do

@@ -34,8 +34,6 @@ local API_UnitDamage = UnitDamage
 local API_UnitRangedDamage = UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
-local self_playerGUID = nil
-
 local OVALE_AUTOSHOT_NAME = API_GetSpellInfo(75)
 local OVALE_RESET_SPELLS = {}
 local OVALE_DELAY_SPELLS = {
@@ -58,7 +56,6 @@ OvaleSwing.swingmode = nil
 
 --<public-static-methods>
 function OvaleSwing:OnEnable()
-	self_playerGUID = OvaleGUID.player
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")
@@ -106,7 +103,7 @@ function OvaleSwing:STOP_AUTOREPEAT_SPELL()
 end
 
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
-	if srcGUID == self_playerGUID then
+	if srcGUID == OvaleGUID:GetGUID("player") then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
 			self:MeleeSwing(Ovale.now)
 		end
