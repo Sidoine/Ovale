@@ -2342,12 +2342,14 @@ end
 -- @name SpellUsable
 -- @paramsig boolean
 -- @param id The spell ID.
--- @param yesno Optional. If yes, then return true if the target is aggroed. If no, then return true if it isn't aggroed.
+-- @param yesno Optional. If yes, then return true if the spell has been learned and the player has enough resources to cast it.
+--     If no, then return true if the player can't cast the spell for one of the above reasons.
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
 -- @usage
--- if SpellUsable(tigers_fury) Spell(berserk_cat)
+-- if SpellUsable(avenging_wrath) and SpellCooldown(avenging_wrath) <10
+--     Spell(guardian_of_ancient_kings_retribution)
 
 OvaleCondition.conditions.spellusable = function(condition)
 	return testbool(API_IsUsableSpell(condition[1]), condition[2])
