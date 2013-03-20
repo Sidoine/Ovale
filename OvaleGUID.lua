@@ -58,7 +58,7 @@ function OvaleGUID:Update(unitId)
 	local guid = API_UnitGUID(unitId)
 	local previousGuid = self_guid[unitId]
 	if previousGuid ~= guid then
-		if previousGuid then
+		if previousGuid and self_unitId[previousGuid] then
 			self_unitId[previousGuid][unitId] = nil
 			if not next(self_unitId[previousGuid]) then
 				self_unitId[previousGuid] = nil
