@@ -216,15 +216,11 @@ local function addOrSubTime(time1, operator, duration)
 	end
 end
 
--- Get the expiration time of a debuff
--- that can be on any unit except the target
--- Returns the first to expires, the last to expires
--- Returns nil if the debuff is not present
-local function getOtherAura(spellId, filter, suppTime, excludingTarget)
-	if excludingTarget then
-		excludingTarget = OvaleGUID:GetGUID(excludingTarget)
+local function getOtherAura(spellId, filter, mine, excludingUnit)
+	if excludingUnit then
+		excludingUnit = OvaleGUID:GetGUID(excludingUnit)
 	end
-	return OvaleState:GetExpirationTimeOnAnyTarget(spellId, filter, excludingTarget)
+	return OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingUnit)
 end
 
 local function GetRuneCount(type, death)
@@ -526,7 +522,7 @@ end
 -- @see DebuffCount
 
 OvaleCondition.conditions.buffcount = function(condition)
-	local start, ending, count = OvaleState:GetExpirationTimeOnAnyTarget(condition[1], getFilter(condition))
+	local start, ending, count = getOtherAura(condition[1], getFilter(condition), getMine(condition))
 	return start, ending, count, 0, 0
 end
 OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
@@ -2005,43 +2001,83 @@ OvaleCondition.conditions.nexttick = function(condition)
 	return nil
 end
 
-	-- Check if the aura is not on any other unit than the current target
-	-- 1: spell id
-	-- return: bool
-	-- alias: otherauraexpires
-OvaleCondition.conditions.otherauraexpires = function(condition)
-	local minTime, maxTime = getOtherAura(condition[1], getFilter(condition), condition[3], "target")
-	if minTime then
-		local timeBefore = condition[2] or 0
-		return minTime - timeBefore, nil
-	end
-	return 0, nil
-end
-OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherauraexpires
-OvaleCondition.conditions.otherdebuffexpires = OvaleCondition.conditions.otherauraexpires
+--- Test if an aura is expired, or will expire after a given number of seconds, on every unit other than the current target.
+-- @name OtherDebuffExpires
+-- @paramsig boolean
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param seconds Optional. The maximum number of seconds before the aura should expire.
+--     Defaults to 0 (zero).
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
+--     Defaults to haste=none.
+--     Valid values: spell, none.
+-- @return A boolean value.
+-- @see OtherBuffExpires
+-- @usage
+-- if OtherDebuffExpires(deep_wounds)
+--     Spell(thunder_clap)
 
-	-- Check if the aura is present on any other unit than the current target
-	-- return: bool
-	-- alias: otheraurapresent
-OvaleCondition.conditions.otheraurapresent = function(condition)
-	local minTime, maxTime = getOtherAura(condition[1], getFilter(condition), condition[3], "target")
-	if maxTime and maxTime>0 then
-		local timeBefore = condition[2] or 0
-		return 0, addTime(maxTime, -timeBefore)
-	end
-	return nil
+OvaleCondition.conditions.otherdebuffexpires = function(condition)
+	local start, ending = getOtherAura(condition[1], getFilter(condition), getMine(condition), "target")
+	local timeBefore = avecHate(condition[2], condition.haste)
+	return addTime(ending, -timeBefore)
 end
-OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otheraurapresent
-OvaleCondition.conditions.otherdebuffpresent = OvaleCondition.conditions.otheraurapresent
+OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebuffexpires
+
+--- Test if an aura is present, or if the remaining time on the aura is more than the given number of seconds, on at least one unit other than the current target.
+-- @name OtherDebuffPresent
+-- @paramsig boolean
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param seconds Optional. The mininum number of seconds before the aura should expire.
+--     Defaults to 0 (zero).
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
+--     Defaults to haste=none.
+--     Valid values: spell, none.
+-- @return A boolean value.
+-- @see OtherBuffPresent
+-- @usage
+-- if not OtherDebuffPresent(devouring_plague)
+--     Spell(devouring_plague)
+
+OvaleCondition.conditions.otherdebuffpresent = function(condition)
+	local start, ending = getOtherAura(condition[1], getFilter(condition), getMine(condition), "target")
+	local timeBefore = avecHate(condition[2], condition.haste)
+	return start, addTime(ending, -timeBefore)
+end
+OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebuffpresent
 
 	-- Get the maximum aura remaining duration on any target
 	-- return: number
-OvaleCondition.conditions.otherauraremains = function(condition)
-	local minTime, maxTime = getOtherAura(condition[1], getFilter(condition))
-	return 0, nil, 0, maxTime, -1
+--- Get the remaining time in seconds on an aura across every unit other than the current target.
+-- @name OtherDebuffRemains
+-- @paramsig number
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds remaining on the aura.
+-- @see OtherBuffRemains
+-- @usage
+-- if OtherDebuffRemains(devouring_plague) <2
+--     Spell(devouring_plague)
+
+OvaleCondition.conditions.otherdebuffremains = function(condition)
+	local start, ending = getOtherAura(condition[1], getFilter(condition), getMine(condition), "target")
+	if ending then
+		return start, ending, ending - start, start, -1
+	else
+		return nil
+	end
 end
-OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherauraremains
-OvaleCondition.conditions.otherdebuffremains = OvaleCondition.conditions.otherauraremains
+OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebuffremains
 
 --- Test if the target exists and is alive.
 -- @name Present

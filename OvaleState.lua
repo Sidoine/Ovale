@@ -552,22 +552,24 @@ function OvaleState:GetAura(target, spellId, filter, mine)
 	return self:GetAuraByGUID(OvaleGUID:GetGUID(target), spellId, filter, mine, target)
 end
 
-function OvaleState:GetExpirationTimeOnAnyTarget(spellId, filter, excludingTarget)
-	local start, ending, count = OvaleAura:GetExpirationTimeOnAnyTarget(spellId, filter, excludingTarget)
-	local aura
-	for guid, auraTable in pairs(self.aura) do
-		if guid ~= excludingTarget then
-			for auraFilter, auraList in pairs(auraTable) do
-				if not filter or auraFilter == filter then
-					aura = auraList[spellId]
-					if aura and aura.serial == self.serial then
-						if aura.start and (not start or aura.start < start) then
-							start = aura.start
+function OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
+	local start, ending, count = OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
+	if mine then
+		local aura
+		for guid, auraTable in pairs(self.aura) do
+			if guid ~= excludingGUID then
+				for auraFilter, auraList in pairs(auraTable) do
+					if not filter or auraFilter == filter then
+						aura = auraList[spellId]
+						if aura and aura.serial == self.serial then
+							if aura.start and (not start or aura.start < start) then
+								start = aura.start
+							end
+							if aura.ending and (not ending or aura.ending > ending) then
+								ending = aura.ending
+							end
+							count = count + 1
 						end
-						if aura.ending and (not ending or aura.ending > ending) then
-							ending = aura.ending
-						end
-						count = count + 1
 					end
 				end
 			end

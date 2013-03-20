@@ -349,27 +349,28 @@ function OvaleAura:GetStealable(unitId)
 	return start, ending
 end
 
--- Look for the last of my aura on any targt that will expires.
--- Returns its expiration time
-function OvaleAura:GetExpirationTimeOnAnyTarget(spellId, filter, excludingTarget)
+-- Look for the aura on any target.
+-- Returns the earliest start time, the latest ending time, and the number of auras seen.
+function OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 	local start, ending
 	local count = 0
 
 	local aura
 	for guid, auraTable in pairs(self_aura) do
-		if guid ~= excludingTarget then
+		if guid ~= excludingGUID then
 			for auraFilter, auraList in pairs(auraTable) do
 				if not filter or auraFilter == filter then
 					if auraList[spellId] then
-						aura = auraList[spellId].mine
-						if aura then
-							if aura.start and (not start or aura.start < start) then
-								start = aura.start
+						for whose, aura in pairs(auraList[spellId]) do
+							if not mine or (mine and whose == "mine") then
+								if aura.start and (not start or aura.start < start) then
+									start = aura.start
+								end
+								if aura.ending and (not ending or aura.ending > ending) then
+									ending = aura.ending
+								end
+								count = count + 1
 							end
-							if aura.ending and (not ending or aura.ending > ending) then
-								ending = aura.ending
-							end
-							count = count + 1
 						end
 					end
 				end
