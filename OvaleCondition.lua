@@ -1643,8 +1643,11 @@ end
 
 OvaleCondition.conditions.lastspellestimateddamage = function(condition)
 	local spellId = condition[1]
-	local ret = OvaleData:GetDamage(spellId, OvaleFuture.lastSpellAP[spellId], OvaleFuture.lastSpellSP[spellId], OvaleFuture.lastSpellCombo[spellId])
-	return 0, nil, ret * (OvaleFuture.lastSpellDM[spellId] or 0), 0, 0
+	local ap = OvaleFuture:GetLastAttackPower(spellId)
+	local sp = OvaleFuture:GetLastSpellpower(spellId)
+	local combo = OvaleFuture:GetLastComboPoints(spellId)
+	local dm = OvaleFuture:GetLastDamageMultiplier(spellId) or 1
+	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, combo) * dm, 0, 0
 end
 
 --- Get the damage multiplier of the most recent cast of a spell.
@@ -1662,7 +1665,7 @@ end
 --     Spell(rupture)
 
 OvaleCondition.conditions.lastspelldamagemultiplier = function(condition)
-	return compare(OvaleFuture.lastSpellDM[condition[1]], condition[2], condition[3])
+	return compare(OvaleFuture:GetLastDamageMultiplier(condition[1]), condition[2], condition[3])
 end
 
 --- Get the attack power of the player during the most recent cast of a spell.
@@ -1679,7 +1682,7 @@ end
 --     Spell(hemorrhage)
 
 OvaleCondition.conditions.lastspellattackpower = function(condition)
-	return compare(OvaleFuture.lastSpellAP[condition[1]], condition[2], condition[3])
+	return compare(OvaleFuture:GetLastAttackPower(condition[1]), condition[2], condition[3])
 end
 
 --- Get the spellpower of the player during the most recent cast of a spell.
@@ -1696,7 +1699,7 @@ end
 --     Spell(living_bomb)
 
 OvaleCondition.conditions.lastspellspellpower = function(condition)
-	return compare(OvaleFuture.lastSpellSP[condition[1]], condition[2], condition[3])
+	return compare(OvaleFuture:GetLastSpellpower(condition[1]), condition[2], condition[3])
 end
 
 --- Get the number of combo points consumed by the most recent cast of a spell for a feral druid or a rogue.
@@ -1713,7 +1716,7 @@ end
 --     Spell(rip)
 
 OvaleCondition.conditions.lastspellcombopoints = function(condition)
-	return compare(OvaleFuture.lastSpellCombo[condition[1]], condition[2], condition[3])
+	return compare(OvaleFuture:GetLastComboPoints(condition[1]), condition[2], condition[3])
 end
 
 --- Get the mastery effect of the player during the most recent cast of a spell.
@@ -1732,7 +1735,7 @@ end
 --     Spell(metamorphosis)
 
 OvaleCondition.conditions.lastspellmastery = function(condition)
-	return compare(OvaleFuture.lastSpellMastery[condition[1]], condition[2], condition[3])
+	return compare(OvaleFuture:GetLastMasteryEffect(condition[1]), condition[2], condition[3])
 end
 
 --- Get the time elapsed in seconds since the player's previous melee swing (white attack).
