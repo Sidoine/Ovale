@@ -25,6 +25,7 @@ local OvaleStance = Ovale.OvaleStance
 
 local floor = math.floor
 local pairs = pairs
+local select = select
 local tostring = tostring
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
@@ -35,6 +36,7 @@ local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
+local self_damageMultiplier = 1
 local self_runes = {}
 local self_runesCD = {}
 --</private-static-properties>
@@ -167,6 +169,19 @@ function OvaleState:Reset()
 	
 	for k,v in pairs(self.state.counter) do
 		self.state.counter[k] = OvaleFuture.counter[k]
+	end
+
+	-- Calculate the base damage multiplier for all spells.
+	self_damageMultiplier = 1
+	local playerGUID = OvaleGUID:GetGUID("player")
+	local count
+	for auraSpellId, multiplier in pairs(OvaleData.selfDamageBuff) do
+		count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
+		if count and count > 0 then
+			-- Try to account for a stacking aura.
+			multiplier = 1 + (multiplier - 1) * count
+			self_damageMultiplier = self_damageMultiplier * multiplier
+		end
 	end
 end
 
@@ -595,6 +610,27 @@ function OvaleState:NewAura(guid, spellId, filter)
 	return aura
 end
 
+function OvaleState:GetDamageMultiplier(spellId)
+	local damageMultiplier = self_damageMultiplier
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.damageAura then
+			local playerGUID = OvaleGUID:GetGUID("player")
+			local count
+			for filter, auraList in pairs(si.damageAura) do
+				for auraSpellId, multiplier in pairs(auraList) do
+					count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
+					if count and count > 0 then
+						-- Try to account for a stacking aura.
+						multiplier = 1 + (multiplier - 1) * count
+						damageMultiplier = damageMultiplier * multiplier
+					end
+				end
+			end
+		end
+	end
+	return damageMultiplier
+end
 
 function OvaleState:GetEclipseDir()
 	local stacks = select(3, self:GetAura("player", 48517, "HELPFUL")) -- Solar

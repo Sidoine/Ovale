@@ -688,6 +688,7 @@ OvaleCondition.conditions.debuffstacks = OvaleCondition.conditions.buffstacks
 --     Spell(spellsteal)
 
 OvaleCondition.conditions.buffstealable = function(condition)
+	-- XXX: This should really be checked only against OvaleState.
 	return OvaleAura:GetStealable(getTarget(condition.target))
 end
 
@@ -1027,7 +1028,7 @@ end
 OvaleCondition.conditions.critdamage = function(condition)
 	local spellId = condition[1]
 	local ret = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
-	return 0, nil, 2 * ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
+	return 0, nil, 2 * ret * OvaleState:GetDamageMultiplier(spellId), 0, 0
 end
 
 --- Get the current estimated damage of a spell.
@@ -1047,7 +1048,7 @@ end
 OvaleCondition.conditions.damage = function(condition)
 	local spellId = condition[1]
 	local ret = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
-	return 0, nil, ret * OvaleAura:GetDamageMultiplier(spellId), 0, 0
+	return 0, nil, ret * OvaleState:GetDamageMultiplier(spellId), 0, 0
 end
 
 --- Get the current damage multiplier of a spell.
@@ -1062,8 +1063,7 @@ end
 --     Spell(rupture)
 
 OvaleCondition.conditions.damagemultiplier = function(condition)
-	-- TODO: use OvaleState
-	return 0, nil, OvaleAura:GetDamageMultiplier(condition[1]), 0, 0
+	return 0, nil, OvaleState:GetDamageMultiplier(condition[1]), 0, 0
 end
 
 --- Get the estimated number of seconds remaining before the target is dead.

@@ -29,7 +29,6 @@ local tsort = table.sort
 local API_IsHarmfulSpell = IsHarmfulSpell
 local API_UnitAura = UnitAura
 
-local self_baseDamageMultiplier = 1
 local self_pool = OvalePool:NewPool("OvaleAura_pool")
 -- self_aura[guid][filter][spellId]["mine" or "other"] = { aura properties }
 local self_aura = {}
@@ -147,7 +146,6 @@ function UpdateAuras(unitId, unitGUID)
 	end
 	
 	local i = 1
-	
 	local filter = "HELPFUL"
 	local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
 	local canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3
@@ -167,12 +165,6 @@ function UpdateAuras(unitId, unitGUID)
 				-- TODO: not very clean
 				-- should be computed by OvaleState:GetAura
 				AddAura(unitGUID, debuffType, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
-			end
-			
-			if unitId == "player" then
-				if OvaleData.selfDamageBuff[spellId] then
-					damageMultiplier = damageMultiplier * OvaleData.selfDamageBuff[spellId]
-				end
 			end
 			i = i + 1
 		end
@@ -383,19 +375,30 @@ function OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 end
 
 function OvaleAura:GetDamageMultiplier(spellId)
-	local damageMultiplier = self_baseDamageMultiplier
+	-- Calculate the base damage multiplier for all spells.
+	local damageMultiplier = 1
+	local playerGUID = OvaleGUID:GetGUID("player")
+	local count
+	for auraSpellId, multiplier in pairs(OvaleData.selfDamageBuff) do
+		count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
+		if count and count > 0 then
+			-- Try to account for a stacking aura.
+			multiplier = 1 + (multiplier - 1) * count
+			damageMultiplier = damageMultiplier * multiplier
+		end
+	end
+
+	-- Factor in the spell-specific multipliers from SpellDamage{Buff,Debuff} declarations.
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
-			local guid = OvaleGUID:GetGUID("player")
-			UpdateAuras("player", guid)
-			local auraTable = self_aura[guid]
-			if auraTable then
-				for filter, filterInfo in pairs(si.damageAura) do
-					for auraSpellId, multiplier in pairs(filterInfo) do
-						if auraTable[filter] and auraTable[filter][auraSpellId] then
-							damageMultiplier = damageMultiplier * multiplier
-						end
+			for filter, auraList in pairs(si.damageAura) do
+				for auraSpellId, multiplier in pairs(auraList) do
+					count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
+					if count and count > 0 then
+						-- Try to account for a stacking aura.
+						multiplier = 1 + (multiplier - 1) * count
+						damageMultiplier = damageMultiplier * multiplier
 					end
 				end
 			end
