@@ -14,16 +14,12 @@ local Ovale = LibStub("AceAddon-3.0"):NewAddon(addonNamespace, "Ovale", "AceCons
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local OvaleOptions = nil
 
-local ipairs = ipairs
 local pairs = pairs
 local strsplit = string.split
-local tinsert = table.insert
-local tsort = table.sort
 local wipe = table.wipe
 local API_GetTime = GetTime
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
-local API_UnitAura = UnitAura
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
@@ -73,24 +69,6 @@ function Ovale:DebugPrint(flag, ...)
 	local profile = OvaleOptions:GetProfile()
 	if profile and profile.debug and profile.debug[flag] then
 		self:Print("[" .. flag .. "]", ...)
-	end
-end
-
--- Print the auras matching the filter on the target in alphabetical order.
-function Ovale:DebugListAura(target, filter)
-	local i = 1
-	local array = {}
-	while true do
-		local name, _, _, _, _, _, _, _, _, _, spellId =  API_UnitAura(target, i, filter)
-		if not name then
-			break
-		end
-		tinsert(array, name .. ": " .. spellId)
-		i = i + 1
-	end
-	tsort(array)
-	for _, v in ipairs(array) do
-		Ovale:Print(v)
 	end
 end
 

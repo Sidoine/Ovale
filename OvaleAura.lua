@@ -20,9 +20,12 @@ local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
 
+local ipairs = ipairs
 local pairs = pairs
 local select = select
 local strfind = string.find
+local tinsert = table.insert
+local tsort = table.sort
 local API_IsHarmfulSpell = IsHarmfulSpell
 local API_UnitAura = UnitAura
 
@@ -411,6 +414,23 @@ function OvaleAura:Debug()
 					Ovale:Print(guid.. " " ..filter.. " " ..whose.. " " ..spellId.. " " ..aura.name.. " stacks=" ..aura.stacks)
 				end
 			end
+		end
+	end
+end
+
+-- Print the auras matching the filter on the unit in alphabetical order.
+function OvaleAura:DebugListAura(unitId, filter)
+	local guid = OvaleGUID:GetGUID(unitId)
+	if self_aura[guid] and self_aura[guid][filter] then
+		local array = {}
+		for spellId, whoseTable in pairs(self_aura[guid][filter]) do
+			for whose, aura in pairs(whoseTable) do
+				tinsert(array, aura.name .. ": " .. spellId)
+			end
+		end
+		tsort(array)
+		for _, v in ipairs(array) do
+			Ovale:Print(v)
 		end
 	end
 end

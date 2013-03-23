@@ -15,6 +15,7 @@ Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
 local L = Ovale.L
+local OvaleAura = Ovale.OvaleAura
 local OvaleData = Ovale.OvaleData
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleScripts = Ovale.OvaleScripts
@@ -471,21 +472,21 @@ local self_options =
 				targetbuff =
 				{
 					order = -5,
-					name = "List target buff and debuff spell id",
+					name = "List target buffs and debuffs",
 					type = "execute",
 					func = function()
-						Ovale:DebugListAura("target", "HELPFUL")
-						Ovale:DebugListAura("target", "HARMFUL")
+						OvaleAura:DebugListAura("target", "HELPFUL")
+						OvaleAura:DebugListAura("target", "HARMFUL")
 					end
 				},
 				buff =
 				{
 					order = -6,
-					name = "List player buff and debuff spell id",
+					name = "List player buffs and debuffs",
 					type = "execute",
 					func = function()
-						Ovale:DebugListAura("player", "HELPFUL")
-						Ovale:DebugListAura("player", "HARMFUL")
+						OvaleAura:DebugListAura("player", "HELPFUL")
+						OvaleAura:DebugListAura("player", "HARMFUL")
 					end
 				},
 				glyph =
