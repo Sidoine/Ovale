@@ -267,9 +267,6 @@ local function GetRunesCooldown(condition)
 	return OvaleState:GetRunesCooldown(self_runes.blood, self_runes.frost, self_runes.unholy, self_runes.death, condition.nodeath)
 end
 
-local lastEnergyValue = nil
-local lastEnergyTime
-
 local function testValue(comparator, limit, value, atTime, rate)
 	if not value or not atTime then
 		return nil
@@ -318,57 +315,42 @@ local function getAura(target, spellId, filter, mine)
 end
 
 local function getMine(condition)
-	local mine = true
 	if condition.any then
-		if condition.any == 0 then
-			mine = true
+		if condition.any == 1 then
+			return false
 		else
-			mine = false
+			return true
+		end
+	elseif condition.mine then
+		-- Use of "mine=1" is deprecated.
+		if condition.mine == 1 then
+			return true
+		else
+			return false
 		end
 	end
-	return mine
+	return true
 end
 
 -- Recherche un aura sur la cible et récupère sa durée et le nombre de stacks
 -- return start, ending, stacks, spellHasteMultiplier
 local function GetTargetAura(condition, target)
-	if (not target) then
-		target=condition.target
-		if (not target) then
-			target="target"
-		end
-	end
-	local stacks = condition.stacks
-	if not stacks then
-		stacks = 1
-	end
+	target = target or condition.target or "target"
+	local stacks = condition.stacks or 1
 	local spellId = condition[1]
 	local mine = getMine(condition)
 
-	local auraStart, auraEnding, auraStacks, auraSpellHasteMultiplier, auraValue, auraGain = getAura(target, spellId, getFilter(condition), mine)
-	if not auraStart then
-		Ovale:Log("Aura "..spellId.." not found on " .. target .. " mine=" .. tostring(mine))
-		return 0,0,0,0
-	end
-	if Ovale.trace then
-		Ovale:Print("GetTargetAura = start=".. tostring(auraStart) .. " end="..tostring(auraEnding).." stacks=" ..tostring(auraStacks).."/"..stacks .. " target="..target)
-	end
-		
-	if (not condition.mine or (mine and condition.mine == 1) or (not mine and condition.mine == 0)) and auraStacks >= stacks then
-		local ending
-		if condition.forceduration then
-			--TODO: this is incorrect.
-			if OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].duration then
-				ending = auraStart + OvaleData.spellInfo[spellId].duration
-			else
-				ending = auraStart + condition.forceduration
-			end
+	local auraStart, auraEnding, auraStacks, auraSpellHasteMultiplier = getAura(target, spellId, getFilter(condition), mine)
+	if auraStart then
+		Ovale:Log("GetTargetAura = start=".. tostring(auraStart) .. " end="..tostring(auraEnding).." stacks=" ..tostring(auraStacks).."/"..stacks .. " target="..target)
+		if auraStacks >= stacks then
+			return auraStart, auraEnding, auraStacks, auraSpellHasteMultiplier
 		else
-			ending = auraEnding
+			return 0, 0, 0, 0
 		end
-		return auraStart, ending, auraStacks, auraSpellHasteMultiplier
 	else
-		return 0,0,0,0
+		Ovale:Log("Aura " .. spellId .. " not found on " .. target .. " mine=" .. tostring(mine))
+		return 0, 0, 0, 0
 	end
 end
 
