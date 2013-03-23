@@ -269,7 +269,7 @@ do
 							if spellTarget == "target" or not spellTarget then
 								spellTarget = target
 							end
-							OvaleState:AddSpellToStack(spellId, start, start + castTime, nextCast, false, OvaleGUID:GetGUID(spellTarget))
+							OvaleState:ApplySpell(spellId, start, start + castTime, nextCast, false, OvaleGUID:GetGUID(spellTarget))
 							start, ending, priorite, element = OvaleBestAction:Compute(node)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
 						else

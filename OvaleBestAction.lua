@@ -697,7 +697,7 @@ local OVALE_COMPUTE_VISITOR =
 --<public-static-methods>
 function OvaleBestAction:StartNewAction()
 	OvaleState:Reset()
-	OvaleState:ApplySpells()
+	OvaleState:ApplyActiveSpells()
 end
 
 function OvaleBestAction:GetActionInfo(element)

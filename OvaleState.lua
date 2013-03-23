@@ -187,9 +187,9 @@ end
 
 -- Apply the effects of spells that are being cast or are in flight, allowing us to
 -- ignore lag or missile travel time.
-function OvaleState:ApplySpells()
+function OvaleState:ApplyActiveSpells()
 	for spellId, _, startCast, endCast, nextCast, nocd, target in OvaleFuture:InFlightSpells(self.maintenant) do
-		OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd, target)
+		OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, target)
 	end
 end
 
@@ -199,7 +199,7 @@ end
 -- endCast : fin du cast
 -- nextCast : temps auquel le prochain sort peut être lancé (>=endCast, avec le GCD)
 -- nocd : le sort ne déclenche pas son cooldown
-function OvaleState:AddSpellToStack(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
 	if not spellId or not targetGUID then
 		return
 	end
