@@ -56,6 +56,7 @@ OvaleCompile.masterNodes = {}
 --<private-static-methods>
 local function AddNode(node)
 	tinsert(self_node, node)
+	node.nodeId = #self_node
 	return "node" .. #self_node
 end
 
