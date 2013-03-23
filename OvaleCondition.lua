@@ -73,6 +73,9 @@ local self_lastTTDTime = {}
 local self_lastTTDHealth = {}
 local self_lastTTDguid = {}
 
+local OVALE_POWERTYPE_ENERGY = OvaleData.power.energy.id
+local OVALE_POWERTYPE_MANA = OvaleData.power.mana.id
+
 local OVALE_RUNETYPE =
 {
 	blood = 1,
@@ -1880,7 +1883,7 @@ OvaleCondition.conditions.mana = function(condition)
 	if target == "player" then
 		return testValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
 	else
-		return compare(API_UnitPower(target), condition[1], condition[2])
+		return compare(API_UnitPower(target, OVALE_POWERTYPE_MANA), condition[1], condition[2])
 	end
 end
 
@@ -1900,7 +1903,7 @@ end
 
 OvaleCondition.conditions.manapercent = function(condition)
 	local target = getTarget(condition.target)
-	local powerMax = API_UnitPowerMax(target, 0) or 0
+	local powerMax = API_UnitPowerMax(target, OVALE_POWERTYPE_MANA) or 0
 	if powerMax == 0 then
 		return nil
 	end
@@ -1908,7 +1911,7 @@ OvaleCondition.conditions.manapercent = function(condition)
 		local conversion = 100 / powerMax
 		return testValue(condition[1], condition[2], OvaleState.state.mana * conversion, OvaleState.currentTime, OvaleState.powerRate.mana * conversion)
 	else
-		return compare(API_UnitPower(target, 0)*100 / powerMax, condition[1], condition[2])
+		return compare(API_UnitPower(target, OVALE_POWERTYPE_MANA) * 100 / powerMax, condition[1], condition[2])
 	end
 end
 
@@ -1963,7 +1966,7 @@ end
 -- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
 
 OvaleCondition.conditions.maxmana = function(condition)
-	return compare(API_UnitPowerMax(getTarget(condition.target)), condition[1], condition[2])
+	return compare(API_UnitPowerMax(getTarget(condition.target), OVALE_POWERTYPE_MANA), condition[1], condition[2])
 end
 
 --- Get the time in seconds until the player's next melee swing (white attack).
@@ -2696,8 +2699,8 @@ end
 
 OvaleCondition.conditions.timetomaxenergy = function(condition)
 -- TODO: temp, need to allow function calls in functions call to do things link TimeTo(Energy() == 100) which would be TimeTo(Equal(Energy(), 100))
--- TODO: This incorrect for class specializations that can exceed 100 energy.
-	local t = OvaleState.currentTime + (100 - OvaleState.state.energy) / OvaleState.powerRate.energy
+	local maxEnergy = API_UnitPowerMax("player", OVALE_POWERTYPE_ENERGY) or 0
+	local t = OvaleState.currentTime + (maxEnergy - OvaleState.state.energy) / OvaleState.powerRate.energy
 	return 0, nil, 0, t, -1
 end
 
