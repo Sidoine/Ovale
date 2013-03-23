@@ -14,6 +14,7 @@ local OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent
 Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
+local L = Ovale.L
 local OvaleData = Ovale.OvaleData
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleScripts = Ovale.OvaleScripts
@@ -33,7 +34,6 @@ OvaleOptions.db = nil
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local LibDualSpec = LibStub("LibDualSpec-1.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 	
 --GUI option
 local self_options = 
