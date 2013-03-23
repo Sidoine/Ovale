@@ -122,71 +122,8 @@ function RemoveAurasForMissingUnits()
 		end
 	end
 end
---</private-static-methods>
 
---<public-static-methods>
-function OvaleAura:OnEnable()
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("UNIT_AURA")
-	self:RegisterMessage("Ovale_GroupChanged", RemoveAurasForMissingUnits)
-	self:RegisterMessage("Ovale_InactiveUnit")
-end
-
-function OvaleAura:OnDisable()
-	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:UnregisterEvent("UNIT_AURA")
-	self:UnregisterMessage("Ovale_GroupChanged")
-	self:UnregisterMessage("Ovale_InactiveUnit")
-end
-
-function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-
-	if event == "UNIT_DIED" then
-		RemoveAurasForGUID(destGUID)
-	elseif strfind(event, "SPELL_AURA_") == 1 then
-		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
-		local spellId, spellName, spellSchool, auraType = select(12, ...)
-
-		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
-		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId and unitId ~= "target" and strfind(unitId, "target") then
-			self:UpdateAuras(unitId, destGUID)
-		end
-
-		if sourceGUID == OvaleGUID:GetGUID("player") and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-			local filter = "HELPFUL"
-			if API_IsHarmfulSpell(spellName) then
-				filter = "HARMFUL"
-			end
-			if self:GetAuraByGUID(destGUID, spellId, filter, true) then
-				local aura = self_aura[destGUID][filter][spellId].mine
-				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
-			end
-		end
-	end
-end
-
-function OvaleAura:PLAYER_ENTERING_WORLD(event)
-	RemoveAurasForMissingUnits()
-	self_pool:Drain()
-end
-
-function OvaleAura:UNIT_AURA(event, unitId)
-	if unitId == "player" then
-		self:UpdateAuras("player", OvaleGUID:GetGUID("player"))
-	elseif unitId then
-		self:UpdateAuras(unitId)
-	end
-end
-
-function OvaleAura:Ovale_InactiveUnit(event, guid)
-	RemoveAurasForGUID(guid)
-end
-
-function OvaleAura:UpdateAuras(unitId, unitGUID)
+function UpdateAuras(unitId, unitGUID)
 	self_serial = self_serial + 1
 	
 	local damageMultiplier
@@ -269,8 +206,70 @@ function OvaleAura:UpdateAuras(unitId, unitGUID)
 	
 	Ovale.refreshNeeded[unitId] = true
 end
+--</private-static-methods>
 
--- Public methods
+--<public-static-methods>
+function OvaleAura:OnEnable()
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("UNIT_AURA")
+	self:RegisterMessage("Ovale_GroupChanged", RemoveAurasForMissingUnits)
+	self:RegisterMessage("Ovale_InactiveUnit")
+end
+
+function OvaleAura:OnDisable()
+	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("UNIT_AURA")
+	self:UnregisterMessage("Ovale_GroupChanged")
+	self:UnregisterMessage("Ovale_InactiveUnit")
+end
+
+function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+
+	if event == "UNIT_DIED" then
+		RemoveAurasForGUID(destGUID)
+	elseif strfind(event, "SPELL_AURA_") == 1 then
+		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
+		local spellId, spellName, spellSchool, auraType = select(12, ...)
+
+		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
+		local unitId = OvaleGUID:GetUnitId(destGUID)
+		if unitId and unitId ~= "target" and strfind(unitId, "target") then
+			UpdateAuras(unitId, destGUID)
+		end
+
+		if sourceGUID == OvaleGUID:GetGUID("player") and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
+			local filter = "HELPFUL"
+			if API_IsHarmfulSpell(spellName) then
+				filter = "HARMFUL"
+			end
+			if self:GetAuraByGUID(destGUID, spellId, filter, true) then
+				local aura = self_aura[destGUID][filter][spellId].mine
+				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+			end
+		end
+	end
+end
+
+function OvaleAura:PLAYER_ENTERING_WORLD(event)
+	RemoveAurasForMissingUnits()
+	self_pool:Drain()
+end
+
+function OvaleAura:UNIT_AURA(event, unitId)
+	if unitId == "player" then
+		UpdateAuras("player", OvaleGUID:GetGUID("player"))
+	elseif unitId then
+		UpdateAuras(unitId)
+	end
+end
+
+function OvaleAura:Ovale_InactiveUnit(event, guid)
+	RemoveAurasForGUID(guid)
+end
+
 function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	if not guid then
 		Ovale:Log(tostring(guid) .. " does not exists in OvaleAura")
@@ -286,7 +285,7 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 			Ovale:Log("Unable to get unitId from " .. tostring(guid))
 			return nil
 		end
-		self:UpdateAuras(unitId, guid)
+		UpdateAuras(unitId, guid)
 		auraTable = self_aura[guid]
 		if not auraTable then
 			-- no aura on target
@@ -389,7 +388,7 @@ function OvaleAura:GetDamageMultiplier(spellId)
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
 			local guid = OvaleGUID:GetGUID("player")
-			self:UpdateAuras("player", guid)
+			UpdateAuras("player", guid)
 			local auraTable = self_aura[guid]
 			if auraTable then
 				for filter, filterInfo in pairs(si.damageAura) do
