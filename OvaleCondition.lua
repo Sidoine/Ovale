@@ -72,6 +72,7 @@ local self_runes = {}
 local self_lastTTDTime = {}
 local self_lastTTDHealth = {}
 local self_lastTTDguid = {}
+local self_lastTTDdps = {}
 
 local OVALE_POWERTYPE_ENERGY = OvaleData.power.energy.id
 local OVALE_POWERTYPE_MANA = OvaleData.power.mana.id
@@ -371,6 +372,10 @@ local function GetTargetAura(condition, target)
 	end
 end
 
+-- Returns:
+--     Estimated number of seconds before the specified unit reaches zero health
+--     Unit's current health
+--     Unit's maximum health
 local function TimeToDie(unitId)
 	if self_lastTTDguid[unitId] ~= OvaleGUID:GetGUID(unitId) then
 		self_lastTTDguid[unitId] = OvaleGUID:GetGUID(unitId)
@@ -380,35 +385,53 @@ local function TimeToDie(unitId)
 		else
 			self_lastTTDHealth[unitId] = {}
 		end
+		self_lastTTDdps[unitId] = nil
 	end
-	local newHealth = API_UnitHealth(unitId)
-	if newHealth then
-		Ovale:Log("newHealth = " .. newHealth)
+	local timeToDie
+	local health = API_UnitHealth(unitId)
+	local maxHealth = API_UnitHealthMax(unitId) or 1
+	if health then
+		Ovale:Log("target = " .. tostring(self_lastTTDguid[unitId]) .. ", health = " .. health .. ", maxHealth = " .. maxHealth)
 	end
-	if API_UnitHealthMax(unitId) <= 2 then
+	if maxHealth < health then
+		maxHealth = health
+	end
+	-- Clamp maxHealth to always be at least 1.
+	if maxHealth < 1 then
+		maxHealth = 1
+	end
+	if health == 0 then
+		timeToDie = 0
+	elseif maxHealth <= 2 then
 		Ovale:Log("Training Dummy, return in the future")
-		return OvaleState.currentTime + 3600
-	end
-
-	local second = floor(OvaleState.maintenant)
-	local dps = 0
-	if self_lastTTDTime[unitId] ~= second and self_lastTTDguid[unitId] then
-		self_lastTTDTime[unitId] = second
-		local mod10 = second % 10
-		local prevHealth = self_lastTTDHealth[unitId][mod10]
-		self_lastTTDHealth[unitId][mod10] = newHealth
-		if prevHealth and prevHealth>newHealth then
-			dps = (prevHealth - newHealth) / 10
-			if dps > 0 then
-				Ovale:Log("dps = " .. dps)
+		timeToDie = 3600
+	else
+		local now = floor(OvaleState.maintenant)
+		if (not self_lastTTDTime[unitId] or self_lastTTDTime[unitId] < now) and self_lastTTDguid[unitId] then
+			self_lastTTDTime[unitId] = now
+			local mod10, prevHealth
+			for delta = 10, 1, -1 do
+				mod10 = (now - delta) % 10
+				prevHealth = self_lastTTDHealth[unitId][mod10]
+				if delta == 10 then
+					self_lastTTDHealth[unitId][mod10] = health
+				end
+				if prevHealth and prevHealth > health then
+					self_lastTTDdps[unitId] = (prevHealth - health) / delta
+					Ovale:Log("prevHealth = " .. prevHealth .. ", health = " .. health .. ", delta = " .. delta .. ", dps = " .. self_lastTTDdps[unitId])
+					break
+				end
 			end
 		end
+		-- Clamp timeToDie at under 3600 to avoid integer division overflow.
+		local dps = self_lastTTDdps[unitId]
+		if dps and dps > health / 3600 then
+			timeToDie = health / dps
+		else
+			timeToDie = 3600
+		end
 	end
-	if dps > 0 then
-		local duration = newHealth / dps
-		return OvaleState.maintenant + duration
-	end
-	return OvaleState.currentTime + 3600
+	return timeToDie, health, maxHealth
 end
 
 local function isSameSpell(spellIdA, spellIdB, spellNameB)
@@ -691,7 +714,7 @@ OvaleCondition.conditions.debuffstacks = OvaleCondition.conditions.buffstacks
 --     Spell(spellsteal)
 
 OvaleCondition.conditions.buffstealable = function(condition)
-	-- XXX: This should really be checked only against OvaleState.
+	-- TODO: This should really be checked only against OvaleState.
 	return OvaleAura:GetStealable(getTarget(condition.target))
 end
 
@@ -1069,25 +1092,6 @@ OvaleCondition.conditions.damagemultiplier = function(condition)
 	return 0, nil, OvaleState:GetDamageMultiplier(condition[1]), 0, 0
 end
 
---- Get the estimated number of seconds remaining before the target is dead.
--- @name DeadIn
--- @paramsig number or boolean
--- @param operator Optional. Comparison operator: less, more.
--- @param number Optional. The number to compare against.
--- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
---     Defaults to target=player.
---     Valid values: player, target, focus, pet.
--- @return The number of seconds.
--- @return A boolean value for the result of the comparison.
--- @see TimeToDie
--- @usage
--- if target.DeadIn() <2 and ComboPoints() >0 Spell(eviscerate)
--- if target.DeadIn(less 2) and ComboPoints() >0 Spell(eviscerate)
-
-OvaleCondition.conditions.deadin = function(condition)
-	return testValue(condition[1], condition[2], 0, TimeToDie(getTarget(condition.target)), -1)
-end
-
 --- Get the current amount of demonic fury for demonology warlocks.
 -- @name DemonicFury
 -- @paramsig number or boolean
@@ -1378,6 +1382,80 @@ OvaleCondition.conditions.hasweapon = function(condition)
 		return testbool(false, condition[2])
 	end
 end
+
+--- Get the current amount of health points of the target.
+-- @name Health
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current health.
+-- @return A boolean value for the result of the comparison.
+-- @see Life
+-- @usage
+-- if Health() <10000 Spell(last_stand)
+-- if Health(less 10000) Spell(last_stand)
+
+OvaleCondition.conditions.health = function(condition)
+	local timeToDie, health, maxHealth = TimeToDie(getTarget(condition.target))
+	if not timeToDie or timeToDie == 0 then
+		return nil
+	end
+	return testValue(condition[1], condition[2], health, OvaleState.maintenant, -1 * health / timeToDie)
+end
+OvaleCondition.conditions.life = OvaleCondition.conditions.health
+
+--- Get the number of health points away from full health of the target.
+-- @name HealthMissing
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current missing health.
+-- @return A boolean value for the result of the comparison.
+-- @see LifeMissing
+-- @usage
+-- if HealthMissing() <20000 Item(healthstone)
+-- if HealthMissing(less 20000) Item(healthstone)
+
+OvaleCondition.conditions.healthmissing = function(condition)
+	local timeToDie, health, maxHealth = TimeToDie(getTarget(condition.target))
+	if not timeToDie or timeToDie == 0 then
+		return nil
+	end
+	local missing = maxHealth - health
+	return testValue(condition[1], condition[2], missing, OvaleState.maintenant, health / timeToDie)
+end
+OvaleCondition.conditions.lifemissing = OvaleCondition.conditions.healthmissing
+
+--- Get the current percent level of health of the target.
+-- @name HealthPercent
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The current health percent.
+-- @return A boolean value for the result of the comparison.
+-- @see LifePercent
+-- @usage
+-- if HealthPercent() <20 Spell(last_stand)
+-- if target.HealthPercent(less 25) Spell(kill_shot)
+
+OvaleCondition.conditions.healthpercent = function(condition)
+	local timeToDie, health, maxHealth = TimeToDie(getTarget(condition.target))
+	if not timeToDie or timeToDie == 0 then
+		return nil
+	end
+	local healthPercent = health / maxHealth * 100
+	return testValue(condition[1], condition[2], healthPercent, OvaleState.maintenant, -1 * healthPercent / timeToDie)
+end
+OvaleCondition.conditions.lifepercent = OvaleCondition.conditions.healthpercent
 
 --- Get the current amount of holy power for a paladin.
 -- @name HolyPower
@@ -1776,74 +1854,6 @@ OvaleCondition.conditions.level = function(condition)
 	end
 	return compare(level, condition[1], condition[2])
 end
-
---- Get the current amount of health points of the target.
--- @name Life
--- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
--- @param number Optional. The number to compare against.
--- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
---     Defaults to target=player.
---     Valid values: player, target, focus, pet.
--- @return The current health.
--- @return A boolean value for the result of the comparison.
--- @see Health
--- @usage
--- if Life() <10000 Spell(last_stand)
--- if Life(less 10000) Spell(last_stand)
-
-OvaleCondition.conditions.life = function(condition)
-	local target = getTarget(condition.target)
-	return compare(API_UnitHealth(target), condition[1], condition[2])
-end
-OvaleCondition.conditions.health = OvaleCondition.conditions.life
-
---- Get the number of health points away from full health of the target.
--- @name LifeMissing
--- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
--- @param number Optional. The number to compare against.
--- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
---     Defaults to target=player.
---     Valid values: player, target, focus, pet.
--- @return The current missing health.
--- @return A boolean value for the result of the comparison.
--- @see HealthMissing
--- @usage
--- if LifeMissing() <20000 Item(healthstone)
--- if LifeMissing(less 20000) Item(healthstone)
-
-OvaleCondition.conditions.lifemissing = function(condition)
-	local target = getTarget(condition.target)
-	return compare(API_UnitHealthMax(target) - API_UnitHealth(target), condition[1], condition[2])
-end
-OvaleCondition.conditions.healthmissing = OvaleCondition.conditions.lifemissing
-
---- Get the current percent level of health of the target.
--- @name LifePercent
--- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
--- @param number Optional. The number to compare against.
--- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
---     Defaults to target=player.
---     Valid values: player, target, focus, pet.
--- @return The current health percent.
--- @return A boolean value for the result of the comparison.
--- @see HealthPercent
--- @usage
--- if LifePercent() <20 Spell(last_stand)
--- if target.LifePercent(less 25) Spell(kill_shot)
-
-OvaleCondition.conditions.lifepercent = function(condition)
-	--TODO: use prediction based on the DPS on the target
-	local target = getTarget(condition.target)
-	local targetHealthMax = API_UnitHealthMax(target) or 0
-	if targetHealthMax == 0 then
-		return nil
-	end
-	return compare(100 * API_UnitHealth(target) / targetHealthMax, condition[1], condition[2])
-end
-OvaleCondition.conditions.healthpercent = OvaleCondition.conditions.lifepercent
 
 --- Test if a list is currently set to the given value.
 -- @name List
@@ -2673,18 +2683,24 @@ end
 
 --- Get the estimated number of seconds remaining before the target is dead.
 -- @name TimeToDie
--- @paramsig number
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: less, more.
+-- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The number of seconds.
+-- @return A boolean value for the result of the comparison.
 -- @see DeadIn
 -- @usage
 -- if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
+-- if target.TimeToDie(less 2) and ComboPoints() >0 Spell(eviscerate)
 
 OvaleCondition.conditions.timetodie = function(condition)
-	return 0, nil, 0, TimeToDie(getTarget(condition.target)), -1
+	local timeToDie = TimeToDie(getTarget(condition.target))
+	return 0, nil, timeToDie, OvaleState.maintenant, -1
 end
+OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
 
 --- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
 -- @name TimeToMaxEnergy
