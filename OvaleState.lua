@@ -531,7 +531,7 @@ function OvaleState:AddEclipse(endCast, spellId)
 	newAura.ending = nil
 end
 
-function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, target)
+function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	local aura
 	if mine then
 		local auraTable = self.aura[guid]
@@ -559,12 +559,31 @@ function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, target)
 		return aura.start, aura.ending, aura.stacks, aura.spellHasteMultiplier, aura.value, aura.gain
 	else
 		Ovale:Log("Aura " .. spellId .. " not found in state for " .. tostring(guid))
-		return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, target)
+		return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
 end
 
-function OvaleState:GetAura(target, spellId, filter, mine)
-	return self:GetAuraByGUID(OvaleGUID:GetGUID(target), spellId, filter, mine, target)
+function OvaleState:GetAura(unitId, spellId, filter, mine)
+	local guid = OvaleGUID:GetGUID(unitId)
+	if type(spellId) == "number" then
+		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+	elseif OvaleData.buffSpellList[spellId] then
+		local newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
+			local start, ending, stacks, spellHasteMultiplier, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
+			if start and (not newStart or stacks > newStacks) then
+				newStart = start
+				newEnding = ending
+				newStacks = stacks
+				newSpellHasteMultiplier = spellHasteMultiplier
+				newValue = value
+				newGain = gain
+			end
+		end
+		return newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
+		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+	end
 end
 
 -- Look for my aura on any target.

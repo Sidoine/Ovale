@@ -317,7 +317,26 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 end
 
 function OvaleAura:GetAura(unitId, spellId, filter, mine)
-	return self:GetAuraByGUID(OvaleGUID:GetGUID(unitId), spellId, filter, mine, unitId)
+	local guid = OvaleGUID:GetGUID(unitId)
+	if type(spellId) == "number" then
+		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+	elseif OvaleData.buffSpellList[spellId] then
+		local newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
+			local start, ending, stacks, spellHasteMultiplier, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
+			if start and (not newStart or stacks > newStacks) then
+				newStart = start
+				newEnding = ending
+				newStacks = stacks
+				newSpellHasteMultiplier = spellHasteMultiplier
+				newValue = value
+				newGain = gain
+			end
+		end
+		return newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
+		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+	end
 end
 
 function OvaleAura:GetStealable(unitId)
