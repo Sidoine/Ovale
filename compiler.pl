@@ -18,42 +18,81 @@
 --</public-properties>
 =cut
 
-$p{Skada}{current} = true;
-$p{Skada}{total} = true;
-$m{Skada}{NewModule} = true;
-$m{Skada}{RemoveMode} = true;
-$m{Skada}{get_player} = true;
-$m{Skada}{AddMode} = true;
-
-$p{Recount}{db} = true;
-$p{Recount}{db2} = true;
-$m{Recount}{AddModeTooltip} = true;
-$m{Recount}{AddAmount} = true;
-$m{Recount}{AddSortedTooltipData} = true;
-
-$m{AceGUI}{RegisterWidgetType} = true;
-$m{AceGUI}{RegisterAsContainer} = true;
-$m{AceGUI}{ClearFocus} = true;
-
-$m{DEFAULT_CHAT_FRAME}{AddMessage} = true;
-
-$m{LRC}{GetRange} = true;
-
-$m{AceConfigDialog}{Open} = true;
-$m{AceConfigDialog}{AddToBlizOptions} = true;
-$m{AceConfigDialog}{SetDefaultSize} = true;
-
-$m{Masque}{Group} = true;
+$m{"AceAddon-3.0"}{GetModule} = true;
+$m{"AceAddon-3.0"}{NewModule} = true;
 
 $m{AceConfig}{RegisterOptionsTable} = true;
 
-$m{GameTooltip}{SetText} = true;
-$m{GameTooltip}{ClearLines} = true;
-$m{GameTooltip}{SetOwner} = true;
+$m{"AceConsole-3.0"}{Print} = true;
+
+$m{"AceEvent-3.0"}{RegisterEvent} = true;
+$m{"AceEvent-3.0"}{RegisterMessage} = true;
+$m{"AceEvent-3.0"}{SendMessage} = true;
+$m{"AceEvent-3.0"}{UnregisterEvent} = true;
+$m{"AceEvent-3.0"}{UnregisterMessage} = true;
+
+$m{AceConfigDialog}{AddToBlizOptions} = true;
+$m{AceConfigDialog}{Open} = true;
+$m{AceConfigDialog}{SetDefaultSize} = true;
+
+$m{AceGUI}{ClearFocus} = true;
+$m{AceGUI}{RegisterAsContainer} = true;
+$m{AceGUI}{RegisterWidgetType} = true;
+
+$m{"AceTimer-3.0"}{CancelTimer} = true;
+$m{"AceTimer-3.0"}{ScheduleRepeatingTimer} = true;
+
+$m{ActionButtonTemplate}{CreateFontString} = true;
+$m{ActionButtonTemplate}{EnableMouse} = true;
+$m{ActionButtonTemplate}{GetName} = true;
+$m{ActionButtonTemplate}{Hide} = true;
+$m{ActionButtonTemplate}{RegisterForClicks} = true;
+$m{ActionButtonTemplate}{SetAttribute} = true;
+$m{ActionButtonTemplate}{SetChecked} = true;
+$m{ActionButtonTemplate}{SetScript} = true;
+$m{ActionButtonTemplate}{Show} = true;
+
+$m{DEFAULT_CHAT_FRAME}{AddMessage} = true;
+
+$m{Frame}{GetLeft} = true;
+$m{Frame}{GetTop} = true;
+$m{Frame}{SetAttribute} = true;
+$m{Frame}{SetScript} = true;
+$m{Frame}{StartMoving} = true;
+$m{Frame}{StopMovingOrSizing} = true;
+
 $m{GameTooltip}{AddDoubleLine} = true;
-$m{GameTooltip}{Show} = true;
-$m{GameTooltip}{Hide} = true;
 $m{GameTooltip}{AddLine} = true;
+$m{GameTooltip}{ClearLines} = true;
+$m{GameTooltip}{Hide} = true;
+$m{GameTooltip}{SetOwner} = true;
+$m{GameTooltip}{SetText} = true;
+$m{GameTooltip}{Show} = true;
+
+$m{LibDualSpec}{EnhanceDatabase} = true;
+$m{LibDualSpec}{EnhanceOptions} = true;
+
+$m{LRC}{GetRange} = true;
+
+$m{Masque}{Group} = true;
+
+$m{Recount}{AddAmount} = true;
+$m{Recount}{AddModeTooltip} = true;
+$m{Recount}{AddSortedTooltipData} = true;
+$p{Recount}{db2} = true;
+$p{Recount}{db} = true;
+
+$m{Skada}{AddMode} = true;
+$m{Skada}{NewModule} = true;
+$m{Skada}{RemoveMode} = true;
+$m{Skada}{get_player} = true;
+$p{Skada}{current} = true;
+$p{Skada}{total} = true;
+
+$sp{Ovale}{OvaleBestAction} = true;
+$sp{Ovale}{OvaleCondition} = true;
+$sp{Ovale}{OvalePool} = true;
+$sp{Ovale}{OvaleState} = true;
 
 opendir(DIR, ".");
 while (defined($r = readdir(DIR)))
@@ -73,51 +112,50 @@ while (defined($r = readdir(DIR)))
 		
 		if ($content =~ m/--inherits (\w+)/)
 		{
-			if ($1 eq 'ActionButtonTemplate')
+			my $parent = $1;
+			for my $method (keys %{$m{$parent}})
 			{
-				$m{$class}{Show} = true;
-				$m{$class}{Hide} = true;
-				$m{$class}{SetChecked} = true;
-				$m{$class}{CreateFontString} = true;
-				$m{$class}{RegisterForClicks} = true;
-				$m{$class}{EnableMouse} = true;
-				$m{$class}{GetName} = true;
-				$m{$class}{SetAttribute} = true;
-				$m{$class}{SetScript} = true;
-			}
-			if ($1 eq 'Frame')
-			{
-				$m{$class}{StartMoving} = true;
-				$m{$class}{StopMovingOrSizing} = true;
-				$m{$class}{GetLeft} = true;
-				$m{$class}{GetTop} = true;
-				$m{$class}{SetAttribute} = true;
-				$m{$class}{SetScript} = true;
+				$m{$class}{$method} = $m{$parent}{$method}
 			}
 		}
 		
-		if ($content =~ m/$class\s*=\s*LibStub\(([^)]+)\)/)
+		if ($content =~ m/$class\s*=\s*LibStub\("([^)]+)"\):NewAddon\(([^)]+)\)/)
 		{
-			if ($1 =~ m/AceAddon/)
+			my $factory = $1;
+			my $mixins = $2;
+			for my $method (keys %{$m{$factory}})
 			{
-				$m{$class}{NewModule} = true;
-				$m{$class}{Print} = true;
-				$m{$class}{RegisterEvent} = true;
-				$m{$class}{UnregisterEvent} = true;
-				$m{$class}{RegisterMessage} = true;
-				$m{$class}{UnregisterMessage} = true;
-				$m{$class}{SendMessage} = true;
+				$m{$class}{$method} = $m{$factory}{$method}
+			}
+			while ($mixins =~ m/"([^",]+)"/g)
+			{
+				my $parent = $1;
+				if ($parent ne $class)
+				{
+					for my $method (keys %{$m{$parent}})
+					{
+						$m{$class}{$method} = $m{$parent}{$method}
+					}
+				}
 			}
 		}
 		
-		if ($content =~ m/$class\s*=\s*Ovale:NewModule\(([^)]+)\)/)
+		if ($content =~ m/$class\s*=\s*([^:]+):NewModule\(([^)]+)\)/)
 		{
-			$m{$class}{Print} = true;
-			$m{$class}{RegisterEvent} = true;
-			$m{$class}{UnregisterEvent} = true;
-			$m{$class}{RegisterMessage} = true;
-			$m{$class}{UnregisterMessage} = true;
-			$m{$class}{SendMessage} = true;
+			my $parent = $1;
+			my $mixins = $2;
+			$sp{$parent}{$class} = true;
+			while ($mixins =~ m/"([^",]+)"/g)
+			{
+				my $parent = $1;
+				if ($parent ne $class)
+				{
+					for my $method (keys %{$m{$parent}})
+					{
+						$m{$class}{$method} = $m{$parent}{$method}
+					}
+				}
+			}
 		}
 
 		if ($content =~ m/<private-static-properties>(.*)<\/private-static-properties>/s)
