@@ -751,10 +751,7 @@ function OvaleBestAction:GetActionInfo(element)
 			end
 		end
 
-		local spellName = OvaleData.spellList[spellId]
-		if not spellName then
-			spellName = API_GetSpellInfo(spellId)
-		end
+		local spellName = OvaleData:GetSpellName(spellId)
 		actionTexture = API_GetSpellTexture(spellId)
 		actionInRange = API_IsSpellInRange(spellName, target)
 		actionUsable = API_IsUsableSpell(spellId)
@@ -780,9 +777,7 @@ function OvaleBestAction:GetActionInfo(element)
 			return nil
 		end
 
-		if (Ovale.trace) then
-			Ovale:Print("Item "..tostring(itemId))
-		end
+		Ovale:Log("Item "..tostring(itemId))
 
 		local spellName = API_GetItemSpell(itemId)
 		actionUsable = (spellName~=nil)

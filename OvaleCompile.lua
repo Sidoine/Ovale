@@ -613,11 +613,12 @@ local function ParseCanStopChannelling(text)
 end
 
 local function ParseSpellName(text)
-	local spell = OvaleData:GetSpellInfoOrNil(text)
-	if (spell) then
-		return '"'..spell..'"'
+	local spellId = tonumber(text)
+	local spell = OvaleData:GetSpellName(spellId)
+	if spell then
+		return '"' .. spell .. '"'
 	else
-		Ovale:Print("SpellName of "..text.." unknown")
+		Ovale:Print("SpellName of " .. text .. " unknown")
 		return nil
 	end
 end

@@ -2722,7 +2722,7 @@ OvaleCondition.conditions.totemexpires = function(condition)
 	if not startTime then
 		return 0
 	end
-	if (condition.totem and OvaleData:GetSpellInfoOrNil(condition.totem)~=totemName) then
+	if condition.totem and OvaleData:GetSpellName(condition.totem) ~= totemName then
 		return 0
 	end
 	return addTime(startTime + duration, -(condition[2] or 0))
@@ -2750,7 +2750,7 @@ OvaleCondition.conditions.totempresent = function(condition)
 	if not startTime then
 		return nil
 	end
-	if (condition.totem and OvaleData:GetSpellInfoOrNil(condition.totem)~=totemName) then
+	if condition.totem and OvaleData:GetSpellName(condition.totem) ~= totemName then
 		return nil
 	end
 	return startTime, startTime + duration
@@ -2760,12 +2760,12 @@ end
 	-- 1: the spell id
 	-- return bool
 OvaleCondition.conditions.tracking = function(condition)
-	local what = OvaleData:GetSpellInfoOrNil(condition[1])
+	local what = OvaleData:GetSpellName(condition[1])
 	local numTrackingTypes = API_GetNumTrackingTypes()
 	local present = false
-	for i=1,numTrackingTypes do
-		local name, texture, active = API_GetTrackingInfo(i)
-		if name == what then
+	for i = 1, numTrackingTypes do
+		local name, _, active = API_GetTrackingInfo(i)
+		if name and name == what then
 			present = (active == 1)
 			break
 		end

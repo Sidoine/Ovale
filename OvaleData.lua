@@ -394,6 +394,11 @@ function OvaleData:GetSpellInfoOrNil(spell)
 	end
 end
 
+function OvaleData:GetSpellName(spellId)
+	if not spellId then return nil end
+	return self.spellList[spellId] or API_GetSpellInfo(spellId)
+end
+
 function OvaleData:FillPetSpellList()
 	--TODO pas moyen d'avoir le nombre de skills pour le pet
 	local book=BOOKTYPE_PET
