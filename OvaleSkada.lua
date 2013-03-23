@@ -12,8 +12,8 @@ local OvaleSkada = Ovale:NewModule("OvaleSkada")
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>
-local Skada	= LibStub("AceAddon-3.0"):GetAddon("Skada", true)
-local SkadaModule = Skada and Skada:NewModule("Ovale Spell Priority", SkadaModule) or { noSkada = true }
+local Skada = LibStub("AceAddon-3.0"):GetAddon("Skada", true)
+local SkadaModule = Skada and Skada:NewModule("Ovale Spell Priority") or { noSkada = true }
 
 local ipairs = ipairs
 local math = math
