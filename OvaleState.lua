@@ -567,24 +567,23 @@ function OvaleState:GetAura(target, spellId, filter, mine)
 	return self:GetAuraByGUID(OvaleGUID:GetGUID(target), spellId, filter, mine, target)
 end
 
-function OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-	local start, ending, count = OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-	if mine then
-		local aura
-		for guid, auraTable in pairs(self.aura) do
-			if guid ~= excludingGUID then
-				for auraFilter, auraList in pairs(auraTable) do
-					if not filter or auraFilter == filter then
-						aura = auraList[spellId]
-						if aura and aura.serial == self.serial then
-							if aura.start and (not start or aura.start < start) then
-								start = aura.start
-							end
-							if aura.ending and (not ending or aura.ending > ending) then
-								ending = aura.ending
-							end
-							count = count + 1
+-- Look for my aura on any target.
+-- Returns the earliest start time, the latest ending time, and the number of auras seen.
+function OvaleState:GetMyAuraOnAnyTarget(spellId, filter, excludingGUID)
+	local start, ending, count = OvaleAura:GetMyAuraOnAnyTarget(spellId, filter, excludingGUID)
+	for guid, auraTable in pairs(self.aura) do
+		if guid ~= excludingGUID then
+			for auraFilter, auraList in pairs(auraTable) do
+				if not filter or auraFilter == filter then
+					local aura = auraList[spellId]
+					if aura and aura.serial == self.serial then
+						if aura.start and (not start or aura.start < start) then
+							start = aura.start
 						end
+						if aura.ending and (not ending or aura.ending > ending) then
+							ending = aura.ending
+						end
+						count = count + 1
 					end
 				end
 			end
