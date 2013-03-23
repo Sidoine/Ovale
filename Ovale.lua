@@ -7,8 +7,8 @@
     file accompanying this program.
 ----------------------------------------------------------------------]]
 
-local _, Ovale = ...
-local OvaleAddon = LibStub("AceAddon-3.0"):NewAddon(Ovale, "Ovale", "AceConsole-3.0", "AceEvent-3.0")
+local _, addonNamespace = ...
+local Ovale = LibStub("AceAddon-3.0"):NewAddon(addonNamespace, "Ovale", "AceConsole-3.0", "AceEvent-3.0")
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
