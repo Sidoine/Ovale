@@ -169,7 +169,12 @@ do
 
 		OvaleState:StartNewFrame()
 		for k,node in pairs(OvaleCompile.masterNodes) do
-			local target = node.params.target or "target"
+			local target
+			if node.params and node.params.target then
+				target = node.params.target
+			else
+				target = "target"
+			end
 			OvaleCondition.defaultTarget = target
 
 			if forceRefresh or Ovale.refreshNeeded[target] or Ovale.refreshNeeded["player"] or Ovale.refreshNeeded["pet"] then
