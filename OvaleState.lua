@@ -403,7 +403,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								stacks = 1
 							end
 
-							local oldStart, oldEnding, oldStacks, oldSpellHasteMultiplier = self:GetAuraByGUID(auraGUID, auraSpellId, true, filter, target)
+							local oldStart, oldEnding, oldStacks, oldSpellHasteMultiplier = self:GetAuraByGUID(auraGUID, auraSpellId, filter, true, target)
 							local newAura = self:NewAura(auraGUID, auraSpellId, filter)
 
 							newAura.mine = true
