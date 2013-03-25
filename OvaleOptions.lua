@@ -34,7 +34,7 @@ OvaleOptions.db = nil
 --<private-static-properties>
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-local LibDualSpec = LibStub("LibDualSpec-1.0")
+local LibDualSpec = LibStub("LibDualSpec-1.0",true)
 	
 --GUI option
 local self_options = 
@@ -547,9 +547,11 @@ function OvaleOptions:OnInitialize()
 	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
 	-- Add dual-spec support
-	LibDualSpec:EnhanceDatabase(self.db, "Ovale")
-	LibDualSpec:EnhanceOptions(self_options.args.profile, self.db)
-
+	if LibDualSpec then
+		LibDualSpec:EnhanceDatabase(self.db, "Ovale")
+		LibDualSpec:EnhanceOptions(self_options.args.profile, self.db)
+	end
+	
 	AceConfig:RegisterOptionsTable("Ovale", self_options.args.code)
 	AceConfig:RegisterOptionsTable("Ovale Actions", self_options.args.actions, "Ovale")
 	AceConfig:RegisterOptionsTable("Ovale Profile", self_options.args.profile)
