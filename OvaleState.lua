@@ -392,7 +392,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 
 							-- Set the duration to the proper length if it's a DoT.
 							if auraSpellInfo and auraSpellInfo.duration then
-								duration = OvaleData:GetDuration(auraSpellId, nil, self.state.combo, self.state.holy)
+								duration = OvaleData:GetDuration(auraSpellId, self.state.combo, self.state.holy)
 							end
 
 							-- If aura is specified with a duration, then assume stacks == 1.
@@ -419,9 +419,10 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 										newAura.stacks = oldStacks + stacks
 									end
 									newAura.start = oldStart
-									if isDoT and oldEnding > newAura.start and oldTick then
-										local k = floor((oldEnding - endCast) / oldTick)
-										newAura.ending = oldEnding - oldTick * k + duration
+									if isDoT and oldEnding > newAura.start and oldTick and oldTick > 0 then
+										-- Add new duration after the next tick is complete.
+										local remainingTicks = floor((oldEnding - endCast) / oldTick)
+										newAura.ending = (oldEnding - oldTick * remainingTicks) + duration
 										newAura.tick = OvaleData:GetTickLength(auraSpellId)
 									else
 										newAura.ending = endCast + duration
@@ -430,7 +431,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								elseif stacks < 0 then
 									Ovale:Logf("Aura %d loses stacks", auraSpellId)
 									newAura.stacks = oldStacks + stacks
-									Ovale:Logf("removing one stack of %d because of %d to %d", auraSpellId, spellId, newAura.stacks)
+									Ovale:Logf("removing %d stack(s) of %d because of %d to %d", stacks, auraSpellId, spellId, newAura.stacks)
 									newAura.start = oldStart
 									newAura.ending = oldEnding
 									if newAura.stacks <= 0 then
