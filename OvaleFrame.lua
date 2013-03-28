@@ -29,6 +29,7 @@ do
 	local wipe = table.wipe
 	local API_CreateFrame = CreateFrame
 	local API_GetSpellInfo = GetSpellInfo
+	local API_GetSpellTexture = GetSpellTexture
 	local API_GetTime = GetTime
 --</private-static-properties>
 
@@ -196,7 +197,7 @@ do
 				if element and element.type == "value" then
 					local actionTexture
 					if node.params.texture then
-						actionTexture = GetSpellTexture(node.params.texture)
+						actionTexture = API_GetSpellTexture(node.params.texture)
 					end
 					local value
 					if element.value and element.origin and element.rate then
