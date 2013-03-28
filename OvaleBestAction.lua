@@ -238,6 +238,7 @@ local function ComputeFunction(element)
 					element.castTime = castTime / 1000
 				else
 					element.castTime = nil
+				end
 			end
 			if si and si.toggle and actionIsCurrent then
 				Ovale:Logf("Action %s (toggle) is the current action", element.params[1])
