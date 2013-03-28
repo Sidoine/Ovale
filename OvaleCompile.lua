@@ -35,6 +35,7 @@ local strsub = string.sub
 local tinsert = table.insert
 local tremove = table.remove
 local wipe = table.wipe
+local API_GetItemInfo = GetItemInfo
 local API_GetSpellInfo = GetSpellInfo
 
 local self_node = {}
@@ -612,6 +613,17 @@ local function ParseCanStopChannelling(text)
 	return ""
 end
 
+local function ParseItemName(text)
+	local itemId = tonumber(text)
+	if itemId then
+		local item = API_GetItemInfo(spellId) or "Item " .. itemId
+		return '"' .. item .. '"'
+	else
+		Ovale:Printf("ItemName of %s unknown\n", text)
+		return nil
+	end
+end
+
 local function ParseSpellName(text)
 	local spellId = tonumber(text)
 	local spell = OvaleData:GetSpellName(spellId)
@@ -653,6 +665,7 @@ local function CompileDeclarations(text)
 	text = strgsub(text, "([%w_]+)", ReplaceDefine)
 	
 	-- Fonctions
+	text = strgsub(text, "ItemName%s*%(%s*(%w+)%s*%)", ParseItemName)
 	text = strgsub(text, "SpellName%s*%(%s*(%w+)%s*%)", ParseSpellName)
 	text = strgsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
 	
