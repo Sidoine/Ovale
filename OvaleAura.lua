@@ -32,6 +32,31 @@ local self_pool = OvalePool:NewPool("OvaleAura_pool")
 -- self_aura[guid][filter][spellId]["mine" or "other"] = { aura properties }
 local self_aura = {}
 local self_serial = 0
+
+-- Units for which UNIT_AURA is known to fire.
+local OVALE_UNIT_AURA_UNITS = {}
+do
+	OVALE_UNIT_AURA_UNITS["focus"] = true
+	OVALE_UNIT_AURA_UNITS["pet"] = true
+	OVALE_UNIT_AURA_UNITS["player"] = true
+	OVALE_UNIT_AURA_UNITS["target"] = true
+
+	for i = 1, 5 do
+		OVALE_UNIT_AURA_UNITS["arena" .. i] = true
+		OVALE_UNIT_AURA_UNITS["arenapet" .. i] = true
+	end
+	for i = 1, 4 do
+		OVALE_UNIT_AURA_UNITS["boss" .. i] = true
+	end
+	for i = 1, 4 do
+		OVALE_UNIT_AURA_UNITS["party" .. i] = true
+		OVALE_UNIT_AURA_UNITS["partypet" .. i] = true
+	end
+	for i = 1, 40 do
+		OVALE_UNIT_AURA_UNITS["raid" .. i] = true
+		OVALE_UNIT_AURA_UNITS["raidpet" .. i] = true
+	end
+end
 --</private-static-properties>
 
 --<private-static-methods>
@@ -235,9 +260,8 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		RemoveAurasForGUID(destGUID)
 	elseif strfind(event, "SPELL_AURA_") == 1 then
 		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
-		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId and unitId ~= "target" and strfind(unitId, "target") then
+		if unitId and not OVALE_UNIT_AURA_UNITS[unitId] then
 			UpdateAuras(unitId, destGUID)
 		end
 	end
