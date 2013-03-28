@@ -729,12 +729,11 @@ function OvaleBestAction:GetActionInfo(element)
 			Ovale:DebugPrint("unknown_spells", "No cooldown data for spell "..spellId)
 		end
 
-		local si = OvaleData:GetSpellInfo(spellId)
+		local si = OvaleData.spellInfo[spellId]
 		if si then
 			if si.stance and not OvaleStance:IsStance(si.stance) then
 				return nil
 			end
-
 			if si.combo == 0 and OvaleState.state.combo == 0 then
 				return nil
 			end
