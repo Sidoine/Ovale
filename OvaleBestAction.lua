@@ -24,6 +24,7 @@ local floor = math.floor
 local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
+local select = select
 local strfind = string.find
 local tonumber = tonumber
 local tostring = tostring
@@ -215,7 +216,6 @@ end
 local function ComputeFunction(element)
 	local self = OvaleBestAction
 	if element.func == "spell" or element.func == "macro" or element.func == "item" or element.func == "texture" then
-		local action
 		local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 			actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
 
@@ -227,62 +227,66 @@ local function ComputeFunction(element)
 			Ovale:Logf("Action %s not usable", element.params[1])
 			return nil
 		end
-		if spellId and OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].casttime then
-			element.castTime = OvaleData.spellInfo[spellId].casttime
-		elseif spellId then
-			local spell, rank, icon, cost, isFunnel, powerType, castTime = API_GetSpellInfo(spellId)
-			if castTime then
-				element.castTime = castTime / 1000
+
+		if spellId then
+			local si = spellId and OvaleData.spellInfo[spellId]
+			if si and si.casttime then
+				element.castTime = si.casttime
 			else
-				element.castTime = nil
+				local castTime = select(7, API_GetSpellInfo(spellId))
+				if castTime then
+					element.castTime = castTime / 1000
+				else
+					element.castTime = nil
+			end
+			if si and si.toggle and actionIsCurrent then
+				Ovale:Logf("Action %s (toggle) is the current action", element.params[1])
+				return nil
 			end
 		else
 			element.castTime = 0
 		end
-		--TODO: not useful anymore?
-		if spellId and OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].toggle and actionIsCurrent then
-			Ovale:Logf("Action %s is current action", element.params[1])
-			return nil
-		end
+
 		if actionEnable and actionEnable > 0 then
-			local remaining
-			if not actionCooldownDuration or actionCooldownStart == 0 then
-				remaining = OvaleState.currentTime
+			local start
+			if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
+				start = actionCooldownDuration + actionCooldownStart
 			else
-				remaining = actionCooldownDuration + actionCooldownStart
+				start = OvaleState.currentTime
 			end
-			Ovale:Logf("remaining=%f attenteFinCast=%s", remaining, OvaleState.attenteFinCast)
-			if remaining < OvaleState.attenteFinCast then
-				if	not OvaleData.spellInfo[OvaleState.currentSpellId] or
-						not OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling then
-					remaining = OvaleState.attenteFinCast
+			Ovale:Logf("start=%f attenteFinCast=%s", start, OvaleState.attenteFinCast)
+			if start < OvaleState.attenteFinCast then
+				local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
+				if not (si and si.canStopChannelling) then
+					-- not a channelled spell, or a channelled spell that cannot be interrupted
+					start = OvaleState.attenteFinCast
 				else
 					--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
 					--ça tombera entre deux ticks
-					local numTicks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling + 0.5)
+					local numTicks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * si.canStopChannelling + 0.5)
 					local tick = (OvaleState.attenteFinCast - OvaleState.startCast) / numTicks
 					local tickTime = OvaleState.startCast + tick
-					Ovale:Logf("%s remaining=%f", spellId, remaining)
-					for i=1, ticks do
-						if remaining <= tickTime then
-							remaining = tickTime
+					Ovale:Logf("%s start=%f", spellId, start)
+					for i = 1, numTicks do
+						if start <= tickTime then
+							start = tickTime
 							break
 						end
 						tickTime = tickTime + tickLength
 					end
-					Ovale:Logf("%s remaining=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, remaining, numTicks, tick, tickTime)
+					Ovale:Logf("%s start=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, start, numTicks, tick, tickTime)
 				end
 			end
-			Ovale:Logf("Action %s remains %f", element.params[1], remaining)
+			Ovale:Logf("Action %s can start at %f", element.params[1], start)
 			local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
-			return remaining, nil, priority, element
+			return start, nil, priority, element
 		else
 			Ovale:Logf("Action %s not enabled", element.params[1])
 		end
 	else
 		local condition = OvaleCondition.conditions[element.func]
 		if not condition then
-			Ovale:Errorf("Function %s not found", element.func)
+			Ovale:Errorf("Condition %s not found", element.func)
 			return nil
 		end
 		local start, ending, value, origin, rate = condition(element.params)
@@ -304,14 +308,9 @@ local function ComputeFunction(element)
 	end
 end
 
-
 local function ComputeGroup(element)
 	local self = OvaleBestAction
-	local bestStart
-	local bestEnding
-	local bestPriority
-	local bestElement
-	local bestCastTime
+	local bestStart, bestEnding, bestPriority, bestElement, bestCastTime
 
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 
@@ -340,24 +339,28 @@ local function ComputeGroup(element)
 			if not bestStart then
 				replace = true
 			else
-				-- Maximum time between the best spell and the current spell.
-				local maxDiff
 				if priority and not bestPriority then
 					Ovale:Errorf("Internal error: bestPriority=nil and priority=%d", priority)
 					return nil
 				elseif priority and priority > bestPriority then
-					-- Si le nouveau sort est plus prioritaire que le précédent, on le lance
-					-- si caster le sort actuel repousse le nouveau sort
-					maxDiff = bestCastTime * 0.75
+					-- If the new spell has a higher priority than the previous one, then choose the
+					-- higher priority spell its cast is pushed back too far by the lower priority one.
+					if start - bestStart < bestCastTime * 0.75 then
+						replace = true
+					end
 				elseif priority and priority < bestPriority then
-					-- A l'inverse, si il est moins prioritaire que le précédent, on ne le lance
-					-- que si caster le nouveau sort ne repousse pas le meilleur
-					maxDiff = castTime * 0.75
+					-- If the new spell has a lower priority than the previous one, then choose the
+					-- lower priority spell only if it doesn't push back the cast of the higher priority
+					-- one by too much.
+					if bestStart - start > castTime * 0.75 then
+						replace = true
+					end
 				else
-					maxDiff = -0.01
-				end
-				if start - bestStart < maxDiff then
-					replace = true
+					-- If the spells have the same priority, then pick the one with an earlier cast time.
+					-- TODO: why have a 0.01 second threshold here?
+					if bestStart - start > 0.01 then
+						replace = true
+					end
 				end
 			end
 			if replace then
