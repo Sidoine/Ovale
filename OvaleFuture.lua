@@ -66,7 +66,7 @@ local function ScoreSpell(spellId)
 	local si = OvaleData.spellInfo[spellId]
 	if Ovale.enCombat and not (si and si.toggle) and OvaleData.scoreSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
-		Ovale:Log("Scored " .. scored)
+		Ovale:Logf("Scored %s", scored)
 		if scored then
 			Ovale.score = Ovale.score + scored
 			Ovale.maxScore = Ovale.maxScore + 1
@@ -86,16 +86,15 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	spellcast.allowRemove = allowRemove
 	--TODO unable to know what is the real target
 	if lineId == self_lastLineID and self_lastTarget then
-		-- Ovale:Print("found lineId " .. lineId .. " target is " .. self_lastTarget)
+		-- Ovale:Printf("found lineId %d, target is %s", lineId, self_lastTarget)
 		spellcast.target = self_lastTarget
 	else
 		spellcast.target = API_UnitGUID("target")
 	end
 	if self.traceSpellId and self.traceSpellId == spellId then
 		local spellName = OvaleData.spellList[spellId] or API_GetSpellInfo(spellId)
-		Ovale:Print("    AddSpellToList: " ..Ovale.now.. " " ..spellName.. " (" ..spellId.. "), lineId = " ..lineId)
-		Ovale:Print("        startTime = " ..startTime.. ", endTime = " ..endTime)
-		Ovale:Print("        target = " ..spellcast.target.. (channeled and "(channeled)" or "") .. (allowRemove and "(allowRemove)" or ""))
+		Ovale:Printf("    AddSpellToQueue: %f %s (%d), lineId = %d", Ovale.now, spellName, spellId, lineId)
+		Ovale:Printf("        startTime = %f, endTime = %f, target = %s", startTime, endTime, spellcast.target)
 	end
 
 	-- Snapshot the current stats for the spellcast.
@@ -159,7 +158,7 @@ local function RemoveSpellFromQueue(spellId, lineId)
 		if spellcast.lineId == lineId then
 			if self.traceSpellId and self.traceSpellId == spellId then
 				local spellName = OvaleData.spellList[spellId] or API_GetSpellInfo(spellId)
-				Ovale:Print("    RemoveSpellFromList: " .. Ovale.now .. " " .. tostring(spellName) .. " (" .. spellId .. ")")
+				Ovale:Printf("    RemoveSpellFromQueue: %f %s (%d)", Ovale.now, spellName, spellId)
 			end
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
@@ -196,8 +195,8 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineI
 	if unit == "player" then
 		local startTime, endTime = select(5, API_UnitChannelInfo("player"))
 		if self.traceSpellId and self.traceSpellId == spellId then
-			Ovale:Print(event.. ": " ..Ovale.now.. " " ..name.. " (" ..spellId.. "), lineId = " ..lineId)
-			Ovale:Print("    startTime = " ..startTime.. ", endTime = " ..endTime)
+			Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
+			Ovale:Printf("    startTime = %f, endTime = %f", startTime, endTime)
 		end
 		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, true, false)
 	end
@@ -206,7 +205,7 @@ end
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		if self.traceSpellId and self.traceSpellId == spellId then
-			Ovale:Print(event.. ": " ..Ovale.now.. " " ..name.. " (" ..spellId.. "), lineId = " ..lineId)
+			Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
 		end
 		RemoveSpellFromQueue(spellId, lineId)
 	end
@@ -217,8 +216,8 @@ function OvaleFuture:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spell
 	if unit == "player" then
 		local startTime, endTime = select(5, API_UnitCastingInfo("player"))
 		if self.traceSpellId and self.traceSpellId == spellId then
-			Ovale:Print(event.. ": " ..Ovale.now.. " " ..name.. " (" ..spellId.. "), lineId = " ..lineId)
-			Ovale:Print("    startTime = " ..startTime.. ", endTime = " ..endTime)
+			Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
+			Ovale:Printf("    startTime = %f, endTime = %f", startTime, endTime)
 		end
 		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, false, false)
 	end
@@ -228,7 +227,7 @@ end
 function OvaleFuture:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		if self.traceSpellId and self.traceSpellId == spellId then
-			Ovale:Print(event.. ": " ..Ovale.now.. " " ..name.. " (" ..spellId.. "), lineId = " ..lineId)
+			Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
 		end
 		RemoveSpellFromQueue(spellId, lineId)
 	end
@@ -249,8 +248,8 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 		self_lastTarget = targetGUID
 		self_lastLineID = lineId
 		if self.traceSpellId and self.traceSpellId == spellId then
-			Ovale:Print(event.. ": " ..Ovale.now.. " " ..name.. " (" ..spellId.. "), lineId = " ..lineId)
-			Ovale:Print("    targetGUID = " ..targetGUID)
+			Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
+			Ovale:Printf("    targetGUID = %s", targetGUID)
 		end
 		for _, spellcast in ipairs(self_activeSpellcast) do
 			if spellcast.lineId == lineId then
@@ -263,7 +262,7 @@ end
 function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		if self.traceSpellId and self.traceSpellId == spellId then
-			Ovale:Print(event.. ": " ..Ovale.now.. " " ..name.. " (" ..spellId.. "), lineId = " ..lineId)
+			Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
 		end
 		-- Search for a cast-time spell matching this spellcast that was added by UNIT_SPELLCAST_START.
 		for _, spellcast in ipairs(self_activeSpellcast) do
@@ -338,14 +337,14 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				or strfind(event, "SPELL_MISSED") == 1 then
 			local spellId, spellName = select(12, ...)
 			if self.traceSpellId and self.traceSpellId == spellId then
-				Ovale:Print(event.. ": " ..Ovale.now.. " " ..spellName.. " (" ..spellId.. ")")
+				Ovale:Printf("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
 			end
 			for index, spellcast in ipairs(self_activeSpellcast) do
 				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraSpellId == spellId) then
 					if not spellcast.channeled and (spellcast.removeOnSuccess or strfind(event, "SPELL_CAST_SUCCESS") ~= 1) then
 						if self.traceSpellId and self.traceSpellId == spellId then
 							local spellName = OvaleData.spellList[spellId] or API_GetSpellInfo(spellId)
-							Ovale:Print("    Spell finished: " ..Ovale.now.. " " ..spellName.. " (" ..spellId.. ")")
+							Ovale:Printf("    Spell finished: %f %s (%d)", Ovale.now, spellName, spellId)
 						end
 						tremove(self_activeSpellcast, index)
 						self_pool:Release(spellcast)
@@ -382,7 +381,7 @@ function OvaleFuture:InFlightSpells(now)
 			si = OvaleData.spellInfo[spellcast.spellId]
 			-- skip over spells that are toggles for other spells
 			if not (si and si.toggle) then
-				Ovale:Log("now = " .. now .. " spellId = " .. spellcast.spellId .. " endCast = " .. spellcast.stop)
+				Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 				if now - spellcast.stop < 5 then
 					return spellcast.spellId, spellcast.lineId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target
 				else
@@ -434,7 +433,7 @@ function OvaleFuture:Debug()
 	end
 	for spellId, lineId in self:InFlightSpells(Ovale.now) do
 		local spellName = OvaleData.spellList[spellId] or API_GetSpellInfo(spellId)
-		Ovale:Print("    " ..spellName.. " (" ..spellId.. "), lineId = " ..tostring(lineId))
+		Ovale:Printf("    %s (%d), lineId = %s", spellName, spellId, lineId)
 	end
 end
 --</public-static-methods>

@@ -152,7 +152,7 @@ local function compare(a, comparison, b)
 			return nil
 		end
 	else
-		Ovale:Error("unknown compare term "..comparison.." (should be more, equal, or less)")
+		Ovale:Errorf("unknown compare term %s (should be more, equal, or less)", comparison)
 	end
 end
 
@@ -280,14 +280,14 @@ local function testValue(comparator, limit, value, atTime, rate)
 			elseif comparator == "less" then
 				if value < limit then return 0 else return nil end
 			else
-				Ovale:Error("Unknown operator "..comparator)
+				Ovale:Errorf("Unknown operator %s", comparator)
 			end
 		elseif (comparator == "more" and rate > 0) or (comparator == "less" and rate < 0) then
 			return (limit - value) / rate + atTime
 		elseif (comparator == "more" and rate < 0) or (comparator == "less" and rate > 0) then
 			return 0, (limit - value) / rate + atTime
 		else
-			Ovale:Error("Unknown operator "..comparator)
+			Ovale:Errorf("Unknown operator %s", comparator)
 		end
 	end
 end
@@ -325,15 +325,15 @@ local function GetAura(condition)
 	local start, ending, stacks, tick, value, gain = OvaleState:GetAura(unitId, spellId, filter, mine)
 
 	if not start then
-		Ovale:Log("GetAura: aura " .. tostring(spellId) .. " not found on " .. unitId .. " filter=" .. tostring(filter) .. " mine=" .. tostring(mine))
+		Ovale:Logf("GetAura: aura %s not found on %s filter=%s mine=%s", spellId, unitId, filter, mine)
 		return nil
 	end
 	local conditionStacks = condition.stacks or 1
 	if stacks and stacks < conditionStacks then
-		Ovale:Log("GetAura: aura " .. tostring(spellId) .. " found on " .. unitId .. " but stacks " .. stacks .. " < " .. conditionStacks)
+		Ovale:Logf("GetAura: aura %s found on %s but stacks %d < %d", spellId, unitId, stacks, conditionStacks)
 		return nil
 	end
-	Ovale:Log("GetAura: aura " .. tostring(spellId) .. " found on " .. unitId .. " start=" .. tostring(start) .. " ending=" .. tostring(ending) .. " stacks=" .. tostring(stacks) .. "/" .. conditionStacks)
+	Ovale:Logf("GetAura: aura %s found on %s start=%s ending=%s stacks=%s/%d", spellId, unitId, start, ending, stacks, conditionStacks)
 	return start, ending, stacks, tick, value, gain
 end
 
@@ -356,7 +356,7 @@ local function TimeToDie(unitId)
 	local health = API_UnitHealth(unitId)
 	local maxHealth = API_UnitHealthMax(unitId) or 1
 	if health then
-		Ovale:Log("target = " .. tostring(self_lastTTDguid[unitId]) .. ", health = " .. health .. ", maxHealth = " .. maxHealth)
+		Ovale:Logf("target = %s, health = %d, maxHealth = %d", self_lastTTDguid[unitId], health, maxHealth)
 	end
 	if maxHealth < health then
 		maxHealth = health
@@ -383,7 +383,7 @@ local function TimeToDie(unitId)
 				end
 				if prevHealth and prevHealth > health then
 					self_lastTTDdps[unitId] = (prevHealth - health) / delta
-					Ovale:Log("prevHealth = " .. prevHealth .. ", health = " .. health .. ", delta = " .. delta .. ", dps = " .. self_lastTTDdps[unitId])
+					Ovale:Logf("prevHealth = %d, health = %d, delta = %d, dps = %d", prevHealth, health, delta, self_lastTTDdps[unitId])
 					break
 				end
 			end
@@ -566,10 +566,7 @@ OvaleCondition.conditions.buffexpires = function(condition)
 		ending = 0
 	end
 	local timeBefore = avecHate(condition[2], condition.haste)
-	if Ovale.trace then
-		Ovale:Print("timeBefore = " .. tostring(timeBefore))
-		Ovale:Print("ending = " .. tostring(ending))
-	end
+	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
 	return addTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
@@ -813,7 +810,7 @@ OvaleCondition.conditions.casttime = function(condition)
 		castTime = select(7, API_GetSpellInfo(condition[1]))
 		if castTime then
 			castTime = castTime / 1000
-			Ovale:Log("castTime = " .. castTime .. " " .. tostring(condition[2]) .. " " .. tostring(condition[3]))
+			Ovale:Logf("castTime = %f %s %s", castTime, condition[2], condition[3])
 		end
 	end
 	return compare(castTime, condition[2], condition[3])

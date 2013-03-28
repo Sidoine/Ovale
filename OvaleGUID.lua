@@ -54,7 +54,7 @@ function OvaleGUID:OnDisable()
 end
 
 function OvaleGUID:Update(unitId)
-	--self:Print("Update " .. unitId)
+	--self:Printf("OvaleGUID:Update %s", unitId)
 	local guid = API_UnitGUID(unitId)
 	local previousGuid = self_guid[unitId]
 	if previousGuid ~= guid then
@@ -69,7 +69,7 @@ function OvaleGUID:Update(unitId)
 			if not self_unitId[guid] then
 				self_unitId[guid] = {}
 			end
-			Ovale:DebugPrint("guid", "GUID "..guid.." is ".. unitId)
+			Ovale:DebugPrintf("guid", "GUID %s is %s", guid, unitId)
 			self_unitId[guid][unitId] = true
 		end
 	end

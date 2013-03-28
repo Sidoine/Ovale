@@ -81,6 +81,6 @@ function OvaleComboPoints:Refresh()
 end
 
 function OvaleComboPoints:Debug()
-	Ovale:Print("Player has " .. self.combo .. " combo points on target " .. OvaleGUID:GetGUID("target") .. ".")
+	Ovale:Printf("Player has %d combo points on target %s.", self.combo, OvaleGUID:GetGUID("target"))
 end
 --</public-static-methods>

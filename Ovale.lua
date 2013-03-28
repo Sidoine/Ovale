@@ -15,6 +15,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
 local OvaleGUID = nil
 local OvaleOptions = nil
 
+local format = string.format
 local pairs = pairs
 local wipe = table.wipe
 local API_GetTime = GetTime
@@ -62,13 +63,6 @@ BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<public-static-methods>
-function Ovale:DebugPrint(flag, ...)
-	local profile = OvaleOptions:GetProfile()
-	if profile and profile.debug and profile.debug[flag] then
-		self:Print("[" .. flag .. "]", ...)
-	end
-end
-
 function Ovale:OnEnable()
     -- Called when the addon is enabled
 	OvaleGUID = Ovale:GetModule("OvaleGUID")
@@ -117,12 +111,6 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.maxScore = 0
 	self.combatStartTime = Ovale.now
 	self:UpdateVisibility()
-end
-
-function Ovale:Log(text)
-	if self.trace then
-		self:Print(text)
-	end
 end
 
 local function OnCheckBoxValueChanged(widget)
@@ -244,8 +232,39 @@ function Ovale:ToggleCheckBox(v)
 	end
 end
 
-function Ovale:Error(text)
-	self:Print("Fatal error: " .. text)
+function Ovale:DebugPrint(flag, ...)
+	local profile = OvaleOptions:GetProfile()
+	if profile and profile.debug and profile.debug[flag] then
+		self:Print("[" .. flag .. "]", ...)
+	end
+end
+
+function Ovale:DebugPrintf(flag, ...)
+	local profile = OvaleOptions:GetProfile()
+	if profile and profile.debug and profile.debug[flag] then
+		self:Printf("[%s] %s", flag, format(...))
+	end
+end
+
+function Ovale:Error(...)
+	self:Print("Fatal error: ", ...)
 	self.bug = true
+end
+
+function Ovale:Errorf(...)
+	self:Printf("Fatal error: %s", format(...))
+	self.bug = true
+end
+
+function Ovale:Log(...)
+	if self.trace then
+		self:Print(...)
+	end
+end
+
+function Ovale:Logf(...)
+	if self.trace then
+		return self:Printf(...)
+	end
 end
 --</public-static-methods>

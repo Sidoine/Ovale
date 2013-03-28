@@ -129,7 +129,7 @@ function OvaleStance:DebugStances()
 end
 
 function OvaleStance:Debug()
-	Ovale:Print("current stance: " .. self_stance)
+	Ovale:Printf("current stance: %s", self_stance)
 end
 
 -- Return true if the current stance matches the given name.

@@ -95,7 +95,7 @@ local function HasTalent(talentId)
 		if OvaleData.pointsTalent[talentId]~=nil then
 			return OvaleData.pointsTalent[talentId]>0
 		else
-			Ovale:Print("Unknown talent "..talentId)
+			Ovale:Printf("Unknown talent %s", talentId)
 			return false
 		end
 	else
@@ -237,11 +237,11 @@ local function ParseFunction(prefix, func, params)
 				end
 				if spellName then
 					if spellName == API_GetSpellInfo(spellName) then
-						Ovale:DebugPrint("missing_spells", "Learning spell "..tostring(spellName).." with ID "..spellId)
+						Ovale:DebugPrintf("missing_spells", "Learning spell %s with ID %d", spellName, spellId)
 						self_missingSpellList[spellId] = spellName
 					end
 				else
-					Ovale:DebugPrint("unknown_spells", "Unknown spell with ID "..spellId)
+					Ovale:DebugPrintf("unknown_spells", "Unknown spell with ID %d", spellId)
 				end
 			end
 		end
@@ -325,10 +325,10 @@ local function ParseScoreSpells(params)
 	for v in strgmatch(params, "(%d+)") do
 		local spellId = tonumber(v)
 		if spellId then
-			--Ovale:Print("Add spell to score "..spellId)
+			--Ovale:Printf("Add spell to score %d", spellId)
 			OvaleData.scoreSpell[spellId] = true
 		else
-			Ovale:Print("unknown spell "..v)
+			Ovale:Printf("ScoreSpell with unknown spell %s", v)
 		end
 	end
 end
@@ -457,7 +457,7 @@ local function ParseGroup(text)
 	text = strgsub(text, "node%d+", "")
 
 	if (strmatch(text,"[^ ]")) then
-		Ovale:Print("syntax error:"..text)
+		Ovale:Printf("syntax error: %s", text)
 		return nil
 	end
 	
@@ -516,7 +516,7 @@ end
 local function ParseCommands(text)
 	local original = text
 	text = strgsub(text,"(%b[])", ParseLua)
-	while (1==1) do
+	while true do
 		local was = text
 		text = strgsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
 		text = strgsub(text, "(%d+%.?%d*)s", ParseTime)
@@ -529,7 +529,7 @@ local function ParseCommands(text)
 		end
 	end
 	
-	while (1==1) do
+	while true do
 		local was = text
 		text = strgsub(text, "node(%d+)%s*([%>%<]=?)%s*node(%d+)", ParseOp)
 		text = strgsub(text, "node(%d+)%s*(==)%s*node(%d+)", ParseOp)
@@ -539,7 +539,7 @@ local function ParseCommands(text)
 		end
 	end
 		
-	while (1==1) do
+	while true do
 		local was = text
 		text = strgsub(text, "not%s+node(%d+)", ParseNot)
 		text = strgsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
@@ -550,12 +550,12 @@ local function ParseCommands(text)
 		text = strgsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
 		text = strgsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
 		text = strgsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
-		if (was == text) then
+		if was == text then
 			break
 		end
 	end
 
-	while (1==1) do
+	while true do
 		local was = text
 		text = strgsub(text, "not%s+node(%d+)", ParseNot)
 		text = strgsub(text, "node(%d+)%s*([%*%+%-%/%>%<]=?|==)%s*node(%d+)", ParseOp)
@@ -565,12 +565,11 @@ local function ParseCommands(text)
 		text = strgsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
 		text = strgsub(text, "wait%s+node(%d+)",ParseWait)
 		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
-		if (was == text) then
+		if was == text then
 			break
 		end
 	end
 
-		
 	local masterNode
 	if (text) then
 		masterNode = strmatch(text, "node(%d+)")
@@ -582,9 +581,9 @@ local function ParseCommands(text)
 	
 	-- Si il reste autre chose que des espaces, c'est une erreur de syntaxe
 	text = strgsub(text, "node%d+", "", 1)
-	if (strmatch(text,"[^ ]")) then
-		Ovale:Print("Group:"..original)
-		Ovale:Print("syntax error:"..text)
+	if strmatch(text,"[^ ]") then
+		Ovale:Printf("Group: %s", original)
+		Ovale:Printf("syntax error: %s", text)
 		return nil
 	end
 	return masterNode
@@ -608,7 +607,7 @@ local function ParseCanStopChannelling(text)
 	if spellId then
 		OvaleData:GetSpellInfo(spellId).canStopChannelling = true
 	else
-		Ovale:Print("CanStopChannelling with unknown spell "..spellId)
+		Ovale:Printf("CanStopChannelling with unknown spell %s", text)
 	end
 	return ""
 end
@@ -630,7 +629,7 @@ local function ParseSpellName(text)
 	if spell then
 		return '"' .. spell .. '"'
 	else
-		Ovale:Print("SpellName of " .. text .. " unknown")
+		Ovale:Printf("SpellName of %s unknown", text)
 		return nil
 	end
 end

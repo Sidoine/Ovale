@@ -133,7 +133,7 @@ function OvaleState:Reset()
 	self.lastSpellId = OvaleFuture.lastSpellId
 	self.serial = self.serial + 1
 	self.currentTime = self.maintenant
-	Ovale:Log("Reset state with current time = " .. self.currentTime)
+	Ovale:Logf("Reset state with current time = %f", self.currentTime)
 	self.currentSpellId = nil
 	self.attenteFinCast = self.maintenant
 	self.state.combo = OvaleComboPoints.combo
@@ -217,9 +217,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 		self.currentTime = self.maintenant
 	end
 	
-	if Ovale.trace then
-		Ovale:Print("add spell "..spellId.." at "..startCast.." currentTime = "..self.currentTime.. " nextCast="..self.attenteFinCast .. " endCast="..endCast .. " targetGUID = " .. tostring(targetGUID))
-	end
+	Ovale:Logf("add spell %d at %f currentTime = %f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.attenteFinCast, endCast, targetGUID)
 	
 	--Effet du sort au moment du début du cast
 	--(donc si cast déjà commencé, on n'en tient pas compte)
@@ -330,8 +328,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 				if si.buffnocd then
 					local buffStart, buffEnding, buffStacks = self:GetAura("player", si.buffnocd)
 					if buffStart then
-						Ovale:Print("buffnocd stacks = "..tostring(buffStacks).." start="..tostring(buffStart).." ending = "..tostring(buffEnding))
-						Ovale:Print("startCast = "..startCast)
+						Ovale:Logf("buffnocd stacks = %s, start = %s, ending = %s, startCast = %f", buffStacks, buffStart, buffEnding, startCast)
 					end
 					if buffStacks and buffStacks > 0 and buffStart and buffStart <= startCast and (not buffEnding or buffEnding > startCast) then
 						cd.duration = 0
@@ -409,16 +406,16 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 							newAura.mine = true
 
 							if stacks ~= "refresh" and stacks == 0 then
-								Ovale:Log("Aura "..auraSpellId.." is completely removed")
+								Ovale:Logf("Aura %d is completely removed", auraSpellId)
 								newAura.stacks = 0
 								newAura.ending = 0	-- self.currentTime?
 							elseif oldEnding and oldEnding >= endCast then
 								if stacks == "refresh" or stacks > 0 then
 									if stacks == "refresh" then
-										Ovale:Log("Aura "..auraSpellId.." is refreshed")
+										Ovale:Logf("Aura %d is refreshed", auraSpellId)
 										newAura.stacks = oldStacks
 									else -- if stacks > 0
-										Ovale:Log("Aura "..auraSpellId.." gain stacks (ending was " .. tostring(newAura.ending)..")")
+										Ovale:Logf("Aura %d gains stacks (ending was %s)", auraSpellId, newAura.ending)
 										newAura.stacks = oldStacks + stacks
 									end
 									newAura.start = oldStart
@@ -429,13 +426,11 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 									else
 										newAura.ending = endCast + duration
 									end
-									Ovale:Log("Aura "..auraSpellId.." ending is now "..newAura.ending)
+									Ovale:Logf("Aura %d ending is now %f", auraSpellId, newAura.ending)
 								elseif stacks < 0 then
-									Ovale:Log("Aura "..auraSpellId.." loses stacks")
+									Ovale:Logf("Aura %d loses stacks", auraSpellId)
 									newAura.stacks = oldStacks + stacks
-									if Ovale.trace then
-										Ovale:Print("removing one stack of "..auraSpellId.." because of ".. spellId.." to ".. newAura.stacks)
-									end
+									Ovale:Logf("removing one stack of %d because of %d to %d", auraSpellId, spellId, newAura.stacks)
 									newAura.start = oldStart
 									newAura.ending = oldEnding
 									if newAura.stacks <= 0 then
@@ -445,7 +440,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 									end
 								end
 							else
-								Ovale:Log("New aura "..auraSpellId.." at " .. endCast .." on " .. target .. " " .. auraGUID)
+								Ovale:Logf("New aura %d at %f on %s %s", auraSpellId, endCast, target, auraGUID)
 								newAura.stacks = stacks
 								newAura.start = endCast
 								newAura.ending = endCast + duration
@@ -547,10 +542,10 @@ function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		end
 	end
 	if aura then
-		Ovale:Log("Found " .. filter .. " aura " .. spellId .. " on " .. tostring(guid))
+		Ovale:Logf("Found %s aura %s on %s", filter, spellId, guid)
 		return aura.start, aura.ending, aura.stacks, aura.tick, aura.value, aura.gain
 	else
-		Ovale:Log("Aura " .. spellId .. " not found in state for " .. tostring(guid))
+		Ovale:Logf("Aura %s not found in state for %s", spellId, guid)
 		return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
 end

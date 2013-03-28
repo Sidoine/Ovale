@@ -38,31 +38,33 @@ OvaleEnemies.activeEnemies = 0
 --<private-static-methods>
 local function AddEnemy(guid, name, timestamp)
 	if not guid then return end
+	local self = OvaleEnemies
 	local seen = self_enemyLastSeen[guid]
 	self_enemyLastSeen[guid] = timestamp
 	self_enemyName[guid] = name
 	if not seen then
-		OvaleEnemies.activeEnemies = OvaleEnemies.activeEnemies + 1
-		Ovale:DebugPrint("enemy", "New enemy (" .. OvaleEnemies.activeEnemies .. " total): " .. guid .. "(" .. tostring(name) .. ")")
+		self.activeEnemies = self.activeEnemies + 1
+		Ovale:DebugPrintf("enemy", "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
 		Ovale.refreshNeeded["player"] = true
 	end
 end
 
 local function RemoveEnemy(guid, isDead)
 	if not guid then return end
+	local self = OvaleEnemies
 	local seen = self_enemyLastSeen[guid]
 	local name = self_enemyName[guid]
 	self_enemyLastSeen[guid] = nil
 	if seen then
-		if OvaleEnemies.activeEnemies > 0 then
-			OvaleEnemies.activeEnemies = OvaleEnemies.activeEnemies - 1
+		if self.activeEnemies > 0 then
+			self.activeEnemies = self.activeEnemies - 1
 		end
 		if isDead then
-			Ovale:DebugPrint("enemy", "Enemy died (" .. OvaleEnemies.activeEnemies .. " total): " .. guid .. " (" .. tostring(name) .. ")")
+			Ovale:DebugPrintf("enemy", "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
 		else
-			Ovale:DebugPrint("enemy", "Enemy removed: (" .. OvaleEnemies.activeEnemies .. " total): " .. guid .. " (" .. tostring(name) .. "), last seen at " .. seen)
+			Ovale:DebugPrintf("enemy", "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
 		end
-		OvaleEnemies:SendMessage("Ovale_InactiveUnit", guid)
+		self:SendMessage("Ovale_InactiveUnit", guid)
 		Ovale.refreshNeeded["player"] = true
 	end
 end
@@ -122,7 +124,7 @@ end
 
 function OvaleEnemies:Debug()
 	for guid, timestamp in pairs(self_enemyLastSeen) do
-		Ovale:Print("enemy " .. guid .. " (" .. tostring(self_enemyName[guid]) .. ") last seen at " .. timestamp)
+		Ovale:Printf("enemy %s (%s) last seen at %f", guid, self_enemyName[guid], timestamp)
 	end	
 end
 --</public-static-methods>

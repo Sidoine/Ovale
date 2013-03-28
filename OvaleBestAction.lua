@@ -45,14 +45,6 @@ local OVALE_DEFAULT_PRIORITY = 3
 --</private-static-properties>
 
 --<private-static-methods>
-local function printTime(temps)
-	if (temps == nil) then
-		Ovale:Print("> nil")
-	else
-		Ovale:Print("> "..temps)
-	end
-end
-
 local function addTime(time1, duration)
 	if not time1 then
 		return nil
@@ -116,15 +108,15 @@ local function ComputeAfter(element)
 end
 
 local function ComputeAnd(element)
-	Ovale:Log(element.type .. " [" .. element.nodeId .. "]")
+	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
 	local startA, endA, priorityA, elementA = self:ComputeBool(element.a)
 	if not startA then
-		Ovale:Log(element.type .. " return nil  [" .. element.nodeId .. "]")
+		Ovale:Logf("%s return nil [%d]", element.type, element.nodeId)
 		return nil
 	end
 	if startA == endA then
-		Ovale:Log(element.type .. " return startA=endA  [" .. element.nodeId .. "]")
+		Ovale:Logf("%s return startA=endA [%d]", element.type, element.nodeId)
 		return nil
 	end
 	local startB, endB, prioriteB, elementB
@@ -138,7 +130,7 @@ local function ComputeAnd(element)
 		elementB.wait = nil
 	end
 	if isAfter(startB, endA) or isAfter(startA, endB) then
-		Ovale:Log(element.type .. " return nil [" .. element.nodeId .. "]")
+		Ovale:Logf("%s return nil [%d]", element.type, element.nodeId)
 		return nil
 	end
 	if isBefore(startB, startA) then
@@ -147,7 +139,7 @@ local function ComputeAnd(element)
 	if isAfter(endB, endA) then
 		endB = endA
 	end
-	Ovale:Log(element.type .. " return " .. tostring(startB) .. "," .. tostring(endB) .. " [" .. element.nodeId .. "]")
+	Ovale:Logf("%s return %s, %s [%d]", element.type, startB, endB, element.nodeId)
 	return startB, endB, prioriteB, elementB
 end
 
@@ -164,11 +156,11 @@ local function ComputeBetween(element)
 	local tempsA = self:Compute(element.a)
 	local tempsB = self:Compute(element.b)
 	if not tempsA and not tempsB then
-		Ovale:Log("diff returns 0 because the two nodes are nil")
+		Ovale:Logf("%s returns 0 because the two nodes are nil", element.type)
 		return 0
 	end
 	if not tempsA or not tempsB then
-		Ovale:Log(element.type .. " return nil")
+		Ovale:Logf("%s return nil", element.type)
 		return nil
 	end
 	local diff
@@ -177,27 +169,27 @@ local function ComputeBetween(element)
 	else
 		diff = tempsB - tempsA
 	end
-	Ovale:Log("diff returns "..diff)
+	Ovale:Logf("%s returns %f", element.type, diff)
 	return diff
 end
 
 local function ComputeCompare(element)
-	Ovale:Log("compare " .. element.comparison)
+	Ovale:Logf("compare %s", element.comparison)
 	local self = OvaleBestAction
 	local tempsA = self:Compute(element.a)
 	local timeB = self:Compute(element.time)
-	Ovale:Log(tostring(tempsA) .. " " .. element.comparison .. " " .. tostring(timeB))
+	Ovale:Logf("%s %s %s", tempsA, element.comparison, timeB)
 	if element.comparison == "more" and (not tempsA or tempsA > timeB) then
-		Ovale:Log(element.type .. " return 0")
+		Ovale:Logf("%s return 0", element.type)
 		return 0
 	elseif element.comparison == "less" and tempsA and tempsA < timeB then
-		Ovale:Log(element.type .. " return 0")
+		Ovale:Logf("%s return 0", element.type)
 		return 0
 	elseif element.comparison == "at most" and tempsA and tempsA <= timeB then
-		Ovale:Log(element.type .. " return 0")
+		Ovale:Logf("%s return 0", element.type)
 		return 0
 	elseif element.comparison == "at least" and (not tempsA or tempsA >= timeB) then
-		Ovale:Log(element.type .. " return 0")
+		Ovale:Logf("%s return 0", element.type)
 		return 0
 	end
 	return nil
@@ -208,15 +200,15 @@ local function ComputeFromUntil(element)
 	local self = OvaleBestAction
 	local tempsA = self:Compute(element.a)
 	if not tempsA then
-		Ovale:Log(element.type .. " return nil")
+		Ovale:Logf("%s return nil", element.type)
 		return nil
 	end
 	local tempsB = self:Compute(element.b)
 	if not tempsB then
-		Ovale:Log(element.type .. " return nil")
+		Ovale:Logf("%s return nil", element.type)
 		return nil
 	end
-	Ovale:Log("fromuntil returns " .. (tempsB - tempsA))
+	Ovale:Logf("%s returns %f", element.type, tempsB - tempsA)
 	return tempsB - tempsA
 end
 
@@ -228,11 +220,11 @@ local function ComputeFunction(element)
 			actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
 
 		if not actionTexture then
-			Ovale:Log("Action "..element.params[1].." not found")
+			Ovale:Logf("Action %s not found", element.params[1])
 			return nil
 		end
 		if element.params.usable == 1 and not actionUsable then
-			Ovale:Log("Action "..element.params[1].." not usable")
+			Ovale:Logf("Action %s not usable", element.params[1])
 			return nil
 		end
 		if spellId and OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].casttime then
@@ -249,7 +241,7 @@ local function ComputeFunction(element)
 		end
 		--TODO: not useful anymore?
 		if spellId and OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].toggle and actionIsCurrent then
-			Ovale:Log("Action "..element.params[1].." is current action")
+			Ovale:Logf("Action %s is current action", element.params[1])
 			return nil
 		end
 		if actionEnable and actionEnable > 0 then
@@ -259,7 +251,7 @@ local function ComputeFunction(element)
 			else
 				remaining = actionCooldownDuration + actionCooldownStart
 			end
-			Ovale:Log("remaining = " .. remaining .. " attenteFinCast=" .. tostring(OvaleState.attenteFinCast))
+			Ovale:Logf("remaining=%f attenteFinCast=%s", remaining, OvaleState.attenteFinCast)
 			if remaining < OvaleState.attenteFinCast then
 				if	not OvaleData.spellInfo[OvaleState.currentSpellId] or
 						not OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling then
@@ -267,11 +259,10 @@ local function ComputeFunction(element)
 				else
 					--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
 					--ça tombera entre deux ticks
-					local ticks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling + 0.5)
-					local tickLength = (OvaleState.attenteFinCast - OvaleState.startCast) / ticks
-					local tickTime = OvaleState.startCast + tickLength
-					Ovale:Log(spellId .. " remaining = " .. remaining)
-					Ovale:Log("ticks = "..ticks.." tickLength="..tickLength.." tickTime="..tickTime)
+					local numTicks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * OvaleData.spellInfo[OvaleState.currentSpellId].canStopChannelling + 0.5)
+					local tick = (OvaleState.attenteFinCast - OvaleState.startCast) / numTicks
+					local tickTime = OvaleState.startCast + tick
+					Ovale:Logf("%s remaining=%f", spellId, remaining)
 					for i=1, ticks do
 						if remaining <= tickTime then
 							remaining = tickTime
@@ -279,30 +270,30 @@ local function ComputeFunction(element)
 						end
 						tickTime = tickTime + tickLength
 					end
-					Ovale:Log(spellId .. " remaining = " .. remaining)
+					Ovale:Logf("%s remaining=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, remaining, numTicks, tick, tickTime)
 				end
 			end
-			Ovale:Log("Action "..element.params[1].." remains "..remaining)
+			Ovale:Logf("Action %s remains %f", element.params[1], remaining)
 			local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
 			return remaining, nil, priority, element
 		else
-			Ovale:Log("Action "..element.params[1].." not enabled")
+			Ovale:Logf("Action %s not enabled", element.params[1])
 		end
 	else
 		local condition = OvaleCondition.conditions[element.func]
 		if not condition then
-			Ovale.bug = true
-			Ovale:Print("Function "..element.func.." not found")
+			Ovale:Errorf("Function %s not found", element.func)
 			return nil
 		end
 		local start, ending, value, origin, rate = condition(element.params)
 
 		if Ovale.trace then
-			local parameterList = element.func.."("
-			for k,v in pairs(element.params) do
-				parameterList = parameterList..k.."="..v..","
+			local conditionCall = element.func .. "("
+			for k, v in pairs(element.params) do
+				conditionCall = parameterList .. k .. "=" .. v .. ","
 			end
-			Ovale:Print("Function "..parameterList..") returned "..tostring(start)..","..tostring(ending)..","..tostring(value)..","..tostring(origin)..","..tostring(rate))
+			conditionCall = conditionCall .. ")"
+			Ovale:Printf("Condition %s returned %s, %s, %s, %s, %s", conditionCall, start, ending, value, origin, rate)
 		end
 
 		if value then
@@ -322,7 +313,7 @@ local function ComputeGroup(element)
 	local bestElement
 	local bestCastTime
 
-	Ovale:Log(element.type .. " [" .. element.nodeId .. "]")
+	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 
 	if #element.nodes == 1 then
 		return self:Compute(element.nodes[1])
@@ -352,7 +343,7 @@ local function ComputeGroup(element)
 				-- Maximum time between the best spell and the current spell.
 				local maxDiff
 				if priority and not bestPriority then
-					Ovale:Error("Internal error: bestPriority=nil and priority=" .. priority)
+					Ovale:Errorf("Internal error: bestPriority=nil and priority=%d", priority)
 					return nil
 				elseif priority and priority > bestPriority then
 					-- Si le nouveau sort est plus prioritaire que le précédent, on le lance
@@ -391,16 +382,16 @@ local function ComputeGroup(element)
 		if bestElement.params then
 			id = bestElement.params[1]
 		end
-		Ovale:Log("group best action " .. tostring(id) .. " remains " .. bestStart .. "," .. tostring(bestEnding) .. " [" .. element.nodeId .. "]")
+		Ovale:Logf("group best action %s remains %s, %s [%d]", id, bestStart, bestEnding, element.nodeId)
 	else
-		Ovale:Log("group no best action returns " .. bestStart .. "," .. tostring(bestEnding) .. " [" .. element.nodeId .. "]")
+		Ovale:Logf("group no best action returns %s, %s [%d]", bestStart, bestEnding, element.nodeId)
 	end
 	return bestStart, bestEnding, bestPriority, bestElement
 end
 
 local function ComputeLua(element)
 	local ret = loadstring(element.lua)()
-	Ovale:Log("lua "..tostring(ret))
+	Ovale:Logf("lua %s", ret)
 	return 0, nil, OVALE_DEFAULT_PRIORITY, PutValue(element, ret, 0, 0)
 end
 
@@ -444,7 +435,7 @@ local function ComputeOperator(element)
 	local startA, endA, prioA, elementA = self:Compute(element.a)
 	local startB, endB, prioB, elementB = self:Compute(element.b)
 	if not elementA or not elementB then
-		Ovale:Log("operator " .. element.operator .. ": elementA or elementB is nil")
+		Ovale:Logf("operator %s: elementA or elementB is nil", element.operator)
 		return nil
 	end
 
@@ -490,11 +481,11 @@ local function ComputeOperator(element)
 	end
 
 	if not a or not x or not b or not y then
-		Ovale:Log("operator " .. element.operator .. ": a or x is nil")
+		Ovale:Logf("operator %s: a or x is nil", element.operator)
 		return nil
 	end
 
-	Ovale:Log(a .. "+(t-" .. b .. ")*" .. c .. " " .. element.operator .. " " .. x .. "+(t-" .. y .. ")*" .. z)
+	Ovale:Logf("%f+(t-%f)*%f %s %f+(t-%f)*%f", a, b, c, element.operator, x, y, z)
 
 	-- result(t) = l + (t - m) * n
 	local l, m, n
@@ -620,7 +611,7 @@ local function ComputeOperator(element)
 		end
 	end
 
-	Ovale:Log("result = " .. tostring(l) .. "+(t-" .. tostring(m) .. ")*" .. tostring(n))
+	Ovale:Logf("result = %f+(t-%f)*%f", l, m, n)
 	return startA, endA, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
 end
 
@@ -639,11 +630,11 @@ local function ComputeUnless(element)
 	end
 
 	if isBeforeEqual(startA, startB) and isAfterEqual(endA, endB) then
-		Ovale:Log(element.type .. " return nil")
+		Ovale:Logf("%s return nil", element.type)
 		return nil
 	end
 	if isAfterEqual(startA, startB) and isBefore(endA, endB) then
-		Ovale:Log(element.type .. " return " .. tostring(endA) .. "," .. tostring(endB))
+		Ovale:Logf("%s return %s, %s", element.type, endA, endB)
 		return endA, endB, prioriteB, elementB
 	end
 	if isAfter(startA, startB) and isBefore(startA, endB) then
@@ -652,22 +643,22 @@ local function ComputeUnless(element)
 	if isAfter(endA, startB) and isBefore(endA, endB) then
 		startB = endA
 	end
-	Ovale:Log(element.type .. " return " .. tostring(startB) .. "," .. tostring(endB))
+	Ovale:Logf("%s return %s, %s", element.type, startB, endB)
 	return startB, endB, prioriteB, elementB
 end
 
 local function ComputeValue(element)
-	Ovale:Log("value " .. element.value)
+	Ovale:Logf("value %s", element.value)
 	return 0, nil, OVALE_DEFAULT_PRIORITY, element
 end
 
 local function ComputeWait(element)
-	Ovale:Log(element.type .. " [" .. element.nodeId .. "]")
+	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
 	local startA, endA, prioriteA, elementA = self:Compute(element.a)
 	if elementA then
 		elementA.wait = true
-		Ovale:Log(element.type .. " return " .. tostring(startA) .. "," .. tostring(endA) .. " [" .. element.nodeId .. "]")
+		Ovale:Logf("%s return %s, %s [%d]", element.type, startA, endA, element.nodeId)
 	end
 	return startA, endA, prioriteA, elementA
 end
@@ -720,13 +711,13 @@ function OvaleBestAction:GetActionInfo(element)
 	if (element.func == "spell" ) then
 		action = OvaleActionBar:GetForSpell(spellId)
 		if not OvaleData.spellList[spellId] and not action then
-			Ovale:Log("Spell "..spellId.." not learnt")
+			Ovale:Logf("Spell %s not learnt", spellId)
 			return nil
 		end
 
 		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(spellId)
 		if not actionCooldownStart or not actionCooldownDuration then
-			Ovale:DebugPrint("unknown_spells", "No cooldown data for spell "..spellId)
+			Ovale:DebugPrintf("unknown_spells", "No cooldown data for spell %s\n", spellId)
 		end
 
 		local si = OvaleData.spellInfo[spellId]
@@ -767,7 +758,7 @@ function OvaleBestAction:GetActionInfo(element)
 			actionShortcut = OvaleActionBar:GetBinding(action)
 			actionIsCurrent = API_IsCurrentAction(action)
 		else
-			Ovale:Log("Unknown macro "..element.params[1])
+			Ovale:Logf("Unknown macro %s", element.params[1])
 		end
 	elseif (element.func=="item") then
 		local itemId = element.params[1]
@@ -778,7 +769,7 @@ function OvaleBestAction:GetActionInfo(element)
 			return nil
 		end
 
-		Ovale:Log("Item "..tostring(itemId))
+		Ovale:Logf("Item %s", itemId)
 
 		local spellName = API_GetItemSpell(itemId)
 		actionUsable = (spellName~=nil)
@@ -824,7 +815,7 @@ function OvaleBestAction:Compute(element)
 		return visitor(element)
 	end
 
-	Ovale:Log("unknown element " .. element.type .. ", return nil")
+	Ovale:Logf("unknown element %s, return nil", element.type)
 	return nil
 end
 

@@ -49,12 +49,12 @@ function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
 	elseif (slot) then
 	-- on reçoit aussi si c'est une macro avec mouseover à chaque fois que la souris passe sur une cible!
 		self:FillActionIndex(tonumber(slot))
-		Ovale:DebugPrint("action_bar", "Mapping button " ..tonumber(slot).." to spell/macro")
+		Ovale:DebugPrintf("action_bar", "Mapping button %s to spell/macro", slot)
 	end
 end
 
 function OvaleActionBar:FillActionIndexes(event)
-	Ovale:DebugPrint("action_bar", "Mapping buttons to spells/macros for " ..event)
+	Ovale:DebugPrintf("action_bar", "Mapping buttons to spells/macros for %s", event)
 	wipe(self_actionSpell)
 	wipe(self_actionMacro)
 	wipe(self_actionItem)

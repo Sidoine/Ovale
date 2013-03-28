@@ -57,6 +57,6 @@ function OvalePool:Drain()
 end
 
 function OvalePool:Debug()
-	Ovale:Print("Pool " .. tostring(self.name) .. " has size " .. self.size .. " with " .. self.unused .. " item(s).")
+	Ovale:Printf("Pool %s has size %d with %d item(s).", self.name, self.size, self.unused)
 end
 --</public-static-methods>

@@ -129,7 +129,7 @@ end
 local function RemoveAurasForGUID(guid)
 	-- Return all auras for the given GUID to the aura pool.
 	if not guid or not self_aura[guid] then return end
-	Ovale:DebugPrint("aura", "Removing auras for guid " .. guid)
+	Ovale:DebugPrintf("aura", "Removing auras for guid %s", guid)
 	for filter, auraList in pairs(self_aura[guid]) do
 		for spellId, whoseTable in pairs(auraList) do
 			for whose, aura in pairs(whoseTable) do
@@ -205,7 +205,7 @@ function UpdateAuras(unitId, unitGUID)
 		for spellId, whoseTable in pairs(auraList) do
 			for whose, aura in pairs(whoseTable) do
 				if aura.serial ~= self_serial then
-					Ovale:DebugPrint("aura", "Removing " ..filter.. " " ..aura.name.. " from " ..whose.. ", serial = " ..self_serial.. " aura.serial = " ..aura.serial)
+					Ovale:DebugPrintf("aura", "Removing %s %s from %s, serial=%d aura.serial=%d", filter, aura.name, whose, self_serial, aura.serial)
 					whoseTable[whose] = nil
 					self_pool:Release(aura)
 				end
@@ -276,7 +276,7 @@ end
 
 function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	if not guid then
-		Ovale:Log(tostring(guid) .. " does not exists in OvaleAura")
+		Ovale:Log("nil guid does not exist in OvaleAura")
 		return nil
 	end
 
@@ -286,14 +286,14 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 			unitId = OvaleGUID:GetUnitId(guid)
 		end
 		if not unitId then
-			Ovale:Log("Unable to get unitId from " .. tostring(guid))
+			Ovale:Logf("Unable to get unitId from %s", guid)
 			return nil
 		end
 		UpdateAuras(unitId, guid)
 		auraTable = self_aura[guid]
 		if not auraTable then
 			-- no aura on target
-			Ovale:Log("Target " .. guid .. " has no aura")
+			Ovale:Logf("Target %s has no aura", guid)
 			return nil
 		end
 	end
@@ -438,7 +438,7 @@ function OvaleAura:Debug()
 		for filter, auraList in pairs(auraTable) do
 			for spellId, whoseTable in pairs(auraList) do
 				for whose, aura in pairs(whoseTable) do
-					Ovale:Print(guid.. " " ..filter.. " " ..whose.. " " ..spellId.. " " ..aura.name.. " stacks=" ..aura.stacks.. " tick=" ..tostring(aura.tick))
+					Ovale:Printf("%s %s %s %s %s stacks=%d tick=%s", guid, filter, whose, spellId, aura.name, aura.stacks, aura.tick)
 				end
 			end
 		end

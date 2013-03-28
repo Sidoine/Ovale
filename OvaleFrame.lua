@@ -179,13 +179,11 @@ do
 			OvaleCondition.defaultTarget = target
 
 			if forceRefresh or Ovale.refreshNeeded[target] or Ovale.refreshNeeded["player"] or Ovale.refreshNeeded["pet"] then
-				if Ovale.trace then
-					Ovale:Print("****Master Node "..k)
-				end
+				Ovale:Logf("****Master Node %d", k)
 				OvaleBestAction:StartNewAction()
 				local start, ending, priorite, element = OvaleBestAction:Compute(node)
 				if start then
-					Ovale:Log("Compute start = "..start)
+					Ovale:Logf("Compute start = %f", start)
 				end
 				local action = self.actions[k]
 				local icons
@@ -265,9 +263,7 @@ do
 							else
 								nextCast = start + gcd
 							end
-							if Ovale.trace then
-								Ovale:Print("****Second icon " .. start)
-							end
+							Ovale:Logf("****Second icon %f", start)
 							local spellTarget
 							if element then
 								spellTarget = element.params.target
