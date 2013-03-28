@@ -577,11 +577,21 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, combo)
 	return damage
 end
 
-function OvaleData:GetDuration(spellId, spellHasteMultiplier, combo, holy)
-	local si = self.spellInfo[spellId]
+function OvaleData:GetDuration(spellId, combo, holy)
+	local si
+	if type(spellId) == "number" then
+		si = self.spellInfo[spellId]
+	elseif OvaleData.buffSpellList[spellId] then
+		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
+			si = self.spellInfo[v]
+			if si then
+				spellId = v
+				break
+			end
+		end
+	end
 	if si and si.duration then
 		local duration = si.duration
-		spellHasteMultiplier = spellHasteMultiplier or 1
 		combo = combo or 0
 		holy = holy or 1
 		if si.adddurationcp then
@@ -592,7 +602,7 @@ function OvaleData:GetDuration(spellId, spellHasteMultiplier, combo, holy)
 		end
 		if si.tick then	-- DoT
 			--DoT duration is tickLength * numberOfTicks.
-			local tickLength = self:GetTickLength(spellId, spellHasteMultiplier)
+			local tickLength = self:GetTickLength(spellId)
 			local numTicks = floor(duration / tickLength + 0.5)
 			duration = tickLength * numTicks
 			return duration, tickLength
@@ -603,13 +613,28 @@ function OvaleData:GetDuration(spellId, spellHasteMultiplier, combo, holy)
 	end
 end
 
-function OvaleData:GetTickLength(spellId, spellHasteMultiplier)
-	local si = self.spellInfo[spellId]
+function OvaleData:GetTickLength(spellId)
+	local si
+	if type(spellId) == "number" then
+		si = self.spellInfo[spellId]
+	elseif OvaleData.buffSpellList[spellId] then
+		for _, spellId in pairs(OvaleData.buffSpellList[spellId]) do
+			si = self.spellInfo[spellId]
+			if si then break end
+		end
+	end
 	if si then
 		local tick = si.tick or 3
-		spellHasteMultiplier = spellHasteMultiplier or 1
-		if si.haste == "spell" then
-			return tick / spellHasteMultiplier
+		local hasteMultiplier = 1
+		if si.haste then
+			if si.haste == "spell" then
+				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+			elseif si.haste == "melee" then
+				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
+			end
+		end
+		if si.haste then
+			return tick / hasteMultiplier
 		else
 			return tick
 		end

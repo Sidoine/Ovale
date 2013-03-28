@@ -310,8 +310,8 @@ local function getMine(condition)
 	return true
 end
 
--- Recherche un aura sur la cible et récupère sa durée et le nombre de stacks
--- return start, ending, stacks, spellHasteMultiplier
+-- Front-end for OvaleState:GetAura() using condition parameters.
+-- return start, ending, stacks, tick, value, gain
 local function GetAura(condition)
 	local unitId = getTarget(condition)
 	local spellId = condition[1]
@@ -320,21 +320,21 @@ local function GetAura(condition)
 
 	if not spellId then
 		Ovale:Log("GetAura: nil spellId")
-		return 0, 0, 0, 0, 0, 0
+		return nil
 	end
-	local start, ending, stacks, spellHasteMultiplier, value, gain = OvaleState:GetAura(unitId, spellId, filter, mine)
+	local start, ending, stacks, tick, value, gain = OvaleState:GetAura(unitId, spellId, filter, mine)
 
 	if not start then
 		Ovale:Log("GetAura: aura " .. tostring(spellId) .. " not found on " .. unitId .. " filter=" .. tostring(filter) .. " mine=" .. tostring(mine))
-		return 0, 0, 0, 0, 0, 0
+		return nil
 	end
 	local conditionStacks = condition.stacks or 1
 	if stacks and stacks < conditionStacks then
 		Ovale:Log("GetAura: aura " .. tostring(spellId) .. " found on " .. unitId .. " but stacks " .. stacks .. " < " .. conditionStacks)
-		return 0, 0, 0, 0, 0, 0
+		return nil
 	end
 	Ovale:Log("GetAura: aura " .. tostring(spellId) .. " found on " .. unitId .. " start=" .. tostring(start) .. " ending=" .. tostring(ending) .. " stacks=" .. tostring(stacks) .. "/" .. conditionStacks)
-	return start, ending, stacks, spellHasteMultiplier, value, gain
+	return start, ending, stacks, tick, value, gain
 end
 
 -- Returns:
@@ -562,10 +562,13 @@ OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduratio
 
 OvaleCondition.conditions.buffexpires = function(condition)
 	local start, ending = GetAura(condition)
+	if not start then
+		ending = 0
+	end
 	local timeBefore = avecHate(condition[2], condition.haste)
 	if Ovale.trace then
 		Ovale:Print("timeBefore = " .. tostring(timeBefore))
-		Ovale:Print("start = " .. tostring(ending))
+		Ovale:Print("ending = " .. tostring(ending))
 	end
 	return addTime(ending, -timeBefore)
 end
@@ -635,6 +638,9 @@ OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
 
 OvaleCondition.conditions.buffpresent = function(condition)
 	local start, ending = GetAura(condition)
+	if not start then
+		start, ending = 0, 0
+	end
 	local timeBefore = avecHate(condition[2], condition.haste)
 	return start, addTime(ending, -timeBefore)
 end
@@ -660,6 +666,7 @@ OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 
 OvaleCondition.conditions.buffstacks = function(condition)
 	local start, ending, stacks = GetAura(condition)
+	stacks = stacks or 0
 	return start, ending, stacks, 0, 0
 end
 OvaleCondition.conditions.debuffstacks = OvaleCondition.conditions.buffstacks
@@ -1957,7 +1964,7 @@ end
 --- Get the number of seconds until the next tick of a periodic aura on the target.
 -- @name NextTick
 -- @paramsig number
--- @param id The aura spell ID.
+-- @param id The spell ID of the aura or the name of a spell list.
 -- @param filter Optional. The type of aura to check.
 --     Default is any.
 --     Valid values: any, buff, debuff
@@ -1968,11 +1975,10 @@ end
 -- @see Ticks, TicksRemain, TickTime
 
 OvaleCondition.conditions.nexttick = function(condition)
-	local start, ending, _, spellHasteMultiplier = GetAura(condition)
-	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
-	if ending and tickLength then
-		while ending - tickLength > OvaleState.currentTime do
-			ending = ending - tickLength
+	local start, ending, _, tick = GetAura(condition)
+	if ending and tick then
+		while ending - tick > OvaleState.currentTime do
+			ending = ending - tick
 		end
 		return 0, nil, 0, ending, -1
 	end
@@ -2512,7 +2518,7 @@ end
 --- Get the current tick value of a periodic aura on the target.
 -- @name TickValue
 -- @paramsig number or boolean
--- @param id The aura spell ID.
+-- @param id The spell ID of the aura or the name of a spell list.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param filter Optional. The type of aura to check.
 --     Default is any.
@@ -2536,7 +2542,7 @@ end
 --- Get the estimated total number of ticks of a periodic aura.
 -- @name Ticks
 -- @paramsig number or boolean
--- @param id The aura spell ID.
+-- @param id The spell ID of the aura or the name of a spell list.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of ticks.
@@ -2544,14 +2550,25 @@ end
 -- @see NextTick, TicksRemain, TickTime
 
 OvaleCondition.conditions.ticks = function(condition)
-	-- TODO: extend to allow checking an existing DoT (how to get DoT duration?)
-	local spellId = condition[1]
-	local duration, tickLength = OvaleData:GetDuration(spellId, OvalePaperDoll:GetSpellHasteMultiplier(), OvaleState.state.combo, OvaleState.state.holy)
-	if tickLength then
-		local numTicks = floor(duration / tickLength + 0.5)
-		return compare(numTicks, condition[2], condition[3])
+	local start, ending, _, tick = GetAura(condition)
+	local duration, numTicks
+	if start then
+		-- Aura exists on the target
+		if ending and tick and tick > 0 then
+			duration = ending - start
+			numTicks = floor(duration / tick + 0.5)
+		end
+	else
+		duration, tick = OvaleData:GetDuration(condition[1], OvaleState.state.combo, OvaleState.state.holy)
+		if duration and tick and tick > 0 then
+			numTicks = floor(duration / tick + 0.5)
+		end
 	end
-	return nil
+	if numTicks then
+		return compare(numTicks, condition[2], condition[3])
+	else
+		return nil
+	end
 end
 
 --- Get the number of ticks that would be added if the dot is refreshed.
@@ -2568,7 +2585,7 @@ end
 --- Get the remaining number of ticks of a periodic aura on a target.
 -- @name TicksRemain
 -- @paramsig number
--- @param id The aura spell ID.
+-- @param id The spell ID of the aura or the name of a spell list.
 -- @param filter Optional. The type of aura to check.
 --     Default is any.
 --     Valid values: any, buff, debuff
@@ -2582,10 +2599,9 @@ end
 --     Spell(shadow_word_pain)
 
 OvaleCondition.conditions.ticksremain = function(condition)
-	local start, ending, _, spellHasteMultiplier = GetAura(condition)
-	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
-	if ending and tickLength then
-		return 0, nil, 1, ending, -1/tickLength
+	local start, ending, _, tick = GetAura(condition)
+	if ending and tick and tick > 0 then
+		return 0, nil, 1, ending, -1/tick
 	end
 	return nil
 end
@@ -2593,7 +2609,7 @@ end
 --- Get the number of seconds between ticks of a periodic aura on a target.
 -- @name TickTime
 -- @paramsig number or boolean
--- @param id The aura spell ID.
+-- @param id The spell ID of the aura or the name of a spell list.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
 -- @param filter Optional. The type of aura to check.
@@ -2607,15 +2623,15 @@ end
 -- @see NextTick, Ticks, TicksRemain
 
 OvaleCondition.conditions.ticktime = function(condition)
-	local start, ending, _, spellHasteMultiplier = GetAura(condition)
-	if not start or not ending or start > OvaleState.currentTime or ending < OvaleState.currentTime then
-		spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+	local start, ending, _, tick = GetAura(condition)
+	if not tick then
+		tick = OvaleData:GetTickLength(condition[1])
 	end
-	local tickLength = OvaleData:GetTickLength(condition[1], spellHasteMultiplier)
-	if tickLength then
-		return compare(tickLength, condition[2], condition[3])
+	if tick then
+		return compare(tick, condition[2], condition[3])
+	else
+		return nil
 	end
-	return nil
 end
 
 --- Get the number of seconds elapsed since the player entered combat.

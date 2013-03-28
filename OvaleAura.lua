@@ -26,7 +26,6 @@ local select = select
 local strfind = string.find
 local tinsert = table.insert
 local tsort = table.sort
-local API_IsHarmfulSpell = IsHarmfulSpell
 local API_UnitAura = UnitAura
 
 local self_pool = OvalePool:NewPool("OvaleAura_pool")
@@ -48,21 +47,25 @@ local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuf
 	-- Re-use existing aura by updating its serial number and adding new information
 	-- if it differs from the old aura.
 	local mine = (unitCaster == "player")
-	local aura
+	local aura, oldAura
 	if mine then
-		if not auraList[spellId].mine then
+		oldAura = auraList[spellId].mine
+		if oldAura then
+			aura = oldAura
+		else
 			aura = self_pool:Get()
 			aura.gain = Ovale.now
 			auraList[spellId].mine = aura
 		end
-		aura = auraList[spellId].mine
 	else
-		if not auraList[spellId].other then
+		oldAura = auraList[spellId].other
+		if oldAura then
+			aura = oldAura
+		else
 			aura = self_pool:Get()
 			aura.gain = Ovale.now
 			auraList[spellId].other = aura
 		end
-		aura = auraList[spellId].other
 	end
 
 	aura.serial = self_serial
@@ -70,7 +73,8 @@ local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuf
 		count = 1
 	end
 
-	if not aura.ending or aura.ending < expirationTime or aura.stacks ~= count then
+	local isSameAura = oldAura and oldAura.duration == duration and oldAura.ending == expirationTime and oldAura.stacks == count
+	if not isSameAura and not aura.ending or aura.ending < expirationTime or aura.stacks ~= count then
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
@@ -87,6 +91,13 @@ local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuf
 		aura.source = unitCaster
 		aura.name = name
 		aura.value = value
+		if mine then
+			-- This is a new or refreshed aura applied by the player, so set the tick information if needed.
+			local si = OvaleData.spellInfo[spellId]
+			if si and si.tick then
+				aura.tick = OvaleData:GetTickLength(spellId)
+			end
+		end
 	end
 end
 
@@ -224,23 +235,10 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		RemoveAurasForGUID(destGUID)
 	elseif strfind(event, "SPELL_AURA_") == 1 then
 		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
-		local spellId, spellName, spellSchool, auraType = select(12, ...)
-
 		-- Only update for "*target" unit IDs.  All others are handled by UNIT_AURA event handler.
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		if unitId and unitId ~= "target" and strfind(unitId, "target") then
 			UpdateAuras(unitId, destGUID)
-		end
-
-		if sourceGUID == OvaleGUID:GetGUID("player") and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" or event == "SPELL_AURA_APPLIED_DOSE") then
-			local filter = "HELPFUL"
-			if API_IsHarmfulSpell(spellName) then
-				filter = "HARMFUL"
-			end
-			if self:GetAuraByGUID(destGUID, spellId, filter, true) then
-				local aura = self_aura[destGUID][filter][spellId].mine
-				aura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
-			end
 		end
 	end
 end
@@ -313,7 +311,7 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		end
 	end
 	if not aura then return nil end
-	return aura.start, aura.ending, aura.stacks, aura.spellHasteMultiplier, aura.value, aura.gain
+	return aura.start, aura.ending, aura.stacks, aura.tick, aura.value, aura.gain
 end
 
 function OvaleAura:GetAura(unitId, spellId, filter, mine)
@@ -321,19 +319,19 @@ function OvaleAura:GetAura(unitId, spellId, filter, mine)
 	if type(spellId) == "number" then
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	elseif OvaleData.buffSpellList[spellId] then
-		local newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		local newStart, newEnding, newStacks, newTick, newValue, newGain
 		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-			local start, ending, stacks, spellHasteMultiplier, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
+			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
 			if start and (not newStart or stacks > newStacks) then
 				newStart = start
 				newEnding = ending
 				newStacks = stacks
-				newSpellHasteMultiplier = spellHasteMultiplier
+				newTick = tick
 				newValue = value
 				newGain = gain
 			end
 		end
-		return newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		return newStart, newEnding, newStacks, newTick, newValue, newGain
 	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
@@ -426,7 +424,7 @@ function OvaleAura:Debug()
 		for filter, auraList in pairs(auraTable) do
 			for spellId, whoseTable in pairs(auraList) do
 				for whose, aura in pairs(whoseTable) do
-					Ovale:Print(guid.. " " ..filter.. " " ..whose.. " " ..spellId.. " " ..aura.name.. " stacks=" ..aura.stacks)
+					Ovale:Print(guid.. " " ..filter.. " " ..whose.. " " ..spellId.. " " ..aura.name.. " stacks=" ..aura.stacks.. " tick=" ..tostring(aura.tick))
 				end
 			end
 		end

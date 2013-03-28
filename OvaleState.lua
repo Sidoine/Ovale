@@ -395,7 +395,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 
 							-- Set the duration to the proper length if it's a DoT.
 							if auraSpellInfo and auraSpellInfo.duration then
-								duration = OvaleData:GetDuration(auraSpellId, OvalePaperDoll:GetSpellHasteMultiplier(), self.state.combo, self.state.holy)
+								duration = OvaleData:GetDuration(auraSpellId, nil, self.state.combo, self.state.holy)
 							end
 
 							-- If aura is specified with a duration, then assume stacks == 1.
@@ -403,7 +403,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								stacks = 1
 							end
 
-							local oldStart, oldEnding, oldStacks, oldSpellHasteMultiplier = self:GetAuraByGUID(auraGUID, auraSpellId, filter, true, target)
+							local oldStart, oldEnding, oldStacks, oldTick = self:GetAuraByGUID(auraGUID, auraSpellId, filter, true, target)
 							local newAura = self:NewAura(auraGUID, auraSpellId, filter)
 
 							newAura.mine = true
@@ -422,12 +422,10 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 										newAura.stacks = oldStacks + stacks
 									end
 									newAura.start = oldStart
-									if isDoT and oldEnding > newAura.start then
-										-- TODO: check that refreshed DoTs take a new snapshot of player stats.
-										local tickLength = OvaleData:GetTickLength(auraSpellId, oldSpellHasteMultiplier)
-										local k = floor((oldEnding - endCast) / tickLength)
-										newAura.ending = oldEnding - tickLength * k + duration
-										newAura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+									if isDoT and oldEnding > newAura.start and oldTick then
+										local k = floor((oldEnding - endCast) / oldTick)
+										newAura.ending = oldEnding - oldTick * k + duration
+										newAura.tick = OvaleData:GetTickLength(auraSpellId)
 									else
 										newAura.ending = endCast + duration
 									end
@@ -452,7 +450,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								newAura.start = endCast
 								newAura.ending = endCast + duration
 								if isDoT then
-									newAura.spellHasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+									newAura.tick = OvaleData:GetTickLength(auraSpellId)
 								end
 							end
 						end
@@ -550,7 +548,7 @@ function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
 	if aura then
 		Ovale:Log("Found " .. filter .. " aura " .. spellId .. " on " .. tostring(guid))
-		return aura.start, aura.ending, aura.stacks, aura.spellHasteMultiplier, aura.value, aura.gain
+		return aura.start, aura.ending, aura.stacks, aura.tick, aura.value, aura.gain
 	else
 		Ovale:Log("Aura " .. spellId .. " not found in state for " .. tostring(guid))
 		return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
@@ -562,19 +560,19 @@ function OvaleState:GetAura(unitId, spellId, filter, mine)
 	if type(spellId) == "number" then
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	elseif OvaleData.buffSpellList[spellId] then
-		local newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		local newStart, newEnding, newStacks, newTick, newValue, newGain
 		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-			local start, ending, stacks, spellHasteMultiplier, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
+			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
 			if start and (not newStart or stacks > newStacks) then
 				newStart = start
 				newEnding = ending
 				newStacks = stacks
-				newSpellHasteMultiplier = spellHasteMultiplier
+				newTick = tick
 				newValue = value
 				newGain = gain
 			end
 		end
-		return newStart, newEnding, newStacks, newSpellHasteMultiplier, newValue, newGain
+		return newStart, newEnding, newStacks, newTick, newValue, newGain
 	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
