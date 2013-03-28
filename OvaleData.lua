@@ -15,6 +15,7 @@ Ovale.OvaleData = OvaleData
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleStance = Ovale.OvaleStance
 
+local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
 local tinsert = table.insert
@@ -568,6 +569,7 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, combo)
 	return damage
 end
 
+-- Returns the duration, tick length, and number of ticks of an aura.
 function OvaleData:GetDuration(spellId, combo, holy)
 	local si
 	if type(spellId) == "number" then
@@ -596,7 +598,7 @@ function OvaleData:GetDuration(spellId, combo, holy)
 			local tickLength = self:GetTickLength(spellId)
 			local numTicks = floor(duration / tickLength + 0.5)
 			duration = tickLength * numTicks
-			return duration, tickLength
+			return duration, tickLength, numTicks
 		end
 		return duration
 	else
@@ -623,8 +625,6 @@ function OvaleData:GetTickLength(spellId)
 			elseif si.haste == "melee" then
 				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
 			end
-		end
-		if si.haste then
 			return tick / hasteMultiplier
 		else
 			return tick

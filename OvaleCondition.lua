@@ -2544,7 +2544,7 @@ OvaleCondition.conditions.tickvalue = function(condition)
 	return compare(value, condition[2], condition[3])
 end
 
---- Get the estimated total number of ticks of a periodic aura.
+--- Get the total number of ticks of a periodic aura.
 -- @name Ticks
 -- @paramsig number or boolean
 -- @param id The spell ID of the aura or the name of a spell list.
@@ -2564,10 +2564,7 @@ OvaleCondition.conditions.ticks = function(condition)
 			numTicks = floor(duration / tick + 0.5)
 		end
 	else
-		duration, tick = OvaleData:GetDuration(condition[1], OvaleState.state.combo, OvaleState.state.holy)
-		if duration and tick and tick > 0 then
-			numTicks = floor(duration / tick + 0.5)
-		end
+		duration, tick, numTicks = OvaleData:GetDuration(condition[1], OvaleState.state.combo, OvaleState.state.holy)
 	end
 	if numTicks then
 		return compare(numTicks, condition[2], condition[3])
