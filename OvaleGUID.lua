@@ -25,6 +25,8 @@ local self_unitId = {}
 local self_guid = {}
 local self_nameToGUID = {}
 local self_nameToUnit = {}
+
+local OVALE_GUID_DEBUG = "guid"
 --</private-static-properties>
 
 --<public-static-methods>
@@ -69,7 +71,7 @@ function OvaleGUID:Update(unitId)
 			if not self_unitId[guid] then
 				self_unitId[guid] = {}
 			end
-			Ovale:DebugPrintf("guid", "GUID %s is %s", guid, unitId)
+			Ovale:DebugPrintf(OVALE_GUID_DEBUG, "GUID %s is %s", guid, unitId)
 			self_unitId[guid][unitId] = true
 		end
 	end

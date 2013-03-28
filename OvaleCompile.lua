@@ -47,6 +47,10 @@ local self_missingSpellList = {}
 -- Whether to trigger a script compilation if items or stances change.
 local self_compileOnItems = false
 local self_compileOnStances = false
+
+local OVALE_COMPILE_DEBUG = "compile"
+local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
+local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
 --</private-static-properties>
 
 --<public-static-properties>
@@ -237,11 +241,11 @@ local function ParseFunction(prefix, func, params)
 				end
 				if spellName then
 					if spellName == API_GetSpellInfo(spellName) then
-						Ovale:DebugPrintf("missing_spells", "Learning spell %s with ID %d", spellName, spellId)
+						Ovale:DebugPrintf(OVALE_MISSING_SPELL_DEBUG, "Learning spell %s with ID %d", spellName, spellId)
 						self_missingSpellList[spellId] = spellName
 					end
 				else
-					Ovale:DebugPrintf("unknown_spells", "Unknown spell with ID %d", spellId)
+					Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %d", spellId)
 				end
 			end
 		end
@@ -766,7 +770,7 @@ function OvaleCompile:OnDisable()
 end
 
 function OvaleCompile:EventHandler(event)
-	Ovale:DebugPrint("compile", event)
+	Ovale:DebugPrint(OVALE_COMPILE_DEBUG, event)
 	self:Compile()
 end
 

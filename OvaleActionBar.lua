@@ -24,6 +24,8 @@ local self_actionSpell = {}
 local self_actionMacro = {}
 local self_actionItem = {}
 local self_keybind = {}
+
+local OVALE_ACTIONBAR_DEBUG = "action_bar"
 --</private-static-properties>
 
 --<public-static-methods>
@@ -49,12 +51,12 @@ function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot, unknown)
 	elseif (slot) then
 	-- on reçoit aussi si c'est une macro avec mouseover à chaque fois que la souris passe sur une cible!
 		self:FillActionIndex(tonumber(slot))
-		Ovale:DebugPrintf("action_bar", "Mapping button %s to spell/macro", slot)
+		Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "Mapping button %s to spell/macro", slot)
 	end
 end
 
 function OvaleActionBar:FillActionIndexes(event)
-	Ovale:DebugPrintf("action_bar", "Mapping buttons to spells/macros for %s", event)
+	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "Mapping buttons to spells/macros for %s", event)
 	wipe(self_actionSpell)
 	wipe(self_actionMacro)
 	wipe(self_actionItem)

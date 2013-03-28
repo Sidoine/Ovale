@@ -33,6 +33,7 @@ local self_pool = OvalePool:NewPool("OvaleAura_pool")
 local self_aura = {}
 local self_serial = 0
 
+local OVALE_AURA_DEBUG = "aura"
 -- Units for which UNIT_AURA is known to fire.
 local OVALE_UNIT_AURA_UNITS = {}
 do
@@ -129,7 +130,7 @@ end
 local function RemoveAurasForGUID(guid)
 	-- Return all auras for the given GUID to the aura pool.
 	if not guid or not self_aura[guid] then return end
-	Ovale:DebugPrintf("aura", "Removing auras for guid %s", guid)
+	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras for guid %s", guid)
 	for filter, auraList in pairs(self_aura[guid]) do
 		for spellId, whoseTable in pairs(auraList) do
 			for whose, aura in pairs(whoseTable) do
@@ -205,7 +206,7 @@ function UpdateAuras(unitId, unitGUID)
 		for spellId, whoseTable in pairs(auraList) do
 			for whose, aura in pairs(whoseTable) do
 				if aura.serial ~= self_serial then
-					Ovale:DebugPrintf("aura", "Removing %s %s from %s, serial=%d aura.serial=%d", filter, aura.name, whose, self_serial, aura.serial)
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing %s %s from %s, serial=%d aura.serial=%d", filter, aura.name, whose, self_serial, aura.serial)
 					whoseTable[whose] = nil
 					self_pool:Release(aura)
 				end

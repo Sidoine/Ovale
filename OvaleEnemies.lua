@@ -29,6 +29,8 @@ local self_enemyName = {}
 -- timer for reaper function to remove inactive enemies
 local self_reaperTimer = nil
 local REAP_INTERVAL = 3
+
+local OVALE_ENEMIES_DEBUG = "enemy"
 --</private-static-properties>
 
 --<public-static-properties>
@@ -44,7 +46,7 @@ local function AddEnemy(guid, name, timestamp)
 	self_enemyName[guid] = name
 	if not seen then
 		self.activeEnemies = self.activeEnemies + 1
-		Ovale:DebugPrintf("enemy", "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
+		Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
 		Ovale.refreshNeeded["player"] = true
 	end
 end
@@ -60,9 +62,9 @@ local function RemoveEnemy(guid, isDead)
 			self.activeEnemies = self.activeEnemies - 1
 		end
 		if isDead then
-			Ovale:DebugPrintf("enemy", "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
+			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
 		else
-			Ovale:DebugPrintf("enemy", "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
+			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
 		end
 		self:SendMessage("Ovale_InactiveUnit", guid)
 		Ovale.refreshNeeded["player"] = true
