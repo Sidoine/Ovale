@@ -21,10 +21,10 @@ local API_GetNumGroupMembers = GetNumGroupMembers
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
-self_unitId = {}
-self_guid = {}
-self_nameToGUID = {}
-self_nameToUnit = {}
+local self_unitId = {}
+local self_guid = {}
+local self_nameToGUID = {}
+local self_nameToUnit = {}
 --</private-static-properties>
 
 --<public-static-methods>

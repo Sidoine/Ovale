@@ -20,10 +20,10 @@ local API_GetActionText = GetActionText
 local API_GetBindingKey = GetBindingKey
 
 --key: spell name / value: action icon id
-self_actionSpell = {}
-self_actionMacro = {}
-self_actionItem = {}
-self_keybind = {}
+local self_actionSpell = {}
+local self_actionMacro = {}
+local self_actionItem = {}
+local self_keybind = {}
 --</private-static-properties>
 
 --<public-static-methods>
