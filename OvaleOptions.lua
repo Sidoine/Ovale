@@ -355,52 +355,77 @@ local self_options =
 			type = "group",
 			args =
 			{
-				-- Node names must match the names of the debug flags.
-				action_bar =
+				trace =
 				{
-					name = "Action bars",
-					desc = L["Debug action bars"],
-					type = "toggle",
+					name = "Trace",
+					type = "group",
+					args =
+					{
+						trace =
+						{
+							name = "Trace",
+							type = "execute",
+							name = "Trace next frame",
+							func = function()
+								Ovale.trace = true
+							end,
+						},
+					},
 				},
-				aura =
+				toggles =
 				{
-					name = "Auras",
-					desc = L["Debug aura"],
-					type = "toggle",
-				},
-				compile =
-				{
-					name = "Compile",
-					desc = L["Debug compile"],
-					type = "toggle",
-				},
-				enemy =
-				{
-					name = "Enemies",
-					desc = L["Debug enemies"],
-					type = "toggle",
-				},
-				guid =
-				{
-					name = "GUIDs",
-					desc = L["Debug GUID"],
-					type = "toggle",
-				},
-				missing_spells =
-				{
-					name = "Missing spells",
-					desc = L["Debug missing spells"],
-					type = "toggle",
-				},
-				unknown_spells =
-				{
-					name = "Unknown spells",
-					desc = L["Debug unknown spells"],
-					type = "toggle",
+					name = "Options",
+					type = "group",
+					args =
+					{
+						-- Node names must match the names of the debug flags.
+						action_bar =
+						{
+							name = "Action bars",
+							desc = L["Debug action bars"],
+							type = "toggle",
+						},
+						aura =
+						{
+							name = "Auras",
+							desc = L["Debug aura"],
+							type = "toggle",
+						},
+						compile =
+						{
+							name = "Compile",
+							desc = L["Debug compile"],
+							type = "toggle",
+						},
+						enemy =
+						{
+							name = "Enemies",
+							desc = L["Debug enemies"],
+							type = "toggle",
+						},
+						guid =
+						{
+							name = "GUIDs",
+							desc = L["Debug GUID"],
+							type = "toggle",
+						},
+						missing_spells =
+						{
+							name = "Missing spells",
+							desc = L["Debug missing spells"],
+							type = "toggle",
+						},
+						unknown_spells =
+						{
+							name = "Unknown spells",
+							desc = L["Debug unknown spells"],
+							type = "toggle",
+						},
+					},
+					get = function(info) return OvaleOptions.db.profile.debug[info[#info]] end,
+					set = function(info, value) OvaleOptions.db.profile.debug[info[#info]] = value end,
 				},
 			},
-			get = function(info) return OvaleOptions.db.profile.debug[info[#info]] end,
-			set = function(info, value) OvaleOptions.db.profile.debug[info[#info]] = value end,
 		},
 		actions =
 		{
