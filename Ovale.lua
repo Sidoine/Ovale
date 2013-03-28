@@ -12,20 +12,17 @@ local Ovale = LibStub("AceAddon-3.0"):NewAddon(addonNamespace, "Ovale", "AceCons
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+local OvaleGUID = nil
 local OvaleOptions = nil
 
 local pairs = pairs
-local strsplit = string.split
 local wipe = table.wipe
 local API_GetTime = GetTime
-local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
-
-local self_damageMeterModules = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -74,13 +71,12 @@ end
 
 function Ovale:OnEnable()
     -- Called when the addon is enabled
-	API_RegisterAddonMessagePrefix("Ovale")
+	OvaleGUID = Ovale:GetModule("OvaleGUID")
+	OvaleOptions = Ovale:GetModule("OvaleOptions")
+
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	self:RegisterEvent("CHAT_MSG_ADDON")
-
-	OvaleOptions = Ovale:GetModule("OvaleOptions")
 
 	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
 	self:UpdateFrame()
@@ -91,7 +87,6 @@ function Ovale:OnDisable()
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
-	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self.frame:Hide()
 end
 
@@ -103,14 +98,6 @@ function Ovale:PLAYER_TARGET_CHANGED()
 	self:UpdateVisibility()
 end
 
-function Ovale:CHAT_MSG_ADDON(event, prefix, msg, type, author)
-	if prefix ~= "Ovale" then return end
-	if type ~= "RAID" and type~= "PARTY" then return end
-
-	local value, maxValue, guid = strsplit(";", msg)
-	self:SendScoreToDamageMeter(author, guid, value, maxValue)
-end
-
 function Ovale:PLAYER_REGEN_ENABLED()
 	self.enCombat = false
 	self:UpdateVisibility()
@@ -120,28 +107,16 @@ function Ovale:PLAYER_REGEN_ENABLED()
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
-	if self.maxScore>0 then
-		API_SendAddonMessage("Ovale", self.score..";"..self.maxScore..";"..UnitGUID("player"), "RAID")
+	if self.maxScore > 0 then
+		-- Broadcast message is "score;maxScore;playerGUID"
+		local message = self.score .. ";" .. self.maxScore .. ";" .. OvaleGUID:GetGUID("player")
+		API_SendAddonMessage("Ovale", message, "RAID")
 	end
 	self.enCombat = true
 	self.score = 0
 	self.maxScore = 0
 	self.combatStartTime = Ovale.now
 	self:UpdateVisibility()
-end
-
-function Ovale:AddDamageMeter(name, module)
-	self_damageMeterModules[name] = module
-end
-
-function Ovale:RemoveDamageMeter(name)
-	self_damageMeterModules[name] = nil
-end
-
-function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	for _, module in pairs(self_damageMeterModules) do
-		module:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	end
 end
 
 function Ovale:Log(text)

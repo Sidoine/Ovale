@@ -8,7 +8,7 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-local OvaleRecount = Ovale:NewModule("OvaleRecount")
+local OvaleRecount = Ovale:NewModule("OvaleRecount", "AceEvent-3.0")
 Ovale.OvaleRecount = OvaleRecount
 
 --<private-static-properties>
@@ -17,6 +17,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Recount", true)
 if not L then
 	L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })
 end
+
+local strsplit = string.split
+local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 --</private-static-properties>
 
 --<private-static-methods>
@@ -53,16 +56,23 @@ function OvaleRecount:OnInitialize()
 end
 
 function OvaleRecount:OnEnable()
-	Ovale:AddDamageMeter("OvaleRecount", self)
+	if not Recount then return end
+	self:RegisterEvent("CHAT_MSG_ADDON")
+	API_RegisterAddonMessagePrefix("Ovale")
 end
 
 function OvaleRecount:OnDisable()
-	Ovale:RemoveDamageMeter("OvaleRecount")
+	if not Recount then return end
+	self:UnregisterEvent("CHAT_MSG_ADDON")
 end
 
-function OvaleRecount:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	if not Recount then return end
-	local source = Recount.db2.combatants[name]
+function OvaleRecount:CHAT_MSG_ADDON(event, ...)
+	local prefix, message, channel, sender = ...
+	if prefix ~= "Ovale" then return end
+	if channel ~= "RAID" and channel ~= "PARTY" then return end
+
+	local scored, scoreMax, guid = strsplit(";", message)
+	local source = Recount.db2.combatants[sender]
 	if source then
 		Recount:AddAmount(source, "Ovale", scored)
 		Recount:AddAmount(source, "OvaleMax", scoreMax)

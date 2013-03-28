@@ -8,7 +8,7 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-local OvaleSkada = Ovale:NewModule("OvaleSkada")
+local OvaleSkada = Ovale:NewModule("OvaleSkada", "AceEvent-3.0")
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>
@@ -17,7 +17,9 @@ local SkadaModule = Skada and Skada:NewModule("Ovale Spell Priority") or { noSka
 
 local ipairs = ipairs
 local math = math
+local strsplit = string.split
 local tostring = tostring
+local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 --</private-static-properties>
 
 --<private-static-methods>
@@ -93,22 +95,27 @@ end
 
 function OvaleSkada:OnEnable()
 	if SkadaModule.noSkada then return end
-	Ovale:AddDamageMeter("OvaleSkada", self)
 	if not SkadaModule:IsEnabled() then
 		SkadaModule:Enable()
 	end
+	self:RegisterEvent("CHAT_MSG_ADDON")
+	API_RegisterAddonMessagePrefix("Ovale")
 end
 
 function OvaleSkada:OnDisable()
 	if SkadaModule.noSkada then return end
-	Ovale:RemoveDamageMeter("OvaleSkada")
+	self:UnregisterEvent("CHAT_MSG_ADDON")
 	if SkadaModule:IsEnabled() then
 		SkadaModule:Disable()
 	end
 end
 
-function OvaleSkada:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	if SkadaModule.noSkada then return end
+function OvaleSkada:CHAT_MSG_ADDON(event, ...)
+	local prefix, message, channel, sender = ...
+	if prefix ~= "Ovale" then return end
+	if channel ~= "RAID" and channel ~= "PARTY" then return end
+
+	local scored, scoreMax, guid = strsplit(";", message)
 	if not guid or not Skada.current or not Skada.total then return end
 
 	local player = Skada:get_player(Skada.current, guid, nil)
