@@ -510,6 +510,7 @@ local function ComputeOperator(element)
 			n = x * c
 		else
 			Ovale:Error("at least one value must be constant when multiplying")
+			return nil
 		end
 	elseif element.operator == "+" then
 		if c + z == 0 then
@@ -546,6 +547,7 @@ local function ComputeOperator(element)
 			n = 0
 		else
 			Ovale:Error("Parameters of % must be constants")
+			return nil
 		end
 	else
 		-- Comparisons
@@ -618,7 +620,7 @@ local function ComputeOperator(element)
 		end
 	end
 
-	Ovale:Log("result = " .. l .. " + " .. m .. "*" .. n)
+	Ovale:Log("result = " .. tostring(l) .. "+(t-" .. tostring(m) .. ")*" .. tostring(n))
 	return startA, endA, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
 end
 

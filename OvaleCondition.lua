@@ -706,13 +706,17 @@ end
 	-- 1: spellId
 	-- returns: bool
 OvaleCondition.conditions.cancast = function(condition)
-	local name, rank, icon, cost, isFunnel, powerType, castTime = OvaleData:GetSpellInfoOrNil(condition[1])
-	local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(condition[1])
+	local spellId = condition[1]
+	local actionCooldownStart, actionCooldownDuration = OvaleState:GetComputedSpellCD(spellId)
 	local startCast = actionCooldownStart + actionCooldownDuration
-	if startCast<OvaleState.currentTime then
+	if startCast < OvaleState.currentTime then
 		startCast = OvaleState.currentTime
 	end
 	--TODO why + castTime?
+	local castTime
+	if spellId then
+		castTime = select(7, API_GetSpellInfo(spellId))
+	end
 	return startCast + castTime/1000
 end
 
@@ -804,11 +808,15 @@ end
 --     Spell(lava_burst)
 
 OvaleCondition.conditions.casttime = function(condition)
-	local name, rank, icon, cost, isFunnel, powerType, castTime = OvaleData:GetSpellInfoOrNil(condition[1])
-	if Ovale.trace then
-		Ovale:Print("castTime/1000 = " .. (castTime/1000) .. " " .. tostring(condition[2]) .. " " .. tostring(condition[3]))
+	local castTime
+	if condition[1] then
+		castTime = select(7, API_GetSpellInfo(condition[1]))
+		if castTime then
+			castTime = castTime / 1000
+			Ovale:Log("castTime = " .. castTime .. " " .. tostring(condition[2]) .. " " .. tostring(condition[3]))
+		end
 	end
-	return compare(castTime/1000, condition[2], condition[3])
+	return compare(castTime, condition[2], condition[3])
 end
 
 --- Get the number of charges on a spell with multiple charges.

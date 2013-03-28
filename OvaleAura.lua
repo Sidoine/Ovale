@@ -161,8 +161,6 @@ end
 function UpdateAuras(unitId, unitGUID)
 	self_serial = self_serial + 1
 	
-	local damageMultiplier
-
 	if not unitId then
 		return
 	end
@@ -171,10 +169,6 @@ function UpdateAuras(unitId, unitGUID)
 	end
 	if not unitGUID then
 		return
-	end
-
-	if unitId == "player" then
-		damageMultiplier = 1
 	end
 
 	if not self_aura[unitGUID] then
@@ -228,10 +222,6 @@ function UpdateAuras(unitId, unitGUID)
 		self_aura[unitGUID] = nil
 	end
 
-	if unitId == "player" then
-		self_baseDamageMultiplier = damageMultiplier
-	end
-	
 	Ovale.refreshNeeded[unitId] = true
 end
 --</private-static-methods>
