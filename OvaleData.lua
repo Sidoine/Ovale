@@ -486,7 +486,7 @@ end
 function OvaleData:DebugGlyphs()
 	local array = {}
 	for glyphId in pairs(self.glyphs) do
-		tinsert(array, API_GetSpellInfo(glyphId) .. ": " .. glyphId)
+		tinsert(array, self:GetSpellName(glyphId) .. ": " .. glyphId)
 	end
 	tsort(array)
 	for _, v in ipairs(array) do

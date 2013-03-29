@@ -237,7 +237,7 @@ function OvaleIcone_OnEnter(self)
 			GameTooltip:SetText(L[self.help])
 		end
 		if self.spellId then
-			GameTooltip:AddLine(GetSpellInfo(self.spellId),0.5,1,0.75)
+			GameTooltip:AddLine(OvaleData:GetSpellName(self.spellId), 0.5, 1, 0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
 			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"],1,1,1)
