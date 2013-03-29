@@ -594,11 +594,11 @@ function OvaleData:GetDuration(spellId, combo, holy)
 			duration = duration + si.adddurationholy * (holy - 1)
 		end
 		if si.tick then	-- DoT
-			--DoT duration is tickLength * numberOfTicks.
-			local tickLength = self:GetTickLength(spellId)
-			local numTicks = floor(duration / tickLength + 0.5)
-			duration = tickLength * numTicks
-			return duration, tickLength, numTicks
+			--DoT duration is tick * numberOfTicks.
+			local tick = self:GetTickLength(spellId)
+			local numTicks = floor(duration / tick + 0.5)
+			duration = tick * numTicks
+			return duration, tick, numTicks
 		end
 		return duration
 	else
