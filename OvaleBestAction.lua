@@ -273,7 +273,7 @@ local function ComputeFunction(element)
 							start = tickTime
 							break
 						end
-						tickTime = tickTime + tickLength
+						tickTime = tickTime + tick
 					end
 					Ovale:Logf("%s start=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, start, numTicks, tick, tickTime)
 				end
