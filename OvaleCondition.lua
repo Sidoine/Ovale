@@ -439,7 +439,7 @@ end
 	(1)	(0, nil) means the condition is always true.  This can be shortened
 		to just return 0.
 
-	(2)	(nil, nil) means the condition is always false.  This can be shorted
+	(2)	(nil, nil) means the condition is always false.  This can be shortened
 		to just return nil.
 
 	(3)	(0, nil, constant, 0, 0) means the condition has a constant value.
@@ -533,6 +533,7 @@ OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
 
 OvaleCondition.conditions.buffduration = function(condition)
 	local start, ending = GetAura(condition)
+	start = start or 0
 	return compare(diffTime(start, ending), condition[2], condition[3])
 end
 OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduration
@@ -562,10 +563,10 @@ OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduratio
 
 OvaleCondition.conditions.buffexpires = function(condition)
 	local start, ending = GetAura(condition)
+	local timeBefore = avecHate(condition[2], condition.haste)
 	if not start then
 		ending = 0
 	end
-	local timeBefore = avecHate(condition[2], condition.haste)
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
 	return addTime(ending, -timeBefore)
 end
@@ -589,10 +590,10 @@ OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
 
 OvaleCondition.conditions.buffremains = function(condition)
 	local start, ending = GetAura(condition)
-	if ending then
+	if start and ending and start <= ending then
 		return start, ending, ending - start, start, -1
 	else
-		return nil
+		return 0, nil, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffremains = OvaleCondition.conditions.buffremains
@@ -636,7 +637,7 @@ OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
 OvaleCondition.conditions.buffpresent = function(condition)
 	local start, ending = GetAura(condition)
 	if not start then
-		start, ending = 0, 0
+		return nil
 	end
 	local timeBefore = avecHate(condition[2], condition.haste)
 	return start, addTime(ending, -timeBefore)
@@ -663,6 +664,7 @@ OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 
 OvaleCondition.conditions.buffstacks = function(condition)
 	local start, ending, stacks = GetAura(condition)
+	start = start or 0
 	stacks = stacks or 0
 	return start, ending, stacks, 0, 0
 end
@@ -2604,7 +2606,7 @@ OvaleCondition.conditions.ticksremain = function(condition)
 	if ending and tick and tick > 0 then
 		return 0, nil, 1, ending, -1/tick
 	end
-	return nil
+	return 0, nil, 0, 0, 0
 end
 
 --- Get the number of seconds between ticks of a periodic aura on a target.
