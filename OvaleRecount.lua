@@ -1,6 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2009 Sidoine
+    Copyright (C) 2012, 2013 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -8,7 +9,7 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-local OvaleRecount = Ovale:NewModule("OvaleRecount", "AceEvent-3.0")
+local OvaleRecount = Ovale:NewModule("OvaleRecount")
 Ovale.OvaleRecount = OvaleRecount
 
 --<private-static-properties>
@@ -17,9 +18,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Recount", true)
 if not L then
 	L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })
 end
-
-local strsplit = string.split
-local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 --</private-static-properties>
 
 --<private-static-methods>
@@ -51,31 +49,30 @@ end
 
 --<public-static-methods>
 function OvaleRecount:OnInitialize()
-	if not Recount then return end
-	Recount:AddModeTooltip("Ovale", DataModes, TooltipFuncs, nil, nil, nil, nil)
+	if Recount then
+		Recount:AddModeTooltip("Ovale", DataModes, TooltipFuncs, nil, nil, nil, nil)
+	end
 end
 
 function OvaleRecount:OnEnable()
-	if not Recount then return end
-	self:RegisterEvent("CHAT_MSG_ADDON")
-	API_RegisterAddonMessagePrefix("Ovale")
+	if Recount then
+		Ovale:RegisterDamageMeter("OvaleRecount", "ReceiveScore")
+	end
 end
 
 function OvaleRecount:OnDisable()
-	if not Recount then return end
-	self:UnregisterEvent("CHAT_MSG_ADDON")
+	if Recount then
+		Ovale:UnregisterDamageMeter("OvaleRecount")
+	end
 end
 
-function OvaleRecount:CHAT_MSG_ADDON(event, ...)
-	local prefix, message, channel, sender = ...
-	if prefix ~= "Ovale" then return end
-	if channel ~= "RAID" and channel ~= "PARTY" then return end
-
-	local scored, scoreMax, guid = strsplit(";", message)
-	local source = Recount.db2.combatants[sender]
-	if source then
-		Recount:AddAmount(source, "Ovale", scored)
-		Recount:AddAmount(source, "OvaleMax", scoreMax)
+function OvaleRecount:ReceiveScore(name, guid, scored, scoreMax)
+	if Recount then
+		local source = Recount.db2.combatants[name]
+		if source then
+			Recount:AddAmount(source, "Ovale", scored)
+			Recount:AddAmount(source, "OvaleMax", scoreMax)
+		end
 	end
 end
 --</public-static-methods>

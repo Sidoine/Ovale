@@ -19,11 +19,14 @@ local format = string.format
 local pairs = pairs
 local wipe = table.wipe
 local API_GetTime = GetTime
+local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
+
+local self_damageMeterMethods = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -62,14 +65,32 @@ BINDING_NAME_OVALE_CHECKBOX2 = L["Inverser la boîte à cocher "].."(3)"
 BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
+--<private-static-methods>
+local function OnCheckBoxValueChanged(widget)
+	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
+	if Ovale.casesACocher[widget.userdata.k].compile then
+		Ovale:SendMessage("Ovale_CheckBoxValueChanged")
+	end
+end
+
+local function OnDropDownValueChanged(widget)
+	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
+	if Ovale.listes[widget.userdata.k].compile then
+		Ovale:SendMessage("Ovale_ListValueChanged")
+	end
+end
+--</private-static-methods>
+
 --<public-static-methods>
 function Ovale:OnEnable()
     -- Called when the addon is enabled
-	OvaleGUID = Ovale:GetModule("OvaleGUID")
-	OvaleOptions = Ovale:GetModule("OvaleOptions")
+	OvaleGUID = self:GetModule("OvaleGUID")
+	OvaleOptions = self:GetModule("OvaleOptions")
 
-	self:RegisterEvent("PLAYER_REGEN_ENABLED");
-	self:RegisterEvent("PLAYER_REGEN_DISABLED");
+	API_RegisterAddonMessagePrefix("Ovale")
+	self:RegisterEvent("CHAT_MSG_ADDON")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
@@ -78,10 +99,21 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
+	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self.frame:Hide()
+end
+
+-- Receive scores for damage meters from other Ovale addons in the raid.
+function Ovale:CHAT_MSG_ADDON(event, ...)
+	local prefix, message, channel, sender = ...
+	if prefix ~= "Ovale" then return end
+	if channel ~= "RAID" and channel ~= "PARTY" then return end
+
+	local scored, scoreMax, guid = strsplit(";", message)
+	self:SendScoreToDamageMeter(sender, guid, scored, scoreMax)
 end
 
 --Called when the player target change
@@ -102,6 +134,7 @@ end
 
 function Ovale:PLAYER_REGEN_DISABLED()
 	if self.maxScore > 0 then
+		-- Broadcast the player's own score for damage meters when combat ends.
 		-- Broadcast message is "score;maxScore;playerGUID"
 		local message = self.score .. ";" .. self.maxScore .. ";" .. OvaleGUID:GetGUID("player")
 		API_SendAddonMessage("Ovale", message, "RAID")
@@ -111,20 +144,6 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.maxScore = 0
 	self.combatStartTime = Ovale.now
 	self:UpdateVisibility()
-end
-
-local function OnCheckBoxValueChanged(widget)
-	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
-	if Ovale.casesACocher[widget.userdata.k].compile then
-		Ovale:SendMessage("Ovale_CheckBoxValueChanged")
-	end
-end
-
-local function OnDropDownValueChanged(widget)
-	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
-	if Ovale.listes[widget.userdata.k].compile then
-		Ovale:SendMessage("Ovale_ListValueChanged")
-	end
 end
 
 function Ovale:ToggleOptions()
@@ -232,6 +251,48 @@ function Ovale:ToggleCheckBox(v)
 	end
 end
 
+--[[
+	Damage meter addons that want to receive Ovale scores should implement
+	and register a function that has the following signature:
+
+		ReceiveScore(name, guid, scored, scoreMax)
+
+		Parameters:
+			name - the name of the unit
+			guid - GUID of the named unit
+			scored - current score
+			scoreMax - current maximum score
+
+		Returns:
+			none
+
+	The function should be registered with Ovale using the RegisterDamageMeter
+	method, which needs a unique name for the meter and either the function itself
+	or a method name for the module with the given name.
+]]--
+
+function Ovale:RegisterDamageMeter(name, method)
+	self_damageMeterMethods[name] = method
+end
+
+function Ovale:UnregisterDamageMeter(name)
+	self_damageMeterMethods[name] = nil
+end
+
+function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
+	for _, method in pairs(self_damageMeterMethods) do
+		if type(method) == "string" then
+			local module = self:GetModule(name) or LibStub("AceAddon-3.0"):GetAddon(name)
+			if module and type(module[method]) == "function" then
+				return module[method](module, name, guid, scored, scoreMax)
+			end
+		elseif type(method) == "function" then
+			return method(name, guid, scored, scoreMax)
+		end
+	end
+end
+
+-- Debugging methods.
 function Ovale:DebugPrint(flag, ...)
 	local profile = OvaleOptions:GetProfile()
 	if profile and profile.debug and profile.debug[flag] then

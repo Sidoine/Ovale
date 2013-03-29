@@ -1,6 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2010 Sidoine
+    Copyright (C) 2012, 2013 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -8,7 +9,7 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-local OvaleSkada = Ovale:NewModule("OvaleSkada", "AceEvent-3.0")
+local OvaleSkada = Ovale:NewModule("OvaleSkada")
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>
@@ -17,9 +18,7 @@ local SkadaModule = Skada and Skada:NewModule("Ovale Spell Priority") or { noSka
 
 local ipairs = ipairs
 local math = math
-local strsplit = string.split
 local tostring = tostring
-local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 --</private-static-properties>
 
 --<private-static-methods>
@@ -94,38 +93,36 @@ function SkadaModule:GetSetSummary(set)
 end
 
 function OvaleSkada:OnEnable()
-	if SkadaModule.noSkada then return end
-	if not SkadaModule:IsEnabled() then
-		SkadaModule:Enable()
+	if not SkadaModule.noSkada then
+		if not SkadaModule:IsEnabled() then
+			SkadaModule:Enable()
+		end
+		Ovale:RegisterDamageMeter("OvaleSkada", "ReceiveScore")
 	end
-	self:RegisterEvent("CHAT_MSG_ADDON")
-	API_RegisterAddonMessagePrefix("Ovale")
 end
 
 function OvaleSkada:OnDisable()
-	if SkadaModule.noSkada then return end
-	self:UnregisterEvent("CHAT_MSG_ADDON")
-	if SkadaModule:IsEnabled() then
-		SkadaModule:Disable()
+	if not SkadaModule.noSkada then
+		Ovale:UnregisterDamageMeter("OvaleSkada")
+		if SkadaModule:IsEnabled() then
+			SkadaModule:Disable()
+		end
 	end
 end
 
-function OvaleSkada:CHAT_MSG_ADDON(event, ...)
-	local prefix, message, channel, sender = ...
-	if prefix ~= "Ovale" then return end
-	if channel ~= "RAID" and channel ~= "PARTY" then return end
+function OvaleSkada:ReceiveScore(name, guid, scored, scoreMax)
+	if not SkadaModule.noSkada then
+		if not guid or not Skada.current or not Skada.total then return end
 
-	local scored, scoreMax, guid = strsplit(";", message)
-	if not guid or not Skada.current or not Skada.total then return end
-
-	local player = Skada:get_player(Skada.current, guid, nil)
-	if not player then return end
-
-	SkadaModule:AddPlayerAttributes(player)
-	player.ovale = player.ovale + scored
-	player.ovaleMax = player.ovaleMax + scoreMax
-	player = Skada:get_player(Skada.total, guid, nil)
-	player.ovale = player.ovale + scored
-	player.ovaleMax = player.ovaleMax + scoreMax
+		local player = Skada:get_player(Skada.current, guid, nil)
+		if player then
+			SkadaModule:AddPlayerAttributes(player)
+			player.ovale = player.ovale + scored
+			player.ovaleMax = player.ovaleMax + scoreMax
+			player = Skada:get_player(Skada.total, guid, nil)
+			player.ovale = player.ovale + scored
+			player.ovaleMax = player.ovaleMax + scoreMax
+		end
+	end
 end
 --</public-static-methods>
