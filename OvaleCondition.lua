@@ -1489,8 +1489,7 @@ end
 --     Spell(kick)
 
 OvaleCondition.conditions.inrange = function(condition)
-	--TODO is IsSpellInRange using spell id now?
-	local spellName = API_GetSpellInfo(condition[1])
+	local spellName = OvaleData:GetSpellName(condition[1])
 	return testbool(API_IsSpellInRange(spellName, getTarget(condition)) == 1,condition[2])
 end
 
@@ -2683,7 +2682,6 @@ OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
 -- if TimeInToMaxEnergy(less 1.2) Spell(sinister_strike)
 
 OvaleCondition.conditions.timetomaxenergy = function(condition)
--- TODO: temp, need to allow function calls in functions call to do things link TimeTo(Energy() == 100) which would be TimeTo(Equal(Energy(), 100))
 	local maxEnergy = API_UnitPowerMax("player", OVALE_POWERTYPE_ENERGY) or 0
 	local t = OvaleState.currentTime + (maxEnergy - OvaleState.state.energy) / OvaleState.powerRate.energy
 	return 0, nil, 0, t, -1
