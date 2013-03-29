@@ -18,7 +18,6 @@ local OvaleOptions = Ovale.OvaleOptions
 local OvaleState = Ovale.OvaleState
 
 local strfind = string.find
-local strformat = string.format
 local strsub = string.sub
 --</private-static-properties>
 
@@ -33,15 +32,14 @@ local function SetValue(self, value, actionTexture)
 	self.shortcut:Hide()
 	if value then
 		if value<10 then
-			value = strformat("%.1f", value)
+			self.remains:SetFormattedText("%.1f", value)
 		else
-			value = strformat("%d", value)
+			self.remains:SetFormattedText("%d", value)
 		end
-		self.remains:SetText(value)
+		self.remains:Show()
 	else
-		self.remains:SetText()
+		self.remains:Hide()
 	end
-	self.remains:Show()
 	self:Show()
 end
 
@@ -134,7 +132,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		
 		-- Le temps restant
 		if ((profile.apparence.numeric or self.params.text == "always") and minAttente > OvaleState.maintenant) then
-			self.remains:SetText(strformat("%.1f", minAttente - OvaleState.maintenant))
+			self.remains:SetFormattedText("%.1f", minAttente - OvaleState.maintenant)
 			self.remains:Show()
 		else
 			self.remains:Hide()
@@ -146,7 +144,6 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			self.shortcut:SetText(actionShortcut)
 		else
 			self.shortcut:Hide()
-			self.shortcut:SetText("")
 		end
 		
 		-- L'indicateur de portée
