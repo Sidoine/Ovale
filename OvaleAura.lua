@@ -439,7 +439,7 @@ function OvaleAura:Debug()
 		for filter, auraList in pairs(auraTable) do
 			for spellId, whoseTable in pairs(auraList) do
 				for whose, aura in pairs(whoseTable) do
-					Ovale:Printf("%s %s %s %s %s stacks=%d tick=%s", guid, filter, whose, spellId, aura.name, aura.stacks, aura.tick)
+					Ovale:FormatPrint("%s %s %s %s %s stacks=%d tick=%s", guid, filter, whose, spellId, aura.name, aura.stacks, aura.tick)
 				end
 			end
 		end

@@ -126,7 +126,7 @@ end
 
 function OvaleEnemies:Debug()
 	for guid, timestamp in pairs(self_enemyLastSeen) do
-		Ovale:Printf("enemy %s (%s) last seen at %f", guid, self_enemyName[guid], timestamp)
+		Ovale:FormatPrint("enemy %s (%s) last seen at %f", guid, self_enemyName[guid], timestamp)
 	end	
 end
 --</public-static-methods>

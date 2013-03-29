@@ -295,10 +295,10 @@ local function ComputeFunction(element)
 		if Ovale.trace then
 			local conditionCall = element.func .. "("
 			for k, v in pairs(element.params) do
-				conditionCall = parameterList .. k .. "=" .. v .. ","
+				conditionCall = conditionCall .. k .. "=" .. v .. ","
 			end
 			conditionCall = conditionCall .. ")"
-			Ovale:Printf("Condition %s returned %s, %s, %s, %s, %s", conditionCall, start, ending, value, origin, rate)
+			Ovale:FormatPrint("Condition %s returned %s, %s, %s, %s, %s", conditionCall, start, ending, value, origin, rate)
 		end
 
 		if value then

@@ -199,7 +199,7 @@ local function SetParams(self, params, secure)
 				local prefix = strsub(k, 1, f-1)
 				local suffix = strsub(k, f + 5)
 				local param
-				Ovale:Printf("%stype%s", prefix, suffix)
+				Ovale:FormatPrint("%stype%s", prefix, suffix)
 				self:SetAttribute(prefix .. "type" .. suffix, "spell")
 				self:SetAttribute("unit", self.params.target or "target")
 				self:SetAttribute(k, OvaleData.spellList[v])

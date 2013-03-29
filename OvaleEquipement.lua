@@ -1065,12 +1065,12 @@ end
 
 function OvaleEquipement:Debug()
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		Ovale:Printf("Slot %d = %s", slotId, self:GetEquippedItem(slotId))
+		Ovale:FormatPrint("Slot %d = %s", slotId, self:GetEquippedItem(slotId))
 	end
-	Ovale:Printf("Main-hand item type: %s", self_mainHandItemType)
-	Ovale:Printf("Off-hand item type: %s", self_offHandItemType)
+	Ovale:FormatPrint("Main-hand item type: %s", self_mainHandItemType)
+	Ovale:FormatPrint("Off-hand item type: %s", self_offHandItemType)
 	for k, v in pairs(self_armorSetCount) do
-		Ovale:Printf("Player has %d piece(s) of %s armor set.", v, k)
+		Ovale:FormatPrint("Player has %d piece(s) of %s armor set.", v, k)
 	end
 end
 --</public-static-methods>
