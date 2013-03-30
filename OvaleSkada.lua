@@ -9,39 +9,58 @@
 ----------------------------------------------------------------------]]
 
 local _, Ovale = ...
-local OvaleSkada = Ovale:NewModule("OvaleSkada")
+local Skada = LibStub("AceAddon-3.0"):GetAddon("Skada", true)
+local OvaleSkada = Skada and Skada:NewModule("Ovale Spell Priority") or {}
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>
-local Skada = LibStub("AceAddon-3.0"):GetAddon("Skada", true)
-local SkadaModule = Skada and Skada:NewModule("Ovale Spell Priority") or { noSkada = true }
-
 local ipairs = ipairs
-local math = math
+local floor = math.floor
 local tostring = tostring
 --</private-static-properties>
 
+--<public-static-properties>
+-- OvaleSkada.metadata = nil
+--</public-static-properties>
+
 --<private-static-methods>
-local function getValue(set)
+local function GetValue(set)
 	if set.ovaleMax and set.ovaleMax > 0 then
-		return math.floor(1000 * set.ovale / set.ovaleMax)
+		return floor(1000 * set.ovale / set.ovaleMax)
 	else
 		return nil
+	end
+end
+
+function ReceiveScore(name, guid, scored, scoreMax)
+	local self = OvaleSkada
+	if guid and Skada and Skada.current and Skada.total then
+		local player = Skada:get_player(Skada.current, guid, nil)
+		if player then
+			self:AddPlayerAttributes(player)
+			player.ovale = player.ovale + scored
+			player.ovaleMax = player.ovaleMax + scoreMax
+			player = Skada:get_player(Skada.total, guid, nil)
+			player.ovale = player.ovale + scored
+			player.ovaleMax = player.ovaleMax + scoreMax
+		end
 	end
 end
 --</private-static-methods>
 
 --<public-static-methods>
-function SkadaModule:OnEnable()
+function OvaleSkada:OnEnable()
 	self.metadata = { showspots = true }
 	Skada:AddMode(self)
+	Ovale:RegisterDamageMeter("OvaleSkada", ReceiveScore)
 end
 
-function SkadaModule:OnDisable()
+function OvaleSkada:OnDisable()
+	Ovale:UnregisterDamageMeter("OvaleSkada")
 	Skada:RemoveMode(self)
 end
 
-function SkadaModule:Update(win, set)
+function OvaleSkada:Update(win, set)
 	local max = 0
 	local nr = 1
 
@@ -49,11 +68,11 @@ function SkadaModule:Update(win, set)
 		if player.ovaleMax and player.ovaleMax > 0 then
 			local d = win.dataset[nr] or {}
 			win.dataset[nr] = d
-			d.value = getValue(player)
+			d.value = GetValue(player)
 			d.label = player.name
 			d.class = player.class
 			d.id = player.id
-			d.valuetext = tostring(getValue(player))
+			d.valuetext = tostring(d.value)
 			if d.value > max then
 				max = d.value
 			end
@@ -64,12 +83,12 @@ function SkadaModule:Update(win, set)
 	win.metadata.maxvalue = max
 end
 
-function SkadaModule:AddToTooltip(set, tooltip)
-	GameTooltip:AddDoubleLine("Ovale", getValue(set), 1, 1, 1)
+function OvaleSkada:AddToTooltip(set, tooltip)
+	GameTooltip:AddDoubleLine("Ovale", GetValue(set), 1, 1, 1)
 end
 
 -- Called by Skada when a new player is added to a set.
-function SkadaModule:AddPlayerAttributes(player)
+function OvaleSkada:AddPlayerAttributes(player)
 	if not player.ovale then
 		player.ovale = 0
 	end
@@ -79,7 +98,7 @@ function SkadaModule:AddPlayerAttributes(player)
 end
 
 -- Called by Skada when a new set is created.
-function SkadaModule:AddSetAttributes(set)
+function OvaleSkada:AddSetAttributes(set)
 	if not set.ovale then
 		set.ovale = 0
 	end
@@ -88,41 +107,7 @@ function SkadaModule:AddSetAttributes(set)
 	end
 end
 
-function SkadaModule:GetSetSummary(set)
-	return getValue(set)
-end
-
-function OvaleSkada:OnEnable()
-	if not SkadaModule.noSkada then
-		if not SkadaModule:IsEnabled() then
-			SkadaModule:Enable()
-		end
-		Ovale:RegisterDamageMeter("OvaleSkada", "ReceiveScore")
-	end
-end
-
-function OvaleSkada:OnDisable()
-	if not SkadaModule.noSkada then
-		Ovale:UnregisterDamageMeter("OvaleSkada")
-		if SkadaModule:IsEnabled() then
-			SkadaModule:Disable()
-		end
-	end
-end
-
-function OvaleSkada:ReceiveScore(name, guid, scored, scoreMax)
-	if not SkadaModule.noSkada then
-		if not guid or not Skada.current or not Skada.total then return end
-
-		local player = Skada:get_player(Skada.current, guid, nil)
-		if player then
-			SkadaModule:AddPlayerAttributes(player)
-			player.ovale = player.ovale + scored
-			player.ovaleMax = player.ovaleMax + scoreMax
-			player = Skada:get_player(Skada.total, guid, nil)
-			player.ovale = player.ovale + scored
-			player.ovaleMax = player.ovaleMax + scoreMax
-		end
-	end
+function OvaleSkada:GetSetSummary(set)
+	return GetValue(set)
 end
 --</public-static-methods>
