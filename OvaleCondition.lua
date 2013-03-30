@@ -115,6 +115,16 @@ local function isDebuffInList(list)
 	return false
 end
 
+local function IsSameSpell(spellIdA, spellIdB, spellNameB)
+	if spellIdB then
+		return spellIdA == spellIdB
+	elseif spellIdA and spellNameB then
+		return OvaleData:GetSpellName(spellIdA) == spellNameB
+	else
+		return false
+	end
+end
+
 local function avecHate(temps, hate)
 	if not temps then
 		temps = 0
@@ -130,7 +140,30 @@ local function avecHate(temps, hate)
 	end
 end
 
-local function compare(a, comparison, b)
+-- Return time1 + duration.
+local function AddToTime(time1, duration)
+	if not time1 or not duration then
+		-- time1 or duration is infinite.
+		return nil
+	else
+		return time1 + duration
+	end
+end
+
+-- Return time2 - time1
+local function DiffTime(time1, time2)
+	if not time1 then
+		-- time1 is infinite, so return the lowest possible time (zero).
+		return 0
+	elseif not time2 then
+		-- time2 is infinite.
+		return nil
+	else
+		return time2 - time1
+	end
+end
+
+local function Compare(a, comparison, b)
 	if not comparison then
 		return 0, nil, a, 0, 0 -- this is not a compare, returns the value a
 	elseif comparison == "more" then
@@ -156,7 +189,7 @@ local function compare(a, comparison, b)
 	end
 end
 
-local function testbool(a, condition)
+local function TestBoolean(a, condition)
 	if (condition == "yes" or not condition) then
 		if (a) then
 			return 0
@@ -172,18 +205,33 @@ local function testbool(a, condition)
 	end
 end
 
-local function getTarget(condition)
-	local target = condition.target
-	if not target then
-		return "player"
-	elseif target == "target" then
-		return OvaleCondition.defaultTarget
-	else	
-		return target
+local function TestValue(comparator, limit, value, atTime, rate)
+	if not value or not atTime then
+		return nil
+	elseif not comparator then
+		return 0, nil, value, atTime, rate
+	else
+		if rate == 0 then
+			if comparator == "more" then
+				if value > limit then return 0 else return nil end
+			elseif comparator == "less" then
+				if value < limit then return 0 else return nil end
+			else
+				Ovale:Errorf("Unknown operator %s", comparator)
+				return nil
+			end
+		elseif (comparator == "more" and rate > 0) or (comparator == "less" and rate < 0) then
+			return (limit - value) / rate + atTime
+		elseif (comparator == "more" and rate < 0) or (comparator == "less" and rate > 0) then
+			return 0, (limit - value) / rate + atTime
+		else
+			Ovale:Errorf("Unknown operator %s", comparator)
+			return nil
+		end
 	end
 end
 
-local function getFilter(condition)
+local function GetFilter(condition)
 	if condition.filter then
 		if condition.filter == "debuff" then
 			return "HARMFUL"
@@ -194,38 +242,33 @@ local function getFilter(condition)
 	return nil
 end
 
-local function addTime(time1, duration)
-	if not time1 then
-		return nil
+local function GetMine(condition)
+	if condition.any then
+		if condition.any == 1 then
+			return false
+		else
+			return true
+		end
+	elseif condition.mine then
+		-- Use of "mine=1" is deprecated.
+		if condition.mine == 1 then
+			return true
+		else
+			return false
+		end
+	end
+	return true
+end
+
+local function GetTarget(condition)
+	local target = condition.target
+	if not target then
+		return "player"
+	elseif target == "target" then
+		return OvaleCondition.defaultTarget
 	else
-		return time1 + duration
+		return target
 	end
-end
-
---Return time2-time1
-local function diffTime(time1, time2)
-	if not time1 then
-		return 0
-	end
-	if not time2 then
-		return nil
-	end
-	return time2 - time1
-end
-
-local function addOrSubTime(time1, operator, duration)
-	if operator == "more" then
-		return addTime(time1, -duration)
-	else
-		return addTime(time1, duration)
-	end
-end
-
-local function getOtherAura(spellId, filter, excludingUnit)
-	if excludingUnit then
-		excludingUnit = OvaleGUID:GetGUID(excludingUnit)
-	end
-	return OvaleState:GetMyAuraOnAnyTarget(spellId, filter, excludingUnit)
 end
 
 local function GetRuneCount(type, death)
@@ -268,55 +311,13 @@ local function GetRunesCooldown(condition)
 	return OvaleState:GetRunesCooldown(self_runes.blood, self_runes.frost, self_runes.unholy, self_runes.death, condition.nodeath)
 end
 
-local function testValue(comparator, limit, value, atTime, rate)
-	if not value or not atTime then
-		return nil
-	elseif not comparator then
-		return 0, nil, value, atTime, rate
-	else
-		if rate == 0 then
-			if comparator == "more" then
-				if value > limit then return 0 else return nil end
-			elseif comparator == "less" then
-				if value < limit then return 0 else return nil end
-			else
-				Ovale:Errorf("Unknown operator %s", comparator)
-			end
-		elseif (comparator == "more" and rate > 0) or (comparator == "less" and rate < 0) then
-			return (limit - value) / rate + atTime
-		elseif (comparator == "more" and rate < 0) or (comparator == "less" and rate > 0) then
-			return 0, (limit - value) / rate + atTime
-		else
-			Ovale:Errorf("Unknown operator %s", comparator)
-		end
-	end
-end
-
-local function getMine(condition)
-	if condition.any then
-		if condition.any == 1 then
-			return false
-		else
-			return true
-		end
-	elseif condition.mine then
-		-- Use of "mine=1" is deprecated.
-		if condition.mine == 1 then
-			return true
-		else
-			return false
-		end
-	end
-	return true
-end
-
 -- Front-end for OvaleState:GetAura() using condition parameters.
 -- return start, ending, stacks, tick, value, gain
 local function GetAura(condition)
-	local unitId = getTarget(condition)
+	local unitId = GetTarget(condition)
 	local spellId = condition[1]
-	local filter = getFilter(condition)
-	local mine = getMine(condition)
+	local filter = GetFilter(condition)
+	local mine = GetMine(condition)
 
 	if not spellId then
 		Ovale:Log("GetAura: nil spellId")
@@ -335,6 +336,28 @@ local function GetAura(condition)
 	end
 	Ovale:Logf("GetAura: aura %s found on %s start=%s ending=%s stacks=%s/%d", spellId, unitId, start, ending, stacks, conditionStacks)
 	return start, ending, stacks, tick, value, gain
+end
+
+-- Front-end for OvaleState:GetMyAuraOnAnyTarget() using condition parameters.
+-- return start, ending, count
+local function GetMyAuraOnAnyTarget(condition, excludingUnit)
+	local spellId = condition[1]
+	local filter = GetFilter(condition)
+	if excludingUnit then
+		excludingUnit = OvaleGUID:GetGUID(excludingUnit)
+	end
+	if not spellId then
+		Ovale:Log("GetAura: nil spellId")
+		return nil
+	end
+	local start, ending, count = OvaleState:GetMyAuraOnAnyTarget(spellId, filter, excludingUnit)
+
+	if not start then
+		Ovale:Logf("GetMyAuraOnAnyTarget: aura %s not found, filter=%s excludingUnit=%s", spellId, filter, excludingUnit)
+		return nil
+	end
+	Ovale:Logf("GetMyAuraOnAnyTarget: aura %s found, start=%s ending=%s count=%d", spellId, start, ending, stacks, count)
+	return start, ending, count
 end
 
 -- Returns:
@@ -397,16 +420,6 @@ local function TimeToDie(unitId)
 		end
 	end
 	return timeToDie, health, maxHealth
-end
-
-local function isSameSpell(spellIdA, spellIdB, spellNameB)
-	if spellIdB then
-		return spellIdA == spellIdB
-	elseif spellIdA and spellNameB then
-		return API_GetSpellInfo(spellIdA) == spellNameB
-	else
-		return false
-	end
 end
 --</private-static-methods>
 
@@ -486,7 +499,7 @@ OvaleCondition.spellbookConditions = { spell = true }
 --     Spell(ferocious_bite)
 
 OvaleCondition.conditions.armorsetparts = function(condition)
-	return compare(OvaleEquipement:GetArmorSetCount(condition[1]), condition[2], condition[3])
+	return Compare(OvaleEquipement:GetArmorSetCount(condition[1]), condition[2], condition[3])
 end
 
 --- Get the current attack power of the player.
@@ -502,7 +515,7 @@ end
 -- if AttackPower(more 10000) Spell(rake)
 
 OvaleCondition.conditions.attackpower = function(condition)
-	return compare(OvalePaperDoll.attackPower, condition[1], condition[2])
+	return Compare(OvalePaperDoll.attackPower, condition[1], condition[2])
 end
 
 --- Get the total count of the given aura applied by the player across all targets.
@@ -513,8 +526,8 @@ end
 -- @see DebuffCount
 
 OvaleCondition.conditions.buffcount = function(condition)
-	local start, ending, count = getOtherAura(condition[1], getFilter(condition))
-	return start, ending, count, 0, 0
+	local start, ending, count = GetMyAuraOnAnyTarget(condition)
+	return start, ending, count, start, 0
 end
 OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
 
@@ -534,7 +547,7 @@ OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
 OvaleCondition.conditions.buffduration = function(condition)
 	local start, ending = GetAura(condition)
 	start = start or 0
-	return compare(diffTime(start, ending), condition[2], condition[3])
+	return Compare(DiffTime(start, ending), condition[2], condition[3])
 end
 OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduration
 
@@ -568,7 +581,7 @@ OvaleCondition.conditions.buffexpires = function(condition)
 		ending = 0
 	end
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
-	return addTime(ending, -timeBefore)
+	return AddToTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
 
@@ -640,7 +653,7 @@ OvaleCondition.conditions.buffpresent = function(condition)
 		return nil
 	end
 	local timeBefore = avecHate(condition[2], condition.haste)
-	return start, addTime(ending, -timeBefore)
+	return start, AddToTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 
@@ -683,7 +696,7 @@ OvaleCondition.conditions.debuffstacks = OvaleCondition.conditions.buffstacks
 
 OvaleCondition.conditions.buffstealable = function(condition)
 	-- TODO: This should really be checked only against OvaleState.
-	return OvaleAura:GetStealable(getTarget(condition))
+	return OvaleAura:GetStealable(GetTarget(condition))
 end
 
 --- Get the current number of Burning Embers for destruction warlocks.
@@ -698,7 +711,7 @@ end
 -- if BurningEmbers(more 10) Spell(chaos_bolt)
 
 OvaleCondition.conditions.burningembers = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.burningembers, OvaleState.currentTime, OvaleState.powerRate.burningembers)
+	return TestValue(condition[1], condition[2], OvaleState.state.burningembers, OvaleState.currentTime, OvaleState.powerRate.burningembers)
 end
 
 	-- Check if the player can cast (cooldown is down)
@@ -737,7 +750,7 @@ end
 
 OvaleCondition.conditions.casting = function(condition)
 	local casting
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	local spellId = condition[1]
 	local start, ending, castSpellId, castSpellName, _
 	if target == "player" then
@@ -756,7 +769,7 @@ OvaleCondition.conditions.casting = function(condition)
 	if not spellId then
 		return start, ending
 	elseif type(spellId) == "number" then
-		if isSameSpell(spellId, castSpellId, castSpellName) then
+		if IsSameSpell(spellId, castSpellId, castSpellName) then
 			return start, ending
 		else
 			return nil
@@ -764,14 +777,14 @@ OvaleCondition.conditions.casting = function(condition)
 	elseif OvaleData.buffSpellList[spellId] then
 		local found = false
 		for k,v in pairs(OvaleData.buffSpellList[spellId]) do
-			if isSameSpell(v, castSpellId, castSpellName) then
+			if IsSameSpell(v, castSpellId, castSpellName) then
 				return start, ending
 			end
 		end
 		return nil
 	elseif spellId == "harmful" then
 		if not castSpellName then
-			castSpellName = API_GetSpellInfo(castSpellId)
+			castSpellName = OvaleData:GetSpellName(castSpellId)
 		end
 		if API_IsHarmfulSpell(castSpellName) then
 			return start, ending
@@ -780,7 +793,7 @@ OvaleCondition.conditions.casting = function(condition)
 		end
 	elseif spellId == "helpful" then
 		if not castSpellName then
-			castSpellName = API_GetSpellInfo(castSpellId)
+			castSpellName = OvaleData:GetSpellName(castSpellId)
 		end
 		if API_IsHelpfulSpell(castSpellName) then
 			return start, ending
@@ -815,7 +828,7 @@ OvaleCondition.conditions.casttime = function(condition)
 			Ovale:Logf("castTime = %f %s %s", castTime, condition[2], condition[3])
 		end
 	end
-	return compare(castTime, condition[2], condition[3])
+	return Compare(castTime, condition[2], condition[3])
 end
 
 --- Get the number of charges on a spell with multiple charges.
@@ -829,7 +842,7 @@ end
 
 OvaleCondition.conditions.charges = function(condition)
 	local currentCharges, maxCharges, timeLastCast, cooldownDuration = API_GetSpellCharges(condition[1])
-	return compare(currentCharges, condition[2], condition[3])
+	return Compare(currentCharges, condition[2], condition[3])
 end
 
 --- Test if all of the listed checkboxes are off.
@@ -884,7 +897,7 @@ end
 -- if Chi(more 3) Spell(chi_burst)
 
 OvaleCondition.conditions.chi = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.chi, OvaleState.currentTime, OvaleState.powerRate.chi)
+	return TestValue(condition[1], condition[2], OvaleState.state.chi, OvaleState.currentTime, OvaleState.powerRate.chi)
 end
 
 --- Test whether the target's class matches the given class.
@@ -903,8 +916,8 @@ end
 -- if target.Class(PRIEST) Spell(cheap_shot)
 
 OvaleCondition.conditions.class = function(condition)
-	local loc, noloc = API_UnitClass(getTarget(condition))
-	return testbool(noloc == condition[1], condition[2])
+	local loc, noloc = API_UnitClass(GetTarget(condition))
+	return TestBoolean(noloc == condition[1], condition[2])
 end
 
 --- Test whether the target's classification matches the given classification.
@@ -924,7 +937,7 @@ end
 
 OvaleCondition.conditions.classification = function(condition)
 	local classification
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	if API_UnitLevel(target) == -1 then
 		classification = "worldboss"
 	else
@@ -935,7 +948,7 @@ OvaleCondition.conditions.classification = function(condition)
 			classification = "normal"
 		end
 	end
-	return testbool(condition[1]==classification, condition[2])
+	return TestBoolean(condition[1]==classification, condition[2])
 end
 
 --- Get the number of combo points on the currently selected target for a feral druid or a rogue.
@@ -951,7 +964,7 @@ end
 -- if ComboPoints(more 0) Spell(savage_roar)
 
 OvaleCondition.conditions.combopoints = function(condition)
-	return compare(OvaleState.state.combo, condition[1], condition[2])
+	return Compare(OvaleState.state.combo, condition[1], condition[2])
 end
 
 --- Get the current value of a script counter.
@@ -968,7 +981,7 @@ end
 -- if ComboPoints(more 0) Spell(savage_roar)
 
 OvaleCondition.conditions.counter = function(condition)
-	return compare(OvaleState:GetCounterValue(condition[1]), condition[2], condition[3])
+	return Compare(OvaleState:GetCounterValue(condition[1]), condition[2], condition[3])
 end
 
 --- Test whether the target's creature family matches the given name.
@@ -993,7 +1006,7 @@ end
 --     Spell(hibernate)
 
 OvaleCondition.conditions.creaturefamily = function(condition)
-	return testbool(API_UnitCreatureFamily(getTarget(condition)) == LBCT[condition[1]], condition[2])
+	return TestBoolean(API_UnitCreatureFamily(GetTarget(condition)) == LBCT[condition[1]], condition[2])
 end
 
 --- Test if the target is any of the listed creature types.
@@ -1011,7 +1024,7 @@ end
 --     Spell(polymorph)
 
 OvaleCondition.conditions.creaturetype = function(condition)
-	local creatureType = API_UnitCreatureType(getTarget(condition))
+	local creatureType = API_UnitCreatureType(GetTarget(condition))
 	for _,v in pairs(condition) do
 		if (creatureType == LBCT[v]) then
 			return 0
@@ -1080,7 +1093,7 @@ end
 -- if DemonicFury(more 999) Spell(metamorphosis)
 
 OvaleCondition.conditions.demonicfury = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.demonicfury, OvaleState.currentTime, OvaleState.powerRate.demonicfury)
+	return TestValue(condition[1], condition[2], OvaleState.state.demonicfury, OvaleState.currentTime, OvaleState.powerRate.demonicfury)
 end
 
 --- Get the distance in yards to the target.
@@ -1101,7 +1114,7 @@ end
 
 OvaleCondition.conditions.distance = function(condition)
 	if LRC then
-		return compare(LRC:GetRange(getTarget(condition)), condition[1], condition[2])
+		return Compare(LRC:GetRange(GetTarget(condition)), condition[1], condition[2])
 	else
 		return nil
 	end
@@ -1122,7 +1135,7 @@ end
 -- if Eclipse(less -70) and EclipseDir(less 0) Spell(wrath)
 
 OvaleCondition.conditions.eclipse = function(condition)
-	return compare(OvaleState.state.eclipse, condition[1], condition[2])
+	return Compare(OvaleState.state.eclipse, condition[1], condition[2])
 end
 
 --- Get the current direction of the Eclipse status on the Eclipse bar for balance druids.
@@ -1140,14 +1153,14 @@ end
 -- if Eclipse(less -70) and EclipseDir(less 0) Spell(wrath)
 
 OvaleCondition.conditions.eclipsedir = function(condition)
-	return compare(OvaleState:GetEclipseDir(), condition[1], condition[2])
+	return Compare(OvaleState:GetEclipseDir(), condition[1], condition[2])
 end
 
 	-- Get the effective mana (e.g. if spell cost is divided by two, will returns the mana multiplied by two)
 	-- TODO: not working
 	-- returns: bool or number
 OvaleCondition.conditions.effectivemana = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
+	return TestValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
 end
 
 --- Get the number of hostile enemies on the battlefield.
@@ -1162,7 +1175,7 @@ end
 -- if Enemies(more 4) Spell(fan_of_knives)
 
 OvaleCondition.conditions.enemies = function(condition)
-	return compare(OvaleEnemies.activeEnemies, condition[1], condition[2])
+	return Compare(OvaleEnemies.activeEnemies, condition[1], condition[2])
 end
 
 --- Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
@@ -1177,7 +1190,7 @@ end
 -- if Energy(more 70) Spell(vanish)
 
 OvaleCondition.conditions.energy = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.energy, OvaleState.currentTime, OvaleState.powerRate.energy)
+	return TestValue(condition[1], condition[2], OvaleState.state.energy, OvaleState.currentTime, OvaleState.powerRate.energy)
 end
 
 --- Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
@@ -1191,7 +1204,7 @@ end
 -- if EnergyRegen() >11 Spell(stance_of_the_sturdy_ox)
 
 OvaleCondition.conditions.energyregen = function(condition)
-	return compare(OvaleState.powerRate.energy, condition[1], condition[2])
+	return Compare(OvaleState.powerRate.energy, condition[1], condition[2])
 end
 
 --- Test if the target exists. The target may be alive or dead.
@@ -1209,7 +1222,7 @@ end
 -- if pet.Exists(no) Spell(summon_imp)
 
 OvaleCondition.conditions.exists = function(condition)
-	return testbool(API_UnitExists(getTarget(condition)) == 1, condition[1])
+	return TestBoolean(API_UnitExists(GetTarget(condition)) == 1, condition[1])
 end
 
 --- A condition that always returns false.
@@ -1233,7 +1246,7 @@ end
 -- if Focus(more 70) Spell(arcane_shot)
 
 OvaleCondition.conditions.focus = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.focus, OvaleState.currentTime, OvaleState.powerRate.focus)
+	return TestValue(condition[1], condition[2], OvaleState.state.focus, OvaleState.currentTime, OvaleState.powerRate.focus)
 end
 
 --- Get the amount of regenerated focus per second for hunters.
@@ -1248,7 +1261,7 @@ end
 -- if FocusRegen(more 20) Spell(arcane_shot)
 
 OvaleCondition.conditions.focusregen = function(condition)
-	return compare(OvaleState.powerRate.focus, condition[1], condition[2])
+	return Compare(OvaleState.powerRate.focus, condition[1], condition[2])
 end
 
 --- Get the player's global cooldown in seconds.
@@ -1263,7 +1276,7 @@ end
 -- if GCD(less 1.1) Spell(frostfire_bolt)
 
 OvaleCondition.conditions.gcd = function(condition)
-	return compare(OvaleState.gcd, condition[1], condition[2])
+	return Compare(OvaleState.gcd, condition[1], condition[2])
 end
 
 --- Test if the given glyph is active.
@@ -1279,7 +1292,7 @@ end
 --     Spell(savage_roar)
 
 OvaleCondition.conditions.glyph = function(condition)
-	return testbool(OvaleData.glyphs[condition[1]], condition[2])
+	return TestBoolean(OvaleData.glyphs[condition[1]], condition[2])
 end
 
 --- Test if the player has full control, i.e., isn't feared, charmed, etc.
@@ -1293,7 +1306,7 @@ end
 -- if HasFullControl(no) Spell(barkskin)
 
 OvaleCondition.conditions.hasfullcontrol = function(condition)
-	return testbool(API_HasFullControl(), condition[1])
+	return TestBoolean(API_HasFullControl(), condition[1])
 end
 
 --- Test if the player has a shield equipped.
@@ -1307,7 +1320,7 @@ end
 -- if HasShield() Spell(shield_wall)
 
 OvaleCondition.conditions.hasshield = function(condition)
-	return testbool(OvaleEquipement:HasShield(), condition[1])
+	return TestBoolean(OvaleEquipement:HasShield(), condition[1])
 end
 
 --- Test if the player has a particular trinket equipped.
@@ -1326,15 +1339,15 @@ end
 OvaleCondition.conditions.hastrinket = function(condition)
 	local trinketId = condition[1]
 	if type(trinketId) == "number" then
-		return testbool(OvaleEquipement:HasTrinket(trinketId), condition[2])
+		return TestBoolean(OvaleEquipement:HasTrinket(trinketId), condition[2])
 	elseif OvaleData.itemList[trinketId] then
 		for _, v in pairs(OvaleData.itemList[trinketId]) do
 			if OvaleEquipement:HasTrinket(v) then
-				return testbool(true, condition[2])
+				return TestBoolean(true, condition[2])
 			end
 		end
 	end
-	return testbool(false, condition[2])
+	return TestBoolean(false, condition[2])
 end
 
 --- Test if the player has a weapon equipped.
@@ -1351,11 +1364,11 @@ end
 
 OvaleCondition.conditions.hasweapon = function(condition)
 	if condition[1] == "offhand" then
-		return testbool(OvaleEquipement:HasOffHandWeapon(), condition[2])
+		return TestBoolean(OvaleEquipement:HasOffHandWeapon(), condition[2])
 	elseif condition[1] == "mainhand" then
-		return testbool(OvaleEquipement:HasMainHandWeapon(), condition[2])
+		return TestBoolean(OvaleEquipement:HasMainHandWeapon(), condition[2])
 	else
-		return testbool(false, condition[2])
+		return TestBoolean(false, condition[2])
 	end
 end
 
@@ -1375,11 +1388,11 @@ end
 -- if Health(less 10000) Spell(last_stand)
 
 OvaleCondition.conditions.health = function(condition)
-	local timeToDie, health, maxHealth = TimeToDie(getTarget(condition))
+	local timeToDie, health, maxHealth = TimeToDie(GetTarget(condition))
 	if not timeToDie or timeToDie == 0 then
 		return nil
 	end
-	return testValue(condition[1], condition[2], health, OvaleState.maintenant, -1 * health / timeToDie)
+	return TestValue(condition[1], condition[2], health, OvaleState.maintenant, -1 * health / timeToDie)
 end
 OvaleCondition.conditions.life = OvaleCondition.conditions.health
 
@@ -1399,12 +1412,12 @@ OvaleCondition.conditions.life = OvaleCondition.conditions.health
 -- if HealthMissing(less 20000) Item(healthstone)
 
 OvaleCondition.conditions.healthmissing = function(condition)
-	local timeToDie, health, maxHealth = TimeToDie(getTarget(condition))
+	local timeToDie, health, maxHealth = TimeToDie(GetTarget(condition))
 	if not timeToDie or timeToDie == 0 then
 		return nil
 	end
 	local missing = maxHealth - health
-	return testValue(condition[1], condition[2], missing, OvaleState.maintenant, health / timeToDie)
+	return TestValue(condition[1], condition[2], missing, OvaleState.maintenant, health / timeToDie)
 end
 OvaleCondition.conditions.lifemissing = OvaleCondition.conditions.healthmissing
 
@@ -1424,12 +1437,12 @@ OvaleCondition.conditions.lifemissing = OvaleCondition.conditions.healthmissing
 -- if target.HealthPercent(less 25) Spell(kill_shot)
 
 OvaleCondition.conditions.healthpercent = function(condition)
-	local timeToDie, health, maxHealth = TimeToDie(getTarget(condition))
+	local timeToDie, health, maxHealth = TimeToDie(GetTarget(condition))
 	if not timeToDie or timeToDie == 0 then
 		return nil
 	end
 	local healthPercent = health / maxHealth * 100
-	return testValue(condition[1], condition[2], healthPercent, OvaleState.maintenant, -1 * healthPercent / timeToDie)
+	return TestValue(condition[1], condition[2], healthPercent, OvaleState.maintenant, -1 * healthPercent / timeToDie)
 end
 OvaleCondition.conditions.lifepercent = OvaleCondition.conditions.healthpercent
 
@@ -1445,7 +1458,7 @@ OvaleCondition.conditions.lifepercent = OvaleCondition.conditions.healthpercent
 -- if HolyPower(more 2) Spell(word_of_glory)
 
 OvaleCondition.conditions.holypower = function(condition)
-	return compare(OvaleState.state.holy, condition[1], condition[2])
+	return Compare(OvaleState.state.holy, condition[1], condition[2])
 end
 
 --- Test if the player is in combat.
@@ -1459,7 +1472,7 @@ end
 -- if InCombat(no) and Stealthed(no) Spell(stealth)
 
 OvaleCondition.conditions.incombat = function(condition)
-	return testbool(Ovale.enCombat, condition[1])
+	return TestBoolean(Ovale.enCombat, condition[1])
 end
 
 --- Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
@@ -1475,7 +1488,7 @@ end
 --     Spell(haunt)
 
 OvaleCondition.conditions.inflighttotarget = function(condition)
-	return testbool(OvaleFuture:InFlight(condition[1] or OvaleState.currentSpellId == condition[1]), condition[2])
+	return TestBoolean(OvaleFuture:InFlight(condition[1] or OvaleState.currentSpellId == condition[1]), condition[2])
 end
 
 --- Test if the distance from the player to the target is within the spell's range.
@@ -1492,7 +1505,7 @@ end
 
 OvaleCondition.conditions.inrange = function(condition)
 	local spellName = OvaleData:GetSpellName(condition[1])
-	return testbool(API_IsSpellInRange(spellName, getTarget(condition)) == 1,condition[2])
+	return TestBoolean(API_IsSpellInRange(spellName, GetTarget(condition)) == 1,condition[2])
 end
 
 --- Get the cooldown time in seconds of an item, e.g., trinket.
@@ -1522,7 +1535,7 @@ end
 -- if ItemCount(mana_gem equal 0) Spell(conjure_mana_gem)
 
 OvaleCondition.conditions.itemcount = function(condition)
-	return compare(API_GetItemCount(condition[1]), condition[2], condition[3])
+	return Compare(API_GetItemCount(condition[1]), condition[2], condition[3])
 end
 
 --- Get the current number of charges of the given item in the player's inventory.
@@ -1539,7 +1552,7 @@ end
 --     Spell(conjure_mana_gem)
 
 OvaleCondition.conditions.itemcharges = function(condition)
-	return compare(API_GetItemCount(condition[1], false, true), condition[2], condition[3])
+	return Compare(API_GetItemCount(condition[1], false, true), condition[2], condition[3])
 end
 
 --- Test if the target's primary aggro is on the player.
@@ -1558,7 +1571,7 @@ end
 -- if target.IsAggroed() Spell(feign_death)
 
 OvaleCondition.conditions.isaggroed = function(condition)
-	return testbool(API_UnitDetailedThreatSituation("player", getTarget(condition)), condition[1])
+	return TestBoolean(API_UnitDetailedThreatSituation("player", GetTarget(condition)), condition[1])
 end
 
 --- Test if the player is feared.
@@ -1573,7 +1586,7 @@ end
 
 OvaleCondition.conditions.isfeared = function(condition)
 	local fearSpellList = OvaleData:GetFearSpellList()
-	return testbool(not API_HasFullControl() and isDebuffInList(fearSpellList), condition[1])
+	return TestBoolean(not API_HasFullControl() and isDebuffInList(fearSpellList), condition[1])
 end
 
 --- Test if the target is friendly to the player.
@@ -1590,7 +1603,7 @@ end
 -- if target.IsFriend() Spell(healing_touch)
 
 OvaleCondition.conditions.isfriend = function(condition)
-	return testbool(API_UnitIsFriend("player", getTarget(condition)), condition[1])
+	return TestBoolean(API_UnitIsFriend("player", GetTarget(condition)), condition[1])
 end
 
 --- Test if the player is incapacitated.
@@ -1605,7 +1618,7 @@ end
 
 OvaleCondition.conditions.isincapacitated = function(condition)
 	local incapacitateSpellList = OvaleData:GetIncapacitateSpellList()
-	return testbool(not API_HasFullControl() and isDebuffInList(incapacitateSpellList), condition[1])
+	return TestBoolean(not API_HasFullControl() and isDebuffInList(incapacitateSpellList), condition[1])
 end
 
 --- Test if the target is currently casting an interruptible spell.
@@ -1622,12 +1635,12 @@ end
 -- if target.IsInterruptible() Spell(kick)
 
 OvaleCondition.conditions.isinterruptible = function(condition)
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	local spell, rank, name, icon, start, ending, isTradeSkill, castID, protected = API_UnitCastingInfo(target)
 	if not spell then
 		spell, rank, name, icon, start, ending, isTradeSkill, protected = API_UnitChannelInfo(target)
 	end
-	return testbool(protected ~= nil and not protected, condition[1])
+	return TestBoolean(protected ~= nil and not protected, condition[1])
 end
 
 --- Test if the player is rooted.
@@ -1642,7 +1655,7 @@ end
 
 OvaleCondition.conditions.isrooted = function(condition)
 	local rootSpellList = OvaleData:GetRootSpellList()
-	return testbool(isDebuffInList(rootSpellList), condition[1])
+	return TestBoolean(isDebuffInList(rootSpellList), condition[1])
 end
 
 --- Test if the player is stunned.
@@ -1657,7 +1670,7 @@ end
 
 OvaleCondition.conditions.isstunned = function(condition)
 	local stunSpellList = OvaleData:GetStunSpellList()
-	return testbool(not API_HasFullControl() and isDebuffInList(stunSpellList), condition[1])
+	return TestBoolean(not API_HasFullControl() and isDebuffInList(stunSpellList), condition[1])
 end
 
 --- Get the damage done by the most recent damage event for the given spell.
@@ -1679,7 +1692,7 @@ OvaleCondition.conditions.lastspelldamage = function(condition)
 	if not OvaleSpellDamage:Get(spellId) then
 		return nil
 	end
-	return compare(OvaleSpellDamage:Get(spellId), condition[2], condition[3])
+	return Compare(OvaleSpellDamage:Get(spellId), condition[2], condition[3])
 end
 
 --- Get the estimated damage of the most recent cast of a spell.
@@ -1721,7 +1734,7 @@ end
 --     Spell(rupture)
 
 OvaleCondition.conditions.lastspelldamagemultiplier = function(condition)
-	return compare(OvaleFuture:GetLastDamageMultiplier(condition[1]), condition[2], condition[3])
+	return Compare(OvaleFuture:GetLastDamageMultiplier(condition[1]), condition[2], condition[3])
 end
 
 --- Get the attack power of the player during the most recent cast of a spell.
@@ -1738,7 +1751,7 @@ end
 --     Spell(hemorrhage)
 
 OvaleCondition.conditions.lastspellattackpower = function(condition)
-	return compare(OvaleFuture:GetLastAttackPower(condition[1]), condition[2], condition[3])
+	return Compare(OvaleFuture:GetLastAttackPower(condition[1]), condition[2], condition[3])
 end
 
 --- Get the spellpower of the player during the most recent cast of a spell.
@@ -1755,7 +1768,7 @@ end
 --     Spell(living_bomb)
 
 OvaleCondition.conditions.lastspellspellpower = function(condition)
-	return compare(OvaleFuture:GetLastSpellpower(condition[1]), condition[2], condition[3])
+	return Compare(OvaleFuture:GetLastSpellpower(condition[1]), condition[2], condition[3])
 end
 
 --- Get the number of combo points consumed by the most recent cast of a spell for a feral druid or a rogue.
@@ -1772,7 +1785,7 @@ end
 --     Spell(rip)
 
 OvaleCondition.conditions.lastspellcombopoints = function(condition)
-	return compare(OvaleFuture:GetLastComboPoints(condition[1]), condition[2], condition[3])
+	return Compare(OvaleFuture:GetLastComboPoints(condition[1]), condition[2], condition[3])
 end
 
 --- Get the mastery effect of the player during the most recent cast of a spell.
@@ -1791,7 +1804,7 @@ end
 --     Spell(metamorphosis)
 
 OvaleCondition.conditions.lastspellmastery = function(condition)
-	return compare(OvaleFuture:GetLastMasteryEffect(condition[1]), condition[2], condition[3])
+	return Compare(OvaleFuture:GetLastMasteryEffect(condition[1]), condition[2], condition[3])
 end
 
 --- Get the time elapsed in seconds since the player's previous melee swing (white attack).
@@ -1820,14 +1833,14 @@ end
 -- if Level(more 33) Spell(tiger_palm)
 
 OvaleCondition.conditions.level = function(condition)
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	local level
 	if target == "player" then
 		level = OvalePaperDoll.level
 	else
 		level = API_UnitLevel(target)
 	end
-	return compare(level, condition[1], condition[2])
+	return Compare(level, condition[1], condition[2])
 end
 
 --- Test if a list is currently set to the given value.
@@ -1864,11 +1877,11 @@ end
 -- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
 
 OvaleCondition.conditions.mana = function(condition)
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	if target == "player" then
-		return testValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
+		return TestValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
 	else
-		return compare(API_UnitPower(target, OVALE_POWERTYPE_MANA), condition[1], condition[2])
+		return Compare(API_UnitPower(target, OVALE_POWERTYPE_MANA), condition[1], condition[2])
 	end
 end
 
@@ -1887,16 +1900,16 @@ end
 -- if ManaPercent(more 90) Spell(arcane_blast)
 
 OvaleCondition.conditions.manapercent = function(condition)
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	local powerMax = API_UnitPowerMax(target, OVALE_POWERTYPE_MANA) or 0
 	if powerMax == 0 then
 		return nil
 	end
 	if target == "player "then
 		local conversion = 100 / powerMax
-		return testValue(condition[1], condition[2], OvaleState.state.mana * conversion, OvaleState.currentTime, OvaleState.powerRate.mana * conversion)
+		return TestValue(condition[1], condition[2], OvaleState.state.mana * conversion, OvaleState.currentTime, OvaleState.powerRate.mana * conversion)
 	else
-		return compare(API_UnitPower(target, OVALE_POWERTYPE_MANA) * 100 / powerMax, condition[1], condition[2])
+		return Compare(API_UnitPower(target, OVALE_POWERTYPE_MANA) * 100 / powerMax, condition[1], condition[2])
 	end
 end
 
@@ -1915,7 +1928,7 @@ end
 --     Spell(rake)
 
 OvaleCondition.conditions.mastery = function(condition)
-	return compare(OvalePaperDoll.masteryEffect, condition[1], condition[2])
+	return Compare(OvalePaperDoll.masteryEffect, condition[1], condition[2])
 end
 
 --- Get the amount of health points of the target when it is at full health.
@@ -1933,8 +1946,8 @@ end
 -- if target.MaxHealth(more 10000000) Item(mogu_power_potion)
 
 OvaleCondition.conditions.maxhealth = function(condition)
-	local target = getTarget(condition)
-	return compare(API_UnitHealthMax(target), condition[1], condition[2])
+	local target = GetTarget(condition)
+	return Compare(API_UnitHealthMax(target), condition[1], condition[2])
 end
 
 --- Get the level of mana of the target when it is at full mana.
@@ -1951,7 +1964,7 @@ end
 -- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
 
 OvaleCondition.conditions.maxmana = function(condition)
-	return compare(API_UnitPowerMax(getTarget(condition), OVALE_POWERTYPE_MANA), condition[1], condition[2])
+	return Compare(API_UnitPowerMax(GetTarget(condition), OVALE_POWERTYPE_MANA), condition[1], condition[2])
 end
 
 --- Get the time in seconds until the player's next melee swing (white attack).
@@ -2007,9 +2020,13 @@ end
 --     Spell(thunder_clap)
 
 OvaleCondition.conditions.otherdebuffexpires = function(condition)
-	local start, ending = getOtherAura(condition[1], getFilter(condition), "target")
+	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
 	local timeBefore = avecHate(condition[2], condition.haste)
-	return addTime(ending, -timeBefore)
+	if not start then
+		ending = 0
+	end
+	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
+	return AddToTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebuffexpires
 
@@ -2029,9 +2046,12 @@ OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebu
 --     Spell(devouring_plague)
 
 OvaleCondition.conditions.otherdebuffpresent = function(condition)
-	local start, ending = getOtherAura(condition[1], getFilter(condition), "target")
+	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
+	if not start then
+		return nil
+	end
 	local timeBefore = avecHate(condition[2], condition.haste)
-	return start, addTime(ending, -timeBefore)
+	return start, AddToTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebuffpresent
 
@@ -2049,11 +2069,11 @@ OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebu
 --     Spell(devouring_plague)
 
 OvaleCondition.conditions.otherdebuffremains = function(condition)
-	local start, ending = getOtherAura(condition[1], getFilter(condition), "target")
-	if ending then
+	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
+	if start and ending and start <= ending then
 		return start, ending, ending - start, start, -1
 	else
-		return nil
+		return 0, nil, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebuffremains
@@ -2074,8 +2094,8 @@ OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebu
 --     Spell(pet_pummel)
 
 OvaleCondition.conditions.present = function(condition)
-	local target = getTarget(condition)
-	return testbool(API_UnitExists(target) and not API_UnitIsDead(target), condition[1])
+	local target = GetTarget(condition)
+	return TestBoolean(API_UnitExists(target) and not API_UnitIsDead(target), condition[1])
 end
 
 --- Test if the previous spell cast matches the given spell.
@@ -2088,7 +2108,7 @@ end
 -- @return A boolean value.
 
 OvaleCondition.conditions.previousspell = function(condition)
-	return testbool(condition[1] == OvaleState.lastSpellId, condition[2])
+	return TestBoolean(condition[1] == OvaleState.lastSpellId, condition[2])
 end
 
 --- Test if the pet exists and is alive.
@@ -2105,7 +2125,7 @@ end
 --     Spell(pet_pummel)
 
 OvaleCondition.conditions.petpresent = function(condition)
-	return testbool(API_UnitExists("pet") and not API_UnitIsDead("pet"), condition[1])
+	return TestBoolean(API_UnitExists("pet") and not API_UnitIsDead("pet"), condition[1])
 end
 
 --- Test if the game is on a PTR server
@@ -2116,7 +2136,7 @@ end
 -- @return A boolean value
 OvaleCondition.conditions.ptr = function(condition)
 	local uiVersion = select(4, API_GetBuildInfo())
-	return testbool(uiVersion > 50200, condition[1])
+	return TestBoolean(uiVersion > 50200, condition[1])
 end
 
 --- Get the current amount of rage for guardian druids and warriors.
@@ -2131,7 +2151,7 @@ end
 -- if Rage(more 70) Spell(heroic_strike)
 
 OvaleCondition.conditions.rage = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.rage, OvaleState.currentTime, OvaleState.powerRate.rage)
+	return TestValue(condition[1], condition[2], OvaleState.state.rage, OvaleState.currentTime, OvaleState.powerRate.rage)
 end
 
 --- Get the result of the target's level minus the player's level. This number may be negative.
@@ -2152,7 +2172,7 @@ end
 
 OvaleCondition.conditions.relativelevel = function(condition)
 	local difference, level
-	local target = getTarget(condition)
+	local target = GetTarget(condition)
 	if target == "player" then
 		level = OvalePaperDoll.level
 	else
@@ -2163,7 +2183,7 @@ OvaleCondition.conditions.relativelevel = function(condition)
 	else
 		difference = level - OvalePaperDoll.level
 	end
-	return compare(difference, condition[1], condition[2])
+	return Compare(difference, condition[1], condition[2])
 end
 
 --- Get the remaining cast time in seconds of the target's current spell cast.
@@ -2179,7 +2199,7 @@ end
 --     Spell(cloak_of_shadows)
 
 OvaleCondition.conditions.remainingcasttime = function(condition)
-	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill, castID, notInterruptible = API_UnitCastingInfo(getTarget(condition))
+	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill, castID, notInterruptible = API_UnitCastingInfo(GetTarget(condition))
 	if not endTime then
 		return nil
 	end
@@ -2263,7 +2283,7 @@ end
 -- if RunicPower(more 70) Spell(frost_strike)
 
 OvaleCondition.conditions.runicpower = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.runicpower, OvaleState.currentTime, OvaleState.powerRate.runicpower)
+	return TestValue(condition[1], condition[2], OvaleState.state.runicpower, OvaleState.currentTime, OvaleState.powerRate.runicpower)
 end
 
 --- Get the current number of Shadow Orbs for shadow priests.
@@ -2278,7 +2298,7 @@ end
 -- if ShadowOrbs(more 2) Spell(mind_blast)
 
 OvaleCondition.conditions.shadoworbs = function(condition)
-	return testValue(condition[1], condition[2], OvaleState.state.shadoworbs, OvaleState.currentTime, OvaleState.powerRate.shadoworbs)
+	return TestValue(condition[1], condition[2], OvaleState.state.shadoworbs, OvaleState.currentTime, OvaleState.powerRate.shadoworbs)
 end
 
 --- Get the current number of Soul Shards for warlocks.
@@ -2293,7 +2313,7 @@ end
 -- if SoulShards(more 0) Spell(summon_felhunter)
 
 OvaleCondition.conditions.soulshards = function(condition)
-	return compare(OvaleState.state.shards, condition[1], condition[2])
+	return Compare(OvaleState.state.shards, condition[1], condition[2])
 end
 
 --- Get the current speed of the target.
@@ -2313,7 +2333,7 @@ end
 --     Spell(aspect_of_the_fox)
 
 OvaleCondition.conditions.speed = function(condition)
-	return compare(API_GetUnitSpeed(getTarget(condition))*100/7, condition[1], condition[2])
+	return Compare(API_GetUnitSpeed(GetTarget(condition))*100/7, condition[1], condition[2])
 end
 
 --- Test if the given spell is usable.
@@ -2331,7 +2351,7 @@ end
 --     Spell(guardian_of_ancient_kings_retribution)
 
 OvaleCondition.conditions.spellusable = function(condition)
-	return testbool(API_IsUsableSpell(condition[1]), condition[2])
+	return TestBoolean(API_IsUsableSpell(condition[1]), condition[2])
 end
 OvaleCondition.spellbookConditions.spellusable = true
 
@@ -2350,7 +2370,7 @@ OvaleCondition.spellbookConditions.spellusable = true
 
 OvaleCondition.conditions.spellcharges = function(condition)
 	local charges = API_GetSpellCharges(condition[1])
-	return compare(charges, condition[2], condition[3])
+	return Compare(charges, condition[2], condition[3])
 end
 OvaleCondition.spellbookConditions.spellcharges = true
 
@@ -2435,7 +2455,7 @@ end
 --     Spell(living_bomb)
 
 OvaleCondition.conditions.spellpower = function(condition)
-	return compare(OvalePaperDoll.spellBonusDamage, condition[1], condition[2])
+	return Compare(OvalePaperDoll.spellBonusDamage, condition[1], condition[2])
 end
 
 --- Test if the player is in a given stance.
@@ -2469,7 +2489,7 @@ end
 --     Spell(ambush)
 
 OvaleCondition.conditions.stealthed = function(condition)
-	return testbool(API_IsStealthed(), condition[1])
+	return TestBoolean(API_IsStealthed(), condition[1])
 end
 
 --- Get the number of points spent in a talent (0 or 1)
@@ -2484,7 +2504,7 @@ end
 -- if TalentPoints(blood_tap_talent) Spell(blood_tap)
 
 OvaleCondition.conditions.talentpoints = function(condition)
-	return compare(OvaleData:GetTalentPoints(condition[1]), condition[2], condition[3])
+	return Compare(OvaleData:GetTalentPoints(condition[1]), condition[2], condition[3])
 end
 
 --- Test if the player is the in-game target of the target.
@@ -2501,7 +2521,7 @@ end
 -- if target.TargetIsPlayer() Spell(feign_death)
 
 OvaleCondition.conditions.targetisplayer = function(condition)
-	return testbool(API_UnitIsUnit("player", getTarget(condition).."target"), condition[1])
+	return TestBoolean(API_UnitIsUnit("player", GetTarget(condition).."target"), condition[1])
 end
 
 --- Get the amount of threat on the current target relative to the its primary aggro target, scaled to between 0 (zero) and 100.
@@ -2517,8 +2537,8 @@ end
 -- if Threat(more 90) Spell(fade)
 
 OvaleCondition.conditions.threat = function(condition)
-	local isTanking, status, threatpct = API_UnitDetailedThreatSituation("player", getTarget(condition))
-	return compare(threatpct, condition[1], condition[2])
+	local isTanking, status, threatpct = API_UnitDetailedThreatSituation("player", GetTarget(condition))
+	return Compare(threatpct, condition[1], condition[2])
 end
 
 --- Get the current tick value of a periodic aura on the target.
@@ -2542,7 +2562,7 @@ end
 
 OvaleCondition.conditions.tickvalue = function(condition)
 	local value = select(5, GetAura(condition)) or 0
-	return compare(value, condition[2], condition[3])
+	return Compare(value, condition[2], condition[3])
 end
 
 --- Get the total number of ticks of a periodic aura.
@@ -2568,7 +2588,7 @@ OvaleCondition.conditions.ticks = function(condition)
 		duration, tick, numTicks = OvaleData:GetDuration(condition[1], OvaleState.state.combo, OvaleState.state.holy)
 	end
 	if numTicks then
-		return compare(numTicks, condition[2], condition[3])
+		return Compare(numTicks, condition[2], condition[3])
 	else
 		return nil
 	end
@@ -2631,7 +2651,7 @@ OvaleCondition.conditions.ticktime = function(condition)
 		tick = OvaleData:GetTickLength(condition[1])
 	end
 	if tick then
-		return compare(tick, condition[2], condition[3])
+		return Compare(tick, condition[2], condition[3])
 	else
 		return nil
 	end
@@ -2648,7 +2668,7 @@ end
 -- if TimeInCombat(more 5) Spell(bloodlust)
 
 OvaleCondition.conditions.timeincombat = function(condition)
-	return testValue(condition[1], condition[2], 0, Ovale.combatStartTime, 1)
+	return TestValue(condition[1], condition[2], 0, Ovale.combatStartTime, 1)
 end
 
 --- Get the estimated number of seconds remaining before the target is dead.
@@ -2667,7 +2687,7 @@ end
 -- if target.TimeToDie(less 2) and ComboPoints() >0 Spell(eviscerate)
 
 OvaleCondition.conditions.timetodie = function(condition)
-	local timeToDie = TimeToDie(getTarget(condition))
+	local timeToDie = TimeToDie(GetTarget(condition))
 	return 0, nil, timeToDie, OvaleState.maintenant, -1
 end
 OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
@@ -2723,7 +2743,7 @@ OvaleCondition.conditions.totemexpires = function(condition)
 	if condition.totem and OvaleData:GetSpellName(condition.totem) ~= totemName then
 		return 0
 	end
-	return addTime(startTime + duration, -(condition[2] or 0))
+	return AddToTime(startTime + duration, -(condition[2] or 0))
 end
 
 --- Test if the totem for shamans, the ghoul for death knights, or the statue for monks is present.
@@ -2768,7 +2788,7 @@ OvaleCondition.conditions.tracking = function(condition)
 			break
 		end
 	end
-	return testbool(present, condition[2])
+	return TestBoolean(present, condition[2])
 end
 
 --- A condition that always returns true.
