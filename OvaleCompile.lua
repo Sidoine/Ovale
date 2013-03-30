@@ -525,7 +525,23 @@ local function ParseCommands(text)
 		text = strgsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
 		text = strgsub(text, "(%d+%.?%d*)s", ParseTime)
 		text = strgsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
+		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
+		if was == text then
+			break
+		end
+	end
+
+	while true do
+		local was = text
 		text = strgsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
+		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
+		if was == text then
+			break
+		end
+	end
+
+	while true do
+		local was = text
 		text = strgsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
 		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
 		if was == text then
