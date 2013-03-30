@@ -447,7 +447,7 @@ local function ParseCompare(comp,t,a)
 	node.type = "compare"
 	node.comparison = comp
 	node.time = self_node[tonumber(t)]
-	node.b = self_node[tonumber(b)]
+	node.a = self_node[tonumber(a)]
 	return AddNode(node)
 end
 
