@@ -56,7 +56,6 @@ function OvaleGUID:OnDisable()
 end
 
 function OvaleGUID:Update(unitId)
-	--self:FormatPrint("OvaleGUID:Update %s", unitId)
 	local guid = API_UnitGUID(unitId)
 	local previousGuid = self_guid[unitId]
 	if previousGuid ~= guid then
