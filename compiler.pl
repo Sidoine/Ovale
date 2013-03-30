@@ -24,6 +24,7 @@ $m{"AceAddon-3.0"}{NewModule} = true;
 $m{AceConfig}{RegisterOptionsTable} = true;
 
 $m{"AceConsole-3.0"}{Print} = true;
+$m{"AceConsole-3.0"}{Printf} = true;
 
 $m{"AceEvent-3.0"}{RegisterEvent} = true;
 $m{"AceEvent-3.0"}{RegisterMessage} = true;
@@ -92,6 +93,7 @@ $p{Skada}{total} = true;
 $sp{Ovale}{OvaleBestAction} = true;
 $sp{Ovale}{OvaleCondition} = true;
 $sp{Ovale}{OvalePool} = true;
+$sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleState} = true;
 
 opendir(DIR, ".");
