@@ -97,7 +97,7 @@ AddIcon mastery=2 help=main
 	if BuffStacks(killing_machine) or RunicPower() >88 Spell(frost_strike)
 	if TalentPoints(plague_leech_talent) and {target.DebuffRemains(blood_plague) <3 or target.DebuffRemains(frost_fever) <3 or SpellCooldown(outbreak) <1 } Spell(plague_leech)
 	if target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 Spell(outbreak)
-	if target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } <=35 Spell(soul_reaper)
+	if target.HealthPercent() -{3 *target.HealthPercent() /target.DeadIn() } <=35 Spell(soul_reaper)
 	if not target.DebuffPresent(frost_fever) Spell(howling_blast)
 	if not target.DebuffPresent(blood_plague) Spell(plague_strike)
 	if BuffStacks(rime) Spell(howling_blast)
@@ -120,8 +120,8 @@ AddIcon mastery=2 help=offgcd
 	}
 	Spell(pillar_of_frost)
 	if TalentPoints(blood_tap_talent) and BuffStacks(blood_charge) >10 and {RunicPower() >76 or {RunicPower() >=20 and BuffStacks(killing_machine) } } Spell(blood_tap)
-	if TalentPoints(blood_tap_talent) and {target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } <=35 and SpellCooldown(soul_reaper) ==0 } Spell(blood_tap)
-	if TalentPoints(blood_tap_talent) and {target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } >35 or BuffStacks(blood_charge) >=8 } Spell(blood_tap)
+	if TalentPoints(blood_tap_talent) and {target.HealthPercent() -{3 *target.HealthPercent() /target.DeadIn() } <=35 and SpellCooldown(soul_reaper) ==0 } Spell(blood_tap)
+	if TalentPoints(blood_tap_talent) and {target.HealthPercent() -{3 *target.HealthPercent() /target.DeadIn() } >35 or BuffStacks(blood_charge) >=8 } Spell(blood_tap)
 }
 AddIcon mastery=2 help=cd
 {
@@ -148,7 +148,7 @@ AddIcon mastery=3 help=main
 	if AttackPower() >{LastSpellAttackPower(blood_plague) +5000 } and TimeInCombat() >15 and not {SpellCooldown(unholy_blight) >49 } Spell(outbreak)
 	if AttackPower() >{LastSpellAttackPower(blood_plague) +5000 } and TimeInCombat() >15 and not {SpellCooldown(unholy_blight) >49 } Spell(plague_strike)
 	if target.DebuffRemains(frost_fever) <3 or target.DebuffRemains(blood_plague) <3 Spell(outbreak)
-	if target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } <=35 Spell(soul_reaper)
+	if target.HealthPercent() -{3 *target.HealthPercent() /target.DeadIn() } <=35 Spell(soul_reaper)
 	if not target.DebuffPresent(blood_plague) or not target.DebuffPresent(frost_fever) Spell(plague_strike)
 	Spell(dark_transformation)
 	if RunicPower() >90 Spell(death_coil)
@@ -166,7 +166,7 @@ AddIcon mastery=3 help=main
 AddIcon mastery=3 help=offgcd
 {
 	if TalentPoints(blood_tap_talent) and BuffStacks(blood_charge) >10 and RunicPower() >=32 Spell(blood_tap)
-	if TalentPoints(blood_tap_talent) and {target.HealthPercent() -3 *{target.HealthPercent() /target.DeadIn() } <=35 and SpellCooldown(soul_reaper) ==0 } Spell(blood_tap)
+	if TalentPoints(blood_tap_talent) and {target.HealthPercent() -{3 *target.HealthPercent() /target.DeadIn() } <=35 and SpellCooldown(soul_reaper) ==0 } Spell(blood_tap)
 	if TalentPoints(blood_tap_talent) and BuffStacks(shadow_infusion) ==5 Spell(blood_tap)
 	if TalentPoints(blood_tap_talent) and RuneCount(unholy) ==2 and SpellCooldown(death_and_decay) ==0 Spell(blood_tap)
 	if TalentPoints(blood_tap_talent) and SpellCooldown(death_and_decay) ==0 Spell(blood_tap)
