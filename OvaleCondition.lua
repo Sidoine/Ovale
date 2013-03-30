@@ -125,18 +125,19 @@ local function IsSameSpell(spellIdA, spellIdB, spellNameB)
 	end
 end
 
-local function avecHate(temps, hate)
-	if not temps then
-		temps = 0
+local function TimeWithHaste(time1, haste)
+	if not time1 then
+		time1 = 0
 	end
-	if (not hate) then
-		return temps
-	elseif (hate == "spell") then
-		return temps / OvalePaperDoll:GetSpellHasteMultiplier()
-	elseif (hate == "melee") then
-		return temps / OvalePaperDoll:GetMeleeHasteMultiplier()
+	if not haste then
+		return time1
+	elseif haste == "spell" then
+		return time1 / OvalePaperDoll:GetSpellHasteMultiplier()
+	elseif haste == "melee" then
+		return time1 / OvalePaperDoll:GetMeleeHasteMultiplier()
 	else
-		return temps
+		Ovale:Logf("Unknown haste parameter haste=%s", haste)
+		return time1
 	end
 end
 
@@ -560,9 +561,9 @@ OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduratio
 -- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 --     Defaults to any=0.
 --     Valid values: 0, 1.
--- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to haste.
 --     Defaults to haste=none.
---     Valid values: spell, none.
+--     Valid values: melee, spell, none.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -576,7 +577,7 @@ OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduratio
 
 OvaleCondition.conditions.buffexpires = function(condition)
 	local start, ending = GetAura(condition)
-	local timeBefore = avecHate(condition[2], condition.haste)
+	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	if not start then
 		ending = 0
 	end
@@ -633,9 +634,9 @@ OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
 -- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 --     Defaults to any=0.
 --     Valid values: 0, 1.
--- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to haste.
 --     Defaults to haste=none.
---     Valid values: spell, none.
+--     Valid values: melee, spell, none.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -652,7 +653,7 @@ OvaleCondition.conditions.buffpresent = function(condition)
 	if not start then
 		return nil
 	end
-	local timeBefore = avecHate(condition[2], condition.haste)
+	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	return start, AddToTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
@@ -2010,9 +2011,9 @@ end
 -- @param id The spell ID of the aura or the name of a spell list.
 -- @param seconds Optional. The maximum number of seconds before the aura should expire.
 --     Defaults to 0 (zero).
--- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to haste.
 --     Defaults to haste=none.
---     Valid values: spell, none.
+--     Valid values: melee, spell, none.
 -- @return A boolean value.
 -- @see OtherBuffExpires
 -- @usage
@@ -2021,7 +2022,7 @@ end
 
 OvaleCondition.conditions.otherdebuffexpires = function(condition)
 	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
-	local timeBefore = avecHate(condition[2], condition.haste)
+	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	if not start then
 		ending = 0
 	end
@@ -2036,9 +2037,9 @@ OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebu
 -- @param id The spell ID of the aura or the name of a spell list.
 -- @param seconds Optional. The mininum number of seconds before the aura should expire.
 --     Defaults to 0 (zero).
--- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to spell haste.
+-- @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to haste.
 --     Defaults to haste=none.
---     Valid values: spell, none.
+--     Valid values: melee, spell, none.
 -- @return A boolean value.
 -- @see OtherBuffPresent
 -- @usage
@@ -2050,7 +2051,7 @@ OvaleCondition.conditions.otherdebuffpresent = function(condition)
 	if not start then
 		return nil
 	end
-	local timeBefore = avecHate(condition[2], condition.haste)
+	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	return start, AddToTime(ending, -timeBefore)
 end
 OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebuffpresent
@@ -2709,11 +2710,22 @@ OvaleCondition.conditions.timetomaxenergy = function(condition)
 	return 0, nil, 0, t, -1
 end
 
-	-- Multiply a time by the current spell haste
-	-- 1: the time
-	-- return: number
+--- Get the time scaled by the specified haste type, defaulting to spell haste.
+--- For example, if a DoT normally ticks every 3 seconds and is scaled by spell haste, then it ticks every TimeWithHaste(3 haste=spell) seconds.
+-- @name TimeWithHaste
+-- @paramsig number
+-- @param time The time in seconds.
+-- @param haste Optional. Sets whether "time" should be lengthened or shortened due to haste.
+--     Defaults to haste=spell.
+--     Valid values: melee, spell.
+-- @return The time in seconds scaled by haste.
+-- @usage
+-- if target.DebuffRemains(flame_shock) < TimeWithHaste(3)
+--     Spell(flame_shock)
+
 OvaleCondition.conditions.timewithhaste = function(condition)
-	return 0, nil, avecHate(condition[1], "spell"),0,0
+	haste = condition.haste or "spell"
+	return 0, nil, TimeWithHaste(condition[1], haste), 0, 0
 end
 
 --- Test if the totem for shamans, the ghoul for death knights, or the statue for monks has expired.
