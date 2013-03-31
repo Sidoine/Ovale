@@ -46,7 +46,6 @@ local self_lastLineID = nil
 local self_lastAttackPower = {}
 local self_lastComboPoints = {}
 local self_lastDamageMultiplier = {}
-local self_lastDamageMultiplier = {}
 local self_lastMasteryEffect = {}
 local self_lastSpellpower = {}
 --</private-static-properties>
