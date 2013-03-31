@@ -24,7 +24,6 @@ local OvalePool = Ovale.OvalePool
 local ipairs = ipairs
 local pairs = pairs
 local select = select
-local strfind = string.find
 local tinsert = table.insert
 local tremove = table.remove
 local API_UnitCastingInfo = UnitCastingInfo
@@ -48,6 +47,16 @@ local self_lastComboPoints = {}
 local self_lastDamageMultiplier = {}
 local self_lastMasteryEffect = {}
 local self_lastSpellpower = {}
+
+-- These CLEU events are eventually received after a successful spellcast.
+local OVALE_CLEU_SPELLCAST_RESULTS = {
+	SPELL_AURA_APPLIED = true,
+	SPELL_AURA_REFRESH = true,
+	SPELL_CAST_SUCCESS = true,
+	SPELL_CAST_FAILED = true,
+	SPELL_DAMAGE = true,
+	SPELL_MISSED = true,
+}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -325,19 +334,14 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	-- Called when a missile reaches or misses its target
 	if sourceGUID == OvaleGUID:GetGUID("player") then
 		-- Do not use SPELL_CAST_SUCCESS because it is sent when the missile has not reached the target.
-		if strfind(event, "SPELL_AURA_APPLIED") == 1
-				or strfind(event, "SPELL_AURA_REFRESH") == 1
-				or strfind(event, "SPELL_CAST_SUCCESS") == 1
-				or strfind(event, "SPELL_CAST_FAILED") == 1
-				or strfind(event, "SPELL_DAMAGE") == 1
-				or strfind(event, "SPELL_MISSED") == 1 then
+		if OVALE_CLEU_SPELLCAST_RESULTS[event] then
 			local spellId, spellName = select(12, ...)
 			if self.traceSpellId and self.traceSpellId == spellId then
 				Ovale:FormatPrint("%s: %f %s (%d), lineId = %d", event, Ovale.now, spellName, spellId, lineId)
 			end
 			for index, spellcast in ipairs(self_activeSpellcast) do
 				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraSpellId == spellId) then
-					if not spellcast.channeled and (spellcast.removeOnSuccess or strfind(event, "SPELL_CAST_SUCCESS") ~= 1) then
+					if not spellcast.channeled and (spellcast.removeOnSuccess or event ~= "SPELL_CAST_SUCCESS") then
 						if self.traceSpellId and self.traceSpellId == spellId then
 							Ovale:FormatPrint("    Spell finished: %f %s (%d)", Ovale.now, OvaleData:GetSpellName(spellId), spellId)
 						end
