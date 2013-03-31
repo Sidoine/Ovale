@@ -61,6 +61,13 @@ OvaleState.powerRate = {}
 OvaleState.lastSpellId = nil
 --</public-static-properties>
 
+--<private-static-methods>
+local function ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+	local self = OvaleState
+	self:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+end
+--</private-static-methods>
+
 --<public-static-methods>
 function OvaleState:StartNewFrame()
 	self.maintenant = Ovale.now
@@ -186,9 +193,7 @@ end
 -- Apply the effects of spells that are being cast or are in flight, allowing us to
 -- ignore lag or missile travel time.
 function OvaleState:ApplyActiveSpells()
-	for spellId, _, startCast, endCast, nextCast, nocd, target in OvaleFuture:InFlightSpells(self.maintenant) do
-		OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, target)
-	end
+	OvaleFuture:ApplyInFlightSpells(self.maintenant, ApplySpell)
 end
 
 -- Cast a spell in the simulator

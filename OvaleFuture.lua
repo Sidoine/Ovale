@@ -356,40 +356,26 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	end
 end
 
---[[-----------------------------------------------------------------------
-	Iterator for spells that are being cast or are in flight.
-
-	The iterator returns:
-		spellId: ID of the spell
-		lineId: spell counter (see documentation for UNIT_SPELLCAST_START)
-		startCast: the time the spell started being cast
-		endCast: the time the spell cast will end
-		nextCast: the time the next spell can be cast
-		nocd: true if the spell has no cooldown
-		target: the target of the spell (can be nil)
---]]-----------------------------------------------------------------------
-function OvaleFuture:InFlightSpells(now)
+-- Apply spells that are being cast or are in flight.
+function OvaleFuture:ApplyInFlightSpells(now, ApplySpell)
 	local index = 0
 	local spellcast, si
-	return function()
-		while true do
-			index = index + 1
-			if index > #self_activeSpellcast then return end
+	while true do
+		index = index + 1
+		if index > #self_activeSpellcast then return end
 
-			spellcast = self_activeSpellcast[index]
-			si = OvaleData.spellInfo[spellcast.spellId]
-			-- skip over spells that are toggles for other spells
-			if not (si and si.toggle) then
-				Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
-				if now - spellcast.stop < 5 then
-					return spellcast.spellId, spellcast.lineId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target
-				else
-					tremove(self_activeSpellcast, index)
-					self_pool:Release(spellcast)
-					-- Decrement current index since item was removed and rest of items shifted up.
-					index = index - 1
-				end
-				break
+		spellcast = self_activeSpellcast[index]
+		si = OvaleData.spellInfo[spellcast.spellId]
+		-- skip over spells that are toggles for other spells
+		if not (si and si.toggle) then
+			Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
+			if now - spellcast.stop < 5 then
+				ApplySpell(spellcast.spellId, spellcast.lineId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target)
+			else
+				tremove(self_activeSpellcast, index)
+				self_pool:Release(spellcast)
+				-- Decrement current index since item was removed and rest of items shifted up.
+				index = index - 1
 			end
 		end
 	end
