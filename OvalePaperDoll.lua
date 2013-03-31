@@ -16,12 +16,15 @@ Ovale.OvalePaperDoll = OvalePaperDoll
 --<private-static-properties>
 local select = select
 local tonumber = tonumber
+local API_GetCritChance = GetCritChance
 local API_GetMasteryEffect = GetMasteryEffect
 local API_GetMeleeHaste = GetMeleeHaste
+local API_GetRangedCritChance = GetRangedCritChance
 local API_GetRangedHaste = GetRangedHaste
 local API_GetSpecialization = GetSpecialization
 local API_GetSpellBonusDamage = GetSpellBonusDamage
 local API_GetSpellBonusHealing = GetSpellBonusHealing
+local API_GetSpellCritChance = GetSpellCritChance
 local API_UnitAttackPower = UnitAttackPower
 local API_UnitClass = UnitClass
 local API_UnitLevel = UnitLevel
@@ -71,10 +74,16 @@ OvalePaperDoll.attackPower = 0
 OvalePaperDoll.rangedAttackPower = 0
 -- percent increase of effect due to mastery
 OvalePaperDoll.masteryEffect = 0
+-- percent increase to melee critical strike
+OvalePaperDoll.meleeCrit = 0
 -- percent increase to melee haste
 OvalePaperDoll.meleeHaste = 0
+-- percent increase to ranged critical strike
+OvalePaperDoll.rangedCrit = 0
 -- percent increase to ranged haste
 OvalePaperDoll.rangedHaste = 0
+-- percent increase to spell critical strike
+OvalePaperDoll.spellCrit = 0
 -- percent increase to spell haste
 OvalePaperDoll.spellHaste = 0
 -- spellpower
@@ -85,34 +94,44 @@ OvalePaperDoll.spellBonusHealing = 0
 --<public-static-methods>
 function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStats")
+	self:RegisterEvent("COMBAT_RATING_UPDATE")
 	self:RegisterEvent("MASTERY_UPDATE")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateStats")
+	self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStats")
+	self:RegisterEvent("SPELL_POWER_CHANGED")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
-	self:RegisterEvent("UNIT_SPELL_POWER")
 	self:RegisterEvent("UNIT_STATS")
 end
 
 function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+	self:UnregisterEvent("COMBAT_RATING_UPDATE")
 	self:UnregisterEvent("MASTERY_UPDATE")
 	self:UnregisterEvent("PLAYER_ALIVE")
+	self:UnregisterEvent("PLAYER_DAMAGE_DONE_MODS")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_LEVEL_UP")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
+	self:UnregisterEvent("SPELL_POWER_CHANGED")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_SPELL_HASTE")
-	self:UnregisterEvent("UNIT_SPELL_POWER")
 	self:UnregisterEvent("UNIT_STATS")
+end
+
+function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
+	self.meleeCrit = API_GetCritChance()
+	self.rangedCrit = API_GetRangedCritChance()
+	self.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
@@ -125,6 +144,14 @@ end
 
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
 	self.level = tonumber(level) or API_UnitLevel("player")
+end
+
+function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
+	self.spellBonusHealing = API_GetSpellBonusHealing()
+end
+
+function OvalePaperDoll:SPELL_POWER_CHANGED(event)
+	self.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 end
 
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
@@ -155,16 +182,6 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 	self.spellHaste = API_UnitSpellHaste(unitId)
 end
 
-function OvalePaperDoll:UNIT_SPELL_POWER(event, unitId)
-	if unitId ~= "player" then return end
-	self.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
-	if OVALE_HEALING_CLASS[self.class] then
-		self.spellBonusHealing = API_GetSpellBonusHealing()
-	else
-		self.spellBonusHealing = self.spellBonusDamage
-	end
-end
-
 function OvalePaperDoll:UNIT_STATS(event, unitId)
 	if unitId ~= "player" then return end
 	self.strength = API_UnitStat(unitId, 1)
@@ -176,12 +193,14 @@ end
 
 function OvalePaperDoll:UpdateStats(event)
 	self.specialization = API_GetSpecialization()
+	self:COMBAT_RATING_UPDATE(event)
 	self:MASTERY_UPDATE(event)
+	self:PLAYER_DAMAGE_DONE_MODS(event, "player")
+	self:SPELL_POWER_CHANGED(event)
 	self:UNIT_ATTACK_POWER(event, "player")
 	self:UNIT_RANGEDDAMAGE(event, "player")
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
-	self:UNIT_SPELL_POWER(event, "player")
 	self:UNIT_STATS(event, "player")
 end
 
@@ -214,8 +233,11 @@ function OvalePaperDoll:Debug()
 	Ovale:FormatPrint("RAP: %d", self.rangedAttackPower)
 	Ovale:FormatPrint("Spell bonus damage: %d", self.spellBonusDamage)
 	Ovale:FormatPrint("Spell bonus healing: %d", self.spellBonusHealing)
+	Ovale:FormatPrint("Spell critical strike effect: %f%%", self.spellCrit)
 	Ovale:FormatPrint("Spell haste effect: %f%%", self.spellHaste)
+	Ovale:FormatPrint("Melee critical strike effect: %f%%", self.meleeCrit)
 	Ovale:FormatPrint("Melee haste effect: %f%%", self.meleeHaste)
+	Ovale:FormatPrint("Ranged critical strike effect: %f%%", self.rangedCrit)
 	Ovale:FormatPrint("Ranged haste effect: %f%%", self.rangedHaste)
 	Ovale:FormatPrint("Mastery effect: %f%%", self.masteryEffect)
 end
