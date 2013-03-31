@@ -2371,7 +2371,7 @@ end
 --     Spell(guardian_of_ancient_kings_retribution)
 
 OvaleCondition.conditions.spellknown = function(condition)
-	return testbool(OvaleData.spellList[condition[1]], condition[2])
+	return TestBoolean(OvaleData.spellList[condition[1]], condition[2])
 end
 OvaleCondition.spellbookConditions.spellknown = true
 
