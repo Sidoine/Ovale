@@ -2355,6 +2355,26 @@ OvaleCondition.conditions.speed = function(condition)
 	return Compare(API_GetUnitSpeed(GetTarget(condition))*100/7, condition[1], condition[2])
 end
 
+--- Test if the given spell is in the spellbook.
+-- A spell is known if the player has learned the spell and it is in the spellbook.
+-- @name SpellKnown
+-- @paramsig boolean
+-- @param id The spell ID.
+-- @param yesno Optional. If yes, then return true if the spell has been learned.
+--     If no, then return true if the player hasn't learned the spell.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @return A boolean value.
+-- @see SpellUsable
+-- @usage
+-- if SpellKnown(avenging_wrath) and SpellCooldown(avenging_wrath) <10
+--     Spell(guardian_of_ancient_kings_retribution)
+
+OvaleCondition.conditions.spellknown = function(condition)
+	return testbool(OvaleData.spellList[condition[1]], condition[2])
+end
+OvaleCondition.spellbookConditions.spellknown = true
+
 --- Test if the given spell is usable.
 -- A spell is usable if the player has learned the spell and has the resources required to cast the spell.
 -- @name SpellUsable
@@ -2365,6 +2385,7 @@ end
 --     Default is yes.
 --     Valid values: yes, no.
 -- @return A boolean value.
+-- @see SpellKnown
 -- @usage
 -- if SpellUsable(avenging_wrath) and SpellCooldown(avenging_wrath) <10
 --     Spell(guardian_of_ancient_kings_retribution)
