@@ -60,6 +60,7 @@ local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local API_UnitIsDead = UnitIsDead
 local API_UnitIsFriend = UnitIsFriend
+local API_UnitIsPVP = UnitIsPVP
 local API_UnitIsUnit = UnitIsUnit
 local API_UnitLevel = UnitLevel
 local API_UnitPower = UnitPower
@@ -1605,6 +1606,23 @@ end
 
 OvaleCondition.conditions.isfriend = function(condition)
 	return TestBoolean(API_UnitIsFriend("player", GetTarget(condition)), condition[1])
+end
+
+--- Test if the target is flagged for PvP activity.
+-- @name IsPVP
+-- @paramsig boolean
+-- @param yesno Optional. If yes, then return true if the target is flagged for PvP activity. If no, then return true if it isn't PvP-flagged.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return A boolean value.
+-- @usage
+-- if not target.IsFriend() and target.IsPVP() Spell(sap)
+
+OvaleCondition.conditions.isfriend = function(condition)
+	return TestBoolean(API_UnitIsPVP(GetTarget(condition)), condition[1])
 end
 
 --- Test if the player is incapacitated.
