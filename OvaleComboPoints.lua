@@ -30,14 +30,22 @@ OvaleComboPoints.combo = 0
 function OvaleComboPoints:OnEnable()
 	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Refresh")
+		self:RegisterEvent("PLAYER_LOGIN", "Refresh")
+		self:RegisterEvent("PLAYER_TARGET_CHANGED", "Refresh")
 		self:RegisterEvent("UNIT_COMBO_POINTS")
+		self:RegisterEvent("UNIT_TARGET", "UNIT_COMBO_POINTS")
 	end
 end
 
 function OvaleComboPoints:OnDisable()
 	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		self:UnregisterEvent("PLAYER_LOGIN")
+		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 		self:UnregisterEvent("UNIT_COMBO_POINTS")
+		self:UnregisterEvent("UNIT_TARGET")
 	end
 end
 
