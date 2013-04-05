@@ -500,19 +500,21 @@ end
 
 function OvaleData:GetGCD(spellId)
 	if spellId and self.spellInfo[spellId] then
-		if self.spellInfo[spellId].haste == "spell" then
-			local cd = self.spellInfo[spellId].gcd
-			if not cd then
-				cd = 1.5
+		local si = self.spellInfo[spellId]
+		if si.haste then
+			local cd = si.gcd or 1.5
+			if si.haste == "melee" then
+				cd = cd / OvalePaperDoll:GetMeleeHasteMultiplier()
+			elseif si.haste == "spell" then
+				cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
 			end
-			cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
-			if (cd<1) then
+			if cd < 1 then
 				cd = 1
 			end
 			return cd
-		elseif self.spellInfo[spellId].gcd then
-			return self.spellInfo[spellId].gcd
-		end			
+		elseif si.gcd then
+			return si.gcd
+		end
 	end
 	
 	-- Default value
