@@ -778,14 +778,12 @@ function OvaleCompile:Ovale_EquipmentChanged(event)
 	if self_compileOnItems then
 		self:EventHandler(event)
 	end
-	Ovale.refreshNeeded.player = true
 end
 
 function OvaleCompile:Ovale_StanceChanged(event)
 	if self_compileOnStances then
 		self:EventHandler(event)
 	end
-	Ovale.refreshNeeded.player = true
 end
 
 function OvaleCompile:Compile()
