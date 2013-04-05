@@ -32,7 +32,7 @@ local function GetValue(set)
 	end
 end
 
-function ReceiveScore(name, guid, scored, scoreMax)
+local function ReceiveScore(name, guid, scored, scoreMax)
 	local self = OvaleSkada
 	if guid and Skada and Skada.current and Skada.total then
 		local player = Skada:get_player(Skada.current, guid, nil)

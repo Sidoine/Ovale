@@ -149,7 +149,7 @@ local function RemoveAurasForGUID(guid)
 	end
 end
 
-function RemoveAurasForMissingUnits()
+local function RemoveAurasForMissingUnits()
 	-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
 	-- i.e., not in the group or not targeted by anyone in the group or focus.
 	for guid in pairs(self_aura) do
@@ -159,7 +159,7 @@ function RemoveAurasForMissingUnits()
 	end
 end
 
-function UpdateAuras(unitId, unitGUID)
+local function UpdateAuras(unitId, unitGUID)
 	self_serial = self_serial + 1
 	
 	if not unitId then
