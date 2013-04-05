@@ -350,6 +350,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 			if si.toggle then
 				cd.toggled = 1
 			end
+			Ovale:Logf("%d cd.start=%f, cd.duration=%f", spellId, cd.start, cd.duration)
 		end
 
 		if si.eclipse then
