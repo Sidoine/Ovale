@@ -346,6 +346,13 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 					end
 				end
 			end
+			if cd.duration > 0 and si.cd_haste then
+				if si.cd_haste == "melee" then
+					cd.duration = cd.duration / OvalePaperDoll:GetMeleeHasteMultiplier()
+				elseif si.cd_haste == "spell" then
+					cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
+				end
+			end
 			cd.enable = 1
 			if si.toggle then
 				cd.toggled = 1
@@ -487,11 +494,11 @@ function OvaleState:GetCD(spellId)
 	if not spellId then
 		return nil
 	end
-	
-	if OvaleData.spellInfo[spellId] and OvaleData.spellInfo[spellId].cd then
+	local si = OvaleData.spellInfo[spellId]
+	if si and si.cd then
 		local cdname
-		if OvaleData.spellInfo[spellId].sharedcd then
-			cdname = OvaleData.spellInfo[spellId].sharedcd
+		if si.sharedcd then
+			cdname = si.sharedcd
 		else
 			cdname = spellId
 		end
