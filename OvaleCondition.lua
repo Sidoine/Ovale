@@ -65,6 +65,7 @@ local API_UnitIsUnit = UnitIsUnit
 local API_UnitLevel = UnitLevel
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
+local API_UnitStagger = UnitStagger
 
 -- static property for GetRunesCooldown(), indexed by rune name
 local self_runes = {}
@@ -2496,6 +2497,37 @@ end
 
 OvaleCondition.conditions.spellpower = function(condition)
 	return Compare(OvalePaperDoll.spellBonusDamage, condition[1], condition[2])
+end
+
+--- Get the remaining amount of damage Stagger will cause to the target.
+-- @name StaggerRemains
+-- @paramsig number
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The amount of damage.
+-- @usage
+-- if StaggerRemains() / MaxHealth() >0.4 Spell(purifying_brew)
+
+OvaleCondition.conditions.staggerremains = function(condition)
+	local target = GetTarget(condition)
+	local start, ending, stacks
+	-- Heavy Stagger
+	start, ending, stacks = OvaleState:GetAura(target, 124273, "HARMFUL")
+	if not stacks or stacks == 0 then
+		-- Moderate Stagger
+		start, ending, stacks = OvaleState:GetAura(target, 124274, "HARMFUL")
+	end
+	if not stacks or stacks == 0 then
+		-- Light Stagger
+		start, ending, stacks = OvaleState:GetAura(target, 124275, "HARMFUL")
+	end
+	if start and ending and start < ending and stacks and stacks > 0 then
+		local stagger = API_UnitStagger(target)
+		return start, ending, 0, ending, -1 * stagger / (ending - start)
+	else
+		return 0, nil, 0, 0, 0
+	end
 end
 
 --- Test if the player is in a given stance.
