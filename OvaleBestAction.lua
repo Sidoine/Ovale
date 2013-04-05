@@ -255,7 +255,7 @@ local function ComputeFunction(element)
 			else
 				start = OvaleState.currentTime
 			end
-			Ovale:Logf("start=%f attenteFinCast=%s", start, OvaleState.attenteFinCast)
+			Ovale:Logf("start=%f attenteFinCast=%s [%d]", start, OvaleState.attenteFinCast, element.nodeId)
 			if start < OvaleState.attenteFinCast then
 				local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
 				if not (si and si.canStopChannelling) then
