@@ -62,6 +62,24 @@ do
 		OVALE_UNIT_AURA_UNITS["raidpet" .. i] = true
 	end
 end
+-- CLEU events triggered by auras being applied, removed, refreshed, or changed in stack size.
+local OVALE_CLEU_AURA_EVENTS = {
+	SPELL_AURA_APPLIED = true,
+	SPELL_AURA_REMOVED = true,
+	SPELL_AURA_APPLIED_DOSE = true,
+	SPELL_AURA_REMOVED_DOSE = true,
+	SPELL_AURA_REFRESH = true,
+	SPELL_AURA_BROKEN = true,
+	SPELL_AURA_BROKEN_SPELL = true,
+}
+-- CLEU events triggered by a periodic aura.
+local OVALE_CLEU_TICK_EVENTS = {
+	SPELL_PERIODIC_DAMAGE = true,
+	SPELL_PERIODIC_HEAL = true,
+	SPELL_PERIODIC_ENERGIZE = true,
+	SPELL_PERIODIC_DRAIN = true,
+	SPELL_PERIODIC_LEECH = true,
+}
 --</private-static-properties>
 
 --<private-static-methods>
@@ -129,10 +147,12 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		aura.source = casterGUID
 		aura.name = name
 		aura.value = value
-		if mine then
-			-- This is a new or refreshed aura applied by the player, so set the tick information if needed.
+
+		-- Only set the tick information for new auras.
+		if mine and not existingAura then
 			local si = OvaleData.spellInfo[spellId]
 			if si and si.tick then
+				aura.ticksSeen = 0
 				aura.tick = OvaleData:GetTickLength(spellId)
 			end
 		end
@@ -252,6 +272,49 @@ local function ScanUnitAuras(event, unitId, guid)
 	end
 	RemoveAurasForGUID(guid, true)
 end
+
+-- Update the tick length of an aura using event timestamps from the combat log.
+local function UpdateAuraTick(guid, spellId, timestamp)
+	local aura, filter
+	if self_aura[guid] then
+		local serial = self_serial[guid]
+		filter = "HARMFUL"
+		while true do
+			if self_aura[guid][filter] and self_aura[guid][filter][spellId] and self_aura[guid][filter][spellId].mine then
+				if RemoveAuraIfExpired(guid, spellId, filter, self_aura[guid][filter][spellId].mine, serial) then
+					self_aura[guid][filter][spellId].mine = nil
+				end
+				aura = self_aura[guid][filter][spellId].mine
+			end
+			if aura then break end
+			if filter == "HARMFUL" then
+				filter = "HELPFUL"
+			else
+				break
+			end
+		end
+	end
+	if aura and aura.tick then
+		local tick = aura.tick
+		local ticksSeen = aura.ticksSeen or 0
+		if not aura.lastTickTime then
+			-- For some reason, there was no lastTickTime information recorded,
+			-- so approximate the tick time using the player's current stats.
+			tick = OvaleData:GetTickLength(spellId)
+			ticksSeen = 0
+		else
+			-- Tick times tend to vary about the "true" value by a up to a few
+			-- hundredths of a second.  Keep a running average to try to protect
+			-- against unusually short or long tick times.
+			tick = ((tick * ticksSeen) + (timestamp - aura.lastTickTime)) / (ticksSeen + 1)
+			ticksSeen = ticksSeen + 1
+		end
+		aura.lastTickTime = timestamp
+		aura.tick = tick
+		aura.ticksSeen = ticksSeen
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s, tick=%f", filter, aura.name, spellId, guid, tick)
+	end
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -276,12 +339,16 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 
 	if event == "UNIT_DIED" then
 		RemoveAurasForGUID(destGUID)
-	elseif strfind(event, "SPELL_AURA_") == 1 then
-		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
+	elseif OVALE_CLEU_AURA_EVENTS[event] then
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		if unitId and not OVALE_UNIT_AURA_UNITS[unitId] then
 			ScanUnitAuras(event, unitId, destGUID)
 		end
+	elseif OVALE_CLEU_TICK_EVENTS[event] and sourceGUID == OvaleGUID:GetGUID("player") then
+		-- Periodic aura cast by the player.
+		-- Update the latest tick time of the aura.
+		local spellId, spellName, spellSchool = select(12, ...)
+		UpdateAuraTick(destGUID, spellId, timestamp)
 	end
 end
 
