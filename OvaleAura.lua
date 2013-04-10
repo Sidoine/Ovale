@@ -28,10 +28,14 @@ local tinsert = table.insert
 local tsort = table.sort
 local API_UnitAura = UnitAura
 
+-- aura pool
 local self_pool = OvalePool:NewPool("OvaleAura_pool")
+-- self_aura[guid] pool
+local self_aura_pool = OvalePool:NewPool("OvaleAura_aura_pool")
 -- self_aura[guid][filter][spellId]["mine" or "other"] = { aura properties }
 local self_aura = {}
-local self_serial = 0
+-- self_serial[guid] = aura age
+local self_serial = {}
 
 local OVALE_AURA_DEBUG = "aura"
 -- Units for which UNIT_AURA is known to fire.
@@ -61,46 +65,54 @@ end
 --</private-static-properties>
 
 --<private-static-methods>
-local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
-	if not self_aura[unitGUID][filter] then
-		self_aura[unitGUID][filter] = {}
+local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
+	if not self_aura[guid][filter] then
+		self_aura[guid][filter] = {}
 	end
-	local auraList = self_aura[unitGUID][filter]
-	if not auraList[spellId] then
-		auraList[spellId] = {}
+	if not self_aura[guid][filter][spellId] then
+		self_aura[guid][filter][spellId] = {}
 	end
 
-	-- Re-use existing aura by updating its serial number and adding new information
-	-- if it differs from the old aura.
-	local mine = (unitCaster == "player")
-	local aura, oldAura
+	local mine = (casterGUID == OvaleGUID:GetGUID("player"))
+	local existingAura, aura
 	if mine then
-		oldAura = auraList[spellId].mine
-		if oldAura then
-			aura = oldAura
+		existingAura = self_aura[guid][filter][spellId].mine
+		if existingAura then
+			aura = existingAura
 		else
 			aura = self_pool:Get()
 			aura.gain = Ovale.now
-			auraList[spellId].mine = aura
+			self_aura[guid][filter][spellId].mine = aura
 		end
 	else
-		oldAura = auraList[spellId].other
-		if oldAura then
-			aura = oldAura
+		existingAura = self_aura[guid][filter][spellId].other
+		if existingAura then
+			aura = existingAura
 		else
 			aura = self_pool:Get()
 			aura.gain = Ovale.now
-			auraList[spellId].other = aura
+			self_aura[guid][filter][spellId].other = aura
 		end
 	end
 
-	aura.serial = self_serial
+	aura.serial = self_serial[guid]
 	if count == 0 then
 		count = 1
 	end
 
-	local isSameAura = oldAura and oldAura.duration == duration and oldAura.ending == expirationTime and oldAura.stacks == count
-	if not isSameAura and not aura.ending or aura.ending < expirationTime or aura.stacks ~= count then
+	-- Only overwrite an existing aura's information if the aura has changed.
+	-- An aura's "fingerprint" is its:
+	--     caster, duration, expiration time, stack count.
+	local auraIsUnchanged = (
+		existingAura and
+		(aura.source == casterGUID) and
+		((not aura.duration and duration == 0) or aura.duration == duration) and
+		((not aura.ending and expirationTime == 0) or aura.ending == expirationTime) and
+		(aura.stacks == count)
+	)
+	local addAura = not existingAura or not auraIsUnchanged
+	if addAura then
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Adding %s %s (%s) to %s, aura.serial=%d", filter, name, spellId, guid, aura.serial)
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
@@ -114,7 +126,7 @@ local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuf
 		aura.start = expirationTime - duration
 		aura.stealable = isStealable
 		aura.mine = mine
-		aura.source = unitCaster
+		aura.source = casterGUID
 		aura.name = name
 		aura.value = value
 		if mine then
@@ -125,88 +137,37 @@ local function AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuf
 			end
 		end
 	end
+	return addAura
 end
 
-local function RemoveAurasForGUID(guid)
-	-- Return all auras for the given GUID to the aura pool.
-	if not guid or not self_aura[guid] then return end
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras for guid %s", guid)
-	for filter, auraList in pairs(self_aura[guid]) do
+local function RemoveAuraIfExpired(guid, spellId, filter, aura, serial)
+	if aura and serial and aura.serial ~= serial then
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing expired %s %s (%s) from %s, serial=%d aura.serial=%d",
+			filter, aura.name, spellId, guid, serial, aura.serial)
+		self_pool:Release(aura)
+		return true
+	end
+	return false
+end
+
+-- Return all auras for the given GUID to the aura pool.
+local function RemoveAurasForGUID(guid, expired)
+	if not guid or not self_aura[guid] or not self_serial[guid] then return end
+	if not expired then
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras from guid %s", guid)
+	end
+	local serial = self_serial[guid]
+	local auraTable = self_aura[guid]
+	for filter, auraList in pairs(auraTable) do
 		for spellId, whoseTable in pairs(auraList) do
 			for whose, aura in pairs(whoseTable) do
-				whoseTable[whose] = nil
-				self_pool:Release(aura)
-			end
-			auraList[spellId] = nil
-		end
-		self_aura[guid][filter] = nil
-	end
-	self_aura[guid] = nil
-
-	local unitId = OvaleGUID:GetUnitId(guid)
-	if unitId then
-		Ovale.refreshNeeded[unitId] = true
-	end
-end
-
-local function RemoveAurasForMissingUnits()
-	-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
-	-- i.e., not in the group or not targeted by anyone in the group or focus.
-	for guid in pairs(self_aura) do
-		if not OvaleGUID:GetUnitId(guid) then
-			RemoveAurasForGUID(guid)
-		end
-	end
-end
-
-local function UpdateAuras(unitId, unitGUID)
-	self_serial = self_serial + 1
-	
-	if not unitId then
-		return
-	end
-	if not unitGUID then
-		unitGUID = OvaleGUID:GetGUID(unitId)
-	end
-	if not unitGUID then
-		return
-	end
-
-	if not self_aura[unitGUID] then
-		self_aura[unitGUID] = {}
-	end
-	
-	local i = 1
-	local filter = "HELPFUL"
-	local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
-	local canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3
-	while (true) do
-		name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
-			canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, filter)
-		if not name then
-			if filter == "HELPFUL" then
-				filter = "HARMFUL"
-				i = 1
-			else
-				break
-			end
-		else
-			AddAura(unitGUID, spellId, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
-			if debuffType then
-				-- TODO: not very clean
-				-- should be computed by OvaleState:GetAura
-				AddAura(unitGUID, debuffType, filter, unitCaster, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
-			end
-			i = i + 1
-		end
-	end
-
-	--Removes expired auras
-	for filter, auraList in pairs(self_aura[unitGUID]) do
-		for spellId, whoseTable in pairs(auraList) do
-			for whose, aura in pairs(whoseTable) do
-				if aura.serial ~= self_serial then
-					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing %s %s from %s, serial=%d aura.serial=%d", filter, aura.name, whose, self_serial, aura.serial)
+				if expired then
+					if RemoveAuraIfExpired(guid, spellId, filter, aura, serial) then
+						whoseTable[whose] = nil
+					end
+				else
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing %s %s (%s) from %s, serial=%d aura.serial=%d",
+						filter, aura.name, spellId, guid, serial, aura.serial)
 					whoseTable[whose] = nil
 					self_pool:Release(aura)
 				end
@@ -216,14 +177,80 @@ local function UpdateAuras(unitId, unitGUID)
 			end
 		end
 		if not next(auraList) then
-			self_aura[unitGUID][filter] = nil
+			auraTable[filter] = nil
 		end
 	end
-	if not next(self_aura[unitGUID]) then
-		self_aura[unitGUID] = nil
+	if not next(auraTable) then
+		self_aura[guid] = nil
+		self_aura_pool:Release(auraTable)
 	end
 
-	Ovale.refreshNeeded[unitId] = true
+	local unitId = OvaleGUID:GetUnitId(guid)
+	if unitId then
+		Ovale.refreshNeeded[unitId] = true
+	end
+end
+
+-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
+-- i.e., not in the group or not targeted by anyone in the group or focus.
+local function RemoveAurasForMissingUnits()
+	for guid in pairs(self_aura) do
+		local unitId = OvaleGUID:GetUnitId(guid)
+		if not unitId then
+			RemoveAurasForGUID(guid)
+			self_serial[guid] = nil
+		end
+	end
+end
+
+-- Scan auras on the given unit and update the aura database.
+local function ScanUnitAuras(event, unitId, guid)
+	if not unitId then
+		return
+	end
+	if not guid then
+		guid = OvaleGUID:GetGUID(unitId)
+	end
+	if not guid then
+		return
+	end
+	if not self_aura[guid] then
+		self_aura[guid] = self_aura_pool:Get()
+	end
+	-- Advance the age of the unit's auras.
+	if not self_serial[guid] then
+		self_serial[guid] = 0
+	end
+	self_serial[guid] = self_serial[guid] + 1
+	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: advancing age of auras for %s (%s) to %d.", event, guid, unitId, self_serial[guid])
+
+	local i = 1
+	local filter = "HELPFUL"
+	while true do
+		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
+			canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, filter)
+		if not name then
+			if filter == "HELPFUL" then
+				filter = "HARMFUL"
+				i = 1
+			else
+				break
+			end
+		else
+			local casterGUID = OvaleGUID:GetGUID(unitCaster)
+			local added = UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			if added then
+				Ovale.refreshNeeded[unitId] = true
+			end
+			if debuffType then
+				-- TODO: not very clean
+				-- should be computed by OvaleState:GetAura
+				UnitGainedAura(guid, debuffType, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			end
+			i = i + 1
+		end
+	end
+	RemoveAurasForGUID(guid, true)
 end
 --</private-static-methods>
 
@@ -253,22 +280,23 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		-- KNOWN BUG: an aura refreshed by a spell other than then one that applies it won't cause the CLEU event to fire.
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		if unitId and not OVALE_UNIT_AURA_UNITS[unitId] then
-			UpdateAuras(unitId, destGUID)
+			ScanUnitAuras(event, unitId, destGUID)
 		end
 	end
 end
 
 function OvaleAura:PLAYER_ENTERING_WORLD(event)
+	-- Update auras on all visible units.
+	for unitId in pairs(OVALE_UNIT_AURA_UNITS) do
+		ScanUnitAuras(event, unitId, OvaleGUID:GetGUID(unitId))
+	end
 	RemoveAurasForMissingUnits()
 	self_pool:Drain()
+	self_aura_pool:Drain()
 end
 
 function OvaleAura:UNIT_AURA(event, unitId)
-	if unitId == "player" then
-		UpdateAuras("player", OvaleGUID:GetGUID("player"))
-	elseif unitId then
-		UpdateAuras(unitId)
-	end
+	ScanUnitAuras(event, unitId, OvaleGUID:GetGUID(unitId))
 end
 
 function OvaleAura:Ovale_InactiveUnit(event, guid)
@@ -290,41 +318,42 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 			Ovale:Logf("Unable to get unitId from %s", guid)
 			return nil
 		end
-		UpdateAuras(unitId, guid)
+		-- This GUID has no auras previously cached, so do an aura scan.
+		if not self_serial[guid] then
+			ScanUnitAuras("GetAuraByGUID", unitId, guid)
+		end
 		auraTable = self_aura[guid]
 		if not auraTable then
-			-- no aura on target
 			Ovale:Logf("Target %s has no aura", guid)
 			return nil
 		end
 	end
 
-	local whose, aura
-	if filter then
-		if auraTable[filter] then
-			local whoseTable = auraTable[filter][spellId]
+	local aura
+	local serial = self_serial[guid]
+	for auraFilter, auraList in pairs(auraTable) do
+		if not filter or (filter == auraFilter) then
+			local whoseTable = auraList[spellId]
 			if whoseTable then
 				if mine then
+					if RemoveAuraIfExpired(guid, spellId, filter, whoseTable.mine, serial) then
+						whoseTable.mine = nil
+					end
 					aura = whoseTable.mine
 				else
-					whose, aura = next(whoseTable)
-				end
-			end
-		end
-	else
-		local whoseTable
-		for _, auraList in pairs(auraTable) do
-			whoseTable = auraList[spellId]
-			if whoseTable then
-				if mine then
-					aura = whoseTable.mine
-				else
-					whose, aura = next(whoseTable)
+					for k, v in pairs(whoseTable) do
+						if RemoveAuraIfExpired(guid, spellId, filter, v, serial) then
+							whoseTable[k] = nil
+						end
+						aura = whoseTable[k]
+						if aura then break end
+					end
 				end
 				if aura then break end
 			end
 		end
 	end
+
 	if not aura then return nil end
 	return aura.start, aura.ending, aura.stacks, aura.tick, aura.value, aura.gain
 end
@@ -353,7 +382,8 @@ function OvaleAura:GetAura(unitId, spellId, filter, mine)
 end
 
 function OvaleAura:GetStealable(unitId)
-	local auraTable = self_aura[OvaleGUID:GetGUID(unitId)]
+	local guid = OvaleGUID:GetGUID(unitId)
+	local auraTable = self_aura[guid]
 	if not auraTable then return nil end
 
 	-- only buffs are stealable
@@ -361,7 +391,11 @@ function OvaleAura:GetStealable(unitId)
 	if not auraList then return nil end
 
 	local start, ending
+	local serial = self_serial[guid]
 	for spellId, whoseTable in pairs(auraList) do
+		if RemoveAuraIfExpired(guid, spellId, "HELPFUL", whoseTable.other, serial) then
+			whoseTable.other = nil
+		end
 		local aura = whoseTable.other
 		if aura and aura.stealable then
 			if aura.start and (not start or aura.start < start) then
@@ -382,9 +416,13 @@ function OvaleAura:GetMyAuraOnAnyTarget(spellId, filter, excludingGUID)
 	local count = 0
 	for guid, auraTable in pairs(self_aura) do
 		if guid ~= excludingGUID then
+			local serial = self_serial[guid]
 			for auraFilter, auraList in pairs(auraTable) do
 				if not filter or auraFilter == filter then
 					if auraList[spellId] then
+						if RemoveAuraIfExpired(guid, spellId, filter, auraList[spellId].mine, serial) then
+							auraList[spellId].mine = nil
+						end
 						local aura = auraList[spellId].mine
 						if aura.start and (not start or aura.start < start) then
 							start = aura.start
@@ -435,11 +473,13 @@ end
 
 function OvaleAura:Debug()
 	self_pool:Debug()
+	self_aura_pool:Debug()
 	for guid, auraTable in pairs(self_aura) do
+		Ovale:FormatPrint("Auras for %s:", guid)
 		for filter, auraList in pairs(auraTable) do
 			for spellId, whoseTable in pairs(auraList) do
 				for whose, aura in pairs(whoseTable) do
-					Ovale:FormatPrint("%s %s %s %s %s stacks=%d tick=%s", guid, filter, whose, spellId, aura.name, aura.stacks, aura.tick)
+					Ovale:FormatPrint("%s %s %s %s %s stacks=%d tick=%s serial=%d", guid, filter, whose, spellId, aura.name, aura.stacks, aura.tick, aura.serial)
 				end
 			end
 		end
@@ -449,6 +489,7 @@ end
 -- Print the auras matching the filter on the unit in alphabetical order.
 function OvaleAura:DebugListAura(unitId, filter)
 	local guid = OvaleGUID:GetGUID(unitId)
+	RemoveAurasForGUID(guid, true)
 	if self_aura[guid] and self_aura[guid][filter] then
 		local array = {}
 		for spellId, whoseTable in pairs(self_aura[guid][filter]) do
