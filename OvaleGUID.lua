@@ -18,6 +18,7 @@ Ovale.OvaleGUID = OvaleGUID
 local strfind = string.find
 local strsub = string.sub
 local API_GetNumGroupMembers = GetNumGroupMembers
+local API_UnitExists = UnitExists
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
@@ -83,10 +84,13 @@ function OvaleGUID:Update(unitId)
 end
 
 function OvaleGUID:GetGUID(unitId)
-	if not self_guid[unitId] then
+	if not unitId then return nil end
+	local guid = self_guid[unitId]
+	if not guid or strfind(unitId, "mouseover") == 1 then
 		self_guid[unitId] = API_UnitGUID(unitId)
+		guid = self_guid[unitId]
 	end
-	return self_guid[unitId]
+	return guid
 end
 
 function OvaleGUID:GetGUIDForName(name)
@@ -96,11 +100,30 @@ end
 function OvaleGUID:GetUnitId(guid)
 	local unitIdTable = self_unitId[guid]
 	if not unitIdTable then return nil end
-	return next(unitIdTable)
+	for unitId in pairs(unitIdTable) do
+		if strfind(unitId, "mouseover") == 1 then
+			if API_UnitExists("mouseover") then
+				return unitId
+			else
+				unitIdTable[unitId] = nil
+				self_guid[unitId] = nil
+			end
+		end
+	end
+	return nil
 end
 
 function OvaleGUID:GetUnitIdForName(name)
-	return self_nameToUnit[name]
+	local unitId = self_nameToUnit[name]
+	if strfind(unitId, "mouseover") == 1 then
+		if API_UnitExists("mouseover") then
+			return unitId
+		else
+			self_nameToUnit[name] = nil
+			return nil
+		end
+	end
+	return unitId
 end
 
 function OvaleGUID:UpdateWithTarget(unitId)
