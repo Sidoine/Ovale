@@ -491,13 +491,15 @@ function OvaleAura:GetMyAuraOnAnyTarget(spellId, filter, excludingGUID)
 							auraList[spellId].mine = nil
 						end
 						local aura = auraList[spellId].mine
-						if aura.start and (not start or aura.start < start) then
-							start = aura.start
+						if aura then
+							if aura.start and (not start or aura.start < start) then
+								start = aura.start
+							end
+							if aura.ending and (not ending or aura.ending > ending) then
+								ending = aura.ending
+							end
+							count = count + 1
 						end
-						if aura.ending and (not ending or aura.ending > ending) then
-							ending = aura.ending
-						end
-						count = count + 1
 					end
 				end
 			end
