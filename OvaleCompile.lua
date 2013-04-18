@@ -33,7 +33,6 @@ local strlower = string.lower
 local strmatch = string.match
 local strsub = string.sub
 local tinsert = table.insert
-local tremove = table.remove
 local wipe = table.wipe
 local API_GetItemInfo = GetItemInfo
 local API_GetSpellInfo = GetSpellInfo
@@ -715,10 +714,8 @@ local function CompileScript(text)
 	wipe(self_functionCalls)
 
 	-- Return all existing nodes to the node pool.
-	local node 
-	while true do
-		node = tremove(self_node)
-		if not node then break end
+	for i, node in pairs(self_node) do
+		self_node[i] = nil
 		self_pool:Release(node)
 	end
 	wipe(self_node)
