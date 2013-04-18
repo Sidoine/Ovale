@@ -467,7 +467,12 @@ end
 
 OvaleCondition.conditions = {}
 -- List of script conditions that refer to a castable spell from the player's spellbook.
-OvaleCondition.spellbookConditions = { spell = true }
+OvaleCondition.spellbookConditions = {}
+
+do
+	-- Spell(spellId) can be used as a condition instead of an action.
+	OvaleCondition.spellbookConditions.spell = true
+end
 
 	-- Test if a white hit just occured
 	-- 1 : maximum time after a white hit
