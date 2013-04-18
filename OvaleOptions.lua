@@ -415,6 +415,12 @@ local self_options =
 							desc = L["Debug missing spells"],
 							type = "toggle",
 						},
+						unknown_function =
+						{
+							name = "Unknown functions",
+							desc = L["Debug unknown functions"],
+							type = "toggle",
+						},
 						unknown_spells =
 						{
 							name = "Unknown spells",

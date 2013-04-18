@@ -43,6 +43,8 @@ local self_pool = OvalePool:NewPool("OvaleCompile_pool")
 local self_defines = {}
 local self_customFunctions = {}
 local self_missingSpellList = {}
+-- table of functions called within the script: self_functionCalls[functionName] = node
+local self_functionCalls = {}
 
 -- Whether to trigger a script compilation if items or stances change.
 local self_compileOnItems = false
@@ -50,7 +52,16 @@ local self_compileOnStances = false
 
 local OVALE_COMPILE_DEBUG = "compile"
 local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
+local OVALE_UNKNOWN_FUNCTION_DEBUG = "unknown_function"
 local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
+
+-- Known script functions other than conditions.
+local OVALE_FUNCTIONS = {
+	item = true,
+	macro = true,
+	spell = true,
+	texture = true,
+}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -199,6 +210,7 @@ local function ParseFunction(prefix, func, params)
 	end
 	
 	if self_customFunctions[func] then
+		self_functionCalls[func] = self_customFunctions[func]
 		return self_customFunctions[func]
 	end
 	
@@ -222,6 +234,7 @@ local function ParseFunction(prefix, func, params)
 	node.func = func
 	node.params = paramList
 	local nodeName = AddNode(node)
+	self_functionCalls[func] = node
 
 	local mine = true
 	if paramList.any then
@@ -699,6 +712,7 @@ local function CompileScript(text)
 
 	wipe(self_defines)
 	wipe(self_missingSpellList)
+	wipe(self_functionCalls)
 
 	-- Return all existing nodes to the node pool.
 	local node 
@@ -735,6 +749,15 @@ local function CompileScript(text)
 		local node = ParseAddIcon(p,t)
 		if node then
 			tinsert(masterNodes, node)
+		end
+	end
+
+	-- Verify that all the functions called within the script are defined.
+	-- Not an error if a function is undefined (might be unreachable code), but complain
+	-- at run-time during compilation.
+	for p, v in pairs(self_functionCalls) do
+		if not (OVALE_FUNCTIONS[p] or self_customFunctions[p] or OvaleCondition.conditions[p]) then
+			Ovale:DebugPrintf(OVALE_UNKNOWN_FUNCTION_DEBUG, "Unknown function call: %s (node%s)", p, v.nodeId)
 		end
 	end
 
