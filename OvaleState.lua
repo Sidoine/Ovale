@@ -393,6 +393,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 						for auraSpellId, spellData in pairs(filterInfo) do
 
 							local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
+							-- An aura is treated as a periodic aura if it sets "tick" explicitly in SpellInfo.
 							local isDoT = auraSpellInfo and auraSpellInfo.tick
 							local duration = spellData
 							local stacks = duration
@@ -409,7 +410,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 							end
 
 							-- If aura is specified with a duration, then assume stacks == 1.
-							if stacks ~= "refresh" and stacks > 0 then
+							if type(stacks) == "number" and stacks > 0 then
 								stacks = 1
 							end
 
@@ -418,7 +419,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 
 							newAura.mine = true
 
-							if stacks ~= "refresh" and stacks == 0 then
+							if type(stacks) == "number" and stacks == 0 then
 								Ovale:Logf("Aura %d is completely removed", auraSpellId)
 								newAura.stacks = 0
 								newAura.ending = 0	-- self.currentTime?
@@ -453,7 +454,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 										newAura.ending = 0	-- self.currentTime?
 									end
 								end
-							else
+							elseif type(stacks) == "number" and type(duration) == "number" then
 								Ovale:Logf("New aura %d at %f on %s %s", auraSpellId, endCast, target, auraGUID)
 								newAura.stacks = stacks
 								newAura.start = endCast
