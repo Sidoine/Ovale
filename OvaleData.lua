@@ -171,7 +171,7 @@ OvaleData.buffSpellList =
 	},
 	spell_power_multiplier = 
 	{
-		1459, -- Arcane Brillance
+		1459, -- Arcane Brillancen (mage)
 		61316, -- Dalaran Brilliance (mage)
 		77747, -- Burning Wrath (shaman)
 		109773,  -- Dark Intent (warlock)
@@ -180,9 +180,9 @@ OvaleData.buffSpellList =
 	stamina =
 	{
 		469, -- Commanding Shout (warrior)
-		6307, -- Blood Pact (imp)
 		21562, -- Power Word: Fortitude (priest)
 		90364, -- Qiraji Fortitude (silithid)
+		109773,  -- Dark Intent (warlock)
 	},
 	str_agi_int =
 	{
@@ -194,8 +194,9 @@ OvaleData.buffSpellList =
 	spell_haste = 
 	{
 		24907, -- Moonkin aura (balance druid)
-		49868, -- Mind Quickening (shadow priest, sporebat)
+		49868, -- Mind Quickening (shadow priest)
 		51470, -- Elemental Oath (elemental shaman)
+		135678, -- Energizing Spores (sporebat)
 	},
 
 	-- Target debuffs
@@ -229,7 +230,7 @@ OvaleData.buffSpellList =
 		8680, -- Wound Poison (rogue)
 		54680, -- Monstrous Bite (devilsaur)
 		82654, -- Widow Venom (hunter)
-		115804, -- Mortal Wounds (arms & fury warriors, windwalker monk)
+		115804, -- Mortal Wounds (arms & fury warriors, windwalker monk, warlock)
 	},
 	lower_physical_damage=
 	{
