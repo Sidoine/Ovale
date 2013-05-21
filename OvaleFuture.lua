@@ -41,6 +41,10 @@ local self_pool = OvalePool:NewPool("OvaleFuture_pool")
 local self_lastTarget = nil
 local self_lastLineID = nil
 
+-- The spell requests that have been sent to the server and are awaiting a reply.
+-- self_sentSpellcast[lineId] = timestamp
+local self_sentSpellcast = {}
+
 -- relevant player stats the last time the spell was cast, indexed by spell ID
 local self_lastAttackPower = {}
 local self_lastComboPoints = {}
@@ -62,6 +66,8 @@ local OVALE_CLEU_SPELLCAST_RESULTS = {
 --<public-static-properties>
 --spell counter (see Counter function)
 OvaleFuture.counter = {}
+-- Most recent latency (time between UNIT_SPELLCAST_SENT and UNIT_SPELLCAST_SUCCEEDED events).
+OvaleFuture.latency = 0
 -- The spell ID of the most recent spell cast.
 OvaleFuture.lastSpellId = nil
 -- Debugging: spell ID to trace
@@ -253,6 +259,7 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 				spellcast.target = targetGUID
 			end
 		end
+		self_sentSpellcast[lineId] = Ovale.now
 	end
 end
 
@@ -275,6 +282,17 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 		]]--
 		if not API_UnitChannelInfo("player") then
 			AddSpellToQueue(spellId, lineId, Ovale.now, Ovale.now, false, true)
+		end
+
+		-- Update latency measurement.  API_GetTime() only updates on frame refresh (OnUpdate) so
+		-- this latency measurement has a lower bound of the 1/FPS, where FPS is the current frame
+		-- rate.
+		if self_sentSpellcast[lineId] then
+			local latency = Ovale.now - self_sentSpellcast[lineId]
+			if latency > 0 then
+				self.latency = latency
+			end
+			self_sentSpellcast[lineId] = nil
 		end
 	end
 end
