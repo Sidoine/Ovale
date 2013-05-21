@@ -358,6 +358,41 @@ local function ParseSpellList(name, params)
 	end
 end
 
+local function ParseItemInfo(params)
+	local paramList = ParseParameters(params)
+	local itemId = paramList[1]
+	if itemId then
+		if not TestConditions(paramList) then
+			return ""
+		end
+		for k, v in pairs(paramList) do
+			if k == "proc" then
+				-- Add the buff for this item proc to the spell list "item_proc_<proc>".
+				local buffId = paramList.buff
+				if buffId then
+					local listName = "item_proc_" .. v
+					if not OvaleData.buffSpellList[listName] then
+						OvaleData.buffSpellList[listName] = {}
+					end
+					local i = 1
+					local found = false
+					for _, buff in ipairs(OvaleData.buffSpellList[listName]) do
+						if buff == buffId then
+							found = true
+							break
+						end
+						i = i + 1
+					end
+					if not found then
+						OvaleData.buffSpellList[listName][i] = buffId
+					end
+				end
+			end
+		end
+	end
+	return ""
+end
+
 local function ParseItemList(name, params)
 	OvaleData.itemList[name] = {}
 	local i = 1
@@ -693,6 +728,7 @@ local function CompileDeclarations(text)
 	text = strgsub(text, "SpellDamageBuff%s*%((.-)%)", ParseSpellDamageBuff)
 	text = strgsub(text, "SpellDamageDebuff%s*%((.-)%)", ParseSpellDamageDebuff)
 	text = strgsub(text, "SpellInfo%s*%((.-)%)", ParseSpellInfo)
+	text = strgsub(text, "ItemInfo%s*%((.-)%)", ParseItemInfo)
 	text = strgsub(text, "ScoreSpells%s*%((.-)%)", ParseScoreSpells)
 	text = strgsub(text, "SpellList%s*%(%s*([%w_]+)%s*(.-)%)", ParseSpellList)
 	text = strgsub(text, "ItemList%s*%(%s*([%w_]+)%s*(.-)%)", ParseItemList)
