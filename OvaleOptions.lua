@@ -407,6 +407,12 @@ local self_options =
 							desc = L["Debug compile"],
 							type = "toggle",
 						},
+						damage_taken =
+						{
+							name = "Damage taken",
+							desc = L["Debug damage taken"],
+							type = "toggle",
+						},
 						enemy =
 						{
 							name = "Enemies",
