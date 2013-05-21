@@ -97,6 +97,7 @@ OvaleData.selfDamageBuff =
 	[84747] = 1.3, -- Deep Insight (rogue)
 	[124974] = 1.2, -- Nature's Vigil (druid)
 	[127538] = 1.3, -- Savage Roar (druid)
+	[138002] = 1.4, -- Fluidity (Throne of Thunder, Jin'rokh encounter)
 	[140741] = 2.0, -- Primal Nutriment (Throne of Thunder, Ji-Kun encounter)
 }
 
