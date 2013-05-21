@@ -9,13 +9,13 @@
 
 -- Double-ended queue.
 local _, Ovale = ...
-local OvaleDeque = {}
-Ovale.OvaleDeque = OvaleDeque
+local OvaleQueue = {}
+Ovale.OvaleQueue = OvaleQueue
 
 --<public-static-properties>
-OvaleDeque.name = "OvaleDeque"
-OvaleDeque.first = 0
-OvaleDeque.last = -1
+OvaleQueue.name = "OvaleQueue"
+OvaleQueue.first = 0
+OvaleQueue.last = -1
 --</public-static-properties>
 
 --<private-static-methods>
@@ -37,25 +37,25 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function OvaleDeque:New(name)
+function OvaleQueue:NewDeque(name)
 	obj = { name = name, first = 0, last = -1 }
 	setmetatable(obj, { __index = self })
 	return obj
 end
 
-function OvaleDeque:InsertFront(element)
+function OvaleQueue:InsertFront(element)
 	local first = self.first - 1
 	self.first = first
 	self[first] = element
 end
 
-function OvaleDeque:InsertBack(element)
+function OvaleQueue:InsertBack(element)
 	local last = self.last + 1
 	self.last = last
 	self[last] = element
 end
 
-function OvaleDeque:RemoveFront()
+function OvaleQueue:RemoveFront()
 	local first = self.first
 	local element = self[first]
 	if element then
@@ -65,7 +65,7 @@ function OvaleDeque:RemoveFront()
 	return element
 end
 
-function OvaleDeque:RemoveBack()
+function OvaleQueue:RemoveBack()
 	local last = self.last
 	local element = self[last]
 	if element then
@@ -75,23 +75,23 @@ function OvaleDeque:RemoveBack()
 	return element
 end
 
-function OvaleDeque:Front()
+function OvaleQueue:Front()
 	return self[self.first]
 end
 
-function OvaleDeque:Back()
+function OvaleQueue:Back()
 	return self[self.last]
 end
 
-function OvaleDeque:BackToFrontIterator()
+function OvaleQueue:BackToFrontIterator()
 	return BackToFrontIterator, self, self.last + 1
 end
 
-function OvaleDeque:FrontToBackIterator()
+function OvaleQueue:FrontToBackIterator()
 	return FrontToBackIterator, self, self.first - 1
 end
 
-function OvaleDeque:Reset()
+function OvaleQueue:Reset()
 	for i in self:BackToFrontIterator() do
 		self[i] = nil
 	end
@@ -99,7 +99,21 @@ function OvaleDeque:Reset()
 	self.last = -1
 end
 
-function OvaleDeque:Debug()
-	Ovale:FormatPrint("Deque %s has %d item(s), first=%d, last=%d.", self.name, self.last - self.first + 1, self.first, self.last)
+function OvaleQueue:Debug()
+	Ovale:FormatPrint("Queue %s has %d item(s), first=%d, last=%d.", self.name, self.last - self.first + 1, self.first, self.last)
 end
 --</public-static-methods>
+
+--<public-static-properties>
+-- Queue (LIFO) methods
+OvaleQueue.NewQueue = OvaleQueue.NewDeque
+OvaleQueue.Insert = OvaleQueue.InsertBack
+OvaleQueue.Remove = OvaleQueue.RemoveFront
+OvaleQueue.Iterator = OvaleQueue.FrontToBackIterator
+
+-- Stack (FIFO) methods
+OvaleQueue.NewStack = OvaleQueue.NewDeque
+OvaleQueue.Push = OvaleQueue.InsertFront
+OvaleQueue.Pop = OvaleQueue.RemoveFront
+OvaleQueue.Top = OvaleQueue.Front
+--</public-static-properties>

@@ -92,7 +92,7 @@ $p{Skada}{total} = true;
 
 $sp{Ovale}{OvaleBestAction} = true;
 $sp{Ovale}{OvaleCondition} = true;
-$sp{Ovale}{OvaleDeque} = true;
+$sp{Ovale}{OvaleQueue} = true;
 $sp{Ovale}{OvalePool} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleState} = true;

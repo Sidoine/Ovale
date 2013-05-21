@@ -31,12 +31,12 @@ Ovale.lua
 
 # Modules with no dependencies
 OvaleActionBar.lua
-OvaleDeque.lua
 OvaleEnemies.lua
 OvaleEquipement.lua
 OvaleGUID.lua
 OvalePaperDoll.lua
 OvalePool.lua
+OvaleQueue.lua
 OvaleRecount.lua
 OvaleSkada.lua
 OvaleStance.lua

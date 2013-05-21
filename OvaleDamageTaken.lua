@@ -14,10 +14,10 @@ local OvaleDamageTaken = Ovale:NewModule("OvaleDamageTaken", "AceEvent-3.0")
 Ovale.OvaleDamageTaken = OvaleDamageTaken
 
 --<private-static-properties>
-local OvaleDeque = Ovale.OvaleDeque
 local OvaleGUID = Ovale.OvaleGUID
 local OvaleFuture = Ovale.OvaleFuture
 local OvalePool = Ovale.OvalePool
+local OvaleQueue = Ovale.OvaleQueue
 
 local select = select
 
@@ -26,7 +26,7 @@ local self_player_guid = nil
 -- Damage event pool.
 local self_pool = OvalePool:NewPool("OvaleDamageTaken_pool")
 -- Damage event queue: new events are inserted at the front of the queue.
-local self_damageEvent = OvaleDeque:New("OvaleDamageTaken_damageEvent")
+local self_damageEvent = OvaleQueue:NewDeque("OvaleDamageTaken_damageEvent")
 -- Time window (past number of seconds) for which damage events are stored.
 local DAMAGE_TAKEN_WINDOW = 20
 
