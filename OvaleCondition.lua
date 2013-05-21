@@ -15,11 +15,12 @@ Ovale.OvaleCondition = OvaleCondition
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 local LRC = LibStub("LibRangeCheck-2.0", true)
 local OvaleAura = Ovale.OvaleAura
+local OvaleDamageTaken = Ovale.OvaleDamageTaken
 local OvaleData = Ovale.OvaleData
 local OvaleEnemies = Ovale.OvaleEnemies
 local OvaleEquipement = Ovale.OvaleEquipement
-local OvaleGUID = Ovale.OvaleGUID
 local OvaleFuture = Ovale.OvaleFuture
+local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleStance = Ovale.OvaleStance
@@ -1089,6 +1090,25 @@ OvaleCondition.conditions.damagemultiplier = function(condition)
 	return 0, nil, OvaleState:GetDamageMultiplier(condition[1]), 0, 0
 end
 
+--- Get the damage taken in the previous time interval.
+-- @name DamageTaken
+-- @paramsig number
+-- @param interval The number of seconds before now.
+-- @return The amount of damage taken in the previous interval.
+-- @usage
+-- if DamageTaken(5) > 50000 Spell(death_strike)
+
+OvaleCondition.conditions.damagetaken = function(condition)
+	-- Damage taken shouldn't be smoothed since spike damage is important data.
+	-- Just present damage taken as a constant value.
+	local interval = condition[1]
+	local damage = 0
+	if interval > 0 then
+		damage = OvaleDamageTaken:GetRecentDamage(interval)
+	end
+	return 0, nil, damage, 0, 0
+end
+
 --- Get the current amount of demonic fury for demonology warlocks.
 -- @name DemonicFury
 -- @paramsig number or boolean
@@ -1843,6 +1863,22 @@ end
 
 OvaleCondition.conditions.lastswing = function(condition)
 	return 0, nil, 0, OvaleSwing:GetLast(condition[1]), 1
+end
+
+--- Get the most recent estimate of latency in milliseconds.
+-- This condition is experimental and may not yield correct results.
+-- @name Latency
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number of milliseconds to compare against.
+-- @return The most recent estimate of latency.
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if Latency() >1000 Spell(sinister_strike)
+-- if Latency(more 1000) Spell(sinister_strike)
+
+OvaleCondition.conditions.latency = function(condition)
+	return 0, nil, OvaleFuture.latency * 1000, 0, 0
 end
 
 --- Get the level of the target.
