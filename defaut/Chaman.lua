@@ -114,13 +114,6 @@ AddIcon mastery=1 help=offgcd
 {
 	if target.IsInterruptible() Spell(wind_shear)
 }
-AddIcon mastery=1 help=moving
-{
-	
-	if not Glyph(101052) Spell(unleash_elements)
-	if not Glyph(101052) and target.DebuffRemains(flame_shock) >SpellCooldown(earth_shock) Spell(earth_shock)
-
-}
 AddIcon mastery=1 help=aoe
 {
 	
@@ -148,7 +141,7 @@ AddIcon mastery=1 help=cd
 	if TalentPoints(ancestral_swiftness_talent) and not BuffPresent(ascendance) Spell(ancestral_swiftness)
 	if BuffPresent(ascendance) Spell(spiritwalkers_grace)
 	if not TotemPresent(earth) and SpellCooldown(fire_elemental_totem) >=60 Spell(earth_elemental_totem)
-	if Glyph(101052) and {{TalentPoints(elemental_blast_talent) and SpellCooldown(elemental_blast) ==0 } or {SpellCooldown(lava_burst) ==0 and not BuffStacks(lava_surge) } } or {BuffDuration(raid_movement) >=SpellCooldown(unleash_elements) +SpellCooldown(earth_shock) } Spell(spiritwalkers_grace)
+	if {{TalentPoints(elemental_blast_talent) and SpellCooldown(elemental_blast) ==0 } or {SpellCooldown(lava_burst) ==0 and not BuffStacks(lava_surge) } } or {BuffDuration(raid_movement) >=SpellCooldown(unleash_elements) +SpellCooldown(earth_shock) } Spell(spiritwalkers_grace)
 
 }
 AddIcon mastery=2 help=main

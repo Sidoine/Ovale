@@ -19,8 +19,6 @@ Define(bestial_wrath 19574)
 Define(black_arrow 3674)
   SpellInfo(black_arrow duration=20 focus=35 tick=2 cd=30 )
   SpellAddTargetDebuff(black_arrow black_arrow=1)
-Define(blink_strike 130392)
-  SpellInfo(blink_strike cd=20 )
 Define(blood_fury 20572)
   SpellInfo(blood_fury duration=15 cd=120 )
   SpellAddBuff(blood_fury blood_fury=1)
@@ -102,7 +100,6 @@ AddIcon mastery=1 help=main
 	if SpellUsable(dire_beast) and Focus() <=90 Spell(dire_beast)
 	if SpellUsable(barrage) Spell(barrage)
 	if SpellUsable(powershot) Spell(powershot)
-	if SpellUsable(blink_strike) Spell(blink_strike)
 	if BuffStacks(thrill_of_the_hunt) Spell(arcane_shot)
 	if not target.DebuffPresent(focus_fire) and not BuffPresent(beast_within) if BuffStacks(pet_frenzy any=1)>4 Spell(focus_fire)
 	if target.DebuffRemains(serpent_sting_aura) <6 Spell(cobra_shot)
@@ -143,7 +140,6 @@ AddIcon mastery=2 help=main
 		unless pet.Present() Spell(call_pet_1)
 	}
 	if SpellUsable(powershot) Spell(powershot)
-	if SpellUsable(blink_strike) Spell(blink_strike)
 	if SpellUsable(dire_beast) Spell(dire_beast)
 	if target.HealthPercent() >80 
 	{
@@ -201,7 +197,6 @@ AddIcon mastery=3 help=main
 		if target.DeadIn() >=21 and not target.DebuffPresent(ranged_vulnerability any=1) Spell(hunters_mark)
 		unless pet.Present() Spell(call_pet_1)
 	}
-	if SpellUsable(blink_strike) Spell(blink_strike)
 	if BuffStacks(lock_and_load) Spell(explosive_shot)
 	if SpellUsable(powershot) Spell(powershot)
 	if SpellUsable(barrage) Spell(barrage)
