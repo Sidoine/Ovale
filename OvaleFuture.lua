@@ -51,6 +51,7 @@ local self_lastComboPoints = {}
 local self_lastDamageMultiplier = {}
 local self_lastMasteryEffect = {}
 local self_lastSpellpower = {}
+local self_lastCritChance = {}
 
 -- These CLEU events are eventually received after a successful spellcast.
 local OVALE_CLEU_SPELLCAST_RESULTS = {
@@ -118,6 +119,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	self.lastSpellId = spellId
 	self_lastAttackPower[spellId] = OvalePaperDoll.attackPower
 	self_lastSpellpower[spellId] = OvalePaperDoll.spellBonusDamage
+	self_lastCritChance[spellId] = OvalePaperDoll.spellCrit
 	self_lastDamageMultiplier[spellId] = OvaleAura:GetDamageMultiplier(spellId)
 	self_lastMasteryEffect[spellId] = OvalePaperDoll.masteryEffect
 	tinsert(self_activeSpellcast, spellcast)
@@ -403,6 +405,10 @@ end
 
 function OvaleFuture:GetLastSpellpower(spellId)
 	return self_lastSpellpower[spellId] or 0
+end
+
+function OvaleFuture:GetLastCritChance(spellId)
+	return self_lastCritChance[spellId] or 0
 end
 
 function OvaleFuture:InFlight(spellId)

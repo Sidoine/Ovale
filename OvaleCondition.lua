@@ -1042,6 +1042,19 @@ OvaleCondition.conditions.creaturetype = function(condition)
 	return nil
 end
 
+--- Get the current critical strike chance of the player.
+-- @name CritChance
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current critical strike chance (in percent).
+-- @return A boolean value for the result of the comparison.
+-- @usage
+-- if CritChance() >30 Spell(immolate)
+OvaleCondition.conditions.critchance = function(condition)
+	return Compare(OvalePaperDoll.spellCrit, condition[1], condition[2])
+end
+
 --- Get the current estimated damage of a spell if it is a critical strike.
 -- @name CritDamage
 -- @paramsig number
@@ -1831,6 +1844,23 @@ end
 
 OvaleCondition.conditions.lastspellcombopoints = function(condition)
 	return Compare(OvaleFuture:GetLastComboPoints(condition[1]), condition[2], condition[3])
+end
+
+--- Get the critical strike chance of the player during the most recent cast of a spell.
+-- @name LastSpellCritChance
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The previous mastery effect.
+-- @return A boolean value for the result of the comparison.
+-- @see Mastery
+-- @usage
+-- if {CritChance(shadow_bolt) - LastSpellCritChance(shadow_bolt)} > 1000
+--     Spell(metamorphosis)
+
+OvaleCondition.conditions.lastspellcritchance = function(condition)
+	return Compare(OvaleFuture:GetLastCritChance(condition[1]), condition[2], condition[3])
 end
 
 --- Get the mastery effect of the player during the most recent cast of a spell.
