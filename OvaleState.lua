@@ -88,11 +88,8 @@ function OvaleState:UpdatePowerRates()
 	-- Strip off 10% attack speed bonus that doesn't count toward power regeneration.
 	if class == "HUNTER" then
 		-- Strip off 10% attack speed bonus that doesn't count toward focus regeneration.
-		for _, v in pairs(OvaleData.buffSpellList.melee_haste) do
-			if OvaleState:GetAura("player", v) then
-				focusRegen = focusRegen / 1.1
-				break
-			end
+		if OvaleState:GetAura("player", "melee_haste") then
+			focusRegen = focusRegen / 1.1
 		end
 	elseif class == "MONK" then
 		-- Way of the Monk (monk)
@@ -571,8 +568,8 @@ function OvaleState:GetAura(unitId, spellId, filter, mine)
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	elseif OvaleData.buffSpellList[spellId] then
 		local newStart, newEnding, newStacks, newTick, newValue, newGain
-		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
+		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
+			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId)
 			if start and (not newStart or stacks > newStacks) then
 				newStart = start
 				newEnding = ending

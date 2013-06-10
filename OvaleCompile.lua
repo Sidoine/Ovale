@@ -351,10 +351,11 @@ end
 
 local function ParseSpellList(name, params)
 	OvaleData.buffSpellList[name] = {}
-	local i = 1
 	for v in strgmatch(params, "(%d+)") do
-		OvaleData.buffSpellList[name][i] = tonumber(v)
-		i = i + 1
+		v = tonumber(v)
+		if v then
+			OvaleData.buffSpellList[name][v] = true
+		end
 	end
 end
 
@@ -368,24 +369,13 @@ local function ParseItemInfo(params)
 		for k, v in pairs(paramList) do
 			if k == "proc" then
 				-- Add the buff for this item proc to the spell list "item_proc_<proc>".
-				local buffId = paramList.buff
-				if buffId then
+				local buff = tonumber(paramList.buff)
+				if buff then
 					local listName = "item_proc_" .. v
 					if not OvaleData.buffSpellList[listName] then
 						OvaleData.buffSpellList[listName] = {}
 					end
-					local i = 1
-					local found = false
-					for _, buff in ipairs(OvaleData.buffSpellList[listName]) do
-						if buff == buffId then
-							found = true
-							break
-						end
-						i = i + 1
-					end
-					if not found then
-						OvaleData.buffSpellList[listName][i] = buffId
-					end
+					OvaleData.buffSpellList[listName][buff] = true
 				end
 			end
 		end

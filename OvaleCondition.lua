@@ -785,8 +785,8 @@ OvaleCondition.conditions.casting = function(condition)
 		end
 	elseif OvaleData.buffSpellList[spellId] then
 		local found = false
-		for k,v in pairs(OvaleData.buffSpellList[spellId]) do
-			if IsSameSpell(v, castSpellId, castSpellName) then
+		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
+			if IsSameSpell(auraId, castSpellId, castSpellName) then
 				return start, ending
 			end
 		end
@@ -1626,8 +1626,7 @@ end
 -- if IsFeared() Spell(every_man_for_himself)
 
 OvaleCondition.conditions.isfeared = function(condition)
-	local fearSpellList = OvaleData:GetFearSpellList()
-	return TestBoolean(not API_HasFullControl() and isDebuffInList(fearSpellList), condition[1])
+	return TestBoolean(not API_HasFullControl() and isDebuffInList(OvaleData.buffSpellList.fear), condition[1])
 end
 
 --- Test if the target is friendly to the player.
@@ -1675,8 +1674,7 @@ end
 -- if IsIncapacitated() Spell(every_man_for_himself)
 
 OvaleCondition.conditions.isincapacitated = function(condition)
-	local incapacitateSpellList = OvaleData:GetIncapacitateSpellList()
-	return TestBoolean(not API_HasFullControl() and isDebuffInList(incapacitateSpellList), condition[1])
+	return TestBoolean(not API_HasFullControl() and isDebuffInList(OvaleData.buffSpellList.incapacitate), condition[1])
 end
 
 --- Test if the target is currently casting an interruptible spell.
@@ -1712,8 +1710,7 @@ end
 -- if IsRooted() Item(Trinket0Slot usable=1)
 
 OvaleCondition.conditions.isrooted = function(condition)
-	local rootSpellList = OvaleData:GetRootSpellList()
-	return TestBoolean(isDebuffInList(rootSpellList), condition[1])
+	return TestBoolean(isDebuffInList(OvaleData.buffSpellList.root), condition[1])
 end
 
 --- Test if the player is stunned.
@@ -1727,8 +1724,7 @@ end
 -- if IsStunned() Item(Trinket0Slot usable=1)
 
 OvaleCondition.conditions.isstunned = function(condition)
-	local stunSpellList = OvaleData:GetStunSpellList()
-	return TestBoolean(not API_HasFullControl() and isDebuffInList(stunSpellList), condition[1])
+	return TestBoolean(not API_HasFullControl() and isDebuffInList(OvaleData.buffSpellList.stun), condition[1])
 end
 
 --- Get the damage done by the most recent damage event for the given spell.

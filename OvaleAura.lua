@@ -431,8 +431,8 @@ function OvaleAura:GetAura(unitId, spellId, filter, mine)
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	elseif OvaleData.buffSpellList[spellId] then
 		local newStart, newEnding, newStacks, newTick, newValue, newGain
-		for _, v in pairs(OvaleData.buffSpellList[spellId]) do
-			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, v, filter, mine, unitId)
+		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
+			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId)
 			if start and (not newStart or stacks > newStacks) then
 				newStart = start
 				newEnding = ending
