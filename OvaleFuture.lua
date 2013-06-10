@@ -255,7 +255,7 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 		end
 		self_lastTarget = targetGUID
 		self_lastLineID = lineId
-		TracePrintf(spellId, "%s: %f %d, lineId=%d, targetGUID=%s", event, Ovale.now, spellId, lineId, targetGUID)
+		TracePrintf(spellId, "%s: %f %s, lineId=%d, targetGUID=%s", event, Ovale.now, spell, lineId, targetGUID)
 		for _, spellcast in ipairs(self_activeSpellcast) do
 			if spellcast.lineId == lineId then
 				spellcast.target = targetGUID
