@@ -639,7 +639,7 @@ function OvaleState:GetDamageMultiplier(spellId)
 					count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
 					if count and count > 0 then
 						-- Try to account for a stacking aura.
-						multiplier = 1 + (multiplier - 1) * count
+						-- multiplier = 1 + (multiplier - 1) * count
 						damageMultiplier = damageMultiplier * multiplier
 					end
 				end
