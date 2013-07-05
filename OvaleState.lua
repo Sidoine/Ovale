@@ -27,6 +27,7 @@ local floor = math.floor
 local pairs = pairs
 local select = select
 local tostring = tostring
+local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetSpellInfo = GetSpellInfo
@@ -39,6 +40,10 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local self_damageMultiplier = 1
 local self_runes = {}
 local self_runesCD = {}
+
+-- Aura IDs for Eclipse buffs.
+local LUNAR_ECLIPSE = 48518
+local SOLAR_ECLIPSE = 48517
 --</private-static-properties>
 
 --<public-static-properties>
@@ -65,6 +70,15 @@ OvaleState.lastSpellId = nil
 local function ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
 	local self = OvaleState
 	self:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+end
+
+-- Track a new Eclipse buff that starts at endCast.
+local function AddEclipse(endCast, spellId)
+	local self = OvaleState
+	local newAura = self:NewAura(OvaleGUID:GetGUID("player"), spellId, "HELPFUL")
+	newAura.start = endCast
+	newAura.ending = nil
+	newAura.stacks = 1
 end
 --</private-static-methods>
 
@@ -249,7 +263,6 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 		if si then
 			-- Update power state, except for eclipse, combo, and runes.
 			for k,v in pairs(OvaleData.power) do
-				-- eclipse cost is on hit
 				if si[k] and k ~= "eclipse" then
 					if si[k] == 0 then
 						self.state[k] = 0
@@ -274,6 +287,33 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 							self.state[k] = maxi
 						end
 					end
+				end
+			end
+
+			-- Eclipse
+			if si.eclipse then
+				local energy = si.eclipse
+				local direction = self:GetEclipseDir()
+				if si.eclipsedir then
+					energy = energy * direction
+				end
+				-- Eclipse energy generated is doubled if not in an Eclipse state with Euphoria.
+				if OvaleData.spellList[81062]
+						and not self:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
+						and not self:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true) then
+					energy = energy * 2
+				end
+				-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
+				if (direction < 0 and energy < 0) or (direction > 0 and energy > 0) then
+					self.state.eclipse = self.state.eclipse + energy
+				end
+				-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached.
+				if self.state.eclipse <= -100 then
+					self.state.eclipse = -100
+					AddEclipse(endCast, LUNAR_ECLIPSE)
+				elseif self.state.eclipse >= 100 then
+					self.state.eclipse = 100
+					AddEclipse(endCast, SOLAR_ECLIPSE)
 				end
 			end
 
@@ -357,28 +397,6 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 			Ovale:Logf("%d cd.start=%f, cd.duration=%f", spellId, cd.start, cd.duration)
 		end
 
-		if si.eclipse then
-			self.state.eclipse = self.state.eclipse + si.eclipse
-			if self.state.eclipse < -100 then
-				self.state.eclipse = -100
-				self:AddEclipse(endCast, 48518)
-			elseif self.state.eclipse > 100 then
-				self.state.eclipse = 100
-				self:AddEclipse(endCast, 48517)
-			end
-		end
-		if spellId == 78674 then -- starsurge
-			self.state.eclipse = self.state.eclipse + self:GetEclipseDir() * 20
-			if self.state.eclipse < -100 then
-				self.state.eclipse = -100
-				self:AddEclipse(endCast, 48518)
-			elseif self.state.eclipse > 100 then
-				self.state.eclipse = 100
-				self:AddEclipse(endCast, 48517)
-			end
-		end
-			
-		
 		--Auras causés par le sort
 		if si.aura then
 			for target, targetInfo in pairs(si.aura) do
@@ -523,13 +541,6 @@ function OvaleState:GetComputedSpellCD(spellId)
 	return actionCooldownStart, actionCooldownDuration, actionEnable
 end
 
-function OvaleState:AddEclipse(endCast, spellId)
-	local newAura = self:NewAura(OvaleGUID:GetGUID("player"), spellId, "HELPFUL")
-	newAura.start = endCast + 0.5
-	newAura.stacks = 1
-	newAura.ending = nil
-end
-
 function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	local aura
 	if mine then
@@ -649,18 +660,26 @@ function OvaleState:GetDamageMultiplier(spellId)
 	return damageMultiplier
 end
 
+-- Returns 1 if moving toward Solar or -1 if moving toward Lunar.
 function OvaleState:GetEclipseDir()
-	local stacks = select(3, self:GetAura("player", 48517, "HELPFUL")) -- Solar
+	local stacks = select(3, self:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true))
 	if stacks and stacks > 0 then
 		return -1
 	else
-		stacks = select(3, self:GetAura("player", 48518, "HELPFUL")) --Lunar
+		stacks = select(3, self:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true))
 		if stacks and stacks > 0 then
 			return 1
 		elseif self.state.eclipse < 0 then
 			return -1
-		else
+		elseif self.state.eclipse > 0 then
 			return 1
+		else
+			local direction = API_GetEclipseDirection()
+			if direction == "moon" then
+				return -1
+			else -- direction == "sun" then
+				return 1
+			end
 		end
 	end
 end
