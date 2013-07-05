@@ -15,6 +15,8 @@ Ovale.OvaleCondition = OvaleCondition
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 local LRC = LibStub("LibRangeCheck-2.0", true)
 local OvaleAura = Ovale.OvaleAura
+local OvaleBestAction = nil	-- forward declaration
+local OvaleCompile = nil	-- forward declaration
 local OvaleDamageTaken = Ovale.OvaleDamageTaken
 local OvaleData = Ovale.OvaleData
 local OvaleEnemies = Ovale.OvaleEnemies
@@ -424,6 +426,27 @@ local function TimeToDie(unitId)
 		end
 	end
 	return timeToDie, health, maxHealth
+end
+
+local function ComputeFunctionParam(spellId, paramName)
+	local si = OvaleData.spellInfo[spellId]
+	if si and si[paramName] then
+		-- Resolve forward declarations.
+		OvaleBestAction = OvaleBestAction or Ovale.OvaleBestAction
+		OvaleCompile = OvaleCompile or Ovale.OvaleCompile
+		if OvaleBestAction and OvaleCompile then
+			local element = OvaleCompile:GetFunctionNode(si[paramName])
+			if element then
+				local element = select(4, OvaleBestAction:Compute(element))
+				local element = element.result
+				if element and element.type == "value" then
+					return element.value, element.origin, element.rate
+				end
+			end
+			return 0, 0, 0
+		end
+	end
+	return nil
 end
 --</private-static-methods>
 
@@ -1063,9 +1086,10 @@ end
 -- @see Damage, LastSpellDamage, LastSpellEstimatedDamage
 
 OvaleCondition.conditions.critdamage = function(condition)
-	local spellId = condition[1]
-	local ret = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
-	return 0, nil, 2 * ret * OvaleState:GetDamageMultiplier(spellId), 0, 0
+	-- TODO: Need to account for increased crit effect from meta-gems.
+	local critFactor = 2
+	local start, ending, value, origin, rate = OvaleCondition.conditions.damage(condition)
+	return start, ending, critFactor * value, critFactor * origin, critFactor * rate
 end
 
 --- Get the current estimated damage of a spell.
@@ -1084,8 +1108,13 @@ end
 
 OvaleCondition.conditions.damage = function(condition)
 	local spellId = condition[1]
-	local ret = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
-	return 0, nil, ret * OvaleState:GetDamageMultiplier(spellId), 0, 0
+	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
+	if value then
+		return 0, nil, value, origin, rate
+	else
+		value = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
+		return 0, nil, value * OvaleState:GetDamageMultiplier(spellId), 0, 0
+	end
 end
 
 --- Get the current damage multiplier of a spell.
