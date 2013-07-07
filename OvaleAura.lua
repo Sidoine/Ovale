@@ -42,6 +42,13 @@ local self_serial = {}
 local OVALE_UNKNOWN_GUID = 0
 
 local OVALE_AURA_DEBUG = "aura"
+-- Aura debuff types
+local OVALE_DEBUFF_TYPES = {
+	Curse = true,
+	Disease = true,
+	Magic = true,
+	Poison = true,
+}
 -- Units for which UNIT_AURA is known to fire.
 local OVALE_UNIT_AURA_UNITS = {}
 do
@@ -173,21 +180,21 @@ local function RemoveAurasForGUID(guid, expired)
 	local serial = self_serial[guid]
 	local auraTable = self_aura[guid]
 	for filter, auraList in pairs(auraTable) do
-		for spellId, whoseTable in pairs(auraList) do
+		for auraId, whoseTable in pairs(auraList) do
 			for whose, aura in pairs(whoseTable) do
 				if expired then
-					if RemoveAuraIfExpired(guid, spellId, filter, aura, serial) then
+					if RemoveAuraIfExpired(guid, auraId, filter, aura, serial) then
 						whoseTable[whose] = nil
 					end
 				else
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing %s %s (%s) from %s, serial=%d aura.serial=%d",
-						filter, aura.name, spellId, guid, serial, aura.serial)
+						filter, aura.name, auraId, guid, serial, aura.serial)
 					whoseTable[whose] = nil
 					self_pool:Release(aura)
 				end
 			end
 			if not next(whoseTable) then
-				auraList[spellId] = nil
+				auraList[auraId] = nil
 			end
 		end
 		if not next(auraList) then
@@ -255,11 +262,6 @@ local function ScanUnitAuras(event, unitId, guid)
 			local added = UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			if added then
 				Ovale.refreshNeeded[unitId] = true
-			end
-			if debuffType then
-				-- TODO: not very clean
-				-- should be computed by OvaleState:GetAura
-				UnitGainedAura(guid, debuffType, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			end
 			i = i + 1
 		end
@@ -393,25 +395,47 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 
 	local aura
 	local serial = self_serial[guid]
-	for auraFilter, auraList in pairs(auraTable) do
-		if not filter or (filter == auraFilter) then
-			local whoseTable = auraList[spellId]
-			if whoseTable then
-				if mine then
-					if RemoveAuraIfExpired(guid, spellId, filter, whoseTable[self_player_guid], serial) then
-						whoseTable[self_player_guid] = nil
-					end
-					aura = whoseTable[self_player_guid]
-				else
-					for k, v in pairs(whoseTable) do
-						if RemoveAuraIfExpired(guid, spellId, filter, v, serial) then
-							whoseTable[k] = nil
+
+	if type(spellId) == "number" then
+		for auraFilter, auraList in pairs(auraTable) do
+			if not filter or (filter == auraFilter) then
+				local whoseTable = auraList[spellId]
+				if whoseTable then
+					if mine then
+						if RemoveAuraIfExpired(guid, spellId, filter, whoseTable[self_player_guid], serial) then
+							whoseTable[self_player_guid] = nil
 						end
-						aura = whoseTable[k]
-						if aura then break end
+						aura = whoseTable[self_player_guid]
+					else
+						for k, v in pairs(whoseTable) do
+							if RemoveAuraIfExpired(guid, spellId, filter, v, serial) then
+								whoseTable[k] = nil
+							end
+							aura = whoseTable[k]
+							if aura then break end
+						end
+					end
+					if aura then break end
+				end
+			end
+		end
+	elseif OVALE_DEBUFF_TYPES[spellId] then
+		for auraFilter, auraList in pairs(auraTable) do
+			if not filter or (filter == auraFilter) then
+				for auraId, whoseTable in pairs(auraList) do
+					for caster, aura in pairs(whoseTable) do
+						if not mine or caster == self_player_guid then
+							if RemoveAuraIfExpired(guid, auraId, filter, aura, serial) then
+								whoseTable[caster] = nil
+							end
+							aura = whoseTable[caster]
+							if aura and aura.debuffType == spellId then
+								-- Stop after finding the first aura of the given debuff type.
+								break
+							end
+						end
 					end
 				end
-				if aura then break end
 			end
 		end
 	end
@@ -422,9 +446,7 @@ end
 
 function OvaleAura:GetAura(unitId, spellId, filter, mine)
 	local guid = OvaleGUID:GetGUID(unitId)
-	if type(spellId) == "number" then
-		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
-	elseif OvaleData.buffSpellList[spellId] then
+	if OvaleData.buffSpellList[spellId] then
 		local newStart, newEnding, newStacks, newTick, newValue, newGain
 		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
 			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId)
@@ -438,7 +460,7 @@ function OvaleAura:GetAura(unitId, spellId, filter, mine)
 			end
 		end
 		return newStart, newEnding, newStacks, newTick, newValue, newGain
-	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
+	else
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
 end
@@ -454,9 +476,9 @@ function OvaleAura:GetStealable(unitId)
 
 	local start, ending
 	local serial = self_serial[guid]
-	for spellId, whoseTable in pairs(auraList) do
+	for auraId, whoseTable in pairs(auraList) do
 		for caster, aura in pairs(whoseTable) do
-			if RemoveAuraIfExpired(guid, spellId, "HELPFUL", aura, serial) then
+			if RemoveAuraIfExpired(guid, auraId, "HELPFUL", aura, serial) then
 				whoseTable[caster] = nil
 			end
 			aura = whoseTable[caster]
@@ -547,9 +569,9 @@ function OvaleAura:Debug()
 	for guid, auraTable in pairs(self_aura) do
 		Ovale:FormatPrint("Auras for %s:", guid)
 		for filter, auraList in pairs(auraTable) do
-			for spellId, whoseTable in pairs(auraList) do
+			for auraId, whoseTable in pairs(auraList) do
 				for whose, aura in pairs(whoseTable) do
-					Ovale:FormatPrint("%s %s %s %s %s stacks=%d tick=%s serial=%d", guid, filter, whose, spellId, aura.name, aura.stacks, aura.tick, aura.serial)
+					Ovale:FormatPrint("%s %s %s %s %s stacks=%d tick=%s serial=%d", guid, filter, whose, auraId, aura.name, aura.stacks, aura.tick, aura.serial)
 				end
 			end
 		end
@@ -562,9 +584,9 @@ function OvaleAura:DebugListAura(unitId, filter)
 	RemoveAurasForGUID(guid, true)
 	if self_aura[guid] and self_aura[guid][filter] then
 		local array = {}
-		for spellId, whoseTable in pairs(self_aura[guid][filter]) do
+		for auraId, whoseTable in pairs(self_aura[guid][filter]) do
 			for whose, aura in pairs(whoseTable) do
-				tinsert(array, aura.name .. ": " .. spellId)
+				tinsert(array, aura.name .. ": " .. auraId)
 			end
 		end
 		tsort(array)

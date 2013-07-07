@@ -579,9 +579,7 @@ end
 
 function OvaleState:GetAura(unitId, spellId, filter, mine)
 	local guid = OvaleGUID:GetGUID(unitId)
-	if type(spellId) == "number" then
-		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
-	elseif OvaleData.buffSpellList[spellId] then
+	if OvaleData.buffSpellList[spellId] then
 		local newStart, newEnding, newStacks, newTick, newValue, newGain
 		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
 			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId)
@@ -595,7 +593,7 @@ function OvaleState:GetAura(unitId, spellId, filter, mine)
 			end
 		end
 		return newStart, newEnding, newStacks, newTick, newValue, newGain
-	elseif spellId == "Magic" or spellId == "Disease" or spellId == "Curse" or spellId == "Poison" then
+	else
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
 end
