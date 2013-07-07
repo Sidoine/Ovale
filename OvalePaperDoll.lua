@@ -25,8 +25,10 @@ local API_GetSpecialization = GetSpecialization
 local API_GetSpellBonusDamage = GetSpellBonusDamage
 local API_GetSpellBonusHealing = GetSpellBonusHealing
 local API_GetSpellCritChance = GetSpellCritChance
+local API_IsDualWielding = IsDualWielding
 local API_UnitAttackPower = UnitAttackPower
 local API_UnitClass = UnitClass
+local API_UnitDamage = UnitDamage
 local API_UnitLevel = UnitLevel
 local API_UnitRangedAttackPower = UnitRangedAttackPower
 local API_UnitSpellHaste = UnitSpellHaste
@@ -93,6 +95,11 @@ OvalePaperDoll.stat = {
 	-- spellpower
 	spellBonusDamage = 0,
 	spellBonusHealing = 0,
+
+-- miscellaneous stats
+	-- average weapon damage of mainhand and offhand weapons
+	mainHandWeaponDamage = 0,
+	offHandWeaponDamage = 0,
 }
 --</public-static-properties>
 
@@ -113,6 +120,7 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_STATS")
+	self:RegisterMessage("Ovale_EquipmentChanged")
 end
 
 function OvalePaperDoll:OnDisable()
@@ -131,6 +139,7 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_SPELL_HASTE")
 	self:UnregisterEvent("UNIT_STATS")
+	self:UnregisterMessage("Ovale_EquipmentChanged")
 end
 
 function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
@@ -205,6 +214,16 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.stat.snapshotTime = Ovale.now
 end
 
+function OvalePaperDoll:Ovale_EquipmentChanged(event)
+	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage = API_UnitDamage("player")
+	self.stat.mainHandWeaponDamage = (minDamage + maxDamage) / 2
+	if API_IsDualWielding() then
+		self.stat.offHandWeaponDamage = (minOffHandDamage + maxOffHandDamage) / 2
+	else
+		self.stat.offHandWeaponDamage = 0
+	end
+end
+
 function OvalePaperDoll:UpdateStats(event)
 	self.specialization = API_GetSpecialization()
 	self:COMBAT_RATING_UPDATE(event)
@@ -216,6 +235,7 @@ function OvalePaperDoll:UpdateStats(event)
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_STATS(event, "player")
+	self:Ovale_EquipmentChanged(event)
 end
 
 function OvalePaperDoll:GetMasteryMultiplier()
@@ -268,5 +288,7 @@ function OvalePaperDoll:Debug()
 	Ovale:FormatPrint("Ranged critical strike effect: %f%%", self.stat.rangedCrit)
 	Ovale:FormatPrint("Ranged haste effect: %f%%", self.stat.rangedHaste)
 	Ovale:FormatPrint("Mastery effect: %f%%", self.stat.masteryEffect)
+	Ovale:FormatPrint("Weapon damage (mainhand): %f", self.stat.mainHandWeaponDamage)
+	Ovale:FormatPrint("Weapon damage (offhand): %f", self.stat.offHandWeaponDamage)
 end
 --</public-static-methods>
