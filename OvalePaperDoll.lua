@@ -63,6 +63,9 @@ OvalePaperDoll.level = API_UnitLevel("player")
 OvalePaperDoll.specialization = nil
 
 OvalePaperDoll.stat = {
+	-- time of most recent snapshot
+	snapshotTime = 0,
+
 -- primary stats
 	agility = 0,
 	intellect = 0,
@@ -134,6 +137,7 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	self.stat.meleeCrit = API_GetCritChance()
 	self.stat.rangedCrit = API_GetRangedCritChance()
 	self.stat.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
@@ -141,6 +145,7 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 		self.stat.masteryEffect = 0
 	else
 		self.stat.masteryEffect = API_GetMasteryEffect()
+		self.stat.snapshotTime = Ovale.now
 	end
 end
 
@@ -150,16 +155,19 @@ end
 
 function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
 	self.stat.spellBonusHealing = API_GetSpellBonusHealing()
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:SPELL_POWER_CHANGED(event)
 	self.stat.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	if unitId ~= "player" then return end
 	local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 	self.stat.attackPower = base + posBuff + negBuff
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:UNIT_LEVEL(event, unitId)
@@ -170,18 +178,21 @@ end
 function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId ~= "player" then return end
 	self.stat.rangedHaste = API_GetRangedHaste()
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 	if unitId ~= "player" then return end
 	local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
 	self.stat.rangedAttackPower = base + posBuff + negBuff
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 	if unitId ~= "player" then return end
 	self.stat.meleeHaste = API_GetMeleeHaste()
 	self.stat.spellHaste = API_UnitSpellHaste(unitId)
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:UNIT_STATS(event, unitId)
@@ -191,6 +202,7 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.stat.stamina = API_UnitStat(unitId, 3)
 	self.stat.intellect = API_UnitStat(unitId, 4)
 	self.stat.spirit = API_UnitStat(unitId, 5)
+	self.stat.snapshotTime = Ovale.now
 end
 
 function OvalePaperDoll:UpdateStats(event)
@@ -222,12 +234,15 @@ function OvalePaperDoll:GetSpellHasteMultiplier()
 	return 1 + self.stat.spellHaste / 100
 end
 
-function OvalePaperDoll:SnapshotStats(t)
-	-- Snapshot the stats into the given table using the same keynames as self.stat.
-	-- Also add snapshotTime as the time that the snapshot was taken.
-	t.snapshotTime = Ovale.now
-	for k, v in pairs(self.stat) do
-		t.k = v
+-- Snapshot the stats into the given table using the same keynames as self.stat.
+-- If source is nil, then use the current player stats; otherwise, use the given stat table.
+-- Only take the snapshot if the source snapshot time is older than timestamp.
+function OvalePaperDoll:SnapshotStats(timestamp, t, source)
+	source = source or self.stat
+	if timestamp and timestamp >= source.snapshotTime then
+		for k in pairs(self.stat) do
+			t[k] = source[k]
+		end
 	end
 end
 

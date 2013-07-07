@@ -17,6 +17,7 @@ Ovale.OvaleAura = OvaleAura
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
+local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
 
 local ipairs = ipairs
@@ -94,7 +95,7 @@ local OVALE_CLEU_TICK_EVENTS = {
 --</private-static-properties>
 
 --<private-static-methods>
-local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
+local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
 	if not self_aura[guid][filter] then
 		self_aura[guid][filter] = {}
 	end
@@ -149,12 +150,15 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		aura.name = name
 		aura.value = value
 
-		-- Only set the tick information for new auras.
-		if mine and not existingAura then
+		-- Only snapshot stats for periodic auras that have been applied or re-applied.
+		-- If SPELL_AURA_REFRESH didn't fire, then the aura was extended by adding ticks,
+		-- which doesn't re-snapshot stats.
+		if mine and (not existingAura or event == "SPELL_AURA_REFRESH") then
 			local si = OvaleData.spellInfo[spellId]
 			if si and si.tick then
 				aura.ticksSeen = 0
 				aura.tick = OvaleData:GetTickLength(spellId)
+				OvalePaperDoll:SnapshotStats(aura.gain, aura)
 			end
 		end
 	end
@@ -259,7 +263,7 @@ local function ScanUnitAuras(event, unitId, guid)
 			end
 		else
 			local casterGUID = OvaleGUID:GetGUID(unitCaster)
-			local added = UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			local added = UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
 			if added then
 				Ovale.refreshNeeded[unitId] = true
 			end

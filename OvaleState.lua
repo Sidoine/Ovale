@@ -67,9 +67,9 @@ OvaleState.lastSpellId = nil
 --</public-static-properties>
 
 --<private-static-methods>
-local function ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+local function ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, stats)
 	local self = OvaleState
-	self:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+	self:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, stats)
 end
 
 -- Track a new Eclipse buff that starts at endCast.
@@ -213,7 +213,8 @@ end
 -- endCast : fin du cast
 -- nextCast : temps auquel le prochain sort peut être lancé (>=endCast, avec le GCD)
 -- nocd : le sort ne déclenche pas son cooldown
-function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID)
+-- spellcast : snapshot of player stats at the time the spell was cast
+function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, stats)
 	if not spellId or not targetGUID then
 		return
 	end
@@ -453,6 +454,8 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 										local remainingTicks = floor((oldEnding - endCast) / oldTick)
 										newAura.ending = (oldEnding - oldTick * remainingTicks) + duration
 										newAura.tick = OvaleData:GetTickLength(auraSpellId)
+										-- Re-snapshot stats for the DoT.
+										OvalePaperDoll:SnapshotStats(newAura.start, newAura, stats)
 									else
 										newAura.ending = endCast + duration
 									end
@@ -476,6 +479,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								newAura.ending = endCast + duration
 								if isDoT then
 									newAura.tick = OvaleData:GetTickLength(auraSpellId)
+									OvalePaperDoll:SnapshotStats(newAura.start, newAura, stats)
 								end
 							end
 						end
