@@ -79,6 +79,9 @@ local self_lastTTDHealth = {}
 local self_lastTTDguid = {}
 local self_lastTTDdps = {}
 
+-- static property for conditions that use GetAura()
+local self_auraFound = {}
+
 local OVALE_POWERTYPE_ENERGY = OvaleData.power.energy.id
 local OVALE_POWERTYPE_MANA = OvaleData.power.mana.id
 
@@ -319,8 +322,8 @@ local function GetRunesCooldown(condition)
 end
 
 -- Front-end for OvaleState:GetAura() using condition parameters.
--- return start, ending, stacks, tick, value, gain
-local function GetAura(condition)
+-- return start, ending, stacks, gain
+local function GetAura(condition, auraFound)
 	local unitId = GetTarget(condition)
 	local spellId = condition[1]
 	local filter = GetFilter(condition)
@@ -330,7 +333,7 @@ local function GetAura(condition)
 		Ovale:Log("GetAura: nil spellId")
 		return nil
 	end
-	local start, ending, stacks, tick, value, gain = OvaleState:GetAura(unitId, spellId, filter, mine)
+	local start, ending, stacks, gain = OvaleState:GetAura(unitId, spellId, filter, mine, auraFound)
 
 	if not start then
 		Ovale:Logf("GetAura: aura %s not found on %s filter=%s mine=%s", spellId, unitId, filter, mine)
@@ -342,7 +345,7 @@ local function GetAura(condition)
 		return nil
 	end
 	Ovale:Logf("GetAura: aura %s found on %s start=%s ending=%s stacks=%s/%d", spellId, unitId, start, ending, stacks, conditionStacks)
-	return start, ending, stacks, tick, value, gain
+	return start, ending, stacks, gain
 end
 
 -- Front-end for OvaleState:GetAuraOnAnyTarget() using condition parameters.
@@ -653,7 +656,7 @@ OvaleCondition.conditions.debuffremains = OvaleCondition.conditions.buffremains
 OvaleCondition.conditions.buffgain = function(condition)
 	Ovale:Error("not implemented")
 	if true then return nil end
-	local gain = select(6, GetAura(condition)) or 0
+	local gain = select(4, GetAura(condition)) or 0
 	return 0, nil, 0, 0, 1
 end
 OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
@@ -2147,7 +2150,9 @@ end
 -- @see Ticks, TicksRemain, TickTime
 
 OvaleCondition.conditions.nexttick = function(condition)
-	local start, ending, _, tick = GetAura(condition)
+	self_auraFound.tick = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local tick = self_auraFound.tick
 	if ending and tick then
 		while ending - tick > OvaleState.currentTime do
 			ending = ending - tick
@@ -2766,7 +2771,9 @@ end
 --     Spell(purifying_brew)
 
 OvaleCondition.conditions.tickvalue = function(condition)
-	local value = select(5, GetAura(condition)) or 0
+	self_auraFound.value = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local value = self_auraFound.value or 0
 	return Compare(value, condition[2], condition[3])
 end
 
@@ -2781,7 +2788,9 @@ end
 -- @see NextTick, TicksRemain, TickTime
 
 OvaleCondition.conditions.ticks = function(condition)
-	local start, ending, _, tick = GetAura(condition)
+	self_auraFound.tick = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local tick = self_auraFound.tick
 	local duration, numTicks
 	if start then
 		-- Aura exists on the target
@@ -2827,7 +2836,9 @@ end
 --     Spell(shadow_word_pain)
 
 OvaleCondition.conditions.ticksremain = function(condition)
-	local start, ending, _, tick = GetAura(condition)
+	self_auraFound.tick = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local tick = self_auraFound.tick
 	if ending and tick and tick > 0 then
 		return 0, nil, 1, ending, -1/tick
 	end
@@ -2851,7 +2862,9 @@ end
 -- @see NextTick, Ticks, TicksRemain
 
 OvaleCondition.conditions.ticktime = function(condition)
-	local start, ending, _, tick = GetAura(condition)
+	self_auraFound.tick = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local tick = self_auraFound.tick
 	if not tick then
 		tick = OvaleData:GetTickLength(condition[1])
 	end

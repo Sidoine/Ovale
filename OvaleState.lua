@@ -27,6 +27,7 @@ local floor = math.floor
 local pairs = pairs
 local select = select
 local tostring = tostring
+local wipe = table.wipe
 local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
@@ -40,6 +41,10 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local self_damageMultiplier = 1
 local self_runes = {}
 local self_runesCD = {}
+
+-- Static properties used by "GetAura" method.
+local aura_GetAura = {}
+local newAura_GetAura = {}
 
 -- Aura IDs for Eclipse buffs.
 local LUNAR_ECLIPSE = 48518
@@ -545,7 +550,7 @@ function OvaleState:GetComputedSpellCD(spellId)
 	return actionCooldownStart, actionCooldownDuration, actionEnable
 end
 
-function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 	local aura
 	if mine then
 		local auraTable = self.aura[guid]
@@ -574,31 +579,47 @@ function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		else
 			Ovale:Logf("Found %s aura %s on %s (removed)", filter, spellId, guid)
 		end
-		return aura.start, aura.ending, aura.stacks, aura.tick, aura.value, aura.gain
+		if auraFound then
+			for k, v in pairs(aura) do
+				auraFound[k] = v
+			end
+		end
+		return aura.start, aura.ending, aura.stacks, aura.gain
 	else
 		Ovale:Logf("Aura %s not found in state for %s", spellId, guid)
-		return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+		return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 	end
 end
 
-function OvaleState:GetAura(unitId, spellId, filter, mine)
+function OvaleState:GetAura(unitId, spellId, filter, mine, auraFound)
 	local guid = OvaleGUID:GetGUID(unitId)
 	if OvaleData.buffSpellList[spellId] then
-		local newStart, newEnding, newStacks, newTick, newValue, newGain
+		if auraFound then wipe(newAura_GetAura) end
+		local newStart, newEnding, newStacks, newGain
 		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			local start, ending, stacks, tick, value, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId)
+			if auraFound then wipe(aura_GetAura) end
+			local start, ending, stacks, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura_GetAura)
 			if start and (not newStart or stacks > newStacks) then
 				newStart = start
 				newEnding = ending
 				newStacks = stacks
-				newTick = tick
-				newValue = value
 				newGain = gain
+				if auraFound then
+					wipe(newAura_GetAura)
+					for k, v in pairs(aura_GetAura) do
+						newAura_GetAura[k] = v
+					end
+				end
 			end
 		end
-		return newStart, newEnding, newStacks, newTick, newValue, newGain
+		if auraFound then
+			for k, v in pairs(newAura_GetAura) do
+				auraFound[k] = v
+			end
+		end
+		return newStart, newEnding, newStacks, newGain
 	else
-		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
+		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 	end
 end
 
