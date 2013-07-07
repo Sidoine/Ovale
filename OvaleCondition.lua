@@ -344,11 +344,12 @@ local function GetAura(condition)
 	return start, ending, stacks, tick, value, gain
 end
 
--- Front-end for OvaleState:GetMyAuraOnAnyTarget() using condition parameters.
+-- Front-end for OvaleState:GetAuraOnAnyTarget() using condition parameters.
 -- return start, ending, count
-local function GetMyAuraOnAnyTarget(condition, excludingUnit)
+local function GetAuraOnAnyTarget(condition, excludingUnit)
 	local spellId = condition[1]
 	local filter = GetFilter(condition)
+	local mine = GetMine(condition)
 	if excludingUnit then
 		excludingUnit = OvaleGUID:GetGUID(excludingUnit)
 	end
@@ -356,13 +357,13 @@ local function GetMyAuraOnAnyTarget(condition, excludingUnit)
 		Ovale:Log("GetAura: nil spellId")
 		return nil
 	end
-	local start, ending, count = OvaleState:GetMyAuraOnAnyTarget(spellId, filter, excludingUnit)
+	local start, ending, count = OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingUnit)
 
 	if not start then
-		Ovale:Logf("GetMyAuraOnAnyTarget: aura %s not found, filter=%s excludingUnit=%s", spellId, filter, excludingUnit)
+		Ovale:Logf("GetAuraOnAnyTarget: aura %s not found, filter=%s mine=%s excludingUnit=%s", spellId, filter, mine, excludingUnit)
 		return nil
 	end
-	Ovale:Logf("GetMyAuraOnAnyTarget: aura %s found, start=%s ending=%s count=%d", spellId, start, ending, stacks, count)
+	Ovale:Logf("GetAuraOnAnyTarget: aura %s found, start=%s ending=%s count=%d", spellId, start, ending, stacks, count)
 	return start, ending, count
 end
 
@@ -558,7 +559,7 @@ end
 -- @see DebuffCount
 
 OvaleCondition.conditions.buffcount = function(condition)
-	local start, ending, count = GetMyAuraOnAnyTarget(condition)
+	local start, ending, count = GetAuraOnAnyTarget(condition)
 	return start, ending, count, start, 0
 end
 OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
@@ -2136,7 +2137,7 @@ end
 --     Spell(thunder_clap)
 
 OvaleCondition.conditions.otherdebuffexpires = function(condition)
-	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
+	local start, ending = GetAuraOnAnyTarget(condition, "target")
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	if not start then
 		ending = 0
@@ -2162,7 +2163,7 @@ OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebu
 --     Spell(devouring_plague)
 
 OvaleCondition.conditions.otherdebuffpresent = function(condition)
-	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
+	local start, ending = GetAuraOnAnyTarget(condition, "target")
 	if not start then
 		return nil
 	end
@@ -2185,7 +2186,7 @@ OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebu
 --     Spell(devouring_plague)
 
 OvaleCondition.conditions.otherdebuffremains = function(condition)
-	local start, ending = GetMyAuraOnAnyTarget(condition, "target")
+	local start, ending = GetAuraOnAnyTarget(condition, "target")
 	if start and ending and start <= ending then
 		return start, ending, ending - start, start, -1
 	else

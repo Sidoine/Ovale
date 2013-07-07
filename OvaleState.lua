@@ -565,7 +565,11 @@ function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		end
 	end
 	if aura then
-		Ovale:Logf("Found %s aura %s on %s", filter, spellId, guid)
+		if aura.stacks > 0 then
+			Ovale:Logf("Found %s aura %s on %s", filter, spellId, guid)
+		else
+			Ovale:Logf("Found %s aura %s on %s (removed)", filter, spellId, guid)
+		end
 		return aura.start, aura.ending, aura.stacks, aura.tick, aura.value, aura.gain
 	else
 		Ovale:Logf("Aura %s not found in state for %s", spellId, guid)
@@ -596,10 +600,11 @@ function OvaleState:GetAura(unitId, spellId, filter, mine)
 	end
 end
 
--- Look for my aura on any target.
+-- Look for an aura on any target, excluding the given GUID.
 -- Returns the earliest start time, the latest ending time, and the number of auras seen.
-function OvaleState:GetMyAuraOnAnyTarget(spellId, filter, excludingGUID)
-	local start, ending, count = OvaleAura:GetMyAuraOnAnyTarget(spellId, filter, excludingGUID)
+function OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
+	local start, ending, count = OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
+	-- TODO: This is broken because it doesn't properly account for removed auras in the current frame.
 	for guid, auraTable in pairs(self.aura) do
 		if guid ~= excludingGUID then
 			for auraFilter, auraList in pairs(auraTable) do
