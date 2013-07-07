@@ -117,11 +117,11 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	-- Snapshot the current stats for the spellcast.
 	self.lastSpellId = spellId
-	self_lastAttackPower[spellId] = OvalePaperDoll.attackPower
-	self_lastSpellpower[spellId] = OvalePaperDoll.spellBonusDamage
-	self_lastCritChance[spellId] = OvalePaperDoll.spellCrit
+	self_lastAttackPower[spellId] = OvalePaperDoll.stat.attackPower
+	self_lastSpellpower[spellId] = OvalePaperDoll.stat.spellBonusDamage
+	self_lastCritChance[spellId] = OvalePaperDoll.stat.spellCrit
 	self_lastDamageMultiplier[spellId] = OvaleAura:GetDamageMultiplier(spellId)
-	self_lastMasteryEffect[spellId] = OvalePaperDoll.masteryEffect
+	self_lastMasteryEffect[spellId] = OvalePaperDoll.stat.masteryEffect
 	tinsert(self_activeSpellcast, spellcast)
 
 	local si = OvaleData.spellInfo[spellId]

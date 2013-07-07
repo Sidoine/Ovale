@@ -548,7 +548,7 @@ end
 -- if AttackPower(more 10000) Spell(rake)
 
 OvaleCondition.conditions.attackpower = function(condition)
-	return Compare(OvalePaperDoll.attackPower, condition[1], condition[2])
+	return Compare(OvalePaperDoll.stat.attackPower, condition[1], condition[2])
 end
 
 --- Get the total count of the given aura applied by the player across all targets.
@@ -1076,7 +1076,7 @@ end
 -- @usage
 -- if CritChance() >30 Spell(immolate)
 OvaleCondition.conditions.critchance = function(condition)
-	return Compare(OvalePaperDoll.spellCrit, condition[1], condition[2])
+	return Compare(OvalePaperDoll.stat.spellCrit, condition[1], condition[2])
 end
 
 --- Get the current estimated damage of a spell if it is a critical strike.
@@ -1113,7 +1113,7 @@ OvaleCondition.conditions.damage = function(condition)
 	if value then
 		return 0, nil, value, origin, rate
 	else
-		value = OvaleData:GetDamage(spellId, OvalePaperDoll.attackPower, OvalePaperDoll.spellBonusDamage, OvaleState.state.combo)
+		value = OvaleData:GetDamage(spellId, OvalePaperDoll.stat.attackPower, OvalePaperDoll.stat.spellBonusDamage, OvaleState.state.combo)
 		return 0, nil, value * OvaleState:GetDamageMultiplier(spellId), 0, 0
 	end
 end
@@ -2045,7 +2045,7 @@ end
 --     Spell(rake)
 
 OvaleCondition.conditions.mastery = function(condition)
-	return Compare(OvalePaperDoll.masteryEffect, condition[1], condition[2])
+	return Compare(OvalePaperDoll.stat.masteryEffect, condition[1], condition[2])
 end
 
 --- Get the amount of health points of the target when it is at full health.
@@ -2593,7 +2593,7 @@ end
 --     Spell(living_bomb)
 
 OvaleCondition.conditions.spellpower = function(condition)
-	return Compare(OvalePaperDoll.spellBonusDamage, condition[1], condition[2])
+	return Compare(OvalePaperDoll.stat.spellBonusDamage, condition[1], condition[2])
 end
 
 --- Get the remaining amount of damage Stagger will cause to the target.
