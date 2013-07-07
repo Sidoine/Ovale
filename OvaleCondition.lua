@@ -555,6 +555,207 @@ OvaleCondition.conditions.attackpower = function(condition)
 	return Compare(OvalePaperDoll.stat.attackPower, condition[1], condition[2])
 end
 
+--- Get the player's attack power at the time the given aura was applied on the target.
+-- @name BuffAttackPower
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The attack power.
+-- @usage
+-- if AttackPower() >target.DebuffAttackPower(rake) Spell(rake)
+
+OvaleCondition.conditions.buffattackpower = function(condition)
+	self_auraFound.attackPower = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local attackPower = self_auraFound.attackPower
+	if start and ending and start <= ending then
+		return start, ending, attackPower, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffattackpower = OvaleCondition.conditions.buffattackpower
+
+--- Get the player's ranged attack power at the time the given aura was applied on the target.
+-- @name BuffRangedAttackPower
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The ranged attack power.
+-- @usage
+-- if RangedAttackPower() >target.DebuffRangedAttackPower(serpent_sting_dot)
+--     Spell(serpent_sting)
+
+OvaleCondition.conditions.buffrangedattackpower = function(condition)
+	self_auraFound.rangedAttackPower = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local rangedAttackPower = self_auraFound.rangedAttackPower
+	if start and ending and start <= ending then
+		return start, ending, rangedAttackPower, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.buffrangedattackpower
+
+--- Get the player's melee critical strike chance at the time the given aura was applied on the target.
+-- @name BuffMeleeCritChance
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The critical strike chance.
+-- @usage
+-- if MeleeCritChance() >target.DebuffMeleeCritChance(rake) Spell(rake)
+
+OvaleCondition.conditions.buffmeleecritchance = function(condition)
+	self_auraFound.meleeCrit = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local meleeCrit = self_auraFound.meleeCrit
+	if start and ending and start <= ending then
+		return start, ending, meleeCrit, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffmeleecritchance = OvaleCondition.conditions.buffmeleecritchance
+
+--- Get the player's ranged critical strike chance at the time the given aura was applied on the target.
+-- @name BuffRangedCritChance
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The critical strike chance.
+-- @usage
+-- if RangedCritChance() >target.DebuffRangedCritChance(serpent_sting_dot)
+--     Spell(serpent_sting)
+
+OvaleCondition.conditions.buffrangedcritchance = function(condition)
+	self_auraFound.rangedCrit = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local rangedCrit = self_auraFound.rangedCrit
+	if start and ending and start <= ending then
+		return start, ending, rangedCrit, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffrangedcritchance = OvaleCondition.conditions.buffrangedcritchance
+
+--- Get the player's spell critical strike chance at the time the given aura was applied on the target.
+-- @name BuffSpellCritChance
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The critical strike chance.
+-- @usage
+-- if SpellCritChance() >target.DebuffSpellCritChance(moonfire) Spell(moonfire)
+
+OvaleCondition.conditions.buffspellcritchance = function(condition)
+	self_auraFound.spellCrit = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local spellCrit = self_auraFound.spellCrit
+	if start and ending and start <= ending then
+		return start, ending, spellCrit, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffspellcritchance = OvaleCondition.conditions.buffspellcritchance
+
+--- Get the player's mastery effect at the time the given aura was applied on the target.
+-- @name BuffMastery
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The mastery effect.
+-- @usage
+-- if Mastery() >target.DebuffMastery(rip) Spell(rip)
+
+OvaleCondition.conditions.buffmastery = function(condition)
+	self_auraFound.masteryEffect = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local masteryEffect = self_auraFound.masteryEffect
+	if start and ending and start <= ending then
+		return start, ending, masteryEffect, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffmastery = OvaleCondition.conditions.buffmastery
+
+--- Get the player's spellpower at the time the given aura was applied on the target.
+-- @name BuffSpellpower
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The spellpower.
+-- @usage
+-- if Spellpower() >target.DebuffSpellpower(moonfire) Spell(moonfire)
+
+OvaleCondition.conditions.buffspellpower = function(condition)
+	self_auraFound.spellBonusDamage = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local spellBonusDamage = self_auraFound.spellBonusDamage
+	if start and ending and start <= ending then
+		return start, ending, spellBonusDamage, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffspellpower = OvaleCondition.conditions.buffspellpower
+
+--- Get the player's spell haste at the time the given aura was applied on the target.
+-- @name BuffSpellHaste
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The percent increase to spell haste.
+-- @usage
+-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
+
+OvaleCondition.conditions.buffspellhaste = function(condition)
+	self_auraFound.spellHaste = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local spellHaste = self_auraFound.spellHaste
+	if start and ending and start <= ending then
+		return start, ending, spellHaste, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffspellhaste = OvaleCondition.conditions.buffspellhaste
+
+--- Get the current percent increase to spell haste of the player.
+-- @name SpellHaste
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current percent increase to spell haste.
+-- @return A boolean value for the result of the comparison.
+-- @see BuffSpellHaste
+-- @usage
+-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
+
+OvaleCondition.conditions.spellhaste = function(condition)
+	return Compare(OvalePaperDoll.stat.spellHaste, condition[1], condition[2])
+end
+
 --- Get the total count of the given aura applied by the player across all targets.
 -- @name BuffCount
 -- @paramsig number
@@ -1079,6 +1280,7 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @usage
 -- if CritChance() >30 Spell(immolate)
+
 OvaleCondition.conditions.critchance = function(condition)
 	return Compare(OvalePaperDoll.stat.spellCrit, condition[1], condition[2])
 end
@@ -1903,7 +2105,7 @@ OvaleCondition.conditions.lastspellcombopoints = function(condition)
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "comboPoints"), condition[2], condition[3])
 end
 
---- Get the critical strike chance of the player during the most recent cast of a spell on the target.
+--- Get the spell critical strike chance of the player during the most recent cast of a spell on the target.
 -- @name LastSpellCritChance
 -- @paramsig number or boolean
 -- @param id The spell ID.
@@ -1914,9 +2116,9 @@ end
 --     Valid values: player, target, focus, pet.
 -- @return The previous critical strike chance.
 -- @return A boolean value for the result of the comparison.
--- @see Mastery
+-- @see SpellCritChance
 -- @usage
--- if CritChance(shadow_bolt) > LastSpellCritChance(shadow_bolt)
+-- if SpellCritChance() > target.LastSpellCritChance(shadow_bolt)
 --     Spell(metamorphosis)
 
 OvaleCondition.conditions.lastspellcritchance = function(condition)
@@ -1945,6 +2147,48 @@ end
 OvaleCondition.conditions.lastspellmastery = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect"), condition[2], condition[3])
+end
+
+--- Get the melee critical strike chance of the player during the most recent cast of a spell on the target.
+-- @name LastSpellMeleeCritChance
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=target.
+--     Valid values: player, target, focus, pet.
+-- @return The previous critical strike chance.
+-- @return A boolean value for the result of the comparison.
+-- @see MeleeCritChance
+-- @usage
+-- if MeleeCritChance() > target.LastSpellMeleeCritChance(rip)
+--     Spell(rip)
+
+OvaleCondition.conditions.lastspellmeleecritchance = function(condition)
+	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
+	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit"), condition[2], condition[3])
+end
+
+--- Get the ranged critical strike chance of the player during the most recent cast of a spell on the target.
+-- @name LastSpellRangedCritChance
+-- @paramsig number or boolean
+-- @param id The spell ID.
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=target.
+--     Valid values: player, target, focus, pet.
+-- @return The previous critical strike chance.
+-- @return A boolean value for the result of the comparison.
+-- @see RangedCritChance
+-- @usage
+-- if RangedCritChance() > target.LastSpellRangedCritChance(serpent_sting_dot)
+--     Spell(serpent_sting)
+
+OvaleCondition.conditions.lastspellrangedcritchance = function(condition)
+	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
+	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit"), condition[2], condition[3])
 end
 
 --- Get the time elapsed in seconds since the player's previous melee swing (white attack).
@@ -2121,6 +2365,21 @@ end
 
 OvaleCondition.conditions.maxmana = function(condition)
 	return Compare(API_UnitPowerMax(GetTarget(condition), OVALE_POWERTYPE_MANA), condition[1], condition[2])
+end
+
+--- Get the current melee critical strike chance of the player.
+-- @name MeleeCritChance
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current critical strike chance (in percent).
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellMeleeCritChance
+-- @usage
+-- if MeleeCritChance() >90 Spell(rip)
+
+OvaleCondition.conditions.meleecritchance = function(condition)
+	return Compare(OvalePaperDoll.stat.meleeCrit, condition[1], condition[2])
 end
 
 --- Get the time in seconds until the player's next melee swing (white attack).
@@ -2312,6 +2571,21 @@ OvaleCondition.conditions.rage = function(condition)
 	return TestValue(condition[1], condition[2], OvaleState.state.rage, OvaleState.currentTime, OvaleState.powerRate.rage)
 end
 
+--- Get the current ranged critical strike chance of the player.
+-- @name RangedCritChance
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current critical strike chance (in percent).
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellRangedCritChance
+-- @usage
+-- if RangedCritChance() >90 Spell(serpent_sting)
+
+OvaleCondition.conditions.rangedcritchance = function(condition)
+	return Compare(OvalePaperDoll.stat.rangedCrit, condition[1], condition[2])
+end
+
 --- Get the result of the target's level minus the player's level. This number may be negative.
 -- @name RelativeLevel
 -- @paramsig number or boolean
@@ -2492,6 +2766,21 @@ end
 
 OvaleCondition.conditions.speed = function(condition)
 	return Compare(API_GetUnitSpeed(GetTarget(condition))*100/7, condition[1], condition[2])
+end
+
+--- Get the current spell critical strike chance of the player.
+-- @name SpellCritChance
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @return The current critical strike chance (in percent).
+-- @return A boolean value for the result of the comparison.
+-- @see LastSpellCritChance
+-- @usage
+-- if SpellCritChance() >30 Spell(immolate)
+
+OvaleCondition.conditions.spellcritchance = function(condition)
+	return Compare(OvalePaperDoll.stat.spellCrit, condition[1], condition[2])
 end
 
 --- Test if the given spell is in the spellbook.
