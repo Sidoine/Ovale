@@ -2040,12 +2040,12 @@ end
 OvaleCondition.conditions.lastspellestimateddamage = function(condition)
 	local spellId = condition[1]
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local ap = GetLastSpellInfo(guid, spellId, "attackPower")
-	local sp = GetLastSpellInfo(guid, spellId, "spellBonusDamage")
-	local mh = GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage")
-	local oh = GetLastSpellInfo(guid, spellId, "offHandWeaponDamage")
-	local combo = GetLastSpellInfo(guid, spellId, "comboPoints")
-	local dm = GetLastSpellInfo(guid, condition, "damageMultiplier") or 1
+	local ap = OvaleFuture:GetLastSpellInfo(guid, spellId, "attackPower")
+	local sp = OvaleFuture:GetLastSpellInfo(guid, spellId, "spellBonusDamage")
+	local mh = OvaleFuture:GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage")
+	local oh = OvaleFuture:GetLastSpellInfo(guid, spellId, "offHandWeaponDamage")
+	local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "comboPoints")
+	local dm = OvaleFuture:GetLastSpellInfo(guid, condition, "damageMultiplier") or 1
 	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
 end
 
