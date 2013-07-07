@@ -29,8 +29,8 @@ local OvalePaperDoll = Ovale.OvalePaperDoll
 local math_abs = math.abs
 local unpack = unpack
 local API_GetSpellInfo = GetSpellInfo
+local API_IsDualWielding = IsDualWielding
 local API_UnitAttackSpeed = UnitAttackSpeed
-local API_UnitDamage = UnitDamage
 local API_UnitRangedDamage = UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
@@ -78,12 +78,7 @@ function OvaleSwing:OnDisable()
 end
 
 function OvaleSwing:PLAYER_ENTER_COMBAT()
-	local _,_,offhandlow, offhandhigh = API_UnitDamage('player')
-	if math_abs(offhandlow - offhandhigh) <= 0.1 or OvalePaperDoll.class == "DRUID" then
-		self.dual = false
-	else
-		self.dual = true
-	end
+	self.dual = API_IsDualWielding()
 	--print("Enter combat")
 end
 
