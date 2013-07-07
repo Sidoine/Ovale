@@ -243,6 +243,8 @@ function OvalePaperDoll:SnapshotStats(timestamp, t, source)
 		for k in pairs(self.stat) do
 			t[k] = source[k]
 		end
+		-- Also snapshot damageMultiplier if it's present (added by OvaleFuture and OvaleAura).
+		t.damageMultiplier = source.damageMultiplier
 	end
 end
 

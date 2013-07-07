@@ -602,6 +602,29 @@ OvaleCondition.conditions.buffrangedattackpower = function(condition)
 end
 OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.buffrangedattackpower
 
+--- Get the player's damage multiplier for the given aura at the time the aura was applied on the target.
+-- @name BuffDamageMultiplier
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The damage multiplier.
+-- @usage
+-- if target.DebuffDamageMultiplier(rake) <1 Spell(rake)
+
+OvaleCondition.conditions.buffdamagemultiplier = function(condition)
+	self_auraFound.damageMultiplier = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local damageMultiplier = self_auraFound.damageMultiplier
+	if start and ending and start <= ending then
+		return start, ending, damageMultiplier, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffdamagemultiplier = OvaleCondition.conditions.buffdamagemultiplier
+
 --- Get the player's melee critical strike chance at the time the given aura was applied on the target.
 -- @name BuffMeleeCritChance
 -- @paramsig number

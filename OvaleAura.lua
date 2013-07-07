@@ -101,6 +101,7 @@ local OVALE_CLEU_TICK_EVENTS = {
 
 --<private-static-methods>
 local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
+	local self = OvaleAura
 	if not self_aura[guid][filter] then
 		self_aura[guid][filter] = {}
 	end
@@ -164,6 +165,7 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 				aura.ticksSeen = 0
 				aura.tick = OvaleData:GetTickLength(spellId)
 				OvalePaperDoll:SnapshotStats(aura.gain, aura)
+				aura.damageMultiplier = self:GetDamageMultiplier(spellId)
 			end
 		end
 	end

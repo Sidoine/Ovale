@@ -295,6 +295,7 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 				spellcast.target = targetGUID
 				-- Update spellcast stats to the latest snapshot of the player's stats.
 				OvalePaperDoll:SnapshotStats(Ovale.now, spellcast)
+				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
 			end
 		end
 		self_sentSpellcast[lineId] = Ovale.now
