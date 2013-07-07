@@ -1326,10 +1326,10 @@ OvaleCondition.conditions.critdamage = function(condition)
 end
 
 --- Get the current estimated damage of a spell on the target.
--- The calculated damage takes into account the current attack power, spellpower and combo points (if used).
+-- The calculated damage takes into account the current attack power, spellpower, weapon damage and combo points (if used).
 -- The damage is computed from information for the spell set via SpellInfo(...):
 --
--- damage = base + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
+-- damage = base + bonusmainhand * MH + bonusoffhand * OH + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
 -- @name Damage
 -- @paramsig number
 -- @param id The spell ID.
@@ -1349,8 +1349,12 @@ OvaleCondition.conditions.damage = function(condition)
 	if value then
 		return 0, nil, value, origin, rate
 	else
-		value = OvaleData:GetDamage(spellId, OvalePaperDoll.stat.attackPower, OvalePaperDoll.stat.spellBonusDamage, OvaleState.state.combo)
-		return 0, nil, value * OvaleState:GetDamageMultiplier(spellId), 0, 0
+		local ap = OvalePaperDoll.stat.attackPower
+		local sp = OvalePaperDoll.stat.spellBonusDamage
+		local mh = OvalePaperDoll.stat.mainHandWeaponDamage
+		local oh = OvalePaperDoll.stat.offHandWeaponDamage
+		local dm = OvaleState:GetDamageMultiplier(spellId)
+		return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
 	end
 end
 
@@ -2016,11 +2020,11 @@ OvaleCondition.conditions.lastspelldamage = function(condition)
 end
 
 --- Get the estimated damage of the most recent cast of the player's spell on the target.
--- The calculated damage takes into account the values of attack power, spellpower and combo points (if used)
+-- The calculated damage takes into account the values of attack power, spellpower, weapon damage and combo points (if used)
 -- at the time the spell was most recent cast.
 -- The damage is computed from information for the spell set via SpellInfo(...):
 --
--- damage = base + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
+-- damage = base + bonusmainhand * MH + bonusoffhand * OH + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
 -- @name LastSpellEstimatedDamage
 -- @paramsig number
 -- @param id The spell ID.
@@ -2038,9 +2042,11 @@ OvaleCondition.conditions.lastspellestimateddamage = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	local ap = GetLastSpellInfo(guid, spellId, "attackPower")
 	local sp = GetLastSpellInfo(guid, spellId, "spellBonusDamage")
+	local mh = GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage")
+	local oh = GetLastSpellInfo(guid, spellId, "offHandWeaponDamage")
 	local combo = GetLastSpellInfo(guid, spellId, "comboPoints")
 	local dm = GetLastSpellInfo(guid, condition, "damageMultiplier") or 1
-	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, combo) * dm, 0, 0
+	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
 end
 
 --- Get the damage multiplier of the most recent cast of a spell on the target.
@@ -3375,6 +3381,29 @@ OvaleCondition.conditions.weaponenchantexpires = function(condition)
 			return OvaleState.maintenant + offHandExpiration - (condition[2] or 60)
 		end
 	end
+end
+
+--- The average weapon damage of the weapon in the given hand.
+-- @name WeaponDamage
+-- @paramsig number
+-- @param hand Optional. Sets which hand weapon.
+--     Defaults to mainhand.
+--     Valid values: mainhand, offhand.
+-- @return The weapon damage.
+-- @usage
+-- AddFunction MangleDamage {
+--     WeaponDamage() * 5 + 78
+-- }
+
+OvaleCondition.conditions.weapondamage = function(condition)
+	local hand = condition[1]
+	local damage = 0
+	if hand == "offhand" or hand == "off" then
+		damage = OvalePaperDoll.stat.offHandWeaponDamage
+	else -- if hand == "mainhand" or hand == "main" then
+		damage = OvalePaperDoll.stat.mainHandWeaponDamage
+	end
+	return 0, nil, damage, 0, 0
 end
 
 OvaleCondition.defaultTarget = "target"

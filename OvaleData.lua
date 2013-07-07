@@ -498,15 +498,23 @@ function OvaleData:GetSpellCD(spellId)
 end
 
 --Compute the damage of the given spell.
-function OvaleData:GetDamage(spellId, attackpower, spellpower, combo)
+function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combo)
 	local si = self.spellInfo[spellId]
 	if not si then
 		return nil
 	end
 	local damage = si.base or 0
-	combo = combo or 0
 	attackpower = attackpower or 0
 	spellpower = spellpower or 0
+	mainHandWeaponDamage = mainHandWeaponDamage or 0
+	offHandWeaponDamage = offHandWeaponDamage or 0
+	combo = combo or 0
+	if si.bonusmainhand then
+		damage = damage + si.bonusmainhand * mainHandWeaponDamage
+	end
+	if si.bonusoffhand then
+		damage = damage + si.bonusoffhand * offHandWeaponDamage
+	end
 	if si.bonuscp then
 		damage = damage + si.bonuscp * combo
 	end
