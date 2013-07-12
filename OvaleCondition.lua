@@ -563,6 +563,7 @@ end
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The attack power.
+-- @see DebuffAttackPower
 -- @usage
 -- if AttackPower() >target.DebuffAttackPower(rake) Spell(rake)
 
@@ -586,6 +587,7 @@ OvaleCondition.conditions.debuffattackpower = OvaleCondition.conditions.buffatta
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The ranged attack power.
+-- @see DebuffRangedAttackPower
 -- @usage
 -- if RangedAttackPower() >target.DebuffRangedAttackPower(serpent_sting_dot)
 --     Spell(serpent_sting)
@@ -610,6 +612,7 @@ OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.bu
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The damage multiplier.
+-- @see DebuffDamageMultiplier
 -- @usage
 -- if target.DebuffDamageMultiplier(rake) <1 Spell(rake)
 
@@ -633,6 +636,7 @@ OvaleCondition.conditions.debuffdamagemultiplier = OvaleCondition.conditions.buf
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The critical strike chance.
+-- @see DebuffMeleeCritChance
 -- @usage
 -- if MeleeCritChance() >target.DebuffMeleeCritChance(rake) Spell(rake)
 
@@ -656,6 +660,7 @@ OvaleCondition.conditions.debuffmeleecritchance = OvaleCondition.conditions.buff
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The critical strike chance.
+-- @see DebuffRangedCritChance
 -- @usage
 -- if RangedCritChance() >target.DebuffRangedCritChance(serpent_sting_dot)
 --     Spell(serpent_sting)
@@ -680,6 +685,7 @@ OvaleCondition.conditions.debuffrangedcritchance = OvaleCondition.conditions.buf
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The critical strike chance.
+-- @see DebuffSpellCritChance
 -- @usage
 -- if SpellCritChance() >target.DebuffSpellCritChance(moonfire) Spell(moonfire)
 
@@ -703,6 +709,7 @@ OvaleCondition.conditions.debuffspellcritchance = OvaleCondition.conditions.buff
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The mastery effect.
+-- @see DebuffMastery
 -- @usage
 -- if Mastery() >target.DebuffMastery(rip) Spell(rip)
 
@@ -726,6 +733,7 @@ OvaleCondition.conditions.debuffmastery = OvaleCondition.conditions.buffmastery
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The spellpower.
+-- @see DebuffSpellpower
 -- @usage
 -- if Spellpower() >target.DebuffSpellpower(moonfire) Spell(moonfire)
 
@@ -749,6 +757,7 @@ OvaleCondition.conditions.debuffspellpower = OvaleCondition.conditions.buffspell
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The percent increase to spell haste.
+-- @see DebuffSpellHaste
 -- @usage
 -- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
 
