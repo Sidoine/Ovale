@@ -1321,27 +1321,6 @@ OvaleCondition.conditions.creaturetype = function(condition)
 	return nil
 end
 
---- Get the current critical strike chance of the player.
--- @name CritChance
--- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
--- @param number Optional. The number to compare against.
--- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
---     Defaults to unlimited=0.
---     Valid values: 0, 1
--- @return The current critical strike chance (in percent).
--- @return A boolean value for the result of the comparison.
--- @usage
--- if CritChance() >30 Spell(immolate)
-
-OvaleCondition.conditions.critchance = function(condition)
-	local critChance = OvalePaperDoll.stat.spellCrit
-	if condition.unlimited ~= 1 and critChance > 100 then
-		critChance = 100
-	end
-	return Compare(critChance, condition[1], condition[2])
-end
-
 --- Get the current estimated damage of a spell on the target if it is a critical strike.
 -- @name CritDamage
 -- @paramsig number
@@ -1373,7 +1352,7 @@ end
 -- @return The estimated damage of the given spell on the target.
 -- @see CritDamage, LastSpellDamage, LastSpellEstimatedDamage
 -- @usage
--- if {target.Damage(rake) / target.LastSpellEstimateDamage(rake)} >1.1
+-- if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 --     Spell(rake)
 
 OvaleCondition.conditions.damage = function(condition)
@@ -2033,7 +2012,7 @@ end
 
 --- Get the damage done by the most recent damage event for the given spell.
 -- If the spell is a periodic aura, then it gives the damage done by the most recent tick.
--- @name LastSpellDamage
+-- @name LastDamage
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2045,13 +2024,14 @@ end
 -- if LastDamage(ignite) >10000 Spell(combustion)
 -- if LastDamage(ignite more 10000) Spell(combustion)
 
-OvaleCondition.conditions.lastspelldamage = function(condition)
+OvaleCondition.conditions.lastdamage = function(condition)
 	local spellId = condition[1]
 	if not OvaleSpellDamage:Get(spellId) then
 		return nil
 	end
 	return Compare(OvaleSpellDamage:Get(spellId), condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspelldamage = OvaleCondition.conditions.lastdamage
 
 --- Get the estimated damage of the most recent cast of the player's spell on the target.
 -- The calculated damage takes into account the values of attack power, spellpower, weapon damage and combo points (if used)
@@ -2059,7 +2039,7 @@ end
 -- The damage is computed from information for the spell set via SpellInfo(...):
 --
 -- damage = base + bonusmainhand * MH + bonusoffhand * OH + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
--- @name LastSpellEstimatedDamage
+-- @name LastEstimatedDamage
 -- @paramsig number
 -- @param id The spell ID.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
@@ -2068,10 +2048,10 @@ end
 -- @return The estimated damage of the most recent cast of the given spell by the player.
 -- @see Damage, LastSpellDamage
 -- @usage
--- if {Damage(rake) / target.LastSpellEstimateDamage(rake)} >1.1
+-- if {Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 --     Spell(rake)
 
-OvaleCondition.conditions.lastspellestimateddamage = function(condition)
+OvaleCondition.conditions.lastestimateddamage = function(condition)
 	local spellId = condition[1]
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	local ap = OvaleFuture:GetLastSpellInfo(guid, spellId, "attackPower")
@@ -2082,10 +2062,11 @@ OvaleCondition.conditions.lastspellestimateddamage = function(condition)
 	local dm = OvaleFuture:GetLastSpellInfo(guid, condition, "damageMultiplier") or 1
 	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
 end
+OvaleCondition.conditions.lastspellestimateddamage = OvaleCondition.conditions.lastestimateddamage
 
 --- Get the damage multiplier of the most recent cast of a spell on the target.
 -- This currently does not take into account increased damage due to mastery.
--- @name LastSpellDamageMultiplier
+-- @name LastDamageMultiplier
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2097,16 +2078,17 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @see DamageMultiplier
 -- @usage
--- if {DamageMultiplier(rupture) / target.LastSpellDamageMultiplier(rupture)} >1.1
+-- if {DamageMultiplier(rupture) / target.LastDamageMultiplier(rupture)} >1.1
 --     Spell(rupture)
 
-OvaleCondition.conditions.lastspelldamagemultiplier = function(condition)
+OvaleCondition.conditions.lastdamagemultiplier = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "damageMultiplier"), condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspelldamagemultiplier = OvaleCondition.conditions.lastdamagemultiplier
 
 --- Get the attack power of the player during the most recent cast of a spell on the target.
--- @name LastSpellAttackPower
+-- @name LastAttackPower
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2118,16 +2100,17 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @see AttackPower
 -- @usage
--- if {AttackPower() / target.LastSpellAttackPower(hemorrhage)} >1.25
+-- if {AttackPower() / target.LastAttackPower(hemorrhage)} >1.25
 --     Spell(hemorrhage)
 
-OvaleCondition.conditions.lastspellattackpower = function(condition)
+OvaleCondition.conditions.lastattackpower = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "attackPower"), condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellattackpower = OvaleCondition.conditions.lastattackpower
 
 --- Get the spellpower of the player during the most recent cast of a spell on the target.
--- @name LastSpellSpellpower
+-- @name LastSpellpower
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2139,16 +2122,17 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @see Spellpower
 -- @usage
--- if {Spellpower() / target.LastSpellSpellpower(living_bomb)} >1.25
+-- if {Spellpower() / target.LastSpellpower(living_bomb)} >1.25
 --     Spell(living_bomb)
 
-OvaleCondition.conditions.lastspellspellpower = function(condition)
+OvaleCondition.conditions.lastspellpower = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellBonusDamage"), condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellspellpower = OvaleCondition.conditions.lastspellpower
 
 --- Get the number of combo points consumed by the most recent cast of a spell on the target for a feral druid or a rogue.
--- @name LastSpellComboPoints
+-- @name LastComboPoints
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2163,10 +2147,11 @@ end
 -- if ComboPoints() >3 and target.LastComboPoints(rip) <3
 --     Spell(rip)
 
-OvaleCondition.conditions.lastspellcombopoints = function(condition)
+OvaleCondition.conditions.lastcombopoints = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "comboPoints"), condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellcombopoints = OvaleCondition.conditions.lastcombopoints
 
 --- Get the spell critical strike chance of the player during the most recent cast of a spell on the target.
 -- @name LastSpellCritChance
@@ -2195,11 +2180,12 @@ OvaleCondition.conditions.lastspellcritchance = function(condition)
 	end
 	return Compare(critChance, condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellspellcritchance = OvaleCondition.conditions.lastspellcritchance
 
 --- Get the mastery effect of the player during the most recent cast of a spell on the target.
 -- Mastery effect is the effect of the player's mastery, typically a percent-increase to damage
 -- or a percent-increase to chance to trigger some effect.
--- @name LastSpellMastery
+-- @name LastMastery
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2211,16 +2197,17 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @see Mastery
 -- @usage
--- if {Mastery(shadow_bolt) - LastSpellMastery(shadow_bolt)} > 1000
+-- if {Mastery(shadow_bolt) - LastMastery(shadow_bolt)} > 1000
 --     Spell(metamorphosis)
 
-OvaleCondition.conditions.lastspellmastery = function(condition)
+OvaleCondition.conditions.lastmastery = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect"), condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmastery
 
 --- Get the melee critical strike chance of the player during the most recent cast of a spell on the target.
--- @name LastSpellMeleeCritChance
+-- @name LastMeleeCritChance
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2235,10 +2222,10 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @see MeleeCritChance
 -- @usage
--- if MeleeCritChance() > target.LastSpellMeleeCritChance(rip)
+-- if MeleeCritChance() > target.LastMeleeCritChance(rip)
 --     Spell(rip)
 
-OvaleCondition.conditions.lastspellmeleecritchance = function(condition)
+OvaleCondition.conditions.lastmeleecritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit")
 	if condition.unlimited ~= 1 and critChance > 100 then
@@ -2246,9 +2233,10 @@ OvaleCondition.conditions.lastspellmeleecritchance = function(condition)
 	end
 	return Compare(critChance, condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellmeleecritchance = OvaleCondition.conditions.lastmeleecritchance
 
 --- Get the ranged critical strike chance of the player during the most recent cast of a spell on the target.
--- @name LastSpellRangedCritChance
+-- @name LastRangedCritChance
 -- @paramsig number or boolean
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2263,10 +2251,10 @@ end
 -- @return A boolean value for the result of the comparison.
 -- @see RangedCritChance
 -- @usage
--- if RangedCritChance() > target.LastSpellRangedCritChance(serpent_sting_dot)
+-- if RangedCritChance() > target.LastRangedCritChance(serpent_sting_dot)
 --     Spell(serpent_sting)
 
-OvaleCondition.conditions.lastspellrangedcritchance = function(condition)
+OvaleCondition.conditions.lastrangedcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
 	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit")
 	if condition.unlimited ~= 1 and critChance > 100 then
@@ -2274,6 +2262,7 @@ OvaleCondition.conditions.lastspellrangedcritchance = function(condition)
 	end
 	return Compare(critChance, condition[2], condition[3])
 end
+OvaleCondition.conditions.lastspellrangedcritchance = OvaleCondition.conditions.lastrangedcritchance
 
 --- Get the time elapsed in seconds since the player's previous melee swing (white attack).
 -- @name LastSwing
@@ -2876,7 +2865,7 @@ end
 --     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellCritChance
+-- @see CritChance, LastSpellCritChance
 -- @usage
 -- if SpellCritChance() >30 Spell(immolate)
 
@@ -2887,6 +2876,7 @@ OvaleCondition.conditions.spellcritchance = function(condition)
 	end
 	return Compare(critChance, condition[1], condition[2])
 end
+OvaleCondition.conditions.critchance = OvaleCondition.conditions.spellcritchance
 
 --- Test if the given spell is in the spellbook.
 -- A spell is known if the player has learned the spell and it is in the spellbook.
