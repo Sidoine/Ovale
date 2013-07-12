@@ -85,22 +85,6 @@ OvaleData.power =
 OvaleData.secondaryPower = {"rage", "focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
 OvaleData.powerType = {}
 
--- List temporary damage multiplier
-OvaleData.selfDamageBuff =
-{
-	[5217] = 1.15, -- Tiger's Fury (druid)
-	[31665] = 1.1, -- Master of Subtlety (rogue)
-	[52610] = 1.4, -- Savage Roar, glyphed (druid)
-	[57933] = 1.15, -- Tricks of the Trade (rogue)
-	[84745] = 1.1, -- Shallow Insight (rogue)
-	[84746] = 1.2, -- Moderate Insight (rogue)
-	[84747] = 1.3, -- Deep Insight (rogue)
-	[124974] = 1.1, -- Nature's Vigil (druid)
-	[127538] = 1.4, -- Savage Roar (druid)
-	[138002] = 1.4, -- Fluidity (Throne of Thunder, Jin'rokh encounter)
-	[140741] = 2.0, -- Primal Nutriment (Throne of Thunder, Ji-Kun encounter)
-}
-
 OvaleData.buffSpellList =
 {
 	-- Debuffs

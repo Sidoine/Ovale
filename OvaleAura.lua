@@ -565,15 +565,7 @@ end
 
 function OvaleAura:GetDamageMultiplier(spellId)
 	-- Calculate the base damage multiplier for all spells.
-	local damageMultiplier = 1
-	for auraSpellId, multiplier in pairs(OvaleData.selfDamageBuff) do
-		local count = select(3, self:GetAuraByGUID(self_player_guid, auraSpellId, filter, nil, "player"))
-		if count and count > 0 then
-			-- Try to account for a stacking aura.
-			-- multiplier = 1 + (multiplier - 1) * count
-			damageMultiplier = damageMultiplier * multiplier
-		end
-	end
+	local damageMultiplier = OvalePaperDoll.stat.damageMultiplier
 
 	-- Factor in the spell-specific multipliers from SpellDamage{Buff,Debuff} declarations.
 	if spellId then

@@ -100,6 +100,8 @@ OvalePaperDoll.stat = {
 	-- average weapon damage of mainhand and offhand weapons
 	mainHandWeaponDamage = 0,
 	offHandWeaponDamage = 0,
+	-- damage multiplier
+	damageMultiplier = 1,
 }
 --</public-static-properties>
 
@@ -115,12 +117,14 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStats")
 	self:RegisterEvent("SPELL_POWER_CHANGED")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
+	self:RegisterEvent("UNIT_AURA", "UpdateDamageMultiplier")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_STATS")
 	self:RegisterMessage("Ovale_EquipmentChanged")
+	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamageMultiplier")
 end
 
 function OvalePaperDoll:OnDisable()
@@ -134,12 +138,14 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("SPELL_POWER_CHANGED")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
+	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_SPELL_HASTE")
 	self:UnregisterEvent("UNIT_STATS")
 	self:UnregisterMessage("Ovale_EquipmentChanged")
+	self:UnregisterMessage("Ovale_StanceChanged")
 end
 
 function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
@@ -225,6 +231,11 @@ function OvalePaperDoll:Ovale_EquipmentChanged(event)
 	end
 end
 
+function OvalePaperDoll:UpdateDamageMultiplier(event)
+	self.stat.damageMultiplier = select(7, API_UnitDamage("player"))
+	self.stat.snapshotTime = Ovale.now
+end
+
 function OvalePaperDoll:UpdateStats(event)
 	self.specialization = API_GetSpecialization()
 	self:COMBAT_RATING_UPDATE(event)
@@ -236,6 +247,7 @@ function OvalePaperDoll:UpdateStats(event)
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_STATS(event, "player")
+	self:UpdateDamageMultiplier(event)
 	self:Ovale_EquipmentChanged(event)
 end
 
@@ -289,6 +301,7 @@ function OvalePaperDoll:Debug()
 	Ovale:FormatPrint("Ranged critical strike effect: %f%%", self.stat.rangedCrit)
 	Ovale:FormatPrint("Ranged haste effect: %f%%", self.stat.rangedHaste)
 	Ovale:FormatPrint("Mastery effect: %f%%", self.stat.masteryEffect)
+	Ovale:FormatPrint("Damage multiplier: %f", self.stat.damageMultiplier)
 	Ovale:FormatPrint("Weapon damage (mainhand): %f", self.stat.mainHandWeaponDamage)
 	Ovale:FormatPrint("Weapon damage (offhand): %f", self.stat.offHandWeaponDamage)
 end
