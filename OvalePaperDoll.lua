@@ -212,6 +212,7 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.stat.intellect = API_UnitStat(unitId, 4)
 	self.stat.spirit = API_UnitStat(unitId, 5)
 	self.stat.snapshotTime = Ovale.now
+	self:COMBAT_RATING_UPDATE(event)
 end
 
 function OvalePaperDoll:Ovale_EquipmentChanged(event)
