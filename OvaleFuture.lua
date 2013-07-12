@@ -178,15 +178,16 @@ end
 local function UpdateLastSpellInfo(spellcast)
 	if spellcast then
 		local targetGUID = spellcast.target
-		if targetGUID then
+		local spellId = spellcast.spellId
+		if targetGUID and spellId then
 			if not self_lastSpellcast[targetGUID] then
 				self_lastSpellcast[targetGUID] = {}
 			end
 			local oldSpellcast = self_lastSpellcast[targetGUID][spellId]
 			if oldSpellcast then
-				self_lastSpellcast[targetGUID][spellId] = spellcast
 				self_pool:Release(oldSpellcast)
 			end
+			self_lastSpellcast[targetGUID][spellId] = spellcast
 		end
 	end
 end
