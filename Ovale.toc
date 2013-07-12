@@ -34,12 +34,13 @@ OvaleActionBar.lua
 OvaleEnemies.lua
 OvaleEquipement.lua
 OvaleGUID.lua
-OvalePaperDoll.lua
 OvalePool.lua
 OvaleQueue.lua
 OvaleRecount.lua
 OvaleSkada.lua
 OvaleStance.lua
+#
+OvalePaperDoll.lua
 #
 OvaleData.lua
 OvaleScripts.lua

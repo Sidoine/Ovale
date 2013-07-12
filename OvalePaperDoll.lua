@@ -14,6 +14,9 @@ local OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 Ovale.OvalePaperDoll = OvalePaperDoll
 
 --<private-static-properties>
+local OvaleEquipement = Ovale.OvaleEquipement
+local OvaleStance = Ovale.OvaleStance
+
 local select = select
 local tonumber = tonumber
 local API_GetCritChance = GetCritChance
@@ -25,8 +28,8 @@ local API_GetSpecialization = GetSpecialization
 local API_GetSpellBonusDamage = GetSpellBonusDamage
 local API_GetSpellBonusHealing = GetSpellBonusHealing
 local API_GetSpellCritChance = GetSpellCritChance
-local API_IsDualWielding = IsDualWielding
 local API_UnitAttackPower = UnitAttackPower
+local API_UnitAttackSpeed = UnitAttackSpeed
 local API_UnitClass = UnitClass
 local API_UnitDamage = UnitDamage
 local API_UnitLevel = UnitLevel
@@ -123,8 +126,8 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_STATS")
-	self:RegisterMessage("Ovale_EquipmentChanged")
-	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamageMultiplier")
+	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateWeaponDamage")
+	self:RegisterMessage("Ovale_StanceChanged", "UpdateWeaponDamage")
 end
 
 function OvalePaperDoll:OnDisable()
@@ -221,18 +224,40 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self:COMBAT_RATING_UPDATE(event)
 end
 
-function OvalePaperDoll:Ovale_EquipmentChanged(event)
-	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage = API_UnitDamage("player")
-	self.stat.mainHandWeaponDamage = (minDamage + maxDamage) / 2
-	if API_IsDualWielding() then
-		self.stat.offHandWeaponDamage = (minOffHandDamage + maxOffHandDamage) / 2
+function OvalePaperDoll:UpdateDamageMultiplier(event)
+	self.stat.damageMultiplier = select(7, API_UnitDamage("player"))
+	self.stat.snapshotTime = Ovale.now
+end
+
+function OvalePaperDoll:UpdateWeaponDamage(event)
+	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, _, _, damageMultiplier = API_UnitDamage("player")
+	local mainHandAttackSpeed, offHandAttackSpeed = API_UnitAttackSpeed("player")
+
+	-- Update stats used by the computation (damage multiplier, AP & melee haste)
+	self.stat.damageMultiplier = damageMultiplier
+	self:UNIT_ATTACK_POWER(event, "player")
+	self:UNIT_SPELL_HASTE(event, "player")
+
+	if self.class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
+		-- Cat Form: 100% increased auto-attack damage.
+		damageMultiplier = damageMultiplier * 2
+	elseif self.class == "MONK" and OvaleEquipement:HasOneHandedWeapon() then
+		-- Way of the Monk: 40% increased auto-attack damage if dual-wielding.
+		damageMultiplier = damageMultiplier * 1.4
+	end
+
+	-- weaponDamage = baseWeaponDamage + weaponSpeed * attackPower / 14
+	local avgDamage = (minDamage + maxDamage) / 2 / damageMultiplier
+	local mainHandWeaponSpeed = mainHandAttackSpeed * self:GetMeleeHasteMultiplier()
+	self.stat.mainHandWeaponDamage = avgDamage - mainHandWeaponSpeed * self.stat.attackPower / 14
+
+	if OvaleEquipement:HasOffHandWeapon() then
+		local avgOffHandDamage = (minOffHandDamage + maxOffHandDamage) / 2 / damageMultiplier
+		local offHandWeaponSpeed = offHandAttackSpeed * self:GetMeleeHasteMultiplier()
+		self.stat.offHandWeaponDamage = avgOffHandDamage - offHandWeaponSpeed * self.stat.attackPower / 14 / 2
 	else
 		self.stat.offHandWeaponDamage = 0
 	end
-end
-
-function OvalePaperDoll:UpdateDamageMultiplier(event)
-	self.stat.damageMultiplier = select(7, API_UnitDamage("player"))
 	self.stat.snapshotTime = Ovale.now
 end
 
@@ -248,7 +273,7 @@ function OvalePaperDoll:UpdateStats(event)
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_STATS(event, "player")
 	self:UpdateDamageMultiplier(event)
-	self:Ovale_EquipmentChanged(event)
+	self:UpdateWeaponDamage(event)
 end
 
 function OvalePaperDoll:GetMasteryMultiplier()

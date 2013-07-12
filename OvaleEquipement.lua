@@ -1042,6 +1042,11 @@ function OvaleEquipement:HasTwoHandedWeapon()
 	return self_mainHandItemType == "INVTYPE_2HWEAPON"
 end
 
+function OvaleEquipement:HasOneHandedWeapon()
+	return self_mainHandItemType == "INVTYPE_WEAPON"
+		or self_mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+end
+
 function OvaleEquipement:UpdateArmorSetCount()
 	wipe(self_armorSetCount)
 	for i = 1, #OVALE_ARMORSET_SLOT_IDS do
