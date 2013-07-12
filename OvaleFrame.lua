@@ -464,7 +464,7 @@ do
 			frame:EnableMouse()
 		end
 		frame:SetMovable(true)
-		frame:SetFrameStrata("BACKGROUND")
+		frame:SetFrameStrata("MEDIUM")
 		frame:SetScript("OnMouseDown", frameOnMouseDown)
 		frame:SetScript("OnMouseUp", frameOnMouseUp)
 		frame:SetScript("OnEnter", frameOnEnter)
