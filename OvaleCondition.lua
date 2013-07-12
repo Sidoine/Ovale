@@ -632,6 +632,9 @@ OvaleCondition.conditions.debuffdamagemultiplier = OvaleCondition.conditions.buf
 -- @name BuffMeleeCritChance
 -- @paramsig number
 -- @param id The aura spell ID.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -643,9 +646,12 @@ OvaleCondition.conditions.debuffdamagemultiplier = OvaleCondition.conditions.buf
 OvaleCondition.conditions.buffmeleecritchance = function(condition)
 	self_auraFound.meleeCrit = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local meleeCrit = self_auraFound.meleeCrit
+	local critChance = self_auraFound.meleeCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
 	if start and ending and start <= ending then
-		return start, ending, meleeCrit, start, 0
+		return start, ending, critChance, start, 0
 	else
 		return 0, nil, 0, 0, 0
 	end
@@ -656,6 +662,9 @@ OvaleCondition.conditions.debuffmeleecritchance = OvaleCondition.conditions.buff
 -- @name BuffRangedCritChance
 -- @paramsig number
 -- @param id The aura spell ID.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -668,9 +677,12 @@ OvaleCondition.conditions.debuffmeleecritchance = OvaleCondition.conditions.buff
 OvaleCondition.conditions.buffrangedcritchance = function(condition)
 	self_auraFound.rangedCrit = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local rangedCrit = self_auraFound.rangedCrit
+	local critChance = self_auraFound.rangedCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
 	if start and ending and start <= ending then
-		return start, ending, rangedCrit, start, 0
+		return start, ending, critChance, start, 0
 	else
 		return 0, nil, 0, 0, 0
 	end
@@ -681,6 +693,9 @@ OvaleCondition.conditions.debuffrangedcritchance = OvaleCondition.conditions.buf
 -- @name BuffSpellCritChance
 -- @paramsig number
 -- @param id The aura spell ID.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
@@ -692,9 +707,12 @@ OvaleCondition.conditions.debuffrangedcritchance = OvaleCondition.conditions.buf
 OvaleCondition.conditions.buffspellcritchance = function(condition)
 	self_auraFound.spellCrit = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local spellCrit = self_auraFound.spellCrit
+	local critChance = self_auraFound.spellCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
 	if start and ending and start <= ending then
-		return start, ending, spellCrit, start, 0
+		return start, ending, critChance, start, 0
 	else
 		return 0, nil, 0, 0, 0
 	end
@@ -1308,13 +1326,20 @@ end
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
 -- @usage
 -- if CritChance() >30 Spell(immolate)
 
 OvaleCondition.conditions.critchance = function(condition)
-	return Compare(OvalePaperDoll.stat.spellCrit, condition[1], condition[2])
+	local critChance = OvalePaperDoll.stat.spellCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[1], condition[2])
 end
 
 --- Get the current estimated damage of a spell on the target if it is a critical strike.
@@ -2149,6 +2174,9 @@ end
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
 --     Valid values: player, target, focus, pet.
@@ -2161,7 +2189,11 @@ end
 
 OvaleCondition.conditions.lastspellcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellCrit"), condition[2], condition[3])
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellCrit")
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[2], condition[3])
 end
 
 --- Get the mastery effect of the player during the most recent cast of a spell on the target.
@@ -2193,6 +2225,9 @@ end
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
 --     Valid values: player, target, focus, pet.
@@ -2205,7 +2240,11 @@ end
 
 OvaleCondition.conditions.lastspellmeleecritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit"), condition[2], condition[3])
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit")
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[2], condition[3])
 end
 
 --- Get the ranged critical strike chance of the player during the most recent cast of a spell on the target.
@@ -2214,6 +2253,9 @@ end
 -- @param id The spell ID.
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
 --     Valid values: player, target, focus, pet.
@@ -2226,7 +2268,11 @@ end
 
 OvaleCondition.conditions.lastspellrangedcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit"), condition[2], condition[3])
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit")
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[2], condition[3])
 end
 
 --- Get the time elapsed in seconds since the player's previous melee swing (white attack).
@@ -2410,6 +2456,9 @@ end
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
 -- @see LastSpellMeleeCritChance
@@ -2417,7 +2466,11 @@ end
 -- if MeleeCritChance() >90 Spell(rip)
 
 OvaleCondition.conditions.meleecritchance = function(condition)
-	return Compare(OvalePaperDoll.stat.meleeCrit, condition[1], condition[2])
+	local critChance = OvalePaperDoll.stat.meleeCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[1], condition[2])
 end
 
 --- Get the time in seconds until the player's next melee swing (white attack).
@@ -2614,6 +2667,9 @@ end
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
 -- @see LastSpellRangedCritChance
@@ -2621,7 +2677,11 @@ end
 -- if RangedCritChance() >90 Spell(serpent_sting)
 
 OvaleCondition.conditions.rangedcritchance = function(condition)
-	return Compare(OvalePaperDoll.stat.rangedCrit, condition[1], condition[2])
+	local critChance = OvalePaperDoll.stat.rangedCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[1], condition[2])
 end
 
 --- Get the result of the target's level minus the player's level. This number may be negative.
@@ -2811,6 +2871,9 @@ end
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
+--     Defaults to unlimited=0.
+--     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
 -- @see LastSpellCritChance
@@ -2818,7 +2881,11 @@ end
 -- if SpellCritChance() >30 Spell(immolate)
 
 OvaleCondition.conditions.spellcritchance = function(condition)
-	return Compare(OvalePaperDoll.stat.spellCrit, condition[1], condition[2])
+	local critChance = OvalePaperDoll.stat.spellCrit
+	if condition.unlimited ~= 1 and critChance > 100 then
+		critChance = 100
+	end
+	return Compare(critChance, condition[1], condition[2])
 end
 
 --- Test if the given spell is in the spellbook.
