@@ -1263,10 +1263,6 @@ end
 -- @param number Optional. The number to compare against.
 -- @return The current value the counter.
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellComboPoints
--- @usage
--- if ComboPoints() >=1 Spell(savage_roar)
--- if ComboPoints(more 0) Spell(savage_roar)
 
 OvaleCondition.conditions.counter = function(condition)
 	return Compare(OvaleState:GetCounterValue(condition[1]), condition[2], condition[3])
@@ -2055,11 +2051,11 @@ OvaleCondition.conditions.lastspelldamage = OvaleCondition.conditions.lastdamage
 OvaleCondition.conditions.lastestimateddamage = function(condition)
 	local spellId = condition[1]
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local ap = OvaleFuture:GetLastSpellInfo(guid, spellId, "attackPower")
-	local sp = OvaleFuture:GetLastSpellInfo(guid, spellId, "spellBonusDamage")
-	local mh = OvaleFuture:GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage")
-	local oh = OvaleFuture:GetLastSpellInfo(guid, spellId, "offHandWeaponDamage")
-	local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "comboPoints")
+	local ap = OvaleFuture:GetLastSpellInfo(guid, spellId, "attackPower") or 1
+	local sp = OvaleFuture:GetLastSpellInfo(guid, spellId, "spellBonusDamage") or 1
+	local mh = OvaleFuture:GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage") or 1
+	local oh = OvaleFuture:GetLastSpellInfo(guid, spellId, "offHandWeaponDamage") or 1
+	local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "comboPoints") or 1
 	local dm = OvaleFuture:GetLastSpellInfo(guid, condition, "damageMultiplier") or 1
 	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
 end
@@ -2084,7 +2080,8 @@ OvaleCondition.conditions.lastspellestimateddamage = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastdamagemultiplier = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "damageMultiplier"), condition[2], condition[3])
+	local dm = OvaleFuture:GetLastSpellInfo(guid, condition[1], "damageMultiplier") or 1
+	return Compare(dm, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspelldamagemultiplier = OvaleCondition.conditions.lastdamagemultiplier
 
@@ -2106,7 +2103,8 @@ OvaleCondition.conditions.lastspelldamagemultiplier = OvaleCondition.conditions.
 
 OvaleCondition.conditions.lastattackpower = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "attackPower"), condition[2], condition[3])
+	local ap = OvaleFuture:GetLastSpellInfo(guid, condition[1], "attackPower") or 1
+	return Compare(ap, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspellattackpower = OvaleCondition.conditions.lastattackpower
 
@@ -2128,7 +2126,8 @@ OvaleCondition.conditions.lastspellattackpower = OvaleCondition.conditions.lasta
 
 OvaleCondition.conditions.lastspellpower = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellBonusDamage"), condition[2], condition[3])
+	local sp = OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellBonusDamage") or 1
+	return Compare(sp, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspellspellpower = OvaleCondition.conditions.lastspellpower
 
@@ -2150,7 +2149,8 @@ OvaleCondition.conditions.lastspellspellpower = OvaleCondition.conditions.lastsp
 
 OvaleCondition.conditions.lastcombopoints = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "comboPoints"), condition[2], condition[3])
+	local combo = OvaleFuture:GetLastSpellInfo(guid, condition[1], "comboPoints") or 1
+	return Compare(combo, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspellcombopoints = OvaleCondition.conditions.lastcombopoints
 
@@ -2175,7 +2175,7 @@ OvaleCondition.conditions.lastspellcombopoints = OvaleCondition.conditions.lastc
 
 OvaleCondition.conditions.lastspellcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellCrit")
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellCrit") or 0.01
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2203,7 +2203,8 @@ OvaleCondition.conditions.lastspellspellcritchance = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastmastery = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	return Compare(OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect"), condition[2], condition[3])
+	local mastery = OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect") or 0.01
+	return Compare(mastery, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmastery
 
@@ -2228,7 +2229,7 @@ OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmaste
 
 OvaleCondition.conditions.lastmeleecritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit")
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit") or 0.01
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2257,7 +2258,7 @@ OvaleCondition.conditions.lastspellmeleecritchance = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastrangedcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit")
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit") or 0.01
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
