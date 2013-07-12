@@ -222,7 +222,7 @@ end
 function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	-- Empty out self_lastSpellcast.
 	for guid, spellTable in pairs(self_lastSpellcast) do
-		for spellId, spellCast in pairs(spellTable) do
+		for spellId, spellcast in pairs(spellTable) do
 			spellTable[spellId] = nil
 			self_pool:Release(spellcast)
 		end
@@ -234,7 +234,7 @@ function OvaleFuture:Ovale_InactiveUnit(event, guid)
 	-- Remove spellcasts for inactive units.
 	local spellTable = self_lastSpellcast[guid]
 	if spellTable then
-		for spellId, spellCast in pairs(spellTable) do
+		for spellId, spellcast in pairs(spellTable) do
 			spellTable[spellId] = nil
 			self_pool:Release(spellcast)
 		end
