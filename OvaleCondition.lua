@@ -1812,7 +1812,8 @@ end
 --     Spell(haunt)
 
 OvaleCondition.conditions.inflighttotarget = function(condition)
-	return TestBoolean(OvaleFuture:InFlight(condition[1] or OvaleState.currentSpellId == condition[1]), condition[2])
+	local spellId = condition[1]
+	return TestBoolean(OvaleState.currentSpellId == spellId or OvaleFuture:InFlight(spellId), condition[2])
 end
 
 --- Test if the distance from the player to the target is within the spell's range.
