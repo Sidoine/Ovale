@@ -549,7 +549,7 @@ end
 -- @param number Optional. The number to compare against.
 -- @return The current attack power.
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellAttackPower
+-- @see LastAttackPower
 -- @usage
 -- if AttackPower() >10000 Spell(rake)
 -- if AttackPower(more 10000) Spell(rake)
@@ -1249,7 +1249,7 @@ end
 -- @param number Optional. The number to compare against.
 -- @return The number of combo points.
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellComboPoints
+-- @see LastComboPoints
 -- @usage
 -- if ComboPoints() >=1 Spell(savage_roar)
 -- if ComboPoints(more 0) Spell(savage_roar)
@@ -1328,7 +1328,7 @@ end
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The estimated critical strike damage of the given spell.
--- @see Damage, LastSpellDamage, LastSpellEstimatedDamage
+-- @see Damage, LastDamage, LastEstimatedDamage
 
 OvaleCondition.conditions.critdamage = function(condition)
 	-- TODO: Need to account for increased crit effect from meta-gems.
@@ -1349,7 +1349,7 @@ end
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The estimated damage of the given spell on the target.
--- @see CritDamage, LastSpellDamage, LastSpellEstimatedDamage
+-- @see CritDamage, LastDamage, LastEstimatedDamage
 -- @usage
 -- if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 --     Spell(rake)
@@ -1376,9 +1376,9 @@ end
 -- @paramsig number
 -- @param id The spell ID.
 -- @return The current damage multiplier of the given spell.
--- @see LastSpellDamageMultiplier
+-- @see LastDamageMultiplier
 -- @usage
--- if {DamageMultiplier(rupture) / LastSpellDamageMultiplier(rupture)} >1.1
+-- if {DamageMultiplier(rupture) / LastDamageMultiplier(rupture)} >1.1
 --     Spell(rupture)
 
 OvaleCondition.conditions.damagemultiplier = function(condition)
@@ -2019,7 +2019,7 @@ end
 -- @param number Optional. The number to compare against.
 -- @return The damage done.
 -- @return A boolean value for the result of the comparison.
--- @see Damage, LastSpellEstimatedDamage
+-- @see Damage, LastEstimatedDamage
 -- @usage
 -- if LastDamage(ignite) >10000 Spell(combustion)
 -- if LastDamage(ignite more 10000) Spell(combustion)
@@ -2046,7 +2046,7 @@ OvaleCondition.conditions.lastspelldamage = OvaleCondition.conditions.lastdamage
 --     Defaults to target=target.
 --     Valid values: player, target, focus, pet.
 -- @return The estimated damage of the most recent cast of the given spell by the player.
--- @see Damage, LastSpellDamage
+-- @see Damage, LastDamage
 -- @usage
 -- if {Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 --     Spell(rake)
@@ -2400,7 +2400,7 @@ end
 -- @param number Optional. The number to compare against.
 -- @return The current mastery effect.
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellMastery
+-- @see LastMastery
 -- @usage
 -- if {DamageMultiplier(rake) * {1 + Mastery()/100}} >1.8
 --     Spell(rake)
@@ -2455,7 +2455,7 @@ end
 --     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellMeleeCritChance
+-- @see LastMeleeCritChance
 -- @usage
 -- if MeleeCritChance() >90 Spell(rip)
 
@@ -2666,7 +2666,7 @@ end
 --     Valid values: 0, 1
 -- @return The current critical strike chance (in percent).
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellRangedCritChance
+-- @see LastRangedCritChance
 -- @usage
 -- if RangedCritChance() >90 Spell(serpent_sting)
 
@@ -3017,9 +3017,9 @@ end
 -- @param number Optional. The number to compare against.
 -- @return The current spellpower.
 -- @return A boolean value for the result of the comparison.
--- @see LastSpellSpellpower
+-- @see LastSpellpower
 -- @usage
--- if {Spellpower() / LastSpellSpellpower(living_bomb)} >1.25
+-- if {Spellpower() / LastSpellpower(living_bomb)} >1.25
 --     Spell(living_bomb)
 
 OvaleCondition.conditions.spellpower = function(condition)
