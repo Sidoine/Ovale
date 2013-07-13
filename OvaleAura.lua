@@ -138,7 +138,8 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 	)
 	local addAura = not existingAura or not auraIsUnchanged
 	if addAura then
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Adding %s %s (%s) to %s, aura.serial=%d", filter, name, spellId, guid, aura.serial)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Adding %s %s (%s) to %s, aura.serial=%d",
+			event, filter, name, spellId, guid, aura.serial)
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
@@ -162,9 +163,11 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 		if mine and (not existingAura or event == "SPELL_AURA_REFRESH") then
 			local si = OvaleData.spellInfo[spellId]
 			if si and si.tick then
+				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Snapshot stats for %s %s (%s) on %s at %f, gain=%f, aura.serial=%d",
+					event, filter, name, spellId, guid, Ovale.now, aura.gain, aura.serial)
 				aura.ticksSeen = 0
 				aura.tick = OvaleData:GetTickLength(spellId)
-				OvalePaperDoll:SnapshotStats(aura.gain, aura)
+				OvalePaperDoll:SnapshotStats(aura)
 				aura.damageMultiplier = self:GetDamageMultiplier(spellId)
 			end
 		end

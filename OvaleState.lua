@@ -446,7 +446,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 										newAura.ending = (oldEnding - oldTick * remainingTicks) + duration
 										newAura.tick = OvaleData:GetTickLength(auraSpellId)
 										-- Re-snapshot stats for the DoT.
-										OvalePaperDoll:SnapshotStats(newAura.start, newAura, stats)
+										OvalePaperDoll:SnapshotStats(newAura, stats)
 										newAura.damageMultiplier = self:GetDamageMultiplier(auraSpellId)
 									else
 										newAura.ending = endCast + duration
@@ -471,7 +471,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								newAura.ending = endCast + duration
 								if isDoT then
 									newAura.tick = OvaleData:GetTickLength(auraSpellId)
-									OvalePaperDoll:SnapshotStats(newAura.start, newAura, stats)
+									OvalePaperDoll:SnapshotStats(newAura, stats)
 									newAura.damageMultiplier = self:GetDamageMultiplier(auraSpellId)
 								end
 							end

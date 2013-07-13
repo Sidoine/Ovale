@@ -294,15 +294,13 @@ end
 
 -- Snapshot the stats into the given table using the same keynames as self.stat.
 -- If source is nil, then use the current player stats; otherwise, use the given stat table.
--- Only take the snapshot if the source snapshot time is older than timestamp.
-function OvalePaperDoll:SnapshotStats(timestamp, t, source)
-	source = source or self.stat
-	if timestamp and timestamp >= source.snapshotTime then
-		for k in pairs(self.stat) do
-			t[k] = source[k]
-		end
-		-- Also snapshot damageMultiplier if it's present (added by OvaleFuture and OvaleAura).
-		t.damageMultiplier = source.damageMultiplier
+function OvalePaperDoll:SnapshotStats(t, source)
+	if not source then
+		self:UpdateStats()
+		source = self.stat
+	end
+	for k in pairs(self.stat) do
+		t[k] = source[k]
 	end
 end
 

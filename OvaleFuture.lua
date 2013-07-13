@@ -111,7 +111,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	-- Snapshot the current stats for the spellcast.
 	self.lastSpellId = spellId
-	OvalePaperDoll:SnapshotStats(Ovale.now, spellcast)
+	OvalePaperDoll:SnapshotStats(spellcast)
 	spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
 	tinsert(self_activeSpellcast, spellcast)
 
@@ -295,7 +295,7 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 			if spellcast.lineId == lineId then
 				spellcast.target = targetGUID
 				-- Update spellcast stats to the latest snapshot of the player's stats.
-				OvalePaperDoll:SnapshotStats(Ovale.now, spellcast)
+				OvalePaperDoll:SnapshotStats(spellcast)
 				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
 			end
 		end
