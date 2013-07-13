@@ -105,6 +105,9 @@ local OVALE_TOTEMTYPE =
 	water = 3,
 	air = 4
 }
+
+local DEFAULT_CRIT_CHANCE = 0.01
+local DEFAULT_MASTERY_EFFECT = 0.01
 --</private-static-properties>
 
 --<private-static-methods>
@@ -646,7 +649,7 @@ OvaleCondition.conditions.debuffdamagemultiplier = OvaleCondition.conditions.buf
 OvaleCondition.conditions.buffmeleecritchance = function(condition)
 	self_auraFound.meleeCrit = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local critChance = self_auraFound.meleeCrit
+	local critChance = self_auraFound.meleeCrit or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -677,7 +680,7 @@ OvaleCondition.conditions.debuffmeleecritchance = OvaleCondition.conditions.buff
 OvaleCondition.conditions.buffrangedcritchance = function(condition)
 	self_auraFound.rangedCrit = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local critChance = self_auraFound.rangedCrit
+	local critChance = self_auraFound.rangedCrit or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -707,7 +710,7 @@ OvaleCondition.conditions.debuffrangedcritchance = OvaleCondition.conditions.buf
 OvaleCondition.conditions.buffspellcritchance = function(condition)
 	self_auraFound.spellCrit = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local critChance = self_auraFound.spellCrit
+	local critChance = self_auraFound.spellCrit or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2175,7 +2178,7 @@ OvaleCondition.conditions.lastspellcombopoints = OvaleCondition.conditions.lastc
 
 OvaleCondition.conditions.lastspellcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellCrit") or 0.01
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "spellCrit") or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2203,7 +2206,7 @@ OvaleCondition.conditions.lastspellspellcritchance = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastmastery = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local mastery = OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect") or 0.01
+	local mastery = OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect") or DEFAULT_MASTERY_EFFECT
 	return Compare(mastery, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmastery
@@ -2229,7 +2232,7 @@ OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmaste
 
 OvaleCondition.conditions.lastmeleecritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit") or 0.01
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "meleeCrit") or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2258,7 +2261,7 @@ OvaleCondition.conditions.lastspellmeleecritchance = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastrangedcritchance = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit") or 0.01
+	local critChance = OvaleFuture:GetLastSpellInfo(guid, condition[1], "rangedCrit") or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2457,7 +2460,7 @@ end
 -- if MeleeCritChance() >90 Spell(rip)
 
 OvaleCondition.conditions.meleecritchance = function(condition)
-	local critChance = OvalePaperDoll.stat.meleeCrit
+	local critChance = OvalePaperDoll.stat.meleeCrit or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2668,7 +2671,7 @@ end
 -- if RangedCritChance() >90 Spell(serpent_sting)
 
 OvaleCondition.conditions.rangedcritchance = function(condition)
-	local critChance = OvalePaperDoll.stat.rangedCrit
+	local critChance = OvalePaperDoll.stat.rangedCrit or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
@@ -2872,7 +2875,7 @@ end
 -- if SpellCritChance() >30 Spell(immolate)
 
 OvaleCondition.conditions.spellcritchance = function(condition)
-	local critChance = OvalePaperDoll.stat.spellCrit
+	local critChance = OvalePaperDoll.stat.spellCrit or DEFAULT_CRIT_CHANCE
 	if condition.unlimited ~= 1 and critChance > 100 then
 		critChance = 100
 	end
