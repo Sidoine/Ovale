@@ -107,7 +107,6 @@ local OVALE_TOTEMTYPE =
 }
 
 local DEFAULT_CRIT_CHANCE = 0.01
-local DEFAULT_MASTERY_EFFECT = 0.01
 --</private-static-properties>
 
 --<private-static-methods>
@@ -573,7 +572,7 @@ end
 OvaleCondition.conditions.buffattackpower = function(condition)
 	self_auraFound.attackPower = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local attackPower = self_auraFound.attackPower
+	local attackPower = self_auraFound.attackPower or 0
 	if start and ending and start <= ending then
 		return start, ending, attackPower, start, 0
 	else
@@ -598,7 +597,7 @@ OvaleCondition.conditions.debuffattackpower = OvaleCondition.conditions.buffatta
 OvaleCondition.conditions.buffrangedattackpower = function(condition)
 	self_auraFound.rangedAttackPower = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local rangedAttackPower = self_auraFound.rangedAttackPower
+	local rangedAttackPower = self_auraFound.rangedAttackPower or 0
 	if start and ending and start <= ending then
 		return start, ending, rangedAttackPower, start, 0
 	else
@@ -606,6 +605,30 @@ OvaleCondition.conditions.buffrangedattackpower = function(condition)
 	end
 end
 OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.buffrangedattackpower
+
+--- Get the player's combo points for the given aura at the time the aura was applied on the target.
+-- @name BuffComboPoints
+-- @paramsig number
+-- @param id The aura spell ID.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of combo points.
+-- @see DebuffComboPoints
+-- @usage
+-- if target.DebuffComboPoints(rip) <5 Spell(rip)
+
+OvaleCondition.conditions.buffcombopoints = function(condition)
+	self_auraFound.comboPoints = nil
+	local start, ending = GetAura(condition, self_auraFound)
+	local comboPoints = self_auraFound.comboPoints or 0
+	if start and ending and start <= ending then
+		return start, ending, comboPoints, start, 0
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.conditions.debuffcombopoints = OvaleCondition.conditions.buffcombopoints
 
 --- Get the player's damage multiplier for the given aura at the time the aura was applied on the target.
 -- @name BuffDamageMultiplier
@@ -622,7 +645,7 @@ OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.bu
 OvaleCondition.conditions.buffdamagemultiplier = function(condition)
 	self_auraFound.damageMultiplier = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local damageMultiplier = self_auraFound.damageMultiplier
+	local damageMultiplier = self_auraFound.damageMultiplier or 1
 	if start and ending and start <= ending then
 		return start, ending, damageMultiplier, start, 0
 	else
@@ -737,7 +760,7 @@ OvaleCondition.conditions.debuffspellcritchance = OvaleCondition.conditions.buff
 OvaleCondition.conditions.buffmastery = function(condition)
 	self_auraFound.masteryEffect = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local masteryEffect = self_auraFound.masteryEffect
+	local masteryEffect = self_auraFound.masteryEffect or 0
 	if start and ending and start <= ending then
 		return start, ending, masteryEffect, start, 0
 	else
@@ -761,7 +784,7 @@ OvaleCondition.conditions.debuffmastery = OvaleCondition.conditions.buffmastery
 OvaleCondition.conditions.buffspellpower = function(condition)
 	self_auraFound.spellBonusDamage = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local spellBonusDamage = self_auraFound.spellBonusDamage
+	local spellBonusDamage = self_auraFound.spellBonusDamage or 0
 	if start and ending and start <= ending then
 		return start, ending, spellBonusDamage, start, 0
 	else
@@ -785,7 +808,7 @@ OvaleCondition.conditions.debuffspellpower = OvaleCondition.conditions.buffspell
 OvaleCondition.conditions.buffspellhaste = function(condition)
 	self_auraFound.spellHaste = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local spellHaste = self_auraFound.spellHaste
+	local spellHaste = self_auraFound.spellHaste or 0
 	if start and ending and start <= ending then
 		return start, ending, spellHaste, start, 0
 	else
@@ -2206,7 +2229,7 @@ OvaleCondition.conditions.lastspellspellcritchance = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastmastery = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
-	local mastery = OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect") or DEFAULT_MASTERY_EFFECT
+	local mastery = OvaleFuture:GetLastSpellInfo(guid, condition[1], "masteryEffect") or 0
 	return Compare(mastery, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmastery
