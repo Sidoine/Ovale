@@ -39,6 +39,8 @@ local OVALE_TRUE_STRING = tostring(true)
 Ovale.L = L
 --The current time, updated once per frame refresh.
 Ovale.now = API_GetTime()
+-- The spell ID of the most recent spell cast.
+Ovale.lastSpellId = nil
 --The table of check boxes definition
 Ovale.casesACocher = {}
 --the frame with the icons

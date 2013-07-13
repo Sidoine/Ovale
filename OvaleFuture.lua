@@ -63,8 +63,6 @@ local OVALE_CLEU_SPELLCAST_RESULTS = {
 OvaleFuture.counter = {}
 -- Most recent latency (time between UNIT_SPELLCAST_SENT and UNIT_SPELLCAST_SUCCEEDED events).
 OvaleFuture.latency = 0
--- The spell ID of the most recent spell cast.
-OvaleFuture.lastSpellId = nil
 -- Debugging: spell ID to trace
 OvaleFuture.traceSpellId = nil
 --</public-static-properties>
@@ -110,7 +108,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		Ovale.now, OvaleData:GetSpellName(spellId), spellId, lineId, startTime, endTime, spellcast.target)
 
 	-- Snapshot the current stats for the spellcast.
-	self.lastSpellId = spellId
+	Ovale.lastSpellId = spellId
 	OvalePaperDoll:SnapshotStats(spellcast)
 	spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
 	tinsert(self_activeSpellcast, spellcast)

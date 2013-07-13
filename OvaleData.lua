@@ -46,6 +46,30 @@ local SPELL_POWER_RAGE = SPELL_POWER_RAGE
 local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
 local SPELL_POWER_SHADOW_ORBS = SPELL_POWER_SHADOW_ORBS
 local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
+
+-- Auras that are refreshed by spells that don't trigger a new snapshot.
+self_buffNoSnapshotSpellList =
+{
+	-- Rip (druid)
+	[1079] =
+	{
+		[5221] = true,		-- Shred
+		[6785] = true,		-- Ravage
+		[22568] = true,		-- Ferocious Bite (target below 25%)
+		[33876] = true,		-- Mangle
+		[102545] = true,	-- Ravage!
+	},
+	-- Blood Plague (death knight)
+	[55078] =
+	{
+		[85948] = true,		-- Festering Strike (unholy)
+	},
+	-- Frost Fever (death knight)
+	[55095] =
+	{
+		[85948] = true,		-- Festering Strike (unholy)
+	},
+}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -431,6 +455,16 @@ end
 
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
+end
+
+-- Returns true if spellId triggers a fresh snapshot for auraSpellId.
+-- TODO: Handle spreading DoTs (Inferno Blast, etc.) and Soul Swap effects.
+function OvaleData:NeedNewSnapshot(auraSpellId, spellId)
+	-- Don't snapshot if the aura was applied by an action that shouldn't cause the aura to re-snapshot.
+	if self_buffNoSnapshotSpellList[auraSpellId] and self_buffNoSnapshotSpellList[auraSpellId][spellId] then
+		return false
+	end
+	return true
 end
 
 function OvaleData:GetGCD(spellId)

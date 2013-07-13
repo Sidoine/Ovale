@@ -157,18 +157,21 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 		aura.name = name
 		aura.value = value
 
-		-- Only snapshot stats for periodic auras that have been applied or re-applied.
-		-- If SPELL_AURA_REFRESH didn't fire, then the aura was extended by adding ticks,
-		-- which doesn't re-snapshot stats.
-		if mine and (not existingAura or event == "SPELL_AURA_REFRESH") then
+		if mine then
 			local si = OvaleData.spellInfo[spellId]
-			if si and si.tick then
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Snapshot stats for %s %s (%s) on %s at %f, gain=%f, aura.serial=%d",
-					event, filter, name, spellId, guid, Ovale.now, aura.gain, aura.serial)
-				aura.ticksSeen = 0
-				aura.tick = OvaleData:GetTickLength(spellId)
-				OvalePaperDoll:SnapshotStats(aura)
-				aura.damageMultiplier = self:GetDamageMultiplier(spellId)
+			if si then
+				-- Only set the initial tick information for new auras.
+				if not existingAura and si.tick then
+					aura.ticksSeen = 0
+					aura.tick = OvaleData:GetTickLength(spellId)
+				end
+				-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
+				if Ovale.lastSpellId and OvaleData:NeedNewSnapshot(spellId, Ovale.lastSpellId) then
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Snapshot stats for %s %s (%s) on %s at %f, gain=%f, aura.serial=%d",
+						event, filter, name, spellId, guid, Ovale.now, aura.gain, aura.serial)
+					OvalePaperDoll:SnapshotStats(aura)
+					aura.damageMultiplier = self:GetDamageMultiplier(spellId)
+				end
 			end
 		end
 	end
