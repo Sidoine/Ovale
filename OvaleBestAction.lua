@@ -43,6 +43,9 @@ local API_IsUsableAction = IsUsableAction
 local API_IsUsableSpell = IsUsableSpell
 
 local OVALE_DEFAULT_PRIORITY = 3
+
+-- Age of the current computation.
+local self_serial = 0
 --</private-static-properties>
 
 --<private-static-methods>
@@ -194,6 +197,18 @@ local function ComputeCompare(element)
 		return 0
 	end
 	return nil
+end
+
+local function ComputeCustomFunction(element)
+	Ovale:Logf("custom function %s", element.name)
+	local self = OvaleBestAction
+	if not element.serial or element.serial < self_serial then
+		element.startA, element.endA, element.priorityA, element.elementA = self:Compute(element.a)
+		element.serial = self_serial
+	else
+		Ovale:Logf("Using cached values for %s", element.name)
+	end
+	return element.startA, element.endA, element.priorityA, element.elementA
 end
 
 local function ComputeFromUntil(element)
@@ -676,6 +691,7 @@ local OVALE_COMPUTE_VISITOR =
 	["before"] = ComputeBefore,
 	["between"] = ComputeBetween,
 	["compare"] = ComputeCompare,
+	["customfunction"] = ComputeCustomFunction,
 	["fromuntil"] = ComputeFromUntil,
 	["function"] = ComputeFunction,
 	["group"] = ComputeGroup,
@@ -695,6 +711,7 @@ local OVALE_COMPUTE_VISITOR =
 function OvaleBestAction:StartNewAction()
 	OvaleState:Reset()
 	OvaleState:ApplyActiveSpells()
+	self_serial = self_serial + 1
 end
 
 function OvaleBestAction:GetActionInfo(element)

@@ -617,11 +617,11 @@ local function ParseCommands(text)
 		end
 	end
 
-	local masterNode
-	if (text) then
-		masterNode = strmatch(text, "node(%d+)")
+	local nodeId
+	if text then
+		nodeId = strmatch(text, "node(%d+)")
 	end
-	if (not masterNode) then
+	if not nodeId then
 		Ovale:Print("no master node")
 		return nil
 	end
@@ -633,7 +633,16 @@ local function ParseCommands(text)
 		Ovale:FormatPrint("syntax error: %s", text)
 		return nil
 	end
-	return masterNode
+	return nodeId
+end
+
+local function ParseAddFunction(name, text)
+	local nodeId = ParseCommands(text)
+	local node = self_pool:Get()
+	node.type = "customfunction"
+	node.name = name
+	node.a = self_node[tonumber(nodeId)]
+	return AddNode(node)
 end
 
 local function ParseAddIcon(params, text, secure)
@@ -756,10 +765,10 @@ local function CompileScript(text)
 	text = CompileDeclarations(text)
 	text = CompileInputs(text)
 
-	for p,t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
-		local node = ParseCommands(t)
+	for name, t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
+		local node = ParseAddFunction(name, t)
 		if node then
-			self_customFunctions[p] = "node"..node
+			self_customFunctions[name] = node
 		end
 	end
 	
@@ -886,6 +895,8 @@ function OvaleCompile:DebugNode(node)
 			text = text .. k.."=" .. p .. " "
 		end
 		text = text .. ")"
+	elseif (node.type == "customfunction") then
+		text = self:DebugNode(node.a)
 	elseif (node.type == "if") then
 		text = "if "..self:DebugNode(node.a).." "..self:DebugNode(node.b)
 	elseif (node.type == "unless") then
