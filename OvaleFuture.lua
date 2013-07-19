@@ -26,6 +26,7 @@ local ipairs = ipairs
 local pairs = pairs
 local select = select
 local tinsert = table.insert
+local tostring = tostring
 local tremove = table.remove
 local API_UnitCastingInfo = UnitCastingInfo
 local API_UnitChannelInfo = UnitChannelInfo
@@ -40,13 +41,19 @@ local self_activeSpellcast = {}
 local self_lastSpellcast = {}
 local self_pool = OvalePool:NewPool("OvaleFuture_pool")
 
--- Used to track the most recent target of a spellcast matching self_lastLineID.
-local self_lastTarget = nil
+-- Used to track the most recent spellcast started with UNIT_SPELLCAST_SENT.
 local self_lastLineID = nil
+local self_lastSpell = nil
+local self_lastTarget = nil
+
+-- Time at which a player aura was last added.
+local self_timeAuraAdded = nil
 
 -- The spell requests that have been sent to the server and are awaiting a reply.
 -- self_sentSpellcast[lineId] = timestamp
 local self_sentSpellcast = {}
+
+local OVALE_UNKNOWN_GUID = 0
 
 -- These CLEU events are eventually received after a successful spellcast.
 local OVALE_CLEU_SPELLCAST_RESULTS = {
@@ -71,8 +78,10 @@ OvaleFuture.traceSpellId = nil
 --<private-static-methods>
 local function TracePrintf(spellId, ...)
 	local self = OvaleFuture
-	if self.traceSpellId and self.traceSpellId == spellId then
-		Ovale:FormatPrint(...)
+	if self.traceSpellId then
+		if (self.traceSpellId == spellId) or (type(spellId) == "string" and OvaleData:GetSpellName(self.traceSpellId) == spellId) then
+			Ovale:FormatPrint(...)
+		end
 	end
 end
 
@@ -98,9 +107,9 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	spellcast.stop = endTime
 	spellcast.channeled = channeled
 	spellcast.allowRemove = allowRemove
-	--TODO unable to know what is the real target
-	if lineId == self_lastLineID and self_lastTarget then
-		-- Ovale:FormatPrint("found lineId %d, target is %s", lineId, self_lastTarget)
+
+	-- Set the target from the data taken from UNIT_SPELLCAST_SENT if it's the same spellcast.
+	if lineId == self_lastLineID and OvaleData:GetSpellName(spellId) == self_lastSpell then
 		spellcast.target = self_lastTarget
 	else
 		spellcast.target = API_UnitGUID("target")
@@ -109,10 +118,8 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		Ovale.now, OvaleData:GetSpellName(spellId), spellId, lineId, startTime, endTime, spellcast.target)
 
 	-- Snapshot the current stats for the spellcast.
-	Ovale.lastSpellId = spellId
 	OvalePaperDoll:SnapshotStats(spellcast)
 	spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
-	tinsert(self_activeSpellcast, spellcast)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -157,6 +164,8 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		spellcast.removeOnSuccess = true
 	end
 
+	tinsert(self_activeSpellcast, spellcast)
+
 	ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
 end
@@ -174,20 +183,41 @@ local function RemoveSpellFromQueue(spellId, lineId)
 	Ovale.refreshNeeded["player"] = true
 end
 
+-- UpdateLastSpellInfo() is called at the end of the event handler for OVALE_CLEU_SPELLCAST_RESULTS[].
+-- It saves the given spellcast as the most recent one on its target and ensures that the spellcast
+-- snapshot values are correctly adjusted for buffs that are added or cleared simultaneously with the
+-- spellcast.
 local function UpdateLastSpellInfo(spellcast)
-	if spellcast then
-		local targetGUID = spellcast.target
-		local spellId = spellcast.spellId
-		if targetGUID and spellId then
-			if not self_lastSpellcast[targetGUID] then
-				self_lastSpellcast[targetGUID] = {}
-			end
-			local oldSpellcast = self_lastSpellcast[targetGUID][spellId]
-			if oldSpellcast then
-				self_pool:Release(oldSpellcast)
-			end
-			self_lastSpellcast[targetGUID][spellId] = spellcast
+	local targetGUID = spellcast.target
+	local spellId = spellcast.spellId
+	if targetGUID and spellId then
+		if not self_lastSpellcast[targetGUID] then
+			self_lastSpellcast[targetGUID] = {}
 		end
+		local oldSpellcast = self_lastSpellcast[targetGUID][spellId]
+		if oldSpellcast then
+			self_pool:Release(oldSpellcast)
+		end
+		self_lastSpellcast[targetGUID][spellId] = spellcast
+
+		--[[
+			If any auras have been added between the start of the spellcast and this event,
+			then take a more recent snapshot of the player stats for this spellcast.
+
+			This is needed to see any auras that were applied at the same time as the
+			spellcast, e.g., potions or other on-use abilities or items.
+		]]--
+		if self_timeAuraAdded then
+			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
+				OvalePaperDoll:SnapshotStats(spellcast)
+				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
+				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
+					OvaleData:GetSpellName(spellId), spellId, spellcast.snapshotTime)
+			end
+		end
+
+		-- Save this most recent spellcast.
+		Ovale:UpdateLastSpellcast(spellcast)
 	end
 end
 --</private-static-methods>
@@ -203,6 +233,7 @@ function OvaleFuture:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_START")
+	self:RegisterMessage("Ovale_AuraAdded")
 	self:RegisterMessage("Ovale_InactiveUnit")
 end
 
@@ -215,17 +246,20 @@ function OvaleFuture:OnDisable()
 	self:UnregisterEvent("UNIT_SPELLCAST_SENT")
 	self:UnregisterEvent("UNIT_SPELLCAST_START")
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:UnregisterMessage("Ovale_AuraAdded")
 	self:UnregisterMessage("Ovale_InactiveUnit")
 end
 
 function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	-- Empty out self_lastSpellcast.
-	for guid, spellTable in pairs(self_lastSpellcast) do
-		for spellId, spellcast in pairs(spellTable) do
-			spellTable[spellId] = nil
-			self_pool:Release(spellcast)
-		end
-		self_lastSpellcast[guid] = nil
+	for guid in pairs(self_lastSpellcast) do
+		self:Ovale_InactiveUnit(event, guid)
+	end
+end
+
+function OvaleFuture:Ovale_AuraAdded(event, guid, spellId, caster)
+	if guid == OvaleGUID:GetGUID("player") then
+		self_timeAuraAdded = Ovale.now
 	end
 end
 
@@ -275,43 +309,54 @@ function OvaleFuture:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId,
 	end
 end
 
--- UNIT_SPELLCAST_SENT is triggered when the spellcast has finished.
--- Look up the active spellcast and fix up the target of the spell.
+-- UNIT_SPELLCAST_SENT is triggered when the spellcast is sent to the server.
+-- This is sent before all other UNIT_SPELLCAST_* events for the same spellcast.
 function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineId)
 	if unit == "player" then
+		self_lastLineID = lineId
+		self_lastSpell = spell
+
 		-- UNIT_TARGET may arrive out of order with UNIT_SPELLCAST* events, so we can't track
 		-- the target in an event handler.
-		local targetGUID
-		if target == API_UnitName("target") then
-			targetGUID = API_UnitGUID("target")
-		else
-			targetGUID = OvaleGUID:GetGUIDForName(target)
-		end
-		self_lastTarget = targetGUID
-		self_lastLineID = lineId
-		TracePrintf(spellId, "%s: %f %s, lineId=%d, targetGUID=%s", event, Ovale.now, spell, lineId, targetGUID)
-		for _, spellcast in ipairs(self_activeSpellcast) do
-			if spellcast.lineId == lineId then
-				spellcast.target = targetGUID
-				-- Update spellcast stats to the latest snapshot of the player's stats.
-				OvalePaperDoll:SnapshotStats(spellcast)
-				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
+		if target then
+			if target == API_UnitName("target") then
+				self_lastTarget = API_UnitGUID("target")
+			else
+				self_lastTarget = OvaleGUID:GetGUIDForName(target)
 			end
+		else
+			self_lastTarget = OVALE_UNKNOWN_GUID
 		end
+		TracePrintf(spell, "%s: %f %s on %s, lineId=%d", event, Ovale.now, spell, self_lastTarget, lineId)
 		self_sentSpellcast[lineId] = Ovale.now
 	end
 end
 
+-- UNIT_SPELLCAST_SUCCEEDED is triggered when a spellcast successfully completes.
+--[[
+	For a cast-time spell:
+		UNIT_SPELLCAST_SENT
+		UNIT_SPELLCAST_START
+		UNIT_SPELLCAST_SUCCEEDED
+	For an instant-cast spell:
+		UNIT_SPELLCAST_SENT
+		UNIT_SPELLCAST_SUCCEEDED
+]]--
 function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, Ovale.now, spellId, lineId)
+
 		-- Search for a cast-time spell matching this spellcast that was added by UNIT_SPELLCAST_START.
 		for _, spellcast in ipairs(self_activeSpellcast) do
 			if spellcast.lineId == lineId then
 				spellcast.allowRemove = true
+				-- Take a more recent snapshot of the player stats for this cast-time spell.
+				OvalePaperDoll:SnapshotStats(spellcast)
+				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
 				return
 			end
 		end
+
 		--[[
 			This spell was an instant-cast spell, but only add it to the queue if it's not part
 			of a channeled spell.  A channeled spell is actually two separate spells, an
@@ -382,7 +427,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	if sourceGUID == OvaleGUID:GetGUID("player") then
 		if OVALE_CLEU_SPELLCAST_RESULTS[event] then
 			local spellId, spellName = select(12, ...)
-			TracePrintf(spellId, "%s: %f %s (%d), lineId=%d", event, Ovale.now, spellName, spellId, lineId)
+			TracePrintf(spellId, "%s: %f %s (%d)", event, Ovale.now, spellName, spellId)
 			for index, spellcast in ipairs(self_activeSpellcast) do
 				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraSpellId == spellId) then
 					if not spellcast.channeled and (spellcast.removeOnSuccess or event ~= "SPELL_CAST_SUCCESS") then
@@ -415,7 +460,7 @@ function OvaleFuture:ApplyInFlightSpells(now, ApplySpell)
 				ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target, spellcast)
 			else
 				tremove(self_activeSpellcast, index)
-				UpdateLastSpellInfo(spellcast)
+				self_pool:Release(spellcast)
 				-- Decrement current index since item was removed and rest of items shifted up.
 				index = index - 1
 			end

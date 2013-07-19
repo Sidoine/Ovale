@@ -319,32 +319,40 @@ function OvalePaperDoll:SnapshotStats(t, source)
 		source = self.stat
 	end
 	for k in pairs(self.stat) do
-		t[k] = source[k]
+		if source[k] then
+			t[k] = source[k]
+		end
+	end
+	-- Copy other properties that are relevant for auras that might be present.
+	-- TODO: Holy power?
+	if source.comboPoints then
+		t.comboPoints = source.comboPoints
 	end
 end
 
-function OvalePaperDoll:Debug()
+function OvalePaperDoll:Debug(stat)
+	stat = stat or self.stat
 	Ovale:FormatPrint("Class: %s", self.class)
 	Ovale:FormatPrint("Level: %d", self.level)
 	Ovale:FormatPrint("Specialization: %s", self.specialization)
-	Ovale:FormatPrint("Agility: %d", self.stat.agility)
-	Ovale:FormatPrint("Intellect: %d", self.stat.intellect)
-	Ovale:FormatPrint("Spirit: %d", self.stat.spirit)
-	Ovale:FormatPrint("Stamina: %d", self.stat.stamina)
-	Ovale:FormatPrint("Strength: %d", self.stat.strength)
-	Ovale:FormatPrint("AP: %d", self.stat.attackPower)
-	Ovale:FormatPrint("RAP: %d", self.stat.rangedAttackPower)
-	Ovale:FormatPrint("Spell bonus damage: %d", self.stat.spellBonusDamage)
-	Ovale:FormatPrint("Spell bonus healing: %d", self.stat.spellBonusHealing)
-	Ovale:FormatPrint("Spell critical strike effect: %f%%", self.stat.spellCrit)
-	Ovale:FormatPrint("Spell haste effect: %f%%", self.stat.spellHaste)
-	Ovale:FormatPrint("Melee critical strike effect: %f%%", self.stat.meleeCrit)
-	Ovale:FormatPrint("Melee haste effect: %f%%", self.stat.meleeHaste)
-	Ovale:FormatPrint("Ranged critical strike effect: %f%%", self.stat.rangedCrit)
-	Ovale:FormatPrint("Ranged haste effect: %f%%", self.stat.rangedHaste)
-	Ovale:FormatPrint("Mastery effect: %f%%", self.stat.masteryEffect)
-	Ovale:FormatPrint("Damage multiplier: %f", self.stat.damageMultiplier)
-	Ovale:FormatPrint("Weapon damage (mainhand): %f", self.stat.mainHandWeaponDamage)
-	Ovale:FormatPrint("Weapon damage (offhand): %f", self.stat.offHandWeaponDamage)
+	Ovale:FormatPrint("Agility: %d", stat.agility)
+	Ovale:FormatPrint("Intellect: %d", stat.intellect)
+	Ovale:FormatPrint("Spirit: %d", stat.spirit)
+	Ovale:FormatPrint("Stamina: %d", stat.stamina)
+	Ovale:FormatPrint("Strength: %d", stat.strength)
+	Ovale:FormatPrint("Attack power: %d", stat.attackPower)
+	Ovale:FormatPrint("Ranged attack power: %d", stat.rangedAttackPower)
+	Ovale:FormatPrint("Spell bonus damage: %d", stat.spellBonusDamage)
+	Ovale:FormatPrint("Spell bonus healing: %d", stat.spellBonusHealing)
+	Ovale:FormatPrint("Spell critical strike effect: %f%%", stat.spellCrit)
+	Ovale:FormatPrint("Spell haste effect: %f%%", stat.spellHaste)
+	Ovale:FormatPrint("Melee critical strike effect: %f%%", stat.meleeCrit)
+	Ovale:FormatPrint("Melee haste effect: %f%%", stat.meleeHaste)
+	Ovale:FormatPrint("Ranged critical strike effect: %f%%", stat.rangedCrit)
+	Ovale:FormatPrint("Ranged haste effect: %f%%", stat.rangedHaste)
+	Ovale:FormatPrint("Mastery effect: %f%%", stat.masteryEffect)
+	Ovale:FormatPrint("Damage multiplier: %f", stat.damageMultiplier)
+	Ovale:FormatPrint("Weapon damage (mainhand): %f", stat.mainHandWeaponDamage)
+	Ovale:FormatPrint("Weapon damage (offhand): %f", stat.offHandWeaponDamage)
 end
 --</public-static-methods>

@@ -622,7 +622,7 @@ OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.bu
 OvaleCondition.conditions.buffcombopoints = function(condition)
 	self_auraFound.comboPoints = nil
 	local start, ending = GetAura(condition, self_auraFound)
-	local comboPoints = self_auraFound.comboPoints or 0
+	local comboPoints = self_auraFound.comboPoints or 1
 	if start and ending and start <= ending then
 		return start, ending, comboPoints, start, 0
 	else

@@ -139,8 +139,8 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 	)
 	local addAura = not existingAura or not auraIsUnchanged
 	if addAura then
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Adding %s %s (%s) to %s, aura.serial=%d",
-			event, filter, name, spellId, guid, aura.serial)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Adding %s %s (%s) to %s at %f, aura.serial=%d",
+			event, filter, name, spellId, guid, Ovale.now, aura.serial)
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
@@ -158,20 +158,22 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 		aura.name = name
 		aura.value = value
 
+		-- Snapshot stats for DoTs.
 		if mine then
 			local si = OvaleData.spellInfo[spellId]
-			if si then
+			if si and si.tick then
 				-- Only set the initial tick information for new auras.
-				if not existingAura and si.tick then
+				if not existingAura then
 					aura.ticksSeen = 0
 					aura.tick = OvaleData:GetTickLength(spellId)
 				end
 				-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
-				if Ovale.lastSpellId and OvaleData:NeedNewSnapshot(spellId, Ovale.lastSpellId) then
-					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Snapshot stats for %s %s (%s) on %s at %f, gain=%f, aura.serial=%d",
-						event, filter, name, spellId, guid, Ovale.now, aura.gain, aura.serial)
-					OvalePaperDoll:SnapshotStats(aura)
-					aura.damageMultiplier = self:GetDamageMultiplier(spellId)
+				local lastSpellcast = Ovale.lastSpellcast
+				local lastSpellId = lastSpellcast and lastSpellcast.spellId
+				if lastSpellId and OvaleData:NeedNewSnapshot(spellId, lastSpellId) then
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: Snapshot stats for %s %s (%s) on %s from %f, now=%f, aura.serial=%d",
+						event, filter, name, spellId, guid, lastSpellcast.snapshotTime, Ovale.now, aura.serial)
+					OvalePaperDoll:SnapshotStats(aura, Ovale.lastSpellcast)
 				end
 			end
 		end
@@ -185,9 +187,10 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 end
 
 local function RemoveAuraIfExpired(guid, spellId, filter, aura, serial)
+	local self = OvaleAura
 	if aura and serial and aura.serial ~= serial then
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing expired %s %s (%s) from %s, serial=%d aura.serial=%d",
-			filter, aura.name, spellId, guid, serial, aura.serial)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing expired %s %s (%s) from %s at %f, serial=%d aura.serial=%d",
+			filter, aura.name, spellId, guid, Ovale.now, serial, aura.serial)
 		self:SendMessage("Ovale_AuraRemoved", guid, spellId, aura.source)
 		self_pool:Release(aura)
 		return true
@@ -332,7 +335,7 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		aura.lastTickTime = timestamp
 		aura.tick = tick
 		aura.ticksSeen = ticksSeen
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s, tick=%f", filter, aura.name, spellId, guid, tick)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s at %f, tick=%f", filter, aura.name, spellId, guid, Ovale.now, tick)
 	end
 end
 --</private-static-methods>

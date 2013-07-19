@@ -153,7 +153,7 @@ function OvaleState:UpdatePowerRates()
 end
 
 function OvaleState:Reset()
-	self.lastSpellId = Ovale.lastSpellId
+	self.lastSpellId = Ovale.lastSpellcast and Ovale.lastSpellcast.spellId
 	self.serial = self.serial + 1
 	self.currentTime = self.maintenant
 	Ovale:Logf("Reset state with current time = %f", self.currentTime)
