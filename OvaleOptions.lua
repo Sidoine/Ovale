@@ -202,7 +202,17 @@ local self_options =
 							desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
 							get = function(info) return OvaleOptions.db.profile.apparence.targetText end,
 							set = function(info, value) OvaleOptions.db.profile.apparence.targetText = value; Ovale:UpdateFrame() end
-						}
+						},
+						updateInterval =
+						{
+							order = 100,
+							type = "range",
+							name = "Update interval",
+							desc = "Maximum time to wait (in milliseconds) before refreshing icons.",
+							min = 0, max = 500, step = 10,
+							get = function(info) return OvaleOptions.db.profile.apparence.updateInterval * 1000 end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.updateInterval = value / 1000; Ovale:UpdateFrame() end
+						},
 					},
 				},
 				iconGroupAppearance =
