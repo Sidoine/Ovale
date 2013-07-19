@@ -166,6 +166,21 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	tinsert(self_activeSpellcast, spellcast)
 
+	-- Update latency measurement.  API_GetTime() only updates on frame refresh (OnUpdate) so
+	-- this latency measurement has a lower bound of the 1/FPS, where FPS is the current frame
+	-- rate.
+	if self_sentSpellcast[lineId] then
+		local latency = Ovale.now - self_sentSpellcast[lineId]
+		local castTime = endTime - startTime
+		if castTime > 0 and latency > castTime then
+			latency = castTime
+		end
+		if latency > 0 then
+			self.latency = latency
+		end
+		self_sentSpellcast[lineId] = nil
+	end
+
 	ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
 end
@@ -328,6 +343,8 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 			self_lastTarget = OVALE_UNKNOWN_GUID
 		end
 		TracePrintf(spell, "%s: %f %s on %s, lineId=%d", event, Ovale.now, spell, self_lastTarget, lineId)
+
+		-- Note starting time for latency calculation.
 		self_sentSpellcast[lineId] = Ovale.now
 	end
 end
@@ -366,17 +383,6 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 		]]--
 		if not API_UnitChannelInfo("player") then
 			AddSpellToQueue(spellId, lineId, Ovale.now, Ovale.now, false, true)
-		end
-
-		-- Update latency measurement.  API_GetTime() only updates on frame refresh (OnUpdate) so
-		-- this latency measurement has a lower bound of the 1/FPS, where FPS is the current frame
-		-- rate.
-		if self_sentSpellcast[lineId] then
-			local latency = Ovale.now - self_sentSpellcast[lineId]
-			if latency > 0 then
-				self.latency = latency
-			end
-			self_sentSpellcast[lineId] = nil
 		end
 	end
 end
