@@ -17,6 +17,7 @@ local select = select
 local tostring = tostring
 local wipe = table.wipe
 
+local API_GetAuctionItemSubClasses = GetAuctionItemSubClasses
 local API_GetInventoryItemID = GetInventoryItemID
 local API_GetInventorySlotInfo = GetInventorySlotInfo
 local API_GetItemInfo = GetItemInfo
@@ -956,14 +957,73 @@ local OVALE_ARMORSET = {
 	[96733] = "T15_melee",
 	[96734] = "T15_melee",
 }
+
+local OVALE_WEAPON_CLASS = {}
+do
+	OVALE_WEAPON_CLASS[1],	-- "One-Handed Axes"
+	OVALE_WEAPON_CLASS[2],	-- "Two-Handed Axes"
+	OVALE_WEAPON_CLASS[3],	-- "Bows"
+	OVALE_WEAPON_CLASS[4],	-- "Guns"
+	OVALE_WEAPON_CLASS[5],	-- "One-Handed Maces"
+	OVALE_WEAPON_CLASS[6],	-- "Two-Handed Maces"
+	OVALE_WEAPON_CLASS[7],	-- "Polearms"
+	OVALE_WEAPON_CLASS[8],	-- "One-Handed Swords"
+	OVALE_WEAPON_CLASS[9],	-- "Two-Handed Swords"
+	OVALE_WEAPON_CLASS[10],	-- "Staves"
+	OVALE_WEAPON_CLASS[11],	-- "Fist Weapons"
+	OVALE_WEAPON_CLASS[12],	-- "Miscellaneous"
+	OVALE_WEAPON_CLASS[13],	-- "Daggers"
+	OVALE_WEAPON_CLASS[14],	-- "Thrown"
+	OVALE_WEAPON_CLASS[15],	-- "Crossbows"
+	OVALE_WEAPON_CLASS[16],	-- "Wands"
+	OVALE_WEAPON_CLASS[17] = API_GetAuctionItemSubClasses(1)	-- "Fishing Poles"
+end
+
+-- Normalized weapon attack speeds (http://www.wowpedia.org/Normalization)
+local OVALE_NORMALIZED_WEAPON_SPEED = {
+	[OVALE_WEAPON_CLASS[1]]  = 2.4,
+	[OVALE_WEAPON_CLASS[2]]  = 3.3,
+	[OVALE_WEAPON_CLASS[3]]  = 2.8,
+	[OVALE_WEAPON_CLASS[4]]  = 2.8,
+	[OVALE_WEAPON_CLASS[5]]  = 2.4,
+	[OVALE_WEAPON_CLASS[6]]  = 3.3,
+	[OVALE_WEAPON_CLASS[7]]  = 3.3,
+	[OVALE_WEAPON_CLASS[8]]  = 2.4,
+	[OVALE_WEAPON_CLASS[9]]  = 3.3,
+	[OVALE_WEAPON_CLASS[10]] = 3.3,
+	[OVALE_WEAPON_CLASS[11]] = 2.4,
+	[OVALE_WEAPON_CLASS[12]] = 2.4, -- ??
+	[OVALE_WEAPON_CLASS[13]] = 1.7,
+	[OVALE_WEAPON_CLASS[14]] = 1.7, -- ??
+	[OVALE_WEAPON_CLASS[15]] = 2.8,
+	[OVALE_WEAPON_CLASS[16]] = 2.4,
+	[OVALE_WEAPON_CLASS[17]] = 3.3,
+}
 --</private-static-properties>
+
+--<public-static-properties>
+-- Normalized weapon speeds for equipped mainhand and offhand weapons.
+OvaleEquipement.mainHandWeaponSpeed = nil
+OvaleEquipement.offHandWeaponSpeed = nil
+--</public-static-properties>
 
 --<private-static-methods>
 local function GetEquippedItemType(slotId)
 	local itemId = OvaleEquipement:GetEquippedItem(slotId)
-	if not itemId then return nil end
-	local inventoryType = select(9, API_GetItemInfo(itemId))
-	return inventoryType
+	if itemId then
+		local inventoryType = select(9, API_GetItemInfo(itemId))
+		return inventoryType
+	end
+end
+
+local function GetNormalizedWeaponSpeed(slotId)
+	if slotId == INVSLOT_MAINHAND or slotId == INVSLOT_OFFHAND then
+		local itemId = OvaleEquipement:GetEquippedItem(slotId)
+		if itemId then
+			local weaponClass = select(7, API_GetItemInfo(itemId))
+			return OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
+		end
+	end
 end
 --</private-static-methods>
 
@@ -985,8 +1045,10 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 		self_equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
 		if slotId == INVSLOT_MAINHAND then
 			self_mainHandItemType = GetEquippedItemType(slotId)
+			self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
 		elseif slotId == INVSLOT_OFFHAND then
 			self_offHandItemType = GetEquippedItemType(slotId)
+			self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
 		end
 	else
 		self_equippedItems[slotId] = nil
@@ -1076,6 +1138,8 @@ function OvaleEquipement:UpdateEquippedItems()
 	end
 	self_mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
 	self_offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
+	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
+	self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
 
 	if changed then
 		self:UpdateArmorSetCount()

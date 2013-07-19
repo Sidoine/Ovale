@@ -100,7 +100,7 @@ OvalePaperDoll.stat = {
 	spellBonusHealing = 0,
 
 -- miscellaneous stats
-	-- average weapon damage of mainhand and offhand weapons
+	-- normalized weapon damage of mainhand and offhand weapons
 	mainHandWeaponDamage = 0,
 	offHandWeaponDamage = 0,
 	-- damage multiplier
@@ -246,15 +246,34 @@ function OvalePaperDoll:UpdateWeaponDamage(event)
 		damageMultiplier = damageMultiplier * 1.4
 	end
 
-	-- weaponDamage = baseWeaponDamage + weaponSpeed * attackPower / 14
+	-- weaponDamage = (weaponDPS + attackPower / 14) * weaponSpeed
+	-- normalizedWeaponDamage = (weaponDPS + attackPower / 14) * normalizedWeaponSpeed
 	local avgDamage = (minDamage + maxDamage) / 2 / damageMultiplier
 	local mainHandWeaponSpeed = mainHandAttackSpeed * self:GetMeleeHasteMultiplier()
-	self.stat.mainHandWeaponDamage = avgDamage - mainHandWeaponSpeed * self.stat.attackPower / 14
+	local normalizedMainHandWeaponSpeed = OvaleEquipement.mainHandWeaponSpeed or 0
+	if self.class == "DRUID" then
+		if OvaleStance:IsStance("druid_cat_form") then
+			normalizedMainHandWeaponSpeed = 1
+		elseif OvaleStance:IsStance("druid_bear_form") then
+			normalizedMainHandWeaponSpeed = 2.5
+		end
+	end
+	self.stat.mainHandWeaponDamage = avgDamage / mainHandWeaponSpeed * normalizedMainHandWeaponSpeed
 
 	if OvaleEquipement:HasOffHandWeapon() then
 		local avgOffHandDamage = (minOffHandDamage + maxOffHandDamage) / 2 / damageMultiplier
+		-- Sometimes, UnitAttackSpeed() doesn't return a value for OH attack speed, so approximate with MH one.
+		offHandAttackSpeed = offHandAttackSpeed or mainHandAttackSpeed
 		local offHandWeaponSpeed = offHandAttackSpeed * self:GetMeleeHasteMultiplier()
-		self.stat.offHandWeaponDamage = avgOffHandDamage - offHandWeaponSpeed * self.stat.attackPower / 14 / 2
+		local normalizedOffHandWeaponSpeed = OvaleEquipement.offHandWeaponSpeed or 0
+		if self.class == "DRUID" then
+			if OvaleStance:IsStance("druid_cat_form") then
+				normalizedOffHandWeaponSpeed = 1
+			elseif OvaleStance:IsStance("druid_bear_form") then
+				normalizedOffHandWeaponSpeed = 2.5
+			end
+		end
+		self.stat.offHandWeaponDamage = avgOffHandDamage / offHandWeaponSpeed * normalizedOffHandWeaponSpeed
 	else
 		self.stat.offHandWeaponDamage = 0
 	end

@@ -3477,13 +3477,13 @@ OvaleCondition.conditions.weaponenchantexpires = function(condition)
 	end
 end
 
---- The average weapon damage of the weapon in the given hand.
+--- The normalized weapon damage of the weapon in the given hand.
 -- @name WeaponDamage
 -- @paramsig number
 -- @param hand Optional. Sets which hand weapon.
 --     Defaults to mainhand.
 --     Valid values: mainhand, offhand.
--- @return The weapon damage.
+-- @return The normalized weapon damage.
 -- @usage
 -- AddFunction MangleDamage {
 --     WeaponDamage() * 5 + 78
