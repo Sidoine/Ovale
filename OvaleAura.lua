@@ -176,6 +176,11 @@ local function UnitGainedAura(event, guid, spellId, filter, casterGUID, icon, co
 			end
 		end
 	end
+	if not existingAura then
+		self:SendMessage("Ovale_AuraAdded", guid, spellId, casterGUID)
+	elseif not auraIsUnchanged then
+		self:SendMessage("Ovale_AuraRefreshed", guid, spellId, casterGUID)
+	end
 	return addAura
 end
 
@@ -183,6 +188,7 @@ local function RemoveAuraIfExpired(guid, spellId, filter, aura, serial)
 	if aura and serial and aura.serial ~= serial then
 		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing expired %s %s (%s) from %s, serial=%d aura.serial=%d",
 			filter, aura.name, spellId, guid, serial, aura.serial)
+		self:SendMessage("Ovale_AuraRemoved", guid, spellId, aura.source)
 		self_pool:Release(aura)
 		return true
 	end
