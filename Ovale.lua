@@ -1,11 +1,12 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2009, 2010, 2011, 2012, 2013 Sidoine, Johnny C. Lam
+    Copyright (C) 2009, 2010, 2011, 2012 Sidoine
+    Copyright (C) 2012, 2013 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
     file accompanying this program.
-----------------------------------------------------------------------]]
+--]]----------------------------------------------------------------------
 
 local _, addonNamespace = ...
 Ovale = LibStub("AceAddon-3.0"):NewAddon(addonNamespace, "Ovale", "AceConsole-3.0", "AceEvent-3.0")

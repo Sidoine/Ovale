@@ -1,4 +1,4 @@
---[[
+--[[--------------------------------------------------------------------
 	Copyright (C) 2006-2007 Nymbia
 
 	This program is free software; you can redistribute it and/or modify
@@ -14,9 +14,16 @@
 	You should have received a copy of the GNU General Public License along
 	with this program; if not, write to the Free Software Foundation, Inc.,
 	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	
-	Modifed for Ovale
-]]
+
+	Modified for Ovale.
+
+    Copyright (C) 2009, 2011, 2012 Sidoine
+    Copyright (C) 2012, 2013 Johnny C. Lam
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License in the LICENSE
+    file accompanying this program.
+--]]--------------------------------------------------------------------
 
 local _, Ovale = ...
 local OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")

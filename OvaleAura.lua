@@ -1,11 +1,12 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2012, 2013 Sidoine, Johnny C. Lam
+    Copyright (C) 2012 Sidoine
+    Copyright (C) 2012, 2013 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
     file accompanying this program.
-----------------------------------------------------------------------]]
+--]]--------------------------------------------------------------------
 
 -- This addon keep the list of all the aura for all the units
 -- Fore each aura, it saves the state of the player when it was refreshed

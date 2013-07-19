@@ -1,11 +1,12 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2012 Sidoine
+    Copyright (C) 2012, 2013 Sidoine
+	Copyright (C) 2013 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
     file accompanying this program.
-----------------------------------------------------------------------]]
+--]]--------------------------------------------------------------------
 
 -- The travelling missiles or spells that have been cast but whose effects were not still not applied
 
