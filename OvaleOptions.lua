@@ -303,14 +303,6 @@ local self_options =
 						},
 					},
 				},
-				latencyCorrection =
-				{
-					order = 80,
-					type = "toggle",
-					name = L["Correction de la latence"],
-					get = function(info) return OvaleOptions.db.profile.apparence.latencyCorrection end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.latencyCorrection = value end
-				},
 			}
 		},
 		code =
@@ -619,7 +611,7 @@ function OvaleOptions:OnInitialize()
 			apparence = {enCombat=false, iconScale = 2, secondIconScale = 1, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
 				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
 				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
-				latencyCorrection=true, hideVehicule=false, flashIcon=true, targetText = "●", alpha = 1,
+				hideVehicule=false, flashIcon=true, targetText = "●", alpha = 1,
 				optionsAlpha = 1, updateInterval=0.1}
 		}
 	})
