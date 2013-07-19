@@ -759,4 +759,11 @@ function OvaleState:GetRunesCooldown(blood, frost, unholy, death, nodeath)
 	end
 	return maxCD
 end
+
+-- Print out the levels of each power type in the current state.
+function OvaleState:DebugPower()
+	for powerType in pairs(OvaleData.power) do
+		Ovale:FormatPrint("%s = %d", powerType, self.state[powerType])
+	end
+end
 --</public-static-methods>

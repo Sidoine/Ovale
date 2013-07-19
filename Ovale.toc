@@ -60,6 +60,7 @@ OvaleSwing.lua
 #
 OvaleAura.lua
 OvaleComboPoints.lua
+OvaleOptions.lua
 #
 OvaleFuture.lua
 #
@@ -67,7 +68,6 @@ OvaleDamageTaken.lua
 OvaleState.lua
 #
 OvaleCondition.lua
-OvaleOptions.lua
 #
 OvaleBestAction.lua
 OvaleCompile.lua

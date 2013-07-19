@@ -442,17 +442,6 @@ function OvaleData:UpdateGlyphs()
 	self:SendMessage("Ovale_GlyphsChanged")
 end
 
-function OvaleData:DebugGlyphs()
-	local array = {}
-	for glyphId in pairs(self.glyphs) do
-		tinsert(array, self:GetSpellName(glyphId) .. ": " .. glyphId)
-	end
-	tsort(array)
-	for _, v in ipairs(array) do
-		Ovale:Print(v)
-	end
-end
-
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
 end
@@ -613,11 +602,35 @@ function OvaleData:GetTickLength(spellId)
 	end
 end
 
+-- Print out the list of active glyphs in alphabetical order.
+function OvaleData:DebugGlyphs()
+	local array = {}
+	for glyphId in pairs(self.glyphs) do
+		tinsert(array, self:GetSpellName(glyphId) .. ": " .. glyphId)
+	end
+	tsort(array)
+	for _, v in ipairs(array) do
+		Ovale:Print(v)
+	end
+end
+
 -- Print out the list of known spells in alphabetical order.
 function OvaleData:DebugSpellList()
 	local array = {}
 	for k, v in pairs(self.spellList) do
 		tinsert(array, v .. ": " .. k)
+	end
+	tsort(array)
+	for _, v in ipairs(array) do
+		Ovale:Print(v)
+	end
+end
+
+-- Print out the list of talents in alphabetical order.
+function OvaleData:DebugTalents()
+	local array = {}
+	for name, id in pairs(self.talentNameToId) do
+		tinsert(array, name .. " = " .. id)
 	end
 	tsort(array)
 	for _, v in ipairs(array) do

@@ -15,12 +15,8 @@ Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
 local L = Ovale.L
-local OvaleAura = Ovale.OvaleAura
-local OvaleData = Ovale.OvaleData
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleScripts = Ovale.OvaleScripts
-local OvaleStance = Ovale.OvaleStance
-local OvaleState = Ovale.OvaleState
 
 local strgmatch = string.gmatch
 local strgsub = string.gsub
@@ -535,9 +531,8 @@ local self_options =
 					order = -3,
 					name = "Power",
 					type = "execute",
-					func = function() 
-						for i=1,10 do Ovale:Print(i.."="..UnitPower("player", i)) end 
-						Ovale:Print(OvaleState.state.eclipse)
+					func = function()
+						if Ovale.OvaleState then Ovale.OvaleState:DebugPower() end
 					end
 				},
 				talent =
@@ -545,10 +540,8 @@ local self_options =
 					order = -4,
 					name = "List talent id",
 					type = "execute",
-					func = function() 
-						for k,v in pairs(OvaleData.talentNameToId) do
-							Ovale:Print(k.."="..v)
-						end
+					func = function()
+						if Ovale.OvaleData then Ovale.OvaleData:DebugTalents() end
 					end
 				},
 				targetbuff =
@@ -557,8 +550,11 @@ local self_options =
 					name = "List target buffs and debuffs",
 					type = "execute",
 					func = function()
-						OvaleAura:DebugListAura("target", "HELPFUL")
-						OvaleAura:DebugListAura("target", "HARMFUL")
+						local OvaleAura = Ovale.OvaleAura
+						if OvaleAura then
+							OvaleAura:DebugListAura("target", "HELPFUL")
+							OvaleAura:DebugListAura("target", "HARMFUL")
+						end
 					end
 				},
 				buff =
@@ -567,8 +563,11 @@ local self_options =
 					name = "List player buffs and debuffs",
 					type = "execute",
 					func = function()
-						OvaleAura:DebugListAura("player", "HELPFUL")
-						OvaleAura:DebugListAura("player", "HARMFUL")
+						local OvaleAura = Ovale.OvaleAura
+						if OvaleAura then
+							OvaleAura:DebugListAura("player", "HELPFUL")
+							OvaleAura:DebugListAura("player", "HARMFUL")
+						end
 					end
 				},
 				glyph =
@@ -577,7 +576,7 @@ local self_options =
 					name = "List player glyphs",
 					type = "execute",
 					func = function()
-						OvaleData:DebugGlyphs()
+						if Ovale.OvaleData then Ovale.OvaleData:DebugGlyphs() end
 					end
 				},
 				spell =
@@ -586,8 +585,8 @@ local self_options =
 					name = "List player spells",
 					type = "execute",
 					func = function()
-						OvaleData:DebugSpellList()
-					end					
+						if Ovale.OvaleData then Ovale.OvaleData:DebugSpellList() end
+					end
 				},
 				stance =
 				{
@@ -595,7 +594,7 @@ local self_options =
 					name = "List stances",
 					type = "execute",
 					func = function()
-						OvaleStance:DebugStances()
+						if Ovale.OvaleStance then Ovale.OvaleStance:DebugStances() end
 					end
 				},
 			}
