@@ -48,236 +48,269 @@ local self_options =
 			type = "group",
 			args =
 			{
-				combatUniquement =
-				{
-					order = 1,
-					type = "toggle",
-					name = L["En combat uniquement"],
-					get = function(info)
-						return OvaleOptions.db.profile.apparence.enCombat
-					end,
-					set = function(info, v)
-						OvaleOptions.db.profile.apparence.enCombat = v
-						Ovale:UpdateVisibility()
-					end,
-					width = "full"
-				},
-				targetOnly =
-				{
-					order = 1.5,
-					type = "toggle",
-					name = L["Si cible uniquement"],
-					get = function(info)
-						return OvaleOptions.db.profile.apparence.avecCible
-					end,
-					set = function(info, v)
-						OvaleOptions.db.profile.apparence.avecCible = v
-						Ovale:UpdateVisibility()
-					end,
-					width = "full"
-				},
-				iconScale = 
-				{
-					order = 2,
-					type = "range",
-					name = L["Taille des icônes"],
-					desc = L["La taille des icônes"],
-					min = 0.1, max = 16, step = 0.1,
-					get = function(info) return OvaleOptions.db.profile.apparence.iconScale end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.iconScale = value; Ovale:UpdateFrame() end
-				},
-				secondIconScale =
-				{
-					order = 2.5,
-					type = "range",
-					name = L["Taille du second icône"],
-					min = 0.2, max = 1, step = 0.1,
-					get = function(info) return OvaleOptions.db.profile.apparence.secondIconScale end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.secondIconScale = value; Ovale:UpdateFrame() end
-				},
-				fontScale = 
-				{
-					order = 3,
-					type = "range",
-					name = L["Taille des polices"],
-					desc = L["La taille des polices"],
-					min = 0.1, max = 2, step = 0.1,
-					get = function(info) return OvaleOptions.db.profile.apparence.fontScale end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.fontScale = value; Ovale:UpdateFrame() end
-				},
-				smallIconScale = 
-				{
-					order = 4,
-					type = "range",
-					name = L["Taille des petites icônes"],
-					desc = L["La taille des petites icônes"],
-					min = 0.1, max = 16, step = 0.1,
-					get = function(info) return OvaleOptions.db.profile.apparence.smallIconScale end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.smallIconScale = value; Ovale:UpdateFrame() end
-				},
-				margin = 
-				{
-					order = 5.5,
-					type = "range",
-					name = L["Marge entre deux icônes"],
-					min = -16, max = 64, step = 1,
-					get = function(info) return OvaleOptions.db.profile.apparence.margin end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.margin = value; Ovale:UpdateFrame() end
-				},
-				iconShiftX =
-				{
-					order = 5.6,
-					type = "range",
-					name = L["Décalage horizontal des options"],
-					min = -256, max = 256, step = 1,
-					get = function(info) return OvaleOptions.db.profile.apparence.iconShiftX end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.iconShiftX = value; Ovale:UpdateFrame() end
-				},
-				iconShiftY =
-				{
-					order = 5.7,
-					type = "range",
-					name = L["Décalage vertical des options"],
-					min = -256, max = 256, step = 1,
-					get = function(info) return OvaleOptions.db.profile.apparence.iconShiftY end,
-					set = function(info,value) OvaleOptions.db.profile.apparence.iconShiftY = value; Ovale:UpdateFrame() end
-				},
-				raccourcis =
-				{
-					order = 6,
-					type = "toggle",
-					name = L["Raccourcis clavier"],
-					desc = L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"],
-					get = function(info) return OvaleOptions.db.profile.apparence.raccourcis end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.raccourcis = value end
-				},
-				numeric =
-				{
-					order = 7,
-					type = "toggle",
-					name = L["Affichage numérique"],
-					desc = L["Affiche le temps de recharge sous forme numérique"],
-					get = function(info) return OvaleOptions.db.profile.apparence.numeric end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.numeric = value end
-				},
 				verrouille =
 				{
-					order = 8,
+					order = 10,
 					type = "toggle",
 					name = L["Verrouiller position"],
 					get = function(info) return OvaleOptions.db.profile.apparence.verrouille end,
 					set = function(info, value) OvaleOptions.db.profile.apparence.verrouille = value end
 				},
-				vertical =
-				{
-					order = 9,
-					type = "toggle",
-					name = L["Vertical"],
-					get = function(info) return OvaleOptions.db.profile.apparence.vertical end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.vertical = value; Ovale:UpdateFrame() end
-				},
-				alpha =
-				{
-					order = 9.5,
-					type = "range",
-					name = L["Opacité des icônes"],
-					min = 0, max = 100, step = 5,
-					get = function(info) return OvaleOptions.db.profile.apparence.alpha * 100 end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.alpha = value/100; Ovale.frame.frame:SetAlpha(value/100) end
-				},
-				optionsAlpha =
-				{
-					order = 9.5,
-					type = "range",
-					name = L["Opacité des options"],
-					min = 0, max = 100, step = 5,
-					get = function(info) return OvaleOptions.db.profile.apparence.optionsAlpha * 100 end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.optionsAlpha = value/100; Ovale.frame.content:SetAlpha(value/100) end
-				},
-				predictif =
-				{
-					order = 10,
-					type = "toggle",
-					name = L["Prédictif"],
-					desc = L["Affiche les deux prochains sorts et pas uniquement le suivant"],
-					get = function(info) return OvaleOptions.db.profile.apparence.predictif end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.predictif = value; Ovale:UpdateFrame() end
-				},
-				moving = 
-				{
-					order = 11,
-					type = "toggle",
-					name = L["Défilement"],
-					desc = L["Les icônes se déplacent"],
-					get = function(info) return OvaleOptions.db.profile.apparence.moving end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.moving = value; Ovale:UpdateFrame() end
-				},
-				hideEmpty =
-				{
-					order = 12,
-					type = "toggle",
-					name = L["Cacher bouton vide"],
-					get = function(info) return OvaleOptions.db.profile.apparence.hideEmpty end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.hideEmpty = value; Ovale:UpdateFrame() end
-				},
-				targetHostileOnly = 
-				{
-					order = 13,
-					type = "toggle",
-					name = L["Cacher si cible amicale ou morte"],
-					get = function(info) return OvaleOptions.db.profile.apparence.targetHostileOnly end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.targetHostileOnly = value; Ovale:UpdateFrame() end
-				},
-				highlightIcon =
-				{
-					order = 14,
-					type = "toggle",
-					name = L["Illuminer l'icône"],
-					desc = L["Illuminer l'icône quand la technique doit être spammée"],
-					get = function(info) return OvaleOptions.db.profile.apparence.highlightIcon end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.highlightIcon = value; Ovale:UpdateFrame() end
-				},
 				clickThru =
 				{
-					order = 15,
+					order = 20,
 					type = "toggle",
 					name = L["Ignorer les clics souris"],
 					get = function(info) return OvaleOptions.db.profile.apparence.clickThru end,
 					set = function(info, value) OvaleOptions.db.profile.apparence.clickThru = value; Ovale:UpdateFrame() end
 				},
+				visibility =
+				{
+					order = 30,
+					type = "group",
+					name = L["Visibilité"],
+					args =
+					{
+						combatUniquement =
+						{
+							order = 10,
+							type = "toggle",
+							name = L["En combat uniquement"],
+							get = function(info) return OvaleOptions.db.profile.apparence.enCombat end,
+							set = function(info, v) OvaleOptions.db.profile.apparence.enCombat = v; Ovale:UpdateVisibility() end,
+						},
+						targetOnly =
+						{
+							order = 20,
+							type = "toggle",
+							name = L["Si cible uniquement"],
+							get = function(info) return OvaleOptions.db.profile.apparence.avecCible end,
+							set = function(info, v) OvaleOptions.db.profile.apparence.avecCible = v; Ovale:UpdateVisibility() end,
+						},
+						targetHostileOnly =
+						{
+							order = 30,
+							type = "toggle",
+							name = L["Cacher si cible amicale ou morte"],
+							get = function(info) return OvaleOptions.db.profile.apparence.targetHostileOnly end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.targetHostileOnly = value; Ovale:UpdateFrame() end
+						},
+						hideVehicule =
+						{
+							order = 40,
+							type = "toggle",
+							name = L["Cacher dans les véhicules"],
+							get = function(info) return OvaleOptions.db.profile.apparence.hideVehicule end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.hideVehicule = value end
+						},
+						hideEmpty =
+						{
+							order = 50,
+							type = "toggle",
+							name = L["Cacher bouton vide"],
+							get = function(info) return OvaleOptions.db.profile.apparence.hideEmpty end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.hideEmpty = value; Ovale:UpdateFrame() end
+						},
+					},
+				},
+				iconAppearance =
+				{
+					order = 40,
+					type = "group",
+					name = L["Icône"],
+					args =
+					{
+						iconScale =
+						{
+							order = 10,
+							type = "range",
+							name = L["Taille des icônes"],
+							desc = L["La taille des icônes"],
+							min = 0.1, max = 16, step = 0.1,
+							get = function(info) return OvaleOptions.db.profile.apparence.iconScale end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.iconScale = value; Ovale:UpdateFrame() end
+						},
+						smallIconScale =
+						{
+							order = 20,
+							type = "range",
+							name = L["Taille des petites icônes"],
+							desc = L["La taille des petites icônes"],
+							min = 0.1, max = 16, step = 0.1,
+							get = function(info) return OvaleOptions.db.profile.apparence.smallIconScale end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.smallIconScale = value; Ovale:UpdateFrame() end
+						},
+						fontScale =
+						{
+							order = 30,
+							type = "range",
+							name = L["Taille des polices"],
+							desc = L["La taille des polices"],
+							min = 0.1, max = 2, step = 0.1,
+							get = function(info) return OvaleOptions.db.profile.apparence.fontScale end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.fontScale = value; Ovale:UpdateFrame() end
+						},
+						alpha =
+						{
+							order = 40,
+							type = "range",
+							name = L["Opacité des icônes"],
+							min = 0, max = 100, step = 5,
+							get = function(info) return OvaleOptions.db.profile.apparence.alpha * 100 end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.alpha = value/100; Ovale.frame.frame:SetAlpha(value/100) end
+						},
+						raccourcis =
+						{
+							order = 50,
+							type = "toggle",
+							name = L["Raccourcis clavier"],
+							desc = L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"],
+							get = function(info) return OvaleOptions.db.profile.apparence.raccourcis end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.raccourcis = value end
+						},
+						numeric =
+						{
+							order = 60,
+							type = "toggle",
+							name = L["Affichage numérique"],
+							desc = L["Affiche le temps de recharge sous forme numérique"],
+							get = function(info) return OvaleOptions.db.profile.apparence.numeric end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.numeric = value end
+						},
+						highlightIcon =
+						{
+							order = 70,
+							type = "toggle",
+							name = L["Illuminer l'icône"],
+							desc = L["Illuminer l'icône quand la technique doit être spammée"],
+							get = function(info) return OvaleOptions.db.profile.apparence.highlightIcon end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.highlightIcon = value; Ovale:UpdateFrame() end
+						},
+						flashIcon =
+						{
+							order = 80,
+							type = "toggle",
+							name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
+							get = function(info) return OvaleOptions.db.profile.apparence.flashIcon end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.flashIcon = value; Ovale:UpdateFrame() end
+						},
+						targetText =
+						{
+							order = 90,
+							type = "input",
+							name = L["Caractère de portée"],
+							desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
+							get = function(info) return OvaleOptions.db.profile.apparence.targetText end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.targetText = value; Ovale:UpdateFrame() end
+						}
+					},
+				},
+				iconGroupAppearance =
+				{
+					order = 50,
+					type = "group",
+					name = L["Groupe d'icônes"],
+					args =
+					{
+						moving =
+						{
+							order = 10,
+							type = "toggle",
+							name = L["Défilement"],
+							desc = L["Les icônes se déplacent"],
+							get = function(info) return OvaleOptions.db.profile.apparence.moving end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.moving = value; Ovale:UpdateFrame() end
+						},
+						vertical =
+						{
+							order = 20,
+							type = "toggle",
+							name = L["Vertical"],
+							get = function(info) return OvaleOptions.db.profile.apparence.vertical end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.vertical = value; Ovale:UpdateFrame() end
+						},
+						margin =
+						{
+							order = 30,
+							type = "range",
+							name = L["Marge entre deux icônes"],
+							min = -16, max = 64, step = 1,
+							get = function(info) return OvaleOptions.db.profile.apparence.margin end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.margin = value; Ovale:UpdateFrame() end
+						},
+					},
+				},
+				optionsAppearance =
+				{
+					order = 60,
+					type = "group",
+					name = L["Options"],
+					args =
+					{
+						iconShiftX =
+						{
+							order = 10,
+							type = "range",
+							name = L["Décalage horizontal des options"],
+							min = -256, max = 256, step = 1,
+							get = function(info) return OvaleOptions.db.profile.apparence.iconShiftX end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.iconShiftX = value; Ovale:UpdateFrame() end
+						},
+						iconShiftY =
+						{
+							order = 20,
+							type = "range",
+							name = L["Décalage vertical des options"],
+							min = -256, max = 256, step = 1,
+							get = function(info) return OvaleOptions.db.profile.apparence.iconShiftY end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.iconShiftY = value; Ovale:UpdateFrame() end
+						},
+						optionsAlpha =
+						{
+							order = 30,
+							type = "range",
+							name = L["Opacité des options"],
+							min = 0, max = 100, step = 5,
+							get = function(info) return OvaleOptions.db.profile.apparence.optionsAlpha * 100 end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.optionsAlpha = value/100; Ovale.frame.content:SetAlpha(value/100) end
+						},
+					},
+				},
+				predictiveIcon =
+				{
+					order = 70,
+					type = "group",
+					name = L["Prédictif"],
+					args =
+					{
+						predictif =
+						{
+							order = 10,
+							type = "toggle",
+							name = L["Prédictif"],
+							desc = L["Affiche les deux prochains sorts et pas uniquement le suivant"],
+							get = function(info) return OvaleOptions.db.profile.apparence.predictif end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.predictif = value; Ovale:UpdateFrame() end
+						},
+						secondIconScale =
+						{
+							order = 20,
+							type = "range",
+							name = L["Taille du second icône"],
+							min = 0.2, max = 1, step = 0.1,
+							get = function(info) return OvaleOptions.db.profile.apparence.secondIconScale end,
+							set = function(info,value) OvaleOptions.db.profile.apparence.secondIconScale = value; Ovale:UpdateFrame() end
+						},
+					},
+				},
 				latencyCorrection =
 				{
-					order = 16,
+					order = 80,
 					type = "toggle",
 					name = L["Correction de la latence"],
 					get = function(info) return OvaleOptions.db.profile.apparence.latencyCorrection end,
 					set = function(info, value) OvaleOptions.db.profile.apparence.latencyCorrection = value end
 				},
-				hideVehicule =
-				{
-					order = 17,
-					type = "toggle",
-					name = L["Cacher dans les véhicules"],
-					get = function(info) return OvaleOptions.db.profile.apparence.hideVehicule end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.hideVehicule = value end
-				},
-				flashIcon =
-				{
-					order = 18,
-					type = "toggle",
-					name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
-					get = function(info) return OvaleOptions.db.profile.apparence.flashIcon end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.flashIcon = value; Ovale:UpdateFrame() end
-				},
-				targetText =
-				{
-					order = 19,
-					type = "input",
-					name = L["Caractère de portée"],
-					desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
-					get = function(info) return OvaleOptions.db.profile.apparence.targetText end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.targetText = value; Ovale:UpdateFrame() end
-				}
 			}
 		},
 		code =
@@ -287,7 +320,7 @@ local self_options =
 			args = 
 			{
 				source = {
-					order = 0,
+					order = 10,
 					type = "select",
 					name = L["Script"],
 					width = "double",
@@ -307,7 +340,7 @@ local self_options =
 				},
 				code = 
 				{
-					order = 1,
+					order = 20,
 					type = "input",
 					multiline = 15,
 					name = L["Code"],
@@ -333,7 +366,7 @@ local self_options =
 				},
 				copy =
 				{
-					order = 2,
+					order = 30,
 					type = "execute",
 					name = L["Copier sur Script personnalisé"],
 					disabled = function()
