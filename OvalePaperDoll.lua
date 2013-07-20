@@ -121,14 +121,14 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStats")
 	self:RegisterEvent("SPELL_POWER_CHANGED")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
-	self:RegisterEvent("UNIT_DAMAGE", "UpdateDamageMultiplier")
+	self:RegisterEvent("UNIT_DAMAGE", "UpdateDamage")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_STATS")
-	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateWeaponDamage")
-	self:RegisterMessage("Ovale_StanceChanged", "UpdateWeaponDamage")
+	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
+	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
 end
 
 function OvalePaperDoll:OnDisable()
@@ -157,9 +157,9 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	self.stat.rangedCrit = API_GetRangedCritChance()
 	self.stat.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 	self.stat.snapshotTime = Ovale.now
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: melee critical strike chance = %f%%", self.stat.snapshotTime, self.stat.meleeCrit)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: ranged critical strike chance = %f%%", self.stat.snapshotTime, self.stat.rangedCrit)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: spell critical strike chance = %f%%", self.stat.snapshotTime, self.stat.spellCrit)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: melee critical strike chance = %f%%", event, self.stat.meleeCrit)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: ranged critical strike chance = %f%%", event, self.stat.rangedCrit)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: spell critical strike chance = %f%%", event, self.stat.spellCrit)
 end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
@@ -168,25 +168,25 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 	else
 		self.stat.masteryEffect = API_GetMasteryEffect()
 		self.stat.snapshotTime = Ovale.now
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: mastery effect = %f%%", self.stat.snapshotTime, self.stat.masteryEffect)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: mastery effect = %f%%", event, self.stat.masteryEffect)
 	end
 end
 
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
 	self.level = tonumber(level) or API_UnitLevel("player")
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: level = %d", Ovale.now, self.level)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: level = %d", Ovale.now, self.level)
 end
 
 function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
 	self.stat.spellBonusHealing = API_GetSpellBonusHealing()
 	self.stat.snapshotTime = Ovale.now
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: spell bonus healing = %d", self.stat.snapshotTime, self.stat.spellBonusHealing)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: spell bonus healing = %d", event, self.stat.spellBonusHealing)
 end
 
 function OvalePaperDoll:SPELL_POWER_CHANGED(event)
 	self.stat.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 	self.stat.snapshotTime = Ovale.now
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: spell bonus damage = %d", self.stat.snapshotTime, self.stat.spellBonusDamage)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: spell bonus damage = %d", event, self.stat.spellBonusDamage)
 end
 
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
@@ -194,14 +194,15 @@ function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 		local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 		self.stat.attackPower = base + posBuff + negBuff
 		self.stat.snapshotTime = Ovale.now
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: attack power = %d", self.stat.snapshotTime, self.stat.attackPower)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: attack power = %d", event, self.stat.attackPower)
+		self:UpdateDamage(event)
 	end
 end
 
 function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId == "player" then
 		self.level = API_UnitLevel(unitId)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: level = %d", Ovale.now, self.level)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: level = %d", Ovale.now, self.level)
 	end
 end
 
@@ -209,7 +210,7 @@ function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId == "player" then
 		self.stat.rangedHaste = API_GetRangedHaste()
 		self.stat.snapshotTime = Ovale.now
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: ranged haste effect = %f%%", self.stat.snapshotTime, self.stat.rangedHaste)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: ranged haste effect = %f%%", event, self.stat.rangedHaste)
 	end
 end
 
@@ -218,7 +219,7 @@ function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 		local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
 		self.stat.rangedAttackPower = base + posBuff + negBuff
 		self.stat.snapshotTime = Ovale.now
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: ranged attack power = %d", self.stat.snapshotTime, self.stat.rangedAttackPower)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: ranged attack power = %d", event, self.stat.rangedAttackPower)
 	end
 end
 
@@ -227,8 +228,9 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		self.stat.meleeHaste = API_GetMeleeHaste()
 		self.stat.spellHaste = API_UnitSpellHaste(unitId)
 		self.stat.snapshotTime = Ovale.now
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: melee haste effect = %f%%", self.stat.snapshotTime, self.stat.meleeHaste)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: spell haste effect = %f%%", self.stat.snapshotTime, self.stat.spellHaste)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: melee haste effect = %f%%", event, self.stat.meleeHaste)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: spell haste effect = %f%%", event, self.stat.spellHaste)
+		self:UpdateDamage(event)
 	end
 end
 
@@ -240,29 +242,19 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 	self.stat.intellect = API_UnitStat(unitId, 4)
 	self.stat.spirit = API_UnitStat(unitId, 5)
 	self.stat.snapshotTime = Ovale.now
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: agility = %d", self.stat.snapshotTime, self.stat.agility)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: intellect = %d", self.stat.snapshotTime, self.stat.intellect)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: spirit = %d", self.stat.snapshotTime, self.stat.spirit)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: stamina = %d", self.stat.snapshotTime, self.stat.stamina)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: strength = %d", self.stat.snapshotTime, self.stat.strength)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: agility = %d", event, self.stat.agility)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: intellect = %d", event, self.stat.intellect)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: spirit = %d", event, self.stat.spirit)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: stamina = %d", event, self.stat.stamina)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: strength = %d", event, self.stat.strength)
 	self:COMBAT_RATING_UPDATE(event)
 end
 
-function OvalePaperDoll:UpdateDamageMultiplier(event)
-	self.stat.damageMultiplier = select(7, API_UnitDamage("player"))
-	self.stat.snapshotTime = Ovale.now
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: damage multiplier = %f", self.stat.snapshotTime, self.stat.damageMultiplier)
-end
-
-function OvalePaperDoll:UpdateWeaponDamage(event)
+function OvalePaperDoll:UpdateDamage(event)
 	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, _, _, damageMultiplier = API_UnitDamage("player")
 	local mainHandAttackSpeed, offHandAttackSpeed = API_UnitAttackSpeed("player")
 
-	-- Update stats used by the computation (damage multiplier, AP & melee haste)
 	self.stat.damageMultiplier = damageMultiplier
-	self:UNIT_ATTACK_POWER(event, "player")
-	self:UNIT_SPELL_HASTE(event, "player")
-
 	if self.class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		-- Cat Form: 100% increased auto-attack damage.
 		damageMultiplier = damageMultiplier * 2
@@ -308,8 +300,9 @@ function OvalePaperDoll:UpdateWeaponDamage(event)
 	end
 	self.stat.snapshotTime = Ovale.now
 
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: weapon damage (mainhand): %f", self.stat.snapshotTime, stat.mainHandWeaponDamage)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%f: weapon damage (offhand): %f", self.stat.snapshotTime, stat.offHandWeaponDamage)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: damage multiplier = %f", event, self.stat.damageMultiplier)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: weapon damage (mainhand): %f", event, self.stat.mainHandWeaponDamage)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s: weapon damage (offhand): %f", event, self.stat.offHandWeaponDamage)
 end
 
 function OvalePaperDoll:UpdateStats(event)
@@ -323,8 +316,7 @@ function OvalePaperDoll:UpdateStats(event)
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_STATS(event, "player")
-	self:UpdateDamageMultiplier(event)
-	self:UpdateWeaponDamage(event)
+	self:UpdateDamage(event)
 end
 
 function OvalePaperDoll:GetMasteryMultiplier()
