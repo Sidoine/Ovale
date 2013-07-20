@@ -3176,6 +3176,9 @@ end
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
 -- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=target.
+--     Valid values: player, target, focus, pet.
 -- @return The amount of threat.
 -- @return A boolean value for the result of the comparison.
 -- @usage
@@ -3183,7 +3186,7 @@ end
 -- if Threat(more 90) Spell(fade)
 
 OvaleCondition.conditions.threat = function(condition)
-	local isTanking, status, threatpct = API_UnitDetailedThreatSituation("player", GetTarget(condition))
+	local isTanking, status, threatpct = API_UnitDetailedThreatSituation("player", GetTarget(condition, "target"))
 	return Compare(threatpct, condition[1], condition[2])
 end
 
