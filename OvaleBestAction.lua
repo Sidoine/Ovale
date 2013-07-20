@@ -418,8 +418,16 @@ end
 local function ComputeNot(element)
 	local self = OvaleBestAction
 	local startA, endA = self:ComputeBool(element.a)
-	if startA then
+	--[[
+		NOT start < t < ending    ==>  0 < t < start  OR  ending < t < infinity
+		NOT start < t < infinity  ==>  0 < t < start
+		NOT nil                   ==>  0 < t < infinity
+	]]--
+	if startA and endA then
+		-- TODO: This is not quite right since we ignore 0 < t < startA.
 		return endA, nil
+	elseif startA then
+		return 0, startA
 	else
 		return 0, nil
 	end
