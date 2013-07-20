@@ -459,6 +459,12 @@ end
 --</private-static-methods>
 
 --<public-static-properties>
+
+-- The actual target referenced when the "target" parameter is used in a condition.
+-- This is to support setting a different target in an AddIcon "target" parameter,
+-- e.g., target=focus, while re-using the same script.
+OvaleCondition.defaultTarget = "target"
+
 --[[----------------------------------------------------------------------------
 	Script conditions.
 
@@ -3500,7 +3506,4 @@ OvaleCondition.conditions.weapondamage = function(condition)
 	end
 	return 0, nil, damage, 0, 0
 end
-
-OvaleCondition.defaultTarget = "target"
-
 --</public-static-properties>
