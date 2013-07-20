@@ -115,7 +115,7 @@ end
 local function ComputeAnd(element)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local startA, endA, priorityA, elementA = self:ComputeBool(element.a)
+	local startA, endA = self:ComputeBool(element.a)
 	if not startA then
 		Ovale:Logf("%s return nil [%d]", element.type, element.nodeId)
 		return nil
@@ -648,7 +648,7 @@ local function ComputeTime(element)
 end
 
 local function ComputeUnless(element)
-	Ovale:Log(element.type)
+	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
 	local startA, endA = self:ComputeBool(element.a)
 	local startB, endB, prioriteB, elementB = self:Compute(element.b)
@@ -656,13 +656,16 @@ local function ComputeUnless(element)
 	if elementB and elementB.wait and isBetween(OvaleState.currentTime, startA, endA) then
 		elementB.wait = nil
 	end
-
+	-- unless {t: startA < t < endA} then {t: startB < t < endB}
+	-- if not {t: startA < t < endA} then {t: startB < t < endB}
+	-- if {t: t < startA} or {t: t > endA} then {t: startB < t < endB}
+	-- {t: t < startA and startB < t < endB} or {t: startB < t < endB and endA < t}
 	if isBeforeEqual(startA, startB) and isAfterEqual(endA, endB) then
-		Ovale:Logf("%s return nil", element.type)
+		Ovale:Logf("%s return nil [%d]", element.type, element.nodeId)
 		return nil
 	end
 	if isAfterEqual(startA, startB) and isBefore(endA, endB) then
-		Ovale:Logf("%s return %s, %s", element.type, endA, endB)
+		Ovale:Logf("%s return %s, %s [%d]", element.type, endA, endB, element.nodeId)
 		return endA, endB, prioriteB, elementB
 	end
 	if isAfter(startA, startB) and isBefore(startA, endB) then
@@ -671,7 +674,7 @@ local function ComputeUnless(element)
 	if isAfter(endA, startB) and isBefore(endA, endB) then
 		startB = endA
 	end
-	Ovale:Logf("%s return %s, %s", element.type, startB, endB)
+	Ovale:Logf("%s return %s, %s [%d]", element.type, startB, endB, element.nodeId)
 	return startB, endB, prioriteB, elementB
 end
 
