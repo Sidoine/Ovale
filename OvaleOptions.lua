@@ -463,6 +463,12 @@ local self_options =
 							desc = L["Debug missing spells"],
 							type = "toggle",
 						},
+						paper_doll =
+						{
+							name = "Paper doll updates",
+							desc = L["Debug paper doll"],
+							type = "toggle",
+						},
 						unknown_function =
 						{
 							name = "Unknown functions",
