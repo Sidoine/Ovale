@@ -2610,6 +2610,23 @@ OvaleCondition.conditions.otherdebuffremains = function(condition)
 end
 OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebuffremains
 
+--- Get the resource cost of the given spell.
+-- @name PowerCost
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The amount of power (energy, focus, rage, etc.).
+-- @see EnergyCost
+-- @usage
+-- if Energy() > PowerCost(rake) Spell(rake)
+
+OvaleCondition.conditions.powercost = function(condition)
+	local cost = select(4, API_GetSpellInfo(condition[1])) or 0
+	return 0, nil, cost, 0, 0
+end
+OvaleCondition.conditions.energycost = OvaleCondition.conditions.powercost
+OvaleCondition.spellbookConditions.energycost = true
+OvaleCondition.spellbookConditions.powercost = true
+
 --- Test if the target exists and is alive.
 -- @name Present
 -- @paramsig boolean
@@ -3329,16 +3346,31 @@ OvaleCondition.conditions.timetodie = function(condition)
 end
 OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
 
+--- Get the number of seconds before the player has enough energy to cast the given spell.
+-- @name TimeToEnergyFor
+-- @paramsig number
+-- @param id The spell ID.
+-- @return The number of seconds.
+-- @see TimeToMaxEnergy
+
+OvaleCondition.conditions.timetoenergyfor = function(condition)
+	local cost = select(4, API_GetSpellInfo(condition[1])) or 0
+	if OvaleState.state.energy < cost then
+		local t = OvaleState.currentTime + (cost - OvaleState.state.energy) / OvaleState.powerRate.energy
+		return 0, nil, 0, t, -1
+	else
+		return 0, nil, 0, 0, 0
+	end
+end
+OvaleCondition.spellbookConditions.timetoenergyfor = true
+
 --- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
 -- @name TimeToMaxEnergy
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
--- @param number Optional. The number to compare against.
 -- @return The number of seconds.
--- @return A boolean value for the result of the comparison.
+-- @see TimeToEnergyFor
 -- @usage
--- if TimeInToMaxEnergy() < 1.2 Spell(sinister_strike)
--- if TimeInToMaxEnergy(less 1.2) Spell(sinister_strike)
+-- if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
 
 OvaleCondition.conditions.timetomaxenergy = function(condition)
 	local maxEnergy = API_UnitPowerMax("player", OVALE_POWERTYPE_ENERGY) or 0
