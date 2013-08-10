@@ -71,15 +71,19 @@ local OVALE_CLEU_SPELLCAST_RESULTS = {
 OvaleFuture.counter = {}
 -- Most recent latency (time between UNIT_SPELLCAST_SENT and UNIT_SPELLCAST_SUCCEEDED events).
 OvaleFuture.latency = 0
--- Debugging: spell ID to trace
-OvaleFuture.traceSpellId = nil
+-- Debugging: spells to trace
+OvaleFuture.traceSpellList = nil
 --</public-static-properties>
 
 --<private-static-methods>
 local function TracePrintf(spellId, ...)
 	local self = OvaleFuture
-	if self.traceSpellId then
-		if (self.traceSpellId == spellId) or (type(spellId) == "string" and OvaleData:GetSpellName(self.traceSpellId) == spellId) then
+	if self.traceSpellList then
+		local name = spellId
+		if type(spellId) == "number" then
+			name = OvaleData:GetSpellName(spellId)
+		end
+		if self.traceSpellList[spellId] or self.traceSpellList[name] then
 			Ovale:FormatPrint(...)
 		end
 	end

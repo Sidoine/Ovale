@@ -22,6 +22,7 @@ local OvaleScripts = Ovale.OvaleScripts
 local strgmatch = string.gmatch
 local strgsub = string.gsub
 local tostring = tostring
+local API_GetSpellInfo = GetSpellInfo
 --</private-static-properties>
 
 --<public-static-properties>
@@ -405,11 +406,64 @@ local self_options =
 					{
 						trace =
 						{
-							name = "Trace",
+							order = 10,
 							type = "execute",
 							name = "Trace next frame",
-							func = function()
-								Ovale.trace = true
+							func = function() Ovale.trace = true end,
+						},
+						traceSpellId =
+						{
+							order = 20,
+							type = "input",
+							dialogControl = "Aura_EditBox",
+							name = "Trace spellcast",
+							desc = "Names or spell IDs of spellcasts to watch, separated by semicolons.",
+							get = function(info)
+								local OvaleFuture = Ovale.OvaleFuture
+								if OvaleFuture then
+									local t = OvaleFuture.traceSpellList or {}
+									local s = ""
+									for k, v in pairs(t) do
+										if type(v) == "boolean" then
+											if string.len(s) == 0 then
+												s = k
+											else
+												s = s .. "; " .. k
+											end
+										end
+									end
+									return s
+								else
+									return ""
+								end
+							end,
+							set = function(info, value)
+								local OvaleFuture = Ovale.OvaleFuture
+								if OvaleFuture then
+									local t = {}
+									for s in strgmatch(value, "[^;]+") do
+										-- strip leading and trailing whitespace
+										s = strgsub(s, "^%s*", "")
+										s = strgsub(s, "%s*$", "")
+										if string.len(s) > 0 then
+											local v = tonumber(s)
+											if v then
+												s = API_GetSpellInfo(v)
+												if s then
+													t[v] = true
+													t[s] = v
+												end
+											else
+												t[s] = true
+											end
+										end
+									end
+									if next(t) then
+										OvaleFuture.traceSpellList = t
+									else
+										OvaleFuture.traceSpellList = nil
+									end
+								end
 							end,
 						},
 					},
