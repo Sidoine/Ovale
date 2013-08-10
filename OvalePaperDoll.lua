@@ -15,6 +15,8 @@ Ovale.OvalePaperDoll = OvalePaperDoll
 
 --<private-static-properties>
 local OvaleEquipement = Ovale.OvaleEquipement
+local OvalePool = Ovale.OvalePool
+local OvaleQueue = Ovale.OvaleQueue
 local OvaleStance = Ovale.OvaleStance
 
 local select = select
@@ -36,6 +38,13 @@ local API_UnitLevel = UnitLevel
 local API_UnitRangedAttackPower = UnitRangedAttackPower
 local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
+
+-- Snapshot table pool.
+local self_pool = OvalePool:NewPool("OvalePaperDoll_pool")
+-- Snapshot queue: new snapshots are inserted at the front of the queue.
+local self_snapshot = OvaleQueue:NewDeque("OvalePaperDoll_snapshot")
+-- Time window (past number of seconds) for which snapshots are stored.
+local SNAPSHOT_WINDOW = 5
 
 local OVALE_PAPERDOLL_DEBUG = "paper_doll"
 local OVALE_SPELLDAMAGE_SCHOOL = {
@@ -97,14 +106,37 @@ OvalePaperDoll.level = API_UnitLevel("player")
 -- Player's current specialization.
 OvalePaperDoll.specialization = nil
 -- Most recent snapshot.
-OvalePaperDoll.stat = {}
-do
-	for k in pairs(OVALE_SNAPSHOT_STATS) do
-		OvalePaperDoll.stat[k] = 0
-	end
-	OvalePaperDoll.stat.damageMultiplier = 1
-end
+OvalePaperDoll.stat = nil
 --</public-static-properties>
+
+--<private-static-methods>
+-- Return stat table for most recent snapshot no older than the given time.
+local function GetSnapshot(t)
+	local self = OvalePaperDoll
+	self:RemoveOldSnapshots()
+	local stat = self_snapshot:Front()
+	if not stat then
+		local newStat = self_pool:Get()
+		do
+			-- Initialize stat table.
+			for k in pairs(OVALE_SNAPSHOT_STATS) do
+				newStat[k] = 0
+			end
+			newStat.damageMultiplier = 1
+		end
+		newStat.snapshotTime = Ovale.now
+		self_snapshot:InsertFront(newStat)
+		stat = self_snapshot:Front()
+	elseif stat.snapshotTime < t then
+		local newStat = self_pool:Get()
+		self:SnapshotStats(newStat, stat)
+		newStat.snapshotTime = Ovale.now
+		self_snapshot:InsertFront(newStat)
+		stat = self_snapshot:Front()
+	end
+	return stat
+end
+--</private-static-methods>
 
 --<public-static-methods>
 function OvalePaperDoll:OnEnable()
@@ -115,6 +147,7 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStats")
 	self:RegisterEvent("SPELL_POWER_CHANGED")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
@@ -126,6 +159,7 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("UNIT_STATS")
 	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
 	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
+	self.stat = GetSnapshot(Ovale.now)
 end
 
 function OvalePaperDoll:OnDisable()
@@ -136,6 +170,7 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("PLAYER_DAMAGE_DONE_MODS")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_LEVEL_UP")
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("SPELL_POWER_CHANGED")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
@@ -150,10 +185,10 @@ function OvalePaperDoll:OnDisable()
 end
 
 function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
+	self.stat = GetSnapshot(Ovale.now)
 	self.stat.meleeCrit = API_GetCritChance()
 	self.stat.rangedCrit = API_GetRangedCritChance()
 	self.stat.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
-	self.stat.snapshotTime = Ovale.now
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.meleeCrit, self.stat.meleeCrit)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.rangedCrit, self.stat.rangedCrit)
@@ -161,11 +196,11 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
+	self.stat = GetSnapshot(Ovale.now)
 	if self.level < 80 then
 		self.stat.masteryEffect = 0
 	else
 		self.stat.masteryEffect = API_GetMasteryEffect()
-		self.stat.snapshotTime = Ovale.now
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: %s = %f%%",
 			event, Ovale.now, OVALE_SNAPSHOT_STATS.masteryEffect, self.stat.masteryEffect)
 	end
@@ -177,24 +212,28 @@ function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
 end
 
 function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
+	self.stat = GetSnapshot(Ovale.now)
 	self.stat.spellBonusHealing = API_GetSpellBonusHealing()
-	self.stat.snapshotTime = Ovale.now
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: %s = %d",
 		event, Ovale.now, OVALE_SNAPSHOT_STATS.spellBonusHealing, self.stat.spellBonusHealing)
 end
 
+function OvalePaperDoll:PLAYER_REGEN_ENABLED(event)
+	self_pool:Drain()
+end
+
 function OvalePaperDoll:SPELL_POWER_CHANGED(event)
+	self.stat = GetSnapshot(Ovale.now)
 	self.stat.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
-	self.stat.snapshotTime = Ovale.now
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: %s = %d",
 		event, Ovale.now, OVALE_SNAPSHOT_STATS.spellBonusDamage, self.stat.spellBonusDamage)
 end
 
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	if unitId == "player" then
+		self.stat = GetSnapshot(Ovale.now)
 		local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 		self.stat.attackPower = base + posBuff + negBuff
-		self.stat.snapshotTime = Ovale.now
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: %s = %d",
 			event, Ovale.now, OVALE_SNAPSHOT_STATS.attackPower, self.stat.attackPower)
 		self:UpdateDamage(event)
@@ -210,8 +249,8 @@ end
 
 function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId == "player" then
+		self.stat = GetSnapshot(Ovale.now)
 		self.stat.rangedHaste = API_GetRangedHaste()
-		self.stat.snapshotTime = Ovale.now
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: %s = %f%%",
 			event, Ovale.now, OVALE_SNAPSHOT_STATS.rangedHaste, self.stat.rangedHaste)
 	end
@@ -220,8 +259,8 @@ end
 function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 	if unitId == "player" then
 		local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
+		self.stat = GetSnapshot(Ovale.now)
 		self.stat.rangedAttackPower = base + posBuff + negBuff
-		self.stat.snapshotTime = Ovale.now
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: %s = %d",
 			event, Ovale.now, OVALE_SNAPSHOT_STATS.rangedAttackPower, self.stat.rangedAttackPower)
 	end
@@ -229,9 +268,9 @@ end
 
 function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 	if unitId == "player" then
+		self.stat = GetSnapshot(Ovale.now)
 		self.stat.meleeHaste = API_GetMeleeHaste()
 		self.stat.spellHaste = API_UnitSpellHaste(unitId)
-		self.stat.snapshotTime = Ovale.now
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.meleeHaste, self.stat.meleeHaste)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.spellHaste, self.stat.spellHaste)
@@ -240,26 +279,28 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 end
 
 function OvalePaperDoll:UNIT_STATS(event, unitId)
-	if unitId ~= "player" then return end
-	self.stat.strength = API_UnitStat(unitId, 1)
-	self.stat.agility = API_UnitStat(unitId, 2)
-	self.stat.stamina = API_UnitStat(unitId, 3)
-	self.stat.intellect = API_UnitStat(unitId, 4)
-	self.stat.spirit = API_UnitStat(unitId, 5)
-	self.stat.snapshotTime = Ovale.now
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.agility, self.stat.agility)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.intellect, self.stat.intellect)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.spirit, self.stat.spirit)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.stamina, self.stat.stamina)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.strength, self.stat.strength)
-	self:COMBAT_RATING_UPDATE(event)
+	if unitId == "player" then
+		self.stat = GetSnapshot(Ovale.now)
+		self.stat.strength = API_UnitStat(unitId, 1)
+		self.stat.agility = API_UnitStat(unitId, 2)
+		self.stat.stamina = API_UnitStat(unitId, 3)
+		self.stat.intellect = API_UnitStat(unitId, 4)
+		self.stat.spirit = API_UnitStat(unitId, 5)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.agility, self.stat.agility)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.intellect, self.stat.intellect)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.spirit, self.stat.spirit)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.stamina, self.stat.stamina)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", OVALE_SNAPSHOT_STATS.strength, self.stat.strength)
+		self:COMBAT_RATING_UPDATE(event)
+	end
 end
 
 function OvalePaperDoll:UpdateDamage(event)
 	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, _, _, damageMultiplier = API_UnitDamage("player")
 	local mainHandAttackSpeed, offHandAttackSpeed = API_UnitAttackSpeed("player")
 
+	self.stat = GetSnapshot(Ovale.now)
 	self.stat.damageMultiplier = damageMultiplier
 	if self.class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		-- Cat Form: 100% increased auto-attack damage.
@@ -304,7 +345,6 @@ function OvalePaperDoll:UpdateDamage(event)
 	else
 		self.stat.offHandWeaponDamage = 0
 	end
-	self.stat.snapshotTime = Ovale.now
 
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.damageMultiplier, self.stat.damageMultiplier)
@@ -342,22 +382,35 @@ function OvalePaperDoll:GetSpellHasteMultiplier()
 	return 1 + self.stat.spellHaste / 100
 end
 
--- Snapshot the stats into the given table using the same keynames as self.stat.
--- If source is nil, then use the current player stats; otherwise, use the given stat table.
+-- Snapshot the stats into the given table using the same keynames as OVALE_SNAPSHOT_STATS.
+-- If source is nil, then use the most recent player stats; otherwise, use the given stat table.
 function OvalePaperDoll:SnapshotStats(t, source)
 	if not source then
 		self:UpdateStats()
-		source = self.stat
+		source = self_snapshot:Front()
 	end
 	for k in pairs(OVALE_SNAPSHOT_STATS) do
 		if source[k] then
 			t[k] = source[k]
 		end
 	end
-	-- Copy other properties that are relevant for auras that might be present.
+	-- Copy other properties that might be present that are relevant for auras.
 	-- TODO: Holy power?
 	if source.comboPoints then
 		t.comboPoints = source.comboPoints
+	end
+end
+
+-- Remove snapshots older than SNAPSHOT_WINDOW seconds from now, but always leave most recent snapshot.
+function OvalePaperDoll:RemoveOldSnapshots()
+	local now = Ovale.now
+	while self_snapshot:Size() > 1 do
+		local stat = self_snapshot:Back()
+		if stat then
+			if now - stat.snapshotTime < SNAPSHOT_WINDOW then break end
+			self_snapshot:RemoveBack()
+			self_pool:Release(stat)
+		end
 	end
 end
 
