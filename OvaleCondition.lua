@@ -2615,7 +2615,7 @@ OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebu
 -- @paramsig number
 -- @param id The spell ID.
 -- @return The amount of power (energy, focus, rage, etc.).
--- @see EnergyCost
+-- @see EnergyCost, FocusCost, ManaCost, RageCost
 -- @usage
 -- if Energy() > PowerCost(rake) Spell(rake)
 
@@ -2624,7 +2624,13 @@ OvaleCondition.conditions.powercost = function(condition)
 	return 0, nil, cost, 0, 0
 end
 OvaleCondition.conditions.energycost = OvaleCondition.conditions.powercost
+OvaleCondition.conditions.focuscost = OvaleCondition.conditions.powercost
+OvaleCondition.conditions.manacost = OvaleCondition.conditions.powercost
+OvaleCondition.conditions.ragecost = OvaleCondition.conditions.powercost
 OvaleCondition.spellbookConditions.energycost = true
+OvaleCondition.spellbookConditions.focuscost = true
+OvaleCondition.spellbookConditions.manacost = true
+OvaleCondition.spellbookConditions.ragecost = true
 OvaleCondition.spellbookConditions.powercost = true
 
 --- Test if the target exists and is alive.
@@ -3349,23 +3355,35 @@ OvaleCondition.conditions.timetodie = function(condition)
 end
 OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
 
---- Get the number of seconds before the player has enough energy to cast the given spell.
--- @name TimeToEnergyFor
+--- Get the number of seconds before the player has enough primary resources to cast the given spell.
+-- @name TimeToPowerFor
 -- @paramsig number
 -- @param id The spell ID.
 -- @return The number of seconds.
--- @see TimeToMaxEnergy
+-- @see TimeToEnergyFor, TimeToFocusFor, TimeToMaxEnergy
 
-OvaleCondition.conditions.timetoenergyfor = function(condition)
-	local cost = select(4, API_GetSpellInfo(condition[1])) or 0
-	if OvaleState.state.energy < cost then
-		local t = OvaleState.currentTime + (cost - OvaleState.state.energy) / OvaleState.powerRate.energy
-		return 0, nil, 0, t, -1
+OvaleCondition.conditions.timetopowerfor = function(condition)
+	local cost, _, powerType = select(4, API_GetSpellInfo(condition[1]))
+	local power = OvaleData.powerType[powerType]
+	local currentPower = OvaleState.state[power]
+	local powerRate = OvaleState.powerRate[power]
+	cost = cost or 0
+	if currentPower < cost then
+		if powerRate > 0 then
+			local t = OvaleState.currentTime + (cost - currentPower) / powerRate
+			return 0, nil, 0, t, -1
+		else
+			return 0, nil, OvaleState.currentTime + 3600, 0, 0
+		end
 	else
 		return 0, nil, 0, 0, 0
 	end
 end
+OvaleCondition.conditions.timetoenergyfor = OvaleCondition.conditions.timetopowerfor
+OvaleCondition.conditions.timetofocusfor = OvaleCondition.conditions.timetopowerfor
 OvaleCondition.spellbookConditions.timetoenergyfor = true
+OvaleCondition.spellbookConditions.timetofocusfor = true
+OvaleCondition.spellbookConditions.timetopowerfor = true
 
 --- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
 -- @name TimeToMaxEnergy
