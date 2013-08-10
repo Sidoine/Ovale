@@ -31,6 +31,35 @@ local self_nameToUnit = {}
 local OVALE_GUID_DEBUG = "guid"
 --</private-static-properties>
 
+--<public-static-properties>
+-- Units for which UNIT_AURA is known to fire.
+-- These are unit IDs that correspond to unit frames in the default WoW UI.
+OvaleGUID.UNIT_AURA_UNITS = {}
+do
+	local self = OvaleGUID
+	self.UNIT_AURA_UNITS["focus"] = true
+	self.UNIT_AURA_UNITS["pet"] = true
+	self.UNIT_AURA_UNITS["player"] = true
+	self.UNIT_AURA_UNITS["target"] = true
+
+	for i = 1, 5 do
+		self.UNIT_AURA_UNITS["arena" .. i] = true
+		self.UNIT_AURA_UNITS["arenapet" .. i] = true
+	end
+	for i = 1, 4 do
+		self.UNIT_AURA_UNITS["boss" .. i] = true
+	end
+	for i = 1, 4 do
+		self.UNIT_AURA_UNITS["party" .. i] = true
+		self.UNIT_AURA_UNITS["partypet" .. i] = true
+	end
+	for i = 1, 40 do
+		self.UNIT_AURA_UNITS["raid" .. i] = true
+		self.UNIT_AURA_UNITS["raidpet" .. i] = true
+	end
+end
+--</public-static-properties>
+
 --<public-static-methods>
 function OvaleGUID:OnEnable()
 	self:Update("player")
@@ -98,20 +127,30 @@ function OvaleGUID:GetGUIDForName(name)
 	return self_nameToGUID[name]
 end
 
+-- Return a unit Id associated with guid.
+-- Prefer to return a unit Id for which the WoW servers fire UNIT_AURA events.
 function OvaleGUID:GetUnitId(guid)
+	local unitIdFound = nil
 	local unitIdTable = self_unitId[guid]
-	if not unitIdTable then return nil end
-	for unitId in pairs(unitIdTable) do
-		if strfind(unitId, "mouseover") == 1 then
-			if API_UnitExists("mouseover") then
+	if unitIdTable then
+		for unitId in pairs(unitIdTable) do
+			if self.UNIT_AURA_UNITS[unitId] then
 				return unitId
-			else
-				unitIdTable[unitId] = nil
-				self_guid[unitId] = nil
+			elseif not unitIdFound then
+				if strfind(unitId, "mouseover") == 1 then
+					if API_UnitExists(unitId) then
+						unitIdFound = unitId
+					else
+						unitIdTable[unitId] = nil
+						self_guid[unitId] = nil
+					end
+				else
+					unitIdFound = unitId
+				end
 			end
 		end
 	end
-	return nil
+	return unitIdFound
 end
 
 function OvaleGUID:GetUnitIdForName(name)

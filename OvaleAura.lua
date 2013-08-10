@@ -56,30 +56,7 @@ local OVALE_DEBUFF_TYPES = {
 	Magic = true,
 	Poison = true,
 }
--- Units for which UNIT_AURA is known to fire.
-local OVALE_UNIT_AURA_UNITS = {}
-do
-	OVALE_UNIT_AURA_UNITS["focus"] = true
-	OVALE_UNIT_AURA_UNITS["pet"] = true
-	OVALE_UNIT_AURA_UNITS["player"] = true
-	OVALE_UNIT_AURA_UNITS["target"] = true
-
-	for i = 1, 5 do
-		OVALE_UNIT_AURA_UNITS["arena" .. i] = true
-		OVALE_UNIT_AURA_UNITS["arenapet" .. i] = true
-	end
-	for i = 1, 4 do
-		OVALE_UNIT_AURA_UNITS["boss" .. i] = true
-	end
-	for i = 1, 4 do
-		OVALE_UNIT_AURA_UNITS["party" .. i] = true
-		OVALE_UNIT_AURA_UNITS["partypet" .. i] = true
-	end
-	for i = 1, 40 do
-		OVALE_UNIT_AURA_UNITS["raid" .. i] = true
-		OVALE_UNIT_AURA_UNITS["raidpet" .. i] = true
-	end
-end
+local OVALE_UNIT_AURA_UNITS = OvaleGUID.UNIT_AURA_UNITS
 -- CLEU events triggered by auras being applied, removed, refreshed, or changed in stack size.
 local OVALE_CLEU_AURA_EVENTS = {
 	SPELL_AURA_APPLIED = true,
