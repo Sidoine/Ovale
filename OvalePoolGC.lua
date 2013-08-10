@@ -21,8 +21,9 @@ OvalePoolGC.unused = 0
 
 --<public-static-methods>
 function OvalePoolGC:NewPool(name)
-	obj = { name = name, size = 0, unused = 0 }
+	obj = { name = name }
 	setmetatable(obj, { __index = self })
+	obj:Reset()
 	return obj
 end
 
@@ -35,6 +36,11 @@ end
 -- The Release and Drain methods are no-ops.
 function OvalePoolGC:Release(item) end
 function OvalePoolGC:Drain() end
+
+function OvalePoolGC:Reset()
+	self.size = 0
+	self.unused = 0
+end
 
 function OvalePoolGC:Debug()
 	Ovale:FormatPrint("Pool %s has size %d.", self.name, self.size)

@@ -21,8 +21,9 @@ OvalePool.unused = 0
 
 --<public-static-methods>
 function OvalePool:NewPool(name)
-	obj = { name = name, pool = {}, size = 0, unused = 0 }
+	obj = { name = name }
 	setmetatable(obj, { __index = self })
+	obj:Reset()
 	return obj
 end
 
@@ -53,6 +54,12 @@ function OvalePool:Drain()
 		end
 	end
 	self.size = self.size - self.unused
+	self.unused = 0
+end
+
+function OvalePool:Reset()
+	self.pool = {}
+	self.size = 0
 	self.unused = 0
 end
 
