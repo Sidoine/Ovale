@@ -254,6 +254,7 @@ OvaleData.buffSpellList =
 		[34889] = true, -- Fire Breath (dragonhawk)
 		[93068] = true, -- Master Poisoner (rogue)
 		[104225] = true, -- Soulburn: Curse of the Elements (warlock)
+		[116202] = true, -- Aura of the Elements (warlock)
 	},
 	physical_vulnerability=
 	{
