@@ -99,8 +99,12 @@ function OvaleQueue:Reset()
 	self.last = -1
 end
 
+function OvaleQueue:Size()
+	return self.last - self.first + 1
+end
+
 function OvaleQueue:Debug()
-	Ovale:FormatPrint("Queue %s has %d item(s), first=%d, last=%d.", self.name, self.last - self.first + 1, self.first, self.last)
+	Ovale:FormatPrint("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
 end
 --</public-static-methods>
 
