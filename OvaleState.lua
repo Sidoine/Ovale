@@ -656,17 +656,16 @@ function OvaleState:NewAura(guid, spellId, filter)
 end
 
 function OvaleState:GetDamageMultiplier(spellId)
-	local damageMultiplier = OvalePaperDoll.stat.damageMultiplier
+	local damageMultiplier = OvalePaperDoll.stat.baseDamageMultiplier
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
 			local playerGUID = OvaleGUID:GetGUID("player")
-			local count
 			for filter, auraList in pairs(si.damageAura) do
 				for auraSpellId, multiplier in pairs(auraList) do
-					count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
+					local count = select(3, self:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
 					if count and count > 0 then
-						-- Try to account for a stacking aura.
+						-- TODO: Try to account for a stacking aura.
 						-- multiplier = 1 + (multiplier - 1) * count
 						damageMultiplier = damageMultiplier * multiplier
 					end

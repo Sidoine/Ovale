@@ -555,29 +555,6 @@ function OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 	return start, ending, count
 end
 
-function OvaleAura:GetDamageMultiplier(spellId)
-	-- Calculate the base damage multiplier for all spells.
-	local damageMultiplier = OvalePaperDoll.stat.damageMultiplier
-
-	-- Factor in the spell-specific multipliers from SpellDamage{Buff,Debuff} declarations.
-	if spellId then
-		local si = OvaleData.spellInfo[spellId]
-		if si and si.damageAura then
-			for filter, auraList in pairs(si.damageAura) do
-				for auraSpellId, multiplier in pairs(auraList) do
-					count = select(3, self:GetAuraByGUID(self_player_guid, auraSpellId, filter, nil, "player"))
-					if count and count > 0 then
-						-- Try to account for a stacking aura.
-						-- multiplier = 1 + (multiplier - 1) * count
-						damageMultiplier = damageMultiplier * multiplier
-					end
-				end
-			end
-		end
-	end
-	return damageMultiplier
-end
-
 function OvaleAura:Debug()
 	self_pool:Debug()
 	self_aura_pool:Debug()

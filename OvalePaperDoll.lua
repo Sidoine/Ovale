@@ -94,7 +94,7 @@ local OVALE_SNAPSHOT_STATS = {
 	-- normalized weapon damage of mainhand and offhand weapons
 	mainHandWeaponDamage = "normalized weapon damage (mainhand)",
 	offHandWeaponDamage = "normalized weapon damage (offhand)",
-	damageMultiplier = "damage multiplier",
+	baseDamageMultiplier = "base damage multiplier",
 }
 --</private-static-properties>
 
@@ -122,7 +122,7 @@ local function GetSnapshot(t)
 			for k in pairs(OVALE_SNAPSHOT_STATS) do
 				newStat[k] = 0
 			end
-			newStat.damageMultiplier = 1
+			newStat.baseDamageMultiplier = 1
 		end
 		newStat.snapshotTime = Ovale.now
 		self_snapshot:InsertFront(newStat)
@@ -301,7 +301,7 @@ function OvalePaperDoll:UpdateDamage(event)
 	local mainHandAttackSpeed, offHandAttackSpeed = API_UnitAttackSpeed("player")
 
 	self.stat = GetSnapshot(Ovale.now)
-	self.stat.damageMultiplier = damageMultiplier
+	self.stat.baseDamageMultiplier = damageMultiplier
 	if self.class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		-- Cat Form: 100% increased auto-attack damage.
 		damageMultiplier = damageMultiplier * 2
@@ -347,7 +347,7 @@ function OvalePaperDoll:UpdateDamage(event)
 	end
 
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.damageMultiplier, self.stat.damageMultiplier)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.baseDamageMultiplier, self.stat.baseDamageMultiplier)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.mainHandWeaponDamage, self.stat.mainHandWeaponDamage)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.offHandWeaponDamage, self.stat.offHandWeaponDamage)
 end
@@ -436,7 +436,7 @@ function OvalePaperDoll:Debug(stat)
 	Ovale:FormatPrint("%s: %f%%", OVALE_SNAPSHOT_STATS.rangedCrit, stat.rangedCrit)
 	Ovale:FormatPrint("%s: %f%%", OVALE_SNAPSHOT_STATS.rangedHaste, stat.rangedHaste)
 	Ovale:FormatPrint("%s: %f%%", OVALE_SNAPSHOT_STATS.masteryEffect, stat.masteryEffect)
-	Ovale:FormatPrint("%s: %f", OVALE_SNAPSHOT_STATS.damageMultiplier, stat.damageMultiplier)
+	Ovale:FormatPrint("%s: %f", OVALE_SNAPSHOT_STATS.baseDamageMultiplier, stat.baseDamageMultiplier)
 	Ovale:FormatPrint("%s: %f", OVALE_SNAPSHOT_STATS.mainHandWeaponDamage, stat.mainHandWeaponDamage)
 	Ovale:FormatPrint("%s: %f", OVALE_SNAPSHOT_STATS.offHandWeaponDamage, stat.offHandWeaponDamage)
 end

@@ -96,6 +96,29 @@ local function ScoreSpell(spellId)
 	end
 end
 
+-- Return the spell-specific damage multiplier using the information from SpellDamage{Buff,Debuff} declarations.
+-- This doesn't include the base damage multiplier of the character.
+local function GetDamageMultiplier(spellId)
+	local damageMultiplier = 1
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.damageAura then
+			local playerGUID = OvaleGUID:GetGUID("player")
+			for filter, auraList in pairs(si.damageAura) do
+				for auraSpellId, multiplier in pairs(auraList) do
+					local count = select(3, OvaleAura:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
+					if count and count > 0 then
+						-- TODO: Try to account for a stacking aura.
+						-- multiplier = 1 + (multiplier - 1) * count
+						damageMultiplier = damageMultiplier * multiplier
+					end
+				end
+			end
+		end
+	end
+	return damageMultiplier
+end
+
 local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, allowRemove)
 	local self = OvaleFuture
 	local spellcast = self_pool:Get()
@@ -117,7 +140,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	-- Snapshot the current stats for the spellcast.
 	OvalePaperDoll:SnapshotStats(spellcast)
-	spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
+	spellcast.damageMultiplier = GetDamageMultiplier(spellId)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -207,7 +230,7 @@ local function UpdateLastSpellInfo(spellcast)
 		if self_timeAuraAdded then
 			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
 				OvalePaperDoll:SnapshotStats(spellcast)
-				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
 					OvaleData:GetSpellName(spellId), spellId, spellcast.snapshotTime)
 			end
@@ -348,7 +371,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				spellcast.allowRemove = true
 				-- Take a more recent snapshot of the player stats for this cast-time spell.
 				OvalePaperDoll:SnapshotStats(spellcast)
-				spellcast.damageMultiplier = OvaleAura:GetDamageMultiplier(spellId)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId)
 				return
 			end
 		end

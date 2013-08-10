@@ -636,11 +636,13 @@ OvaleCondition.conditions.debuffcombopoints = OvaleCondition.conditions.buffcomb
 -- if target.DebuffDamageMultiplier(rake) <1 Spell(rake)
 
 OvaleCondition.conditions.buffdamagemultiplier = function(condition)
+	self_auraFound.baseDamageMultiplier = nil
 	self_auraFound.damageMultiplier = nil
 	local start, ending = GetAura(condition, self_auraFound)
+	local baseDamageMultiplier = self_auraFound.baseDamageMultiplier or 1
 	local damageMultiplier = self_auraFound.damageMultiplier or 1
 	if start and ending and start <= ending then
-		return start, ending, damageMultiplier, start, 0
+		return start, ending, baseDamageMultiplier * damageMultiplier, start, 0
 	else
 		return 0, nil, 0, 0, 0
 	end
@@ -2075,8 +2077,9 @@ OvaleCondition.conditions.lastestimateddamage = function(condition)
 	local mh = OvaleFuture:GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage") or 1
 	local oh = OvaleFuture:GetLastSpellInfo(guid, spellId, "offHandWeaponDamage") or 1
 	local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "comboPoints") or 1
+	local bdm = OvaleFuture:GetLastSpellInfo(guid, spellId, "baseDamageMultiplier") or 1
 	local dm = OvaleFuture:GetLastSpellInfo(guid, spellId, "damageMultiplier") or 1
-	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
+	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, 0, 0
 end
 OvaleCondition.conditions.lastspellestimateddamage = OvaleCondition.conditions.lastestimateddamage
 
@@ -2099,8 +2102,9 @@ OvaleCondition.conditions.lastspellestimateddamage = OvaleCondition.conditions.l
 
 OvaleCondition.conditions.lastdamagemultiplier = function(condition)
 	local guid = OvaleGUID:GetGUID(GetTarget(condition, "target"))
+	local bdm = OvaleFuture:GetLastSpellInfo(guid, condition[1], "baseDamageMultiplier") or 1
 	local dm = OvaleFuture:GetLastSpellInfo(guid, condition[1], "damageMultiplier") or 1
-	return Compare(dm, condition[2], condition[3])
+	return Compare(bdm * dm, condition[2], condition[3])
 end
 OvaleCondition.conditions.lastspelldamagemultiplier = OvaleCondition.conditions.lastdamagemultiplier
 
