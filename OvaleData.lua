@@ -313,6 +313,7 @@ function OvaleData:OnInitialize()
 end
 
 function OvaleData:OnEnable()
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "RemplirListeTalents")
 	self:RegisterEvent("GLYPH_ADDED", "UpdateGlyphs")
 	self:RegisterEvent("GLYPH_DISABLED", "UpdateGlyphs")
@@ -327,6 +328,7 @@ function OvaleData:OnEnable()
 end
 
 function OvaleData:OnDisable()
+	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
 	self:UnregisterEvent("GLYPH_ADDED")
 	self:UnregisterEvent("GLYPH_DISABLED")
