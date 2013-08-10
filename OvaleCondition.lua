@@ -24,6 +24,7 @@ local OvaleEnemies = Ovale.OvaleEnemies
 local OvaleEquipement = Ovale.OvaleEquipement
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
+local OvaleLatency = Ovale.OvaleLatency
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleStance = Ovale.OvaleStance
@@ -2297,8 +2298,7 @@ OvaleCondition.conditions.lastswing = function(condition)
 	return 0, nil, 0, OvaleSwing:GetLast(condition[1]), 1
 end
 
---- Get the most recent estimate of latency in milliseconds.
--- This condition is experimental and may not yield correct results.
+--- Get the most recent estimate of roundtrip latency in milliseconds.
 -- @name Latency
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2310,7 +2310,7 @@ end
 -- if Latency(more 1000) Spell(sinister_strike)
 
 OvaleCondition.conditions.latency = function(condition)
-	return 0, nil, OvaleFuture.latency * 1000, 0, 0
+	return 0, nil, OvaleLatency:GetLatency() * 1000, 0, 0
 end
 
 --- Get the level of the target.

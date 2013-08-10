@@ -49,10 +49,6 @@ local self_lastTarget = nil
 -- Time at which a player aura was last added.
 local self_timeAuraAdded = nil
 
--- The spell requests that have been sent to the server and are awaiting a reply.
--- self_sentSpellcast[lineId] = timestamp
-local self_sentSpellcast = {}
-
 local OVALE_UNKNOWN_GUID = 0
 
 -- These CLEU events are eventually received after a successful spellcast.
@@ -69,8 +65,6 @@ local OVALE_CLEU_SPELLCAST_RESULTS = {
 --<public-static-properties>
 --spell counter (see Counter function)
 OvaleFuture.counter = {}
--- Most recent latency (time between UNIT_SPELLCAST_SENT and UNIT_SPELLCAST_SUCCEEDED events).
-OvaleFuture.latency = 0
 -- Debugging: spells to trace
 OvaleFuture.traceSpellList = nil
 --</public-static-properties>
@@ -167,23 +161,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	else
 		spellcast.removeOnSuccess = true
 	end
-
 	tinsert(self_activeSpellcast, spellcast)
-
-	-- Update latency measurement.  API_GetTime() only updates on frame refresh (OnUpdate) so
-	-- this latency measurement has a lower bound of the 1/FPS, where FPS is the current frame
-	-- rate.
-	if self_sentSpellcast[lineId] then
-		local latency = Ovale.now - self_sentSpellcast[lineId]
-		local castTime = endTime - startTime
-		if castTime > 0 and latency > castTime then
-			latency = castTime
-		end
-		if latency > 0 then
-			self.latency = latency
-		end
-		self_sentSpellcast[lineId] = nil
-	end
 
 	ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
@@ -347,9 +325,6 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 			self_lastTarget = OVALE_UNKNOWN_GUID
 		end
 		TracePrintf(spell, "%s: %f %s on %s, lineId=%d", event, Ovale.now, spell, self_lastTarget, lineId)
-
-		-- Note starting time for latency calculation.
-		self_sentSpellcast[lineId] = Ovale.now
 	end
 end
 

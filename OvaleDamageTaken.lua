@@ -15,7 +15,7 @@ Ovale.OvaleDamageTaken = OvaleDamageTaken
 
 --<private-static-properties>
 local OvaleGUID = Ovale.OvaleGUID
-local OvaleFuture = Ovale.OvaleFuture
+local OvaleLatency = Ovale.OvaleLatency
 local OvalePool = Ovale.OvalePool
 local OvaleQueue = Ovale.OvaleQueue
 
@@ -80,7 +80,7 @@ end
 function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
 	local lowerBound = Ovale.now - interval
 	if lagCorrection then
-		lowerBound = lowerBound - OvaleFuture.latency
+		lowerBound = lowerBound - OvaleLatency:GetLatency()
 	end
 	self:RemoveExpiredEvents()
 
