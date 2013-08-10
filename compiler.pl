@@ -94,6 +94,7 @@ $sp{Ovale}{OvaleBestAction} = true;
 $sp{Ovale}{OvaleCondition} = true;
 $sp{Ovale}{OvaleQueue} = true;
 $sp{Ovale}{OvalePool} = true;
+$sp{Ovale}{OvalePoolGC} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleState} = true;
 
@@ -287,4 +288,3 @@ for my $class (keys %sp)
 		}
 	}
 }
-

@@ -35,6 +35,7 @@ OvaleEnemies.lua
 OvaleEquipement.lua
 OvaleGUID.lua
 OvalePool.lua
+OvalePoolGC.lua
 OvaleQueue.lua
 OvaleRecount.lua
 OvaleSkada.lua
