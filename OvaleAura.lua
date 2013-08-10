@@ -335,6 +335,7 @@ end
 
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+	local mine = sourceGUID == self_player_guid
 
 	if event == "UNIT_DIED" then
 		RemoveAurasForGUID(destGUID)
@@ -343,9 +344,8 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		if unitId and not OVALE_UNIT_AURA_UNITS[unitId] then
 			ScanUnitAuras(unitId, destGUID)
 		end
-	elseif OVALE_CLEU_TICK_EVENTS[event] and sourceGUID == self_player_guid then
-		-- Periodic aura cast by the player.
-		-- Update the latest tick time of the aura.
+	elseif mine and OVALE_CLEU_TICK_EVENTS[event] then
+		-- Update the latest tick time of the periodic aura cast by the player.
 		local spellId, spellName, spellSchool = select(12, ...)
 		UpdateAuraTick(destGUID, spellId, timestamp)
 	end
