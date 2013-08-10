@@ -111,21 +111,6 @@ local DEFAULT_CRIT_CHANCE = 0.01
 --</private-static-properties>
 
 --<private-static-methods>
-local function isDebuffInList(list)
-	local i=1;
-	while (true) do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId =  API_UnitDebuff("player", i);
-		if (not name) then
-			break
-		end
-		if (list[spellId]) then
-			return true
-		end
-		i = i +1
-	end
-	return false
-end
-
 local function IsSameSpell(spellIdA, spellIdB, spellNameB)
 	if spellIdB then
 		return spellIdA == spellIdB
@@ -1939,7 +1924,7 @@ end
 -- if IsFeared() Spell(every_man_for_himself)
 
 OvaleCondition.conditions.isfeared = function(condition)
-	return TestBoolean(not API_HasFullControl() and isDebuffInList(OvaleData.buffSpellList.fear), condition[1])
+	return TestBoolean(not API_HasFullControl() and OvaleState:GetAura("player", "fear", "HARMFUL"), condition[1])
 end
 
 --- Test if the target is friendly to the player.
@@ -1987,7 +1972,7 @@ end
 -- if IsIncapacitated() Spell(every_man_for_himself)
 
 OvaleCondition.conditions.isincapacitated = function(condition)
-	return TestBoolean(not API_HasFullControl() and isDebuffInList(OvaleData.buffSpellList.incapacitate), condition[1])
+	return TestBoolean(not API_HasFullControl() and OvaleState:GetAura("player", "incapacitate", "HARMFUL"), condition[1])
 end
 
 --- Test if the target is currently casting an interruptible spell.
@@ -2023,7 +2008,7 @@ end
 -- if IsRooted() Item(Trinket0Slot usable=1)
 
 OvaleCondition.conditions.isrooted = function(condition)
-	return TestBoolean(isDebuffInList(OvaleData.buffSpellList.root), condition[1])
+	return TestBoolean(OvaleState:GetAura("player", "root", "HARMFUL"), condition[1])
 end
 
 --- Test if the player is stunned.
@@ -2037,7 +2022,7 @@ end
 -- if IsStunned() Item(Trinket0Slot usable=1)
 
 OvaleCondition.conditions.isstunned = function(condition)
-	return TestBoolean(not API_HasFullControl() and isDebuffInList(OvaleData.buffSpellList.stun), condition[1])
+	return TestBoolean(not API_HasFullControl() and OvaleState:GetAura("player", "stun", "HARMFUL"), condition[1])
 end
 
 --- Get the damage done by the most recent damage event for the given spell.
