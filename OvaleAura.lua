@@ -138,6 +138,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		if mine then
 			local si = OvaleData.spellInfo[spellId]
 			if si and si.tick then
+				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is a periodic aura.", name, spellId)
 				-- Only set the initial tick information for new auras.
 				if not existingAura then
 					aura.ticksSeen = 0
