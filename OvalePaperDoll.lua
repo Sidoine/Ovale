@@ -70,6 +70,8 @@ local OVALE_HEALING_CLASS = {
 	SHAMAN = true,
 }
 local OVALE_SNAPSHOT_STATS = {
+	snapshotTime = "snapshot time",
+
 	-- primary stats
 	agility = "agility",
 	intellect = "intellect",
