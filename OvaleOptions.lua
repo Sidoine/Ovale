@@ -523,6 +523,12 @@ local self_options =
 							desc = L["Debug paper doll"],
 							type = "toggle",
 						},
+						snapshot =
+						{
+							name = "Snapshot updates",
+							desc = L["Debug stat snapshots"],
+							type = "toggle",
+						},
 						unknown_function =
 						{
 							name = "Unknown functions",

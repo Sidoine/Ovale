@@ -47,6 +47,8 @@ local self_snapshot = OvaleQueue:NewDeque("OvalePaperDoll_snapshot")
 local SNAPSHOT_WINDOW = 5
 
 local OVALE_PAPERDOLL_DEBUG = "paper_doll"
+local OVALE_SNAPSHOT_DEBUG = "snapshot"
+
 local OVALE_SPELLDAMAGE_SCHOOL = {
 	DEATHKNIGHT = 4, -- Nature
 	DRUID = 4, -- Nature
@@ -133,6 +135,7 @@ local function GetSnapshot(t)
 		newStat.snapshotTime = Ovale.now
 		self_snapshot:InsertFront(newStat)
 		stat = self_snapshot:Front()
+		Ovale:DebugPrintf(OVALE_SNAPSHOT_DEBUG, "New snapshot at %f.", Ovale.now)
 	end
 	return stat
 end
@@ -323,8 +326,8 @@ function OvalePaperDoll:UpdateDamage(event)
 		end
 	end
 	self.stat.mainHandWeaponDamage = avgDamage / mainHandWeaponSpeed * normalizedMainHandWeaponSpeed
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    MH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
-		minDamage, maxDamage, damageMultiplier, mainHandWeaponSpeed, normalizedMainHandWeaponSpeed)
+	--Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    MH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
+	--	minDamage, maxDamage, damageMultiplier, mainHandWeaponSpeed, normalizedMainHandWeaponSpeed)
 
 	if OvaleEquipement:HasOffHandWeapon() then
 		local avgOffHandDamage = (minOffHandDamage + maxOffHandDamage) / 2 / damageMultiplier
@@ -340,8 +343,8 @@ function OvalePaperDoll:UpdateDamage(event)
 			end
 		end
 		self.stat.offHandWeaponDamage = avgOffHandDamage / offHandWeaponSpeed * normalizedOffHandWeaponSpeed
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    OH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
-			minOffHandDamage, maxOffHandDamage, damageMultiplier, offHandWeaponSpeed, normalizedOffHandWeaponSpeed)
+		--Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    OH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
+		--	minOffHandDamage, maxOffHandDamage, damageMultiplier, offHandWeaponSpeed, normalizedOffHandWeaponSpeed)
 	else
 		self.stat.offHandWeaponDamage = 0
 	end
@@ -386,7 +389,7 @@ end
 -- If source is nil, then use the most recent player stats; otherwise, use the given stat table.
 function OvalePaperDoll:SnapshotStats(t, source)
 	if not source then
-		self:UpdateStats()
+		self:UpdateStats("SnapshotStats")
 		source = self_snapshot:Front()
 	end
 	for k in pairs(OVALE_SNAPSHOT_STATS) do
