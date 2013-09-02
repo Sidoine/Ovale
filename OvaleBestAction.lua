@@ -361,21 +361,33 @@ local function ComputeGroup(element)
 					return nil
 				elseif priority and priority > bestPriority then
 					-- If the new spell has a higher priority than the previous one, then choose the
-					-- higher priority spell its cast is pushed back too far by the lower priority one.
-					if start - bestStart < bestCastTime * 0.75 then
+					-- higher priority spell if its cast is pushed back too far by the lower priority one.
+					if newElement and newElement.params and newElement.params.wait then
+						if start and start - bestStart < newElement.params.wait then
+							replace = true
+						end
+					elseif start - bestStart < bestCastTime * 0.75 then
 						replace = true
 					end
 				elseif priority and priority < bestPriority then
 					-- If the new spell has a lower priority than the previous one, then choose the
 					-- lower priority spell only if it doesn't push back the cast of the higher priority
 					-- one by too much.
-					if bestStart - start > castTime * 0.75 then
+					if bestElement and bestElement.params and bestElement.params.wait then
+						if bestStart - start > bestElement.params.wait then
+							replace = true
+						end
+					elseif bestStart - start > castTime * 0.75 then
 						replace = true
 					end
 				else
 					-- If the spells have the same priority, then pick the one with an earlier cast time.
 					-- TODO: why have a 0.01 second threshold here?
-					if bestStart - start > 0.01 then
+					if bestElement and bestElement.params and bestElement.params.wait then
+						if bestStart - start > bestElement.params.wait then
+							replace = true
+						end
+					elseif bestStart - start > 0.01 then
 						replace = true
 					end
 				end
