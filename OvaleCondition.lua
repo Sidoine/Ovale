@@ -1408,6 +1408,7 @@ end
 -- @paramsig number
 -- @param interval The number of seconds before now.
 -- @return The amount of damage taken in the previous interval.
+-- @see IncomingDamage
 -- @usage
 -- if DamageTaken(5) > 50000 Spell(death_strike)
 
@@ -1421,6 +1422,7 @@ OvaleCondition.conditions.damagetaken = function(condition)
 	end
 	return 0, nil, damage, 0, 0
 end
+OvaleCondition.conditions.incomingdamage = OvaleCondition.conditions.damagetaken
 
 --- Get the current amount of demonic fury for demonology warlocks.
 -- @name DemonicFury
