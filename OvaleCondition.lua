@@ -1383,8 +1383,9 @@ OvaleCondition.conditions.damage = function(condition)
 		local sp = OvalePaperDoll.stat.spellBonusDamage
 		local mh = OvalePaperDoll.stat.mainHandWeaponDamage
 		local oh = OvalePaperDoll.stat.offHandWeaponDamage
+		local bdm = OvalePaperDoll.stat.baseDamageMultiplier
 		local dm = OvaleState:GetDamageMultiplier(spellId)
-		return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * dm, 0, 0
+		return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, 0, 0
 	end
 end
 
@@ -1400,7 +1401,10 @@ end
 --     Spell(rupture)
 
 OvaleCondition.conditions.damagemultiplier = function(condition)
-	return 0, nil, OvaleState:GetDamageMultiplier(condition[1]), 0, 0
+	local spellId = condition[1]
+	local bdm = OvalePaperDoll.stat.baseDamageMultiplier
+	local dm = OvaleState:GetDamageMultiplier(spellId)
+	return 0, nil, bdm * dm, 0, 0
 end
 
 --- Get the damage taken by the player in the previous time interval.

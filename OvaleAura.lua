@@ -151,6 +151,8 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%s) on %s from %f, now=%f, aura.serial=%d",
 						filter, name, spellId, guid, lastSpellcast.snapshotTime, Ovale.now, aura.serial)
 					OvalePaperDoll:SnapshotStats(aura, Ovale.lastSpellcast)
+					-- TODO: This isn't correct if lastSpellId doesn't directly apply the DoT.
+					aura.damageMultiplier = Ovale.lastSpellcast.damageMultiplier
 				end
 			end
 		end

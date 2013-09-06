@@ -656,7 +656,7 @@ function OvaleState:NewAura(guid, spellId, filter)
 end
 
 function OvaleState:GetDamageMultiplier(spellId)
-	local damageMultiplier = OvalePaperDoll.stat.baseDamageMultiplier
+	local damageMultiplier = 1
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
