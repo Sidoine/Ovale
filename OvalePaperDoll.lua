@@ -101,11 +101,6 @@ local OVALE_SNAPSHOT_STATS = {
 	mainHandWeaponDamage = "normalized weapon damage (mainhand)",
 	offHandWeaponDamage = "normalized weapon damage (offhand)",
 	baseDamageMultiplier = "base damage multiplier",
-	-- power type (energy, rage, mana)
-	powerType = "power type",
-	-- power regeneration rate (energy, rage, mana)
-	inactivePowerRegen = "inactive power regen",
-	activePowerRegen = "active power regen",
 }
 --</private-static-properties>
 
@@ -116,6 +111,11 @@ OvalePaperDoll.class = select(2, API_UnitClass("player"))
 OvalePaperDoll.level = API_UnitLevel("player")
 -- Player's current specialization.
 OvalePaperDoll.specialization = nil
+-- Player's current power type (see API_UnitPowerType for values).
+OvalePaperDoll.powerType = nil
+-- Player's current power regeneration rate.
+OvalePaperDoll.activeRegen = 0
+OvalePaperDoll.inactiveRegen = 0
 -- Most recent snapshot.
 OvalePaperDoll.stat = nil
 --</public-static-properties>
@@ -256,8 +256,8 @@ end
 
 function OvalePaperDoll:UNIT_DISPLAYPOWER(event, unitId)
 	if unitId == "player" then
-		self.stat.powerType = API_UnitPowerType(unitId)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: power type = %d", event, Ovale.now, self.stat.powerType)
+		self.powerType = API_UnitPowerType(unitId)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: power type = %d", event, Ovale.now, self.powerType)
 	end
 end
 
@@ -292,12 +292,9 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		self.stat = GetSnapshot(Ovale.now)
 		self.stat.meleeHaste = API_GetMeleeHaste()
 		self.stat.spellHaste = API_UnitSpellHaste(unitId)
-		self.stat.inactivePowerRegen, self.stat.activePowerRegen = API_GetPowerRegen()
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.meleeHaste, self.stat.meleeHaste)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.spellHaste, self.stat.spellHaste)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.inactivePowerRegen, self.stat.inactivePowerRegen)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.activePowerRegen, self.stat.activePowerRegen)
 		self:UpdateDamage(event)
 		self:UpdatePowerRegen(event)
 	end
@@ -393,9 +390,9 @@ function OvalePaperDoll:UpdateStats(event)
 end
 
 function OvalePaperDoll:UpdatePowerRegen(event)
-	self.stat.inactivePowerRegen, self.stat.activePowerRegen = API_GetPowerRegen()
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.inactivePowerRegen, self.stat.inactivePowerRegen)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.activePowerRegen, self.stat.activePowerRegen)
+	self.inactiveRegen, self.activeRegen = API_GetPowerRegen()
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", "active regen", self.activeRegen)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", "inactive regen", self.inactiveRegen)
 end
 
 function OvalePaperDoll:Ovale_StanceChanged(event)
@@ -456,6 +453,9 @@ function OvalePaperDoll:Debug(stat)
 	Ovale:FormatPrint("Class: %s", self.class)
 	Ovale:FormatPrint("Level: %d", self.level)
 	Ovale:FormatPrint("Specialization: %s", self.specialization)
+	Ovale:FormatPrint("Power type: %d", self.powerType)
+	Ovale:FormatPrint("Active regen: %f", self.activeRegen)
+	Ovale:FormatPrint("Inactive regen: %f", self.inactiveRegen)
 	Ovale:FormatPrint("Snapshot time: %f", stat.snapshotTime)
 	Ovale:FormatPrint("%s: %d", OVALE_SNAPSHOT_STATS.agility, stat.agility)
 	Ovale:FormatPrint("%s: %d", OVALE_SNAPSHOT_STATS.intellect, stat.intellect)
