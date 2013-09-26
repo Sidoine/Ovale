@@ -94,62 +94,19 @@ function OvaleState:StartNewFrame()
 end
 
 function OvaleState:UpdatePowerRates()
-	local class = OvalePaperDoll.class
-
 	for k,v in pairs(OvaleData.power) do
 		self.powerRate[k] = 0
 	end
 
-	-- Base power regeneration for all classes, based on power type.
-	local energyRegen = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
-	local focusRegen = 4 * OvalePaperDoll:GetRangedHasteMultiplier()
+	-- Energy Regeneration for Druids not in Cat form
+	self.powerRate.energy = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
 
-	-- Strip off 10% attack speed bonus that doesn't count toward power regeneration.
-	if class == "HUNTER" then
-		-- Strip off 10% attack speed bonus that doesn't count toward focus regeneration.
-		if OvaleState:GetAura("player", "melee_haste") then
-			focusRegen = focusRegen / 1.1
-		end
-	elseif class == "MONK" then
-		-- Way of the Monk (monk)
-		if OvaleEquipement:HasTwoHandedWeapon() then
-			-- Strip off 40% melee attack speed bonus for two-handed weapon.
-			energyRegen = energyRegen / 1.4
-		end
-
-		-- Ascension (monk)
-		if OvaleData:GetTalentPoints(8) > 0 then
-			energyRegen = energyRegen * 1.15
-		end
-
-		-- Stance of the Sturdy Ox (brewmaster monk)
-		if OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
-			energyRegen = energyRegen * 1.1
-		end
-	elseif class == "ROGUE" then
-		-- Rogue attack-speed self-buff incorrectly counts towards its melee haste.
-		if OvalePaperDoll.level >= 30 then
-			energyRegen = energyRegen / 1.1
-		end
-
-		-- Blade Flurry (combat rogue)
-		if OvaleState:GetAura("player", 13877, "HELPFUL", true) then
-			energyRegen = energyRegen * 0.8
-		end
-
-		-- Vitality (combat rogue)
-		if OvalePaperDoll.specialization == 2 then
-			energyRegen = energyRegen * 1.2
-		end
-
-		-- Adrenaline Rush (rogue)
-		if OvaleState:GetAura("player", 13750, "HELPFUL", true) then
-			energyRegen = energyRegen * 2
-		end
+	-- Power regeneration for current power type
+	if Ovale.enCombat then
+		self.powerRate[OvaleData.powerType[OvalePaperDoll.stat.powerType]] = OvalePaperDoll.stat.activePowerRegen
+	else
+		self.powerRate[OvaleData.powerType[OvalePaperDoll.stat.powerType]] = OvalePaperDoll.stat.inactivePowerRegen
 	end
-
-	self.powerRate.energy = energyRegen
-	self.powerRate.focus = focusRegen
 end
 
 function OvaleState:Reset()

@@ -24,6 +24,7 @@ local tonumber = tonumber
 local API_GetCritChance = GetCritChance
 local API_GetMasteryEffect = GetMasteryEffect
 local API_GetMeleeHaste = GetMeleeHaste
+local API_GetPowerRegen = GetPowerRegen
 local API_GetRangedCritChance = GetRangedCritChance
 local API_GetRangedHaste = GetRangedHaste
 local API_GetSpecialization = GetSpecialization
@@ -35,6 +36,7 @@ local API_UnitAttackSpeed = UnitAttackSpeed
 local API_UnitClass = UnitClass
 local API_UnitDamage = UnitDamage
 local API_UnitLevel = UnitLevel
+local API_UnitPowerType = UnitPowerType
 local API_UnitRangedAttackPower = UnitRangedAttackPower
 local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
@@ -99,6 +101,11 @@ local OVALE_SNAPSHOT_STATS = {
 	mainHandWeaponDamage = "normalized weapon damage (mainhand)",
 	offHandWeaponDamage = "normalized weapon damage (offhand)",
 	baseDamageMultiplier = "base damage multiplier",
+	-- power type (energy, rage, mana)
+	powerType = "power type",
+	-- power regeneration rate (energy, rage, mana)
+	inactivePowerRegen = "inactive power regen",
+	activePowerRegen = "active power regen",
 }
 --</private-static-properties>
 
@@ -157,13 +164,14 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("SPELL_POWER_CHANGED")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
 	self:RegisterEvent("UNIT_DAMAGE", "UpdateDamage")
+	self:RegisterEvent("UNIT_DISPLAYPOWER")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_STATS")
 	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
-	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
+	self:RegisterMessage("Ovale_StanceChanged")
 	self.stat = GetSnapshot(Ovale.now)
 end
 
@@ -180,6 +188,7 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("SPELL_POWER_CHANGED")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_DAMAGE")
+	self:UnregisterEvent("UNIT_DISPLAYPOWER")
 	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
@@ -245,6 +254,13 @@ function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	end
 end
 
+function OvalePaperDoll:UNIT_DISPLAYPOWER(event, unitId)
+	if unitId == "player" then
+		self.stat.powerType = API_UnitPowerType(unitId)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f: power type = %d", event, Ovale.now, self.stat.powerType)
+	end
+end
+
 function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId == "player" then
 		self.level = API_UnitLevel(unitId)
@@ -276,10 +292,14 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		self.stat = GetSnapshot(Ovale.now)
 		self.stat.meleeHaste = API_GetMeleeHaste()
 		self.stat.spellHaste = API_UnitSpellHaste(unitId)
+		self.stat.inactivePowerRegen, self.stat.activePowerRegen = API_GetPowerRegen()
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "%s @ %f", event, Ovale.now)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.meleeHaste, self.stat.meleeHaste)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.spellHaste, self.stat.spellHaste)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.inactivePowerRegen, self.stat.inactivePowerRegen)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.activePowerRegen, self.stat.activePowerRegen)
 		self:UpdateDamage(event)
+		self:UpdatePowerRegen(event)
 	end
 end
 
@@ -364,11 +384,23 @@ function OvalePaperDoll:UpdateStats(event)
 	self:PLAYER_DAMAGE_DONE_MODS(event, "player")
 	self:SPELL_POWER_CHANGED(event)
 	self:UNIT_ATTACK_POWER(event, "player")
+	self:UNIT_DISPLAYPOWER(event, "player")
 	self:UNIT_RANGEDDAMAGE(event, "player")
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_STATS(event, "player")
 	self:UpdateDamage(event)
+end
+
+function OvalePaperDoll:UpdatePowerRegen(event)
+	self.stat.inactivePowerRegen, self.stat.activePowerRegen = API_GetPowerRegen()
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.inactivePowerRegen, self.stat.inactivePowerRegen)
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.activePowerRegen, self.stat.activePowerRegen)
+end
+
+function OvalePaperDoll:Ovale_StanceChanged(event)
+	self:UpdateDamage(event)
+	self:UpdatePowerRegen(event)
 end
 
 function OvalePaperDoll:GetMasteryMultiplier()
