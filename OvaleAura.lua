@@ -28,6 +28,7 @@ local strfind = string.find
 local tinsert = table.insert
 local tsort = table.sort
 local wipe = table.wipe
+local API_GetTime = GetTime
 local API_UnitAura = UnitAura
 
 -- aura pool
@@ -89,12 +90,13 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 	casterGUID = casterGUID or OVALE_UNKNOWN_GUID
 	local mine = (casterGUID == self_player_guid)
 	local existingAura, aura
+	local now = API_GetTime()
 	existingAura = self_aura[guid][filter][spellId][casterGUID]
 	if existingAura then
 		aura = existingAura
 	else
 		aura = self_pool:Get()
-		aura.gain = Ovale.now
+		aura.gain = now
 		self_aura[guid][filter][spellId][casterGUID] = aura
 	end
 
@@ -116,7 +118,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 	local addAura = not existingAura or not auraIsUnchanged
 	if addAura then
 		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Adding %s %s (%s) to %s at %f, aura.serial=%d",
-			filter, name, spellId, guid, Ovale.now, aura.serial)
+			filter, name, spellId, guid, now, aura.serial)
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
@@ -149,7 +151,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 				local lastSpellId = lastSpellcast and lastSpellcast.spellId
 				if lastSpellId and OvaleData:NeedNewSnapshot(spellId, lastSpellId) then
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%s) on %s from %f, now=%f, aura.serial=%d",
-						filter, name, spellId, guid, lastSpellcast.snapshotTime, Ovale.now, aura.serial)
+						filter, name, spellId, guid, lastSpellcast.snapshotTime, now, aura.serial)
 					OvalePaperDoll:SnapshotStats(aura, Ovale.lastSpellcast)
 					-- TODO: This isn't correct if lastSpellId doesn't directly apply the DoT.
 					aura.damageMultiplier = Ovale.lastSpellcast.damageMultiplier
@@ -168,8 +170,9 @@ end
 local function RemoveAuraIfExpired(guid, spellId, filter, aura, serial)
 	local self = OvaleAura
 	if aura and serial and aura.serial ~= serial then
+		local now = API_GetTime()
 		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Removing expired %s %s (%s) from %s at %f, serial=%d aura.serial=%d",
-			filter, aura.name, spellId, guid, Ovale.now, serial, aura.serial)
+			filter, aura.name, spellId, guid, now, serial, aura.serial)
 		self:SendMessage("Ovale_AuraRemoved", guid, spellId, aura.source)
 		self_pool:Release(aura)
 		return true
@@ -296,6 +299,7 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		end
 	end
 	if aura and aura.tick then
+		local now = API_GetTime()
 		local tick = aura.tick
 		local ticksSeen = aura.ticksSeen or 0
 		if not aura.lastTickTime then
@@ -313,7 +317,7 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		aura.lastTickTime = timestamp
 		aura.tick = tick
 		aura.ticksSeen = ticksSeen
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s at %f, tick=%f", filter, aura.name, spellId, guid, Ovale.now, tick)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s at %f, tick=%f", filter, aura.name, spellId, guid, now, tick)
 	end
 end
 --</private-static-methods>

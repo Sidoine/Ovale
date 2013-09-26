@@ -38,8 +38,6 @@ local OVALE_TRUE_STRING = tostring(true)
 
 --<public-static-properties>
 Ovale.L = L
---The current time, updated once per frame refresh.
-Ovale.now = API_GetTime()
 -- The most recent spell cast.
 Ovale.lastSpellcast = {}
 --The table of check boxes definition
@@ -165,7 +163,7 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.enCombat = true
 	self.score = 0
 	self.maxScore = 0
-	self.combatStartTime = Ovale.now
+	self.combatStartTime = API_GetTime()
 	self:UpdateVisibility()
 end
 

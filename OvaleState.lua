@@ -33,6 +33,7 @@ local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetSpellInfo = GetSpellInfo
+local API_GetTime = GetTime
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local API_UnitPower = UnitPower
@@ -89,7 +90,7 @@ end
 
 --<public-static-methods>
 function OvaleState:StartNewFrame()
-	self.maintenant = Ovale.now
+	self.maintenant = API_GetTime()
 	self.gcd = OvaleData:GetGCD()
 end
 

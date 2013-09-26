@@ -14,6 +14,7 @@ Ovale.OvaleLatency = OvaleLatency
 --<private-static-properties>
 local select = select
 local API_GetNetStats = GetNetStats
+local API_GetTime = GetTime
 
 -- The spell requests that have been sent to the server and are awaiting a reply.
 -- self_sentSpellcast[lineId] = GetTime() timestamp
@@ -50,10 +51,11 @@ function OvaleLatency:UpdateLatency(event, unit, name, rank, lineId, spellId)
 			we are assuming that the processing time on the server is negligible compared to the
 			network latency.  As a result, this will always over-estimate the true latency.
 		]]--
-		local latency = Ovale.now - self_sentSpellcast[lineId]
+		local now = API_GetTime()
+		local latency = now - self_sentSpellcast[lineId]
 		if latency > 0 then
 			self_latency = latency
-			self_lastUpdateTime = Ovale.now
+			self_lastUpdateTime = now
 		end
 		self_sentSpellcast[lineId] = nil
 	end
@@ -62,14 +64,15 @@ end
 function OvaleLatency:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineId)
 	if unit == "player" then
 		-- Note starting time for latency calculation.
-		self_sentSpellcast[lineId] = Ovale.now
+		self_sentSpellcast[lineId] = API_GetTime()
 	end
 end
 
 function OvaleLatency:GetLatency()
 	-- If we haven't cast a spell in a while, then get the average world roundtrip latency
 	-- using GetNetStats().
-	if not self_latency or not self_lastUpdateTime or Ovale.now - self_lastUpdateTime > 10 then
+	local now = API_GetTime()
+	if not self_latency or not self_lastUpdateTime or now - self_lastUpdateTime > 10 then
 		self_latency = select(4, API_GetNetStats()) / 1000
 	end
 	return self_latency

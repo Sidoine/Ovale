@@ -36,6 +36,7 @@ local OvalePaperDoll = Ovale.OvalePaperDoll
 local math_abs = math.abs
 local unpack = unpack
 local API_GetSpellInfo = GetSpellInfo
+local API_GetTime = GetTime
 local API_IsDualWielding = IsDualWielding
 local API_UnitAttackSpeed = UnitAttackSpeed
 local API_UnitRangedDamage = UnitRangedDamage
@@ -107,14 +108,15 @@ end
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
 	if srcGUID == OvaleGUID:GetGUID("player") then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
-			self:MeleeSwing(Ovale.now)
+			local now = API_GetTime()
+			self:MeleeSwing(now)
 		end
 	end
 end
 
 function OvaleSwing:UNIT_SPELLCAST_START(event, unit, spell)
 	if OVALE_DELAY_SPELLS[spell] and unit=="player" then
-		self.startdelay = Ovale.now
+		self.startdelay = API_GetTime()
 		local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = API_GetSpellInfo(spell)
 		self.delay = castTime
 	end
@@ -122,17 +124,19 @@ end
 
 function OvaleSwing:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
 	if unit == "player" and OVALE_DELAY_SPELLS[spell] and self.startdelay then
-		self.delay = Ovale.now - self.startdelay
+		local now = API_GetTime()
+		self.delay = now - self.startdelay
 	end
 end
 
 function OvaleSwing:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
 	if unit == "player" then
+		local now = API_GetTime()
 		if OVALE_RESET_SPELLS[spell] then
-			self:MeleeSwing(Ovale.now)
+			self:MeleeSwing(now)
 		end
 		if OVALE_DELAY_SPELLS[spell] and self.startdelay then
-			self.delay = Ovale.now - self.startdelay
+			self.delay = now - self.startdelay
 		end
 		if spell == OVALE_AUTOSHOT_NAME then
 			self:Shoot()
@@ -187,7 +191,7 @@ function OvaleSwing:Shoot()
 		print("Prediction = " ..(self.duration+self.starttime))
 	end]]
 	self.duration = API_UnitRangedDamage('player')
-	self.starttime = Ovale.now
+	self.starttime = API_GetTime()
 	--print("Shoot " .. self.starttime)
 end
 

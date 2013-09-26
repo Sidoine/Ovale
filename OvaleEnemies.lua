@@ -20,6 +20,7 @@ local pairs = pairs
 local select = select
 local tostring = tostring
 local wipe = table.wipe
+local API_GetTime = GetTime
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
 
@@ -93,17 +94,17 @@ end
 
 function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-
+	local now = API_GetTime()
 	if event == "UNIT_DIED" then
 		RemoveEnemy(destGUID, true)
 	elseif sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and destFlags and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
-		AddEnemy(sourceGUID, sourceName, Ovale.now)
+		AddEnemy(sourceGUID, sourceName, now)
 	elseif destGUID and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
-		AddEnemy(destGUID, destName, Ovale.now)
+		AddEnemy(destGUID, destName, now)
 	end
 end
 
@@ -118,8 +119,9 @@ end
 -- These enemies are not in combat with your group, out of range, or
 -- incapacitated and shouldn't count toward the number of active enemies.
 function OvaleEnemies:RemoveInactiveEnemies()
+	local now = API_GetTime()
 	for guid, timestamp in pairs(self_enemyLastSeen) do
-		if Ovale.now - timestamp > REAP_INTERVAL then
+		if now - timestamp > REAP_INTERVAL then
 			RemoveEnemy(guid)
 		end
 	end

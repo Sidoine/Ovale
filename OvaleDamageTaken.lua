@@ -20,6 +20,7 @@ local OvalePool = Ovale.OvalePool
 local OvaleQueue = Ovale.OvaleQueue
 
 local select = select
+local API_GetTime = GetTime
 
 -- Player's GUID.
 local self_player_guid = nil
@@ -59,15 +60,16 @@ end
 function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 	if destGUID == self_player_guid and event:find("_DAMAGE") then
+		local now = API_GetTime()
 		if event:find("SWING_") == 1 then
 			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s caused %d damage.", event, amount)
-			AddDamageTaken(Ovale.now, amount)
+			AddDamageTaken(now, amount)
 		elseif event:find("RANGE_") == 1 or event:find("SPELL_") == 1 then
 			local spellId, spellName, spellSchool = select(12, ...)
 			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(15, ...)
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", event, spellName, amount)
-			AddDamageTaken(Ovale.now, amount)
+			AddDamageTaken(now, amount)
 		end
 	end
 end
@@ -78,7 +80,8 @@ end
 
 -- Return the total damage taken in the previous time interval (in seconds).
 function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
-	local lowerBound = Ovale.now - interval
+	local now = API_GetTime()
+	local lowerBound = now - interval
 	if lagCorrection then
 		lowerBound = lowerBound - OvaleLatency:GetLatency()
 	end
@@ -95,7 +98,7 @@ function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
 end
 
 function OvaleDamageTaken:RemoveExpiredEvents()
-	local now = Ovale.now
+	local now = API_GetTime()
 	while true do
 		local event = self_damageEvent:Back()
 		if not event then break end

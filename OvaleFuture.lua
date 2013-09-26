@@ -28,6 +28,7 @@ local select = select
 local tinsert = table.insert
 local tostring = tostring
 local tremove = table.remove
+local API_GetTime = GetTime
 local API_UnitCastingInfo = UnitCastingInfo
 local API_UnitChannelInfo = UnitChannelInfo
 local API_UnitGUID = UnitGUID
@@ -135,8 +136,9 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	else
 		spellcast.target = API_UnitGUID("target")
 	end
+	local now = API_GetTime()
 	TracePrintf(spellId, "    AddSpellToQueue: %f %s (%d), lineId=%d, startTime=%f, endTime=%f, target=%s",
-		Ovale.now, OvaleData:GetSpellName(spellId), spellId, lineId, startTime, endTime, spellcast.target)
+		now, OvaleData:GetSpellName(spellId), spellId, lineId, startTime, endTime, spellcast.target)
 
 	-- Snapshot the current stats for the spellcast.
 	OvalePaperDoll:SnapshotStats(spellcast)
@@ -192,9 +194,10 @@ end
 
 local function RemoveSpellFromQueue(spellId, lineId)
 	local self = OvaleFuture
+	local now = API_GetTime()
 	for index, spellcast in ipairs(self_activeSpellcast) do
 		if spellcast.lineId == lineId then
-			TracePrintf(spellId, "    RemoveSpellFromQueue: %f %s (%d)", Ovale.now, OvaleData:GetSpellName(spellId), spellId)
+			TracePrintf(spellId, "    RemoveSpellFromQueue: %f %s (%d)", now, OvaleData:GetSpellName(spellId), spellId)
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
 			break
@@ -279,7 +282,7 @@ end
 
 function OvaleFuture:Ovale_AuraAdded(event, guid, spellId, caster)
 	if guid == OvaleGUID:GetGUID("player") then
-		self_timeAuraAdded = Ovale.now
+		self_timeAuraAdded = API_GetTime()
 	end
 end
 
@@ -298,15 +301,17 @@ end
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		local startTime, endTime = select(5, API_UnitChannelInfo("player"))
+		local now = API_GetTime()
 		TracePrintf(spellId, "%s: %f %d, lineId=%d, startTime=%f, endTime=%f",
-			event, Ovale.now, spellId, lineId, startTime, endTime)
+			event, now, spellId, lineId, startTime, endTime)
 		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, true, false)
 	end
 end
 
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
-		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, Ovale.now, spellId, lineId)
+		local now = API_GetTime()
+		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, now, spellId, lineId)
 		RemoveSpellFromQueue(spellId, lineId)
 	end
 end
@@ -315,8 +320,9 @@ end
 function OvaleFuture:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		local startTime, endTime = select(5, API_UnitCastingInfo("player"))
+		local now = API_GetTime()
 		TracePrintf(spellId, "%s: %f %d, lineId=%d, startTime=%f, endTime=%f",
-			event, Ovale.now, spellId, lineId, startTime, endTime)
+			event, now, spellId, lineId, startTime, endTime)
 		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, false, false)
 	end
 end
@@ -324,7 +330,8 @@ end
 --Called if the player interrupted early his cast
 function OvaleFuture:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
-		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, Ovale.now, spellId, lineId)
+		local now = API_GetTime()
+		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, now, spellId, lineId)
 		RemoveSpellFromQueue(spellId, lineId)
 	end
 end
@@ -347,7 +354,8 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 		else
 			self_lastTarget = OVALE_UNKNOWN_GUID
 		end
-		TracePrintf(spell, "%s: %f %s on %s, lineId=%d", event, Ovale.now, spell, self_lastTarget, lineId)
+		local now = API_GetTime()
+		TracePrintf(spell, "%s: %f %s on %s, lineId=%d", event, now, spell, self_lastTarget, lineId)
 	end
 end
 
@@ -363,7 +371,8 @@ end
 ]]--
 function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
-		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, Ovale.now, spellId, lineId)
+		local now = API_GetTime()
+		TracePrintf(spellId, "%s: %f %d, lineId=%d", event, now, spellId, lineId)
 
 		-- Search for a cast-time spell matching this spellcast that was added by UNIT_SPELLCAST_START.
 		for _, spellcast in ipairs(self_activeSpellcast) do
@@ -384,7 +393,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 			UNIT_SPELLCAST_CHANNEL_START and UNIT_SPELLCAST_CHANNEL_STOP.
 		]]--
 		if not API_UnitChannelInfo("player") then
-			AddSpellToQueue(spellId, lineId, Ovale.now, Ovale.now, false, true)
+			AddSpellToQueue(spellId, lineId, now, now, false, true)
 		end
 	end
 end
@@ -435,11 +444,12 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	if sourceGUID == OvaleGUID:GetGUID("player") then
 		if OVALE_CLEU_SPELLCAST_RESULTS[event] then
 			local spellId, spellName = select(12, ...)
-			TracePrintf(spellId, "%s: %f %s (%d)", event, Ovale.now, spellName, spellId)
+			local now = API_GetTime()
+			TracePrintf(spellId, "%s: %f %s (%d)", event, now, spellName, spellId)
 			for index, spellcast in ipairs(self_activeSpellcast) do
 				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraSpellId == spellId) then
 					if not spellcast.channeled and (spellcast.removeOnSuccess or event ~= "SPELL_CAST_SUCCESS") then
-						TracePrintf(spellId, "    Spell finished: %f %s (%d)", Ovale.now, spellName, spellId)
+						TracePrintf(spellId, "    Spell finished: %f %s (%d)", now, spellName, spellId)
 						tremove(self_activeSpellcast, index)
 						UpdateLastSpellInfo(spellcast)
 						Ovale.refreshNeeded["player"] = true
