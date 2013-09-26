@@ -299,7 +299,6 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		end
 	end
 	if aura and aura.tick then
-		local now = API_GetTime()
 		local tick = aura.tick
 		local ticksSeen = aura.ticksSeen or 0
 		if not aura.lastTickTime then
@@ -317,7 +316,7 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		aura.lastTickTime = timestamp
 		aura.tick = tick
 		aura.ticksSeen = ticksSeen
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s at %f, tick=%f", filter, aura.name, spellId, guid, now, tick)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s, tick=%f", filter, aura.name, spellId, guid, tick)
 	end
 end
 --</private-static-methods>

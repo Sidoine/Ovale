@@ -73,20 +73,6 @@ BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
 BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<private-static-methods>
--- format() wrapper that turns nil arguments into tostring(nil)
-local function Format(...)
-	local arg = {}
-	for i = 1, select("#", ...) do
-		local v = select(i, ...)
-		if type(v) == "boolean" then
-			arg[i] = v and OVALE_TRUE_STRING or OVALE_FALSE_STRING
-		else
-			arg[i] = v or OVALE_NIL_STRING
-		end
-	end
-	return format(unpack(arg))
-end
-
 local function OnCheckBoxValueChanged(widget)
 	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
 	if Ovale.casesACocher[widget.userdata.k].compile then
@@ -321,8 +307,22 @@ function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
 end
 
 -- Debugging methods.
+-- format() wrapper that turns nil arguments into tostring(nil)
+function Ovale:Format(...)
+	local arg = {}
+	for i = 1, select("#", ...) do
+		local v = select(i, ...)
+		if type(v) == "boolean" then
+			arg[i] = v and OVALE_TRUE_STRING or OVALE_FALSE_STRING
+		else
+			arg[i] = v or OVALE_NIL_STRING
+		end
+	end
+	return format(unpack(arg))
+end
+
 function Ovale:FormatPrint(...)
-	self:Print(Format(...))
+	self:Print(self:Format(...))
 end
 
 function Ovale:DebugPrint(flag, ...)
@@ -335,7 +335,17 @@ end
 function Ovale:DebugPrintf(flag, ...)
 	local profile = OvaleOptions:GetProfile()
 	if profile and profile.debug and profile.debug[flag] then
-		self:Printf("[%s] %s", flag, Format(...))
+		local addTimestamp = select(1, ...)
+		if type(addTimestamp) == "boolean" or type(addTimestamp) == "nil" then
+			if addTimestamp then
+				local now = API_GetTime()
+				self:Printf("[%s] @%f %s", flag, now, self:Format(select(2, ...)))
+			else
+				self:Printf("[%s] %s", flag, self:Format(select(2, ...)))
+			end
+		else
+			self:Printf("[%s] %s", flag, self:Format(...))
+		end
 	end
 end
 
@@ -345,7 +355,7 @@ function Ovale:Error(...)
 end
 
 function Ovale:Errorf(...)
-	self:Printf("Fatal error: %s", Format(...))
+	self:Printf("Fatal error: %s", self:Format(...))
 	self.bug = true
 end
 
@@ -357,7 +367,7 @@ end
 
 function Ovale:Logf(...)
 	if self.trace then
-		return self:Printf(Format(...))
+		return self:FormatPrint(...)
 	end
 end
 --</public-static-methods>

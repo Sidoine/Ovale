@@ -41,7 +41,7 @@ local function AddDamageTaken(timestamp, damage)
 	event.timestamp = timestamp
 	event.damage = damage
 	self_damageEvent:InsertFront(event)
-	self:RemoveExpiredEvents()
+	self:RemoveExpiredEvents(timestamp)
 end
 --</private-static-methods>
 
@@ -85,7 +85,7 @@ function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
 	if lagCorrection then
 		lowerBound = lowerBound - OvaleLatency:GetLatency()
 	end
-	self:RemoveExpiredEvents()
+	self:RemoveExpiredEvents(now)
 
 	local total = 0
 	for i, event in self_damageEvent:FrontToBackIterator() do
@@ -97,13 +97,13 @@ function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
 	return total
 end
 
-function OvaleDamageTaken:RemoveExpiredEvents()
-	local now = API_GetTime()
+-- Remove all events that are more than DAMAGE_TAKEN_WINDOW seconds before the given timestamp.
+function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
 	while true do
 		local event = self_damageEvent:Back()
 		if not event then break end
 		if event then
-			if now - event.timestamp < DAMAGE_TAKEN_WINDOW then
+			if timestamp - event.timestamp < DAMAGE_TAKEN_WINDOW then
 				break
 			end
 			self_damageEvent:RemoveBack()
