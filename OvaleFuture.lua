@@ -279,9 +279,9 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	end
 end
 
-function OvaleFuture:Ovale_AuraAdded(event, guid, spellId, caster)
+function OvaleFuture:Ovale_AuraAdded(event, timestamp, guid, spellId, caster)
 	if guid == OvaleGUID:GetGUID("player") then
-		self_timeAuraAdded = API_GetTime()
+		self_timeAuraAdded = timestamp
 	end
 end
 
