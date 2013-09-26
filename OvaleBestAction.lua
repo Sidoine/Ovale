@@ -783,10 +783,13 @@ function OvaleBestAction:GetActionInfo(element)
 					end
 				end
 			end
+			if si.texture then
+				actionTexture = "Interface\\Icons\\" .. si.texture
+			end
 		end
 
 		local spellName = OvaleData:GetSpellName(spellId)
-		actionTexture = API_GetSpellTexture(spellId)
+		actionTexture = actionTexture or API_GetSpellTexture(spellId)
 		actionInRange = API_IsSpellInRange(spellName, target)
 		actionUsable = API_IsUsableSpell(spellId)
 		actionShortcut = nil
