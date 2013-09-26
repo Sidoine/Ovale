@@ -3332,24 +3332,44 @@ end
 
 --- Get the estimated number of seconds remaining before the target is dead.
 -- @name TimeToDie
--- @paramsig number or boolean
--- @param operator Optional. Comparison operator: less, more.
--- @param number Optional. The number to compare against.
+-- @paramsig number
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
 -- @return The number of seconds.
--- @return A boolean value for the result of the comparison.
 -- @see DeadIn
 -- @usage
 -- if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
--- if target.TimeToDie(less 2) and ComboPoints() >0 Spell(eviscerate)
 
 OvaleCondition.conditions.timetodie = function(condition)
 	local timeToDie = TimeToDie(GetTarget(condition))
 	return 0, nil, timeToDie, OvaleState.maintenant, -1
 end
 OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
+
+--- Get the estimated number of seconds remaining before the target is reaches the given percent of max health.
+-- @name TimeToHealthPercent
+-- @paramsig number
+-- @param percent The percent of max health of the target.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The number of seconds.
+-- @see TimeToDie
+-- @usage
+-- if target.TimeToHealthPercent(25) <15 Item(virmens_bite_potion)
+
+OvaleCondition.conditions.timetohealthpercent = function(condition)
+	local timeToDie, health, maxHealth = TimeToDie(GetTarget(condition))
+	local percent = condition[1]
+	local healthPercent = health / maxHealth * 100
+	if healthPercent >= percent then
+		local t = timeToDie * (healthPercent - percent) / healthPercent
+		return 0, nil, t, OvaleState.maintenant, -1
+	end
+	return 0, nil, 0, 0, 0
+end
+OvaleCondition.conditions.timetolifepercent = OvaleCondition.conditions.timetohealthpercent
 
 --- Get the number of seconds before the player has enough primary resources to cast the given spell.
 -- @name TimeToPowerFor
