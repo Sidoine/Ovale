@@ -2606,6 +2606,7 @@ end
 OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebuffremains
 
 --- Get the resource cost of the given spell.
+-- This returns zero for spells that use either mana or another resource based on stance/specialization, e.g., Monk's Jab.
 -- @name PowerCost
 -- @paramsig number
 -- @param id The spell ID.
