@@ -59,6 +59,7 @@ self_buffNoSnapshotSpellList =
 		[22568] = true,		-- Ferocious Bite (target below 25%)
 		[33876] = true,		-- Mangle
 		[102545] = true,	-- Ravage!
+		[114236] = true,	-- Shred!
 	},
 	-- Blood Plague (death knight)
 	[55078] =
