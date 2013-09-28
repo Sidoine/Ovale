@@ -31,6 +31,7 @@ do
 	local API_GetSpellInfo = GetSpellInfo
 	local API_GetSpellTexture = GetSpellTexture
 	local API_GetTime = GetTime
+	local API_RegisterStateDriver = RegisterStateDriver
 --</private-static-properties>
 
 --<public-methods>
@@ -423,7 +424,12 @@ do
 	end
 	
 	local function Constructor()
-		local frame = API_CreateFrame("Frame",nil,UIParent)
+		-- Create parent frame for Ovale that auto-hides/shows based on whether the Pet Battle UI is active.
+		local hider = API_CreateFrame("Frame", "OvalePetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
+		hider:SetAllPoints(true)
+		API_RegisterStateDriver(hider, "visibility", "[petbattle] hide; show")
+
+		local frame = API_CreateFrame("Frame", nil, hider)
 		local self = {}
 		local profile = OvaleOptions:GetProfile()
 		
@@ -444,6 +450,7 @@ do
 		self.localstatus = {}
 		self.actions = {}
 		self.frame = frame
+		self.hider = hider
 		self.updateFrame = API_CreateFrame("Frame")
 		self.barre = self.frame:CreateTexture();
 		self.content = API_CreateFrame("Frame",nil,frame)

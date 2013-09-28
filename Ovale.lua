@@ -165,27 +165,31 @@ function Ovale:UpdateLastSpellcast(spellcast)
 end
 
 function Ovale:UpdateVisibility()
+	local visible = true
 	local profile = OvaleOptions:GetProfile()
 
-	if not profile.display then
-		self.frame:Hide()
-		return
+	if not self.frame.hider:IsVisible() then
+		visible = false
+	elseif not profile.display then
+		visible = false
+	else
+		if profile.apparence.hideVehicule and API_UnitHasVehicleUI("player") then
+			visible = false
+		end
+		if profile.apparence.avecCible and not API_UnitExists("target") then
+			visible = false
+		end
+		if profile.apparence.enCombat and not Ovale.enCombat then
+			visible = false
+		end
+		if profile.apparence.targetHostileOnly and (API_UnitIsDead("target") or not API_UnitCanAttack("player", "target")) then
+			visible = false
+		end
 	end
 
-	self.frame:Show()
-	if profile.apparence.hideVehicule and API_UnitHasVehicleUI("player") then
-		self.frame:Hide()
-	end
-	
-	if profile.apparence.avecCible and not API_UnitExists("target") then
-		self.frame:Hide()
-	end
-	
-	if profile.apparence.enCombat and not Ovale.enCombat then
-		self.frame:Hide()
-	end	
-	
-	if profile.apparence.targetHostileOnly and (API_UnitIsDead("target") or not API_UnitCanAttack("player", "target")) then
+	if visible then
+		self.frame:Show()
+	else
 		self.frame:Hide()
 	end
 end
