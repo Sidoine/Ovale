@@ -1966,7 +1966,7 @@ end
 -- @usage
 -- if not target.IsFriend() and target.IsPVP() Spell(sap)
 
-OvaleCondition.conditions.isfriend = function(condition)
+OvaleCondition.conditions.ispvp = function(condition)
 	return TestBoolean(API_UnitIsPVP(GetTarget(condition)), condition[1])
 end
 
