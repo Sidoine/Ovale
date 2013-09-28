@@ -24,7 +24,6 @@ local tonumber = tonumber
 local API_GetCritChance = GetCritChance
 local API_GetMasteryEffect = GetMasteryEffect
 local API_GetMeleeHaste = GetMeleeHaste
-local API_GetPowerRegen = GetPowerRegen
 local API_GetRangedCritChance = GetRangedCritChance
 local API_GetRangedHaste = GetRangedHaste
 local API_GetSpecialization = GetSpecialization
@@ -37,7 +36,6 @@ local API_UnitAttackSpeed = UnitAttackSpeed
 local API_UnitClass = UnitClass
 local API_UnitDamage = UnitDamage
 local API_UnitLevel = UnitLevel
-local API_UnitPowerType = UnitPowerType
 local API_UnitRangedAttackPower = UnitRangedAttackPower
 local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
@@ -112,11 +110,6 @@ OvalePaperDoll.class = select(2, API_UnitClass("player"))
 OvalePaperDoll.level = API_UnitLevel("player")
 -- Player's current specialization.
 OvalePaperDoll.specialization = nil
--- Player's current power type (see API_UnitPowerType for values).
-OvalePaperDoll.powerType = nil
--- Player's current power regeneration rate.
-OvalePaperDoll.activeRegen = 0
-OvalePaperDoll.inactiveRegen = 0
 -- Most recent snapshot.
 OvalePaperDoll.stat = nil
 --</public-static-properties>
@@ -166,14 +159,13 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("SPELL_POWER_CHANGED")
 	self:RegisterEvent("UNIT_ATTACK_POWER")
 	self:RegisterEvent("UNIT_DAMAGE", "UpdateDamage")
-	self:RegisterEvent("UNIT_DISPLAYPOWER")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RANGEDDAMAGE")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
 	self:RegisterEvent("UNIT_SPELL_HASTE")
 	self:RegisterEvent("UNIT_STATS")
 	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
-	self:RegisterMessage("Ovale_StanceChanged")
+	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
 
 	local now = API_GetTime()
 	self.stat = GetSnapshot(now)
@@ -192,7 +184,6 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("SPELL_POWER_CHANGED")
 	self:UnregisterEvent("UNIT_ATTACK_POWER")
 	self:UnregisterEvent("UNIT_DAMAGE")
-	self:UnregisterEvent("UNIT_DISPLAYPOWER")
 	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
@@ -263,13 +254,6 @@ function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	end
 end
 
-function OvalePaperDoll:UNIT_DISPLAYPOWER(event, unitId)
-	if unitId == "player" then
-		self.powerType = API_UnitPowerType(unitId)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: power type = %d", event, self.powerType)
-	end
-end
-
 function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId == "player" then
 		self.level = API_UnitLevel(unitId)
@@ -308,7 +292,6 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.meleeHaste, self.stat.meleeHaste)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS.spellHaste, self.stat.spellHaste)
 		self:UpdateDamage(event)
-		self:UpdatePowerRegen(event)
 	end
 end
 
@@ -395,24 +378,11 @@ function OvalePaperDoll:UpdateStats(event)
 	self:PLAYER_DAMAGE_DONE_MODS(event, "player")
 	self:SPELL_POWER_CHANGED(event)
 	self:UNIT_ATTACK_POWER(event, "player")
-	self:UNIT_DISPLAYPOWER(event, "player")
 	self:UNIT_RANGEDDAMAGE(event, "player")
 	self:UNIT_RANGED_ATTACK_POWER(event, "player")
 	self:UNIT_SPELL_HASTE(event, "player")
 	self:UNIT_STATS(event, "player")
 	self:UpdateDamage(event)
-end
-
-function OvalePaperDoll:UpdatePowerRegen(event)
-	self.inactiveRegen, self.activeRegen = API_GetPowerRegen()
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", "active regen", self.activeRegen)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", "inactive regen", self.inactiveRegen)
-end
-
-function OvalePaperDoll:Ovale_StanceChanged(event)
-	self:UpdateDamage(event)
-	self:UpdatePowerRegen(event)
 end
 
 function OvalePaperDoll:GetMasteryMultiplier()
@@ -468,9 +438,6 @@ function OvalePaperDoll:Debug(stat)
 	Ovale:FormatPrint("Class: %s", self.class)
 	Ovale:FormatPrint("Level: %d", self.level)
 	Ovale:FormatPrint("Specialization: %s", self.specialization)
-	Ovale:FormatPrint("Power type: %d", self.powerType)
-	Ovale:FormatPrint("Active regen: %f", self.activeRegen)
-	Ovale:FormatPrint("Inactive regen: %f", self.inactiveRegen)
 	Ovale:FormatPrint("Snapshot time: %f", stat.snapshotTime)
 	Ovale:FormatPrint("%s: %d", OVALE_SNAPSHOT_STATS.agility, stat.agility)
 	Ovale:FormatPrint("%s: %d", OVALE_SNAPSHOT_STATS.intellect, stat.intellect)

@@ -13,22 +13,7 @@ local OvaleData = {}
 Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
-local floor = math.floor
-local pairs = pairs
 local API_GetSpellCooldown = GetSpellCooldown
-local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
-local SPELL_POWER_BURNING_EMBERS = SPELL_POWER_BURNING_EMBERS
-local SPELL_POWER_CHI = SPELL_POWER_CHI
-local SPELL_POWER_DEMONIC_FURY = SPELL_POWER_DEMONIC_FURY
-local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
-local SPELL_POWER_ENERGY = SPELL_POWER_ENERGY
-local SPELL_POWER_FOCUS = SPELL_POWER_FOCUS
-local SPELL_POWER_HOLY_POWER = SPELL_POWER_HOLY_POWER
-local SPELL_POWER_MANA = SPELL_POWER_MANA
-local SPELL_POWER_RAGE = SPELL_POWER_RAGE
-local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
-local SPELL_POWER_SHADOW_ORBS = SPELL_POWER_SHADOW_ORBS
-local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 
 -- Auras that are refreshed by spells that don't trigger a new snapshot.
 self_buffNoSnapshotSpellList =
@@ -62,30 +47,6 @@ OvaleData.itemList = {}
 OvaleData.spellInfo = {}
 --spells that count for scoring
 OvaleData.scoreSpell = {}
-
-OvaleData.power =
-{
-	mana = { id = SPELL_POWER_MANA, mini = 0 },
-	rage = { id = SPELL_POWER_RAGE, mini = 0, maxi = 100 },
-	focus = { id = SPELL_POWER_FOCUS, mini = 0, maxi = 100 },
-	energy = { id = SPELL_POWER_ENERGY, mini = 0, maxi = 100 },
-	runicpower = { id = SPELL_POWER_RUNIC_POWER, mini = 0, maxi = 100 },
-	shards = { id = SPELL_POWER_SOUL_SHARDS, mini = 0 },
-	eclipse = { id = SPELL_POWER_ECLIPSE, mini = -100, maxi = 100 },
-	holy = { id = SPELL_POWER_HOLY_POWER, mini = 0, maxi = 5 },
-	alternate = { id = SPELL_POWER_ALTERNATE_POWER, mini = 0 },
-	chi = { id = SPELL_POWER_CHI, mini = 0, maxi = 4 },
-	shadoworbs = { id = SPELL_POWER_SHADOW_ORBS, mini = 0, maxi = 3 },
-	burningembers = { id = SPELL_POWER_BURNING_EMBERS, mini = 0, segments = true },
-	demonicfury = { id = SPELL_POWER_DEMONIC_FURY, mini = 0 }
-}
-OvaleData.secondaryPower = {"rage", "focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
-OvaleData.powerType = {}
-do
-	for k,v in pairs(OvaleData.power) do
-		OvaleData.powerType[v.id] = k
-	end
-end
 
 OvaleData.buffSpellList =
 {

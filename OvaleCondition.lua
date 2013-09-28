@@ -26,6 +26,7 @@ local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
 local OvaleLatency = Ovale.OvaleLatency
 local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvalePower = Ovale.OvalePower
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleStance = Ovale.OvaleStance
@@ -72,6 +73,7 @@ local API_UnitLevel = UnitLevel
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitStagger = UnitStagger
+local SPELL_POWER_MANA = SPELL_POWER_MANA
 
 -- static property for GetRunesCooldown(), indexed by rune name
 local self_runes = {}
@@ -84,9 +86,6 @@ local self_lastTTDdps = {}
 
 -- static property for conditions that use GetAura()
 local self_auraFound = {}
-
-local OVALE_POWERTYPE_ENERGY = OvaleData.power.energy.id
-local OVALE_POWERTYPE_MANA = OvaleData.power.mana.id
 
 local OVALE_RUNETYPE =
 {
@@ -2385,7 +2384,7 @@ OvaleCondition.conditions.mana = function(condition)
 	if target == "player" then
 		return TestValue(condition[1], condition[2], OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana)
 	else
-		return Compare(API_UnitPower(target, OVALE_POWERTYPE_MANA), condition[1], condition[2])
+		return Compare(API_UnitPower(target, SPELL_POWER_MANA), condition[1], condition[2])
 	end
 end
 
@@ -2405,15 +2404,16 @@ end
 
 OvaleCondition.conditions.manapercent = function(condition)
 	local target = GetTarget(condition)
-	local powerMax = API_UnitPowerMax(target, OVALE_POWERTYPE_MANA) or 0
-	if powerMax == 0 then
-		return nil
-	end
-	if target == "player "then
-		local conversion = 100 / powerMax
-		return TestValue(condition[1], condition[2], OvaleState.state.mana * conversion, OvaleState.currentTime, OvaleState.powerRate.mana * conversion)
+	if target == "player" then
+		local powerMax = OvalePower.maxPower.mana or 0
+		if powerMax > 0 then
+			local conversion = 100 / powerMax
+			return TestValue(condition[1], condition[2], OvaleState.state.mana * conversion, OvaleState.currentTime, OvaleState.powerRate.mana * conversion)
+		end
 	else
-		return Compare(API_UnitPower(target, OVALE_POWERTYPE_MANA) * 100 / powerMax, condition[1], condition[2])
+		local powerMax = API_UnitPowerMax(target, SPELL_POWER_MANA) or 0
+		local conversion = 100 / powerMax
+		return Compare(API_UnitPower(target, SPELL_POWER_MANA) * conversion, condition[1], condition[2])
 	end
 end
 
@@ -2454,7 +2454,131 @@ OvaleCondition.conditions.maxhealth = function(condition)
 	return Compare(API_UnitHealthMax(target), condition[1], condition[2])
 end
 
---- Get the level of mana of the target when it is at full mana.
+-- Return the maximum power of the given power type on the target.
+local function MaxPowerConditionHelper(target, power)
+	local maxi
+	if target == "player" then
+		maxi = OvalePower.maxPower[power]
+	else
+		maxi = API_UnitPowerMax(target, OvalePower.POWER[power].id, OvalePower.POWER[power].segments)
+	end
+	return maxi
+end
+
+--- Get the maximum amount of alternate power of the target.
+-- Alternate power is the resource tracked by the alternate power bar in certain boss fights.
+-- @name MaxAlternatePower
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxalternatepower = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "alternate")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of burning embers of the target.
+-- @name MaxBurningEmbers
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxburningembers = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "burningembers")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of Chi of the target.
+-- @name MaxChi
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxchi = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "chi")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of Demonic Fury of the target.
+-- @name MaxDemonicFury
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxdemonicfury = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "demonicfury")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of energy of the target.
+-- @name MaxEnergy
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxenergy = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "energy")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of focus of the target.
+-- @name MaxFocus
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxfocus = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "maxfocus")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of Holy Power of the target.
+-- @name MaxHolyPower
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxholypower = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "holy")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of mana of the target.
 -- @name MaxMana
 -- @paramsig number or boolean
 -- @param operator Optional. Comparison operator: equal, less, more.
@@ -2462,13 +2586,78 @@ end
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
 --     Valid values: player, target, focus, pet.
--- @return The maximum mana.
+-- @return The maximum value.
 -- @return A boolean value for the result of the comparison.
 -- @usage
 -- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
 
 OvaleCondition.conditions.maxmana = function(condition)
-	return Compare(API_UnitPowerMax(GetTarget(condition), OVALE_POWERTYPE_MANA), condition[1], condition[2])
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "mana")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of rage of the target.
+-- @name MaxRage
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxrage = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "rage")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of Runic Power of the target.
+-- @name MaxRunicPower
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxrunicpower = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "runicpower")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of Shadow Orbs of the target.
+-- @name MaxShadowOrbs
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxshadoworbs = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "shadoworbs")
+	return Compare(maxi, condition[1], condition[2])
+end
+
+--- Get the maximum amount of Soul Shards of the target.
+-- @name MaxSoulShards
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: equal, less, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The maximum value.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.maxsoulshards = function(condition)
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "shards")
+	return Compare(maxi, condition[1], condition[2])
 end
 
 --- Get the current melee critical strike chance of the player.
@@ -3382,7 +3571,7 @@ OvaleCondition.conditions.timetolifepercent = OvaleCondition.conditions.timetohe
 
 OvaleCondition.conditions.timetopowerfor = function(condition)
 	local cost, _, powerType = select(4, API_GetSpellInfo(condition[1]))
-	local power = OvaleData.powerType[powerType]
+	local power = OvalePower.POWER_TYPE[powerType]
 	local currentPower = OvaleState.state[power]
 	local powerRate = OvaleState.powerRate[power]
 	cost = cost or 0
@@ -3412,7 +3601,7 @@ OvaleCondition.spellbookConditions.timetopowerfor = true
 -- if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
 
 OvaleCondition.conditions.timetomaxenergy = function(condition)
-	local maxEnergy = API_UnitPowerMax("player", OVALE_POWERTYPE_ENERGY) or 0
+	local maxEnergy = OvalePower.maxPower.energy or 0
 	local t = OvaleState.currentTime + (maxEnergy - OvaleState.state.energy) / OvaleState.powerRate.energy
 	return 0, nil, 0, t, -1
 end

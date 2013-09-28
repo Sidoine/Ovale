@@ -18,6 +18,7 @@ local OvaleCondition = Ovale.OvaleCondition
 local OvaleData = Ovale.OvaleData
 local OvaleEquipement = Ovale.OvaleEquipement
 local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvalePower = Ovale.OvalePower
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
@@ -771,8 +772,8 @@ function OvaleBestAction:GetActionInfo(element)
 			if si.combo == 0 and OvaleState.state.combo == 0 then
 				return nil
 			end
-			for k,v in pairs(OvaleData.secondaryPower) do
-				if si[v] and si[v] > OvaleState.state[v] then
+			for _, power in pairs(OvalePower.SECONDARY_POWER) do
+				if si[power] and si[power] > OvaleState.state[power] then
 					return nil
 				end
 			end
