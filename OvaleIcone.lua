@@ -14,8 +14,8 @@ local _, Ovale = ...
 
 --<private-static-properties>
 local L = Ovale.L
-local OvaleData = Ovale.OvaleData
 local OvaleOptions = Ovale.OvaleOptions
+local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleState = Ovale.OvaleState
 
 local strfind = string.find
@@ -203,7 +203,7 @@ local function SetParams(self, params, secure)
 				Ovale:FormatPrint("%stype%s", prefix, suffix)
 				self:SetAttribute(prefix .. "type" .. suffix, "spell")
 				self:SetAttribute("unit", self.params.target or "target")
-				self:SetAttribute(k, OvaleData.spellList[v])
+				self:SetAttribute(k, OvaleSpellBook:GetSpellName(v))
 				self.actionButton = true
 			end
 		end
@@ -235,7 +235,7 @@ function OvaleIcone_OnEnter(self)
 			GameTooltip:SetText(L[self.help])
 		end
 		if self.spellId then
-			GameTooltip:AddLine(OvaleData:GetSpellName(self.spellId), 0.5, 1, 0.75)
+			GameTooltip:AddLine(OvaleSpellBook:GetSpellName(self.spellId), 0.5, 1, 0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
 			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"],1,1,1)

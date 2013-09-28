@@ -18,6 +18,7 @@ Ovale.OvaleOptions = OvaleOptions
 local L = Ovale.L
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleScripts = Ovale.OvaleScripts
+local OvaleSpellBook = Ovale.OvaleSpellBook
 
 local strgmatch = string.gmatch
 local strgsub = string.gsub
@@ -607,9 +608,7 @@ local self_options =
 					order = -4,
 					name = "List talent id",
 					type = "execute",
-					func = function()
-						if Ovale.OvaleData then Ovale.OvaleData:DebugTalents() end
-					end
+					func = function() OvaleSpellBook:DebugTalents() end
 				},
 				targetbuff =
 				{
@@ -642,18 +641,14 @@ local self_options =
 					order = -7,
 					name = "List player glyphs",
 					type = "execute",
-					func = function()
-						if Ovale.OvaleData then Ovale.OvaleData:DebugGlyphs() end
-					end
+					func = function() OvaleSpellBook:DebugGlyphs() end
 				},
 				spell =
 				{
 					order = -8,
 					name = "List player spells",
 					type = "execute",
-					func = function()
-						if Ovale.OvaleData then Ovale.OvaleData:DebugSpellList() end
-					end
+					func = function() OvaleSpellBook:DebugSpells() end
 				},
 				stance =
 				{

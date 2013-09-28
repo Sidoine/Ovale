@@ -18,7 +18,6 @@ do
 	local OvaleBestAction = Ovale.OvaleBestAction
 	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleData = Ovale.OvaleData
 	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleOptions = Ovale.OvaleOptions
 	local OvaleState = Ovale.OvaleState
@@ -257,7 +256,7 @@ do
 									castTime = _castTime/1000
 								end
 							end
-							local gcd = OvaleData:GetGCD(spellId)
+							local gcd = OvaleState:GetGCD(spellId)
 							local nextCast
 							if (castTime>gcd) then
 								nextCast = start + castTime

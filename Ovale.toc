@@ -31,6 +31,7 @@ Ovale.lua
 
 # Modules with no dependencies
 OvaleActionBar.lua
+OvaleData.lua
 OvaleEnemies.lua
 OvaleEquipement.lua
 OvaleGUID.lua
@@ -40,12 +41,12 @@ OvalePoolGC.lua
 OvaleQueue.lua
 OvaleRecount.lua
 OvaleSkada.lua
+OvaleSpellBook.lua
 OvaleStance.lua
 #
 OvaleDamageTaken.lua
 OvalePaperDoll.lua
 #
-OvaleData.lua
 OvaleScripts.lua
 defaut\Chaman.lua
 defaut\Chasseur.lua

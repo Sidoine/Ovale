@@ -18,6 +18,7 @@ local OvaleCondition = Ovale.OvaleCondition
 local OvaleData = Ovale.OvaleData
 local OvaleEquipement = Ovale.OvaleEquipement
 local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
 
@@ -755,7 +756,7 @@ function OvaleBestAction:GetActionInfo(element)
 
 	if (element.func == "spell" ) then
 		action = OvaleActionBar:GetForSpell(spellId)
-		if not OvaleData.spellList[spellId] and not action then
+		if not OvaleSpellBook:IsKnownSpell(spellId) and not action then
 			Ovale:Logf("Spell %s not learnt", spellId)
 			return nil
 		end
@@ -788,9 +789,8 @@ function OvaleBestAction:GetActionInfo(element)
 			end
 		end
 
-		local spellName = OvaleData:GetSpellName(spellId)
 		actionTexture = actionTexture or API_GetSpellTexture(spellId)
-		actionInRange = API_IsSpellInRange(spellName, target)
+		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
 		actionUsable = API_IsUsableSpell(spellId)
 		actionShortcut = nil
 	elseif (element.func=="macro") then

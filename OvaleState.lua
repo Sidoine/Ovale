@@ -22,6 +22,7 @@ local OvaleEquipement = Ovale.OvaleEquipement
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
 
 local floor = math.floor
@@ -91,7 +92,7 @@ end
 --<public-static-methods>
 function OvaleState:StartNewFrame()
 	self.maintenant = API_GetTime()
-	self.gcd = OvaleData:GetGCD()
+	self.gcd = self:GetGCD()
 end
 
 function OvaleState:UpdatePowerRates()
@@ -114,7 +115,7 @@ function OvaleState:UpdatePowerRates()
 				energyRegen = energyRegen / 1.4
 			end
 			-- Ascension (monk): increases energy regen by 15%.
-			if OvaleData:GetTalentPoints(8) > 0 then
+			if OvaleSpellBook:GetTalentPoints(8) > 0 then
 				energyRegen = energyRegen * 1.15
 			end
 			-- Stance of the Sturdy Ox (brewmaster monk): increases Energy regeneration by 10%.
@@ -272,8 +273,8 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 				if si.eclipsedir then
 					energy = energy * direction
 				end
-				-- Eclipse energy generated is doubled if not in an Eclipse state with Euphoria.
-				if OvaleData.spellList[81062]
+				-- Euphoria: While not in an Eclipse state, your spells generate double the normal amount of Solar or Lunar energy.
+				if OvaleSpellBook:IsKnownSpell(81062)
 						and not self:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
 						and not self:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true) then
 					energy = energy * 2
@@ -396,7 +397,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 
 							-- Set the duration to the proper length if it's a DoT.
 							if auraSpellInfo and auraSpellInfo.duration then
-								duration = OvaleData:GetDuration(auraSpellId, self.state.combo, self.state.holy)
+								duration = self:GetDuration(auraSpellId)
 							end
 
 							-- If aura is specified with a duration, then assume stacks == 1.
@@ -427,7 +428,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 										-- Add new duration after the next tick is complete.
 										local remainingTicks = floor((oldEnding - endCast) / oldTick)
 										newAura.ending = (oldEnding - oldTick * remainingTicks) + duration
-										newAura.tick = OvaleData:GetTickLength(auraSpellId)
+										newAura.tick = OvaleAura:GetTickLength(auraSpellId)
 										-- Re-snapshot stats for the DoT.
 										OvalePaperDoll:SnapshotStats(newAura, stats)
 										newAura.damageMultiplier = self:GetDamageMultiplier(auraSpellId)
@@ -453,7 +454,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 								newAura.start = endCast
 								newAura.ending = endCast + duration
 								if isDoT then
-									newAura.tick = OvaleData:GetTickLength(auraSpellId)
+									newAura.tick = OvaleAura:GetTickLength(auraSpellId)
 									OvalePaperDoll:SnapshotStats(newAura, stats)
 									newAura.damageMultiplier = self:GetDamageMultiplier(auraSpellId)
 								end
@@ -483,6 +484,61 @@ function OvaleState:GetCounterValue(id)
 		return self.state.counter[id]
 	else
 		return 0
+	end
+end
+
+-- Return the GCD after the given spellId is cast.
+-- If no spellId is given, then returns the GCD after a "yellow-hit" ability has been cast.
+function OvaleState:GetGCD(spellId)
+	-- Use SpellInfo() information if available.
+	if spellId and OvaleData.spellInfo[spellId] then
+		local si = OvaleData.spellInfo[spellId]
+		if si.haste then
+			local cd = si.gcd or 1.5
+			if si.haste == "melee" then
+				cd = cd / OvalePaperDoll:GetMeleeHasteMultiplier()
+			elseif si.haste == "spell" then
+				cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
+			end
+			if cd < 1 then
+				cd = 1
+			end
+			return cd
+		elseif si.gcd then
+			return si.gcd
+		end
+	end
+
+	-- Default value.
+	local class = OvalePaperDoll.class
+	local isCaster = false
+	if class == "DRUID" and not (OvaleStance:IsStance("druid_bear_form") or OvaleStance:IsStance("druid_cat_form")) then
+		isCaster = true
+	elseif class == "MAGE" then
+		isCaster = true
+	elseif class == "PRIEST" then
+		isCaster = true
+	elseif class == "SHAMAN" then
+		isCaster = true
+	elseif class == "WARLOCK" then
+		isCaster = true
+	end
+	if isCaster then
+		local cd = 1.5 / OvalePaperDoll:GetSpellHasteMultiplier()
+		if cd < 1 then
+			cd = 1
+		end
+		return cd
+	elseif class == "DEATHKNIGHT" then
+		return 1.0
+	elseif class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
+		return 1.0
+	elseif class == "MONK" then
+		return 1.0
+	elseif class == "ROGUE" then
+		return 1.0
+	else
+		return 1.5
 	end
 end
 
@@ -740,6 +796,41 @@ function OvaleState:GetRunesCooldown(blood, frost, unholy, death, nodeath)
 		end
 	end
 	return maxCD
+end
+
+-- Returns the duration, tick length, and number of ticks of an aura.
+function OvaleState:GetDuration(auraSpellId)
+	local si
+	if type(auraSpellId) == "number" then
+		si = OvaleData.spellInfo[auraSpellId]
+	elseif OvaleData.buffSpellList[auraSpellId] then
+		for spellId in pairs(OvaleData.buffSpellList[auraSpellId]) do
+			si = OvaleData.spellInfo[spellId]
+			if si then
+				auraSpellId = spellId
+				break
+			end
+		end
+	end
+	if si and si.duration then
+		local duration = si.duration
+		local combo = self.state.combo or 0
+		local holy = self.state.holy or 1
+		if si.adddurationcp then
+			duration = duration + si.adddurationcp * combo
+		end
+		if si.adddurationholy then
+			duration = duration + si.adddurationholy * (holy - 1)
+		end
+		if si.tick then	-- DoT
+			--DoT duration is tick * numTicks.
+			local tick = OvaleAura:GetTickLength(auraSpellId)
+			local numTicks = floor(duration / tick + 0.5)
+			duration = tick * numTicks
+			return duration, tick, numTicks
+		end
+		return duration
+	end
 end
 
 -- Print out the levels of each power type in the current state.

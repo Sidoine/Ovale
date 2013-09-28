@@ -21,6 +21,7 @@ local OvaleOptions = Ovale.OvaleOptions
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
 local OvaleScripts = Ovale.OvaleScripts
+local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
 
 local ipairs = ipairs
@@ -103,23 +104,16 @@ local function ParseParameters(params)
 end
 
 local function HasTalent(talentId)
-	if not OvaleData.listeTalentsRemplie then
-		OvaleData:RemplirListeTalents()
-	end
-	if OvaleData.listeTalentsRemplie then
-		if OvaleData.pointsTalent[talentId]~=nil then
-			return OvaleData.pointsTalent[talentId]>0
-		else
-			Ovale:FormatPrint("Unknown talent %s", talentId)
-			return false
-		end
+	if OvaleSpellBook:IsKnownTalent(talentId) then
+		return OvaleSpellBook:GetTalentPoints(talentId) > 0
 	else
+		Ovale:FormatPrint("Unknown talent %s", talentId)
 		return false
 	end
 end
 
 local function TestConditions(paramList)
-	if paramList.glyph and not OvaleData.glyphs[paramList.glyph] then
+	if paramList.glyph and not OvaleSpellBook:IsActiveGlyph(paramList.glyph) then
 		return false
 	end
 	if paramList.mastery and OvalePaperDoll.specialization ~= paramList.mastery then
@@ -131,7 +125,7 @@ local function TestConditions(paramList)
 			return false
 		end
 	end
-	if paramList.if_spell and not OvaleData.spellList[paramList.if_spell] then
+	if paramList.if_spell and not OvaleSpellBook:IsKnownSpell(paramList.if_spell) then
 		return false
 	end
 	if paramList.talent and not HasTalent(paramList.talent) then
@@ -247,7 +241,7 @@ local function ParseFunction(prefix, func, params)
 		-- is a variant of a spell with the same name as one already in the
 		-- spellbook.  If it is, then add that variant spell ID to our spellList.
 		if OvaleCondition.spellbookConditions[func] then
-			if not OvaleData.spellList[spellId] and not self_missingSpellList[spellId] then
+			if not OvaleSpellBook:IsKnownSpell(spellId) and not self_missingSpellList[spellId] then
 				local spellName
 				if type(spellId) == "number" then
 					spellName = API_GetSpellInfo(spellId)
@@ -682,7 +676,7 @@ end
 
 local function ParseSpellName(text)
 	local spellId = tonumber(text)
-	local spell = OvaleData:GetSpellName(spellId)
+	local spell = OvaleSpellBook:GetSpellName(spellId)
 	if spell then
 		return '"' .. spell .. '"'
 	else
@@ -802,7 +796,7 @@ local function CompileScript(text)
 
 	-- Add any missing spells found while compiling the script into the spellbook.
 	for k, v in pairs(self_missingSpellList) do
-		OvaleData.spellList[k] = v
+		OvaleSpellBook:AddSpell(k, v)
 	end
 end
 --</private-static-methods>

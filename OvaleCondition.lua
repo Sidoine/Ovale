@@ -26,6 +26,7 @@ local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
 local OvaleLatency = Ovale.OvaleLatency
 local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
@@ -116,7 +117,7 @@ local function IsSameSpell(spellIdA, spellIdB, spellNameB)
 	if spellIdB then
 		return spellIdA == spellIdB
 	elseif spellIdA and spellNameB then
-		return OvaleData:GetSpellName(spellIdA) == spellNameB
+		return OvaleSpellBook:GetSpellName(spellIdA) == spellNameB
 	else
 		return false
 	end
@@ -1093,7 +1094,7 @@ OvaleCondition.conditions.casting = function(condition)
 		return nil
 	elseif spellId == "harmful" then
 		if not castSpellName then
-			castSpellName = OvaleData:GetSpellName(castSpellId)
+			castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
 		end
 		if API_IsHarmfulSpell(castSpellName) then
 			return start, ending
@@ -1102,7 +1103,7 @@ OvaleCondition.conditions.casting = function(condition)
 		end
 	elseif spellId == "helpful" then
 		if not castSpellName then
-			castSpellName = OvaleData:GetSpellName(castSpellId)
+			castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
 		end
 		if API_IsHelpfulSpell(castSpellName) then
 			return start, ending
@@ -1639,7 +1640,7 @@ end
 --     Spell(savage_roar)
 
 OvaleCondition.conditions.glyph = function(condition)
-	return TestBoolean(OvaleData.glyphs[condition[1]], condition[2])
+	return TestBoolean(OvaleSpellBook:IsActiveGlyph(condition[1]), condition[2])
 end
 
 --- Test if the player has full control, i.e., isn't feared, charmed, etc.
@@ -1852,7 +1853,7 @@ end
 --     Spell(kick)
 
 OvaleCondition.conditions.inrange = function(condition)
-	local spellName = OvaleData:GetSpellName(condition[1])
+	local spellName = OvaleSpellBook:GetSpellName(condition[1])
 	return TestBoolean(API_IsSpellInRange(spellName, GetTarget(condition)) == 1,condition[2])
 end
 
@@ -2948,7 +2949,7 @@ OvaleCondition.conditions.critchance = OvaleCondition.conditions.spellcritchance
 --     Spell(guardian_of_ancient_kings_retribution)
 
 OvaleCondition.conditions.spellknown = function(condition)
-	return TestBoolean(OvaleData.spellList[condition[1]], condition[2])
+	return TestBoolean(OvaleSpellBook:IsKnownSpell(condition[1]), condition[2])
 end
 OvaleCondition.spellbookConditions.spellknown = true
 
@@ -3021,17 +3022,18 @@ OvaleCondition.spellbookConditions.spellchargecooldown = true
 --     Spell(devouring_plague)
 
 OvaleCondition.conditions.spellcooldown = function(condition)
-	if type(condition[1]) == "string" then
-		local sharedCd = OvaleState.state.cd[condition[1]]
+	local spellId = condition[1]
+	if type(spellId) == "string" then
+		local sharedCd = OvaleState.state.cd[spellId]
 		if sharedCd then
 			return 0, nil, sharedCd.duration, sharedCd.start, -1
 		else
 			return nil
 		end
-	elseif not OvaleData.spellList[condition[1]] then
+	elseif not OvaleSpellBook:IsKnownSpell(spellId) then
 		return 0, nil, 0, OvaleState.currentTime + 3600, -1
 	else
-		local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(condition[1])
+		local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(spellId)
 		return 0, nil, actionCooldownDuration, actionCooldownStart, -1
 	end
 end
@@ -3152,7 +3154,7 @@ end
 -- if TalentPoints(blood_tap_talent) Spell(blood_tap)
 
 OvaleCondition.conditions.talentpoints = function(condition)
-	return Compare(OvaleData:GetTalentPoints(condition[1]), condition[2], condition[3])
+	return Compare(OvaleSpellBook:GetTalentPoints(condition[1]), condition[2], condition[3])
 end
 
 --- Test if the player is the in-game target of the target.
@@ -3240,7 +3242,7 @@ OvaleCondition.conditions.ticks = function(condition)
 			numTicks = floor(duration / tick + 0.5)
 		end
 	else
-		duration, tick, numTicks = OvaleData:GetDuration(condition[1], OvaleState.state.combo, OvaleState.state.holy)
+		duration, tick, numTicks = OvaleState:GetDuration(condition[1])
 	end
 	if numTicks then
 		return Compare(numTicks, condition[2], condition[3])
@@ -3307,7 +3309,7 @@ OvaleCondition.conditions.ticktime = function(condition)
 	local start, ending = GetAura(condition, self_auraFound)
 	local tick = self_auraFound.tick
 	if not tick then
-		tick = OvaleData:GetTickLength(condition[1])
+		tick = OvaleAura:GetTickLength(condition[1])
 	end
 	if tick then
 		return Compare(tick, condition[2], condition[3])
@@ -3457,7 +3459,7 @@ OvaleCondition.conditions.totemexpires = function(condition)
 	if not startTime then
 		return 0
 	end
-	if condition.totem and OvaleData:GetSpellName(condition.totem) ~= totemName then
+	if condition.totem and OvaleSpellBook:GetSpellName(condition.totem) ~= totemName then
 		return 0
 	end
 	return AddToTime(startTime + duration, -(condition[2] or 0))
@@ -3485,7 +3487,7 @@ OvaleCondition.conditions.totempresent = function(condition)
 	if not startTime then
 		return nil
 	end
-	if condition.totem and OvaleData:GetSpellName(condition.totem) ~= totemName then
+	if condition.totem and OvaleSpellBook:GetSpellName(condition.totem) ~= totemName then
 		return nil
 	end
 	return startTime, startTime + duration
@@ -3495,7 +3497,7 @@ end
 	-- 1: the spell id
 	-- return bool
 OvaleCondition.conditions.tracking = function(condition)
-	local what = OvaleData:GetSpellName(condition[1])
+	local what = OvaleSpellBook:GetSpellName(condition[1])
 	local numTrackingTypes = API_GetNumTrackingTypes()
 	local present = false
 	for i = 1, numTrackingTypes do

@@ -144,7 +144,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 				-- Only set the initial tick information for new auras.
 				if not existingAura then
 					aura.ticksSeen = 0
-					aura.tick = OvaleData:GetTickLength(spellId)
+					aura.tick = self:GetTickLength(spellId)
 				end
 				-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
 				local lastSpellcast = Ovale.lastSpellcast
@@ -279,6 +279,7 @@ end
 
 -- Update the tick length of an aura using event timestamps from the combat log.
 local function UpdateAuraTick(guid, spellId, timestamp)
+	local self = OvaleAura
 	local aura, filter
 	if self_aura[guid] then
 		local serial = self_serial[guid]
@@ -304,7 +305,7 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		if not aura.lastTickTime then
 			-- For some reason, there was no lastTickTime information recorded,
 			-- so approximate the tick time using the player's current stats.
-			tick = OvaleData:GetTickLength(spellId)
+			tick = self:GetTickLength(spellId)
 			ticksSeen = 0
 		else
 			-- Tick times tend to vary about the "true" value by a up to a few
@@ -559,6 +560,32 @@ function OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 		end
 	end
 	return start, ending, count
+end
+
+function OvaleAura:GetTickLength(spellId)
+	local si
+	if type(spellId) == "number" then
+		si = OvaleData.spellInfo[spellId]
+	elseif OvaleData.buffSpellList[spellId] then
+		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
+			si = OvaleData.spellInfo[auraId]
+			if si then break end
+		end
+	end
+	if si then
+		local tick = si.tick or 3
+		local hasteMultiplier = 1
+		if si.haste then
+			if si.haste == "spell" then
+				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+			elseif si.haste == "melee" then
+				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
+			end
+			return tick / hasteMultiplier
+		else
+			return tick
+		end
+	end
 end
 
 function OvaleAura:Debug()

@@ -21,6 +21,7 @@ local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
+local OvaleSpellBook = Ovale.OvaleSpellBook
 
 local ipairs = ipairs
 local pairs = pairs
@@ -76,7 +77,7 @@ local function TracePrintf(spellId, ...)
 	if self.traceSpellList then
 		local name = spellId
 		if type(spellId) == "number" then
-			name = OvaleData:GetSpellName(spellId)
+			name = OvaleSpellBook:GetSpellName(spellId)
 		end
 		if self.traceSpellList[spellId] or self.traceSpellList[name] then
 			local now = API_GetTime()
@@ -132,13 +133,14 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	spellcast.allowRemove = allowRemove
 
 	-- Set the target from the data taken from UNIT_SPELLCAST_SENT if it's the same spellcast.
-	if lineId == self_lastLineID and OvaleData:GetSpellName(spellId) == self_lastSpell then
+	local spellName = OvaleSpellBook:GetSpellName(spellId)
+	if lineId == self_lastLineID and spellName == self_lastSpell then
 		spellcast.target = self_lastTarget
 	else
 		spellcast.target = API_UnitGUID("target")
 	end
 	TracePrintf(spellId, "    AddSpellToQueue: %s (%d), lineId=%d, startTime=%f, endTime=%f, target=%s",
-		OvaleData:GetSpellName(spellId), spellId, lineId, startTime, endTime, spellcast.target)
+		spellName, spellId, lineId, startTime, endTime, spellcast.target)
 
 	-- Snapshot the current stats for the spellcast.
 	OvalePaperDoll:SnapshotStats(spellcast)
@@ -196,7 +198,7 @@ local function RemoveSpellFromQueue(spellId, lineId)
 	local self = OvaleFuture
 	for index, spellcast in ipairs(self_activeSpellcast) do
 		if spellcast.lineId == lineId then
-			TracePrintf(spellId, "    RemoveSpellFromQueue: %s (%d)", OvaleData:GetSpellName(spellId), spellId)
+			TracePrintf(spellId, "    RemoveSpellFromQueue: %s (%d)", OvaleSpellBook:GetSpellName(spellId), spellId)
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
 			break
@@ -234,7 +236,7 @@ local function UpdateLastSpellInfo(spellcast)
 				OvalePaperDoll:SnapshotStats(spellcast)
 				spellcast.damageMultiplier = GetDamageMultiplier(spellId)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
-					OvaleData:GetSpellName(spellId), spellId, spellcast.snapshotTime)
+					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshotTime)
 			end
 		end
 
@@ -501,7 +503,7 @@ function OvaleFuture:Debug()
 		Ovale:Print("No spells in flight!")
 	end
 	for _, spellcast in ipairs(self_activeSpellcast) do
-		Ovale:FormatPrint("    %s (%d), lineId=%s", OvaleData:GetSpellName(spellcast.spellId), spellcast.spellId, spellcast.lineId)
+		Ovale:FormatPrint("    %s (%d), lineId=%s", OvaleSpellBook:GetSpellName(spellcast.spellId), spellcast.spellId, spellcast.lineId)
 	end
 end
 --</public-static-methods>

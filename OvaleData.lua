@@ -9,31 +9,13 @@
 --]]--------------------------------------------------------------------
 
 local _, Ovale = ...
-local OvaleData = Ovale:NewModule("OvaleData", "AceEvent-3.0")
+local OvaleData = {}
 Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
-local OvalePaperDoll = Ovale.OvalePaperDoll
-local OvaleStance = Ovale.OvaleStance
-
 local floor = math.floor
-local ipairs = ipairs
 local pairs = pairs
-local tinsert = table.insert
-local tonumber = tonumber
-local tostring = tostring
-local tsort = table.sort
-local wipe = table.wipe
-local API_GetNumGlyphSockets = GetNumGlyphSockets
-local API_GetGlyphSocketInfo = GetGlyphSocketInfo
 local API_GetSpellCooldown = GetSpellCooldown
-local API_GetSpellBookItemInfo = GetSpellBookItemInfo
-local API_GetSpellBookItemName = GetSpellBookItemName
-local API_GetSpellInfo = GetSpellInfo
-local API_GetSpellTabInfo = GetSpellTabInfo
-local API_GetTalentInfo = GetTalentInfo
-local API_HasPetSpells = HasPetSpells
-local BOOKTYPE_SPELL, BOOKTYPE_PET = BOOKTYPE_SPELL, BOOKTYPE_PET
 local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
 local SPELL_POWER_BURNING_EMBERS = SPELL_POWER_BURNING_EMBERS
 local SPELL_POWER_CHI = SPELL_POWER_CHI
@@ -75,18 +57,7 @@ self_buffNoSnapshotSpellList =
 --</private-static-properties>
 
 --<public-static-properties>
-OvaleData.spellList = {}
 OvaleData.itemList = {}
---allows to fill the player talent tables on first use
-OvaleData.listeTalentsRemplie = false
---key: talentId / value: points in this talent
-OvaleData.pointsTalent = {}
---key: talentId / value: talent name (not used)
-OvaleData.talentIdToName = {}
---key: talent name / value: talent id
-OvaleData.talentNameToId = {}
---active glyphs: self.glyphs[glyphId] is true if the given glyphId is active
-OvaleData.glyphs = {}
 --spell info from the current script (by spellId)
 OvaleData.spellInfo = {}
 --spells that count for scoring
@@ -110,6 +81,11 @@ OvaleData.power =
 }
 OvaleData.secondaryPower = {"rage", "focus", "shards", "holy", "chi", "shadoworbs", "burningembers", "demonicfury"}
 OvaleData.powerType = {}
+do
+	for k,v in pairs(OvaleData.power) do
+		OvaleData.powerType[v.id] = k
+	end
+end
 
 OvaleData.buffSpellList =
 {
@@ -308,123 +284,6 @@ OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleData:OnInitialize()
-	for k,v in pairs(self.power) do
-		self.powerType[v.id] = k
-	end
-end
-
-function OvaleData:OnEnable()
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
-	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "RemplirListeTalents")
-	self:RegisterEvent("GLYPH_ADDED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_DISABLED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_ENABLED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_REMOVED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_UPDATED", "UpdateGlyphs")
-	self:RegisterEvent("PLAYER_ALIVE", "Update")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
-	self:RegisterEvent("PLAYER_TALENT_UPDATE", "RemplirListeTalents")
-	self:RegisterEvent("SPELLS_CHANGED", "FillSpellList")
-	self:RegisterEvent("UNIT_PET", "FillPetSpellList")
-end
-
-function OvaleData:OnDisable()
-	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
-	self:UnregisterEvent("GLYPH_ADDED")
-	self:UnregisterEvent("GLYPH_DISABLED")
-	self:UnregisterEvent("GLYPH_ENABLED")
-	self:UnregisterEvent("GLYPH_REMOVED")
-	self:UnregisterEvent("GLYPH_UPDATED")
-	self:UnregisterEvent("PLAYER_ALIVE")
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-	self:UnregisterEvent("SPELLS_CHANGED")
-	self:UnregisterEvent("UNIT_PET")
-end
-
-function OvaleData:Update()
-	self:RemplirListeTalents()
-	self:UpdateGlyphs()
-	self:FillSpellList()
-end
-
-function OvaleData:GetSpellName(spellId)
-	if not spellId then return nil end
-	return self.spellList[spellId] or API_GetSpellInfo(spellId)
-end
-
-function OvaleData:FillPetSpellList()
-	--TODO pas moyen d'avoir le nombre de skills pour le pet
-	local book=BOOKTYPE_PET
-	local numSpells, _ = API_HasPetSpells()
-	if not numSpells then return end
-	local i=1
-	while i <= numSpells do
-		local skillType, spellId = API_GetSpellBookItemInfo(i, book)
-		if skillType~="FUTURESPELL" and spellId then
-			local spellName = API_GetSpellBookItemName(i, book)
-			self.spellList[spellId] = spellName
-		end
-		i = i + 1
-	end
-end
-
-function OvaleData:FillSpellList()
-	self.spellList = {}
-	
-	--TODO pas moyen d'avoir le nombre de skills pour le pet
-	local book=BOOKTYPE_SPELL
-	local name, texture, offset, numSpells, isGuild = API_GetSpellTabInfo(2)
-	
-	numSpells = numSpells + offset
-	
-	local i=1
-	while i <= numSpells do
-		local skillType, spellId = API_GetSpellBookItemInfo(i, book)
-		if skillType~="FUTURESPELL" and spellId then
-			local spellName = API_GetSpellBookItemName(i, book)
-			self.spellList[spellId] = spellName
-		end
-		i = i + 1
-	end
-	self:FillPetSpellList()
-	self:SendMessage("Ovale_SpellsChanged")
-end
-
-function OvaleData:RemplirListeTalents()
-	local talentId = 1
-	local talentsChanged = false
-	while true do
-		local name, texture, tier, column, selected, available = API_GetTalentInfo(talentId)
-		if not name then
-			break
-		end
-		talentId = tonumber(talentId)
-		self.talentIdToName[talentId] = name
-		self.talentNameToId[name] = talentId
-		if selected then
-			self.pointsTalent[talentId] = 1
-		else
-			self.pointsTalent[talentId] = 0
-		end		
-		self.listeTalentsRemplie = true
-		talentsChanged = true
-		talentId = talentId + 1
-	end
-	if talentsChanged then
-		self:SendMessage("Ovale_TalentsChanged")
-	end
-end
-
-function OvaleData:GetTalentPoints(talentId)
-	if not self.listeTalentsRemplie then
-		self:RemplirListeTalents()
-	end
-	return self.pointsTalent[talentId]
-end
-
 function OvaleData:GetSpellInfo(spellId)
 	if (not self.spellInfo[spellId]) then
 		self.spellInfo[spellId] =
@@ -434,17 +293,6 @@ function OvaleData:GetSpellInfo(spellId)
 		}
 	end
 	return self.spellInfo[spellId]
-end
-
-function OvaleData:UpdateGlyphs()
-	wipe(self.glyphs)
-	for i = 1, API_GetNumGlyphSockets() do
-		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
-		if enabled and glyphSpell then
-			self.glyphs[glyphSpell] = true
-		end
-	end
-	self:SendMessage("Ovale_GlyphsChanged")
 end
 
 function OvaleData:ResetSpellInfo()
@@ -459,45 +307,6 @@ function OvaleData:NeedNewSnapshot(auraSpellId, spellId)
 		return false
 	end
 	return true
-end
-
-function OvaleData:GetGCD(spellId)
-	if spellId and self.spellInfo[spellId] then
-		local si = self.spellInfo[spellId]
-		if si.haste then
-			local cd = si.gcd or 1.5
-			if si.haste == "melee" then
-				cd = cd / OvalePaperDoll:GetMeleeHasteMultiplier()
-			elseif si.haste == "spell" then
-				cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
-			end
-			if cd < 1 then
-				cd = 1
-			end
-			return cd
-		elseif si.gcd then
-			return si.gcd
-		end
-	end
-	
-	-- Default value
-	local class = OvalePaperDoll.class
-	if class == "DEATHKNIGHT" or class == "ROGUE"
-		or (class == "MONK"
-			and (OvaleStance:IsStance("monk_stance_of_the_sturdy_ox")
-				or OvaleStance:IsStance("monk_stance_of_the_fierce_tiger")))
-		or (class == "DRUID" and OvaleStance:IsStance("druid_cat_form")) then
-		return 1.0
-	elseif class == "MAGE" or class == "WARLOCK" or class == "PRIEST" or
-			(class == "DRUID" and not OvaleStance:IsStance("druid_bear_form")) then
-		local cd = 1.5 / OvalePaperDoll:GetSpellHasteMultiplier()
-		if cd < 1 then
-			cd = 1
-		end
-		return cd
-	else
-		return 1.5
-	end
 end
 
 --Compute the spell Cooldown
@@ -540,106 +349,5 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDam
 		damage = damage + si.bonussp * spellpower
 	end
 	return damage
-end
-
--- Returns the duration, tick length, and number of ticks of an aura.
-function OvaleData:GetDuration(spellId, combo, holy)
-	local si
-	if type(spellId) == "number" then
-		si = self.spellInfo[spellId]
-	elseif OvaleData.buffSpellList[spellId] then
-		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			si = self.spellInfo[auraId]
-			if si then
-				spellId = auraId
-				break
-			end
-		end
-	end
-	if si and si.duration then
-		local duration = si.duration
-		combo = combo or 0
-		holy = holy or 1
-		if si.adddurationcp then
-			duration = duration + si.adddurationcp * combo
-		end
-		if si.adddurationholy then
-			duration = duration + si.adddurationholy * (holy - 1)
-		end
-		if si.tick then	-- DoT
-			--DoT duration is tick * numberOfTicks.
-			local tick = self:GetTickLength(spellId)
-			local numTicks = floor(duration / tick + 0.5)
-			duration = tick * numTicks
-			return duration, tick, numTicks
-		end
-		return duration
-	else
-		return nil
-	end
-end
-
-function OvaleData:GetTickLength(spellId)
-	local si
-	if type(spellId) == "number" then
-		si = self.spellInfo[spellId]
-	elseif OvaleData.buffSpellList[spellId] then
-		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			si = self.spellInfo[auraId]
-			if si then break end
-		end
-	end
-	if si then
-		local tick = si.tick or 3
-		local hasteMultiplier = 1
-		if si.haste then
-			if si.haste == "spell" then
-				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
-			elseif si.haste == "melee" then
-				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
-			end
-			return tick / hasteMultiplier
-		else
-			return tick
-		end
-	else
-		return nil
-	end
-end
-
--- Print out the list of active glyphs in alphabetical order.
-function OvaleData:DebugGlyphs()
-	local array = {}
-	for glyphId in pairs(self.glyphs) do
-		tinsert(array, self:GetSpellName(glyphId) .. ": " .. glyphId)
-	end
-	tsort(array)
-	for _, v in ipairs(array) do
-		Ovale:Print(v)
-	end
-end
-
--- Print out the list of known spells in alphabetical order.
-function OvaleData:DebugSpellList()
-	local array = {}
-	for k, v in pairs(self.spellList) do
-		tinsert(array, v .. ": " .. k)
-	end
-	tsort(array)
-	for _, v in ipairs(array) do
-		Ovale:Print(v)
-	end
-end
-
--- Print out the list of talents in alphabetical order.
-function OvaleData:DebugTalents()
-	local array = {}
-	for name, id in pairs(self.talentNameToId) do
-		tinsert(array, name .. " = " .. id)
-	end
-	tsort(array)
-	for _, v in ipairs(array) do
-		Ovale:Print(v)
-	end
 end
 --</public-static-methods>
