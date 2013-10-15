@@ -7,11 +7,10 @@ It displays one or more icons that show the cooldown of an action.  The action i
   [Corruption]: http://www.wowhead.com/spell=172
   [Shadow Bolt]: http://www.wowhead.com/spell=686
 
-Default scripts are available for all dps classes and specs, based on [SimulationCraft][].  There is an [online tool][wowdps] to import your [SimulationCraft][] profile (Mists of Pandaria only).  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
+Default scripts are available for all dps classes and specs, based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
-  [wowdps]: http://wowdps.com/
 
 See the [video of a survival hunter][ovale-video] using [Ovale][ovale] during Wrath of the Lich King.
 
@@ -69,7 +68,6 @@ Click the icon and select the bane or curse that you want to use from the dropdo
 
 Custom scripts
 ==============
-- [SimulationCraft profile importer][wowdps]
 - [Ovale Spell Priority forums][ovale-forums]
 - [Nerien's Ovale Scripts][]
 
