@@ -1706,6 +1706,52 @@ OvaleCondition.conditions.glyph = function(condition)
 	return TestBoolean(OvaleSpellBook:IsActiveGlyph(condition[1]), condition[2])
 end
 
+--- Test if the player has a particular item equipped.
+-- @name HasEquippedItem
+-- @paramsig boolean
+-- @param item Item to be checked whether it is equipped.
+-- @param yesno Optional. If yes, then return true if the item is equipped. If no, then return true if it isn't equipped.
+--     Default is yes.
+--     Valid values: yes, no.
+-- @param ilevel Optional.  Checks the item level of the equipped item.  If not specified, then any item level is valid.
+--     Defaults to not specified.
+--     Valid values: ilevel=N, where N is any number.
+-- @param slot Optional. Sets the inventory slot to check.  If not specified, then all slots are checked.
+--     Defaults to not specified.
+--     Valid values: slot=SLOTNAME, where SLOTNAME is a valid slot name, e.g., HandSlot.
+
+OvaleCondition.conditions.hasequippeditem = function(condition)
+	local itemId, yesno = condition[1], condition[2]
+	local ilevel, slot = condition.ilevel, condition.slot
+	local slotId
+	if type(itemId) == "number" then
+		slotId = OvaleEquipement:HasEquippedItem(itemId, slot)
+		if slotId then
+			if ilevel then
+				if ilevel == OvaleEquipement:GetEquippedItemLevel(slotId) then
+					return TestBoolean(true, yesno)
+				end
+			else
+				return TestBoolean(true, yesno)
+			end
+		end
+	elseif OvaleData.itemList[itemId] then
+		for _, v in pairs(OvaleData.itemList[itemId]) do
+			slotId = OvaleEquipement:HasEquippedItem(v, slot)
+			if slotId then
+				if ilevel then
+					if ilevel == OvaleEquipement:GetEquippedItemLevel(slotId) then
+						return TestBoolean(true, yesno)
+					end
+				else
+					return TestBoolean(true, yesno)
+				end
+			end
+		end
+	end
+	return TestBoolean(false, yesno)
+end
+
 --- Test if the player has full control, i.e., isn't feared, charmed, etc.
 -- @name HasFullControl
 -- @paramsig boolean

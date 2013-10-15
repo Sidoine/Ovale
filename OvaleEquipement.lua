@@ -1391,6 +1391,25 @@ function OvaleEquipement:GetEquippedItemLevel(slotId)
 	return self_equippedItemLevels[slotId]
 end
 
+function OvaleEquipement:HasEquippedItem(itemId, slotId)
+	if slotId and type(slotId) ~= "number" then
+		if not OVALE_SLOTNAME[slotId] then return nil end
+		slotId = API_GetInventorySlotInfo(slotId)
+	end
+	if slotId then
+		if self_equippedItems[slotId] == itemId then
+			return slotId
+		end
+	else
+		for slotId, equippedItemId in pairs(self_equippedItems) do
+			if equippedItemId == itemId then
+				return slotId
+			end
+		end
+	end
+	return nil
+end
+
 function OvaleEquipement:HasMainHandWeapon()
 	return self_mainHandItemType == "INVTYPE_WEAPON"
 		or self_mainHandItemType == "INVTYPE_WEAPONMAINHAND"
@@ -1407,8 +1426,8 @@ function OvaleEquipement:HasShield()
 end
 
 function OvaleEquipement:HasTrinket(itemId)
-	return self:GetEquippedItem(INVSLOT_TRINKET1) == itemId
-		or self:GetEquippedItem(INVSLOT_TRINKET2) == itemId
+	return self:HasEquippedItem(itemId, INVSLOT_TRINKET1)
+		or self:HasEquippedItem(itemId, INVSLOT_TRINKET2)
 end
 
 function OvaleEquipement:HasTwoHandedWeapon()
