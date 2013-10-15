@@ -69,6 +69,81 @@ local function PutValue(element, value, origin, rate)
 	return result
 end
 
+local function ComputeAction(element, atTime)
+	local self = OvaleBestAction
+	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
+
+	if not actionTexture then
+		Ovale:Logf("Action %s not found", element.params[1])
+		return nil
+	end
+	if not (actionEnable and actionEnable > 0) then
+		Ovale:Logf("Action %s not enabled", element.params[1])
+		return nil
+	end
+	if element.params.usable == 1 and not actionUsable then
+		Ovale:Logf("Action %s not usable", element.params[1])
+		return nil
+	end
+
+	if spellId then
+		local si = spellId and OvaleData.spellInfo[spellId]
+		if si and si.casttime then
+			element.castTime = si.casttime
+		else
+			local castTime = select(7, API_GetSpellInfo(spellId))
+			if castTime then
+				element.castTime = castTime / 1000
+			else
+				element.castTime = nil
+			end
+		end
+		if si and si.toggle and actionIsCurrent then
+			Ovale:Logf("Action %s (toggle) is the current action", element.params[1])
+			return nil
+		end
+	else
+		element.castTime = 0
+	end
+
+	local start, ending = 0, math.huge
+	local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
+
+	-- If the action is not on cooldown, then treat it like it's immediately ready.
+	if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
+		start = actionCooldownDuration + actionCooldownStart
+	else
+		start = atTime
+	end
+
+	Ovale:Logf("start=%f attenteFinCast=%s [%d]", start, OvaleState.attenteFinCast, element.nodeId)
+	if start < OvaleState.attenteFinCast then
+		local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
+		if not (si and si.canStopChannelling) then
+			-- not a channelled spell, or a channelled spell that cannot be interrupted
+			start = OvaleState.attenteFinCast
+		else
+			--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
+			--ça tombera entre deux ticks
+			local numTicks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * si.canStopChannelling + 0.5)
+			local tick = (OvaleState.attenteFinCast - OvaleState.startCast) / numTicks
+			local tickTime = OvaleState.startCast + tick
+			Ovale:Logf("%s start=%f", spellId, start)
+			for i = 1, numTicks do
+				if start <= tickTime then
+					start = tickTime
+					break
+				end
+				tickTime = tickTime + tick
+			end
+			Ovale:Logf("%s start=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, start, numTicks, tick, tickTime)
+		end
+	end
+	Ovale:Logf("Action %s can start at %f", element.params[1], start)
+	return start, ending, priority, element
+end
+
 local function ComputeAnd(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
@@ -260,98 +335,26 @@ end
 
 local function ComputeFunction(element, atTime)
 	local self = OvaleBestAction
-	if element.func == "spell" or element.func == "macro" or element.func == "item" or element.func == "texture" then
-		local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-			actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
+	local condition = OvaleCondition.conditions[element.func]
+	if not condition then
+		Ovale:Errorf("Condition %s not found", element.func)
+		return nil
+	end
+	local start, ending, value, origin, rate = condition(element.params, atTime)
 
-		if not actionTexture then
-			Ovale:Logf("Action %s not found", element.params[1])
-			return nil
+	if Ovale.trace then
+		local conditionCall = element.func .. "("
+		for k, v in pairs(element.params) do
+			conditionCall = conditionCall .. k .. "=" .. v .. ","
 		end
-		if element.params.usable == 1 and not actionUsable then
-			Ovale:Logf("Action %s not usable", element.params[1])
-			return nil
-		end
+		conditionCall = conditionCall .. ")"
+		Ovale:FormatPrint("Condition %s returned %s, %s, %s, %s, %s", conditionCall, start, ending, value, origin, rate)
+	end
 
-		if spellId then
-			local si = spellId and OvaleData.spellInfo[spellId]
-			if si and si.casttime then
-				element.castTime = si.casttime
-			else
-				local castTime = select(7, API_GetSpellInfo(spellId))
-				if castTime then
-					element.castTime = castTime / 1000
-				else
-					element.castTime = nil
-				end
-			end
-			if si and si.toggle and actionIsCurrent then
-				Ovale:Logf("Action %s (toggle) is the current action", element.params[1])
-				return nil
-			end
-		else
-			element.castTime = 0
-		end
-
-		if actionEnable and actionEnable > 0 then
-			local start, ending = 0, math.huge
-			local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
-
-			if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
-				start = actionCooldownDuration + actionCooldownStart
-			else
-				start = atTime
-			end
-			Ovale:Logf("start=%f attenteFinCast=%s [%d]", start, OvaleState.attenteFinCast, element.nodeId)
-			if start < OvaleState.attenteFinCast then
-				local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
-				if not (si and si.canStopChannelling) then
-					-- not a channelled spell, or a channelled spell that cannot be interrupted
-					start = OvaleState.attenteFinCast
-				else
-					--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
-					--ça tombera entre deux ticks
-					local numTicks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * si.canStopChannelling + 0.5)
-					local tick = (OvaleState.attenteFinCast - OvaleState.startCast) / numTicks
-					local tickTime = OvaleState.startCast + tick
-					Ovale:Logf("%s start=%f", spellId, start)
-					for i = 1, numTicks do
-						if start <= tickTime then
-							start = tickTime
-							break
-						end
-						tickTime = tickTime + tick
-					end
-					Ovale:Logf("%s start=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, start, numTicks, tick, tickTime)
-				end
-			end
-			Ovale:Logf("Action %s can start at %f", element.params[1], start)
-			return start, ending, priority, element
-		else
-			Ovale:Logf("Action %s not enabled", element.params[1])
-		end
+	if value then
+		return start, ending, OVALE_DEFAULT_PRIORITY, PutValue(element, value, origin, rate)
 	else
-		local condition = OvaleCondition.conditions[element.func]
-		if not condition then
-			Ovale:Errorf("Condition %s not found", element.func)
-			return nil
-		end
-		local start, ending, value, origin, rate = condition(element.params, atTime)
-
-		if Ovale.trace then
-			local conditionCall = element.func .. "("
-			for k, v in pairs(element.params) do
-				conditionCall = conditionCall .. k .. "=" .. v .. ","
-			end
-			conditionCall = conditionCall .. ")"
-			Ovale:FormatPrint("Condition %s returned %s, %s, %s, %s, %s", conditionCall, start, ending, value, origin, rate)
-		end
-
-		if value then
-			return start, ending, OVALE_DEFAULT_PRIORITY, PutValue(element, value, origin, rate)
-		else
-			return start, ending
-		end
+		return start, ending
 	end
 end
 
@@ -522,6 +525,7 @@ end
 --<private-static-properties>
 local OVALE_COMPUTE_VISITOR =
 {
+	["action"] = ComputeAction,
 	["and"] = ComputeAnd,
 	["arithmetic"] = ComputeArithmetic,
 	["compare"] = ComputeCompare,

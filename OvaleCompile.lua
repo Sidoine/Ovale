@@ -217,7 +217,11 @@ local function ParseFunction(prefix, func, params)
 	end
 
 	local node = self_pool:Get()
-	node.type = "function"
+	if func == "spell" or func == "macro" or func == "item" or func == "texture" then
+		node.type = "action"
+	else
+		node.type = "function"
+	end
 	node.func = func
 	node.params = paramList
 	local nodeName = AddNode(node)
@@ -835,7 +839,7 @@ function OvaleCompile:DebugNode(node)
 			text = text .. self:DebugNode(n) .. " "
 		end
 		text = text .. "}\n"
-	elseif (node.type == "function") then
+	elseif (node.type == "action" or node.type == "function") then
 		text = node.func.."("
 		for k,p in pairs(node.params) do
 			text = text .. k.."=" .. p .. " "
