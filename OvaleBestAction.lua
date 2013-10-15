@@ -667,9 +667,10 @@ function OvaleBestAction:Compute(element, atTime)
 end
 
 function OvaleBestAction:ComputeBool(element, atTime)
-	local start, ending, priority, element = self:Compute(element, atTime)
-	--Special case of a value element: it must not be 0
-	if element and element.type == "value" and element.value == 0 and element.rate == 0 then
+	local start, ending, _, newElement = self:Compute(element, atTime)
+	-- Match SimC:0 is false, non-zero is true.
+	--	(https://code.google.com/p/simulationcraft/wiki/ActionLists#Logical_operators)
+	if newElement and newElement.type == "value" and newElement.value == 0 and newElement.rate == 0 then
 		return nil
 	else
 		return start, ending
