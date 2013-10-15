@@ -98,6 +98,7 @@ $sp{Ovale}{OvalePool} = true;
 $sp{Ovale}{OvalePoolGC} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleState} = true;
+$sp{Ovale}{OvaleTimeSpan} = true;
 
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;
@@ -105,6 +106,12 @@ $sp{OvaleQueue}{InsertBack} = true;
 $sp{OvaleQueue}{InsertFront} = true;
 $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
+
+$sp{OvaleTimeSpan}{Complement} = true;
+$sp{OvaleTimeSpan}{HasTime} = true;
+$sp{OvaleTimeSpan}{Intersect} = true;
+$sp{OvaleTimeSpan}{Measure} = true;
+$sp{OvaleTimeSpan}{Union} = true;
 
 opendir(DIR, ".");
 while (defined($r = readdir(DIR)))

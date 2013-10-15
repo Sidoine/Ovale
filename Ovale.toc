@@ -44,6 +44,7 @@ OvaleRecount.lua
 OvaleSkada.lua
 OvaleSpellBook.lua
 OvaleStance.lua
+OvaleTimeSpan.lua
 #
 OvaleDamageTaken.lua
 OvalePaperDoll.lua

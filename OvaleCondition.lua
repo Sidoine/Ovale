@@ -138,47 +138,24 @@ local function TimeWithHaste(time1, haste)
 	end
 end
 
--- Return time1 + duration.
-local function AddToTime(time1, duration)
-	if not time1 or not duration then
-		-- time1 or duration is infinite.
-		return nil
-	else
-		return time1 + duration
-	end
-end
-
--- Return time2 - time1
-local function DiffTime(time1, time2)
-	if not time1 then
-		-- time1 is infinite, so return the lowest possible time (zero).
-		return 0
-	elseif not time2 then
-		-- time2 is infinite.
-		return nil
-	else
-		return time2 - time1
-	end
-end
-
 local function Compare(a, comparison, b)
 	if not comparison then
-		return 0, nil, a, 0, 0 -- this is not a compare, returns the value a
+		return 0, math.huge, a, 0, 0 -- this is not a compare, returns the value a
 	elseif comparison == "more" then
-		if (not b or (a~=nil and a>b)) then
-			return 0
+		if not b or (a and a > b) then
+			return 0, math.huge
 		else
 			return nil
 		end
 	elseif comparison == "equal" then
 		if b == a then
-			return 0
+			return 0, math.huge
 		else
 			return nil
 		end
 	elseif comparison == "less" then
-		if (not a or (b~=nil and a<b)) then
-			return 0
+		if not a or (b and a < b) then
+			return 0, math.huge
 		else
 			return nil
 		end
@@ -188,15 +165,15 @@ local function Compare(a, comparison, b)
 end
 
 local function TestBoolean(a, condition)
-	if (condition == "yes" or not condition) then
-		if (a) then
-			return 0
+	if condition == "yes" or not condition then
+		if a then
+			return 0, math.huge
 		else
 			return nil
 		end
 	else
-		if (not a) then
-			return 0
+		if not a then
+			return 0, math.huge
 		else
 			return nil
 		end
@@ -207,25 +184,22 @@ local function TestValue(comparator, limit, value, atTime, rate)
 	if not value or not atTime then
 		return nil
 	elseif not comparator then
-		return 0, nil, value, atTime, rate
+		return 0, math.huge, value, atTime, rate
 	else
-		if rate == 0 then
-			if comparator == "more" then
-				if value > limit then return 0 else return nil end
-			elseif comparator == "less" then
-				if value < limit then return 0 else return nil end
-			else
-				Ovale:Errorf("Unknown operator %s", comparator)
-				return nil
-			end
+		local start, ending = 0, math.huge
+		if comparator == "more" and rate == 0 then
+			if value <= limit then return nil end
+		elseif comparator == "less" and rate == 0 then
+			if value >= limit then return nil end
 		elseif (comparator == "more" and rate > 0) or (comparator == "less" and rate < 0) then
-			return (limit - value) / rate + atTime
+			start = (limit - value)/rate + atTime
 		elseif (comparator == "more" and rate < 0) or (comparator == "less" and rate > 0) then
-			return 0, (limit - value) / rate + atTime
+			ending = (limit - value)/rate + atTime
 		else
 			Ovale:Errorf("Unknown operator %s", comparator)
 			return nil
 		end
+		return start, ending
 	end
 end
 
@@ -471,18 +445,16 @@ OvaleCondition.defaultTarget = "target"
 		or operations.
 
 	The endpoint of a time interval must be between 0 and infinity, where
-	infinity is represented by "nil".  Time is a value such as returned by
+	infinity is represented by math.huge.  Time is a value such as returned by
 	the API function GetTime().
 
 	Examples:
 
-	(1)	(0, nil) means the condition is always true.  This can be shortened
-		to just return 0.
+	(1)	(0, math.huge) means the condition is always true.
 
-	(2)	(nil, nil) means the condition is always false.  This can be shortened
-		to just return nil.
+	(2)	nil is the empty set and means the condition is always false.
 
-	(3)	(0, nil, constant, 0, 0) means the condition has a constant value.
+	(3)	(0, math.huge, constant, 0, 0) means the condition has a constant value.
 
 	(4)	(start, ending, ending - start, start, -1) means the condition has a
 		value of f(t) = ending - t, at time t between start and ending.  This
@@ -569,7 +541,7 @@ OvaleCondition.conditions.buffattackpower = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, attackPower, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffattackpower = OvaleCondition.conditions.buffattackpower
@@ -594,7 +566,7 @@ OvaleCondition.conditions.buffrangedattackpower = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, rangedAttackPower, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffrangedattackpower = OvaleCondition.conditions.buffrangedattackpower
@@ -618,7 +590,7 @@ OvaleCondition.conditions.buffcombopoints = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, comboPoints, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffcombopoints = OvaleCondition.conditions.buffcombopoints
@@ -644,7 +616,7 @@ OvaleCondition.conditions.buffdamagemultiplier = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, baseDamageMultiplier * damageMultiplier, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffdamagemultiplier = OvaleCondition.conditions.buffdamagemultiplier
@@ -674,7 +646,7 @@ OvaleCondition.conditions.buffmeleecritchance = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, critChance, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffmeleecritchance = OvaleCondition.conditions.buffmeleecritchance
@@ -705,7 +677,7 @@ OvaleCondition.conditions.buffrangedcritchance = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, critChance, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffrangedcritchance = OvaleCondition.conditions.buffrangedcritchance
@@ -735,7 +707,7 @@ OvaleCondition.conditions.buffspellcritchance = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, critChance, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffspellcritchance = OvaleCondition.conditions.buffspellcritchance
@@ -759,7 +731,7 @@ OvaleCondition.conditions.buffmastery = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, masteryEffect, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffmastery = OvaleCondition.conditions.buffmastery
@@ -783,7 +755,7 @@ OvaleCondition.conditions.buffspellpower = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, spellBonusDamage, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffspellpower = OvaleCondition.conditions.buffspellpower
@@ -807,7 +779,7 @@ OvaleCondition.conditions.buffspellhaste = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, spellHaste, start, 0
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffspellhaste = OvaleCondition.conditions.buffspellhaste
@@ -856,7 +828,8 @@ OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
 OvaleCondition.conditions.buffduration = function(condition)
 	local start, ending = GetAura(condition)
 	start = start or 0
-	return Compare(DiffTime(start, ending), condition[2], condition[3])
+	ending = ending or math.huge
+	return Compare(ending - start, condition[2], condition[3])
 end
 OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduration
 
@@ -887,10 +860,10 @@ OvaleCondition.conditions.buffexpires = function(condition)
 	local start, ending = GetAura(condition)
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	if not start then
-		ending = 0
+		return 0, math.huge
 	end
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
-	return AddToTime(ending, -timeBefore)
+	return ending - timeBefore, math.huge
 end
 OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
 
@@ -915,7 +888,7 @@ OvaleCondition.conditions.buffremains = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, ending - start, start, -1
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.debuffremains = OvaleCondition.conditions.buffremains
@@ -929,7 +902,7 @@ OvaleCondition.conditions.buffgain = function(condition)
 	Ovale:Error("not implemented")
 	if true then return nil end
 	local gain = select(4, GetAura(condition)) or 0
-	return 0, nil, 0, 0, 1
+	return 0, math.huge, 0, 0, 1
 end
 OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
 
@@ -962,7 +935,7 @@ OvaleCondition.conditions.buffpresent = function(condition)
 		return nil
 	end
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
-	return start, AddToTime(ending, -timeBefore)
+	return start, ending - timeBefore
 end
 OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 
@@ -987,6 +960,7 @@ OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 OvaleCondition.conditions.buffstacks = function(condition)
 	local start, ending, stacks = GetAura(condition)
 	start = start or 0
+	ending = ending or math.huge
 	stacks = stacks or 0
 	return start, ending, stacks, 0, 0
 end
@@ -1023,22 +997,16 @@ OvaleCondition.conditions.burningembers = function(condition)
 	return TestValue(condition[1], condition[2], OvaleState.state.burningembers, OvaleState.currentTime, OvaleState.powerRate.burningembers)
 end
 
-	-- Check if the player can cast (cooldown is down)
-	-- 1: spellId
-	-- returns: bool
+--- Check if the player can cast the given spell (not on cooldown).
+-- @name CanCast
+-- @paramsig boolean
+-- @param id The spell ID to check.
+-- @return True if the spell cast be cast; otherwise, false.
+
 OvaleCondition.conditions.cancast = function(condition)
 	local spellId = condition[1]
 	local actionCooldownStart, actionCooldownDuration = OvaleState:GetComputedSpellCD(spellId)
-	local startCast = actionCooldownStart + actionCooldownDuration
-	if startCast < OvaleState.currentTime then
-		startCast = OvaleState.currentTime
-	end
-	--TODO why + castTime?
-	local castTime
-	if spellId then
-		castTime = select(7, API_GetSpellInfo(spellId))
-	end
-	return startCast + castTime/1000
+	return actionCooldownStart + actionCooldownDuration, math.huge
 end
 
 --- Test if the target is casting the given spell.
@@ -1171,7 +1139,7 @@ OvaleCondition.conditions.checkboxoff = function(condition)
 			return nil
 		end
 	end
-	return 0
+	return 0, math.huge
 end
 
 --- Test if all of the listed checkboxes are on.
@@ -1191,7 +1159,7 @@ OvaleCondition.conditions.checkboxon = function(condition)
 			return nil
 		end
 	end
-	return 0
+	return 0, math.huge
 end
 
 --- Get the current amount of stored Chi for monks.
@@ -1225,8 +1193,8 @@ end
 -- if target.Class(PRIEST) Spell(cheap_shot)
 
 OvaleCondition.conditions.class = function(condition)
-	local loc, noloc = API_UnitClass(GetTarget(condition))
-	return TestBoolean(noloc == condition[1], condition[2])
+	local class, classToken = API_UnitClass(GetTarget(condition))
+	return TestBoolean(classToken == condition[1], condition[2])
 end
 
 --- Test whether the target's classification matches the given classification.
@@ -1247,17 +1215,17 @@ end
 OvaleCondition.conditions.classification = function(condition)
 	local classification
 	local target = GetTarget(condition)
-	if API_UnitLevel(target) == -1 then
+	if API_UnitLevel(target) < 0 then
 		classification = "worldboss"
 	else
-		classification = API_UnitClassification(target);
-		if (classification == "rareelite") then
+		classification = API_UnitClassification(target)
+		if classification == "rareelite" then
 			classification = "elite"
-		elseif (classification == "rare") then
+		elseif classification == "rare" then
 			classification = "normal"
 		end
 	end
-	return TestBoolean(condition[1]==classification, condition[2])
+	return TestBoolean(classification == condition[1], condition[2])
 end
 
 --- Get the number of combo points on the currently selected target for a feral druid or a rogue.
@@ -1311,7 +1279,8 @@ end
 --     Spell(hibernate)
 
 OvaleCondition.conditions.creaturefamily = function(condition)
-	return TestBoolean(API_UnitCreatureFamily(GetTarget(condition)) == LBCT[condition[1]], condition[2])
+	local family = API_UnitCreatureFamily(GetTarget(condition))
+	return TestBoolean(family == LBCT[condition[1]], condition[2])
 end
 
 --- Test if the target is any of the listed creature types.
@@ -1330,9 +1299,9 @@ end
 
 OvaleCondition.conditions.creaturetype = function(condition)
 	local creatureType = API_UnitCreatureType(GetTarget(condition))
-	for _,v in pairs(condition) do
-		if (creatureType == LBCT[v]) then
-			return 0
+	for _, v in pairs(condition) do
+		if creatureType == LBCT[v] then
+			return 0, math.huge
 		end
 	end
 	return nil
@@ -1352,7 +1321,7 @@ OvaleCondition.conditions.critdamage = function(condition)
 	-- TODO: Need to account for increased crit effect from meta-gems.
 	local critFactor = 2
 	local start, ending, value, origin, rate = OvaleCondition.conditions.damage(condition)
-	return start, ending, critFactor * value, critFactor * origin, critFactor * rate
+	return start, ending, critFactor * value, origin, critFactor * rate
 end
 
 --- Get the current estimated damage of a spell on the target.
@@ -1377,7 +1346,7 @@ OvaleCondition.conditions.damage = function(condition)
 	local spellId = condition[1]
 	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
 	if value then
-		return 0, nil, value, origin, rate
+		return 0, math.huge, value, origin, rate
 	else
 		local ap = OvalePaperDoll.stat.attackPower
 		local sp = OvalePaperDoll.stat.spellBonusDamage
@@ -1385,7 +1354,7 @@ OvaleCondition.conditions.damage = function(condition)
 		local oh = OvalePaperDoll.stat.offHandWeaponDamage
 		local bdm = OvalePaperDoll.stat.baseDamageMultiplier
 		local dm = OvaleState:GetDamageMultiplier(spellId)
-		return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, 0, 0
+		return 0, math.huge, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, 0, 0
 	end
 end
 
@@ -1404,7 +1373,7 @@ OvaleCondition.conditions.damagemultiplier = function(condition)
 	local spellId = condition[1]
 	local bdm = OvalePaperDoll.stat.baseDamageMultiplier
 	local dm = OvaleState:GetDamageMultiplier(spellId)
-	return 0, nil, bdm * dm, 0, 0
+	return 0, math.huge, bdm * dm, 0, 0
 end
 
 --- Get the damage taken by the player in the previous time interval.
@@ -1424,7 +1393,7 @@ OvaleCondition.conditions.damagetaken = function(condition)
 	if interval > 0 then
 		damage = OvaleDamageTaken:GetRecentDamage(interval)
 	end
-	return 0, nil, damage, 0, 0
+	return 0, math.huge, damage, 0, 0
 end
 OvaleCondition.conditions.incomingdamage = OvaleCondition.conditions.damagetaken
 
@@ -1867,7 +1836,7 @@ end
 
 OvaleCondition.conditions.itemcooldown = function(condition)
 	local actionCooldownStart, actionCooldownDuration, actionEnable = API_GetItemCooldown(condition[1])
-	return 0, nil, actionCooldownDuration, actionCooldownStart, -1
+	return 0, math.huge, actionCooldownDuration, actionCooldownStart, -1
 end
 
 --- Get the current number of the given item in the player's inventory.
@@ -2085,7 +2054,7 @@ OvaleCondition.conditions.lastestimateddamage = function(condition)
 	local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "comboPoints") or 1
 	local bdm = OvaleFuture:GetLastSpellInfo(guid, spellId, "baseDamageMultiplier") or 1
 	local dm = OvaleFuture:GetLastSpellInfo(guid, spellId, "damageMultiplier") or 1
-	return 0, nil, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, 0, 0
+	return 0, math.huge, OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, 0, 0
 end
 OvaleCondition.conditions.lastspellestimateddamage = OvaleCondition.conditions.lastestimateddamage
 
@@ -2305,7 +2274,7 @@ OvaleCondition.conditions.lastspellrangedcritchance = OvaleCondition.conditions.
 -- @see NextSwing
 
 OvaleCondition.conditions.lastswing = function(condition)
-	return 0, nil, 0, OvaleSwing:GetLast(condition[1]), 1
+	return 0, math.huge, 0, OvaleSwing:GetLast(condition[1]), 1
 end
 
 --- Get the most recent estimate of roundtrip latency in milliseconds.
@@ -2320,7 +2289,7 @@ end
 -- if Latency(more 1000) Spell(sinister_strike)
 
 OvaleCondition.conditions.latency = function(condition)
-	return 0, nil, OvaleLatency:GetLatency() * 1000, 0, 0
+	return 0, math.huge, OvaleLatency:GetLatency() * 1000, 0, 0
 end
 
 --- Get the level of the target.
@@ -2358,9 +2327,9 @@ end
 -- if List(opt_curse coe) Spell(curse_of_the_elements)
 
 OvaleCondition.conditions.list = function(condition)
-	if (condition[1]) then
-		if (Ovale:GetListValue(condition[1]) == condition[2]) then
-			return 0
+	if condition[1] then
+		if Ovale:GetListValue(condition[1]) == condition[2] then
+			return 0, math.huge
 		end
 	end
 	return nil
@@ -2692,7 +2661,7 @@ end
 -- @see LastSwing
 
 OvaleCondition.conditions.nextswing = function(condition)
-	return 0, nil, 0, OvaleSwing:GetNext(condition[1]), 0, -1
+	return 0, math.huge, OvaleSwing:GetNext(condition[1]), 0, -1
 end
 
 --- Get the number of seconds until the next tick of a periodic aura on the target.
@@ -2716,7 +2685,7 @@ OvaleCondition.conditions.nexttick = function(condition)
 		while ending - tick > OvaleState.currentTime do
 			ending = ending - tick
 		end
-		return 0, nil, 0, ending, -1
+		return 0, math.huge, 0, ending, -1
 	end
 	return nil
 end
@@ -2740,10 +2709,10 @@ OvaleCondition.conditions.otherdebuffexpires = function(condition)
 	local start, ending = GetAuraOnAnyTarget(condition, "target")
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
 	if not start then
-		ending = 0
+		return nil
 	end
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
-	return AddToTime(ending, -timeBefore)
+	return ending - timeBefore, math.huge
 end
 OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebuffexpires
 
@@ -2768,7 +2737,7 @@ OvaleCondition.conditions.otherdebuffpresent = function(condition)
 		return nil
 	end
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
-	return start, AddToTime(ending, -timeBefore)
+	return start, ending - timeBefore
 end
 OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebuffpresent
 
@@ -2790,7 +2759,7 @@ OvaleCondition.conditions.otherdebuffremains = function(condition)
 	if start and ending and start <= ending then
 		return start, ending, ending - start, start, -1
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebuffremains
@@ -2807,7 +2776,7 @@ OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebu
 
 OvaleCondition.conditions.powercost = function(condition)
 	local cost = select(4, API_GetSpellInfo(condition[1])) or 0
-	return 0, nil, cost, 0, 0
+	return 0, math.huge, cost, 0, 0
 end
 OvaleCondition.conditions.energycost = OvaleCondition.conditions.powercost
 OvaleCondition.conditions.focuscost = OvaleCondition.conditions.powercost
@@ -2966,7 +2935,7 @@ OvaleCondition.conditions.remainingcasttime = function(condition)
 	if not endTime then
 		return nil
 	end
-	return 0, nil, 0, endTime/1000, -1
+	return 0, math.huge, 0, endTime/1000, -1
 end
 
 --- Test if the current rune count meets the minimum rune requirements set out in the parameters.
@@ -3003,7 +2972,7 @@ end
 --     Spell(obliterate)
 
 OvaleCondition.conditions.runecount = function(condition)
-	return 0, nil, GetRuneCount(condition[1], condition.death)
+	return 0, math.huge, GetRuneCount(condition[1], condition.death)
 end
 
 --- Get the number of seconds before the rune conditions are met.
@@ -3031,7 +3000,7 @@ OvaleCondition.conditions.runescooldown = function(condition)
 	if ret < OvaleState.maintenant then
 		ret = OvaleState.maintenant
 	end
-	return 0, nil, 0, ret, -1
+	return 0, math.huge, 0, ret, -1
 end
 
 --- Get the current amount of runic power for death knights.
@@ -3194,9 +3163,9 @@ OvaleCondition.spellbookConditions.spellcharges = true
 OvaleCondition.conditions.spellchargecooldown = function(condition)
 	local charges, maxCharges, cooldownStart, cooldownDuration = API_GetSpellCharges(condition[1])
 	if charges < maxCharges then
-		return 0, nil, cooldownDuration, cooldownStart, -1
+		return 0, math.huge, cooldownDuration, cooldownStart, -1
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.spellbookConditions.spellchargecooldown = true
@@ -3215,15 +3184,15 @@ OvaleCondition.conditions.spellcooldown = function(condition)
 	if type(spellId) == "string" then
 		local sharedCd = OvaleState.state.cd[spellId]
 		if sharedCd then
-			return 0, nil, sharedCd.duration, sharedCd.start, -1
+			return 0, math.huge, sharedCd.duration, sharedCd.start, -1
 		else
 			return nil
 		end
 	elseif not OvaleSpellBook:IsKnownSpell(spellId) then
-		return 0, nil, 0, OvaleState.currentTime + 3600, -1
+		return 0, math.huge, 0, OvaleState.currentTime + 3600, -1
 	else
 		local actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(spellId)
-		return 0, nil, actionCooldownDuration, actionCooldownStart, -1
+		return 0, math.huge, actionCooldownDuration, actionCooldownStart, -1
 	end
 end
 -- OvaleCondition.spellbookConditions.spellcooldown = true / may be a sharedcd
@@ -3244,7 +3213,7 @@ OvaleCondition.conditions.spelldata = function(condition)
 	if si then
 		local ret = si[condition[2]]
 		if ret then
-			return 0, nil, ret, 0, 0
+			return 0, math.huge, ret, 0, 0
 		end
 	end
 	return nil
@@ -3293,7 +3262,7 @@ OvaleCondition.conditions.staggerremains = function(condition)
 		local stagger = API_UnitStagger(target)
 		return start, ending, 0, ending, -1 * stagger / (ending - start)
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 
@@ -3307,7 +3276,7 @@ end
 
 OvaleCondition.conditions.stance = function(condition)
 	if OvaleStance:IsStance(condition[1]) then
-		return 0
+		return 0, math.huge
 	else
 		return nil
 	end
@@ -3448,7 +3417,7 @@ end
 -- @return The number of added ticks.
 
 OvaleCondition.conditions.ticksadded = function(condition)
-	return 0, nil, 0, 0, 0
+	return 0, math.huge, 0, 0, 0
 end
 
 --- Get the remaining number of ticks of a periodic aura on a target.
@@ -3472,9 +3441,9 @@ OvaleCondition.conditions.ticksremain = function(condition)
 	local start, ending = GetAura(condition, self_auraFound)
 	local tick = self_auraFound.tick
 	if ending and tick and tick > 0 then
-		return 0, nil, 1, ending, -1/tick
+		return 0, math.huge, 1, ending, -1/tick
 	end
-	return 0, nil, 0, 0, 0
+	return 0, math.huge, 0, 0, 0
 end
 
 --- Get the number of seconds between ticks of a periodic aura on a target.
@@ -3534,7 +3503,7 @@ end
 
 OvaleCondition.conditions.timetodie = function(condition)
 	local timeToDie = TimeToDie(GetTarget(condition))
-	return 0, nil, timeToDie, OvaleState.maintenant, -1
+	return 0, math.huge, timeToDie, OvaleState.maintenant, -1
 end
 OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
 
@@ -3556,9 +3525,9 @@ OvaleCondition.conditions.timetohealthpercent = function(condition)
 	local healthPercent = health / maxHealth * 100
 	if healthPercent >= percent then
 		local t = timeToDie * (healthPercent - percent) / healthPercent
-		return 0, nil, t, OvaleState.maintenant, -1
+		return 0, math.huge, t, OvaleState.maintenant, -1
 	end
-	return 0, nil, 0, 0, 0
+	return 0, math.huge, 0, 0, 0
 end
 OvaleCondition.conditions.timetolifepercent = OvaleCondition.conditions.timetohealthpercent
 
@@ -3578,12 +3547,12 @@ OvaleCondition.conditions.timetopowerfor = function(condition)
 	if currentPower < cost then
 		if powerRate > 0 then
 			local t = OvaleState.currentTime + (cost - currentPower) / powerRate
-			return 0, nil, 0, t, -1
+			return 0, math.huge, 0, t, -1
 		else
-			return 0, nil, OvaleState.currentTime + 3600, 0, 0
+			return 0, math.huge, OvaleState.currentTime + 3600, 0, 0
 		end
 	else
-		return 0, nil, 0, 0, 0
+		return 0, math.huge, 0, 0, 0
 	end
 end
 OvaleCondition.conditions.timetoenergyfor = OvaleCondition.conditions.timetopowerfor
@@ -3603,7 +3572,7 @@ OvaleCondition.spellbookConditions.timetopowerfor = true
 OvaleCondition.conditions.timetomaxenergy = function(condition)
 	local maxEnergy = OvalePower.maxPower.energy or 0
 	local t = OvaleState.currentTime + (maxEnergy - OvaleState.state.energy) / OvaleState.powerRate.energy
-	return 0, nil, 0, t, -1
+	return 0, math.huge, 0, t, -1
 end
 
 --- Get the time scaled by the specified haste type, defaulting to spell haste.
@@ -3621,7 +3590,7 @@ end
 
 OvaleCondition.conditions.timewithhaste = function(condition)
 	haste = condition.haste or "spell"
-	return 0, nil, TimeWithHaste(condition[1], haste), 0, 0
+	return 0, math.huge, TimeWithHaste(condition[1], haste), 0, 0
 end
 
 --- Test if the totem for shamans, the ghoul for death knights, or the statue for monks has expired.
@@ -3640,18 +3609,19 @@ end
 -- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
 OvaleCondition.conditions.totemexpires = function(condition)
-	if type(condition[1]) ~= "number" then
-		condition[1] = OVALE_TOTEMTYPE[condition[1]]
+	local totemId = condition[1]
+	local seconds = condition[2] or 0
+	if type(totemId) ~= "number" then
+		totemId = OVALE_TOTEMTYPE[totemId]
 	end
-	
-	local haveTotem, totemName, startTime, duration = API_GetTotemInfo(condition[1])
+	local haveTotem, totemName, startTime, duration = API_GetTotemInfo(totemId)
 	if not startTime then
-		return 0
+		return 0, math.huge
 	end
 	if condition.totem and OvaleSpellBook:GetSpellName(condition.totem) ~= totemName then
-		return 0
+		return 0, math.huge
 	end
-	return AddToTime(startTime + duration, -(condition[2] or 0))
+	return startTime + duration - seconds, math.huge
 end
 
 --- Test if the totem for shamans, the ghoul for death knights, or the statue for monks is present.
@@ -3668,11 +3638,11 @@ end
 -- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
 OvaleCondition.conditions.totempresent = function(condition)
-	if type(condition[1]) ~= "number" then
-		condition[1] = OVALE_TOTEMTYPE[condition[1]]
+	local totemId = condition[1]
+	if type(totemId) ~= "number" then
+		totemId = OVALE_TOTEMTYPE[totemId]
 	end
-
-	local haveTotem, totemName, startTime, duration = API_GetTotemInfo(condition[1])
+	local haveTotem, totemName, startTime, duration = API_GetTotemInfo(totemId)
 	if not startTime then
 		return nil
 	end
@@ -3705,7 +3675,7 @@ end
 -- @return A boolean value.
 
 OvaleCondition.conditions["true"] = function(condition)
-	return 0, nil
+	return TestBoolean(true)
 end
 
 --- Test if the weapon imbue on the given weapon has expired or will expire after a given number of seconds.
@@ -3723,23 +3693,23 @@ OvaleCondition.conditions.weaponenchantexpires = function(condition)
 	local hasMainHandEnchant, mainHandExpiration, mainHandCharges, hasOffHandEnchant, offHandExpiration, offHandCharges = API_GetWeaponEnchantInfo()
 	if (condition[1] == "mainhand") then
 		if (not hasMainHandEnchant) then
-			return 0
+			return 0, math.huge
 		end
 		mainHandExpiration = mainHandExpiration/1000
 		if ((condition[2] or 0) >= mainHandExpiration) then
-			return 0
+			return 0, math.huge
 		else
-			return OvaleState.maintenant + mainHandExpiration - (condition[2] or 60)
+			return OvaleState.maintenant + mainHandExpiration - (condition[2] or 60), math.huge
 		end
 	else
 		if (not hasOffHandEnchant) then
-			return 0
+			return 0, math.huge
 		end
 		offHandExpiration = offHandExpiration/1000
 		if ((condition[2] or 0) >= offHandExpiration) then
-			return 0
+			return 0, math.huge
 		else
-			return OvaleState.maintenant + offHandExpiration - (condition[2] or 60)
+			return OvaleState.maintenant + offHandExpiration - (condition[2] or 60), math.huge
 		end
 	end
 end
@@ -3764,6 +3734,6 @@ OvaleCondition.conditions.weapondamage = function(condition)
 	else -- if hand == "mainhand" or hand == "main" then
 		damage = OvalePaperDoll.stat.mainHandWeaponDamage
 	end
-	return 0, nil, damage, 0, 0
+	return 0, math.huge, damage, 0, 0
 end
 --</public-static-properties>
