@@ -114,6 +114,8 @@ local DEFAULT_CRIT_CHANCE = 0.01
 
 -- Comparison words used in conditions, e.g., ComboPoints(more 4).
 local OVALE_COMPARATOR = {
+	["atLeast"] = true,
+	["atMost"] = true,
 	["equal"] = true,
 	["less"] = true,
 	["more"] = true,
@@ -180,14 +182,20 @@ local function TestOvaleValue(start, ending, value, atTime, rate, comparator, li
 		Ovale:Errorf("comparator %s missing limit", comparator)
 	elseif rate == 0 then
 		if (comparator == "less" and value < limit)
+				or (comparator == "atMost" and value <= limit)
 				or (comparator == "equal" and value == limit)
+				or (comparator == "atLeast" and value >= limit)
 				or (comparator == "more" and value > limit) then
 			return start, ending
 		end
 	elseif (comparator == "less" and rate > 0)
+			or (comparator == "atMost" and rate > 0)
+			or (comparator == "atLeast" and rate < 0)
 			or (comparator == "more" and rate < 0) then
 		return Intersect(start, ending, 0, (limit - value)/rate + atTime)
 	elseif (comparator == "less" and rate < 0)
+			or (comparator == "atMost" and rate < 0)
+			or (comparator == "atLeast" and rate > 0)
 			or (comparator == "more" and rate > 0) then
 		return Intersect(start, ending, (limit - value)/rate + atTime, math.huge)
 	end
@@ -491,7 +499,7 @@ end
 -- @param name The name of the armor set.
 --     Valid names: T11, T12, T13, T14, T15.
 --     Valid names for hybrid classes: append _caster, _heal, _melee, _tank.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of pieces of the named set that are equipped by the player.
 -- @return A boolean value for the result of the comparison.
@@ -508,7 +516,7 @@ end
 --- Get the current attack power of the player.
 -- @name AttackPower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current attack power.
 -- @return A boolean value for the result of the comparison.
@@ -786,7 +794,7 @@ OvaleCondition.conditions.debuffspellhaste = OvaleCondition.conditions.buffspell
 --- Get the current percent increase to spell haste of the player.
 -- @name SpellHaste
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current percent increase to spell haste.
 -- @return A boolean value for the result of the comparison.
@@ -815,7 +823,7 @@ OvaleCondition.conditions.debuffcount = OvaleCondition.conditions.buffcount
 -- @name BuffDuration
 -- @paramsig number or boolean
 -- @param id The aura spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1083,7 +1091,7 @@ end
 -- @name CastTime
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1111,7 +1119,7 @@ end
 -- @name Charges
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of charges
 -- @return A boolean value for the result of the comparison.
@@ -1230,7 +1238,7 @@ end
 --- Get the number of combo points on the currently selected target for a feral druid or a rogue.
 -- @name ComboPoints
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of combo points.
 -- @return A boolean value for the result of the comparison.
@@ -1247,7 +1255,7 @@ end
 -- @name Counter
 -- @paramsig number or boolean
 -- @param id The name of the counter. It should match one that's defined by inccounter=xxx in SpellInfo(...).
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current value the counter.
 -- @return A boolean value for the result of the comparison.
@@ -1416,7 +1424,7 @@ end
 -- You should not test for equality.
 -- @name Distance
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1440,7 +1448,7 @@ end
 -- A positive amount of power signifies being closer to Solar Eclipse.
 -- @name Eclipse
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The amount of Eclipse power.
 -- @return A boolean value for the result of the comparison.
@@ -1458,7 +1466,7 @@ end
 -- A positive number means heading toward Solar Eclipse.
 -- @name EclipseDir
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current direction.
 -- @return A boolean value for the result of the comparison.
@@ -1481,7 +1489,7 @@ end
 --- Get the number of hostile enemies on the battlefield.
 -- @name Enemies
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of enemies.
 -- @return A boolean value for the result of the comparison.
@@ -1511,7 +1519,7 @@ end
 --- Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
 -- @name EnergyRegen
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current rate of energy regeneration.
 -- @return A boolean value for the result of the comparison.
@@ -1567,7 +1575,7 @@ end
 --- Get the amount of regenerated focus per second for hunters.
 -- @name FocusRegen
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current rate of focus regeneration.
 -- @return A boolean value for the result of the comparison.
@@ -1582,7 +1590,7 @@ end
 --- Get the player's global cooldown in seconds.
 -- @name GCD
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of seconds.
 -- @return A boolean value for the result of the comparison.
@@ -1690,7 +1698,7 @@ end
 --- Get the current amount of health points of the target.
 -- @name Health
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1714,7 +1722,7 @@ OvaleCondition.conditions.life = OvaleCondition.conditions.health
 --- Get the number of health points away from full health of the target.
 -- @name HealthMissing
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1739,7 +1747,7 @@ OvaleCondition.conditions.lifemissing = OvaleCondition.conditions.healthmissing
 --- Get the current percent level of health of the target.
 -- @name HealthPercent
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -1764,7 +1772,7 @@ OvaleCondition.conditions.lifepercent = OvaleCondition.conditions.healthpercent
 --- Get the current amount of holy power for a paladin.
 -- @name HolyPower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The amount of holy power.
 -- @return A boolean value for the result of the comparison.
@@ -1842,7 +1850,7 @@ end
 -- Items with more than one charge count as one item.
 -- @name ItemCount
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The count of the item.
 -- @return A boolean value for the result of the comparison.
@@ -1857,7 +1865,7 @@ end
 --- Get the current number of charges of the given item in the player's inventory.
 -- @name ItemCharges
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of charges.
 -- @return A boolean value for the result of the comparison.
@@ -2007,7 +2015,7 @@ end
 -- @name LastDamage
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The damage done.
 -- @return A boolean value for the result of the comparison.
@@ -2062,7 +2070,7 @@ OvaleCondition.conditions.lastspellestimateddamage = OvaleCondition.conditions.l
 -- @name LastDamageMultiplier
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
@@ -2086,7 +2094,7 @@ OvaleCondition.conditions.lastspelldamagemultiplier = OvaleCondition.conditions.
 -- @name LastAttackPower
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
@@ -2109,7 +2117,7 @@ OvaleCondition.conditions.lastspellattackpower = OvaleCondition.conditions.lasta
 -- @name LastSpellpower
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
@@ -2132,7 +2140,7 @@ OvaleCondition.conditions.lastspellspellpower = OvaleCondition.conditions.lastsp
 -- @name LastComboPoints
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
@@ -2155,7 +2163,7 @@ OvaleCondition.conditions.lastspellcombopoints = OvaleCondition.conditions.lastc
 -- @name LastSpellCritChance
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 --     Defaults to unlimited=0.
@@ -2186,7 +2194,7 @@ OvaleCondition.conditions.lastspellspellcritchance = OvaleCondition.conditions.l
 -- @name LastMastery
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
@@ -2209,7 +2217,7 @@ OvaleCondition.conditions.lastspellmastery = OvaleCondition.conditions.lastmaste
 -- @name LastMeleeCritChance
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 --     Defaults to unlimited=0.
@@ -2238,7 +2246,7 @@ OvaleCondition.conditions.lastspellmeleecritchance = OvaleCondition.conditions.l
 -- @name LastRangedCritChance
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 --     Defaults to unlimited=0.
@@ -2279,7 +2287,7 @@ end
 --- Get the most recent estimate of roundtrip latency in milliseconds.
 -- @name Latency
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number of milliseconds to compare against.
 -- @return The most recent estimate of latency.
 -- @return A boolean value for the result of the comparison.
@@ -2390,7 +2398,7 @@ end
 -- or a percent-increase to chance to trigger some effect.
 -- @name Mastery
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current mastery effect.
 -- @return A boolean value for the result of the comparison.
@@ -2406,7 +2414,7 @@ end
 --- Get the amount of health points of the target when it is at full health.
 -- @name MaxHealth
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2437,7 +2445,7 @@ end
 -- Alternate power is the resource tracked by the alternate power bar in certain boss fights.
 -- @name MaxAlternatePower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2453,7 +2461,7 @@ end
 --- Get the maximum amount of burning embers of the target.
 -- @name MaxBurningEmbers
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2469,7 +2477,7 @@ end
 --- Get the maximum amount of Chi of the target.
 -- @name MaxChi
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2485,7 +2493,7 @@ end
 --- Get the maximum amount of Demonic Fury of the target.
 -- @name MaxDemonicFury
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2501,7 +2509,7 @@ end
 --- Get the maximum amount of energy of the target.
 -- @name MaxEnergy
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2517,7 +2525,7 @@ end
 --- Get the maximum amount of focus of the target.
 -- @name MaxFocus
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2533,7 +2541,7 @@ end
 --- Get the maximum amount of Holy Power of the target.
 -- @name MaxHolyPower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2549,7 +2557,7 @@ end
 --- Get the maximum amount of mana of the target.
 -- @name MaxMana
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2567,7 +2575,7 @@ end
 --- Get the maximum amount of rage of the target.
 -- @name MaxRage
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2583,7 +2591,7 @@ end
 --- Get the maximum amount of Runic Power of the target.
 -- @name MaxRunicPower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2599,7 +2607,7 @@ end
 --- Get the maximum amount of Shadow Orbs of the target.
 -- @name MaxShadowOrbs
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2615,7 +2623,7 @@ end
 --- Get the maximum amount of Soul Shards of the target.
 -- @name MaxSoulShards
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -2631,7 +2639,7 @@ end
 --- Get the current melee critical strike chance of the player.
 -- @name MeleeCritChance
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 --     Defaults to unlimited=0.
@@ -2866,7 +2874,7 @@ end
 --- Get the current ranged critical strike chance of the player.
 -- @name RangedCritChance
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 --     Defaults to unlimited=0.
@@ -2888,7 +2896,7 @@ end
 --- Get the result of the target's level minus the player's level. This number may be negative.
 -- @name RelativeLevel
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -3035,7 +3043,7 @@ end
 --- Get the current number of Soul Shards for warlocks.
 -- @name SoulShards
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of Soul Shards.
 -- @return A boolean value for the result of the comparison.
@@ -3052,7 +3060,7 @@ end
 -- If the target is at running speed, then this condition returns 100.
 -- @name Speed
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=player.
@@ -3070,7 +3078,7 @@ end
 --- Get the current spell critical strike chance of the player.
 -- @name SpellCritChance
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
 --     Defaults to unlimited=0.
@@ -3134,7 +3142,7 @@ OvaleCondition.spellbookConditions.spellusable = true
 -- @name SpellCharges
 -- @paramsig number or boolean
 -- @param id The spell ID.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of charges.
 -- @return A boolean value for the result of the comparison.
@@ -3221,7 +3229,7 @@ end
 --- Get the current spellpower of the player.
 -- @name Spellpower
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The current spellpower.
 -- @return A boolean value for the result of the comparison.
@@ -3303,7 +3311,7 @@ end
 -- @name TalentPoints
 -- @paramsig number or boolean
 -- @param talent Talent to inspect.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of talent points.
 -- @return A boolean value for the result of the comparison.
@@ -3335,7 +3343,7 @@ end
 -- This is a number between 0 (no threat) and 100 (will become the primary aggro target).
 -- @name Threat
 -- @paramsig number or boolean
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 --     Defaults to target=target.
@@ -3355,7 +3363,7 @@ end
 -- @name TickValue
 -- @paramsig number or boolean
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param filter Optional. The type of aura to check.
 --     Default is any.
 --     Valid values: any, buff, debuff
@@ -3381,7 +3389,7 @@ end
 -- @name Ticks
 -- @paramsig number or boolean
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @return The number of ticks.
 -- @return A boolean value for the result of the comparison.
@@ -3449,7 +3457,7 @@ end
 -- @name TickTime
 -- @paramsig number or boolean
 -- @param id The spell ID of the aura or the name of a spell list.
--- @param operator Optional. Comparison operator: equal, less, more.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 -- @param number Optional. The number to compare against.
 -- @param filter Optional. The type of aura to check.
 --     Default is any.
