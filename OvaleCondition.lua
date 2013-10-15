@@ -2846,7 +2846,7 @@ end
 -- @return A boolean value
 OvaleCondition.conditions.ptr = function(condition)
 	local uiVersion = select(4, API_GetBuildInfo())
-	return TestBoolean(uiVersion > 50200, condition[1])
+	return TestBoolean(uiVersion > 50400, condition[1])
 end
 
 --- Get the current amount of rage for guardian druids and warriors.
