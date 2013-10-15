@@ -172,13 +172,6 @@ local function TestConditions(paramList)
 	return true
 end
 
-local function ParseTime(value)
-	local node = self_pool:Get()
-	node.type = "time"
-	node.value = tonumber(value)
-	return AddNode(node)
-end
-
 local function ParseNumber(dummy, value)
 	local node = self_pool:Get()
 	node.type = "value"
@@ -431,38 +424,6 @@ local function ParseNot(a)
 	return AddNode(node)
 end
 
-local function ParseBefore(t,a)
-	local node = self_pool:Get()
-	node.type = "before"
-	node.time = self_node[tonumber(t)]
-	node.a = self_node[tonumber(a)]
-	return AddNode(node)
-end
-
-local function ParseAfter(t,a)
-	local node = self_pool:Get()
-	node.type = "after"
-	node.time = self_node[tonumber(t)]
-	node.a = self_node[tonumber(a)]
-	return AddNode(node)
-end
-
-local function ParseBetween(a,b)
-	local node = self_pool:Get()
-	node.type = "between"
-	node.a = self_node[tonumber(a)]
-	node.b = self_node[tonumber(b)]
-	return AddNode(node)
-end
-
-local function ParseFromUntil(a,b)
-	local node = self_pool:Get()
-	node.type = "fromuntil"
-	node.a = self_node[tonumber(a)]
-	node.b = self_node[tonumber(b)]
-	return AddNode(node)
-end
-
 local function ParseOr(a,b)
 	local node = self_pool:Get()
 	node.type = "or"
@@ -477,15 +438,6 @@ local function ParseOp(a, op, b)
 	node.operator = op
 	node.a = self_node[tonumber(a)]
 	node.b = self_node[tonumber(b)]
-	return AddNode(node)
-end
-
-local function ParseCompare(comp,t,a)
-	local node = self_pool:Get()
-	node.type = "compare"
-	node.comparison = comp
-	node.time = self_node[tonumber(t)]
-	node.a = self_node[tonumber(a)]
 	return AddNode(node)
 end
 
@@ -561,7 +513,6 @@ local function ParseCommands(text)
 	while true do
 		local was = text
 		text = strgsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
-		text = strgsub(text, "(%d+%.?%d*)s", ParseTime)
 		text = strgsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
 		text = strgsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
 		text = strgsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
@@ -581,22 +532,6 @@ local function ParseCommands(text)
 		end
 	end
 		
-	while true do
-		local was = text
-		text = strgsub(text, "not%s+node(%d+)", ParseNot)
-		text = strgsub(text, "between%s+node(%d+)%s+and%s+node(%d+)", ParseBetween)
-		text = strgsub(text, "from%s+node(%d+)%s+until%s+node(%d+)", ParseFromUntil)
-		text = strgsub(text, "(more)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)
-		text = strgsub(text, "(less)%s+than%s+node(%d+)%s+node(%d+)", ParseCompare)		
-		text = strgsub(text, "(at least)%s+node(%d+)%s+node(%d+)", ParseCompare)
-		text = strgsub(text, "(at most)%s+node(%d+)%s+node(%d+)", ParseCompare)		
-		text = strgsub(text, "node(%d+)%s+before%s+node(%d+)", ParseBefore)
-		text = strgsub(text, "node(%d+)%s+after%s+node(%d+)", ParseAfter)
-		if was == text then
-			break
-		end
-	end
-
 	while true do
 		local was = text
 		text = strgsub(text, "not%s+node(%d+)", ParseNot)
@@ -904,16 +839,6 @@ function OvaleCompile:DebugNode(node)
 		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
 	elseif (node.type == "not") then
 		text = "not "..self:DebugNode(node.a)
-	elseif (node.type == "before") then
-		text = self:DebugNode(node.time) .. " before "..self:DebugNode(node.a)
-	elseif (node.type == "between") then
-		text = "between "..self:DebugNode(node.a).." and "..self:DebugNode(node.b)
-	elseif (node.type == "fromuntil") then
-		text = "from "..self:DebugNode(node.a).." until "..self:DebugNode(node.b)
-	elseif (node.type == "compare") then
-		text = node.comparison.." than "..self:DebugNode(node.time).." "..self:DebugNode(node.a)
-	elseif (node.type == "time") then
-		text = node.value.."s"
 	elseif node.type == "operator" then
 		text = self:DebugNode(node.a)..node.operator..self:DebugNode(node.b)
 	elseif node.type == "lua" then

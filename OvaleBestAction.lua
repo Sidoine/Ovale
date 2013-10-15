@@ -107,13 +107,6 @@ local function PutValue(element, value, origin, rate)
 	return result
 end
 
-local function ComputeAfter(element, atTime)
-	local self = OvaleBestAction
-	local timeA = self:Compute(element.time, atTime)
-	local startA, endA = self:Compute(element.a, atTime)
-	return addTime(startA, timeA), addTime(endA, timeA)
-end
-
 local function ComputeAnd(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
@@ -150,58 +143,6 @@ local function ComputeAnd(element, atTime)
 	return startB, endB, prioriteB, elementB
 end
 
-local function ComputeBefore(element, atTime)
-	local self = OvaleBestAction
-	local timeA = self:Compute(element.time, atTime)
-	local startA, endA = self:Compute(element.a, atTime)
-	return addTime(startA, -timeA), addTime(endA, -timeA)
-end
-
-local function ComputeBetween(element, atTime)
-	Ovale:Log("between")
-	local self = OvaleBestAction
-	local tempsA = self:Compute(element.a, atTime)
-	local tempsB = self:Compute(element.b, atTime)
-	if not tempsA and not tempsB then
-		Ovale:Logf("%s returns 0 because the two nodes are nil", element.type)
-		return 0
-	end
-	if not tempsA or not tempsB then
-		Ovale:Logf("%s return nil", element.type)
-		return nil
-	end
-	local diff
-	if tempsA > tempsB then
-		diff = tempsA - tempsB
-	else
-		diff = tempsB - tempsA
-	end
-	Ovale:Logf("%s returns %f", element.type, diff)
-	return diff
-end
-
-local function ComputeCompare(element, atTime)
-	Ovale:Logf("compare %s", element.comparison)
-	local self = OvaleBestAction
-	local tempsA = self:Compute(element.a, atTime)
-	local timeB = self:Compute(element.time, atTime)
-	Ovale:Logf("%s %s %s", tempsA, element.comparison, timeB)
-	if element.comparison == "more" and (not tempsA or tempsA > timeB) then
-		Ovale:Logf("%s return 0", element.type)
-		return 0
-	elseif element.comparison == "less" and tempsA and tempsA < timeB then
-		Ovale:Logf("%s return 0", element.type)
-		return 0
-	elseif element.comparison == "at most" and tempsA and tempsA <= timeB then
-		Ovale:Logf("%s return 0", element.type)
-		return 0
-	elseif element.comparison == "at least" and (not tempsA or tempsA >= timeB) then
-		Ovale:Logf("%s return 0", element.type)
-		return 0
-	end
-	return nil
-end
-
 local function ComputeCustomFunction(element, atTime)
 	Ovale:Logf("custom function %s", element.name)
 	local self = OvaleBestAction
@@ -212,23 +153,6 @@ local function ComputeCustomFunction(element, atTime)
 		Ovale:Logf("Using cached values for %s", element.name)
 	end
 	return element.startA, element.endA, element.priorityA, element.elementA
-end
-
-local function ComputeFromUntil(element, atTime)
-	Ovale:Log("fromuntil")
-	local self = OvaleBestAction
-	local tempsA = self:Compute(element.a, atTime)
-	if not tempsA then
-		Ovale:Logf("%s return nil", element.type)
-		return nil
-	end
-	local tempsB = self:Compute(element.b, atTime)
-	if not tempsB then
-		Ovale:Logf("%s return nil", element.type)
-		return nil
-	end
-	Ovale:Logf("%s returns %f", element.type, tempsB - tempsA)
-	return tempsB - tempsA
 end
 
 local function ComputeFunction(element, atTime)
@@ -657,10 +581,6 @@ local function ComputeOperator(element, atTime)
 	return startA, endA, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
 end
 
-local function ComputeTime(element, atTime)
-	return element.value
-end
-
 local function ComputeUnless(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
@@ -712,13 +632,8 @@ end
 --<private-static-properties>
 local OVALE_COMPUTE_VISITOR =
 {
-	["after"] = ComputeAfter,
 	["and"] = ComputeAnd,
-	["before"] = ComputeBefore,
-	["between"] = ComputeBetween,
-	["compare"] = ComputeCompare,
 	["customfunction"] = ComputeCustomFunction,
-	["fromuntil"] = ComputeFromUntil,
 	["function"] = ComputeFunction,
 	["group"] = ComputeGroup,
 	["if"] = ComputeAnd,
@@ -726,7 +641,6 @@ local OVALE_COMPUTE_VISITOR =
 	["not"] = ComputeNot,
 	["operator"] = ComputeOperator,
 	["or"] = ComputeOr,
-	["time"] = ComputeTime,
 	["unless"] = ComputeUnless,
 	["value"] = ComputeValue,
 	["wait"] = ComputeWait,
