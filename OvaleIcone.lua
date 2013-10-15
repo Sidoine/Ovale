@@ -32,8 +32,11 @@ local function SetValue(self, value, actionTexture)
 	self.aPortee:Hide()	
 	self.shortcut:Hide()
 	if value then
-		if value<10 then
+		if value < 10 then
 			self.remains:SetFormattedText("%.1f", value)
+		elseif value == math.huge then
+			-- Clamp infinite time values to 3600 (one hour)
+			self.remains:SetFormattedText("3600")
 		else
 			self.remains:SetFormattedText("%d", value)
 		end
