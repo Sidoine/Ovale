@@ -107,17 +107,17 @@ local function PutValue(element, value, origin, rate)
 	return result
 end
 
-local function ComputeAfter(element)
+local function ComputeAfter(element, atTime)
 	local self = OvaleBestAction
-	local timeA = self:Compute(element.time)
-	local startA, endA = self:Compute(element.a)
+	local timeA = self:Compute(element.time, atTime)
+	local startA, endA = self:Compute(element.a, atTime)
 	return addTime(startA, timeA), addTime(endA, timeA)
 end
 
-local function ComputeAnd(element)
+local function ComputeAnd(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local startA, endA = self:ComputeBool(element.a)
+	local startA, endA = self:ComputeBool(element.a, atTime)
 	if not startA then
 		Ovale:Logf("%s return nil [%d]", element.type, element.nodeId)
 		return nil
@@ -128,12 +128,12 @@ local function ComputeAnd(element)
 	end
 	local startB, endB, prioriteB, elementB
 	if element.type == "if" then
-		startB, endB, prioriteB, elementB = self:Compute(element.b)
+		startB, endB, prioriteB, elementB = self:Compute(element.b, atTime)
 	else
-		startB, endB, prioriteB, elementB = self:ComputeBool(element.b)
+		startB, endB, prioriteB, elementB = self:ComputeBool(element.b, atTime)
 	end
 	-- If the "then" clause is a "wait" node, then only wait if the conditions are true.
-	if elementB and elementB.wait and not isBetween(OvaleState.currentTime, startA, endA) then
+	if elementB and elementB.wait and not isBetween(atTime, startA, endA) then
 		elementB.wait = nil
 	end
 	if isAfter(startB, endA) or isAfter(startA, endB) then
@@ -150,18 +150,18 @@ local function ComputeAnd(element)
 	return startB, endB, prioriteB, elementB
 end
 
-local function ComputeBefore(element)
+local function ComputeBefore(element, atTime)
 	local self = OvaleBestAction
-	local timeA = self:Compute(element.time)
-	local startA, endA = self:Compute(element.a)
+	local timeA = self:Compute(element.time, atTime)
+	local startA, endA = self:Compute(element.a, atTime)
 	return addTime(startA, -timeA), addTime(endA, -timeA)
 end
 
-local function ComputeBetween(element)
+local function ComputeBetween(element, atTime)
 	Ovale:Log("between")
 	local self = OvaleBestAction
-	local tempsA = self:Compute(element.a)
-	local tempsB = self:Compute(element.b)
+	local tempsA = self:Compute(element.a, atTime)
+	local tempsB = self:Compute(element.b, atTime)
 	if not tempsA and not tempsB then
 		Ovale:Logf("%s returns 0 because the two nodes are nil", element.type)
 		return 0
@@ -180,11 +180,11 @@ local function ComputeBetween(element)
 	return diff
 end
 
-local function ComputeCompare(element)
+local function ComputeCompare(element, atTime)
 	Ovale:Logf("compare %s", element.comparison)
 	local self = OvaleBestAction
-	local tempsA = self:Compute(element.a)
-	local timeB = self:Compute(element.time)
+	local tempsA = self:Compute(element.a, atTime)
+	local timeB = self:Compute(element.time, atTime)
 	Ovale:Logf("%s %s %s", tempsA, element.comparison, timeB)
 	if element.comparison == "more" and (not tempsA or tempsA > timeB) then
 		Ovale:Logf("%s return 0", element.type)
@@ -202,11 +202,11 @@ local function ComputeCompare(element)
 	return nil
 end
 
-local function ComputeCustomFunction(element)
+local function ComputeCustomFunction(element, atTime)
 	Ovale:Logf("custom function %s", element.name)
 	local self = OvaleBestAction
 	if not element.serial or element.serial < self_serial then
-		element.startA, element.endA, element.priorityA, element.elementA = self:Compute(element.a)
+		element.startA, element.endA, element.priorityA, element.elementA = self:Compute(element.a, atTime)
 		element.serial = self_serial
 	else
 		Ovale:Logf("Using cached values for %s", element.name)
@@ -214,15 +214,15 @@ local function ComputeCustomFunction(element)
 	return element.startA, element.endA, element.priorityA, element.elementA
 end
 
-local function ComputeFromUntil(element)
+local function ComputeFromUntil(element, atTime)
 	Ovale:Log("fromuntil")
 	local self = OvaleBestAction
-	local tempsA = self:Compute(element.a)
+	local tempsA = self:Compute(element.a, atTime)
 	if not tempsA then
 		Ovale:Logf("%s return nil", element.type)
 		return nil
 	end
-	local tempsB = self:Compute(element.b)
+	local tempsB = self:Compute(element.b, atTime)
 	if not tempsB then
 		Ovale:Logf("%s return nil", element.type)
 		return nil
@@ -231,7 +231,7 @@ local function ComputeFromUntil(element)
 	return tempsB - tempsA
 end
 
-local function ComputeFunction(element)
+local function ComputeFunction(element, atTime)
 	local self = OvaleBestAction
 	if element.func == "spell" or element.func == "macro" or element.func == "item" or element.func == "texture" then
 		local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -271,7 +271,7 @@ local function ComputeFunction(element)
 			if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
 				start = actionCooldownDuration + actionCooldownStart
 			else
-				start = OvaleState.currentTime
+				start = atTime
 			end
 			Ovale:Logf("start=%f attenteFinCast=%s [%d]", start, OvaleState.attenteFinCast, element.nodeId)
 			if start < OvaleState.attenteFinCast then
@@ -308,7 +308,7 @@ local function ComputeFunction(element)
 			Ovale:Errorf("Condition %s not found", element.func)
 			return nil
 		end
-		local start, ending, value, origin, rate = condition(element.params)
+		local start, ending, value, origin, rate = condition(element.params, atTime)
 
 		if Ovale.trace then
 			local conditionCall = element.func .. "("
@@ -327,21 +327,21 @@ local function ComputeFunction(element)
 	end
 end
 
-local function ComputeGroup(element)
+local function ComputeGroup(element, atTime)
 	local self = OvaleBestAction
 	local bestStart, bestEnding, bestPriority, bestElement, bestCastTime
 
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 
 	if #element.nodes == 1 then
-		return self:Compute(element.nodes[1])
+		return self:Compute(element.nodes[1], atTime)
 	end
 
 	for k, v in ipairs(element.nodes) do
-		local start, ending, priority, newElement = self:Compute(v)
+		local start, ending, priority, newElement = self:Compute(v, atTime)
 
-		if start and start < OvaleState.currentTime then
-			start = OvaleState.currentTime
+		if start and start < atTime then
+			start = atTime
 		end
 
 		if start and (not ending or start <= ending) then
@@ -423,15 +423,15 @@ local function ComputeGroup(element)
 	return bestStart, bestEnding, bestPriority, bestElement
 end
 
-local function ComputeLua(element)
+local function ComputeLua(element, atTime)
 	local ret = loadstring(element.lua)()
 	Ovale:Logf("lua %s", ret)
 	return 0, nil, OVALE_DEFAULT_PRIORITY, PutValue(element, ret, 0, 0)
 end
 
-local function ComputeNot(element)
+local function ComputeNot(element, atTime)
 	local self = OvaleBestAction
-	local startA, endA = self:ComputeBool(element.a)
+	local startA, endA = self:ComputeBool(element.a, atTime)
 	--[[
 		NOT start < t < ending    ==>  0 < t < start  OR  ending < t < infinity
 		NOT start < t < infinity  ==>  0 < t < start
@@ -447,15 +447,15 @@ local function ComputeNot(element)
 	end
 end
 
-local function ComputeOr(element)
+local function ComputeOr(element, atTime)
 	Ovale:Log(element.type)
 	local self = OvaleBestAction
-	local startA, endA = self:ComputeBool(element.a)
-	local startB, endB = self:ComputeBool(element.b)
+	local startA, endA = self:ComputeBool(element.a, atTime)
+	local startB, endB = self:ComputeBool(element.b, atTime)
 
-	if isBefore(endA, OvaleState.currentTime) then
+	if isBefore(endA, atTime) then
 		return startB, endB
-	elseif isBefore(endB, OvaleState.currentTime) then
+	elseif isBefore(endB, atTime) then
 		return startA, endA
 	end
 	if isBefore(endA, startB) then
@@ -472,10 +472,10 @@ local function ComputeOr(element)
 	return startB, endB
 end
 
-local function ComputeOperator(element)
+local function ComputeOperator(element, atTime)
 	local self = OvaleBestAction
-	local startA, endA, prioA, elementA = self:Compute(element.a)
-	local startB, endB, prioB, elementB = self:Compute(element.b)
+	local startA, endA, prioA, elementA = self:Compute(element.a, atTime)
+	local startB, endB, prioB, elementB = self:Compute(element.b, atTime)
 	if not elementA or not elementB then
 		Ovale:Logf("operator %s: elementA or elementB is nil", element.operator)
 		return nil
@@ -568,7 +568,7 @@ local function ComputeOperator(element)
 	elseif element.operator == "/" then
 		if z ~= 0 then
 			-- To allow constructs like {target.Health() / target.DeadIn()}
-			x = x + (OvaleState.currentTime - y) * z
+			x = x + (atTime - y) * z
 		end
 		l = a / x
 		m = b
@@ -657,17 +657,17 @@ local function ComputeOperator(element)
 	return startA, endA, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
 end
 
-local function ComputeTime(element)
+local function ComputeTime(element, atTime)
 	return element.value
 end
 
-local function ComputeUnless(element)
+local function ComputeUnless(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local startA, endA = self:ComputeBool(element.a)
-	local startB, endB, prioriteB, elementB = self:Compute(element.b)
+	local startA, endA = self:ComputeBool(element.a, atTime)
+	local startB, endB, prioriteB, elementB = self:Compute(element.b, atTime)
 	-- If the "then" clause is a "wait" node, then only wait if the conditions are false.
-	if elementB and elementB.wait and isBetween(OvaleState.currentTime, startA, endA) then
+	if elementB and elementB.wait and isBetween(atTime, startA, endA) then
 		elementB.wait = nil
 	end
 	-- unless {t: startA < t < endA} then {t: startB < t < endB}
@@ -692,15 +692,15 @@ local function ComputeUnless(element)
 	return startB, endB, prioriteB, elementB
 end
 
-local function ComputeValue(element)
+local function ComputeValue(element, atTime)
 	Ovale:Logf("value %s", element.value)
 	return 0, nil, OVALE_DEFAULT_PRIORITY, element
 end
 
-local function ComputeWait(element)
+local function ComputeWait(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local startA, endA, prioriteA, elementA = self:Compute(element.a)
+	local startA, endA, prioriteA, elementA = self:Compute(element.a, atTime)
 	if elementA then
 		elementA.wait = true
 		Ovale:Logf("%s return %s, %s [%d]", element.type, startA, endA, element.nodeId)
@@ -851,22 +851,22 @@ function OvaleBestAction:GetActionInfo(element)
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, target, element.params.nored
 end
 
-function OvaleBestAction:Compute(element)
+function OvaleBestAction:Compute(element, atTime)
 	if not element or (Ovale.bug and not Ovale.trace) then
 		return nil
 	end
 
 	local visitor = OVALE_COMPUTE_VISITOR[element.type]
 	if visitor then
-		return visitor(element)
+		return visitor(element, atTime)
 	end
 
 	Ovale:Logf("unknown element %s, return nil", element.type)
 	return nil
 end
 
-function OvaleBestAction:ComputeBool(element)
-	local start, ending, priority, element = self:Compute(element)
+function OvaleBestAction:ComputeBool(element, atTime)
+	local start, ending, priority, element = self:Compute(element, atTime)
 	--Special case of a value element: it must not be 0
 	if element and element.type == "value" and element.value == 0 and element.rate == 0 then
 		return nil
