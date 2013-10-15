@@ -878,7 +878,7 @@ OvaleCondition.conditions.debuffduration = OvaleCondition.conditions.buffduratio
 OvaleCondition.conditions.buffexpires = function(condition)
 	local start, ending = GetAura(condition)
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
-	if not start then
+	if not start or not ending then
 		return TestBoolean(true)
 	end
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
@@ -908,7 +908,11 @@ OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
 OvaleCondition.conditions.buffremains = function(condition)
 	local comparator, limit = condition[2], condition[3]
 	local start, ending = GetAura(condition)
-	return TestOvaleValue(start, ending, ending - start, start, -1, comparator, limit)
+	if not start or not ending then
+		return Compare(0, comparator, limit)
+	else
+		return TestOvaleValue(start, ending, ending - start, start, -1, comparator, limit)
+	end
 end
 OvaleCondition.conditions.debuffremains = OvaleCondition.conditions.buffremains
 
@@ -965,7 +969,7 @@ OvaleCondition.conditions.debuffgain = OvaleCondition.conditions.buffgain
 
 OvaleCondition.conditions.buffpresent = function(condition)
 	local start, ending = GetAura(condition)
-	if not start then
+	if not start or not ending then
 		return nil
 	end
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
@@ -997,10 +1001,12 @@ OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 OvaleCondition.conditions.buffstacks = function(condition)
 	local comparator, limit = condition[2], condition[3]
 	local start, ending, stacks = GetAura(condition)
-	start = start or 0
-	ending = ending or math.huge
-	stacks = stacks or 0
-	return TestOvaleValue(start, ending, stacks, 0, 0, comparator, limit)
+	if not start or not ending then
+		return Compare(0, comparator, limit)
+	else
+		stacks = stacks or 0
+		return TestOvaleValue(start, ending, stacks, 0, 0, comparator, limit)
+	end
 end
 OvaleCondition.conditions.debuffstacks = OvaleCondition.conditions.buffstacks
 
@@ -2868,7 +2874,7 @@ end
 OvaleCondition.conditions.otherdebuffexpires = function(condition)
 	local start, ending = GetAuraOnAnyTarget(condition, "target")
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
-	if not start then
+	if not start or not ending then
 		return nil
 	end
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
@@ -2893,7 +2899,7 @@ OvaleCondition.conditions.otherbuffexpires = OvaleCondition.conditions.otherdebu
 
 OvaleCondition.conditions.otherdebuffpresent = function(condition)
 	local start, ending = GetAuraOnAnyTarget(condition, "target")
-	if not start then
+	if not start or not ending then
 		return nil
 	end
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
@@ -2920,7 +2926,11 @@ OvaleCondition.conditions.otherbuffpresent = OvaleCondition.conditions.otherdebu
 OvaleCondition.conditions.otherdebuffremains = function(condition)
 	local comparator, limit = condition[2], condition[3]
 	local start, ending = GetAuraOnAnyTarget(condition, "target")
-	return TestOvaleValue(start, ending, ending - start, start, -1, comparator, limit)
+	if not start or not ending then
+		return Compare(0, comparator, limit)
+	else
+		return TestOvaleValue(start, ending, ending - start, start, -1, comparator, limit)
+	end
 end
 OvaleCondition.conditions.otherbuffremains = OvaleCondition.conditions.otherdebuffremains
 
@@ -3353,7 +3363,7 @@ OvaleCondition.conditions.spellchargecooldown = function(condition)
 	local comparator, limit = condition[2], condition[3]
 	local charges, maxCharges, cooldownStart, cooldownDuration = API_GetSpellCharges(spellId)
 	if charges < maxCharges then
-		return TestOvaleValue(cooldownStart, math.huge, cooldownDuration, cooldownStart, -1, comparator, limit)
+		return TestOvaleValue(cooldownStart, cooldownStart + cooldownDuration, cooldownDuration, cooldownStart, -1, comparator, limit)
 	else
 		return Compare(0, comparator, limit)
 	end
@@ -3375,20 +3385,19 @@ OvaleCondition.spellbookConditions.spellchargecooldown = true
 OvaleCondition.conditions.spellcooldown = function(condition)
 	local spellId = condition[1]
 	local comparator, limit = condition[2], condition[3]
+	local start, duration
 	if type(spellId) == "string" then
 		local sharedCd = OvaleState.state.cd[spellId]
-		local start, duration = sharedCd.start, sharedCd.duration
-		if sharedCd then
-			return TestOvaleValue(start, start + duration, duration, start, -1, comparator, limit)
-		else
+		if not sharedCd then
 			return nil
 		end
+		start, duration = sharedCd.start, sharedCd.duration
 	elseif not OvaleSpellBook:IsKnownSpell(spellId) then
-		return Compare(0, comparator, limit)
+		return nil
 	else
-		local start, duration = OvaleState:GetComputedSpellCD(spellId)
-		return TestOvaleValue(start, start + duration, duration, start, -1, comparator, limit)
+		start, duration = OvaleState:GetComputedSpellCD(spellId)
 	end
+	return TestOvaleValue(start, start + duration, duration, start, -1, comparator, limit)
 end
 -- OvaleCondition.spellbookConditions.spellcooldown = true / may be a sharedcd
 
@@ -3462,11 +3471,11 @@ OvaleCondition.conditions.staggerremains = function(condition)
 		-- Light Stagger
 		start, ending, stacks = OvaleState:GetAura(target, 124275, "HARMFUL")
 	end
-	if start and ending and start < ending and stacks and stacks > 0 then
+	if not start or not ending then
+		return Compare(0, comparator, limit)
+	else
 		local stagger = API_UnitStagger(target)
 		return TestOvaleValue(start, ending, 0, ending, -1 * stagger / (ending - start), comparator, limit)
-	else
-		return Compare(0, comparator, limit)
 	end
 end
 
@@ -3807,7 +3816,7 @@ OvaleCondition.conditions.timetomaxenergy = function(condition)
 	if t > 0 then
 		return TestOvaleValue(0, OvaleState.currentTime + t, t, OvaleState.currentTime, -1, comparator, limit)
 	else
-		return TestOvaleValue(OvaleState.currentTime, math.huge, 0, 0, 0, comparator, limit)
+		return Compare(0, comparator, limit)
 	end
 end
 
