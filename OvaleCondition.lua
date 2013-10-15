@@ -32,12 +32,14 @@ local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
 local OvaleSwing = Ovale.OvaleSwing
+local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
 local floor = floor
 local pairs = pairs
 local select = select
 local tostring = tostring
 local wipe = table.wipe
+local Intersect = OvaleTimeSpan.Intersect
 local API_GetBuildInfo = GetBuildInfo
 local API_GetItemCooldown = GetItemCooldown
 local API_GetItemCount = GetItemCount
@@ -109,6 +111,13 @@ local OVALE_TOTEMTYPE =
 }
 
 local DEFAULT_CRIT_CHANCE = 0.01
+
+-- Comparison words used in conditions, e.g., ComboPoints(more 4).
+local OVALE_COMPARATOR = {
+	["equal"] = true,
+	["less"] = true,
+	["more"] = true,
+}
 --</private-static-properties>
 
 --<private-static-methods>
@@ -138,69 +147,59 @@ local function TimeWithHaste(time1, haste)
 	end
 end
 
-local function Compare(a, comparison, b)
-	if not comparison then
-		return 0, math.huge, a, 0, 0 -- this is not a compare, returns the value a
-	elseif comparison == "more" then
-		if not b or (a and a > b) then
-			return 0, math.huge
-		else
-			return nil
-		end
-	elseif comparison == "equal" then
-		if b == a then
-			return 0, math.huge
-		else
-			return nil
-		end
-	elseif comparison == "less" then
-		if not a or (b and a < b) then
-			return 0, math.huge
-		else
-			return nil
-		end
-	else
-		Ovale:Errorf("unknown compare term %s (should be more, equal, or less)", comparison)
-	end
-end
-
-local function TestBoolean(a, condition)
-	if condition == "yes" or not condition then
+-- Returns whether "a" matches "yesno".
+local function TestBoolean(a, yesno)
+	if not yesno or yesno == "yes" then
 		if a then
 			return 0, math.huge
-		else
-			return nil
 		end
 	else
 		if not a then
 			return 0, math.huge
-		else
-			return nil
 		end
 	end
+	return nil
+end
+
+-- Returns either an "Ovale value" or a boolean, depending on whether "comparator" is given.
+-- An "Ovale value" is a quintuplet (start, ending, value, atTime, rate) that determines a
+-- linear function A(t) = value + (t - atTime)*rate, with domain (start, ending).
+local function TestOvaleValue(start, ending, value, atTime, rate, comparator, limit)
+	--[[
+		                     A(t) = limit
+		value + (t - atTime)*rate = limit
+		        (t - atTime)*rate = limit - value
+	--]]
+	if not value or not atTime or not rate then
+		return nil
+	elseif not comparator then
+		return start, ending, value, atTime, rate
+	elseif not OVALE_COMPARATOR[comparator] then
+		Ovale:Errorf("unknown compare term %s (should be less, equal, or more)", comparator)
+	elseif not limit then
+		Ovale:Errorf("comparator %s missing limit", comparator)
+	elseif rate == 0 then
+		if (comparator == "less" and value < limit)
+				or (comparator == "equal" and value == limit)
+				or (comparator == "more" and value > limit) then
+			return start, ending
+		end
+	elseif (comparator == "less" and rate > 0)
+			or (comparator == "more" and rate < 0) then
+		return Intersect(start, ending, 0, (limit - value)/rate + atTime)
+	elseif (comparator == "less" and rate < 0)
+			or (comparator == "more" and rate > 0) then
+		return Intersect(start, ending, (limit - value)/rate + atTime, math.huge)
+	end
+	return nil
+end
+
+local function Compare(value, comparator, limit)
+	return TestOvaleValue(0, math.huge, value, 0, 0, comparator, limit)
 end
 
 local function TestValue(comparator, limit, value, atTime, rate)
-	if not value or not atTime then
-		return nil
-	elseif not comparator then
-		return 0, math.huge, value, atTime, rate
-	else
-		local start, ending = 0, math.huge
-		if comparator == "more" and rate == 0 then
-			if value <= limit then return nil end
-		elseif comparator == "less" and rate == 0 then
-			if value >= limit then return nil end
-		elseif (comparator == "more" and rate > 0) or (comparator == "less" and rate < 0) then
-			start = (limit - value)/rate + atTime
-		elseif (comparator == "more" and rate < 0) or (comparator == "less" and rate > 0) then
-			ending = (limit - value)/rate + atTime
-		else
-			Ovale:Errorf("Unknown operator %s", comparator)
-			return nil
-		end
-		return start, ending
-	end
+	return TestOvaleValue(0, math.huge, value, atTime, rate, comparator, limit)
 end
 
 local function GetFilter(condition)
@@ -438,8 +437,8 @@ OvaleCondition.defaultTarget = "target"
 		This returns a time interval representing when the condition is true
 		and is used by conditions that return only a time interval.
 
-	(2) start, ending, value, origin, rate
-		This returns a function f(t) = value + (t - origin) * rate that is
+	(2) start, ending, value, atTime, rate
+		This returns a function f(t) = value + (t - atTime) * rate that is
 		valid for start < t < ending.  This return method is used by
 		conditions that return a value that is used in numerical comparisons
 		or operations.
@@ -1320,8 +1319,8 @@ end
 OvaleCondition.conditions.critdamage = function(condition)
 	-- TODO: Need to account for increased crit effect from meta-gems.
 	local critFactor = 2
-	local start, ending, value, origin, rate = OvaleCondition.conditions.damage(condition)
-	return start, ending, critFactor * value, origin, critFactor * rate
+	local start, ending, value, atTime, rate = OvaleCondition.conditions.damage(condition)
+	return start, ending, critFactor * value, atTime, critFactor * rate
 end
 
 --- Get the current estimated damage of a spell on the target.
@@ -1344,9 +1343,9 @@ end
 OvaleCondition.conditions.damage = function(condition)
 	-- TODO: Use target's debuffs in this calculation.
 	local spellId = condition[1]
-	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
+	local value, atTime, rate = ComputeFunctionParam(spellId, "damage")
 	if value then
-		return 0, math.huge, value, origin, rate
+		return 0, math.huge, value, atTime, rate
 	else
 		local ap = OvalePaperDoll.stat.attackPower
 		local sp = OvalePaperDoll.stat.spellBonusDamage
