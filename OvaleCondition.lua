@@ -943,7 +943,11 @@ OvaleCondition.conditions.buffexpires = function(condition)
 		return TestBoolean(true)
 	end
 	Ovale:Logf("timeBefore = %s, ending = %s", timeBefore, ending)
-	return ending - timeBefore, math.huge
+	if ending - timeBefore <= start then
+		return start, math.huge
+	else
+		return ending - timeBefore, math.huge
+	end
 end
 OvaleCondition.conditions.debuffexpires = OvaleCondition.conditions.buffexpires
 
@@ -1034,7 +1038,11 @@ OvaleCondition.conditions.buffpresent = function(condition)
 		return nil
 	end
 	local timeBefore = TimeWithHaste(condition[2], condition.haste)
-	return start, ending - timeBefore
+	if ending - timeBefore <= start then
+		return nil
+	else
+		return start, ending - timeBefore
+	end
 end
 OvaleCondition.conditions.debuffpresent = OvaleCondition.conditions.buffpresent
 
