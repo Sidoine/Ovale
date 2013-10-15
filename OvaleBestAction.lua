@@ -569,25 +569,31 @@ function OvaleBestAction:GetActionInfo(element)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable
 
-	if (element.func == "spell") then
+	if element.func == "spell" then
 		action = OvaleActionBar:GetForSpell(spellId)
 		if not OvaleSpellBook:IsKnownSpell(spellId) and not action then
 			Ovale:Logf("Spell %s not learnt", spellId)
 			return nil
 		end
 
+		actionTexture = actionTexture or API_GetSpellTexture(spellId)
+		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
 		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(spellId)
 
 		local si = OvaleData.spellInfo[spellId]
 		if si then
 			if si.stance and not OvaleStance:IsStance(si.stance) then
+				-- Spell requires a stance that player is not in.
 				return nil
 			end
 			if si.combo == 0 and OvaleState.state.combo == 0 then
+				-- Spell is a combo point finisher, but player has no combo points on the target.
 				return nil
 			end
 			for _, power in pairs(OvalePower.SECONDARY_POWER) do
 				if si[power] and si[power] > OvaleState.state[power] then
+					-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
+					-- that the player does not have enough of.
 					return nil
 				end
 			end
@@ -599,49 +605,47 @@ function OvaleBestAction:GetActionInfo(element)
 					end
 				end
 			end
+			-- Use a custom texture if given.
 			if si.texture then
 				actionTexture = "Interface\\Icons\\" .. si.texture
 			end
 		end
 
-		actionTexture = actionTexture or API_GetSpellTexture(spellId)
-		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
 		actionUsable = API_IsUsableSpell(spellId)
-		actionShortcut = nil
-	elseif (element.func=="macro") then
+
+	elseif element.func == "macro" then
 		action = OvaleActionBar:GetForMacro(element.params[1])
-		if action then
-			actionTexture = API_GetActionTexture(action)
-			actionInRange = API_IsActionInRange(action, target)
-			actionCooldownStart, actionCooldownDuration, actionEnable = API_GetActionCooldown(action)
-			actionUsable = API_IsUsableAction(action)
-			actionShortcut = OvaleActionBar:GetBinding(action)
-			actionIsCurrent = API_IsCurrentAction(action)
-		else
+		if not action then
 			Ovale:Logf("Unknown macro %s", element.params[1])
+			return nil
 		end
-	elseif (element.func=="item") then
+		actionTexture = API_GetActionTexture(action)
+		actionInRange = API_IsActionInRange(action, target)
+		actionCooldownStart, actionCooldownDuration, actionEnable = API_GetActionCooldown(action)
+		actionUsable = API_IsUsableAction(action)
+
+	elseif element.func == "item" then
 		local itemId = element.params[1]
 		if itemId and type(itemId) ~= "number" then
 			itemId = OvaleEquipement:GetEquippedItem(itemId)
 		end
 		if not itemId then
+			Ovale:Logf("Unknown item %s", element.params[1])
 			return nil
 		end
-
 		Ovale:Logf("Item %s", itemId)
-
-		local spellName = API_GetItemSpell(itemId)
-		actionUsable = (spellName~=nil)
-
 		action = OvaleActionBar:GetForItem(itemId)
+
 		actionTexture = API_GetItemIcon(itemId)
 		actionInRange = API_IsItemInRange(itemId, target)
 		actionCooldownStart, actionCooldownDuration, actionEnable = API_GetItemCooldown(itemId)
-		actionShortcut = nil
-		actionIsCurrent = nil
-	elseif element.func=="texture" then
-		actionTexture = "Interface\\Icons\\"..element.params[1]
+
+		local spellName = API_GetItemSpell(itemId)
+		actionUsable = (spellName ~= nil)
+
+	elseif element.func == "texture" then
+		actionTexture = "Interface\\Icons\\" .. element.params[1]
+		actionInRange = nil
 		actionCooldownStart = OvaleState.maintenant
 		actionCooldownDuration = 0
 		actionEnable = 1
@@ -649,9 +653,6 @@ function OvaleBestAction:GetActionInfo(element)
 	end
 
 	if action then
-		if actionUsable == nil then
-			actionUsable = API_IsUsableAction(action)
-		end
 		actionShortcut = OvaleActionBar:GetBinding(action)
 		actionIsCurrent = API_IsCurrentAction(action)
 	end
