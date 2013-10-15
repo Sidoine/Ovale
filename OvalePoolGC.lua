@@ -12,21 +12,31 @@ local _, Ovale = ...
 local OvalePoolGC = {}
 Ovale.OvalePoolGC = OvalePoolGC
 
+--<private-static-properties>
+local setmetatable = setmetatable
+--</private-static-properties>
+
 --<public-static-properties>
 OvalePoolGC.name = "OvalePoolGC"
 OvalePoolGC.pool = nil
 OvalePoolGC.size = 0
 OvalePoolGC.unused = 0
+OvalePoolGC.__index = OvalePoolGC
+do
+	setmetatable(OvalePoolGC, { __call = function(_, ...) return NewPool(...) end })
+end
+
 --</public-static-properties>
 
---<public-static-methods>
-function OvalePoolGC:NewPool(name)
-	obj = { name = name }
-	setmetatable(obj, { __index = self })
+--<private-static-methods>
+function NewPool(...)
+	local obj = setmetatable({ name = ... }, OvalePoolGC)
 	obj:Reset()
 	return obj
 end
+--</private-static-methods>
 
+--<public-static-methods>
 function OvalePoolGC:Get()
 	-- Keep running count of total number of tables allocated.
 	self.size = self.size + 1

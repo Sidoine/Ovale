@@ -99,6 +99,13 @@ $sp{Ovale}{OvalePoolGC} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleState} = true;
 
+$sp{OvaleQueue}{Front} = true;
+$sp{OvaleQueue}{FrontToBackIterator} = true;
+$sp{OvaleQueue}{InsertBack} = true;
+$sp{OvaleQueue}{InsertFront} = true;
+$sp{OvaleQueue}{NewDeque} = true;
+$sp{OvaleQueue}{RemoveFront} = true;
+
 opendir(DIR, ".");
 while (defined($r = readdir(DIR)))
 {

@@ -12,21 +12,34 @@ local _, Ovale = ...
 local OvalePool = {}
 Ovale.OvalePool = OvalePool
 
+--<private-static-properties>
+local assert = assert
+local setmetatable = setmetatable
+local tinsert = table.insert
+local tremove = table.remove
+local wipe = table.wipe
+--</private-static-properties>
+
 --<public-static-properties>
 OvalePool.name = "OvalePool"
 OvalePool.pool = nil
 OvalePool.size = 0
 OvalePool.unused = 0
+OvalePool.__index = OvalePool
+do
+	setmetatable(OvalePool, { __call = function(_, ...) return NewPool(...) end })
+end
 --</public-static-properties>
 
---<public-static-methods>
-function OvalePool:NewPool(name)
-	obj = { name = name }
-	setmetatable(obj, { __index = self })
+--<private-static-methods>
+function NewPool(...)
+	local obj = setmetatable({ name = ... }, OvalePool)
 	obj:Reset()
 	return obj
 end
+--</private-static-methods>
 
+--<public-static-methods>
 function OvalePool:Get()
 	assert(self.pool)
 	local item = tremove(self.pool)

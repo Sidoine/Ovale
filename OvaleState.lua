@@ -45,10 +45,6 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local self_runes = {}
 local self_runesCD = {}
 
--- Static properties used by "GetAura" method.
-local aura_GetAura = {}
-local newAura_GetAura = {}
-
 -- Aura IDs for Eclipse buffs.
 local LUNAR_ECLIPSE = 48518
 local SOLAR_ECLIPSE = 48517
@@ -653,35 +649,40 @@ function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound
 	end
 end
 
-function OvaleState:GetAura(unitId, spellId, filter, mine, auraFound)
-	local guid = OvaleGUID:GetGUID(unitId)
-	if OvaleData.buffSpellList[spellId] then
-		if auraFound then wipe(newAura_GetAura) end
-		local newStart, newEnding, newStacks, newGain
-		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			if auraFound then wipe(aura_GetAura) end
-			local start, ending, stacks, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura_GetAura)
-			if start and (not newStart or stacks > newStacks) then
-				newStart = start
-				newEnding = ending
-				newStacks = stacks
-				newGain = gain
-				if auraFound then
-					wipe(newAura_GetAura)
-					for k, v in pairs(aura_GetAura) do
-						newAura_GetAura[k] = v
+do
+	local aura = {}
+	local newAura = {}
+
+	function OvaleState:GetAura(unitId, spellId, filter, mine, auraFound)
+		local guid = OvaleGUID:GetGUID(unitId)
+		if OvaleData.buffSpellList[spellId] then
+			if auraFound then wipe(newAura) end
+			local newStart, newEnding, newStacks, newGain
+			for auraId in pairs(OvaleData.buffSpellList[spellId]) do
+				if auraFound then wipe(aura) end
+				local start, ending, stacks, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura)
+				if start and (not newStart or stacks > newStacks) then
+					newStart = start
+					newEnding = ending
+					newStacks = stacks
+					newGain = gain
+					if auraFound then
+						wipe(newAura)
+						for k, v in pairs(aura) do
+							newAura[k] = v
+						end
 					end
 				end
 			end
-		end
-		if auraFound then
-			for k, v in pairs(newAura_GetAura) do
-				auraFound[k] = v
+			if auraFound then
+				for k, v in pairs(newAura) do
+					auraFound[k] = v
+				end
 			end
+			return newStart, newEnding, newStacks, newGain
+		else
+			return self:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 		end
-		return newStart, newEnding, newStacks, newGain
-	else
-		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 	end
 end
 

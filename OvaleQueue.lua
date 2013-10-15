@@ -12,10 +12,15 @@ local _, Ovale = ...
 local OvaleQueue = {}
 Ovale.OvaleQueue = OvaleQueue
 
+--<private-static-properties>
+local setmetatable = setmetatable
+--</private-static-properties>
+
 --<public-static-properties>
 OvaleQueue.name = "OvaleQueue"
 OvaleQueue.first = 0
 OvaleQueue.last = -1
+OvaleQueue.__index = OvaleQueue
 --</public-static-properties>
 
 --<private-static-methods>
@@ -38,9 +43,7 @@ end
 
 --<public-static-methods>
 function OvaleQueue:NewDeque(name)
-	obj = { name = name, first = 0, last = -1 }
-	setmetatable(obj, { __index = self })
-	return obj
+	return setmetatable({ name = name, first = 0, last = -1 }, OvaleQueue)
 end
 
 function OvaleQueue:InsertFront(element)

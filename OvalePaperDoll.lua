@@ -41,7 +41,7 @@ local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
 
 -- Snapshot table pool.
-local self_pool = OvalePool:NewPool("OvalePaperDoll_pool")
+local self_pool = OvalePool("OvalePaperDoll_pool")
 -- Snapshot queue: new snapshots are inserted at the front of the queue.
 local self_snapshot = OvaleQueue:NewDeque("OvalePaperDoll_snapshot")
 -- Time window (past number of seconds) for which snapshots are stored.

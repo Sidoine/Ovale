@@ -32,19 +32,15 @@ local API_GetTime = GetTime
 local API_UnitAura = UnitAura
 
 -- aura pool
-local self_pool = OvalePool:NewPool("OvaleAura_pool")
+local self_pool = OvalePool("OvaleAura_pool")
 -- self_aura[guid] pool
-local self_aura_pool = OvalePool:NewPool("OvaleAura_aura_pool")
+local self_aura_pool = OvalePool("OvaleAura_aura_pool")
 -- player's GUID
 local self_player_guid = nil
 -- self_aura[guid][filter][spellId][casterGUID] = { aura properties }
 local self_aura = {}
 -- self_serial[guid] = aura age
 local self_serial = {}
-
--- Static properties used by "GetAura" method.
-local aura_GetAura = {}
-local newAura_GetAura = {}
 
 local OVALE_UNKNOWN_GUID = 0
 
@@ -466,26 +462,23 @@ end
 function OvaleAura:GetAura(unitId, spellId, filter, mine, auraFound)
 	local guid = OvaleGUID:GetGUID(unitId)
 	if OvaleData.buffSpellList[spellId] then
-		if auraFound then wipe(newAura_GetAura) end
-		local newStart, newEnding, newStacks, newGain
+		local newAura, newStart, newEnding, newStacks, newGain
 		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			if auraFound then wipe(aura_GetAura) end
-			local start, ending, stacks, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura_GetAura)
+			local aura = self_pool:Get()
+			local start, ending, stacks, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura)
 			if start and (not newStart or stacks > newStacks) then
+				if newAura then
+					self_pool:Release(newAura)
+				end
+				newAura = aura
 				newStart = start
 				newEnding = ending
 				newStacks = stacks
 				newGain = gain
-				if auraFound then
-					wipe(newAura_GetAura)
-					for k, v in pairs(aura_GetAura) do
-						newAura_GetAura[k] = v
-					end
-				end
 			end
 		end
 		if auraFound then
-			for k, v in pairs(newAura_GetAura) do
+			for k, v in pairs(newAura) do
 				auraFound[k] = v
 			end
 		end

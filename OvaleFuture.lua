@@ -41,7 +41,7 @@ local self_playerName = nil
 local self_activeSpellcast = {}
 -- self_lastSpellcast[targetGUID][spellId] is the most recent spell that has landed successfully on the target.
 local self_lastSpellcast = {}
-local self_pool = OvalePool:NewPool("OvaleFuture_pool")
+local self_pool = OvalePool("OvaleFuture_pool")
 
 -- Used to track the most recent spellcast started with UNIT_SPELLCAST_SENT.
 local self_lastLineID = nil

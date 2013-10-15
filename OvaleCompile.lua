@@ -40,7 +40,7 @@ local API_GetItemInfo = GetItemInfo
 local API_GetSpellInfo = GetSpellInfo
 
 local self_node = {}
-local self_pool = OvalePool:NewPool("OvaleCompile_pool")
+local self_pool = OvalePool("OvaleCompile_pool")
 local self_defines = {}
 local self_customFunctions = {}
 local self_missingSpellList = {}
