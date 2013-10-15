@@ -143,6 +143,179 @@ local function ComputeAnd(element, atTime)
 	return startB, endB, prioriteB, elementB
 end
 
+local function ComputeArithmetic(element, atTime)
+	local self = OvaleBestAction
+	local startA, endA, _, elementA = self:Compute(element.a, atTime)
+	local startB, endB, _, elementB = self:Compute(element.b, atTime)
+
+	-- Take intersection of (startA, endA) and (startB, endB)
+	if isBefore(startA, startB) then
+		startA = startB
+	end
+	if isAfter(endA, endB) then
+		endA = endB
+	end
+	if not isBefore(startA, endA) then
+		return nil
+	end
+
+	--[[
+		A(t) = a + (t - b)*c
+		B(t) = x + (t - y)*z
+
+		Silently "typecast" non-values to a constant value of 0.
+	--]]
+	local a = elementA and elementA.value or 0
+	local b = elementA and elementA.origin or 0
+	local c = elementA and elementA.rate or 0
+	local x = elementB and elementB.value or 0
+	local y = elementB and elementB.origin or 0
+	local z = elementB and elementB.rate or 0
+
+	Ovale:Logf("%f+(t-%f)*%f %s %f+(t-%f)*%f [%d]", a, b, c, element.operator, x, y, z, element.nodeId)
+
+	-- result(t) = l + (t - m) * n
+	local l, m, n
+
+	--[[
+		A(t) = a + (t - b)*c = a + (t - t0 + t0 - b)*c = [a + (t0 - b)*c] + (t - t0)*c = A(t0) + (t - t0)*c
+		B(t) = x + (t - y)*z = x + (t - t0 + t0 - y)*z = [x + (t0 - y)*z] + (t - t0)*z = B(t0) + (t - t0)*z
+	--]]
+	local A = a + (atTime - b)*c
+	local B = x + (atTime - y)*z
+
+	if element.operator == "+" then
+		--[[
+			A(t) = A(t0) + (t - t0)*c
+			B(t) = B(t0) + (t - t0)*z
+
+			A(t) + B(t) = [A(t0) + B(t0)] + (t - t0)*(c + z)
+		--]]
+		l = A + B
+		m = atTime
+		n = c + z
+	elseif element.operator == "-" then
+		--[[
+			A(t) = A(t0) + (t - t0)*c
+			B(t) = B(t0) + (t - t0)*z
+
+			A(t) - B(t) = [A(t0) - B(t0)] + (t - t0)*(c - z)
+		--]]
+		l = A - B
+		m = atTime
+		n = c - z
+	elseif element.operator == "*" then
+		--[[
+			A(t) = A(t0) + (t - t0)*c
+			B(t) = B(t0) + (t - t0)*z
+		--]]
+		if c == 0 then
+			l = A * B
+			m = atTime
+			n = A * z
+		elseif z == 0 then
+			l = A * B
+			m = atTime
+			n = c * B
+		else
+			Ovale:Error("at least one value must be constant when multiplying")
+			return nil
+		end
+	elseif element.operator == "/" then
+		--[[
+			      A(t) = A(t0) + (t - t0)*c
+			A(t)/B(t0) = [A(t0)/B(t0)] + (t - t0)*[c / B(t0)]
+
+			Divide by B(t0) instead of B(t) to allow constructs like {target.Health() / target.TimeToDie()}.
+		--]]
+		l = A / B
+		m = atTime
+		n = c / B
+	elseif element.operator == "%" then
+		if c == 0 and z == 0 then
+			l = A % B
+			m = atTime
+			n = 0
+		else
+			Ovale:Error("Parameters of % must be constants")
+			return nil
+		end
+	end
+	Ovale:Logf("result = %f+(t-%f)*%f [%d]", l, m, n, element.nodeId)
+	return startA, endA, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
+end
+
+local function ComputeCompare(element, atTime)
+	local self = OvaleBestAction
+	local startA, endA, _, elementA = self:Compute(element.a, atTime)
+	local startB, endB, _, elementB = self:Compute(element.b, atTime)
+
+	-- Take intersection of (startA, endA) and (startB, endB)
+	if isBefore(startA, startB) then
+		startA = startB
+	end
+	if isAfter(endA, endB) then
+		endA = endB
+	end
+	if not isBefore(startA, endA) then
+		return nil
+	end
+
+	--[[
+		A(t) = a + (t - b)*c
+		B(t) = x + (t - y)*z
+
+		Silently "typecast" non-values to a constant value of 0.
+	--]]
+	local a = elementA and elementA.value or 0
+	local b = elementA and elementA.origin or 0
+	local c = elementA and elementA.rate or 0
+	local x = elementB and elementB.value or 0
+	local y = elementB and elementB.origin or 0
+	local z = elementB and elementB.rate or 0
+
+	Ovale:Logf("%f+(t-%f)*%f %s %f+(t-%f)*%f [%d]", a, b, c, element.operator, x, y, z, element.nodeId)
+
+	--[[
+		         A(t) = B(t)
+		a + (t - b)*c = x + (t - y)*z
+		a + t*c - b*c = x + t*z - y*z
+		    t*c - t*z = (x - y*z) - (a - b*c)
+		    t*(c - z) = B(0) - A(0)
+	--]]
+	local A = a - b*c
+	local B = x - y*z
+	if c == z then
+		if (element.operator == "==" and A == B)
+				or (element.operator == "<" and A < B)
+				or (element.operator == "<=" and A <= B)
+				or (element.operator == ">" and A > B)
+				or (element.operator == ">=" and A >= B) then
+			return startA, endA
+		end
+	else
+		local t = (B - A)/(c - z)
+		if (c > z and element.operator == "<")
+				or (c > z and element.operator == "<=")
+				or (c < z and element.operator == ">")
+				or (c < z and element.operator == ">=") then
+			-- (startA, endA) intersect (-inf, t)
+			endA = minTime(endA, t)
+		end
+		if (c < z and element.operator == "<")
+				or (c < z and element.operator == "<=")
+				or (c > z and element.operator == ">")
+				or (c > z and element.operator == ">=") then
+			-- (startA, endA) intersect (t, inf)
+			startA = maxTime(startA, t)
+		end
+		if isBefore(startA, endA) then
+			return startA, endA
+		end
+	end
+	return nil
+end
+
 local function ComputeCustomFunction(element, atTime)
 	Ovale:Logf("custom function %s", element.name)
 	local self = OvaleBestAction
@@ -396,191 +569,6 @@ local function ComputeOr(element, atTime)
 	return startB, endB
 end
 
-local function ComputeOperator(element, atTime)
-	local self = OvaleBestAction
-	local startA, endA, prioA, elementA = self:Compute(element.a, atTime)
-	local startB, endB, prioB, elementB = self:Compute(element.b, atTime)
-	if not elementA or not elementB then
-		Ovale:Logf("operator %s: elementA or elementB is nil", element.operator)
-		return nil
-	end
-
-	-- A(t) = a + (t - b) * c
-	-- B(t) = x + (t - y) * z
-	local a, b, c
-	local x, y, z
-
-	if elementA then
-		a = elementA.value
-		b = elementA.origin
-		c = elementA.rate
-	else
-		-- A boolean used in a number context has the value 1
-		a = 1
-		b = 0
-		c = 0
-	end
-	if elementB then
-		x = elementB.value
-		y = elementB.origin
-		z = elementB.rate
-	else
-		x = 1
-		y = 0
-		z = 0
-	end
-
-	if startA == endA then
-		startA, endA = 0, nil
-		a, b, c = 0, 0, 0
-	end
-	if startB == endB then
-		startB, endB = 0, nil
-		x, y, z = 0, 0, 0
-	end
-
-	if isBefore(startA, startB) then
-		startA = startB
-	end
-	if isAfter(endA, endB) then
-		endA = endB
-	end
-
-	if not a or not x or not b or not y then
-		Ovale:Logf("operator %s: a or x is nil", element.operator)
-		return nil
-	end
-
-	Ovale:Logf("%f+(t-%f)*%f %s %f+(t-%f)*%f", a, b, c, element.operator, x, y, z)
-
-	-- result(t) = l + (t - m) * n
-	local l, m, n
-
-	if element.operator == "*" then
-		if c == 0 then
-			l = a * x
-			m = y
-			n = a * z
-		elseif z == 0 then
-			l = x * a
-			m = b
-			n = x * c
-		else
-			Ovale:Error("at least one value must be constant when multiplying")
-			return nil
-		end
-	elseif element.operator == "+" then
-		if c + z == 0 then
-			l = (a + x) - (b - y) * c
-			m = 0
-			n = 0
-		else
-			l = a + x
-			m = (b * c + y * z) / (c + z)
-			n = c + z
-		end
-	elseif element.operator == "-" then
-		if c - z == 0 then
-			l = (a - x) - (b - y) * c
-			m = 0
-			n = 0
-		else
-			l = a - x
-			m = (b * c - y * z) / (c - z)
-			n = c - z
-		end
-	elseif element.operator == "/" then
-		if z ~= 0 then
-			-- To allow constructs like {target.Health() / target.DeadIn()}
-			x = x + (atTime - y) * z
-		end
-		l = a / x
-		m = b
-		n = c / x
-	elseif element.operator == "%" then
-		if c == 0 and z == 0 then
-			l = c % z
-			m = 0
-			n = 0
-		else
-			Ovale:Error("Parameters of % must be constants")
-			return nil
-		end
-	else
-		-- Comparisons
-		-- a + (t-b)*c = x + (t-y)*z
-		-- (t-b)*c - (t-y)*z = x-a
-		-- t*c - b*c - t*z + y*z = x-a
-		-- t*(c-z) = x-a + b*c - y*z
-		-- t = (x-a + b*c - y*z)/(c-z)
-		local A, B, t
-		if c == z then
-			A = a - b * c
-			B = x - y * z
-		else
-			t = (x - a + b * c - y * z) / (c - z)
-		end
-		if element.operator == "<" then
-			if c == z then
-				if A < B then
-					return startA, endA
-				else
-					return nil
-				end
-			elseif c > z then
-				return startA, minTime(endA, t)
-			else
-				return maxTime(startA, t), endA
-			end
-		elseif element.operator == "<=" then
-			if c == z then
-				if A <= B then
-					return startA, endA
-				else
-					return nil
-				end
-			elseif c > z then
-				return startA, minTime(endA, t)
-			else
-				return maxTime(startA, t), endA
-			end
-		elseif element.operator == ">" then
-			if c == z then
-				if A > B then
-					return startA, endA
-				else
-					return nil
-				end
-			elseif c < z then
-				return startA, minTime(endA, t)
-			else
-				return maxTime(startA, t), endA
-			end
-		elseif element.operator == ">=" then
-			if c == z then
-				if A >= B then
-					return startA, endA
-				else
-					return nil
-				end
-			elseif c < z then return
-				startA, minTime(endA, t)
-			else
-				return maxTime(startA, t), endA
-			end
-		elseif element.operator == "==" then
-			if c == z and A == B then
-				return startA, endA
-			else
-				return nil
-			end
-		end
-	end
-
-	Ovale:Logf("result = %f+(t-%f)*%f", l, m, n)
-	return startA, endA, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
-end
-
 local function ComputeUnless(element, atTime)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
@@ -633,13 +621,14 @@ end
 local OVALE_COMPUTE_VISITOR =
 {
 	["and"] = ComputeAnd,
+	["arithmetic"] = ComputeArithmetic,
+	["compare"] = ComputeCompare,
 	["customfunction"] = ComputeCustomFunction,
 	["function"] = ComputeFunction,
 	["group"] = ComputeGroup,
 	["if"] = ComputeAnd,
 	["lua"] = ComputeLua,
 	["not"] = ComputeNot,
-	["operator"] = ComputeOperator,
 	["or"] = ComputeOr,
 	["unless"] = ComputeUnless,
 	["value"] = ComputeValue,

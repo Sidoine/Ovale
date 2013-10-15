@@ -432,13 +432,29 @@ local function ParseOr(a,b)
 	return AddNode(node)
 end
 
-local function ParseOp(a, op, b)
-	local node = self_pool:Get()
-	node.type = "operator"
-	node.operator = op
-	node.a = self_node[tonumber(a)]
-	node.b = self_node[tonumber(b)]
-	return AddNode(node)
+local ParseOp
+do
+	local operator = {
+		["+"] = "arithmetic",
+		["-"] = "arithmetic",
+		["*"] = "arithmetic",
+		["/"] = "arithmetic",
+		["%"] = "arithmetic",
+		["<"] = "compare",
+		["<="] = "compare",
+		["=="] = "compare",
+		[">="] = "compare",
+		[">"] = "compare",
+	}
+
+	function ParseOp(a, op, b)
+		local node = self_pool:Get()
+		node.type = operator[op]
+		node.operator = op
+		node.a = self_node[tonumber(a)]
+		node.b = self_node[tonumber(b)]
+		return AddNode(node)
+	end
 end
 
 local function ParseGroup(text)
