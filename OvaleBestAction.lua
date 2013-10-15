@@ -107,10 +107,8 @@ local function ComputeAction(element, atTime)
 		element.castTime = 0
 	end
 
-	local start, ending = 0, math.huge
-	local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
-
 	-- If the action is not on cooldown, then treat it like it's immediately ready.
+	local start
 	if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
 		start = actionCooldownDuration + actionCooldownStart
 	else
@@ -118,15 +116,24 @@ local function ComputeAction(element, atTime)
 	end
 
 	Ovale:Logf("start=%f attenteFinCast=%s [%d]", start, OvaleState.attenteFinCast, element.nodeId)
+
 	if start < OvaleState.attenteFinCast then
 		local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
 		if not (si and si.canStopChannelling) then
 			-- not a channelled spell, or a channelled spell that cannot be interrupted
 			start = OvaleState.attenteFinCast
 		else
-			--TODO: pas exact, parce que si ce sort est reporté de par exemple 0,5s par un debuff
-			--ça tombera entre deux ticks
-			local numTicks = floor(OvalePaperDoll:GetSpellHasteMultiplier() * si.canStopChannelling + 0.5)
+			-- This is a channelled spell that can be interrupted, so wait till the next tick.
+			-- "canStopChannelling=N" means that there are N total ticks in the channelled spell.
+			local numTicks, scaling
+			if si.haste == "spell" then
+				scaling = OvalePaperDoll:GetSpellHasteMultiplier()
+			elseif si.haste == "melee" then
+				scaling = OvalePaperDoll:GetMeleeHasteMultiplier()
+			else
+				scaling = 1
+			end
+			numTicks = floor(si.canStopChannelling * scaling + 0.5)
 			local tick = (OvaleState.attenteFinCast - OvaleState.startCast) / numTicks
 			local tickTime = OvaleState.startCast + tick
 			Ovale:Logf("%s start=%f", spellId, start)
@@ -141,7 +148,9 @@ local function ComputeAction(element, atTime)
 		end
 	end
 	Ovale:Logf("Action %s can start at %f", element.params[1], start)
-	return start, ending, priority, element
+
+	local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
+	return start, math.huge, priority, element
 end
 
 local function ComputeAnd(element, atTime)
