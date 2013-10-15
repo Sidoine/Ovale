@@ -1174,7 +1174,7 @@ end
 -- if Chi(more 3) Spell(chi_burst)
 
 OvaleCondition.conditions.chi = function(condition)
-	return TestValue(condition[1], condition[2], OvaleState.state.chi, OvaleState.currentTime, OvaleState.powerRate.chi)
+	return Compare(OvaleState.state.chi, condition[1], condition[2])
 end
 
 --- Test whether the target's class matches the given class.
