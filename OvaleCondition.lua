@@ -2527,7 +2527,7 @@ end
 -- @return A boolean value for the result of the comparison.
 
 OvaleCondition.conditions.maxfocus = function(condition)
-	local maxi = MaxPowerConditionHelper(GetTarget(condition), "maxfocus")
+	local maxi = MaxPowerConditionHelper(GetTarget(condition), "focus")
 	return Compare(maxi, condition[1], condition[2])
 end
 
