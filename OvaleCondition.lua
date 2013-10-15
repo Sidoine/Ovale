@@ -2674,7 +2674,7 @@ local function MaxPowerConditionHelper(target, power)
 	if target == "player" then
 		maxi = OvalePower.maxPower[power]
 	else
-		maxi = API_UnitPowerMax(target, OvalePower.POWER[power].id, OvalePower.POWER[power].segments)
+		maxi = API_UnitPowerMax(target, OvalePower.POWER_INFO[power].id, OvalePower.POWER_INFO[power].segments)
 	end
 	return maxi
 end

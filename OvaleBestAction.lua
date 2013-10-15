@@ -590,8 +590,8 @@ function OvaleBestAction:GetActionInfo(element)
 				-- Spell is a combo point finisher, but player has no combo points on the target.
 				return nil
 			end
-			for _, power in pairs(OvalePower.SECONDARY_POWER) do
-				if si[power] and si[power] > OvaleState.state[power] then
+			for _, powerType in pairs(OvalePower.SECONDARY_POWER) do
+				if si[powerType] and si[powerType] > OvaleState.state[powerType] then
 					-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
 					-- that the player does not have enough of.
 					return nil
