@@ -74,7 +74,7 @@ local OVALE_CLEU_TICK_EVENTS = {
 --</private-static-properties>
 
 --<private-static-methods>
-local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value)
+local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
 	local self = OvaleAura
 	if not self_aura[guid][filter] then
 		self_aura[guid][filter] = {}
@@ -130,7 +130,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		aura.mine = mine
 		aura.source = casterGUID
 		aura.name = name
-		aura.value = value
+		aura.value1, aura.value2, aura.value3 = value1, value2, value3
 
 		-- Snapshot stats for DoTs.
 		if mine then
@@ -263,7 +263,7 @@ local function ScanUnitAuras(unitId, guid)
 			end
 		else
 			local casterGUID = OvaleGUID:GetGUID(unitCaster)
-			local added = UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1)
+			local added = UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
 			if added then
 				Ovale.refreshNeeded[unitId] = true
 			end

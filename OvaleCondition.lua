@@ -518,6 +518,67 @@ OvaleCondition.conditions.armorsetparts = function(condition)
 	return Compare(OvaleEquipement:GetArmorSetCount(condition[1]), comparator, limit)
 end
 
+--- Get the current tick value of a periodic aura on the target.
+-- @name TickValue
+-- @paramsig number or boolean
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @param filter Optional. The type of aura to check.
+--     Default is any.
+--     Valid values: any, buff, debuff
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @return The tick value.
+-- @return A boolean value for the result of the comparison.
+-- @see TicksRemain
+-- @usage
+-- if DebuffRemains(light_stagger) >0 and TickValue(light_stagger) >10000
+--     Spell(purifying_brew)
+
+--- Get the value of a buff as a number.  Not all buffs return an amount.
+-- @name BuffAmount
+-- @paramsig number
+-- @param id The spell ID of the aura or the name of a spell list.
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+--     Defaults to target=player.
+--     Valid values: player, target, focus, pet.
+-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+--     Defaults to any=0.
+--     Valid values: 0, 1.
+-- @param value Optional. Sets which aura value to return from UnitAura().
+--     Defaults to value=1.
+--     Valid values: 1, 2, 3.
+-- @return The value of the buff as a number.
+-- @see DebuffAmount
+-- @see TickValue
+-- @usage
+-- if DebuffAmount(stagger) >10000 Spell(purifying_brew)
+-- if DebuffAmount(stagger more 10000) Spell(purifying_brew)
+
+OvaleCondition.conditions.buffamount = function(condition)
+	self_auraFound.value1, self_auraFound.value2, self_auraFound.value3 = nil, nil, nil
+	local comparator, limit = condition[2], condition[3]
+	local start, ending = GetAura(condition, self_auraFound)
+	local value = condition.value or 1
+	local amount
+	if value == 1 then
+		amount = self_auraFound.value1 or 0
+	elseif value == 2 then
+		amount = self_auraFound.value2 or 0
+	elseif value == 3 then
+		amount = self_auraFound.value3 or 0
+	else
+		amount = 0
+	end
+	return Compare(amount, comparator, limit)
+end
+OvaleCondition.conditions.debuffamount = OvaleCondition.conditions.buffamount
+OvaleCondition.conditions.tickvalue = OvaleCondition.conditions.buffamount
+
 --- Get the current attack power of the player.
 -- @name AttackPower
 -- @paramsig number or boolean
@@ -3611,33 +3672,6 @@ OvaleCondition.conditions.threat = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local isTanking, status, threatpct = API_UnitDetailedThreatSituation("player", GetTarget(condition, "target"))
 	return Compare(threatpct, comparator, limit)
-end
-
---- Get the current tick value of a periodic aura on the target.
--- @name TickValue
--- @paramsig number or boolean
--- @param id The spell ID of the aura or the name of a spell list.
--- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
--- @param filter Optional. The type of aura to check.
---     Default is any.
---     Valid values: any, buff, debuff
--- @param number Optional. The number to compare against.
--- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
---     Defaults to target=player.
---     Valid values: player, target, focus, pet.
--- @return The tick value.
--- @return A boolean value for the result of the comparison.
--- @see TicksRemain
--- @usage
--- if DebuffRemains(light_stagger) >0 and TickValue(light_stagger) >10000
---     Spell(purifying_brew)
-
-OvaleCondition.conditions.tickvalue = function(condition)
-	self_auraFound.value = nil
-	local comparator, limit = condition[2], condition[3]
-	local start, ending = GetAura(condition, self_auraFound)
-	local value = self_auraFound.value or 0
-	return Compare(value, comparator, limit)
 end
 
 --- Get the total number of ticks of a periodic aura.
