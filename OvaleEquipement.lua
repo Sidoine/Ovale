@@ -15,8 +15,12 @@ Ovale.OvaleEquipement = OvaleEquipement
 --<private-static-properties>
 local pairs = pairs
 local select = select
+local strgsub = string.gsub
+local strmatch = string.match
+local tonumber = tonumber
 local tostring = tostring
 local wipe = table.wipe
+local API_CreateFrame = CreateFrame
 
 local API_GetAuctionItemSubClasses = GetAuctionItemSubClasses
 local API_GetInventoryItemID = GetInventoryItemID
@@ -47,12 +51,21 @@ local INVSLOT_WRIST = INVSLOT_WRIST
 
 -- item IDs of equipped items, indexed by slot ID
 local self_equippedItems = {}
+-- item levels of equipped items, indexed by slot ID
+local self_equippedItemLevels = {}
 -- type of main-hand item equipped
 local self_mainHandItemType
 -- type of off-hand item equipped
 local self_offHandItemType
 -- count of equipped pieces of an armor set: self_armorSetCount[armorSetName] = equippedCount
 local self_armorSetCount = {}
+
+-- frame for tooltip-scanning
+local self_tooltip = API_CreateFrame("GameTooltip", "OvaleScanningTooltip", nil, "GameTooltipTemplate")
+do
+	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+end
+local OVALE_ITEM_LEVEL_PATTERN = "^" .. strgsub(ITEM_LEVEL, "%%d", "(%%d+)")
 
 -- equipment slot names
 local OVALE_SLOTNAME = {
@@ -1287,6 +1300,20 @@ local function GetEquippedItemType(slotId)
 	end
 end
 
+function GetItemLevel(slotId)
+	self_tooltip:SetInventoryItem("player", slotId)
+	local itemLevel
+	for i = 2, self_tooltip:NumLines() do
+		local text = _G["OvaleScanningTooltipTextLeft" .. i]:GetText()
+		if text then
+			itemLevel = strmatch(text, OVALE_ITEM_LEVEL_PATTERN)
+			if itemLevel then
+				return tonumber(itemLevel)
+			end
+		end
+	end
+end
+
 local function GetNormalizedWeaponSpeed(slotId)
 	if slotId == INVSLOT_MAINHAND or slotId == INVSLOT_OFFHAND then
 		local itemId = OvaleEquipement:GetEquippedItem(slotId)
@@ -1302,18 +1329,21 @@ end
 function OvaleEquipement:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateEquippedItems")
+	self:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_READY", "UpdateEquippedItemLevels")
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
 function OvaleEquipement:OnDisable()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_ALIVE")
+	self:UnregisterEvent("PLAYER_AVG_ITEM_LEVEL_READY")
 	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
 function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 	if hasItem then
 		self_equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
+		self_equippedItemLevels[slotId] = GetItemLevel(slotId)
 		if slotId == INVSLOT_MAINHAND then
 			self_mainHandItemType = GetEquippedItemType(slotId)
 			self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
@@ -1323,6 +1353,7 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 		end
 	else
 		self_equippedItems[slotId] = nil
+		self_equippedItemLevels[slotId] = nil
 		if slotId == INVSLOT_MAINHAND then
 			self_mainHandItemType = nil
 		elseif slotId == INVSLOT_OFFHAND then
@@ -1349,6 +1380,15 @@ function OvaleEquipement:GetEquippedItem(slotId)
 		if not slotId then return nil end
 	end
 	return self_equippedItems[slotId]
+end
+
+function OvaleEquipement:GetEquippedItemLevel(slotId)
+	if type(slotId) ~= "number" then
+		if not OVALE_SLOTNAME[slotId] then return nil end
+		slotId = API_GetInventorySlotInfo(slotId)
+		if not slotId then return nil end
+	end
+	return self_equippedItemLevels[slotId]
 end
 
 function OvaleEquipement:HasMainHandWeapon()
@@ -1411,6 +1451,7 @@ function OvaleEquipement:UpdateEquippedItems()
 	self_offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
 	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
 	self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
+	self:UpdateEquippedItemLevels()
 
 	if changed then
 		self:UpdateArmorSetCount()
@@ -1418,9 +1459,21 @@ function OvaleEquipement:UpdateEquippedItems()
 	end
 end
 
+function OvaleEquipement:UpdateEquippedItemLevels()
+	local changed = false
+	local itemLevel
+	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
+		itemLevel = GetItemLevel(slotId)
+		if itemLevel ~= self_equippedItemLevels[slotId] then
+			self_equippedItemLevels[slotId] = itemLevel
+			changed = true
+		end
+	end
+end
+
 function OvaleEquipement:Debug()
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		Ovale:FormatPrint("Slot %d = %s", slotId, self:GetEquippedItem(slotId))
+		Ovale:FormatPrint("Slot %d = %s (%d)", slotId, self:GetEquippedItem(slotId), self:GetEquippedItemLevel(slotId))
 	end
 	Ovale:FormatPrint("Main-hand item type: %s", self_mainHandItemType)
 	Ovale:FormatPrint("Off-hand item type: %s", self_offHandItemType)
