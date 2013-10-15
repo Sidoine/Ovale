@@ -24,6 +24,7 @@ local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
+local abs = math.abs
 local floor = math.floor
 local ipairs = ipairs
 local loadstring = loadstring
@@ -208,51 +209,50 @@ local function ComputeArithmetic(element, atTime)
 
 	if element.operator == "+" then
 		--[[
-			A(t) = A(t0) + (t - t0)*c
-			B(t) = B(t0) + (t - t0)*z
+			A(t) = A(t0) + (t - t0)*c = A + (t - t0)*c
+			B(t) = B(t0) + (t - t0)*z = B + (t - t0)*z
 
-			A(t) + B(t) = [A(t0) + B(t0)] + (t - t0)*(c + z)
+			A(t) + B(t) = (A + B) + (t - t0)*(c + z)
 		--]]
 		l = A + B
 		m = atTime
 		n = c + z
 	elseif element.operator == "-" then
 		--[[
-			A(t) = A(t0) + (t - t0)*c
-			B(t) = B(t0) + (t - t0)*z
+			A(t) = A(t0) + (t - t0)*c = A + (t - t0)*c
+			B(t) = B(t0) + (t - t0)*z = B + (t - t0)*z
 
-			A(t) - B(t) = [A(t0) - B(t0)] + (t - t0)*(c - z)
+			A(t) - B(t) = (A - B) + (t - t0)*(c - z)
 		--]]
 		l = A - B
 		m = atTime
 		n = c - z
 	elseif element.operator == "*" then
 		--[[
-			A(t) = A(t0) + (t - t0)*c
-			B(t) = B(t0) + (t - t0)*z
+			     A(t) = A(t0) + (t - t0)*c = A + (t - t0)*c
+			     B(t) = B(t0) + (t - t0)*z = B + (t - t0)*z
+			A(t)*B(t) = A*B + (t - t0)*[A*z + B*c] + [(t - t0)^2]*(c*z)
+			          = A*B + (t - t0)*[A*z + B*c] + O(t^2) converges everywhere.
 		--]]
-		if c == 0 then
-			l = A * B
+			l = A*B
 			m = atTime
-			n = A * z
-		elseif z == 0 then
-			l = A * B
-			m = atTime
-			n = c * B
-		else
-			Ovale:Error("at least one value must be constant when multiplying")
-			return nil
-		end
+			n = A*z + B*c
 	elseif element.operator == "/" then
 		--[[
-			      A(t) = A(t0) + (t - t0)*c
-			A(t)/B(t0) = [A(t0)/B(t0)] + (t - t0)*[c / B(t0)]
-
-			Divide by B(t0) instead of B(t) to allow constructs like {target.Health() / target.TimeToDie()}.
+			     A(t) = A(t0) + (t - t0)*c = A + (t - t0)*c
+				 B(t) = B(t0) + (t - t0)*z = B + (t - t0)*z
+			A(t)/B(t) = A/B + (t - t0)*[(B*c - A*z)/B^2] + O(t^2) converges when |t - t0| < |B/z|.
 		--]]
-		l = A / B
+		l = A/B
 		m = atTime
-		n = c / B
+		n = (B*c - A*z)/(B^2)
+		local bound
+		if z == 0 then
+			bound = math.huge
+		else
+			bound = abs(B/z)
+		end
+		startA, endA = Intersect(startA, endA, atTime - bound, atTime + bound)
 	elseif element.operator == "%" then
 		if c == 0 and z == 0 then
 			l = A % B
