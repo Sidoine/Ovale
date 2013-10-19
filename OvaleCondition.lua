@@ -518,25 +518,6 @@ OvaleCondition.conditions.armorsetparts = function(condition)
 	return Compare(OvaleEquipement:GetArmorSetCount(condition[1]), comparator, limit)
 end
 
---- Get the current tick value of a periodic aura on the target.
--- @name TickValue
--- @paramsig number or boolean
--- @param id The spell ID of the aura or the name of a spell list.
--- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
--- @param number Optional. The number to compare against.
--- @param filter Optional. The type of aura to check.
---     Default is any.
---     Valid values: any, buff, debuff
--- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
---     Defaults to target=player.
---     Valid values: player, target, focus, pet.
--- @return The tick value.
--- @return A boolean value for the result of the comparison.
--- @see TicksRemain
--- @usage
--- if DebuffRemains(light_stagger) >0 and TickValue(light_stagger) >10000
---     Spell(purifying_brew)
-
 --- Get the value of a buff as a number.  Not all buffs return an amount.
 -- @name BuffAmount
 -- @paramsig number
