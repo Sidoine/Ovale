@@ -21,9 +21,15 @@ Ovale.OvaleTimeSpan = OvaleTimeSpan
 
 --<public-static-methods>
 function OvaleTimeSpan.Complement(startA, endA, atTime)
-	-- The complement of an interval is actually the union of two intervals.
-	-- If the point of interest (atTime) lies in the left interval, then return it.
-	-- Otherwise, return the right interval.
+	--[[
+		The complement of an interval is as follows:
+
+			COMPLEMENT{} = (0, math.huge)
+			COMPLEMENT(a, b) = (0, a) UNION (b, math.huge)
+
+		In the second case, it is the union of two intervals.  If the point of interest (atTime)
+		lies in the left interval, then return it.  Otherwise, return the right interval.
+	--]]
 	if not startA or not endA then
 		return 0, math.huge
 	elseif 0 < startA and atTime <= startA then
