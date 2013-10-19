@@ -1607,15 +1607,6 @@ OvaleCondition.conditions.eclipsedir = function(condition)
 	return Compare(OvaleState:GetEclipseDir(), comparator, limit)
 end
 
-	-- Get the effective mana (e.g. if spell cost is divided by two, will returns the mana multiplied by two)
-	-- TODO: not working
-	-- returns: bool or number
-OvaleCondition.conditions.effectivemana = function(condition)
-	local comparator, limit = condition[1], condition[2]
-	local value, origin, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
-	return TestValue(comparator, limit, value, origin, rate)
-end
-
 --- Get the number of hostile enemies on the battlefield.
 -- @name Enemies
 -- @paramsig number or boolean
