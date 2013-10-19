@@ -713,7 +713,7 @@ end
 
 function OvaleBestAction:ComputeBool(element)
 	local start, ending, _, newElement = self:Compute(element)
-	-- Match SimC:0 is false, non-zero is true.
+	-- Match SimC: 0 is false, non-zero is true.
 	--	(https://code.google.com/p/simulationcraft/wiki/ActionLists#Logical_operators)
 	if newElement and newElement.type == "value" and newElement.value == 0 and newElement.rate == 0 then
 		return nil
