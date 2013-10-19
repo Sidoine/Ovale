@@ -17,15 +17,17 @@ Ovale.OvaleSpellBook = OvaleSpellBook
 --<private-static-properties>
 local ipairs = ipairs
 local pairs = pairs
+local strfind = string.find
 local tinsert = table.insert
+local tonumber = tonumber
 local tostring = tostring
 local tsort = table.sort
 local wipe = table.wipe
 local API_GetNumGlyphSockets = GetNumGlyphSockets
 local API_GetGlyphSocketInfo = GetGlyphSocketInfo
 local API_GetSpellBookItemInfo = GetSpellBookItemInfo
-local API_GetSpellBookItemName = GetSpellBookItemName
 local API_GetSpellInfo = GetSpellInfo
+local API_GetSpellLink = GetSpellLink
 local API_GetSpellTabInfo = GetSpellTabInfo
 local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
@@ -43,6 +45,11 @@ self_glyph = {}
 --</private-static-properties>
 
 --<private-static-methods>
+-- Return the four components of a hyperlink: color, linktype, linkdata, text.
+local function ParseHyperlink(hyperlink)
+	return select(3, strfind(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?"))
+end
+
 local function PrintTableValues(tbl)
 	local array = {}
 	for k, v in pairs(tbl) do
@@ -141,13 +148,17 @@ function OvaleSpellBook:UpdateSpells()
 
 	local name, _, offset, numSpells = API_GetSpellTabInfo(2)
 	if name then
-		local skillType, spellId
-		local spellName
 		for i = 1, offset + numSpells do
-			skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
-			if spellId and skillType ~= "FUTURESPELL" then
-				spellName = API_GetSpellBookItemName(i, BOOKTYPE_SPELL)
-				self_spell[spellId] = spellName
+			local skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
+			if spellId and skillType ~= "FUTURESPELL" and skillType ~= "FLYOUT" then
+				-- Use GetSpellLink() in case this spellbook item was replaced by another spell,
+				-- i.e., through talents or Symbiosis.
+				local spellLink = API_GetSpellLink(i, BOOKTYPE_SPELL)
+				if spellLink then
+					local linkdata, spellName = select(3, ParseHyperlink(spellLink))
+					self_spell[tonumber(linkdata)] = spellName
+					self_spell[spellId] = spellName
+				end
 			end
 		end
 	end
@@ -159,15 +170,17 @@ end
 function OvaleSpellBook:UpdatePetSpells()
 	local hasPetSpells = API_HasPetSpells()
 	if hasPetSpells then
-		local skillType, spellId
-		local spellName
 		local i = 1
 		while true do
-			skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_PET)
-			if not spellId then break end
-			if skillType ~= "FUTURESPELL" then
-				spellName = API_GetSpellBookItemName(i, BOOKTYPE_PET)
-				self_spell[spellId] = spellName
+			local skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_PET)
+			if spellId and skillType ~= "FUTURESPELL" and skillType ~= "FLYOUT" then
+				-- Use GetSpellLink() in case this spellbook item was replaced by another spell.
+				local spellLink = API_GetSpellLink(i, BOOKTYPE_PET)
+				if spellLink then
+					local linkdata, spellName = select(3, ParseHyperlink(spellLink))
+					self_spell[tonumber(linkdata)] = spellName
+					self_spell[spellId] = spellName
+				end
 			end
 			i = i + 1
 		end
