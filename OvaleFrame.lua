@@ -182,7 +182,7 @@ do
 			if forceRefresh or Ovale.refreshNeeded[target] or Ovale.refreshNeeded["player"] or Ovale.refreshNeeded["pet"] then
 				Ovale:Logf("****Master Node %d", k)
 				OvaleBestAction:StartNewAction()
-				local start, ending, priorite, element = OvaleBestAction:Compute(node, OvaleState.currentTime)
+				local start, ending, priorite, element = OvaleBestAction:Compute(node)
 				if start then
 					Ovale:Logf("Compute start = %f", start)
 				end
@@ -273,7 +273,7 @@ do
 								spellTarget = target
 							end
 							OvaleState:ApplySpell(spellId, start, start + castTime, nextCast, false, OvaleGUID:GetGUID(spellTarget))
-							start, ending, priorite, element = OvaleBestAction:Compute(node, nextCast)
+							start, ending, priorite, element = OvaleBestAction:Compute(node)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
 						else
 							icons[2]:Update(element, nil)
