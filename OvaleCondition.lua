@@ -3845,10 +3845,10 @@ OvaleCondition.conditions.timetolifepercent = OvaleCondition.conditions.timetohe
 
 OvaleCondition.conditions.timetopowerfor = function(condition)
 	local comparator, limit = condition[2], condition[3]
-	local cost, _, powerType = select(4, API_GetSpellInfo(condition[1]))
-	local power = OvalePower.POWER_TYPE[powerType]
-	local currentPower = OvaleState.state[power]
-	local powerRate = OvaleState.powerRate[power]
+	local cost, _, powerToken = select(4, API_GetSpellInfo(condition[1]))
+	local powerType = OvalePower.POWER_TYPE[powerToken]
+	local currentPower = OvaleState.state[powerType]
+	local powerRate = OvaleState.powerRate[powerType]
 	cost = cost or 0
 	if currentPower < cost then
 		if powerRate > 0 then
