@@ -44,6 +44,8 @@ local API_UnitStat = UnitStat
 local self_pool = OvalePool("OvalePaperDoll_pool")
 -- Snapshot queue: new snapshots are inserted at the front of the queue.
 local self_snapshot = OvaleQueue:NewDeque("OvalePaperDoll_snapshot")
+-- Total number of snapshots taken.
+local self_snapshotCount = 0
 -- Time window (past number of seconds) for which snapshots are stored.
 local SNAPSHOT_WINDOW = 5
 
@@ -140,6 +142,7 @@ local function GetSnapshot(t)
 		self_snapshot:InsertFront(newStat)
 		stat = self_snapshot:Front()
 		Ovale:DebugPrintf(OVALE_SNAPSHOT_DEBUG, true, "New snapshot.")
+		self_snapshotCount = self_snapshotCount + 1
 	end
 	return stat
 end
@@ -230,7 +233,15 @@ function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
 		event, OVALE_SNAPSHOT_STATS.spellBonusHealing, self.stat.spellBonusHealing)
 end
 
+function OvalePaperDoll:PLAYER_REGEN_DISABLED(event)
+	self_snapshotCount = 0
+end
+
 function OvalePaperDoll:PLAYER_REGEN_ENABLED(event)
+	local now = API_GetTime()
+	if Ovale.enCombat and Ovale.combatStartTime then
+		Ovale:FormatPrint("[%s] %d snapshots in %f seconds.", OVALE_PAPERDOLL_DEBUG, self_snapshotCount, now - Ovale.combatStartTime)
+	end
 	self_pool:Drain()
 end
 
@@ -438,6 +449,7 @@ function OvalePaperDoll:Debug(stat)
 	Ovale:FormatPrint("Class: %s", self.class)
 	Ovale:FormatPrint("Level: %d", self.level)
 	Ovale:FormatPrint("Specialization: %s", self.specialization)
+	Ovale:FormatPrint("Total snapshots: %d", self_snapshotCount)
 	Ovale:FormatPrint("Snapshot time: %f", stat.snapshotTime)
 	Ovale:FormatPrint("%s: %d", OVALE_SNAPSHOT_STATS.agility, stat.agility)
 	Ovale:FormatPrint("%s: %d", OVALE_SNAPSHOT_STATS.intellect, stat.intellect)
