@@ -1224,7 +1224,7 @@ end
 
 OvaleCondition.conditions.charges = function(condition)
 	local spellId, comparator, limit = condition[1], condition[2], condition[3]
-	local currentCharges, maxCharges, timeLastCast, cooldownDuration = API_GetSpellCharges(spellId)
+	local currentCharges = API_GetSpellCharges(spellId)
 	return Compare(currentCharges, comparator, limit)
 end
 
@@ -2046,8 +2046,12 @@ end
 
 OvaleCondition.conditions.itemcooldown = function(condition)
 	local itemId, comparator, limit = condition[1], condition[2], condition[3]
-	local actionCooldownStart, actionCooldownDuration, actionEnable = API_GetItemCooldown(itemId)
-	return TestValue(comparator, limit, actionCooldownDuration, actionCooldownStart, -1)
+	local start, duration = API_GetItemCooldown(itemId)
+	if start + duration > OvaleState.currentTime then
+		return TestOvaleValue(start, start + duration, duration, start, -1, comparator, limit)
+	else
+		return Compare(0, comparator, limit)
+	end
 end
 
 --- Get the current number of the given item in the player's inventory.
@@ -3549,7 +3553,11 @@ OvaleCondition.conditions.spellcooldown = function(condition)
 	else
 		start, duration = OvaleState:GetComputedSpellCD(spellId)
 	end
-	return TestOvaleValue(start, start + duration, duration, start, -1, comparator, limit)
+	if start + duration > OvaleState.currentTime then
+		return TestOvaleValue(start, start + duration, duration, start, -1, comparator, limit)
+	else
+		return Compare(0, comparator, limit)
+	end
 end
 -- OvaleCondition.spellbookConditions.spellcooldown = true / may be a sharedcd
 
