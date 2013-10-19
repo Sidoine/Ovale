@@ -111,8 +111,10 @@ local function GetDamageMultiplier(spellId)
 				for auraSpellId, multiplier in pairs(auraList) do
 					local count = select(3, OvaleAura:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
 					if count and count > 0 then
-						-- TODO: Try to account for a stacking aura.
-						-- multiplier = 1 + (multiplier - 1) * count
+						local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
+						if auraSpellInfo.stacking and auraSpellInfo.stacking > 0 then
+							multiplier = 1 + (multiplier - 1) * count
+						end
 						damageMultiplier = damageMultiplier * multiplier
 					end
 				end
