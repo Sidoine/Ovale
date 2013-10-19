@@ -701,6 +701,7 @@ local function CompileScript(text)
 	Ovale.bug = false
 
 	wipe(self_defines)
+	wipe(self_customFunctions)
 	wipe(self_missingSpellList)
 	wipe(self_functionCalls)
 
