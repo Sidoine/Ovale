@@ -15,6 +15,7 @@ Ovale.OvalePower = OvalePower
 --<private-static-properties>
 local pairs = pairs
 local API_GetPowerRegen = GetPowerRegen
+local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitPowerType = UnitPowerType
 local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
@@ -35,6 +36,8 @@ local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 --<public-static-properties>
 -- Player's current power type (key for POWER table).
 OvalePower.powerType = nil
+-- Player's current power; power[powerType] = number.
+OvalePower.power = {}
 -- Player's current max power; maxPower[powerType] = number.
 OvalePower.maxPower = {}
 -- Player's current power regeneration rate for the active power type.
@@ -86,8 +89,10 @@ function OvalePower:OnEnable()
 	self:RegisterEvent("UNIT_DISPLAYPOWER")
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_MAXPOWER")
-	self:RegisterEvent("UNIT_RANGEDDAMAGE", "PowerRegenEventHandler")
-	self:RegisterEvent("UNIT_SPELL_HASTE", "PowerRegenEventHandler")
+	self:RegisterEvent("UNIT_POWER")
+	self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER")
+	self:RegisterEvent("UNIT_RANGEDDAMAGE")
+	self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
 	self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
 end
 
@@ -100,34 +105,23 @@ function OvalePower:OnDisable()
 	self:UnregisterEvent("UNIT_DISPLAYPOWER")
 	self:UnregisterEvent("UNIT_LEVEL")
 	self:UnregisterEvent("UNIT_MAXPOWER")
+	self:UnregisterEvent("UNIT_POWER")
+	self:UnregisterEvent("UNIT_POWER_FREQUENT")
 	self:UnregisterEvent("UNIT_RANGEDDAMAGE")
 	self:UnregisterEvent("UNIT_SPELL_HASTE")
 	self:UnregisterMessage("Ovale_StanceChanged")
 end
 
 function OvalePower:EventHandler(event)
-	self:MaxPowerEventHandler(event)
+	self:UpdatePowerType()
+	self:UpdateMaxPower()
+	self:UpdatePower()
 	self:UpdatePowerRegen()
-end
-
-function OvalePower:MaxPowerEventHandler(event)
-	self:UNIT_DISPLAYPOWER(event, "player")
-	for _, powerInfo in pairs(self.POWER_INFO) do
-		self:UNIT_MAXPOWER(event, "player", powerInfo.token)
-	end
-end
-
-function OvalePower:PowerRegenEventHandler(event, unitId)
-	if unitId == "player" then
-		self:UpdatePowerRegen()
-	end
 end
 
 function OvalePower:UNIT_DISPLAYPOWER(event, unitId)
 	if unitId == "player" then
-		local currentType, currentToken = API_UnitPowerType(unitId)
-		self.powerType = self.POWER_TYPE[currentType]
-		self:UNIT_MAXPOWER(event, unitId, currentToken)
+		self:UpdatePowerType()
 	end
 end
 
@@ -139,12 +133,40 @@ end
 
 function OvalePower:UNIT_MAXPOWER(event, unitId, powerToken)
 	if unitId == "player" then
-		local powerType = self.POWER_TYPE[powerToken]
-		if powerType then
-			local powerInfo = self.POWER_INFO[powerType]
-			if powerInfo then
-				self.maxPower[powerType] = API_UnitPowerMax(unitId, powerInfo.id, powerInfo.segments)
-			end
+		self:UpdateMaxPower(self.POWER_TYPE[powerToken])
+	end
+end
+
+function OvalePower:UNIT_POWER(event, unitId, powerToken)
+	if unitId == "player" then
+		self:UpdatePower(self.POWER_TYPE[powerToken])
+	end
+end
+
+function OvalePower:UNIT_RANGEDDAMAGE(event, unitId)
+	if unitId == "player" then
+		self:UpdatePowerRegen()
+	end
+end
+
+function OvalePower:UpdateMaxPower(powerType)
+	if powerType then
+		local powerInfo = self.POWER_INFO[powerType]
+		self.maxPower[powerType] = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+	else
+		for powerType, powerInfo in pairs(self.POWER_INFO) do
+			self.maxPower[powerType] = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+		end
+	end
+end
+
+function OvalePower:UpdatePower(powerType)
+	if powerType then
+		local powerInfo = self.POWER_INFO[powerType]
+		self.power[powerType] = API_UnitPower("player", powerInfo.id, powerInfo.segments)
+	else
+		for powerType, powerInfo in pairs(self.POWER_INFO) do
+			self.power[powerType] = API_UnitPower("player", powerInfo.id, powerInfo.segments)
 		end
 	end
 end
@@ -153,10 +175,15 @@ function OvalePower:UpdatePowerRegen()
 	self.inactiveRegen, self.activeRegen = API_GetPowerRegen()
 end
 
+function OvalePower:UpdatePowerType()
+	local currentType, currentToken = API_UnitPowerType("player")
+	self.powerType = self.POWER_TYPE[currentType]
+end
+
 function OvalePower:Debug()
 	Ovale:FormatPrint("Power type: %s", self.powerType)
-	for k, v in pairs(self.maxPower) do
-		Ovale:FormatPrint("Max power (%s): %d", k, v)
+	for powerType, v in pairs(self.power) do
+		Ovale:FormatPrint("Power (%s): %d / %d", powerType, v, self.maxPower[powerType])
 	end
 	Ovale:FormatPrint("Active regen: %f", self.activeRegen)
 	Ovale:FormatPrint("Inactive regen: %f", self.inactiveRegen)

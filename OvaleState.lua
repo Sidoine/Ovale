@@ -38,8 +38,6 @@ local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
-local API_UnitPower = UnitPower
-local API_UnitPowerMax = UnitPowerMax
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 local self_runes = {}
@@ -139,11 +137,12 @@ function OvaleState:Reset()
 	Ovale:Logf("Reset state with current time = %f", self.currentTime)
 	self.currentSpellId = nil
 	self.attenteFinCast = self.maintenant
+
+	-- Snapshot the current power and regeneration rates.
 	self.state.combo = OvaleComboPoints.combo
-	for powerType, powerInfo in pairs(OvalePower.POWER_INFO) do
-		self.state[powerType] = API_UnitPower("player", powerInfo.id, powerInfo.segments)
+	for powerType in pairs(OvalePower.POWER_INFO) do
+		self.state[powerType] = OvalePower.power[powerType]
 	end
-	
 	self:UpdatePowerRates()
 	
 	if OvalePaperDoll.class == "DEATHKNIGHT" then
