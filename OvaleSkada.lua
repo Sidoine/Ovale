@@ -14,6 +14,8 @@ local OvaleSkada = Skada and Skada:NewModule("Ovale Spell Priority") or {}
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>
+local OvaleScore = Ovale.OvaleScore
+
 local ipairs = ipairs
 local floor = math.floor
 local tostring = tostring
@@ -31,9 +33,23 @@ local function GetValue(set)
 		return nil
 	end
 end
+--</private-static-methods>
 
-local function ReceiveScore(name, guid, scored, scoreMax)
-	local self = OvaleSkada
+--<public-static-methods>
+function OvaleSkada:OnEnable()
+	self.metadata = { showspots = true }
+	if Skada then
+		Skada:AddMode(self)
+		OvaleScore:RegisterDamageMeter("OvaleSkada", self, "ReceiveScore")
+	end
+end
+
+function OvaleSkada:OnDisable()
+	OvaleScore:UnregisterDamageMeter("OvaleSkada")
+	if Skada then Skada:RemoveMode(self) end
+end
+
+function OvaleSkada:ReceiveScore(name, guid, scored, scoreMax)
 	if guid and Skada and Skada.current and Skada.total then
 		local player = Skada:get_player(Skada.current, guid, nil)
 		if player then
@@ -45,19 +61,6 @@ local function ReceiveScore(name, guid, scored, scoreMax)
 			player.ovaleMax = player.ovaleMax + scoreMax
 		end
 	end
-end
---</private-static-methods>
-
---<public-static-methods>
-function OvaleSkada:OnEnable()
-	self.metadata = { showspots = true }
-	Skada:AddMode(self)
-	Ovale:RegisterDamageMeter("OvaleSkada", ReceiveScore)
-end
-
-function OvaleSkada:OnDisable()
-	Ovale:UnregisterDamageMeter("OvaleSkada")
-	Skada:RemoveMode(self)
 end
 
 function OvaleSkada:Update(win, set)

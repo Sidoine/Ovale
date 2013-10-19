@@ -13,11 +13,9 @@ local OvaleRecount = Ovale:NewModule("OvaleRecount")
 Ovale.OvaleRecount = OvaleRecount
 
 --<private-static-properties>
-local Recount = LibStub("AceAddon-3.0"):GetAddon("Recount", true)
 local L = LibStub("AceLocale-3.0"):GetLocale("Recount", true)
-if not L then
-	L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })
-end
+local OvaleScore = Ovale.OvaleScore
+local Recount = LibStub("AceAddon-3.0"):GetAddon("Recount", true)
 --</private-static-properties>
 
 --<private-static-methods>
@@ -50,20 +48,21 @@ end
 --<public-static-methods>
 function OvaleRecount:OnInitialize()
 	if Recount then
+		if not L then
+			L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })
+		end
 		Recount:AddModeTooltip("Ovale", DataModes, TooltipFuncs, nil, nil, nil, nil)
 	end
 end
 
 function OvaleRecount:OnEnable()
 	if Recount then
-		Ovale:RegisterDamageMeter("OvaleRecount", "ReceiveScore")
+		OvaleScore:RegisterDamageMeter("OvaleRecount", self, "ReceiveScore")
 	end
 end
 
 function OvaleRecount:OnDisable()
-	if Recount then
-		Ovale:UnregisterDamageMeter("OvaleRecount")
-	end
+	OvaleScore:UnregisterDamageMeter("OvaleRecount")
 end
 
 function OvaleRecount:ReceiveScore(name, guid, scored, scoreMax)

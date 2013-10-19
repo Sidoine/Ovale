@@ -21,6 +21,7 @@ local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
+local OvaleScore = Ovale.OvaleScore
 local OvaleSpellBook = Ovale.OvaleSpellBook
 
 local ipairs = ipairs
@@ -82,19 +83,6 @@ local function TracePrintf(spellId, ...)
 		if self.traceSpellList[spellId] or self.traceSpellList[name] then
 			local now = API_GetTime()
 			Ovale:Printf("[trace] @%f %s", now, Ovale:Format(...))
-		end
-	end
-end
-
-local function ScoreSpell(spellId)
-	local si = OvaleData.spellInfo[spellId]
-	if Ovale.enCombat and not (si and si.toggle) and OvaleData.scoreSpell[spellId] then
-		local scored = Ovale.frame:GetScore(spellId)
-		Ovale:Logf("Scored %s", scored)
-		if scored then
-			Ovale.score = Ovale.score + scored
-			Ovale.maxScore = Ovale.maxScore + 1
-			Ovale:SendScoreToDamageMeter(self_playerName, OvaleGUID:GetGUID("player"), scored, 1)
 		end
 	end
 end
@@ -192,7 +180,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	end
 	tinsert(self_activeSpellcast, spellcast)
 
-	ScoreSpell(spellId)
+	OvaleScore:ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
 end
 

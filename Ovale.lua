@@ -13,7 +13,6 @@ Ovale = LibStub("AceAddon-3.0"):NewAddon(addonNamespace, "Ovale", "AceConsole-3.
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
-local OvaleGUID = nil
 local OvaleOptions = nil
 
 local format = string.format
@@ -22,14 +21,10 @@ local select = select
 local tostring = tostring
 local wipe = table.wipe
 local API_GetTime = GetTime
-local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
-local API_SendAddonMessage = SendAddonMessage
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
-
-local self_damageMeterMethods = {}
 
 local OVALE_FALSE_STRING = tostring(false)
 local OVALE_NIL_STRING = tostring(nil)
@@ -55,10 +50,6 @@ Ovale.traced = false
 Ovale.trace=false
 --in combat?
 Ovale.enCombat = false
---score in current combat
-Ovale.score = 0
---maximal theoric score in current combat
-Ovale.maxScore = 0
 Ovale.refreshNeeded = {}
 Ovale.combatStartTime = nil
 Ovale.listes = {}
@@ -91,11 +82,8 @@ end
 --<public-static-methods>
 function Ovale:OnEnable()
     -- Called when the addon is enabled
-	OvaleGUID = self:GetModule("OvaleGUID")
 	OvaleOptions = self:GetModule("OvaleOptions")
 
-	API_RegisterAddonMessagePrefix("Ovale")
-	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -106,21 +94,10 @@ end
 
 function Ovale:OnDisable()
     -- Called when the addon is disabled
-	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self.frame:Hide()
-end
-
--- Receive scores for damage meters from other Ovale addons in the raid.
-function Ovale:CHAT_MSG_ADDON(event, ...)
-	local prefix, message, channel, sender = ...
-	if prefix ~= "Ovale" then return end
-	if channel ~= "RAID" and channel ~= "PARTY" then return end
-
-	local scored, scoreMax, guid = strsplit(";", message)
-	self:SendScoreToDamageMeter(sender, guid, scored, scoreMax)
 end
 
 --Called when the player target change
@@ -134,21 +111,10 @@ end
 function Ovale:PLAYER_REGEN_ENABLED()
 	self.enCombat = false
 	self:UpdateVisibility()
-	-- if self.maxScore and self.maxScore > 0 then
-	-- 	self:Print((self.score/self.maxScore*100).."%")
-	-- end
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
-	if self.maxScore > 0 then
-		-- Broadcast the player's own score for damage meters when combat ends.
-		-- Broadcast message is "score;maxScore;playerGUID"
-		local message = self.score .. ";" .. self.maxScore .. ";" .. OvaleGUID:GetGUID("player")
-		API_SendAddonMessage("Ovale", message, "RAID")
-	end
 	self.enCombat = true
-	self.score = 0
-	self.maxScore = 0
 	self.combatStartTime = API_GetTime()
 	self:UpdateVisibility()
 end
@@ -266,47 +232,6 @@ function Ovale:ToggleCheckBox(v)
 			break
 		end
 		v = v - 1
-	end
-end
-
---[[
-	Damage meter addons that want to receive Ovale scores should implement
-	and register a function that has the following signature:
-
-		ReceiveScore(name, guid, scored, scoreMax)
-
-		Parameters:
-			name - the name of the unit
-			guid - GUID of the named unit
-			scored - current score
-			scoreMax - current maximum score
-
-		Returns:
-			none
-
-	The function should be registered with Ovale using the RegisterDamageMeter
-	method, which needs a unique name for the meter and either the function itself
-	or a method name for the module with the given name.
-]]--
-
-function Ovale:RegisterDamageMeter(name, method)
-	self_damageMeterMethods[name] = method
-end
-
-function Ovale:UnregisterDamageMeter(name)
-	self_damageMeterMethods[name] = nil
-end
-
-function Ovale:SendScoreToDamageMeter(name, guid, scored, scoreMax)
-	for _, method in pairs(self_damageMeterMethods) do
-		if type(method) == "string" then
-			local module = self:GetModule(name) or LibStub("AceAddon-3.0"):GetAddon(name)
-			if module and type(module[method]) == "function" then
-				return module[method](module, name, guid, scored, scoreMax)
-			end
-		elseif type(method) == "function" then
-			return method(name, guid, scored, scoreMax)
-		end
 	end
 end
 

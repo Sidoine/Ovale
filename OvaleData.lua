@@ -45,8 +45,6 @@ self_buffNoSnapshotSpellList =
 OvaleData.itemList = {}
 --spell info from the current script (by spellId)
 OvaleData.spellInfo = {}
---spells that count for scoring
-OvaleData.scoreSpell = {}
 
 OvaleData.buffSpellList =
 {

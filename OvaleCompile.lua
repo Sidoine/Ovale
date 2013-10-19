@@ -20,6 +20,7 @@ local OvaleEquipement = Ovale.OvaleEquipement
 local OvaleOptions = Ovale.OvaleOptions
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
+local OvaleScore = Ovale.OvaleScore
 local OvaleScripts = Ovale.OvaleScripts
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
@@ -339,8 +340,7 @@ local function ParseScoreSpells(params)
 	for v in strgmatch(params, "(%d+)") do
 		local spellId = tonumber(v)
 		if spellId then
-			--Ovale:FormatPrint("Add spell to score %d", spellId)
-			OvaleData.scoreSpell[spellId] = true
+			OvaleScore:AddSpell(spellId)
 		else
 			Ovale:FormatPrint("ScoreSpell with unknown spell %s", v)
 		end
