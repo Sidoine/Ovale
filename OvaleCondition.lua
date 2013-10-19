@@ -165,19 +165,19 @@ local function TestBoolean(a, yesno)
 end
 
 -- Returns either an "Ovale value" or a boolean, depending on whether "comparator" is given.
--- An "Ovale value" is a quintuplet (start, ending, value, atTime, rate) that determines a
--- linear function A(t) = value + (t - atTime)*rate, with domain (start, ending).
-local function TestOvaleValue(start, ending, value, atTime, rate, comparator, limit)
+-- An "Ovale value" is a quintuplet (start, ending, value, origin, rate) that determines a
+-- linear function A(t) = value + (t - origin)*rate, with domain (start, ending).
+local function TestOvaleValue(start, ending, value, origin, rate, comparator, limit)
 	--[[
 		                     A(t) = limit
-		value + (t - atTime)*rate = limit
-		        (t - atTime)*rate = limit - value
+		value + (t - origin)*rate = limit
+		        (t - origin)*rate = limit - value
 	--]]
-	if not value or not atTime or not rate then
+	if not value or not origin or not rate then
 		return nil
 	elseif not comparator then
 		if Measure(start, ending) > 0 then
-			return start, ending, value, atTime, rate
+			return start, ending, value, origin, rate
 		else
 			return 0, math.huge, 0, 0, 0
 		end
@@ -197,12 +197,12 @@ local function TestOvaleValue(start, ending, value, atTime, rate, comparator, li
 			or (comparator == "atMost" and rate > 0)
 			or (comparator == "atLeast" and rate < 0)
 			or (comparator == "more" and rate < 0) then
-		return Intersect(start, ending, 0, (limit - value)/rate + atTime)
+		return Intersect(start, ending, 0, (limit - value)/rate + origin)
 	elseif (comparator == "less" and rate < 0)
 			or (comparator == "atMost" and rate < 0)
 			or (comparator == "atLeast" and rate > 0)
 			or (comparator == "more" and rate > 0) then
-		return Intersect(start, ending, (limit - value)/rate + atTime, math.huge)
+		return Intersect(start, ending, (limit - value)/rate + origin, math.huge)
 	end
 	return nil
 end
@@ -211,8 +211,8 @@ local function Compare(value, comparator, limit)
 	return TestOvaleValue(0, math.huge, value, 0, 0, comparator, limit)
 end
 
-local function TestValue(comparator, limit, value, atTime, rate)
-	return TestOvaleValue(0, math.huge, value, atTime, rate, comparator, limit)
+local function TestValue(comparator, limit, value, origin, rate)
+	return TestOvaleValue(0, math.huge, value, origin, rate, comparator, limit)
 end
 
 local function GetFilter(condition)
@@ -258,15 +258,15 @@ end
 
 local function GetRuneCount(type, death)
 	local ret = 0
-	local atTime = nil
+	local origin = nil
 	local rate = nil
 	type = OVALE_RUNETYPE[type]
 	for i=1,6 do
 		local rune = OvaleState.state.rune[i]
 		if rune and (rune.type == type or (rune.type == 4 and death==1)) then
 			if rune.cd > OvaleState.currentTime then
-				if not atTime or rune.cd < atTime then
-					atTime = rune.cd
+				if not origin or rune.cd < origin then
+					origin = rune.cd
 					rate = 1/rune.duration
 				end
 			else
@@ -274,8 +274,8 @@ local function GetRuneCount(type, death)
 			end
 		end
 	end
-	if atTime then
-		return ret + 1, atTime, rate
+	if origin then
+		return ret + 1, origin, rate
 	else
 		return ret, 0, 0
 	end
@@ -449,8 +449,8 @@ OvaleCondition.defaultTarget = "target"
 		This returns a time interval representing when the condition is true
 		and is used by conditions that return only a time interval.
 
-	(2) start, ending, value, atTime, rate
-		This returns a function f(t) = value + (t - atTime) * rate that is
+	(2) start, ending, value, origin, rate
+		This returns a function f(t) = value + (t - origin) * rate that is
 		valid for start < t < ending.  This return method is used by
 		conditions that return a value that is used in numerical comparisons
 		or operations.
@@ -1089,8 +1089,8 @@ end
 
 OvaleCondition.conditions.burningembers = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.burningembers, OvaleState.currentTime, OvaleState.powerRate.burningembers
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.burningembers, OvaleState.currentTime, OvaleState.powerRate.burningembers
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Check if the player can cast the given spell (not on cooldown).
@@ -1429,9 +1429,9 @@ OvaleCondition.conditions.critdamage = function(condition)
 	-- TODO: Use target's debuffs in this calculation.
 	local spellId = condition[1]
 	local comparator, limit = condition[2], condition[3]
-	local value, atTime, rate = ComputeFunctionParam(spellId, "damage")
+	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
 	if value then
-		return TestValue(comparator, limit, critFactor * value, atTime, critFactor * rate)
+		return TestValue(comparator, limit, critFactor * value, origin, critFactor * rate)
 	else
 		local ap = OvalePaperDoll.stat.attackPower
 		local sp = OvalePaperDoll.stat.spellBonusDamage
@@ -1467,9 +1467,9 @@ OvaleCondition.conditions.damage = function(condition)
 	-- TODO: Use target's debuffs in this calculation.
 	local spellId = condition[1]
 	local comparator, limit = condition[2], condition[3]
-	local value, atTime, rate = ComputeFunctionParam(spellId, "damage")
+	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
 	if value then
-		return TestValue(comparator, limit, value, atTime, rate)
+		return TestValue(comparator, limit, value, origin, rate)
 	else
 		local ap = OvalePaperDoll.stat.attackPower
 		local sp = OvalePaperDoll.stat.spellBonusDamage
@@ -1541,8 +1541,8 @@ OvaleCondition.conditions.incomingdamage = OvaleCondition.conditions.damagetaken
 
 OvaleCondition.conditions.demonicfury = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.demonicfury, OvaleState.currentTime, OvaleState.powerRate.demonicfury
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.demonicfury, OvaleState.currentTime, OvaleState.powerRate.demonicfury
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the distance in yards to the target.
@@ -1612,8 +1612,8 @@ end
 	-- returns: bool or number
 OvaleCondition.conditions.effectivemana = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the number of hostile enemies on the battlefield.
@@ -1645,8 +1645,8 @@ end
 
 OvaleCondition.conditions.energy = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.energy, OvaleState.currentTime, OvaleState.powerRate.energy
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.energy, OvaleState.currentTime, OvaleState.powerRate.energy
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
@@ -1704,8 +1704,8 @@ end
 
 OvaleCondition.conditions.focus = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.focus, OvaleState.currentTime, OvaleState.powerRate.focus
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.focus, OvaleState.currentTime, OvaleState.powerRate.focus
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the amount of regenerated focus per second for hunters.
@@ -2580,8 +2580,8 @@ OvaleCondition.conditions.mana = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
 	if target == "player" then
-		local value, atTime, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
-		return TestValue(comparator, limit, value, atTime, rate)
+		local value, origin, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
+		return TestValue(comparator, limit, value, origin, rate)
 	else
 		return Compare(API_UnitPower(target, SPELL_POWER_MANA), comparator, limit)
 	end
@@ -2607,7 +2607,7 @@ OvaleCondition.conditions.manapercent = function(condition)
 	if target == "player" then
 		local powerMax = OvalePower.maxPower.mana or 0
 		if powerMax > 0 then
-			local value, atTime, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
+			local value, origin, rate = OvaleState.state.mana, OvaleState.currentTime, OvaleState.powerRate.mana
 			local conversion = 100 / powerMax
 			return TestValue(comparator, limit, value * conversion, OvaleState.currentTime, rate * conversion)
 		end
@@ -3132,8 +3132,8 @@ end
 
 OvaleCondition.conditions.rage = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.rage, OvaleState.currentTime, OvaleState.powerRate.rage
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.rage, OvaleState.currentTime, OvaleState.powerRate.rage
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the current ranged critical strike chance of the player.
@@ -3256,8 +3256,8 @@ end
 
 OvaleCondition.conditions.runecount = function(condition)
 	local comparator, limit = condition[2], condition[3]
-	local count, atTime, rate = GetRuneCount(condition[1], condition.death)
-	return TestValue(comparator, limit, count, atTime, rate)
+	local count, origin, rate = GetRuneCount(condition[1], condition.death)
+	return TestValue(comparator, limit, count, origin, rate)
 end
 
 --- Get the number of seconds before the rune conditions are met.
@@ -3299,8 +3299,8 @@ end
 
 OvaleCondition.conditions.runicpower = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.runicpower, OvaleState.currentTime, OvaleState.powerRate.runicpower
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.runicpower, OvaleState.currentTime, OvaleState.powerRate.runicpower
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the current number of Shadow Orbs for shadow priests.
@@ -3316,8 +3316,8 @@ end
 
 OvaleCondition.conditions.shadoworbs = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	local value, atTime, rate = OvaleState.state.shadoworbs, OvaleState.currentTime, OvaleState.powerRate.shadoworbs
-	return TestValue(comparator, limit, value, atTime, rate)
+	local value, origin, rate = OvaleState.state.shadoworbs, OvaleState.currentTime, OvaleState.powerRate.shadoworbs
+	return TestValue(comparator, limit, value, origin, rate)
 end
 
 --- Get the current number of Soul Shards for warlocks.
