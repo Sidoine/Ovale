@@ -173,7 +173,8 @@ function OvaleSpellBook:UpdatePetSpells()
 		local i = 1
 		while true do
 			local skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_PET)
-			if spellId and skillType ~= "FUTURESPELL" and skillType ~= "FLYOUT" then
+			if not spellId then break end
+			if skillType ~= "FUTURESPELL" and skillType ~= "FLYOUT" then
 				-- Use GetSpellLink() in case this spellbook item was replaced by another spell.
 				local spellLink = API_GetSpellLink(i, BOOKTYPE_PET)
 				if spellLink then
