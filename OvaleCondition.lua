@@ -3843,7 +3843,11 @@ end
 
 OvaleCondition.conditions.timeincombat = function(condition)
 	local comparator, limit = condition[1], condition[2]
-	return TestValue(comparator, limit, 0, Ovale.combatStartTime, 1)
+	if Ovale.enCombat then
+		return TestOvaleValue(Ovale.combatStartTime, math.huge, 0, Ovale.combatStartTime, 1, comparator, limit)
+	else
+		return Compare(0, comparator, limit)
+	end
 end
 
 --- Get the estimated number of seconds remaining before the target is dead.
