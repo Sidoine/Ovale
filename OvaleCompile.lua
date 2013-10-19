@@ -664,7 +664,7 @@ end
 -- Compile non-function and non-icon declarations.
 local function CompileDeclarations(text)
 	-- Define(CONSTANTE valeur)
-	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+(%w+)%s*%)", ParseDefine)
+	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+([%w_.=]+)%s*%)", ParseDefine)
 	
 	-- On remplace les constantes par leur valeur
 	text = strgsub(text, "([%w_]+)", ReplaceDefine)
