@@ -340,7 +340,36 @@ local function ComputeCustomFunction(element)
 	else
 		Ovale:Logf("Using cached values for %s", element.name)
 	end
-	return element.startA, element.endA, element.priorityA, element.elementA
+	local startA, endA, priorityA, elementA = element.startA, element.endA, element.priorityA, element.elementA
+	if element.params.asValue and element.params.asValue == 1 then
+		--[[
+			Allow for the return value of a custom function to be "typecast" to a constant value.
+
+			If the return value is a time span (a "boolean" value), then if the current time of
+			the simulation is within the time span, then return 1, or 0 otherwise.
+
+			If the return value is a linear function, then if the current time of the simulation
+			is within the function's domain, then the function is simply evaluated at the current
+			time, or 0 otherwise.
+
+			If the return value is an action, then return 1 if the action is off of cooldown, or
+			0 if it is on cooldown.
+		==]]
+		local atTime = OvaleState.currentTime
+		local value = 0
+		if HasTime(startA, endA, atTime) then
+			if not elementA then	-- boolean
+				value = 1
+			elseif elementA.type == "value" then
+				value = elementA.value + (atTime - elementA.origin) * elementA.rate
+			elseif elementA.type == "action" then
+				value = 1
+			end
+		end
+		return 0, math.huge, priorityA, PutValue(element, value, 0, 0)
+	else
+		return startA, endA, priorityA, elementA
+	end
 end
 
 local function ComputeFunction(element)
