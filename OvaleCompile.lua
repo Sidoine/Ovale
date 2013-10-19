@@ -586,12 +586,16 @@ local function ParseCommands(text)
 	return nodeId
 end
 
-local function ParseAddFunction(name, text)
+local function ParseAddFunction(name, params, text)
 	local nodeId = ParseCommands(text)
 	local node = self_pool:Get()
 	node.type = "customfunction"
 	node.name = name
+	node.params = ParseParameters(params)
 	node.a = self_node[tonumber(nodeId)]
+	if not TestConditions(node.params) then
+		return nil
+	end
 	return AddNode(node)
 end
 
@@ -716,8 +720,8 @@ local function CompileScript(text)
 	text = CompileDeclarations(text)
 	text = CompileInputs(text)
 
-	for name, t in strgmatch(text, "AddFunction%s+(%w+)%s*(%b{})") do
-		local node = ParseAddFunction(name, t)
+	for name, p, t in strgmatch(text, "AddFunction%s+(%w+)%s*(.-)%s*(%b{})") do
+		local node = ParseAddFunction(name, p, t)
 		if node then
 			self_customFunctions[name] = node
 		end
