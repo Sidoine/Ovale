@@ -497,6 +497,19 @@ end
 		end 
 	end,]]
 
+--- Get the current agility of the player.
+-- @name Agility
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @return The current agility.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.agility = function(condition)
+	local comparator, limit = condition[1], condition[2]
+	return Compare(OvalePaperDoll.stat.agility, comparator, limit)
+end
+
 --- Get how many pieces of an armor set, e.g., Tier 14 set, are equipped by the player.
 -- @name ArmorSetParts
 -- @paramsig number or boolean
@@ -2030,6 +2043,19 @@ OvaleCondition.conditions.inrange = function(condition)
 	local target = GetTarget(condition)
 	local spellName = OvaleSpellBook:GetSpellName(spellId)
 	return TestBoolean(API_IsSpellInRange(spellName, target) == 1, yesno)
+end
+
+--- Get the current intellect of the player.
+-- @name Intellect
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @return The current intellect.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.intellect = function(condition)
+	local comparator, limit = condition[1], condition[2]
+	return Compare(OvalePaperDoll.stat.intellect, comparator, limit)
 end
 
 --- Get the cooldown time in seconds of an item, e.g., trinket.
@@ -3604,6 +3630,32 @@ OvaleCondition.conditions.spellpower = function(condition)
 	return Compare(OvalePaperDoll.stat.spellBonusDamage, comparator, limit)
 end
 
+--- Get the current spirit of the player.
+-- @name Spirit
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @return The current spirit.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.spirit = function(condition)
+	local comparator, limit = condition[1], condition[2]
+	return Compare(OvalePaperDoll.stat.spirit, comparator, limit)
+end
+
+--- Get the current stamina of the player.
+-- @name Stamina
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @return The current stamina.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.stamina = function(condition)
+	local comparator, limit = condition[1], condition[2]
+	return Compare(OvalePaperDoll.stat.stamina, comparator, limit)
+end
+
 --- Get the remaining amount of damage Stagger will cause to the target.
 -- @name StaggerRemains
 -- @paramsig number or boolean
@@ -3672,6 +3724,19 @@ end
 OvaleCondition.conditions.stealthed = function(condition)
 	local yesno = condition[1]
 	return TestBoolean(API_IsStealthed(), yesno)
+end
+
+--- Get the current strength of the player.
+-- @name Strength
+-- @paramsig number or boolean
+-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+-- @param number Optional. The number to compare against.
+-- @return The current strength.
+-- @return A boolean value for the result of the comparison.
+
+OvaleCondition.conditions.strength = function(condition)
+	local comparator, limit = condition[1], condition[2]
+	return Compare(OvalePaperDoll.stat.strength, comparator, limit)
 end
 
 --- Get the number of points spent in a talent (0 or 1)
