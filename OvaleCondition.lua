@@ -344,6 +344,31 @@ local function GetAuraOnAnyTarget(condition, excludingUnit)
 	return start, ending, count
 end
 
+-- Return the non-critical-strike damage of a spell, given the player's current stats.
+local function GetDamage(spellId)
+	-- TODO: Use target's debuffs in this calculation.
+	local ap = OvalePaperDoll.stat.attackPower or 0
+	local sp = OvalePaperDoll.stat.spellBonusDamage or 0
+	local mh = OvalePaperDoll.stat.mainHandWeaponDamage or 0
+	local oh = OvalePaperDoll.stat.offHandWeaponDamage or 0
+	local bdm = OvalePaperDoll.stat.baseDamageMultiplier or 1
+	local dm = OvaleState:GetDamageMultiplier(spellId) or 1
+	local combo = OvaleState.state.combo or 1
+	return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
+end
+
+-- Return the maximum power of the given power type on the target.
+local function MaxPower(target, powerType)
+	local maxi
+	if target == "player" then
+		maxi = OvalePower.maxPower[powerType]
+	else
+		local powerInfo = OvalePower.POWER_INFO[powerType]
+		maxi = API_UnitPowerMax(target, powerInfo.id, powerInfo.segments)
+	end
+	return maxi
+end
+
 -- Returns:
 --     Estimated number of seconds before the specified unit reaches zero health
 --     Unit's current health
@@ -2669,18 +2694,6 @@ OvaleCondition.conditions.maxhealth = function(condition)
 	return Compare(API_UnitHealthMax(target), comparator, limit)
 end
 
--- Return the maximum power of the given power type on the target.
-local function MaxPowerConditionHelper(target, powerType)
-	local maxi
-	if target == "player" then
-		maxi = OvalePower.maxPower[powerType]
-	else
-		local powerInfo = OvalePower.POWER_INFO[powerType]
-		maxi = API_UnitPowerMax(target, powerInfo.id, powerInfo.segments)
-	end
-	return maxi
-end
-
 --- Get the maximum amount of alternate power of the target.
 -- Alternate power is the resource tracked by the alternate power bar in certain boss fights.
 -- @name MaxAlternatePower
@@ -2696,7 +2709,7 @@ end
 OvaleCondition.conditions.maxalternatepower = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "alternate")
+	local maxi = MaxPower(target, "alternate")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2714,7 +2727,7 @@ end
 OvaleCondition.conditions.maxburningembers = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "burningembers")
+	local maxi = MaxPower(target, "burningembers")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2732,7 +2745,7 @@ end
 OvaleCondition.conditions.maxchi = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "chi")
+	local maxi = MaxPower(target, "chi")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2750,7 +2763,7 @@ end
 OvaleCondition.conditions.maxdemonicfury = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "demonicfury")
+	local maxi = MaxPower(target, "demonicfury")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2768,7 +2781,7 @@ end
 OvaleCondition.conditions.maxenergy = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "energy")
+	local maxi = MaxPower(target, "energy")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2786,7 +2799,7 @@ end
 OvaleCondition.conditions.maxfocus = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "focus")
+	local maxi = MaxPower(target, "focus")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2804,7 +2817,7 @@ end
 OvaleCondition.conditions.maxholypower = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "holy")
+	local maxi = MaxPower(target, "holy")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2824,7 +2837,7 @@ end
 OvaleCondition.conditions.maxmana = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "mana")
+	local maxi = MaxPower(target, "mana")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2842,7 +2855,7 @@ end
 OvaleCondition.conditions.maxrage = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "rage")
+	local maxi = MaxPower(target, "rage")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2860,7 +2873,7 @@ end
 OvaleCondition.conditions.maxrunicpower = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "runicpower")
+	local maxi = MaxPower(target, "runicpower")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2878,7 +2891,7 @@ end
 OvaleCondition.conditions.maxshadoworbs = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "shadoworbs")
+	local maxi = MaxPower(target, "shadoworbs")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -2896,7 +2909,7 @@ end
 OvaleCondition.conditions.maxsoulshards = function(condition)
 	local comparator, limit = condition[1], condition[2]
 	local target = GetTarget(condition)
-	local maxi = MaxPowerConditionHelper(target, "shards")
+	local maxi = MaxPower(target, "shards")
 	return Compare(maxi, comparator, limit)
 end
 
@@ -4151,18 +4164,3 @@ OvaleCondition.conditions.weapondamage = function(condition)
 	return Compare(damage, comparator, limit)
 end
 --</public-static-properties>
-
---<private-static-methods>
--- Return the non-critical-strike damage of a spell, given the player's current stats.
-local function GetDamage(spellId)
-	-- TODO: Use target's debuffs in this calculation.
-	local ap = OvalePaperDoll.stat.attackPower or 0
-	local sp = OvalePaperDoll.stat.spellBonusDamage or 0
-	local mh = OvalePaperDoll.stat.mainHandWeaponDamage or 0
-	local oh = OvalePaperDoll.stat.offHandWeaponDamage or 0
-	local bdm = OvalePaperDoll.stat.baseDamageMultiplier or 1
-	local dm = OvaleState:GetDamageMultiplier(spellId) or 1
-	local combo = OvaleState.state.combo or 1
-	return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
-end
---</private-static-methods>
