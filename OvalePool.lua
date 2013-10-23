@@ -16,6 +16,7 @@ Ovale.OvalePool = OvalePool
 local assert = assert
 local setmetatable = setmetatable
 local tinsert = table.insert
+local tostring = tostring
 local tremove = table.remove
 local wipe = table.wipe
 --</private-static-properties>
@@ -26,16 +27,16 @@ OvalePool.pool = nil
 OvalePool.size = 0
 OvalePool.unused = 0
 OvalePool.__index = OvalePool
-do
-	setmetatable(OvalePool, { __call = function(_, ...) return NewPool(...) end })
-end
 --</public-static-properties>
 
 --<private-static-methods>
-function NewPool(...)
-	local obj = setmetatable({ name = ... }, OvalePool)
-	obj:Reset()
-	return obj
+do
+	local function NewPool(...)
+		local obj = setmetatable({ name = ... }, OvalePool)
+		obj:Reset()
+		return obj
+	end
+	setmetatable(OvalePool, { __call = function(_, ...) return NewPool(...) end })
 end
 --</private-static-methods>
 
@@ -77,6 +78,6 @@ function OvalePool:Reset()
 end
 
 function OvalePool:Debug()
-	Ovale:FormatPrint("Pool %s has size %d with %d item(s).", self.name, self.size, self.unused)
+	Ovale:FormatPrint("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
 end
 --</public-static-methods>

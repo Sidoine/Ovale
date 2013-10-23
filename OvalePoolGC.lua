@@ -14,6 +14,7 @@ Ovale.OvalePoolGC = OvalePoolGC
 
 --<private-static-properties>
 local setmetatable = setmetatable
+local tostring = tostring
 --</private-static-properties>
 
 --<public-static-properties>
@@ -22,17 +23,16 @@ OvalePoolGC.pool = nil
 OvalePoolGC.size = 0
 OvalePoolGC.unused = 0
 OvalePoolGC.__index = OvalePoolGC
-do
-	setmetatable(OvalePoolGC, { __call = function(_, ...) return NewPool(...) end })
-end
-
 --</public-static-properties>
 
 --<private-static-methods>
-function NewPool(...)
-	local obj = setmetatable({ name = ... }, OvalePoolGC)
-	obj:Reset()
-	return obj
+do
+	local function NewPool(...)
+		local obj = setmetatable({ name = ... }, OvalePoolGC)
+		obj:Reset()
+		return obj
+	end
+	setmetatable(OvalePoolGC, { __call = function(_, ...) return NewPool(...) end })
 end
 --</private-static-methods>
 
@@ -53,6 +53,6 @@ function OvalePoolGC:Reset()
 end
 
 function OvalePoolGC:Debug()
-	Ovale:FormatPrint("Pool %s has size %d.", self.name, self.size)
+	Ovale:FormatPrint("Pool %s has size %d.", tostring(self.name), self.size)
 end
 --</public-static-methods>
