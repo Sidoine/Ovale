@@ -132,6 +132,14 @@ while (defined($r = readdir(DIR)))
 		if ($content =~ m/--inherits (\w+)/)
 		{
 			my $parent = $1;
+			for my $prop (keys %{$sp{$parent}})
+			{
+				$sp{$class}{$prop} = $sp{$parent}{$prop}
+			}
+			for my $method (keys %{$sm{$parent}})
+			{
+				$sm{$class}{$method} = $sm{$parent}{$method}
+			}
 			for my $method (keys %{$m{$parent}})
 			{
 				$m{$class}{$method} = $m{$parent}{$method}
