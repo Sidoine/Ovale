@@ -57,6 +57,21 @@ local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
 local OVALE_UNKNOWN_FUNCTION_DEBUG = "unknown_function"
 local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
 
+-- Parameters used as conditionals in script declarations.
+local OVALE_PARAMETER = {
+	checkboxoff = true,
+	checkboxon = true,
+	glyph = true,
+	if_spell = true,
+	if_stance = true,
+	item = true,
+	itemcount = true,
+	itemset = true,
+	list = true,
+	mastery = true,
+	talent = true,
+}
+
 -- Known script functions other than conditions.
 local OVALE_FUNCTIONS = {
 	item = true,
@@ -259,12 +274,30 @@ local function ParseFunction(prefix, func, params)
 	return nodeName
 end
 
-local function ParseSpellAddDebuff(params)
-	local paramList = ParseParameters(params)
-	local spellId = paramList[1]
-	if spellId then
+--[[
+	Parse the various Spell*{Buff,Debuff}() declarations.
+	Check for test conditions to see whether this declaration is active.
+	Filter out then test conditions and copy the rest of the key=value pairs
+	into the aura table.
+--]]
+local function ParseSpellAuraList(auraTable, filter, paramList)
+	if TestConditions(paramList) then
 		paramList[1] = nil
-		OvaleData:GetSpellInfo(spellId).aura.player.HARMFUL = paramList
+		if not auraTable[filter] then
+			for k, v in pairs(paramList) do
+				if OVALE_PARAMETER[k] then
+					paramList[k] = nil
+				end
+			end
+			auraTable[filter] = paramList
+		else
+			local tbl = auraTable[filter]
+			for k, v in pairs(paramList) do
+				if not OVALE_PARAMETER[k] then
+					tbl[k] = v
+				end
+			end
+		end
 	end
 	return ""
 end
@@ -272,41 +305,43 @@ end
 local function ParseSpellAddBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	if spellId then
-		paramList[1] = nil
-		OvaleData:GetSpellInfo(spellId).aura.player.HELPFUL = paramList
-	end
-	return ""
+	local si = OvaleData:GetSpellInfo(spellId)
+	return ParseSpellAuraList(si.aura.player, "HELPFUL", paramList)
+end
+
+local function ParseSpellAddDebuff(params)
+	local paramList = ParseParameters(params)
+	local spellId = paramList[1]
+	local si = OvaleData:GetSpellInfo(spellId)
+	return ParseSpellAuraList(si.aura.player, "HARMFUL", paramList)
+end
+
+local function ParseSpellAddTargetBuff(params)
+	local paramList = ParseParameters(params)
+	local spellId = paramList[1]
+	local si = OvaleData:GetSpellInfo(spellId)
+	return ParseSpellAuraList(si.aura.target, "HELPFUL", paramList)
 end
 
 local function ParseSpellAddTargetDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	if spellId then
-		paramList[1] = nil
-		OvaleData:GetSpellInfo(spellId).aura.target.HARMFUL = paramList
-	end
-	return ""
+	local si = OvaleData:GetSpellInfo(spellId)
+	return ParseSpellAuraList(si.aura.target, "HARMFUL", paramList)
 end
 
 local function ParseSpellDamageBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	if spellId then
-		paramList[1] = nil
-		OvaleData:GetSpellInfo(spellId).damageAura.HELPFUL = paramList
-	end
-	return ""
+	local si = OvaleData:GetSpellInfo(spellId)
+	return ParseSpellAuraList(si.damageAura, "HELPFUL", paramList)
 end
 
 local function ParseSpellDamageDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	if spellId then
-		paramList[1] = nil
-		OvaleData:GetSpellInfo(spellId).damageAura.HARMFUL = paramList
-	end
-	return ""
+	local si = OvaleData:GetSpellInfo(spellId)
+	return ParseSpellAuraList(si.damageAura, "HARMFUL", paramList)
 end
 
 local function ParseSpellInfo(params)
@@ -316,12 +351,12 @@ local function ParseSpellInfo(params)
 		if not TestConditions(paramList) then
 			return ""
 		end
-		local spellInfo = OvaleData:GetSpellInfo(spellId)
+		local si = OvaleData:GetSpellInfo(spellId)
 		for k,v in pairs(paramList) do
 			if k == "addduration" then
-				spellInfo.duration = spellInfo.duration + v
+				si.duration = si.duration + v
 			elseif k == "addcd" then
-				spellInfo.cd = spellInfo.cd + v
+				si.cd = si.cd + v
 			elseif k == "list" then
 				-- Add this buff to the named spell list.
 				if not OvaleData.buffSpellList[v] then
@@ -329,7 +364,7 @@ local function ParseSpellInfo(params)
 				end
 				OvaleData.buffSpellList[v][spellId] = true
 			else
-				spellInfo[k] = v
+				si[k] = v
 			end
 		end
 	end
