@@ -240,7 +240,8 @@ end
 function OvalePaperDoll:PLAYER_REGEN_ENABLED(event)
 	local now = API_GetTime()
 	if Ovale.enCombat and Ovale.combatStartTime then
-		Ovale:FormatPrint("[%s] %d snapshots in %f seconds.", OVALE_PAPERDOLL_DEBUG, self_snapshotCount, now - Ovale.combatStartTime)
+		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%d snapshots in %f seconds.",
+			self_snapshotCount, now - Ovale.combatStartTime)
 	end
 	self_pool:Drain()
 end
