@@ -15,17 +15,7 @@ embeds.xml
 #@no-lib-strip@
 libs\LibDualSpec-1.0\LibDualSpec-1.0.lua
 #@end-no-lib-strip@
-
-Locale-frFR.lua
-Locale-deDE.lua
-Locale-enUS.lua
-Locale-esES.lua
-Locale-itIT.lua
-Locale-koKR.lua
-Locale-ptBR.lua
-Locale-ruRU.lua
-Locale-zhCN.lua
-Locale-zhTW.lua
+locales.xml
 
 Ovale.lua
 
