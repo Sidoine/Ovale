@@ -46,6 +46,8 @@ local self_runesCD = {}
 -- Aura IDs for Eclipse buffs.
 local LUNAR_ECLIPSE = 48518
 local SOLAR_ECLIPSE = 48517
+-- Spell ID for Starfall (Balance specialization spell).
+local STARFALL = 48505
 --</private-static-properties>
 
 --<public-static-properties>
@@ -476,6 +478,13 @@ function OvaleState:ApplySpellCost(spellId, startCast, endCast)
 			if self.state.eclipse <= -100 then
 				self.state.eclipse = -100
 				AddEclipse(endCast, LUNAR_ECLIPSE)
+				-- Reaching Lunar Eclipse resets the cooldown of Starfall.
+				local cd = self:GetCD(STARFALL)
+				if cd then
+					cd.start = 0
+					cd.duration = 0
+					cd.enable = 0
+				end
 			elseif self.state.eclipse >= 100 then
 				self.state.eclipse = 100
 				AddEclipse(endCast, SOLAR_ECLIPSE)
