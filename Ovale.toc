@@ -52,17 +52,7 @@ OvaleRecount.lua
 OvaleSkada.lua
 #
 OvaleScripts.lua
-defaut\Chaman.lua
-defaut\Chasseur.lua
-defaut\Chevalier.lua
-defaut\Demoniste.lua
-defaut\Druide.lua
-defaut\Guerrier.lua
-defaut\Mage.lua
-defaut\Moine.lua
-defaut\Paladin.lua
-defaut\Pretre.lua
-defaut\Voleur.lua
+defaut\scripts.xml
 OvaleSpellDamage.lua
 OvaleSwing.lua
 #
@@ -80,5 +70,5 @@ OvaleBestAction.lua
 OvaleCompile.lua
 OvaleIcone.lua
 OvaleIcone.xml
-
+#
 OvaleFrame.lua
