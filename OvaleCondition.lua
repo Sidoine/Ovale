@@ -16,8 +16,6 @@ Ovale.OvaleCondition = OvaleCondition
 local LBCT = LibStub("LibBabble-CreatureType-3.0"):GetLookupTable()
 local LRC = LibStub("LibRangeCheck-2.0", true)
 local OvaleAura = Ovale.OvaleAura
-local OvaleBestAction = nil	-- forward declaration
-local OvaleCompile = nil	-- forward declaration
 local OvaleDamageTaken = Ovale.OvaleDamageTaken
 local OvaleData = Ovale.OvaleData
 local OvaleEnemies = Ovale.OvaleEnemies
@@ -405,27 +403,6 @@ local function TimeToDie(unitId)
 		end
 	end
 	return timeToDie, health, maxHealth
-end
-
-local function ComputeFunctionParam(spellId, paramName)
-	local si = OvaleData.spellInfo[spellId]
-	if si and si[paramName] then
-		-- Resolve forward declarations.
-		OvaleBestAction = OvaleBestAction or Ovale.OvaleBestAction
-		OvaleCompile = OvaleCompile or Ovale.OvaleCompile
-		if OvaleBestAction and OvaleCompile then
-			local element = OvaleCompile:GetFunctionNode(si[paramName])
-			if element then
-				local element = select(4, OvaleBestAction:Compute(element))
-				local element = element.result
-				if element and element.type == "value" then
-					return element.value, element.origin, element.rate
-				end
-			end
-			return 0, 0, 0
-		end
-	end
-	return nil
 end
 --</private-static-methods>
 
@@ -1449,22 +1426,10 @@ end
 -- @see Damage, LastDamage, LastEstimatedDamage
 
 OvaleCondition.conditions.critdamage = function(condition)
+	local spellId, comparator, limit = condition[1], condition[2], condition[3]
 	-- TODO: Need to account for increased crit effect from meta-gems.
 	local critFactor = 2
-	-- TODO: Use target's debuffs in this calculation.
-	local spellId, comparator, limit = condition[1], condition[2], condition[3]
-	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
-	if value then
-		return TestValue(comparator, limit, critFactor * value, origin, critFactor * rate)
-	else
-		local ap = OvalePaperDoll.stat.attackPower
-		local sp = OvalePaperDoll.stat.spellBonusDamage
-		local mh = OvalePaperDoll.stat.mainHandWeaponDamage
-		local oh = OvalePaperDoll.stat.offHandWeaponDamage
-		local bdm = OvalePaperDoll.stat.baseDamageMultiplier
-		local dm = OvaleState:GetDamageMultiplier(spellId)
-		return Compare(critFactor * OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, comparator, limit)
-	end
+	return Compare(critFactor * GetDamage(spellId), comparator, limit)
 end
 
 --- Get the current estimated damage of a spell on the target.
@@ -1488,20 +1453,8 @@ end
 --     Spell(rake)
 
 OvaleCondition.conditions.damage = function(condition)
-	-- TODO: Use target's debuffs in this calculation.
 	local spellId, comparator, limit = condition[1], condition[2], condition[3]
-	local value, origin, rate = ComputeFunctionParam(spellId, "damage")
-	if value then
-		return TestValue(comparator, limit, value, origin, rate)
-	else
-		local ap = OvalePaperDoll.stat.attackPower
-		local sp = OvalePaperDoll.stat.spellBonusDamage
-		local mh = OvalePaperDoll.stat.mainHandWeaponDamage
-		local oh = OvalePaperDoll.stat.offHandWeaponDamage
-		local bdm = OvalePaperDoll.stat.baseDamageMultiplier
-		local dm = OvaleState:GetDamageMultiplier(spellId)
-		return Compare(OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm, comparator, limit)
-	end
+	return Compare(GetDamage(spellId), comparator, limit)
 end
 
 --- Get the current damage multiplier of a spell.
@@ -4198,3 +4151,18 @@ OvaleCondition.conditions.weapondamage = function(condition)
 	return Compare(damage, comparator, limit)
 end
 --</public-static-properties>
+
+--<private-static-methods>
+-- Return the non-critical-strike damage of a spell, given the player's current stats.
+local function GetDamage(spellId)
+	-- TODO: Use target's debuffs in this calculation.
+	local ap = OvalePaperDoll.stat.attackPower or 0
+	local sp = OvalePaperDoll.stat.spellBonusDamage or 0
+	local mh = OvalePaperDoll.stat.mainHandWeaponDamage or 0
+	local oh = OvalePaperDoll.stat.offHandWeaponDamage or 0
+	local bdm = OvalePaperDoll.stat.baseDamageMultiplier or 1
+	local dm = OvaleState:GetDamageMultiplier(spellId) or 1
+	local combo = OvaleState.state.combo or 1
+	return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
+end
+--</private-static-methods>

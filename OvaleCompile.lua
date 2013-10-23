@@ -816,18 +816,6 @@ function OvaleCompile:Compile()
 	Ovale:UpdateFrame()
 end
 
-function OvaleCompile:GetFunctionNode(name)
-	name = strlower(name)
-	local nodeName = self_customFunctions[name]
-	if nodeName then
-		local nodeId = strmatch(nodeName, "node(%d+)")
-		if nodeId then
-			return self_node[tonumber(nodeId)]
-		end
-	end
-	return nil
-end
-
 function OvaleCompile:Debug()
 	self_pool:Debug()
 	Ovale:Print(self:DebugNode(self.masterNodes[1]))
