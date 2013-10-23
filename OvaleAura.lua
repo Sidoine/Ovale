@@ -482,7 +482,7 @@ function OvaleAura:GetAura(unitId, spellId, filter, mine, auraFound)
 				auraFound[k] = v
 			end
 		end
-		return newStart, newEnding, newStacks, newTick, newValue, newGain
+		return newStart, newEnding, newStacks, newGain
 	else
 		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 	end
