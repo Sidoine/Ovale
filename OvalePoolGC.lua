@@ -19,9 +19,7 @@ local tostring = tostring
 
 --<public-static-properties>
 OvalePoolGC.name = "OvalePoolGC"
-OvalePoolGC.pool = nil
 OvalePoolGC.size = 0
-OvalePoolGC.unused = 0
 OvalePoolGC.__index = OvalePoolGC
 --</public-static-properties>
 
@@ -49,7 +47,6 @@ function OvalePoolGC:Drain() end
 
 function OvalePoolGC:Reset()
 	self.size = 0
-	self.unused = 0
 end
 
 function OvalePoolGC:Debug()
