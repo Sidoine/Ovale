@@ -158,7 +158,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 	if not existingAura then
 		self:SendMessage("Ovale_AuraAdded", now, guid, spellId, casterGUID)
 	elseif not auraIsUnchanged then
-		self:SendMessage("Ovale_AuraRefreshed", now, guid, spellId, casterGUID)
+		self:SendMessage("Ovale_AuraChanged", now, guid, spellId, casterGUID)
 	end
 	return addAura
 end
