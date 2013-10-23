@@ -23,29 +23,28 @@ OvalePoolGC.size = 0
 OvalePoolGC.__index = OvalePoolGC
 --</public-static-properties>
 
---<private-static-methods>
-do
-	local function NewPool(...)
-		local obj = setmetatable({ name = ... }, OvalePoolGC)
-		obj:Reset()
-		return obj
-	end
-	setmetatable(OvalePoolGC, { __call = function(_, ...) return NewPool(...) end })
-end
---</private-static-methods>
-
 --<public-static-methods>
+do
+	-- Class constructor
+	setmetatable(OvalePoolGC, { __call = function(self, ...) return self:NewPool(...) end })
+end
+
+function OvalePoolGC:NewPool(name)
+	name = name or self.name
+	return setmetatable({ name = name }, self)
+end
+
 function OvalePoolGC:Get()
 	-- Keep running count of total number of tables allocated.
 	self.size = self.size + 1
 	return {}
 end
 
--- The Release and Drain methods are no-ops.
-function OvalePoolGC:Release(item) end
-function OvalePoolGC:Drain() end
+function OvalePoolGC:Release(item)
+	-- no-op
+end
 
-function OvalePoolGC:Reset()
+function OvalePoolGC:Drain()
 	self.size = 0
 end
 

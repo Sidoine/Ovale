@@ -29,18 +29,19 @@ OvalePool.unused = 0
 OvalePool.__index = OvalePool
 --</public-static-properties>
 
---<private-static-methods>
-do
-	local function NewPool(...)
-		local obj = setmetatable({ name = ... }, OvalePool)
-		obj:Reset()
-		return obj
-	end
-	setmetatable(OvalePool, { __call = function(_, ...) return NewPool(...) end })
-end
---</private-static-methods>
-
 --<public-static-methods>
+do
+	-- Class constructor
+	setmetatable(OvalePool, { __call = function(self, ...) return self:NewPool(...) end })
+end
+
+function OvalePool:NewPool(name)
+	name = name or self.name
+	local obj = setmetatable({ name = name }, self)
+	obj:Drain()
+	return obj
+end
+
 function OvalePool:Get()
 	assert(self.pool)
 	local item = tremove(self.pool)
@@ -61,19 +62,8 @@ function OvalePool:Release(item)
 end
 
 function OvalePool:Drain()
-	assert(self.pool)
-	while true do
-		if not tremove(self.pool) then
-			break
-		end
-	end
-	self.size = self.size - self.unused
-	self.unused = 0
-end
-
-function OvalePool:Reset()
 	self.pool = {}
-	self.size = 0
+	self.size = self.size - self.unused
 	self.unused = 0
 end
 
