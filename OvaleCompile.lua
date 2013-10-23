@@ -357,7 +357,7 @@ local function ParseSpellInfo(params)
 				si.duration = si.duration + v
 			elseif k == "addcd" then
 				si.cd = si.cd + v
-			elseif k == "list" then
+			elseif k == "addlist" then
 				-- Add this buff to the named spell list.
 				if not OvaleData.buffSpellList[v] then
 					OvaleData.buffSpellList[v] = {}
