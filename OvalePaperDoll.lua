@@ -383,8 +383,16 @@ function OvalePaperDoll:UpdateDamage(event)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", OVALE_SNAPSHOT_STATS.offHandWeaponDamage, self.stat.offHandWeaponDamage)
 end
 
+function OvalePaperDoll:UpdateSpecialization(event)
+	local newSpecialization = API_GetSpecialization()
+	if self.specialization ~= newSpecialization then
+		self.specialization = newSpecialization
+		self:SendMessage("Ovale_SpecializationChanged", self.specialization)
+	end
+end
+
 function OvalePaperDoll:UpdateStats(event)
-	self.specialization = API_GetSpecialization()
+	self:UpdateSpecialization(event)
 	self:COMBAT_RATING_UPDATE(event)
 	self:MASTERY_UPDATE(event)
 	self:PLAYER_DAMAGE_DONE_MODS(event, "player")
