@@ -227,8 +227,6 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 	if endCast > self.maintenant then
 		self:ApplySpellCost(spellId, startCast, endCast)
 	end
-	
-	-- Effets du sort au moment où il atteint sa cible
 	if si then
 		-- Cooldown du sort
 		local cd = self:GetCD(spellId)
@@ -268,7 +266,10 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 			end
 			Ovale:Logf("%d cd.start=%f, cd.duration=%f", spellId, cd.start, cd.duration)
 		end
+	end
 
+	-- Effets du sort au moment où il atteint sa cible
+	if si then
 		--Auras causés par le sort
 		if si.aura then
 			for target, targetInfo in pairs(si.aura) do
