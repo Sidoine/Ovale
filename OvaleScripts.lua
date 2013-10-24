@@ -14,7 +14,7 @@ local OvaleScripts = Ovale:NewModule("OvaleScripts")
 Ovale.OvaleScripts = OvaleScripts
 
 --<private-static-properties>
-local OvalePaperDoll = Ovale:GetModule("OvalePaperDoll")
+local OvalePaperDoll = Ovale.OvalePaperDoll
 --</private-static-properties>
 
 --<public-static-properties>
