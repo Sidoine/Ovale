@@ -5,15 +5,14 @@
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
 ## Version: @project-version@
-## OptionalDeps: Ace3, Masque, Recount, Skada, LibBabble-CreatureType-3.0, LibDualSpec-1.0, LibRangeCheck-2.0
+## OptionalDeps: Ace3, CallbackHandler-1.0, LibBabble-CreatureType-3.0, LibDualSpec-1.0, LibRangeCheck-2.0, LibStub, Masque, Recount, Skada
 ## SavedVariables: OvaleDB
 ## SavedVariablesPerCharacter: OvaleDBPC
 ## X-Category: Combat
 ## X-Embeds: Ace3
 
-embeds.xml
 #@no-lib-strip@
-libs\LibDualSpec-1.0\LibDualSpec-1.0.lua
+embeds.xml
 #@end-no-lib-strip@
 locales.xml
 
