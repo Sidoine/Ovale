@@ -119,13 +119,14 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		aura.stacks = count
 		aura.debuffType = debuffType
 		if duration > 0 then
+			aura.start = expirationTime - duration
 			aura.duration = duration
 			aura.ending = expirationTime
 		else
-			aura.duration = nil
-			aura.ending = nil
+			aura.start = now
+			aura.duration = math.huge
+			aura.ending = math.huge
 		end
-		aura.start = expirationTime - duration
 		aura.stealable = isStealable
 		aura.mine = mine
 		aura.source = casterGUID
