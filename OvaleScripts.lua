@@ -18,45 +18,31 @@ local OvalePaperDoll = Ovale.OvalePaperDoll
 --</private-static-properties>
 
 --<public-static-properties>
--- Table of default class scripts, indexed by class tokens.
-OvaleScripts.script = {
-	DEATHKNIGHT = {},
-	DRUID = {},
-	HUNTER = {},
-	MAGE = {},
-	MONK = {},
-	PALADIN = {},
-	PRIEST = {},
-	ROGUE = {},
-	SHAMAN = {},
-	WARLOCK = {},
-	WARRIOR = {},
-}
+-- Table of scripts, indexed by source; a script is a table { description = description, code = "..." }.
+OvaleScripts.script = {}
 --</public-static-properties>
 
 --<public-static-methods>
 -- Return a table of script descriptions indexed by source.
 function OvaleScripts:GetDescriptions()
 	local descriptionsTable = {}
-	for src, tbl in pairs(self.script[OvalePaperDoll.class]) do
+	for src, tbl in pairs(self.script) do
 		descriptionsTable[src] = tbl.desc
 	end
 	return descriptionsTable
 end
 
 function OvaleScripts:RegisterScript(class, source, description, code)
-	-- Default values for description and code.
-	description = description or source
-	code = code or ""
-
-	if not self.script[class][source] then
-		self.script[class][source] = {}
+	if class == OvalePaperDoll.class then
+		self.script[source] = self.script[source] or {}
+		self.script[source].desc = description or source
+		self.script[source].code = code or ""
 	end
-	self.script[class][source].desc = description
-	self.script[class][source].code = code
 end
 
 function OvaleScripts:UnregisterScript(class, source)
-	self.script[class][source] = nil
+	if class == OvalePaperDoll.class then
+		self.script[source] = nil
+	end
 end
 --</public-static-methods>

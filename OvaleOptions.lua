@@ -352,8 +352,8 @@ local self_options =
 					get = function(info)
 						local source = OvaleOptions.db.profile.source
 						local code
-						if source and OvaleScripts.script[OvalePaperDoll.class][source] then
-							code = OvaleScripts.script[OvalePaperDoll.class][source].code
+						if source and OvaleScripts.script[source] then
+							code = OvaleScripts.script[source].code
 						else
 							code = ""
 						end
@@ -380,12 +380,12 @@ local self_options =
 						local class = OvalePaperDoll.class
 						local source = OvaleOptions.db.profile.source
 						local code
-						if source and OvaleScripts.script[OvalePaperDoll.class][source] then
-							code = OvaleScripts.script[OvalePaperDoll.class][source].code
+						if source and OvaleScripts.script[source] then
+							code = OvaleScripts.script[source].code
 						else
 							code = ""
 						end
-						OvaleScripts.script[class]["custom"].code = code
+						OvaleScripts.script["custom"].code = code
 						OvaleOptions.db.profile.source = "custom"
 						OvaleOptions.db.profile.code = code
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")

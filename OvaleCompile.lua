@@ -841,8 +841,8 @@ function OvaleCompile:Compile()
 	local profile = OvaleOptions:GetProfile()
 	local source = profile.source
 	local code
-	if source and OvaleScripts.script[OvalePaperDoll.class][source] then
-		code = OvaleScripts.script[OvalePaperDoll.class][source].code
+	if source and OvaleScripts.script[source] then
+		code = OvaleScripts.script[source].code
 	else
 		code = ""
 	end
