@@ -25,6 +25,7 @@ function OvaleTimeSpan.Complement(startA, endA, atTime)
 		The complement of an interval is as follows:
 
 			COMPLEMENT{} = (0, math.huge)
+			COMPLEMENT(0, math.huge) = {}
 			COMPLEMENT(a, b) = (0, a) UNION (b, math.huge)
 
 		In the second case, it is the union of two intervals.  If the point of interest (atTime)
@@ -32,7 +33,9 @@ function OvaleTimeSpan.Complement(startA, endA, atTime)
 	--]]
 	if not startA or not endA then
 		return 0, math.huge
-	elseif 0 < startA and atTime <= startA then
+	elseif startA == 0 and endA == math.huge then
+		return nil
+	elseif 0 <= atTime and atTime < startA then
 		return 0, startA
 	else
 		return endA, math.huge
@@ -52,23 +55,20 @@ function OvaleTimeSpan.Intersect(startA, endA, startB, endB)
 	if not startA or not endA or not startB or not endB then
 		return nil
 	end
+	-- Swap around so that (startA, endA) comes "before" (startB, endB).
+	if startA > startB then
+		startA, startB = startB, startA
+		endA, endB = endB, endA
+	end
 	-- If the two time spans don't overlap, then return the empty set.
-	if endB <= startA or endA <= startB then
+	-- Otherwise, the take leftmost right endpoint.
+	if endA <= startB then
 		return nil
+	elseif endB < endA then
+		return startB, endB
+	else
+		return startB, endA
 	end
-	-- Take the rightmost left endpoint.
-	if startA < startB then
-		startA = startB
-	end
-	-- Take the leftmost right endpoint.
-	if endA > endB then
-		endA = endB
-	end
-	-- Sanity check that it's a valid time span, otherwise, return the empty set.
-	if startA >= endA then
-		return nil
-	end
-	return startA, endA
 end
 
 function OvaleTimeSpan.Measure(startA, endA)
@@ -89,14 +89,16 @@ function OvaleTimeSpan.Union(startA, endA, startB, endB)
 	elseif not startB or not endB then
 		return startA, endA
 	end
-	-- Take the leftmost left endpoint.
+	-- Swap around so that (startA, endA) comes "before" (startB, endB).
 	if startA > startB then
-		startA = startB
+		startA, startB = startB, startA
+		endA, endB = endB, endA
 	end
 	-- Take the rightmost right endpoint.
-	if endA < endB then
-		endA = endB
+	if endA > endB then
+		return startA, endA
+	else
+		return startA, endB
 	end
-	return startA, endA
 end
 --</public-static-methods>
