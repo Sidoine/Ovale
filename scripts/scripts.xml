@@ -1,2 +1,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="OvaleDeathKnight.lua" />
+	<Script file="OvaleDruid.lua" />
+	<Script file="OvaleHunter.lua" />
+	<Script file="OvaleMage.lua" />
+	<Script file="OvaleMonk.lua" />
+	<Script file="OvalePaladin.lua" />
+	<Script file="OvalePriest.lua" />
+	<Script file="OvaleRogue.lua" />
+	<Script file="OvaleShaman.lua" />
+	<Script file="OvaleWarlock.lua" />
+	<Script file="OvaleWarrior.lua" />
 </Ui>
