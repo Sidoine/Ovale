@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Affliction, Demonology, Destruction"
+	local code = [[
 Define(agony 980)
   SpellInfo(agony duration=24 tick=2 haste=spell )
   SpellAddTargetDebuff(agony agony=1)
@@ -303,4 +306,5 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("WARLOCK", "Ovale", "[5.2] Ovale: Affliction, Demonology, Destruction", code)
+	OvaleScripts:RegisterScript("WARLOCK", name, desc, code)
+end

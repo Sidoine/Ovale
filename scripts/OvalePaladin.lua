@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Retribution"
+	local code = [[
 Define(avenging_wrath 31884)
   SpellInfo(avenging_wrath duration=20 cd=180 )
   SpellAddBuff(avenging_wrath avenging_wrath=1)
@@ -101,4 +104,5 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("PALADIN", "Ovale", "[5.2] Ovale: Retribution", code)
+	OvaleScripts:RegisterScript("PALADIN", name, desc, code)
+end

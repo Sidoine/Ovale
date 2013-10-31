@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Beast Mastery, Marksmanship, Survival"
+	local code = [[
 Define(a_murder_of_crows 131900)
 Define(aimed_shot 19434)
   SpellInfo(aimed_shot focus=50 )
@@ -238,4 +241,5 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("HUNTER", "Ovale", "[5.2] Ovale: Beast Mastery, Marksmanship, Survival", code)
+	OvaleScripts:RegisterScript("HUNTER", name, desc, code)
+end

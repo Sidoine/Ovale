@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Elemental, Enhancement"
+	local code = [[
 Define(ancestral_swiftness 16188)
   SpellInfo(ancestral_swiftness cd=90 )
   SpellAddBuff(ancestral_swiftness ancestral_swiftness=1)
@@ -212,4 +215,5 @@ AddIcon mastery=2 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("SHAMAN", "Ovale", "[5.2] Ovale: Elemental, Enhancement", code)
+	OvaleScripts:RegisterScript("SHAMAN", name, desc, code)
+end

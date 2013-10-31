@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Frost, Unholy"
+	local code = [[
 Define(army_of_the_dead 42650)
   SpellInfo(army_of_the_dead duration=4 frost=1 blood=1 unholy=1 runicpower=-300 cd=600 )
   SpellAddBuff(army_of_the_dead army_of_the_dead=1)
@@ -189,4 +192,5 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("DEATHKNIGHT", "Ovale", "[5.2] Ovale: Frost, Unholy", code)
+	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code)
+end

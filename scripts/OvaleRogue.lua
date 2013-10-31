@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Assassination, Combat, Subtlety"
+	local code = [[
 Define(adrenaline_rush 13750)
   SpellInfo(adrenaline_rush duration=15 cd=180 )
   SpellAddBuff(adrenaline_rush adrenaline_rush=1)
@@ -202,4 +205,5 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("ROGUE", "Ovale", "[5.2] Ovale: Assassination, Combat, Subtlety", code)
+	OvaleScripts:RegisterScript("ROGUE", name, desc, code)
+end

@@ -1,7 +1,10 @@
 local _, Ovale = ...
-local OvaleScripts = Ovale:GetModule("OvaleScripts")
+local OvaleScripts = Ovale.OvaleScripts
 
-local code = [[
+do
+	local name = "Ovale"
+	local desc = "[5.2] Ovale: Shadow"
+	local code = [[
 Define(berserking 26297)
   SpellInfo(berserking duration=10 cd=180 )
   SpellAddBuff(berserking berserking=1)
@@ -121,4 +124,5 @@ AddIcon mastery=3 help=cd
 }
 ]]
 
-OvaleScripts:RegisterScript("PRIEST", "Ovale", "[5.2] Ovale: Shadow", code)
+	OvaleScripts:RegisterScript("PRIEST", name, desc, code)
+end
