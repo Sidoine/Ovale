@@ -24,6 +24,7 @@ local OvaleScore = Ovale.OvaleScore
 local OvaleScripts = Ovale.OvaleScripts
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
+local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
 local ipairs = ipairs
 local pairs = pairs
@@ -42,6 +43,7 @@ local API_GetSpellInfo = GetSpellInfo
 
 local self_node = {}
 local self_pool = OvalePool("OvaleCompile_pool")
+local self_timeSpanPool = OvalePool("OvaleCompile_timeSpanPool")
 local self_defines = {}
 local self_customFunctions = {}
 local self_missingSpellList = {}
@@ -194,6 +196,7 @@ local function ParseNumber(dummy, value)
 	node.value = tonumber(value)
 	node.origin = 0
 	node.rate = 0
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return dummy..AddNode(node)
 end
 
@@ -240,6 +243,7 @@ local function ParseFunction(prefix, func, params)
 	end
 	node.func = func
 	node.params = paramList
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	local nodeName = AddNode(node)
 	self_functionCalls[func] = node
 
@@ -430,6 +434,7 @@ local function ParseIf(a, b)
 	node.type = "if"
 	node.a = self_node[tonumber(a)]
 	node.b = self_node[tonumber(b)]
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -438,6 +443,7 @@ local function ParseUnless(a, b)
 	node.type = "unless"
 	node.a = self_node[tonumber(a)]
 	node.b = self_node[tonumber(b)]
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -445,6 +451,7 @@ local function ParseWait(a)
 	local node = self_pool:Get()
 	node.type = "wait"
 	node.a = self_node[tonumber(a)]
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -453,6 +460,7 @@ local function ParseAnd(a,b)
 	node.type = "and"
 	node.a = self_node[tonumber(a)]
 	node.b = self_node[tonumber(b)]
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -460,6 +468,7 @@ local function ParseNot(a)
 	local node = self_pool:Get()
 	node.type = "not"
 	node.a = self_node[tonumber(a)]
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -468,6 +477,7 @@ local function ParseOr(a,b)
 	node.type = "or"
 	node.a = self_node[tonumber(a)]
 	node.b = self_node[tonumber(b)]
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -492,6 +502,7 @@ do
 		node.operator = op
 		node.a = self_node[tonumber(a)]
 		node.b = self_node[tonumber(b)]
+		node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 		return AddNode(node)
 	end
 end
@@ -513,6 +524,7 @@ local function ParseGroup(text)
 	local node = self_pool:Get()
 	node.type = "group"
 	node.nodes = nodes
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -559,6 +571,7 @@ local function ParseLua(text)
 	local node = self_pool:Get()
 	node.type = "lua"
 	node.lua = strsub(text, 2, strlen(text)-1)
+	node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
 	return AddNode(node)
 end
 
@@ -604,7 +617,7 @@ local function ParseCommands(text)
 
 	local nodeId
 	if text then
-		nodeId = strmatch(text, "node(%d+)")
+		nodeId = tonumber(strmatch(text, "node(%d+)"))
 	end
 	if not nodeId then
 		Ovale:Print("no master node")
@@ -622,29 +635,32 @@ local function ParseCommands(text)
 end
 
 local function ParseAddFunction(name, params, text)
-	local nodeId = ParseCommands(text)
-	local node = self_pool:Get()
-	node.type = "customfunction"
-	node.name = name
-	node.params = ParseParameters(params)
-	node.a = self_node[tonumber(nodeId)]
-	if not TestConditions(node.params) then
-		return nil
+	local paramList = ParseParameters(params)
+	if TestConditions(paramList) then
+		local nodeId = ParseCommands(text)
+		if nodeId then
+			local node = self_pool:Get()
+			node.type = "customfunction"
+			node.name = name
+			node.params = paramList
+			node.a = self_node[nodeId]
+			node.timeSpan = OvaleTimeSpan(self_timeSpanPool:Get())
+			return AddNode(node)
+		end
 	end
-	return AddNode(node)
 end
 
 local function ParseAddIcon(params, text, secure)
-	-- On convertit le numéro de node en node
-	local masterNode = ParseCommands(text)
-	if not masterNode then return nil end
-	masterNode = self_node[tonumber(masterNode)]
-	masterNode.params = ParseParameters(params)
-	masterNode.secure = secure
-	if not TestConditions(masterNode.params) then
-		return nil
+	local paramList = ParseParameters(params)
+	if TestConditions(paramList) then
+		local masterNodeId = ParseCommands(text)
+		if masterNodeId then
+			local masterNode = self_node[masterNodeId]
+			masterNode.params = paramList
+			masterNode.secure = secure
+			return masterNode
+		end
 	end
-	return masterNode
 end
 
 local function ParseCanStopChannelling(text)
@@ -747,6 +763,7 @@ local function CompileScript(text)
 	-- Return all existing nodes to the node pool.
 	for i, node in pairs(self_node) do
 		self_node[i] = nil
+		self_timeSpanPool:Release(node.timeSpan)
 		self_pool:Release(node)
 	end
 	wipe(self_node)

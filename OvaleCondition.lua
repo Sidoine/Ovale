@@ -30,15 +30,12 @@ local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
 local OvaleSwing = Ovale.OvaleSwing
-local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
 local floor = floor
 local pairs = pairs
 local select = select
 local tostring = tostring
 local wipe = table.wipe
-local Intersect = OvaleTimeSpan.Intersect
-local Measure = OvaleTimeSpan.Measure
 local API_GetBuildInfo = GetBuildInfo
 local API_GetItemCooldown = GetItemCooldown
 local API_GetItemCount = GetItemCount
@@ -174,7 +171,7 @@ local function TestOvaleValue(start, ending, value, origin, rate, comparator, li
 	if not value or not origin or not rate then
 		return nil
 	elseif not comparator then
-		if Measure(start, ending) > 0 then
+		if start < ending then
 			return start, ending, value, origin, rate
 		else
 			return 0, math.huge, 0, 0, 0
@@ -195,12 +192,16 @@ local function TestOvaleValue(start, ending, value, origin, rate, comparator, li
 			or (comparator == "atMost" and rate > 0)
 			or (comparator == "atLeast" and rate < 0)
 			or (comparator == "more" and rate < 0) then
-		return Intersect(start, ending, 0, (limit - value)/rate + origin)
+		local t = (limit - value)/rate + origin
+		ending = (ending < t) and ending or t
+		return start, ending
 	elseif (comparator == "less" and rate < 0)
 			or (comparator == "atMost" and rate < 0)
 			or (comparator == "atLeast" and rate > 0)
 			or (comparator == "more" and rate > 0) then
-		return Intersect(start, ending, (limit - value)/rate + origin, math.huge)
+		local t = (limit - value)/rate + origin
+		start = (start > t) and start or t
+		return start, math.huge
 	end
 	return nil
 end
