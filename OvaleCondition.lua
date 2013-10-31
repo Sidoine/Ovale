@@ -3927,7 +3927,7 @@ OvaleCondition.conditions.timetodie = function(condition)
 	local timeToDie = TimeToDie(target)
 	local value, origin, rate = timeToDie, OvaleState.maintenant, -1
 	local start, ending = OvaleState.maintenant, OvaleState.maintenant + timeToDie
-	return TestOvaleValue(start, ending, value, origin, rate)
+	return TestOvaleValue(start, ending, value, origin, rate, comparator, limit)
 end
 OvaleCondition.conditions.deadin = OvaleCondition.conditions.timetodie
 
@@ -3955,7 +3955,7 @@ OvaleCondition.conditions.timetohealthpercent = function(condition)
 		local t = timeToDie * (healthPercent - percent) / healthPercent
 		local value, origin, rate = t, OvaleState.maintenant, -1
 		local start, ending = OvaleState.maintenant, OvaleState.maintenant + t
-		return TestOvaleValue(start, ending, value, origin, rate)
+		return TestOvaleValue(start, ending, value, origin, rate, comparator, limit)
 	end
 	return Compare(0, comparator, limit)
 end
