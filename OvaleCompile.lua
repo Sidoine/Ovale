@@ -269,7 +269,7 @@ local function ParseFunction(prefix, func, params)
 						self_missingSpellList[spellId] = spellName
 					end
 				else
-					Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %d", spellId)
+					Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %s", spellId)
 				end
 			end
 		end
@@ -575,6 +575,18 @@ local function ParseLua(text)
 	return AddNode(node)
 end
 
+local function ParseInclude(name)
+	local code
+	local script = OvaleScripts.script[name]
+	if script then
+		code = script.code
+	end
+	if not code then
+		Ovale:FormatPrint("Cannot Include(...): script named \"%s\" not found", name)
+	end
+	return code or ""
+end
+
 local function ParseCommands(text)
 	local original = text
 	text = strgsub(text,"(%b[])", ParseLua)
@@ -699,13 +711,6 @@ local function ParseL(text)
 	return '"'..L[text]..'"'
 end
 
--- Suppression des commentaires
-local function CompileComments(text)
-	text = strgsub(text, "#.-\n","")
-	text = strgsub(text, "#.*$","")
-	return text
-end
-
 -- On compile les AddCheckBox et AddListItem
 local function CompileInputs(text)
 	Ovale.casesACocher = {}
@@ -768,7 +773,18 @@ local function CompileScript(text)
 	end
 	wipe(self_node)
 
-	text = CompileComments(text)
+	-- Loop and strip out comments and replace Include() directives until there
+	-- are no more inclusions to make.
+	while true do
+		local was = text
+		text = strgsub(text, "#.-\n","")
+		text = strgsub(text, "#.*$","")
+		text = strgsub(text, "Include%s*%(%s*([%w_]+)%s*%)", ParseInclude)
+		if was == text then
+			break
+		end
+	end
+
 	text = CompileDeclarations(text)
 	text = CompileInputs(text)
 

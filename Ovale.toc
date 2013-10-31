@@ -41,6 +41,7 @@ OvaleAura.lua
 OvaleComboPoints.lua
 OvaleRecount.lua
 OvaleScripts.lua
+scripts\scripts.xml
 defaut\scripts.xml
 OvaleSkada.lua
 OvaleSpellDamage.lua

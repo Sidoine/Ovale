@@ -18,31 +18,35 @@ local OvalePaperDoll = Ovale.OvalePaperDoll
 --</private-static-properties>
 
 --<public-static-properties>
--- Table of scripts, indexed by source; a script is a table { description = description, code = "..." }.
+-- A "script" is a table { type = "scriptType", desc = "description", code = "..." }
+-- Table of scripts, indexed by name.
 OvaleScripts.script = {}
 --</public-static-properties>
 
 --<public-static-methods>
--- Return a table of script descriptions indexed by source.
-function OvaleScripts:GetDescriptions()
+-- Return a table of script descriptions indexed by name.
+function OvaleScripts:GetDescriptions(scriptType)
+	scriptType = scriptType or "script"
 	local descriptionsTable = {}
-	for src, tbl in pairs(self.script) do
-		descriptionsTable[src] = tbl.desc
+	for name, script in pairs(self.script) do
+		if script.type == scriptType then
+			descriptionsTable[name] = script.desc
+		end
 	end
 	return descriptionsTable
 end
 
-function OvaleScripts:RegisterScript(class, source, description, code)
+function OvaleScripts:RegisterScript(class, name, description, code, scriptType)
 	if class == OvalePaperDoll.class then
-		self.script[source] = self.script[source] or {}
-		self.script[source].desc = description or source
-		self.script[source].code = code or ""
+		self.script[name] = self.script[name] or {}
+		local script = self.script[name]
+		script.type = scriptType or "script"
+		script.desc = description or name
+		script.code = code or ""
 	end
 end
 
-function OvaleScripts:UnregisterScript(class, source)
-	if class == OvalePaperDoll.class then
-		self.script[source] = nil
-	end
+function OvaleScripts:UnregisterScript(name)
+	self.script[name] = nil
 end
 --</public-static-methods>
