@@ -4061,7 +4061,7 @@ OvaleCondition.conditions.totemexpires = function(condition)
 	if type(totemId) ~= "number" then
 		totemId = OVALE_TOTEMTYPE[totemId]
 	end
-	local startTime, duration = select(3, API_GetTotemInfo(totemId))
+	local totemName, startTime, duration = select(2, API_GetTotemInfo(totemId))
 	if not startTime then
 		return TestBoolean(true)
 	end
@@ -4089,7 +4089,7 @@ OvaleCondition.conditions.totempresent = function(condition)
 	if type(totemId) ~= "number" then
 		totemId = OVALE_TOTEMTYPE[totemId]
 	end
-	local startTime, duration = select(3, API_GetTotemInfo(totemId))
+	local totemName, startTime, duration = select(2, API_GetTotemInfo(totemId))
 	if not startTime then
 		return nil
 	end
