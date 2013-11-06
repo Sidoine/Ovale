@@ -422,11 +422,16 @@ local function TimeToDie(unitId)
 			end
 		end
 		local dps = self_lastTTDdps[unitId]
-		if dps and dps > health / 3600 then
+		if dps and dps > 0 then
 			timeToDie = health / dps
 		else
 			timeToDie = math.huge
 		end
+	end
+	-- Clamp time to die at a finite number.
+	if timeToDie == math.huge then
+		-- Return time to die in the far-off future (one week).
+		timeToDie = 3600 * 24 * 7
 	end
 	return timeToDie, health, maxHealth
 end
