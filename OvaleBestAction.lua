@@ -344,12 +344,13 @@ local function ComputeCompare(element)
 				or (c < z and operator == ">")
 				or (c < z and operator == ">=") then
 			IntersectInterval(scratch, 0, t, timeSpan)
-		end
-		if (c < z and operator == "<")
+		elseif (c < z and operator == "<")
 				or (c < z and operator == "<=")
 				or (c > z and operator == ">")
 				or (c > z and operator == ">=") then
 			IntersectInterval(scratch, t, math.huge, timeSpan)
+		else -- if c ~= z and operator == "==" then
+			timeSpan:Reset()
 		end
 		self_pool:Release(scratch)
 	end
