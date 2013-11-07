@@ -270,6 +270,7 @@ local function ComputeArithmetic(element)
 		end
 		local scratch = OvaleTimeSpan(self_pool:Get())
 		scratch:Reset(timeSpan)
+		timeSpan:Reset()
 		IntersectInterval(scratch, atTime - bound, atTime + bound, timeSpan)
 		self_pool:Release(scratch)
 	elseif element.operator == "%" then
@@ -338,7 +339,10 @@ local function ComputeCompare(element)
 	else
 		local scratch = OvaleTimeSpan(self_pool:Get())
 		scratch:Reset(timeSpan)
+		timeSpan:Reset()
 		local t = (B - A)/(c - z)
+		t = (t > 0) and t or 0
+		Ovale:Logf("t = %f", t)
 		if (c > z and operator == "<")
 				or (c > z and operator == "<=")
 				or (c < z and operator == ">")
@@ -349,8 +353,6 @@ local function ComputeCompare(element)
 				or (c > z and operator == ">")
 				or (c > z and operator == ">=") then
 			IntersectInterval(scratch, t, math.huge, timeSpan)
-		else -- if c ~= z and operator == "==" then
-			timeSpan:Reset()
 		end
 		self_pool:Release(scratch)
 	end
