@@ -227,3 +227,27 @@ do
 	OvaleCondition:RegisterCondition("stamina", false, Stamina)
 	OvaleCondition:RegisterCondition("strength", false, Strength)
 end
+
+do
+	local OvaleScripts = Ovale.OvaleScripts
+
+	local name = "Regression: PaperDoll"
+	local code = [[
+# Add a separate icon for each paper-doll stat.
+# Need to manually verify numbers against the in-game paper-doll.
+#
+AddIcon help=agility { Agility() }
+AddIcon help=attackPower { AttackPower() }
+AddIcon help=intellect { Intellect() }
+AddIcon help=masteryEffect { MasteryEffect() }
+AddIcon help=meleeCrit { MeleeCritChance() }
+AddIcon help=rangedCrit { RangedCritChance() }
+AddIcon help=spellCrit { SpellCritChance() }
+AddIcon help=spellHaste { SpellHaste() }
+AddIcon help=spellpower { Spellpower() }
+AddIcon help=spirit { Spirit() }
+AddIcon help=stamina { Stamina() }
+AddIcon help=strength { Strength() }
+]]
+	OvaleScripts:RegisterScript(nil, name, nil, code, "regression")
+end
