@@ -27,6 +27,7 @@ Ovale.OvaleTimeSpan = OvaleTimeSpan
 --<private-static-properties>
 --local debugprint = print
 local setmetatable = setmetatable
+local strformat = string.format
 local tconcat = table.concat
 local wipe = table.wipe
 --</private-static-properties>
@@ -83,7 +84,7 @@ function OvaleTimeSpan:__tostring()
 	if not self or #self == 0 then
 		return "empty set"
 	else
-		return tconcat(self, ", ")
+		return strformat("(%s)", tconcat(self, ", "))
 	end
 end
 
