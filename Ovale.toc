@@ -28,6 +28,7 @@ OvaleGUID.lua
 OvaleLatency.lua
 OvalePool.lua
 OvalePoolGC.lua
+OvalePoolRefCount.lua
 OvalePower.lua
 OvaleQueue.lua
 OvaleSpellBook.lua
