@@ -17,7 +17,6 @@ Ovale.OvaleState = OvaleState
 
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleQueue = Ovale.OvaleQueue
 local OvaleSpellBook = Ovale.OvaleSpellBook
 
@@ -27,6 +26,7 @@ local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetTime = GetTime
+local API_UnitClass = UnitClass
 
 local self_statePrototype = {}
 local self_stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
@@ -34,6 +34,8 @@ local self_stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
 local self_runes = {}
 local self_runesCD = {}
 
+-- Player's class.
+local self_class = select(2, API_UnitClass("player"))
 -- Whether the state of the simulator has been initialized.
 local self_stateIsInitialized = false
 
@@ -139,7 +141,7 @@ function OvaleState:Reset()
 
 	self:InvokeMethod("ResetState")
 
-	if OvalePaperDoll.class == "DEATHKNIGHT" then
+	if self_class == "DEATHKNIGHT" then
 		for i=1,6 do
 			self.state.rune[i].type = API_GetRuneType(i)
 			local start, duration, runeReady = API_GetRuneCooldown(i)

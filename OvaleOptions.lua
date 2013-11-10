@@ -16,7 +16,6 @@ Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
 local L = Ovale.L
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleScripts = Ovale.OvaleScripts
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleState = Ovale.OvaleState
@@ -25,6 +24,10 @@ local strgmatch = string.gmatch
 local strgsub = string.gsub
 local tostring = tostring
 local API_GetSpellInfo = GetSpellInfo
+local API_UnitClass = UnitClass
+
+-- Player's class.
+local self_class = select(2, API_UnitClass("player"))
 --</private-static-properties>
 
 --<public-static-properties>
@@ -361,7 +364,7 @@ local self_options =
 						return strgsub(code, "\t", "    ")
 					end,
 					set = function(info, v)
-						OvaleScripts:RegisterScript(OvalePaperDoll.class, "custom", L["Script personnalisé"], v)
+						OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], v)
 						OvaleOptions.db.profile.code = v
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
@@ -378,7 +381,6 @@ local self_options =
 						return L["Ecraser le Script personnalisé préexistant?"]
 					end,
 					func = function()
-						local class = OvalePaperDoll.class
 						local source = OvaleOptions.db.profile.source
 						local code
 						if source and OvaleScripts.script[source] then
@@ -712,7 +714,7 @@ function OvaleOptions:OnInitialize()
 	self.db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
-	OvaleScripts:RegisterScript(OvalePaperDoll.class, "custom", L["Script personnalisé"], self.db.profile.code)
+	OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], self.db.profile.code)
 	self:HandleProfileChanges()
 end
 

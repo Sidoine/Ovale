@@ -20,6 +20,10 @@ local OvaleState = Ovale.OvaleState
 
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
+local API_UnitClass = UnitClass
+
+-- Player's class.
+local self_class = select(2, API_UnitClass("player"))
 --</private-static-properties>
 
 --<public-static-methods>
@@ -35,15 +39,14 @@ end
 -- If no spellId is given, then returns the GCD after a "yellow-hit" ability has been cast.
 function OvaleCooldown:GetGCD(spellId)
 	-- Base global cooldown.
-	local class = OvalePaperDoll.class
 	local isCaster = false
-	if class == "DEATHKNIGHT" then
+	if self_class == "DEATHKNIGHT" then
 		cd = 1.0
-	elseif class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
+	elseif self_class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		cd = 1.0
-	elseif class == "MONK" then
+	elseif self_class == "MONK" then
 		cd = 1.0
-	elseif class == "ROGUE" then
+	elseif self_class == "ROGUE" then
 		cd = 1.0
 	else
 		isCaster = true

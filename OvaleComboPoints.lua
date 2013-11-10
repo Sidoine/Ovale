@@ -16,11 +16,14 @@ Ovale.OvaleComboPoints = OvaleComboPoints
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleState = Ovale.OvaleState
 
 local API_GetComboPoints = GetComboPoints
+local API_UnitClass = UnitClass
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
+
+-- Player's class.
+local self_class = select(2, API_UnitClass("player"))
 --</private-static-properties>
 
 --<public-static-properties>
@@ -29,7 +32,7 @@ OvaleComboPoints.combo = 0
 
 --<public-static-methods>
 function OvaleComboPoints:OnEnable()
-	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
+	if self_class == "ROGUE" or self_class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Refresh")
 		self:RegisterEvent("PLAYER_LOGIN", "Refresh")
@@ -41,7 +44,7 @@ function OvaleComboPoints:OnEnable()
 end
 
 function OvaleComboPoints:OnDisable()
-	if OvalePaperDoll.class == "ROGUE" or OvalePaperDoll.class == "DRUID" then
+	if self_class == "ROGUE" or self_class == "DRUID" then
 		OvaleState:UnregisterState(self)
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")

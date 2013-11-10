@@ -14,7 +14,11 @@ local OvaleScripts = Ovale:NewModule("OvaleScripts")
 Ovale.OvaleScripts = OvaleScripts
 
 --<private-static-properties>
-local OvalePaperDoll = Ovale.OvalePaperDoll
+local pairs = pairs
+local API_UnitClass = UnitClass
+
+-- Player's class.
+local self_class = select(2, API_UnitClass("player"))
 --</private-static-properties>
 
 --<public-static-properties>
@@ -37,7 +41,7 @@ function OvaleScripts:GetDescriptions(scriptType)
 end
 
 function OvaleScripts:RegisterScript(class, name, description, code, scriptType)
-	if not class or class == OvalePaperDoll.class then
+	if not class or class == self_class then
 		self.script[name] = self.script[name] or {}
 		local script = self.script[name]
 		script.type = scriptType or "script"

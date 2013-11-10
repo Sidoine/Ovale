@@ -40,6 +40,8 @@ local API_UnitRangedAttackPower = UnitRangedAttackPower
 local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
 
+-- Player's class.
+local self_class = select(2, API_UnitClass("player"))
 -- Snapshot table pool.
 local self_pool = OvalePool("OvalePaperDoll_pool")
 -- Snapshot queue: new snapshots are inserted at the front of the queue.
@@ -106,8 +108,6 @@ local OVALE_SNAPSHOT_STATS = {
 --</private-static-properties>
 
 --<public-static-properties>
--- player's class token
-OvalePaperDoll.class = select(2, API_UnitClass("player"))
 -- player's level
 OvalePaperDoll.level = API_UnitLevel("player")
 -- Player's current specialization.
@@ -201,7 +201,7 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	self.stat = GetSnapshot(now)
 	self.stat.meleeCrit = API_GetCritChance()
 	self.stat.rangedCrit = API_GetRangedCritChance()
-	self.stat.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+	self.stat.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self_class])
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS["meleeCrit"], self.stat.meleeCrit)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", OVALE_SNAPSHOT_STATS["rangedCrit"], self.stat.rangedCrit)
@@ -249,7 +249,7 @@ end
 function OvalePaperDoll:SPELL_POWER_CHANGED(event)
 	local now = API_GetTime()
 	self.stat = GetSnapshot(now)
-	self.stat.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+	self.stat.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self_class])
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %d",
 		event, OVALE_SNAPSHOT_STATS["spellBonusDamage"], self.stat.spellBonusDamage)
 end
@@ -333,10 +333,10 @@ function OvalePaperDoll:UpdateDamage(event)
 	local now = API_GetTime()
 	self.stat = GetSnapshot(now)
 	self.stat.baseDamageMultiplier = damageMultiplier
-	if self.class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
+	if self_class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		-- Cat Form: 100% increased auto-attack damage.
 		damageMultiplier = damageMultiplier * 2
-	elseif self.class == "MONK" and OvaleEquipement:HasOneHandedWeapon() then
+	elseif self_class == "MONK" and OvaleEquipement:HasOneHandedWeapon() then
 		-- Way of the Monk: 40% increased auto-attack damage if dual-wielding.
 		damageMultiplier = damageMultiplier * 1.4
 	end
@@ -346,7 +346,7 @@ function OvalePaperDoll:UpdateDamage(event)
 	local avgDamage = (minDamage + maxDamage) / 2 / damageMultiplier
 	local mainHandWeaponSpeed = mainHandAttackSpeed * self:GetMeleeHasteMultiplier()
 	local normalizedMainHandWeaponSpeed = OvaleEquipement.mainHandWeaponSpeed or 0
-	if self.class == "DRUID" then
+	if self_class == "DRUID" then
 		if OvaleStance:IsStance("druid_cat_form") then
 			normalizedMainHandWeaponSpeed = 1
 		elseif OvaleStance:IsStance("druid_bear_form") then
@@ -363,7 +363,7 @@ function OvalePaperDoll:UpdateDamage(event)
 		offHandAttackSpeed = offHandAttackSpeed or mainHandAttackSpeed
 		local offHandWeaponSpeed = offHandAttackSpeed * self:GetMeleeHasteMultiplier()
 		local normalizedOffHandWeaponSpeed = OvaleEquipement.offHandWeaponSpeed or 0
-		if self.class == "DRUID" then
+		if self_class == "DRUID" then
 			if OvaleStance:IsStance("druid_cat_form") then
 				normalizedOffHandWeaponSpeed = 1
 			elseif OvaleStance:IsStance("druid_bear_form") then
@@ -455,7 +455,6 @@ end
 
 function OvalePaperDoll:Debug(stat)
 	stat = stat or self.stat
-	Ovale:FormatPrint("Class: %s", self.class)
 	Ovale:FormatPrint("Level: %d", self.level)
 	Ovale:FormatPrint("Specialization: %s", self.specialization)
 	Ovale:FormatPrint("Total snapshots: %d", self_snapshotCount)
