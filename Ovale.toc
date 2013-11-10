@@ -14,7 +14,7 @@
 #@no-lib-strip@
 embeds.xml
 #@end-no-lib-strip@
-locales.xml
+locales\locales.xml
 
 Ovale.lua
 
