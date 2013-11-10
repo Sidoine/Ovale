@@ -158,10 +158,31 @@ local function ComputeAction(element)
 		end
 	end
 	Ovale:Logf("Action %s can start at %f", action, start)
+	timeSpan[1], timeSpan[2] = start, math.huge
+
+	--[[
+		Allow for the return value of an to be "typecast" to a constant value by specifying
+		asValue=1 as a parameter.
+
+		Return 1 if the action is off of cooldown, or 0 if it is on cooldown.
+	--]]
+	local value
+	if element.params.asValue and element.params.asValue == 1 then
+		local atTime = OvaleState.currentTime
+		if HasTime(timeSpan, atTime) then
+			value = 1
+		else
+			value = 0
+		end
+		timeSpan[1], timeSpan[2] = 0, math.huge
+	end
 
 	local priority = element.params.priority or OVALE_DEFAULT_PRIORITY
-	timeSpan[1], timeSpan[2] = start, math.huge
-	return timeSpan, priority, element
+	if value then
+		return timeSpan, priority, PutValue(element, value, 0, 0)
+	else
+		return timeSpan, priority, element
+	end
 end
 
 local function ComputeAnd(element)
@@ -388,7 +409,7 @@ local function ComputeCustomFunction(element)
 
 			If the return value is an action, then return 1 if the action is off of cooldown, or
 			0 if it is on cooldown.
-		==]]
+		--]]
 		local atTime = OvaleState.currentTime
 		local value = 0
 		if HasTime(timeSpanA, atTime) then
@@ -419,6 +440,10 @@ local function ComputeFunction(element)
 	end
 
 	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.params)
+	if start and ending then
+		timeSpan[1], timeSpan[2] = start, ending
+	end
+
 	if Ovale.trace then
 		local conditionCall = element.func .. "("
 		for k, v in pairs(element.params) do
@@ -428,9 +453,32 @@ local function ComputeFunction(element)
 		Ovale:FormatPrint("Condition %s returned %s, %s, %s, %s, %s", conditionCall, start, ending, value, origin, rate)
 	end
 
-	if start and ending then
-		timeSpan[1], timeSpan[2] = start, ending
+	--[[
+		Allow for the return value of a script condition to be "typecast" to a constant value
+		by specifying asValue=1 as a script parameter.
+
+		If the return value is a time span (a "boolean" value), then if the current time of
+		the simulation is within the time span, then return 1, or 0 otherwise.
+
+		If the return value is a linear function, then if the current time of the simulation
+		is within the function's domain, then the function is simply evaluated at the current
+		time, or 0 otherwise.
+	--]]
+	if element.params.asValue and element.params.asValue == 1 then
+		local atTime = OvaleState.currentTime
+		if HasTime(timeSpan, atTime) then
+			if value then
+				value = value + (atTime - origin) * rate
+			else
+				value = 1
+			end
+		else
+			value = 0
+		end
+		origin, rate = 0, 0
+		timeSpan[1], timeSpan[2] = 0, math.huge
 	end
+
 	if value then
 		return timeSpan, OVALE_DEFAULT_PRIORITY, PutValue(element, value, origin, rate)
 	else
