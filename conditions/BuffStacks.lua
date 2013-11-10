@@ -40,7 +40,8 @@ do
 	local function BuffStacks(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local start, ending, stacks = OvaleState:GetAura(target, auraId, filter, mine)
+		local state = OvaleState.state
+		local start, ending, stacks = state:GetAura(target, auraId, filter, mine)
 		stacks = stacks or 0
 		return TestValue(start, ending, stacks, start, 0, comparator, limit)
 	end

@@ -27,7 +27,8 @@ do
 
 	local function EnergyRegen(condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleState.powerRate.energy
+		local state = OvaleState.state
+		local value = state.powerRate.energy
 		return Compare(value, comparator, limit)
 	end
 

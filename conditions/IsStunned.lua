@@ -28,7 +28,8 @@ do
 
 	local function IsStunned(condition)
 		local yesno = condition[1]
-		local boolean = not API_HasFullControl() and OvaleState:GetAura("player", "stun", "HARMFUL")
+		local state = OvaleState.state
+		local boolean = not API_HasFullControl() and state:GetAura("player", "stun", "HARMFUL")
 		return TestBoolean(boolean, yesno)
 	end
 

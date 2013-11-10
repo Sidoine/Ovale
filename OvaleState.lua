@@ -49,8 +49,6 @@ local STARFALL = 48505
 --<public-static-properties>
 -- The state in the current frame
 OvaleState.state = {}
--- Legacy table for transition.
-OvaleState.powerRate = nil
 -- The spell being cast
 OvaleState.currentSpellId = nil
 OvaleState.now = nil
@@ -125,9 +123,6 @@ function OvaleState:InitializeState()
 	for i = 1, 6 do
 		self.state.rune[i] = {}
 	end
-
-	-- Legacy fields
-	self.powerRate = self.state.powerRate
 
 	self_stateIsInitialized = true
 end
@@ -241,8 +236,8 @@ function OvaleState:ApplySpellCost(spellId, startCast, endCast)
 			end
 			-- Euphoria: While not in an Eclipse state, your spells generate double the normal amount of Solar or Lunar energy.
 			if OvaleSpellBook:IsKnownSpell(81062)
-					and not self:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
-					and not self:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true) then
+					and not self.state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
+					and not self.state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true) then
 				energy = energy * 2
 			end
 			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
@@ -254,7 +249,7 @@ function OvaleState:ApplySpellCost(spellId, startCast, endCast)
 				self.state.eclipse = -100
 				self.state:AddEclipse(endCast, LUNAR_ECLIPSE)
 				-- Reaching Lunar Eclipse resets the cooldown of Starfall.
-				local cd = self:GetCD(STARFALL)
+				local cd = self.state:GetCD(STARFALL)
 				if cd then
 					cd.start = 0
 					cd.duration = 0
@@ -284,11 +279,11 @@ end
 
 -- Returns 1 if moving toward Solar or -1 if moving toward Lunar.
 function OvaleState:GetEclipseDir()
-	local stacks = select(3, self:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true))
+	local stacks = select(3, self.state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true))
 	if stacks and stacks > 0 then
 		return -1
 	else
-		stacks = select(3, self:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true))
+		stacks = select(3, self.state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true))
 		if stacks and stacks > 0 then
 			return 1
 		elseif self.state.eclipse < 0 then
@@ -364,44 +359,5 @@ function OvaleState:GetRunesCooldown(blood, frost, unholy, death, nodeath)
 		end
 	end
 	return maxCD
-end
-
---[[------------------------------
-	Legacy methods for transition.
---]]------------------------------
-function OvaleState:GetCounterValue(id)
-	return self.state:GetCounterValue(id)
-end
-
-function OvaleState:GetCD(spellId)
-	return self.state:GetCD(spellId)
-end
-
-function OvaleState:GetComputedSpellCD(spellId)
-	return self.state:GetSpellCooldown(spellId)
-end
-
-function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
-	return self.state:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
-end
-
-function OvaleState:GetAura(unitId, spellId, filter, mine, auraFound)
-	return self.state:GetAura(unitId, spellId, filter, mine, auraFound)
-end
-
-function OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-	return self.state:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-end
-
-function OvaleState:NewAura(guid, spellId, filter)
-	return self.state:NewAura(guid, spellId, filter)
-end
-
-function OvaleState:GetDamageMultiplier(spellId)
-	return self.state:GetDamageMultiplier(spellId)
-end
-
-function OvaleState:GetDuration(auraSpellId)
-	return self.state:GetDuration(auraSpellId)
 end
 --</public-static-methods>

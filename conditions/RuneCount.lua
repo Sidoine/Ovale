@@ -42,12 +42,13 @@ do
 	local function RuneCount(condition)
 		local runeType, comparator, limit = condition[1], condition[2], condition[3]
 		local death = condition.death
+		local state = OvaleState.state
 		runeType = RUNE_TYPE[runeType]
 
 		-- Loop through the rune state and count the number of runes that match the given rune type.
 		local value, origin, rate = 0, nil, nil
 		for i = 1, 6 do
-			local rune = OvaleState.state.rune[i]
+			local rune = state.rune[i]
 			if rune and (rune.type == runeType or (rune.type == 4 and death == 1)) then
 				if rune.cd > OvaleState.currentTime then
 					-- Rune matches but is on cooldown.

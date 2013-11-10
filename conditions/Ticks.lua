@@ -33,8 +33,9 @@ do
 	local function Ticks(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
+		local state = OvaleState.state
 		auraFound.tick = nil
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine, auraFound)
+		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local tick = auraFound.tick
 		local duration, numTicks
 		if start then
@@ -44,7 +45,7 @@ do
 				numTicks = floor(duration / tick + 0.5)
 			end
 		else
-			duration, tick, numTicks = OvaleState:GetDuration(auraId)
+			duration, tick, numTicks = state:GetDuration(auraId)
 		end
 		if numTicks then
 			return Compare(numTicks, comparator, limit)

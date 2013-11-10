@@ -39,7 +39,8 @@ do
 	local function BuffRemains(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine)
+		local state = OvaleState.state
+		local start, ending = state:GetAura(target, auraId, filter, mine)
 		if not start or not ending then
 			return Compare(0, comparator, limit)
 		else

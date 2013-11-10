@@ -22,8 +22,9 @@ do
 	local function BuffSnapshot(statName, defaultValue, condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
+		local state = OvaleState.state
 		auraFound[statName] = nil
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine, auraFound)
+		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local value = auraFound[statName]
 		value = value and value or defaultValue
 		return TestValue(start, ending, value, start, 0, comparator, limit)
@@ -33,8 +34,9 @@ do
 	local function BuffSnapshotCritChance(statName, defaultValue, condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
+		local state = OvaleState.state
 		auraFound[statName] = nil
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine, auraFound)
+		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local value = auraFound[statName]
 		value = value and value or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then

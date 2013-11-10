@@ -29,7 +29,8 @@ do
 
 	local function ComboPoints(condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleState.state.combo
+		local state = OvaleState.state
+		local value = state.combo
 		return Compare(value, comparator, limit)
 	end
 

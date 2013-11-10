@@ -27,7 +27,8 @@ do
 
 	local function IsRooted(condition)
 		local yesno = condition[1]
-		local boolean = OvaleState:GetAura("player", "root", "HARMFUL")
+		local state = OvaleState.state
+		local boolean = state:GetAura("player", "root", "HARMFUL")
 		return TestBoolean(boolean, yesno)
 	end
 

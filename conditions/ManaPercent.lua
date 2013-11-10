@@ -37,11 +37,12 @@ do
 	local function ManaPercent(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
+		local state = OvaleState.state
 		if target == "player" then
 			local powerMax = OvalePower.maxPower.mana or 0
 			if powerMax > 0 then
 				local conversion = 100 / powerMax
-				local value, origin, rate = OvaleState.state.mana * conversion, OvaleState.currentTime, OvaleState.powerRate.mana * conversion
+				local value, origin, rate = state.mana * conversion, OvaleState.currentTime, state.powerRate.mana * conversion
 				local start, ending = OvaleState.currentTime, math.huge
 				return TestValue(start, ending, value, origin, rate, comparator, limit)
 			end

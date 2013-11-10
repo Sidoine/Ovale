@@ -711,6 +711,7 @@ function OvaleBestAction:GetActionInfo(element)
 		return nil
 	end
 
+	local state = OvaleState.state
 	local target = element.params.target or OvaleCondition.defaultTarget
 	local action
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -726,7 +727,7 @@ function OvaleBestAction:GetActionInfo(element)
 
 		actionTexture = actionTexture or API_GetSpellTexture(spellId)
 		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
-		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState.state:GetSpellCooldown(spellId)
+		actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
 
 		-- Verify that the spell may be cast given restrictions specified in SpellInfo().
 		local si = OvaleData.spellInfo[spellId]
@@ -737,13 +738,13 @@ function OvaleBestAction:GetActionInfo(element)
 			end
 			if si.combo == 0 then
 				local minCombo = si.minCombo or 1
-				if OvaleState.state.combo < minCombo then
+				if state.combo < minCombo then
 					-- Spell is a combo point finisher, but player has too few combo points on the target.
 					return nil
 				end
 			end
 			for _, powerType in pairs(OvalePower.SECONDARY_POWER) do
-				if si[powerType] and si[powerType] > OvaleState.state[powerType] then
+				if si[powerType] and si[powerType] > state[powerType] then
 					-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
 					-- that the player does not have enough of.
 					return nil
@@ -811,8 +812,8 @@ function OvaleBestAction:GetActionInfo(element)
 		actionIsCurrent = API_IsCurrentAction(action)
 	end
 
-	local cd = OvaleState:GetCD(spellId)
-	if cd and cd.toggle then
+	local cd = state:GetCD(spellId)
+	if cd and cd.toggled then
 		actionIsCurrent = 1
 	end
 

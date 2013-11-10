@@ -32,8 +32,9 @@ do
 	local function TicksAdded(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
+		local state = OvaleState.state
 		auraFound.tick = nil
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine, auraFound)
+		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local tick = auraFound.tick
 		return TestValue(start, ending, 0, start, 0, comparator, limit)
 	end

@@ -28,7 +28,8 @@ do
 
 	local function IsFeared(condition)
 		local yesno = condition[1]
-		local boolean = not API_HasFullControl() and OvaleState:GetAura("player", "fear", "HARMFUL")
+		local state = OvaleState.state
+		local boolean = not API_HasFullControl() and state:GetAura("player", "fear", "HARMFUL")
 		return TestBoolean(boolean, yesno)
 	end
 

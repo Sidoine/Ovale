@@ -22,8 +22,9 @@ do
 
 	local function CanCast(condition)
 		local spellId = condition[1]
-		local actionCooldownStart, actionCooldownDuration = OvaleState:GetComputedSpellCD(spellId)
-		return actionCooldownStart + actionCooldownDuration, math.huge
+		local state = OvaleState.state
+		local start, duration = state:GetSpellCooldown(spellId)
+		return start + duration, math.huge
 	end
 
 	OvaleCondition:RegisterCondition("cancast", true, CanCast)

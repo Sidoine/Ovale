@@ -38,8 +38,9 @@ do
 	local function Power(powerType, condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
+		local state = OvaleState.state
 		if target == "player" then
-			local value, origin, rate = OvaleState.state[powerType], OvaleState.currentTime, OvaleState.powerRate[powerType]
+			local value, origin, rate = state[powerType], OvaleState.currentTime, state.powerRate[powerType]
 			local start, ending = OvaleState.currentTime, math.huge
 			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		else

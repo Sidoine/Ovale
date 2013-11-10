@@ -31,7 +31,8 @@ do
 
 	local function Eclipse(condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleState.state.eclipse
+		local state = OvaleState.state
+		local value = state.eclipse
 		return Compare(value, comparator, limit)
 	end
 

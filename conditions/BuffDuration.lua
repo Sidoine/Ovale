@@ -32,7 +32,8 @@ do
 	local function BuffDuration(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine)
+		local state = OvaleState.state
+		local start, ending = state:GetAura(target, auraId, filter, mine)
 		start = start or 0
 		ending = ending or math.huge
 		value = ending - start

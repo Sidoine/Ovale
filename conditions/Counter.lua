@@ -26,7 +26,8 @@ do
 
 	local function Counter(condition)
 		local counter, comparator, limit = condition[1], condition[2], condition[3]
-		local value = OvaleState:GetCounterValue(counter)
+		local state = OvaleState.state
+		local value = state:GetCounterValue(counter)
 		return Compare(value, comparator, limit)
 	end
 

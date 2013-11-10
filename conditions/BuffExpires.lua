@@ -59,7 +59,8 @@ do
 	local function BuffExpires(condition)
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition)
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine)
+		local state = OvaleState.state
+		local start, ending = state:GetAura(target, auraId, filter, mine)
 		if not start or not ending then
 			return 0, math.huge
 		end
@@ -100,7 +101,8 @@ do
 	local function BuffPresent(condition)
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition)
-		local start, ending = OvaleState:GetAura(target, auraId, filter, mine)
+		local state = OvaleState.state
+		local start, ending = state:GetAura(target, auraId, filter, mine)
 		if not start or not ending then
 			return nil
 		end

@@ -28,7 +28,8 @@ do
 
 	local function IsIncapacitated(condition)
 		local yesno = condition[1]
-		local boolean = not API_HasFullControl() and OvaleState:GetAura("player", "incapacitate", "HARMFUL")
+		local state = OvaleState.state
+		local boolean = not API_HasFullControl() and state:GetAura("player", "incapacitate", "HARMFUL")
 		return TestBoolean(boolean, yesno)
 	end
 

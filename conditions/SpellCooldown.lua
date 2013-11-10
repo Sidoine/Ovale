@@ -34,9 +34,10 @@ do
 
 	local function SpellCooldown(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local state = OvaleState.state
 		local start, duration
 		if type(spellId) == "string" then
-			local sharedCd = OvaleState.state.cd[spellId]
+			local sharedCd = state.cd[spellId]
 			if not sharedCd then
 				return nil
 			end
@@ -44,7 +45,7 @@ do
 		elseif not OvaleSpellBook:IsKnownSpell(spellId) then
 			return nil
 		else
-			start, duration = OvaleState:GetComputedSpellCD(spellId)
+			start, duration = state:GetSpellCooldown(spellId)
 		end
 		if start > 0 and duration > 0 then
 			return TestValue(start, start + duration, duration, start, -1, comparator, limit)

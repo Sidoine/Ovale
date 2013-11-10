@@ -28,7 +28,8 @@ do
 
 	local function FocusRegen(condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleState.powerRate.focus
+		local state = OvaleState.state
+		local value = state.powerRate.focus
 		return Compare(value, comparator, limit)
 	end
 

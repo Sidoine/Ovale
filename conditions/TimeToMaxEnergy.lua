@@ -31,8 +31,9 @@ do
 	local function TimeToMaxEnergy(condition)
 		local comparator, limit = condition[1], condition[2]
 		local maxEnergy = OvalePower.maxPower.energy or 0
-		local energy = OvaleState.state.energy or 0
-		local energyRegen = OvaleState.powerRate.energy or 10
+		local state = OvaleState.state
+		local energy = state.energy or 0
+		local energyRegen = state.powerRate.energy or 10
 		local t = (maxEnergy - energy) / energyRegen
 		if t > 0 then
 			return TestValue(0, OvaleState.currentTime + t, t, OvaleState.currentTime, -1, comparator, limit)

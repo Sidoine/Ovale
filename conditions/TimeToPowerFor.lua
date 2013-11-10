@@ -33,8 +33,9 @@ do
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local cost, _, powerToken = select(4, API_GetSpellInfo(spellId))
 		local powerType = OvalePower.POWER_TYPE[powerToken]
-		local currentPower = OvaleState.state[powerType]
-		local powerRate = OvaleState.powerRate[powerType]
+		local state = OvaleState.state
+		local currentPower = state[powerType]
+		local powerRate = state.powerRate[powerType]
 		cost = cost or 0
 		if currentPower < cost then
 			if powerRate > 0 then

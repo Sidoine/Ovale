@@ -38,13 +38,14 @@ do
 	local function StaggerRemains(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
+		local state = OvaleState.state
 		local start, ending, stacks
-		start, ending, stacks = OvaleState:GetAura(target, HEAVY_STAGGER, "HARMFUL")
+		start, ending, stacks = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
 		if not stacks or stacks == 0 then
-			start, ending, stacks = OvaleState:GetAura(target, MODERATE_STAGGER, "HARMFUL")
+			start, ending, stacks = state:GetAura(target, MODERATE_STAGGER, "HARMFUL")
 		end
 		if not stacks or stacks == 0 then
-			start, ending, stacks = OvaleState:GetAura(target, LIGHT_STAGGER, "HARMFUL")
+			start, ending, stacks = state:GetAura(target, LIGHT_STAGGER, "HARMFUL")
 		end
 		if start and ending then
 			local stagger = API_UnitStagger(target)

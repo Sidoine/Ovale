@@ -19,14 +19,15 @@ do
 
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
 	local function GetDamage(spellId)
+		local state = OvaleState.state
 		-- TODO: Use target's debuffs in this calculation.
 		local ap = OvalePaperDoll.stat.attackPower or 0
 		local sp = OvalePaperDoll.stat.spellBonusDamage or 0
 		local mh = OvalePaperDoll.stat.mainHandWeaponDamage or 0
 		local oh = OvalePaperDoll.stat.offHandWeaponDamage or 0
 		local bdm = OvalePaperDoll.stat.baseDamageMultiplier or 1
-		local dm = OvaleState:GetDamageMultiplier(spellId) or 1
-		local combo = OvaleState.state.combo or 0
+		local dm = state:GetDamageMultiplier(spellId) or 1
+		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
 	end
 
