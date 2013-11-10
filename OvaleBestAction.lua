@@ -125,14 +125,14 @@ local function ComputeAction(element)
 		start = OvaleState.currentTime
 	end
 
-	Ovale:Logf("start=%f attenteFinCast=%s [%d]", start, OvaleState.attenteFinCast, element.nodeId)
+	Ovale:Logf("start=%f nextCast=%s [%d]", start, OvaleState.nextCast, element.nodeId)
 
 	-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
-	if start < OvaleState.attenteFinCast then
+	if start < OvaleState.nextCast then
 		local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
 		if not (si and si.canStopChannelling) then
 			-- not a channelled spell, or a channelled spell that cannot be interrupted
-			start = OvaleState.attenteFinCast
+			start = OvaleState.nextCast
 		else
 			-- This is a channelled spell that can be interrupted, so wait till the next tick.
 			-- "canStopChannelling=N" means that there are N total ticks in the channelled spell.
@@ -145,7 +145,7 @@ local function ComputeAction(element)
 				scaling = 1
 			end
 			numTicks = floor(si.canStopChannelling * scaling + 0.5)
-			local tick = (OvaleState.attenteFinCast - OvaleState.startCast) / numTicks
+			local tick = (OvaleState.nextCast - OvaleState.startCast) / numTicks
 			local tickTime = OvaleState.startCast + tick
 			Ovale:Logf("%s start=%f", spellId, start)
 			for i = 1, numTicks do

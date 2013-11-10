@@ -218,8 +218,8 @@ do
 						end
 					end
 						-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-					if start and OvaleState.currentSpellId and OvaleState.attenteFinCast and spellId == OvaleState.currentSpellId and start<OvaleState.attenteFinCast then
-						start = OvaleState.attenteFinCast
+					if start and OvaleState.currentSpellId and OvaleState.nextCast and spellId == OvaleState.currentSpellId and start < OvaleState.nextCast then
+						start = OvaleState.nextCast
 					end
 						if (node.params.nocd and start~=nil and OvaleState.now<start-node.params.nocd) then
 						icons[1]:Update(element, nil)

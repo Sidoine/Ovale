@@ -97,8 +97,9 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		local red
-		if (minAttente > actionCooldownStart + actionCooldownDuration + 0.01 and minAttente > OvaleState.now
-			and minAttente>OvaleState.attenteFinCast) then
+		if minAttente > actionCooldownStart + actionCooldownDuration + 0.01
+				and minAttente > OvaleState.now
+				and minAttente > OvaleState.nextCast then
 			self.icone:SetVertexColor(0.75,0.2,0.2)
 			red = true
 		else

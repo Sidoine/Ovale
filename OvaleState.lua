@@ -62,7 +62,7 @@ OvaleState.powerRate = nil
 OvaleState.currentSpellId = nil
 OvaleState.now = nil
 OvaleState.currentTime = nil
-OvaleState.attenteFinCast = nil
+OvaleState.nextCast = nil
 OvaleState.startCast = nil
 OvaleState.endCast = nil
 OvaleState.gcd = 1.5
@@ -146,7 +146,7 @@ function OvaleState:Reset()
 	self.currentTime = self.now
 	Ovale:Logf("Reset state with current time = %f", self.currentTime)
 	self.currentSpellId = nil
-	self.attenteFinCast = self.now
+	self.nextCast = self.now
 
 	self:InvokeMethod("ResetState")
 
@@ -191,7 +191,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 	end
 
 	-- Update the latest spell cast in the simulator.
-	self.attenteFinCast = nextCast
+	self.nextCast = nextCast
 	self.currentSpellId = spellId
 	self.startCast = startCast
 	self.endCast = endCast
@@ -206,7 +206,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 		self.currentTime = self.now
 	end
 
-	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.attenteFinCast, endCast, targetGUID)
+	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.nextCast, endCast, targetGUID)
 
 	--[[
 		Apply the effects of the spellcast in three phases.
