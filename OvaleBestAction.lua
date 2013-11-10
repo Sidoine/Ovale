@@ -685,9 +685,12 @@ function OvaleBestAction:GetActionInfo(element)
 				-- Spell requires a stance that player is not in.
 				return nil
 			end
-			if si.combo == 0 and OvaleState.state.combo == 0 then
-				-- Spell is a combo point finisher, but player has no combo points on the target.
-				return nil
+			if si.combo == 0 then
+				local minCombo = si.minCombo or 1
+				if OvaleState.state.combo < minCombo then
+					-- Spell is a combo point finisher, but player has too few combo points on the target.
+					return nil
+				end
 			end
 			for _, powerType in pairs(OvalePower.SECONDARY_POWER) do
 				if si[powerType] and si[powerType] > OvaleState.state[powerType] then
