@@ -18,8 +18,11 @@ local OvaleOptions = Ovale.OvaleOptions
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleState = Ovale.OvaleState
 
+local next = next
+local pairs = pairs
 local strfind = string.find
 local strsub = string.sub
+local tostring = tostring
 --</private-static-properties>
 
 --<public-methods>
@@ -32,11 +35,12 @@ local function SetValue(self, value, actionTexture)
 	self.aPortee:Hide()	
 	self.shortcut:Hide()
 	if value then
+		self.value = value
+		self.spellId = nil
 		if value < 10 then
 			self.remains:SetFormattedText("%.1f", value)
 		elseif value == math.huge then
-			-- Clamp infinite time values to 3600 (one hour)
-			self.remains:SetFormattedText("3600")
+			self.remains:SetFormattedText("inf")
 		else
 			self.remains:SetFormattedText("%d", value)
 		end
@@ -51,6 +55,8 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
 				
 	self.spellId = spellId
+	self.value = nil
+
 	local profile = OvaleOptions:GetProfile()
 	if (minAttente~=nil and actionTexture) then	
 	
@@ -232,13 +238,16 @@ function OvaleIcone_OnMouseUp(self)
 end
 
 function OvaleIcone_OnEnter(self)
-	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.spellId then
+	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.spellId or self.value then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 		if self.help then
 			GameTooltip:SetText(L[self.help])
 		end
 		if self.spellId then
 			GameTooltip:AddLine(OvaleSpellBook:GetSpellName(self.spellId), 0.5, 1, 0.75)
+		elseif self.value then
+			local value = (value < math.huge) and tostring(value) or "infinity"
+			GameTooltip:AddLine(value, 0.5, 1, 0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
 			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"],1,1,1)
@@ -274,6 +283,7 @@ function OvaleIcone_OnLoad(self)
 	self.shouldClick = false
 	self.help = nil
 	self.spellId = nil
+	self.value = nil
 	self.fontScale = nil
 	self.lastSound = nil
 	self.ancienneAttente = nil
