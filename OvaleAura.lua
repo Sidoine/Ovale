@@ -96,21 +96,23 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		aura.gain = now
 		self_aura[guid][filter][spellId][casterGUID] = aura
 	end
-
 	aura.serial = self_serial[guid]
-	if count == 0 then
-		count = 1
-	end
+
+	-- UnitAura() can return zero count for auras that are present.
+	count = (count > 0) and count or 1
+	-- "Zero" duration and expiration actually mean the aura never expires.
+	duration = (duration > 0) and duration or math.huge
+	expirationTime = (expirationTime > 0) and expirationTime or math.huge
 
 	-- Only overwrite an existing aura's information if the aura has changed.
 	-- An aura's "fingerprint" is its:
 	--     caster, duration, expiration time, stack count.
 	local auraIsUnchanged = (
-		existingAura and
-		(aura.source == casterGUID) and
-		((not aura.duration and duration == 0) or aura.duration == duration) and
-		((not aura.ending and expirationTime == 0) or aura.ending == expirationTime) and
-		(aura.stacks == count)
+		existingAura
+			and aura.source == casterGUID
+			and aura.duration == duration
+			and aura.ending == expirationTime
+			and aura.stacks == count
 	)
 	local addAura = not existingAura or not auraIsUnchanged
 	if addAura then
@@ -119,15 +121,13 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 		aura.icon = icon
 		aura.stacks = count
 		aura.debuffType = debuffType
-		if duration > 0 then
+		if duration < math.huge and expirationTime < math.huge then
 			aura.start = expirationTime - duration
-			aura.duration = duration
-			aura.ending = expirationTime
 		else
 			aura.start = now
-			aura.duration = math.huge
-			aura.ending = math.huge
 		end
+		aura.duration = duration
+		aura.ending = expirationTime
 		aura.stealable = isStealable
 		aura.mine = mine
 		aura.source = casterGUID
