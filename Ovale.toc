@@ -29,7 +29,6 @@ OvaleLatency.lua
 OvalePool.lua
 OvalePoolGC.lua
 OvalePoolRefCount.lua
-OvalePower.lua
 OvaleQueue.lua
 OvaleSpellBook.lua
 OvaleStance.lua
@@ -39,8 +38,11 @@ OvaleDamageTaken.lua
 OvalePaperDoll.lua
 OvaleScore.lua
 #
+OvaleState.lua
+#
 OvaleAura.lua
 OvaleComboPoints.lua
+OvalePower.lua
 OvaleRecount.lua
 OvaleScripts.lua
 scripts\scripts.xml
@@ -51,13 +53,11 @@ OvaleSwing.lua
 OvaleOptions.lua
 OvaleFuture.lua
 #
-OvaleState.lua
 conditions\conditions.xml
-#
+OvaleCompile.lua
 OvaleIcone.lua
 OvaleIcone.xml
 #
 OvaleBestAction.lua
-OvaleCompile.lua
 #
 OvaleFrame.lua

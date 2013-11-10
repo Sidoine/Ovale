@@ -23,6 +23,7 @@ local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
 local OvaleScore = Ovale.OvaleScore
 local OvaleSpellBook = Ovale.OvaleSpellBook
+local OvaleState = Ovale.OvaleState
 
 local ipairs = ipairs
 local pairs = pairs
@@ -249,9 +250,11 @@ function OvaleFuture:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_START")
 	self:RegisterMessage("Ovale_AuraAdded")
 	self:RegisterMessage("Ovale_InactiveUnit")
+	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleFuture:OnDisable()
+	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
@@ -446,8 +449,10 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	end
 end
 
--- Apply spells that are being cast or are in flight.
-function OvaleFuture:ApplyInFlightSpells(now, ApplySpell)
+-- Apply the effects of spells that are being cast or are in flight, allowing us to
+-- ignore lag or missile travel time.
+function OvaleFuture:ApplyInFlightSpells()
+	local now = OvaleState.now
 	local index = 0
 	local spellcast, si
 	while true do
@@ -460,7 +465,7 @@ function OvaleFuture:ApplyInFlightSpells(now, ApplySpell)
 		if not (si and si.toggle) then
 			Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 			if now - spellcast.stop < 5 then
-				ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target, spellcast)
+				OvaleState:ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target, spellcast)
 			else
 				tremove(self_activeSpellcast, index)
 				self_pool:Release(spellcast)
@@ -497,3 +502,59 @@ function OvaleFuture:Debug()
 	end
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleFuture.statePrototype = {
+	counter = nil,
+}
+--</public-static-properties>
+
+--<public-static-methods>
+-- Initialize the state.
+function OvaleFuture:InitializeState(state)
+	state.counter = {}
+end
+
+-- Reset the state to the current conditions.
+function OvaleFuture:ResetState(state)
+	for k, v in pairs(self.counter) do
+		state.counter[k] = self.counter[k]
+	end
+end
+
+-- Apply the effects of the spell at the start of the spellcast.
+function OvaleFuture:ApplySpellStart(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	-- If the spellcast has already started, then the effects have already occurred.
+	if startCast < OvaleState.now then
+		return
+	end
+
+	local si = OvaleData.spellInfo[spellId]
+	if si then
+		-- Increment and reset spell counters.
+		if si.inccounter then
+			local id = si.inccounter
+			local value = state.counter[id] and state.counter[id] or 0
+			state.counter[id] = value + 1
+		end
+		if si.resetcounter then
+			local id = si.resetcounter
+			state.counter[id] = 0
+		end
+	end
+end
+--</public-static-methods>
+
+-- Mix-in methods for simulator state.
+do
+	local statePrototype = OvaleFuture.statePrototype
+
+	function statePrototype:GetCounterValue(id)
+		local state = self
+		return state.counter[id] and state.counter[id] or 0
+	end
+end

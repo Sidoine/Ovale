@@ -101,6 +101,7 @@ $sp{OvaleCondition}{ParseCondition} = true;
 $sp{OvaleCondition}{ParseRuneCondition} = true;
 $sp{OvaleCondition}{TestValue} = true;
 
+$m{OvaleQueue}{NewQueue} = true;
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;
 $sp{OvaleQueue}{InsertBack} = true;

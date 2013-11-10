@@ -19,6 +19,7 @@ local L = Ovale.L
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleScripts = Ovale.OvaleScripts
 local OvaleSpellBook = Ovale.OvaleSpellBook
+local OvaleState = Ovale.OvaleState
 
 local strgmatch = string.gmatch
 local strgsub = string.gsub
@@ -600,7 +601,7 @@ local self_options =
 					name = "Power",
 					type = "execute",
 					func = function()
-						if Ovale.OvaleState then Ovale.OvaleState:DebugPower() end
+						OvaleState.state:DebugPower()
 					end
 				},
 				talent =

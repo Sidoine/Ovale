@@ -17,6 +17,7 @@ local OvaleActionBar = Ovale.OvaleActionBar
 local OvaleCondition = Ovale.OvaleCondition
 local OvaleData = Ovale.OvaleData
 local OvaleEquipement = Ovale.OvaleEquipement
+local OvaleFuture = Ovale.OvaleFuture
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
 local OvalePower = Ovale.OvalePower
@@ -699,7 +700,7 @@ local OVALE_COMPUTE_VISITOR =
 --<public-static-methods>
 function OvaleBestAction:StartNewAction()
 	OvaleState:Reset()
-	OvaleState:ApplyActiveSpells()
+	OvaleFuture:ApplyInFlightSpells()
 	self_serial = self_serial + 1
 end
 
