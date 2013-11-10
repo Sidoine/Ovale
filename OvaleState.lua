@@ -18,7 +18,6 @@ Ovale.OvaleState = OvaleState
 local OvaleAura = Ovale.OvaleAura
 local OvaleComboPoints = Ovale.OvaleComboPoints
 local OvaleData = Ovale.OvaleData
-local OvaleEquipement = Ovale.OvaleEquipement
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
@@ -97,34 +96,6 @@ function OvaleState:UpdatePowerRates()
 	for powerType in pairs(OvalePower.POWER_INFO) do
 		self.powerRate[powerType] = 0
 	end
-
-	-- Energy regeneration for druids and monks out of DPS stance.
-	local class = OvalePaperDoll.class
-	if class == "DRUID" or class == "MONK" then
-		-- Base energy regen is 10 energy per second, scaled by the melee haste.
-		local energyRegen = 10 * OvalePaperDoll:GetMeleeHasteMultiplier()
-		-- Strip off 10% attack speed bonus that doesn't count toward energy regeneration.
-		if OvaleState:GetAura("player", "melee_haste") then
-			energyRegen = energyRegen / 1.1
-		end
-		if class == "MONK" then
-			-- Way of the Monk (monk): melee attack speed increased by 40% for two-handed weapons.
-			if OvaleEquipement:HasTwoHandedWeapon() then
-				energyRegen = energyRegen / 1.4
-			end
-			-- Ascension (monk): increases energy regen by 15%.
-			if OvaleSpellBook:GetTalentPoints(8) > 0 then
-				energyRegen = energyRegen * 1.15
-			end
-			-- Stance of the Sturdy Ox (brewmaster monk): increases Energy regeneration by 10%.
-			if OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
-				energyRegen = energyRegen * 1.1
-			end
-		end
-		self.powerRate.energy = energyRegen
-	end
-	-- TODO: mana regen for classes that that use mana based on stance.
-
 	-- Power regeneration for current power type.
 	if Ovale.enCombat then
 		self.powerRate[OvalePower.powerType] = OvalePower.activeRegen
