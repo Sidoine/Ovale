@@ -494,6 +494,34 @@ do
 	end
 
 	testFunction[#testFunction + 1] = function()
+		local A        = OvaleTimeSpan(1, 2)
+		local B        = OvaleTimeSpan(3, 4)
+		local expected = OvaleTimeSpan(1, 2, 3, 4)
+
+		local result = A:Union(B)
+		if not result:Equals(expected) then
+			print(string.format("  result: %s", tostring(result)))
+			print(string.format("expected: %s", tostring(expected)))
+			return false
+		end
+		return true
+	end
+
+	testFunction[#testFunction + 1] = function()
+		local A        = OvaleTimeSpan(3, 4)
+		local B        = OvaleTimeSpan(1, 2)
+		local expected = OvaleTimeSpan(1, 2, 3, 4)
+
+		local result = A:Union(B)
+		if not result:Equals(expected) then
+			print(string.format("  result: %s", tostring(result)))
+			print(string.format("expected: %s", tostring(expected)))
+			return false
+		end
+		return true
+	end
+
+	testFunction[#testFunction + 1] = function()
 		local A        = OvaleTimeSpan(1, 2, 3, 4)
 		local B        = OvaleTimeSpan(2, 3, 4, 5)
 		local expected = OvaleTimeSpan(1, 5)
