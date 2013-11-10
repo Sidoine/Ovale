@@ -18,6 +18,7 @@ do
 	--- Get the current direction of the Eclipse status on the Eclipse bar for balance druids.
 	-- A negative number means heading toward Lunar Eclipse.
 	-- A positive number means heading toward Solar Eclipse.
+	-- Zero means it can head in either direction.
 	-- @name EclipseDir
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -31,7 +32,7 @@ do
 
 	local function EclipseDir(condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleState:GetEclipseDir()
+		local value = OvaleState.state.eclipseDirection
 		return Compare(value, comparator, limit)		
 	end
 

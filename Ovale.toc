@@ -52,6 +52,7 @@ OvaleSpellDamage.lua
 OvaleSwing.lua
 #
 OvaleCompile.lua
+OvaleEclipse.lua
 OvaleFuture.lua
 OvaleIcone.lua
 OvaleIcone.xml

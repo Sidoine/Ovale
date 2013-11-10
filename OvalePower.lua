@@ -252,7 +252,7 @@ function OvalePower:ApplySpellOnPlayer(state, spellId, startCast, endCast, nextC
 	end
 
 	if si then
-		-- Update power state except for eclipse energy.
+		-- Update power state except for eclipse energy (handled by OvaleEclipse).
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
 			if powerType ~= "eclipse" then
 				local cost = si[powerType]

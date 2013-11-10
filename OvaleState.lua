@@ -9,7 +9,7 @@
 --]]--------------------------------------------------------------------
 
 -- Keep the current state in the simulation
--- XXX Split out Eclipse and Runes modules (Druid and DeathKnight modules?).
+-- XXX Split out Runes module.
 
 local _, Ovale = ...
 local OvaleState = Ovale:NewModule("OvaleState")
@@ -18,11 +18,9 @@ Ovale.OvaleState = OvaleState
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
 local OvaleQueue = Ovale.OvaleQueue
-local OvaleSpellBook = Ovale.OvaleSpellBook
 
 local pairs = pairs
 local select = select
-local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetTime = GetTime
@@ -38,12 +36,6 @@ local self_runesCD = {}
 local self_class = select(2, API_UnitClass("player"))
 -- Whether the state of the simulator has been initialized.
 local self_stateIsInitialized = false
-
--- Aura IDs for Eclipse buffs.
-local LUNAR_ECLIPSE = 48518
-local SOLAR_ECLIPSE = 48517
--- Spell ID for Starfall (Balance specialization spell).
-local STARFALL = 48505
 --</private-static-properties>
 
 --<public-static-properties>
@@ -212,93 +204,28 @@ function OvaleState:ApplySpellOnPlayer(spellId, startCast, endCast, nextCast, no
 		so only consider spells that have not yet finished casting in the simulator.
 	--]]
 	if endCast > self.now then
-		-- Adjust the player's resources.
-		self:ApplySpellCost(spellId, startCast, endCast)
+		local si = OvaleData.spellInfo[spellId]
+		if si then
+			-- Runes
+			if si.blood and si.blood < 0 then
+				AddRune(startCast, 1, si.blood)
+			end
+			if si.unholy and si.unholy < 0 then
+				AddRune(startCast, 2, si.unholy)
+			end
+			if si.frost and si.frost < 0 then
+				AddRune(startCast, 3, si.frost)
+			end
+			if si.death and si.death < 0 then
+				AddRune(startCast, 4, si.death)
+			end
+		end
 	end
 end
 
 -- Apply the effects of the spell on the target's state when it lands on the target.
 function OvaleState:ApplySpellOnTarget(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	self:InvokeMethod("ApplySpellOnTarget", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
-end
-
--- Adjust the player's resources in the simulator from casting the given spell.
-function OvaleState:ApplySpellCost(spellId, startCast, endCast)
-	local si = OvaleData.spellInfo[spellId]
-
-	if si then
-		-- Eclipse
-		if si.eclipse then
-			local energy = si.eclipse
-			local direction = self:GetEclipseDir()
-			if si.eclipsedir then
-				energy = energy * direction
-			end
-			-- Euphoria: While not in an Eclipse state, your spells generate double the normal amount of Solar or Lunar energy.
-			if OvaleSpellBook:IsKnownSpell(81062)
-					and not self.state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
-					and not self.state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true) then
-				energy = energy * 2
-			end
-			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
-			if (direction < 0 and energy < 0) or (direction > 0 and energy > 0) then
-				self.state.eclipse = self.state.eclipse + energy
-			end
-			-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached after the spellcast.
-			if self.state.eclipse <= -100 then
-				self.state.eclipse = -100
-				self.state:AddEclipse(endCast, LUNAR_ECLIPSE)
-				-- Reaching Lunar Eclipse resets the cooldown of Starfall.
-				local cd = self.state:GetCD(STARFALL)
-				if cd then
-					cd.start = 0
-					cd.duration = 0
-					cd.enable = 0
-				end
-			elseif self.state.eclipse >= 100 then
-				self.state.eclipse = 100
-				self.state:AddEclipse(endCast, SOLAR_ECLIPSE)
-			end
-		end
-
-		-- Runes
-		if si.blood and si.blood < 0 then
-			AddRune(startCast, 1, si.blood)
-		end
-		if si.unholy and si.unholy < 0 then
-			AddRune(startCast, 2, si.unholy)
-		end
-		if si.frost and si.frost < 0 then
-			AddRune(startCast, 3, si.frost)
-		end
-		if si.death and si.death < 0 then
-			AddRune(startCast, 4, si.death)
-		end
-	end
-end
-
--- Returns 1 if moving toward Solar or -1 if moving toward Lunar.
-function OvaleState:GetEclipseDir()
-	local stacks = select(3, self.state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true))
-	if stacks and stacks > 0 then
-		return -1
-	else
-		stacks = select(3, self.state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true))
-		if stacks and stacks > 0 then
-			return 1
-		elseif self.state.eclipse < 0 then
-			return -1
-		elseif self.state.eclipse > 0 then
-			return 1
-		else
-			local direction = API_GetEclipseDirection()
-			if direction == "moon" then
-				return -1
-			else -- direction == "sun" then
-				return 1
-			end
-		end
-	end
 end
 
 -- Returns the cooldown time before all of the required runes are available.
