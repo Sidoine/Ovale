@@ -30,6 +30,7 @@ local floor = math.floor
 local pairs = pairs
 local select = select
 local tostring = tostring
+local type = type
 local wipe = table.wipe
 local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
@@ -71,9 +72,9 @@ OvaleState.lastSpellId = nil
 --</public-static-properties>
 
 --<private-static-methods>
-local function ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, stats)
+local function ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	local self = OvaleState
-	self:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, stats)
+	self:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 end
 
 -- Track a new Eclipse buff that starts at timestamp.
@@ -180,81 +181,142 @@ function OvaleState:ApplyActiveSpells()
 	OvaleFuture:ApplyInFlightSpells(self.maintenant, ApplySpell)
 end
 
--- Cast a spell in the simulator
--- spellId : the spell id
--- startCast : temps du cast
--- endCast : fin du cast
--- nextCast : temps auquel le prochain sort peut être lancé (>=endCast, avec le GCD)
--- nocd : le sort ne déclenche pas son cooldown
--- spellcast : snapshot of player stats at the time the spell was cast
-function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, stats)
+--[[
+	Cast a spell in the simulator and advance the state of the simulator.
+
+	Parameters:
+		spellId		The ID of the spell to cast.
+		startCast	The time at the start of the spellcast.
+		endCast		The time at the end of the spellcast.
+		nextCast	The earliest time at which the next spell can be cast (nextCast >= endCast).
+		nocd		The spell's cooldown is not triggered.
+		targetGUID	The GUID of the target of the spellcast.
+		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
+--]]
+function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	if not spellId or not targetGUID then
 		return
 	end
-	
-	local si = OvaleData.spellInfo[spellId]
-	
-	self.lastSpellId = spellId
-	--On enregistre les infos sur le sort en cours
+
+	-- Update the latest spell cast in the simulator.
 	self.attenteFinCast = nextCast
 	self.currentSpellId = spellId
 	self.startCast = startCast
 	self.endCast = endCast
-	--Temps actuel de la simulation : un peu après le dernier cast (ou maintenant si dans le passé)
-	if startCast>=self.maintenant then
-		self.currentTime = startCast+0.1
+
+	self.lastSpellId = spellId
+
+	-- Set the current time in the simulator to a little after the start of the current cast,
+	-- or to now if in the past.
+	if startCast >= self.maintenant then
+		self.currentTime = startCast + 0.1
 	else
 		self.currentTime = self.maintenant
 	end
-	
-	Ovale:Logf("add spell %d at %f currentTime = %f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.attenteFinCast, endCast, targetGUID)
-	
-	--Effet du sort au moment du début du cast
-	--(donc si cast déjà commencé, on n'en tient pas compte)
+
+	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.attenteFinCast, endCast, targetGUID)
+
+	--[[
+		Apply the effects of the spellcast in three phases.
+			1. Spell effects at the beginning of the cast.
+			2. Spell effects on player assuming the cast completes.
+			3. Spell effects on target when it lands.
+	--]]
+	self:ApplySpellStart(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	self:ApplySpellOnPlayer(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	self:ApplySpellOnTarget(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+end
+
+-- Apply the effects of the spell at the start of the spellcast.
+function OvaleState:ApplySpellStart(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	local si = OvaleData.spellInfo[spellId]
+	--[[
+		If the spellcast has already started, then the effects have already occurred,
+		so only consider spells that are cast in the future in the simulator.
+	--]]
 	if startCast >= self.maintenant then
 		if si then
+			-- Increment and reset spell counters.
 			if si.inccounter then
 				local id = si.inccounter
-				self.state.counter[id] = self:GetCounterValue(id) + 1
+				local value = self.state.counter[id] and self.state.counter[id] or 0
+				self.state.counter[id] = value + 1
 			end
-			
 			if si.resetcounter then
-				self.state.counter[si.resetcounter] = 0
+				local id = si.resetcounter
+				self.state.counter[id] = 0
 			end
 		end
 	end
-	
-	--Effet du sort au moment où il est lancé
-	--(donc si il est déjà lancé, on n'en tient pas compte)
+end
+
+-- Apply the effects of the spell on the player's state, assuming the spellcast completes.
+function OvaleState:ApplySpellOnPlayer(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	local si = OvaleData.spellInfo[spellId]
+	--[[
+		If the spellcast has already ended, then the effects have already occurred,
+		so only consider spells that have not yet finished casting in the simulator.
+	--]]
 	if endCast > self.maintenant then
+		-- Adjust the spell's cooldown.
+		self:ApplySpellCooldown(spellId, startCast, endCast, nocd)
+
+		-- Adjust the player's resources.
 		self:ApplySpellCost(spellId, startCast, endCast)
+
+		-- Apply the auras on the player.
+		if si and si.aura and si.aura.player then
+			self:ApplySpellAuras(spellId, startCast, endCast, OvaleGUID:GetGUID("player"), si.aura.player, spellcast)
+		end
 	end
+end
+
+-- Apply the effects of the spell on the target's state when it lands on the target.
+function OvaleState:ApplySpellOnTarget(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	local si = OvaleData.spellInfo[spellId]
+	if si and si.aura and si.aura.target then
+		-- Apply the auras on the target.
+		self:ApplySpellAuras(spellId, startCast, endCast, targetGUID, si.aura.target, spellcast)
+	end
+end
+
+-- Adjust a spell cooldown in the simulator.
+function OvaleState:ApplySpellCooldown(spellId, startCast, endCast, nocd)
+	local si = OvaleData.spellInfo[spellId]
 	if si then
-		-- Cooldown du sort
 		local cd = self:GetCD(spellId)
 		if cd then
 			cd.start = startCast
-			cd.duration = si.cd
-			--Pas de cooldown
+			cd.duration = si.cd or 0
+
+			-- Test for no cooldown.
 			if nocd then
 				cd.duration = 0
 			else
-				--On vérifie si le buff "buffnocd" est présent, auquel cas le CD du sort n'est pas déclenché
+				-- There is no cooldown if the buff named by "buffnocd" parameter is present.
 				if si.buffnocd then
 					local start, ending, stacks = self:GetAura("player", si.buffnocd)
-					if start then
+					if start and stacks and stacks > 0 then
 						Ovale:Logf("buffnocd stacks = %s, start = %s, ending = %s, startCast = %f", stacks, start, ending, startCast)
-						if stacks and stacks > 0 and start <= startCast and (not ending or ending > startCast) then
+						-- XXX Shouldn't this be (not ending or ending > endCast)?
+						-- XXX The spellcast needs to finish before the buff expires.
+						if start <= startCast and (not ending or ending > startCast) then
 							cd.duration = 0
 						end
 					end
 				end
+
+				-- There is no cooldown if the target's health percent is below what's specified
+				-- with the "targetlifenocd" parameter.
 				if si.targetlifenocd then
-					if API_UnitHealth("target") / API_UnitHealthMax("target") * 100 < si.targetlifenocd then
+					local healthPercent = API_UnitHealth("target") / API_UnitHealthMax("target") * 100
+					if healthPercent < si.targetlifenocd then
 						cd.duration = 0
 					end
 				end
 			end
+
+			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
 			if cd.duration > 0 and si.cd_haste then
 				if si.cd_haste == "melee" then
 					cd.duration = cd.duration / OvalePaperDoll:GetMeleeHasteMultiplier()
@@ -262,110 +324,17 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 					cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
 				end
 			end
+
 			cd.enable = 1
 			if si.toggle then
 				cd.toggled = 1
 			end
-			Ovale:Logf("%d cd.start=%f, cd.duration=%f", spellId, cd.start, cd.duration)
-		end
-	end
-
-	-- Effets du sort au moment où il atteint sa cible
-	if si then
-		--Auras causés par le sort
-		if si.aura then
-			for target, targetInfo in pairs(si.aura) do
-				if not (target == "player" and endCast <= self.maintenant) then
-					-- If the spell has already finished casting, then player auras match the game
-					-- state already, so no need to account for traveling spells.  Update auras
-					-- affected by the spell in all other cases.
-					for filter, filterInfo in pairs(targetInfo) do
-						for auraSpellId, spellData in pairs(filterInfo) do
-
-							local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
-							-- An aura is treated as a periodic aura if it sets "tick" explicitly in SpellInfo.
-							local isDoT = auraSpellInfo and auraSpellInfo.tick
-							local duration = spellData
-							local stacks = duration
-							local auraGUID
-							if target == "target" then
-								auraGUID = targetGUID
-							else
-								auraGUID = OvaleGUID:GetGUID(target)
-							end
-
-							-- Set the duration to the proper length if it's a DoT.
-							if auraSpellInfo and auraSpellInfo.duration then
-								duration = self:GetDuration(auraSpellId)
-							end
-
-							-- If aura is specified with a duration, then assume stacks == 1.
-							if type(stacks) == "number" and stacks > 0 then
-								stacks = 1
-							end
-
-							local oldStart, oldEnding, oldStacks, oldTick = self:GetAuraByGUID(auraGUID, auraSpellId, filter, true, target)
-							local newAura = self:NewAura(auraGUID, auraSpellId, filter)
-
-							newAura.mine = true
-
-							if type(stacks) == "number" and stacks == 0 then
-								Ovale:Logf("Aura %d is completely removed", auraSpellId)
-								newAura.stacks = 0
-								newAura.ending = 0	-- self.currentTime?
-							elseif oldEnding and oldEnding >= endCast then
-								if stacks == "refresh" or stacks > 0 then
-									if stacks == "refresh" then
-										Ovale:Logf("Aura %d is refreshed", auraSpellId)
-										newAura.stacks = oldStacks
-									else -- if stacks > 0
-										Ovale:Logf("Aura %d gains stacks (ending was %s)", auraSpellId, newAura.ending)
-										newAura.stacks = oldStacks + stacks
-									end
-									newAura.start = oldStart
-									if isDoT and oldEnding > newAura.start and oldTick and oldTick > 0 then
-										-- Add new duration after the next tick is complete.
-										local remainingTicks = floor((oldEnding - endCast) / oldTick)
-										newAura.ending = (oldEnding - oldTick * remainingTicks) + duration
-										newAura.tick = OvaleAura:GetTickLength(auraSpellId)
-										-- Re-snapshot stats for the DoT.
-										OvalePaperDoll:SnapshotStats(newAura, stats)
-										newAura.damageMultiplier = self:GetDamageMultiplier(auraSpellId)
-									else
-										newAura.ending = endCast + duration
-									end
-									Ovale:Logf("Aura %d ending is now %f", auraSpellId, newAura.ending)
-								elseif stacks < 0 then
-									Ovale:Logf("Aura %d loses stacks", auraSpellId)
-									newAura.stacks = oldStacks + stacks
-									Ovale:Logf("removing %d stack(s) of %d because of %d to %d", stacks, auraSpellId, spellId, newAura.stacks)
-									newAura.start = oldStart
-									newAura.ending = oldEnding
-									if newAura.stacks <= 0 then
-										Ovale:Log("Aura is completely removed")
-										newAura.stacks = 0
-										newAura.ending = 0	-- self.currentTime?
-									end
-								end
-							elseif type(stacks) == "number" and type(duration) == "number" then
-								Ovale:Logf("New aura %d at %f on %s %s", auraSpellId, endCast, target, auraGUID)
-								newAura.stacks = stacks
-								newAura.start = endCast
-								newAura.ending = endCast + duration
-								if isDoT then
-									newAura.tick = OvaleAura:GetTickLength(auraSpellId)
-									OvalePaperDoll:SnapshotStats(newAura, stats)
-									newAura.damageMultiplier = self:GetDamageMultiplier(auraSpellId)
-								end
-							end
-						end
-					end
-				end
-			end
+			Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
 		end
 	end
 end
 
+-- Adjust the player's resources in the simulator from casting the given spell.
 function OvaleState:ApplySpellCost(spellId, startCast, endCast)
 	local si = OvaleData.spellInfo[spellId]
 	local _, _, _, cost, _, powerType = API_GetSpellInfo(spellId)
@@ -491,39 +460,115 @@ function OvaleState:ApplySpellCost(spellId, startCast, endCast)
 			end
 		end
 
-		--Runes
-		if si.frost then
-			self:AddRune(startCast, 3, si.frost)
-		end
-		if si.death then
-			self:AddRune(startCast, 4, si.death)
-		end
-		if si.blood then
+		-- Runes
+		if si.blood and si.blood < 0 then
 			self:AddRune(startCast, 1, si.blood)
 		end
-		if si.unholy then
+		if si.unholy and si.unholy < 0 then
 			self:AddRune(startCast, 2, si.unholy)
 		end
+		if si.frost and si.frost < 0 then
+			self:AddRune(startCast, 3, si.frost)
+		end
+		if si.death and si.death < 0 then
+			self:AddRune(startCast, 4, si.death)
+		end
 	end
 end
 
-function OvaleState:AddRune(time, type, value)
-	if value<0 then
-		for i=1,6 do
-			if (self.state.rune[i].type == type or self.state.rune[i].type==4)and self.state.rune[i].cd<=time then
-				self.state.rune[i].cd = time + 10
+-- XXX The way this function updates the rune state looks completely wrong.
+function OvaleState:AddRune(atTime, runeType, value)
+	for i = 1, 6 do
+		local rune = self.state.rune[i]
+		if (rune.type == runeType or rune.type == 4) and rune.cd <= atTime then
+			rune.cd = atTime + 10
+		end
+	end
+end
+
+-- Apply the auras caused by the given spell in the simulator.
+function OvaleState:ApplySpellAuras(spellId, startCast, endCast, guid, auraList, spellcast)
+	for filter, filterInfo in pairs(auraList) do
+		for auraId, spellData in pairs(filterInfo) do
+			local si = OvaleData.spellInfo[auraId]
+			-- An aura is treated as a periodic aura if it sets "tick" explicitly in SpellInfo.
+			local isDoT = (si and si.tick)
+			local duration = spellData
+			local stacks = spellData
+
+			-- If aura is specified with a duration, then assume stacks == 1.
+			if type(duration) == "number" and duration > 0 then
+				stacks = 1
+			end
+			-- Set the duration to the proper length if it's a DoT.
+			if si and si.duration then
+				duration = self:GetDuration(auraId)
+			end
+
+			local start, ending, currentStacks, tick = self:GetAuraByGUID(guid, auraId, filter, true, target)
+			local newAura = self:NewAura(guid, auraId, filter)
+			newAura.mine = true
+
+			--[[
+				auraId=N, N > 0		N is duration, auraID is applied, add one stack
+				auraId=0			aura is removed
+				auraId=N, N < 0		N is number of stacks of aura removed
+				auraId=refresh		auraId is refreshed, no change to stacks
+			--]]
+			if type(stacks) == "number" and stacks == 0 then
+				Ovale:Logf("Aura %d is completely removed", auraId)
+				newAura.stacks = 0
+				newAura.start = start
+				newAura.ending = endCast
+			elseif ending and endCast <= ending then
+				-- Spellcast ends before the aura expires.
+				if stacks == "refresh" or stacks > 0 then
+					if stacks == "refresh" then
+						Ovale:Logf("Aura %d is refreshed", auraId)
+						newAura.stacks = currentStacks
+					else -- if stacks > 0 then
+						newAura.stacks = currentStacks + stacks
+						Ovale:Logf("Aura %d gains a stack to %d because of spell %d (ending was %s)", auraId, newAura.stacks, spellId, ending)
+					end
+					newAura.start = start
+					if isDoT and ending > newAura.start and tick and tick > 0 then
+						-- Add new duration after the next tick is complete.
+						local remainingTicks = floor((ending - endCast) / tick)
+						newAura.ending = (ending - tick * remainingTicks) + duration
+						newAura.tick = OvaleAura:GetTickLength(auraId)
+						-- Re-snapshot stats for the DoT.
+						-- XXX This is not quite right because it uses the current player stats instead of the simulator's state.
+						OvalePaperDoll:SnapshotStats(newAura, spellcast)
+						newAura.damageMultiplier = self:GetDamageMultiplier(auraId)
+					else
+						newAura.ending = endCast + duration
+					end
+					Ovale:Logf("Aura %d ending is now %f", auraId, newAura.ending)
+				elseif stacks < 0 then
+					newAura.stacks = currentStacks + stacks
+					newAura.start = start
+					newAura.ending = ending
+					Ovale:Logf("Aura %d loses %d stack(s) to %d because of spell %d", auraId, -1 * stacks, newAura.stacks, spellId)
+					if newAura.stacks <= 0 then
+						Ovale:Logf("Aura %d is completely removed", auraId)
+						newAura.stacks = 0
+						newAura.ending = endCast
+					end
+				end
+			elseif type(stacks) == "number" and type(duration) == "number" and stacks > 0 and duration > 0 then
+				Ovale:Logf("New aura %d at %f on %s", auraId, endCast, guid)
+				newAura.stacks = stacks
+				newAura.start = endCast
+				newAura.ending = endCast + duration
+				if isDoT then
+					newAura.tick = OvaleAura:GetTickLength(auraId)
+					-- Snapshot stats for the DoT.
+					-- XXX This is not quite right because it uses the current player stats instead of the simulator's state.
+					OvalePaperDoll:SnapshotStats(newAura, spellcast)
+					newAura.damageMultiplier = self:GetDamageMultiplier(auraId)
+				end
 			end
 		end
-	else
-	
-	end
-end
-
-function OvaleState:GetCounterValue(id)
-	if self.state.counter[id] then
-		return self.state.counter[id]
-	else
-		return 0
 	end
 end
 
