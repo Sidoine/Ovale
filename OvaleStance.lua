@@ -134,6 +134,11 @@ function OvaleStance:Debug()
 	Ovale:FormatPrint("current stance: %s", self_stance)
 end
 
+-- Return the current stance's name.
+function OvaleStance:GetStance()
+	return self_stanceList[self_stance]
+end
+
 -- Return true if the current stance matches the given name.
 function OvaleStance:IsStance(name)
 	if not name or not self_stance then return false end
