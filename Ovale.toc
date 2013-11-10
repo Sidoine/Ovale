@@ -20,6 +20,7 @@ Ovale.lua
 
 # Modules with no dependencies
 OvaleActionBar.lua
+OvaleCondition.lua
 OvaleData.lua
 OvaleEnemies.lua
 OvaleEquipement.lua
@@ -50,8 +51,8 @@ OvaleOptions.lua
 OvaleFuture.lua
 #
 OvaleState.lua
+conditions\conditions.xml
 #
-OvaleCondition.lua
 OvaleIcone.lua
 OvaleIcone.xml
 #

@@ -257,7 +257,7 @@ local function ParseFunction(prefix, func, params)
 		-- For the conditions that refer to player's spells, check if the spell ID
 		-- is a variant of a spell with the same name as one already in the
 		-- spellbook.  If it is, then add that variant spell ID to our spellList.
-		if OvaleCondition.spellbookConditions[func] then
+		if OvaleCondition:IsSpellbookCondition(func) then
 			if not OvaleSpellBook:IsKnownSpell(spellId) and not self_missingSpellList[spellId] then
 				local spellName
 				if type(spellId) == "number" then
@@ -817,7 +817,7 @@ local function CompileScript(text)
 	-- Not an error if a function is undefined (might be unreachable code), but complain
 	-- at run-time during compilation.
 	for p, v in pairs(self_functionCalls) do
-		if not (OVALE_FUNCTIONS[p] or self_customFunctions[p] or OvaleCondition.conditions[p]) then
+		if not (OVALE_FUNCTIONS[p] or self_customFunctions[p] or OvaleCondition:IsCondition(p)) then
 			Ovale:DebugPrintf(OVALE_UNKNOWN_FUNCTION_DEBUG, "Unknown function call: %s (node%s)", p, v.nodeId)
 		end
 	end

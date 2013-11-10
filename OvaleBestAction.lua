@@ -413,13 +413,12 @@ local function ComputeFunction(element)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
-	local condition = OvaleCondition.conditions[element.func]
-	if not condition then
+	if not OvaleCondition:IsCondition(element.func) then
 		Ovale:Errorf("Condition %s not found", element.func)
 		return timeSpan
 	end
 
-	local start, ending, value, origin, rate = condition(element.params)
+	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.params)
 	if Ovale.trace then
 		local conditionCall = element.func .. "("
 		for k, v in pairs(element.params) do

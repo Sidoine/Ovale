@@ -40,6 +40,8 @@ $m{AceGUI}{ClearFocus} = true;
 $m{AceGUI}{RegisterAsContainer} = true;
 $m{AceGUI}{RegisterWidgetType} = true;
 
+$m{AceLocale}{NewLocale} = true;
+
 $m{"AceTimer-3.0"}{CancelTimer} = true;
 $m{"AceTimer-3.0"}{ScheduleRepeatingTimer} = true;
 
@@ -73,6 +75,8 @@ $m{GameTooltip}{Show} = true;
 $m{LibDualSpec}{EnhanceDatabase} = true;
 $m{LibDualSpec}{EnhanceOptions} = true;
 
+$m{LibStub}{GetLibrary} = true;
+
 $m{LRC}{GetRange} = true;
 
 $m{Masque}{Group} = true;
@@ -92,6 +96,11 @@ $p{Skada}{total} = true;
 
 $sp{Ovale}{OvaleSkada} = true;
 
+$sp{OvaleCondition}{Compare} = true;
+$sp{OvaleCondition}{ParseCondition} = true;
+$sp{OvaleCondition}{ParseRuneCondition} = true;
+$sp{OvaleCondition}{TestValue} = true;
+
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;
 $sp{OvaleQueue}{InsertBack} = true;
@@ -107,171 +116,184 @@ $sp{OvaleTimeSpan}{IntersectInterval} = true;
 $sp{OvaleTimeSpan}{Measure} = true;
 $sp{OvaleTimeSpan}{Union} = true;
 
-opendir(DIR, ".");
-while (defined($r = readdir(DIR)))
+sub ParseDirectory
 {
-	if ($r =~ m/(Ovale.*)\.lua$/)
+	my $dh = shift;
+	while (defined($r = readdir($dh)))
 	{
-		my $class = $1;
-		open(F, "<", $r);
-		undef $/;
-		my $content = <F>;
-		close(F);
-		
-		my %psp = {};
-		my %psm = {};
-		my %pp = {};
-		my %pm = {};
-		
-		if ($content =~ m/--inherits (\w+)/)
+		if ($r =~ m/(.*)\.lua$/)
 		{
-			my $parent = $1;
-			for my $prop (keys %{$sp{$parent}})
-			{
-				$sp{$class}{$prop} = $sp{$parent}{$prop}
-			}
-			for my $method (keys %{$sm{$parent}})
-			{
-				$sm{$class}{$method} = $sm{$parent}{$method}
-			}
-			for my $method (keys %{$m{$parent}})
-			{
-				$m{$class}{$method} = $m{$parent}{$method}
-			}
-		}
-		
-		if ($content =~ m/$class\s*=\s*LibStub\("([^)]+)"\):NewAddon\(([^)]+)\)/)
-		{
-			my $factory = $1;
-			my $mixins = $2;
-			for my $method (keys %{$m{$factory}})
-			{
-				$m{$class}{$method} = $m{$factory}{$method}
-			}
-			while ($mixins =~ m/"([^",]+)"/g)
-			{
-				my $parent = $1;
-				if ($parent ne $class)
-				{
-					for my $method (keys %{$m{$parent}})
-					{
-						$m{$class}{$method} = $m{$parent}{$method}
-					}
-				}
-			}
-		}
-		
-		if ($content =~ m/$class\s*=\s*([^:]+):NewModule\(([^)]+)\)/)
-		{
-			my $parent = $1;
-			my $mixins = $2;
-			$sp{$parent}{$class} = true;
-			while ($mixins =~ m/"([^",]+)"/g)
-			{
-				my $parent = $1;
-				if ($parent ne $class)
-				{
-					for my $method (keys %{$m{$parent}})
-					{
-						$m{$class}{$method} = $m{$parent}{$method}
-					}
-				}
-			}
-		}
+			my $class = $1;
+			open(F, "<", $r);
+			undef $/;
+			my $content = <F>;
+			close(F);
 
-		if ($content =~ m/<private-static-properties>(.*)<\/private-static-properties>/s)
-		{
-			my $psp = $1;
-			while ($psp =~ m/local (\w+)\s*=/g)
+			my %psp = {};
+			my %psm = {};
+			my %pp = {};
+			my %pm = {};
+
+			if ($content =~ m/--inherits (\w+)/)
 			{
-				$psp{$1} = true;
+				my $parent = $1;
+				for my $prop (keys %{$sp{$parent}})
+				{
+					$sp{$class}{$prop} = $sp{$parent}{$prop}
+				}
+				for my $method (keys %{$sm{$parent}})
+				{
+					$sm{$class}{$method} = $sm{$parent}{$method}
+				}
+				for my $method (keys %{$m{$parent}})
+				{
+					$m{$class}{$method} = $m{$parent}{$method}
+				}
 			}
-		}
-		
-		if ($content =~ m/<private-static-methods>(.*)<\/private-static-methods>/s)
-		{
-			my $psm = $1;
-			while ($psm =~ m/local function (\w+)\s*=/g)
+
+			if ($content =~ m/$class\s*=\s*LibStub\("([^)]+)"\):NewAddon\(([^)]+)\)/)
 			{
-				$psm{$1} = true;
+				my $factory = $1;
+				my $mixins = $2;
+				for my $method (keys %{$m{$factory}})
+				{
+					$m{$class}{$method} = $m{$factory}{$method}
+				}
+				while ($mixins =~ m/"([^",]+)"/g)
+				{
+					my $parent = $1;
+					if ($parent ne $class)
+					{
+						for my $method (keys %{$m{$parent}})
+						{
+							$m{$class}{$method} = $m{$parent}{$method}
+						}
+					}
+				}
 			}
-		}
-		
-		if ($content =~ m/<public-static-properties>(.*)<\/public-static-properties>/s)
-		{
-			my $sp = $1;
-			while ($sp =~ m/${class}\.(\w+)\s*=/g)
+
+			if ($content =~ m/$class\s*=\s*([^:]+):NewModule\(([^)]+)\)/)
 			{
-				$sp{$class}{$1} = true;
+				my $parent = $1;
+				my $mixins = $2;
+				$sp{$parent}{$class} = true;
+				while ($mixins =~ m/"([^",]+)"/g)
+				{
+					my $parent = $1;
+					if ($parent ne $class)
+					{
+						for my $method (keys %{$m{$parent}})
+						{
+							$m{$class}{$method} = $m{$parent}{$method}
+						}
+					}
+				}
 			}
-		}
-		
-		if ($content =~ m/<public-static-methods>(.*)<\/public-static-methods>/s)
-		{
-			my $sm = $1;
-			while ($sm =~ m/function\s+$class:(\w+)\s*\(/g)
+
+			if ($content =~ m/<private-static-properties>(.*)<\/private-static-properties>/s)
 			{
-				$sm{$class}{$1} = true;
-				delete $m{$class}{$1}
+				my $psp = $1;
+				while ($psp =~ m/local (\w+)\s*=/g)
+				{
+					$psp{$1} = true;
+				}
 			}
-		}
-		
-		if ($content =~ m/<public-methods>(.*)<\/public-methods>/s)
-		{
-			my $m = $1;
-			while ($m =~ m/local function (\w+)\(self/g)
+
+			if ($content =~ m/<private-static-methods>(.*)<\/private-static-methods>/s)
 			{
-				$m{$class}{$1} = true;
-				delete $sm{$class}{$1}
+				my $psm = $1;
+				while ($psm =~ m/local function (\w+)\s*=/g)
+				{
+					$psm{$1} = true;
+				}
 			}
-		}
-		
-		if ($content =~ m/<public-properties>(.*)<\/public-properties>/s)
-		{
-			my $p = $1;
-			while ($p =~ m/self\.(\w+)/g)
+
+			if ($content =~ m/<public-static-properties>(.*)<\/public-static-properties>/s)
 			{
-				$p{$class}{$1} = true;
+				my $sp = $1;
+				while ($sp =~ m/${class}\.(\w+)\s*=/g)
+				{
+					$sp{$class}{$1} = true;
+				}
 			}
-		}
-		
-		while ($content =~ m/\b([A-Z]\w+)\.(\w+)/g)
-		{
-			unless ($sp{$1}{$2} or $p{$1}{$2})
+
+			if ($content =~ m/<public-static-methods>(.*)<\/public-static-methods>/s)
 			{
-				$sp{$1}{$2} = $class;
+				my $sm = $1;
+				while ($sm =~ m/function\s+$class:(\w+)\s*\(/g)
+				{
+					$sm{$class}{$1} = true;
+					delete $m{$class}{$1}
+				}
 			}
-		}
-		
-		while ($content =~ m/\b([A-Z]\w+)\:(\w+)/g)
-		{
-			unless ($sm{$1}{$2} or $m{$1}{$2})
+
+			if ($content =~ m/<public-methods>(.*)<\/public-methods>/s)
 			{
-				$sm{$1}{$2} = $class;
+				my $m = $1;
+				while ($m =~ m/local function (\w+)\(self/g)
+				{
+					$m{$class}{$1} = true;
+					delete $sm{$class}{$1}
+				}
 			}
-		}
-		
-		while ($content =~ m/self\.([a-z]\w*)/g)
-		{
-			#if ($class eq 'OvaleSwing')
-			#{
-			#	print $1," ",$sp{$class}{$1}," ",$pp{$1}, " ", $p{$class}{$1},"\n";
-			#}
-			unless ($sp{$class}{$1} eq true or $pp{$1} eq true or $p{$class}{$1} eq true)
+
+			if ($content =~ m/<public-properties>(.*)<\/public-properties>/s)
 			{
-				print "La classe $class ne contient pas la propriété $1\n";
+				my $p = $1;
+				while ($p =~ m/self\.(\w+)/g)
+				{
+					$p{$class}{$1} = true;
+				}
 			}
-		}
-		
-		while ($content =~ m/self\:(\w+)/g)
-		{
-			unless ($sm{$class}{$1} eq true or $pm{$1} eq true or $m{$class}{$1} eq true)
+
+			while ($content =~ m/\b([A-Z]\w+)\.(\w+)/g)
 			{
-				print "La classe $class ne contient pas la méthode $1\n";
+				unless ($sp{$1}{$2} or $p{$1}{$2})
+				{
+					$sp{$1}{$2} = $class;
+				}
+			}
+
+			while ($content =~ m/\b([A-Z]\w+)\:(\w+)/g)
+			{
+				unless ($sm{$1}{$2} or $m{$1}{$2})
+				{
+					$sm{$1}{$2} = $class;
+				}
+			}
+
+			while ($content =~ m/self\.([a-z]\w*)/g)
+			{
+				#if ($class eq 'OvaleSwing')
+				#{
+				#	print $1," ",$sp{$class}{$1}," ",$pp{$1}, " ", $p{$class}{$1},"\n";
+				#}
+				unless ($sp{$class}{$1} eq true or $pp{$1} eq true or $p{$class}{$1} eq true)
+				{
+					print "La classe $class ne contient pas la propriété $1\n";
+				}
+			}
+
+			while ($content =~ m/self\:(\w+)/g)
+			{
+				unless ($sm{$class}{$1} eq true or $pm{$1} eq true or $m{$class}{$1} eq true)
+				{
+					print "La classe $class ne contient pas la méthode $1\n";
+				}
 			}
 		}
 	}
 }
+
+opendir(my $dh, ".");
+ParseDirectory($dh);
+closedir($dh);
+opendir($dh, "conditions");
+ParseDirectory($dh);
+closedir($dh);
+opendir($dh, "scripts");
+ParseDirectory($dh);
+closedir($dh);
 
 for my $class (keys %sm)
 {
