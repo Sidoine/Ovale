@@ -90,15 +90,7 @@ $m{Skada}{get_player} = true;
 $p{Skada}{current} = true;
 $p{Skada}{total} = true;
 
-$sp{Ovale}{OvaleBestAction} = true;
-$sp{Ovale}{OvaleCondition} = true;
-$sp{Ovale}{OvaleData} = true;
-$sp{Ovale}{OvaleQueue} = true;
-$sp{Ovale}{OvalePool} = true;
-$sp{Ovale}{OvalePoolGC} = true;
 $sp{Ovale}{OvaleSkada} = true;
-$sp{Ovale}{OvaleState} = true;
-$sp{Ovale}{OvaleTimeSpan} = true;
 
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;

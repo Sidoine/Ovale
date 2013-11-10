@@ -10,7 +10,7 @@
 
 local _, Ovale = ...
 local Skada = LibStub("AceAddon-3.0"):GetAddon("Skada", true)
-local OvaleSkada = Skada and Skada:NewModule("Ovale Spell Priority") or {}
+local OvaleSkada = Skada and Skada:NewModule("Ovale Spell Priority") or Ovale:NewModule("OvaleSkada")
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>

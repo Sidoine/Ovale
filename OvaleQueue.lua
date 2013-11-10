@@ -9,7 +9,7 @@
 
 -- Double-ended queue.
 local _, Ovale = ...
-local OvaleQueue = {}
+local OvaleQueue = Ovale:NewModule("OvaleQueue")
 Ovale.OvaleQueue = OvaleQueue
 
 --<private-static-properties>

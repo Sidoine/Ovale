@@ -11,7 +11,7 @@
 -- Keep the current state in the simulation
 
 local _, Ovale = ...
-OvaleState = {}
+local OvaleState = Ovale:NewModule("OvaleState")
 Ovale.OvaleState = OvaleState
 
 --<private-static-properties>

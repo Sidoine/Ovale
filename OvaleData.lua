@@ -9,7 +9,7 @@
 --]]--------------------------------------------------------------------
 
 local _, Ovale = ...
-local OvaleData = {}
+local OvaleData = Ovale:NewModule("OvaleData")
 Ovale.OvaleData = OvaleData
 
 --<private-static-properties>

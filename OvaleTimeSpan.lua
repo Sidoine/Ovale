@@ -21,7 +21,7 @@
 --]]
 
 local _, Ovale = ...
-local OvaleTimeSpan = {}
+local OvaleTimeSpan = Ovale:NewModule("OvaleTimeSpan")
 Ovale.OvaleTimeSpan = OvaleTimeSpan
 
 --<private-static-properties>

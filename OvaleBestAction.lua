@@ -9,7 +9,7 @@
 --]]--------------------------------------------------------------------
 
 local _, Ovale = ...
-local OvaleBestAction = {}
+local OvaleBestAction = Ovale:NewModule("OvaleBestAction")
 Ovale.OvaleBestAction = OvaleBestAction
 
 --<private-static-properties>
