@@ -83,8 +83,8 @@ do
 		local blood, frost, unholy, death, nodeath = ParseRuneCondition(condition)
 		local seconds = OvaleState:GetRunesCooldown(blood, frost, unholy, death, nodeath)
 		if seconds then
-			if seconds < OvaleState.maintenant then
-				seconds = OvaleState.maintenant
+			if seconds < OvaleState.now then
+				seconds = OvaleState.now
 			end
 			return 0, OvaleState.currentTime + seconds, seconds, OvaleState.currentTime, -1
 		end

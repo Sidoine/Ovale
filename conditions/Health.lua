@@ -65,7 +65,7 @@ do
 			Ovale:Log("Training Dummy, return in the future")
 			timeToDie = math.huge
 		else
-			local now = floor(OvaleState.maintenant)
+			local now = floor(OvaleState.now)
 			if (not lastTTDTime[unitId] or lastTTDTime[unitId] < now) and lastTTDguid[unitId] then
 				lastTTDTime[unitId] = now
 				local mod10, prevHealth
@@ -121,8 +121,8 @@ do
 		elseif timeToDie == 0 then
 			return Compare(0, comparator, limit)
 		end
-		local value, origin, rate = health, OvaleState.maintenant, -1 * health / timeToDie
-		local start, ending = OvaleState.maintenant, math.huge
+		local value, origin, rate = health, OvaleState.now, -1 * health / timeToDie
+		local start, ending = OvaleState.now, math.huge
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -152,8 +152,8 @@ do
 			return nil
 		end
 		local missing = maxHealth - health
-		local value, origin, rate = missing, OvaleState.maintenant, health / timeToDie
-		local start, ending = OvaleState.maintenant, math.huge
+		local value, origin, rate = missing, OvaleState.now, health / timeToDie
+		local start, ending = OvaleState.now, math.huge
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -185,8 +185,8 @@ do
 			return Compare(0, comparator, limit)
 		end
 		local healthPercent = health / maxHealth * 100
-		local value, origin, rate = healthPercent, OvaleState.maintenant, -1 * healthPercent / timeToDie
-		local start, ending = OvaleState.maintenant, math.huge
+		local value, origin, rate = healthPercent, OvaleState.now, -1 * healthPercent / timeToDie
+		local start, ending = OvaleState.now, math.huge
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -234,8 +234,8 @@ do
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
 		local timeToDie = EstimatedTimeToDie(target)
-		local value, origin, rate = timeToDie, OvaleState.maintenant, -1
-		local start, ending = OvaleState.maintenant, OvaleState.maintenant + timeToDie
+		local value, origin, rate = timeToDie, OvaleState.now, -1
+		local start, ending = OvaleState.now, OvaleState.now + timeToDie
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -264,8 +264,8 @@ do
 		local healthPercent = health / maxHealth * 100
 		if healthPercent >= percent then
 			local t = timeToDie * (healthPercent - percent) / healthPercent
-			local value, origin, rate = t, OvaleState.maintenant, -1
-			local start, ending = OvaleState.maintenant, OvaleState.maintenant + t
+			local value, origin, rate = t, OvaleState.now, -1
+			local start, ending = OvaleState.now, OvaleState.now + t
 			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		end
 		return Compare(0, comparator, limit)

@@ -798,7 +798,7 @@ function OvaleBestAction:GetActionInfo(element)
 		local texture = element.params[1]
 		actionTexture = "Interface\\Icons\\" .. texture
 		actionInRange = nil
-		actionCooldownStart = OvaleState.maintenant
+		actionCooldownStart = OvaleState.now
 		actionCooldownDuration = 0
 		actionEnable = 1
 		actionUsable = true

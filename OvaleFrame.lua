@@ -135,7 +135,7 @@ do
 					-- print("sort "..spellId.." parfait")
 					return 1
 				else
-					local lag = OvaleState.maintenant - action.waitStart
+					local lag = OvaleState.now - action.waitStart
 					if lag>5 then
 					-- 	print("sort "..spellId.." ignoré (>5s)")
 						return nil
@@ -202,7 +202,7 @@ do
 					end
 					local value
 					if element.value and element.origin and element.rate then
-						value = element.value + (OvaleState.maintenant - element.origin) * element.rate
+						value = element.value + (OvaleState.now - element.origin) * element.rate
 					end
 					icons[1]:SetValue(value, actionTexture)
 					if #icons > 1 then
@@ -221,7 +221,7 @@ do
 					if start and OvaleState.currentSpellId and OvaleState.attenteFinCast and spellId == OvaleState.currentSpellId and start<OvaleState.attenteFinCast then
 						start = OvaleState.attenteFinCast
 					end
-						if (node.params.nocd and start~=nil and OvaleState.maintenant<start-node.params.nocd) then
+						if (node.params.nocd and start~=nil and OvaleState.now<start-node.params.nocd) then
 						icons[1]:Update(element, nil)
 					else
 						icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -229,16 +229,16 @@ do
 					end
 
 					action.spellId = spellId
-					if start == OvaleState.maintenant and actionUsable then
+					if start == OvaleState.now and actionUsable then
 						if not action.waitStart then
-							action.waitStart = OvaleState.maintenant
+							action.waitStart = OvaleState.now
 						end
 					else
 						action.waitStart = nil
 					end
 
 					if profile.apparence.moving and icons[1].debutAction and icons[1].finAction then
-						local top=1-(OvaleState.maintenant - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
+						local top=1-(OvaleState.now - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
 						if top<0 then
 							top = 0
 						elseif top>1 then

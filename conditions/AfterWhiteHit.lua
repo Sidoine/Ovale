@@ -24,7 +24,7 @@ do
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local start = OvaleSwing.starttime
 		local ending = start + OvaleSwing.duration
-		local now = OvaleState.maintenant
+		local now = OvaleState.now
 		local value
 		if now - start < seconds then
 			value = 0
@@ -33,7 +33,7 @@ do
 		else
 			value = 0.1
 		end
-		return TestValue(start, math.huge, value, OvaleState.maintenant, -1, comparator, limit)
+		return TestValue(start, math.huge, value, now, -1, comparator, limit)
 	end
 
 	--OvaleCondition:RegisterCondition("afterwhitehit", false, AfterWhiteHit)

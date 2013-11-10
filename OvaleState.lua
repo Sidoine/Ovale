@@ -54,12 +54,13 @@ local STARFALL = 48505
 --</private-static-properties>
 
 --<public-static-properties>
---the state in the current frame
+-- The state in the current frame
 OvaleState.state = {}
---The spell being cast
+-- Legacy table for transition.
+OvaleState.powerRate = nil
+-- The spell being cast
 OvaleState.currentSpellId = nil
 OvaleState.now = nil
-OvaleState.maintenant = nil
 OvaleState.currentTime = nil
 OvaleState.attenteFinCast = nil
 OvaleState.startCast = nil
@@ -123,7 +124,6 @@ function OvaleState:StartNewFrame()
 		self:InitializeState()
 	end
 	self.now = API_GetTime()
-	self.maintenant = self.now
 	self.gcd = self:GetGCD()
 end
 
@@ -143,10 +143,10 @@ end
 
 function OvaleState:Reset()
 	self.lastSpellId = Ovale.lastSpellcast and Ovale.lastSpellcast.spellId
-	self.currentTime = self.maintenant
+	self.currentTime = self.now
 	Ovale:Logf("Reset state with current time = %f", self.currentTime)
 	self.currentSpellId = nil
-	self.attenteFinCast = self.maintenant
+	self.attenteFinCast = self.now
 
 	self:InvokeMethod("ResetState")
 
@@ -200,10 +200,10 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 
 	-- Set the current time in the simulator to a little after the start of the current cast,
 	-- or to now if in the past.
-	if startCast >= self.maintenant then
+	if startCast >= self.now then
 		self.currentTime = startCast + 0.1
 	else
-		self.currentTime = self.maintenant
+		self.currentTime = self.now
 	end
 
 	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.attenteFinCast, endCast, targetGUID)
@@ -231,7 +231,7 @@ function OvaleState:ApplySpellOnPlayer(spellId, startCast, endCast, nextCast, no
 		If the spellcast has already ended, then the effects have already occurred,
 		so only consider spells that have not yet finished casting in the simulator.
 	--]]
-	if endCast > self.maintenant then
+	if endCast > self.now then
 		-- Adjust the spell's cooldown.
 		self:ApplySpellCooldown(spellId, startCast, endCast, nocd)
 

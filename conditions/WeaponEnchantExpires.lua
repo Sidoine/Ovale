@@ -36,13 +36,13 @@ do
 				return 0, math.huge
 			end
 			mainHandExpiration = mainHandExpiration / 1000
-			return OvaleState.maintenant + mainHandExpiration - seconds, math.huge
+			return OvaleState.now + mainHandExpiration - seconds, math.huge
 		else
 			if not hasOffHandEnchant then
 				return 0, math.huge
 			end
 			offHandExpiration = offHandExpiration / 1000
-			return OvaleState.maintenant + offHandExpiration - seconds, math.huge
+			return OvaleState.now + offHandExpiration - seconds, math.huge
 		end
 	end
 
