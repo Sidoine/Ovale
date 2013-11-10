@@ -37,7 +37,7 @@ function OvaleScripts:GetDescriptions(scriptType)
 end
 
 function OvaleScripts:RegisterScript(class, name, description, code, scriptType)
-	if class == OvalePaperDoll.class then
+	if not class or class == OvalePaperDoll.class then
 		self.script[name] = self.script[name] or {}
 		local script = self.script[name]
 		script.type = scriptType or "script"
