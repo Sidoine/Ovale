@@ -11,7 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleState = Ovale.OvaleState
+	local OvaleCooldown = Ovale.OvaleCooldown
 
 	local Compare = OvaleCondition.Compare
 
@@ -28,7 +28,7 @@ do
 
 	local function GCD(condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleState.gcd
+		local value = OvaleCooldown:GetGCD()
 		return Compare(value, comparator, limit)
 	end
 

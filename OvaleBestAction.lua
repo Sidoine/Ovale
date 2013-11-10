@@ -15,6 +15,7 @@ Ovale.OvaleBestAction = OvaleBestAction
 --<private-static-properties>
 local OvaleActionBar = Ovale.OvaleActionBar
 local OvaleCondition = Ovale.OvaleCondition
+local OvaleCooldown = Ovale.OvaleCooldown
 local OvaleData = Ovale.OvaleData
 local OvaleEquipement = Ovale.OvaleEquipement
 local OvaleFuture = Ovale.OvaleFuture
@@ -513,8 +514,9 @@ local function ComputeGroup(element)
 			if currentElement then
 				currentCastTime = currentElement.castTime
 			end
-			if not currentCastTime or currentCastTime < OvaleState.gcd then
-				currentCastTime = OvaleState.gcd
+			local gcd = OvaleCooldown:GetGCD()
+			if not currentCastTime or currentCastTime < gcd then
+				currentCastTime = gcd
 			end
 
 			local replace = false
@@ -724,7 +726,7 @@ function OvaleBestAction:GetActionInfo(element)
 
 		actionTexture = actionTexture or API_GetSpellTexture(spellId)
 		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
-		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState:GetComputedSpellCD(spellId)
+		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleState.state:GetSpellCooldown(spellId)
 
 		-- Verify that the spell may be cast given restrictions specified in SpellInfo().
 		local si = OvaleData.spellInfo[spellId]

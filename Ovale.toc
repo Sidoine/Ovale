@@ -42,6 +42,7 @@ OvaleState.lua
 #
 OvaleAura.lua
 OvaleComboPoints.lua
+OvaleCooldown.lua
 OvalePower.lua
 OvaleRecount.lua
 OvaleScripts.lua

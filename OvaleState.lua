@@ -9,6 +9,7 @@
 --]]--------------------------------------------------------------------
 
 -- Keep the current state in the simulation
+-- XXX Split out Eclipse and Runes modules (Druid and DeathKnight modules?).
 
 local _, Ovale = ...
 local OvaleState = Ovale:NewModule("OvaleState")
@@ -16,26 +17,16 @@ Ovale.OvaleState = OvaleState
 
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
-local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleQueue = Ovale.OvaleQueue
 local OvaleSpellBook = Ovale.OvaleSpellBook
-local OvaleStance = Ovale.OvaleStance
 
-local floor = math.floor
 local pairs = pairs
 local select = select
-local tinsert = table.insert
-local tremove = table.remove
-local tostring = tostring
-local type = type
-local wipe = table.wipe
 local API_GetEclipseDirection = GetEclipseDirection
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetTime = GetTime
-local API_UnitHealth = UnitHealth
-local API_UnitHealthMax = UnitHealthMax
 
 local self_statePrototype = {}
 local self_stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
@@ -65,7 +56,6 @@ OvaleState.currentTime = nil
 OvaleState.nextCast = nil
 OvaleState.startCast = nil
 OvaleState.endCast = nil
-OvaleState.gcd = 1.5
 OvaleState.lastSpellId = nil
 --</public-static-properties>
 
@@ -124,7 +114,6 @@ function OvaleState:StartNewFrame()
 		self:InitializeState()
 	end
 	self.now = API_GetTime()
-	self.gcd = self:GetGCD()
 end
 
 function OvaleState:InitializeState()
@@ -164,12 +153,6 @@ function OvaleState:Reset()
 				end
 			end
 		end
-	end
-	for k,v in pairs(self.state.cd) do
-		v.start = nil
-		v.duration = nil
-		v.enable = 0
-		v.toggled = nil
 	end
 end
 
@@ -232,9 +215,6 @@ function OvaleState:ApplySpellOnPlayer(spellId, startCast, endCast, nextCast, no
 		so only consider spells that have not yet finished casting in the simulator.
 	--]]
 	if endCast > self.now then
-		-- Adjust the spell's cooldown.
-		self:ApplySpellCooldown(spellId, startCast, endCast, nocd)
-
 		-- Adjust the player's resources.
 		self:ApplySpellCost(spellId, startCast, endCast)
 	end
@@ -243,60 +223,6 @@ end
 -- Apply the effects of the spell on the target's state when it lands on the target.
 function OvaleState:ApplySpellOnTarget(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	self:InvokeMethod("ApplySpellOnTarget", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
-end
-
--- Adjust a spell cooldown in the simulator.
-function OvaleState:ApplySpellCooldown(spellId, startCast, endCast, nocd)
-	local si = OvaleData.spellInfo[spellId]
-	if si then
-		local cd = self:GetCD(spellId)
-		if cd then
-			cd.start = startCast
-			cd.duration = si.cd or 0
-
-			-- Test for no cooldown.
-			if nocd then
-				cd.duration = 0
-			else
-				-- There is no cooldown if the buff named by "buffnocd" parameter is present.
-				if si.buffnocd then
-					local start, ending, stacks = self:GetAura("player", si.buffnocd)
-					if start and stacks and stacks > 0 then
-						Ovale:Logf("buffnocd stacks = %s, start = %s, ending = %s, startCast = %f", stacks, start, ending, startCast)
-						-- XXX Shouldn't this be (not ending or ending > endCast)?
-						-- XXX The spellcast needs to finish before the buff expires.
-						if start <= startCast and (not ending or ending > startCast) then
-							cd.duration = 0
-						end
-					end
-				end
-
-				-- There is no cooldown if the target's health percent is below what's specified
-				-- with the "targetlifenocd" parameter.
-				if si.targetlifenocd then
-					local healthPercent = API_UnitHealth("target") / API_UnitHealthMax("target") * 100
-					if healthPercent < si.targetlifenocd then
-						cd.duration = 0
-					end
-				end
-			end
-
-			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
-			if cd.duration > 0 and si.cd_haste then
-				if si.cd_haste == "melee" then
-					cd.duration = cd.duration / OvalePaperDoll:GetMeleeHasteMultiplier()
-				elseif si.cd_haste == "spell" then
-					cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
-				end
-			end
-
-			cd.enable = 1
-			if si.toggle then
-				cd.toggled = 1
-			end
-			Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
-		end
-	end
 end
 
 -- Adjust the player's resources in the simulator from casting the given spell.
@@ -352,120 +278,6 @@ function OvaleState:ApplySpellCost(spellId, startCast, endCast)
 			AddRune(startCast, 4, si.death)
 		end
 	end
-end
-
--- Return the GCD after the given spellId is cast.
--- If no spellId is given, then returns the GCD after a "yellow-hit" ability has been cast.
-function OvaleState:GetGCD(spellId)
-	-- Use SpellInfo() information if available.
-	if spellId and OvaleData.spellInfo[spellId] then
-		local si = OvaleData.spellInfo[spellId]
-		if si.haste then
-			local cd = si.gcd or 1.5
-			if si.haste == "melee" then
-				cd = cd / OvalePaperDoll:GetMeleeHasteMultiplier()
-			elseif si.haste == "spell" then
-				cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
-			end
-			if cd < 1 then
-				cd = 1
-			end
-			return cd
-		elseif si.gcd then
-			return si.gcd
-		end
-	end
-
-	-- Default value.
-	local class = OvalePaperDoll.class
-	local isCaster = false
-	if class == "DRUID" and not (OvaleStance:IsStance("druid_bear_form") or OvaleStance:IsStance("druid_cat_form")) then
-		isCaster = true
-	elseif class == "MAGE" then
-		isCaster = true
-	elseif class == "PRIEST" then
-		isCaster = true
-	elseif class == "SHAMAN" then
-		isCaster = true
-	elseif class == "WARLOCK" then
-		isCaster = true
-	end
-	if isCaster then
-		local cd = 1.5 / OvalePaperDoll:GetSpellHasteMultiplier()
-		if cd < 1 then
-			cd = 1
-		end
-		return cd
-	elseif class == "DEATHKNIGHT" then
-		return 1.0
-	elseif class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
-		return 1.0
-	elseif class == "MONK" then
-		return 1.0
-	elseif class == "ROGUE" then
-		return 1.0
-	else
-		return 1.5
-	end
-end
-
-function OvaleState:GetCD(spellId)
-	if not spellId then
-		return nil
-	end
-	local si = OvaleData.spellInfo[spellId]
-	if si and si.cd then
-		local cdname
-		if si.sharedcd then
-			cdname = si.sharedcd
-		else
-			cdname = spellId
-		end
-		if not self.state.cd[cdname] then
-			self.state.cd[cdname] = {}
-		end
-		return self.state.cd[cdname]
-	else
-		return nil
-	end
-end
-
---Compute the spell Cooldown
-function OvaleState:GetComputedSpellCD(spellId)
-	local actionCooldownStart, actionCooldownDuration, actionEnable
-	local cd = self:GetCD(spellId)
-	if cd and cd.start then
-		actionCooldownStart = cd.start
-		actionCooldownDuration = cd.duration
-		actionEnable = cd.enable
-	else
-		actionCooldownStart, actionCooldownDuration, actionEnable = OvaleData:GetSpellCD(spellId)
-	end
-	return actionCooldownStart, actionCooldownDuration, actionEnable
-end
-
-function OvaleState:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
-	return self.state:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
-end
-
-function OvaleState:GetAura(unitId, spellId, filter, mine, auraFound)
-	return self.state:GetAura(unitId, spellId, filter, mine, auraFound)
-end
-
-function OvaleState:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-	return self.state:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-end
-
-function OvaleState:NewAura(guid, spellId, filter)
-	return self.state:NewAura(guid, spellId, filter)
-end
-
-function OvaleState:GetDamageMultiplier(spellId)
-	return self.state:GetDamageMultiplier(spellId)
-end
-
-function OvaleState:GetDuration(auraSpellId)
-	return self.state:GetDuration(auraSpellId)
 end
 
 -- Returns 1 if moving toward Solar or -1 if moving toward Lunar.

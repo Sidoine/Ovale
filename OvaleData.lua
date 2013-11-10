@@ -269,12 +269,13 @@ function OvaleData:NeedNewSnapshot(auraSpellId, spellId)
 end
 
 --Compute the spell Cooldown
-function OvaleData:GetSpellCD(spellId)
-	local actionCooldownStart, actionCooldownDuration, actionEnable = API_GetSpellCooldown(spellId)
-	if self.spellInfo[spellId] and self.spellInfo[spellId].forcecd then
-		actionCooldownStart, actionCooldownDuration = API_GetSpellCooldown(self.spellInfo[spellId].forcecd)
+function OvaleData:GetSpellCooldown(spellId)
+	local start, duration, enable = API_GetSpellCooldown(spellId)
+	local si = self.spellInfo[spellId]
+	if si and si.forcecd then
+		start, duration = API_GetSpellCooldown(si.forcecd)
 	end
-	return actionCooldownStart, actionCooldownDuration, actionEnable
+	return start, duration, enable
 end
 
 --Compute the damage of the given spell.
