@@ -14,6 +14,7 @@ Ovale.OvaleCooldown = OvaleCooldown
 
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
+local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
@@ -135,8 +136,9 @@ function OvaleCooldown:ApplySpellOnPlayer(state, spellId, startCast, endCast, ne
 
 				-- There is no cooldown if the target's health percent is below what's specified
 				-- with the "targetlifenocd" parameter.
-				if si.targetlifenocd then
-					local healthPercent = API_UnitHealth("target") / API_UnitHealthMax("target") * 100
+				local target = OvaleGUID:GetUnitId(targetGUID)
+				if target and si.targetlifenocd then
+					local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
 					if healthPercent < si.targetlifenocd then
 						cd.duration = 0
 					end
