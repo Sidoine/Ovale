@@ -271,7 +271,7 @@ sub ParseDirectory
 				#}
 				unless ($sp{$class}{$1} eq true or $pp{$1} eq true or $p{$class}{$1} eq true)
 				{
-					print "La classe $class ne contient pas la propriété $1\n";
+					print "The class $class does not contain the property $1\n";
 				}
 			}
 
@@ -279,7 +279,7 @@ sub ParseDirectory
 			{
 				unless ($sm{$class}{$1} eq true or $pm{$1} eq true or $m{$class}{$1} eq true)
 				{
-					print "La classe $class ne contient pas la méthode $1\n";
+					print "The class $class does not contain the method $1\n";
 				}
 			}
 		}
