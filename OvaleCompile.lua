@@ -56,7 +56,6 @@ local self_compileOnStances = false
 
 local OVALE_COMPILE_DEBUG = "compile"
 local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
-local OVALE_UNKNOWN_FUNCTION_DEBUG = "unknown_function"
 local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
 
 -- Parameters used as conditionals in script declarations.
@@ -814,11 +813,9 @@ local function CompileScript(text)
 	end
 
 	-- Verify that all the functions called within the script are defined.
-	-- Not an error if a function is undefined (might be unreachable code), but complain
-	-- at run-time during compilation.
 	for p, v in pairs(self_functionCalls) do
 		if not (OVALE_FUNCTIONS[p] or self_customFunctions[p] or OvaleCondition:IsCondition(p)) then
-			Ovale:DebugPrintf(OVALE_UNKNOWN_FUNCTION_DEBUG, "Unknown function call: %s (node%s)", p, v.nodeId)
+			Ovale:Errorf("Unknown function call: %s (node%s)", p, v.nodeId)
 		end
 	end
 
