@@ -179,13 +179,13 @@ function OvaleEclipse:ApplySpellOnPlayer(state, spellId, startCast, endCast, nex
 			if eclipse <= -100 then
 				eclipse = -100
 				direction = 1
-				state:AddEclipse(endCast, LUNAR_ECLIPSE)
+				state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, "HELPFUL", true, endCast, math.huge)
 				-- Reaching Lunar Eclipse resets the cooldown of Starfall.
 				state:ResetSpellCooldown(LUNAR_ECLIPSE, endCast)
 			elseif eclipse >= 100 then
 				eclipse = 100
 				direction = -1
-				state:AddEclipse(endCast, SOLAR_ECLIPSE)
+				state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, "HELPFUL", true, endCast, math.huge)
 			end
 		end
 		state.eclipse = eclipse

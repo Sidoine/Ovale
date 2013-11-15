@@ -691,7 +691,7 @@ do
 				end
 
 				local start, ending, currentStacks, tick = state:GetAuraByGUID(guid, auraId, filter, true, target)
-				local newAura = state:NewAura(guid, auraId, filter)
+				local newAura = state:NewAura(guid, auraId, filter, OvaleState.currentTime)
 				newAura.mine = true
 
 				--[[
@@ -864,7 +864,7 @@ do
 		return start, ending, count
 	end
 
-	function statePrototype:NewAura(guid, spellId, filter)
+	function statePrototype:NewAura(guid, spellId, filter, gain)
 		local state = self
 		if not state.aura[guid] then
 			state.aura[guid] = {}
@@ -878,7 +878,7 @@ do
 		local aura = state.aura[guid][filter][spellId]
 		aura.serial = state.serial
 		aura.mine = true
-		aura.gain = OvaleState.currentTime
+		aura.gain = gain
 		return aura
 	end
 
@@ -944,12 +944,13 @@ do
 		end
 	end
 
-	-- Track a new Eclipse buff that starts at timestamp.
-	function statePrototype:AddEclipse(timestamp, spellId)
+	-- Add a new aura to the unit specified by GUID.
+	function statePrototype:AddAuraToGUID(guid, spellId, filter, mine, start, ending)
 		local state = self
-		local aura = state:NewAura(self_guid, spellId, "HELPFUL")
-		aura.start = timestamp
-		aura.ending = nil
+		local aura = state:NewAura(guid, spellId, filter, start)
+		aura.mine = mine
+		aura.start = start
+		aura.ending = ending
 		aura.stacks = 1
 	end
 end
