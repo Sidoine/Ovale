@@ -37,7 +37,7 @@ local self_pool = OvalePool("OvaleAura_pool")
 -- self_aura[guid] pool
 local self_aura_pool = OvalePool("OvaleAura_aura_pool")
 -- player's GUID
-local self_player_guid = nil
+local self_guid = nil
 -- self_aura[guid][filter][spellId][casterGUID] = { aura properties }
 local self_aura = {}
 -- self_serial[guid] = aura age
@@ -85,7 +85,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 	end
 
 	casterGUID = casterGUID or OVALE_UNKNOWN_GUID
-	local mine = (casterGUID == self_player_guid)
+	local mine = (casterGUID == self_guid)
 	local existingAura, aura
 	local now = API_GetTime()
 	existingAura = self_aura[guid][filter][spellId][casterGUID]
@@ -283,11 +283,11 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		local serial = self_serial[guid]
 		filter = "HARMFUL"
 		while true do
-			if self_aura[guid][filter] and self_aura[guid][filter][spellId] and self_aura[guid][filter][spellId][self_player_guid] then
-				if RemoveAuraIfExpired(guid, spellId, filter, self_aura[guid][filter][spellId][self_player_guid], serial) then
-					self_aura[guid][filter][spellId][self_player_guid] = nil
+			if self_aura[guid][filter] and self_aura[guid][filter][spellId] and self_aura[guid][filter][spellId][self_guid] then
+				if RemoveAuraIfExpired(guid, spellId, filter, self_aura[guid][filter][spellId][self_guid], serial) then
+					self_aura[guid][filter][spellId][self_guid] = nil
 				end
-				aura = self_aura[guid][filter][spellId][self_player_guid]
+				aura = self_aura[guid][filter][spellId][self_guid]
 			end
 			if aura then break end
 			if filter == "HARMFUL" then
@@ -322,7 +322,7 @@ end
 
 --<public-static-methods>
 function OvaleAura:OnEnable()
-	self_player_guid = OvaleGUID:GetGUID("player")
+	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
@@ -342,7 +342,7 @@ end
 
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-	local mine = sourceGUID == self_player_guid
+	local mine = sourceGUID == self_guid
 
 	if event == "UNIT_DIED" then
 		RemoveAurasForGUID(destGUID)
@@ -412,10 +412,10 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 				local whoseTable = auraList[spellId]
 				if whoseTable then
 					if mine then
-						if RemoveAuraIfExpired(guid, spellId, filter, whoseTable[self_player_guid], serial) then
-							whoseTable[self_player_guid] = nil
+						if RemoveAuraIfExpired(guid, spellId, filter, whoseTable[self_guid], serial) then
+							whoseTable[self_guid] = nil
 						end
-						aura = whoseTable[self_player_guid]
+						aura = whoseTable[self_guid]
 					else
 						for k, v in pairs(whoseTable) do
 							if RemoveAuraIfExpired(guid, spellId, filter, v, serial) then
@@ -434,7 +434,7 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 			if not filter or (filter == auraFilter) then
 				for auraId, whoseTable in pairs(auraList) do
 					for caster, aura in pairs(whoseTable) do
-						if not mine or caster == self_player_guid then
+						if not mine or caster == self_guid then
 							if RemoveAuraIfExpired(guid, auraId, filter, aura, serial) then
 								whoseTable[caster] = nil
 							end
@@ -535,7 +535,7 @@ function OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 					local whoseTable = auraList[spellId]
 					if whoseTable then
 						for caster, aura in pairs(whoseTable) do
-							if not mine or caster == self_player_guid then
+							if not mine or caster == self_guid then
 								if RemoveAuraIfExpired(guid, spellId, filter, aura, serial) then
 									whoseTable[caster] = nil
 								end
@@ -947,7 +947,7 @@ do
 	-- Track a new Eclipse buff that starts at timestamp.
 	function statePrototype:AddEclipse(timestamp, spellId)
 		local state = self
-		local aura = state:NewAura(self_player_guid, spellId, "HELPFUL")
+		local aura = state:NewAura(self_guid, spellId, "HELPFUL")
 		aura.start = timestamp
 		aura.ending = nil
 		aura.stacks = 1

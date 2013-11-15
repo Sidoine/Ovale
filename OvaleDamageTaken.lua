@@ -23,7 +23,7 @@ local select = select
 local API_GetTime = GetTime
 
 -- Player's GUID.
-local self_player_guid = nil
+local self_guid = nil
 -- Damage event pool.
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 -- Damage event queue: new events are inserted at the front of the queue.
@@ -47,7 +47,7 @@ end
 
 --<public-static-methods>
 function OvaleDamageTaken:OnEnable()
-	self_player_guid = OvaleGUID:GetGUID("player")
+	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 end
@@ -59,7 +59,7 @@ end
 
 function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-	if destGUID == self_player_guid and event:find("_DAMAGE") then
+	if destGUID == self_guid and event:find("_DAMAGE") then
 		local now = API_GetTime()
 		if event:find("SWING_") == 1 then
 			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
