@@ -49,7 +49,6 @@ OvaleCooldown.lua
 OvaleOptions.lua
 OvalePower.lua
 OvaleRecount.lua
-OvaleRunes.lua
 OvaleSkada.lua
 #
 OvaleCompile.lua
@@ -57,6 +56,7 @@ OvaleEclipse.lua
 OvaleFuture.lua
 OvaleIcone.lua
 OvaleIcone.xml
+OvaleRunes.lua
 #
 conditions\conditions.xml
 OvaleBestAction.lua

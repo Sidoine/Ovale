@@ -19,6 +19,7 @@ Ovale.OvaleRunes = OvaleRunes
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
 local OvalePaperDoll = Ovale.OvalePaperDoll
+local OvalePower = Ovale.OvalePower
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleStance = Ovale.OvaleStance
 local OvaleState = Ovale.OvaleState
@@ -164,11 +165,13 @@ end
 
 --[[----------------------------------------------------------------------------
 	State machine for simulator.
+
+	AFTER: OvalePower
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
 OvaleRunes.statePrototype = {
-	rune = nil,				-- indexed by slot (1 through 6)
+	rune = nil,	-- indexed by slot (1 through 6)
 }
 --</public-static-properties>
 
@@ -283,6 +286,16 @@ do
 			consumedRune.startCooldown = start
 			consumedRune.endCooldown = start + duration
 			consumedRune.active = false
+
+			-- Each rune consumed generates 10 (12, if in Frost Presence) runic power.
+			local runicpower = state.runicpower
+			if OvaleStance:IsStance("death_knight_frost_presence") then
+				runicpower = runicpower + 12
+			else
+				runicpower = runicpower + 10
+			end
+			local maxi = OvalePower.maxPower.runicpower
+			state.runicpower = (runicpower < maxi) and runicpower or maxi
 		else
 			Ovale:Errorf("No %s rune available to consume!", RUNE_NAME[runeType])
 		end
