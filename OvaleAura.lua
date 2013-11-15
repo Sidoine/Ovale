@@ -643,7 +643,7 @@ function OvaleAura:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleAura:ApplySpellOnPlayer(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleAura:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	-- If the spellcast has already ended, then the effects on the player have already occurred.
 	if endCast <= OvaleState.now then
 		return
@@ -657,7 +657,7 @@ function OvaleAura:ApplySpellOnPlayer(state, spellId, startCast, endCast, nextCa
 end
 
 -- Apply the effects of the spell on the target's state when it lands on the target.
-function OvaleAura:ApplySpellOnTarget(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleAura:ApplySpellOnHit(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.aura and si.aura.target then
 		-- Apply the auras on the target.

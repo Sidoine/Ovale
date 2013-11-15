@@ -522,7 +522,7 @@ function OvaleFuture:ResetState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvaleFuture:ApplySpellStart(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleFuture:ApplySpellStartCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	-- If the spellcast has already started, then the effects have already occurred.
 	if startCast < OvaleState.now then
 		return

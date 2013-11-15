@@ -146,12 +146,12 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 
 	--[[
 		Apply the effects of the spellcast in three phases.
-			1. Spell effects at the beginning of the cast.
-			2. Spell effects on player assuming the cast completes.
-			3. Spell effects on target when it lands.
+			1. Effects at the beginning of the spellcast.
+			2. Effects when the spell has been cast.
+			3. Effects when the spellcast hits the target.
 	--]]
-	self:InvokeMethod("ApplySpellStart", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
-	self:InvokeMethod("ApplySpellOnPlayer", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
-	self:InvokeMethod("ApplySpellOnTarget", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	self:InvokeMethod("ApplySpellStartCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	self:InvokeMethod("ApplySpellAfterCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	self:InvokeMethod("ApplySpellOnHit", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 end
 --</public-static-methods>

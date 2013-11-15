@@ -121,7 +121,7 @@ function OvaleComboPoints:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleComboPoints:ApplySpellOnPlayer(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleComboPoints:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 	-- If the spellcast has already ended, then the effects on the player have already occurred.
 	if endCast <= OvaleState.now then
 		return
