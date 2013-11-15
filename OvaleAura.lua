@@ -696,13 +696,14 @@ do
 					auraId=N, N < 0		N is number of stacks of aura removed
 					auraId=refresh		auraId is refreshed, no change to stacks
 				--]]
+				local atTime = isChanneled and startCast or endCast
 				if type(stacks) == "number" and stacks == 0 then
 					Ovale:Logf("Aura %d is completely removed", auraId)
 					newAura.stacks = 0
 					newAura.start = start
-					newAura.ending = endCast
-				elseif ending and endCast <= ending then
-					-- Spellcast ends before the aura expires.
+					newAura.ending = atTime
+				elseif ending and ((isChanneled and startCast < ending) or (not isChanneled and endCast <= ending)) then
+					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
 					if stacks == "refresh" or stacks > 0 then
 						if stacks == "refresh" then
 							Ovale:Logf("Aura %d is refreshed", auraId)
@@ -714,7 +715,7 @@ do
 						newAura.start = start
 						if isDoT and ending > newAura.start and tick and tick > 0 then
 							-- Add new duration after the next tick is complete.
-							local remainingTicks = floor((ending - endCast) / tick)
+							local remainingTicks = floor((ending - atTime) / tick)
 							newAura.ending = (ending - tick * remainingTicks) + duration
 							newAura.tick = OvaleAura:GetTickLength(auraId)
 							-- Re-snapshot stats for the DoT.
@@ -722,7 +723,7 @@ do
 							OvalePaperDoll:SnapshotStats(newAura, spellcast)
 							newAura.damageMultiplier = state:GetDamageMultiplier(auraId)
 						else
-							newAura.ending = endCast + duration
+							newAura.ending = atTime + duration
 						end
 						Ovale:Logf("Aura %d ending is now %f", auraId, newAura.ending)
 					elseif stacks < 0 then
@@ -733,14 +734,14 @@ do
 						if newAura.stacks <= 0 then
 							Ovale:Logf("Aura %d is completely removed", auraId)
 							newAura.stacks = 0
-							newAura.ending = endCast
+							newAura.ending = atTime
 						end
 					end
 				elseif type(stacks) == "number" and type(duration) == "number" and stacks > 0 and duration > 0 then
-					Ovale:Logf("New aura %d at %f on %s", auraId, endCast, guid)
+					Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
 					newAura.stacks = stacks
-					newAura.start = endCast
-					newAura.ending = endCast + duration
+					newAura.start = atTime
+					newAura.ending = atTime + duration
 					if isDoT then
 						newAura.tick = OvaleAura:GetTickLength(auraId)
 						-- Snapshot stats for the DoT.
