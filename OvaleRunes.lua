@@ -201,7 +201,8 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, startCast, endCast, next
 		for i, name in ipairs(RUNE_NAME) do
 			local count = si[name] or 0
 			while count > 0 do
-				state:ConsumeRune(endCast, name)
+				local attime = isChanneled and startCast or endCast
+				state:ConsumeRune(atTime, name)
 				count = count - 1
 			end
 		end

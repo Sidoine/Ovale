@@ -108,7 +108,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, startCast, endCast, n
 	if si then
 		local cd = state:GetCD(spellId)
 		if cd then
-			cd.start = startCast
+			cd.start = isChanneled and startCast or endCast
 			cd.duration = si.cd or 0
 			cd.enable = 1
 
