@@ -150,8 +150,14 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 			2. Effects when the spell has been cast.
 			3. Effects when the spellcast hits the target.
 	--]]
-	self:InvokeMethod("ApplySpellStartCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
-	self:InvokeMethod("ApplySpellAfterCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	-- If the spellcast has already started, then the effects have already occurred.
+	if startCast >= OvaleState.now then
+		self:InvokeMethod("ApplySpellStartCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	end
+	-- If the spellcast has already ended, then the effects have already occurred.
+	if endCast > OvaleState.now then
+		self:InvokeMethod("ApplySpellAfterCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	end
 	self:InvokeMethod("ApplySpellOnHit", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
 end
 --</public-static-methods>

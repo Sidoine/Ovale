@@ -523,11 +523,6 @@ end
 
 -- Apply the effects of the spell at the start of the spellcast.
 function OvaleFuture:ApplySpellStartCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
-	-- If the spellcast has already started, then the effects have already occurred.
-	if startCast < OvaleState.now then
-		return
-	end
-
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Increment and reset spell counters.
