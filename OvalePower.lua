@@ -232,7 +232,7 @@ function OvalePower:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvalePower:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvalePower:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 
 	-- Update power using information from GetSpellInfo() if there is no SpellInfo() for the spell's cost.

@@ -195,7 +195,7 @@ function OvaleRunes:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleRunes:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleRunes:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		for i, name in ipairs(RUNE_NAME) do

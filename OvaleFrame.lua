@@ -278,7 +278,7 @@ do
 							if spellTarget == "target" or not spellTarget then
 								spellTarget = target
 							end
-							OvaleState:ApplySpell(spellId, start, start + castTime, nextCast, false, OvaleGUID:GetGUID(spellTarget))
+							OvaleState:ApplySpell(spellId, start, start + castTime, nextCast, false, false, OvaleGUID:GetGUID(spellTarget))
 							timeSpan, _, element = OvaleBestAction:Compute(node)
 							start = NextTime(timeSpan, state.currentTime)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))

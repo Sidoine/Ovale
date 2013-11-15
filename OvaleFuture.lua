@@ -461,7 +461,7 @@ function OvaleFuture:ApplyInFlightSpells()
 		local spellcast = self_activeSpellcast[index]
 		Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 		if now - spellcast.stop < 5 then
-			OvaleState:ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target, spellcast)
+			OvaleState:ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast.nocd, spellcast.target, spellcast)
 		else
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
@@ -522,7 +522,7 @@ function OvaleFuture:ResetState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvaleFuture:ApplySpellStartCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleFuture:ApplySpellStartCast(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Increment and reset spell counters.

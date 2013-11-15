@@ -136,7 +136,7 @@ function OvaleEclipse:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleEclipse:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleEclipse:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.eclipse then
 		local eclipse = state.eclipse

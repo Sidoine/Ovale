@@ -643,20 +643,20 @@ function OvaleAura:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleAura:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleAura:ApplySpellAfterCast(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the player.
 	if si and si.aura and si.aura.player then
-		state:ApplySpellAuras(spellId, startCast, endCast, OvaleGUID:GetGUID("player"), si.aura.player, spellcast)
+		state:ApplySpellAuras(spellId, startCast, endCast, isChanneled, OvaleGUID:GetGUID("player"), si.aura.player, spellcast)
 	end
 end
 
 -- Apply the effects of the spell on the target's state when it lands on the target.
-function OvaleAura:ApplySpellOnHit(state, spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleAura:ApplySpellOnHit(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the target.
 	if si and si.aura and si.aura.target then
-		state:ApplySpellAuras(spellId, startCast, endCast, targetGUID, si.aura.target, spellcast)
+		state:ApplySpellAuras(spellId, startCast, endCast, isChanneled, targetGUID, si.aura.target, spellcast)
 	end
 end
 --</public-static-methods>
@@ -666,8 +666,9 @@ do
 	local statePrototype = OvaleAura.statePrototype
 
 	-- Apply the auras caused by the given spell in the simulator.
-	function statePrototype:ApplySpellAuras(spellId, startCast, endCast, guid, auraList, spellcast)
+	function statePrototype:ApplySpellAuras(spellId, startCast, endCast, isChanneled, guid, auraList, spellcast)
 		local state = self
+		local target = OvaleGUID:GetUnitId(guid)
 		for filter, filterInfo in pairs(auraList) do
 			for auraId, spellData in pairs(filterInfo) do
 				local si = OvaleData.spellInfo[auraId]

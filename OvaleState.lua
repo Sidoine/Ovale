@@ -37,6 +37,7 @@ OvaleState.now = nil
 OvaleState.nextCast = nil
 OvaleState.startCast = nil
 OvaleState.endCast = nil
+OvaleState.isChanneling = nil
 OvaleState.lastSpellId = nil
 
 -- The state for the simulator.
@@ -80,7 +81,7 @@ end
 function OvaleState:InvokeMethod(methodName, ...)
 	for _, addon in self_stateModules:Iterator() do
 		if addon[methodName] then
-			addon[methodName](addon, self.state, ...)
+			addon[methodName](addon, ...)
 		end
 	end
 end
@@ -93,7 +94,7 @@ function OvaleState:StartNewFrame()
 end
 
 function OvaleState:InitializeState()
-	self:InvokeMethod("InitializeState")
+	self:InvokeMethod("InitializeState", self.state)
 	self_stateIsInitialized = true
 end
 
@@ -104,9 +105,10 @@ function OvaleState:Reset()
 
 	self.lastSpellId = Ovale.lastSpellcast and Ovale.lastSpellcast.spellId
 	self.currentSpellId = nil
+	self.isChanneling = false
 	self.nextCast = self.now
 
-	self:InvokeMethod("ResetState")
+	self:InvokeMethod("ResetState", self.state)
 end
 
 --[[
@@ -117,11 +119,13 @@ end
 		startCast	The time at the start of the spellcast.
 		endCast		The time at the end of the spellcast.
 		nextCast	The earliest time at which the next spell can be cast (nextCast >= endCast).
+		isChanneled	The spell is a channeled spell.
 		nocd		The spell's cooldown is not triggered.
 		targetGUID	The GUID of the target of the spellcast.
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
-function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+function OvaleState:ApplySpell(...)
+	local spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast = ...
 	if not spellId or not targetGUID then
 		return
 	end
@@ -132,6 +136,7 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 	self.currentSpellId = spellId
 	self.startCast = startCast
 	self.endCast = endCast
+	self.isChanneling = isChanneled
 	self.lastSpellId = spellId
 
 	-- Set the current time in the simulator to a little after the start of the current cast,
@@ -152,12 +157,12 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 	--]]
 	-- If the spellcast has already started, then the effects have already occurred.
 	if startCast >= OvaleState.now then
-		self:InvokeMethod("ApplySpellStartCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+		self:InvokeMethod("ApplySpellStartCast", self.state, ...)
 	end
 	-- If the spellcast has already ended, then the effects have already occurred.
 	if endCast > OvaleState.now then
-		self:InvokeMethod("ApplySpellAfterCast", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+		self:InvokeMethod("ApplySpellAfterCast", self.state, ...)
 	end
-	self:InvokeMethod("ApplySpellOnHit", spellId, startCast, endCast, nextCast, nocd, targetGUID, spellcast)
+	self:InvokeMethod("ApplySpellOnHit", self.state, ...)
 end
 --</public-static-methods>
