@@ -182,7 +182,7 @@ do
 		return nil
 	end
 
-	-- Return the cooldown for the given spell in the simulator.
+	-- Return the cooldown for the spell in the simulator.
 	function statePrototype:GetSpellCooldown(spellId)
 		local state = self
 		local start, duration, enable
@@ -195,5 +195,16 @@ do
 			start, duration, enable = OvaleData:GetSpellCooldown(spellId)
 		end
 		return start, duration, enable
+	end
+
+	-- Force the cooldown of a spell to reset at the specified time.
+	function statePrototype:ResetSpellCooldown(spellId, atTime)
+		local state = self
+		if atTime >= OvaleState.currentTime then
+			local cd = state:GetCD(spellId)
+			cd.start = OvaleState.currentTime
+			cd.duration = atTime - OvaleState.currentTime
+			cd.enable = 1
+		end
 	end
 end

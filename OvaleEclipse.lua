@@ -181,12 +181,7 @@ function OvaleEclipse:ApplySpellOnPlayer(state, spellId, startCast, endCast, nex
 				direction = 1
 				state:AddEclipse(endCast, LUNAR_ECLIPSE)
 				-- Reaching Lunar Eclipse resets the cooldown of Starfall.
-				local cd = state:GetCD(STARFALL)
-				if cd then
-					cd.start = 0
-					cd.duration = 0
-					cd.enable = 0
-				end
+				state:ResetSpellCooldown(LUNAR_ECLIPSE, endCast)
 			elseif eclipse >= 100 then
 				eclipse = 100
 				direction = -1
