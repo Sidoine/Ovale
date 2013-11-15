@@ -114,6 +114,8 @@ end
 
 --[[----------------------------------------------------------------------------
 	State machine for simulator.
+
+	AFTER: OvalePower
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
@@ -125,12 +127,11 @@ OvaleEclipse.statePrototype = {
 --<public-static-methods>
 -- Initialize the state.
 function OvaleEclipse:InitializeState(state)
-	state.eclipseDirection = nil
+	state.eclipseDirection = 0
 end
 
 -- Reset the state to the current conditions.
 function OvaleEclipse:ResetState(state)
-	state.eclipse = self.eclipse or 0
 	state.eclipseDirection = self.eclipseDirection
 end
 
