@@ -121,9 +121,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, startCast, endCast, n
 					local start, ending, stacks = state:GetAura("player", si.buffnocd)
 					if start and stacks and stacks > 0 then
 						Ovale:Logf("buffnocd stacks = %s, start = %s, ending = %s, startCast = %f", stacks, start, ending, startCast)
-						-- XXX Shouldn't this be (not ending or ending > endCast)?
-						-- XXX The spellcast needs to finish before the buff expires.
-						if start <= startCast and (not ending or ending > startCast) then
+						if start <= startCast and startCast < ending then
 							cd.duration = 0
 						end
 					end
