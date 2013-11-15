@@ -47,6 +47,7 @@ OvaleCooldown.lua
 OvaleOptions.lua
 OvalePower.lua
 OvaleRecount.lua
+OvaleRunes.lua
 OvaleSkada.lua
 OvaleSpellDamage.lua
 OvaleSwing.lua
