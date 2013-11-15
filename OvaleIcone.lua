@@ -247,7 +247,7 @@ function OvaleIcone_OnEnter(self)
 		if self.spellId then
 			GameTooltip:AddLine(OvaleSpellBook:GetSpellName(self.spellId), 0.5, 1, 0.75)
 		elseif self.value then
-			local value = (value < math.huge) and tostring(value) or "infinity"
+			local value = (self.value < math.huge) and tostring(self.value) or "infinity"
 			GameTooltip:AddLine(value, 0.5, 1, 0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
