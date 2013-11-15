@@ -11,7 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleDate = Ovale.OvaleData
+	local OvaleData = Ovale.OvaleData
 	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleFuture = Ovale.OvaleFuture
 
