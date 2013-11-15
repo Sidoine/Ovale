@@ -16,10 +16,8 @@ local OvaleEclipse = Ovale:NewModule("OvaleEclipse", "AceEvent-3.0")
 Ovale.OvaleEclipse = OvaleEclipse
 
 --<private-static-properties>
-local OvaleAura = Ovale.OvaleAura
 local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
-local OvalePower = Ovale.OvalePower
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleState = Ovale.OvaleState
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE

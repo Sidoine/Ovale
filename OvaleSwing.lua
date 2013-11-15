@@ -31,7 +31,6 @@ Ovale.OvaleSwing = OvaleSwing
 
 --<private-static-properties>
 local OvaleGUID = Ovale.OvaleGUID
-local OvalePaperDoll = Ovale.OvalePaperDoll
 
 local math_abs = math.abs
 local unpack = unpack
