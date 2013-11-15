@@ -172,6 +172,7 @@ do
 		self.lastUpdate = now
 
 		OvaleState:StartNewFrame()
+		local state = OvaleState.state
 		for k,node in pairs(OvaleCompile.masterNodes) do
 			local target
 			if node.params and node.params.target then
@@ -214,8 +215,8 @@ do
 							actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = OvaleBestAction:GetActionInfo(element)
 					if noRed then
 						start = actionCooldownStart + actionCooldownDuration
-						if start < OvaleState.currentTime then
-							start = OvaleState.currentTime
+						if start < state.currentTime then
+							start = state.currentTime
 						end
 					end
 						-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide

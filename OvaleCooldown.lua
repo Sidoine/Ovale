@@ -198,10 +198,10 @@ do
 	-- Force the cooldown of a spell to reset at the specified time.
 	function statePrototype:ResetSpellCooldown(spellId, atTime)
 		local state = self
-		if atTime >= OvaleState.currentTime then
+		if atTime >= state.currentTime then
 			local cd = state:GetCD(spellId)
-			cd.start = OvaleState.currentTime
-			cd.duration = atTime - OvaleState.currentTime
+			cd.start = state.currentTime
+			cd.duration = atTime - state.currentTime
 			cd.enable = 1
 		end
 	end

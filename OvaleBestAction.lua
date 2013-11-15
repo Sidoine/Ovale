@@ -80,6 +80,7 @@ end
 
 local function ComputeAction(element)
 	local self = OvaleBestAction
+	local state = OvaleState.state
 	local action = element.params[1]
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
@@ -119,7 +120,7 @@ local function ComputeAction(element)
 	if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
 		start = actionCooldownDuration + actionCooldownStart
 	else
-		start = OvaleState.currentTime
+		start = state.currentTime
 	end
 
 	Ovale:Logf("start=%f nextCast=%s [%d]", start, OvaleState.nextCast, element.nodeId)
@@ -166,7 +167,7 @@ local function ComputeAction(element)
 	--]]
 	local value
 	if element.params.asValue and element.params.asValue == 1 then
-		local atTime = OvaleState.currentTime
+		local atTime = state.currentTime
 		if HasTime(timeSpan, atTime) then
 			value = 1
 		else
@@ -204,6 +205,7 @@ end
 
 local function ComputeArithmetic(element)
 	local self = OvaleBestAction
+	local state = OvaleState.state
 	local timeSpanA, _, elementA = self:Compute(element.a)
 	local timeSpanB, _, elementB = self:Compute(element.b)
 	local timeSpan = element.timeSpan
@@ -228,7 +230,7 @@ local function ComputeArithmetic(element)
 	local x = elementB and elementB.value or 0
 	local y = elementB and elementB.origin or 0
 	local z = elementB and elementB.rate or 0
-	local atTime = OvaleState.currentTime
+	local atTime = state.currentTime
 
 	Ovale:Logf("%f+(t-%f)*%f %s %f+(t-%f)*%f [%d]", a, b, c, element.operator, x, y, z, element.nodeId)
 
@@ -382,6 +384,7 @@ end
 local function ComputeCustomFunction(element)
 	Ovale:Logf("custom function %s", element.name)
 	local self = OvaleBestAction
+	local state = OvaleState.state
 	if not element.serial or element.serial < self_serial then
 		-- Cache new values in element.
 		element.timeSpanA, element.priorityA, element.elementA = self:Compute(element.a)
@@ -408,7 +411,7 @@ local function ComputeCustomFunction(element)
 			If the return value is an action, then return 1 if the action is off of cooldown, or
 			0 if it is on cooldown.
 		--]]
-		local atTime = OvaleState.currentTime
+		local atTime = state.currentTime
 		local value = 0
 		if HasTime(timeSpanA, atTime) then
 			if not elementA then	-- boolean
@@ -429,6 +432,7 @@ end
 
 local function ComputeFunction(element)
 	local self = OvaleBestAction
+	local state = OvaleState.state
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -463,7 +467,7 @@ local function ComputeFunction(element)
 		time, or 0 otherwise.
 	--]]
 	if element.params.asValue and element.params.asValue == 1 then
-		local atTime = OvaleState.currentTime
+		local atTime = state.currentTime
 		if HasTime(timeSpan, atTime) then
 			if value then
 				value = value + (atTime - origin) * rate
@@ -486,6 +490,7 @@ end
 
 local function ComputeGroup(element)
 	local self = OvaleBestAction
+	local state = OvaleState.state
 	local bestTimeSpan, bestPriority, bestElement, bestCastTime
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
@@ -501,9 +506,9 @@ local function ComputeGroup(element)
 
 	for k, v in ipairs(element.nodes) do
 		local currentTimeSpan, currentPriority, currentElement = self:Compute(v)
-		-- We only care about actions that are available at time t > OvaleState.currentTime.
+		-- We only care about actions that are available at time t > state.currentTime.
 		current:Reset()
-		IntersectInterval(currentTimeSpan, OvaleState.currentTime, math.huge, current)
+		IntersectInterval(currentTimeSpan, state.currentTime, math.huge, current)
 		if Measure(current) > 0 then
 			Ovale:Logf("    group checking %s [%d]", tostring(current), element.nodeId)
 			local currentCastTime
@@ -580,6 +585,7 @@ end
 local function ComputeIf(element)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
+	local state = OvaleState.state
 
 	local timeSpanA = self:ComputeBool(element.a)
 	local timeSpan = element.timeSpan
@@ -602,7 +608,7 @@ local function ComputeIf(element)
 
 	local timeSpanB, priorityB, elementB = self:Compute(element.b)
 	-- If the "then" clause is a "wait" node, then only wait if the conditions are true.
-	if elementB and elementB.wait and not HasTime(conditionTimeSpan, OvaleState.currentTime) then
+	if elementB and elementB.wait and not HasTime(conditionTimeSpan, state.currentTime) then
 		elementB.wait = nil
 	end
 	-- Take intersection of the condition and B.

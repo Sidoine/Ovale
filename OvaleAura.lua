@@ -691,7 +691,7 @@ do
 				end
 
 				local start, ending, currentStacks, tick = state:GetAuraByGUID(guid, auraId, filter, true, target)
-				local newAura = state:NewAura(guid, auraId, filter, OvaleState.currentTime)
+				local newAura = state:NewAura(guid, auraId, filter, state.currentTime)
 				newAura.mine = true
 
 				--[[

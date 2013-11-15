@@ -71,7 +71,7 @@ do
 		local blood, unholy, frost, death, deathCondition = ParseRuneCondition(condition)
 		local state = OvaleState.state
 		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
-		return OvaleState.currentTime + seconds, math.huge
+		return state.currentTime + seconds, math.huge
 	end
 
 	--- Get the number of seconds before the rune conditions are met.
@@ -96,7 +96,7 @@ do
 		local blood, unholy, frost, death, deathCondition = ParseRuneCondition(condition)
 		local state = OvaleState.state
 		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
-		return 0, OvaleState.currentTime + seconds, seconds, OvaleState.currentTime, -1
+		return 0, state.currentTime + seconds, seconds, state.currentTime, -1
 	end
 
 	OvaleCondition:RegisterCondition("runes", false, Runes)

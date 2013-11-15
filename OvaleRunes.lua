@@ -216,7 +216,7 @@ do
 	local statePrototype = OvaleRunes.statePrototype
 
 	function statePrototype:DebugRunes()
-		local now = OvaleState.currentTime
+		local now = state.currentTime
 		for slot = 1, 6 do
 			local rune = self.rune[slot]
 			if rune.active then
@@ -421,7 +421,7 @@ do
 				end
 			end
 			if maxEndCooldown > 0 then
-				return maxEndCooldown - OvaleState.currentTime
+				return maxEndCooldown - state.currentTime
 			end
 			return 0
 		end

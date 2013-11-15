@@ -36,7 +36,7 @@ do
 		local energyRegen = state.powerRate.energy or 10
 		local t = (maxEnergy - energy) / energyRegen
 		if t > 0 then
-			return TestValue(0, OvaleState.currentTime + t, t, OvaleState.currentTime, -1, comparator, limit)
+			return TestValue(0, state.currentTime + t, t, state.currentTime, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end

@@ -40,7 +40,7 @@ do
 		if currentPower < cost then
 			if powerRate > 0 then
 				local t = (cost - currentPower)/powerRate
-				return TestValue(0, OvaleState.currentTime + t, t, OvaleState.currentTime, -1, comparator, limit)
+				return TestValue(0, state.currentTime + t, t, state.currentTime, -1, comparator, limit)
 			else
 				return Compare(math.huge, comparator, limit)
 			end

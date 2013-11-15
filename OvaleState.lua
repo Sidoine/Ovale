@@ -31,16 +31,18 @@ local self_stateIsInitialized = false
 --</private-static-properties>
 
 --<public-static-properties>
--- The state for the simulator.
-OvaleState.state = {}
 -- The spell being cast.
 OvaleState.currentSpellId = nil
 OvaleState.now = nil
-OvaleState.currentTime = nil
 OvaleState.nextCast = nil
 OvaleState.startCast = nil
 OvaleState.endCast = nil
 OvaleState.lastSpellId = nil
+
+-- The state for the simulator.
+OvaleState.state = {
+	currentTime = nil,
+}
 --</public-static-properties>
 
 --<private-static-methods>
@@ -96,8 +98,9 @@ function OvaleState:InitializeState()
 end
 
 function OvaleState:Reset()
-	self.currentTime = self.now
-	Ovale:Logf("Reset state with current time = %f", self.currentTime)
+	local state = self.state
+	state.currentTime = self.now
+	Ovale:Logf("Reset state with current time = %f", state.currentTime)
 
 	self.lastSpellId = Ovale.lastSpellcast and Ovale.lastSpellcast.spellId
 	self.currentSpellId = nil
@@ -124,22 +127,22 @@ function OvaleState:ApplySpell(spellId, startCast, endCast, nextCast, nocd, targ
 	end
 
 	-- Update the latest spell cast in the simulator.
+	local state = self.state
 	self.nextCast = nextCast
 	self.currentSpellId = spellId
 	self.startCast = startCast
 	self.endCast = endCast
-
 	self.lastSpellId = spellId
 
 	-- Set the current time in the simulator to a little after the start of the current cast,
 	-- or to now if in the past.
 	if startCast >= self.now then
-		self.currentTime = startCast + 0.1
+		state.currentTime = startCast + 0.1
 	else
-		self.currentTime = self.now
+		state.currentTime = self.now
 	end
 
-	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, self.currentTime, self.nextCast, endCast, targetGUID)
+	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, self.nextCast, endCast, targetGUID)
 
 	--[[
 		Apply the effects of the spellcast in three phases.

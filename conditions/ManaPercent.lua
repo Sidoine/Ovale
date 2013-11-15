@@ -42,8 +42,8 @@ do
 			local powerMax = OvalePower.maxPower.mana or 0
 			if powerMax > 0 then
 				local conversion = 100 / powerMax
-				local value, origin, rate = state.mana * conversion, OvaleState.currentTime, state.powerRate.mana * conversion
-				local start, ending = OvaleState.currentTime, math.huge
+				local value, origin, rate = state.mana * conversion, state.currentTime, state.powerRate.mana * conversion
+				local start, ending = state.currentTime, math.huge
 				return TestValue(start, ending, value, origin, rate, comparator, limit)
 			end
 		else

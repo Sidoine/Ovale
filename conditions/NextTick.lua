@@ -42,7 +42,7 @@ do
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local tick = auraFound.tick
 		if ending and ending < math.huge and tick then
-			while ending - tick > OvaleState.currentTime do
+			while ending - tick > state.currentTime do
 				ending = ending - tick
 			end
 			return TestValue(0, ending, 0, ending, -1, comparator, limit)

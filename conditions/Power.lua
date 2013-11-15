@@ -40,8 +40,8 @@ do
 		local target = ParseCondition(condition)
 		local state = OvaleState.state
 		if target == "player" then
-			local value, origin, rate = state[powerType], OvaleState.currentTime, state.powerRate[powerType]
-			local start, ending = OvaleState.currentTime, math.huge
+			local value, origin, rate = state[powerType], state.currentTime, state.powerRate[powerType]
+			local start, ending = state.currentTime, math.huge
 			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		else
 			local powerInfo = OvalePower.POWER_INFO[powerType]
