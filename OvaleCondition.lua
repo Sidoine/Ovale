@@ -124,8 +124,11 @@ OvaleCondition.ParseCondition = function(condition, defaultTarget)
 	local mine = true
 	if condition.any and condition.any == 1 then
 		mine = false
-	elseif condition.mine and condition.mine ~= 1 then
-		mine = false
+	else
+		-- Legacy parameter "mine"; no longer documented.
+		if not condition.any and condition.mine and condition.mine ~= 1 then
+			mine = false
+		end
 	end
 
 	return target, filter, mine
