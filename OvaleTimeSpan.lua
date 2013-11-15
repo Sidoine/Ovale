@@ -147,6 +147,18 @@ function OvaleTimeSpan:HasTime(atTime)
 	return false
 end
 
+function OvaleTimeSpan:NextTime(atTime)
+	local A = self
+	local countA = A and #A or 0
+	for i = 1, countA, 2 do
+		if atTime < A[i] then
+			return A[i]
+		elseif A[i] <= atTime and atTime <= A[i+1] then
+			return atTime
+		end
+	end
+end
+
 function OvaleTimeSpan:Measure()
 	local A = self
 	local countA = A and #A or 0

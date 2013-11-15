@@ -22,6 +22,7 @@ do
 	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleOptions = Ovale.OvaleOptions
 	local OvaleState = Ovale.OvaleState
+	local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
 	local Type = "OvaleFrame"
 	local Version = 7
@@ -34,6 +35,7 @@ do
 	local API_GetSpellTexture = GetSpellTexture
 	local API_GetTime = GetTime
 	local API_RegisterStateDriver = RegisterStateDriver
+	local NextTime = OvaleTimeSpan.NextTime
 --</private-static-properties>
 
 --<public-methods>
@@ -186,7 +188,7 @@ do
 				Ovale:Logf("****Master Node %d", k)
 				OvaleBestAction:StartNewAction()
 				local timeSpan, _, element = OvaleBestAction:Compute(node)
-				local start = timeSpan[1]
+				local start = NextTime(timeSpan, state.currentTime)
 				if start then
 					Ovale:Logf("Compute start = %f", start)
 				end
@@ -278,7 +280,7 @@ do
 							end
 							OvaleState:ApplySpell(spellId, start, start + castTime, nextCast, false, OvaleGUID:GetGUID(spellTarget))
 							timeSpan, _, element = OvaleBestAction:Compute(node)
-							start = timeSpan[1]
+							start = NextTime(timeSpan, state.currentTime)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
 						else
 							icons[2]:Update(element, nil)

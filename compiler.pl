@@ -115,6 +115,7 @@ $sp{OvaleTimeSpan}{HasTime} = true;
 $sp{OvaleTimeSpan}{Intersect} = true;
 $sp{OvaleTimeSpan}{IntersectInterval} = true;
 $sp{OvaleTimeSpan}{Measure} = true;
+$sp{OvaleTimeSpan}{NextTime} = true;
 $sp{OvaleTimeSpan}{Union} = true;
 
 sub ParseDirectory
