@@ -26,7 +26,7 @@ do
 		auraFound[statName] = nil
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local value = auraFound[statName]
-		value = value and value or defaultValue
+		value = value or defaultValue
 		return TestValue(start, ending, value, start, 0, comparator, limit)
 	end
 
@@ -38,7 +38,7 @@ do
 		auraFound[statName] = nil
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local value = auraFound[statName]
-		value = value and value or defaultValue
+		value = value or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100
 		end

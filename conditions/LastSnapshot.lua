@@ -23,7 +23,7 @@ do
 		local target = ParseCondition(condition, "target")
 		local guid = OvaleGUID:GetGUID(target)
 		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
-		value = value and value or defaultValue
+		value = value or defaultValue
 		return Compare(value, comparator, limit)
 	end
 
@@ -33,7 +33,7 @@ do
 		local target = ParseCondition(condition)
 		local guid = OvaleGUID:GetGUID(target)
 		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
-		value = value and value or defaultValue
+		value = value or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100
 		end

@@ -107,7 +107,7 @@ end
 
 OvaleCondition.ParseCondition = function(condition, defaultTarget)
 	defaultTarget = defaultTarget or "player"
-	local target = condition.target and condition.target or defaultTarget
+	local target = condition.target or defaultTarget
 	if target == "target" then
 		target = OvaleCondition.defaultTarget
 	end
@@ -161,8 +161,8 @@ OvaleCondition.TestValue = function(start, ending, value, origin, rate, comparat
 		return nil
 	end
 
-	start = start and start or 0
-	ending = (start and ending) and ending or math.huge
+	start = start or 0
+	ending = ending or math.huge
 
 	if not comparator then
 		if start < ending then

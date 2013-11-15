@@ -43,7 +43,7 @@ do
 		auraFound.tick = nil
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
 		local value = auraFound.tick
-		value = value and value or OvaleAura:GetTickLength(auraId)
+		value = value or OvaleAura:GetTickLength(auraId)
 		if value then
 			return Compare(value, comparator, limit)
 		end

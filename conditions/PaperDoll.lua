@@ -19,7 +19,7 @@ do
 	local function PaperDoll(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
 		local value = OvalePaperDoll.stat[statName]
-		value = value and value or defaultValue
+		value = value or defaultValue
 		return Compare(value, comparator, limit)
 	end
 
@@ -27,7 +27,7 @@ do
 	local function PaperDollCritChance(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
 		local value = OvalePaperDoll.stat[statName]
-		value = value and value or defaultValue
+		value = value or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100
 		end
