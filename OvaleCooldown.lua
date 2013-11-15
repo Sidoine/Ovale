@@ -99,7 +99,6 @@ function OvaleCooldown:ResetState(state)
 		cd.start = nil
 		cd.duration = nil
 		cd.enable = 0
-		cd.toggled = nil
 	end
 end
 
@@ -116,6 +115,7 @@ function OvaleCooldown:ApplySpellOnPlayer(state, spellId, startCast, endCast, ne
 		if cd then
 			cd.start = startCast
 			cd.duration = si.cd or 0
+			cd.enable = 1
 
 			-- Test for no cooldown.
 			if nocd then
@@ -154,10 +154,6 @@ function OvaleCooldown:ApplySpellOnPlayer(state, spellId, startCast, endCast, ne
 				end
 			end
 
-			cd.enable = 1
-			if si.toggle then
-				cd.toggled = 1
-			end
 			Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
 		end
 	end

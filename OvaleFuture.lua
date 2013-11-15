@@ -454,24 +454,19 @@ end
 function OvaleFuture:ApplyInFlightSpells()
 	local now = OvaleState.now
 	local index = 0
-	local spellcast, si
 	while true do
 		index = index + 1
 		if index > #self_activeSpellcast then return end
 
-		spellcast = self_activeSpellcast[index]
-		si = OvaleData.spellInfo[spellcast.spellId]
-		-- skip over spells that are toggles for other spells
-		if not (si and si.toggle) then
-			Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
-			if now - spellcast.stop < 5 then
-				OvaleState:ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target, spellcast)
-			else
-				tremove(self_activeSpellcast, index)
-				self_pool:Release(spellcast)
-				-- Decrement current index since item was removed and rest of items shifted up.
-				index = index - 1
-			end
+		local spellcast = self_activeSpellcast[index]
+		Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
+		if now - spellcast.stop < 5 then
+			OvaleState:ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.nocd, spellcast.target, spellcast)
+		else
+			tremove(self_activeSpellcast, index)
+			self_pool:Release(spellcast)
+			-- Decrement current index since item was removed and rest of items shifted up.
+			index = index - 1
 		end
 	end
 end

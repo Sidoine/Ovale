@@ -110,10 +110,6 @@ local function ComputeAction(element)
 				element.castTime = nil
 			end
 		end
-		if si and si.toggle and actionIsCurrent then
-			Ovale:Logf("Action %s (toggle) is the current action", action)
-			return timeSpan
-		end
 	else
 		element.castTime = 0
 	end
@@ -811,11 +807,6 @@ function OvaleBestAction:GetActionInfo(element)
 	if action then
 		actionShortcut = OvaleActionBar:GetBinding(action)
 		actionIsCurrent = API_IsCurrentAction(action)
-	end
-
-	local cd = state:GetCD(spellId)
-	if cd and cd.toggled then
-		actionIsCurrent = 1
 	end
 
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,

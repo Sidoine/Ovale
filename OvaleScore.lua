@@ -33,7 +33,6 @@ local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0")
 Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
 local OvaleGUID = Ovale.OvaleGUID
 
 local pairs = pairs
@@ -115,8 +114,7 @@ function OvaleScore:AddSpell(spellId)
 end
 
 function OvaleScore:ScoreSpell(spellId)
-	local si = OvaleData.spellInfo[spellId]
-	if Ovale.enCombat and self_scoredSpell[spellId] and not (si and si.toggle) then
+	if Ovale.enCombat and self_scoredSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
 		Ovale:Logf("Scored %s", scored)
 		if scored then
