@@ -13,23 +13,22 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
 
+	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
-
-	local auraFound = {}
 
 	-- Return the value of the stat from the aura snapshot at the time the aura was applied.
 	local function BuffSnapshot(statName, defaultValue, condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound.snapshot = nil
-		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local value = defaultValue
-		if auraFound.snapshot and auraFound.snapshot[statName] then
-			value = auraFound.snapshot[statName]
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local start, ending = aura.start, aura.ending
+			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
+			return TestValue(start, ending, value, start, 0, comparator, limit)
 		end
-		return TestValue(start, ending, value, start, 0, comparator, limit)
+		return Compare(defaultValue, comparator, limit)
 	end
 
 	-- Return the value of the given critical strike chance from the aura snapshot at the time the aura was applied.
@@ -37,16 +36,17 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound[statName] = nil
-		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local value = defaultValue
-		if auraFound.snapshot and auraFound.snapshot[statName] then
-			value = auraFound.snapshot[statName]
+		local aura = state:GetAura(target, auraId, filter, mine)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local start, ending = aura.start, aura.ending
+			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
+			if condition.unlimited ~= 1 and value > 100 then
+				value = 100
+			end
+			return TestValue(start, ending, value, start, 0, comparator, limit)
 		end
-		if condition.unlimited ~= 1 and value > 100 then
-			value = 100
-		end
-		return TestValue(start, ending, value, start, 0, comparator, limit)
+		return Compare(defaultValue, comparator, limit)
 	end
 
 	--- Get the player's attack power at the time the given aura was applied on the target.

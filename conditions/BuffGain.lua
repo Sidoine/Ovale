@@ -13,10 +13,9 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
 
+	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
-
-	local auraFound = {}
 
 	--- Get the time elapsed since the aura was last gained on the target.
 	-- @paramsig number or boolean
@@ -37,14 +36,16 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound.gain = nil
-		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local gain = auraFound.gain or 0
-		if true then
-			Ovale:Error("not implemented")
-			return nil
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local gain = aura.gain or 0
+			if true then
+				Ovale:Error("not implemented")
+				return nil
+			end
+			return TestValue(gain, math.huge, 0, gain, 1, comparator, limit)
 		end
-		return TestValue(gain, math.huge, 0, gain, 1, comparator, limit)
+		return Compare(0, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("buffgain", false, BuffGain)

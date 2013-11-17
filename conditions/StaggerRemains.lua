@@ -39,17 +39,18 @@ do
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
 		local state = OvaleState.state
-		local start, ending, stacks
-		start, ending, stacks = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
-		if not stacks or stacks == 0 then
-			start, ending, stacks = state:GetAura(target, MODERATE_STAGGER, "HARMFUL")
+		local aura = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
+		if not aura or aura.stacks == 0 then
+			aura = state:GetAura(target, MODERATE_STAGGER, "HARMFUL")
 		end
-		if not stacks or stacks == 0 then
-			start, ending, stacks = state:GetAura(target, LIGHT_STAGGER, "HARMFUL")
+		if not aura or aura.stacks == 0 then
+			aura = state:GetAura(target, LIGHT_STAGGER, "HARMFUL")
 		end
-		if start and ending then
+		if aura and aura.stacks > 0 then
+			local start, ending = aura.start, aura.ending
 			local stagger = API_UnitStagger(target)
-			return TestValue(start, ending, 0, ending, -1 * stagger / (ending - start), comparator, limit)
+			local rate = -1 * stagger / (ending - start)
+			return TestValue(start, ending, 0, ending, rate, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end

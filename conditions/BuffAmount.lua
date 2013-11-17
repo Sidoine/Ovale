@@ -13,10 +13,9 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
 
+	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
-
-	local auraFound = {}
 
 	--- Get the value of a buff as a number.  Not all buffs return an amount.
 	-- @name BuffAmount
@@ -53,10 +52,13 @@ do
 		elseif value == 3 then
 			statName = "value3"
 		end
-		auraFound[statName] = nil
-		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local value = auraFound[statName] or 0
-		return TestValue(start, ending, value, start, 0, comparator, limit)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local start, ending = aura.start, aura.ending
+			local value = aura[statName] or 0
+			return TestValue(start, ending, value, start, 0, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("buffamount", false, BuffAmount)

@@ -60,16 +60,17 @@ do
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		local start, ending = state:GetAura(target, auraId, filter, mine)
-		if not start or not ending then
-			return 0, math.huge
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local start, ending = aura.start, aura.ending
+			seconds = TimeWithHaste(seconds or 0, condition.haste)
+			if ending - seconds <= start then
+				return start, math.huge
+			else
+				return ending - seconds, math.huge
+			end
 		end
-		seconds = TimeWithHaste(seconds or 0, condition.haste)
-		if ending - seconds <= start then
-			return start, math.huge
-		else
-			return ending - seconds, math.huge
-		end
+		return 0, math.huge
 	end
 
 	OvaleCondition:RegisterCondition("buffexpires", false, BuffExpires)
@@ -102,16 +103,17 @@ do
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		local start, ending = state:GetAura(target, auraId, filter, mine)
-		if not start or not ending then
-			return nil
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local start, ending = aura.start, aura.ending
+			seconds = TimeWithHaste(seconds or 0, condition.haste)
+			if ending - seconds <= start then
+				return nil
+			else
+				return start, ending - seconds
+			end
 		end
-		seconds = TimeWithHaste(seconds or 0, condition.haste)
-		if ending - seconds <= start then
-			return nil
-		else
-			return start, ending - seconds
-		end
+		return nil
 	end
 
 	OvaleCondition:RegisterCondition("buffpresent", false, BuffPresent)

@@ -17,6 +17,7 @@ Ovale.OvaleAura = OvaleAura
 
 --<private-static-properties>
 local OvalePool = Ovale.OvalePool
+local OvalePoolRefCount = Ovale.OvalePoolRefCount
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
@@ -36,7 +37,7 @@ local API_GetTime = GetTime
 local API_UnitAura = UnitAura
 
 -- aura pool
-local self_pool = OvalePool("OvaleAura_pool")
+local self_pool = OvalePoolRefCount("OvaleAura_pool")
 do
 	self_pool.Clean = function(self, aura)
 		-- Release reference-counted snapshot before wiping.
@@ -397,7 +398,7 @@ function OvaleAura:Ovale_InactiveUnit(event, guid)
 	RemoveAurasForGUID(guid)
 end
 
-function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
+function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	if not guid then
 		Ovale:Log("nil guid does not exist in OvaleAura")
 		return nil
@@ -421,7 +422,7 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 		end
 	end
 
-	local aura
+	local auraFound
 	local serial = self_serial[guid]
 
 	if type(spellId) == "number" then
@@ -433,17 +434,17 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 						if RemoveAuraIfExpired(guid, spellId, filter, whoseTable[self_guid], serial) then
 							whoseTable[self_guid] = nil
 						end
-						aura = whoseTable[self_guid]
+						auraFound = whoseTable[self_guid]
 					else
 						for k, v in pairs(whoseTable) do
 							if RemoveAuraIfExpired(guid, spellId, filter, v, serial) then
 								whoseTable[k] = nil
 							end
-							aura = whoseTable[k]
-							if aura then break end
+							auraFound = whoseTable[k]
+							if auraFound then break end
 						end
 					end
-					if aura then break end
+					if auraFound then break end
 				end
 			end
 		end
@@ -456,8 +457,8 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 							if RemoveAuraIfExpired(guid, auraId, filter, aura, serial) then
 								whoseTable[caster] = nil
 							end
-							aura = whoseTable[caster]
-							if aura and aura.debuffType == spellId then
+							auraFound = whoseTable[caster]
+							if auraFound and auraFound.debuffType == spellId then
 								-- Stop after finding the first aura of the given debuff type.
 								break
 							end
@@ -468,45 +469,22 @@ function OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 		end
 	end
 
-	if aura then
-		-- If auraFound is a table, then copy the found aura into auraFound.
-		if auraFound then
-			for k, v in pairs(aura) do
-				auraFound[k] = v
-			end
-		end
-		return aura.start, aura.ending, aura.stacks, aura.gain
-	else
-		return nil
-	end
+	return auraFound
 end
 
-function OvaleAura:GetAura(unitId, spellId, filter, mine, auraFound)
+function OvaleAura:GetAura(unitId, spellId, filter, mine)
 	local guid = OvaleGUID:GetGUID(unitId)
 	if OvaleData.buffSpellList[spellId] then
-		local newAura, newStart, newEnding, newStacks, newGain
+		local auraFound
 		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			local aura = self_pool:Get()
-			local start, ending, stacks, gain = self:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura)
-			if start and (not newStart or stacks > newStacks) then
-				if newAura then
-					self_pool:Release(newAura)
-				end
-				newAura = aura
-				newStart = start
-				newEnding = ending
-				newStacks = stacks
-				newGain = gain
+			local aura = self:GetAuraByGUID(guid, auraId, filter, mine, unitId)
+			if aura and (not auraFound or aura.stacks > auraFound.stacks) then
+				auraFound = aura
 			end
 		end
-		if auraFound then
-			for k, v in pairs(newAura) do
-				auraFound[k] = v
-			end
-		end
-		return newStart, newEnding, newStacks, newGain
+		return auraFound
 	else
-		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
+		return self:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 	end
 end
 
@@ -601,6 +579,7 @@ function OvaleAura:GetTickLength(spellId)
 			return tick
 		end
 	end
+	return math.huge
 end
 
 function OvaleAura:Debug()
@@ -704,7 +683,7 @@ do
 					duration = state:GetDuration(auraId)
 				end
 
-				local start, ending, currentStacks, tick = state:GetAuraByGUID(guid, auraId, filter, true, target)
+				local aura = state:GetAuraByGUID(guid, auraId, filter, true, target)
 				local newAura = state:NewAura(guid, auraId, filter, state.currentTime)
 				newAura.mine = true
 
@@ -718,16 +697,17 @@ do
 				if type(stacks) == "number" and stacks == 0 then
 					Ovale:Logf("Aura %d is completely removed", auraId)
 					newAura.stacks = 0
-					newAura.start = start
-					newAura.ending = atTime
-				elseif ending and ((isChanneled and startCast < ending) or (not isChanneled and endCast <= ending)) then
+					newAura.start = aura and aura.start or 0
+					newAura.ending = aura and atTime or 0
+				elseif aura and ((isChanneled and startCast < aura.ending) or (not isChanneled and endCast <= aura.ending)) then
+					local start, ending, tick = aura.start, aura.ending, aura.tick
 					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
 					if stacks == "refresh" or stacks > 0 then
 						if stacks == "refresh" then
 							Ovale:Logf("Aura %d is refreshed", auraId)
-							newAura.stacks = currentStacks
+							newAura.stacks = aura.stacks
 						else -- if stacks > 0 then
-							newAura.stacks = currentStacks + stacks
+							newAura.stacks = aura.stacks + stacks
 							Ovale:Logf("Aura %d gains a stack to %d because of spell %d (ending was %s)", auraId, newAura.stacks, spellId, ending)
 						end
 						newAura.start = start
@@ -743,7 +723,7 @@ do
 						end
 						Ovale:Logf("Aura %d ending is now %f", auraId, newAura.ending)
 					elseif stacks < 0 then
-						newAura.stacks = currentStacks + stacks
+						newAura.stacks = aura.stacks + stacks
 						newAura.start = start
 						newAura.ending = ending
 						Ovale:Logf("Aura %d loses %d stack(s) to %d because of spell %d", auraId, -1 * stacks, newAura.stacks, spellId)
@@ -768,9 +748,9 @@ do
 		end
 	end
 
-	function statePrototype:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
+	function statePrototype:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		local state = self
-		local aura
+		local auraFound
 		if mine then
 			local auraTable = state.aura[guid]
 			if auraTable then
@@ -778,13 +758,13 @@ do
 					local auraList = auraTable[filter]
 					if auraList then
 						if auraList[spellId] and auraList[spellId].serial == state.serial then
-							aura = auraList[spellId]
+							auraFound = auraList[spellId]
 						end
 					end
 				else
 					for auraFilter, auraList in pairs(auraTable) do
 						if auraList[spellId] and auraList[spellId].serial == state.serial then
-							aura = auraList[spellId]
+							auraFound = auraList[spellId]
 							filter = auraFilter
 							break
 						end
@@ -792,59 +772,33 @@ do
 				end
 			end
 		end
-		if aura then
-			if aura.stacks > 0 then
+		if auraFound then
+			if auraFound.stacks > 0 then
 				Ovale:Logf("Found %s aura %s on %s", filter, spellId, guid)
 			else
 				Ovale:Logf("Found %s aura %s on %s (removed)", filter, spellId, guid)
 			end
-			if auraFound then
-				for k, v in pairs(aura) do
-					auraFound[k] = v
-				end
-			end
-			return aura.start, aura.ending, aura.stacks, aura.gain
+			return auraFound
 		else
 			Ovale:Logf("Aura %s not found in state for %s", spellId, guid)
-			return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
+			return OvaleAura:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		end
 	end
 
-	do
-		local aura = {}
-		local newAura = {}
-
-		function statePrototype:GetAura(unitId, spellId, filter, mine, auraFound)
-			local state = self
-			local guid = OvaleGUID:GetGUID(unitId)
-			if OvaleData.buffSpellList[spellId] then
-				if auraFound then wipe(newAura) end
-				local newStart, newEnding, newStacks, newGain
-				for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-					if auraFound then wipe(aura) end
-					local start, ending, stacks, gain = state:GetAuraByGUID(guid, auraId, filter, mine, unitId, aura)
-					if start and (not newStart or stacks > newStacks) then
-						newStart = start
-						newEnding = ending
-						newStacks = stacks
-						newGain = gain
-						if auraFound then
-							wipe(newAura)
-							for k, v in pairs(aura) do
-								newAura[k] = v
-							end
-						end
-					end
+	function statePrototype:GetAura(unitId, spellId, filter, mine)
+		local state = self
+		local guid = OvaleGUID:GetGUID(unitId)
+		if OvaleData.buffSpellList[spellId] then
+			local auraFound
+			for auraId in pairs(OvaleData.buffSpellList[spellId]) do
+				local aura = state:GetAuraByGUID(guid, auraId, filter, mine, unitId)
+				if aura and (not auraFound or aura.stacks > auraFound.stacks) then
+					auraFound = aura
 				end
-				if auraFound then
-					for k, v in pairs(newAura) do
-						auraFound[k] = v
-					end
-				end
-				return newStart, newEnding, newStacks, newGain
-			else
-				return state:GetAuraByGUID(guid, spellId, filter, mine, unitId, auraFound)
 			end
+			return auraFound
+		else
+			return state:GetAuraByGUID(guid, spellId, filter, mine, unitId)
 		end
 	end
 
@@ -902,11 +856,11 @@ do
 				local playerGUID = OvaleGUID:GetGUID("player")
 				for filter, auraList in pairs(si.damageAura) do
 					for auraSpellId, multiplier in pairs(auraList) do
-						local count = select(3, state:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player"))
-						if count and count > 0 then
+						local aura = state:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player")
+						if aura and aura.stacks > 0 then
 							local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
 							if auraSpellInfo.stacking and auraSpellInfo.stacking > 0 then
-								multiplier = 1 + (multiplier - 1) * count
+								multiplier = 1 + (multiplier - 1) * aura.stacks
 							end
 							damageMultiplier = damageMultiplier * multiplier
 						end

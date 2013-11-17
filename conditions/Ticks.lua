@@ -15,10 +15,9 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local floor = math.floor
+	local select = select
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
-
-	local auraFound = {}
 
 	--- Get the total number of ticks of a periodic aura.
 	-- @name Ticks
@@ -34,23 +33,20 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound.tick = nil
-		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local tick = auraFound.tick
-		local duration, numTicks
-		if start then
-			-- Aura exists on the target
-			if ending and tick and tick > 0 then
-				duration = ending - start
-				numTicks = floor(duration / tick + 0.5)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		local numTicks
+		if aura then
+			local start, ending, tick = aura.start, aura.ending, aura.tick
+			if tick and tick > 0 then
+				numTicks = floor((ending - start) / tick + 0.5)
 			end
 		else
-			duration, tick, numTicks = state:GetDuration(auraId)
+			numTicks = select(3, state:GetDuration(auraId))
 		end
 		if numTicks then
 			return Compare(numTicks, comparator, limit)
 		end
-		return nil
+		return Compare(math.huge, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("ticks", false, Ticks)

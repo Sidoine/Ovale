@@ -13,10 +13,9 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
 
+	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
-
-	local auraFound = {}
 
 	--- Get the player's damage multiplier for the given aura at the time the aura was applied on the target.
 	-- @name BuffDamageMultiplier
@@ -37,16 +36,15 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound.snapshot = nil
-		auraFound.damageMultiplier = nil
-		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local baseDamageMultiplier = 1
-		if auraFound.snapshot and auraFound.snapshot.baseDamageMultiplier then
-			baseDamageMultiplier = auraFound.snapshot.baseDamageMultiplier
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local start, ending = aura.start, aura.ending
+			local baseDamageMultiplier = aura.snapshot and aura.snapshot.baseDamageMultiplier or 1
+			local damageMultiplier = aura.damageMultiplier or 1
+			local value = baseDamageMultiplier * damageMultiplier
+			return TestValue(start, ending, value, start, 0, comparator, limit)
 		end
-		local damageMultiplier = auraFound.damageMultiplier or 1
-		local value = baseDamageMultiplier * damageMultiplier
-		return TestValue(start, ending, value, start, 0, comparator, limit)
+		return Compare(1, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("buffdamagemultiplier", false, BuffDamageMultiplier)
