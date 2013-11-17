@@ -19,6 +19,7 @@ local OvalePoolRefCount = Ovale.OvalePoolRefCount
 -- Forward declarations for module dependencies.
 local OvaleEquipement = nil
 local OvaleStance = nil
+local OvaleState = nil
 
 local select = select
 local tonumber = tonumber
@@ -139,6 +140,7 @@ function OvalePaperDoll:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleEquipement = Ovale.OvaleEquipement
 	OvaleStance = Ovale.OvaleStance
+	OvaleState = Ovale.OvaleState
 
 	-- Initialize latest snapshot table.
 	if self.snapshot then
@@ -171,9 +173,11 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("UNIT_STATS")
 	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
 	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
+	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvalePaperDoll:OnDisable()
+	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("COMBAT_RATING_UPDATE")
 	self:UnregisterEvent("MASTERY_UPDATE")
@@ -471,3 +475,60 @@ function OvalePaperDoll:Debug(snapshot)
 	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvalePaperDoll.statePrototype = {
+	level = nil,
+	specialization = nil,
+	snapshot = nil,
+}
+--</public-static-properties>
+
+--<public-static-methods>
+-- Initialize the state.
+function OvalePaperDoll:InitializeState(state)
+	state.level = nil
+	state.specialization = nil
+	state.snapshot = nil
+end
+
+-- Reset the state to the current conditions.
+function OvalePaperDoll:ResetState(state)
+	state.level = self.level
+	state.specialization = self.specialization
+	if state.snapshot and state.snapshot.snapshotTime < OvaleState.now then
+		state.snapshot:ReleaseReference()
+		state.snapshot = nil
+	end
+	state.snapshot = state.snapshot or self.snapshot:GetReference()
+end
+--</public-static-methods>
+
+-- Mix-in methods for simulator state.
+do
+	local statePrototype = OvalePaperDoll.statePrototype
+
+	function statePrototype:GetMasteryMultiplier()
+		local state = self
+		return 1 + state.snapshot.masteryEffect / 100
+	end
+
+	function statePrototype:GetMeleeHasteMultiplier()
+		local state = self
+		return 1 + state.snapshot.meleeHaste / 100
+	end
+
+	function statePrototype:GetRangedHasteMultiplier()
+		local state = self
+		return 1 + state.snapshot.rangedHaste / 100
+	end
+
+	function statePrototype:GetSpellHasteMultiplier()
+		local state = self
+		return 1 + state.snapshot.spellHaste / 100
+	end
+end

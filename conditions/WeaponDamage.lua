@@ -11,7 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.OvalePaperDoll
+	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
 
@@ -33,16 +33,17 @@ do
 	local function WeaponDamage(condition)
 		local hand = condition[1]
 		local comparator, limit
+		local state = OvaleState.state
 		local value = 0
 		if hand == "offhand" or hand == "off" then
 			comparator, limit = condition[2], condition[3]
-			value = OvalePaperDoll.snapshot.offHandWeaponDamage
+			value = state.snapshot.offHandWeaponDamage
 		elseif hand == "mainhand" or hand == "main" then
 			comparator, limit = condition[2], condition[3]
-			value = OvalePaperDoll.snapshot.mainHandWeaponDamage
+			value = state.snapshot.mainHandWeaponDamage
 		else
 			comparator, limit = condition[1], condition[2]
-			value = OvalePaperDoll.snapshot.mainHandWeaponDamage
+			value = state.snapshot.mainHandWeaponDamage
 		end
 		return Compare(value, comparator, limit)
 	end

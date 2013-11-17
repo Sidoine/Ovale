@@ -11,23 +11,23 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.OvalePaperDoll
+	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
 
-	-- Returns the value of the given paper-doll stat.
-	local function PaperDoll(statName, defaultValue, condition)
+	-- Returns the value of the given snapshot stat.
+	local function Snapshot(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvalePaperDoll.snapshot[statName]
-		value = value or defaultValue
+		local state = OvaleState.state
+		local value = state.snapshot[statName] or defaultValue
 		return Compare(value, comparator, limit)
 	end
 
-	-- Returns the critical strike chance of the given paper-doll stat.
-	local function PaperDollCritChance(statName, defaultValue, condition)
+	-- Returns the critical strike chance of the given snapshot stat.
+	local function SnapshotCritChance(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvalePaperDoll.snapshot[statName]
-		value = value or defaultValue
+		local state = OvaleState.state
+		local value = state.snapshot[statName] or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100
 		end
@@ -43,7 +43,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function Agility(condition)
-		return PaperDoll("agility", 0, condition)
+		return Snapshot("agility", 0, condition)
 	end
 
 	--- Get the current attack power of the player.
@@ -59,7 +59,7 @@ do
 	-- if AttackPower(more 10000) Spell(rake)
 
 	local function AttackPower(condition)
-		return PaperDoll("attackPower", 0, condition)
+		return Snapshot("attackPower", 0, condition)
 	end
 
 	--- Get the current intellect of the player.
@@ -71,7 +71,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function Intellect(condition)
-		return PaperDoll("intellect", 0, condition)
+		return Snapshot("intellect", 0, condition)
 	end
 
 	--- Get the current mastery effect of the player.
@@ -89,7 +89,7 @@ do
 	--     Spell(rake)
 
 	local function MasteryEffect(condition)
-		return PaperDoll("masteryEffect", 0, condition)
+		return Snapshot("masteryEffect", 0, condition)
 	end
 
 	--- Get the current melee critical strike chance of the player.
@@ -107,7 +107,7 @@ do
 	-- if MeleeCritChance() >90 Spell(rip)
 
 	local function MeleeCritChance(condition)
-		return PaperDollCritChance("meleeCrit", 0, condition)
+		return SnapshotCritChance("meleeCrit", 0, condition)
 	end
 
 	--- Get the current ranged critical strike chance of the player.
@@ -125,7 +125,7 @@ do
 	-- if RangedCritChance() >90 Spell(serpent_sting)
 
 	local function RangedCritChance(condition)
-		return PaperDollCritChance("rangedCrit", 0, condition)
+		return SnapshotCritChance("rangedCrit", 0, condition)
 	end
 
 	--- Get the current spell critical strike chance of the player.
@@ -143,7 +143,7 @@ do
 	-- if SpellCritChance() >30 Spell(immolate)
 
 	local function SpellCritChance(condition)
-		return PaperDollCritChance("spellCrit", 0, condition)
+		return SnapshotCritChance("spellCrit", 0, condition)
 	end
 
 	--- Get the current percent increase to spell haste of the player.
@@ -158,7 +158,7 @@ do
 	-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
 
 	local function SpellHaste(condition)
-		return PaperDoll("spellHaste", 0, condition)
+		return Snapshot("spellHaste", 0, condition)
 	end
 
 	--- Get the current spellpower of the player.
@@ -174,7 +174,7 @@ do
 	--     Spell(living_bomb)
 
 	local function Spellpower(condition)
-		return PaperDoll("spellBonusDamage", 0, condition)
+		return Snapshot("spellBonusDamage", 0, condition)
 	end
 
 	--- Get the current spirit of the player.
@@ -186,7 +186,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function Spirit(condition)
-		return PaperDoll("spirit", 0, condition)
+		return Snapshot("spirit", 0, condition)
 	end
 
 	--- Get the current stamina of the player.
@@ -198,7 +198,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function Stamina(condition)
-		return PaperDoll("stamina", 0, condition)
+		return Snapshot("stamina", 0, condition)
 	end
 
 	--- Get the current strength of the player.
@@ -210,7 +210,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function Strength(condition)
-		return PaperDoll("strength", 0, condition)
+		return Snapshot("strength", 0, condition)
 	end
 
 	OvaleCondition:RegisterCondition("agility", false, Agility)
@@ -231,7 +231,7 @@ end
 do
 	local OvaleScripts = Ovale.OvaleScripts
 
-	local name = "Regression: PaperDoll"
+	local name = "Regression: Snapshot"
 	local code = [[
 # Add a separate icon for each paper-doll stat.
 # Need to manually verify numbers against the in-game paper-doll.

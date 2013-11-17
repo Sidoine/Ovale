@@ -151,9 +151,9 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, startCast, endCast, n
 			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
 			if cd.duration > 0 and si.cd_haste then
 				if si.cd_haste == "melee" then
-					cd.duration = cd.duration / OvalePaperDoll:GetMeleeHasteMultiplier()
+					cd.duration = cd.duration / state:GetMeleeHasteMultiplier()
 				elseif si.cd_haste == "spell" then
-					cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
+					cd.duration = cd.duration / state:GetSpellHasteMultiplier()
 				end
 			end
 

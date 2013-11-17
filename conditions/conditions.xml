@@ -65,7 +65,6 @@
 	<Script file="ManaPercent.lua" />
 	<Script file="NextTick.lua" />
 	<Script file="PTR.lua" />
-	<Script file="PaperDoll.lua" />
 	<Script file="PetPresent.lua" />
 	<Script file="Power.lua" />
 	<Script file="PowerCost.lua" />
@@ -75,6 +74,7 @@
 	<Script file="RemainingCastTime.lua" />
 	<Script file="RuneCount.lua" />
 	<Script file="Runes.lua" />
+	<Script file="Snapshot.lua" />
 	<Script file="Speed.lua" />
 	<Script file="SpellChargeCooldown.lua" />
 	<Script file="SpellCharges.lua" />

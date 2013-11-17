@@ -11,7 +11,6 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.OvalePaperDoll
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
@@ -33,7 +32,7 @@ do
 	local function DamageMultiplier(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local state = OvaleState.state
-		local bdm = OvalePaperDoll.snapshot.baseDamageMultiplier
+		local bdm = state.snapshot.baseDamageMultiplier
 		local dm = state:GetDamageMultiplier(spellId)
 		local value = bdm * dm
 		return Compare(value, comparator, limit)

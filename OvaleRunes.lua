@@ -19,7 +19,6 @@ Ovale.OvaleRunes = OvaleRunes
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleData = nil
-local OvalePaperDoll = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
 local OvaleStance = nil
@@ -86,7 +85,6 @@ OvaleRunes.RUNE_TYPE = RUNE_TYPE
 function OvaleRunes:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
-	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleStance = Ovale.OvaleStance
@@ -285,7 +283,7 @@ do
 					start = rune.endCooldown
 				end
 			end
-			local duration = 10 / OvalePaperDoll:GetSpellHasteMultiplier()
+			local duration = 10 / state:GetSpellHasteMultiplier()
 			if OvaleStance:IsStance("death_knight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
 				-- Improved Blood Presence increases rune regeneration rate by 20%.
 				duration = duration / 1.2

@@ -23,7 +23,6 @@ local OvaleCooldown = nil
 local OvaleData = nil
 local OvaleEquipement = nil
 local OvaleFuture = nil
-local OvalePaperDoll = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
 local OvaleStance = nil
@@ -138,9 +137,9 @@ local function ComputeAction(element)
 			-- "canStopChannelling=N" means that there are N total ticks in the channelled spell.
 			local numTicks, scaling
 			if si.haste == "spell" then
-				scaling = OvalePaperDoll:GetSpellHasteMultiplier()
+				scaling = state:GetSpellHasteMultiplier()
 			elseif si.haste == "melee" then
-				scaling = OvalePaperDoll:GetMeleeHasteMultiplier()
+				scaling = state:GetMeleeHasteMultiplier()
 			else
 				scaling = 1
 			end
@@ -712,7 +711,6 @@ function OvaleBestAction:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleEquipement = Ovale.OvaleEquipement
 	OvaleFuture = Ovale.OvaleFuture
-	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleStance = Ovale.OvaleStance

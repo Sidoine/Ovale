@@ -12,21 +12,21 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.PaperDoll
 	local OvaleState = Ovale.OvaleState
 
 	local ParseCondition = OvaleCondition.ParseCondition
 
 	local function TimeWithHaste(t, haste)
+		local state = OvaleState.state
 		if not t then
 			t = 0
 		end
 		if not haste then
 			return t
 		elseif haste == "spell" then
-			return t / OvalePaperDoll:GetSpellHasteMultiplier()
+			return t / state:GetSpellHasteMultiplier()
 		elseif haste == "melee" then
-			return t / OvalePaperDoll:GetMeleeHasteMultiplier()
+			return t / state:GetMeleeHasteMultiplier()
 		else
 			Ovale:Logf("Unknown haste parameter haste=%s", haste)
 			return t

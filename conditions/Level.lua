@@ -11,7 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.OvalePaperDoll
+	local OvaleState = Ovale.OvaleState
 
 	local API_UnitLevel = UnitLevel
 	local Compare = OvaleCondition.Compare
@@ -34,9 +34,10 @@ do
 	local function Level(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
+		local state = OvaleState.state
 		local value
 		if target == "player" then
-			value = OvalePaperDoll.level
+			value = state.level
 		else
 			value = API_UnitLevel(target)
 		end

@@ -11,7 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.OvalePaperDoll
+	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
 
@@ -34,12 +34,13 @@ do
 	local function TimeWithHaste(condition)
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local haste = condition.haste or "spell"
+		local state = OvaleState.state
 		seconds = seconds or 0
 		local value = seconds
 		if haste == "spell" then
-			value = seconds / OvalePaperDoll:GetSpellHasteMultiplier()
+			value = seconds / state:GetSpellHasteMultiplier()
 		elseif haste == "melee" then
-			value = seconds / OvalePaperDoll:GetMeleeHasteMultiplier()
+			value = seconds / state:GetMeleeHasteMultiplier()
 		else
 			Ovale:Logf("Unknown haste parameter haste=%s", haste)
 		end

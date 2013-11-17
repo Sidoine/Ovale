@@ -12,7 +12,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvalePaperDoll = Ovale.OvalePaperDoll
+	local OvaleState = Ovale.OvaleState
 
 	local API_UnitLevel = UnitLevel
 	local Compare = OvaleCondition.Compare
@@ -37,9 +37,10 @@ do
 	local function RelativeLevel(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
+		local state = OvaleState.state
 		local value, level
 		if target == "player" then
-			level = OvalePaperDoll.level
+			level = state.level
 		else
 			level = API_UnitLevel(target)
 		end
@@ -47,7 +48,7 @@ do
 			-- World boss, so treat it as three levels higher.
 			value = 3
 		else
-			value = level - OvalePaperDoll.level
+			value = level - state.level
 		end
 		return Compare(value, comparator, limit)
 	end
