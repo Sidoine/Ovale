@@ -63,29 +63,6 @@ do
 	OvaleCondition:RegisterCondition("lastattackpower", false, LastAttackPower)
 	OvaleCondition:RegisterCondition("lastspellattackpower", false, LastAttackPower)
 
-	--- Get the number of combo points consumed by the most recent cast of a spell on the target for a feral druid or a rogue.
-	-- @name LastComboPoints
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The number of combo points.
-	-- @return A boolean value for the result of the comparison.
-	-- @see ComboPoints
-	-- @usage
-	-- if ComboPoints() >3 and target.LastComboPoints(rip) <3
-	--     Spell(rip)
-
-	local function LastComboPoints(condition)
-		return LastSnapshot("comboPoints", 0, condition)
-	end
-
-	OvaleCondition:RegisterCondition("lastcombopoints", false, LastComboPoints)
-	OvaleCondition:RegisterCondition("lastspellcombopoints", false, LastComboPoints)
-
 	--- Get the mastery effect of the player during the most recent cast of a spell on the target.
 	-- Mastery effect is the effect of the player's mastery, typically a percent-increase to damage
 	-- or a percent-increase to chance to trigger some effect.

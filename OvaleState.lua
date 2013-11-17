@@ -18,6 +18,7 @@ Ovale.OvaleState = OvaleState
 
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
+local OvaleFuture = nil		-- forward declaration
 local OvaleQueue = Ovale.OvaleQueue
 
 local pairs = pairs
@@ -50,6 +51,11 @@ OvaleState.state = {
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleState:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleFuture = Ovale.OvaleFuture
+end
+
 function OvaleState:RegisterState(addon, statePrototype)
 	self_stateModules:Insert(addon)
 	self_statePrototype[addon] = statePrototype
@@ -103,7 +109,7 @@ function OvaleState:Reset()
 	state.currentTime = self.now
 	Ovale:Logf("Reset state with current time = %f", state.currentTime)
 
-	self.lastSpellId = Ovale.lastSpellcast and Ovale.lastSpellcast.spellId
+	self.lastSpellId = OvaleFuture.lastSpellcast and OvaleFuture.lastSpellcast.spellId
 	self.currentSpellId = nil
 	self.isChanneling = false
 	self.nextCast = self.now

@@ -18,7 +18,7 @@ do
 	-- Returns the value of the given paper-doll stat.
 	local function PaperDoll(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvalePaperDoll.stat[statName]
+		local value = OvalePaperDoll.snapshot[statName]
 		value = value or defaultValue
 		return Compare(value, comparator, limit)
 	end
@@ -26,7 +26,7 @@ do
 	-- Returns the critical strike chance of the given paper-doll stat.
 	local function PaperDollCritChance(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvalePaperDoll.stat[statName]
+		local value = OvalePaperDoll.snapshot[statName]
 		value = value or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100

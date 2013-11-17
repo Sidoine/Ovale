@@ -21,11 +21,11 @@ do
 	local function GetDamage(spellId)
 		local state = OvaleState.state
 		-- TODO: Use target's debuffs in this calculation.
-		local ap = OvalePaperDoll.stat.attackPower or 0
-		local sp = OvalePaperDoll.stat.spellBonusDamage or 0
-		local mh = OvalePaperDoll.stat.mainHandWeaponDamage or 0
-		local oh = OvalePaperDoll.stat.offHandWeaponDamage or 0
-		local bdm = OvalePaperDoll.stat.baseDamageMultiplier or 1
+		local ap = OvalePaperDoll.snapshot.attackPower or 0
+		local sp = OvalePaperDoll.snapshot.spellBonusDamage or 0
+		local mh = OvalePaperDoll.snapshot.mainHandWeaponDamage or 0
+		local oh = OvalePaperDoll.snapshot.offHandWeaponDamage or 0
+		local bdm = OvalePaperDoll.snapshot.baseDamageMultiplier or 1
 		local dm = state:GetDamageMultiplier(spellId) or 1
 		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm

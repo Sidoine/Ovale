@@ -17,6 +17,7 @@ Ovale.OvaleAura = OvaleAura
 
 --<private-static-properties>
 local OvaleData = Ovale.OvaleData
+local OvaleFuture = nil		-- forward declaration
 local OvaleGUID = Ovale.OvaleGUID
 local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
@@ -34,6 +35,14 @@ local API_UnitAura = UnitAura
 
 -- aura pool
 local self_pool = OvalePool("OvaleAura_pool")
+do
+	self_pool.Clean = function(self, aura)
+		-- Release reference-counted snapshot before wiping.
+		if aura.snapshot then
+			aura.snapshot:ReleaseReference()
+		end
+	end
+end
 -- self_aura[guid] pool
 local self_aura_pool = OvalePool("OvaleAura_aura_pool")
 -- player's GUID
@@ -145,14 +154,13 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 					aura.tick = self:GetTickLength(spellId)
 				end
 				-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
-				local lastSpellcast = Ovale.lastSpellcast
+				local lastSpellcast = OvaleFuture.lastSpellcast
 				local lastSpellId = lastSpellcast and lastSpellcast.spellId
 				if lastSpellId and OvaleData:NeedNewSnapshot(spellId, lastSpellId) then
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%s) on %s from %f, now=%f, aura.serial=%d",
 						filter, name, spellId, guid, lastSpellcast.snapshotTime, now, aura.serial)
-					OvalePaperDoll:SnapshotStats(aura, Ovale.lastSpellcast)
-					-- TODO: This isn't correct if lastSpellId doesn't directly apply the DoT.
-					aura.damageMultiplier = Ovale.lastSpellcast.damageMultiplier
+					-- TODO: damageMultiplier isn't correct if lastSpellId spreads the DoT.
+					OvaleFuture:UpdateFromSpellcast(aura, lastSpellcast)
 				end
 			end
 		end
@@ -322,6 +330,7 @@ end
 
 --<public-static-methods>
 function OvaleAura:OnEnable()
+	OvaleFuture = Ovale.OvaleFuture		-- resolve forward declaration
 	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -719,9 +728,7 @@ do
 							newAura.ending = (ending - tick * remainingTicks) + duration
 							newAura.tick = OvaleAura:GetTickLength(auraId)
 							-- Re-snapshot stats for the DoT.
-							-- XXX This is not quite right because it uses the current player stats instead of the simulator's state.
-							OvalePaperDoll:SnapshotStats(newAura, spellcast)
-							newAura.damageMultiplier = state:GetDamageMultiplier(auraId)
+							OvaleFuture:UpdateFromSpellcast(newAura, spellcast)
 						else
 							newAura.ending = atTime + duration
 						end
@@ -745,9 +752,7 @@ do
 					if isDoT then
 						newAura.tick = OvaleAura:GetTickLength(auraId)
 						-- Snapshot stats for the DoT.
-						-- XXX This is not quite right because it uses the current player stats instead of the simulator's state.
-						OvalePaperDoll:SnapshotStats(newAura, spellcast)
-						newAura.damageMultiplier = state:GetDamageMultiplier(auraId)
+						OvaleFuture:UpdateFromSpellcast(newAura, spellcast)
 					end
 				end
 			end

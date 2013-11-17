@@ -18,8 +18,8 @@ do
 
 	local auraFound = {}
 
-	--- Get the player's damage multiplier for the given aura at the time the aura was applied on the target.
-	-- @name BuffDamageMultiplier
+	--- Get the player's combo points for the given aura at the time the aura was applied on the target.
+	-- @name BuffComboPoints
 	-- @paramsig number or boolean
 	-- @param id The aura spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -27,28 +27,22 @@ do
 	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	--     Defaults to target=player.
 	--     Valid values: player, target, focus, pet.
-	-- @return The damage multiplier.
+	-- @return The number of combo points.
 	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffDamageMultiplier
+	-- @see DebuffComboPoints
 	-- @usage
-	-- if target.DebuffDamageMultiplier(rake) <1 Spell(rake)
+	-- if target.DebuffComboPoints(rip) <5 Spell(rip)
 
-	local function BuffDamageMultiplier(condition)
+	local function BuffComboPoints(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound.snapshot = nil
-		auraFound.damageMultiplier = nil
+		auraFound.combo = nil
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local baseDamageMultiplier = 1
-		if auraFound.snapshot and auraFound.snapshot.baseDamageMultiplier then
-			baseDamageMultiplier = auraFound.snapshot.baseDamageMultiplier
-		end
-		local damageMultiplier = auraFound.damageMultiplier or 1
-		local value = baseDamageMultiplier * damageMultiplier
+		local value = auraFound.combo or 1
 		return TestValue(start, ending, value, start, 0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("buffdamagemultiplier", false, BuffDamageMultiplier)
-	OvaleCondition:RegisterCondition("debuffdamagemultiplier", false, BuffDamageMultiplier)
+	OvaleCondition:RegisterCondition("buffcombopoints", false, BuffComboPoints)
+	OvaleCondition:RegisterCondition("debuffcombopoints", false, BuffComboPoints)
 end

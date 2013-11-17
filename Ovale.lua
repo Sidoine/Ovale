@@ -33,8 +33,6 @@ local OVALE_TRUE_STRING = tostring(true)
 
 --<public-static-properties>
 Ovale.L = L
--- The most recent spell cast.
-Ovale.lastSpellcast = {}
 --The table of check boxes definition
 Ovale.casesACocher = {}
 --the frame with the icons
@@ -121,13 +119,6 @@ end
 
 function Ovale:ToggleOptions()
 	self.frame:ToggleOptions()
-end
-
-function Ovale:UpdateLastSpellcast(spellcast)
-	wipe(self.lastSpellcast)
-	for k, v in pairs(spellcast) do
-		self.lastSpellcast[k] = v
-	end
 end
 
 function Ovale:UpdateVisibility()

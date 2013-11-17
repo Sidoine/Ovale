@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AfterWhiteHit.lua" />
 	<Script file="ArmorSetParts.lua" />
+	<Script file="BuffAmount.lua" />
+	<Script file="BuffComboPoints.lua" />
 	<Script file="BuffDamageMultiplier.lua" />
 	<Script file="BuffDuration.lua" />
 	<Script file="BuffExpires.lua" />
@@ -52,6 +54,7 @@
 	<Script file="ItemCharges.lua" />
 	<Script file="ItemCooldown.lua" />
 	<Script file="ItemCount.lua" />
+	<Script file="LastComboPoints.lua" />
 	<Script file="LastDamage.lua" />
 	<Script file="LastDamageMultiplier.lua" />
 	<Script file="LastEstimatedDamage.lua" />

@@ -47,7 +47,7 @@ do
 		local sp = OvaleFuture:GetLastSpellInfo(guid, spellId, "spellBonusDamage") or 0
 		local mh = OvaleFuture:GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage") or 0
 		local oh = OvaleFuture:GetLastSpellInfo(guid, spellId, "offHandWeaponDamage") or 0
-		local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "comboPoints") or 0
+		local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "combo") or 0
 		local bdm = OvaleFuture:GetLastSpellInfo(guid, spellId, "baseDamageMultiplier") or 1
 		local dm = OvaleFuture:GetLastSpellInfo(guid, spellId, "damageMultiplier") or 1
 		local value = OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm

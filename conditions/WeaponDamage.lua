@@ -36,13 +36,13 @@ do
 		local value = 0
 		if hand == "offhand" or hand == "off" then
 			comparator, limit = condition[2], condition[3]
-			value = OvalePaperDoll.stat.offHandWeaponDamage
+			value = OvalePaperDoll.snapshot.offHandWeaponDamage
 		elseif hand == "mainhand" or hand == "main" then
 			comparator, limit = condition[2], condition[3]
-			value = OvalePaperDoll.stat.mainHandWeaponDamage
+			value = OvalePaperDoll.snapshot.mainHandWeaponDamage
 		else
 			comparator, limit = condition[1], condition[2]
-			value = OvalePaperDoll.stat.mainHandWeaponDamage
+			value = OvalePaperDoll.snapshot.mainHandWeaponDamage
 		end
 		return Compare(value, comparator, limit)
 	end

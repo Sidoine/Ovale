@@ -23,10 +23,12 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local state = OvaleState.state
-		auraFound[statName] = nil
+		auraFound.snapshot = nil
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local value = auraFound[statName]
-		value = value or defaultValue
+		local value = defaultValue
+		if auraFound.snapshot and auraFound.snapshot[statName] then
+			value = auraFound.snapshot[statName]
+		end
 		return TestValue(start, ending, value, start, 0, comparator, limit)
 	end
 
@@ -37,54 +39,15 @@ do
 		local state = OvaleState.state
 		auraFound[statName] = nil
 		local start, ending = state:GetAura(target, auraId, filter, mine, auraFound)
-		local value = auraFound[statName]
-		value = value or defaultValue
+		local value = defaultValue
+		if auraFound.snapshot and auraFound.snapshot[statName] then
+			value = auraFound.snapshot[statName]
+		end
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100
 		end
 		return TestValue(start, ending, value, start, 0, comparator, limit)
 	end
-
-	--- Get the value of a buff as a number.  Not all buffs return an amount.
-	-- @name BuffAmount
-	-- @paramsig number
-	-- @param id The spell ID of the aura or the name of a spell list.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
-	--     Defaults to any=0.
-	--     Valid values: 0, 1.
-	-- @param value Optional. Sets which aura value to return from UnitAura().
-	--     Defaults to value=1.
-	--     Valid values: 1, 2, 3.
-	-- @return The value of the buff as a number.
-	-- @see DebuffAmount
-	-- @see TickValue
-	-- @usage
-	-- if DebuffAmount(stagger) >10000 Spell(purifying_brew)
-	-- if DebuffAmount(stagger more 10000) Spell(purifying_brew)
-
-	local function BuffAmount(condition)
-		local value = condition.value or 1
-		local statName
-		if value == 1 then
-			statName = "value1"
-		elseif value == 2 then
-			statName = "value2"
-		elseif value == 3 then
-			statName = "value3"
-		else
-			statName = "value1"
-		end
-		return BuffSnapshot(statName, 0, condition)
-	end
-
-	OvaleCondition:RegisterCondition("buffamount", false, BuffAmount)
-	OvaleCondition:RegisterCondition("debuffamount", false, BuffAmount)
-	OvaleCondition:RegisterCondition("tickvalue", false, BuffAmount)
 
 	--- Get the player's attack power at the time the given aura was applied on the target.
 	-- @name BuffAttackPower
@@ -107,29 +70,6 @@ do
 
 	OvaleCondition:RegisterCondition("buffattackpower", false, BuffAttackPower)
 	OvaleCondition:RegisterCondition("debuffattackpower", false, BuffAttackPower)
-
-	--- Get the player's combo points for the given aura at the time the aura was applied on the target.
-	-- @name BuffComboPoints
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The number of combo points.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffComboPoints
-	-- @usage
-	-- if target.DebuffComboPoints(rip) <5 Spell(rip)
-
-	local function BuffComboPoints(condition)
-		-- If the buff is presetnt, then it had at least one combo point.
-		return BuffSnapshot("comboPoints", 1, condition)
-	end
-
-	OvaleCondition:RegisterCondition("buffcombopoints", false, BuffComboPoints)
-	OvaleCondition:RegisterCondition("debuffcombopoints", false, BuffComboPoints)
 
 	--- Get the player's mastery effect at the time the given aura was applied on the target.
 	-- @name BuffMasteryEffect
