@@ -129,6 +129,7 @@ end
 function OvalePower:UNIT_DISPLAYPOWER(event, unitId)
 	if unitId == "player" then
 		self:UpdatePowerType()
+		self:UpdatePowerRegen()
 	end
 end
 
