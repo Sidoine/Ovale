@@ -18,18 +18,18 @@ Ovale.OvaleEclipse = OvaleEclipse
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleData = nil
-local OvaleGUID = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
 local select = select
 local API_GetEclipseDirection = GetEclipseDirection
 local API_UnitClass = UnitClass
+local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
 
 -- Player's GUID.
-local self_guid = nil
+local self_guid = API_UnitGUID("player")
 -- Player's class.
 local self_class = select(2, API_UnitClass("player"))
 
@@ -50,14 +50,12 @@ OvaleEclipse.eclipseDirection = 0
 function OvaleEclipse:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
-	OvaleGUID = Ovale.OvaleGUID
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 end
 
 function OvaleEclipse:OnEnable()
 	if self_class == "DRUID" then
-		self_guid = OvaleGUID:GetGUID("player")
 		self:RegisterEvent("ECLIPSE_DIRECTION_CHANGE", "UpdateEclipseDirection")
 		self:RegisterEvent("UNIT_POWER")
 		self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER")

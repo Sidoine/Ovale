@@ -41,7 +41,7 @@ local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
 -- Player's GUID.
-local self_guid = nil
+local self_guid = API_UnitGUID("player")
 
 -- The spells that the player is casting or has cast but are still in-flight toward their targets.
 local self_activeSpellcast = {}
@@ -109,10 +109,9 @@ local function GetDamageMultiplier(spellId)
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
-			local playerGUID = OvaleGUID:GetGUID("player")
 			for filter, auraList in pairs(si.damageAura) do
 				for auraSpellId, multiplier in pairs(auraList) do
-					local aura = OvaleAura:GetAuraByGUID(playerGUID, auraSpellId, filter, nil, "player")
+					local aura = OvaleAura:GetAuraByGUID(self_guid, auraSpellId, filter, nil, "player")
 					if aura and aura.stacks > 0 then
 						local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
 						if auraSpellInfo.stacking and auraSpellInfo.stacking > 0 then
@@ -271,7 +270,6 @@ function OvaleFuture:OnInitialize()
 end
 
 function OvaleFuture:OnEnable()
-	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
@@ -465,7 +463,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	]]--
 
 	-- Called when a missile reaches or misses its target
-	if sourceGUID == OvaleGUID:GetGUID("player") then
+	if sourceGUID == self_guid then
 		if OVALE_CLEU_SPELLCAST_RESULTS[event] then
 			local spellId, spellName = select(12, ...)
 			TracePrintf(spellId, "%s: %s (%d)", event, spellName, spellId)

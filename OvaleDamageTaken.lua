@@ -18,14 +18,14 @@ local OvalePool = Ovale.OvalePool
 local OvaleQueue = Ovale.OvaleQueue
 
 -- Forward declarations for module dependencies.
-local OvaleGUID = nil
 local OvaleLatency = nil
 
 local select = select
 local API_GetTime = GetTime
+local API_UnitGUID = UnitGUID
 
 -- Player's GUID.
-local self_guid = nil
+local self_guid = API_UnitGUID("player")
 -- Damage event pool.
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 -- Damage event queue: new events are inserted at the front of the queue.
@@ -50,12 +50,10 @@ end
 --<public-static-methods>
 function OvaleDamageTaken:OnInitialize()
 	-- Resolve module dependencies.
-	OvaleGUID = Ovale.OvaleGUID
 	OvaleLatency = Ovale.OvaleLatency
 end
 
 function OvaleDamageTaken:OnEnable()
-	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 end

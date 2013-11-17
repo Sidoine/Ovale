@@ -30,20 +30,18 @@ local OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")
 Ovale.OvaleSwing = OvaleSwing
 
 --<private-static-properties>
--- Forward declarations for module dependencies.
-local OvaleGUID = nil
-
 local math_abs = math.abs
 local unpack = unpack
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_IsDualWielding = IsDualWielding
 local API_UnitAttackSpeed = UnitAttackSpeed
+local API_UnitGUID = UnitGUID
 local API_UnitRangedDamage = UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
 -- Player's GUID.
-local self_guid = nil
+local self_guid = API_UnitGUID("player")
 
 local OVALE_AUTOSHOT_NAME = API_GetSpellInfo(75)
 local OVALE_RESET_SPELLS = {}
@@ -66,14 +64,7 @@ OvaleSwing.swingmode = nil
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleSwing:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleGUID = Ovale.OvaleGUID
-end
-
 function OvaleSwing:OnEnable()
-	self_guid = OvaleGUID:GetGUID("player")
-
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")
@@ -116,7 +107,7 @@ function OvaleSwing:STOP_AUTOREPEAT_SPELL()
 end
 
 function OvaleSwing:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventName, srcGUID, srcName, srcFlags, dstName, dstGUID, dstFlags, ...)
-	if srcGUID == OvaleGUID:GetGUID("player") then
+	if srcGUID == self_guid then
 		if eventName == "SWING_DAMAGE" or eventName == "SWING_MISSED" then
 			local now = API_GetTime()
 			self:MeleeSwing(now)

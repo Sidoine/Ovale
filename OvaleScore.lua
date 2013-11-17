@@ -34,15 +34,14 @@ Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
 -- Forward declarations for module dependencies.
-local OvaleGUID = nil
-
 local pairs = pairs
 local strsplit = string.split
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
+local API_UnitGUID = UnitGUID
 
 -- Player's GUID.
-local self_guid = nil
+local self_guid = API_UnitGUID("player")
 -- self_damageMeter[moduleName] = module
 local self_damageMeter = {}
 -- self_damageMeterMethod[moduleName] = methodName or function
@@ -59,13 +58,7 @@ local self_scoredSpell = {}
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleScore:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleGUID = Ovale.OvaleGUID
-end
-
 function OvaleScore:OnEnable()
-	self_guid = OvaleGUID:GetGUID("player")
 	API_RegisterAddonMessagePrefix("Ovale")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")

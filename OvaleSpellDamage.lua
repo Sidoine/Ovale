@@ -16,13 +16,12 @@ Ovale.OvaleSpellDamage = OvaleSpellDamage
 
 --<private-static-properties>
 -- Forward declarations for module dependencies.
-local OvaleGUID = nil
-
 local select = select
 local strfind = string.find
+local API_UnitGUID = UnitGUID
 
 -- Player's GUID.
-local self_guid = nil
+local self_guid = API_UnitGUID("player")
 --</private-static-properties>
 
 --<public-static-properties>
@@ -30,12 +29,7 @@ OvaleSpellDamage.value = {}
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleSpellDamage:OnInitialize()
-	OvaleGUID = Ovale.OvaleGUID
-end
-
 function OvaleSpellDamage:OnEnable()
-	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
