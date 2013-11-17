@@ -46,8 +46,8 @@ do
 		end
 	end
 end
--- self_aura[guid] pool
-local self_aura_pool = OvalePool("OvaleAura_aura_pool")
+-- Table pool.
+local self_table_pool = OvalePool("OvaleAura_table_pool")
 -- player's GUID
 local self_guid = nil
 -- self_aura[guid][filter][spellId][casterGUID] = { aura properties }
@@ -89,10 +89,10 @@ local OVALE_CLEU_TICK_EVENTS = {
 local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
 	local self = OvaleAura
 	if not self_aura[guid][filter] then
-		self_aura[guid][filter] = {}
+		self_aura[guid][filter] = self_table_pool:Get()
 	end
 	if not self_aura[guid][filter][spellId] then
-		self_aura[guid][filter][spellId] = {}
+		self_aura[guid][filter][spellId] = self_table_pool:Get()
 	end
 
 	casterGUID = casterGUID or OVALE_UNKNOWN_GUID
@@ -212,15 +212,17 @@ local function RemoveAurasForGUID(guid, expired)
 			end
 			if not next(whoseTable) then
 				auraList[auraId] = nil
+				self_table_pool:Release(whoseTable)
 			end
 		end
 		if not next(auraList) then
 			auraTable[filter] = nil
+			self_table_pool:Release(auraList)
 		end
 	end
 	if not next(auraTable) then
 		self_aura[guid] = nil
-		self_aura_pool:Release(auraTable)
+		self_table_pool:Release(auraTable)
 	end
 
 	local unitId = OvaleGUID:GetUnitId(guid)
@@ -258,7 +260,7 @@ local function ScanUnitAuras(unitId, guid)
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Advancing age of auras for %s (%s) to %d.", guid, unitId, self_serial[guid])
 
 	if not self_aura[guid] then
-		self_aura[guid] = self_aura_pool:Get()
+		self_aura[guid] = self_table_pool:Get()
 	end
 
 	local i = 1
@@ -385,7 +387,7 @@ function OvaleAura:PLAYER_ENTERING_WORLD(event)
 	end
 	RemoveAurasForMissingUnits()
 	self_pool:Drain()
-	self_aura_pool:Drain()
+	self_table_pool:Drain()
 end
 
 function OvaleAura:UNIT_AURA(event, unitId)
@@ -584,7 +586,7 @@ end
 
 function OvaleAura:Debug()
 	self_pool:Debug()
-	self_aura_pool:Debug()
+	self_table_pool:Debug()
 	for guid, auraTable in pairs(self_aura) do
 		Ovale:FormatPrint("Auras for %s:", guid)
 		for filter, auraList in pairs(auraTable) do
