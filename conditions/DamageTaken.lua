@@ -11,7 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleDamage = Ovale.OvaleDamage
+	local OvaleDamageTaken = Ovale.OvaleDamageTaken
 
 	local Compare = OvaleCondition.Compare
 

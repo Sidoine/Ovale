@@ -11,6 +11,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleData = Ovale.OvaleData
 	local OvaleEquipement = Ovale.OvaleEquipement
 
 	local pairs = pairs

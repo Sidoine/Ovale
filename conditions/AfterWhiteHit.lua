@@ -12,6 +12,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleState = Ovale.OvaleState
 	local OvaleSwing = Ovale.OvaleSwing
 
 	local TestValue = OvaleCondition.TestValue

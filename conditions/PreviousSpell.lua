@@ -13,6 +13,7 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
+
 	local TestBoolean = OvaleCondition.TestBoolean
 
 	--- Test if the previous spell cast matches the given spell.

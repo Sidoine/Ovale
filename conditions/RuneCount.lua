@@ -12,7 +12,6 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleRunes = Ovale.OvaleRunes
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare

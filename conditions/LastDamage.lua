@@ -12,6 +12,7 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleSpellDamage = Ovale.OvaleSpellDamage
 
 	local Compare = OvaleCondition.Compare
 
