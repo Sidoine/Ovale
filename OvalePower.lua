@@ -218,6 +218,9 @@ OvalePower.statePrototype = {
 --<public-static-methods>
 -- Initialize the state.
 function OvalePower:InitializeState(state)
+	for powerType in pairs(self.POWER_INFO) do
+		state[powerType] = 0
+	end
 	state.powerRate = {}
 end
 
