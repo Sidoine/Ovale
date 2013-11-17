@@ -71,7 +71,7 @@ end
 --<private-static-properties>
 local itemPrototype = {
 	_refcount_pool_object = nil,
-	AddReference = AddReference,
+	GetReference = GetReference,
 	ReferenceCount = ReferenceCount,
 	ReleaseReference = ReleaseReference,
 }
