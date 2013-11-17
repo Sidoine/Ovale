@@ -17,12 +17,13 @@ local OvaleRunes = Ovale:NewModule("OvaleRunes", "AceEvent-3.0")
 Ovale.OvaleRunes = OvaleRunes
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
-local OvalePaperDoll = Ovale.OvalePaperDoll
-local OvalePower = Ovale.OvalePower
-local OvaleSpellBook = Ovale.OvaleSpellBook
-local OvaleStance = Ovale.OvaleStance
-local OvaleState = Ovale.OvaleState
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvalePaperDoll = nil
+local OvalePower = nil
+local OvaleSpellBook = nil
+local OvaleStance = nil
+local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
@@ -82,6 +83,16 @@ OvaleRunes.RUNE_TYPE = RUNE_TYPE
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleRunes:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvalePower = Ovale.OvalePower
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleStance = Ovale.OvaleStance
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleRunes:OnEnable()
 	if self_class == "DEATHKNIGHT" then
 		-- Initialize rune database.

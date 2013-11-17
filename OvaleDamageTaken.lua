@@ -14,10 +14,12 @@ local OvaleDamageTaken = Ovale:NewModule("OvaleDamageTaken", "AceEvent-3.0")
 Ovale.OvaleDamageTaken = OvaleDamageTaken
 
 --<private-static-properties>
-local OvaleGUID = Ovale.OvaleGUID
-local OvaleLatency = Ovale.OvaleLatency
 local OvalePool = Ovale.OvalePool
 local OvaleQueue = Ovale.OvaleQueue
+
+-- Forward declarations for module dependencies.
+local OvaleGUID = nil
+local OvaleLatency = nil
 
 local select = select
 local API_GetTime = GetTime
@@ -46,6 +48,12 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleDamageTaken:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleGUID = Ovale.OvaleGUID
+	OvaleLatency = Ovale.OvaleLatency
+end
+
 function OvaleDamageTaken:OnEnable()
 	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")

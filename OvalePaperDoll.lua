@@ -14,9 +14,11 @@ local OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 Ovale.OvalePaperDoll = OvalePaperDoll
 
 --<private-static-properties>
-local OvaleEquipement = Ovale.OvaleEquipement
 local OvalePoolRefCount = Ovale.OvalePoolRefCount
-local OvaleStance = Ovale.OvaleStance
+
+-- Forward declarations for module dependencies.
+local OvaleEquipement = nil
+local OvaleStance = nil
 
 local select = select
 local tonumber = tonumber
@@ -133,14 +135,23 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function OvalePaperDoll:OnEnable()
+function OvalePaperDoll:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleStance = Ovale.OvaleStance
+
 	-- Initialize latest snapshot table.
+	if self.snapshot then
+		self.snapshot:Release()
+	end
 	self.snapshot = self_pool:Get()
 	for k, info in pairs(self.SNAPSHOT_STATS) do
 		self.snapshot[k] = info.default
 	end
 	self.snapshot.snapshotTime = 0
+end
 
+function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStats")
 	self:RegisterEvent("COMBAT_RATING_UPDATE")
 	self:RegisterEvent("MASTERY_UPDATE")

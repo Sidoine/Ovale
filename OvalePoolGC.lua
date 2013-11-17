@@ -9,7 +9,7 @@
 
 -- This module wraps the standard Lua garbage collector using the Pool interface.
 local _, Ovale = ...
-local OvalePoolGC = Ovale:NewModule("OvalePoolGC")
+local OvalePoolGC = {}
 Ovale.OvalePoolGC = OvalePoolGC
 
 --<private-static-properties>

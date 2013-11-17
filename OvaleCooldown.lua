@@ -13,11 +13,12 @@ local OvaleCooldown = Ovale:NewModule("OvaleCooldown")
 Ovale.OvaleCooldown = OvaleCooldown
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
-local OvaleGUID = Ovale.OvaleGUID
-local OvalePaperDoll = Ovale.OvalePaperDoll
-local OvaleStance = Ovale.OvaleStance
-local OvaleState = Ovale.OvaleState
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvaleGUID = nil
+local OvalePaperDoll = nil
+local OvaleStance = nil
+local OvaleState = nil
 
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
@@ -28,6 +29,15 @@ local self_class = select(2, API_UnitClass("player"))
 --</private-static-properties>
 
 --<public-static-methods>
+function OvaleCooldown:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvaleGUID = Ovale.OvaleGUID
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleStance = Ovale.OvaleStance
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleCooldown:OnEnable()
 	OvaleState:RegisterState(self, self.statePrototype)
 end

@@ -33,13 +33,16 @@ local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0")
 Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
-local OvaleGUID = Ovale.OvaleGUID
+-- Forward declarations for module dependencies.
+local OvaleGUID = nil
 
 local pairs = pairs
 local strsplit = string.split
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
 
+-- Player's GUID.
+local self_guid = nil
 -- self_damageMeter[moduleName] = module
 local self_damageMeter = {}
 -- self_damageMeterMethod[moduleName] = methodName or function
@@ -56,7 +59,13 @@ local self_scoredSpell = {}
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleScore:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleGUID = Ovale.OvaleGUID
+end
+
 function OvaleScore:OnEnable()
+	self_guid = OvaleGUID:GetGUID("player")
 	API_RegisterAddonMessagePrefix("Ovale")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -83,7 +92,7 @@ function OvaleScore:PLAYER_REGEN_ENABLED()
 	-- Broadcast the player's own score for damage meters when combat ends.
 	-- Broadcast message is "score;maxScore;playerGUID"
 	if self_maxScore > 0 then
-		local message = self_score .. ";" .. self_maxScore .. ";" .. OvaleGUID:GetGUID("player")
+		local message = self_score .. ";" .. self_maxScore .. ";" .. self_guid
 		API_SendAddonMessage("Ovale", message, "RAID")
 	end
 end
@@ -120,7 +129,7 @@ function OvaleScore:ScoreSpell(spellId)
 		if scored then
 			self_score = self_score + scored
 			self_maxScore = self_maxScore + 1
-			self:SendScore(self_playerName, OvaleGUID:GetGUID("player"), scored, 1)
+			self:SendScore(self_playerName, self_guid, scored, 1)
 		end
 	end
 end

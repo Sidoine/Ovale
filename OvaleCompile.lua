@@ -14,17 +14,19 @@ Ovale.OvaleCompile = OvaleCompile
 
 --<private-static-properties>
 local L = Ovale.L
-local OvaleCondition = Ovale.OvaleCondition
-local OvaleData = Ovale.OvaleData
-local OvaleEquipement = Ovale.OvaleEquipement
-local OvaleOptions = Ovale.OvaleOptions
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
-local OvaleScore = Ovale.OvaleScore
-local OvaleScripts = Ovale.OvaleScripts
-local OvaleSpellBook = Ovale.OvaleSpellBook
-local OvaleStance = Ovale.OvaleStance
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
+
+-- Forward declarations for module dependencies.
+local OvaleCondition = nil
+local OvaleData = nil
+local OvaleEquipement = nil
+local OvaleOptions = nil
+local OvalePaperDoll = nil
+local OvaleScore = nil
+local OvaleScripts = nil
+local OvaleSpellBook = nil
+local OvaleStance = nil
 
 local ipairs = ipairs
 local pairs = pairs
@@ -827,6 +829,19 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleCompile:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleCondition = Ovale.OvaleCondition
+	OvaleData = Ovale.OvaleData
+	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleOptions = Ovale.OvaleOptions
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleScore = Ovale.OvaleScore
+	OvaleScripts = Ovale.OvaleScripts
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleStance = Ovale.OvaleStance
+end
+
 function OvaleCompile:OnEnable()
 	self:RegisterMessage("Ovale_CheckBoxValueChanged", "EventHandler")
 	self:RegisterMessage("Ovale_EquipmentChanged")

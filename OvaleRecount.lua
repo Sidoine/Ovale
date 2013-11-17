@@ -14,7 +14,7 @@ Ovale.OvaleRecount = OvaleRecount
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale("Recount", true)
-local OvaleScore = Ovale.OvaleScore
+local OvaleScore = nil
 local Recount = LibStub("AceAddon-3.0"):GetAddon("Recount", true)
 --</private-static-properties>
 
@@ -47,6 +47,7 @@ end
 
 --<public-static-methods>
 function OvaleRecount:OnInitialize()
+	OvaleScore = Ovale.OvaleScore
 	if Recount then
 		if not L then
 			L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })

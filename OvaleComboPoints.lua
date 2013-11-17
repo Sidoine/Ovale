@@ -14,9 +14,10 @@ local OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 Ovale.OvaleComboPoints = OvaleComboPoints
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
-local OvaleGUID = Ovale.OvaleGUID
-local OvaleState = Ovale.OvaleState
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvaleGUID = nil
+local OvaleState = nil
 
 local API_GetComboPoints = GetComboPoints
 local API_UnitClass = UnitClass
@@ -31,6 +32,13 @@ OvaleComboPoints.combo = 0
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleComboPoints:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvaleGUID = Ovale.OvaleGUID
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleComboPoints:OnEnable()
 	if self_class == "ROGUE" or self_class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")

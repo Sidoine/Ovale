@@ -16,9 +16,11 @@ Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
 local L = Ovale.L
-local OvaleScripts = Ovale.OvaleScripts
-local OvaleSpellBook = Ovale.OvaleSpellBook
-local OvaleState = Ovale.OvaleState
+
+-- Forward declarations for module dependencies.
+local OvaleScripts = nil
+local OvaleSpellBook = nil
+local OvaleState = nil
 
 local strgmatch = string.gmatch
 local strgsub = string.gsub
@@ -664,6 +666,11 @@ local self_options =
 
 --<public-static-methods>
 function OvaleOptions:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleScripts = Ovale.OvaleScripts
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleState = Ovale.OvaleState
+
 	self.db = LibStub("AceDB-3.0"):New("OvaleDB",
 	{
 		profile = 

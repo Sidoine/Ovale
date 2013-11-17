@@ -13,8 +13,9 @@ local OvalePower = Ovale:NewModule("OvalePower", "AceEvent-3.0")
 Ovale.OvalePower = OvalePower
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
-local OvaleState = Ovale.OvaleState
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvaleState = nil
 
 local pairs = pairs
 local select = select
@@ -85,6 +86,12 @@ end
 --</public-static-properties>
 
 --<public-static-methods>
+function OvalePower:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvaleState = Ovale.OvaleState
+end
+
 function OvalePower:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "EventHandler")
 	self:RegisterEvent("PLAYER_ALIVE", "EventHandler")

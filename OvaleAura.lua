@@ -16,12 +16,14 @@ local OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 Ovale.OvaleAura = OvaleAura
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
-local OvaleFuture = nil		-- forward declaration
-local OvaleGUID = Ovale.OvaleGUID
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
-local OvaleState = Ovale.OvaleState
+
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvaleFuture = nil
+local OvaleGUID = nil
+local OvalePaperDoll = nil
+local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
@@ -62,7 +64,6 @@ local OVALE_DEBUFF_TYPES = {
 	Magic = true,
 	Poison = true,
 }
-local OVALE_UNIT_AURA_UNITS = OvaleGUID.UNIT_AURA_UNITS
 -- CLEU events triggered by auras being applied, removed, refreshed, or changed in stack size.
 local OVALE_CLEU_AURA_EVENTS = {
 	SPELL_AURA_APPLIED = true,
@@ -329,8 +330,16 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleAura:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvaleFuture = Ovale.OvaleFuture
+	OvaleGUID = Ovale.OvaleGUID
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleAura:OnEnable()
-	OvaleFuture = Ovale.OvaleFuture		-- resolve forward declaration
 	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -357,7 +366,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		RemoveAurasForGUID(destGUID)
 	elseif OVALE_CLEU_AURA_EVENTS[event] then
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId and not OVALE_UNIT_AURA_UNITS[unitId] then
+		if unitId and not OvaleGUID.UNIT_AURA_UNITS[unitId] then
 			ScanUnitAuras(unitId, destGUID)
 		end
 	elseif mine and OVALE_CLEU_TICK_EVENTS[event] then
@@ -370,7 +379,7 @@ end
 function OvaleAura:PLAYER_ENTERING_WORLD(event)
 	Ovale:DebugPrint(OVALE_AURA_DEBUG, event)
 	-- Update auras on all visible units.
-	for unitId in pairs(OVALE_UNIT_AURA_UNITS) do
+	for unitId in pairs(OvaleGUID.UNIT_AURA_UNITS) do
 		ScanUnitAuras(unitId)
 	end
 	RemoveAurasForMissingUnits()

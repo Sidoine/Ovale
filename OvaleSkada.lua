@@ -14,7 +14,8 @@ local OvaleSkada = Skada and Skada:NewModule("Ovale Spell Priority") or Ovale:Ne
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>
-local OvaleScore = Ovale.OvaleScore
+-- Forward declarations for module dependencies.
+local OvaleScore = nil
 
 local ipairs = ipairs
 local floor = math.floor
@@ -36,6 +37,11 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleSkada:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleScore = Ovale.OvaleScore
+end
+
 function OvaleSkada:OnEnable()
 	self.metadata = { showspots = true }
 	if Skada then

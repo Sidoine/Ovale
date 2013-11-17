@@ -30,7 +30,8 @@ local OvaleSwing = Ovale:NewModule("OvaleSwing", "AceEvent-3.0")
 Ovale.OvaleSwing = OvaleSwing
 
 --<private-static-properties>
-local OvaleGUID = Ovale.OvaleGUID
+-- Forward declarations for module dependencies.
+local OvaleGUID = nil
 
 local math_abs = math.abs
 local unpack = unpack
@@ -40,6 +41,9 @@ local API_IsDualWielding = IsDualWielding
 local API_UnitAttackSpeed = UnitAttackSpeed
 local API_UnitRangedDamage = UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
+
+-- Player's GUID.
+local self_guid = nil
 
 local OVALE_AUTOSHOT_NAME = API_GetSpellInfo(75)
 local OVALE_RESET_SPELLS = {}
@@ -62,7 +66,14 @@ OvaleSwing.swingmode = nil
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleSwing:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleGUID = Ovale.OvaleGUID
+end
+
 function OvaleSwing:OnEnable()
+	self_guid = OvaleGUID:GetGUID("player")
+
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")

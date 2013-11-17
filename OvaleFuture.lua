@@ -15,16 +15,18 @@ local OvaleFuture = Ovale:NewModule("OvaleFuture", "AceEvent-3.0")
 Ovale.OvaleFuture = OvaleFuture
 
 --<private-static-properties>
-local OvaleAura = Ovale.OvaleAura
-local OvaleComboPoints = Ovale.OvaleComboPoints
-local OvaleData = Ovale.OvaleData
-local OvaleGUID = Ovale.OvaleGUID
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
-local OvalePower = Ovale.OvalePower
-local OvaleScore = Ovale.OvaleScore
-local OvaleSpellBook = Ovale.OvaleSpellBook
-local OvaleState = Ovale.OvaleState
+
+-- Forward declarations for module dependencies.
+local OvaleAura = nil
+local OvaleComboPoints = nil
+local OvaleData = nil
+local OvaleGUID = nil
+local OvalePaperDoll = nil
+local OvalePower = nil
+local OvaleScore = nil
+local OvaleSpellBook = nil
+local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
@@ -255,6 +257,19 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleFuture:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleAura = Ovale.OvaleAura
+	OvaleComboPoints = Ovale.OvaleComboPoints
+	OvaleData = Ovale.OvaleData
+	OvaleGUID = Ovale.OvaleGUID
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvalePower = Ovale.OvalePower
+	OvaleScore = Ovale.OvaleScore
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleFuture:OnEnable()
 	self_guid = OvaleGUID:GetGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")

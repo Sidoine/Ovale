@@ -94,7 +94,12 @@ $m{Skada}{get_player} = true;
 $p{Skada}{current} = true;
 $p{Skada}{total} = true;
 
+$sp{Ovale}{OvalePool} = true;
+$sp{Ovale}{OvalePoolGC} = true;
+$sp{Ovale}{OvalePoolRefCount} = true;
+$sp{Ovale}{OvaleQueue} = true;
 $sp{Ovale}{OvaleSkada} = true;
+$sp{Ovale}{OvaleTimeSpan} = true;
 
 $sp{OvaleCondition}{Compare} = true;
 $sp{OvaleCondition}{ParseCondition} = true;

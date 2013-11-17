@@ -9,7 +9,7 @@
 
 -- Simple resource pool.
 local _, Ovale = ...
-local OvalePool = Ovale:NewModule("OvalePool")
+local OvalePool = {}
 Ovale.OvalePool = OvalePool
 
 --<private-static-properties>

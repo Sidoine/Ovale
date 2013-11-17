@@ -13,19 +13,21 @@ local OvaleBestAction = Ovale:NewModule("OvaleBestAction")
 Ovale.OvaleBestAction = OvaleBestAction
 
 --<private-static-properties>
-local OvaleActionBar = Ovale.OvaleActionBar
-local OvaleCondition = Ovale.OvaleCondition
-local OvaleCooldown = Ovale.OvaleCooldown
-local OvaleData = Ovale.OvaleData
-local OvaleEquipement = Ovale.OvaleEquipement
-local OvaleFuture = Ovale.OvaleFuture
-local OvalePaperDoll = Ovale.OvalePaperDoll
 local OvalePool = Ovale.OvalePool
-local OvalePower = Ovale.OvalePower
-local OvaleSpellBook = Ovale.OvaleSpellBook
-local OvaleStance = Ovale.OvaleStance
-local OvaleState = Ovale.OvaleState
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
+
+-- Forward declarations for module dependencies.
+local OvaleActionBar = nil
+local OvaleCondition = nil
+local OvaleCooldown = nil
+local OvaleData = nil
+local OvaleEquipement = nil
+local OvaleFuture = nil
+local OvalePaperDoll = nil
+local OvalePower = nil
+local OvaleSpellBook = nil
+local OvaleStance = nil
+local OvaleState = nil
 
 local abs = math.abs
 local floor = math.floor
@@ -702,6 +704,21 @@ local OVALE_COMPUTE_VISITOR =
 --</private-static-properties>
 
 --<public-static-methods>
+function OvaleBestAction:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleActionBar = Ovale.OvaleActionBar
+	OvaleCooldown = Ovale.OvaleCooldown
+	OvaleCondition = Ovale.OvaleCondition
+	OvaleData = Ovale.OvaleData
+	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleFuture = Ovale.OvaleFuture
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvalePower = Ovale.OvalePower
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleStance = Ovale.OvaleStance
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleBestAction:StartNewAction()
 	OvaleState:Reset()
 	OvaleFuture:ApplyInFlightSpells()

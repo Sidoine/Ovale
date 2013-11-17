@@ -17,9 +17,11 @@ local OvaleState = Ovale:NewModule("OvaleState")
 Ovale.OvaleState = OvaleState
 
 --<private-static-properties>
-local OvaleData = Ovale.OvaleData
-local OvaleFuture = nil		-- forward declaration
 local OvaleQueue = Ovale.OvaleQueue
+
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvaleFuture = nil
 
 local pairs = pairs
 local API_GetTime = GetTime
@@ -53,6 +55,7 @@ OvaleState.state = {
 --<public-static-methods>
 function OvaleState:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 end
 

@@ -20,7 +20,7 @@
 --]]
 
 local _, Ovale = ...
-local OvalePoolRefCount = Ovale:NewModule("OvalePoolRefCount")
+local OvalePoolRefCount = {}
 Ovale.OvalePoolRefCount = OvalePoolRefCount
 
 --<private-static-properties>

@@ -18,47 +18,48 @@ locales\locales.xml
 
 Ovale.lua
 
-# Modules with no dependencies
-OvaleActionBar.lua
-OvaleCondition.lua
-OvaleData.lua
-OvaleEnemies.lua
-OvaleEquipement.lua
-OvaleGUID.lua
-OvaleLatency.lua
+# Utility modules.
 OvalePool.lua
 OvalePoolGC.lua
 OvalePoolRefCount.lua
 OvaleQueue.lua
+OvaleTimeSpan.lua
+
+# Core modules.
+OvaleActionBar.lua
+OvaleAura.lua
+OvaleBestAction.lua
+OvaleComboPoints.lua
+OvaleCompile.lua
+OvaleCondition.lua
+OvaleCooldown.lua
+OvaleData.lua
+OvaleEquipement.lua
+OvaleFuture.lua
+OvaleGUID.lua
+OvaleLatency.lua
+OvaleOptions.lua
+OvalePaperDoll.lua
+OvalePower.lua
+OvaleScore.lua
 OvaleScripts.lua
-scripts\scripts.xml
 OvaleSpellBook.lua
 OvaleStance.lua
-OvaleTimeSpan.lua
-#
-OvaleDamageTaken.lua
-OvalePaperDoll.lua
-OvaleScore.lua
-OvaleSpellDamage.lua
 OvaleState.lua
-OvaleSwing.lua
-#
-OvaleAura.lua
-OvaleComboPoints.lua
-OvaleCooldown.lua
-OvaleOptions.lua
-OvalePower.lua
-OvaleRecount.lua
-OvaleSkada.lua
-#
-OvaleCompile.lua
-OvaleEclipse.lua
-OvaleFuture.lua
+
+# Core modules with dependencies.
 OvaleIcone.lua
 OvaleIcone.xml
-OvaleRunes.lua
-#
-conditions\conditions.xml
-OvaleBestAction.lua
-#
 OvaleFrame.lua
+
+# Additional modules.
+OvaleDamageTaken.lua
+OvaleEclipse.lua
+OvaleEnemies.lua
+OvaleRecount.lua
+OvaleRunes.lua
+OvaleSkada.lua
+OvaleSpellDamage.lua
+OvaleSwing.lua
+conditions\conditions.xml
+scripts\scripts.xml
