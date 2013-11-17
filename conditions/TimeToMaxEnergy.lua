@@ -16,6 +16,7 @@ do
 
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
 	-- @name TimeToMaxEnergy
@@ -31,7 +32,6 @@ do
 	local function TimeToMaxEnergy(condition)
 		local comparator, limit = condition[1], condition[2]
 		local maxEnergy = OvalePower.maxPower.energy or 0
-		local state = OvaleState.state
 		local energy = state.energy or 0
 		local energyRegen = state.powerRate.energy or 10
 		local t = (maxEnergy - energy) / energyRegen

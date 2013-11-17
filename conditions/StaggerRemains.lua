@@ -17,6 +17,7 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	local LIGHT_STAGGER = 124275
 	local MODERATE_STAGGER = 124274
@@ -38,7 +39,6 @@ do
 	local function StaggerRemains(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
 		if not aura or aura.stacks == 0 then
 			aura = state:GetAura(target, MODERATE_STAGGER, "HARMFUL")

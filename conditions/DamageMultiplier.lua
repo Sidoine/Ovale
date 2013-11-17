@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the current damage multiplier of a spell.
 	-- This currently does not take into account increased damage due to mastery.
@@ -31,7 +32,6 @@ do
 
 	local function DamageMultiplier(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local state = OvaleState.state
 		local bdm = state.snapshot.baseDamageMultiplier
 		local dm = state:GetDamageMultiplier(spellId)
 		local value = bdm * dm

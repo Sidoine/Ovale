@@ -16,6 +16,7 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the time elapsed since the aura was last gained on the target.
 	-- @paramsig number or boolean
@@ -35,7 +36,6 @@ do
 	local function BuffGain(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local gain = aura.gain or 0

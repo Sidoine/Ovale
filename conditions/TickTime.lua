@@ -17,6 +17,7 @@ do
 
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	--- Get the number of seconds between ticks of a periodic aura on a target.
 	-- @name TickTime
@@ -37,7 +38,6 @@ do
 	local function TickTime(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local value = aura.tick or OvaleAura:GetTickLength(auraId)

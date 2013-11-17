@@ -15,6 +15,7 @@ do
 
 	local API_HasFullControl = HasFullControl
 	local TestBoolean = OvaleCondition.TestBoolean
+	local state = OvaleState.state
 
 	--- Test if the player is stunned.
 	-- @name IsStunned
@@ -28,7 +29,6 @@ do
 
 	local function IsStunned(condition)
 		local yesno = condition[1]
-		local state = OvaleState.state
 		local boolean = not API_HasFullControl() and state:GetAura("player", "stun", "HARMFUL")
 		return TestBoolean(boolean, yesno)
 	end

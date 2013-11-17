@@ -17,6 +17,7 @@ do
 	local API_UnitLevel = UnitLevel
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	--- Get the result of the target's level minus the player's level. This number may be negative.
 	-- @name RelativeLevel
@@ -37,7 +38,6 @@ do
 	local function RelativeLevel(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local state = OvaleState.state
 		local value, level
 		if target == "player" then
 			level = state.level

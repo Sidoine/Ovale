@@ -17,6 +17,8 @@ do
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
 
+	local state = OvaleState.state
+
 	--- Get the value of a buff as a number.  Not all buffs return an amount.
 	-- @name BuffAmount
 	-- @paramsig number
@@ -43,7 +45,6 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local value = condition.value or 1
-		local state = OvaleState.state
 		local statName = "value1"
 		if value == 1 then
 			statName = "value1"

@@ -17,6 +17,7 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the remaining number of ticks of a periodic aura on a target.
 	-- @name TicksRemain
@@ -40,7 +41,6 @@ do
 	local function TicksRemain(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local start, ending, tick = aura.start, aura.ending, aura.tick

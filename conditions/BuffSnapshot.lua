@@ -16,12 +16,12 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	-- Return the value of the stat from the aura snapshot at the time the aura was applied.
 	local function BuffSnapshot(statName, defaultValue, condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local start, ending = aura.start, aura.ending
@@ -35,7 +35,6 @@ do
 	local function BuffSnapshotCritChance(statName, defaultValue, condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then

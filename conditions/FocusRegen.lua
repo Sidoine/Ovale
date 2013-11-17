@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the amount of regenerated focus per second for hunters.
 	-- @name FocusRegen
@@ -28,7 +29,6 @@ do
 
 	local function FocusRegen(condition)
 		local comparator, limit = condition[1], condition[2]
-		local state = OvaleState.state
 		local value = state.powerRate.focus
 		return Compare(value, comparator, limit)
 	end

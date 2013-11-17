@@ -15,10 +15,10 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
 	local function GetDamage(spellId)
-		local state = OvaleState.state
 		-- TODO: Use target's debuffs in this calculation.
 		local ap = state.snapshot.attackPower or 0
 		local sp = state.snapshot.spellBonusDamage or 0

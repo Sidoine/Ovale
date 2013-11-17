@@ -16,6 +16,7 @@ do
 	local API_UnitLevel = UnitLevel
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	--- Get the level of the target.
 	-- @name Level
@@ -34,7 +35,6 @@ do
 	local function Level(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local state = OvaleState.state
 		local value
 		if target == "player" then
 			value = state.level

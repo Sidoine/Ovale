@@ -16,6 +16,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local RUNE_TYPE = OvaleRunes.RUNE_TYPE
+	local state = OvaleState.state
 
 	local ParseRuneCondition = nil
 	do
@@ -69,7 +70,6 @@ do
 
 	local function Runes(condition)
 		local blood, unholy, frost, death, deathCondition = ParseRuneCondition(condition)
-		local state = OvaleState.state
 		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
 		return state.currentTime + seconds, math.huge
 	end
@@ -94,7 +94,6 @@ do
 
 	local function RunesCooldown(condition)
 		local blood, unholy, frost, death, deathCondition = ParseRuneCondition(condition)
-		local state = OvaleState.state
 		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
 		return 0, state.currentTime + seconds, seconds, state.currentTime, -1
 	end

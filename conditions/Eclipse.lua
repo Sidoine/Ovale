@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the current amount of Eclipse power for balance druids.
 	-- A negative amount of power signifies being closer to Lunar Eclipse.
@@ -31,7 +32,6 @@ do
 
 	local function Eclipse(condition)
 		local comparator, limit = condition[1], condition[2]
-		local state = OvaleState.state
 		local value = state.eclipse
 		return Compare(value, comparator, limit)
 	end

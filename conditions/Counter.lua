@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the current value of a script counter.
 	-- @name Counter
@@ -26,7 +27,6 @@ do
 
 	local function Counter(condition)
 		local counter, comparator, limit = condition[1], condition[2], condition[3]
-		local state = OvaleState.state
 		local value = state:GetCounterValue(counter)
 		return Compare(value, comparator, limit)
 	end

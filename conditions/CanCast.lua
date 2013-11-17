@@ -14,6 +14,8 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
 
+	local state = OvaleState.state
+
 	--- Check if the player can cast the given spell (not on cooldown).
 	-- @name CanCast
 	-- @paramsig boolean
@@ -22,7 +24,6 @@ do
 
 	local function CanCast(condition)
 		local spellId = condition[1]
-		local state = OvaleState.state
 		local start, duration = state:GetSpellCooldown(spellId)
 		return start + duration, math.huge
 	end

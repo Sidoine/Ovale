@@ -16,6 +16,7 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the remaining time in seconds on an aura.
 	-- @name BuffRemains
@@ -39,7 +40,6 @@ do
 	local function BuffRemains(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local start, ending = aura.start, aura.ending

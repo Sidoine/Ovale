@@ -18,6 +18,7 @@ do
 	local select = select
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	--- Get the total number of ticks of a periodic aura.
 	-- @name Ticks
@@ -32,7 +33,6 @@ do
 	local function Ticks(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		local numTicks
 		if aura then

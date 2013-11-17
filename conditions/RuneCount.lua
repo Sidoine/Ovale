@@ -16,6 +16,7 @@ do
 
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the current number of active runes of the given type for death knights.
 	-- @name RuneCount
@@ -40,7 +41,6 @@ do
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local deathCondition = condition.death
 
-		local state = OvaleState.state
 		local count, startCooldown, endCooldown = state:RuneCount(name, deathCondition)
 		if startCooldown < math.huge then
 			local origin = startCooldown

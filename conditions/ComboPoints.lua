@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the number of combo points on the currently selected target for a feral druid or a rogue.
 	-- @name ComboPoints
@@ -29,7 +30,6 @@ do
 
 	local function ComboPoints(condition)
 		local comparator, limit = condition[1], condition[2]
-		local state = OvaleState.state
 		local value = state.combo
 		return Compare(value, comparator, limit)
 	end

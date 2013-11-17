@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the time scaled by the specified haste type, defaulting to spell haste.
 	--- For example, if a DoT normally ticks every 3 seconds and is scaled by spell haste, then it ticks every TimeWithHaste(3 haste=spell) seconds.
@@ -34,7 +35,6 @@ do
 	local function TimeWithHaste(condition)
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local haste = condition.haste or "spell"
-		local state = OvaleState.state
 		seconds = seconds or 0
 		local value = seconds
 		if haste == "spell" then

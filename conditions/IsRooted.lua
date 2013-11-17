@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local TestBoolean = OvaleCondition.TestBoolean
+	local state = OvaleState.state
 
 	--- Test if the player is rooted.
 	-- @name IsRooted
@@ -27,7 +28,6 @@ do
 
 	local function IsRooted(condition)
 		local yesno = condition[1]
-		local state = OvaleState.state
 		local boolean = state:GetAura("player", "root", "HARMFUL")
 		return TestBoolean(boolean, yesno)
 	end

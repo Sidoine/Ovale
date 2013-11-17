@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
 	-- @name EnergyRegen
@@ -27,7 +28,6 @@ do
 
 	local function EnergyRegen(condition)
 		local comparator, limit = condition[1], condition[2]
-		local state = OvaleState.state
 		local value = state.powerRate.energy
 		return Compare(value, comparator, limit)
 	end

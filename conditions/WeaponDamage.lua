@@ -14,6 +14,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	--- The normalized weapon damage of the weapon in the given hand.
 	-- @name WeaponDamage
@@ -33,7 +34,6 @@ do
 	local function WeaponDamage(condition)
 		local hand = condition[1]
 		local comparator, limit
-		local state = OvaleState.state
 		local value = 0
 		if hand == "offhand" or hand == "off" then
 			comparator, limit = condition[2], condition[3]

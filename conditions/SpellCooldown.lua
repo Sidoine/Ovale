@@ -19,6 +19,7 @@ do
 	local type = type
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the cooldown in seconds before a spell is ready for use.
 	-- @name SpellCooldown
@@ -34,7 +35,6 @@ do
 
 	local function SpellCooldown(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local state = OvaleState.state
 		local start, duration
 		if type(spellId) == "string" then
 			local sharedCd = state.cd[spellId]

@@ -19,6 +19,7 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the current percent level of mana (between 0 and 100) of the target.
 	-- @name ManaPercent
@@ -37,7 +38,6 @@ do
 	local function ManaPercent(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local state = OvaleState.state
 		if target == "player" then
 			local powerMax = OvalePower.maxPower.mana or 0
 			if powerMax > 0 then

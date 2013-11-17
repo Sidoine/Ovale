@@ -14,11 +14,11 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local state = OvaleState.state
 
 	-- Returns the value of the given snapshot stat.
 	local function Snapshot(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
-		local state = OvaleState.state
 		local value = state.snapshot[statName] or defaultValue
 		return Compare(value, comparator, limit)
 	end
@@ -26,7 +26,6 @@ do
 	-- Returns the critical strike chance of the given snapshot stat.
 	local function SnapshotCritChance(statName, defaultValue, condition)
 		local comparator, limit = condition[1], condition[2]
-		local state = OvaleState.state
 		local value = state.snapshot[statName] or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
 			value = 100

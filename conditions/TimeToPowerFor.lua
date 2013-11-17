@@ -18,6 +18,7 @@ do
 	local API_GetSpellInfo = GetSpellInfo
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the number of seconds before the player has enough primary resources to cast the given spell.
 	-- @name TimeToPowerFor
@@ -33,7 +34,6 @@ do
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local cost, _, powerToken = select(4, API_GetSpellInfo(spellId))
 		local powerType = OvalePower.POWER_TYPE[powerToken]
-		local state = OvaleState.state
 		local currentPower = state[powerType]
 		local powerRate = state.powerRate[powerType]
 		cost = cost or 0

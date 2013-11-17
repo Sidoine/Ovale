@@ -19,6 +19,7 @@ do
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	-- Return the maximum power of the given power type on the target.
 	local function MaxPower(powerType, condition)
@@ -38,7 +39,6 @@ do
 	local function Power(powerType, condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local state = OvaleState.state
 		if target == "player" then
 			local value, origin, rate = state[powerType], state.currentTime, state.powerRate[powerType]
 			local start, ending = state.currentTime, math.huge

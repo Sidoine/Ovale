@@ -15,9 +15,9 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	local function TimeWithHaste(t, haste)
-		local state = OvaleState.state
 		if not t then
 			t = 0
 		end
@@ -59,7 +59,6 @@ do
 	local function BuffExpires(condition)
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local start, ending = aura.start, aura.ending
@@ -102,7 +101,6 @@ do
 	local function BuffPresent(condition)
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition)
-		local state = OvaleState.state
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local start, ending = aura.start, aura.ending
