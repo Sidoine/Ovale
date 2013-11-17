@@ -59,6 +59,7 @@ local function ReleaseReference(item)
 		poolObject.refcount[item] = refcount - 1
 	else
 		poolObject.refcount[item] = nil
+		poolObject:Clean(item)
 		wipe(item)
 		tinsert(poolObject.pool, item)
 		poolObject.unused = poolObject.unused + 1
@@ -108,6 +109,10 @@ end
 
 function OvalePoolRefCount:Release(item)
 	item:ReleaseReference()
+end
+
+function OvalePoolRefCount:Clean(item)
+	-- virtual function; override as needed.
 end
 
 function OvalePoolRefCount:Drain()

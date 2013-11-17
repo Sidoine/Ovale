@@ -41,7 +41,11 @@ function OvalePoolGC:Get()
 end
 
 function OvalePoolGC:Release(item)
-	-- no-op
+	self:Clean(item)
+end
+
+function OvalePoolGC:Clean(item)
+	-- virtual function; override as needed.
 end
 
 function OvalePoolGC:Drain()

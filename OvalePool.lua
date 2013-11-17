@@ -56,9 +56,14 @@ end
 
 function OvalePool:Release(item)
 	assert(self.pool)
+	self:Clean(item)
 	wipe(item)
 	tinsert(self.pool, item)
 	self.unused = self.unused + 1
+end
+
+function OvalePool:Clean(item)
+	-- virtual function; override as needed.
 end
 
 function OvalePool:Drain()
