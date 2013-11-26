@@ -279,6 +279,19 @@ local function ParseFunction(prefix, func, params)
 	return nodeName
 end
 
+local function GetSpellInfo(spellId)
+	if not OvaleData.spellInfo[spellId] then
+		OvaleData.spellInfo[spellId] = {
+			aura = {
+				player = {},
+				target = {},
+			},
+			damageAura = {},
+		}
+	end
+	return OvaleData.spellInfo[spellId]
+end
+
 --[[
 	Parse the various Spell*{Buff,Debuff}() declarations.
 	Check for test conditions to see whether this declaration is active.
@@ -310,42 +323,42 @@ end
 local function ParseSpellAddBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = OvaleData:GetSpellInfo(spellId)
+	local si = GetSpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.player, "HELPFUL", paramList)
 end
 
 local function ParseSpellAddDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = OvaleData:GetSpellInfo(spellId)
+	local si = GetSpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.player, "HARMFUL", paramList)
 end
 
 local function ParseSpellAddTargetBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = OvaleData:GetSpellInfo(spellId)
+	local si = GetSpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.target, "HELPFUL", paramList)
 end
 
 local function ParseSpellAddTargetDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = OvaleData:GetSpellInfo(spellId)
+	local si = GetSpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.target, "HARMFUL", paramList)
 end
 
 local function ParseSpellDamageBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = OvaleData:GetSpellInfo(spellId)
+	local si = GetSpellInfo(spellId)
 	return ParseSpellAuraList(si.damageAura, "HELPFUL", paramList)
 end
 
 local function ParseSpellDamageDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = OvaleData:GetSpellInfo(spellId)
+	local si = GetSpellInfo(spellId)
 	return ParseSpellAuraList(si.damageAura, "HARMFUL", paramList)
 end
 
@@ -356,7 +369,7 @@ local function ParseSpellInfo(params)
 		if not TestConditions(paramList) then
 			return ""
 		end
-		local si = OvaleData:GetSpellInfo(spellId)
+		local si = GetSpellInfo(spellId)
 		for k,v in pairs(paramList) do
 			if k == "addduration" then
 				si.duration = si.duration + v
@@ -679,7 +692,8 @@ end
 local function ParseCanStopChannelling(text)
 	local spellId = tonumber(text)
 	if spellId then
-		OvaleData:GetSpellInfo(spellId).canStopChannelling = true
+		local si = GetSpellInfo(spellId)
+		si.canStopChannelling = true
 	else
 		Ovale:FormatPrint("CanStopChannelling with unknown spell %s", text)
 	end

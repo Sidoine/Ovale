@@ -243,17 +243,6 @@ OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleData:GetSpellInfo(spellId)
-	if (not self.spellInfo[spellId]) then
-		self.spellInfo[spellId] =
-		{
-			aura = {player = {}, target = {}},
-			damageAura = {},
-		}
-	end
-	return self.spellInfo[spellId]
-end
-
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
 end
