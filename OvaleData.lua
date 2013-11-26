@@ -15,7 +15,9 @@ Ovale.OvaleData = OvaleData
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvalePaperDoll = nil
+local OvaleState = nil
 
+local floor = math.floor
 local API_GetSpellCooldown = GetSpellCooldown
 
 -- Auras that are refreshed by spells that don't trigger a new snapshot.
@@ -249,17 +251,26 @@ OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 function OvaleData:OnInitialize()
 	-- Resolve module dependencies.
 	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleState = Ovale.OvaleState
+end
+
+function OvaleData:OnEnable()
+	OvaleState:RegisterState(self, self.statePrototype)
+end
+
+function OvaleData:OnDisable()
+	OvaleState:UnregisterState(self)
 end
 
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
 end
 
--- Returns true if spellId triggers a fresh snapshot for auraSpellId.
+-- Returns true if spellId triggers a fresh snapshot for auraId.
 -- TODO: Handle spreading DoTs (Inferno Blast, etc.) and Soul Swap effects.
-function OvaleData:NeedNewSnapshot(auraSpellId, spellId)
+function OvaleData:NeedNewSnapshot(auraId, spellId)
 	-- Don't snapshot if the aura was applied by an action that shouldn't cause the aura to re-snapshot.
-	if self_buffNoSnapshotSpellList[auraSpellId] and self_buffNoSnapshotSpellList[auraSpellId][spellId] then
+	if self_buffNoSnapshotSpellList[auraId] and self_buffNoSnapshotSpellList[auraId][spellId] then
 		return false
 	end
 	return true
@@ -320,10 +331,11 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDam
 	return damage
 end
 
-function OvaleData:GetTickLength(spellId)
-	local si = self:GetSpellInfo(spellId)
+function OvaleData:GetTickLength(auraId)
+	local tick = 3
+	local si = self.spellInfo[auraId]
 	if si then
-		local tick = si.tick or 3
+		tick = si.tick or tick
 		local hasteMultiplier = 1
 		if si.haste then
 			if si.haste == "spell" then
@@ -331,11 +343,63 @@ function OvaleData:GetTickLength(spellId)
 			elseif si.haste == "melee" then
 				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
 			end
-			return tick / hasteMultiplier
-		else
-			return tick
+			tick = tick / hasteMultiplier
 		end
 	end
-	return math.huge
+	return tick
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleData.statePrototype = {}
+--</public-static-properties>
+
+--<state-methods>
+do
+	local statePrototype = OvaleData.statePrototype
+
+	statePrototype.GetTickLength = function(state, auraId)
+		local tick = 3
+		local si = OvaleData.spellInfo[auraId]
+		if si then
+			tick = si.tick or tick
+			local hasteMultiplier = 1
+			if si.haste then
+				if si.haste == "spell" then
+					hasteMultiplier = state:GetSpellHasteMultiplier()
+				elseif si.haste == "melee" then
+					hasteMultiplier = state:GetMeleeHasteMultiplier()
+				end
+				tick = tick / hasteMultiplier
+			end
+		end
+		return tick
+	end
+
+	-- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.
+	statePrototype.GetDuration = function(state, auraId)
+		local duration = math.huge
+		local tick = state:GetTickLength(auraId)
+
+		local si = OvaleData.spellInfo[auraId]
+		if si and si.duration then
+			duration = si.duration
+			if si.adddurationcp and state.combo then
+				duration = duration + si.adddurationcp * state.combo
+			end
+			if si.adddurationholy and state.holy then
+				duration = duration + si.adddurationholy * (state.holy - 1)
+			end
+		end
+
+		local numTicks = floor(duration / tick + 0.5)
+		local dotDuration = tick * numTicks
+
+		return duration, dotDuration, tick, numTicks
+	end
+end
+--</state-methods>
