@@ -23,6 +23,7 @@ local OvalePoolRefCount = Ovale.OvalePoolRefCount
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
+local OvalePaperDoll = nil
 local OvaleState = nil
 
 local ipairs = ipairs
@@ -41,7 +42,7 @@ do
 	self_pool.Clean = function(self, aura)
 		-- Release reference-counted snapshot before wiping.
 		if aura.snapshot then
-			aura.snapshot:ReleaseReference()
+			OvalePaperDoll:ReleaseSnapshot(aura.snapshot)
 		end
 	end
 end
@@ -337,6 +338,7 @@ function OvaleAura:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
+	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleState = Ovale.OvaleState
 end
 

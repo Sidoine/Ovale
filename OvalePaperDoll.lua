@@ -436,15 +436,15 @@ function OvalePaperDoll:CurrentSnapshot()
 	return self.snapshot
 end
 
--- Get a new reference to the current snapshot.
-function OvalePaperDoll:GetSnapshot()
-	local snapshot = self:CurrentSnapshot()
-	return snapshot:GetReference()
+-- Get a new reference to a snapshot; if no snapshot is specified, use the current one.
+function OvalePaperDoll:GetSnapshot(snapshot)
+	snapshot = snapshot or self:CurrentSnapshot()
+	return self_pool:GetReference(snapshot)
 end
 
 -- Release a reference to the given snapshot.
 function OvalePaperDoll:ReleaseSnapshot(snapshot)
-	return snapshot:ReleaseReference()
+	return self_pool:ReleaseReference(snapshot)
 end
 
 function OvalePaperDoll:Debug(snapshot)
@@ -502,10 +502,10 @@ function OvalePaperDoll:ResetState(state)
 	state.specialization = self.specialization
 	local now = API_GetTime()
 	if state.snapshot and state.snapshot.snapshotTime < now then
-		state.snapshot:ReleaseReference()
+		self_pool:ReleaseReference(state.snapshot)
 		state.snapshot = nil
 	end
-	state.snapshot = state.snapshot or self.snapshot:GetReference()
+	state.snapshot = state.snapshot or self_pool:GetReference(self.snapshot)
 end
 --</public-static-methods>
 

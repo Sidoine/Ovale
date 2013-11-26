@@ -52,7 +52,7 @@ do
 	self_pool.Clean = function(self, spellcast)
 		-- Release reference-counted snapshot before wiping.
 		if spellcast.snapshot then
-			spellcast.snapshot:ReleaseReference()
+			OvalePaperDoll:ReleaseSnapshot(spellcast.snapshot)
 		end
 	end
 end
@@ -514,10 +514,10 @@ end
 
 function OvaleFuture:UpdateSnapshotFromSpellcast(dest, spellcast)
 	if dest.snapshot then
-		dest.snapshot:ReleaseReference()
+		OvalePaperDoll:ReleaseSnapshot(dest.snapshot)
 	end
 	if spellcast.snapshot then
-		dest.snapshot = spellcast.snapshot:GetReference()
+		dest.snapshot = OvalePaperDoll:GetSnapshot(spellcast.snapshot)
 	end
 	if spellcast.damageMultiplier then
 		dest.damageMultiplier = spellcast.damageMultiplier
