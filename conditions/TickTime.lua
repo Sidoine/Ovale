@@ -11,8 +11,8 @@
 local _, Ovale = ...
 
 do
-	local OvaleAura = Ovale.OvaleAura
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleData = Ovale.OvaleData
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
@@ -40,7 +40,7 @@ do
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
-			local value = aura.tick or OvaleAura:GetTickLength(auraId)
+			local value = aura.tick or OvaleData:GetTickLength(auraId)
 			return Compare(value, comparator, limit)
 		end
 		return Compare(math.huge, comparator, limit)

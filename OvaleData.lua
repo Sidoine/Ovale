@@ -13,6 +13,9 @@ local OvaleData = Ovale:NewModule("OvaleData")
 Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
+-- Forward declarations for module dependencies.
+local OvalePaperDoll = nil
+
 local API_GetSpellCooldown = GetSpellCooldown
 
 -- Auras that are refreshed by spells that don't trigger a new snapshot.
@@ -243,6 +246,11 @@ OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleData:OnInitialize()
+	-- Resolve module dependencies.
+	OvalePaperDoll = Ovale.OvalePaperDoll
+end
+
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
 end
@@ -255,6 +263,18 @@ function OvaleData:NeedNewSnapshot(auraSpellId, spellId)
 		return false
 	end
 	return true
+end
+
+function OvaleData:GetSpellInfo(spellId)
+	if type(spellId) == "number" then
+		return self.spellInfo[spellId]
+	elseif self.buffSpellList[spellId] then
+		for auraId in pairs(self.buffSpellList[spellId]) do
+			if self.spellInfo[auraId] then
+				return self.spellInfo[auraId]
+			end
+		end
+	end
 end
 
 --Compute the spell Cooldown
@@ -298,5 +318,24 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDam
 		damage = damage + si.bonussp * spellpower
 	end
 	return damage
+end
+
+function OvaleData:GetTickLength(spellId)
+	local si = self:GetSpellInfo(spellId)
+	if si then
+		local tick = si.tick or 3
+		local hasteMultiplier = 1
+		if si.haste then
+			if si.haste == "spell" then
+				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+			elseif si.haste == "melee" then
+				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
+			end
+			return tick / hasteMultiplier
+		else
+			return tick
+		end
+	end
+	return math.huge
 end
 --</public-static-methods>

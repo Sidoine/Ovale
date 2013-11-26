@@ -23,7 +23,6 @@ local OvalePoolRefCount = Ovale.OvalePoolRefCount
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
-local OvalePaperDoll = nil
 local OvaleState = nil
 
 local ipairs = ipairs
@@ -153,7 +152,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 				-- Only set the initial tick information for new auras.
 				if not existingAura then
 					aura.ticksSeen = 0
-					aura.tick = self:GetTickLength(spellId)
+					aura.tick = OvaleData:GetTickLength(spellId)
 				end
 				-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
 				local lastSpellcast = OvaleFuture.lastSpellcast
@@ -315,7 +314,7 @@ local function UpdateAuraTick(guid, spellId, timestamp)
 		if not aura.lastTickTime then
 			-- For some reason, there was no lastTickTime information recorded,
 			-- so approximate the tick time using the player's current stats.
-			tick = self:GetTickLength(spellId)
+			tick = OvaleData:GetTickLength(spellId)
 			ticksSeen = 0
 		else
 			-- Tick times tend to vary about the "true" value by a up to a few
@@ -338,7 +337,6 @@ function OvaleAura:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
-	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleState = Ovale.OvaleState
 end
 
@@ -557,33 +555,6 @@ function OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 	return start, ending, count
 end
 
-function OvaleAura:GetTickLength(spellId)
-	local si
-	if type(spellId) == "number" then
-		si = OvaleData.spellInfo[spellId]
-	elseif OvaleData.buffSpellList[spellId] then
-		for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-			si = OvaleData.spellInfo[auraId]
-			if si then break end
-		end
-	end
-	if si then
-		local tick = si.tick or 3
-		local hasteMultiplier = 1
-		if si.haste then
-			if si.haste == "spell" then
-				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
-			elseif si.haste == "melee" then
-				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
-			end
-			return tick / hasteMultiplier
-		else
-			return tick
-		end
-	end
-	return math.huge
-end
-
 function OvaleAura:Debug()
 	self_pool:Debug()
 	self_table_pool:Debug()
@@ -717,7 +688,7 @@ do
 							-- Add new duration after the next tick is complete.
 							local remainingTicks = floor((ending - atTime) / tick)
 							newAura.ending = (ending - tick * remainingTicks) + duration
-							newAura.tick = OvaleAura:GetTickLength(auraId)
+							newAura.tick = OvaleData:GetTickLength(auraId)
 							-- Re-snapshot stats for the DoT.
 							OvaleFuture:UpdateSnapshotFromSpellcast(newAura, spellcast)
 						else
@@ -741,7 +712,7 @@ do
 					newAura.start = atTime
 					newAura.ending = atTime + duration
 					if isDoT then
-						newAura.tick = OvaleAura:GetTickLength(auraId)
+						newAura.tick = OvaleData:GetTickLength(auraId)
 						-- Snapshot stats for the DoT.
 						OvaleFuture:UpdateSnapshotFromSpellcast(newAura, spellcast)
 					end
@@ -902,7 +873,7 @@ do
 			end
 			if si.tick then	-- DoT
 				--DoT duration is tick * numTicks.
-				local tick = OvaleAura:GetTickLength(auraSpellId)
+				local tick = OvaleData:GetTickLength(auraSpellId)
 				local numTicks = floor(duration / tick + 0.5)
 				duration = tick * numTicks
 				return duration, tick, numTicks
