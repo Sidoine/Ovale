@@ -343,7 +343,7 @@ function OvaleAura:OnInitialize()
 end
 
 function OvaleAura:OnEnable()
-	self_guid = OvaleGUID:GetGUID("player")
+	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")

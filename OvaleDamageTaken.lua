@@ -25,7 +25,7 @@ local API_GetTime = GetTime
 local API_UnitGUID = UnitGUID
 
 -- Player's GUID.
-local self_guid = API_UnitGUID("player")
+local self_guid = nil
 -- Damage event pool.
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 -- Damage event queue: new events are inserted at the front of the queue.
@@ -54,6 +54,7 @@ function OvaleDamageTaken:OnInitialize()
 end
 
 function OvaleDamageTaken:OnEnable()
+	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 end

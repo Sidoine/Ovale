@@ -41,7 +41,7 @@ local API_UnitRangedDamage = UnitRangedDamage
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 
 -- Player's GUID.
-local self_guid = API_UnitGUID("player")
+local self_guid = nil
 
 local OVALE_AUTOSHOT_NAME = API_GetSpellInfo(75)
 local OVALE_RESET_SPELLS = {}
@@ -65,6 +65,7 @@ OvaleSwing.swingmode = nil
 
 --<public-static-methods>
 function OvaleSwing:OnEnable()
+	self_guid = API_UnitGUID("player")
 	self.ohNext = false
 	-- fired when autoattack is enabled/disabled.
 	self:RegisterEvent("PLAYER_ENTER_COMBAT")

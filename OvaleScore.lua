@@ -33,7 +33,6 @@ local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0")
 Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
--- Forward declarations for module dependencies.
 local pairs = pairs
 local strsplit = string.split
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
@@ -41,7 +40,7 @@ local API_SendAddonMessage = SendAddonMessage
 local API_UnitGUID = UnitGUID
 
 -- Player's GUID.
-local self_guid = API_UnitGUID("player")
+local self_guid = nil
 -- self_damageMeter[moduleName] = module
 local self_damageMeter = {}
 -- self_damageMeterMethod[moduleName] = methodName or function
@@ -59,6 +58,7 @@ local self_scoredSpell = {}
 
 --<public-static-methods>
 function OvaleScore:OnEnable()
+	self_guid = API_UnitGUID("player")
 	API_RegisterAddonMessagePrefix("Ovale")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")

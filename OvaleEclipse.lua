@@ -29,7 +29,7 @@ local API_UnitPower = UnitPower
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
 
 -- Player's GUID.
-local self_guid = API_UnitGUID("player")
+local self_guid = nil
 -- Player's class.
 local self_class = select(2, API_UnitClass("player"))
 
@@ -55,6 +55,7 @@ function OvaleEclipse:OnInitialize()
 end
 
 function OvaleEclipse:OnEnable()
+	self_guid = API_UnitGUID("player")
 	if self_class == "DRUID" then
 		self:RegisterEvent("ECLIPSE_DIRECTION_CHANGE", "UpdateEclipseDirection")
 		self:RegisterEvent("UNIT_POWER")

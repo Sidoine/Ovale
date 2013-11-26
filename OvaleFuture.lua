@@ -41,7 +41,7 @@ local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
 -- Player's GUID.
-local self_guid = API_UnitGUID("player")
+local self_guid = nil
 
 -- The spells that the player is casting or has cast but are still in-flight toward their targets.
 local self_activeSpellcast = {}
@@ -270,6 +270,7 @@ function OvaleFuture:OnInitialize()
 end
 
 function OvaleFuture:OnEnable()
+	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
