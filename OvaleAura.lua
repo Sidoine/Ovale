@@ -162,7 +162,7 @@ local function UnitGainedAura(guid, spellId, filter, casterGUID, icon, count, de
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%s) on %s from %f, now=%f, aura.serial=%d",
 						filter, name, spellId, guid, lastSpellcast.snapshotTime, now, aura.serial)
 					-- TODO: damageMultiplier isn't correct if lastSpellId spreads the DoT.
-					OvaleFuture:UpdateFromSpellcast(aura, lastSpellcast)
+					OvaleFuture:UpdateSnapshotFromSpellcast(aura, lastSpellcast)
 				end
 			end
 		end
@@ -719,7 +719,7 @@ do
 							newAura.ending = (ending - tick * remainingTicks) + duration
 							newAura.tick = OvaleAura:GetTickLength(auraId)
 							-- Re-snapshot stats for the DoT.
-							OvaleFuture:UpdateFromSpellcast(newAura, spellcast)
+							OvaleFuture:UpdateSnapshotFromSpellcast(newAura, spellcast)
 						else
 							newAura.ending = atTime + duration
 						end
@@ -743,7 +743,7 @@ do
 					if isDoT then
 						newAura.tick = OvaleAura:GetTickLength(auraId)
 						-- Snapshot stats for the DoT.
-						OvaleFuture:UpdateFromSpellcast(newAura, spellcast)
+						OvaleFuture:UpdateSnapshotFromSpellcast(newAura, spellcast)
 					end
 				end
 			end

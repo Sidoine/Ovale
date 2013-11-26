@@ -505,7 +505,7 @@ function OvaleFuture:ApplyInFlightSpells()
 	end
 end
 
-function OvaleFuture:UpdateFromSpellcast(dest, spellcast)
+function OvaleFuture:UpdateSnapshotFromSpellcast(dest, spellcast)
 	if dest.snapshot then
 		dest.snapshot:ReleaseReference()
 	end
