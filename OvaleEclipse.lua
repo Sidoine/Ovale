@@ -179,18 +179,18 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
 			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then
 				eclipse = eclipse + energy
-			end
-			-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached after the spellcast.
-			if eclipse <= -100 then
-				eclipse = -100
-				direction = 1
-				state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, "HELPFUL", true, endCast, math.huge)
-				-- Reaching Lunar Eclipse resets the cooldown of Starfall.
-				state:ResetSpellCooldown(LUNAR_ECLIPSE, endCast)
-			elseif eclipse >= 100 then
-				eclipse = 100
-				direction = -1
-				state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, "HELPFUL", true, endCast, math.huge)
+				-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached after the spellcast.
+				if eclipse <= -100 then
+					eclipse = -100
+					direction = 1
+					state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, "HELPFUL", true, endCast, math.huge)
+					-- Reaching Lunar Eclipse resets the cooldown of Starfall.
+					state:ResetSpellCooldown(STARFALL, endCast)
+				elseif eclipse >= 100 then
+					eclipse = 100
+					direction = -1
+					state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, "HELPFUL", true, endCast, math.huge)
+				end
 			end
 		end
 		state.eclipse = eclipse
