@@ -636,8 +636,7 @@ do
 	local statePrototype = OvaleAura.statePrototype
 
 	-- Apply the auras caused by the given spell in the simulator.
-	function statePrototype:ApplySpellAuras(spellId, startCast, endCast, isChanneled, guid, auraList, spellcast)
-		local state = self
+	statePrototype.ApplySpellAuras = function(state, spellId, startCast, endCast, isChanneled, guid, auraList, spellcast)
 		local target = OvaleGUID:GetUnitId(guid)
 		for filter, filterInfo in pairs(auraList) do
 			for auraId, spellData in pairs(filterInfo) do
@@ -721,8 +720,7 @@ do
 		end
 	end
 
-	function statePrototype:GetAuraByGUID(guid, spellId, filter, mine, unitId)
-		local state = self
+	statePrototype.GetAuraByGUID = function(state, guid, spellId, filter, mine, unitId)
 		local auraFound
 		if mine then
 			local auraTable = state.aura[guid]
@@ -758,8 +756,7 @@ do
 		end
 	end
 
-	function statePrototype:GetAura(unitId, spellId, filter, mine)
-		local state = self
+	statePrototype.GetAura = function(state, unitId, spellId, filter, mine)
 		local guid = OvaleGUID:GetGUID(unitId)
 		if OvaleData.buffSpellList[spellId] then
 			local auraFound
@@ -777,8 +774,7 @@ do
 
 	-- Look for an aura on any target, excluding the given GUID.
 	-- Returns the earliest start time, the latest ending time, and the number of auras seen.
-	function statePrototype:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
-		local state = self
+	statePrototype.GetAuraOnAnyTarget = function(state, spellId, filter, mine, excludingGUID)
 		local start, ending, count = OvaleAura:GetAuraOnAnyTarget(spellId, filter, mine, excludingGUID)
 		-- TODO: This is broken because it doesn't properly account for removed auras in the current frame.
 		for guid, auraTable in pairs(state.aura) do
@@ -802,13 +798,11 @@ do
 		return start, ending, count
 	end
 
-	function statePrototype:IsActiveAura(aura)
-		local state = self
+	statePrototype.IsActiveAura = function(state, aura)
 		return (aura and aura.stacks > 0 and aura.start <= state.currentTime and state.currentTime <= aura.ending)
 	end
 
-	function statePrototype:NewAura(guid, spellId, filter, gain)
-		local state = self
+	statePrototype.NewAura = function(state, guid, spellId, filter, gain)
 		if not state.aura[guid] then
 			state.aura[guid] = {}
 		end
@@ -825,8 +819,7 @@ do
 		return aura
 	end
 
-	function statePrototype:GetDamageMultiplier(spellId)
-		local state = self
+	statePrototype.GetDamageMultiplier = function(state, spellId)
 		local damageMultiplier = 1
 		if spellId then
 			local si = OvaleData.spellInfo[spellId]
@@ -850,8 +843,7 @@ do
 	end
 
 	-- Returns the duration, tick length, and number of ticks of an aura.
-	function statePrototype:GetDuration(auraSpellId)
-		local state = self
+	statePrototype.GetDuration = function(state, auraSpellId)
 		local si
 		if type(auraSpellId) == "number" then
 			si = OvaleData.spellInfo[auraSpellId]
@@ -888,8 +880,7 @@ do
 	end
 
 	-- Add a new aura to the unit specified by GUID.
-	function statePrototype:AddAuraToGUID(guid, spellId, filter, mine, start, ending)
-		local state = self
+	statePrototype.AddAuraToGUID = function(state, guid, spellId, filter, mine, start, ending)
 		local aura = state:NewAura(guid, spellId, filter, start)
 		aura.mine = mine
 		aura.start = start

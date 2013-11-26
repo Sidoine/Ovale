@@ -512,23 +512,19 @@ end
 do
 	local statePrototype = OvalePaperDoll.statePrototype
 
-	function statePrototype:GetMasteryMultiplier()
-		local state = self
+	statePrototype.GetMasteryMultiplier = function(state)
 		return 1 + state.snapshot.masteryEffect / 100
 	end
 
-	function statePrototype:GetMeleeHasteMultiplier()
-		local state = self
+	statePrototype.GetMeleeHasteMultiplier = function(state)
 		return 1 + state.snapshot.meleeHaste / 100
 	end
 
-	function statePrototype:GetRangedHasteMultiplier()
-		local state = self
+	statePrototype.GetRangedHasteMultiplier = function(state)
 		return 1 + state.snapshot.rangedHaste / 100
 	end
 
-	function statePrototype:GetSpellHasteMultiplier()
-		local state = self
+	statePrototype.GetSpellHasteMultiplier = function(state)
 		return 1 + state.snapshot.spellHaste / 100
 	end
 end

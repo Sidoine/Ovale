@@ -311,8 +311,7 @@ do
 	local statePrototype = OvalePower.statePrototype
 
 	-- Print out the levels of each power type in the current state.
-	function statePrototype:DebugPower()
-		local state = self
+	statePrototype.DebugPower = function(state)
 		for powerType in pairs(OvalePower.POWER_INFO) do
 			Ovale:FormatPrint("%s = %d", powerType, state[powerType])
 		end

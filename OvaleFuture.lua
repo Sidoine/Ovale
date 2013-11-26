@@ -606,8 +606,7 @@ end
 do
 	local statePrototype = OvaleFuture.statePrototype
 
-	function statePrototype:GetCounterValue(id)
-		local state = self
+	statePrototype.GetCounterValue = function(state, id)
 		return state.counter[id] and state.counter[id] or 0
 	end
 end

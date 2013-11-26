@@ -223,7 +223,7 @@ end
 do
 	local statePrototype = OvaleRunes.statePrototype
 
-	function statePrototype:DebugRunes()
+	statePrototype.DebugRunes = function(state)
 		local now = state.currentTime
 		for slot = 1, 6 do
 			local rune = self.rune[slot]
@@ -236,8 +236,7 @@ do
 	end
 
 	-- Consume a rune of the given type.  Assume that the required runes are available.
-	function statePrototype:ConsumeRune(atTime, name)
-		local state = self
+	statePrototype.ConsumeRune = function(state, atTime, name)
 		--[[
 			Find a usable rune, preferring a regular rune of that rune type over death
 			runes of that rune type over death runes of any rune type.
@@ -306,8 +305,7 @@ do
 		end
 	end
 
-	function statePrototype:RuneCount(name, death)
-		local state = self
+	statePrototype.RuneCount = function(state, name, death)
 		local count = 0
 		local startCooldown, endCooldown = math.huge, math.huge
 		local runeType = RUNE_TYPE[name]
@@ -375,9 +373,7 @@ do
 		-- The latest time till a rune of that type is off cooldown, indexed by rune type.
 		local runeEndCooldown = {}
 
-		function statePrototype:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
-			local state = self
-
+		statePrototype.GetRunesCooldown = function(state, blood, unholy, frost, death, deathCondition)
 			-- Initialize static variables.
 			runeCount[BLOOD_RUNE] = blood or 0
 			runeCount[UNHOLY_RUNE] = unholy or 0
