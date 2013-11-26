@@ -185,7 +185,7 @@ do
 	-- Return the cooldown for the spell in the simulator.
 	statePrototype.GetSpellCooldown = function(state, spellId)
 		local start, duration, enable
-		local cd = state:GetCD(state, spellId)
+		local cd = state:GetCD(spellId)
 		if cd and cd.start then
 			start = cd.start
 			duration = cd.duration
@@ -199,10 +199,15 @@ do
 	-- Force the cooldown of a spell to reset at the specified time.
 	statePrototype.ResetSpellCooldown = function(state, spellId, atTime)
 		if atTime >= state.currentTime then
-			local cd = state:GetCD(state, spellId)
-			cd.start = state.currentTime
-			cd.duration = atTime - state.currentTime
-			cd.enable = 1
+			local start, duration, enable = state:GetSpellCooldown(spellId)
+			if start + duration > state.currentTime then
+				local cd = state:GetCD(spellId)
+				if cd then
+					cd.start = state.currentTime
+					cd.duration = atTime - state.currentTime
+					cd.enable = 1
+				end
+			end
 		end
 	end
 end
