@@ -62,6 +62,7 @@ end
 function OvaleDamageTaken:OnDisable()
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	self_pool:Drain()
 end
 
 function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, ...)

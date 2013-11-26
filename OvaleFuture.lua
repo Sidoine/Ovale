@@ -287,6 +287,7 @@ function OvaleFuture:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
@@ -302,6 +303,7 @@ function OvaleFuture:OnDisable()
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
@@ -310,6 +312,8 @@ function OvaleFuture:OnDisable()
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:UnregisterMessage("Ovale_AuraAdded")
 	self:UnregisterMessage("Ovale_InactiveUnit")
+	self:PLAYER_ENTERING_WORLD("OnDisable")
+	self_pool:Drain()
 end
 
 function OvaleFuture:PLAYER_ENTERING_WORLD(event)
@@ -317,6 +321,10 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	for guid in pairs(self_lastSpellcast) do
 		self:Ovale_InactiveUnit(event, guid)
 	end
+end
+
+function OvaleFuture:PLAYER_REGEN_ENABLED(event)
+	self_pool:Drain()
 end
 
 function OvaleFuture:Ovale_AuraAdded(event, timestamp, guid, spellId, caster)

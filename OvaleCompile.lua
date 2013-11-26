@@ -857,6 +857,7 @@ function OvaleCompile:OnInitialize()
 end
 
 function OvaleCompile:OnEnable()
+	self:RegisterMessage("PLAYER_REGEN_ENABLED")
 	self:RegisterMessage("Ovale_CheckBoxValueChanged", "EventHandler")
 	self:RegisterMessage("Ovale_EquipmentChanged")
 	self:RegisterMessage("Ovale_GlyphsChanged", "EventHandler")
@@ -879,9 +880,8 @@ function OvaleCompile:OnDisable()
 	self_pool:Drain()
 end
 
-function OvaleCompile:EventHandler(event)
-	Ovale:DebugPrint(OVALE_COMPILE_DEBUG, event)
-	self:Compile()
+function OvaleCompile:PLAYER_REGEN_ENABLED(event)
+	self_pool:Drain()
 end
 
 function OvaleCompile:Ovale_EquipmentChanged(event)
@@ -894,6 +894,11 @@ function OvaleCompile:Ovale_StanceChanged(event)
 	if self_compileOnStances then
 		self:EventHandler(event)
 	end
+end
+
+function OvaleCompile:EventHandler(event)
+	Ovale:DebugPrint(OVALE_COMPILE_DEBUG, event)
+	self:Compile()
 end
 
 function OvaleCompile:Compile()

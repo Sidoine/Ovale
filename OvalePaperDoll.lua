@@ -197,6 +197,7 @@ function OvalePaperDoll:OnDisable()
 	self:UnregisterEvent("UNIT_STATS")
 	self:UnregisterMessage("Ovale_EquipmentChanged")
 	self:UnregisterMessage("Ovale_StanceChanged")
+	self_pool:Drain()
 end
 
 function OvalePaperDoll:COMBAT_RATING_UPDATE(event)

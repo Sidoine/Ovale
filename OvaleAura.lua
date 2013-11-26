@@ -211,20 +211,28 @@ end
 function OvaleAura:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", "Cleanup")
+	self:RegisterEvent("PLAYER_ALIVE")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ScanAllUnitAuras")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_UNGHOST", "PLAYER_ALIVE")
 	self:RegisterEvent("UNIT_AURA")
-	self:RegisterMessage("Ovale_GroupChanged", "Cleanup")
+	self:RegisterMessage("Ovale_GroupChanged", "RemoveAurasOnInactiveUnits")
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleAura:OnDisable()
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	self:UnregisterEvent("PLAYER_UNGHOST")
 	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterMessage("Ovale_GroupChanged")
+	for guid in pairs(self_aura) do
+		RemoveAurasOnGUID(self_aura, guid)
+	end
+	self_pool:Drain()
 end
 
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
@@ -263,25 +271,30 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	end
 end
 
-function OvaleAura:PLAYER_ENTERING_WORLD(event)
-	Ovale:DebugPrint(OVALE_AURA_DEBUG, event)
-	-- Update auras on all visible units.
-	for unitId in pairs(OvaleGUID.UNIT_AURA_UNITS) do
-		self:UNIT_AURA(event, unitId)
-	end
-	self:Cleanup()
+function OvaleAura:PLAYER_ALIVE(event)
+	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s", event)
+	self:ScanAurasOnGUID(self_guid)
+end
+
+function OvaleAura:PLAYER_REGEN_ENABLED(event)
+	self:RemoveAurasOnInactiveUnits()
+	self_pool:Drain()
 end
 
 function OvaleAura:UNIT_AURA(event, unitId)
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
-	local guid = OvaleGUID:GetGUID(unitId)
-	if guid then
-		self:ScanAurasOnGUID(guid)
+	self:ScanAuras(unitId)
+end
+
+function OvaleAura:ScanAllUnitAuras()
+	-- Update auras on all visible units.
+	for unitId in pairs(OvaleGUID.UNIT_AURA_UNITS) do
+		self:ScanAuras(unitId)
 	end
 end
 
-function OvaleAura:Cleanup()
-	-- Rmove all auras from GUIDs that can no longer be referenced by a unit ID,
+function OvaleAura:RemoveAurasOnInactiveUnits()
+	-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
 	-- i.e., not in the group or not targeted by anyone in the group or focus.
 	for guid in pairs(self_aura) do
 		local unitId = OvaleGUID:GetUnitId(guid)
@@ -290,7 +303,6 @@ function OvaleAura:Cleanup()
 			self_serial[guid] = nil
 		end
 	end
-	self_pool:Drain()
 end
 
 function OvaleAura:IsActiveAura(aura, now)
@@ -443,6 +455,13 @@ function OvaleAura:ScanAurasOnGUID(guid)
 				end
 			end
 		end
+	end
+end
+
+function OvaleAura:ScanAuras(unitId)
+	local guid = OvaleGUID:GetGUID(unitId)
+	if guid then
+		return self:ScanAurasOnGUID(guid)
 	end
 end
 
