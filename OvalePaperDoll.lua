@@ -500,7 +500,8 @@ end
 function OvalePaperDoll:ResetState(state)
 	state.level = self.level
 	state.specialization = self.specialization
-	if state.snapshot and state.snapshot.snapshotTime < OvaleState.now then
+	local now = API_GetTime()
+	if state.snapshot and state.snapshot.snapshotTime < now then
 		state.snapshot:ReleaseReference()
 		state.snapshot = nil
 	end

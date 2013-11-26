@@ -492,8 +492,8 @@ end
 
 -- Apply the effects of spells that are being cast or are in flight, allowing us to
 -- ignore lag or missile travel time.
-function OvaleFuture:ApplyInFlightSpells()
-	local now = OvaleState.now
+function OvaleFuture:ApplyInFlightSpells(state)
+	local now = API_GetTime()
 	local index = 0
 	while true do
 		index = index + 1
@@ -502,7 +502,7 @@ function OvaleFuture:ApplyInFlightSpells()
 		local spellcast = self_activeSpellcast[index]
 		Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 		if now - spellcast.stop < 5 then
-			OvaleState:ApplySpell(spellcast.spellId, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast.nocd, spellcast.target, spellcast)
+			OvaleState:ApplySpell(state, spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast.nocd, spellcast)
 		else
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
@@ -585,7 +585,7 @@ function OvaleFuture:ResetState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvaleFuture:ApplySpellStartCast(state, spellId, startCast, endCast, nextCast, isChanneled, nocd, targetGUID, spellcast)
+function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Increment and reset spell counters.

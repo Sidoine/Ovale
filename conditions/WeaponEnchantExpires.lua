@@ -12,8 +12,8 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleState = Ovale.OvaleState
 
+	local API_GetTime = GetTime
 	local API_GetWeaponEnchantInfo = GetWeaponEnchantInfo
 
 	--- Test if the weapon imbue on the given weapon has expired or will expire after a given number of seconds.
@@ -31,18 +31,19 @@ do
 		local hand, seconds = condition[1], condition[2]
 		seconds = seconds or 0
 		local hasMainHandEnchant, mainHandExpiration, _, hasOffHandEnchant, offHandExpiration = API_GetWeaponEnchantInfo()
+		local now = API_GetTime()
 		if hand == "mainhand" or hand == "main" then
 			if not hasMainHandEnchant then
 				return 0, math.huge
 			end
 			mainHandExpiration = mainHandExpiration / 1000
-			return OvaleState.now + mainHandExpiration - seconds, math.huge
+			return now + mainHandExpiration - seconds, math.huge
 		else
 			if not hasOffHandEnchant then
 				return 0, math.huge
 			end
 			offHandExpiration = offHandExpiration / 1000
-			return OvaleState.now + offHandExpiration - seconds, math.huge
+			return now + offHandExpiration - seconds, math.huge
 		end
 	end
 

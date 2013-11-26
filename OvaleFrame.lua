@@ -138,7 +138,8 @@ do
 					-- print("sort "..spellId.." parfait")
 					return 1
 				else
-					local lag = OvaleState.now - action.waitStart
+					local now = API_GetTime()
+					local lag = now - action.waitStart
 					if lag>5 then
 					-- 	print("sort "..spellId.." ignoré (>5s)")
 						return nil
@@ -173,8 +174,8 @@ do
 		
 		self.lastUpdate = now
 
-		OvaleState:StartNewFrame()
 		local state = OvaleState.state
+		OvaleState:StartNewFrame(state)
 		for k,node in pairs(OvaleCompile.masterNodes) do
 			local target
 			if node.params and node.params.target then
@@ -186,7 +187,7 @@ do
 
 			if forceRefresh or Ovale.refreshNeeded[target] or Ovale.refreshNeeded["player"] or Ovale.refreshNeeded["pet"] then
 				Ovale:Logf("****Master Node %d", k)
-				OvaleBestAction:StartNewAction()
+				OvaleBestAction:StartNewAction(state)
 				local timeSpan, _, element = OvaleBestAction:Compute(node)
 				local start = NextTime(timeSpan, state.currentTime)
 				if start then
@@ -206,7 +207,7 @@ do
 					end
 					local value
 					if element.value and element.origin and element.rate then
-						value = element.value + (OvaleState.now - element.origin) * element.rate
+						value = element.value + (now - element.origin) * element.rate
 					end
 					icons[1]:SetValue(value, actionTexture)
 					if #icons > 1 then
@@ -222,10 +223,10 @@ do
 						end
 					end
 						-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-					if start and OvaleState.currentSpellId and OvaleState.nextCast and spellId == OvaleState.currentSpellId and start < OvaleState.nextCast then
-						start = OvaleState.nextCast
+					if start and state.currentSpellId and state.nextCast and spellId == state.currentSpellId and start < state.nextCast then
+						start = state.nextCast
 					end
-						if (node.params.nocd and start~=nil and OvaleState.now<start-node.params.nocd) then
+						if (node.params.nocd and start~=nil and now < start - node.params.nocd) then
 						icons[1]:Update(element, nil)
 					else
 						icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -233,16 +234,16 @@ do
 					end
 
 					action.spellId = spellId
-					if start == OvaleState.now and actionUsable then
+					if start and start <= now and actionUsable then
 						if not action.waitStart then
-							action.waitStart = OvaleState.now
+							action.waitStart = now
 						end
 					else
 						action.waitStart = nil
 					end
 
 					if profile.apparence.moving and icons[1].debutAction and icons[1].finAction then
-						local top=1-(OvaleState.now - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
+						local top=1-(now - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
 						if top<0 then
 							top = 0
 						elseif top>1 then
@@ -256,29 +257,15 @@ do
 
 					if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
 						if start then
-							local castTime=0
-							if spellId then
-								local _, _, _, _, _, _, _castTime = API_GetSpellInfo(spellId)
-								if _castTime and _castTime>0 then
-									castTime = _castTime/1000
-								end
-							end
-							local gcd = OvaleCooldown:GetGCD(spellId)
-							local nextCast
-							if (castTime>gcd) then
-								nextCast = start + castTime
-							else
-								nextCast = start + gcd
-							end
 							Ovale:Logf("****Second icon %f", start)
 							local spellTarget
 							if element then
 								spellTarget = element.params.target
 							end
-							if spellTarget == "target" or not spellTarget then
-								spellTarget = target
+							if not spellTarget or spellTarget == "target" then
+								spellTarget = OvaleCondition.defaultTarget
 							end
-							OvaleState:ApplySpell(spellId, start, start + castTime, nextCast, false, false, OvaleGUID:GetGUID(spellTarget))
+							OvaleState:ApplySpell(state, spellId, OvaleGUID:GetGUID(spellTarget))
 							timeSpan, _, element = OvaleBestAction:Compute(node)
 							start = NextTime(timeSpan, state.currentTime)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))

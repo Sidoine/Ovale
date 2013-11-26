@@ -45,6 +45,7 @@ local Intersect = OvaleTimeSpan.Intersect
 local IntersectInterval = OvaleTimeSpan.IntersectInterval
 local Measure = OvaleTimeSpan.Measure
 local Union = OvaleTimeSpan.Union
+local API_GetTime = GetTime
 local API_GetActionCooldown = GetActionCooldown
 local API_GetActionTexture = GetActionTexture
 local API_GetItemIcon = GetItemIcon
@@ -124,14 +125,14 @@ local function ComputeAction(element)
 		start = state.currentTime
 	end
 
-	Ovale:Logf("start=%f nextCast=%s [%d]", start, OvaleState.nextCast, element.nodeId)
+	Ovale:Logf("start=%f nextCast=%s [%d]", start, state.nextCast, element.nodeId)
 
 	-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
-	if start < OvaleState.nextCast then
-		local si = OvaleState.currentSpellId and OvaleData.spellInfo[OvaleState.currentSpellId]
+	if start < state.nextCast then
+		local si = state.currentSpellId and OvaleData.spellInfo[state.currentSpellId]
 		if not (si and si.canStopChannelling) then
 			-- not a channelled spell, or a channelled spell that cannot be interrupted
-			start = OvaleState.nextCast
+			start = state.nextCast
 		else
 			-- This is a channelled spell that can be interrupted, so wait till the next tick.
 			-- "canStopChannelling=N" means that there are N total ticks in the channelled spell.
@@ -144,8 +145,8 @@ local function ComputeAction(element)
 				scaling = 1
 			end
 			numTicks = floor(si.canStopChannelling * scaling + 0.5)
-			local tick = (OvaleState.nextCast - OvaleState.startCast) / numTicks
-			local tickTime = OvaleState.startCast + tick
+			local tick = (state.nextCast - state.startCast) / numTicks
+			local tickTime = state.startCast + tick
 			Ovale:Logf("%s start=%f", spellId, start)
 			for i = 1, numTicks do
 				if start <= tickTime then
@@ -717,9 +718,9 @@ function OvaleBestAction:OnInitialize()
 	OvaleState = Ovale.OvaleState
 end
 
-function OvaleBestAction:StartNewAction()
-	OvaleState:Reset()
-	OvaleFuture:ApplyInFlightSpells()
+function OvaleBestAction:StartNewAction(state)
+	OvaleState:Reset(state)
+	OvaleFuture:ApplyInFlightSpells(state)
 	self_serial = self_serial + 1
 end
 
@@ -819,7 +820,7 @@ function OvaleBestAction:GetActionInfo(element)
 		local texture = element.params[1]
 		actionTexture = "Interface\\Icons\\" .. texture
 		actionInRange = nil
-		actionCooldownStart = OvaleState.now
+		actionCooldownStart = API_GetTime()
 		actionCooldownDuration = 0
 		actionEnable = 1
 		actionUsable = true

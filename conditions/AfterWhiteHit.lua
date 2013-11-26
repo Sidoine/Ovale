@@ -12,9 +12,9 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleState = Ovale.OvaleState
 	local OvaleSwing = Ovale.OvaleSwing
 
+	local API_GetTime = GetTime
 	local TestValue = OvaleCondition.TestValue
 
 	-- Test if a white hit just occured
@@ -25,7 +25,7 @@ do
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local start = OvaleSwing.starttime
 		local ending = start + OvaleSwing.duration
-		local now = OvaleState.now
+		local now = API_GetTime()
 		local value
 		if now - start < seconds then
 			value = 0

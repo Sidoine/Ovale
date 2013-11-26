@@ -23,6 +23,7 @@ local pairs = pairs
 local strfind = string.find
 local strsub = string.sub
 local tostring = tostring
+local API_GetTime = GetTime
 --</private-static-properties>
 
 --<public-methods>
@@ -53,23 +54,24 @@ end
 
 local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
-				
 	self.spellId = spellId
 	self.value = nil
 
+	local now = API_GetTime()
+	local state = OvaleState.state
 	local profile = OvaleOptions:GetProfile()
 	if (minAttente~=nil and actionTexture) then	
 	
 		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-			(minAttente~=OvaleState.now and minAttente>self.ancienneAttente+0.01) or
+			(minAttente~=now and minAttente>self.ancienneAttente+0.01) or
 			(minAttente < self.finAction-0.01)) then
 			if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-					(minAttente~=OvaleState.now and minAttente>self.ancienneAttente+0.01)) then
-				self.debutAction = OvaleState.now
+					(minAttente~=now and minAttente>self.ancienneAttente+0.01)) then
+				self.debutAction = now
 			end
 			self.actionCourante = actionTexture
 			self.finAction = minAttente
-			if (minAttente == OvaleState.now) then
+			if (minAttente == now) then
 				self.cd:Hide()
 			else
 				self.lastSound = nil
@@ -80,7 +82,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			end
 		end
 		
-		if not profile.apparence.flashIcon and minAttente<=OvaleState.now then
+		if not profile.apparence.flashIcon and minAttente<=now then
 			self.cd:Hide()
 		end
 		
@@ -98,21 +100,21 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		
 		local red
 		if minAttente > actionCooldownStart + actionCooldownDuration + 0.01
-				and minAttente > OvaleState.now
-				and minAttente > OvaleState.nextCast then
+				and minAttente > now
+				and minAttente > state.nextCast then
 			self.icone:SetVertexColor(0.75,0.2,0.2)
 			red = true
 		else
 			self.icone:SetVertexColor(1,1,1)
 		end 
 		
-		--if (minAttente==OvaleState.now) then
+		--if (minAttente==now) then
 			--self.cd:Hide()
 		--end
 
 		if element.params.sound and not self.lastSound then
 			local delay = element.params.soundtime or 0.5
-			if OvaleState.now>=minAttente - delay then
+			if now>=minAttente - delay then
 				self.lastSound = element.params.sound
 			--	print("Play" .. self.lastSound)
 				PlaySoundFile(self.lastSound)
@@ -120,10 +122,10 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- La latence
-		if minAttente>OvaleState.now and profile.apparence.highlightIcon and not red then
+		if minAttente>now and profile.apparence.highlightIcon and not red then
 			local lag = 0.6
 			local newShouldClick
-			if minAttente<OvaleState.now + lag then
+			if minAttente<now + lag then
 				newShouldClick = true
 			else
 				newShouldClick = false
@@ -142,8 +144,8 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 		
 		-- Le temps restant
-		if ((profile.apparence.numeric or self.params.text == "always") and minAttente > OvaleState.now) then
-			self.remains:SetFormattedText("%.1f", minAttente - OvaleState.now)
+		if ((profile.apparence.numeric or self.params.text == "always") and minAttente > now) then
+			self.remains:SetFormattedText("%.1f", minAttente - now)
 			self.remains:Show()
 		else
 			self.remains:Hide()
