@@ -62,6 +62,14 @@ function OvalePool:Release(item)
 	self.unused = self.unused + 1
 end
 
+function OvalePool:GetReference(item)
+	return item
+end
+
+function OvalePool:ReleaseReference(item)
+	-- no-op
+end
+
 function OvalePool:Clean(item)
 	-- virtual function; override as needed.
 end

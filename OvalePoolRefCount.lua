@@ -108,7 +108,15 @@ function OvalePoolRefCount:Get()
 end
 
 function OvalePoolRefCount:Release(item)
-	item:ReleaseReference()
+	return item:ReleaseReference()
+end
+
+function OvalePoolRefCount:GetReference(item)
+	return item:GetReference()
+end
+
+function OvalePoolRefCount:ReleaseReference(item)
+	return item:ReleaseReference()
 end
 
 function OvalePoolRefCount:Clean(item)
