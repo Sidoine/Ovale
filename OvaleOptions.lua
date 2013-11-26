@@ -615,11 +615,8 @@ local self_options =
 					name = "List target buffs and debuffs",
 					type = "execute",
 					func = function()
-						local OvaleAura = Ovale.OvaleAura
-						if OvaleAura then
-							OvaleAura:DebugListAura("target", "HELPFUL")
-							OvaleAura:DebugListAura("target", "HARMFUL")
-						end
+						OvaleState.state:PrintUnitAuras("target", "HELPFUL")
+						OvaleState.state:PrintUnitAuras("target", "HARMFUL")
 					end
 				},
 				buff =
@@ -628,11 +625,8 @@ local self_options =
 					name = "List player buffs and debuffs",
 					type = "execute",
 					func = function()
-						local OvaleAura = Ovale.OvaleAura
-						if OvaleAura then
-							OvaleAura:DebugListAura("player", "HELPFUL")
-							OvaleAura:DebugListAura("player", "HARMFUL")
-						end
+						OvaleState.state:PrintUnitAuras("player", "HELPFUL")
+						OvaleState.state:PrintUnitAuras("player", "HARMFUL")
 					end
 				},
 				glyph =

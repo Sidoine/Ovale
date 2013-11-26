@@ -102,24 +102,31 @@ local function TracePrintf(spellId, ...)
 	end
 end
 
--- Return the spell-specific damage multiplier using the information from SpellDamage{Buff,Debuff} declarations.
--- This doesn't include the base damage multiplier of the character.
-local function GetDamageMultiplier(spellId)
+--[[
+	Return the spell-specific damage multiplier using the information from
+	SpellDamage{Buff,Debuff} declarations.  This doesn't include the base
+	damage multiplier of the character kept in snapshots.
+
+	auraObject is an object that provides the following two methods:
+
+		GetAura(unitId, auraId, filter, mine)
+		IsActiveAura(aura, atTime)
+--]]
+local function GetDamageMultiplier(spellId, auraObject)
+	auraObject = auraObject or OvaleAura
 	local damageMultiplier = 1
-	if spellId then
-		local si = OvaleData.spellInfo[spellId]
-		if si and si.damageAura then
-			local now = API_GetTime()
-			for filter, auraList in pairs(si.damageAura) do
-				for auraSpellId, multiplier in pairs(auraList) do
-					local aura = OvaleAura:GetAura("player", auraSpellId, filter)
-					if aura and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
-						local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
-						if auraSpellInfo.stacking and auraSpellInfo.stacking > 0 then
-							multiplier = 1 + (multiplier - 1) * aura.stacks
-						end
-						damageMultiplier = damageMultiplier * multiplier
+	local si = OvaleData.spellInfo[spellId]
+	if si and si.damageAura then
+		for filter, auraList in pairs(si.damageAura) do
+			for auraId, multiplier in pairs(auraList) do
+				local aura = auraObject:GetAura("player", auraId, filter)
+				if auraObject:IsActiveAura(aura) then
+					local siAura = OvaleData.spellInfo[auraId]
+					-- If an aura does stacking damage, then it needs to set stacking=1.
+					if siAura.stacking and siAura.stacking > 0 then
+						multiplier = 1 + (multiplier - 1) * aura.stacks
 					end
+					damageMultiplier = damageMultiplier * multiplier
 				end
 			end
 		end
@@ -181,9 +188,9 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		if si.aura then
 			for target, auraTable in pairs(si.aura) do
 				for filter, auraList in pairs(auraTable) do
-					for auraSpellId, spellData in pairs(auraList) do
+					for auraId, spellData in pairs(auraList) do
 						if spellData and type(spellData) == "number" and spellData > 0 then
-							spellcast.auraSpellId = auraSpellId
+							spellcast.auraId = auraId
 							if target == "player" then
 								spellcast.removeOnSuccess = true
 							end
@@ -476,7 +483,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			local spellId, spellName = select(12, ...)
 			TracePrintf(spellId, "%s: %s (%d)", event, spellName, spellId)
 			for index, spellcast in ipairs(self_activeSpellcast) do
-				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraSpellId == spellId) then
+				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
 					if not spellcast.channeled and (spellcast.removeOnSuccess or event ~= "SPELL_CAST_SUCCESS") then
 						TracePrintf(spellId, "    Spell finished: %s (%d)", spellName, spellId)
 						tremove(self_activeSpellcast, index)
@@ -607,7 +614,11 @@ do
 	local statePrototype = OvaleFuture.statePrototype
 
 	statePrototype.GetCounterValue = function(state, id)
-		return state.counter[id] and state.counter[id] or 0
+		return state.counter[id] or 0
+	end
+
+	statePrototype.GetDamageMultiplier = function(state, spellId)
+		return GetDamageMultiplier(spellId, state)
 	end
 end
 --</state-methods>
