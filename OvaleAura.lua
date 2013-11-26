@@ -514,6 +514,13 @@ function OvaleAura:ResetState(state)
 	state.serial = state.serial + 1
 end
 
+-- Release state resources prior to removing from the simulator.
+function OvaleAura:CleanState(state)
+	for guid in pairs(state.aura) do
+		RemoveAurasOnGUID(state.aura, guid)
+	end
+end
+
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	local si = OvaleData.spellInfo[spellId]

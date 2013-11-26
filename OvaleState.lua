@@ -71,6 +71,11 @@ function OvaleState:UnregisterState(addon)
 	end
 	self_stateModules = stateModules
 
+	-- Release resources used by the state machine managed by the addon.
+	if addon.CleanState then
+		addon:CleanState(self.state)
+	end
+
 	-- Remove mix-in methods from addon's state prototype.
 	local statePrototype = self_statePrototype[addon]
 	for k in pairs(statePrototype) do

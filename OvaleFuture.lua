@@ -599,6 +599,13 @@ function OvaleFuture:ResetState(state)
 	end
 end
 
+-- Release state resources prior to removing from the simulator.
+function OvaleFuture:CleanState(state)
+	for k in pairs(state.counter) do
+		state.counter[k] = nil
+	end
+end
+
 -- Apply the effects of the spell at the start of the spellcast.
 function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	local si = OvaleData.spellInfo[spellId]

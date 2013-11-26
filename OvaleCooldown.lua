@@ -112,6 +112,16 @@ function OvaleCooldown:ResetState(state)
 	end
 end
 
+-- Release state resources prior to removing from the simulator.
+function OvaleCooldown:CleanState(state)
+	for spellId, cd in pairs(state.cd) do
+		for k in pairs(cd) do
+			cd[k] = nil
+		end
+		state.cd[spellId] = nil
+	end
+end
+
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	local si = OvaleData.spellInfo[spellId]

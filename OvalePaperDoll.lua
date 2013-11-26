@@ -508,6 +508,11 @@ function OvalePaperDoll:ResetState(state)
 	end
 	state.snapshot = state.snapshot or self_pool:GetReference(self.snapshot)
 end
+
+-- Release state resources prior to removing from the simulator.
+function OvalePaperDoll:CleanState(state)
+	self_pool:ReleaseReference(state.snapshot)
+end
 --</public-static-methods>
 
 --<state-methods>

@@ -242,6 +242,16 @@ function OvalePower:ResetState(state)
 	end
 end
 
+-- Release state resources prior to removing from the simulator.
+function OvalePower:CleanState(state)
+	for powerType in pairs(self.POWER_INFO) do
+		state[powerType] = nil
+	end
+	for k in pairs(state.powerRate) do
+		state.powerRate[k] = nil
+	end
+end
+
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	local si = OvaleData.spellInfo[spellId]
