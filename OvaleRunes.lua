@@ -211,7 +211,7 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 			local count = si[name] or 0
 			while count > 0 do
 				local atTime = isChanneled and startCast or endCast
-				state:ConsumeRune(atTime, name)
+				state:ConsumeRune(atTime, name, spellcast.snapshot)
 				count = count - 1
 			end
 		end
@@ -236,7 +236,7 @@ do
 	end
 
 	-- Consume a rune of the given type.  Assume that the required runes are available.
-	statePrototype.ConsumeRune = function(state, atTime, name)
+	statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 		--[[
 			Find a usable rune, preferring a regular rune of that rune type over death
 			runes of that rune type over death runes of any rune type.
@@ -282,7 +282,7 @@ do
 					start = rune.endCooldown
 				end
 			end
-			local duration = 10 / state:GetSpellHasteMultiplier()
+			local duration = 10 / state:GetSpellHasteMultiplier(snapshot)
 			if OvaleStance:IsStance("death_knight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
 				-- Improved Blood Presence increases rune regeneration rate by 20%.
 				duration = duration / 1.2
