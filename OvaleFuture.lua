@@ -602,7 +602,7 @@ function OvaleFuture:ApplySpellStartCast(state, spellId, startCast, endCast, nex
 end
 --</public-static-methods>
 
--- Mix-in methods for simulator state.
+--<state-methods>
 do
 	local statePrototype = OvaleFuture.statePrototype
 
@@ -610,3 +610,4 @@ do
 		return state.counter[id] and state.counter[id] or 0
 	end
 end
+--</state-methods>

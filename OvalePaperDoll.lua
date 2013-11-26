@@ -508,7 +508,7 @@ function OvalePaperDoll:ResetState(state)
 end
 --</public-static-methods>
 
--- Mix-in methods for simulator state.
+--<state-methods>
 do
 	local statePrototype = OvalePaperDoll.statePrototype
 
@@ -528,3 +528,4 @@ do
 		return 1 + state.snapshot.spellHaste / 100
 	end
 end
+--</state-methods>

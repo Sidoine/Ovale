@@ -163,7 +163,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, startCast, endCast, n
 end
 --</public-static-methods>
 
--- Mix-in methods for simulator state.
+--<state-methods>
 do
 	local statePrototype = OvaleCooldown.statePrototype
 
@@ -206,3 +206,4 @@ do
 		end
 	end
 end
+--</state-methods>

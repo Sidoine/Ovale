@@ -631,7 +631,7 @@ function OvaleAura:ApplySpellOnHit(state, spellId, startCast, endCast, nextCast,
 end
 --</public-static-methods>
 
--- Mix-in methods for simulator state.
+--<state-methods>
 do
 	local statePrototype = OvaleAura.statePrototype
 
@@ -888,3 +888,4 @@ do
 		aura.stacks = 1
 	end
 end
+--</state-methods>

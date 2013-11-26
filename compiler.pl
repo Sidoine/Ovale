@@ -16,6 +16,9 @@
 
 --<public-properties>
 --</public-properties>
+
+--<state-methods>
+--</state-methods>
 =cut
 
 $m{"AceAddon-3.0"}{GetModule} = true;
@@ -253,6 +256,15 @@ sub ParseDirectory
 				}
 			}
 
+			if ($content =~ m/<state-methods>(.*)<\/state-methods>/s)
+			{
+				my $p = $1;
+				while ($p =~ m/statePrototype\.(\w+)/g)
+				{
+					$smm{$1} = true;
+				}
+			}
+
 			while ($content =~ m/\b([A-Z]\w+)\.(\w+)/g)
 			{
 				unless ($sp{$1}{$2} or $p{$1}{$2})
@@ -266,6 +278,14 @@ sub ParseDirectory
 				unless ($sm{$1}{$2} or $m{$1}{$2})
 				{
 					$sm{$1}{$2} = $class;
+				}
+			}
+
+			while ($content =~ m/\bstate\:(\w+)/g)
+			{
+				unless ($smm{$1})
+				{
+					$smm{$1} = $class;
 				}
 			}
 
@@ -332,5 +352,13 @@ for my $class (keys %sp)
 		{
 			print "public static $class.$prop $sp{$class}{$prop}\n";
 		}
+	}
+}
+
+for my $method (keys %smm)
+{
+	unless ($smm{$method} eq true)
+	{
+		print "state:$method $smm{$method}\n";
 	}
 }

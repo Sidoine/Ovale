@@ -219,7 +219,7 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, startCast, endCast, next
 end
 --</public-static-methods>
 
--- Mix-in methods for simulator state.
+--<state-methods>
 do
 	local statePrototype = OvaleRunes.statePrototype
 
@@ -441,3 +441,4 @@ do
 		end
 	end
 end
+--</state-methods>
