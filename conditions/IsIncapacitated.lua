@@ -29,7 +29,8 @@ do
 
 	local function IsIncapacitated(condition)
 		local yesno = condition[1]
-		local boolean = not API_HasFullControl() and state:GetAura("player", "incapacitate", "HARMFUL")
+		local aura = state:GetAura("player", "incapacitate", "HARMFUL")
+		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
 		return TestBoolean(boolean, yesno)
 	end
 

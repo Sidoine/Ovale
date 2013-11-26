@@ -39,7 +39,7 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if aura then
+		if state:IsActiveAura(aura) then
 			local value = aura.tick or OvaleData:GetTickLength(auraId)
 			return Compare(value, comparator, limit)
 		end

@@ -38,7 +38,7 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if aura then
+		if state:IsActiveAura(aura) then
 			local start, ending, tick = aura.start, aura.ending, aura.tick
 			if ending < math.huge and tick then
 				while ending - tick > state.currentTime do

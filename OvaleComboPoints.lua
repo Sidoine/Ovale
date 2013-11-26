@@ -150,9 +150,12 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, startCast, endCast
 			"buff_combo_amount" is the number of extra points generated or used, defaulting to 1
 				(one extra point generated).
 		--]]
-		if si.buff_combo and state:GetAura("player", si.buff_combo, nil, true) then
-			local buffAmount = si.buff_combo_amount or 1
-			power = power + buffAmount
+		if si.buff_combo then
+			local aura = state:GetAura("player", si.buff_combo, nil, true)
+			if state:IsActiveAura(aura) then
+				local buffAmount = si.buff_combo_amount or 1
+				power = power + buffAmount
+			end
 		end
 		-- Clamp combo points to lower and upper limits.
 		if power < 0 then

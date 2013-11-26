@@ -282,9 +282,12 @@ function OvalePower:ApplySpellAfterCast(state, spellId, startCast, endCast, next
 					--]]
 					local buffParam = "buff_" .. tostring(powerType)
 					local buffAmoumtParam = buffParam .. "_amount"
-					if si[buffParam] and state:GetAura("player", si[buffParam], nil, true) then
-						local buffAmount = si[buffAmountParam] or -1
-						power = power - buffAmount
+					if si[buffParam] then
+						local aura = state:GetAura("player", si[buffParam], nil, true)
+						if state:IsActiveAura(aura) then
+							local buffAmount = si[buffAmountParam] or -1
+							power = power - buffAmount
+						end
 					end
 					-- Clamp power to lower and upper limits.
 					local mini = powerInfo.mini or 0

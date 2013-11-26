@@ -129,7 +129,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, startCast, endCast, n
 				-- There is no cooldown if the buff named by "buffnocd" parameter is present.
 				if si.buffnocd then
 					local aura = state:GetAura("player", si.buffnocd)
-					if aura and aura.stacks > 0 then
+					if state:IsActiveAura(aura) then
 						Ovale:Logf("buffnocd stacks = %s, start = %s, ending = %s, startCast = %f", aura.stacks, aura.start, aura.ending, startCast)
 						if aura.start <= startCast and startCast < aura.ending then
 							cd.duration = 0

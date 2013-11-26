@@ -163,15 +163,18 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, startCast, endCast, ne
 			if si.eclipsedir then
 				energy = energy * direction
 			end
-			if state:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true) then
+			local aura = state:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true)
+			if state:IsActiveAura(aura) then
 				-- Celestial Alignment prevents gaining Eclipse energy during its duration.
 				energy = 0
-			elseif OvaleSpellBook:IsKnownSpell(EUPHORIA)
-						and not state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
-						and not state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true) then
-				-- Euphoria: While not in an Eclipse state, your spells generate double the normal
-				-- amount of Solar or Lunar energy.
-				energy = energy * 2
+			elseif OvaleSpellBook:IsKnownSpell(EUPHORIA) then
+				local lunar = state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
+				local solar = state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true)
+				if not state:IsActiveAura(lunar) and not state:IsActiveAura(solar) then
+					-- Euphoria: While not in an Eclipse state, your spells generate double the normal
+					-- amount of Solar or Lunar energy.
+					energy = energy * 2
+				end
 			end
 			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
 			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then

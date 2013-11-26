@@ -40,13 +40,13 @@ do
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
 		local aura = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
-		if not aura or aura.stacks == 0 then
+		if not state:IsActiveAura(aura) then
 			aura = state:GetAura(target, MODERATE_STAGGER, "HARMFUL")
 		end
-		if not aura or aura.stacks == 0 then
+		if not state:IsActiveAura(aura) then
 			aura = state:GetAura(target, LIGHT_STAGGER, "HARMFUL")
 		end
-		if aura and aura.stacks > 0 then
+		if state:IsActiveAura(aura) then
 			local start, ending = aura.start, aura.ending
 			local stagger = API_UnitStagger(target)
 			local rate = -1 * stagger / (ending - start)

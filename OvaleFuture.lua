@@ -109,10 +109,11 @@ local function GetDamageMultiplier(spellId)
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.damageAura then
+			local now = API_GetTime()
 			for filter, auraList in pairs(si.damageAura) do
 				for auraSpellId, multiplier in pairs(auraList) do
-					local aura = OvaleAura:GetAuraByGUID(self_guid, auraSpellId, filter, nil, "player")
-					if aura and aura.stacks > 0 then
+					local aura = OvaleAura:GetAura("player", auraSpellId, filter)
+					if aura and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
 						local auraSpellInfo = OvaleData.spellInfo[auraSpellId]
 						if auraSpellInfo.stacking and auraSpellInfo.stacking > 0 then
 							multiplier = 1 + (multiplier - 1) * aura.stacks
@@ -152,7 +153,13 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
-		spellcast.nocd = (si.buffnocd and OvaleAura:GetAura("player", si.buffnocd))
+		if si.buffnocd then
+			local now = API_GetTime()
+			local aura = OvaleAura:GetAura("player", si.buffnocd)
+			if aura and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+				spellcast.nocd = true
+			end
+		end
 
 		-- Save the number of combo points used if this spell is a finisher.
 		if si.combo == 0 then

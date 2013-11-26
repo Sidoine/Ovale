@@ -28,7 +28,8 @@ do
 
 	local function IsRooted(condition)
 		local yesno = condition[1]
-		local boolean = state:GetAura("player", "root", "HARMFUL")
+		local aura = state:GetAura("player", "root", "HARMFUL")
+		local boolean = state:IsActiveAura(aura)
 		return TestBoolean(boolean, yesno)
 	end
 

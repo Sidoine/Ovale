@@ -802,6 +802,11 @@ do
 		return start, ending, count
 	end
 
+	function statePrototype:IsActiveAura(aura)
+		local state = self
+		return (aura and aura.stacks > 0 and aura.start <= state.currentTime and state.currentTime <= aura.ending)
+	end
+
 	function statePrototype:NewAura(guid, spellId, filter, gain)
 		local state = self
 		if not state.aura[guid] then
