@@ -216,7 +216,7 @@ function OvaleAura:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_UNGHOST", "PLAYER_ALIVE")
 	self:RegisterEvent("UNIT_AURA")
-	self:RegisterMessage("Ovale_GroupChanged", "RemoveAurasOnInactiveUnits")
+	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
