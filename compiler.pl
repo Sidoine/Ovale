@@ -129,12 +129,13 @@ $sp{OvaleTimeSpan}{Union} = true;
 sub ParseDirectory
 {
 	my $dh = shift;
+	my $dir = shift;
 	while (defined($r = readdir($dh)))
 	{
 		if ($r =~ m/(.*)\.lua$/)
 		{
 			my $class = $1;
-			open(F, "<", $r);
+			open(F, "<", "$dir/$r");
 			undef $/;
 			my $content = <F>;
 			close(F);
@@ -312,15 +313,13 @@ sub ParseDirectory
 	}
 }
 
-opendir(my $dh, ".");
-ParseDirectory($dh);
-closedir($dh);
-opendir($dh, "conditions");
-ParseDirectory($dh);
-closedir($dh);
-opendir($dh, "scripts");
-ParseDirectory($dh);
-closedir($dh);
+my @directories = (".", "conditions", "scripts");
+while ($dir = shift @directories)
+{
+	opendir(my $dh, $dir);
+	ParseDirectory($dh, $dir);
+	closedir($dh);
+}
 
 for my $class (keys %sm)
 {
@@ -359,6 +358,6 @@ for my $method (keys %smm)
 {
 	unless ($smm{$method} eq true)
 	{
-		print "state:$method $smm{$method}\n";
+		print "state matchine state:$method $smm{$method}\n";
 	}
 }
