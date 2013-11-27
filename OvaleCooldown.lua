@@ -92,10 +92,16 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvaleCooldown.statePrototype = {
-	cd = nil,
-}
+OvaleCooldown.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleCooldown.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+statePrototype.cd = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
@@ -174,49 +180,45 @@ end
 --</public-static-methods>
 
 --<state-methods>
-do
-	local statePrototype = OvaleCooldown.statePrototype
-
-	-- Return the table holding the simulator's cooldown information for the given spell.
-	statePrototype.GetCD = function(state, spellId)
-		if spellId then
-			local si = OvaleData.spellInfo[spellId]
-			if si and si.cd then
-				local cdname = si.sharedcd and si.sharedcd or spellId
-				if not state.cd[cdname] then
-					state.cd[cdname] = {}
-				end
-				return state.cd[cdname]
+-- Return the table holding the simulator's cooldown information for the given spell.
+statePrototype.GetCD = function(state, spellId)
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.cd then
+			local cdname = si.sharedcd and si.sharedcd or spellId
+			if not state.cd[cdname] then
+				state.cd[cdname] = {}
 			end
+			return state.cd[cdname]
 		end
-		return nil
 	end
+	return nil
+end
 
-	-- Return the cooldown for the spell in the simulator.
-	statePrototype.GetSpellCooldown = function(state, spellId)
-		local start, duration, enable
-		local cd = state:GetCD(spellId)
-		if cd and cd.start then
-			start = cd.start
-			duration = cd.duration
-			enable = cd.enable
-		else
-			start, duration, enable = OvaleData:GetSpellCooldown(spellId)
-		end
-		return start, duration, enable
+-- Return the cooldown for the spell in the simulator.
+statePrototype.GetSpellCooldown = function(state, spellId)
+	local start, duration, enable
+	local cd = state:GetCD(spellId)
+	if cd and cd.start then
+		start = cd.start
+		duration = cd.duration
+		enable = cd.enable
+	else
+		start, duration, enable = OvaleData:GetSpellCooldown(spellId)
 	end
+	return start, duration, enable
+end
 
-	-- Force the cooldown of a spell to reset at the specified time.
-	statePrototype.ResetSpellCooldown = function(state, spellId, atTime)
-		if atTime >= state.currentTime then
-			local start, duration, enable = state:GetSpellCooldown(spellId)
-			if start + duration > state.currentTime then
-				local cd = state:GetCD(spellId)
-				if cd then
-					cd.start = state.currentTime
-					cd.duration = atTime - state.currentTime
-					cd.enable = 1
-				end
+-- Force the cooldown of a spell to reset at the specified time.
+statePrototype.ResetSpellCooldown = function(state, spellId, atTime)
+	if atTime >= state.currentTime then
+		local start, duration, enable = state:GetSpellCooldown(spellId)
+		if start + duration > state.currentTime then
+			local cd = state:GetCD(spellId)
+			if cd then
+				cd.start = state.currentTime
+				cd.duration = atTime - state.currentTime
+				cd.enable = 1
 			end
 		end
 	end

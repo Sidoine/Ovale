@@ -17,6 +17,9 @@
 --<public-properties>
 --</public-properties>
 
+--<state-properties>
+--</state-properties>
+
 --<state-methods>
 --</state-methods>
 =cut
@@ -257,6 +260,15 @@ sub ParseDirectory
 				}
 			}
 
+			if ($content =~ m/<state-properties>(.*)<\/state-properties>/s)
+			{
+				my $p = $1;
+				while ($p =~ m/statePrototype\.(\w+)/g)
+				{
+					$smp{$1} = true;
+				}
+			}
+
 			if ($content =~ m/<state-methods>(.*)<\/state-methods>/s)
 			{
 				my $p = $1;
@@ -279,6 +291,14 @@ sub ParseDirectory
 				unless ($sm{$1}{$2} or $m{$1}{$2})
 				{
 					$sm{$1}{$2} = $class;
+				}
+			}
+
+			while ($content =~ m/\bstate\.(\w+)/g)
+			{
+				unless ($smp{$1})
+				{
+					$smp{$1} = $class;
 				}
 			}
 
@@ -327,7 +347,7 @@ for my $class (keys %sm)
 	{
 		unless ($sm{$class}{$method} eq true)
 		{
-			print "public static $class:$method $sm{$class}{$method}\n";
+			print "public static $class:$method used in $sm{$class}{$method}\n";
 		}
 	}
 }
@@ -338,7 +358,7 @@ for my $class (keys %m)
 	{
 		unless ($m{$class}{$method} eq true)
 		{
-			print "public $class:$method $m{$class}{$method}\n";
+			print "public $class:$method used in $m{$class}{$method}\n";
 		}
 	}
 }
@@ -349,8 +369,16 @@ for my $class (keys %sp)
 	{
 		unless ($sp{$class}{$prop} eq true)
 		{
-			print "public static $class.$prop $sp{$class}{$prop}\n";
+			print "public static $class.$prop used in $sp{$class}{$prop}\n";
 		}
+	}
+}
+
+for my $prop (keys %smp)
+{
+	unless ($smp{$prop} eq true)
+	{
+		print "state machine property state.$prop used in $smp{$prop}\n";
 	}
 }
 
@@ -358,6 +386,6 @@ for my $method (keys %smm)
 {
 	unless ($smm{$method} eq true)
 	{
-		print "state matchine state:$method $smm{$method}\n";
+		print "state machine method state:$method used in $smm{$method}\n";
 	}
 }

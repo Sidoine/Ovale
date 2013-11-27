@@ -179,10 +179,17 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvaleRunes.statePrototype = {
-	rune = nil,	-- indexed by slot (1 through 6)
-}
+OvaleRunes.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleRunes.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- indexed by slot (1 through 6)
+statePrototype.rune = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
@@ -230,124 +237,109 @@ end
 --</public-static-methods>
 
 --<state-methods>
-do
-	local statePrototype = OvaleRunes.statePrototype
-
-	statePrototype.DebugRunes = function(state)
-		local now = state.currentTime
-		for slot = 1, 6 do
-			local rune = self.rune[slot]
-			if rune.active then
-				Ovale:FormatPrint("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
-			else
-				Ovale:FormatPrint("rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
-			end
+statePrototype.DebugRunes = function(state)
+	local now = state.currentTime
+	for slot = 1, 6 do
+		local rune = self.rune[slot]
+		if rune.active then
+			Ovale:FormatPrint("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
+		else
+			Ovale:FormatPrint("rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
 		end
 	end
+end
 
-	-- Consume a rune of the given type.  Assume that the required runes are available.
-	statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
-		--[[
-			Find a usable rune, preferring a regular rune of that rune type over death
-			runes of that rune type over death runes of any rune type.
-		--]]
-		local consumedRune
-		local runeType = RUNE_TYPE[name]
-		if runeType ~= DEATH_RUNE then
-			-- Search for an active regular rune of the given rune type.
-			for _, slot in ipairs(RUNE_SLOTS[runeType]) do
-				local rune = state.rune[slot]
-				if rune.type == runeType and rune.active then
-					consumedRune = rune
-					break
-				end
-			end
-			if not consumedRune then
-				-- Search for an active death rune of the given rune type.
-				for _, slot in ipairs(RUNE_SLOTS[runeType]) do
-					if rune.type == DEATH_RUNE and rune.active then
-						consumedRune = rune
-						break
-					end
-				end
+-- Consume a rune of the given type.  Assume that the required runes are available.
+statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
+	--[[
+		Find a usable rune, preferring a regular rune of that rune type over death
+		runes of that rune type over death runes of any rune type.
+	--]]
+	local consumedRune
+	local runeType = RUNE_TYPE[name]
+	if runeType ~= DEATH_RUNE then
+		-- Search for an active regular rune of the given rune type.
+		for _, slot in ipairs(RUNE_SLOTS[runeType]) do
+			local rune = state.rune[slot]
+			if rune.type == runeType and rune.active then
+				consumedRune = rune
+				break
 			end
 		end
-		-- No runes of the right type are active, so look for any active death rune.
 		if not consumedRune then
-			for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
-				local rune = state.rune[slot]
+			-- Search for an active death rune of the given rune type.
+			for _, slot in ipairs(RUNE_SLOTS[runeType]) do
 				if rune.type == DEATH_RUNE and rune.active then
 					consumedRune = rune
 					break
 				end
 			end
 		end
-		if consumedRune then
-			-- Put that rune on cooldown, starting when the other rune of that slot type comes off cooldown.
-			local k = consumedRune.slotType
-			local start = atTime
-			for _, slot in ipairs(RUNE_SLOTS[consumedRune.slotType]) do
-				local rune = state.rune[slot]
-				if rune.endCooldown > start then
-					start = rune.endCooldown
-				end
+	end
+	-- No runes of the right type are active, so look for any active death rune.
+	if not consumedRune then
+		for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
+			local rune = state.rune[slot]
+			if rune.type == DEATH_RUNE and rune.active then
+				consumedRune = rune
+				break
 			end
-			local duration = 10 / state:GetSpellHasteMultiplier(snapshot)
-			if OvaleStance:IsStance("death_knight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
-				-- Improved Blood Presence increases rune regeneration rate by 20%.
-				duration = duration / 1.2
-			end
-			consumedRune.startCooldown = start
-			consumedRune.endCooldown = start + duration
-			consumedRune.active = false
-
-			-- Each rune consumed generates 10 (12, if in Frost Presence) runic power.
-			local runicpower = state.runicpower
-			if OvaleStance:IsStance("death_knight_frost_presence") then
-				runicpower = runicpower + 12
-			else
-				runicpower = runicpower + 10
-			end
-			local maxi = OvalePower.maxPower.runicpower
-			state.runicpower = (runicpower < maxi) and runicpower or maxi
-		else
-			Ovale:Errorf("No %s rune available to consume!", RUNE_NAME[runeType])
 		end
 	end
+	if consumedRune then
+		-- Put that rune on cooldown, starting when the other rune of that slot type comes off cooldown.
+		local k = consumedRune.slotType
+		local start = atTime
+		for _, slot in ipairs(RUNE_SLOTS[consumedRune.slotType]) do
+			local rune = state.rune[slot]
+			if rune.endCooldown > start then
+				start = rune.endCooldown
+			end
+		end
+		local duration = 10 / state:GetSpellHasteMultiplier(snapshot)
+		if OvaleStance:IsStance("death_knight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
+			-- Improved Blood Presence increases rune regeneration rate by 20%.
+			duration = duration / 1.2
+		end
+		consumedRune.startCooldown = start
+		consumedRune.endCooldown = start + duration
+		consumedRune.active = false
 
-	statePrototype.RuneCount = function(state, name, death)
-		local count = 0
-		local startCooldown, endCooldown = math.huge, math.huge
-		local runeType = RUNE_TYPE[name]
-		if runeType ~= DEATH_RUNE then
-			if deathCondition == "any" then
-				-- Match runes of the given type or any death runes.
-				for slot, rune in ipairs(state.rune) do
-					if rune.type == runeType or rune.type == DEATH_RUNE then
-						if rune.active then
-							count = count + 1
-						elseif rune.endCooldown < endCooldown then
-							startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
-						end
-					end
-				end
-			else
-				-- Match only the runes of the given type.
-				for _, slot in ipairs(RUNE_SLOTS[runeType]) do
-					local rune = state.rune[slot]
-					if not deathCondition or (deathCondition == "none" and rune.type ~= DEATH_RUNE) then
-						if rune.active then
-							count = count + 1
-						elseif rune.endCooldown < endCooldown then
-							startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
-						end
+		-- Each rune consumed generates 10 (12, if in Frost Presence) runic power.
+		local runicpower = state.runicpower
+		if OvaleStance:IsStance("death_knight_frost_presence") then
+			runicpower = runicpower + 12
+		else
+			runicpower = runicpower + 10
+		end
+		local maxi = OvalePower.maxPower.runicpower
+		state.runicpower = (runicpower < maxi) and runicpower or maxi
+	else
+		Ovale:Errorf("No %s rune available to consume!", RUNE_NAME[runeType])
+	end
+end
+
+statePrototype.RuneCount = function(state, name, death)
+	local count = 0
+	local startCooldown, endCooldown = math.huge, math.huge
+	local runeType = RUNE_TYPE[name]
+	if runeType ~= DEATH_RUNE then
+		if deathCondition == "any" then
+			-- Match runes of the given type or any death runes.
+			for slot, rune in ipairs(state.rune) do
+				if rune.type == runeType or rune.type == DEATH_RUNE then
+					if rune.active then
+						count = count + 1
+					elseif rune.endCooldown < endCooldown then
+						startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
 					end
 				end
 			end
 		else
-			-- Match any requested death runes.
-			for slot, rune in ipairs(state.rune) do
-				if rune.type == DEATH_RUNE then
+			-- Match only the runes of the given type.
+			for _, slot in ipairs(RUNE_SLOTS[runeType]) do
+				local rune = state.rune[slot]
+				if not deathCondition or (deathCondition == "none" and rune.type ~= DEATH_RUNE) then
 					if rune.active then
 						count = count + 1
 					elseif rune.endCooldown < endCooldown then
@@ -356,99 +348,110 @@ do
 				end
 			end
 		end
-		return count, startCooldown, endCooldown
-	end
-
-	-- Returns the number of seconds before all of the required runes are available.
-	statePrototype.GetRunesCooldown = nil
-	do
-		-- If the rune is active, then return the remaining active runes count requirement.
-		-- Also return the time of the next rune becoming active.
-		local function MatchRune(rune, count, endCooldown)
-			if count > 0 then
-				count = count - 1
-				if rune.endCooldown > endCooldown then
-					endCooldown = rune.endCooldown
-				end
-			else
-				if rune.endCooldown < endCooldown then
-					endCooldown = rune.endCooldown
+	else
+		-- Match any requested death runes.
+		for slot, rune in ipairs(state.rune) do
+			if rune.type == DEATH_RUNE then
+				if rune.active then
+					count = count + 1
+				elseif rune.endCooldown < endCooldown then
+					startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
 				end
 			end
-			return count, endCooldown
 		end
+	end
+	return count, startCooldown, endCooldown
+end
 
-		-- The remaining count requirements, indexed by rune type.
-		local runeCount = {}
-		-- The latest time till a rune of that type is off cooldown, indexed by rune type.
-		local runeEndCooldown = {}
+-- Returns the number of seconds before all of the required runes are available.
+statePrototype.GetRunesCooldown = nil
+do
+	-- If the rune is active, then return the remaining active runes count requirement.
+	-- Also return the time of the next rune becoming active.
+	local function MatchRune(rune, count, endCooldown)
+		if count > 0 then
+			count = count - 1
+			if rune.endCooldown > endCooldown then
+				endCooldown = rune.endCooldown
+			end
+		else
+			if rune.endCooldown < endCooldown then
+				endCooldown = rune.endCooldown
+			end
+		end
+		return count, endCooldown
+	end
 
-		statePrototype.GetRunesCooldown = function(state, blood, unholy, frost, death, deathCondition)
-			-- Initialize static variables.
-			runeCount[BLOOD_RUNE] = blood or 0
-			runeCount[UNHOLY_RUNE] = unholy or 0
-			runeCount[FROST_RUNE] = frost or 0
-			runeCount[DEATH_RUNE] = death or 0
-			runeEndCooldown[BLOOD_RUNE] = 0
-			runeEndCooldown[UNHOLY_RUNE] = 0
-			runeEndCooldown[FROST_RUNE] = 0
-			runeEndCooldown[DEATH_RUNE] = 0
+	-- The remaining count requirements, indexed by rune type.
+	local runeCount = {}
+	-- The latest time till a rune of that type is off cooldown, indexed by rune type.
+	local runeEndCooldown = {}
 
-			-- Use regular runes to meet the count requirements.
+	statePrototype.GetRunesCooldown = function(state, blood, unholy, frost, death, deathCondition)
+		-- Initialize static variables.
+		runeCount[BLOOD_RUNE] = blood or 0
+		runeCount[UNHOLY_RUNE] = unholy or 0
+		runeCount[FROST_RUNE] = frost or 0
+		runeCount[DEATH_RUNE] = death or 0
+		runeEndCooldown[BLOOD_RUNE] = 0
+		runeEndCooldown[UNHOLY_RUNE] = 0
+		runeEndCooldown[FROST_RUNE] = 0
+		runeEndCooldown[DEATH_RUNE] = 0
+
+		-- Use regular runes to meet the count requirements.
+		for slot, rune in ipairs(state.rune) do
+			if rune.type ~= DEATH_RUNE then
+				local runeType = rune.type
+				local count, endCooldown = MatchRune(rune, runeCount[runeType], runeEndCooldown[runeType])
+				runeCount[runeType] = count
+				runeEndCooldown[runeType] = endCooldown
+			end
+		end
+		-- Use death runes of the matching rune type to meet the count requirements.
+		if deathCondition ~= "none" then
 			for slot, rune in ipairs(state.rune) do
-				if rune.type ~= DEATH_RUNE then
-					local runeType = rune.type
+				if rune.type == DEATH_RUNE then
+					local runeType = rune.slotType
 					local count, endCooldown = MatchRune(rune, runeCount[runeType], runeEndCooldown[runeType])
 					runeCount[runeType] = count
 					runeEndCooldown[runeType] = endCooldown
 				end
 			end
-			-- Use death runes of the matching rune type to meet the count requirements.
-			if deathCondition ~= "none" then
-				for slot, rune in ipairs(state.rune) do
-					if rune.type == DEATH_RUNE then
-						local runeType = rune.slotType
-						local count, endCooldown = MatchRune(rune, runeCount[runeType], runeEndCooldown[runeType])
-						runeCount[runeType] = count
-						runeEndCooldown[runeType] = endCooldown
-					end
-				end
-			end
-
-			-- Remaining rune requirements that have not yet been met.
-			local remainingCount = 0
-			for runeType = 1, 4 do
-				remainingCount = remainingCount + runeCount[runeType]
-			end
-
-			-- Use death runes of any type to meet any remaining count requirements.
-			if deathCondition == "any" then
-				for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
-					local rune = state.rune[slot]
-					local runeType = DEATH_RUNE
-					local count, endCooldown = MatchRune(rune, remainingCount, runeEndCooldown[runeType])
-					remainingCount = count
-					runeEndCooldown[runeType] = endCooldown
-				end
-			end
-
-			-- This shouldn't happen because it means the rune requirements will never be met.
-			if remainingCount > 0 then
-				Ovale:Logf("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
-				return math.huge
-			end
-
-			local maxEndCooldown = 0
-			for runeType = 1, 4 do
-				if runeEndCooldown[runeType] > maxEndCooldown then
-					maxEndCooldown = runeEndCooldown[runeType]
-				end
-			end
-			if maxEndCooldown > 0 then
-				return maxEndCooldown - state.currentTime
-			end
-			return 0
 		end
+
+		-- Remaining rune requirements that have not yet been met.
+		local remainingCount = 0
+		for runeType = 1, 4 do
+			remainingCount = remainingCount + runeCount[runeType]
+		end
+
+		-- Use death runes of any type to meet any remaining count requirements.
+		if deathCondition == "any" then
+			for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
+				local rune = state.rune[slot]
+				local runeType = DEATH_RUNE
+				local count, endCooldown = MatchRune(rune, remainingCount, runeEndCooldown[runeType])
+				remainingCount = count
+				runeEndCooldown[runeType] = endCooldown
+			end
+		end
+
+		-- This shouldn't happen because it means the rune requirements will never be met.
+		if remainingCount > 0 then
+			Ovale:Logf("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
+			return math.huge
+		end
+
+		local maxEndCooldown = 0
+		for runeType = 1, 4 do
+			if runeEndCooldown[runeType] > maxEndCooldown then
+				maxEndCooldown = runeEndCooldown[runeType]
+			end
+		end
+		if maxEndCooldown > 0 then
+			return maxEndCooldown - state.currentTime
+		end
+		return 0
 	end
 end
 --</state-methods>

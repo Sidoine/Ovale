@@ -502,6 +502,17 @@ OvaleAura.statePrototype = {
 }
 --</public-static-properties>
 
+--<private-static-properties>
+local statePrototype = OvaleAura.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- Aura database: aura[guid][auraId][casterId] = aura
+statePrototype.aura = nil
+-- Age of active auras in the simulator.
+statePrototype.serial = nil
+--</state-properties>
+
 --<public-static-methods>
 -- Initialize the state.
 function OvaleAura:InitializeState(state)
@@ -545,359 +556,355 @@ end
 --</public-static-methods>
 
 --<state-methods>
-do
-	local statePrototype = OvaleAura.statePrototype
-
-	local function GetStateAura(state, guid, auraId, casterGUID)
-		local auraFound = GetAura(state.aura, guid, auraId, casterGUID)
-		if not state:IsActiveAura(auraFound) then
-			auraFound = GetAura(self_aura, guid, auraId, casterGUID)
-		end
-		return auraFound
+local function GetStateAura(state, guid, auraId, casterGUID)
+	local auraFound = GetAura(state.aura, guid, auraId, casterGUID)
+	if not state:IsActiveAura(auraFound) then
+		auraFound = GetAura(self_aura, guid, auraId, casterGUID)
 	end
+	return auraFound
+end
 
-	local function GetStateAuraAnyCaster(state, guid, auraId)
-		local auraFound = GetAuraAnyCaster(state.aura, guid, auraId)
-		local aura = GetAuraAnyCaster(self_aura, guid, auraId)
-		local now = state.currentTime
-		if OvaleAura:IsActiveAura(aura, now) then
-			if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
-				auraFound = aura
-			end
+local function GetStateAuraAnyCaster(state, guid, auraId)
+	local auraFound = GetAuraAnyCaster(state.aura, guid, auraId)
+	local aura = GetAuraAnyCaster(self_aura, guid, auraId)
+	local now = state.currentTime
+	if OvaleAura:IsActiveAura(aura, now) then
+		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
+			auraFound = aura
 		end
-		return auraFound
 	end
+	return auraFound
+end
 
-	local function GetStateDebuffType(state, guid, debuffType, filter, casterGUID)
-		local auraFound = GetDebuffType(state.aura, guid, debuffType, filter, casterGUID)
-		local aura = GetDebuffType(self_aura, guid, debuffType, filter, casterGUID)
-		local now = state.currentTime
-		if OvaleAura:IsActiveAura(aura, now) then
-			if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
-				auraFound = aura
-			end
+local function GetStateDebuffType(state, guid, debuffType, filter, casterGUID)
+	local auraFound = GetDebuffType(state.aura, guid, debuffType, filter, casterGUID)
+	local aura = GetDebuffType(self_aura, guid, debuffType, filter, casterGUID)
+	local now = state.currentTime
+	if OvaleAura:IsActiveAura(aura, now) then
+		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
+			auraFound = aura
 		end
-		return auraFound
 	end
+	return auraFound
+end
 
-	local function GetStateDebuffTypeAnyCaster(state, guid, debuffType, filter)
-		local auraFound = GetDebuffTypeAnyCaster(state.aura, guid, debuffType, filter)
-		local aura = GetDebuffTypeAnyCaster(self_aura, guid, debuffType, filter)
-		local now = state.currentTime
-		if OvaleAura:IsActiveAura(aura, now) then
-			if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
-				auraFound = aura
-			end
+local function GetStateDebuffTypeAnyCaster(state, guid, debuffType, filter)
+	local auraFound = GetDebuffTypeAnyCaster(state.aura, guid, debuffType, filter)
+	local aura = GetDebuffTypeAnyCaster(self_aura, guid, debuffType, filter)
+	local now = state.currentTime
+	if OvaleAura:IsActiveAura(aura, now) then
+		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
+			auraFound = aura
 		end
-		return auraFound
 	end
+	return auraFound
+end
 
-	local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
-		local auraFound
-		if DEBUFF_TYPES[auraId] then
-			if mine then
-				auraFound = GetStateDebuffType(state, guid, auraId, filter, self_guid)
-			else
-				auraFound = GetStateDebuffTypeAnyCaster(state, guid, auraId, filter)
-			end
+local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
+	local auraFound
+	if DEBUFF_TYPES[auraId] then
+		if mine then
+			auraFound = GetStateDebuffType(state, guid, auraId, filter, self_guid)
 		else
-			if mine then
-				auraFound = GetStateAura(state, guid, auraId, self_guid)
-			else
-				auraFound = GetStateAuraAnyCaster(state, guid, auraId)
-			end
+			auraFound = GetStateDebuffTypeAnyCaster(state, guid, auraId, filter)
 		end
-		return auraFound
+	else
+		if mine then
+			auraFound = GetStateAura(state, guid, auraId, self_guid)
+		else
+			auraFound = GetStateAuraAnyCaster(state, guid, auraId)
+		end
 	end
+	return auraFound
+end
 
-	-- Print the auras matching the filter on the unit in alphabetical order.
-	do
-		local array = {}
+-- Print the auras matching the filter on the unit in alphabetical order.
+do
+	local array = {}
 
-		statePrototype.PrintUnitAuras = function(state, unitId, filter)
-			wipe(array)
-			local guid = OvaleGUID:GetGUID(unitId)
-			if self_aura[guid] then
-				for auraId, whoseTable in pairs(self_aura[guid]) do
-					for casterGUID in pairs(whoseTable) do
-						local aura = GetStateAura(state, guid, auraId, casterGUID)
-						if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
-							local name = aura.name or "Unknown spell"
-							tinsert(array, name .. ": " .. auraId)
-						end
+	statePrototype.PrintUnitAuras = function(state, unitId, filter)
+		wipe(array)
+		local guid = OvaleGUID:GetGUID(unitId)
+		if self_aura[guid] then
+			for auraId, whoseTable in pairs(self_aura[guid]) do
+				for casterGUID in pairs(whoseTable) do
+					local aura = GetStateAura(state, guid, auraId, casterGUID)
+					if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+						local name = aura.name or "Unknown spell"
+						tinsert(array, name .. ": " .. auraId)
 					end
-				end
-			end
-			if state.aura[guid] then
-				for auraId, whoseTable in pairs(state.aura[guid]) do
-					for casterGUID, aura in pairs(whoseTable) do
-						if state:IsActiveAura(aura, now) and aura.filter == filter then
-							local name = aura.name or "Unknown spell"
-							tinsert(array, name .. ": " .. auraId)
-						end
-					end
-				end
-			end
-			if next(array) then
-				tsort(array)
-				for _, v in ipairs(array) do
-					Ovale:Print(v)
 				end
 			end
 		end
-	end
-
-	statePrototype.IsActiveAura = function(state, aura, now)
-		now = now or state.currentTime
-		local boolean = false
-		if aura then
-			if aura.state then
-				boolean = (aura.serial == state.serial and aura.stacks > 0 and aura.start <= now and now <= aura.ending)
-			else
-				boolean = OvaleAura:IsActiveAura(aura, now)
-			end
-		end
-		return boolean
-	end
-
-	statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCast, isChanneled, auraList, spellcast)
-		local unitId = OvaleGUID:GetUnitId(guid)
-		for filter, filterInfo in pairs(auraList) do
-			for auraId, spellData in pairs(filterInfo) do
-				--[[
-					For lists described by SpellAddBuff(), etc., use the following interpretation:
-						auraId=refresh		aura is refreshed, no change to stacks
-						auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
-						auraId=N, N > 0		N is number of stacks added
-						auraId=0			aura is removed
-						auraId=N, N < 0		N is number of stacks of aura removed
-				--]]
-				local si = OvaleData.spellInfo[auraId]
-				local duration, dotDuration, tick, numTicks = state:GetDuration(auraId, spellcast)
-				local stacks = 1
-
-				if type(spellData) == "number" and spellData > 0 then
-					stacks = spellData
-					-- Deprecated after transition.
-					if not (si and si.duration) then
-						-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
-						duration = spellData
-						stacks = 1
+		if state.aura[guid] then
+			for auraId, whoseTable in pairs(state.aura[guid]) do
+				for casterGUID, aura in pairs(whoseTable) do
+					if state:IsActiveAura(aura, now) and aura.filter == filter then
+						local name = aura.name or "Unknown spell"
+						tinsert(array, name .. ": " .. auraId)
 					end
 				end
+			end
+		end
+		if next(array) then
+			tsort(array)
+			for _, v in ipairs(array) do
+				Ovale:Print(v)
+			end
+		end
+	end
+end
 
-				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
-				local atTime = isChanneled and startCast or endCast
+statePrototype.IsActiveAura = function(state, aura, now)
+	now = now or state.currentTime
+	local boolean = false
+	if aura then
+		if aura.state then
+			boolean = (aura.serial == state.serial and aura.stacks > 0 and aura.start <= now and now <= aura.ending)
+		else
+			boolean = OvaleAura:IsActiveAura(aura, now)
+		end
+	end
+	return boolean
+end
 
-				if state:IsActiveAura(auraFound, atTime) then
-					local aura
-					if auraFound.state then
-						-- Re-use existing aura in the simulator.
-						aura = auraFound
-					else
-						-- Add an aura in the simulator and copy the existing aura information over.
-						aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
-						for k, v in pairs(auraFound) do
-							aura[k] = v
-						end
-						if auraFound.snapshot then
-							aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
-						end
-						-- Reset the aura age relative to the state of the simulator.
-						aura.serial = state.serial
-						-- Information that needs to be set below: stacks, start, ending, duration, gain.
-					end
-					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
-					if spellData == "refresh" or stacks > 0 then
-						-- Adjust stack count.
-						if spellData == "refresh" then
-							Ovale:Logf("Aura %d is refreshed.", auraId)
-						else -- if stacks > 0 then
-							local maxstacks = si.maxstacks or 1
-							aura.stacks = aura.stacks + stacks
-							if aura.stacks > maxstacks then
-								aura.stacks = maxstacks
-							end
-							Ovale:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
-						end
-						-- Set start and duration for aura.
-						if aura.tick and aura.tick > 0 then
-							-- This is a periodic aura, so add new duration after the next tick is complete.
-							local ticksRemain = floor((aura.ending - atTime) / aura.tick)
-							aura.start = aura.ending - aura.tick * ticksRemain
-							if OvaleData:NeedNewSnapshot(auraId, spellId) then
-								-- Use duration and tick information based on spellcast snapshot.
-								aura.duration = dotDuration
-								aura.tick = tick
-								OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
-							end
-						else
-							aura.start = atTime
-							if OvaleData:NeedNewSnapshot(auraId, spellId) then
-								aura.duration = duration
-							end
-						end
-						aura.ending = aura.start + aura.duration
-						aura.gain = atTime
-						Ovale:Logf("Aura %d now ending at %f", auraId, aura.ending)
-					elseif stacks == 0 or stacks < 0 then
-						if stacks == 0 then
-							aura.stacks = 0
-						else -- if stacks < 0 then
-							aura.stacks = aura.stacks + stacks
-							if aura.stacks < 0 then
-								aura.stacks = 0
-							end
-							Ovale:Logf("Aura %d loses %d stack(s) to %d because of spell %d.", auraId, -1 * stacks, aura.stacks, spellId)
-						end
-						-- An existing aura is losing stacks, so inherit start, duration, ending and gain information.
-						if aura.stacks == 0 then
-							Ovale:Logf("Aura %d is completely removed.", auraId)
-							-- The aura is completely removed, so set ending to the time that the aura is removed.
-							aura.ending = atTime
-						end
-					end
+statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCast, isChanneled, auraList, spellcast)
+	local unitId = OvaleGUID:GetUnitId(guid)
+	for filter, filterInfo in pairs(auraList) do
+		for auraId, spellData in pairs(filterInfo) do
+			--[[
+				For lists described by SpellAddBuff(), etc., use the following interpretation:
+					auraId=refresh		aura is refreshed, no change to stacks
+					auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
+					auraId=N, N > 0		N is number of stacks added
+					auraId=0			aura is removed
+					auraId=N, N < 0		N is number of stacks of aura removed
+			--]]
+			local si = OvaleData.spellInfo[auraId]
+			local duration, dotDuration, tick, numTicks = state:GetDuration(auraId, spellcast)
+			local stacks = 1
+
+			if type(spellData) == "number" and spellData > 0 then
+				stacks = spellData
+				-- Deprecated after transition.
+				if not (si and si.duration) then
+					-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
+					duration = spellData
+					stacks = 1
+				end
+			end
+
+			local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
+			local atTime = isChanneled and startCast or endCast
+
+			if state:IsActiveAura(auraFound, atTime) then
+				local aura
+				if auraFound.state then
+					-- Re-use existing aura in the simulator.
+					aura = auraFound
 				else
-					-- Aura is not on the target.
-					if stacks > 0 then
-						-- Spellcast causes a new aura.
-						Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
-						-- Add an aura in the simulator and copy the existing aura information over.
-						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
-						-- Information that needs to be set below: stacks, start, ending, duration, gain.
-						aura.stacks = stacks
-						aura.start = atTime
-						-- Set start and duration for aura.
-						if si and si.tick then
-							-- "tick" is set explicitly in SpellInfo, so this is a known periodic aura.
+					-- Add an aura in the simulator and copy the existing aura information over.
+					aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
+					for k, v in pairs(auraFound) do
+						aura[k] = v
+					end
+					if auraFound.snapshot then
+						aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
+					end
+					-- Reset the aura age relative to the state of the simulator.
+					aura.serial = state.serial
+					-- Information that needs to be set below: stacks, start, ending, duration, gain.
+				end
+				-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
+				if spellData == "refresh" or stacks > 0 then
+					-- Adjust stack count.
+					if spellData == "refresh" then
+						Ovale:Logf("Aura %d is refreshed.", auraId)
+					else -- if stacks > 0 then
+						local maxstacks = si.maxstacks or 1
+						aura.stacks = aura.stacks + stacks
+						if aura.stacks > maxstacks then
+							aura.stacks = maxstacks
+						end
+						Ovale:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
+					end
+					-- Set start and duration for aura.
+					if aura.tick and aura.tick > 0 then
+						-- This is a periodic aura, so add new duration after the next tick is complete.
+						local ticksRemain = floor((aura.ending - atTime) / aura.tick)
+						aura.start = aura.ending - aura.tick * ticksRemain
+						if OvaleData:NeedNewSnapshot(auraId, spellId) then
+							-- Use duration and tick information based on spellcast snapshot.
 							aura.duration = dotDuration
 							aura.tick = tick
-							aura.ticksSeen = 0
-						else
+							OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
+						end
+					else
+						aura.start = atTime
+						if OvaleData:NeedNewSnapshot(auraId, spellId) then
 							aura.duration = duration
 						end
-						aura.ending = aura.start + aura.duration
-						aura.gain = aura.start
-						OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
+					end
+					aura.ending = aura.start + aura.duration
+					aura.gain = atTime
+					Ovale:Logf("Aura %d now ending at %f", auraId, aura.ending)
+				elseif stacks == 0 or stacks < 0 then
+					if stacks == 0 then
+						aura.stacks = 0
+					else -- if stacks < 0 then
+						aura.stacks = aura.stacks + stacks
+						if aura.stacks < 0 then
+							aura.stacks = 0
+						end
+						Ovale:Logf("Aura %d loses %d stack(s) to %d because of spell %d.", auraId, -1 * stacks, aura.stacks, spellId)
+					end
+					-- An existing aura is losing stacks, so inherit start, duration, ending and gain information.
+					if aura.stacks == 0 then
+						Ovale:Logf("Aura %d is completely removed.", auraId)
+						-- The aura is completely removed, so set ending to the time that the aura is removed.
+						aura.ending = atTime
 					end
 				end
-			end
-		end
-	end
-
-	statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
-		local auraFound
-		if OvaleData.buffSpellList[auraId] then
-			for id in pairs(OvaleData.buffSpellList[auraId]) do
-				local aura = GetStateAuraOnGUID(state, guid, id, filter, mine)
-				if aura and (not auraFound or auraFound.ending < aura.ending) then
-					auraFound = aura
+			else
+				-- Aura is not on the target.
+				if stacks > 0 then
+					-- Spellcast causes a new aura.
+					Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
+					-- Add an aura in the simulator and copy the existing aura information over.
+					local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
+					-- Information that needs to be set below: stacks, start, ending, duration, gain.
+					aura.stacks = stacks
+					aura.start = atTime
+					-- Set start and duration for aura.
+					if si and si.tick then
+						-- "tick" is set explicitly in SpellInfo, so this is a known periodic aura.
+						aura.duration = dotDuration
+						aura.tick = tick
+						aura.ticksSeen = 0
+					else
+						aura.duration = duration
+					end
+					aura.ending = aura.start + aura.duration
+					aura.gain = aura.start
+					OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
 				end
 			end
-		else
-			auraFound = GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 		end
-		return auraFound
 	end
+end
 
-	statePrototype.GetAura = function(state, unitId, auraId, filter, mine)
-		local guid = OvaleGUID:GetGUID(unitId)
-		return state:GetAuraByGUID(guid, auraId, filter, mine)
-	end
-
-	-- Add a new aura to the unit specified by GUID.
-	statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter, start, ending, snapshot)
-		local aura = self_pool:Get()
-		aura.state = true
-		aura.serial = state.serial
-		aura.filter = filter
-		aura.mine = mine
-		aura.start = start or 0
-		aura.ending = ending or math.huge
-		aura.duration = ending - start
-		aura.gain = aura.start
-		aura.stacks = 1
-		if snapshot then
-			aura.snapshot = OvalePaperDoll:GetSnapshot(snapshot)
-		end
-		PutAura(state.aura, guid, auraId, casterGUID, aura)
-		return aura
-	end
-
-	do
-		-- The total count of the matched aura.
-		local count
-		-- The start and ending times of the first aura to expire that will change the total count.
-		local startChangeCount, endingChangeCount
-		-- The time interval over which count > 0.
-		local startFirst, endingLast
-
-		local function CountMatchingActiveAura(aura)
-			count = count + 1
-			if aura.ending < endingChangeCount then
-				startChangeCount, endingChangeCount = aura.start, aura.ending
-			end
-			if aura.start < startFirst then
-				startFirst = aura.start
-			end
-			if aura.ending > endingLast then
-				endingLast = aura.ending
+statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
+	local auraFound
+	if OvaleData.buffSpellList[auraId] then
+		for id in pairs(OvaleData.buffSpellList[auraId]) do
+			local aura = GetStateAuraOnGUID(state, guid, id, filter, mine)
+			if aura and (not auraFound or auraFound.ending < aura.ending) then
+				auraFound = aura
 			end
 		end
+	else
+		auraFound = GetStateAuraOnGUID(state, guid, auraId, filter, mine)
+	end
+	return auraFound
+end
 
-		--[[
-			Return the total count of the given aura across all units, the start/end times of
-			the first aura to expire that will change the total count, and the time interval
-			over which the count is more than 0.
-		--]]
-		statePrototype.AuraCount = function(state, auraId, filter, mine)
-			-- Initialize.
-			count = 0
-			startChangeCount, endingChangeCount = math.huge, math.huge
-			startFirst, endingLast = math.huge, 0
+statePrototype.GetAura = function(state, unitId, auraId, filter, mine)
+	local guid = OvaleGUID:GetGUID(unitId)
+	return state:GetAuraByGUID(guid, auraId, filter, mine)
+end
 
-			local now = state.currentTime
+-- Add a new aura to the unit specified by GUID.
+statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter, start, ending, snapshot)
+	local aura = self_pool:Get()
+	aura.state = true
+	aura.serial = state.serial
+	aura.filter = filter
+	aura.mine = mine
+	aura.start = start or 0
+	aura.ending = ending or math.huge
+	aura.duration = ending - start
+	aura.gain = aura.start
+	aura.stacks = 1
+	if snapshot then
+		aura.snapshot = OvalePaperDoll:GetSnapshot(snapshot)
+	end
+	PutAura(state.aura, guid, auraId, casterGUID, aura)
+	return aura
+end
 
-			-- Loop through auras not kept in the simulator that match the criteria.
-			for guid, auraTable in pairs(self_aura) do
-				if auraTable[auraId] then
-					if mine then
-						local aura = GetStateAura(state, guid, auraId, self_guid)
+do
+	-- The total count of the matched aura.
+	local count
+	-- The start and ending times of the first aura to expire that will change the total count.
+	local startChangeCount, endingChangeCount
+	-- The time interval over which count > 0.
+	local startFirst, endingLast
+
+	local function CountMatchingActiveAura(aura)
+		count = count + 1
+		if aura.ending < endingChangeCount then
+			startChangeCount, endingChangeCount = aura.start, aura.ending
+		end
+		if aura.start < startFirst then
+			startFirst = aura.start
+		end
+		if aura.ending > endingLast then
+			endingLast = aura.ending
+		end
+	end
+
+	--[[
+		Return the total count of the given aura across all units, the start/end times of
+		the first aura to expire that will change the total count, and the time interval
+		over which the count is more than 0.
+	--]]
+	statePrototype.AuraCount = function(state, auraId, filter, mine)
+		-- Initialize.
+		count = 0
+		startChangeCount, endingChangeCount = math.huge, math.huge
+		startFirst, endingLast = math.huge, 0
+
+		local now = state.currentTime
+
+		-- Loop through auras not kept in the simulator that match the criteria.
+		for guid, auraTable in pairs(self_aura) do
+			if auraTable[auraId] then
+				if mine then
+					local aura = GetStateAura(state, guid, auraId, self_guid)
+					if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+						CountMatchingActiveAura(aura)
+					end
+				else
+					for casterGUID in pairs(auraTable[auraId]) do
+						local aura = GetStateAura(state, guid, auraId, casterGUID)
 						if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
 							CountMatchingActiveAura(aura)
 						end
-					else
-						for casterGUID in pairs(auraTable[auraId]) do
-							local aura = GetStateAura(state, guid, auraId, casterGUID)
-							if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
-								CountMatchingActiveAura(aura)
-							end
-						end
 					end
 				end
 			end
-			-- Loop through auras in the simulator that match the criteria.
-			for guid, auraTable in pairs(state.aura) do
-				if auraTable[auraId] then
-					if mine then
-						local aura = auraTable[auraId][self_guid]
-						if aura then
-							if state:IsActiveAura(aura, now) and aura.filter == filter then
-								CountMatchingActiveAura(aura)
-							end
-						end
-					else
-						for casterGUID, aura in pairs(auraTable[auraId]) do
-							if state:IsActiveAura(aura, now) and aura.filter == filter then
-								CountMatchingActiveAura(aura)
-							end
-						end
-					end
-				end
-			end
-
-			return count, startChangeCount, endingChangeCount, startFirst, endingLast
 		end
+		-- Loop through auras in the simulator that match the criteria.
+		for guid, auraTable in pairs(state.aura) do
+			if auraTable[auraId] then
+				if mine then
+					local aura = auraTable[auraId][self_guid]
+					if aura then
+						if state:IsActiveAura(aura, now) and aura.filter == filter then
+							CountMatchingActiveAura(aura)
+						end
+					end
+				else
+					for casterGUID, aura in pairs(auraTable[auraId]) do
+						if state:IsActiveAura(aura, now) and aura.filter == filter then
+							CountMatchingActiveAura(aura)
+						end
+					end
+				end
+			end
+		end
+
+		return count, startChangeCount, endingChangeCount, startFirst, endingLast
 	end
 end
 --</state-methods>

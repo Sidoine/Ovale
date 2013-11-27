@@ -129,10 +129,17 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvaleEclipse.statePrototype = {
-	eclipseDirection = nil,
-}
+OvaleEclipse.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleEclipse.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- Direction in which the Eclipse bar is moving.
+statePrototype.eclipseDirection = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.

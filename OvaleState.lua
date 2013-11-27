@@ -175,25 +175,31 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvaleState.statePrototype = {
-	-- Whether the state of the simulator has been initialized.
-	isInitialized = nil,
-	-- The current time in the simulator.
-	currentTime = nil,
-	-- The spell being cast in the simulator.
-	currentSpellId = nil,
-	-- The starting cast time of the spell being cast in the simulator.
-	startCast = nil,
-	-- The ending cast time of the spell being cast in the simulator.
-	endCast = nil,
-	-- The time at which the next GCD spell can be cast in the simulator.
-	nextCast = nil,
-	-- Whether the player is channeling a spell in the simulator at the current time.
-	isChanneling = nil,
-	-- The previous spell cast in the simulator.
-	lastSpellId = nil,
-}
+OvaleState.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleState.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- Whether the state of the simulator has been initialized.
+statePrototype.isInitialized = nil
+-- The current time in the simulator.
+statePrototype.currentTime = nil
+-- The spell being cast in the simulator.
+statePrototype.currentSpellId = nil
+-- The starting cast time of the spell being cast in the simulator.
+statePrototype.startCast = nil
+-- The ending cast time of the spell being cast in the simulator.
+statePrototype.endCast = nil
+-- The time at which the next GCD spell can be cast in the simulator.
+statePrototype.nextCast = nil
+-- Whether the player is channeling a spell in the simulator at the current time.
+statePrototype.isChanneling = nil
+-- The previous spell cast in the simulator.
+statePrototype.lastSpellId = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.

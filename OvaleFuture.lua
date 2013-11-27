@@ -581,10 +581,17 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvaleFuture.statePrototype = {
-	counter = nil,
-}
+OvaleFuture.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleFuture.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- counter[name] = count
+statePrototype.counter = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
@@ -625,15 +632,11 @@ end
 --</public-static-methods>
 
 --<state-methods>
-do
-	local statePrototype = OvaleFuture.statePrototype
+statePrototype.GetCounterValue = function(state, id)
+	return state.counter[id] or 0
+end
 
-	statePrototype.GetCounterValue = function(state, id)
-		return state.counter[id] or 0
-	end
-
-	statePrototype.GetDamageMultiplier = function(state, spellId)
-		return GetDamageMultiplier(spellId, state)
-	end
+statePrototype.GetDamageMultiplier = function(state, spellId)
+	return GetDamageMultiplier(spellId, state)
 end
 --</state-methods>

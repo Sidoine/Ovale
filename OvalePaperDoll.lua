@@ -482,12 +482,21 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvalePaperDoll.statePrototype = {
-	level = nil,
-	specialization = nil,
-	snapshot = nil,
-}
+OvalePaperDoll.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvalePaperDoll.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- Player's level.
+statePrototype.level = nil
+-- Player's chosen specialization/mastery.
+statePrototype.specialization = nil
+-- Player's current snapshot.
+statePrototype.snapshot = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
@@ -516,27 +525,23 @@ end
 --</public-static-methods>
 
 --<state-methods>
-do
-	local statePrototype = OvalePaperDoll.statePrototype
+statePrototype.GetMasteryMultiplier = function(state, snapshot)
+	snapshot = snapshot or state.snapshot
+	return 1 + snapshot.masteryEffect / 100
+end
 
-	statePrototype.GetMasteryMultiplier = function(state, snapshot)
-		snapshot = snapshot or state.snapshot
-		return 1 + snapshot.masteryEffect / 100
-	end
+statePrototype.GetMeleeHasteMultiplier = function(state, snapshot)
+	snapshot = snapshot or state.snapshot
+	return 1 + snapshot.meleeHaste / 100
+end
 
-	statePrototype.GetMeleeHasteMultiplier = function(state, snapshot)
-		snapshot = snapshot or state.snapshot
-		return 1 + snapshot.meleeHaste / 100
-	end
+statePrototype.GetRangedHasteMultiplier = function(state, snapshot)
+	snapshot = snapshot or state.snapshot
+	return 1 + snapshot.rangedHaste / 100
+end
 
-	statePrototype.GetRangedHasteMultiplier = function(state, snapshot)
-		snapshot = snapshot or state.snapshot
-		return 1 + snapshot.rangedHaste / 100
-	end
-
-	statePrototype.GetSpellHasteMultiplier = function(state, snapshot)
-		snapshot = snapshot or state.snapshot
-		return 1 + snapshot.spellHaste / 100
-	end
+statePrototype.GetSpellHasteMultiplier = function(state, snapshot)
+	snapshot = snapshot or state.snapshot
+	return 1 + snapshot.spellHaste / 100
 end
 --</state-methods>

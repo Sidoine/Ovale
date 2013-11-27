@@ -358,55 +358,55 @@ end
 OvaleData.statePrototype = {}
 --</public-static-properties>
 
+--<private-static-properties>
+local statePrototype = OvaleData.statePrototype
+--</private-static-properties>
+
 --<state-methods>
-do
-	local statePrototype = OvaleData.statePrototype
-
-	statePrototype.GetTickLength = function(state, auraId, snapshot)
-		local tick = 3
-		local si = OvaleData.spellInfo[auraId]
-		if si then
-			tick = si.tick or tick
-			local hasteMultiplier = 1
-			if si.haste then
-				if si.haste == "spell" then
-					hasteMultiplier = state:GetSpellHasteMultiplier(snapshot)
-				elseif si.haste == "melee" then
-					hasteMultiplier = state:GetMeleeHasteMultiplier(snapshot)
-				end
-				tick = tick / hasteMultiplier
+statePrototype.GetTickLength = function(state, auraId, snapshot)
+	local tick = 3
+	local si = OvaleData.spellInfo[auraId]
+	if si then
+		tick = si.tick or tick
+		local hasteMultiplier = 1
+		if si.haste then
+			if si.haste == "spell" then
+				hasteMultiplier = state:GetSpellHasteMultiplier(snapshot)
+			elseif si.haste == "melee" then
+				hasteMultiplier = state:GetMeleeHasteMultiplier(snapshot)
 			end
+			tick = tick / hasteMultiplier
 		end
-		return tick
+	end
+	return tick
+end
+
+-- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.
+statePrototype.GetDuration = function(state, auraId, spellcast)
+	local snapshot, combo, holy
+	if spellcast then
+		snapshot, combo, holy = spellcast.snapshot, spellcast.combo, spellcast.holy
+	else
+		snapshot, combo, holy = state.snapshot, state.combo, state.holy
 	end
 
-	-- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.
-	statePrototype.GetDuration = function(state, auraId, spellcast)
-		local snapshot, combo, holy
-		if spellcast then
-			snapshot, combo, holy = spellcast.snapshot, spellcast.combo, spellcast.holy
-		else
-			snapshot, combo, holy = state.snapshot, state.combo, state.holy
+	local duration = math.huge
+	local tick = state:GetTickLength(auraId, snapshot)
+
+	local si = OvaleData.spellInfo[auraId]
+	if si and si.duration then
+		duration = si.duration
+		if si.adddurationcp and combo then
+			duration = duration + si.adddurationcp * combo
 		end
-
-		local duration = math.huge
-		local tick = state:GetTickLength(auraId, snapshot)
-
-		local si = OvaleData.spellInfo[auraId]
-		if si and si.duration then
-			duration = si.duration
-			if si.adddurationcp and combo then
-				duration = duration + si.adddurationcp * combo
-			end
-			if si.adddurationholy and holy then
-				duration = duration + si.adddurationholy * (holy - 1)
-			end
+		if si.adddurationholy and holy then
+			duration = duration + si.adddurationholy * (holy - 1)
 		end
-
-		local numTicks = floor(duration/tick + 0.5)
-		local dotDuration = tick * numTicks
-
-		return duration, dotDuration, tick, numTicks
 	end
+
+	local numTicks = floor(duration/tick + 0.5)
+	local dotDuration = tick * numTicks
+
+	return duration, dotDuration, tick, numTicks
 end
 --</state-methods>

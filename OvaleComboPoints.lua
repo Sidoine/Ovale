@@ -112,10 +112,16 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvaleComboPoints.statePrototype = {
-	combo = nil,
-}
+OvaleComboPoints.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleComboPoints.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+statePrototype.combo = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.

@@ -210,10 +210,35 @@ end
 --]]----------------------------------------------------------------------------
 
 --<public-static-properties>
-OvalePower.statePrototype = {
-	powerRate = nil,
-}
+OvalePower.statePrototype = {}
 --</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvalePower.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+--[[
+	This block is here for compiler.pl to know that these properties are added to the state machine.
+
+	statePrototype.alternate = nil
+	statePrototype.burningembers = nil
+	statePrototype.chi = nil
+	statePrototype.demonicfury = nil
+	statePrototype.eclipse = nil
+	statePrototype.energy = nil
+	statePrototype.focus = nil
+	statePrototype.holy = nil
+	statePrototype.mana = nil
+	statePrototype.rage = nil
+	statePrototype.runicpower = nil
+	statePrototype.shadoworbs = nil
+	statePrototype.shards = nil
+--]]
+
+-- powerRate[powerType] = regen rate
+statePrototype.powerRate = nil
+--</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
@@ -317,14 +342,10 @@ end
 --</public-static-methods>
 
 --<state-methods>
-do
-	local statePrototype = OvalePower.statePrototype
-
-	-- Print out the levels of each power type in the current state.
-	statePrototype.DebugPower = function(state)
-		for powerType in pairs(OvalePower.POWER_INFO) do
-			Ovale:FormatPrint("%s = %d", powerType, state[powerType])
-		end
+-- Print out the levels of each power type in the current state.
+statePrototype.DebugPower = function(state)
+	for powerType in pairs(OvalePower.POWER_INFO) do
+		Ovale:FormatPrint("%s = %d", powerType, state[powerType])
 	end
 end
 --</state-methods>
