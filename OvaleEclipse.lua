@@ -35,6 +35,8 @@ local self_class = select(2, API_UnitClass("player"))
 
 local LUNAR_ECLIPSE = ECLIPSE_BAR_LUNAR_BUFF_ID
 local SOLAR_ECLIPSE = ECLIPSE_BAR_SOLAR_BUFF_ID
+-- Nature's Grace: You gain 15% spell haste for 15 seconds each time you trigger an Eclipse.
+local NATURES_GRACE = 16886
 local CELESTIAL_ALIGNMENT = 112071
 local EUPHORIA = 81062
 local STARFALL = 48505
@@ -183,13 +185,17 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 				if eclipse <= -100 then
 					eclipse = -100
 					direction = 1
-					state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge)
+					state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge, spellcast.snapshot)
 					-- Reaching Lunar Eclipse resets the cooldown of Starfall.
 					state:ResetSpellCooldown(STARFALL, endCast)
+					-- Reaching Eclipse state grants Nature's Grace.
+					state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", endCast, endCast + 15, spellcast.snapshot)
 				elseif eclipse >= 100 then
 					eclipse = 100
 					direction = -1
-					state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge)
+					state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge, spellcast.snapshot)
+					-- Reaching Eclipse state grants Nature's Grace.
+					state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", endCast, endCast + 15, spellcast.snapshot)
 				end
 			end
 		end
