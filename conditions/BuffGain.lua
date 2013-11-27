@@ -37,12 +37,8 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if aura then
 			local gain = aura.gain or 0
-			if true then
-				Ovale:Error("not implemented")
-				return nil
-			end
 			return TestValue(gain, math.huge, 0, gain, 1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
