@@ -832,6 +832,47 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	return aura
 end
 
+statePrototype.GetStealable = function(state, unitId)
+	local count = 0
+	local start, ending = math.huge, 0
+	local guid = OvaleGUID:GetGUID(unitId)
+	local now = state.currentTime
+
+	-- Loop through auras not kept in the simulator that match the criteria.
+	if self_aura[guid] then
+		for auraId, whoseTable in pairs(self_aura[guid]) do
+			for casterGUID in pairs(whoseTable) do
+				local aura = GetStateAura(state, guid, auraId, self_guid)
+				if state:IsActiveAura(aura, now) and not aura.state then
+					if aura.stealable and aura.filter == "HELPFUL" then
+						count = count + 1
+						start = (aura.start < start) and aura.start or start
+						ending = (aura.ending > ending) and aura.ending or ending
+					end
+				end
+			end
+		end
+	end
+	-- Loop through auras in the simulator that match the criteria.
+	if state.aura[guid] then
+		for auraId, whoseTable in pairs(state.aura[guid]) do
+			for casterGUID, aura in pairs(whoseTable) do
+				if state:IsActiveAura(aura, now) then
+					if aura.stealable and aura.filter == "HELPFUL" then
+						count = count + 1
+						start = (aura.start < start) and aura.start or start
+						ending = (aura.ending > ending) and aura.ending or ending
+					end
+				end
+			end
+		end
+	end
+	if count > 0 then
+		return count, start, ending
+	end
+	return nil
+end
+
 do
 	-- The total count of the matched aura.
 	local count

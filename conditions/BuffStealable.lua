@@ -11,9 +11,10 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleAura = Ovale.OvaleAura
+	local OvaleState = Ovale.OvaleState
 
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	--- Test if there is a stealable buff on the target.
 	-- @name BuffStealable
@@ -27,9 +28,12 @@ do
 	--     Spell(spellsteal)
 
 	local function BuffStealable(condition)
-		-- TODO: This should really be checked only against OvaleState.
 		local target = ParseCondition(condition)
-		return OvaleAura:GetStealable(target)
+		local count, start, ending = state:GetStealable(target)
+		if count > 0 then
+			return start, ending
+		end
+		return nil
 	end
 
 	OvaleCondition:RegisterCondition("buffstealable", false, BuffStealable)
