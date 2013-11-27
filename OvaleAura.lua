@@ -823,5 +823,81 @@ do
 		PutAura(state.aura, guid, auraId, casterGUID, aura)
 		return aura
 	end
+
+	do
+		-- The total count of the matched aura.
+		local count
+		-- The start and ending times of the first aura to expire that will change the total count.
+		local startChangeCount, endingChangeCount
+		-- The time interval over which count > 0.
+		local startFirst, endingLast
+
+		local function CountMatchingActiveAura(aura)
+			count = count + 1
+			if aura.ending < endingChangeCount then
+				startChangeCount, endingChangeCount = aura.start, aura.ending
+			end
+			if aura.start < startFirst then
+				startFirst = aura.start
+			end
+			if aura.ending > endingLast then
+				endingLast = aura.ending
+			end
+		end
+
+		--[[
+			Return the total count of the given aura across all units, the start/end times of
+			the first aura to expire that will change the total count, and the time interval
+			over which the count is more than 0.
+		--]]
+		statePrototype.AuraCount = function(state, auraId, filter, mine)
+			-- Initialize.
+			count = 0
+			startChangeCount, endingChangeCount = math.huge, math.huge
+			startFirst, endingLast = math.huge, 0
+
+			local now = state.currentTime
+
+			-- Loop through auras not kept in the simulator that match the criteria.
+			for guid, auraTable in pairs(self_aura) do
+				if auraTable[auraId] then
+					if mine then
+						local aura = GetStateAura(state, guid, auraId, self_guid)
+						if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+							CountMatchingActiveAura(aura)
+						end
+					else
+						for casterGUID in pairs(auraTable[auraId]) do
+							local aura = GetStateAura(state, guid, auraId, casterGUID)
+							if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+								CountMatchingActiveAura(aura)
+							end
+						end
+					end
+				end
+			end
+			-- Loop through auras in the simulator that match the criteria.
+			for guid, auraTable in pairs(state.aura) do
+				if auraTable[auraId] then
+					if mine then
+						local aura = auraTable[auraId][self_guid]
+						if aura then
+							if state:IsActiveAura(aura, now) and aura.filter == filter then
+								CountMatchingActiveAura(aura)
+							end
+						end
+					else
+						for casterGUID, aura in pairs(auraTable[auraId]) do
+							if state:IsActiveAura(aura, now) and aura.filter == filter then
+								CountMatchingActiveAura(aura)
+							end
+						end
+					end
+				end
+			end
+
+			return count, startChangeCount, endingChangeCount, startFirst, endingLast
+		end
+	end
 end
 --</state-methods>
