@@ -55,6 +55,7 @@ do
 				return Compare(value, comparator, limit)
 			end
 		end
+		return Compare(0, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("manapercent", false, ManaPercent)

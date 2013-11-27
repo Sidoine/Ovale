@@ -33,18 +33,17 @@ do
 		local hasMainHandEnchant, mainHandExpiration, _, hasOffHandEnchant, offHandExpiration = API_GetWeaponEnchantInfo()
 		local now = API_GetTime()
 		if hand == "mainhand" or hand == "main" then
-			if not hasMainHandEnchant then
-				return 0, math.huge
+			if hasMainHandEnchant then
+				mainHandExpiration = mainHandExpiration / 1000
+				return now + mainHandExpiration - seconds, math.huge
 			end
-			mainHandExpiration = mainHandExpiration / 1000
-			return now + mainHandExpiration - seconds, math.huge
-		else
-			if not hasOffHandEnchant then
-				return 0, math.huge
+		elseif hand == "offhand" or hand == "off" then
+			if hasOffHandEnchant then
+				offHandExpiration = offHandExpiration / 1000
+				return now + offHandExpiration - seconds, math.huge
 			end
-			offHandExpiration = offHandExpiration / 1000
-			return now + offHandExpiration - seconds, math.huge
 		end
+		return 0, math.huge
 	end
 
 	OvaleCondition:RegisterCondition("weaponenchantexpires", false, WeaponEnchantExpires)

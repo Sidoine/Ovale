@@ -25,23 +25,13 @@ do
 	local ParseCondition = OvaleCondition.ParseCondition
 	local state = OvaleState.state
 
-	local function IsSameSpell(spellIdA, spellIdB, spellNameB)
-		if spellIdB then
-			return spellIdA == spellIdB
-		elseif spellIdA and spellNameB then
-			return OvaleSpellBook:GetSpellName(spellIdA) == spellNameB
-		else
-			return false
-		end
-	end
-
 	--- Test if the target is casting the given spell.
-	-- The spell may be specified either by spell ID, localized spell name, spell list name (as defined in SpellList),
+	-- The spell may be specified either by spell ID, spell list name (as defined in SpellList),
 	-- "harmful" for any harmful spell, or "helpful" for any helpful spell.
 	-- @name Casting
 	-- @paramsig boolean
 	-- @param spell The spell to check.
-	--     Valid values: spell ID, spell name, spell list name, harmful, helpful
+	--     Valid values: spell ID, spell list name, harmful, helpful
 	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	--     Defaults to target=player.
 	--     Valid values: player, target, focus, pet.
@@ -54,55 +44,45 @@ do
 	local function Casting(condition)
 		local spellId = condition[1]
 		local target = ParseCondition(condition)
-		local start, ending, castSpellId, castSpellName, _
+
+		-- Get the information about the current spellcast.
+		local start, ending, castSpellId, castSpellName
 		if target == "player" then
 			start = state.startCast
 			ending = state.endCast
 			castSpellId = state.currentSpellId
+			castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
 		else
-			castSpellName, _, _, _, start, ending = API_UnitCastingInfo(target)
-			if not castSpellName then
-				castSpellName, _, _, _, start, ending = API_UnitChannelInfo(target)
+			local spellName, _, _, _, startTime, endTime = UnitCastingInfo(target)
+			if not spellName then
+				spellName, _, _, _, startTime, endTime = UnitChannelInfo("unit")
+			end
+			if spellName then
+				castSpellName = spellName
+				start = startTime/1000
+				ending = endTime/1000
 			end
 		end
-		if not castSpellId and not castSpellName then
-			return nil
-		end
-		if not spellId then
-			return start, ending
-		elseif type(spellId) == "number" then
-			if IsSameSpell(spellId, castSpellId, castSpellName) then
-				return start, ending
-			else
-				return nil
-			end
-		elseif OvaleData.buffSpellList[spellId] then
-			local found = false
-			for auraId in pairs(OvaleData.buffSpellList[spellId]) do
-				if IsSameSpell(auraId, castSpellId, castSpellName) then
-					return start, ending
+
+		local isCasting = false
+		if castSpellId or castSpellName then
+			if not spellId then
+				-- No spell specified, so whatever spell is currently casting.
+				isCasting = true
+			elseif OvaleData.buffSpellList[spellId] then
+				for id in pairs(OvaleData.buffSpellList[spellId]) do
+					if id == castSpellId or OvaleSpellBook:GetSpellName(id) == castSpellName then
+						isCasting = true
+						break
+					end
 				end
-			end
-			return nil
-		elseif spellId == "harmful" then
-			if not castSpellName then
-				castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
-			end
-			if API_IsHarmfulSpell(castSpellName) then
-				return start, ending
-			else
-				return nil
-			end
-		elseif spellId == "helpful" then
-			if not castSpellName then
-				castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
-			end
-			if API_IsHelpfulSpell(castSpellName) then
-				return start, ending
-			else
-				return nil
+			elseif spellId == "harmful" and API_IsHarmfulSpell(castSpellName) then
+				isCasting = true
+			elseif spellId == "helpful" and API_IsHelpfulSpell(castSpellName) then
+				isCasting = true
 			end
 		end
+		return isCasting
 	end
 
 	OvaleCondition:RegisterCondition("casting", false, casting)
