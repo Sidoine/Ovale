@@ -15,6 +15,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local TestBoolean = OvaleCondition.TestBoolean
+	local state = OvaleState.state
 
 	--- Test if the previous spell cast matches the given spell.
 	-- @name PreviousSpell
@@ -27,7 +28,7 @@ do
 
 	local function PreviousSpell(condition)
 		local spellId, yesno = condition[1], condition[2]
-		local boolean = (spellId == OvaleState.lastSpellId)
+		local boolean = (spellId == state.lastSpellId)
 		return TestBoolean(boolean, yesno)
 	end
 

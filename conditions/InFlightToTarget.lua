@@ -15,6 +15,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local TestBoolean = OvaleCondition.TestBoolean
+	local state = OvaleState.state
 
 	--- Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
 	-- @name InFlightToTarget
@@ -30,7 +31,7 @@ do
 
 	local function InFlightToTarget(condition)
 		local spellId, yesno = condition[1], condition[2]
-		local boolean = (OvaleState.currentSpellId == spellId) or OvaleFuture:InFlight(spellId)
+		local boolean = (state.currentSpellId == spellId) or OvaleFuture:InFlight(spellId)
 		return TestBoolean(boolean, yesno)
 	end
 

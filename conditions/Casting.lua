@@ -23,6 +23,7 @@ do
 	local API_UnitCastingInfo = UnitCastingInfo
 	local API_UnitChannelInfo = UnitChannelInfo
 	local ParseCondition = OvaleCondition.ParseCondition
+	local state = OvaleState.state
 
 	local function IsSameSpell(spellIdA, spellIdB, spellNameB)
 		if spellIdB then
@@ -55,9 +56,9 @@ do
 		local target = ParseCondition(condition)
 		local start, ending, castSpellId, castSpellName, _
 		if target == "player" then
-			start = OvaleState.startCast
-			ending = OvaleState.endCast
-			castSpellId = OvaleState.currentSpellId
+			start = state.startCast
+			ending = state.endCast
+			castSpellId = state.currentSpellId
 		else
 			castSpellName, _, _, _, start, ending = API_UnitCastingInfo(target)
 			if not castSpellName then
