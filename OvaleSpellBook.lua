@@ -112,10 +112,9 @@ function OvaleSpellBook:UpdateTalents()
 	wipe(self_talent)
 	wipe(self_talentPoints)
 
-	local name, selected
 	local i = 1
 	while true do
-		name, _, _, _, selected, _ = API_GetTalentInfo(i)
+		local name, _, _, _, selected, _ = API_GetTalentInfo(i)
 		if not name then break end
 		self_talent[i] = name
 		if selected then
@@ -132,9 +131,8 @@ end
 function OvaleSpellBook:UpdateGlyphs()
 	wipe(self_glyph)
 
-	local enabled, glyphSpell
 	for i = 1, API_GetNumGlyphSockets() do
-		enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
+		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
 		if enabled and glyphSpell then
 			self_glyph[glyphSpell] = API_GetSpellInfo(glyphSpell)
 		end
