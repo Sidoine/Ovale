@@ -266,7 +266,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			aura.ticksSeen = ticksSeen
 			aura.lastTickTime = timestamp
 			local name = aura.name or "Unknown spell"
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s %s (%s) on %s, tick=%f", filter, name, spellId, destGUID, tick)
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%f", name, spellId, destGUID, tick)
 		end
 	end
 end
