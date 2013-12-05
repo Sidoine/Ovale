@@ -614,8 +614,8 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleAura:ResetState(state)
-	-- Periodically garbage-collect auras in the state machine.
-	if not Ovale.enCombat and state.serial % 1000 then
+	-- Garbage-collect auras in the state machine.
+	if not Ovale.enCombat then
 		self:CleanState(state)
 	end
 	state.serial = state.serial + 1
