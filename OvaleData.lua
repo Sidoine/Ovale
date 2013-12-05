@@ -13,11 +13,6 @@ local OvaleData = Ovale:NewModule("OvaleData")
 Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
--- Forward declarations for module dependencies.
-local OvalePaperDoll = nil
-local OvaleState = nil
-
-local floor = math.floor
 local API_GetSpellCooldown = GetSpellCooldown
 
 -- Auras that are refreshed by spells that don't trigger a new snapshot.
@@ -248,20 +243,6 @@ OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleData:OnInitialize()
-	-- Resolve module dependencies.
-	OvalePaperDoll = Ovale.OvalePaperDoll
-	OvaleState = Ovale.OvaleState
-end
-
-function OvaleData:OnEnable()
-	OvaleState:RegisterState(self, self.statePrototype)
-end
-
-function OvaleData:OnDisable()
-	OvaleState:UnregisterState(self)
-end
-
 function OvaleData:ResetSpellInfo()
 	self.spellInfo = {}
 end
@@ -330,69 +311,4 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDam
 	end
 	return damage
 end
-
-function OvaleData:GetTickLength(auraId, snapshot)
-	local tick = 3
-	local si = self.spellInfo[auraId]
-	if si then
-		tick = si.tick or tick
-		local hasteMultiplier = 1
-		if si.haste then
-			if si.haste == "spell" then
-				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
-			elseif si.haste == "melee" then
-				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
-			end
-			tick = tick / hasteMultiplier
-		end
-	end
-	return tick
-end
 --</public-static-methods>
-
---[[----------------------------------------------------------------------------
-	State machine for simulator.
---]]----------------------------------------------------------------------------
-
---<public-static-properties>
-OvaleData.statePrototype = {}
---</public-static-properties>
-
---<private-static-properties>
-local statePrototype = OvaleData.statePrototype
---</private-static-properties>
-
---<state-methods>
-statePrototype.GetTickLength = function(state, auraId, snapshot)
-	return OvaleData:GetTickLength(auraId, snapshot)
-end
-
--- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.
-statePrototype.GetDuration = function(state, auraId, spellcast)
-	local snapshot, combo, holy
-	if spellcast then
-		snapshot, combo, holy = spellcast.snapshot, spellcast.combo, spellcast.holy
-	else
-		snapshot, combo, holy = state.snapshot, state.combo, state.holy
-	end
-
-	local duration = math.huge
-	local tick = state:GetTickLength(auraId, snapshot)
-
-	local si = OvaleData.spellInfo[auraId]
-	if si and si.duration then
-		duration = si.duration
-		if si.adddurationcp and combo then
-			duration = duration + si.adddurationcp * combo
-		end
-		if si.adddurationholy and holy then
-			duration = duration + si.adddurationholy * (holy - 1)
-		end
-	end
-
-	local numTicks = floor(duration/tick + 0.5)
-	local dotDuration = tick * numTicks
-
-	return duration, dotDuration, tick, numTicks
-end
---</state-methods>

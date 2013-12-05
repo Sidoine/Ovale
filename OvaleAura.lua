@@ -212,6 +212,24 @@ end
 local function IsWithinAuraLag(time1, time2)
 	return (time1 - time2 < self_auraLag/1000) and (time2 - time1 < self_auraLag/1000)
 end
+
+local function GetTickLength(auraId, snapshot)
+	local tick = 3
+	local si = OvaleData.spellInfo[auraId]
+	if si then
+		tick = si.tick or tick
+		local hasteMultiplier = 1
+		if si.haste then
+			if si.haste == "spell" then
+				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
+			elseif si.haste == "melee" then
+				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
+			end
+			tick = tick / hasteMultiplier
+		end
+	end
+	return tick
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -274,7 +292,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				-- This isn't a known periodic aura, but it's ticking so treat this as the first tick.
 				local si = OvaleData.spellInfo[spellId]
 				if si and si.tick then
-					tick = OvaleData:GetTickLength(spellId, aura.snapshot)
+					tick = GetTickLength(spellId, aura.snapshot)
 				elseif bit_band(spellSchool, CLEU_SCHOOL_MASK_MAGIC) > 0 then
 					tick = 3 / OvalePaperDoll:GetSpellHasteMultiplier(aura.snapshot)
 				else
@@ -426,7 +444,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 				-- Only set the initial tick information for new auras.
 				if not auraIsActive then
 					aura.ticksSeen = 0
-					aura.tick = OvaleData:GetTickLength(auraId, aura.snapshot)
+					aura.tick = GetTickLength(auraId, aura.snapshot)
 				end
 			end
 		end
@@ -690,6 +708,35 @@ local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 		end
 	end
 	return auraFound
+end
+
+-- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.
+statePrototype.GetDuration = function(state, auraId, spellcast)
+	local snapshot, combo, holy
+	if spellcast then
+		snapshot, combo, holy = spellcast.snapshot, spellcast.combo, spellcast.holy
+	else
+		snapshot, combo, holy = state.snapshot, state.combo, state.holy
+	end
+
+	local duration = math.huge
+	local tick = GetTickLength(auraId, snapshot)
+
+	local si = OvaleData.spellInfo[auraId]
+	if si and si.duration then
+		duration = si.duration
+		if si.adddurationcp and combo then
+			duration = duration + si.adddurationcp * combo
+		end
+		if si.adddurationholy and holy then
+			duration = duration + si.adddurationholy * (holy - 1)
+		end
+	end
+
+	local numTicks = floor(duration/tick + 0.5)
+	local dotDuration = tick * numTicks
+
+	return duration, dotDuration, tick, numTicks
 end
 
 -- Print the auras matching the filter on the unit in alphabetical order.
