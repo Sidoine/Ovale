@@ -183,7 +183,6 @@ end
 
 local function RemoveAurasOnGUID(auraDB, guid)
 	if auraDB[guid] then
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras from guid %s", guid)
 		local auraTable = auraDB[guid]
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
@@ -299,6 +298,7 @@ function OvaleAura:RemoveAurasOnInactiveUnits()
 	for guid in pairs(self_aura) do
 		local unitId = OvaleGUID:GetUnitId(guid)
 		if not unitId then
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras from guid %s", guid)
 			RemoveAurasOnGUID(self_aura, guid)
 			self_serial[guid] = nil
 		end
