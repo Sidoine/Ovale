@@ -245,6 +245,11 @@ end
 -- Print out the list of known spells in alphabetical order.
 function OvaleSpellBook:DebugSpells()
 	PrintTableValues(self_spell)
+	local total = 0
+	for _ in pairs(self_spell) do
+		total = total + 1
+	end
+	Ovale:FormatPrint("Total spells: %d", total)
 end
 
 -- Print out the list of talents in alphabetical order.
