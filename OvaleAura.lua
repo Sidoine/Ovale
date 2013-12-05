@@ -748,7 +748,10 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					if spellData == "refresh" then
 						Ovale:Logf("Aura %d is refreshed.", auraId)
 					else -- if stacks > 0 then
-						local maxstacks = si.maxstacks or 1
+						local maxstacks = 1
+						if si and si.maxstacks then
+							maxstacks = si.maxstacks
+						end
 						aura.stacks = aura.stacks + stacks
 						if aura.stacks > maxstacks then
 							aura.stacks = maxstacks
