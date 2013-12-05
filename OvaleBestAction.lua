@@ -719,7 +719,7 @@ function OvaleBestAction:OnInitialize()
 end
 
 function OvaleBestAction:StartNewAction(state)
-	OvaleState:Reset(state)
+	state:Reset()
 	OvaleFuture:ApplyInFlightSpells(state)
 	self_serial = self_serial + 1
 end

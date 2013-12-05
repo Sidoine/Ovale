@@ -517,7 +517,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 		local spellcast = self_activeSpellcast[index]
 		Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 		if now - spellcast.stop < 5 then
-			OvaleState:ApplySpell(state, spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast.nocd, spellcast)
+			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast.nocd, spellcast)
 		else
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
@@ -589,6 +589,20 @@ local statePrototype = OvaleFuture.statePrototype
 --</private-static-properties>
 
 --<state-properties>
+-- The current time in the simulator.
+statePrototype.currentTime = nil
+-- The spell being cast in the simulator.
+statePrototype.currentSpellId = nil
+-- The starting cast time of the spell being cast in the simulator.
+statePrototype.startCast = nil
+-- The ending cast time of the spell being cast in the simulator.
+statePrototype.endCast = nil
+-- The time at which the next GCD spell can be cast in the simulator.
+statePrototype.nextCast = nil
+-- Whether the player is channeling a spell in the simulator at the current time.
+statePrototype.isChanneling = nil
+-- The previous spell cast in the simulator.
+statePrototype.lastSpellId = nil
 -- counter[name] = count
 statePrototype.counter = nil
 --</state-properties>
@@ -601,6 +615,15 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleFuture:ResetState(state)
+	local now = API_GetTime()
+	state.currentTime = now
+	Ovale:Logf("Reset state with current time = %f", state.currentTime)
+
+	state.lastSpellId = self.lastSpellcast and self.lastSpellcast.spellId
+	state.currentSpellId = nil
+	state.isChanneling = false
+	state.nextCast = now
+
 	for k, v in pairs(self.counter) do
 		state.counter[k] = self.counter[k]
 	end
@@ -608,6 +631,14 @@ end
 
 -- Release state resources prior to removing from the simulator.
 function OvaleFuture:CleanState(state)
+	state.currentTime = nil
+	state.currentSpellId = nil
+	state.startCast = nil
+	state.endCast = nil
+	state.nextCast = nil
+	state.isChanneling = nil
+	state.lastSpellId = nil
+
 	for k in pairs(state.counter) do
 		state.counter[k] = nil
 	end
@@ -638,5 +669,72 @@ end
 
 statePrototype.GetDamageMultiplier = function(state, spellId)
 	return GetDamageMultiplier(spellId, state)
+end
+
+--[[
+	Cast a spell in the simulator and advance the state of the simulator.
+
+	Parameters:
+		spellId		The ID of the spell to cast.
+		targetGUID	The GUID of the target of the spellcast.
+		startCast	The time at the start of the spellcast.
+		endCast		The time at the end of the spellcast.
+		nextCast	The earliest time at which the next spell can be cast (nextCast >= endCast).
+		isChanneled	The spell is a channeled spell.
+		nocd		The spell's cooldown is not triggered.
+		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
+--]]
+statePrototype.ApplySpell = function(state, ...)
+	local spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast = ...
+	if not spellId or not targetGUID then
+		return
+	end
+
+	-- Handle missing start/end/next cast times.
+	if not startCast or not endCast or not nextCast then
+		local castTime = 0
+		local castTime = select(7, API_GetSpellInfo(spellId))
+		castTime = castTime and (castTime / 1000) or 0
+		local gcd = OvaleCooldown:GetGCD(spellId)
+
+		startCast = startCast or state.nextCast
+		endCast = endCast or (startCast + castTime)
+		nextCast = (castTime > gcd) and endCast or (startCast + gcd)
+	end
+
+	-- Update the latest spell cast in the simulator.
+	state.currentSpellId = spellId
+	state.startCast = startCast
+	state.endCast = endCast
+	state.nextCast = nextCast
+	state.isChanneling = isChanneled
+	state.lastSpellId = spellId
+
+	-- Set the current time in the simulator to a little after the start of the current cast,
+	-- or to now if in the past.
+	local now = API_GetTime()
+	if startCast >= now then
+		state.currentTime = startCast + 0.1
+	else
+		state.currentTime = now
+	end
+
+	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
+
+	--[[
+		Apply the effects of the spellcast in three phases.
+			1. Effects at the beginning of the spellcast.
+			2. Effects when the spell has been cast.
+			3. Effects when the spellcast hits the target.
+	--]]
+	-- If the spellcast has already started, then the effects have already occurred.
+	if startCast >= now then
+		OvaleState:InvokeMethod("ApplySpellStartCast", state, ...)
+	end
+	-- If the spellcast has already ended, then the effects have already occurred.
+	if endCast > now then
+		OvaleState:InvokeMethod("ApplySpellAfterCast", state, ...)
+	end
+	OvaleState:InvokeMethod("ApplySpellOnHit", state, ...)
 end
 --</state-methods>

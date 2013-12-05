@@ -24,7 +24,6 @@ local OvaleData = nil
 local OvaleFuture = nil
 
 local pairs = pairs
-local API_GetTime = GetTime
 
 local self_statePrototype = {}
 local self_stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
@@ -91,83 +90,6 @@ function OvaleState:InvokeMethod(methodName, ...)
 		end
 	end
 end
-
-function OvaleState:StartNewFrame(state)
-	if not state.isInitialized then
-		self:InvokeMethod("InitializeState", state)
-	end
-end
-
-function OvaleState:Reset(state)
-	self:InvokeMethod("ResetState", state)
-end
-
---[[
-	Cast a spell in the simulator and advance the state of the simulator.
-
-	Parameters:
-		spellId		The ID of the spell to cast.
-		targetGUID	The GUID of the target of the spellcast.
-		startCast	The time at the start of the spellcast.
-		endCast		The time at the end of the spellcast.
-		nextCast	The earliest time at which the next spell can be cast (nextCast >= endCast).
-		isChanneled	The spell is a channeled spell.
-		nocd		The spell's cooldown is not triggered.
-		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
---]]
-function OvaleState:ApplySpell(state, ...)
-	local spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast = ...
-	if not spellId or not targetGUID then
-		return
-	end
-
-	-- Handle missing start/end/next cast times.
-	if not startCast or not endCast or not nextCast then
-		local castTime = 0
-		local castTime = select(7, API_GetSpellInfo(spellId))
-		castTime = castTime and (castTime / 1000) or 0
-		local gcd = OvaleCooldown:GetGCD(spellId)
-
-		startCast = startCast or state.nextCast
-		endCast = endCast or (startCast + castTime)
-		nextCast = (castTime > gcd) and endCast or (startCast + gcd)
-	end
-
-	-- Update the latest spell cast in the simulator.
-	state.currentSpellId = spellId
-	state.startCast = startCast
-	state.endCast = endCast
-	state.nextCast = nextCast
-	state.isChanneling = isChanneled
-	state.lastSpellId = spellId
-
-	-- Set the current time in the simulator to a little after the start of the current cast,
-	-- or to now if in the past.
-	local now = API_GetTime()
-	if startCast >= now then
-		state.currentTime = startCast + 0.1
-	else
-		state.currentTime = now
-	end
-
-	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
-
-	--[[
-		Apply the effects of the spellcast in three phases.
-			1. Effects at the beginning of the spellcast.
-			2. Effects when the spell has been cast.
-			3. Effects when the spellcast hits the target.
-	--]]
-	-- If the spellcast has already started, then the effects have already occurred.
-	if startCast >= now then
-		self:InvokeMethod("ApplySpellStartCast", state, ...)
-	end
-	-- If the spellcast has already ended, then the effects have already occurred.
-	if endCast > now then
-		self:InvokeMethod("ApplySpellAfterCast", state, ...)
-	end
-	self:InvokeMethod("ApplySpellOnHit", state, ...)
-end
 --</public-static-methods>
 
 --[[----------------------------------------------------------------------------
@@ -185,37 +107,17 @@ local statePrototype = OvaleState.statePrototype
 --<state-properties>
 -- Whether the state of the simulator has been initialized.
 statePrototype.isInitialized = nil
--- The current time in the simulator.
-statePrototype.currentTime = nil
--- The spell being cast in the simulator.
-statePrototype.currentSpellId = nil
--- The starting cast time of the spell being cast in the simulator.
-statePrototype.startCast = nil
--- The ending cast time of the spell being cast in the simulator.
-statePrototype.endCast = nil
--- The time at which the next GCD spell can be cast in the simulator.
-statePrototype.nextCast = nil
--- Whether the player is channeling a spell in the simulator at the current time.
-statePrototype.isChanneling = nil
--- The previous spell cast in the simulator.
-statePrototype.lastSpellId = nil
 --</state-properties>
 
---<public-static-methods>
--- Initialize the state.
-function OvaleState:InitializeState(state)
-	state.isInitialized = true
+--<state-methods>
+statePrototype.Initialize = function(state)
+	if not state.isInitialized then
+		OvaleState:InvokeMethod("InitializeState", state)
+		state.isInitialized = true
+	end
 end
 
--- Reset the state to the current conditions.
-function OvaleState:ResetState(state)
-	local now = API_GetTime()
-	state.currentTime = now
-	Ovale:Logf("Reset state with current time = %f", state.currentTime)
-
-	state.lastSpellId = OvaleFuture.lastSpellcast and OvaleFuture.lastSpellcast.spellId
-	state.currentSpellId = nil
-	state.isChanneling = false
-	state.nextCast = now
+statePrototype.Reset = function(state)
+	OvaleState:InvokeMethod("ResetState", state)
 end
---</public-static-methods>
+--</state-methods>

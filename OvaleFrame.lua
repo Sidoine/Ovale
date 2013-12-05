@@ -175,7 +175,7 @@ do
 		self.lastUpdate = now
 
 		local state = OvaleState.state
-		OvaleState:StartNewFrame(state)
+		state:Initialize()
 		for k,node in pairs(OvaleCompile.masterNodes) do
 			local target
 			if node.params and node.params.target then
@@ -265,7 +265,7 @@ do
 							if not spellTarget or spellTarget == "target" then
 								spellTarget = OvaleCondition.defaultTarget
 							end
-							OvaleState:ApplySpell(state, spellId, OvaleGUID:GetGUID(spellTarget))
+							state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
 							timeSpan, _, element = OvaleBestAction:Compute(node)
 							start = NextTime(timeSpan, state.currentTime)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
