@@ -23,8 +23,10 @@ local tonumber = tonumber
 local tostring = tostring
 local tsort = table.sort
 local wipe = table.wipe
-local API_GetNumGlyphSockets = GetNumGlyphSockets
+local API_GetFlyoutInfo = GetFlyoutInfo
+local API_GetFlyoutSlotInfo = GetFlyoutSlotInfo
 local API_GetGlyphSocketInfo = GetGlyphSocketInfo
+local API_GetNumGlyphSockets = GetNumGlyphSockets
 local API_GetSpellBookItemInfo = GetSpellBookItemInfo
 local API_GetSpellInfo = GetSpellInfo
 local API_GetSpellLink = GetSpellLink
@@ -58,6 +60,42 @@ local function PrintTableValues(tbl)
 	tsort(array)
 	for _, v in ipairs(array) do
 		Ovale:Print(v)
+	end
+end
+
+-- Scan a spellbook and populate self_spell table.
+local function ScanSpellBook(bookType, numSpells, offset)
+	offset = offset or 0
+	for index = offset + 1, offset + numSpells do
+		local skillType, spellId = API_GetSpellBookItemInfo(index, bookType)
+		if skillType == "SPELL" or skillType == "PETACTION" then
+			-- Use GetSpellLink() in case this spellbook item was replaced by another spell,
+			-- i.e., through talents or Symbiosis.
+			local spellLink = API_GetSpellLink(index, bookType)
+			if spellLink then
+				local linkdata, spellName = select(3, ParseHyperlink(spellLink))
+				self_spell[tonumber(linkdata)] = spellName
+				if spellId then
+					self_spell[spellId] = spellName
+				end
+			end
+		elseif skillType == "FLYOUT" then
+			local flyoutId = spellId
+			local _, _, numSlots, isKnown = API_GetFlyoutInfo(flyoutId)
+			if numSlots > 0 and isKnown then
+				for flyoutIndex = 1, numSlots do
+					local id, overrideId, isKnown, spellName = GetFlyoutSlotInfo(flyoutId, flyoutIndex)
+					if isKnown then
+						self_spell[id] = spellName
+						self_spell[overrideId] = spellName
+					end
+				end
+			end
+		-- elseif skillType == "FUTURESPELL" then
+		--	no-op
+		elseif not skillType then
+			break
+		end
 	end
 end
 --</private-static-methods>
@@ -140,50 +178,24 @@ function OvaleSpellBook:UpdateGlyphs()
 	self:SendMessage("Ovale_GlyphsChanged")
 end
 
--- Update the player's spells by scanning the first two tabs of the spellbook.
 function OvaleSpellBook:UpdateSpells()
 	wipe(self_spell)
 
-	local name, _, offset, numSpells = API_GetSpellTabInfo(2)
-	if name then
-		for i = 1, offset + numSpells do
-			local skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
-			if spellId and skillType ~= "FUTURESPELL" and skillType ~= "FLYOUT" then
-				-- Use GetSpellLink() in case this spellbook item was replaced by another spell,
-				-- i.e., through talents or Symbiosis.
-				local spellLink = API_GetSpellLink(i, BOOKTYPE_SPELL)
-				if spellLink then
-					local linkdata, spellName = select(3, ParseHyperlink(spellLink))
-					self_spell[tonumber(linkdata)] = spellName
-					self_spell[spellId] = spellName
-				end
-			end
+	-- Scan the first two tabs of the player's spellbook.
+	for tab = 1, 2 do
+		local name, _, offset, numSpells = API_GetSpellTabInfo(tab)
+		if name then
+			ScanSpellBook(BOOKTYPE_SPELL, numSpells, offset)
 		end
 	end
-	self:UpdatePetSpells()
-	self:SendMessage("Ovale_SpellsChanged")
-end
 
--- Update the player's pet spells by scanning the pet spellbook.
-function OvaleSpellBook:UpdatePetSpells()
-	local hasPetSpells = API_HasPetSpells()
-	if hasPetSpells then
-		local i = 1
-		while true do
-			local skillType, spellId = API_GetSpellBookItemInfo(i, BOOKTYPE_PET)
-			if not spellId then break end
-			if skillType ~= "FUTURESPELL" and skillType ~= "FLYOUT" then
-				-- Use GetSpellLink() in case this spellbook item was replaced by another spell.
-				local spellLink = API_GetSpellLink(i, BOOKTYPE_PET)
-				if spellLink then
-					local linkdata, spellName = select(3, ParseHyperlink(spellLink))
-					self_spell[tonumber(linkdata)] = spellName
-					self_spell[spellId] = spellName
-				end
-			end
-			i = i + 1
-		end
+	-- Scan the pet's spellbook.
+	local numPetSpells, petToken = API_HasPetSpells()
+	if numPetSpells then
+		ScanSpellBook(BOOKTYPE_PET, numPetSpells)
 	end
+
+	self:SendMessage("Ovale_SpellsChanged")
 end
 
 function OvaleSpellBook:GetSpellName(spellId)
