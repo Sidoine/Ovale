@@ -870,7 +870,7 @@ statePrototype.GetStealable = function(state, unitId)
 	if count > 0 then
 		return count, start, ending
 	end
-	return nil
+	return 0, 0, math.huge
 end
 
 do
