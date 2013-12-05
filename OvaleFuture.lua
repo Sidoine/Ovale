@@ -163,7 +163,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		if si.buffnocd then
 			local now = API_GetTime()
 			local aura = OvaleAura:GetAura("player", si.buffnocd)
-			if aura and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+			if OvaleAura:IsActiveAura(aura) then
 				spellcast.nocd = true
 			end
 		end
@@ -525,6 +525,13 @@ function OvaleFuture:ApplyInFlightSpells(state)
 			index = index - 1
 		end
 	end
+end
+
+function OvaleFuture:LastInFlightSpell()
+	if #self_activeSpellcast > 0 then
+		return self_activeSpellcast[#self_activeSpellcast]
+	end
+	return self.lastSpellcast
 end
 
 function OvaleFuture:UpdateSnapshotFromSpellcast(dest, spellcast)

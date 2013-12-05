@@ -23,9 +23,9 @@ local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
 local OvalePaperDoll = nil
+local OvaleSpellBook = nil
 local OvaleState = nil
 
-local abs = math.abs
 local bit_band = bit.band
 local bit_bor = bit.bor
 local floor = math.floor
@@ -63,6 +63,10 @@ local self_aura = {}
 -- Current age of auras per unit: self_serial[guid] = age.
 local self_serial = {}
 
+-- Aura lag in milliseconds, with respect to the corresponding spellcast.
+-- TODO: Promote this into a slider option in the config panel.
+local self_auraLag = 300
+
 -- Some auras have a nil caster, so treat those as having a GUID of zero for indexing purposes.
 local UNKNOWN_GUID = 0
 
@@ -99,9 +103,6 @@ local CLEU_TICK_EVENTS = {
 -- Spell school bitmask to identify magic effects.
 local CLEU_SCHOOL_MASK_MAGIC = bit_bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW)
 --</private-static-properties>
-
---<public-static-properties>
---</public-static-properties>
 
 --<private-static-methods>
 local function PutAura(auraDB, guid, auraId, casterGUID, aura)
@@ -207,6 +208,10 @@ local function RemoveAurasOnGUID(auraDB, guid)
 		auraDB[guid] = nil
 	end
 end
+
+local function IsWithinAuraLag(time1, time2)
+	return (time1 - time2 < self_auraLag/1000) and (time2 - time1 < self_auraLag/1000)
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -216,6 +221,7 @@ function OvaleAura:OnInitialize()
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 end
 
@@ -329,7 +335,15 @@ end
 
 function OvaleAura:IsActiveAura(aura, now)
 	now = now or API_GetTime()
-	return (aura and aura.serial == self_serial[aura.guid] and aura.stacks > 0 and aura.start <= now and now <= aura.ending)
+	local boolean = false
+	if aura then
+		if aura.serial == self_serial[aura.guid] and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+			boolean = true
+		elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
+			boolean = true
+		end
+	end
+	return boolean
 end
 
 function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
@@ -378,6 +392,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 		end
 		aura.gain = atTime
 		aura.stacks = count
+		aura.consumed = nil
 		aura.filter = filter
 		aura.icon = icon
 		aura.debuffType = debuffType
@@ -387,13 +402,21 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 		-- Snapshot stats for auras applied by the player.
 		if mine then
 			-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
-			local lastSpellcast = OvaleFuture.lastSpellcast
-			local lastSpellId = lastSpellcast and lastSpellcast.spellId
-			if lastSpellId and OvaleData:NeedNewSnapshot(auraId, lastSpellId) then
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%d) on %s from %f, now=%f, aura.serial=%d",
-					filter, name, auraId, guid, lastSpellcast.snapshot.snapshotTime, atTime, aura.serial)
-				-- TODO: damageMultiplier isn't correct if lastSpellId spreads the DoT.
-				OvaleFuture:UpdateSnapshotFromSpellcast(aura, lastSpellcast)
+			local spellcast = OvaleFuture:LastInFlightSpell()
+			if spellcast and spellcast.stop and not IsWithinAuraLag(spellcast.stop, atTime) then
+				spellcast = OvaleFuture.lastSpellcast
+				if spellcast and spellcast.stop and not IsWithinAuraLag(spellcast.stop, atTime) then
+					spellcast = nil
+				end
+			end
+			if spellcast and spellcast.target == guid then
+				if OvaleData:NeedNewSnapshot(auraId, spellcast.spellId) then
+					local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
+						filter, name, auraId, guid, spellName, spellcast.spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
+					-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
+					OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
+				end
 			end
 
 			-- Set the tick information for known DoTs.
@@ -421,15 +444,39 @@ end
 
 function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 	local aura = GetAura(self_aura, guid, auraId, casterGUID)
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Expiring %s %s (%s) from %s at %f.",
-		aura.filter, aura.name, auraId, guid, atTime)
+	local filter = aura.filter
+	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Expiring %s %s (%d) from %s at %f.",
+		filter, aura.name, auraId, guid, atTime)
 	if aura.ending > atTime then
 		aura.ending = atTime
 	end
-	-- Clear old tick information.
-	aura.tick = nil
-	aura.ticksSeen = nil
-	aura.lastTickTime = nil
+
+	local mine = (casterGUID == self_guid)
+	if mine then
+		-- Clear old tick information for player-applied periodic auras.
+		aura.tick = nil
+		aura.ticksSeen = nil
+		aura.lastTickTime = nil
+
+		-- Check if the aura was consumed by the last spellcast.
+		-- The aura must have ended early, i.e., start + duration > ending.
+		if aura.start + aura.duration > aura.ending then
+			local spellcast
+			if guid == self_guid then
+				-- Player aura, so it was possibly consumed by an in-flight spell.
+				spellcast = OvaleFuture:LastInFlightSpell()
+			else
+				-- Non-player aura, so it was possibly consumed by a spell that landed on its target.
+				spellcast = OvaleFuture.lastSpellcast
+			end
+			if spellcast and spellcast.stop and IsWithinAuraLag(spellcast.stop, aura.ending) then
+				aura.consumed = true
+				local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
+				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Consuming %s %s (%d) on %s with %s (%d) at %f.",
+					filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.stop)
+			end
+		end
+	end
 
 	self:SendMessage("Ovale_AuraRemoved", atTime, guid, auraId, aura.source)
 	local unitId = OvaleGUID:GetUnitId(guid)
@@ -687,7 +734,11 @@ statePrototype.IsActiveAura = function(state, aura, now)
 	local boolean = false
 	if aura then
 		if aura.state then
-			boolean = (aura.serial == state.serial and aura.stacks > 0 and aura.start <= now and now <= aura.ending)
+			if aura.serial == state.serial and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+				boolean = true
+			elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
+				boolean = true
+			end
 		else
 			boolean = OvaleAura:IsActiveAura(aura, now)
 		end
@@ -793,6 +844,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						Ovale:Logf("Aura %d is completely removed.", auraId)
 						-- The aura is completely removed, so set ending to the time that the aura is removed.
 						aura.ending = atTime
+						aura.consumed = true
 					end
 				end
 			else
