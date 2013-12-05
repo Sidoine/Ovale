@@ -399,23 +399,23 @@ function OvalePaperDoll:UpdateStats(event)
 	self:UpdateDamage(event)
 end
 
-function OvalePaperDoll:GetMasteryMultiplier()
-	local snapshot = self:CurrentSnapshot()
+function OvalePaperDoll:GetMasteryMultiplier(snapshot)
+	snapshot = snapshot or self:CurrentSnapshot()
 	return 1 + snapshot.masteryEffect / 100
 end
 
-function OvalePaperDoll:GetMeleeHasteMultiplier()
-	local snapshot = self:CurrentSnapshot()
+function OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
+	snapshot = snapshot or self:CurrentSnapshot()
 	return 1 + snapshot.meleeHaste / 100
 end
 
-function OvalePaperDoll:GetRangedHasteMultiplier()
-	local snapshot = self:CurrentSnapshot()
+function OvalePaperDoll:GetRangedHasteMultiplier(snapshot)
+	snapshot = snapshot or self:CurrentSnapshot()
 	return 1 + snapshot.rangedHaste / 100
 end
 
-function OvalePaperDoll:GetSpellHasteMultiplier()
-	local snapshot = self:CurrentSnapshot()
+function OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
+	snapshot = snapshot or self:CurrentSnapshot()
 	return 1 + snapshot.spellHaste / 100
 end
 
@@ -527,21 +527,21 @@ end
 --<state-methods>
 statePrototype.GetMasteryMultiplier = function(state, snapshot)
 	snapshot = snapshot or state.snapshot
-	return 1 + snapshot.masteryEffect / 100
+	return OvalePaperDoll:GetMasteryMultiplier(snapshot)
 end
 
 statePrototype.GetMeleeHasteMultiplier = function(state, snapshot)
 	snapshot = snapshot or state.snapshot
-	return 1 + snapshot.meleeHaste / 100
+	return OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
 end
 
 statePrototype.GetRangedHasteMultiplier = function(state, snapshot)
 	snapshot = snapshot or state.snapshot
-	return 1 + snapshot.rangedHaste / 100
+	return OvalePaperDoll:GetRangedHasteMultiplier(snapshot)
 end
 
 statePrototype.GetSpellHasteMultiplier = function(state, snapshot)
 	snapshot = snapshot or state.snapshot
-	return 1 + snapshot.spellHaste / 100
+	return OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
 end
 --</state-methods>

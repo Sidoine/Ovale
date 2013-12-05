@@ -331,7 +331,7 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDam
 	return damage
 end
 
-function OvaleData:GetTickLength(auraId)
+function OvaleData:GetTickLength(auraId, snapshot)
 	local tick = 3
 	local si = self.spellInfo[auraId]
 	if si then
@@ -339,9 +339,9 @@ function OvaleData:GetTickLength(auraId)
 		local hasteMultiplier = 1
 		if si.haste then
 			if si.haste == "spell" then
-				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier()
+				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
 			elseif si.haste == "melee" then
-				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier()
+				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
 			end
 			tick = tick / hasteMultiplier
 		end
@@ -364,21 +364,7 @@ local statePrototype = OvaleData.statePrototype
 
 --<state-methods>
 statePrototype.GetTickLength = function(state, auraId, snapshot)
-	local tick = 3
-	local si = OvaleData.spellInfo[auraId]
-	if si then
-		tick = si.tick or tick
-		local hasteMultiplier = 1
-		if si.haste then
-			if si.haste == "spell" then
-				hasteMultiplier = state:GetSpellHasteMultiplier(snapshot)
-			elseif si.haste == "melee" then
-				hasteMultiplier = state:GetMeleeHasteMultiplier(snapshot)
-			end
-			tick = tick / hasteMultiplier
-		end
-	end
-	return tick
+	return OvaleData:GetTickLength(auraId, snapshot)
 end
 
 -- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.

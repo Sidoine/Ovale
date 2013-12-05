@@ -25,6 +25,9 @@ local OvaleGUID = nil
 local OvalePaperDoll = nil
 local OvaleState = nil
 
+local abs = math.abs
+local bit_band = bit.band
+local bit_bor = bit.bor
 local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
@@ -35,6 +38,12 @@ local wipe = table.wipe
 local API_GetTime = GetTime
 local API_UnitAura = UnitAura
 local API_UnitGUID = UnitGUID
+local SCHOOL_MASK_ARCANE = SCHOOL_MASK_ARCANE
+local SCHOOL_MASK_FIRE = SCHOOL_MASK_FIRE
+local SCHOOL_MASK_FROST = SCHOOL_MASK_FROST
+local SCHOOL_MASK_HOLY = SCHOOL_MASK_HOLY
+local SCHOOL_MASK_NATURE = SCHOOL_MASK_NATURE
+local SCHOOL_MASK_SHADOW = SCHOOL_MASK_SHADOW
 
 -- Player's GUID.
 local self_guid = nil
@@ -86,6 +95,9 @@ local CLEU_TICK_EVENTS = {
 	SPELL_PERIODIC_DRAIN = true,
 	SPELL_PERIODIC_LEECH = true,
 }
+
+-- Spell school bitmask to identify magic effects.
+local CLEU_SCHOOL_MASK_MAGIC = bit_bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -250,10 +262,21 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
 		local aura = GetAura(self_aura, destGUID, spellId, self_guid)
 		if self:IsActiveAura(aura) then
+			local name = aura.name or "Unknown spell"
 			local tick, ticksSeen, lastTickTime = aura.tick, aura.ticksSeen, aura.lastTickTime
 			if not lastTickTime then
-				tick = aura.tick or OvaleData:GetTickLength(spellId)
-				ticksSeen = aura.ticksSeen or 0
+				-- This isn't a known periodic aura, but it's ticking so treat this as the first tick.
+				local si = OvaleData.spellInfo[spellId]
+				if si and si.tick then
+					tick = OvaleData:GetTickLength(spellId, aura.snapshot)
+				elseif bit_band(spellSchool, CLEU_SCHOOL_MASK_MAGIC) > 0 then
+					tick = 3 / OvalePaperDoll:GetSpellHasteMultiplier(aura.snapshot)
+				else
+					-- This is a physical DoT, so not affected by haste.
+					tick = 3
+				end
+				ticksSeen = 1
+				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
 			else
 				-- Tick times tend to vary about the "true" value by a up to a few
 				-- hundredths of a second.  Keep a running average to try to protect
@@ -264,8 +287,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			aura.tick = tick
 			aura.ticksSeen = ticksSeen
 			aura.lastTickTime = timestamp
-			local name = aura.name or "Unknown spell"
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%f", name, spellId, destGUID, tick)
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%f, ticksSeen=%d", name, spellId, destGUID, tick, ticksSeen)
 		end
 	end
 end
@@ -381,7 +403,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 				-- Only set the initial tick information for new auras.
 				if not auraIsActive then
 					aura.ticksSeen = 0
-					aura.tick = OvaleData:GetTickLength(auraId)
+					aura.tick = OvaleData:GetTickLength(auraId, aura.snapshot)
 				end
 			end
 		end
@@ -404,6 +426,11 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 	if aura.ending > atTime then
 		aura.ending = atTime
 	end
+	-- Clear old tick information.
+	aura.tick = nil
+	aura.ticksSeen = nil
+	aura.lastTickTime = nil
+
 	self:SendMessage("Ovale_AuraRemoved", atTime, guid, auraId, aura.source)
 	local unitId = OvaleGUID:GetUnitId(guid)
 	if unitId then
