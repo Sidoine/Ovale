@@ -318,6 +318,24 @@ local self_options =
 						},
 					},
 				},
+				advanced = {
+					order = 80,
+					type = "group",
+					name = "Advanced",
+					args =
+					{
+						auraLag =
+						{
+							order = 100,
+							type = "range",
+							name = "Aura lag",
+							desc = "Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed.",
+							min = 100, max = 700, step = 10,
+							get = function(info) return OvaleOptions.db.profile.apparence.auraLag end,
+							set = function(info, value) OvaleOptions.db.profile.apparence.auraLag = value end
+						},
+					},
+				},
 			}
 		},
 		code =
@@ -677,11 +695,31 @@ function OvaleOptions:OnInitialize()
 			check = {},
 			list = {},
 			debug = {},
-			apparence = {enCombat=false, iconScale = 2, secondIconScale = 1, margin = 4, fontScale = 0.5, iconShiftX = 0, iconShiftY = 0,
-				smallIconScale=1, raccourcis=true, numeric=false, avecCible = false,
-				verrouille = false, vertical = false, predictif=false, highlightIcon = true, clickThru = false, 
-				hideVehicule=false, flashIcon=true, targetText = "●", alpha = 1,
-				optionsAlpha = 1, updateInterval=0.1}
+			apparence = {
+				enCombat = false,
+				iconScale = 2,
+				secondIconScale = 1,
+				margin = 4,
+				fontScale = 0.5,
+				iconShiftX = 0,
+				iconShiftY = 0,
+				smallIconScale=1,
+				raccourcis=true,
+				numeric=false,
+				avecCible = false,
+				verrouille = false,
+				vertical = false,
+				predictif = false,
+				highlightIcon = true,
+				clickThru = false,
+				hideVehicule = false,
+				flashIcon = true,
+				targetText = "●",
+				alpha = 1,
+				optionsAlpha = 1,
+				updateInterval = 0.1,
+				auraLag = 400,
+			}
 		}
 	})
 

@@ -22,6 +22,7 @@ local OvalePool = Ovale.OvalePool
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
+local OvaleOptions = nil
 local OvalePaperDoll = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
@@ -57,10 +58,6 @@ do
 		end
 	end
 end
-
--- Aura lag in milliseconds, with respect to the corresponding spellcast.
--- TODO: Promote this into a slider option in the config panel.
-local self_auraLag = 300
 
 -- Some auras have a nil caster, so treat those as having a GUID of zero for indexing purposes.
 local UNKNOWN_GUID = 0
@@ -212,7 +209,8 @@ local function RemoveAurasOnGUID(auraDB, guid)
 end
 
 local function IsWithinAuraLag(time1, time2)
-	return (time1 - time2 < self_auraLag/1000) and (time2 - time1 < self_auraLag/1000)
+	local auraLag = OvaleOptions:GetProfile().apparence.auraLag
+	return (time1 - time2 < auraLag/1000) and (time2 - time1 < auraLag/1000)
 end
 
 local function GetTickLength(auraId, snapshot)
@@ -240,6 +238,7 @@ function OvaleAura:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
+	OvaleOptions = Ovale.OvaleOptions
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
