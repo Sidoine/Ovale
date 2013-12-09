@@ -277,7 +277,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 
 	if CLEU_AURA_EVENTS[event] then
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId and not OvaleGUID.UNIT_AURA_UNITS[unitId] then
+		if unitId and not OvaleGUID.UNIT_AURA_UNIT[unitId] then
 			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
 			self:ScanAurasOnGUID(destGUID)
 		end
@@ -335,7 +335,7 @@ end
 
 function OvaleAura:ScanAllUnitAuras()
 	-- Update auras on all visible units.
-	for unitId in pairs(OvaleGUID.UNIT_AURA_UNITS) do
+	for unitId in pairs(OvaleGUID.UNIT_AURA_UNIT) do
 		self:ScanAuras(unitId)
 	end
 end
