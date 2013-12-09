@@ -28,6 +28,8 @@ local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
 
+local OVALE_ECLIPSE_DEBUG = "eclipse"
+
 -- Player's GUID.
 local self_guid = nil
 -- Player's class.
@@ -187,6 +189,7 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 			end
 			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
 			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then
+				Ovale:Logf("[%s] Eclipse %d -> %d", OVALE_ECLIPSE_DEBUG, eclipse, eclipse + energy)
 				eclipse = eclipse + energy
 
 				-- Crossing zero energy removes the corresponding Eclipse state.
@@ -200,6 +203,7 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 				if eclipse <= -100 then
 					eclipse = -100
 					direction = 1
+					Ovale:Logf("[%s] Adding Lunar Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, LUNAR_ECLIPSE, endCast)
 					state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge, spellcast.snapshot)
 					-- Reaching Lunar Eclipse resets the cooldown of Starfall.
 					state:ResetSpellCooldown(STARFALL, endCast)
@@ -208,6 +212,7 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 				elseif eclipse >= 100 then
 					eclipse = 100
 					direction = -1
+					Ovale:Logf("[%s] Adding Solar Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, SOLAR_ECLIPSE, endCast)
 					state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge, spellcast.snapshot)
 					-- Reaching Eclipse state grants Nature's Grace.
 					state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", endCast, endCast + 15, spellcast.snapshot)
