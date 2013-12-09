@@ -651,44 +651,107 @@ end
 
 --<state-methods>
 local function GetStateAura(state, guid, auraId, casterGUID)
-	local auraFound = GetAura(state.aura, guid, auraId, casterGUID)
-	if not state:IsActiveAura(auraFound) then
-		auraFound = GetAura(OvaleAura.aura, guid, auraId, casterGUID)
+	local aura = GetAura(state.aura, guid, auraId, casterGUID)
+	if not aura or aura.serial < state.serial then
+		aura = GetAura(OvaleAura.aura, guid, auraId, casterGUID)
 	end
-	return auraFound
+	return aura
 end
 
 local function GetStateAuraAnyCaster(state, guid, auraId)
-	local auraFound = GetAuraAnyCaster(state.aura, guid, auraId)
-	local aura = GetAuraAnyCaster(OvaleAura.aura, guid, auraId)
-	local now = state.currentTime
-	if OvaleAura:IsActiveAura(aura, now) then
-		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
-			auraFound = aura
+	--[[
+		Loop over all of the auras in the true aura database and the state machine aura
+		database and find the one with the latest expiration time.
+	--]]
+	local auraFound
+	if OvaleAura.aura[guid] and OvaleAura.aura[guid][auraId] then
+		for casterGUID in pairs(OvaleAura.aura[guid][auraId]) do
+			local aura = GetStateAura(state, guid, auraId, casterGUID)
+			-- Skip over auras found in the state machine for now.
+			if not aura.state and OvaleAura:IsActiveAura(aura, state.currentTime) then
+				if not auraFound or auraFound.ending < aura.ending then
+					auraFound = aura
+				end
+			end
+		end
+	end
+	if state.aura[guid] and state.aura[guid][auraId] then
+		for casterGUID, aura in pairs(state.aura[guid][auraId]) do
+			if aura.stacks > 0 then
+				if not auraFound or auraFound.ending < aura.ending then
+					auraFound = aura
+				end
+			end
 		end
 	end
 	return auraFound
 end
 
 local function GetStateDebuffType(state, guid, debuffType, filter, casterGUID)
-	local auraFound = GetDebuffType(state.aura, guid, debuffType, filter, casterGUID)
-	local aura = GetDebuffType(OvaleAura.aura, guid, debuffType, filter, casterGUID)
-	local now = state.currentTime
-	if OvaleAura:IsActiveAura(aura, now) then
-		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
-			auraFound = aura
+	--[[
+		Loop over all of the auras in the true aura database and the state machine aura
+		database and find the one with the latest expiration time.
+	--]]
+	local auraFound
+	if OvaleAura.aura[guid] then
+		for auraId in pairs(OvaleAura.aura[guid]) do
+			local aura = GetStateAura(state, guid, auraId, casterGUID)
+			-- Skip over auras found in the state machine for now.
+			if aura and not aura.state and OvaleAura:IsActiveAura(aura, state.currentTime) then
+				if aura.debuffType == debuffType and aura.filter == filter then
+					if not auraFound or auraFound.ending < aura.ending then
+						auraFound = aura
+					end
+				end
+			end
+		end
+	end
+	if state.aura[guid] then
+		for auraId, whoseTable in pairs(state.aura[guid]) do
+			local aura = whoseTable[casterGUID]
+			if aura and aura.stacks > 0 then
+				if aura.debuffType == debuffType and aura.filter == filter then
+					if not auraFound or auraFound.ending < aura.ending then
+						auraFound = aura
+					end
+				end
+			end
 		end
 	end
 	return auraFound
 end
 
 local function GetStateDebuffTypeAnyCaster(state, guid, debuffType, filter)
-	local auraFound = GetDebuffTypeAnyCaster(state.aura, guid, debuffType, filter)
-	local aura = GetDebuffTypeAnyCaster(OvaleAura.aura, guid, debuffType, filter)
-	local now = state.currentTime
-	if OvaleAura:IsActiveAura(aura, now) then
-		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
-			auraFound = aura
+	--[[
+		Loop over all of the auras in the true aura database and the state machine aura
+		database and find the one with the latest expiration time.
+	--]]
+	local auraFound
+	if OvaleAura.aura[guid] then
+		for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
+			for casterGUID in pairs(whoseTable) do
+				local aura = GetStateAura(state, guid, auraId, casterGUID)
+				if aura and not aura.state and OvaleAura:IsActiveAura(aura, state.currentTime) then
+					if aura.debuffType == debuffType and aura.filter == filter then
+						if not auraFound or auraFound.ending < aura.ending then
+							auraFound = aura
+						end
+					end
+				end
+			end
+		end
+	end
+	if state.aura[guid] then
+		for auraId, whoseTable in pairs(state.aura[guid]) do
+			for casterGUID, aura in pairs(whoseTable) do
+				if aura and not aura.state and aura.stacks > 0 then
+					if aura.debuffType == debuffType and aura.filter == filter then
+						if not auraFound or auraFound.ending < aura.ending then
+							auraFound = aura
+						end
+					end
+				end
+			end
 		end
 	end
 	return auraFound
@@ -704,7 +767,10 @@ local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 		end
 	else
 		if mine then
-			auraFound = GetStateAura(state, guid, auraId, self_guid)
+			local aura = GetStateAura(state, guid, auraId, self_guid)
+			if aura and aura.stacks > 0 then
+				auraFound = aura
+			end
 		else
 			auraFound = GetStateAuraAnyCaster(state, guid, auraId)
 		end
