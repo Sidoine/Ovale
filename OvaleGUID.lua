@@ -23,15 +23,15 @@ local API_UnitExists = UnitExists
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
-local self_unitId = {}
-local self_guid = {}
-local self_nameToGUID = {}
-local self_nameToUnit = {}
-
 local OVALE_GUID_DEBUG = "guid"
 --</private-static-properties>
 
 --<public-static-properties>
+OvaleGUID.unitId = {}
+OvaleGUID.guid = {}
+OvaleGUID.nameToGUID = {}
+OvaleGUID.nameToUnit = {}
+
 -- Units for which UNIT_AURA is known to fire.
 -- These are unit IDs that correspond to unit frames in the default WoW UI.
 OvaleGUID.UNIT_AURA_UNITS = {}
@@ -88,50 +88,50 @@ end
 
 function OvaleGUID:Update(unitId)
 	local guid = API_UnitGUID(unitId)
-	local previousGuid = self_guid[unitId]
+	local previousGuid = self.guid[unitId]
 	if previousGuid ~= guid then
-		if previousGuid and self_unitId[previousGuid] then
-			self_unitId[previousGuid][unitId] = nil
-			if not next(self_unitId[previousGuid]) then
-				self_unitId[previousGuid] = nil
+		if previousGuid and self.unitId[previousGuid] then
+			self.unitId[previousGuid][unitId] = nil
+			if not next(self.unitId[previousGuid]) then
+				self.unitId[previousGuid] = nil
 			end
 		end
-		self_guid[unitId] = guid
+		self.guid[unitId] = guid
 		if guid then
-			if not self_unitId[guid] then
-				self_unitId[guid] = {}
+			if not self.unitId[guid] then
+				self.unitId[guid] = {}
 			end
 			Ovale:DebugPrintf(OVALE_GUID_DEBUG, "GUID %s is %s", guid, unitId)
-			self_unitId[guid][unitId] = true
+			self.unitId[guid][unitId] = true
 		end
 	end
 	local name = API_UnitName(unitId)
-	if name and (not self_nameToGUID[name] or unitId == "target" 
-			or self_nameToUnit[name] == "mouseover") then
-		self_nameToGUID[name] = guid
-		self_nameToUnit[name] = unitId
+	if name and (not self.nameToGUID[name] or unitId == "target" 
+			or self.nameToUnit[name] == "mouseover") then
+		self.nameToGUID[name] = guid
+		self.nameToUnit[name] = unitId
 	end
 end
 
 function OvaleGUID:GetGUID(unitId)
 	if not unitId then return nil end
-	local guid = self_guid[unitId]
+	local guid = self.guid[unitId]
 	if not guid or strfind(unitId, "mouseover") == 1 then
-		self_guid[unitId] = API_UnitGUID(unitId)
-		guid = self_guid[unitId]
+		self.guid[unitId] = API_UnitGUID(unitId)
+		guid = self.guid[unitId]
 	end
 	return guid
 end
 
 function OvaleGUID:GetGUIDForName(name)
-	return self_nameToGUID[name]
+	return self.nameToGUID[name]
 end
 
 -- Return a unit Id associated with guid.
 -- Prefer to return a unit Id for which the WoW servers fire UNIT_AURA events.
 function OvaleGUID:GetUnitId(guid)
 	local unitIdFound = nil
-	local unitIdTable = self_unitId[guid]
+	local unitIdTable = self.unitId[guid]
 	if unitIdTable then
 		for unitId in pairs(unitIdTable) do
 			if self.UNIT_AURA_UNITS[unitId] then
@@ -142,7 +142,7 @@ function OvaleGUID:GetUnitId(guid)
 						unitIdFound = unitId
 					else
 						unitIdTable[unitId] = nil
-						self_guid[unitId] = nil
+						self.guid[unitId] = nil
 					end
 				else
 					unitIdFound = unitId
@@ -154,12 +154,12 @@ function OvaleGUID:GetUnitId(guid)
 end
 
 function OvaleGUID:GetUnitIdForName(name)
-	local unitId = self_nameToUnit[name]
+	local unitId = self.nameToUnit[name]
 	if strfind(unitId, "mouseover") == 1 then
 		if API_UnitExists("mouseover") then
 			return unitId
 		else
-			self_nameToUnit[name] = nil
+			self.nameToUnit[name] = nil
 			return nil
 		end
 	end

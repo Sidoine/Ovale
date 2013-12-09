@@ -25,11 +25,6 @@ local API_GetShapeshiftForm = GetShapeshiftForm
 local API_GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local API_GetSpellInfo = GetSpellInfo
 
--- List of available stances, populated by CreateStanceList()
-local self_stanceList = {}
--- Player's current stance.
-local self_stance = nil
-
 local OVALE_SPELLID_TO_STANCE = {
 	-- Death Knight
 	[API_GetSpellInfo(48263)] = "death_knight_blood_presence",
@@ -72,6 +67,13 @@ local OVALE_SPELLID_TO_STANCE = {
 }
 --</private-static-properties>
 
+--<public-static-properties>
+-- List of available stances, populated by CreateStanceList()
+OvaleStance.stanceList = {}
+-- Player's current stance.
+OvaleStance.stance = nil
+--</public-static-properties>
+
 --<public-static-methods>
 function OvaleStance:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStances")
@@ -101,15 +103,15 @@ function OvaleStance:UPDATE_SHAPESHIFT_FORMS(event)
 	self:ShapeshiftEventHandler()
 end
 
--- Fill self_stanceList with stance bar index <-> Ovale stance name mappings.
+-- Fill OvaleStance.stanceList with stance bar index <-> Ovale stance name mappings.
 function OvaleStance:CreateStanceList()
-	wipe(self_stanceList)
+	wipe(self.stanceList)
 	local _, name, stanceName
 	for i = 1, API_GetNumShapeshiftForms() do
 		_, name = API_GetShapeshiftFormInfo(i)
 		stanceName = OVALE_SPELLID_TO_STANCE[name]
 		if stanceName then
-			self_stanceList[i] = stanceName
+			self.stanceList[i] = stanceName
 		end
 	end
 end
@@ -117,8 +119,8 @@ end
 -- Print out the list of stances in alphabetical order.
 function OvaleStance:DebugStances()
 	local array = {}
-	for k, v in pairs(self_stanceList) do
-		if self_stance == k then
+	for k, v in pairs(self.stanceList) do
+		if self.stance == k then
 			tinsert(array, v .. " (active)")
 		else
 			tinsert(array, v)
@@ -131,28 +133,28 @@ function OvaleStance:DebugStances()
 end
 
 function OvaleStance:Debug()
-	Ovale:FormatPrint("current stance: %s", self_stance)
+	Ovale:FormatPrint("current stance: %s", self.stance)
 end
 
 -- Return the current stance's name.
 function OvaleStance:GetStance()
-	return self_stanceList[self_stance]
+	return self.stanceList[self.stance]
 end
 
 -- Return true if the current stance matches the given name.
 function OvaleStance:IsStance(name)
-	if not name or not self_stance then return false end
+	if not name or not self.stance then return false end
 	if type(name) == "number" then
-		return name == self_stance
+		return name == self.stance
 	else
-		return name == self_stanceList[self_stance]
+		return name == self.stanceList[self.stance]
 	end
 end
 
 function OvaleStance:ShapeshiftEventHandler()
 	local newStance = API_GetShapeshiftForm()
-	if self_stance ~= newStance then
-		self_stance = newStance
+	if self.stance ~= newStance then
+		self.stance = newStance
 		self:SendMessage("Ovale_StanceChanged")
 	end
 end

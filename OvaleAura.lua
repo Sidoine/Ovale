@@ -58,11 +58,6 @@ do
 	end
 end
 
--- Auras on the target (past & present): self_aura[guid][auraId][casterGUID] = aura.
-local self_aura = {}
--- Current age of auras per unit: self_serial[guid] = age.
-local self_serial = {}
-
 -- Aura lag in milliseconds, with respect to the corresponding spellcast.
 -- TODO: Promote this into a slider option in the config panel.
 local self_auraLag = 300
@@ -103,6 +98,13 @@ local CLEU_TICK_EVENTS = {
 -- Spell school bitmask to identify magic effects.
 local CLEU_SCHOOL_MASK_MAGIC = bit_bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW)
 --</private-static-properties>
+
+--<public-static-properties>
+-- Auras on the target (past & present): aura[guid][auraId][casterGUID] = aura.
+OvaleAura.aura = {}
+-- Current age of auras per unit: serial[guid] = age.
+OvaleAura.serial = {}
+--</public-static-properties>
 
 --<private-static-methods>
 local function PutAura(auraDB, guid, auraId, casterGUID, aura)
@@ -264,8 +266,8 @@ function OvaleAura:OnDisable()
 	self:UnregisterEvent("PLAYER_UNGHOST")
 	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterMessage("Ovale_GroupChanged")
-	for guid in pairs(self_aura) do
-		RemoveAurasOnGUID(self_aura, guid)
+	for guid in pairs(self.aura) do
+		RemoveAurasOnGUID(self.aura, guid)
 	end
 	self_pool:Drain()
 end
@@ -284,7 +286,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		local spellId, spellName, spellSchool = select(12, ...)
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
-		local aura = GetAura(self_aura, destGUID, spellId, self_guid)
+		local aura = GetAura(self.aura, destGUID, spellId, self_guid)
 		if self:IsActiveAura(aura) then
 			local name = aura.name or "Unknown spell"
 			local tick, ticksSeen, lastTickTime = aura.tick, aura.ticksSeen, aura.lastTickTime
@@ -341,12 +343,12 @@ end
 function OvaleAura:RemoveAurasOnInactiveUnits()
 	-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
 	-- i.e., not in the group or not targeted by anyone in the group or focus.
-	for guid in pairs(self_aura) do
+	for guid in pairs(self.aura) do
 		local unitId = OvaleGUID:GetUnitId(guid)
 		if not unitId then
 			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras from guid %s", guid)
-			RemoveAurasOnGUID(self_aura, guid)
-			self_serial[guid] = nil
+			RemoveAurasOnGUID(self.aura, guid)
+			self.serial[guid] = nil
 		end
 	end
 end
@@ -355,7 +357,7 @@ function OvaleAura:IsActiveAura(aura, now)
 	now = now or API_GetTime()
 	local boolean = false
 	if aura then
-		if aura.serial == self_serial[aura.guid] and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+		if aura.serial == self.serial[aura.guid] and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
 			boolean = true
 		elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
 			boolean = true
@@ -375,13 +377,13 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 	duration = (duration and duration > 0) and duration or math.huge
 	expirationTime = (expirationTime and expirationTime > 0) and expirationTime or math.huge
 
-	local aura = GetAura(self_aura, guid, auraId, casterGUID)
+	local aura = GetAura(self.aura, guid, auraId, casterGUID)
 	local auraIsActive
 	if aura then
 		auraIsActive = (aura.stacks > 0 and aura.start <= atTime and atTime <= aura.ending)
 	else
 		aura = self_pool:Get()
-		PutAura(self_aura, guid, auraId, casterGUID, aura)
+		PutAura(self.aura, guid, auraId, casterGUID, aura)
 		auraIsActive = false
 	end
 
@@ -395,7 +397,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 	)
 
 	-- Update age of aura, regardless of whether it's changed.
-	aura.serial = self_serial[guid]
+	aura.serial = self.serial[guid]
 
 	if not auraIsActive or not auraIsUnchanged then
 		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Adding %s %s (%s) to %s at %f, aura.serial=%d",
@@ -461,7 +463,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 end
 
 function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
-	local aura = GetAura(self_aura, guid, auraId, casterGUID)
+	local aura = GetAura(self.aura, guid, auraId, casterGUID)
 	local filter = aura.filter
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Expiring %s %s (%d) from %s at %f.",
 		filter, aura.name, auraId, guid, atTime)
@@ -513,8 +515,10 @@ function OvaleAura:ScanAurasOnGUID(guid)
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Scanning auras on %s (%s) at %f", guid, unitId, now)
 
 	-- Advance the age of the unit's auras.
-	self_serial[guid] = self_serial[guid] and (self_serial[guid] + 1) or 1
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Advancing age of auras for %s (%s) to %d.", guid, unitId, self_serial[guid])
+	local serial = self.serial[guid] or 0
+	serial = serial + 1
+	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
+	self.serial[guid] = serial
 
 	-- Add all auras on the unit into the database.
 	local i = 1
@@ -537,9 +541,8 @@ function OvaleAura:ScanAurasOnGUID(guid)
 	end
 
 	-- Find recently expired auras on the unit.
-	if self_aura[guid] then
-		local auraTable = self_aura[guid]
-		local serial = self_serial[guid]
+	if self.aura[guid] then
+		local auraTable = self.aura[guid]
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
 				if aura.serial == serial - 1 then
@@ -559,20 +562,20 @@ end
 
 function OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
 	-- If this GUID has no auras in the database, then do an aura scan.
-	if not self_serial[guid] then
+	if not self.serial[guid] then
 		self:ScanAurasOnGUID(guid)
 	end
 
 	local auraFound
 	if OvaleData.buffSpellList[auraId] then
 		for id in pairs(OvaleData.buffSpellList[auraId]) do
-			local aura = GetAuraOnGUID(self_aura, guid, id, filter, mine)
+			local aura = GetAuraOnGUID(self.aura, guid, id, filter, mine)
 			if aura and (not auraFound or auraFound.ending < aura.ending) then
 				auraFound = aura
 			end
 		end
 	else
-		auraFound = GetAuraOnGUID(self_aura, guid, auraId, filter, mine)
+		auraFound = GetAuraOnGUID(self.aura, guid, auraId, filter, mine)
 	end
 	return auraFound
 end
@@ -651,14 +654,14 @@ end
 local function GetStateAura(state, guid, auraId, casterGUID)
 	local auraFound = GetAura(state.aura, guid, auraId, casterGUID)
 	if not state:IsActiveAura(auraFound) then
-		auraFound = GetAura(self_aura, guid, auraId, casterGUID)
+		auraFound = GetAura(OvaleAura.aura, guid, auraId, casterGUID)
 	end
 	return auraFound
 end
 
 local function GetStateAuraAnyCaster(state, guid, auraId)
 	local auraFound = GetAuraAnyCaster(state.aura, guid, auraId)
-	local aura = GetAuraAnyCaster(self_aura, guid, auraId)
+	local aura = GetAuraAnyCaster(OvaleAura.aura, guid, auraId)
 	local now = state.currentTime
 	if OvaleAura:IsActiveAura(aura, now) then
 		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
@@ -670,7 +673,7 @@ end
 
 local function GetStateDebuffType(state, guid, debuffType, filter, casterGUID)
 	local auraFound = GetDebuffType(state.aura, guid, debuffType, filter, casterGUID)
-	local aura = GetDebuffType(self_aura, guid, debuffType, filter, casterGUID)
+	local aura = GetDebuffType(OvaleAura.aura, guid, debuffType, filter, casterGUID)
 	local now = state.currentTime
 	if OvaleAura:IsActiveAura(aura, now) then
 		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
@@ -682,7 +685,7 @@ end
 
 local function GetStateDebuffTypeAnyCaster(state, guid, debuffType, filter)
 	local auraFound = GetDebuffTypeAnyCaster(state.aura, guid, debuffType, filter)
-	local aura = GetDebuffTypeAnyCaster(self_aura, guid, debuffType, filter)
+	local aura = GetDebuffTypeAnyCaster(OvaleAura.aura, guid, debuffType, filter)
 	local now = state.currentTime
 	if OvaleAura:IsActiveAura(aura, now) then
 		if not state:IsActiveAura(auraFound, now) or auraFound.ending < aura.ending then
@@ -746,8 +749,8 @@ do
 	statePrototype.PrintUnitAuras = function(state, unitId, filter)
 		wipe(array)
 		local guid = OvaleGUID:GetGUID(unitId)
-		if self_aura[guid] then
-			for auraId, whoseTable in pairs(self_aura[guid]) do
+		if OvaleAura.aura[guid] then
+			for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
 				for casterGUID in pairs(whoseTable) do
 					local aura = GetStateAura(state, guid, auraId, casterGUID)
 					if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
@@ -968,8 +971,8 @@ statePrototype.GetStealable = function(state, unitId)
 	local now = state.currentTime
 
 	-- Loop through auras not kept in the simulator that match the criteria.
-	if self_aura[guid] then
-		for auraId, whoseTable in pairs(self_aura[guid]) do
+	if OvaleAura.aura[guid] then
+		for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
 			for casterGUID in pairs(whoseTable) do
 				local aura = GetStateAura(state, guid, auraId, self_guid)
 				if state:IsActiveAura(aura, now) and not aura.state then
@@ -1037,7 +1040,7 @@ do
 		local now = state.currentTime
 
 		-- Loop through auras not kept in the simulator that match the criteria.
-		for guid, auraTable in pairs(self_aura) do
+		for guid, auraTable in pairs(OvaleAura.aura) do
 			if auraTable[auraId] then
 				if mine then
 					local aura = GetStateAura(state, guid, auraId, self_guid)

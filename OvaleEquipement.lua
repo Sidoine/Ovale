@@ -49,17 +49,6 @@ local INVSLOT_TRINKET2 = INVSLOT_TRINKET2
 local INVSLOT_WAIST = INVSLOT_WAIST
 local INVSLOT_WRIST = INVSLOT_WRIST
 
--- item IDs of equipped items, indexed by slot ID
-local self_equippedItems = {}
--- item levels of equipped items, indexed by slot ID
-local self_equippedItemLevels = {}
--- type of main-hand item equipped
-local self_mainHandItemType
--- type of off-hand item equipped
-local self_offHandItemType
--- count of equipped pieces of an armor set: self_armorSetCount[armorSetName] = equippedCount
-local self_armorSetCount = {}
-
 -- frame for tooltip-scanning
 local self_tooltip = API_CreateFrame("GameTooltip", "OvaleScanningTooltip", nil, "GameTooltipTemplate")
 do
@@ -1286,6 +1275,17 @@ local OVALE_NORMALIZED_WEAPON_SPEED = {
 --</private-static-properties>
 
 --<public-static-properties>
+-- Item IDs of equipped items, indexed by slot ID.
+OvaleEquipement.equippedItems = {}
+-- Item levels of equipped items, indexed by slot ID.
+OvaleEquipement.equippedItemLevels = {}
+-- Type of main-hand item equipped.
+OvaleEquipement.mainHandItemType = nil
+-- Type of off-hand item equipped.
+OvaleEquipement.offHandItemType = nil
+-- Count of equipped pieces of an armor set: armorSetCount[armorSetName] = equippedCount
+OvaleEquipement.armorSetCount = {}
+
 -- Normalized weapon speeds for equipped mainhand and offhand weapons.
 OvaleEquipement.mainHandWeaponSpeed = nil
 OvaleEquipement.offHandWeaponSpeed = nil
@@ -1342,22 +1342,22 @@ end
 
 function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 	if hasItem then
-		self_equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
-		self_equippedItemLevels[slotId] = GetItemLevel(slotId)
+		self.equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
+		self.equippedItemLevels[slotId] = GetItemLevel(slotId)
 		if slotId == INVSLOT_MAINHAND then
-			self_mainHandItemType = GetEquippedItemType(slotId)
+			self.mainHandItemType = GetEquippedItemType(slotId)
 			self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
 		elseif slotId == INVSLOT_OFFHAND then
-			self_offHandItemType = GetEquippedItemType(slotId)
+			self.offHandItemType = GetEquippedItemType(slotId)
 			self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
 		end
 	else
-		self_equippedItems[slotId] = nil
-		self_equippedItemLevels[slotId] = nil
+		self.equippedItems[slotId] = nil
+		self.equippedItemLevels[slotId] = nil
 		if slotId == INVSLOT_MAINHAND then
-			self_mainHandItemType = nil
+			self.mainHandItemType = nil
 		elseif slotId == INVSLOT_OFFHAND then
-			self_offHandItemType = nil
+			self.offHandItemType = nil
 		end
 	end
 
@@ -1366,11 +1366,7 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 end
 
 function OvaleEquipement:GetArmorSetCount(name)
-	if not self_armorSetCount[name] then
-		return 0
-	else
-		return self_armorSetCount[name]
-	end
+	return self.armorSetCount[name] or 0
 end
 
 function OvaleEquipement:GetEquippedItem(slotId)
@@ -1379,7 +1375,7 @@ function OvaleEquipement:GetEquippedItem(slotId)
 		slotId = API_GetInventorySlotInfo(slotId)
 		if not slotId then return nil end
 	end
-	return self_equippedItems[slotId]
+	return self.equippedItems[slotId]
 end
 
 function OvaleEquipement:GetEquippedItemLevel(slotId)
@@ -1388,7 +1384,7 @@ function OvaleEquipement:GetEquippedItemLevel(slotId)
 		slotId = API_GetInventorySlotInfo(slotId)
 		if not slotId then return nil end
 	end
-	return self_equippedItemLevels[slotId]
+	return self.equippedItemLevels[slotId]
 end
 
 function OvaleEquipement:HasEquippedItem(itemId, slotId)
@@ -1397,11 +1393,11 @@ function OvaleEquipement:HasEquippedItem(itemId, slotId)
 		slotId = API_GetInventorySlotInfo(slotId)
 	end
 	if slotId then
-		if self_equippedItems[slotId] == itemId then
+		if self.equippedItems[slotId] == itemId then
 			return slotId
 		end
 	else
-		for slotId, equippedItemId in pairs(self_equippedItems) do
+		for slotId, equippedItemId in pairs(self.equippedItems) do
 			if equippedItemId == itemId then
 				return slotId
 			end
@@ -1411,18 +1407,18 @@ function OvaleEquipement:HasEquippedItem(itemId, slotId)
 end
 
 function OvaleEquipement:HasMainHandWeapon()
-	return self_mainHandItemType == "INVTYPE_WEAPON"
-		or self_mainHandItemType == "INVTYPE_WEAPONMAINHAND"
-		or self_mainHandItemType == "INVTYPE_2HWEAPON"
+	return self.mainHandItemType == "INVTYPE_WEAPON"
+		or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+		or self.mainHandItemType == "INVTYPE_2HWEAPON"
 end
 
 function OvaleEquipement:HasOffHandWeapon()
-	return self_offHandItemType == "INVTYPE_WEAPON"
-		or self_offHandItemType == "INVTYPE_WEAPONOFFHAND"
+	return self.offHandItemType == "INVTYPE_WEAPON"
+		or self.offHandItemType == "INVTYPE_WEAPONOFFHAND"
 end
 
 function OvaleEquipement:HasShield()
-	return self_offHandItemType == "INVTYPE_SHIELD"
+	return self.offHandItemType == "INVTYPE_SHIELD"
 end
 
 function OvaleEquipement:HasTrinket(itemId)
@@ -1431,25 +1427,25 @@ function OvaleEquipement:HasTrinket(itemId)
 end
 
 function OvaleEquipement:HasTwoHandedWeapon()
-	return self_mainHandItemType == "INVTYPE_2HWEAPON"
+	return self.mainHandItemType == "INVTYPE_2HWEAPON"
 end
 
 function OvaleEquipement:HasOneHandedWeapon()
-	return self_mainHandItemType == "INVTYPE_WEAPON"
-		or self_mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+	return self.mainHandItemType == "INVTYPE_WEAPON"
+		or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
 end
 
 function OvaleEquipement:UpdateArmorSetCount()
-	wipe(self_armorSetCount)
+	wipe(self.armorSetCount)
 	for i = 1, #OVALE_ARMORSET_SLOT_IDS do
 		local itemId = self:GetEquippedItem(OVALE_ARMORSET_SLOT_IDS[i])
 		if itemId then
 			local name = OVALE_ARMORSET[itemId]
 			if name then
-				if not self_armorSetCount[name] then
-					self_armorSetCount[name] = 1
+				if not self.armorSetCount[name] then
+					self.armorSetCount[name] = 1
 				else
-					self_armorSetCount[name] = self_armorSetCount[name] + 1
+					self.armorSetCount[name] = self.armorSetCount[name] + 1
 				end
 			end
 		end
@@ -1461,13 +1457,13 @@ function OvaleEquipement:UpdateEquippedItems()
 	local item
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
 		item = API_GetInventoryItemID("player", slotId)
-		if item ~= self_equippedItems[slotId] then
-			self_equippedItems[slotId] = item
+		if item ~= self.equippedItems[slotId] then
+			self.equippedItems[slotId] = item
 			changed = true
 		end
 	end
-	self_mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
-	self_offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
+	self.mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
+	self.offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
 	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
 	self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
 	self:UpdateEquippedItemLevels()
@@ -1483,8 +1479,8 @@ function OvaleEquipement:UpdateEquippedItemLevels()
 	local itemLevel
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
 		itemLevel = GetItemLevel(slotId)
-		if itemLevel ~= self_equippedItemLevels[slotId] then
-			self_equippedItemLevels[slotId] = itemLevel
+		if itemLevel ~= self.equippedItemLevels[slotId] then
+			self.equippedItemLevels[slotId] = itemLevel
 			changed = true
 		end
 	end
@@ -1494,9 +1490,9 @@ function OvaleEquipement:Debug()
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
 		Ovale:FormatPrint("Slot %d = %s (%d)", slotId, self:GetEquippedItem(slotId), self:GetEquippedItemLevel(slotId))
 	end
-	Ovale:FormatPrint("Main-hand item type: %s", self_mainHandItemType)
-	Ovale:FormatPrint("Off-hand item type: %s", self_offHandItemType)
-	for k, v in pairs(self_armorSetCount) do
+	Ovale:FormatPrint("Main-hand item type: %s", self.mainHandItemType)
+	Ovale:FormatPrint("Off-hand item type: %s", self.offHandItemType)
+	for k, v in pairs(self.armorSetCount) do
 		Ovale:FormatPrint("Player has %d piece(s) of %s armor set.", v, k)
 	end
 end

@@ -24,12 +24,13 @@ local OvaleData = nil
 local OvaleFuture = nil
 
 local pairs = pairs
-
-local self_statePrototype = {}
-local self_stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
 --</private-static-properties>
 
 --<public-static-properties>
+-- Registered state prototypes from which mix-in methods are added to state machines.
+OvaleState.statePrototype = {}
+OvaleState.stateAddons = OvaleQueue:NewQueue("OvaleState_stateAddons")
+
 -- The state for the simulator.
 OvaleState.state = {}
 --</public-static-properties>
@@ -50,9 +51,9 @@ function OvaleState:OnDisable()
 end
 
 
-function OvaleState:RegisterState(addon, statePrototype)
-	self_stateModules:Insert(addon)
-	self_statePrototype[addon] = statePrototype
+function OvaleState:RegisterState(stateAddon, statePrototype)
+	self.stateAddons:Insert(stateAddon)
+	self.statePrototype[stateAddon] = statePrototype
 
 	-- Mix-in addon's state prototype into OvaleState.state.
 	for k, v in pairs(statePrototype) do
@@ -60,31 +61,31 @@ function OvaleState:RegisterState(addon, statePrototype)
 	end
 end
 
-function OvaleState:UnregisterState(addon)
+function OvaleState:UnregisterState(stateAddon)
 	stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
-	while self_stateModules:Size() > 0 do
-		local stateAddon = self_stateModules:Remove()
+	while self.stateAddons:Size() > 0 do
+		local addon = self.stateAddons:Remove()
 		if stateAddon ~= addon then
 			stateModules:Insert(addon)
 		end
 	end
-	self_stateModules = stateModules
+	self.stateAddons = stateModules
 
 	-- Release resources used by the state machine managed by the addon.
-	if addon.CleanState then
-		addon:CleanState(self.state)
+	if stateAddon.CleanState then
+		stateAddon:CleanState(self.state)
 	end
 
 	-- Remove mix-in methods from addon's state prototype.
-	local statePrototype = self_statePrototype[addon]
+	local statePrototype = self.statePrototype[stateAddon]
 	for k in pairs(statePrototype) do
 		self.state[k] = nil
 	end
-	self_stateModules[addon] = nil
+	self.statePrototype[stateAddon] = nil
 end
 
 function OvaleState:InvokeMethod(methodName, ...)
-	for _, addon in self_stateModules:Iterator() do
+	for _, addon in self.stateAddons:Iterator() do
 		if addon[methodName] then
 			addon[methodName](addon, ...)
 		end

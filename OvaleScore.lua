@@ -38,27 +38,31 @@ local strsplit = string.split
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
 local API_UnitGUID = UnitGUID
+local API_UnitName = UnitName
 
 -- Player's GUID.
 local self_guid = nil
--- self_damageMeter[moduleName] = module
-local self_damageMeter = {}
--- self_damageMeterMethod[moduleName] = methodName or function
-local self_damageMeterMethod = {}
--- Score from current combat session.
-local self_score = 0
--- Maximum possible score from current combat session.
-local self_maxScore = 0
--- Spells for which a score is computed.
-local self_scoredSpell = {}
+-- Player's name.
+local self_name = nil
 --</private-static-properties>
 
 --<public-static-properties>
+-- self_damageMeter[moduleName] = module
+OvaleScore.damageMeter = {}
+-- self_damageMeterMethod[moduleName] = methodName or function
+OvaleScore.damageMeterMethod = {}
+-- Score from current combat session.
+OvaleScore.score = 0
+-- Maximum possible score from current combat session.
+OvaleScore.maxScore = 0
+-- Spells for which a score is computed.
+OvaleScore.scoredSpell = {}
 --</public-static-properties>
 
 --<public-static-methods>
 function OvaleScore:OnEnable()
 	self_guid = API_UnitGUID("player")
+	self_name = API_UnitName("player")
 	API_RegisterAddonMessagePrefix("Ovale")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -84,15 +88,15 @@ end
 function OvaleScore:PLAYER_REGEN_ENABLED()
 	-- Broadcast the player's own score for damage meters when combat ends.
 	-- Broadcast message is "score;maxScore;playerGUID"
-	if self_maxScore > 0 then
-		local message = self_score .. ";" .. self_maxScore .. ";" .. self_guid
+	if self.maxScore > 0 then
+		local message = self.score .. ";" .. self.maxScore .. ";" .. self_guid
 		API_SendAddonMessage("Ovale", message, "RAID")
 	end
 end
 
 function OvaleScore:PLAYER_REGEN_DISABLED()
-	self_score = 0
-	self_maxScore = 0
+	self.score = 0
+	self.maxScore = 0
 end
 
 -- RegisterDamageMeter(moduleName, function) or
@@ -101,35 +105,35 @@ function OvaleScore:RegisterDamageMeter(moduleName, addon, func)
 	if not func then
 		func = addon
 	elseif addon then
-		self_damageMeter[moduleName] = addon
+		self.damageMeter[moduleName] = addon
 	end
-	self_damageMeterMethod[moduleName] = func
+	self.damageMeterMethod[moduleName] = func
 end
 
 function OvaleScore:UnregisterDamageMeter(moduleName)
-	self_damageMeter[moduleName] = nil
-	self_damageMeterMethod[moduleName] = nil
+	self.damageMeter[moduleName] = nil
+	self.damageMeterMethod[moduleName] = nil
 end
 
 function OvaleScore:AddSpell(spellId)
-	self_scoredSpell[spellId] = true
+	self.scoredSpell[spellId] = true
 end
 
 function OvaleScore:ScoreSpell(spellId)
-	if Ovale.enCombat and self_scoredSpell[spellId] then
+	if Ovale.enCombat and self.scoredSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
 		Ovale:Logf("Scored %s", scored)
 		if scored then
-			self_score = self_score + scored
-			self_maxScore = self_maxScore + 1
-			self:SendScore(self_playerName, self_guid, scored, 1)
+			self.score = self.score + scored
+			self.maxScore = self.maxScore + 1
+			self:SendScore(self_name, self_guid, scored, 1)
 		end
 	end
 end
 
 function OvaleScore:SendScore(name, guid, scored, scoreMax)
-	for moduleName, method in pairs(self_damageMeterMethods) do
-		local addon = self_damageMeter[moduleName]
+	for moduleName, method in pairs(self.damageMeterMethod) do
+		local addon = self.damageMeter[moduleName]
 		if addon then
 			addon[method](addon, name, guid, scored, scoreMax)
 		elseif type(method) == "function" then

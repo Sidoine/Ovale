@@ -24,11 +24,7 @@ local API_GetTime = GetTime
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
 
--- self_enemyLastSeen[guid] = timestamp
-local self_enemyLastSeen = {}
--- self_enemyName[guid] = name
-local self_enemyName = {}
--- timer for reaper function to remove inactive enemies
+-- Timer for reaper function to remove inactive enemies.
 local self_reaperTimer = nil
 local REAP_INTERVAL = 3
 
@@ -36,43 +32,14 @@ local OVALE_ENEMIES_DEBUG = "enemy"
 --</private-static-properties>
 
 --<public-static-properties>
+-- enemyLastSeen[guid] = timestamp
+OvaleEnemies.enemyLastSeen = {}
+-- enemyName[guid] = name
+OvaleEnemies.enemyName = {}
+
+-- Total number of active enemies.
 OvaleEnemies.activeEnemies = 0
 --</public-static-properties>
-
---<private-static-methods>
-local function AddEnemy(guid, name, timestamp)
-	if not guid then return end
-	local self = OvaleEnemies
-	local seen = self_enemyLastSeen[guid]
-	self_enemyLastSeen[guid] = timestamp
-	self_enemyName[guid] = name
-	if not seen then
-		self.activeEnemies = self.activeEnemies + 1
-		Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
-		Ovale.refreshNeeded["player"] = true
-	end
-end
-
-local function RemoveEnemy(guid, isDead)
-	if not guid then return end
-	local self = OvaleEnemies
-	local seen = self_enemyLastSeen[guid]
-	local name = self_enemyName[guid]
-	self_enemyLastSeen[guid] = nil
-	if seen then
-		if self.activeEnemies > 0 then
-			self.activeEnemies = self.activeEnemies - 1
-		end
-		if isDead then
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
-		else
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
-		end
-		self:SendMessage("Ovale_InactiveUnit", guid)
-		Ovale.refreshNeeded["player"] = true
-	end
-end
---</private-static-methods>
 
 --<public-static-methods>
 function OvaleEnemies:OnEnable()
@@ -96,22 +63,22 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
 	local now = API_GetTime()
 	if event == "UNIT_DIED" then
-		RemoveEnemy(destGUID, true)
+		self:RemoveEnemy(destGUID, true)
 	elseif sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and destFlags and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
-		AddEnemy(sourceGUID, sourceName, now)
+		self:AddEnemy(sourceGUID, sourceName, now)
 	elseif destGUID and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
-		AddEnemy(destGUID, destName, now)
+		self:AddEnemy(destGUID, destName, now)
 	end
 end
 
 function OvaleEnemies:PLAYER_REGEN_DISABLED()
 	-- Reset enemy tracking when combat starts.
-	wipe(self_enemyLastSeen)
-	wipe(self_enemyName)
+	wipe(self.enemyLastSeen)
+	wipe(self.enemyName)
 	self.activeEnemies = 0
 end
 
@@ -120,16 +87,47 @@ end
 -- incapacitated and shouldn't count toward the number of active enemies.
 function OvaleEnemies:RemoveInactiveEnemies()
 	local now = API_GetTime()
-	for guid, timestamp in pairs(self_enemyLastSeen) do
+	for guid, timestamp in pairs(self.enemyLastSeen) do
 		if now - timestamp > REAP_INTERVAL then
-			RemoveEnemy(guid)
+			self:RemoveEnemy(guid)
 		end
 	end
 end
 
+function OvaleEnemies:AddEnemy(guid, name, timestamp)
+	if not guid then return end
+	local seen = self.enemyLastSeen[guid]
+	self.enemyLastSeen[guid] = timestamp
+	self.enemyName[guid] = name
+	if not seen then
+		self.activeEnemies = self.activeEnemies + 1
+		Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
+		Ovale.refreshNeeded["player"] = true
+	end
+end
+
+function OvaleEnemies:RemoveEnemy(guid, isDead)
+	if not guid then return end
+	local seen = self.enemyLastSeen[guid]
+	local name = self.enemyName[guid]
+	self.enemyLastSeen[guid] = nil
+	if seen then
+		if self.activeEnemies > 0 then
+			self.activeEnemies = self.activeEnemies - 1
+		end
+		if isDead then
+			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
+		else
+			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
+		end
+		self:SendMessage("Ovale_InactiveUnit", guid)
+		Ovale.refreshNeeded["player"] = true
+	end
+end
+
 function OvaleEnemies:Debug()
-	for guid, timestamp in pairs(self_enemyLastSeen) do
-		Ovale:FormatPrint("enemy %s (%s) last seen at %f", guid, self_enemyName[guid], timestamp)
+	for guid, timestamp in pairs(self.enemyLastSeen) do
+		Ovale:FormatPrint("enemy %s (%s) last seen at %f", guid, self.enemyName[guid], timestamp)
 	end	
 end
 --</public-static-methods>

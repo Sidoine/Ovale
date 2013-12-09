@@ -28,24 +28,16 @@ local API_UnitGUID = UnitGUID
 local self_guid = nil
 -- Damage event pool.
 local self_pool = OvalePool("OvaleDamageTaken_pool")
--- Damage event queue: new events are inserted at the front of the queue.
-local self_damageEvent = OvaleQueue:NewDeque("OvaleDamageTaken_damageEvent")
 -- Time window (past number of seconds) for which damage events are stored.
 local DAMAGE_TAKEN_WINDOW = 20
 
 local OVALE_DAMAGE_TAKEN_DEBUG = "damage_taken"
 --</private-static-properties>
 
---<private-static-methods>
-local function AddDamageTaken(timestamp, damage)
-	local self = OvaleDamageTaken
-	local event = self_pool:Get()
-	event.timestamp = timestamp
-	event.damage = damage
-	self_damageEvent:InsertFront(event)
-	self:RemoveExpiredEvents(timestamp)
-end
---</private-static-methods>
+--<public-static-properties>
+-- Damage event queue: new events are inserted at the front of the queue.
+OvaleDamageTaken.damageEvent = OvaleQueue:NewDeque("OvaleDamageTaken_damageEvent")
+--</public-static-properties>
 
 --<public-static-methods>
 function OvaleDamageTaken:OnInitialize()
@@ -72,18 +64,26 @@ function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		if event:find("SWING_") == 1 then
 			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s caused %d damage.", event, amount)
-			AddDamageTaken(now, amount)
+			self:AddDamageTaken(now, amount)
 		elseif event:find("RANGE_") == 1 or event:find("SPELL_") == 1 then
 			local spellId, spellName, spellSchool = select(12, ...)
 			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(15, ...)
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", event, spellName, amount)
-			AddDamageTaken(now, amount)
+			self:AddDamageTaken(now, amount)
 		end
 	end
 end
 
 function OvaleDamageTaken:PLAYER_REGEN_ENABLED(event)
 	self_pool:Drain()
+end
+
+function OvaleDamageTaken:AddDamageTaken(timestamp, damage)
+	local event = self_pool:Get()
+	event.timestamp = timestamp
+	event.damage = damage
+	self.damageEvent:InsertFront(event)
+	self:RemoveExpiredEvents(timestamp)
 end
 
 -- Return the total damage taken in the previous time interval (in seconds).
@@ -96,7 +96,7 @@ function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
 	self:RemoveExpiredEvents(now)
 
 	local total = 0
-	for i, event in self_damageEvent:FrontToBackIterator() do
+	for i, event in self.damageEvent:FrontToBackIterator() do
 		if event.timestamp < lowerBound then
 			break
 		end
@@ -108,21 +108,21 @@ end
 -- Remove all events that are more than DAMAGE_TAKEN_WINDOW seconds before the given timestamp.
 function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
 	while true do
-		local event = self_damageEvent:Back()
+		local event = self.damageEvent:Back()
 		if not event then break end
 		if event then
 			if timestamp - event.timestamp < DAMAGE_TAKEN_WINDOW then
 				break
 			end
-			self_damageEvent:RemoveBack()
+			self.damageEvent:RemoveBack()
 			self_pool:Release(event)
 		end
 	end
 end
 
 function OvaleDamageTaken:Debug()
-	self_damageEvent:Debug()
-	for i, event in self_damageEvent:BackToFrontIterator() do
+	self.damageEvent:Debug()
+	for i, event in self.damageEvent:BackToFrontIterator() do
 		Ovale:FormatPrint("%d: %d damage", event.timestamp, event.damage)
 	end
 end

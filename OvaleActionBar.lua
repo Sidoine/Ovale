@@ -20,21 +20,23 @@ local API_GetActionInfo = GetActionInfo
 local API_GetActionText = GetActionText
 local API_GetBindingKey = GetBindingKey
 
--- Maps each action slot (1..120) to the current action: self_action[slot] = action
-local self_action = {}
--- Maps each action slot (1..120) to its current keybind: self_keybind[slot] = keybind
-local self_keybind = {}
-
--- Maps each spell/macro/item ID to its current action slot.
--- self_spell[spellId] = slot
-local self_spell = {}
--- self_macro[macroName] = slot
-local self_macro = {}
--- self_item[itemId] = slot
-local self_item = {}
-
 local OVALE_ACTIONBAR_DEBUG = "action_bar"
 --</private-static-properties>
+
+--<public-static-properties>
+-- Maps each action slot (1..120) to the current action: action[slot] = action
+OvaleActionBar.action = {}
+-- Maps each action slot (1..120) to its current keybind: keybind[slot] = keybind
+OvaleActionBar.keybind = {}
+
+-- Maps each spell/macro/item ID to its current action slot.
+-- spell[spellId] = slot
+OvaleActionBar.spell = {}
+-- macro[macroName] = slot
+OvaleActionBar.macro = {}
+-- item[itemId] = slot
+OvaleActionBar.item = {}
+--</public-static-properties>
 
 --<private-static-methods>
 local function GetKeyBinding(slot)
@@ -60,51 +62,6 @@ local function GetKeyBinding(slot)
 	local key = name and API_GetBindingKey(name)
 	return key
 end
-
-local function UpdateActionSlot(slot)
-	-- Clear old slot and associated actions.
-	local action = self_action[slot]
-	if self_spell[action] == slot then
-		self_spell[action] = nil
-	elseif self_item[action] == slot then
-		self_item[action] = nil
-	elseif self_macro[action] == slot then
-		self_macro[action] = nil
-	end
-	self_action[slot] = nil
-
-	-- Map the current action in the slot.
-	local actionType, id, subType = API_GetActionInfo(slot)
-	if actionType == "spell" then
-		id = tonumber(id)
-		if id then
-			if self_spell[id] and slot < self_spell[id] then
-				self_spell[id] = slot
-			end
-			self_action[slot] = id
-		end
-	elseif actionType == "item" then
-		id = tonumber(id)
-		if id then
-			if self_item[id] and slot < self_item[id] then
-				self_item[id] = slot
-			end
-			self_action[slot] = id
-		end
-	elseif actionType == "macro" then
-		local actionText = API_GetActionText(slot)
-		if actionText then
-			if self_macro[actionText] and slot < self_macro[actionText] then
-				self_macro[actionText] = slot
-			end
-			self_action[slot] = actionText
-		end
-	end
-	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "Mapping button %s to %s", slot, self_action[slot])
-
-	-- Update the keybind for the slot.
-	self_keybind[slot] = GetKeyBinding(slot)
-end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -129,45 +86,90 @@ function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot)
 	if slot == 0 then
 		self:UpdateActionSlots(event)
 	elseif slot then
-		UpdateActionSlot(slot)
+		self:UpdateActionSlot(slot)
 	end
 end
 
 function OvaleActionBar:UPDATE_BINDINGS(event)
 	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "%s: Updating key bindings.", event)
 	for slot = 1, 120 do
-		self_keybind[slot] = GetKeyBinding(slot)
+		self.keybind[slot] = GetKeyBinding(slot)
 	end
 end
 
 function OvaleActionBar:UpdateActionSlots(event)
 	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "%s: Updating all action slot mappings.", event)
-	wipe(self_action)
-	wipe(self_item)
-	wipe(self_macro)
-	wipe(self_spell)
+	wipe(self.action)
+	wipe(self.item)
+	wipe(self.macro)
+	wipe(self.spell)
 	for slot = 1, 120 do
-		UpdateActionSlot(slot)
+		self:UpdateActionSlot(slot)
 	end
+end
+
+function OvaleActionBar:UpdateActionSlot(slot)
+	-- Clear old slot and associated actions.
+	local action = self.action[slot]
+	if self.spell[action] == slot then
+		self.spell[action] = nil
+	elseif self.item[action] == slot then
+		self.item[action] = nil
+	elseif self.macro[action] == slot then
+		self.macro[action] = nil
+	end
+	self.action[slot] = nil
+
+	-- Map the current action in the slot.
+	local actionType, id, subType = API_GetActionInfo(slot)
+	if actionType == "spell" then
+		id = tonumber(id)
+		if id then
+			if self.spell[id] and slot < self.spell[id] then
+				self.spell[id] = slot
+			end
+			self.action[slot] = id
+		end
+	elseif actionType == "item" then
+		id = tonumber(id)
+		if id then
+			if self.item[id] and slot < self.item[id] then
+				self.item[id] = slot
+			end
+			self.action[slot] = id
+		end
+	elseif actionType == "macro" then
+		local actionText = API_GetActionText(slot)
+		if actionText then
+			if self.macro[actionText] and slot < self.macro[actionText] then
+				self.macro[actionText] = slot
+			end
+			self.action[slot] = actionText
+		end
+	end
+	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "Mapping button %s to %s", slot, self.action[slot])
+
+	-- Update the keybind for the slot.
+	self.keybind[slot] = GetKeyBinding(slot)
 end
 
 -- Get the action slot that matches a spell ID.
 function OvaleActionBar:GetForSpell(spellId)
-	return self_spell[spellId]
+	return self.spell[spellId]
 end
 
 -- Get the action slot that matches a macro name.
 function OvaleActionBar:GetForMacro(macroName)
-	return self_macro[macroName]
+	return self.macro[macroName]
 end
 
 -- Get the action slot that matches an item ID.
 function OvaleActionBar:GetForItem(itemId)
-	return self_item[itemId]
+	return self.item[itemId]
 end
 
 -- Get the keybinding for an action slot.
 function OvaleActionBar:GetBinding(slot)
-	return self_keybind[slot]
+	return self.keybind[slot]
 end
 --</public-static-methods>
