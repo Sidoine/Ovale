@@ -752,7 +752,7 @@ do
 			for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
 				for casterGUID in pairs(whoseTable) do
 					local aura = GetStateAura(state, guid, auraId, casterGUID)
-					if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+					if state:IsActiveAura(aura) and aura.filter == filter and not aura.state then
 						local name = aura.name or "Unknown spell"
 						tinsert(array, name .. ": " .. auraId)
 					end
@@ -762,7 +762,7 @@ do
 		if state.aura[guid] then
 			for auraId, whoseTable in pairs(state.aura[guid]) do
 				for casterGUID, aura in pairs(whoseTable) do
-					if state:IsActiveAura(aura, now) and aura.filter == filter then
+					if state:IsActiveAura(aura) and aura.filter == filter then
 						local name = aura.name or "Unknown spell"
 						tinsert(array, name .. ": " .. auraId)
 					end
