@@ -831,7 +831,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					aura = auraFound
 				else
 					-- Add an aura in the simulator and copy the existing aura information over.
-					aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
+					aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, math.huge)
 					for k, v in pairs(auraFound) do
 						aura[k] = v
 					end
