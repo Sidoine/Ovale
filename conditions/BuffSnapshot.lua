@@ -23,7 +23,7 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if aura then
 			local start, ending = aura.start, aura.ending
 			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
 			return TestValue(start, ending, value, start, 0, comparator, limit)
@@ -36,7 +36,7 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if aura then
 			local start, ending = aura.start, aura.ending
 			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
 			if condition.unlimited ~= 1 and value > 100 then
