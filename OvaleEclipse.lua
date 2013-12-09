@@ -188,6 +188,14 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
 			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then
 				eclipse = eclipse + energy
+
+				-- Crossing zero energy removes the corresponding Eclipse state.
+				if direction < 0 and eclipse <= 0 then
+					state:RemoveAuraOnGUID(self_guid, SOLAR_ECLIPSE, "HELPFUL", true, endCast)
+				elseif direction > 0 and eclipse >= 0 then
+					state:RemoveAuraOnGUID(self_guid, LUNAR_ECLIPSE, "HELPFUL", true, endCast)
+				end
+
 				-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached after the spellcast.
 				if eclipse <= -100 then
 					eclipse = -100
