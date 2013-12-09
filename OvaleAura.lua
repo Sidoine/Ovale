@@ -19,6 +19,7 @@ Ovale.OvaleAura = OvaleAura
 local OvalePool = Ovale.OvalePool
 
 -- Forward declarations for module dependencies.
+local LibDispellable = LibStub("LibDispellable-1.0", true)
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
@@ -206,6 +207,14 @@ local function RemoveAurasOnGUID(auraDB, guid)
 		self_pool:Release(auraTable)
 		auraDB[guid] = nil
 	end
+end
+
+local function IsEnrageEffect(auraId)
+	local boolean = OvaleData.buffSpellList.enrage[auraId]
+	if LibDispellable then
+		boolean = LibDispellable:IsEnrageEffect(auraId)
+	end
+	return boolean or nil
 end
 
 local function IsWithinAuraLag(time1, time2)
@@ -415,6 +424,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 		aura.filter = filter
 		aura.icon = icon
 		aura.debuffType = debuffType
+		aura.enrage = IsEnrageEffect(auraId)
 		aura.stealable = isStealable
 		aura.value1, aura.value2, aura.value3 = value1, value2, value3
 
@@ -1056,10 +1066,10 @@ statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, at
 	end
 end
 
-statePrototype.GetStealable = function(state, unitId)
+statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filter)
 	local count = 0
-	local start, ending = math.huge, 0
 	local guid = OvaleGUID:GetGUID(unitId)
+	local start, ending = math.huge, 0
 	local now = state.currentTime
 
 	-- Loop through auras not kept in the simulator that match the criteria.
@@ -1068,7 +1078,7 @@ statePrototype.GetStealable = function(state, unitId)
 			for casterGUID in pairs(whoseTable) do
 				local aura = GetStateAura(state, guid, auraId, self_guid)
 				if state:IsActiveAura(aura, now) and not aura.state then
-					if aura.stealable and aura.filter == "HELPFUL" then
+					if aura[propertyName] and aura.filter == filter then
 						count = count + 1
 						start = (aura.start < start) and aura.start or start
 						ending = (aura.ending > ending) and aura.ending or ending
@@ -1082,7 +1092,7 @@ statePrototype.GetStealable = function(state, unitId)
 		for auraId, whoseTable in pairs(state.aura[guid]) do
 			for casterGUID, aura in pairs(whoseTable) do
 				if state:IsActiveAura(aura, now) then
-					if aura.stealable and aura.filter == "HELPFUL" then
+					if aura[propertyName] and aura.filter == filter then
 						count = count + 1
 						start = (aura.start < start) and aura.start or start
 						ending = (aura.ending > ending) and aura.ending or ending
@@ -1092,9 +1102,9 @@ statePrototype.GetStealable = function(state, unitId)
 		end
 	end
 	if count > 0 then
-		return count, start, ending
+		return start, ending
 	end
-	return 0, 0, math.huge
+	return nil
 end
 
 do

@@ -78,6 +78,8 @@ $m{GameTooltip}{SetOwner} = true;
 $m{GameTooltip}{SetText} = true;
 $m{GameTooltip}{Show} = true;
 
+$m{LibDispellable}{IsEnrageEffect} = true;
+
 $m{LibDualSpec}{EnhanceDatabase} = true;
 $m{LibDualSpec}{EnhanceOptions} = true;
 

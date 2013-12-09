@@ -13,4 +13,5 @@
   <Include file="Libs\AceConfig-3.0\AceConfig-3.0.xml" />
   <Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml" />
   <Include file="Libs\LibBabble-CreatureType-3.0\lib.xml" />
+  <Include file="Libs\LibDispellable-1.0\LibDispellable-1.0.lua" />
 </Ui>

@@ -13,24 +13,26 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleState = Ovale.OvaleState
 
-	local ParseCondition = OvaleCondition.ParseCondition
+	local TestBoolean = OvaleCondition.TestBoolean
 	local state = OvaleState.state
 
-	--- Test if there is a stealable buff on the target.
-	-- @name BuffStealable
+	--- Test if the target is enraged.
+	-- @name IsEnraged
 	-- @paramsig boolean
+	-- @param yesno Optional. If yes, then return true if enraged. If no, then return true if not enraged.
+	--     Default is yes.
+	--     Valid values: yes.  "no" currently doesn't work.
 	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
 	--     Defaults to target=player.
 	--     Valid values: player, target, focus, pet.
 	-- @return A boolean value.
 	-- @usage
-	-- if target.BuffStealable()
-	--     Spell(spellsteal)
+	-- if target.IsEnraged() Spell(soothe)
 
-	local function BuffStealable(condition)
-		local target = ParseCondition(condition)
-		return state:GetAuraWithProperty(target, "stealable", "HELPFUL")
+	local function IsEnraged(condition)
+		local yesno = condition[1]
+		return state:GetAuraWithProperty(target, "enraged", "HELPFUL")
 	end
 
-	OvaleCondition:RegisterCondition("buffstealable", false, BuffStealable)
+	OvaleCondition:RegisterCondition("isfeared", false, IsFeared)
 end
