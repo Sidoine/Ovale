@@ -963,6 +963,33 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	return aura
 end
 
+-- Remove an aura from the unit specified by GUID.
+statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, atTime)
+	local auraFound = state:GetAuraByGUID(guid, auraId, filter, mine)
+	if state:IsActiveAura(auraFound, atTime) then
+		local aura
+		if auraFound.state then
+			-- Re-use existing aura in the simulator.
+			aura = auraFound
+		else
+			-- Add an aura in the simulator and copy the existing aura information over.
+			aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, math.huge)
+			for k, v in pairs(auraFound) do
+				aura[k] = v
+			end
+			if auraFound.snapshot then
+				aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
+			end
+			-- Reset the aura age relative to the state of the simulator.
+			aura.serial = state.serial
+		end
+
+		-- Expire the aura.
+		aura.stacks = 0
+		aura.ending = atTime
+	end
+end
+
 statePrototype.GetStealable = function(state, unitId)
 	local count = 0
 	local start, ending = math.huge, 0
