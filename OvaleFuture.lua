@@ -123,7 +123,7 @@ local function GetDamageMultiplier(spellId, auraObject)
 				if auraObject:IsActiveAura(aura) then
 					local siAura = OvaleData.spellInfo[auraId]
 					-- If an aura does stacking damage, then it needs to set stacking=1.
-					if siAura.stacking and siAura.stacking > 0 then
+					if siAura and siAura.stacking and siAura.stacking > 0 then
 						multiplier = 1 + (multiplier - 1) * aura.stacks
 					end
 					damageMultiplier = damageMultiplier * multiplier
