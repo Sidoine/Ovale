@@ -345,14 +345,14 @@ local function ParseSpellDamageBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
 	local si = OvaleData:SpellInfo(spellId)
-	return ParseSpellAuraList(si.damageAura, "HELPFUL", paramList)
+	return ParseSpellAuraList(si.aura.damage, "HELPFUL", paramList)
 end
 
 local function ParseSpellDamageDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
 	local si = OvaleData:SpellInfo(spellId)
-	return ParseSpellAuraList(si.damageAura, "HARMFUL", paramList)
+	return ParseSpellAuraList(si.aura.damage, "HARMFUL", paramList)
 end
 
 local function ParseSpellInfo(params)

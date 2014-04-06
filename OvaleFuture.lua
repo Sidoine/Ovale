@@ -115,8 +115,8 @@ local function GetDamageMultiplier(spellId, auraObject)
 	auraObject = auraObject or OvaleAura
 	local damageMultiplier = 1
 	local si = OvaleData.spellInfo[spellId]
-	if si and si.damageAura then
-		for filter, auraList in pairs(si.damageAura) do
+	if si and si.aura and si.aura.damage then
+		for filter, auraList in pairs(si.aura.damage) do
 			for auraId, multiplier in pairs(auraList) do
 				local aura = auraObject:GetAura("player", auraId, filter)
 				if auraObject:IsActiveAura(aura) then

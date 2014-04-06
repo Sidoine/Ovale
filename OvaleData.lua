@@ -269,9 +269,9 @@ function OvaleData:SpellInfo(spellId)
 				player = {},
 				-- Auras applied by this spell on its target.
 				target = {},
+				-- Auras granting extra damage multipliers for this spell.
+				damage = {},
 			},
-			-- Auras granting extra damage multipliers for this spell.
-			damageAura = {},
 		}
 		self.spellInfo[spellId] = si
 	end
