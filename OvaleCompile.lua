@@ -55,6 +55,11 @@ local self_functionCalls = {}
 local self_compileOnItems = false
 local self_compileOnStances = false
 
+-- Lua pattern to match a key=value pair, returning key and value.
+local KEY_VALUE_PATTERN = "([%w_]+)=([-%w\\_%.]+)"
+-- Lua pattern to match a floating-point number that may start with a minus sign.
+local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
+
 local OVALE_COMPILE_DEBUG = "compile"
 local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
 local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
@@ -95,28 +100,30 @@ local function AddNode(node)
 	return "node" .. #self_node
 end
 
-local function ParseParameters(params)
-	local paramList = {}
-	if not params then
-		return paramList
-	end
-	for k,v in strgmatch(params, "([%w_]+)=([-%w\\_%.]+)") do
-		if (strmatch(v,"^%-?%d+%.?%d*$")) then
-			v = tonumber(v)
-		end	
-		if (strmatch(k,"^%-?%d+%.?%d*$")) then
-			k = tonumber(k)
-		end		
-		paramList[k] = v
-	end
-	params = strgsub(params,"[%w_]+=[-%w\\_%.]+","")
-	local n=0
-	for w in strgmatch(params, "[-%w_\\%.]+") do
-		if (strmatch(w,"^%-?%d+%.?%d*$")) then
-			w = tonumber(w)
-		end		
-		paramList[n+1] = w
-		n=n+1
+-- Parse params string into key=value pairs and positional arguments stored in paramList table.
+local function ParseParameters(params, paramList)
+	paramList = paramList or {}
+	if params then
+		-- Handle key=value pairs.
+		for key, value in strgmatch(params, KEY_VALUE_PATTERN) do
+			if strmatch(key, NUMBER_PATTERN) then
+				key = tonumber(key)
+			end
+			if strmatch(value, NUMBER_PATTERN) then
+				value = tonumber(value)
+			end
+			paramList[key] = value
+		end
+		-- Strip out all key=value pairs and handle positional arguments.
+		params = strgsub(params, KEY_VALUE_PATTERN, "")
+		local k = 1
+		for word in strgmatch(params, "[-%w_\\%.]+") do
+			if strmatch(word, NUMBER_PATTERN) then
+				word = tonumber(word)
+			end
+			paramList[k] = word
+			k = k + 1
+		end
 	end
 	return paramList
 end
@@ -278,19 +285,6 @@ local function ParseFunction(prefix, func, params)
 	return nodeName
 end
 
-local function GetSpellInfo(spellId)
-	if not OvaleData.spellInfo[spellId] then
-		OvaleData.spellInfo[spellId] = {
-			aura = {
-				player = {},
-				target = {},
-			},
-			damageAura = {},
-		}
-	end
-	return OvaleData.spellInfo[spellId]
-end
-
 --[[
 	Parse the various Spell*{Buff,Debuff}() declarations.
 	Check for test conditions to see whether this declaration is active.
@@ -322,42 +316,42 @@ end
 local function ParseSpellAddBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = GetSpellInfo(spellId)
+	local si = OvaleData:SpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.player, "HELPFUL", paramList)
 end
 
 local function ParseSpellAddDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = GetSpellInfo(spellId)
+	local si = OvaleData:SpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.player, "HARMFUL", paramList)
 end
 
 local function ParseSpellAddTargetBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = GetSpellInfo(spellId)
+	local si = OvaleData:SpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.target, "HELPFUL", paramList)
 end
 
 local function ParseSpellAddTargetDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = GetSpellInfo(spellId)
+	local si = OvaleData:SpellInfo(spellId)
 	return ParseSpellAuraList(si.aura.target, "HARMFUL", paramList)
 end
 
 local function ParseSpellDamageBuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = GetSpellInfo(spellId)
+	local si = OvaleData:SpellInfo(spellId)
 	return ParseSpellAuraList(si.damageAura, "HELPFUL", paramList)
 end
 
 local function ParseSpellDamageDebuff(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	local si = GetSpellInfo(spellId)
+	local si = OvaleData:SpellInfo(spellId)
 	return ParseSpellAuraList(si.damageAura, "HARMFUL", paramList)
 end
 
@@ -368,7 +362,7 @@ local function ParseSpellInfo(params)
 		if not TestConditions(paramList) then
 			return ""
 		end
-		local si = GetSpellInfo(spellId)
+		local si = OvaleData:SpellInfo(spellId)
 		for k,v in pairs(paramList) do
 			if k == "addduration" then
 				si.duration = si.duration + v
@@ -691,7 +685,7 @@ end
 local function ParseCanStopChannelling(text)
 	local spellId = tonumber(text)
 	if spellId then
-		local si = GetSpellInfo(spellId)
+		local si = OvaleData:SpellInfo(spellId)
 		si.canStopChannelling = true
 	else
 		Ovale:FormatPrint("CanStopChannelling with unknown spell %s", text)

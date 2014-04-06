@@ -255,6 +255,29 @@ function OvaleData:NeedNewSnapshot(auraId, spellId)
 	return true
 end
 
+--[[
+	Return the exact spell info table for the given spell, creating a new table entry if necessary.
+	This method should only be used by modules that need to directly manipulate the table without
+	incurring the overhead of function calls.
+--]]
+function OvaleData:SpellInfo(spellId)
+	local si = self.spellInfo[spellId]
+	if not si then
+		si = {
+			aura = {
+				-- Auras applied by this spell on the player.
+				player = {},
+				-- Auras applied by this spell on its target.
+				target = {},
+			},
+			-- Auras granting extra damage multipliers for this spell.
+			damageAura = {},
+		}
+		self.spellInfo[spellId] = si
+	end
+	return si
+end
+
 function OvaleData:GetSpellInfo(spellId)
 	if type(spellId) == "number" then
 		return self.spellInfo[spellId]
