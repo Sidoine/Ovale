@@ -535,6 +535,8 @@ local statePrototype = OvalePaperDoll.statePrototype
 --</private-static-properties>
 
 --<state-properties>
+-- Player's class.
+statePrototype.class = nil
 -- Player's level.
 statePrototype.level = nil
 -- Player's chosen specialization/mastery.
@@ -546,6 +548,7 @@ statePrototype.snapshot = nil
 --<public-static-methods>
 -- Initialize the state.
 function OvalePaperDoll:InitializeState(state)
+	state.class = nil
 	state.level = nil
 	state.specialization = nil
 	state.snapshot = nil
@@ -553,6 +556,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvalePaperDoll:ResetState(state)
+	state.class = self_class
 	state.level = self.level
 	state.specialization = self.specialization
 	local now = API_GetTime()
