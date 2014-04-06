@@ -64,7 +64,6 @@
 	<Script file="Latency.lua" />
 	<Script file="Level.lua" />
 	<Script file="List.lua" />
-	<Script file="ManaPercent.lua" />
 	<Script file="NextTick.lua" />
 	<Script file="PTR.lua" />
 	<Script file="PetPresent.lua" />

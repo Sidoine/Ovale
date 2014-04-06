@@ -50,6 +50,30 @@ do
 		end
 	end
 
+	--- Return the current percent level of power (between 0 and 100) on the target.
+	local function PowerPercent(powerType, condition)
+		local comparator, limit = condition[1], condition[2]
+		local target = ParseCondition(condition)
+		if target == "player" then
+			local powerMax = OvalePower.maxPower[powerType] or 0
+			if powerMax > 0 then
+				local conversion = 100 / powerMax
+				local value, origin, rate = state[powerType] * conversion, state.currentTime, state.powerRate[powerType] * conversion
+				local start, ending = state.currentTime, math.huge
+				return TestValue(start, ending, value, origin, rate, comparator, limit)
+			end
+		else
+			local powerInfo = OvalePower.POWER_INFO[powerType]
+			local powerMax = API_UnitPowerMax(target, powerInfo.id, powerInfo.segments) or 0
+			if powerMax > 0 then
+				local conversion = 100 / powerMax
+				local value = API_UnitPower(target, powerInfo.id) * conversion
+				return Compare(value, comparator, limit)
+			end
+		end
+		return Compare(0, comparator, limit)
+	end
+
 	--- Get the current amount of alternate power displayed on the alternate power bar.
 	-- @name AlternatePower
 	-- @paramsig number or boolean
@@ -241,6 +265,26 @@ do
 	OvaleCondition:RegisterCondition("runicpower", false, RunicPower)
 	OvaleCondition:RegisterCondition("shadoworbs", false, ShadowOrbs)
 	OvaleCondition:RegisterCondition("soulshards", false, SoulShards)
+
+	--- Get the current percent level of mana (between 0 and 100) of the target.
+	-- @name ManaPercent
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current mana percent.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if ManaPercent() >90 Spell(arcane_blast)
+	-- if ManaPercent(more 90) Spell(arcane_blast)
+
+	local function ManaPercent(condition)
+		return PowerPercent("mana", condition)
+	end
+
+	OvaleCondition:RegisterCondition("manapercent", false, ManaPercent)
 
 	--- Get the maximum amount of alternate power of the target.
 	-- Alternate power is the resource tracked by the alternate power bar in certain boss fights.
