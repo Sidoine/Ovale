@@ -10,7 +10,7 @@
 
 local _, Ovale = ...
 
---inherits ActionButtonTemplate
+--<class name="OvaleIcone" inherits="ActionButtonTemplate" />
 
 --<private-static-properties>
 local L = Ovale.L

@@ -10,7 +10,7 @@
 
 local _, Ovale = ...
 
---inherits Frame
+--<class name="OvaleFrame" inherits="Frame" />
 do
 --<private-static-properties>
 	local AceGUI = LibStub("AceGUI-3.0")

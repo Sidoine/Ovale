@@ -136,9 +136,15 @@ sub ParseDirectory
 			my %pp = {};
 			my %pm = {};
 
-			if ($content =~ m/--inherits (\w+)/)
+			if ($content =~ m/--<class name="(\w+)"\s*\/>/)
 			{
-				my $parent = $1;
+				$class = $1;
+			}
+
+			if ($content =~ m/--<class name="(\w+)"\s+inherits="(\w+)"\s*\/>/)
+			{
+				$class = $1;
+				my $parent = $2;
 				for my $prop (keys %{$sp{$parent}})
 				{
 					$sp{$class}{$prop} = $sp{$parent}{$prop}
