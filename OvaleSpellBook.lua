@@ -33,6 +33,7 @@ local API_GetSpellLink = GetSpellLink
 local API_GetSpellTabInfo = GetSpellTabInfo
 local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
+local API_IsUsableSpell = IsUsableSpell
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 --</private-static-properties>
@@ -250,6 +251,18 @@ function OvaleSpellBook:IsKnownTalent(talentId)
 	else
 		return false
 	end
+end
+
+-- Returns true if the given spell ID is usable.  A spell is *not* usable if:
+--     The player hasn't learned the spell.
+--     The player lacks required mana or reagents.
+--     Reactive conditions haven't been met.
+function OvaleSpellBook:IsUsableSpell(spellId)
+	local name = self:GetSpellName(spellId)
+	if name then
+		return API_IsUsableSpell(self:GetSpellName(spellId))
+	end
+	return false
 end
 
 -- Print out the list of active glyphs in alphabetical order.

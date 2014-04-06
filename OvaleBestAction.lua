@@ -56,7 +56,6 @@ local API_IsCurrentAction = IsCurrentAction
 local API_IsItemInRange = IsItemInRange
 local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableAction = IsUsableAction
-local API_IsUsableSpell = IsUsableSpell
 
 local OVALE_DEFAULT_PRIORITY = 3
 
@@ -781,7 +780,7 @@ function OvaleBestAction:GetActionInfo(element)
 			end
 		end
 
-		actionUsable = API_IsUsableSpell(spellId)
+		actionUsable = OvaleSpellBook:IsUsableSpell(spellId)
 
 	elseif element.func == "macro" then
 		local macro = element.params[1]

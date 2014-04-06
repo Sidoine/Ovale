@@ -12,8 +12,8 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleSpellBook = Ovale.OvaleSpellBook
 
-	local API_IsUsableSpell = IsUsableSpell
 	local TestBoolean = OvaleCondition.TestBoolean
 
 	--- Test if the given spell is usable.
@@ -33,7 +33,7 @@ do
 
 	local function SpellUsable(condition)
 		local spellId, yesno = condition[1], condition[2]
-		local boolean = API_IsUsableSpell(spellId)
+		local boolean = OvaleSpellBook:IsUsableSpell(spellId)
 		return TestBoolean(boolean, yesno)
 	end
 
