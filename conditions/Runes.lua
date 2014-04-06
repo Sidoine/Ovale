@@ -49,7 +49,7 @@ do
 		end
 	end
 
-	--- Test if the current active rune counst meets the minimum rune requirements set out in the parameters.
+	--- Test if the current active rune counts meets the minimum rune requirements set out in the parameters.
 	-- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
 	-- E.g., Runes(blood 1 frost 1 unholy 1) means at least one blood, one frost, and one unholy rune is available.
 	-- @name Runes
