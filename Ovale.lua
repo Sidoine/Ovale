@@ -8,11 +8,11 @@
     file accompanying this program.
 --]]----------------------------------------------------------------------
 
-local _, addonNamespace = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(addonNamespace, "Ovale", "AceConsole-3.0", "AceEvent-3.0")
+local addonName, addonTable = ...
+Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, addonName, "AceConsole-3.0", "AceEvent-3.0")
 
 --<private-static-properties>
-local L = LibStub("AceLocale-3.0"):GetLocale("Ovale")
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local OvaleOptions = nil
 
 local format = string.format
@@ -54,7 +54,7 @@ Ovale.listes = {}
 --</public-static-properties>
 
 --Key bindings
-BINDING_HEADER_OVALE = "Ovale"
+BINDING_HEADER_OVALE = addonName
 BINDING_NAME_OVALE_CHECKBOX0 = L["Inverser la boîte à cocher "].."(1)"
 BINDING_NAME_OVALE_CHECKBOX1 = L["Inverser la boîte à cocher "].."(2)"
 BINDING_NAME_OVALE_CHECKBOX2 = L["Inverser la boîte à cocher "].."(3)"
@@ -86,7 +86,7 @@ function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
-	self.frame = LibStub("AceGUI-3.0"):Create("OvaleFrame")
+	self.frame = LibStub("AceGUI-3.0"):Create(addonName .. "Frame")
 	self:UpdateFrame()
 end
 

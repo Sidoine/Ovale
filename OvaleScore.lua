@@ -28,7 +28,7 @@
 	or a method name for the module with the given name.
 ]]--
 
-local _, Ovale = ...
+local addonName, Ovale = ...
 local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0")
 Ovale.OvaleScore = OvaleScore
 
@@ -44,6 +44,9 @@ local API_UnitName = UnitName
 local self_guid = nil
 -- Player's name.
 local self_name = nil
+
+-- Message prefix.
+local MSG_PREFIX = addonName
 --</private-static-properties>
 
 --<public-static-properties>
@@ -63,7 +66,7 @@ OvaleScore.scoredSpell = {}
 function OvaleScore:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self_name = API_UnitName("player")
-	API_RegisterAddonMessagePrefix("Ovale")
+	API_RegisterAddonMessagePrefix(MSG_PREFIX)
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -78,7 +81,7 @@ end
 -- Receive scores for damage meters from other Ovale addons in the raid.
 function OvaleScore:CHAT_MSG_ADDON(event, ...)
 	local prefix, message, channel, sender = ...
-	if prefix ~= "Ovale" then return end
+	if prefix ~= MSG_PREFIX then return end
 	if channel ~= "RAID" and channel ~= "PARTY" then return end
 
 	local scored, scoreMax, guid = strsplit(";", message)
@@ -90,7 +93,7 @@ function OvaleScore:PLAYER_REGEN_ENABLED()
 	-- Broadcast message is "score;maxScore;playerGUID"
 	if self.maxScore > 0 then
 		local message = self.score .. ";" .. self.maxScore .. ";" .. self_guid
-		API_SendAddonMessage("Ovale", message, "RAID")
+		API_SendAddonMessage(MSG_PREFIX, message, "RAID")
 	end
 end
 

@@ -8,9 +8,9 @@
     file accompanying this program.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local addonName, Ovale = ...
 local Skada = LibStub("AceAddon-3.0"):GetAddon("Skada", true)
-local OvaleSkada = Skada and Skada:NewModule("Ovale Spell Priority") or Ovale:NewModule("OvaleSkada")
+local OvaleSkada = Skada and Skada:NewModule(addonName) or Ovale:NewModule("OvaleSkada")
 Ovale.OvaleSkada = OvaleSkada
 
 --<private-static-properties>

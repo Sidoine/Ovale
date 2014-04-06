@@ -8,7 +8,7 @@
     file accompanying this program.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local addonName, Ovale = ...
 local OvaleRecount = Ovale:NewModule("OvaleRecount")
 Ovale.OvaleRecount = OvaleRecount
 
@@ -52,7 +52,7 @@ function OvaleRecount:OnInitialize()
 		if not L then
 			L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })
 		end
-		Recount:AddModeTooltip("Ovale", DataModes, TooltipFuncs, nil, nil, nil, nil)
+		Recount:AddModeTooltip(addonName, DataModes, TooltipFuncs, nil, nil, nil, nil)
 	end
 end
 
@@ -70,8 +70,8 @@ function OvaleRecount:ReceiveScore(name, guid, scored, scoreMax)
 	if Recount then
 		local source = Recount.db2.combatants[name]
 		if source then
-			Recount:AddAmount(source, "Ovale", scored)
-			Recount:AddAmount(source, "OvaleMax", scoreMax)
+			Recount:AddAmount(source, addonName, scored)
+			Recount:AddAmount(source, addonName .. "Max", scoreMax)
 		end
 	end
 end

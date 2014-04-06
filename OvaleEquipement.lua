@@ -8,7 +8,7 @@
     file accompanying this program.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local addonName, Ovale = ...
 local OvaleEquipement = Ovale:NewModule("OvaleEquipement", "AceEvent-3.0")
 Ovale.OvaleEquipement = OvaleEquipement
 
@@ -49,7 +49,7 @@ local INVSLOT_WAIST = INVSLOT_WAIST
 local INVSLOT_WRIST = INVSLOT_WRIST
 
 -- frame for tooltip-scanning
-local self_tooltip = API_CreateFrame("GameTooltip", "OvaleScanningTooltip", nil, "GameTooltipTemplate")
+local self_tooltip = API_CreateFrame("GameTooltip", addonName .. "ScanningTooltip", nil, "GameTooltipTemplate")
 do
 	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
 end
@@ -1303,7 +1303,7 @@ function GetItemLevel(slotId)
 	self_tooltip:SetInventoryItem("player", slotId)
 	local itemLevel
 	for i = 2, self_tooltip:NumLines() do
-		local text = _G["OvaleScanningTooltipTextLeft" .. i]:GetText()
+		local text = _G[addonName .. "ScanningTooltipTextLeft" .. i]:GetText()
 		if text then
 			itemLevel = strmatch(text, OVALE_ITEM_LEVEL_PATTERN)
 			if itemLevel then
