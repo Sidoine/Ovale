@@ -329,7 +329,7 @@ sub ParseDirectory
 	}
 }
 
-my @directories = (".", "conditions", "scripts");
+my @directories = (".", "class", "conditions", "scripts");
 while ($dir = shift @directories)
 {
 	opendir(my $dh, $dir);

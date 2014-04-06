@@ -14,7 +14,7 @@
 #@no-lib-strip@
 embeds.xml
 #@end-no-lib-strip@
-locales\locales.xml
+locales\files.xml
 
 Ovale.lua
 
@@ -61,5 +61,5 @@ OvaleRunes.lua
 OvaleSkada.lua
 OvaleSpellDamage.lua
 OvaleSwing.lua
-conditions\conditions.xml
-scripts\scripts.xml
+class\files.xml
+conditions\files.xml
