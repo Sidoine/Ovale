@@ -53,6 +53,7 @@ OvaleIcone.xml
 OvaleFrame.lua
 
 # Additional modules.
+OvaleBanditsGuile.lua
 OvaleDamageTaken.lua
 OvaleEclipse.lua
 OvaleEnemies.lua
