@@ -26,9 +26,9 @@ local API_GetSpellInfo = GetSpellInfo
 
 local OVALE_SPELLID_TO_STANCE = {
 	-- Death Knight
-	[API_GetSpellInfo(48263)] = "death_knight_blood_presence",
-	[API_GetSpellInfo(48265)] = "death_knight_unholy_presence",
-	[API_GetSpellInfo(48266)] = "death_knight_frost_presence",
+	[API_GetSpellInfo(48263)] = "deathknight_blood_presence",
+	[API_GetSpellInfo(48265)] = "deathknight_unholy_presence",
+	[API_GetSpellInfo(48266)] = "deathknight_frost_presence",
 	-- Druid
 	[API_GetSpellInfo(768)] = "druid_cat_form",
 	[API_GetSpellInfo(783)] = "druid_travel_form",

@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -296,7 +296,7 @@ statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 			end
 		end
 		local duration = 10 / state:GetSpellHasteMultiplier(snapshot)
-		if OvaleStance:IsStance("death_knight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
+		if OvaleStance:IsStance("deathknight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
 			-- Improved Blood Presence increases rune regeneration rate by 20%.
 			duration = duration / 1.2
 		end
@@ -306,7 +306,7 @@ statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 
 		-- Each rune consumed generates 10 (12, if in Frost Presence) runic power.
 		local runicpower = state.runicpower
-		if OvaleStance:IsStance("death_knight_frost_presence") then
+		if OvaleStance:IsStance("deathknight_frost_presence") then
 			runicpower = runicpower + 12
 		else
 			runicpower = runicpower + 10
