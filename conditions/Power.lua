@@ -50,6 +50,29 @@ do
 		end
 	end
 
+	--- Return the current deficit of power from max power on the target.
+	local function PowerDeficit(powerType, condition)
+		local comparator, limit = condition[1], condition[2]
+		local target = ParseCondition(condition)
+		if target == "player" then
+			local powerMax = OvalePower.maxPower[powerType] or 0
+			if powerMax > 0 then
+				local value, origin, rate = powerMax - state[powerType], state.currentTime, -1 * state.powerRate[powerType]
+				local start, ending = state.currentTime, math.huge
+				return TestValue(start, ending, value, origin, rate, comparator, limit)
+			end
+		else
+			local powerInfo = OvalePower.POWER_INFO[powerType]
+			local powerMax = API_UnitPowerMax(target, powerInfo.id, powerInfo.segments) or 0
+			if powerMax > 0 then
+				local power = API_UnitPower(target, powerInfo.id)
+				local value = powerMax - power
+				return Compare(value, comparator, limit)
+			end
+		end
+		return Compare(0, comparator, limit)
+	end
+
 	--- Return the current percent level of power (between 0 and 100) on the target.
 	local function PowerPercent(powerType, condition)
 		local comparator, limit = condition[1], condition[2]
@@ -265,6 +288,208 @@ do
 	OvaleCondition:RegisterCondition("runicpower", false, RunicPower)
 	OvaleCondition:RegisterCondition("shadoworbs", false, ShadowOrbs)
 	OvaleCondition:RegisterCondition("soulshards", false, SoulShards)
+
+	--- Get the number of lacking resource points for a full alternate power bar, between 0 and maximum alternate power, of the target.
+	-- @name AlternatePowerDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current alternate power deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function AlternatePowerDeficit(condition)
+		return PowerDeficit("alternatepower", condition)
+	end
+
+	--- Get the number of lacking resource points for a full burning embers bar, between 0 and maximum burning embers, of the target.
+	-- @name BurningEmbersDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current burning embers deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function BurningEmbersDeficit(condition)
+		return PowerDeficit("burningembers", condition)
+	end
+
+	--- Get the number of lacking resource points for full chi, between 0 and maximum chi, of the target.
+	-- @name ChiDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current chi deficit.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if ChiDeficit() >=2 Spell(keg_smash)
+	-- if ChiDeficit(more 1) Spell(keg_smash)
+
+	local function ChiDeficit(condition)
+		return PowerDeficit("chi", condition)
+	end
+
+	--- Get the number of lacking resource points for a full demonic fury bar, between 0 and maximum demonic fury, of the target.
+	-- @name DemonicFuryDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current demonic fury deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function DemonicFuryDeficit(condition)
+		return PowerDeficit("demonicfury", condition)
+	end
+
+	--- Get the number of lacking resource points for a full energy bar, between 0 and maximum energy, of the target.
+	-- @name EnergyDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current energy deficit.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if EnergyDeficit() >60 Spell(tigers_fury)
+	-- if EnergyDeficit(more 60) Spell(tigers_fury)
+
+	local function EnergyDeficit(condition)
+		return PowerDeficit("energy", condition)
+	end
+
+	--- Get the number of lacking resource points for a full focus bar, between 0 and maximum focus, of the target.
+	-- @name FocusDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current focus deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function FocusDeficit(condition)
+		return PowerDeficit("focus", condition)
+	end
+
+	--- Get the number of lacking resource points for full holy power, between 0 and maximum holy power, of the target.
+	-- @name HolyPowerDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current holy power deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function HolyPowerDeficit(condition)
+		return PowerDeficit("holypower", condition)
+	end
+
+	--- Get the number of lacking resource points for a full mana bar, between 0 and maximum mana, of the target.
+	-- @name ManaDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current mana deficit.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if ManaDeficit() >30000 Item(mana_gem)
+	-- if ManaDeficit(more 30000) Item(mana_gem)
+
+	local function ManaDeficit(condition)
+		return PowerDeficit("mana", condition)
+	end
+
+	--- Get the number of lacking resource points for a full rage bar, between 0 and maximum rage, of the target.
+	-- @name RageDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current rage deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function RageDeficit(condition)
+		return PowerDeficit("rage", condition)
+	end
+
+	--- Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
+	-- @name RunicPowerDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current runic power deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function RunicPowerDeficit(condition)
+		return PowerDeficit("runicpower", condition)
+	end
+
+	--- Get the number of lacking resource points for full shadow orbs, between 0 and maximum shadow orbs, of the target.
+	-- @name ShadowOrbsDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current shadow orbs deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function ShadowOrbsDeficit(condition)
+		return PowerDeficit("shadoworbs", condition)
+	end
+
+	--- Get the number of lacking resource points for full soul shards, between 0 and maximum soul shards, of the target.
+	-- @name SoulShardsDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current soul shards deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function SoulShardsDeficit(condition)
+		return PowerDeficit("shards", condition)
+	end
+
+	OvaleCondition:RegisterCondition("alternatepowerdeficit", false, AlternatePowerDeficit)
+	OvaleCondition:RegisterCondition("burningembersdeficit", false, BurningEmbersDeficit)
+	OvaleCondition:RegisterCondition("chideficit", false, ChiDeficit)
+	OvaleCondition:RegisterCondition("demonicfurydeficit", false, DemonicFuryDeficit)
+	OvaleCondition:RegisterCondition("energydeficit", false, EnergyDeficit)
+	OvaleCondition:RegisterCondition("focusdeficit", false, FocusDeficit)
+	OvaleCondition:RegisterCondition("holypowerdeficit", false, HolyPowerDeficit)
+	OvaleCondition:RegisterCondition("manadeficit", false, ManaDeficit)
+	OvaleCondition:RegisterCondition("ragedeficit", false, RageDeficit)
+	OvaleCondition:RegisterCondition("runicpowerdeficit", false, RunicPowerDeficit)
+	OvaleCondition:RegisterCondition("shadoworbsdeficit", false, ShadowOrbsDeficit)
+	OvaleCondition:RegisterCondition("soulshardsdeficit", false, SoulShardsDeficit)
 
 	--- Get the current percent level of mana (between 0 and 100) of the target.
 	-- @name ManaPercent
