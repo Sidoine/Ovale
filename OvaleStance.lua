@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -41,7 +41,7 @@ local OVALE_SPELLID_TO_STANCE = {
 	[API_GetSpellInfo(5118)] = "hunter_aspect_of_the_cheetah",
 	[API_GetSpellInfo(13159)] = "hunter_aspect_of_the_pack",
 	[API_GetSpellInfo(13165)] = "hunter_aspect_of_the_hawk",
-	[API_GetSpellInfo(109260)] = "hunter_asepct_of_the_iron_hawk",
+	[API_GetSpellInfo(109260)] = "hunter_aspect_of_the_iron_hawk",
 	-- Monk
 	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
 	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
