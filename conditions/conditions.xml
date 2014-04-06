@@ -95,6 +95,7 @@
 	<Script file="TicksAdded.lua" />
 	<Script file="TicksRemain.lua" />
 	<Script file="TimeInCombat.lua" />
+	<Script file="TimeToBloodlust.lua" />
 	<Script file="TimeToMaxEnergy.lua" />
 	<Script file="TimeToPowerFor.lua" />
 	<Script file="TimeWithHaste.lua" />
