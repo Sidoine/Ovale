@@ -35,16 +35,18 @@ local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
-
--- spell[spellId] = spellName
-self_spell = {}
--- talent[talentId] = talentName
-self_talent = {}
--- talentPoints[talentId] = 0 or 1
-self_talentPoints = {}
--- glyph[glyphSpellId] = glyphName
-self_glyph = {}
 --</private-static-properties>
+
+--<public-static-properties>
+-- self.spell[spellId] = spellName
+OvaleSpellBook.spell = {}
+-- self.talent[talentId] = talentName
+OvaleSpellBook.talent = {}
+-- self.talentPoints[talentId] = 0 or 1
+OvaleSpellBook.talentPoints = {}
+-- self.glyph[glyphSpellId] = glyphName
+OvaleSpellBook.glyph = {}
+--</public-static-properties>
 
 --<private-static-methods>
 -- Return the four components of a hyperlink: color, linktype, linkdata, text.
@@ -63,41 +65,6 @@ local function PrintTableValues(tbl)
 	end
 end
 
--- Scan a spellbook and populate self_spell table.
-local function ScanSpellBook(bookType, numSpells, offset)
-	offset = offset or 0
-	for index = offset + 1, offset + numSpells do
-		local skillType, spellId = API_GetSpellBookItemInfo(index, bookType)
-		if skillType == "SPELL" or skillType == "PETACTION" then
-			-- Use GetSpellLink() in case this spellbook item was replaced by another spell,
-			-- i.e., through talents or Symbiosis.
-			local spellLink = API_GetSpellLink(index, bookType)
-			if spellLink then
-				local linkdata, spellName = select(3, ParseHyperlink(spellLink))
-				self_spell[tonumber(linkdata)] = spellName
-				if spellId then
-					self_spell[spellId] = spellName
-				end
-			end
-		elseif skillType == "FLYOUT" then
-			local flyoutId = spellId
-			local _, _, numSlots, isKnown = API_GetFlyoutInfo(flyoutId)
-			if numSlots > 0 and isKnown then
-				for flyoutIndex = 1, numSlots do
-					local id, overrideId, isKnown, spellName = API_GetFlyoutSlotInfo(flyoutId, flyoutIndex)
-					if isKnown then
-						self_spell[id] = spellName
-						self_spell[overrideId] = spellName
-					end
-				end
-			end
-		-- elseif skillType == "FUTURESPELL" then
-		--	no-op
-		elseif not skillType then
-			break
-		end
-	end
-end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -147,18 +114,18 @@ end
 -- Update the player's talents by scanning the talent tab for the active specialization.
 -- Store the number of points assigned to each talent.
 function OvaleSpellBook:UpdateTalents()
-	wipe(self_talent)
-	wipe(self_talentPoints)
+	wipe(self.talent)
+	wipe(self.talentPoints)
 
 	local i = 1
 	while true do
 		local name, _, _, _, selected, _ = API_GetTalentInfo(i)
 		if not name then break end
-		self_talent[i] = name
+		self.talent[i] = name
 		if selected then
-			self_talentPoints[i] = 1
+			self.talentPoints[i] = 1
 		else
-			self_talentPoints[i] = 0
+			self.talentPoints[i] = 0
 		end
 		i = i + 1
 	end
@@ -167,40 +134,76 @@ end
 
 -- Update the player's glyphs by scanning the glyph socket tab for the active specialization.
 function OvaleSpellBook:UpdateGlyphs()
-	wipe(self_glyph)
+	wipe(self.glyph)
 
 	for i = 1, API_GetNumGlyphSockets() do
 		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
 		if enabled and glyphSpell then
-			self_glyph[glyphSpell] = API_GetSpellInfo(glyphSpell)
+			self.glyph[glyphSpell] = API_GetSpellInfo(glyphSpell)
 		end
 	end
 	self:SendMessage("Ovale_GlyphsChanged")
 end
 
 function OvaleSpellBook:UpdateSpells()
-	wipe(self_spell)
+	wipe(self.spell)
 
 	-- Scan the first two tabs of the player's spellbook.
 	for tab = 1, 2 do
 		local name, _, offset, numSpells = API_GetSpellTabInfo(tab)
 		if name then
-			ScanSpellBook(BOOKTYPE_SPELL, numSpells, offset)
+			self:ScanSpellBook(BOOKTYPE_SPELL, numSpells, offset)
 		end
 	end
 
 	-- Scan the pet's spellbook.
 	local numPetSpells, petToken = API_HasPetSpells()
 	if numPetSpells then
-		ScanSpellBook(BOOKTYPE_PET, numPetSpells)
+		self:ScanSpellBook(BOOKTYPE_PET, numPetSpells)
 	end
 
 	self:SendMessage("Ovale_SpellsChanged")
 end
 
+-- Scan a spellbook and populate self.spell table.
+function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
+	offset = offset or 0
+	for index = offset + 1, offset + numSpells do
+		local skillType, spellId = API_GetSpellBookItemInfo(index, bookType)
+		if skillType == "SPELL" or skillType == "PETACTION" then
+			-- Use GetSpellLink() in case this spellbook item was replaced by another spell,
+			-- i.e., through talents or Symbiosis.
+			local spellLink = API_GetSpellLink(index, bookType)
+			if spellLink then
+				local linkdata, spellName = select(3, ParseHyperlink(spellLink))
+				self.spell[tonumber(linkdata)] = spellName
+				if spellId then
+					self.spell[spellId] = spellName
+				end
+			end
+		elseif skillType == "FLYOUT" then
+			local flyoutId = spellId
+			local _, _, numSlots, isKnown = API_GetFlyoutInfo(flyoutId)
+			if numSlots > 0 and isKnown then
+				for flyoutIndex = 1, numSlots do
+					local id, overrideId, isKnown, spellName = API_GetFlyoutSlotInfo(flyoutId, flyoutIndex)
+					if isKnown then
+						self.spell[id] = spellName
+						self.spell[overrideId] = spellName
+					end
+				end
+			end
+		-- elseif skillType == "FUTURESPELL" then
+		--	no-op
+		elseif not skillType then
+			break
+		end
+	end
+end
+
 function OvaleSpellBook:GetSpellName(spellId)
 	if spellId then
-		local name = self_spell[spellId]
+		local name = self.spell[spellId]
 		if not name then
 			name = API_GetSpellInfo(spellId)
 		end
@@ -210,21 +213,21 @@ end
 
 function OvaleSpellBook:GetTalentPoints(talentId)
 	local points = 0
-	if talentId and self_talentPoints[talentId] then
-		points = self_talentPoints[talentId]
+	if talentId and self.talentPoints[talentId] then
+		points = self.talentPoints[talentId]
 	end
 	return points
 end
 
 function OvaleSpellBook:AddSpell(spellId, name)
 	if spellId and name then
-		self_spell[spellId] = name
+		self.spell[spellId] = name
 	end
 end
 
 -- Returns true if the given glyph spell Id is an active glyph in the player's glyph tab.
 function OvaleSpellBook:IsActiveGlyph(glyphId)
-	if glyphId and self_glyph[glyphId] then
+	if glyphId and self.glyph[glyphId] then
 		return true
 	else
 		return false
@@ -233,7 +236,7 @@ end
 
 -- Returns true if the given spellId is found in the player's list of known spells.
 function OvaleSpellBook:IsKnownSpell(spellId)
-	if spellId and self_spell[spellId] then
+	if spellId and self.spell[spellId] then
 		return true
 	else
 		return false
@@ -242,7 +245,7 @@ end
 
 -- Returns true if the given talentId is found in the player's talent tree.
 function OvaleSpellBook:IsKnownTalent(talentId)
-	if talentId and self_talentPoints[talentId] then
+	if talentId and self.talentPoints[talentId] then
 		return true
 	else
 		return false
@@ -251,14 +254,14 @@ end
 
 -- Print out the list of active glyphs in alphabetical order.
 function OvaleSpellBook:DebugGlyphs()
-	PrintTableValues(self_glyph)
+	PrintTableValues(self.glyph)
 end
 
 -- Print out the list of known spells in alphabetical order.
 function OvaleSpellBook:DebugSpells()
-	PrintTableValues(self_spell)
+	PrintTableValues(self.spell)
 	local total = 0
-	for _ in pairs(self_spell) do
+	for _ in pairs(self.spell) do
 		total = total + 1
 	end
 	Ovale:FormatPrint("Total spells: %d", total)
@@ -266,6 +269,6 @@ end
 
 -- Print out the list of talents in alphabetical order.
 function OvaleSpellBook:DebugTalents()
-	PrintTableValues(self_talent)
+	PrintTableValues(self.talent)
 end
 --</public-static-methods>
