@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012, 2013 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -40,7 +40,7 @@ do
 				numTicks = floor((ending - start) / tick + 0.5)
 			end
 		else
-			local _, _, _numTicks = state:GetDuration(auraId)
+			local _, _, _, _numTicks = state:GetDuration(auraId)
 			numTicks = _numTicks
 		end
 		if numTicks then
