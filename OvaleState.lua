@@ -19,10 +19,6 @@ Ovale.OvaleState = OvaleState
 --<private-static-properties>
 local OvaleQueue = Ovale.OvaleQueue
 
--- Forward declarations for module dependencies.
-local OvaleData = nil
-local OvaleFuture = nil
-
 local pairs = pairs
 --</private-static-properties>
 
@@ -36,12 +32,6 @@ OvaleState.state = {}
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleState:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleData = Ovale.OvaleData
-	OvaleFuture = Ovale.OvaleFuture
-end
-
 function OvaleState:OnEnable()
 	self:RegisterState(self, self.statePrototype)
 end
