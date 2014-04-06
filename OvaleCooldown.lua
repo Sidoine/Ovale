@@ -51,6 +51,7 @@ end
 -- If no spellId is given, then returns the GCD after a "yellow-hit" ability has been cast.
 function OvaleCooldown:GetGCD(spellId)
 	-- Base global cooldown.
+	local cd
 	local isCaster = false
 	if self_class == "DEATHKNIGHT" then
 		cd = 1.0
