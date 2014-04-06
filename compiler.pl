@@ -109,11 +109,6 @@ $sp{Ovale}{OvaleQueue} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleTimeSpan} = true;
 
-$sp{OvaleCondition}{Compare} = true;
-$sp{OvaleCondition}{ParseCondition} = true;
-$sp{OvaleCondition}{ParseRuneCondition} = true;
-$sp{OvaleCondition}{TestValue} = true;
-
 $m{OvaleQueue}{NewQueue} = true;
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;
@@ -121,15 +116,6 @@ $sp{OvaleQueue}{InsertBack} = true;
 $sp{OvaleQueue}{InsertFront} = true;
 $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
-
-$sp{OvaleTimeSpan}{Complement} = true;
-$sp{OvaleTimeSpan}{CopyTo} = true;
-$sp{OvaleTimeSpan}{HasTime} = true;
-$sp{OvaleTimeSpan}{Intersect} = true;
-$sp{OvaleTimeSpan}{IntersectInterval} = true;
-$sp{OvaleTimeSpan}{Measure} = true;
-$sp{OvaleTimeSpan}{NextTime} = true;
-$sp{OvaleTimeSpan}{Union} = true;
 
 sub ParseDirectory
 {
@@ -236,10 +222,12 @@ sub ParseDirectory
 			if ($content =~ m/<public-static-methods>(.*)<\/public-static-methods>/s)
 			{
 				my $sm = $1;
-				while ($sm =~ m/function\s+$class:(\w+)\s*\(/g)
+				while ($sm =~ m/function\s+${class}[.:](\w+)\s*\(/g)
 				{
 					$sm{$class}{$1} = true;
-					delete $m{$class}{$1}
+					delete $m{$class}{$1};
+					# All public static methods are also public static properties.
+					$sp{$class}{$1} = true;
 				}
 			}
 
