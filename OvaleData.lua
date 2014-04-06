@@ -13,8 +13,6 @@ local OvaleData = Ovale:NewModule("OvaleData")
 Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
-local API_GetSpellCooldown = GetSpellCooldown
-
 -- Auras that are refreshed by spells that don't trigger a new snapshot.
 self_buffNoSnapshotSpellList =
 {
@@ -267,16 +265,6 @@ function OvaleData:GetSpellInfo(spellId)
 			end
 		end
 	end
-end
-
---Compute the spell Cooldown
-function OvaleData:GetSpellCooldown(spellId)
-	local start, duration, enable = API_GetSpellCooldown(spellId)
-	local si = self.spellInfo[spellId]
-	if si and si.forcecd then
-		start, duration = API_GetSpellCooldown(si.forcecd)
-	end
-	return start, duration, enable
 end
 
 --Compute the damage of the given spell.

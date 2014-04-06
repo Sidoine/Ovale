@@ -20,6 +20,7 @@ local OvalePaperDoll = nil
 local OvaleStance = nil
 local OvaleState = nil
 
+local API_GetSpellCooldown = GetSpellCooldown
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local API_UnitClass = UnitClass
@@ -200,11 +201,13 @@ statePrototype.GetSpellCooldown = function(state, spellId)
 	local start, duration, enable
 	local cd = state:GetCD(spellId)
 	if cd and cd.start then
-		start = cd.start
-		duration = cd.duration
-		enable = cd.enable
+		start, duration, enable = cd.start, cd.duration, cd.enable
 	else
-		start, duration, enable = OvaleData:GetSpellCooldown(spellId)
+		start, duration, enable = API_GetSpellCooldown(spellId)
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.forcecd then
+			start, duration = API_GetSpellCooldown(si.forcecd)
+		end
 	end
 	return start, duration, enable
 end
