@@ -84,7 +84,7 @@ local function ScanSpellBook(bookType, numSpells, offset)
 			local _, _, numSlots, isKnown = API_GetFlyoutInfo(flyoutId)
 			if numSlots > 0 and isKnown then
 				for flyoutIndex = 1, numSlots do
-					local id, overrideId, isKnown, spellName = GetFlyoutSlotInfo(flyoutId, flyoutIndex)
+					local id, overrideId, isKnown, spellName = API_GetFlyoutSlotInfo(flyoutId, flyoutIndex)
 					if isKnown then
 						self_spell[id] = spellName
 						self_spell[overrideId] = spellName
