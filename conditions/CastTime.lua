@@ -13,7 +13,6 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 
-	local select = select
 	local API_GetSpellInfo = GetSpellInfo
 	local Compare = OvaleCondition.Compare
 
@@ -37,9 +36,9 @@ do
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local castTime = 0
 		if spellId then
-			castTime = select(7, API_GetSpellInfo(spellId))
-			if castTime then
-				castTime = castTime / 1000
+			local _, _, _, _, _, _, _castTime = API_GetSpellInfo(spellId)
+			if _castTime then
+				castTime = _castTime / 1000
 				Ovale:Logf("castTime = %f %s %s", castTime, comparator, limit)
 			end
 		end

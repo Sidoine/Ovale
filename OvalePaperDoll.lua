@@ -21,7 +21,6 @@ local OvaleEquipement = nil
 local OvaleStance = nil
 local OvaleState = nil
 
-local select = select
 local tonumber = tonumber
 local API_GetCritChance = GetCritChance
 local API_GetMasteryEffect = GetMasteryEffect
@@ -43,7 +42,7 @@ local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
 
 -- Player's class.
-local self_class = select(2, API_UnitClass("player"))
+local _, self_class = API_UnitClass("player")
 -- Snapshot table pool.
 local self_pool = OvalePoolRefCount("OvalePaperDoll_pool")
 -- Total number of snapshots taken.

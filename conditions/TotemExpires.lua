@@ -14,7 +14,6 @@ do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleSpellBook = Ovale.OvaleSpellBook
 
-	local select = select
 	local type = type
 	local API_GetTotemInfo = GetTotemInfo
 

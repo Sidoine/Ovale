@@ -17,7 +17,7 @@ Ovale.OvaleSpellBook = OvaleSpellBook
 --<private-static-properties>
 local ipairs = ipairs
 local pairs = pairs
-local strfind = string.find
+local strmatch = string.match
 local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
@@ -49,9 +49,9 @@ OvaleSpellBook.glyph = {}
 --</public-static-properties>
 
 --<private-static-methods>
--- Return the four components of a hyperlink: color, linktype, linkdata, text.
 local function ParseHyperlink(hyperlink)
-	return select(3, strfind(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?"))
+	local color, linkType, linkData, text = strmatch(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
+	return color, linkType, linkData, text
 end
 
 local function PrintTableValues(tbl)
@@ -175,8 +175,8 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 			-- i.e., through talents or Symbiosis.
 			local spellLink = API_GetSpellLink(index, bookType)
 			if spellLink then
-				local linkdata, spellName = select(3, ParseHyperlink(spellLink))
-				self.spell[tonumber(linkdata)] = spellName
+				local _, _, linkData, spellName = ParseHyperlink(spellLink)
+				self.spell[tonumber(linkData)] = spellName
 				if spellId then
 					self.spell[spellId] = spellName
 				end

@@ -24,7 +24,7 @@ local API_UnitClass = UnitClass
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 -- Player's class.
-local self_class = select(2, API_UnitClass("player"))
+local _, self_class = API_UnitClass("player")
 --</private-static-properties>
 
 --<public-static-properties>
@@ -75,11 +75,12 @@ An ability that generates extra combo points after it critically strikes the tar
 should have a "critcombo=N" parameter in its SpellInfo() description, where N is
 the number of extra combo points to add, e.g., critcombo=1.
 --]]
-function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local _, event, _, sourceGUID, _, _, _,	destGUID = ...
+function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
+
 	if sourceGUID == OvaleGUID:GetGUID("player") and destGUID == OvaleGUID:GetGUID("target") then
-		if event == "SPELL_DAMAGE" then
-			local spellId, _, _, _, _, _, _, _, _, critical = select(12, ...)
+		if cleuEvent == "SPELL_DAMAGE" then
+			local spellId, critical = arg12, arg21
 			local si = OvaleData.spellInfo[spellId]
 			if critical and si and si.critcombo then
 				self.combo = self.combo + si.critcombo

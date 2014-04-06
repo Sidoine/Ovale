@@ -21,7 +21,6 @@ local OvaleData = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
-local select = select
 local API_GetEclipseDirection = GetEclipseDirection
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
@@ -33,7 +32,7 @@ local OVALE_ECLIPSE_DEBUG = "eclipse"
 -- Player's GUID.
 local self_guid = nil
 -- Player's class.
-local self_class = select(2, API_UnitClass("player"))
+local _, self_class = API_UnitClass("player")
 
 local LUNAR_ECLIPSE = ECLIPSE_BAR_LUNAR_BUFF_ID
 local SOLAR_ECLIPSE = ECLIPSE_BAR_SOLAR_BUFF_ID

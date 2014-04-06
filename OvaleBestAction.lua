@@ -33,7 +33,6 @@ local floor = math.floor
 local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
-local select = select
 local strfind = string.find
 local tonumber = tonumber
 local tostring = tostring
@@ -106,7 +105,7 @@ local function ComputeAction(element)
 		if si and si.casttime then
 			element.castTime = si.casttime
 		else
-			local castTime = select(7, API_GetSpellInfo(spellId))
+			local _, _, _, _, _, _, castTime = API_GetSpellInfo(spellId)
 			if castTime then
 				element.castTime = castTime / 1000
 			else

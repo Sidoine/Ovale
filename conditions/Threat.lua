@@ -13,7 +13,6 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 
-	local select = select
 	local API_UnitDetailedThreatSituation = UnitDetailedThreatSituation
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
@@ -36,7 +35,7 @@ do
 	local function Threat(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, "target")
-		local value = select(3, API_UnitDetailedThreatSituation("player", target))
+		local _, _, value = API_UnitDetailedThreatSituation("player", target)
 		return Compare(value, comparator, limit)
 	end
 

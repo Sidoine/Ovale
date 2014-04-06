@@ -12,7 +12,6 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 
-	local select = select
 	local API_GetSpellInfo = GetSpellInfo
 	local Compare = OvaleCondition.Compare
 
@@ -31,7 +30,8 @@ do
 
 	local function PowerCost(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local value = select(4, API_GetSpellInfo(spellId)) or 0
+		local _, _, _, cost = API_GetSpellInfo(spellId)
+		local value = cost or 0
 		return Compare(value, comparator, limit)
 	end
 

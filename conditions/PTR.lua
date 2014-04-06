@@ -13,7 +13,6 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 
-	local select = select
 	local API_GetBuildInfo = GetBuildInfo
 	local TestBoolean = OvaleCondition.TestBoolean
 
@@ -26,7 +25,7 @@ do
 
 	local function PTR(condition)
 		local yesno = condition[1]
-		local uiVersion = select(4, API_GetBuildInfo())
+		local _, _, _, uiVersion = API_GetBuildInfo()
 		local boolean = (uiVersion > 50400)
 		return TestBoolean(boolean, yesno)
 	end

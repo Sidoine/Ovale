@@ -14,7 +14,6 @@ do
 	local OvalePower = Ovale.OvalePower
 	local OvaleState = Ovale.OvaleState
 
-	local select = select
 	local API_GetSpellInfo = GetSpellInfo
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
@@ -32,7 +31,7 @@ do
 
 	local function TimeToPowerFor(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local cost, _, powerToken = select(4, API_GetSpellInfo(spellId))
+		local _, _, _, cost, _, powerToken = API_GetSpellInfo(spellId)
 		local powerType = OvalePower.POWER_TYPE[powerToken]
 		local currentPower = state[powerType]
 		local powerRate = state.powerRate[powerType]

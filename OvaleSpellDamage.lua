@@ -15,9 +15,12 @@ local OvaleSpellDamage = Ovale:NewModule("OvaleSpellDamage", "AceEvent-3.0")
 Ovale.OvaleSpellDamage = OvaleSpellDamage
 
 --<private-static-properties>
-local select = select
-local strfind = string.find
 local API_UnitGUID = UnitGUID
+
+local CLEU_DAMAGE_EVENT = {
+	SPELL_DAMAGE = true,
+	SPELL_PERIODIC_AURA = true,
+}
 
 -- Player's GUID.
 local self_guid = nil
@@ -37,12 +40,12 @@ function OvaleSpellDamage:OnDisable()
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
-function OvaleSpellDamage:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local time, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+function OvaleSpellDamage:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
 
 	if sourceGUID == self_guid then
-		if strfind(event, "SPELL_PERIODIC_DAMAGE")==1 or strfind(event, "SPELL_DAMAGE")==1 then
-			local spellId, spellName, spellSchool, amount = select(12, ...)
+		if CLEU_DAMAGE_EVENT[cleuEvent] then
+			local spellId, amount = arg12, arg15
 			self.value[spellId] = amount
 		end
 	end

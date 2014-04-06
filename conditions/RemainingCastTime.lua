@@ -13,7 +13,6 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 
-	local select = select
 	local API_UnitCastingInfo = UnitCastingInfo
 	local ParseCondition = OvaleCondition.ParseCondition
 	local TestValue = OvaleCondition.TestValue
@@ -36,13 +35,13 @@ do
 	local function RemainingCastTime(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local startTime, endTime = select(5, API_UnitCastingInfo(target))
-		if not startTime or not endTime then
-			return nil
+		local _, _, _, _, startTime, endTime = API_UnitCastingInfo(target)
+		if startTime and endTime then
+			startTime = startTime / 1000
+			endTime = endTime / 1000
+			return TestValue(startTime, endTime, 0, endTime, -1, comparator, limit)
 		end
-		startTime = startTime / 1000
-		endTime = endTime / 1000
-		return TestValue(startTime, endTime, 0, endTime, -1, comparator, limit)
+		return nil
 	end
 
 	OvaleCondition:RegisterCondition("remainingcasttime", false, RemainingCastTime)

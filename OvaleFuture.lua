@@ -30,7 +30,6 @@ local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
-local select = select
 local tinsert = table.insert
 local tostring = tostring
 local tremove = table.remove
@@ -347,7 +346,7 @@ end
 
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
-		local startTime, endTime = select(5, API_UnitChannelInfo("player"))
+		local _, _, _, _, startTime, endTime = API_UnitChannelInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
 			event, spellId, lineId, startTime, endTime)
 		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, true, false)
@@ -364,7 +363,7 @@ end
 --Called when a spell started its cast
 function OvaleFuture:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
-		local startTime, endTime = select(5, API_UnitCastingInfo("player"))
+		local _, _, _, _, startTime, endTime = API_UnitCastingInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
 			event, spellId, lineId, startTime, endTime)
 		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, false, false)
@@ -443,8 +442,8 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 	end
 end
 
-function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
 
 	--[[
 	Sequence of events:
@@ -487,12 +486,12 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 
 	-- Called when a missile reaches or misses its target
 	if sourceGUID == self_guid then
-		if OVALE_CLEU_SPELLCAST_RESULTS[event] then
-			local spellId, spellName = select(12, ...)
-			TracePrintf(spellId, "%s: %s (%d)", event, spellName, spellId)
+		if OVALE_CLEU_SPELLCAST_RESULTS[cleuEvent] then
+			local spellId, spellName = arg12, arg13
+			TracePrintf(spellId, "%s: %s (%d)", cleuEvent, spellName, spellId)
 			for index, spellcast in ipairs(self_activeSpellcast) do
 				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
-					if not spellcast.channeled and (spellcast.removeOnSuccess or event ~= "SPELL_CAST_SUCCESS") then
+					if not spellcast.channeled and (spellcast.removeOnSuccess or cleuEvent ~= "SPELL_CAST_SUCCESS") then
 						TracePrintf(spellId, "    Spell finished: %s (%d)", spellName, spellId)
 						tremove(self_activeSpellcast, index)
 						UpdateLastSpellcast(spellcast)
@@ -699,8 +698,7 @@ statePrototype.ApplySpell = function(state, ...)
 
 	-- Handle missing start/end/next cast times.
 	if not startCast or not endCast or not nextCast then
-		local castTime = 0
-		local castTime = select(7, API_GetSpellInfo(spellId))
+		local _, _, _, _, _, _, castTime = API_GetSpellInfo(spellId)
 		castTime = castTime and (castTime / 1000) or 0
 		local gcd = OvaleCooldown:GetGCD(spellId)
 

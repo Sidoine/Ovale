@@ -18,7 +18,6 @@ local OvaleData = nil
 local OvaleState = nil
 
 local pairs = pairs
-local select = select
 local API_GetPowerRegen = GetPowerRegen
 local API_GetSpellInfo = GetSpellInfo
 local API_UnitPower = UnitPower
@@ -283,7 +282,7 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 
 	-- Update power using information from GetSpellInfo() if there is no SpellInfo() for the spell's cost.
 	do
-		local cost, _, powerType = select(4, API_GetSpellInfo(spellId))
+		local _, _, _, cost, _, powerType = API_GetSpellInfo(spellId)
 		if cost and powerType then
 			powerType = self.POWER_TYPE[powerType]
 			if not si or not si[powerType] then

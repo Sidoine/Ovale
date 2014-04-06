@@ -12,7 +12,6 @@ local OvaleLatency = Ovale:NewModule("OvaleLatency", "AceEvent-3.0")
 Ovale.OvaleLatency = OvaleLatency
 
 --<private-static-properties>
-local select = select
 local API_GetNetStats = GetNetStats
 local API_GetTime = GetTime
 --</private-static-properties>
@@ -74,7 +73,8 @@ function OvaleLatency:GetLatency()
 	-- using GetNetStats().
 	local now = API_GetTime()
 	if not self.latency or not self.lastUpdateTime or now - self.lastUpdateTime > 10 then
-		self.latency = select(4, API_GetNetStats()) / 1000
+		local _, _, _, latency = API_GetNetStats()
+		self.latency = latency / 1000
 	end
 	return self.latency
 end

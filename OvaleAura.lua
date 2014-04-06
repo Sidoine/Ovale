@@ -33,7 +33,6 @@ local bit_bor = bit.bor
 local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
-local select = select
 local tinsert = table.insert
 local tsort = table.sort
 local wipe = table.wipe
@@ -280,20 +279,20 @@ function OvaleAura:OnDisable()
 	self_pool:Drain()
 end
 
-function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
 
-	if CLEU_AURA_EVENTS[event] then
+	if CLEU_AURA_EVENTS[cleuEvent] then
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		if unitId and not OvaleGUID.UNIT_AURA_UNIT[unitId] then
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", cleuEvent, unitId)
 			self:ScanAurasOnGUID(destGUID)
 		end
-	elseif sourceGUID == self_guid and CLEU_TICK_EVENTS[event] then
+	elseif sourceGUID == self_guid and CLEU_TICK_EVENTS[cleuEvent] then
 		-- Update the latest tick time of the periodic aura cast by the player.
-		local spellId, spellName, spellSchool = select(12, ...)
+		local spellId, spellName, spellSchool = arg12, arg13, arg14
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", cleuEvent, unitId)
 		local aura = GetAura(self.aura, destGUID, spellId, self_guid)
 		if self:IsActiveAura(aura) then
 			local name = aura.name or "Unknown spell"

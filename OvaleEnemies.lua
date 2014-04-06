@@ -17,7 +17,6 @@ Ovale.OvaleEnemies = OvaleEnemies
 --<private-static-properties>
 local bit_band = bit.band
 local pairs = pairs
-local select = select
 local tostring = tostring
 local wipe = table.wipe
 local API_GetTime = GetTime
@@ -59,10 +58,9 @@ function OvaleEnemies:OnDisable()
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 end
 
-function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local now = API_GetTime()
-	if event == "UNIT_DIED" then
+	if cleuEvent == "UNIT_DIED" then
 		self:RemoveEnemy(destGUID, true)
 	elseif sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0

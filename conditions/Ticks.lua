@@ -15,7 +15,6 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local floor = math.floor
-	local select = select
 	local Compare = OvaleCondition.Compare
 	local ParseCondition = OvaleCondition.ParseCondition
 	local state = OvaleState.state
@@ -41,7 +40,8 @@ do
 				numTicks = floor((ending - start) / tick + 0.5)
 			end
 		else
-			numTicks = select(3, state:GetDuration(auraId))
+			local _, _, _numTicks = state:GetDuration(auraId)
+			numTicks = _numTicks
 		end
 		if numTicks then
 			return Compare(numTicks, comparator, limit)

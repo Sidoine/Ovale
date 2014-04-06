@@ -26,14 +26,13 @@ local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
-local select = select
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
 -- Player's class.
-local self_class = select(2, API_UnitClass("player"))
+local _, self_class = API_UnitClass("player")
 
 local BLOOD_RUNE = 1
 local UNHOLY_RUNE = 2

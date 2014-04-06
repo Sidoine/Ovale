@@ -14,7 +14,6 @@ Ovale.OvaleEquipement = OvaleEquipement
 
 --<private-static-properties>
 local pairs = pairs
-local select = select
 local strgsub = string.gsub
 local strmatch = string.match
 local tonumber = tonumber
@@ -1295,7 +1294,7 @@ OvaleEquipement.offHandWeaponSpeed = nil
 local function GetEquippedItemType(slotId)
 	local itemId = OvaleEquipement:GetEquippedItem(slotId)
 	if itemId then
-		local inventoryType = select(9, API_GetItemInfo(itemId))
+		local _, _, _, _, _, _, _, _, inventoryType = API_GetItemInfo(itemId)
 		return inventoryType
 	end
 end
@@ -1318,7 +1317,7 @@ local function GetNormalizedWeaponSpeed(slotId)
 	if slotId == INVSLOT_MAINHAND or slotId == INVSLOT_OFFHAND then
 		local itemId = OvaleEquipement:GetEquippedItem(slotId)
 		if itemId then
-			local weaponClass = select(7, API_GetItemInfo(itemId))
+			local _, _, _, _, _, _, weaponClass = API_GetItemInfo(itemId)
 			return OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
 		end
 	end

@@ -20,7 +20,6 @@ local OvaleQueue = Ovale.OvaleQueue
 -- Forward declarations for module dependencies.
 local OvaleLatency = nil
 
-local select = select
 local API_GetTime = GetTime
 local API_UnitGUID = UnitGUID
 
@@ -57,18 +56,18 @@ function OvaleDamageTaken:OnDisable()
 	self_pool:Drain()
 end
 
-function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-	if destGUID == self_guid and event:find("_DAMAGE") then
+function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
+
+	if destGUID == self_guid and cleuEvent:find("_DAMAGE") then
 		local now = API_GetTime()
-		if event:find("SWING_") == 1 then
-			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
-			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s caused %d damage.", event, amount)
+		if cleuEvent:find("SWING_") == 1 then
+			local amount = arg12
+			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s caused %d damage.", cleuEvent, amount)
 			self:AddDamageTaken(now, amount)
-		elseif event:find("RANGE_") == 1 or event:find("SPELL_") == 1 then
-			local spellId, spellName, spellSchool = select(12, ...)
-			local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(15, ...)
-			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", event, spellName, amount)
+		elseif cleuEvent:find("RANGE_") == 1 or cleuEvent:find("SPELL_") == 1 then
+			local spellName, amount = arg13, arg15
+			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", cleuEvent, spellName, amount)
 			self:AddDamageTaken(now, amount)
 		end
 	end

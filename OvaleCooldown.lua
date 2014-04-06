@@ -26,7 +26,7 @@ local API_UnitHealthMax = UnitHealthMax
 local API_UnitClass = UnitClass
 
 -- Player's class.
-local self_class = select(2, API_UnitClass("player"))
+local _, self_class = API_UnitClass("player")
 --</private-static-properties>
 
 --<public-static-methods>
