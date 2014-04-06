@@ -33,7 +33,6 @@ local floor = math.floor
 local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
-local strfind = string.find
 local tonumber = tonumber
 local tostring = tostring
 local wipe = table.wipe

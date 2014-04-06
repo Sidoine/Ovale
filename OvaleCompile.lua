@@ -31,7 +31,6 @@ local OvaleStance = nil
 local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
-local strfind = string.find
 local strgmatch = string.gmatch
 local strgsub = string.gsub
 local strlen = string.len
@@ -210,7 +209,7 @@ local function ParseFunction(prefix, func, params)
 	end
 	
 	if not paramList.target then
-		if strfind(func, "Target") == 1 then
+		if strsub(func, 1, 6) == "Target" then
 			paramList.target = "target"
 			func = strsub(func, 7)
 		end
@@ -225,13 +224,13 @@ local function ParseFunction(prefix, func, params)
 
 	-- "debuff" and "buff" conditions implicitly set their aura filter.
 	if not paramList.filter then
-		if strfind(func, "debuff") == 1 then
+		if strsub(func, 1, 6) == "debuff" then
 			paramList.filter = "debuff"
-		elseif strfind(func, "buff") == 1 then
+		elseif strsub(func, 1, 4) == "buff" then
 			paramList.filter = "buff"
-		elseif strfind(func, "otherdebuff") == 1 then
+		elseif strsub(func, 1, 11) == "otherdebuff" then
 			paramList.filter = "debuff"
-		elseif strfind(func, "otherbuff") == 1 then
+		elseif strsub(func, 1, 9) == "otherbuff" then
 			paramList.filter = "buff"
 		end
 	end

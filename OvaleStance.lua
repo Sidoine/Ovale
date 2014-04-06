@@ -16,7 +16,6 @@ Ovale.OvaleStance = OvaleStance
 --<private-static-properties>
 local ipairs = ipairs
 local pairs = pairs
-local strfind = string.find
 local tinsert = table.insert
 local tsort = table.sort
 local wipe = table.wipe

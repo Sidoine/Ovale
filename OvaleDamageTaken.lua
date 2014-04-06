@@ -59,13 +59,14 @@ end
 function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
 
-	if destGUID == self_guid and cleuEvent:find("_DAMAGE") then
+	if destGUID == self_guid and strsub(cleuEvent, -7) == "_DAMAGE" then
 		local now = API_GetTime()
-		if cleuEvent:find("SWING_") == 1 then
+		local eventPrefix = strsub(cleuEvent, 1, 6)
+		if eventPrefix == "SWING_" then
 			local amount = arg12
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s caused %d damage.", cleuEvent, amount)
 			self:AddDamageTaken(now, amount)
-		elseif cleuEvent:find("RANGE_") == 1 or cleuEvent:find("SPELL_") == 1 then
+		elseif eventPrefix == "RANGE_" or eventPrefix == "SPELL_" then
 			local spellName, amount = arg13, arg15
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", cleuEvent, spellName, amount)
 			self:AddDamageTaken(now, amount)
