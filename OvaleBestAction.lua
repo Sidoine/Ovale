@@ -753,8 +753,8 @@ function OvaleBestAction:GetActionInfo(element)
 				return nil
 			end
 			if si.combo == 0 then
-				local minCombo = si.minCombo or 1
-				if state.combo < minCombo then
+				local mincombo = si.mincombo or 1
+				if state.combo < mincombo then
 					-- Spell is a combo point finisher, but player has too few combo points on the target.
 					return nil
 				end
