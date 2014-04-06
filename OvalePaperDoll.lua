@@ -22,7 +22,9 @@ local OvaleStance = nil
 local OvaleState = nil
 
 local tonumber = tonumber
+local API_GetCombatRating = GetCombatRating
 local API_GetCritChance = GetCritChance
+local API_GetMastery = GetMastery
 local API_GetMasteryEffect = GetMasteryEffect
 local API_GetMeleeHaste = GetMeleeHaste
 local API_GetRangedCritChance = GetRangedCritChance
@@ -40,6 +42,8 @@ local API_UnitLevel = UnitLevel
 local API_UnitRangedAttackPower = UnitRangedAttackPower
 local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
+local CR_CRIT_MELEE = CR_CRIT_MELEE
+local CR_HASTE_MELEE = CR_HASTE_MELEE
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -103,6 +107,10 @@ OvalePaperDoll.SNAPSHOT_STATS = {
 	-- percent increase to spell critical strike & haste
 	spellCrit =				{ default = 0, description = "spell critical strike chance" },
 	spellHaste =			{ default = 0, description = "spell haste effect" },
+	-- combat rating for mastery, critical strike & haste
+	masteryRating =			{ default = 0, description = "mastery rating" },
+	critRating =			{ default = 0, description = "critical strike rating" },
+	hasteRating =			{ default = 0, description = "haste rating" },
 	-- spellpower
 	spellBonusDamage =		{ default = 0, description = "spell bonus damage" },
 	spellBonusHealing =		{ default = 0, description = "spell bonus healing" },
@@ -204,6 +212,8 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	snapshot.meleeCrit = API_GetCritChance()
 	snapshot.rangedCrit = API_GetRangedCritChance()
 	snapshot.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self_class])
+	snapshot.critRating = API_GetCombatRating(CR_CRIT_MELEE)
+	snapshot.hasteRating = API_GetCombatRating(CR_HASTE_MELEE)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["meleeCrit"].description, snapshot.meleeCrit)
 	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
@@ -212,6 +222,7 @@ end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
 	local snapshot = UpdateCurrentSnapshot()
+	snapshot.masteryRating = API_GetMastery()
 	if self.level < 80 then
 		snapshot.masteryEffect = 0
 	else
@@ -470,6 +481,9 @@ function OvalePaperDoll:Debug(snapshot)
 	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
 	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["rangedHaste"].description, snapshot.rangedHaste)
 	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["masteryEffect"].description, snapshot.masteryEffect)
+	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["critRating"].description, snapshot.critRating)
+	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["hasteRating"].description, snapshot.hasteRating)
+	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["masteryRating"].description, snapshot.masteryRating)
 	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["baseDamageMultiplier"].description, snapshot.baseDamageMultiplier)
 	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["mainHandWeaponDamage"].description, snapshot.mainHandWeaponDamage)
 	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)

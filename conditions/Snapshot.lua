@@ -61,6 +61,30 @@ do
 		return Snapshot("attackPower", 0, condition)
 	end
 
+	--- Get the current critical strike rating of the player.
+	-- @name CritRating
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The current critical strike rating.
+	-- @return A boolean value for the result of the comparison.
+
+	local function CritRating(condition)
+		return Snapshot("critRating", 0, condition)
+	end
+
+	--- Get the current haste rating of the player.
+	-- @name HasteRating
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The current haste rating.
+	-- @return A boolean value for the result of the comparison.
+
+	local function HasteRating(condition)
+		return Snapshot("hasteRating", 0, condition)
+	end
+
 	--- Get the current intellect of the player.
 	-- @name Intellect
 	-- @paramsig number or boolean
@@ -89,6 +113,18 @@ do
 
 	local function MasteryEffect(condition)
 		return Snapshot("masteryEffect", 0, condition)
+	end
+
+	--- Get the current mastery rating of the player.
+	-- @name MasteryRating
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The current mastery rating.
+	-- @return A boolean value for the result of the comparison.
+
+	local function MasteryRating(condition)
+		return Snapshot("masteryRating", 0, condition)
 	end
 
 	--- Get the current melee critical strike chance of the player.
@@ -214,9 +250,12 @@ do
 
 	OvaleCondition:RegisterCondition("agility", false, Agility)
 	OvaleCondition:RegisterCondition("attackpower", false, AttackPower)
+	OvaleCondition:RegisterCondition("critrating", false, CritRating)
+	OvaleCondition:RegisterCondition("hasterating", false, HasteRating)
 	OvaleCondition:RegisterCondition("intellect", false, Intellect)
 	OvaleCondition:RegisterCondition("mastery", false, MasteryEffect)
 	OvaleCondition:RegisterCondition("masteryeffect", false, MasteryEffect)
+	OvaleCondition:RegisterCondition("masteryrating", false, MasteryRating)
 	OvaleCondition:RegisterCondition("meleecritchance", false, MeleeCritChance)
 	OvaleCondition:RegisterCondition("rangedcritchance", false, RangedCritChance)
 	OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
