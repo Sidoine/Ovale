@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -87,8 +87,8 @@ function OvaleBanditsGuile:OnDisable()
 	end
 end
 
-function OvaleBanditsGuile:Ovale_SpecializationChanged(event, specialization)
-	if specialization == 2 then
+function OvaleBanditsGuile:Ovale_SpecializationChanged(event, specialization, previousSpecialization)
+	if specialization == "combat" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterMessage("Ovale_AuraAdded")
 		self:RegisterMessage("Ovale_AuraChanged")

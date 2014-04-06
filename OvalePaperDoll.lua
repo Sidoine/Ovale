@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -74,6 +74,19 @@ local OVALE_HEALING_CLASS = {
 	PALADIN = true,
 	PRIEST = true,
 	SHAMAN = true,
+}
+local OVALE_SPECIALIZATION_NAME = {
+	DEATHKNIGHT = { "blood", "frost", "unholy" },
+	DRUID = { "balance", "feral", "guardian", "restoration" },
+	HUNTER = { "beast_mastery", "marksmanship", "survival" },
+	MAGE = { "arcane", "fire", "frost" },
+	MONK = { "brewmaster", "mistweaver", "windwalker" },
+	PALADIN = { "holy", "protection", "retribution" },
+	PRIEST = { "discipline", "holy", "shadow" },
+	ROGUE = { "assassination", "combat", "subtlety" },
+	SHAMAN = { "elemental", "enhancement", "restoration" },
+	WARLOCK = { "affliction", "demonology", "destruction" },
+	WARRIOR = { "arms", "fury", "protection" },
 }
 --</private-static-properties>
 
@@ -390,8 +403,9 @@ end
 function OvalePaperDoll:UpdateSpecialization(event)
 	local newSpecialization = API_GetSpecialization()
 	if self.specialization ~= newSpecialization then
+		local oldSpecialization = self.specialization
 		self.specialization = newSpecialization
-		self:SendMessage("Ovale_SpecializationChanged", self.specialization)
+		self:SendMessage("Ovale_SpecializationChanged", self:GetSpecialization(newSpecialization), self:GetSpecialization(oldSpecialization))
 	end
 end
 
@@ -427,6 +441,24 @@ end
 function OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
 	snapshot = snapshot or self:CurrentSnapshot()
 	return 1 + snapshot.spellHaste / 100
+end
+
+-- Return the given specialization's name, or the current one if none is specified.
+function OvalePaperDoll:GetSpecialization(specialization)
+	specialization = specialization or self.specialization
+	return OVALE_SPECIALIZATION_NAME[self_class][specialization]
+end
+
+-- Return true if the current specialization matches the given name.
+function OvalePaperDoll:IsSpecialization(name)
+	if name and self.specialization then
+		if type(name) == "number" then
+			return name == self.specialization
+		else
+			return name == OVALE_SPECIALIZATION_NAME[self_class][self.specialization]
+		end
+	end
+	return false
 end
 
 -- Copy the current snapshot into the given snapshot table.

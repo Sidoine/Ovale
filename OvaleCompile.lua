@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2009, 2010, 2011, 2012 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -141,7 +141,7 @@ local function TestConditions(paramList)
 	if paramList.glyph and not OvaleSpellBook:IsActiveGlyph(paramList.glyph) then
 		return false
 	end
-	if paramList.mastery and OvalePaperDoll.specialization ~= paramList.mastery then
+	if paramList.mastery and not OvalePaperDoll:IsSpecialization(paramList.mastery) then
 		return false
 	end
 	if paramList.if_stance then
