@@ -749,10 +749,13 @@ function OvaleBestAction:GetActionInfo(element, state)
 				end
 			end
 			for _, powerType in pairs(OvalePower.SECONDARY_POWER) do
-				if si[powerType] and si[powerType] > state[powerType] then
-					-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
-					-- that the player does not have enough of.
-					return nil
+				if si[powerType] then
+					local cost = state:PowerCost(spellId, powerType)
+					if cost > state[powerType] then
+						-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
+						-- that the player does not have enough of.
+						return nil
+					end
 				end
 			end
 			if actionCooldownStart and actionCooldownDuration then
