@@ -188,7 +188,7 @@ do
 			if forceRefresh or Ovale.refreshNeeded[target] or Ovale.refreshNeeded["player"] or Ovale.refreshNeeded["pet"] then
 				Ovale:Logf("****Master Node %d", k)
 				OvaleBestAction:StartNewAction(state)
-				local timeSpan, _, element = OvaleBestAction:Compute(node)
+				local timeSpan, _, element = OvaleBestAction:Compute(node, state)
 				local start = NextTime(timeSpan, state.currentTime)
 				if start then
 					Ovale:Logf("Compute start = %f", start)
@@ -215,7 +215,7 @@ do
 					end
 				else
 					local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-							actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = OvaleBestAction:GetActionInfo(element)
+							actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = OvaleBestAction:GetActionInfo(element, state)
 					if noRed then
 						start = actionCooldownStart + actionCooldownDuration
 						if start < state.currentTime then
@@ -266,9 +266,9 @@ do
 								spellTarget = OvaleCondition.defaultTarget
 							end
 							state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
-							timeSpan, _, element = OvaleBestAction:Compute(node)
+							timeSpan, _, element = OvaleBestAction:Compute(node, state)
 							start = NextTime(timeSpan, state.currentTime)
-							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element))
+							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element, state))
 						else
 							icons[2]:Update(element, nil)
 						end

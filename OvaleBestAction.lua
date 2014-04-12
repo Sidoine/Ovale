@@ -26,7 +26,6 @@ local OvaleFuture = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
 local OvaleStance = nil
-local OvaleState = nil
 
 local abs = math.abs
 local floor = math.floor
@@ -77,12 +76,11 @@ local function PutValue(element, value, origin, rate)
 	return result
 end
 
-local function ComputeAction(element)
+local function ComputeAction(element, state)
 	local self = OvaleBestAction
-	local state = OvaleState.state
 	local action = element.params[1]
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element)
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -183,17 +181,17 @@ local function ComputeAction(element)
 	end
 end
 
-local function ComputeAnd(element)
+local function ComputeAnd(element, state)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local timeSpanA = self:ComputeBool(element.a)
+	local timeSpanA = self:ComputeBool(element.a, state)
 	local timeSpan = element.timeSpan
 
 	-- Short-circuit evaluation of left argument to AND.
 	if Measure(timeSpanA) == 0 then
 		timeSpan:Reset(timeSpanA)
 	else
-		local timeSpanB = self:ComputeBool(element.b)
+		local timeSpanB = self:ComputeBool(element.b, state)
 		-- Take intersection of A and B.
 		timeSpan:Reset()
 		Intersect(timeSpanA, timeSpanB, timeSpan)
@@ -202,11 +200,10 @@ local function ComputeAnd(element)
 	return timeSpan
 end
 
-local function ComputeArithmetic(element)
+local function ComputeArithmetic(element, state)
 	local self = OvaleBestAction
-	local state = OvaleState.state
-	local timeSpanA, _, elementA = self:Compute(element.a)
-	local timeSpanB, _, elementB = self:Compute(element.b)
+	local timeSpanA, _, elementA = self:Compute(element.a, state)
+	local timeSpanB, _, elementB = self:Compute(element.b, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -310,10 +307,10 @@ local function ComputeArithmetic(element)
 	return timeSpan, OVALE_DEFAULT_PRIORITY, PutValue(element, l, m, n)
 end
 
-local function ComputeCompare(element)
+local function ComputeCompare(element, state)
 	local self = OvaleBestAction
-	local timeSpanA, _, elementA = self:Compute(element.a)
-	local timeSpanB, _, elementB = self:Compute(element.b)
+	local timeSpanA, _, elementA = self:Compute(element.a, state)
+	local timeSpanB, _, elementB = self:Compute(element.b, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -380,13 +377,12 @@ local function ComputeCompare(element)
 	return timeSpan
 end
 
-local function ComputeCustomFunction(element)
+local function ComputeCustomFunction(element, state)
 	Ovale:Logf("custom function %s", element.name)
 	local self = OvaleBestAction
-	local state = OvaleState.state
 	if not element.serial or element.serial < self_serial then
 		-- Cache new values in element.
-		element.timeSpanA, element.priorityA, element.elementA = self:Compute(element.a)
+		element.timeSpanA, element.priorityA, element.elementA = self:Compute(element.a, state)
 		element.serial = self_serial
 	else
 		Ovale:Logf("Using cached values for %s", element.name)
@@ -429,9 +425,7 @@ local function ComputeCustomFunction(element)
 	end
 end
 
-local function ComputeFunction(element)
-	local self = OvaleBestAction
-	local state = OvaleState.state
+local function ComputeFunction(element, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -487,9 +481,8 @@ local function ComputeFunction(element)
 	end
 end
 
-local function ComputeGroup(element)
+local function ComputeGroup(element, state)
 	local self = OvaleBestAction
-	local state = OvaleState.state
 	local bestTimeSpan, bestPriority, bestElement, bestCastTime
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
@@ -497,14 +490,14 @@ local function ComputeGroup(element)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 
 	if #element.nodes == 1 then
-		return self:Compute(element.nodes[1])
+		return self:Compute(element.nodes[1], state)
 	end
 
 	local best = OvaleTimeSpan(self_pool:Get())
 	local current = OvaleTimeSpan(self_pool:Get())
 
 	for k, v in ipairs(element.nodes) do
-		local currentTimeSpan, currentPriority, currentElement = self:Compute(v)
+		local currentTimeSpan, currentPriority, currentElement = self:Compute(v, state)
 		-- We only care about actions that are available at time t > state.currentTime.
 		current:Reset()
 		IntersectInterval(currentTimeSpan, state.currentTime, math.huge, current)
@@ -581,12 +574,11 @@ local function ComputeGroup(element)
 	end
 end
 
-local function ComputeIf(element)
+local function ComputeIf(element, state)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local state = OvaleState.state
 
-	local timeSpanA = self:ComputeBool(element.a)
+	local timeSpanA = self:ComputeBool(element.a, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -605,7 +597,7 @@ local function ComputeIf(element)
 		return timeSpan, OVALE_DEFAULT_PRIORITY, PutValue(element, 0, 0, 0)
 	end
 
-	local timeSpanB, priorityB, elementB = self:Compute(element.b)
+	local timeSpanB, priorityB, elementB = self:Compute(element.b, state)
 	-- If the "then" clause is a "wait" node, then only wait if the conditions are true.
 	if elementB and elementB.wait and not HasTime(conditionTimeSpan, state.currentTime) then
 		elementB.wait = nil
@@ -618,7 +610,7 @@ local function ComputeIf(element)
 	return timeSpan, priorityB, elementB
 end
 
-local function ComputeLua(element)
+local function ComputeLua(element, state)
 	local ret = loadstring(element.lua)()
 	Ovale:Logf("lua %s [%d]", ret, element.nodeId)
 
@@ -629,10 +621,10 @@ local function ComputeLua(element)
 	return timeSpan, OVALE_DEFAULT_PRIORITY, PutValue(element, ret, 0, 0)
 end
 
-local function ComputeNot(element)
+local function ComputeNot(element, state)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local timeSpanA = self:ComputeBool(element.a)
+	local timeSpanA = self:ComputeBool(element.a, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -641,11 +633,11 @@ local function ComputeNot(element)
 	return timeSpan
 end
 
-local function ComputeOr(element)
+local function ComputeOr(element, state)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local timeSpanA = self:ComputeBool(element.a)
-	local timeSpanB = self:ComputeBool(element.b)
+	local timeSpanA = self:ComputeBool(element.a, state)
+	local timeSpanB = self:ComputeBool(element.b, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -655,7 +647,7 @@ local function ComputeOr(element)
 	return timeSpan
 end
 
-local function ComputeValue(element)
+local function ComputeValue(element, state)
 	Ovale:Logf("value %s", element.value)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
@@ -664,10 +656,10 @@ local function ComputeValue(element)
 	return timeSpan, OVALE_DEFAULT_PRIORITY, element
 end
 
-local function ComputeWait(element)
+local function ComputeWait(element, state)
 	Ovale:Logf("%s [%d]", element.type, element.nodeId)
 	local self = OvaleBestAction
-	local timeSpanA, priorityA, elementA = self:Compute(element.a)
+	local timeSpanA, priorityA, elementA = self:Compute(element.a, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -712,7 +704,6 @@ function OvaleBestAction:OnInitialize()
 	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleStance = Ovale.OvaleStance
-	OvaleState = Ovale.OvaleState
 end
 
 function OvaleBestAction:StartNewAction(state)
@@ -721,12 +712,11 @@ function OvaleBestAction:StartNewAction(state)
 	self_serial = self_serial + 1
 end
 
-function OvaleBestAction:GetActionInfo(element)
+function OvaleBestAction:GetActionInfo(element, state)
 	if not element then
 		return nil
 	end
 
-	local state = OvaleState.state
 	local target = element.params.target or OvaleCondition.defaultTarget
 	local action
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -832,22 +822,22 @@ function OvaleBestAction:GetActionInfo(element)
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, target, element.params.nored
 end
 
-function OvaleBestAction:Compute(element)
+function OvaleBestAction:Compute(element, state)
 	if not element or (Ovale.bug and not Ovale.trace) then
 		return nil
 	end
 
 	local visitor = OVALE_COMPUTE_VISITOR[element.type]
 	if visitor then
-		return visitor(element)
+		return visitor(element, state)
 	end
 
 	Ovale:Logf("unknown element %s, return nil", element.type)
 	return nil
 end
 
-function OvaleBestAction:ComputeBool(element)
-	local timeSpan, _, newElement = self:Compute(element)
+function OvaleBestAction:ComputeBool(element, state)
+	local timeSpan, _, newElement = self:Compute(element, state)
 	-- Match SimC: 0 is false, non-zero is true.
 	--	(https://code.google.com/p/simulationcraft/wiki/ActionLists#Logical_operators)
 	if newElement and newElement.type == "value" and newElement.value == 0 and newElement.rate == 0 then
