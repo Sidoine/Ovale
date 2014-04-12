@@ -17,6 +17,7 @@ Ovale.OvalePower = OvalePower
 local OvaleData = nil
 local OvaleState = nil
 
+local ceil = math.ceil
 local pairs = pairs
 local API_GetPowerRegen = GetPowerRegen
 local API_GetSpellInfo = GetSpellInfo
@@ -340,14 +341,34 @@ statePrototype.PowerCost = function(state, spellId, powerType)
 			"buff_<powerType>" is the spell ID of the buff that causes extra resources to be generated or used.
 			"buff_<powerType>_amount" is the amount of extra resources generated or used, defaulting to -1
 				(one extra resource generated).
+
+			Some buffs can change the cost of a spell.
+			"buffnocost" is the spell ID of the buff that makes casting the spell resource-free.
+			"buffhalfcost" is the spell ID of the buff that makes casting the spell cost half the resources.
 		--]]
-		local buffParam = "buff_" .. tostring(powerType)
-		local buffAmoumtParam = buffParam .. "_amount"
-		if si[buffParam] then
-			local aura = state:GetAura("player", si[buffParam], nil, true)
+		if si.buffnocost and cost > 0 then
+			local aura = state:GetAura("player", si.buffnocost)
 			if state:IsActiveAura(aura) then
-				local buffAmount = si[buffAmountParam] or -1
-				cost = cost + buffAmount
+				cost = 0
+			end
+		else
+			local buffParam = "buff_" .. tostring(powerType)
+			local buffAmoumtParam = buffParam .. "_amount"
+			if si[buffParam] then
+				local aura = state:GetAura("player", si[buffParam], nil, true)
+				if state:IsActiveAura(aura) then
+					local buffAmount = si[buffAmountParam] or -1
+					cost = cost + buffAmount
+				end
+			end
+			-- Apply any percent reductions to cost after fixed reductions are applied.
+			-- This seems to be a consistent Blizzard rule for spell costs so that you
+			-- never end up with a negative spell cost.
+			if si.buffhalfcost then
+				local aura = state:GetAura("player", si.buffhalfcost)
+				if state:IsActiveAura(aura) then
+					cost = ceil(cost / 2)
+				end
 			end
 		end
 		spellCost = cost
