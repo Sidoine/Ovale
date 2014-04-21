@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -125,7 +125,7 @@ function OvaleActionBar:UpdateActionSlot(slot)
 	if actionType == "spell" then
 		id = tonumber(id)
 		if id then
-			if self.spell[id] and slot < self.spell[id] then
+			if not self.spell[id] or slot < self.spell[id] then
 				self.spell[id] = slot
 			end
 			self.action[slot] = id
@@ -133,7 +133,7 @@ function OvaleActionBar:UpdateActionSlot(slot)
 	elseif actionType == "item" then
 		id = tonumber(id)
 		if id then
-			if self.item[id] and slot < self.item[id] then
+			if not self.item[id] or slot < self.item[id] then
 				self.item[id] = slot
 			end
 			self.action[slot] = id
@@ -141,7 +141,7 @@ function OvaleActionBar:UpdateActionSlot(slot)
 	elseif actionType == "macro" then
 		local actionText = API_GetActionText(slot)
 		if actionText then
-			if self.macro[actionText] and slot < self.macro[actionText] then
+			if not self.macro[actionText] or slot < self.macro[actionText] then
 				self.macro[actionText] = slot
 			end
 			self.action[slot] = actionText
