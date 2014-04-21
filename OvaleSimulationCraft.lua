@@ -254,10 +254,37 @@ do
 		druid = {
 			balance = {
 				["dream_of_cenarius"] = "dream_of_cenarius_caster",
-				["incarnation"] = "incarnation_caster",
+				["force_of_nature"] = "force_of_nature_caster",
 				["wild_mushroom"] = "wild_mushroom_caster",
-			}
+			},
+			feral = {
+				["berserk"] = "berserk_cat",
+				["dream_of_cenarius"] = "dream_of_cenarius_melee",
+				["force_of_nature"] = "force_of_nature_melee",
+				["stealth"] = "prowl",
+			},
 		},
+		paladin = {
+			protection = {
+				["arcane_torrent"] = "arcane_torrent_mana",
+				["guardian_of_ancient_kings"] = "guardian_of_ancient_kings_tank",
+			},
+			retribution = {
+				["arcane_torrent"] = "arcane_torrent_mana",
+				["guardian_of_ancient_kings"] = "guardian_of_ancient_kings_melee",
+			},
+		},
+		shaman = {
+			elemental = {
+				["ascendance"] = "ascendance_caster",
+			},
+			enhancement = {
+				["ascendance"] = "ascendance_melee",
+			},
+			restoration = {
+				["ascendance"] = "ascendance_heal",
+			},
+		}
 	}
 
 	function OvaleSimulationCraft:Name(name)
@@ -271,9 +298,12 @@ end
 
 do
 	local SIMC_ACTION = {
-		["_potion$"] = function(simc, action) return format("Item(%s)", action) end,
+		["^jade_serpent_potion$"] = "UsePotionIntellect()",
+		["^mogu_power_potion$"] = "UsePotionStrength()",
+		["^virmens_bite_potion$"] = "UsePotionAgility()",
 		["^$"] = false,
 		["^auto_attack$"] = false,
+		["^auto_shot$"] = false,
 		["^flask$"] = false,
 		["^food$"] = false,
 		["^snapshot_stats$"] = false,
@@ -281,11 +311,22 @@ do
 		["^blood_presence$"] = "if not Stance(deathknight_blood_presence) Spell(blood_presence)",
 		["^frost_presence$"] = "if not Stance(deathknight_frost_presence) Spell(frost_presence)",
 		["^unholy_presence$"] = "if not Stance(deathknight_unholy_presence) Spell(unholy_presence)",
+		-- Druid
+		["^cat_form$"] = "if not Stance(druid_cat_form) Spell(cat_form)",
+		["^moonkin_form$"] = "if not Stance(druid_moonkin_form) Spell(moonkin_form)",
+		["^prowl$"] = "if Stealthed(no) Spell(prowl)",
+		["^ravage$"] = "Spell(ravage usable=1)",
+		["^savage_roar$"] = "SavageRoar()",
+		["^skull_bash_cat$"] = "FeralInterrupt()",
 		-- Hunter
 		["^aspect_of_the_"] = function(simc, action) return format("if not Stance(hunter_%s) Spell(%s)", action, action) end,
+		["^kill_shot$"] = "Spell(kill_shot usable=1)",
+		["^summon_pet$"] = "SummonPet()",
 		-- Mage
 		["^arcane_brilliance$"] = "if BuffExpires(critical_strike any=1) or BuffExpires(spell_power_multiplier any=1) Spell(arcane_brilliance)",
 		["^cancel_buff$"] = false,
+		["^conjure_mana_gem$"] = "ConjureManaGem()",
+		["^mana_gem$"] = "UseManaGem()",
 		["^frost_armor$"] = function(simc, action)
 				tinsert(simc.symbols, "frost_armor_buff")
 				return "if BuffExpires(frost_armor_buff) Spell(frost_armor)"
@@ -295,21 +336,31 @@ do
 				return "if BuffExpires(molten_armor_buff) Spell(molten_armor)"
 			end,
 		["^rune_of_power$"] = false, -- XXX
+		["^water_elemental$"] = "if pet.Present(no) Spell(water_elemental)",
 		-- Monk
 		["^chi_sphere$"] = false,
 		-- Paladin
-		["^rebuke$"] = "if target.IsInterruptible() Spell(rebuke)",
+		["^hammer_of_wrath$"] = "Spell(hammer_of_wrath usable=1)",
+		["^rebuke$"] = "Interrupt()",
 		["^seal_of_"] = function(simc, action) return format("if not Stance(paladin_%s) Spell(%s)", action, action) end,
 		-- Priest
 		["^inner_fire$"] = function(simc, action)
 				tinsert(simc.symbols, "inner_fire_buff")
 				return "if BuffExpires(inner_fire_buff) Spell(inner_fire)"
 			end,
+		["^mind_flay_insanity$"] = function(simc, action)
+				tinsert(simc.symbols, "mind_flay")
+				return "Spell(mind_flay)"
+			end,
 		["^shadowform$"] = "if not Stance(priest_shadowform) Spell(shadowform)",
+		["^shadow_word_death$"] = "Spell(shadow_word_death usable=1)",
 		-- Rogue
 		["^apply_poison$"] = false,	-- XXX
 		["^kick$"] = "if target.IsInterruptible() Spell(kick)",
 		["^stealth$"] = "if Stealthed(no) Spell(stealth)",
+		-- Shaman
+		["^bloodlust$"] = "Bloodlust()",
+		["^wind_shear$"] = "Interrupt()",
 	}
 
 	local scriptLine = {}
@@ -341,6 +392,8 @@ do
 				for i, expr in ipairs(actionLine) do
 					local name, value = NameValuePair(expr)
 					if action == "use_item" then
+						scriptLine.action = "UseItemActions()"
+						--[[
 						if name == "slot" then
 							if value == "hands" then
 								scriptLine.action = "Item(HandsSlot usable=1)"
@@ -352,6 +405,7 @@ do
 								scriptLine.action = "Item(HandsSlot usable=1)"
 							end
 						end
+						]]--
 					elseif action == "wait" then
 						if name == "sec" then
 							if type(value) == "number" then
@@ -555,7 +609,18 @@ do
 		["^buff%.bloodlust%.down$"] = "BuffExpires(burst_haste any=1)",
 		["^buff%.stealthed%.down$"] = "Stealthed(no)",
 		["^buff%.stealthed%.up$"] = "Stealthed()",
-
+		["^debuff%.weakened_armor%.stack$"] = function(simc, action)
+				tinsert(simc.symbols, "weakened_armor_debuff")
+				return "target.DebuffStacks(weakened_armor_debuff any=1)"
+			end,
+		["^buff%.vicious%.react$"] = function(simc, action)
+				tinsert(simc.symbols, "trinket_proc_agility_buff")
+				return "BuffPresent(trinket_proc_agility_buff)"
+			end,
+		["^buff%.vicious%.remains$"] = function(simc, action)
+				tinsert(simc.symbols, "trinket_proc_agility_buff")
+				return "BuffRemains(trinket_proc_agility_buff)"
+			end,
 		-- Druid
 		["^buff%.wild_mushroom%.max_stack$"] = function(simc, action)
 				local class, spec = simc.profile.class, simc.profile.spec
@@ -576,6 +641,15 @@ do
 		["^dot%.zen_sphere%.ticking$"] = function(simc, action)
 				tinsert(simc.symbols, "zen_sphere_buff")
 				return "BuffPresent(zen_sphere_buff)"
+			end,
+		-- Priest
+		["^buff%.surge_of_darkness%.react$"] = function(simc, action)
+				tinsert(simc.symbols, "surge_of_darkness_buff")
+				return "BuffStacks(surge_of_darkness_buff)"
+			end,
+		["^dot%.devouring_plague_tick%.ticks_remain$"] = function(simc, action)
+				tinsert(simc.symbols, "devouring_plague_debuff")
+				return "TicksRemain(devouring_plague_debuff)"
 			end,
 		-- Rogue
 		["^buff%.stealth%.down$"] = "Stealthed(no)",
