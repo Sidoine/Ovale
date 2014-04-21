@@ -46,6 +46,7 @@
 	<Script file="InFlightToTarget.lua" />
 	<Script file="InRange.lua" />
 	<Script file="IsAggroed.lua" />
+	<Script file="IsDead.lua" />
 	<Script file="IsEnraged.lua" />
 	<Script file="IsFeared.lua" />
 	<Script file="IsFriend.lua" />
