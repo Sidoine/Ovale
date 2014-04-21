@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="ovale_items.lua" />
+	<Script file="ovale_racials.lua" />
+
+	<Script file="ovale_druid.lua" />
+	<Script file="ovale_druid_spells.lua" />
+	<Script file="ovale_hunter.lua" />
+	<Script file="ovale_hunter_spells.lua" />
+	<Script file="ovale_monk.lua" />
+	<Script file="ovale_monk_spells.lua" />
+	<Script file="ovale_paladin.lua" />
+	<Script file="ovale_paladin_spells.lua" />
+	<Script file="ovale_shaman.lua" />
+	<Script file="ovale_shaman_spells.lua" />
+</Ui>
