@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -36,8 +36,8 @@ do
 		local _, filter, mine = ParseCondition(condition)
 
 		local count, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine)
-		Ovale:Logf("BuffCount(%d) is %d, %d, %d, %d, %d", auraId, count, startChangeCount, endingChangeCount, startFirst, endingLast)
-		if count > 0 then
+		Ovale:Logf("BuffCount(%d) is %s, %s, %s, %s, %s", auraId, count, startChangeCount, endingChangeCount, startFirst, endingLast)
+		if count > 0 and startChangeCount < math.huge then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)
 			local start, ending = startFirst, endingLast
