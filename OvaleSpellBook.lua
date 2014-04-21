@@ -261,8 +261,17 @@ end
 -- XXX to a proc but the proc replaces the spell in the spellbook, e.g.,
 -- XXX "Aimed Shot" --> "Aimed Shot!".
 function OvaleSpellBook:IsUsableSpell(spellId)
-	local name = self:GetSpellName(spellId)
-	return API_IsUsableSpell(name) or API_IsSpellOverlayed(spellId)
+	local spellName = self:GetSpellName(spellId)
+	local result = API_IsUsableSpell(spellName) or API_IsSpellOverlayed(spellId)
+	if not result then
+		-- Catch case where the name in the spellbook does not match the GetSpellInfo() name,
+		-- e.g., druid's Incarnation.
+		local name = API_GetSpellInfo(spellId)
+		if name ~= spellName then
+			result = API_IsUsableSpell(name)
+		end
+	end
+	return result
 end
 
 -- Print out the list of active glyphs in alphabetical order.
