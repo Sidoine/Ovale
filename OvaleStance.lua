@@ -94,6 +94,12 @@ function OvaleStance:OnDisable()
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
 end
 
+function OvaleStance:PLAYER_TALENT_UPDATE(event)
+	-- Clear old stance ID since talent update may overwrite old stance with new one with same ID.
+	self.stance = nil
+	UpdateStances()
+end
+
 function OvaleStance:UPDATE_SHAPESHIFT_FORM(event)
 	self:ShapeshiftEventHandler()
 end
