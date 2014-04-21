@@ -741,19 +741,18 @@ function OvaleBestAction:GetActionInfo(element, state)
 				-- Spell requires a stance that player is not in.
 				return nil
 			end
-			if si.combo == 0 then
-				local mincombo = si.mincombo or 1
-				if state.combo < mincombo then
-					-- Spell is a combo point finisher, but player has too few combo points on the target.
+			if si.combo then
+				-- Spell requires combo points.
+				local cost = state:ComboPointCost(spellId)
+				if state.combo < cost then
 					return nil
 				end
 			end
 			for _, powerType in pairs(OvalePower.SECONDARY_POWER) do
 				if si[powerType] then
+					-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
 					local cost = state:PowerCost(spellId, powerType)
-					if cost > state[powerType] then
-						-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
-						-- that the player does not have enough of.
+					if state[powerType] < cost then
 						return nil
 					end
 				end

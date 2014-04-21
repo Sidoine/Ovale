@@ -38,6 +38,7 @@ local API_UnitCastingInfo = UnitCastingInfo
 local API_UnitChannelInfo = UnitChannelInfo
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
+local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 -- Player's GUID.
 local self_guid = nil
@@ -168,16 +169,36 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		end
 
 		-- Save the number of combo points used if this spell is a finisher.
-		if si.combo == 0 then
+		if si.combo == "finisher" then
+			-- If a buff is present that removes the combo point cost of the spell,
+			-- then treat it as a maximum combo-point finisher.
+			if si.buff_combo_none then
+				if OvaleAura:GetAura("player", si.buff_combo_none) then
+					spellcast.combo = MAX_COMBO_POINTS
+				end
+			end
 			if OvaleComboPoints.combo > 0 then
 				spellcast.combo = OvaleComboPoints.combo
 			end
 		end
 
 		-- Save the number of holy power used if this spell is a finisher.
-		if si.holy == 0 then
-			if OvalePower.power.holy > 0 then
-				spellcast.holy = OvalePower.power.holy
+		if si.holy == "finisher" then
+			local max_holy = si.max_holy or 3
+			-- If a buff is present that removes the holy power cost of the spell,
+			-- then treat it as using the maximum amount of holy power.
+			if si.buff_holy_none then
+				if OvaleAura:GetAura("player", si.buff_holy_none) then
+					spellcast.holy = max_holy
+				end
+			end
+			local holy = OvalePower.power.holy
+			if holy > 0 then
+				if holy > max_holy then
+					spellcast.holy = max_holy
+				else
+					spellcast.holy = holy
+				end
 			end
 		end
 
