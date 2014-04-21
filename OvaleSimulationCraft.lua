@@ -481,7 +481,7 @@ do
 					if needAnd then
 						tinsert(scriptLine, "and")
 					end
-					tinsert(scriptLine, "BuffStacks(pet_frenzy any=1) == 5")
+					tinsert(scriptLine, "pet.BuffStacks(pet_frenzy_buff any=1) == 5")
 					needAnd = true
 				end
 				if action == "stance" and scriptLine.choose then
@@ -632,6 +632,10 @@ do
 		["^buff%.wild_mushroom%.stack$"] = "WildMushroomCount()",
 		-- Hunter
 		["^debuff%.ranged_vulnerability%.up$"] = "target.DebuffPresent(ranged_vulnerability any=1)",
+		["^buff%.beast_cleave$.down$"] = function(simc, action)
+				tinsert(simc.symbols, "pet_beast_cleave_buff")
+				return "pet.BuffExpires(pet_beast_cleave_buff any=1)"
+			end,
 		-- Mage
 		["^buff%.arcane_charge%.stack$"] = function(simc, action)
 				tinsert(simc.symbols, "arcane_charge_debuff")
