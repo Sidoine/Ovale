@@ -162,7 +162,7 @@ end
 
 function OvaleBanditsGuile:GainedAura(atTime)
 	atTime = atTime or API_GetTime()
-	OvaleAura:GainedAuraOnGUID(self_guid, atTime, BANDITS_GUILE, self_guid, "HELPFUL", nil, self.stacks, nil, INSIGHT_DURATION, self.ending, nil, "Bandit's Guile", nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_guid, atTime, BANDITS_GUILE, self_guid, "HELPFUL", nil, nil, self.stacks, nil, INSIGHT_DURATION, self.ending, nil, "Bandit's Guile", nil, nil, nil)
 end
 
 function OvaleBanditsGuile:LostAura(atTime)

@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -373,7 +373,7 @@ function OvaleAura:IsActiveAura(aura, now)
 	return boolean
 end
 
-function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
+function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, visible, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
 	-- Whose aura is it?
 	casterGUID = casterGUID or UNKNOWN_GUID
 	local mine = (casterGUID == self_guid)
@@ -421,6 +421,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, ic
 		aura.stacks = count
 		aura.consumed = nil
 		aura.filter = filter
+		aura.visible = visible
 		aura.icon = icon
 		aura.debuffType = debuffType
 		aura.enrage = IsEnrageEffect(auraId)
@@ -543,7 +544,7 @@ function OvaleAura:ScanAurasOnGUID(guid)
 			end
 		else
 			local casterGUID = OvaleGUID:GetGUID(unitCaster)
-			self:GainedAuraOnGUID(guid, now, spellId, casterGUID, filter, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
+			self:GainedAuraOnGUID(guid, now, spellId, casterGUID, filter, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
 			i = i + 1
 		end
 	end
@@ -554,7 +555,13 @@ function OvaleAura:ScanAurasOnGUID(guid)
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
 				if aura.serial == serial - 1 then
-					self:LostAuraOnGUID(guid, now, auraId, casterGUID)
+					if aura.visible then
+						-- Remove the aura if it was visible.
+						self:LostAuraOnGUID(guid, now, auraId, casterGUID)
+					else
+						-- Age any hidden auras that are managed by outside modules.
+						aura.serial = serial
+					end
 				end
 			end
 		end

@@ -128,7 +128,7 @@ function OvaleSteadyFocus:GainedAura(atTime)
 	self.start = atTime
 	self.ending = math.huge
 	self.stacks = self.stacks + 1
-	OvaleAura:GainedAuraOnGUID(self_guid, self.start, PRE_STEADY_FOCUS, self_guid, "HELPFUL", nil, 1, nil, math.huge, self.ending, nil, "Pre-Steady Focus", nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_guid, self.start, PRE_STEADY_FOCUS, self_guid, "HELPFUL", nil, nil, 1, nil, math.huge, self.ending, nil, "Pre-Steady Focus", nil, nil, nil)
 end
 
 function OvaleSteadyFocus:LostAura(atTime)
