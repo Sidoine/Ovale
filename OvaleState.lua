@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -68,8 +68,10 @@ function OvaleState:UnregisterState(stateAddon)
 
 	-- Remove mix-in methods from addon's state prototype.
 	local statePrototype = self.statePrototype[stateAddon]
-	for k in pairs(statePrototype) do
-		self.state[k] = nil
+	if statePrototype then
+		for k in pairs(statePrototype) do
+			self.state[k] = nil
+		end
 	end
 	self.statePrototype[stateAddon] = nil
 end
