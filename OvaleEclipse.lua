@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -58,26 +58,33 @@ function OvaleEclipse:OnInitialize()
 end
 
 function OvaleEclipse:OnEnable()
-	self_guid = API_UnitGUID("player")
 	if self_class == "DRUID" then
-		self:RegisterEvent("ECLIPSE_DIRECTION_CHANGE", "UpdateEclipseDirection")
-		self:RegisterEvent("UNIT_POWER")
-		self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER")
-		self:RegisterMessage("Ovale_SpecializationChanged", "UpdateEclipseDirection")
-		self:RegisterMessage("Ovale_StanceChanged", "Update")
-		self:RegisterMessage("Ovale_AuraAdded")
-		OvaleState:RegisterState(self, self.statePrototype)
+		self_guid = API_UnitGUID("player")
+		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
 
 function OvaleEclipse:OnDisable()
 	if self_class == "DRUID" then
+		self:UnregisterMessage("Ovale_SpecializationChanged")
+	end
+end
+
+function OvaleEclipse:Ovale_SpecializationChanged(event, specialization, previousSpecialization)
+	if specialization == "balance" then
+		self:Update()
+		self:RegisterEvent("ECLIPSE_DIRECTION_CHANGE", "UpdateEclipseDirection")
+		self:RegisterEvent("UNIT_POWER")
+		self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER")
+		self:RegisterMessage("Ovale_StanceChanged", "Update")
+		self:RegisterMessage("Ovale_AuraAdded")
+		OvaleState:RegisterState(self, self.statePrototype)
+	else
 		OvaleState:UnregisterState(self)
 		self:UnregisterEvent("ECLIPSE_DIRECTION_CHANGE")
 		self:UnregisterEvent("UNIT_POWER")
 		self:UnregisterEvent("UNIT_POWER_FREQUENT")
 		self:UnregisterMessage("Ovale_AuraAdded")
-		self:UnregisterMessage("Ovale_SpecializationChanged")
 		self:UnregisterMessage("Ovale_StanceChanged")
 	end
 end
