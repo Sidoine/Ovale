@@ -46,6 +46,7 @@ local self_node = {}
 local self_pool = OvalePool("OvaleCompile_pool")
 local self_timeSpanPool = OvalePool("OvaleCompile_timeSpanPool")
 local self_defines = {}
+local self_sharedCooldownNames = {}
 local self_customFunctions = {}
 local self_missingSpellList = {}
 -- table of functions called within the script: self_functionCalls[functionName] = node
@@ -265,7 +266,7 @@ local function ParseFunction(prefix, func, params)
 		-- is a variant of a spell with the same name as one already in the
 		-- spellbook.  If it is, then add that variant spell ID to our spellList.
 		if OvaleCondition:IsSpellbookCondition(func) then
-			if not OvaleSpellBook:IsKnownSpell(spellId) and not self_missingSpellList[spellId] then
+			if not OvaleSpellBook:IsKnownSpell(spellId) and not self_missingSpellList[spellId] and not self_sharedCooldownNames[spellId] then
 				local spellName
 				if type(spellId) == "number" then
 					spellName = API_GetSpellInfo(spellId)
@@ -374,6 +375,8 @@ local function ParseSpellInfo(params)
 					OvaleData.buffSpellList[v] = {}
 				end
 				OvaleData.buffSpellList[v][spellId] = true
+			elseif k == "sharedcd" then
+				self_sharedCooldownNames[v] = true
 			else
 				si[k] = v
 			end
@@ -769,6 +772,7 @@ local function CompileScript(text)
 	Ovale.bug = false
 
 	wipe(self_defines)
+	wipe(self_sharedCooldownNames)
 	wipe(self_customFunctions)
 	wipe(self_missingSpellList)
 	wipe(self_functionCalls)
