@@ -685,17 +685,6 @@ local function ParseAddIcon(params, text, secure)
 	end
 end
 
-local function ParseCanStopChannelling(text)
-	local spellId = tonumber(text)
-	if spellId then
-		local si = OvaleData:SpellInfo(spellId)
-		si.canStopChannelling = true
-	else
-		Ovale:FormatPrint("CanStopChannelling with unknown spell %s", text)
-	end
-	return ""
-end
-
 local function ParseItemName(text)
 	local itemId = tonumber(text)
 	if itemId then
@@ -747,7 +736,6 @@ local function CompileDeclarations(text)
 	
 	-- Options diverses
 	OvaleData:ResetSpellInfo()
-	text = strgsub(text, "CanStopChannelling%s*%(%s*(%w+)%s*%)", ParseCanStopChannelling)
 	text = strgsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
 	text = strgsub(text, "SpellAddDebuff%s*%((.-)%)", ParseSpellAddDebuff)
 	text = strgsub(text, "SpellAddTargetDebuff%s*%((.-)%)", ParseSpellAddTargetDebuff)
