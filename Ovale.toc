@@ -19,6 +19,7 @@ locales\files.xml
 Ovale.lua
 
 # Utility modules.
+OvaleLexer.lua
 OvalePool.lua
 OvalePoolGC.lua
 OvalePoolRefCount.lua
@@ -43,6 +44,7 @@ OvalePaperDoll.lua
 OvalePower.lua
 OvaleScore.lua
 OvaleScripts.lua
+OvaleSimulationCraft.lua
 OvaleSpellBook.lua
 OvaleStance.lua
 OvaleState.lua

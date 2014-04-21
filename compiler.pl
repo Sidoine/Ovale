@@ -102,10 +102,12 @@ $m{Skada}{get_player} = true;
 $p{Skada}{current} = true;
 $p{Skada}{total} = true;
 
+$sp{Ovale}{OvaleLexer} = true;
 $sp{Ovale}{OvalePool} = true;
 $sp{Ovale}{OvalePoolGC} = true;
 $sp{Ovale}{OvalePoolRefCount} = true;
 $sp{Ovale}{OvaleQueue} = true;
+$sp{Ovale}{OvaleSimulationCraft} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleTimeSpan} = true;
 
