@@ -50,18 +50,27 @@ local STEADY_FOCUS = 53220
 -- Steady Shot spell Id.
 local STEADY_SHOT = 56641
 -- Spell IDs of abilities that clear "pre-Steady Focus".
-local RANGED_ATTACKS_MM = {
+local RANGED_ATTACKS_DAMAGING = {
 	[  1978] = "Serpent Sting",
 	[  2643] = "Multi-Shot",
 	[  3044] = "Arcane Shot",
-	[ 13813] = "Explosive Trap",
 	[ 19434] = "Aimed Shot",
 	[ 19503] = "Scatter Shot",
-	[ 34490] = "Silencing Shot",
 	[ 53209] = "Chimera Shot",
 	[ 53351] = "Kill Shot",
 	[109259] = "Powershot",
 	[117050] = "Glaive Toss",
+	[120360] = "Barrage",
+	[120361] = "Barrage",
+	[120761] = "Glaive Toss",
+	[121414] = "Glaive Toss",
+}
+local RANGED_ATTACKS_ON_CAST = {
+	[ 19801] = "Tranquilizing Shot",
+	[ 34490] = "Silencing Shot",
+}
+local RANGED_ATTACKS_BY_DEBUFF = {
+	[118253] = "Serpent Sting",
 }
 --</private-static-properties>
 
@@ -104,23 +113,35 @@ end
 
 function OvaleSteadyFocus:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
-	if sourceGUID == self_guid and cleuEvent == "SPELL_DAMAGE" then
-		local spellId = arg12
-		if spellId == STEADY_SHOT and self.stacks == 0 then			
-			local now = API_GetTime()
-			if now - self.ending > 1 then
-				self:GainedAura(now)
+	if sourceGUID == self_guid then
+		if cleuEvent == "SPELL_DAMAGE" then
+			local spellId = arg12
+			if spellId == STEADY_SHOT and self.stacks == 0 then
+				local now = API_GetTime()
+				if now - self.ending > 1 then
+					self:GainedAura(now)
+				end
+			elseif RANGED_ATTACKS_DAMAGING[spellId] and self.stacks > 0 then
+				local now = API_GetTime()
+				self:LostAura(now)
 			end
-		elseif RANGED_ATTACKS_MM[spellId] and self.stacks > 0 then
-			local now = API_GetTime()
-			self:LostAura(now)
+		elseif cleuEvent == "SPELL_CAST_SUCCESS" then
+			local spellId = arg12
+			if RANGED_ATTACKS_ON_CAST[spellId] and self.stacks > 0 then
+				local now = API_GetTime()
+				self:LostAura(now)
+			end
 		end
 	end
 end
 
 function OvaleSteadyFocus:Ovale_AuraAdded(event, timestamp, target, auraId, caster)
-	if target == self_guid and auraId == STEADY_FOCUS and self.stacks > 0 then
-		self:LostAura(timestamp)
+	if self.stacks > 0 then
+		if auraId == STEADY_FOCUS and target == self_guid then
+			self:LostAura(timestamp)
+		elseif RANGED_ATTACKS_BY_DEBUFF[auraId] and caster == self_guid then
+			self:LostAura(timestamp)
+		end
 	end
 end
 
