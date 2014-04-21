@@ -103,10 +103,10 @@ end
 
 function OvaleBanditsGuile:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
-	if sourceGUID == self_guid and event == "SPELL_DAMAGE" and self.stacks < 4 then
+	if sourceGUID == self_guid and cleuEvent == "SPELL_DAMAGE" and self.stacks < 4 then
 		local spellId = arg12
 		if spellId == REVEALING_STRIKE or spellID == SINISTER_STRIKE then
-			now = API_GetTime()
+			local now = API_GetTime()
 			self.start = now
 			self.ending = now + INSIGHT_DURATION
 			self.stacks = self.stacks + 1
