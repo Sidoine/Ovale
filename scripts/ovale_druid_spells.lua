@@ -5,6 +5,9 @@ do
 	local name = "ovale_druid_spells"
 	local desc = "[5.4.7] Ovale: Druid spells"
 	local code = [[
+# Druid spells and functions.
+#	Last updated: 2014-04-24
+
 Define(barkskin 22812)
 	SpellInfo(barkskin cd=60)
 	SpellInfo(barkskin addcd=-15 if_spell=malfurions_gift)
@@ -51,14 +54,11 @@ Define(feral_fury_buff 48848)
 Define(feral_rage_buff 146874)
 	SpellInfo(feral_rage_buff duration=20)
 Define(ferocious_bite 22568)
-	SpellInfo(ferocious_bite combo=finisher energy=25)
+	SpellInfo(ferocious_bite combo=finisher energy=25 physical=1)
 	SpellInfo(ferocious_bite buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(ferocious_bite buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
+	SpellInfo(ferocious_bite damage=FeralFerociousBiteDamage mastery=feral)
 	SpellAddBuff(ferocious_bite omen_of_clarity_buff=0 if_spell=omen_of_clarity)
-	# Ferocious Bite does ((316 to 658) + 762 * CP + 0.196 * AP * CP) damage (from Wowhead).
-	# Average the base damage to (316 + 658) / 2 = 487.
-	SpellInfo(ferocious_bite base=487 bonuscp=762 bonusapcp=0.196)
-	SpellDamageBuff(ferocious_bite dream_of_cenarius_melee_buff=1.3)
 Define(force_of_nature_caster 33831)
 	SpellInfo(force_of_nature_caster gcd=0)
 Define(force_of_nature_melee 102703)
@@ -85,16 +85,17 @@ Define(king_of_the_jungle_buff 102543)
 	SpellInfo(king_of_the_jungle_buff duration=30)
 Define(lunar_eclipse_buff 48518)
 Define(maim 22570)
-	SpellInfo(maim cd=10 combo=finisher energy=35)
+	SpellInfo(maim cd=10 combo=finisher energy=35 physical=1)
 	SpellInfo(maim buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(maim buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
 	SpellAddBuff(maim omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 Define(malfurions_gift 92364)
 Define(mangle_cat 33876)
-	SpellInfo(mangle_cat combo=1 energy=35)
+	SpellInfo(mangle_cat combo=1 energy=35 physical=1)
 	SpellInfo(mangle_cat critcombo=1 if_spell=primal_fury)
 	SpellInfo(mangle_cat buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(mangle_cat buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
+	SpellInfo(mangle_cat damage=FeralMangleCatDamage mastery=feral)
 	SpellAddBuff(mangle_cat omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 Define(mark_of_the_wild 1126)
 Define(might_of_ursoc 106922)
@@ -124,7 +125,7 @@ Define(predatory_swiftness_buff 69369)
 	SpellInfo(predatory_swiftness_buff duration=8)
 Define(prowl 5215)
 Define(rake 1822)
-	SpellInfo(rake combo=1 energy=35)
+	SpellInfo(rake combo=1 energy=35 physical=1)
 	SpellInfo(rake critcombo=1 if_spell=primal_fury)
 	SpellInfo(rake buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(rake buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
@@ -132,14 +133,15 @@ Define(rake 1822)
 	SpellAddTargetDebuff(rake rake_debuff=1)
 Define(rake_debuff 1822)
 	SpellInfo(rake_debuff duration=15 tick=3)
-	# Damage(rake_debuff) = (99 + 0.3 * AP) damage per tick (from Catus).
-	SpellInfo(rake_debuff base=99 bonusap=0.3)
+	SpellInfo(rake_debuff damage=FeralRakeTickDamage mastery=feral)
+	SpellInfo(rake_debuff lastEstimatedDamage=FeralRakeTickLastDamage mastery=feral)
 	SpellDamageBuff(rake_debuff dream_of_cenarius_melee_buff=1.3)
 Define(ravage 6785)
-	SpellInfo(ravage combo=1 energy=45)
+	SpellInfo(ravage combo=1 energy=45 physical=1)
 	SpellInfo(ravage critcombo=1 if_spell=primal_fury)
 	SpellInfo(ravage buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(ravage buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
+	SpellInfo(ravage damage=FeralRavageDamage mastery=feral)
 	SpellAddBuff(ravage omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 Define(renewal 108238)
 	SpellInfo(renewal cd=120)
@@ -153,9 +155,9 @@ Define(rip 1079)
 Define(rip_debuff 1079)
 	SpellInfo(rip_debuff duration=16 resetcounter=ripshreds tick=2)
 	SpellInfo(rip_debuff addduration=4 itemset=T14_melee itemcount=4)
-	# Rip does (113 + 320 * CP + 0.0484 * AP * CP * 8) damage over 16 seconds (from Wowhead).
-	# Damage(rip_debuff) = (14.125 + 40 * CP + 0.0484 * AP * CP) damage per tick.
 	SpellInfo(rip_debuff base=14.125 bonuscp=40 bonusapcp=0.0484)
+	SpellInfo(rip_debuff damage=FeralRipTickDamage mastery=feral)
+	SpellInfo(rip_debuff lastEstimatedDamage=FeralRipTickLastDamage mastery=feral)
 	SpellDamageBuff(rip_debuff dream_of_cenarius_damage_buff=1.3)
 Define(rune_of_reorigination_buff 139120)
 	SpellInfo(rune_of_reorigination_buff duration=10)
@@ -175,10 +177,11 @@ Define(savage_roar_glyphed 127538)
 	SpellAddBuff(savage_roar_glyphed omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 SpellList(savage_roar_buff savage_roar savage_roar_glyphed)
 Define(shred 5221)
-	SpellInfo(shred combo=1 energy=40)
+	SpellInfo(shred combo=1 energy=40 physical=1)
 	SpellInfo(shred critcombo=1 if_spell=primal_fury)
 	SpellInfo(shred buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(shred buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
+	SpellInfo(shred damage=FeralShredDamage mastery=feral)
 	SpellAddBuff(shred omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 Define(shooting_stars_buff 93400)
 	SpellInfo(shooting_stars_buff duration=12)
@@ -208,20 +211,22 @@ Define(survival_instincts 61336)
 	SpellInfo(survival_instincts addcd=-60 glyph=glyph_of_survival_instincts)
 	SpellAddBuff(survival_instincts survival_instincts=1)
 Define(swipe_cat 62078)
-	SpellInfo(swipe_cat combo=1 energy=45)
+	SpellInfo(swipe_cat combo=1 energy=45 physical=1)
 	SpellInfo(swipe_cat buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(swipe_cat buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
+	SpellInfo(swipe_cat damage=FeralSwipeCatDamage mastery=feral)
 	SpellAddBuff(swipe_cat omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 Define(symbiosis_mirror_image 110621)
 	SpellInfo(symbiosis_mirror_image cd=180)
 Define(thrash_cat 106830)
-	SpellInfo(thrash_cat energy=50)
+	SpellInfo(thrash_cat energy=50 physical=1)
 	SpellInfo(thrash_cat buff_energy_half=berserk_cat_buff if_stance=druid_cat_form)
 	SpellInfo(thrash_cat buff_energy_none=omen_of_clarity_buff if_spell=omen_of_clarity)
+	SpellInfo(thrash_cat damage=FeralThrashCatDamage mastery=feral)
 	SpellAddBuff(thrash_cat omen_of_clarity_buff=0 if_spell=omen_of_clarity)
 	SpellAddTargetDebuff(thrash_cat thrash_cat_debuff=1)
 Define(thrash_cat_debuff 106830)
-	SpellInfo(thrash_cat_debuff duration=15 tick=3)
+	SpellInfo(thrash_cat_debuff duration=15 tick=3 physical=1)
 Define(tigers_fury 5217)
 	SpellInfo(tigers_fury cd=30 energy=-60)
 	SpellAddBuff(tigers_fury tigers_fury_buff=1)
@@ -288,6 +293,68 @@ AddFunction FeralInterrupt
 			if ComboPoints() > 0 and target.InRange(maim) Spell(maim)
 		}
 	}
+}
+
+AddFunction FeralMasteryDamageMultiplier asValue=1 { 1 + MasteryEffect() / 100 }
+
+### Ferocious Bite.
+AddFunction FeralFerociousBiteDamage asValue=1
+{
+	# The "2" at the end is from assuming that FB is always cast at 50 energy, with the extra 25 energy
+	# increasing damage by 100%.
+	{ 500 + { 762 + 0.196 * AttackPower() } * ComboPoints() } * target.DamageMultiplier(ferocious_bite) * 2
+}
+
+### Mangle (cat).
+AddFunction FeralMangleCatDamage asValue=1
+{
+	{ 78 + WeaponDamage() } * 5 * target.DamageMultiplier(mangle_cat)
+}
+
+### Rake.
+AddFunction FeralRakeTickDamage asValue=1
+{
+	{ 99 + 0.3 * AttackPower() } * target.DamageMultiplier(rake_debuff) * FeralMasteryDamageMultiplier()
+}
+AddFunction FeralRakeTickLastDamage asValue=1
+{
+	{ 99 + 0.3 * target.DebuffAttackPower(rake_debuff) } * target.DebuffDamageMultiplier(rake_debuff) * { 1 + target.DebuffMasteryEffect(rake_debuff) / 100 }
+}
+
+### Ravage
+AddFunction FeralRavageDamage asValue=1
+{
+	{ 78 + WeaponDamage() } * 9.5 * target.DamageMultiplier(ravage)
+}
+
+### Rip.
+AddFunction FeralRipTickDamage asValue=1
+{
+	{ 136 + { { 384 + 0.05808 * AttackPower() } * ComboPoints() } } * target.DamageMultiplier(rip_debuff) * FeralMasteryDamageMultiplier()
+}
+AddFunction FeralRipTickLastDamage asValue=1
+{
+	{ 136 + { { 384 + 0.05808 * target.DebuffAttackPower(rip_debuff) } * target.DebuffComboPoints(rip_debuff) } } * target.DebuffDamageMultiplier(rip_debuff) * { 1 + target.DebuffMasteryEffect(rip_debuff) / 100 }
+}
+
+### Shred.
+AddFunction FeralShredDamage asValue=1
+{
+	# The "1.2" at the end is from assuming that Shred is only cast against bleeding targets.
+	FeralMangleCatDamage() * 1.2
+}
+
+### Swipe (cat)
+AddFunction FeralSwipeCatDamage asValue=1
+{
+	# The "1.2" at the end is from assuming that Swipe is only cast against bleeding targets (usually with Thrash debuff)
+	WeaponDamage() * 1.4 * target.DamageMultiplier(swipe_cat) * 1.2
+}
+
+### Thrash (cat)
+AddFunction FeralThrashCatHitDamage asValue=1
+{
+	{ 1232 + 0.191 * AttackPower() } * target.DamageMultiplier(thrash_cat) * FeralMasteryDamageMultiplier()
 }
 ]]
 

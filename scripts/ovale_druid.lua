@@ -6,7 +6,7 @@ do
 	local desc = "[5.4] Ovale: Balance, Feral"
 	local code = [[
 # Ovale druid script based on SimulationCraft.
-#	Last updated: 2014-04-18
+#	Last updated: 2014-04-24
 
 Include(ovale_items)
 Include(ovale_racials)
@@ -222,7 +222,7 @@ AddFunction FeralFillerActions
 	#ravage
 	Spell(ravage usable=1)
 	#rake,if=target.time_to_die-dot.rake.remains>3&action.rake.tick_damage*(dot.rake.ticks_remain+1)-dot.rake.tick_dmg*dot.rake.ticks_remain>action.mangle_cat.hit_damage
-	if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and Damage(rake_debuff) * { target.TicksRemain(rake_debuff) + 1 } - target.LastEstimatedDamage(rake_debuff) * target.TicksRemain(rake_debuff) > Damage(mangle_cat) Spell(rake)
+	if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and target.Damage(rake_debuff) * { target.TicksRemain(rake_debuff) + 1 } - target.LastEstimatedDamage(rake_debuff) * target.TicksRemain(rake_debuff) > target.Damage(mangle_cat) Spell(rake)
 	#shred,if=(buff.omen_of_clarity.react|buff.berserk.up|energy.regen>=15)&buff.king_of_the_jungle.down
 	if { BuffPresent(omen_of_clarity_buff) or BuffPresent(berserk_cat_buff) or EnergyRegen() >= 15 } and BuffExpires(king_of_the_jungle_buff) Spell(shred)
 	#mangle_cat,if=buff.king_of_the_jungle.down
@@ -245,7 +245,7 @@ AddFunction FeralBasicActions
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
 	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
 	#rip,if=combo_points>=5&target.health.pct<=25&action.rip.tick_damage%dot.rip.tick_dmg>=1.15
-	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 Spell(rip)
+	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 Spell(rip)
 	#ferocious_bite,if=combo_points>=5&target.health.pct<=25&dot.rip.ticking
 	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.DebuffPresent(rip_debuff) Spell(ferocious_bite)
 	#rip,if=combo_points>=5&dot.rip.remains<2
@@ -253,7 +253,7 @@ AddFunction FeralBasicActions
 	#thrash_cat,if=buff.omen_of_clarity.react&dot.thrash_cat.remains<3
 	if BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 Spell(thrash_cat)
 	#rake,cycle_targets=1,if=dot.rake.remains<3|action.rake.tick_damage>dot.rake.tick_dmg
-	if target.DebuffRemains(rake_debuff) < 3 or Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) Spell(rake)
+	if target.DebuffRemains(rake_debuff) < 3 or target.Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) Spell(rake)
 	#pool_resource,for_next=1
 	#thrash_cat,if=dot.thrash_cat.remains<3&(dot.rip.remains>=8&buff.savage_roar.remains>=12|buff.berserk.up|combo_points>=5)
 	if Energy() >= EnergyCost(thrash_cat) and target.DebuffRemains(thrash_cat_debuff) < 3 and { target.DebuffRemains(rip_debuff) >= 8 and BuffRemains(savage_roar_buff) >= 12 or BuffPresent(berserk_cat_buff) or ComboPoints() >= 5 } wait Spell(thrash_cat)
@@ -295,7 +295,7 @@ AddFunction FeralBasicPredictiveActions
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
 	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
 	#rip,if=combo_points>=5&target.health.pct<=25&action.rip.tick_damage%dot.rip.tick_dmg>=1.15
-	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 Spell(rip)
+	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 Spell(rip)
 	#ferocious_bite,if=combo_points>=5&target.health.pct<=25&dot.rip.ticking
 	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.DebuffPresent(rip_debuff) Spell(ferocious_bite)
 	#rip,if=combo_points>=5&dot.rip.remains<2
@@ -303,7 +303,7 @@ AddFunction FeralBasicPredictiveActions
 	#thrash_cat,if=buff.omen_of_clarity.react&dot.thrash_cat.remains<3
 	if BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 Spell(thrash_cat)
 	#rake,cycle_targets=1,if=dot.rake.remains<3|action.rake.tick_damage>dot.rake.tick_dmg
-	if target.DebuffRemains(rake_debuff) < 3 or Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) Spell(rake)
+	if target.DebuffRemains(rake_debuff) < 3 or target.Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) Spell(rake)
 	#pool_resource,for_next=1
 	#thrash_cat,if=dot.thrash_cat.remains<3&(dot.rip.remains>=8&buff.savage_roar.remains>=12|buff.berserk.up|combo_points>=5)
 	if Energy() >= EnergyCost(thrash_cat) and target.DebuffRemains(thrash_cat_debuff) < 3 and { target.DebuffRemains(rip_debuff) >= 8 and BuffRemains(savage_roar_buff) >= 12 or BuffPresent(berserk_cat_buff) or ComboPoints() >= 5 } wait Spell(thrash_cat)
@@ -424,9 +424,9 @@ AddFunction FeralAdvancedActions
 	#savage_roar,if=buff.savage_roar.remains<=3&combo_points>0&target.health.pct<25
 	if BuffRemains(savage_roar_buff) <= 3 and ComboPoints() > 0 and target.HealthPercent() < 25 SavageRoar()
 	#rip,if=combo_points>=5&action.rip.tick_damage%dot.rip.tick_dmg>=1.15&target.time_to_die>30
-	if ComboPoints() >= 5 and Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 and target.TimeToDie() > 30 Spell(rip)
+	if ComboPoints() >= 5 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 and target.TimeToDie() > 30 Spell(rip)
 	#rip,if=combo_points>=4&action.rip.tick_damage%dot.rip.tick_dmg>=0.95&target.time_to_die>30&buff.rune_of_reorigination.up&buff.rune_of_reorigination.remains<=1.5
-	if ComboPoints() >= 4 and Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 0.95 and target.TimeToDie() > 30 and BuffPresent(rune_of_reorigination_buff) and BuffRemains(rune_of_reorigination_buff) <= 1.5 Spell(rip)
+	if ComboPoints() >= 4 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 0.95 and target.TimeToDie() > 30 and BuffPresent(rune_of_reorigination_buff) and BuffRemains(rune_of_reorigination_buff) <= 1.5 Spell(rip)
 	#pool_resource,if=combo_points>=5&target.health.pct<=25&dot.rip.ticking&!(energy>=50|(buff.berserk.up&energy>=25))
 	unless ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.DebuffPresent(rip_debuff) and not { Energy() >= 50 or { BuffPresent(berserk_cat_buff) and Energy() >= 25 } }
 	{
@@ -443,7 +443,7 @@ AddFunction FeralAdvancedActions
 		#rake,if=buff.rune_of_reorigination.up&dot.rake.remains<9&buff.rune_of_reorigination.remains<=1.5
 		if BuffPresent(rune_of_reorigination_buff) and target.DebuffRemains(rake_debuff) < 9 and BuffRemains(rune_of_reorigination_buff) <= 1.5 Spell(rake)
 		#rake,cycle_targets=1,if=target.time_to_die-dot.rake.remains>3&(action.rake.tick_damage>dot.rake.tick_dmg|(dot.rake.remains<3&action.rake.tick_damage%dot.rake.tick_dmg>=0.75))
-		if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and { Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) or { target.DebuffRemains(rake_debuff) < 3 and Damage(rake_debuff) / target.LastEstimatedDamage(rake_debuff) >= 0.75 } } Spell(rake)
+		if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and { target.Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) or { target.DebuffRemains(rake_debuff) < 3 and target.Damage(rake_debuff) / target.LastEstimatedDamage(rake_debuff) >= 0.75 } } Spell(rake)
 		#pool_resource,for_next=1
 		#thrash_cat,if=target.time_to_die>=6&dot.thrash_cat.remains<3&(dot.rip.remains>=8&buff.savage_roar.remains>=12|buff.berserk.up|combo_points>=5)&dot.rip.ticking
 		if Energy() >= EnergyCost(thrash_cat) and target.TimeToDie() >= 6 and target.DebuffRemains(thrash_cat_debuff) < 3 and { target.DebuffRemains(rip_debuff) >= 8 and BuffRemains(savage_roar_buff) >= 12 or BuffPresent(berserk_cat_buff) or ComboPoints() >= 5 } and target.DebuffPresent(rip_debuff) wait Spell(thrash_cat)
@@ -497,9 +497,9 @@ AddFunction FeralAdvancedPredictiveActions
 	#savage_roar,if=buff.savage_roar.remains<=3&combo_points>0&target.health.pct<25
 	if BuffRemains(savage_roar_buff) <= 3 and ComboPoints() > 0 and target.HealthPercent() < 25 SavageRoar()
 	#rip,if=combo_points>=5&action.rip.tick_damage%dot.rip.tick_dmg>=1.15&target.time_to_die>30
-	if ComboPoints() >= 5 and Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 and target.TimeToDie() > 30 Spell(rip)
+	if ComboPoints() >= 5 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 and target.TimeToDie() > 30 Spell(rip)
 	#rip,if=combo_points>=4&action.rip.tick_damage%dot.rip.tick_dmg>=0.95&target.time_to_die>30&buff.rune_of_reorigination.up&buff.rune_of_reorigination.remains<=1.5
-	if ComboPoints() >= 4 and Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 0.95 and target.TimeToDie() > 30 and BuffPresent(rune_of_reorigination_buff) and BuffRemains(rune_of_reorigination_buff) <= 1.5 Spell(rip)
+	if ComboPoints() >= 4 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 0.95 and target.TimeToDie() > 30 and BuffPresent(rune_of_reorigination_buff) and BuffRemains(rune_of_reorigination_buff) <= 1.5 Spell(rip)
 	#pool_resource,if=combo_points>=5&target.health.pct<=25&dot.rip.ticking&!(energy>=50|(buff.berserk.up&energy>=25))
 	unless ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.DebuffPresent(rip_debuff) and not { Energy() >= 50 or { BuffPresent(berserk_cat_buff) and Energy() >= 25 } }
 	{
@@ -516,7 +516,7 @@ AddFunction FeralAdvancedPredictiveActions
 		#rake,if=buff.rune_of_reorigination.up&dot.rake.remains<9&buff.rune_of_reorigination.remains<=1.5
 		if BuffPresent(rune_of_reorigination_buff) and target.DebuffRemains(rake_debuff) < 9 and BuffRemains(rune_of_reorigination_buff) <= 1.5 Spell(rake)
 		#rake,cycle_targets=1,if=target.time_to_die-dot.rake.remains>3&(action.rake.tick_damage>dot.rake.tick_dmg|(dot.rake.remains<3&action.rake.tick_damage%dot.rake.tick_dmg>=0.75))
-		if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and { Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) or { target.DebuffRemains(rake_debuff) < 3 and Damage(rake_debuff) / target.LastEstimatedDamage(rake_debuff) >= 0.75 } } Spell(rake)
+		if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and { target.Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) or { target.DebuffRemains(rake_debuff) < 3 and target.Damage(rake_debuff) / target.LastEstimatedDamage(rake_debuff) >= 0.75 } } Spell(rake)
 		#pool_resource,for_next=1
 		#thrash_cat,if=target.time_to_die>=6&dot.thrash_cat.remains<3&(dot.rip.remains>=8&buff.savage_roar.remains>=12|buff.berserk.up|combo_points>=5)&dot.rip.ticking
 		if Energy() >= EnergyCost(thrash_cat) and target.TimeToDie() >= 6 and target.DebuffRemains(thrash_cat_debuff) < 3 and { target.DebuffRemains(rip_debuff) >= 8 and BuffRemains(savage_roar_buff) >= 12 or BuffPresent(berserk_cat_buff) or ComboPoints() >= 5 } and target.DebuffPresent(rip_debuff) wait Spell(thrash_cat)
