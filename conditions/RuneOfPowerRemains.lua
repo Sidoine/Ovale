@@ -35,7 +35,7 @@ do
 	local function RuneOfPowerRemains(condition)
 		local comparator, limit = condition[1], condition[2]
 		local aura = state:GetAura("player", RUNE_OF_POWER_BUFF, "HELPFUL")
-		if aura then
+		if state:IsActiveAura(aura) then
 			local start, ending
 			for totemSlot = 1, 2 do
 				local haveTotem, name, startTime, duration = API_GetTotemInfo(totemSlot)
@@ -45,7 +45,7 @@ do
 				end
 			end
 			if start then
-				return TestValue(start, ending, ending - start, start, -1, comparator, limit)
+				return TestValue(0, math.huge, ending - start, start, -1, comparator, limit)
 			end
 		end
 		return Compare(0, comparator, limit)

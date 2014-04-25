@@ -42,10 +42,10 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if aura then
+		if state:IsActiveAura(aura) then
 			local start, ending, tick = aura.start, aura.ending, aura.tick
 			if tick and tick > 0 then
-				return TestValue(start, ending, 1, ending, -1/tick, comparator, limit)
+				return TestValue(0, math.huge, 1, ending, -1/tick, comparator, limit)
 			end
 		end
 		return Compare(0, comparator, limit)

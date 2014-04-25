@@ -54,10 +54,10 @@ do
 			statName = "value3"
 		end
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if aura then
+		if state:IsActiveAura(aura) then
 			local start, ending = aura.start, aura.ending
 			local value = aura[statName] or 0
-			return TestValue(start, ending, value, start, 0, comparator, limit)
+			return TestValue(0, math.huge, value, start, 0, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
