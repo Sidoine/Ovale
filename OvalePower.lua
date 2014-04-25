@@ -75,6 +75,7 @@ OvalePower.SECONDARY_POWER = {
 	focus = true,
 	holy = true,
 	rage = true,
+	runicpower = true,
 	shadoworbs = true,
 	shards = true,
 }
