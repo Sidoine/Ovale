@@ -222,11 +222,17 @@ function OvaleTimeSpan:IntersectInterval(startB, endB, result)
 			break
 		elseif compare == -1 then
 			-- Overlap; A comes before B, output, advance A.
-			result[k], result[k+1] = startB, endA
-			i, k = i + 2, k + 2
+			if endA > startB then
+				result[k], result[k+1] = startB, endA
+				i, k = i + 2, k + 2
+			else
+				i = i + 2
+			end
 		elseif compare == 1 then
 			-- Overlap; B comes before A, output, exit.
-			result[k], result[k+1] = startA, endB
+			if endB > startA then
+				result[k], result[k+1] = startA, endB
+			end
 			break
 		elseif compare == -2 then
 			-- A contains B; output, exist.
@@ -281,13 +287,21 @@ function OvaleTimeSpan:Intersect(B, result)
 			--debugprint("         ADV(B)")
 		elseif compare == -1 then
 			-- Overlap; A comes before B, output, advance A.
-			result[k], result[k+1] = startB, endA
-			i, k = i + 2, k + 2
+			if endA > startB then
+				result[k], result[k+1] = startB, endA
+				i, k = i + 2, k + 2
+			else
+				i = i + 2
+			end
 			--debugprint("         ADV(A)")
 		elseif compare == 1 then
 			-- Overlap; B comes before A, output, advance B.
-			result[k], result[k+1] = startA, endB
-			j, k = j + 2, k + 2
+			if endB > startA then
+				result[k], result[k+1] = startA, endB
+				j, k = j + 2, k + 2
+			else
+				j = j + 2
+			end
 			--debugprint("         ADV(B)")
 		elseif compare == -2 then
 			-- A contains B; output, advance B.
@@ -727,6 +741,34 @@ do
 		local A            = OvaleTimeSpan(1, 3, 4, 6)
 		local startB, endB = 2, 5
 		local expected     = OvaleTimeSpan(2, 3, 4, 5)
+
+		local result = A:IntersectInterval(startB, endB)
+		if not result:Equals(expected) then
+			print(string.format("  result: %s", tostring(result)))
+			print(string.format("expected: %s", tostring(expected)))
+			return false
+		end
+		return true
+	end
+
+	testFunction[#testFunction + 1] = function()
+		local A        = OvaleTimeSpan(1, 3, 4, 6)
+		local B        = OvaleTimeSpan(3, math.huge)
+		local expected = OvaleTimeSpan(4, 6)
+
+		local result = A:Intersect(B)
+		if not result:Equals(expected) then
+			print(string.format("  result: %s", tostring(result)))
+			print(string.format("expected: %s", tostring(expected)))
+			return false
+		end
+		return true
+	end
+
+	testFunction[#testFunction + 1] = function()
+		local A            = OvaleTimeSpan(1, 3, 4, 6)
+		local startB, endB = 3, math.huge
+		local expected     = OvaleTimeSpan(4, 6)
 
 		local result = A:IntersectInterval(startB, endB)
 		if not result:Equals(expected) then
