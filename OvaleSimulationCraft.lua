@@ -736,7 +736,11 @@ do
 		["^crit_damage$"] = function(simc, actionName) return format("CritDamage(%s)", actionName) end,
 		-- TODO: Melee/Ranged/Spell crit chance depending on type of attack, or at least class of player.
 		["^crit_pct_current$"] = function(simc, actionName) return format("SpellCritChance(%s)", actionName) end,
-		["^crit_tick_damage$"] = function(simc, actionName) return format("CritDamage(%s)", actionName) end,
+		["^crit_tick_damage$"] = function(simc, actionName)
+				local symbol = format("%s_debuff", actionName)
+				tinsert(simc.symbols, symbol)
+				return format("CritDamage(%s)", symbol)
+			end,
 		["^duration$"] = function(simc, actionName)
 				local symbol = format("%s_debuff", actionName)
 				tinsert(simc.symbols, symbol)
@@ -775,7 +779,12 @@ do
 				tinsert(simc.symbols, symbol)
 				return format("target.DebuffSpellpower(%s)", symbol)
 			end,
-		["^tick_damage$"] = function(simc, actionName) return format("Damage(%s)", actionName) end,
+		-- TODO: Buff?
+		["^tick_damage$"] = function(simc, actionName)
+				local symbol = format("%s_debuff", actionName)
+				tinsert(simc.symbols, symbol)
+				return format("Damage(%s)", symbol)
+			end,
 		["^tick_multiplier$"] = function(simc, actionName) return format("target.DamageMultiplier(%s)", actionName) end,
 		-- TODO: Buff?
 		["^tick_time$"] = function(simc, actionName)
