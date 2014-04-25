@@ -465,8 +465,6 @@ AddFunction WindwalkerPrecombatActions
 	#stance,choose=fierce_tiger
 	if not Stance(monk_stance_of_the_fierce_tiger) Spell(stance_of_the_fierce_tiger)
 	#snapshot_stats
-	#virmens_bite_potion
-	UsePotionAgility()
 }
 
 AddFunction WindwalkerPrecombatCdActions
