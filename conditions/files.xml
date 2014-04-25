@@ -76,6 +76,7 @@
 	<Script file="RelativeLevel.lua" />
 	<Script file="RemainingCastTime.lua" />
 	<Script file="RuneCount.lua" />
+	<Script file="RuneOfPowerRemains.lua" />
 	<Script file="Runes.lua" />
 	<Script file="Snapshot.lua" />
 	<Script file="Speed.lua" />

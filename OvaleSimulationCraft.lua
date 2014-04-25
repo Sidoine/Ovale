@@ -335,7 +335,6 @@ do
 				tinsert(simc.symbols, "molten_armor_buff")
 				return "if BuffExpires(molten_armor_buff) Spell(molten_armor)"
 			end,
-		["^rune_of_power$"] = false, -- XXX
 		["^water_elemental$"] = "if pet.Present(no) Spell(water_elemental)",
 		-- Monk
 		["^chi_sphere$"] = false,
@@ -641,6 +640,7 @@ do
 				tinsert(simc.symbols, "arcane_charge_debuff")
 				return "DebuffStacks(arcane_charge_debuff)"
 			end,
+		["^buff%.rune_of_power%.remains$"] = "RuneOfPowerRemains()",
 		-- Monk
 		["^dot%.zen_sphere%.ticking$"] = function(simc, action)
 				tinsert(simc.symbols, "zen_sphere_buff")
