@@ -480,7 +480,7 @@ do
 					if needAnd then
 						tinsert(scriptLine, "and")
 					end
-					tinsert(scriptLine, "pet.BuffStacks(pet_frenzy_buff any=1) == 5")
+					tinsert(scriptLine, "BuffStacks(frenzy_buff any=1) == 5")
 					needAnd = true
 				end
 				if action == "stance" and scriptLine.choose then
