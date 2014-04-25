@@ -15,6 +15,7 @@ do
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
+	local ComputeParameter = OvaleCondition.ComputeParameter
 	local state = OvaleState.state
 
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
@@ -45,9 +46,13 @@ do
 
 	local function CritDamage(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local value = ComputeParameter(spellId, "damage", state)
+		if not value then
+			value = GetDamage(spellId)
+		end
 		-- TODO: Need to account for increased crit effect from meta-gems.
 		local critFactor = 2
-		local value = critFactor * GetDamage(spellId)
+		local value = critFactor * value
 		return Compare(value, comparator, limit)
 	end
 
@@ -75,7 +80,10 @@ do
 
 	local function Damage(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local value = GetDamage(spellId)
+		local value = ComputeParameter(spellId, "damage", state)
+		if not value then
+			value = GetDamage(spellId)
+		end
 		return Compare(value, comparator, limit)
 	end
 

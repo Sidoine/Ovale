@@ -92,6 +92,7 @@ local OVALE_FUNCTIONS = {
 --<public-static-properties>
 --master nodes of the current script (one node for each icon)
 OvaleCompile.masterNodes = {}
+OvaleCompile.customFunctionNode = {}
 --</public-static-properties>
 
 --<private-static-methods>
@@ -755,6 +756,7 @@ local function CompileDeclarations(text)
 end
 
 local function CompileScript(text)
+	local self = OvaleCompile
 	self_compileOnItems = false
 	self_compileOnStances = false
 	Ovale.bug = false
@@ -764,6 +766,7 @@ local function CompileScript(text)
 	wipe(self_customFunctions)
 	wipe(self_missingSpellList)
 	wipe(self_functionCalls)
+	wipe(self.customFunctionNode)
 
 	-- Return all existing nodes to the node pool.
 	for i, node in pairs(self_node) do
@@ -792,6 +795,8 @@ local function CompileScript(text)
 		local node = ParseAddFunction(name, p, t)
 		if node then
 			self_customFunctions[name] = node
+			local nodeId = strmatch(node, "node(%d+)")
+			self.customFunctionNode[name] = self_node[tonumber(nodeId)]
 		end
 	end
 	
