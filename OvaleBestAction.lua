@@ -748,7 +748,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 					return nil
 				end
 			end
-			for _, powerType in pairs(OvalePower.SECONDARY_POWER) do
+			for powerType in pairs(OvalePower.SECONDARY_POWER) do
 				if si[powerType] then
 					-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
 					local cost = state:PowerCost(spellId, powerType)

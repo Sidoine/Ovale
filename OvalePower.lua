@@ -68,15 +68,27 @@ OvalePower.POWER_INFO =
 	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS_POWER", mini = 0 },
 }
 OvalePower.SECONDARY_POWER = {
-	"burningembers",
-	"chi",
-	"demonicfury",
-	"focus",
-	"holy",
-	"rage",
-	"shadoworbs",
-	"shards",
+	alternate = true,
+	burningembers = true,
+	chi = true,
+	demonicfury = true,
+	focus = true,
+	holy = true,
+	rage = true,
+	shadoworbs = true,
+	shards = true,
 }
+OvalePower.PRIMARY_POWER = {}
+do
+	for powerType in pairs(OvalePower.POWER_INFO) do
+		if not OvalePower.SECONDARY_POWER[powerType] then
+			-- Eclipse has special semantics; it's not a cost/generated resource.
+			if powerType ~= "eclipse" then
+				OvalePower.PRIMARY_POWER[powerType] = true
+			end
+		end
+	end
+end
 OvalePower.POWER_TYPE = {}
 do
 	for powerType, v in pairs(OvalePower.POWER_INFO) do
