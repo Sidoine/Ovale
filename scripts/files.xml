@@ -12,4 +12,6 @@
 	<Script file="ovale_paladin_spells.lua" />
 	<Script file="ovale_shaman.lua" />
 	<Script file="ovale_shaman_spells.lua" />
+
+	<Script file="leafkiller_druid.lua" />
 </Ui>
