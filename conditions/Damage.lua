@@ -16,6 +16,7 @@ do
 
 	local Compare = OvaleCondition.Compare
 	local ComputeParameter = OvaleCondition.ComputeParameter
+	local ParseCondition = OvaleCondition.ParseCondition
 	local state = OvaleState.state
 
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
@@ -29,6 +30,23 @@ do
 		local dm = state:GetDamageMultiplier(spellId) or 1
 		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
+	end
+
+	-- Return the damage reduction from armor, assuming the target is boss-level.
+	local BOSS_ARMOR = 24835
+	local WEAKENED_ARMOR_DEBUFF = 113746
+
+	local function BossArmorDamageReduction(target)
+		local aura = state:GetAura(target, WEAKENED_ARMOR_DEBUFF, "HARMFUL")
+		local armor = BOSS_ARMOR
+		if state:IsActiveAura(aura) then
+			armor = armor * (1 - 0.04 * aura.stacks)
+		end
+		local constant = 4037.5 * state.level - 317117.5
+		if constant < 0 then
+			constant = 0
+		end
+		return armor / (armor + constant)
 	end
 
 	--- Get the current estimated damage of a spell on the target if it is a critical strike.
@@ -46,9 +64,15 @@ do
 
 	local function CritDamage(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, "target")
 		local value = ComputeParameter(spellId, "damage", state)
 		if not value then
 			value = GetDamage(spellId)
+		end
+		-- Reduce by armor damage reduction for physical attacks.
+		local si = OvaleData:GetSpellInfo(spellId)
+		if si and si.physical then
+			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		-- TODO: Need to account for increased crit effect from meta-gems.
 		local critFactor = 2
@@ -80,9 +104,15 @@ do
 
 	local function Damage(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, "target")
 		local value = ComputeParameter(spellId, "damage", state)
 		if not value then
 			value = GetDamage(spellId)
+		end
+		-- Reduce by armor damage reduction for physical attacks.
+		local si = OvaleData:GetSpellInfo(spellId)
+		if si and si.physical then
+			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		return Compare(value, comparator, limit)
 	end
