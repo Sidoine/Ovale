@@ -332,6 +332,24 @@ end
 --</public-static-methods>
 
 --<state-methods>
+-- Return the number of seconds before all of the primary resources needed by a spell are available.
+statePrototype.TimeToPower = function(state, spellId, powerType)
+	local power = state[powerType]
+	local powerRate = state.powerRate[powerType]
+	local cost = state:PowerCost(spellId, powerType)
+
+	local seconds = 0
+	if power < cost then
+		if powerRate > 0 then
+			seconds = (cost - power) / powerRate
+		else
+			seconds = math.huge
+		end
+	end
+	return seconds
+end
+
+-- Return the amount of the given resource needed to cast the given spell.
 statePrototype.PowerCost = function(state, spellId, powerType)
 	local buffParam = "buff_" .. powerType
 	local spellCost = 0

@@ -757,7 +757,27 @@ function OvaleBestAction:GetActionInfo(element, state)
 					end
 				end
 			end
+
 			if actionCooldownStart and actionCooldownDuration then
+				-- Get the maximum time before all "primary" resources are ready.
+				local atTime = state.currentTime
+				for powerType in pairs(OvalePower.PRIMARY_POWER) do
+					if si[powerType] then
+						local t = state.currentTime + state:TimeToPower(spellId, powerType)
+						if atTime < t then
+							atTime = t
+						end
+					end
+				end
+				if actionCooldownStart > 0 then
+					if atTime > actionCooldownStart + actionCooldownDuration then
+						actionCooldownDuration = atTime - actionCooldownStart
+					end
+				else
+					actionCooldownStart = state.currentTime
+					actionCooldownDuration = atTime - actionCooldownStart
+				end
+
 				if si.blood or si.frost or si.unholy or si.death then
 					-- Spell requires runes.
 					local runecd = state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death, false)
