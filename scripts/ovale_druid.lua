@@ -137,14 +137,18 @@ AddFunction BalancePrecombatActions
 	#food,type=mogu_fish_stew
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int any=1) Spell(mark_of_the_wild)
-	#wild_mushroom,if=buff.wild_mushroom.stack<buff.wild_mushroom.max_stack
-	if WildMushroomCount() < 3 Spell(wild_mushroom_caster)
 	#healing_touch,if=!buff.dream_of_cenarius.up&talent.dream_of_cenarius.enabled
 	if not BuffPresent(dream_of_cenarius_caster_buff) and TalentPoints(dream_of_cenarius_talent) Spell(healing_touch)
 	#moonkin_form
 	if not Stance(druid_moonkin_form) Spell(moonkin_form)
 	# Snapshot raid buffed stats before combat begins and pre-potting is done.
 	#snapshot_stats
+}
+
+AddFunction BalancePrecombatMovingActions
+{
+	#wild_mushroom,if=buff.wild_mushroom.stack<buff.wild_mushroom.max_stack
+	if WildMushroomCount() < 3 Spell(wild_mushroom_caster)
 }
 
 AddFunction BalancePrecombatCdActions
@@ -187,7 +191,7 @@ AddIcon mastery=balance help=main
 
 AddIcon mastery=balance help=moving
 {
-	if InCombat(no) BalancePrecombatActions()
+	if InCombat(no) BalancePrecombatMovingActions()
 	BalanceDefaultMovingActions()
 }
 
