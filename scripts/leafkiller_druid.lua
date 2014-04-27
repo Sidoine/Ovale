@@ -104,7 +104,7 @@ Define(SYMBIOSIS 110309)
 	SpellAddBuff(SYMBIOSIS SYMBIOSIS=1)
 Define(WRATH 5176)
 Define(HURRICANE 16914)
-  SpellInfo(HURRICANE duration=10 tick=1 haste=spell canStopChannelling=9 )
+  SpellInfo(HURRICANE haste=spell channel=9 )
 
 # Shared buffs
 Define(DREAM_OF_CENARIUS 145152)

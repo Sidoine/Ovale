@@ -124,34 +124,38 @@ local function ComputeAction(element, state)
 
 	-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
 	if start < state.nextCast then
-		local si = state.currentSpellId and OvaleData.spellInfo[state.currentSpellId]
-		if not (si and si.canStopChannelling) then
-			-- not a channelled spell, or a channelled spell that cannot be interrupted
-			start = state.nextCast
-		else
-			-- This is a channelled spell that can be interrupted, so wait till the next tick.
-			-- "canStopChannelling=N" means that there are N total ticks in the channelled spell.
-			local numTicks, scaling
-			if si.haste == "spell" then
-				scaling = state:GetSpellHasteMultiplier()
-			elseif si.haste == "melee" then
-				scaling = state:GetMeleeHasteMultiplier()
-			else
-				scaling = 1
-			end
-			numTicks = floor(si.canStopChannelling * scaling + 0.5)
-			local tick = (state.nextCast - state.startCast) / numTicks
-			local tickTime = state.startCast + tick
-			Ovale:Logf("%s start=%f", spellId, start)
-			for i = 1, numTicks do
-				if start <= tickTime then
-					start = tickTime
-					break
+		-- Default to starting at next available cast time.
+		local newStart = state.nextCast
+		-- If we are currently channeling a spellcast, then see if it is interruptible.
+		-- If we are allowed to interrupt it, then start after the next tick of the channel.
+		if state.isChanneling then
+			local spellId = state.currentSpellId
+			local si = spellId and OvaleData.spellInfo[spellId]
+			if si then
+				-- "channel=N" means that the channel has N total ticks and can be interrupted.
+				local channel = si.channel or si.canStopChannelling
+				if channel then
+					local hasteMultiplier = 1
+					if si.haste == "spell" then
+						hasteMultiplier = state:GetSpellHasteMultiplier()
+					elseif si.haste == "melee" then
+						hasteMultiplier = state:GetMeleeHasteMultiplier()
+					end
+					local numTicks = floor(channel * hasteMultiplier + 0.5)
+					local tick = (state.nextCast - state.startCast) / numTicks
+					local tickTime = state.startCast
+					for i = 1, numTicks do
+						tickTime = tickTime + tick
+						if start <= tickTime then
+							break
+						end
+					end
+					newStart = tickTime
+					Ovale:Logf("%s start=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, newStart, numTicks, tick, tickTime)
 				end
-				tickTime = tickTime + tick
 			end
-			Ovale:Logf("%s start=%f, numTicks=%d, tick=%f, tickTime=%f", spellId, start, numTicks, tick, tickTime)
 		end
+		start = newStart
 	end
 	Ovale:Logf("Action %s can start at %f", action, start)
 	timeSpan[1], timeSpan[2] = start, math.huge
