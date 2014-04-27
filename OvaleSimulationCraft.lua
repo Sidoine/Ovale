@@ -449,6 +449,7 @@ do
 				or scriptLine.moving == 1
 				or scriptLine.sync
 				or action == "focus_fire" and scriptLine.five_stacks == 1
+				or action == "kill_command"
 				or action == "stance" and scriptLine.choose
 				or scriptLine.weapon
 			then
@@ -481,6 +482,13 @@ do
 						tinsert(scriptLine, "and")
 					end
 					tinsert(scriptLine, "BuffStacks(frenzy_buff any=1) == 5")
+					needAnd = true
+				end
+				if action == "kill_command" then
+					if needAnd then
+						tinsert(scriptLine, "and")
+					end
+					tinsert(scriptLine, "pet.Present()")
 					needAnd = true
 				end
 				if action == "stance" and scriptLine.choose then

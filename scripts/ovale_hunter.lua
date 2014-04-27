@@ -6,7 +6,7 @@ do
 	local desc = "[5.4] Ovale: Beast Mastery, Marksmanship, Survival"
 	local code = [[
 # Ovale hunter script based on SimulationCraft.
-#	Last updated: 2014-04-18
+#	Last updated: 2014-04-25
 
 Include(ovale_items)
 Include(ovale_racials)
@@ -37,7 +37,7 @@ AddFunction BeastMasteryDefaultActions
 	#kill_shot
 	Spell(kill_shot usable=1)
 	#kill_command
-	Spell(kill_command)
+	if pet.Present() Spell(kill_command)
 	#glaive_toss,if=enabled
 	if TalentPoints(glaive_toss_talent) Spell(glaive_toss)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react|buff.beast_within.up
@@ -69,7 +69,7 @@ AddFunction BeastMasteryDefaultAoeActions
 	#kill_shot
 	Spell(kill_shot usable=1)
 	#kill_command
-	Spell(kill_command)
+	if pet.Present() Spell(kill_command)
 	#glaive_toss,if=enabled
 	if TalentPoints(glaive_toss_talent) Spell(glaive_toss)
 	#cobra_shot,if=active_enemies>5
@@ -98,13 +98,20 @@ AddFunction BeastMasteryDefaultShortCdActions
 		if TalentPoints(barrage_talent) and Enemies() > 5 Spell(barrage)
 
 		unless Spell(kill_shot usable=1)
-			or Spell(kill_command)
-			or { TalentPoints(glaive_toss_talent) and Spell(glaive_toss) }
+			or { pet.Present() and Spell(kill_command) }
 		{
-			#barrage,if=enabled
-			if TalentPoints(barrage_talent) Spell(barrage)
-			#powershot,if=enabled
-			if TalentPoints(powershot_talent) Spell(powershot)
+			#a_murder_of_crows,if=enabled&!ticking
+			if TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) Spell(a_murder_of_crows)
+
+			unless { TalentPoints(glaive_toss_talent) and Spell(glaive_toss) }
+			{
+				#lynx_rush,if=enabled&!dot.lynx_rush.ticking
+				if TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) Spell(lynx_rush)
+				#barrage,if=enabled
+				if TalentPoints(barrage_talent) Spell(barrage)
+				#powershot,if=enabled
+				if TalentPoints(powershot_talent) Spell(powershot)
+			}
 		}
 	}
 }
@@ -127,19 +134,6 @@ AddFunction BeastMasteryDefaultCdActions
 			if not BuffPresent(rapid_fire_buff) Spell(rapid_fire)
 			#stampede,if=trinket.stat.agility.up|target.time_to_die<=20|(trinket.stacking_stat.agility.stack>10&trinket.stat.agility.cooldown_remains<=3)
 			if CheckBoxOff(opt_proc_on_use_agility_trinket) or BuffPresent(trinket_stat_agility_buff) or target.TimeToDie() <= 20 or { BuffStacks(trinket_stacking_stat_agility_buff) > 10 and { ItemCooldown(Trinket0Slot) + ItemCooldown(Trinket1Slot) } <= 3 } Spell(stampede)
-
-			unless Spell(kill_shot usable=1)
-				or Spell(kill_command)
-			{
-				#a_murder_of_crows,if=enabled&!ticking
-				if TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) Spell(a_murder_of_crows)
-
-				unless { TalentPoints(glaive_toss_talent) and Spell(glaive_toss) }
-				{
-					#lynx_rush,if=enabled&!dot.lynx_rush.ticking
-					if TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) Spell(lynx_rush)
-				}
-			}
 		}
 	}
 }
@@ -151,9 +145,12 @@ AddFunction BeastMasteryPrecombatActions
 	#aspect_of_the_hawk
 	if TalentPoints(aspect_of_the_iron_hawk_talent) and not Stance(hunter_aspect_of_the_iron_hawk) Spell(aspect_of_the_iron_hawk)
 	if not TalentPoints(aspect_of_the_iron_hawk_talent) and not Stance(hunter_aspect_of_the_hawk) Spell(aspect_of_the_hawk)
+}
+
+AddFunction BeastMasteryPrecombatShortCdActions
+{
 	#summon_pet
 	SummonPet()
-	#snapshot_stats
 }
 
 AddFunction BeastMasteryPrecombatCdActions
@@ -178,6 +175,7 @@ AddIcon mastery=beast_mastery size=small checkboxon=opt_icons_left
 
 AddIcon mastery=beast_mastery help=shortcd
 {
+	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	SummonPet()
 	BeastMasteryDefaultShortCdActions()
 }
@@ -198,6 +196,7 @@ AddIcon mastery=beast_mastery help=cd
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	Interrupt()
+	UseRacialInterruptActions()
 	BeastMasteryDefaultCdActions()
 }
 
@@ -309,8 +308,13 @@ AddFunction MarksmanshipDefaultShortCdActions
 {
 	#powershot,if=enabled
 	if TalentPoints(powershot_talent) Spell(powershot)
+	#lynx_rush,if=enabled&!dot.lynx_rush.ticking
+	if TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) Spell(lynx_rush)
+	#a_murder_of_crows,if=enabled&!ticking
+	if TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) Spell(a_murder_of_crows)
 
-	unless target.HealthPercent() > 80
+	unless { TalentPoints(dire_beast_talent) and Spell(dire_beast) }
+		or target.HealthPercent() > 80
 		or { BuffPresent(pre_steady_focus_buff) and BuffRemains(steady_focus_buff) <= 4 and Spell(steady_shot) }
 		or { TalentPoints(glaive_toss_talent) and Spell(glaive_toss) }
 	{
@@ -329,15 +333,12 @@ AddFunction MarksmanshipDefaultCdActions
 	UseRacialActions()
 
 	unless { TalentPoints(powershot_talent) and Spell(powershot) }
+		or { TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) and Spell(lynx_rush) }
 	{
-		#lynx_rush,if=enabled&!dot.lynx_rush.ticking
-		if TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) Spell(lynx_rush)
 		#rapid_fire,if=!buff.rapid_fire.up
 		if not BuffPresent(rapid_fire_buff) Spell(rapid_fire)
 		#stampede,if=trinket.stat.agility.up|target.time_to_die<=20|(trinket.stacking_stat.agility.stack>10&trinket.stat.agility.cooldown_remains<=3)
 		if CheckBoxOff(opt_proc_on_use_agility_trinket) or BuffPresent(trinket_stat_agility_buff) or target.TimeToDie() <= 20 or { BuffStacks(trinket_stacking_stat_agility_buff) > 10 and { ItemCooldown(Trinket0Slot) + ItemCooldown(Trinket1Slot) } <= 3 } Spell(stampede)
-		#a_murder_of_crows,if=enabled&!ticking
-		if TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) Spell(a_murder_of_crows)
 	}
 }
 
@@ -348,9 +349,12 @@ AddFunction MarksmanshipPrecombatActions
 	#aspect_of_the_hawk
 	if TalentPoints(aspect_of_the_iron_hawk_talent) and not Stance(hunter_aspect_of_the_iron_hawk) Spell(aspect_of_the_iron_hawk)
 	if not TalentPoints(aspect_of_the_iron_hawk_talent) and not Stance(hunter_aspect_of_the_hawk) Spell(aspect_of_the_hawk)
+}
+
+AddFunction MarksmanshipPrecombatShortCdActions
+{
 	#summon_pet
 	SummonPet()
-	#snapshot_stats
 }
 
 AddFunction MarksmanshipPrecombatCdActions
@@ -375,6 +379,7 @@ AddIcon mastery=marksmanship size=small checkboxon=opt_icons_left
 
 AddIcon mastery=marksmanship help=shortcd
 {
+	if InCombat(no) MarksmanshipPrecombatShortCdActions()
 	SummonPet()
 	MarksmanshipDefaultShortCdActions()
 }
@@ -395,6 +400,7 @@ AddIcon mastery=marksmanship help=cd
 {
 	if InCombat(no) MarksmanshipPrecombatCdActions()
 	Interrupt()
+	UseRacialInterruptActions()
 	MarksmanshipDefaultCdActions()
 }
 
@@ -486,6 +492,11 @@ AddFunction SurvivalDefaultAoeActions
 
 AddFunction SurvivalDefaultShortCdActions
 {
+	#a_murder_of_crows,if=enabled&!ticking
+	if TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) Spell(a_murder_of_crows)
+	#lynx_rush,if=enabled&!dot.lynx_rush.ticking
+	if TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) Spell(lynx_rush)
+
 	unless { BuffPresent(lock_and_load_buff) and Spell(explosive_shot) }
 		or { TalentPoints(glaive_toss_talent) and Spell(glaive_toss) }
 	{
@@ -505,11 +516,10 @@ AddFunction SurvivalDefaultCdActions
 	#use_item
 	UseItemActions()
 	#a_murder_of_crows,if=enabled&!ticking
-	if TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) Spell(a_murder_of_crows)
-	#lynx_rush,if=enabled&!dot.lynx_rush.ticking
-	if TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) Spell(lynx_rush)
 
-	unless { BuffPresent(lock_and_load_buff) and Spell(explosive_shot) }
+	unless { TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) and Spell(a_murder_of_crows) }
+		or { TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) and Spell(lynx_rush) }
+		or { BuffPresent(lock_and_load_buff) and Spell(explosive_shot) }
 		or { TalentPoints(glaive_toss_talent) and Spell(glaive_toss) }
 		or { TalentPoints(powershot_talent) and Spell(powershot) }
 		or { TalentPoints(barrage_talent) and Spell(barrage) }
@@ -538,9 +548,12 @@ AddFunction SurvivalPrecombatActions
 	#aspect_of_the_hawk
 	if TalentPoints(aspect_of_the_iron_hawk_talent) and not Stance(hunter_aspect_of_the_iron_hawk) Spell(aspect_of_the_iron_hawk)
 	if not TalentPoints(aspect_of_the_iron_hawk_talent) and not Stance(hunter_aspect_of_the_hawk) Spell(aspect_of_the_hawk)
+}
+
+AddFunction SurvivalPrecombatShortCdActions
+{
 	#summon_pet
 	SummonPet()
-	#snapshot_stats
 }
 
 AddFunction SurvivalPrecombatCdActions
@@ -565,6 +578,7 @@ AddIcon mastery=survival size=small checkboxon=opt_icons_left
 
 AddIcon mastery=survival help=shortcd
 {
+	if InCombat(no) SurvivalPrecombatShortCdActions()
 	SummonPet()
 	SurvivalDefaultShortCdActions()
 }
@@ -585,6 +599,7 @@ AddIcon mastery=survival help=cd
 {
 	if InCombat(no) SurvivalPrecombatCdActions()
 	Interrupt()
+	UseRacialInterruptActions()
 	SurvivalDefaultCdActions()
 }
 
