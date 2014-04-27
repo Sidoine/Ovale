@@ -43,8 +43,6 @@ local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
--- Steady Focus spell ID from spellbook; re-used has as the aura ID of the hidden buff.
-local PRE_STEADY_FOCUS = 53224
 -- Steady Focus aura ID for visible buff.
 local STEADY_FOCUS = 53220
 -- Steady Shot spell Id.
@@ -75,8 +73,13 @@ local RANGED_ATTACKS_BY_DEBUFF = {
 --</private-static-properties>
 
 --<public-static-properties>
+OvaleSteadyFocus.name = "Pre-Steady Focus"
+-- Steady Focus spell ID from spellbook; re-used as the aura ID of the hidden buff.
+OvaleSteadyFocus.spellId = 53224
+OvaleSteadyFocus.start = 0
 OvaleSteadyFocus.start = 0
 OvaleSteadyFocus.ending = 0
+OvaleSteadyFocus.duration = math.huge
 OvaleSteadyFocus.stacks = 0
 --</public-static-properties>
 
@@ -147,19 +150,19 @@ end
 
 function OvaleSteadyFocus:GainedAura(atTime)
 	self.start = atTime
-	self.ending = math.huge
+	self.ending = self.start + self.duration
 	self.stacks = self.stacks + 1
-	OvaleAura:GainedAuraOnGUID(self_guid, self.start, PRE_STEADY_FOCUS, self_guid, "HELPFUL", nil, nil, 1, nil, math.huge, self.ending, nil, "Pre-Steady Focus", nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.name, nil, nil, nil)
 end
 
 function OvaleSteadyFocus:LostAura(atTime)
 	self.ending = atTime
 	self.stacks = 0
-	OvaleAura:LostAuraOnGUID(self_guid, atTime, PRE_STEADY_FOCUS, self_guid)
+	OvaleAura:LostAuraOnGUID(self_guid, atTime, self.spellId, self_guid)
 end
 
 function OvaleSteadyFocus:Debug()
-	local aura = OvaleAura:GetAuraByGUID(self_guid, PRE_STEADY_FOCUS, "HELPFUL", true)
+	local aura = OvaleAura:GetAuraByGUID(self_guid, self.spellId, "HELPFUL", true)
 	if aura then
 		Ovale:FormatPrint("Player has pre-Steady Focus aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
 	else

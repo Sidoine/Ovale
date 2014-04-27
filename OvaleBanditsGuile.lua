@@ -48,23 +48,22 @@ local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
--- Bandit's Guile spell ID from spellbook; re-used has as the aura ID of the hidden, stacking buff.
-local BANDITS_GUILE = 84654
 -- Aura IDs for visible buff from Bandit's Guile.
 local SHALLOW_INSIGHT = 84745
 local MODERATE_INSIGHT = 84746
 local DEEP_INSIGHT = 84747
-local INSIGHT_DURATION = 15
 -- Spell IDs for abilities that proc Bandit's Guile.
 local REVEALING_STRIKE = 84617
 local SINISTER_STRIKE = 1752
 --</private-static-properties>
 
 --<public-static-properties>
--- start, ending, stacks for hidden Bandit's Guile buff.
-OvaleBanditsGuile.spellId = BANDITS_GUILE
+OvaleBanditsGuile.name = "Bandit's Guile"
+-- Bandit's Guile spell ID from spellbook; re-used as the aura ID of the hidden, stacking buff.
+OvaleBanditsGuile.spellId = 84654
 OvaleBanditsGuile.start = 0
 OvaleBanditsGuile.ending = math.huge
+OvaleBanditsGuile.duration = 15
 OvaleBanditsGuile.stacks = 0
 --</public-static-properties>
 
@@ -162,16 +161,16 @@ end
 
 function OvaleBanditsGuile:GainedAura(atTime)
 	atTime = atTime or API_GetTime()
-	OvaleAura:GainedAuraOnGUID(self_guid, atTime, BANDITS_GUILE, self_guid, "HELPFUL", nil, nil, self.stacks, nil, INSIGHT_DURATION, self.ending, nil, "Bandit's Guile", nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_guid, atTime, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, INSIGHT_DURATION, self.ending, nil, self.name, nil, nil, nil)
 end
 
 function OvaleBanditsGuile:LostAura(atTime)
 	atTime = atTime or API_GetTime()
-	OvaleAura:LostAuraOnGUID(self_guid, atTime, BANDITS_GUILE, self_guid)
+	OvaleAura:LostAuraOnGUID(self_guid, atTime, self.spellId, self_guid)
 end
 
 function OvaleBanditsGuile:Debug()
-	local aura = OvaleAura:GetAuraByGUID(self_guid, BANDITS_GUILE, "HELPFUL", true)
+	local aura = OvaleAura:GetAuraByGUID(self_guid, self.spellId, "HELPFUL", true)
 	Ovale:FormatPrint("Player has Bandit's Guile aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
 end
 --</public-static-methods>
