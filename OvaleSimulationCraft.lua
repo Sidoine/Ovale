@@ -274,6 +274,11 @@ do
 				["guardian_of_ancient_kings"] = "guardian_of_ancient_kings_melee",
 			},
 		},
+		priest = {
+			shadow = {
+				["arcane_torrent"] = "arcane_torrent_mana",
+			},
+		},
 		shaman = {
 			elemental = {
 				["ascendance"] = "ascendance_caster",
@@ -450,6 +455,7 @@ do
 				or scriptLine.sync
 				or action == "focus_fire" and scriptLine.five_stacks == 1
 				or action == "kill_command"
+				or action == "mind_flay_insanity"
 				or action == "stance" and scriptLine.choose
 				or scriptLine.weapon
 			then
@@ -483,15 +489,19 @@ do
 					end
 					tinsert(scriptLine, "BuffStacks(frenzy_buff any=1) == 5")
 					needAnd = true
-				end
-				if action == "kill_command" then
+				elseif action == "kill_command" then
 					if needAnd then
 						tinsert(scriptLine, "and")
 					end
 					tinsert(scriptLine, "pet.Present()")
 					needAnd = true
-				end
-				if action == "stance" and scriptLine.choose then
+				elseif action == "mind_flay_insanity" then
+					if needAnd then
+						tinsert(scriptLine, "and")
+					end
+					tinsert(scriptLine, "target.DebuffPresent(devouring_plague_debuff)")
+					needAnd = true
+				elseif action == "stance" and scriptLine.choose then
 					if needAnd then
 						tinsert(scriptLine, "and")
 					end

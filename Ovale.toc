@@ -61,6 +61,7 @@ OvaleEclipse.lua
 OvaleEnemies.lua
 OvaleRecount.lua
 OvaleRunes.lua
+OvaleShadowWordDeath.lua
 OvaleSkada.lua
 OvaleSpellDamage.lua
 OvaleSteadyFocus.lua
