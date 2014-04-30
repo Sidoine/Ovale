@@ -47,14 +47,15 @@ SpellList(trinket_stat_agility_buff 126554 126690 126707 128984 138699 138938 14
 SpellList(trinket_stacking_stat_agility_buff 138756)
 
 # Intellect
-SpellList(trinket_proc_intellect_buff 126554 126690 126707 128984 138699 138938 146308 146310 148896 148903)
-SpellList(trinket_stacking_proc_intellect_buff 138756)
+SpellList(trinket_proc_intellect_buff 126577 126683 126705 128985 136082 138898 138963 139133 146046 148897 148906)
+SpellList(trinket_stacking_proc_intellect_buff 138786 146184)
 
 # Strength
-SpellList(trinket_proc_strength_buff 126554 126690 126707 128984 138699 138938 146308 146310 148896 148903)
+SpellList(trinket_proc_strength_buff 126582 126679 126700 128986 138702 146245 146250 148899)
+SpellList(trinket_stacking_proc_strength_buff 138759 138870)
 
 # Critical Strike
-SpellList(trinket_stacking_stat_crit_buff 138756)
+SpellList(trinket_stacking_stat_crit_buff 146285)
 
 AddCheckBox(opt_use_trinket0 "Use trinket 0" default)
 AddCheckBox(opt_use_trinket1 "Use trinket 1" default)
