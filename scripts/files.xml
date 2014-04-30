@@ -18,4 +18,5 @@
 	<Script file="ovale_shaman_spells.lua" />
 
 	<Script file="leafkiller_druid.lua" />
+	<Script file="wiljo_mage.lua" />
 </Ui>
