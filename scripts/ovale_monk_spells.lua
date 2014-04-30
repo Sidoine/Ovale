@@ -195,7 +195,7 @@ Define(tigereye_brew_use_buff 116740)
 	SpellInfo(tigereye_brew_use_buff duration=15)
 Define(touch_of_death 115080)
 	SpellInfo(touch_of_death cd=90 chi=3)
-	SpellInfo(touch_of_death addcd=120 chi=-1 glyph=glyph_of_touch_of_death) # XXX
+	SpellInfo(touch_of_death addcd=120 chi=0 glyph=glyph_of_touch_of_death)
 Define(uplift 116670)
 	SpellInfo(uplift chi=2)
 	SpellAddBuff(uplift thunder_focus_tea_buff=0 if_spell=thunder_focus_tea)
