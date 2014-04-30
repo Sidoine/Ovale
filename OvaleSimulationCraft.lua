@@ -336,6 +336,7 @@ do
 				tinsert(simc.symbols, "frost_armor_buff")
 				return "if BuffExpires(frost_armor_buff) Spell(frost_armor)"
 			end,
+		["^icy_veins$"] = "IcyVeins()",
 		["^molten_armor$"] = function(simc, action)
 				tinsert(simc.symbols, "molten_armor_buff")
 				return "if BuffExpires(molten_armor_buff) Spell(molten_armor)"
@@ -659,6 +660,7 @@ do
 				return "DebuffStacks(arcane_charge_debuff)"
 			end,
 		["^buff%.rune_of_power%.remains$"] = "RuneOfPowerRemains()",
+		["^cooldown%.icy_veins%.remains$"] = "IcyVeinsCooldownRemains()",
 		-- Monk
 		["^dot%.zen_sphere%.ticking$"] = function(simc, action)
 				tinsert(simc.symbols, "zen_sphere_buff")
@@ -868,7 +870,7 @@ do
 				tinsert(simc.symbols, "mana_gem")
 				return "ItemCharges(mana_gem)"
 			end,
-		["^mastery_value$"] = "MasteryEffect()",
+		["^mastery_value$"] = "MasteryEffect() / 100",
 		["^multiplier$"] = "DamageMultiplier()",
 		["^position_front$"] = "False(position_front)",	-- XXX
 		["^rage$"] = "Rage()",
