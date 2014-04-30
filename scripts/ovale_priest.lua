@@ -99,11 +99,6 @@ AddFunction ShadowDefaultMovingActions
 
 AddFunction ShadowDefaultShortCdActions
 {
-	#mindbender,if=talent.mindbender.enabled
-	if TalentPoints(mindbender_talent) Spell(mindbender)
-	#shadowfiend,if=!talent.mindbender.enabled
-	if not TalentPoints(mindbender_talent) Spell(shadowfiend)
-
 	unless { BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death usable=1) }
 		or { ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } }
 		or Spell(mind_blast)
@@ -140,19 +135,18 @@ AddFunction ShadowDefaultCdActions
 		UseItemActions()
 		#jade_serpent_potion,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
-
-		unless { TalentPoints(mindbender_talent) and Spell(mindbender) }
-			or { not TalentPoints(mindbender_talent) and Spell(shadowfiend) }
-		{
-			#power_infusion,if=talent.power_infusion.enabled
-			if TalentPoints(power_infusion_talent) Spell(power_infusion)
-			#blood_fury
-			Spell(blood_fury)
-			#berserking
-			Spell(berserking)
-			#arcane_torrent
-			Spell(arcane_torrent_mana)
-		}
+		#mindbender,if=talent.mindbender.enabled
+		if TalentPoints(mindbender_talent) Spell(mindbender)
+		#shadowfiend,if=!talent.mindbender.enabled
+		if not TalentPoints(mindbender_talent) Spell(shadowfiend)
+		#power_infusion,if=talent.power_infusion.enabled
+		if TalentPoints(power_infusion_talent) Spell(power_infusion)
+		#blood_fury
+		Spell(blood_fury)
+		#berserking
+		Spell(berserking)
+		#arcane_torrent
+		Spell(arcane_torrent_mana)
 	}
 }
 
