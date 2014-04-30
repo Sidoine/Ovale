@@ -23,6 +23,7 @@ local wipe = table.wipe
 local API_CreateFrame = CreateFrame
 local API_GetAuctionItemSubClasses = GetAuctionItemSubClasses
 local API_GetInventoryItemID = GetInventoryItemID
+local API_GetInventoryItemGems = GetInventoryItemGems
 local API_GetInventorySlotInfo = GetInventorySlotInfo
 local API_GetItemInfo = GetItemInfo
 local API_UnitClass = UnitClass
@@ -1075,6 +1076,12 @@ do
 	OVALE_WEAPON_CLASS[17] = API_GetAuctionItemSubClasses(1)	-- "Fishing Poles"
 end
 
+local OVALE_META_GEM = nil
+do
+	local _, _, _, _, _, _, name = API_GetAuctionItemSubClasses(8)	-- "8" is "Gem"
+	OVALE_META_GEM = name
+end
+
 -- Normalized weapon attack speeds (http://www.wowpedia.org/Normalization)
 local OVALE_NORMALIZED_WEAPON_SPEED = {
 	[OVALE_WEAPON_CLASS[1]]  = 2.4,
@@ -1108,6 +1115,8 @@ OvaleEquipement.mainHandItemType = nil
 OvaleEquipement.offHandItemType = nil
 -- Count of equipped pieces of an armor set: armorSetCount[armorSetName] = equippedCount
 OvaleEquipement.armorSetCount = {}
+-- Item ID of meta gem if equipped.
+OvaleEquipement.metaGem = nil
 
 -- Normalized weapon speeds for equipped mainhand and offhand weapons.
 OvaleEquipement.mainHandWeaponSpeed = nil
@@ -1302,11 +1311,14 @@ function OvaleEquipement:UpdateEquippedItems()
 			changed = true
 		end
 	end
+	local changedMetaGem = self:UpdateMetaGem()
+	local changedItemLevels = self:UpdateEquippedItemLevels()
+	changed = changed or changedMetaGem or changedItemLevels
+
 	self.mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
 	self.offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
 	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
 	self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
-	self:UpdateEquippedItemLevels()
 
 	if changed then
 		self:UpdateArmorSetCount()
@@ -1324,6 +1336,27 @@ function OvaleEquipement:UpdateEquippedItemLevels()
 			changed = true
 		end
 	end
+	return changed
+end
+
+function OvaleEquipement:UpdateMetaGem()
+	local changed = false
+	local gemId = API_GetInventoryItemGems(INVSLOT_HEAD)
+	if gemId then
+		local name, link, quality, iLevel, reqLevel, class, subclass = API_GetItemInfo(gemId)
+		if subclass == OVALE_META_GEM then
+			if gemId ~= self.metaGem then
+				self.metaGem = gemId
+				changed = true
+			end
+		end
+	else
+		if self.metaGem then
+			self.metaGem = nil
+			changed = true
+		end
+	end
+	return changed
 end
 
 function OvaleEquipement:Debug()
