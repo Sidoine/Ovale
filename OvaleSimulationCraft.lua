@@ -279,6 +279,17 @@ do
 				["arcane_torrent"] = "arcane_torrent_mana",
 			},
 		},
+		rogue = {
+			assassination = {
+				["arcane_torrent"] = "arcane_torrent_energy",
+			},
+			combat = {
+				["arcane_torrent"] = "arcane_torrent_energy",
+			},
+			subtlety = {
+				["arcane_torrent"] = "arcane_torrent_energy",
+			},
+		},
 		shaman = {
 			elemental = {
 				["ascendance"] = "ascendance_caster",
@@ -360,9 +371,14 @@ do
 		["^shadowform$"] = "if not Stance(priest_shadowform) Spell(shadowform)",
 		["^shadow_word_death$"] = "Spell(shadow_word_death usable=1)",
 		-- Rogue
-		["^apply_poison$"] = false,	-- XXX
+		["^ambush$"] = "Spell(ambush usable=1)",
+		["^apply_poison$"] = "ApplyPoisons()",
+		["^backstab$"] = "Spell(backstab usable=1)",
+		["^dispatch$"] = "Spell(dispatch usable=1)",
 		["^kick$"] = "if target.IsInterruptible() Spell(kick)",
-		["^stealth$"] = "if Stealthed(no) Spell(stealth)",
+		["^premeditation$"] = "Spell(premeditation usable=1)",
+		["^stealth$"] = "if not IsStealthed() Spell(stealth)",
+		["^tricks_of_the_trade$"] = "TricksOfTheTrade()",
 		-- Shaman
 		["^bloodlust$"] = "Bloodlust()",
 		["^wind_shear$"] = "Interrupt()",

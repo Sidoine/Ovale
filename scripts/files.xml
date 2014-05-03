@@ -14,6 +14,8 @@
 	<Script file="ovale_paladin_spells.lua" />
 	<Script file="ovale_priest.lua" />
 	<Script file="ovale_priest_spells.lua" />
+	<Script file="ovale_rogue.lua" />
+	<Script file="ovale_rogue_spells.lua" />
 	<Script file="ovale_shaman.lua" />
 	<Script file="ovale_shaman_spells.lua" />
 
