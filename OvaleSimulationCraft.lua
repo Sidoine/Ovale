@@ -255,13 +255,19 @@ do
 			balance = {
 				["dream_of_cenarius"] = "dream_of_cenarius_caster",
 				["force_of_nature"] = "force_of_nature_caster",
+				["heart_of_the_wild"] = "heart_of_the_wild_caster",
 				["wild_mushroom"] = "wild_mushroom_caster",
 			},
 			feral = {
 				["berserk"] = "berserk_cat",
 				["dream_of_cenarius"] = "dream_of_cenarius_melee",
 				["force_of_nature"] = "force_of_nature_melee",
+				["heart_of_the_wild"] = "heart_of_the_wild_melee",
 				["stealth"] = "prowl",
+			},
+			restoration = {
+				["force_of_nature"] = "force_of_nature_heal",
+				["heart_of_the_wild"] = "heart_of_the_wild_heal",
 			},
 		},
 		paladin = {

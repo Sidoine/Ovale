@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "Ovale"
-	local desc = "[5.4] Ovale: Balance, Feral"
+	local desc = "[5.4] Ovale: Balance, Feral, Guardian, Restoration"
 	local code = [[
 # Ovale druid script based on SimulationCraft.
 
@@ -202,7 +202,7 @@ AddIcon mastery=balance help=cd
 
 AddIcon mastery=balance help=cd size=small checkboxon=opt_icons_right
 {
-	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild)
+	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_caster)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
@@ -624,11 +624,256 @@ AddIcon mastery=feral help=cd
 
 AddIcon mastery=feral help=cd size=small checkboxon=opt_icons_right
 {
-	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild)
+	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_melee)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
 AddIcon mastery=feral help=cd size=small checkboxon=opt_icons_right
+{
+	UseItemActions()
+}
+
+###
+### Guardian
+###
+
+AddFunction GuardianAoeActions
+{
+	# AoE rotation: Mangle > Thrash > Swipe
+	if target.DebuffRemains(thrash_bear_debuff) < 3 Spell(thrash_bear)
+	Spell(mangle_bear)
+	Spell(thrash_bear)
+	Spell(swipe_bear)
+}
+
+AddFunction GuardianMainActions
+{
+	#thrash_bear,if=debuff.weakened_blows.remains<3
+	if target.DebuffRemains(weakened_blows_debuff any=1) < 3 Spell(thrash_bear)
+	#lacerate,if=((dot.lacerate.remains<3)|(buff.lacerate.stack<3&dot.thrash_bear.remains>3))&(buff.son_of_ursoc.up|buff.berserk.up)
+	if { target.DebuffRemains(lacerate_debuff) < 3 or { target.DebuffStacks(lacerate_debuff) < 3 and target.DebuffRemains(thrash_bear_debuff) > 3 } } and { BuffPresent(son_of_ursoc_buff) or BuffPresent(berserk_bear_buff) } Spell(lacerate)
+	#faerie_fire,if=debuff.weakened_armor.stack<3
+	if target.DebuffStacks(weakened_armor_debuff any=1) < 3 FaerieFire()
+	#thrash_bear,if=dot.thrash_bear.remains<3&(buff.son_of_ursoc.up|buff.berserk.up)
+	if target.DebuffRemains(thrash_bear_debuff) < 3 and { BuffPresent(son_of_ursoc_buff) or BuffPresent(berserk_bear_buff) } Spell(thrash_bear)
+	#mangle_bear
+	#wait,sec=cooldown.mangle_bear.remains,if=cooldown.mangle_bear.remains<=0.5
+	Spell(mangle_bear wait=0.5)
+	#cenarion_ward,if=talent.cenarion_ward.enabled
+	if TalentPoints(cenarion_ward_talent) Spell(cenarion_ward)
+	if BuffPresent(dream_of_cenarius_tank_buff) Spell(healing_touch)
+	#lacerate,if=dot.lacerate.remains<3|buff.lacerate.stack<3
+	if target.DebuffRemains(lacerate_debuff) < 3 or target.DebuffStacks(lacerate_debuff) < 3 Spell(lacerate)
+	#thrash_bear,if=dot.thrash_bear.remains<2
+	if target.DebuffRemains(thrash_bear_debuff) < 2 Spell(thrash_bear)
+	#lacerate
+	Spell(lacerate)
+	#faerie_fire,if=dot.thrash_bear.remains>6
+	if target.DebuffRemains(thrash_bear_debuff) > 6 FaerieFire()
+	#thrash_bear
+	Spell(thrash_bear)
+	FaerieFire()
+}
+
+AddFunction GuardianShortCdActions
+{
+	#frenzied_regeneration,if=health.pct<100&action.savage_defense.charges=0&incoming_damage_5>0.2*health.max
+	if HealthPercent() < 100 and Charges(savage_defense) < 1 and IncomingDamage(5) > 0.2 * MaxHealth() Spell(frenzied_regeneration)
+	#frenzied_regeneration,if=health.pct<100&action.savage_defense.charges>0&incoming_damage_5>0.4*health.max
+	if HealthPercent() < 100 and Charges(savage_defense) > 0 and IncomingDamage(5) > 0.4 * MaxHealth() Spell(frenzied_regeneration)
+	#savage_defense
+	Spell(savage_defense)
+	#maul,if=buff.tooth_and_claw.react&buff.tooth_and_claw_absorb.down
+	if BuffPresent(tooth_and_claw_buff) and target.DebuffExpires(tooth_and_claw_debuff) Spell(maul)
+}
+
+AddFunction GuardianCdActions
+{
+	GuardianInterrupt()
+	if Rage() < 11 Spell(enrage)
+	if HealthPercent() < 25
+	{
+		if BuffExpires(son_of_ursoc) Spell(berserk_bear)
+		if TalentPoints(incarnation_talent) and BuffExpires(berserk_bear_buff) Spell(incarnation)
+	}
+	if BuffExpires(burst_haste any=1) Spell(berserking)
+	if BuffExpires(son_of_ursoc) Spell(berserk_bear)
+	if TalentPoints(incarnation_talent) and BuffExpires(berserk_bear) Spell(incarnation)
+}
+
+AddFunction GuardianPrecombatActions
+{
+	if BuffRemains(str_agi_int any=1) < 600 Spell(mark_of_the_wild)
+	if not Stance(druid_bear_form) Spell(bear_form)
+}
+
+### Guardian icons.
+
+AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_left
+{
+	Spell(might_of_ursoc)
+}
+
+AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_left
+{
+	Spell(barkskin)
+	if TalentPoints(force_of_nature_talent) Spell(force_of_nature_tank)
+	Spell(survival_instincts)
+}
+
+AddIcon mastery=guardian help=shortcd
+{
+	GuardianShortCdActions()
+}
+
+AddIcon mastery=guardian help=main
+{
+	if InCombat(no) GuardianPrecombatActions()
+	GuardianMainActions()
+}
+
+AddIcon mastery=guardian help=aoe checkboxon=aoe
+{
+	GuardianAoeActions()
+}
+
+AddIcon mastery=guardian help=cd
+{
+	GuardianCdActions()
+}
+
+AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_right
+{
+	#renewal,if=talent.renewal.enabled&incoming_damage_5>0.8*health.max
+	if TalentPoints(renewal_talent) and IncomingDamage(5) > 0.8 * MaxHealth() Spell(renewal)
+}
+
+AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_right
+{
+	UseItemActions()
+}
+
+###
+### Restoration
+###
+
+AddFunction Swiftmend
+{
+	if not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation)
+}
+
+AddFunction RestorationMainActions
+{
+	if WildMushroomCount() < 1 Spell(wild_mushroom_heal)
+
+	# Cast instant/mana-free Healing Touch or Regrowth.
+	if BuffStacks(sage_mender_buff) == 5 Spell(healing_touch)
+	if BuffPresent(omen_of_clarity_buff)
+	{
+		if Glyph(glyph_of_regrowth) Spell(regrowth)
+		Spell(healing_touch)
+	}
+	if BuffPresent(natures_swiftness_buff) Spell(healing_touch)
+
+	# Maintain 100% uptime on Harmony mastery buff.
+	if BuffRemains(harmony_buff) < 3
+	{
+		if BuffCount(rejuvenation_buff) > 0 or BuffCount(regrowth_buff) > 0 Swiftmend()
+		Spell(nourish)
+	}
+
+	# Keep one Lifebloom stack up on the raid.
+	if not BuffCount(lifebloom_buff) > 0 Spell(lifebloom)
+
+	if BuffCount(rejuvenation_buff) > 0 or BuffCount(regrowth_buff) > 0 Swiftmend()
+	if TalentPoints(cenarion_ward_talent) Spell(cenarion_ward)
+
+	# Keep up 5 Rejuvenation HoTs on the raid.
+	if BuffCount(rejuvenation_buff) < 5 Spell(rejuvenation)
+
+	# Filler.
+	Spell(nourish)
+}
+
+AddFunction RestorationAoeActions
+{
+	if BuffPresent(tree_of_life_buff)
+	{
+		Spell(wild_growth)
+		if BuffPresent(omen_of_clarity_buff) Spell(regrowth)
+		Spell(lifebloom)
+	}
+
+	Spell(wild_growth)
+	if not Glyph(glyph_of_efflorescence) Swiftmend()
+	if BuffCount(rejuvenation_buff) >= 3 Spell(genesis)
+	Spell(rejuvenation)
+}
+
+AddFunction RestorationShortCdActions
+{
+	if BuffCount(rejuvenation_buff) >= 5 Spell(genesis)
+	if WildMushroomCount() > 0 Spell(wild_mushroom_bloom)
+}
+
+AddFunction RestorationCdActions
+{
+	Spell(natures_swiftness)
+	if TalentPoints(force_of_nature_talent) Spell(force_of_nature_heal)
+	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_heal)
+	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
+}
+
+AddFunction RestorationPrecombatActions
+{
+	if BuffRemains(harmony_buff) < 10 Spell(nourish)
+}
+
+### Restoration icons.
+
+AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_left
+{
+	Spell(barkskin)
+	Spell(might_of_ursoc)
+	Spell(survival_instincts)
+}
+
+AddIcon mastery=restoration help=buff size=small checkboxon=opt_icons_left
+{
+	#innervate,if=mana.pct<90
+	if ManaPercent() < 90 Spell(innervate)
+	Spell(tranquility)
+	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
+}
+
+AddIcon mastery=restoration help=shortcd
+{
+	RestorationShortCdActions()
+}
+
+AddIcon mastery=restoration help=main
+{
+	if InCombat(no) RestorationPrecombatActions()
+	RestorationMainActions()
+}
+
+AddIcon mastery=restoration help=aoe checkboxon=aoe
+{
+	RestorationAoeActions()
+}
+
+AddIcon mastery=restoration help=cd
+{
+	RestorationInterrupt()
+	RestorationCdActions()
+}
+
+AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_right
+{
+	Spell(ironbark)
+}
+
+AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
