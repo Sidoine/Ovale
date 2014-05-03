@@ -1,4 +1,4 @@
-[Ovale Spell Priority][ovale] shows you what spell or ability you should use in order to maximize your damage.
+[Ovale Spell Priority][ovale] is a rotation-helper addon shows you what spell or ability you should use in order to maximize your damage.
 
   [ovale]: http://www.curse.com/addons/wow/ovale
 
@@ -65,10 +65,3 @@ You need to reach level 10 and choose a specialization.
 
 ##### There is no bane or curse (or whatever) in the rotation.
 Click the icon and select the bane or curse that you want to use from the dropdown menu list.
-
-Custom scripts
-==============
-- [Ovale Spell Priority forums][ovale-forums]
-- [Nerien's Ovale Scripts][]
-
-  [Nerien's Ovale Scripts]: http://www.curse.com/addons/wow/nerien-ovale-scripts
