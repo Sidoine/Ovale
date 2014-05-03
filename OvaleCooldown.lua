@@ -72,7 +72,7 @@ function OvaleCooldown:GetGCD(spellId)
 	if spellId and OvaleData.spellInfo[spellId] then
 		local si = OvaleData.spellInfo[spellId]
 		if si.gcd then
-			cd = si.gcd
+			return si.gcd
 		end
 		if si.haste then
 			if si.haste == "melee" then
