@@ -291,7 +291,7 @@ AddFunction MarksmanshipDefaultAoeActions
 	#kill_shot
 	Spell(kill_shot usable=1)
 	#multi_shot,if=active_enemies>=4
-	if Enemies() >= 4 Spell(multi_shot)
+	Spell(multi_shot)
 	#aimed_shot,if=buff.master_marksman_fire.react
 	if BuffPresent(master_marksman_fire_buff) Spell(aimed_shot)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react
@@ -473,7 +473,7 @@ AddFunction SurvivalDefaultAoeActions
 	#black_arrow,if=!ticking&target.time_to_die>=8
 	if not target.DebuffPresent(black_arrow_debuff) and target.TimeToDie() >= 8 Spell(black_arrow)
 	#multi_shot,if=active_enemies>3
-	if Enemies() > 3 Spell(multi_shot)
+	Spell(multi_shot)
 	#multi_shot,if=buff.thrill_of_the_hunt.react&dot.serpent_sting.remains<2
 	if BuffPresent(thrill_of_the_hunt_buff) and target.DebuffRemains(serpent_sting_debuff) < 2 Spell(multi_shot)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react
@@ -482,10 +482,8 @@ AddFunction SurvivalDefaultAoeActions
 	if TalentPoints(dire_beast_talent) Spell(dire_beast)
 	#cobra_shot,if=dot.serpent_sting.remains<6
 	if target.DebuffRemains(serpent_sting_debuff) < 6 Spell(cobra_shot)
-	#arcane_shot,if=focus>=67&active_enemies<2
-	if Focus() >= 67 and Enemies() < 2 Spell(arcane_shot)
 	#multi_shot,if=focus>=67&active_enemies>1
-	if Focus() >= 67 and Enemies() > 1 Spell(multi_shot)
+	if Focus() >= 67 Spell(multi_shot)
 	#cobra_shot
 	Spell(cobra_shot)
 }
@@ -515,7 +513,6 @@ AddFunction SurvivalDefaultCdActions
 	UseRacialActions()
 	#use_item
 	UseItemActions()
-	#a_murder_of_crows,if=enabled&!ticking
 
 	unless { TalentPoints(a_murder_of_crows_talent) and not target.DebuffPresent(a_murder_of_crows_debuff) and Spell(a_murder_of_crows) }
 		or { TalentPoints(lynx_rush_talent) and not target.DebuffPresent(lynx_rush_debuff) and Spell(lynx_rush) }
