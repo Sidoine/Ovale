@@ -917,10 +917,10 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local duration, dotDuration, tick, numTicks = state:GetDuration(auraId, spellcast)
 			local stacks = 1
 
-			if type(spellData) == "number" and spellData > 0 then
+			if type(spellData) == "number" then
 				stacks = spellData
 				-- Deprecated after transition.
-				if not (si and si.duration) then
+				if not (si and si.duration) and spellData > 0 then
 					-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
 					duration = spellData
 					stacks = 1
@@ -1004,7 +1004,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 				end
 			else
 				-- Aura is not on the target.
-				if stacks > 0 then
+				if spellData ~= "refresh" and stacks > 0 then
 					-- Spellcast causes a new aura.
 					Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
 					-- Add an aura in the simulator and copy the existing aura information over.
