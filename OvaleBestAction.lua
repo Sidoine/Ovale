@@ -775,6 +775,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 				end
 				if actionCooldownStart > 0 then
 					if atTime > actionCooldownStart + actionCooldownDuration then
+						Ovale:Logf("Delaying spell %s for primary resource.", spellId)
 						actionCooldownDuration = atTime - actionCooldownStart
 					end
 				else
