@@ -57,7 +57,7 @@ local self_compileOnItems = false
 local self_compileOnStances = false
 
 -- Lua pattern to match a key=value pair, returning key and value.
-local KEY_VALUE_PATTERN = "([%w_]+)=([-%w\\_%.]+)"
+local KEY_VALUE_PATTERN = "([%w_]+)=(!?[-%w\\_%.]+)"
 -- Lua pattern to match a floating-point number that may start with a minus sign.
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
 
@@ -139,24 +139,52 @@ local function HasTalent(talentId)
 	end
 end
 
+local function RequireValue(value)
+	local requireValue = (strsub(value, 1, 1) ~= "!")
+	if not requireValue then
+		value = strsub(value, 2)
+		if strmatch(value, NUMBER_PATTERN) then
+			value = tonumber(value)
+		end
+	end
+	return value, requireValue
+end
+
 local function TestConditions(paramList)
-	if paramList.glyph and not OvaleSpellBook:IsActiveGlyph(paramList.glyph) then
-		return false
-	end
-	if paramList.mastery and not OvalePaperDoll:IsSpecialization(paramList.mastery) then
-		return false
-	end
-	if paramList.if_stance then
-		self_compileOnStances = true
-		if not OvaleStance:IsStance(paramList.if_stance) then
+	if paramList.glyph then
+		local glyph, requireGlyph = RequireValue(paramList.glyph)
+		local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
+		if (requireGlyph and not hasGlyph) or (not requireGlyph and hasGlyph) then
 			return false
 		end
 	end
-	if paramList.if_spell and not OvaleSpellBook:IsKnownSpell(paramList.if_spell) then
-		return false
+	if paramList.mastery then
+		local spec, requireSpec = RequireValue(paramList.mastery)
+		local isSpec = OvalePaperDoll:IsSpecialization(spec)
+		if (requireSpec and not isSpec) or (not requireSpec and isSpec) then
+			return false
+		end
 	end
-	if paramList.talent and not HasTalent(paramList.talent) then
-		return false
+	if paramList.if_stance then
+		local stance, requireStance = RequireValue(paramList.if_stance)
+		local isStance = OvaleStance:IsStance(stance)
+		if (requireStance and not isStance) or (not requireStance and isStance) then
+			return false
+		end
+	end
+	if paramList.if_spell then
+		local spell, requireSpell = RequireValue(paramList.if_spell)
+		local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
+		if (requireSpell and not hasSpell) or (not requireSpell and hasSpell) then
+			return false
+		end
+	end
+	if paramList.talent then
+		local talent, requireTalent = RequireValue(paramList.talent)
+		local hasTalent = HasTalent(talent)
+		if (requireTalent and not hasTalent) or (not requireTalent and hasTalent) then
+			return false
+		end
 	end
 	if paramList.checkboxon then
 		local cb = paramList.checkboxon
