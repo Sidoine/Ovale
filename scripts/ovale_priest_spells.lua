@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Priest spells"
 	local code = [[
 # Priest spells and functions.
-#	Last updated: 2014-04-19
 
 Define(cascade_damage 121135)
 	SpellInfo(cascade_damage cd=25)

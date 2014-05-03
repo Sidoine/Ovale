@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Assassination, Combat, Subtlety"
 	local code = [[
 # Ovale rogue script based on SimulationCraft.
-#	Last updated: 2014-04-28
 
 Include(ovale_items)
 Include(ovale_racials)

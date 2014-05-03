@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Shaman spells"
 	local code = [[
 # Shaman spells and functions.
-#	Last updated: 2014-04-19
 
 Define(ancestral_guidance 108281)
 	SpellInfo(ancestral_guidance cd=120)

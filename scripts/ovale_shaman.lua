@@ -6,7 +6,6 @@ do
 	local desc = "[5.4] Ovale: Elemental, Enhancement, Restoration"
 	local code = [[
 # Ovale shaman script based on SimulationCraft.
-#	Last updated: 2014-04-19
 
 Include(ovale_items)
 Include(ovale_racials)

@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Mage spells"
 	local code = [[
 # Mage spells and functions.
-#	Last updated: 2014-04-21
 
 Define(alter_time 108978)
 	SpellInfo(alter_time cd=180)

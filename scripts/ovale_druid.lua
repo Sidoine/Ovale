@@ -6,7 +6,6 @@ do
 	local desc = "[5.4] Ovale: Balance, Feral"
 	local code = [[
 # Ovale druid script based on SimulationCraft.
-#	Last updated: 2014-04-24
 
 Include(ovale_items)
 Include(ovale_racials)

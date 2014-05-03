@@ -6,7 +6,6 @@ do
 	local desc = "[5.4] Ovale: Arcane, Fire, Frost"
 	local code = [[
 # Ovale mage script based on SimulationCraft.
-#	Last updated: 2014-04-27
 
 Include(ovale_items)
 Include(ovale_racials)

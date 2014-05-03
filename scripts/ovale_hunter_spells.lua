@@ -5,6 +5,8 @@ do
 	local name = "ovale_hunter_spells"
 	local desc = "[5.4.7] Ovale: Hunter spells"
 	local code = [[
+# Hunter spells and functions.
+
 Define(a_murder_of_crows 131894)
 	SpellInfo(a_murder_of_crows cd=120 focus=60)
 	SpellInfo(a_murder_of_crows buff_focus_half=beast_within_buff mastery=beast_mastery)

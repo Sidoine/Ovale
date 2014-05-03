@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Monk spells"
 	local code = [[
 # Monk spells and functions.
-#	Last updated: 2014-04-16
 
 Define(blackout_kick 100784)
 	SpellInfo(blackout_kick chi=2)

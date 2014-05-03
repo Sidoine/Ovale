@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Rogue spells"
 	local code = [[
 # Rogue spells and functions.
-#	Last updated: 2014-04-28
 
 Define(adrenaline_rush 13750)
 	SpellInfo(adrenaline_rush cd=180)

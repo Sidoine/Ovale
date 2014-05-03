@@ -6,7 +6,6 @@ do
 	local desc = "[5.4.7] Ovale: Druid spells"
 	local code = [[
 # Druid spells and functions.
-#	Last updated: 2014-04-24
 
 Define(barkskin 22812)
 	SpellInfo(barkskin cd=60)

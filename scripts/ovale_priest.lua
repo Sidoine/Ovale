@@ -6,7 +6,6 @@ do
 	local desc = "[5.4] Ovale: Shadow"
 	local code = [[
 # Ovale shadow script based on SimulationCraft.
-#	Last updated: 2014-04-25
 
 Include(ovale_items)
 Include(ovale_racials)

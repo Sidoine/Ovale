@@ -5,6 +5,8 @@ do
 	local name = "ovale_paladin_spells"
 	local desc = "[5.4.7] Ovale: Paladin spells"
 	local code = [[
+# Paladin spells and functions.
+
 Define(ancient_power_buff 86700)
 	SpellInfo(ancient_power_buff duration=30)
 Define(ardent_defender 31850)
