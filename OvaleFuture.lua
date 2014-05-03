@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012, 2013 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -177,7 +177,8 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 					spellcast.combo = MAX_COMBO_POINTS
 				end
 			end
-			if OvaleComboPoints.combo > 0 then
+			local min_combo = si.min_combo or si.mincombo or 1
+			if OvaleComboPoints.combo >= min_combo then
 				spellcast.combo = OvaleComboPoints.combo
 			end
 		end
