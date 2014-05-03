@@ -4,5 +4,5 @@
     output-page: Main
 -
     type: luadoc
-	input-file: OvaleCondition.lua
+	input-files: conditions/*.lua
 	output-page: Conditions
