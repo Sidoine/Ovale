@@ -199,6 +199,7 @@ local function RemoveAurasOnGUID(auraDB, guid)
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
 				self_pool:Release(aura)
+				whoseTable[casterGUID] = nil
 			end
 			self_pool:Release(whoseTable)
 			auraTable[auraId] = nil
@@ -418,6 +419,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 			aura.start = atTime
 		end
 		aura.gain = atTime
+		aura.lastUpdated = atTime
 		aura.stacks = count
 		aura.consumed = nil
 		aura.filter = filter
@@ -506,6 +508,7 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 			end
 		end
 	end
+	aura.lastUpdated = atTime
 
 	self:SendMessage("Ovale_AuraRemoved", atTime, guid, auraId, aura.source)
 	local unitId = OvaleGUID:GetUnitId(guid)
@@ -632,11 +635,32 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleAura:ResetState(state)
-	-- Garbage-collect auras in the state machine.
-	if not Ovale.enCombat then
-		self:CleanState(state)
-	end
+	-- Advance age of auras in state machine.
 	state.serial = state.serial + 1
+
+	-- Garbage-collect auras in the state machine that are more recently updated in the true aura database.
+	for guid, auraTable in pairs(state.aura) do
+		for auraId, whoseTable in pairs(auraTable) do
+			for casterGUID, aura in pairs(whoseTable) do
+				local auraFound = GetAura(self.aura, guid, auraId, casterGUID)
+				if auraFound and aura.lastUpdated <= auraFound.lastUpdated then
+					self_pool:Release(aura)
+					whoseTable[casterGUID] = nil
+				else
+					-- Reset the aura age relative to the state of the simulator.
+					aura.serial = state.serial
+				end
+			end
+			if not next(whoseTable) then
+				self_pool:Release(whoseTable)
+				auraTable[auraId] = nil
+			end
+		end
+		if not next(auraTable) then
+			self_pool:Release(auraTable)
+			state.aura[guid] = nil
+		end
+	end
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -1031,6 +1055,7 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	local aura = self_pool:Get()
 	aura.state = true
 	aura.serial = state.serial
+	aura.lastUpdated = state.currentTime
 	aura.filter = filter
 	aura.mine = mine
 	aura.start = start or 0
@@ -1069,6 +1094,7 @@ statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, at
 		-- Expire the aura.
 		aura.stacks = 0
 		aura.ending = atTime
+		aura.lastUpdated = atTime
 	end
 end
 
