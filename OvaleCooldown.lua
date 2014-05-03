@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -57,6 +57,8 @@ function OvaleCooldown:GetGCD(spellId)
 		cd = 1.0
 	elseif self_class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		cd = 1.0
+	elseif self_class == "HUNTER" then
+		cd = 1.0
 	elseif self_class == "MONK" then
 		cd = 1.0
 	elseif self_class == "ROGUE" then
@@ -75,6 +77,8 @@ function OvaleCooldown:GetGCD(spellId)
 		if si.haste then
 			if si.haste == "melee" then
 				cd = cd / OvalePaperDoll:GetMeleeHasteMultiplier()
+			elseif si.haste == "ranged" then
+				cd = cd / OvalePaperDoll:GetRangedHasteMultiplier()
 			elseif si.haste == "spell" then
 				cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
 			end
