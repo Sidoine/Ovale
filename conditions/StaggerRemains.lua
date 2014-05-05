@@ -47,10 +47,10 @@ do
 			aura = state:GetAura(target, LIGHT_STAGGER, "HARMFUL")
 		end
 		if state:IsActiveAura(aura) then
-			local start, ending = aura.start, aura.ending
+			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local stagger = API_UnitStagger(target)
 			local rate = -1 * stagger / (ending - start)
-			return TestValue(start, ending, 0, ending, rate, comparator, limit)
+			return TestValue(gain, ending, 0, ending, rate, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end

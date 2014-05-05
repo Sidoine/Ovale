@@ -39,7 +39,6 @@ do
 		local _, filter, mine = ParseCondition(condition)
 
 		local count, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
-		Ovale:Logf("BuffCount(%d) is %s, %s, %s, %s, %s", auraId, count, startChangeCount, endingChangeCount, startFirst, endingLast)
 		if count > 0 and startChangeCount < math.huge then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)

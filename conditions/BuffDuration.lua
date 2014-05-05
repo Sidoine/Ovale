@@ -36,9 +36,9 @@ do
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if state:IsActiveAura(aura) then
-			local start, ending = aura.start, aura.ending
+			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = ending - start
-			return TestValue(start, ending, value, start, 0, comparator, limit)
+			return TestValue(gain, ending, value, start, 0, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end

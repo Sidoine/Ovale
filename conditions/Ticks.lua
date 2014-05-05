@@ -35,7 +35,7 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		local numTicks
 		if state:IsActiveAura(aura) then
-			local start, ending, tick = aura.start, aura.ending, aura.tick
+			local gain, start, ending, tick = aura.gain, aura.start, aura.ending, aura.tick
 			if tick and tick > 0 then
 				numTicks = floor((ending - start) / tick + 0.5)
 			end

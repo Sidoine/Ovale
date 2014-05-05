@@ -61,10 +61,10 @@ do
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
-			local start, ending = aura.start, aura.ending
+			local gain, start, ending = aura.gain, aura.start, aura.ending
 			seconds = TimeWithHaste(seconds or 0, condition.haste)
-			if ending - seconds <= start then
-				return start, math.huge
+			if ending - seconds <= gain then
+				return gain, math.huge
 			else
 				return ending - seconds, math.huge
 			end
@@ -103,12 +103,12 @@ do
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
-			local start, ending = aura.start, aura.ending
+			local gain, start, ending = aura.gain, aura.start, aura.ending
 			seconds = TimeWithHaste(seconds or 0, condition.haste)
-			if ending - seconds <= start then
+			if ending - seconds <= gain then
 				return nil
 			else
-				return start, ending - seconds
+				return gain, ending - seconds
 			end
 		end
 		return nil

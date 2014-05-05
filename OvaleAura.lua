@@ -365,7 +365,7 @@ function OvaleAura:IsActiveAura(aura, now)
 	now = now or API_GetTime()
 	local boolean = false
 	if aura then
-		if aura.serial == self.serial[aura.guid] and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+		if aura.serial == self.serial[aura.guid] and aura.stacks > 0 and aura.gain <= now and now <= aura.ending then
 			boolean = true
 		elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
 			boolean = true
@@ -388,7 +388,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 	local aura = GetAura(self.aura, guid, auraId, casterGUID)
 	local auraIsActive
 	if aura then
-		auraIsActive = (aura.stacks > 0 and aura.start <= atTime and atTime <= aura.ending)
+		auraIsActive = (aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending)
 	else
 		aura = self_pool:Get()
 		PutAura(self.aura, guid, auraId, casterGUID, aura)
@@ -892,7 +892,7 @@ statePrototype.IsActiveAura = function(state, aura, now)
 	local boolean = false
 	if aura then
 		if aura.state then
-			if aura.serial == state.serial and aura.stacks > 0 and aura.start <= now and now <= aura.ending then
+			if aura.serial == state.serial and aura.stacks > 0 and aura.gain <= now and now <= aura.ending then
 				boolean = true
 			elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
 				boolean = true
@@ -949,13 +949,14 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					end
 					-- Reset the aura age relative to the state of the simulator.
 					aura.serial = state.serial
+					Ovale:Logf("Aura %d is copied into simulator.", auraId)
 					-- Information that needs to be set below: stacks, start, ending, duration, gain.
 				end
 				-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
 				if spellData == "refresh" or stacks > 0 then
 					-- Adjust stack count.
 					if spellData == "refresh" then
-						Ovale:Logf("Aura %d is refreshed.", auraId)
+						Ovale:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
 					else -- if stacks > 0 then
 						local maxstacks = 1
 						if si and si.maxstacks then
@@ -986,7 +987,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					end
 					aura.ending = aura.start + aura.duration
 					aura.gain = atTime
-					Ovale:Logf("Aura %d now ending at %f", auraId, aura.ending)
+					Ovale:Logf("Aura %d with duration %s now ending at %f", auraId, aura.duration, aura.ending)
 				elseif stacks == 0 or stacks < 0 then
 					if stacks == 0 then
 						aura.stacks = 0
@@ -1105,17 +1106,16 @@ statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filte
 	local count = 0
 	local guid = OvaleGUID:GetGUID(unitId)
 	local start, ending = math.huge, 0
-	local now = state.currentTime
 
 	-- Loop through auras not kept in the simulator that match the criteria.
 	if OvaleAura.aura[guid] then
 		for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
 			for casterGUID in pairs(whoseTable) do
 				local aura = GetStateAura(state, guid, auraId, self_guid)
-				if state:IsActiveAura(aura, now) and not aura.state then
+				if state:IsActiveAura(aura) and not aura.state then
 					if aura[propertyName] and aura.filter == filter then
 						count = count + 1
-						start = (aura.start < start) and aura.start or start
+						start = (aura.gain < start) and aura.gain or start
 						ending = (aura.ending > ending) and aura.ending or ending
 					end
 				end
@@ -1126,10 +1126,10 @@ statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filte
 	if state.aura[guid] then
 		for auraId, whoseTable in pairs(state.aura[guid]) do
 			for casterGUID, aura in pairs(whoseTable) do
-				if state:IsActiveAura(aura, now) then
+				if state:IsActiveAura(aura) then
 					if aura[propertyName] and aura.filter == filter then
 						count = count + 1
-						start = (aura.start < start) and aura.start or start
+						start = (aura.gain < start) and aura.gain or start
 						ending = (aura.ending > ending) and aura.ending or ending
 					end
 				end
@@ -1153,10 +1153,10 @@ do
 	local function CountMatchingActiveAura(aura)
 		count = count + 1
 		if aura.ending < endingChangeCount then
-			startChangeCount, endingChangeCount = aura.start, aura.ending
+			startChangeCount, endingChangeCount = aura.gain, aura.ending
 		end
-		if aura.start < startFirst then
-			startFirst = aura.start
+		if aura.gain < startFirst then
+			startFirst = aura.gain
 		end
 		if aura.ending > endingLast then
 			endingLast = aura.ending
@@ -1175,20 +1175,18 @@ do
 		startChangeCount, endingChangeCount = math.huge, math.huge
 		startFirst, endingLast = math.huge, 0
 
-		local now = state.currentTime
-
 		-- Loop through auras not kept in the simulator that match the criteria.
 		for guid, auraTable in pairs(OvaleAura.aura) do
 			if auraTable[auraId] then
 				if mine then
 					local aura = GetStateAura(state, guid, auraId, self_guid)
-					if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
+					if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
 						CountMatchingActiveAura(aura)
 					end
 				else
 					for casterGUID in pairs(auraTable[auraId]) do
 						local aura = GetStateAura(state, guid, auraId, casterGUID)
-						if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
+						if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
 							CountMatchingActiveAura(aura)
 						end
 					end
@@ -1201,13 +1199,13 @@ do
 				if mine then
 					local aura = auraTable[auraId][self_guid]
 					if aura then
-						if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks then
+						if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks then
 							CountMatchingActiveAura(aura)
 						end
 					end
 				else
 					for casterGUID, aura in pairs(auraTable[auraId]) do
-						if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks then
+						if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks then
 							CountMatchingActiveAura(aura)
 						end
 					end
@@ -1215,6 +1213,7 @@ do
 			end
 		end
 
+		Ovale:Logf("AuraCount(%d) is %s, %s, %s, %s, %s", auraId, count, startChangeCount, endingChangeCount, startFirst, endingLast)
 		return count, startChangeCount, endingChangeCount, startFirst, endingLast
 	end
 end

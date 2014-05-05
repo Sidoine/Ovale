@@ -41,7 +41,7 @@ do
 		local count, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
 		if count > 0 then
 			local start, ending = startFirst, endingLast
-			return TestValue(start, math.huge, ending - start, start, -1, comparator, limit)
+			return TestValue(start, math.huge, 0, ending, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
