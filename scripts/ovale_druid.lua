@@ -227,7 +227,7 @@ AddFunction FeralFillerActions
 	#rake,if=target.time_to_die-dot.rake.remains>3&action.rake.tick_damage*(dot.rake.ticks_remain+1)-dot.rake.tick_dmg*dot.rake.ticks_remain>action.mangle_cat.hit_damage
 	if target.TimeToDie() - target.DebuffRemains(rake_debuff) > 3 and target.Damage(rake_debuff) * { target.TicksRemain(rake_debuff) + 1 } - target.LastEstimatedDamage(rake_debuff) * target.TicksRemain(rake_debuff) > target.Damage(mangle_cat) Spell(rake)
 	#shred,if=(buff.omen_of_clarity.react|buff.berserk.up|energy.regen>=15)&buff.king_of_the_jungle.down
-	if { BuffPresent(omen_of_clarity_buff) or BuffPresent(berserk_cat_buff) or EnergyRegen() >= 15 } and BuffExpires(king_of_the_jungle_buff) Spell(shred)
+	if { BuffPresent(omen_of_clarity_melee_buff) or BuffPresent(berserk_cat_buff) or EnergyRegen() >= 15 } and BuffExpires(king_of_the_jungle_buff) Spell(shred)
 	#mangle_cat,if=buff.king_of_the_jungle.down
 	if BuffExpires(king_of_the_jungle_buff) Spell(mangle_cat)
 }
@@ -246,7 +246,7 @@ AddFunction FeralBasicActions
 	#savage_roar,if=buff.savage_roar.remains<3
 	if BuffRemains(savage_roar_buff) < 3 SavageRoar()
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
-	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
+	if Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) Spell(tigers_fury)
 	#rip,if=combo_points>=5&target.health.pct<=25&action.rip.tick_damage%dot.rip.tick_dmg>=1.15
 	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 Spell(rip)
 	#ferocious_bite,if=combo_points>=5&target.health.pct<=25&dot.rip.ticking
@@ -254,7 +254,7 @@ AddFunction FeralBasicActions
 	#rip,if=combo_points>=5&dot.rip.remains<2
 	if ComboPoints() >= 5 and target.DebuffRemains(rip_debuff) < 2 Spell(rip)
 	#thrash_cat,if=buff.omen_of_clarity.react&dot.thrash_cat.remains<3
-	if BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 Spell(thrash_cat)
+	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 Spell(thrash_cat)
 	#rake,cycle_targets=1,if=dot.rake.remains<3|action.rake.tick_damage>dot.rake.tick_dmg
 	if target.DebuffRemains(rake_debuff) < 3 or target.Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) Spell(rake)
 	#pool_resource,for_next=1
@@ -266,7 +266,7 @@ AddFunction FeralBasicActions
 		#ferocious_bite,if=combo_points>=5&dot.rip.ticking
 		if ComboPoints() >= 5 and target.DebuffPresent(rip_debuff) Spell(ferocious_bite)
 		#run_action_list,name=filler,if=buff.omen_of_clarity.react
-		if BuffPresent(omen_of_clarity_buff) FeralFillerActions()
+		if BuffPresent(omen_of_clarity_melee_buff) FeralFillerActions()
 		#run_action_list,name=filler,if=buff.feral_fury.react
 		if BuffPresent(feral_fury_buff) FeralFillerActions()
 		#run_action_list,name=filler,if=(combo_points<5&dot.rip.remains<3.0)|(combo_points=0&buff.savage_roar.remains<2)
@@ -296,7 +296,7 @@ AddFunction FeralBasicPredictiveActions
 	#savage_roar,if=buff.savage_roar.remains<3
 	if BuffRemains(savage_roar_buff) < 3 SavageRoar()
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
-	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
+	if Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) Spell(tigers_fury)
 	#rip,if=combo_points>=5&target.health.pct<=25&action.rip.tick_damage%dot.rip.tick_dmg>=1.15
 	if ComboPoints() >= 5 and target.HealthPercent() <= 25 and target.Damage(rip_debuff) / target.LastEstimatedDamage(rip_debuff) >= 1.15 Spell(rip)
 	#ferocious_bite,if=combo_points>=5&target.health.pct<=25&dot.rip.ticking
@@ -304,7 +304,7 @@ AddFunction FeralBasicPredictiveActions
 	#rip,if=combo_points>=5&dot.rip.remains<2
 	if ComboPoints() >= 5 and target.DebuffRemains(rip_debuff) < 2 Spell(rip)
 	#thrash_cat,if=buff.omen_of_clarity.react&dot.thrash_cat.remains<3
-	if BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 Spell(thrash_cat)
+	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 Spell(thrash_cat)
 	#rake,cycle_targets=1,if=dot.rake.remains<3|action.rake.tick_damage>dot.rake.tick_dmg
 	if target.DebuffRemains(rake_debuff) < 3 or target.Damage(rake_debuff) > target.LastEstimatedDamage(rake_debuff) Spell(rake)
 	#pool_resource,for_next=1
@@ -332,7 +332,7 @@ AddFunction FeralBasicCdActions
 		if { target.HealthPercent() < 30 and BuffPresent(berserk_cat_buff) } or target.TimeToDie() <= 40 UsePotionAgility()
 
 		# Synchronize display with Tiger's Fury buff in main actions.
-		if { Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) } or BuffPresent(tigers_fury_buff)
+		if { Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) } or BuffPresent(tigers_fury_buff)
 		{
 			#berserk,if=buff.tigers_fury.up
 			Spell(berserk_cat)
@@ -353,7 +353,7 @@ AddFunction FeralAoeActions
 	if BuffExpires(savage_roar_buff) or { BuffRemains(savage_roar_buff) < 3 and ComboPoints() > 0 } SavageRoar()
 	#use_item,slot=hands,if=buff.tigers_fury.up
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
-	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
+	if Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) Spell(tigers_fury)
 	#berserk,if=buff.tigers_fury.up
 	if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
 	#pool_resource,for_next=1
@@ -375,7 +375,7 @@ AddFunction FeralAoeActions
 	#swipe_cat,if=cooldown.tigers_fury.remains<3
 	if SpellCooldown(tigers_fury) < 3 Spell(swipe_cat)
 	#swipe_cat,if=buff.omen_of_clarity.react
-	if BuffPresent(omen_of_clarity_buff) Spell(swipe_cat)
+	if BuffPresent(omen_of_clarity_melee_buff) Spell(swipe_cat)
 	#swipe_cat,if=energy.time_to_max<=1
 	if TimeToMaxEnergy() <= 1 Spell(swipe_cat)
 }
@@ -419,9 +419,9 @@ AddFunction FeralAdvancedActions
 	#savage_roar,if=buff.savage_roar.down
 	if BuffExpires(savage_roar_buff) SavageRoar()
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
-	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
+	if Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) Spell(tigers_fury)
 	#thrash_cat,if=buff.omen_of_clarity.react&dot.thrash_cat.remains<3&target.time_to_die>=6
-	if BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 and target.TimeToDie() >= 6 Spell(thrash_cat)
+	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 and target.TimeToDie() >= 6 Spell(thrash_cat)
 	#ferocious_bite,if=target.time_to_die<=1&combo_points>=3
 	if target.TimeToDie() <= 1 and ComboPoints() >= 3 Spell(ferocious_bite)
 	#savage_roar,if=buff.savage_roar.remains<=3&combo_points>0&target.health.pct<25
@@ -459,7 +459,7 @@ AddFunction FeralAdvancedActions
 			#ferocious_bite,if=combo_points>=5&dot.rip.ticking
 			if ComboPoints() >= 5 and target.DebuffPresent(rip_debuff) Spell(ferocious_bite)
 			#run_action_list,name=filler,if=buff.omen_of_clarity.react
-			if BuffPresent(omen_of_clarity_buff) FeralFillerActions()
+			if BuffPresent(omen_of_clarity_melee_buff) FeralFillerActions()
 			#run_action_list,name=filler,if=buff.feral_fury.react
 			if BuffPresent(feral_fury_buff) FeralFillerActions()
 			#run_action_list,name=filler,if=(combo_points<5&dot.rip.remains<3.0)|(combo_points=0&buff.savage_roar.remains<2)
@@ -492,9 +492,9 @@ AddFunction FeralAdvancedPredictiveActions
 	#savage_roar,if=buff.savage_roar.down
 	if BuffExpires(savage_roar_buff) SavageRoar()
 	#tigers_fury,if=energy<=35&!buff.omen_of_clarity.react
-	if Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) Spell(tigers_fury)
+	if Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) Spell(tigers_fury)
 	#thrash_cat,if=buff.omen_of_clarity.react&dot.thrash_cat.remains<3&target.time_to_die>=6
-	if BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 and target.TimeToDie() >= 6 Spell(thrash_cat)
+	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 and target.TimeToDie() >= 6 Spell(thrash_cat)
 	#ferocious_bite,if=target.time_to_die<=1&combo_points>=3
 	if target.TimeToDie() <= 1 and ComboPoints() >= 3 Spell(ferocious_bite)
 	#savage_roar,if=buff.savage_roar.remains<=3&combo_points>0&target.health.pct<25
@@ -549,7 +549,7 @@ AddFunction FeralAdvancedCdActions
 	{
 		# Synchronize display with Tiger's Fury buff in main actions.
 		if target.TimeToDie() < 18 and SpellCooldown(tigers_fury) > 6 Spell(berserk_cat)
-		if { Energy() <= 35 and not BuffPresent(omen_of_clarity_buff) } or BuffPresent(tigers_fury_buff)
+		if { Energy() <= 35 and not BuffPresent(omen_of_clarity_melee_buff) } or BuffPresent(tigers_fury_buff)
 		{
 			#berserk,if=buff.tigers_fury.up|(target.time_to_die<18&cooldown.tigers_fury.remains>6)
 			Spell(berserk_cat)
@@ -557,7 +557,7 @@ AddFunction FeralAdvancedCdActions
 			UseItemActions()
 		}
 
-		unless { BuffPresent(omen_of_clarity_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 and target.TimeToDie() >= 6 and Spell(thrash_cat) }
+		unless { BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemains(thrash_cat_debuff) < 3 and target.TimeToDie() >= 6 and Spell(thrash_cat) }
 			or { target.TimeToDie() <= 1 and ComboPoints() >= 3 or Spell(ferocious_bite) }
 			or { BuffRemains(savage_roar_buff) <= 3 and ComboPoints() > 0 and target.HealthPercent() < 25 and SavageRoar() }
 		{
@@ -768,7 +768,7 @@ AddFunction RestorationMainActions
 
 	# Cast instant/mana-free Healing Touch or Regrowth.
 	if BuffStacks(sage_mender_buff) == 5 Spell(healing_touch)
-	if BuffPresent(omen_of_clarity_buff)
+	if BuffPresent(omen_of_clarity_heal_buff)
 	{
 		if Glyph(glyph_of_regrowth) Spell(regrowth)
 		Spell(healing_touch)
@@ -800,7 +800,7 @@ AddFunction RestorationAoeActions
 	if BuffPresent(tree_of_life_buff)
 	{
 		Spell(wild_growth)
-		if BuffPresent(omen_of_clarity_buff) Spell(regrowth)
+		if BuffPresent(omen_of_clarity_heal_buff) Spell(regrowth)
 		Spell(lifebloom)
 	}
 
@@ -822,11 +822,6 @@ AddFunction RestorationCdActions
 	if TalentPoints(force_of_nature_talent) Spell(force_of_nature_heal)
 	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_heal)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
-}
-
-AddFunction RestorationPrecombatActions
-{
-	if BuffRemains(harmony_buff) < 10 Spell(nourish)
 }
 
 ### Restoration icons.
@@ -853,11 +848,10 @@ AddIcon mastery=restoration help=shortcd
 
 AddIcon mastery=restoration help=main
 {
-	if InCombat(no) RestorationPrecombatActions()
 	RestorationMainActions()
 }
 
-AddIcon mastery=restoration help=aoe checkboxon=aoe
+AddIcon mastery=restoration help=aoe checkboxon=opt_aoe
 {
 	RestorationAoeActions()
 }
