@@ -109,4 +109,5 @@
 	<Script file="WeaponDamage.lua" />
 	<Script file="WeaponEnchantExpires.lua" />
 	<Script file="WildMushroomCount.lua" />
+	<Script file="WildMushroomIsCharged.lua" />
 </Ui>
