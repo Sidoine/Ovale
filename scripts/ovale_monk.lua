@@ -156,20 +156,19 @@ AddFunction BrewmasterPrecombatActions
 
 ### Brewmaster icons.
 
-AddIcon mastery=brewmaster help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=brewmaster size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(dampen_harm_talent) Spell(dampen_harm)
 	if TalentPoints(diffuse_magic_talent) Spell(diffuse_magic)
 }
 
-AddIcon mastery=brewmaster help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=brewmaster size=small checkboxon=opt_icons_left
 {
 	Spell(fortifying_brew)
 	Spell(symbiosis_survival_instincts)
 	UseRacialSurvivalActions()
 }
 
-# Defensive abilities
 AddIcon mastery=brewmaster help=cd
 {
 	BrewmasterShortCdActions()
@@ -200,12 +199,12 @@ AddIcon mastery=brewmaster help=cd
 	BrewmasterCdActions()
 }
 
-AddIcon mastery=brewmaster help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=brewmaster size=small checkboxon=opt_icons_right
 {
 	if TotemExpires(statue) or BuffExpires(sanctuary_of_the_ox_buff) Spell(summon_black_ox_statue)
 }
 
-AddIcon mastery=brewmaster help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=brewmaster size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -292,12 +291,12 @@ AddFunction MistweaverPrecombatActions
 
 ### Mistweaver icons.
 
-AddIcon mastery=mistweaver help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=mistweaver size=small checkboxon=opt_icons_right
 {
 	if TotemExpires(statue) Spell(summon_jade_serpent_statue)
 }
 
-AddIcon mastery=mistweaver help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=mistweaver size=small checkboxon=opt_icons_left
 {
 	if BuffCount(renewing_mist_buff) > 5 Spell(thunder_focus_tea)
 	Spell(revival)
@@ -349,7 +348,7 @@ AddIcon mastery=mistweaver help=mana size=small checkboxon=opt_icons_left
 	}
 }
 
-AddIcon mastery=mistweaver help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=mistweaver size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -474,13 +473,13 @@ AddFunction WindwalkerPrecombatCdActions
 
 ### Windwalker icons.
 
-AddIcon mastery=windwalker help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=windwalker size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(dampen_harm_talent) Spell(dampen_harm)
 	if TalentPoints(diffuse_magic_talent) Spell(diffuse_magic)
 }
 
-AddIcon mastery=windwalker help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=windwalker size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(chi_burst_talent) Spell(chi_burst)
 	if TalentPoints(chi_wave_talent) Spell(chi_wave)
@@ -519,12 +518,12 @@ AddIcon mastery=windwalker help=cd
 	WindwalkerDefaultCdActions()
 }
 
-AddIcon mastery=windwalker help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=windwalker size=small checkboxon=opt_icons_right
 {
 	Spell(zen_meditation)
 }
 
-AddIcon mastery=windwalker help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=windwalker size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }

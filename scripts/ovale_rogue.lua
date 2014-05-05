@@ -174,13 +174,13 @@ AddIcon mastery=assassination help=cd
 	AssassinationDefaultCdActions()
 }
 
-AddIcon mastery=assassination help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=assassination size=small checkboxon=opt_icons_right
 {
 	Spell(feint)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=assassination help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=assassination size=small checkboxon=opt_icons_right
 {
 	Spell(cloak_of_shadows)
 }
@@ -377,13 +377,13 @@ AddIcon mastery=combat help=cd
 	CombatDefaultCdActions()
 }
 
-AddIcon mastery=combat help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=combat size=small checkboxon=opt_icons_right
 {
 	Spell(feint)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=combat help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=combat size=small checkboxon=opt_icons_right
 {
 	Spell(cloak_of_shadows)
 }
@@ -588,13 +588,13 @@ AddIcon mastery=subtlety help=cd
 	SubtletyDefaultCdActions()
 }
 
-AddIcon mastery=subtlety help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=subtlety size=small checkboxon=opt_icons_right
 {
 	Spell(feint)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=subtlety help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=subtlety size=small checkboxon=opt_icons_right
 {
 	Spell(cloak_of_shadows)
 }

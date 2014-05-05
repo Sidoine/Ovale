@@ -158,7 +158,7 @@ AddFunction BalancePrecombatCdActions
 
 ### Balance Icons
 
-AddIcon mastery=balance help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=balance size=small checkboxon=opt_icons_left
 {
 	Spell(barkskin)
 	Spell(survival_instincts)
@@ -200,13 +200,13 @@ AddIcon mastery=balance help=cd
 	BalanceDefaultCdActions()
 }
 
-AddIcon mastery=balance help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=balance size=small checkboxon=opt_icons_right
 {
 	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_caster)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
-AddIcon mastery=balance help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=balance size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -572,7 +572,7 @@ AddListItem(opt_feral_rotation advanced "Use advanced rotation" mastery=feral)
 
 ### Feral Icons
 
-AddIcon mastery=feral help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=feral size=small checkboxon=opt_icons_left
 {
 	Spell(barkskin)
 	Spell(survival_instincts)
@@ -622,13 +622,13 @@ AddIcon mastery=feral help=cd
 	if List(opt_feral_rotation advanced) FeralAdvancedCdActions()
 }
 
-AddIcon mastery=feral help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=feral size=small checkboxon=opt_icons_right
 {
 	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_melee)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
-AddIcon mastery=feral help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=feral size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -709,12 +709,12 @@ AddFunction GuardianPrecombatActions
 
 ### Guardian icons.
 
-AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=guardian size=small checkboxon=opt_icons_left
 {
 	Spell(might_of_ursoc)
 }
 
-AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=guardian size=small checkboxon=opt_icons_left
 {
 	Spell(barkskin)
 	if TalentPoints(force_of_nature_talent) Spell(force_of_nature_tank)
@@ -742,13 +742,13 @@ AddIcon mastery=guardian help=cd
 	GuardianCdActions()
 }
 
-AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=guardian size=small checkboxon=opt_icons_right
 {
 	#renewal,if=talent.renewal.enabled&incoming_damage_5>0.8*health.max
 	if TalentPoints(renewal_talent) and IncomingDamage(5) > 0.8 * MaxHealth() Spell(renewal)
 }
 
-AddIcon mastery=guardian help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=guardian size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -831,14 +831,14 @@ AddFunction RestorationPrecombatActions
 
 ### Restoration icons.
 
-AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=restoration size=small checkboxon=opt_icons_left
 {
 	Spell(barkskin)
 	Spell(might_of_ursoc)
 	Spell(survival_instincts)
 }
 
-AddIcon mastery=restoration help=buff size=small checkboxon=opt_icons_left
+AddIcon mastery=restoration size=small checkboxon=opt_icons_left
 {
 	#innervate,if=mana.pct<90
 	if ManaPercent() < 90 Spell(innervate)
@@ -868,12 +868,12 @@ AddIcon mastery=restoration help=cd
 	RestorationCdActions()
 }
 
-AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 {
 	Spell(ironbark)
 }
 
-AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }

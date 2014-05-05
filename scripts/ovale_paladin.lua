@@ -67,15 +67,14 @@ AddFunction HolyPrecombatActions
 
 ### Holy Icons
 
-# Damage reduction cooldowns.
-AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=holy size=small checkboxon=opt_icons_left
 {
 	Spell(divine_protection)
 	Spell(devotion_aura)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=holy help=mana size=small checkboxon=opt_icons_left
 {
 	if ManaPercent() <98 Spell(arcane_torrent_mana)
 	if ManaPercent() <88 Spell(divine_plea)
@@ -113,12 +112,12 @@ AddIcon mastery=holy help=cd
 	Spell(guardian_of_ancient_kings_heal)
 }
 
-AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=holy size=small checkboxon=opt_icons_right
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
 }
 
-AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=holy size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -221,7 +220,7 @@ AddFunction ProtectionPrecombatActions
 
 ### Protection Icons
 
-AddIcon mastery=protection help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=protection size=small checkboxon=opt_icons_left
 {
 	Spell(divine_protection)
 	Spell(ardent_defender)
@@ -230,7 +229,7 @@ AddIcon mastery=protection help=cd size=small checkboxon=opt_icons_left
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=protection help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=protection size=small checkboxon=opt_icons_left
 {
 	if DebuffExpires(forbearance_debuff)
 	{
@@ -273,13 +272,12 @@ AddIcon mastery=protection help=cd
 	ProtectionDefaultCdActions()
 }
 
-# Righteous Fury indicator.
-AddIcon mastery=protection help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=protection size=small checkboxon=opt_icons_right
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
 }
 
-AddIcon mastery=protection help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=protection size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -431,7 +429,7 @@ AddFunction RetributionPrecombatCdActions
 
 ### Retribution Icons
 
-AddIcon mastery=retribution help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=retribution size=small checkboxon=opt_icons_left
 {
 	if IsRooted()
 	{
@@ -440,7 +438,7 @@ AddIcon mastery=retribution help=cd size=small checkboxon=opt_icons_left
 	}
 }
 
-AddIcon mastery=retribution help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=retribution size=small checkboxon=opt_icons_left
 {
 	Spell(lay_on_hands)
 	Spell(hand_of_protection)
@@ -470,14 +468,14 @@ AddIcon mastery=retribution help=cd
 	RetributionDefaultCdActions()
 }
 
-AddIcon mastery=retribution help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=retribution size=small checkboxon=opt_icons_right
 {
 	#seal_of_righteousness,if=active_enemies>=4
 	if Enemies() >= 4 and not Stance(paladin_seal_of_righteousness) Spell(seal_of_righteousness)
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
 }
 
-AddIcon mastery=retribution help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=retribution size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }

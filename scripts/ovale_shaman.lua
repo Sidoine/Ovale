@@ -140,7 +140,7 @@ AddFunction ElementalPrecombatCdActions
 
 ### Elemental icons.
 
-AddIcon mastery=elemental help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=elemental size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(stone_bulwark_totem_talent) Spell(stone_bulwark_totem)
 	if TalentPoints(astral_shift_talent) Spell(astral_shift)
@@ -148,7 +148,7 @@ AddIcon mastery=elemental help=cd size=small checkboxon=opt_icons_left
 	Spell(earthbind_totem)
 }
 
-AddIcon mastery=elemental help=buff size=small checkboxon=opt_icons_left
+AddIcon mastery=elemental size=small checkboxon=opt_icons_left
 {
 	if IsFeared() Spell(tremor_totem)
 	#if IsStunned() Spell(windwalk_totem)
@@ -190,7 +190,7 @@ AddIcon mastery=elemental help=cd
 	ElementalSingleCdActions()
 }
 
-AddIcon mastery=elemental help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=elemental size=small checkboxon=opt_icons_right
 {
 	#bloodlust,if=target.health.pct<25|time>5
 	if target.HealthPercent() < 25 or TimeInCombat() > 5 Bloodlust()
@@ -198,7 +198,7 @@ AddIcon mastery=elemental help=cd size=small checkboxon=opt_icons_right
 	if not TotemPresent(air totem=stormlash_totem) and not BuffPresent(stormlash_buff) and { BuffPresent(burst_haste any=1) or TimeInCombat() >= 60 } Spell(stormlash_totem)
 }
 
-AddIcon mastery=elemental help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=elemental size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -381,7 +381,7 @@ AddFunction EnhancementPrecombatCdActions
 
 ### Enhancement icons.
 
-AddIcon mastery=enhancement help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=enhancement size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(stone_bulwark_totem_talent) Spell(stone_bulwark_totem)
 	if TalentPoints(astral_shift_talent) Spell(astral_shift)
@@ -389,7 +389,7 @@ AddIcon mastery=enhancement help=cd size=small checkboxon=opt_icons_left
 	Spell(earthbind_totem)
 }
 
-AddIcon mastery=enhancement help=buff size=small checkboxon=opt_icons_left
+AddIcon mastery=enhancement size=small checkboxon=opt_icons_left
 {
 	if IsFeared() Spell(tremor_totem)
 	#if IsStunned() Spell(windwalk_totem)
@@ -429,7 +429,7 @@ AddIcon mastery=enhancement help=cd
 	EnhancementSingleCdActions()
 }
 
-AddIcon mastery=enhancement help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=enhancement size=small checkboxon=opt_icons_right
 {
 	#bloodlust,if=target.health.pct<25|time>5
 	if target.HealthPercent() < 25 or TimeInCombat() > 5 Spell(bloodlust)
@@ -437,7 +437,7 @@ AddIcon mastery=enhancement help=cd size=small checkboxon=opt_icons_right
 	if not TotemPresent(air totem=stormlash_totem) and not BuffPresent(stormlash_buff) and { BuffPresent(burst_haste any=1) or TimeInCombat() >= 60 } Spell(stormlash_totem)
 }
 
-AddIcon mastery=enhancement help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=enhancement size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -494,7 +494,7 @@ AddFunction RestorationShortCdActions
 
 ### Restoration icons.
 
-AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=restoration size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(stone_bulwark_totem_talent) Spell(stone_bulwark_totem)
 	if TalentPoints(astral_shift_talent) Spell(astral_shift)
@@ -502,7 +502,7 @@ AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_left
 	Spell(earthbind_totem)
 }
 
-AddIcon mastery=restoration help=buff size=small checkboxon=opt_icons_left
+AddIcon mastery=restoration size=small checkboxon=opt_icons_left
 {
 	if IsFeared() Spell(tremor_totem)
 	#if IsStunned() Spell(windwalk_totem)
@@ -540,13 +540,13 @@ AddIcon mastery=restoration help=cd
 	Spell(earth_elemental_totem)
 }
 
-AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 {
 	if BuffExpires(stormlash_totem_buff any=1) and {BuffPresent(burst_haste any=1) or TimeInCombat() >60} Spell(stormlash_totem)
 	if BuffExpires(burst_haste any=1) Bloodlust()
 }
 
-AddIcon mastery=restoration help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }

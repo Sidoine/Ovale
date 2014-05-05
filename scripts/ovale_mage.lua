@@ -185,7 +185,7 @@ AddFunction ArcanePrecombatCdActions
 
 ### Arcane icons.
 
-AddIcon mastery=arcane help=Blink size=small checkboxon=opt_icons_left
+AddIcon mastery=arcane size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(cold_snap_talent) and HealthPercent() < 30 Spell(cold_snap)
 	Spell(blink)
@@ -221,12 +221,12 @@ AddIcon mastery=arcane help=cd
 	ArcaneDefaultCdActions()
 }
 
-AddIcon mastery=arcane help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=arcane size=small checkboxon=opt_icons_right
 {
 	if BuffExpires(burst_haste any=1) and DebuffExpires(burst_haste_debuff) Spell(time_warp)
 }
 
-AddIcon mastery=arcane help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=arcane size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -378,13 +378,13 @@ AddFunction FirePrecombatCdActions
 
 ### Fire icons.
 
-AddIcon mastery=fire help=Blink size=small checkboxon=opt_icons_left
+AddIcon mastery=fire size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(cold_snap_talent) and HealthPercent() < 30 Spell(cold_snap)
 	Spell(blink)
 }
 
-AddIcon mastery=fire help=Combustion size=small checkboxon=opt_icons_left
+AddIcon mastery=fire size=small checkboxon=opt_icons_left
 {
 	Spell(combustion)
 }
@@ -412,12 +412,12 @@ AddIcon mastery=fire help=cd
 	FireDefaultCdActions()
 }
 
-AddIcon mastery=fire help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=fire size=small checkboxon=opt_icons_right
 {
 	if BuffExpires(burst_haste any=1) and DebuffExpires(burst_haste_debuff) Spell(time_warp)
 }
 
-AddIcon mastery=fire help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=fire size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
@@ -571,13 +571,13 @@ AddFunction FrostAoeActions
 
 ### Frost icons.
 
-AddIcon mastery=frost help=Blink size=small checkboxon=opt_icons_left
+AddIcon mastery=frost size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(cold_snap_talent) and HealthPercent() < 30 Spell(cold_snap)
 	Spell(blink)
 }
 
-AddIcon mastery=frost help=combustion size=small checkboxon=opt_icons_left
+AddIcon mastery=frost size=small checkboxon=opt_icons_left
 {
 	if pet.Present() Spell(water_elemental_freeze)
 }
@@ -605,12 +605,12 @@ AddIcon mastery=frost help=cd
 	FrostDefaultCdActions()
 }
 
-AddIcon mastery=frost help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=frost size=small checkboxon=opt_icons_right
 {
 	if BuffExpires(burst_haste any=1) and DebuffExpires(burst_haste_debuff) Spell(time_warp)
 }
 
-AddIcon mastery=frost help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=frost size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }

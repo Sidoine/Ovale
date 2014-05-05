@@ -170,7 +170,7 @@ AddFunction ShadowPrecombatCdActions
 
 ### Feral Icons
 
-AddIcon mastery=shadow help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=shadow size=small checkboxon=opt_icons_left
 {
 	if TalentPoints(desperate_prayer_talent) Spell(desperate_prayer)
 	Spell(dispersion)
@@ -207,12 +207,12 @@ AddIcon mastery=shadow help=cd
 	ShadowDefaultCdActions()
 }
 
-AddIcon mastery=shadow help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=shadow size=small checkboxon=opt_icons_right
 {
 	Spell(mass_dispel)
 }
 
-AddIcon mastery=shadow help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=shadow size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
