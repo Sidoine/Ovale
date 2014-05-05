@@ -70,7 +70,9 @@ local OVALE_UNKNOWN_GUID = 0
 -- These CLEU events are eventually received after a successful spellcast.
 local OVALE_CLEU_SPELLCAST_RESULTS = {
 	SPELL_AURA_APPLIED = true,
+	SPELL_AURA_APPLIED_DOSE = true,
 	SPELL_AURA_REFRESH = true,
+	SPELL_AURA_REMOVED_DOSE = true,
 	SPELL_CAST_SUCCESS = true,
 	SPELL_CAST_FAILED = true,
 	SPELL_DAMAGE = true,
@@ -210,9 +212,9 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 			for target, auraTable in pairs(si.aura) do
 				for filter, auraList in pairs(auraTable) do
 					for auraId, spellData in pairs(auraList) do
-						if spellData and type(spellData) == "number" and spellData > 0 then
+						if spellData and (spellData == "refresh" or (type(spellData) == "number" and spellData > 0)) then
 							spellcast.auraId = auraId
-							if target == "player" then
+							if target == "player" or (target == "target" and spellcast.target == self_guid) then
 								spellcast.removeOnSuccess = true
 							end
 							break
