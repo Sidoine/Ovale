@@ -887,18 +887,26 @@ do
 	end
 end
 
-statePrototype.IsActiveAura = function(state, aura, now)
-	now = now or state.currentTime
+statePrototype.IsActiveAura = function(state, aura, atTime)
+	-- Default to checking if an aura is active at the end of the current spellcast
+	-- in the simulator, or at the current time if no spell is being cast.
+	if not atTime then
+		if state.endCast and state.endCast > state.currentTime then
+			atTime = state.endCast
+		else
+			atTime = state.currentTime
+		end
+	end
 	local boolean = false
 	if aura then
 		if aura.state then
-			if aura.serial == state.serial and aura.stacks > 0 and aura.gain <= now and now <= aura.ending then
+			if aura.serial == state.serial and aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending then
 				boolean = true
-			elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
+			elseif aura.consumed and IsWithinAuraLag(aura.ending, atTime) then
 				boolean = true
 			end
 		else
-			boolean = OvaleAura:IsActiveAura(aura, now)
+			boolean = OvaleAura:IsActiveAura(aura, atTime)
 		end
 	end
 	return boolean
