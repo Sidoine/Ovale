@@ -252,7 +252,7 @@ AddIcon mastery=protection help=main
 	ProtectionDefaultActions()
 }
 
-AddIcon mastery=protection help=opt_aoe
+AddIcon mastery=protection help=aoe checkboxon=opt_aoe
 {
 	if InCombat(no) ProtectionPrecombatActions()
 

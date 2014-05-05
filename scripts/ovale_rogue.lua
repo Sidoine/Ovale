@@ -365,7 +365,7 @@ AddIcon mastery=combat help=main
 	CombatDefaultActions()
 }
 
-AddIcon mastery=combat help=Predictive
+AddIcon mastery=combat help=aoe checkboxon=opt_aoe
 {
 	if InCombat(no) CombatPrecombatActions()
 	CombatDefaultAoeActions()
