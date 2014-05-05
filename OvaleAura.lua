@@ -639,6 +639,7 @@ function OvaleAura:ResetState(state)
 	state.serial = state.serial + 1
 
 	-- Garbage-collect auras in the state machine that are more recently updated in the true aura database.
+	Ovale:Log("Resetting aura state:")
 	for guid, auraTable in pairs(state.aura) do
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
@@ -646,9 +647,11 @@ function OvaleAura:ResetState(state)
 				if auraFound and aura.lastUpdated <= auraFound.lastUpdated then
 					self_pool:Release(aura)
 					whoseTable[casterGUID] = nil
+					Ovale:Logf("    Aura %d removed; more recently updated outside simulator.", auraId)
 				else
 					-- Reset the aura age relative to the state of the simulator.
 					aura.serial = state.serial
+					Ovale:Logf("    Aura %d preserved in simulator.", auraId)
 				end
 			end
 			if not next(whoseTable) then
