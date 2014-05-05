@@ -23,8 +23,8 @@ AddCheckBox(opt_icons_right "Right icons")
 
 AddFunction HolySingleTargetActions
 {
-	if BuffCount(beacon_of_light_buff) == 0 Spell(beacon_of_light)
-	if TalentPoints(sacred_shield_talent) and BuffCount(sacred_shield_holy_buff) == 0 Spell(sacred_shield_holy)
+	if BuffCountOnAny(beacon_of_light_buff) == 0 Spell(beacon_of_light)
+	if TalentPoints(sacred_shield_talent) and BuffCountOnAny(sacred_shield_holy_buff) == 0 Spell(sacred_shield_holy)
 	if HolyPower() == MaxHolyPower()
 	{
 		if TalentPoints(eternal_flame_talent) Spell(eternal_flame)
@@ -37,8 +37,8 @@ AddFunction HolySingleTargetActions
 
 AddFunction HolyAoeActions
 {
-	if BuffCount(beacon_of_light_buff) == 0 Spell(beacon_of_light)
-	if TalentPoints(sacred_shield_talent) and BuffCount(sacred_shield_holy_buff) == 0 Spell(sacred_shield_holy)
+	if BuffCountOnAny(beacon_of_light_buff) == 0 Spell(beacon_of_light)
+	if TalentPoints(sacred_shield_talent) and BuffCountOnAny(sacred_shield_holy_buff) == 0 Spell(sacred_shield_holy)
 	if HolyPower() == MaxHolyPower()
 	{
 		if TalentPoints(eternal_flame_talent) Spell(eternal_flame)
@@ -51,7 +51,7 @@ AddFunction HolyAoeActions
 
 AddFunction HolySelflessHealerAoeActions()
 {
-	if BuffCount(beacon_of_light_buff) == 0 Spell(beacon_of_light)
+	if BuffCountOnAny(beacon_of_light_buff) == 0 Spell(beacon_of_light)
 	if HolyPower() == MaxHolyPower() Spell(light_of_dawn)
 	if target.IsFriend(no) and target.InRange(judgment) Spell(judgment)
 	if BuffPresent(selfless_healer_buff) Spell(holy_radiance)

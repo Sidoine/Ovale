@@ -778,18 +778,18 @@ AddFunction RestorationMainActions
 	# Maintain 100% uptime on Harmony mastery buff.
 	if BuffRemains(harmony_buff) < 3
 	{
-		if BuffCount(rejuvenation_buff) > 0 or BuffCount(regrowth_buff) > 0 Swiftmend()
+		if BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(regrowth_buff) > 0 Swiftmend()
 		Spell(nourish)
 	}
 
 	# Keep one Lifebloom stack up on the raid.
-	if not BuffCount(lifebloom_buff) > 0 Spell(lifebloom)
+	if not BuffCountOnAny(lifebloom_buff) > 0 Spell(lifebloom)
 
-	if BuffCount(rejuvenation_buff) > 0 or BuffCount(regrowth_buff) > 0 Swiftmend()
+	if BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(regrowth_buff) > 0 Swiftmend()
 	if TalentPoints(cenarion_ward_talent) Spell(cenarion_ward)
 
 	# Keep up 5 Rejuvenation HoTs on the raid.
-	if BuffCount(rejuvenation_buff) < 5 Spell(rejuvenation)
+	if BuffCountOnAny(rejuvenation_buff) < 5 Spell(rejuvenation)
 
 	# Filler.
 	Spell(nourish)
@@ -806,13 +806,13 @@ AddFunction RestorationAoeActions
 
 	Spell(wild_growth)
 	if not Glyph(glyph_of_efflorescence) Swiftmend()
-	if BuffCount(rejuvenation_buff) >= 3 Spell(genesis)
+	if BuffCountOnAny(rejuvenation_buff) >= 3 Spell(genesis)
 	Spell(rejuvenation)
 }
 
 AddFunction RestorationShortCdActions
 {
-	if BuffCount(rejuvenation_buff) >= 5 Spell(genesis)
+	if BuffCountOnAny(rejuvenation_buff) >= 5 Spell(genesis)
 	if WildMushroomCount() > 0 Spell(wild_mushroom_bloom)
 }
 

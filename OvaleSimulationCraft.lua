@@ -705,7 +705,7 @@ do
 		-- Shaman
 		["^active_flame_shock$"] = function(simc, action)
 				tinsert(simc.symbols, "flame_shock_debuff")
-				return "DebuffCount(flame_shock_debuff)"
+				return "DebuffCountOnAny(flame_shock_debuff)"
 			end,
 		["^buff%.lightning_shield%.max_stack$"] = "7",
 		["^buff%.lightning_shield%.react$"] = function(simc, action)

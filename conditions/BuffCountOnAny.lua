@@ -19,7 +19,7 @@ do
 	local state = OvaleState.state
 
 	--- Get the total count of the given aura across all targets.
-	-- @name BuffCount
+	-- @name BuffCountOnAny
 	-- @paramsig number or boolean
 	-- @param id The spell ID of the aura or the name of a spell list.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -29,9 +29,9 @@ do
 	--     Valid values: 0, 1.
 	-- @return The total aura count.
 	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffCount
+	-- @see DebuffCountOnAny
 
-	local function BuffCount(condition)
+	local function BuffCountOnAny(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
 
@@ -46,6 +46,10 @@ do
 		return Compare(count, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("buffcount", false, BuffCount)
-	OvaleCondition:RegisterCondition("debuffcount", false, BuffCount)
+	OvaleCondition:RegisterCondition("buffcountonany", false, BuffCountOnAny)
+	OvaleCondition:RegisterCondition("debuffcountonany", false, BuffCountOnAny)
+
+	-- Deprecated.
+	OvaleCondition:RegisterCondition("buffcount", false, BuffCountOnAny)
+	OvaleCondition:RegisterCondition("debuffcount", false, BuffCountOnAny)
 end

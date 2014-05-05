@@ -4,7 +4,7 @@
 	<Script file="ArmorSetParts.lua" />
 	<Script file="BuffAmount.lua" />
 	<Script file="BuffComboPoints.lua" />
-	<Script file="BuffCount.lua" />
+	<Script file="BuffCountOnAny.lua" />
 	<Script file="BuffDamageMultiplier.lua" />
 	<Script file="BuffDuration.lua" />
 	<Script file="BuffExpires.lua" />

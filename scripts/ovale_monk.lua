@@ -231,7 +231,7 @@ AddFunction MistweaverAoeActions
 	#rushing_jade_wind,if=talent.rushing_jade_wind.enabled
 	if TalentPoints(rushing_jade_wind_talent) Spell(rushing_jade_wind)
 	#zen_sphere,cycle_targets=1,if=talent.zen_sphere.enabled&!dot.zen_sphere.ticking
-	if TalentPoints(zen_sphere_talent) and BuffCount(zen_sphere_buff) < 1 Spell(zen_sphere)
+	if TalentPoints(zen_sphere_talent) and BuffCountOnAny(zen_sphere_buff) < 1 Spell(zen_sphere)
 	#chi_burst,if=talent.chi_burst.enabled
 	if TalentPoints(chi_burst_talent) Spell(chi_burst)
 	#tiger_palm,if=buff.muscle_memory.up&!buff.tiger_power.up
@@ -263,7 +263,7 @@ AddFunction MistweaverSingleTargetActions
 	#chi_wave,if=talent.chi_wave.enabled
 	if TalentPoints(chi_wave_talent) Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=talent.zen_sphere.enabled&!dot.zen_sphere.ticking
-	if TalentPoints(zen_sphere_talent) and BuffCount(zen_sphere_buff) < 1 Spell(zen_sphere)
+	if TalentPoints(zen_sphere_talent) and BuffCountOnAny(zen_sphere_buff) < 1 Spell(zen_sphere)
 	#jab
 	if Glyph(glyph_of_targeted_expulsion) Spell(expel_harm_glyphed)
 	if Glyph(glyph_of_targeted_expulsion no) Spell(expel_harm)
@@ -298,7 +298,7 @@ AddIcon mastery=mistweaver size=small checkboxon=opt_icons_right
 
 AddIcon mastery=mistweaver size=small checkboxon=opt_icons_left
 {
-	if BuffCount(renewing_mist_buff) > 5 Spell(thunder_focus_tea)
+	if BuffCountOnAny(renewing_mist_buff) > 5 Spell(thunder_focus_tea)
 	Spell(revival)
 }
 
@@ -313,7 +313,7 @@ AddIcon mastery=mistweaver help=shortcd
 	}
 	Spell(renewing_mist)
 	if TalentPoints(chi_burst_talent) Spell(chi_burst)
-	if TalentPoints(zen_sphere_talent) and BuffCount(zen_sphere_buff) < 1 Spell(zen_sphere)
+	if TalentPoints(zen_sphere_talent) and BuffCountOnAny(zen_sphere_buff) < 1 Spell(zen_sphere)
 }
 
 AddIcon mastery=mistweaver help=main

@@ -215,9 +215,9 @@ AddIcon mastery=elemental size=small checkboxon=opt_icons_right
 AddFunction EnhancementAoeActions
 {
 	#fire_nova,if=active_flame_shock>=4
-	if DebuffCount(flame_shock_debuff) >= 4 Spell(fire_nova)
+	if DebuffCountOnAny(flame_shock_debuff) >= 4 Spell(fire_nova)
 	#wait,sec=cooldown.fire_nova.remains,if=active_flame_shock>=4&cooldown.fire_nova.remains<0.67
-	if DebuffCount(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) < 0.67 wait Spell(fire_nova)
+	if DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) < 0.67 wait Spell(fire_nova)
 	#magma_totem,if=active_enemies>5&!totem.fire.active
 	if Enemies() > 5 and not TotemPresent(fire) Spell(magma_totem)
 	#searing_totem,if=active_enemies<=5&!totem.fire.active
@@ -235,7 +235,7 @@ AddFunction EnhancementAoeActions
 	#stormblast
 	Spell(stormblast)
 	#fire_nova,if=active_flame_shock>=3
-	if DebuffCount(flame_shock_debuff) >= 3 Spell(fire_nova)
+	if DebuffCountOnAny(flame_shock_debuff) >= 3 Spell(fire_nova)
 	#chain_lightning,if=active_enemies>=2&buff.maelstrom_weapon.react>=1
 	if Enemies() >= 2 and BuffPresent(maelstrom_weapon_buff) >= 1 Spell(chain_lightning)
 	#stormstrike
@@ -247,7 +247,7 @@ AddFunction EnhancementAoeActions
 	#earth_elemental_totem,if=!active&cooldown.fire_elemental_totem.remains>=50
 	if not TotemPresent(earth totem=earth_elemental_totem) and SpellCooldown(fire_elemental_totem) >= 50 Spell(earth_elemental_totem)
 	#fire_nova,if=active_flame_shock>=1
-	if DebuffCount(flame_shock_debuff) >= 1 Spell(fire_nova)
+	if DebuffCountOnAny(flame_shock_debuff) >= 1 Spell(fire_nova)
 }
 
 AddFunction EnhancementSingleActions
@@ -455,7 +455,7 @@ AddFunction RestorationMainActions
 {
 	if WeaponEnchantExpires(mainhand) Spell(earthliving_weapon)
 	if BuffExpires(water_shield_buff) Spell(water_shield)
-	if BuffCount(earth_shield_buff) == 0 Spell(earth_shield)
+	if BuffCountOnAny(earth_shield_buff) == 0 Spell(earth_shield)
 	if CheckBoxOn(opt_totemic_recall)
 	{
 		# Suggest Totemic Recall to regain mana from Healing Stream Totem, but only if it won't
