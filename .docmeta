@@ -5,4 +5,4 @@
 -
     type: luadoc
 	input-files: conditions/*.lua
-	output-page: Conditions
+	output-directory: Conditions
