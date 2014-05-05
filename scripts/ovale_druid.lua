@@ -757,6 +757,9 @@ AddIcon mastery=guardian size=small checkboxon=opt_icons_right
 ### Restoration
 ###
 
+# Swiftmend requires either a Rejuvenation or Regrowth HoT to be on the target before
+# it is usable, but we want to show Swiftmend as usable if the cooldown is up.
+#
 AddFunction Swiftmend
 {
 	if not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation)
@@ -776,23 +779,17 @@ AddFunction RestorationMainActions
 	if BuffPresent(natures_swiftness_buff) Spell(healing_touch)
 
 	# Maintain 100% uptime on Harmony mastery buff.
-	if BuffRemains(harmony_buff) < 3
+	if BuffRemains(harmony_buff) < 6
 	{
 		if BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(regrowth_buff) > 0 Swiftmend()
 		Spell(nourish)
 	}
 
 	# Keep one Lifebloom stack up on the raid.
-	if not BuffCountOnAny(lifebloom_buff) > 0 Spell(lifebloom)
+	if BuffRemainsOnAny(lifebloom_buff stacks=3) < 4 Spell(lifebloom)
 
-	if BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(regrowth_buff) > 0 Swiftmend()
+	# Cast Cenarion Ward on cooldown, usually on the tank.
 	if TalentPoints(cenarion_ward_talent) Spell(cenarion_ward)
-
-	# Keep up 5 Rejuvenation HoTs on the raid.
-	if BuffCountOnAny(rejuvenation_buff) < 5 Spell(rejuvenation)
-
-	# Filler.
-	Spell(nourish)
 }
 
 AddFunction RestorationAoeActions
@@ -801,27 +798,32 @@ AddFunction RestorationAoeActions
 	{
 		Spell(wild_growth)
 		if BuffPresent(omen_of_clarity_heal_buff) Spell(regrowth)
-		Spell(lifebloom)
 	}
 
-	Spell(wild_growth)
-	if not Glyph(glyph_of_efflorescence) Swiftmend()
-	if BuffCountOnAny(rejuvenation_buff) >= 3 Spell(genesis)
-	Spell(rejuvenation)
+	if BuffExpires(tree_of_life_buff)
+	{
+		Spell(wild_growth)
+		if not Glyph(glyph_of_efflorescence) Swiftmend()
+		if BuffCountOnAny(rejuvenation_buff) > 4 Spell(genesis)
+	}
 }
 
 AddFunction RestorationShortCdActions
 {
-	if BuffCountOnAny(rejuvenation_buff) >= 5 Spell(genesis)
-	if WildMushroomCount() > 0 Spell(wild_mushroom_bloom)
+	if WildMushroomIsCharged() Spell(wild_mushroom_bloom)
 }
 
 AddFunction RestorationCdActions
 {
-	Spell(natures_swiftness)
 	if TalentPoints(force_of_nature_talent) Spell(force_of_nature_heal)
+	if TalentPoints(incarnation_talent) Spell(incarnation)
 	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_heal)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
+}
+
+AddFunction RestorationPrecombatActions
+{
+	if BuffRemains(str_agi_int any=1) < 600 Spell(mark_of_the_wild)
 }
 
 ### Restoration icons.
@@ -848,6 +850,7 @@ AddIcon mastery=restoration help=shortcd
 
 AddIcon mastery=restoration help=main
 {
+	if InCombat(no) RestorationPrecombatActions()
 	RestorationMainActions()
 }
 
@@ -865,6 +868,7 @@ AddIcon mastery=restoration help=cd
 AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 {
 	Spell(ironbark)
+	Spell(natures_swiftness)
 }
 
 AddIcon mastery=restoration size=small checkboxon=opt_icons_right
