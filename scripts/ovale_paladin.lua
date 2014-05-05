@@ -68,14 +68,14 @@ AddFunction HolyPrecombatActions
 ### Holy Icons
 
 # Damage reduction cooldowns.
-AddIcon mastery=1 help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_left
 {
 	Spell(divine_protection)
 	Spell(devotion_aura)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=1 help=cd size=small checkboxon=opt_icons_left
+AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_left
 {
 	if ManaPercent() <98 Spell(arcane_torrent_mana)
 	if ManaPercent() <88 Spell(divine_plea)
@@ -83,27 +83,27 @@ AddIcon mastery=1 help=cd size=small checkboxon=opt_icons_left
 	if target.IsFriend(no) and not target.InRange(crusader_strike) Texture(ability_druid_dash)
 }
 
-AddIcon mastery=1 help=shortcd
+AddIcon mastery=holy help=shortcd
 {
 	if TalentPoints(holy_prism_talent) Spell(holy_prism)
 	if TalentPoints(lights_hammer_talent) Spell(lights_hammer)
 	if TalentPoints(execution_sentence_talent) Spell(execution_sentence)
 }
 
-AddIcon mastery=1 help=main
+AddIcon mastery=holy help=main
 {
 	HolyPrecombatActions()
 	HolySingleTargetActions()
 }
 
-AddIcon mastery=1 help=aoe checkboxon=opt_aoe
+AddIcon mastery=holy help=aoe checkboxon=opt_aoe
 {
 	HolyPrecombatActions()
 	if TalentPoints(selfless_healer_talent) HolySelflessHealerAoeActions()
 	if not TalentPoints(selfless_healer_talent) HolyAoeActions()
 }
 
-AddIcon mastery=1 help=cd
+AddIcon mastery=holy help=cd
 {
 	Interrupt()
 	if IsRooted() Spell(hand_of_freedom)
@@ -113,12 +113,12 @@ AddIcon mastery=1 help=cd
 	Spell(guardian_of_ancient_kings_heal)
 }
 
-AddIcon mastery=1 help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_right
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
 }
 
-AddIcon mastery=1 help=cd size=small checkboxon=opt_icons_right
+AddIcon mastery=holy help=cd size=small checkboxon=opt_icons_right
 {
 	UseItemActions()
 }
