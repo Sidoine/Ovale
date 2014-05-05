@@ -18,6 +18,7 @@ local OvaleOptions = Ovale.OvaleOptions
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleState = Ovale.OvaleState
 
+local format = string.format
 local next = next
 local pairs = pairs
 local strfind = string.find
@@ -36,8 +37,8 @@ local function SetValue(self, value, actionTexture)
 	self.aPortee:Hide()	
 	self.shortcut:Hide()
 	if value then
+		self.actionType = "value"
 		self.value = value
-		self.spellId = nil
 		if value < 10 then
 			self.remains:SetFormattedText("%.1f", value)
 		elseif value == math.huge then
@@ -53,8 +54,9 @@ local function SetValue(self, value, actionTexture)
 end
 
 local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
-	self.spellId = spellId
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
+	self.actionType = actionType
+	self.actionId = actionId
 	self.value = nil
 
 	local now = API_GetTime()
@@ -241,26 +243,31 @@ function OvaleIcone_OnMouseUp(self)
 end
 
 function OvaleIcone_OnEnter(self)
-	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.spellId or self.value then
+	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.actionType then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 		if self.help then
 			GameTooltip:SetText(L[self.help])
 		end
-		if self.spellId then
-			GameTooltip:AddLine(OvaleSpellBook:GetSpellName(self.spellId), 0.5, 1, 0.75)
-		elseif self.value then
-			local value = (self.value < math.huge) and tostring(self.value) or "infinity"
-			GameTooltip:AddLine(value, 0.5, 1, 0.75)
+		if self.actionType then
+			local text
+			if self.actionType == "spell" then
+				text = OvaleSpellBook:GetSpellName(self.actionId)
+			elseif self.actionType == "value" then
+				text = (self.value < math.huge) and tostring(self.value) or "infinity"
+			else
+				text = format("%s %s", self.actionType, tostring(self.actionId))
+			end
+			GameTooltip:AddLine(text, 0.5, 1, 0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
-			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"],1,1,1)
+			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"], 1, 1, 1)
 		end
 		GameTooltip:Show()
 	end
 end
 
 function OvaleIcone_OnLeave(self)
-	if self.help  or next(Ovale.casesACocher) or next(Ovale.listes)  then
+	if self.help or next(Ovale.casesACocher) or next(Ovale.listes)  then
 		GameTooltip:Hide()
 	end
 end
@@ -285,7 +292,6 @@ function OvaleIcone_OnLoad(self)
 	self.cdShown = true
 	self.shouldClick = false
 	self.help = nil
-	self.spellId = nil
 	self.value = nil
 	self.fontScale = nil
 	self.lastSound = nil
@@ -295,6 +301,8 @@ function OvaleIcone_OnLoad(self)
 	self.actionCourante = nil
 	self.params = nil
 	self.actionButton = false
+	self.actionType = nil
+	self.actionId = nil
 --</public-properties>	
 	
 	self:SetScript("OnMouseUp", OvaleIcone_OnMouseUp)

@@ -215,25 +215,31 @@ do
 					end
 				else
 					local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-							actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget, noRed = OvaleBestAction:GetActionInfo(element, state)
+						actionUsable, actionShortcut, actionIsCurrent, actionEnable,
+						actionType, actionId, actionTarget, noRed = OvaleBestAction:GetActionInfo(element, state)
 					if noRed then
 						start = actionCooldownStart + actionCooldownDuration
 						if start < state.currentTime then
 							start = state.currentTime
 						end
 					end
-						-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-					if start and state.currentSpellId and state.nextCast and spellId == state.currentSpellId and start < state.nextCast then
+					-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
+					if start and state.currentSpellId and state.nextCast and actionType == "spell" and actionId == state.currentSpellId and start < state.nextCast then
 						start = state.nextCast
 					end
-						if (node.params.nocd and start~=nil and now < start - node.params.nocd) then
+					if start and node.params.nocd and now < start - node.params.nocd then
 						icons[1]:Update(element, nil)
 					else
 						icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-							actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, actionTarget)
+							actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
 					end
 
-					action.spellId = spellId
+					-- TODO: Scoring should allow for other actions besides spells.
+					if actionType == "spell" then
+						action.spellId = actionId
+					else
+						action.spellId = nil
+					end
 					if start and start <= now and actionUsable then
 						if not action.waitStart then
 							action.waitStart = now

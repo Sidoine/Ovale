@@ -80,7 +80,7 @@ local function ComputeAction(element, state)
 	local self = OvaleBestAction
 	local action = element.params[1]
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId = self:GetActionInfo(element, state)
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId = self:GetActionInfo(element, state)
 	local timeSpan = element.timeSpan
 	timeSpan:Reset()
 
@@ -96,7 +96,8 @@ local function ComputeAction(element, state)
 	end
 
 	-- Set the cast time of the action.
-	if spellId then
+	if actionType == "spell" then
+		local spellId = actionId
 		local si = spellId and OvaleData.spellInfo[spellId]
 		if si and si.casttime then
 			element.castTime = si.casttime
@@ -724,7 +725,8 @@ function OvaleBestAction:GetActionInfo(element, state)
 	local target = element.params.target or OvaleCondition.defaultTarget
 	local action
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable,
+		actionType, actionId
 
 	if element.func == "spell" then
 		local spellId = element.params[1]
@@ -737,6 +739,8 @@ function OvaleBestAction:GetActionInfo(element, state)
 		actionTexture = actionTexture or API_GetSpellTexture(spellId)
 		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
 		actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
+		actionType = "spell"
+		actionId = spellId
 
 		-- Verify that the spell may be cast given restrictions specified in SpellInfo().
 		local si = OvaleData.spellInfo[spellId]
@@ -810,6 +814,8 @@ function OvaleBestAction:GetActionInfo(element, state)
 		actionInRange = API_IsActionInRange(action, target)
 		actionCooldownStart, actionCooldownDuration, actionEnable = API_GetActionCooldown(action)
 		actionUsable = API_IsUsableAction(action)
+		actionType = "macro"
+		actionId = macro
 
 	elseif element.func == "item" then
 		local itemId = element.params[1]
@@ -829,6 +835,8 @@ function OvaleBestAction:GetActionInfo(element, state)
 
 		local spellName = API_GetItemSpell(itemId)
 		actionUsable = (spellName ~= nil)
+		actionType = "item"
+		actionId = itemId
 
 	elseif element.func == "texture" then
 		local texture = element.params[1]
@@ -838,6 +846,8 @@ function OvaleBestAction:GetActionInfo(element, state)
 		actionCooldownDuration = 0
 		actionEnable = 1
 		actionUsable = true
+		actionType = "texture"
+		actionId = texture
 	end
 
 	if action then
@@ -846,7 +856,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 	end
 
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, spellId, target, element.params.nored
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, element.params.nored
 end
 
 function OvaleBestAction:Compute(element, state)
