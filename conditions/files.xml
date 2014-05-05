@@ -10,6 +10,7 @@
 	<Script file="BuffExpires.lua" />
 	<Script file="BuffGain.lua" />
 	<Script file="BuffRemains.lua" />
+	<Script file="BuffRemainsOnAny.lua" />
 	<Script file="BuffSnapshot.lua" />
 	<Script file="BuffStacks.lua" />
 	<Script file="BuffStealable.lua" />
