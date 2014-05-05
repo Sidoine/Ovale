@@ -1165,8 +1165,9 @@ do
 		the first aura to expire that will change the total count, and the time interval
 		over which the count is more than 0.
 	--]]
-	statePrototype.AuraCount = function(state, auraId, filter, mine)
+	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks)
 		-- Initialize.
+		minStacks = minStacks or 0
 		count = 0
 		startChangeCount, endingChangeCount = math.huge, math.huge
 		startFirst, endingLast = math.huge, 0
@@ -1178,13 +1179,13 @@ do
 			if auraTable[auraId] then
 				if mine then
 					local aura = GetStateAura(state, guid, auraId, self_guid)
-					if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+					if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
 						CountMatchingActiveAura(aura)
 					end
 				else
 					for casterGUID in pairs(auraTable[auraId]) do
 						local aura = GetStateAura(state, guid, auraId, casterGUID)
-						if state:IsActiveAura(aura, now) and aura.filter == filter and not aura.state then
+						if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
 							CountMatchingActiveAura(aura)
 						end
 					end
@@ -1197,13 +1198,13 @@ do
 				if mine then
 					local aura = auraTable[auraId][self_guid]
 					if aura then
-						if state:IsActiveAura(aura, now) and aura.filter == filter then
+						if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks then
 							CountMatchingActiveAura(aura)
 						end
 					end
 				else
 					for casterGUID, aura in pairs(auraTable[auraId]) do
-						if state:IsActiveAura(aura, now) and aura.filter == filter then
+						if state:IsActiveAura(aura, now) and aura.filter == filter and aura.stacks >= minStacks then
 							CountMatchingActiveAura(aura)
 						end
 					end

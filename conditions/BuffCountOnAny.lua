@@ -24,6 +24,9 @@ do
 	-- @param id The spell ID of the aura or the name of a spell list.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param stacks Optional. The minimum number of stacks of the aura required.
+	--     Defaults to stacks=1.
+	--     Valid values: any number greater than zero.
 	-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	--     Defaults to any=0.
 	--     Valid values: 0, 1.
@@ -35,7 +38,7 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
 
-		local count, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine)
+		local count, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
 		Ovale:Logf("BuffCount(%d) is %s, %s, %s, %s, %s", auraId, count, startChangeCount, endingChangeCount, startFirst, endingLast)
 		if count > 0 and startChangeCount < math.huge then
 			local origin = startChangeCount
