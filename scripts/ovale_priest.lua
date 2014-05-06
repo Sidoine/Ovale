@@ -41,13 +41,13 @@ AddFunction ShadowDefaultActions
 	#mind_flay_insanity,interrupt=1,chain=1,if=active_enemies<=5
 	if target.DebuffPresent(devouring_plague_debuff) Spell(mind_flay)
 	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
-	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
 	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time&miss_react
-	if target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) Spell(vampiric_touch)
+	if target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(vampiric_touch)
 	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&ticks_remain<=1
-	if True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 Spell(shadow_word_pain)
+	if True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
 	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time+tick_time&miss_react
-	if target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) Spell(vampiric_touch)
+	if target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(vampiric_touch)
 	#devouring_plague,if=shadow_orb=3&ticks_remain<=1
 	if ShadowOrbs() == 3 and target.TicksRemain(devouring_plague_debuff) <= 1 Spell(devouring_plague)
 	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=2
@@ -75,9 +75,9 @@ AddFunction ShadowDefaultMovingActions
 	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0&active_enemies<=5
 	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Enemies() <= 5 Spell(shadow_word_death usable=1)
 	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
-	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
 	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&ticks_remain<=1
-	if True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 Spell(shadow_word_pain)
+	if True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
 	#devouring_plague,if=shadow_orb=3&ticks_remain<=1
 	if ShadowOrbs() == 3 and target.TicksRemain(devouring_plague_debuff) <= 1 Spell(devouring_plague)
 	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=2

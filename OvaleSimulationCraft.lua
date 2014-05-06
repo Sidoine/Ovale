@@ -483,6 +483,7 @@ do
 				or action == "mind_flay_insanity"
 				or action == "stance" and scriptLine.choose
 				or scriptLine.weapon
+				or scriptLine.max_cycle_targets
 			then
 				local needAnd = false
 				if action == "pool_resource" and not script.for_next then
@@ -557,6 +558,13 @@ do
 					else
 						tinsert(scriptLine, scriptLine.if_expr)
 					end
+					needAnd = true
+				end
+				if scriptLine.max_cycle_targets then
+					if needAnd then
+						tinsert(scriptLine, "and")
+					end
+					tinsert(scriptLine, format("DebuffCountOnAny(%s_debuff) <= %d", action, scriptLine.max_cycle_targets))
 					needAnd = true
 				end
 			end
