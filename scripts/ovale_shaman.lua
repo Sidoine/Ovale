@@ -448,15 +448,12 @@ AddIcon mastery=enhancement size=small checkboxon=opt_icons_right
 # Information from Elitist Jerks, "[Resto] It's Raining Heals 5.4"
 #	http://forums.elitistjerks.com/page/articles.html/_/world-of-warcraft/shaman/resto-its-raining-heals-54-r89
 
-# Suggest using Totemic Recall to regain mana from casting Healing Stream Totem.
-AddCheckBox(opt_totemic_recall SpellName(totemic_recall) mastery=restoration)
-
 AddFunction RestorationMainActions
 {
 	if WeaponEnchantExpires(mainhand) Spell(earthliving_weapon)
 	if BuffExpires(water_shield_buff) Spell(water_shield)
 	if BuffCountOnAny(earth_shield_buff) == 0 Spell(earth_shield)
-	if CheckBoxOn(opt_totemic_recall)
+	if Glyph(glyph_of_totemic_recall)
 	{
 		# Suggest Totemic Recall to regain mana from Healing Stream Totem, but only if it won't
 		# recall other totems with very long CDs.
