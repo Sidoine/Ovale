@@ -38,9 +38,15 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) and aura.tick then
-			local value = aura.tick
-			return Compare(value, comparator, limit)
+		local tickTime
+		if state:IsActiveAura(aura) then
+			tickTime = aura.tick
+		else
+			local _, _, tick = state:GetDuration(auraId)
+			tickTime = tick
+		end
+		if tickTime and tickTime > 0 then
+			return Compare(tickTime, comparator, limit)
 		end
 		return Compare(math.huge, comparator, limit)
 	end
