@@ -328,6 +328,10 @@ statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 	end
 end
 
+-- Returns a triplet of count, startCooldown, endCooldown:
+--     count			The number of currently active runes of the given type.
+--     startCooldown	The time at which the next rune of the given type went on cooldown.
+--     endCooldown		The time at which the next rune of the given type will be active.
 statePrototype.RuneCount = function(state, name, death)
 	local count = 0
 	local startCooldown, endCooldown = math.huge, math.huge
