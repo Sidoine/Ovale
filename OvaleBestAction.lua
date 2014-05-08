@@ -789,7 +789,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 
 				if si.blood or si.frost or si.unholy or si.death then
 					-- Spell requires runes.
-					local runecd = state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death, false)
+					local runecd = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death, false)
 					if runecd > actionCooldownStart + actionCooldownDuration then
 						actionCooldownDuration = runecd - actionCooldownStart
 					end
