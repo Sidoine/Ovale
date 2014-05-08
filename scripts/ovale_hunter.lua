@@ -421,6 +421,16 @@ AddIcon mastery=marksmanship size=small checkboxon=opt_icons_right
 #	spec=survival
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Yb!...200
 
+AddFunction SurvivalArcaneShotFocusCondition
+{
+	# Pool focus for Black Arrow if it is coming off of cooldown.
+	# If 2pT16 is not present, then also pool focus for Explosive Shot if it is coming off cooldown.
+	#
+	{ SpellCooldown(black_arrow) > 0 or Focus() - FocusCost(arcane_shot) >= FocusCost(black_arrow) }
+		and { ArmorSetBonus(T16_melee 2) == 1
+			or { ArmorSetBonus(T16_melee 2) == 0 and { SpellCooldown(explosive_shot) > 0 or Focus() - FocusCost(arcane_shot) >= FocusCost(explosive_shot) } } }
+}
+
 AddFunction SurvivalDefaultActions
 {
 	#auto_shot
@@ -441,7 +451,7 @@ AddFunction SurvivalDefaultActions
 	#multi_shot,if=buff.thrill_of_the_hunt.react&dot.serpent_sting.remains<2
 	if BuffPresent(thrill_of_the_hunt_buff) and target.DebuffRemains(serpent_sting_debuff) < 2 Spell(multi_shot)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react
-	if BuffPresent(thrill_of_the_hunt_buff) Spell(arcane_shot)
+	if BuffPresent(thrill_of_the_hunt_buff) and SurvivalArcaneShotFocusCondition() Spell(arcane_shot)
 	#dire_beast,if=enabled
 	if TalentPoints(dire_beast_talent) Spell(dire_beast)
 	#cobra_shot,if=dot.serpent_sting.remains<6
