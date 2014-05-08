@@ -380,7 +380,7 @@ statePrototype.GetRunesCooldown = nil
 do
 	-- If the rune is active, then return the remaining active runes count requirement.
 	-- Also return the time of the next rune becoming active.
-	local function MatchRune(rune, count, endCooldown)
+	local function MatchingRune(rune, count, endCooldown)
 		if count > 0 then
 			count = count - 1
 			if rune.endCooldown > endCooldown then
@@ -414,7 +414,7 @@ do
 		for slot, rune in ipairs(state.rune) do
 			if rune.type ~= DEATH_RUNE then
 				local runeType = rune.type
-				local count, endCooldown = MatchRune(rune, runeCount[runeType], runeEndCooldown[runeType])
+				local count, endCooldown = MatchingRune(rune, runeCount[runeType], runeEndCooldown[runeType])
 				runeCount[runeType] = count
 				runeEndCooldown[runeType] = endCooldown
 			end
@@ -424,7 +424,7 @@ do
 			for slot, rune in ipairs(state.rune) do
 				if rune.type == DEATH_RUNE then
 					local runeType = rune.slotType
-					local count, endCooldown = MatchRune(rune, runeCount[runeType], runeEndCooldown[runeType])
+					local count, endCooldown = MatchingRune(rune, runeCount[runeType], runeEndCooldown[runeType])
 					runeCount[runeType] = count
 					runeEndCooldown[runeType] = endCooldown
 				end
@@ -442,7 +442,7 @@ do
 			for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
 				local rune = state.rune[slot]
 				local runeType = DEATH_RUNE
-				local count, endCooldown = MatchRune(rune, remainingCount, runeEndCooldown[runeType])
+				local count, endCooldown = MatchingRune(rune, remainingCount, runeEndCooldown[runeType])
 				remainingCount = count
 				runeEndCooldown[runeType] = endCooldown
 			end
