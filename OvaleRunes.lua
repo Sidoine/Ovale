@@ -65,10 +65,19 @@ local RUNE_SLOTS = {
 }
 
 --[[
-	In-game testing shows that death runes are preferred in the order:
-		Frost death runes > Blood death runes > Unholy death runes
+	From SimC:sc_death_knight.cpp:
+
+	If explicitly consuming a death rune, any death runes available are preferred in the order:
+
+		frost > blood > unholy.
+
+	If consuming a non-death rune of a given type and that no rune of that type is available,
+	any death runes available are preferred in the order:
+
+		blood > unholy > frost
 --]]
-local DEATH_RUNE_PRIORITY = { 5, 6, 1, 2, 4, 5 }
+local DEATH_RUNE_PRIORITY = { 3, 4, 5, 6, 1, 2 }
+local ANY_RUNE_PRIORITY = { 1, 2, 3, 4, 5, 6 }
 
 -- Improved Blood Presence increases rune regenerate rate by 20%.
 local IMPROVED_BLOOD_PRESENCE = 50371
@@ -277,7 +286,8 @@ statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 	end
 	-- No runes of the right type are active, so look for any active death rune.
 	if not consumedRune then
-		for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
+		local deathRunePriority = (runeType == DEATH_RUNE) and DEATH_RUNE_PRIORITY or ANY_RUNE_PRIORITY
+		for _, slot in ipairs(deathRunePriority) do
 			local rune = state.rune[slot]
 			if rune.type == DEATH_RUNE and rune.active then
 				consumedRune = rune
