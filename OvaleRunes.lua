@@ -247,7 +247,7 @@ end
 --<state-methods>
 statePrototype.DebugRunes = function(state)
 	local now = state.currentTime
-	for slot, rune in ipairs(self.rune) do
+	for slot, rune in ipairs(state.rune) do
 		if rune.active then
 			Ovale:FormatPrint("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
 		else
