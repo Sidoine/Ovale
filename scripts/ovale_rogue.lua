@@ -483,7 +483,7 @@ AddFunction SubtletyDefaultActions
 	if ComboPoints() <= 4 Spell(premeditation usable=1)
 	#pool_resource,for_next=1
 	#ambush,if=combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)|(buff.sleight_of_hand.up&buff.sleight_of_hand.remains<=gcd)
-	if ComboPoints() < 5 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffPresent(sleight_of_hand_buff) and BuffRemains(sleight_of_hand_buff) <= GCD(ambush) } wait Spell(ambush usable=1)
+	if ComboPoints() < 5 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffPresent(sleight_of_hand_buff) and BuffRemains(sleight_of_hand_buff) <= GCD() } wait Spell(ambush usable=1)
 	#marked_for_death,if=talent.marked_for_death.enabled&combo_points=0
 	if TalentPoints(marked_for_death_talent) and ComboPoints() == 0 Spell(marked_for_death)
 	#run_action_list,name=generator,if=talent.anticipation.enabled&anticipation_charges<4&buff.slice_and_dice.up&dot.rupture.remains>2&(buff.slice_and_dice.remains<6|dot.rupture.remains<4)
@@ -504,7 +504,7 @@ AddFunction SubtletyDefaultAoeActions
 	if ComboPoints() <= 4 Spell(premeditation usable=1)
 	#pool_resource,for_next=1
 	#ambush,if=combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)|(buff.sleight_of_hand.up&buff.sleight_of_hand.remains<=gcd)
-	if ComboPoints() < 5 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffPresent(sleight_of_hand_buff) and BuffRemains(sleight_of_hand_buff) <= GCD(ambush) } wait Spell(ambush usable=1)
+	if ComboPoints() < 5 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffPresent(sleight_of_hand_buff) and BuffRemains(sleight_of_hand_buff) <= GCD() } wait Spell(ambush usable=1)
 	#marked_for_death,if=talent.marked_for_death.enabled&combo_points=0
 	if TalentPoints(marked_for_death_talent) and ComboPoints() == 0 Spell(marked_for_death)
 	#run_action_list,name=generator,if=talent.anticipation.enabled&anticipation_charges<4&buff.slice_and_dice.up&dot.rupture.remains>2&(buff.slice_and_dice.remains<6|dot.rupture.remains<4)
@@ -521,7 +521,7 @@ AddFunction SubtletyDefaultShortCdActions
 {
 	unless { Energy() < 60 and Spell(arcane_torrent_energy) }
 		or { ComboPoints() <= 4 and Spell(premeditation usable=1) }
-		or { { ComboPoints() < 5 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffPresent(sleight_of_hand_buff) and BuffRemains(sleight_of_hand_buff) <= GCD(ambush) } } and Spell(ambush usable=1) }
+		or { { ComboPoints() < 5 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffPresent(sleight_of_hand_buff) and BuffRemains(sleight_of_hand_buff) <= GCD() } } and Spell(ambush usable=1) }
 	{
 		#pool_resource,for_next=1,extra_amount=75
 		#shadow_dance,if=energy>=75&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down

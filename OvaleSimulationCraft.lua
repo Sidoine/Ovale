@@ -787,7 +787,7 @@ do
 		["^cooldown_react$"] = function(simc, actionName) return format("Spell(%s)", actionName) end,
 		["^crit_damage$"] = function(simc, actionName) return format("target.CritDamage(%s)", actionName) end,
 		-- TODO: Melee/Ranged/Spell crit chance depending on type of attack, or at least class of player.
-		["^crit_pct_current$"] = function(simc, actionName) return format("SpellCritChance(%s)", actionName) end,
+		["^crit_pct_current$"] = function(simc, actionName) return format("SpellCritChance()", actionName) end,
 		["^crit_tick_damage$"] = function(simc, actionName)
 				local symbol = format("%s_debuff", actionName)
 				tinsert(simc.symbols, symbol)
@@ -803,7 +803,7 @@ do
 				tinsert(simc.symbols, symbol)
 				return format("TalentPoints(%s)", symbol)
 			end,
-		["^gcd$"] = function(simc, actionName) return format("GCD(%s)", actionName) end,
+		["^gcd$"] = function(simc, actionName) return format("GCD()", actionName) end,
 		["^hit_damage$"] = function(simc, actionName) return format("target.Damage(%s)", actionName) end,
 		["^in_flight$"] = function(simc, actionName) return format("InFlightToTarget(%s)", actionName) end,
 		["^in_flight_to_target$"] = function(simc, actionName) return format("InFlightToTarget(%s)", actionName) end,
