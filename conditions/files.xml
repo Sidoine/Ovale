@@ -13,6 +13,7 @@
 	<Script file="BuffRemainsOnAny.lua" />
 	<Script file="BuffSnapshot.lua" />
 	<Script file="BuffStacks.lua" />
+	<Script file="BuffStacksOnAny.lua" />
 	<Script file="BuffStealable.lua" />
 	<Script file="CanCast.lua" />
 	<Script file="CastTime.lua" />

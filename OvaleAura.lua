@@ -1153,6 +1153,8 @@ end
 do
 	-- The total count of the matched aura.
 	local count
+	-- The total number of stacks of the matched aura.
+	local stacks
 	-- The start and ending times of the first aura to expire that will change the total count.
 	local startChangeCount, endingChangeCount
 	-- The time interval over which count > 0.
@@ -1160,6 +1162,7 @@ do
 
 	local function CountMatchingActiveAura(aura)
 		count = count + 1
+		stacks = stacks + aura.stacks
 		if aura.ending < endingChangeCount then
 			startChangeCount, endingChangeCount = aura.gain, aura.ending
 		end
@@ -1172,14 +1175,15 @@ do
 	end
 
 	--[[
-		Return the total count of the given aura across all units, the start/end times of
-		the first aura to expire that will change the total count, and the time interval
-		over which the count is more than 0.
+		Return the total count and stacks of the given aura across all units, the start/end times of
+		the first aura to expire that will change the total count, and the time interval over which
+		the count is more than 0.
 	--]]
 	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks)
 		-- Initialize.
 		minStacks = minStacks or 0
 		count = 0
+		stacks = 0
 		startChangeCount, endingChangeCount = math.huge, math.huge
 		startFirst, endingLast = math.huge, 0
 
@@ -1221,8 +1225,8 @@ do
 			end
 		end
 
-		Ovale:Logf("AuraCount(%d) is %s, %s, %s, %s, %s", auraId, count, startChangeCount, endingChangeCount, startFirst, endingLast)
-		return count, startChangeCount, endingChangeCount, startFirst, endingLast
+		Ovale:Logf("AuraCount(%d) is %s, %s, %s, %s, %s, %s", auraId, count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast)
+		return count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast
 	end
 end
 --</state-methods>

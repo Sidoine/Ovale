@@ -38,7 +38,7 @@ do
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
 
-		local count, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
 		if count > 0 and startChangeCount < math.huge then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)

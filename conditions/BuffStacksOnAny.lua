@@ -18,34 +18,31 @@ do
 	local TestValue = OvaleCondition.TestValue
 	local state = OvaleState.state
 
-	--- Get the remaining time in seconds before the aura expires across all targets.
-	-- @name BuffRemainsOnAny
+	--- Get the total number of stacks of the given aura across all targets.
+	-- @name BuffStacksOnAny
 	-- @paramsig number or boolean
 	-- @param id The spell ID of the aura or the name of a spell list.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param stacks Optional. The minimum number of stacks of the aura required.
-	--     Defaults to stacks=1.
-	--     Valid values: any number greater than zero.
 	-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	--     Defaults to any=0.
 	--     Valid values: 0, 1.
-	-- @return The number of seconds.
+	-- @return The total number of stacks.
 	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffRemainsOnAny
+	-- @see DebuffStacksOnAny
 
-	local function BuffRemainsOnAny(condition)
+	local function BuffStacksOnAny(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
 
-		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine)
 		if count > 0 then
-			local start, ending = startFirst, endingLast
-			return TestValue(start, math.huge, 0, ending, -1, comparator, limit)
+			local start, ending = startFirst, endingChangeCount
+			return TestValue(start, ending, stacks, start, 0, comparator, limit)
 		end
-		return Compare(0, comparator, limit)
+		return Compare(count, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("buffremainsonany", false, BuffRemainsOnAny)
-	OvaleCondition:RegisterCondition("debuffremainsonany", false, BuffRemainsOnAny)
+	OvaleCondition:RegisterCondition("buffstacksonany", false, BuffStacksOnAny)
+	OvaleCondition:RegisterCondition("debuffstacksonany", false, BuffStacksOnAny)
 end
