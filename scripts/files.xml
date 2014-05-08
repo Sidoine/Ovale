@@ -2,6 +2,8 @@
 	<Script file="ovale_items.lua" />
 	<Script file="ovale_racials.lua" />
 
+	<Script file="ovale_deathknight.lua" />
+	<Script file="ovale_deathknight_spells.lua" />
 	<Script file="ovale_druid.lua" />
 	<Script file="ovale_druid_spells.lua" />
 	<Script file="ovale_hunter.lua" />
@@ -18,6 +20,10 @@
 	<Script file="ovale_rogue_spells.lua" />
 	<Script file="ovale_shaman.lua" />
 	<Script file="ovale_shaman_spells.lua" />
+	<Script file="ovale_warlock.lua" />
+	<Script file="ovale_warlock_spells.lua" />
+	<Script file="ovale_warrior.lua" />
+	<Script file="ovale_warrior_spells.lua" />
 
 	<Script file="leafkiller_druid.lua" />
 	<Script file="wiljo_mage.lua" />
