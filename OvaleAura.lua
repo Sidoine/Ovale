@@ -217,9 +217,11 @@ local function IsEnrageEffect(auraId)
 	return boolean or nil
 end
 
-local function IsWithinAuraLag(time1, time2)
+local function IsWithinAuraLag(time1, time2, factor)
+	factor = factor or 1
 	local auraLag = OvaleOptions:GetProfile().apparence.auraLag
-	return (time1 - time2 < auraLag/1000) and (time2 - time1 < auraLag/1000)
+	local tolerance = factor * auraLag / 1000
+	return (time1 - time2 < tolerance) and (time2 - time1 < tolerance)
 end
 
 local function GetTickLength(auraId, snapshot)
@@ -639,23 +641,44 @@ function OvaleAura:ResetState(state)
 	state.serial = state.serial + 1
 
 	-- Garbage-collect auras in the state machine that are more recently updated in the true aura database.
-	Ovale:Log("Resetting aura state:")
+	if next(state.aura) then
+		Ovale:Log("Resetting aura state:")
+	end
 	for guid, auraTable in pairs(state.aura) do
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
+				local keepAura = false
 				local auraFound = GetAura(self.aura, guid, auraId, casterGUID)
 				if auraFound and aura.lastUpdated <= auraFound.lastUpdated then
+					Ovale:Logf("    Aura %d on %s more recently updated outside simulator.", auraId, guid)
+				elseif state.lastSpellId and state.endCast and state.endCast < state.currentTime then
+					local si = OvaleData.spellInfo[state.lastSpellId]
+					if si and si.aura then
+						if guid == self_guid then
+							-- Check for auras that start within aura lag if they are auras applied onto the player.
+							if (si.aura.player and si.aura.player[aura.filter] and si.aura.player[aura.filter][auraId])
+									or (si.aura.target and si.aura.target[aura.filter] and si.aura.target[aura.filter][auraId]) then
+								if IsWithinAuraLag(aura.start, state.currentTime) then
+									keepAura = true
+								end
+							end
+						elseif si.aura.target and si.aura.target[aura.filter] and si.aura.target[aura.filter][auraId] then
+							-- Check for auras that start within twice the aura lag if they are auras applied onto a target.
+							if IsWithinAuraLag(aura.start, state.currentTime, 2) then
+								keepAura = true
+							end
+						end
+					end
+					if keepAura then
+						-- Reset the aura age relative to the state of the simulator.
+						aura.serial = state.serial
+						Ovale:Logf("    Aura %d on %s preserved in simulator for aura lag, start=%f, now=%f.", auraId, guid, aura.start, state.currentTime)
+					end
+				end
+				if not keepAura then
 					self_pool:Release(aura)
 					whoseTable[casterGUID] = nil
-					Ovale:Logf("    Aura %d on %d removed; more recently updated outside simulator.", auraId, guid)
-				elseif not IsWithinAuraLag(aura.start, state.currentTime) then
-					self_pool:Release(aura)
-					whoseTable[casterGUID] = nil
-					Ovale:Logf("    Aura %d on %d removed; outside of predicted aura lag.", auraId, guid)
-				else
-					-- Reset the aura age relative to the state of the simulator.
-					aura.serial = state.serial
-					Ovale:Logf("    Aura %d on %d preserved in simulator.", auraId, guid)
+					Ovale:Logf("    Aura %d on %s removed, now=%f.", auraId, guid, state.currentTime)
 				end
 			end
 			if not next(whoseTable) then
