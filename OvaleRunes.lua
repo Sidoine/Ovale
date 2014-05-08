@@ -203,24 +203,24 @@ statePrototype.rune = nil
 -- Initialize the state.
 function OvaleRunes:InitializeState(state)
 	state.rune = {}
-	for slot = 1, 6 do
+	for slot in ipairs(self.rune) do
 		state.rune[slot] = {}
 	end
 end
 
 -- Reset the state to the current conditions.
 function OvaleRunes:ResetState(state)
-	for slot = 1, 6 do
-		local rune = state.rune[slot]
-		for k, v in pairs(self.rune[slot]) do
-			rune[k] = v
+	for slot, rune in ipairs(self.rune) do
+		local stateRune = state.rune[slot]
+		for k, v in pairs(rune) do
+			stateRune[k] = v
 		end
 	end
 end
 
 -- Release state resources prior to removing from the simulator.
 function OvaleRunes:CleanState(state)
-	for slot, rune in pairs(state.rune) do
+	for slot, rune in ipairs(state.rune) do
 		for k in pairs(rune) do
 			rune[k] = nil
 		end
@@ -247,8 +247,7 @@ end
 --<state-methods>
 statePrototype.DebugRunes = function(state)
 	local now = state.currentTime
-	for slot = 1, 6 do
-		local rune = self.rune[slot]
+	for slot, rune in ipairs(self.rune) do
 		if rune.active then
 			Ovale:FormatPrint("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
 		else
