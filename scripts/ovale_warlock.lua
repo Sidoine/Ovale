@@ -15,72 +15,174 @@ AddCheckBox(opt_aoe L(AOE) default)
 AddCheckBox(opt_icons_left "Left icons")
 AddCheckBox(opt_icons_right "Right icons")
 
+###
+### Affliction
+###
+# Based on SimulationCraft profile "Warlock_Affliction_T16H".
+#	class=warlock
+#	spec=affliction
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Va!....00
+#	glyphs=siphon_life
+#	pet=felhunter
+
+AddFunction AfflictionAoeActions
+{
+	#soulburn,cycle_targets=1,if=buff.soulburn.down&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target&shard_react
+	if BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 Spell(soulburn)
+	#soul_swap,if=buff.soulburn.up&!dot.agony.ticking&!dot.corruption.ticking
+	if BuffPresent(soulburn_buff) and not target.DebuffPresent(agony_debuff) and not target.DebuffPresent(corruption_debuff) Spell(soul_swap)
+	#soul_swap,cycle_targets=1,if=buff.soulburn.up&dot.corruption.ticking&!dot.agony.ticking
+	if BuffPresent(soulburn_buff) and target.DebuffPresent(corruption_debuff) and not target.DebuffPresent(agony_debuff) Spell(soul_swap_exhale)
+	#seed_of_corruption,cycle_targets=1,if=(buff.soulburn.down&!in_flight_to_target&!ticking)|(buff.soulburn.up&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target)
+	if { BuffExpires(soulburn_buff) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption_debuff) } or { BuffPresent(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) } Spell(seed_of_corruption)
+	#haunt,cycle_targets=1,if=!in_flight_to_target&debuff.haunt.remains<cast_time+travel_time&shard_react
+	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt_debuff) < CastTime(haunt) + 0.5 and SoulShards() >= 1 Spell(haunt)
+	#life_tap,if=mana.pct<70
+	if ManaPercent() < 70 Spell(life_tap)
+	#fel_flame,cycle_targets=1,if=!in_flight_to_target
+	if not InFlightToTarget(fel_flame) Spell(fel_flame)
+}
+
+AddFunction AfflictionAoeCdActions
+{
+	#summon_infernal
+	Spell(summon_infernal)
+}
+
+AddFunction AfflictionSingleTargetActions
+{
+	#soul_swap,if=buff.soulburn.up
+	if BuffPresent(soulburn_buff) Spell(soul_swap)
+	#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
+	if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemain(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemain(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemain(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soulburn)
+	#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
+	if { target.TicksRemain(unstable_affliction_debuff) <= 1 or target.TicksRemain(corruption_debuff) <= 1 or target.TicksRemain(agony_debuff) <= 1 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soulburn)
+	#haunt,if=!in_flight_to_target&remains<cast_time+travel_time+tick_time&shard_react&target.health.pct<=20
+	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt_debuff) < CastTime(haunt) + 0.5 + target.TickTime(haunt_debuff) and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(haunt)
+	#drain_soul,interrupt=1,chain=1,if=target.health.pct<=20
+	if target.HealthPercent() <= 20 Spell(drain_soul)
+	#haunt,if=!in_flight_to_target&remains<cast_time+travel_time+tick_time&shard_react
+	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt_debuff) < CastTime(haunt) + 0.5 + target.TickTime(haunt_debuff) and SoulShards() >= 1 Spell(haunt)
+	#agony,if=(tick_damage*n_ticks*(100+crit_pct_current)>4*dot.agony.tick_dmg*dot.agony.ticks_remain*(100+dot.agony.crit_pct))&miss_react
+	if { target.Damage(agony_debuff) * target.Ticks(agony_debuff) * { 100 + SpellCritChance() } > 4 * target.LastEstimatedDamage(agony_debuff) * target.TicksRemain(agony_debuff) * { 100 + target.DebuffSpellCritChance(agony_debuff) } } and True(miss_react) Spell(agony)
+	#corruption,if=((stat.spell_power>spell_power&ticks_remain<add_ticks%2)|(stat.spell_power>spell_power*1.5)|remains<gcd)&miss_react
+	if { { Spellpower() > target.DebuffSpellpower(corruption_debuff) and target.TicksRemain(corruption_debuff) < TicksAdded(corruption_debuff) / 2 } or { Spellpower() > target.DebuffSpellpower(corruption_debuff) * 1.5 } or target.DebuffRemains(corruption_debuff) < GCD() } and True(miss_react) Spell(corruption)
+	#unstable_affliction,if=((stat.spell_power>spell_power&ticks_remain<add_ticks%2)|(stat.spell_power>spell_power*1.5)|remains<cast_time+gcd)&miss_react
+	if { { Spellpower() > target.DebuffSpellpower(unstable_affliction_debuff) and target.TicksRemain(unstable_affliction_debuff) < TicksAdded(unstable_affliction_debuff) / 2 } or { Spellpower() > target.DebuffSpellpower(unstable_affliction_debuff) * 1.5 } or target.DebuffRemains(unstable_affliction_debuff) < CastTime(unstable_affliction) + GCD() } and True(miss_react) Spell(unstable_affliction)
+	#life_tap,if=buff.dark_soul.down&buff.bloodlust.down&mana.pct<50
+	if BuffExpires(dark_soul_misery_buff) and BuffExpires(burst_haste any=1) and ManaPercent() < 50 Spell(life_tap)
+	#malefic_grasp,chain=1,interrupt_if=target.health.pct<=20
+	Spell(malefic_grasp)
+	#life_tap,moving=1,if=mana.pct<80&mana.pct<target.health.pct
+	if Speed() > 0 and ManaPercent() < 80 and ManaPercent() < target.HealthPercent() Spell(life_tap)
+	#fel_flame,moving=1
+	if Speed() > 0 Spell(fel_flame)
+	#life_tap
+	Spell(life_tap)
+}
+
+AddFunction AfflictionSingleTargetCdActions
+{
+	#summon_doomguard
+	Spell(summon_doomguard)
+}
+
+AddFunction AfflictionDefaultActions
+{
+	#curse_of_the_elements,if=debuff.magic_vulnerability.down
+	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
+}
+
+AddFunction AfflictionDefaultShortCdActions
+{
+	unless target.DebuffExpires(magic_vulnerability any=1)
+	{
+		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
+		if not TalentPoints(archimondes_darkness_talent) or { TalentPoints(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } } Spell(dark_soul_misery)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if TalentPoints(grimoire_of_service_talent) ServicePet()
+	}
+}
+
+AddFunction AfflictionDefaultCdActions
+{
+	unless target.DebuffExpires(magic_vulnerability any=1)
+	{
+		#use_item,name=gloves_of_the_horned_nightmare
+		UseItemActions()
+		#jade_serpent_potion,if=buff.bloodlust.react|target.health.pct<=20
+		if BuffPresent(burst_haste any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+		#berserking
+		UseRacialActions()
+	}
+}
+
+AddFunction AfflictionPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
+	#snapshot_stats
+}
+
+AddFunction AfflictionPrecombatShortCdActions
+{
+	#summon_pet,if=!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down
+	if not TalentPoints(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) SummonPet()
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if TalentPoints(grimoire_of_service_talent) ServicePet()
+}
+
+AddFunction AfflictionPrecombatCdActions
+{
+	#jade_serpent_potion
+	UsePotionIntellect()
+}
+
 ### Affliction icons.
 
-AddIcon mastery=affliction size=small checkboxon=opt_icons_left {}
-AddIcon mastery=affliction size=small checkboxon=opt_icons_left {}
-
-AddIcon mastery=affliction help=offgcd
+AddIcon mastery=affliction size=small checkboxon=opt_icons_left
 {
-	if not InCombat()
-	{
-		if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
-	}
-	if BuffPresent(dark_soul_misery) and {target.TicksRemain(agony) <=Ticks(agony) /2 or target.TicksRemain(corruption_debuff) <=Ticks(corruption_debuff) /2 or target.TicksRemain(unstable_affliction) <=Ticks(unstable_affliction) /2 } and SoulShards() Spell(soulburn)
-	if {target.TicksRemain(unstable_affliction) <=1 or target.TicksRemain(corruption_debuff) <=1 or target.TicksRemain(agony) <=1 } and SoulShards() and target.HealthPercent() <=20 Spell(soulburn)
-	if SpellPower() >LastSpellSpellPower(unstable_affliction) and target.TicksRemain(unstable_affliction) <=Ticks(unstable_affliction) /2 and SoulShards() and target.HealthPercent() <=20 Spell(soulburn)
+}
+
+AddIcon mastery=affliction size=small checkboxon=opt_icons_left
+{
+}
+
+AddIcon mastery=affliction help=shortcd
+{
+	if InCombat(no) AfflictionPrecombatShortCdActions()
+	AfflictionDefaultShortCdActions()
 }
 
 AddIcon mastery=affliction help=main
 {
-	if not InCombat()
-	{
-		if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
-		if not TalentPoints(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
-		if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
-	}
-	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
-	if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
-	if BuffPresent(soulburn) Spell(soul_swap)
-	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 +TickTime(haunt) and SoulShards() and target.HealthPercent() <=20 Spell(haunt)
-	if BuffExpires(dark_soul_misery) and BuffExpires(bloodlust any=1) and ManaPercent() <10 and target.HealthPercent() <=20 Spell(life_tap)
-	if target.HealthPercent() <=20 Spell(drain_soul)
-	if target.HealthPercent() <=20 Spell(life_tap)
-	if target.DebuffRemains(agony) <GCD() and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul_misery) Spell(agony)
-	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 +TickTime(haunt) and {SoulShards() >2 or SpellCooldown(dark_soul_misery) >35 or {SoulShards() >1 and SpellCooldown(dark_soul_misery) <CastTime(haunt) } } and SoulShards() Spell(haunt)
-	if target.DebuffRemains(corruption_debuff) <GCD() and target.DebuffRemains(corruption_debuff) <SpellCooldown(dark_soul_misery) Spell(corruption)
-	if target.DebuffRemains(unstable_affliction) <GCD() +CastTime(unstable_affliction) and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul_misery) Spell(unstable_affliction)
-	if target.TicksRemain(agony) <=2 and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul_misery) Spell(agony)
-	if target.TicksRemain(corruption_debuff) <=2 and target.DebuffRemains(corruption_debuff) <SpellCooldown(dark_soul_misery) Spell(corruption)
-	if {target.DebuffRemains(unstable_affliction) -CastTime(unstable_affliction) } /{BuffDuration(unstable_affliction) /Ticks(unstable_affliction) } <=2 and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul_misery) Spell(unstable_affliction)
-	if SpellPower() >LastSpellSpellPower(agony) and target.TicksRemain(agony) <Ticks(agony) /2 and target.DebuffRemains(agony) +2 <SpellCooldown(dark_soul_misery) Spell(agony)
-	if SpellPower() >LastSpellSpellPower(corruption_debuff) and target.TicksRemain(corruption_debuff) <Ticks(corruption_debuff) /2 and target.DebuffRemains(corruption_debuff) <SpellCooldown(dark_soul_misery) Spell(corruption)
-	if SpellPower() >LastSpellSpellPower(unstable_affliction) and target.TicksRemain(unstable_affliction) <Ticks(unstable_affliction) /2 and target.DebuffRemains(unstable_affliction) <SpellCooldown(dark_soul_misery) Spell(unstable_affliction)
-	if BuffExpires(dark_soul_misery) and BuffExpires(bloodlust any=1) and ManaPercent() <50 Spell(life_tap)
-	Spell(malefic_grasp)
-	Spell(life_tap)
+	if InCombat(no) AfflictionPrecombatActions()
+	AfflictionDefaultActions()
+	AfflictionSingleTargetActions()
 }
 
 AddIcon mastery=affliction help=aoe checkboxon=opt_aoe
 {
-	if BuffExpires(soulburn) and not target.DebuffPresent(soulburn_seed_of_corruption) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() Spell(soulburn)
-	if BuffPresent(soulburn) and not target.DebuffPresent(agony) and not target.DebuffPresent(corruption_debuff) Spell(soul_swap)
-	if BuffPresent(soulburn) and target.DebuffPresent(corruption_debuff) and not target.DebuffPresent(agony) Spell(soul_swap)
-	if {BuffExpires(soulburn) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption) } or {BuffPresent(soulburn) and not target.DebuffPresent(soulburn_seed_of_corruption) and not InFlightToTarget(soulburn_seed_of_corruption) } Spell(seed_of_corruption)
-	if not InFlightToTarget(haunt) and target.DebuffRemains(haunt) <CastTime(haunt) +1 and SoulShards() Spell(haunt)
-	if ManaPercent() <70 Spell(life_tap)
-	if not InFlightToTarget(fel_flame) Spell(fel_flame)
+	if InCombat(no) AfflictionPrecombatActions()
+	AfflictionDefaultActions()
+	AfflictionAoeActions()
 }
 
 AddIcon mastery=affliction help=cd
 {
-	UseItemActions()
-	Spell(blood_fury)
-	Spell(dark_soul_misery)
-	Spell(summon_doomguard)
+	if InCombat(no) AfflictionPrecombatCdActions()
+	AfflictionDefaultCdActions()
+	if Enemies() > 6 AfflictionAoeCdActions()
+	if Enemies() <= 6 AfflictionSingleTargetCdActions()
 }
 
-AddIcon mastery=affliction size=small checkboxon=opt_icons_right {}
+AddIcon mastery=affliction size=small checkboxon=opt_icons_right
+{
+}
 
 AddIcon mastery=affliction size=small checkboxon=opt_icons_right
 {
@@ -99,8 +201,8 @@ AddIcon mastery=demonology help=offgcd
 		if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	}
 	Spell(melee)
-	Spell(felstorm)
-	Spell(wrathstorm)
+	Spell(felguard_felstorm)
+	Spell(wrathguard_wrathstorm)
 	if {BuffPresent(dark_soul_knowledge) and DemonicFury() /32 >BuffRemains(dark_soul_knowledge) } or target.DebuffRemains(corruption_debuff) <5 or not target.DebuffPresent(doom) or DemonicFury() >=950 or DemonicFury() /32 >target.DeadIn() unless Stance(1) Spell(metamorphosis)
 }
 
@@ -184,7 +286,7 @@ AddIcon mastery=destruction help=main
 	if {target.TicksRemain(immolate_debuff) <Ticks(immolate_debuff) /2 or target.DebuffExpires(immolate_debuff) } and target.DeadIn() >=5 Spell(immolate)
 	if Charges(conflagrate) ==2 Spell(conflagrate)
 	if not target.DebuffPresent(rain_of_fire_aftermath) and not InFlightToTarget(rain_of_fire_aftermath) Spell(rain_of_fire_aftermath)
-	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {{BurningEmbers() / 10} >3.5 or BuffRemains(dark_soul_instability) >CastTime(chaos_bolt) or BuffRemains(skull_banner) >CastTime(chaos_bolt) } Spell(chaos_bolt)
+	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {{BurningEmbers() / 10} >3.5 or BuffRemains(dark_soul_instability) >CastTime(chaos_bolt) or BuffRemains(skull_banner_buff) >CastTime(chaos_bolt) } Spell(chaos_bolt)
 	Spell(conflagrate)
 	Spell(incinerate)
 }

@@ -308,7 +308,18 @@ do
 			restoration = {
 				["ascendance"] = "ascendance_heal",
 			},
-		}
+		},
+		warlock = {
+			affliction = {
+				["dark_soul"] = "dark_soul_misery",
+			},
+			demonology = {
+				["dark_soul"] = "dark_soul_knowledge",
+			},
+			destruction = {
+				["dark_soul"] = "dark_soul_instability",
+			},
+		},
 	}
 
 	function OvaleSimulationCraft:Name(name)
@@ -390,6 +401,8 @@ do
 		-- Shaman
 		["^bloodlust$"] = "Bloodlust()",
 		["^wind_shear$"] = "Interrupt()",
+		-- Warlock
+		["^service_pet$"] = "ServicePet()",
 	}
 
 	local scriptLine = {}
@@ -400,7 +413,7 @@ do
 			self:Append(script, "#%s", actionLine.line)
 		end
 
-		local action = self:Name(actionLine.action)
+		local action = self:Name(gsub(actionLine.action, ":", "_"))
 		local matchedAction = false
 		for pattern, result in pairs(SIMC_ACTION) do
 			if strmatch(action, pattern) then
@@ -724,6 +737,9 @@ do
 			end,
 		["^pet%.greater_fire_elemental%.active$"] = "TotemPresent(fire totem=fire_elemental_totem)",
 		["^pet%.primal_fire_elemental%.active$"] = "TotemPresent(fire totem=fire_elemental_totem)",
+		-- Warlock
+		["^debuff%.magic_vulnerability%.down$"] = "target.DebuffExpires(magic_vulnerability any=1)",
+		["^debuff%.magic_vulnerability%.up$"] = "target.DebuffPresent(magic_vulnerability any=1)",
 	}
 
 	-- totem.<totem_name>.<totem_property>
@@ -858,7 +874,8 @@ do
 				tinsert(simc.symbols, symbol)
 				return format("target.TicksRemain(%s)", symbol)
 			end,
-		["^travel_time$"] = function(simc, actionName) return format("TravelTime(%s)", actionName) end,
+		-- TODO: Assume travel time of a spell is always 0.5s.
+		["^travel_time$"] = function(simc, actionName) return "0.5" end,
 	}
 
 	local CHARACTER_PROPERTY = {
