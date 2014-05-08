@@ -332,7 +332,7 @@ end
 --     count			The number of currently active runes of the given type.
 --     startCooldown	The time at which the next rune of the given type went on cooldown.
 --     endCooldown		The time at which the next rune of the given type will be active.
-statePrototype.RuneCount = function(state, name, death)
+statePrototype.RuneCount = function(state, name, deathCondition)
 	local count = 0
 	local startCooldown, endCooldown = math.huge, math.huge
 	local runeType = RUNE_TYPE[name]
