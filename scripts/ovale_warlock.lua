@@ -146,10 +146,14 @@ AddFunction AfflictionPrecombatCdActions
 
 AddIcon mastery=affliction size=small checkboxon=opt_icons_left
 {
+	if target.IsAggroed() Spell(soulshatter)
+	if TalentPoints(dark_regeneration_talent) Spell(dark_regeneration)
 }
 
 AddIcon mastery=affliction size=small checkboxon=opt_icons_left
 {
+	if TalentPoints(sacrificial_pact_talent) Spell(sacrificial_pact)
+	if TalentPoints(dark_bargain_talent) Spell(dark_bargain)
 }
 
 AddIcon mastery=affliction help=shortcd
@@ -182,6 +186,7 @@ AddIcon mastery=affliction help=cd
 
 AddIcon mastery=affliction size=small checkboxon=opt_icons_right
 {
+	Spell(demonic_circle_teleport)
 }
 
 AddIcon mastery=affliction size=small checkboxon=opt_icons_right
@@ -191,8 +196,17 @@ AddIcon mastery=affliction size=small checkboxon=opt_icons_right
 
 ### Demonology icons.
 
-AddIcon mastery=demonology size=small checkboxon=opt_icons_left {}
-AddIcon mastery=demonology size=small checkboxon=opt_icons_left {}
+AddIcon mastery=demonology size=small checkboxon=opt_icons_left
+{
+	if target.IsAggroed() Spell(soulshatter)
+	if TalentPoints(dark_regeneration_talent) Spell(dark_regeneration)
+}
+
+AddIcon mastery=demonology size=small checkboxon=opt_icons_left
+{
+	if TalentPoints(sacrificial_pact_talent) Spell(sacrificial_pact)
+	if TalentPoints(dark_bargain_talent) Spell(dark_bargain)
+}
 
 AddIcon mastery=demonology help=offgcd
 {
@@ -252,7 +266,10 @@ AddIcon mastery=demonology help=cd
 	Spell(summon_doomguard)
 }
 
-AddIcon mastery=demonology size=small checkboxon=opt_icons_right {}
+AddIcon mastery=demonology size=small checkboxon=opt_icons_right
+{
+	Spell(demonic_circle_teleport)
+}
 
 AddIcon mastery=demonology size=small checkboxon=opt_icons_right
 {
@@ -377,10 +394,14 @@ AddFunction DestructionPrecombatCdActions
 
 AddIcon mastery=destruction size=small checkboxon=opt_icons_left
 {
+	if target.IsAggroed() Spell(soulshatter)
+	if TalentPoints(dark_regeneration_talent) Spell(dark_regeneration)
 }
 
 AddIcon mastery=destruction size=small checkboxon=opt_icons_left
 {
+	if TalentPoints(sacrificial_pact_talent) Spell(sacrificial_pact)
+	if TalentPoints(dark_bargain_talent) Spell(dark_bargain)
 }
 
 AddIcon mastery=destruction help=shortcd
@@ -417,6 +438,7 @@ AddIcon mastery=destruction help=cd
 
 AddIcon mastery=destruction size=small checkboxon=opt_icons_right
 {
+	Spell(demonic_circle_teleport)
 }
 
 AddIcon mastery=destruction size=small checkboxon=opt_icons_right
