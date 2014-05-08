@@ -230,7 +230,7 @@ AddFunction Interrupt
 		if target.InRange(rebuke) Spell(rebuke)
 		if target.Classification(worldboss no)
 		{
-			if TalentPoints(fist_of_justice_talent) and target.InRange(fist_of_justice) Spell(fist_of_justice)
+			if TalentPoints(fist_of_justice_talent) Spell(fist_of_justice)
 			if not TalentPoints(fist_of_justice_talent) and target.InRange(hammer_of_justice) Spell(hammer_of_justice)
 			#Spell(blinding_light)
 		}
