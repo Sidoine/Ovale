@@ -349,7 +349,7 @@ AddIcon mastery=combat size=small checkboxon=opt_icons_left
 
 AddIcon mastery=combat size=small checkboxon=opt_icons_left
 {
-	if BuffPresent(blade_flurry_buff) Texture(ability_warrior_punishingblow)
+	if BuffPresent(blade_flurry_buff) Texture(ability_warrior_punishingblow help=BladeFlurryIsActive)
 	Spell(redirect)
 }
 

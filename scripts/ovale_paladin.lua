@@ -79,7 +79,7 @@ AddIcon mastery=holy help=mana size=small checkboxon=opt_icons_left
 	if ManaPercent() <98 Spell(arcane_torrent_mana)
 	if ManaPercent() <88 Spell(divine_plea)
 	# Show "dash" icon if not in melee range.
-	if target.IsFriend(no) and not target.InRange(crusader_strike) Texture(ability_druid_dash)
+	if target.IsFriend(no) and not target.InRange(crusader_strike) Texture(ability_druid_dash help=NotInMeleeRange)
 }
 
 AddIcon mastery=holy help=shortcd
@@ -114,7 +114,7 @@ AddIcon mastery=holy help=cd
 
 AddIcon mastery=holy size=small checkboxon=opt_icons_right
 {
-	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
+	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
 AddIcon mastery=holy size=small checkboxon=opt_icons_right
@@ -274,7 +274,7 @@ AddIcon mastery=protection help=cd
 
 AddIcon mastery=protection size=small checkboxon=opt_icons_right
 {
-	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
+	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
 AddIcon mastery=protection size=small checkboxon=opt_icons_right
@@ -472,7 +472,7 @@ AddIcon mastery=retribution size=small checkboxon=opt_icons_right
 {
 	#seal_of_righteousness,if=active_enemies>=4
 	if Enemies() >= 4 and not Stance(paladin_seal_of_righteousness) Spell(seal_of_righteousness)
-	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury)
+	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
 AddIcon mastery=retribution size=small checkboxon=opt_icons_right

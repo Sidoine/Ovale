@@ -597,7 +597,7 @@ AddIcon mastery=feral size=small checkboxon=opt_icons_left
 AddIcon mastery=feral help=main
 {
 	if InCombat(no) FeralPrecombatActions()
-	if not target.InRange(mangle_cat) Texture(ability_druid_catformattack)
+	if not target.InRange(mangle_cat) Texture(ability_druid_catformattack help=NotInMeleeRange)
 	if List(opt_feral_rotation basic) FeralBasicActions()
 	if List(opt_feral_rotation advanced) FeralAdvancedActions()
 }
@@ -605,7 +605,7 @@ AddIcon mastery=feral help=main
 AddIcon mastery=feral help=main
 {
 	if InCombat(no) FeralPrecombatActions()
-	if not target.InRange(mangle_cat) Texture(ability_druid_catformattack)
+	if not target.InRange(mangle_cat) Texture(ability_druid_catformattack help=NotInMeleeRange)
 	if List(opt_feral_rotation basic) FeralBasicPredictiveActions()
 	if List(opt_feral_rotation advanced) FeralAdvancedPredictiveActions()
 }
@@ -762,7 +762,7 @@ AddIcon mastery=guardian size=small checkboxon=opt_icons_right
 #
 AddFunction Swiftmend
 {
-	if not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation)
+	if not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation help=Swiftmend)
 }
 
 AddFunction RestorationMainActions

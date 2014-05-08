@@ -38,6 +38,7 @@ local function SetValue(self, value, actionTexture)
 	self.shortcut:Hide()
 	if value then
 		self.actionType = "value"
+		self.actionHelp = nil
 		self.value = value
 		if value < 10 then
 			self.remains:SetFormattedText("%.1f", value)
@@ -113,6 +114,8 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		--if (minAttente==now) then
 			--self.cd:Hide()
 		--end
+
+		self.actionHelp = element.params.help
 
 		if element.params.sound and not self.lastSound then
 			local delay = element.params.soundtime or 0.5
@@ -249,15 +252,17 @@ function OvaleIcone_OnEnter(self)
 			GameTooltip:SetText(L[self.help])
 		end
 		if self.actionType then
-			local text
-			if self.actionType == "spell" then
-				text = OvaleSpellBook:GetSpellName(self.actionId)
-			elseif self.actionType == "value" then
-				text = (self.value < math.huge) and tostring(self.value) or "infinity"
-			else
-				text = format("%s %s", self.actionType, tostring(self.actionId))
+			local actionHelp = self.actionHelp
+			if not actionHelp then
+				if self.actionType == "spell" then
+					actionHelp = OvaleSpellBook:GetSpellName(self.actionId)
+				elseif self.actionType == "value" then
+					actionHelp = (self.value < math.huge) and tostring(self.value) or "infinity"
+				else
+					actionHelp = format("%s %s", self.actionType, tostring(self.actionId))
+				end
 			end
-			GameTooltip:AddLine(text, 0.5, 1, 0.75)
+			GameTooltip:AddLine(actionHelp, 0.5, 1, 0.75)
 		end
 		if next(Ovale.casesACocher) or next(Ovale.listes) then
 			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"], 1, 1, 1)
@@ -303,6 +308,7 @@ function OvaleIcone_OnLoad(self)
 	self.actionButton = false
 	self.actionType = nil
 	self.actionId = nil
+	self.actionHelp = nil
 --</public-properties>	
 	
 	self:SetScript("OnMouseUp", OvaleIcone_OnMouseUp)

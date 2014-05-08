@@ -163,7 +163,7 @@ AddFunction Interrupt
 
 AddFunction SummonPet
 {
-	if pet.Present(no) Texture(ability_hunter_beastcall)
+	if pet.Present(no) Texture(ability_hunter_beastcall help=SummonPet)
 	if pet.IsDead() Spell(revive_pet)
 }
 ]]
