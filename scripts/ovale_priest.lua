@@ -168,7 +168,7 @@ AddFunction ShadowPrecombatCdActions
 	UsePotionIntellect()
 }
 
-### Feral Icons
+### Shadow icons
 
 AddIcon mastery=shadow size=small checkboxon=opt_icons_left
 {
