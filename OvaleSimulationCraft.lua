@@ -525,7 +525,9 @@ do
 					if needAnd then
 						tinsert(scriptLine, "and")
 					end
-					tinsert(scriptLine, "target.DebuffPresent(devouring_plague_debuff)")
+					tinsert(scriptLine, "TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff)")
+					tinsert(self.symbols, "solace_and_insanity_talent")
+					tinsert(self.symbols, "devouring_plague_debuff")
 					needAnd = true
 				elseif action == "stance" and scriptLine.choose then
 					if needAnd then

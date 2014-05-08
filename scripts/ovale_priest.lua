@@ -37,9 +37,9 @@ AddFunction ShadowDefaultActions
 	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0&active_enemies<=5
 	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 Spell(shadow_word_death usable=1)
 	#mind_flay_insanity,if=target.dot.devouring_plague_tick.ticks_remain=1,chain=1
-	if target.DebuffPresent(devouring_plague_debuff) and target.TicksRemain(devouring_plague_debuff) == 1 Spell(mind_flay)
+	if TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and target.TicksRemain(devouring_plague_debuff) < 2 Spell(mind_flay)
 	#mind_flay_insanity,interrupt=1,chain=1,if=active_enemies<=5
-	if target.DebuffPresent(devouring_plague_debuff) Spell(mind_flay)
+	if TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) Spell(mind_flay)
 	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
 	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
 	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time&miss_react
@@ -102,8 +102,8 @@ AddFunction ShadowDefaultShortCdActions
 		or { ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } }
 		or Spell(mind_blast)
 		or { BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Spell(shadow_word_death usable=1) }
-		or { target.DebuffPresent(devouring_plague_debuff) and target.TicksRemain(devouring_plague_debuff) == 1 }
-		or target.DebuffPresent(devouring_plague_debuff)
+		or { TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and target.TicksRemain(devouring_plague_debuff) < 2 }
+		or { TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) }
 		or { True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) }
 		or { target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) }
 		or { True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 }
