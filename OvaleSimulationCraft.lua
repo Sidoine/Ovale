@@ -318,6 +318,7 @@ do
 			},
 			destruction = {
 				["dark_soul"] = "dark_soul_instability",
+				["rain_of_fire"] = "rain_of_fire_aftermath",
 			},
 		},
 	}
@@ -492,6 +493,7 @@ do
 				or scriptLine.moving == 1
 				or scriptLine.sync
 				or action == "focus_fire" and scriptLine.five_stacks == 1
+				or action == "grimoire_of_sacrifice"
 				or action == "kill_command"
 				or action == "mind_flay_insanity"
 				or action == "stance" and scriptLine.choose
@@ -527,6 +529,12 @@ do
 						tinsert(scriptLine, "and")
 					end
 					tinsert(scriptLine, "BuffStacks(frenzy_buff any=1) == 5")
+					needAnd = true
+				elseif action == "grimoire_of_sacrifice" then
+					if needAnd then
+						tinsert(scriptLine, "and")
+					end
+					tinsert(scriptLine, "pet.Present()")
 					needAnd = true
 				elseif action == "kill_command" then
 					if needAnd then
@@ -738,6 +746,14 @@ do
 		["^pet%.greater_fire_elemental%.active$"] = "TotemPresent(fire totem=fire_elemental_totem)",
 		["^pet%.primal_fire_elemental%.active$"] = "TotemPresent(fire totem=fire_elemental_totem)",
 		-- Warlock
+		["^buff%.havoc%.remains$"] = function(simc, action)
+				tinsert(simc.symbols, "havoc_debuff")
+				return "DebuffRemainsOnAny(havoc_debuff)"
+			end,
+		["^buff%.havoc%.stack$"] = function(simc, action)
+				tinsert(simc.symbols, "havoc_debuff")
+				return "DebuffStacksOnAny(havoc_debuff)"
+			end,
 		["^debuff%.magic_vulnerability%.down$"] = "target.DebuffExpires(magic_vulnerability any=1)",
 		["^debuff%.magic_vulnerability%.up$"] = "target.DebuffPresent(magic_vulnerability any=1)",
 	}
@@ -795,7 +811,7 @@ do
 				tinsert(simc.symbols, symbol)
 				return format("TicksAdded(%s)", symbol)
 			end,
-		["^ember_react$"] = "BurningEmbers() >= 1",
+		["^ember_react$"] = "BurningEmbers() >= 10",
 		["^cast_delay$"] = "True(cast_delay)",
 		["^cast_time$"] = function(simc, actionName) return format("CastTime(%s)", actionName) end,
 		["^charges$"] = function(simc, actionName) return format("Charges(%s)", actionName) end,
@@ -883,7 +899,7 @@ do
 				tinsert(simc.symbols, "anticipation_buff")
 				return "BuffStacks(anticipation_buff)"
 			end,
-		["^burning_ember$"] = "BurningEmbers()",
+		["^burning_ember$"] = "BurningEmbers() / 10",
 		["^chi$"] = "Chi()",
 		["^chi%.max$"] = "MaxChi()",
 		["^combo_points$"] = "ComboPoints()",

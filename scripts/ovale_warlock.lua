@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "Ovale"
-	local desc = "[5.2] Ovale: Affliction, Demonology, Destruction"
+	local desc = "[5.4] Ovale: Affliction, Demonology (5.2), Destruction"
 	local code = [[
-# Ovale warlock script by Sidoine for WoW 5.2.
+# Ovale warlock script based on SimulationCraft.
 
 Include(ovale_items)
 Include(ovale_racials)
@@ -131,7 +131,7 @@ AddFunction AfflictionPrecombatShortCdActions
 	#summon_pet,if=!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down
 	if not TalentPoints(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) SummonPet()
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-	if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
+	if pet.Present() and TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	#service_pet,if=talent.grimoire_of_service.enabled
 	if TalentPoints(grimoire_of_service_talent) ServicePet()
 }
@@ -198,7 +198,7 @@ AddIcon mastery=demonology help=offgcd
 {
 	if not InCombat()
 	{
-		if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
+		if pet.Present() and TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
 	}
 	Spell(melee)
 	Spell(felguard_felstorm)
@@ -259,62 +259,165 @@ AddIcon mastery=demonology size=small checkboxon=opt_icons_right
 	UseItemActions()
 }
 
+###
+### Destruction
+###
+# Based on SimulationCraft profile "Warlock_Destruction_T16H".
+#	class=warlock
+#	spec=destruction
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Vb!....20
+#	pet=felhunter
+
+AddFunction DestructionAoeActions
+{
+	#rain_of_fire,if=!ticking&!in_flight
+	if not target.DebuffPresent(rain_of_fire_aftermath_debuff) and not InFlightToTarget(rain_of_fire_aftermath) Spell(rain_of_fire_aftermath)
+	#fire_and_brimstone,if=ember_react&buff.fire_and_brimstone.down
+	if BurningEmbers() >= 10 and BuffExpires(fire_and_brimstone_buff) Spell(fire_and_brimstone)
+	#immolate,if=buff.fire_and_brimstone.up&!ticking
+	if BuffPresent(fire_and_brimstone_buff) and not target.DebuffPresent(immolate_debuff) Spell(immolate)
+	#conflagrate,if=buff.fire_and_brimstone.up
+	if BuffPresent(fire_and_brimstone_buff) Spell(conflagrate)
+	#incinerate,if=buff.fire_and_brimstone.up
+	if BuffPresent(fire_and_brimstone_buff) Spell(incinerate)
+	#incinerate
+	Spell(incinerate)
+}
+
+AddFunction DestructionAoeCdActions
+{
+	#summon_infernal
+	Spell(summon_infernal)
+}
+
+AddFunction DestructionSingleTargetActions
+{
+	#immolate,cycle_targets=1,if=n_ticks*crit_pct_current>3*dot.immolate.ticks_remain*dot.immolate.crit_pct&miss_react
+	if target.Ticks(immolate_debuff) * SpellCritChance() > 3 * target.TicksRemain(immolate_debuff) * target.DebuffSpellCritChance(immolate_debuff) and True(miss_react) Spell(immolate)
+	#conflagrate,if=charges=2&buff.havoc.stack=0
+	if Charges(conflagrate) == 2 and DebuffStacksOnAny(havoc_debuff) == 0 Spell(conflagrate)
+	#chaos_bolt,if=ember_react&target.health.pct>20&(buff.backdraft.stack<3|level<86|(active_enemies>1&action.incinerate.cast_time<1))&(burning_ember>(4.5-active_enemies)|buff.skull_banner.remains>cast_time|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|(trinket.stacking_proc.intellect.remains<cast_time*2.5&trinket.stacking_proc.intellect.remains>cast_time))
+	if BurningEmbers() >= 10 and target.HealthPercent() > 20 and { BuffStacks(backdraft_buff) < 3 or Level() < 86 } and { BurningEmbers() / 10 > 3.5 or BuffRemains(skull_banner_buff) > CastTime(chaos_bolt) or { BuffPresent(trinket_proc_intellect_buff) and BuffRemains(trinket_proc_intellect_buff) > CastTime(chaos_bolt) } or { BuffRemains(trinket_stacking_proc_intellect_buff) < CastTime(chaos_bolt) * 2.5 and BuffRemains(trinket_stacking_proc_intellect_buff) > CastTime(chaos_bolt) } } Spell(chaos_bolt)
+	#chaos_bolt,if=ember_react&target.health.pct>20&(buff.havoc.stack=3&buff.havoc.remains>cast_time)
+	if BurningEmbers() >= 10 and target.HealthPercent() > 20 and { DebuffStacksOnAny(havoc_debuff) == 3 and DebuffRemainsOnAny(havoc_debuff) > CastTime(chaos_bolt) } Spell(chaos_bolt)
+	#conflagrate
+	Spell(conflagrate)
+	#incinerate
+	Spell(incinerate)
+}
+
+AddFunction DestructionSingleTargetShortCdActions
+{
+	#shadowburn,if=ember_react&(burning_ember>3.5|mana.pct<=20|target.time_to_die<20|buff.havoc.stack>=1|trinket.proc.intellect.react|(trinket.stacking_proc.intellect.remains<cast_time*4&trinket.stacking_proc.intellect.remains>cast_time))
+	if BurningEmbers() >= 10 and { BurningEmbers() / 10 > 3.5 or ManaPercent() <= 20 or target.TimeToDie() < 20 or DebuffStacksOnAny(havoc_debuff) >= 1 or BuffPresent(trinket_proc_intellect_buff) or { BuffRemains(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemains(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } } Spell(shadowburn)
+}
+
+AddFunction DestructionSingleTargetCdActions
+{
+	#summon_doomguard
+	Spell(summon_doomguard)
+}
+
+AddFunction DestructionDefaultActions
+{
+	#curse_of_the_elements,if=debuff.magic_vulnerability.down
+	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
+}
+
+AddFunction DestructionDefaultShortCdActions
+{
+	unless target.DebuffExpires(magic_vulnerability any=1)
+	{
+		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
+		if not TalentPoints(archimondes_darkness_talent) or { TalentPoints(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } } Spell(dark_soul_instability)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if TalentPoints(grimoire_of_service_talent) ServicePet()
+	}
+}
+
+AddFunction DestructionDefaultCdActions
+{
+	unless target.DebuffExpires(magic_vulnerability any=1)
+	{
+		#use_item,name=gloves_of_the_horned_nightmare
+		UseItemActions()
+		#jade_serpent_potion,if=buff.bloodlust.react|target.health.pct<=20
+		if BuffPresent(burst_haste any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+		#berserking
+		UseRacialActions()
+	}
+}
+
+AddFunction DestructionPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
+	#snapshot_stats
+}
+
+AddFunction DestructionPrecombatShortCdActions
+{
+	#summon_pet,if=!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down
+	if not TalentPoints(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) SummonPet()
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+	if pet.Present() and TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if TalentPoints(grimoire_of_service_talent) ServicePet()
+}
+
+AddFunction DestructionPrecombatCdActions
+{
+	#jade_serpent_potion
+	UsePotionIntellect()
+}
+
 ### Destruction icons.
 
-AddIcon mastery=destruction size=small checkboxon=opt_icons_left {}
-AddIcon mastery=destruction size=small checkboxon=opt_icons_left {}
-
-AddIcon mastery=destruction help=offgcd
+AddIcon mastery=destruction size=small checkboxon=opt_icons_left
 {
-	if not InCombat()
-	{
-		if TalentPoints(grimoire_of_sacrifice_talent) Spell(grimoire_of_sacrifice)
-	}
+}
+
+AddIcon mastery=destruction size=small checkboxon=opt_icons_left
+{
+}
+
+AddIcon mastery=destruction help=shortcd
+{
+	if InCombat(no) DestructionPrecombatShortCdActions()
+	DestructionDefaultShortCdActions()
 }
 
 AddIcon mastery=destruction help=main
 {
-	if not InCombat()
-	{
-		if not BuffPresent(spell_power_multiplier any=1) Spell(dark_intent)
-		if not TalentPoints(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice) unless pet.CreatureFamily(Felhunter) Spell(summon_felhunter)
-		if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
-	}
-	if target.DebuffExpires(magic_vulnerability any=1) Spell(curse_of_the_elements)
-	if TalentPoints(grimoire_of_service_talent) Spell(service_felhunter)
-	if BurningEmbers() if target.HealthPercent(less 20) Spell(shadowburn)
-	if {target.TicksRemain(immolate_debuff) <Ticks(immolate_debuff) /2 or target.DebuffExpires(immolate_debuff) } and target.DeadIn() >=5 Spell(immolate)
-	if Charges(conflagrate) ==2 Spell(conflagrate)
-	if not target.DebuffPresent(rain_of_fire_aftermath) and not InFlightToTarget(rain_of_fire_aftermath) Spell(rain_of_fire_aftermath)
-	if BurningEmbers() and {BuffStacks(backdraft) <3 or Level() <86 } and {{BurningEmbers() / 10} >3.5 or BuffRemains(dark_soul_instability) >CastTime(chaos_bolt) or BuffRemains(skull_banner_buff) >CastTime(chaos_bolt) } Spell(chaos_bolt)
-	Spell(conflagrate)
-	Spell(incinerate)
+	if InCombat(no) DestructionPrecombatActions()
+	DestructionDefaultActions()
+	DestructionSingleTargetActions()
 }
 
 AddIcon mastery=destruction help=aoe checkboxon=opt_aoe
 {
-	if not target.DebuffPresent(rain_of_fire_aftermath) and not InFlightToTarget(rain_of_fire_aftermath) Spell(rain_of_fire_aftermath)
-	if {BurningEmbers() / 10} >=3.5 and BurningEmbers() and target.HealthPercent() <=20 focus.Spell(havoc)
-	if {BurningEmbers() / 10} >=3.5 and BurningEmbers() and BuffStacks(havoc) >=1 if target.HealthPercent(less 20) Spell(shadowburn)
-	if BurningEmbers() and BuffExpires(fire_and_brimstone) Spell(fire_and_brimstone)
-	if BuffPresent(fire_and_brimstone) and not target.DebuffPresent(immolate_debuff) Spell(immolate)
-	if BuffPresent(fire_and_brimstone) Spell(conflagrate)
-	if BuffPresent(fire_and_brimstone) Spell(incinerate)
-	if not target.DebuffPresent(immolate_debuff) Spell(immolate)
+	if InCombat(no) DestructionPrecombatActions()
+	DestructionDefaultActions()
 
-	if not target.DebuffPresent(rain_of_fire_aftermath) and not InFlightToTarget(rain_of_fire_aftermath) Spell(rain_of_fire_aftermath)
-	focus.Spell(havoc)
+	#havoc,target=2,if=active_enemies>1
+	Spell(havoc)
+
+	DestructionAoeActions()
 }
 
 AddIcon mastery=destruction help=cd
 {
-	UseItemActions()
-	Spell(blood_fury)
-	Spell(dark_soul_instability)
-	Spell(summon_doomguard)
+	if InCombat(no) DestructionPrecombatCdActions()
+	DestructionDefaultCdActions()
+	if Enemies() > 3 DestructionAoeCdActions()
+	if Enemies() <= 3 DestructionSingleTargetCdActions()
 }
 
-AddIcon mastery=destruction size=small checkboxon=opt_icons_right {}
+AddIcon mastery=destruction size=small checkboxon=opt_icons_right
+{
+}
 
 AddIcon mastery=destruction size=small checkboxon=opt_icons_right
 {
