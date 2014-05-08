@@ -77,6 +77,14 @@ OvaleCondition.ParseCondition = nil
 OvaleCondition.ParseRuneCondition = nil
 OvaleCondition.TestBoolean = nil
 OvaleCondition.TestValue = nil
+
+OvaleCondition.COMPARATOR = {
+	atLeast = true,
+	atMost = true,
+	equal = true,
+	less = true,
+	more = true,
+}
 --</public-static-properties>
 
 --<public-static-methods>
@@ -202,9 +210,8 @@ OvaleCondition.TestValue = function(start, ending, value, origin, rate, comparat
 		else
 			return 0, math.huge, 0, 0, 0
 		end
-	elseif comparator ~= "atLeast" and comparator ~= "atMost" and comparator ~= "equal"
-			and comparator ~= "less" and comparator ~= "more" then
-		Ovale:Errorf("unknown compare term %s", comparator)
+	elseif not OvaleCondition.COMPARATOR[comparator] then
+		Ovale:Errorf("unknown comparator %s", comparator)
 	elseif not limit then
 		Ovale:Errorf("comparator %s missing limit", comparator)
 	elseif rate == 0 then
