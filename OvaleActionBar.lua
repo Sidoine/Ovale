@@ -14,11 +14,16 @@ local OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0")
 Ovale.OvaleActionBar = OvaleActionBar
 
 --<private-static-properties>
+local gsub = string.gsub
+local strmatch = string.match
 local tonumber = tonumber
 local wipe = table.wipe
 local API_GetActionInfo = GetActionInfo
 local API_GetActionText = GetActionText
 local API_GetBindingKey = GetBindingKey
+local API_GetBonusBarIndex = GetBonusBarIndex
+local API_GetMacroItem = GetMacroItem
+local API_GetMacroSpell = GetMacroSpell
 
 local OVALE_ACTIONBAR_DEBUG = "action_bar"
 --</private-static-properties>
@@ -41,7 +46,7 @@ OvaleActionBar.item = {}
 --<private-static-methods>
 local function GetKeyBinding(slot)
 	--[[
-		ACTIONBUTTON1..12			=> primary (1..12, 13..24, 73..108)
+		ACTIONBUTTON1..12			=> primary (1..12, 13..24), bonus (73..120)
 		MULTIACTIONBAR1BUTTON1..12	=> bottom left (61..72)
 		MULTIACTIONBAR2BUTTON1..12	=> bottom right (49..60)
 		MULTIACTIONBAR3BUTTON1..12	=> top right (25..36)
@@ -62,6 +67,11 @@ local function GetKeyBinding(slot)
 	local key = name and API_GetBindingKey(name)
 	return key
 end
+
+local function ParseHyperlink(hyperlink)
+	local color, linkType, linkData, text = strmatch(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
+	return color, linkType, linkData, text
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -71,6 +81,7 @@ function OvaleActionBar:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateActionSlots")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateActionSlots")
 	self:RegisterEvent("UPDATE_BINDINGS")
+	self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots")
 end
 	
 function OvaleActionBar:OnDisable()
@@ -79,6 +90,7 @@ function OvaleActionBar:OnDisable()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("UPDATE_BINDINGS")
+	self:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
 end
 
 function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot)
@@ -103,7 +115,16 @@ function OvaleActionBar:UpdateActionSlots(event)
 	wipe(self.item)
 	wipe(self.macro)
 	wipe(self.spell)
-	for slot = 1, 120 do
+
+	local start = 1
+	local bonus = tonumber(API_GetBonusBarIndex()) * 12
+	if bonus > 0 then
+		start = 13
+		for slot = bonus - 11, bonus do
+			self:UpdateActionSlot(slot)
+		end
+	end
+	for slot = start, 72 do
 		self:UpdateActionSlot(slot)
 	end
 end
@@ -139,12 +160,37 @@ function OvaleActionBar:UpdateActionSlot(slot)
 			self.action[slot] = id
 		end
 	elseif actionType == "macro" then
-		local actionText = API_GetActionText(slot)
-		if actionText then
-			if not self.macro[actionText] or slot < self.macro[actionText] then
-				self.macro[actionText] = slot
+		id = tonumber(id)
+		if id then
+			local actionText = API_GetActionText(slot)
+			if actionText then
+				if not self.macro[actionText] or slot < self.macro[actionText] then
+					self.macro[actionText] = slot
+				end
+				local _, _, spellId = API_GetMacroSpell(id)
+				if spellId then
+					if not self.spell[spellId] or slot < self.spell[spellId] then
+						self.spell[spellId] = slot
+					end
+					self.action[slot] = spellId
+				else
+					local _, hyperlink = API_GetMacroItem(id)
+					if hyperlink then
+						local _, _, linkData = ParseHyperlink(hyperlink)
+						local itemId = gsub(linkData, ":.*", "")
+						itemId = tonumber(itemId)
+						if itemId then
+							if not self.item[itemId] or slot < self.item[itemId] then
+								self.item[itemId] = slot
+							end
+							self.action[slot] = itemId
+						end
+					end
+				end
+				if not self.action[slot] then
+					self.action[slot] = actionText
+				end
 			end
-			self.action[slot] = actionText
 		end
 	end
 	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "Mapping button %s to %s", slot, self.action[slot])
