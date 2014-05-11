@@ -56,7 +56,6 @@ AddFunction BeastMasteryDefaultAoeActions
 {
 	#auto_shot
 	#explosive_trap,if=active_enemies>1
-	if Enemies() > 1 Spell(explosive_trap)
 	#serpent_sting,if=!ticking
 	if not target.DebuffPresent(serpent_sting_debuff) Spell(serpent_sting)
 	#dire_beast,if=enabled
@@ -270,7 +269,6 @@ AddFunction MarksmanshipDefaultAoeActions
 {
 	#auto_shot
 	#explosive_trap,if=active_enemies>1
-	if Enemies() > 1 Spell(explosive_trap)
 	#fervor,if=enabled&focus<=50
 	if TalentPoints(fervor_talent) and Focus() <= 50 Spell(fervor)
 	#dire_beast,if=enabled
@@ -466,7 +464,6 @@ AddFunction SurvivalDefaultAoeActions
 {
 	#auto_shot
 	#explosive_trap,if=active_enemies>1
-	if Enemies() > 1 Spell(explosive_trap)
 	#fervor,if=enabled&focus<=50
 	if TalentPoints(fervor_talent) and Focus() <= 50 Spell(fervor)
 	#explosive_shot,if=buff.lock_and_load.react
@@ -602,6 +599,7 @@ AddIcon mastery=survival help=cd
 AddIcon mastery=survival size=small checkboxon=opt_icons_right
 {
 	Spell(explosive_trap)
+	Spell(ice_trap)
 }
 
 AddIcon mastery=survival size=small checkboxon=opt_icons_right
