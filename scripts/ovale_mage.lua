@@ -465,8 +465,8 @@ AddFunction FrostDefaultShortCdActions
 	#rune_of_power,if=cooldown.icy_veins.remains=0&buff.rune_of_power.remains<20
 	if TalentPoints(rune_of_power_talent) and IcyVeins() and RuneOfPowerRemains() < 20 Spell(rune_of_power)
 	#evocation,if=buff.invokers_energy.remains<cast_time&buff.alter_time.down
-	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(rune_of_power) and BuffExpires(alter_time_buff) Spell(evocation)
-	#evocation,if=cooldown.icy_veins.remains=0&buff.rune_of_power.remains<20
+	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(evocation) and BuffExpires(alter_time_buff) Spell(evocation)
+	#evocation,if=cooldown.icy_veins.remains=0&buff.invokers_energy.remains<20
 	if TalentPoints(invocation_talent) and IcyVeins() and BuffRemains(invokers_energy_buff) < 20 Spell(evocation)
 	#evocation,if=mana.pct<50,interrupt_if=mana.pct>95
 	if not TalentPoints(rune_of_power_talent) and not TalentPoints(invocation_talent) and ManaPercent() < 50 Spell(evocation)
@@ -482,7 +482,7 @@ AddFunction FrostDefaultCdActions
 
 	unless { TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) and BuffExpires(alter_time_buff) }
 		or { TalentPoints(rune_of_power_talent) and IcyVeins() and RuneOfPowerRemains() < 20 }
-		or { TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(rune_of_power) and BuffExpires(alter_time_buff) }
+		or { TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(evocation) and BuffExpires(alter_time_buff) }
 		or { TalentPoints(invocation_talent) and IcyVeins() and BuffRemains(invokers_energy_buff) < 20 }
 		or { not TalentPoints(rune_of_power_talent) and not TalentPoints(invocation_talent) and ManaPercent() < 50 and Spell(evocation) }
 	{
