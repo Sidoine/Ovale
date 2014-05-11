@@ -154,6 +154,7 @@ Define(steady_shot 56641)
 Define(thrill_of_the_hunt_buff 34720)
 	SpellInfo(thrill_of_the_hunt_buff duration=15)
 Define(thrill_of_the_hunt_talent 12)
+Define(trap_mastery 63458)
 
 AddFunction Interrupt
 {
