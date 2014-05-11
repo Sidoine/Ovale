@@ -473,8 +473,6 @@ AddFunction SurvivalDefaultAoeActions
 	if BuffPresent(lock_and_load_buff) Spell(explosive_shot)
 	#glaive_toss,if=enabled
 	if TalentPoints(glaive_toss_talent) Spell(glaive_toss)
-	#serpent_sting,if=!ticking&target.time_to_die>=10
-	if not target.DebuffPresent(serpent_sting_debuff) and target.TimeToDie() >= 10 Spell(serpent_sting)
 	#explosive_shot,if=cooldown_react
 	Spell(explosive_shot)
 	#kill_shot
@@ -483,16 +481,8 @@ AddFunction SurvivalDefaultAoeActions
 	if not target.DebuffPresent(black_arrow_debuff) and target.TimeToDie() >= 8 Spell(black_arrow)
 	#multi_shot,if=active_enemies>3
 	Spell(multi_shot)
-	#multi_shot,if=buff.thrill_of_the_hunt.react&dot.serpent_sting.remains<2
-	if BuffPresent(thrill_of_the_hunt_buff) and target.DebuffRemains(serpent_sting_debuff) < 2 Spell(multi_shot)
-	#arcane_shot,if=buff.thrill_of_the_hunt.react
-	if BuffPresent(thrill_of_the_hunt_buff) Spell(arcane_shot)
 	#dire_beast,if=enabled
 	if TalentPoints(dire_beast_talent) Spell(dire_beast)
-	#cobra_shot,if=dot.serpent_sting.remains<6
-	if target.DebuffRemains(serpent_sting_debuff) < 6 Spell(cobra_shot)
-	#multi_shot,if=focus>=67&active_enemies>1
-	if Focus() >= 67 Spell(multi_shot)
 	#cobra_shot
 	Spell(cobra_shot)
 }
