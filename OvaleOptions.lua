@@ -1,7 +1,7 @@
 ﻿--[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012, 2013 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -697,15 +697,15 @@ function OvaleOptions:OnInitialize()
 			debug = {},
 			apparence = {
 				enCombat = false,
-				iconScale = 2,
+				iconScale = 1,
 				secondIconScale = 1,
 				margin = 4,
-				fontScale = 0.5,
+				fontScale = 1,
 				iconShiftX = 0,
 				iconShiftY = 0,
-				smallIconScale=1,
-				raccourcis=true,
-				numeric=false,
+				smallIconScale = 0.8,
+				raccourcis = true,
+				numeric = false,
 				avecCible = false,
 				verrouille = false,
 				vertical = false,
