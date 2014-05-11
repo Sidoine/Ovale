@@ -1,22 +1,19 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012, 2013 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
     file accompanying this program.
 --]]--------------------------------------------------------------------
 
-
 local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
-	local OvaleSpellBook = Ovale.OvaleSpellBook
 	local OvaleState = Ovale.OvaleState
 
-	local type = type
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
 	local state = OvaleState.state
@@ -35,18 +32,7 @@ do
 
 	local function SpellCooldown(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local start, duration
-		if type(spellId) == "string" then
-			local sharedCd = state.cd[spellId]
-			if not sharedCd then
-				return nil
-			end
-			start, duration = sharedCd.start, sharedCd.duration
-		elseif not OvaleSpellBook:IsKnownSpell(spellId) then
-			return nil
-		else
-			start, duration = state:GetSpellCooldown(spellId)
-		end
+		local start, duration = state:GetSpellCooldown(spellId)
 		if start > 0 and duration > 0 then
 			return TestValue(start, start + duration, duration, start, -1, comparator, limit)
 		end

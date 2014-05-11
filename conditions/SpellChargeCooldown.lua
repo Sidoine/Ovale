@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
-    Copyright (C) 2013 Johnny C. Lam
+    Copyright (C) 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -11,10 +11,11 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleState = Ovale.OvaleState
 
-	local API_GetSpellCharges = GetSpellCharges
 	local Compare = OvaleCondition.Compare
 	local TestValue = OvaleCondition.TestValue
+	local state = OvaleState.state
 
 	--- Get the cooldown in seconds on a spell before it gains another charge.
 	-- @name SpellChargeCooldown
@@ -31,8 +32,8 @@ do
 
 	local function SpellChargeCooldown(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local charges, maxCharges, start, duration = API_GetSpellCharges(spellId)
-		if charges < maxCharges then
+		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId)
+		if charges and charges < maxCharges then
 			return TestValue(start, start + duration, duration, start, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
