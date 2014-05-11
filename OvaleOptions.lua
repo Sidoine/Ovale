@@ -739,7 +739,7 @@ function OvaleOptions:OnInitialize()
 
 	AceConfigDialog:AddToBlizOptions("Ovale", "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", "Ovale")
-	AceConfigDialog:AddToBlizOptions("Ovale Apparence", "Apparence", "Ovale")
+	AceConfigDialog:AddToBlizOptions("Ovale Apparence", L["Apparence"], "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", "Ovale")
 
 	self.db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
