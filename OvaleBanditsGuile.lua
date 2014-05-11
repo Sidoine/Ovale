@@ -38,6 +38,7 @@ Ovale.OvaleBanditsGuile = OvaleBanditsGuile
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
+local OvaleSpellBook = nil
 
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
@@ -52,6 +53,8 @@ local self_guid = nil
 local SHALLOW_INSIGHT = 84745
 local MODERATE_INSIGHT = 84746
 local DEEP_INSIGHT = 84747
+-- Bandit's Guile spell ID.
+local BANDITS_GUILE = 84654
 -- Spell IDs for abilities that proc Bandit's Guile.
 local BANDITS_GUILE_ATTACK = {
 	[ 1752] = "Sinister Strike",
@@ -62,7 +65,7 @@ local BANDITS_GUILE_ATTACK = {
 --<public-static-properties>
 OvaleBanditsGuile.name = "Bandit's Guile"
 -- Bandit's Guile spell ID from spellbook; re-used as the aura ID of the hidden, stacking buff.
-OvaleBanditsGuile.spellId = 84654
+OvaleBanditsGuile.spellId = BANDITS_GUILE
 OvaleBanditsGuile.start = 0
 OvaleBanditsGuile.ending = math.huge
 OvaleBanditsGuile.duration = 15
@@ -73,6 +76,7 @@ OvaleBanditsGuile.stacks = 0
 function OvaleBanditsGuile:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
+	OvaleSpellBook = Ovale.OvaleSpellBook
 end
 
 function OvaleBanditsGuile:OnEnable()
@@ -89,7 +93,8 @@ function OvaleBanditsGuile:OnDisable()
 end
 
 function OvaleBanditsGuile:Ovale_SpecializationChanged(event, specialization, previousSpecialization)
-	if specialization == "combat" then
+	-- This misses the corner case of if you're leveling and just acquire the spell.
+	if specialization == "combat" and OvaleSpellBook:IsKnownSpell(BANDITS_GUILE) then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterMessage("Ovale_AuraAdded")
 		self:RegisterMessage("Ovale_AuraChanged")
