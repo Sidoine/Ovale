@@ -245,8 +245,8 @@ do
 						action.waitStart = nil
 					end
 
-					if profile.apparence.moving and icons[1].debutAction and icons[1].finAction then
-						local top=1-(now - icons[1].debutAction)/(icons[1].finAction-icons[1].debutAction)
+					if profile.apparence.moving and icons[1].cooldownStart and icons[1].cooldownEnd then
+						local top=1-(now - icons[1].cooldownStart)/(icons[1].cooldownEnd-icons[1].cooldownStart)
 						if top<0 then
 							top = 0
 						elseif top>1 then

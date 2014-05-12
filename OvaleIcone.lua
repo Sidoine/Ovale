@@ -34,7 +34,7 @@ local function SetValue(self, value, actionTexture)
 	self.icone:SetAlpha(1.0)
 	self.cd:Hide()
 	self.focusText:Hide()
-	self.aPortee:Hide()	
+	self.rangeIndicator:Hide()
 	self.shortcut:Hide()
 	if value then
 		self.actionType = "value"
@@ -54,7 +54,7 @@ local function SetValue(self, value, actionTexture)
 	self:Show()
 end
 
-local function Update(self, element, minAttente, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+local function Update(self, element, startTime, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
 	self.actionType = actionType
 	self.actionId = actionId
@@ -63,78 +63,77 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 	local now = API_GetTime()
 	local state = OvaleState.state
 	local profile = OvaleOptions:GetProfile()
-	if (minAttente~=nil and actionTexture) then	
-	
-		if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-			(minAttente~=now and minAttente>self.ancienneAttente+0.01) or
-			(minAttente < self.finAction-0.01)) then
-			if (actionTexture~=self.actionCourante or self.ancienneAttente==nil or 
-					(minAttente~=now and minAttente>self.ancienneAttente+0.01)) then
-				self.debutAction = now
+
+	if startTime and actionTexture then
+		-- Cooldown text.
+		if actionTexture ~= self.texture
+				or not self.startTime
+				or (startTime ~= now and startTime > self.startTime + 0.01)
+				or (startTime < self.cooldownEnd - 0.01) then
+
+			if actionTexture ~= self.texture
+					or not self.startTime
+					or (startTime ~= now and startTime > self.startTime + 0.01) then
+				self.cooldownStart = now
 			end
-			self.actionCourante = actionTexture
-			self.finAction = minAttente
-			if (minAttente == now) then
+
+			self.texture = actionTexture
+			self.cooldownEnd = startTime
+			if startTime == now then
 				self.cd:Hide()
 			else
 				self.lastSound = nil
 				if self.cdShown then
 					self.cd:Show()
-					self.cd:SetCooldown(self.debutAction, self.finAction - self.debutAction);
+					self.cd:SetCooldown(self.cooldownStart, self.cooldownEnd - self.cooldownStart);
 				end
 			end
 		end
-		
-		if not profile.apparence.flashIcon and minAttente<=now then
+		if not profile.apparence.flashIcon and startTime <= now then
 			self.cd:Hide()
 		end
-		
-		self.ancienneAttente = minAttente
-		
+
+		self.startTime = startTime
+
 		-- L'icône avec le cooldown
 		self.icone:Show()
-		self.icone:SetTexture(actionTexture);
-		
-		if (actionUsable) then
+		self.icone:SetTexture(actionTexture)
+
+		if actionUsable then
 			self.icone:SetAlpha(1.0)
 		else
 			self.icone:SetAlpha(0.33)
 		end
-		
-		local red
-		if minAttente > actionCooldownStart + actionCooldownDuration + 0.01
-				and minAttente > now
-				and minAttente > state.nextCast then
-			self.icone:SetVertexColor(0.75,0.2,0.2)
-			red = true
-		else
-			self.icone:SetVertexColor(1,1,1)
-		end 
-		
-		--if (minAttente==now) then
-			--self.cd:Hide()
-		--end
 
+		-- Icon color overlay (red or not red).
+		local red = false
+		if startTime > actionCooldownStart + actionCooldownDuration + 0.01
+				and startTime > now
+				and startTime > state.nextCast then
+			red = true
+		end
+		if red then
+			self.icone:SetVertexColor(0.75, 0.2, 0.2)
+		else
+			self.icone:SetVertexColor(1, 1, 1)
+		end
+
+		-- Action help text.
 		self.actionHelp = element.params.help
 
+		-- Sound file.
 		if element.params.sound and not self.lastSound then
 			local delay = element.params.soundtime or 0.5
-			if now>=minAttente - delay then
+			if now >= startTime - delay then
 				self.lastSound = element.params.sound
 			--	print("Play" .. self.lastSound)
 				PlaySoundFile(self.lastSound)
 			end
 		end
-		
-		-- La latence
-		if minAttente>now and profile.apparence.highlightIcon and not red then
+
+		if not red and startTime > now and profile.apparence.highlightIcon then
 			local lag = 0.6
-			local newShouldClick
-			if minAttente<now + lag then
-				newShouldClick = true
-			else
-				newShouldClick = false
-			end
+			local newShouldClick = (startTime < now + lag)
 			if self.shouldClick ~= newShouldClick then
 				if newShouldClick then
 					self:SetChecked(1)
@@ -147,44 +146,46 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 			self.shouldClick = false
 			self:SetChecked(0)
 		end
-		
-		-- Le temps restant
-		if ((profile.apparence.numeric or self.params.text == "always") and minAttente > now) then
-			self.remains:SetFormattedText("%.1f", minAttente - now)
+
+		-- Remaining time.
+		if (profile.apparence.numeric or self.params.text == "always") and startTime > now then
+			self.remains:SetFormattedText("%.1f", startTime - now)
 			self.remains:Show()
 		else
 			self.remains:Hide()
 		end
-		
-		-- Le raccourcis clavier 
-		if (profile.apparence.raccourcis) then
+
+		-- Keyboard shortcut.
+		if profile.apparence.raccourcis then
 			self.shortcut:Show()
 			self.shortcut:SetText(actionShortcut)
 		else
 			self.shortcut:Hide()
 		end
-		
-		-- L'indicateur de portée
-		self.aPortee:Show()
-		if (actionInRange==1) then
-			self.aPortee:SetVertexColor(0.6,0.6,0.6)
-			self.aPortee:Show()
-		elseif (actionInRange==0) then
-			self.aPortee:SetVertexColor(1.0,0.1,0.1)
-			self.aPortee:Show()
+
+		-- Range indicator.
+		if actionInRange == 1 then
+			self.rangeIndicator:SetVertexColor(0.6,0.6,0.6)
+			self.rangeIndicator:Show()
+		elseif actionInRange == 0 then
+			self.rangeIndicator:SetVertexColor(1.0,0.1,0.1)
+			self.rangeIndicator:Show()
 		else
-			self.aPortee:Hide()
+			self.rangeIndicator:Hide()
 		end
+
+		-- Focus text.
 		if actionTarget and actionTarget~="target" then
 			self.focusText:SetText(actionTarget)
 			self.focusText:Show()
 		else
 			self.focusText:Hide()
 		end
+
 		self:Show()
 	else
 		self.icone:Hide()
-		self.aPortee:Hide()
+		self.rangeIndicator:Hide()
 		self.shortcut:Hide()
 		self.remains:Hide()
 		self.focusText:Hide()
@@ -199,7 +200,7 @@ local function Update(self, element, minAttente, actionTexture, actionInRange, a
 		end
 	end
 
-	return minAttente,element
+	return startTime, element
 end
 
 local function SetHelp(self, help)
@@ -208,7 +209,7 @@ end
 
 local function SetParams(self, params, secure)
 	self.params = params
-	
+
 	self.actionButton = false
 	if secure then
 		for k,v in pairs(params) do
@@ -230,11 +231,11 @@ end
 local function SetFontScale(self, scale)
 	self.fontScale = scale
 	self.shortcut:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
-	self.aPortee:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
+	self.rangeIndicator:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 end
 
 local function SetRangeIndicator(self, text)
-	self.aPortee:SetText(text)
+	self.rangeIndicator:SetText(text)
 end
 --</public-methods>
 
@@ -285,8 +286,8 @@ function OvaleIcone_OnLoad(self)
 	self.icone = _G[name.."Icon"]
 	self.shortcut = _G[name.."HotKey"]
 	self.remains = _G[name.."Name"]
-	self.aPortee = _G[name.."Count"]
-	self.aPortee:SetText(profile.apparence.targetText)
+	self.rangeIndicator = _G[name.."Count"]
+	self.rangeIndicator:SetText(profile.apparence.targetText)
 	self.cd = _G[name.."Cooldown"]
 	self.normalTexture = _G[name.."NormalTexture"]
 	local fontName, fontHeight, fontFlags = self.shortcut:GetFont()
@@ -300,24 +301,24 @@ function OvaleIcone_OnLoad(self)
 	self.value = nil
 	self.fontScale = nil
 	self.lastSound = nil
-	self.ancienneAttente = nil
-	self.finAction = nil
-	self.debutAction = nil
-	self.actionCourante = nil
+	self.startTime = nil
+	self.cooldownEnd = nil
+	self.cooldownStart = nil
+	self.texture = nil
 	self.params = nil
 	self.actionButton = false
 	self.actionType = nil
 	self.actionId = nil
 	self.actionHelp = nil
---</public-properties>	
-	
+--</public-properties>
+
 	self:SetScript("OnMouseUp", OvaleIcone_OnMouseUp)
-	
+
 	self.focusText:SetFontObject("GameFontNormalSmall");
 	self.focusText:SetAllPoints(self);
 	self.focusText:SetTextColor(1,1,1);
 	self.focusText:SetText(L["Focus"])
-	
+
 	--self:RegisterForClicks("LeftButtonUp")
 	self:RegisterForClicks("AnyUp")
 	self.SetSkinGroup = SetSkinGroup
