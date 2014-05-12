@@ -138,7 +138,7 @@ AddIcon mastery=frost help=offgcd
 	#/water_elemental:freeze,if=buff.alter_time.down&buff.fingers_of_frost.stack<2
 	unless target.Classification(worldboss)
 	{
-		if BuffExpires(alter_time_buff) and BuffStacks(fingers_of_frost_buff less 2) Pet.Spell(water_elemental_freeze)
+		if BuffExpires(alter_time_buff) and BuffStacks(fingers_of_frost_buff less 2) Spell(water_elemental_freeze)
 	}
 
 	#/time_warp,if=target.health.pct<25|time>5
