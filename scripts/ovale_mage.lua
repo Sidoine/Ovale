@@ -99,7 +99,7 @@ AddFunction ArcaneDefaultActions
 	#run_action_list,name=single_target,if=active_enemies<6
 }
 
-AddFunction ArcaneDefaultManaActions
+AddFunction ArcaneDefaultShortCdActions
 {
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) Spell(rune_of_power)
@@ -167,12 +167,12 @@ AddFunction ArcanePrecombatActions
 	#snapshot_stats
 }
 
-AddFunction ArcanePrecombatManaActions
+AddFunction ArcanePrecombatShortCdActions
 {
 	#evocation
-	if TalentPoints(invocation_talent) Spell(evocation)
+	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < 50 Spell(evocation)
 	#rune_of_power
-	if TalentPoints(rune_of_power_talent) Spell(rune_of_power)
+	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < 50  Spell(rune_of_power)
 }
 
 AddFunction ArcanePrecombatCdActions
@@ -196,10 +196,10 @@ AddIcon mastery=arcane help=moving size=small checkboxon=opt_icons_left
 	ArcaneSingleTargetMovingActions()
 }
 
-AddIcon mastery=arcane help=mana
+AddIcon mastery=arcane help=shortcd
 {
-	if InCombat(no) ArcanePrecombatManaActions()
-	ArcaneDefaultManaActions()
+	if InCombat(no) ArcanePrecombatShortCdActions()
+	ArcaneDefaultShortCdActions()
 }
 
 AddIcon mastery=arcane help=main
@@ -363,9 +363,9 @@ AddFunction FirePrecombatActions
 AddFunction FirePrecombatShortCdActions
 {
 	#evocation
-	if TalentPoints(invocation_talent) Spell(evocation)
+	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < 50 Spell(evocation)
 	#rune_of_power
-	if TalentPoints(rune_of_power_talent) Spell(rune_of_power)
+	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < 50  Spell(rune_of_power)
 }
 
 AddFunction FirePrecombatCdActions
@@ -527,9 +527,9 @@ AddFunction FrostPrecombatActions
 AddFunction FrostPrecombatShortCdActions
 {
 	#evocation
-	if TalentPoints(invocation_talent) Spell(evocation)
+	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < 50 Spell(evocation)
 	#rune_of_power
-	if TalentPoints(rune_of_power_talent) Spell(rune_of_power)
+	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < 50  Spell(rune_of_power)
 }
 
 AddFunction FrostPrecombatCdActions
