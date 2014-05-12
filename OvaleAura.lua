@@ -647,39 +647,9 @@ function OvaleAura:ResetState(state)
 	for guid, auraTable in pairs(state.aura) do
 		for auraId, whoseTable in pairs(auraTable) do
 			for casterGUID, aura in pairs(whoseTable) do
-				local keepAura = false
-				local auraFound = GetAura(self.aura, guid, auraId, casterGUID)
-				if auraFound and aura.lastUpdated <= auraFound.lastUpdated then
-					Ovale:Logf("    Aura %d on %s more recently updated outside simulator.", auraId, guid)
-				elseif state.lastSpellId and state.endCast and state.endCast < state.currentTime then
-					local si = OvaleData.spellInfo[state.lastSpellId]
-					if si and si.aura then
-						if guid == self_guid then
-							-- Check for auras that start within aura lag if they are auras applied onto the player.
-							if (si.aura.player and si.aura.player[aura.filter] and si.aura.player[aura.filter][auraId])
-									or (si.aura.target and si.aura.target[aura.filter] and si.aura.target[aura.filter][auraId]) then
-								if IsWithinAuraLag(aura.start, state.currentTime) then
-									keepAura = true
-								end
-							end
-						elseif si.aura.target and si.aura.target[aura.filter] and si.aura.target[aura.filter][auraId] then
-							-- Check for auras that start within twice the aura lag if they are auras applied onto a target.
-							if IsWithinAuraLag(aura.start, state.currentTime, 2) then
-								keepAura = true
-							end
-						end
-					end
-					if keepAura then
-						-- Reset the aura age relative to the state of the simulator.
-						aura.serial = state.serial
-						Ovale:Logf("    Aura %d on %s preserved in simulator for aura lag, start=%f, now=%f.", auraId, guid, aura.start, state.currentTime)
-					end
-				end
-				if not keepAura then
-					self_pool:Release(aura)
-					whoseTable[casterGUID] = nil
-					Ovale:Logf("    Aura %d on %s removed, now=%f.", auraId, guid, state.currentTime)
-				end
+				self_pool:Release(aura)
+				whoseTable[casterGUID] = nil
+				Ovale:Logf("    Aura %d on %s removed, now=%f.", auraId, guid, state.currentTime)
 			end
 			if not next(whoseTable) then
 				self_pool:Release(whoseTable)
@@ -709,8 +679,8 @@ function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, en
 	end
 end
 
--- Apply the effects of the spell on the target's state when it lands on the target.
-function OvaleAura:ApplySpellOnHit(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+-- Apply the effects of the spell on the target's state after it lands on the target.
+function OvaleAura:ApplySpellAfterHit(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the target.
 	if si and si.aura and si.aura.target then

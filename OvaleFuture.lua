@@ -68,16 +68,32 @@ local self_timeAuraAdded = nil
 local OVALE_UNKNOWN_GUID = 0
 
 -- These CLEU events are eventually received after a successful spellcast.
-local OVALE_CLEU_SPELLCAST_RESULTS = {
-	SPELL_AURA_APPLIED = true,
-	SPELL_AURA_APPLIED_DOSE = true,
-	SPELL_AURA_REFRESH = true,
-	SPELL_AURA_REMOVED_DOSE = true,
-	SPELL_CAST_SUCCESS = true,
-	SPELL_CAST_FAILED = true,
-	SPELL_DAMAGE = true,
-	SPELL_MISSED = true,
+local CLEU_AURA_EVENT = {
+	SPELL_AURA_APPLIED = "hit",
+	SPELL_AURA_APPLIED_DOSE = "hit",
+	SPELL_AURA_BROKEN = "hit",
+	SPELL_AURA_BROKEN_SPELL = "hit",
+	SPELL_AURA_REFRESH = "hit",
+	SPELL_AURA_REMOVED = "hit",
+	SPELL_AURA_REMOVED_DOSE = "hit",
 }
+local CLEU_SUCCESSFUL_SPELLCAST_EVENT = {
+--	SPELL_CAST_SUCCESS = "hit",
+	SPELL_CAST_FAILED = "miss",
+	SPELL_DAMAGE = "hit",
+	SPELL_DISPEL = "hit",
+	SPELL_DISPEL_FAILED = "miss",
+	SPELL_HEAL = "hit",
+	SPELL_INTERRUPT = "hit",
+	SPELL_MISSED = "miss",
+	SPELL_STOLEN = "hit",
+}
+do
+	-- All aura events are also successful spellcast events.
+	for cleuEvent, v in pairs(CLEU_AURA_EVENT) do
+		CLEU_SUCCESSFUL_SPELLCAST_EVENT[cleuEvent] = v
+	end
+end
 --</private-static-properties>
 
 --<public-static-properties>
@@ -209,14 +225,25 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		-- This helps to later identify whether the spellcast succeeded by noting when
 		-- the aura is applied or refreshed.
 		if si.aura then
-			for target, auraTable in pairs(si.aura) do
-				for filter, auraList in pairs(auraTable) do
+			-- Look for target auras before player auras applied by the spell.
+			if not spellcast.auraId and si.aura.target then
+				for filter, auraList in pairs(si.aura.target) do
 					for auraId, spellData in pairs(auraList) do
 						if spellData and (spellData == "refresh" or (type(spellData) == "number" and spellData > 0)) then
 							spellcast.auraId = auraId
-							if target == "player" or (target == "target" and spellcast.target == self_guid) then
-								spellcast.removeOnSuccess = true
+							if spellcast.target ~= self_guid then
+								spellcast.removeOnAuraSuccess = true
 							end
+							break
+						end
+					end
+				end
+			end
+			if not spellcast.auraId and si.aura.player then
+				for filter, auraList in pairs(si.aura.player) do
+					for auraId, spellData in pairs(auraList) do
+						if spellData and (spellData == "refresh" or (type(spellData) == "number" and spellData > 0)) then
+							spellcast.auraId = auraId
 							break
 						end
 					end
@@ -232,9 +259,13 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 			local prev = self.counter[si.inccounter] or 0
 			self.counter[si.inccounter] = prev + 1
 		end
-	else
+	end
+
+	-- Set the condition for detecting a successful spellcast.
+	if not spellcast.removeOnAuraSuccess then
 		spellcast.removeOnSuccess = true
 	end
+
 	tinsert(self_activeSpellcast, spellcast)
 
 	OvaleScore:ScoreSpell(spellId)
@@ -254,7 +285,7 @@ local function RemoveSpellFromQueue(spellId, lineId)
 	Ovale.refreshNeeded["player"] = true
 end
 
--- UpdateLastSpellcast() is called at the end of the event handler for OVALE_CLEU_SPELLCAST_RESULTS[].
+-- UpdateLastSpellcast() is called at the end of the event handler for CLEU_SUCCESSFUL_SPELLCAST_EVENT[].
 -- It saves the given spellcast as the most recent one on its target and ensures that the spellcast
 -- snapshot values are correctly adjusted for buffs that are added or cleared simultaneously with the
 -- spellcast.
@@ -510,15 +541,19 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 
 	-- Called when a missile reaches or misses its target
 	if sourceGUID == self_guid then
-		if OVALE_CLEU_SPELLCAST_RESULTS[cleuEvent] then
+		local success = CLEU_SUCCESSFUL_SPELLCAST_EVENT[cleuEvent]
+		if success then
 			local spellId, spellName = arg12, arg13
 			TracePrintf(spellId, "%s: %s (%d)", cleuEvent, spellName, spellId)
 			for index, spellcast in ipairs(self_activeSpellcast) do
-				if spellcast.allowRemove and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
-					if not spellcast.channeled and (spellcast.removeOnSuccess or cleuEvent ~= "SPELL_CAST_SUCCESS") then
+				if spellcast.allowRemove and not spellcast.channeled and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
+					spellcast.success = success
+					if spellcast.removeOnSuccess or (spellcast.removeOnAuraSuccess and CLEU_AURA_EVENT[cleuEvent]) then
 						TracePrintf(spellId, "    Spell finished: %s (%d)", spellName, spellId)
 						tremove(self_activeSpellcast, index)
 						UpdateLastSpellcast(spellcast)
+						local unitId = spellcast.target and OvaleGUID:GetUnitId(spellcast.target) or "player"
+						Ovale.refreshNeeded[unitId] = true
 						Ovale.refreshNeeded["player"] = true
 					end
 					break
@@ -751,10 +786,11 @@ statePrototype.ApplySpell = function(state, ...)
 	Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
 
 	--[[
-		Apply the effects of the spellcast in three phases.
+		Apply the effects of the spellcast in four phases.
 			1. Effects at the beginning of the spellcast.
 			2. Effects when the spell has been cast.
 			3. Effects when the spellcast hits the target.
+			4. Effects after the spellcast hits the target (possibly due to server lag).
 	--]]
 	-- If the spellcast has already started, then the effects have already occurred.
 	if startCast >= now then
@@ -764,6 +800,11 @@ statePrototype.ApplySpell = function(state, ...)
 	if endCast > now then
 		OvaleState:InvokeMethod("ApplySpellAfterCast", state, ...)
 	end
-	OvaleState:InvokeMethod("ApplySpellOnHit", state, ...)
+	if not spellcast or not spellcast.success then
+		OvaleState:InvokeMethod("ApplySpellOnHit", state, ...)
+	end
+	if not spellcast or not spellcast.success or spellcast.success == "hit" then
+		OvaleState:InvokeMethod("ApplySpellAfterHit", state, ...)
+	end
 end
 --</state-methods>
