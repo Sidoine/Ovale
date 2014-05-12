@@ -356,6 +356,7 @@ do
 		["^skull_bash_cat$"] = "FeralInterrupt()",
 		-- Hunter
 		["^aspect_of_the_"] = function(simc, action) return format("if not Stance(hunter_%s) Spell(%s)", action, action) end,
+		["^kill_command$"] = "KillCommand()",
 		["^kill_shot$"] = "Spell(kill_shot usable=1)",
 		["^summon_pet$"] = "SummonPet()",
 		-- Mage

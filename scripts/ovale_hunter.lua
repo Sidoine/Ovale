@@ -36,7 +36,7 @@ AddFunction BeastMasteryDefaultActions
 	#kill_shot
 	Spell(kill_shot usable=1)
 	#kill_command
-	if pet.Present() Spell(kill_command)
+	KillCommand()
 	#glaive_toss,if=enabled
 	if TalentPoints(glaive_toss_talent) Spell(glaive_toss)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react|buff.beast_within.up

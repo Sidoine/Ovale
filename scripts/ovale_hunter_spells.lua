@@ -169,6 +169,12 @@ AddFunction SummonPet
 	if pet.Present(no) Texture(ability_hunter_beastcall help=SummonPet)
 	if pet.IsDead() Spell(revive_pet)
 }
+
+AddFunction KillCommand
+{
+	# Only suggest Kill Command if the pet can attack.
+	if pet.Present() and pet.IsIncapacitated(no) and pet.IsFeared(no) and pet.IsStunned(no) Spell(kill_command)
+}
 ]]
 
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")
