@@ -178,9 +178,10 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
-		if si.buffnocd then
-			local now = API_GetTime()
-			local aura = OvaleAura:GetAura("player", si.buffnocd)
+		-- Check whether this spell has no cooldown.
+		local buffNoCooldown = si.buff_no_cd or si.buffnocd
+		if buffNoCooldown then
+			local aura = OvaleAura:GetAura("player", buffNoCooldown)
 			if OvaleAura:IsActiveAura(aura) then
 				spellcast.nocd = true
 			end
