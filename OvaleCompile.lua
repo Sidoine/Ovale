@@ -56,6 +56,11 @@ local self_functionCalls = {}
 local self_compileOnItems = false
 local self_compileOnStances = false
 
+-- Current age of compilation state.
+local self_serial = 0
+-- Master nodes of the current script (one node for each icon)
+local self_masterNodes = {}
+
 -- Lua pattern to match a key=value pair, returning key and value.
 local KEY_VALUE_PATTERN = "([%w_]+)=(!?[-%w\\_%.]+)"
 -- Lua pattern to match a floating-point number that may start with a minus sign.
@@ -90,8 +95,8 @@ local OVALE_FUNCTIONS = {
 --</private-static-properties>
 
 --<public-static-properties>
---master nodes of the current script (one node for each icon)
-OvaleCompile.masterNodes = {}
+-- Current age of the current compiled script.
+OvaleCompile.serial = nil
 OvaleCompile.customFunctionNode = {}
 --</public-static-properties>
 
@@ -829,21 +834,20 @@ local function CompileScript(text)
 		end
 	end
 	
-	local masterNodes = OvaleCompile.masterNodes
-	wipe(masterNodes)
-
 	-- On compile les AddIcon
+	wipe(self_masterNodes)
+
 	for p,t in strgmatch(text, "AddActionIcon%s*(.-)%s*(%b{})") do
 		local node = ParseAddIcon(p,t,true)
 		if node then
-			tinsert(masterNodes, node)
+			tinsert(self_masterNodes, node)
 		end
 	end
 	
 	for p,t in strgmatch(text, "AddIcon%s*(.-)%s*(%b{})") do
 		local node = ParseAddIcon(p,t)
 		if node then
-			tinsert(masterNodes, node)
+			tinsert(self_masterNodes, node)
 		end
 	end
 
@@ -917,7 +921,9 @@ end
 
 function OvaleCompile:EventHandler(event)
 	Ovale:DebugPrint(OVALE_COMPILE_DEBUG, event)
-	self:Compile()
+	-- Advance age of current compilation state.
+	self_serial = self_serial + 1
+	Ovale.refreshNeeded["player"] = true
 end
 
 function OvaleCompile:Compile()
@@ -930,13 +936,21 @@ function OvaleCompile:Compile()
 		code = ""
 	end
 	CompileScript(code)
-	Ovale.refreshNeeded.player = true
 	Ovale:UpdateFrame()
+end
+
+function OvaleCompile:GetMasterNodes()
+	-- Compile the script if it is outdated.
+	if not self.serial or self.serial < self_serial then
+		self.serial = self_serial
+		self:Compile()
+	end
+	return self_masterNodes
 end
 
 function OvaleCompile:Debug()
 	self_pool:Debug()
-	Ovale:Print(self:DebugNode(self.masterNodes[1]))
+	Ovale:Print(self:DebugNode(self_masterNodes[1]))
 end
 
 function OvaleCompile:DebugNode(node)

@@ -165,18 +165,20 @@ do
 		local now = API_GetTime()
 
 		local profile = OvaleOptions:GetProfile()
+		-- Force a refresh if we've exceeded the minimum update interval since the last refresh.
 		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
-		
-		if not next(Ovale.refreshNeeded) and not forceRefresh then
-			return
-		end
-		if not OvaleCompile.masterNodes then return end
+		-- Refresh the icons if we're forcing a refresh or if one of the units the script is tracking needs a refresh.
+		local refresh = forceRefresh or next(Ovale.refreshNeeded)
+		if not refresh then return end
+
+		local masterNodes = OvaleCompile:GetMasterNodes()
+		if not masterNodes then return end
 		
 		self.lastUpdate = now
 
 		local state = OvaleState.state
 		state:Initialize()
-		for k,node in pairs(OvaleCompile.masterNodes) do
+		for k,node in pairs(masterNodes) do
 			local target
 			if node.params and node.params.target then
 				target = node.params.target
@@ -185,7 +187,7 @@ do
 			end
 			OvaleCondition.defaultTarget = target
 
-			if forceRefresh or Ovale.refreshNeeded[target] or Ovale.refreshNeeded["player"] or Ovale.refreshNeeded["pet"] then
+			if refresh then
 				Ovale:Logf("****Master Node %d", k)
 				OvaleBestAction:StartNewAction(state)
 				local timeSpan, _, element = OvaleBestAction:Compute(node, state)
@@ -194,12 +196,7 @@ do
 					Ovale:Logf("Compute start = %f", start)
 				end
 				local action = self.actions[k]
-				local icons
-				if action.secure then
-					icons = action.secureIcons
-				else
-					icons = action.icons
-				end
+				local icons = action.secure and action.secureIcons or action.icons
 				if element and element.type == "value" then
 					local actionTexture
 					if node.params and node.params.texture then
@@ -315,16 +312,15 @@ do
 		local maxHeight = 0
 		local maxWidth = 0
 		local top = 0
-		
-		if (not OvaleCompile.masterNodes) then
-			return;
-		end
+
+		local masterNodes = OvaleCompile:GetMasterNodes()
+		if not masterNodes then return end
 		
 		local BARRE = 8
 		
 		local margin = profile.apparence.margin
 			
-		for k,node in pairs(OvaleCompile.masterNodes) do
+		for k,node in pairs(masterNodes) do
 			if not self.actions[k] then
 				self.actions[k] = {icons={}, secureIcons={}}
 			end
