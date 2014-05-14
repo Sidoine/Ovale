@@ -336,7 +336,7 @@ local self_options =
 						},
 					},
 				},
-			}
+			},
 		},
 		code =
 		{
@@ -413,8 +413,8 @@ local self_options =
 						OvaleOptions.db.profile.code = code
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
-				}
-			}
+				},
+			},
 		},
 		debug =
 		{
@@ -670,9 +670,9 @@ local self_options =
 						if Ovale.OvaleStance then Ovale.OvaleStance:DebugStances() end
 					end
 				},
-			}
-		}
-	}
+			},
+		},
+	},
 }
 --</private-static-properties>
 
