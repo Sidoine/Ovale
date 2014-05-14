@@ -65,7 +65,7 @@ local RUNE_SLOTS = {
 }
 
 --[[
-	From SimC:sc_death_knight.cpp:
+	From SimulationCraft's sc_death_knight.cpp:
 
 	If explicitly consuming a death rune, any death runes available are preferred in the order:
 
