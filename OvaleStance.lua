@@ -67,6 +67,8 @@ local OVALE_SPELLID_TO_STANCE = {
 --</private-static-properties>
 
 --<public-static-properties>
+-- Whether the stance information is ready for use by other modules.
+OvaleStance.ready = false
 -- List of available stances, populated by CreateStanceList()
 OvaleStance.stanceList = {}
 -- Player's current stance.
@@ -167,5 +169,6 @@ end
 function OvaleStance:UpdateStances()
 	self:CreateStanceList()
 	self:ShapeshiftEventHandler()
+	self.ready = true
 end
 --</public-static-methods>

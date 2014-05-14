@@ -56,6 +56,10 @@ local self_functionCalls = {}
 local self_compileOnItems = false
 local self_compileOnStances = false
 
+-- This module needs the information in other modules to be preloaded and ready for use.
+local self_canCompile = false
+local self_requirePreload = { "OvaleEquipement", "OvaleSpellBook", "OvaleStance" }
+
 -- Current age of compilation state.
 local self_serial = 0
 -- Number of times the script has been compiled.
@@ -929,17 +933,20 @@ function OvaleCompile:EventHandler(event)
 end
 
 function OvaleCompile:Compile()
-	local profile = OvaleOptions:GetProfile()
-	local source = profile.source
-	local code
-	if source and OvaleScripts.script[source] then
-		code = OvaleScripts.script[source].code
-	else
-		code = ""
+	self_canCompile = self_canCompile or Ovale:IsPreloaded(self_requirePreload)
+	if self_canCompile then
+		local profile = OvaleOptions:GetProfile()
+		local source = profile.source
+		local code
+		if source and OvaleScripts.script[source] then
+			code = OvaleScripts.script[source].code
+		else
+			code = ""
+		end
+		CompileScript(code)
+		self_compileCount = self_compileCount + 1
+		Ovale:UpdateFrame()
 	end
-	CompileScript(code)
-	self_compileCount = self_compileCount + 1
-	Ovale:UpdateFrame()
 end
 
 function OvaleCompile:GetMasterNodes()

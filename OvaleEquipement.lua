@@ -1105,6 +1105,8 @@ local OVALE_NORMALIZED_WEAPON_SPEED = {
 --</private-static-properties>
 
 --<public-static-properties>
+-- Whether the equipment information is ready for use by other modules.
+OvaleEquipement.ready = false
 -- Item IDs of equipped items, indexed by slot ID.
 OvaleEquipement.equippedItems = {}
 -- Item levels of equipped items, indexed by slot ID.
@@ -1324,6 +1326,7 @@ function OvaleEquipement:UpdateEquippedItems()
 		self:UpdateArmorSetCount()
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
+	self.ready = true
 end
 
 function OvaleEquipement:UpdateEquippedItemLevels()

@@ -117,6 +117,14 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self:UpdateVisibility()
 end
 
+function Ovale:IsPreloaded(moduleList)
+	local preloaded = true
+	for _, moduleName in pairs(moduleList) do
+		preloaded = preloaded and self[moduleName].ready
+	end
+	return preloaded
+end
+
 function Ovale:ToggleOptions()
 	self.frame:ToggleOptions()
 end

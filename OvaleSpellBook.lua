@@ -40,6 +40,8 @@ local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 --</private-static-properties>
 
 --<public-static-properties>
+-- Whether the spellbook information is ready for use by other modules.
+OvaleSpellBook.ready = false
 -- self.spell[spellId] = spellName
 OvaleSpellBook.spell = {}
 -- self.talent[talentId] = talentName
@@ -111,6 +113,7 @@ function OvaleSpellBook:Update()
 	self:UpdateTalents()
 	self:UpdateGlyphs()
 	self:UpdateSpells()
+	self.ready = true
 end
 
 -- Update the player's talents by scanning the talent tab for the active specialization.
