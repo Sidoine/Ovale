@@ -408,6 +408,7 @@ AddIcon mastery=destruction help=shortcd
 {
 	if InCombat(no) DestructionPrecombatShortCdActions()
 	DestructionDefaultShortCdActions()
+	DestructionSingleTargetShortCdActions()
 }
 
 AddIcon mastery=destruction help=main
