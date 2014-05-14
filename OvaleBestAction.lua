@@ -55,6 +55,7 @@ local API_IsCurrentAction = IsCurrentAction
 local API_IsItemInRange = IsItemInRange
 local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableAction = IsUsableAction
+local API_IsUsableItem = IsUsableItem
 
 local OVALE_DEFAULT_PRIORITY = 3
 
@@ -834,7 +835,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 		actionCooldownStart, actionCooldownDuration, actionEnable = API_GetItemCooldown(itemId)
 
 		local spellName = API_GetItemSpell(itemId)
-		actionUsable = (spellName ~= nil)
+		actionUsable = spellName and API_IsUsableItem(action)
 		actionType = "item"
 		actionId = itemId
 
