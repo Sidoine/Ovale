@@ -103,7 +103,7 @@ end
 -- Update spells if the player's pet is summoned or dismissed.
 function OvaleSpellBook:UNIT_PET(unitId)
 	if unitId == "player" then
-		UpdateSpells()
+		self:UpdateSpells()
 	end
 end
 
