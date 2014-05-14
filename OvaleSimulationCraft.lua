@@ -191,11 +191,33 @@ do
 		if profile.default_pet then
 			self:Append(script, "#	pet=%s", profile.default_pet)
 		end
+
+		self:Append(script, "")
+		self:Append(script, "Include(ovale_items)")
+		self:Append(script, "Include(ovale_racials)")
+		self:Append(script, format("Include(ovale_%s_spells)", profile.class))
+		self:Append(script, "")
+
 		if profile.actionList then
 			for listName, actionList in pairs(profile.actionList) do
 				self:ParseActionList(script, listName, actionList)
 			end
 		end
+		self:Append(script, "")
+
+		if profile.spec then
+			self:Append(script, format("AddIcon mastery=%s help=main", profile.spec))
+		else
+			self:Append(script, "AddIcon help=main")
+		end
+		self:Append(script, "{")
+		self:Indent()
+		if profile.actionList.precombat then
+			self:Append(script, format("if InCombat(no) %s()", self:FunctionName("precombat")))
+		end
+		self:Append(script, format("%s()", self:FunctionName("default")))
+		self:UnIndent()
+		self:Append(script, "}")
 		self:Append(script, "")
 
 		tsort(self.symbols)
