@@ -58,6 +58,8 @@ local self_compileOnStances = false
 
 -- Current age of compilation state.
 local self_serial = 0
+-- Number of times the script has been compiled.
+local self_compileCount = 0
 -- Master nodes of the current script (one node for each icon)
 local self_masterNodes = {}
 
@@ -936,6 +938,7 @@ function OvaleCompile:Compile()
 		code = ""
 	end
 	CompileScript(code)
+	self_compileCount = self_compileCount + 1
 	Ovale:UpdateFrame()
 end
 
@@ -951,6 +954,7 @@ end
 function OvaleCompile:Debug()
 	self_pool:Debug()
 	Ovale:Print(self:DebugNode(self_masterNodes[1]))
+	Ovale:FormatPrint("Total number of script compilations: %d", self_compileCount)
 end
 
 function OvaleCompile:DebugNode(node)
