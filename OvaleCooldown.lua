@@ -45,6 +45,10 @@ end
 function OvaleCooldown:OnEnable()
 	self:RegisterEvent("SPELL_UPDATE_CHARGES", "Update")
 	self:RegisterEvent("SPELL_UPDATE_USABLE", "Update")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", "Update")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", "Update")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "Update")
+	self:RegisterEvent("UNIT_SPELLCAST_START", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "Update")
 	OvaleState:RegisterState(self, self.statePrototype)
 end
@@ -53,6 +57,10 @@ function OvaleCooldown:OnDisable()
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("SPELL_UPDATE_CHARGES")
 	self:UnregisterEvent("SPELL_UPDATE_USABLE")
+	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+	self:UnregisterEvent("UNIT_SPELLCAST_START")
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 end
 
