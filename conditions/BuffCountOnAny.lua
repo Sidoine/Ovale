@@ -30,6 +30,9 @@ do
 	-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	--     Defaults to any=0.
 	--     Valid values: 0, 1.
+	-- @param excludeTarget Optional. Sets whether to ignore the current target when scanning targets.
+	--     Defaults to excludeTarget=0.
+	--     Valid values: 0, 1.
 	-- @return The total aura count.
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffCountOnAny
@@ -37,8 +40,9 @@ do
 	local function BuffCountOnAny(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
+		local excludeUnitId = (condition.excludeTarget == 1) and OvaleCondition.defaultTarget or nil
 
-		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, excludeUnitId)
 		if count > 0 and startChangeCount < math.huge then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)

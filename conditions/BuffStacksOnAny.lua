@@ -27,6 +27,9 @@ do
 	-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
 	--     Defaults to any=0.
 	--     Valid values: 0, 1.
+	-- @param excludeTarget Optional. Sets whether to ignore the current target when scanning targets.
+	--     Defaults to excludeTarget=0.
+	--     Valid values: 0, 1.
 	-- @return The total number of stacks.
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffStacksOnAny
@@ -34,8 +37,9 @@ do
 	local function BuffStacksOnAny(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
+		local excludeUnitId = (condition.excludeTarget == 1) and OvaleCondition.defaultTarget or nil
 
-		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, 1, excludeUnitId)
 		if count > 0 then
 			local start, ending = startFirst, endingChangeCount
 			return TestValue(start, ending, stacks, start, 0, comparator, limit)

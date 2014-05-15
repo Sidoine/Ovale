@@ -1174,19 +1174,20 @@ do
 	--[[
 		Return the total count and stacks of the given aura across all units, the start/end times of
 		the first aura to expire that will change the total count, and the time interval over which
-		the count is more than 0.
+		the count is more than 0.  If excludeUnitId is given, then that unit is excluded from the count.
 	--]]
-	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks)
+	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks, excludeUnitId)
 		-- Initialize.
-		minStacks = minStacks or 0
+		minStacks = minStacks or 1
 		count = 0
 		stacks = 0
 		startChangeCount, endingChangeCount = math.huge, math.huge
 		startFirst, endingLast = math.huge, 0
+		local excludeGUID = excludeUnitId and OvaleGUID:GetGUID(excludeUnitId) or nil
 
 		-- Loop through auras not kept in the simulator that match the criteria.
 		for guid, auraTable in pairs(OvaleAura.aura) do
-			if auraTable[auraId] then
+			if guid ~= excludeGUID and auraTable[auraId] then
 				if mine then
 					local aura = GetStateAura(state, guid, auraId, self_guid)
 					if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
@@ -1204,7 +1205,7 @@ do
 		end
 		-- Loop through auras in the simulator that match the criteria.
 		for guid, auraTable in pairs(state.aura) do
-			if auraTable[auraId] then
+			if guid ~= excludeGUID and auraTable[auraId] then
 				if mine then
 					local aura = auraTable[auraId][self_guid]
 					if aura then
