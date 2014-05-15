@@ -104,11 +104,11 @@ AddFunction ArcaneDefaultShortCdActions
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) Spell(rune_of_power)
 	#rune_of_power,if=cooldown.arcane_power.remains=0&buff.rune_of_power.remains<buff.arcane_power.duration
-	if TalentPoints(rune_of_power_talent) and Spell(arcane_power) and RuneOfPowerRemains() < SpellData(arcane_power_buff duration) Spell(rune_of_power)
+	if TalentPoints(rune_of_power_talent) and not SpellCooldown(arcane_power) > 0 and RuneOfPowerRemains() < SpellData(arcane_power_buff duration) Spell(rune_of_power)
 	#evocation,if=buff.invokers_energy.down
 	if TalentPoints(invocation_talent) and BuffExpires(invokers_energy_buff) Spell(evocation)
 	#evocation,if=cooldown.arcane_power.remains=0&buff.invokers_energy.remains<buff.arcane_power.duration
-	if TalentPoints(invocation_talent) and Spell(arcane_power) and BuffRemains(invokers_energy_buff) < SpellData(arcane_power_buff duration) Spell(evocation)
+	if TalentPoints(invocation_talent) and not SpellCooldown(arcane_power) > 0 and BuffRemains(invokers_energy_buff) < SpellData(arcane_power_buff duration) Spell(evocation)
 	#evocation,if=mana.pct<50,interrupt_if=mana.pct>95&buff.invokers_energy.remains>10
 	if not TalentPoints(rune_of_power_talent) and ManaPercent() < 50 Spell(evocation)
 }
@@ -142,7 +142,7 @@ AddFunction ArcaneDefaultCdActions
 		#jade_serpent_potion,if=buff.alter_time.down&(buff.arcane_power.up|target.time_to_die<50)
 		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or target.TimeToDie() < 50 } UsePotionIntellect()
 		#use_item,slot=hands,sync=alter_time_activate,if=buff.alter_time.down
-		if Spell(alter_time_activate) and BuffExpires(alter_time_buff) UseItemActions()
+		if not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) UseItemActions()
 		#alter_time,if=buff.alter_time.down&buff.arcane_power.up
 		if BuffExpires(alter_time_buff) and BuffPresent(arcane_power_buff) Spell(alter_time)
 		#use_item,slot=hands,if=(cooldown.alter_time_activate.remains>45|target.time_to_die<25)&buff.rune_of_power.remains>20
@@ -246,7 +246,7 @@ AddFunction FireDefaultActions
 	#conjure_mana_gem,if=mana_gem_charges<3&target.debuff.invulnerable.react
 	if ItemCharges(mana_gem) < 3 and target.InCombat(no) ConjureManaGem()
 	#presence_of_mind,sync=alter_time_activate,if=buff.alter_time.down
-	if TalentPoints(presence_of_mind_talent) and Spell(alter_time_activate) and BuffExpires(alter_time_buff) Spell(presence_of_mind)
+	if TalentPoints(presence_of_mind_talent) and not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) Spell(presence_of_mind)
 	#presence_of_mind,if=cooldown.alter_time_activate.remains>60|target.time_to_die<5
 	if TalentPoints(presence_of_mind_talent) and { SpellCooldown(alter_time_activate) > 60 or target.TimeToDie() < 5 } Spell(presence_of_mind)
 	#pyroblast,if=buff.pyroblast.react|buff.presence_of_mind.up
@@ -271,7 +271,7 @@ AddFunction FireDefaultAoeActions
 	#conjure_mana_gem,if=mana_gem_charges<3&target.debuff.invulnerable.react
 	if ItemCharges(mana_gem) < 3 and target.InCombat(no) ConjureManaGem()
 	#presence_of_mind,sync=alter_time_activate,if=buff.alter_time.down
-	if TalentPoints(presence_of_mind_talent) and Spell(alter_time_activate) and BuffExpires(alter_time_buff) Spell(presence_of_mind)
+	if TalentPoints(presence_of_mind_talent) and not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) Spell(presence_of_mind)
 	#presence_of_mind,if=cooldown.alter_time_activate.remains>60|target.time_to_die<5
 	if TalentPoints(presence_of_mind_talent) and { SpellCooldown(alter_time_activate) > 60 or target.TimeToDie() < 5 } Spell(presence_of_mind)
 	#flamestrike,if=active_enemies>=5
@@ -295,11 +295,11 @@ AddFunction FireDefaultShortCdActions
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time&buff.alter_time.down
 	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) and BuffExpires(alter_time_buff) Spell(rune_of_power)
 	#rune_of_power,if=cooldown.alter_time_activate.remains=0&buff.rune_of_power.remains<6
-	if TalentPoints(rune_of_power_talent) and Spell(alter_time_activate) and RuneOfPowerRemains() < 6 Spell(rune_of_power)
+	if TalentPoints(rune_of_power_talent) and not SpellCooldown(alter_time_activate) > 0 and RuneOfPowerRemains() < 6 Spell(rune_of_power)
 	#evocation,if=buff.rune_of_power.remains<cast_time&buff.alter_time.down
 	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(rune_of_power) and BuffExpires(alter_time_buff) Spell(evocation)
 	#evocation,if=cooldown.alter_time_activate.remains=0&buff.rune_of_power.remains<6
-	if TalentPoints(invocation_talent) and Spell(alter_time_activate) and BuffRemains(invokers_energy_buff) < 6 Spell(evocation)
+	if TalentPoints(invocation_talent) and not Spell(alter_time_activate) > 0 and BuffRemains(invokers_energy_buff) < 6 Spell(evocation)
 	#evocation,if=buff.alter_time.down&mana.pct<20,interrupt_if=mana.pct>95
 	if not TalentPoints(rune_of_power_talent) and not TalentPoints(invocation_talent) and BuffExpires(alter_time_buff) and ManaPercent() < 20 Spell(evocation)
 	#combustion,if=target.time_to_die<22
@@ -336,11 +336,11 @@ AddFunction FireDefaultCdActions
 			#blood_fury,if=buff.alter_time.down&(cooldown.alter_time_activate.remains>30|target.time_to_die<18)
 			if BuffExpires(alter_time_buff) and { SpellCooldown(alter_time_activate) > 30 or target.TimeToDie() < 18 } Spell(blood_fury)
 			#berserking,sync=alter_time_activate,if=buff.alter_time.down
-			if Spell(alter_time_activate) and BuffExpires(alter_time_buff) Spell(berserking)
+			if not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) Spell(berserking)
 			#jade_serpent_potion,sync=alter_time_activate,if=buff.alter_time.down
-			if Spell(alter_time_activate) and BuffExpires(alter_time_buff) UsePotionIntellect()
+			if not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) UsePotionIntellect()
 			#use_item,slot=hands,sync=alter_time_activate
-			if Spell(alter_time_activate) UseItemActions()
+			if not SpellCooldown(alter_time_activate) > 0 UseItemActions()
 			#alter_time,if=time_to_bloodlust>180&buff.alter_time.down&buff.pyroblast.react
 			if TimeToBloodlust() > 180 and BuffExpires(alter_time_buff) and BuffPresent(pyroblast_buff) Spell(alter_time)
 			#use_item,slot=hands,if=cooldown.alter_time_activate.remains>40|target.time_to_die<12
@@ -447,13 +447,13 @@ AddFunction FrostDefaultActions
 	#frost_bomb,if=!ticking&target.time_to_die>tick_time*3
 	if TalentPoints(frost_bomb_talent) and not target.DebuffPresent(frost_bomb_debuff) and target.TimeToDie() > target.TickTime(frost_bomb_debuff) * 3 Spell(frost_bomb)
 	#frostfire_bolt,if=buff.brain_freeze.react&cooldown.icy_veins.remains>2
-	if BuffPresent(brain_freeze_buff) and { IcyVeins() or IcyVeinsCooldownRemains() > 2 } Spell(frostfire_bolt)
+	if BuffPresent(brain_freeze_buff) and { not IcyVeinsCooldownRemains() > 0 or IcyVeinsCooldownRemains() > 2 } Spell(frostfire_bolt)
 	#ice_lance,if=buff.frozen_thoughts.react&buff.fingers_of_frost.up
 	if ArmorSetBonus(T16_caster 2) == 1 and BuffPresent(frozen_thoughts_buff) and BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
 	#ice_lance,if=buff.fingers_of_frost.up&(buff.fingers_of_frost.remains<2|(buff.fingers_of_frost.stack>1&cooldown.icy_veins.remains>2))
-	if ArmorSetBonus(T16_caster 2) == 1 and BuffPresent(fingers_of_frost_buff) and { BuffRemains(fingers_of_frost_buff) < 2 or { BuffStacks(fingers_of_frost_buff) > 1 and { IcyVeins() or IcyVeinsCooldownRemains() > 2 } } } Spell(ice_lance)
+	if ArmorSetBonus(T16_caster 2) == 1 and BuffPresent(fingers_of_frost_buff) and { BuffRemains(fingers_of_frost_buff) < 2 or { BuffStacks(fingers_of_frost_buff) > 1 and { not IcyVeinsCooldownRemains() > 0 or IcyVeinsCooldownRemains() > 2 } } } Spell(ice_lance)
 	#ice_lance,if=buff.fingers_of_frost.react&cooldown.icy_veins.remains>2
-	if ArmorSetBonus(T16_caster 2) == 0 and BuffPresent(fingers_of_frost_buff) and { IcyVeins() or IcyVeinsCooldownRemains() > 2 } Spell(ice_lance)
+	if ArmorSetBonus(T16_caster 2) == 0 and BuffPresent(fingers_of_frost_buff) and { not IcyVeinsCooldownRemains() > 0 or IcyVeinsCooldownRemains() > 2 } Spell(ice_lance)
 	#frostbolt
 	Spell(frostbolt)
 }
@@ -463,11 +463,11 @@ AddFunction FrostDefaultShortCdActions
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time&buff.alter_time.down
 	if TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) and BuffExpires(alter_time_buff) Spell(rune_of_power)
 	#rune_of_power,if=cooldown.icy_veins.remains=0&buff.rune_of_power.remains<20
-	if TalentPoints(rune_of_power_talent) and IcyVeins() and RuneOfPowerRemains() < 20 Spell(rune_of_power)
+	if TalentPoints(rune_of_power_talent) and not IcyVeinsCooldownRemains() > 0 and RuneOfPowerRemains() < 20 Spell(rune_of_power)
 	#evocation,if=buff.invokers_energy.remains<cast_time&buff.alter_time.down
 	if TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(evocation) and BuffExpires(alter_time_buff) Spell(evocation)
 	#evocation,if=cooldown.icy_veins.remains=0&buff.invokers_energy.remains<20
-	if TalentPoints(invocation_talent) and IcyVeins() and BuffRemains(invokers_energy_buff) < 20 Spell(evocation)
+	if TalentPoints(invocation_talent) and not IcyVeinsCooldownRemains() > 0 and BuffRemains(invokers_energy_buff) < 20 Spell(evocation)
 	#evocation,if=mana.pct<50,interrupt_if=mana.pct>95
 	if not TalentPoints(rune_of_power_talent) and not TalentPoints(invocation_talent) and ManaPercent() < 50 Spell(evocation)
 	#frozen_orb
@@ -481,9 +481,9 @@ AddFunction FrostDefaultCdActions
 	UseRacialInterruptActions()
 
 	unless { TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) and BuffExpires(alter_time_buff) }
-		or { TalentPoints(rune_of_power_talent) and IcyVeins() and RuneOfPowerRemains() < 20 }
+		or { TalentPoints(rune_of_power_talent) and not IcyVeinsCooldownRemains() > 0 and RuneOfPowerRemains() < 20 }
 		or { TalentPoints(invocation_talent) and BuffRemains(invokers_energy_buff) < CastTime(evocation) and BuffExpires(alter_time_buff) }
-		or { TalentPoints(invocation_talent) and IcyVeins() and BuffRemains(invokers_energy_buff) < 20 }
+		or { TalentPoints(invocation_talent) and not IcyVeinsCooldownRemains() > 0 and BuffRemains(invokers_energy_buff) < 20 }
 		or { not TalentPoints(rune_of_power_talent) and not TalentPoints(invocation_talent) and ManaPercent() < 50 and Spell(evocation) }
 	{
 		#mirror_image
@@ -499,7 +499,7 @@ AddFunction FrostDefaultCdActions
 		#presence_of_mind,if=buff.icy_veins.up|cooldown.icy_veins.remains>15|target.time_to_die<15
 		if BuffPresent(icy_veins_buff) or IcyVeinsCooldownRemains() > 15 or target.TimeToDie() < 15 Spell(presence_of_mind)
 		#use_item,slot=hands,sync=alter_time_activate,if=buff.alter_time.down
-		if Spell(alter_time_activate) and BuffExpires(alter_time_buff) UseItemActions()
+		if not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) UseItemActions()
 		#alter_time,if=buff.alter_time.down&buff.icy_veins.up
 		if BuffExpires(alter_time_buff) and BuffPresent(icy_veins_buff) Spell(alter_time)
 		#use_item,slot=hands,if=(cooldown.alter_time_activate.remains>45&buff.rune_of_power.remains>20)|target.time_to_die<25" )

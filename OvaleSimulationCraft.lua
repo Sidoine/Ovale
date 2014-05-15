@@ -537,7 +537,7 @@ do
 					if needAnd then
 						tinsert(scriptLine, "and")
 					end
-					tinsert(scriptLine, format("Spell(%s)", scriptLine.sync))
+					tinsert(scriptLine, format("not SpellCooldown(%s) > 0", scriptLine.sync))
 					needAnd = true
 				end
 				if scriptLine.weapon then
@@ -738,7 +738,6 @@ do
 				return "DebuffStacks(arcane_charge_debuff)"
 			end,
 		["^buff%.rune_of_power%.remains$"] = "RuneOfPowerRemains()",
-		["^cooldown%.icy_veins%.remains$"] = "IcyVeinsCooldownRemains()",
 		-- Monk
 		["^dot%.zen_sphere%.ticking$"] = function(simc, action)
 				tinsert(simc.symbols, "zen_sphere_buff")
@@ -1220,10 +1219,39 @@ do
 					if name then
 						name = self:Name(name)
 						tinsert(self.symbols, name)
+						local remains = false
 						for pattern, result in pairs(COOLDOWN_PROPERTY) do
 							if strmatch(property, pattern) then
 								translated = (type(result) == "function") and result(self, name) or result
 								break
+							end
+						end
+						-- XXX
+						if strmatch(token, "^cooldown%.icy_veins%.remains$") then
+							translated = "IcyVeinsCooldownRemains()"
+							remains = true
+						end
+						if strmatch(property, "^remains$") then
+							remains = true
+						end
+						if remains then
+							tokenType, token = tokenIterator()
+							if tokenType then
+								if token == "=" then
+									translated = format("not %s >", translated)
+								else
+									local nextTranslated
+									for pattern, result in pairs(TRANSLATED_TOKEN) do
+										if strmatch(token, pattern) then
+											nextTranslated = (type(result) == "function") and result(self, token) or result
+											break
+										end
+									end
+									if not nextTranslated then
+										nextTranslated = format("FIXME_%s", token)
+									end
+									translated = format("%s %s", translated, nextTranslated)
+								end
 							end
 						end
 					end

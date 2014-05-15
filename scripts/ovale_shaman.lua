@@ -105,7 +105,7 @@ AddFunction ElementalDefaultCdActions
 		#jade_serpent_potion,if=time>60&(pet.primal_fire_elemental.active|pet.greater_fire_elemental.active|target.time_to_die<=60)
 		if TimeInCombat() > 60 and { TotemPresent(fire totem=fire_elemental_totem) or TotemPresent(fire totem=fire_elemental_totem) or target.TimeToDie() <= 60 } UsePotionIntellect()
 		#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
-		if not BuffPresent(burst_haste any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or { SpellCooldown(ascendance_caster) == 0 and { target.DebuffRemains(flame_shock_debuff) > SpellData(ascendance_caster_buff duration) or Level() < 87 } } } Spell(berserking)
+		if not BuffPresent(burst_haste any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or { not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemains(flame_shock_debuff) > SpellData(ascendance_caster_buff duration) or Level() < 87 } } } Spell(berserking)
 		#blood_fury,if=buff.bloodlust.up|buff.ascendance.up|((cooldown.ascendance.remains>10|level<87)&cooldown.fire_elemental_totem.remains>10)
 		if BuffPresent(burst_haste any=1) or BuffPresent(ascendance_caster_buff) or { { SpellCooldown(ascendance_caster) > 10 or Level() < 87 } and SpellCooldown(fire_elemental_totem) > 10 } Spell(blood_fury)
 		#elemental_mastery,if=talent.elemental_mastery.enabled&(time>15&((!buff.bloodlust.up&time<120)|(!buff.berserking.up&!buff.bloodlust.up&buff.ascendance.up)|(time>=200&(cooldown.ascendance.remains>30|level<87))))
@@ -346,9 +346,9 @@ AddFunction EnhancementDefaultCdActions
 		#blood_fury
 		UseRacialActions()
 		#elemental_mastery,if=talent.elemental_mastery.enabled&(talent.primal_elementalist.enabled&glyph.fire_elemental_totem.enabled&(cooldown.fire_elemental_totem.remains=0|cooldown.fire_elemental_totem.remains>=80))
-		if TalentPoints(elemental_mastery_talent) and { TalentPoints(primal_elementalist_talent) and Glyph(glyph_of_fire_elemental_totem) and { SpellCooldown(fire_elemental_totem) == 0 or SpellCooldown(fire_elemental_totem) >= 80 } } Spell(elemental_mastery)
+		if TalentPoints(elemental_mastery_talent) and { TalentPoints(primal_elementalist_talent) and Glyph(glyph_of_fire_elemental_totem) and { not SpellCooldown(fire_elemental_totem) > 0 or SpellCooldown(fire_elemental_totem) >= 80 } } Spell(elemental_mastery)
 		#elemental_mastery,if=talent.elemental_mastery.enabled&(talent.primal_elementalist.enabled&!glyph.fire_elemental_totem.enabled&(cooldown.fire_elemental_totem.remains=0|cooldown.fire_elemental_totem.remains>=50))
-		if TalentPoints(elemental_mastery_talent) and { TalentPoints(primal_elementalist_talent) and not Glyph(glyph_of_fire_elemental_totem) and { SpellCooldown(fire_elemental_totem) == 0 or SpellCooldown(fire_elemental_totem) >= 50 } } Spell(elemental_mastery)
+		if TalentPoints(elemental_mastery_talent) and { TalentPoints(primal_elementalist_talent) and not Glyph(glyph_of_fire_elemental_totem) and { not SpellCooldown(fire_elemental_totem) > 0 or SpellCooldown(fire_elemental_totem) >= 50 } } Spell(elemental_mastery)
 		#elemental_mastery,if=talent.elemental_mastery.enabled&!talent.primal_elementalist.enabled
 		if TalentPoints(elemental_mastery_talent) and not TalentPoints(primal_elementalist_talent) Spell(elemental_mastery)
 		#fire_elemental_totem,if=!active
