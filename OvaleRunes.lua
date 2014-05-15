@@ -28,6 +28,7 @@ local ipairs = ipairs
 local pairs = pairs
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
+local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
@@ -81,6 +82,23 @@ local ANY_RUNE_PRIORITY = { 1, 2, 3, 4, 5, 6 }
 
 -- Improved Blood Presence increases rune regenerate rate by 20%.
 local IMPROVED_BLOOD_PRESENCE = 50371
+
+-- Blood of the North (frost) permanently transforms Blood Runes into Death Runes.
+local BLOOD_OF_THE_NORTH = 54637
+-- Blood Rites (blood) causes the Frost and Unholy runes consumed by Death Strike to reactivate as Death runes.
+local BLOOD_RITES = 50034
+local BLOOD_RITES_ATTACK = {
+	[49998] = API_GetSpellInfo(49998),	-- Death Strike
+}
+-- Reaping (unholy) causes the runes consumed by Blood Strike, Pestilence, Festering Strike, Icy Touch or Blood Boil to reactivate as Death Runes.
+local REAPING = 56835
+local REAPING_ATTACK = {
+	[45477] = API_GetSpellInfo(45477),	-- Icy Touch
+	[45902] = API_GetSpellInfo(45902),	-- Blood Strike
+	[48721] = API_GetSpellInfo(48721),	-- Blood Boil
+	[50842] = API_GetSpellInfo(50842),	-- Pestilence
+	[85948] = API_GetSpellInfo(85948),	-- Festering Strike
+}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -241,7 +259,7 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 			local count = si[name] or 0
 			while count > 0 do
 				local atTime = isChanneled and startCast or endCast
-				state:ConsumeRune(atTime, name, spellcast.snapshot)
+				state:ConsumeRune(atTime, spellId, name, spellcast.snapshot)
 				count = count - 1
 			end
 		end
@@ -262,7 +280,7 @@ statePrototype.DebugRunes = function(state)
 end
 
 -- Consume a rune of the given type.  Assume that the required runes are available.
-statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
+statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 	--[[
 		Find a usable rune, preferring a regular rune of that rune type over death
 		runes of that rune type over death runes of any rune type.
@@ -301,9 +319,9 @@ statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 	end
 	if consumedRune then
 		-- Put that rune on cooldown, starting when the other rune of that slot type comes off cooldown.
-		local k = consumedRune.slotType
+		local slotType = consumedRune.slotType
 		local start = atTime
-		for _, slot in ipairs(RUNE_SLOTS[consumedRune.slotType]) do
+		for _, slot in ipairs(RUNE_SLOTS[slotType]) do
 			local rune = state.rune[slot]
 			if rune.endCooldown > start then
 				start = rune.endCooldown
@@ -316,6 +334,22 @@ statePrototype.ConsumeRune = function(state, atTime, name, snapshot)
 		end
 		consumedRune.startCooldown = start
 		consumedRune.endCooldown = start + duration
+
+		-- Set the type of rune that this consumed rune will reactivate as.
+		if slotType == BLOOD_RUNE and OvaleSpellBook:IsKnownSpell(BLOOD_OF_THE_NORTH) then
+			-- Blood of the North (frost) permanently transforms Blood Runes into Death Runes.
+			consumedRune.type = DEATH_RUNE
+		elseif (slotType == FROST_RUNE or slotType == UNHOLY_RUNE) and BLOOD_RITES_ATTACK[spellId] and OvaleSpellBook:IsKnownSpell(BLOOD_RITES) then
+			-- Blood Rites (blood) causes the Frost and Unholy runes consumed by Death Strike to reactivate as Death runes.
+			consumedRune.type = DEATH_RUNE
+		elseif REAPING_ATTACK[spellId] and OvaleSpellBook:IsKnownSpell(REAPING) then
+			-- Reaping (unholy) causes the runes consumed by Blood Strike, Pestilence, Festering Strike, Icy Touch or
+			-- Blood Boil to reactivate as Death Runes.
+			consumedRune.type = DEATH_RUNE
+		else
+			-- In all other cases, runes reactivate according to their slot type.
+			consumedRune.type = slotType
+		end
 
 		-- Each rune consumed generates 10 (12, if in Frost Presence) runic power.
 		local runicpower = state.runicpower
