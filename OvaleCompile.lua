@@ -640,18 +640,40 @@ end
 local function ParseCommands(text)
 	local original = text
 	text = strgsub(text,"(%b[])", ParseLua)
+
 	while true do
 		local was = text
 		text = strgsub(text, "(%w+)%.?(%w*)%s*%((.-)%)", ParseFunction)
 		text = strgsub(text, "([^%w])(%d+%.?%d*)", ParseNumber)
-		text = strgsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
-		text = strgsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
 		text = strgsub(text, "{([node%d ]*)}", ParseGroup)
 		if was == text then
 			break
 		end
 	end
-	
+
+	while true do
+		local was = text
+		while true do
+			local was = text
+			text = strgsub(text, "node(%d+)%s*([%*%/%%])%s*node(%d+)", ParseOp)
+			text = strgsub(text, "{([node%d ]*)}", ParseGroup)
+			if was == text then
+				break
+			end
+		end
+		while true do
+			local was = text
+			text = strgsub(text, "node(%d+)%s*([%+%-])%s*node(%d+)", ParseOp)
+			text = strgsub(text, "{([node%d ]*)}", ParseGroup)
+			if was == text then
+				break
+			end
+		end
+		if was == text then
+			break
+		end
+	end
+
 	while true do
 		local was = text
 		text = strgsub(text, "node(%d+)%s*([%>%<]=?)%s*node(%d+)", ParseOp)
@@ -661,13 +683,33 @@ local function ParseCommands(text)
 			break
 		end
 	end
-		
+
 	while true do
 		local was = text
-		text = strgsub(text, "not%s+node(%d+)", ParseNot)
-		text = strgsub(text, "node(%d+)%s*([%*%+%-%/%>%<]=?|==)%s*node(%d+)", ParseOp)
-		text = strgsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
-		text = strgsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
+		while true do
+			local was = text
+			text = strgsub(text, "not%s+node(%d+)", ParseNot)
+			text = strgsub(text, "{([node%d ]*)}", ParseGroup)
+			if was == text then
+				break
+			end
+		end
+		while true do
+			local was = text
+			text = strgsub(text, "node(%d+)%s+and%s+node(%d+)", ParseAnd)
+			text = strgsub(text, "node(%d+)%s+or%s+node(%d+)", ParseOr)
+			text = strgsub(text, "{([node%d ]*)}", ParseGroup)
+			if was == text then
+				break
+			end
+		end
+		if was == text then
+			break
+		end
+	end
+
+	while true do
+		local was = text
 		text = strgsub(text, "if%s+node(%d+)%s+node(%d+)",ParseIf)
 		text = strgsub(text, "unless%s+node(%d+)%s+node(%d+)",ParseUnless)
 		text = strgsub(text, "wait%s+node(%d+)",ParseWait)
@@ -958,9 +1000,11 @@ function OvaleCompile:GetMasterNodes()
 	return self_masterNodes
 end
 
-function OvaleCompile:Debug()
+function OvaleCompile:Debug(iconNumber)
+	iconNumber = iconNumber or 1
 	self_pool:Debug()
-	Ovale:Print(self:DebugNode(self_masterNodes[1]))
+	local masterNodes = self:GetMasterNodes()
+	Ovale:Print(self:DebugNode(masterNodes[iconNumber]))
 	Ovale:FormatPrint("Total number of script compilations: %d", self_compileCount)
 end
 
@@ -995,14 +1039,16 @@ function OvaleCompile:DebugNode(node)
 		text = self:DebugNode(node.a).." or "..self:DebugNode(node.b)
 	elseif (node.type == "not") then
 		text = "not "..self:DebugNode(node.a)
-	elseif node.type == "operator" then
+	elseif node.type == "compare" then
+		text = self:DebugNode(node.a)..node.operator..self:DebugNode(node.b)
+	elseif node.type == "arithmetic" then
 		text = self:DebugNode(node.a)..node.operator..self:DebugNode(node.b)
 	elseif node.type == "lua" then
 		text = "["..node.lua.."]"
 	elseif node.type == "value" then
 		text = node.value
 	else
-		text = "#unknown node type#"
+		text = "#unknown node type "..node.type.."#"
 	end
 	
 	return text
