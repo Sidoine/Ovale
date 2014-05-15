@@ -383,7 +383,7 @@ statePrototype.RuneCount = function(state, name, deathCondition, atTime)
 	local startCooldown, endCooldown = math.huge, math.huge
 	local runeType = RUNE_TYPE[name]
 	if runeType ~= DEATH_RUNE then
-		if deathCondition == "any" then
+		if deathCondition == "any" or deathCondition == 1 then
 			-- Match runes of the given type or any death runes.
 			for slot, rune in ipairs(state.rune) do
 				if rune.type == runeType or rune.type == DEATH_RUNE then
@@ -398,7 +398,7 @@ statePrototype.RuneCount = function(state, name, deathCondition, atTime)
 			-- Match only the runes of the given type.
 			for _, slot in ipairs(RUNE_SLOTS[runeType]) do
 				local rune = state.rune[slot]
-				if not deathCondition or (deathCondition == "none" and rune.type ~= DEATH_RUNE) then
+				if not deathCondition or ((deathCondition == "none" or deathCondition == 0) and rune.type ~= DEATH_RUNE) then
 					if rune:IsActiveRune(atTime) then
 						count = count + 1
 					elseif rune.endCooldown < endCooldown then
@@ -467,7 +467,7 @@ do
 			end
 		end
 		-- Use death runes of the matching rune type to meet the count requirements.
-		if deathCondition ~= "none" then
+		if deathCondition ~= "none" and deathCondition ~= 0 then
 			for slot, rune in ipairs(state.rune) do
 				if rune.type == DEATH_RUNE then
 					local runeType = rune.slotType
@@ -485,7 +485,7 @@ do
 		end
 
 		-- Use death runes of any type to meet any remaining count requirements.
-		if deathCondition == "any" then
+		if deathCondition == "any" or deathCondition == 1 then
 			for _, slot in ipairs(DEATH_RUNE_PRIORITY) do
 				local rune = state.rune[slot]
 				local runeType = DEATH_RUNE
