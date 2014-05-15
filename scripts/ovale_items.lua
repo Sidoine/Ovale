@@ -9,6 +9,9 @@ do
 ### Potions (Mists of Pandaria only)
 ###
 
+Define(golemblood_potion 58146)
+Define(golemblood_potion_buff 79634)
+	SpellInfo(golemblood_potion_buff duration=25)
 Define(jade_serpent_potion 76093)
 Define(jade_serpent_potion_buff 105702)
 	SpellInfo(jade_serpent_potion_buff duration=25)
