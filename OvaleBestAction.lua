@@ -800,7 +800,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 						end
 					end
 					if needRunes then
-						local ending = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death, false)
+						local ending = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death)
 						if ending > actionCooldownStart + actionCooldownDuration then
 							actionCooldownDuration = ending - actionCooldownStart
 						end

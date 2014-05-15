@@ -33,19 +33,7 @@ do
 				runes[name] = runes[name] + count
 				k = k + 1
 			end
-			local deathCondition
-			if condition.death == 0 then
-				deathCondition = "none"
-			elseif condition.death == 1 then
-				deathCondition = "any"
-			end
-			-- Legacy parameter "nodeath"; no longer documented.
-			if not condition.death and condition.nodeath == 1 then
-				deathCondition = "none"
-			elseif condition.nodeath == 0 then
-				deathCondition = "any"
-			end
-			return runes.blood, runes.unholy, runes.frost, runes.death, deathCondition
+			return runes.blood, runes.unholy, runes.frost, runes.death
 		end
 	end
 
@@ -58,19 +46,13 @@ do
 	--     Valid values: blood, frost, unholy, death
 	-- @param number The number of runes
 	-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
-	-- @param death Sets how death runes are used to fulfill the rune count requirements.
-	--     If not set, then only death runes of the proper rune type are used.
-	--     If set with "death=0", then no death runes are used.
-	--     If set with "death=1", then death runes of any rune type are used.
-	--     Default is unset.
-	--     Valid values: unset, 0, 1
 	-- @return A boolean value.
 	-- @usage
 	-- if Runes(frost 1) Spell(howling_blast)
 
 	local function Runes(condition)
-		local blood, unholy, frost, death, deathCondition = ParseRuneCondition(condition)
-		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
+		local blood, unholy, frost, death = ParseRuneCondition(condition)
+		local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
 		return state.currentTime + seconds, math.huge
 	end
 
@@ -93,8 +75,8 @@ do
 	-- @return The number of seconds.
 
 	local function RunesCooldown(condition)
-		local blood, unholy, frost, death, deathCondition = ParseRuneCondition(condition)
-		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, deathCondition)
+		local blood, unholy, frost, death = ParseRuneCondition(condition)
+		local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
 		return 0, state.currentTime + seconds, seconds, state.currentTime, -1
 	end
 

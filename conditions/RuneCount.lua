@@ -25,12 +25,6 @@ do
 	--     Valid values: blood, frost, unholy, death
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param death Sets how death runes are used to fulfill the rune count requirements.
-	--     If not set, then only death runes of the proper rune type are used.
-	--     If set with "death=0", then no death runes are used.
-	--     If set with "death=1", then death runes of any rune type are used.
-	--     Default is unset.
-	--     Valid values: unset, 0, 1
 	-- @return The number of runes.
 	-- @return A boolean value for the result of the comparison.
 	-- @see Rune
@@ -40,9 +34,7 @@ do
 
 	local function RuneCount(condition)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
-		local deathCondition = condition.death
-
-		local count, startCooldown, endCooldown = state:RuneCount(name, deathCondition)
+		local count, startCooldown, endCooldown = state:RuneCount(name)
 		if startCooldown < math.huge then
 			local start, ending = startCooldown, endCooldown
 			return TestValue(start, ending, count, start, 0, comparator, limit)
@@ -57,12 +49,6 @@ do
 	--     Valid values: blood, frost, unholy, death
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param death Sets how death runes are used to fulfill the rune count requirements.
-	--     If not set, then only death runes of the proper rune type are used.
-	--     If set with "death=0", then no death runes are used.
-	--     If set with "death=1", then death runes of any rune type are used.
-	--     Default is unset.
-	--     Valid values: unset, 0, 1
 	-- @return The number of runes.
 	-- @return A boolean value for the result of the comparison.
 	-- @see RuneCount
@@ -71,9 +57,7 @@ do
 
 	local function Rune(condition)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
-		local deathCondition = condition.death
-
-		local count, startCooldown, endCooldown = state:RuneCount(name, deathCondition)
+		local count, startCooldown, endCooldown = state:RuneCount(name)
 		if startCooldown < math.huge then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
