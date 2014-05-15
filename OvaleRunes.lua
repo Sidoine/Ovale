@@ -335,17 +335,25 @@ end
 --     count			The number of currently active runes of the given type.
 --     startCooldown	The time at which the next rune of the given type went on cooldown.
 --     endCooldown		The time at which the next rune of the given type will be active.
-statePrototype.RuneCount = function(state, name, deathCondition)
+statePrototype.RuneCount = function(state, name, deathCondition, atTime)
+	-- Default to checking the rune count at the end of the current spellcast in the
+	-- simulator, or at the current time if no spell is being cast.
+	if not atTime then
+		if state.endCast and state.endCast > state.currentTime then
+			atTime = state.endCast
+		else
+			atTime = state.currentTime
+		end
+	end
 	local count = 0
 	local startCooldown, endCooldown = math.huge, math.huge
 	local runeType = RUNE_TYPE[name]
-	local now = state.currentTime
 	if runeType ~= DEATH_RUNE then
 		if deathCondition == "any" then
 			-- Match runes of the given type or any death runes.
 			for slot, rune in ipairs(state.rune) do
 				if rune.type == runeType or rune.type == DEATH_RUNE then
-					if rune:IsActiveRune(now) then
+					if rune:IsActiveRune(atTime) then
 						count = count + 1
 					elseif rune.endCooldown < endCooldown then
 						startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
@@ -357,7 +365,7 @@ statePrototype.RuneCount = function(state, name, deathCondition)
 			for _, slot in ipairs(RUNE_SLOTS[runeType]) do
 				local rune = state.rune[slot]
 				if not deathCondition or (deathCondition == "none" and rune.type ~= DEATH_RUNE) then
-					if rune:IsActiveRune(now) then
+					if rune:IsActiveRune(atTime) then
 						count = count + 1
 					elseif rune.endCooldown < endCooldown then
 						startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
@@ -369,7 +377,7 @@ statePrototype.RuneCount = function(state, name, deathCondition)
 		-- Match any requested death runes.
 		for slot, rune in ipairs(state.rune) do
 			if rune.type == DEATH_RUNE then
-				if rune:IsActiveRune(now) then
+				if rune:IsActiveRune(atTime) then
 					count = count + 1
 				elseif rune.endCooldown < endCooldown then
 					startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
