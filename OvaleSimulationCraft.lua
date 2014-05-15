@@ -1085,6 +1085,16 @@ do
 		["^time_to_bloodlust$"] = "TimeToBloodlust()",
 	}
 
+	-- Runes
+	local RUNE_PATTERN = {
+		["^(blood)$"] = true,
+		["^(death)$"] = true,
+		["^(frost)$"] = true,
+		["^(unholy)$"] = true,
+		["^rune%.([%w_]+)$"] = true,
+	--	["^rune%.([%w_]+)%.([%w_]+)$"] = true,
+	}
+
 	local TRANSLATED_TOKEN = {
 		["^!$"] = "not",
 		["^!=$"] = "!=",
@@ -1284,6 +1294,56 @@ do
 					for pattern, result in pairs(GENERAL_PROPERTY) do
 						if strmatch(token, pattern) then
 							translated = (type(result) == "function") and result(self, action) or result
+							break
+						end
+					end
+				end
+				if not translated then
+					for pattern in pairs(RUNE_PATTERN) do
+						local rune = strmatch(token, pattern)
+						if rune then
+							-- Look ahead at the next token to see which rune condition is needed.
+							local _, comparatorToken = tokenIterator()
+							if comparatorToken == "=" then
+								local operandTokenType, operandToken = tokenIterator()
+								if operandTokenType == "number" then
+									local number = tonumber(operandToken)
+									local maxRunes = (rune == "death") and 6 or 2
+									if number == 0 then
+										translated = format("Rune(%s) < 1", rune)
+									elseif number == maxRunes then
+										translated = format("Rune(%s) >= %d", rune, number)
+									else -- if 0 < number and number < maxRunes then
+										translated = format("{ Rune(%s) >= %d and Rune(%s) < %d }", rune, number, rune, number + 1)
+									end
+								else
+									translated = format("RuneCount(%s) == %s", rune, operandToken)
+								end
+							elseif comparatorToken == "!=" then
+								local operandTokenType, operandToken = tokenIterator()
+								if operandTokenType == "number" then
+									local number = tonumber(operandToken)
+									local maxRunes = (rune == "death") and 6 or 2
+									if number == 0 then
+										translated = format("Rune(%s) >= 1", rune)
+									elseif number == maxRunes then
+										translated = format("Rune(%s) < %d", rune, maxRunes)
+									else -- if 0 < number and number < maxRunes then
+										translated = format("{ Rune(%s) < %d or Rune(%s) >= %d }", rune, number, rune, number + 1)
+									end
+								else
+									translated = format("not RuneCount(%s) == %s", rune, operandToken)
+								end
+							elseif comparatorToken == "<=" or comparatorToken == ">=" then
+								translated = format("Rune(%s) %s", rune, comparatorToken)
+							elseif comparatorToken == "<" or comparatorToken == ">" then
+								local operandTokenType, operandToken = tokenIterator()
+								if operandTokenType == "number" then
+									translated = format("Rune(%s) %s= %d", rune, comparatorToken, 1 + tonumber(operandToken))
+								else
+									translated = format("Rune(%s) %s= 1 + %s", rune, comparatorToken, operandToken)
+								end
+							end
 							break
 						end
 					end
