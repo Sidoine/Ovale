@@ -790,9 +790,20 @@ function OvaleBestAction:GetActionInfo(element, state)
 
 				if si.blood or si.frost or si.unholy or si.death then
 					-- Spell requires runes.
-					local runecd = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death, false)
-					if runecd > actionCooldownStart + actionCooldownDuration then
-						actionCooldownDuration = runecd - actionCooldownStart
+					local needRunes = true
+					-- "buff_runes_none" is the spell ID of the buff that makes casting the spell cost no runes.
+					local buffNoRunes = si.buff_runes_none
+					if buffNoRunes then
+						local aura = state:GetAura("player", buffNoRunes)
+						if state:IsActiveAura(aura) then
+							needRunes = false
+						end
+					end
+					if needRunes then
+						local ending = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death, false)
+						if ending > actionCooldownStart + actionCooldownDuration then
+							actionCooldownDuration = ending - actionCooldownStart
+						end
 					end
 				end
 			end
