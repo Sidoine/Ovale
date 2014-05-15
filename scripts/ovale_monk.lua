@@ -140,11 +140,7 @@ AddFunction BrewmasterShortCdActions
 AddFunction BrewmasterCdActions
 {
 	if TalentPoints(chi_burst_talent) Spell(chi_burst)
-	unless { target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death) }
-		or { TalentPoints(chi_burst_talent) and Spell(chi_burst) }
-	{
-		if TalentPoints(invoke_xuen_talent) Spell(invoke_xuen)
-	}
+	if TalentPoints(invoke_xuen_talent) Spell(invoke_xuen)
 }
 
 AddFunction BrewmasterPrecombatActions
