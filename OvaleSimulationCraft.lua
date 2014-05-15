@@ -196,7 +196,6 @@ do
 		self:Append(script, "Include(ovale_items)")
 		self:Append(script, "Include(ovale_racials)")
 		self:Append(script, format("Include(ovale_%s_spells)", profile.class))
-		self:Append(script, "")
 
 		if profile.actionList then
 			for listName, actionList in pairs(profile.actionList) do
@@ -273,6 +272,17 @@ end
 
 do
 	local TO_NAME = {
+		deathknight = {
+			blood = {
+				["soul_reaper"] = "soul_reaper_blood",
+			},
+			frost = {
+				["soul_reaper"] = "soul_reaper_frost",
+			},
+			unholy = {
+				["soul_reaper"] = "soul_reaper_unholy",
+			},
+		},
 		druid = {
 			balance = {
 				["dream_of_cenarius"] = "dream_of_cenarius_caster",
@@ -369,6 +379,8 @@ do
 		["^blood_presence$"] = "if not Stance(deathknight_blood_presence) Spell(blood_presence)",
 		["^frost_presence$"] = "if not Stance(deathknight_frost_presence) Spell(frost_presence)",
 		["^unholy_presence$"] = "if not Stance(deathknight_unholy_presence) Spell(unholy_presence)",
+		["^blood_tap$"] = "BloodTap()",
+		["^plague_leech$"] = "PlagueLeech()",
 		-- Druid
 		["^cat_form$"] = "if not Stance(druid_cat_form) Spell(cat_form)",
 		["^moonkin_form$"] = "if not Stance(druid_moonkin_form) Spell(moonkin_form)",
