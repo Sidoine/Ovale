@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "Ovale"
-	local desc = "[5.4] Ovale: Frost, Unholy"
+	local desc = "[5.4] Ovale: Blood, Frost, Unholy"
 	local code = [[
 # Ovale death knight script based on SimulationCraft.
 
@@ -14,6 +14,214 @@ Include(ovale_deathknight_spells)
 AddCheckBox(opt_aoe L(AOE) default)
 AddCheckBox(opt_icons_left "Left icons")
 AddCheckBox(opt_icons_right "Right icons")
+
+###
+### Blood
+###
+
+AddFunction BloodPrecombatActions
+{
+	if not Stance(deathknight_blood_presence) Spell(blood_presence)
+	Spell(horn_of_winter)
+	if BuffExpires(bone_shield_buff) Spell(bone_shield)
+}
+
+AddFunction BloodSurvivalBuffPresent
+{
+	BuffPresent(army_of_the_dead_buff)
+		or BuffPresent(bone_shield_buff)
+		or BuffPresent(dancing_rune_weapon_buff)
+		or BuffPresent(icebound_fortitude_buff)
+		or BuffPresent(vampiric_blood_buff)
+}
+
+AddFunction BloodApplyDiseases
+{
+	if target.DebuffRemains(blood_plague_debuff) < 2 or target.DebuffRemains(frost_fever_debuff) < 2
+	{
+		if DebuffCountOnAny(blood_plague_debuff excludeTarget=1) > 0 and DebuffCountOnAny(frost_fever_debuff excludeTarget=1) > 0 and { BuffPresent(crimson_scourge_buff) or Rune(blood) >= 1 } Spell(blood_boil)
+		Spell(outbreak)
+	}
+	if target.DebuffExpires(blood_plague_debuff) Spell(plague_strike)
+	if target.DebuffExpires(frost_fever_debuff) Spell(icy_touch)
+}
+
+AddFunction BloodSingleTargetActions
+{
+	#death_strike,if=incoming_damage_5s>=health.max*0.65
+	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
+
+	if { Rune(blood) < 2 or Rune(unholy) < 2 or Rune(frost) < 2 } and Spell(outbreak) PlagueLeech()
+	BloodApplyDiseases()
+
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+
+	if BuffPresent(crimson_scourge_buff) Spell(blood_boil)
+	if Rune(blood) >= 1 and { target.DebuffRemains(frost_fever_debuff) <= 10 or target.DebuffRemains(blood_plague_debuff) <= 10 } Spell(blood_boil)
+
+	if TalentPoints(blood_tap_talent)
+	{
+		# Try to store one death rune in a blood rune socket.
+		if BuffStacks(blood_charge_buff) >= 5 and Rune(blood) < 1 Spell(blood_tap)
+		if BuffStacks(blood_charge_buff) >= 10
+		{
+			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+			if Rune(unholy) < 1 or Rune(frost) < 1 Spell(blood_tap)
+		}
+		if Rune(blood) >= 2 Spell(heart_strike)
+	}
+	if TalentPoints(runic_empowerment_talent)
+	{
+		if Rune(blood) >= 2 Spell(heart_strike)
+		if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+	}
+	if TalentPoints(runic_corruption_talent)
+	{
+		# Try to put one rune of each set on cooldown to benefit from Runic Corruption procs.
+		if Rune(blood) >= 2 Spell(heart_strike)
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+	}
+	if not TalentPoints(blood_tap_talent) and not TalentPoints(runic_empowerment_talent) and not TalentPoints(runic_corruption_talent)
+	{
+		if Rune(blood) >= 2 Spell(heart_strike)
+	}
+
+	if not Glyph(glyph_of_outbreak) or RunicPower() >= 65 Spell(rune_strike)
+	Spell(horn_of_winter)
+
+	#death_strike,if=(unholy=2|frost=2)&incoming_damage_5s>=health.max*0.4
+	if { Rune(unholy) >= 2 or Rune(frost) >= 2 } and IncomingDamage(5) >= HealthPercent() * 0.4 Spell(death_strike)
+}
+
+AddFunction BloodAoeActions
+{
+	#death_strike,if=incoming_damage_5s>=health.max*0.65
+	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
+
+	if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
+
+	if { Rune(blood) < 2 or Rune(unholy) < 2 or Rune(frost) < 2 } and Spell(outbreak) PlagueLeech()
+	BloodApplyDiseases()
+
+	if target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
+	{
+		if BuffPresent(crimson_scourge_buff) Spell(blood_boil)
+		if DebuffRemainsOnAny(blood_plague_debuff excludeTarget=1) < 10 and DebuffRemainsOnAny(frost_fever_debuff excludeTarget=1) < 10
+		{
+			if TalentPoints(roiling_blood_talent) Spell(blood_boil)
+			Spell(pestilence)
+		}
+	}
+
+	if TalentPoints(blood_tap_talent)
+	{
+		# Try to store one death rune in a blood rune socket.
+		if BuffStacks(blood_charge_buff) >= 5 and Rune(blood) < 1 Spell(blood_tap)
+		if BuffStacks(blood_charge_buff) >= 10
+		{
+			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+			if Rune(unholy) < 1 or Rune(frost) < 1 Spell(blood_tap)
+		}
+		if Rune(blood) >= 2 Spell(blood_boil)
+	}
+	if TalentPoints(runic_empowerment_talent)
+	{
+		if Rune(blood) >= 2 Spell(blood_boil)
+		if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+	}
+	if TalentPoints(runic_corruption_talent)
+	{
+		# Try to put one rune of each set on cooldown to benefit from Runic Corruption procs.
+		if Rune(blood) >= 2 Spell(blood_boil)
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+	}
+	if not TalentPoints(blood_tap_talent) and not TalentPoints(runic_empowerment_talent) and not TalentPoints(runic_corruption_talent)
+	{
+		if Rune(blood) >= 2 Spell(blood_boil)
+	}
+
+	if not Glyph(glyph_of_outbreak) or RunicPower() >= 65 Spell(rune_strike)
+	Spell(horn_of_winter)
+
+	#death_strike,if=(unholy=2|frost=2)&incoming_damage_5s>=health.max*0.4
+	if { Rune(unholy) >= 2 or Rune(frost) >= 2 } and IncomingDamage(5) >= HealthPercent() * 0.4 Spell(death_strike)
+}
+
+AddFunction BloodShortCdActions
+{
+	if not BloodSurvivalBuffPresent() Spell(bone_shield)
+	if HealthPercent() < 50 Spell(vampiric_blood)
+	if HealthPercent() < 90 Spell(rune_tap)
+	if HealthPercent() < 50 Spell(raise_dead)
+	if TalentPoints(death_pact_talent) and TotemPresent(ghoul) and HealthPercent() < 50 Spell(death_pact)
+
+	if Rune(unholy) < 1 and Rune(frost) < 1 and ArmorSetParts(T16_tank) >= 4 Spell(dancing_rune_weapon)
+	if Rune(blood) < 1 and Rune(unholy) < 1 and Rune(frost) < 1 Spell(empower_rune_weapon)
+	if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
+	Spell(antimagic_shell)
+}
+
+AddFunction BloodCdActions
+{
+	if not BloodSurvivalBuffPresent()
+	{
+		if HealthPercent() < 30 Spell(icebound_fortitude)
+		if HealthPercent() < 80 Spell(dancing_rune_weapon)
+		Spell(army_of_the_dead)
+	}
+}
+
+# Blood icons.
+
+AddIcon mastery=blood size=small checkboxon=opt_icons_left
+{
+	Spell(antimagic_shell)
+	Spell(icebound_fortitude)
+}
+
+AddIcon mastery=blood size=small checkboxon=opt_icons_left
+{
+	if TalentPoints(death_pact_talent) Spell(death_pact)
+	if TalentPoints(death_siphon_talent) Spell(death_siphon)
+}
+
+AddIcon mastery=blood help=shortcd
+{
+	BloodShortCdActions()
+}
+
+AddIcon mastery=blood help=main
+{
+	if InCombat(no) BloodPrecombatActions()
+	BloodSingleTargetActions()
+}
+
+AddIcon mastery=blood help=aoe checkboxon=opt_aoe
+{
+	if InCombat(no) BloodPrecombatActions()
+	BloodAoeActions()
+}
+
+AddIcon mastery=blood help=cd
+{
+	Interrupt()
+	UseRacialInterruptActions()
+	BloodCdActions()
+}
+
+AddIcon mastery=blood size=small checkboxon=opt_icons_right
+{
+	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
+	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
+	#pestilence,if=dot.blood_plague.ticking&talent.unholy_blight.enabled&cooldown.unholy_blight.remains<49,line_cd=28
+	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
+}
+
+AddIcon mastery=blood size=small checkboxon=opt_icons_right
+{
+	UseItemActions()
+}
 
 ###
 ### Frost
