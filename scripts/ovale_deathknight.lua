@@ -182,7 +182,11 @@ AddIcon mastery=blood size=small checkboxon=opt_icons_left
 
 AddIcon mastery=blood size=small checkboxon=opt_icons_left
 {
-	if TalentPoints(death_pact_talent) Spell(death_pact)
+	if TalentPoints(death_pact_talent)
+	{
+		Spell(raise_dead)
+		if TotemPresent(ghoul) Spell(death_pact)
+	}
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
@@ -481,7 +485,11 @@ AddIcon mastery=frost size=small checkboxon=opt_icons_left
 
 AddIcon mastery=frost size=small checkboxon=opt_icons_left
 {
-	if TalentPoints(death_pact_talent) Spell(death_pact)
+	if TalentPoints(death_pact_talent)
+	{
+		Spell(raise_dead)
+		if TotemPresent(ghoul) Spell(death_pact)
+	}
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
@@ -718,7 +726,11 @@ AddIcon mastery=unholy size=small checkboxon=opt_icons_left
 
 AddIcon mastery=unholy size=small checkboxon=opt_icons_left
 {
-	if TalentPoints(death_pact_talent) Spell(death_pact)
+	if TalentPoints(death_pact_talent)
+	{
+		Spell(raise_dead)
+		if TotemPresent(ghoul) Spell(death_pact)
+	}
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
