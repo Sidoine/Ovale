@@ -1,4 +1,4 @@
-[Ovale Spell Priority][ovale] is a rotation-helper addon shows you what spell or ability you should use in order to maximize your damage.
+[Ovale Spell Priority][ovale] is a rotation-helper addon that shows you what spell or ability you should use in order to maximize your damage.
 
   [ovale]: http://www.curse.com/addons/wow/ovale
 
@@ -7,7 +7,7 @@ It displays one or more icons that show the cooldown of an action.  The action i
   [Corruption]: http://www.wowhead.com/spell=172
   [Shadow Bolt]: http://www.wowhead.com/spell=686
 
-Default scripts are available for all dps classes and specs, based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
+Default scripts are available for all dps classes and specializations, based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
