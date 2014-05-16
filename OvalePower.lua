@@ -291,16 +291,34 @@ function OvalePower:CleanState(state)
 	end
 end
 
+-- Apply the effects of the spell at the start of the spellcast.
+function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	-- Channeled spells cost resources at the start of the channel.
+	if isChanneled then
+		state:ApplyPowerCost(spellId)
+	end
+end
+
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	-- Instant or cast-time spells cost resources at the end of the spellcast.
+	if not isChanneled then
+		state:ApplyPowerCost(spellId)
+	end
+end
+--</public-static-methods>
+
+--<state-methods>
+-- Update the state of the simulator for the power cost of the given spell.
+statePrototype.ApplyPowerCost = function(state, spellId)
 	local si = OvaleData.spellInfo[spellId]
 
 	-- Update power using information from GetSpellInfo() if there is no SpellInfo() for the spell's cost.
 	do
 		local _, _, _, cost, _, powerTypeId = API_GetSpellInfo(spellId)
 		if cost and powerTypeId then
-			powerType = self.POWER_TYPE[powerTypeId]
-			if not si or not si[powerType] then
+			powerType = OvalePower.POWER_TYPE[powerTypeId]
+			if state[powerType] and not (si and si[powerType]) then
 				state[powerType] = state[powerType] - cost
 			end
 		end
@@ -308,7 +326,7 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 
 	if si then
 		-- Update power state except for eclipse energy (handled by OvaleEclipse).
-		for powerType, powerInfo in pairs(self.POWER_INFO) do
+		for powerType, powerInfo in pairs(OvalePower.POWER_INFO) do
 			if powerType ~= "eclipse" then
 				local cost = state:PowerCost(spellId, powerType)
 				local power = state[powerType] or 0
@@ -316,7 +334,7 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 					power = power - cost
 					-- Clamp power to lower and upper limits.
 					local mini = powerInfo.mini or 0
-					local maxi = powerInfo.maxi or self.maxPower[powerType]
+					local maxi = powerInfo.maxi or OvalePower.maxPower[powerType]
 					if mini and power < mini then
 						power = mini
 					end
@@ -329,9 +347,7 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 		end
 	end
 end
---</public-static-methods>
 
---<state-methods>
 -- Return the number of seconds before all of the primary resources needed by a spell are available.
 statePrototype.TimeToPower = function(state, spellId, powerType)
 	local power = state[powerType]

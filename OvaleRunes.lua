@@ -252,18 +252,19 @@ function OvaleRunes:CleanState(state)
 	end
 end
 
+-- Apply the effects of the spell at the start of the spellcast.
+function OvaleRunes:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	-- Channeled spells cost resources at the start of the channel.
+	if isChanneled then
+		state:ApplyRuneCost(spellId, startCast, spellcast)
+	end
+end
+
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
-	local si = OvaleData.spellInfo[spellId]
-	if si then
-		for i, name in ipairs(RUNE_NAME) do
-			local count = si[name] or 0
-			while count > 0 do
-				local atTime = isChanneled and startCast or endCast
-				state:ConsumeRune(atTime, spellId, name, spellcast.snapshot)
-				count = count - 1
-			end
-		end
+	-- Instant or cast-time spells cost resources at the end of the spellcast.
+	if not isChanneled then
+		state:ApplyRuneCost(spellId, endCast, spellcast)
 	end
 end
 --</public-static-methods>
@@ -276,6 +277,21 @@ statePrototype.DebugRunes = function(state)
 			Ovale:FormatPrint("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
 		else
 			Ovale:FormatPrint("rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
+		end
+	end
+end
+
+-- Update the rune state with the rune cost of the give spell.
+statePrototype.ApplyRuneCost = function(state, spellId, atTime, spellcast)
+	local si = OvaleData.spellInfo[spellId]
+	if si then
+		for i, name in ipairs(RUNE_NAME) do
+			local count = si[name] or 0
+			while count > 0 do
+				local snapshot = spellcast and spellcast.snapshot or nil
+				state:ConsumeRune(atTime, spellId, name, snapshot)
+				count = count - 1
+			end
 		end
 	end
 end
@@ -300,6 +316,7 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 		if not consumedRune then
 			-- Search for an active death rune of the given rune type.
 			for _, slot in ipairs(RUNE_SLOTS[runeType]) do
+				local rune = state.rune[slot]
 				if rune.type == DEATH_RUNE and rune:IsActiveRune(atTime) then
 					consumedRune = rune
 					break
@@ -362,7 +379,7 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 		local maxi = OvalePower.maxPower.runicpower
 		state.runicpower = (runicpower < maxi) and runicpower or maxi
 	else
-		Ovale:Errorf("No %s rune available to consume!", RUNE_NAME[runeType])
+		Ovale:FormatPrint("No %s rune available to consume!", RUNE_NAME[runeType])
 	end
 end
 
