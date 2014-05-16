@@ -220,6 +220,8 @@ AddIcon mastery=balance size=small checkboxon=opt_icons_right
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#UZ!...2.1
 #	glyphs=savagery/cat_form
 
+AddCheckBox(opt_weakened_armor_debuff SpellName(weakened_armor_debuff) default mastery=feral)
+
 AddFunction FeralFillerActions
 {
 	#ravage
@@ -240,7 +242,7 @@ AddFunction FeralBasicActions
 	#ferocious_bite,if=dot.rip.ticking&dot.rip.remains<=3&target.health.pct<=25
 	if target.DebuffPresent(rip_debuff) and target.DebuffRemains(rip_debuff) <= 3 and target.HealthPercent() <= 25 Spell(ferocious_bite)
 	#faerie_fire,if=debuff.weakened_armor.stack<3
-	if target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
+	if CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
 	#healing_touch,if=talent.dream_of_cenarius.enabled&buff.predatory_swiftness.up&buff.dream_of_cenarius.down&(buff.predatory_swiftness.remains<1.5|combo_points>=4)
 	if TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(dream_of_cenarius_melee_buff) and { BuffRemains(predatory_swiftness_buff) < 1.5 or ComboPoints() >= 4 } Spell(healing_touch)
 	#savage_roar,if=buff.savage_roar.remains<3
@@ -290,7 +292,7 @@ AddFunction FeralBasicPredictiveActions
 	#ferocious_bite,if=dot.rip.ticking&dot.rip.remains<=3&target.health.pct<=25
 	if target.DebuffPresent(rip_debuff) and target.DebuffRemains(rip_debuff) <= 3 and target.HealthPercent() <= 25 Spell(ferocious_bite)
 	#faerie_fire,if=debuff.weakened_armor.stack<3
-	if target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
+	if CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
 	#healing_touch,if=talent.dream_of_cenarius.enabled&buff.predatory_swiftness.up&buff.dream_of_cenarius.down&(buff.predatory_swiftness.remains<1.5|combo_points>=4)
 	if TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(dream_of_cenarius_melee_buff) and { BuffRemains(predatory_swiftness_buff) < 1.5 or ComboPoints() >= 4 } Spell(healing_touch)
 	#savage_roar,if=buff.savage_roar.remains<3
@@ -324,7 +326,7 @@ AddFunction FeralBasicCdActions
 	FeralInterrupt()
 
 	unless { target.DebuffPresent(rip_debuff) and target.DebuffRemains(rip_debuff) <= 3 and target.HealthPercent() <= 25 and Spell(ferocious_bite) }
-		or { target.DebuffStacks(weakened_armor_debuff any=1) < 3 and Spell(faerie_fire) }
+		or { CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 and Spell(faerie_fire) }
 		or { TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(dream_of_cenarius_melee_buff) and { BuffRemains(predatory_swiftness_buff) < 1.5 or ComboPoints() >= 4 } and Spell(healing_touch) }
 		or { BuffRemains(savage_roar_buff) < 3 and SavageRoar() }
 	{
@@ -348,7 +350,7 @@ AddFunction FeralAoeActions
 {
 	#auto_attack
 	#faerie_fire,cycle_targets=1,if=debuff.weakened_armor.stack<3
-	if target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
+	if CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
 	#savage_roar,if=buff.savage_roar.down|(buff.savage_roar.remains<3&combo_points>0)
 	if BuffExpires(savage_roar_buff) or { BuffRemains(savage_roar_buff) < 3 and ComboPoints() > 0 } SavageRoar()
 	#use_item,slot=hands,if=buff.tigers_fury.up
@@ -413,7 +415,7 @@ AddFunction FeralAdvancedActions
 	#ferocious_bite,if=dot.rip.ticking&dot.rip.remains<=3&target.health.pct<=25
 	if target.DebuffPresent(rip_debuff) and target.DebuffRemains(rip_debuff) <= 3 and target.HealthPercent() <= 25 Spell(ferocious_bite)
 	#faerie_fire,if=debuff.weakened_armor.stack<3
-	if target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
+	if CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
 	#healing_touch,if=talent.dream_of_cenarius.enabled&buff.predatory_swiftness.up&buff.dream_of_cenarius.down&(buff.predatory_swiftness.remains<1.5|combo_points>=4)
 	if TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(dream_of_cenarius_melee_buff) and { BuffRemains(predatory_swiftness_buff) < 1.5 or ComboPoints() >= 4 } Spell(healing_touch)
 	#savage_roar,if=buff.savage_roar.down
@@ -486,7 +488,7 @@ AddFunction FeralAdvancedPredictiveActions
 	#ferocious_bite,if=dot.rip.ticking&dot.rip.remains<=3&target.health.pct<=25
 	if target.DebuffPresent(rip_debuff) and target.DebuffRemains(rip_debuff) <= 3 and target.HealthPercent() <= 25 Spell(ferocious_bite)
 	#faerie_fire,if=debuff.weakened_armor.stack<3
-	if target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
+	if CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 Spell(faerie_fire)
 	#healing_touch,if=talent.dream_of_cenarius.enabled&buff.predatory_swiftness.up&buff.dream_of_cenarius.down&(buff.predatory_swiftness.remains<1.5|combo_points>=4)
 	if TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(dream_of_cenarius_melee_buff) and { BuffRemains(predatory_swiftness_buff) < 1.5 or ComboPoints() >= 4 } Spell(healing_touch)
 	#savage_roar,if=buff.savage_roar.down
@@ -543,7 +545,7 @@ AddFunction FeralAdvancedCdActions
 	Spell(berserking)
 	unless { Stealthed() and Spell(ravage) }
 		or { target.DebuffPresent(rip_debuff) and target.DebuffRemains(rip_debuff) <= 3 and target.HealthPercent() <= 25 and Spell(ferocious_bite) }
-		or { target.DebuffStacks(weakened_armor_debuff any=1) < 3 and Spell(faerie_fire) }
+		or { CheckBoxOn(opt_weakened_armor_debuff) and target.DebuffStacks(weakened_armor_debuff any=1) < 3 and Spell(faerie_fire) }
 		or { TalentPoints(dream_of_cenarius_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(dream_of_cenarius_melee_buff) and { BuffRemains(predatory_swiftness_buff) < 1.5 or ComboPoints() >= 4 } and Spell(healing_touch) }
 		or { BuffExpires(savage_roar_buff) and SavageRoar() }
 	{
