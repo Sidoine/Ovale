@@ -10,6 +10,8 @@
 
 --[[
 	This addon tracks rune information on death knights.
+
+	TODO: Handle spells in the simulator that reactivate runes, e.g., Empower Rune Weapon, Blood Tap, etc.
 --]]
 
 local _, Ovale = ...
