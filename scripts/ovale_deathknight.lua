@@ -736,7 +736,6 @@ AddIcon mastery=unholy size=small checkboxon=opt_icons_left
 
 AddIcon mastery=unholy help=shortcd
 {
-	UnholyDefaultShortCdActions()
 	UnholySingleTargetShortCdActions()
 }
 
