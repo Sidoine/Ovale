@@ -87,7 +87,7 @@ AddFunction BloodSingleTargetActions
 		if Rune(blood) >= 2 Spell(heart_strike)
 	}
 
-	if not Glyph(glyph_of_outbreak) or RunicPower() >= 65 Spell(rune_strike)
+	Spell(rune_strike)
 	Spell(horn_of_winter)
 
 	#death_strike,if=(unholy=2|frost=2)&incoming_damage_5s>=health.max*0.4
@@ -141,7 +141,7 @@ AddFunction BloodAoeActions
 		if Rune(blood) >= 2 Spell(blood_boil)
 	}
 
-	if not Glyph(glyph_of_outbreak) or RunicPower() >= 65 Spell(rune_strike)
+	Spell(rune_strike)
 	Spell(horn_of_winter)
 
 	#death_strike,if=(unholy=2|frost=2)&incoming_damage_5s>=health.max*0.4
