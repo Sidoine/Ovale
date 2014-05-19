@@ -794,7 +794,7 @@ statePrototype.ApplySpell = function(state, ...)
 			4. Effects after the spellcast hits the target (possibly due to server lag).
 	--]]
 	-- If the spellcast has already started, then the effects have already occurred.
-	if startCast >= now then
+	if startCast > now then
 		OvaleState:InvokeMethod("ApplySpellStartCast", state, ...)
 	end
 	-- If the spellcast has already ended, then the effects have already occurred.
