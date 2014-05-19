@@ -46,10 +46,15 @@ AddFunction BloodApplyDiseases
 	if target.DebuffExpires(frost_fever_debuff) Spell(icy_touch)
 }
 
+AddFunction BloodDeathStrikeCondition
+{
+	IncomingDamage(5) >= MaxHealth() * 0.65
+}
+
 AddFunction BloodSingleTargetActions
 {
 	#death_strike,if=incoming_damage_5s>=health.max*0.65
-	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
+	if BloodDeathStrikeCondition() Spell(death_strike)
 
 	if { Rune(blood) < 2 or Rune(unholy) < 2 or Rune(frost) < 2 } and Spell(outbreak) PlagueLeech()
 	BloodApplyDiseases()
@@ -97,7 +102,7 @@ AddFunction BloodSingleTargetActions
 AddFunction BloodAoeActions
 {
 	#death_strike,if=incoming_damage_5s>=health.max*0.65
-	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
+	if BloodDeathStrikeCondition() Spell(death_strike)
 
 	if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
 
@@ -156,8 +161,11 @@ AddFunction BloodShortCdActions
 	if HealthPercent() < 50 Spell(raise_dead)
 	if TalentPoints(death_pact_talent) and TotemPresent(ghoul) and HealthPercent() < 50 Spell(death_pact)
 
-	if Rune(unholy) < 1 and Rune(frost) < 1 and ArmorSetParts(T16_tank) >= 4 Spell(dancing_rune_weapon)
-	if Rune(blood) < 1 and Rune(unholy) < 1 and Rune(frost) < 1 Spell(empower_rune_weapon)
+	if BloodDeathStrikeCondition()
+	{
+		if Rune(unholy) < 1 and Rune(frost) < 1 and ArmorSetParts(T16_tank) >= 4 Spell(dancing_rune_weapon)
+		if Rune(blood) < 1 and Rune(unholy) < 1 and Rune(frost) < 1 Spell(empower_rune_weapon)
+	}
 	if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
 	Spell(antimagic_shell)
 }
