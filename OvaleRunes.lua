@@ -102,6 +102,10 @@ local REAPING_ATTACK = {
 	[50842] = API_GetSpellInfo(50842),	-- Pestilence
 	[85948] = API_GetSpellInfo(85948),	-- Festering Strike
 }
+-- Empower Rune Weapon immediately reactivates all runes.
+local EMPOWER_RUNE_WEAPON = 47568
+-- 4pT16 tanking bonus causes Dancing Rune Weapon to reactivate immediately all Frost and Unholy runes as Death runes.
+local DANCING_RUNE_WEAPON = 49028
 --</private-static-properties>
 
 --<public-static-properties>
@@ -267,6 +271,21 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
 		state:ApplyRuneCost(spellId, endCast, spellcast)
+
+		if spellId == EMPOWER_RUNE_WEAPON then
+			-- Empower Rune Weapon immediately reactivates all runes.
+			for slot in ipairs(state.rune) do
+				state:ReactivateRune(slot, endCast)
+			end
+		elseif spellId == DANCING_RUNE_WEAPON and OvaleEquipement:GetArmorSetCount("T16_tank") >= 4 then
+			-- 4pT16 tanking bonus causes Dancing Rune Weapon to reactivate immediately all Frost and Unholy runes as Death runes.
+			for slot in ipairs(RUNE_SLOTS[FROST_RUNE]) do
+				state:ReactivateRune(slot, endCast, DEATH_RUNE)
+			end
+			for slot in ipairs(RUNE_SLOTS[UNHOLY_RUNE]) do
+				state:ReactivateRune(slot, endCast, DEATH_RUNE)
+			end
+		end
 	end
 end
 --</public-static-methods>
@@ -296,6 +315,21 @@ statePrototype.ApplyRuneCost = function(state, spellId, atTime, spellcast)
 				count = count - 1
 			end
 		end
+	end
+end
+
+-- Reactivate the rune in the given slot.  If runeType is given, then reactivate as that type of rune.
+statePrototype.ReactivateRune = function(state, slot, atTime, runeType)
+	local rune = state.rune[slot]
+	if atTime < state.currentTime then
+		atTime = state.currentTime
+	end
+	if rune.startCooldown > atTime then
+		rune.startCooldown = atTime
+	end
+	rune.endCooldown = atTime
+	if runeType then
+		rune.type = runeType
 	end
 end
 
