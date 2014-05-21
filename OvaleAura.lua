@@ -477,45 +477,47 @@ end
 
 function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 	local aura = GetAura(self.aura, guid, auraId, casterGUID)
-	local filter = aura.filter
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Expiring %s %s (%d) from %s at %f.",
-		filter, aura.name, auraId, guid, atTime)
-	if aura.ending > atTime then
-		aura.ending = atTime
-	end
+	if aura then
+		local filter = aura.filter
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Expiring %s %s (%d) from %s at %f.",
+			filter, aura.name, auraId, guid, atTime)
+		if aura.ending > atTime then
+			aura.ending = atTime
+		end
 
-	local mine = (casterGUID == self_guid)
-	if mine then
-		-- Clear old tick information for player-applied periodic auras.
-		aura.tick = nil
-		aura.ticksSeen = nil
-		aura.lastTickTime = nil
+		local mine = (casterGUID == self_guid)
+		if mine then
+			-- Clear old tick information for player-applied periodic auras.
+			aura.tick = nil
+			aura.ticksSeen = nil
+			aura.lastTickTime = nil
 
-		-- Check if the aura was consumed by the last spellcast.
-		-- The aura must have ended early, i.e., start + duration > ending.
-		if aura.start + aura.duration > aura.ending then
-			local spellcast
-			if guid == self_guid then
-				-- Player aura, so it was possibly consumed by an in-flight spell.
-				spellcast = OvaleFuture:LastInFlightSpell()
-			else
-				-- Non-player aura, so it was possibly consumed by a spell that landed on its target.
-				spellcast = OvaleFuture.lastSpellcast
-			end
-			if spellcast and spellcast.stop and IsWithinAuraLag(spellcast.stop, aura.ending) then
-				aura.consumed = true
-				local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Consuming %s %s (%d) on %s with %s (%d) at %f.",
-					filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.stop)
+			-- Check if the aura was consumed by the last spellcast.
+			-- The aura must have ended early, i.e., start + duration > ending.
+			if aura.start + aura.duration > aura.ending then
+				local spellcast
+				if guid == self_guid then
+					-- Player aura, so it was possibly consumed by an in-flight spell.
+					spellcast = OvaleFuture:LastInFlightSpell()
+				else
+					-- Non-player aura, so it was possibly consumed by a spell that landed on its target.
+					spellcast = OvaleFuture.lastSpellcast
+				end
+				if spellcast and spellcast.stop and IsWithinAuraLag(spellcast.stop, aura.ending) then
+					aura.consumed = true
+					local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Consuming %s %s (%d) on %s with %s (%d) at %f.",
+						filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.stop)
+				end
 			end
 		end
-	end
-	aura.lastUpdated = atTime
+		aura.lastUpdated = atTime
 
-	self:SendMessage("Ovale_AuraRemoved", atTime, guid, auraId, aura.source)
-	local unitId = OvaleGUID:GetUnitId(guid)
-	if unitId then
-		Ovale.refreshNeeded[unitId] = true
+		self:SendMessage("Ovale_AuraRemoved", atTime, guid, auraId, aura.source)
+		local unitId = OvaleGUID:GetUnitId(guid)
+		if unitId then
+			Ovale.refreshNeeded[unitId] = true
+		end
 	end
 end
 
