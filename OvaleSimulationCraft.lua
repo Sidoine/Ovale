@@ -227,7 +227,7 @@ do
 				tinsert(symbols, v)
 			end
 		end
-		self:Append(script, "### Pre-defined symbols")
+		self:Append(script, "### Required symbols")
 		for _, v in ipairs(symbols) do
 			self:Append(script, format("# %s", v))
 		end
