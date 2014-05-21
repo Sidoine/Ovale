@@ -203,14 +203,23 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast
 			end
 		end
 
-		-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
-		if cd.duration > 0 and si.cd_haste then
-			if si.cd_haste == "melee" then
-				cd.duration = cd.duration / state:GetMeleeHasteMultiplier(spellcast.snapshot)
-			elseif si.haste == "ranged" then
-				cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
-			elseif si.cd_haste == "spell" then
-				cd.duration = cd.duration / state:GetSpellHasteMultiplier(spellcast.snapshot)
+		if cd.duration > 0 then
+			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
+			if si.cd_haste then
+				if si.cd_haste == "melee" then
+					cd.duration = cd.duration / state:GetMeleeHasteMultiplier(spellcast.snapshot)
+				elseif si.haste == "ranged" then
+					cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
+				elseif si.cd_haste == "spell" then
+					cd.duration = cd.duration / state:GetSpellHasteMultiplier(spellcast.snapshot)
+				end
+			end
+			-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".
+			if si.buff_cdr then
+				local aura = state:GetAura("player", si.buff_cdr)
+				if state:IsActiveAura(aura, cd.start) then
+					cd.duration = cd.duration / aura.value1
+				end
 			end
 		end
 

@@ -59,6 +59,7 @@ OvaleBanditsGuile.lua
 OvaleDamageTaken.lua
 OvaleEclipse.lua
 OvaleEnemies.lua
+OvalePassiveAura.lua
 OvaleRecount.lua
 OvaleRunes.lua
 OvaleShadowWordDeath.lua

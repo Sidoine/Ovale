@@ -353,6 +353,14 @@ do
 				["rain_of_fire"] = "rain_of_fire_aftermath",
 			},
 		},
+		warrior = {
+			arms = {
+				["cooldown_reduction"] = "cooldown_reduction_strength",
+			},
+			fury = {
+				["cooldown_reduction"] = "cooldown_reduction_strength",
+			},
+		}
 	}
 
 	function OvaleSimulationCraft:Name(name)

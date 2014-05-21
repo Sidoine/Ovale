@@ -60,6 +60,11 @@ SpellList(trinket_stacking_proc_strength_buff 138759 138870)
 # Critical Strike
 SpellList(trinket_stacking_stat_crit_buff 146285)
 
+# Cooldown reduction trinket passive buffs.
+Define(cooldown_reduction_agility_buff 146019)
+Define(cooldown_reduction_strength_buff 145955)
+Define(cooldown_reduction_tank_buff 146025)
+
 AddCheckBox(opt_use_trinket0 "Use trinket 0" default)
 AddCheckBox(opt_use_trinket1 "Use trinket 1" default)
 
