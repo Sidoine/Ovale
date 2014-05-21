@@ -600,5 +600,5 @@ AddIcon mastery=subtlety size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("ROGUE", name, desc, code)
+	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
 end

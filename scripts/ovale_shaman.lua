@@ -549,5 +549,5 @@ AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("SHAMAN", name, desc, code)
+	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "script")
 end

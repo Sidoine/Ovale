@@ -616,5 +616,5 @@ AddIcon mastery=frost size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("MAGE", name, desc, code)
+	OvaleScripts:RegisterScript("MAGE", name, desc, code, "script")
 end

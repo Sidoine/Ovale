@@ -204,5 +204,5 @@ AddIcon mastery=protection size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("WARRIOR", name, desc, code)
+	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "script")
 end

@@ -783,5 +783,5 @@ AddIcon mastery=unholy size=small checkboxon=opt_icons_right
 	UseItemActions()
 }
 ]]
-	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code)
+	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "script")
 end

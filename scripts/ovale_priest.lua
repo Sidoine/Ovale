@@ -218,5 +218,5 @@ AddIcon mastery=shadow size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code)
+	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "script")
 end

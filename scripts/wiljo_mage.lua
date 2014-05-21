@@ -239,5 +239,5 @@ AddIcon help=cd size=small
 }
 ]]
 
-	OvaleScripts:RegisterScript("MAGE", name, desc, code)
+	OvaleScripts:RegisterScript("MAGE", name, desc, code, "script")
 end

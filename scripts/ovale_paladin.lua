@@ -481,5 +481,5 @@ AddIcon mastery=retribution size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("PALADIN", name, desc, code)
+	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "script")
 end

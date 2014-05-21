@@ -448,5 +448,5 @@ AddIcon mastery=destruction size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code)
+	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "script")
 end

@@ -30,10 +30,9 @@ OvaleScripts.script = {}
 --<public-static-methods>
 -- Return a table of script descriptions indexed by name.
 function OvaleScripts:GetDescriptions(scriptType)
-	scriptType = scriptType or "script"
 	local descriptionsTable = {}
 	for name, script in pairs(self.script) do
-		if script.type == scriptType then
+		if not scriptType or script.type == scriptType then
 			descriptionsTable[name] = script.desc
 		end
 	end

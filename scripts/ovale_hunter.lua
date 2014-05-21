@@ -608,5 +608,5 @@ AddIcon mastery=survival size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code)
+	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "script")
 end

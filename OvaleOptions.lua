@@ -350,7 +350,8 @@ local self_options =
 					name = L["Script"],
 					width = "double",
 					values = function(info)
-						return OvaleScripts:GetDescriptions()
+						local scriptType = not OvaleOptions.db.profile.showHiddenScripts and "script"
+						return OvaleScripts:GetDescriptions(scriptType)
 					end,
 					get = function(info)
 						return OvaleOptions.db.profile.source
@@ -384,7 +385,7 @@ local self_options =
 						return strgsub(code, "\t", "    ")
 					end,
 					set = function(info, v)
-						OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], v)
+						OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], v, "script")
 						OvaleOptions.db.profile.code = v
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
@@ -413,6 +414,13 @@ local self_options =
 						OvaleOptions.db.profile.code = code
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
+				},
+				showHiddenScripts = {
+					order = 40,
+					type = "toggle",
+					name = L["Show hidden"],
+					get = function(info) return OvaleOptions.db.profile.showHiddenScripts end,
+					set = function(info, value) OvaleOptions.db.profile.showHiddenScripts = value end
 				},
 			},
 		},
@@ -688,6 +696,7 @@ function OvaleOptions:OnInitialize()
 		profile = 
 		{
 			display = true,
+			showHiddenScripts = false,
 			source = "Ovale",
 			code = "",
 			left = 500,

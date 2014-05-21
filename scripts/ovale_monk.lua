@@ -525,5 +525,5 @@ AddIcon mastery=windwalker size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("MONK", name, desc, code)
+	OvaleScripts:RegisterScript("MONK", name, desc, code, "script")
 end

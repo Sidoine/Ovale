@@ -879,5 +879,5 @@ AddIcon mastery=restoration size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("DRUID", name, desc, code)
+	OvaleScripts:RegisterScript("DRUID", name, desc, code, "script")
 end
