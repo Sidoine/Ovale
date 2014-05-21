@@ -737,6 +737,7 @@ do
 				tinsert(simc.symbols, "trinket_proc_agility_buff")
 				return "BuffRemains(trinket_proc_agility_buff)"
 			end,
+		["^distance$"] = "Distance()",
 		-- Druid
 		["^buff%.wild_mushroom%.max_stack$"] = function(simc, action)
 				local class, spec = simc.profile.class, simc.profile.spec
