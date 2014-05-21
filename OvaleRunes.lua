@@ -468,8 +468,8 @@ end
 statePrototype.GetRunesCooldown = nil
 do
 	-- The remaining count requirements, indexed by rune type.
-	count = {}
-	usedRune = {}
+	local count = {}
+	local usedRune = {}
 
 	statePrototype.GetRunesCooldown = function(state, blood, unholy, frost, death, atTime)
 		-- Default to checking runes at the end of the current spellcast in the
