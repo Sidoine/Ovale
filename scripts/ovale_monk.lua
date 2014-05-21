@@ -459,6 +459,8 @@ AddFunction WindwalkerPrecombatActions
 	#stance,choose=fierce_tiger
 	if not Stance(monk_stance_of_the_fierce_tiger) Spell(stance_of_the_fierce_tiger)
 	#snapshot_stats
+	if BuffExpires(str_agi_int any=1) Spell(legacy_of_the_emperor)
+	if BuffExpires(critical_strike any=1) Spell(legacy_of_the_white_tiger)
 }
 
 AddFunction WindwalkerPrecombatCdActions
