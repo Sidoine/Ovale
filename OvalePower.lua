@@ -14,6 +14,8 @@ Ovale.OvalePower = OvalePower
 
 --<private-static-properties>
 -- Forward declarations for module dependencies.
+local OvaleAura = nil
+local OvaleFuture = nil
 local OvaleData = nil
 local OvaleState = nil
 
@@ -38,6 +40,9 @@ local SPELL_POWER_RAGE = SPELL_POWER_RAGE
 local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
 local SPELL_POWER_SHADOW_ORBS = SPELL_POWER_SHADOW_ORBS
 local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
+
+-- Table of functions to update spellcast information to register with OvaleFuture.
+local self_updateSpellcastInfo = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -99,10 +104,51 @@ do
 end
 --</public-static-properties>
 
+--<private-static-methods>
+-- Manage spellcast.holy information.
+local function SaveToSpellcast(spellcast)
+	if spellcast.spellId then
+		local si = OvaleData.spellInfo[spellcast.spellId]
+		-- Save the number of holy power used if this spell is a finisher.
+		if si.holy == "finisher" then
+			local max_holy = si.max_holy or 3
+			-- If a buff is present that removes the holy power cost of the spell,
+			-- then treat it as using the maximum amount of holy power.
+			if si.buff_holy_none then
+				if OvaleAura:GetAura("player", si.buff_holy_none) then
+					spellcast.holy = max_holy
+				end
+			end
+			local holy = OvalePower.power.holy
+			if holy > 0 then
+				if holy > max_holy then
+					spellcast.holy = max_holy
+				else
+					spellcast.holy = holy
+				end
+			end
+		end
+	end
+end
+
+local function UpdateFromSpellcast(dest, spellcast)
+	if spellcast.holy then
+		dest.holy = spellcast.holy
+	end
+end
+
+do
+	self_updateSpellcastInfo.SaveToSpellcast = SaveToSpellcast
+	self_updateSpellcastInfo.UpdateFromSpellcast = UpdateFromSpellcast
+end
+--</private-static-methods>
+
 --<public-static-methods>
 function OvalePower:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleAura = Ovale.OvaleAura
 	OvaleData = Ovale.OvaleData
+	OvaleFuture = Ovale.OvaleFuture
 	OvaleState = Ovale.OvaleState
 end
 
@@ -121,10 +167,12 @@ function OvalePower:OnEnable()
 	self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
 	self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
 	OvaleState:RegisterState(self, self.statePrototype)
+	OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 end
 
 function OvalePower:OnDisable()
 	OvaleState:UnregisterState(self)
+	OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")

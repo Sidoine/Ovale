@@ -19,11 +19,9 @@ local OvalePool = Ovale.OvalePool
 
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
-local OvaleComboPoints = nil
 local OvaleData = nil
 local OvaleGUID = nil
 local OvalePaperDoll = nil
-local OvalePower = nil
 local OvaleScore = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
@@ -64,6 +62,9 @@ local self_lastTarget = nil
 
 -- Time at which a player aura was last added.
 local self_timeAuraAdded = nil
+
+-- Table of external functions to save additional data about a spellcast.
+local self_updateSpellcastInfo = {}
 
 local OVALE_UNKNOWN_GUID = 0
 
@@ -187,38 +188,10 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 			end
 		end
 
-		-- Save the number of combo points used if this spell is a finisher.
-		if si.combo == "finisher" then
-			-- If a buff is present that removes the combo point cost of the spell,
-			-- then treat it as a maximum combo-point finisher.
-			if si.buff_combo_none then
-				if OvaleAura:GetAura("player", si.buff_combo_none) then
-					spellcast.combo = MAX_COMBO_POINTS
-				end
-			end
-			local min_combo = si.min_combo or si.mincombo or 1
-			if OvaleComboPoints.combo >= min_combo then
-				spellcast.combo = OvaleComboPoints.combo
-			end
-		end
-
-		-- Save the number of holy power used if this spell is a finisher.
-		if si.holy == "finisher" then
-			local max_holy = si.max_holy or 3
-			-- If a buff is present that removes the holy power cost of the spell,
-			-- then treat it as using the maximum amount of holy power.
-			if si.buff_holy_none then
-				if OvaleAura:GetAura("player", si.buff_holy_none) then
-					spellcast.holy = max_holy
-				end
-			end
-			local holy = OvalePower.power.holy
-			if holy > 0 then
-				if holy > max_holy then
-					spellcast.holy = max_holy
-				else
-					spellcast.holy = holy
-				end
+		-- Save additional information to the spellcast that are registered with this module.
+		for tbl in pairs(self_updateSpellcastInfo) do
+			if tbl.SaveToSpellcast then
+				tbl.SaveToSpellcast(spellcast)
 			end
 		end
 
@@ -328,11 +301,9 @@ end
 function OvaleFuture:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
-	OvaleComboPoints = Ovale.OvaleComboPoints
 	OvaleData = Ovale.OvaleData
 	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll
-	OvalePower = Ovale.OvalePower
 	OvaleScore = Ovale.OvaleScore
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
@@ -603,11 +574,11 @@ function OvaleFuture:UpdateSnapshotFromSpellcast(dest, spellcast)
 	if spellcast.damageMultiplier then
 		dest.damageMultiplier = spellcast.damageMultiplier
 	end
-	if spellcast.combo then
-		dest.combo = spellcast.combo
-	end
-	if spellcast.holy then
-		dest.holy = spellcast.holy
+	-- Update additional information from the spellcast that are registered with this module.
+	for tbl in pairs(self_updateSpellcastInfo) do
+		if tbl.UpdateFromSpellcast then
+			tbl.UpdateFromSpellcast(dest, spellcast)
+		end
 	end
 end
 
@@ -628,6 +599,14 @@ function OvaleFuture:InFlight(spellId)
 		end
 	end
 	return false
+end
+
+function OvaleFuture:RegisterSpellcastInfo(functionTable)
+	self_updateSpellcastInfo[functionTable] = true
+end
+
+function OvaleFuture:UnregisterSpellcastInfo(functionTable)
+	self_updateSpellcastInfo[functionTable] = nil
 end
 
 function OvaleFuture:Debug()

@@ -15,7 +15,9 @@ Ovale.OvaleComboPoints = OvaleComboPoints
 
 --<private-static-properties>
 -- Forward declarations for module dependencies.
+local OvaleAura = nil
 local OvaleData = nil
+local OvaleFuture = nil
 local OvaleGUID = nil
 local OvaleState = nil
 
@@ -25,16 +27,54 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
+
+-- Table of functions to update spellcast information to register with OvaleFuture.
+local self_updateSpellcastInfo = {}
 --</private-static-properties>
 
 --<public-static-properties>
 OvaleComboPoints.combo = 0
 --</public-static-properties>
 
+--<private-static-methods>
+-- Manage spellcast.combo information.
+local function SaveToSpellcast(spellcast)
+	if spellcast.spellId then
+		local si = OvaleData.spellInfo[spellcast.spellId]
+		if si.combo == "finisher" then
+			-- If a buff is present that removes the combo point cost of the spell,
+			-- then treat it as a maximum combo-point finisher.
+			if si.buff_combo_none then
+				if OvaleAura:GetAura("player", si.buff_combo_none) then
+					spellcast.combo = MAX_COMBO_POINTS
+				end
+			end
+			local min_combo = si.min_combo or si.mincombo or 1
+			if OvaleComboPoints.combo >= min_combo then
+				spellcast.combo = OvaleComboPoints.combo
+			end
+		end
+	end
+end
+
+local function UpdateFromSpellcast(dest, spellcast)
+	if spellcast.combo then
+		dest.combo = spellcast.combo
+	end
+end
+
+do
+	self_updateSpellcastInfo.SaveToSpellcast = SaveToSpellcast
+	self_updateSpellcastInfo.UpdateFromSpellcast = UpdateFromSpellcast
+end
+--</private-static-methods>
+
 --<public-static-methods>
 function OvaleComboPoints:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleAura = Ovale.OvaleAura
 	OvaleData = Ovale.OvaleData
+	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
 end
@@ -48,12 +88,14 @@ function OvaleComboPoints:OnEnable()
 		self:RegisterEvent("UNIT_COMBO_POINTS")
 		self:RegisterEvent("UNIT_TARGET", "UNIT_COMBO_POINTS")
 		OvaleState:RegisterState(self, self.statePrototype)
+		OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 	end
 end
 
 function OvaleComboPoints:OnDisable()
 	if self_class == "ROGUE" or self_class == "DRUID" then
 		OvaleState:UnregisterState(self)
+		OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("PLAYER_LOGIN")
