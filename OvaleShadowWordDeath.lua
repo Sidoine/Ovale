@@ -58,14 +58,14 @@ function OvaleShadowWordDeath:OnInitialize()
 end
 
 function OvaleShadowWordDeath:OnEnable()
-	if self_class == "OvaleShadowWordDeath" then
+	if self_class == "PRIEST" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
 
 function OvaleShadowWordDeath:OnDisable()
-	if self_class == "OvaleShadowWordDeath" then
+	if self_class == "PRIEST" then
 		self:UnregisterMessage("Ovale_SpecializationChanged")
 	end
 end
@@ -85,8 +85,8 @@ function OvaleShadowWordDeath:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleu
 			local spellId, overkill = arg12, arg16
 			if SHADOW_WORD_DEATH[spellId] and not (overkill and overkill > 0) then
 				local now = API_GetTime()
-				self.start = atTime
-				self.ending = atTime + self.duration
+				self.start = now
+				self.ending = now + self.duration
 				self.stacks = 1
 				OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.name, nil, nil, nil)
 			end
