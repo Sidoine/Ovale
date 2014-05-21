@@ -7,7 +7,7 @@ do
 	local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
 
 	local profilesDirectory = "..\\SimulationCraft\\profiles\\Tier16H"
-	local outputDirectory = "profiles"
+	local outputDirectory = "scripts"
 
 	local saveInput = io.input()
 	local saveOutput = io.output()
@@ -23,7 +23,8 @@ do
 				local simc = OvaleSimulationCraft(simcStr)
 				simc.simcComments = true
 
-				local outputFileName = string.gsub(filename, ".simc", ".txt")
+				local outputFileName = "simulationcraft_" .. string.lower(string.gsub(filename, ".simc", ".lua"))
+				outputFileName = string.gsub(outputFileName, "death_knight", "deathknight")
 				print("Generating " .. outputFileName)
 				local outputName = outputDirectory .. "/" .. outputFileName
 				io.output(outputName)

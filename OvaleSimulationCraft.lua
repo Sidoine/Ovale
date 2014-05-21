@@ -23,6 +23,7 @@ local strlower = string.lower
 local strmatch = string.match
 local strsplit = strsplit
 local strupper = string.upper
+local strsub = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
@@ -174,10 +175,23 @@ do
 		for class in pairs(SIMC_CLASS) do
 			local simcName = profile[class]
 			if simcName then
+				profile.simcName = strsub(simcName, 2, -2)
 				profile.class = class
-				self:Append(script, "# Based on SimulationCraft profile %s.", simcName)
-				self:Append(script, "#	class=%s", class)
+				break
 			end
+		end
+
+		self:Append(script, "local _, Ovale = ...")
+		self:Append(script, "local OvaleScripts = Ovale.OvaleScripts")
+		self:Append(script, "")
+		self:Append(script, "do")
+		self:Append(script, [[	local name = "SimulationCraft: %s"]], profile.simcName)
+		self:Append(script, [[	local desc = "[5.4] SimulationCraft: %s" ]], profile.simcName)
+		self:Append(script, "	local code = [[")
+
+		self:Append(script, [[# Based on SimulationCraft profile "%s".]], profile.simcName)
+		if profile.class then
+			self:Append(script, "#	class=%s", profile.class)
 		end
 		if profile.spec then
 			self:Append(script, "#	spec=%s", profile.spec)
@@ -231,6 +245,12 @@ do
 		for _, v in ipairs(symbols) do
 			self:Append(script, format("# %s", v))
 		end
+		self:Append(script, "]]")
+		if profile.class then
+			self:Append(script, [[	OvaleScripts:RegisterScript("%s", name, desc, code, "reference")]], strupper(profile.class))
+		end
+		self:Append(script, "end")
+
 		return script
 	end
 end
@@ -380,6 +400,7 @@ do
 		["^$"] = false,
 		["^auto_attack$"] = false,
 		["^auto_shot$"] = false,
+		["^elixir$"] = false,
 		["^flask$"] = false,
 		["^food$"] = false,
 		["^snapshot_stats$"] = false,
