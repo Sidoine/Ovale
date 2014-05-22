@@ -32,7 +32,7 @@ AddFunction ArmsAoeActions
 	#mortal_strike,if=active_enemies=2|rage<50
 	if Enemies() == 2 or Rage() < 50 Spell(mortal_strike)
 	#execute,if=buff.sudden_execute.down&active_enemies=2
-	if BuffExpires(sudden_execute_buff) and Enemies() == 2 Spell(execute)
+	if BuffExpires(sudden_execute_buff) and Enemies() == 2 Spell(execute usable=1)
 	#slam,if=buff.sweeping_strikes.up&debuff.colossus_smash.up
 	if BuffPresent(sweeping_strikes_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(slam)
 	#overpower,if=active_enemies=2
@@ -60,13 +60,13 @@ AddFunction ArmsSingleTargetActions
 	#dragon_roar,if=enabled&debuff.colossus_smash.down
 	if TalentPoints(dragon_roar_talent) and target.DebuffExpires(colossus_smash_debuff) Spell(dragon_roar)
 	#execute,if=buff.sudden_execute.down|buff.taste_for_blood.down|rage>90|target.time_to_die<12
-	if BuffExpires(sudden_execute_buff) or BuffExpires(taste_for_blood_buff) or Rage() > 90 or target.TimeToDie() < 12 Spell(execute)
+	if BuffExpires(sudden_execute_buff) or BuffExpires(taste_for_blood_buff) or Rage() > 90 or target.TimeToDie() < 12 Spell(execute usable=1)
 	#slam,if=target.health.pct>=20&(trinket.stacking_stat.crit.stack>=10|buff.recklessness.up)
 	if target.HealthPercent() >= 20 and { BuffStacks(trinket_stacking_stat_crit_buff) >= 10 or BuffPresent(recklessness_buff) } Spell(slam)
 	#overpower,if=target.health.pct>=20&rage<100|buff.sudden_execute.up
 	if target.HealthPercent() >= 20 and Rage() < 100 or BuffPresent(sudden_execute_buff) Spell(overpower)
 	#execute
-	Spell(execute)
+	Spell(execute usable=1)
 	#slam,if=target.health.pct>=20
 	if target.HealthPercent() >= 20 Spell(slam)
 	#heroic_throw
@@ -99,7 +99,7 @@ AddFunction ArmsDefaultActions
 	#berserker_rage,if=buff.enrage.remains<0.5
 	if BuffRemains(enrage_buff) < 0.5 Spell(berserker_rage)
 	#heroic_leap,if=debuff.colossus_smash.up
-	if target.DebuffPresent(colossus_smash_debuff) Spell(heroic_leap)
+	if target.DebuffPresent(colossus_smash_debuff) HeroicLeap()
 	#run_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 ArmsAoeActions()
 	#run_action_list,name=single_target,if=active_enemies<2

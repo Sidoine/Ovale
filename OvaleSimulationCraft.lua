@@ -468,6 +468,10 @@ do
 		["^wind_shear$"] = "Interrupt()",
 		-- Warlock
 		["^service_pet$"] = "ServicePet()",
+		-- Warrior
+		["^execute$"] = "Spell(execute usable=1)",
+		["^heroic_leap$"] = "HeroicLeap()",
+		["^raging_blow$"] = "RagingBlow()",
 	}
 
 	local scriptLine = {}
