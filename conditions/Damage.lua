@@ -63,58 +63,8 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see Damage, LastDamage, LastEstimatedDamage
 
-	local INCREASED_CRIT_META_GEM = {
-		[52291] = 1.03,
-		[52297] = 1.03,
-		[68778] = 1.03,
-		[68779] = 1.03,
-		[68780] = 1.03,
-		[76884] = 1.03,
-		[76885] = 1.03,
-		[76886] = 1.03,
-		[76888] = 1.03,
-	}
-	local AMPLIFICATION_TRINKET = {
-		[102293] = true,
-		[102299] = true,
-		[102305] = true,
-		[104426] = true,
-		[104478] = true,
-		[104613] = true,
-		[104675] = true,
-		[104727] = true,
-		[104862] = true,
-		[104924] = true,
-		[104976] = true,
-		[105111] = true,
-		[105173] = true,
-		[105225] = true,
-		[105360] = true,
-		[105422] = true,
-		[105474] = true,
-		[105609] = true,
-	}
-	local AMPLIFICATION_TRINKET_EFFECT = {
-		[528] = 0.0555,
-		[532] = 0.0576,
-		[536] = 0.0598,
-		[540] = 0.062,
-		[544] = 0.0644,
-		[548] = 0.0668,
-		[553] = 0.07,
-		[557] = 0.0727,
-		[559] = 0.074,
-		[561] = 0.0754,
-		[563] = 0.0769,
-		[566] = 0.079,
-		[567] = 0.0798,
-		[570] = 0.082,
-		[572] = 0.0836,
-		[574] = 0.0852,
-		[576] = 0.0867,
-		[580] = 0.09,
-	}
-	local TRINKET_SLOTS = { INVSLOT_TRINKET1, INVSLOT_TRINKET2 }
+	local AMPLIFICATION = 146051
+	local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
 
 	local function CritDamage(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
@@ -132,19 +82,19 @@ do
 		-- Default crit damage is 2 times normal damage.
 		local critMultiplier = 2
 		-- Add additional critical strike damage from MoP amplification trinkets.
-		for _, slotId in pairs(TRINKET_SLOTS) do
-			local trinket = OvaleEquipement:GetEquippedItem(slotId)
-			local trinketItemLevel = OvaleEquipement:GetEquippedItemLevel(slotId)
-			local amplificationEffect = 0
-			if AMPLIFICATION_TRINKET[trinket] then
-				amplificationEffect = AMPLIFICATION_TRINKET_EFFECT[trinketItemLevel] or 0
+		do
+			local aura = state:GetAura("player", AMPLIFICATION, "HELPFUL")
+			if state:IsActiveAura(aura) then
+				critMultiplier = critMultiplier + aura.value1
 			end
-			critMultiplier = critMultiplier + amplificationEffect
 		end
 		-- Multiply by increased crit effect from the meta gem.
-		local metaGem = OvaleEquipement.metaGem
-		local increasedMetaGemCritEffect = metaGem and INCREASED_CRIT_META_GEM[metaGem] or 1
-		critMultiplier = critMultiplier * increasedMetaGemCritEffect
+		do
+			local aura = state:GetAura("player", INCREASED_CRIT_EFFECT_3_PERCENT, "HELPFUL")
+			if state:IsActiveAura(aura) then
+				critMultiplier = critMultiplier * aura.value1
+			end
+		end
 
 		local value = critMultiplier * value
 		return Compare(value, comparator, limit)

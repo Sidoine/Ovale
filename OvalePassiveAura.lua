@@ -33,11 +33,72 @@ local INVSLOT_TRINKET2 = INVSLOT_TRINKET2
 local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
+-- Trinket slot IDs list.
+local TRINKET_SLOTS = { INVSLOT_TRINKET1, INVSLOT_TRINKET2 }
+
+local AURA_NAME = {}
+
+-- Meta Gem Increased Critical Effect passive aura.
+local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
+do
+	AURA_NAME[INCREASED_CRIT_EFFECT_3_PERCENT] = "3% Increased Critical Effect"
+end
+local INCREASED_CRIT_EFFECT = {
+	[INCREASED_CRIT_EFFECT_3_PERCENT] = 1.03,
+}
+local INCREASED_CRIT_META_GEM = {
+	[32409] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Relentless Earthstorm Diamond
+	[34220] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Chaotic Skyfire Diamond
+	[41285] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Chaotic Skyflare Diamond
+	[41398] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Relentless Earthsiege Diamond
+	[52291] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Chaotic Shadowspirit Diamond
+	[52297] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Revitalizing Shadowspirit Diamond
+	[68778] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Agile Shadowspirit Diamond
+	[68779] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Reverberating Shadowspirit Diamond
+	[68780] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Burning Shadowspirit Diamond
+	[76884] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Agile Primal Diamond
+	[76885] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Burning Primal Diamond
+	[76886] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Reverberating Primal Diamond
+	[76888] = INCREASED_CRIT_EFFECT_3_PERCENT,	-- Revitalizing Primal Diamond
+}
+
+-- Amplification (secondary stats increase) passive aura.
+local AMPLIFICATION = 146051
+do
+	AURA_NAME[AMPLIFICATION] = "Amplification"
+end
+local AMPLIFICATION_TRINKET = {
+	[102293] = AMPLIFICATION,	-- Purified Bindings of Immerseus
+	[104426] = AMPLIFICATION,	-- Purified Bindings of Immerseus (Heroic)
+	[104675] = AMPLIFICATION,	-- Purified Bindings of Immerseus (Flexible)
+	[104924] = AMPLIFICATION,	-- Purified Bindings of Immerseus (Raid Finder)
+	[105173] = AMPLIFICATION,	-- Purified Bindings of Immerseus (Warforged)
+	[105422] = AMPLIFICATION,	-- Purified Bindings of Immerseus (Heroic Warforged)
+
+	[102299] = AMPLIFICATION,	-- Prismatic Prison of Pride
+	[104478] = AMPLIFICATION,	-- Prismatic Prison of Pride (Heroic)
+	[104727] = AMPLIFICATION,	-- Prismatic Prison of Pride (Flexible)
+	[104976] = AMPLIFICATION,	-- Prismatic Prison of Pride (Raid Finder)
+	[105225] = AMPLIFICATION,	-- Prismatic Prison of Pride (Warforged)
+	[105474] = AMPLIFICATION,	-- Prismatic Prison of Pride (Heroic Warforged)
+
+	[102305] = AMPLIFICATION,	-- Thok's Tail Tip
+	[104613] = AMPLIFICATION,	-- Thok's Tail Tip (Heroic)
+	[104862] = AMPLIFICATION,	-- Thok's Tail Tip (Flexible)
+	[105111] = AMPLIFICATION,	-- Thok's Tail Tip (Raid Finder)
+	[105360] = AMPLIFICATION,	-- Thok's Tail Tip (Warforged)
+	[105609] = AMPLIFICATION,	-- Thok's Tail Tip (Heroic Warforged)
+}
 
 -- Readiness (cooldown reduction) passive aura.
 local READINESS_AGILITY_DPS = 146019
 local READINESS_STRENGTH_DPS = 145955
 local READINESS_TANK = 146025
+do
+	AURA_NAME[READINESS_AGILITY_DPS] = "Readiness"
+	AURA_NAME[READINESS_STRENGTH_DPS] = "Readiness"
+	AURA_NAME[READINESS_TANK] = "Readiness"
+end
 local READINESS_TRINKET = {
 	[102292] = READINESS_AGILITY_DPS,	-- Assurance of Consequence
 	[104476] = READINESS_AGILITY_DPS,	-- Assurance of Consequence (Heroic)
@@ -92,6 +153,8 @@ function OvalePassiveAura:OnDisable()
 end
 
 function OvalePassiveAura:Ovale_EquipmentChanged()
+	self:UpdateIncreasedCritEffectMetaGem()
+	self:UpdateAmplification()
 	self:UpdateReadiness()
 end
 
@@ -99,33 +162,93 @@ function OvalePassiveAura:Ovale_SpecializationChanged()
 	self:UpdateReadiness()
 end
 
+function OvalePassiveAura:UpdateIncreasedCritEffectMetaGem()
+	local metaGem = OvaleEquipement.metaGem
+	local spellId = metaGem and INCREASED_CRIT_META_GEM[metaGem]
+
+	-- Update the passive, hidden aura for the meta gem.
+	local now = API_GetTime()
+	if spellId then
+		local name = AURA_NAME[spellId]
+		local start = now
+		local duration = math.huge
+		local ending = math.huge
+		local stacks = 1
+		local value = INCREASED_CRIT_EFFECT[spellId]
+		OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value, nil, nil)
+	else
+		OvaleAura:LostAuraOnGUID(self_guid, now, spellId, self_guid)
+	end
+end
+
+function OvalePassiveAura:UpdateAmplification()
+	local hasAmplification = false
+	local critDamageIncrease = 0
+	local statMultiplier = 1
+
+	-- Check if an Amplification trinket is equipped.  If more than one Amplification trinket is
+	-- equipped, then the effects stack.
+	for _, slot in pairs(TRINKET_SLOTS) do
+		local trinket = OvaleEquipement:GetEquippedItem(slot)
+		if trinket and AMPLIFICATION_TRINKET[trinket] then
+			hasAmplification = true
+			-- Use a derived formula that very closely approximates the true percent increase based on item level.
+			local ilevel = OvaleEquipement:GetEquippedItemLevel(slot) or 528
+			local amplificationEffect = exp((ilevel - 528) * 0.009327061882 + 1.713797928)
+			critDamageIncrease = critDamageIncrease + amplificationEffect / 100
+			statMultiplier = statMultiplier * (1 + amplificationEffect / 100)
+		end
+	end
+
+	-- Update the passive, hidden aura for the Amplification trinkets.
+	local now = API_GetTime()
+	local spellId = AMPLIFICATION
+	if hasAmplification then
+		local name = AURA_NAME[spellId]
+		local start = now
+		local duration = math.huge
+		local ending = math.huge
+		local stacks = 1
+		local value1 = critDamageIncrease
+		local value2 = statMultiplier
+		OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value1, value2, nil)
+	else
+		OvaleAura:LostAuraOnGUID(self_guid, now, spellId, self_guid)
+	end
+end
+
 function OvalePassiveAura:UpdateReadiness()
 	local specialization = OvalePaperDoll:GetSpecialization()
 	local spellId = READINESS_ROLE[self_class] and READINESS_ROLE[self_class][specialization]
 	if spellId then
-		-- Check a Readiness trinket is equipped and for the correct role.
-		local slot = INVSLOT_TRINKET1
-		local trinket = OvaleEquipement:GetEquippedItem(slot)
-		local readiness = trinket and READINESS_TRINKET[trinket]
-		if not readiness then
-			slot = INVSLOT_TRINKET2
-			trinket = OvaleEquipement:GetEquippedItem(slot)
-			readiness = trinket and READINESS_TRINKET[trinket]
+		local hasReadiness = false
+		local cdRecoveryRateIncrease
+
+		-- Check if a Readiness trinket is equipped and for the correct role.
+		for _, slot in pairs(TRINKET_SLOTS) do
+			local trinket = OvaleEquipement:GetEquippedItem(slot)
+			local readinessId = trinket and READINESS_TRINKET[trinket]
+			if readinessId then
+				hasReadiness = true
+				-- Use a derived formula that very closely approximates the true cooldown recovery rate increase based on item level.
+				local ilevel = OvaleEquipement:GetEquippedItemLevel(slot) or 528
+				cdRecoveryRateIncrease = exp((ilevel - 528) * 0.009317881032 + 3.434954478)
+				if readinessId == READINESS_TANK then
+					-- The cooldown recovery rate of the tank trinket is half the value of the same item-level DPS trinket.
+					cdRecoveryRateIncrease = cdRecoveryRateIncrease / 2
+				end
+				break
+			end
 		end
+
+	-- Update the passive, hidden aura for the Readiness trinkets.
 		local now = API_GetTime()
-		if readiness == spellId then
-			local name = "Readiness"
+		if hasReadiness then
+			local name = AURA_NAME[spellId]
 			local start = now
 			local duration = math.huge
 			local ending = math.huge
 			local stacks = 1
-			-- Use a derived formula that very closely approximates the true cooldown recovery rate increase based on item level.
-			local ilevel = OvaleEquipement:GetEquippedItemLevel(slot)
-			local cdRecoveryRateIncrease = exp((ilevel - 528) * 0.009317881032 + 3.434954478)
-			if readiness == READINESS_TANK then
-				-- The cooldown recovery rate of the tank trinket is half the value of the same item-level DPS trinket.
-				cdRecoveryRateIncrease = cdRecoveryRateIncrease / 2
-			end
 			local value = 1 / (1 + cdRecoveryRateIncrease / 100)
 			OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value, nil, nil)
 		else
