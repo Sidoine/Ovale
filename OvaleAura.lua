@@ -398,12 +398,15 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 	end
 
 	-- Only overwrite an active aura's information if the aura has changed.
-	-- An aura's "fingerprint" is its: caster, duration, expiration time, stack count.
+	-- An aura's "fingerprint" is its: caster, duration, expiration time, stack count, value
 	local auraIsUnchanged = (
 		aura.source == casterGUID
 			and aura.duration == duration
 			and aura.ending == expirationTime
 			and aura.stacks == count
+			and aura.value1 == value1
+			and aura.value2 == value2
+			and aura.value3 == value3
 	)
 
 	-- Update age of aura, regardless of whether it's changed.
