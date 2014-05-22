@@ -348,8 +348,6 @@ AddFunction FrostOneHandSingleTargetActions
 	if BuffPresent(killing_machine_buff) or RunicPower() > 88 Spell(frost_strike)
 	#howling_blast,if=death>1|frost>1
 	if Rune(death) >= 2 or Rune(frost) >= 2 Spell(howling_blast)
-	#outbreak,if=!dot.frost_fever.ticking|!dot.blood_plague.ticking
-	if not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(blood_plague_debuff) Spell(outbreak)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
 	if target.HealthPercent() -3 * { target.HealthPercent() / target.TimeToDie() } <= 35 Spell(soul_reaper_frost)
 	#blood_tap,if=talent.blood_tap.enabled&((target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0))
