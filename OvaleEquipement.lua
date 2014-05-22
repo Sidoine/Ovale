@@ -73,7 +73,6 @@ local OVALE_SLOTNAME = {
 	LegsSlot = true,
 	MainHandSlot = true,
 	NeckSlot = true,
-	RangedSlot = true,
 	SecondaryHandSlot = true,
 	ShirtSlot = true,
 	ShoulderSlot = true,
@@ -83,6 +82,11 @@ local OVALE_SLOTNAME = {
 	WaistSlot = true,
 	WristSlot = true,
 }
+do
+	for slotName in pairs(OVALE_SLOTNAME) do
+		OVALE_SLOTNAME[slotName] = API_GetInventorySlotInfo(slotName)
+	end
+end
 -- slots that can contain pieces from armor sets
 local OVALE_ARMORSET_SLOT_IDS = { INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LEGS, INVSLOT_SHOULDER }
 -- database of armor set items: OVALE_ARMORSET[itemId] = armorSetName
@@ -457,27 +461,28 @@ do
 end
 
 function OvaleEquipement:GetEquippedItem(slotId)
-	if type(slotId) ~= "number" then
-		if not OVALE_SLOTNAME[slotId] then return nil end
-		slotId = API_GetInventorySlotInfo(slotId)
-		if not slotId then return nil end
+	if slotId and type(slotId) ~= "number" then
+		slotId = OVALE_SLOTNAME[slotId]
 	end
-	return self.equippedItems[slotId]
+	if slotId then
+		return self.equippedItems[slotId]
+	end
+	return nil
 end
 
 function OvaleEquipement:GetEquippedItemLevel(slotId)
-	if type(slotId) ~= "number" then
-		if not OVALE_SLOTNAME[slotId] then return nil end
-		slotId = API_GetInventorySlotInfo(slotId)
-		if not slotId then return nil end
+	if slotId and type(slotId) ~= "number" then
+		slotId = OVALE_SLOTNAME[slotId]
 	end
-	return self.equippedItemLevels[slotId]
+	if slotId then
+		return self.equippedItemLevels[slotId]
+	end
+	return nil
 end
 
 function OvaleEquipement:HasEquippedItem(itemId, slotId)
 	if slotId and type(slotId) ~= "number" then
-		if not OVALE_SLOTNAME[slotId] then return nil end
-		slotId = API_GetInventorySlotInfo(slotId)
+		slotId = OVALE_SLOTNAME[slotId]
 	end
 	if slotId then
 		if self.equippedItems[slotId] == itemId then
@@ -493,15 +498,38 @@ function OvaleEquipement:HasEquippedItem(itemId, slotId)
 	return nil
 end
 
-function OvaleEquipement:HasMainHandWeapon()
-	return self.mainHandItemType == "INVTYPE_WEAPON"
-		or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
-		or self.mainHandItemType == "INVTYPE_2HWEAPON"
+function OvaleEquipement:HasMainHandWeapon(handedness)
+	if handedness then
+		if handedness == 1 then
+			return self.mainHandItemType == "INVTYPE_WEAPON"
+				or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+		elseif handedness == 2 then
+			return self.mainHandItemType == "INVTYPE_2HWEAPON"
+		end
+	else
+		return self.mainHandItemType == "INVTYPE_WEAPON"
+			or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+			or self.mainHandItemType == "INVTYPE_2HWEAPON"
+	end
+	return false
 end
 
-function OvaleEquipement:HasOffHandWeapon()
-	return self.offHandItemType == "INVTYPE_WEAPON"
-		or self.offHandItemType == "INVTYPE_WEAPONOFFHAND"
+function OvaleEquipement:HasOffHandWeapon(handedness)
+	if handedness then
+		if handedness == 1 then
+			return self.offHandItemType == "INVTYPE_WEAPON"
+				or self.offHandItemType == "INVTYPE_WEAPONOFFHAND"
+				or self.offHandItemType == "INVTYPE_WEAPONMAINHAND"
+		elseif handedness == 2 then
+			return self.offHandItemType == "INVTYPE_2HWEAPON"
+		end
+	else
+		return self.offHandItemType == "INVTYPE_WEAPON"
+			or self.offHandItemType == "INVTYPE_WEAPONOFFHAND"
+			or self.offHandItemType == "INVTYPE_WEAPONMAINHAND"
+			or self.offHandItemType == "INVTYPE_2HWEAPON"
+	end
+	return false
 end
 
 function OvaleEquipement:HasShield()
@@ -513,13 +541,37 @@ function OvaleEquipement:HasTrinket(itemId)
 		or self:HasEquippedItem(itemId, INVSLOT_TRINKET2)
 end
 
-function OvaleEquipement:HasTwoHandedWeapon()
-	return self.mainHandItemType == "INVTYPE_2HWEAPON"
+function OvaleEquipement:HasTwoHandedWeapon(slotId)
+	if slotId and type(slotId) ~= "number" then
+		slotId = OVALE_SLOTNAME[slotId]
+	end
+	if slotId then
+		if slotId == INVSLOT_MAINHAND then
+			return self.mainHandItemType == "INVTYPE_2HWEAPON"
+		elseif slotId == INVSLOT_OFFHAND then
+			return self.offHandItemType == "INVTYPE_2HWEAPON"
+		end
+	else
+		return self.mainHandItemType == "INVTYPE_2HWEAPON" or self.offHandItemType == "INVTYPE_2HWEAPON"
+	end
+	return false
 end
 
-function OvaleEquipement:HasOneHandedWeapon()
-	return self.mainHandItemType == "INVTYPE_WEAPON"
-		or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+function OvaleEquipement:HasOneHandedWeapon(slotId)
+	if slotId and type(slotId) ~= "number" then
+		slotId = OVALE_SLOTNAME[slotId]
+	end
+	if slotId then
+		if slotId == INVSLOT_MAINHAND then
+			return self.mainHandItemType == "INVTYPE_WEAPON" or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+		elseif slotId == INVSLOT_OFFHAND then
+			return self.offHandItemType == "INVTYPE_WEAPON" or self.offHandItemType == "INVTYPE_WEAPONMAINHAND"
+		end
+	else
+		return self.mainHandItemType == "INVTYPE_WEAPON" or self.mainHandItemType == "INVTYPE_WEAPONMAINHAND"
+			or self.offHandItemType == "INVTYPE_WEAPON" or self.offHandItemType == "INVTYPE_WEAPONMAINHAND"
+	end
+	return false
 end
 
 function OvaleEquipement:UpdateArmorSetCount()

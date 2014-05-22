@@ -23,17 +23,26 @@ do
 	-- @param yesno Optional. If yes, then return true if the weapon is equipped. If no, then return true if it isn't equipped.
 	--     Default is yes.
 	--     Valid values: yes, no.
+	-- @param type Optional. If set via type=value, then specify whether the weapon must be one-handed or two-handed.
+	--     Default is unset.
+	--     Valid values: 1h, 2h
 	-- @return A boolean value.
 	-- @usage
 	-- if HasWeapon(offhand) and BuffStacks(killing_machine) Spell(frost_strike)
 
 	local function HasWeapon(condition)
 		local hand, yesno = condition[1], condition[2]
+		local weaponType = condition.type
 		local boolean = false
+		if weaponType == "1h" then
+			weaponType = 1
+		elseif weaponType == "2h" then
+			weaponType = 2
+		end
 		if hand == "offhand" or hand == "off" then
-			boolean = OvaleEquipement:HasOffHandWeapon()
+			boolean = OvaleEquipement:HasOffHandWeapon(weaponType)
 		elseif hand == "mainhand" or hand == "main" then
-			boolean = OvaleEquipement:HasMainHandWeapon()
+			boolean = OvaleEquipement:HasMainHandWeapon(weaponType)
 		end
 		return TestBoolean(boolean, yesno)
 	end
