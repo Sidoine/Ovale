@@ -30,6 +30,8 @@ local API_UnitClass = UnitClass
 local _, self_class = API_UnitClass("player")
 -- Current age of cooldown state.
 local self_serial = 0
+-- Shared cooldown name (sharedcd) to spell table mapping.
+local self_sharedCooldownSpells = {}
 --</private-static-properties>
 
 --<public-static-methods>
@@ -67,6 +69,36 @@ end
 function OvaleCooldown:Update()
 	-- Advance age of current cooldown state.
 	self_serial = self_serial + 1
+end
+
+-- Empty out the sharedcd table.
+function OvaleCooldown:ResetSharedCooldowns()
+	for name, spellTable in pairs(self_sharedCooldownSpells) do
+		for spellId in pairs(spellTable) do
+			spellTable[spellId] = nil
+		end
+	end
+end
+
+function OvaleCooldown:AddSharedCooldown(name, spellId)
+	self_sharedCooldownSpells[name] = self_sharedCooldownSpells[name] or {}
+	self_sharedCooldownSpells[name][spellId] = true
+end
+
+-- Get the cooldown information for the given spell ID.  If given a shared cooldown name,
+-- then cycle through all spells associated with that spell ID to find the cooldown
+-- information.
+function OvaleCooldown:GetSpellCooldown(spellId)
+	local start, duration, enable
+	if self_sharedCooldownSpells[spellId] then
+		for id in pairs(self_sharedCooldownSpells[spellId]) do
+			start, duration, enable = API_GetSpellCooldown(id)
+			if start then break end
+		end
+	else
+		start, duration, enable = API_GetSpellCooldown(spellId)
+	end
+	return start, duration, enable
 end
 
 -- Return the GCD after the given spellId is cast.
@@ -256,13 +288,13 @@ statePrototype.GetCD = function(state, spellId)
 	-- Populate the cooldown information from the current game state if it is outdated.
 	local cd = state.cd[cdName]
 	if not cd.start or not cd.serial or cd.serial < self_serial then
-		local start, duration, enable = API_GetSpellCooldown(spellId)
+		local start, duration, enable = OvaleCooldown:GetSpellCooldown(spellId)
 		if start and start > 0 then
 			charges = 0
 		end
 		if si and si.forcecd then
 			if si.forcecd then
-				start, duration = API_GetSpellCooldown(si.forcecd)
+				start, duration = OvaleCooldown:GetSpellCooldown(si.forcecd)
 			end
 		end
 		cd.serial = self_serial

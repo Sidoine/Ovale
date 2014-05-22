@@ -19,6 +19,7 @@ local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
 -- Forward declarations for module dependencies.
 local OvaleCondition = nil
+local OvaleCooldown = nil
 local OvaleData = nil
 local OvaleEquipement = nil
 local OvaleOptions = nil
@@ -416,6 +417,7 @@ local function ParseSpellInfo(params)
 				end
 				OvaleData.buffSpellList[v][spellId] = true
 			elseif k == "sharedcd" then
+				OvaleCooldown:AddSharedCooldown(v, spellId)
 				self_sharedCooldownNames[v] = true
 			else
 				si[k] = v
@@ -849,6 +851,7 @@ local function CompileScript(text)
 	wipe(self_missingSpellList)
 	wipe(self_functionCalls)
 	wipe(self.customFunctionNode)
+	OvaleCooldown:ResetSharedCooldowns()
 
 	-- Return all existing nodes to the node pool.
 	for i, node in pairs(self_node) do
@@ -917,6 +920,7 @@ end
 function OvaleCompile:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleCondition = Ovale.OvaleCondition
+	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
 	OvaleEquipement = Ovale.OvaleEquipement
 	OvaleOptions = Ovale.OvaleOptions
