@@ -627,6 +627,9 @@ function OvaleEquipement:UpdateEquippedItemLevels()
 			changed = true
 		end
 	end
+	if changed then
+		self:SendMessage("Ovale_EquipmentChanged")
+	end
 	return changed
 end
 
