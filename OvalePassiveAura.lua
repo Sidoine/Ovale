@@ -122,6 +122,10 @@ function OvalePassiveAura:UpdateReadiness()
 			-- Use a derived formula that very closely approximates the true cooldown recovery rate increase based on item level.
 			local ilevel = OvaleEquipement:GetEquippedItemLevel(slot)
 			local cdRecoveryRateIncrease = exp((ilevel - 528) * 0.009317881032 + 3.434954478)
+			if readiness == READINESS_TANK then
+				-- The cooldown recovery rate of the tank trinket is half the value of the same item-level DPS trinket.
+				cdRecoveryRateIncrease = cdRecoveryRateIncrease / 2
+			end
 			local value = 1 / (1 + cdRecoveryRateIncrease / 100)
 			OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value, nil, nil)
 		else
