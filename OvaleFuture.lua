@@ -131,7 +131,7 @@ end
 		GetAura(unitId, auraId, filter, mine)
 		IsActiveAura(aura, atTime)
 --]]
-local function GetDamageMultiplier(spellId, auraObject)
+local function GetDamageMultiplier(spellId, snapshot, auraObject)
 	auraObject = auraObject or OvaleAura
 	local damageMultiplier = 1
 	local si = OvaleData.spellInfo[spellId]
@@ -148,6 +148,13 @@ local function GetDamageMultiplier(spellId, auraObject)
 					damageMultiplier = damageMultiplier * multiplier
 				end
 			end
+		end
+	end
+	-- Factor in additional damage multipliers that are registered with this module.
+	for tbl in pairs(self_updateSpellcastInfo) do
+		if tbl.GetDamageMultiplier then
+			local multiplier = tbl.GetDamageMultiplier(spellId, snapshot, auraObject)
+			damageMultiplier = damageMultiplier * multiplier
 		end
 	end
 	return damageMultiplier
@@ -175,7 +182,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	-- Snapshot the current stats for the spellcast.
 	spellcast.snapshot = OvalePaperDoll:GetSnapshot()
-	spellcast.damageMultiplier = GetDamageMultiplier(spellId)
+	spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -288,7 +295,7 @@ local function UpdateLastSpellcast(spellcast)
 		if self_timeAuraAdded then
 			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
 				OvalePaperDoll:UpdateSnapshot(spellcast.snapshot)
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
 					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshot.snapshotTime)
 			end
@@ -450,7 +457,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 					OvalePaperDoll:ReleaseSnapshot(spellcast.snapshot)
 				end
 				spellcast.snapshot = OvalePaperDoll:GetSnapshot()
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
 				return
 			end
 		end
@@ -713,7 +720,7 @@ statePrototype.GetCounterValue = function(state, id)
 end
 
 statePrototype.GetDamageMultiplier = function(state, spellId)
-	return GetDamageMultiplier(spellId, state)
+	return GetDamageMultiplier(spellId, state.snapshot, state)
 end
 
 --[[

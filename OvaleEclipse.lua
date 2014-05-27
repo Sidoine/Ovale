@@ -17,10 +17,13 @@ Ovale.OvaleEclipse = OvaleEclipse
 
 --<private-static-properties>
 -- Forward declarations for module dependencies.
+local OvaleAura = nil
 local OvaleData = nil
+local OvaleFuture = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
+local floor = math.floor
 local API_GetEclipseDirection = GetEclipseDirection
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
@@ -33,13 +36,18 @@ local OVALE_ECLIPSE_DEBUG = "eclipse"
 local self_guid = nil
 -- Player's class.
 local _, self_class = API_UnitClass("player")
+-- Table of functions to update spellcast information to register with OvaleFuture.
+local self_updateSpellcastInfo = {}
 
 local LUNAR_ECLIPSE = ECLIPSE_BAR_LUNAR_BUFF_ID
 local SOLAR_ECLIPSE = ECLIPSE_BAR_SOLAR_BUFF_ID
 -- Nature's Grace: You gain 15% spell haste for 15 seconds each time you trigger an Eclipse.
 local NATURES_GRACE = 16886
 local CELESTIAL_ALIGNMENT = 112071
+local DREAM_OF_CENARIUS = 145151
+local DREAM_OF_CENARIUS_TALENT = 17
 local EUPHORIA = 81062
+local MOONKIN_FORM = 24858
 local STARFALL = 48505
 --</private-static-properties>
 
@@ -49,10 +57,52 @@ OvaleEclipse.eclipse = 0
 OvaleEclipse.eclipseDirection = 0
 --<public-static-properties>
 
+--<private-static-methods>
+-- Manage Eclipsed damage multiplier information.
+local function GetDamageMultiplier(spellId, snapshot, auraObject)
+	auraObject = auraObject or OvaleAura
+	local damageMultiplier = 1
+	local si = OvaleData.spellInfo[spellId]
+
+	if si and (si.arcane == 1 or si.nature == 1) then
+		-- Update the damage multiplier for Moonkin Form 10% bonus to Arcane and Nature damage.
+		local moonkinForm = auraObject:GetAura("player", MOONKIN_FORM, "HELPFUL", true)
+		if auraObject:IsActiveAura(moonkinForm) then
+			damageMultiplier = damageMultiplier * 1.1
+		end
+
+		-- Update the damage multiplier for Eclipse bonus to Arcane and Nature damage.
+		local aura
+		if si.arcane == 1 then
+			aura = auraObject:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
+		end
+		if not auraObject:IsActiveAura(aura) and si.nature == 1 then
+			aura = auraObject:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true)
+		end
+		if not auraObject:IsActiveAura(aura) then
+			aura = auraObject:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true)
+		end
+		if auraObject:IsActiveAura(aura) then
+			local eclipseEffect = aura.value1
+			local masteryEffect = snapshot.masteryEffect or 0
+			eclipseEffect = eclipseEffect - floor(masteryEffect) + masteryEffect
+			damageMultiplier = damageMultiplier * (1 + eclipseEffect / 100)
+		end
+	end
+	return damageMultiplier
+end
+
+do
+	self_updateSpellcastInfo.GetDamageMultiplier = GetDamageMultiplier
+end
+--</private-static-methods>
+
 --<public-static-methods>
 function OvaleEclipse:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleAura = Ovale.OvaleAura
 	OvaleData = Ovale.OvaleData
+	OvaleFuture = Ovale.OvaleFuture
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 end
@@ -79,8 +129,10 @@ function OvaleEclipse:Ovale_SpecializationChanged(event, specialization, previou
 		self:RegisterMessage("Ovale_StanceChanged", "Update")
 		self:RegisterMessage("Ovale_AuraAdded")
 		OvaleState:RegisterState(self, self.statePrototype)
+		OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 	else
 		OvaleState:UnregisterState(self)
+		OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
 		self:UnregisterEvent("ECLIPSE_DIRECTION_CHANGE")
 		self:UnregisterEvent("UNIT_POWER")
 		self:UnregisterEvent("UNIT_POWER_FREQUENT")
@@ -181,6 +233,8 @@ end
 -- Update the state of the simulator for the eclipse energy gained by casting the given spell.
 statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
 	if spellId == CELESTIAL_ALIGNMENT then
+		local aura = state:AddAuraToGUID(self_guid, spellId, self_guid, "HELPFUL", atTime, atTime + 15, snapshot)
+		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)
 		-- Celestial Alignment grants the spell effects of both Lunar and Solar Eclipse and
 		-- also resets the total Eclipse energy to zero.
 		state:AddEclipse(LUNAR_ECLIPSE, atTime, snapshot)
@@ -267,11 +321,28 @@ statePrototype.EclipseEnergy = function(state, spellId)
 	return eclipseEnergy
 end
 
+statePrototype.EclipseBonusDamage = function(state, atTime, snapshot)
+	-- Base Eclipse bonus (percent) to damage.
+	local bonus = 15
+	-- Add in mastery bonus to Eclipse damage.
+	bonus = bonus + snapshot.masteryEffect
+	-- Add in bonus from Dream of Cenarius.
+	if OvaleSpellBook:GetTalentPoints(DREAM_OF_CENARIUS_TALENT) > 0 then
+		local aura = state:GetAura("player", DREAM_OF_CENARIUS, "HELPFUL", true)
+		if state:IsActiveAura(aura, atTime) then
+			bonus = bonus + 25
+		end
+	end
+	return bonus
+end
+
 statePrototype.AddEclipse = function(state, eclipseId, atTime, snapshot)
 	if eclipseId == LUNAR_ECLIPSE or eclipseId == SOLAR_ECLIPSE then
 		local eclipseName = (eclipseId == LUNAR_ECLIPSE) and "Lunar" or "Solar"
 		Ovale:Logf("[%s] Adding %s Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, eclipseName, eclipseId, atTime)
-		state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, math.huge, snapshot)
+		local aura = state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, math.huge, snapshot)
+		-- Set the value of the Eclipse aura to the Eclipse's bonus damage.
+		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)
 		-- Reaching Eclipse state grants Nature's Grace.
 		state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", atTime, atTime + 15, snapshot)
 		-- Reaching Lunar Eclipse resets the cooldown of Starfall.
