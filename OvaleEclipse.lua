@@ -160,73 +160,130 @@ function OvaleEclipse:ResetState(state)
 	state.eclipseDirection = self.eclipseDirection
 end
 
+-- Apply the effects of the spell at the start of the spellcast.
+function OvaleEclipse:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	-- Channeled spells cost resources at the start of the channel.
+	if isChanneled then
+		state:ApplyEclipseEnergy(spellId, startCast, spellcast.snapshot)
+	end
+end
+
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
-	local si = OvaleData.spellInfo[spellId]
-	if si and si.eclipse then
-		local eclipse = state.eclipse
-		local direction = state.eclipseDirection
-		local energy = si.eclipse
-
-		if energy == 0 then
-			-- Spell resets Eclipse energy to zero, but leaves the Eclipse direction intact.
-			eclipse = 0
-		else -- if energy ~= 0 then
-			-- If there is no Eclipse direction yet, then start moving in the direction generated
-			-- by the energy of the spellcast.
-			if direction == 0 then
-				direction = (energy < 0) and -1 or 1
-			end
-			if si.eclipsedir then
-				energy = energy * direction
-			end
-			local aura = state:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true)
-			if state:IsActiveAura(aura) then
-				-- Celestial Alignment prevents gaining Eclipse energy during its duration.
-				energy = 0
-			elseif OvaleSpellBook:IsKnownSpell(EUPHORIA) then
-				local lunar = state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
-				local solar = state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true)
-				if not state:IsActiveAura(lunar) and not state:IsActiveAura(solar) then
-					-- Euphoria: While not in an Eclipse state, your spells generate double the normal
-					-- amount of Solar or Lunar energy.
-					energy = energy * 2
-				end
-			end
-			-- Only adjust Eclipse energy if the spell moves the Eclipse bar in the right direction.
-			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then
-				Ovale:Logf("[%s] Eclipse %d -> %d", OVALE_ECLIPSE_DEBUG, eclipse, eclipse + energy)
-				eclipse = eclipse + energy
-
-				-- Crossing zero energy removes the corresponding Eclipse state.
-				if direction < 0 and eclipse <= 0 then
-					state:RemoveAuraOnGUID(self_guid, SOLAR_ECLIPSE, "HELPFUL", true, endCast)
-				elseif direction > 0 and eclipse >= 0 then
-					state:RemoveAuraOnGUID(self_guid, LUNAR_ECLIPSE, "HELPFUL", true, endCast)
-				end
-
-				-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached after the spellcast.
-				if eclipse <= -100 then
-					eclipse = -100
-					direction = 1
-					Ovale:Logf("[%s] Adding Lunar Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, LUNAR_ECLIPSE, endCast)
-					state:AddAuraToGUID(self_guid, LUNAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge, spellcast.snapshot)
-					-- Reaching Lunar Eclipse resets the cooldown of Starfall.
-					state:ResetSpellCooldown(STARFALL, endCast)
-					-- Reaching Eclipse state grants Nature's Grace.
-					state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", endCast, endCast + 15, spellcast.snapshot)
-				elseif eclipse >= 100 then
-					eclipse = 100
-					direction = -1
-					Ovale:Logf("[%s] Adding Solar Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, SOLAR_ECLIPSE, endCast)
-					state:AddAuraToGUID(self_guid, SOLAR_ECLIPSE, self_guid, "HELPFUL", endCast, math.huge, spellcast.snapshot)
-					-- Reaching Eclipse state grants Nature's Grace.
-					state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", endCast, endCast + 15, spellcast.snapshot)
-				end
-			end
-		end
-		state.eclipse = eclipse
-		state.eclipseDirection = direction
+	-- Instant or cast-time spells cost resources at the end of the spellcast.
+	if not isChanneled then
+		state:ApplyEclipseEnergy(spellId, endCast, spellcast.snapshot)
 	end
 end
 --</public-static-methods>
+
+--<state-methods>
+-- Update the state of the simulator for the eclipse energy gained by casting the given spell.
+statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
+	if spellId == CELESTIAL_ALIGNMENT then
+		-- Celestial Alignment grants the spell effects of both Lunar and Solar Eclipse and
+		-- also resets the total Eclipse energy to zero.
+		state:AddEclipse(LUNAR_ECLIPSE, atTime, snapshot)
+		state:AddEclipse(SOLAR_ECLIPSE, atTime, snapshot)
+		state.eclipse = 0
+		-- Remove any current Eclipse state.
+		state:RemoveEclipse(LUNAR_ECLIPSE, atTime)
+		state:RemoveEclipse(SOLAR_ECLIPSE, atTime)
+	else
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.eclipse then
+			local power = state.eclipse
+			local direction = state.eclipseDirection
+			local energy = state:EclipseEnergy(spellId)
+
+			-- Celestial Alignment prevents gaining Eclipse energy during its duration.
+			local aura = state:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true)
+			if state:IsActiveAura(aura) then
+				energy = 0
+			end
+			-- Only adjust the total Eclipse energy if the spell adds Eclipse energy in the current direction.
+			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then
+				Ovale:Logf("[%s] Eclipse %d -> %d", OVALE_ECLIPSE_DEBUG, power, power + energy)
+				power = power + energy
+
+				-- Crossing zero energy removes the corresponding Eclipse state.
+				if direction < 0 and power <= 0 then
+					state:RemoveEclipse(SOLAR_ECLIPSE, atTime)
+				elseif direction > 0 and power >= 0 then
+					state:RemoveEclipse(LUNAR_ECLIPSE, atTime)
+				end
+
+				-- Clamp Eclipse energy to min/max values and note that an Eclipse state will be reached.
+				if power <= -100 then
+					power = -100
+					direction = 1
+					state:AddEclipse(LUNAR_ECLIPSE, atTime, snapshot)
+				elseif power >= 100 then
+					power = 100
+					direction = -1
+					state:AddEclipse(SOLAR_ECLIPSE, atTime, snapshot)
+				end
+			end
+
+			state.eclipse = power
+			state.eclipseDirection = direction
+		end
+	end
+end
+
+statePrototype.EclipseEnergy = function(state, spellId)
+	local eclipseEnergy = 0
+	local si = OvaleData.spellInfo[spellId]
+	if si and si.eclipse then
+		local energy = si.eclipse
+		--[[
+			eclipse = 0 means that the spell generates no Eclipse energy.
+			eclipse < 0 means that the spell generates Lunar energy.
+			eclipse > 0 means that the spell generates Solar energy.
+		--]]
+		if energy ~= "0" then
+			-- If there is no Eclipse direction yet, then start moving in the direction generated
+			-- by the energy of the spellcast.
+			local direction = state.eclipseDirection
+			if direction == 0 then
+				direction = (energy < 0) and -1 or 1
+			end
+			-- If "eclipsedir" is set, then the spell adds energy in the current direction.
+			if si.eclipsedir then
+				energy = energy * direction
+			end
+			-- Euphoria: While not in an Eclipse state, your spells generate double the normal
+			-- amount of Solar or Lunar energy.
+			if OvaleSpellBook:IsKnownSpell(EUPHORIA) then
+				local lunar = state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
+				local solar = state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true)
+				if not state:IsActiveAura(lunar) and not state:IsActiveAura(solar) then
+					energy = energy * 2
+				end
+			end
+			eclipseEnergy = energy
+		end
+	end
+	return eclipseEnergy
+end
+
+statePrototype.AddEclipse = function(state, eclipseId, atTime, snapshot)
+	if eclipseId == LUNAR_ECLIPSE or eclipseId == SOLAR_ECLIPSE then
+		local eclipseName = (eclipseId == LUNAR_ECLIPSE) and "Lunar" or "Solar"
+		Ovale:Logf("[%s] Adding %s Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, eclipseName, eclipseId, atTime)
+		state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, math.huge, snapshot)
+		-- Reaching Eclipse state grants Nature's Grace.
+		state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", atTime, atTime + 15, snapshot)
+		-- Reaching Lunar Eclipse resets the cooldown of Starfall.
+		if eclipseId == LUNAR_ECLIPSE then
+			state:ResetSpellCooldown(STARFALL, atTime)
+		end
+	end
+end
+
+statePrototype.RemoveEclipse = function(state, eclipseId, atTime)
+	if eclipseId == LUNAR_ECLIPSE or eclipseId == SOLAR_ECLIPSE then
+		state:RemoveAuraOnGUID(self_guid, eclipseId, "HELPFUL", true, atTime)
+	end
+end
+--</state-methods>
