@@ -182,6 +182,8 @@ Define(moonfire 8921)
 Define(moonfire_debuff 8921)
 	SpellInfo(moonfire_debuff arcane=1 duration=14 haste=spell tick=2)
 	SpellInfo(moonfire_debuff addduration=2 itemset=T14_caster itemcount=4)
+	SpellInfo(moonfire_debuff damage=BalanceMoonfireTickDamage mastery=balance)
+	SpellInfo(moonfire_debuff lastEstimatedDamage=BalanceMoonfireTickLastDamage mastery=balance)
 Define(moonkin_form 24858)
 Define(natures_grace_buff 16886)
 	SpellInfo(natures_grace_buff duration=15)
@@ -318,7 +320,9 @@ Define(sunfire 93402)
 	SpellAddTargetDebuff(sunfire sunfire_debuff=1)
 Define(sunfire_debuff 93402)
 	SpellInfo(sunfire_debuff duration=14 haste=spell nature=1 tick=2)
-	SpellInfo(sunfire addduration=2 itemset=T14_caster itemcount=4)
+	SpellInfo(sunfire_debuff addduration=2 itemset=T14_caster itemcount=4)
+	SpellInfo(sunfire_debuff damage=BalanceSunfireTickDamage mastery=balance)
+	SpellInfo(sunfire_debuff lastEstimatedDamage=BalanceSunfireTickLastDamage mastery=balance)
 Define(survival_instincts 61336)
 	SpellInfo(survival_instincts cd=180)
 	SpellInfo(survival_instincts addcd=-60 glyph=glyph_of_survival_instincts)
@@ -436,6 +440,26 @@ AddFunction FeralInterrupt
 			if ComboPoints() > 0 and target.InRange(maim) Spell(maim)
 		}
 	}
+}
+
+### Moonfire
+AddFunction BalanceMoonfireTickDamage asValue=1
+{
+	{ 263 + 0.24 * Spellpower() } * DamageMultiplier(moonfire_debuff) * { 1 + SpellCritChance() / 100 }
+}
+AddFunction BalanceMoonfireTickLastDamage asValue=1
+{
+	{ 263 + 0.24 * target.DebuffSpellpower(moonfire_debuff) } * target.DebuffDamageMultiplier(moonfire_debuff) * { 1 + target.DebuffSpellCritChance(moonfire_debuff) / 100 }
+}
+
+### Sunfire
+AddFunction BalanceSunfireTickDamage asValue=1
+{
+	{ 263 + 0.24 * Spellpower() } * DamageMultiplier(sunfire_debuff) * { 1 + SpellCritChance() / 100 }
+}
+AddFunction BalanceSunfireTickLastDamage asValue=1
+{
+	{ 263 + 0.24 * target.DebuffSpellpower(sunfire_debuff) } * target.DebuffDamageMultiplier(sunfire_debuff) * { 1 + target.DebuffSpellCritChance(moonfire_debuff) / 100 }
 }
 
 AddFunction FeralMasteryDamageMultiplier asValue=1 { 1 + MasteryEffect() / 100 }
