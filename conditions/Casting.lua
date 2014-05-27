@@ -64,26 +64,24 @@ do
 			end
 		end
 
-		local isCasting = false
 		if castSpellId or castSpellName then
 			if not spellId then
 				-- No spell specified, so whatever spell is currently casting.
-				isCasting = true
+				return start, ending
 			elseif OvaleData.buffSpellList[spellId] then
 				for id in pairs(OvaleData.buffSpellList[spellId]) do
 					if id == castSpellId or OvaleSpellBook:GetSpellName(id) == castSpellName then
-						isCasting = true
-						break
+						return start, ending
 					end
 				end
 			elseif spellId == "harmful" and API_IsHarmfulSpell(castSpellName) then
-				isCasting = true
+				return start, ending
 			elseif spellId == "helpful" and API_IsHelpfulSpell(castSpellName) then
-				isCasting = true
+				return start, ending
 			end
 		end
-		return isCasting
+		return nil
 	end
 
-	OvaleCondition:RegisterCondition("casting", false, casting)
+	OvaleCondition:RegisterCondition("casting", false, Casting)
 end
