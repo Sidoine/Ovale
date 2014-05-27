@@ -51,6 +51,110 @@ AddFunction BloodDeathStrikeCondition
 	IncomingDamage(5) >= MaxHealth() * 0.65
 }
 
+AddFunction BloodSingleTargetLevel75Actions
+{
+	if TalentPoints(blood_tap_talent)
+	{
+		# Don't cap FU rune pairs.
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+		if BuffStacks(blood_charge_buff) >= 12
+		{
+			# Spend any FU pairs so we can use Blood Tap twice to reactivate an FU pair as death runes.
+			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+			# Blood Tap once to reactivate one F/U death rune.
+			if { Rune(unholy) < 1 and Rune(frost) < 1 } or { RunicPower() >= MaxRunicPower() - 10 } Spell(blood_tap)
+		}
+		# Use Blood Tap a second time to reactivate another F/U death rune to bank a full FU pair.
+		if BuffStacks(blood_charge_buff) >= 5
+		{
+			if Rune(unholy) >= 1 and Rune(frost) < 1 Spell(blood_tap)
+			if Rune(unholy) < 1 and Rune(frost) >= 1 Spell(blood_tap)
+		}
+		# Don't fully deplete a blood rune or else we may proc a blood rune into a death rune.
+		if Rune(blood) >= 2 Spell(heart_strike)
+		# Rune Strike to build Blood Charges.
+		Spell(rune_strike)
+	}
+	if TalentPoints(runic_empowerment_talent)
+	{
+		# Keep F/U runes fully depleted for Runic Empowerment procs.
+		if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+		# Don't fully deplete a blood rune or else we may proc a blood rune into a death rune.
+		if Rune(blood) >= 2 Spell(heart_strike)
+		# Rune Strike to proc Runic Empowerment.
+		Spell(rune_strike)
+	}
+	if TalentPoints(runic_corruption_talent)
+	{
+		# Try to put one rune of each set on cooldown to benefit from Runic Corruption procs.
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+		if Rune(blood) >= 2 Spell(heart_strike)
+		# Rune Strike to proc Runic Corruption.
+		Spell(rune_strike)
+	}
+	if not TalentPoints(blood_tap_talent) and not TalentPoints(runic_empowerment_talent) and not TalentPoints(runic_corruption_talent)
+	{
+		# Bank a pair of FU runes for emergency Death Strike.
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+		# Use up blood runes to generate runic power.
+		if Rune(blood) >= 1 Spell(heart_strike)
+		# Dump runic power.
+		Spell(rune_strike)
+	}
+}
+
+AddFunction BloodAoeLevel75Actions
+{
+	if TalentPoints(blood_tap_talent)
+	{
+		# Don't cap FU rune pairs.
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+		if BuffStacks(blood_charge_buff) >= 12
+		{
+			# Spend any FU pairs so we can use Blood Tap twice to reactivate an FU pair as death runes.
+			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+			# Blood Tap once to reactivate one F/U death rune.
+			if { Rune(unholy) < 1 and Rune(frost) < 1 } or { RunicPower() >= MaxRunicPower() - 10 } Spell(blood_tap)
+		}
+		# Use Blood Tap a second time to reactivate another F/U death rune to bank a full FU pair.
+		if BuffStacks(blood_charge_buff) >= 5
+		{
+			if Rune(unholy) >= 1 and Rune(frost) < 1 Spell(blood_tap)
+			if Rune(unholy) < 1 and Rune(frost) >= 1 Spell(blood_tap)
+		}
+		# Don't fully deplete a blood rune or else we may proc a blood rune into a death rune.
+		if Rune(blood) >= 2 Spell(blood_boil)
+		# Rune Strike to build Blood Charges.
+		Spell(rune_strike)
+	}
+	if TalentPoints(runic_empowerment_talent)
+	{
+		# Keep F/U runes fully depleted for Runic Empowerment procs.
+		if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+		# Don't fully deplete a blood rune or else we may proc a blood rune into a death rune.
+		if Rune(blood) >= 2 Spell(blood_boil)
+		# Rune Strike to proc Runic Empowerment.
+		Spell(rune_strike)
+	}
+	if TalentPoints(runic_corruption_talent)
+	{
+		# Try to put one rune of each set on cooldown to benefit from Runic Corruption procs.
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+		if Rune(blood) >= 2 Spell(blood_boil)
+		# Rune Strike to proc Runic Corruption.
+		Spell(rune_strike)
+	}
+	if not TalentPoints(blood_tap_talent) and not TalentPoints(runic_empowerment_talent) and not TalentPoints(runic_corruption_talent)
+	{
+		# Bank a pair of FU runes for emergency Death Strike.
+		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+		# Use up blood runes to generate runic power.
+		if Rune(blood) >= 1 Spell(blood_boil)
+		# Dump runic power.
+		Spell(rune_strike)
+	}
+}
+
 AddFunction BloodSingleTargetActions
 {
 	#death_strike,if=incoming_damage_5s>=health.max*0.65
@@ -65,34 +169,7 @@ AddFunction BloodSingleTargetActions
 	if BuffPresent(crimson_scourge_buff) Spell(blood_boil)
 	if Rune(blood) >= 1 and { target.DebuffRemains(frost_fever_debuff) <= 10 or target.DebuffRemains(blood_plague_debuff) <= 10 } Spell(blood_boil)
 
-	if TalentPoints(blood_tap_talent)
-	{
-		# Try to store one death rune in a blood rune socket.
-		if BuffStacks(blood_charge_buff) >= 5 and Rune(blood) < 1 Spell(blood_tap)
-		if BuffStacks(blood_charge_buff) >= 10
-		{
-			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-			if Rune(unholy) < 1 or Rune(frost) < 1 Spell(blood_tap)
-		}
-		if Rune(blood) >= 2 Spell(heart_strike)
-	}
-	if TalentPoints(runic_empowerment_talent)
-	{
-		if Rune(blood) >= 2 Spell(heart_strike)
-		if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-	}
-	if TalentPoints(runic_corruption_talent)
-	{
-		# Try to put one rune of each set on cooldown to benefit from Runic Corruption procs.
-		if Rune(blood) >= 2 Spell(heart_strike)
-		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-	}
-	if not TalentPoints(blood_tap_talent) and not TalentPoints(runic_empowerment_talent) and not TalentPoints(runic_corruption_talent)
-	{
-		if Rune(blood) >= 2 Spell(heart_strike)
-	}
-
-	Spell(rune_strike)
+	BloodSingleTargetLevel75Actions()
 	Spell(horn_of_winter)
 
 	#death_strike,if=(unholy=2|frost=2)&incoming_damage_5s>=health.max*0.4
@@ -119,34 +196,7 @@ AddFunction BloodAoeActions
 		}
 	}
 
-	if TalentPoints(blood_tap_talent)
-	{
-		# Try to store one death rune in a blood rune socket.
-		if BuffStacks(blood_charge_buff) >= 5 and Rune(blood) < 1 Spell(blood_tap)
-		if BuffStacks(blood_charge_buff) >= 10
-		{
-			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-			if Rune(unholy) < 1 or Rune(frost) < 1 Spell(blood_tap)
-		}
-		if Rune(blood) >= 2 Spell(blood_boil)
-	}
-	if TalentPoints(runic_empowerment_talent)
-	{
-		if Rune(blood) >= 2 Spell(blood_boil)
-		if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-	}
-	if TalentPoints(runic_corruption_talent)
-	{
-		# Try to put one rune of each set on cooldown to benefit from Runic Corruption procs.
-		if Rune(blood) >= 2 Spell(blood_boil)
-		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-	}
-	if not TalentPoints(blood_tap_talent) and not TalentPoints(runic_empowerment_talent) and not TalentPoints(runic_corruption_talent)
-	{
-		if Rune(blood) >= 2 Spell(blood_boil)
-	}
-
-	Spell(rune_strike)
+	BloodAoeLevel75Actions()
 	Spell(horn_of_winter)
 
 	#death_strike,if=(unholy=2|frost=2)&incoming_damage_5s>=health.max*0.4
