@@ -57,12 +57,12 @@ AddFunction BloodSingleTargetLevel75Actions
 	{
 		# Don't cap FU rune pairs.
 		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-		if BuffStacks(blood_charge_buff) >= 12
+		if BuffStacks(blood_charge_buff) >= 10
 		{
 			# Spend any FU pairs so we can use Blood Tap twice to reactivate an FU pair as death runes.
 			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
 			# Blood Tap once to reactivate one F/U death rune.
-			if { Rune(unholy) < 1 and Rune(frost) < 1 } or { RunicPower() >= MaxRunicPower() - 10 } Spell(blood_tap)
+			if { Rune(unholy) < 1 and Rune(frost) < 1 } or { RunicPower() >= MaxRunicPower() - 20 } Spell(blood_tap)
 		}
 		# Use Blood Tap a second time to reactivate another F/U death rune to bank a full FU pair.
 		if BuffStacks(blood_charge_buff) >= 5
@@ -109,12 +109,12 @@ AddFunction BloodAoeLevel75Actions
 	{
 		# Don't cap FU rune pairs.
 		if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-		if BuffStacks(blood_charge_buff) >= 12
+		if BuffStacks(blood_charge_buff) >= 10
 		{
 			# Spend any FU pairs so we can use Blood Tap twice to reactivate an FU pair as death runes.
 			if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
 			# Blood Tap once to reactivate one F/U death rune.
-			if { Rune(unholy) < 1 and Rune(frost) < 1 } or { RunicPower() >= MaxRunicPower() - 10 } Spell(blood_tap)
+			if { Rune(unholy) < 1 and Rune(frost) < 1 } or { RunicPower() >= MaxRunicPower() - 20 } Spell(blood_tap)
 		}
 		# Use Blood Tap a second time to reactivate another F/U death rune to bank a full FU pair.
 		if BuffStacks(blood_charge_buff) >= 5
