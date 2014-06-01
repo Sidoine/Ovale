@@ -60,8 +60,7 @@ AddFunction HolySelflessHealerAoeActions()
 
 AddFunction HolyPrecombatActions
 {
-	if not BuffPresent(str_agi_int any=1) Spell(blessing_of_kings)
-	if not BuffPresent(mastery any=1) and not BuffPresent(str_agi_int) Spell(blessing_of_might)
+	RaidBuffActions()
 	if not Stance(paladin_seal_of_insight) Spell(seal_of_insight)
 }
 
@@ -208,9 +207,8 @@ AddFunction ProtectionPrecombatActions
 	#flask,type=earth
 	#food,type=chun_tian_spring_rolls
 	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
-	if not BuffPresent(str_agi_int any=1) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
-	if not BuffPresent(mastery any=1) and not BuffPresent(str_agi_int) Spell(blessing_of_might)
+	RaidBuffActions()
 	#seal_of_insight
 	if not Stance(paladin_seal_of_insight) Spell(seal_of_insight)
 	#sacred_shield,if=talent.sacred_shield.enabled
@@ -411,11 +409,7 @@ AddFunction RetributionPrecombatActions
 	#food,type=black_pepper_ribs_and_shrimp
 	#blessing_of_kings,if=!aura.str_agi_int.up
 	#blessing_of_might,if=!aura.mastery.up
-	if not BuffPresent(str_agi_int any=1)
-	{
-		Spell(blessing_of_kings)
-		if not BuffPresent(mastery any=1) Spell(blessing_of_might)
-	}
+	RaidBuffActions()
 	#seal_of_truth,if=active_enemies<4
 	if not Stance(paladin_seal_of_truth) Spell(seal_of_truth)
 	#snapshot_stats
@@ -452,7 +446,7 @@ AddIcon mastery=retribution help=shortcd
 
 AddIcon mastery=retribution help=main
 {
-	RetributionPrecombatActions()
+	if InCombat(no) RetributionPrecombatActions()
 	RetributionDefaultActions()
 }
 

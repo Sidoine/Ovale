@@ -248,6 +248,14 @@ AddFunction Interrupt
 		}
 	}
 }
+
+AddFunction RaidBuffActions
+{
+	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
+	if BuffExpires(str_agi_int any=1) and BuffPresent(mastery any=1) and BuffExpires(mastery) Spell(blessing_of_kings)
+	#blessing_of_might,if=!aura.mastery.up
+	if BuffExpires(mastery any=1) Spell(blessing_of_might)
+}
 ]]
 
 	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")
