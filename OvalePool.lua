@@ -13,6 +13,14 @@ local OvalePool = {}
 Ovale.OvalePool = OvalePool
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvalePool")
+	profiler = Profiler.group["OvalePool"]
+end
+
 local assert = assert
 local setmetatable = setmetatable
 local tinsert = table.insert
@@ -26,6 +34,7 @@ OvalePool.name = "OvalePool"
 OvalePool.pool = nil
 OvalePool.size = 0
 OvalePool.unused = 0
+OvalePool.profiler = nil
 OvalePool.__index = OvalePool
 --</public-static-properties>
 
@@ -43,6 +52,7 @@ function OvalePool:NewPool(name)
 end
 
 function OvalePool:Get()
+	profiler.Start(self.name)
 	assert(self.pool)
 	local item = tremove(self.pool)
 	if item then
@@ -51,15 +61,18 @@ function OvalePool:Get()
 		self.size = self.size + 1
 		item = {}
 	end
+	profiler.Stop(self.name)
 	return item
 end
 
 function OvalePool:Release(item)
+	profiler.Start(self.name)
 	assert(self.pool)
 	self:Clean(item)
 	wipe(item)
 	tinsert(self.pool, item)
 	self.unused = self.unused + 1
+	profiler.Stop(self.name)
 end
 
 function OvalePool:GetReference(item)
@@ -75,9 +88,11 @@ function OvalePool:Clean(item)
 end
 
 function OvalePool:Drain()
+	profiler.Start(self.name)
 	self.pool = {}
 	self.size = self.size - self.unused
 	self.unused = 0
+	profiler.Stop(self.name)
 end
 
 function OvalePool:Debug()

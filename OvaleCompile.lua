@@ -13,6 +13,14 @@ local OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
 Ovale.OvaleCompile = OvaleCompile
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleCompile")
+	profiler = Profiler.group["OvaleCompile"]
+end
+
 local L = Ovale.L
 local OvalePool = Ovale.OvalePool
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
@@ -840,6 +848,7 @@ local function CompileDeclarations(text)
 end
 
 local function CompileScript(text)
+	profiler.Start("OvaleCompile_CompileScript")
 	local self = OvaleCompile
 	self_compileOnItems = false
 	self_compileOnStances = false
@@ -913,6 +922,7 @@ local function CompileScript(text)
 	for k, v in pairs(self_missingSpellList) do
 		OvaleSpellBook:AddSpell(k, v)
 	end
+	profiler.Stop("OvaleCompile_CompileScript")
 end
 --</private-static-methods>
 

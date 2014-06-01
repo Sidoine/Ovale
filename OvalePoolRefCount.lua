@@ -24,6 +24,14 @@ local OvalePoolRefCount = {}
 Ovale.OvalePoolRefCount = OvalePoolRefCount
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvalePoolRefCount")
+	profiler = Profiler.group["OvalePoolRefCount"]
+end
+
 local assert = assert
 local setmetatable = setmetatable
 local tinsert = table.insert
@@ -38,6 +46,7 @@ OvalePoolRefCount.pool = nil
 OvalePoolRefCount.refcount = nil
 OvalePoolRefCount.size = 0
 OvalePoolRefCount.unused = 0
+OvalePoolRefCount.profiler = nil
 OvalePoolRefCount.__index = OvalePoolRefCount
 --</public-static-properties>
 
@@ -47,14 +56,18 @@ local function ReferenceCount(item)
 end
 
 local function GetReference(item)
+	local poolObject = item._refcount_pool_object
+	profiler.Start(poolObject.name)
 	local refcount = item:ReferenceCount()
-	item._refcount_pool_object.refcount[item] = refcount + 1
+	poolObject.refcount[item] = refcount + 1
+	profiler.Stop(poolObject.name)
 	return item
 end
 
 local function ReleaseReference(item)
-	local refcount = item:ReferenceCount()
 	local poolObject = item._refcount_pool_object
+	profiler.Start(poolObject.name)
+	local refcount = item:ReferenceCount()
 	if refcount > 1 then
 		poolObject.refcount[item] = refcount - 1
 	else
@@ -64,6 +77,7 @@ local function ReleaseReference(item)
 		tinsert(poolObject.pool, item)
 		poolObject.unused = poolObject.unused + 1
 	end
+	profiler.Stop(poolObject.name)
 	return item
 end
 --</private-static-methods>
@@ -92,6 +106,7 @@ function OvalePoolRefCount:NewPool(name)
 end
 
 function OvalePoolRefCount:Get()
+	profiler.Start(self.name)
 	assert(self.pool and self.refcount)
 	local item = tremove(self.pool)
 	if item then
@@ -104,6 +119,7 @@ function OvalePoolRefCount:Get()
 		item[name] = method
 	end
 	item._refcount_pool_object = self
+	profiler.Stop(self.name)
 	return item:GetReference()
 end
 
@@ -124,9 +140,11 @@ function OvalePoolRefCount:Clean(item)
 end
 
 function OvalePoolRefCount:Drain()
+	profiler.Start(self.name)
 	self.pool = {}
 	self.size = self.size - self.unused
 	self.unused = 0
+	profiler.Stop(self.name)
 end
 
 function OvalePoolRefCount:Debug()

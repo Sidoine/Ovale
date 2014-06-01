@@ -15,6 +15,14 @@ local OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0", "AceTimer-3
 Ovale.OvaleEnemies = OvaleEnemies
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleEnemies")
+	profiler = Profiler.group["OvaleEnemies"]
+end
+
 local bit_band = bit.band
 local pairs = pairs
 local tostring = tostring
@@ -84,15 +92,18 @@ end
 -- These enemies are not in combat with your group, out of range, or
 -- incapacitated and shouldn't count toward the number of active enemies.
 function OvaleEnemies:RemoveInactiveEnemies()
+	profiler.Start("OvaleEnemies_RemoveInactiveEnemies")
 	local now = API_GetTime()
 	for guid, timestamp in pairs(self.enemyLastSeen) do
 		if now - timestamp > REAP_INTERVAL then
 			self:RemoveEnemy(guid)
 		end
 	end
+	profiler.Stop("OvaleEnemies_RemoveInactiveEnemies")
 end
 
 function OvaleEnemies:AddEnemy(guid, name, timestamp)
+	profiler.Start("OvaleEnemies_AddEnemy")
 	if not guid then return end
 	local seen = self.enemyLastSeen[guid]
 	self.enemyLastSeen[guid] = timestamp
@@ -102,9 +113,11 @@ function OvaleEnemies:AddEnemy(guid, name, timestamp)
 		Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
 		Ovale.refreshNeeded["player"] = true
 	end
+	profiler.Stop("OvaleEnemies_AddEnemy")
 end
 
 function OvaleEnemies:RemoveEnemy(guid, isDead)
+	profiler.Start("OvaleEnemies_RemoveEnemy")
 	if not guid then return end
 	local seen = self.enemyLastSeen[guid]
 	local name = self.enemyName[guid]
@@ -121,6 +134,7 @@ function OvaleEnemies:RemoveEnemy(guid, isDead)
 		self:SendMessage("Ovale_InactiveUnit", guid)
 		Ovale.refreshNeeded["player"] = true
 	end
+	profiler.Stop("OvaleEnemies_RemoveEnemy")
 end
 
 function OvaleEnemies:Debug()

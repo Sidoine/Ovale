@@ -13,6 +13,14 @@ local OvaleCooldown = Ovale:NewModule("OvaleCooldown", "AceEvent-3.0")
 Ovale.OvaleCooldown = OvaleCooldown
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleCooldown")
+	profiler = Profiler.group["OvaleCooldown"]
+end
+
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvaleGUID = nil
@@ -171,6 +179,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleCooldown:ResetState(state)
+	profiler.Start("OvaleCooldown_ResetState")
 	for _, cd in pairs(state.cd) do
 		-- Remove outdated cooldown state.
 		if cd.serial and cd.serial < self_serial then
@@ -179,6 +188,7 @@ function OvaleCooldown:ResetState(state)
 			end
 		end
 	end
+	profiler.Stop("OvaleCooldown_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -193,6 +203,7 @@ end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	profiler.Start("OvaleCooldown_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		local cd = state:GetCD(spellId)
@@ -257,6 +268,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast
 
 		Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
 	end
+	profiler.Stop("OvaleCooldown_ApplySpellAfterCast")
 end
 --</public-static-methods>
 
@@ -276,6 +288,7 @@ end
 
 -- Return the table holding the simulator's cooldown information for the given spell.
 statePrototype.GetCD = function(state, spellId)
+	profiler.Start("OvaleCooldown_state_GetCD")
 	local cdName = spellId
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.sharedcd then
@@ -329,6 +342,7 @@ statePrototype.GetCD = function(state, spellId)
 		cd.chargeStart = chargeStart
 	end
 
+	profiler.Stop("OvaleCooldown_state_GetCD")
 	return cd
 end
 

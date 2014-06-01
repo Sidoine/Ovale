@@ -14,6 +14,14 @@ local OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 Ovale.OvaleComboPoints = OvaleComboPoints
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleComboPoints")
+	profiler = Profiler.group["OvaleComboPoints"]
+end
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleData = nil
@@ -174,11 +182,14 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleComboPoints:ResetState(state)
+	profiler.Start("OvaleComboPoints_ResetState")
 	state.combo = self.combo or 0
+	profiler.Stop("OvaleComboPoints_ResetState")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	profiler.Start("OvaleComboPoints_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
 		local cost = state:ComboPointCost(spellId)
@@ -193,12 +204,14 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 		end
 		state.combo = power
 	end
+	profiler.Stop("OvaleComboPoints_ApplySpellAfterCast")
 end
 --</public-static-methods>
 
 --<state-methods>
 -- Return the number of combo points required to cast the given spell.
 statePrototype.ComboPointCost = function(state, spellId)
+	profiler.Start("OvaleComboPoints_state_ComboPointCost")
 	local spellCost = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
@@ -249,6 +262,7 @@ statePrototype.ComboPointCost = function(state, spellId)
 		end
 		spellCost = cost
 	end
+	profiler.Stop("OvaleComboPoints_state_ComboPointCost")
 	return spellCost
 end
 --</state-methods>

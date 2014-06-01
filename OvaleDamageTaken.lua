@@ -14,6 +14,14 @@ local OvaleDamageTaken = Ovale:NewModule("OvaleDamageTaken", "AceEvent-3.0")
 Ovale.OvaleDamageTaken = OvaleDamageTaken
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleDamageTaken")
+	profiler = Profiler.group["OvaleDamageTaken"]
+end
+
 local OvalePool = Ovale.OvalePool
 local OvaleQueue = Ovale.OvaleQueue
 
@@ -60,6 +68,7 @@ function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEven
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
 
 	if destGUID == self_guid and strsub(cleuEvent, -7) == "_DAMAGE" then
+		profiler.Start("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
 		local now = API_GetTime()
 		local eventPrefix = strsub(cleuEvent, 1, 6)
 		if eventPrefix == "SWING_" then
@@ -71,6 +80,7 @@ function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEven
 			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", cleuEvent, spellName, amount)
 			self:AddDamageTaken(now, amount)
 		end
+		profiler.Stop("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
 	end
 end
 
@@ -79,11 +89,13 @@ function OvaleDamageTaken:PLAYER_REGEN_ENABLED(event)
 end
 
 function OvaleDamageTaken:AddDamageTaken(timestamp, damage)
+	profiler.Start("OvaleDamageTaken_AddDamageTaken")
 	local event = self_pool:Get()
 	event.timestamp = timestamp
 	event.damage = damage
 	self.damageEvent:InsertFront(event)
 	self:RemoveExpiredEvents(timestamp)
+	profiler.Stop("OvaleDamageTaken_AddDamageTaken")
 end
 
 -- Return the total damage taken in the previous time interval (in seconds).
@@ -107,6 +119,7 @@ end
 
 -- Remove all events that are more than DAMAGE_TAKEN_WINDOW seconds before the given timestamp.
 function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
+	profiler.Start("OvaleDamageTaken_RemoveExpiredEvents")
 	while true do
 		local event = self.damageEvent:Back()
 		if not event then break end
@@ -118,6 +131,7 @@ function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
 			self_pool:Release(event)
 		end
 	end
+	profiler.Stop("OvaleDamageTaken_RemoveExpiredEvents")
 end
 
 function OvaleDamageTaken:Debug()

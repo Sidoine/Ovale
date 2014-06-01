@@ -13,6 +13,14 @@ local OvaleEquipement = Ovale:NewModule("OvaleEquipement", "AceEvent-3.0")
 Ovale.OvaleEquipement = OvaleEquipement
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleEquipement")
+	profiler = Profiler.group["OvaleEquipement"]
+end
+
 local pairs = pairs
 local strgsub = string.gsub
 local strmatch = string.match
@@ -415,6 +423,7 @@ function OvaleEquipement:OnDisable()
 end
 
 function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
+	profiler.Start("OvaleEquipement_PLAYER_EQUIPMENT_CHANGED")
 	if hasItem then
 		self.equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
 		self.equippedItemLevels[slotId] = GetItemLevel(slotId)
@@ -437,6 +446,7 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 
 	self:UpdateArmorSetCount()
 	self:SendMessage("Ovale_EquipmentChanged")
+	profiler.Stop("OvaleEquipement_PLAYER_EQUIPMENT_CHANGED")
 end
 
 do
@@ -575,6 +585,7 @@ function OvaleEquipement:HasOneHandedWeapon(slotId)
 end
 
 function OvaleEquipement:UpdateArmorSetCount()
+	profiler.Start("OvaleEquipement_UpdateArmorSetCount")
 	wipe(self.armorSetCount)
 	for i = 1, #OVALE_ARMORSET_SLOT_IDS do
 		local itemId = self:GetEquippedItem(OVALE_ARMORSET_SLOT_IDS[i])
@@ -589,9 +600,11 @@ function OvaleEquipement:UpdateArmorSetCount()
 			end
 		end
 	end	
+	profiler.Stop("OvaleEquipement_UpdateArmorSetCount")
 end
 
 function OvaleEquipement:UpdateEquippedItems()
+	profiler.Start("OvaleEquipement_UpdateEquippedItems")
 	local changed = false
 	local item
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
@@ -615,9 +628,11 @@ function OvaleEquipement:UpdateEquippedItems()
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
 	self.ready = true
+	profiler.Stop("OvaleEquipement_UpdateEquippedItems")
 end
 
 function OvaleEquipement:UpdateEquippedItemLevels()
+	profiler.Start("OvaleEquipement_UpdateEquippedItemLevels")
 	local changed = false
 	local itemLevel
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
@@ -630,10 +645,12 @@ function OvaleEquipement:UpdateEquippedItemLevels()
 	if changed then
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
+	profiler.Stop("OvaleEquipement_UpdateEquippedItemLevels")
 	return changed
 end
 
 function OvaleEquipement:UpdateMetaGem()
+	profiler.Start("OvaleEquipement_UpdateMetaGem")
 	local changed = false
 	local gemId = API_GetInventoryItemGems(INVSLOT_HEAD)
 	if gemId then
@@ -650,6 +667,7 @@ function OvaleEquipement:UpdateMetaGem()
 			changed = true
 		end
 	end
+	profiler.Stop("OvaleEquipement_UpdateMetaGem")
 	return changed
 end
 

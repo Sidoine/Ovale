@@ -14,6 +14,14 @@ local OvaleStance = Ovale:NewModule("OvaleStance", "AceEvent-3.0")
 Ovale.OvaleStance = OvaleStance
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleStance")
+	profiler = Profiler.group["OvaleStance"]
+end
+
 local ipairs = ipairs
 local pairs = pairs
 local tinsert = table.insert
@@ -112,6 +120,7 @@ end
 
 -- Fill OvaleStance.stanceList with stance bar index <-> Ovale stance name mappings.
 function OvaleStance:CreateStanceList()
+	profiler.Start("OvaleStance_CreateStanceList")
 	wipe(self.stanceList)
 	local _, name, stanceName
 	for i = 1, API_GetNumShapeshiftForms() do
@@ -121,6 +130,7 @@ function OvaleStance:CreateStanceList()
 			self.stanceList[i] = stanceName
 		end
 	end
+	profiler.Stop("OvaleStance_CreateStanceList")
 end
 
 -- Print out the list of stances in alphabetical order.
@@ -159,11 +169,13 @@ function OvaleStance:IsStance(name)
 end
 
 function OvaleStance:ShapeshiftEventHandler()
+	profiler.Start("OvaleStance_ShapeshiftEventHandler")
 	local newStance = API_GetShapeshiftForm()
 	if self.stance ~= newStance then
 		self.stance = newStance
 		self:SendMessage("Ovale_StanceChanged")
 	end
+	profiler.Stop("OvaleStance_ShapeshiftEventHandler")
 end
 
 function OvaleStance:UpdateStances()

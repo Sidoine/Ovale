@@ -16,6 +16,14 @@ local OvaleEclipse = Ovale:NewModule("OvaleEclipse", "AceEvent-3.0")
 Ovale.OvaleEclipse = OvaleEclipse
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	Profiler:RegisterProfilingGroup("OvaleEclipse")
+	profiler = Profiler.group["OvaleEclipse"]
+end
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleData = nil
@@ -209,29 +217,36 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleEclipse:ResetState(state)
+	profiler.Start("OvaleEclipse_ResetState")
 	state.eclipseDirection = self.eclipseDirection
+	profiler.Stop("OvaleEclipse_ResetState")
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
 function OvaleEclipse:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	profiler.Start("OvaleEclipse_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
 		state:ApplyEclipseEnergy(spellId, startCast, spellcast.snapshot)
 	end
+	profiler.Stop("OvaleEclipse_ApplySpellStartCast")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	profiler.Start("OvaleEclipse_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
 		state:ApplyEclipseEnergy(spellId, endCast, spellcast.snapshot)
 	end
+	profiler.Stop("OvaleEclipse_ApplySpellAfterCast")
 end
 --</public-static-methods>
 
 --<state-methods>
 -- Update the state of the simulator for the eclipse energy gained by casting the given spell.
 statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
+	profiler.Start("OvaleEclipse_ApplyEclipseEnergy")
 	if spellId == CELESTIAL_ALIGNMENT then
 		local aura = state:AddAuraToGUID(self_guid, spellId, self_guid, "HELPFUL", atTime, atTime + 15, snapshot)
 		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)
@@ -283,6 +298,7 @@ statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
 			state.eclipseDirection = direction
 		end
 	end
+	profiler.Stop("OvaleEclipse_ApplyEclipseEnergy")
 end
 
 statePrototype.EclipseEnergy = function(state, spellId)
