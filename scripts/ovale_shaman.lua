@@ -225,9 +225,9 @@ AddFunction EnhancementAoeActions
 	#lava_lash,if=dot.flame_shock.ticking
 	if target.DebuffPresent(flame_shock_debuff) Spell(lava_lash)
 	#elemental_blast,if=talent.elemental_blast.enabled&buff.maelstrom_weapon.react>=1
-	if TalentPoints(elemental_blast_talent) and BuffPresent(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
+	if TalentPoints(elemental_blast_talent) and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
 	#chain_lightning,if=active_enemies>=2&buff.maelstrom_weapon.react>=3
-	if Enemies() >= 2 and BuffPresent(maelstrom_weapon_buff) >= 3 Spell(chain_lightning)
+	if Enemies() >= 2 and BuffStacks(maelstrom_weapon_buff) >= 3 Spell(chain_lightning)
 	#unleash_elements
 	Spell(unleash_elements)
 	#flame_shock,cycle_targets=1,if=!ticking
@@ -237,7 +237,7 @@ AddFunction EnhancementAoeActions
 	#fire_nova,if=active_flame_shock>=3
 	if DebuffCountOnAny(flame_shock_debuff) >= 3 Spell(fire_nova)
 	#chain_lightning,if=active_enemies>=2&buff.maelstrom_weapon.react>=1
-	if Enemies() >= 2 and BuffPresent(maelstrom_weapon_buff) >= 1 Spell(chain_lightning)
+	if Enemies() >= 2 and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(chain_lightning)
 	#stormstrike
 	Spell(stormstrike)
 	#earth_shock,if=active_enemies<4
@@ -257,9 +257,9 @@ AddFunction EnhancementSingleActions
 	#unleash_elements,if=(talent.unleashed_fury.enabled|set_bonus.tier16_2pc_melee=1)
 	if { TalentPoints(unleashed_fury_talent) or ArmorSetBonus(T16_melee 2) == 1 } Spell(unleash_elements)
 	#elemental_blast,if=talent.elemental_blast.enabled&buff.maelstrom_weapon.react>=1
-	if TalentPoints(elemental_blast_talent) and BuffPresent(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
+	if TalentPoints(elemental_blast_talent) and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
 	#lightning_bolt,if=buff.maelstrom_weapon.react=5
-	if BuffPresent(maelstrom_weapon_buff) == 5 Spell(lightning_bolt)
+	if BuffStacks(maelstrom_weapon_buff) == 5 Spell(lightning_bolt)
 	#stormblast
 	Spell(stormblast)
 	#stormstrike
@@ -269,7 +269,7 @@ AddFunction EnhancementSingleActions
 	#lava_lash
 	Spell(lava_lash)
 	#lightning_bolt,if=set_bonus.tier15_2pc_melee=1&buff.maelstrom_weapon.react>=4&!buff.ascendance.up
-	if ArmorSetBonus(T15_melee 2) == 1 and BuffPresent(maelstrom_weapon_buff) >= 4 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
+	if ArmorSetBonus(T15_melee 2) == 1 and BuffStacks(maelstrom_weapon_buff) >= 4 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
 	#flame_shock,if=(buff.unleash_flame.up&(dot.flame_shock.remains<10|action.flame_shock.tick_damage>dot.flame_shock.tick_dmg))|!ticking
 	if { BuffPresent(unleash_flame_buff) and { target.DebuffRemains(flame_shock_debuff) < 10 or Damage(flame_shock) > target.LastEstimatedDamage(flame_shock_debuff) } } or not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
 	#unleash_elements
@@ -277,21 +277,21 @@ AddFunction EnhancementSingleActions
 	#frost_shock,if=glyph.frost_shock.enabled&set_bonus.tier14_4pc_melee=0
 	if Glyph(glyph_of_frost_shock) and ArmorSetBonus(T14_melee 4) == 0 Spell(frost_shock)
 	#lightning_bolt,if=buff.maelstrom_weapon.react>=3&!buff.ascendance.up
-	if BuffPresent(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
+	if BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
 	#lightning_bolt,if=buff.ancestral_swiftness.up
 	if BuffPresent(ancestral_swiftness_buff) or Spell(ancestral_swiftness) Spell(lightning_bolt)
 	#earth_shock,if=(!glyph.frost_shock.enabled|set_bonus.tier14_4pc_melee=1)
 	if { not Glyph(glyph_of_frost_shock) or ArmorSetBonus(T14_melee 4) == 1 } Spell(earth_shock)
 	#lightning_bolt,if=buff.maelstrom_weapon.react>1&!buff.ascendance.up
-	if BuffPresent(maelstrom_weapon_buff) > 1 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
+	if BuffStacks(maelstrom_weapon_buff) > 1 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
 }
 
 AddFunction EnhancementSingleCdActions
 {
 	unless not TotemPresent(fire)
 		or { { TalentPoints(unleashed_fury_talent) or ArmorSetBonus(T16_melee 2) == 1 } and Spell(unleash_elements) }
-		or { TalentPoints(elemental_blast_talent) and BuffPresent(maelstrom_weapon_buff) >= 1 and Spell(elemental_blast) }
-		or BuffPresent(maelstrom_weapon_buff) == 5
+		or { TalentPoints(elemental_blast_talent) and BuffStacks(maelstrom_weapon_buff) >= 1 and Spell(elemental_blast) }
+		or BuffStacks(maelstrom_weapon_buff) == 5
 	{
 		#feral_spirit,if=set_bonus.tier15_4pc_melee=1
 		if ArmorSetBonus(T15_melee 4) == 1 Spell(feral_spirit)
@@ -300,14 +300,14 @@ AddFunction EnhancementSingleCdActions
 			or Spell(stormstrike)
 			or { BuffPresent(unleash_flame_buff) and not target.DebuffPresent(flame_shock_debuff) and Spell(flame_shock) }
 			or Spell(lava_lash)
-			or { ArmorSetBonus(T15_melee 2) == 1 and BuffPresent(maelstrom_weapon_buff) >= 4 and not BuffPresent(ascendance_melee_buff) }
+			or { ArmorSetBonus(T15_melee 2) == 1 and BuffStacks(maelstrom_weapon_buff) >= 4 and not BuffPresent(ascendance_melee_buff) }
 			or { { BuffPresent(unleash_flame_buff) and { target.DebuffRemains(flame_shock_debuff) < 10 or Damage(flame_shock) > target.LastEstimatedDamage(flame_shock_debuff) } } or not target.DebuffPresent(flame_shock_debuff) or Spell(flame_shock) }
 			or Spell(unleash_elements)
 			or { Glyph(glyph_of_frost_shock) and ArmorSetBonus(T14_melee 4) == 0 and Spell(frost_shock) }
-			or { BuffPresent(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) }
+			or { BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) }
 		{
 			#ancestral_swiftness,if=talent.ancestral_swiftness.enabled&buff.maelstrom_weapon.react<2
-			if TalentPoints(ancestral_swiftness_talent) and BuffPresent(maelstrom_weapon_buff) < 2 Spell(ancestral_swiftness)
+			if TalentPoints(ancestral_swiftness_talent) and BuffStacks(maelstrom_weapon_buff) < 2 Spell(ancestral_swiftness)
 
 			unless BuffPresent(ancestral_swiftness_buff)
 				or { { not Glyph(glyph_of_frost_shock) or ArmorSetBonus(T14_melee 4) == 1 } and Spell(earth_shock) }

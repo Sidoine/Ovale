@@ -68,7 +68,7 @@ AddFunction DemonologyDefaultActions
 	#cancel_metamorphosis,if=buff.metamorphosis.up&buff.dark_soul.down&demonic_fury<=650&target.time_to_die>30&(cooldown.metamorphosis.remains<4|demonic_fury<=300)&!(action.hand_of_guldan.in_flight&dot.shadowflame.remains)
 	if BuffPresent(metamorphosis_buff) and BuffExpires(dark_soul_knowledge_buff) and DemonicFury() <= 650 and target.TimeToDie() > 30 and { SpellCooldown(metamorphosis) < 4 or DemonicFury() <= 300 } and not { InFlightToTarget(hand_of_guldan) and target.DebuffRemains(shadowflame_debuff) } Spell(cancel_metamorphosis)
 	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
-	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffRemains(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemains(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
+	if BuffPresent(metamorphosis_buff) and BuffStacks(molten_core_buff) and { BuffRemains(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemains(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
 	#touch_of_chaos,if=buff.metamorphosis.up
 	if BuffPresent(metamorphosis_buff) Spell(touch_of_chaos)
 	#metamorphosis,if=(buff.dark_soul.up&buff.dark_soul.remains<demonic_fury%32)|demonic_fury>=950|demonic_fury%32>target.time_to_die|(action.hand_of_guldan.in_flight&dot.shadowflame.remains)
@@ -80,7 +80,7 @@ AddFunction DemonologyDefaultActions
 	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&(charges=2|dot.shadowflame.remains>travel_time|(charges=1&recharge_time<4))
 	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemains(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and { Charges(hand_of_guldan) == 2 or target.DebuffRemains(shadowflame_debuff) > 0.5 or { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 } } Spell(hand_of_guldan)
 	#soul_fire,if=buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)&(buff.molten_core.react>9|target.health.pct<=28)
-	if BuffPresent(molten_core_buff) and { BuffRemains(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemains(dark_soul_knowledge_buff) > CastTime(soul_fire) } and { BuffPresent(molten_core_buff) > 9 or target.HealthPercent() <= 28 } Spell(soul_fire)
+	if BuffStacks(molten_core_buff) and { BuffRemains(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemains(dark_soul_knowledge_buff) > CastTime(soul_fire) } and { BuffStacks(molten_core_buff) > 9 or target.HealthPercent() <= 28 } Spell(soul_fire)
 	#life_tap,if=mana.pct<60
 	if ManaPercent() < 60 Spell(life_tap)
 	#shadow_bolt

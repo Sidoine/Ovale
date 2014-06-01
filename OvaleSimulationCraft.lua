@@ -811,6 +811,10 @@ do
 				tinsert(simc.symbols, "lightning_shield_buff")
 				return "BuffStacks(lightning_shield_buff)"
 			end,
+		["^buff%.maelstrom_weapon%.react$"] = function(simc, action)
+				tinsert(simc.symbols, "maelstrom_weapon_buff")
+				return "BuffStacks(maelstrom_weapon_buff)"
+			end,
 		["^pet%.greater_fire_elemental%.active$"] = "TotemPresent(fire totem=fire_elemental_totem)",
 		["^pet%.primal_fire_elemental%.active$"] = "TotemPresent(fire totem=fire_elemental_totem)",
 		-- Warlock
@@ -821,6 +825,10 @@ do
 		["^buff%.havoc%.stack$"] = function(simc, action)
 				tinsert(simc.symbols, "havoc_debuff")
 				return "DebuffStacksOnAny(havoc_debuff)"
+			end,
+		["^buff%.molten_core%.react$"] = function(simc, action)
+				tinsert(simc.symbols, "molten_core_buff")
+				return "BuffStacks(molten_core_buff)"
 			end,
 		["^debuff%.magic_vulnerability%.down$"] = "target.DebuffExpires(magic_vulnerability any=1)",
 		["^debuff%.magic_vulnerability%.up$"] = "target.DebuffPresent(magic_vulnerability any=1)",
