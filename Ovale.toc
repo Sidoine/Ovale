@@ -18,6 +18,9 @@ locales\files.xml
 
 Ovale.lua
 
+# Profiling module.
+Profiler.lua
+
 # Utility modules.
 OvaleLexer.lua
 OvalePool.lua

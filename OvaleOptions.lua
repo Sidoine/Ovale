@@ -678,6 +678,30 @@ local self_options =
 						if Ovale.OvaleStance then Ovale.OvaleStance:DebugStances() end
 					end
 				},
+				profilestart = {
+					order = -10,
+					name = "Start gathering profiling stats",
+					type = "execute",
+					func = function() Ovale.Profiler:Enable(nil, true) end,
+				},
+				profilestop = {
+					order = -11,
+					name = "Stop gathering profiling stats",
+					type = "execute",
+					func = function() Ovale.Profiler:Disable(nil, true) end,
+				},
+				profilereset = {
+					order = -12,
+					name = "Reset profiling stats",
+					type = "execute",
+					func = function() Ovale.Profiler:Reset() end,
+				},
+				profile = {
+					order = -13,
+					name = "Print profiling stats",
+					type = "execute",
+					func = function() Ovale.Profiler:Info() end,
+				},
 			},
 		},
 	},

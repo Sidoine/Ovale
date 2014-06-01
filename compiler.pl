@@ -110,6 +110,7 @@ $sp{Ovale}{OvaleQueue} = true;
 $sp{Ovale}{OvaleSimulationCraft} = true;
 $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleTimeSpan} = true;
+$sp{Ovale}{Profiler} = true;
 
 $m{OvaleQueue}{NewQueue} = true;
 $sp{OvaleQueue}{Front} = true;
