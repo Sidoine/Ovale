@@ -14,7 +14,7 @@ local OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 Ovale.OvalePaperDoll = OvalePaperDoll
 
 --<private-static-properties>
-local OvalePoolRefCount = Ovale.OvalePoolRefCount
+local OvalePool = Ovale.OvalePoolRefCount
 
 -- Forward declarations for module dependencies.
 local OvaleEquipement = nil
@@ -48,7 +48,7 @@ local CR_HASTE_MELEE = CR_HASTE_MELEE
 -- Player's class.
 local _, self_class = API_UnitClass("player")
 -- Snapshot table pool.
-local self_pool = OvalePoolRefCount("OvalePaperDoll_pool")
+local self_pool = OvalePool("OvalePaperDoll_pool")
 -- Total number of snapshots taken.
 local self_snapshotCount = 0
 
