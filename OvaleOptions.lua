@@ -709,6 +709,12 @@ local self_options =
 					type = "execute",
 					func = function() Ovale:Print(Ovale.version) end,
 				},
+				ping = {
+					order = -15,
+					name = "Ping for Ovale users in group",
+					type = "execute",
+					func = function() Ovale:VersionCheck() end,
+				},
 			},
 		},
 	},

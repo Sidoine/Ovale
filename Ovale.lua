@@ -9,19 +9,22 @@
 --]]----------------------------------------------------------------------
 
 local addonName, addonTable = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, addonName, "AceConsole-3.0", "AceEvent-3.0")
+Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, addonName, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
 
 --<private-static-properties>
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local OvaleOptions = nil
 
 local format = string.format
+local next = next
 local pairs = pairs
 local select = select
 local tostring = tostring
 local wipe = table.wipe
 local API_GetTime = GetTime
+local API_IsInGroup = IsInGroup
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
+local API_SendAddonMessage = SendAddonMessage
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
@@ -93,6 +96,7 @@ function Ovale:OnInitialize()
 end
 
 function Ovale:OnEnable()
+	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -102,10 +106,53 @@ function Ovale:OnEnable()
 end
 
 function Ovale:OnDisable()
+	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self.frame:Hide()
+end
+
+do
+	local versionReply = {}
+	local timer
+
+	function Ovale:CHAT_MSG_ADDON(event, ...)
+		local prefix, message, channel, sender = ...
+		if prefix == OVALE_MSG_PREFIX then
+			local ok, msgType, version = self:Deserialize(message)
+			if ok then
+				if msgType == "V" then
+					local msg = self:Serialize("VR", self.version)
+					local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
+					API_SendAddonMessage(OVALE_MSG_PREFIX, msg, channel)
+				elseif msgType == "VR" then
+					versionReply[sender] = version
+				end
+			end
+		end
+	end
+
+	function Ovale:VersionCheck()
+		if not timer then
+			wipe(versionReply)
+			local message = "V"
+			local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
+			API_SendAddonMessage(OVALE_MSG_PREFIX, message, channel)
+			timer = self:ScheduleTimer("PrintVersionCheck", 3)
+		end
+	end
+
+	function Ovale:PrintVersionCheck()
+		if next(versionReply) then
+			for sender, version in pairs(versionReply) do
+				self:FormatPrint(">>> %s is using Ovale %s", sender, version)
+			end
+		else
+			self:Print(">>> No other Ovale users present.")
+		end
+		timer = nil
+	end
 end
 
 --Called when the player target change
