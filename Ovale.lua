@@ -21,6 +21,7 @@ local select = select
 local tostring = tostring
 local wipe = table.wipe
 local API_GetTime = GetTime
+local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
@@ -29,6 +30,9 @@ local API_UnitIsDead = UnitIsDead
 local OVALE_FALSE_STRING = tostring(false)
 local OVALE_NIL_STRING = tostring(nil)
 local OVALE_TRUE_STRING = tostring(true)
+
+-- Addon message prefix.
+local OVALE_MSG_PREFIX = addonName
 --</private-static-properties>
 
 --<public-static-properties>
@@ -81,10 +85,14 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function Ovale:OnEnable()
-    -- Called when the addon is enabled
+function Ovale:OnInitialize()
+	-- Resolve module dependencies.
 	OvaleOptions = self:GetModule("OvaleOptions")
+	-- Register message prefix for the addon.
+	API_RegisterAddonMessagePrefix(OVALE_MSG_PREFIX)
+end
 
+function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -94,7 +102,6 @@ function Ovale:OnEnable()
 end
 
 function Ovale:OnDisable()
-    -- Called when the addon is disabled
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")

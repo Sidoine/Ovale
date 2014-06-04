@@ -29,24 +29,25 @@
 ]]--
 
 local addonName, Ovale = ...
-local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0")
+local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0", "AceSerializer-3.0")
 Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
 local pairs = pairs
 local strsplit = string.split
-local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
+local API_IsInGroup = IsInGroup
 local API_SendAddonMessage = SendAddonMessage
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
+local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 -- Player's GUID.
 local self_guid = nil
 -- Player's name.
 local self_name = nil
 
--- Message prefix.
-local MSG_PREFIX = addonName
+-- Addon message prefix.
+local OVALE_MSG_PREFIX = addonName
 --</private-static-properties>
 
 --<public-static-properties>
@@ -66,7 +67,6 @@ OvaleScore.scoredSpell = {}
 function OvaleScore:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self_name = API_UnitName("player")
-	API_RegisterAddonMessagePrefix(MSG_PREFIX)
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -81,19 +81,21 @@ end
 -- Receive scores for damage meters from other Ovale addons in the raid.
 function OvaleScore:CHAT_MSG_ADDON(event, ...)
 	local prefix, message, channel, sender = ...
-	if prefix ~= MSG_PREFIX then return end
-	if channel ~= "RAID" and channel ~= "PARTY" then return end
-
-	local scored, scoreMax, guid = strsplit(";", message)
-	self:SendScore(sender, guid, scored, scoreMax)
+	if prefix == OVALE_MSG_PREFIX then
+		local ok, msgType, scored, scoreMax, guid = self:Deserialize(message)
+		if ok and msgType == "S" then
+			self:SendScore(sender, guid, scored, scoreMax)
+		end
+	end
 end
 
 function OvaleScore:PLAYER_REGEN_ENABLED()
 	-- Broadcast the player's own score for damage meters when combat ends.
 	-- Broadcast message is "score;maxScore;playerGUID"
-	if self.maxScore > 0 then
-		local message = self.score .. ";" .. self.maxScore .. ";" .. self_guid
-		API_SendAddonMessage(MSG_PREFIX, message, "RAID")
+	if self.maxScore > 0 and API_IsInGroup() then
+		local message = self:Serialize("score", self,score, self.maxScore, self_guid)
+		local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
+		API_SendAddonMessage(OVALE_MSG_PREFIX, message, channel)
 	end
 end
 
