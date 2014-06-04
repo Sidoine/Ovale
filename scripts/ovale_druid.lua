@@ -62,10 +62,11 @@ AddFunction BalanceElitistJerksDotActions
 
 # Minimize the time spent outside of Eclipse by only casting Starsurge at the appropriate times:
 #	* The Shooting Stars buff is about to expire.
-#	* Always during Lunar Eclipse unless it pushes you out of Eclipse during Starfall.
-#	* Always when outside Lunar Eclipse and moving toward Solar Eclipse.
+#	* During Lunar Eclipse unless it pushes you out of Eclipse during Starfall.
+#	* When outside Lunar Eclipse and moving toward Solar Eclipse.
 #	* The first time Starsurge is available during Solar Eclipse.
 #	* The second time Starsurge is available during Solar Eclipse only at 5 Eclipse energy.
+#	* When outside Solar Eclipse and moving toward Lunar Eclipse.
 #
 AddFunction BalanceElitistJerksStarsurgeCondition
 {
@@ -73,18 +74,33 @@ AddFunction BalanceElitistJerksStarsurgeCondition
 	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() > 20 }
 	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() <= 20 and BuffPresent(shooting_stars_buff) and BuffExpires(starfall_buff) }
 	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() <= 20 and BuffExpires(shooting_stars_buff) and BuffRemains(starfall_buff) < CastTime(starsurge) }
-	or { BuffExpires(lunar_eclipse_buff) and EclipseDir() > 0 }
+	or { BuffExpires(lunar_eclipse_buff) and EclipseDir() >= 0 }
 	or { BuffPresent(solar_eclipse_buff) and { Eclipse(asValue=1) - 10 } % 15 == 0 }
 	or { BuffPresent(solar_eclipse_buff) and Eclipse() == 5 }
-	or { BuffExpires(solar_eclipse_buff) and EclipseDir() < 0 }
+	or { BuffExpires(solar_eclipse_buff) and EclipseDir() <= 0 }
+}
+
+# Only suggest Starfire at the appropriate times:
+#	* During Lunar Eclipse unless it pushes you out of Eclipse during Starfall.
+#	* When outside Lunar Eclipse and moving toward Solar Eclipse.
+#
+AddFunction BalanceElitistJerksStarfireCondition
+{
+	   { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() > 20 }
+	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() <= 20 and BuffRemains(starfall_buff) < CastTime(starfire) }
+	or { BuffExpires(lunar_eclipse_buff) and EclipseDir() >= 0 }
 }
 
 AddFunction BalanceElitistJerksMainActions
 {
+	# Proc Dream of Cenarius with Healing Touch if one cast away from reaching Eclipse.
+	if TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BalanceIsNearEclipseState() Spell(healing_touch)
 	# Cast instant-cast Starsurge.
 	if BuffPresent(shooting_stars_buff) and BalanceElitistJerksStarsurgeCondition() Spell(starsurge)
 	# Apply and maintain Moonfire and Sunfire on the target.
 	BalanceElitistJerksDotActions()
+	# Proc Dream of Cenarius with Healing Touch after refreshing DoTs if outside of major CD buffs.
+	if TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BuffExpires(celestial_alignment) and BuffExpires(chosen_of_elune_buff) Spell(healing_touch)
 	# Cast Starsurge on cooldown.
 	if BalanceElitistJerksStarsurgeCondition() Spell(starsurge)
 	# Spam Starfire during Celestial Alignment.
@@ -92,7 +108,7 @@ AddFunction BalanceElitistJerksMainActions
 	# Cast Wrath as Celestial Alignment is expiring if the cast will finish before the buff expires.
 	if BuffPresent(celestial_alignment_buff) and CastTime(wrath) < BuffRemains(celestial_alignment_buff) Spell(wrath)
 	# Cast Starfire if moving toward Solar Eclipse (only if it won't affect Eclipsed Starfall).
-	if EclipseDir() > 0 and { BuffExpires(lunar_eclipse_buff) or 0 - Eclipse() > 20 or { 0 - Eclipse() <= 20 and BuffRemains(starfall_buff) < CastTime(starfire) } } Spell(starfire)
+	if EclipseDir() > 0 and BalanceElitistJerksStarfireCondition() Spell(starfire)
 	# Filler
 	Spell(wrath)
 }
@@ -106,6 +122,20 @@ AddFunction BalanceElitistJerksMovingActions
 	if WildMushroomCount() < 3 Spell(wild_mushroom_caster)
 	if BuffPresent(solar_eclipse_buff) Spell(sunfire)
 	Spell(moonfire)
+}
+
+AddFunction BalanceElitistJerksCdActions
+{
+	if BuffPresent(burst_haste any=1) or target.TimeToDie() <= 40 or BuffPresent(celestial_alignment_buff) UsePotionIntellect()
+	if BuffPresent(celestial_alignment_buff) Spell(berserking)
+	if BuffPresent(celestial_alignment_buff) or SpellCooldown(celestial_alignment) > 30 UseItemActions()
+	if TalentPoints(natures_vigil_talent) and BuffPresent(celestial_alignment_buff) or BuffPresent(chosen_of_elune_buff) Spell(natures_vigil)
+
+	unless { TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BalanceIsNearEclipseState() }
+	{
+		if TalentPoints(incarnation_talent) and { BuffPresent(lunar_eclipse_buff) or BuffPresent(solar_eclipse_buff) } and BuffPresent(natures_grace_buff) Spell(incarnation)
+		if { BuffExpires(lunar_eclipse_buff) and BuffExpires(solar_eclipse_buff) } and { BuffPresent(chosen_of_elune_buff) or not TalentPoints(incarnation_talent) or SpellCooldown(incarnation) > 10 } Spell(celestial_alignment)
+	}
 }
 
 # Based on SimulationCraft profile "Druid_Balance_T16H".
@@ -173,15 +203,14 @@ AddFunction BalanceDefaultMovingActions
 	Spell(sunfire)
 }
 
-AddFunction BalanceHurricaneActions
+AddFunction BalanceAoeActions
 {
-	unless { TalentPoints(dream_of_cenarius_talent) and not BuffPresent(dream_of_cenarius_caster_buff) and ManaPercent() > 25 and Spell(healing_touch) }
-	{
-		#hurricane,if=active_enemies>4&buff.solar_eclipse.up&buff.natures_grace.up
-		if BuffPresent(solar_eclipse_buff) and BuffPresent(natures_grace_buff) Spell(hurricane)
-		#hurricane,if=active_enemies>5&buff.solar_eclipse.up&mana.pct>25
-		if BuffPresent(solar_eclipse_buff) and ManaPercent() > 25 Spell(hurricane)
-	}
+	#wild_mushroom_detonate,moving=0,if=buff.wild_mushroom.stack>0&buff.solar_eclipse.up
+	if WildMushroomCount() > 0 and BuffPresent(solar_eclipse_buff) Spell(wild_mushroom_detonate)
+	#hurricane,if=active_enemies>4&buff.solar_eclipse.up&buff.natures_grace.up
+	if BuffPresent(solar_eclipse_buff) and BuffPresent(natures_grace_buff) Spell(hurricane)
+	#hurricane,if=active_enemies>5&buff.solar_eclipse.up&mana.pct>25
+	if BuffPresent(solar_eclipse_buff) and ManaPercent() > 25 Spell(hurricane)
 }
 
 AddFunction BalanceDefaultShortCdActions
@@ -269,7 +298,7 @@ AddIcon mastery=balance help=shortcd
 	if not Stance(druid_moonkin_form) Spell(moonkin_form)
 
 	BalanceDefaultShortCdActions()
-	BalanceHurricaneActions()
+	BalanceAoeActions()
 }
 
 AddIcon mastery=balance help=main
@@ -289,7 +318,8 @@ AddIcon mastery=balance help=moving
 AddIcon mastery=balance help=cd
 {
 	BalanceInterrupt()
-	BalanceDefaultCdActions()
+	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksCdActions()
+	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultCdActions()
 }
 
 AddIcon mastery=balance size=small checkboxon=opt_icons_right
