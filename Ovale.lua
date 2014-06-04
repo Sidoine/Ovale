@@ -32,6 +32,9 @@ local OVALE_TRUE_STRING = tostring(true)
 --</private-static-properties>
 
 --<public-static-properties>
+-- Project version number.
+Ovale.version = "@project-version@"
+-- Localization string table.
 Ovale.L = L
 --The table of check boxes definition
 Ovale.casesACocher = {}

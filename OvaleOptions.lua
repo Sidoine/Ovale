@@ -22,6 +22,7 @@ local OvaleScripts = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
+local format = string.format
 local strgmatch = string.gmatch
 local strgsub = string.gsub
 local tostring = tostring
@@ -701,6 +702,12 @@ local self_options =
 					name = "Print profiling stats",
 					type = "execute",
 					func = function() Ovale.Profiler:Info() end,
+				},
+				version = {
+					order = -14,
+					name = "Show version number",
+					type = "execute",
+					func = function() Ovale:Print(Ovale.version) end,
 				},
 			},
 		},
