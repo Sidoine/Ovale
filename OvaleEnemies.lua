@@ -19,8 +19,9 @@ Ovale.OvaleEnemies = OvaleEnemies
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleEnemies")
-	profiler = Profiler.group["OvaleEnemies"]
+	local group = OvaleEnemies:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local bit_band = bit.band
@@ -67,16 +68,17 @@ function OvaleEnemies:OnDisable()
 end
 
 function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-	local now = API_GetTime()
 	if cleuEvent == "UNIT_DIED" then
 		self:RemoveEnemy(destGUID, true)
 	elseif sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and destFlags and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
+		local now = API_GetTime()
 		self:AddEnemy(sourceGUID, sourceName, now)
 	elseif destGUID and bit_band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0
 			and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
+		local now = API_GetTime()
 		self:AddEnemy(destGUID, destName, now)
 	end
 end
@@ -104,35 +106,37 @@ end
 
 function OvaleEnemies:AddEnemy(guid, name, timestamp)
 	profiler.Start("OvaleEnemies_AddEnemy")
-	if not guid then return end
-	local seen = self.enemyLastSeen[guid]
-	self.enemyLastSeen[guid] = timestamp
-	self.enemyName[guid] = name
-	if not seen then
-		self.activeEnemies = self.activeEnemies + 1
-		Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
-		Ovale.refreshNeeded["player"] = true
+	if guid then
+		local seen = self.enemyLastSeen[guid]
+		self.enemyLastSeen[guid] = timestamp
+		self.enemyName[guid] = name
+		if not seen then
+			self.activeEnemies = self.activeEnemies + 1
+			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
+			Ovale.refreshNeeded["player"] = true
+		end
 	end
 	profiler.Stop("OvaleEnemies_AddEnemy")
 end
 
 function OvaleEnemies:RemoveEnemy(guid, isDead)
 	profiler.Start("OvaleEnemies_RemoveEnemy")
-	if not guid then return end
-	local seen = self.enemyLastSeen[guid]
-	local name = self.enemyName[guid]
-	self.enemyLastSeen[guid] = nil
-	if seen then
-		if self.activeEnemies > 0 then
-			self.activeEnemies = self.activeEnemies - 1
+	if guid then
+		local seen = self.enemyLastSeen[guid]
+		local name = self.enemyName[guid]
+		self.enemyLastSeen[guid] = nil
+		if seen then
+			if self.activeEnemies > 0 then
+				self.activeEnemies = self.activeEnemies - 1
+			end
+			if isDead then
+				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
+			else
+				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
+			end
+			self:SendMessage("Ovale_InactiveUnit", guid)
+			Ovale.refreshNeeded["player"] = true
 		end
-		if isDead then
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
-		else
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
-		end
-		self:SendMessage("Ovale_InactiveUnit", guid)
-		Ovale.refreshNeeded["player"] = true
 	end
 	profiler.Stop("OvaleEnemies_RemoveEnemy")
 end

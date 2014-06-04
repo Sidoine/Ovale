@@ -14,14 +14,6 @@ local OvaleStance = Ovale:NewModule("OvaleStance", "AceEvent-3.0")
 Ovale.OvaleStance = OvaleStance
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	Profiler:RegisterProfilingGroup("OvaleStance")
-	profiler = Profiler.group["OvaleStance"]
-end
-
 local ipairs = ipairs
 local pairs = pairs
 local tinsert = table.insert
@@ -31,6 +23,28 @@ local API_GetNumShapeshiftForms = GetNumShapeshiftForms
 local API_GetShapeshiftForm = GetShapeshiftForm
 local API_GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local API_GetSpellInfo = GetSpellInfo
+
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	local group = OvaleStance:GetName()
+
+	local function EnableProfiling()
+		API_GetNumShapeshiftForms = Profiler:Wrap(group, "OvaleStance_API_GetNumShapeshiftForms", GetNumShapeshiftForms)
+		API_GetShapeshiftForm = Profiler:Wrap(group, "OvaleStance_API_GetShapeshiftForm", GetShapeshiftForm)
+		API_GetShapeshiftFormInfo = Profiler:Wrap(group, "OvaleStance_API_GetShapeshiftFormInfo", GetShapeshiftFormInfo)
+	end
+
+	local function DisableProfiling()
+		API_GetNumShapeshiftForms = GetNumShapeshiftForms
+		API_GetShapeshiftForm = GetShapeshiftForm
+		API_GetShapeshiftFormInfo = GetShapeshiftFormInfo
+	end
+
+	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	profiler = Profiler:GetProfilingGroup(group)
+end
 
 local OVALE_SPELLID_TO_STANCE = {
 	-- Death Knight

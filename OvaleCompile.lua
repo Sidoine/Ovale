@@ -13,14 +13,6 @@ local OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
 Ovale.OvaleCompile = OvaleCompile
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	Profiler:RegisterProfilingGroup("OvaleCompile")
-	profiler = Profiler.group["OvaleCompile"]
-end
-
 local L = Ovale.L
 local OvalePool = Ovale.OvalePool
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
@@ -50,6 +42,26 @@ local tinsert = table.insert
 local wipe = table.wipe
 local API_GetItemInfo = GetItemInfo
 local API_GetSpellInfo = GetSpellInfo
+
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	local group = OvaleCompile:GetName()
+
+	local function EnableProfiling()
+		API_GetItemInfo = Profiler:Wrap(group, "OvaleCompile_API_GetItemInfo", GetItemInfo)
+		API_GetSpellInfo = Profiler:Wrap(group, "OvaleCompile_API_GetSpellInfo", GetSpellInfo)
+	end
+
+	local function DisableProfiling()
+		API_GetItemInfo = GetItemInfo
+		API_GetSpellInfo = GetSpellInfo
+	end
+
+	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	profiler = Profiler:GetProfilingGroup(group)
+end
 
 local self_node = {}
 local self_pool = OvalePool("OvaleCompile_pool")
@@ -780,7 +792,7 @@ end
 local function ParseItemName(text)
 	local itemId = tonumber(text)
 	if itemId then
-		local item = API_GetItemInfo(spellId) or "Item " .. itemId
+		local item = API_GetItemInfo(itemId) or "Item " .. itemId
 		return '"' .. item .. '"'
 	else
 		Ovale:FormatPrint("ItemName of %s unknown\n", text)

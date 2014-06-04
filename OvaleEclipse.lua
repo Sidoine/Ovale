@@ -20,8 +20,9 @@ Ovale.OvaleEclipse = OvaleEclipse
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleEclipse")
-	profiler = Profiler.group["OvaleEclipse"]
+	local group = OvaleEclipse:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 -- Forward declarations for module dependencies.
@@ -169,10 +170,13 @@ function OvaleEclipse:Update()
 end
 
 function OvaleEclipse:UpdateEclipse()
+	profiler.Start("OvaleEclipse_UpdateEclipse")
 	self.eclipse = API_UnitPower("player", SPELL_POWER_ECLIPSE)
+	profiler.Stop("OvaleEclipse_UpdateEclipse")
 end
 
 function OvaleEclipse:UpdateEclipseDirection()
+	profiler.Start("OvaleEclipse_UpdateEclipseDirection")
 	local direction = API_GetEclipseDirection()
 	if direction == "moon" then
 		self.eclipseDirection = -1
@@ -187,6 +191,7 @@ function OvaleEclipse:UpdateEclipseDirection()
 			self.eclipseDirection = 0
 		end
 	end
+	profiler.Stop("OvaleEclipse_UpdateEclipseDirection")
 end
 --</public-static-methods>
 

@@ -20,8 +20,9 @@ Ovale.OvaleAura = OvaleAura
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleAura")
-	profiler = Profiler.group["OvaleAura"]
+	local group = OvaleAura:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local OvalePool = Ovale.OvalePool
@@ -372,9 +373,9 @@ function OvaleAura:RemoveAurasOnInactiveUnits()
 end
 
 function OvaleAura:IsActiveAura(aura, now)
-	now = now or API_GetTime()
 	local boolean = false
 	if aura then
+		now = now or API_GetTime()
 		if aura.serial == self.serial[aura.guid] and aura.stacks > 0 and aura.gain <= now and now <= aura.ending then
 			boolean = true
 		elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
@@ -538,11 +539,11 @@ end
 
 -- Scan auras on the given GUID and update the aura database.
 function OvaleAura:ScanAurasOnGUID(guid)
-	profiler.Start("OvaleAura_ScanAurasOnGUID")
 	if not guid then return end
 	local unitId = OvaleGUID:GetUnitId(guid)
 	if not unitId then return end
 
+	profiler.Start("OvaleAura_ScanAurasOnGUID")
 	local now = API_GetTime()
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Scanning auras on %s (%s) at %f", guid, unitId, now)
 

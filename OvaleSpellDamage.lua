@@ -19,8 +19,9 @@ Ovale.OvaleSpellDamage = OvaleSpellDamage
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleSpellDamage")
-	profiler = Profiler.group["OvaleSpellDamage"]
+	local group = OvaleSpellDamage:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local API_UnitGUID = UnitGUID

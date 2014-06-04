@@ -18,8 +18,9 @@ Ovale.OvaleActionBar = OvaleActionBar
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleActionBar")
-	profiler = Profiler.group["OvaleActionBar"]
+	local group = OvaleActionBar:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local gsub = string.gsub

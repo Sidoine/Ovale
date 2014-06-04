@@ -18,8 +18,9 @@ Ovale.OvaleComboPoints = OvaleComboPoints
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleComboPoints")
-	profiler = Profiler.group["OvaleComboPoints"]
+	local group = OvaleComboPoints:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 -- Forward declarations for module dependencies.
@@ -150,7 +151,9 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, ...)
 end
 
 function OvaleComboPoints:Refresh()
+	profiler.Start("OvaleComboPoints_Refresh")
 	self.combo = API_GetComboPoints("player") or 0
+	profiler.Stop("OvaleComboPoints_Refresh")
 end
 
 function OvaleComboPoints:Debug()

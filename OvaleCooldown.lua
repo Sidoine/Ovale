@@ -13,14 +13,6 @@ local OvaleCooldown = Ovale:NewModule("OvaleCooldown", "AceEvent-3.0")
 Ovale.OvaleCooldown = OvaleCooldown
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	Profiler:RegisterProfilingGroup("OvaleCooldown")
-	profiler = Profiler.group["OvaleCooldown"]
-end
-
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvaleGUID = nil
@@ -33,6 +25,30 @@ local API_GetSpellCooldown = GetSpellCooldown
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local API_UnitClass = UnitClass
+
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	local group = OvaleCooldown:GetName()
+
+	local function EnableProfiling()
+		API_GetSpellCharges = Profiler:Wrap(group, "OvaleCooldown_API_GetSpellCharges", GetSpellCharges)
+		API_GetSpellCooldown = Profiler:Wrap(group, "OvaleCooldown_API_GetSpellCooldown", GetSpellCooldown)
+		API_UnitHealth = Profiler:Wrap(group, "OvaleCooldown_API_UnitHealth", UnitHealth)
+		API_UnitHealthMax = Profiler:Wrap(group, "OvaleCooldown_API_UnitHealthMax", UnitHealthMax)
+	end
+
+	local function DisableProfiling()
+		API_GetSpellCharges = GetSpellCharges
+		API_GetSpellCooldown = GetSpellCooldown
+		API_UnitHealth = UnitHealth
+		API_UnitHealthMax = UnitHealthMax
+	end
+
+	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	profiler = Profiler:GetProfilingGroup(group)
+end
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")

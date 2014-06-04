@@ -28,12 +28,10 @@ local self_stack = {}
 local self_stackSize = 0
 local self_timeSpent = {}
 local self_timesInvoked = {}
---</private-static-properties>
 
---<public-static-properties>
--- Registered profiling groups.
-Profiler.group = {}
---</public-static-properties>
+-- Profiling methods collections, indexed by group.
+local self_profiler = {}
+--</private-static-properties>
 
 --<private-static-methods>
 local function DoNothing()
@@ -80,49 +78,68 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function Profiler:RegisterProfilingGroup(group)
-	self.group[group] = self.group[group] or {}
+function Profiler:RegisterProfilingGroup(group, enableFunction, disableFunction)
+	local profiler = self_profiler[group] or {}
+	profiler.Enable = enableFunction
+	profiler.Disable = disableFunction
+	self_profiler[group] = profiler
 	self:Disable(group, false)
+end
+
+function Profiler:GetProfilingGroup(group)
+	return self_profiler[group]
 end
 
 function Profiler:Enable(group, isVerbose)
 	if group then
-		local methods = self.group[group]
-		if methods then
+		local profiler = self_profiler[group]
+		if profiler then
 			if isVerbose then
 				Ovale:FormatPrint("Profiling for %s is enabled.", group)
 			end
-			methods.Start = StartProfiler
-			methods.Stop = StopProfiler
+			if profiler.Enable then
+				profiler.Enable()
+			end
+			profiler.Start = StartProfiler
+			profiler.Stop = StopProfiler
 		end
 	else
-		for group, methods in pairs(self.group) do
+		for group, profiler in pairs(self_profiler) do
 			if isVerbose then
 				Ovale:FormatPrint("Profiling for %s is enabled.", group)
 			end
-			methods.Start = StartProfiler
-			methods.Stop = StopProfiler
+			if profiler.Enable then
+				profiler.Enable()
+			end
+			profiler.Start = StartProfiler
+			profiler.Stop = StopProfiler
 		end
 	end
 end
 
 function Profiler:Disable(group, isVerbose)
 	if group then
-		local methods = self.group[group]
-		if methods then
+		local profiler = self_profiler[group]
+		if profiler then
 			if isVerbose then
 				Ovale:FormatPrint("Profiling for %s is disabled.", group)
 			end
-			methods.Start = DoNothing
-			methods.Stop = DoNothing
+			if profiler.Disable then
+				profiler.Disable()
+			end
+			profiler.Start = DoNothing
+			profiler.Stop = DoNothing
 		end
 	else
-		for group, methods in pairs(self.group) do
+		for group, profiler in pairs(self_profiler) do
 			if isVerbose then
 				Ovale:FormatPrint("Profiling for %s is disabled.", group)
 			end
-			methods.Start = DoNothing
-			methods.Stop = DoNothing
+			if profiler.Disable then
+				profiler.Disable()
+			end
+			profiler.Start = DoNothing
+			profiler.Stop = DoNothing
 		end
 	end
 end
@@ -170,6 +187,19 @@ do
 			end
 		end
 	end
+end
+
+function Profiler:Wrap(group, tag, functionPtr)
+	local profiler = self_profiler[group]
+	local helper = function(...)
+		profiler.Stop(tag)
+		return ...
+	end
+	local wrapper = function(...)
+		profiler.Start(tag)
+		return helper(functionPtr(...))
+	end
+	return wrapper
 end
 
 function Profiler:Debug()

@@ -13,14 +13,6 @@ local OvalePower = Ovale:NewModule("OvalePower", "AceEvent-3.0")
 Ovale.OvalePower = OvalePower
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	Profiler:RegisterProfilingGroup("OvalePower")
-	profiler = Profiler.group["OvalePower"]
-end
-
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleFuture = nil
@@ -48,6 +40,24 @@ local SPELL_POWER_RAGE = SPELL_POWER_RAGE
 local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
 local SPELL_POWER_SHADOW_ORBS = SPELL_POWER_SHADOW_ORBS
 local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
+
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	local group = OvalePower:GetName()
+
+	local function EnableProfiling()
+		API_GetSpellInfo = Profiler:Wrap(group, "OvalePower_API_GetSpellInfo", GetSpellInfo)
+	end
+
+	local function DisableProfiling()
+		API_GetSpellInfo = GetSpellInfo
+	end
+
+	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	profiler = Profiler:GetProfilingGroup(group)
+end
 
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}

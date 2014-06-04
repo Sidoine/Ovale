@@ -18,8 +18,9 @@ Ovale.OvaleDamageTaken = OvaleDamageTaken
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleDamageTaken")
-	profiler = Profiler.group["OvaleDamageTaken"]
+	local group = OvaleDamageTaken:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local OvalePool = Ovale.OvalePool

@@ -18,8 +18,9 @@ Ovale.OvalePaperDoll = OvalePaperDoll
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvalePaperDoll")
-	profiler = Profiler.group["OvalePaperDoll"]
+	local group = OvalePaperDoll:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local OvalePool = Ovale.OvalePoolRefCount

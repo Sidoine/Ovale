@@ -17,8 +17,9 @@ Ovale.OvaleEquipement = OvaleEquipement
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	Profiler:RegisterProfilingGroup("OvaleEquipement")
-	profiler = Profiler.group["OvaleEquipement"]
+	local group = OvaleEquipement:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
 end
 
 local pairs = pairs
@@ -375,14 +376,19 @@ OvaleEquipement.offHandWeaponSpeed = nil
 
 --<private-static-methods>
 local function GetEquippedItemType(slotId)
+	profiler.Start("OvaleEquipement_GetEquippedItemType")
 	local itemId = OvaleEquipement:GetEquippedItem(slotId)
+	local itemType
 	if itemId then
 		local _, _, _, _, _, _, _, _, inventoryType = API_GetItemInfo(itemId)
-		return inventoryType
+		itemType = inventoryType
 	end
+	profiler.Stop("OvaleEquipement_GetEquippedItemType")
+	return itemType
 end
 
-function GetItemLevel(slotId)
+local function GetItemLevel(slotId)
+	profiler.Start("OvaleEquipement_GetItemLevel")
 	self_tooltip:SetInventoryItem("player", slotId)
 	local itemLevel
 	for i = 2, self_tooltip:NumLines() do
@@ -390,20 +396,27 @@ function GetItemLevel(slotId)
 		if text then
 			itemLevel = strmatch(text, OVALE_ITEM_LEVEL_PATTERN)
 			if itemLevel then
-				return tonumber(itemLevel)
+				itemLevel = tonumber(itemLevel)
+				break
 			end
 		end
 	end
+	profiler.Stop("OvaleEquipement_GetItemLevel")
+	return itemLevel
 end
 
 local function GetNormalizedWeaponSpeed(slotId)
+	profiler.Start("OvaleEquipement_GetNormalizedWeaponSpeed")
+	local weaponSpeed
 	if slotId == INVSLOT_MAINHAND or slotId == INVSLOT_OFFHAND then
 		local itemId = OvaleEquipement:GetEquippedItem(slotId)
 		if itemId then
 			local _, _, _, _, _, _, weaponClass = API_GetItemInfo(itemId)
-			return OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
+			weaponSpeed = OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
 		end
 	end
+	profiler.Stop("OvaleEquipement_GetNormalizedWeaponSpeed")
+	return weaponSpeed
 end
 --</private-static-methods>
 
