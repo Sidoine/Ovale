@@ -136,6 +136,7 @@ end
 
 -- Parse params string into key=value pairs and positional arguments stored in paramList table.
 local function ParseParameters(params, paramList)
+	profiler.Start("OvaleCompile_ParseParameters")
 	paramList = paramList or {}
 	if params then
 		-- Handle key=value pairs.
@@ -159,6 +160,7 @@ local function ParseParameters(params, paramList)
 			k = k + 1
 		end
 	end
+	profiler.Stop("OvaleCompile_ParseParameters")
 	return paramList
 end
 
@@ -183,62 +185,64 @@ local function RequireValue(value)
 end
 
 local function TestConditions(paramList)
-	if paramList.glyph then
+	profiler.Start("OvaleCompile_TestConditions")
+	local boolean = true
+	if boolean and paramList.glyph then
 		local glyph, requireGlyph = RequireValue(paramList.glyph)
 		local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
 		if (requireGlyph and not hasGlyph) or (not requireGlyph and hasGlyph) then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.mastery then
+	if boolean and paramList.mastery then
 		local spec, requireSpec = RequireValue(paramList.mastery)
 		local isSpec = OvalePaperDoll:IsSpecialization(spec)
 		if (requireSpec and not isSpec) or (not requireSpec and isSpec) then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.if_stance then
+	if boolean and paramList.if_stance then
 		local stance, requireStance = RequireValue(paramList.if_stance)
 		local isStance = OvaleStance:IsStance(stance)
 		if (requireStance and not isStance) or (not requireStance and isStance) then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.if_spell then
+	if boolean and paramList.if_spell then
 		local spell, requireSpell = RequireValue(paramList.if_spell)
 		local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
 		if (requireSpell and not hasSpell) or (not requireSpell and hasSpell) then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.talent then
+	if boolean and paramList.talent then
 		local talent, requireTalent = RequireValue(paramList.talent)
 		local hasTalent = HasTalent(talent)
 		if (requireTalent and not hasTalent) or (not requireTalent and hasTalent) then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.checkboxon then
+	if boolean and paramList.checkboxon then
 		local cb = paramList.checkboxon
 		if not Ovale.casesACocher[cb] then
 			Ovale.casesACocher[cb] = {}
 		end
 		Ovale.casesACocher[cb].compile = true
 		if not OvaleOptions:GetProfile().check[cb] then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.checkboxoff then
+	if boolean and paramList.checkboxoff then
 		local cb = paramList.checkboxoff
 		if not Ovale.casesACocher[cb] then
 			Ovale.casesACocher[cb] = {}
 		end
 		Ovale.casesACocher[cb].compile = true
 		if OvaleOptions:GetProfile().check[cb] then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.list and paramList.item then
+	if boolean and paramList.list and paramList.item then
 		local list = paramList.list
 		local key = paramList.item
 		if not Ovale.listes[list] then
@@ -246,17 +250,18 @@ local function TestConditions(paramList)
 		end
 		Ovale.listes[list].compile = true
 		if OvaleOptions:GetProfile().list[list] ~= key then
-			return false
+			boolean = false
 		end
 	end
-	if paramList.itemset and paramList.itemcount then
+	if boolean and paramList.itemset and paramList.itemcount then
 		local equippedCount = OvaleEquipement:GetArmorSetCount(paramList.itemset)
 		self_compileOnItems = true
 		if equippedCount < paramList.itemcount then
-			return false
+			boolean = false
 		end
 	end
-	return true
+	profiler.Stop("OvaleCompile_TestConditions")
+	return boolean
 end
 
 local function ParseNumber(dummy, value)
@@ -420,10 +425,7 @@ end
 local function ParseSpellInfo(params)
 	local paramList = ParseParameters(params)
 	local spellId = paramList[1]
-	if spellId then
-		if not TestConditions(paramList) then
-			return ""
-		end
+	if spellId and TestConditions(paramList) then
 		local si = OvaleData:SpellInfo(spellId)
 		for k,v in pairs(paramList) do
 			if k == "addduration" then
@@ -471,10 +473,7 @@ end
 local function ParseItemInfo(params)
 	local paramList = ParseParameters(params)
 	local itemId = paramList[1]
-	if itemId then
-		if not TestConditions(paramList) then
-			return ""
-		end
+	if itemId and TestConditions(paramList) then
 		for k, v in pairs(paramList) do
 			if k == "proc" then
 				-- Add the buff for this item proc to the spell list "item_proc_<proc>".
@@ -745,17 +744,16 @@ local function ParseCommands(text)
 	if text then
 		nodeId = tonumber(strmatch(text, "node(%d+)"))
 	end
-	if not nodeId then
+	if nodeId then
+		-- If there is anything other than spaces, this is a syntax error.
+		text = strgsub(text, "node%d+", "", 1)
+		if strmatch(text,"[^ ]") then
+			Ovale:FormatPrint("Group: %s", original)
+			Ovale:FormatPrint("syntax error: %s", text)
+			nodeId = nil
+		end
+	else
 		Ovale:Print("no master node")
-		return nil
-	end
-	
-	-- Si il reste autre chose que des espaces, c'est une erreur de syntaxe
-	text = strgsub(text, "node%d+", "", 1)
-	if strmatch(text,"[^ ]") then
-		Ovale:FormatPrint("Group: %s", original)
-		Ovale:FormatPrint("syntax error: %s", text)
-		return nil
 	end
 	return nodeId
 end
@@ -829,15 +827,14 @@ end
 local function CompileDeclarations(text)
 	-- Define(CONSTANTE valeur)
 	text = strgsub(text, "Define%s*%(%s*([%w_]+)%s+([%w_.=]+)%s*%)", ParseDefine)
-	
 	-- On remplace les constantes par leur valeur
 	text = strgsub(text, "([%w_]+)", ReplaceDefine)
-	
+
 	-- Fonctions
 	text = strgsub(text, "ItemName%s*%(%s*(%w+)%s*%)", ParseItemName)
 	text = strgsub(text, "SpellName%s*%(%s*(%w+)%s*%)", ParseSpellName)
 	text = strgsub(text, "L%s*%(%s*(%w+)%s*%)", ParseL)
-	
+
 	-- Options diverses
 	OvaleData:ResetSpellInfo()
 	text = strgsub(text, "SpellAddBuff%s*%((.-)%)", ParseSpellAddBuff)
