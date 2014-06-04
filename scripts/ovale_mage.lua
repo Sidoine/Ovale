@@ -42,8 +42,14 @@ AddFunction ArcaneAoeActions
 
 AddFunction ArcaneSingleTargetActions
 {
-	#arcane_barrage,if=buff.alter_time.up&buff.alter_time.remains<2
-	if BuffPresent(alter_time_buff) and BuffRemains(alter_time_buff) < 2 Spell(arcane_barrage)
+	#arcane_barrage,if=buff.alter_time.up&buff.alter_time.remains<action.arcane_blast.cast_time
+	if BuffPresent(alter_time_buff) and BuffRemains(alter_time_buff) < CastTime(arcane_blast) Spell(arcane_barrage)
+	#nether_tempest,cycle_targets=1,if=(!ticking|remains<tick_time)&target.time_to_die>6
+	if TalentPoints(nether_tempest_talent) and { not target.DebuffPresent(nether_tempest_debuff) or target.DebuffRemains(nether_tempest_debuff) < target.TickTime(nether_tempest_debuff) } and target.TimeToDie() > 6 Spell(nether_tempest)
+	#living_bomb,cycle_targets=1,if=(!ticking|remains<tick_time)&target.time_to_die>tick_time*3
+	if TalentPoints(living_bomb_talent) and { not target.DebuffPresent(living_bomb_debuff) or target.DebuffRemains(living_bomb_debuff) < target.TickTime(living_bomb_debuff) } and target.TimeToDie() > target.TickTime(living_bomb_debuff) * 3 Spell(living_bomb)
+	#frost_bomb,if=!ticking&target.time_to_die>tick_time*3
+	if TalentPoints(frost_bomb_talent) and not target.DebuffPresent(frost_bomb_debuff) and target.TimeToDie() > target.TickTime(frost_bomb_debuff) * 3 Spell(frost_bomb)
 	#arcane_missiles,if=buff.alter_time.up
 	if BuffPresent(arcane_missiles_buff) and BuffPresent(alter_time_buff) Spell(arcane_missiles)
 	#arcane_blast,if=buff.alter_time.up
@@ -52,12 +58,6 @@ AddFunction ArcaneSingleTargetActions
 	if BuffPresent(profound_magic_buff) and DebuffStacks(arcane_charge_debuff) > 3 and ManaPercent() > 93 Spell(arcane_blast)
 	#arcane_missiles,if=(buff.arcane_missiles.stack=2&cooldown.arcane_power.remains>0)|(buff.arcane_charge.stack>=4&cooldown.arcane_power.remains>8)
 	if BuffPresent(arcane_missiles_buff) and { { BuffStacks(arcane_missiles_buff) == 2 and SpellCooldown(arcane_power) > 0 } or { DebuffStacks(arcane_charge_debuff) >= 4 and SpellCooldown(arcane_power) > 8 } } Spell(arcane_missiles)
-	#nether_tempest,cycle_targets=1,if=(!ticking|remains<tick_time)&target.time_to_die>6
-	if TalentPoints(nether_tempest_talent) and { not target.DebuffPresent(nether_tempest_debuff) or target.DebuffRemains(nether_tempest_debuff) < target.TickTime(nether_tempest_debuff) } and target.TimeToDie() > 6 Spell(nether_tempest)
-	#living_bomb,cycle_targets=1,if=(!ticking|remains<tick_time)&target.time_to_die>tick_time*3
-	if TalentPoints(living_bomb_talent) and { not target.DebuffPresent(living_bomb_debuff) or target.DebuffRemains(living_bomb_debuff) < target.TickTime(living_bomb_debuff) } and target.TimeToDie() > target.TickTime(living_bomb_debuff) * 3 Spell(living_bomb)
-	#frost_bomb,if=!ticking&target.time_to_die>tick_time*3
-	if TalentPoints(frost_bomb_talent) and not target.DebuffPresent(frost_bomb_debuff) and target.TimeToDie() > target.TickTime(frost_bomb_debuff) * 3 Spell(frost_bomb)
 	#arcane_barrage,if=buff.arcane_charge.stack>=4&mana.pct<95
 	if DebuffStacks(arcane_charge_debuff) >= 4 and ManaPercent() < 95 Spell(arcane_barrage)
 	#presence_of_mind
@@ -68,8 +68,8 @@ AddFunction ArcaneSingleTargetActions
 
 AddFunction ArcaneSingleTargetMovingActions
 {
-	#arcane_barrage,if=buff.alter_time.up&buff.alter_time.remains<2
-	if BuffPresent(alter_time_buff) and BuffRemains(alter_time_buff) < 2 Spell(arcane_barrage)
+	#arcane_barrage,if=buff.alter_time.up&buff.alter_time.remains<action.arcane_blast.cast_time
+	if BuffPresent(alter_time_buff) and BuffRemains(alter_time_buff) < CastTime(arcane_blast) Spell(arcane_barrage)
 	#nether_tempest,cycle_targets=1,if=(!ticking|remains<tick_time)&target.time_to_die>6
 	if TalentPoints(nether_tempest_talent) and { not target.DebuffPresent(nether_tempest_debuff) or target.DebuffRemains(nether_tempest_debuff) < target.TickTime(nether_tempest_debuff) } and target.TimeToDie() > 6 Spell(nether_tempest)
 	#living_bomb,cycle_targets=1,if=(!ticking|remains<tick_time)&target.time_to_die>tick_time*3
@@ -139,12 +139,13 @@ AddFunction ArcaneDefaultCdActions
 		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or SpellCooldown(arcane_power) > 15 or target.TimeToDie() < 18 } Spell(blood_fury)
 		#berserking,if=buff.alter_time.down&(buff.arcane_power.up|target.time_to_die<18)
 		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or target.TimeToDie() < 18 } Spell(berserking)
-		#jade_serpent_potion,if=buff.alter_time.down&(buff.arcane_power.up|target.time_to_die<50)
-		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or target.TimeToDie() < 50 } UsePotionIntellect()
+		#jade_serpent_potion,if=buff.alter_time.down&((cooldown.alter_time.remains=0&buff.arcane_power.up)|target.time_to_die<50)
+		if BuffExpires(alter_time_buff) and { { not SpellCooldown(alter_time) > 0 and BuffPresent(arcane_power_buff) } or target.TimeToDie() < 50 } UsePotionIntellect()
 		#use_item,slot=hands,sync=alter_time_activate,if=buff.alter_time.down
 		if not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) UseItemActions()
-		#alter_time,if=buff.alter_time.down&buff.arcane_power.up
+		#alter_time,if=buff.alter_time.down&buff.arcane_power.up&trinket.stat.intellect.cooldown_remains>15
 		if BuffExpires(alter_time_buff) and BuffPresent(arcane_power_buff) Spell(alter_time)
+		#cancel_buff,name=alter_time,if=buff.alter_time.remains<trinket.stat.intellect.cooldown_remains-109
 		#use_item,slot=hands,if=(cooldown.alter_time_activate.remains>45|target.time_to_die<25)&buff.rune_of_power.remains>20
 		if TalentPoints(rune_of_power_talent) and { SpellCooldown(alter_time_activate) > 45 or target.TimeToDie() < 25 } and RuneOfPowerRemains() > 20 UseItemActions()
 		#use_item,slot=hands,if=(cooldown.alter_time_activate.remains>45|target.time_to_die<25)&buff.invokers_energy.remains>20
