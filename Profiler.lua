@@ -129,10 +129,10 @@ end
 
 function Profiler:Reset()
 	for tag in pairs(self_timeSpent) do
-		self_timeSpent[tag] = 0
+		self_timeSpent[tag] = nil
 	end
 	for tag in pairs(self_timesInvoked) do
-		self_timesInvoked[tag] = 0
+		self_timesInvoked[tag] = nil
 	end
 end
 
@@ -142,7 +142,7 @@ do
 	function Profiler:Info()
 		if next(self_timeSpent) then
 			local now = API_GetTime()
-			Ovale:FormatPrint("Profiler info at %f:", now)
+			Ovale:FormatPrint("Profiling statistics at %f:", now)
 
 			-- Calculate the width needed to print out the times invoked.
 			local width = 1
@@ -157,10 +157,10 @@ do
 			end
 
 			wipe(array)
-			local formatString = format("    %%6fs: %%%dd x %%s", width)
+			local formatString = format("    %%08.3fms: %%0%dd (%%05f) x %%s", width)
 			for tag, timeSpent in pairs(self_timeSpent) do
 				local timesInvoked = self_timesInvoked[tag]
-				tinsert(array, format(formatString, timeSpent/1000, timesInvoked, tag))
+				tinsert(array, format(formatString, timeSpent, timesInvoked, timeSpent / timesInvoked, tag))
 			end
 			if next(array) then
 				tsort(array)
