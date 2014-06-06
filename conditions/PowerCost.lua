@@ -77,8 +77,22 @@ do
 		return PowerCost("rage", condition)
 	end
 
+	--- Get the amount of runic power required to cast the given spell.
+	-- @name RunicPowerCost
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The amount of runic power.
+	-- @return A boolean value for the result of the comparison.
+
+	local function RunicPowerCost(condition)
+		return PowerCost("runicpower", condition)
+	end
+
 	OvaleCondition:RegisterCondition("energycost", true, EnergyCost)
 	OvaleCondition:RegisterCondition("focuscost", true, FocusCost)
 	OvaleCondition:RegisterCondition("manacost", true, ManaCost)
 	OvaleCondition:RegisterCondition("ragecost", true, RageCost)
+	OvaleCondition:RegisterCondition("runicpowercost", true, RunicPowerCost)
 end
