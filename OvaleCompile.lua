@@ -202,6 +202,7 @@ local function TestConditions(paramList)
 		end
 	end
 	if boolean and paramList.if_stance then
+		self_compileOnStances = true
 		local stance, requireStance = RequireValue(paramList.if_stance)
 		local isStance = OvaleStance:IsStance(stance)
 		if (requireStance and not isStance) or (not requireStance and isStance) then
