@@ -171,26 +171,25 @@ do
 		local refresh = forceRefresh or next(Ovale.refreshNeeded)
 		if not refresh then return end
 
-		local masterNodes = OvaleCompile:GetMasterNodes()
-		if not masterNodes then return end
+		local iconNodes = OvaleCompile:GetIconNodes()
+		if not iconNodes then return end
 		
 		self.lastUpdate = now
 
 		local state = OvaleState.state
 		state:Initialize()
-		for k,node in pairs(masterNodes) do
-			local target
+		for k, node in ipairs(iconNodes) do
+			-- Set the true target of "target" references in the icon's body.
 			if node.params and node.params.target then
-				target = node.params.target
+				OvaleCondition.defaultTarget = node.params.target
 			else
-				target = "target"
+				OvaleCondition.defaultTarget = "target"
 			end
-			OvaleCondition.defaultTarget = target
 
 			if refresh then
-				Ovale:Logf("****Master Node %d", k)
+				Ovale:Logf("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
-				local timeSpan, _, element = OvaleBestAction:Compute(node, state)
+				local timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
 				local start = NextTime(timeSpan, state.currentTime)
 				if start then
 					Ovale:Logf("Compute start = %f", start)
@@ -213,8 +212,11 @@ do
 				else
 					local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 						actionUsable, actionShortcut, actionIsCurrent, actionEnable,
-						actionType, actionId, actionTarget, noRed = OvaleBestAction:GetActionInfo(element, state)
-					if noRed then
+						actionType, actionId, actionTarget = OvaleBestAction:GetActionInfo(element, state)
+
+					-- Use the start time of the best action instead of the intersection of its start time
+					-- with any conditions used to determine the best action.
+					if element and element.params and element.params.nored == 1 then
 						start = actionCooldownStart + actionCooldownDuration
 						if start < state.currentTime then
 							start = state.currentTime
@@ -238,9 +240,7 @@ do
 						action.spellId = nil
 					end
 					if start and start <= now and actionUsable then
-						if not action.waitStart then
-							action.waitStart = now
-						end
+						action.waitStart = action.waitStart or now
 					else
 						action.waitStart = nil
 					end
@@ -269,7 +269,7 @@ do
 								spellTarget = OvaleCondition.defaultTarget
 							end
 							state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
-							timeSpan, _, element = OvaleBestAction:Compute(node, state)
+							timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
 							start = NextTime(timeSpan, state.currentTime)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element, state))
 						else
@@ -313,14 +313,14 @@ do
 		local maxWidth = 0
 		local top = 0
 
-		local masterNodes = OvaleCompile:GetMasterNodes()
-		if not masterNodes then return end
+		local iconNodes = OvaleCompile:GetIconNodes()
+		if not iconNodes then return end
 		
 		local BARRE = 8
 		
 		local margin = profile.apparence.margin
 			
-		for k,node in pairs(masterNodes) do
+		for k, node in ipairs(iconNodes) do
 			if not self.actions[k] then
 				self.actions[k] = {icons={}, secureIcons={}}
 			end
