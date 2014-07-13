@@ -234,28 +234,6 @@ Define(word_of_glory 85673)
 	SpellAddBuff(word_of_glory bastion_of_power_buff=0 if_spell=shield_of_the_righteous itemset=T16_tank itemcount=4)
 	SpellAddBuff(word_of_glory divine_purpose_buff=0 talent=divine_purpose_talent)
 SpellList(word_of_glory_no_holy_power_buff bastion_of_power_buff divine_purpose_buff)
-
-AddFunction Interrupt
-{
-	if not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(rebuke) Spell(rebuke)
-		if target.Classification(worldboss no)
-		{
-			if TalentPoints(fist_of_justice_talent) Spell(fist_of_justice)
-			if not TalentPoints(fist_of_justice_talent) and target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-			#Spell(blinding_light)
-		}
-	}
-}
-
-AddFunction RaidBuffActions
-{
-	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
-	if BuffExpires(str_agi_int any=1) and BuffPresent(mastery any=1) and BuffExpires(mastery) Spell(blessing_of_kings)
-	#blessing_of_might,if=!aura.mastery.up
-	if BuffExpires(mastery any=1) Spell(blessing_of_might)
-}
 ]]
 
 	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")

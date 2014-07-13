@@ -7,9 +7,8 @@ do
 	local code = [[
 # Ovale hunter script based on SimulationCraft.
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_hunter_spells)
+Include(ovale_common)
+Include(ovale_hunter_common)
 
 AddCheckBox(opt_aoe L(AOE) default)
 AddCheckBox(opt_icons_left "Left icons")

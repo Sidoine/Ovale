@@ -80,11 +80,6 @@ Define(vampiric_touch 34914)
 Define(vampiric_touch_debuff 34914)
 	SpellInfo(vampiric_touch_debuff duration=15 haste=spell tick=3)
 	SpellInfo(vampiric_touch_debuff addduration=3 itemset=T14_caster itemcount=4)
-
-AddFunction Interrupt
-{
-	if target.IsFriend(no) and target.IsInterruptible() Spell(silence)
-}
 ]]
 
 	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "include")

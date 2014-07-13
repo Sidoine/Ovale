@@ -10,9 +10,8 @@ do
 #	spec=windwalker
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#fb!002221
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_monk_spells)
+Include(ovale_common)
+Include(ovale_monk_common)
 
 AddFunction WindwalkerAoeActions
 {

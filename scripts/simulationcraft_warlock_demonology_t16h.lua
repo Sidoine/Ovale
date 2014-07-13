@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#VZ!....10
 #	pet=felguard
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_warlock_spells)
+Include(ovale_common)
+Include(ovale_warlock_common)
 
 AddFunction DemonologyAoeActions
 {

@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!122012
 #	glyphs=unending_rage/death_from_above/bull_rush
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_warrior_spells)
+Include(ovale_common)
+Include(ovale_warrior_common)
 
 AddFunction FurySingleTargetActions
 {

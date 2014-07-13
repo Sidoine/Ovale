@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Xb!002202
 #	glyphs=inner_sanctum/mind_flay/dark_archangel/shadowy_friends/shadow_ravens
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_priest_spells)
+Include(ovale_common)
+Include(ovale_priest_common)
 
 AddFunction ShadowDefaultActions
 {

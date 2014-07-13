@@ -10,9 +10,8 @@ do
 #	spec=balance
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ua!.0.1.0
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_druid_spells)
+Include(ovale_common)
+Include(ovale_druid_common)
 
 AddFunction BalanceDefaultActions
 {

@@ -198,20 +198,6 @@ Define(pet_reinforce 118347)
 	SpellAddBuff(pet_reinforce pet_reinforce_buff=1)
 Define(pet_reinforce_buff 118347)
 	SpellInfo(pet_reinforce_buff duration=60)
-
-AddFunction Bloodlust
-{
-	if DebuffExpires(burst_haste_debuff any=1)
-	{
-		Spell(bloodlust)
-		Spell(heroism)
-	}
-}
-
-AddFunction Interrupt
-{
-	if target.IsFriend(no) and target.IsInterruptible() Spell(wind_shear)
-}
 ]]
 
 	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")

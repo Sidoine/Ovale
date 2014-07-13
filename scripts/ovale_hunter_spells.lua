@@ -160,27 +160,6 @@ Define(thrill_of_the_hunt_buff 34720)
 	SpellInfo(thrill_of_the_hunt_buff duration=15)
 Define(thrill_of_the_hunt_talent 12)
 Define(trap_mastery 63458)
-
-AddFunction Interrupt
-{
-	if not target.IsFriend() and target.IsInterruptible()
-	{
-		Spell(silencing_shot)
-		Spell(counter_shot)
-	}
-}
-
-AddFunction SummonPet
-{
-	if pet.Present(no) Texture(ability_hunter_beastcall help=SummonPet)
-	if pet.IsDead() Spell(revive_pet)
-}
-
-AddFunction KillCommand
-{
-	# Only suggest Kill Command if the pet can attack.
-	if pet.Present() and pet.IsIncapacitated(no) and pet.IsFeared(no) and pet.IsStunned(no) Spell(kill_command)
-}
 ]]
 
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")

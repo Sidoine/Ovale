@@ -10,9 +10,8 @@ do
 #	spec=combat
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#cZ!200002
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_rogue_spells)
+Include(ovale_common)
+Include(ovale_rogue_common)
 
 AddFunction CombatFinisherActions
 {

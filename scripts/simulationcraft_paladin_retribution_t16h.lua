@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#bb!110112
 #	glyphs=double_jeopardy/mass_exorcism
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_paladin_spells)
+Include(ovale_common)
+Include(ovale_paladin_common)
 
 AddFunction RetributionDefaultActions
 {

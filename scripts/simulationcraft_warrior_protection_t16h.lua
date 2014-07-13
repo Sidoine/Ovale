@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Zb!.00110
 #	glyphs=unending_rage/hold_the_line/heavy_repercussions
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_warrior_spells)
+Include(ovale_common)
+Include(ovale_warrior_common)
 
 AddFunction ProtectionDpsCdsActions
 {

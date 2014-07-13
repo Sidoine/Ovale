@@ -10,9 +10,8 @@ do
 #	spec=unholy
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#db!2...0.
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_deathknight_spells)
+Include(ovale_common)
+Include(ovale_deathknight_common)
 
 AddFunction UnholyAoeActions
 {

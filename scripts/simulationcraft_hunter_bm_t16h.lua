@@ -10,9 +10,8 @@ do
 #	spec=beast_mastery
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ya!...100
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_hunter_spells)
+Include(ovale_common)
+Include(ovale_hunter_common)
 
 AddFunction BeastMasteryDefaultActions
 {

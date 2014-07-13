@@ -7,9 +7,8 @@ do
 	local code = [[
 # Ovale shaman script based on SimulationCraft.
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_shaman_spells)
+Include(ovale_common)
+Include(ovale_shaman_common)
 
 AddCheckBox(opt_aoe L(AOE) default)
 AddCheckBox(opt_icons_left "Left icons")

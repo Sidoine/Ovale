@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!0...11
 #	glyphs=evocation/icy_veins/splitting_ice
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_mage_spells)
+Include(ovale_common)
+Include(ovale_mage_common)
 
 AddFunction FrostDefaultActions
 {

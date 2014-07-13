@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#WZ!...0.1
 #	glyphs=chain_lightning
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_shaman_spells)
+Include(ovale_common)
+Include(ovale_shaman_common)
 
 AddFunction EnhancementAoeActions
 {

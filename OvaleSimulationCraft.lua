@@ -207,9 +207,8 @@ do
 		end
 
 		self:Append(script, "")
-		self:Append(script, "Include(ovale_items)")
-		self:Append(script, "Include(ovale_racials)")
-		self:Append(script, format("Include(ovale_%s_spells)", profile.class))
+		self:Append(script, "Include(ovale_common)")
+		self:Append(script, format("Include(ovale_%s_common)", profile.class))
 
 		if profile.actionList then
 			for listName, actionList in pairs(profile.actionList) do
@@ -250,6 +249,7 @@ do
 			self:Append(script, [[	OvaleScripts:RegisterScript("%s", name, desc, code, "reference")]], strupper(profile.class))
 		end
 		self:Append(script, "end")
+		self:Append(script, "")
 
 		return script
 	end

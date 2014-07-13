@@ -25,23 +25,6 @@ Define(virmens_bite_potion 76089)
 Define(virmens_bite_potion_buff 105697)
 	SpellInfo(virmens_bite_potion_buff duration=25)
 
-AddCheckBox(potions "Use potions" default)
-
-AddFunction UsePotionAgility
-{
-	if CheckBoxOn(potions) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
-}
-
-AddFunction UsePotionIntellect
-{
-	if CheckBoxOn(potions) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
-}
-
-AddFunction UsePotionStrength
-{
-	if CheckBoxOn(potions) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
-}
-
 ###
 ### Trinkets (Mists of Pandaria only)
 ###
@@ -74,16 +57,6 @@ SpellList(trinket_stacking_stat_crit_buff 146285)
 Define(cooldown_reduction_agility_buff 146019)
 Define(cooldown_reduction_strength_buff 145955)
 Define(cooldown_reduction_tank_buff 146025)
-
-AddCheckBox(opt_use_trinket0 "Use trinket 0" default)
-AddCheckBox(opt_use_trinket1 "Use trinket 1" default)
-
-AddFunction UseItemActions
-{
-	Item(HandsSlot usable=1)
-	if CheckBoxOn(opt_use_trinket0) Item(Trinket0Slot usable=1)
-	if CheckBoxOn(opt_use_trinket1) Item(Trinket1Slot usable=1)
-}
 
 ###
 ### Legendary Meta Gem

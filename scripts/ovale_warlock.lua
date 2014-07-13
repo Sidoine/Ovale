@@ -7,9 +7,8 @@ do
 	local code = [[
 # Ovale warlock script based on SimulationCraft.
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_warlock_spells)
+Include(ovale_common)
+Include(ovale_warlock_common)
 
 AddCheckBox(opt_aoe L(AOE) default)
 AddCheckBox(opt_icons_left "Left icons")

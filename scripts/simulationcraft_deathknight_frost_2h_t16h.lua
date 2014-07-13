@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#dZ!1...0.
 #	glyphs=loud_horn
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_deathknight_spells)
+Include(ovale_common)
+Include(ovale_deathknight_common)
 
 AddFunction FrostAoeActions
 {

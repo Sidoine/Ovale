@@ -202,16 +202,6 @@ Define(wrathguard_wrathstorm 115831)
 Define(wrathguard_wrathstorm_buff 89751)
 	SpellInfo(wrathguard_wrathstorm_buff duration=6)
 
-AddFunction SummonPet
-{
-	if pet.Present(no) Texture(spell_nature_removecurse help=SummonPet)
-}
-
-AddFunction ServicePet
-{
-	if TalentPoints(grimoire_of_service_talent) and Spell(grimoire_of_service) Texture(spell_nature_removecurse help=ServicePet)
-}
-
 AddFunction AfflictionMasteryDamageMultiplier asValue=1 { 1 + MasteryEffect() / 100 }
 AddFunction AfflictionAgonyTickDamage asValue=1
 {

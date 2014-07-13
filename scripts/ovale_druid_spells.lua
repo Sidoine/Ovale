@@ -403,45 +403,6 @@ Define(wild_mushroom_heal 145205)
 Define(wrath 5176)
 	SpellInfo(wrath eclipse=-15 nature=1)
 
-AddFunction FaerieFire
-{
-	if TalentPoints(faerie_swarm_talent) Spell(faerie_swarm)
-	if not TalentPoints(faerie_swarm_talent) Spell(faerie_fire)
-}
-
-AddFunction SavageRoar
-{
-    if Glyph(glyph_of_savagery) Spell(savage_roar_glyphed)
-    if Glyph(glyph_of_savagery no) and ComboPoints() >0 Spell(savage_roar)
-}
-
-AddFunction BalanceInterrupt
-{
-	if not target.IsFriend() and target.IsInterruptible()
-	{
-		if not target.Classification(worldboss)
-		{
-			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
-			if TalentPoints(typhoon_talent) Spell(typhoon)
-			Spell(solar_beam)
-		}
-	}
-}
-
-AddFunction FeralInterrupt
-{
-	if not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(skull_bash_cat) Spell(skull_bash_cat)
-		if not target.Classification(worldboss)
-		{
-			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
-			if TalentPoints(typhoon_talent) and target.InRange(skull_bash_cat) Spell(typhoon)
-			if ComboPoints() > 0 and target.InRange(maim) Spell(maim)
-		}
-	}
-}
-
 ### Moonfire
 AddFunction BalanceMoonfireTickDamage asValue=1
 {
@@ -522,31 +483,6 @@ AddFunction FeralSwipeCatDamage asValue=1
 AddFunction FeralThrashCatHitDamage asValue=1
 {
 	{ 1232 + 0.191 * AttackPower() } * target.DamageMultiplier(thrash_cat) * FeralMasteryDamageMultiplier()
-}
-
-AddFunction GuardianInterrupt
-{
-	if not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(skull_bash_bear) Spell(skull_bash_bear)
-		if TalentPoints(typhoon_talent) and target.InRange(skull_bash_bear) Spell(typhoon)
-		if not target.Classification(worldboss) and TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash)
-		{
-			Spell(mighty_bash)
-		}
-	}
-}
-
-AddFunction RestorationInterrupt
-{
-	if not target.IsFriend() and target.IsInterruptible()
-	{
-		if not target.Classification(worldboss)
-		{
-			if TalentPoints(typhoon_talent) Spell(typhoon)
-			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
-		}
-	}
 }
 ]]
 

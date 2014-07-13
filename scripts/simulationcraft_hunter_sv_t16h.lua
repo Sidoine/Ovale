@@ -10,9 +10,8 @@ do
 #	spec=survival
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Yb!...200
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_hunter_spells)
+Include(ovale_common)
+Include(ovale_hunter_common)
 
 AddFunction SurvivalDefaultActions
 {

@@ -277,27 +277,6 @@ Define(wild_strike 100130)
 	SpellInfo(wild_strike rage=30)
 	SpellInfo(wild_strike buff_rage_none=bloodsurge_buff if_spell=bloodsurge)
 	SpellAddBuff(wild_strike bloodsurge_buff=-1)
-
-AddFunction Interrupt
-{
-	if target.IsFriend(no) and target.IsInterruptible()
-	{
-		if target.InRange(pummel) Spell(pummel)
-		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
-		Spell(disrupting_shout)
-	}
-}
-
-AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) mastery=!protection)
-AddFunction HeroicLeap
-{
-	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-}
-
-AddFunction RagingBlow
-{
-	if BuffPresent(raging_blow_buff) Spell(raging_blow)
-}
 ]]
 
 	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")

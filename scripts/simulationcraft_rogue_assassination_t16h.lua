@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#ca!200002
 #	glyphs=vendetta
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_rogue_spells)
+Include(ovale_common)
+Include(ovale_rogue_common)
 
 AddFunction AssassinationDefaultActions
 {

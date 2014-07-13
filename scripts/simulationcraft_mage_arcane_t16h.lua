@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!0...11
 #	glyphs=mana_gem/mirror_image/arcane_power
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_mage_spells)
+Include(ovale_common)
+Include(ovale_mage_common)
 
 AddFunction ArcaneAoeActions
 {

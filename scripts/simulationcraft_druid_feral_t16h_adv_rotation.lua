@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#UZ!...2.1
 #	glyphs=savagery/cat_form
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_druid_spells)
+Include(ovale_common)
+Include(ovale_druid_common)
 
 AddFunction FeralFillerActions
 {

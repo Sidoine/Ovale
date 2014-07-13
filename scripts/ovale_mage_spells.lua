@@ -42,6 +42,7 @@ Define(blizzard 10)
 	SpellInfo(blizzard channel=8 haste=spell)
 Define(brain_freeze_buff 57761)
 	SpellInfo(brain_freeze_buff duration=15)
+Define(brilliant_mana_gem 81901)
 Define(cold_snap 11958)
 	SpellInfo(cold_snap cd=180)
 Define(cold_snap_talent 12)
@@ -156,6 +157,7 @@ Define(living_bomb_debuff 44457)
 Define(living_bomb_talent 14)
 Define(mage_armor 6117)
 Define(mage_armor_buff 6117)
+Define(mana_gem 36799)
 Define(mirror_image 55342)
 	SpellInfo(mirror_image cd=180)
 Define(molten_armor 30482)
@@ -204,33 +206,6 @@ Define(water_elemental 31687)
 	SpellInfo(water_elemental cd=60)
 Define(water_elemental_freeze 33395)
 	SpellInfo(water_elemental_freeze cd=25)
-
-Define(brilliant_mana_gem 81901)
-Define(mana_gem 36799)
-
-AddFunction ConjureManaGem
-{
-	if Glyph(glyph_of_mana_gem) and ItemCharges(brilliant_mana_gem) <10 Spell(conjure_brilliant_mana_gem)
-	if Glyph(glyph_of_mana_gem no) and ItemCharges(mana_gem) <3 Spell(conjure_mana_gem)
-}
-
-AddFunction UseManaGem
-{
-	if Glyph(glyph_of_mana_gem) Item(brilliant_mana_gem)
-	if Glyph(glyph_of_mana_gem no) Item(mana_gem)
-}
-
-AddFunction IcyVeins
-{
-	if Glyph(glyph_of_icy_veins) Spell(icy_veins_glyphed)
-	if Glyph(glyph_of_icy_veins no) Spell(icy_veins)
-}
-
-AddFunction IcyVeinsCooldownRemains
-{
-	if Glyph(glyph_of_icy_veins) SpellCooldown(icy_veins_glyphed)
-	if Glyph(glyph_of_icy_veins no) SpellCooldown(icy_veins)
-}
 ]]
 
 	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")

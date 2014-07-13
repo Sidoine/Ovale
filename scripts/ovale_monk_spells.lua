@@ -216,15 +216,6 @@ Define(zen_sphere 124081)
 Define(zen_sphere_buff 124081)
 	SpellInfo(zen_sphere_buff duration=16 haste=spell tick=2)
 Define(zen_sphere_talent 5)
-
-AddFunction Interrupt
-{
-	if target.IsFriend(no) and target.IsInterruptible()
-	{
-		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
-		if target.Classification(worldboss no) and target.InRange(paralysis) Spell(paralysis)
-	}
-}
 ]]
 
 	OvaleScripts:RegisterScript("MONK", name, desc, code, "include")

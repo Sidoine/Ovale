@@ -11,9 +11,8 @@ do
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#bZ!201121
 #	glyphs=focused_shield/alabaster_shield/divine_protection
 
-Include(ovale_items)
-Include(ovale_racials)
-Include(ovale_paladin_spells)
+Include(ovale_common)
+Include(ovale_paladin_common)
 
 AddFunction ProtectionDefaultActions
 {
