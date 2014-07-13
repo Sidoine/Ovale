@@ -106,13 +106,6 @@ local function TestConditions(parameters)
 		local isSpec = OvalePaperDoll:IsSpecialization(spec)
 		boolean = (required and isSpec) or (not required and not isSpec)
 	end
-	-- Deprecated: mastery -> specialization
-	if boolean and parameters.mastery then
-		Ovale:OneTimeMessage("Warning: 'mastery' is deprecated; use 'specialization' instead.")
-		local spec, required = RequireValue(parameters.mastery)
-		local isSpec = OvalePaperDoll:IsSpecialization(spec)
-		boolean = (required and isSpec) or (not required and not isSpec)
-	end
 	if boolean and parameters.if_stance then
 		self_compileOnStances = true
 		local stance, required = RequireValue(parameters.if_stance)
@@ -137,50 +130,28 @@ local function TestConditions(parameters)
 	do
 		local profile
 		if boolean and parameters.checkbox then
-			local name, required = RequireValue(parameters.checkbox)
-			local checkBox = Ovale.casesACocher[name] or {}
-			checkBox.compile = true
-			Ovale.casesACocher[name] = checkBox
-			-- Check the value of the checkbox.
-			profile = profile or OvaleOptions:GetProfile()
-			local isChecked = (profile.check[name] ~= nil)
-			boolean = (required and isChecked) or (not required and not isChecked)
+			for _, checkbox in ipairs(parameters.checkbox) do
+				local name, required = RequireValue(checkbox)
+				local control = Ovale.casesACocher[name] or {}
+				control.compile = true
+				Ovale.casesACocher[name] = control
+				-- Check the value of the checkbox.
+				profile = profile or OvaleOptions:GetProfile()
+				local isChecked = (profile.check[name] ~= nil)
+				boolean = (required and isChecked) or (not required and not isChecked)
+			end
 		end
-		-- Deprecated: checkboxon
-		if boolean and parameters.checkboxon then
-			Ovale:OneTimeMessage("Warning: 'checkboxon=name' is deprecated; use 'checkbox=name' instead.")
-			-- Flag this checkbox as triggering a script evaluation.
-			local name = parameters.checkboxon
-			local checkBox = Ovale.casesACocher[name] or {}
-			checkBox.compile = true
-			Ovale.casesACocher[name] = checkBox
-			-- Check the value of the checkbox.
-			profile = profile or OvaleOptions:GetProfile()
-			boolean = (profile.check[name] ~= nil)
-		end
-		-- Deprecated: checkboxoff
-		if boolean and parameters.checkboxoff then
-			Ovale:OneTimeMessage("Warning: 'checkboxoff=name' is deprecated; use 'checkbox=!name' instead.")
-			-- Flag this checkbox as triggering a script evaluation.
-			local name = parameters.checkboxon
-			local checkBox = Ovale.casesACocher[name] or {}
-			checkBox.compile = true
-			Ovale.casesACocher[name] = checkBox
-			-- Check the value of the checkbox.
-			profile = profile or OvaleOptions:GetProfile()
-			boolean = (profile.check[name] == nil)
-		end
-		if boolean and parameters.list and parameters.item then
-			-- Flag this list as triggering a script evaluation.
-			local name = parameters.list
-			local item, required = RequireValue(parameters.item)
-			local list = Ovale.listes[name] or { items = {}, default = nil }
-			list.compile = true
-			Ovale.listes[name] = list
-			-- Check the selected item in the list.
-			profile = profile or OvaleOptions:GetProfile()
-			local isSelected = (profile.list[name] == item)
-			boolean = (required and isSelected) or (not required and not isSelected)
+		if boolean and parameters.listitem then
+			for list, listitem in pairs(parameters.listitem) do
+				local item, required = RequireValue(listitem)
+				local control = Ovale.listes[list] or { items = {}, default = nil }
+				control.compile = true
+				Ovale.listes[list] = control
+				-- Check the selected item in the list.
+				profile = profile or OvaleOptions:GetProfile()
+				local isSelected = (profile.list[list] == item)
+				boolean = (required and isSelected) or (not required and not isSelected)
+			end
 		end
 	end
 	profiler.Stop("OvaleCompile_TestConditions")
@@ -323,8 +294,7 @@ local function EvaluateSpellAuraList(node)
 		local tbl = auraTable[filter] or {}
 		local count = 0
 		for k, v in pairs(parameters) do
-			-- Deprecated: "mastery" can't be a keyword since it's the same as the name of the raid buff.
-			if not OvaleAST.PARAMETER_KEYWORD[k] and k ~= "mastery" then
+			if not OvaleAST.PARAMETER_KEYWORD[k] then
 				tbl[k] = v
 				count = count + 1
 			end
@@ -365,11 +335,8 @@ local function EvaluateSpellInfo(node)
 				OvaleData.buffSpellList[v] = list
 			elseif k == "sharedcd" then
 				OvaleCooldown:AddSharedCooldown(v, spellId)
-			else
-				-- Deprecated: "mastery" can't be a keyword since it's the same as the name of the raid buff.
-				if not OvaleAST.PARAMETER_KEYWORD[k] and k ~= "mastery" then
-					si[k] = v
-				end
+			elseif not OvaleAST.PARAMETER_KEYWORD[k] then
+				si[k] = v
 			end
 		end
 	end

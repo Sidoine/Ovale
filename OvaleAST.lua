@@ -99,15 +99,16 @@ local DECLARATION_KEYWORD = {
 
 local PARAMETER_KEYWORD = {
 	["checkbox"] = true,
-	["checkboxoff"] = true,
-	["checkboxon"] = true,
+	["checkboxoff"] = true,		-- deprecated
+	["checkboxon"] = true,		-- deprecated
 	["glyph"] = true,
 	["if_spell"] = true,
 	["if_stance"] = true,
-	["item"] = true,
+	["item"] = true,			-- deprecated
 	["itemcount"] = true,
 	["itemset"] = true,
-	["list"] = true,
+	["list"] = true,			-- deprecated
+	["listitem"] = true,
 	["specialization"] = true,
 	["stance"] = true,
 	["talent"] = true,
@@ -203,6 +204,7 @@ end
 local self_indent = 0
 local self_outputPool = OvalePool("OvaleAST_outputPool")
 
+local self_controlPool = OvalePool("OvaleAST_controlPool")
 local self_parametersPool = OvalePool("OvaleAST_parametersPool")
 local self_childrenPool = OvalePool("OvaleAST_childrenPool")
 local self_pool = OvalePool("OvaleAST_pool")
@@ -347,6 +349,30 @@ local function GetTokenIterator(s)
 		end
 	end
 	return OvaleLexer.scan(s, MATCHES, exclude)
+end
+
+-- "Flatten" a parameter value node into a string.
+local function FlattenParameterValue(parameterValue)
+	local value = parameterValue
+	if type(parameterValue) == "table" then
+		local node = parameterValue
+		local isBang = false
+		if node.type == "bang_value" then
+			isBang = true
+			node = node.child[1]
+		end
+		if node.type == "value" then
+			value = node.value
+		elseif node.type == "variable" then
+			value = node.name
+		elseif node.type == "string" then
+			value = node.value
+		end
+		if isBang then
+			value = "!" .. tostring(value)
+		end
+	end
+	return value
 end
 
 --[[------------------------
@@ -530,6 +556,14 @@ UnparseParameters = function(parameters)
 	for k, v in pairs(parameters) do
 		if type(k) == "number" and k <= N then
 			-- Already output in previous loop.
+		elseif k == "checkbox" then
+			for _, name in ipairs(v) do
+				output[#output + 1] = format("checkbox=%s", Unparse(name))
+			end
+		elseif k == "listitem" then
+			for list, item in pairs(v) do
+				output[#output + 1] = format("listitem=%s:%s", list, Unparse(item))
+			end
 		elseif type(v) == "table" then
 			output[#output + 1] = format("%s=%s", k, Unparse(v))
 		elseif k == "filter" or k == "target" then
@@ -1524,14 +1558,50 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 				if tokenType == "=" then
 					-- Consume the '=' token.
 					tokenStream:Consume()
-					-- Get the value.
-					ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
-					if ok then
+					if name == "checkbox" or name == "listitem" then
+						local control = parameters[name] or self_controlPool:Get()
+						if name == "checkbox" then
+							-- Get the checkbox name.
+							ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
+							if ok then
+								control[#control + 1] = node
+							end
+						else -- if name == "listitem" then
+							-- Consume the list name.
+							tokenType, token = tokenStream:Consume()
+							local list
+							if tokenType == "name" then
+								list = token
+							else
+								SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; name expected.", token)
+								ok = false
+							end
+							if ok then
+								-- Consume the ':' token.
+								tokenType, token = tokenStream:Consume()
+								if tokenType ~= ":" then
+									SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; ':' expected.", token)
+									ok = false
+								end
+							end
+							if ok then
+								-- Consume the list item.
+								ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
+							end
+							if ok then
+								control[list] = node
+							end
+						end
+						if not parameters[name] then
+							parameters[name] = control
+							annotation.controlList = annotation.controlList or {}
+							annotation.controlList[#annotation.controlList + 1] = control
+						end
+					else
+						-- Get the value.
+						ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
 						parameters[name] = node
 					end
-				elseif PARAMETER_KEYWORD[name] then
-					SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", name)
-					ok = false
 				else
 					parameters[#parameters + 1] = node
 				end
@@ -2021,6 +2091,7 @@ end
 function OvaleAST:Debug()
 	self_pool:Debug()
 	self_parametersPool:Debug()
+	self_controlPool:Debug()
 	self_childrenPool:Debug()
 	self_outputPool:Debug()
 end
@@ -2045,6 +2116,11 @@ function OvaleAST:NodeToString(node)
 end
 
 function OvaleAST:ReleaseAnnotation(annotation)
+	if annotation.controlList then
+		for _, control in ipairs(annotation.controlList) do
+			self_controlPool:Release(control)
+		end
+	end
 	if annotation.parametersList then
 		for _, parameters in ipairs(annotation.parametersList) do
 			self_parametersPool:Release(parameters)
@@ -2209,29 +2285,65 @@ function OvaleAST:FlattenParameters(ast)
 				local parameters = self_parametersPool:Get()
 				for key, value in pairs(node.rawParams) do
 					-- Lookup the key.
-					if type(key) ~= "number" and dictionary and dictionary[key] then
-						key = dictionary[key]
+					if key == "checkbox" or key == "listitem" then
+						local control = parameters[key] or self_controlPool:Get()
+						if key == "checkbox" then
+							for i, name in ipairs(value) do
+								control[i] = FlattenParameterValue(name)
+							end
+						else -- if key == "listitem" then
+							for list, item in pairs(value) do
+								control[list] = FlattenParameterValue(item)
+							end
+						end
+						if not parameters[key] then
+							parameters[key] = control
+							annotation.controlList = annotation.controlList or {}
+							annotation.controlList[#annotation.controlList + 1] = control
+						end
+					elseif key == "checkboxon" or key == "checkboxoff" then
+						-- Deprecated: checkboxon
+						-- Deprecated: checkboxoff
+						local control = parameters.checkbox or self_controlPool:Get()
+						local name = FlattenParameterValue(value)
+						if key == "checkboxon" then
+							Ovale:OneTimeMessage("Warning: 'checkboxon=%s' is deprecated; use 'checkbox=%s' instead.", name, name)
+							control[#control + 1] = name
+						elseif key == "checkboxoff" then
+							Ovale:OneTimeMessage("Warning: 'checkboxoff=%s' is deprecated; use 'checkbox=!%s' instead.", name, name)
+							control[#control + 1] = "!" .. name
+						end
+						if not parameters.checkbox then
+							parameters.checkbox = control
+							annotation.controlList = annotation.controlList or {}
+							annotation.controlList[#annotation.controlList + 1] = control
+						end
+					elseif key == "list" or key == "item" then
+						-- Deprecated: list
+						-- Deprecated: item
+						if key == "list" and node.rawParams.item then
+							local control = parameters.listitem or self_controlPool:Get()
+							local list = FlattenParameterValue(value)
+							local item = FlattenParameterValue(node.rawParams.item)
+							Ovale:OneTimeMessage("Warning: 'list=%s item=%s' is deprecated; use 'listitem=%s:%s' instead.", list, item, list, item)
+							control[list] = item
+							if not parameters.listitem then
+								parameters.listitem = control
+								annotation.controlList = annotation.controlList or {}
+								annotation.controlList[#annotation.controlList + 1] = control
+							end
+						end
+					elseif key == "mastery" then
+						-- Deprecated: mastery -> specialization
+						local spec = FlattenParameterValue(value)
+						Ovale:OneTimeMessage("Warning: 'mastery=%s' is deprecated; use 'specialization=%s' instead.", spec, spec)
+						parameters.specialization = spec
+					else
+						if type(key) ~= "number" and dictionary and dictionary[key] then
+							key = dictionary[key]
+						end
+						parameters[key] = FlattenParameterValue(value)
 					end
-					-- Evaluate the value.
-					if type(value) == "table" then
-						local node = value
-						local isBang = false
-						if node.type == "bang_value" then
-							isBang = true
-							node = node.child[1]
-						end
-						if node.type == "value" then
-							value = node.value
-						elseif node.type == "variable" then
-							value = node.name
-						elseif node.type == "string" then
-							value = node.value
-						end
-						if isBang then
-							value = "!" .. tostring(value)
-						end
-					end
-					parameters[key] = value
 				end
 				node.params = parameters
 				annotation.parametersList = annotation.parametersList or {}
@@ -2246,6 +2358,14 @@ function OvaleAST:FlattenParameters(ast)
 				for k, v in pairs(parameters) do
 					if type(k) == "number" and k <= N then
 						-- Already output in previous loop.
+					elseif k == "checkbox" then
+						for _, name in ipairs(v) do
+							output[#output + 1] = format("checkbox=%s", name)
+						end
+					elseif k == "listitem" then
+						for list, item in ipairs(v) do
+							output[#output + 1] = format("listitem=%s:%s", list, item)
+						end
 					else
 						output[#output + 1] = format("%s=%s", k, v)
 					end
