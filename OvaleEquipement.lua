@@ -61,11 +61,8 @@ local INVSLOT_WRIST = INVSLOT_WRIST
 -- Player's class.
 local _, self_class = API_UnitClass("player")
 
--- frame for tooltip-scanning
-local self_tooltip = API_CreateFrame("GameTooltip", addonName .. "ScanningTooltip", nil, "GameTooltipTemplate")
-do
-	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-end
+-- Frame for tooltip-scanning.
+local self_tooltip = nil
 local OVALE_ITEM_LEVEL_PATTERN = "^" .. strgsub(ITEM_LEVEL, "%%d", "(%%d+)")
 
 -- equipment slot names
@@ -415,6 +412,12 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleEquipement:OnInitialize()
+	-- Create the tooltip used for scanning.
+	self_tooltip = API_CreateFrame("GameTooltip", addonName .. "ScanningTooltip", nil, "GameTooltipTemplate")
+	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+end
+
 function OvaleEquipement:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateEquippedItems")
