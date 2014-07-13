@@ -1,4 +1,4 @@
-﻿## Interface: 50400
+## Interface: 50400
 ## X-Min-Interface: 50100
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
