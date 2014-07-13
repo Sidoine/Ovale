@@ -227,6 +227,10 @@ sub ParseDirectory
 				{
 					$psm{$1} = true;
 				}
+				while ($psm =~ m/(\w+)\s*=\s*function\s*\(/g)
+				{
+					$psm{$1} = true;
+				}
 			}
 
 			if ($content =~ m/<public-static-properties>(.*)<\/public-static-properties>/s)
