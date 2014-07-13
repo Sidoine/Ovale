@@ -18,8 +18,8 @@ local setmetatable = setmetatable
 
 --<public-static-properties>
 OvaleQueue.name = "OvaleQueue"
-OvaleQueue.first = 0
-OvaleQueue.last = -1
+OvaleQueue.first = 1
+OvaleQueue.last = 0
 OvaleQueue.__index = OvaleQueue
 --</public-static-properties>
 
@@ -78,6 +78,13 @@ function OvaleQueue:RemoveBack()
 	return element
 end
 
+function OvaleQueue:At(index)
+	if index > self:Size() then
+		return
+	end
+	return self[self.first + index - 1]
+end
+
 function OvaleQueue:Front()
 	return self[self.first]
 end
@@ -112,15 +119,15 @@ end
 --</public-static-methods>
 
 --<public-static-properties>
--- Queue (LIFO) methods
+-- Queue (FIFO) methods
 OvaleQueue.NewQueue = OvaleQueue.NewDeque
 OvaleQueue.Insert = OvaleQueue.InsertBack
 OvaleQueue.Remove = OvaleQueue.RemoveFront
 OvaleQueue.Iterator = OvaleQueue.FrontToBackIterator
 
--- Stack (FIFO) methods
+-- Stack (LIFO) methods
 OvaleQueue.NewStack = OvaleQueue.NewDeque
-OvaleQueue.Push = OvaleQueue.InsertFront
-OvaleQueue.Pop = OvaleQueue.RemoveFront
-OvaleQueue.Top = OvaleQueue.Front
+OvaleQueue.Push = OvaleQueue.InsertBack
+OvaleQueue.Pop = OvaleQueue.RemoveBack
+OvaleQueue.Top = OvaleQueue.Back
 --</public-static-properties>
