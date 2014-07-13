@@ -379,6 +379,8 @@ end
 		http://lua-users.org/wiki/SplitJoin
 --]]--------------------------------------------------------------------
 WoWAPI.strsplit = function(delim, str, maxNb)
+	-- Fix up '.' character class.
+	delim = string.gsub(delim, "%.", "%%.")
 	-- Eliminate bad cases...
 	if string.find(str, delim) == nil then
 		return str
@@ -513,6 +515,8 @@ function WoWAPI:ExportSymbols(namespace)
 			namespace[k] = namespace[k] or v
 		end
 	end
+	-- Special handling for strsplit() to add to "string" module.
+	string.split = string.split or WoWAPI.strsplit
 	-- Special handling for wipe() to add to "table" module.
 	table.wipe = table.wipe or WoWAPI.wipe
 end
