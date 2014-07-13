@@ -35,7 +35,6 @@ OvalePool.name = "OvalePool"
 OvalePool.pool = nil
 OvalePool.size = 0
 OvalePool.unused = 0
-OvalePool.profiler = nil
 OvalePool.__index = OvalePool
 --</public-static-properties>
 

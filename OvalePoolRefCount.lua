@@ -47,7 +47,6 @@ OvalePoolRefCount.pool = nil
 OvalePoolRefCount.refcount = nil
 OvalePoolRefCount.size = 0
 OvalePoolRefCount.unused = 0
-OvalePoolRefCount.profiler = nil
 OvalePoolRefCount.__index = OvalePoolRefCount
 --</public-static-properties>
 
