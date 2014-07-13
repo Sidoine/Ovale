@@ -136,7 +136,7 @@ do
 	function Ovale:VersionCheck()
 		if not timer then
 			wipe(versionReply)
-			local message = "V"
+			local message = self:Serialize("V", self.version)
 			local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
 			API_SendAddonMessage(OVALE_MSG_PREFIX, message, channel)
 			timer = self:ScheduleTimer("PrintVersionCheck", 3)
