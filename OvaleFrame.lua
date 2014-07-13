@@ -281,19 +281,7 @@ do
 		end
 
 		wipe(Ovale.refreshNeeded)
-		
-		if (not Ovale.bug) then
-			Ovale.traced = false
-		end
-		
-		if (Ovale.trace) then
-			Ovale.trace=false
-			Ovale.traced = true
-		end
-		
-		if (Ovale.bug and not Ovale.traced) then
-			Ovale.trace = true
-		end	
+		Ovale:PostRefresh()
 	end
 	
 	local function UpdateIcons(self)

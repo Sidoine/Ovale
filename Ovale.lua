@@ -36,6 +36,12 @@ local OVALE_TRUE_STRING = tostring(true)
 
 -- Addon message prefix.
 local OVALE_MSG_PREFIX = addonName
+
+-- Flags used by debugging print functions.
+-- If "bug" flag is set, then the next frame refresh is traced.
+local self_bug = false
+-- If "traced" flag is set, then the public "trace" property is toggled before the next frame refresh.
+local self_traced = false
 --</private-static-properties>
 
 --<public-static-properties>
@@ -51,11 +57,8 @@ Ovale.frame = nil
 Ovale.checkBoxes = {}
 --drop down GUI items
 Ovale.dropDowns = {}
---set it if there was a bug, traces will be enabled on next frame
-Ovale.bug = false
-Ovale.traced = false
---trace next script function calls
-Ovale.trace=false
+-- Flag to activate tracing the function calls for the next frame refresh.
+Ovale.trace = false
 --in combat?
 Ovale.enCombat = false
 Ovale.refreshNeeded = {}
@@ -261,6 +264,22 @@ function Ovale:UpdateFrame()
 	end
 end
 
+function Ovale:PostRefresh()
+	-- If trace flag is set here, then flag that we just traced one frame.
+	if self.trace then
+		self_traced = true
+	end
+	-- If there was a bug, then enable trace on the next frame.
+	if self_bug then
+		self.trace = true
+	end
+	-- Toggle trace flag so we don't endlessly trace successive frames.
+	if self.trace and self_traced then
+		self_traced = false
+		self.trace = false
+	end
+end
+
 function Ovale:IsChecked(v)
 	return self.checkBoxes[v] and self.checkBoxes[v]:GetValue()
 end
@@ -336,12 +355,12 @@ end
 
 function Ovale:Error(...)
 	self:Print("Fatal error: ", ...)
-	self.bug = true
+	self_bug = true
 end
 
 function Ovale:Errorf(...)
 	self:Printf("Fatal error: %s", self:Format(...))
-	self.bug = true
+	self_bug = true
 end
 
 function Ovale:Log(...)
