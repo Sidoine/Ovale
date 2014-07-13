@@ -1073,11 +1073,22 @@ statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
 		for id in pairs(OvaleData.buffSpellList[auraId]) do
 			local aura = GetStateAuraOnGUID(state, guid, id, filter, mine)
 			if aura and (not auraFound or auraFound.ending < aura.ending) then
+				Ovale:Logf("Aura %s matching '%s' found on %s with (%f, %f)", id, auraId, guid, aura.start, aura.ending)
 				auraFound = aura
+			else
+				Ovale:Logf("Aura %s matching '%s' is missing on %s.", id, auraId, guid)
 			end
+		end
+		if not auraFound then
+			Ovale:Logf("Aura matching '%s' is missing on %s.", auraId, guid)
 		end
 	else
 		auraFound = GetStateAuraOnGUID(state, guid, auraId, filter, mine)
+		if auraFound then
+			Ovale:Logf("Aura %s found on %s with (%f, %f)", auraId, guid, auraFound.start, auraFound.ending)
+		else
+			Ovale:Logf("Aura %s is missing on %s.", auraId, guid)
+		end
 	end
 	return auraFound
 end
@@ -1169,10 +1180,14 @@ statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filte
 			end
 		end
 	end
+
 	if count > 0 then
-		return start, ending
+		Ovale:Logf("Aura with '%s' property found on %s (count=%s, minStart=%s, maxEnding=%s).", propertyName, unitId, count, start, ending)
+	else
+		Ovale:Logf("Aura with '%s' property is missing on %s.", propertyName, unitId)
+		start, ending = nil
 	end
-	return nil
+	return start, ending
 end
 
 do
@@ -1186,6 +1201,7 @@ do
 	local startFirst, endingLast
 
 	local function CountMatchingActiveAura(aura)
+		Ovale:Logf("Counting aura %s found on %s with (%f, %f)", aura.spellId, aura.guid, aura.start, aura.ending)
 		count = count + 1
 		stacks = stacks + aura.stacks
 		if aura.ending < endingChangeCount then
