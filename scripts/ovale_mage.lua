@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "Ovale"
+	local name = "ovale_mage"
 	local desc = "[5.4] Ovale: Arcane, Fire, Frost"
 	local code = [[
 # Ovale mage script based on SimulationCraft.
@@ -616,5 +616,7 @@ AddIcon mastery=frost size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("MAGE", name, desc, code, "script")
+	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")
+	-- Register as the default Ovale script.
+	OvaleScripts:RegisterScript("MAGE", "Ovale", desc, code, "script")
 end

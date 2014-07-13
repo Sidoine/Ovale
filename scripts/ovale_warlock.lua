@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "Ovale"
+	local name = "ovale_warlock"
 	local desc = "[5.4] Ovale: Affliction, Demonology (5.2), Destruction"
 	local code = [[
 # Ovale warlock script based on SimulationCraft.
@@ -447,5 +447,7 @@ AddIcon mastery=destruction size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "script")
+	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "include")
+	-- Register as the default Ovale script.
+	OvaleScripts:RegisterScript("WARLOCK", "Ovale", desc, code, "script")
 end

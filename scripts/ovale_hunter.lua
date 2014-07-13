@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "Ovale"
+	local name = "ovale_hunter"
 	local desc = "[5.4] Ovale: Beast Mastery, Marksmanship, Survival"
 	local code = [[
 # Ovale hunter script based on SimulationCraft.
@@ -607,5 +607,7 @@ AddIcon mastery=survival size=small checkboxon=opt_icons_right
 }
 ]]
 
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "script")
+	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")
+	-- Register as the default Ovale script.
+	OvaleScripts:RegisterScript("HUNTER", "Ovale", desc, code, "script")
 end
