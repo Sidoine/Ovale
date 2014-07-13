@@ -957,6 +957,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 				-- Deprecated after transition.
 				if not (si and si.duration) and spellData > 0 then
 					-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
+					Ovale:OneTimeMessage("Warning: '%s=%d' is deprecated for spell ID %d; aura ID %s should have duration information.", auraId, spellData, spellId, auraId)
 					duration = spellData
 					stacks = 1
 				end

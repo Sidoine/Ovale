@@ -108,6 +108,7 @@ local function TestConditions(parameters)
 	end
 	-- Deprecated: mastery -> specialization
 	if boolean and parameters.mastery then
+		Ovale:OneTimeMessage("Warning: 'mastery' is deprecated; use 'specialization' instead.")
 		local spec, required = RequireValue(parameters.mastery)
 		local isSpec = OvalePaperDoll:IsSpecialization(spec)
 		boolean = (required and isSpec) or (not required and not isSpec)
@@ -147,6 +148,7 @@ local function TestConditions(parameters)
 		end
 		-- Deprecated: checkboxon
 		if boolean and parameters.checkboxon then
+			Ovale:OneTimeMessage("Warning: 'checkboxon=name' is deprecated; use 'checkbox=name' instead.")
 			-- Flag this checkbox as triggering a script evaluation.
 			local name = parameters.checkboxon
 			local checkBox = Ovale.casesACocher[name] or {}
@@ -158,6 +160,7 @@ local function TestConditions(parameters)
 		end
 		-- Deprecated: checkboxoff
 		if boolean and parameters.checkboxoff then
+			Ovale:OneTimeMessage("Warning: 'checkboxoff=name' is deprecated; use 'checkbox=!name' instead.")
 			-- Flag this checkbox as triggering a script evaluation.
 			local name = parameters.checkboxon
 			local checkBox = Ovale.casesACocher[name] or {}

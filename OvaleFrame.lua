@@ -282,6 +282,7 @@ do
 
 		wipe(Ovale.refreshNeeded)
 		Ovale:PostRefresh()
+		Ovale:PrintOneTimeMessages()
 	end
 	
 	local function UpdateIcons(self)

@@ -43,6 +43,8 @@ local OVALE_MSG_PREFIX = addonName
 local self_bug = false
 -- If "traced" flag is set, then the public "trace" property is toggled before the next frame refresh.
 local self_traced = false
+-- Table of strings to display once per session.
+local self_oneTimeMessage = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -102,6 +104,7 @@ end
 
 function Ovale:OnEnable()
 	self:RegisterEvent("CHAT_MSG_ADDON")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -112,6 +115,7 @@ end
 
 function Ovale:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_ADDON")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
@@ -163,6 +167,10 @@ end
 --Called when the player target change
 --Used to update the visibility e.g. if the user chose
 --to hide Ovale if a friendly unit is targeted
+function Ovale:PLAYER_ENTERING_WORLD()
+	self:ClearOneTimeMessages()
+end
+
 function Ovale:PLAYER_TARGET_CHANGED()
 	self.refreshNeeded.target = true
 	self:UpdateVisibility()
@@ -375,6 +383,26 @@ end
 function Ovale:Logf(...)
 	if self.trace then
 		self.traceLog[#self.traceLog + 1] = self:Format(...)
+	end
+end
+
+function Ovale:OneTimeMessage(...)
+	local s = Ovale:Format(...)
+	if not self_oneTimeMessage[s] then
+		self_oneTimeMessage[s] = true
+	end
+end
+
+function Ovale:ClearOneTimeMessages()
+	wipe(self_oneTimeMessage)
+end
+
+function Ovale:PrintOneTimeMessages()
+	for s in pairs(self_oneTimeMessage) do
+		if self_oneTimeMessage[s] ~= "printed" then
+			Ovale:Print(s)
+			self_oneTimeMessage[s] = "printed"
+		end
 	end
 end
 --</public-static-methods>
