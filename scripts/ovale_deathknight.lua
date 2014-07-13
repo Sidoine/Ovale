@@ -229,15 +229,16 @@ AddFunction BloodCdActions
 	}
 }
 
-# Blood icons.
+### Blood icons.
+AddCheckBox(opt_deathknight_blood "Show Blood icons" specialization=blood default)
 
-AddIcon specialization=blood size=small checkbox=opt_icons_left
+AddIcon specialization=blood size=small checkbox=opt_icons_left checkbox=opt_deathknight_blood
 {
 	Spell(antimagic_shell)
 	Spell(icebound_fortitude)
 }
 
-AddIcon specialization=blood size=small checkbox=opt_icons_left
+AddIcon specialization=blood size=small checkbox=opt_icons_left checkbox=opt_deathknight_blood
 {
 	if TalentPoints(death_pact_talent)
 	{
@@ -247,31 +248,31 @@ AddIcon specialization=blood size=small checkbox=opt_icons_left
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
-AddIcon specialization=blood help=shortcd
+AddIcon specialization=blood help=shortcd checkbox=opt_deathknight_blood
 {
 	BloodShortCdActions()
 }
 
-AddIcon specialization=blood help=main
+AddIcon specialization=blood help=main checkbox=opt_deathknight_blood
 {
 	if InCombat(no) BloodPrecombatActions()
 	BloodSingleTargetActions()
 }
 
-AddIcon specialization=blood help=aoe checkbox=opt_aoe
+AddIcon specialization=blood help=aoe checkbox=opt_aoe checkbox=opt_deathknight_blood
 {
 	if InCombat(no) BloodPrecombatActions()
 	BloodAoeActions()
 }
 
-AddIcon specialization=blood help=cd
+AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood
 {
 	Interrupt()
 	UseRacialInterruptActions()
 	BloodCdActions()
 }
 
-AddIcon specialization=blood size=small checkbox=opt_icons_right
+AddIcon specialization=blood size=small checkbox=opt_icons_right checkbox=opt_deathknight_blood
 {
 	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
@@ -279,7 +280,7 @@ AddIcon specialization=blood size=small checkbox=opt_icons_right
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
 }
 
-AddIcon specialization=blood size=small checkbox=opt_icons_right
+AddIcon specialization=blood size=small checkbox=opt_icons_right checkbox=opt_deathknight_blood
 {
 	UseItemActions()
 }
@@ -534,14 +535,15 @@ AddFunction FrostTwoHandSingleTargetShortCdActions
 }
 
 ### Frost icons.
+AddCheckBox(opt_deathknight_frost "Show Frost icons" specialization=frost default)
 
-AddIcon specialization=frost size=small checkbox=opt_icons_left
+AddIcon specialization=frost size=small checkbox=opt_icons_left checkbox=opt_deathknight_frost
 {
 	Spell(antimagic_shell)
 	Spell(icebound_fortitude)
 }
 
-AddIcon specialization=frost size=small checkbox=opt_icons_left
+AddIcon specialization=frost size=small checkbox=opt_icons_left checkbox=opt_deathknight_frost
 {
 	if TalentPoints(death_pact_talent)
 	{
@@ -551,7 +553,7 @@ AddIcon specialization=frost size=small checkbox=opt_icons_left
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
-AddIcon specialization=frost help=shortcd
+AddIcon specialization=frost help=shortcd checkbox=opt_deathknight_frost
 {
 	if InCombat(no) FrostPrecombatShortCdActions()
 	FrostDefaultShortCdActions()
@@ -559,7 +561,7 @@ AddIcon specialization=frost help=shortcd
 	if HasWeapon(offhand no) FrostTwoHandSingleTargetShortCdActions()
 }
 
-AddIcon specialization=frost help=main
+AddIcon specialization=frost help=main checkbox=opt_deathknight_frost
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()
@@ -567,7 +569,7 @@ AddIcon specialization=frost help=main
 	if HasWeapon(offhand no) FrostTwoHandSingleTargetActions()
 }
 
-AddIcon specialization=frost help=aoe checkbox=opt_aoe
+AddIcon specialization=frost help=aoe checkbox=opt_aoe checkbox=opt_deathknight_frost
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()
@@ -575,7 +577,7 @@ AddIcon specialization=frost help=aoe checkbox=opt_aoe
 	if HasWeapon(offhand no) FrostTwoHandAoeActions()
 }
 
-AddIcon specialization=frost help=cd
+AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost
 {
 	if InCombat(no) FrostPrecombatCdActions()
 	Interrupt()
@@ -583,7 +585,7 @@ AddIcon specialization=frost help=cd
 	FrostDefaultCdActions()
 }
 
-AddIcon specialization=frost size=small checkbox=opt_icons_right
+AddIcon specialization=frost size=small checkbox=opt_icons_right checkbox=opt_deathknight_frost
 {
 	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
@@ -591,7 +593,7 @@ AddIcon specialization=frost size=small checkbox=opt_icons_right
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
 }
 
-AddIcon specialization=frost size=small checkbox=opt_icons_right
+AddIcon specialization=frost size=small checkbox=opt_icons_right checkbox=opt_deathknight_frost
 {
 	UseItemActions()
 }
@@ -775,14 +777,15 @@ AddFunction UnholyPrecombatCdActions
 }
 
 ### Unholy icons.
+AddCheckBox(opt_deathknight_unholy "Show Unholy icons" specialization=unholy default)
 
-AddIcon specialization=unholy size=small checkbox=opt_icons_left
+AddIcon specialization=unholy size=small checkbox=opt_icons_left checkbox=opt_deathknight_unholy
 {
 	Spell(antimagic_shell)
 	Spell(icebound_fortitude)
 }
 
-AddIcon specialization=unholy size=small checkbox=opt_icons_left
+AddIcon specialization=unholy size=small checkbox=opt_icons_left checkbox=opt_deathknight_unholy
 {
 	if TalentPoints(death_pact_talent)
 	{
@@ -792,26 +795,26 @@ AddIcon specialization=unholy size=small checkbox=opt_icons_left
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
-AddIcon specialization=unholy help=shortcd
+AddIcon specialization=unholy help=shortcd checkbox=opt_deathknight_unholy
 {
 	UnholySingleTargetShortCdActions()
 }
 
-AddIcon specialization=unholy help=main
+AddIcon specialization=unholy help=main checkbox=opt_deathknight_unholy
 {
 	if InCombat(no) UnholyPrecombatActions()
 	UnholyDefaultActions()
 	UnholySingleTargetActions()
 }
 
-AddIcon specialization=unholy help=aoe checkbox=opt_aoe
+AddIcon specialization=unholy help=aoe checkbox=opt_aoe checkbox=opt_deathknight_unholy
 {
 	if InCombat(no) UnholyPrecombatActions()
 	UnholyDefaultActions()
 	UnholyAoeActions()
 }
 
-AddIcon specialization=unholy help=cd
+AddIcon specialization=unholy help=cd checkbox=opt_deathknight_unholy
 {
 	if InCombat(no) UnholyPrecombatCdActions()
 	Interrupt()
@@ -820,7 +823,7 @@ AddIcon specialization=unholy help=cd
 	UnholySingleTargetCdActions()
 }
 
-AddIcon specialization=unholy size=small checkbox=opt_icons_right
+AddIcon specialization=unholy size=small checkbox=opt_icons_right checkbox=opt_deathknight_unholy
 {
 	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
@@ -828,7 +831,7 @@ AddIcon specialization=unholy size=small checkbox=opt_icons_right
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
 }
 
-AddIcon specialization=unholy size=small checkbox=opt_icons_right
+AddIcon specialization=unholy size=small checkbox=opt_icons_right checkbox=opt_deathknight_unholy
 {
 	UseItemActions()
 }

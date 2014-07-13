@@ -64,15 +64,16 @@ AddFunction HolyPrecombatActions
 }
 
 ### Holy Icons
+AddCheckBox(opt_paladin_holy "Show Holy icons" specialization=holy default)
 
-AddIcon specialization=holy size=small checkbox=opt_icons_left
+AddIcon specialization=holy size=small checkbox=opt_icons_left checkbox=opt_paladin_holy
 {
 	Spell(divine_protection)
 	Spell(devotion_aura)
 	UseRacialSurvivalActions()
 }
 
-AddIcon specialization=holy help=mana size=small checkbox=opt_icons_left
+AddIcon specialization=holy help=mana size=small checkbox=opt_icons_left checkbox=opt_paladin_holy
 {
 	if ManaPercent() <98 Spell(arcane_torrent_mana)
 	if ManaPercent() <88 Spell(divine_plea)
@@ -80,27 +81,27 @@ AddIcon specialization=holy help=mana size=small checkbox=opt_icons_left
 	if target.IsFriend(no) and not target.InRange(crusader_strike) Texture(ability_druid_dash help=NotInMeleeRange)
 }
 
-AddIcon specialization=holy help=shortcd
+AddIcon specialization=holy help=shortcd checkbox=opt_paladin_holy
 {
 	if TalentPoints(holy_prism_talent) Spell(holy_prism)
 	if TalentPoints(lights_hammer_talent) Spell(lights_hammer)
 	if TalentPoints(execution_sentence_talent) Spell(execution_sentence)
 }
 
-AddIcon specialization=holy help=main
+AddIcon specialization=holy help=main checkbox=opt_paladin_holy
 {
 	HolyPrecombatActions()
 	HolySingleTargetActions()
 }
 
-AddIcon specialization=holy help=aoe checkbox=opt_aoe
+AddIcon specialization=holy help=aoe checkbox=opt_aoe checkbox=opt_paladin_holy
 {
 	HolyPrecombatActions()
 	if TalentPoints(selfless_healer_talent) HolySelflessHealerAoeActions()
 	if not TalentPoints(selfless_healer_talent) HolyAoeActions()
 }
 
-AddIcon specialization=holy help=cd
+AddIcon specialization=holy help=cd checkbox=opt_paladin_holy
 {
 	Interrupt()
 	if IsRooted() Spell(hand_of_freedom)
@@ -110,12 +111,12 @@ AddIcon specialization=holy help=cd
 	Spell(guardian_of_ancient_kings_heal)
 }
 
-AddIcon specialization=holy size=small checkbox=opt_icons_right
+AddIcon specialization=holy size=small checkbox=opt_icons_right checkbox=opt_paladin_holy
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
-AddIcon specialization=holy size=small checkbox=opt_icons_right
+AddIcon specialization=holy size=small checkbox=opt_icons_right checkbox=opt_paladin_holy
 {
 	UseItemActions()
 }
@@ -216,8 +217,9 @@ AddFunction ProtectionPrecombatActions
 }
 
 ### Protection Icons
+AddCheckBox(opt_paladin_protection "Show Protection icons" specialization=protection default)
 
-AddIcon specialization=protection size=small checkbox=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left checkbox=opt_paladin_protection
 {
 	Spell(divine_protection)
 	Spell(ardent_defender)
@@ -226,7 +228,7 @@ AddIcon specialization=protection size=small checkbox=opt_icons_left
 	UseRacialSurvivalActions()
 }
 
-AddIcon specialization=protection size=small checkbox=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left checkbox=opt_paladin_protection
 {
 	if DebuffExpires(forbearance_debuff)
 	{
@@ -236,19 +238,19 @@ AddIcon specialization=protection size=small checkbox=opt_icons_left
 	}
 }
 
-AddIcon specialization=protection help=shortcd
+AddIcon specialization=protection help=shortcd checkbox=opt_paladin_protection
 {
 	if BuffExpires(righteous_fury) Spell(righteous_fury)
 	ProtectionDefaultShortCdActions()
 }
 
-AddIcon specialization=protection help=main
+AddIcon specialization=protection help=main checkbox=opt_paladin_protection
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 
-AddIcon specialization=protection help=aoe checkbox=opt_aoe
+AddIcon specialization=protection help=aoe checkbox=opt_aoe checkbox=opt_paladin_protection
 {
 	if InCombat(no) ProtectionPrecombatActions()
 
@@ -262,19 +264,19 @@ AddIcon specialization=protection help=aoe checkbox=opt_aoe
 	Spell(holy_wrath)
 }
 
-AddIcon specialization=protection help=cd
+AddIcon specialization=protection help=cd checkbox=opt_paladin_protection
 {
 	Interrupt()
 	if IsRooted() Spell(hand_of_freedom)
 	ProtectionDefaultCdActions()
 }
 
-AddIcon specialization=protection size=small checkbox=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right checkbox=opt_paladin_protection
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
-AddIcon specialization=protection size=small checkbox=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right checkbox=opt_paladin_protection
 {
 	UseItemActions()
 }
@@ -421,8 +423,9 @@ AddFunction RetributionPrecombatCdActions
 }
 
 ### Retribution Icons
+AddCheckBox(opt_paladin_retribution "Show Retribution icons" specialization=retribution default)
 
-AddIcon specialization=retribution size=small checkbox=opt_icons_left
+AddIcon specialization=retribution size=small checkbox=opt_icons_left checkbox=opt_paladin_retribution
 {
 	if IsRooted()
 	{
@@ -431,44 +434,44 @@ AddIcon specialization=retribution size=small checkbox=opt_icons_left
 	}
 }
 
-AddIcon specialization=retribution size=small checkbox=opt_icons_left
+AddIcon specialization=retribution size=small checkbox=opt_icons_left checkbox=opt_paladin_retribution
 {
 	Spell(lay_on_hands)
 	Spell(hand_of_protection)
 	if DebuffExpires(forbearance_debuff) Spell(divine_shield)
 }
 
-AddIcon specialization=retribution help=shortcd
+AddIcon specialization=retribution help=shortcd checkbox=opt_paladin_retribution
 {
 	RetributionDefaultShortCdActions()
 }
 
-AddIcon specialization=retribution help=main
+AddIcon specialization=retribution help=main checkbox=opt_paladin_retribution
 {
 	if InCombat(no) RetributionPrecombatActions()
 	RetributionDefaultActions()
 }
 
-AddIcon specialization=retribution help=aoe checkbox=opt_aoe
+AddIcon specialization=retribution help=aoe checkbox=opt_aoe checkbox=opt_paladin_retribution
 {
 	if InCombat(no) RetributionPrecombatActions()
 	RetributionDefaultAoeActions()
 }
 
-AddIcon specialization=retribution help=cd
+AddIcon specialization=retribution help=cd checkbox=opt_paladin_retribution
 {
 	if InCombat(no) RetributionPrecombatCdActions()
 	RetributionDefaultCdActions()
 }
 
-AddIcon specialization=retribution size=small checkbox=opt_icons_right
+AddIcon specialization=retribution size=small checkbox=opt_icons_right checkbox=opt_paladin_retribution
 {
 	#seal_of_righteousness,if=active_enemies>=4
 	if Enemies() >= 4 and not Stance(paladin_seal_of_righteousness) Spell(seal_of_righteousness)
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
-AddIcon specialization=retribution size=small checkbox=opt_icons_right
+AddIcon specialization=retribution size=small checkbox=opt_icons_right checkbox=opt_paladin_retribution
 {
 	UseItemActions()
 }

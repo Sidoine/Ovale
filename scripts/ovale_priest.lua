@@ -168,37 +168,38 @@ AddFunction ShadowPrecombatCdActions
 }
 
 ### Shadow icons
+AddCheckBox(opt_priest_shadow "Show Shadow icons" specialization=shadow default)
 
-AddIcon specialization=shadow size=small checkbox=opt_icons_left
+AddIcon specialization=shadow size=small checkbox=opt_icons_left checkbox=opt_priest_shadow
 {
 	if TalentPoints(desperate_prayer_talent) Spell(desperate_prayer)
 	Spell(dispersion)
 }
 
-AddIcon specialization=shadow size=small checkbox=opt_icons_left
+AddIcon specialization=shadow size=small checkbox=opt_icons_left checkbox=opt_priest_shadow
 {
 	Spell(vampiric_embrace)
 	Spell(hymn_of_hope)
 }
 
-AddIcon specialization=shadow help=shortcd
+AddIcon specialization=shadow help=shortcd checkbox=opt_priest_shadow
 {
 	ShadowDefaultShortCdActions()
 }
 
-AddIcon specialization=shadow help=main
+AddIcon specialization=shadow help=main checkbox=opt_priest_shadow
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultActions()
 }
 
-AddIcon specialization=shadow help=moving
+AddIcon specialization=shadow help=moving checkbox=opt_priest_shadow
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultMovingActions()
 }
 
-AddIcon specialization=shadow help=cd
+AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow
 {
 	if InCombat(no) ShadowPrecombatCdActions()
 	Interrupt()
@@ -206,12 +207,12 @@ AddIcon specialization=shadow help=cd
 	ShadowDefaultCdActions()
 }
 
-AddIcon specialization=shadow size=small checkbox=opt_icons_right
+AddIcon specialization=shadow size=small checkbox=opt_icons_right checkbox=opt_priest_shadow
 {
 	Spell(mass_dispel)
 }
 
-AddIcon specialization=shadow size=small checkbox=opt_icons_right
+AddIcon specialization=shadow size=small checkbox=opt_icons_right checkbox=opt_priest_shadow
 {
 	UseItemActions()
 }

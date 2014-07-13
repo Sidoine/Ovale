@@ -184,49 +184,50 @@ AddFunction ArcanePrecombatCdActions
 }
 
 ### Arcane icons.
+AddCheckBox(opt_mage_arcane "Show Arcane icons" specialization=arcane default)
 
-AddIcon specialization=arcane size=small checkbox=opt_icons_left
+AddIcon specialization=arcane size=small checkbox=opt_icons_left checkbox=opt_mage_arcane
 {
 	if TalentPoints(cold_snap_talent) and HealthPercent() < 30 Spell(cold_snap)
 	Spell(blink)
 }
 
-AddIcon specialization=arcane help=moving size=small checkbox=opt_icons_left
+AddIcon specialization=arcane help=moving size=small checkbox=opt_icons_left checkbox=opt_mage_arcane
 {
 	ArcaneSingleTargetMovingActions()
 }
 
-AddIcon specialization=arcane help=shortcd
+AddIcon specialization=arcane help=shortcd checkbox=opt_mage_arcane
 {
 	if InCombat(no) ArcanePrecombatShortCdActions()
 	ArcaneDefaultShortCdActions()
 }
 
-AddIcon specialization=arcane help=main
+AddIcon specialization=arcane help=main checkbox=opt_mage_arcane
 {
 	if InCombat(no) ArcanePrecombatActions()
 	ArcaneDefaultActions()
 	ArcaneSingleTargetActions()
 }
 
-AddIcon specialization=arcane help=aoe checkbox=opt_aoe
+AddIcon specialization=arcane help=aoe checkbox=opt_aoe checkbox=opt_mage_arcane
 {
 	if InCombat(no) ArcanePrecombatActions()
 	ArcaneDefaultActions()
 	ArcaneAoeActions()
 }
 
-AddIcon specialization=arcane help=cd
+AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane
 {
 	ArcaneDefaultCdActions()
 }
 
-AddIcon specialization=arcane size=small checkbox=opt_icons_right
+AddIcon specialization=arcane size=small checkbox=opt_icons_right checkbox=opt_mage_arcane
 {
 	if BuffExpires(burst_haste any=1) and DebuffExpires(burst_haste_debuff) Spell(time_warp)
 }
 
-AddIcon specialization=arcane size=small checkbox=opt_icons_right
+AddIcon specialization=arcane size=small checkbox=opt_icons_right checkbox=opt_mage_arcane
 {
 	UseItemActions()
 }
@@ -377,47 +378,48 @@ AddFunction FirePrecombatCdActions
 }
 
 ### Fire icons.
+AddCheckBox(opt_mage_fire "Show Fire icons" specialization=fire default)
 
-AddIcon specialization=fire size=small checkbox=opt_icons_left
+AddIcon specialization=fire size=small checkbox=opt_icons_left checkbox=opt_mage_fire
 {
 	if TalentPoints(cold_snap_talent) and HealthPercent() < 30 Spell(cold_snap)
 	Spell(blink)
 }
 
-AddIcon specialization=fire size=small checkbox=opt_icons_left
+AddIcon specialization=fire size=small checkbox=opt_icons_left checkbox=opt_mage_fire
 {
 	Spell(combustion)
 }
 
-AddIcon specialization=fire help=shortcd
+AddIcon specialization=fire help=shortcd checkbox=opt_mage_fire
 {
 	if InCombat(no) FirePrecombatShortCdActions()
 	FireDefaultShortCdActions()
 }
 
-AddIcon specialization=fire help=main
+AddIcon specialization=fire help=main checkbox=opt_mage_fire
 {
 	if InCombat(no) FirePrecombatActions()
 	FireDefaultActions()
 }
 
-AddIcon specialization=fire help=aoe checkbox=opt_aoe
+AddIcon specialization=fire help=aoe checkbox=opt_aoe checkbox=opt_mage_fire
 {
 	if InCombat(no) FirePrecombatActions()
 	FireDefaultAoeActions()
 }
 
-AddIcon specialization=fire help=cd
+AddIcon specialization=fire help=cd checkbox=opt_mage_fire
 {
 	FireDefaultCdActions()
 }
 
-AddIcon specialization=fire size=small checkbox=opt_icons_right
+AddIcon specialization=fire size=small checkbox=opt_icons_right checkbox=opt_mage_fire
 {
 	if BuffExpires(burst_haste any=1) and DebuffExpires(burst_haste_debuff) Spell(time_warp)
 }
 
-AddIcon specialization=fire size=small checkbox=opt_icons_right
+AddIcon specialization=fire size=small checkbox=opt_icons_right checkbox=opt_mage_fire
 {
 	UseItemActions()
 }
@@ -570,47 +572,48 @@ AddFunction FrostAoeActions
 }
 
 ### Frost icons.
+AddCheckBox(opt_mage_frost "Show Frost icons" specialization=frost default)
 
-AddIcon specialization=frost size=small checkbox=opt_icons_left
+AddIcon specialization=frost size=small checkbox=opt_icons_left checkbox=opt_mage_frost
 {
 	if TalentPoints(cold_snap_talent) and HealthPercent() < 30 Spell(cold_snap)
 	Spell(blink)
 }
 
-AddIcon specialization=frost size=small checkbox=opt_icons_left
+AddIcon specialization=frost size=small checkbox=opt_icons_left checkbox=opt_mage_frost
 {
 	if pet.Present() Spell(water_elemental_freeze)
 }
 
-AddIcon specialization=frost help=shortcd
+AddIcon specialization=frost help=shortcd checkbox=opt_mage_frost
 {
 	if InCombat(no) FrostPrecombatShortCdActions()
 	FrostDefaultShortCdActions()
 }
 
-AddIcon specialization=frost help=main
+AddIcon specialization=frost help=main checkbox=opt_mage_frost
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()
 }
 
-AddIcon specialization=frost help=aoe checkbox=opt_aoe
+AddIcon specialization=frost help=aoe checkbox=opt_aoe checkbox=opt_mage_frost
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostAoeActions()
 }
 
-AddIcon specialization=frost help=cd
+AddIcon specialization=frost help=cd checkbox=opt_mage_frost
 {
 	FrostDefaultCdActions()
 }
 
-AddIcon specialization=frost size=small checkbox=opt_icons_right
+AddIcon specialization=frost size=small checkbox=opt_icons_right checkbox=opt_mage_frost
 {
 	if BuffExpires(burst_haste any=1) and DebuffExpires(burst_haste_debuff) Spell(time_warp)
 }
 
-AddIcon specialization=frost size=small checkbox=opt_icons_right
+AddIcon specialization=frost size=small checkbox=opt_icons_right checkbox=opt_mage_frost
 {
 	UseItemActions()
 }

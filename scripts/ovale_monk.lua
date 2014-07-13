@@ -150,26 +150,27 @@ AddFunction BrewmasterPrecombatActions
 }
 
 ### Brewmaster icons.
+AddCheckBox(opt_monk_brewmaster "Show Brewmaster icons" specialization=brewmaster default)
 
-AddIcon specialization=brewmaster size=small checkbox=opt_icons_left
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_left checkbox=opt_monk_brewmaster
 {
 	if TalentPoints(dampen_harm_talent) Spell(dampen_harm)
 	if TalentPoints(diffuse_magic_talent) Spell(diffuse_magic)
 }
 
-AddIcon specialization=brewmaster size=small checkbox=opt_icons_left
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_left checkbox=opt_monk_brewmaster
 {
 	Spell(fortifying_brew)
 	Spell(symbiosis_survival_instincts)
 	UseRacialSurvivalActions()
 }
 
-AddIcon specialization=brewmaster help=cd
+AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster
 {
 	BrewmasterShortCdActions()
 }
 
-AddIcon specialization=brewmaster help=main
+AddIcon specialization=brewmaster help=main checkbox=opt_monk_brewmaster
 {
 	if InCombat(no) BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
@@ -177,7 +178,7 @@ AddIcon specialization=brewmaster help=main
 	BrewmasterFillerActions()
 }
 
-AddIcon specialization=brewmaster help=aoe checkbox=opt_aoe
+AddIcon specialization=brewmaster help=aoe checkbox=opt_aoe checkbox=opt_monk_brewmaster
 {
 	if InCombat(no) BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
@@ -185,7 +186,7 @@ AddIcon specialization=brewmaster help=aoe checkbox=opt_aoe
 	BrewmasterFillerActions()
 }
 
-AddIcon specialization=brewmaster help=cd
+AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster
 {
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	if target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death)
@@ -194,12 +195,12 @@ AddIcon specialization=brewmaster help=cd
 	BrewmasterCdActions()
 }
 
-AddIcon specialization=brewmaster size=small checkbox=opt_icons_right
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_right checkbox=opt_monk_brewmaster
 {
 	if TotemExpires(statue) or BuffExpires(sanctuary_of_the_ox_buff) Spell(summon_black_ox_statue)
 }
 
-AddIcon specialization=brewmaster size=small checkbox=opt_icons_right
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_right checkbox=opt_monk_brewmaster
 {
 	UseItemActions()
 }
@@ -285,19 +286,20 @@ AddFunction MistweaverPrecombatActions
 }
 
 ### Mistweaver icons.
+AddCheckBox(opt_monk_mistweaver "Show Mistweaver icons" specialization=mistweaver default)
 
-AddIcon specialization=mistweaver size=small checkbox=opt_icons_right
+AddIcon specialization=mistweaver size=small checkbox=opt_icons_right checkbox=opt_monk_mistweaver
 {
 	if TotemExpires(statue) Spell(summon_jade_serpent_statue)
 }
 
-AddIcon specialization=mistweaver size=small checkbox=opt_icons_left
+AddIcon specialization=mistweaver size=small checkbox=opt_icons_left checkbox=opt_monk_mistweaver
 {
 	if BuffCountOnAny(renewing_mist_buff) > 5 Spell(thunder_focus_tea)
 	Spell(revival)
 }
 
-AddIcon specialization=mistweaver help=shortcd
+AddIcon specialization=mistweaver help=shortcd checkbox=opt_monk_mistweaver
 {
 	unless Stance(monk_stance_of_the_wise_serpent) Spell(stance_of_the_wise_serpent)
 
@@ -311,19 +313,19 @@ AddIcon specialization=mistweaver help=shortcd
 	if TalentPoints(zen_sphere_talent) and BuffCountOnAny(zen_sphere_buff) < 1 Spell(zen_sphere)
 }
 
-AddIcon specialization=mistweaver help=main
+AddIcon specialization=mistweaver help=main checkbox=opt_monk_mistweaver
 {
 	if InCombat(no) MistweaverPrecombatActions()
 	MistweaverSingleTargetActions()
 }
 
-AddIcon specialization=mistweaver help=aoe checkbox=opt_aoe
+AddIcon specialization=mistweaver help=aoe checkbox=opt_aoe checkbox=opt_monk_mistweaver
 {
 	if InCombat(no) MistweaverPrecombatActions()
 	MistweaverAoeActions()
 }
 
-AddIcon specialization=mistweaver help=cd
+AddIcon specialization=mistweaver help=cd checkbox=opt_monk_mistweaver
 {
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	if target.Health() < Health() and BuffPresent(death_note) Spell(touch_of_death)
@@ -335,7 +337,7 @@ AddIcon specialization=mistweaver help=cd
 	MistweaverDefaultCdActions()
 }
 
-AddIcon specialization=mistweaver help=mana size=small checkbox=opt_icons_left
+AddIcon specialization=mistweaver help=mana size=small checkbox=opt_icons_left checkbox=opt_monk_mistweaver
 {
 	if ManaPercent() < 100
 	{
@@ -343,7 +345,7 @@ AddIcon specialization=mistweaver help=mana size=small checkbox=opt_icons_left
 	}
 }
 
-AddIcon specialization=mistweaver size=small checkbox=opt_icons_right
+AddIcon specialization=mistweaver size=small checkbox=opt_icons_right checkbox=opt_monk_mistweaver
 {
 	UseItemActions()
 }
@@ -469,41 +471,42 @@ AddFunction WindwalkerPrecombatCdActions
 }
 
 ### Windwalker icons.
+AddCheckBox(opt_monk_windwalker "Show Windwalker icons" specialization=windwalker default)
 
-AddIcon specialization=windwalker size=small checkbox=opt_icons_left
+AddIcon specialization=windwalker size=small checkbox=opt_icons_left checkbox=opt_monk_windwalker
 {
 	if TalentPoints(dampen_harm_talent) Spell(dampen_harm)
 	if TalentPoints(diffuse_magic_talent) Spell(diffuse_magic)
 }
 
-AddIcon specialization=windwalker size=small checkbox=opt_icons_left
+AddIcon specialization=windwalker size=small checkbox=opt_icons_left checkbox=opt_monk_windwalker
 {
 	if TalentPoints(chi_burst_talent) Spell(chi_burst)
 	if TalentPoints(chi_wave_talent) Spell(chi_wave)
 	if TalentPoints(zen_sphere_talent) and BuffExpires(zen_sphere_buff) Spell(zen_sphere)
 }
 
-AddIcon specialization=windwalker help=shortcd
+AddIcon specialization=windwalker help=shortcd checkbox=opt_monk_windwalker
 {
 	WindwalkerDefaultShortCdActions()
 	WindwalkerSingleTargetShortCdActions()
 }
 
-AddIcon specialization=windwalker help=main
+AddIcon specialization=windwalker help=main checkbox=opt_monk_windwalker
 {
 	if InCombat(no) WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()
 	WindwalkerSingleTargetActions()
 }
 
-AddIcon specialization=windwalker help=aoe checkbox=opt_aoe
+AddIcon specialization=windwalker help=aoe checkbox=opt_aoe checkbox=opt_monk_windwalker
 {
 	if InCombat(no) WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()
 	WindwalkerAoeActions()
 }
 
-AddIcon specialization=windwalker help=cd
+AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker
 {
 	if InCombat(no) WindwalkerPrecombatCdActions()
 
@@ -515,12 +518,12 @@ AddIcon specialization=windwalker help=cd
 	WindwalkerDefaultCdActions()
 }
 
-AddIcon specialization=windwalker size=small checkbox=opt_icons_right
+AddIcon specialization=windwalker size=small checkbox=opt_icons_right checkbox=opt_monk_windwalker
 {
 	Spell(zen_meditation)
 }
 
-AddIcon specialization=windwalker size=small checkbox=opt_icons_right
+AddIcon specialization=windwalker size=small checkbox=opt_icons_right checkbox=opt_monk_windwalker
 {
 	UseItemActions()
 }

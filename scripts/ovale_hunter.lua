@@ -159,37 +159,38 @@ AddFunction BeastMasteryPrecombatCdActions
 }
 
 ### Beast Mastery icons
+AddCheckBox(opt_hunter_best_mastery "Show Beast Mastery icons" specialization=beast_mastery default)
 
-AddIcon specialization=beast_mastery size=small checkbox=opt_icons_left
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_left checkbox=opt_hunter_best_mastery
 {
 	Spell(misdirection)
 }
 
-AddIcon specialization=beast_mastery size=small checkbox=opt_icons_left
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_left checkbox=opt_hunter_best_mastery
 {
 	Spell(disengage)
 }
 
-AddIcon specialization=beast_mastery help=shortcd
+AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_best_mastery
 {
 	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	SummonPet()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon specialization=beast_mastery help=main
+AddIcon specialization=beast_mastery help=main checkbox=opt_hunter_best_mastery
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 
-AddIcon specialization=beast_mastery help=aoe checkbox=opt_aoe
+AddIcon specialization=beast_mastery help=aoe checkbox=opt_aoe checkbox=opt_hunter_best_mastery
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultAoeActions()
 }
 
-AddIcon specialization=beast_mastery help=cd
+AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_best_mastery
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	Interrupt()
@@ -197,12 +198,12 @@ AddIcon specialization=beast_mastery help=cd
 	BeastMasteryDefaultCdActions()
 }
 
-AddIcon specialization=beast_mastery size=small checkbox=opt_icons_right
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_right checkbox=opt_hunter_best_mastery
 {
 	Spell(explosive_trap)
 }
 
-AddIcon specialization=beast_mastery size=small checkbox=opt_icons_right
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_right checkbox=opt_hunter_best_mastery
 {
 	UseItemActions()
 }
@@ -362,37 +363,38 @@ AddFunction MarksmanshipPrecombatCdActions
 }
 
 ### Marksmanship icons
+AddCheckBox(opt_hunter_marksmanship "Show Marksmanship icons" specialization=marksmanship default)
 
-AddIcon specialization=marksmanship size=small checkbox=opt_icons_left
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_left checkbox=opt_hunter_marksmanship
 {
 	Spell(misdirection)
 }
 
-AddIcon specialization=marksmanship size=small checkbox=opt_icons_left
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_left checkbox=opt_hunter_marksmanship
 {
 	Spell(disengage)
 }
 
-AddIcon specialization=marksmanship help=shortcd
+AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship
 {
 	if InCombat(no) MarksmanshipPrecombatShortCdActions()
 	SummonPet()
 	MarksmanshipDefaultShortCdActions()
 }
 
-AddIcon specialization=marksmanship help=main
+AddIcon specialization=marksmanship help=main checkbox=opt_hunter_marksmanship
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()
 }
 
-AddIcon specialization=marksmanship help=aoe checkbox=opt_aoe
+AddIcon specialization=marksmanship help=aoe checkbox=opt_aoe checkbox=opt_hunter_marksmanship
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultAoeActions()
 }
 
-AddIcon specialization=marksmanship help=cd
+AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship
 {
 	if InCombat(no) MarksmanshipPrecombatCdActions()
 	Interrupt()
@@ -400,12 +402,12 @@ AddIcon specialization=marksmanship help=cd
 	MarksmanshipDefaultCdActions()
 }
 
-AddIcon specialization=marksmanship size=small checkbox=opt_icons_right
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_right checkbox=opt_hunter_marksmanship
 {
 	Spell(explosive_trap)
 }
 
-AddIcon specialization=marksmanship size=small checkbox=opt_icons_right
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_right checkbox=opt_hunter_marksmanship
 {
 	UseItemActions()
 }
@@ -557,37 +559,38 @@ AddFunction SurvivalPrecombatCdActions
 }
 
 ### Survival icons
+AddCheckBox(opt_hunter_survival "Show Survival icons" specialization=survival default)
 
-AddIcon specialization=survival size=small checkbox=opt_icons_left
+AddIcon specialization=survival size=small checkbox=opt_icons_left checkbox=opt_hunter_survival
 {
 	Spell(misdirection)
 }
 
-AddIcon specialization=survival size=small checkbox=opt_icons_left
+AddIcon specialization=survival size=small checkbox=opt_icons_left checkbox=opt_hunter_survival
 {
 	Spell(disengage)
 }
 
-AddIcon specialization=survival help=shortcd
+AddIcon specialization=survival help=shortcd checkbox=opt_hunter_survival
 {
 	if InCombat(no) SurvivalPrecombatShortCdActions()
 	SummonPet()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=main
+AddIcon specialization=survival help=main checkbox=opt_hunter_survival
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultActions()
 }
 
-AddIcon specialization=survival help=aoe checkbox=opt_aoe
+AddIcon specialization=survival help=aoe checkbox=opt_aoe checkbox=opt_hunter_survival
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultAoeActions()
 }
 
-AddIcon specialization=survival help=cd
+AddIcon specialization=survival help=cd checkbox=opt_hunter_survival
 {
 	if InCombat(no) SurvivalPrecombatCdActions()
 	Interrupt()
@@ -595,13 +598,13 @@ AddIcon specialization=survival help=cd
 	SurvivalDefaultCdActions()
 }
 
-AddIcon specialization=survival size=small checkbox=opt_icons_right
+AddIcon specialization=survival size=small checkbox=opt_icons_right checkbox=opt_hunter_survival
 {
 	Spell(explosive_trap)
 	Spell(ice_trap)
 }
 
-AddIcon specialization=survival size=small checkbox=opt_icons_right
+AddIcon specialization=survival size=small checkbox=opt_icons_right checkbox=opt_hunter_survival
 {
 	UseItemActions()
 }

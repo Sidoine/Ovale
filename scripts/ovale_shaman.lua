@@ -138,8 +138,9 @@ AddFunction ElementalPrecombatCdActions
 }
 
 ### Elemental icons.
+AddCheckBox(opt_shaman_elemental "Show Elemental icons" specialization=elemental default)
 
-AddIcon specialization=elemental size=small checkbox=opt_icons_left
+AddIcon specialization=elemental size=small checkbox=opt_icons_left checkbox=opt_shaman_elemental
 {
 	if TalentPoints(stone_bulwark_totem_talent) Spell(stone_bulwark_totem)
 	if TalentPoints(astral_shift_talent) Spell(astral_shift)
@@ -147,7 +148,7 @@ AddIcon specialization=elemental size=small checkbox=opt_icons_left
 	Spell(earthbind_totem)
 }
 
-AddIcon specialization=elemental size=small checkbox=opt_icons_left
+AddIcon specialization=elemental size=small checkbox=opt_icons_left checkbox=opt_shaman_elemental
 {
 	if IsFeared() Spell(tremor_totem)
 	#if IsStunned() Spell(windwalk_totem)
@@ -160,7 +161,7 @@ AddIcon specialization=elemental size=small checkbox=opt_icons_left
 	if TalentPoints(ancestral_guidance_talent) Spell(ancestral_guidance)
 }
 
-AddIcon specialization=elemental help=main
+AddIcon specialization=elemental help=main checkbox=opt_shaman_elemental
 {
 	ElementalPrecombatActions()
 	ElementalDefaultActions()
@@ -169,27 +170,27 @@ AddIcon specialization=elemental help=main
 	Spell(lightning_bolt)
 }
 
-AddIcon specialization=elemental help=main
+AddIcon specialization=elemental help=main checkbox=opt_shaman_elemental
 {
 	ElementalPrecombatActions()
 	ElementalDefaultActions()
 	ElementalSingleActions()
 }
 
-AddIcon specialization=elemental help=aoe checkbox=aoe
+AddIcon specialization=elemental help=aoe checkbox=aoe checkbox=opt_shaman_elemental
 {
 	ElementalPrecombatActions()
 	ElementalDefaultActions()
 	ElementalAoeActions()
 }
 
-AddIcon specialization=elemental help=cd
+AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental
 {
 	ElementalDefaultCdActions()
 	ElementalSingleCdActions()
 }
 
-AddIcon specialization=elemental size=small checkbox=opt_icons_right
+AddIcon specialization=elemental size=small checkbox=opt_icons_right checkbox=opt_shaman_elemental
 {
 	#bloodlust,if=target.health.pct<25|time>5
 	if target.HealthPercent() < 25 or TimeInCombat() > 5 Bloodlust()
@@ -197,7 +198,7 @@ AddIcon specialization=elemental size=small checkbox=opt_icons_right
 	if not TotemPresent(air totem=stormlash_totem) and not BuffPresent(stormlash_buff) and { BuffPresent(burst_haste any=1) or TimeInCombat() >= 60 } Spell(stormlash_totem)
 }
 
-AddIcon specialization=elemental size=small checkbox=opt_icons_right
+AddIcon specialization=elemental size=small checkbox=opt_icons_right checkbox=opt_shaman_elemental
 {
 	UseItemActions()
 }
@@ -379,8 +380,9 @@ AddFunction EnhancementPrecombatCdActions
 }
 
 ### Enhancement icons.
+AddCheckBox(opt_shaman_enhancement "Show Enhancement icons" specialization=enhancement default)
 
-AddIcon specialization=enhancement size=small checkbox=opt_icons_left
+AddIcon specialization=enhancement size=small checkbox=opt_icons_left checkbox=opt_shaman_enhancement
 {
 	if TalentPoints(stone_bulwark_totem_talent) Spell(stone_bulwark_totem)
 	if TalentPoints(astral_shift_talent) Spell(astral_shift)
@@ -388,7 +390,7 @@ AddIcon specialization=enhancement size=small checkbox=opt_icons_left
 	Spell(earthbind_totem)
 }
 
-AddIcon specialization=enhancement size=small checkbox=opt_icons_left
+AddIcon specialization=enhancement size=small checkbox=opt_icons_left checkbox=opt_shaman_enhancement
 {
 	if IsFeared() Spell(tremor_totem)
 	#if IsStunned() Spell(windwalk_totem)
@@ -401,34 +403,34 @@ AddIcon specialization=enhancement size=small checkbox=opt_icons_left
 	if TalentPoints(ancestral_guidance_talent) Spell(ancestral_guidance)
 }
 
-AddIcon specialization=enhancement help=main
+AddIcon specialization=enhancement help=main checkbox=opt_shaman_enhancement
 {
 	EnhancementPrecombatActions()
 	EnhancementDefaultActions()
 	EnhancementSingleActions()
 }
 
-AddIcon specialization=enhancement help=main
+AddIcon specialization=enhancement help=main checkbox=opt_shaman_enhancement
 {
 	EnhancementPrecombatActions()
 	EnhancementDefaultActions()
 	EnhancementSingleActions()
 }
 
-AddIcon specialization=enhancement help=aoe checkbox=aoe
+AddIcon specialization=enhancement help=aoe checkbox=aoe checkbox=opt_shaman_enhancement
 {
 	EnhancementPrecombatActions()
 	EnhancementDefaultActions()
 	EnhancementAoeActions()
 }
 
-AddIcon specialization=enhancement help=cd
+AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement
 {
 	EnhancementDefaultCdActions()
 	EnhancementSingleCdActions()
 }
 
-AddIcon specialization=enhancement size=small checkbox=opt_icons_right
+AddIcon specialization=enhancement size=small checkbox=opt_icons_right checkbox=opt_shaman_enhancement
 {
 	#bloodlust,if=target.health.pct<25|time>5
 	if target.HealthPercent() < 25 or TimeInCombat() > 5 Spell(bloodlust)
@@ -436,7 +438,7 @@ AddIcon specialization=enhancement size=small checkbox=opt_icons_right
 	if not TotemPresent(air totem=stormlash_totem) and not BuffPresent(stormlash_buff) and { BuffPresent(burst_haste any=1) or TimeInCombat() >= 60 } Spell(stormlash_totem)
 }
 
-AddIcon specialization=enhancement size=small checkbox=opt_icons_right
+AddIcon specialization=enhancement size=small checkbox=opt_icons_right checkbox=opt_shaman_enhancement
 {
 	UseItemActions()
 }
@@ -489,8 +491,9 @@ AddFunction RestorationShortCdActions
 }
 
 ### Restoration icons.
+AddCheckBox(opt_shaman_restoration "Show Restoration icons" specialization=restoration default)
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_left
+AddIcon specialization=restoration size=small checkbox=opt_icons_left checkbox=opt_shaman_restoration
 {
 	if TalentPoints(stone_bulwark_totem_talent) Spell(stone_bulwark_totem)
 	if TalentPoints(astral_shift_talent) Spell(astral_shift)
@@ -498,7 +501,7 @@ AddIcon specialization=restoration size=small checkbox=opt_icons_left
 	Spell(earthbind_totem)
 }
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_left
+AddIcon specialization=restoration size=small checkbox=opt_icons_left checkbox=opt_shaman_restoration
 {
 	if IsFeared() Spell(tremor_totem)
 	#if IsStunned() Spell(windwalk_totem)
@@ -512,22 +515,22 @@ AddIcon specialization=restoration size=small checkbox=opt_icons_left
 	Spell(spirit_link_totem)
 }
 
-AddIcon specialization=restoration help=shortcd
+AddIcon specialization=restoration help=shortcd checkbox=opt_shaman_restoration
 {
 	RestorationShortCdActions()
 }
 
-AddIcon specialization=restoration help=main
+AddIcon specialization=restoration help=main checkbox=opt_shaman_restoration
 {
 	RestorationMainActions()
 }
 
-AddIcon specialization=restoration help=aoe checkbox=aoe
+AddIcon specialization=restoration help=aoe checkbox=aoe checkbox=opt_shaman_restoration
 {
 	RestorationAoeActions()
 }
 
-AddIcon specialization=restoration help=cd
+AddIcon specialization=restoration help=cd checkbox=opt_shaman_restoration
 {
 	Interrupt()
 	if Speed(more 0) Spell(spiritwalkers_grace)
@@ -536,13 +539,13 @@ AddIcon specialization=restoration help=cd
 	Spell(earth_elemental_totem)
 }
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_right
+AddIcon specialization=restoration size=small checkbox=opt_icons_right checkbox=opt_shaman_restoration
 {
 	if BuffExpires(stormlash_totem_buff any=1) and {BuffPresent(burst_haste any=1) or TimeInCombat() >60} Spell(stormlash_totem)
 	if BuffExpires(burst_haste any=1) Bloodlust()
 }
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_right
+AddIcon specialization=restoration size=small checkbox=opt_icons_right checkbox=opt_shaman_restoration
 {
 	UseItemActions()
 }

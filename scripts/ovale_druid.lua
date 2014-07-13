@@ -275,8 +275,9 @@ AddFunction BalancePrecombatCdActions
 }
 
 ### Balance Icons
+AddCheckBox(opt_druid_balance "Show Balance icons" specialization=balance default)
 
-AddIcon specialization=balance size=small checkbox=opt_icons_left
+AddIcon specialization=balance size=small checkbox=opt_icons_left checkbox=opt_druid_balance
 {
 	Spell(barkskin)
 	Spell(survival_instincts)
@@ -286,13 +287,13 @@ AddIcon specialization=balance size=small checkbox=opt_icons_left
 	Spell(tranquility)
 }
 
-AddIcon specialization=balance size=small checkbox=opt_icons_left
+AddIcon specialization=balance size=small checkbox=opt_icons_left checkbox=opt_druid_balance
 {
 	#wild_mushroom_detonate,moving=0,if=buff.wild_mushroom.stack>0&buff.solar_eclipse.up
 	if WildMushroomCount() > 0 and BuffPresent(solar_eclipse_buff) Spell(wild_mushroom_detonate)
 }
 
-AddIcon specialization=balance help=shortcd
+AddIcon specialization=balance help=shortcd checkbox=opt_druid_balance
 {
 	if not Stance(druid_moonkin_form) Spell(moonkin_form)
 
@@ -300,34 +301,34 @@ AddIcon specialization=balance help=shortcd
 	BalanceAoeActions()
 }
 
-AddIcon specialization=balance help=main
+AddIcon specialization=balance help=main checkbox=opt_druid_balance
 {
 	if InCombat(no) BalancePrecombatActions()
 	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksMainActions()
 	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultActions()
 }
 
-AddIcon specialization=balance help=moving
+AddIcon specialization=balance help=moving checkbox=opt_druid_balance
 {
 	if InCombat(no) BalancePrecombatMovingActions()
 	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksMovingActions()
 	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultMovingActions()
 }
 
-AddIcon specialization=balance help=cd
+AddIcon specialization=balance help=cd checkbox=opt_druid_balance
 {
 	BalanceInterrupt()
 	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksCdActions()
 	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultCdActions()
 }
 
-AddIcon specialization=balance size=small checkbox=opt_icons_right
+AddIcon specialization=balance size=small checkbox=opt_icons_right checkbox=opt_druid_balance
 {
 	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_caster)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
-AddIcon specialization=balance size=small checkbox=opt_icons_right
+AddIcon specialization=balance size=small checkbox=opt_icons_right checkbox=opt_druid_balance
 {
 	UseItemActions()
 }
@@ -694,8 +695,9 @@ AddListItem(opt_feral_rotation basic "Use basic rotation" default specialization
 AddListItem(opt_feral_rotation advanced "Use advanced rotation" specialization=feral)
 
 ### Feral Icons
+AddCheckBox(opt_druid_feral "Show Feral icons" specialization=feral default)
 
-AddIcon specialization=feral size=small checkbox=opt_icons_left
+AddIcon specialization=feral size=small checkbox=opt_icons_left checkbox=opt_druid_feral
 {
 	Spell(barkskin)
 	Spell(survival_instincts)
@@ -705,7 +707,7 @@ AddIcon specialization=feral size=small checkbox=opt_icons_left
 	Spell(tranquility)
 }
 
-AddIcon specialization=feral size=small checkbox=opt_icons_left
+AddIcon specialization=feral size=small checkbox=opt_icons_left checkbox=opt_druid_feral
 {
 	if TalentPoints(displacer_beast_talent) Spell(displacer_beast)
 	if TalentPoints(wild_charge_talent)
@@ -717,7 +719,7 @@ AddIcon specialization=feral size=small checkbox=opt_icons_left
 	Spell(dash)
 }
 
-AddIcon specialization=feral help=main
+AddIcon specialization=feral help=main checkbox=opt_druid_feral
 {
 	if InCombat(no) FeralPrecombatActions()
 	if not target.InRange(mangle_cat) Texture(ability_druid_catformattack help=NotInMeleeRange)
@@ -725,7 +727,7 @@ AddIcon specialization=feral help=main
 	if List(opt_feral_rotation advanced) FeralAdvancedActions()
 }
 
-AddIcon specialization=feral help=main
+AddIcon specialization=feral help=main checkbox=opt_druid_feral
 {
 	if InCombat(no) FeralPrecombatActions()
 	if not target.InRange(mangle_cat) Texture(ability_druid_catformattack help=NotInMeleeRange)
@@ -733,25 +735,25 @@ AddIcon specialization=feral help=main
 	if List(opt_feral_rotation advanced) FeralAdvancedPredictiveActions()
 }
 
-AddIcon specialization=feral help=aoe checkbox=opt_aoe
+AddIcon specialization=feral help=aoe checkbox=opt_aoe checkbox=opt_druid_feral
 {
 	if InCombat(no) FeralPrecombatActions()
 	FeralAoeActions()
 }
 
-AddIcon specialization=feral help=cd
+AddIcon specialization=feral help=cd checkbox=opt_druid_feral
 {
 	if List(opt_feral_rotation basic) FeralBasicCdActions()
 	if List(opt_feral_rotation advanced) FeralAdvancedCdActions()
 }
 
-AddIcon specialization=feral size=small checkbox=opt_icons_right
+AddIcon specialization=feral size=small checkbox=opt_icons_right checkbox=opt_druid_feral
 {
 	if TalentPoints(heart_of_the_wild_talent) Spell(heart_of_the_wild_melee)
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
-AddIcon specialization=feral size=small checkbox=opt_icons_right
+AddIcon specialization=feral size=small checkbox=opt_icons_right checkbox=opt_druid_feral
 {
 	UseItemActions()
 }
@@ -831,47 +833,48 @@ AddFunction GuardianPrecombatActions
 }
 
 ### Guardian icons.
+AddCheckBox(opt_druid_guardian "Show Guardian icons" specialization=guardian default)
 
-AddIcon specialization=guardian size=small checkbox=opt_icons_left
+AddIcon specialization=guardian size=small checkbox=opt_icons_left checkbox=opt_druid_guardian
 {
 	Spell(might_of_ursoc)
 }
 
-AddIcon specialization=guardian size=small checkbox=opt_icons_left
+AddIcon specialization=guardian size=small checkbox=opt_icons_left checkbox=opt_druid_guardian
 {
 	Spell(barkskin)
 	if TalentPoints(force_of_nature_talent) Spell(force_of_nature_tank)
 	Spell(survival_instincts)
 }
 
-AddIcon specialization=guardian help=shortcd
+AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian
 {
 	GuardianShortCdActions()
 }
 
-AddIcon specialization=guardian help=main
+AddIcon specialization=guardian help=main checkbox=opt_druid_guardian
 {
 	if InCombat(no) GuardianPrecombatActions()
 	GuardianMainActions()
 }
 
-AddIcon specialization=guardian help=aoe checkbox=aoe
+AddIcon specialization=guardian help=aoe checkbox=aoe checkbox=opt_druid_guardian
 {
 	GuardianAoeActions()
 }
 
-AddIcon specialization=guardian help=cd
+AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian
 {
 	GuardianCdActions()
 }
 
-AddIcon specialization=guardian size=small checkbox=opt_icons_right
+AddIcon specialization=guardian size=small checkbox=opt_icons_right checkbox=opt_druid_guardian
 {
 	#renewal,if=talent.renewal.enabled&incoming_damage_5>0.8*health.max
 	if TalentPoints(renewal_talent) and IncomingDamage(5) > 0.8 * MaxHealth() Spell(renewal)
 }
 
-AddIcon specialization=guardian size=small checkbox=opt_icons_right
+AddIcon specialization=guardian size=small checkbox=opt_icons_right checkbox=opt_druid_guardian
 {
 	UseItemActions()
 }
@@ -950,15 +953,16 @@ AddFunction RestorationPrecombatActions
 }
 
 ### Restoration icons.
+AddCheckBox(opt_druid_restoration "Show Restoration icons" specialization=restoration default)
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_left
+AddIcon specialization=restoration size=small checkbox=opt_icons_left checkbox=opt_druid_restoration
 {
 	Spell(barkskin)
 	Spell(might_of_ursoc)
 	Spell(survival_instincts)
 }
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_left
+AddIcon specialization=restoration size=small checkbox=opt_icons_left checkbox=opt_druid_restoration
 {
 	#innervate,if=mana.pct<90
 	if ManaPercent() < 90 Spell(innervate)
@@ -966,35 +970,35 @@ AddIcon specialization=restoration size=small checkbox=opt_icons_left
 	if TalentPoints(natures_vigil_talent) Spell(natures_vigil)
 }
 
-AddIcon specialization=restoration help=shortcd
+AddIcon specialization=restoration help=shortcd checkbox=opt_druid_restoration
 {
 	RestorationShortCdActions()
 }
 
-AddIcon specialization=restoration help=main
+AddIcon specialization=restoration help=main checkbox=opt_druid_restoration
 {
 	if InCombat(no) RestorationPrecombatActions()
 	RestorationMainActions()
 }
 
-AddIcon specialization=restoration help=aoe checkbox=opt_aoe
+AddIcon specialization=restoration help=aoe checkbox=opt_aoe checkbox=opt_druid_restoration
 {
 	RestorationAoeActions()
 }
 
-AddIcon specialization=restoration help=cd
+AddIcon specialization=restoration help=cd checkbox=opt_druid_restoration
 {
 	RestorationInterrupt()
 	RestorationCdActions()
 }
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_right
+AddIcon specialization=restoration size=small checkbox=opt_icons_right checkbox=opt_druid_restoration
 {
 	Spell(ironbark)
 	Spell(natures_swiftness)
 }
 
-AddIcon specialization=restoration size=small checkbox=opt_icons_right
+AddIcon specialization=restoration size=small checkbox=opt_icons_right checkbox=opt_druid_restoration
 {
 	UseItemActions()
 }

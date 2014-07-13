@@ -161,42 +161,43 @@ AddFunction ArmsPrecombatCdActions
 }
 
 ### Arms icons.
+AddCheckBox(opt_warrior_arms "Show Arms icons" specialization=arms default)
 
-AddIcon specialization=arms size=small checkbox=opt_icons_left
+AddIcon specialization=arms size=small checkbox=opt_icons_left checkbox=opt_warrior_arms
 {
 	Spell(vigilance)
 	Spell(demoralizing_banner)
 	Spell(rallying_cry)
 }
 
-AddIcon specialization=arms size=small checkbox=opt_icons_left
+AddIcon specialization=arms size=small checkbox=opt_icons_left checkbox=opt_warrior_arms
 {
 	if TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(impending_victory usable=1)
 	if not TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(victory_rush usable=1)
 	if TalentPoints(enraged_regeneration_talent) Spell(enraged_regeneration)
 }
 
-AddIcon specialization=arms help=shortcd
+AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms
 {
 	ArmsDefaultShortCdActions()
 	ArmsSingleTargetShortCdActions()
 }
 
-AddIcon specialization=arms help=main
+AddIcon specialization=arms help=main checkbox=opt_warrior_arms
 {
 	if InCombat(no) ArmsPrecombatActions()
 	ArmsDefaultActions()
 	ArmsSingleTargetActions()
 }
 
-AddIcon specialization=arms help=aoe checkbox=opt_aoe
+AddIcon specialization=arms help=aoe checkbox=opt_aoe checkbox=opt_warrior_arms
 {
 	if InCombat(no) ArmsPrecombatActions()
 	ArmsDefaultActions()
 	ArmsAoeActions()
 }
 
-AddIcon specialization=arms help=cd
+AddIcon specialization=arms help=cd checkbox=opt_warrior_arms
 {
 	Interrupt()
 	UseRacialInterruptActions()
@@ -205,13 +206,13 @@ AddIcon specialization=arms help=cd
 	ArmsDefaultCdActions()
 }
 
-AddIcon specialization=arms size=small checkbox=opt_icons_right
+AddIcon specialization=arms size=small checkbox=opt_icons_right checkbox=opt_warrior_arms
 {
 	Spell(die_by_the_sword)
 	Spell(shield_wall)
 }
 
-AddIcon specialization=arms size=small checkbox=opt_icons_right
+AddIcon specialization=arms size=small checkbox=opt_icons_right checkbox=opt_warrior_arms
 {
 	#shattering_throw,if=cooldown.colossus_smash.remains>5
 	if target.DebuffExpires(shattering_throw_debuff) and SpellCooldown(colossus_smash) > 5 Spell(shattering_throw)
@@ -550,35 +551,36 @@ AddFunction FuryTwoHandSingleTargetShortCdActions
 }
 
 ### Fury icons.
+AddCheckBox(opt_warrior_fury "Show Fury icons" specialization=fury default)
 
-AddIcon specialization=fury size=small checkbox=opt_icons_left
+AddIcon specialization=fury size=small checkbox=opt_icons_left checkbox=opt_warrior_fury
 {
 	Spell(vigilance)
 	Spell(demoralizing_banner)
 	Spell(rallying_cry)
 }
 
-AddIcon specialization=fury size=small checkbox=opt_icons_left
+AddIcon specialization=fury size=small checkbox=opt_icons_left checkbox=opt_warrior_fury
 {
 	if TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(impending_victory usable=1)
 	if not TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(victory_rush usable=1)
 	if TalentPoints(enraged_regeneration_talent) Spell(enraged_regeneration)
 }
 
-AddIcon specialization=fury help=shortcd
+AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury
 {
 	if HasWeapon(main type=1h) FuryOneHandSingleTargetShortCdActions()
 	if HasWeapon(main type=2h) FuryTwoHandSingleTargetShortCdActions()
 }
 
-AddIcon specialization=fury help=main
+AddIcon specialization=fury help=main checkbox=opt_warrior_fury
 {
 	if InCombat(no) FuryPrecombatActions()
 	if HasWeapon(main type=1h) FuryOneHandSingleTargetActions()
 	if HasWeapon(main type=2h) FuryTwoHandSingleTargetActions()
 }
 
-AddIcon specialization=fury help=aoe checkbox=opt_aoe
+AddIcon specialization=fury help=aoe checkbox=opt_aoe checkbox=opt_warrior_fury
 {
 	if InCombat(no) FuryPrecombatActions()
 	#run_action_list,name=two_targets,if=active_enemies=2
@@ -589,7 +591,7 @@ AddIcon specialization=fury help=aoe checkbox=opt_aoe
 	if Enemies() > 3 FuryAoeActions()
 }
 
-AddIcon specialization=fury help=cd
+AddIcon specialization=fury help=cd checkbox=opt_warrior_fury
 {
 	Interrupt()
 	UseRacialInterruptActions()
@@ -598,13 +600,13 @@ AddIcon specialization=fury help=cd
 	FuryDefaultCdActions()
 }
 
-AddIcon specialization=fury size=small checkbox=opt_icons_right
+AddIcon specialization=fury size=small checkbox=opt_icons_right checkbox=opt_warrior_fury
 {
 	Spell(die_by_the_sword)
 	Spell(shield_wall)
 }
 
-AddIcon specialization=fury size=small checkbox=opt_icons_right
+AddIcon specialization=fury size=small checkbox=opt_icons_right checkbox=opt_warrior_fury
 {
 	#shattering_throw,if=cooldown.colossus_smash.remains>5
 	if target.DebuffExpires(shattering_throw_debuff) and SpellCooldown(colossus_smash) > 5 Spell(shattering_throw)
@@ -717,53 +719,54 @@ AddFunction ProtectionPrecombatActions
 }
 
 ### Protection icons.
+AddCheckBox(opt_warrior_protection "Show Protection icons" specialization=protection default)
 
-AddIcon specialization=protection size=small checkbox=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left checkbox=opt_warrior_protection
 {
 	Spell(vigilance)
 	Spell(demoralizing_banner)
 	Spell(rallying_cry)
 }
 
-AddIcon specialization=protection size=small checkbox=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left checkbox=opt_warrior_protection
 {
 	if TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(impending_victory usable=1)
 	if not TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(victory_rush usable=1)
 	if TalentPoints(enraged_regeneration_talent) Spell(enraged_regeneration)
 }
 
-AddIcon specialization=protection help=shortcd
+AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection
 {
 	ProtectionDefaultShortCdActions()
 }
 
-AddIcon specialization=protection help=main
+AddIcon specialization=protection help=main checkbox=opt_warrior_protection
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 	ProtectionNormalRotationActions()
 }
 
-AddIcon specialization=protection help=aoe checkbox=opt_aoe
+AddIcon specialization=protection help=aoe checkbox=opt_aoe checkbox=opt_warrior_protection
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionAoeActions()
 }
 
-AddIcon specialization=protection help=cd
+AddIcon specialization=protection help=cd checkbox=opt_warrior_protection
 {
 	Interrupt()
 	UseRacialInterruptActions()
 	ProtectionDefaultCdActions()
 }
 
-AddIcon specialization=protection size=small checkbox=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right checkbox=opt_warrior_protection
 {
 	Spell(die_by_the_sword)
 	Spell(shield_wall)
 }
 
-AddIcon specialization=protection size=small checkbox=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right checkbox=opt_warrior_protection
 {
 	#shattering_throw
 	if target.DebuffExpires(shattering_throw_debuff) Spell(shattering_throw)

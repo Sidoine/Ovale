@@ -139,47 +139,49 @@ AddFunction AssassinationPrecombatCdActions
 }
 
 ### Assassination icons.
-AddIcon specialization=assassination size=small checkbox=opt_icons_left
+AddCheckBox(opt_rogue_assassination "Show Assassination icons" specialization=assassination default)
+
+AddIcon specialization=assassination size=small checkbox=opt_icons_left checkbox=opt_rogue_assassination
 {
 	Spell(tricks_of_the_trade)
 }
 
-AddIcon specialization=assassination size=small checkbox=opt_icons_left
+AddIcon specialization=assassination size=small checkbox=opt_icons_left checkbox=opt_rogue_assassination
 {
 	Spell(redirect)
 }
 
-AddIcon specialization=assassination help=shortcd
+AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination
 {
 	if InCombat(no) AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=main
+AddIcon specialization=assassination help=main checkbox=opt_rogue_assassination
 {
 	if InCombat(no) AssassinationPrecombatActions()
 	AssassinationDefaultActions()
 }
 
-AddIcon specialization=assassination help=aoe checkbox=opt_aoe
+AddIcon specialization=assassination help=aoe checkbox=opt_aoe checkbox=opt_rogue_assassination
 {
 	if InCombat(no) AssassinationPrecombatActions()
 	AssassinationDefaultAoeActions()
 }
 
-AddIcon specialization=assassination help=cd
+AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination
 {
 	if InCombat(no) AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()
 }
 
-AddIcon specialization=assassination size=small checkbox=opt_icons_right
+AddIcon specialization=assassination size=small checkbox=opt_icons_right checkbox=opt_rogue_assassination
 {
 	Spell(feint)
 	UseRacialSurvivalActions()
 }
 
-AddIcon specialization=assassination size=small checkbox=opt_icons_right
+AddIcon specialization=assassination size=small checkbox=opt_icons_right checkbox=opt_rogue_assassination
 {
 	Spell(cloak_of_shadows)
 }
@@ -341,48 +343,50 @@ AddFunction CombatPrecombatCdActions
 }
 
 ### Combat icons.
-AddIcon specialization=combat size=small checkbox=opt_icons_left
+AddCheckBox(opt_rogue_combat "Show Combat icons" specialization=combat default)
+
+AddIcon specialization=combat size=small checkbox=opt_icons_left checkbox=opt_rogue_combat
 {
 	Spell(tricks_of_the_trade)
 }
 
-AddIcon specialization=combat size=small checkbox=opt_icons_left
+AddIcon specialization=combat size=small checkbox=opt_icons_left checkbox=opt_rogue_combat
 {
 	if BuffPresent(blade_flurry_buff) Texture(ability_warrior_punishingblow help=BladeFlurryIsActive)
 	Spell(redirect)
 }
 
-AddIcon specialization=combat help=shortcd
+AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat
 {
 	if InCombat(no) CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=main
+AddIcon specialization=combat help=main checkbox=opt_rogue_combat
 {
 	if InCombat(no) CombatPrecombatActions()
 	CombatDefaultActions()
 }
 
-AddIcon specialization=combat help=aoe checkbox=opt_aoe
+AddIcon specialization=combat help=aoe checkbox=opt_aoe checkbox=opt_rogue_combat
 {
 	if InCombat(no) CombatPrecombatActions()
 	CombatDefaultAoeActions()
 }
 
-AddIcon specialization=combat help=cd
+AddIcon specialization=combat help=cd checkbox=opt_rogue_combat
 {
 	if InCombat(no) CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
 
-AddIcon specialization=combat size=small checkbox=opt_icons_right
+AddIcon specialization=combat size=small checkbox=opt_icons_right checkbox=opt_rogue_combat
 {
 	Spell(feint)
 	UseRacialSurvivalActions()
 }
 
-AddIcon specialization=combat size=small checkbox=opt_icons_right
+AddIcon specialization=combat size=small checkbox=opt_icons_right checkbox=opt_rogue_combat
 {
 	Spell(cloak_of_shadows)
 }
@@ -553,47 +557,49 @@ AddFunction SubtletyDefaultCdActions
 }
 
 ### Subtlety icons.
-AddIcon specialization=subtlety size=small checkbox=opt_icons_left
+AddCheckBox(opt_rogue_subtlety "Show Subtlety icons" specialization=subtlety default)
+
+AddIcon specialization=subtlety size=small checkbox=opt_icons_left checkbox=opt_rogue_subtlety
 {
 	Spell(tricks_of_the_trade)
 }
 
-AddIcon specialization=subtlety size=small checkbox=opt_icons_left
+AddIcon specialization=subtlety size=small checkbox=opt_icons_left checkbox=opt_rogue_subtlety
 {
 	Spell(redirect)
 }
 
-AddIcon specialization=subtlety help=shortcd
+AddIcon specialization=subtlety help=shortcd checkbox=opt_rogue_subtlety
 {
 	if InCombat(no) SubtletyPrecombatShortCdActions()
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=main
+AddIcon specialization=subtlety help=main checkbox=opt_rogue_subtlety
 {
 	if InCombat(no) SubtletyPrecombatActions()
 	SubtletyDefaultActions()
 }
 
-AddIcon specialization=subtlety help=aoe checkbox=opt_aoe
+AddIcon specialization=subtlety help=aoe checkbox=opt_aoe checkbox=opt_rogue_subtlety
 {
 	if InCombat(no) SubtletyPrecombatActions()
 	SubtletyDefaultAoeActions()
 }
 
-AddIcon specialization=subtlety help=cd
+AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety
 {
 	if InCombat(no) SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()
 }
 
-AddIcon specialization=subtlety size=small checkbox=opt_icons_right
+AddIcon specialization=subtlety size=small checkbox=opt_icons_right checkbox=opt_rogue_subtlety
 {
 	Spell(feint)
 	UseRacialSurvivalActions()
 }
 
-AddIcon specialization=subtlety size=small checkbox=opt_icons_right
+AddIcon specialization=subtlety size=small checkbox=opt_icons_right checkbox=opt_rogue_subtlety
 {
 	Spell(cloak_of_shadows)
 }

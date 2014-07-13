@@ -142,40 +142,41 @@ AddFunction AfflictionPrecombatCdActions
 }
 
 ### Affliction icons.
+AddCheckBox(opt_warlock_affliction "Show Affliction icons" specialization=affliction default)
 
-AddIcon specialization=affliction size=small checkbox=opt_icons_left
+AddIcon specialization=affliction size=small checkbox=opt_icons_left checkbox=opt_warlock_affliction
 {
 	if target.IsAggroed() Spell(soulshatter)
 	if TalentPoints(dark_regeneration_talent) Spell(dark_regeneration)
 }
 
-AddIcon specialization=affliction size=small checkbox=opt_icons_left
+AddIcon specialization=affliction size=small checkbox=opt_icons_left checkbox=opt_warlock_affliction
 {
 	if TalentPoints(sacrificial_pact_talent) Spell(sacrificial_pact)
 	if TalentPoints(dark_bargain_talent) Spell(dark_bargain)
 }
 
-AddIcon specialization=affliction help=shortcd
+AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction
 {
 	if InCombat(no) AfflictionPrecombatShortCdActions()
 	AfflictionDefaultShortCdActions()
 }
 
-AddIcon specialization=affliction help=main
+AddIcon specialization=affliction help=main checkbox=opt_warlock_affliction
 {
 	if InCombat(no) AfflictionPrecombatActions()
 	AfflictionDefaultActions()
 	AfflictionSingleTargetActions()
 }
 
-AddIcon specialization=affliction help=aoe checkbox=opt_aoe
+AddIcon specialization=affliction help=aoe checkbox=opt_aoe checkbox=opt_warlock_affliction
 {
 	if InCombat(no) AfflictionPrecombatActions()
 	AfflictionDefaultActions()
 	AfflictionAoeActions()
 }
 
-AddIcon specialization=affliction help=cd
+AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction
 {
 	if InCombat(no) AfflictionPrecombatCdActions()
 	AfflictionDefaultCdActions()
@@ -183,31 +184,32 @@ AddIcon specialization=affliction help=cd
 	if Enemies() <= 6 AfflictionSingleTargetCdActions()
 }
 
-AddIcon specialization=affliction size=small checkbox=opt_icons_right
+AddIcon specialization=affliction size=small checkbox=opt_icons_right checkbox=opt_warlock_affliction
 {
 	Spell(demonic_circle_teleport)
 }
 
-AddIcon specialization=affliction size=small checkbox=opt_icons_right
+AddIcon specialization=affliction size=small checkbox=opt_icons_right checkbox=opt_warlock_affliction
 {
 	UseItemActions()
 }
 
 ### Demonology icons.
+AddCheckBox(opt_warlock_demonology "Show Demonology icons" specialization=demonology default)
 
-AddIcon specialization=demonology size=small checkbox=opt_icons_left
+AddIcon specialization=demonology size=small checkbox=opt_icons_left checkbox=opt_warlock_demonology
 {
 	if target.IsAggroed() Spell(soulshatter)
 	if TalentPoints(dark_regeneration_talent) Spell(dark_regeneration)
 }
 
-AddIcon specialization=demonology size=small checkbox=opt_icons_left
+AddIcon specialization=demonology size=small checkbox=opt_icons_left checkbox=opt_warlock_demonology
 {
 	if TalentPoints(sacrificial_pact_talent) Spell(sacrificial_pact)
 	if TalentPoints(dark_bargain_talent) Spell(dark_bargain)
 }
 
-AddIcon specialization=demonology help=offgcd
+AddIcon specialization=demonology help=offgcd checkbox=opt_warlock_demonology
 {
 	if not InCombat()
 	{
@@ -219,7 +221,7 @@ AddIcon specialization=demonology help=offgcd
 	if {BuffPresent(dark_soul_knowledge) and DemonicFury() /32 >BuffRemains(dark_soul_knowledge) } or target.DebuffRemains(corruption_debuff) <5 or not target.DebuffPresent(doom) or DemonicFury() >=950 or DemonicFury() /32 >target.DeadIn() unless Stance(1) Spell(metamorphosis)
 }
 
-AddIcon specialization=demonology help=main
+AddIcon specialization=demonology help=main checkbox=opt_warlock_demonology
 {
 	if not InCombat()
 	{
@@ -243,7 +245,7 @@ AddIcon specialization=demonology help=main
 	Spell(life_tap)
 }
 
-AddIcon specialization=demonology help=aoe checkbox=opt_aoe
+AddIcon specialization=demonology help=aoe checkbox=opt_aoe checkbox=opt_warlock_demonology
 {
 	if BuffPresent(metamorphosis) and target.DebuffRemains(corruption_debuff) >10 and DemonicFury() <=650 and BuffExpires(dark_soul_knowledge) and not target.DebuffPresent(immolation_aura) if Stance(1) cancel.Texture(Spell_shadow_demonform)
 	if BuffPresent(metamorphosis) Spell(immolation_aura)
@@ -257,7 +259,7 @@ AddIcon specialization=demonology help=aoe checkbox=opt_aoe
 	Spell(life_tap)
 }
 
-AddIcon specialization=demonology help=cd
+AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology
 {
 	UseItemActions()
 	Spell(blood_fury)
@@ -265,12 +267,12 @@ AddIcon specialization=demonology help=cd
 	Spell(summon_doomguard)
 }
 
-AddIcon specialization=demonology size=small checkbox=opt_icons_right
+AddIcon specialization=demonology size=small checkbox=opt_icons_right checkbox=opt_warlock_demonology
 {
 	Spell(demonic_circle_teleport)
 }
 
-AddIcon specialization=demonology size=small checkbox=opt_icons_right
+AddIcon specialization=demonology size=small checkbox=opt_icons_right checkbox=opt_warlock_demonology
 {
 	UseItemActions()
 }
@@ -390,34 +392,35 @@ AddFunction DestructionPrecombatCdActions
 }
 
 ### Destruction icons.
+AddCheckBox(opt_warlock_destruction "Show Destruction icons" specialization=destruction default)
 
-AddIcon specialization=destruction size=small checkbox=opt_icons_left
+AddIcon specialization=destruction size=small checkbox=opt_icons_left checkbox=opt_warlock_destruction
 {
 	if target.IsAggroed() Spell(soulshatter)
 	if TalentPoints(dark_regeneration_talent) Spell(dark_regeneration)
 }
 
-AddIcon specialization=destruction size=small checkbox=opt_icons_left
+AddIcon specialization=destruction size=small checkbox=opt_icons_left checkbox=opt_warlock_destruction
 {
 	if TalentPoints(sacrificial_pact_talent) Spell(sacrificial_pact)
 	if TalentPoints(dark_bargain_talent) Spell(dark_bargain)
 }
 
-AddIcon specialization=destruction help=shortcd
+AddIcon specialization=destruction help=shortcd checkbox=opt_warlock_destruction
 {
 	if InCombat(no) DestructionPrecombatShortCdActions()
 	DestructionDefaultShortCdActions()
 	DestructionSingleTargetShortCdActions()
 }
 
-AddIcon specialization=destruction help=main
+AddIcon specialization=destruction help=main checkbox=opt_warlock_destruction
 {
 	if InCombat(no) DestructionPrecombatActions()
 	DestructionDefaultActions()
 	DestructionSingleTargetActions()
 }
 
-AddIcon specialization=destruction help=aoe checkbox=opt_aoe
+AddIcon specialization=destruction help=aoe checkbox=opt_aoe checkbox=opt_warlock_destruction
 {
 	if InCombat(no) DestructionPrecombatActions()
 	DestructionDefaultActions()
@@ -428,7 +431,7 @@ AddIcon specialization=destruction help=aoe checkbox=opt_aoe
 	DestructionAoeActions()
 }
 
-AddIcon specialization=destruction help=cd
+AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction
 {
 	if InCombat(no) DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()
@@ -436,12 +439,12 @@ AddIcon specialization=destruction help=cd
 	if Enemies() <= 3 DestructionSingleTargetCdActions()
 }
 
-AddIcon specialization=destruction size=small checkbox=opt_icons_right
+AddIcon specialization=destruction size=small checkbox=opt_icons_right checkbox=opt_warlock_destruction
 {
 	Spell(demonic_circle_teleport)
 }
 
-AddIcon specialization=destruction size=small checkbox=opt_icons_right
+AddIcon specialization=destruction size=small checkbox=opt_icons_right checkbox=opt_warlock_destruction
 {
 	UseItemActions()
 }
