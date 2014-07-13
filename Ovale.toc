@@ -29,6 +29,7 @@ OvaleQueue.lua
 OvaleTimeSpan.lua
 
 # Core modules.
+OvaleAST.lua
 OvaleActionBar.lua
 OvaleAura.lua
 OvaleBestAction.lua
