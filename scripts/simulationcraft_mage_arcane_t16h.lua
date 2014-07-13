@@ -107,7 +107,7 @@ AddFunction ArcanePrecombatActions
 	Spell(mirror_image)
 }
 
-AddIcon mastery=arcane help=main
+AddIcon specialization=arcane help=main
 {
 	if InCombat(no) ArcanePrecombatActions()
 	ArcaneDefaultActions()

@@ -169,36 +169,36 @@ AddFunction ShadowPrecombatCdActions
 
 ### Shadow icons
 
-AddIcon mastery=shadow size=small checkboxon=opt_icons_left
+AddIcon specialization=shadow size=small checkbox=opt_icons_left
 {
 	if TalentPoints(desperate_prayer_talent) Spell(desperate_prayer)
 	Spell(dispersion)
 }
 
-AddIcon mastery=shadow size=small checkboxon=opt_icons_left
+AddIcon specialization=shadow size=small checkbox=opt_icons_left
 {
 	Spell(vampiric_embrace)
 	Spell(hymn_of_hope)
 }
 
-AddIcon mastery=shadow help=shortcd
+AddIcon specialization=shadow help=shortcd
 {
 	ShadowDefaultShortCdActions()
 }
 
-AddIcon mastery=shadow help=main
+AddIcon specialization=shadow help=main
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultActions()
 }
 
-AddIcon mastery=shadow help=moving
+AddIcon specialization=shadow help=moving
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultMovingActions()
 }
 
-AddIcon mastery=shadow help=cd
+AddIcon specialization=shadow help=cd
 {
 	if InCombat(no) ShadowPrecombatCdActions()
 	Interrupt()
@@ -206,12 +206,12 @@ AddIcon mastery=shadow help=cd
 	ShadowDefaultCdActions()
 }
 
-AddIcon mastery=shadow size=small checkboxon=opt_icons_right
+AddIcon specialization=shadow size=small checkbox=opt_icons_right
 {
 	Spell(mass_dispel)
 }
 
-AddIcon mastery=shadow size=small checkboxon=opt_icons_right
+AddIcon specialization=shadow size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }

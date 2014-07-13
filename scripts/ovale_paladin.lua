@@ -65,14 +65,14 @@ AddFunction HolyPrecombatActions
 
 ### Holy Icons
 
-AddIcon mastery=holy size=small checkboxon=opt_icons_left
+AddIcon specialization=holy size=small checkbox=opt_icons_left
 {
 	Spell(divine_protection)
 	Spell(devotion_aura)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=holy help=mana size=small checkboxon=opt_icons_left
+AddIcon specialization=holy help=mana size=small checkbox=opt_icons_left
 {
 	if ManaPercent() <98 Spell(arcane_torrent_mana)
 	if ManaPercent() <88 Spell(divine_plea)
@@ -80,27 +80,27 @@ AddIcon mastery=holy help=mana size=small checkboxon=opt_icons_left
 	if target.IsFriend(no) and not target.InRange(crusader_strike) Texture(ability_druid_dash help=NotInMeleeRange)
 }
 
-AddIcon mastery=holy help=shortcd
+AddIcon specialization=holy help=shortcd
 {
 	if TalentPoints(holy_prism_talent) Spell(holy_prism)
 	if TalentPoints(lights_hammer_talent) Spell(lights_hammer)
 	if TalentPoints(execution_sentence_talent) Spell(execution_sentence)
 }
 
-AddIcon mastery=holy help=main
+AddIcon specialization=holy help=main
 {
 	HolyPrecombatActions()
 	HolySingleTargetActions()
 }
 
-AddIcon mastery=holy help=aoe checkboxon=opt_aoe
+AddIcon specialization=holy help=aoe checkbox=opt_aoe
 {
 	HolyPrecombatActions()
 	if TalentPoints(selfless_healer_talent) HolySelflessHealerAoeActions()
 	if not TalentPoints(selfless_healer_talent) HolyAoeActions()
 }
 
-AddIcon mastery=holy help=cd
+AddIcon specialization=holy help=cd
 {
 	Interrupt()
 	if IsRooted() Spell(hand_of_freedom)
@@ -110,12 +110,12 @@ AddIcon mastery=holy help=cd
 	Spell(guardian_of_ancient_kings_heal)
 }
 
-AddIcon mastery=holy size=small checkboxon=opt_icons_right
+AddIcon specialization=holy size=small checkbox=opt_icons_right
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
-AddIcon mastery=holy size=small checkboxon=opt_icons_right
+AddIcon specialization=holy size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -217,7 +217,7 @@ AddFunction ProtectionPrecombatActions
 
 ### Protection Icons
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left
 {
 	Spell(divine_protection)
 	Spell(ardent_defender)
@@ -226,7 +226,7 @@ AddIcon mastery=protection size=small checkboxon=opt_icons_left
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left
 {
 	if DebuffExpires(forbearance_debuff)
 	{
@@ -236,19 +236,19 @@ AddIcon mastery=protection size=small checkboxon=opt_icons_left
 	}
 }
 
-AddIcon mastery=protection help=shortcd
+AddIcon specialization=protection help=shortcd
 {
 	if BuffExpires(righteous_fury) Spell(righteous_fury)
 	ProtectionDefaultShortCdActions()
 }
 
-AddIcon mastery=protection help=main
+AddIcon specialization=protection help=main
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 
-AddIcon mastery=protection help=aoe checkboxon=opt_aoe
+AddIcon specialization=protection help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) ProtectionPrecombatActions()
 
@@ -262,19 +262,19 @@ AddIcon mastery=protection help=aoe checkboxon=opt_aoe
 	Spell(holy_wrath)
 }
 
-AddIcon mastery=protection help=cd
+AddIcon specialization=protection help=cd
 {
 	Interrupt()
 	if IsRooted() Spell(hand_of_freedom)
 	ProtectionDefaultCdActions()
 }
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right
 {
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -422,7 +422,7 @@ AddFunction RetributionPrecombatCdActions
 
 ### Retribution Icons
 
-AddIcon mastery=retribution size=small checkboxon=opt_icons_left
+AddIcon specialization=retribution size=small checkbox=opt_icons_left
 {
 	if IsRooted()
 	{
@@ -431,44 +431,44 @@ AddIcon mastery=retribution size=small checkboxon=opt_icons_left
 	}
 }
 
-AddIcon mastery=retribution size=small checkboxon=opt_icons_left
+AddIcon specialization=retribution size=small checkbox=opt_icons_left
 {
 	Spell(lay_on_hands)
 	Spell(hand_of_protection)
 	if DebuffExpires(forbearance_debuff) Spell(divine_shield)
 }
 
-AddIcon mastery=retribution help=shortcd
+AddIcon specialization=retribution help=shortcd
 {
 	RetributionDefaultShortCdActions()
 }
 
-AddIcon mastery=retribution help=main
+AddIcon specialization=retribution help=main
 {
 	if InCombat(no) RetributionPrecombatActions()
 	RetributionDefaultActions()
 }
 
-AddIcon mastery=retribution help=aoe checkboxon=opt_aoe
+AddIcon specialization=retribution help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) RetributionPrecombatActions()
 	RetributionDefaultAoeActions()
 }
 
-AddIcon mastery=retribution help=cd
+AddIcon specialization=retribution help=cd
 {
 	if InCombat(no) RetributionPrecombatCdActions()
 	RetributionDefaultCdActions()
 }
 
-AddIcon mastery=retribution size=small checkboxon=opt_icons_right
+AddIcon specialization=retribution size=small checkbox=opt_icons_right
 {
 	#seal_of_righteousness,if=active_enemies>=4
 	if Enemies() >= 4 and not Stance(paladin_seal_of_righteousness) Spell(seal_of_righteousness)
 	if BuffPresent(righteous_fury) Texture(spell_holy_sealoffury help=RighteousFuryIsActive)
 }
 
-AddIcon mastery=retribution size=small checkboxon=opt_icons_right
+AddIcon specialization=retribution size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }

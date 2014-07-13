@@ -127,7 +127,7 @@ AddFunction Interrupt
 	UseRacialInterrupt()
 }
 
-AddIcon mastery=frost help=offgcd
+AddIcon specialization=frost help=offgcd
 {
 	#/counterspell,if=target.debuff.casting.react
 	if not target.IsFriend() and target.IsInterruptible() Interrupt()
@@ -151,7 +151,7 @@ AddIcon mastery=frost help=offgcd
 	if ManaPercent(less 84) and BuffExpires(alter_time_buff) UseManaGem()
 }
 
-AddIcon mastery=frost help=main
+AddIcon specialization=frost help=main
 {
 	if not InCombat()
 	{
@@ -202,7 +202,7 @@ AddIcon mastery=frost help=main
 	Spell(frostbolt)
 }
 
-AddIcon mastery=frost help=cd
+AddIcon specialization=frost help=cd
 {
 	#/evocation,if=mana.pct<20&buff.alter_time.down
 	if ManaPercent(less 20) and BuffExpires(alter_time_buff) Spell(evocation)

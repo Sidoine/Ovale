@@ -85,7 +85,7 @@ AddFunction ProtectionPrecombatActions
 	#snapshot_stats
 }
 
-AddIcon mastery=protection help=main
+AddIcon specialization=protection help=main
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()

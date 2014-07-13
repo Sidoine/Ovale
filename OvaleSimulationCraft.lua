@@ -218,7 +218,7 @@ do
 		self:Append(script, "")
 
 		if profile.spec then
-			self:Append(script, format("AddIcon mastery=%s help=main", profile.spec))
+			self:Append(script, format("AddIcon specialization=%s help=main", profile.spec))
 		else
 			self:Append(script, "AddIcon help=main")
 		end

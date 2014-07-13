@@ -86,7 +86,7 @@ AddFunction FrostPrecombatActions
 	Spell(mirror_image)
 }
 
-AddIcon mastery=frost help=main
+AddIcon specialization=frost help=main
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()

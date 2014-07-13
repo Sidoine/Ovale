@@ -231,13 +231,13 @@ AddFunction BloodCdActions
 
 # Blood icons.
 
-AddIcon mastery=blood size=small checkboxon=opt_icons_left
+AddIcon specialization=blood size=small checkbox=opt_icons_left
 {
 	Spell(antimagic_shell)
 	Spell(icebound_fortitude)
 }
 
-AddIcon mastery=blood size=small checkboxon=opt_icons_left
+AddIcon specialization=blood size=small checkbox=opt_icons_left
 {
 	if TalentPoints(death_pact_talent)
 	{
@@ -247,31 +247,31 @@ AddIcon mastery=blood size=small checkboxon=opt_icons_left
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
-AddIcon mastery=blood help=shortcd
+AddIcon specialization=blood help=shortcd
 {
 	BloodShortCdActions()
 }
 
-AddIcon mastery=blood help=main
+AddIcon specialization=blood help=main
 {
 	if InCombat(no) BloodPrecombatActions()
 	BloodSingleTargetActions()
 }
 
-AddIcon mastery=blood help=aoe checkboxon=opt_aoe
+AddIcon specialization=blood help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) BloodPrecombatActions()
 	BloodAoeActions()
 }
 
-AddIcon mastery=blood help=cd
+AddIcon specialization=blood help=cd
 {
 	Interrupt()
 	UseRacialInterruptActions()
 	BloodCdActions()
 }
 
-AddIcon mastery=blood size=small checkboxon=opt_icons_right
+AddIcon specialization=blood size=small checkbox=opt_icons_right
 {
 	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
@@ -279,7 +279,7 @@ AddIcon mastery=blood size=small checkboxon=opt_icons_right
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
 }
 
-AddIcon mastery=blood size=small checkboxon=opt_icons_right
+AddIcon specialization=blood size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -535,13 +535,13 @@ AddFunction FrostTwoHandSingleTargetShortCdActions
 
 ### Frost icons.
 
-AddIcon mastery=frost size=small checkboxon=opt_icons_left
+AddIcon specialization=frost size=small checkbox=opt_icons_left
 {
 	Spell(antimagic_shell)
 	Spell(icebound_fortitude)
 }
 
-AddIcon mastery=frost size=small checkboxon=opt_icons_left
+AddIcon specialization=frost size=small checkbox=opt_icons_left
 {
 	if TalentPoints(death_pact_talent)
 	{
@@ -551,7 +551,7 @@ AddIcon mastery=frost size=small checkboxon=opt_icons_left
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
-AddIcon mastery=frost help=shortcd
+AddIcon specialization=frost help=shortcd
 {
 	if InCombat(no) FrostPrecombatShortCdActions()
 	FrostDefaultShortCdActions()
@@ -559,7 +559,7 @@ AddIcon mastery=frost help=shortcd
 	if HasWeapon(offhand no) FrostTwoHandSingleTargetShortCdActions()
 }
 
-AddIcon mastery=frost help=main
+AddIcon specialization=frost help=main
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()
@@ -567,7 +567,7 @@ AddIcon mastery=frost help=main
 	if HasWeapon(offhand no) FrostTwoHandSingleTargetActions()
 }
 
-AddIcon mastery=frost help=aoe checkboxon=opt_aoe
+AddIcon specialization=frost help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()
@@ -575,7 +575,7 @@ AddIcon mastery=frost help=aoe checkboxon=opt_aoe
 	if HasWeapon(offhand no) FrostTwoHandAoeActions()
 }
 
-AddIcon mastery=frost help=cd
+AddIcon specialization=frost help=cd
 {
 	if InCombat(no) FrostPrecombatCdActions()
 	Interrupt()
@@ -583,7 +583,7 @@ AddIcon mastery=frost help=cd
 	FrostDefaultCdActions()
 }
 
-AddIcon mastery=frost size=small checkboxon=opt_icons_right
+AddIcon specialization=frost size=small checkbox=opt_icons_right
 {
 	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
@@ -591,7 +591,7 @@ AddIcon mastery=frost size=small checkboxon=opt_icons_right
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
 }
 
-AddIcon mastery=frost size=small checkboxon=opt_icons_right
+AddIcon specialization=frost size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -776,13 +776,13 @@ AddFunction UnholyPrecombatCdActions
 
 ### Unholy icons.
 
-AddIcon mastery=unholy size=small checkboxon=opt_icons_left
+AddIcon specialization=unholy size=small checkbox=opt_icons_left
 {
 	Spell(antimagic_shell)
 	Spell(icebound_fortitude)
 }
 
-AddIcon mastery=unholy size=small checkboxon=opt_icons_left
+AddIcon specialization=unholy size=small checkbox=opt_icons_left
 {
 	if TalentPoints(death_pact_talent)
 	{
@@ -792,26 +792,26 @@ AddIcon mastery=unholy size=small checkboxon=opt_icons_left
 	if TalentPoints(death_siphon_talent) Spell(death_siphon)
 }
 
-AddIcon mastery=unholy help=shortcd
+AddIcon specialization=unholy help=shortcd
 {
 	UnholySingleTargetShortCdActions()
 }
 
-AddIcon mastery=unholy help=main
+AddIcon specialization=unholy help=main
 {
 	if InCombat(no) UnholyPrecombatActions()
 	UnholyDefaultActions()
 	UnholySingleTargetActions()
 }
 
-AddIcon mastery=unholy help=aoe checkboxon=opt_aoe
+AddIcon specialization=unholy help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) UnholyPrecombatActions()
 	UnholyDefaultActions()
 	UnholyAoeActions()
 }
 
-AddIcon mastery=unholy help=cd
+AddIcon specialization=unholy help=cd
 {
 	if InCombat(no) UnholyPrecombatCdActions()
 	Interrupt()
@@ -820,7 +820,7 @@ AddIcon mastery=unholy help=cd
 	UnholySingleTargetCdActions()
 }
 
-AddIcon mastery=unholy size=small checkboxon=opt_icons_right
+AddIcon specialization=unholy size=small checkbox=opt_icons_right
 {
 	#pestilence,if=dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(plague_leech_talent) Spell(pestilence)
@@ -828,7 +828,7 @@ AddIcon mastery=unholy size=small checkboxon=opt_icons_right
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 Spell(pestilence)
 }
 
-AddIcon mastery=unholy size=small checkboxon=opt_icons_right
+AddIcon specialization=unholy size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }

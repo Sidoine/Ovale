@@ -23,7 +23,7 @@ AddFunction Interrupt
 	}
 }
 
-AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) mastery=!protection)
+AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) specialization=!protection)
 AddFunction HeroicLeap
 {
 	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)

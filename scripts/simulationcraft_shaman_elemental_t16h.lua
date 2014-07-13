@@ -109,7 +109,7 @@ AddFunction ElementalPrecombatActions
 	UsePotionIntellect()
 }
 
-AddIcon mastery=elemental help=main
+AddIcon specialization=elemental help=main
 {
 	if InCombat(no) ElementalPrecombatActions()
 	ElementalDefaultActions()

@@ -83,7 +83,7 @@ AddFunction BeastMasteryPrecombatActions
 	UsePotionAgility()
 }
 
-AddIcon mastery=beast_mastery help=main
+AddIcon specialization=beast_mastery help=main
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()

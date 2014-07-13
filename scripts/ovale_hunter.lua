@@ -160,36 +160,36 @@ AddFunction BeastMasteryPrecombatCdActions
 
 ### Beast Mastery icons
 
-AddIcon mastery=beast_mastery size=small checkboxon=opt_icons_left
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_left
 {
 	Spell(misdirection)
 }
 
-AddIcon mastery=beast_mastery size=small checkboxon=opt_icons_left
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_left
 {
 	Spell(disengage)
 }
 
-AddIcon mastery=beast_mastery help=shortcd
+AddIcon specialization=beast_mastery help=shortcd
 {
 	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	SummonPet()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon mastery=beast_mastery help=main
+AddIcon specialization=beast_mastery help=main
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 
-AddIcon mastery=beast_mastery help=aoe checkboxon=opt_aoe
+AddIcon specialization=beast_mastery help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultAoeActions()
 }
 
-AddIcon mastery=beast_mastery help=cd
+AddIcon specialization=beast_mastery help=cd
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	Interrupt()
@@ -197,12 +197,12 @@ AddIcon mastery=beast_mastery help=cd
 	BeastMasteryDefaultCdActions()
 }
 
-AddIcon mastery=beast_mastery size=small checkboxon=opt_icons_right
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_right
 {
 	Spell(explosive_trap)
 }
 
-AddIcon mastery=beast_mastery size=small checkboxon=opt_icons_right
+AddIcon specialization=beast_mastery size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -363,36 +363,36 @@ AddFunction MarksmanshipPrecombatCdActions
 
 ### Marksmanship icons
 
-AddIcon mastery=marksmanship size=small checkboxon=opt_icons_left
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_left
 {
 	Spell(misdirection)
 }
 
-AddIcon mastery=marksmanship size=small checkboxon=opt_icons_left
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_left
 {
 	Spell(disengage)
 }
 
-AddIcon mastery=marksmanship help=shortcd
+AddIcon specialization=marksmanship help=shortcd
 {
 	if InCombat(no) MarksmanshipPrecombatShortCdActions()
 	SummonPet()
 	MarksmanshipDefaultShortCdActions()
 }
 
-AddIcon mastery=marksmanship help=main
+AddIcon specialization=marksmanship help=main
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()
 }
 
-AddIcon mastery=marksmanship help=aoe checkboxon=opt_aoe
+AddIcon specialization=marksmanship help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultAoeActions()
 }
 
-AddIcon mastery=marksmanship help=cd
+AddIcon specialization=marksmanship help=cd
 {
 	if InCombat(no) MarksmanshipPrecombatCdActions()
 	Interrupt()
@@ -400,12 +400,12 @@ AddIcon mastery=marksmanship help=cd
 	MarksmanshipDefaultCdActions()
 }
 
-AddIcon mastery=marksmanship size=small checkboxon=opt_icons_right
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_right
 {
 	Spell(explosive_trap)
 }
 
-AddIcon mastery=marksmanship size=small checkboxon=opt_icons_right
+AddIcon specialization=marksmanship size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -558,36 +558,36 @@ AddFunction SurvivalPrecombatCdActions
 
 ### Survival icons
 
-AddIcon mastery=survival size=small checkboxon=opt_icons_left
+AddIcon specialization=survival size=small checkbox=opt_icons_left
 {
 	Spell(misdirection)
 }
 
-AddIcon mastery=survival size=small checkboxon=opt_icons_left
+AddIcon specialization=survival size=small checkbox=opt_icons_left
 {
 	Spell(disengage)
 }
 
-AddIcon mastery=survival help=shortcd
+AddIcon specialization=survival help=shortcd
 {
 	if InCombat(no) SurvivalPrecombatShortCdActions()
 	SummonPet()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon mastery=survival help=main
+AddIcon specialization=survival help=main
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultActions()
 }
 
-AddIcon mastery=survival help=aoe checkboxon=opt_aoe
+AddIcon specialization=survival help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultAoeActions()
 }
 
-AddIcon mastery=survival help=cd
+AddIcon specialization=survival help=cd
 {
 	if InCombat(no) SurvivalPrecombatCdActions()
 	Interrupt()
@@ -595,13 +595,13 @@ AddIcon mastery=survival help=cd
 	SurvivalDefaultCdActions()
 }
 
-AddIcon mastery=survival size=small checkboxon=opt_icons_right
+AddIcon specialization=survival size=small checkbox=opt_icons_right
 {
 	Spell(explosive_trap)
 	Spell(ice_trap)
 }
 
-AddIcon mastery=survival size=small checkboxon=opt_icons_right
+AddIcon specialization=survival size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }

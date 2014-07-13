@@ -152,7 +152,7 @@ AddFunction EnhancementPrecombatActions
 	UsePotionAgility()
 }
 
-AddIcon mastery=enhancement help=main
+AddIcon specialization=enhancement help=main
 {
 	if InCombat(no) EnhancementPrecombatActions()
 	EnhancementDefaultActions()

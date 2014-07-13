@@ -100,7 +100,7 @@ AddFunction ProtectionPrecombatActions
 	Spell(mountains_potion)
 }
 
-AddIcon mastery=protection help=main
+AddIcon specialization=protection help=main
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()

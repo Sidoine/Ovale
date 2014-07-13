@@ -96,7 +96,7 @@ AddFunction WindwalkerPrecombatActions
 	UsePotionAgility()
 }
 
-AddIcon mastery=windwalker help=main
+AddIcon specialization=windwalker help=main
 {
 	if InCombat(no) WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()

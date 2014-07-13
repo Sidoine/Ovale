@@ -134,7 +134,7 @@ AddFunction FrostPrecombatActions
 	Spell(raise_dead)
 }
 
-AddIcon mastery=frost help=main
+AddIcon specialization=frost help=main
 {
 	if InCombat(no) FrostPrecombatActions()
 	FrostDefaultActions()

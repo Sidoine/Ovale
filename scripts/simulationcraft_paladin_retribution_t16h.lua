@@ -104,7 +104,7 @@ AddFunction RetributionPrecombatActions
 	UsePotionStrength()
 }
 
-AddIcon mastery=retribution help=main
+AddIcon specialization=retribution help=main
 {
 	if InCombat(no) RetributionPrecombatActions()
 	RetributionDefaultActions()

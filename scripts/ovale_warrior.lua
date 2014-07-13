@@ -162,41 +162,41 @@ AddFunction ArmsPrecombatCdActions
 
 ### Arms icons.
 
-AddIcon mastery=arms size=small checkboxon=opt_icons_left
+AddIcon specialization=arms size=small checkbox=opt_icons_left
 {
 	Spell(vigilance)
 	Spell(demoralizing_banner)
 	Spell(rallying_cry)
 }
 
-AddIcon mastery=arms size=small checkboxon=opt_icons_left
+AddIcon specialization=arms size=small checkbox=opt_icons_left
 {
 	if TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(impending_victory usable=1)
 	if not TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(victory_rush usable=1)
 	if TalentPoints(enraged_regeneration_talent) Spell(enraged_regeneration)
 }
 
-AddIcon mastery=arms help=shortcd
+AddIcon specialization=arms help=shortcd
 {
 	ArmsDefaultShortCdActions()
 	ArmsSingleTargetShortCdActions()
 }
 
-AddIcon mastery=arms help=main
+AddIcon specialization=arms help=main
 {
 	if InCombat(no) ArmsPrecombatActions()
 	ArmsDefaultActions()
 	ArmsSingleTargetActions()
 }
 
-AddIcon mastery=arms help=aoe checkboxon=opt_aoe
+AddIcon specialization=arms help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) ArmsPrecombatActions()
 	ArmsDefaultActions()
 	ArmsAoeActions()
 }
 
-AddIcon mastery=arms help=cd
+AddIcon specialization=arms help=cd
 {
 	Interrupt()
 	UseRacialInterruptActions()
@@ -205,13 +205,13 @@ AddIcon mastery=arms help=cd
 	ArmsDefaultCdActions()
 }
 
-AddIcon mastery=arms size=small checkboxon=opt_icons_right
+AddIcon specialization=arms size=small checkbox=opt_icons_right
 {
 	Spell(die_by_the_sword)
 	Spell(shield_wall)
 }
 
-AddIcon mastery=arms size=small checkboxon=opt_icons_right
+AddIcon specialization=arms size=small checkbox=opt_icons_right
 {
 	#shattering_throw,if=cooldown.colossus_smash.remains>5
 	if target.DebuffExpires(shattering_throw_debuff) and SpellCooldown(colossus_smash) > 5 Spell(shattering_throw)
@@ -551,34 +551,34 @@ AddFunction FuryTwoHandSingleTargetShortCdActions
 
 ### Fury icons.
 
-AddIcon mastery=fury size=small checkboxon=opt_icons_left
+AddIcon specialization=fury size=small checkbox=opt_icons_left
 {
 	Spell(vigilance)
 	Spell(demoralizing_banner)
 	Spell(rallying_cry)
 }
 
-AddIcon mastery=fury size=small checkboxon=opt_icons_left
+AddIcon specialization=fury size=small checkbox=opt_icons_left
 {
 	if TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(impending_victory usable=1)
 	if not TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(victory_rush usable=1)
 	if TalentPoints(enraged_regeneration_talent) Spell(enraged_regeneration)
 }
 
-AddIcon mastery=fury help=shortcd
+AddIcon specialization=fury help=shortcd
 {
 	if HasWeapon(main type=1h) FuryOneHandSingleTargetShortCdActions()
 	if HasWeapon(main type=2h) FuryTwoHandSingleTargetShortCdActions()
 }
 
-AddIcon mastery=fury help=main
+AddIcon specialization=fury help=main
 {
 	if InCombat(no) FuryPrecombatActions()
 	if HasWeapon(main type=1h) FuryOneHandSingleTargetActions()
 	if HasWeapon(main type=2h) FuryTwoHandSingleTargetActions()
 }
 
-AddIcon mastery=fury help=aoe checkboxon=opt_aoe
+AddIcon specialization=fury help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) FuryPrecombatActions()
 	#run_action_list,name=two_targets,if=active_enemies=2
@@ -589,7 +589,7 @@ AddIcon mastery=fury help=aoe checkboxon=opt_aoe
 	if Enemies() > 3 FuryAoeActions()
 }
 
-AddIcon mastery=fury help=cd
+AddIcon specialization=fury help=cd
 {
 	Interrupt()
 	UseRacialInterruptActions()
@@ -598,13 +598,13 @@ AddIcon mastery=fury help=cd
 	FuryDefaultCdActions()
 }
 
-AddIcon mastery=fury size=small checkboxon=opt_icons_right
+AddIcon specialization=fury size=small checkbox=opt_icons_right
 {
 	Spell(die_by_the_sword)
 	Spell(shield_wall)
 }
 
-AddIcon mastery=fury size=small checkboxon=opt_icons_right
+AddIcon specialization=fury size=small checkbox=opt_icons_right
 {
 	#shattering_throw,if=cooldown.colossus_smash.remains>5
 	if target.DebuffExpires(shattering_throw_debuff) and SpellCooldown(colossus_smash) > 5 Spell(shattering_throw)
@@ -718,52 +718,52 @@ AddFunction ProtectionPrecombatActions
 
 ### Protection icons.
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left
 {
 	Spell(vigilance)
 	Spell(demoralizing_banner)
 	Spell(rallying_cry)
 }
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_left
+AddIcon specialization=protection size=small checkbox=opt_icons_left
 {
 	if TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(impending_victory usable=1)
 	if not TalentPoints(impending_victory_talent) and HealthPercent() < 80 Spell(victory_rush usable=1)
 	if TalentPoints(enraged_regeneration_talent) Spell(enraged_regeneration)
 }
 
-AddIcon mastery=protection help=shortcd
+AddIcon specialization=protection help=shortcd
 {
 	ProtectionDefaultShortCdActions()
 }
 
-AddIcon mastery=protection help=main
+AddIcon specialization=protection help=main
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 	ProtectionNormalRotationActions()
 }
 
-AddIcon mastery=protection help=aoe checkboxon=opt_aoe
+AddIcon specialization=protection help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionAoeActions()
 }
 
-AddIcon mastery=protection help=cd
+AddIcon specialization=protection help=cd
 {
 	Interrupt()
 	UseRacialInterruptActions()
 	ProtectionDefaultCdActions()
 }
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right
 {
 	Spell(die_by_the_sword)
 	Spell(shield_wall)
 }
 
-AddIcon mastery=protection size=small checkboxon=opt_icons_right
+AddIcon specialization=protection size=small checkbox=opt_icons_right
 {
 	#shattering_throw
 	if target.DebuffExpires(shattering_throw_debuff) Spell(shattering_throw)

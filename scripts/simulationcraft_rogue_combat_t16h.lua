@@ -91,7 +91,7 @@ AddFunction CombatPrecombatActions
 	if TalentPoints(marked_for_death_talent) Spell(slice_and_dice)
 }
 
-AddIcon mastery=combat help=main
+AddIcon specialization=combat help=main
 {
 	if InCombat(no) CombatPrecombatActions()
 	CombatDefaultActions()

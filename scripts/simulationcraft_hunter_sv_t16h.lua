@@ -81,7 +81,7 @@ AddFunction SurvivalPrecombatActions
 	UsePotionAgility()
 }
 
-AddIcon mastery=survival help=main
+AddIcon specialization=survival help=main
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultActions()

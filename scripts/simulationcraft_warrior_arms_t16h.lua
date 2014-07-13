@@ -118,7 +118,7 @@ AddFunction ArmsPrecombatActions
 	UsePotionStrength()
 }
 
-AddIcon mastery=arms help=main
+AddIcon specialization=arms help=main
 {
 	if InCombat(no) ArmsPrecombatActions()
 	ArmsDefaultActions()

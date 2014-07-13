@@ -151,25 +151,25 @@ AddFunction BrewmasterPrecombatActions
 
 ### Brewmaster icons.
 
-AddIcon mastery=brewmaster size=small checkboxon=opt_icons_left
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_left
 {
 	if TalentPoints(dampen_harm_talent) Spell(dampen_harm)
 	if TalentPoints(diffuse_magic_talent) Spell(diffuse_magic)
 }
 
-AddIcon mastery=brewmaster size=small checkboxon=opt_icons_left
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_left
 {
 	Spell(fortifying_brew)
 	Spell(symbiosis_survival_instincts)
 	UseRacialSurvivalActions()
 }
 
-AddIcon mastery=brewmaster help=cd
+AddIcon specialization=brewmaster help=cd
 {
 	BrewmasterShortCdActions()
 }
 
-AddIcon mastery=brewmaster help=main
+AddIcon specialization=brewmaster help=main
 {
 	if InCombat(no) BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
@@ -177,7 +177,7 @@ AddIcon mastery=brewmaster help=main
 	BrewmasterFillerActions()
 }
 
-AddIcon mastery=brewmaster help=aoe checkboxon=opt_aoe
+AddIcon specialization=brewmaster help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
@@ -185,7 +185,7 @@ AddIcon mastery=brewmaster help=aoe checkboxon=opt_aoe
 	BrewmasterFillerActions()
 }
 
-AddIcon mastery=brewmaster help=cd
+AddIcon specialization=brewmaster help=cd
 {
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	if target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death)
@@ -194,12 +194,12 @@ AddIcon mastery=brewmaster help=cd
 	BrewmasterCdActions()
 }
 
-AddIcon mastery=brewmaster size=small checkboxon=opt_icons_right
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_right
 {
 	if TotemExpires(statue) or BuffExpires(sanctuary_of_the_ox_buff) Spell(summon_black_ox_statue)
 }
 
-AddIcon mastery=brewmaster size=small checkboxon=opt_icons_right
+AddIcon specialization=brewmaster size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -208,7 +208,7 @@ AddIcon mastery=brewmaster size=small checkboxon=opt_icons_right
 ### Mistweaver
 ###
 
-AddCheckBox(opt_mistweaver_pool_chi "Pool Chi >= 2" mastery=mistweaver)
+AddCheckBox(opt_mistweaver_pool_chi "Pool Chi >= 2" specialization=mistweaver)
 AddFunction MistweaverChiPool
 {
 	if CheckBoxOn(opt_mistweaver_pool_chi) 2
@@ -286,18 +286,18 @@ AddFunction MistweaverPrecombatActions
 
 ### Mistweaver icons.
 
-AddIcon mastery=mistweaver size=small checkboxon=opt_icons_right
+AddIcon specialization=mistweaver size=small checkbox=opt_icons_right
 {
 	if TotemExpires(statue) Spell(summon_jade_serpent_statue)
 }
 
-AddIcon mastery=mistweaver size=small checkboxon=opt_icons_left
+AddIcon specialization=mistweaver size=small checkbox=opt_icons_left
 {
 	if BuffCountOnAny(renewing_mist_buff) > 5 Spell(thunder_focus_tea)
 	Spell(revival)
 }
 
-AddIcon mastery=mistweaver help=shortcd
+AddIcon specialization=mistweaver help=shortcd
 {
 	unless Stance(monk_stance_of_the_wise_serpent) Spell(stance_of_the_wise_serpent)
 
@@ -311,19 +311,19 @@ AddIcon mastery=mistweaver help=shortcd
 	if TalentPoints(zen_sphere_talent) and BuffCountOnAny(zen_sphere_buff) < 1 Spell(zen_sphere)
 }
 
-AddIcon mastery=mistweaver help=main
+AddIcon specialization=mistweaver help=main
 {
 	if InCombat(no) MistweaverPrecombatActions()
 	MistweaverSingleTargetActions()
 }
 
-AddIcon mastery=mistweaver help=aoe checkboxon=opt_aoe
+AddIcon specialization=mistweaver help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) MistweaverPrecombatActions()
 	MistweaverAoeActions()
 }
 
-AddIcon mastery=mistweaver help=cd
+AddIcon specialization=mistweaver help=cd
 {
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	if target.Health() < Health() and BuffPresent(death_note) Spell(touch_of_death)
@@ -335,7 +335,7 @@ AddIcon mastery=mistweaver help=cd
 	MistweaverDefaultCdActions()
 }
 
-AddIcon mastery=mistweaver help=mana size=small checkboxon=opt_icons_left
+AddIcon specialization=mistweaver help=mana size=small checkbox=opt_icons_left
 {
 	if ManaPercent() < 100
 	{
@@ -343,7 +343,7 @@ AddIcon mastery=mistweaver help=mana size=small checkboxon=opt_icons_left
 	}
 }
 
-AddIcon mastery=mistweaver size=small checkboxon=opt_icons_right
+AddIcon specialization=mistweaver size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }
@@ -470,40 +470,40 @@ AddFunction WindwalkerPrecombatCdActions
 
 ### Windwalker icons.
 
-AddIcon mastery=windwalker size=small checkboxon=opt_icons_left
+AddIcon specialization=windwalker size=small checkbox=opt_icons_left
 {
 	if TalentPoints(dampen_harm_talent) Spell(dampen_harm)
 	if TalentPoints(diffuse_magic_talent) Spell(diffuse_magic)
 }
 
-AddIcon mastery=windwalker size=small checkboxon=opt_icons_left
+AddIcon specialization=windwalker size=small checkbox=opt_icons_left
 {
 	if TalentPoints(chi_burst_talent) Spell(chi_burst)
 	if TalentPoints(chi_wave_talent) Spell(chi_wave)
 	if TalentPoints(zen_sphere_talent) and BuffExpires(zen_sphere_buff) Spell(zen_sphere)
 }
 
-AddIcon mastery=windwalker help=shortcd
+AddIcon specialization=windwalker help=shortcd
 {
 	WindwalkerDefaultShortCdActions()
 	WindwalkerSingleTargetShortCdActions()
 }
 
-AddIcon mastery=windwalker help=main
+AddIcon specialization=windwalker help=main
 {
 	if InCombat(no) WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()
 	WindwalkerSingleTargetActions()
 }
 
-AddIcon mastery=windwalker help=aoe checkboxon=opt_aoe
+AddIcon specialization=windwalker help=aoe checkbox=opt_aoe
 {
 	if InCombat(no) WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()
 	WindwalkerAoeActions()
 }
 
-AddIcon mastery=windwalker help=cd
+AddIcon specialization=windwalker help=cd
 {
 	if InCombat(no) WindwalkerPrecombatCdActions()
 
@@ -515,12 +515,12 @@ AddIcon mastery=windwalker help=cd
 	WindwalkerDefaultCdActions()
 }
 
-AddIcon mastery=windwalker size=small checkboxon=opt_icons_right
+AddIcon specialization=windwalker size=small checkbox=opt_icons_right
 {
 	Spell(zen_meditation)
 }
 
-AddIcon mastery=windwalker size=small checkboxon=opt_icons_right
+AddIcon specialization=windwalker size=small checkbox=opt_icons_right
 {
 	UseItemActions()
 }

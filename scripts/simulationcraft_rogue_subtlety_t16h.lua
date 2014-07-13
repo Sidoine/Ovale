@@ -106,7 +106,7 @@ AddFunction SubtletyDefaultActions
 	SubtletyPoolActions()
 }
 
-AddIcon mastery=subtlety help=main
+AddIcon specialization=subtlety help=main
 {
 	if InCombat(no) SubtletyPrecombatActions()
 	SubtletyDefaultActions()

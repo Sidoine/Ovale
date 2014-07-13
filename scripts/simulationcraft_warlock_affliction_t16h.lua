@@ -104,7 +104,7 @@ AddFunction AfflictionPrecombatActions
 	UsePotionIntellect()
 }
 
-AddIcon mastery=affliction help=main
+AddIcon specialization=affliction help=main
 {
 	if InCombat(no) AfflictionPrecombatActions()
 	AfflictionDefaultActions()

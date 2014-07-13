@@ -107,7 +107,7 @@ AddFunction DemonologyPrecombatActions
 	UsePotionIntellect()
 }
 
-AddIcon mastery=demonology help=main
+AddIcon specialization=demonology help=main
 {
 	if InCombat(no) DemonologyPrecombatActions()
 	DemonologyDefaultActions()

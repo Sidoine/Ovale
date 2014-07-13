@@ -97,7 +97,7 @@ AddFunction MarksmanshipPrecombatActions
 	UsePotionAgility()
 }
 
-AddIcon mastery=marksmanship help=main
+AddIcon specialization=marksmanship help=main
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()

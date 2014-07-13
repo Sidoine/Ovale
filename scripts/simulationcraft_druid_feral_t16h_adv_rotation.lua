@@ -251,7 +251,7 @@ AddFunction FeralAdvancedActions
 	}
 }
 
-AddIcon mastery=feral help=main
+AddIcon specialization=feral help=main
 {
 	if InCombat(no) FeralPrecombatActions()
 	FeralDefaultActions()

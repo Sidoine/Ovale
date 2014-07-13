@@ -81,7 +81,7 @@ AddFunction BalanceDefaultActions
 	if Speed() > 0 Spell(sunfire)
 }
 
-AddIcon mastery=balance help=main
+AddIcon specialization=balance help=main
 {
 	BalanceDefaultActions()
 }

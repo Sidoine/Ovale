@@ -86,7 +86,7 @@ AddFunction FirePrecombatActions
 	Spell(mirror_image)
 }
 
-AddIcon mastery=fire help=main
+AddIcon specialization=fire help=main
 {
 	if InCombat(no) FirePrecombatActions()
 	FireDefaultActions()

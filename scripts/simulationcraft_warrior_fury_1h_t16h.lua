@@ -216,7 +216,7 @@ AddFunction FuryAoeActions
 	Spell(battle_shout)
 }
 
-AddIcon mastery=fury help=main
+AddIcon specialization=fury help=main
 {
 	if InCombat(no) FuryPrecombatActions()
 	FuryDefaultActions()

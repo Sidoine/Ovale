@@ -155,7 +155,7 @@ AddFunction UnholyPrecombatActions
 	Spell(raise_dead)
 }
 
-AddIcon mastery=unholy help=main
+AddIcon specialization=unholy help=main
 {
 	if InCombat(no) UnholyPrecombatActions()
 	UnholyDefaultActions()

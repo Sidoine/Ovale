@@ -91,7 +91,7 @@ AddFunction DestructionPrecombatActions
 	UsePotionIntellect()
 }
 
-AddIcon mastery=destruction help=main
+AddIcon specialization=destruction help=main
 {
 	if InCombat(no) DestructionPrecombatActions()
 	DestructionDefaultActions()

@@ -105,7 +105,7 @@ AddFunction ShadowPrecombatActions
 	UsePotionIntellect()
 }
 
-AddIcon mastery=shadow help=main
+AddIcon specialization=shadow help=main
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultActions()
