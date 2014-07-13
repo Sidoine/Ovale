@@ -33,7 +33,6 @@ local API_CreateFrame = CreateFrame
 local API_GetAuctionItemSubClasses = GetAuctionItemSubClasses
 local API_GetInventoryItemID = GetInventoryItemID
 local API_GetInventoryItemGems = GetInventoryItemGems
-local API_GetInventorySlotInfo = GetInventorySlotInfo
 local API_GetItemInfo = GetItemInfo
 local API_UnitClass = UnitClass
 local INVSLOT_AMMO = INVSLOT_AMMO
@@ -71,31 +70,26 @@ local OVALE_ITEM_LEVEL_PATTERN = "^" .. strgsub(ITEM_LEVEL, "%%d", "(%%d+)")
 
 -- equipment slot names
 local OVALE_SLOTNAME = {
-	AmmoSlot = true,
-	BackSlot = true,
-	ChestSlot = true,
-	FeetSlot = true,
-	Finger0Slot = true,
-	Finger1Slot = true,
-	HandsSlot = true,
-	HeadSlot = true,
-	LegsSlot = true,
-	MainHandSlot = true,
-	NeckSlot = true,
-	SecondaryHandSlot = true,
-	ShirtSlot = true,
-	ShoulderSlot = true,
-	TabardSlot = true,
-	Trinket0Slot = true,
-	Trinket1Slot = true,
-	WaistSlot = true,
-	WristSlot = true,
+	AmmoSlot = INVSLOT_AMMO,
+	BackSlot = INVSLOT_BACK,
+	ChestSlot = INVSLOT_CHEST,
+	FeetSlot = INVSLOT_FEET,
+	Finger0Slot = INVSLOT_FINGER1,
+	Finger1Slot = INVSLOT_FINGER2,
+	HandsSlot = INVSLOT_HAND,
+	HeadSlot = INVSLOT_HEAD,
+	LegsSlot = INVSLOT_LEGS,
+	MainHandSlot = INVSLOT_MAINHAND,
+	NeckSlot = INVSLOT_NECK,
+	SecondaryHandSlot = INVSLOT_OFFHAND,
+	ShirtSlot = INVSLOT_BODY,
+	ShoulderSlot = INVSLOT_SHOULDER,
+	TabardSlot = INVSLOT_TABARD,
+	Trinket0Slot = INVSLOT_TRINKET1,
+	Trinket1Slot = INVSLOT_TRINKET2,
+	WaistSlot = INVSLOT_WAIST,
+	WristSlot = INVSLOT_WRIST,
 }
-do
-	for slotName in pairs(OVALE_SLOTNAME) do
-		OVALE_SLOTNAME[slotName] = API_GetInventorySlotInfo(slotName)
-	end
-end
 -- slots that can contain pieces from armor sets
 local OVALE_ARMORSET_SLOT_IDS = { INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LEGS, INVSLOT_SHOULDER }
 -- database of armor set items: OVALE_ARMORSET[itemId] = armorSetName
