@@ -1015,6 +1015,10 @@ function OvaleCompile:Compile()
 	end
 end
 
+function OvaleCompile:GetFunctionNode(name)
+	return self.customFunctionNode[name]
+end
+
 function OvaleCompile:GetMasterNodes()
 	-- Compile the script if it is outdated.
 	if not self.serial or self.serial < self_serial then

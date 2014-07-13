@@ -10,15 +10,34 @@
 local _, Ovale = ...
 
 do
+	local OvaleBestAction = Ovale.OvaleBestAction
+	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleData = Ovale.OvaleData
 	local OvaleEquipement = Ovale.OvaleEquipement
 	local OvaleState = Ovale.OvaleState
 
 	local Compare = OvaleCondition.Compare
-	local ComputeParameter = OvaleCondition.ComputeParameter
 	local ParseCondition = OvaleCondition.ParseCondition
 	local state = OvaleState.state
+
+	function ComputeParameter(spellId, paramName, state)
+		local si = OvaleData:GetSpellInfo(spellId)
+		if si and si[paramName] then
+			local name = si[paramName]
+			local node = OvaleCompile:GetFunctionNode(name)
+			if node then
+				local timeSpan, priority, element = OvaleBestAction:Compute(node, state)
+				if element and element.type == "value" then
+					local value = element.value + (state.currentTime - element.origin) * element.rate
+					return value
+				end
+			else
+				return si[paramName]
+			end
+		end
+		return nil
+	end
 
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
 	local function GetDamage(spellId)

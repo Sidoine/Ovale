@@ -47,11 +47,6 @@ local OvaleCondition = Ovale:NewModule("OvaleCondition")
 Ovale.OvaleCondition = OvaleCondition
 
 --<private-static-properties>
--- Forward declarations for module dependencies.
-local OvaleBestAction = nil
-local OvaleCompile = nil
-local OvaleData = nil
-
 local type = type
 local wipe = table.wipe
 
@@ -88,13 +83,6 @@ OvaleCondition.COMPARATOR = {
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleCondition:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleBestAction = Ovale.OvaleBestAction
-	OvaleCompile = Ovale.OvaleCompile
-	OvaleData = Ovale.OvaleData
-end
-
 function OvaleCondition:RegisterCondition(name, isSpellbookCondition, func, arg)
 	if arg then
 		if type(func) == "string" then
@@ -123,24 +111,6 @@ end
 
 function OvaleCondition:EvaluateCondition(name, ...)
 	return self_condition[name](...)
-end
-
-function OvaleCondition.ComputeParameter(spellId, paramName, state)
-	local si = OvaleData:GetSpellInfo(spellId)
-	if si and si[paramName] then
-		local name = si[paramName]
-		local node = OvaleCompile.customFunctionNode[name]
-		if node then
-			local timeSpan, priority, element = OvaleBestAction:Compute(node, state)
-			if element and element.type == "value" then
-				local value = element.value + (state.currentTime - element.origin) * element.rate
-				return value
-			end
-		else
-			return si[paramName]
-		end
-	end
-	return nil
 end
 
 OvaleCondition.ParseCondition = function(condition, defaultTarget)
