@@ -101,6 +101,12 @@ local function TestConditions(parameters)
 		local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
 		boolean = (required and hasGlyph) or (not required and not hasGlyph)
 	end
+	if boolean and parameters.specialization then
+		local spec, required = RequireValue(parameters.specialization)
+		local isSpec = OvalePaperDoll:IsSpecialization(spec)
+		boolean = (required and isSpec) or (not required and not isSpec)
+	end
+	-- Deprecated: mastery -> specialization
 	if boolean and parameters.mastery then
 		local spec, required = RequireValue(parameters.mastery)
 		local isSpec = OvalePaperDoll:IsSpecialization(spec)
@@ -139,7 +145,7 @@ local function TestConditions(parameters)
 			local isChecked = (profile.check[name] ~= nil)
 			boolean = (required and isChecked) or (not required and not isChecked)
 		end
-		-- XXX Deprecated: checkboxon
+		-- Deprecated: checkboxon
 		if boolean and parameters.checkboxon then
 			-- Flag this checkbox as triggering a script evaluation.
 			local name = parameters.checkboxon
@@ -150,7 +156,7 @@ local function TestConditions(parameters)
 			profile = profile or OvaleOptions:GetProfile()
 			boolean = (profile.check[name] ~= nil)
 		end
-		-- XXX Deprecated: checkboxoff
+		-- Deprecated: checkboxoff
 		if boolean and parameters.checkboxoff then
 			-- Flag this checkbox as triggering a script evaluation.
 			local name = parameters.checkboxon
@@ -314,7 +320,8 @@ local function EvaluateSpellAuraList(node)
 		local tbl = auraTable[filter] or {}
 		local count = 0
 		for k, v in pairs(parameters) do
-			if not OvaleAST.PARAMETER_KEYWORD[k] then
+			-- Deprecated: "mastery" can't be a keyword since it's the same as the name of the raid buff.
+			if not OvaleAST.PARAMETER_KEYWORD[k] and k ~= "mastery" then
 				tbl[k] = v
 				count = count + 1
 			end
@@ -355,8 +362,11 @@ local function EvaluateSpellInfo(node)
 				OvaleData.buffSpellList[v] = list
 			elseif k == "sharedcd" then
 				OvaleCooldown:AddSharedCooldown(v, spellId)
-			elseif not OvaleAST.PARAMETER_KEYWORD[k] then
-				si[k] = v
+			else
+				-- Deprecated: "mastery" can't be a keyword since it's the same as the name of the raid buff.
+				if not OvaleAST.PARAMETER_KEYWORD[k] and k ~= "mastery" then
+					si[k] = v
+				end
 			end
 		end
 	end
