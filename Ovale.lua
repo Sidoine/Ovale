@@ -19,6 +19,7 @@ local format = string.format
 local next = next
 local pairs = pairs
 local select = select
+local tconcat = table.concat
 local tostring = tostring
 local wipe = table.wipe
 local API_GetTime = GetTime
@@ -59,6 +60,7 @@ Ovale.checkBoxes = {}
 Ovale.dropDowns = {}
 -- Flag to activate tracing the function calls for the next frame refresh.
 Ovale.trace = false
+Ovale.traceLog = {}
 --in combat?
 Ovale.enCombat = false
 Ovale.refreshNeeded = {}
@@ -365,13 +367,14 @@ end
 
 function Ovale:Log(...)
 	if self.trace then
-		self:Print(...)
+		local output = { ... }
+		self.traceLog[#self.traceLog + 1] = tconcat(output, "\t")
 	end
 end
 
 function Ovale:Logf(...)
 	if self.trace then
-		return self:FormatPrint(...)
+		self.traceLog[#self.traceLog + 1] = self:Format(...)
 	end
 end
 --</public-static-methods>

@@ -25,8 +25,11 @@ local OvaleState = nil
 local format = string.format
 local strgmatch = string.gmatch
 local strgsub = string.gsub
+local tconcat = table.concat
 local tostring = tostring
+local wipe = table.wipe
 local API_GetSpellInfo = GetSpellInfo
+local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
 -- Player's class.
@@ -369,7 +372,7 @@ local self_options =
 				{
 					order = 20,
 					type = "input",
-					multiline = 15,
+					multiline = 25,
 					name = L["Code"],
 					width = "full",
 					disabled = function()
@@ -431,10 +434,71 @@ local self_options =
 			type = "group",
 			args =
 			{
+				toggles =
+				{
+					name = "Options",
+					type = "group",
+					order = 10,
+					args =
+					{
+						-- Node names must match the names of the debug flags.
+						action_bar =
+						{
+							name = "Action bars",
+							desc = L["Debug action bars"],
+							type = "toggle",
+						},
+						aura =
+						{
+							name = "Auras",
+							desc = L["Debug aura"],
+							type = "toggle",
+						},
+						compile =
+						{
+							name = "Compile",
+							desc = L["Debug compile"],
+							type = "toggle",
+						},
+						damage_taken =
+						{
+							name = "Damage taken",
+							desc = L["Debug damage taken"],
+							type = "toggle",
+						},
+						enemy =
+						{
+							name = "Enemies",
+							desc = L["Debug enemies"],
+							type = "toggle",
+						},
+						guid =
+						{
+							name = "GUIDs",
+							desc = L["Debug GUID"],
+							type = "toggle",
+						},
+						paper_doll =
+						{
+							name = "Paper doll updates",
+							desc = L["Debug paper doll"],
+							type = "toggle",
+						},
+						snapshot =
+						{
+							name = "Snapshot updates",
+							desc = L["Debug stat snapshots"],
+							type = "toggle",
+						},
+					},
+					get = function(info) return OvaleOptions.db.profile.debug[info[#info]] end,
+					set = function(info, value) OvaleOptions.db.profile.debug[info[#info]] = value end,
+				},
 				trace =
 				{
 					name = "Trace",
 					type = "group",
+					order = 20,
 					args =
 					{
 						trace =
@@ -442,7 +506,11 @@ local self_options =
 							order = 10,
 							type = "execute",
 							name = "Trace next frame",
-							func = function() Ovale.trace = true end,
+							func = function()
+								wipe(Ovale.traceLog)
+								Ovale.trace = true
+								Ovale:Logf("=== Trace @%f", API_GetTime())
+							end,
 						},
 						traceSpellId =
 						{
@@ -501,64 +569,19 @@ local self_options =
 						},
 					},
 				},
-				toggles =
-				{
-					name = "Options",
+				traceLog = {
+					name = L["Trace Log"],
 					type = "group",
-					args =
-					{
-						-- Node names must match the names of the debug flags.
-						action_bar =
-						{
-							name = "Action bars",
-							desc = L["Debug action bars"],
-							type = "toggle",
-						},
-						aura =
-						{
-							name = "Auras",
-							desc = L["Debug aura"],
-							type = "toggle",
-						},
-						compile =
-						{
-							name = "Compile",
-							desc = L["Debug compile"],
-							type = "toggle",
-						},
-						damage_taken =
-						{
-							name = "Damage taken",
-							desc = L["Debug damage taken"],
-							type = "toggle",
-						},
-						enemy =
-						{
-							name = "Enemies",
-							desc = L["Debug enemies"],
-							type = "toggle",
-						},
-						guid =
-						{
-							name = "GUIDs",
-							desc = L["Debug GUID"],
-							type = "toggle",
-						},
-						paper_doll =
-						{
-							name = "Paper doll updates",
-							desc = L["Debug paper doll"],
-							type = "toggle",
-						},
-						snapshot =
-						{
-							name = "Snapshot updates",
-							desc = L["Debug stat snapshots"],
-							type = "toggle",
+					order = 30,
+					args = {
+						traceLog = {
+							name = L["Trace Log"],
+							type = "input",
+							multiline = 25,
+							width = "full",
+							get = function() return tconcat(Ovale.traceLog, "\n") end,
 						},
 					},
-					get = function(info) return OvaleOptions.db.profile.debug[info[#info]] end,
-					set = function(info, value) OvaleOptions.db.profile.debug[info[#info]] = value end,
 				},
 			},
 		},
@@ -600,13 +623,13 @@ local self_options =
 				{
 					name = "Code",
 					type = "execute",
-					func = function() AceConfigDialog:SetDefaultSize("Ovale", 500, 550); AceConfigDialog:Open("Ovale") end
+					func = function() AceConfigDialog:SetDefaultSize("Ovale", 700, 550); AceConfigDialog:Open("Ovale") end
 				},
 				debug =
 				{
 					name = "Debug",
 					type = "execute",
-					func = function() AceConfigDialog:SetDefaultSize("Ovale", 500, 550); AceConfigDialog:Open("Ovale Debug") end
+					func = function() AceConfigDialog:SetDefaultSize("Ovale Debug", 800, 550); AceConfigDialog:Open("Ovale Debug") end
 				},
 				power =
 				{

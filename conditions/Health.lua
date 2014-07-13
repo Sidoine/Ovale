@@ -64,7 +64,6 @@ do
 		if health == 0 then
 			timeToDie = 0
 		elseif maxHealth <= 5 then
-			Ovale:Log("Training Dummy, return in the future")
 			timeToDie = math.huge
 		else
 			local now = floor(currentTime)
