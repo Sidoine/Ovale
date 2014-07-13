@@ -63,7 +63,7 @@ local BANDITS_GUILE_ATTACK = {
 --</private-static-properties>
 
 --<public-static-properties>
-OvaleBanditsGuile.name = "Bandit's Guile"
+OvaleBanditsGuile.spellName = "Bandit's Guile"
 -- Bandit's Guile spell ID from spellbook; re-used as the aura ID of the hidden, stacking buff.
 OvaleBanditsGuile.spellId = BANDITS_GUILE
 OvaleBanditsGuile.start = 0
@@ -174,7 +174,7 @@ function OvaleBanditsGuile:Ovale_AuraRemoved(event, timestamp, target, auraId, c
 end
 
 function OvaleBanditsGuile:GainedAura(atTime)
-	OvaleAura:GainedAuraOnGUID(self_guid, atTime, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.name, nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_guid, atTime, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 end
 
 function OvaleBanditsGuile:Debug()

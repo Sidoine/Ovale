@@ -43,7 +43,7 @@ local SHADOW_WORD_DEATH = {
 --</private-static-properties>
 
 --<public-static-properties>
-OvaleShadowWordDeath.name = "Shadow Word: Death Reset Cooldown"
+OvaleShadowWordDeath.spellName = "Shadow Word: Death Reset Cooldown"
 OvaleShadowWordDeath.spellId = 157218	-- spell ID to use for the hidden buff
 OvaleShadowWordDeath.start = 0
 OvaleShadowWordDeath.ending = 0
@@ -88,7 +88,7 @@ function OvaleShadowWordDeath:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleu
 				self.start = now
 				self.ending = now + self.duration
 				self.stacks = 1
-				OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.name, nil, nil, nil)
+				OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 			end
 		end
 	end

@@ -73,7 +73,7 @@ local RANGED_ATTACKS_BY_DEBUFF = {
 --</private-static-properties>
 
 --<public-static-properties>
-OvaleSteadyFocus.name = "Pre-Steady Focus"
+OvaleSteadyFocus.spellName = "Pre-Steady Focus"
 -- Steady Focus spell ID from spellbook; re-used as the aura ID of the hidden buff.
 OvaleSteadyFocus.spellId = 53224
 OvaleSteadyFocus.start = 0
@@ -152,7 +152,7 @@ function OvaleSteadyFocus:GainedAura(atTime)
 	self.start = atTime
 	self.ending = self.start + self.duration
 	self.stacks = self.stacks + 1
-	OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.name, nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 end
 
 function OvaleSteadyFocus:LostAura(atTime)
