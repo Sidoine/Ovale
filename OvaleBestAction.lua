@@ -266,7 +266,7 @@ local function GetActionSpellInfo(element, state, target)
 			elseif si.combo then
 				-- Spell requires combo points.
 				local cost = state:ComboPointCost(spellId)
-				if state.combo < cost then
+				if cost > 0 and state.combo < cost then
 					Ovale:Logf("Spell ID '%s' requires at least %d combo points.", spellId, cost)
 					meetsRequirements = false
 				end
@@ -275,7 +275,7 @@ local function GetActionSpellInfo(element, state, target)
 					if si[powerType] then
 						-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
 						local cost = state:PowerCost(spellId, powerType)
-						if state[powerType] < cost then
+						if cost > 0 and state[powerType] < cost then
 							Ovale:Logf("Spell ID '%s' requires at least %d %s.", spellId, cost, powerType)
 							meetsRequirements = false
 							break
