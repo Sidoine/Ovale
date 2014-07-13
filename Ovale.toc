@@ -22,7 +22,6 @@ Ovale.lua
 Profiler.lua
 
 # Utility modules.
-OvaleLexer.lua
 OvalePool.lua
 OvalePoolGC.lua
 OvalePoolRefCount.lua
@@ -42,6 +41,7 @@ OvaleEquipement.lua
 OvaleFuture.lua
 OvaleGUID.lua
 OvaleLatency.lua
+OvaleLexer.lua
 OvaleOptions.lua
 OvalePaperDoll.lua
 OvalePower.lua

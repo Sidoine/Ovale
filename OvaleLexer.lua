@@ -12,6 +12,9 @@ local OvaleLexer = {}
 Ovale.OvaleLexer = OvaleLexer
 
 --<private-static-properties>
+local OvaleQueue = Ovale.OvaleQueue
+local setmetatable = setmetatable
+
 -- Additional Lua functions used by Penlight pl.lexer module.
 local error = error
 local type = type
@@ -499,5 +502,78 @@ end
 --</vendor-code>
 
 --<public-static-properties>
+OvaleLexer.typeQueue = nil
+OvaleLexer.tokenQueue = nil
+OvaleLexer.iterator = nil
+OvaleLexer.endOfStream = nil
 OvaleLexer.scan = lexer.scan
+OvaleLexer.__index = OvaleLexer
 --</public-static-properties>
+
+--<public-static-methods>
+do
+	-- Class constructor
+	setmetatable(OvaleLexer, { __call = function(self, ...) return self:New(...) end })
+end
+
+function OvaleLexer:New(name, iterator)
+	local obj = {
+		typeQueue = OvaleQueue:NewDeque(name .. "_typeQueue"),
+		tokenQueue = OvaleQueue:NewDeque(name .. "_tokenQueue"),
+		iterator = iterator,
+	}
+	return setmetatable(obj, self)
+end
+
+function OvaleLexer:Release()
+	for key in pairs(self) do
+		self[key] = nil
+	end
+end
+
+function OvaleLexer:Consume(index)
+	index = index or 1
+	local tokenType, token
+	-- Consume the tokens in the buffer first.
+	while index > 0 and self.typeQueue:Size() > 0 do
+		tokenType = self.typeQueue:RemoveFront()
+		token = self.tokenQueue:RemoveFront()
+		if not tokenType then
+			break
+		end
+		index = index - 1
+	end
+	-- Consume from the token stream if needed.
+	while index > 0 do
+		tokenType, token = self.iterator()
+		if not tokenType then
+			break
+		end
+		index = index - 1
+	end
+	return tokenType, token
+end
+
+function OvaleLexer:Peek(index)
+	index = index or 1
+	local tokenType, token
+	while index > self.typeQueue:Size() do
+		if self.endOfStream then
+			break
+		else
+			tokenType, token = self.iterator()
+			if not tokenType then
+				self.endOfStream = true
+				break
+			end
+			self.typeQueue:InsertBack(tokenType)
+			self.tokenQueue:InsertBack(token)
+		end
+	end
+	if index <= self.typeQueue:Size() then
+		tokenType = self.typeQueue:At(index)
+		token = self.tokenQueue:At(index)
+	end
+	return tokenType, token
+end
+--</public-static-methods>
