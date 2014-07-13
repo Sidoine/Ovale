@@ -102,14 +102,19 @@ AddFunction AssassinationDefaultCdActions
 	unless { Energy() < 60 and Spell(arcane_torrent_energy) }
 		or { TimeInCombat() > 10 and not Stealthed() and not BuffPresent(shadow_blades_buff) and Spell(vanish) }
 		or { Stealthed() and Spell(mutilate) }
-		or { BuffRemains(slice_and_dice_buff) < 2 and Spell(slice_and_dice) }
-		or { target.TicksRemain(rupture_debuff) < 2 and Energy() > 90 and Spell(dispatch usable=1) }
-		or { target.TicksRemain(rupture_debuff) < 2 and Energy() > 90 and Spell(mutilate) }
-		or { TalentPoints(marked_for_death_talent) and ComboPoints() == 0 and Spell(marked_for_death) }
-		or { target.TicksRemain(rupture_debuff) < 2 or { ComboPoints() == 5 and target.TicksRemain(rupture_debuff) < 3 } and Spell(rupture) }
 	{
-		#vendetta
-		Spell(vendetta)
+		#shadow_blades,if=buff.bloodlust.react|time>60
+		if BuffPresent(burst_haste any=1) or TimeInCombat() > 60 or Spell(vendetta) Spell(shadow_blades)
+
+		unless { BuffRemains(slice_and_dice_buff) < 2 and Spell(slice_and_dice) }
+			or { target.TicksRemain(rupture_debuff) < 2 and Energy() > 90 and Spell(dispatch usable=1) }
+			or { target.TicksRemain(rupture_debuff) < 2 and Energy() > 90 and Spell(mutilate) }
+			or { TalentPoints(marked_for_death_talent) and ComboPoints() == 0 and Spell(marked_for_death) }
+			or { target.TicksRemain(rupture_debuff) < 2 or { ComboPoints() == 5 and target.TicksRemain(rupture_debuff) < 3 } and Spell(rupture) }
+		{
+			#vendetta
+			Spell(vendetta)
+		}
 	}
 }
 
