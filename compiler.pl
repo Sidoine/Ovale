@@ -25,6 +25,7 @@
 =cut
 
 $m{"AceAddon-3.0"}{GetModule} = true;
+$m{"AceAddon-3.0"}{GetName} = true;
 $m{"AceAddon-3.0"}{NewModule} = true;
 
 $m{AceConfig}{RegisterOptionsTable} = true;
@@ -48,8 +49,12 @@ $m{AceGUI}{RegisterWidgetType} = true;
 
 $m{AceLocale}{NewLocale} = true;
 
+$m{"AceSerializer-3.0"}{Deserialize} = true;
+$m{"AceSerializer-3.0"}{Serialize} = true;
+
 $m{"AceTimer-3.0"}{CancelTimer} = true;
 $m{"AceTimer-3.0"}{ScheduleRepeatingTimer} = true;
+$m{"AceTimer-3.0"}{ScheduleTimer} = true;
 
 $m{ActionButtonTemplate}{CreateFontString} = true;
 $m{ActionButtonTemplate}{EnableMouse} = true;
@@ -188,6 +193,11 @@ sub ParseDirectory
 				my $parent = $1;
 				my $mixins = $2;
 				$sp{$parent}{$class} = true;
+				my $factory = "AceAddon-3.0";
+				for my $method (keys %{$m{$factory}})
+				{
+					$m{$class}{$method} = $m{$factory}{$method}
+				}
 				while ($mixins =~ m/"([^",]+)"/g)
 				{
 					my $parent = $1;
