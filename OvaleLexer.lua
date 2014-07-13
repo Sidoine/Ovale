@@ -1,4 +1,24 @@
 --[[--------------------------------------------------------------------
+    Ovale Spell Priority
+    Copyright (C) 2014 Johnny C. Lam
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License in the LICENSE
+    file accompanying this program.
+--]]--------------------------------------------------------------------
+
+local _, Ovale = ...
+local OvaleLexer = {}
+Ovale.OvaleLexer = OvaleLexer
+
+--<private-static-properties>
+-- Additional Lua functions used by Penlight pl.lexer module.
+local error = error
+local type = type
+--</private-static-properties>
+
+--<vendor-code>
+--[[--------------------------------------------------------------------
   Copyright (C) 2009 Steve Donovan, David Manura.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,17 +40,6 @@
   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --]]--------------------------------------------------------------------
---[[--------------------------------------------------------------------
-    Ovale Spell Priority
-    Copyright (C) 2014 Johnny C. Lam
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License in the LICENSE
-    file accompanying this program.
---]]--------------------------------------------------------------------
-
--- This file is modified from:
--- https://github.com/stevedonovan/Penlight/blob/master/lua/pl/lexer.lua
 
 --- Lexical scanner for creating a sequence of tokens from text.
 -- `lexer.scan(s)` returns an iterator over all tokens found in the
@@ -54,19 +63,18 @@
 -- See the Guide for further @{06-data.md.Lexical_Scanning|discussion}
 -- @module pl.lexer
 
-local _, Ovale = ...
-local OvaleLexer = {}
-Ovale.OvaleLexer = OvaleLexer
-
---<private-static-properties>
-local append = table.insert
-local error = error
+local yield,wrap = coroutine.yield,coroutine.wrap
 local strfind = string.find
 local strsub = string.sub
-local type = type
-local yield, wrap = coroutine.yield, coroutine.wrap
+local append = table.insert
 
-local plain_matches = nil
+local function assert_arg(idx,val,tp)
+    if type(val) ~= tp then
+        error("argument "..idx.." must be "..tp, 2)
+    end
+end
+
+local lexer = {}
 
 local NUMBER1 = '^[%+%-]?%d+%.?%d*[eE][%+%-]?%d+'
 local NUMBER2 = '^[%+%-]?%d+%.?%d*'
@@ -79,14 +87,8 @@ local STRING0 = [[^(['\"]).-\\%1]]
 local STRING1 = [[^(['\"]).-[^\]%1]]
 local STRING3 = "^((['\"])%2)" -- empty string
 local PREPRO = '^#.-[^\\]\n'
---</private-static-properties>
 
---<private-static-methods>
-local function assert_arg(idx,val,tp)
-    if type(val) ~= tp then
-        error("argument "..idx.." must be "..tp, 2)
-    end
-end
+local plain_matches,lua_matches,cpp_matches,lua_keyword,cpp_keyword
 
 local function tdump(tok)
     return yield(tok,tok)
@@ -103,14 +105,22 @@ end
 -- without the quotes
 local function sdump(tok,options)
     if options and options.string then
-        tok = strsub(tok,2,-2)
+        tok = tok:sub(2,-2)
+    end
+    return yield("string",tok)
+end
+
+-- long Lua strings need extra work to get rid of the quotes
+local function sdump_l(tok,options)
+    if options and options.string then
+        tok = tok:sub(3,-3)
     end
     return yield("string",tok)
 end
 
 local function chdump(tok,options)
     if options and options.string then
-        tok = strsub(tok,2,-2)
+        tok = tok:sub(2,-2)
     end
     return yield("char",tok)
 end
@@ -130,16 +140,30 @@ end
 local function plain_vdump(tok)
     return yield("iden",tok)
 end
---<private-static-methods>
 
---<public-static-methods>
+local function lua_vdump(tok)
+    if lua_keyword[tok] then
+        return yield("keyword",tok)
+    else
+        return yield("iden",tok)
+    end
+end
+
+local function cpp_vdump(tok)
+    if cpp_keyword[tok] then
+        return yield("keyword",tok)
+    else
+        return yield("iden",tok)
+    end
+end
+
 --- create a plain token iterator from a string or file-like object.
--- @param s the string
--- @param matches an optional match table (set of pattern-action pairs)
--- @param filter a table of token types to exclude, by default {space=true}
--- @param options a table of options; by default, {number=true,string=true},
+-- @string s the string
+-- @tab matches an optional match table (set of pattern-action pairs)
+-- @tab[opt] filter a table of token types to exclude, by default `{space=true}`
+-- @tab[opt] options a table of options; by default, `{number=true,string=true}`,
 -- which means convert numbers and strip string quotes.
-function OvaleLexer.scan (s,matches,filter,options)
+function lexer.scan (s,matches,filter,options)
     --assert_arg(1,s,'string')
     local file = type(s) ~= 'string' and s
     filter = filter or {space=true}
@@ -182,6 +206,7 @@ function OvaleLexer.scan (s,matches,filter,options)
                     tok = strsub(s,i1,i2)
                     idx = i2 + 1
                     if not (filter and filter[fun]) then
+                        lexer.finished = idx > sz
                         res1,res2 = fun(tok,options)
                     end
                     if res1 then
@@ -236,8 +261,8 @@ end
 -- @param tok a token stream
 -- @param a1 a string is the type, a table is a token list and
 -- a function is assumed to be a token-like iterator (returns type & value)
--- @param a2 a string is the value
-function OvaleLexer.insert (tok,a1,a2)
+-- @string a2 a string is the value
+function lexer.insert (tok,a1,a2)
     if not a1 then return end
     local ts
     if isstring(a1) and isstring(a2) then
@@ -256,33 +281,143 @@ end
 --- get everything in a stream upto a newline.
 -- @param tok a token stream
 -- @return a string
-function OvaleLexer.getline (tok)
+function lexer.getline (tok)
     local t,v = tok('.-\n')
     return v
 end
 
---- get current line number. <br>
+--- get current line number.
 -- Only available if the input source is a file-like object.
 -- @param tok a token stream
 -- @return the line number and current column
-function OvaleLexer.lineno (tok)
+function lexer.lineno (tok)
     return tok(0)
 end
 
 --- get the rest of the stream.
 -- @param tok a token stream
 -- @return a string
-function OvaleLexer.getrest (tok)
+function lexer.getrest (tok)
     local t,v = tok('.+')
     return v
 end
 
+--- get the Lua keywords as a set-like table.
+-- So `res["and"]` etc would be `true`.
+-- @return a table
+function lexer.get_keywords ()
+    if not lua_keyword then
+        lua_keyword = {
+            ["and"] = true, ["break"] = true,  ["do"] = true,
+            ["else"] = true, ["elseif"] = true, ["end"] = true,
+            ["false"] = true, ["for"] = true, ["function"] = true,
+            ["if"] = true, ["in"] = true,  ["local"] = true, ["nil"] = true,
+            ["not"] = true, ["or"] = true, ["repeat"] = true,
+            ["return"] = true, ["then"] = true, ["true"] = true,
+            ["until"] = true,  ["while"] = true
+        }
+    end
+    return lua_keyword
+end
+
+--- create a Lua token iterator from a string or file-like object.
+-- Will return the token type and value.
+-- @string s the string
+-- @tab[opt] filter a table of token types to exclude, by default `{space=true,comments=true}`
+-- @tab[opt] options a table of options; by default, `{number=true,string=true}`,
+-- which means convert numbers and strip string quotes.
+function lexer.lua(s,filter,options)
+    filter = filter or {space=true,comments=true}
+    lexer.get_keywords()
+    if not lua_matches then
+        lua_matches = {
+            {WSPACE,wsdump},
+            {NUMBER3,ndump},
+            {IDEN,lua_vdump},
+            {NUMBER4,ndump},
+            {NUMBER5,ndump},
+            {STRING3,sdump},
+            {STRING0,sdump},
+            {STRING1,sdump},
+            {'^%-%-%[%[.-%]%]',cdump},
+            {'^%-%-.-\n',cdump},
+            {'^%[%[.-%]%]',sdump_l},
+            {'^==',tdump},
+            {'^~=',tdump},
+            {'^<=',tdump},
+            {'^>=',tdump},
+            {'^%.%.%.',tdump},
+            {'^%.%.',tdump},
+            {'^.',tdump}
+        }
+    end
+    return lexer.scan(s,lua_matches,filter,options)
+end
+
+--- create a C/C++ token iterator from a string or file-like object.
+-- Will return the token type type and value.
+-- @string s the string
+-- @tab[opt] filter a table of token types to exclude, by default `{space=true,comments=true}`
+-- @tab[opt] options a table of options; by default, `{number=true,string=true}`,
+-- which means convert numbers and strip string quotes.
+function lexer.cpp(s,filter,options)
+    filter = filter or {comments=true}
+    if not cpp_keyword then
+        cpp_keyword = {
+            ["class"] = true, ["break"] = true,  ["do"] = true, ["sizeof"] = true,
+            ["else"] = true, ["continue"] = true, ["struct"] = true,
+            ["false"] = true, ["for"] = true, ["public"] = true, ["void"] = true,
+            ["private"] = true, ["protected"] = true, ["goto"] = true,
+            ["if"] = true, ["static"] = true,  ["const"] = true, ["typedef"] = true,
+            ["enum"] = true, ["char"] = true, ["int"] = true, ["bool"] = true,
+            ["long"] = true, ["float"] = true, ["true"] = true, ["delete"] = true,
+            ["double"] = true,  ["while"] = true, ["new"] = true,
+            ["namespace"] = true, ["try"] = true, ["catch"] = true,
+            ["switch"] = true, ["case"] = true, ["extern"] = true,
+            ["return"] = true,["default"] = true,['unsigned']  = true,['signed'] = true,
+            ["union"] =  true, ["volatile"] = true, ["register"] = true,["short"] = true,
+        }
+    end
+    if not cpp_matches then
+        cpp_matches = {
+            {WSPACE,wsdump},
+            {PREPRO,pdump},
+            {NUMBER3,ndump},
+            {IDEN,cpp_vdump},
+            {NUMBER4,ndump},
+            {NUMBER5,ndump},
+            {STRING3,sdump},
+            {STRING1,chdump},
+            {'^//.-\n',cdump},
+            {'^/%*.-%*/',cdump},
+            {'^==',tdump},
+            {'^!=',tdump},
+            {'^<=',tdump},
+            {'^>=',tdump},
+            {'^->',tdump},
+            {'^&&',tdump},
+            {'^||',tdump},
+            {'^%+%+',tdump},
+            {'^%-%-',tdump},
+            {'^%+=',tdump},
+            {'^%-=',tdump},
+            {'^%*=',tdump},
+            {'^/=',tdump},
+            {'^|=',tdump},
+            {'^%^=',tdump},
+            {'^::',tdump},
+            {'^.',tdump}
+        }
+    end
+    return lexer.scan(s,cpp_matches,filter,options)
+end
+
 --- get a list of parameters separated by a delimiter from a stream.
 -- @param tok the token stream
--- @param endtoken end of list (default ')'). Can be '\n'
--- @param delim separator (default ',')
+-- @string[opt=')'] endtoken end of list. Can be '\n'
+-- @string[opt=','] delim separator
 -- @return a list of token lists.
-function OvaleLexer.get_separated_list(tok,endtoken,delim)
+function lexer.get_separated_list(tok,endtoken,delim)
     endtoken = endtoken or ')'
     delim = delim or ','
     local parm_values = {}
@@ -332,7 +467,7 @@ end
 
 --- get the next non-space token from the stream.
 -- @param tok the token stream.
-function OvaleLexer.skipws (tok)
+function lexer.skipws (tok)
     local t,v = tok()
     while t == 'space' do
         t,v = tok()
@@ -340,14 +475,14 @@ function OvaleLexer.skipws (tok)
     return t,v
 end
 
-local skipws = OvaleLexer.skipws
+local skipws = lexer.skipws
 
 --- get the next token, which must be of the expected type.
 -- Throws an error if this type does not match!
 -- @param tok the token stream
--- @param expected_type the token type
--- @param no_skip_ws whether we should skip whitespace
-function OvaleLexer.expecting (tok,expected_type,no_skip_ws)
+-- @string expected_type the token type
+-- @bool no_skip_ws whether we should skip whitespace
+function lexer.expecting (tok,expected_type,no_skip_ws)
     assert_arg(1,tok,'function')
     assert_arg(2,expected_type,'string')
     local t,v
@@ -359,4 +494,10 @@ function OvaleLexer.expecting (tok,expected_type,no_skip_ws)
     if t ~= expected_type then error ("expecting "..expected_type,2) end
     return v
 end
---</public-static-methods>
+
+--return lexer
+--</vendor-code>
+
+--<public-static-properties>
+OvaleLexer.scan = lexer.scan
+--</public-static-properties>
