@@ -63,7 +63,7 @@ AddFunction ProtectionDefaultActions
 	#hammer_of_wrath
 	Spell(hammer_of_wrath usable=1)
 	#consecration,if=target.debuff.flying.down&!ticking
-	if target.True(not flying_debuff) and not target.DebuffPresent(consecration_debuff) Spell(consecration)
+	if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff) Spell(consecration)
 	#holy_prism,if=talent.holy_prism.enabled
 	if TalentPoints(holy_prism_talent) Spell(holy_prism)
 	#sacred_shield,if=talent.sacred_shield.enabled

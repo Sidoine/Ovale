@@ -97,7 +97,7 @@ AddFunction ShadowDefaultMovingActions
 
 AddFunction ShadowDefaultShortCdActions
 {
-	unless { BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death usable=1) }
+	unless { BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Spell(shadow_word_death usable=1) }
 		or { ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } }
 		or Spell(mind_blast)
 		or { BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Spell(shadow_word_death usable=1) }

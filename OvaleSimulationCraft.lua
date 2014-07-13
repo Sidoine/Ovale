@@ -741,7 +741,7 @@ do
 	--]]
 	local SPECIAL_PROPERTY = {
 		["^debuff%.casting%.react$"] = "IsInterruptible()",
-		["^debuff%.flying%.down$"] = "True(not flying_debuff)",
+		["^debuff%.flying%.down$"] = "True(debuff_flying_down)",
 		["^buff%.raid_movement%.duration$"] = "0",
 		-- Pretend the target can never be invulnerable.
 		["^debuff%.invulnerable%.react$"] = "InCombat(no)",

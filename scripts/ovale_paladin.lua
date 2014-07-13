@@ -48,7 +48,7 @@ AddFunction HolyAoeActions
 	Spell(holy_radiance)
 }
 
-AddFunction HolySelflessHealerAoeActions()
+AddFunction HolySelflessHealerAoeActions
 {
 	if BuffCountOnAny(beacon_of_light_buff) == 0 Spell(beacon_of_light)
 	if HolyPower() == MaxHolyPower() Spell(light_of_dawn)
@@ -179,7 +179,7 @@ AddFunction ProtectionDefaultShortCdActions
 		unless Spell(hammer_of_wrath usable=1)
 		{
 			#consecration,if=target.debuff.flying.down&!ticking
-			if target.True(not flying_debuff) and not target.DebuffPresent(consecration_debuff)
+			if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff)
 			{
 				if Glyph(glyph_of_consecration) Spell(consecration_glyphed)
 				if Glyph(glyph_of_consecration no) Spell(consecration)
