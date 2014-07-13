@@ -277,7 +277,7 @@ AddFunction CombatDefaultShortCdActions
 	#vanish,if=time>10&(combo_points<3|(talent.anticipation.enabled&anticipation_charges<3)|(buff.shadow_blades.down&(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4))))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<20)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
 	if TimeInCombat() > 10 and { ComboPoints() < 3 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffExpires(shadow_blades_buff) and { ComboPoints() < 4 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } } } } and { { TalentPoints(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 20 } or { TalentPoints(subterfuge_talent) and Energy() >= 90 } or { not TalentPoints(shadow_focus_talent) and not TalentPoints(subterfuge_talent) and Energy() >= 60 } } Spell(vanish)
 	#killing_spree,if=energy<45
-	if Energy() < 45 Spell(killing_spree)
+	if Energy() < 50 Spell(killing_spree)
 }
 
 AddFunction CombatDefaultCdActions
@@ -299,15 +299,12 @@ AddFunction CombatDefaultCdActions
 	unless { Energy() < 60 and Spell(arcane_torrent_energy) }
 		or Spell(ambush usable=1)
 		or { TimeInCombat() > 10 and { ComboPoints() < 3 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } or { BuffExpires(shadow_blades_buff) and { ComboPoints() < 4 or { TalentPoints(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } } } } and { { TalentPoints(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 20 } or { TalentPoints(subterfuge_talent) and Energy() >= 90 } or { not TalentPoints(shadow_focus_talent) and not TalentPoints(subterfuge_talent) and Energy() >= 60 } } and Spell(vanish) }
+		or { Energy() < 50 and Spell(killing_spree) }
 	{
 		#shadow_blades,if=time>5
 		if TimeInCombat() > 5 Spell(shadow_blades)
-
-		unless { Energy() < 45 and Spell(killing_spree) }
-		{
-			#adrenaline_rush,if=energy<35|buff.shadow_blades.up
-			if Energy() < 35 or BuffPresent(shadow_blades_buff) Spell(adrenaline_rush)
-		}
+		#adrenaline_rush,if=energy<35|buff.shadow_blades.up
+		if Energy() < 35 or BuffPresent(shadow_blades_buff) Spell(adrenaline_rush)
 	}
 }
 
