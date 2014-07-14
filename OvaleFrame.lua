@@ -171,6 +171,7 @@ do
 		local refresh = forceRefresh or next(Ovale.refreshNeeded)
 		if not refresh then return end
 
+		OvaleCompile:EvaluateScript()
 		local iconNodes = OvaleCompile:GetIconNodes()
 		if not iconNodes then return end
 		

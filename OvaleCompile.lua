@@ -426,10 +426,10 @@ function OvaleCompile:CompileScript(event)
 	self:EventHandler(event)
 end
 
-function OvaleCompile:EvaluateScript()
+function OvaleCompile:EvaluateScript(forceEvaluation)
 	profiler.Start("OvaleCompile_EvaluateScript")
 	self_canEvaluate = self_canEvaluate or Ovale:IsPreloaded(self_requirePreload)
-	if self_canEvaluate and self.ast then
+	if self_canEvaluate and self.ast and (forceEvaluation or not self.serial or self.serial < self_serial) then
 		Ovale:DebugPrint(OVALE_COMPILE_DEBUG, "Evaluating script.")
 		-- Reset compilation state.
 		local ok = true
@@ -438,6 +438,7 @@ function OvaleCompile:EvaluateScript()
 		wipe(self_icon)
 		OvaleCooldown:ResetSharedCooldowns()
 		self_timesEvaluated = self_timesEvaluated + 1
+		self.serial = self_serial
 
 		-- Evaluate every declaration node of the script.
 		for _, node in ipairs(self.ast.child) do
@@ -481,11 +482,6 @@ function OvaleCompile:GetFunctionNode(name)
 end
 
 function OvaleCompile:GetIconNodes()
-	-- Evaluate the script if it is outdated.
-	if not self.serial or self.serial < self_serial then
-		self.serial = self_serial
-		self:EvaluateScript()
-	end
 	return self_icon
 end
 
