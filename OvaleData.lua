@@ -47,28 +47,24 @@ OvaleData.spellInfo = {}
 OvaleData.buffSpellList =
 {
 	-- Debuffs
-	fear =
-	{
+	fear_debuff = {
 		[5782] = true, -- Fear
 		[5484] = true, -- Howl of terror
 		[5246] = true, -- Intimidating Shout
 		[8122] = true, -- Psychic scream
 	},
-	incapacitate =
-	{
+	incapacitate_debuff = {
 		[6770] = true, -- Sap
 		[12540] = true, -- Gouge
 		[20066] = true, -- Repentance
 	},
-	root =
-	{
+	root_debuff = {
 		[23694] = true, -- Improved Hamstring
 		[339] = true, -- Entangling Roots
 		[122] = true, -- Frost Nova
 		[47168] = true, -- Improved Wing Clip
 	},
-	stun = 
-	{
+	stun_debuff = {
 		[5211] = true, -- Bash
 		[44415] = true, -- Blackout
 		[6409] = true, -- Cheap Shot
@@ -79,14 +75,19 @@ OvaleData.buffSpellList =
 	},
 
 	-- Raid buffs
-	attack_power_multiplier=
-	{
+	attack_power_multiplier_buff = {
 		[6673] = true, -- Battle Shout (warrior)
 		[19506] = true, -- Trueshot Aura (hunter)
 		[57330] = true, -- Horn of Winter (death knight)
 	},
-	critical_strike =
-	{
+	attack_speed_buff = {
+		[30809] = true, -- Unleashed Rage (enhancement shaman)
+		[55610] = true, -- Unholy Aura (frost & unholy death knights)
+		[113742] = true, -- Swiftblade's Cunning (rogue)
+		[128432] = true, -- Cackling Howl (hyena)
+		[128433] = true, -- Serpent's Swiftness (serpent)
+	},
+	critical_strike_buff = {
 		[1459] = true, -- Arcane Brillance (mage)
 		[24604] = true, -- Furious Howl (wolf)
 		[24932] = true, -- Leader of the Pack (feral & guardian druids)
@@ -97,45 +98,32 @@ OvaleData.buffSpellList =
 		[126309] = true, -- Still Water (waterstrider)
 		[126373] = true, -- Fearless Roar (quilen)
 	},
-	mastery =
-	{
+	mastery_buff = {
 		[19740] = true, -- Blessing of Might (paladin)
 		[93435] = true, -- Roar of Courage (cat)
 		[116956] = true, -- Grace of Air (shaman)
 		[128997] = true, -- Spirit Beast Blessing (spirit beast)
 	},
-	melee_haste =
-	{
-		[30809] = true, -- Unleashed Rage (enhancement shaman)
-		[55610] = true, -- Unholy Aura (frost & unholy death knights)
-		[113742] = true, -- Swiftblade's Cunning (rogue)
-		[128432] = true, -- Cackling Howl (hyena)
-		[128433] = true, -- Serpent's Swiftness (serpent)
-	},
-	spell_power_multiplier = 
-	{
+	spell_power_multiplier_buff = {
 		[1459] = true, -- Arcane Brillancen (mage)
 		[61316] = true, -- Dalaran Brilliance (mage)
 		[77747] = true, -- Burning Wrath (shaman)
 		[109773] = true,  -- Dark Intent (warlock)
 		[126309] = true, -- Still Water (waterstrider)
 	},
-	stamina =
-	{
+	stamina_buff = {
 		[469] = true, -- Commanding Shout (warrior)
 		[21562] = true, -- Power Word: Fortitude (priest)
 		[90364] = true, -- Qiraji Fortitude (silithid)
 		[109773] = true,  -- Dark Intent (warlock)
 	},
-	str_agi_int =
-	{
+	str_agi_int_buff = {
 		[1126] = true, -- Mark of the Wild (druid)
 		[20217] = true, -- Blessing of Kings (paladin)
 		[90363] = true, -- Embrace of the Shale Spider (shale spider)
 		[117666] = true, -- Legacy of the Emporer (monk)
 	},
-	spell_haste = 
-	{
+	spell_haste_buff = {
 		[24907] = true, -- Moonkin aura (balance druid)
 		[49868] = true, -- Mind Quickening (shadow priest)
 		[51470] = true, -- Elemental Oath (elemental shaman)
@@ -143,8 +131,7 @@ OvaleData.buffSpellList =
 	},
 
 	-- Target debuffs
-	bleed =
-	{
+	bleed_debuff = {
 		[1079] = true, -- Rip (feral druid)
 		[1822] = true, -- Rake (cat druid)
 		[9007] = true, -- Pounce Bleed (cat druid)
@@ -157,8 +144,7 @@ OvaleData.buffSpellList =
 		[120699] = true, -- Lynx Rush (hunter)
 		[122233] = true, -- Crimson Tempest (rogue)
 	},
-	cast_slow =
-	{
+	cast_slow_debuff = {
 		[5760] = true, -- Mind-numbing Poison (rogue)
 		[31589] = true, -- Slow (arcane mage)
 		[50274] = true, -- Spore Cloud (sporebat)
@@ -168,21 +154,18 @@ OvaleData.buffSpellList =
 		[109466] = true, -- Curse of Enfeeblement (warlock)
 		[126406] = true, -- Trample (goat)
 	},
-	healing_reduced =
-	{
+	healing_reduced_debuff = {
 		[8680] = true, -- Wound Poison (rogue)
 		[54680] = true, -- Monstrous Bite (devilsaur)
 		[82654] = true, -- Widow Venom (hunter)
 		[115804] = true, -- Mortal Wounds (arms & fury warriors, windwalker monk, warlock)
 	},
-	lower_physical_damage=
-	{
+	lower_physical_damage_debuff = {
 		[24423] = true, -- Demoralizing Screech (carrion bird)
 		[50256] = true, -- Demoralizing Roar (bear)
 		[115798] = true, -- Weakened Blows (all tank specs, feral druid, retribution paladin, shaman, warlock, warrior)
 	},
-	magic_vulnerability=
-	{
+	magic_vulnerability_debuff = {
 		[1490] = true, -- Curse of the Elements (warlock)
 		[24844] = true, -- Lightning Breath (wind serpent)
 		[34889] = true, -- Fire Breath (dragonhawk)
@@ -190,22 +173,19 @@ OvaleData.buffSpellList =
 		[104225] = true, -- Soulburn: Curse of the Elements (warlock)
 		[116202] = true, -- Aura of the Elements (warlock)
 	},
-	physical_vulnerability=
-	{
+	physical_vulnerability_debuff = {
 		[35290] = true, -- Gore (boar)
 		[50518] = true, -- Ravage (ravager)
 		[55749] = true, -- Acid Spit (worm)
 		[57386] = true, -- Stampede (rhino)
 		[81326] = true, -- Physical Vulnerability (frost & unholy death knights, retribution paladin, arms & fury warriors)
 	},
-	ranged_vulnerability =
-	{
+	ranged_vulnerability_debuff = {
 		[1130] = true, -- Hunter's Mark
 	},
 
 	-- Target buffs
-	enrage =
-	{
+	enrage_buff = {
 		[12292] = true, -- Bloodbath (warrior)
 		[12880] = true, -- Enrage (warrior)
 		[18499] = true, -- Berserker Rage (warrior)
@@ -215,29 +195,52 @@ OvaleData.buffSpellList =
 	},
 
 	-- Raid buffs (short term)
-	burst_haste =
-	{
+	burst_haste_buff = {
 		[2825] = true, --Bloodlust (Horde shaman)
 		[32182] = true, --Heroism (Alliance shaman)
 		[80353] = true, --Time Warp (mage)
 		[90355] = true, -- Ancient Hysteria (core hound)
 	},
-	burst_haste_debuff =
-	{
+	burst_haste_debuff = {
 		[57723] = true, -- Exhaustion (Heroism)
 		[57724] = true, -- Sated (Bloodlust)
 		[80354] = true, -- Temporal Displacement (Time Warp)
 		[95809] = true, -- Insanity (Ancient Hysteria)
 	},
-	raid_movement =
-	{
+	raid_movement_buff = {
 		[106898] = true, -- Stampeding Roar
 	}
 }
-OvaleData.buffSpellList.bloodlust_aura = OvaleData.buffSpellList.burst_haste
-OvaleData.buffSpellList.bloodlust = OvaleData.buffSpellList.burst_haste
-OvaleData.buffSpellList.heroism_aura = OvaleData.buffSpellList.burst_haste
-OvaleData.buffSpellList.heroism = OvaleData.buffSpellList.burst_haste
+-- Deprecated: spell list aliases
+do
+	local list = OvaleData.buffSpellList
+	list.attack_power_multiplier	= list.attack_power_multiplier_buff
+	list.bleed						= list.bleed_debuff
+	list.bloodlust					= list.burst_haste_buff
+	list.bloodlust_aura				= list.burst_haste_buff
+	list.burst_haste				= list.burst_haste_buff
+	list.cast_slow					= list.cast_slow_debuff
+	list.critical_strike			= list.critical_strike_buff
+	list.enrage						= list.enrage_buff
+	list.fear						= list.fear_debuff
+	list.healing_reduced			= list.healing_reduced_debuff
+	list.heroism					= list.burst_haste_buff
+	list.heroism_aura				= list.burst_haste_buff
+	list.incapacitate				= list.incapacitate_debuff
+	list.lower_physical_damage		= list.lower_physical_damage_debuff
+	list.magic_vulnerability		= list.magic_vulnerability_debuff
+	list.mastery					= list.mastery_buff
+	list.melee_haste				= list.attack_speed_buff
+	list.physical_vulnerability		= list.physical_vulnerability_debuff
+	list.raid_movement				= list.raid_movement_buff
+	list.ranged_vulnerability		= list.ranged_vulnerability_debuff
+	list.root						= list.root_debuff
+	list.spell_haste				= list.spell_haste_buff
+	list.spell_power_multiplier		= list.spell_power_multiplier_buff
+	list.stamina					= list.stamina_buff
+	list.str_agi_int				= list.str_agi_int_buff
+	list.stun						= list.stun_debuff
+end
 --</public-static-properties>
 
 --<public-static-methods>
