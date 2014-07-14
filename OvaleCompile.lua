@@ -163,14 +163,15 @@ local function EvaluateAddCheckBox(node)
 	local name, parameters = node.name, node.params
 	if TestConditions(parameters) then
 		--[[
-			If this control was not previously existing, then age the  script evaluation state
+			If this control was not previously existing, then age the script evaluation state
 			so that anything that checks the value of this control are re-evaluated after the
 			current evaluation cycle.
 		--]]
-		if not Ovale.casesACocher[name] then
+		local checkBox = Ovale.casesACocher[name]
+		if not checkBox then
 			self_serial = self_serial + 1
 		end
-		local checkBox = Ovale.casesACocher[name] or {}
+		checkBox = checkBox or {}
 		checkBox.text = node.description.value
 		for _, v in ipairs(parameters) do
 			if v == "default" then
@@ -200,10 +201,11 @@ local function EvaluateAddListItem(node)
 			so that anything that checks the value of this control are re-evaluated after the
 			current evaluation cycle.
 		--]]
-		if not (Ovale.listes[name] and Ovale.listes[name][item]) then
+		local list = Ovale.listes[name]
+		if not (list and list.items and list.items[item]) then
 			self_serial = self_serial + 1
 		end
-		local list = Ovale.listes[name] or { items = {}, default = nil }
+		list = list or { items = {}, default = nil }
 		list.items[item] = node.description.value
 		for _, v in ipairs(parameters) do
 			if v == "default" then
