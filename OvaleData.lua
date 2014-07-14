@@ -193,6 +193,20 @@ OvaleData.buffSpellList =
 		[76691] = true, -- Vengeance (all tank specs)
 		[132365] = true, -- Vengeance (all tank specs)
 	},
+	stealthed_buff = {
+		[1784] = true, -- Stealth
+		[5215] = true, -- Prowl
+		[11327] = true, -- Vanish
+		[24450] = true, -- Prowl (pet)
+		[51713] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
+		[58984] = true, -- Shadowmeld
+		[90328] = true, -- Spirit Walk (spirit beast pet)
+		[113289] = true, -- Prowl (Symbiosis)
+		[115191] = true, -- Stealth (Subterfuge)
+		[115193] = true, -- Vanish (Subterfuge)
+		[115834] = true, -- Shroud of Concealment
+		[148523] = true, -- Jade Mist
+	},
 
 	-- Raid buffs (short term)
 	burst_haste_buff = {
