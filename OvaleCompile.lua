@@ -137,8 +137,11 @@ local function TestConditions(parameters)
 				Ovale.casesACocher[name] = control
 				-- Check the value of the checkbox.
 				profile = profile or OvaleOptions:GetProfile()
-				local isChecked = (profile.check[name] ~= nil)
+				local isChecked = profile.check[name]
 				boolean = (required and isChecked) or (not required and not isChecked)
+				if not boolean then
+					break
+				end
 			end
 		end
 		if boolean and parameters.listitem then
@@ -151,6 +154,9 @@ local function TestConditions(parameters)
 				profile = profile or OvaleOptions:GetProfile()
 				local isSelected = (profile.list[list] == item)
 				boolean = (required and isSelected) or (not required and not isSelected)
+				if not boolean then
+					break
+				end
 			end
 		end
 	end
