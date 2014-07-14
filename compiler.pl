@@ -44,6 +44,7 @@ $m{AceConfigDialog}{Open} = true;
 $m{AceConfigDialog}{SetDefaultSize} = true;
 
 $m{AceGUI}{ClearFocus} = true;
+$m{AceGUI}{Create} = true;
 $m{AceGUI}{RegisterAsContainer} = true;
 $m{AceGUI}{RegisterWidgetType} = true;
 

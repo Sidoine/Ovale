@@ -12,6 +12,7 @@ local addonName, addonTable = ...
 Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, addonName, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
 
 --<private-static-properties>
+local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local OvaleOptions = nil
 
@@ -56,10 +57,9 @@ Ovale.L = L
 Ovale.casesACocher = {}
 --the frame with the icons
 Ovale.frame = nil
---check boxes GUI items
-Ovale.checkBoxes = {}
---drop down GUI items
-Ovale.dropDowns = {}
+-- Checkbox and dropdown GUI controls
+Ovale.checkBoxWidget = {}
+Ovale.listWidget = {}
 -- Flag to activate tracing the function calls for the next frame refresh.
 Ovale.trace = false
 Ovale.traceLog = {}
@@ -80,15 +80,21 @@ BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<private-static-methods>
 local function OnCheckBoxValueChanged(widget)
-	OvaleOptions:GetProfile().check[widget.userdata.k] = widget:GetValue()
-	if Ovale.casesACocher[widget.userdata.k].compile then
+	-- Reflect the value change into the profile (model).
+	local profile = OvaleOptions:GetProfile()
+	local name = widget:GetUserData("name")
+	profile.check[name] = widget:GetValue()
+	if Ovale.casesACocher[name].compile then
 		Ovale:SendMessage("Ovale_CheckBoxValueChanged")
 	end
 end
 
 local function OnDropDownValueChanged(widget)
-	OvaleOptions:GetProfile().list[widget.userdata.k] = widget.value
-	if Ovale.listes[widget.userdata.k].compile then
+	-- Reflect the value change into the profile (model).
+	local profile = OvaleOptions:GetProfile()
+	local name = widget:GetUserData("name")
+	profile.list[name] = widget:GetValue()
+	if Ovale.listes[name].compile then
 		Ovale:SendMessage("Ovale_ListValueChanged")
 	end
 end
@@ -109,7 +115,7 @@ function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
-	self.frame = LibStub("AceGUI-3.0"):Create(addonName .. "Frame")
+	self.frame = AceGUI:Create(addonName .. "Frame")
 	self:UpdateFrame()
 end
 
@@ -229,49 +235,52 @@ function Ovale:UpdateVisibility()
 	end
 end
 
+function Ovale:UpdateControls()
+	local profile = OvaleOptions:GetProfile()
+
+	-- Create a new CheckBox widget for each checkbox declared in the script.
+	wipe(self.checkBoxWidget)
+	for name, checkBox in pairs(Ovale.casesACocher) do
+		local widget = AceGUI:Create("CheckBox")
+		widget:SetLabel(checkBox.text)
+		if profile.check[name] == nil then
+			profile.check[name] = checkBox.checked
+		end
+		if profile.check[name] then
+			widget:SetValue(profile.check[name])
+		end
+		widget:SetUserData("name", name)
+		widget:SetCallback("OnValueChanged", OnCheckBoxValueChanged)
+		self.frame:AddChild(widget)
+		self.checkBoxWidget[name] = widget
+	end
+
+	-- Create a new Dropdown widget for each list declared in the script.
+	wipe(self.listWidget)
+	for name, list in pairs(Ovale.listes) do
+		local widget = AceGUI:Create("Dropdown")
+		widget:SetList(list.items)
+		if not profile.list[name] then
+			profile.list[name] = list.default
+		end
+		if profile.list[name] then
+			widget:SetValue(profile.list[name])
+		end
+		widget:SetUserData("name", name)
+		widget:SetCallback("OnValueChanged", OnDropDownValueChanged)
+		self.frame:AddChild(widget)
+		self.listWidget[name] = widget
+	end
+end
+
+
 function Ovale:UpdateFrame()
 	local profile = OvaleOptions:GetProfile()
 	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
-
 	self.frame:ReleaseChildren()
-
 	self.frame:UpdateIcons()
-	
+	self:UpdateControls()
 	self:UpdateVisibility()
-	
-	wipe(self.checkBoxes)
-	
-	for k,checkBox in pairs(self.casesACocher) do
-		self.checkBoxes[k] = LibStub("AceGUI-3.0"):Create("CheckBox");
-		self.frame:AddChild(self.checkBoxes[k])
-		self.checkBoxes[k]:SetLabel(checkBox.text)
-		if profile.check[k]==nil then
-			profile.check[k] = checkBox.checked
-		end
-		if (profile.check[k]) then
-			self.checkBoxes[k]:SetValue(profile.check[k]);
-		end
-		self.checkBoxes[k].userdata.k = k
-		self.checkBoxes[k]:SetCallback("OnValueChanged",OnCheckBoxValueChanged)
-	end
-	
-	wipe(self.dropDowns)
-	
-	if (self.listes) then
-		for k,list in pairs(self.listes) do
-			self.dropDowns[k] = LibStub("AceGUI-3.0"):Create("Dropdown");
-			self.dropDowns[k]:SetList(list.items)
-			if not profile.list[k] then
-				profile.list[k] = list.default
-			end
-			if (profile.list[k]) then
-				self.dropDowns[k]:SetValue(profile.list[k]);
-			end
-			self.dropDowns[k].userdata.k = k
-			self.dropDowns[k]:SetCallback("OnValueChanged",OnDropDownValueChanged)
-			self.frame:AddChild(self.dropDowns[k])
-		end
-	end
 end
 
 function Ovale:PostRefresh()
@@ -290,33 +299,40 @@ function Ovale:PostRefresh()
 	end
 end
 
-function Ovale:IsChecked(v)
-	return self.checkBoxes[v] and self.checkBoxes[v]:GetValue()
+function Ovale:IsChecked(name)
+	local widget = self.checkBoxWidget[name]
+	return widget and widget:GetValue()
 end
 
-function Ovale:GetListValue(v)
-	return self.dropDowns[v] and self.dropDowns[v].value
+function Ovale:GetListValue(name)
+	local widget = self.listWidget[name]
+	return widget and widget:GetValue()
 end
 
-function Ovale:SetCheckBox(v,on)
-	for k,checkBox in pairs(self.casesACocher) do
-		if v==0 then
-			self.checkBoxes[k]:SetValue(on)
-			OvaleOptions:GetProfile().check[k] = on
+-- Set the k'th checkbox control to the specified on/off (true/false) value.
+function Ovale:SetCheckBox(k, on)
+	local profile = OvaleOptions:GetProfile()
+	for name, widget in pairs(self.checkBoxWidget) do
+		if k == 0 then
+			widget:SetValue(on)
+			profile.check[name] = on
 			break
 		end
-		v = v - 1
+		k = k - 1
 	end
 end
 
-function Ovale:ToggleCheckBox(v)
-	for k,checkBox in pairs(self.casesACocher) do
-		if v==0 then
-			self.checkBoxes[k]:SetValue(not self.checkBoxes[k]:GetValue())
-			OvaleOptions:GetProfile().check[k] = self.checkBoxes[k]:GetValue()
+-- Toggle the k'th checkbox control.
+function Ovale:ToggleCheckBox(k)
+	local profile = OvaleOptions:GetProfile()
+	for name, widget in pairs(self.checkBoxWidget) do
+		if k == 0 then
+			local on = not widget:GetValue()
+			widget:SetValue(on)
+			profile.check[name] = on
 			break
 		end
-		v = v - 1
+		k = k - 1
 	end
 end
 
