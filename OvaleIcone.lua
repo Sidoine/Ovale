@@ -27,6 +27,10 @@ local tostring = tostring
 local API_GetTime = GetTime
 --</private-static-properties>
 
+local function HasScriptControls()
+	return (next(Ovale.checkBoxWidget) ~= nil or next(Ovale.listWidget) ~= nil)
+end
+
 --<public-methods>
 local function SetValue(self, value, actionTexture)
 	self.icone:Show()
@@ -247,7 +251,7 @@ function OvaleIcone_OnMouseUp(self)
 end
 
 function OvaleIcone_OnEnter(self)
-	if self.help or next(Ovale.casesACocher) or next(Ovale.listes) or self.actionType then
+	if self.help or self.actionType or HasScriptControls() then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 		if self.help then
 			GameTooltip:SetText(L[self.help])
@@ -265,7 +269,7 @@ function OvaleIcone_OnEnter(self)
 			end
 			GameTooltip:AddLine(actionHelp, 0.5, 1, 0.75)
 		end
-		if next(Ovale.casesACocher) or next(Ovale.listes) then
+		if HasScriptControls() then
 			GameTooltip:AddLine(L["Cliquer pour afficher/cacher les options"], 1, 1, 1)
 		end
 		GameTooltip:Show()
@@ -273,7 +277,7 @@ function OvaleIcone_OnEnter(self)
 end
 
 function OvaleIcone_OnLeave(self)
-	if self.help or next(Ovale.casesACocher) or next(Ovale.listes)  then
+	if self.help or HasScriptControls() then
 		GameTooltip:Hide()
 	end
 end
