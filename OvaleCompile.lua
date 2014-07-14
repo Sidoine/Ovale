@@ -132,9 +132,9 @@ local function TestConditions(parameters)
 		if boolean and parameters.checkbox then
 			for _, checkbox in ipairs(parameters.checkbox) do
 				local name, required = RequireValue(checkbox)
-				local control = Ovale.casesACocher[name] or {}
-				control.compile = true
-				Ovale.casesACocher[name] = control
+				local control = Ovale.checkBox[name] or {}
+				control.triggerEvaluation = true
+				Ovale.checkBox[name] = control
 				-- Check the value of the checkbox.
 				profile = profile or OvaleOptions:GetProfile()
 				local isChecked = profile.check[name]
@@ -145,14 +145,14 @@ local function TestConditions(parameters)
 			end
 		end
 		if boolean and parameters.listitem then
-			for list, listitem in pairs(parameters.listitem) do
+			for name, listitem in pairs(parameters.listitem) do
 				local item, required = RequireValue(listitem)
-				local control = Ovale.listes[list] or { items = {}, default = nil }
-				control.compile = true
-				Ovale.listes[list] = control
+				local control = Ovale.list[name] or { items = {}, default = nil }
+				control.triggerEvaluation = true
+				Ovale.list[name] = control
 				-- Check the selected item in the list.
 				profile = profile or OvaleOptions:GetProfile()
-				local isSelected = (profile.list[list] == item)
+				local isSelected = (profile.list[name] == item)
 				boolean = (required and isSelected) or (not required and not isSelected)
 				if not boolean then
 					break
@@ -173,9 +173,10 @@ local function EvaluateAddCheckBox(node)
 			so that anything that checks the value of this control are re-evaluated after the
 			current evaluation cycle.
 		--]]
-		local checkBox = Ovale.casesACocher[name]
+		local checkBox = Ovale.checkBox[name]
 		if not checkBox then
 			self_serial = self_serial + 1
+			Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "New checkbox '%s': advance age to %d.", name, self_serial)
 		end
 		checkBox = checkBox or {}
 		checkBox.text = node.description.value
@@ -185,7 +186,7 @@ local function EvaluateAddCheckBox(node)
 				break
 			end
 		end
-		Ovale.casesACocher[name] = checkBox
+		Ovale.checkBox[name] = checkBox
 	end
 	return ok
 end
@@ -207,9 +208,10 @@ local function EvaluateAddListItem(node)
 			so that anything that checks the value of this control are re-evaluated after the
 			current evaluation cycle.
 		--]]
-		local list = Ovale.listes[name]
+		local list = Ovale.list[name]
 		if not (list and list.items and list.items[item]) then
 			self_serial = self_serial + 1
+			Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "New list '%s': advance age to %d.", name, self_serial)
 		end
 		list = list or { items = {}, default = nil }
 		list.items[item] = node.description.value
@@ -219,7 +221,7 @@ local function EvaluateAddListItem(node)
 				break
 			end
 		end
-		Ovale.listes[name] = list
+		Ovale.list[name] = list
 	end
 	return ok
 end
@@ -369,10 +371,10 @@ function OvaleCompile:OnInitialize()
 end
 
 function OvaleCompile:OnEnable()
-	self:RegisterMessage("Ovale_CheckBoxValueChanged", "EventHandler")
+	self:RegisterMessage("Ovale_CheckBoxValueChanged", "ScriptControlChanged")
 	self:RegisterMessage("Ovale_EquipmentChanged")
 	self:RegisterMessage("Ovale_GlyphsChanged", "EventHandler")
-	self:RegisterMessage("Ovale_ListValueChanged", "EventHandler")
+	self:RegisterMessage("Ovale_ListValueChanged", "ScriptControlChanged")
 	self:RegisterMessage("Ovale_ScriptChanged", "CompileScript")
 	self:RegisterMessage("Ovale_SpellsChanged", "EventHandler")
 	self:RegisterMessage("Ovale_StanceChanged")
@@ -403,6 +405,25 @@ function OvaleCompile:Ovale_StanceChanged(event)
 	end
 end
 
+function OvaleCompile:ScriptControlChanged(event, name)
+	if not name then
+		self:EventHandler(event)
+	else
+		-- Locate the correct script control definition.
+		local control
+		if event == "Ovale_CheckBoxValueChanged" then
+			control = Ovale.checkBox[name]
+		elseif event == "Ovale_ListValueChanged" then
+			control = Ovale.list[name]
+		end
+		-- Only trigger script evaluation if "triggerEvaluation" was set
+		-- for the named control.
+		if control and control.triggerEvaluation then
+			self:EventHandler(event)
+		end
+	end
+end
+
 function OvaleCompile:EventHandler(event)
 	-- Advance age of the script evaluation state.
 	self_serial = self_serial + 1
@@ -411,6 +432,7 @@ function OvaleCompile:EventHandler(event)
 end
 
 function OvaleCompile:CompileScript(event)
+	-- Compile the selected script from the profile.
 	local profile = OvaleOptions:GetProfile()
 	local source = profile.source
 	Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "Compiling script '%s'.", source)
@@ -423,6 +445,9 @@ function OvaleCompile:CompileScript(event)
 		OvaleAST:Optimize(ast)
 		self.ast = ast
 	end
+	-- Reset the controls defined by the previous script.
+	Ovale:ResetControls()
+	-- Trigger script evaluation.
 	self:EventHandler(event)
 end
 

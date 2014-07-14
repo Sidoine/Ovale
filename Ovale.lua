@@ -53,11 +53,12 @@ local self_oneTimeMessage = {}
 Ovale.version = "@project-version@"
 -- Localization string table.
 Ovale.L = L
---The table of check boxes definition
-Ovale.casesACocher = {}
 --the frame with the icons
 Ovale.frame = nil
--- Checkbox and dropdown GUI controls
+-- Checkbox and dropdown definitions from evaluating the script.
+Ovale.checkBox = {}
+Ovale.list = {}
+-- Checkbox and dropdown GUI controls.
 Ovale.checkBoxWidget = {}
 Ovale.listWidget = {}
 -- Flag to activate tracing the function calls for the next frame refresh.
@@ -67,7 +68,6 @@ Ovale.traceLog = {}
 Ovale.enCombat = false
 Ovale.refreshNeeded = {}
 Ovale.combatStartTime = nil
-Ovale.listes = {}
 --</public-static-properties>
 
 --Key bindings
@@ -84,9 +84,7 @@ local function OnCheckBoxValueChanged(widget)
 	local profile = OvaleOptions:GetProfile()
 	local name = widget:GetUserData("name")
 	profile.check[name] = widget:GetValue()
-	if Ovale.casesACocher[name].compile then
-		Ovale:SendMessage("Ovale_CheckBoxValueChanged")
-	end
+	Ovale:SendMessage("Ovale_CheckBoxValueChanged", name)
 end
 
 local function OnDropDownValueChanged(widget)
@@ -94,9 +92,7 @@ local function OnDropDownValueChanged(widget)
 	local profile = OvaleOptions:GetProfile()
 	local name = widget:GetUserData("name")
 	profile.list[name] = widget:GetValue()
-	if Ovale.listes[name].compile then
-		Ovale:SendMessage("Ovale_ListValueChanged")
-	end
+	Ovale:SendMessage("Ovale_ListValueChanged", name)
 end
 --</private-static-methods>
 
@@ -235,12 +231,17 @@ function Ovale:UpdateVisibility()
 	end
 end
 
+function Ovale:ResetControls()
+	wipe(self.checkBox)
+	wipe(self.list)
+end
+
 function Ovale:UpdateControls()
 	local profile = OvaleOptions:GetProfile()
 
 	-- Create a new CheckBox widget for each checkbox declared in the script.
 	wipe(self.checkBoxWidget)
-	for name, checkBox in pairs(Ovale.casesACocher) do
+	for name, checkBox in pairs(self.checkBox) do
 		local widget = AceGUI:Create("CheckBox")
 		widget:SetLabel(checkBox.text)
 		if profile.check[name] == nil then
@@ -257,7 +258,7 @@ function Ovale:UpdateControls()
 
 	-- Create a new Dropdown widget for each list declared in the script.
 	wipe(self.listWidget)
-	for name, list in pairs(Ovale.listes) do
+	for name, list in pairs(self.list) do
 		local widget = AceGUI:Create("Dropdown")
 		widget:SetList(list.items)
 		if not profile.list[name] then
