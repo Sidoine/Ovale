@@ -1753,8 +1753,8 @@ ParseSimpleExpression = function(tokenStream, nodeList, annotation)
 	elseif tokenType == "(" or tokenType == "{" then
 		ok, node = ParseParentheses(tokenStream, nodeList, annotation)
 	else
-		SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
 		tokenStream:Consume()
+		SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
 		ok = false
 	end
 	return ok, node
@@ -1950,8 +1950,8 @@ ParseString = function(tokenStream, nodeList, annotation)
 				tokenStream:Consume()
 			end
 		else
-			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.", token)
 			tokenStream:Consume()
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.", token)
 			ok = false
 		end
 	end
