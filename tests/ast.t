@@ -27,8 +27,11 @@ do
 		"OvaleAST.lua",
 		"OvaleCondition.lua",
 		"OvaleLexer.lua",
+		"OvaleRunes.lua",
 		"OvaleScripts.lua",
+		"OvaleState.lua",
 		-- Additional modules.
+		"conditions/files.xml",
 		"scripts/files.xml",
 	}
 	for _, file in ipairs(addonFiles) do
