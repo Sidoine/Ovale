@@ -379,6 +379,23 @@ end
 	"Unparser" functions
 --]]------------------------
 
+-- Return the precedence of an operator in the given node.
+-- Returns nil if the node is not an expression node.
+local function GetPrecedence(node)
+	local precedence = node.precedence
+	if not precedence then
+		local operator = node.operator
+		if operator then
+			if node.expressionType == "unary" and UNARY_OPERATOR[operator] then
+				precedence = UNARY_OPERATOR[operator][2]
+			elseif node.expressionType == "binary" and BINARY_OPERATOR[operator] then
+				precedence = BINARY_OPERATOR[operator][2]
+			end
+		end
+	end
+	return precedence
+end
+
 -- Forward declarations of functions needed to implement the recursive unparser.
 local UNPARSE_VISITOR = nil
 local Unparse = nil
@@ -470,23 +487,42 @@ end
 
 UnparseExpression = function(node)
 	local expression
+	local precedence = GetPrecedence(node)
 	if node.expressionType == "unary" then
-		if node.operator == "-" then
-			expression = "-" .. Unparse(node.child[1])
+		local rhsExpression
+		local rhsNode = node.child[1]
+		local rhsPrecedence = GetPrecedence(rhsNode)
+		if rhsPrecedence and precedence >= rhsPrecedence then
+			rhsExpression = "{ " .. Unparse(rhsNode) .. " }"
 		else
-			expression = format("%s %s", node.operator, Unparse(node.child[1]))
+			rhsExpression = Unparse(rhsNode)
+		end
+		if node.operator == "-" then
+			expression = "-" .. rhsExpression
+		else
+			expression = node.operator .. " " .. rhsExpression
 		end
 	elseif node.expressionType == "binary" then
-		expression = format("%s %s %s", Unparse(node.child[1]), node.operator, Unparse(node.child[2]))
+		local lhsExpression, rhsExpression
+		local lhsNode = node.child[1]
+		local lhsPrecedence = GetPrecedence(lhsNode)
+		if lhsPrecedence and lhsPrecedence < precedence then
+			lhsExpression = "{ " .. Unparse(lhsNode) .. " }"
+		else
+			lhsExpression = Unparse(lhsNode)
+		end
+		local rhsNode = node.child[2]
+		local rhsPrecedence = GetPrecedence(rhsNode)
+		if rhsPrecedence and precedence > rhsPrecedence then
+			rhsExpression = "{ " .. Unparse(rhsNode) .. " }"
+		elseif rhsPrecedence and precedence == rhsPrecedence and node.operator ~= rhsNode.operator then
+			rhsExpression = "{ " .. Unparse(rhsNode) .. " }"
+		else
+			rhsExpression = Unparse(rhsNode)
+		end
+		expression = lhsExpression .. " " .. node.operator .. " " .. rhsExpression
 	end
-	if node.left and node.right then
-		local left, right = node.left, node.right
-		local left = (node.left == "{") and "{ " or node.left
-		local right = (node.right == "}") and " }" or node.right
-		return left .. expression .. right
-	else
-		return expression
-	end
+	return expression
 end
 
 UnparseFunction = function(node)
@@ -672,6 +708,18 @@ local function SyntaxError(tokenStream, ...)
 		end
 	end
 	Ovale:Print(tconcat(context, " "))
+end
+
+-- Left-rotate tree to preserve precedence.
+local function LeftRotateTree(node)
+	local rhsNode = node.child[2]
+	while node.type == rhsNode.type and node.operator == rhsNode.operator and rhsNode.expressionType == "binary" do
+		node.child[2] = rhsNode.child[1]
+		rhsNode.child[1] = node
+		node = rhsNode
+		rhsNode = node.child[2]
+	end
+	return node
 end
 
 -- Forward declarations of parser functions needed to implement a recursive descent parser.
@@ -1099,6 +1147,8 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 						node.precedence = precedence
 						node.child[1] = lhsNode
 						node.child[2] = rhsNode
+						-- Left-rotate tree to preserve precedence.
+						node = LeftRotateTree(node)
 					end
 				end
 			end
