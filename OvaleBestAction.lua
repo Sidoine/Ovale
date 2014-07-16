@@ -263,14 +263,16 @@ local function GetActionSpellInfo(element, state, target)
 			if si.stance and not OvaleStance:IsStance(si.stance) then
 				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'", spellId, si.stance)
 				meetsRequirements = false
-			elseif si.combo then
+			end
+			if meetsRequirements and si.combo then
 				-- Spell requires combo points.
 				local cost = state:ComboPointCost(spellId)
 				if cost > 0 and state.combo < cost then
 					Ovale:Logf("Spell ID '%s' requires at least %d combo points.", spellId, cost)
 					meetsRequirements = false
 				end
-			else
+			end
+			if meetsRequirements then
 				for powerType in pairs(OvalePower.SECONDARY_POWER) do
 					if si[powerType] then
 						-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
