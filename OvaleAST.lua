@@ -158,7 +158,7 @@ local STRING_LOOKUP_FUNCTION = {
 
 -- Unary and binary operators with precedence.
 local UNARY_OPERATOR = {
-	["not"] = { "logical", 50 },
+	["not"] = { "logical", 15 },
 	["-"]   = { "arithmetic", 50 },
 }
 local BINARY_OPERATOR = {
