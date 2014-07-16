@@ -12,8 +12,10 @@ local _, Ovale = ...
 do
 	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleStance = Ovale.OvaleStance
+	local OvaleState = Ovale.OvaleState
 
 	local TestBoolean = OvaleCondition.TestBoolean
+	local state = OvaleState.state
 
 	--- Test if the player is in a given stance.
 	-- @name Stance
@@ -28,7 +30,7 @@ do
 
 	local function Stance(condition)
 		local stance, yesno = condition[1], condition[2]
-		local boolean = OvaleStance:IsStance(stance)
+		local boolean = state:IsStance(stance)
 		return TestBoolean(boolean, yesno)
 	end
 

@@ -125,7 +125,7 @@ Define(life_tap 1454)
 Define(malefic_grasp 103103)
 #	SpellInfo(malefic_grasp channel=4 haste=spell)	# XXX Don't interrupt channeling Malefic Grasp.
 Define(metamorphosis 103958)
-	SpellInfo(metamorphosis demonicfury=0 cd=10)
+	SpellInfo(metamorphosis demonicfury=0 cd=10 to_stance=warlock_metamorphosis)
 	SpellAddBuff(metamorphosis metamorphosis_buff=1)
 Define(metamorphosis_buff 103958)
 Define(molten_core_buff 122355)

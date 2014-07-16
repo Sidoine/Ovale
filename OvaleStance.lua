@@ -14,6 +14,10 @@ local OvaleStance = Ovale:NewModule("OvaleStance", "AceEvent-3.0")
 Ovale.OvaleStance = OvaleStance
 
 --<private-static-properties>
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvaleState = nil
+
 local ipairs = ipairs
 local pairs = pairs
 local tinsert = table.insert
@@ -93,11 +97,19 @@ local OVALE_SPELLID_TO_STANCE = {
 OvaleStance.ready = false
 -- List of available stances, populated by CreateStanceList()
 OvaleStance.stanceList = {}
+-- Map stance names to stance ID (index on shapeshift/stance bar).
+OvaleStance.stanceId = {}
 -- Player's current stance.
 OvaleStance.stance = nil
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleStance:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleStance:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStances")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateStances")
@@ -106,9 +118,11 @@ function OvaleStance:OnEnable()
 	self:RegisterEvent("SPELLS_CHANGED", "UpdateStances")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleStance:OnDisable()
+	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -136,12 +150,14 @@ end
 function OvaleStance:CreateStanceList()
 	profiler.Start("OvaleStance_CreateStanceList")
 	wipe(self.stanceList)
+	wipe(self.stanceId)
 	local _, name, stanceName
 	for i = 1, API_GetNumShapeshiftForms() do
 		_, name = API_GetShapeshiftFormInfo(i)
 		stanceName = OVALE_SPELLID_TO_STANCE[name]
 		if stanceName then
 			self.stanceList[i] = stanceName
+			self.stanceId[stanceName] = i
 		end
 	end
 	profiler.Stop("OvaleStance_CreateStanceList")
@@ -198,3 +214,59 @@ function OvaleStance:UpdateStances()
 	self.ready = true
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleStance.statePrototype = {}
+--</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleStance.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+statePrototype.stance = nil
+--</state-properties>
+
+--<public-static-methods>
+-- Initialize the state.
+function OvaleStance:InitializeState(state)
+	state.stance = nil
+end
+
+-- Reset the state to the current conditions.
+function OvaleStance:ResetState(state)
+	profiler.Start("OvaleStance_ResetState")
+	state.stance = self.stance or 0
+	profiler.Stop("OvaleStance_ResetState")
+end
+
+-- Apply the effects of the spell on the player's state, assuming the spellcast completes.
+function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+	profiler.Start("OvaleStance_ApplySpellAfterCast")
+	local si = OvaleData.spellInfo[spellId]
+	if si and si.to_stance then
+		local stance = si.to_stance
+		stance = (type(stance) == "number") and stance or self.stanceId[stance]
+		state.stance = stance
+	end
+	profiler.Stop("OvaleStance_ApplySpellAfterCast")
+end
+--</public-static-methods>
+
+--<state-methods>
+-- Return true if the stance matches the given name.
+statePrototype.IsStance = function(state, name)
+	if name and state.stance then
+		if type(name) == "number" then
+			return name == state.stance
+		else
+			return name == OvaleStance.stanceList[state.stance]
+		end
+	end
+	return false
+end
+--</state-methods>
