@@ -11,9 +11,11 @@ local _, Ovale = ...
 
 do
 	local OvaleCondition = Ovale.OvaleCondition
+	local OvaleData = Ovale.OvaleData
 	local OvalePower = Ovale.OvalePower
 	local OvaleState = Ovale.OvaleState
 
+	local API_GetSpellInfo = GetSpellInfo
 	local API_UnitPower = UnitPower
 	local API_UnitPowerMax = UnitPowerMax
 	local Compare = OvaleCondition.Compare
@@ -96,6 +98,45 @@ do
 		end
 		return Compare(0, comparator, limit)
 	end
+
+	--- Get the current amount of the player's primary resource for the given spell.
+	-- @name PrimaryResource
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The amount of the primary resource.
+	-- @return A boolean value for the result of the comparison.
+
+	local function PrimaryResource(condition)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local primaryPowerType
+		local si = OvaleData:GetSpellInfo(spellId)
+		if si then
+			-- Check the spell information to see if a primary resource cost was given.
+			for powerType in pairs(OvalePower.PRIMARY_POWER) do
+				if si[powerType] then
+					primaryPowerType = powerType
+					break
+				end
+			end
+		end
+		-- If no primary resource cost was found, then query using Blizzard API.
+		if not primaryPowerType then
+			local _, _, _, _, _, powerTypeId = API_GetSpellInfo(spellId)
+			if powerTypeId then
+				primaryPowerType = OvalePower.POWER_TYPE[powerTypeId]
+			end
+		end
+		if primaryPowerType then
+			local value, origin, rate = state[primaryPowerType], state.currentTime, state.powerRate[primaryPowerType]
+			local start, ending = state.currentTime, math.huge
+			return TestValue(start, ending, value, origin, rate, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("primaryresource", true, PrimaryResource)
 
 	--- Get the current amount of alternate power displayed on the alternate power bar.
 	-- @name AlternatePower
