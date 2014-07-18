@@ -204,7 +204,7 @@ local function EvaluateAddListItem(node)
 	local name, item, parameters = node.name, node.item, node.params
 	if TestConditions(parameters) then
 		--[[
-			If this control was not previously existing, then age the  script evaluation state
+			If this control was not previously existing, then age the script evaluation state
 			so that anything that checks the value of this control are re-evaluated after the
 			current evaluation cycle.
 		--]]
