@@ -982,7 +982,7 @@ function OvaleBestAction:ComputeLogical(element, state)
 		-- Short-circuit evaluation of left argument to AND.
 		if Measure(timeSpanA) == 0 then
 			timeSpan:Reset(timeSpanA)
-			Ovale:Logf("[%d]    logical '%s' short-circuits with zero measure left argument", element.nodeId, element.operator, tostring(timeSpan))
+			Ovale:Logf("[%d]    logical '%s' short-circuits with zero measure left argument", element.nodeId, element.operator)
 		else
 			local timeSpanB = self:ComputeBool(element.child[2], state)
 			-- Take intersection of A and B.
@@ -994,7 +994,7 @@ function OvaleBestAction:ComputeLogical(element, state)
 		-- Short-circuit evaluation of left argument to OR.
 		if timeSpanA and timeSpanA[1] == 0 and timeSpanA[2] == math.huge then
 			timeSpan:Reset(timeSpanA)
-			Ovale:Logf("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator, tostring(timeSpan))
+			Ovale:Logf("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator)
 		else
 			local timeSpanB = self:ComputeBool(element.child[2], state)
 			-- Take union of A and B.
