@@ -20,6 +20,8 @@ local OvalePaperDoll = nil
 local OvaleStance = nil
 local OvaleState = nil
 
+local next = next
+local pairs = pairs
 local API_GetSpellCharges = GetSpellCharges
 local API_GetSpellCooldown = GetSpellCooldown
 local API_UnitHealth = UnitHealth
@@ -102,6 +104,11 @@ function OvaleCooldown:ResetSharedCooldowns()
 			spellTable[spellId] = nil
 		end
 	end
+end
+
+function OvaleCooldown:IsSharedCooldown(name)
+	local spellTable = self_sharedCooldownSpells[name]
+	return (spellTable and next(spellTable) ~= nil)
 end
 
 function OvaleCooldown:AddSharedCooldown(name, spellId)
