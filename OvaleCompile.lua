@@ -33,6 +33,7 @@ local strfind = string.find
 local strmatch = string.match
 local strsub = string.sub
 local wipe = table.wipe
+local API_GetSpellInfo = GetSpellInfo
 
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
@@ -63,6 +64,8 @@ local self_icon = {}
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
 
 local OVALE_COMPILE_DEBUG = "compile"
+local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
+local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
 --</private-static-properties>
 
 --<public-static-properties>
@@ -352,6 +355,32 @@ local function EvaluateSpellInfo(node)
 	end
 	return ok
 end
+
+-- Scan for spell IDs used in the script that are missing from the spellbook and add them if
+-- they are variants of a spell with the same name as one already in the spellbook.
+local function AddMissingVariantSpells(annotation)
+	if annotation.functionReference then
+		for _, node in ipairs(annotation.functionReference) do
+			local spellId = node.params[1]
+			if spellId and OvaleCondition:IsSpellBookCondition(node.func) then
+				if not OvaleSpellBook:IsKnownSpell(spellId) and not OvaleCooldown:IsSharedCooldown(spellId) then
+					local spellName
+					if type(spellId) == "number" then
+						spellName = OvaleSpellBook:GetSpellName(spellId)
+					end
+					if spellName then
+						if spellName == API_GetSpellInfo(spellName) then
+							Ovale:DebugPrintf(OVALE_MISSING_SPELL_DEBUG, "Learning spell %s with ID %d.", spellName, spellId)
+							OvaleSpellBook:AddSpell(spellId, spellName)
+						end
+					else
+						Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %d.", spellId)
+					end
+				end
+			end
+		end
+	end
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -492,6 +521,7 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 			end
 		end
 		if ok then
+			AddMissingVariantSpells(self.ast.annotation)
 			Ovale:UpdateFrame()
 		end
 	end

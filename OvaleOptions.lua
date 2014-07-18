@@ -478,6 +478,12 @@ local self_options =
 							desc = L["Debug GUID"],
 							type = "toggle",
 						},
+						missing_spells =
+						{
+							name = "Missing spells",
+							desc = L["Debug missing spells"],
+							type = "toggle",
+						},
 						paper_doll =
 						{
 							name = "Paper doll updates",
@@ -488,6 +494,12 @@ local self_options =
 						{
 							name = "Snapshot updates",
 							desc = L["Debug stat snapshots"],
+							type = "toggle",
+						},
+						unknown_spells =
+						{
+							name = "Unknown spells",
+							desc = L["Debug unknown spells"],
 							type = "toggle",
 						},
 					},
