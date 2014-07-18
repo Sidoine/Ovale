@@ -53,10 +53,10 @@ local wipe = table.wipe
 -- Table of script conditions.
 self_condition = {}
 -- List of script conditions that refer to a castable spell from the player's spellbook.
-self_spellbookCondition = {}
+self_spellBookCondition = {}
 do
 	-- Spell(spellId) can be used as a condition instead of an action.
-	self_spellbookCondition["spell"] = true
+	self_spellBookCondition["spell"] = true
 end
 --</private-static-properties>
 
@@ -83,7 +83,7 @@ OvaleCondition.COMPARATOR = {
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleCondition:RegisterCondition(name, isSpellbookCondition, func, arg)
+function OvaleCondition:RegisterCondition(name, isSpellBookCondition, func, arg)
 	if arg then
 		if type(func) == "string" then
 			func = arg[func]
@@ -92,8 +92,8 @@ function OvaleCondition:RegisterCondition(name, isSpellbookCondition, func, arg)
 	else
 		self_condition[name] = func
 	end
-	if isSpellbookCondition then
-		self_spellbookCondition[name] = true
+	if isSpellBookCondition then
+		self_spellBookCondition[name] = true
 	end
 end
 
@@ -105,8 +105,8 @@ function OvaleCondition:IsCondition(name)
 	return (self_condition[name] ~= nil)
 end
 
-function OvaleCondition:IsSpellbookCondition(name)
-	return (self_spellbookCondition[name] ~= nil)
+function OvaleCondition:IsSpellBookCondition(name)
+	return (self_spellBookCondition[name] ~= nil)
 end
 
 function OvaleCondition:EvaluateCondition(name, ...)
