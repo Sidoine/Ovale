@@ -992,7 +992,7 @@ function OvaleBestAction:ComputeLogical(element, state)
 		Complement(timeSpanA, timeSpan)
 	elseif element.operator == "or" then
 		-- Short-circuit evaluation of left argument to OR.
-		if timeSpanA[1] == 0 and timeSpanA[1] == math.huge then
+		if timeSpanA and timeSpanA[1] == 0 and timeSpanA[2] == math.huge then
 			timeSpan:Reset(timeSpanA)
 			Ovale:Logf("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator, tostring(timeSpan))
 		else
