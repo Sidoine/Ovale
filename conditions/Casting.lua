@@ -78,6 +78,10 @@ do
 				return start, ending
 			elseif spellId == "helpful" and API_IsHelpfulSpell(castSpellName) then
 				return start, ending
+			elseif spellId == castSpellId then
+				return start, ending
+			elseif type(spellId) == "number" and OvaleSpellBook:GetSpellName(spellId) == castSpellName then
+				return start, ending
 			end
 		end
 		return nil
