@@ -25,9 +25,6 @@ local OvaleState = nil
 local format = string.format
 local strgmatch = string.gmatch
 local strgsub = string.gsub
-local tconcat = table.concat
-local tostring = tostring
-local wipe = table.wipe
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
@@ -519,7 +516,7 @@ local self_options =
 							type = "execute",
 							name = "Trace next frame",
 							func = function()
-								wipe(Ovale.traceLog)
+								Ovale:ClearLog()
 								Ovale.trace = true
 								Ovale:Logf("=== Trace @%f", API_GetTime())
 							end,
@@ -591,7 +588,7 @@ local self_options =
 							type = "input",
 							multiline = 25,
 							width = "full",
-							get = function() return tconcat(Ovale.traceLog, "\n") end,
+							get = function() return Ovale:TraceLog() end,
 						},
 					},
 				},

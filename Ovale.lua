@@ -22,6 +22,7 @@ local pairs = pairs
 local select = select
 local tconcat = table.concat
 local tostring = tostring
+local unpack = unpack
 local wipe = table.wipe
 local API_GetTime = GetTime
 local API_IsInGroup = IsInGroup
@@ -44,6 +45,10 @@ local OVALE_MSG_PREFIX = addonName
 local self_bug = false
 -- If "traced" flag is set, then the public "trace" property is toggled before the next frame refresh.
 local self_traced = false
+-- Table of lines output using Log() or Logf() methods.
+local self_traceLog = {}
+-- Maximum length of the trace log.
+local OVALE_TRACELOG_MAXLINES = 4096	-- 2^14
 -- Table of strings to display once per session.
 local self_oneTimeMessage = {}
 --</private-static-properties>
@@ -63,7 +68,6 @@ Ovale.checkBoxWidget = {}
 Ovale.listWidget = {}
 -- Flag to activate tracing the function calls for the next frame refresh.
 Ovale.trace = false
-Ovale.traceLog = {}
 --in combat?
 Ovale.enCombat = false
 Ovale.refreshNeeded = {}
@@ -398,15 +402,35 @@ end
 
 function Ovale:Log(...)
 	if self.trace then
-		local output = { ... }
-		self.traceLog[#self.traceLog + 1] = tconcat(output, "\t")
+		local N = #self_traceLog
+		if N < OVALE_TRACELOG_MAXLINES - 1 then
+			local output = { ... }
+			self_traceLog[N + 1] = tconcat(output, "\t")
+		elseif N == OVALE_TRACELOG_MAXLINES - 1 then
+			self_traceLog[N + 1] = "WARNING: Maximum length of trace log has been reached."
+		end
 	end
 end
 
 function Ovale:Logf(...)
+	local N = #self_traceLog
 	if self.trace then
-		self.traceLog[#self.traceLog + 1] = self:Format(...)
+		if N < OVALE_TRACELOG_MAXLINES - 1 then
+			self_traceLog[N + 1] = self:Format(...)
+		elseif N == OVALE_TRACELOG_MAXLINES - 1 then
+			self_traceLog[N + 1] = "WARNING: Maximum length of trace log has been reached."
+		end
 	end
+end
+
+-- Reset/empty the contents of the trace log.
+function Ovale:ClearLog()
+	wipe(self_traceLog)
+end
+
+-- Return the contents of the trace log as a string.
+function Ovale:TraceLog()
+	return tconcat(self_traceLog, "\n")
 end
 
 function Ovale:OneTimeMessage(...)
