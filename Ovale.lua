@@ -284,7 +284,13 @@ function Ovale:UpdateFrame()
 	self:UpdateVisibility()
 end
 
-function Ovale:PostRefresh()
+function Ovale:ResetTrace()
+	self.trace = false
+	self_traced = false
+	self_bug = false
+end
+
+function Ovale:UpdateTrace()
 	-- If trace flag is set here, then flag that we just traced one frame.
 	if self.trace then
 		self_traced = true

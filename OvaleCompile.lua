@@ -461,6 +461,8 @@ function OvaleCompile:EventHandler(event)
 end
 
 function OvaleCompile:CompileScript(event)
+	-- Reset the trace state if we compile a new script.
+	Ovale:ResetTrace()
 	-- Compile the selected script from the profile.
 	local profile = OvaleOptions:GetProfile()
 	local source = profile.source

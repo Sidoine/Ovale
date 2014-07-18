@@ -282,7 +282,7 @@ do
 		end
 
 		wipe(Ovale.refreshNeeded)
-		Ovale:PostRefresh()
+		Ovale:UpdateTrace()
 		Ovale:PrintOneTimeMessages()
 	end
 	
