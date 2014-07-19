@@ -858,7 +858,7 @@ AddIcon specialization=guardian help=main checkbox=opt_druid_guardian
 	GuardianMainActions()
 }
 
-AddIcon specialization=guardian help=aoe checkbox=aoe checkbox=opt_druid_guardian
+AddIcon specialization=guardian help=aoe checkbox=opt_aoe checkbox=opt_druid_guardian
 {
 	GuardianAoeActions()
 }

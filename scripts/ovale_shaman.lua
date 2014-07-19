@@ -177,7 +177,7 @@ AddIcon specialization=elemental help=main checkbox=opt_shaman_elemental
 	ElementalSingleActions()
 }
 
-AddIcon specialization=elemental help=aoe checkbox=aoe checkbox=opt_shaman_elemental
+AddIcon specialization=elemental help=aoe checkbox=opt_aoe checkbox=opt_shaman_elemental
 {
 	ElementalPrecombatActions()
 	ElementalDefaultActions()
@@ -417,7 +417,7 @@ AddIcon specialization=enhancement help=main checkbox=opt_shaman_enhancement
 	EnhancementSingleActions()
 }
 
-AddIcon specialization=enhancement help=aoe checkbox=aoe checkbox=opt_shaman_enhancement
+AddIcon specialization=enhancement help=aoe checkbox=opt_aoe checkbox=opt_shaman_enhancement
 {
 	EnhancementPrecombatActions()
 	EnhancementDefaultActions()
@@ -525,7 +525,7 @@ AddIcon specialization=restoration help=main checkbox=opt_shaman_restoration
 	RestorationMainActions()
 }
 
-AddIcon specialization=restoration help=aoe checkbox=aoe checkbox=opt_shaman_restoration
+AddIcon specialization=restoration help=aoe checkbox=opt_aoe checkbox=opt_shaman_restoration
 {
 	RestorationAoeActions()
 }
