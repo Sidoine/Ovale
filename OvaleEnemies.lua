@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
     Ovale Spell Priority
     Copyright (C) 2012 Sidoine
-    Copyright (C) 2012, 2013 Johnny C. Lam
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License in the LICENSE
@@ -25,12 +25,33 @@ do
 end
 
 local bit_band = bit.band
+local ipairs = ipairs
 local pairs = pairs
+local strfind = string.find
 local tostring = tostring
 local wipe = table.wipe
 local API_GetTime = GetTime
+local API_UnitGUID = UnitGUID
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
+
+-- List of CLEU event suffixes that can correspond to the player damaging or try to damage (tag) an enemy.
+local CLEU_TAG_SUFFIXES = {
+	"_DAMAGE",
+	"_MISSED",
+	"_DRAIN",
+	"_LEECH",
+	"_INTERRUPT",
+	"_DISPEL",
+	"_DISPEL_FAILED",
+	"_STOLEN",
+	"_AURA_APPLIED",
+	"_AURA_APPLIED_DOSE",
+	"_AURA_REFRESH",
+}
+
+-- Player's GUID.
+local self_guid = nil
 
 -- Timer for reaper function to remove inactive enemies.
 local self_reaperTimer = nil
@@ -44,13 +65,29 @@ local OVALE_ENEMIES_DEBUG = "enemy"
 OvaleEnemies.enemyLastSeen = {}
 -- enemyName[guid] = name
 OvaleEnemies.enemyName = {}
+-- taggedEnemy[guid] = true/nil
+OvaleEnemies.taggedEnemy = {}
 
 -- Total number of active enemies.
 OvaleEnemies.activeEnemies = 0
+-- Total number of tagged enemies.
+OvaleEnemies.taggedEnemies = 0
 --</public-static-properties>
+
+--<private-static-methods>
+local function IsTagEvent(cleuEvent)
+	for _, suffix in ipairs(CLEU_TAG_SUFFIXES) do
+		if strfind(cleuEvent, suffix .. "$") then
+			return true
+		end
+	end
+	return false
+end
+--</private-static-methods>
 
 --<public-static-methods>
 function OvaleEnemies:OnEnable()
+	self_guid = API_UnitGUID("player")
 	if not self_reaperTimer then
 		self_reaperTimer = self:ScheduleRepeatingTimer("RemoveInactiveEnemies", REAP_INTERVAL)
 	end
@@ -79,7 +116,8 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, h
 			and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		local now = API_GetTime()
-		self:AddEnemy(destGUID, destName, now)
+		local isTagged = (sourceGUID == self_guid and IsTagEvent(cleuEvent))
+		self:AddEnemy(destGUID, destName, now, isTagged)
 	end
 end
 
@@ -104,7 +142,7 @@ function OvaleEnemies:RemoveInactiveEnemies()
 	profiler.Stop("OvaleEnemies_RemoveInactiveEnemies")
 end
 
-function OvaleEnemies:AddEnemy(guid, name, timestamp)
+function OvaleEnemies:AddEnemy(guid, name, timestamp, isTagged)
 	profiler.Start("OvaleEnemies_AddEnemy")
 	if guid then
 		local seen = self.enemyLastSeen[guid]
@@ -112,7 +150,13 @@ function OvaleEnemies:AddEnemy(guid, name, timestamp)
 		self.enemyName[guid] = name
 		if not seen then
 			self.activeEnemies = self.activeEnemies + 1
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
+			if isTagged then
+				self.taggedEnemies = self.taggedEnemies + 1
+				self.taggedEnemy[guid] = true
+				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New tagged enemy (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
+			else
+				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy (%d total): %s (%s)", self.activeEnemies, guid, name)
+			end
 			Ovale.refreshNeeded["player"] = true
 		end
 	end
@@ -128,6 +172,10 @@ function OvaleEnemies:RemoveEnemy(guid, isDead)
 		if seen then
 			if self.activeEnemies > 0 then
 				self.activeEnemies = self.activeEnemies - 1
+				if self.taggedEnemy[guid] then
+					self.taggedEnemy[guid] = nil
+					self.taggedEnemies = self.taggedEnemies - 1
+				end
 			end
 			if isDead then
 				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
