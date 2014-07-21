@@ -246,35 +246,43 @@ function Ovale:UpdateControls()
 	-- Create a new CheckBox widget for each checkbox declared in the script.
 	wipe(self.checkBoxWidget)
 	for name, checkBox in pairs(self.checkBox) do
-		local widget = AceGUI:Create("CheckBox")
-		widget:SetLabel(checkBox.text)
-		if profile.check[name] == nil then
-			profile.check[name] = checkBox.checked
+		if checkBox.text then
+			local widget = AceGUI:Create("CheckBox")
+			widget:SetLabel(checkBox.text)
+			if profile.check[name] == nil then
+				profile.check[name] = checkBox.checked
+			end
+			if profile.check[name] then
+				widget:SetValue(profile.check[name])
+			end
+			widget:SetUserData("name", name)
+			widget:SetCallback("OnValueChanged", OnCheckBoxValueChanged)
+			self.frame:AddChild(widget)
+			self.checkBoxWidget[name] = widget
+		else
+			self:OneTimeMessage("Warning: checkbox '%s' is used but not defined.", name)
 		end
-		if profile.check[name] then
-			widget:SetValue(profile.check[name])
-		end
-		widget:SetUserData("name", name)
-		widget:SetCallback("OnValueChanged", OnCheckBoxValueChanged)
-		self.frame:AddChild(widget)
-		self.checkBoxWidget[name] = widget
 	end
 
 	-- Create a new Dropdown widget for each list declared in the script.
 	wipe(self.listWidget)
 	for name, list in pairs(self.list) do
-		local widget = AceGUI:Create("Dropdown")
-		widget:SetList(list.items)
-		if not profile.list[name] then
-			profile.list[name] = list.default
+		if next(list.items) then
+			local widget = AceGUI:Create("Dropdown")
+			widget:SetList(list.items)
+			if not profile.list[name] then
+				profile.list[name] = list.default
+			end
+			if profile.list[name] then
+				widget:SetValue(profile.list[name])
+			end
+			widget:SetUserData("name", name)
+			widget:SetCallback("OnValueChanged", OnDropDownValueChanged)
+			self.frame:AddChild(widget)
+			self.listWidget[name] = widget
+		else
+			self:OneTimeMessage("Warning: list '%s' is used but has no items.", name)
 		end
-		if profile.list[name] then
-			widget:SetValue(profile.list[name])
-		end
-		widget:SetUserData("name", name)
-		widget:SetCallback("OnValueChanged", OnDropDownValueChanged)
-		self.frame:AddChild(widget)
-		self.listWidget[name] = widget
 	end
 end
 
