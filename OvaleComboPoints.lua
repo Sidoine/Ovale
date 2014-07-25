@@ -147,16 +147,16 @@ function OvaleComboPoints:OnDisable()
 end
 
 --[[
-A rogue's Seal Fate or a druid's Primal Fury are passive abilities that grant an
-extra combo point when a combo-point generator critically strikes the target.
+	A rogue's Seal Fate or a druid's Primal Fury are passive abilities that grant an
+	extra combo point when a combo-point generator critically strikes the target.
 
-Workaround the "combo point delay" after a generator critically strikes the target
-by catching the critical strike damage event and adding the given number of extra
-combo points.  The delay MUST be less than the GCD.
+	Workaround the "combo point delay" after a generator critically strikes the target
+	by catching the critical strike damage event and adding the given number of extra
+	combo points.  The delay MUST be less than the GCD.
 
-An ability that generates extra combo points after it critically strikes the target
-should have a "critcombo=N" parameter in its SpellInfo() description, where N is
-the number of extra combo points to add, e.g., critcombo=1.
+	An ability that generates extra combo points after it critically strikes the target
+	should have a "critcombo=N" parameter in its SpellInfo() description, where N is
+	the number of extra combo points to add, e.g., critcombo=1.
 --]]
 function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
