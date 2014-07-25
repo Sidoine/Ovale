@@ -86,20 +86,20 @@ end
 --<public-static-methods>
 function OvaleActionBar:OnEnable()
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateActionSlots")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateActionSlots")
-	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateActionSlots")
 	self:RegisterEvent("UPDATE_BINDINGS")
 	self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots")
+	self:RegisterMessage("Ovale_StanceChanged", "UpdateActionSlots")
+	self:RegisterMessage("Ovale_TalentsChanged", "UpdateActionSlots")
 end
 	
 function OvaleActionBar:OnDisable()
 	self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
-	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("UPDATE_BINDINGS")
 	self:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
+	self:UnregisterMessage("Ovale_StanceChanged")
+	self:UnregisterMessage("Ovale_TalentsChanged")
 end
 
 function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot)

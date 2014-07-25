@@ -111,25 +111,23 @@ function OvaleStance:OnInitialize()
 end
 
 function OvaleStance:OnEnable()
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "UpdateStances")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateStances")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStances")
-	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateStances")
-	self:RegisterEvent("SPELLS_CHANGED", "UpdateStances")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	self:RegisterMessage("Ovale_SpellsChanged", "UpdateStances")
+	self:RegisterMessage("Ovale_TalentsChanged", "UpdateStances")
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleStance:OnDisable()
 	OvaleState:UnregisterState(self)
-	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-	self:UnregisterEvent("SPELLS_CHANGED")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	self:UnregisterMessage("Ovale_SpellsChanged")
+	self:UnregisterMessage("Ovale_TalentsChanged")
 end
 
 function OvaleStance:PLAYER_TALENT_UPDATE(event)
