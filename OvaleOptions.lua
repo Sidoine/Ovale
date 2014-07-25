@@ -451,6 +451,12 @@ local self_options =
 							desc = L["Debug aura"],
 							type = "toggle",
 						},
+						combo_points =
+						{
+							name = "Combo points",
+							desc = L["Debug combo points"],
+							type = "toggle",
+						},
 						compile =
 						{
 							name = "Compile",

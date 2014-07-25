@@ -28,17 +28,39 @@ local OvaleAura = nil
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
+local OvaleSpellBook = nil
 local OvaleState = nil
 
 local API_GetComboPoints = GetComboPoints
 local API_UnitClass = UnitClass
+local API_UnitGUID = UnitGUID
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
+-- Player's GUID.
+local self_guid = nil
+
+-- Rogue's Anticipation talent.
+local ANTICIPATION = 115189
+local ANTICIPATION_DURATION = 15
+local ANTICIPATION_TALENT = 18
+local self_hasAnticipation = false
+-- The number of stacks of Anticipation that were on the player when the most recent finisher was cast.
+local self_anticipation = 0
+-- Rogue offensive finishers.
+local OFFENSIVE_FINISHER_ROGUE = {
+	[   408] = "Kidney Shot",
+	[  1943] = "Rupture",
+	[  2098] = "Eviscerate",
+	[ 32645] = "Envenom",
+	[121411] = "Crimson Tempest",
+}
 
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
+
+local OVALE_COMBO_POINTS_DEBUG = "combo_points"
 --</private-static-properties>
 
 --<public-static-properties>
@@ -85,10 +107,12 @@ function OvaleComboPoints:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
+	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 end
 
 function OvaleComboPoints:OnEnable()
+	self_guid = API_UnitGUID("player")
 	if self_class == "ROGUE" or self_class == "DRUID" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Refresh")
@@ -96,6 +120,10 @@ function OvaleComboPoints:OnEnable()
 		self:RegisterEvent("PLAYER_TARGET_CHANGED", "Refresh")
 		self:RegisterEvent("UNIT_COMBO_POINTS")
 		self:RegisterEvent("UNIT_TARGET", "UNIT_COMBO_POINTS")
+		if self_class == "ROGUE" then
+			self:RegisterMessage("Ovale_AuraRemoved")
+			self:RegisterMessage("Ovale_TalentsChanged")
+		end
 		OvaleState:RegisterState(self, self.statePrototype)
 		OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 	end
@@ -111,6 +139,10 @@ function OvaleComboPoints:OnDisable()
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 		self:UnregisterEvent("UNIT_COMBO_POINTS")
 		self:UnregisterEvent("UNIT_TARGET")
+		if self_class == "ROGUE" then
+			self:RegisterMessage("Ovale_AuraRemoved")
+			self:RegisterMessage("Ovale_TalentsChanged")
+		end
 	end
 end
 
@@ -129,14 +161,24 @@ the number of extra combo points to add, e.g., critcombo=1.
 function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
 
-	if sourceGUID == OvaleGUID:GetGUID("player") and destGUID == OvaleGUID:GetGUID("target") then
+	if sourceGUID == self_guid and destGUID == OvaleGUID:GetGUID("target") then
 		if cleuEvent == "SPELL_DAMAGE" then
 			local spellId, critical = arg12, arg21
 			local si = OvaleData.spellInfo[spellId]
 			if critical and si and si.critcombo then
+				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "Critical strike for %d additional combo points.", si.critcombo)
 				self.combo = self.combo + si.critcombo
 				if self.combo > MAX_COMBO_POINTS then
 					self.combo = MAX_COMBO_POINTS
+				end
+			end
+		elseif self_hasAnticipation and cleuEvent == "SPELL_CAST_SUCCESS" then
+			local spellId = arg12
+			if OFFENSIVE_FINISHER_ROGUE[spellId] then
+				local aura = OvaleAura:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
+				if OvaleAura:IsActiveAura(aura) then
+					self_anticipation = aura.stacks
+					Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "Finisher with %d anticipation stacks.", self_anticipation)
 				end
 			end
 		end
@@ -150,9 +192,35 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, ...)
 	end
 end
 
+function OvaleComboPoints:Ovale_AuraRemoved(event, atTime, guid, auraId, source)
+	if guid == self_guid and auraId == ANTICIPATION then
+		self_anticipation = 0
+	end
+end
+
+function OvaleComboPoints:Ovale_TalentsChanged(event)
+	self_hasAnticipation = (self_class == "ROGUE" and OvaleSpellBook:GetTalentPoints(ANTICIPATION_TALENT) > 0)
+end
+
 function OvaleComboPoints:Refresh()
 	profiler.Start("OvaleComboPoints_Refresh")
-	self.combo = API_GetComboPoints("player") or 0
+	local combo = API_GetComboPoints("player") or 0
+	local oldCombo = self.combo
+	if oldCombo == combo then
+		-- Game state has caught up with the adjusted combo point total, so remove the adjustment.
+		self_anticipation = 0
+	else
+		if self_hasAnticipation and self_anticipation > 0 then
+			self.combo = combo + self_anticipation
+			if self.combo > MAX_COMBO_POINTS then
+				self.combo = MAX_COMBO_POINTS
+			end
+			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "%d -> %d (+%d).", oldCombo, combo, self_anticipation)
+		else
+			self.combo = combo
+			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "%d -> %d.", oldCombo, combo)
+		end
+	end
 	profiler.Stop("OvaleComboPoints_Refresh")
 end
 
@@ -199,10 +267,42 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 		local power = state.combo
 		power = power - cost
 		-- Clamp combo points to lower and upper limits.
-		if power < 0 then
+		if power <= 0 then
 			power = 0
+			--[[
+				If a rogue is talented into Anticipation, then any stacks of Anticipation
+				become combo points on the target after the finisher is cast.
+			--]]
+			if self_hasAnticipation and state.combo > 0 then
+				local aura = state:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
+				if state:IsActiveAura(aura, endCast) then
+					power = aura.stacks
+					state:RemoveAuraOnGUID(self_guid, ANTICIPATION, "HELPFUL", true, state.currentTime)
+				end
+			end
 		end
 		if power > MAX_COMBO_POINTS then
+			--[[
+				If a rogue is talented into Anticipation, then any combo points over
+				MAX_COMBO_POINTS are added to the stacks of Anticipation on the player
+				to a maximum of MAX_COMBO_POINTS stacks.
+			--]]
+			if self_hasAnticipation then
+				local stacks = power - MAX_COMBO_POINTS
+				-- Look for a pre-existing Anticipation buff and add to its stacks.
+				local aura = state:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
+				if state:IsActiveAura(aura, endCast) then
+					stacks = stacks + aura.stacks
+					if stacks > MAX_COMBO_POINTS then
+						stacks = MAX_COMBO_POINTS
+					end
+				end
+				-- Add a new Anticipation buff with the updated start, ending, stacks information.
+				local start = state.currentTime
+				local ending = start + ANTICIPATION_DURATION
+				aura = state:AddAuraToGUID(self_guid, ANTICIPATION, self_guid, "HELPFUL", start, ending)
+				aura.stacks = stacks
+			end
 			power = MAX_COMBO_POINTS
 		end
 		state.combo = power
