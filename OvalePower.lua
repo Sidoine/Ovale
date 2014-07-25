@@ -448,9 +448,9 @@ end
 -- Return the amount of the given resource needed to cast the given spell.
 do
 	local BUFF_PERCENT_REDUCTION = {
-		["_less15"] = 0.85,
+		["_less15"] = 0.15,
 		["_less50"] = 0.50,
-		["_less75"] = 0.25,
+		["_less75"] = 0.75,
 		["_half"] = 0.5,
 	}
 
@@ -495,6 +495,11 @@ do
 					local aura = state:GetAura("player", buffExtra, nil, true)
 					if state:IsActiveAura(aura) then
 						local buffAmount = si[buffAmountParam] or -1
+						-- Check if this aura has a stacking effect.
+						local siAura = OvaleData.spellInfo[buffExtra]
+						if siAura and siAura.stacking == 1 then
+							buffAmount = buffAmount * aura.stacks
+						end
 						cost = cost + buffAmount
 					end
 				end
@@ -504,11 +509,21 @@ do
 						This seems to be a consistent Blizzard rule for spell costs so that you
 						never end up with a negative spell cost.
 					--]]
-					for suffix, multiplier in pairs(BUFF_PERCENT_REDUCTION) do
+					for suffix, reduction in pairs(BUFF_PERCENT_REDUCTION) do
 						local buffPercentReduction = si[buffParam .. suffix]
 						if buffPercentReduction then
 							local aura = state:GetAura("player", buffPercentReduction)
 							if state:IsActiveAura(aura) then
+								-- Check if this aura has a stacking effect.
+								local siAura = OvaleDat.spellInfo[buffPercentReduction]
+								if siAura and siAura.stacking then
+									reduction = reduction * aura.stacks
+									-- Clamp to a maximum of 100% reduction.
+									if reduction > 1 then
+										reduction = 1
+									end
+								end
+								local multiplier = 1 - reduction
 								cost = cost * multiplier
 							end
 						end
