@@ -20,6 +20,11 @@ AddFunction Interrupt
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
 		Spell(disrupting_shout)
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
 	}
 }
 

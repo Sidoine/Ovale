@@ -13,6 +13,12 @@ Include(ovale_shaman_spells)
 ### Common functions for all specializations.
 ###
 
+AddFunction UseRacialActions
+{
+	Spell(berserking)
+	Spell(blood_fury_apsp)
+}
+
 AddFunction Bloodlust
 {
 	if DebuffExpires(burst_haste_debuff any=1)
@@ -24,7 +30,15 @@ AddFunction Bloodlust
 
 AddFunction Interrupt
 {
-	if target.IsFriend(no) and target.IsInterruptible() Spell(wind_shear)
+	if target.IsFriend(no) and target.IsInterruptible()
+	{
+		Spell(wind_shear)
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
 }
 ]]
 

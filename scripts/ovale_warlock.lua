@@ -262,7 +262,7 @@ AddIcon specialization=demonology help=aoe checkbox=opt_aoe checkbox=opt_warlock
 AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology
 {
 	UseItemActions()
-	Spell(blood_fury)
+	UseRacialActions()
 	Spell(dark_soul_knowledge)
 	Spell(summon_doomguard)
 }

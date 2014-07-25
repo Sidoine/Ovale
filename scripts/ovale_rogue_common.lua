@@ -41,11 +41,16 @@ AddFunction TricksOfTheTrade
 
 AddFunction Interrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
 		if IsStealthed() and target.InRange(cheap_shot) Spell(cheap_shot)
 		if target.InRange(kick) Spell(kick)
-		if not target.Classification(worldboss) and target.InRange(kidney_shot) Spell(kidney_shot)
+		if target.Classification(worldboss no)
+		{
+			if target.InRange(kidney_shot) Spell(kidney_shot)
+			Spell(arcane_torrent_energy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
 	}
 }
 ]]

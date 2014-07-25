@@ -115,8 +115,7 @@ AddFunction ArcaneDefaultShortCdActions
 AddFunction ArcaneDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() Spell(counterspell)
-	UseRacialInterruptActions()
+	if target.IsInterruptible() Interrupt()
 
 	unless { TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) }
 		or { TalentPoints(rune_of_power_talent) and Spell(arcane_power) and RuneOfPowerRemains() < SpellData(arcane_power_buff duration) }
@@ -135,7 +134,7 @@ AddFunction ArcaneDefaultCdActions
 		#arcane_power,if=time_to_bloodlust>180&((buff.arcane_missiles.stack=2&buff.arcane_charge.stack>2)|target.time_to_die<buff.arcane_power.duration+5),moving=0
 		if not TalentPoints(rune_of_power_talent) and not TalentPoints(invocation_talent) and TimeToBloodlust() > SpellData(arcane_power cd) and { { BuffStacks(arcane_missiles_buff) == 2 and DebuffStacks(arcane_charge_debuff) > 2 } or target.TimeToDie() < SpellData(arcane_power_buff duration) + 5 } Spell(arcane_power)
 		#blood_fury,if=buff.alter_time.down&(buff.arcane_power.up|cooldown.arcane_power.remains>15|target.time_to_die<18)
-		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or SpellCooldown(arcane_power) > 15 or target.TimeToDie() < 18 } Spell(blood_fury)
+		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or SpellCooldown(arcane_power) > 15 or target.TimeToDie() < 18 } Spell(blood_fury_sp)
 		#berserking,if=buff.alter_time.down&(buff.arcane_power.up|target.time_to_die<18)
 		if BuffExpires(alter_time_buff) and { BuffPresent(arcane_power_buff) or target.TimeToDie() < 18 } Spell(berserking)
 		#jade_serpent_potion,if=buff.alter_time.down&((cooldown.alter_time.remains=0&buff.arcane_power.up)|target.time_to_die<50)
@@ -314,8 +313,7 @@ AddFunction FireDefaultShortCdActions
 AddFunction FireDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() Spell(counterspell)
-	UseRacialInterruptActions()
+	if target.IsInterruptible() Interrupt()
 
 	unless { TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) and BuffExpires(alter_time_buff) }
 		or { TalentPoints(rune_of_power_talent) and Spell(alter_time_activate) and RuneOfPowerRemains() < 6 }
@@ -335,7 +333,7 @@ AddFunction FireDefaultCdActions
 			or { target.LastEstimatedDamage(ignite_debuff) >= { { target.CritDamage(fireball) + target.CritDamage(inferno_blast) + target.Damage(pyroblast) } * MasteryEffect() * 0.5 } and target.DebuffPresent(pyroblast_debuff) and BuffExpires(alter_time_buff) and BuffExpires(pyroblast_buff) and BuffExpires(presence_of_mind_buff) and Spell(combustion) }
 		{
 			#blood_fury,if=buff.alter_time.down&(cooldown.alter_time_activate.remains>30|target.time_to_die<18)
-			if BuffExpires(alter_time_buff) and { SpellCooldown(alter_time_activate) > 30 or target.TimeToDie() < 18 } Spell(blood_fury)
+			if BuffExpires(alter_time_buff) and { SpellCooldown(alter_time_activate) > 30 or target.TimeToDie() < 18 } Spell(blood_fury_sp)
 			#berserking,sync=alter_time_activate,if=buff.alter_time.down
 			if not SpellCooldown(alter_time_activate) > 0 and BuffExpires(alter_time_buff) Spell(berserking)
 			#jade_serpent_potion,sync=alter_time_activate,if=buff.alter_time.down
@@ -479,8 +477,7 @@ AddFunction FrostDefaultShortCdActions
 AddFunction FrostDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() Spell(counterspell)
-	UseRacialInterruptActions()
+	if target.IsInterruptible() Interrupt()
 
 	unless { TalentPoints(rune_of_power_talent) and RuneOfPowerRemains() < CastTime(rune_of_power) and BuffExpires(alter_time_buff) }
 		or { TalentPoints(rune_of_power_talent) and not IcyVeinsCooldownRemains() > 0 and RuneOfPowerRemains() < 20 }
@@ -493,7 +490,7 @@ AddFunction FrostDefaultCdActions
 		#icy_veins,if=time_to_bloodlust>180&((buff.brain_freeze.react|buff.fingers_of_frost.react)|target.time_to_die<22),moving=0
 		if TimeToBloodlust() > 180 and { { BuffPresent(brain_freeze_buff) or BuffPresent(fingers_of_frost_buff) } or target.TimeToDie() < 22 } IcyVeins()
 		#blood_fury,if=buff.icy_veins.up|cooldown.icy_veins.remains>30|target.time_to_die<18
-		if BuffPresent(icy_veins_buff) or IcyVeinsCooldownRemains() > 30 or target.TimeToDie() < 18 Spell(blood_fury)
+		if BuffPresent(icy_veins_buff) or IcyVeinsCooldownRemains() > 30 or target.TimeToDie() < 18 Spell(blood_fury_sp)
 		#berserking,if=buff.icy_veins.up|target.time_to_die<18
 		if BuffPresent(icy_veins_buff) or target.TimeToDie() < 18 Spell(berserking)
 		#jade_serpent_potion,if=buff.icy_veins.up|target.time_to_die<45

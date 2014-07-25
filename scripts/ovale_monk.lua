@@ -513,7 +513,6 @@ AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	if target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death)
 	Interrupt()
-	UseRacialInterruptActions()
 
 	WindwalkerDefaultCdActions()
 }

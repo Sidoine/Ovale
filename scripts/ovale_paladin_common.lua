@@ -13,9 +13,11 @@ Include(ovale_paladin_spells)
 ### Common functions for all specializations.
 ###
 
+AddFunction UseRacialActions {}
+
 AddFunction Interrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
 		if target.InRange(rebuke) Spell(rebuke)
 		if target.Classification(worldboss no)
@@ -23,6 +25,8 @@ AddFunction Interrupt
 			if TalentPoints(fist_of_justice_talent) Spell(fist_of_justice)
 			if not TalentPoints(fist_of_justice_talent) and target.InRange(hammer_of_justice) Spell(hammer_of_justice)
 			#Spell(blinding_light)
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
 		}
 	}
 }

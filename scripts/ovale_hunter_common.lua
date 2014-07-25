@@ -13,12 +13,23 @@ Include(ovale_hunter_spells)
 ### Common functions for all specializations.
 ###
 
+AddFunction UseRacialActions
+{
+	Spell(berserking)
+	Spell(blood_fury_ap)
+}
+
 AddFunction Interrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
 		Spell(silencing_shot)
 		Spell(counter_shot)
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
 	}
 }
 

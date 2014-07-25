@@ -133,7 +133,7 @@ AddFunction ArmsDefaultCdActions
 	#use_item,slot=hands,if=!talent.bloodbath.enabled&debuff.colossus_smash.up|buff.bloodbath.up
 	if not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(bloodbath_buff) UseItemActions()
 	#blood_fury,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or { not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury)
+	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or { not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
 	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or { not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(berserking)
 	#arcane_torrent,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
@@ -200,7 +200,6 @@ AddIcon specialization=arms help=aoe checkbox=opt_aoe checkbox=opt_warrior_arms
 AddIcon specialization=arms help=cd checkbox=opt_warrior_arms
 {
 	Interrupt()
-	UseRacialInterruptActions()
 
 	if InCombat(no) ArmsPrecombatCdActions()
 	ArmsDefaultCdActions()
@@ -262,7 +261,7 @@ AddFunction FuryDefaultCdActions
 	#use_item,slot=hands,if=!talent.bloodbath.enabled&debuff.colossus_smash.up|buff.bloodbath.up
 	if not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(bloodbath_buff) UseItemActions()
 	#blood_fury,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or { not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury)
+	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or { not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
 	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or { not TalentPoints(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(berserking)
 	#arcane_torrent,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
@@ -594,7 +593,6 @@ AddIcon specialization=fury help=aoe checkbox=opt_aoe checkbox=opt_warrior_fury
 AddIcon specialization=fury help=cd checkbox=opt_warrior_fury
 {
 	Interrupt()
-	UseRacialInterruptActions()
 
 	if InCombat(no) FuryPrecombatCdActions()
 	FuryDefaultCdActions()
@@ -630,7 +628,7 @@ AddFunction ProtectionDpsCdsActions
 	#bloodbath,if=enabled
 	if TalentPoints(bloodbath_talent) Spell(bloodbath)
 	#blood_fury
-	Spell(blood_fury)
+	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
@@ -756,7 +754,6 @@ AddIcon specialization=protection help=aoe checkbox=opt_aoe checkbox=opt_warrior
 AddIcon specialization=protection help=cd checkbox=opt_warrior_protection
 {
 	Interrupt()
-	UseRacialInterruptActions()
 	ProtectionDefaultCdActions()
 }
 

@@ -194,7 +194,6 @@ AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_best_mastery
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	Interrupt()
-	UseRacialInterruptActions()
 	BeastMasteryDefaultCdActions()
 }
 
@@ -398,7 +397,6 @@ AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship
 {
 	if InCombat(no) MarksmanshipPrecombatCdActions()
 	Interrupt()
-	UseRacialInterruptActions()
 	MarksmanshipDefaultCdActions()
 }
 
@@ -594,7 +592,6 @@ AddIcon specialization=survival help=cd checkbox=opt_hunter_survival
 {
 	if InCombat(no) SurvivalPrecombatCdActions()
 	Interrupt()
-	UseRacialInterruptActions()
 	SurvivalDefaultCdActions()
 }
 

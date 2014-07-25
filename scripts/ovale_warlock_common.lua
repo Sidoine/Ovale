@@ -13,6 +13,23 @@ Include(ovale_warlock_spells)
 ### Common functions for all specializations.
 ###
 
+AddFunction UseRacialActions
+{
+	Spell(berserking)
+	Spell(blood_fury_sp)
+}
+
+AddFunction Interrupt
+{
+	if target.IsFriend(no) and target.IsInterruptible() 
+	{
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_mana)
+		}
+	}
+}
+
 AddFunction SummonPet
 {
 	if pet.Present(no) Texture(spell_nature_removecurse help=SummonPet)

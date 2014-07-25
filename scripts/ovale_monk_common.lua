@@ -13,12 +13,23 @@ Include(ovale_monk_spells)
 ### Common functions for all specializations.
 ###
 
+AddFunction UseRacialActions
+{
+	Spell(berserking)
+	Spell(blood_fury_apsp)
+}
+
 AddFunction Interrupt
 {
 	if target.IsFriend(no) and target.IsInterruptible()
 	{
 		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
-		if target.Classification(worldboss no) and target.InRange(paralysis) Spell(paralysis)
+		if target.Classification(worldboss no)
+		{
+			if target.InRange(paralysis) Spell(paralysis)
+			Spell(arcane_torrent_chi)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
 	}
 }
 ]]

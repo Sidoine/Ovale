@@ -89,13 +89,12 @@ AddFunction AssassinationDefaultCdActions
 	if BuffPresent(burst_haste any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	Interrupt()
-	UseRacialInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
 	#use_item,slot=hands
 	UseItemActions()
 	#blood_fury
-	Spell(blood_fury)
+	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
 
@@ -291,13 +290,12 @@ AddFunction CombatDefaultCdActions
 	if BuffPresent(burst_haste any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	Interrupt()
-	UseRacialInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
 	#use_item,slot=hands,if=time=0|buff.shadow_blades.up
 	if TimeInCombat() == 0 or BuffPresent(shadow_blades_buff) UseItemActions()
 	#blood_fury,if=time=0|buff.shadow_blades.up
-	if TimeInCombat() == 0 or BuffPresent(shadow_blades_buff) Spell(blood_fury)
+	if TimeInCombat() == 0 or BuffPresent(shadow_blades_buff) Spell(blood_fury_ap)
 	#berserking,if=time=0|buff.shadow_blades.up
 	if TimeInCombat() == 0 or BuffPresent(shadow_blades_buff) Spell(berserking)
 
@@ -543,11 +541,10 @@ AddFunction SubtletyDefaultCdActions
 	if BuffPresent(burst_haste any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	Interrupt()
-	UseRacialInterruptActions()
 	#use_item,slot=hands,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) UseItemActions()
 	#blood_fury,if=buff.shadow_dance.up
-	if BuffPresent(shadow_dance_buff) Spell(blood_fury)
+	if BuffPresent(shadow_dance_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(berserking)
 

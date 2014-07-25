@@ -22,6 +22,8 @@ AddFunction Interrupt
 		{
 			if TalentPoints(asphyxiate_talent) and target.InRange(asphyxiate) Spell(asphyxiate)
 			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
 		}
 	}
 }

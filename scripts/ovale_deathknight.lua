@@ -268,7 +268,6 @@ AddIcon specialization=blood help=aoe checkbox=opt_aoe checkbox=opt_deathknight_
 AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood
 {
 	Interrupt()
-	UseRacialInterruptActions()
 	BloodCdActions()
 }
 
@@ -316,7 +315,7 @@ AddFunction FrostDefaultCdActions
 	#empower_rune_weapon,if=target.time_to_die<=60&(buff.mogu_power_potion.up|buff.golemblood_potion.up)
 	if target.TimeToDie() <= 60 and { BuffPresent(mogu_power_potion_buff) or BuffPresent(golemblood_potion_buff) } Spell(empower_rune_weapon)
 	#blood_fury
-	Spell(blood_fury)
+	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
@@ -581,7 +580,6 @@ AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost
 {
 	if InCombat(no) FrostPrecombatCdActions()
 	Interrupt()
-	UseRacialInterruptActions()
 	FrostDefaultCdActions()
 }
 
@@ -739,7 +737,7 @@ AddFunction UnholyDefaultActions
 AddFunction UnholyDefaultCdActions
 {
 	#blood_fury
-	Spell(blood_fury)
+	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
@@ -818,7 +816,6 @@ AddIcon specialization=unholy help=cd checkbox=opt_deathknight_unholy
 {
 	if InCombat(no) UnholyPrecombatCdActions()
 	Interrupt()
-	UseRacialInterruptActions()
 	UnholyDefaultCdActions()
 	UnholySingleTargetCdActions()
 }

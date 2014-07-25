@@ -192,10 +192,10 @@ AddFunction ProtectionDefaultShortCdActions
 AddFunction ProtectionDefaultCdActions
 {
 	Interrupt()
-	UseRacialInterruptActions()
 	if IsRooted() Spell(hand_of_freedom)
 
 	#blood_fury
+	UseRacialActions()
 	#avenging_wrath
 	Spell(avenging_wrath)
 	#holy_avenger,if=talent.holy_avenger.enabled

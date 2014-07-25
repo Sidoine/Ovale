@@ -463,7 +463,7 @@ AddFunction FeralBasicCdActions
 			#use_item,slot=hands,if=buff.tigers_fury.up
 			UseItemActions()
 			#berserking,if=buff.tigers_fury.up
-			UseRacialActions()
+			Spell(berserking)
 		}
 	}
 }

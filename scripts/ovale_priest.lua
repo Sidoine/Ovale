@@ -140,7 +140,7 @@ AddFunction ShadowDefaultCdActions
 		#power_infusion,if=talent.power_infusion.enabled
 		if TalentPoints(power_infusion_talent) Spell(power_infusion)
 		#blood_fury
-		Spell(blood_fury)
+		Spell(blood_fury_sp)
 		#berserking
 		Spell(berserking)
 		#arcane_torrent
@@ -203,7 +203,6 @@ AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow
 {
 	if InCombat(no) ShadowPrecombatCdActions()
 	Interrupt()
-	UseRacialInterruptActions()
 	ShadowDefaultCdActions()
 }
 

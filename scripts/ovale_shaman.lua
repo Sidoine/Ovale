@@ -97,7 +97,6 @@ AddFunction ElementalDefaultCdActions
 {
 	#wind_shear
 	Interrupt()
-	UseRacialInterruptActions()
 
 	unless not BuffPresent(lightning_shield_buff)
 	{
@@ -106,7 +105,7 @@ AddFunction ElementalDefaultCdActions
 		#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
 		if not BuffPresent(burst_haste any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or { not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemains(flame_shock_debuff) > SpellData(ascendance_caster_buff duration) or Level() < 87 } } } Spell(berserking)
 		#blood_fury,if=buff.bloodlust.up|buff.ascendance.up|((cooldown.ascendance.remains>10|level<87)&cooldown.fire_elemental_totem.remains>10)
-		if BuffPresent(burst_haste any=1) or BuffPresent(ascendance_caster_buff) or { { SpellCooldown(ascendance_caster) > 10 or Level() < 87 } and SpellCooldown(fire_elemental_totem) > 10 } Spell(blood_fury)
+		if BuffPresent(burst_haste any=1) or BuffPresent(ascendance_caster_buff) or { { SpellCooldown(ascendance_caster) > 10 or Level() < 87 } and SpellCooldown(fire_elemental_totem) > 10 } Spell(blood_fury_apsp)
 		#elemental_mastery,if=talent.elemental_mastery.enabled&(time>15&((!buff.bloodlust.up&time<120)|(!buff.berserking.up&!buff.bloodlust.up&buff.ascendance.up)|(time>=200&(cooldown.ascendance.remains>30|level<87))))
 		if TalentPoints(elemental_mastery_talent) and { TimeInCombat() > 15 and { { not BuffPresent(burst_haste any=1) and TimeInCombat() < 120 } or { not BuffPresent(berserking_buff) and not BuffPresent(burst_haste any=1) and BuffPresent(ascendance_caster_buff) } or { TimeInCombat() >= 200 and { SpellCooldown(ascendance_caster) > 30 or Level() < 87 } } } } Spell(elemental_mastery)
 		#ancestral_swiftness,if=talent.ancestral_swiftness.enabled&!buff.ascendance.up
@@ -335,7 +334,6 @@ AddFunction EnhancementDefaultCdActions
 {
 	#wind_shear
 	Interrupt()
-	UseRacialInterruptActions()
 
 	unless not BuffPresent(lightning_shield_buff)
 	{

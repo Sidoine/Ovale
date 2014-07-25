@@ -31,12 +31,12 @@ AddFunction SavageRoar
 
 AddFunction BalanceInterrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
-		if not target.Classification(worldboss)
+		if target.Classification(worldboss no)
 		{
-			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
 			if TalentPoints(typhoon_talent) Spell(typhoon)
+			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
 			Spell(solar_beam)
 		}
 	}
@@ -44,10 +44,10 @@ AddFunction BalanceInterrupt
 
 AddFunction FeralInterrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
 		if target.InRange(skull_bash_cat) Spell(skull_bash_cat)
-		if not target.Classification(worldboss)
+		if target.Classification(worldboss no)
 		{
 			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
 			if TalentPoints(typhoon_talent) and target.InRange(skull_bash_cat) Spell(typhoon)
@@ -58,22 +58,22 @@ AddFunction FeralInterrupt
 
 AddFunction GuardianInterrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
 		if target.InRange(skull_bash_bear) Spell(skull_bash_bear)
-		if TalentPoints(typhoon_talent) and target.InRange(skull_bash_bear) Spell(typhoon)
-		if not target.Classification(worldboss) and TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash)
+		if target.Classification(worldboss no)
 		{
-			Spell(mighty_bash)
+			if TalentPoints(typhoon_talent) and target.InRange(skull_bash_bear) Spell(typhoon)
+			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
 		}
 	}
 }
 
 AddFunction RestorationInterrupt
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if target.IsFriend(no) and target.IsInterruptible()
 	{
-		if not target.Classification(worldboss)
+		if target.Classification(worldboss no)
 		{
 			if TalentPoints(typhoon_talent) Spell(typhoon)
 			if TalentPoints(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)

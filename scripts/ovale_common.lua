@@ -46,28 +46,6 @@ AddFunction UseItemActions
 ###
 ### Racial actions.
 ###
-AddFunction UseRacialActions
-{
-	Spell(berserking)
-	Spell(blood_fury)
-}
-
-AddFunction UseRacialInterruptActions
-{
-	if target.IsFriend(no) and target.IsInterruptible() 
-	{
-		if target.Classification(worldboss no)
-		{
-			Spell(arcane_torrent_chi)
-			Spell(arcane_torrent_energy)
-			Spell(arcane_torrent_focus)
-			Spell(arcane_torrent_mana)
-			Spell(arcane_torrent_rage)
-			Spell(arcane_torrent_runicpower)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-		}
-	}
-}
 
 AddFunction UseRacialSurvivalActions
 {

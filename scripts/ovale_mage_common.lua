@@ -9,6 +9,23 @@ do
 
 Include(ovale_mage_spells)
 
+###
+### Common functions for all specializations.
+###
+
+AddFunction Interrupt
+{
+	if target.IsFriend(no) and target.IsInterruptible() 
+	{
+		Spell(counterspell)
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
+
 AddFunction ConjureManaGem
 {
 	if Glyph(glyph_of_mana_gem) and ItemCharges(brilliant_mana_gem) <10 Spell(conjure_brilliant_mana_gem)

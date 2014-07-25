@@ -15,7 +15,15 @@ Include(ovale_priest_spells)
 
 AddFunction Interrupt
 {
-	if target.IsFriend(no) and target.IsInterruptible() Spell(silence)
+	if target.IsFriend(no) and target.IsInterruptible()
+	{
+		Spell(silence)
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
 }
 ]]
 
