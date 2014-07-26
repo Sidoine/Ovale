@@ -515,7 +515,7 @@ do
 							local aura = state:GetAura("player", buffPercentReduction)
 							if state:IsActiveAura(aura) then
 								-- Check if this aura has a stacking effect.
-								local siAura = OvaleDat.spellInfo[buffPercentReduction]
+								local siAura = OvaleData.spellInfo[buffPercentReduction]
 								if siAura and siAura.stacking then
 									reduction = reduction * aura.stacks
 									-- Clamp to a maximum of 100% reduction.
