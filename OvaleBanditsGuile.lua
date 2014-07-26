@@ -38,7 +38,6 @@ Ovale.OvaleBanditsGuile = OvaleBanditsGuile
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
-local OvaleSpellBook = nil
 
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
@@ -76,7 +75,6 @@ OvaleBanditsGuile.stacks = 0
 function OvaleBanditsGuile:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
-	OvaleSpellBook = Ovale.OvaleSpellBook
 end
 
 function OvaleBanditsGuile:OnEnable()
@@ -93,8 +91,7 @@ function OvaleBanditsGuile:OnDisable()
 end
 
 function OvaleBanditsGuile:Ovale_SpecializationChanged(event, specialization, previousSpecialization)
-	-- This misses the corner case of if you're leveling and just acquire the spell.
-	if specialization == "combat" and OvaleSpellBook:IsKnownSpell(BANDITS_GUILE) then
+	if specialization == "combat" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterMessage("Ovale_AuraAdded")
 		self:RegisterMessage("Ovale_AuraChanged")
