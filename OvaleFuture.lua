@@ -277,6 +277,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	OvaleScore:ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
 	profiler.Stop("OvaleFuture_AddSpellToQueue")
+	return spellcast
 end
 
 local function RemoveSpellFromQueue(spellId, lineId)
@@ -490,6 +491,8 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				end
 				spellcast.snapshot = OvalePaperDoll:GetSnapshot()
 				spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
+				local now = API_GetTime()
+				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
 				profiler.Stop("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 				return
 			end
@@ -504,7 +507,8 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 		]]--
 		if not API_UnitChannelInfo("player") then
 			local now = API_GetTime()
-			AddSpellToQueue(spellId, lineId, now, now, false, true)
+			local spellcast = AddSpellToQueue(spellId, lineId, now, now, false, true)
+			self:SendMessage("Ovale_SpellCast", now, spellId, spellcast.target)
 		end
 		profiler.Stop("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 	end
@@ -555,6 +559,18 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 	-- Called when a missile reaches or misses its target
 	if sourceGUID == self_guid then
 		local success = CLEU_SUCCESSFUL_SPELLCAST_EVENT[cleuEvent]
+		--[[
+			If this is a "SPELL_DAMAGE" event, then only count it as a success if it was the "main" attack,
+			and not an off-hand or multistrike attack.  Also change success type to "critical" if true.
+		--]]
+		if cleuEvent == "SPELL_DAMAGE" then
+			local critical, isOffHand, multistrike = arg21, arg24, arg25
+			if isOffHand or multistrike then
+				success = nil
+			elseif critical then
+				success = "critical"
+			end
+		end
 		if success then
 			profiler.Start("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
 			local spellId, spellName = arg12, arg13
@@ -562,11 +578,13 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 			for index, spellcast in ipairs(self_activeSpellcast) do
 				if spellcast.allowRemove and not spellcast.channeled and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
 					spellcast.success = success
-					if spellcast.removeOnSuccess or (spellcast.removeOnAuraSuccess and CLEU_AURA_EVENT[cleuEvent]) then
-						TracePrintf(spellId, "    Spell finished: %s (%d)", spellName, spellId)
+					if spellcast.removeOnSuccess or (spellcast.removeOnAuraSuccess and CLEU_AURA_EVENT[cleuEvent]) or success == "miss" then
+						TracePrintf(spellId, "    Spell finished (%s): %s (%d)", success, spellName, spellId)
 						tremove(self_activeSpellcast, index)
 						UpdateLastSpellcast(spellcast)
-						self_lastCast[spellcast.spellId] = API_GetTime()
+						local now = API_GetTime()
+						self_lastCast[spellcast.spellId] = now
+						self:SendMessage("Ovale_SpellFinished", now, spellcast.spellId, spellcast.target, success)
 						local unitId = spellcast.target and OvaleGUID:GetUnitId(spellcast.target) or "player"
 						Ovale.refreshNeeded[unitId] = true
 						Ovale.refreshNeeded["player"] = true
@@ -843,7 +861,7 @@ statePrototype.ApplySpell = function(state, ...)
 		if not spellcast or not spellcast.success then
 			OvaleState:InvokeMethod("ApplySpellOnHit", state, ...)
 		end
-		if not spellcast or not spellcast.success or spellcast.success == "hit" then
+		if not spellcast or not spellcast.success or spellcast.success == "hit" or spellcast.success == "critical" then
 			OvaleState:InvokeMethod("ApplySpellAfterHit", state, ...)
 		end
 	end
