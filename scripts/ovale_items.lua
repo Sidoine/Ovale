@@ -53,6 +53,9 @@ SpellList(trinket_stacking_proc_crit_buff 146285)
 SpellList(trinket_stat_crit_buff 138963)
 SpellList(trinket_stacking_stat_crit_buff 146285)
 
+# Amplification trinket passive buff.
+Define(amplified_buff 146051)
+
 # Cooldown reduction trinket passive buffs.
 Define(cooldown_reduction_agility_buff 146019)
 Define(cooldown_reduction_strength_buff 145955)
