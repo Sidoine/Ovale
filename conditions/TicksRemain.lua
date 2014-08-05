@@ -20,7 +20,7 @@ do
 	local state = OvaleState.state
 
 	--- Get the remaining number of ticks of a periodic aura on a target.
-	-- @name TicksRemain
+	-- @name TicksRemaining
 	-- @paramsig number or boolean
 	-- @param id The spell ID of the aura or the name of a spell list.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -35,10 +35,10 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see NextTick, Ticks, TickTime
 	-- @usage
-	-- if target.TicksRemain(shadow_word_pain) <2
+	-- if target.TicksRemaining(shadow_word_pain) <2
 	--     Spell(shadow_word_pain)
 
-	local function TicksRemain(condition)
+	local function TicksRemaining(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -51,5 +51,6 @@ do
 		return Compare(0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("ticksremain", false, TicksRemain)
+	OvaleCondition:RegisterCondition("ticksremaining", false, TicksRemaining)
+	OvaleCondition:RegisterCondition("ticksremain", false, TicksRemaining)
 end
