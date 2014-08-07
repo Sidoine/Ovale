@@ -1617,6 +1617,25 @@ do
 end
 
 do
+	--- Get the value of the named state variable from the simulator.
+	-- @name GetState
+	-- @paramsig number or boolean
+	-- @param name The name of the state variable.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The value of the state variable.
+	-- @return A boolean value for the result of the comparison.
+
+	local function GetState(condition)
+		local name, comparator, limit = condition[1], condition[2], condition[3]
+		local value = state:GetState(name)
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("getstate", false, GetState)
+end
+
+do
 	--- Test if the given glyph is active.
 	-- @name Glyph
 	-- @paramsig boolean

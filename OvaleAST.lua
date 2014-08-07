@@ -141,14 +141,19 @@ end
 -- Table of pattern/tokenizer pairs for the Ovale script language.
 local MATCHES = nil
 
--- Functions that are actions.
-local ACTION = {
-	["item"] = true,
-	["macro"] = true,
-	["spell"] = true,
-	["texture"] = true,
+-- Functions that are actions; ACTION_PARAMETER_COUNT[action] = number of required parameters
+local ACTION_PARAMETER_COUNT = {
+	["item"] = 1,
+	["macro"] = 1,
+	["spell"] = 1,
+	["texture"] = 1,
+	["setstate"] = 2,
 }
 
+-- Actions that are special "state" actions and return no other relevant action information.
+local STATE_ACTION = {
+	["setstate"] = true,
+}
 -- Functions for accessing string databases.
 local STRING_LOOKUP_FUNCTION = {
 	["ItemName"] = true,
@@ -694,6 +699,7 @@ do
 		["script"] = UnparseScript,
 		["spell_aura_list"] = UnparseSpellAuraList,
 		["spell_info"] = UnparseSpellInfo,
+		["state"] = UnparseFunction,
 		["string"] = UnparseString,
 		["unless"] = UnparseUnless,
 		["value"] = UnparseNumber,
@@ -1216,10 +1222,13 @@ ParseFunction = function(tokenStream, nodeList, annotation)
 	if ok then
 		ok, parameters = ParseParameters(tokenStream, nodeList, annotation)
 	end
-	-- Verify that an action has at least one fixed parameter.
-	if ok and ACTION[lowername] and not parameters[1] then
-		SyntaxError(tokenStream, "Syntax error: action '%s' requires at least one fixed parameter.", name)
-		ok = false
+	-- Verify that an action has the required number of fixed parameters.
+	if ok and ACTION_PARAMETER_COUNT[lowername] then
+		local count = ACTION_PARAMETER_COUNT[lowername]
+		if count > #parameters then
+			SyntaxError(tokenStream, "Syntax error: action '%s' requires at least %d fixed parameter(s).", name, count)
+			ok = false
+		end
 	end
 	-- Consume the right parenthesis.
 	if ok then
@@ -1262,7 +1271,11 @@ ParseFunction = function(tokenStream, nodeList, annotation)
 		node = OvaleAST:NewNode(nodeList)
 		node.name = name
 		node.lowername = lowername
-		if ACTION[lowername] then
+		if STATE_ACTION[lowername] then
+			node.type = "state"
+			-- Built-in functions are case-insensitive.
+			node.func = lowername
+		elseif ACTION_PARAMETER_COUNT[lowername] then
 			node.type = "action"
 			-- Built-in functions are case-insensitive.
 			node.func = lowername
@@ -2448,7 +2461,7 @@ function OvaleAST:VerifyFunctionCalls(ast)
 		local functionCall = ast.annotation.functionCall
 		if functionCall then
 			for name in pairs(functionCall) do
-				if ACTION[name] then
+				if ACTION_PARAMETER_COUNT[name] then
 					-- Function call is an action.
 				elseif STRING_LOOKUP_FUNCTION[name] then
 					-- Function call is a string-lookup function.

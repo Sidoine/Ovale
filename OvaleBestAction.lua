@@ -116,6 +116,7 @@ local COMPUTE_VISITOR = {
 	["if"] = "ComputeIf",
 	["logical"] = "ComputeLogical",
 	["lua"] = "ComputeLua",
+	["state"] = "ComputeState",
 	["unless"] = "ComputeIf",
 	["value"] = "ComputeValue",
 	["wait"] = "ComputeWait",
@@ -929,6 +930,12 @@ function OvaleBestAction:ComputeGroup(element, state)
 			id = bestElement.params[1]
 		end
 		Ovale:Logf("[%d]    group best action %s remains %s", element.nodeId, id, tostring(timeSpan))
+		-- Set state if it is the best action.
+		if bestElement.type == "state" and bestElement.func == "setstate" then
+			local value = bestElement.params[2]
+			Ovale:Logf("[%d]    setting state %s to %d", id, value)
+			state:PutState(id, value)
+		end
 	else
 		Ovale:Logf("[%d]    group no best action returns %s", element.nodeId, tostring(timeSpan))
 	end
@@ -1021,6 +1028,21 @@ function OvaleBestAction:ComputeLua(element, state)
 	end
 	profiler.Stop("OvaleBestAction_ComputeLua")
 	return timeSpan, priority, result
+end
+
+function OvaleBestAction:ComputeState(element, state)
+	profiler.Start("OvaleBestAction_ComputeState")
+	local timeSpan = GetTimeSpan(element)
+
+	if element.func == "setstate" then
+		local variable = element.params[1]
+		local value = element.params[2]
+		Ovale:Logf("[%d]    %s: %s = %s", element.nodeId, element.name, variable, value)
+		timespan[1], timespan[2] = 0, math.huge
+	end
+
+	profiler.Stop("OvaleBestAction_ComputeState")
+	return timeSpan, OVALE_DEFAULT_PRIORITY, element
 end
 
 function OvaleBestAction:ComputeValue(element, state)

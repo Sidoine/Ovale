@@ -190,7 +190,15 @@ do
 			if refresh then
 				Ovale:Logf("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
+
+				-- Get the best "proper" action that is nil, a value or an action.
+				-- Otherwise, loop until we get a proper action.
 				local timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
+				while element and element.type ~= "action" and element.type ~= "value" do
+					Ovale:Logf("[%d] '%s' is not a proper action -- re-computing.", element.nodeId, element.type)
+					timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
+				end
+
 				local start = NextTime(timeSpan, state.currentTime)
 				if start then
 					Ovale:Logf("Compute start = %f", start)
