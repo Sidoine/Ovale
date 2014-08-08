@@ -31,7 +31,7 @@ do
 		"OvaleScripts.lua",
 		"OvaleState.lua",
 		-- Additional modules.
-		"conditions/files.xml",
+		"conditions.lua",
 		"scripts/files.xml",
 	}
 	for _, file in ipairs(addonFiles) do

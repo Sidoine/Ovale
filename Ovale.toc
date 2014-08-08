@@ -71,5 +71,6 @@ OvaleSkada.lua
 OvaleSpellDamage.lua
 OvaleSteadyFocus.lua
 OvaleSwing.lua
-conditions\files.xml
+
+conditions.lua
 scripts\files.xml
