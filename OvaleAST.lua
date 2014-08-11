@@ -450,9 +450,9 @@ end
 UnparseAddFunction = function(node)
 	local s
 	if node.rawParams and next(node.rawParams) then
-		s = format("AddFunction %s %s %s", node.name, UnparseParameters(node.rawParams), Unparse(node.child[1]))
+		s = format("AddFunction %s %s%s", node.name, UnparseParameters(node.rawParams), UnparseGroup(node.child[1]))
 	else
-		s = format("AddFunction %s %s", node.name, Unparse(node.child[1]))
+		s = format("AddFunction %s%s", node.name, UnparseGroup(node.child[1]))
 	end
 	return s
 end
@@ -460,9 +460,9 @@ end
 UnparseAddIcon = function(node)
 	local s
 	if node.rawParams and next(node.rawParams) then
-		s = format("AddIcon %s %s", UnparseParameters(node.rawParams), Unparse(node.child[1]))
+		s = format("AddIcon %s%s", UnparseParameters(node.rawParams), UnparseGroup(node.child[1]))
 	else
-		s = format("AddIcon %s", Unparse(node.child[1]))
+		s = format("AddIcon%s", UnparseGroup(node.child[1]))
 	end
 	return s
 end
@@ -564,7 +564,11 @@ UnparseGroup = function(node)
 end
 
 UnparseIf = function(node)
-	return format("if %s %s", Unparse(node.child[1]), Unparse(node.child[2]))
+	if node.child[2].type == "group" then
+		return format("if %s%s", Unparse(node.child[1]), UnparseGroup(node.child[2]))
+	else
+		return format("if %s %s", Unparse(node.child[1]), Unparse(node.child[2]))
+	end
 end
 
 UnparseItemInfo = function(node)
@@ -648,7 +652,11 @@ UnparseString = function(node)
 end
 
 UnparseUnless = function(node)
-	return format("unless %s %s", Unparse(node.child[1]), Unparse(node.child[2]))
+	if node.child[2].type == "group" then
+		return format("unless %s%s", Unparse(node.child[1]), UnparseGroup(node.child[2]))
+	else
+		return format("unless %s %s", Unparse(node.child[1]), Unparse(node.child[2]))
+	end
 end
 
 UnparseVariable = function(node)
@@ -656,7 +664,11 @@ UnparseVariable = function(node)
 end
 
 UnparseWait = function(node)
-	return format("wait %s", Unparse(node.child[1]))
+	if node.child[1].type == "group" then
+		return format("wait%s", UnparseGroup(node.child[1]))
+	else
+		return format("wait %s", Unparse(node.child[1]))
+	end
 end
 
 do
