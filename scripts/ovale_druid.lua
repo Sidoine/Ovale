@@ -818,11 +818,11 @@ AddFunction GuardianCdActions
 	if Rage() < 11 Spell(enrage)
 	if HealthPercent() < 25
 	{
-		if BuffExpires(son_of_ursoc) Spell(berserk_bear)
+		if BuffExpires(son_of_ursoc_buff) Spell(berserk_bear)
 		if TalentPoints(incarnation_talent) and BuffExpires(berserk_bear_buff) Spell(incarnation)
 	}
 	if BuffExpires(burst_haste any=1) Spell(berserking)
-	if BuffExpires(son_of_ursoc) Spell(berserk_bear)
+	if BuffExpires(son_of_ursoc_buff) Spell(berserk_bear)
 	if TalentPoints(incarnation_talent) and BuffExpires(berserk_bear) Spell(incarnation)
 }
 
