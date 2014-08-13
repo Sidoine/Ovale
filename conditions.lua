@@ -2197,7 +2197,7 @@ do
 
 	local function IsFeared(condition)
 		local yesno = condition[1]
-		local aura = state:GetAura("player", "fear", "HARMFUL")
+		local aura = state:GetAura("player", "fear_debuff", "HARMFUL")
 		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
 		return TestBoolean(boolean, yesno)
 	end
@@ -2242,7 +2242,7 @@ do
 
 	local function IsIncapacitated(condition)
 		local yesno = condition[1]
-		local aura = state:GetAura("player", "incapacitate", "HARMFUL")
+		local aura = state:GetAura("player", "incapacitate_debuff", "HARMFUL")
 		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
 		return TestBoolean(boolean, yesno)
 	end
@@ -2315,7 +2315,7 @@ do
 
 	local function IsRooted(condition)
 		local yesno = condition[1]
-		local aura = state:GetAura("player", "root", "HARMFUL")
+		local aura = state:GetAura("player", "root_debuff", "HARMFUL")
 		local boolean = state:IsActiveAura(aura)
 		return TestBoolean(boolean, yesno)
 	end
@@ -2336,7 +2336,7 @@ do
 
 	local function IsStunned(condition)
 		local yesno = condition[1]
-		local aura = state:GetAura("player", "stun", "HARMFUL")
+		local aura = state:GetAura("player", "stun_debuff", "HARMFUL")
 		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
 		return TestBoolean(boolean, yesno)
 	end
@@ -4470,8 +4470,6 @@ end
 do
 	--- Test if the player is currently stealthed.
 	-- The player is stealthed if rogue Stealth, druid Prowl, or a similar ability is active.
-	-- Note that the rogue Vanish buff causes this condition to return false,
-	-- but as soon as the buff disappears and the rogue is stealthed, this condition will return true.
 	-- @name Stealthed
 	-- @paramsig boolean
 	-- @param yesno Optional. If yes, then return true if stealthed. If no, then return true if it not stealthed.
@@ -4479,12 +4477,12 @@ do
 	--     Valid values: yes, no.
 	-- @return A boolean value.
 	-- @usage
-	-- if Stealthed() or BuffPresent(vanish_buff) or BuffPresent(shadow_dance)
+	-- if Stealthed() or BuffPresent(shadow_dance)
 	--     Spell(ambush)
 
 	local function Stealthed(condition)
 		local yesno = condition[1]
-		local boolean = API_IsStealthed()
+		local boolean = state:GetAura("player", "stealthed_buff") or API_IsStealthed()
 		return TestBoolean(boolean, yesno)
 	end
 
