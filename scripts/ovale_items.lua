@@ -74,6 +74,8 @@ Define(lucidity_priest_buff 137323)
 	SpellInfo(lucidity_priest_buff duration=4)
 Define(lucidity_shaman_buff 137326)
 	SpellInfo(lucidity_shaman_buff duration=4)
+Define(tempus_repit_buff 137590)
+	SpellInfo(tempus_repit_buff duration=10)
 ]]
 
 	OvaleScripts:RegisterScript(nil, name, desc, code, "include")
