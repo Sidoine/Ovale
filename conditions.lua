@@ -523,7 +523,7 @@ end
 
 do
 	--- Get the remaining time in seconds on an aura.
-	-- @name BuffRemains
+	-- @name BuffRemaining
 	-- @paramsig number or boolean
 	-- @param id The spell ID of the aura or the name of a spell list.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -536,12 +536,12 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds remaining on the aura.
 	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffRemains
+	-- @see DebuffRemaining
 	-- @usage
-	-- if BuffRemains(slice_and_dice) <2
+	-- if BuffRemaining(slice_and_dice) <2
 	--     Spell(slice_and_dice)
 
-	local function BuffRemains(condition)
+	local function BuffRemaining(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -552,13 +552,15 @@ do
 		return Compare(0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("buffremains", false, BuffRemains)
-	OvaleCondition:RegisterCondition("debuffremains", false, BuffRemains)
+	OvaleCondition:RegisterCondition("buffremaining", false, BuffRemaining)
+	OvaleCondition:RegisterCondition("debuffremaining", false, BuffRemaining)
+	OvaleCondition:RegisterCondition("buffremains", false, BuffRemaining)
+	OvaleCondition:RegisterCondition("debuffremains", false, BuffRemaining)
 end
 
 do
 	--- Get the remaining time in seconds before the aura expires across all targets.
-	-- @name BuffRemainsOnAny
+	-- @name BuffRemainingOnAny
 	-- @paramsig number or boolean
 	-- @param id The spell ID of the aura or the name of a spell list.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -574,9 +576,9 @@ do
 	--     Valid values: 0, 1.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffRemainsOnAny
+	-- @see DebuffRemainingOnAny
 
-	local function BuffRemainsOnAny(condition)
+	local function BuffRemainingOnAny(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition)
 		local excludeUnitId = (condition.excludeTarget == 1) and OvaleCondition.defaultTarget or nil
@@ -589,8 +591,10 @@ do
 		return Compare(0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("buffremainsonany", false, BuffRemainsOnAny)
-	OvaleCondition:RegisterCondition("debuffremainsonany", false, BuffRemainsOnAny)
+	OvaleCondition:RegisterCondition("buffremainingonany", false, BuffRemainingOnAny)
+	OvaleCondition:RegisterCondition("debuffremainingonany", false, BuffRemainingOnAny)
+	OvaleCondition:RegisterCondition("buffremainsonany", false, BuffRemainingOnAny)
+	OvaleCondition:RegisterCondition("debuffremainsonany", false, BuffRemainingOnAny)
 end
 
 do
@@ -932,7 +936,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see ExecuteTime
 	-- @usage
-	-- if target.DebuffRemains(flame_shock) < CastTime(lava_burst)
+	-- if target.DebuffRemaining(flame_shock) < CastTime(lava_burst)
 	--     Spell(lava_burst)
 
 	local function CastTime(condition)
@@ -951,7 +955,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see CastTime
 	-- @usage
-	-- if target.DebuffRemains(flame_shock) < ExecuteTime(lava_burst)
+	-- if target.DebuffRemaining(flame_shock) < ExecuteTime(lava_burst)
 	--     Spell(lava_burst)
 
 	local function ExecuteTime(condition)
@@ -2072,7 +2076,7 @@ do
 	--     Valid values: yes, no.
 	-- @return A boolean value.
 	-- @usage
-	-- if target.DebuffRemains(haunt) <3 and not InFlightToTarget(haunt)
+	-- if target.DebuffRemaining(haunt) <3 and not InFlightToTarget(haunt)
 	--     Spell(haunt)
 
 	local function InFlightToTarget(condition)
@@ -2819,7 +2823,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
-	-- @see Ticks, TicksRemain, TickTime
+	-- @see Ticks, TicksRemaining, TickTime
 
 	local function NextTick(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
@@ -3864,16 +3868,16 @@ do
 
 	--- Get the remaining time in seconds before the latest Rune of Power expires.
 	--- Returns non-zero only if the player is standing within an existing Rune of Power.
-	-- @name RuneOfPowerRemains
+	-- @name RuneOfPowerRemaining
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
-	-- if RuneOfPowerRemains() < CastTime(rune_of_power) Spell(rune_of_power)
+	-- if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 
-	local function RuneOfPowerRemains(condition)
+	local function RuneOfPowerRemaining(condition)
 		local comparator, limit = condition[1], condition[2]
 		local aura = state:GetAura("player", RUNE_OF_POWER_BUFF, "HELPFUL")
 		if state:IsActiveAura(aura) then
@@ -3892,7 +3896,8 @@ do
 		return Compare(0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("runeofpowerremains", false, RuneOfPowerRemains)
+	OvaleCondition:RegisterCondition("runeofpowerremaining", false, RuneOfPowerRemaining)
+	OvaleCondition:RegisterCondition("runeofpowerremains", false, RuneOfPowerRemaining)
 end
 
 do
@@ -4332,7 +4337,7 @@ do
 	-- @return The number data associated with the given key.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
-	-- if BuffRemains(slice_and_dice) >= SpellData(shadow_blades duration)
+	-- if BuffRemaining(slice_and_dice) >= SpellData(shadow_blades duration)
 	--     Spell(shadow_blades)
 
 	local function SpellData(condition)
@@ -4406,7 +4411,7 @@ do
 	local HEAVY_STAGGER = 124273
 
 	--- Get the remaining amount of damage Stagger will cause to the target.
-	-- @name StaggerRemains
+	-- @name StaggerRemaining
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
@@ -4416,9 +4421,9 @@ do
 	-- @return The amount of damage.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
-	-- if StaggerRemains() / MaxHealth() >0.4 Spell(purifying_brew)
+	-- if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
 
-	local function StaggerRemains(condition)
+	local function StaggerRemaining(condition)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition)
 		local aura = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
@@ -4437,7 +4442,8 @@ do
 		return Compare(0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("staggerremains", false, StaggerRemains)
+	OvaleCondition:RegisterCondition("staggerremaining", false, StaggerRemaining)
+	OvaleCondition:RegisterCondition("staggerremains", false, StaggerRemaining)
 end
 
 do
@@ -4630,7 +4636,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
-	-- @see NextTick, Ticks, TicksRemain
+	-- @see NextTick, Ticks, TicksRemaining
 
 	local function TickTime(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
@@ -4661,7 +4667,7 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The number of ticks.
 	-- @return A boolean value for the result of the comparison.
-	-- @see NextTick, TicksRemain, TickTime
+	-- @see NextTick, TicksRemaining, TickTime
 
 	local function Ticks(condition)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
@@ -4898,7 +4904,7 @@ do
 	-- @return The time in seconds scaled by haste.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
-	-- if target.DebuffRemains(flame_shock) < TimeWithHaste(3)
+	-- if target.DebuffRemaining(flame_shock) < TimeWithHaste(3)
 	--     Spell(flame_shock)
 
 	local function TimeWithHaste(condition)
@@ -4935,7 +4941,7 @@ do
 	-- @param totem Optional. Sets the specific totem to check of given totem ID type.
 	--     Valid values: any totem spell ID
 	-- @return A boolean value.
-	-- @see TotemPresent, TotemRemains
+	-- @see TotemPresent, TotemRemaining
 	-- @usage
 	-- if TotemExpires(fire) Spell(searing_totem)
 	-- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
@@ -4961,7 +4967,7 @@ do
 	-- @param totem Optional. Sets the specific totem to check of given totem ID type.
 	--     Valid values: any totem spell ID
 	-- @return A boolean value.
-	-- @see TotemExpires, TotemRemains
+	-- @see TotemExpires, TotemRemaining
 	-- @usage
 	-- if not TotemPresent(fire) Spell(searing_totem)
 	-- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
@@ -4982,7 +4988,7 @@ do
 	OvaleCondition:RegisterCondition("totempresent", false, TotemPresent)
 
 	--- Get the remaining time in seconds before a totem expires.
-	-- @name TotemRemains
+	-- @name TotemRemaining
 	-- @paramsig number or boolean
 	-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
 	--     Valid types: fire, water, air, earth, ghoul, statue.
@@ -4994,9 +5000,9 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see TotemExpires, TotemPresent
 	-- @usage
-	-- if TotemRemains(water totem=healing_stream_totem) <2 Spell(totemic_recall)
+	-- if TotemRemaining(water totem=healing_stream_totem) <2 Spell(totemic_recall)
 
-	local function TotemRemains(condition)
+	local function TotemRemaining(condition)
 		local totemId = condition[1]
 		if type(totemId) ~= "number" then
 			totemId = OVALE_TOTEMTYPE[totemId]
@@ -5009,7 +5015,8 @@ do
 		return Compare(0, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("totemremains", false, TotemRemains)
+	OvaleCondition:RegisterCondition("totemremaining", false, TotemRemaining)
+	OvaleCondition:RegisterCondition("totemremains", false, TotemRemaining)
 end
 
 do
