@@ -465,14 +465,24 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				end
 			end
 
-			-- Set the tick information for known DoTs.
 			local si = OvaleData.spellInfo[auraId]
-			if si and si.tick then
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is a periodic aura.", name, auraId)
-				-- Only set the initial tick information for new auras.
-				if not auraIsActive then
-					aura.ticksSeen = 0
-					aura.tick = GetTickLength(auraId, aura.snapshot)
+			if si then
+				-- Set the tick information for known DoTs.
+				if si.tick then
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is a periodic aura.", name, auraId)
+					-- Only set the initial tick information for new auras.
+					if not auraIsActive then
+						aura.ticksSeen = 0
+						aura.tick = GetTickLength(auraId, aura.snapshot)
+					end
+				end
+				-- Set the cooldown expiration time for player buffs applied by items with a cooldown.
+				if guid == self_guid and si.buff_cd then
+					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is applied by an item with a cooldown of %ds.", name, auraId, si.buff_cd)
+					if not auraIsActive then
+						-- cooldownEnding is the earliest time at which we expect to gain this buff again.
+						aura.cooldownEnding = aura.gain + si.buff_cd
+					end
 				end
 			end
 		end

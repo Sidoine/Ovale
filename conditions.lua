@@ -298,6 +298,36 @@ do
 end
 
 do
+	--- Get the number of seconds before a buff can be gained again.
+	-- @name BuffCooldown
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @see DebuffCooldown
+	-- @usage
+	-- if BuffCooldown(trinket_stat_agility_buff) > 45
+	--     Spell(tigers_fury)
+
+	local function BuffCooldown(condition)
+		local auraId, comparator, limit = condition[1], condition[2], condition[3]
+		local target, filter, mine = ParseCondition(condition)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local gain, cooldownEnding = aura.gain, aura.cooldownEnding
+			cooldownEnding = aura.cooldownEnding or 0
+			return TestValue(gain, math.huge, 0, cooldownEnding, -1, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("buffcooldown", false, BuffCooldown)
+	OvaleCondition:RegisterCondition("debuffcooldown", false, BuffCooldown)
+end
+
+do
 	--- Get the total count of the given aura across all targets.
 	-- @name BuffCountOnAny
 	-- @paramsig number or boolean
