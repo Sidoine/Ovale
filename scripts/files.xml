@@ -2,37 +2,26 @@
 	<Script file="ovale_common.lua" />
 
 	<Script file="ovale_deathknight.lua" />
-	<Script file="ovale_deathknight_common.lua" />
 	<Script file="ovale_deathknight_spells.lua" />
 	<Script file="ovale_druid.lua" />
-	<Script file="ovale_druid_common.lua" />
 	<Script file="ovale_druid_spells.lua" />
 	<Script file="ovale_hunter.lua" />
-	<Script file="ovale_hunter_common.lua" />
 	<Script file="ovale_hunter_spells.lua" />
 	<Script file="ovale_mage.lua" />
-	<Script file="ovale_mage_common.lua" />
 	<Script file="ovale_mage_spells.lua" />
 	<Script file="ovale_monk.lua" />
-	<Script file="ovale_monk_common.lua" />
 	<Script file="ovale_monk_spells.lua" />
 	<Script file="ovale_paladin.lua" />
-	<Script file="ovale_paladin_common.lua" />
 	<Script file="ovale_paladin_spells.lua" />
 	<Script file="ovale_priest.lua" />
-	<Script file="ovale_priest_common.lua" />
 	<Script file="ovale_priest_spells.lua" />
 	<Script file="ovale_rogue.lua" />
-	<Script file="ovale_rogue_common.lua" />
 	<Script file="ovale_rogue_spells.lua" />
 	<Script file="ovale_shaman.lua" />
-	<Script file="ovale_shaman_common.lua" />
 	<Script file="ovale_shaman_spells.lua" />
 	<Script file="ovale_warlock.lua" />
-	<Script file="ovale_warlock_common.lua" />
 	<Script file="ovale_warlock_spells.lua" />
 	<Script file="ovale_warrior.lua" />
-	<Script file="ovale_warrior_common.lua" />
 	<Script file="ovale_warrior_spells.lua" />
 
 	<Script file="leafkiller_druid.lua" />

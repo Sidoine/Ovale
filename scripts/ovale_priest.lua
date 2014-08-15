@@ -3,16 +3,39 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_priest"
-	local desc = "[5.4] Ovale: Shadow"
+	local desc = "[5.4.8] Ovale: Shadow"
 	local code = [[
 # Ovale shadow script based on SimulationCraft.
 
 Include(ovale_common)
-Include(ovale_priest_common)
+Include(ovale_priest_spells)
 
-AddCheckBox(opt_aoe L(AOE) default)
-AddCheckBox(opt_icons_left "Left icons")
-AddCheckBox(opt_icons_right "Right icons")
+AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+
+AddFunction UsePotionIntellect
+{
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction InterruptActions
+{
+	if target.IsFriend(no) and target.IsInterruptible()
+	{
+		Spell(silence)
+		if target.Classification(worldboss no)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
 
 ###
 ### Shadow
@@ -23,137 +46,14 @@ AddCheckBox(opt_icons_right "Right icons")
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Xb!002202
 #	glyphs=inner_sanctum/mind_flay/dark_archangel/shadowy_friends/shadow_ravens
 
-AddFunction ShadowDefaultActions
-{
-	#shadowform
-	if not Stance(priest_shadowform) Spell(shadowform)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1&active_enemies<=5
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death usable=1)
-	#devouring_plague,if=shadow_orb=3&(cooldown.mind_blast.remains<1.5|target.health.pct<20&cooldown.shadow_word_death.remains<1.5)
-	if ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } Spell(devouring_plague)
-	#mind_blast,if=active_enemies<=5&cooldown_react
-	Spell(mind_blast)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0&active_enemies<=5
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 Spell(shadow_word_death usable=1)
-	#mind_flay_insanity,if=target.dot.devouring_plague_tick.ticks_remain=1,chain=1
-	if TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and target.TicksRemain(devouring_plague_debuff) < 2 Spell(mind_flay)
-	#mind_flay_insanity,interrupt=1,chain=1,if=active_enemies<=5
-	if TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) Spell(mind_flay)
-	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
-	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
-	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time&miss_react
-	if target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(vampiric_touch)
-	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&ticks_remain<=1
-	if True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
-	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time+tick_time&miss_react
-	if target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(vampiric_touch)
-	#devouring_plague,if=shadow_orb=3&ticks_remain<=1
-	if ShadowOrbs() == 3 and target.TicksRemain(devouring_plague_debuff) <= 1 Spell(devouring_plague)
-	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=2
-	if BuffStacks(surge_of_darkness_buff) == 2 Spell(mind_spike)
-	#cascade_damage,if=talent.cascade.enabled
-	if TalentPoints(cascade_talent) Spell(cascade_damage)
-	#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
-	if target.HealthPercent() < 20 Spell(shadow_word_death wait=0.5)
-	#wait,sec=cooldown.mind_blast.remains,if=cooldown.mind_blast.remains<0.5&active_enemies<=1
-	Spell(mind_blast wait=0.5)
-	#mind_spike,if=buff.surge_of_darkness.react&active_enemies<=5
-	if BuffPresent(surge_of_darkness_buff) Spell(mind_spike)
-	#mind_flay,chain=1,interrupt=1
-	Spell(mind_flay)
-}
-
-AddFunction ShadowDefaultMovingActions
-{
-	#shadowform
-	if not Stance(priest_shadowform) Spell(shadowform)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1&active_enemies<=5
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Enemies() <= 5 Spell(shadow_word_death usable=1)
-	#devouring_plague,if=shadow_orb=3&(cooldown.mind_blast.remains<1.5|target.health.pct<20&cooldown.shadow_word_death.remains<1.5)
-	if ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } Spell(devouring_plague)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0&active_enemies<=5
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Enemies() <= 5 Spell(shadow_word_death usable=1)
-	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
-	if True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
-	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&ticks_remain<=1
-	if True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 Spell(shadow_word_pain)
-	#devouring_plague,if=shadow_orb=3&ticks_remain<=1
-	if ShadowOrbs() == 3 and target.TicksRemain(devouring_plague_debuff) <= 1 Spell(devouring_plague)
-	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=2
-	if Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 2 Spell(mind_spike)
-	#cascade_damage,if=talent.cascade.enabled
-	if TalentPoints(cascade_talent) Spell(cascade_damage)
-	#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
-	if target.HealthPercent() < 20 Spell(shadow_word_death wait=0.5 usable=1)
-	#mind_spike,if=buff.surge_of_darkness.react&active_enemies<=5
-	if BuffPresent(surge_of_darkness_buff) and Enemies() <= 5 Spell(mind_spike)
-	#shadow_word_death,moving=1
-	Spell(shadow_word_death usable=1)
-	#mind_blast,moving=1,if=buff.divine_insight_shadow.react&cooldown_react
-	if BuffPresent(divine_insight_shadow_buff) and Spell(mind_blast) Spell(mind_blast)
-	#shadow_word_pain,moving=1
-	Spell(shadow_word_pain)
-}
-
-AddFunction ShadowDefaultShortCdActions
-{
-	unless { BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Spell(shadow_word_death usable=1) }
-		or { ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } }
-		or Spell(mind_blast)
-		or { BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Spell(shadow_word_death usable=1) }
-		or { TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and target.TicksRemain(devouring_plague_debuff) < 2 }
-		or { TalentPoints(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) }
-		or { True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) }
-		or { target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) }
-		or { True(miss_react) and target.TicksRemain(shadow_word_pain_debuff) <= 1 }
-		or target.DebuffRemains(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) Spell(vampiric_touch)
-		or { ShadowOrbs() == 3 and target.TicksRemain(devouring_plague_debuff) <= 1 }
-		or { BuffStacks(surge_of_darkness_buff) == 2 }
-	{
-		#halo,if=talent.halo.enabled
-		if TalentPoints(halo_talent) Spell(halo)
-		#divine_star,if=talent.divine_star.enabled
-		if TalentPoints(divine_star_talent) Spell(divine_star)
-
-		unless { target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 }
-			or { SpellCooldown(mind_blast) < 0.5 and Enemies() <= 1 }
-			or { BuffPresent(surge_of_darkness_buff) and Enemies() <= 5 }
-		{
-			#mind_sear,chain=1,interrupt=1,if=active_enemies>=3
-			if Enemies() >= 3 Spell(mind_sear)
-		}
-	}
-}
-
-AddFunction ShadowDefaultCdActions
-{
-	unless not Stance(priest_shadowform)
-	{
-		#use_item,slot=hands
-		UseItemActions()
-		#jade_serpent_potion,if=buff.bloodlust.react|target.time_to_die<=40
-		if BuffPresent(burst_haste any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
-		#mindbender,if=talent.mindbender.enabled
-		if TalentPoints(mindbender_talent) Spell(mindbender)
-		#shadowfiend,if=!talent.mindbender.enabled
-		if not TalentPoints(mindbender_talent) Spell(shadowfiend)
-		#power_infusion,if=talent.power_infusion.enabled
-		if TalentPoints(power_infusion_talent) Spell(power_infusion)
-		#blood_fury
-		Spell(blood_fury_sp)
-		#berserking
-		Spell(berserking)
-		#arcane_torrent
-		Spell(arcane_torrent_mana)
-	}
-}
+# ActionList: ShadowPrecombatActions --> main, moving, shortcd, cd
 
 AddFunction ShadowPrecombatActions
 {
 	#flask,type=warm_sun
 	#food,type=mogu_fish_stew
 	#power_word_fortitude,if=!aura.stamina.up
-	if not BuffPresent(stamina any=1) Spell(power_word_fortitude)
+	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
 	#inner_fire
 	if BuffExpires(inner_fire_buff) Spell(inner_fire)
 	#shadowform
@@ -161,59 +61,246 @@ AddFunction ShadowPrecombatActions
 	#snapshot_stats
 }
 
+AddFunction ShadowPrecombatMovingActions
+{
+	ShadowPrecombatActions()
+}
+
+AddFunction ShadowPrecombatShortCdActions {}
+
 AddFunction ShadowPrecombatCdActions
 {
-	#jade_serpent_potion
-	UsePotionIntellect()
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude)
+		or BuffExpires(inner_fire_buff) and Spell(inner_fire)
+		or not Stance(priest_shadowform) and Spell(shadowform)
+	{
+		#jade_serpent_potion
+		UsePotionIntellect()
+	}
+}
+
+# ActionList: ShadowDefaultActions --> main, moving, shortcd, cd
+
+AddFunction ShadowDefaultActions
+{
+	#shadowform
+	if not Stance(priest_shadowform) Spell(shadowform)
+	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1&active_enemies<=5
+	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } Spell(shadow_word_death)
+	#devouring_plague,if=shadow_orb=3&(cooldown.mind_blast.remains<1.5|target.health.pct<20&cooldown.shadow_word_death.remains<1.5)
+	if ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } Spell(devouring_plague)
+	#mind_blast,if=active_enemies<=5&cooldown_react
+	if Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
+	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0&active_enemies<=5
+	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } Spell(shadow_word_death)
+	#mind_flay_insanity,if=target.dot.devouring_plague_tick.ticks_remain=1,chain=1
+	if target.TicksRemaining(devouring_plague_debuff) < 2 and Talent(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) Spell(mind_flay)
+	#mind_flay_insanity,interrupt=1,chain=1,if=active_enemies<=5
+	if Enemies() <= 5 and Talent(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) Spell(mind_flay)
+	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time&miss_react
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) Spell(vampiric_touch)
+	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&ticks_remain<=1
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and target.TicksRemaining(shadow_word_pain_debuff) < 2 Spell(shadow_word_pain)
+	#vampiric_touch,cycle_targets=1,max_cycle_targets=5,if=remains<cast_time+tick_time&miss_react
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) Spell(vampiric_touch)
+	#devouring_plague,if=shadow_orb=3&ticks_remain<=1
+	if ShadowOrbs() == 3 and target.TicksRemaining(devouring_plague_debuff) < 2 Spell(devouring_plague)
+	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=2
+	if Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 2 Spell(mind_spike)
+	#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
+	unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
+	{
+		#wait,sec=cooldown.mind_blast.remains,if=cooldown.mind_blast.remains<0.5&active_enemies<=1
+		unless SpellCooldown(mind_blast) < 0.5 and Enemies() <= 1 and SpellCooldown(mind_blast) > 0
+		{
+			#mind_spike,if=buff.surge_of_darkness.react&active_enemies<=5
+			if BuffPresent(surge_of_darkness_buff) and Enemies() <= 5 Spell(mind_spike)
+			#mind_sear,chain=1,interrupt=1,if=active_enemies>=3
+			if Enemies() >= 3 Spell(mind_sear)
+			#mind_flay,chain=1,interrupt=1
+			Spell(mind_flay)
+			#shadow_word_death,moving=1
+			if Speed() > 0 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } Spell(shadow_word_death)
+			#mind_blast,moving=1,if=buff.divine_insight_shadow.react&cooldown_react
+			if Speed() > 0 and BuffPresent(divine_insight_shadow_buff) and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
+			#shadow_word_pain,moving=1
+			if Speed() > 0 Spell(shadow_word_pain)
+			#dispersion
+			Spell(dispersion)
+		}
+	}
+}
+
+AddFunction ShadowDefaultMovingActions
+{
+	#shadowform
+	if not Stance(priest_shadowform) Spell(shadowform)
+	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1&active_enemies<=5
+	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } Spell(shadow_word_death)
+	#devouring_plague,if=shadow_orb=3&(cooldown.mind_blast.remains<1.5|target.health.pct<20&cooldown.shadow_word_death.remains<1.5)
+	if ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } Spell(devouring_plague)
+	#mind_blast,if=active_enemies<=5&cooldown_react
+	if Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and BuffPresent(divine_insight_shadow_buff) Spell(mind_blast)
+	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0&active_enemies<=5
+	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } Spell(shadow_word_death)
+	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&ticks_remain<=1
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and target.TicksRemaining(shadow_word_pain_debuff) < 2 Spell(shadow_word_pain)
+	#devouring_plague,if=shadow_orb=3&ticks_remain<=1
+	if ShadowOrbs() == 3 and target.TicksRemaining(devouring_plague_debuff) < 2 Spell(devouring_plague)
+	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=2
+	if Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 2 Spell(mind_spike)
+	#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
+	unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
+	{
+		#wait,sec=cooldown.mind_blast.remains,if=cooldown.mind_blast.remains<0.5&active_enemies<=1
+		unless SpellCooldown(mind_blast) < 0.5 and Enemies() <= 1 and SpellCooldown(mind_blast) > 0
+		{
+			#mind_spike,if=buff.surge_of_darkness.react&active_enemies<=5
+			if BuffPresent(surge_of_darkness_buff) and Enemies() <= 5 Spell(mind_spike)
+			#shadow_word_death,moving=1
+			if Speed() > 0 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } Spell(shadow_word_death)
+			#mind_blast,moving=1,if=buff.divine_insight_shadow.react&cooldown_react
+			if Speed() > 0 and BuffPresent(divine_insight_shadow_buff) and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
+			#shadow_word_pain,moving=1
+			if Speed() > 0 Spell(shadow_word_pain)
+			#dispersion
+			Spell(dispersion)
+		}
+	}
+}
+
+AddFunction ShadowDefaultShortCdActions
+{
+	unless not Stance(priest_shadowform) and Spell(shadowform)
+		or BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } and Spell(shadow_word_death)
+		or ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } and Spell(devouring_plague)
+		or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+		or BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } and Spell(shadow_word_death)
+		or target.TicksRemaining(devouring_plague_debuff) < 2 and Talent(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and Spell(mind_flay)
+		or Enemies() <= 5 and Talent(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and Spell(mind_flay)
+		or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain)
+		or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Spell(vampiric_touch)
+		or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and target.TicksRemaining(shadow_word_pain_debuff) < 2 and Spell(shadow_word_pain)
+		or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) and Spell(vampiric_touch)
+		or ShadowOrbs() == 3 and target.TicksRemaining(devouring_plague_debuff) < 2 and Spell(devouring_plague)
+		or Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 2 and Spell(mind_spike)
+	{
+		#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
+		if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo)
+		#cascade_damage,if=talent.cascade.enabled&(active_enemies>1|(target.distance>=25&stat.mastery_rating<15000)|target.distance>=28)&target.distance<=40&target.distance>=11
+		if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 25 and MasteryRating() < 15000 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_damage)
+		#divine_star,if=talent.divine_star.enabled&(active_enemies>1|stat.mastery_rating<3500)&target.distance<=24
+		if Talent(divine_star_talent) and { Enemies() > 1 or MasteryRating() < 3500 } and target.Distance() <= 24 Spell(divine_star)
+		#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
+		unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
+		{
+			#wait,sec=cooldown.mind_blast.remains,if=cooldown.mind_blast.remains<0.5&active_enemies<=1
+			unless SpellCooldown(mind_blast) < 0.5 and Enemies() <= 1 and SpellCooldown(mind_blast) > 0
+			{
+				unless BuffPresent(surge_of_darkness_buff) and Enemies() <= 5 and Spell(mind_spike)
+					or Enemies() >= 3 and Spell(mind_sear)
+					or Spell(mind_flay)
+					or Speed() > 0 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } and Spell(shadow_word_death)
+					or Speed() > 0 and BuffPresent(divine_insight_shadow_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+				{
+					#divine_star,moving=1,if=talent.divine_star.enabled&target.distance<=28
+					if Speed() > 0 and Talent(divine_star_talent) and target.Distance() <= 28 Spell(divine_star)
+					#cascade_damage,moving=1,if=talent.cascade.enabled&target.distance<=40
+					if Speed() > 0 and Talent(cascade_talent) and target.Distance() <= 40 Spell(cascade_damage)
+				}
+			}
+		}
+	}
+}
+
+AddFunction ShadowDefaultCdActions
+{
+	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	InterruptActions()
+
+	unless not Stance(priest_shadowform) and Spell(shadowform)
+	{
+		#use_item,slot=hands
+		UseItemActions()
+		#jade_serpent_potion,if=buff.bloodlust.react|target.time_to_die<=40
+		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
+		#mindbender,if=talent.mindbender.enabled
+		if Talent(mindbender_talent) Spell(mindbender)
+		#shadowfiend,if=!talent.mindbender.enabled
+		if Talent(mindbender_talent no) Spell(shadowfiend)
+		#power_infusion,if=talent.power_infusion.enabled
+		if Talent(power_infusion_talent) Spell(power_infusion)
+		#blood_fury
+		Spell(blood_fury_sp)
+		#berserking
+		Spell(berserking)
+		#arcane_torrent
+		Spell(arcane_torrent_mana)
+
+		unless BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } and Spell(shadow_word_death)
+			or ShadowOrbs() == 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } and Spell(devouring_plague)
+			or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+			or BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 and Enemies() <= 5 and { Glyph(glyph_of_shadow_word_death) or target.HealthPercent() < 20 } and Spell(shadow_word_death)
+			or target.TicksRemaining(devouring_plague_debuff) < 2 and Talent(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and Spell(mind_flay)
+			or Enemies() <= 5 and Talent(solace_and_insanity_talent) and target.DebuffPresent(devouring_plague_debuff) and Spell(mind_flay)
+			or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain)
+			or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Spell(vampiric_touch)
+			or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and target.TicksRemaining(shadow_word_pain_debuff) < 2 and Spell(shadow_word_pain)
+			or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) + target.TickTime(vampiric_touch_debuff) and True(miss_react) and Spell(vampiric_touch)
+		{
+			if ShadowOrbs() == 3 and HealthPercent() <= 40 Spell(vampiric_embrace)
+		}
+	}
 }
 
 ### Shadow icons
 AddCheckBox(opt_priest_shadow "Show Shadow icons" specialization=shadow default)
+AddCheckBox(opt_priest_shadow_aoe L(AOE) specialization=shadow default)
 
-AddIcon specialization=shadow size=small checkbox=opt_icons_left checkbox=opt_priest_shadow
+AddIcon specialization=shadow help=shortcd enemies=1 checkbox=opt_priest_shadow checkbox=!opt_priest_shadow_aoe
 {
-	if TalentPoints(desperate_prayer_talent) Spell(desperate_prayer)
-	Spell(dispersion)
-}
-
-AddIcon specialization=shadow size=small checkbox=opt_icons_left checkbox=opt_priest_shadow
-{
-	Spell(vampiric_embrace)
-	Spell(hymn_of_hope)
-}
-
-AddIcon specialization=shadow help=shortcd checkbox=opt_priest_shadow
-{
+	if InCombat(no) ShadowPrecombatShortCdActions()
 	ShadowDefaultShortCdActions()
 }
 
-AddIcon specialization=shadow help=main checkbox=opt_priest_shadow
+AddIcon specialization=shadow help=shortcd checkbox=opt_priest_shadow checkbox=opt_priest_shadow_aoe
+{
+	if InCombat(no) ShadowPrecombatShortCdActions()
+	ShadowDefaultShortCdActions()
+}
+
+AddIcon specialization=shadow help=main enemies=1 checkbox=opt_priest_shadow
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultActions()
 }
 
-AddIcon specialization=shadow help=moving checkbox=opt_priest_shadow
+AddIcon specialization=shadow help=moving enemies=1 checkbox=opt_priest_shadow checkbox=!opt_priest_shadow_aoe
 {
-	if InCombat(no) ShadowPrecombatActions()
+	if InCombat(no) ShadowPrecombatMovingActions()
 	ShadowDefaultMovingActions()
 }
 
-AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow
+AddIcon specialization=shadow help=main checkbox=opt_priest_shadow checkbox=opt_priest_shadow_aoe
+{
+	if InCombat(no) ShadowPrecombatActions()
+	ShadowDefaultActions()
+}
+
+AddIcon specialization=shadow help=cd enemies=1 checkbox=opt_priest_shadow checkbox=!opt_priest_shadow_aoe
 {
 	if InCombat(no) ShadowPrecombatCdActions()
-	Interrupt()
 	ShadowDefaultCdActions()
 }
 
-AddIcon specialization=shadow size=small checkbox=opt_icons_right checkbox=opt_priest_shadow
+AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow checkbox=opt_priest_shadow_aoe
 {
-	Spell(mass_dispel)
-}
-
-AddIcon specialization=shadow size=small checkbox=opt_icons_right checkbox=opt_priest_shadow
-{
-	UseItemActions()
+	if InCombat(no) ShadowPrecombatCdActions()
+	ShadowDefaultCdActions()
 }
 ]]
 
