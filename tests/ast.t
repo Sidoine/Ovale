@@ -1,10 +1,15 @@
+--[[
+	This Lua file may be invoked to test parsing the default script for other classes via:
+		cat ast.t | sed "s/DEATHKNIGHT/DRUID/g" | lua
+--]]
+
 --[[------------------------------
 	Load fake WoW environment.
 --]]------------------------------
 local root = "../"
 do
 	local state = {
-		class = "SHAMAN",
+		class = "DEATHKNIGHT",
 		level = 90,
 	}
 	dofile(root .. "WoWAPI.lua")
@@ -46,13 +51,16 @@ local OvaleAST = Ovale.OvaleAST
 local separator = string.rep("-", 80)
 
 -- Parse the default Ovale script for the class.
-local ast = OvaleAST:ParseScript("Ovale", { verify = false })
+local class = UnitClass()
+local source = "Ovale"
+local ast = OvaleAST:ParseScript(source)
 if ast then
 	OvaleAST:Optimize(ast)
-	Ovale:Print(OvaleAST:NodeToString(ast))
-	Ovale:Print(separator)
-	Ovale:Print(OvaleAST:Unparse(ast))
-	OvaleAST:Release(ast)
+--	Ovale:Print(OvaleAST:NodeToString(ast))
+--	Ovale:Print(separator)
+--	Ovale:Print(OvaleAST:Unparse(ast))
+--	OvaleAST:Release(ast)
+--	Ovale:Print(separator)
+--	OvaleAST:Debug()
+	Ovale:FormatPrint("Successfully parsed %s '%s' script.", class, source)
 end
-Ovale:Print(separator)
-OvaleAST:Debug()
