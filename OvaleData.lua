@@ -183,6 +183,12 @@ OvaleData.buffSpellList =
 	ranged_vulnerability_debuff = {
 		[1130] = true, -- Hunter's Mark
 	},
+	weakened_armor_debuff = {
+		[113746] = true, -- Weakened Armor
+	},
+	weakened_blows_debuff = {
+		[115798] = true, -- Weakened Blows
+	},
 
 	-- Target buffs
 	enrage_buff = {

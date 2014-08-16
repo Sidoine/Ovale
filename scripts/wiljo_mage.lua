@@ -11,8 +11,7 @@ do
 ##
 ##Last updated: 2013-12-18
 
-Include(ovale_items)
-Include(ovale_racials)
+Include(ovale_common)
 Include(ovale_mage_spells)
 
 AddFunction BrainFreeze
