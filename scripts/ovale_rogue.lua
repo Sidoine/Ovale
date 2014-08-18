@@ -413,7 +413,7 @@ AddFunction SubtletyPrecombatActions
 	ApplyPoisons()
 	#snapshot_stats
 	#premeditation
-	Spell(premeditation)
+	Spell(premeditation usable=1)
 	#slice_and_dice
 	Spell(slice_and_dice)
 }
