@@ -615,7 +615,7 @@ AddFunction UnholyAoeActions
 	#pestilence,if=dot.blood_plague.ticking&talent.unholy_blight.enabled&cooldown.unholy_blight.remains<49,line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and TalentPoints(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 and DebuffRemainsOnAny(blood_plague_debuff excludeTarget=1) < 2 Spell(pestilence)
 	#dark_transformation
-	Spell(dark_transformation)
+	if BuffStacks(shadow_infusion_buff) >= 5 Spell(dark_transformation)
 	#blood_tap,if=talent.blood_tap.enabled&buff.shadow_infusion.stack=5
 	if TalentPoints(blood_tap_talent) and BuffStacks(shadow_infusion_buff) == 5 BloodTap()
 	#blood_boil,if=blood=2|death=2
@@ -629,7 +629,7 @@ AddFunction UnholyAoeActions
 	#blood_tap,if=talent.blood_tap.enabled&buff.blood_charge.stack>10
 	if TalentPoints(blood_tap_talent) and BuffStacks(blood_charge_buff) > 10 BloodTap()
 	#death_coil,if=runic_power>90|buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1)
-	if RunicPower() > 90 or BuffPresent(sudden_doom_buff) or { BuffExpires(dark_transformation_buff) and Rune(unholy) <= 1 } Spell(death_coil)
+	if RunicPower() > 90 or BuffPresent(sudden_doom_buff) or { pet.BuffExpires(dark_transformation_buff) and Rune(unholy) <= 1 } Spell(death_coil)
 	#blood_boil
 	Spell(blood_boil)
 	#icy_touch
@@ -665,7 +665,7 @@ AddFunction UnholySingleTargetActions
 	#plague_strike,if=!dot.blood_plague.ticking|!dot.frost_fever.ticking
 	if not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) Spell(plague_strike)
 	#dark_transformation
-	Spell(dark_transformation)
+	if BuffStacks(shadow_infusion_buff) >= 5 Spell(dark_transformation)
 	#death_coil,if=runic_power>90
 	if RunicPower() > 90 Spell(death_coil)
 	#death_and_decay,if=unholy=2
@@ -681,7 +681,7 @@ AddFunction UnholySingleTargetActions
 	#blood_tap,if=talent.blood_tap.enabled&cooldown.death_and_decay.remains=0
 	if TalentPoints(blood_tap_talent) and not SpellCooldown(death_and_decay) > 0 BloodTap()
 	#death_coil,if=buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1)
-	if BuffPresent(sudden_doom_buff) or { BuffExpires(dark_transformation_buff) and Rune(unholy) <= 1 } Spell(death_coil)
+	if BuffPresent(sudden_doom_buff) or { pet.BuffExpires(dark_transformation_buff) and Rune(unholy) <= 1 } Spell(death_coil)
 	#scourge_strike
 	Spell(scourge_strike)
 	#plague_leech,if=talent.plague_leech.enabled&cooldown.outbreak.remains<1
@@ -745,7 +745,7 @@ AddFunction UnholyDefaultCdActions
 	#use_item,slot=hands
 	UseItemActions()
 	#mogu_power_potion,if=buff.dark_transformation.up&target.time_to_die<=60
-	if BuffPresent(dark_transformation_buff) and target.TimeToDie() <= 60 UsePotionStrength()
+	if pet.BuffPresent(dark_transformation_buff) and target.TimeToDie() <= 60 UsePotionStrength()
 	#unholy_frenzy,if=time>=4
 	if TimeInCombat() >= 4 Spell(unholy_frenzy)
 }
