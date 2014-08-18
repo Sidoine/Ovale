@@ -419,6 +419,7 @@ function OvaleEquipement:OnInitialize()
 end
 
 function OvaleEquipement:OnEnable()
+	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_READY", "UpdateEquippedItemLevels")
@@ -426,10 +427,25 @@ function OvaleEquipement:OnEnable()
 end
 
 function OvaleEquipement:OnDisable()
+	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_AVG_ITEM_LEVEL_READY")
 	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+end
+
+function OvaleEquipement:GET_ITEM_INFO_RECEIVED(event)
+	profiler.Start("OvaleEquipement_GET_ITEM_INFO_RECEIVED")
+	self.mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
+	self.offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
+	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
+	self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
+
+	local changed = self:UpdateMetaGem()
+	if changed then
+		self:SendMessage("Ovale_EquipmentChanged")
+	end
+	profiler.Stop("OvaleEquipement_GET_ITEM_INFO_RECEIVED")
 end
 
 function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
