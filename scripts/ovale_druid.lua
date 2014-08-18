@@ -55,8 +55,8 @@ AddFunction BalanceElitistJerksDotActions
 	}
 
 	# Simplistic logic for refreshing DoTs early to snapshot powerful buff effects.
-	if Level() >= 90 and target.DebuffPresent(moonfire_debuff) and Damage(moonfire_debuff) / LastEstimatedDamage(moonfire_debuff) > 1.15 Spell(moonfire)
-	if Level() >= 90 and target.DebuffPresent(sunfire_debuff) and Damage(sunfire_debuff) / LastEstimatedDamage(sunfire_debuff) > 1.15 Spell(sunfire)
+	if Level() >= 90 and target.DebuffPresent(moonfire_debuff) and Damage(moonfire_debuff) / LastEstimatedDamage(moonfire_debuff) > 1.3 Spell(moonfire)
+	if Level() >= 90 and target.DebuffPresent(sunfire_debuff) and Damage(sunfire_debuff) / LastEstimatedDamage(sunfire_debuff) > 1.3 Spell(sunfire)
 }
 
 # Minimize the time spent outside of Eclipse by only casting Starsurge at the appropriate times:
