@@ -201,6 +201,7 @@ OvaleData.buffSpellList =
 		[51713] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
 		[58984] = true, -- Shadowmeld
 		[90328] = true, -- Spirit Walk (spirit beast pet)
+		[102543] = true, -- Incarnation: King of the Jungle (feral druid); not truly "stealth" but functions like it for spell usage.
 		[113289] = true, -- Prowl (Symbiosis)
 		[115191] = true, -- Stealth (Subterfuge)
 		[115193] = true, -- Vanish (Subterfuge)
