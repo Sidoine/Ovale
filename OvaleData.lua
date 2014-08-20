@@ -224,7 +224,13 @@ OvaleData.buffSpellList =
 	},
 	raid_movement_buff = {
 		[106898] = true, -- Stampeding Roar
-	}
+	},
+	skull_banner_buff = {
+		[114206] = true, -- Skull Banner (warrior)
+	},
+	stormlash_buff = {
+		[120676] = true, -- Stormlash Totem (shaman)
+	},
 }
 -- Deprecated: spell list aliases
 do
