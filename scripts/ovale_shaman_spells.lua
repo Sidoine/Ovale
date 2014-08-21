@@ -89,6 +89,9 @@ Define(flame_shock 8050)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
 Define(flame_shock_debuff 8050)
 	SpellInfo(flame_shock_debuff duration=30 haste=spell tick=3)
+	SpellInfo(flame_shock_debuff damage=EnhancementFlameShockTickDamage specialization=enhancement)
+	SpellInfo(flame_shock_debuff lastEstimatedDamage=EnhancementFlameShockTickLastDamage specialization=enhancement)
+	SpellDamageBuff(flame_shock_debuff unleash_flame_buff=1.3)
 Define(flametongue_weapon 8024)
 Define(frost_shock 8050)
 	SpellInfo(frost_shock cd=6 sharedcd=shock)
@@ -200,6 +203,18 @@ Define(pet_reinforce 118347)
 	SpellAddBuff(pet_reinforce pet_reinforce_buff=1)
 Define(pet_reinforce_buff 118347)
 	SpellInfo(pet_reinforce_buff duration=60)
+
+### Flame Shock
+Define(FLAMETONGUE_DAMAGE_MULTIPLIER 1.07)
+
+AddFunction EnhancementFlameShockTickDamage asValue=1
+{
+	{ 291 + 0.21 * Spellpower() } * FLAMETONGUE_DAMAGE_MULTIPLIER * DamageMultiplier(flame_shock_debuff) * { 1 + SpellCritChance() / 100 } * { 1 + MasteryEffect() / 100 }
+}
+AddFunction EnhancementFlameShockTickLastDamage asValue=1
+{
+	{ 291 + 0.21 * target.DebuffSpellpower(flame_shock_debuff) } * FLAMETONGUE_DAMAGE_MULTIPLIER * target.DebuffDamageMultiplier(flame_shock_debuff) * { 1 + target.DebuffSpellCritChance(flame_shock_debuff) / 100 } * { 1 + target.DebuffMasteryEffect(flame_shock_debuff) / 100 }
+}
 ]]
 
 	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")
