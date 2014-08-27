@@ -4381,6 +4381,25 @@ do
 end
 
 do
+	--- Get the cooldown duration in seconds for a given spell.
+	-- @name SpellCooldownDuration
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+
+	local function SpellCooldownDuration(condition)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local start, duration = state:GetSpellCooldown(spellId)
+		return Compare(duration, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("spellcooldownduration", true, SpellCooldownDuration)
+end
+
+do
 	--- Get data for the given spell defined by SpellInfo(...)
 	-- @name SpellData
 	-- @paramsig number or boolean
