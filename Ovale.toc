@@ -14,9 +14,9 @@
 #@no-lib-strip@
 embeds.xml
 #@end-no-lib-strip@
-locales\files.xml
 
 Ovale.lua
+Localization.lua
 
 # Profiling module.
 Profiler.lua

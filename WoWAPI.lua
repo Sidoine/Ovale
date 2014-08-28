@@ -453,6 +453,10 @@ WoWAPI.GetItemInfo = function(item)
 	return item
 end
 
+WoWAPI.GetLocale = function()
+	return "enUS"
+end
+
 WoWAPI.GetSpellInfo = function(spell)
 	if type(spell) == "number" then
 		spell = string.format("Spell Name Of %d", spell)

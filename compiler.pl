@@ -48,8 +48,6 @@ $m{AceGUI}{Create} = true;
 $m{AceGUI}{RegisterAsContainer} = true;
 $m{AceGUI}{RegisterWidgetType} = true;
 
-$m{AceLocale}{NewLocale} = true;
-
 $m{"AceSerializer-3.0"}{Deserialize} = true;
 $m{"AceSerializer-3.0"}{Serialize} = true;
 

@@ -13,8 +13,10 @@ Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, addonName, "AceConsole-3.0"
 
 --<private-static-properties>
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local OvaleOptions = nil
+
+-- Localized strings table.
+local L = nil
 
 local format = string.format
 local next = next
@@ -57,7 +59,7 @@ local self_oneTimeMessage = {}
 -- Project version number.
 Ovale.version = "@project-version@"
 -- Localization string table.
-Ovale.L = L
+Ovale.L = nil
 --the frame with the icons
 Ovale.frame = nil
 -- Checkbox and dropdown definitions from evaluating the script.
@@ -73,14 +75,6 @@ Ovale.enCombat = false
 Ovale.refreshNeeded = {}
 Ovale.combatStartTime = nil
 --</public-static-properties>
-
---Key bindings
-BINDING_HEADER_OVALE = addonName
-BINDING_NAME_OVALE_CHECKBOX0 = L["Inverser la boîte à cocher "].."(1)"
-BINDING_NAME_OVALE_CHECKBOX1 = L["Inverser la boîte à cocher "].."(2)"
-BINDING_NAME_OVALE_CHECKBOX2 = L["Inverser la boîte à cocher "].."(3)"
-BINDING_NAME_OVALE_CHECKBOX3 = L["Inverser la boîte à cocher "].."(4)"
-BINDING_NAME_OVALE_CHECKBOX4 = L["Inverser la boîte à cocher "].."(5)"
 
 --<private-static-methods>
 local function OnCheckBoxValueChanged(widget)
@@ -106,6 +100,16 @@ function Ovale:OnInitialize()
 	OvaleOptions = self:GetModule("OvaleOptions")
 	-- Register message prefix for the addon.
 	API_RegisterAddonMessagePrefix(OVALE_MSG_PREFIX)
+	-- Localization.
+	L = Ovale.L
+	-- Key bindings.
+	BINDING_HEADER_OVALE = addonName
+	local toggleCheckBox = L["Inverser la boîte à cocher "]
+	BINDING_NAME_OVALE_CHECKBOX0 = toggleCheckBox .. "(1)"
+	BINDING_NAME_OVALE_CHECKBOX1 = toggleCheckBox .. "(2)"
+	BINDING_NAME_OVALE_CHECKBOX2 = toggleCheckBox .. "(3)"
+	BINDING_NAME_OVALE_CHECKBOX3 = toggleCheckBox .. "(4)"
+	BINDING_NAME_OVALE_CHECKBOX4 = toggleCheckBox .. "(5)"
 end
 
 function Ovale:OnEnable()

@@ -23,6 +23,7 @@ end
 do
 	local addonFiles = {
 		"Ovale.lua",
+		"Localization.lua",
 		-- Profiling module.
 		"Profiler.lua",
 		-- Utility modules.
