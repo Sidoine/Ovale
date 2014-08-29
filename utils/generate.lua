@@ -1,19 +1,20 @@
 --[[------------------------------
 	Load fake WoW environment.
 --]]------------------------------
+local root = "../"
 do
 	local state = {
 		class = "DRUID",
 		level = 90,
 	}
-	dofile("WoWAPI.lua")
+	dofile(root .. "WoWAPI.lua")
 	WoWAPI:Initialize("Ovale", state)
 	WoWAPI:ExportSymbols()
 end
 
 do
 	-- Load all of the addon files.
-	WoWAPI:LoadAddonFile("Ovale.toc")
+	WoWAPI:LoadAddonFile("Ovale.toc", root)
 
 	-- Pretend to fire ADDON_LOADED event.
 	local AceAddon = LibStub("AceAddon-3.0")
@@ -31,8 +32,8 @@ local strsub = string.sub
 local tconcat = table.concat
 local wipe = table.wipe
 
-local profilesDirectory = "..\\SimulationCraft\\profiles\\Tier16H"
-local outputDirectory = "scripts"
+local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16H"
+local outputDirectory = "..\\scripts"
 local output = {}
 
 -- Save original input and output handles.
@@ -71,7 +72,7 @@ for filename in dir:lines() do
 			local outputFileName = "simulationcraft_" .. strlower(gsub(filename, ".simc", ".lua"))
 			outputFileName = gsub(outputFileName, "death_knight", "deathknight")
 			print("Generating " .. outputFileName)
-			local outputName = outputDirectory .. "/" .. outputFileName
+			local outputName = gsub(outputDirectory, "\\", "/") .. "/" .. outputFileName
 			io.output(outputName)
 			io.write(tconcat(output, "\n"))
 		end
