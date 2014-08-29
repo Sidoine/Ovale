@@ -434,6 +434,36 @@ do
 end
 
 do
+	--- Get the duration of the aura if it is applied at the current time.
+	-- @name BuffDurationIfApplied
+	-- @paramsig number or boolean
+	-- @param id The aura spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The total duration of the aura.
+	-- @return A boolean value for the result of the comparison.
+	-- @see DebuffDuration
+	-- @usage
+	-- if BuffDurationIfApplied(slice_and_dice_buff) > BuffDuration(slice_and_dice_buff)
+	--     Spell(slice_and_dice)
+
+	local function BuffDurationIfApplied(condition)
+		local auraId, comparator, limit = condition[1], condition[2], condition[3]
+		local target, filter, mine = ParseCondition(condition)
+		local duration, dotDuration = state:GetDuration(auraId)
+		local si = OvaleData.spellInfo[auraId]
+		local value = (si and si.tick) and dotDuration or duration
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("buffdurationifapplied", false, BuffDurationIfApplied)
+	OvaleCondition:RegisterCondition("debuffdurationifapplied", false, BuffDurationIfApplied)
+end
+
+do
 	--- Test if an aura is expired, or will expire after a given number of seconds.
 	-- @name BuffExpires
 	-- @paramsig boolean
