@@ -84,14 +84,16 @@ $m{GameTooltip}{SetOwner} = true;
 $m{GameTooltip}{SetText} = true;
 $m{GameTooltip}{Show} = true;
 
+$m{LibBabbleCreatureType}{GetLookupTable} = true;
+
 $m{LibDispellable}{IsEnrageEffect} = true;
 
 $m{LibDualSpec}{EnhanceDatabase} = true;
 $m{LibDualSpec}{EnhanceOptions} = true;
 
-$m{LibStub}{GetLibrary} = true;
+$m{LibRangeCheck}{GetRange} = true;
 
-$m{LRC}{GetRange} = true;
+$m{LibStub}{GetLibrary} = true;
 
 $m{Masque}{Group} = true;
 
