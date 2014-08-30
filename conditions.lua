@@ -1518,6 +1518,7 @@ end
 
 do
 	--- Get the number of hostile enemies on the battlefield.
+	-- The minimum value returned is 1.
 	-- @name Enemies
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
@@ -1539,6 +1540,10 @@ do
 			value = OvaleEnemies.taggedEnemies
 		else
 			value = OvaleEnemies.activeEnemies
+		end
+		-- This works around problems with testing on target dummies, which are never hostile.
+		if value < 1 then
+			value = 1
 		end
 		return Compare(value, comparator, limit)
 	end
