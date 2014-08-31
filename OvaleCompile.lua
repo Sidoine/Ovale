@@ -374,7 +374,11 @@ local function AddMissingVariantSpells(annotation)
 							OvaleSpellBook:AddSpell(spellId, spellName)
 						end
 					else
-						Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %d.", spellId)
+						local functionCall = node.name
+						if node.paramsAsString then
+							functionCall = node.name .. "(" .. node.paramsAsString .. ")"
+						end
+						Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %s used in %s.", spellId, functionCall)
 					end
 				end
 			end
