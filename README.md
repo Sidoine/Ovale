@@ -62,6 +62,3 @@ Blizzard does not allow this.  Only a predefined sequence of spells can be bound
 
 ##### On my low-level character, there is nothing at all.
 You need to reach level 10 and choose a specialization.
-
-##### There is no bane or curse (or whatever) in the rotation.
-Click the icon and select the bane or curse that you want to use from the dropdown menu list.
