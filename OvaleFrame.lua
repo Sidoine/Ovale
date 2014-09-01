@@ -186,6 +186,12 @@ do
 			else
 				OvaleCondition.defaultTarget = "target"
 			end
+			-- Set the number of enemies on the battlefield, if given via "enemies=N".
+			if node.params and node.params.enemies then
+				state.enemies = node.params.enemies
+			else
+				state.enemies = nil
+			end
 
 			if refresh then
 				Ovale:Logf("+++ Icon %d", k)

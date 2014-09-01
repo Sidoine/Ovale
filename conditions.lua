@@ -19,7 +19,6 @@ local OvaleCondition = Ovale.OvaleCondition
 local OvaleCooldown = Ovale.OvaleCooldown
 local OvaleDamageTaken = Ovale.OvaleDamageTaken
 local OvaleData = Ovale.OvaleData
-local OvaleEnemies = Ovale.OvaleEnemies
 local OvaleEquipement = Ovale.OvaleEquipement
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
@@ -1535,11 +1534,13 @@ do
 	local function Enemies(condition)
 		local comparator, limit = condition[1], condition[2]
 		local _, _, mine = ParseCondition(condition)
-		local value
-		if mine then
-			value = OvaleEnemies.taggedEnemies
-		else
-			value = OvaleEnemies.activeEnemies
+		local value = state.enemies
+		if not value then
+			if mine then
+				value = state.taggedEnemies
+			else
+				value = state.activeEnemies
+			end
 		end
 		-- This works around problems with testing on target dummies, which are never hostile.
 		if value < 1 then

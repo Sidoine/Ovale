@@ -15,6 +15,9 @@ local OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0", "AceTimer-3
 Ovale.OvaleEnemies = OvaleEnemies
 
 --<private-static-properties>
+-- Forward declarations for module dependencies.
+local OvaleState = nil
+
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
 local profiler = nil
@@ -88,6 +91,11 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleEnemies:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleEnemies:OnEnable()
 	self_guid = API_UnitGUID("player")
 	if not self_reaperTimer then
@@ -95,9 +103,11 @@ function OvaleEnemies:OnEnable()
 	end
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleEnemies:OnDisable()
+	OvaleState:UnregisterState(self)
 	if not self_reaperTimer then
 		self:CancelTimer(self_reaperTimer)
 		self_reaperTimer = nil
@@ -226,5 +236,48 @@ function OvaleEnemies:Debug()
 	end
 	Ovale:FormatPrint("Total enemies: %d", self.activeEnemies)
 	Ovale:FormatPrint("Total tagged enemies: %d", self.taggedEnemies)
+end
+--</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleEnemies.statePrototype = {}
+--</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleEnemies.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+-- Total number of active enemies.
+statePrototype.activeEnemies = nil
+-- Total number of tagged enemies.
+statePrototype.taggedEnemies = nil
+-- Requested number of enemies.
+statePrototype.enemies = nil
+--</state-properties>
+
+--<public-static-methods>
+-- Initialize the state.
+function OvaleEnemies:InitializeState(state)
+	state.enemies = nil
+end
+
+-- Reset the state to the current conditions.
+function OvaleEnemies:ResetState(state)
+	profiler.Start("OvaleEnemies_ResetState")
+	state.activeEnemies = self.activeEnemies
+	state.taggedEnemies = self.taggedEnemies
+	profiler.Stop("OvaleEnemies_ResetState")
+end
+
+-- Release state resources prior to removing from the simulator.
+function OvaleEnemies:CleanState(state)
+	state.activeEnemies = nil
+	state.taggedEnemies = nil
+	state.enemies = nil
 end
 --</public-static-methods>
