@@ -4652,6 +4652,27 @@ do
 end
 
 do
+	--- Test if the given talent is active.
+	-- @name Talent
+	-- @paramsig boolean
+	-- @param id The talent ID.
+	-- @param yesno Optional. If yes, then return true if the glyph is active. If no, then return true if it isn't active.
+	--     Default is yes.
+	--     Valid values: yes, no.
+	-- @return A boolean value.
+	-- @usage
+	-- if Talent(blood_tap_talent) Spell(blood_tap)
+
+	local function Talent(condition)
+		local talentId, yesno = condition[1], condition[2]
+		local boolean = (OvaleSpellBook:GetTalentPoints(talentId) > 0)
+		return TestBoolean(boolean, yesno)
+	end
+
+	OvaleCondition:RegisterCondition("talent", false, Talent)
+end
+
+do
 	--- Get the number of points spent in a talent (0 or 1)
 	-- @name TalentPoints
 	-- @paramsig number or boolean
