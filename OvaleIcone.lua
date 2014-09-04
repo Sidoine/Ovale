@@ -179,7 +179,10 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 		end
 
 		-- Focus text.
-		if actionTarget and actionTarget~="target" then
+		if element.params.text then
+			self.focusText:SetText(tostring(element.params.text))
+			self.focusText:Show()
+		elseif actionTarget and actionTarget ~= "target" then
 			self.focusText:SetText(actionTarget)
 			self.focusText:Show()
 		else

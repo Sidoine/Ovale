@@ -102,6 +102,7 @@ local PARAMETER_KEYWORD = {
 	["checkboxoff"] = true,		-- deprecated
 	["checkboxon"] = true,		-- deprecated
 	["glyph"] = true,
+	["help"] = true,
 	["if_spell"] = true,
 	["if_stance"] = true,
 	["item"] = true,			-- deprecated
@@ -112,6 +113,7 @@ local PARAMETER_KEYWORD = {
 	["specialization"] = true,
 	["stance"] = true,
 	["talent"] = true,
+	["text"] = true,
 	["wait"] = true,
 }
 
@@ -1283,6 +1285,8 @@ ParseFunction = function(tokenStream, nodeList, annotation)
 			node.type = "function"
 			-- String-lookup functions are case-sensitive.
 			node.func = name
+			annotation.stringReference = annotation.stringReference or {}
+			annotation.stringReference[#annotation.stringReference + 1] = node
 		elseif OvaleCondition:IsCondition(lowername) then
 			node.type = "function"
 			-- Built-in functions are case-insensitive.
@@ -1818,6 +1822,8 @@ ParseSimpleExpression = function(tokenStream, nodeList, annotation)
 	local tokenType, token = tokenStream:Peek()
 	if tokenType == "number" then
 		ok, node = ParseNumber(tokenStream, nodeList, annotation)
+	elseif tokenType == "string" then
+		ok, node = ParseString(tokenStream, nodeList, annotation)
 	elseif tokenType == "name" then
 		tokenType, token = tokenStream:Peek(2)
 		if tokenType == "." or tokenType == "(" then
@@ -2031,12 +2037,10 @@ ParseString = function(tokenStream, nodeList, annotation)
 		end
 	end
 	-- Create the AST node.
-	if ok then
-		if not node then
-			node = OvaleAST:NewNode(nodeList)
-			node.type = "string"
-			node.value = value
-		end
+	if ok and not node then
+		node = OvaleAST:NewNode(nodeList)
+		node.type = "string"
+		node.value = value
 		annotation.stringReference = annotation.stringReference or {}
 		annotation.stringReference[#annotation.stringReference + 1] = node
 	end
