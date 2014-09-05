@@ -71,6 +71,8 @@ local self_guid = nil
 local self_activeSpellcast = {}
 -- self_lastSpellcast[targetGUID][spellId] is the most recent spell that has landed successfully on the target.
 local self_lastSpellcast = {}
+-- self_lastCast[spellId] is the time of the most recent cast of the spell.
+local self_lastCast = {}
 local self_pool = OvalePool("OvaleFuture_pool")
 do
 	self_pool.Clean = function(self, spellcast)
@@ -386,6 +388,7 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	for guid in pairs(self_lastSpellcast) do
 		self:Ovale_InactiveUnit(event, guid)
 	end
+	wipe(self_lastCast)
 end
 
 function OvaleFuture:PLAYER_REGEN_ENABLED(event)
@@ -567,6 +570,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 						TracePrintf(spellId, "    Spell finished: %s (%d)", spellName, spellId)
 						tremove(self_activeSpellcast, index)
 						UpdateLastSpellcast(spellcast)
+						self_lastCast[spellcast.spellId] = API_GetTime()
 						local unitId = spellcast.target and OvaleGUID:GetUnitId(spellcast.target) or "player"
 						Ovale.refreshNeeded[unitId] = true
 						Ovale.refreshNeeded["player"] = true
@@ -694,6 +698,8 @@ statePrototype.nextCast = nil
 statePrototype.isChanneling = nil
 -- The previous spell cast in the simulator.
 statePrototype.lastSpellId = nil
+-- The most recent time the spell was cast in the simulator.
+statePrototype.lastCast = nil
 -- counter[name] = count
 statePrototype.counter = nil
 --</state-properties>
@@ -701,6 +707,7 @@ statePrototype.counter = nil
 --<public-static-methods>
 -- Initialize the state.
 function OvaleFuture:InitializeState(state)
+	state.lastCast = {}
 	state.counter = {}
 end
 
@@ -716,6 +723,9 @@ function OvaleFuture:ResetState(state)
 	state.isChanneling = false
 	state.nextCast = now
 
+	for k in pairs(state.lastCast) do
+		state.lastCast[k] = nil
+	end
 	for k, v in pairs(self.counter) do
 		state.counter[k] = self.counter[k]
 	end
@@ -732,6 +742,9 @@ function OvaleFuture:CleanState(state)
 	state.isChanneling = nil
 	state.lastSpellId = nil
 
+	for k in pairs(state.lastCast) do
+		state.lastCast[k] = nil
+	end
 	for k in pairs(state.counter) do
 		state.counter[k] = nil
 	end
@@ -764,6 +777,10 @@ end
 
 statePrototype.GetDamageMultiplier = function(state, spellId)
 	return GetDamageMultiplier(spellId, state.snapshot, state)
+end
+
+statePrototype.TimeOfLastCast = function(state, spellId)
+	return state.lastCast[spellId] or self_lastCast[spellId] or 0
 end
 
 --[[
@@ -801,6 +818,7 @@ statePrototype.ApplySpell = function(state, ...)
 		state.nextCast = nextCast
 		state.isChanneling = isChanneled
 		state.lastSpellId = spellId
+		state.lastCast[spellId] = endCast
 
 		-- Set the current time in the simulator to a little after the start of the current cast,
 		-- or to now if in the past.

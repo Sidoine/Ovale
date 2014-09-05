@@ -4829,6 +4829,27 @@ do
 end
 
 do
+	--- Get the number of seconds elapsed since the player cast the given spell.
+	-- @name TimeSincePreviousSpell
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
+
+	local function TimeSincePreviousSpell(condition)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local t = OvaleFuture:TimeOfLastCast(spellId)
+		return TestValue(0, math.huge, t, 0, 1, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("timesincepreviousspell", false, TimeSincePreviousSpell)
+end
+
+do
 	--- Get the time in seconds until the next scheduled Bloodlust cast.
 	-- Not implemented, always returns 3600 seconds.
 	-- @name TimeToBloodlust
