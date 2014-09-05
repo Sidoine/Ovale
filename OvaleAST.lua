@@ -1620,6 +1620,11 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 				if ok then
 					name = node.value
 				end
+			elseif tokenType == "string" then
+				ok, node = ParseString(tokenStream, nodeList, annotation)
+				if ok then
+					name = node.value
+				end
 			elseif PARAMETER_KEYWORD[token] then
 				if isList then
 					SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", token)
@@ -2309,11 +2314,22 @@ function OvaleAST:PropagateStrings(ast)
 	if ast.annotation and ast.annotation.stringReference then
 		for _, node in ipairs(ast.annotation.stringReference) do
 			if node.type == "string" then
-				-- do nothing
+				local key = node.value
+				local value = L[key]
+				if key ~= value then
+					node.value = value
+					node.key = key
+				end
 			elseif node.type == "variable" then
 				local value = node.name
 				-- Convert to a string node.
-				node.previousType = "variable"
+				node.previousType = node.type
+				node.type = "string"
+				node.value = value
+			elseif node.type == "number" then
+				local value = tostring(node.value)
+				-- Convert to a string node.
+				node.previousType = "number"
 				node.type = "string"
 				node.value = value
 			elseif node.type == "function" then
