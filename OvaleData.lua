@@ -221,6 +221,7 @@ OvaleData.buffSpellList =
 		[32182] = true, --Heroism (Alliance shaman)
 		[80353] = true, --Time Warp (mage)
 		[90355] = true, -- Ancient Hysteria (core hound)
+		[146555] = true, -- Drums of Rage
 	},
 	burst_haste_debuff = {
 		[57723] = true, -- Exhaustion (Heroism)
