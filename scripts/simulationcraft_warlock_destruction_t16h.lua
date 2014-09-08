@@ -68,7 +68,7 @@ AddFunction DestructionDefaultActions
 	#havoc,target=2,if=active_enemies>1
 	if Enemies() > 1 Spell(havoc)
 	#shadowburn,if=ember_react&(burning_ember>3.5|mana.pct<=20|target.time_to_die<20|buff.havoc.stack>=1|trinket.proc.intellect.react|(trinket.stacking_proc.intellect.remains<cast_time*4&trinket.stacking_proc.intellect.remains>cast_time))
-	if BurningEmbers() >= 10 and { BurningEmbers() / 10 > 3.5 or ManaPercent() <= 20 or target.TimeToDie() < 20 or DebuffStacksOnAny(havoc_debuff) >= 1 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } Spell(shadowburn)
+	if BurningEmbers() >= 10 and { BurningEmbers() / 10 > 3.5 or ManaPercent() <= 20 or target.TimeToDie() < 20 or DebuffStacksOnAny(havoc_debuff) >= 1 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } and target.HealthPercent() < 20 Spell(shadowburn)
 	#immolate,cycle_targets=1,if=n_ticks*crit_pct_current>3*dot.immolate.ticks_remain*dot.immolate.crit_pct&miss_react
 	if target.Ticks(immolate_debuff) * SpellCritChance() > 3 * target.TicksRemaining(immolate_debuff) * target.DebuffSpellCritChance(immolate_debuff) and True(miss_react) Spell(immolate)
 	#conflagrate,if=charges=2&buff.havoc.stack=0

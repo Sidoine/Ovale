@@ -1259,6 +1259,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 				bodyCode = "Texture(spell_nature_removecurse help=ServicePet)"
 			end
 			isSpellAction = false
+		elseif class == "WARLOCK" and action == "shadowburn" then
+			-- Shadowburn can only be cast on targets below 20% health.
+			conditionCode = "target.HealthPercent() < 20"
 		elseif class == "WARLOCK" and action == "summon_pet" then
 			if annotation.pet then
 				local spellName = "summon_" .. annotation.pet
