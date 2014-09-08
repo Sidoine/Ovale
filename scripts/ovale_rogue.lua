@@ -98,8 +98,10 @@ AddFunction AssassinationDefaultActions
 	if target.TicksRemaining(rupture_debuff) < 2 and Energy() > 90 Spell(mutilate)
 	#marked_for_death,if=talent.marked_for_death.enabled&combo_points=0
 	if Talent(marked_for_death_talent) and ComboPoints() == 0 Spell(marked_for_death)
+	# CHANGE: Only Rupture if the target will still be alive for at least half of the ticks.
 	#rupture,if=ticks_remain<2|(combo_points=5&ticks_remain<3)
-	if target.TicksRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 Spell(rupture)
+	#if target.TicksRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 Spell(rupture)
+	if { target.TicksRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 } and target.TimeToDie() > DebuffDurationIfApplied(rupture) / 2 Spell(rupture)
 	#fan_of_knives,if=combo_points<5&active_enemies>=4
 	if ComboPoints() < 5 and Enemies() >= 4 Spell(fan_of_knives)
 	# CHANGE: Always pool energy for Envenom.
