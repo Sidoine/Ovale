@@ -140,13 +140,13 @@ AddFunction ArcaneDefaultShortCdActions
 		if Talent(rune_of_power_talent) and RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 		#rune_of_power,if=talent.rune_of_power.enabled&(cooldown.arcane_power.remains<gcd&buff.rune_of_power.remains<buff.arcane_power.duration)
 		if Talent(rune_of_power_talent) and SpellCooldown(arcane_power) < GCD() and RuneOfPowerRemaining() < SpellData(arcane_power_buff duration) Spell(rune_of_power)
-		#evocation,if=talent.invocation.enabled&buff.invokers_energy.down&talent.invocation.enabled
+		#evocation,if=talent.invocation.enabled&buff.invokers_energy.down
 		if Talent(invocation_talent) and BuffExpires(invokers_energy_buff) Spell(evocation)
 		#evocation,if=talent.invocation.enabled&cooldown.arcane_power.remains=0&buff.invokers_energy.remains<buff.arcane_power.duration
 		if Talent(invocation_talent) and not SpellCooldown(arcane_power) > 0 and BuffRemaining(invokers_energy_buff) < SpellData(arcane_power_buff duration) Spell(evocation)
 		#evocation,if=talent.invocation.enabled&mana.pct<50,interrupt_if=mana.pct>95&buff.invokers_energy.remains>10
 		if Talent(invocation_talent) and ManaPercent() < 50 and BuffRemaining(invokers_energy_buff) > 10 Spell(evocation)
-		#evocation,if=!talent.invocation.enabled=mana.pct<50,interrupt_if=mana.pct>95
+		#evocation,if=!talent.invocation.enabled&mana.pct<50,interrupt_if=mana.pct>95
 		if Talent(invocation_talent no) and ManaPercent() < 50 Spell(evocation)
 		#arcane_power,if=time_to_bloodlust>cooldown.arcane_power.duration&((buff.arcane_charge.stack=4)|target.time_to_die<buff.arcane_power.duration+5),moving=0
 		if TimeToBloodlust() > SpellCooldownDuration(arcane_power) and { DebuffStacks(arcane_charge_debuff) == 4 or target.TimeToDie() < SpellData(arcane_power_buff duration) + 5 } Spell(arcane_power)
