@@ -100,18 +100,24 @@ local statePrototype = OvaleState.statePrototype
 --<state-properties>
 -- Whether the state of the simulator has been initialized.
 statePrototype.isInitialized = nil
--- Table of state variables added by scripts.
+-- Table of state variables added by scripts that is reset on every refresh.
+statePrototype.futureVariable = nil
+-- Table of state variables added by scripts that is reset only when out of combat.
 statePrototype.variable = nil
 --</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
 function OvaleState:InitializeState(state)
+	state.futureVariable = {}
 	state.variable = {}
 end
 
 -- Reset the state to the current conditions.
 function OvaleState:ResetState(state)
+	for k in pairs(state.futureVariable) do
+		state.futureVariable[k] = nil
+	end
 	-- TODO: What conditions should trigger resetting state variables?
 	-- For now, reset/remove all state variables if out of combat.
 	if not Ovale.enCombat then
@@ -123,6 +129,9 @@ end
 
 -- Release state resources prior to removing from the simulator.
 function OvaleState:CleanState(state)
+	for k in pairs(state.futureVariable) do
+		state.futureVariable[k] = nil
+	end
 	for k in pairs(state.variable) do
 		state.variable[k] = nil
 	end
@@ -143,11 +152,15 @@ end
 
 -- Get the value of the named state variable.  If missing, then return 0.
 statePrototype.GetState = function(state, name)
-	return state.variable[name] or 0
+	return state.futureVariable[name] or state.variable[name] or 0
 end
 
 -- Put a value into the named state variable.
-statePrototype.PutState = function(state, name, value)
-	state.variable[name] = value
+statePrototype.PutState = function(state, name, value, isFuture)
+	if isTemporary then
+		state.futureVariable[name] = value
+	else
+		state.variable[name] = value
+	end
 end
 --</state-methods>

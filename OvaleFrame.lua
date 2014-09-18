@@ -196,15 +196,7 @@ do
 			if refresh then
 				Ovale:Logf("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
-
-				-- Get the best "proper" action that is nil, a value or an action.
-				-- Otherwise, loop until we get a proper action.
-				local timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
-				while element and element.type ~= "action" and element.type ~= "value" do
-					Ovale:Logf("[%d] '%s' is not a proper action -- re-computing.", element.nodeId, element.type)
-					timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
-				end
-
+				local timeSpan, _, element = OvaleBestAction:GetAction(node, state)
 				local start = NextTime(timeSpan, state.currentTime)
 				if start then
 					Ovale:Logf("Compute start = %f", start)
@@ -284,7 +276,7 @@ do
 								spellTarget = OvaleCondition.defaultTarget
 							end
 							state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
-							timeSpan, _, element = OvaleBestAction:Compute(node.child[1], state)
+							timeSpan, _, element = OvaleBestAction:GetAction(node, state)
 							start = NextTime(timeSpan, state.currentTime)
 							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element, state))
 						else

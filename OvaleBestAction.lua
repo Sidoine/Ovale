@@ -134,6 +134,10 @@ local self_timeSpan = {}
 local self_valuePool = OvalePool("OvaleBestAction_valuePool")
 -- value[node] = result node of that node.
 local self_value = {}
+
+-- Static time-span variables.
+local self_computedTimeSpan = OvaleTimeSpan()
+local self_tempTimeSpan = OvaleTimeSpan()
 --</private-static-properties>
 
 --<private-static-methods>
@@ -424,6 +428,31 @@ function OvaleBestAction:GetActionInfo(element, state)
 		end
 	end
 	return nil
+end
+
+function OvaleBestAction:GetAction(node, state)
+	local timeSpan, priority, element = self:Compute(node.child[1], state)
+	self_computedTimeSpan:Reset(timeSpan)
+	if element and element.type == "state" then
+		-- Loop-count check to guard against infinite loops.
+		local loopCount = 0
+		while element and element.type == "state" do
+			loopCount = loopCount + 1
+			if loopCount >= 10 then
+				Ovale:Error("Found too many SetState() actions -- probably an infinite loop in script.")
+				break
+			end
+			-- Set the state in the simulator.
+			local variable, value = element.params[1], element.params[2]
+			local isFuture = not HasTime(computedTimeSpan, state.currentTime)
+			state:PutState(variable, value, isFuture)
+			-- Get the cumulative intersection of time spans for these re-computations.
+			self_tempTimeSpan:Reset(self_computedTimeSpan)
+			timeSpan, priority, element = self:Compute(node.child[1], state)
+			Intersect(self_tempTimeSpan, timeSpan, self_computedTimeSpan)
+		end
+	end
+	return self_computedTimeSpan, priority, element
 end
 
 function OvaleBestAction:Compute(element, state)
@@ -930,12 +959,6 @@ function OvaleBestAction:ComputeGroup(element, state)
 			id = bestElement.params[1]
 		end
 		Ovale:Logf("[%d]    group best action %s remains %s", element.nodeId, id, tostring(timeSpan))
-		-- Set state if it is the best action.
-		if bestElement.type == "state" and bestElement.func == "setstate" then
-			local value = bestElement.params[2]
-			Ovale:Logf("[%d]    setting state %s to %d", id, value)
-			state:PutState(id, value)
-		end
 	else
 		Ovale:Logf("[%d]    group no best action returns %s", element.nodeId, tostring(timeSpan))
 	end
@@ -1033,16 +1056,15 @@ end
 function OvaleBestAction:ComputeState(element, state)
 	profiler.Start("OvaleBestAction_ComputeState")
 	local timeSpan = GetTimeSpan(element)
+	local result
 
 	if element.func == "setstate" then
-		local variable = element.params[1]
-		local value = element.params[2]
-		Ovale:Logf("[%d]    %s: %s = %s", element.nodeId, element.name, variable, value)
+		Ovale:Logf("[%d]    %s: %s = %s", element.nodeId, element.name, element.params[1], element.params[2])
 		timespan[1], timespan[2] = 0, math.huge
+		result = element
 	end
-
 	profiler.Stop("OvaleBestAction_ComputeState")
-	return timeSpan, OVALE_DEFAULT_PRIORITY, element
+	return timeSpan, OVALE_DEFAULT_PRIORITY, result
 end
 
 function OvaleBestAction:ComputeValue(element, state)
