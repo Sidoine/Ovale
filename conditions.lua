@@ -4912,7 +4912,7 @@ do
 
 	local function TimeSincePreviousSpell(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local t = OvaleFuture:TimeOfLastCast(spellId)
+		local t = state:TimeOfLastCast(spellId)
 		return TestValue(0, math.huge, t, 0, 1, comparator, limit)
 	end
 
