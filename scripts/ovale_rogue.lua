@@ -57,8 +57,6 @@ AddFunction Stealth
 
 # ActionList: AssassinationPrecombatActions --> main, shortcd, cd
 
-AddCheckBox(opt_rogue_pool_for_envenom L("Pool energy for Envenom") specialization=assassination default)
-
 AddFunction AssassinationPrecombatActions
 {
 	#flask,type=spring_blossoms
@@ -104,33 +102,23 @@ AddFunction AssassinationDefaultActions
 	if target.TicksRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 Spell(rupture)
 	#fan_of_knives,if=combo_points<5&active_enemies>=4
 	if ComboPoints() < 5 and Enemies() >= 4 Spell(fan_of_knives)
-	# CHANGE: Add option to pool energy for Envenom.
-	if CheckBoxOff(opt_rogue_pool_for_envenom)
+	# CHANGE: Always pool energy for Envenom.
+	#envenom,if=combo_points>4
+	#envenom,if=combo_points>=2&buff.slice_and_dice.remains<3
+	#dispatch,if=combo_points<5
+	#mutilate
+	# Always use Envenom to refresh Slice and Dice if Slice and Dice is on its last tick.
+	if ComboPoints() >= 1 and BuffRemaining(slice_and_dice_buff) < 3 Spell(envenom)
+	# Pool energy for 4CP+ Envenom to prevent clipping the previous Envenom buff unless we will cap on energy.
+	if Talent(anticipation_talent) and ComboPoints() > 4 or not Talent(anticipation_talent) and ComboPoints() >= 4
 	{
-		#envenom,if=combo_points>4
-		if ComboPoints() > 4 Spell(envenom)
-		#envenom,if=combo_points>=2&buff.slice_and_dice.remains<3
-		if ComboPoints() >= 2 and BuffRemaining(slice_and_dice_buff) < 3 Spell(envenom)
-		#dispatch,if=combo_points<5
-		if ComboPoints() < 5 and { target.HealthPercent() < 35 or BuffPresent(blindside_buff) } Spell(dispatch)
-		#mutilate
-		Spell(mutilate)
+		if BuffRemaining(envenom_buff) < 1 or TimeToMaxEnergy() < 1 Spell(envenom)
 	}
-	if CheckBoxOn(opt_rogue_pool_for_envenom)
+	# Combo point builders.
+	unless Talent(anticipation_talent) and ComboPoints() > 4 or not Talent(anticipation_talent) and ComboPoints() >= 4
 	{
-		# Always use Envenom to refresh Slice and Dice if Slice and Dice is on its last tick.
-		if ComboPoints() >= 2 and BuffRemaining(slice_and_dice_buff) < 3 Spell(envenom)
-		# Pool energy for 4CP+ Envenom to prevent clipping the previous Envenom buff unless we will cap on energy.
-		if Talent(anticipation_talent) and ComboPoints() > 4 or not Talent(anticipation_talent) and ComboPoints() >= 4
-		{
-			if BuffRemaining(envenom_buff) < 1 or TimeToMaxEnergy() < 1 Spell(envenom)
-		}
-		# Combo point builders.
-		unless Talent(anticipation_talent) and ComboPoints() > 4 or not Talent(anticipation_talent) and ComboPoints() >= 4
-		{
-			if target.HealthPercent() < 35 or BuffPresent(blindside_buff) Spell(dispatch)
-			Spell(mutilate)
-		}
+		if target.HealthPercent() < 35 or BuffPresent(blindside_buff) Spell(dispatch)
+		Spell(mutilate)
 	}
 }
 
