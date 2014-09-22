@@ -118,6 +118,7 @@ function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterMessage("Ovale_OptionChanged")
 
 	self.frame = AceGUI:Create(addonName .. "Frame")
 	self:UpdateFrame()
@@ -129,6 +130,7 @@ function Ovale:OnDisable()
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+	self:UnregisterMessage("Ovale_OptionChanged")
 	self.frame:Hide()
 end
 
@@ -195,6 +197,14 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self.enCombat = true
 	self.combatStartTime = API_GetTime()
 	self:UpdateVisibility()
+end
+
+function Ovale:Ovale_OptionChanged(event, group)
+	if group == "visibility" then
+		self:UpdateVisibility()
+	else
+		self:UpdateFrame()
+	end
 end
 
 function Ovale:IsPreloaded(moduleList)

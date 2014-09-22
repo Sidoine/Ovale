@@ -52,6 +52,14 @@ local self_options =
 		{
 			name = L["Apparence"],
 			type = "group",
+			-- Generic getter/setter for options.
+			get = function(info)
+				return OvaleOptions.db.profile.apparence[info[#info]]
+			end,
+			set = function(info, value)
+				OvaleOptions.db.profile.apparence[info[#info]] = value
+				OvaleOptions:SendMessage("Ovale_OptionChanged", info[#info - 1])
+			end,
 			args =
 			{
 				verrouille =
@@ -59,16 +67,12 @@ local self_options =
 					order = 10,
 					type = "toggle",
 					name = L["Verrouiller position"],
-					get = function(info) return OvaleOptions.db.profile.apparence.verrouille end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.verrouille = value end
 				},
 				clickThru =
 				{
 					order = 20,
 					type = "toggle",
 					name = L["Ignorer les clics souris"],
-					get = function(info) return OvaleOptions.db.profile.apparence.clickThru end,
-					set = function(info, value) OvaleOptions.db.profile.apparence.clickThru = value; Ovale:UpdateFrame() end
 				},
 				visibility =
 				{
@@ -77,45 +81,35 @@ local self_options =
 					name = L["Visibilité"],
 					args =
 					{
-						combatUniquement =
+						enCombat =
 						{
 							order = 10,
 							type = "toggle",
 							name = L["En combat uniquement"],
-							get = function(info) return OvaleOptions.db.profile.apparence.enCombat end,
-							set = function(info, v) OvaleOptions.db.profile.apparence.enCombat = v; Ovale:UpdateVisibility() end,
 						},
-						targetOnly =
+						avecCible =
 						{
 							order = 20,
 							type = "toggle",
 							name = L["Si cible uniquement"],
-							get = function(info) return OvaleOptions.db.profile.apparence.avecCible end,
-							set = function(info, v) OvaleOptions.db.profile.apparence.avecCible = v; Ovale:UpdateVisibility() end,
 						},
 						targetHostileOnly =
 						{
 							order = 30,
 							type = "toggle",
 							name = L["Cacher si cible amicale ou morte"],
-							get = function(info) return OvaleOptions.db.profile.apparence.targetHostileOnly end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.targetHostileOnly = value; Ovale:UpdateFrame() end
 						},
 						hideVehicule =
 						{
 							order = 40,
 							type = "toggle",
 							name = L["Cacher dans les véhicules"],
-							get = function(info) return OvaleOptions.db.profile.apparence.hideVehicule end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.hideVehicule = value end
 						},
 						hideEmpty =
 						{
 							order = 50,
 							type = "toggle",
 							name = L["Cacher bouton vide"],
-							get = function(info) return OvaleOptions.db.profile.apparence.hideEmpty end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.hideEmpty = value; Ovale:UpdateFrame() end
 						},
 					},
 				},
@@ -133,8 +127,6 @@ local self_options =
 							name = L["Taille des icônes"],
 							desc = L["La taille des icônes"],
 							min = 0.1, max = 16, step = 0.1,
-							get = function(info) return OvaleOptions.db.profile.apparence.iconScale end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.iconScale = value; Ovale:UpdateFrame() end
 						},
 						smallIconScale =
 						{
@@ -143,8 +135,6 @@ local self_options =
 							name = L["Taille des petites icônes"],
 							desc = L["La taille des petites icônes"],
 							min = 0.1, max = 16, step = 0.1,
-							get = function(info) return OvaleOptions.db.profile.apparence.smallIconScale end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.smallIconScale = value; Ovale:UpdateFrame() end
 						},
 						fontScale =
 						{
@@ -153,8 +143,6 @@ local self_options =
 							name = L["Taille des polices"],
 							desc = L["La taille des polices"],
 							min = 0.1, max = 2, step = 0.1,
-							get = function(info) return OvaleOptions.db.profile.apparence.fontScale end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.fontScale = value; Ovale:UpdateFrame() end
 						},
 						alpha =
 						{
@@ -162,8 +150,6 @@ local self_options =
 							type = "range",
 							name = L["Opacité des icônes"],
 							min = 0, max = 100, step = 5,
-							get = function(info) return OvaleOptions.db.profile.apparence.alpha * 100 end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.alpha = value/100; Ovale.frame.frame:SetAlpha(value/100) end
 						},
 						raccourcis =
 						{
@@ -171,8 +157,6 @@ local self_options =
 							type = "toggle",
 							name = L["Raccourcis clavier"],
 							desc = L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"],
-							get = function(info) return OvaleOptions.db.profile.apparence.raccourcis end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.raccourcis = value end
 						},
 						numeric =
 						{
@@ -180,8 +164,6 @@ local self_options =
 							type = "toggle",
 							name = L["Affichage numérique"],
 							desc = L["Affiche le temps de recharge sous forme numérique"],
-							get = function(info) return OvaleOptions.db.profile.apparence.numeric end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.numeric = value end
 						},
 						highlightIcon =
 						{
@@ -189,16 +171,12 @@ local self_options =
 							type = "toggle",
 							name = L["Illuminer l'icône"],
 							desc = L["Illuminer l'icône quand la technique doit être spammée"],
-							get = function(info) return OvaleOptions.db.profile.apparence.highlightIcon end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.highlightIcon = value; Ovale:UpdateFrame() end
 						},
 						flashIcon =
 						{
 							order = 80,
 							type = "toggle",
 							name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
-							get = function(info) return OvaleOptions.db.profile.apparence.flashIcon end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.flashIcon = value; Ovale:UpdateFrame() end
 						},
 						targetText =
 						{
@@ -206,8 +184,6 @@ local self_options =
 							type = "input",
 							name = L["Caractère de portée"],
 							desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
-							get = function(info) return OvaleOptions.db.profile.apparence.targetText end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.targetText = value; Ovale:UpdateFrame() end
 						},
 						updateInterval =
 						{
@@ -216,8 +192,13 @@ local self_options =
 							name = "Update interval",
 							desc = "Maximum time to wait (in milliseconds) before refreshing icons.",
 							min = 0, max = 500, step = 10,
-							get = function(info) return OvaleOptions.db.profile.apparence.updateInterval * 1000 end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.updateInterval = value / 1000; Ovale:UpdateFrame() end
+							get = function(info)
+								return OvaleOptions.db.profile.apparence.updateInterval * 1000
+							end,
+							set = function(info, value)
+								OvaleOptions.db.profile.apparence.updateInterval = value / 1000
+								self:SendMessage("Ovale_OptionChanged")
+							end
 						},
 					},
 				},
@@ -234,16 +215,12 @@ local self_options =
 							type = "toggle",
 							name = L["Défilement"],
 							desc = L["Les icônes se déplacent"],
-							get = function(info) return OvaleOptions.db.profile.apparence.moving end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.moving = value; Ovale:UpdateFrame() end
 						},
 						vertical =
 						{
 							order = 20,
 							type = "toggle",
 							name = L["Vertical"],
-							get = function(info) return OvaleOptions.db.profile.apparence.vertical end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.vertical = value; Ovale:UpdateFrame() end
 						},
 						margin =
 						{
@@ -251,8 +228,6 @@ local self_options =
 							type = "range",
 							name = L["Marge entre deux icônes"],
 							min = -16, max = 64, step = 1,
-							get = function(info) return OvaleOptions.db.profile.apparence.margin end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.margin = value; Ovale:UpdateFrame() end
 						},
 					},
 				},
@@ -269,8 +244,6 @@ local self_options =
 							type = "range",
 							name = L["Décalage horizontal des options"],
 							min = -256, max = 256, step = 1,
-							get = function(info) return OvaleOptions.db.profile.apparence.iconShiftX end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.iconShiftX = value; Ovale:UpdateFrame() end
 						},
 						iconShiftY =
 						{
@@ -278,8 +251,6 @@ local self_options =
 							type = "range",
 							name = L["Décalage vertical des options"],
 							min = -256, max = 256, step = 1,
-							get = function(info) return OvaleOptions.db.profile.apparence.iconShiftY end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.iconShiftY = value; Ovale:UpdateFrame() end
 						},
 						optionsAlpha =
 						{
@@ -287,8 +258,14 @@ local self_options =
 							type = "range",
 							name = L["Opacité des options"],
 							min = 0, max = 100, step = 5,
-							get = function(info) return OvaleOptions.db.profile.apparence.optionsAlpha * 100 end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.optionsAlpha = value/100; Ovale.frame.content:SetAlpha(value/100) end
+							get = function(info)
+								return OvaleOptions.db.profile.apparence.optionsAlpha * 100
+							end,
+							set = function(info, value)
+								OvaleOptions.db.profile.apparence.optionsAlpha = value / 100
+								Ovale.frame.content:SetAlpha(value/100)
+								self:SendMessage("Ovale_OptionChanged")
+							end
 						},
 					},
 				},
@@ -305,8 +282,6 @@ local self_options =
 							type = "toggle",
 							name = L["Prédictif"],
 							desc = L["Affiche les deux prochains sorts et pas uniquement le suivant"],
-							get = function(info) return OvaleOptions.db.profile.apparence.predictif end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.predictif = value; Ovale:UpdateFrame() end
 						},
 						secondIconScale =
 						{
@@ -314,8 +289,6 @@ local self_options =
 							type = "range",
 							name = L["Taille du second icône"],
 							min = 0.2, max = 1, step = 0.1,
-							get = function(info) return OvaleOptions.db.profile.apparence.secondIconScale end,
-							set = function(info,value) OvaleOptions.db.profile.apparence.secondIconScale = value; Ovale:UpdateFrame() end
 						},
 					},
 				},
@@ -332,8 +305,6 @@ local self_options =
 							name = "Aura lag",
 							desc = "Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed.",
 							min = 100, max = 700, step = 10,
-							get = function(info) return OvaleOptions.db.profile.apparence.auraLag end,
-							set = function(info, value) OvaleOptions.db.profile.apparence.auraLag = value end
 						},
 					},
 				},
