@@ -456,7 +456,7 @@ function Ovale:TraceLog()
 end
 
 function Ovale:OneTimeMessage(...)
-	local s = Ovale:Format(...)
+	local s = self:Format(...)
 	if not self_oneTimeMessage[s] then
 		self_oneTimeMessage[s] = true
 	end
@@ -469,7 +469,7 @@ end
 function Ovale:PrintOneTimeMessages()
 	for s in pairs(self_oneTimeMessage) do
 		if self_oneTimeMessage[s] ~= "printed" then
-			Ovale:Print(s)
+			self:Print(s)
 			self_oneTimeMessage[s] = "printed"
 		end
 	end
