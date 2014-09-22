@@ -83,31 +83,26 @@ local self_options =
 					{
 						enCombat =
 						{
-							order = 10,
 							type = "toggle",
 							name = L["En combat uniquement"],
 						},
 						avecCible =
 						{
-							order = 20,
 							type = "toggle",
 							name = L["Si cible uniquement"],
 						},
 						targetHostileOnly =
 						{
-							order = 30,
 							type = "toggle",
 							name = L["Cacher si cible amicale ou morte"],
 						},
 						hideVehicule =
 						{
-							order = 40,
 							type = "toggle",
 							name = L["Cacher dans les véhicules"],
 						},
 						hideEmpty =
 						{
-							order = 50,
 							type = "toggle",
 							name = L["Cacher bouton vide"],
 						},
@@ -122,7 +117,6 @@ local self_options =
 					{
 						iconScale =
 						{
-							order = 10,
 							type = "range",
 							name = L["Taille des icônes"],
 							desc = L["La taille des icônes"],
@@ -130,7 +124,6 @@ local self_options =
 						},
 						smallIconScale =
 						{
-							order = 20,
 							type = "range",
 							name = L["Taille des petites icônes"],
 							desc = L["La taille des petites icônes"],
@@ -138,7 +131,6 @@ local self_options =
 						},
 						fontScale =
 						{
-							order = 30,
 							type = "range",
 							name = L["Taille des polices"],
 							desc = L["La taille des polices"],
@@ -146,48 +138,41 @@ local self_options =
 						},
 						alpha =
 						{
-							order = 40,
 							type = "range",
 							name = L["Opacité des icônes"],
 							min = 0, max = 100, step = 5,
 						},
 						raccourcis =
 						{
-							order = 50,
 							type = "toggle",
 							name = L["Raccourcis clavier"],
 							desc = L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"],
 						},
 						numeric =
 						{
-							order = 60,
 							type = "toggle",
 							name = L["Affichage numérique"],
 							desc = L["Affiche le temps de recharge sous forme numérique"],
 						},
 						highlightIcon =
 						{
-							order = 70,
 							type = "toggle",
 							name = L["Illuminer l'icône"],
 							desc = L["Illuminer l'icône quand la technique doit être spammée"],
 						},
 						flashIcon =
 						{
-							order = 80,
 							type = "toggle",
 							name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
 						},
 						targetText =
 						{
-							order = 90,
 							type = "input",
 							name = L["Caractère de portée"],
 							desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
 						},
 						updateInterval =
 						{
-							order = 100,
 							type = "range",
 							name = "Update interval",
 							desc = "Maximum time to wait (in milliseconds) before refreshing icons.",
@@ -211,20 +196,17 @@ local self_options =
 					{
 						moving =
 						{
-							order = 10,
 							type = "toggle",
 							name = L["Défilement"],
 							desc = L["Les icônes se déplacent"],
 						},
 						vertical =
 						{
-							order = 20,
 							type = "toggle",
 							name = L["Vertical"],
 						},
 						margin =
 						{
-							order = 30,
 							type = "range",
 							name = L["Marge entre deux icônes"],
 							min = -16, max = 64, step = 1,
@@ -240,21 +222,18 @@ local self_options =
 					{
 						iconShiftX =
 						{
-							order = 10,
 							type = "range",
 							name = L["Décalage horizontal des options"],
 							min = -256, max = 256, step = 1,
 						},
 						iconShiftY =
 						{
-							order = 20,
 							type = "range",
 							name = L["Décalage vertical des options"],
 							min = -256, max = 256, step = 1,
 						},
 						optionsAlpha =
 						{
-							order = 30,
 							type = "range",
 							name = L["Opacité des options"],
 							min = 0, max = 100, step = 5,
@@ -278,14 +257,12 @@ local self_options =
 					{
 						predictif =
 						{
-							order = 10,
 							type = "toggle",
 							name = L["Prédictif"],
 							desc = L["Affiche les deux prochains sorts et pas uniquement le suivant"],
 						},
 						secondIconScale =
 						{
-							order = 20,
 							type = "range",
 							name = L["Taille du second icône"],
 							min = 0.2, max = 1, step = 0.1,
