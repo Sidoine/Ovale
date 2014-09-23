@@ -279,8 +279,8 @@ local self_options =
 						{
 							order = 100,
 							type = "range",
-							name = "Aura lag",
-							desc = "Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed.",
+							name = L["Aura lag"],
+							desc = L["Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed"],
 							min = 100, max = 700, step = 10,
 						},
 					},
