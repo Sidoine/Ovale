@@ -7,7 +7,6 @@
 ## Version: @project-version@
 ## OptionalDeps: Ace3, CallbackHandler-1.0, LibBabble-CreatureType-3.0, LibDualSpec-1.0, LibDispellable-1.0, LibRangeCheck-2.0, LibStub, Masque, Recount, Skada
 ## SavedVariables: OvaleDB
-## SavedVariablesPerCharacter: OvaleDBPC
 ## X-Category: Combat
 ## X-Embeds: Ace3
 
