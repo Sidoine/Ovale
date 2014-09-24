@@ -408,7 +408,7 @@ function OvaleCompile:OnEnable()
 	self:RegisterMessage("Ovale_EquipmentChanged")
 	self:RegisterMessage("Ovale_GlyphsChanged", "EventHandler")
 	self:RegisterMessage("Ovale_ListValueChanged", "ScriptControlChanged")
-	self:RegisterMessage("Ovale_ScriptChanged", "CompileScript")
+	self:RegisterMessage("Ovale_ScriptChanged")
 	self:RegisterMessage("Ovale_SpellsChanged", "EventHandler")
 	self:RegisterMessage("Ovale_StanceChanged")
 	self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
@@ -430,6 +430,14 @@ function OvaleCompile:Ovale_EquipmentChanged(event)
 	if self_compileOnItems then
 		self:EventHandler(event)
 	end
+end
+
+function OvaleCompile:Ovale_ScriptChanged(event)
+	-- Compile the script named in the current profile.
+	local profile = OvaleOptions:GetProfile()
+	self:CompileScript(profile.source)
+	-- Trigger script evaluation.
+	self:EventHandler(event)
 end
 
 function OvaleCompile:Ovale_StanceChanged(event)
@@ -464,26 +472,22 @@ function OvaleCompile:EventHandler(event)
 	Ovale.refreshNeeded["player"] = true
 end
 
-function OvaleCompile:CompileScript(event)
+function OvaleCompile:CompileScript(name)
 	-- Reset the trace state if we compile a new script.
 	Ovale:ResetTrace()
-	-- Compile the selected script from the profile.
-	local profile = OvaleOptions:GetProfile()
-	local source = profile.source
-	Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "Compiling script '%s'.", source)
+	-- Generate the node tree from the named script.
+	Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "Compiling script '%s'.", name)
 	if self.ast then
 		OvaleAST:Release(self.ast)
 		self.ast = nil
 	end
-	local ast = OvaleAST:ParseScript(source)
+	local ast = OvaleAST:ParseScript(name)
 	if ast then
 		OvaleAST:Optimize(ast)
 		self.ast = ast
 	end
 	-- Reset the controls defined by the previous script.
 	Ovale:ResetControls()
-	-- Trigger script evaluation.
-	self:EventHandler(event)
 end
 
 function OvaleCompile:EvaluateScript(forceEvaluation)
