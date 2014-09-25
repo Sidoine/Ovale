@@ -26,6 +26,7 @@ local tconcat = table.concat
 local tostring = tostring
 local unpack = unpack
 local wipe = table.wipe
+local API_GetItemInfo = GetItemInfo
 local API_GetTime = GetTime
 local API_IsInGroup = IsInGroup
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
@@ -262,7 +263,9 @@ function Ovale:UpdateControls()
 	for name, checkBox in pairs(self.checkBox) do
 		if checkBox.text then
 			local widget = AceGUI:Create("CheckBox")
-			widget:SetLabel(checkBox.text)
+			-- XXX Workaround for GetItemInfo() possibly returning nil.
+			local text = self:FinalizeString(checkBox.text)
+			widget:SetLabel(text)
 			if profile.check[name] == nil then
 				profile.check[name] = checkBox.checked
 			end
@@ -367,6 +370,14 @@ function Ovale:ToggleCheckBox(k)
 		end
 		k = k - 1
 	end
+end
+
+function Ovale:FinalizeString(s)
+	local item, id = strmatch(s, "^(item:)(.+)")
+	if item then
+		s = API_GetItemInfo(id)
+	end
+	return s
 end
 
 -- Debugging methods.

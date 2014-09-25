@@ -2348,7 +2348,7 @@ function OvaleAST:PropagateStrings(ast)
 				if key then
 					local name = node.name
 					if name == "ItemName" then
-						value = API_GetItemInfo(key)
+						value = API_GetItemInfo(key) or "item:" .. key
 					elseif name == "L" then
 						value = L[key]
 					elseif name == "SpellName" then
