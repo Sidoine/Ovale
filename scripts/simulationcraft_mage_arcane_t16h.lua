@@ -165,7 +165,6 @@ AddFunction ArcaneSingleTargetActions
 	#arcane_blast
 	Spell(arcane_blast)
 	#ice_floes,if=talent.ice_floes.enabled
-	if Talent(ice_floes_talent) Spell(ice_floes)
 	#arcane_barrage,moving=1
 	if Speed() > 0 Spell(arcane_barrage)
 	#fire_blast,moving=1
@@ -217,8 +216,6 @@ AddIcon specialization=arcane help=aoe
 # frost_bomb_talent
 # glyph_of_loose_mana
 # glyph_of_mana_gem
-# ice_floes
-# ice_floes_talent
 # ice_lance
 # invocation_talent
 # invokers_energy_buff

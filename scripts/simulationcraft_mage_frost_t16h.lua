@@ -157,7 +157,6 @@ AddFunction FrostDefaultActions
 	#frostbolt
 	Spell(frostbolt)
 	#ice_floes,if=talent.ice_floes.enabled
-	if Talent(ice_floes_talent) Spell(ice_floes)
 	#fire_blast,moving=1
 	if Speed() > 0 Spell(fire_blast)
 	#ice_lance,moving=1
@@ -204,8 +203,6 @@ AddIcon specialization=frost help=aoe
 # frozen_orb
 # glyph_of_icy_veins
 # glyph_of_mana_gem
-# ice_floes
-# ice_floes_talent
 # ice_lance
 # icy_veins
 # icy_veins_buff

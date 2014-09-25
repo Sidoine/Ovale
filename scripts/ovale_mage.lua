@@ -900,7 +900,6 @@ AddFunction FrostDefaultActions
 	#frostbolt
 	Spell(frostbolt)
 	#ice_floes,if=talent.ice_floes.enabled
-	if Talent(ice_floes_talent) Spell(ice_floes)
 	#fire_blast,moving=1
 	if Speed() > 0 Spell(fire_blast)
 	#ice_lance,moving=1
