@@ -492,9 +492,11 @@ end
 
 function OvaleCompile:EvaluateScript(forceEvaluation)
 	profiler.Start("OvaleCompile_EvaluateScript")
+	local changed = false
 	self_canEvaluate = self_canEvaluate or Ovale:IsPreloaded(self_requirePreload)
 	if self_canEvaluate and self.ast and (forceEvaluation or not self.serial or self.serial < self_serial) then
 		Ovale:DebugPrint(OVALE_COMPILE_DEBUG, "Evaluating script.")
+		changed = true
 		-- Reset compilation state.
 		local ok = true
 		self_compileOnItems = false
@@ -532,10 +534,10 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 		end
 		if ok then
 			AddMissingVariantSpells(self.ast.annotation)
-			Ovale:UpdateFrame()
 		end
 	end
 	profiler.Stop("OvaleCompile_EvaluateScript")
+	return changed
 end
 
 function OvaleCompile:GetFunctionNode(name)

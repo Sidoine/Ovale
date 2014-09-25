@@ -171,14 +171,16 @@ do
 		local refresh = forceRefresh or next(Ovale.refreshNeeded)
 		if not refresh then return end
 
-		OvaleCompile:EvaluateScript()
-		local iconNodes = OvaleCompile:GetIconNodes()
-		if not iconNodes then return end
-		
 		self.lastUpdate = now
 
 		local state = OvaleState.state
 		state:Initialize()
+
+		if OvaleCompile:EvaluateScript() then
+			Ovale:UpdateFrame()
+		end
+
+		local iconNodes = OvaleCompile:GetIconNodes()
 		for k, node in ipairs(iconNodes) do
 			-- Set the true target of "target" references in the icon's body.
 			if node.params and node.params.target then
@@ -308,14 +310,10 @@ do
 		local maxHeight = 0
 		local maxWidth = 0
 		local top = 0
+		local BARRE = 8
+		local margin = profile.apparence.margin
 
 		local iconNodes = OvaleCompile:GetIconNodes()
-		if not iconNodes then return end
-		
-		local BARRE = 8
-		
-		local margin = profile.apparence.margin
-			
 		for k, node in ipairs(iconNodes) do
 			if not self.actions[k] then
 				self.actions[k] = {icons={}, secureIcons={}}
