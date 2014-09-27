@@ -1026,7 +1026,7 @@ AddIcon specialization=guardian help=shortcd enemies=1 checkbox=opt_druid_guardi
 	GuardianDefaultShortCdActions()
 }
 
-AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian checkbox=!opt_druid_guardian_aoe
+AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian checkbox=opt_druid_guardian_aoe
 {
 	if InCombat(no) GuardianPrecombatShortCdActions()
 	GuardianDefaultShortCdActions()
