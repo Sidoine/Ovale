@@ -196,7 +196,7 @@ AddIcon specialization=brewmaster help=main checkbox=opt_monk_brewmaster
 	BrewmasterFillerActions()
 }
 
-AddIcon specialization=brewmaster help=aoe checkbox=opt_monk_brewmaster_aoe checkbox=opt_monk_brewmaster
+AddIcon specialization=brewmaster help=aoe checkbox=opt_monk_brewmaster checkbox=opt_monk_brewmaster_aoe
 {
 	if InCombat(no) BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
@@ -319,7 +319,7 @@ AddIcon specialization=mistweaver help=main checkbox=opt_monk_mistweaver
 	MistweaverSingleTargetActions()
 }
 
-AddIcon specialization=mistweaver help=aoe checkbox=opt_monk_mistweaver_aoe checkbox=opt_monk_mistweaver
+AddIcon specialization=mistweaver help=aoe checkbox=opt_monk_mistweaver checkbox=opt_monk_mistweaver_aoe
 {
 	if InCombat(no) MistweaverPrecombatActions()
 	MistweaverAoeActions()

@@ -288,7 +288,7 @@ AddIcon specialization=protection help=main checkbox=opt_paladin_protection
 	ProtectionDefaultActions()
 }
 
-AddIcon specialization=protection help=aoe checkbox=opt_paladin_protection_aoe checkbox=opt_paladin_protection
+AddIcon specialization=protection help=aoe checkbox=opt_paladin_protection checkbox=opt_paladin_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatActions()
 

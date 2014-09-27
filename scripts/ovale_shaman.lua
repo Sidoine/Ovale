@@ -657,7 +657,7 @@ AddIcon specialization=restoration help=main checkbox=opt_shaman_restoration
 	RestorationMainActions()
 }
 
-AddIcon specialization=restoration help=aoe checkbox=opt_shaman_restoration_aoe checkbox=opt_shaman_restoration
+AddIcon specialization=restoration help=aoe checkbox=opt_shaman_restoration checkbox=opt_shaman_restoration_aoe
 {
 	RestorationAoeActions()
 }
