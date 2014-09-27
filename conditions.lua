@@ -1552,8 +1552,8 @@ do
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param any Optional. By default, only enemies tagged by the player are counted. To count all enemies of the player's group, set any=1.
-	--     Defaults to any=0.
+	-- @param tagged Optional. By default, all enemies are counted. To count only enemies directly tagged by the player, set tagged=1.
+	--     Defaults to tagged=0.
 	--     Valid values: 0, 1.
 	-- @return The number of enemies.
 	-- @return A boolean value for the result of the comparison.
@@ -1563,10 +1563,9 @@ do
 
 	local function Enemies(condition)
 		local comparator, limit = condition[1], condition[2]
-		local _, _, mine = ParseCondition(condition)
 		local value = state.enemies
 		if not value then
-			if mine then
+			if condition.tagged == 1 then
 				value = state.taggedEnemies
 			else
 				value = state.activeEnemies
