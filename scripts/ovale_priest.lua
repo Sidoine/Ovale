@@ -285,7 +285,7 @@ AddIcon specialization=shadow help=moving enemies=1 checkbox=opt_priest_shadow c
 	ShadowDefaultMovingActions()
 }
 
-AddIcon specialization=shadow help=main checkbox=opt_priest_shadow checkbox=opt_priest_shadow_aoe
+AddIcon specialization=shadow help=aoe checkbox=opt_priest_shadow checkbox=opt_priest_shadow_aoe
 {
 	if InCombat(no) ShadowPrecombatActions()
 	ShadowDefaultActions()
