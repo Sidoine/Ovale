@@ -660,7 +660,7 @@ AddIcon specialization=destruction help=predict enemies=1 checkbox=opt_warlock_d
 	DestructionDefaultPredictActions()
 }
 
-AddIcon specialization=destruction help=aoe checkbox=opt_warlock_destruction
+AddIcon specialization=destruction help=aoe checkbox=opt_warlock_destruction checkbox=opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatActions()
 	DestructionDefaultActions()
