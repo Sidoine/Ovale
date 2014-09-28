@@ -340,14 +340,18 @@ AddFunction FrostDualWieldDefaultActions
 
 AddFunction FrostDualWieldDefaultShortCdActions
 {
+	# CHANGE: Suggest Anti-Magic Shell after other short CD spells.
 	#antimagic_shell,damage=100000
-	Spell(antimagic_shell)
+	#Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
 	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostDualWieldAoeShortCdActions()
 	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostDualWieldSingleTargetShortCdActions()
+	# CHANGE: Suggest Anti-Magic Shell after other short CD spells.
+	#antimagic_shell,damage=100000
+	Spell(antimagic_shell)
 }
 
 AddFunction FrostDualWieldDefaultCdActions
@@ -602,14 +606,18 @@ AddFunction FrostTwoHandedDefaultActions
 
 AddFunction FrostTwoHandedDefaultShortCdActions
 {
+	# CHANGE: Suggest Anti-Magic Shell after other short CD spells.
 	#antimagic_shell,damage=100000
-	Spell(antimagic_shell)
+	#Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
 	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostTwoHandedAoeShortCdActions()
 	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostTwoHandedSingleTargetShortCdActions()
+	# CHANGE: Suggest Anti-Magic Shell after other short CD spells.
+	#antimagic_shell,damage=100000
+	Spell(antimagic_shell)
 }
 
 AddFunction FrostTwoHandedDefaultCdActions
@@ -963,12 +971,16 @@ AddFunction UnholyDefaultActions
 
 AddFunction UnholyDefaultShortCdActions
 {
+	# CHANGE: Suggest Anti-Magic Shell after other short CD spells.
 	#antimagic_shell,damage=100000
-	Spell(antimagic_shell)
+	#Spell(antimagic_shell)
 	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 UnholyAoeShortCdActions()
 	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 UnholySingleTargetShortCdActions()
+	# CHANGE: Suggest Anti-Magic Shell after other short CD spells.
+	#antimagic_shell,damage=100000
+	Spell(antimagic_shell)
 }
 
 AddFunction UnholyDefaultCdActions
