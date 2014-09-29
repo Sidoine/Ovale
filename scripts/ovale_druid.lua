@@ -61,115 +61,6 @@ AddFunction SavageRoar
 ###
 ### Balance
 ###
-
-### Elitist Jerks rotation functions.
-
-AddCheckBox(opt_elitist_jerks_balance_rotation "Elitist Jerks Balance Rotation" specialization=balance)
-
-AddFunction BalanceIsNearEclipseState
-{
-	# True if we're one cast away from reaching the next Eclipse.
-	   { EclipseDir() < 0 and BuffExpires(shooting_stars_buff) and Eclipse() + 100 <= 30 }
-	or { EclipseDir() < 0 and BuffPresent(shooting_stars_buff) and Eclipse() + 100 <= 40 }
-	or { EclipseDir() > 0 and 100 - Eclipse() <= 40 }
-}
-
-AddFunction BalanceElitistJerksDotActions
-{
-	# If both DoTs need to be applied or refreshed, apply the non-Eclipsed DoT first to gain Lunar Shower for the application of the Eclipsed DoT.
-	if target.TicksRemain(moonfire_debuff) < 2 and target.TicksRemain(sunfire_debuff) < 2
-	{
-		if BuffPresent(lunar_eclipse_buff) Spell(sunfire)
-		if BuffPresent(solar_eclipse_buff) Spell(moonfire)
-	}
-
-	# Apply the Eclipsed DoT when entering the corresponding Eclipse state.
-	if BuffPresent(lunar_eclipse_buff) and target.DebuffRemaining(moonfire_debuff) < { BuffRemaining(natures_grace_buff) - 2 + 2 * ArmorSetBonus(T14_caster 4) } Spell(moonfire)
-	if BuffPresent(solar_eclipse_buff) and target.DebuffRemaining(sunfire_debuff) < { BuffRemaining(natures_grace_buff) - 2 + 2 * ArmorSetBonus(T14_caster 4) } Spell(sunfire)
-
-	# Apply the Eclipsed DoT if it fell off during the Eclipse state.
-	if BuffPresent(lunar_eclipse_buff) and target.TicksRemain(moonfire_debuff) < 2 Spell(moonfire)
-	if BuffPresent(solar_eclipse_buff) and target.TicksRemain(sunfire_debuff) < 2 Spell(sunfire)
-
-	# Apply the non-Eclipsed DoT only when it is about to expire (on the last tick) and we are not about to enter a new Eclipse state.
-	if not BalanceIsNearEclipseState()
-	{
-		if BuffExpires(lunar_eclipse_buff) and target.TicksRemain(moonfire_debuff) < 2 Spell(moonfire)
-		if BuffExpires(solar_eclipse_buff) and target.TicksRemain(sunfire_debuff) < 2 Spell(sunfire)
-	}
-
-	# Simplistic logic for refreshing DoTs early to snapshot powerful buff effects.
-	if Level() >= 90 and target.DebuffPresent(moonfire_debuff) and Damage(moonfire_debuff) / LastEstimatedDamage(moonfire_debuff) > 1.3 Spell(moonfire)
-	if Level() >= 90 and target.DebuffPresent(sunfire_debuff) and Damage(sunfire_debuff) / LastEstimatedDamage(sunfire_debuff) > 1.3 Spell(sunfire)
-}
-
-# Minimize the time spent outside of Eclipse by only casting Starsurge at the appropriate times:
-#	* The Shooting Stars buff is about to expire.
-#	* During Lunar Eclipse unless it pushes you out of Eclipse during Starfall.
-#	* When outside Lunar Eclipse and moving toward Solar Eclipse.
-#	* The first time Starsurge is available during Solar Eclipse.
-#	* The second time Starsurge is available during Solar Eclipse only at 5 Eclipse energy.
-#	* When outside Solar Eclipse and moving toward Lunar Eclipse.
-#
-AddFunction BalanceElitistJerksStarsurgeCondition
-{
-	   { BuffPresent(shooting_stars_buff) and BuffRemaining(shooting_stars_buff) < 2 }
-	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() > 20 }
-	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() <= 20 and BuffPresent(shooting_stars_buff) and BuffExpires(starfall_buff) }
-	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() <= 20 and BuffExpires(shooting_stars_buff) and BuffRemaining(starfall_buff) < CastTime(starsurge) }
-	or { BuffExpires(lunar_eclipse_buff) and EclipseDir() >= 0 }
-	or { BuffPresent(solar_eclipse_buff) and { Eclipse(asValue=1) - 10 } % 15 == 0 }
-	or { BuffPresent(solar_eclipse_buff) and Eclipse() == 5 }
-	or { BuffExpires(solar_eclipse_buff) and EclipseDir() <= 0 }
-}
-
-# Only suggest Starfire at the appropriate times:
-#	* During Lunar Eclipse unless it pushes you out of Eclipse during Starfall.
-#	* When outside Lunar Eclipse and moving toward Solar Eclipse.
-#
-AddFunction BalanceElitistJerksStarfireCondition
-{
-	   { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() > 20 }
-	or { BuffPresent(lunar_eclipse_buff) and 0 - Eclipse() <= 20 and BuffRemaining(starfall_buff) < CastTime(starfire) }
-	or { BuffExpires(lunar_eclipse_buff) and EclipseDir() >= 0 }
-}
-
-AddFunction BalanceElitistJerksMainActions
-{
-	# Proc Dream of Cenarius with Healing Touch if one cast away from reaching Eclipse.
-	if Talent(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BalanceIsNearEclipseState() Spell(healing_touch)
-	# Cast instant-cast Starsurge.
-	if BuffPresent(shooting_stars_buff) and BalanceElitistJerksStarsurgeCondition() Spell(starsurge)
-	# Apply and maintain Moonfire and Sunfire on the target.
-	BalanceElitistJerksDotActions()
-	# Proc Dream of Cenarius with Healing Touch after refreshing DoTs if outside of major CD buffs.
-	if Talent(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BuffExpires(celestial_alignment) and BuffExpires(chosen_of_elune_buff) Spell(healing_touch)
-	# Cast Starsurge on cooldown.
-	if BalanceElitistJerksStarsurgeCondition() Spell(starsurge)
-	# Spam Starfire during Celestial Alignment.
-	if BuffPresent(celestial_alignment_buff) and CastTime(starfire) < BuffRemaining(celestial_alignment_buff) Spell(starfire)
-	# Cast Wrath as Celestial Alignment is expiring if the cast will finish before the buff expires.
-	if BuffPresent(celestial_alignment_buff) and CastTime(wrath) < BuffRemaining(celestial_alignment_buff) Spell(wrath)
-	# Cast Starfire if moving toward Solar Eclipse (only if it won't affect Eclipsed Starfall).
-	if EclipseDir() > 0 and BalanceElitistJerksStarfireCondition() Spell(starfire)
-	# Filler
-	Spell(wrath)
-}
-
-AddFunction BalanceElitistJerksCdActions
-{
-	if BuffPresent(burst_haste any=1) or target.TimeToDie() <= 40 or BuffPresent(celestial_alignment_buff) UsePotionIntellect()
-	if BuffPresent(celestial_alignment_buff) Spell(berserking)
-	if BuffPresent(celestial_alignment_buff) or SpellCooldown(celestial_alignment) > 30 UseItemActions()
-	if Talent(natures_vigil_talent) and BuffPresent(celestial_alignment_buff) or BuffPresent(chosen_of_elune_buff) Spell(natures_vigil)
-
-	unless { Talent(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BalanceIsNearEclipseState() }
-	{
-		if Talent(incarnation_talent) and { BuffPresent(lunar_eclipse_buff) or BuffPresent(solar_eclipse_buff) } and BuffPresent(natures_grace_buff) Spell(incarnation)
-		if { BuffExpires(lunar_eclipse_buff) and BuffExpires(solar_eclipse_buff) } and { BuffPresent(chosen_of_elune_buff) or Talent(incarnation_talent no) or SpellCooldown(incarnation) > 10 } Spell(celestial_alignment)
-	}
-}
-
 # Based on SimulationCraft profile "Druid_Balance_T16H".
 #	class=druid
 #	spec=balance
@@ -299,29 +190,25 @@ AddIcon specialization=balance help=shortcd checkbox=opt_druid_balance checkbox=
 AddIcon specialization=balance help=main enemies=1 checkbox=opt_druid_balance
 {
 	if InCombat(no) BalancePrecombatActions()
-	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksMainActions()
-	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultActions()
+	BalanceDefaultActions()
 }
 
 AddIcon specialization=balance help=aoe checkbox=opt_druid_balance checkbox=opt_druid_balance_aoe
 {
 	if InCombat(no) BalancePrecombatActions()
-	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksMainActions()
-	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultActions()
+	BalanceDefaultActions()
 }
 
 AddIcon specialization=balance help=cd enemies=1 checkbox=opt_druid_balance checkbox=!opt_druid_balance_aoe
 {
 	if InCombat(no) BalancePrecombatCdActions()
-	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksCdActions()
-	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultCdActions()
+	BalanceDefaultCdActions()
 }
 
 AddIcon specialization=balance help=cd checkbox=opt_druid_balance checkbox=opt_druid_balance_aoe
 {
 	if InCombat(no) BalancePrecombatCdActions()
-	if CheckBoxOn(opt_elitist_jerks_balance_rotation) BalanceElitistJerksCdActions()
-	if CheckBoxOff(opt_elitist_jerks_balance_rotation) BalanceDefaultCdActions()
+	BalanceDefaultCdActions()
 }
 
 ###
