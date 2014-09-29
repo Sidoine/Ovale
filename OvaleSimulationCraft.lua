@@ -1137,6 +1137,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "PALADIN" and action == "hammer_of_wrath" then
 			-- Hammer of Wrath can only be cast on targets below 20% health.
 			conditionCode = "target.HealthPercent() < 20"
+			-- Retribution paladins can also cast Hammer of Wrath if Avenging Wrath is up.
+			if specialization == "retribution" then
+				local buffName = "avenging_wrath_buff"
+				AddSymbol(annotation, buffName)
+				conditionCode = format("%s or BuffPresent(%s)", conditionCode, buffName)
+			end
 		elseif class == "PALADIN" and action == "rebuke" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class

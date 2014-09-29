@@ -364,7 +364,7 @@ AddFunction RetributionDefaultActions
 	#templars_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<4
 	if BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < 4 Spell(templars_verdict)
 	#hammer_of_wrath
-	if target.HealthPercent() < 20 Spell(hammer_of_wrath)
+	if target.HealthPercent() < 20 or BuffPresent(avenging_wrath_buff) Spell(hammer_of_wrath)
 	#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.2
 	unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.2
 	{
