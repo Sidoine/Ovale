@@ -7,6 +7,8 @@ do
 	local code = [[
 # Druid spells and functions.
 
+Define(astral_communion 127663)
+	SpellInfo(astral_communion channel=4)
 Define(astral_storm 106996)
 	SpellInfo(astral_storm arcane=1 channel=10 haste=spell)
 Define(barkskin 22812)
