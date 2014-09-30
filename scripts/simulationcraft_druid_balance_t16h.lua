@@ -46,7 +46,7 @@ AddFunction BalanceDefaultActions
 	#healing_touch,if=talent.dream_of_cenarius.enabled&!buff.dream_of_cenarius.up&mana.pct>25
 	if Talent(dream_of_cenarius_talent) and not BuffPresent(dream_of_cenarius_caster_buff) and ManaPercent() > 25 Spell(healing_touch)
 	#incarnation,if=talent.incarnation.enabled&trinket.stat.intellect.up
-	if Talent(incarnation_talent) and BuffPresent(trinket_stat_intellect_buff) Spell(incarnation)
+	if Talent(incarnation_talent) and BuffPresent(trinket_stat_intellect_buff) Spell(incarnation_caster)
 	#celestial_alignment,if=trinket.stat.intellect.up
 	if BuffPresent(trinket_stat_intellect_buff) Spell(celestial_alignment)
 	#natures_vigil,if=talent.natures_vigil.enabled
@@ -108,7 +108,7 @@ AddIcon specialization=balance help=aoe
 # force_of_nature_talent
 # healing_touch
 # hurricane
-# incarnation
+# incarnation_caster
 # incarnation_talent
 # jade_serpent_potion
 # mark_of_the_wild

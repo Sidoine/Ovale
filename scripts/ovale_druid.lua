@@ -125,8 +125,8 @@ AddFunction BalanceDefaultCdActions
 		#incarnation,if=talent.incarnation.enabled&trinket.stat.intellect.up
 		# CHANGE: Incarnation should only be cast if in Lunar or Solar Eclipse.
 		# CHANGE: Only delay Incarnation if the trinket proc will be up soon.
-		#if Talent(incarnation_talent) and BuffPresent(trinket_stat_intellect_buff) Spell(incarnation)
-		if Talent(incarnation_talent) and { BuffPresent(lunar_eclipse_buff) or BuffPresent(solar_eclipse_buff) } and { BuffPresent(trinket_stat_intellect_buff) or BuffCooldown(trinket_stat_intellect_buff) > 15 } Spell(incarnation)
+		#if Talent(incarnation_talent) and BuffPresent(trinket_stat_intellect_buff) Spell(incarnation_caster)
+		if Talent(incarnation_talent) and { BuffPresent(lunar_eclipse_buff) or BuffPresent(solar_eclipse_buff) } and { BuffPresent(trinket_stat_intellect_buff) or BuffCooldown(trinket_stat_intellect_buff) > 15 } Spell(incarnation_caster)
 		#celestial_alignment,if=trinket.stat.intellect.up
 		# CHANGE: Celestial Alignment should only be cast if not in Lunar or Solar Eclipse.
 		# CHANGE: Only delay Celestial Alignment if the trinket proc will be up soon.
@@ -874,13 +874,13 @@ AddFunction GuardianDefaultCdActions
 	#renewal,if=talent.renewal.enabled&incoming_damage_5>0.8*health.max
 	if Talent(renewal_talent) and IncomingDamage(5) > 0.8 * MaxHealth() Spell(renewal)
 	#natures_vigil,if=talent.natures_vigil.enabled&(!talent.incarnation.enabled|buff.son_of_ursoc.up|cooldown.incarnation.remains)
-	if Talent(natures_vigil_talent) and { Talent(incarnation_talent no) or BuffPresent(son_of_ursoc_buff) or SpellCooldown(incarnation) > 0 } Spell(natures_vigil)
+	if Talent(natures_vigil_talent) and { Talent(incarnation_talent no) or BuffPresent(son_of_ursoc_buff) or SpellCooldown(incarnation_tank) > 0 } Spell(natures_vigil)
 
 	# CHANGE: Add bear DPS cooldown abilities.
 	if HealthPercent() < 50
 	{
 		if BuffExpires(son_of_ursoc_buff) Spell(berserk_bear)
-		if Talent(incarnation_talent) and BuffExpires(berserk_bear_buff) Spell(incarnation)
+		if Talent(incarnation_talent) and BuffExpires(berserk_bear_buff) Spell(incarnation_tank)
 	}
 }
 
@@ -1015,7 +1015,7 @@ AddFunction RestorationCdActions
 {
 	InterruptActions()
 	if Talent(force_of_nature_talent) Spell(force_of_nature_heal)
-	if Talent(incarnation_talent) Spell(incarnation)
+	if Talent(incarnation_talent) Spell(incarnation_heal)
 	if Talent(heart_of_the_wild_talent) Spell(heart_of_the_wild_heal)
 	if Talent(natures_vigil_talent) Spell(natures_vigil)
 }

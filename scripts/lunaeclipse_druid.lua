@@ -131,9 +131,9 @@ AddFunction BalanceMainActions
 	# Proc Dream of Cenarius with Healing Touch if one cast away from reaching Eclipse.
 	if TalentPoints(dream_of_cenarius_talent) and BuffExpires(dream_of_cenarius_caster_buff) and BalanceIsNearEclipseState() Spell(healing_touch)
 	# Cast Incarnation.
-	if TalentPoints(incarnation_talent) and BalanceIncarnationCondition() Spell(incarnation)
+	if TalentPoints(incarnation_talent) and BalanceIncarnationCondition() Spell(incarnation_caster)
 	# Cast Celestial Alignment if currently out of an Eclipse state and Incarnation is active.
-	if BuffExpires(lunar_eclipse_buff) and BuffExpires(solar_eclipse_buff) and { BuffPresent(chosen_of_elune_buff) or not TalentPoints(incarnation_talent) or SpellCooldown(incarnation) > 10 } Spell(celestial_alignment)
+	if BuffExpires(lunar_eclipse_buff) and BuffExpires(solar_eclipse_buff) and { BuffPresent(chosen_of_elune_buff) or not TalentPoints(incarnation_talent) or SpellCooldown(incarnation_caster) > 10 } Spell(celestial_alignment)
 	# Cast Starfall if it won't clip a previous Starfall.
 	if BuffExpires(starfall_buff) and { BuffPresent(lunar_eclipse_buff) or BuffPresent(celestial_alignment_buff) } Spell(starfall)
 	# Cast instant-cast Starsurge.
