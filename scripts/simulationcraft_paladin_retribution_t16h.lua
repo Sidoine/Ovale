@@ -28,6 +28,12 @@ AddFunction UseItemActions
 	Item(Trinket1Slot usable=1)
 }
 
+AddFunction Exorcism
+{
+	if Glyph(glyph_of_mass_exorcism) Spell(exorcism_glyphed)
+	if Glyph(glyph_of_mass_exorcism no) Spell(exorcism)
+}
+
 AddFunction InterruptActions
 {
 	if target.IsFriend(no) and target.IsInterruptible()
@@ -112,7 +118,7 @@ AddFunction RetributionDefaultActions
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.2 and SpellCooldown(crusader_strike) > 0
 		{
 			#exorcism,if=active_enemies>=2&active_enemies<=4&set_bonus.tier15_2pc_melee&glyph.mass_exorcism.enabled
-			if Enemies() >= 2 and Enemies() <= 4 and ArmorSetBonus(T15_melee 2) and Glyph(glyph_of_mass_exorcism) Spell(exorcism)
+			if Enemies() >= 2 and Enemies() <= 4 and ArmorSetBonus(T15_melee 2) and Glyph(glyph_of_mass_exorcism) Exorcism()
 			#judgment
 			Spell(judgment)
 			#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2
@@ -123,7 +129,7 @@ AddFunction RetributionDefaultActions
 				#templars_verdict,if=buff.divine_purpose.react
 				if BuffPresent(divine_purpose_buff) Spell(templars_verdict)
 				#exorcism
-				Spell(exorcism)
+				Exorcism()
 				#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2
 				unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and SpellCooldown(exorcism) > 0
 				{
@@ -169,6 +175,7 @@ AddIcon specialization=retribution help=aoe
 # execution_sentence
 # execution_sentence_talent
 # exorcism
+# exorcism_glyphed
 # fist_of_justice
 # glyph_of_mass_exorcism
 # guardian_of_ancient_kings_melee

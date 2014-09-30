@@ -1134,6 +1134,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "Consecration()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "PALADIN" and action == "exorcism" then
+			bodyCode = "Exorcism()"
+			annotation[action] = class
+			isSpellAction = false
 		elseif class == "PALADIN" and action == "hammer_of_wrath" then
 			-- Hammer of Wrath can only be cast on targets below 20% health.
 			conditionCode = "target.HealthPercent() < 20"
@@ -2763,6 +2767,21 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "hammer_of_justice")
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "rebuke")
+		count = count + 1
+	end
+	if annotation.exorcism == "PALADIN" then
+		local code = [[
+			AddFunction Exorcism
+			{
+				if Glyph(glyph_of_mass_exorcism) Spell(exorcism_glyphed)
+				if Glyph(glyph_of_mass_exorcism no) Spell(exorcism)
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "exorcism")
+		AddSymbol(annotation, "exorcism_glyphed")
+		AddSymbol(annotation, "glyph_of_mass_exorcism")
 		count = count + 1
 	end
 	if annotation.consecration == "PALADIN" then
