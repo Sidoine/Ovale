@@ -1144,7 +1144,7 @@ AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury checkbox=opt_
 	}
 }
 
-AddIcon specialization=fury help=main enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
+AddIcon specialization=fury help=main enemies=1 checkbox=opt_warrior_fury
 {
 	if HasWeapon(main type=1h)
 	{
