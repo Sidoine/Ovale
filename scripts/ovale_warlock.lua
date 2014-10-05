@@ -100,10 +100,15 @@ AddFunction AfflictionDefaultPredictActions
 	if Enemies() > 6 AfflictionAoePredictActions()
 	#soul_swap,if=buff.soulburn.up
 	if BuffPresent(soulburn_buff) Spell(soul_swap)
-	#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
-	if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soulburn)
-	#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
-	if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soulburn)
+	# CHANGE: Synchronize abilities that use Soulburn with Soulburn's conditions so that they are shown concurrently with Soulburn.
+	unless { Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } } and Spell(dark_soul_misery)
+		or Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+	{
+		#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
+		#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
+		if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soul_swap)
+		if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soul_swapsoulburn)
+	}
 	#soul_swap,if=active_enemies>1&buff.soul_swap.down&(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)
 	if Enemies() > 1 and BuffExpires(soul_swap_buff) and { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } Spell(soul_swap)
 	#soul_swap,cycle_targets=1,if=active_enemies>1&buff.soul_swap.up&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
@@ -132,6 +137,14 @@ AddFunction AfflictionDefaultShortCdActions
 		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
 		#service_pet,if=talent.grimoire_of_service.enabled
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+
+		unless BuffPresent(soulburn_buff) and Spell(soul_swap)
+		{
+			#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
+			if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soulburn)
+			#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
+			if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soulburn)
+		}
 	}
 }
 
@@ -165,14 +178,15 @@ AddFunction AfflictionAoeActions
 
 AddFunction AfflictionAoePredictActions
 {
+	# CHANGE: Synchronize abilities that use Soulburn with Soulburn's conditions so that they are shown concurrently with Soulburn.
 	#soulburn,cycle_targets=1,if=buff.soulburn.down&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target&shard_react
-	if BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 Spell(soulburn)
+	#if BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 Spell(soul_swap)
 	#soul_swap,if=buff.soulburn.up&!dot.agony.ticking&!dot.corruption.ticking
-	if BuffPresent(soulburn_buff) and not target.DebuffPresent(agony_debuff) and not target.DebuffPresent(corruption_debuff) Spell(soul_swap)
+	if { BuffPresent(soulburn_buff) or BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 } and not target.DebuffPresent(agony_debuff) and not target.DebuffPresent(corruption_debuff) Spell(soul_swap)
 	#soul_swap,cycle_targets=1,if=buff.soulburn.up&dot.corruption.ticking&!dot.agony.ticking
-	if BuffPresent(soulburn_buff) and target.DebuffPresent(corruption_debuff) and not target.DebuffPresent(agony_debuff) Spell(soul_swap)
+	if { BuffPresent(soulburn_buff) or BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 } and target.DebuffPresent(corruption_debuff) and not target.DebuffPresent(agony_debuff) Spell(soul_swap)
 	#seed_of_corruption,cycle_targets=1,if=(buff.soulburn.down&!in_flight_to_target&!ticking)|(buff.soulburn.up&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target)
-	if BuffExpires(soulburn_buff) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption_debuff) or BuffPresent(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) Spell(seed_of_corruption)
+	if BuffExpires(soulburn_buff) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption_debuff) or { BuffPresent(soulburn_buff) or BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 } and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) Spell(seed_of_corruption)
 	#haunt,cycle_targets=1,if=!in_flight_to_target&debuff.haunt.remains<cast_time+travel_time&shard_react
 	if not InFlightToTarget(haunt) and target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + 0.5 and SoulShards() >= 1 Spell(haunt)
 	#life_tap,if=mana.pct<70
@@ -181,7 +195,11 @@ AddFunction AfflictionAoePredictActions
 	if not InFlightToTarget(fel_flame) Spell(fel_flame)
 }
 
-AddFunction AfflictionAoeShortCdActions {}
+AddFunction AfflictionAoeShortCdActions
+{
+	#soulburn,cycle_targets=1,if=buff.soulburn.down&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target&shard_react
+	if BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 Spell(soulburn)
+}
 
 AddFunction AfflictionAoeCdActions
 {
