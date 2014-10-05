@@ -133,23 +133,10 @@ AddFunction AssassinationDefaultShortCdActions
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 
+	# CHANGE: Use Tricks of the Trade on cooldown.
+	if CheckBoxOn(opt_tricks_of_the_trade) and Glyph(glyph_of_tricks_of_the_trade no) Spell(tricks_of_the_trade)
 	#vanish,if=time>10&!buff.stealth.up&!buff.shadow_blades.up
 	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) and not BuffPresent(shadow_blades_buff) Spell(vanish)
-
-	unless BuffPresent(stealthed_buff any=1) and Spell(mutilate)
-		or BuffRemaining(slice_and_dice_buff) < 2 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) and Spell(slice_and_dice)
-		or target.TicksRemaining(rupture_debuff) < 2 and Energy() > 90 and { target.HealthPercent() < 35 or BuffPresent(blindside_buff) } and Spell(dispatch)
-		or target.TicksRemaining(rupture_debuff) < 2 and Energy() > 90 and Spell(mutilate)
-		or target.TicksRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture)
-		or ComboPoints() < 5 and Enemies() >= 4 and Spell(fan_of_knives)
-		or ComboPoints() > 4 and Spell(envenom)
-		or ComboPoints() >= 2 and BuffRemaining(slice_and_dice_buff) < 3 and Spell(envenom)
-		or ComboPoints() < 5 and { target.HealthPercent() < 35 or BuffPresent(blindside_buff) } and Spell(dispatch)
-		or Spell(mutilate)
-	{
-		#tricks_of_the_trade
-		if CheckBoxOn(opt_tricks_of_the_trade) and Glyph(glyph_of_tricks_of_the_trade no) Spell(tricks_of_the_trade)
-	}
 }
 
 AddFunction AssassinationDefaultCdActions
@@ -294,6 +281,8 @@ AddFunction CombatDefaultShortCdActions
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 
+	# CHANGE: Use Tricks of the Trade on cooldown.
+	if CheckBoxOn(opt_tricks_of_the_trade) and Glyph(glyph_of_tricks_of_the_trade no) Spell(tricks_of_the_trade)
 	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
 	if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) Spell(blade_flurry)
 
@@ -479,6 +468,8 @@ AddFunction SubtletyDefaultShortCdActions
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 
+	# CHANGE: Use Tricks of the Trade on cooldown.
+	if CheckBoxOn(opt_tricks_of_the_trade) and Glyph(glyph_of_tricks_of_the_trade no) Spell(tricks_of_the_trade)
 	#pool_resource,for_next=1
 	#ambush,if=combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)|(buff.sleight_of_hand.up&buff.sleight_of_hand.remains<=gcd)
 	unless { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or BuffPresent(sleight_of_hand_buff) and BuffRemaining(sleight_of_hand_buff) <= GCD() } and { BuffPresent(stealthed_buff any=1) or BuffPresent(sleight_of_hand_buff) } and not SpellCooldown(ambush) > 0
