@@ -82,6 +82,9 @@ $m{GameTooltip}{SetOwner} = true;
 $m{GameTooltip}{SetText} = true;
 $m{GameTooltip}{Show} = true;
 
+# Hack to silence warnings about LICENSE.txt.
+$sp{LICENSE}{txt} = true;
+
 $m{LibBabbleCreatureType}{GetLookupTable} = true;
 
 $m{LibDispellable}{IsEnrageEffect} = true;
@@ -326,10 +329,6 @@ sub ParseDirectory
 
 			while ($content =~ m/self\.([a-z]\w*)/g)
 			{
-				#if ($class eq 'OvaleSwing')
-				#{
-				#	print $1," ",$sp{$class}{$1}," ",$pp{$1}, " ", $p{$class}{$1},"\n";
-				#}
 				unless ($sp{$class}{$1} eq true or $pp{$1} eq true or $p{$class}{$1} eq true)
 				{
 					print "The class $class does not contain the property $1\n";

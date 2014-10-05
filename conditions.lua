@@ -1,11 +1,7 @@
 --[[--------------------------------------------------------------------
-    Ovale Spell Priority
-    Copyright (C) 2012, 2013 Sidoine
-    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License in the LICENSE
-    file accompanying this program.
+    Copyright (C) 2009, 2010, 2011, 2012, 2013 Sidoine De Wispelaere.
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam.
+    See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
 local _, Ovale = ...
@@ -28,7 +24,6 @@ local OvaleRunes = Ovale.OvaleRunes
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleState = Ovale.OvaleState
-local OvaleSwing = Ovale.OvaleSwing
 
 local floor = math.floor
 local ipairs = ipairs
@@ -151,17 +146,8 @@ do
 
 	local function AfterWhiteHit(condition)
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
-		local start = OvaleSwing.starttime
-		local ending = start + OvaleSwing.duration
-		local now = API_GetTime()
-		local value
-		if now - start < seconds then
-			value = 0
-		elseif ending - now > 0.1 then
-			value = ending - now
-		else
-			value = 0.1
-		end
+		local value = 0
+		Ovale:OneTimeMessage("Warning: 'AfterWhiteHit() is not implemented.")
 		return TestValue(start, math.huge, value, now, -1, comparator, limit)
 	end
 
@@ -4612,11 +4598,12 @@ do
 		local start
 		if swing and swing == "main" or swing == "off" then
 			comparator, limit = condition[2], condition[3]
-			start = OvaleSwing:GetLast(swing)
+			start = 0
 		else
 			comparator, limit = condition[1], condition[2]
-			start = OvaleSwing:GetLast()
+			start = 0
 		end
+		Ovale:OneTimeMessage("Warning: 'LastSwing() is not implemented.")
 		return TestValue(start, math.huge, 0, start, 1, comparator, limit)
 	end
 
@@ -4638,11 +4625,12 @@ do
 		local ending
 		if swing and swing == "main" or swing == "off" then
 			comparator, limit = condition[2], condition[3]
-			ending = OvaleSwing:GetNext(swing)
+			ending = 0
 		else
 			comparator, limit = condition[1], condition[2]
-			ending = OvaleSwing:GetNext()
+			ending = 0
 		end
+		Ovale:OneTimeMessage("Warning: 'NextSwing() is not implemented.")
 		return TestValue(0, ending, 0, ending, -1, comparator, limit)
 	end
 

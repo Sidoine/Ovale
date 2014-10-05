@@ -1,10 +1,6 @@
 --[[--------------------------------------------------------------------
-    Ovale Spell Priority
-    Copyright (C) 2012, 2013, 2014 Johnny C. Lam
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License in the LICENSE
-    file accompanying this program.
+    Copyright (C) 2012, 2013, 2014 Johnny C. Lam.
+    See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
 -- This addon tracks the number of combo points by the player on the current target.
