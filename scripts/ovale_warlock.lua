@@ -101,13 +101,12 @@ AddFunction AfflictionDefaultPredictActions
 	#soul_swap,if=buff.soulburn.up
 	if BuffPresent(soulburn_buff) Spell(soul_swap)
 	# CHANGE: Synchronize abilities that use Soulburn with Soulburn's conditions so that they are shown concurrently with Soulburn.
-	unless { Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } } and Spell(dark_soul_misery)
-		or Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+	unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
 	{
 		#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
 		#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
 		if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soul_swap)
-		if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soul_swapsoulburn)
+		if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soul_swap)
 	}
 	#soul_swap,if=active_enemies>1&buff.soul_swap.down&(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)
 	if Enemies() > 1 and BuffExpires(soul_swap_buff) and { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } Spell(soul_swap)
@@ -133,8 +132,6 @@ AddFunction AfflictionDefaultShortCdActions
 {
 	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
 	{
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
-		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
 		#service_pet,if=talent.grimoire_of_service.enabled
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
 
@@ -158,6 +155,8 @@ AddFunction AfflictionDefaultCdActions
 		if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
 		#berserking
 		Spell(berserking)
+		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
+		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
 
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
 		{
@@ -342,8 +341,6 @@ AddFunction DemonologyDefaultShortCdActions
 {
 	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
 	{
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
-		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_knowledge) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_knowledge)
 		#service_pet,if=talent.grimoire_of_service.enabled
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
 		#felguard:felstorm
@@ -378,6 +375,8 @@ AddFunction DemonologyDefaultCdActions
 		if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
 		#berserking
 		Spell(berserking)
+		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
+		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_knowledge) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_knowledge)
 
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
 		{
@@ -571,8 +570,6 @@ AddFunction DestructionDefaultShortCdActions
 {
 	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
 	{
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
-		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_instability)
 		#service_pet,if=talent.grimoire_of_service.enabled
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
 		#run_action_list,name=aoe,if=active_enemies>3
@@ -602,6 +599,8 @@ AddFunction DestructionDefaultCdActions
 		if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
 		#berserking
 		Spell(berserking)
+		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
+		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_instability)
 
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
 		{
