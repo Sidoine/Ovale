@@ -1,1 +1,2 @@
-Libs
+libs/*
+!libs/*.xml

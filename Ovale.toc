@@ -10,9 +10,8 @@
 ## X-Category: Combat
 ## X-Embeds: Ace3
 
-#@no-lib-strip@
-embeds.xml
-#@end-no-lib-strip@
+# Libraries.
+libs\libs.xml
 
 Ovale.lua
 Localization.lua
