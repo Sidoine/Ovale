@@ -14,5 +14,6 @@
 	<Include file="AceTimer-3.0\AceTimer-3.0.xml" />
 	<Include file="LibBabble-CreatureType-3.0\lib.xml" />
 	<Include file="LibDispellable-1.0\LibDispellable-1.0.lua" />
+	<Script  file="LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
 <!--@end-no-lib-strip@-->
 </Ui>

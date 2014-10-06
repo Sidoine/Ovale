@@ -242,6 +242,20 @@ do
 	end
 end
 
+-- CallbackHandler-1.0
+local CallbackHandler = nil
+do
+	local lib = {}
+	CallbackHandler = lib
+
+	lib.New = function(lib, obj)
+		obj.Fire = lib.Fire
+		return obj
+	end
+
+	lib.Fire = function(lib, ...) end
+end
+
 -- LibBabble-CreatureType-3.0
 local LibBabbleCreatureType = nil
 do
@@ -271,6 +285,7 @@ do
 		["AceEvent-3.0"] = AceEvent,
 		["AceGUI-3.0"] = AceGUI,
 		["AceLocale-3.0"] = AceLocale,
+		["CallbackHandler-1.0"] = CallbackHandler,
 		["LibBabble-CreatureType-3.0"] = LibBabbleCreatureType,
 	}
 
@@ -282,6 +297,12 @@ do
 
 	lib.GetLibrary = function(lib, name, flag)
 		return lib.library[name]
+	end
+
+	lib.NewLibrary = function(lib, name, major, minor)
+		local newLib = {}
+		lib.library[name] = newLib
+		return newLib
 	end
 
 	setmetatable(lib, mt)

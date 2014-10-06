@@ -40,7 +40,9 @@ $m{"AceEvent-3.0"}{UnregisterEvent} = true;
 $m{"AceEvent-3.0"}{UnregisterMessage} = true;
 
 $m{AceConfigDialog}{AddToBlizOptions} = true;
+$m{AceConfigDialog}{Close} = true;
 $m{AceConfigDialog}{Open} = true;
+$sp{AceConfigDialog}{OpenFrames} = true;
 $m{AceConfigDialog}{SetDefaultSize} = true;
 
 $m{AceGUI}{ClearFocus} = true;
@@ -86,6 +88,8 @@ $m{GameTooltip}{Show} = true;
 $sp{LICENSE}{txt} = true;
 
 $m{LibBabbleCreatureType}{GetLookupTable} = true;
+
+$m{LibDataBroker}{NewDataObject} = true;
 
 $m{LibDispellable}{IsEnrageEffect} = true;
 
