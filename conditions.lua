@@ -1605,7 +1605,7 @@ do
 	local function Exists(condition)
 		local yesno = condition[1]
 		local target = ParseCondition(condition)
-		local boolean = (API_UnitExists(target) == 1)
+		local boolean = API_UnitExists(target)
 		return TestBoolean(boolean, yesno)
 	end
 

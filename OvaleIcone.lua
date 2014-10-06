@@ -136,15 +136,15 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			local newShouldClick = (startTime < now + lag)
 			if self.shouldClick ~= newShouldClick then
 				if newShouldClick then
-					self:SetChecked(1)
+					self:SetChecked(true)
 				else
-					self:SetChecked(0)
+					self:SetChecked(false)
 				end
 				self.shouldClick = newShouldClick
 			end
 		elseif self.shouldClick then
 			self.shouldClick = false
-			self:SetChecked(0)
+			self:SetChecked(false)
 		end
 
 		-- Remaining time.
@@ -198,7 +198,7 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			self:Show()
 		end
 		if self.shouldClick then
-			self:SetChecked(0)
+			self:SetChecked(false)
 			self.shouldClick = false
 		end
 	end
@@ -246,7 +246,7 @@ function OvaleIcone_OnMouseUp(self)
 	if not self.actionButton then
 		Ovale:ToggleOptions()
 	end
-	self:SetChecked(1)
+	self:SetChecked(true)
 end
 
 function OvaleIcone_OnEnter(self)
