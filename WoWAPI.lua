@@ -634,7 +634,7 @@ function WoWAPI:LoadXML(filename, directory, verbose)
 	if ok then
 		local list = {}
 		for line in io.lines(filename) do
-			local s = string.match(line, '<Script file="([^"]+)"')
+			local s = string.match(line, '<Script[%s]+file="([^"]+)"')
 			if s then
 				s = string.gsub(s, "\\", "/")
 				local t = {}
