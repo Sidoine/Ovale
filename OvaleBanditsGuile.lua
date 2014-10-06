@@ -103,7 +103,7 @@ end
 -- This event handler uses CLEU to track Bandit's Guile before it has procced any level of the
 -- Insight buff.
 function OvaleBanditsGuile:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 	if sourceGUID == self_guid and cleuEvent == "SPELL_DAMAGE" and self.stacks < 3 then
 		local spellId = arg12
 		if BANDITS_GUILE_ATTACK[spellId] then

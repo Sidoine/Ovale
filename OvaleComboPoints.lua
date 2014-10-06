@@ -155,7 +155,7 @@ end
 	the number of extra combo points to add, e.g., critcombo=1.
 --]]
 function OvaleComboPoints:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23 = ...
+	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
 	if sourceGUID == self_guid and destGUID == OvaleGUID:GetGUID("target") then
 		if cleuEvent == "SPELL_DAMAGE" then
