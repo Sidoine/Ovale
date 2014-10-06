@@ -1,3 +1,6 @@
+ChangeLog*
 libs/*
 !libs/LibDataBroker-1.1
 !libs/*.xml
+tests/OUT*
+tests/*.bat
