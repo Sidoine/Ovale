@@ -1,5 +1,5 @@
-## Interface: 50400
-## X-Min-Interface: 50100
+## Interface: 60000
+## X-Min-Interface: 60000
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
