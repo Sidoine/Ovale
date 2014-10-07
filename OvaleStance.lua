@@ -59,11 +59,6 @@ local OVALE_SPELLID_TO_STANCE = {
 	[API_GetSpellInfo(24858)] = "druid_moonkin_form",
 	[API_GetSpellInfo(33943)] = "druid_flight_form",
 	[API_GetSpellInfo(40120)] = "druid_swift_flight_form",
-	-- Hunter
-	[API_GetSpellInfo(5118)] = "hunter_aspect_of_the_cheetah",
-	[API_GetSpellInfo(13159)] = "hunter_aspect_of_the_pack",
-	[API_GetSpellInfo(13165)] = "hunter_aspect_of_the_hawk",
-	[API_GetSpellInfo(109260)] = "hunter_aspect_of_the_iron_hawk",
 	-- Monk
 	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
 	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
@@ -78,13 +73,11 @@ local OVALE_SPELLID_TO_STANCE = {
 	[API_GetSpellInfo(15473)] = "priest_shadowform",
 	-- Rogue
 	[API_GetSpellInfo(1784)] = "rogue_stealth",
-	[API_GetSpellInfo(51713)] = "rogue_shadow_dance",
 	-- Warlock
 	[API_GetSpellInfo(103958)] = "warlock_metamorphosis",
 	-- Warrior
 	[API_GetSpellInfo(71)] = "warrior_defensive_stance",
 	[API_GetSpellInfo(2457)] = "warrior_battle_stance",
-	[API_GetSpellInfo(2458)] = "warrior_berserker_stance",
 }
 --</private-static-properties>
 
