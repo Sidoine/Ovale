@@ -19,6 +19,7 @@ local tonumber = tonumber
 local tostring = tostring
 local tsort = table.sort
 local wipe = table.wipe
+local API_GetActiveSpecGroup = GetActiveSpecGroup
 local API_GetFlyoutInfo = GetFlyoutInfo
 local API_GetFlyoutSlotInfo = GetFlyoutSlotInfo
 local API_GetGlyphSocketInfo = GetGlyphSocketInfo
@@ -33,6 +34,10 @@ local API_IsSpellOverlayed = IsSpellOverlayed
 local API_IsUsableSpell = IsUsableSpell
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
+local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
+
+local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 21
+local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
 --</private-static-properties>
 
 --<public-static-properties>
@@ -118,17 +123,22 @@ function OvaleSpellBook:UpdateTalents()
 	wipe(self.talent)
 	wipe(self.talentPoints)
 
-	local i = 1
-	while true do
-		local name, _, _, _, selected, _ = API_GetTalentInfo(i)
-		if not name then break end
-		self.talent[i] = name
-		if selected then
-			self.talentPoints[i] = 1
-		else
-			self.talentPoints[i] = 0
+	local activeTalentGroup = API_GetActiveSpecGroup()
+	for i = 1, MAX_NUM_TALENT_TIERS do
+		for j = 1, NUM_TALENT_COLUMNS do
+			local talentId, name, _, selected, _ = API_GetTalentInfo(i, j, activeTalentGroup)
+			if talentId then
+				local index = 3 * (i - 1) + j
+				if index <= MAX_NUM_TALENTS then
+					self.talent[index] = name
+					if selected then
+						self.talentPoints[index] = 1
+					else
+						self.talentPoints[index] = 0
+					end
+				end
+			end
 		end
-		i = i + 1
 	end
 	self:SendMessage("Ovale_TalentsChanged")
 end
