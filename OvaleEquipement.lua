@@ -418,7 +418,7 @@ function OvaleEquipement:OnEnable()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateEquippedItems")
-	self:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_READY", "UpdateEquippedItemLevels")
+	self:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE", "UpdateEquippedItemLevels")
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
@@ -426,7 +426,7 @@ function OvaleEquipement:OnDisable()
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_ALIVE")
-	self:UnregisterEvent("PLAYER_AVG_ITEM_LEVEL_READY")
+	self:UnregisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE")
 	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
