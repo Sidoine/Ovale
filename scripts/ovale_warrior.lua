@@ -241,6 +241,18 @@ AddFunction ArmsSingleTargetCdActions {}
 AddCheckBox(opt_warrior_arms "Show Arms icons" specialization=arms default)
 AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
 
+AddIcon specialization=arms size=small help=offgcd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatOffGcdActions()
+	ArmsDefaultOffGcdActions()
+}
+
+AddIcon specialization=arms size=small help=offgcd checkbox=opt_warrior_arms checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatOffGcdActions()
+	ArmsDefaultOffGcdActions()
+}
+
 AddIcon specialization=arms help=shortcd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
 {
 	if InCombat(no) ArmsPrecombatShortCdActions()
@@ -263,18 +275,6 @@ AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms checkbox=opt_warr
 {
 	if InCombat(no) ArmsPrecombatActions()
 	ArmsDefaultActions()
-}
-
-AddIcon specialization=arms help=offgcd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatOffGcdActions()
-	ArmsDefaultOffGcdActions()
-}
-
-AddIcon specialization=arms help=offgcd checkbox=opt_warrior_arms checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatOffGcdActions()
-	ArmsDefaultOffGcdActions()
 }
 
 AddIcon specialization=arms help=cd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
@@ -1116,6 +1116,34 @@ AddFunction FuryTitansGripThreeTargetsCdActions {}
 AddCheckBox(opt_warrior_fury "Show Fury icons" specialization=fury default)
 AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
 
+AddIcon specialization=fury size=small help=offgcd enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=1h)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatOffGcdActions()
+		FurySingleMindedFuryDefaultOffGcdActions()
+	}
+	if HasWeapon(main type=2h)
+	{
+		if InCombat(no) FuryTitansGripPrecombatOffGcdActions()
+		FuryTitansGripDefaultOffGcdActions()
+	}
+}
+
+AddIcon specialization=fury size=small help=offgcd checkbox=opt_warrior_fury checkbox=opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=1h)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatOffGcdActions()
+		FurySingleMindedFuryDefaultOffGcdActions()
+	}
+	if HasWeapon(main type=2h)
+	{
+		if InCombat(no) FuryTitansGripPrecombatOffGcdActions()
+		FuryTitansGripDefaultOffGcdActions()
+	}
+}
+
 AddIcon specialization=fury help=shortcd enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
 {
 	if HasWeapon(main type=1h)
@@ -1169,34 +1197,6 @@ AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury checkbox=opt_warr
 	{
 		if InCombat(no) FuryTitansGripPrecombatActions()
 		FuryTitansGripDefaultActions()
-	}
-}
-
-AddIcon specialization=fury help=offgcd enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=1h)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatOffGcdActions()
-		FurySingleMindedFuryDefaultOffGcdActions()
-	}
-	if HasWeapon(main type=2h)
-	{
-		if InCombat(no) FuryTitansGripPrecombatOffGcdActions()
-		FuryTitansGripDefaultOffGcdActions()
-	}
-}
-
-AddIcon specialization=fury help=offgcd checkbox=opt_warrior_fury checkbox=opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=1h)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatOffGcdActions()
-		FurySingleMindedFuryDefaultOffGcdActions()
-	}
-	if HasWeapon(main type=2h)
-	{
-		if InCombat(no) FuryTitansGripPrecombatOffGcdActions()
-		FuryTitansGripDefaultOffGcdActions()
 	}
 }
 
@@ -1417,6 +1417,18 @@ AddFunction ProtectionDpsCdsCdActions
 AddCheckBox(opt_warrior_protection "Show Protection icons" specialization=protection default)
 AddCheckBox(opt_warrior_protection_aoe L(AOE) specialization=protection default)
 
+AddIcon specialization=protection size=small help=offgcd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatOffGcdActions()
+	ProtectionDefaultOffGcdActions()
+}
+
+AddIcon specialization=protection size=small help=offgcd checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatOffGcdActions()
+	ProtectionDefaultOffGcdActions()
+}
+
 AddIcon specialization=protection help=shortcd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatShortCdActions()
@@ -1441,18 +1453,6 @@ AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection check
 	# CHANGE: Use Thunder Clap on cooldown when tanking multiple mobs.
 	Spell(thunder_clap)
 	ProtectionNormalRotationActions()
-}
-
-AddIcon specialization=protection help=offgcd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatOffGcdActions()
-	ProtectionDefaultOffGcdActions()
-}
-
-AddIcon specialization=protection help=offgcd checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatOffGcdActions()
-	ProtectionDefaultOffGcdActions()
 }
 
 AddIcon specialization=protection help=cd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
