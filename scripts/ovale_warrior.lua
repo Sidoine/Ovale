@@ -1328,8 +1328,6 @@ AddFunction ProtectionNormalRotationActions
 	if Rage() <= MaxRage() - 20 Spell(battle_shout)
 	#thunder_clap,if=glyph.resonating_power.enabled|target.debuff.weakened_blows.down
 	if Glyph(glyph_of_resonating_power) or target.DebuffExpires(weakened_blows_debuff any=1) Spell(thunder_clap)
-	#demoralizing_shout
-	Spell(demoralizing_shout)
 	#impending_victory,if=enabled
 	if Talent(impending_victory_talent) and BuffPresent(victorious_buff) Spell(impending_victory)
 	#victory_rush,if=!talent.impending_victory.enabled
@@ -1340,7 +1338,17 @@ AddFunction ProtectionNormalRotationActions
 
 AddFunction ProtectionNormalRotationOffGcdActions {}
 
-AddFunction ProtectionNormalRotationShortCdActions {}
+AddFunction ProtectionNormalRotationShortCdActions
+{
+	unless Spell(shield_slam)
+		or Spell(revenge)
+		or Rage() <= MaxRage() - 20 and Spell(battle_shout)
+		or { Glyph(glyph_of_resonating_power) or target.DebuffExpires(weakened_blows_debuff any=1) } and Spell(thunder_clap)
+	{
+		#demoralizing_shout
+		Spell(demoralizing_shout)
+	}
+}
 
 AddFunction ProtectionNormalRotationCdActions {}
 
@@ -1437,14 +1445,14 @@ AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection check
 
 AddIcon specialization=protection help=offgcd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
 {
-	if InCombat(no) ProtectionPrecombatActions()
-	ProtectionDefaultActions()
+	if InCombat(no) ProtectionPrecombatOffGcdActions()
+	ProtectionDefaultOffGcdActions()
 }
 
 AddIcon specialization=protection help=offgcd checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
 {
-	if InCombat(no) ProtectionPrecombatActions()
-	ProtectionDefaultActions()
+	if InCombat(no) ProtectionPrecombatOffGcdActions()
+	ProtectionDefaultOffGcdActions()
 }
 
 AddIcon specialization=protection help=cd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
