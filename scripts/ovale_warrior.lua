@@ -1277,6 +1277,8 @@ AddFunction ProtectionDefaultActions
 
 AddFunction ProtectionDefaultOffGcdActions
 {
+	# CHANGE: Use Cleave instead of Heroic Strike when tanking multiple mobs.
+	if Enemies() > 2 and { BuffPresent(ultimatum_buff) or BuffPresent(glyph_incite_buff) } Spell(cleave)
 	#heroic_strike,if=buff.ultimatum.up|buff.glyph_incite.up
 	if BuffPresent(ultimatum_buff) or BuffPresent(glyph_incite_buff) Spell(heroic_strike)
 	#berserker_rage,if=buff.enrage.down&rage<=rage.max-10
@@ -1303,7 +1305,6 @@ AddFunction ProtectionDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-
 	#mountains_potion,if=incoming_damage_2500ms>health.max*0.6&(buff.shield_wall.down&buff.last_stand.down)
 	if IncomingDamage(2.5) > MaxHealth() * 0.6 and BuffExpires(shield_wall_buff) and BuffExpires(last_stand_buff) UsePotionArmor()
 	#use_item,slot=trinket2
@@ -1320,6 +1321,8 @@ AddFunction ProtectionDefaultCdActions
 
 AddFunction ProtectionNormalRotationActions
 {
+	# CHANGE: Use Thunder Clap on cooldown when tanking multiple mobs.
+	if Enemies() > 2 Spell(thunder_clap)
 	#shield_slam
 	Spell(shield_slam)
 	#revenge
@@ -1340,13 +1343,27 @@ AddFunction ProtectionNormalRotationOffGcdActions {}
 
 AddFunction ProtectionNormalRotationShortCdActions
 {
-	unless Spell(shield_slam)
-		or Spell(revenge)
-		or Rage() <= MaxRage() - 20 and Spell(battle_shout)
-		or { Glyph(glyph_of_resonating_power) or target.DebuffExpires(weakened_blows_debuff any=1) } and Spell(thunder_clap)
+	unless Enemies() > 2 and Spell(thunder_clap)
+		or Spell(shield_slam)
 	{
-		#demoralizing_shout
-		Spell(demoralizing_shout)
+		# CHANGE: Use Level 60 talent on cooldown if tanking multiple mobs.
+		if Enemies() > 2
+		{
+			#dragon_roar,if=enabled
+			if Talent(dragon_roar_talent) Spell(dragon_roar)
+			#shockwave,if=enabled
+			if Talent(shockwave_talent) Spell(shockwave)
+			#bladestorm,if=enabled
+			if Talent(bladestorm_talent) Spell(bladestorm)
+		}
+
+		unless Spell(revenge)
+			or Rage() <= MaxRage() - 20 and Spell(battle_shout)
+			or { Glyph(glyph_of_resonating_power) or target.DebuffExpires(weakened_blows_debuff any=1) } and Spell(thunder_clap)
+		{
+			#demoralizing_shout
+			Spell(demoralizing_shout)
+		}
 	}
 }
 
@@ -1450,8 +1467,6 @@ AddIcon specialization=protection help=main enemies=1 checkbox=opt_warrior_prote
 AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatActions()
-	# CHANGE: Use Thunder Clap on cooldown when tanking multiple mobs.
-	Spell(thunder_clap)
 	ProtectionNormalRotationActions()
 }
 
