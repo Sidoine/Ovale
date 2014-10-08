@@ -32,7 +32,7 @@ local strsub = string.sub
 local tconcat = table.concat
 local wipe = table.wipe
 
-local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16H"
+local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16M"
 local outputDirectory = "..\\scripts"
 local output = {}
 
@@ -44,8 +44,20 @@ local dir = io.popen("dir /b " .. profilesDirectory)
 os.execute("mkdir " .. outputDirectory)
 
 for filename in dir:lines() do
+	local doFile = true
 	-- Profile names always begin with a capital letter.
-	if strmatch(filename, "^[A-Z]") then
+	if doFile and not strmatch(filename, "^[A-Z]") then
+		doFile = false
+	end
+	-- Profile names always end in ".simc".
+	if doFile and not strmatch(filename, "%.simc$") then
+		doFile = false
+	end
+	-- Skip files that are variations of the default profiles.
+	if doFile and strmatch(filename, "_T%d+%w+_[%w_]+%.simc$") then
+		doFile = false
+	end
+	if doFile then
 		local inputName = gsub(profilesDirectory, "\\", "/") .. "/" .. filename
 		io.input(inputName)
 		local simc = io.read("*all")
@@ -60,7 +72,7 @@ for filename in dir:lines() do
 			output[#output + 1] = ""
 			output[#output + 1] = "do"
 			output[#output + 1] = format('	local name = "%s"', name)
-			output[#output + 1] = format('	local desc = "[5.4] %s"', name)
+			output[#output + 1] = format('	local desc = "[6.0.2] %s"', name)
 			output[#output + 1] = "	local code = [["
 			output[#output + 1] = OvaleSimulationCraft:Emit(profile)
 			output[#output + 1] = "]]"
@@ -70,6 +82,9 @@ for filename in dir:lines() do
 
 			-- Output the Lua code into the proper output file.
 			local outputFileName = "simulationcraft_" .. strlower(gsub(filename, ".simc", ".lua"))
+			-- Strip the tier designation from the end of the output filename.
+			outputFileName = gsub(outputFileName, "_t%d+%w+%.", ".")
+			-- Fix the name of the death knight output file.
 			outputFileName = gsub(outputFileName, "death_knight", "deathknight")
 			print("Generating " .. outputFileName)
 			local outputName = gsub(outputDirectory, "\\", "/") .. "/" .. outputFileName

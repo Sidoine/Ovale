@@ -27,4 +27,36 @@
 	<Script file="leafkiller_druid.lua" />
 	<Script file="lunaeclipse_druid.lua" />
 	<Script file="wiljo_mage.lua" />
+
+	<Script file="simulationcraft_deathknight_frost_1h.lua" />
+	<Script file="simulationcraft_deathknight_frost_2h.lua" />
+	<Script file="simulationcraft_deathknight_unholy.lua" />
+	<Script file="simulationcraft_druid_balance.lua" />
+	<Script file="simulationcraft_druid_feral.lua" />
+	<Script file="simulationcraft_druid_guardian.lua" />
+	<Script file="simulationcraft_hunter_bm.lua" />
+	<Script file="simulationcraft_hunter_mm.lua" />
+	<Script file="simulationcraft_hunter_sv.lua" />
+	<Script file="simulationcraft_mage_arcane.lua" />
+	<Script file="simulationcraft_mage_fire.lua" />
+	<Script file="simulationcraft_mage_frost.lua" />
+	<Script file="simulationcraft_monk_brewmaster_1h.lua" />
+	<Script file="simulationcraft_monk_brewmaster_2h.lua" />
+	<Script file="simulationcraft_monk_windwalker_1h.lua" />
+	<Script file="simulationcraft_monk_windwalker_2h.lua" />
+	<Script file="simulationcraft_paladin_protection.lua" />
+	<Script file="simulationcraft_paladin_retribution.lua" />
+	<Script file="simulationcraft_priest_shadow.lua" />
+	<Script file="simulationcraft_rogue_assassination.lua" />
+	<Script file="simulationcraft_rogue_combat.lua" />
+	<Script file="simulationcraft_rogue_subtlety.lua" />
+	<Script file="simulationcraft_shaman_elemental.lua" />
+	<Script file="simulationcraft_shaman_enhancement.lua" />
+	<Script file="simulationcraft_warlock_affliction.lua" />
+	<Script file="simulationcraft_warlock_demonology.lua" />
+	<Script file="simulationcraft_warlock_destruction.lua" />
+	<Script file="simulationcraft_warrior_arms.lua" />
+	<Script file="simulationcraft_warrior_fury_1h.lua" />
+	<Script file="simulationcraft_warrior_fury_2h.lua" />
+	<Script file="simulationcraft_warrior_protection.lua" />
 </Ui>

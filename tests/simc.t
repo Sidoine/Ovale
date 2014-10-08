@@ -28,7 +28,7 @@ local gsub = string.gsub
 local strfind = string.find
 local strmatch = string.match
 
-local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16H"
+local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16M"
 
 -- Save original input and output handles.
 local saveInput = io.input()
