@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_common"
-	local desc = "[5.4] Ovale: Common spell definitions"
+	local desc = "[6.0.2] Ovale: Common spell definitions"
 	local code = [[
 # Common spell definitions shared by all classes and specializations.
 
@@ -121,17 +121,19 @@ Define(tempus_repit_buff 137590)
 ###
 
 Define(arcane_torrent_chi 129597)
-	SpellInfo(arcane_torrent_chi cd=120 chi=1)
+	SpellInfo(arcane_torrent_chi cd=120 chi=-1)
 Define(arcane_torrent_energy 25046)
 	SpellInfo(arcane_torrent_energy cd=120 energy=-15)
 Define(arcane_torrent_focus 80483)
 	SpellInfo(arcane_torrent_focus cd=120 focus=-15)
+Define(arcane_torrent_holy 155145)
+	SpellInfo(arcane_torrent_holy cd=120 holy=-1)
 Define(arcane_torrent_mana 28730)
 	SpellInfo(arcane_torrent_mana cd=120)
 Define(arcane_torrent_rage 69179)
 	SpellInfo(arcane_torrent_rage cd=120 rage=-15)
 Define(arcane_torrent_runicpower 50613)
-	SpellInfo(arcane_torrent_runicpower cd=120 runicpower=-15)
+	SpellInfo(arcane_torrent_runicpower cd=120 runicpower=-20)
 Define(berserking 26297)
 	SpellInfo(berserking cd=180)
 	SpellAddBuff(berserking berserking_buff=1)
@@ -154,25 +156,25 @@ Define(blood_fury_sp_buff 33702)
 	SpellInfo(blood_fury_sp_buff duration=15)
 Define(quaking_palm 107079)
 	SpellInfo(quaking_palm cd=120)
+Define(rocket_barrage 69041)
+	SpellInfo(rocket_barrage cd=120)
+Define(shadowmeld 58984)
+	SpellInfo(shadowmeld cd=120)
+	SpellAddBuff(shadowmeld shadowmeld_buff=1)
+Define(shadowmeld_buff 58984)
+	SpellInfo(shadowmeld_buff duration=3600)	# fake duration
 Define(stoneform 20594)
 	SpellInfo(stoneform cd=120)
 	SpellAddBuff(stoneform stoneform_buff=1)
 Define(stoneform_buff 20594)
 	SpellInfo(stoneform_buff duration=8)
+Define(war_stomp 20549)
+	SpellInfo(war_stomp cd=120)
 
 AddFunction UseRacialSurvivalActions
 {
 	Spell(stoneform)
 }
-
-###
-### Raid buffs and debuffs
-###
-
-Define(weakened_armor 113746)
-	SpellInfo(weakened_armor duration=30 maxstacks=3)
-Define(weakened_blows 115798)
-	SpellInfo(weakened_blows duration=30)
 ]]
 
 	OvaleScripts:RegisterScript(nil, name, desc, code, "include")
