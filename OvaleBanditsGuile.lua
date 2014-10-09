@@ -9,11 +9,10 @@
 
 	Bandit's Guile description from wowhead.com:
 
-		Your training allows you to recognize and take advantage of the
-		natural ebb and flow of combat.  Your Sinister Strike and Revealing
-		Strike abilities increase your damage dealt by up to 30%.  After
-		reaching this maximum, the effect will fade after 15 sec and the
-		cycle will begin anew.
+		Take advantage of the natural ebb and flow of combat, causing your
+		Sinister Strike to gradually increase your damage dealt by up to 30%.
+		This maximum effect will last for 15 sec before fading and beginning
+		the cycle anew.
 
 	Mechanically, there is a hidden buff that stacks up to 12.  At 4 stacks,
 	the rogue gains Shallow Insight (10% increased damage).  At 8 stacks, the
@@ -21,10 +20,10 @@
 	rogue gains Deep Insight (30% increased damage).
 
 	This addon manages the hidden aura in OvaleAura using events triggered by
-	either attacking with Sinister/Revealing Strike or by changes to the
-	Insight auras on the player.  The aura ID of the hidden aura is set to
-	84654, the spell ID of Bandit's Guile, and can be checked like any other
-	aura using OvaleAura's public or state methods.
+	attacking with Sinister Strike or by changes to the	Insight auras on the
+	player.  The aura ID of the hidden aura is set to 84654, the spell ID of
+	Bandit's Guile, and can be checked like any other aura using OvaleAura's
+	public or state methods.
 --]]
 
 local _, Ovale = ...
@@ -53,7 +52,6 @@ local BANDITS_GUILE = 84654
 -- Spell IDs for abilities that proc Bandit's Guile.
 local BANDITS_GUILE_ATTACK = {
 	[ 1752] = "Sinister Strike",
-	[84617] = "Revealing Strike",
 }
 --</private-static-properties>
 
