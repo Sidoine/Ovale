@@ -16,7 +16,6 @@ local L = Ovale.L
 -- Forward declarations for module dependencies.
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-local LibDataBroker = LibStub("LibDataBroker-1.1", true)
 local OvaleScripts = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
@@ -25,29 +24,11 @@ local format = string.format
 local strgmatch = string.gmatch
 local strgsub = string.gsub
 local tinsert = table.insert
-local API_CreateFrame = CreateFrame
-local API_EasyMenu = EasyMenu
-local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
-
--- Class icon textures.
-local self_classIcons = {
-	["DEATHKNIGHT"] = "Interface\\Icons\\ClassIcon_DeathKnight",
-	["DRUID"] = "Interface\\Icons\\ClassIcon_Druid",
-	["HUNTER"] = "Interface\\Icons\\ClassIcon_Hunter",
-	["MAGE"] = "Interface\\Icons\\ClassIcon_Mage",
-	["MONK"] = "Interface\\Icons\\ClassIcon_Monk",
-	["PALADIN"] = "Interface\\Icons\\ClassIcon_Paladin",
-	["PRIEST"] = "Interface\\Icons\\ClassIcon_Priest",
-	["ROGUE"] = "Interface\\Icons\\ClassIcon_Rogue",
-	["SHAMAN"] = "Interface\\Icons\\ClassIcon_Shaman",
-	["WARLOCK"] = "Interface\\Icons\\ClassIcon_Warlock",
-	["WARRIOR"] = "Interface\\Icons\\ClassIcon_Warrior",
-}
 
 -- AceDB options table.
 local self_options = 
@@ -696,13 +677,10 @@ local self_options =
 		},
 	},
 }
-
-local ldbMenuFrame = nil
 --</private-static-properties>
 
 --<public-static-properties>
 OvaleOptions.db = nil
-OvaleOptions.broker = nil
 --</public-static-properties>
 
 --<public-static-methods>
@@ -779,53 +757,10 @@ function OvaleOptions:OnInitialize()
 	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
 	OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], self.db.profile.code)
-
-	-- LDB dataobject
-	if LibDataBroker then
-		local broker = {
-			type = "data source",
-			text = "",
-			icon = self_classIcons[self_class],
-			OnClick = function(frame, button)
-				if button == "LeftButton" then
-					local menu = {
-						{ text = L["Script"], isTitle = true },
-					}
-					local scriptType = not OvaleOptions.db.profile.showHiddenScripts and "script"
-					local descriptions = OvaleScripts:GetDescriptions(scriptType)
-					for name, description in pairs(descriptions) do
-						local menuItem = {
-							text = description,
-							func = function() OvaleOptions:SetScript(name) end,
-						}
-						tinsert(menu, menuItem)
-					end
-					ldbMenuFrame = ldbMenuFrame or API_CreateFrame("Frame", addonName .. "MenuFrame", UIParent, "UIDropDownMenuTemplate")
-					API_EasyMenu(menu, ldbMenuFrame, "cursor", 0, 0, "MENU")
-				elseif button == "RightButton" then
-					OvaleOptions:ToggleConfig()
-				end
-			end,
-			OnTooltipShow = function(tooltip)
-				tooltip:SetText(addonName .. " " .. Ovale.version)
-				tooltip:AddLine(L["Click to select the script."])
-				tooltip:AddLine(L["Right-Click for options."])
-			end,
-		}
-		self.broker = LibDataBroker:NewDataObject(addonName, broker)
-	end
 end
 
 function OvaleOptions:OnEnable()
-	self:RegisterMessage("Ovale_ScriptChanged")
 	self:HandleProfileChanges()
-end
-
-function OvaleOptions:Ovale_ScriptChanged()
-	-- Update the LDB dataobject.
-	if self.broker then
-		self.broker.text = self.db.profile.source
-	end
 end
 
 function OvaleOptions:HandleProfileChanges()
