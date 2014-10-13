@@ -365,7 +365,8 @@ local function AddMissingVariantSpells(annotation)
 						spellName = OvaleSpellBook:GetSpellName(spellId)
 					end
 					if spellName then
-						if spellName == API_GetSpellInfo(spellName) then
+						local name = API_GetSpellInfo(spellName)
+						if spellName == name then
 							Ovale:DebugPrintf(OVALE_MISSING_SPELL_DEBUG, "Learning spell %s with ID %d.", spellName, spellId)
 							OvaleSpellBook:AddSpell(spellId, spellName)
 						end

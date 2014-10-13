@@ -28,6 +28,7 @@ local OvalePool = Ovale.OvalePool
 local OvaleCondition = nil
 local OvaleLexer = nil
 local OvaleScripts = nil
+local OvaleSpellBook = nil
 
 local format = string.format
 local gsub = string.gsub
@@ -46,7 +47,6 @@ local type = type
 local wipe = table.wipe
 local yield = coroutine.yield
 local API_GetItemInfo = GetItemInfo
-local API_GetSpellInfo = GetSpellInfo
 
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
@@ -56,12 +56,10 @@ do
 
 	local function EnableProfiling()
 		API_GetItemInfo = Profiler:Wrap(group, "OvaleAST_API_GetItemInfo", GetItemInfo)
-		API_GetSpellInfo = Profiler:Wrap(group, "OvaleAST_API_GetSpellInfo", GetSpellInfo)
 	end
 
 	local function DisableProfiling()
 		API_GetItemInfo = GetItemInfo
-		API_GetSpellInfo = GetSpellInfo
 	end
 
 	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
@@ -2166,6 +2164,7 @@ function OvaleAST:OnInitialize()
 	OvaleCondition = Ovale.OvaleCondition
 	OvaleLexer = Ovale.OvaleLexer
 	OvaleScripts = Ovale.OvaleScripts
+	OvaleSpellBook = Ovale.OvaleSpellBook
 end
 
 function OvaleAST:Debug()
@@ -2348,7 +2347,7 @@ function OvaleAST:PropagateStrings(ast)
 					elseif name == "L" then
 						value = L[key]
 					elseif name == "SpellName" then
-						value = API_GetSpellInfo(key)
+						value = OvaleSpellBook:GetSpellName(key) or "spell:" .. key
 					end
 				end
 				if value then

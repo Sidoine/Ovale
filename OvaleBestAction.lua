@@ -525,12 +525,7 @@ function OvaleBestAction:ComputeAction(element, state)
 			if si and si.casttime then
 				element.castTime = si.casttime
 			else
-				local _, _, _, _, _, _, castTime = API_GetSpellInfo(spellId)
-				if castTime then
-					element.castTime = castTime / 1000
-				else
-					element.castTime = nil
-				end
+				element.castTime = OvaleSpellBook:GetCastTime(spellId)
 			end
 		else
 			element.castTime = 0

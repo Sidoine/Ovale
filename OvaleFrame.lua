@@ -27,7 +27,6 @@ do
 	local tostring = tostring
 	local wipe = table.wipe
 	local API_CreateFrame = CreateFrame
-	local API_GetSpellInfo = GetSpellInfo
 	local API_GetSpellTexture = GetSpellTexture
 	local API_GetTime = GetTime
 	local API_RegisterStateDriver = RegisterStateDriver

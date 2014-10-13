@@ -33,7 +33,6 @@ local API_GetBuildInfo = GetBuildInfo
 local API_GetItemCooldown = GetItemCooldown
 local API_GetItemCount = GetItemCount
 local API_GetNumTrackingTypes = GetNumTrackingTypes
-local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_GetTotemInfo = GetTotemInfo
 local API_GetTrackingInfo = GetTrackingInfo
@@ -111,13 +110,6 @@ local function ComputeParameter(spellId, paramName, state)
 		end
 	end
 	return nil
-end
-
--- Return the player's cast time in seconds for the given spell.
-local function GetCastTime(spellId)
-	local _, _, _, _, _, _, castTime = API_GetSpellInfo(spellId)
-	castTime = castTime and castTime / 1000 or 0
-	return castTime
 end
 
 -- Return the time in seconds, adjusted by the named haste effect.
@@ -986,7 +978,7 @@ do
 
 	local function CastTime(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local castTime = GetCastTime(spellId)
+		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
 		return Compare(castTime, comparator, limit)
 	end
 
@@ -1005,7 +997,7 @@ do
 
 	local function ExecuteTime(condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local castTime = GetCastTime(spellId)
+		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
 		local gcd = OvaleCooldown:GetGCD()
 		local t = (castTime > gcd) and castTime or gcd
 		return Compare(t, comparator, limit)
@@ -3057,9 +3049,9 @@ do
 		end
 		-- If no primary resource cost was found, then query using Blizzard API.
 		if not primaryPowerType then
-			local _, _, _, _, _, powerTypeId = API_GetSpellInfo(spellId)
-			if powerTypeId then
-				primaryPowerType = OvalePower.POWER_TYPE[powerTypeId]
+			local _, powerType = OvalePower:PowerCost(spellId)
+			if powerType then
+				primaryPowerType = powerType
 			end
 		end
 		if primaryPowerType then
@@ -4975,8 +4967,8 @@ do
 	local function TimeToPower(powerType, condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		if not powerType then
-			local _, _, _, _, _, powerToken = API_GetSpellInfo(spellId)
-			powerType = OvalePower.POWER_TYPE[powerToken]
+			local _, pt = OvalePower:PowerCost(spellId)
+			powerType = pt
 		end
 		local seconds = state:TimeToPower(spellId, powerType)
 

@@ -150,7 +150,7 @@ function OvaleSpellBook:UpdateGlyphs()
 	for i = 1, API_GetNumGlyphSockets() do
 		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
 		if enabled and glyphSpell then
-			self.glyph[glyphSpell] = API_GetSpellInfo(glyphSpell)
+			self.glyph[glyphSpell] = self:GetSpellName(glyphSpell)
 		end
 	end
 	self:SendMessage("Ovale_GlyphsChanged")
@@ -212,13 +212,30 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 	end
 end
 
+-- Returns the cast time of a spell in seconds.
+function OvaleSpellBook:GetCastTime(spellId)
+	if spellId then
+		local name, _, _, castTime = API_GetSpellInfo(spellId)
+		if name then
+			if castTime then
+				castTime = castTime / 1000
+			else
+				castTime = 0
+			end
+		else
+			castTime = nil
+		end
+		return castTime
+	end
+end
+
 function OvaleSpellBook:GetSpellName(spellId)
 	if spellId then
-		local name = self.spell[spellId]
-		if not name then
-			name = API_GetSpellInfo(spellId)
+		local spellName = self.spell[spellId]
+		if not spellName then
+			spellName = API_GetSpellInfo(spellId)
 		end
-		return name
+		return spellName
 	end
 end
 
@@ -276,7 +293,7 @@ function OvaleSpellBook:IsUsableSpell(spellId)
 		-- Catch case where the name in the spellbook does not match the GetSpellInfo() name,
 		-- e.g., druid's Incarnation.
 		local name = API_GetSpellInfo(spellId)
-		if name ~= spellName then
+		if name and name ~= "" and name ~= spellName then
 			result = API_IsUsableSpell(name)
 		end
 	end

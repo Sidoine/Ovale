@@ -515,7 +515,7 @@ local self_options =
 										if string.len(s) > 0 then
 											local v = tonumber(s)
 											if v then
-												s = API_GetSpellInfo(v)
+												s = OvaleSpellBook:GetSpellName(v)
 												if s then
 													t[v] = true
 													t[s] = v
