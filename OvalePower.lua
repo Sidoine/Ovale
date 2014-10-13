@@ -16,47 +16,36 @@ local OvaleData = nil
 local OvaleState = nil
 
 local ceil = math.ceil
+local format = string.format
+local gsub = string.gsub
 local pairs = pairs
-local type = type
+local strmatch = string.match
+local tonumber = tonumber
+local tostring = tostring
+local API_CreateFrame = CreateFrame
 local API_GetPowerRegen = GetPowerRegen
-local API_GetSpellInfo = GetSpellInfo
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitPowerType = UnitPowerType
-local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
-local SPELL_POWER_BURNING_EMBERS = SPELL_POWER_BURNING_EMBERS
-local SPELL_POWER_CHI = SPELL_POWER_CHI
-local SPELL_POWER_DEMONIC_FURY = SPELL_POWER_DEMONIC_FURY
-local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
-local SPELL_POWER_ENERGY = SPELL_POWER_ENERGY
-local SPELL_POWER_FOCUS = SPELL_POWER_FOCUS
-local SPELL_POWER_HOLY_POWER = SPELL_POWER_HOLY_POWER
-local SPELL_POWER_MANA = SPELL_POWER_MANA
-local SPELL_POWER_RAGE = SPELL_POWER_RAGE
-local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
-local SPELL_POWER_SHADOW_ORBS = SPELL_POWER_SHADOW_ORBS
-local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
 	local group = OvalePower:GetName()
-
-	local function EnableProfiling()
-		API_GetSpellInfo = Profiler:Wrap(group, "OvalePower_API_GetSpellInfo", GetSpellInfo)
-	end
-
-	local function DisableProfiling()
-		API_GetSpellInfo = GetSpellInfo
-	end
-
-	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
+
+-- Frame for resolving strings.
+local self_button = nil
+-- Frame for tooltip-scanning.
+local self_tooltip = nil
+-- Table of Lua patterns for matching spell costs in tooltips.
+local self_costPatterns = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -73,18 +62,18 @@ OvalePower.inactiveRegen = 0
 OvalePower.POWER_INFO =
 {
 	alternate = { id = SPELL_POWER_ALTERNATE_POWER, token = "ALTERNATE_RESOURCE_TEXT", mini = 0 },
-	burningembers = { id = SPELL_POWER_BURNING_EMBERS, token = "BURNING_EMBERS", mini = 0, segments = true },
-	chi = { id = SPELL_POWER_CHI, token = "CHI", mini = 0 },
-	demonicfury = { id = SPELL_POWER_DEMONIC_FURY, token = "DEMONIC_FURY", mini = 0 },
+	burningembers = { id = SPELL_POWER_BURNING_EMBERS, token = "BURNING_EMBERS", mini = 0, segments = true, costString = BURNING_EMBERS_COST },
+	chi = { id = SPELL_POWER_CHI, token = "CHI", mini = 0, costString = CHI_COST },
+	demonicfury = { id = SPELL_POWER_DEMONIC_FURY, token = "DEMONIC_FURY", mini = 0, costString = DEMONIC_FURY_COST },
 	eclipse = { id = SPELL_POWER_ECLIPSE, token = "ECLIPSE", mini = -100, maxi = 100 },
-	energy = { id = SPELL_POWER_ENERGY, token = "ENERGY", mini = 0 },
-	focus = { id = SPELL_POWER_FOCUS, token = "FOCUS", mini = 0 },
-	holy = { id = SPELL_POWER_HOLY_POWER, token = "HOLY_POWER", mini = 0 },
-	mana = { id = SPELL_POWER_MANA, token = "MANA", mini = 0 },
-	rage = { id = SPELL_POWER_RAGE, token = "RAGE", mini = 0 },
-	runicpower = { id = SPELL_POWER_RUNIC_POWER, token = "RUNIC_POWER", mini = 0 },
+	energy = { id = SPELL_POWER_ENERGY, token = "ENERGY", mini = 0, costString = ENERGY_COST },
+	focus = { id = SPELL_POWER_FOCUS, token = "FOCUS", mini = 0, costString = FOCUS_COST },
+	holy = { id = SPELL_POWER_HOLY_POWER, token = "HOLY_POWER", mini = 0, costString = HOLY_POWER_COST },
+	mana = { id = SPELL_POWER_MANA, token = "MANA", mini = 0, costString = MANA_COST },
+	rage = { id = SPELL_POWER_RAGE, token = "RAGE", mini = 0, costString = RAGE_COST },
+	runicpower = { id = SPELL_POWER_RUNIC_POWER, token = "RUNIC_POWER", mini = 0, costString = RUNIC_POWER_COST },
 	shadoworbs = { id = SPELL_POWER_SHADOW_ORBS, token = "SHADOW_ORBS", mini = 0 },
-	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS_POWER", mini = 0 },
+	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS_POWER", mini = 0, costString = SOUL_SHARDS_COST },
 }
 OvalePower.SECONDARY_POWER = {
 	alternate = true,
@@ -164,6 +153,25 @@ function OvalePower:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleState = Ovale.OvaleState
+
+	-- Create the tooltip used for scanning.
+	self_tooltip = API_CreateFrame("GameTooltip", "OvalePower_ScanningTooltip", nil, "GameTooltipTemplate")
+	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+
+	-- Populate the table of patterns to match spell costs in tooltips.
+	self_button = API_CreateFrame("Button")
+	for powerType, powerInfo in pairs(self.POWER_INFO) do
+		local costString = powerInfo.costString
+		if costString then
+			for i = 1, 3 do
+				-- Resolve the string then extract it again.
+				self_button:SetFormattedText(format(costString, i))
+				local text = self_button:GetText()
+				local pattern = gsub(text, tostring(i), "(%%d)")
+				self_costPatterns[pattern] = powerType
+			end
+		end
+	end
 end
 
 function OvalePower:OnEnable()
@@ -277,6 +285,33 @@ function OvalePower:UpdatePowerType()
 	profiler.Stop("OvalePower_UpdatePowerType")
 end
 
+function OvalePower:PowerCost(spellId, powerType)
+	profiler.Start("OvalePower_PowerCost")
+	self_tooltip:SetSpellByID(spellId)
+	local spellCost, spellPowerType
+	for i = 2, self_tooltip:NumLines() do
+		local line = _G["OvalePower_ScanningTooltipTextLeft" .. i]
+		local text = line:GetText()
+		if text then
+			for pattern, pt in pairs(self_costPatterns) do
+				if not powerType or pt == powerType then
+					cost = strmatch(text, pattern)
+					if cost then
+						spellCost = tonumber(cost)
+						spellPowerType = pt
+						break
+					end
+				end
+			end
+			if spellCost and spellPowerType then
+				break
+			end
+		end
+	end
+	profiler.Stop("OvaleEquipement_PowerCost")
+	return spellCost, spellPowerType
+end
+
 function OvalePower:Debug()
 	Ovale:FormatPrint("Power type: %s", self.powerType)
 	for powerType, v in pairs(self.power) do
@@ -388,14 +423,11 @@ statePrototype.ApplyPowerCost = function(state, spellId)
 	profiler.Start("OvalePower_state_ApplyPowerCost")
 	local si = OvaleData.spellInfo[spellId]
 
-	-- Update power using information from GetSpellInfo() if there is no SpellInfo() for the spell's cost.
+	-- Update power using information from the spell tooltip if there is no SpellInfo() for the spell's cost.
 	do
-		local _, _, _, cost, _, powerTypeId = API_GetSpellInfo(spellId)
-		if cost and powerTypeId then
-			powerType = OvalePower.POWER_TYPE[powerTypeId]
-			if state[powerType] and not (si and si[powerType]) then
-				state[powerType] = state[powerType] - cost
-			end
+		local cost, powerType = OvalePower:PowerCost(spellId)
+		if cost and powerType and state[powerType] and not (si and si[powerType]) then
+			state[powerType] = state[powerType] - cost
 		end
 	end
 
@@ -539,9 +571,9 @@ do
 			end
 			spellCost = cost
 		else
-			-- Determine cost using information from GetSpellInfo() if there is no SpellInfo() for the spell's cost.
-			local _, _, _, cost, _, powerTypeId = API_GetSpellInfo(spellId)
-			if cost and powerTypeId and powerType == OvalePower.POWER_TYPE[powerTypeId] then
+			-- Determine cost using information from the spell tooltip if there is no SpellInfo() for the spell's cost.
+			local cost = OvalePower:PowerCost(spellId, powerType)
+			if cost then
 				spellCost = cost
 			end
 		end
