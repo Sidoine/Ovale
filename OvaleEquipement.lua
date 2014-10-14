@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local addonName, Ovale = ...
+local _, Ovale = ...
 local OvaleEquipement = Ovale:NewModule("OvaleEquipement", "AceEvent-3.0")
 Ovale.OvaleEquipement = OvaleEquipement
 
@@ -379,7 +379,7 @@ local function GetItemLevel(slotId)
 	self_tooltip:SetInventoryItem("player", slotId)
 	local itemLevel
 	for i = 2, self_tooltip:NumLines() do
-		local text = _G[addonName .. "ScanningTooltipTextLeft" .. i]:GetText()
+		local text = _G["OvaleEquipement_ScanningTooltipTextLeft" .. i]:GetText()
 		if text then
 			itemLevel = strmatch(text, OVALE_ITEM_LEVEL_PATTERN)
 			if itemLevel then
@@ -410,7 +410,7 @@ end
 --<public-static-methods>
 function OvaleEquipement:OnInitialize()
 	-- Create the tooltip used for scanning.
-	self_tooltip = API_CreateFrame("GameTooltip", addonName .. "ScanningTooltip", nil, "GameTooltipTemplate")
+	self_tooltip = API_CreateFrame("GameTooltip", "OvaleEquipement_ScanningTooltip", nil, "GameTooltipTemplate")
 	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
 end
 
