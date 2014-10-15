@@ -735,6 +735,28 @@ do
 	OvaleCondition:RegisterCondition("buffmeleecritchance", false, BuffMeleeCritChance)
 	OvaleCondition:RegisterCondition("debuffmeleecritchance", false, BuffMeleeCritChance)
 
+	--- Get the player's multistrike chance at the time the given aura was applied on the target.
+	-- @name BuffMultistrikeChance
+	-- @paramsig number or boolean
+	-- @param id The aura spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The multistrike chance (in percent).
+	-- @return A boolean value for the result of the comparison.
+	-- @see DebuffMultistrikeChance
+	-- @usage
+	-- if MultistrikeChance() >target.DebuffMultistrikeChance(rip) Spell(rip)
+
+	local function BuffMultistrikeChance(condition)
+		return BuffSnapshot("multistrike", 0, condition)
+	end
+
+	OvaleCondition:RegisterCondition("buffmultistrikechance", false, BuffMultistrikeChance)
+	OvaleCondition:RegisterCondition("debuffmultistrikechance", false, BuffMultistrikeChance)
+
 	--- Get the player's ranged attack power at the time the given aura was applied on the target.
 	-- @name BuffRangedAttackPower
 	-- @paramsig number or boolean
@@ -2720,6 +2742,28 @@ do
 	OvaleCondition:RegisterCondition("lastmeleecritchance", false, LastMeleeCritChance)
 	OvaleCondition:RegisterCondition("lastspellmeleecritchance", false, LastMeleeCritChance)
 
+	--- Get the multistrike chance of the player during the most recent cast of a spell on the target.
+	-- @name LastMultistrikeEffect
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
+	-- @return The previous multistrike chance (in percent).
+	-- @return A boolean value for the result of the comparison.
+	-- @see MultistrikeEffect
+	-- @usage
+	-- if MultistrikeChance(shadow_bolt) > LastMultistrikeChance(shadow_bolt)
+	--     Spell(metamorphosis)
+
+	local function LastMultistrikeChance(condition)
+		return LastSnapshot("multistrike", 0, condition)
+	end
+
+	OvaleCondition:RegisterCondition("lastmultistrikechance", false, LastMultistrikeChance)
+
 	--- Get the ranged critical strike chance of the player during the most recent cast of a spell on the target.
 	-- @name LastRangedCritChance
 	-- @paramsig number or boolean
@@ -4163,6 +4207,19 @@ do
 		return SnapshotCritChance("meleeCrit", 0, condition)
 	end
 
+	--- Get the current multistrike chance of the player.
+	-- @name MultistrikeChance
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The current multistrike chance (in percent).
+	-- @return A boolean value for the result of the comparison.
+	-- @see LastMultistrikeChance
+
+	local function MultistrikeChance(condition)
+		return Snapshot("multistrike", 0, condition)
+	end
+
 	--- Get the current ranged critical strike chance of the player.
 	-- @name RangedCritChance
 	-- @paramsig number or boolean
@@ -4275,6 +4332,7 @@ do
 	OvaleCondition:RegisterCondition("masteryeffect", false, MasteryEffect)
 	OvaleCondition:RegisterCondition("masteryrating", false, MasteryRating)
 	OvaleCondition:RegisterCondition("meleecritchance", false, MeleeCritChance)
+	OvaleCondition:RegisterCondition("multistrikechance", false, MultistrikeChance)
 	OvaleCondition:RegisterCondition("rangedcritchance", false, RangedCritChance)
 	OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
 	OvaleCondition:RegisterCondition("spellhaste", false, SpellHaste)

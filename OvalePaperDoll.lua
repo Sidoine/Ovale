@@ -32,6 +32,8 @@ local API_GetCritChance = GetCritChance
 local API_GetMastery = GetMastery
 local API_GetMasteryEffect = GetMasteryEffect
 local API_GetMeleeHaste = GetMeleeHaste
+local API_GetMultistrike = GetMultistrike
+local API_GetMultistrikeEffect = GetMultistrikeEffect
 local API_GetRangedCritChance = GetRangedCritChance
 local API_GetRangedHaste = GetRangedHaste
 local API_GetSpecialization = GetSpecialization
@@ -125,10 +127,13 @@ OvalePaperDoll.SNAPSHOT_STATS = {
 	-- percent increase to spell critical strike & haste
 	spellCrit =				{ default = 0, description = "spell critical strike chance" },
 	spellHaste =			{ default = 0, description = "spell haste effect" },
-	-- combat rating for mastery, critical strike & haste
+	-- percent chance to multistrike
+	multistrike =			{ default = 0, description = "multistrike chance" },
+	-- combat rating for mastery, critical strike, haste, and multistrike
 	masteryRating =			{ default = 0, description = "mastery rating" },
 	critRating =			{ default = 0, description = "critical strike rating" },
 	hasteRating =			{ default = 0, description = "haste rating" },
+	multistrikeRating =		{ default = 0, description = "multistrike rating" },
 	-- spellpower
 	spellBonusDamage =		{ default = 0, description = "spell bonus damage" },
 	spellBonusHealing =		{ default = 0, description = "spell bonus healing" },
@@ -181,6 +186,7 @@ end
 function OvalePaperDoll:OnEnable()
 	self:RegisterEvent("COMBAT_RATING_UPDATE")
 	self:RegisterEvent("MASTERY_UPDATE")
+	self:RegisterEvent("MULTISTRIKE_UPDATE")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateStats")
 	self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
@@ -205,6 +211,7 @@ function OvalePaperDoll:OnDisable()
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("COMBAT_RATING_UPDATE")
 	self:UnregisterEvent("MASTERY_UPDATE")
+	self:UnregisterEvent("MULTISTRIKE_UPDATE")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_DAMAGE_DONE_MODS")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -251,6 +258,16 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %f%%",
 			event, self.SNAPSHOT_STATS["masteryEffect"].description, snapshot.masteryEffect)
 	end
+	profiler.Stop("OvalePaperDoll_UpdateStats")
+end
+
+function OvalePaperDoll:MULTISTRIKE_UPDATE(event)
+	profiler.Start("OvalePaperDoll_UpdateStats")
+	local snapshot = UpdateCurrentSnapshot()
+	snapshot.multistrikeRating = API_GetMultistrike()
+	snapshot.multistrike = API_GetMultistrikeEffect()
+	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %f%%",
+		event, self.SNAPSHOT_STATS["multistrike"].description, snapshot.multistrike)
 	profiler.Stop("OvalePaperDoll_UpdateStats")
 end
 
