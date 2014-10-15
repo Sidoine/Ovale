@@ -431,6 +431,12 @@ local self_options =
 							desc = L["Debug stat snapshots"],
 							type = "toggle",
 						},
+						steady_focus =
+						{
+							name = "Steady Focus",
+							desc = L["Debug Steady Focus"],
+							type = "toggle",
+						},
 						unknown_spells =
 						{
 							name = "Unknown spells",
