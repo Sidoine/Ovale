@@ -65,7 +65,6 @@ OvalePower.POWER_INFO =
 	burningembers = { id = SPELL_POWER_BURNING_EMBERS, token = "BURNING_EMBERS", mini = 0, segments = true, costString = BURNING_EMBERS_COST },
 	chi = { id = SPELL_POWER_CHI, token = "CHI", mini = 0, costString = CHI_COST },
 	demonicfury = { id = SPELL_POWER_DEMONIC_FURY, token = "DEMONIC_FURY", mini = 0, costString = DEMONIC_FURY_COST },
-	eclipse = { id = SPELL_POWER_ECLIPSE, token = "ECLIPSE", mini = -100, maxi = 100 },
 	energy = { id = SPELL_POWER_ENERGY, token = "ENERGY", mini = 0, costString = ENERGY_COST },
 	focus = { id = SPELL_POWER_FOCUS, token = "FOCUS", mini = 0, costString = FOCUS_COST },
 	holy = { id = SPELL_POWER_HOLY_POWER, token = "HOLY_POWER", mini = 0, costString = HOLY_POWER_COST },
@@ -91,10 +90,7 @@ OvalePower.PRIMARY_POWER = {}
 do
 	for powerType in pairs(OvalePower.POWER_INFO) do
 		if not OvalePower.SECONDARY_POWER[powerType] then
-			-- Eclipse has special semantics; it's not a cost/generated resource.
-			if powerType ~= "eclipse" then
-				OvalePower.PRIMARY_POWER[powerType] = true
-			end
+			OvalePower.PRIMARY_POWER[powerType] = true
 		end
 	end
 end
@@ -348,7 +344,6 @@ local statePrototype = OvalePower.statePrototype
 	statePrototype.burningembers = nil
 	statePrototype.chi = nil
 	statePrototype.demonicfury = nil
-	statePrototype.eclipse = nil
 	statePrototype.energy = nil
 	statePrototype.focus = nil
 	statePrototype.holy = nil
@@ -438,24 +433,22 @@ statePrototype.ApplyPowerCost = function(state, spellId)
 	end
 
 	if si then
-		-- Update power state except for eclipse energy (handled by OvaleEclipse).
+		-- Update power state.
 		for powerType, powerInfo in pairs(OvalePower.POWER_INFO) do
-			if powerType ~= "eclipse" then
-				local cost = state:PowerCost(spellId, powerType)
-				local power = state[powerType] or 0
-				if cost then
-					power = power - cost
-					-- Clamp power to lower and upper limits.
-					local mini = powerInfo.mini or 0
-					local maxi = powerInfo.maxi or OvalePower.maxPower[powerType]
-					if mini and power < mini then
-						power = mini
-					end
-					if maxi and power > maxi then
-						power = maxi
-					end
-					state[powerType] = power
+			local cost = state:PowerCost(spellId, powerType)
+			local power = state[powerType] or 0
+			if cost then
+				power = power - cost
+				-- Clamp power to lower and upper limits.
+				local mini = powerInfo.mini or 0
+				local maxi = powerInfo.maxi or OvalePower.maxPower[powerType]
+				if mini and power < mini then
+					power = mini
 				end
+				if maxi and power > maxi then
+					power = maxi
+				end
+				state[powerType] = power
 			end
 		end
 	end

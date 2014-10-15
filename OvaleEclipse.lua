@@ -206,6 +206,7 @@ local statePrototype = OvaleEclipse.statePrototype
 --</private-static-properties>
 
 --<state-properties>
+statePrototype.eclipse = nil
 -- Direction in which the Eclipse bar is moving.
 statePrototype.eclipseDirection = nil
 --</state-properties>
