@@ -1582,22 +1582,23 @@ end
 
 do
 	--- Get the amount of regenerated energy per second for feral druids, non-mistweaver monks, and rogues.
-	-- @name EnergyRegen
+	-- @name EnergyRegenRate
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The current rate of energy regeneration.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
-	-- if EnergyRegen() >11 Spell(stance_of_the_sturdy_ox)
+	-- if EnergyRegenRage() >11 Spell(stance_of_the_sturdy_ox)
 
-	local function EnergyRegen(condition)
+	local function EnergyRegenRate(condition)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.powerRate.energy
 		return Compare(value, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("energyregen", false, EnergyRegen)
+	OvaleCondition:RegisterCondition("energyregen", false, EnergyRegenRate)
+	OvaleCondition:RegisterCondition("energyregenrate", false, EnergyRegenRate)
 end
 
 do
@@ -1640,23 +1641,24 @@ end
 
 do
 	--- Get the amount of regenerated focus per second for hunters.
-	-- @name FocusRegen
+	-- @name FocusRegenRate
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The current rate of focus regeneration.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
-	-- if FocusRegen() >20 Spell(arcane_shot)
-	-- if FocusRegen(more 20) Spell(arcane_shot)
+	-- if FocusRegenRate() >20 Spell(arcane_shot)
+	-- if FocusRegenRate(more 20) Spell(arcane_shot)
 
-	local function FocusRegen(condition)
+	local function FocusRegenRate(condition)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.powerRate.focus
 		return Compare(value, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("focusregen", false, FocusRegen)
+	OvaleCondition:RegisterCondition("focusregen", false, FocusRegenRate)
+	OvaleCondition:RegisterCondition("focusregenrate", false, FocusRegenRate)
 end
 
 do
