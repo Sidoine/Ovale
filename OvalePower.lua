@@ -230,13 +230,19 @@ end
 
 function OvalePower:UNIT_MAXPOWER(event, unitId, powerToken)
 	if unitId == "player" then
-		self:UpdateMaxPower(self.POWER_TYPE[powerToken])
+		local powerType = self.POWER_TYPE[powerToken]
+		if powerType then
+			self:UpdateMaxPower(powerType)
+		end
 	end
 end
 
 function OvalePower:UNIT_POWER(event, unitId, powerToken)
 	if unitId == "player" then
-		self:UpdatePower(self.POWER_TYPE[powerToken])
+		local powerType = self.POWER_TYPE[powerToken]
+		if powerType then
+			self:UpdatePower(powerType)
+		end
 	end
 end
 
