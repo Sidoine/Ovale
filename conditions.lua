@@ -1662,6 +1662,47 @@ do
 end
 
 do
+	--- Get the amount of focus that would be regenerated during the cast time of the given spell for hunters.
+	-- @name FocusCastingRegen
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The amount of focus.
+	-- @return A boolean value for the result of the comparison.
+
+	local STEADY_FOCUS = 177668
+
+	local function FocusCastingRegen(condition)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local regenRate = state.powerRate.focus
+		local power = 0
+
+		-- Get the "execute time" of the spell (smaller of GCD or the cast time).
+		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
+		local gcd = OvaleCooldown:GetGCD()
+		local castSeconds = (castTime > gcd) and castTime or gcd
+		power = power + regenRate * castSeconds
+
+		-- Get the amount of time remaining on the Steady Focus buff.
+		local aura = state:GetAura("player", STEADY_FOCUS, "HELPFUL", true)
+		if aura then
+			local seconds = aura.ending - state.currentTime
+			if seconds <= 0 then
+				seconds = 0
+			elseif seconds > castSeconds then
+				seconds = castSeconds
+			end
+			-- Steady Focus increases the focus regeneration rate by 50% for its duration.
+			power = power + regenRate * 1.5 * seconds
+		end
+		return Compare(power, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("focuscastingregen", false, FocusCastingRegen)
+end
+
+do
 	--- Get the player's global cooldown in seconds.
 	-- @name GCD
 	-- @paramsig number or boolean
