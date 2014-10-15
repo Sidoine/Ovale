@@ -99,9 +99,6 @@ local RUNE_SLOTS = {
 local DEATH_RUNE_PRIORITY = { 3, 4, 5, 6, 1, 2 }
 local ANY_RUNE_PRIORITY = { 1, 2, 3, 4, 5, 6 }
 
--- Improved Blood Presence increases rune regenerate rate by 20%.
-local IMPROVED_BLOOD_PRESENCE = 50371
-
 -- Blood of the North (frost) permanently transforms Blood Runes into Death Runes.
 local BLOOD_OF_THE_NORTH = 54637
 -- Blood Rites (blood) causes the Frost and Unholy runes consumed by Death Strike to reactivate as Death runes.
@@ -113,8 +110,6 @@ local BLOOD_RITES_ATTACK = {
 local REAPING = 56835
 local REAPING_ATTACK = {
 	[45477] = API_GetSpellInfo(45477),	-- Icy Touch
-	[45902] = API_GetSpellInfo(45902),	-- Blood Strike
-	[48721] = API_GetSpellInfo(48721),	-- Blood Boil
 	[50842] = API_GetSpellInfo(50842),	-- Pestilence
 	[85948] = API_GetSpellInfo(85948),	-- Festering Strike
 }
@@ -408,10 +403,6 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 			end
 		end
 		local duration = 10 / state:GetSpellHasteMultiplier(snapshot)
-		if OvaleStance:IsStance("deathknight_blood_presence") and OvaleSpellBook:IsKnownSpell(IMPROVED_BLOOD_PRESENCE) then
-			-- Improved Blood Presence increases rune regeneration rate by 20%.
-			duration = duration / 1.2
-		end
 		consumedRune.startCooldown = start
 		consumedRune.endCooldown = start + duration
 
