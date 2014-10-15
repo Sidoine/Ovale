@@ -4455,23 +4455,43 @@ do
 end
 
 do
-	--- Get the cooldown in seconds before a spell is ready for use.
+	--- Get the number of seconds before any of the listed spells are ready for use.
 	-- @name SpellCooldown
 	-- @paramsig number or boolean
 	-- @param id The spell ID.
+	-- @param ... Optional. Additional spell IDs.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
+	-- @see TimeToSpell
 	-- @usage
 	-- if ShadowOrbs() ==3 and SpellCooldown(mind_blast) <2
 	--     Spell(devouring_plague)
 
 	local function SpellCooldown(condition, state)
-		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local start, duration = state:GetSpellCooldown(spellId)
-		if start > 0 and duration > 0 then
-			return TestValue(start, start + duration, duration, start, -1, comparator, limit)
+		local comparator, limit
+		local usable = (condition.usable == 1)
+		local target = ParseCondition(condition, state, state.defaultTarget)
+		local atTime = math.huge
+		for i = 1, #condition do
+			local spellId = condition[1]
+			if OvaleCondition.COMPARATOR[spellId] then
+				comparator, limit = spellId, condition[i+1]
+				break
+			elseif not usable or state:IsUsableSpell(spellId, target) then
+				local start, duration = state:GetSpellCooldown(spellId)
+				local t = 0
+				if start > 0 and duration > 0 then
+					t = start + duration
+				end
+				if t < atTime then
+					atTime = t
+				end
+			end
+		end
+		if atTime > 0 then
+			return TestValue(0, atTime, 0, atTime, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
