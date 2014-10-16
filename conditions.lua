@@ -74,14 +74,10 @@ local state = OvaleState.state
 --]]--------------------
 
 -- Return the target's damage reduction from armor, assuming the target is boss-level.
+-- This function makes heavy use of magic constants and is only valid for level 93 bosses.
 local function BossArmorDamageReduction(target)
-	local BOSS_ARMOR = 24835
-	local WEAKENED_ARMOR_DEBUFF = 113746
-	local aura = state:GetAura(target, WEAKENED_ARMOR_DEBUFF, "HARMFUL")
-	local armor = BOSS_ARMOR
-	if state:IsActiveAura(aura) then
-		armor = armor * (1 - 0.04 * aura.stacks)
-	end
+	-- Boss armor value empirically determined.
+	local armor = 24835
 	local constant = 4037.5 * state.level - 317117.5
 	if constant < 0 then
 		constant = 0
