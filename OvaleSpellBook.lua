@@ -30,6 +30,7 @@ local API_GetSpellLink = GetSpellLink
 local API_GetSpellTabInfo = GetSpellTabInfo
 local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
+local API_IsSpellInRange = IsSpellInRange
 local API_IsSpellOverlayed = IsSpellOverlayed
 local API_IsUsableSpell = IsUsableSpell
 local BOOKTYPE_PET = BOOKTYPE_PET
@@ -45,6 +46,11 @@ local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
 OvaleSpellBook.ready = false
 -- self.spell[spellId] = spellName
 OvaleSpellBook.spell = {}
+-- self.spellbookId[bookType][spellId] = index of spell in the spellbook
+OvaleSpellBook.spellbookId = {
+	[BOOKTYPE_PET] = {},
+	[BOOKTYPE_SPELL] = {},
+}
 -- self.talent[talentId] = talentName
 OvaleSpellBook.talent = {}
 -- self.talentPoints[talentId] = 0 or 1
@@ -69,7 +75,6 @@ local function PrintTableValues(tbl)
 		Ovale:Print(v)
 	end
 end
-
 --</private-static-methods>
 
 --<public-static-methods>
@@ -158,6 +163,8 @@ end
 
 function OvaleSpellBook:UpdateSpells()
 	wipe(self.spell)
+	wipe(self.spellbookId[BOOKTYPE_PET])
+	wipe(self.spellbookId[BOOKTYPE_SPELL])
 
 	-- Scan the first two tabs of the player's spellbook.
 	for tab = 1, 2 do
@@ -190,6 +197,7 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 				self.spell[tonumber(linkData)] = spellName
 				if spellId then
 					self.spell[spellId] = spellName
+					self.spellbookId[bookType][spellId] = index
 				end
 			end
 		elseif skillType == "FLYOUT" then
@@ -200,12 +208,18 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 					local id, overrideId, isKnown, spellName = API_GetFlyoutSlotInfo(flyoutId, flyoutIndex)
 					if isKnown then
 						self.spell[id] = spellName
-						self.spell[overrideId] = spellName
+						-- Flyout spells have no spellbook index.
+						self.spellbookId[bookType][id] = nil
+						if id ~= overrideId then
+							self.spell[overrideId] = spellName
+							-- Flyout spells have no spellbook index.
+							self.spellbookId[bookType][overrideId] = nil
+						end
 					end
 				end
 			end
-		-- elseif skillType == "FUTURESPELL" then
-		--	no-op
+		elseif skillType == "FUTURESPELL" then
+			--	no-op
 		elseif not skillType then
 			break
 		end
@@ -277,6 +291,32 @@ function OvaleSpellBook:IsKnownTalent(talentId)
 		return true
 	else
 		return false
+	end
+end
+
+-- Returns the index in the spellbook of the given spell.
+function OvaleSpellBook:GetSpellBookIndex(spellId)
+	local bookType = BOOKTYPE_SPELL
+	while true do
+		local index = self.spellbookId[bookType][spellId]
+		if index then
+			return index, bookType
+		elseif bookType == BOOKTYPE_SPELL then
+			bookType = BOOKTYPE_PET
+		else
+			break
+		end
+	end
+end
+
+-- Returns whether the unit is within range of the spell.
+function OvaleSpellBook:IsSpellInRange(spellId, unitId)
+	local index, bookType = self:GetSpellBookIndex(spellId)
+	if index and bookType then
+		return API_IsSpellInRange(index, bookType, unitId)
+	else
+		local name = self:GetSpellName(spellId)
+		return API_IsSpellInRange(name, unitId)
 	end
 end
 

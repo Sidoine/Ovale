@@ -41,7 +41,6 @@ local API_GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local API_HasFullControl = HasFullControl
 local API_IsHarmfulSpell = IsHarmfulSpell
 local API_IsHelpfulSpell = IsHelpfulSpell
-local API_IsSpellInRange = IsSpellInRange
 local API_IsSpellOverlayed = IsSpellOverlayed
 local API_IsStealthed = IsStealthed
 local API_UnitCastingInfo = UnitCastingInfo
@@ -2188,8 +2187,7 @@ do
 	local function InRange(condition)
 		local spellId, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition)
-		local spellName = OvaleSpellBook:GetSpellName(spellId)
-		local boolean = (API_IsSpellInRange(spellName, target) == 1)
+		local boolean = (OvaleSpellBook:IsSpellInRange(spellId, target) == 1)
 		return TestBoolean(boolean, yesno)
 	end
 

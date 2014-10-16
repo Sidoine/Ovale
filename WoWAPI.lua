@@ -376,6 +376,13 @@ WoWAPI.RAID_CLASS_COLORS = {
 
 WoWAPI.ITEM_LEVEL = "Item Level %d"
 
+--[[---------------------------
+	FrameXML/SpellBookFrame
+--]]---------------------------
+
+WoWAPI.BOOKTYPE_SPELL = "spell"
+WoWAPI.BOOKTYPE_PET = "pet"
+
 --[[--------------------------------------------------------------------
 	debugprofilestop() is a non-standard Lua function that returns the
 	current time in milliseconds.

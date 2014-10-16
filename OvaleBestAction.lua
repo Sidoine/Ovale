@@ -52,7 +52,6 @@ local API_GetSpellTexture = GetSpellTexture
 local API_IsActionInRange = IsActionInRange
 local API_IsCurrentAction = IsCurrentAction
 local API_IsItemInRange = IsItemInRange
-local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableAction = IsUsableAction
 local API_IsUsableItem = IsUsableItem
 
@@ -73,7 +72,6 @@ do
 		API_IsActionInRange = Profiler:Wrap(group, "OvaleBestAction_API_IsActionInRange", IsActionInRange)
 		API_IsCurrentAction = Profiler:Wrap(group, "OvaleBestAction_API_IsCurrentAction", IsCurrentAction)
 		API_IsItemInRange = Profiler:Wrap(group, "OvaleBestAction_API_IsItemInRange", IsItemInRange)
-		API_IsSpellInRange = Profiler:Wrap(group, "OvaleBestAction_API_IsSpellInRange", IsSpellInRange)
 		API_IsUsableAction = Profiler:Wrap(group, "OvaleBestAction_API_IsUsableAction", IsUsableAction)
 		API_IsUsableItem = Profiler:Wrap(group, "OvaleBestAction_API_IsUsableItem", IsUsableItem)
 	end
@@ -90,7 +88,6 @@ do
 		API_IsActionInRange = IsActionInRange
 		API_IsCurrentAction = IsCurrentAction
 		API_IsItemInRange = IsItemInRange
-		API_IsSpellInRange = IsSpellInRange
 		API_IsUsableAction = IsUsableAction
 		API_IsUsableItem = IsUsableItem
 	end
@@ -247,7 +244,7 @@ local function GetActionSpellInfo(element, state, target)
 			actionTexture = "Interface\\Icons\\" .. element.params.texture
 		end
 		actionTexture = actionTexture or API_GetSpellTexture(spellId)
-		actionInRange = API_IsSpellInRange(OvaleSpellBook:GetSpellName(spellId), target)
+		actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
 		actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
 		actionUsable = OvaleSpellBook:IsUsableSpell(spellId)
 		if action then
