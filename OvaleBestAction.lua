@@ -382,7 +382,7 @@ end
 
 function OvaleBestAction:GetActionInfo(element, state)
 	if element and element.type == "action" then
-		local target = element.params.target or OvaleCondition.defaultTarget
+		local target = element.params.target or state.defaultTarget
 		if element.lowername == "item" then
 			return GetActionItemInfo(element, state, target)
 		elseif element.lowername == "macro" then
@@ -805,7 +805,7 @@ function OvaleBestAction:ComputeFunction(element, state)
 	local priority, result
 
 	Ovale:Logf("[%d]    evaluating condition: %s(%s)", element.nodeId, element.name, element.paramsAsString)
-	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.params)
+	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.params, state)
 	if start and ending then
 		timeSpan[1], timeSpan[2] = start, ending
 	end

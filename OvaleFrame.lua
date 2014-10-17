@@ -13,7 +13,6 @@ do
 	local Masque = LibStub("Masque", true)
 	local OvaleBestAction = Ovale.OvaleBestAction
 	local OvaleCompile = Ovale.OvaleCompile
-	local OvaleCondition = Ovale.OvaleCondition
 	local OvaleCooldown = Ovale.OvaleCooldown
 	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleOptions = Ovale.OvaleOptions
@@ -179,9 +178,9 @@ do
 		for k, node in ipairs(iconNodes) do
 			-- Set the true target of "target" references in the icon's body.
 			if node.params and node.params.target then
-				OvaleCondition.defaultTarget = node.params.target
+				state.defaultTarget = node.params.target
 			else
-				OvaleCondition.defaultTarget = "target"
+				state.defaultTarget = "target"
 			end
 			-- Set the number of enemies on the battlefield, if given via "enemies=N".
 			if node.params and node.params.enemies then
@@ -270,7 +269,7 @@ do
 								spellTarget = element.params.target
 							end
 							if not spellTarget or spellTarget == "target" then
-								spellTarget = OvaleCondition.defaultTarget
+								spellTarget = state.defaultTarget
 							end
 							state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
 							timeSpan, _, element = OvaleBestAction:GetAction(node, state)

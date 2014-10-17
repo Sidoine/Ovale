@@ -43,6 +43,9 @@ local OvaleCondition = Ovale:NewModule("OvaleCondition")
 Ovale.OvaleCondition = OvaleCondition
 
 --<private-static-properties>
+-- Forward declarations for module dependencies.
+local OvaleState = nil
+
 local type = type
 local wipe = table.wipe
 
@@ -57,12 +60,6 @@ end
 --</private-static-properties>
 
 --<public-static-properties>
---[[
-	The actual target referenced when the "target" parameter is used in a condition.
-	This is to support setting a different target in an AddIcon "target" parameter,
-	e.g., target=focus, while re-using the same script.
---]]
-OvaleCondition.defaultTarget = "target"
 OvaleCondition.Compare = nil
 OvaleCondition.ParseCondition = nil
 OvaleCondition.ParseRuneCondition = nil
@@ -79,6 +76,19 @@ OvaleCondition.COMPARATOR = {
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleCondition:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleState = Ovale.OvaleState
+end
+
+function OvaleCondition:OnEnable()
+	OvaleState:RegisterState(self, self.statePrototype)
+end
+
+function OvaleCondition:OnDisable()
+	OvaleState:UnregisterState(self)
+end
+
 function OvaleCondition:RegisterCondition(name, isSpellBookCondition, func, arg)
 	if arg then
 		if type(func) == "string" then
@@ -105,17 +115,16 @@ function OvaleCondition:IsSpellBookCondition(name)
 	return (self_spellBookCondition[name] ~= nil)
 end
 
-function OvaleCondition:EvaluateCondition(name, ...)
-	return self_condition[name](...)
+function OvaleCondition:EvaluateCondition(name, condition, state)
+	return self_condition[name](condition, state)
 end
 
-OvaleCondition.ParseCondition = function(condition, defaultTarget)
-	defaultTarget = defaultTarget or "player"
-	local target = condition.target or defaultTarget
+OvaleCondition.ParseCondition = function(condition, state, defaultTarget)
+	local target = condition.target or defaultTarget or "player"
 	-- Side-effect: set condition.target to the correct value if not present.
 	condition.target = condition.target or target
 	if target == "target" then
-		target = OvaleCondition.defaultTarget
+		target = state.defaultTarget
 	end
 
 	local filter
@@ -210,3 +219,37 @@ OvaleCondition.Compare = function(value, comparator, limit)
 	return OvaleCondition.TestValue(0, math.huge, value, 0, 0, comparator, limit)
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleCondition.statePrototype = {}
+--</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleCondition.statePrototype
+--</private-static-properties>
+
+--<state-properties>
+--[[
+	The default target referenced when the "target" parameter is used in a condition.
+	This is to support setting a different target in an AddIcon "target" parameter,
+	e.g., target=focus, while re-using the same script.
+--]]
+statePrototype.defaultTarget = nil
+--</state-properties>
+
+--<public-static-methods>
+-- Initialize the state.
+function OvaleCondition:InitializeState(state)
+	state.defaultTarget = "target"
+end
+
+-- Release state resources prior to removing from the simulator.
+function OvaleCondition:CleanState(state)
+	state.defaultTarget = nil
+end
+--</public-static-methods>
+
