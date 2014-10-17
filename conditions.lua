@@ -1057,9 +1057,9 @@ do
 			castSpellId = state.currentSpellId
 			castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
 		else
-			local spellName, _, _, _, startTime, endTime = UnitCastingInfo(target)
+			local spellName, _, _, _, startTime, endTime = API_UnitCastingInfo(target)
 			if not spellName then
-				spellName, _, _, _, startTime, endTime = UnitChannelInfo("unit")
+				spellName, _, _, _, startTime, endTime = API_UnitChannelInfo("unit")
 			end
 			if spellName then
 				castSpellName = spellName
