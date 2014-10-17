@@ -420,6 +420,27 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'", spellId, si.stance)
 				isUsable = false
 			end
+			-- Target health percent (execute range).
+			if isUsable and si.target_health_pct then
+				local usable = false
+				-- Look for a buff that allows this ability to ignore the health percent restriction.
+				if si.buff_no_target_health_pct then
+					local aura = state:GetAura("player", si.buff_no_target_health_pct)
+					if state:IsActiveAura(aura) then
+						usable = true
+					end
+				end
+				if not usable then
+					local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
+					if healthPercent < si.target_health_pct then
+						usable = true
+					end
+				end
+				if not usable then
+					Ovale:Logf("Spell ID '%s' requires the target's health to be less than %f%%.", spellId, si.target_health_pct)
+					isUsable = false
+				end
+			end
 			-- Secondary resources, e.g., chi, focus, rage, etc.
 			if isUsable and si.combo then
 				-- Spell requires combo points.
