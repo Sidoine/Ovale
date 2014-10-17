@@ -4436,6 +4436,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param count Optional. Sets whether a count or a fractional value is returned.
+	--     Defaults to count=1.
+	--     Valid values: 0, 1.
 	-- @return The number of charges.
 	-- @return A boolean value for the result of the comparison.
 	-- @see SpellChargeCooldown
@@ -4447,6 +4450,10 @@ do
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId)
 		charges = charges or 0
+		maxCharges = maxCharges or 1
+		if condition.count == 0 and charges < maxCharges then
+			return TestValue(state.currentTime, math.huge, charges + 1, start + duration, 1, comparator, limit)
+		end
 		return Compare(charges, comparator, limit)
 	end
 
