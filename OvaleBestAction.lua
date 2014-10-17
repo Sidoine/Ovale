@@ -256,34 +256,6 @@ local function GetActionSpellInfo(element, state, target)
 
 		local si = OvaleData.spellInfo[spellId]
 		if si then
-			-- Verify that the spell may be cast given restrictions specified in SpellInfo().
-			local meetsRequirements = true
-			if si.stance and not OvaleStance:IsStance(si.stance) then
-				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'", spellId, si.stance)
-				meetsRequirements = false
-			end
-			if meetsRequirements and si.combo then
-				-- Spell requires combo points.
-				local cost = state:ComboPointCost(spellId)
-				if cost > 0 and state.combo < cost then
-					Ovale:Logf("Spell ID '%s' requires at least %d combo points.", spellId, cost)
-					meetsRequirements = false
-				end
-			end
-			if meetsRequirements then
-				for powerType in pairs(OvalePower.SECONDARY_POWER) do
-					if si[powerType] then
-						-- Spell requires "secondary" resources, e.g., chi, focus, rage, etc.,
-						local cost = state:PowerCost(spellId, powerType)
-						if cost > 0 and state[powerType] < cost then
-							Ovale:Logf("Spell ID '%s' requires at least %d %s.", spellId, cost, powerType)
-							meetsRequirements = false
-							break
-						end
-					end
-				end
-			end
-
 			-- Fix spell cooldown information using primary resource requirements specified in SpellInfo().
 			if actionCooldownStart and actionCooldownDuration then
 				-- Get the maximum time before all "primary" resources are ready.
@@ -331,7 +303,8 @@ local function GetActionSpellInfo(element, state, target)
 				actionTexture = "Interface\\Icons\\" .. si.texture
 			end
 
-			if not meetsRequirements then
+			local isUsable = state:IsUsableSpell(spellId, target)
+			if not isUsable then
 				-- Assign all return values to nil.
 				actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 					actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target = nil

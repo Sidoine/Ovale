@@ -11,6 +11,20 @@ local OvaleSpellBook = Ovale:NewModule("OvaleSpellBook", "AceEvent-3.0")
 Ovale.OvaleSpellBook = OvaleSpellBook
 
 --<private-static-properties>
+-- Profiling set-up.
+local Profiler = Ovale.Profiler
+local profiler = nil
+do
+	local group = OvaleSpellBook:GetName()
+	Profiler:RegisterProfilingGroup(group)
+	profiler = Profiler:GetProfilingGroup(group)
+end
+
+-- Forward declarations for module dependencies.
+local OvaleData = nil
+local OvalePower = nil
+local OvaleState = nil
+
 local ipairs = ipairs
 local pairs = pairs
 local strmatch = string.match
@@ -32,12 +46,16 @@ local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
 local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableSpell = IsUsableSpell
+local API_UnitHealth = UnitHealth
+local API_UnitHealthMax = UnitHealthMax
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 
 local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 21
 local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
+
+local OVALE_SPELLBOOK_DEBUG = "spellbook"
 --</private-static-properties>
 
 --<public-static-properties>
@@ -77,6 +95,13 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+function OvaleSpellBook:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleData = Ovale.OvaleData
+	OvalePower = Ovale.OvalePower
+	OvaleState = Ovale.OvaleState
+end
+
 function OvaleSpellBook:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents")
@@ -90,9 +115,11 @@ function OvaleSpellBook:OnEnable()
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalents")
 	self:RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
 	self:RegisterEvent("UNIT_PET")
+	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleSpellBook:OnDisable()
+	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
 	self:UnregisterEvent("GLYPH_ADDED")
@@ -124,6 +151,7 @@ end
 -- Update the player's talents by scanning the talent tab for the active specialization.
 -- Store the number of points assigned to each talent.
 function OvaleSpellBook:UpdateTalents()
+	Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "Updating talents.")
 	wipe(self.talent)
 	wipe(self.talentPoints)
 
@@ -140,6 +168,7 @@ function OvaleSpellBook:UpdateTalents()
 					else
 						self.talentPoints[index] = 0
 					end
+					Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    Talent %s (%d) is %s.", name, index, selected and "enabled" or "disabled")
 				end
 			end
 		end
@@ -149,12 +178,17 @@ end
 
 -- Update the player's glyphs by scanning the glyph socket tab for the active specialization.
 function OvaleSpellBook:UpdateGlyphs()
+	Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "Updating glyphs.")
 	wipe(self.glyph)
 
 	for i = 1, API_GetNumGlyphSockets() do
 		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
 		if enabled and glyphSpell then
-			self.glyph[glyphSpell] = self:GetSpellName(glyphSpell)
+			local name = self:GetSpellName(glyphSpell)
+			self.glyph[glyphSpell] = name
+			Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    Glyph socket %d has %s (%d).", i, name, glyphSpell)
+		else
+			Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    Glyph socket %d is empty.", i)
 		end
 	end
 	self:SendMessage("Ovale_GlyphsChanged")
@@ -185,6 +219,7 @@ end
 -- Scan a spellbook and populate self.spell table.
 function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 	offset = offset or 0
+	Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "Updating '%s' spellbook starting at offset %d.", bookType, offset)
 	for index = offset + 1, offset + numSpells do
 		local skillType, spellId = API_GetSpellBookItemInfo(index, bookType)
 		if skillType == "SPELL" or skillType == "PETACTION" then
@@ -193,8 +228,12 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 			local spellLink = API_GetSpellLink(index, bookType)
 			if spellLink then
 				local _, _, linkData, spellName = ParseHyperlink(spellLink)
-				self.spell[tonumber(linkData)] = spellName
-				if spellId then
+				local id = tonumber(linkData)
+				Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, id, index)
+				self.spell[id] = spellName
+				self.spellbookId[bookType][id] = index
+				if spellId and id ~= spellId then
+					Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, spellId, index)
 					self.spell[spellId] = spellName
 					self.spellbookId[bookType][spellId] = index
 				end
@@ -206,10 +245,12 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 				for flyoutIndex = 1, numSlots do
 					local id, overrideId, isKnown, spellName = API_GetFlyoutSlotInfo(flyoutId, flyoutIndex)
 					if isKnown then
+						Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, id, index)
 						self.spell[id] = spellName
 						-- Flyout spells have no spellbook index.
 						self.spellbookId[bookType][id] = nil
 						if id ~= overrideId then
+							Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, overrideId, index)
 							self.spell[overrideId] = spellName
 							-- Flyout spells have no spellbook index.
 							self.spellbookId[bookType][overrideId] = nil
@@ -352,3 +393,58 @@ function OvaleSpellBook:DebugTalents()
 	PrintTableValues(self.talent)
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleSpellBook.statePrototype = {}
+--</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleSpellBook.statePrototype
+--</private-static-properties>
+
+--<state-methods>
+statePrototype.IsUsableSpell = function(state, spellId, target)
+	profiler.Start("OvaleSpellBook_state_IsUsableSpell")
+	local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
+	local noMana = false
+	if isUsable then
+		-- Verify that the spell may be cast given restrictions specified in SpellInfo().
+		local si = OvaleData.spellInfo[spellId]
+		if si then
+			-- Stance.
+			if isUsable and si.stance and not state:IsStance(si.stance) then
+				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'", spellId, si.stance)
+				isUsable = false
+			end
+			-- Secondary resources, e.g., chi, focus, rage, etc.
+			if isUsable and si.combo then
+				-- Spell requires combo points.
+				local cost = state:ComboPointCost(spellId)
+				if cost > 0 and state.combo < cost then
+					Ovale:Logf("Spell ID '%s' requires at least %d combo points.", spellId, cost)
+					isUsable = false
+					noMana = true
+				end
+			end
+			for powerType in pairs(OvalePower.SECONDARY_POWER) do
+				if isUsable and si[powerType] then
+					-- Spell requires a secondary resource.
+					local cost = state:PowerCost(spellId, powerType)
+					if cost > 0 and state[powerType] < cost then
+						Ovale:Logf("Spell ID '%s' requires at least %d %s.", spellId, cost, powerType)
+						isUsable = false
+						noMana = true
+						break
+					end
+				end
+			end
+		end
+	end
+	profiler.Stop("OvaleSpellBook_state_IsUsableSpell")
+	return isUsable, noMana
+end
+--</state-methods>
