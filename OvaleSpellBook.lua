@@ -420,6 +420,27 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'", spellId, si.stance)
 				isUsable = false
 			end
+			-- Stealthed.
+			if isUsable and si.stealthed == 1 then
+				local usable = false
+				-- Look for a buff that allows this ability to ignore the stealth requirements.
+				if si.buff_no_stealthed then
+					local aura = state:GetAura("player", si.buff_no_stealthed)
+					if state:IsActiveAura(aura) then
+						usable = true
+					end
+				end
+				if not usable then
+					local aura = state:GetAura("player", "stealthed_buff", "HELPFUL", true)
+					if state:IsActiveAura(aura) then
+						usable = true
+					end
+				end
+				if not usable then
+					Ovale:Logf("Spell ID '%s' requires the player to be stealthed.", spellId)
+					isUsable = false
+				end
+			end
 			-- Target health percent (execute range).
 			if isUsable and si.target_health_pct then
 				local usable = false
