@@ -27,34 +27,4 @@
 	<Script file="leafkiller_druid.lua" />
 	<Script file="lunaeclipse_druid.lua" />
 	<Script file="wiljo_mage.lua" />
-
-	<Script file="simulationcraft_deathknight_frost_1h_t16h.lua" />
-	<Script file="simulationcraft_deathknight_frost_2h_t16h.lua" />
-	<Script file="simulationcraft_deathknight_unholy_t16h.lua" />
-	<Script file="simulationcraft_druid_balance_t16h.lua" />
-	<Script file="simulationcraft_druid_feral_t16h.lua" />
-	<Script file="simulationcraft_druid_feral_t16h_adv_rotation.lua" />
-	<Script file="simulationcraft_hunter_bm_t16h.lua" />
-	<Script file="simulationcraft_hunter_mm_t16h.lua" />
-	<Script file="simulationcraft_hunter_sv_t16h.lua" />
-	<Script file="simulationcraft_mage_arcane_t16h.lua" />
-	<Script file="simulationcraft_mage_fire_t16h.lua" />
-	<Script file="simulationcraft_mage_frost_t16h.lua" />
-	<Script file="simulationcraft_monk_windwalker_1h_t16h.lua" />
-	<Script file="simulationcraft_monk_windwalker_2h_t16h.lua" />
-	<Script file="simulationcraft_paladin_protection_t16h.lua" />
-	<Script file="simulationcraft_paladin_retribution_t16h.lua" />
-	<Script file="simulationcraft_priest_shadow_t16h.lua" />
-	<Script file="simulationcraft_rogue_assassination_t16h.lua" />
-	<Script file="simulationcraft_rogue_combat_t16h.lua" />
-	<Script file="simulationcraft_rogue_subtlety_t16h.lua" />
-	<Script file="simulationcraft_shaman_elemental_t16h.lua" />
-	<Script file="simulationcraft_shaman_enhancement_t16h.lua" />
-	<Script file="simulationcraft_warlock_affliction_t16h.lua" />
-	<Script file="simulationcraft_warlock_demonology_t16h.lua" />
-	<Script file="simulationcraft_warlock_destruction_t16h.lua" />
-	<Script file="simulationcraft_warrior_arms_t16h.lua" />
-	<Script file="simulationcraft_warrior_fury_1h_t16h.lua" />
-	<Script file="simulationcraft_warrior_fury_2h_t16h.lua" />
-	<Script file="simulationcraft_warrior_protection_t16h.lua" />
 </Ui>
