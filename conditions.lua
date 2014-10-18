@@ -5017,17 +5017,41 @@ do
 end
 
 do
-	--- Get the number of seconds before the player reaches maximum power.
-	local function TimeToMax(powerType, condition)
-		local comparator, limit = condition[1], condition[2]
-		local maxPower = OvalePower.maxPower[powerType] or 0
+	--- Get the number of seconds before the player reaches the given power level.
+	local function TimeToPower(powerType, level, comparator, limit)
+		local level = level or 0
 		local power = state[powerType] or 0
 		local powerRegen = state.powerRate[powerType] or 1
-		local t = (maxPower - power) / powerRegen
-		if t > 0 then
-			return TestValue(0, state.currentTime + t, t, state.currentTime, -1, comparator, limit)
+		if powerRegen == 0 then
+			if power == level then
+				return Compare(0, comparator, limit)
+			end
+			return Compare(math.huge, comparator, limit)
+		else
+			local t = (level - power) / powerRegen
+			if t > 0 then
+				local ending = state.currentTime + t
+				return TestValue(0, ending, 0, ending, -1, comparator, limit)
+			end
+			return Compare(0, comparator, limit)
 		end
-		return Compare(0, comparator, limit)
+	end
+
+	--- Get the number of seconds before the player reaches the given energy level for feral druids, non-mistweaver monks and rogues.
+	-- @name TimeToEnergy
+	-- @paramsig number or boolean
+	-- @param level. The level of energy to reach.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @see TimeToEnergyFor, TimeToMaxEnergy
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if TimeToEnergy(100) < 1.2 Spell(sinister_strike)
+
+	local function TimeToEnergy(condition)
+		local level, comparator, limit = condition[1], condition[2], condition[3]
+		return TimeToPower("energy", level, comparator, limit)
 	end
 
 	--- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
@@ -5036,13 +5060,33 @@ do
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The number of seconds.
-	-- @see TimeToEnergyFor
+	-- @see TimeToEnergy, TimeToEnergyFor
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
 	-- if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
 
 	local function TimeToMaxEnergy(condition)
-		return TimeToMax("energy", condition)
+		local powerType = "energy"
+		local comparator, limit = condition[1], condition[2]
+		local level = OvalePower.maxPower[powerType] or 0
+		return TimeToPower(powerType, level, comparator, limit)
+	end
+
+	--- Get the number of seconds before the player reaches the given focus level for hunters.
+	-- @name TimeToFocus
+	-- @paramsig number or boolean
+	-- @param level. The level of focus to reach.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @see TimeToFocusFor, TimeToMaxFocus
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if TimeToFocus(100) < 1.2 Spell(cobra_shot)
+
+	local function TimeToFocus(condition)
+		local level, comparator, limit = condition[1], condition[2], condition[3]
+		return TimeToPower("focus", level, comparator, limit)
 	end
 
 	--- Get the number of seconds before the player reaches maximum focus for hunters.
@@ -5051,19 +5095,26 @@ do
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The number of seconds.
-	-- @see TimeToEnergyFor
+	-- @see TimeToFocus, TimeToFocusFor
 	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if TimeToMaxFocus() < 1.2 Spell(cobra_shot)
 
 	local function TimeToMaxFocus(condition)
-		return TimeToMax("focus", condition)
+		local powerType = "focus"
+		local comparator, limit = condition[1], condition[2]
+		local level = OvalePower.maxPower[powerType] or 0
+		return TimeToPower(powerType, level, comparator, limit)
 	end
 
+	OvaleCondition:RegisterCondition("timetoenergy", false, TimeToEnergy)
+	OvaleCondition:RegisterCondition("timetofocus", false, TimeToFocus)
 	OvaleCondition:RegisterCondition("timetomaxenergy", false, TimeToMaxEnergy)
 	OvaleCondition:RegisterCondition("timetomaxfocus", false, TimeToMaxFocus)
 end
 
 do
-	local function TimeToPower(powerType, condition)
+	local function TimeToPowerFor(powerType, condition)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		if not powerType then
 			local _, pt = OvalePower:PowerCost(spellId)
@@ -5091,7 +5142,7 @@ do
 	-- @see TimeToEnergyFor, TimeToMaxEnergy
 
 	local function TimeToEnergyFor(condition)
-		return TimeToPower("energy", condition)
+		return TimeToPowerFor("energy", condition)
 	end
 
 	--- Get the number of seconds before the player has enough focus to cast the given spell.
@@ -5105,7 +5156,7 @@ do
 	-- @see TimeToFocusFor
 
 	local function TimeToFocusFor(condition)
-		return TimeToPower("focus", condition)
+		return TimeToPowerFor("focus", condition)
 	end
 
 	OvaleCondition:RegisterCondition("timetoenergyfor", true, TimeToEnergyFor)
