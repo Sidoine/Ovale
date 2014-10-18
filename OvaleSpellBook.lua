@@ -269,7 +269,7 @@ end
 -- Returns the cast time of a spell in seconds.
 function OvaleSpellBook:GetCastTime(spellId)
 	if spellId then
-		local name, _, _, castTime = API_GetSpellInfo(spellId)
+		local name, _, _, castTime = self:GetSpellInfo(spellId)
 		if name then
 			if castTime then
 				castTime = castTime / 1000
@@ -283,11 +283,20 @@ function OvaleSpellBook:GetCastTime(spellId)
 	end
 end
 
+function OvaleSpellBook:GetSpellInfo(spellId)
+	local index, bookType = self:GetSpellBookIndex(spellId)
+	if index and bookType then
+		return API_GetSpellInfo(index, bookType)
+	else
+		return API_GetSpellInfo(spellId)
+	end
+end
+
 function OvaleSpellBook:GetSpellName(spellId)
 	if spellId then
 		local spellName = self.spell[spellId]
 		if not spellName then
-			spellName = API_GetSpellInfo(spellId)
+			spellName = self:GetSpellInfo(spellId)
 		end
 		return spellName
 	end

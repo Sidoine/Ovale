@@ -47,7 +47,6 @@ local API_GetActionTexture = GetActionTexture
 local API_GetItemIcon = GetItemIcon
 local API_GetItemCooldown = GetItemCooldown
 local API_GetItemSpell = GetItemSpell
-local API_GetSpellInfo = GetSpellInfo
 local API_GetSpellTexture = GetSpellTexture
 local API_IsActionInRange = IsActionInRange
 local API_IsCurrentAction = IsCurrentAction
@@ -67,7 +66,6 @@ do
 		API_GetItemIcon = Profiler:Wrap(group, "OvaleBestAction_API_GetItemIcon", GetItemIcon)
 		API_GetItemCooldown = Profiler:Wrap(group, "OvaleBestAction_API_GetItemCooldown", GetItemCooldown)
 		API_GetItemSpell = Profiler:Wrap(group, "OvaleBestAction_API_GetItemSpell", GetItemSpell)
-		API_GetSpellInfo = Profiler:Wrap(group, "OvaleBestAction_API_GetSpellInfo", GetSpellTexture)
 		API_GetSpellTexture = Profiler:Wrap(group, "OvaleBestAction_API_GetSpellTexture", GetSpellTexture)
 		API_IsActionInRange = Profiler:Wrap(group, "OvaleBestAction_API_IsActionInRange", IsActionInRange)
 		API_IsCurrentAction = Profiler:Wrap(group, "OvaleBestAction_API_IsCurrentAction", IsCurrentAction)
@@ -83,7 +81,6 @@ do
 		API_GetItemIcon = GetItemIcon
 		API_GetItemCooldown = GetItemCooldown
 		API_GetItemSpell = GetItemSpell
-		API_GetSpellInfo = GetSpellInfo
 		API_GetSpellTexture = GetSpellTexture
 		API_IsActionInRange = IsActionInRange
 		API_IsCurrentAction = IsCurrentAction

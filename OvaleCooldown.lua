@@ -13,6 +13,7 @@ Ovale.OvaleCooldown = OvaleCooldown
 local OvaleData = nil
 local OvaleGUID = nil
 local OvalePaperDoll = nil
+local OvaleSpellBook = nil
 local OvaleStance = nil
 local OvaleState = nil
 
@@ -62,6 +63,7 @@ function OvaleCooldown:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleStance = Ovale.OvaleStance
 	OvaleState = Ovale.OvaleState
 end
@@ -119,11 +121,16 @@ function OvaleCooldown:GetSpellCooldown(spellId)
 	local start, duration, enable
 	if self_sharedCooldownSpells[spellId] then
 		for id in pairs(self_sharedCooldownSpells[spellId]) do
-			start, duration, enable = API_GetSpellCooldown(id)
+			start, duration, enable = self:GetSpellCooldown(id)
 			if start then break end
 		end
 	else
-		start, duration, enable = API_GetSpellCooldown(spellId)
+		local index, bookType = OvaleSpellBook:GetSpellBookIndex(spellId)
+		if index and bookType then
+			start, duration, enable = API_GetSpellCooldown(index, bookType)
+		else
+			start, duration, enable = API_GetSpellCooldown(spellId)
+		end
 	end
 	return start, duration, enable
 end
