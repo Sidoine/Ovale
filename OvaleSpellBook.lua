@@ -424,9 +424,14 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 		-- Verify that the spell may be cast given restrictions specified in SpellInfo().
 		local si = OvaleData.spellInfo[spellId]
 		if si then
+			-- Flagged as not usable in the spell information.
+			if isUsable and si.unusable == 1 then
+				Ovale:Logf("Spell ID '%s' is flagged as unusable.", spellId)
+				isUsable = false
+			end
 			-- Stance.
 			if isUsable and si.stance and not state:IsStance(si.stance) then
-				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'", spellId, si.stance)
+				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s'.", spellId, si.stance)
 				isUsable = false
 			end
 			-- Stealthed.
