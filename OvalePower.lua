@@ -74,6 +74,7 @@ OvalePower.POWER_INFO =
 	shadoworbs = { id = SPELL_POWER_SHADOW_ORBS, token = "SHADOW_ORBS", mini = 0 },
 	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS_POWER", mini = 0, costString = SOUL_SHARDS_COST },
 }
+
 OvalePower.SECONDARY_POWER = {
 	alternate = true,
 	burningembers = true,
@@ -86,6 +87,7 @@ OvalePower.SECONDARY_POWER = {
 	shadoworbs = true,
 	shards = true,
 }
+
 OvalePower.PRIMARY_POWER = {}
 do
 	for powerType in pairs(OvalePower.POWER_INFO) do
@@ -94,6 +96,7 @@ do
 		end
 	end
 end
+
 OvalePower.POWER_TYPE = {}
 do
 	for powerType, v in pairs(OvalePower.POWER_INFO) do
@@ -101,6 +104,13 @@ do
 		OvalePower.POWER_TYPE[v.token] = powerType
 	end
 end
+
+-- POOLED_RESOURCE[class] = powerType
+OvalePower.POOLED_RESOURCE = {
+	["DRUID"] = "energy",
+	["HUNTER"] = "focus",
+	["ROGUE"] = "energy"
+}
 --</public-static-properties>
 
 --<private-static-methods>
