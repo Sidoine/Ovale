@@ -4540,9 +4540,6 @@ do
 	--     Valid values: yes, no.
 	-- @return A boolean value.
 	-- @see SpellUsable
-	-- @usage
-	-- if SpellKnown(avenging_wrath) and SpellCooldown(avenging_wrath) <10
-	--     Spell(guardian_of_ancient_kings_retribution)
 
 	local function SpellKnown(condition, state)
 		local spellId, yesno = condition[1], condition[2]
@@ -4555,23 +4552,20 @@ end
 
 do
 	--- Test if the given spell is usable.
-	-- A spell is usable if the player has learned the spell and has the resources required to cast the spell.
+	-- A spell is usable if the player has learned the spell and meets any requirements for casting the spell.
 	-- @name SpellUsable
 	-- @paramsig boolean
 	-- @param id The spell ID.
-	-- @param yesno Optional. If yes, then return true if the spell has been learned and the player has enough resources to cast it.
-	--     If no, then return true if the player can't cast the spell for one of the above reasons.
+	-- @param yesno Optional. If yes, then return true if the spell is usable. If no, then return true if it isn't usable.
 	--     Default is yes.
 	--     Valid values: yes, no.
 	-- @return A boolean value.
 	-- @see SpellKnown
-	-- @usage
-	-- if SpellUsable(avenging_wrath) and SpellCooldown(avenging_wrath) <10
-	--     Spell(guardian_of_ancient_kings_retribution)
 
 	local function SpellUsable(condition, state)
 		local spellId, yesno = condition[1], condition[2]
-		local boolean = OvaleSpellBook:IsUsableSpell(spellId)
+		local target = ParseCondition(condition, state, state.defaultTarget)
+		local boolean = state:IsUsableSpell(spellId, target)
 		return TestBoolean(boolean, yesno)
 	end
 
