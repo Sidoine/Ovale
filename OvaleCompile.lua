@@ -100,6 +100,12 @@ local function TestConditions(parameters)
 		local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
 		boolean = (required and hasGlyph) or (not required and not hasGlyph)
 	end
+	if boolean and parameters.level then
+		local boolean = OvalePaperDoll.level >= parameters.level
+	end
+	if boolean and parameters.maxLevel then
+		local boolean = OvalePaperDoll.level <= parameters.maxLevel
+	end
 	if boolean and parameters.specialization then
 		local spec, required = RequireValue(parameters.specialization)
 		local isSpec = OvalePaperDoll:IsSpecialization(spec)

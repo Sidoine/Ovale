@@ -102,6 +102,7 @@ local PARAMETER_KEYWORD = {
 	["item"] = true,			-- deprecated
 	["itemcount"] = true,
 	["itemset"] = true,
+	["level"] = true,
 	["list"] = true,			-- deprecated
 	["listitem"] = true,
 	["specialization"] = true,
