@@ -31,7 +31,6 @@ local API_GetSpellTabInfo = GetSpellTabInfo
 local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
 local API_IsSpellInRange = IsSpellInRange
-local API_IsSpellOverlayed = IsSpellOverlayed
 local API_IsUsableSpell = IsUsableSpell
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
@@ -323,21 +322,14 @@ end
 -- Returns true if the given spell ID is usable.  A spell is *not* usable if:
 --     The player lacks required mana or reagents.
 --     Reactive conditions haven't been met.
--- XXX Use IsSpellOverlayed() to catch instances where a spell becomes usable due
--- XXX to a proc but the proc replaces the spell in the spellbook, e.g.,
--- XXX "Aimed Shot" --> "Aimed Shot!".
 function OvaleSpellBook:IsUsableSpell(spellId)
-	local spellName = self:GetSpellName(spellId)
-	local result = API_IsUsableSpell(spellName) or API_IsSpellOverlayed(spellId)
-	if not result then
-		-- Catch case where the name in the spellbook does not match the GetSpellInfo() name,
-		-- e.g., druid's Incarnation.
-		local name = API_GetSpellInfo(spellId)
-		if name and name ~= "" and name ~= spellName then
-			result = API_IsUsableSpell(name)
-		end
+	local index, bookType = self:GetSpellBookIndex(spellId)
+	if index and bookType then
+		return API_IsUsableSpell(index, bookType)
+	else
+		local name = self:GetSpellName(spellId)
+		return API_IsUsableSpell(name)
 	end
-	return result
 end
 
 -- Print out the list of active glyphs in alphabetical order.
