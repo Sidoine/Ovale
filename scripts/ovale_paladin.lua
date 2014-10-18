@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_paladin"
+	local name = "legacy_ovale_paladin"
 	local desc = "[5.4.8] Ovale: Holy, Protection, Retribution"
 	local code = [[
 # Ovale paladin script based on SimulationCraft.
@@ -491,6 +491,16 @@ AddIcon specialization=retribution help=cd checkbox=opt_paladin_retribution chec
 	if InCombat(no) RetributionPrecombatCdActions()
 	RetributionDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("PALADIN", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_paladin"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")

@@ -257,5 +257,5 @@ AddIcon specialization=balance help=cd
 }
 ]]
 
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "script")
+	OvaleScripts:RegisterScript("DRUID", name, desc, code, "legacy")
 end

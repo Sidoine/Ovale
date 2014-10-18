@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_rogue"
+	local name = "legacy_ovale_rogue"
 	local desc = "[5.4.8] Ovale: Assassination, Combat, Subtlety"
 	local code = [[
 # Ovale rogue script based on SimulationCraft.
@@ -669,6 +669,16 @@ AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety checkbox=opt
 	if InCombat(no) SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("ROGUE", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_rogue"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "include")

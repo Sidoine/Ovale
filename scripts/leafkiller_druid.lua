@@ -1596,5 +1596,5 @@ AddIcon size=small mastery=3 checkboxon=cooldownsR {
 }
 ]]
 
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "script")
+	OvaleScripts:RegisterScript("DRUID", name, desc, code, "legacy")
 end

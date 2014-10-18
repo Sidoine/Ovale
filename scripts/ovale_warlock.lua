@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_warlock"
+	local name = "legacy_ovale_warlock"
 	local desc = "[5.4.8] Ovale: Affliction, Demonology, Destruction"
 	local code = [[
 # Ovale warlock script based on SimulationCraft.
@@ -694,6 +694,16 @@ AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction chec
 	if InCombat(no) DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("WARLOCK", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_warlock"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "include")

@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_hunter"
+	local name = "legacy_ovale_hunter"
 	local desc = "[5.4.8] Ovale: Beast Mastery, Marksmanship, Survival"
 	local code = [[
 # Ovale hunter script based on SimulationCraft.
@@ -601,6 +601,16 @@ AddIcon specialization=survival help=cd checkbox=opt_hunter_survival checkbox=op
 	if InCombat(no) SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("HUNTER", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_hunter"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")

@@ -1,8 +1,8 @@
-local _, Ovale = ...
+-- local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_priest"
+	local name = "legacy_ovale_priest"
 	local desc = "[5.4.8] Ovale: Shadow"
 	local code = [[
 # Ovale shadow script based on SimulationCraft.
@@ -302,6 +302,16 @@ AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow checkbox=opt_pr
 	if InCombat(no) ShadowPrecombatCdActions()
 	ShadowDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("PRIEST", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_priest"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "include")

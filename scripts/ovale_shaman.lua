@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_shaman"
+	local name = "legacy_ovale_shaman"
 	local desc = "[5.4.8] Ovale: Elemental, Enhancement, Restoration"
 	local code = [[
 # Ovale shaman script based on SimulationCraft.
@@ -678,6 +678,16 @@ AddIcon specialization=restoration help=cd checkbox=opt_shaman_restoration
 	Spell(fire_elemental_totem)
 	Spell(earth_elemental_totem)
 }
+]]
+
+	OvaleScripts:RegisterScript("SHAMAN", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_shaman"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")

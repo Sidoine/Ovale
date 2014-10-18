@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_monk"
+	local name = "legacy_ovale_monk"
 	local desc = "[5.4.8] Ovale: Brewmaster, Mistweaver, Windwalker"
 	local code = [[
 # Ovale monk script based on SimulationCraft.
@@ -547,6 +547,16 @@ AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker checkbox=
 	if InCombat(no) WindwalkerPrecombatCdActions()
 	WindwalkerDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("MONK", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_monk"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("MONK", name, desc, code, "include")

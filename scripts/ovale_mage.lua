@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_mage"
+	local name = "legacy_ovale_mage"
 	local desc = "[5.4.8] Ovale: Arcane, Fire, Frost"
 	local code = [[
 # Ovale mage script based on SimulationCraft.
@@ -1070,6 +1070,16 @@ AddIcon specialization=frost help=cd checkbox=opt_mage_frost checkbox=opt_mage_f
 	if InCombat(no) FrostPrecombatCdActions()
 	FrostDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("MAGE", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_mage"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")

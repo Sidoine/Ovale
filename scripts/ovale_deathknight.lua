@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_deathknight"
+	local name = "legacy_ovale_deathknight"
 	local desc = "[5.4.8] Ovale: Blood, Frost, Unholy"
 	local code = [[
 # Ovale death knight script based on SimulationCraft.
@@ -1274,6 +1274,16 @@ AddIcon specialization=unholy help=cd checkbox=opt_deathknight_unholy checkbox=o
 	if InCombat(no) UnholyPrecombatCdActions()
 	UnholyDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("DEATHKNIGHT", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_deathknight"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "include")

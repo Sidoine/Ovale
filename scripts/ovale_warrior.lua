@@ -2,7 +2,7 @@ local _, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_warrior"
+	local name = "legacy_ovale_warrior"
 	local desc = "[5.4.8] Ovale: Arms, Fury, Protection"
 	local code = [[
 # Ovale warrior script based on SimulationCraft.
@@ -1481,6 +1481,16 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection checkb
 	if InCombat(no) ProtectionPrecombatCdActions()
 	ProtectionDefaultCdActions()
 }
+]]
+
+	OvaleScripts:RegisterScript("WARRIOR", "legacy", desc, code, "legacy")
+end
+
+do
+	local name = "ovale_warrior"
+	local desc = "[6.0.2] Ovale: Work in progress"
+	local code = [[
+# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")
