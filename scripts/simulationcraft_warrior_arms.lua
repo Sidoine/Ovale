@@ -27,7 +27,7 @@ AddFunction ArmsPrecombatActions
 	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
 	#stance,choose=battle
-	if not Stance(warrior_battle_stance) Spell(battle_stance)
+	Spell(battle_stance)
 	#snapshot_stats
 	#potion,name=mogu_power
 	UsePotionStrength()
@@ -132,13 +132,13 @@ AddFunction ArmsMovementActions
 
 AddIcon specialization=arms help=main enemies=1
 {
-	if InCombat(no) ArmsPrecombatActions()
+	if not InCombat() ArmsPrecombatActions()
 	ArmsDefaultActions()
 }
 
 AddIcon specialization=arms help=aoe
 {
-	if InCombat(no) ArmsPrecombatActions()
+	if not InCombat() ArmsPrecombatActions()
 	ArmsDefaultActions()
 }
 

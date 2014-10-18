@@ -23,7 +23,7 @@ AddFunction UsePotionAgility
 
 AddFunction SummonPet
 {
-	if pet.Present(no) Texture(ability_hunter_beastcall help=L(summon_pet))
+	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
 	if pet.IsDead() Spell(revive_pet)
 }
 
@@ -81,7 +81,7 @@ AddFunction SurvivalAoeActions
 	#black_arrow,if=!ticking
 	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 	#explosive_trap,if=dot.explosive_trap.remains<=5
-	if target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and Glyph(glyph_of_explosive_trap no) Spell(explosive_trap)
+	if target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#a_murder_of_crows
 	Spell(a_murder_of_crows)
 	#dire_beast
@@ -119,13 +119,13 @@ AddFunction SurvivalPrecombatActions
 
 AddIcon specialization=survival help=main enemies=1
 {
-	if InCombat(no) SurvivalPrecombatActions()
+	if not InCombat() SurvivalPrecombatActions()
 	SurvivalDefaultActions()
 }
 
 AddIcon specialization=survival help=aoe
 {
-	if InCombat(no) SurvivalPrecombatActions()
+	if not InCombat() SurvivalPrecombatActions()
 	SurvivalDefaultActions()
 }
 

@@ -27,7 +27,7 @@ AddFunction BalancePrecombatActions
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#moonkin_form
-	if not Stance(druid_moonkin_form) Spell(moonkin_form)
+	Spell(moonkin_form)
 	#snapshot_stats
 	#potion,name=jade_serpent
 	UsePotionIntellect()
@@ -99,13 +99,13 @@ AddFunction BalanceSingleTargetActions
 
 AddIcon specialization=balance help=main enemies=1
 {
-	if InCombat(no) BalancePrecombatActions()
+	if not InCombat() BalancePrecombatActions()
 	BalanceDefaultActions()
 }
 
 AddIcon specialization=balance help=aoe
 {
-	if InCombat(no) BalancePrecombatActions()
+	if not InCombat() BalancePrecombatActions()
 	BalanceDefaultActions()
 }
 

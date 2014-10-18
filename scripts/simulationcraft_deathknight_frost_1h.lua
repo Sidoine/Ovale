@@ -22,12 +22,12 @@ AddFunction UsePotionStrength
 
 AddFunction DiseasesAnyTicking
 {
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or Talent(necrotic_plague_talent no) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
+	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
 }
 
 AddFunction DiseasesTicking
 {
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or Talent(necrotic_plague_talent no) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
+	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
 }
 
 AddFunction FrostPrecombatActions
@@ -37,7 +37,7 @@ AddFunction FrostPrecombatActions
 	#horn_of_winter
 	Spell(horn_of_winter)
 	#frost_presence
-	if not Stance(deathknight_frost_presence) Spell(frost_presence)
+	Spell(frost_presence)
 	#snapshot_stats
 	#army_of_the_dead
 	Spell(army_of_the_dead)
@@ -200,13 +200,13 @@ AddFunction FrostSingleTargetActions
 
 AddIcon specialization=frost help=main enemies=1
 {
-	if InCombat(no) FrostPrecombatActions()
+	if not InCombat() FrostPrecombatActions()
 	FrostDefaultActions()
 }
 
 AddIcon specialization=frost help=aoe
 {
-	if InCombat(no) FrostPrecombatActions()
+	if not InCombat() FrostPrecombatActions()
 	FrostDefaultActions()
 }
 

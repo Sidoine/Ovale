@@ -27,7 +27,7 @@ AddFunction ProtectionPrecombatActions
 	#flask,type=earth
 	#food,type=chun_tian_spring_rolls
 	#stance,choose=defensive
-	if not Stance(warrior_defensive_stance) Spell(defensive_stance)
+	Spell(defensive_stance)
 	#snapshot_stats
 	#shield_wall
 	Spell(shield_wall)
@@ -136,13 +136,13 @@ AddFunction ProtectionProtActions
 
 AddIcon specialization=protection help=main enemies=1
 {
-	if InCombat(no) ProtectionPrecombatActions()
+	if not InCombat() ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 
 AddIcon specialization=protection help=aoe
 {
-	if InCombat(no) ProtectionPrecombatActions()
+	if not InCombat() ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 

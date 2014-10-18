@@ -74,15 +74,15 @@ AddFunction DemonologyDefaultActions
 	#touch_of_chaos,if=buff.metamorphosis.up
 	if BuffPresent(metamorphosis_buff) Spell(touch_of_chaos)
 	#metamorphosis,if=buff.dark_soul.remains>gcd&(demonic_fury>300|!glyph.dark_soul.enabled)
-	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and { DemonicFury() > 300 or not Glyph(glyph_of_dark_soul_knowledge) } and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and { DemonicFury() > 300 or not Glyph(glyph_of_dark_soul_knowledge) } Spell(metamorphosis)
 	#metamorphosis,if=(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.demonic_synergy.up)&demonic_fury>400&action.dark_soul.recharge_time>=10
-	if { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(demonic_synergy_buff) } and DemonicFury() > 400 and SpellChargeCooldown(dark_soul_knowledge) >= 10 and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(demonic_synergy_buff) } and DemonicFury() > 400 and SpellChargeCooldown(dark_soul_knowledge) >= 10 Spell(metamorphosis)
 	#metamorphosis,if=!cooldown.cataclysm.remains&talent.cataclysm.enabled
-	if not SpellCooldown(cataclysm) and Talent(cataclysm_talent) and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if not SpellCooldown(cataclysm) and Talent(cataclysm_talent) Spell(metamorphosis)
 	#metamorphosis,if=!dot.doom.ticking&target.time_to_die>=30%(1%spell_haste)&demonic_fury>300
-	if not target.DebuffPresent(doom_debuff) and target.TimeToDie() >= 30 / 1 / SpellHaste() / 100 and DemonicFury() > 300 and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if not target.DebuffPresent(doom_debuff) and target.TimeToDie() >= 30 / 1 / SpellHaste() / 100 and DemonicFury() > 300 Spell(metamorphosis)
 	#metamorphosis,if=(demonic_fury>750&(action.hand_of_guldan.charges=0|(!dot.shadowflame.ticking&!action.hand_of_guldan.in_flight_to_target)))|target.time_to_die<30&action.dark_soul.recharge_time>=10
-	if { DemonicFury() > 750 and { Charges(hand_of_guldan) == 0 or not target.DebuffPresent(shadowflame_debuff) and not InFlightToTarget(hand_of_guldan) } or target.TimeToDie() < 30 and SpellChargeCooldown(dark_soul_knowledge) >= 10 } and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if DemonicFury() > 750 and { Charges(hand_of_guldan) == 0 or not target.DebuffPresent(shadowflame_debuff) and not InFlightToTarget(hand_of_guldan) } or target.TimeToDie() < 30 and SpellChargeCooldown(dark_soul_knowledge) >= 10 Spell(metamorphosis)
 	#cancel_metamorphosis
 	Texture(spell_shadow_demonform text=cancel)
 	#soul_fire,if=buff.molten_core.react&(buff.molten_core.stack>=4|target.health.pct<=25)&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
@@ -104,7 +104,7 @@ AddFunction DemonologyPrecombatActions
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) Spell(summon_felguard)
+	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
 	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
 	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
@@ -137,17 +137,17 @@ AddFunction DemonologyDbActions
 	#touch_of_chaos,if=buff.metamorphosis.up&(((demonic_fury-40)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
 	if BuffPresent(metamorphosis_buff) and { DemonicFury() - 40 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * { SpellHaste() / 100 } } and DemonicFury() >= 750 Spell(touch_of_chaos)
 	#metamorphosis,if=buff.dark_soul.remains>gcd&demonic_fury>=240&(buff.demonbolt.down|target.time_to_die<buff.demonbolt.remains|(buff.dark_soul.remains>execute_time&demonic_fury>=175))
-	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and DemonicFury() >= 240 and { BuffExpires(demonbolt_buff) or target.TimeToDie() < BuffRemaining(demonbolt_buff) or BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(metamorphosis) and DemonicFury() >= 175 } and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and DemonicFury() >= 240 and { BuffExpires(demonbolt_buff) or target.TimeToDie() < BuffRemaining(demonbolt_buff) or BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(metamorphosis) and DemonicFury() >= 175 } Spell(metamorphosis)
 	#metamorphosis,if=buff.demonbolt.down&demonic_fury>=480&(action.dark_soul.charges=0|!talent.archimondes_darkness.enabled&cooldown.dark_soul.remains)
-	if BuffExpires(demonbolt_buff) and DemonicFury() >= 480 and { Charges(dark_soul_knowledge) == 0 or not Talent(archimondes_darkness_talent) and SpellCooldown(dark_soul_knowledge) } and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if BuffExpires(demonbolt_buff) and DemonicFury() >= 480 and { Charges(dark_soul_knowledge) == 0 or not Talent(archimondes_darkness_talent) and SpellCooldown(dark_soul_knowledge) } Spell(metamorphosis)
 	#metamorphosis,if=(demonic_fury%80)*2*spell_haste>=target.time_to_die&target.time_to_die<buff.demonbolt.remains
-	if DemonicFury() / 80 * 2 * { SpellHaste() / 100 } >= target.TimeToDie() and target.TimeToDie() < BuffRemaining(demonbolt_buff) and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if DemonicFury() / 80 * 2 * { SpellHaste() / 100 } >= target.TimeToDie() and target.TimeToDie() < BuffRemaining(demonbolt_buff) Spell(metamorphosis)
 	#metamorphosis,if=target.time_to_die>=30*spell_haste&!dot.doom.ticking&buff.dark_soul.down
-	if target.TimeToDie() >= 30 * { SpellHaste() / 100 } and not target.DebuffPresent(doom_debuff) and BuffExpires(dark_soul_knowledge_buff) and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if target.TimeToDie() >= 30 * { SpellHaste() / 100 } and not target.DebuffPresent(doom_debuff) and BuffExpires(dark_soul_knowledge_buff) Spell(metamorphosis)
 	#metamorphosis,if=demonic_fury>750&buff.demonbolt.remains>=action.metamorphosis.cooldown
-	if DemonicFury() > 750 and BuffRemaining(demonbolt_buff) >= SpellCooldown(metamorphosis) and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if DemonicFury() > 750 and BuffRemaining(demonbolt_buff) >= SpellCooldown(metamorphosis) Spell(metamorphosis)
 	#metamorphosis,if=(((demonic_fury-120)%800)>(buff.demonbolt.remains%(40*spell_haste)))&buff.demonbolt.remains>=10&dot.doom.remains<=dot.doom.duration*0.3
-	if { DemonicFury() - 120 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * { SpellHaste() / 100 } } and BuffRemaining(demonbolt_buff) >= 10 and target.DebuffRemaining(doom_debuff) <= target.DebuffDuration(doom_debuff) * 0.3 and not Stance(warlock_metamorphosis) Spell(metamorphosis)
+	if { DemonicFury() - 120 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * { SpellHaste() / 100 } } and BuffRemaining(demonbolt_buff) >= 10 and target.DebuffRemaining(doom_debuff) <= target.DebuffDuration(doom_debuff) * 0.3 Spell(metamorphosis)
 	#cancel_metamorphosis
 	Texture(spell_shadow_demonform text=cancel)
 	#soul_fire,if=buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
@@ -162,13 +162,13 @@ AddFunction DemonologyDbActions
 
 AddIcon specialization=demonology help=main enemies=1
 {
-	if InCombat(no) DemonologyPrecombatActions()
+	if not InCombat() DemonologyPrecombatActions()
 	DemonologyDefaultActions()
 }
 
 AddIcon specialization=demonology help=aoe
 {
-	if InCombat(no) DemonologyPrecombatActions()
+	if not InCombat() DemonologyPrecombatActions()
 	DemonologyDefaultActions()
 }
 

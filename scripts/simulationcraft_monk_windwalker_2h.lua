@@ -25,7 +25,7 @@ AddFunction WindwalkerPrecombatActions
 	#flask,type=spring_blossoms
 	#food,type=sea_mist_rice_noodles
 	#stance,choose=fierce_tiger
-	if not Stance(monk_stance_of_the_fierce_tiger) Spell(stance_of_the_fierce_tiger)
+	Spell(stance_of_the_fierce_tiger)
 	#snapshot_stats
 	#potion,name=virmens_bite
 	UsePotionAgility()
@@ -137,13 +137,13 @@ AddFunction WindwalkerStActions
 
 AddIcon specialization=windwalker help=main enemies=1
 {
-	if InCombat(no) WindwalkerPrecombatActions()
+	if not InCombat() WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()
 }
 
 AddIcon specialization=windwalker help=aoe
 {
-	if InCombat(no) WindwalkerPrecombatActions()
+	if not InCombat() WindwalkerPrecombatActions()
 	WindwalkerDefaultActions()
 }
 

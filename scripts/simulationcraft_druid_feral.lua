@@ -8,8 +8,8 @@ do
 # Based on SimulationCraft profile "Druid_Feral_T16M".
 #	class=druid
 #	spec=feral
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#UZ!...2...
-#	glyphs=savage_roar/master_shapeshifter
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#UZ!...0...
+#	glyphs=savage_roar
 
 Include(ovale_common)
 Include(ovale_druid_spells)
@@ -23,14 +23,14 @@ AddFunction UsePotionAgility
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(skull_bash) Spell(skull_bash)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
-			if Talent(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
-			if Talent(typhoon_talent) and target.InRange(skull_bash) Spell(typhoon)
-			if Stance(druid_cat_form) and target.InRange(maim) Spell(maim)
+			if target.InRange(mighty_bash) Spell(mighty_bash)
+			Spell(typhoon)
+			if target.InRange(maim) Spell(maim)
 			Spell(war_stomp)
 		}
 	}
@@ -106,7 +106,7 @@ AddFunction FeralPrecombatActions
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#cat_form
-	if not Stance(druid_cat_form) Spell(cat_form)
+	Spell(cat_form)
 	#prowl
 	if BuffExpires(stealthed_buff any=1) Spell(prowl)
 	#snapshot_stats
@@ -116,13 +116,13 @@ AddFunction FeralPrecombatActions
 
 AddIcon specialization=feral help=main enemies=1
 {
-	if InCombat(no) FeralPrecombatActions()
+	if not InCombat() FeralPrecombatActions()
 	FeralDefaultActions()
 }
 
 AddIcon specialization=feral help=aoe
 {
-	if InCombat(no) FeralPrecombatActions()
+	if not InCombat() FeralPrecombatActions()
 	FeralDefaultActions()
 }
 

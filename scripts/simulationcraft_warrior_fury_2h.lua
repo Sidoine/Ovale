@@ -27,7 +27,7 @@ AddFunction FuryPrecombatActions
 	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
 	#stance,choose=battle
-	if not Stance(warrior_battle_stance) Spell(battle_stance)
+	Spell(battle_stance)
 	#snapshot_stats
 	#potion,name=mogu_power
 	UsePotionStrength()
@@ -38,8 +38,8 @@ AddFunction FuryDefaultActions
 	#charge
 	Spell(charge)
 	#auto_attack
-	#call_action_list,name=movement,if=movement.distance>8
-	if 0 > 8 FuryMovementActions()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FuryMovementActions()
 	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=10|talent.anger_management.enabled
@@ -98,6 +98,8 @@ AddFunction FuryTwoTargetsActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
 	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
 	#execute,if=target.health.pct<20|buff.sudden_death.react
@@ -106,8 +108,6 @@ AddFunction FuryTwoTargetsActions
 	if BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#whirlwind,if=!buff.meat_cleaver.up
 	if not BuffPresent(meat_cleaver_buff) Spell(whirlwind)
-	#bladestorm,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 	#bloodthirst
 	Spell(bloodthirst)
 }
@@ -130,18 +130,20 @@ AddFunction FurySingleTargetActions
 	Spell(siegebreaker)
 	#storm_bolt
 	Spell(storm_bolt)
-	#execute,if=buff.enrage.up|target.time_to_die<12|rage>60
-	if BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 or Rage() > 60 Spell(execute)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+	#execute,if=buff.enrage.up|target.time_to_die<12
+	if BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 Spell(execute)
 	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#raging_blow
 	if BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#wild_strike,if=buff.bloodsurge.up|(buff.enrage.up&target.health.pct>20)
-	if BuffPresent(bloodsurge_buff) or BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
+	#wild_strike,if=buff.enrage.up&target.health.pct>20
+	if BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
 	#shockwave,if=!talent.unquenchable_thirst.enabled
 	if not Talent(unquenchable_thirst_talent) Spell(shockwave)
-	#impending_victory,if=!talent.unquenchable_thirst.enabled
-	if not Talent(unquenchable_thirst_talent) and BuffPresent(victorious_buff) Spell(impending_victory)
+	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20
+	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and BuffPresent(victorious_buff) Spell(impending_victory)
 	#bloodthirst
 	Spell(bloodthirst)
 }
@@ -152,6 +154,8 @@ AddFunction FuryThreeTargetsActions
 	Spell(bloodbath)
 	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
 	#execute,if=buff.sudden_death.react
@@ -162,8 +166,6 @@ AddFunction FuryThreeTargetsActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#whirlwind
 	Spell(whirlwind)
-	#bladestorm,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 	#bloodthirst
 	Spell(bloodthirst)
 }
@@ -180,13 +182,13 @@ AddFunction FuryMovementActions
 
 AddIcon specialization=fury help=main enemies=1
 {
-	if InCombat(no) FuryPrecombatActions()
+	if not InCombat() FuryPrecombatActions()
 	FuryDefaultActions()
 }
 
 AddIcon specialization=fury help=aoe
 {
-	if InCombat(no) FuryPrecombatActions()
+	if not InCombat() FuryPrecombatActions()
 	FuryDefaultActions()
 }
 

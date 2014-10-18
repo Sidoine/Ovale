@@ -24,10 +24,10 @@ AddFunction UsePotionIntellect
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(counterspell)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_mana)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -37,8 +37,8 @@ AddFunction InterruptActions
 
 AddFunction IcyVeins
 {
-	if Glyph(glyph_of_icy_veins) Spell(icy_veins_glyphed)
-	if Glyph(glyph_of_icy_veins no) Spell(icy_veins)
+	Spell(icy_veins)
+	Spell(icy_veins_glyphed)
 }
 
 AddFunction FrostPrecombatActions
@@ -48,7 +48,7 @@ AddFunction FrostPrecombatActions
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#water_elemental
-	if pet.Present(no) Spell(water_elemental)
+	if not pet.Present() Spell(water_elemental)
 	#snapshot_stats
 	#rune_of_power
 	Spell(rune_of_power)
@@ -196,13 +196,13 @@ AddFunction FrostCooldownsActions
 
 AddIcon specialization=frost help=main enemies=1
 {
-	if InCombat(no) FrostPrecombatActions()
+	if not InCombat() FrostPrecombatActions()
 	FrostDefaultActions()
 }
 
 AddIcon specialization=frost help=aoe
 {
-	if InCombat(no) FrostPrecombatActions()
+	if not InCombat() FrostPrecombatActions()
 	FrostDefaultActions()
 }
 

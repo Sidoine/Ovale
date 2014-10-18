@@ -22,7 +22,7 @@ AddFunction UsePotionStrength
 
 AddFunction DiseasesTicking
 {
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or Talent(necrotic_plague_talent no) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
+	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
 }
 
 AddFunction UnholyPrecombatActions
@@ -32,7 +32,7 @@ AddFunction UnholyPrecombatActions
 	#horn_of_winter
 	Spell(horn_of_winter)
 	#unholy_presence
-	if not Stance(deathknight_unholy_presence) Spell(unholy_presence)
+	Spell(unholy_presence)
 	#snapshot_stats
 	#army_of_the_dead
 	Spell(army_of_the_dead)
@@ -221,13 +221,13 @@ AddFunction UnholySingleTargetActions
 
 AddIcon specialization=unholy help=main enemies=1
 {
-	if InCombat(no) UnholyPrecombatActions()
+	if not InCombat() UnholyPrecombatActions()
 	UnholyDefaultActions()
 }
 
 AddIcon specialization=unholy help=aoe
 {
-	if InCombat(no) UnholyPrecombatActions()
+	if not InCombat() UnholyPrecombatActions()
 	UnholyDefaultActions()
 }
 

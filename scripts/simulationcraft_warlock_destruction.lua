@@ -74,7 +74,7 @@ AddFunction DestructionPrecombatActions
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) Spell(summon_felhunter)
+	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
 	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
 	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
@@ -92,13 +92,13 @@ AddFunction DestructionPrecombatActions
 
 AddIcon specialization=destruction help=main enemies=1
 {
-	if InCombat(no) DestructionPrecombatActions()
+	if not InCombat() DestructionPrecombatActions()
 	DestructionDefaultActions()
 }
 
 AddIcon specialization=destruction help=aoe
 {
-	if InCombat(no) DestructionPrecombatActions()
+	if not InCombat() DestructionPrecombatActions()
 	DestructionDefaultActions()
 }
 

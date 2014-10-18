@@ -26,7 +26,7 @@ AddFunction BrewmasterPrecombatActions
 	#flask,type=earth
 	#food,type=mogu_fish_stew
 	#stance,choose=sturdy_ox
-	if not Stance(monk_stance_of_the_sturdy_ox) Spell(stance_of_the_sturdy_ox)
+	Spell(stance_of_the_sturdy_ox)
 	#snapshot_stats
 	#potion,name=virmens_bite
 	UsePotionAgility()
@@ -46,7 +46,6 @@ AddFunction BrewmasterDefaultActions
 	#chi_brew,if=talent.chi_brew.enabled&chi.max-chi>=2&buff.elusive_brew_stacks.stack<=10
 	if Talent(chi_brew_talent) and MaxChi() - Chi() >= 2 and BuffStacks(elusive_brew_stacks_buff) <= 10 Spell(chi_brew)
 	#gift_of_the_ox,if=buff.gift_of_the_ox.react&incoming_damage_1500ms
-	if BuffPresent(gift_of_the_ox_buff) and IncomingDamage(1.5) Spell(gift_of_the_ox)
 	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 	if IncomingDamage(1.5) and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
 	#fortifying_brew,if=incoming_damage_1500ms&buff.dampen_harm.down&buff.elusive_brew_activated.down
@@ -145,13 +144,13 @@ AddFunction BrewmasterStActions
 
 AddIcon specialization=brewmaster help=main enemies=1
 {
-	if InCombat(no) BrewmasterPrecombatActions()
+	if not InCombat() BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
 }
 
 AddIcon specialization=brewmaster help=aoe
 {
-	if InCombat(no) BrewmasterPrecombatActions()
+	if not InCombat() BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
 }
 
@@ -179,8 +178,6 @@ AddIcon specialization=brewmaster help=aoe
 # expel_harm
 # fortifying_brew
 # fortifying_brew_buff
-# gift_of_the_ox
-# gift_of_the_ox_buff
 # guard
 # heavy_stagger_debuff
 # invoke_xuen

@@ -76,7 +76,7 @@ AddFunction ShadowCopActions
 AddFunction ShadowDefaultActions
 {
 	#shadowform,if=!buff.shadowform.up
-	if not BuffPresent(shadowform_buff) and not Stance(priest_shadowform) Spell(shadowform)
+	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#potion,name=jade_serpent,if=buff.bloodlust.react|target.time_to_die<=40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
 	#power_infusion,if=talent.power_infusion.enabled
@@ -268,7 +268,7 @@ AddFunction ShadowPrecombatActions
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
 	#shadowform,if=!buff.shadowform.up
-	if not BuffPresent(shadowform_buff) and not Stance(priest_shadowform) Spell(shadowform)
+	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#snapshot_stats
 	#potion,name=jade_serpent
 	UsePotionIntellect()
@@ -338,13 +338,13 @@ AddFunction ShadowCopMfiActions
 
 AddIcon specialization=shadow help=main enemies=1
 {
-	if InCombat(no) ShadowPrecombatActions()
+	if not InCombat() ShadowPrecombatActions()
 	ShadowDefaultActions()
 }
 
 AddIcon specialization=shadow help=aoe
 {
-	if InCombat(no) ShadowPrecombatActions()
+	if not InCombat() ShadowPrecombatActions()
 	ShadowDefaultActions()
 }
 

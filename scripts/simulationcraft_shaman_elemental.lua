@@ -33,10 +33,10 @@ AddFunction Bloodlust
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(wind_shear)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_mana)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -146,13 +146,13 @@ AddFunction ElementalSingleActions
 
 AddIcon specialization=elemental help=main enemies=1
 {
-	if InCombat(no) ElementalPrecombatActions()
+	if not InCombat() ElementalPrecombatActions()
 	ElementalDefaultActions()
 }
 
 AddIcon specialization=elemental help=aoe
 {
-	if InCombat(no) ElementalPrecombatActions()
+	if not InCombat() ElementalPrecombatActions()
 	ElementalDefaultActions()
 }
 

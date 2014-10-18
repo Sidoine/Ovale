@@ -33,10 +33,10 @@ AddFunction Bloodlust
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(wind_shear)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_mana)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -115,7 +115,7 @@ AddFunction EnhancementAoeActions
 		#lightning_bolt,if=(!glyph.chain_lightning.enabled|active_enemies<=3)&(buff.maelstrom_weapon.react=5|(buff.ancestral_swiftness.up&buff.maelstrom_weapon.react>=3))
 		if { not Glyph(glyph_of_chain_lightning) or Enemies() <= 3 } and { BuffStacks(maelstrom_weapon_buff) == 5 or BuffPresent(ancestral_swiftness_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 } Spell(lightning_bolt)
 		#windstrike
-		Spell(windstrike)
+		if BuffPresent(ascendance_melee_buff) Spell(windstrike)
 		#fire_nova,if=active_dot.flame_shock>=2
 		if DebuffCountOnAny(flame_shock_debuff) >= 2 Spell(fire_nova)
 		#chain_lightning,if=active_enemies>=2&buff.maelstrom_weapon.react>=1
@@ -144,7 +144,7 @@ AddFunction EnhancementSingleActions
 	#lightning_bolt,if=buff.maelstrom_weapon.react=5|(buff.maelstrom_weapon.react>=4&!buff.ascendance.up)|(buff.ancestral_swiftness.up&buff.maelstrom_weapon.react>=3)
 	if BuffStacks(maelstrom_weapon_buff) == 5 or BuffStacks(maelstrom_weapon_buff) >= 4 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 Spell(lightning_bolt)
 	#windstrike
-	Spell(windstrike)
+	if BuffPresent(ascendance_melee_buff) Spell(windstrike)
 	#stormstrike
 	Spell(stormstrike)
 	#lava_lash
@@ -163,13 +163,13 @@ AddFunction EnhancementSingleActions
 
 AddIcon specialization=enhancement help=main enemies=1
 {
-	if InCombat(no) EnhancementPrecombatActions()
+	if not InCombat() EnhancementPrecombatActions()
 	EnhancementDefaultActions()
 }
 
 AddIcon specialization=enhancement help=aoe
 {
-	if InCombat(no) EnhancementPrecombatActions()
+	if not InCombat() EnhancementPrecombatActions()
 	EnhancementDefaultActions()
 }
 

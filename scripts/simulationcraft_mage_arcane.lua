@@ -24,10 +24,10 @@ AddFunction UsePotionIntellect
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(counterspell)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_mana)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -205,13 +205,13 @@ AddFunction ArcaneBurnActions
 
 AddIcon specialization=arcane help=main enemies=1
 {
-	if InCombat(no) ArcanePrecombatActions()
+	if not InCombat() ArcanePrecombatActions()
 	ArcaneDefaultActions()
 }
 
 AddIcon specialization=arcane help=aoe
 {
-	if InCombat(no) ArcanePrecombatActions()
+	if not InCombat() ArcanePrecombatActions()
 	ArcaneDefaultActions()
 }
 

@@ -8,21 +8,29 @@ do
 # Based on SimulationCraft profile "Druid_Guardian_T16M".
 #	class=druid
 #	spec=guardian
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ub!.0.0.1.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ub!.1.0.1.
+#	glyphs=maul
 
 Include(ovale_common)
 Include(ovale_druid_spells)
 
+AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+
+AddFunction UsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+}
+
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(skull_bash) Spell(skull_bash)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
-			if Talent(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
-			if Talent(typhoon_talent) and target.InRange(skull_bash) Spell(typhoon)
-			if Stance(druid_cat_form) and target.InRange(maim) Spell(maim)
+			if target.InRange(mighty_bash) Spell(mighty_bash)
+			Spell(typhoon)
+			if target.InRange(maim) Spell(maim)
 			Spell(war_stomp)
 		}
 	}
@@ -31,71 +39,82 @@ AddFunction InterruptActions
 AddFunction GuardianDefaultActions
 {
 	#auto_attack
-	#skull_bash
-	InterruptActions()
-	#savage_defense
-	Spell(savage_defense)
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
+	#potion,name=tolvir,if=buff.berserking.up|buff.berserk.up
+	if BuffPresent(berserking_buff) or BuffPresent(berserk_bear_buff) UsePotionAgility()
+	#skull_bash
+	InterruptActions()
 	#barkskin
 	Spell(barkskin)
-	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s&rage>=80
-	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) and Rage() >= 80 Spell(maul)
-	#cenarion_ward
-	Spell(cenarion_ward)
+	#survival_instincts,if=health.pct<50
+	if HealthPercent() < 50 Spell(survival_instincts)
+	#savage_defense,if=buff.savage_defense.down
+	if BuffExpires(savage_defense_buff) Spell(savage_defense)
+	#frenzied_regeneration,if=health.pct<40
+	if HealthPercent() < 40 Spell(frenzied_regeneration)
+	#maul
+	Spell(maul)
+	#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
+	if Charges(force_of_nature) == 3 or BuffPresent(trinket_proc_all_buff) or target.TimeToDie() < 20 Spell(force_of_nature)
+	#berserk,if=dot.thrash_bear.remains>10&dot.lacerate.stack=3&dot.lacerate.remains>10&buff.son_of_ursoc.down
+	if target.DebuffRemaining(thrash_bear_debuff) > 10 and target.DebuffStacks(lacerate_debuff) == 3 and target.DebuffRemaining(lacerate_debuff) > 10 and BuffExpires(son_of_ursoc_buff) Spell(berserk_bear)
 	#renewal,if=health.pct<30
 	if HealthPercent() < 30 Spell(renewal)
-	#heart_of_the_wild
-	Spell(heart_of_the_wild)
-	#rejuvenation,if=!ticking&buff.heart_of_the_wild.up
-	if not target.DebuffPresent(rejuvenation_debuff) and BuffPresent(heart_of_the_wild_buff) Spell(rejuvenation)
 	#natures_vigil
 	Spell(natures_vigil)
-	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<30
-	if BuffPresent(dream_of_cenarius_buff) and HealthPercent() < 30 Spell(healing_touch)
-	#pulverize,if=buff.pulverize.remains<0.5
-	if BuffRemaining(pulverize_buff) < 0.5 Spell(pulverize)
-	#lacerate,if=talent.pulverize.enabled&buff.pulverize.remains<=(3-dot.lacerate.stack)*gcd
-	if Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - FIXME_dot.lacerate.stack } * GCD() Spell(lacerate)
-	#incarnation
-	Spell(incarnation)
-	#mangle,if=buff.son_of_ursoc.down
-	if BuffExpires(son_of_ursoc_buff) Spell(mangle)
-	#thrash_bear,if=!ticking
-	if not target.DebuffPresent(thrash_bear_debuff) Spell(thrash_bear)
-	#mangle
-	Spell(mangle)
+	#heart_of_the_wild
+	Spell(heart_of_the_wild)
+	#cenarion_ward
+	Spell(cenarion_ward)
+	#lacerate,cycle_targets=1,if=dot.lacerate.ticking&dot.lacerate.remains<2
+	if target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) < 2 Spell(lacerate)
+	#mangle,if=active_enemies<4
+	if Enemies() < 4 Spell(mangle)
+	#thrash_bear,if=dot.thrash_bear.remains<1
+	if target.DebuffRemaining(thrash_bear_debuff) < 1 Spell(thrash_bear)
+	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<10
+	if BuffPresent(dream_of_cenarius_buff) and HealthPercent() < 10 Spell(healing_touch)
+	#thrash_bear,if=active_enemies>4
+	if Enemies() > 4 Spell(thrash_bear)
+	#lacerate,cycle_targets=1,if=!dot.lacerate.ticking
+	if not target.DebuffPresent(lacerate_debuff) Spell(lacerate)
+	#lacerate,cycle_targets=1,if=dot.lacerate.stack<3
+	if target.DebuffStacks(lacerate_debuff) < 3 Spell(lacerate)
+	#thrash_bear,if=active_enemies>1
+	if Enemies() > 1 Spell(thrash_bear)
 	#lacerate
 	Spell(lacerate)
 }
 
 AddFunction GuardianPrecombatActions
 {
-	#elixir,type=mad_hozen
-	#elixir,type=mantid
+	#flask,type=winds
 	#food,type=seafood_magnifique_feast
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#bear_form
-	if not Stance(druid_bear_form) Spell(bear_form)
+	Spell(bear_form)
 	#snapshot_stats
+	#rejuvenation
+	Spell(rejuvenation)
 	#cenarion_ward
 	Spell(cenarion_ward)
 }
 
 AddIcon specialization=guardian help=main enemies=1
 {
-	if InCombat(no) GuardianPrecombatActions()
+	if not InCombat() GuardianPrecombatActions()
 	GuardianDefaultActions()
 }
 
 AddIcon specialization=guardian help=aoe
 {
-	if InCombat(no) GuardianPrecombatActions()
+	if not InCombat() GuardianPrecombatActions()
 	GuardianDefaultActions()
 }
 
@@ -103,15 +122,19 @@ AddIcon specialization=guardian help=aoe
 # arcane_torrent_energy
 # barkskin
 # bear_form
+# berserk_bear
+# berserk_bear_buff
 # berserking
+# berserking_buff
 # blood_fury_apsp
 # cenarion_ward
 # dream_of_cenarius_buff
+# force_of_nature
+# frenzied_regeneration
 # healing_touch
 # heart_of_the_wild
-# heart_of_the_wild_buff
-# incarnation
 # lacerate
+# lacerate_debuff
 # maim
 # mangle
 # mark_of_the_wild
@@ -119,20 +142,19 @@ AddIcon specialization=guardian help=aoe
 # mighty_bash
 # mighty_bash_talent
 # natures_vigil
-# pulverize
-# pulverize_buff
-# pulverize_talent
 # rejuvenation
-# rejuvenation_debuff
 # renewal
 # savage_defense
+# savage_defense_buff
 # skull_bash
 # son_of_ursoc_buff
+# survival_instincts
 # thrash_bear
 # thrash_bear_debuff
-# tooth_and_claw_buff
+# trinket_proc_all_buff
 # typhoon
 # typhoon_talent
+# virmens_bite_potion
 # war_stomp
 ]]
 	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")

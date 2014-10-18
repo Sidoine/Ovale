@@ -15,6 +15,7 @@ Include(ovale_common)
 Include(ovale_paladin_spells)
 
 AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
 
 AddFunction UsePotionStrength
 {
@@ -23,14 +24,25 @@ AddFunction UsePotionStrength
 
 AddFunction Consecration
 {
-	if Glyph(glyph_of_consecration) Spell(consecration_glyphed)
-	if Glyph(glyph_of_consecration no) Spell(consecration)
+	Spell(consecration)
+	Spell(consecration_glyph_of_consecration)
+	Spell(consecration_glyph_of_the_consecrator)
+}
+
+AddFunction GetInMeleeRange
+{
+	if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction ProtectionRighteousFury
+{
+	if CheckBoxOn(opt_righteous_fury_check) and BuffExpires(righteous_fury) Spell(righteous_fury)
 }
 
 AddFunction ProtectionTimeToHPG
 {
 	if Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike holy_wrath judgment)
-	if Talent(sanctified_wrath_talent no) SpellCooldown(crusader_strike judgment)
+	if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
 }
 
 AddFunction ProtectionPrecombatActions
@@ -263,13 +275,13 @@ AddFunction ProtectionMaxSurvivalActions
 
 AddIcon specialization=protection help=main enemies=1
 {
-	if InCombat(no) ProtectionPrecombatActions()
+	if not InCombat() ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 
 AddIcon specialization=protection help=aoe
 {
-	if InCombat(no) ProtectionPrecombatActions()
+	if not InCombat() ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 
@@ -286,7 +298,8 @@ AddIcon specialization=protection help=aoe
 # blood_fury_apsp
 # consecration
 # consecration_debuff
-# consecration_glyphed
+# consecration_glyph_of_consecration
+# consecration_glyph_of_the_consecrator
 # crusader_strike
 # divine_protection
 # divine_protection_buff
@@ -299,6 +312,7 @@ AddIcon specialization=protection help=aoe
 # glyph_of_consecration
 # glyph_of_final_wrath
 # glyph_of_focused_shield
+# glyph_of_the_consecrator
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
@@ -314,6 +328,8 @@ AddIcon specialization=protection help=aoe
 # lights_hammer
 # maraads_truth_buff
 # mogu_power_potion
+# rebuke
+# righteous_fury
 # sacred_shield
 # sacred_shield_buff
 # sanctified_wrath_talent

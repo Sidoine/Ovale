@@ -23,7 +23,7 @@ AddFunction UsePotionAgility
 
 AddFunction SummonPet
 {
-	if pet.Present(no) Texture(ability_hunter_beastcall help=L(summon_pet))
+	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
 	if pet.IsDead() Spell(revive_pet)
 }
 
@@ -45,7 +45,7 @@ AddFunction BeastMasteryDefaultActions
 	#dire_beast
 	Spell(dire_beast)
 	#explosive_trap,if=active_enemies>2
-	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and Glyph(glyph_of_explosive_trap no) Spell(explosive_trap)
+	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#bestial_wrath,if=focus>60&!buff.bestial_wrath.up
 	if Focus() > 60 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
 	#barrage,if=active_enemies>2
@@ -59,7 +59,7 @@ AddFunction BeastMasteryDefaultActions
 	#kill_shot,if=focus.time_to_max>gcd
 	if TimeToMaxFocus() > GCD() Spell(kill_shot)
 	#kill_command
-	if pet.Present() and pet.IsIncapacitated(no) and pet.IsFeared(no) and pet.IsStunned(no) Spell(kill_command)
+	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
 	#focusing_shot,if=focus<50
 	if Focus() < 50 Spell(focusing_shot)
 	#cobra_shot,if=buff.pre_steady_focus.up&(14+cast_regen)<=focus.deficit
@@ -99,13 +99,13 @@ AddFunction BeastMasteryPrecombatActions
 
 AddIcon specialization=beast_mastery help=main enemies=1
 {
-	if InCombat(no) BeastMasteryPrecombatActions()
+	if not InCombat() BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 
 AddIcon specialization=beast_mastery help=aoe
 {
-	if InCombat(no) BeastMasteryPrecombatActions()
+	if not InCombat() BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 

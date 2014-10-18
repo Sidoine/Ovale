@@ -23,7 +23,7 @@ AddFunction UsePotionAgility
 
 AddFunction SummonPet
 {
-	if pet.Present(no) Texture(ability_hunter_beastcall help=L(summon_pet))
+	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
 	if pet.IsDead() Spell(revive_pet)
 }
 
@@ -49,7 +49,7 @@ AddFunction MarksmanshipDefaultActions
 	#run_action_list,name=careful_aim,if=buff.careful_aim.up
 	if BuffPresent(careful_aim_buff) MarksmanshipCarefulAimActions()
 	#explosive_trap,if=active_enemies>2
-	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and Glyph(glyph_of_explosive_trap no) Spell(explosive_trap)
+	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#a_murder_of_crows
 	Spell(a_murder_of_crows)
 	#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
@@ -113,13 +113,13 @@ AddFunction MarksmanshipPrecombatActions
 
 AddIcon specialization=marksmanship help=main enemies=1
 {
-	if InCombat(no) MarksmanshipPrecombatActions()
+	if not InCombat() MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()
 }
 
 AddIcon specialization=marksmanship help=aoe
 {
-	if InCombat(no) MarksmanshipPrecombatActions()
+	if not InCombat() MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()
 }
 

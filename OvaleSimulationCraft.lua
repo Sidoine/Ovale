@@ -926,6 +926,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("zen_sphere_debuff",		"zen_sphere_buff",				"MONK")
 	-- Paladin
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_holy",			"PALADIN")
+	AddDisambiguation("avenging_wrath",			"avenging_wrath_melee",			"PALADIN",		"retribution")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"PALADIN")
 	AddDisambiguation("sacred_shield_debuff",	"sacred_shield_buff",			"PALADIN")
 	-- Priest
@@ -1049,7 +1050,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local glyphName = "glyph_of_explosive_trap"
 			AddSymbol(annotation, glyphName)
 			annotation.trap_launcher = class
-			conditionCode = format("CheckBoxOn(opt_trap_launcher) and Glyph(%s no)", glyphName)
+			conditionCode = format("CheckBoxOn(opt_trap_launcher) and not Glyph(%s)", glyphName)
 		elseif class == "HUNTER" and action == "focus_fire" then
 			-- Focus Fire requires at least one stack of Frenzy.
 			local buffName = "frenzy_buff"
@@ -1065,7 +1066,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			end
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
-			conditionCode = "pet.Present() and pet.IsIncapacitated(no) and pet.IsFeared(no) and pet.IsStunned(no)"
+			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
 		elseif class == "HUNTER" and strsub(action, -5) == "_trap" then
 			annotation.trap_launcher = class
 			conditionCode = "CheckBoxOn(opt_trap_launcher)"
@@ -1100,8 +1101,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 		elseif class == "MAGE" and action == "water_elemental" then
 			-- Only suggest summoning the Water Elemental if the pet is not already summoned.
-			conditionCode = "pet.Present(no)"
+			conditionCode = "not pet.Present()"
 		elseif class == "MONK" and action == "chi_sphere" then
+			-- skip
+			isSpellAction = false
+		elseif class == "MONK" and action == "gift_of_the_ox" then
 			-- skip
 			isSpellAction = false
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
@@ -1156,6 +1160,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local spellName = "primal_strike"
 			AddSymbol(annotation, spellName)
 			conditionCode = format("target.InRange(%s)", spellName)
+		elseif class == "SHAMAN" and action == "windstrike" then
+			-- Windstrike is the enhancement Ascendance version of Stormstrike.
+			local buffName = "ascendance_melee_buff"
+			AddSymbol(annotation, buffName)
+			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "SHAMAN" and action == "wind_shear" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -1186,7 +1195,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				bodyCode = "Texture(spell_nature_removecurse help=L(summon_pet))"
 			end
 			-- Only summon a pet if one is not already summoned.
-			conditionCode = "pet.Present(no)"
+			conditionCode = "not pet.Present()"
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "wrathguard_wrathstorm" then
 			conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
@@ -1203,14 +1212,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local buffName = "raging_blow_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffPresent(%s)", buffName)
-		elseif (class == "DEATHKNIGHT" and strsub(action, -9) == "_presence")
-				or (class == "DRUID" and strsub(action, -5) == "_form")
-				or (class == "MONK" and strsub(action, 1, 14) == "stance_of_the_")
-				or (class == "PRIEST" and action == "shadowform")
-				or (class == "WARLOCK" and action == "metamorphosis")
-				or (class == "WARRIOR" and strsub(action, -7) == "_stance") then
-			local stanceName = format("%s_%s", strlower(class), action)
-			conditionCode = format("not Stance(%s)", stanceName)
 		elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
 			if modifier.name then
 				local name = Unparse(modifier.name)
@@ -1255,8 +1256,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 				else
 					action = name
 				end
-				local stanceName = format("%s_%s", strlower(class), action)
-				conditionCode = format("not Stance(%s)", stanceName)
 			else
 				isSpellAction = false
 			end
@@ -2138,6 +2137,8 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 			code = format("%s%sDamageMultiplier(%s)", target, prefix, dotName)
 		elseif property == "remains" then
 			code = format("%s%sRemaining(%s)", target, prefix, dotName)
+		elseif property == "stack" then
+			code = format("%s%sStacks(%s)", target, prefix, dotName)
 		elseif property == "ticking" then
 			code = format("%s%sPresent(%s)", target, prefix, dotName)
 		elseif property == "ticks_remain" then
@@ -2172,7 +2173,7 @@ EmitOperandGlyph = function(operand, parseNode, nodeList, annotation, action)
 
 		local code
 		if property == "disabled" then
-			code = format("Glyph(%s no)", glyphName)
+			code = format("not Glyph(%s)", glyphName)
 		elseif property == "enabled" then
 			code = format("Glyph(%s)", glyphName)
 		else
@@ -2471,7 +2472,7 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 
 		local code
 		if property == "disabled" then
-			code = format("Talent(%s no)", talentName)
+			code = format("not Talent(%s)", talentName)
 		elseif property == "enabled" then
 			code = format("Talent(%s)", talentName)
 		else
@@ -2583,12 +2584,12 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(mind_freeze) Spell(mind_freeze)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
-						if Talent(asphyxiate_talent) and target.InRange(asphyxiate) Spell(asphyxiate)
+						if target.InRange(asphyxiate) Spell(asphyxiate)
 						if target.InRange(strangulate) Spell(strangulate)
 						Spell(arcane_torrent_runicpower)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -2613,7 +2614,7 @@ local function InsertSupportingFunctions(child, annotation)
 			AddFunction DiseasesTicking
 			{
 				   Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff)
-				or Talent(necrotic_plague_talent no) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
+				or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -2629,7 +2630,7 @@ local function InsertSupportingFunctions(child, annotation)
 			AddFunction DiseasesRemaining
 			{
 				if Talent(necrotic_plague_talent) target.DebuffRemaining(necrotic_plague_debuff)
-				if Talent(necrotic_plague_talent no)
+				unless Talent(necrotic_plague_talent)
 				{
 					if target.DebuffRemaining(blood_plague_debuff) < target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(blood_plague_debuff)
 					if target.DebuffRemaining(blood_plague_debuff) >= target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(frost_fever_debuff)
@@ -2649,7 +2650,7 @@ local function InsertSupportingFunctions(child, annotation)
 			AddFunction DiseasesAnyTicking
 			{
 				   Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff)
-				or Talent(necrotic_plague_talent no) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
+				or not Talent(necrotic_plague_talent) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -2664,14 +2665,14 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(skull_bash) Spell(skull_bash)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
-						if Talent(mighty_bash_talent) and target.InRange(mighty_bash) Spell(mighty_bash)
-						if Talent(typhoon_talent) and target.InRange(skull_bash) Spell(typhoon)
-						if Stance(druid_cat_form) and target.InRange(maim) Spell(maim)
+						if target.InRange(mighty_bash) Spell(mighty_bash)
+						Spell(typhoon)
+						if target.InRange(maim) Spell(maim)
 						Spell(war_stomp)
 					}
 				}
@@ -2692,7 +2693,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction SummonPet
 			{
-				if pet.Present(no) Texture(ability_hunter_beastcall help=L(summon_pet))
+				if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
 				if pet.IsDead() Spell(revive_pet)
 			}
 		]]
@@ -2705,10 +2706,10 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(counter_shot)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_focus)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -2729,8 +2730,8 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction IcyVeins
 			{
-				if Glyph(glyph_of_icy_veins) Spell(icy_veins_glyphed)
-				if Glyph(glyph_of_icy_veins no) Spell(icy_veins)
+				Spell(icy_veins)
+				Spell(icy_veins_glyphed)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -2744,10 +2745,10 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible() 
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(counterspell)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_mana)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -2766,10 +2767,10 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						if target.InRange(paralysis) Spell(paralysis)
 						Spell(arcane_torrent_chi)
@@ -2788,42 +2789,11 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
-	if annotation.rebuke == "PALADIN" then
-		local code = [[
-			AddFunction InterruptActions
-			{
-				if target.IsFriend(no) and target.IsInterruptible()
-				{
-					if target.InRange(rebuke) Spell(rebuke)
-					if target.Classification(worldboss no)
-					{
-						if Talent(fist_of_justice_talent) Spell(fist_of_justice)
-						if Talent(fist_of_justice_talent no) and target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-						if Talent(blinding_light_talent) Spell(blinding_light)
-						Spell(arcane_torrent_holy)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "arcane_torrent_mana")
-		AddSymbol(annotation, "blinding_light")
-		AddSymbol(annotation, "blinding_light_talent")
-		AddSymbol(annotation, "fist_of_justice")
-		AddSymbol(annotation, "hammer_of_justice")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "rebuke")
-		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
 	if annotation.time_to_hpg_melee == "PALADIN" then
 		local code = [[
 			AddFunction RetributionTimeToHPG
 			{
-				SpellCooldown(crusader_strike exorcism exorcism_glyphed hammer_of_wrath judgment usable=1)
+				SpellCooldown(crusader_strike exorcism exorcism_glyphed hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -2840,7 +2810,7 @@ local function InsertSupportingFunctions(child, annotation)
 			AddFunction ProtectionTimeToHPG
 			{
 				if Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike holy_wrath judgment)
-				if Talent(sanctified_wrath_talent no) SpellCooldown(crusader_strike judgment)
+				if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -2849,6 +2819,28 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "holy_wrath")
 		AddSymbol(annotation, "judgment")
 		AddSymbol(annotation, "sanctified_wrath_talent")
+		count = count + 1
+	end
+	if annotation.class == "PALADIN" then
+		local code
+		if annotation.specialization == "protection" then
+			code = [[
+				AddFunction ProtectionRighteousFury
+				{
+					if CheckBoxOn(opt_righteous_fury_check) and BuffExpires(righteous_fury) Spell(righteous_fury)
+				}
+			]]
+		else
+			code = [[
+				AddFunction RighteousFuryOff
+				{
+					if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
+				}
+			]]
+		end
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "righteous_fury")
 		count = count + 1
 	end
 	if annotation.time_to_hpg_heal == "PALADIN" then
@@ -2865,12 +2857,55 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "judgment")
 		count = count + 1
 	end
+	if annotation.rebuke == "PALADIN" then
+		local code = [[
+			AddFunction InterruptActions
+			{
+				if not target.IsFriend() and target.IsInterruptible()
+				{
+					if target.InRange(rebuke) Spell(rebuke)
+					if not target.Classification(worldboss)
+					{
+						if target.InRange(fist_of_justice) Spell(fist_of_justice)
+						if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
+						Spell(blinding_light)
+						Spell(arcane_torrent_holy)
+						if target.InRange(quaking_palm) Spell(quaking_palm)
+						Spell(war_stomp)
+					}
+				}
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "arcane_torrent_holy")
+		AddSymbol(annotation, "blinding_light")
+		AddSymbol(annotation, "blinding_light_talent")
+		AddSymbol(annotation, "fist_of_justice")
+		AddSymbol(annotation, "hammer_of_justice")
+		AddSymbol(annotation, "quaking_palm")
+		AddSymbol(annotation, "rebuke")
+		AddSymbol(annotation, "war_stomp")
+		count = count + 1
+	end
+	if annotation.melee == "PALADIN" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "rebuke")
+		count = count + 1
+	end
 	if annotation.exorcism == "PALADIN" then
 		local code = [[
 			AddFunction Exorcism
 			{
-				if Glyph(glyph_of_mass_exorcism) Spell(exorcism_glyphed)
-				if Glyph(glyph_of_mass_exorcism no) Spell(exorcism)
+				Spell(exorcism)
+				Spell(exorcism_glyphed)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -2884,25 +2919,28 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction Consecration
 			{
-				if Glyph(glyph_of_consecration) Spell(consecration_glyphed)
-				if Glyph(glyph_of_consecration no) Spell(consecration)
+				Spell(consecration)
+				Spell(consecration_glyph_of_consecration)
+				Spell(consecration_glyph_of_the_consecrator)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "consecration")
-		AddSymbol(annotation, "consecration_glyphed")
+		AddSymbol(annotation, "consecration_glyph_of_consecration")
+		AddSymbol(annotation, "consecration_glyph_of_the_consecrator")
 		AddSymbol(annotation, "glyph_of_consecration")
+		AddSymbol(annotation, "glyph_of_the_consecrator")
 		count = count + 1
 	end
 	if annotation.silence == "PRIEST" then
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(silence)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_mana)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -2923,13 +2961,13 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(kick) Spell(kick)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						if target.InRange(cheap_shot) Spell(cheap_shot)
-						if Talent(deadly_throw_talent) and target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+						if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
 						if target.InRange(kidney_shot) Spell(kidney_shot)
 						Spell(arcane_torrent_energy)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -2948,14 +2986,31 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "quaking_palm")
 		count = count + 1
 	end
+	if annotation.melee == "ROGUE" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if not target.InRange(kick)
+				{
+					Spell(shadowstep)
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "kick")
+		AddSymbol(annotation, "shadowstep")
+		count = count + 1
+	end
 	if annotation.wind_shear == "SHAMAN" then
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible() 
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(wind_shear)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_mana)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -2993,11 +3048,11 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if target.IsFriend(no) and target.IsInterruptible()
+				if not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(pummel) Spell(pummel)
 					if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
-					if target.Classification(worldboss no)
+					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_rage)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -3109,6 +3164,15 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "bloodlust")
+		count = count + 1
+	end
+	if annotation.class == "PALADIN" then
+		local code = [[
+			AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+		]]
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "righteous_fury")
 		count = count + 1
 	end
 	if annotation.heroic_leap == "WARRIOR" then
@@ -3256,9 +3320,22 @@ function OvaleSimulationCraft:ParseProfile(simc)
 		end
 	end
 	annotation.specialization = profile.spec
-	annotation.role = profile.role
 	ok = ok and (annotation.class and annotation.specialization)
 	annotation.pet = profile.default_pet
+	annotation.role = profile.role
+
+	-- Set the attack range of the class and role.
+	if profile.role == "tank" then
+		annotation.melee = annotation.class
+	elseif profile.role == "spell" then
+		annotation.ranged = annotation.class
+	elseif profile.role == "attack" or profile.role == "dps" then
+		if profile.position == "ranged_back" then
+			annotation.ranged = annotation.class
+		else
+			annotation.melee = annotation.class
+		end
+	end
 
 	profile.actionList = actionList
 	profile.annotation = annotation
@@ -3338,7 +3415,7 @@ function OvaleSimulationCraft:Emit(profile)
 		output[#output + 1] = format("AddIcon specialization=%s help=main enemies=1", annotation.specialization)
 		output[#output + 1] = "{"
 		if profile["actions.precombat"] then
-			output[#output + 1] = format("	if InCombat(no) %s()", OvaleFunctionName("precombat", annotation.class, annotation.specialization))
+			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation.class, annotation.specialization))
 		end
 		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation.class, annotation.specialization))
 		output[#output + 1] = "}"
@@ -3347,7 +3424,7 @@ function OvaleSimulationCraft:Emit(profile)
 		output[#output + 1] = format("AddIcon specialization=%s help=aoe", annotation.specialization)
 		output[#output + 1] = "{"
 		if profile["actions.precombat"] then
-			output[#output + 1] = format("	if InCombat(no) %s()", OvaleFunctionName("precombat", annotation.class, annotation.specialization))
+			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation.class, annotation.specialization))
 		end
 		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation.class, annotation.specialization))
 		output[#output + 1] = "}"

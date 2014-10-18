@@ -21,15 +21,24 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if not target.InRange(kick)
+	{
+		Spell(shadowstep)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(kick) Spell(kick)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			if target.InRange(cheap_shot) Spell(cheap_shot)
-			if Talent(deadly_throw_talent) and target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
 			if target.InRange(kidney_shot) Spell(kidney_shot)
 			Spell(arcane_torrent_energy)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -110,13 +119,13 @@ AddFunction CombatFinisherActions
 
 AddIcon specialization=combat help=main enemies=1
 {
-	if InCombat(no) CombatPrecombatActions()
+	if not InCombat() CombatPrecombatActions()
 	CombatDefaultActions()
 }
 
 AddIcon specialization=combat help=aoe
 {
-	if InCombat(no) CombatPrecombatActions()
+	if not InCombat() CombatPrecombatActions()
 	CombatDefaultActions()
 }
 
@@ -155,6 +164,7 @@ AddIcon specialization=combat help=aoe
 # shadow_reflection
 # shadow_reflection_buff
 # shadow_reflection_talent
+# shadowstep
 # sinister_strike
 # slice_and_dice
 # slice_and_dice_buff
