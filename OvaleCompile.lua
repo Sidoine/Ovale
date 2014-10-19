@@ -505,6 +505,7 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 		self_compileOnItems = false
 		self_compileOnStances = false
 		wipe(self_icon)
+		OvaleData:ResetSpellInfo()
 		OvaleCooldown:ResetSharedCooldowns()
 		self_timesEvaluated = self_timesEvaluated + 1
 		self.serial = self_serial
