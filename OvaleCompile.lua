@@ -101,10 +101,10 @@ local function TestConditions(parameters)
 		boolean = (required and hasGlyph) or (not required and not hasGlyph)
 	end
 	if boolean and parameters.level then
-		local boolean = OvalePaperDoll.level >= parameters.level
+		boolean = OvalePaperDoll.level >= parameters.level
 	end
 	if boolean and parameters.maxLevel then
-		local boolean = OvalePaperDoll.level <= parameters.maxLevel
+		boolean = OvalePaperDoll.level <= parameters.maxLevel
 	end
 	if boolean and parameters.specialization then
 		local spec, required = RequireValue(parameters.specialization)
