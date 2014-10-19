@@ -24,6 +24,15 @@ AddFunction UseItemActions
 	Item(Trinket1Slot usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if not target.InRange(kick)
+	{
+		Spell(shadowstep)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 AddFunction InterruptActions
 {
 	if target.IsFriend(no) and target.IsInterruptible()
@@ -121,13 +130,8 @@ AddFunction AssassinationDefaultActions
 
 AddFunction AssassinationDefaultShortCdActions
 {
-	# CHANGE: Display Shadowstep or "up arrow" texture if not in melee range of target.
-	if not target.InRange(kick)
-	{
-		if Talent(shadowstep_talent) Spell(shadowstep)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
 	#vanish,if=time>10&!buff.stealth.up
 	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
 }
@@ -261,13 +265,8 @@ AddFunction CombatDefaultActions
 
 AddFunction CombatDefaultShortCdActions
 {
-	# CHANGE: Display Shadowstep or "up arrow" texture if not in melee range of target.
-	if not target.InRange(kick)
-	{
-		if Talent(shadowstep_talent) Spell(shadowstep)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
 	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
 	if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) Spell(blade_flurry)
 
@@ -450,13 +449,8 @@ AddFunction SubtletyDefaultActions
 
 AddFunction SubtletyDefaultShortCdActions
 {
-	# CHANGE: Display Shadowstep or "up arrow" texture if not in melee range of target.
-	if not target.InRange(kick)
-	{
-		if Talent(shadowstep_talent) Spell(shadowstep)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
 	unless ComboPoints() <= 4 and Spell(premeditation)
 	{
 		#pool_resource,for_next=1
