@@ -235,7 +235,7 @@ local function GetActionSpellInfo(element, state, target)
 	local action = OvaleActionBar:GetForSpell(spellId)
 	if not OvaleSpellBook:IsKnownSpell(spellId) and not action then
 		Ovale:Logf("Unknown spell ID '%s'.", spellId)
-	else
+	elseif state:IsUsableSpell(spellId, target) then
 		-- Use texture specified in the action if given.
 		if element.params.texture then
 			actionTexture = "Interface\\Icons\\" .. element.params.texture
@@ -253,6 +253,10 @@ local function GetActionSpellInfo(element, state, target)
 
 		local si = OvaleData.spellInfo[spellId]
 		if si then
+			-- Use texture specified in the SpellInfo() if given.
+			if si.texture then
+				actionTexture = "Interface\\Icons\\" .. si.texture
+			end
 			-- Fix spell cooldown information using primary resource requirements specified in SpellInfo().
 			if actionCooldownStart and actionCooldownDuration then
 				-- Get the maximum time before all "primary" resources are ready.
@@ -293,18 +297,6 @@ local function GetActionSpellInfo(element, state, target)
 						end
 					end
 				end
-			end
-
-			-- Use texture specified in the SpellInfo() if given.
-			if si.texture then
-				actionTexture = "Interface\\Icons\\" .. si.texture
-			end
-
-			local isUsable = state:IsUsableSpell(spellId, target)
-			if not isUsable then
-				-- Assign all return values to nil.
-				actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target = nil
 			end
 		end
 	end
