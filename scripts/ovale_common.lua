@@ -162,7 +162,6 @@ Define(shadowmeld 58984)
 	SpellInfo(shadowmeld cd=120)
 	SpellAddBuff(shadowmeld shadowmeld_buff=1)
 Define(shadowmeld_buff 58984)
-	SpellInfo(shadowmeld_buff duration=3600)	# fake duration
 Define(stoneform 20594)
 	SpellInfo(stoneform cd=120)
 	SpellAddBuff(stoneform stoneform_buff=1)
