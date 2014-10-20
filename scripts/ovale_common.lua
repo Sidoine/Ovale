@@ -117,6 +117,23 @@ Define(tempus_repit_buff 137590)
 	SpellInfo(tempus_repit_buff duration=10)
 
 ###
+### Legendary ring
+###
+
+Define(archmages_greater_incandescence_agi_buff 177172)
+	SpellInfo(archmages_greater_incandescence_agi_buff duration=10)
+Define(archmages_incandescence_agi_buff 177161)
+	SpellInfo(archmages_incandescence_agi_buff duration=10)
+Define(archmages_greater_incandescence_int_buff 177176)
+	SpellInfo(archmages_greater_incandescence_int_buff duration=10)
+Define(archmages_incandescence_int_buff 177159)
+	SpellInfo(archmages_incandescence_int_buff duration=10)
+Define(archmages_greater_incandescence_str_buff 177175)
+	SpellInfo(archmages_greater_incandescence_str_buff duration=10)
+Define(archmages_incandescence_str_buff 177160)
+	SpellInfo(archmages_incandescence_str_buff duration=10)
+
+###
 ### Racials
 ###
 
