@@ -124,30 +124,30 @@ local MATCHES = nil
 
 -- Unary and binary operators with precedence.
 local UNARY_OPERATOR = {
-	["!"] = { "logical", 15 },
-	["-"]   = { "arithmetic", 50 },
+	["!"]  = { "logical", 15 },
+	["-"]  = { "arithmetic", 50 },
 }
 local BINARY_OPERATOR = {
 	-- logical
-	["|"]  = { "logical", 5 },
-	["&"] = { "logical", 10 },
+	["|"]  = { "logical", 5, "associative" },
+	["&"]  = { "logical", 10, "associative" },
 	-- comparison
-	["!="]  = { "compare", 20 },
-	["<"]   = { "compare", 20 },
-	["<="]  = { "compare", 20 },
+	["!="] = { "compare", 20 },
+	["<"]  = { "compare", 20 },
+	["<="] = { "compare", 20 },
 	["="]  = { "compare", 20 },
-	[">"]   = { "compare", 20 },
-	[">="]  = { "compare", 20 },
-	["~"] = { "compare", 20 },
+	[">"]  = { "compare", 20 },
+	[">="] = { "compare", 20 },
+	["~"]  = { "compare", 20 },
 	["!~"] = { "compare", 20 },
 	-- addition, subtraction
-	["+"]   = { "arithmetic", 30 },
-	["-"]   = { "arithmetic", 30 },
+	["+"]  = { "arithmetic", 30, "associative" },
+	["-"]  = { "arithmetic", 30 },
 	-- multiplication, division, modulus
-	["%"]   = { "arithmetic", 40 },
-	["*"]   = { "arithmetic", 40 },
+	["%"]  = { "arithmetic", 40 },
+	["*"]  = { "arithmetic", 40, "associative" },
 	-- exponentiation
-	["^"]   = { "arithmetic", 100 },
+	["^"]  = { "arithmetic", 100 },
 }
 
 -- INDENT[k] is a string of k concatenated tabs.
@@ -375,8 +375,12 @@ local function UnparseExpression(node)
 		local rhsPrecedence = GetPrecedence(rhsNode)
 		if rhsPrecedence and precedence > rhsPrecedence then
 			rhsExpression = "(" .. Unparse(rhsNode) .. ")"
-		elseif rhsPrecedence and precedence == rhsPrecedence and node.operator ~= rhsNode.operator then
-			rhsExpression = "(" .. Unparse(rhsNode) .. ")"
+		elseif rhsPrecedence and precedence == rhsPrecedence then
+			if BINARY_OPERATOR[node.operator][3] == "associative" then
+				rhsExpression = Unparse(rhsNode)
+			else
+				rhsExpression = "{ " .. Unparse(rhsNode) .. " }"
+			end
 		else
 			rhsExpression = Unparse(rhsNode)
 		end
@@ -433,7 +437,7 @@ end
 -- Left-rotate tree to preserve precedence.
 local function LeftRotateTree(node)
 	local rhsNode = node.child[2]
-	while node.type == rhsNode.type and node.operator == rhsNode.operator and rhsNode.expressionType == "binary" do
+	while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
 		node.child[2] = rhsNode.child[1]
 		rhsNode.child[1] = node
 		node = rhsNode
@@ -1348,8 +1352,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 						conditionNode.operator = "and"
 						conditionNode.child[1] = lhsNode
 						conditionNode.child[2] = rhsNode
-						-- Left-rotate tree to preserve precedence.
-						conditionNode = LeftRotateTree(conditionNode)
 					end
 				end
 			end
@@ -1363,8 +1365,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 					conditionNode.operator = "and"
 					conditionNode.child[1] = lhsNode
 					conditionNode.child[2] = rhsNode
-					-- Left-rotate tree to preserve precedence.
-					conditionNode = LeftRotateTree(conditionNode)
 				else
 					conditionNode = extraConditionNode
 				end
