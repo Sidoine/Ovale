@@ -906,12 +906,19 @@ local function InitializeDisambiguation()
 	AddDisambiguation("berserk",				"berserk_bear",					"DRUID",		"guardian")
 	AddDisambiguation("berserk",				"berserk_cat",					"DRUID",		"feral")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"DRUID")
+	AddDisambiguation("dream_of_cenarius",		"dream_of_cenarius_caster",		"DRUID",		"balance")
+	AddDisambiguation("dream_of_cenarius",		"dream_of_cenarius_melee",		"DRUID",		"feral")
+	AddDisambiguation("dream_of_cenarius",		"dream_of_cenarius_tank",		"DRUID",		"guardian")
 	AddDisambiguation("force_of_nature",		"force_of_nature_caster",		"DRUID",		"balance")
 	AddDisambiguation("force_of_nature",		"force_of_nature_melee",		"DRUID",		"feral")
+	AddDisambiguation("force_of_nature",		"force_of_nature_tank",			"DRUID",		"guardian")
+	AddDisambiguation("heart_of_the_wild",		"heart_of_the_wild_tank",		"DRUID",		"guardian")
 	AddDisambiguation("incarnation",			"incarnation_caster",			"DRUID",		"balance")
 	AddDisambiguation("incarnation",			"incarnation_melee",			"DRUID",		"feral")
+	AddDisambiguation("incarnation",			"incarnation_tank",				"DRUID",		"guardian")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"feral")	-- XXX
+	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"guardian")	-- XXX
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
@@ -1027,6 +1034,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Plague Leech requires diseases to exist on the target.
 			conditionCode = "DiseasesTicking()"
 			annotation.diseases_ticking = class
+		elseif class == "DRUID" and specialization == "guardian" and action == "rejuvenation" then
+			-- Only cast Rejuvenation as a guardian druid if it is Enhanced Rejuvenation (castable in bear form).
+			local spellName = "enhanced_rejuvenation"
+			AddSymbol(annotation, spellName)
+			conditionCode = format("SpellKnown(%s)", spellName)
 		elseif class == "DRUID" and action == "prowl" then
 			-- Don't Prowl if already stealthed.
 			conditionCode = "BuffExpires(stealthed_buff any=1)"
@@ -2602,7 +2614,6 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "arcane_torrent_runicpower")
 		AddSymbol(annotation, "asphyxiate")
-		AddSymbol(annotation, "asphyxiate_talent")
 		AddSymbol(annotation, "mind_freeze")
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "strangulate")
@@ -2682,11 +2693,33 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "maim")
 		AddSymbol(annotation, "mighty_bash")
-		AddSymbol(annotation, "mighty_bash_talent")
 		AddSymbol(annotation, "skull_bash")
 		AddSymbol(annotation, "typhoon")
-		AddSymbol(annotation, "typhoon_talent")
 		AddSymbol(annotation, "war_stomp")
+		count = count + 1
+	end
+	if annotation.melee == "DRUID" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if Stance(druid_bear_form) and not target.InRange(mangle)
+				{
+					if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
+				if Stance(druid_cat_form) and not target.InRange(shred)
+				{
+					if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "mangle")
+		AddSymbol(annotation, "shred")
+		AddSymbol(annotation, "wild_charge_bear")
+		AddSymbol(annotation, "wild_charge_cat")
 		count = count + 1
 	end
 	if annotation.summon_pet == "HUNTER" then
@@ -2880,7 +2913,6 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "arcane_torrent_holy")
 		AddSymbol(annotation, "blinding_light")
-		AddSymbol(annotation, "blinding_light_talent")
 		AddSymbol(annotation, "fist_of_justice")
 		AddSymbol(annotation, "hammer_of_justice")
 		AddSymbol(annotation, "quaking_palm")
@@ -2980,7 +3012,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "arcane_torrent_energy")
 		AddSymbol(annotation, "cheap_shot")
 		AddSymbol(annotation, "deadly_throw")
-		AddSymbol(annotation, "deadly_throw_talent")
 		AddSymbol(annotation, "kick")
 		AddSymbol(annotation, "kidney_shot")
 		AddSymbol(annotation, "quaking_palm")

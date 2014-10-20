@@ -21,6 +21,20 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if Stance(druid_bear_form) and not target.InRange(mangle)
+	{
+		if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+	if Stance(druid_cat_form) and not target.InRange(shred)
+	{
+		if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -140,9 +154,9 @@ AddIcon specialization=feral help=aoe
 # healing_touch
 # incarnation_melee
 # maim
+# mangle
 # mark_of_the_wild
 # mighty_bash
-# mighty_bash_talent
 # omen_of_clarity_melee_buff
 # predatory_swiftness_buff
 # prowl
@@ -164,9 +178,10 @@ AddIcon specialization=feral help=aoe
 # tigers_fury_buff
 # trinket_proc_agility_buff
 # typhoon
-# typhoon_talent
 # virmens_bite_potion
 # war_stomp
+# wild_charge_bear
+# wild_charge_cat
 ]]
 	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")
 end

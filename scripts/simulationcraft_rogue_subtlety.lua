@@ -173,7 +173,6 @@ AddIcon specialization=subtlety help=aoe
 # crimson_tempest_dot_debuff
 # deadly_poison
 # deadly_throw
-# deadly_throw_talent
 # death_from_above
 # death_from_above_talent
 # eviscerate

@@ -143,7 +143,6 @@ AddIcon specialization=assassination help=aoe
 # deadly_poison
 # deadly_poison_dot_debuff
 # deadly_throw
-# deadly_throw_talent
 # death_from_above
 # death_from_above_talent
 # dispatch

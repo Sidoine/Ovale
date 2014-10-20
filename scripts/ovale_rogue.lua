@@ -41,7 +41,7 @@ AddFunction InterruptActions
 		if target.Classification(worldboss no)
 		{
 			if target.InRange(cheap_shot) Spell(cheap_shot)
-			if Talent(deadly_throw_talent) and target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
 			if target.InRange(kidney_shot) Spell(kidney_shot)
 			Spell(arcane_torrent_energy)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
@@ -151,12 +151,10 @@ AddFunction AssassinationDefaultCdActions
 	#arcane_torrent,if=energy<60
 	if Energy() < 60 Spell(arcane_torrent_energy)
 
-	unless TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) and Spell(vanish)
-		or ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture)
+	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture)
 		or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture)
 		or BuffPresent(stealthed_buff any=1) Spell(mutilate)
 		or BuffRemaining(slice_and_dice_buff) < 5 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) and Spell(slice_and_dice)
-		or ComboPoints() == 0 and Spell(marked_for_death)
 		or ComboPoints() > 4 and Enemies() >= 4 and target.DebuffRemaining(crimson_tempest_debuff) < 8 and Spell(crimson_tempest)
 		or ComboPoints() < 5 and Enemies() >= 4 and Spell(fan_of_knives)
 		or { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= SpellData(rupture_debuff duration) * 0.3 } and Enemies() == 1 and Spell(rupture)
@@ -294,18 +292,14 @@ AddFunction CombatDefaultCdActions
 	#arcane_torrent,if=energy<60
 	if Energy() < 60 Spell(arcane_torrent_energy)
 
-	unless Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) and Spell(blade_flurry)
-	{
-		#shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
-		if SpellCooldown(killing_spree) < 10 and ComboPoints() > 3 or BuffPresent(adrenaline_rush_buff) Spell(shadow_reflection)
+	#shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
+	if SpellCooldown(killing_spree) < 10 and ComboPoints() > 3 or BuffPresent(adrenaline_rush_buff) Spell(shadow_reflection)
 
-		unless Spell(ambush)
-			or TimeInCombat() > 10 and { ComboPoints() < 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and { Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 20 or Talent(subterfuge_talent) and Energy() >= 90 or not Talent(shadow_focus_talent) and not Talent(subterfuge_talent) and Energy() >= 60 } and Spell(vanish)
-			or Energy() < 50 and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } and Spell(killing_spree)
-		{
-			#adrenaline_rush,if=energy<35
-			if Energy() < 35 Spell(adrenaline_rush)
-		}
+	unless Spell(ambush)
+		or Energy() < 50 and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } and Spell(killing_spree)
+	{
+		#adrenaline_rush,if=energy<35
+		if Energy() < 35 Spell(adrenaline_rush)
 	}
 }
 

@@ -146,7 +146,6 @@ AddIcon specialization=combat help=aoe
 # crimson_tempest_dot_debuff
 # deadly_poison
 # deadly_throw
-# deadly_throw_talent
 # death_from_above
 # deep_insight_buff
 # eviscerate

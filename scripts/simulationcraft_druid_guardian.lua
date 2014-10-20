@@ -21,6 +21,20 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if Stance(druid_bear_form) and not target.InRange(mangle)
+	{
+		if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+	if Stance(druid_cat_form) and not target.InRange(shred)
+	{
+		if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -60,7 +74,7 @@ AddFunction GuardianDefaultActions
 	#maul
 	Spell(maul)
 	#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
-	if Charges(force_of_nature) == 3 or BuffPresent(trinket_proc_all_buff) or target.TimeToDie() < 20 Spell(force_of_nature)
+	if Charges(force_of_nature_tank) == 3 or BuffPresent(trinket_proc_agility_buff) or target.TimeToDie() < 20 Spell(force_of_nature_tank)
 	#berserk,if=dot.thrash_bear.remains>10&dot.lacerate.stack=3&dot.lacerate.remains>10&buff.son_of_ursoc.down
 	if target.DebuffRemaining(thrash_bear_debuff) > 10 and target.DebuffStacks(lacerate_debuff) == 3 and target.DebuffRemaining(lacerate_debuff) > 10 and BuffExpires(son_of_ursoc_buff) Spell(berserk_bear)
 	#renewal,if=health.pct<30
@@ -68,7 +82,7 @@ AddFunction GuardianDefaultActions
 	#natures_vigil
 	Spell(natures_vigil)
 	#heart_of_the_wild
-	Spell(heart_of_the_wild)
+	Spell(heart_of_the_wild_tank)
 	#cenarion_ward
 	Spell(cenarion_ward)
 	#lacerate,cycle_targets=1,if=dot.lacerate.ticking&dot.lacerate.remains<2
@@ -78,7 +92,7 @@ AddFunction GuardianDefaultActions
 	#thrash_bear,if=dot.thrash_bear.remains<1
 	if target.DebuffRemaining(thrash_bear_debuff) < 1 Spell(thrash_bear)
 	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<10
-	if BuffPresent(dream_of_cenarius_buff) and HealthPercent() < 10 Spell(healing_touch)
+	if BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 10 Spell(healing_touch)
 	#thrash_bear,if=active_enemies>4
 	if Enemies() > 4 Spell(thrash_bear)
 	#lacerate,cycle_targets=1,if=!dot.lacerate.ticking
@@ -101,7 +115,7 @@ AddFunction GuardianPrecombatActions
 	Spell(bear_form)
 	#snapshot_stats
 	#rejuvenation
-	Spell(rejuvenation)
+	if SpellKnown(enhanced_rejuvenation) Spell(rejuvenation)
 	#cenarion_ward
 	Spell(cenarion_ward)
 }
@@ -128,11 +142,12 @@ AddIcon specialization=guardian help=aoe
 # berserking_buff
 # blood_fury_apsp
 # cenarion_ward
-# dream_of_cenarius_buff
-# force_of_nature
+# dream_of_cenarius_tank_buff
+# enhanced_rejuvenation
+# force_of_nature_tank
 # frenzied_regeneration
 # healing_touch
-# heart_of_the_wild
+# heart_of_the_wild_tank
 # lacerate
 # lacerate_debuff
 # maim
@@ -140,22 +155,23 @@ AddIcon specialization=guardian help=aoe
 # mark_of_the_wild
 # maul
 # mighty_bash
-# mighty_bash_talent
 # natures_vigil
 # rejuvenation
 # renewal
 # savage_defense
 # savage_defense_buff
+# shred
 # skull_bash
 # son_of_ursoc_buff
 # survival_instincts
 # thrash_bear
 # thrash_bear_debuff
-# trinket_proc_all_buff
+# trinket_proc_agility_buff
 # typhoon
-# typhoon_talent
 # virmens_bite_potion
 # war_stomp
+# wild_charge_bear
+# wild_charge_cat
 ]]
 	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")
 end

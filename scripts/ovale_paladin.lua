@@ -78,7 +78,7 @@ AddFunction ProtectionTimeToHPG
 	if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
 }
 
-# ActionList: ProtectionPrecombatActions -> main, shortcd, cd
+# ActionList: ProtectionPrecombatActions --> main, shortcd, cd
 
 AddFunction ProtectionPrecombatActions
 {
@@ -116,7 +116,7 @@ AddFunction ProtectionPrecombatCdActions
 	}
 }
 
-# ActionList: ProtectionDefaultActions -> main, shortcd, cd
+# ActionList: ProtectionDefaultActions --> main, shortcd, cd
 
 AddFunction ProtectionDefaultActions
 {
@@ -247,7 +247,6 @@ AddFunction ProtectionDefaultCdActions
 	Spell(holy_avenger)
 
 	unless Spell(seraphim)
-		or TimeInCombat() < 5 or not Talent(seraphim_talent) or BuffExpires(seraphim_buff) and SpellCooldown(seraphim) > 5 and Spell(divine_protection)
 	{
 		#guardian_of_ancient_kings,if=time<5|(buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down)
 		if TimeInCombat() < 5 or BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) Spell(guardian_of_ancient_kings)
@@ -305,7 +304,7 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection checkb
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#bb!110112.
 #	glyphs=double_jeopardy/mass_exorcism
 
-# ActionList: RetributionPrecombatActions -> main, shortcd, cd
+# ActionList: RetributionPrecombatActions --> main, shortcd, cd
 
 AddFunction RetributionPrecombatActions
 {
@@ -338,7 +337,7 @@ AddFunction RetributionPrecombatCdActions
 	}
 }
 
-# ActionList: RetributionDefaultActions -> main, shortcd, cd
+# ActionList: RetributionDefaultActions --> main, shortcd, cd
 
 AddFunction RetributionDefaultActions
 {
@@ -372,8 +371,7 @@ AddFunction RetributionDefaultCdActions
 	#potion,name=mogu_power,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 UsePotionStrength()
 
-	unless 0 > 5 and Spell(speed_of_light)
-		or Spell(execution_sentence)
+	unless Spell(execution_sentence)
 		or Spell(lights_hammer)
 	{
 		#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
@@ -393,7 +391,7 @@ AddFunction RetributionDefaultCdActions
 	}
 }
 
-# ActionList: RetributionAoeActions -> main
+# ActionList: RetributionAoeActions --> main
 
 AddFunction RetributionAoeActions
 {
@@ -447,7 +445,7 @@ AddFunction RetributionAoeActions
 	}
 }
 
-# ActionList: RetributionSingleActions -> main
+# ActionList: RetributionSingleActions --> main
 
 AddFunction RetributionSingleActions
 {
@@ -533,7 +531,7 @@ AddFunction RetributionSingleActions
 	}
 }
 
-# ActionList: RetributionCleaveActions -> main
+# ActionList: RetributionCleaveActions --> main
 
 AddFunction RetributionCleaveActions
 {

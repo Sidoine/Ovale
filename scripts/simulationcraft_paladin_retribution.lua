@@ -317,7 +317,6 @@ AddIcon specialization=retribution help=aoe
 # blessing_of_kings
 # blessing_of_might
 # blinding_light
-# blinding_light_talent
 # blood_fury_apsp
 # crusader_strike
 # divine_crusader_buff
