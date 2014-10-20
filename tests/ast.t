@@ -35,6 +35,7 @@ do
 		"OvaleLexer.lua",
 		"OvaleRunes.lua",
 		"OvaleScripts.lua",
+		"OvaleSpellBook.lua",
 		"OvaleState.lua",
 		-- Additional modules.
 		"conditions.lua",
