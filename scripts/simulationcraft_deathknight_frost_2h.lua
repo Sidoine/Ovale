@@ -64,7 +64,7 @@ AddFunction FrostDefaultActions
 	#potion,name=mogu_power,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
 	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) UsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
-	if target.TimeToDie() <= 60 and BuffPresent(potion_buff) Spell(empower_rune_weapon)
+	if target.TimeToDie() <= 60 and BuffPresent(potion_strength_buff) Spell(empower_rune_weapon)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -162,9 +162,9 @@ AddFunction FrostSingleTargetActions
 	#unholy_blight,if=!disease.min_ticking
 	if not DiseasesTicking() Spell(unholy_blight)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 Spell(soul_reaper_frost)
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_frost)
 	#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
-	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#obliterate,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<76
@@ -257,7 +257,7 @@ AddIcon specialization=frost help=aoe
 # plague_leech
 # plague_leech_talent
 # plague_strike
-# potion_buff
+# potion_strength_buff
 # rime_buff
 # runic_empowerment_talent
 # soul_reaper_frost

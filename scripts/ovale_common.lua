@@ -27,6 +27,11 @@ Define(virmens_bite_potion 76089)
 Define(virmens_bite_potion_buff 105697)
 	SpellInfo(virmens_bite_potion_buff duration=25)
 
+SpellList(potion_agility_buff virmens_bite_potion_buff)
+SpellList(potion_armor_buff mountains_potion_buff)
+SpellList(potion_intellect_buff jade_serpent_potion_buff)
+SpellList(potion_strength_buff golemblood_potion_buff)
+
 ###
 ### Trinkets (Mists of Pandaria only)
 ###

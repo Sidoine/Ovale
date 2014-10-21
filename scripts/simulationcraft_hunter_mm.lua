@@ -21,6 +21,20 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction SummonPet
 {
 	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
@@ -47,7 +61,7 @@ AddFunction MarksmanshipDefaultActions
 	#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=20
 	if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 Spell(stampede)
 	#run_action_list,name=careful_aim,if=buff.careful_aim.up
-	if BuffPresent(careful_aim_buff) MarksmanshipCarefulAimActions()
+	if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
 	#explosive_trap,if=active_enemies>2
 	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#a_murder_of_crows
@@ -63,7 +77,7 @@ AddFunction MarksmanshipDefaultActions
 	#steady_shot,if=focus.deficit*cast_time%(14+cast_regen)>cooldown.rapid_fire.remains
 	if FocusDeficit() * CastTime(steady_shot) / { 14 + FocusCastingRegen(steady_shot) } > SpellCooldown(rapid_fire) Spell(steady_shot)
 	#focusing_shot,if=focus.deficit*cast_time%(50+cast_regen)>cooldown.rapid_fire.remains&focus<100
-	if FocusDeficit() * CastTime(focusing_shot) / { 50 + FocusCastingRegen(focusing_shot) } > SpellCooldown(rapid_fire) and Focus() < 100 Spell(focusing_shot)
+	if FocusDeficit() * CastTime(focusing_shot_marksmanship) / { 50 + FocusCastingRegen(focusing_shot_marksmanship) } > SpellCooldown(rapid_fire) and Focus() < 100 Spell(focusing_shot_marksmanship)
 	#steady_shot,if=buff.pre_steady_focus.up&(14+cast_regen+action.aimed_shot.cast_regen)<=focus.deficit
 	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(steady_shot) + FocusCastingRegen(aimed_shot) <= FocusDeficit() Spell(steady_shot)
 	#aimed_shot,if=talent.focusing_shot.enabled
@@ -73,7 +87,7 @@ AddFunction MarksmanshipDefaultActions
 	#aimed_shot,if=buff.thrill_of_the_hunt.react&focus+cast_regen>=65
 	if BuffPresent(thrill_of_the_hunt_buff) and Focus() + FocusCastingRegen(aimed_shot) >= 65 Spell(aimed_shot)
 	#focusing_shot,if=50+cast_regen-10<focus.deficit
-	if 50 + FocusCastingRegen(focusing_shot) - 10 < FocusDeficit() Spell(focusing_shot)
+	if 50 + FocusCastingRegen(focusing_shot_marksmanship) - 10 < FocusDeficit() Spell(focusing_shot_marksmanship)
 	#steady_shot
 	Spell(steady_shot)
 }
@@ -89,7 +103,7 @@ AddFunction MarksmanshipCarefulAimActions
 	#aimed_shot
 	Spell(aimed_shot)
 	#focusing_shot,if=50+cast_regen<focus.deficit
-	if 50 + FocusCastingRegen(focusing_shot) < FocusDeficit() Spell(focusing_shot)
+	if 50 + FocusCastingRegen(focusing_shot_marksmanship) < FocusDeficit() Spell(focusing_shot_marksmanship)
 	#steady_shot
 	Spell(steady_shot)
 }
@@ -130,12 +144,12 @@ AddIcon specialization=marksmanship help=aoe
 # barrage
 # berserking
 # blood_fury_ap
-# careful_aim_buff
 # chimaera_shot
+# counter_shot
 # dire_beast
 # exotic_munitions_buff
 # explosive_trap
-# focusing_shot
+# focusing_shot_marksmanship
 # focusing_shot_talent
 # glaive_toss
 # glyph_of_explosive_trap
@@ -144,6 +158,7 @@ AddIcon specialization=marksmanship help=aoe
 # poisoned_ammo
 # powershot
 # pre_steady_focus_buff
+# quaking_palm
 # rapid_fire
 # rapid_fire_buff
 # revive_pet
@@ -153,6 +168,7 @@ AddIcon specialization=marksmanship help=aoe
 # thrill_of_the_hunt_buff
 # trap_launcher
 # virmens_bite_potion
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")
 end

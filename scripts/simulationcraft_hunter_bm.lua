@@ -21,6 +21,20 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction SummonPet
 {
 	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
@@ -119,6 +133,7 @@ AddIcon specialization=beast_mastery help=aoe
 # bestial_wrath_buff
 # blood_fury_ap
 # cobra_shot
+# counter_shot
 # dire_beast
 # exotic_munitions_buff
 # explosive_trap
@@ -136,12 +151,14 @@ AddIcon specialization=beast_mastery help=aoe
 # poisoned_ammo
 # powershot
 # pre_steady_focus_buff
+# quaking_palm
 # revive_pet
 # stampede
 # stampede_talent
 # thrill_of_the_hunt_buff
 # trap_launcher
 # virmens_bite_potion
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")
 end

@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Druid_Balance_T16M".
 #	class=druid
 #	spec=balance
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ua!.0.1.0.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ua!.0.0.0.
 
 Include(ovale_common)
 Include(ovale_druid_spells)

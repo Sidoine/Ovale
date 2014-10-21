@@ -926,6 +926,7 @@ local function InitializeDisambiguation()
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
+	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	AddDisambiguation("trinket_stat_any_buff",	"trinket_stat_agility_buff",	"HUNTER")	-- XXX
 	-- Mage
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
@@ -1312,12 +1313,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				bodyNode = OvaleAST:NewNode(nodeList)
 				bodyNode.type = "simc_wait"
 				-- "wait,sec=expr" means to halt the processing of the action list if "expr > 0".
-				conditionNode = OvaleAST:NewNode(nodeList, true)
-				conditionNode.type = "compare"
-				conditionNode.expressionType = "binary"
-				conditionNode.operator = ">"
-				conditionNode.child[1] = Emit(modifier.sec, nodeList, annotation, action)
-				conditionNode.child[2] = OvaleAST:ParseCode("value", "0", nodeList, annotation.astAnnotation)
+				conditionNode = Emit(modifier.sec, nodeList, annotation, action)
 			end
 			isSpellAction = false
 		end
@@ -1919,6 +1915,19 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 			any = " any=1"
 		end
 
+		-- Assume that the "potion" action has already been seen.
+		if buffName == "potion_buff" then
+			if annotation.use_potion_agility then
+				buffName = "potion_agility_buff"
+			elseif annotation.use_potion_armor then
+				buffName = "potion_armor_buff"
+			elseif annotation.use_potion_intellect then
+				buffName = "potion_intellect_buff"
+			elseif annotation.use_potion_strength then
+				buffName = "potion_strength_buff"
+			end
+		end
+
 		local code
 		if property == "cooldown_remains" then
 			-- Assume that the spell and the buff have the same name.
@@ -2070,14 +2079,33 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		local name = tokenIterator()
 		local property = tokenIterator()
 		name = Disambiguate(name, annotation.class, annotation.specialization)
+		local prefix = "Spell"
+
+		-- Assume that the "potion" action has already been seen.
+		if name == "potion" then
+			prefix = "Item"
+			if annotation.use_potion_agility then
+				name = "virmens_bite_potion"
+			elseif annotation.use_potion_armor then
+				name = "mountains_potion"
+			elseif annotation.use_potion_intellect then
+				name = "jade_serpent_potion"
+			elseif annotation.use_potion_strength then
+				name = "mogu_power_potion"
+			end
+		end
 
 		local code
 		if property == "duration" then
-			code = format("SpellCooldownDuration(%s)", name)
+			code = format("%sCooldownDuration(%s)", prefix, name)
 		elseif property == "remains" then
-			code = format("SpellCooldown(%s)", name)
+			if parseNode.asType == "boolean" then
+				code = format("%sCooldown(%s) > 0", prefix, name)
+			else
+				code = format("%sCooldown(%s)", prefix, name)
+			end
 		elseif property == "up" then
-			code = format("not SpellCooldown(%s) > 0", name)
+			code = format("not %sCooldown(%s) > 0", prefix, name)
 		else
 			ok = false
 		end
@@ -2409,6 +2437,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local buffName = "pet_beast_cleave_buff"
 		code = format("pet.BuffExpires(%s any=1)", buffName)
 		AddSymbol(annotation, buffName)
+	elseif class == "HUNTER" and operand == "buff.careful_aim.up" then
+		-- The "careful_aim" buff is a fake SimulationCraft buff.
+		code = format("%sHealthPercent() > 80 or BuffPresent(rapid_fire_buff)", target)
+		AddSymbol(annotation, "rapid_fire_buff")
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
 		code = "RuneOfPowerRemaining()"
 	elseif class == "MAGE" and operand == "cooldown.icy_veins.remains" then
@@ -2735,7 +2767,8 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.counter_shot == "HUNTER" or annotation.silencing_shot == "HUNTER" then
+	if annotation.class == "HUNTER" then
+		-- Hunter profiles never include Counter Shot since it's a DPS loss.
 		local code = [[
 			AddFunction InterruptActions
 			{
@@ -3351,7 +3384,8 @@ function OvaleSimulationCraft:ParseProfile(simc)
 		end
 	end
 	annotation.specialization = profile.spec
-	ok = ok and (annotation.class and annotation.specialization)
+	annotation.level = profile.level
+	ok = ok and (annotation.class and annotation.specialization and annotation.level)
 	annotation.pet = profile.default_pet
 	annotation.role = profile.role
 

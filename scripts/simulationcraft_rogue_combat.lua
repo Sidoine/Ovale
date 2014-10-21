@@ -109,8 +109,6 @@ AddFunction CombatGeneratorActions
 
 AddFunction CombatFinisherActions
 {
-	#death_from_above
-	Spell(death_from_above)
 	#crimson_tempest,if=active_enemies>7&dot.crimson_tempest_dot.ticks_remain<=1
 	if Enemies() > 7 and target.TicksRemaining(crimson_tempest_dot_debuff) < 2 Spell(crimson_tempest)
 	#eviscerate
@@ -146,7 +144,6 @@ AddIcon specialization=combat help=aoe
 # crimson_tempest_dot_debuff
 # deadly_poison
 # deadly_throw
-# death_from_above
 # deep_insight_buff
 # eviscerate
 # kick

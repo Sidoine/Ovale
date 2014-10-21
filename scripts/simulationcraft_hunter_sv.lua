@@ -21,6 +21,20 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction SummonPet
 {
 	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
@@ -41,7 +55,7 @@ AddFunction SurvivalDefaultActions
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeActions()
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))
-	if BuffPresent(potion_buff) or SpellCooldown(potion) and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) } Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) } Spell(stampede)
 	#explosive_shot
 	Spell(explosive_shot)
 	#black_arrow,if=!ticking
@@ -71,7 +85,7 @@ AddFunction SurvivalDefaultActions
 AddFunction SurvivalAoeActions
 {
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up|buff.archmages_incandescence_agi.up))
-	if BuffPresent(potion_buff) or SpellCooldown(potion) and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
 	#explosive_shot,if=buff.lock_and_load.react&cooldown.barrage.remains>0
 	if BuffPresent(lock_and_load_buff) and SpellCooldown(barrage) > 0 Spell(explosive_shot)
 	#barrage
@@ -142,6 +156,7 @@ AddIcon specialization=survival help=aoe
 # black_arrow_debuff
 # blood_fury_ap
 # cobra_shot
+# counter_shot
 # dire_beast
 # exotic_munitions_buff
 # explosive_shot
@@ -155,10 +170,10 @@ AddIcon specialization=survival help=aoe
 # lock_and_load_buff
 # multishot
 # poisoned_ammo
-# potion
-# potion_buff
+# potion_agility_buff
 # powershot
 # pre_steady_focus_buff
+# quaking_palm
 # revive_pet
 # serpent_sting_debuff
 # stampede
@@ -168,6 +183,7 @@ AddIcon specialization=survival help=aoe
 # trap_launcher
 # trinket_stat_agility_buff
 # virmens_bite_potion
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")
 end

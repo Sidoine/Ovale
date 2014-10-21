@@ -230,10 +230,10 @@ AddFunction ShadowMainActions
 	#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 	if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star)
 	#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
-	unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
+	unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) > 0 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
 	{
 		#wait,sec=cooldown.mind_blast.remains,if=cooldown.mind_blast.remains<0.5&cooldown.mind_blast.remains&active_enemies<=1
-		unless SpellCooldown(mind_blast) < 0.5 and SpellCooldown(mind_blast) and Enemies() <= 1 and SpellCooldown(mind_blast) > 0
+		unless SpellCooldown(mind_blast) < 0.5 and SpellCooldown(mind_blast) > 0 and Enemies() <= 1 and SpellCooldown(mind_blast) > 0
 		{
 			#mind_spike,if=buff.surge_of_darkness.react&active_enemies<=5
 			if BuffPresent(surge_of_darkness_buff) and Enemies() <= 5 Spell(mind_spike)
