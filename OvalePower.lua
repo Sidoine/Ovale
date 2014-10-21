@@ -412,7 +412,7 @@ function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, e
 	profiler.Start("OvalePower_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
-		state:ApplyPowerCost(spellId)
+		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	end
 	profiler.Stop("OvalePower_ApplySpellStartCast")
 end
@@ -422,7 +422,7 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 	profiler.Start("OvalePower_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
-		state:ApplyPowerCost(spellId)
+		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	end
 	profiler.Stop("OvalePower_ApplySpellAfterCast")
 end
@@ -430,7 +430,7 @@ end
 
 --<state-methods>
 -- Update the state of the simulator for the power cost of the given spell.
-statePrototype.ApplyPowerCost = function(state, spellId)
+statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	profiler.Start("OvalePower_state_ApplyPowerCost")
 	local si = OvaleData.spellInfo[spellId]
 
@@ -449,6 +449,12 @@ statePrototype.ApplyPowerCost = function(state, spellId)
 			local power = state[powerType] or 0
 			if cost then
 				power = power - cost
+				-- Add any power regenerated or consumed during the cast time of a non-channeled spell.
+				if not isChanneled then
+					local powerRate = state.powerRate[powerType]
+					local gain = powerRate * (nextCast - state.currentTime)
+					power = power + gain
+				end
 				-- Clamp power to lower and upper limits.
 				local mini = powerInfo.mini or 0
 				local maxi = powerInfo.maxi or OvalePower.maxPower[powerType]
