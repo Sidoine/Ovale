@@ -84,7 +84,8 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			else
 				self.lastSound = nil
 				if self.cdShown then
-					self.cd:SetSwipeColor(0, 0, 0)
+					self.cd:SetDrawEdge(false)
+					self.cd:SetSwipeColor(0, 0, 0, 0.8)
 					self.cd:Show()
 					self.cd:SetCooldown(self.cooldownStart, self.cooldownEnd - self.cooldownStart);
 				end
