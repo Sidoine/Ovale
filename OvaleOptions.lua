@@ -475,7 +475,6 @@ local self_options =
 						{
 							order = 20,
 							type = "input",
-							dialogControl = "Aura_EditBox",
 							name = "Trace spellcast",
 							desc = "Names or spell IDs of spellcasts to watch, separated by semicolons.",
 							get = function(info)

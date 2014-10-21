@@ -30,6 +30,12 @@ $m{"AceAddon-3.0"}{NewModule} = true;
 
 $m{AceConfig}{RegisterOptionsTable} = true;
 
+$m{AceConfigDialog}{AddToBlizOptions} = true;
+$m{AceConfigDialog}{Close} = true;
+$m{AceConfigDialog}{Open} = true;
+$sp{AceConfigDialog}{OpenFrames} = true;
+$m{AceConfigDialog}{SetDefaultSize} = true;
+
 $m{"AceConsole-3.0"}{Print} = true;
 $m{"AceConsole-3.0"}{Printf} = true;
 
@@ -39,16 +45,12 @@ $m{"AceEvent-3.0"}{SendMessage} = true;
 $m{"AceEvent-3.0"}{UnregisterEvent} = true;
 $m{"AceEvent-3.0"}{UnregisterMessage} = true;
 
-$m{AceConfigDialog}{AddToBlizOptions} = true;
-$m{AceConfigDialog}{Close} = true;
-$m{AceConfigDialog}{Open} = true;
-$sp{AceConfigDialog}{OpenFrames} = true;
-$m{AceConfigDialog}{SetDefaultSize} = true;
-
 $m{AceGUI}{ClearFocus} = true;
 $m{AceGUI}{Create} = true;
 $m{AceGUI}{RegisterAsContainer} = true;
 $m{AceGUI}{RegisterWidgetType} = true;
+
+$m{AceLocale}{GetLocale} = true;
 
 $m{"AceSerializer-3.0"}{Deserialize} = true;
 $m{"AceSerializer-3.0"}{Serialize} = true;
