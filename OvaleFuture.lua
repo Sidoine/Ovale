@@ -119,6 +119,13 @@ do
 		CLEU_SUCCESSFUL_SPELLCAST_EVENT[cleuEvent] = v
 	end
 end
+
+--[[
+	This is the delta added to the starting cast time of the spell in the simulator.
+	This ensures that the time in the simulator is just after the spell has started
+	being cast.
+--]]
+local SIMULATOR_LAG = 0.005
 --</private-static-properties>
 
 --<public-static-properties>
@@ -832,11 +839,11 @@ statePrototype.ApplySpell = function(state, ...)
 		state.lastSpellId = spellId
 		state.lastCast[spellId] = endCast
 
-		-- Set the current time in the simulator to a little after the start of the current cast,
+		-- Set the current time in the simulator to *slightly* after the start of the current cast,
 		-- or to now if in the past.
 		local now = API_GetTime()
 		if startCast >= now then
-			state.currentTime = startCast + 0.1
+			state.currentTime = startCast + SIMULATOR_LAG
 		else
 			state.currentTime = now
 		end

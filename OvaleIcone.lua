@@ -21,6 +21,10 @@ local strfind = string.find
 local strsub = string.sub
 local tostring = tostring
 local API_GetTime = GetTime
+
+-- Threshold for resetting the cooldown animation.
+-- This should be more than OvaleFuture's SIMULATOR_LAG.
+local COOLDOWN_THRESHOLD = 0.01
 --</private-static-properties>
 
 local function HasScriptControls()
@@ -65,37 +69,47 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 	local profile = OvaleOptions:GetProfile()
 
 	if startTime and actionTexture then
-		-- Cooldown text.
-		if actionTexture ~= self.texture
-				or not self.startTime
-				or (startTime ~= now and startTime > self.startTime + 0.01)
-				or (startTime < self.cooldownEnd - 0.01) then
-
-			if actionTexture ~= self.texture
-					or not self.startTime
-					or (startTime ~= now and startTime > self.startTime + 0.01) then
+		-- Cooldown.
+		local cd = self.cd
+		local resetCooldown = false
+		if startTime > now then
+			--[[
+				Check for the cooldown duration mysteriously being reset to zero while an active
+				cooldown animation is in effect, and force the cooldown information to be reset
+				to the existing information.
+			--]]
+			local duration = cd:GetCooldownDuration()
+			if duration == 0 and self.texture == actionTexture and self.cooldownStart and self.cooldownEnd then
+				Ovale:FormatPrint("OOPS! Blizzard screwed us over again: start=%f, end=%f", self.cooldownStart, self.cooldownEnd)
+				resetCooldown = true
+			end
+			if self.texture ~= actionTexture or not self.cooldownStart or not self.cooldownEnd
+					or startTime < self.cooldownEnd - COOLDOWN_THRESHOLD
+					or startTime > self.cooldownEnd + COOLDOWN_THRESHOLD then
+				-- Update the cooldown if this is a new action or if the new end time would exceed the tolerance threshold.
 				self.cooldownStart = now
+				self.cooldownEnd = startTime
+				resetCooldown = true
 			end
-
 			self.texture = actionTexture
-			self.cooldownEnd = startTime
-			if startTime == now then
-				self.cd:Hide()
-			else
-				self.lastSound = nil
-				if self.cdShown then
-					self.cd:SetDrawEdge(false)
-					self.cd:SetSwipeColor(0, 0, 0, 0.8)
-					self.cd:Show()
-					self.cd:SetCooldown(self.cooldownStart, self.cooldownEnd - self.cooldownStart);
-				end
-			end
+		else
+			-- The cooldown is finished.
+			self.cooldownStart = nil
+			self.cooldownEnd = nil
 		end
-		if not profile.apparence.flashIcon and startTime <= now then
+		if self.cdShown and profile.apparence.flashIcon and self.cooldownStart and self.cooldownEnd then
+			local start, ending = self.cooldownStart, self.cooldownEnd
+			local duration = ending - start
+			if resetCooldown and duration > COOLDOWN_THRESHOLD then
+				cd:SetDrawEdge(false)
+				cd:SetSwipeColor(0, 0, 0, 0.8)
+				Ovale:FormatPrint("SetCooldown: start=%f, ending=%f", start, ending)
+				cd:SetCooldown(start, duration)
+				cd:Show()
+			end
+		else
 			self.cd:Hide()
 		end
-
-		self.startTime = startTime
 
 		-- L'icône avec le cooldown
 		self.icone:Show()
@@ -124,6 +138,9 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 		self.actionHelp = element.params.help
 
 		-- Sound file.
+		if not (self.cooldownStart and self.cooldownEnd) then
+			self.lastSound = nil
+		end
 		if element.params.sound and not self.lastSound then
 			local delay = element.params.soundtime or 0.5
 			if now >= startTime - delay then
@@ -306,7 +323,6 @@ function OvaleIcone_OnLoad(self)
 	self.value = nil
 	self.fontScale = nil
 	self.lastSound = nil
-	self.startTime = nil
 	self.cooldownEnd = nil
 	self.cooldownStart = nil
 	self.texture = nil
