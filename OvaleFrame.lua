@@ -189,24 +189,24 @@ do
 				state.enemies = nil
 			end
 
+			local action = self.actions[k]
+			local icons = action.secure and action.secureIcons or action.icons
+
 			if refresh then
 				Ovale:Logf("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
 				local timeSpan, _, element = OvaleBestAction:GetAction(node, state)
 				local start = NextTime(timeSpan, state.currentTime)
-				if start then
-					Ovale:Logf("Compute start = %f", start)
-				end
-				local action = self.actions[k]
-				local icons = action.secure and action.secureIcons or action.icons
+
 				if element and element.type == "value" then
-					local actionTexture
-					if node.params and node.params.texture then
-						actionTexture = API_GetSpellTexture(node.params.texture)
-					end
 					local value
 					if element.value and element.origin and element.rate then
 						value = element.value + (now - element.origin) * element.rate
+					end
+					Ovale:Logf("GetAction: start=%f, value=%f", start, value)
+					local actionTexture
+					if node.params and node.params.texture then
+						actionTexture = API_GetSpellTexture(node.params.texture)
 					end
 					icons[1]:SetValue(value, actionTexture)
 					if #icons > 1 then
@@ -217,13 +217,17 @@ do
 						actionUsable, actionShortcut, actionIsCurrent, actionEnable,
 						actionType, actionId, actionTarget = OvaleBestAction:GetActionInfo(element, state)
 
-					-- Use the start time of the best action instead of the intersection of its start time
-					-- with any conditions used to determine the best action.
+					Ovale:Logf("GetAction: start=%f, id=%s", start, actionId)
+					--[[
+						If "nored=1" is given as an action parameter, then just use the actual start time of
+						the element itself.
+					--]]
 					if element and element.params and element.params.nored == 1 then
 						start = actionCooldownStart + actionCooldownDuration
 						if start < state.currentTime then
 							start = state.currentTime
 						end
+						Ovale:Logf("Adjusting for 'nored': start = %f", start)
 					end
 					-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
 					if start and state.currentSpellId and state.nextCast and actionType == "spell" and actionId == state.currentSpellId and start < state.nextCast then
