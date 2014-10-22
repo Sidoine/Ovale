@@ -38,12 +38,16 @@ local bit_bor = bit.bor
 local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
+local substr = string.sub
 local tinsert = table.insert
+local tonumber = tonumber
 local tsort = table.sort
 local wipe = table.wipe
 local API_GetTime = GetTime
 local API_UnitAura = UnitAura
 local API_UnitGUID = UnitGUID
+local API_UnitHealth = UnitHealth
+local API_UnitHealthMax = UnitHealthMax
 local SCHOOL_MASK_ARCANE = SCHOOL_MASK_ARCANE
 local SCHOOL_MASK_FIRE = SCHOOL_MASK_FIRE
 local SCHOOL_MASK_FROST = SCHOOL_MASK_FROST
@@ -228,24 +232,6 @@ local function IsWithinAuraLag(time1, time2, factor)
 	local tolerance = factor * auraLag / 1000
 	return (time1 - time2 < tolerance) and (time2 - time1 < tolerance)
 end
-
-local function GetTickLength(auraId, snapshot)
-	local tick = 3
-	local si = OvaleData.spellInfo[auraId]
-	if si then
-		tick = si.tick or tick
-		local hasteMultiplier = 1
-		if si.haste then
-			if si.haste == "spell" then
-				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
-			elseif si.haste == "melee" then
-				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
-			end
-			tick = tick / hasteMultiplier
-		end
-	end
-	return tick
-end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -304,31 +290,22 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 		local aura = GetAura(self.aura, destGUID, spellId, self_guid)
 		if self:IsActiveAura(aura) then
 			local name = aura.name or "Unknown spell"
-			local tick, ticksSeen, lastTickTime = aura.tick, aura.ticksSeen, aura.lastTickTime
-			if not lastTickTime then
+			local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
+			local tick = baseTick
+			if lastTickTime then
+				-- Update the tick length based on the timestamps of the current tick and the previous tick.
+				tick = timestamp - lastTickTime
+			elseif not baseTick then
 				-- This isn't a known periodic aura, but it's ticking so treat this as the first tick.
-				local si = OvaleData.spellInfo[spellId]
-				if si and si.tick then
-					tick = GetTickLength(spellId, aura.snapshot)
-				elseif bit_band(spellSchool, CLEU_SCHOOL_MASK_MAGIC) > 0 then
-					tick = 3 / OvalePaperDoll:GetSpellHasteMultiplier(aura.snapshot)
-				else
-					-- This is a physical DoT, so not affected by haste.
-					tick = 3
-				end
-				ticksSeen = 1
 				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
-			else
-				-- Tick times tend to vary about the "true" value by a up to a few
-				-- hundredths of a second.  Keep a running average to try to protect
-				-- against unusually short or long tick times.
-				tick = ((tick * ticksSeen) + (timestamp - lastTickTime)) / (ticksSeen + 1)
-				ticksSeen = ticksSeen + 1
+				local si = OvaleData.spellInfo[spellId]
+				baseTick = (si and si.tick) and si.tick or 3
+				tick = OvaleData:GetTickLength(spellId)
 			end
-			aura.tick = tick
-			aura.ticksSeen = ticksSeen
+			aura.baseTick = baseTick
 			aura.lastTickTime = timestamp
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%f, ticksSeen=%d", name, spellId, destGUID, tick, ticksSeen)
+			aura.tick = tick
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%f, lastTickTime=%f", name, spellId, destGUID, tick, lastTickTime)
 		end
 	end
 end
@@ -452,13 +429,11 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				end
 			end
 			if spellcast and spellcast.target == guid then
-				if OvaleData:NeedNewSnapshot(auraId, spellcast.spellId) then
-					local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
-					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
-						filter, name, auraId, guid, spellName, spellcast.spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
-					-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
-					OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
-				end
+				local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
+				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
+					filter, name, auraId, guid, spellName, spellcast.spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
+				-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
+				OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
 			end
 
 			local si = OvaleData.spellInfo[auraId]
@@ -468,12 +443,16 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is a periodic aura.", name, auraId)
 					-- Only set the initial tick information for new auras.
 					if not auraIsActive then
-						aura.ticksSeen = 0
-						aura.tick = GetTickLength(auraId, aura.snapshot)
+						aura.baseTick = si.tick
+						if spellcast and spellcast.target == guid then
+							aura.tick = OvaleData:GetTickLength(auraId, spellcast.snapshot)
+						else
+							aura.tick = OvaleData:GetTickLength(auraId)
+						end
 					end
 				end
 				-- Set the cooldown expiration time for player buffs applied by items with a cooldown.
-				if guid == self_guid and si.buff_cd then
+				if si.buff_cd and guid == self_guid then
 					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is applied by an item with a cooldown of %ds.", name, auraId, si.buff_cd)
 					if not auraIsActive then
 						-- cooldownEnding is the earliest time at which we expect to gain this buff again.
@@ -509,9 +488,9 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 		local mine = (casterGUID == self_guid)
 		if mine then
 			-- Clear old tick information for player-applied periodic auras.
-			aura.tick = nil
-			aura.ticksSeen = nil
+			aura.baseTick = nil
 			aura.lastTickTime = nil
+			aura.tick = nil
 
 			-- Check if the aura was consumed by the last spellcast.
 			-- The aura must have ended early, i.e., start + duration > ending.
@@ -850,35 +829,6 @@ local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 	return auraFound
 end
 
--- Returns the raw duration, DoT duration, tick length, and number of ticks of an aura.
-statePrototype.GetDuration = function(state, auraId, spellcast)
-	local snapshot, combo, holy
-	if spellcast then
-		snapshot, combo, holy = spellcast.snapshot, spellcast.combo, spellcast.holy
-	else
-		snapshot, combo, holy = state.snapshot, state.combo, state.holy
-	end
-
-	local duration = math.huge
-	local tick = GetTickLength(auraId, snapshot)
-
-	local si = OvaleData.spellInfo[auraId]
-	if si and si.duration then
-		duration = si.duration
-		if si.adddurationcp and combo then
-			duration = duration + si.adddurationcp * combo
-		end
-		if si.adddurationholy and holy then
-			duration = duration + si.adddurationholy * (holy - 1)
-		end
-	end
-
-	local numTicks = floor(duration/tick + 0.5)
-	local dotDuration = tick * numTicks
-
-	return duration, dotDuration, tick, numTicks
-end
-
 -- Print the auras matching the filter on the unit in alphabetical order.
 do
 	local array = {}
@@ -948,15 +898,16 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 		for auraId, spellData in pairs(filterInfo) do
 			--[[
 				For lists described by SpellAddBuff(), etc., use the following interpretation:
-					auraId=refresh		aura is refreshed, no change to stacks
+					auraId=refresh*		aura is refreshed, no change to stacks
 					auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
 					auraId=N, N > 0		N is number of stacks added
 					auraId=0			aura is removed
 					auraId=N, N < 0		N is number of stacks of aura removed
 			--]]
 			local si = OvaleData.spellInfo[auraId]
-			local duration, dotDuration, tick, numTicks = state:GetDuration(auraId, spellcast)
+			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
 			local stacks = 1
+			local refresh = (strsub(1, 7, spelData) == "refresh")
 
 			if type(spellData) == "number" then
 				stacks = spellData
@@ -992,41 +943,56 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					-- Information that needs to be set below: stacks, start, ending, duration, gain.
 				end
 				-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
-				if spellData == "refresh" or stacks > 0 then
+				if refresh or stacks > 0 then
 					-- Adjust stack count.
-					if spellData == "refresh" then
-						Ovale:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
+					if refresh then
+						-- Verify that the aura is refreshed by the spell.
+						local refreshCondition = strsub(refresh, 9)
+						if substr(refreshCondition, 1, 18) == "target_health_pct_" then
+							local threshold = substr(refreshCondition, 19)
+							if threshold then
+								threshold = tonumber(threshold)
+								local healthPercent = API_UnitHealth(unitId) / API_UnitHealthMax(unitId) * 100
+								if healthPercent < threshold then
+									Ovale:Logf("Aura %d is refreshed to %d stack(s) at target health < %d%%.", auraId, aura.stacks, threshold)
+								else
+									refresh = false
+								end
+							else
+								Ovale:OneTimeMessage("Warning: '%d=%s' refresh parameter missing threshold", auraId, spellData)
+							end
+						else
+							Ovale:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
+						end
 					else -- if stacks > 0 then
-						local maxstacks = 1
-						if si and si.maxstacks then
-							maxstacks = si.maxstacks
+						local maxStacks = 1
+						if si and (si.max_stacks or si.maxstacks) then
+							maxStacks = si.max_stacks or si.maxstacks
 						end
 						aura.stacks = aura.stacks + stacks
-						if aura.stacks > maxstacks then
-							aura.stacks = maxstacks
+						if aura.stacks > maxStacks then
+							aura.stacks = maxStacks
 						end
 						Ovale:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
 					end
-					-- Set start and duration for aura.
+					-- Set duration for the aura.
 					if aura.tick and aura.tick > 0 then
-						-- This is a periodic aura, so add new duration after the next tick is complete.
-						local ticksRemain = floor((aura.ending - atTime) / aura.tick)
-						aura.start = aura.ending - aura.tick * ticksRemain
-						if OvaleData:NeedNewSnapshot(auraId, spellId) then
-							-- Use duration and tick information based on spellcast snapshot.
-							aura.duration = dotDuration
-							aura.tick = tick
-							OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
+						-- This is a periodic aura, so add new duration to extend the aura up to 130% of the normal duration.
+						local remainingDuration = aura.ending - atTime
+						local extensionDuration = 0.3 * duration
+						if remainingDuration < extensionDuration then
+							-- Aura is extended by the normal duration.
+							aura.duration = remainingDuration + duration
+						else
+							aura.duration = extensionDuration + duration
 						end
 					else
-						aura.start = atTime
-						if OvaleData:NeedNewSnapshot(auraId, spellId) then
-							aura.duration = duration
-						end
+						aura.duration = duration
 					end
+					aura.start = atTime
 					aura.ending = aura.start + aura.duration
 					aura.gain = atTime
-					Ovale:Logf("Aura %d with duration %s now ending at %f", auraId, aura.duration, aura.ending)
+					Ovale:Logf("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
 				elseif stacks == 0 or stacks < 0 then
 					if stacks == 0 then
 						aura.stacks = 0
@@ -1047,22 +1013,20 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 				end
 			else
 				-- Aura is not on the target.
-				if spellData ~= "refresh" and stacks > 0 then
+				if not refresh and stacks > 0 then
 					-- Spellcast causes a new aura.
 					Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
 					-- Add an aura in the simulator and copy the existing aura information over.
 					local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
 					-- Information that needs to be set below: stacks, start, ending, duration, gain.
 					aura.stacks = stacks
-					aura.start = atTime
 					-- Set start and duration for aura.
+					aura.start = atTime
+					aura.duration = duration
+					-- If "tick" is set explicitly in SpellInfo, then this is a known periodic aura.
 					if si and si.tick then
-						-- "tick" is set explicitly in SpellInfo, so this is a known periodic aura.
-						aura.duration = dotDuration
-						aura.tick = tick
-						aura.ticksSeen = 0
-					else
-						aura.duration = duration
+						aura.baseTick = si.tick
+						aura.tick = OvaleData:GetTickLength(auraId, spellcast.snapshot)
 					end
 					aura.ending = aura.start + aura.duration
 					aura.gain = aura.start

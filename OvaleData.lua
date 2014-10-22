@@ -8,6 +8,11 @@ local _, Ovale = ...
 local OvaleData = Ovale:NewModule("OvaleData")
 Ovale.OvaleData = OvaleData
 
+--<private-static-properties>
+-- Forward declarations for module dependencies.
+local OvalePaperDoll = nil
+--<private-static-properties>
+
 --<public-static-properties>
 OvaleData.itemList = {}
 --spell info from the current script (by spellId)
@@ -215,14 +220,13 @@ end
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleData:ResetSpellInfo()
-	self.spellInfo = {}
+function OvaleData:OnInitialize()
+	-- Resolve module dependencies.
+	OvalePaperDoll = Ovale.OvalePaperDoll
 end
 
--- Returns true if spellId triggers a fresh snapshot for auraId.
--- TODO: Handle spreading DoTs (Inferno Blast, etc.) and Soul Swap effects.
-function OvaleData:NeedNewSnapshot(auraId, spellId)
-	return true
+function OvaleData:ResetSpellInfo()
+	self.spellInfo = {}
 end
 
 --[[
@@ -291,5 +295,41 @@ function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDam
 		damage = damage + si.bonussp * spellpower
 	end
 	return damage
+end
+
+-- Returns the base duration of an aura.
+function OvaleData:GetBaseDuration(auraId, spellcast)
+	local combo, holy = spellcast.combo, spellcast.holy
+	local duration = math.huge
+	local si = OvaleData.spellInfo[auraId]
+	if si and si.duration then
+		duration = si.duration
+		if si.adddurationcp and combo then
+			duration = duration + si.adddurationcp * combo
+		end
+		if si.adddurationholy and holy then
+			duration = duration + si.adddurationholy * (holy - 1)
+		end
+	end
+	return duration
+end
+
+-- Returns the length in seconds of a tick of the periodic aura.
+function OvaleData:GetTickLength(auraId, snapshot)
+	local tick = 3
+	local si = OvaleData.spellInfo[auraId]
+	if si then
+		tick = si.tick or tick
+		local hasteMultiplier = 1
+		if si.haste then
+			if si.haste == "spell" then
+				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
+			elseif si.haste == "melee" then
+				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
+			end
+			tick = tick / hasteMultiplier
+		end
+	end
+	return tick
 end
 --</public-static-methods>

@@ -423,9 +423,7 @@ do
 	local function BuffDurationIfApplied(condition, state)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
-		local duration, dotDuration = state:GetDuration(auraId)
-		local si = OvaleData.spellInfo[auraId]
-		local value = (si and si.tick) and dotDuration or duration
+		local value = OvaleData:GetBaseDuration(auraId, state)
 		return Compare(value, comparator, limit)
 	end
 
@@ -2949,42 +2947,6 @@ do
 end
 
 do
-	--- Get the number of seconds until the next tick of a periodic aura on the target.
-	-- @name NextTick
-	-- @paramsig number or boolean
-	-- @param id The spell ID of the aura or the name of a spell list.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param filter Optional. The type of aura to check.
-	--     Default is any.
-	--     Valid values: any, buff, debuff
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The number of seconds.
-	-- @return A boolean value for the result of the comparison.
-	-- @see Ticks, TicksRemaining, TickTime
-
-	local function NextTick(condition, state)
-		local auraId, comparator, limit = condition[1], condition[2], condition[3]
-		local target, filter, mine = ParseCondition(condition, state)
-		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
-			local gain, start, ending, tick = aura.gain, aura.start, aura.ending, aura.tick
-			if ending < math.huge and tick then
-				while ending - tick > state.currentTime do
-					ending = ending - tick
-				end
-				return TestValue(0, ending, 0, ending, -1, comparator, limit)
-			end
-		end
-		return Compare(math.huge, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("nexttick", false, NextTick)
-end
-
-do
 	--- Test if the game is on a PTR server
 	-- @paramsig boolean
 	-- @param yesno Optional. If yes, then returns true if it is a PTR realm. If no, return true if it is a live realm.
@@ -4851,7 +4813,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
-	-- @see NextTick, Ticks, TicksRemaining
+	-- @see TicksRemaining
 
 	local function TickTime(condition, state)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
@@ -4861,8 +4823,7 @@ do
 		if state:IsActiveAura(aura) then
 			tickTime = aura.tick
 		else
-			local _, _, tick = state:GetDuration(auraId)
-			tickTime = tick
+			tickTime = OvaleData:GetTickLength(auraId, state.snapshot)
 		end
 		if tickTime and tickTime > 0 then
 			return Compare(tickTime, comparator, limit)
@@ -4871,63 +4832,6 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("ticktime", false, TickTime)
-end
-
-do
-	--- Get the total number of ticks of a periodic aura.
-	-- @name Ticks
-	-- @paramsig number or boolean
-	-- @param id The spell ID of the aura or the name of a spell list.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The number of ticks.
-	-- @return A boolean value for the result of the comparison.
-	-- @see NextTick, TicksRemaining, TickTime
-
-	local function Ticks(condition, state)
-		local auraId, comparator, limit = condition[1], condition[2], condition[3]
-		local target, filter, mine = ParseCondition(condition, state)
-		local aura = state:GetAura(target, auraId, filter, mine)
-		local numTicks
-		if state:IsActiveAura(aura) then
-			local gain, start, ending, tick = aura.gain, aura.start, aura.ending, aura.tick
-			if tick and tick > 0 then
-				numTicks = floor((ending - start) / tick + 0.5)
-			end
-		else
-			local _, _, _, _numTicks = state:GetDuration(auraId)
-			numTicks = _numTicks
-		end
-		if numTicks then
-			return Compare(numTicks, comparator, limit)
-		end
-		return Compare(math.huge, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("ticks", false, Ticks)
-end
-
-do
-	--- Get the number of ticks that would be added if the dot were cast with a current snapshot.
-	-- @name TicksAdded
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The number of added ticks.
-	-- @return A boolean value for the result of the comparison.
-
-	local function TicksAdded(condition, state)
-		local auraId, comparator, limit = condition[1], condition[2], condition[3]
-		local target, filter, mine = ParseCondition(condition, state)
-		local _, _, _, numTicks = state:GetDuration(auraId)
-		if numTicks and numTicks > 0 then
-			return Compare(numTicks, comparator, limit)
-		end
-		return Compare(0, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("ticksadded", false, TicksAdded)
 end
 
 do
@@ -4945,7 +4849,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return The number of ticks.
 	-- @return A boolean value for the result of the comparison.
-	-- @see NextTick, Ticks, TickTime
+	-- @see TickTime
 	-- @usage
 	-- if target.TicksRemaining(shadow_word_pain) <2
 	--     Spell(shadow_word_pain)
