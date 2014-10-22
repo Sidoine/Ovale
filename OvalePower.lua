@@ -39,6 +39,8 @@ end
 
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
+-- List of resources that have finishers that we need to save to the spellcast.
+local self_SpellcastInfoPowerTypes = { "chi", "holy" }
 
 -- Frame for resolving strings.
 local self_button = nil
@@ -118,31 +120,42 @@ OvalePower.POOLED_RESOURCE = {
 local function SaveToSpellcast(spellcast)
 	if spellcast.spellId then
 		local si = OvaleData.spellInfo[spellcast.spellId]
-		-- Save the number of holy power used if this spell is a finisher.
-		if si.holy == "finisher" then
-			local max_holy = si.max_holy or 3
-			-- If a buff is present that removes the holy power cost of the spell,
-			-- then treat it as using the maximum amount of holy power.
-			if si.buff_holy_none then
-				if OvaleAura:GetAura("player", si.buff_holy_none) then
-					spellcast.holy = max_holy
+		for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+			if si[powerType] == "finisher" then
+				local cost
+				-- Get the maximum cost of the finisher.
+				local maxCostParam = "max_" .. powerType
+				local maxCost = si[maxCostParam] or 1
+				-- If a buff is present that removes the cost of the spell, then treat it as using the maximum cost.
+				local buffNoCostParam = "buff_" .. powerType .. "_none"
+				local buffNoCost = si[buffNoCostParam]
+				if buffNoCost then
+					local aura = OvaleAura:GetAura("player", buffNoCost)
+					if aura then
+						cost = maxCost
+					end
 				end
-			end
-			local holy = OvalePower.power.holy
-			if holy > 0 then
-				if holy > max_holy then
-					spellcast.holy = max_holy
-				else
-					spellcast.holy = holy
+				-- Check the resource cost of this finisher.
+				if not cost then
+					local power = OvalePower.power[powerType]
+					if power > maxCost then
+						cost = maxCost
+					else
+						cost = power
+					end
 				end
+				-- Save the cost to the spellcast table.
+				spellcast[powerType] = cost
 			end
 		end
 	end
 end
 
 local function UpdateFromSpellcast(dest, spellcast)
-	if spellcast.holy then
-		dest.holy = spellcast.holy
+	for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+		if spellcast[powerType] then
+			dest[powerType] = spellcast[powerType]
+		end
 	end
 end
 

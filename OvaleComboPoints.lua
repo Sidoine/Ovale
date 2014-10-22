@@ -107,17 +107,21 @@ local function SaveToSpellcast(spellcast)
 	if spellcast.spellId then
 		local si = OvaleData.spellInfo[spellcast.spellId]
 		if si.combo == "finisher" then
+			local cost
 			-- If a buff is present that removes the combo point cost of the spell,
 			-- then treat it as a maximum combo-point finisher.
 			if si.buff_combo_none then
 				if OvaleAura:GetAura("player", si.buff_combo_none) then
-					spellcast.combo = MAX_COMBO_POINTS
+					cost = MAX_COMBO_POINTS
 				end
 			end
-			local min_combo = si.min_combo or si.mincombo or 1
-			if OvaleComboPoints.combo >= min_combo then
-				spellcast.combo = OvaleComboPoints.combo
+			if not cost then
+				local min_combo = si.min_combo or si.mincombo or 1
+				if OvaleComboPoints.combo >= min_combo then
+					cost = OvaleComboPoints.combo
+				end
 			end
+			spellcast.combo = cost
 		end
 	end
 end
