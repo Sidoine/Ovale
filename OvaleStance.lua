@@ -63,6 +63,7 @@ local OVALE_SPELLID_TO_STANCE = {
 	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
 	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
 	[API_GetSpellInfo(115070)] = "monk_stance_of_the_wise_serpent",
+	[API_GetSpellInfo(154436)] = "monk_stance_of_the_spirited_crane",
 	-- Paladin
 	[API_GetSpellInfo(20154)] = "paladin_seal_of_righteousness",
 	[API_GetSpellInfo(20164)] = "paladin_seal_of_justice",
