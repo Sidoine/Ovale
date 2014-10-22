@@ -80,7 +80,6 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			--]]
 			local duration = cd:GetCooldownDuration()
 			if duration == 0 and self.texture == actionTexture and self.cooldownStart and self.cooldownEnd then
-				Ovale:FormatPrint("OOPS! Blizzard screwed us over again: start=%f, end=%f", self.cooldownStart, self.cooldownEnd)
 				resetCooldown = true
 			end
 			if self.texture ~= actionTexture or not self.cooldownStart or not self.cooldownEnd
@@ -103,7 +102,6 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			if resetCooldown and duration > COOLDOWN_THRESHOLD then
 				cd:SetDrawEdge(false)
 				cd:SetSwipeColor(0, 0, 0, 0.8)
-				Ovale:FormatPrint("SetCooldown: start=%f, ending=%f", start, ending)
 				cd:SetCooldown(start, duration)
 				cd:Show()
 			end
