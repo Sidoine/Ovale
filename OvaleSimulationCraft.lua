@@ -935,6 +935,9 @@ local function InitializeDisambiguation()
 	-- Monk
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_chi",			"MONK")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"MONK")
+	AddDisambiguation("chi_explosion",			"chi_explosion_heal",			"MONK",			"mistweaver")
+	AddDisambiguation("chi_explosion",			"chi_explosion_melee",			"MONK",			"windwalker")
+	AddDisambiguation("chi_explosion",			"chi_explosion_tank",			"MONK",			"brewmaster")
 	AddDisambiguation("zen_sphere_debuff",		"zen_sphere_buff",				"MONK")
 	-- Paladin
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_holy",			"PALADIN")
@@ -1119,12 +1122,29 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "water_elemental" then
 			-- Only suggest summoning the Water Elemental if the pet is not already summoned.
 			conditionCode = "not pet.Present()"
+		elseif class == "MONK" and action == "chi_burst" then
+			-- Only suggest Chi Burst if it's toggled on.
+			conditionCode = "CheckBoxOn(opt_chi_burst)"
+			annotation[action] = class
 		elseif class == "MONK" and action == "chi_sphere" then
 			-- skip
+			isSpellAction = false
+		elseif class == "MONK" and action == "expel_harm" then
+			bodyCode = "ExpelHarm()"
+			annotation[action] = class
+			isSpellAction = false
+		elseif class == "MONK" and action == "guard" then
+			bodyCode = "Guard()"
+			annotation[action] = class
 			isSpellAction = false
 		elseif class == "MONK" and action == "gift_of_the_ox" then
 			-- skip
 			isSpellAction = false
+		elseif class == "MONK" and action == "touch_of_death" then
+			-- Touch of Death can only be used if the Death Note buff is present on the player.
+			local buffName = "death_note_buff"
+			AddSymbol(annotation, buffName)
+			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"
@@ -2829,7 +2849,8 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "quaking_palm")
 		count = count + 1
 	end
-	if annotation.spear_hand_strike == "MONK" then
+	if annotation.class == "MONK" then
+		-- Monk profiles never include Spear Hand Strike.
 		local code = [[
 			AddFunction InterruptActions
 			{
@@ -2853,6 +2874,36 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "spear_hand_strike")
 		AddSymbol(annotation, "war_stomp")
+		count = count + 1
+	end
+	if annotation.expel_harm == "MONK" then
+		local code = [[
+			AddFunction Guard
+			{
+				Spell(guard)
+				Spell(guard_glyphed)
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "guard")
+		AddSymbol(annotation, "guard_glyphed")
+		AddSymbol(annotation, "glyph_of_guard")
+		count = count + 1
+	end
+	if annotation.expel_harm == "MONK" then
+		local code = [[
+			AddFunction ExpelHarm
+			{
+				Spell(expel_harm)
+				Spell(expel_harm_glyphed)
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "expel_harm")
+		AddSymbol(annotation, "expel_harm_glyphed")
+		AddSymbol(annotation, "glyph_of_targeted_expulsion")
 		count = count + 1
 	end
 	if annotation.time_to_hpg_melee == "PALADIN" then
@@ -3219,6 +3270,15 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "time_warp")
+		count = count + 1
+	end
+	if annotation.chi_burst == "MONK" then
+		local code = [[
+			AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
+		]]
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "chi_burst")
 		count = count + 1
 	end
 	if annotation.bloodlust == "SHAMAN" then

@@ -135,38 +135,46 @@ AddFunction ProtectionDefaultActions
 	if Enemies() >= 3 Spell(hammer_of_the_righteous)
 	#crusader_strike
 	Spell(crusader_strike)
-	#judgment
-	Spell(judgment)
-	#avengers_shield,if=active_enemies>1&!glyph.focused_shield.enabled
-	if Enemies() > 1 and not Glyph(glyph_of_focused_shield) Spell(avengers_shield)
-	#holy_wrath,if=talent.sanctified_wrath.enabled
-	if Talent(sanctified_wrath_talent) Spell(holy_wrath)
-	#avengers_shield,if=buff.grand_crusader.react
-	if BuffPresent(grand_crusader_buff) Spell(avengers_shield)
-	#sacred_shield,if=target.dot.sacred_shield.remains<2
-	if BuffPresent(sacred_shield_buff) < 2 Spell(sacred_shield)
-	#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
-	if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
-	#avengers_shield
-	Spell(avengers_shield)
-	#holy_prism
-	Spell(holy_prism)
-	#execution_sentence
-	Spell(execution_sentence)
-	#hammer_of_wrath
-	Spell(hammer_of_wrath)
-	#sacred_shield,if=target.dot.sacred_shield.remains<8
-	if BuffPresent(sacred_shield_buff) < 8 Spell(sacred_shield)
-	#holy_wrath
-	Spell(holy_wrath)
-	#seal_of_insight,if=talent.empowered_seals.enabled&!seal.insight&buff.uthers_insight.remains<=buff.liadrins_righteousness.remains&buff.uthers_insight.remains<=buff.maraads_truth.remains
-	if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_insight) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(liadrins_righteousness_buff) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(maraads_truth_buff) Spell(seal_of_insight)
-	#seal_of_righteousness,if=talent.empowered_seals.enabled&!seal.righteousness&buff.liadrins_righteousness.remains<=buff.uthers_insight.remains&buff.liadrins_righteousness.remains<=buff.maraads_truth.remains
-	if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(uthers_insight_buff) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(maraads_truth_buff) Spell(seal_of_righteousness)
-	#seal_of_truth,if=talent.empowered_seals.enabled&!seal.truth&buff.maraads_truth.remains<buff.uthers_insight.remains&buff.maraads_truth.remains<buff.liadrins_righteousness.remains
-	if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < BuffRemaining(uthers_insight_buff) and BuffRemaining(maraads_truth_buff) < BuffRemaining(liadrins_righteousness_buff) Spell(seal_of_truth)
-	#sacred_shield
-	Spell(sacred_shield)
+	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
+	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
+	{
+		#judgment
+		Spell(judgment)
+		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
+		unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
+		{
+			#avengers_shield,if=active_enemies>1&!glyph.focused_shield.enabled
+			if Enemies() > 1 and not Glyph(glyph_of_focused_shield) Spell(avengers_shield)
+			#holy_wrath,if=talent.sanctified_wrath.enabled
+			if Talent(sanctified_wrath_talent) Spell(holy_wrath)
+			#avengers_shield,if=buff.grand_crusader.react
+			if BuffPresent(grand_crusader_buff) Spell(avengers_shield)
+			#sacred_shield,if=target.dot.sacred_shield.remains<2
+			if BuffPresent(sacred_shield_buff) < 2 Spell(sacred_shield)
+			#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
+			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
+			#avengers_shield
+			Spell(avengers_shield)
+			#holy_prism
+			Spell(holy_prism)
+			#execution_sentence
+			Spell(execution_sentence)
+			#hammer_of_wrath
+			Spell(hammer_of_wrath)
+			#sacred_shield,if=target.dot.sacred_shield.remains<8
+			if BuffPresent(sacred_shield_buff) < 8 Spell(sacred_shield)
+			#holy_wrath
+			Spell(holy_wrath)
+			#seal_of_insight,if=talent.empowered_seals.enabled&!seal.insight&buff.uthers_insight.remains<=buff.liadrins_righteousness.remains&buff.uthers_insight.remains<=buff.maraads_truth.remains
+			if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_insight) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(liadrins_righteousness_buff) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(maraads_truth_buff) Spell(seal_of_insight)
+			#seal_of_righteousness,if=talent.empowered_seals.enabled&!seal.righteousness&buff.liadrins_righteousness.remains<=buff.uthers_insight.remains&buff.liadrins_righteousness.remains<=buff.maraads_truth.remains
+			if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(uthers_insight_buff) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(maraads_truth_buff) Spell(seal_of_righteousness)
+			#seal_of_truth,if=talent.empowered_seals.enabled&!seal.truth&buff.maraads_truth.remains<buff.uthers_insight.remains&buff.maraads_truth.remains<buff.liadrins_righteousness.remains
+			if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < BuffRemaining(uthers_insight_buff) and BuffRemaining(maraads_truth_buff) < BuffRemaining(liadrins_righteousness_buff) Spell(seal_of_truth)
+			#sacred_shield
+			Spell(sacred_shield)
+		}
+	}
 }
 
 AddFunction ProtectionDefaultShortCdActions
@@ -194,35 +202,45 @@ AddFunction ProtectionDefaultShortCdActions
 		or BuffPresent(grand_crusader_buff) and Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield)
 		or Enemies() >= 3 and Spell(hammer_of_the_righteous)
 		or Spell(crusader_strike)
-		or Spell(judgment)
-		or Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield)
-		or Talent(sanctified_wrath_talent) and Spell(holy_wrath)
-		or BuffPresent(grand_crusader_buff) and Spell(avengers_shield)
-		or BuffPresent(sacred_shield_buff) < 2 and Spell(sacred_shield)
-		or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath)
-		or Spell(avengers_shield)
 	{
-		#lights_hammer
-		Spell(lights_hammer)
-
-		unless Spell(holy_prism)
+		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
+		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			if target.True(debuff_flying_down) and Enemies() >= 3 Consecration()
-			
-			unless Spell(execution_sentence)
-				or Spell(hammer_of_wrath)
-				or BuffPresent(sacred_shield_buff) < 8 and Spell(sacred_shield)
+			unless Spell(judgment)
 			{
-				if target.True(debuff_flying_down) Consecration()
-				
-				unless Spell(holy_wrath)
-					or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_insight) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(liadrins_righteousness_buff) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(maraads_truth_buff) and Spell(seal_of_insight)
-					or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(uthers_insight_buff) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(maraads_truth_buff) and Spell(seal_of_righteousness)
-					or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < BuffRemaining(uthers_insight_buff) and BuffRemaining(maraads_truth_buff) < BuffRemaining(liadrins_righteousness_buff) and Spell(seal_of_truth)
-					or Spell(sacred_shield)
+				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
+				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
+					or Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield)
+					or Talent(sanctified_wrath_talent) and Spell(holy_wrath)
+					or BuffPresent(grand_crusader_buff) and Spell(avengers_shield)
+					or BuffPresent(sacred_shield_buff) < 2 and Spell(sacred_shield)
+					or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath)
+					or Spell(avengers_shield)
 				{
-					#flash_of_light,if=talent.selfless_healer.enabled&buff.selfless_healer.stack>=3
-					if Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) >= 3 Spell(flash_of_light)
+					#lights_hammer
+					Spell(lights_hammer)
+
+					unless Spell(holy_prism)
+					{
+						if target.True(debuff_flying_down) and Enemies() >= 3 Consecration()
+						
+						unless Spell(execution_sentence)
+							or Spell(hammer_of_wrath)
+							or BuffPresent(sacred_shield_buff) < 8 and Spell(sacred_shield)
+						{
+							if target.True(debuff_flying_down) Consecration()
+							
+							unless Spell(holy_wrath)
+								or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_insight) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(liadrins_righteousness_buff) and BuffRemaining(uthers_insight_buff) <= BuffRemaining(maraads_truth_buff) and Spell(seal_of_insight)
+								or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(uthers_insight_buff) and BuffRemaining(liadrins_righteousness_buff) <= BuffRemaining(maraads_truth_buff) and Spell(seal_of_righteousness)
+								or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < BuffRemaining(uthers_insight_buff) and BuffRemaining(maraads_truth_buff) < BuffRemaining(liadrins_righteousness_buff) and Spell(seal_of_truth)
+								or Spell(sacred_shield)
+							{
+								#flash_of_light,if=talent.selfless_healer.enabled&buff.selfless_healer.stack>=3
+								if Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) >= 3 Spell(flash_of_light)
+							}
+						}
+					}
 				}
 			}
 		}

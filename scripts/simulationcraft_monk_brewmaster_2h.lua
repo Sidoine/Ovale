@@ -15,10 +15,38 @@ Include(ovale_common)
 Include(ovale_monk_spells)
 
 AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
 
 AddFunction UsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+}
+
+AddFunction ExpelHarm
+{
+	Spell(expel_harm)
+	Spell(expel_harm_glyphed)
+}
+
+AddFunction Guard
+{
+	Spell(guard)
+	Spell(guard_glyphed)
+}
+
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(paralysis) Spell(paralysis)
+			Spell(arcane_torrent_chi)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction BrewmasterPrecombatActions
@@ -65,21 +93,21 @@ AddFunction BrewmasterDefaultActions
 AddFunction BrewmasterAoeActions
 {
 	#guard
-	Spell(guard)
+	Guard()
 	#breath_of_fire,if=chi>=3&buff.shuffle.remains>=6&dot.breath_of_fire.remains<=1&target.debuff.dizzying_haze.up
 	if Chi() >= 3 and BuffRemaining(shuffle_buff) >= 6 and target.DebuffRemaining(breath_of_fire_debuff) <= 1 and target.DebuffPresent(dizzying_haze_debuff) Spell(breath_of_fire)
 	#chi_explosion,if=chi>=4
-	if Chi() >= 4 Spell(chi_explosion)
+	if Chi() >= 4 Spell(chi_explosion_tank)
 	#rushing_jade_wind,if=chi.max-chi>=1&talent.rushing_jade_wind.enabled
 	if MaxChi() - Chi() >= 1 and Talent(rushing_jade_wind_talent) Spell(rushing_jade_wind)
 	#purifying_brew,if=!talent.chi_explosion.enabled&stagger.heavy
 	if not Talent(chi_explosion_talent) and DebuffPresent(heavy_stagger_debuff) Spell(purifying_brew)
 	#guard
-	Spell(guard)
+	Guard()
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
 	if MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
-	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 Spell(chi_burst)
+	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	#chi_wave,if=talent.chi_wave.enabled&energy.time_to_max>3
 	if Talent(chi_wave_talent) and TimeToMaxEnergy() > 3 Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=talent.zen_sphere.enabled&!dot.zen_sphere.ticking
@@ -91,7 +119,7 @@ AddFunction BrewmasterAoeActions
 	#blackout_kick,if=talent.rushing_jade_wind.enabled&chi>=4
 	if Talent(rushing_jade_wind_talent) and Chi() >= 4 Spell(blackout_kick)
 	#expel_harm,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=40
-	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 40 Spell(expel_harm)
+	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 40 ExpelHarm()
 	#spinning_crane_kick,if=chi.max-chi>=1&!talent.rushing_jade_wind.enabled
 	if MaxChi() - Chi() >= 1 and not Talent(rushing_jade_wind_talent) Spell(spinning_crane_kick)
 	#jab,if=talent.rushing_jade_wind.enabled&chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd
@@ -113,17 +141,17 @@ AddFunction BrewmasterStActions
 	#purifying_brew,if=!buff.serenity.up
 	if not BuffPresent(serenity_buff) Spell(purifying_brew)
 	#guard
-	Spell(guard)
+	Guard()
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
 	if MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
-	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 Spell(chi_burst)
+	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	#chi_wave,if=talent.chi_wave.enabled&energy.time_to_max>3
 	if Talent(chi_wave_talent) and TimeToMaxEnergy() > 3 Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=talent.zen_sphere.enabled&!dot.zen_sphere.ticking
 	if Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) Spell(zen_sphere)
 	#chi_explosion,if=chi>=3
-	if Chi() >= 3 Spell(chi_explosion)
+	if Chi() >= 3 Spell(chi_explosion_tank)
 	#blackout_kick,if=buff.shuffle.remains<=3&cooldown.keg_smash.remains>=gcd
 	if BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() Spell(blackout_kick)
 	#blackout_kick,if=buff.serenity.up
@@ -131,7 +159,7 @@ AddFunction BrewmasterStActions
 	#blackout_kick,if=chi>=4
 	if Chi() >= 4 Spell(blackout_kick)
 	#expel_harm,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd
-	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() Spell(expel_harm)
+	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() ExpelHarm()
 	#jab,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd
 	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() Spell(jab)
 	#purifying_brew,if=!talent.chi_explosion.enabled&stagger.moderate&buff.shuffle.remains>=6
@@ -165,8 +193,8 @@ AddIcon specialization=brewmaster help=aoe
 # chi_brew_talent
 # chi_burst
 # chi_burst_talent
-# chi_explosion
 # chi_explosion_talent
+# chi_explosion_tank
 # chi_wave
 # chi_wave_talent
 # dampen_harm
@@ -176,26 +204,34 @@ AddIcon specialization=brewmaster help=aoe
 # elusive_brew_activated_buff
 # elusive_brew_stacks_buff
 # expel_harm
+# expel_harm_glyphed
 # fortifying_brew
 # fortifying_brew_buff
+# glyph_of_guard
+# glyph_of_targeted_expulsion
 # guard
+# guard_glyphed
 # heavy_stagger_debuff
 # invoke_xuen
 # invoke_xuen_talent
 # jab
 # keg_smash
 # moderate_stagger_debuff
+# paralysis
 # purifying_brew
+# quaking_palm
 # rushing_jade_wind
 # rushing_jade_wind_talent
 # serenity
 # serenity_buff
 # serenity_talent
 # shuffle_buff
+# spear_hand_strike
 # spinning_crane_kick
 # stance_of_the_sturdy_ox
 # tiger_palm
 # virmens_bite_potion
+# war_stomp
 # zen_sphere
 # zen_sphere_buff
 # zen_sphere_talent
