@@ -16,6 +16,7 @@ local L = Ovale.L
 -- Forward declarations for module dependencies.
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local OvaleDataBroker = nil
 local OvaleScripts = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
@@ -61,6 +62,21 @@ local self_options =
 					order = 20,
 					type = "toggle",
 					name = L["Ignorer les clics souris"],
+				},
+				minimap =
+				{
+					order = 25,
+					type = "toggle",
+					name = L["Show minimap icon"],
+					get = function(info)
+						return not Ovale.db.profile.apparence.minimap.hide
+					end,
+					set = function(info, value)
+						Ovale.db.profile.apparence.minimap.hide = not value
+						if OvaleDataBroker then
+							OvaleDataBroker:UpdateIcon()
+						end
+					end
 				},
 				visibility =
 				{
@@ -701,6 +717,7 @@ local self_options =
 --<public-static-methods>
 function OvaleOptions:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleDataBroker = Ovale.OvaleDataBroker
 	OvaleScripts = Ovale.OvaleScripts
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
@@ -720,6 +737,7 @@ function OvaleOptions:OnInitialize()
 			check = {},
 			list = {},
 			apparence = {
+				minimap = {},
 				enCombat = false,
 				iconScale = 1,
 				secondIconScale = 1,
@@ -782,6 +800,7 @@ function OvaleOptions:OnEnable()
 end
 
 function OvaleOptions:HandleProfileChanges()
+	self:SendMessage("Ovale_ProfileChanged")
 	self:SendMessage("Ovale_ScriptChanged")
 end
 

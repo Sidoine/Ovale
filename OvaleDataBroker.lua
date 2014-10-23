@@ -12,6 +12,7 @@ local L = Ovale.L
 
 -- Forward declarations for module dependencies.
 local LibDataBroker = LibStub("LibDataBroker-1.1", true)
+local LibDBIcon = LibStub("LibDBIcon-1.0", true)
 local OvaleOptions = nil
 local OvaleScripts = nil
 
@@ -71,7 +72,7 @@ end
 
 local function OnTooltipShow(tooltip)
 	self_tooltipTitle = self_tooltipTitle or OVALE .. " " .. Ovale.version
-	tooltip:SetText(self_tooltipTitle)
+	tooltip:SetText(self_tooltipTitle, 1, 1, 1)
 	tooltip:AddLine(L["Click to select the script."])
 	tooltip:AddLine(L["Right-Click for options."])
 end
@@ -93,19 +94,38 @@ function OvaleDataBroker:OnInitialize()
 			OnTooltipShow = OnTooltipShow,
 		}
 		self.broker = LibDataBroker:NewDataObject(OVALE, broker)
+
+		if LibDBIcon then
+			LibDBIcon:Register(OVALE, self.broker, Ovale.db.profile.apparence.minimap)
+		end
 	end
 end
 
 function OvaleDataBroker:OnEnable()
 	if self.broker then
+		self:RegisterMessage("Ovale_ProfileChanged", "UpdateIcon")
 		self:RegisterMessage("Ovale_ScriptChanged")
 		self:Ovale_ScriptChanged()
+		self:UpdateIcon()
 	end
 end
 
 function OvaleDataBroker:OnDisable()
 	if self.broker then
+		self:UnregisterMessage("Ovale_ProfileChanged")
 		self:UnregisterMessage("Ovale_ScriptChanged")
+	end
+end
+
+function OvaleDataBroker:UpdateIcon()
+	if LibDBIcon and self.broker then
+		local minimap = Ovale.db.profile.apparence.minimap
+		LibDBIcon:Refresh(OVALE, minimap)
+		if minimap.hide then
+			LibDBIcon:Hide(OVALE)
+		else
+			LibDBIcon:Show(OVALE)
+		end
 	end
 end
 

@@ -93,6 +93,11 @@ $m{LibBabbleCreatureType}{GetLookupTable} = true;
 
 $m{LibDataBroker}{NewDataObject} = true;
 
+$m{LibDBIcon}{Hide} = true;
+$m{LibDBIcon}{Refresh} = true;
+$m{LibDBIcon}{Register} = true;
+$m{LibDBIcon}{Show} = true;
+
 $m{LibDispellable}{IsEnrageEffect} = true;
 
 $m{LibDualSpec}{EnhanceDatabase} = true;
