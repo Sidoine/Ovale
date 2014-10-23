@@ -7,18 +7,7 @@ do
 	local code = [[
 # Warlock spells and functions.
 
-Define(agony 980)
-	SpellAddTargetDebuff(agony agony_debuff=1)
-Define(agony_debuff 980)
-	SpellInfo(agony_debuff duration=24 haste=spell maxstacks=10 tick=2)
-	SpellInfo(agony_debuff addduration=12 glyph=glyph_of_everlasting_affliction)
-	SpellInfo(agony_debuff damage=AfflictionAgonyTickDamage specialization=affliction)
-	SpellInfo(agony_debuff lastEstimatedDamage=AfflictionAgonyTickLastDamage specialization=affliction)
 Define(aftermath 109784)
-Define(archimondes_darkness_talent 16)
-Define(backdraft 117896)
-Define(backdraft_buff 117828)
-	SpellInfo(backdraft_buff duration=15 maxstacks=3)
 Define(burning_embers 108647)
 # cancel_metamorphosis
 Define(chaos_bolt 116858)
