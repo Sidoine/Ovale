@@ -71,26 +71,31 @@ local self_options =
 					{
 						enCombat =
 						{
+							order = 10,
 							type = "toggle",
 							name = L["En combat uniquement"],
 						},
 						avecCible =
 						{
+							order = 20,
 							type = "toggle",
 							name = L["Si cible uniquement"],
 						},
 						targetHostileOnly =
 						{
+							order = 30,
 							type = "toggle",
 							name = L["Cacher si cible amicale ou morte"],
 						},
 						hideVehicule =
 						{
+							order = 40,
 							type = "toggle",
 							name = L["Cacher dans les véhicules"],
 						},
 						hideEmpty =
 						{
+							order = 50,
 							type = "toggle",
 							name = L["Cacher bouton vide"],
 						},
@@ -105,6 +110,7 @@ local self_options =
 					{
 						iconScale =
 						{
+							order = 10,
 							type = "range",
 							name = L["Taille des icônes"],
 							desc = L["La taille des icônes"],
@@ -112,6 +118,7 @@ local self_options =
 						},
 						smallIconScale =
 						{
+							order = 20,
 							type = "range",
 							name = L["Taille des petites icônes"],
 							desc = L["La taille des petites icônes"],
@@ -119,6 +126,7 @@ local self_options =
 						},
 						fontScale =
 						{
+							order = 30,
 							type = "range",
 							name = L["Taille des polices"],
 							desc = L["La taille des polices"],
@@ -126,41 +134,48 @@ local self_options =
 						},
 						alpha =
 						{
+							order = 40,
 							type = "range",
 							name = L["Opacité des icônes"],
 							min = 0, max = 100, step = 5,
 						},
 						raccourcis =
 						{
+							order = 50,
 							type = "toggle",
 							name = L["Raccourcis clavier"],
 							desc = L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"],
 						},
 						numeric =
 						{
+							order = 60,
 							type = "toggle",
 							name = L["Affichage numérique"],
 							desc = L["Affiche le temps de recharge sous forme numérique"],
 						},
 						highlightIcon =
 						{
+							order = 70,
 							type = "toggle",
 							name = L["Illuminer l'icône"],
 							desc = L["Illuminer l'icône quand la technique doit être spammée"],
 						},
 						flashIcon =
 						{
+							order = 80,
 							type = "toggle",
 							name = L["Illuminer l'icône quand le temps de recharge est écoulé"],
 						},
 						targetText =
 						{
+							order = 90,
 							type = "input",
 							name = L["Caractère de portée"],
 							desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
 						},
 						updateInterval =
 						{
+							order = 100,
 							type = "range",
 							name = "Update interval",
 							desc = "Maximum time to wait (in milliseconds) before refreshing icons.",
@@ -184,17 +199,20 @@ local self_options =
 					{
 						moving =
 						{
+							order = 10,
 							type = "toggle",
 							name = L["Défilement"],
 							desc = L["Les icônes se déplacent"],
 						},
 						vertical =
 						{
+							order = 20,
 							type = "toggle",
 							name = L["Vertical"],
 						},
 						margin =
 						{
+							order = 30,
 							type = "range",
 							name = L["Marge entre deux icônes"],
 							min = -16, max = 64, step = 1,
@@ -210,18 +228,21 @@ local self_options =
 					{
 						iconShiftX =
 						{
+							order = 10,
 							type = "range",
 							name = L["Décalage horizontal des options"],
 							min = -256, max = 256, step = 1,
 						},
 						iconShiftY =
 						{
+							order = 20,
 							type = "range",
 							name = L["Décalage vertical des options"],
 							min = -256, max = 256, step = 1,
 						},
 						optionsAlpha =
 						{
+							order = 30,
 							type = "range",
 							name = L["Opacité des options"],
 							min = 0, max = 100, step = 5,
@@ -245,12 +266,14 @@ local self_options =
 					{
 						predictif =
 						{
+							order = 10,
 							type = "toggle",
 							name = L["Prédictif"],
 							desc = L["Affiche les deux prochains sorts et pas uniquement le suivant"],
 						},
 						secondIconScale =
 						{
+							order = 20,
 							type = "range",
 							name = L["Taille du second icône"],
 							min = 0.2, max = 1, step = 0.1,
@@ -265,7 +288,7 @@ local self_options =
 					{
 						auraLag =
 						{
-							order = 100,
+							order = 10,
 							type = "range",
 							name = L["Aura lag"],
 							desc = L["Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed"],
@@ -551,7 +574,6 @@ local self_options =
 			{
 				show =
 				{
-					order = -1,
 					type = "execute",
 					name = L["Afficher la fenêtre"],
 					guiHidden = true,
@@ -562,7 +584,6 @@ local self_options =
 				},
 				hide =
 				{
-					order = -2,
 					type = "execute",
 					name = L["Cacher la fenêtre"],
 					guiHidden = true,
@@ -591,7 +612,6 @@ local self_options =
 				},
 				power =
 				{
-					order = -3,
 					name = "Power",
 					type = "execute",
 					func = function()
@@ -600,14 +620,12 @@ local self_options =
 				},
 				talent =
 				{
-					order = -4,
 					name = "List talent id",
 					type = "execute",
 					func = function() OvaleSpellBook:DebugTalents() end
 				},
 				targetbuff =
 				{
-					order = -5,
 					name = "List target buffs and debuffs",
 					type = "execute",
 					func = function()
@@ -617,7 +635,6 @@ local self_options =
 				},
 				buff =
 				{
-					order = -6,
 					name = "List player buffs and debuffs",
 					type = "execute",
 					func = function()
@@ -627,21 +644,18 @@ local self_options =
 				},
 				glyph =
 				{
-					order = -7,
 					name = "List player glyphs",
 					type = "execute",
 					func = function() OvaleSpellBook:DebugGlyphs() end
 				},
 				spell =
 				{
-					order = -8,
 					name = "List player spells",
 					type = "execute",
 					func = function() OvaleSpellBook:DebugSpells() end
 				},
 				stance =
 				{
-					order = -9,
 					name = "List stances",
 					type = "execute",
 					func = function()
@@ -649,37 +663,31 @@ local self_options =
 					end
 				},
 				profilestart = {
-					order = -10,
 					name = "Start gathering profiling stats",
 					type = "execute",
 					func = function() Ovale.Profiler:Enable(nil, true) end,
 				},
 				profilestop = {
-					order = -11,
 					name = "Stop gathering profiling stats",
 					type = "execute",
 					func = function() Ovale.Profiler:Disable(nil, true) end,
 				},
 				profilereset = {
-					order = -12,
 					name = "Reset profiling stats",
 					type = "execute",
 					func = function() Ovale.Profiler:Reset() end,
 				},
 				profile = {
-					order = -13,
 					name = "Print profiling stats",
 					type = "execute",
 					func = function() Ovale.Profiler:Info() end,
 				},
 				version = {
-					order = -14,
 					name = "Show version number",
 					type = "execute",
 					func = function() Ovale:Print(Ovale.version) end,
 				},
 				ping = {
-					order = -15,
 					name = "Ping for Ovale users in group",
 					type = "execute",
 					func = function() Ovale:VersionCheck() end,
