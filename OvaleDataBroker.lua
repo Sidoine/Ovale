@@ -53,8 +53,7 @@ local function OnClick(frame, button)
 		local menu = {
 			{ text = L["Script"], isTitle = true },
 		}
-		local profile = OvaleOptions:GetProfile()
-		local scriptType = not profile.showHiddenScripts and "script"
+		local scriptType = not Ovale.db.profile.showHiddenScripts and "script"
 		local descriptions = OvaleScripts:GetDescriptions(scriptType)
 		for name, description in pairs(descriptions) do
 			local menuItem = {
@@ -112,7 +111,6 @@ end
 
 function OvaleDataBroker:Ovale_ScriptChanged()
 	-- Update the LDB dataobject.
-	local profile = OvaleOptions:GetProfile()
-	self.broker.text = profile.source
+	self.broker.text = Ovale.db.profile.source
 end
 --</public-static-methods>

@@ -15,7 +15,6 @@ local OvaleCondition = nil
 local OvaleCooldown = nil
 local OvaleData = nil
 local OvaleEquipement = nil
-local OvaleOptions = nil
 local OvalePaperDoll = nil
 local OvaleScore = nil
 local OvaleScripts = nil
@@ -133,15 +132,14 @@ local function TestConditions(parameters)
 		boolean = (equippedCount >= parameters.itemcount)
 	end
 	do
-		local profile
 		if boolean and parameters.checkbox then
+			local profile = Ovale.db.profile
 			for _, checkbox in ipairs(parameters.checkbox) do
 				local name, required = RequireValue(checkbox)
 				local control = Ovale.checkBox[name] or {}
 				control.triggerEvaluation = true
 				Ovale.checkBox[name] = control
 				-- Check the value of the checkbox.
-				profile = profile or OvaleOptions:GetProfile()
 				local isChecked = profile.check[name]
 				boolean = (required and isChecked) or (not required and not isChecked)
 				if not boolean then
@@ -150,13 +148,13 @@ local function TestConditions(parameters)
 			end
 		end
 		if boolean and parameters.listitem then
+			local profile = Ovale.db.profile
 			for name, listitem in pairs(parameters.listitem) do
 				local item, required = RequireValue(listitem)
 				local control = Ovale.list[name] or { items = {}, default = nil }
 				control.triggerEvaluation = true
 				Ovale.list[name] = control
 				-- Check the selected item in the list.
-				profile = profile or OvaleOptions:GetProfile()
 				local isSelected = (profile.list[name] == item)
 				boolean = (required and isSelected) or (not required and not isSelected)
 				if not boolean then
@@ -398,7 +396,6 @@ function OvaleCompile:OnInitialize()
 	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
 	OvaleEquipement = Ovale.OvaleEquipement
-	OvaleOptions = Ovale.OvaleOptions
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleScore = Ovale.OvaleScore
 	OvaleScripts = Ovale.OvaleScripts
@@ -437,8 +434,7 @@ end
 
 function OvaleCompile:Ovale_ScriptChanged(event)
 	-- Compile the script named in the current profile.
-	local profile = OvaleOptions:GetProfile()
-	self:CompileScript(profile.source)
+	self:CompileScript(Ovale.db.profile.source)
 	-- Trigger script evaluation.
 	self:EventHandler(event)
 end

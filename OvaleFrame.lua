@@ -15,7 +15,6 @@ do
 	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCooldown = Ovale.OvaleCooldown
 	local OvaleGUID = Ovale.OvaleGUID
-	local OvaleOptions = Ovale.OvaleOptions
 	local OvaleState = Ovale.OvaleState
 	local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
@@ -42,7 +41,7 @@ do
 	end
 	
 	local function frameOnMouseDown(self)
-		if (not OvaleOptions:GetProfile().apparence.verrouille) then
+		if (not Ovale.db.profile.apparence.verrouille) then
 			self:StartMoving()
 			AceGUI:ClearFocus()
 		end
@@ -58,7 +57,7 @@ do
 	
 	local function frameOnMouseUp(self)
 		self:StopMovingOrSizing()
-		local profile = OvaleOptions:GetProfile()
+		local profile = Ovale.db.profile
 		
 		if (profile.left~=self:GetLeft() or profile.top ~=self:GetTop()) then
 			profile.left = self:GetLeft()
@@ -67,7 +66,7 @@ do
 	end
 	
 	local function frameOnEnter(self)
-		if (not OvaleOptions:GetProfile().apparence.verrouille) then
+		if (not Ovale.db.profile.apparence.verrouille) then
 			self.obj.barre:Show()
         end
 	end
@@ -158,7 +157,7 @@ do
 		-- Update current time.
 		local now = API_GetTime()
 
-		local profile = OvaleOptions:GetProfile()
+		local profile = Ovale.db.profile
 		-- Force a refresh if we've exceeded the minimum update interval since the last refresh.
 		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
 		-- Refresh the icons if we're forcing a refresh or if one of the units the script is tracking needs a refresh.
@@ -301,7 +300,7 @@ do
 				icon:Hide()
 			end
 		end
-		local profile = OvaleOptions:GetProfile()
+		local profile = Ovale.db.profile
 		self.frame:EnableMouse(not profile.apparence.clickThru)
 		
 		local left = 0
@@ -419,7 +418,7 @@ do
 
 		local frame = API_CreateFrame("Frame", nil, hider)
 		local self = {}
-		local profile = OvaleOptions:GetProfile()
+		local profile = Ovale.db.profile
 		
 		self.Hide = Hide
 		self.Show = Show

@@ -28,7 +28,6 @@ local LibDispellable = LibStub("LibDispellable-1.0", true)
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
-local OvaleOptions = nil
 local OvalePaperDoll = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
@@ -228,7 +227,7 @@ end
 
 local function IsWithinAuraLag(time1, time2, factor)
 	factor = factor or 1
-	local auraLag = OvaleOptions:GetProfile().apparence.auraLag
+	local auraLag = Ovale.db.profile.apparence.auraLag
 	local tolerance = factor * auraLag / 1000
 	return (time1 - time2 < tolerance) and (time2 - time1 < tolerance)
 end
@@ -240,7 +239,6 @@ function OvaleAura:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
-	OvaleOptions = Ovale.OvaleOptions
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState

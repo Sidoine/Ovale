@@ -10,7 +10,6 @@ local OVALE, Ovale = ...
 
 --<private-static-properties>
 local L = Ovale.L
-local OvaleOptions = Ovale.OvaleOptions
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleState = Ovale.OvaleState
 
@@ -66,7 +65,7 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 
 	local now = API_GetTime()
 	local state = OvaleState.state
-	local profile = OvaleOptions:GetProfile()
+	local profile = Ovale.db.profile
 
 	if startTime and actionTexture then
 		-- Cooldown.
@@ -300,7 +299,7 @@ end
 
 function OvaleIcone_OnLoad(self)
 	local name = self:GetName()
-	local profile = OvaleOptions:GetProfile()
+	local profile = Ovale.db.profile
 
 --<public-properties>
 	self.icone = _G[name.."Icon"]

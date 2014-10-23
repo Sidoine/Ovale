@@ -9,7 +9,6 @@ Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, OVALE, "AceConsole-3.0", "A
 
 --<private-static-properties>
 local AceGUI = LibStub("AceGUI-3.0")
-local OvaleOptions = nil
 
 -- Localized strings table.
 local L = nil
@@ -54,6 +53,8 @@ local self_oneTimeMessage = {}
 Ovale.version = "@project-version@"
 -- Localization string table.
 Ovale.L = nil
+-- AceDB-3.0 database to handle SavedVariables (managed by OvaleOptions).
+Ovale.db = nil
 --the frame with the icons
 Ovale.frame = nil
 -- Checkbox and dropdown definitions from evaluating the script.
@@ -75,25 +76,21 @@ Ovale.MSG_PREFIX = OVALE
 --<private-static-methods>
 local function OnCheckBoxValueChanged(widget)
 	-- Reflect the value change into the profile (model).
-	local profile = OvaleOptions:GetProfile()
 	local name = widget:GetUserData("name")
-	profile.check[name] = widget:GetValue()
+	Ovale.db.profile.check[name] = widget:GetValue()
 	Ovale:SendMessage("Ovale_CheckBoxValueChanged", name)
 end
 
 local function OnDropDownValueChanged(widget)
 	-- Reflect the value change into the profile (model).
-	local profile = OvaleOptions:GetProfile()
 	local name = widget:GetUserData("name")
-	profile.list[name] = widget:GetValue()
+	Ovale.db.profile.list[name] = widget:GetValue()
 	Ovale:SendMessage("Ovale_ListValueChanged", name)
 end
 --</private-static-methods>
 
 --<public-static-methods>
 function Ovale:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleOptions = self:GetModule("OvaleOptions")
 	-- Register message prefix for the addon.
 	API_RegisterAddonMessagePrefix(self.MSG_PREFIX)
 	-- Localization.
@@ -217,7 +214,7 @@ end
 
 function Ovale:UpdateVisibility()
 	local visible = true
-	local profile = OvaleOptions:GetProfile()
+	local profile = self.db.profile
 
 	if not self.frame.hider:IsVisible() then
 		visible = false
@@ -251,7 +248,7 @@ function Ovale:ResetControls()
 end
 
 function Ovale:UpdateControls()
-	local profile = OvaleOptions:GetProfile()
+	local profile = self.db.profile
 
 	-- Create a new CheckBox widget for each checkbox declared in the script.
 	wipe(self.checkBoxWidget)
@@ -300,8 +297,7 @@ end
 
 
 function Ovale:UpdateFrame()
-	local profile = OvaleOptions:GetProfile()
-	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", profile.left, profile.top)
+	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.left, self.db.profile.top)
 	self.frame:ReleaseChildren()
 	self.frame:UpdateIcons()
 	self:UpdateControls()
@@ -342,7 +338,7 @@ end
 
 -- Set the k'th checkbox control to the specified on/off (true/false) value.
 function Ovale:SetCheckBox(k, on)
-	local profile = OvaleOptions:GetProfile()
+	local profile = self.db.profile
 	for name, widget in pairs(self.checkBoxWidget) do
 		if k == 0 then
 			widget:SetValue(on)
@@ -355,7 +351,7 @@ end
 
 -- Toggle the k'th checkbox control.
 function Ovale:ToggleCheckBox(k)
-	local profile = OvaleOptions:GetProfile()
+	local profile = self.db.profile
 	for name, widget in pairs(self.checkBoxWidget) do
 		if k == 0 then
 			local on = not widget:GetValue()
@@ -395,14 +391,14 @@ function Ovale:FormatPrint(...)
 end
 
 function Ovale:DebugPrint(flag, ...)
-	local global = OvaleOptions.db.global
+	local global = self.db.global
 	if global and global.debug and global.debug[flag] then
 		self:Print("[" .. flag .. "]", ...)
 	end
 end
 
 function Ovale:DebugPrintf(flag, ...)
-	local global = OvaleOptions.db.global
+	local global = self.db.global
 	if global and global.debug and global.debug[flag] then
 		local addTimestamp = select(1, ...)
 		if type(addTimestamp) == "boolean" or type(addTimestamp) == "nil" then

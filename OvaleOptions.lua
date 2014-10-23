@@ -42,10 +42,10 @@ local self_options =
 			type = "group",
 			-- Generic getter/setter for options.
 			get = function(info)
-				return OvaleOptions.db.profile.apparence[info[#info]]
+				return Ovale.db.profile.apparence[info[#info]]
 			end,
 			set = function(info, value)
-				OvaleOptions.db.profile.apparence[info[#info]] = value
+				Ovale.db.profile.apparence[info[#info]] = value
 				OvaleOptions:SendMessage("Ovale_OptionChanged", info[#info - 1])
 			end,
 			args =
@@ -181,10 +181,10 @@ local self_options =
 							desc = "Maximum time to wait (in milliseconds) before refreshing icons.",
 							min = 0, max = 500, step = 10,
 							get = function(info)
-								return OvaleOptions.db.profile.apparence.updateInterval * 1000
+								return Ovale.db.profile.apparence.updateInterval * 1000
 							end,
 							set = function(info, value)
-								OvaleOptions.db.profile.apparence.updateInterval = value / 1000
+								Ovale.db.profile.apparence.updateInterval = value / 1000
 								self:SendMessage("Ovale_OptionChanged")
 							end
 						},
@@ -247,10 +247,10 @@ local self_options =
 							name = L["Opacité des options"],
 							min = 0, max = 100, step = 5,
 							get = function(info)
-								return OvaleOptions.db.profile.apparence.optionsAlpha * 100
+								return Ovale.db.profile.apparence.optionsAlpha * 100
 							end,
 							set = function(info, value)
-								OvaleOptions.db.profile.apparence.optionsAlpha = value / 100
+								Ovale.db.profile.apparence.optionsAlpha = value / 100
 								Ovale.frame.content:SetAlpha(value/100)
 								self:SendMessage("Ovale_OptionChanged")
 							end
@@ -310,11 +310,11 @@ local self_options =
 					name = L["Script"],
 					width = "double",
 					values = function(info)
-						local scriptType = not OvaleOptions.db.profile.showHiddenScripts and "script"
+						local scriptType = not Ovale.db.profile.showHiddenScripts and "script"
 						return OvaleScripts:GetDescriptions(scriptType)
 					end,
 					get = function(info)
-						return OvaleOptions.db.profile.source
+						return Ovale.db.profile.source
 					end,
 					set = function(info, v)
 						OvaleOptions:SetScript(v)
@@ -328,10 +328,10 @@ local self_options =
 					name = L["Code"],
 					width = "full",
 					disabled = function()
-						return OvaleOptions.db.profile.source ~= "custom"
+						return Ovale.db.profile.source ~= "custom"
 					end,
 					get = function(info)
-						local source = OvaleOptions.db.profile.source
+						local source = Ovale.db.profile.source
 						local code
 						if source and OvaleScripts.script[source] then
 							code = OvaleScripts.script[source].code
@@ -342,7 +342,7 @@ local self_options =
 					end,
 					set = function(info, v)
 						OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], v, "script")
-						OvaleOptions.db.profile.code = v
+						Ovale.db.profile.code = v
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
 				},
@@ -352,13 +352,13 @@ local self_options =
 					type = "execute",
 					name = L["Copier sur Script personnalisé"],
 					disabled = function()
-						return OvaleOptions.db.profile.source == "custom"
+						return Ovale.db.profile.source == "custom"
 					end,
 					confirm = function()
 						return L["Ecraser le Script personnalisé préexistant?"]
 					end,
 					func = function()
-						local source = OvaleOptions.db.profile.source
+						local source = Ovale.db.profile.source
 						local code
 						if source and OvaleScripts.script[source] then
 							code = OvaleScripts.script[source].code
@@ -366,8 +366,8 @@ local self_options =
 							code = ""
 						end
 						OvaleScripts.script["custom"].code = code
-						OvaleOptions.db.profile.source = "custom"
-						OvaleOptions.db.profile.code = code
+						Ovale.db.profile.source = "custom"
+						Ovale.db.profile.code = code
 						OvaleOptions:SendMessage("Ovale_ScriptChanged")
 					end,
 				},
@@ -375,8 +375,8 @@ local self_options =
 					order = 40,
 					type = "toggle",
 					name = L["Show hidden"],
-					get = function(info) return OvaleOptions.db.profile.showHiddenScripts end,
-					set = function(info, value) OvaleOptions.db.profile.showHiddenScripts = value end
+					get = function(info) return Ovale.db.profile.showHiddenScripts end,
+					set = function(info, value) Ovale.db.profile.showHiddenScripts = value end
 				},
 			},
 		},
@@ -473,8 +473,8 @@ local self_options =
 							type = "toggle",
 						},
 					},
-					get = function(info) return OvaleOptions.db.global.debug[info[#info]] end,
-					set = function(info, value) OvaleOptions.db.global.debug[info[#info]] = value end,
+					get = function(info) return Ovale.db.global.debug[info[#info]] end,
+					set = function(info, value) Ovale.db.global.debug[info[#info]] = value end,
 				},
 				trace =
 				{
@@ -578,7 +578,7 @@ local self_options =
 					name = L["Afficher la fenêtre"],
 					guiHidden = true,
 					func = function()
-						OvaleOptions.db.profile.display = true
+						Ovale.db.profile.display = true
 						Ovale:UpdateVisibility()
 					end
 				},
@@ -588,7 +588,7 @@ local self_options =
 					name = L["Cacher la fenêtre"],
 					guiHidden = true,
 					func = function()
-						OvaleOptions.db.profile.display = false
+						Ovale.db.profile.display = false
 						Ovale.frame:Hide()	
 					end
 				},
@@ -698,10 +698,6 @@ local self_options =
 }
 --</private-static-properties>
 
---<public-static-properties>
-OvaleOptions.db = nil
---</public-static-properties>
-
 --<public-static-methods>
 function OvaleOptions:OnInitialize()
 	-- Resolve module dependencies.
@@ -709,7 +705,7 @@ function OvaleOptions:OnInitialize()
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 
-	self.db = LibStub("AceDB-3.0"):New("OvaleDB",
+	local db = LibStub("AceDB-3.0"):New("OvaleDB",
 	{
 		global = {
 			debug = {},
@@ -751,15 +747,22 @@ function OvaleOptions:OnInitialize()
 		},
 	})
 
-	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(db)
 
 	-- Add dual-spec support
 	local LibDualSpec = LibStub("LibDualSpec-1.0",true)
 	if LibDualSpec then
-		LibDualSpec:EnhanceDatabase(self.db, "Ovale")
-		LibDualSpec:EnhanceOptions(self_options.args.profile, self.db)
+		LibDualSpec:EnhanceDatabase(db, "Ovale")
+		LibDualSpec:EnhanceOptions(self_options.args.profile, db)
 	end
 	
+	db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
+	db.RegisterCallback( self, "OnProfileReset", "HandleProfileChanges" )
+	db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
+	db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
+
+	Ovale.db = db
+
 	AceConfig:RegisterOptionsTable("Ovale", self_options.args.code)
 	AceConfig:RegisterOptionsTable("Ovale Actions", self_options.args.actions, "Ovale")
 	AceConfig:RegisterOptionsTable("Ovale Profile", self_options.args.profile)
@@ -771,12 +774,7 @@ function OvaleOptions:OnInitialize()
 	AceConfigDialog:AddToBlizOptions("Ovale Apparence", L["Apparence"], "Ovale")
 	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", "Ovale")
 
-	self.db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
-	self.db.RegisterCallback( self, "OnProfileReset", "HandleProfileChanges" )
-	self.db.RegisterCallback( self, "OnProfileChanged", "HandleProfileChanges" )
-	self.db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
-
-	OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], self.db.profile.code)
+	OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], db.profile.code)
 end
 
 function OvaleOptions:OnEnable()
@@ -787,14 +785,10 @@ function OvaleOptions:HandleProfileChanges()
 	self:SendMessage("Ovale_ScriptChanged")
 end
 
-function OvaleOptions:GetProfile()
-	return self.db.profile
-end
-
 function OvaleOptions:SetScript(name)
-	local oldSource = self.db.profile.source
+	local oldSource = Ovale.db.profile.source
 	if oldSource ~= name then
-		self.db.profile.source = name
+		Ovale.db.profile.source = name
 		self:SendMessage("Ovale_ScriptChanged")
 	end
 end
