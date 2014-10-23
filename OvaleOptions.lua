@@ -473,8 +473,8 @@ local self_options =
 							type = "toggle",
 						},
 					},
-					get = function(info) return OvaleOptions.db.profile.debug[info[#info]] end,
-					set = function(info, value) OvaleOptions.db.profile.debug[info[#info]] = value end,
+					get = function(info) return OvaleOptions.db.global.debug[info[#info]] end,
+					set = function(info, value) OvaleOptions.db.global.debug[info[#info]] = value end,
 				},
 				trace =
 				{
@@ -711,8 +711,10 @@ function OvaleOptions:OnInitialize()
 
 	self.db = LibStub("AceDB-3.0"):New("OvaleDB",
 	{
-		profile = 
-		{
+		global = {
+			debug = {},
+		},
+		profile = {
 			display = true,
 			showHiddenScripts = false,
 			source = "Ovale",
@@ -721,7 +723,6 @@ function OvaleOptions:OnInitialize()
 			top = 500,
 			check = {},
 			list = {},
-			debug = {},
 			apparence = {
 				enCombat = false,
 				iconScale = 1,
@@ -747,7 +748,7 @@ function OvaleOptions:OnInitialize()
 				updateInterval = 0.1,
 				auraLag = 400,
 			}
-		}
+		},
 	})
 
 	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)

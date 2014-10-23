@@ -395,15 +395,15 @@ function Ovale:FormatPrint(...)
 end
 
 function Ovale:DebugPrint(flag, ...)
-	local profile = OvaleOptions:GetProfile()
-	if profile and profile.debug and profile.debug[flag] then
+	local global = OvaleOptions.db.global
+	if global and global.debug and global.debug[flag] then
 		self:Print("[" .. flag .. "]", ...)
 	end
 end
 
 function Ovale:DebugPrintf(flag, ...)
-	local profile = OvaleOptions:GetProfile()
-	if profile and profile.debug and profile.debug[flag] then
+	local global = OvaleOptions.db.global
+	if global and global.debug and global.debug[flag] then
 		local addTimestamp = select(1, ...)
 		if type(addTimestamp) == "boolean" or type(addTimestamp) == "nil" then
 			if addTimestamp then
