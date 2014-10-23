@@ -36,9 +36,6 @@ local OVALE_FALSE_STRING = tostring(false)
 local OVALE_NIL_STRING = tostring(nil)
 local OVALE_TRUE_STRING = tostring(true)
 
--- Addon message prefix.
-local OVALE_MSG_PREFIX = OVALE
-
 -- Flags used by debugging print functions.
 -- If "bug" flag is set, then the next frame refresh is traced.
 local self_bug = false
@@ -71,6 +68,8 @@ Ovale.trace = false
 Ovale.enCombat = false
 Ovale.refreshNeeded = {}
 Ovale.combatStartTime = nil
+-- Prefix of messages received via CHAT_MSG_ADDON for Ovale.
+Ovale.MSG_PREFIX = OVALE
 --</public-static-properties>
 
 --<private-static-methods>
@@ -96,7 +95,7 @@ function Ovale:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleOptions = self:GetModule("OvaleOptions")
 	-- Register message prefix for the addon.
-	API_RegisterAddonMessagePrefix(OVALE_MSG_PREFIX)
+	API_RegisterAddonMessagePrefix(self.MSG_PREFIX)
 	-- Localization.
 	L = Ovale.L
 	-- Key bindings.
@@ -137,13 +136,13 @@ do
 
 	function Ovale:CHAT_MSG_ADDON(event, ...)
 		local prefix, message, channel, sender = ...
-		if prefix == OVALE_MSG_PREFIX then
+		if prefix == self.MSG_PREFIX then
 			local ok, msgType, version = self:Deserialize(message)
 			if ok then
 				if msgType == "V" then
 					local msg = self:Serialize("VR", self.version)
 					local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
-					API_SendAddonMessage(OVALE_MSG_PREFIX, msg, channel)
+					API_SendAddonMessage(self.MSG_PREFIX, msg, channel)
 				elseif msgType == "VR" then
 					versionReply[sender] = version
 				end
@@ -156,7 +155,7 @@ do
 			wipe(versionReply)
 			local message = self:Serialize("V", self.version)
 			local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
-			API_SendAddonMessage(OVALE_MSG_PREFIX, message, channel)
+			API_SendAddonMessage(self.MSG_PREFIX, message, channel)
 			timer = self:ScheduleTimer("PrintVersionCheck", 3)
 		end
 	end

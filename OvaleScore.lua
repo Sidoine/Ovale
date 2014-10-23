@@ -36,14 +36,12 @@ local API_SendAddonMessage = SendAddonMessage
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
+local MSG_PREFIX = Ovale.MSG_PREFIX
 
 -- Player's GUID.
 local self_guid = nil
 -- Player's name.
 local self_name = nil
-
--- Addon message prefix.
-local OVALE_MSG_PREFIX = OVALE
 --</private-static-properties>
 
 --<public-static-properties>
@@ -77,7 +75,7 @@ end
 -- Receive scores for damage meters from other Ovale addons in the raid.
 function OvaleScore:CHAT_MSG_ADDON(event, ...)
 	local prefix, message, channel, sender = ...
-	if prefix == OVALE_MSG_PREFIX then
+	if prefix == MSG_PREFIX then
 		local ok, msgType, scored, scoreMax, guid = self:Deserialize(message)
 		if ok and msgType == "S" then
 			self:SendScore(sender, guid, scored, scoreMax)
@@ -91,7 +89,7 @@ function OvaleScore:PLAYER_REGEN_ENABLED()
 	if self.maxScore > 0 and API_IsInGroup() then
 		local message = self:Serialize("score", self,score, self.maxScore, self_guid)
 		local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
-		API_SendAddonMessage(OVALE_MSG_PREFIX, message, channel)
+		API_SendAddonMessage(MSG_PREFIX, message, channel)
 	end
 end
 
