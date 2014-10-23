@@ -6,7 +6,7 @@
 
 -- Ovale options and UI
 
-local addonName, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent-3.0")
 Ovale.OvaleOptions = OvaleOptions
 

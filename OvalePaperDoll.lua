@@ -5,7 +5,7 @@
 
 -- This addon tracks the player's stats as available on the in-game paper doll.
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 Ovale.OvalePaperDoll = OvalePaperDoll
 

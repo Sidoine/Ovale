@@ -3,7 +3,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local addonName, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleDataBroker = Ovale:NewModule("OvaleDataBroker", "AceEvent-3.0")
 Ovale.OvaleDataBroker = OvaleDataBroker
 
@@ -71,7 +71,7 @@ local function OnClick(frame, button)
 end
 
 local function OnTooltipShow(tooltip)
-	self_tooltipTitle = self_tooltipTitle or addonName .. " " .. Ovale.version
+	self_tooltipTitle = self_tooltipTitle or OVALE .. " " .. Ovale.version
 	tooltip:SetText(self_tooltipTitle)
 	tooltip:AddLine(L["Click to select the script."])
 	tooltip:AddLine(L["Right-Click for options."])
@@ -93,7 +93,7 @@ function OvaleDataBroker:OnInitialize()
 			OnClick = OnClick,
 			OnTooltipShow = OnTooltipShow,
 		}
-		self.broker = LibDataBroker:NewDataObject(addonName, broker)
+		self.broker = LibDataBroker:NewDataObject(OVALE, broker)
 	end
 end
 

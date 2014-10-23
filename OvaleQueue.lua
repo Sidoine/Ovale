@@ -4,7 +4,7 @@
 --]]--------------------------------------------------------------------
 
 -- Double-ended queue.
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleQueue = {}
 Ovale.OvaleQueue = OvaleQueue
 

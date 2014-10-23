@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
 Ovale.OvaleCompile = OvaleCompile
 

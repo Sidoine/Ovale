@@ -24,7 +24,7 @@
 	or a method name for the module with the given name.
 ]]--
 
-local addonName, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0", "AceSerializer-3.0")
 Ovale.OvaleScore = OvaleScore
 
@@ -43,7 +43,7 @@ local self_guid = nil
 local self_name = nil
 
 -- Addon message prefix.
-local OVALE_MSG_PREFIX = addonName
+local OVALE_MSG_PREFIX = OVALE
 --</private-static-properties>
 
 --<public-static-properties>

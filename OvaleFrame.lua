@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local addonName, Ovale = ...
+local OVALE, Ovale = ...
 
 --<class name="OvaleFrame" inherits="Frame" />
 do
@@ -19,7 +19,7 @@ do
 	local OvaleState = Ovale.OvaleState
 	local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
-	local Type = addonName .. "Frame"
+	local Type = OVALE .. "Frame"
 	local Version = 7
 
 	local pairs = pairs
@@ -358,12 +358,12 @@ do
 				local icon
 				if not node.secure then
 					if not action.icons[l] then
-						action.icons[l] = API_CreateFrame("CheckButton", "Icon"..k.."n"..l, self.frame, addonName .. "IconTemplate");
+						action.icons[l] = API_CreateFrame("CheckButton", "Icon"..k.."n"..l, self.frame, OVALE .. "IconTemplate");
 					end
 					icon = action.icons[l]
 				else
 					if not action.secureIcons[l] then
-						action.secureIcons[l] = API_CreateFrame("CheckButton", "SecureIcon"..k.."n"..l, self.frame, "Secure" .. addonName .. "IconTemplate");
+						action.secureIcons[l] = API_CreateFrame("CheckButton", "SecureIcon"..k.."n"..l, self.frame, "Secure" .. OVALE .. "IconTemplate");
 					end
 					icon = action.secureIcons[l]
 				end
@@ -413,7 +413,7 @@ do
 	
 	local function Constructor()
 		-- Create parent frame for Ovale that auto-hides/shows based on whether the Pet Battle UI is active.
-		local hider = API_CreateFrame("Frame", addonName .. "PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
+		local hider = API_CreateFrame("Frame", OVALE .. "PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
 		hider:SetAllPoints(true)
 		API_RegisterStateDriver(hider, "visibility", "[petbattle] hide; show")
 
@@ -443,7 +443,7 @@ do
 		self.barre = self.frame:CreateTexture();
 		self.content = API_CreateFrame("Frame",nil,frame)
 		if Masque then
-			self.skinGroup = Masque:Group(addonName)
+			self.skinGroup = Masque:Group(OVALE)
 		end
 		self.lastUpdate = nil
 		--Cheating with frame object which has an obj property

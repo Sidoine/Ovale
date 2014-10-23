@@ -6,7 +6,7 @@
 
 -- Gather information about ennemies
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0", "AceTimer-3.0")
 Ovale.OvaleEnemies = OvaleEnemies
 

@@ -4,7 +4,7 @@
 --]]--------------------------------------------------------------------
 
 -- This module wraps the standard Lua garbage collector using the Pool interface.
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvalePoolGC = {}
 Ovale.OvalePoolGC = OvalePoolGC
 

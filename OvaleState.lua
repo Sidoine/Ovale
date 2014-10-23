@@ -8,7 +8,7 @@
 	This addon is the core of the state machine for the simulator.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleState = Ovale:NewModule("OvaleState")
 Ovale.OvaleState = OvaleState
 

@@ -4,7 +4,7 @@
 --]]--------------------------------------------------------------------
 
 -- Simple resource pool.
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvalePool = {}
 Ovale.OvalePool = OvalePool
 

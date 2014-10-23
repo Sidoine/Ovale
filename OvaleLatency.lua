@@ -3,7 +3,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleLatency = Ovale:NewModule("OvaleLatency", "AceEvent-3.0")
 Ovale.OvaleLatency = OvaleLatency
 

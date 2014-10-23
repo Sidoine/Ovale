@@ -3,7 +3,7 @@
     See the file LICENSE.txt for copying permission.
 --]]-------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvalePassiveAura = Ovale:NewModule("OvalePassiveAura", "AceEvent-3.0")
 Ovale.OvalePassiveAura = OvalePassiveAura
 

@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local addonName, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleRecount = Ovale:NewModule("OvaleRecount")
 Ovale.OvaleRecount = OvaleRecount
 
@@ -50,7 +50,7 @@ function OvaleRecount:OnInitialize()
 		if not L then
 			L = setmetatable({}, { __index = function(t, k) t[k] = k; return k; end })
 		end
-		Recount:AddModeTooltip(addonName, DataModes, TooltipFuncs, nil, nil, nil, nil)
+		Recount:AddModeTooltip(OVALE, DataModes, TooltipFuncs, nil, nil, nil, nil)
 	end
 end
 
@@ -68,8 +68,8 @@ function OvaleRecount:ReceiveScore(name, guid, scored, scoreMax)
 	if Recount then
 		local source = Recount.db2.combatants[name]
 		if source then
-			Recount:AddAmount(source, addonName, scored)
-			Recount:AddAmount(source, addonName .. "Max", scoreMax)
+			Recount:AddAmount(source, OVALE, scored)
+			Recount:AddAmount(source, OVALE .. "Max", scoreMax)
 		end
 	end
 end

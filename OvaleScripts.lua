@@ -5,7 +5,7 @@
 
 -- This addon is a script repository.
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleScripts = Ovale:NewModule("OvaleScripts")
 Ovale.OvaleScripts = OvaleScripts
 

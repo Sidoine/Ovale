@@ -15,7 +15,7 @@
 	ReferenceCount()		the count of references to this table.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvalePoolRefCount = {}
 Ovale.OvalePoolRefCount = OvalePoolRefCount
 

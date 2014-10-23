@@ -38,7 +38,7 @@
 		basically returns how much time is left within the time interval.
 --]]----------------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleCondition = Ovale:NewModule("OvaleCondition")
 Ovale.OvaleCondition = OvaleCondition
 

@@ -5,7 +5,7 @@
 
 -- This addon tracks the number of combo points on the player.
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 Ovale.OvaleComboPoints = OvaleComboPoints
 

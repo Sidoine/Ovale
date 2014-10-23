@@ -16,7 +16,7 @@
 	No "mouseover" unit IDs receive events.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0")
 Ovale.OvaleGUID = OvaleGUID
 

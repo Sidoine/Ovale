@@ -26,7 +26,7 @@
 	public or state methods.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleBanditsGuile = Ovale:NewModule("OvaleBanditsGuile", "AceEvent-3.0")
 Ovale.OvaleBanditsGuile = OvaleBanditsGuile
 

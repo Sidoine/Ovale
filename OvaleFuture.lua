@@ -6,7 +6,7 @@
 
 -- The travelling missiles or spells that have been cast but whose effects were not still not applied
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleFuture = Ovale:NewModule("OvaleFuture", "AceEvent-3.0")
 Ovale.OvaleFuture = OvaleFuture
 

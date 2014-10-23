@@ -6,7 +6,7 @@
 
 -- This addon tracks the player's active spells, talents, and glyphs.
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleSpellBook = Ovale:NewModule("OvaleSpellBook", "AceEvent-3.0")
 Ovale.OvaleSpellBook = OvaleSpellBook
 

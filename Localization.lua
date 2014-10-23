@@ -3,7 +3,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 
 local rawset = rawset
 local setmetatable = setmetatable

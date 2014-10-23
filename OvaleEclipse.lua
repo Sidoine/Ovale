@@ -7,7 +7,7 @@
 	This addon tracks Eclipse energy information on druids.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleEclipse = Ovale:NewModule("OvaleEclipse", "AceEvent-3.0")
 Ovale.OvaleEclipse = OvaleEclipse
 

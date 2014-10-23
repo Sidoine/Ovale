@@ -8,7 +8,7 @@
 	the two timestamps is calculated and attributed to that function.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local Profiler = {}
 Ovale.Profiler = Profiler
 

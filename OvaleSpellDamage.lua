@@ -6,7 +6,7 @@
 
 -- Add-on that registers how many damage made the last spell cast by the player
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleSpellDamage = Ovale:NewModule("OvaleSpellDamage", "AceEvent-3.0")
 Ovale.OvaleSpellDamage = OvaleSpellDamage
 

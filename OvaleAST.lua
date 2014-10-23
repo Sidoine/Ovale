@@ -16,7 +16,7 @@
 		ast.child
 --]]----------------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleAST = Ovale:NewModule("OvaleAST")
 Ovale.OvaleAST = OvaleAST
 

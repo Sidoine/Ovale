@@ -3,7 +3,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleSimulationCraft = Ovale:NewModule("OvaleSimulationCraft")
 Ovale.OvaleSimulationCraft = OvaleSimulationCraft
 

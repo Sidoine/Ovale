@@ -10,7 +10,7 @@
 	TODO: Handle spells in the simulator that reactivate runes, e.g., Empower Rune Weapon, Blood Tap, etc.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleRunes = Ovale:NewModule("OvaleRunes", "AceEvent-3.0")
 Ovale.OvaleRunes = OvaleRunes
 

@@ -5,7 +5,7 @@
 
 -- This addon tracks the player's current stance.
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleStance = Ovale:NewModule("OvaleStance", "AceEvent-3.0")
 Ovale.OvaleStance = OvaleStance
 

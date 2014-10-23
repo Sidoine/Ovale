@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 
 local LibBabbleCreatureType = LibStub("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub("LibRangeCheck-2.0", true)

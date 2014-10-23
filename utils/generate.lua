@@ -67,7 +67,7 @@ for filename in dir:lines() do
 			local profile = OvaleSimulationCraft:ParseProfile(simc)
 			local name = format("SimulationCraft: %s", strsub(profile.annotation.name, 2, -2))
 			wipe(output)
-			output[#output + 1] = "local _, Ovale = ..."
+			output[#output + 1] = "local OVALE, Ovale = ..."
 			output[#output + 1] = "local OvaleScripts = Ovale.OvaleScripts"
 			output[#output + 1] = ""
 			output[#output + 1] = "do"

@@ -4,8 +4,8 @@
     See the file LICENSE.txt for copying permission.
 --]]----------------------------------------------------------------------
 
-local addonName, addonTable = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, addonName, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
+local OVALE, addonTable = ...
+Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, OVALE, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
 
 --<private-static-properties>
 local AceGUI = LibStub("AceGUI-3.0")
@@ -37,7 +37,7 @@ local OVALE_NIL_STRING = tostring(nil)
 local OVALE_TRUE_STRING = tostring(true)
 
 -- Addon message prefix.
-local OVALE_MSG_PREFIX = addonName
+local OVALE_MSG_PREFIX = OVALE
 
 -- Flags used by debugging print functions.
 -- If "bug" flag is set, then the next frame refresh is traced.
@@ -100,7 +100,7 @@ function Ovale:OnInitialize()
 	-- Localization.
 	L = Ovale.L
 	-- Key bindings.
-	BINDING_HEADER_OVALE = addonName
+	BINDING_HEADER_OVALE = OVALE
 	local toggleCheckBox = L["Inverser la boîte à cocher "]
 	BINDING_NAME_OVALE_CHECKBOX0 = toggleCheckBox .. "(1)"
 	BINDING_NAME_OVALE_CHECKBOX1 = toggleCheckBox .. "(2)"
@@ -117,7 +117,7 @@ function Ovale:OnEnable()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterMessage("Ovale_OptionChanged")
 
-	self.frame = AceGUI:Create(addonName .. "Frame")
+	self.frame = AceGUI:Create(OVALE .. "Frame")
 	self:UpdateFrame()
 end
 

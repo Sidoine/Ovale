@@ -21,7 +21,7 @@
 	aura using OvaleAura's public or state methods.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleSteadyFocus = Ovale:NewModule("OvaleSteadyFocus", "AceEvent-3.0")
 Ovale.OvaleSteadyFocus = OvaleSteadyFocus
 

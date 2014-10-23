@@ -7,7 +7,7 @@
 	This addon tracks all auras for all units.
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 Ovale.OvaleAura = OvaleAura
 

@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleCooldown = Ovale:NewModule("OvaleCooldown", "AceEvent-3.0")
 Ovale.OvaleCooldown = OvaleCooldown
 

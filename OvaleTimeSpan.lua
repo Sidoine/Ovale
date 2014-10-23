@@ -16,7 +16,7 @@
 		Intersection
 --]]
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleTimeSpan = {}
 Ovale.OvaleTimeSpan = OvaleTimeSpan
 

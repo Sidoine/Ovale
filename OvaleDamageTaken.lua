@@ -5,7 +5,7 @@
 
 -- This addon tracks the damage taken by the player from non-player sources.
 
-local _, Ovale = ...
+local OVALE, Ovale = ...
 local OvaleDamageTaken = Ovale:NewModule("OvaleDamageTaken", "AceEvent-3.0")
 Ovale.OvaleDamageTaken = OvaleDamageTaken
 
