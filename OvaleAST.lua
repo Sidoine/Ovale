@@ -32,6 +32,7 @@ local OvaleSpellBook = nil
 
 local format = string.format
 local gsub = string.gsub
+local ipairs = ipairs
 local next = next
 local pairs = pairs
 local rawset = rawset
@@ -369,6 +370,13 @@ local function FlattenParameterValue(parameterValue)
 			value = node.name
 		elseif node.type == "string" then
 			value = node.value
+		elseif node.type == "comma_separated_values" then
+			local output = self_outputPool:Get()
+			for k, v in ipairs(node.csv) do
+				output[k] = FlattenParameterValue(v)
+			end
+			value = tconcat(output, ",")
+			self_outputPool:Release(output)
 		end
 		if isBang then
 			value = "!" .. tostring(value)
@@ -407,6 +415,7 @@ local UnparseAddIcon = nil
 local UnparseAddListItem = nil
 local UnparseBangValue = nil
 local UnparseComment = nil
+local UnparseCommaSeparatedValues = nil
 local UnparseDefine = nil
 local UnparseExpression = nil
 local UnparseFunction = nil
@@ -485,6 +494,16 @@ end
 
 UnparseComment = function(node)
 	return "#" .. node.comment
+end
+
+UnparseCommaSeparatedValues = function(node)
+	local output = self_outputPool:Get()
+	for k, v in ipairs(node.csv) do
+		output[#output + 1] = Unparse(v)
+	end
+	local outputString = tconcat(output, ",")
+	self_outputPool:Release(output)
+	return outputString
 end
 
 UnparseDefine = function(node)
@@ -582,7 +601,8 @@ UnparseIf = function(node)
 end
 
 UnparseItemInfo = function(node)
-	return format("ItemInfo(%s %s)", node.name, UnparseParameters(node.rawParams))
+	local identifier = node.name and node.name or node.itemId
+	return format("ItemInfo(%s %s)", identifier, UnparseParameters(node.rawParams))
 end
 
 UnparseList = function(node)
@@ -646,11 +666,13 @@ UnparseScript = function(node)
 end
 
 UnparseSpellAuraList = function(node)
-	return format("%s(%s %s)", node.keyword, node.name, UnparseParameters(node.rawParams))
+	local identifier = node.name and node.name or node.spellId
+	return format("%s(%s %s)", node.keyword, identifier, UnparseParameters(node.rawParams))
 end
 
 UnparseSpellInfo = function(node)
-	return format("SpellInfo(%s %s)", node.name, UnparseParameters(node.rawParams))
+	local identifier = node.name and node.name or node.spellId
+	return format("SpellInfo(%s %s)", identifier, UnparseParameters(node.rawParams))
 end
 
 UnparseString = function(node)
@@ -685,6 +707,7 @@ do
 		["bang_value"] = UnparseBangValue,
 		["checkbox"] = UnparseAddCheckBox,
 		["compare"] = UnparseExpression,
+		["comma_separated_values"] = UnparseCommaSeparatedValues,
 		["comment"] = UnparseComment,
 		["custom_function"] = UnparseFunction,
 		["define"] = UnparseDefine,
@@ -764,6 +787,7 @@ local ParseParentheses = nil
 local ParseScoreSpells = nil
 local ParseScript = nil
 local ParseSimpleExpression = nil
+local ParseSimpleParameterValue = nil
 local ParseSpellAuraList = nil
 local ParseSpellInfo = nil
 local ParseString = nil
@@ -1456,7 +1480,7 @@ ParseItemInfo = function(tokenStream, nodeList, annotation)
 	if ok then
 		local tokenType, token = tokenStream:Consume()
 		if tokenType == "number" then
-			spellId = token
+			itemId = token
 		elseif tokenType == "name" then
 			name = token
 		else
@@ -1577,27 +1601,30 @@ end
 
 ParseParameterValue = function(tokenStream, nodeList, annotation)
 	local ok = true
-	local isBang = false
-	local tokenType, token = tokenStream:Peek()
-	if tokenType == "!" then
-		isBang = true
-		-- Consume the '!' token.
-		tokenStream:Consume()
-	end
-	local expressionNode
-	tokenType, token = tokenStream:Peek()
-	if tokenType == "(" or tokenType == "-" then
-		ok, expressionNode = ParseExpression(tokenStream, nodeList, annotation)
-	else
-		ok, expressionNode = ParseSimpleExpression(tokenStream, nodeList, annotation)
-	end
 	local node
-	if isBang then
-		node = OvaleAST:NewNode(nodeList, true)
-		node.type = "bang_value"
-		node.child[1] = expressionNode
-	else
-		node = expressionNode
+	local tokenType, token
+	local parameters
+	repeat
+		ok, node = ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+		if ok and node then
+			tokenType, token = tokenStream:Peek()
+			if tokenType == "," then
+				-- Consume the ',' token.
+				tokenStream:Consume()
+				parameters = parameters or self_parametersPool:Get()
+			end
+			if parameters then
+				parameters[#parameters + 1] = node
+			end
+		end
+	until not ok or tokenType ~= ","
+	if ok and parameters then
+		-- This was a list of comma-separated values.
+		node = OvaleAST:NewNode(nodeList)
+		node.type = "comma_separated_values"
+		node.csv = parameters
+		annotation.parametersList = annotation.parametersList or {}
+		annotation.parametersList[#annotation.parametersList + 1] = parameters
 	end
 	return ok, node
 end
@@ -1645,7 +1672,7 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 						local control = parameters[name] or self_controlPool:Get()
 						if name == "checkbox" then
 							-- Get the checkbox name.
-							ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
+							ok, node = ParseSimpleParameterValue(tokenStream, nodeList, annotation)
 							if ok and node then
 								-- Check afterwards that the parameter value is only "name" or "!name".
 								if not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
@@ -1676,7 +1703,7 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 							end
 							if ok then
 								-- Consume the list item.
-								ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
+								ok, node = ParseSimpleParameterValue(tokenStream, nodeList, annotation)
 							end
 							if ok and node then
 								-- Check afterwards that the parameter value is only "name" or "!name".
@@ -1855,6 +1882,33 @@ ParseSimpleExpression = function(tokenStream, nodeList, annotation)
 		tokenStream:Consume()
 		SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
 		ok = false
+	end
+	return ok, node
+end
+
+ParseSimpleParameterValue = function(tokenStream, nodeList, annotation)
+	local ok = true
+	local isBang = false
+	local tokenType, token = tokenStream:Peek()
+	if tokenType == "!" then
+		isBang = true
+		-- Consume the '!' token.
+		tokenStream:Consume()
+	end
+	local expressionNode
+	tokenType, token = tokenStream:Peek()
+	if tokenType == "(" or tokenType == "-" then
+		ok, expressionNode = ParseExpression(tokenStream, nodeList, annotation)
+	else
+		ok, expressionNode = ParseSimpleExpression(tokenStream, nodeList, annotation)
+	end
+	local node
+	if isBang then
+		node = OvaleAST:NewNode(nodeList, true)
+		node.type = "bang_value"
+		node.child[1] = expressionNode
+	else
+		node = expressionNode
 	end
 	return ok, node
 end
@@ -2149,7 +2203,7 @@ do
 		["action"] = ParseFunction,
 		["add_function"] = ParseAddFunction,
 		["arithmetic"] = ParseExpression,
-		["bang_value"] = ParseParameterValue,
+		["bang_value"] = ParseSimpleParameterValue,
 		["checkbox"] = ParseAddCheckBox,
 		["compare"] = ParseExpression,
 		["comment"] = ParseComment,
