@@ -1646,6 +1646,13 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 						if name == "checkbox" then
 							-- Get the checkbox name.
 							ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
+							if ok and node then
+								-- Check afterwards that the parameter value is only "name" or "!name".
+								if not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
+									SyntaxError(tokenStream, "Syntax error: 'checkbox' parameter with unexpected value '%s'.", Unparse(node))
+									ok = false
+								end
+							end
 							if ok then
 								control[#control + 1] = node
 							end
@@ -1670,6 +1677,13 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 							if ok then
 								-- Consume the list item.
 								ok, node = ParseParameterValue(tokenStream, nodeList, annotation)
+							end
+							if ok and node then
+								-- Check afterwards that the parameter value is only "name" or "!name".
+								if not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
+									SyntaxError(tokenStream, "Syntax error: 'listitem=%s' parameter with unexpected value '%s'.", Unparse(node))
+									ok = false
+								end
 							end
 							if ok then
 								control[list] = node
