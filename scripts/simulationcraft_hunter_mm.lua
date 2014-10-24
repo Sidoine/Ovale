@@ -60,7 +60,7 @@ AddFunction MarksmanshipDefaultActions
 	Spell(rapid_fire)
 	#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=20
 	if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 Spell(stampede)
-	#run_action_list,name=careful_aim,if=buff.careful_aim.up
+	#call_action_list,name=careful_aim,if=buff.careful_aim.up
 	if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
 	#explosive_trap,if=active_enemies>2
 	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)

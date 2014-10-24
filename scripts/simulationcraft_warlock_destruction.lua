@@ -58,9 +58,9 @@ AddFunction DestructionDefaultActions
 	#chaos_bolt,if=buff.backdraft.stack<3&(burning_ember>=3.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up|(burning_ember>=3&buff.ember_master.react))
 	if BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) } Spell(chaos_bolt)
 	#immolate,if=remains<=(duration*0.3)
-	if target.DebuffRemaining(immolate_debuff) <= target.DebuffDurationIfApplied(immolate_debuff) * 0.3 Spell(immolate)
+	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#rain_of_fire,if=(!ticking|(talent.mannoroths_fury.enabled&buff.mannoroths_fury.up&buff.mannoroths_fury.remains<1))
-	if not target.DebuffPresent(rain_of_fire_aftermath_debuff) or Talent(mannoroths_fury_talent) and BuffPresent(mannoroths_fury_buff) and BuffRemaining(mannoroths_fury_buff) < 1 Spell(rain_of_fire_aftermath)
+	if not target.DebuffPresent(rain_of_fire_debuff) or Talent(mannoroths_fury_talent) and BuffPresent(mannoroths_fury_buff) and BuffRemaining(mannoroths_fury_buff) < 1 Spell(rain_of_fire)
 	#conflagrate
 	Spell(conflagrate)
 	#incinerate
@@ -131,8 +131,8 @@ AddIcon specialization=destruction help=aoe
 # mannoroths_fury
 # mannoroths_fury_buff
 # mannoroths_fury_talent
-# rain_of_fire_aftermath
-# rain_of_fire_aftermath_debuff
+# rain_of_fire
+# rain_of_fire_debuff
 # shadowburn
 # summon_doomguard
 # summon_felhunter

@@ -47,9 +47,9 @@ AddFunction BalanceDefaultActions
 	if BuffPresent(celestial_alignment_buff) Spell(arcane_torrent_energy)
 	#force_of_nature,if=trinket.stat.intellect.up|charges=3|target.time_to_die<21
 	if BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 Spell(force_of_nature_caster)
-	#run_action_list,name=single_target,if=active_enemies=1
+	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 BalanceSingleTargetActions()
-	#run_action_list,name=aoe,if=active_enemies>1
+	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 BalanceAoeActions()
 }
 

@@ -86,8 +86,8 @@ AddFunction SurvivalAoeActions
 {
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up|buff.archmages_incandescence_agi.up))
 	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
-	#explosive_shot,if=buff.lock_and_load.react&cooldown.barrage.remains>0
-	if BuffPresent(lock_and_load_buff) and SpellCooldown(barrage) > 0 Spell(explosive_shot)
+	#explosive_shot,if=buff.lock_and_load.react&(!talent.barrage.enabled|cooldown.barrage.remains>0)
+	if BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } Spell(explosive_shot)
 	#barrage
 	Spell(barrage)
 	#explosive_shot,if=active_enemies<5
@@ -151,6 +151,7 @@ AddIcon specialization=survival help=aoe
 # archmages_greater_incandescence_agi_buff
 # archmages_incandescence_agi_buff
 # barrage
+# barrage_talent
 # berserking
 # black_arrow
 # black_arrow_debuff

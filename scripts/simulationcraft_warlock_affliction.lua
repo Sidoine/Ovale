@@ -72,11 +72,11 @@ AddFunction AfflictionDefaultActions
 	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&((buff.soulburn.up&buff.haunting_spirits.remains<5)|soul_shard=4)
 	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { BuffPresent(soulburn_buff) and BuffRemaining(haunting_spirits_buff) < 5 or SoulShards() == 4 } Spell(haunt)
 	#agony,cycle_targets=1,if=target.time_to_die>16&remains<=(duration*0.3)&((talent.cataclysm.enabled&remains<=(cooldown.cataclysm.remains+action.cataclysm.cast_time))|!talent.cataclysm.enabled)
-	if target.TimeToDie() > 16 and target.DebuffRemaining(agony_debuff) <= target.DebuffDurationIfApplied(agony_debuff) * 0.3 and { Talent(cataclysm_talent) and target.DebuffRemaining(agony_debuff) <= SpellCooldown(cataclysm) + CastTime(cataclysm) or not Talent(cataclysm_talent) } Spell(agony)
+	if target.TimeToDie() > 16 and target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and { Talent(cataclysm_talent) and target.DebuffRemaining(agony_debuff) <= SpellCooldown(cataclysm) + CastTime(cataclysm) or not Talent(cataclysm_talent) } Spell(agony)
 	#unstable_affliction,cycle_targets=1,if=target.time_to_die>10&remains<=(duration*0.3)
-	if target.TimeToDie() > 10 and target.DebuffRemaining(unstable_affliction_debuff) <= target.DebuffDurationIfApplied(unstable_affliction_debuff) * 0.3 Spell(unstable_affliction)
+	if target.TimeToDie() > 10 and target.DebuffRemaining(unstable_affliction_debuff) <= BaseDuration(unstable_affliction_debuff) * 0.3 Spell(unstable_affliction)
 	#corruption,cycle_targets=1,if=target.time_to_die>12&remains<=(duration*0.3)
-	if target.TimeToDie() > 12 and target.DebuffRemaining(corruption_debuff) <= target.DebuffDurationIfApplied(corruption_debuff) * 0.3 Spell(corruption)
+	if target.TimeToDie() > 12 and target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 Spell(corruption)
 	#life_tap,if=mana.pct<40
 	if ManaPercent() < 40 Spell(life_tap)
 	#drain_soul,interrupt=1,chain=1

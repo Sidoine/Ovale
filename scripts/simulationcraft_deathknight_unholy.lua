@@ -57,9 +57,9 @@ AddFunction UnholyDefaultActions
 	Spell(arcane_torrent_runicpower)
 	#potion,name=mogu_power,if=buff.dark_transformation.up&target.time_to_die<=60
 	if pet.BuffPresent(dark_transformation_buff any=1) and target.TimeToDie() <= 60 UsePotionStrength()
-	#run_action_list,name=aoe,if=active_enemies>=2
+	#call_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeActions()
-	#run_action_list,name=single_target,if=active_enemies<2
+	#call_action_list,name=single_target,if=active_enemies<2
 	if Enemies() < 2 UnholySingleTargetActions()
 }
 
@@ -93,6 +93,8 @@ AddFunction UnholyAoeActions
 	if Talent(defile_talent) and RunicPower() < 89 Spell(defile)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
+	#call_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
+	if target.DebuffPresent(breath_of_sindragosa_debuff) UnholyBosAoeActions()
 	#blood_boil,if=blood=2|(frost=2&death=2)
 	if Runes(blood 2) or Runes(frost 2) and Runes(death 2) and not Runes(death 3) Spell(blood_boil)
 	#summon_gargoyle
@@ -175,7 +177,7 @@ AddFunction UnholySingleTargetActions
 	if BuffStacks(shadow_infusion_buff) >= 5 Spell(dark_transformation)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
-	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
+	#call_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 	if target.DebuffPresent(breath_of_sindragosa_debuff) UnholyBosStActions()
 	#death_and_decay,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
 	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(death_and_decay)

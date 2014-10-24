@@ -106,52 +106,32 @@ AddFunction RetributionDefaultActions
 
 AddFunction RetributionAoeActions
 {
-	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>3)
-	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } Spell(divine_storm)
-	#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2&talent.empowered_seals.enabled
-	unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and Talent(empowered_seals_talent) and SpellCooldown(judgment) > 0
+	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
+	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(divine_storm)
+	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
+	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
+	#hammer_of_the_righteous
+	Spell(hammer_of_the_righteous)
+	#wait,sec=cooldown.hammer_of_the_righteous.remains,if=cooldown.hammer_of_the_righteous.remains>0&cooldown.hammer_of_the_righteous.remains<=0.4
+	unless SpellCooldown(hammer_of_the_righteous) > 0 and SpellCooldown(hammer_of_the_righteous) <= 0.4 and SpellCooldown(hammer_of_the_righteous) > 0
 	{
-		#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-		if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
-		#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2&buff.blazing_contempt.up
-		unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and BuffPresent(blazing_contempt_buff) and SpellCooldown(exorcism) > 0
+		#judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<=5
+		if Talent(empowered_seals_talent) and Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= 5 Spell(judgment)
+		#hammer_of_wrath
+		Spell(hammer_of_wrath)
+		#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.4
+		unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.4 and SpellCooldown(hammer_of_wrath) > 0
 		{
-			#hammer_of_the_righteous
-			Spell(hammer_of_the_righteous)
-			#wait,sec=cooldown.hammer_of_the_righteous.remains,if=cooldown.hammer_of_the_righteous.remains>0&cooldown.hammer_of_the_righteous.remains<=0.2
-			unless SpellCooldown(hammer_of_the_righteous) > 0 and SpellCooldown(hammer_of_the_righteous) <= 0.2 and SpellCooldown(hammer_of_the_righteous) > 0
-			{
-				#judgment,if=talent.empowered_seals.enabled&((buff.seal_of_righteousness.up&buff.liadrins_righteousness.down)|buff.liadrins_righteousness.remains<=5)
-				if Talent(empowered_seals_talent) and { BuffPresent(seal_of_righteousness_buff) and BuffExpires(liadrins_righteousness_buff) or BuffRemaining(liadrins_righteousness_buff) <= 5 } Spell(judgment)
-				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2&talent.empowered_seals.enabled
-				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and Talent(empowered_seals_talent) and SpellCooldown(judgment) > 0
-				{
-					#hammer_of_wrath
-					Spell(hammer_of_wrath)
-					#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.2
-					unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.2 and SpellCooldown(hammer_of_wrath) > 0
-					{
-						#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>3)
-						if not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 Spell(divine_storm)
-						#exorcism,if=glyph.mass_exorcism.enabled
-						if Glyph(glyph_of_mass_exorcism) Exorcism()
-						#judgment
-						Spell(judgment)
-						#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2
-						unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and SpellCooldown(judgment) > 0
-						{
-							#exorcism
-							Exorcism()
-							#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2
-							unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and SpellCooldown(exorcism) > 0
-							{
-								#holy_prism
-								Spell(holy_prism)
-							}
-						}
-					}
-				}
-			}
+			#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
+			if not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 Spell(divine_storm)
+			#exorcism,if=glyph.mass_exorcism.enabled
+			if Glyph(glyph_of_mass_exorcism) Exorcism()
+			#judgment
+			Spell(judgment)
+			#exorcism
+			Exorcism()
+			#holy_prism
+			Spell(holy_prism)
 		}
 	}
 }
@@ -164,8 +144,8 @@ AddFunction RetributionSingleActions
 	if BuffPresent(divine_crusader_buff) and HolyPower() == 5 and Enemies() == 2 and not Talent(final_verdict_talent) Spell(divine_storm)
 	#divine_storm,if=holy_power=5&active_enemies=2&buff.final_verdict.up
 	if HolyPower() == 5 and Enemies() == 2 and BuffPresent(final_verdict_buff) Spell(divine_storm)
-	#templars_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>3)
-	if HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } Spell(templars_verdict)
+	#templars_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
+	if HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
 	#templars_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<4
 	if BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < 4 Spell(templars_verdict)
 	#final_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3
@@ -174,68 +154,54 @@ AddFunction RetributionSingleActions
 	if BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < 4 Spell(final_verdict)
 	#hammer_of_wrath
 	Spell(hammer_of_wrath)
-	#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.2
-	unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.2 and SpellCooldown(hammer_of_wrath) > 0
+	#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.4
+	unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.4 and SpellCooldown(hammer_of_wrath) > 0
 	{
-		#judgment,if=talent.empowered_seals.enabled&((buff.seal_of_truth.up&buff.maraads_truth.down)|(buff.seal_of_righteousness.up&buff.liadrins_righteousness.down|cooldown.avenging_wrath.remains<=3))
-		if Talent(empowered_seals_talent) and { BuffPresent(seal_of_truth_buff) and BuffExpires(maraads_truth_buff) or BuffPresent(seal_of_righteousness_buff) and BuffExpires(liadrins_righteousness_buff) or SpellCooldown(avenging_wrath_melee) <= 3 } Spell(judgment)
-		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2&talent.empowered_seals.enabled
-		unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and Talent(empowered_seals_talent) and SpellCooldown(judgment) > 0
+		#judgment,if=talent.empowered_seals.enabled&((seal.truth&buff.maraads_truth.down)|(seal.righteousness&buff.liadrins_righteousness.down))&cooldown.avenging_wrath.remains<=3
+		if Talent(empowered_seals_talent) and { Stance(paladin_seal_of_truth) and BuffExpires(maraads_truth_buff) or Stance(paladin_seal_of_righteousness) and BuffExpires(liadrins_righteousness_buff) } and SpellCooldown(avenging_wrath_melee) <= 3 Spell(judgment)
+		#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
+		if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
+		#divine_storm,if=buff.divine_crusader.react&buff.final_verdict.up
+		if BuffPresent(divine_crusader_buff) and BuffPresent(final_verdict_buff) Spell(divine_storm)
+		#judgment,if=talent.empowered_seals.enabled&((seal.truth&buff.maraads_truth.remains<=6)|(seal.righteousness&buff.liadrins_righteousness.remains<=6))
+		if Talent(empowered_seals_talent) and { Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) <= 6 or Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= 6 } Spell(judgment)
+		#seal_of_truth,if=talent.empowered_seals.enabled&buff.maraads_truth.remains<(cooldown.judgment.remains+2*cooldown.judgment.duration)
+		if Talent(empowered_seals_talent) and BuffRemaining(maraads_truth_buff) < SpellCooldown(judgment) + 2 * SpellCooldownDuration(judgment) Spell(seal_of_truth)
+		#seal_of_truth,if=talent.empowered_seals.enabled&cooldown.avenging_wrath.remains<(cooldown.judgment.remains+2*cooldown.judgment.duration)
+		if Talent(empowered_seals_talent) and SpellCooldown(avenging_wrath_melee) < SpellCooldown(judgment) + 2 * SpellCooldownDuration(judgment) Spell(seal_of_truth)
+		#seal_of_truth,if=talent.empowered_seals.enabled&buff.maraads_truth.down
+		if Talent(empowered_seals_talent) and BuffExpires(maraads_truth_buff) Spell(seal_of_truth)
+		#templars_verdict,if=buff.avenging_wrath.up&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
+		if BuffPresent(avenging_wrath_melee_buff) and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
+		#divine_storm,if=talent.divine_purpose.enabled&buff.divine_crusader.react&buff.avenging_wrath.up&!talent.final_verdict.enabled
+		if Talent(divine_purpose_talent) and BuffPresent(divine_crusader_buff) and BuffPresent(avenging_wrath_melee_buff) and not Talent(final_verdict_talent) Spell(divine_storm)
+		#crusader_strike
+		Spell(crusader_strike)
+		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.4
+		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.4 and SpellCooldown(crusader_strike) > 0
 		{
-			#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-			if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
-			#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2&buff.blazing_contempt.up
-			unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and BuffPresent(blazing_contempt_buff) and SpellCooldown(exorcism) > 0
-			{
-				#divine_storm,if=buff.divine_crusader.react&buff.final_verdict.up
-				if BuffPresent(divine_crusader_buff) and BuffPresent(final_verdict_buff) Spell(divine_storm)
-				#judgment,if=talent.empowered_seals.enabled&(buff.seal_of_truth.up&buff.maraads_truth.remains<=6)|(buff.seal_of_righteousness.up&buff.liadrins_righteousness.remains<=6)
-				if Talent(empowered_seals_talent) and BuffPresent(seal_of_truth_buff) and BuffRemaining(maraads_truth_buff) <= 6 or BuffPresent(seal_of_righteousness_buff) and BuffRemaining(liadrins_righteousness_buff) <= 6 Spell(judgment)
-				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2&talent.empowered_seals.enabled
-				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and Talent(empowered_seals_talent) and SpellCooldown(judgment) > 0
-				{
-					#seal_of_truth,if=talent.empowered_seals.enabled&(buff.maraads_truth.remains<cooldown.judgment.remains*3|cooldown.avenging_wrath.remains<cooldown.judgment.remains*3|buff.maraads_truth.down)
-					if Talent(empowered_seals_talent) and { BuffRemaining(maraads_truth_buff) < SpellCooldown(judgment) * 3 or SpellCooldown(avenging_wrath_melee) < SpellCooldown(judgment) * 3 or BuffExpires(maraads_truth_buff) } Spell(seal_of_truth)
-					#templars_verdict,if=buff.avenging_wrath.up&(!talent.seraphim.enabled|cooldown.seraphim.remains>3)
-					if BuffPresent(avenging_wrath_melee_buff) and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } Spell(templars_verdict)
-					#divine_storm,if=talent.divine_purpose.enabled&buff.divine_crusader.react&buff.avenging_wrath.up&!talent.final_verdict.enabled
-					if Talent(divine_purpose_talent) and BuffPresent(divine_crusader_buff) and BuffPresent(avenging_wrath_melee_buff) and not Talent(final_verdict_talent) Spell(divine_storm)
-					#crusader_strike
-					Spell(crusader_strike)
-					#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.2
-					unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.2 and SpellCooldown(crusader_strike) > 0
-					{
-						#final_verdict
-						Spell(final_verdict)
-						#seal_of_righteousness,if=talent.empowered_seals.enabled&(buff.maraads_truth.remains>cooldown.judgment.remains*3&buff.liadrins_righteousness.remains<=3|buff.liadrins_righteousness.down)
-						if Talent(empowered_seals_talent) and { BuffRemaining(maraads_truth_buff) > SpellCooldown(judgment) * 3 and BuffRemaining(liadrins_righteousness_buff) <= 3 or BuffExpires(liadrins_righteousness_buff) } Spell(seal_of_righteousness)
-						#judgment
-						Spell(judgment)
-						#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2
-						unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and SpellCooldown(judgment) > 0
-						{
-							#seal_of_righteousness,if=talent.empowered_seals.enabled&buff.liadrins_righteousness.remains<=6
-							if Talent(empowered_seals_talent) and BuffRemaining(liadrins_righteousness_buff) <= 6 Spell(seal_of_righteousness)
-							#templars_verdict,if=buff.divine_purpose.react
-							if BuffPresent(divine_purpose_buff) Spell(templars_verdict)
-							#divine_storm,if=buff.divine_crusader.react&!talent.final_verdict.enabled
-							if BuffPresent(divine_crusader_buff) and not Talent(final_verdict_talent) Spell(divine_storm)
-							#templars_verdict,if=holy_power>=4&(!talent.seraphim.enabled|cooldown.seraphim.remains>3)
-							if HolyPower() >= 4 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } Spell(templars_verdict)
-							#exorcism
-							Exorcism()
-							#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2
-							unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and SpellCooldown(exorcism) > 0
-							{
-								#templars_verdict,if=holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>3)
-								if HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } Spell(templars_verdict)
-								#holy_prism
-								Spell(holy_prism)
-							}
-						}
-					}
-				}
-			}
+			#final_verdict
+			Spell(final_verdict)
+			#seal_of_righteousness,if=talent.empowered_seals.enabled&buff.maraads_truth.remains>(cooldown.judgment.remains+2*cooldown.judgment.duration)&buff.liadrins_righteousness.remains<=3
+			if Talent(empowered_seals_talent) and BuffRemaining(maraads_truth_buff) > SpellCooldown(judgment) + 2 * SpellCooldownDuration(judgment) and BuffRemaining(liadrins_righteousness_buff) <= 3 Spell(seal_of_righteousness)
+			#seal_of_righteousness,if=talent.empowered_seals.enabled&buff.liadrins_righteousness.down
+			if Talent(empowered_seals_talent) and BuffExpires(liadrins_righteousness_buff) Spell(seal_of_righteousness)
+			#judgment
+			Spell(judgment)
+			#seal_of_righteousness,if=talent.empowered_seals.enabled&buff.liadrins_righteousness.remains<=6
+			if Talent(empowered_seals_talent) and BuffRemaining(liadrins_righteousness_buff) <= 6 Spell(seal_of_righteousness)
+			#templars_verdict,if=buff.divine_purpose.react
+			if BuffPresent(divine_purpose_buff) Spell(templars_verdict)
+			#divine_storm,if=buff.divine_crusader.react&!talent.final_verdict.enabled
+			if BuffPresent(divine_crusader_buff) and not Talent(final_verdict_talent) Spell(divine_storm)
+			#templars_verdict,if=holy_power>=4&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
+			if HolyPower() >= 4 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
+			#exorcism
+			Exorcism()
+			#templars_verdict,if=holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
+			if HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
+			#holy_prism
+			Spell(holy_prism)
 		}
 	}
 }
@@ -246,52 +212,32 @@ AddFunction RetributionCleaveActions
 	if BuffExpires(final_verdict_buff) and HolyPower() == 5 Spell(final_verdict)
 	#divine_storm,if=holy_power=5&buff.final_verdict.up
 	if HolyPower() == 5 and BuffPresent(final_verdict_buff) Spell(divine_storm)
-	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>3)&!talent.final_verdict.enabled
-	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } and not Talent(final_verdict_talent) Spell(divine_storm)
-	#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2&talent.empowered_seals.enabled
-	unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and Talent(empowered_seals_talent) and SpellCooldown(judgment) > 0
+	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
+	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
+	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
+	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
+	#hammer_of_wrath
+	Spell(hammer_of_wrath)
+	#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.4
+	unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.4 and SpellCooldown(hammer_of_wrath) > 0
 	{
-		#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-		if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
-		#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2&buff.blazing_contempt.up
-		unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and BuffPresent(blazing_contempt_buff) and SpellCooldown(exorcism) > 0
+		#judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<=5
+		if Talent(empowered_seals_talent) and Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= 5 Spell(judgment)
+		#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
+		if { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
+		#crusader_strike
+		Spell(crusader_strike)
+		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.4
+		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.4 and SpellCooldown(crusader_strike) > 0
 		{
-			#hammer_of_wrath
-			Spell(hammer_of_wrath)
-			#wait,sec=cooldown.hammer_of_wrath.remains,if=cooldown.hammer_of_wrath.remains>0&cooldown.hammer_of_wrath.remains<=0.2
-			unless SpellCooldown(hammer_of_wrath) > 0 and SpellCooldown(hammer_of_wrath) <= 0.2 and SpellCooldown(hammer_of_wrath) > 0
-			{
-				#judgment,if=talent.empowered_seals.enabled&((buff.seal_of_righteousness.up&buff.liadrins_righteousness.down)|buff.liadrins_righteousness.remains<=5)
-				if Talent(empowered_seals_talent) and { BuffPresent(seal_of_righteousness_buff) and BuffExpires(liadrins_righteousness_buff) or BuffRemaining(liadrins_righteousness_buff) <= 5 } Spell(judgment)
-				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2&talent.empowered_seals.enabled
-				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and Talent(empowered_seals_talent) and SpellCooldown(judgment) > 0
-				{
-					#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>3)&!talent.final_verdict.enabled
-					if { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 3 } and not Talent(final_verdict_talent) Spell(divine_storm)
-					#crusader_strike
-					Spell(crusader_strike)
-					#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.2
-					unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.2 and SpellCooldown(crusader_strike) > 0
-					{
-						#divine_storm,if=buff.final_verdict.up
-						if BuffPresent(final_verdict_buff) Spell(divine_storm)
-						#judgment
-						Spell(judgment)
-						#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.2
-						unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.2 and SpellCooldown(judgment) > 0
-						{
-							#exorcism
-							Exorcism()
-							#wait,sec=cooldown.exorcism.remains,if=cooldown.exorcism.remains>0&cooldown.exorcism.remains<=0.2
-							unless SpellCooldown(exorcism) > 0 and SpellCooldown(exorcism) <= 0.2 and SpellCooldown(exorcism) > 0
-							{
-								#holy_prism
-								Spell(holy_prism)
-							}
-						}
-					}
-				}
-			}
+			#divine_storm,if=buff.final_verdict.up
+			if BuffPresent(final_verdict_buff) Spell(divine_storm)
+			#judgment
+			Spell(judgment)
+			#exorcism
+			Exorcism()
+			#holy_prism
+			Spell(holy_prism)
 		}
 	}
 }
@@ -347,9 +293,7 @@ AddIcon specialization=retribution help=aoe
 # rebuke
 # righteous_fury
 # seal_of_righteousness
-# seal_of_righteousness_buff
 # seal_of_truth
-# seal_of_truth_buff
 # seraphim
 # seraphim_talent
 # speed_of_light

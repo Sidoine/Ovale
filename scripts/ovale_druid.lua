@@ -62,7 +62,7 @@ AddFunction FeralDefaultActions
 	FeralDefaultPredictActions()
 	#pool_resource,for_next=1
 	#thrash_cat,if=remains<=duration*0.3&active_enemies>1
-	unless target.DebuffRemaining(thrash_cat_debuff) <= target.DebuffDurationIfApplied(thrash_cat_debuff) * 0.3 and Enemies() > 1 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
+	unless target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() > 1 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
 	{
 		#rake,cycle_targets=1,if=persistent_multiplier>dot.rake.pmultiplier&combo_points<5
 		if DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) and ComboPoints() < 5 Spell(rake)
@@ -85,24 +85,26 @@ AddFunction FeralDefaultPredictActions
 	#savage_roar,if=buff.savage_roar.remains<3
 	if BuffRemaining(savage_roar_buff) < 3 Spell(savage_roar)
 	#thrash_cat,if=buff.omen_of_clarity.react&remains<=duration*0.3&active_enemies>1
-	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemaining(thrash_cat_debuff) <= target.DebuffDurationIfApplied(thrash_cat_debuff) * 0.3 and Enemies() > 1 Spell(thrash_cat)
-	#ferocious_bite,cycle_targets=1,if=combo_points=5&target.health.pct<25&dot.rip.ticking
-	if ComboPoints() == 5 and target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) Spell(ferocious_bite)
+	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() > 1 Spell(thrash_cat)
+	#ferocious_bite,cycle_targets=1,if=combo_points=5&target.health.pct<25&dot.rip.ticking&energy>=max_fb_energy
+	if ComboPoints() == 5 and target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
 	#rip,cycle_targets=1,if=combo_points=5&remains<=3
 	if ComboPoints() == 5 and target.DebuffRemaining(rip_debuff) <= 3 Spell(rip)
 	#rip,cycle_targets=1,if=combo_points=5&remains<=duration*0.3&persistent_multiplier>dot.rip.pmultiplier
-	if ComboPoints() == 5 and target.DebuffRemaining(rip_debuff) <= target.DebuffDurationIfApplied(rip_debuff) * 0.3 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) Spell(rip)
+	if ComboPoints() == 5 and target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) Spell(rip)
 	#savage_roar,if=combo_points=5&(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&buff.savage_roar.remains<42*0.3
 	if ComboPoints() == 5 and { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 42 * 0.3 Spell(savage_roar)
-	#ferocious_bite,if=combo_points=5&(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)
-	if ComboPoints() == 5 and { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } Spell(ferocious_bite)
+	#ferocious_bite,if=combo_points=5&(energy.time_to_max<=1|buff.berserk.up|(cooldown.tigers_fury.remains<3&energy>=max_fb_energy))
+	if ComboPoints() == 5 and { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 and Energy() >= EnergyCost(ferocious_bite max=1) } Spell(ferocious_bite)
 	#rake,cycle_targets=1,if=remains<=3&combo_points<5
 	if target.DebuffRemaining(rake_debuff) <= 3 and ComboPoints() < 5 Spell(rake)
 	#rake,cycle_targets=1,if=remains<=duration*0.3&combo_points<5&persistent_multiplier>dot.rake.pmultiplier
-	if target.DebuffRemaining(rake_debuff) <= target.DebuffDurationIfApplied(rake_debuff) * 0.3 and ComboPoints() < 5 and DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) Spell(rake)
+	if target.DebuffRemaining(rake_debuff) <= BaseDuration(rake_debuff) * 0.3 and ComboPoints() < 5 and DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) Spell(rake)
+	#thrash_cat,if=combo_points=5&buff.omen_of_clarity.react
+	if ComboPoints() == 5 and BuffPresent(omen_of_clarity_melee_buff) Spell(thrash_cat)
 	#pool_resource,for_next=1
 	#thrash_cat,if=remains<=duration*0.3&active_enemies>1
-	if target.DebuffRemaining(thrash_cat_debuff) <= target.DebuffDurationIfApplied(thrash_cat_debuff) * 0.3 and Enemies() > 1 Spell(thrash_cat)
+	if target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() > 1 Spell(thrash_cat)
 }
 
 AddFunction FeralDefaultShortCdActions
@@ -116,6 +118,13 @@ AddFunction FeralDefaultShortCdActions
 	if not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(tigers_fury)
 }
 
+# CHANGE: Helper function for Tiger's Fury sync condition.
+AddFunction FeralTigersFurySyncCondition
+{
+	#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
+	BuffPresent(tigers_fury_buff) or { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and not SpellCooldown(tigers_fury) > 0
+}
+
 AddFunction FeralDefaultCdActions
 {
 	unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
@@ -127,29 +136,24 @@ AddFunction FeralDefaultCdActions
 		#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
 		#blood_fury,sync=tigers_fury
 		#if not SpellCooldown(tigers_fury) > 0 Spell(blood_fury_apsp)
-		if BuffPresent(tigers_fury_buff) or not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(blood_fury_apsp)
+		if FeralTigersFurySyncCondition() Spell(blood_fury_apsp)
 		#berserking,sync=tigers_fury
 		#if not SpellCooldown(tigers_fury) > 0 Spell(berserking)
-		if BuffPresent(tigers_fury_buff) or not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(berserking)
+		if FeralTigersFurySyncCondition() Spell(berserking)
 		#arcane_torrent,sync=tigers_fury
 		#if not SpellCooldown(tigers_fury) > 0 Spell(arcane_torrent_energy)
-		if BuffPresent(tigers_fury_buff) or not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(arcane_torrent_energy)
+		if FeralTigersFurySyncCondition() Spell(arcane_torrent_energy)
 		#incarnation,sync=tigers_fury
 		#if not SpellCooldown(tigers_fury) > 0 Spell(incarnation_melee)
-		if BuffPresent(tigers_fury_buff) or not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(incarnation_melee)
+		if FeralTigersFurySyncCondition() Spell(incarnation_melee)
+		#potion,name=tolvir,sync=berserk,if=target.health.pct<25
+		#if target.HealthPercent() < 25 and not SpellCooldown(berserk_cat) > 0 UsePotionAgility()
+		if target.HealthPercent() < 25 and { BuffPresent(berserk_cat_buff) or FeralTigersFurySyncCondition() and SpellCooldown(berserk_cat) > 0 } UsePotionAgility()
 		#berserk,if=buff.tigers_fury.up
 		#if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
-		if BuffPresent(tigers_fury_buff) or not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80  Spell(berserk_cat)
+		if FeralTigersFurySyncCondition() Spell(berserk_cat)
 		#shadowmeld,if=(buff.bloodtalons.up|!talent.bloodtalons.enabled)&dot.rake.remains<0.3*dot.rake.duration
 		if { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and target.DebuffRemaining(rake_debuff) < 0.3 * target.DebuffDuration(rake_debuff) Spell(shadowmeld)
-
-		unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) <= 3 and target.HealthPercent() < 25 and Spell(ferocious_bite)
-			or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 4 or BuffRemaining(predatory_swiftness_buff) < 1.5 } and Spell(healing_touch)
-			or BuffRemaining(savage_roar_buff) < 3 and Spell(savage_roar)
-		{
-			#potion,name=tolvir,sync=berserk,if=target.health.pct<25
-			if target.HealthPercent() < 25 and not SpellCooldown(berserk_cat) > 0 UsePotionAgility()
-		}
 	}
 }
 

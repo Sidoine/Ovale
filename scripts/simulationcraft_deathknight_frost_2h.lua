@@ -71,9 +71,9 @@ AddFunction FrostDefaultActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
-	#run_action_list,name=aoe,if=active_enemies>=3
+	#call_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostAoeActions()
-	#run_action_list,name=single_target,if=active_enemies<3
+	#call_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostSingleTargetActions()
 }
 
@@ -107,6 +107,8 @@ AddFunction FrostAoeActions
 	Spell(defile)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
+	#call_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
+	if target.DebuffPresent(breath_of_sindragosa_debuff) FrostBosAoeActions()
 	#howling_blast
 	Spell(howling_blast)
 	#blood_tap,if=buff.blood_charge.stack>10
@@ -167,6 +169,8 @@ AddFunction FrostSingleTargetActions
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
+	#call_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
+	if target.DebuffPresent(breath_of_sindragosa_debuff) FrostBosStActions()
 	#obliterate,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<76
 	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 Spell(obliterate)
 	#howling_blast,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<3&runic_power<88
@@ -235,6 +239,7 @@ AddIcon specialization=frost help=aoe
 # blood_tap
 # blood_tap_talent
 # breath_of_sindragosa
+# breath_of_sindragosa_debuff
 # breath_of_sindragosa_talent
 # death_and_decay
 # deaths_advance

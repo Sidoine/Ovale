@@ -963,7 +963,9 @@ local function InitializeDisambiguation()
 	AddDisambiguation("dark_soul",				"dark_soul_instability",		"WARLOCK",		"destruction")
 	AddDisambiguation("dark_soul",				"dark_soul_knowledge",			"WARLOCK",		"demonology")
 	AddDisambiguation("dark_soul",				"dark_soul_misery",				"WARLOCK",		"affliction")
-	AddDisambiguation("rain_of_fire",			"rain_of_fire_aftermath",		"WARLOCK",		"destruction")
+	AddDisambiguation("glyph_of_dark_soul_instability",	"glyph_of_dark_soul",	"WARLOCK",		"destruction")
+	AddDisambiguation("glyph_of_dark_soul_knowledge",	"glyph_of_dark_soul",	"WARLOCK",		"demonology")
+	AddDisambiguation("glyph_of_dark_soul_misery",		"glyph_of_dark_soul",	"WARLOCK",		"affliction")
 	AddDisambiguation("trinket_proc_any_buff",	"trinket_proc_intellect_buff",	"WARLOCK")	-- XXX
 	AddDisambiguation("trinket_stacking_proc_any_buff",	"trinket_stacking_proc_intellect_buff",	"WARLOCK")	-- XXX
 	-- Warrior
@@ -1175,11 +1177,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "ROGUE" and action == "slice_and_dice" then
-			-- The game does not prevent the player from overwriting a longer Slice and Dice buff with a shorter one.
+		elseif class == "ROGUE" and specialization == "subtlety" and action == "slice_and_dice" then
+			-- The game does not prevent a Subtlety rogue from overwriting a longer Slice and Dice buff with a shorter one.
 			local buffName = "slice_and_dice_buff"
 			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffDurationIfApplied(%s) > BuffRemaining(%s)", buffName, buffName)
+			conditionCode = format("BuffRemaining(%s) < 0.3 * BaseDuration(%s)", buffName, buffName)
 		elseif class == "ROGUE" and action == "stealth" then
 			-- Don't Stealth if already stealthed.
 			conditionCode = "BuffExpires(stealthed_buff any=1)"
@@ -1207,7 +1209,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "cancel_metamorphosis" then
-			bodyCode = "Texture(spell_shadow_demonform text=cancel)"
+			spellName = "metamorphosis"
+			buffName = "metamorphosis_buff"
+			AddSymbol(annotation, spellName)
+			AddSymbol(annotation, buffName)
+			bodyCode = format("Spell(%s text=cancel)", spellName)
+			conditionCode = format("BuffPresent(%s)", buffName)
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "felguard_felstorm" then
 			conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)"
@@ -1826,7 +1833,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	elseif property == "cooldown_react" then
 		code = format("not SpellCooldown(%s) > 0", name)
 	elseif property == "duration" then
-		code = format("%s%sDurationIfApplied(%s)", buffTarget, prefix, buffName)
+		code = format("BaseDuration(%s)", buffName)
 		symbol = buffName
 	elseif property == "enabled" then
 		code = format("Talent(%s)", talentName)
@@ -1955,7 +1962,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 		elseif property == "down" then
 			code = format("%s%sExpires(%s%s)", target, prefix, buffName, any)
 		elseif property == "duration" then
-			code = format("%s%sDurationIfApplied(%s)", target, prefix, buffName)
+			code = format("BaseDuration(%s)", buffName)
 		elseif property == "max_stack" then
 			local maxStack = 1
 			if buffName == "lightning_shield_buff" then
@@ -2452,7 +2459,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 
 	target = target and (target .. ".") or ""
 	local code
-	if class == "HUNTER" and operand == "buff.beast_cleave.down" then
+	if class == "DRUID" and operand == "max_fb_energy" then
+		-- SimulationCraft's max_fb_energy is the maximum cost of Ferocious Bite if used.
+		local spellName = "ferocious_bite"
+		code = format("EnergyCost(%s max=1)", spellName)
+		AddSymbol(annotation, spellName)
+	elseif class == "HUNTER" and operand == "buff.beast_cleave.down" then
 		-- Beast Cleave is a buff on the hunter's pet.
 		local buffName = "pet_beast_cleave_buff"
 		code = format("pet.BuffExpires(%s any=1)", buffName)

@@ -74,7 +74,7 @@ AddFunction AssassinationPrecombatActions
 	#marked_for_death
 	Spell(marked_for_death)
 	#slice_and_dice,if=talent.marked_for_death.enabled
-	if Talent(marked_for_death_talent) and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if Talent(marked_for_death_talent) Spell(slice_and_dice)
 }
 
 AddFunction AssassinationPrecombatShortCdActions {}
@@ -99,7 +99,7 @@ AddFunction AssassinationDefaultActions
 	#mutilate,if=buff.stealth.up
 	if BuffPresent(stealthed_buff any=1) Spell(mutilate)
 	#slice_and_dice,if=buff.slice_and_dice.remains<5
-	if BuffRemaining(slice_and_dice_buff) < 5 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if BuffRemaining(slice_and_dice_buff) < 5 Spell(slice_and_dice)
 	#marked_for_death,if=combo_points=0
 	if ComboPoints() == 0 Spell(marked_for_death)
 	#crimson_tempest,if=combo_points>4&active_enemies>=4&remains<8
@@ -107,7 +107,7 @@ AddFunction AssassinationDefaultActions
 	#fan_of_knives,if=combo_points<5&active_enemies>=4
 	if ComboPoints() < 5 and Enemies() >= 4 Spell(fan_of_knives)
 	#rupture,if=(remains<2|(combo_points=5&remains<=(duration*0.3)))&active_enemies=1
-	if { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= target.DebuffDurationIfApplied(rupture_debuff) * 0.3 } and Enemies() == 1 Spell(rupture)
+	if { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 } and Enemies() == 1 Spell(rupture)
 	#envenom,cycle_targets=1,if=(combo_points>4&buff.envenom.remains<2&(cooldown.death_from_above.remains>2|!talent.death_from_above.enabled))&active_enemies<4&!dot.deadly_poison_dot.ticking
 	if ComboPoints() > 4 and BuffRemaining(envenom_buff) < 2 and { SpellCooldown(death_from_above) > 2 or not Talent(death_from_above_talent) } and Enemies() < 4 and not target.DebuffPresent(deadly_poison_dot_debuff) Spell(envenom)
 	#envenom,if=(combo_points>4&buff.envenom.remains<2&(cooldown.death_from_above.remains>2|!talent.death_from_above.enabled))&active_enemies<4
@@ -231,7 +231,7 @@ AddFunction CombatPrecombatActions
 	#marked_for_death
 	Spell(marked_for_death)
 	#slice_and_dice,if=talent.marked_for_death.enabled
-	if Talent(marked_for_death_talent) and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if Talent(marked_for_death_talent) Spell(slice_and_dice)
 }
 
 AddFunction CombatPrecombatShortCdActions {}
@@ -252,7 +252,7 @@ AddFunction CombatDefaultActions
 	#ambush
 	Spell(ambush)
 	#slice_and_dice,if=buff.slice_and_dice.remains<2|(buff.slice_and_dice.remains<15&buff.bandits_guile.stack=11&combo_points>=4)
-	if { BuffRemaining(slice_and_dice_buff) < 2 or BuffRemaining(slice_and_dice_buff) < 15 and BuffStacks(bandits_guile_buff) == 11 and ComboPoints() >= 4 } and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if BuffRemaining(slice_and_dice_buff) < 2 or BuffRemaining(slice_and_dice_buff) < 15 and BuffStacks(bandits_guile_buff) == 11 and ComboPoints() >= 4 Spell(slice_and_dice)
 	#marked_for_death,if=combo_points<=1&dot.revealing_strike.ticking&(!talent.shadow_reflection.enabled|buff.shadow_reflection.up|cooldown.shadow_reflection.remains>30)
 	if ComboPoints() <= 1 and target.DebuffPresent(revealing_strike_debuff) and { not Talent(shadow_reflection_talent) or BuffPresent(shadow_reflection_buff) or SpellCooldown(shadow_reflection) > 30 } Spell(marked_for_death)
 	#call_action_list,name=generator,if=combo_points<5|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
@@ -387,7 +387,7 @@ AddFunction SubtletyPrecombatActions
 	#premeditation
 	Spell(premeditation)
 	#slice_and_dice
-	if BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 }
 
 AddFunction SubtletyPrecombatShortCdActions {}
@@ -541,11 +541,11 @@ AddFunction SubtletyGeneratorCdActions
 AddFunction SubtletyFinisherActions
 {
 	#slice_and_dice,if=buff.slice_and_dice.remains<4
-	if BuffRemaining(slice_and_dice_buff) < 4 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if BuffRemaining(slice_and_dice_buff) < 4 and BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 	#death_from_above
 	Spell(death_from_above)
 	#rupture,cycle_targets=1,if=(!ticking|remains<duration*0.3)&active_enemies<=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
-	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < target.DebuffDurationIfApplied(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(rupture)
+	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(rupture)
 	#crimson_tempest,if=(active_enemies>3&dot.crimson_tempest_dot.ticks_remain<=2&combo_points=5)|active_enemies>=5&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
 	if Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) < 3 and ComboPoints() == 5 or Enemies() >= 5 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
 	#eviscerate,if=active_enemies<4|(active_enemies>3&dot.crimson_tempest_dot.ticks_remain>=2)&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)

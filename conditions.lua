@@ -186,6 +186,31 @@ do
 end
 
 do
+	--- Get the base duration of the aura in seconds if it is applied at the current time.
+	-- @name BaseDuration
+	-- @paramsig number or boolean
+	-- @param id The aura spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The base duration in seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @see BuffDuration
+	-- @usage
+	-- if BaseDuration(slice_and_dice_buff) > BuffDuration(slice_and_dice_buff)
+	--     Spell(slice_and_dice)
+
+	local function BaseDuration(condition, state)
+		local auraId, comparator, limit = condition[1], condition[2], condition[3]
+		local value = OvaleData:GetBaseDuration(auraId, state)
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("baseduration", false, BaseDuration)
+	OvaleCondition:RegisterCondition("buffdurationifapplied", false, BaseDuration)
+	OvaleCondition:RegisterCondition("debuffdurationifapplied", false, BaseDuration)
+end
+
+do
 	--- Get the value of a buff as a number.  Not all buffs return an amount.
 	-- @name BuffAmount
 	-- @paramsig number
@@ -401,34 +426,6 @@ do
 
 	OvaleCondition:RegisterCondition("buffduration", false, BuffDuration)
 	OvaleCondition:RegisterCondition("debuffduration", false, BuffDuration)
-end
-
-do
-	--- Get the duration of the aura if it is applied at the current time.
-	-- @name BuffDurationIfApplied
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The total duration of the aura.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffDuration
-	-- @usage
-	-- if BuffDurationIfApplied(slice_and_dice_buff) > BuffDuration(slice_and_dice_buff)
-	--     Spell(slice_and_dice)
-
-	local function BuffDurationIfApplied(condition, state)
-		local auraId, comparator, limit = condition[1], condition[2], condition[3]
-		local target, filter, mine = ParseCondition(condition, state)
-		local value = OvaleData:GetBaseDuration(auraId, state)
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("buffdurationifapplied", false, BuffDurationIfApplied)
-	OvaleCondition:RegisterCondition("debuffdurationifapplied", false, BuffDurationIfApplied)
 end
 
 do

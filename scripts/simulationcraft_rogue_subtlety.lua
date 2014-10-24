@@ -59,7 +59,7 @@ AddFunction SubtletyPrecombatActions
 	#premeditation
 	Spell(premeditation)
 	#slice_and_dice
-	if BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 }
 
 AddFunction SubtletyPoolActions
@@ -135,11 +135,11 @@ AddFunction SubtletyGeneratorActions
 AddFunction SubtletyFinisherActions
 {
 	#slice_and_dice,if=buff.slice_and_dice.remains<4
-	if BuffRemaining(slice_and_dice_buff) < 4 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) Spell(slice_and_dice)
+	if BuffRemaining(slice_and_dice_buff) < 4 and BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 	#death_from_above
 	Spell(death_from_above)
 	#rupture,cycle_targets=1,if=(!ticking|remains<duration*0.3)&active_enemies<=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
-	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < target.DebuffDurationIfApplied(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(rupture)
+	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(rupture)
 	#crimson_tempest,if=(active_enemies>3&dot.crimson_tempest_dot.ticks_remain<=2&combo_points=5)|active_enemies>=5&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
 	if Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) < 3 and ComboPoints() == 5 or Enemies() >= 5 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
 	#eviscerate,if=active_enemies<4|(active_enemies>3&dot.crimson_tempest_dot.ticks_remain>=2)&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)

@@ -215,7 +215,7 @@ AddFunction MarksmanshipDefaultActions
 	if FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(kill_shot)
 	#chimaera_shot
 	Spell(chimaera_shot)
-	#run_action_list,name=careful_aim,if=buff.careful_aim.up
+	#call_action_list,name=careful_aim,if=buff.careful_aim.up
 	if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
 	#glaive_toss
 	Spell(glaive_toss)
@@ -242,7 +242,7 @@ AddFunction MarksmanshipDefaultShortCdActions
 	unless FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() and Spell(kill_shot)
 		or Spell(chimaera_shot)
 	{
-		#run_action_list,name=careful_aim,if=buff.careful_aim.up
+		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
 		#explosive_trap,if=active_enemies>2
 		if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
@@ -281,7 +281,7 @@ AddFunction MarksmanshipDefaultCdActions
 		Spell(rapid_fire)
 		#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=20
 		if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 Spell(stampede)
-		#run_action_list,name=careful_aim,if=buff.careful_aim.up
+		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimCdActions()
 	}
 }
@@ -465,9 +465,7 @@ AddFunction SurvivalDefaultCdActions
 
 AddFunction SurvivalAoeActions
 {
-	# CHANGE: Barrage talent check missing.
-	#explosive_shot,if=buff.lock_and_load.react&cooldown.barrage.remains>0
-	#if BuffPresent(lock_and_load_buff) and SpellCooldown(barrage) > 0 Spell(explosive_shot)
+	#explosive_shot,if=buff.lock_and_load.react&(!talent.barrage.enabled|cooldown.barrage.remains>0)
 	if BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } Spell(explosive_shot)
 	#explosive_shot,if=active_enemies<5
 	if Enemies() < 5 Spell(explosive_shot)

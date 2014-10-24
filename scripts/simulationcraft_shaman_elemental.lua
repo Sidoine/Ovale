@@ -65,7 +65,7 @@ AddFunction ElementalDefaultActions
 	#potion,name=jade_serpent,if=buff.ascendance.up|target.time_to_die<=30
 	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 UsePotionIntellect()
 	#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
-	if not BuffPresent(burst_haste_buff any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemaining(flame_shock_debuff) > BuffDurationIfApplied(ascendance_caster_buff) or Level() < 87 } } Spell(berserking)
+	if not BuffPresent(burst_haste_buff any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) or Level() < 87 } } Spell(berserking)
 	#blood_fury,if=buff.bloodlust.up|buff.ascendance.up|((cooldown.ascendance.remains>10|level<87)&cooldown.fire_elemental_totem.remains>10)
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(ascendance_caster_buff) or { SpellCooldown(ascendance_caster) > 10 or Level() < 87 } and SpellCooldown(fire_elemental_totem) > 10 Spell(blood_fury_apsp)
 	#arcane_torrent
@@ -79,7 +79,7 @@ AddFunction ElementalDefaultActions
 	#fire_elemental_totem,if=!active
 	if not TotemPresent(fire totem=fire_elemental_totem) Spell(fire_elemental_totem)
 	#ascendance,if=active_enemies>1|(dot.flame_shock.remains>buff.ascendance.duration&(target.time_to_die<20|buff.bloodlust.up|time>=60)&cooldown.lava_burst.remains>0)
-	if Enemies() > 1 or target.DebuffRemaining(flame_shock_debuff) > BuffDurationIfApplied(ascendance_caster_buff) and { target.TimeToDie() < 20 or BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 60 } and SpellCooldown(lava_burst) > 0 Spell(ascendance_caster)
+	if Enemies() > 1 or target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) and { target.TimeToDie() < 20 or BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 60 } and SpellCooldown(lava_burst) > 0 Spell(ascendance_caster)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.fire_elemental_totem.remains>=15
 	if TotemRemaining(fire totem=searing_totem) >= 15 or TotemRemaining(fire totem=fire_elemental_totem) >= 15 Spell(liquid_magma)
 	#call_action_list,name=single,if=active_enemies=1
@@ -135,7 +135,7 @@ AddFunction ElementalSingleActions
 	#elemental_blast
 	Spell(elemental_blast)
 	#flame_shock,if=time>60&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<duration
-	if TimeInCombat() > 60 and target.DebuffRemaining(flame_shock_debuff) <= BuffDurationIfApplied(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BuffDurationIfApplied(ascendance_caster_buff) < target.DebuffDurationIfApplied(flame_shock_debuff) Spell(flame_shock)
+	if TimeInCombat() > 60 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) < BaseDuration(flame_shock_debuff) Spell(flame_shock)
 	#searing_totem,if=(!talent.liquid_magma.enabled&!totem.fire.active)|(talent.liquid_magma.enabled&pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up)
 	if not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 	#spiritwalkers_grace,moving=1,if=((talent.elemental_blast.enabled&cooldown.elemental_blast.remains=0)|(cooldown.lava_burst.remains=0&!buff.lava_surge.react))
