@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "legacy_ovale_warlock"
-	local desc = "[5.4.8] Ovale: Affliction, Demonology, Destruction"
+	local desc = "[6.0.2] Ovale: Affliction, Demonology, Destruction"
 	local code = [[
 # Ovale warlock script based on SimulationCraft.
 
@@ -17,20 +17,13 @@ AddFunction UsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
 }
 
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
 ###
 ### Affliction
 ###
-# Based on SimulationCraft profile "Warlock_Affliction_T16H".
+# Based on SimulationCraft profile "Warlock_Affliction_T16M".
 #	class=warlock
 #	spec=affliction
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Va!....00
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Va!....00.
 #	glyphs=siphon_life
 #	pet=felhunter
 
@@ -48,16 +41,16 @@ AddFunction AfflictionPrecombatPredictActions
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#snapshot_stats
-	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
+	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 }
 
 AddFunction AfflictionPrecombatShortCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
 	{
-		#summon_pet,if=!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down
-		if { Talent(grimoire_of_sacrifice_talent no) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) Spell(summon_felhunter)
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
 		#service_pet,if=talent.grimoire_of_service.enabled
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
 	}
@@ -66,11 +59,18 @@ AddFunction AfflictionPrecombatShortCdActions
 AddFunction AfflictionPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-		or { Talent(grimoire_of_sacrifice_talent no) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) and Spell(summon_felhunter)
-		or Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
 	{
-		#jade_serpent_potion
-		UsePotionIntellect()
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+
+		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+		{
+			#potion,name=jade_serpent
+			UsePotionIntellect()
+		}
 	}
 }
 
@@ -80,130 +80,66 @@ AddFunction AfflictionDefaultActions
 {
 	AfflictionDefaultPredictActions()
 
-	#life_tap,if=buff.dark_soul.down&buff.bloodlust.down&mana.pct<50
-	if BuffExpires(dark_soul_misery_buff) and BuffExpires(burst_haste_buff any=1) and ManaPercent() < 50 Spell(life_tap)
-	#malefic_grasp,chain=1,interrupt_if=target.health.pct<=20
-	Spell(malefic_grasp)
-	#life_tap,moving=1,if=mana.pct<80&mana.pct<target.health.pct
-	if Speed() > 0 and ManaPercent() < 80 and ManaPercent() < target.HealthPercent() Spell(life_tap)
-	#fel_flame,moving=1
-	if Speed() > 0 Spell(fel_flame)
+	#life_tap,if=mana.pct<40
+	if ManaPercent() < 40 Spell(life_tap)
+	#drain_soul,interrupt=1,chain=1
+	Spell(drain_soul)
+	#agony,cycle_targets=1,moving=1,if=mana.pct>50
+	if Speed() > 0 and ManaPercent() > 50 Spell(agony)
 	#life_tap
 	Spell(life_tap)
 }
 
 AddFunction AfflictionDefaultPredictActions
 {
-	#curse_of_the_elements,if=debuff.magic_vulnerability.down
-	if target.DebuffExpires(magic_vulnerability_debuff any=1) Spell(curse_of_the_elements)
-	#run_action_list,name=aoe,if=active_enemies>6
-	if Enemies() > 6 AfflictionAoePredictActions()
-	#soul_swap,if=buff.soulburn.up
-	if BuffPresent(soulburn_buff) Spell(soul_swap)
-	# CHANGE: Synchronize abilities that use Soulburn with Soulburn's conditions so that they are shown concurrently with Soulburn.
-	unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
-	{
-		#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
-		#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
-		if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soul_swap)
-		if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soul_swap)
-	}
-	#soul_swap,if=active_enemies>1&buff.soul_swap.down&(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)
-	if Enemies() > 1 and BuffExpires(soul_swap_buff) and { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } Spell(soul_swap)
-	#soul_swap,cycle_targets=1,if=active_enemies>1&buff.soul_swap.up&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
-	# CHANGE: Soul Swap: Exhale replaces Soul Swap if the Soul Swap buff is present.
-	#if Enemies() > 1 and BuffPresent(soul_swap_buff) and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soul_swap)
-	if Enemies() > 1 and BuffPresent(soul_swap_buff) and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soul_swap_exhale)
-	#haunt,if=!in_flight_to_target&remains<cast_time+travel_time+tick_time&shard_react&target.health.pct<=20
-	if not InFlightToTarget(haunt) and target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + 0.5 + target.TickTime(haunt_debuff) and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(haunt)
-	#drain_soul,interrupt=1,chain=1,if=target.health.pct<=20
-	if target.HealthPercent() <= 20 Spell(drain_soul)
-	#haunt,if=!in_flight_to_target&remains<cast_time+travel_time+tick_time&shard_react
-	if not InFlightToTarget(haunt) and target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + 0.5 + target.TickTime(haunt_debuff) and SoulShards() >= 1 Spell(haunt)
-	#agony,if=(tick_damage*n_ticks*(100+crit_pct_current)>4*dot.agony.tick_dmg*dot.agony.ticks_remain*(100+dot.agony.crit_pct))&miss_react
-	if target.Damage(agony_debuff) * target.Ticks(agony_debuff) * { 100 + SpellCritChance() } > 4 * target.LastEstimatedDamage(agony_debuff) * target.TicksRemaining(agony_debuff) * { 100 + target.DebuffSpellCritChance(agony_debuff) } and True(miss_react) Spell(agony)
-	#corruption,if=((stat.spell_power>spell_power&ticks_remain<add_ticks%2)|(stat.spell_power>spell_power*1.5)|remains<gcd)&miss_react
-	if { Spellpower() > target.DebuffSpellpower(corruption_debuff) and target.TicksRemaining(corruption_debuff) < TicksAdded(corruption_debuff) / 2 or Spellpower() > target.DebuffSpellpower(corruption_debuff) * 1.5 or target.DebuffRemaining(corruption_debuff) < GCD() } and True(miss_react) Spell(corruption)
-	#unstable_affliction,if=((stat.spell_power>spell_power&ticks_remain<add_ticks%2)|(stat.spell_power>spell_power*1.5)|remains<cast_time+gcd)&miss_react
-	if { Spellpower() > target.DebuffSpellpower(unstable_affliction_debuff) and target.TicksRemaining(unstable_affliction_debuff) < TicksAdded(unstable_affliction_debuff) / 2 or Spellpower() > target.DebuffSpellpower(unstable_affliction_debuff) * 1.5 or target.DebuffRemaining(unstable_affliction_debuff) < CastTime(unstable_affliction) + GCD() } and True(miss_react) Spell(unstable_affliction)
+	#haunt,if=shard_react&!talent.soulburn_haunt.enabled&!in_flight_to_target&(dot.haunt.remains<cast_time+travel_time|soul_shard=4)&(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.dark_soul.up|soul_shard>2|soul_shard*14<=target.time_to_die)
+	if SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + 0.5 or SoulShards() == 4 } and { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
+	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&((buff.soulburn.up&buff.haunting_spirits.remains<5)|soul_shard=4)
+	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { BuffPresent(soulburn_buff) and BuffRemaining(haunting_spirits_buff) < 5 or SoulShards() == 4 } Spell(haunt)
+	#agony,cycle_targets=1,if=target.time_to_die>16&remains<=(duration*0.3)&((talent.cataclysm.enabled&remains<=(cooldown.cataclysm.remains+action.cataclysm.cast_time))|!talent.cataclysm.enabled)
+	if target.TimeToDie() > 16 and target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and { Talent(cataclysm_talent) and target.DebuffRemaining(agony_debuff) <= SpellCooldown(cataclysm) + CastTime(cataclysm) or not Talent(cataclysm_talent) } Spell(agony)
+	#unstable_affliction,cycle_targets=1,if=target.time_to_die>10&remains<=(duration*0.3)
+	if target.TimeToDie() > 10 and target.DebuffRemaining(unstable_affliction_debuff) <= BaseDuration(unstable_affliction_debuff) * 0.3 Spell(unstable_affliction)
+	#corruption,cycle_targets=1,if=target.time_to_die>12&remains<=(duration*0.3)
+	if target.TimeToDie() > 12 and target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 Spell(corruption)
 }
 
 AddFunction AfflictionDefaultShortCdActions
 {
-	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
-	{
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	#mannoroths_fury
+	Spell(mannoroths_fury)
+	#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
+	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felhunter)
+	#cataclysm
+	Spell(cataclysm)
 
-		unless BuffPresent(soulburn_buff) and Spell(soul_swap)
-		{
-			#soulburn,if=(buff.dark_soul.up|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6)&(dot.agony.ticks_remain<=action.agony.add_ticks%2|dot.corruption.ticks_remain<=action.corruption.add_ticks%2|dot.unstable_affliction.ticks_remain<=action.unstable_affliction.add_ticks%2)&shard_react
-			if { BuffPresent(dark_soul_misery_buff) or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and { target.TicksRemaining(agony_debuff) <= TicksAdded(agony_debuff) / 2 or target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 or target.TicksRemaining(unstable_affliction_debuff) <= TicksAdded(unstable_affliction_debuff) / 2 } and SoulShards() >= 1 Spell(soulburn)
-			#soulburn,if=(dot.unstable_affliction.ticks_remain<=1|dot.corruption.ticks_remain<=1|dot.agony.ticks_remain<=1)&shard_react&target.health.pct<=20
-			if { target.TicksRemaining(unstable_affliction_debuff) < 2 or target.TicksRemaining(corruption_debuff) < 2 or target.TicksRemaining(agony_debuff) < 2 } and SoulShards() >= 1 and target.HealthPercent() <= 20 Spell(soulburn)
-		}
+	unless SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + 0.5 or SoulShards() == 4 } and { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } and Spell(haunt)
+	{
+		#soulburn,if=shard_react&talent.soulburn_haunt.enabled&buff.soulburn.down&(buff.haunting_spirits.down|soul_shard=4&buff.haunting_spirits.remains<5)
+		if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and BuffExpires(soulburn_buff) and { BuffExpires(haunting_spirits_buff) or SoulShards() == 4 and BuffRemaining(haunting_spirits_buff) < 5 } Spell(soulburn)
 	}
 }
 
 AddFunction AfflictionDefaultCdActions
 {
-	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
+	#potion,name=jade_serpent,if=buff.bloodlust.react|target.health.pct<=20
+	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+	#berserking
+	Spell(berserking)
+	#blood_fury
+	Spell(blood_fury_sp)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
+	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
+	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
+
+	unless Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) and Spell(grimoire_felhunter)
 	{
-		#use_item,name=gloves_of_the_horned_nightmare
-		UseItemActions()
-		#jade_serpent_potion,if=buff.bloodlust.react|target.health.pct<=20
-		if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
-		#berserking
-		Spell(berserking)
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
-		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
-
-		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
-		{
-			#run_action_list,name=aoe,if=active_enemies>6
-			if Enemies() > 6 AfflictionAoeCdActions()
-			#summon_doomguard
-			Spell(summon_doomguard)
-		}
+		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
+		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,,if=!talent.demonic_servitude.enabled&active_enemies>=5
+		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
 	}
-}
-
-# ActionList: AfflictionAoeActions --> main, predict, shortcd, cd
-
-AddFunction AfflictionAoeActions
-{
-	AfflictionAoePredictActions()
-}
-
-AddFunction AfflictionAoePredictActions
-{
-	# CHANGE: Synchronize abilities that use Soulburn with Soulburn's conditions so that they are shown concurrently with Soulburn.
-	#soulburn,cycle_targets=1,if=buff.soulburn.down&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target&shard_react
-	#if BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 Spell(soul_swap)
-	#soul_swap,if=buff.soulburn.up&!dot.agony.ticking&!dot.corruption.ticking
-	if { BuffPresent(soulburn_buff) or BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 } and not target.DebuffPresent(agony_debuff) and not target.DebuffPresent(corruption_debuff) Spell(soul_swap)
-	#soul_swap,cycle_targets=1,if=buff.soulburn.up&dot.corruption.ticking&!dot.agony.ticking
-	if { BuffPresent(soulburn_buff) or BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 } and target.DebuffPresent(corruption_debuff) and not target.DebuffPresent(agony_debuff) Spell(soul_swap)
-	#seed_of_corruption,cycle_targets=1,if=(buff.soulburn.down&!in_flight_to_target&!ticking)|(buff.soulburn.up&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target)
-	if BuffExpires(soulburn_buff) and not InFlightToTarget(seed_of_corruption) and not target.DebuffPresent(seed_of_corruption_debuff) or { BuffPresent(soulburn_buff) or BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 } and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) Spell(seed_of_corruption)
-	#haunt,cycle_targets=1,if=!in_flight_to_target&debuff.haunt.remains<cast_time+travel_time&shard_react
-	if not InFlightToTarget(haunt) and target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + 0.5 and SoulShards() >= 1 Spell(haunt)
-	#life_tap,if=mana.pct<70
-	if ManaPercent() < 70 Spell(life_tap)
-	#fel_flame,cycle_targets=1,if=!in_flight_to_target
-	if not InFlightToTarget(fel_flame) Spell(fel_flame)
-}
-
-AddFunction AfflictionAoeShortCdActions
-{
-	#soulburn,cycle_targets=1,if=buff.soulburn.down&!dot.soulburn_seed_of_corruption.ticking&!action.soulburn_seed_of_corruption.in_flight_to_target&shard_react
-	if BuffExpires(soulburn_buff) and not target.DebuffPresent(soulburn_seed_of_corruption_debuff) and not InFlightToTarget(soulburn_seed_of_corruption) and SoulShards() >= 1 Spell(soulburn)
-}
-
-AddFunction AfflictionAoeCdActions
-{
-	#summon_infernal
-	Spell(summon_infernal)
 }
 
 ### Affliction icons.
@@ -252,11 +188,159 @@ AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction checkb
 	AfflictionDefaultCdActions()
 }
 
-# Based on SimulationCraft profile "Warlock_Demonology_T16H".
+###
+### Demonology
+###
+# Based on SimulationCraft profile "Warlock_Demonology_T16M".
 #	class=warlock
 #	spec=demonology
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#VZ!....10
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#VZ!....20.
 #	pet=felguard
+
+# ActionList: DemonologyDefaultActions --> main, predict, shortcd, cd
+
+AddFunction DemonologyDefaultActions
+{
+	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&((set_bonus.tier17_2pc=0&((charges=1&recharge_time<4)|charges=2))|(charges=3|(charges=2&recharge_time<13.8-travel_time*2))|dot.shadowflame.remains>travel_time)
+	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and { ArmorSetBonus(T17 2) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - 0.5 * 2 or target.DebuffRemaining(shadowflame_debuff) > 0.5 } Spell(hand_of_guldan)
+	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+3&buff.demonbolt.remains<gcd*2&charges>=2&action.dark_soul.charges>=1
+	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + 3 and BuffRemaining(demonbolt_buff) < GCD() * 2 and Charges(hand_of_guldan) >= 2 and Charges(dark_soul_knowledge) >= 1 Spell(hand_of_guldan)
+	#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
+	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
+	#call_action_list,name=db,if=talent.demonbolt.enabled
+	if Talent(demonbolt_talent) DemonologyDbActions()
+	#cataclysm,if=buff.metamorphosis.up
+	if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)
+	if BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * SpellHaste() / 100 and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { target.DebuffRemaining(doom_debuff) < SpellCooldown(cataclysm) or not Talent(cataclysm_talent) } and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } Spell(doom)
+	#corruption,if=target.time_to_die>=6&remains<=(0.3*duration)&buff.metamorphosis.down
+	if target.TimeToDie() >= 6 and target.DebuffRemaining(corruption_debuff) <= 0.3 * BaseDuration(corruption_debuff) and BuffExpires(metamorphosis_buff) Spell(corruption)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&((demonic_fury<650&!glyph.dark_soul.enabled)|demonic_fury<450)&buff.dark_soul.down&trinket.proc.any.down&target.time_to_die>cooldown.dark_soul.remains
+	if BuffPresent(metamorphosis_buff) and { DemonicFury() < 650 and not Glyph(glyph_of_dark_soul) or DemonicFury() < 450 } and BuffExpires(dark_soul_knowledge_buff) and BuffExpires(trinket_proc_intellect_buff) and target.TimeToDie() > SpellCooldown(dark_soul_knowledge) and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges>0&dot.shadowflame.ticking<action.hand_of_guldan.travel_time+action.shadow_bolt.cast_time&demonic_fury<100&buff.dark_soul.remains>10
+	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) > 0 and target.DebuffPresent(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and DemonicFury() < 100 and BuffRemaining(dark_soul_knowledge_buff) > 10 and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges=3&(!buff.dark_soul.remains>gcd|action.metamorphosis.cooldown<gcd)
+	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) == 3 and { not BuffRemaining(dark_soul_knowledge_buff) > GCD() or SpellCooldown(metamorphosis) < GCD() } and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#chaos_wave,if=buff.metamorphosis.up&(set_bonus.tier17_2pc=0&charges=2)|charges=3
+	if BuffPresent(metamorphosis_buff) and ArmorSetBonus(T17 2) == 0 and Charges(chaos_wave) == 2 or Charges(chaos_wave) == 3 Spell(chaos_wave)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(buff.dark_soul.up|target.health.pct<=25)
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffPresent(dark_soul_knowledge_buff) or target.HealthPercent() <= 25 } Spell(soul_fire)
+	#touch_of_chaos,if=buff.metamorphosis.up
+	if BuffPresent(metamorphosis_buff) Spell(touch_of_chaos)
+	#metamorphosis,if=buff.dark_soul.remains>gcd&(demonic_fury>300|!glyph.dark_soul.enabled)
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and { DemonicFury() > 300 or not Glyph(glyph_of_dark_soul) } Spell(metamorphosis)
+	#metamorphosis,if=(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.demonic_synergy.up)&demonic_fury>400&action.dark_soul.recharge_time>=10
+	if { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(demonic_synergy_buff) } and DemonicFury() > 400 and SpellChargeCooldown(dark_soul_knowledge) >= 10 Spell(metamorphosis)
+	#metamorphosis,if=!cooldown.cataclysm.remains&talent.cataclysm.enabled
+	if not SpellCooldown(cataclysm) > 0 and Talent(cataclysm_talent) Spell(metamorphosis)
+	#metamorphosis,if=!dot.doom.ticking&target.time_to_die>=30%(1%spell_haste)&demonic_fury>300
+	if not target.DebuffPresent(doom_debuff) and target.TimeToDie() >= 30 / { 1 / { SpellHaste() / 100 } } and DemonicFury() > 300 Spell(metamorphosis)
+	#metamorphosis,if=(demonic_fury>750&(action.hand_of_guldan.charges=0|(!dot.shadowflame.ticking&!action.hand_of_guldan.in_flight_to_target)))|target.time_to_die<30&action.dark_soul.recharge_time>=10
+	if DemonicFury() > 750 and { Charges(hand_of_guldan) == 0 or not target.DebuffPresent(shadowflame_debuff) and not InFlightToTarget(hand_of_guldan) } or target.TimeToDie() < 30 and SpellChargeCooldown(dark_soul_knowledge) >= 10 Spell(metamorphosis)
+	#cancel_metamorphosis
+	if BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#soul_fire,if=buff.molten_core.react&(buff.molten_core.stack>=4|target.health.pct<=25)&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
+	if BuffPresent(molten_core_buff) and { BuffStacks(molten_core_buff) >= 4 or target.HealthPercent() <= 25 } and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
+	#soul_fire,if=buff.molten_core.react&target.health.pct<=35&buff.dark_soul.remains>30
+	if BuffPresent(molten_core_buff) and target.HealthPercent() <= 35 and BuffRemaining(dark_soul_knowledge_buff) > 30 Spell(soul_fire)
+	#life_tap,if=mana.pct<40
+	if ManaPercent() < 40 Spell(life_tap)
+	#shadow_bolt
+	Spell(shadow_bolt)
+	#life_tap
+	Spell(life_tap)
+}
+
+AddFunction DemonologyDefaultPredictActions
+{
+	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&((set_bonus.tier17_2pc=0&((charges=1&recharge_time<4)|charges=2))|(charges=3|(charges=2&recharge_time<13.8-travel_time*2))|dot.shadowflame.remains>travel_time)
+	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and { ArmorSetBonus(T17 2) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - 0.5 * 2 or target.DebuffRemaining(shadowflame_debuff) > 0.5 } Spell(hand_of_guldan)
+	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+3&buff.demonbolt.remains<gcd*2&charges>=2&action.dark_soul.charges>=1
+	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + 3 and BuffRemaining(demonbolt_buff) < GCD() * 2 and Charges(hand_of_guldan) >= 2 and Charges(dark_soul_knowledge) >= 1 Spell(hand_of_guldan)
+	#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
+	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
+	#call_action_list,name=db,if=talent.demonbolt.enabled
+	if Talent(demonbolt_talent) DemonologyDbPredictActions()
+	#cataclysm,if=buff.metamorphosis.up
+	if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)
+	if BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * SpellHaste() / 100 and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { target.DebuffRemaining(doom_debuff) < SpellCooldown(cataclysm) or not Talent(cataclysm_talent) } and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } Spell(doom)
+	#corruption,if=target.time_to_die>=6&remains<=(0.3*duration)&buff.metamorphosis.down
+	if target.TimeToDie() >= 6 and target.DebuffRemaining(corruption_debuff) <= 0.3 * BaseDuration(corruption_debuff) and BuffExpires(metamorphosis_buff) Spell(corruption)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&((demonic_fury<650&!glyph.dark_soul.enabled)|demonic_fury<450)&buff.dark_soul.down&trinket.proc.any.down&target.time_to_die>cooldown.dark_soul.remains
+	if BuffPresent(metamorphosis_buff) and { DemonicFury() < 650 and not Glyph(glyph_of_dark_soul) or DemonicFury() < 450 } and BuffExpires(dark_soul_knowledge_buff) and BuffExpires(trinket_proc_intellect_buff) and target.TimeToDie() > SpellCooldown(dark_soul_knowledge) and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges>0&dot.shadowflame.ticking<action.hand_of_guldan.travel_time+action.shadow_bolt.cast_time&demonic_fury<100&buff.dark_soul.remains>10
+	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) > 0 and target.DebuffPresent(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and DemonicFury() < 100 and BuffRemaining(dark_soul_knowledge_buff) > 10 and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges=3&(!buff.dark_soul.remains>gcd|action.metamorphosis.cooldown<gcd)
+	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) == 3 and { not BuffRemaining(dark_soul_knowledge_buff) > GCD() or SpellCooldown(metamorphosis) < GCD() } and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#chaos_wave,if=buff.metamorphosis.up&(set_bonus.tier17_2pc=0&charges=2)|charges=3
+	if BuffPresent(metamorphosis_buff) and ArmorSetBonus(T17 2) == 0 and Charges(chaos_wave) == 2 or Charges(chaos_wave) == 3 Spell(chaos_wave)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(buff.dark_soul.up|target.health.pct<=25)
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffPresent(dark_soul_knowledge_buff) or target.HealthPercent() <= 25 } Spell(soul_fire)
+	#metamorphosis,if=buff.dark_soul.remains>gcd&(demonic_fury>300|!glyph.dark_soul.enabled)
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and { DemonicFury() > 300 or not Glyph(glyph_of_dark_soul) } Spell(metamorphosis)
+	#metamorphosis,if=(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.demonic_synergy.up)&demonic_fury>400&action.dark_soul.recharge_time>=10
+	if { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(demonic_synergy_buff) } and DemonicFury() > 400 and SpellChargeCooldown(dark_soul_knowledge) >= 10 Spell(metamorphosis)
+	#metamorphosis,if=!cooldown.cataclysm.remains&talent.cataclysm.enabled
+	if not SpellCooldown(cataclysm) > 0 and Talent(cataclysm_talent) Spell(metamorphosis)
+	#metamorphosis,if=!dot.doom.ticking&target.time_to_die>=30%(1%spell_haste)&demonic_fury>300
+	if not target.DebuffPresent(doom_debuff) and target.TimeToDie() >= 30 / { 1 / { SpellHaste() / 100 } } and DemonicFury() > 300 Spell(metamorphosis)
+	#metamorphosis,if=(demonic_fury>750&(action.hand_of_guldan.charges=0|(!dot.shadowflame.ticking&!action.hand_of_guldan.in_flight_to_target)))|target.time_to_die<30&action.dark_soul.recharge_time>=10
+	if DemonicFury() > 750 and { Charges(hand_of_guldan) == 0 or not target.DebuffPresent(shadowflame_debuff) and not InFlightToTarget(hand_of_guldan) } or target.TimeToDie() < 30 and SpellChargeCooldown(dark_soul_knowledge) >= 10 Spell(metamorphosis)
+	#cancel_metamorphosis
+	if BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#soul_fire,if=buff.molten_core.react&(buff.molten_core.stack>=4|target.health.pct<=25)&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
+	if BuffPresent(molten_core_buff) and { BuffStacks(molten_core_buff) >= 4 or target.HealthPercent() <= 25 } and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
+	#soul_fire,if=buff.molten_core.react&target.health.pct<=35&buff.dark_soul.remains>30
+	if BuffPresent(molten_core_buff) and target.HealthPercent() <= 35 and BuffRemaining(dark_soul_knowledge_buff) > 30 Spell(soul_fire)
+}
+
+AddFunction DemonologyDefaultShortCdActions
+{
+	#mannoroths_fury
+	Spell(mannoroths_fury)
+	#felguard:felstorm
+	if pet.Present() and pet.CreatureFamily(Felguard) Spell(felguard_felstorm)
+	#wrathguard:wrathstorm
+	if pet.Present() and pet.CreatureFamily(Wrathguard) Spell(wrathguard_wrathstorm)
+
+	unless not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and { ArmorSetBonus(T17 2) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - 0.5 * 2 or target.DebuffRemaining(shadowflame_debuff) > 0.5 } and Spell(hand_of_guldan)
+		or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + 3 and BuffRemaining(demonbolt_buff) < GCD() * 2 and Charges(hand_of_guldan) >= 2 and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
+	{
+		#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
+		if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
+		#cataclysm,if=buff.metamorphosis.up
+		if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+	}
+}
+
+AddFunction DemonologyDefaultCdActions
+{
+	#potion,name=jade_serpent,if=buff.bloodlust.react|(buff.dark_soul.up&(trinket.proc.any.react|trinket.stacking_proc.any.react>6)&!buff.demonbolt.remains)|target.health.pct<20
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(dark_soul_knowledge_buff) and { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 } and not BuffRemaining(demonbolt_buff) or target.HealthPercent() < 20 UsePotionIntellect()
+	#berserking
+	Spell(berserking)
+	#blood_fury
+	Spell(blood_fury_sp)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
+	#dark_soul,if=talent.demonbolt.enabled&(charges=2|target.time_to_die<buff.demonbolt.remains|(!buff.demonbolt.remains&demonic_fury>=790))
+	if Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 or target.TimeToDie() < BuffRemaining(demonbolt_buff) or not BuffRemaining(demonbolt_buff) and DemonicFury() >= 790 } Spell(dark_soul_knowledge)
+	#dark_soul,if=!talent.demonbolt.enabled&(charges=2|(target.time_to_die<=20&!glyph.dark_soul.enabled|target.time_to_die<=10)|(target.time_to_die<=60&demonic_fury>400)|(trinket.proc.any.react&demonic_fury>400))
+	if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or BuffPresent(trinket_proc_intellect_buff) and DemonicFury() > 400 } Spell(dark_soul_knowledge)
+	#imp_swarm,if=(buff.dark_soul.up|(cooldown.dark_soul.remains>(120%(1%spell_haste)))|time_to_die<32)&time>3
+	if { BuffPresent(dark_soul_knowledge_buff) or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { SpellHaste() / 100 } } or TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
+
+	unless not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and { ArmorSetBonus(T17 2) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - 0.5 * 2 or target.DebuffRemaining(shadowflame_debuff) > 0.5 } and Spell(hand_of_guldan)
+		or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + 3 and BuffRemaining(demonbolt_buff) < GCD() * 2 and Charges(hand_of_guldan) >= 2 and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
+		or Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) and Spell(grimoire_felguard)
+	{
+		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
+		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,,if=!talent.demonic_servitude.enabled&active_enemies>=5
+		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+	}
+}
 
 # ActionList: DemonologyPrecombatActions --> main, predict, shortcd, cd
 
@@ -272,16 +356,16 @@ AddFunction DemonologyPrecombatPredictActions
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#snapshot_stats
-	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+	#soul_fire
+	Spell(soul_fire)
 }
 
 AddFunction DemonologyPrecombatShortCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
 	{
-		#summon_pet,if=!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down
-		if { Talent(grimoire_of_sacrifice_talent no) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) Spell(summon_felhunter)
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
 		#service_pet,if=talent.grimoire_of_service.enabled
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
 	}
@@ -290,153 +374,97 @@ AddFunction DemonologyPrecombatShortCdActions
 AddFunction DemonologyPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-		or { Talent(grimoire_of_sacrifice_talent no) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) and Spell(summon_felguard)
-		or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice)
-		or Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
+		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard)
 	{
-		#jade_serpent_potion
-		UsePotionIntellect()
-	}
-}
-
-# ActionList: DemonologyDefaultActions --> main, predict, shortcd, cd
-
-AddFunction DemonologyDefaultActions
-{
-	DemonologyDefaultPredictActions()
-
-	#life_tap,if=mana.pct<60
-	if ManaPercent() < 60 Spell(life_tap)
-	#shadow_bolt
-	Spell(shadow_bolt)
-	#fel_flame,moving=1
-	if Speed() > 0 Spell(fel_flame)
-	#life_tap
-	Spell(life_tap)
-}
-
-AddFunction DemonologyDefaultPredictActions
-{
-	#curse_of_the_elements,if=debuff.magic_vulnerability.down
-	if target.DebuffExpires(magic_vulnerability_debuff any=1) Spell(curse_of_the_elements)
-	#run_action_list,name=aoe,if=active_enemies>4
-	if Enemies() > 4 DemonologyAoePredictActions()
-	#doom,cycle_targets=1,if=buff.metamorphosis.up&(ticks_remain<=1|(ticks_remain+1<n_ticks&buff.dark_soul.up)|(ticks_remain<=add_ticks%2&stat.spell_power>spell_power))&target.time_to_die>=30&miss_react
-	if BuffPresent(metamorphosis_buff) and { target.TicksRemaining(doom_debuff) < 2 or target.TicksRemaining(doom_debuff) + 1 < target.Ticks(doom_debuff) and BuffPresent(dark_soul_knowledge_buff) or target.TicksRemaining(doom_debuff) <= TicksAdded(doom_debuff) / 2 and Spellpower() > target.DebuffSpellpower(doom_debuff) } and target.TimeToDie() >= 30 and True(miss_react) Spell(doom)
-	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
-	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
-	#touch_of_chaos,if=buff.metamorphosis.up
-	if BuffPresent(metamorphosis_buff) Spell(touch_of_chaos)
-	#corruption,cycle_targets=1,if=!ticking&target.time_to_die>=6&miss_react
-	if not target.DebuffPresent(corruption_debuff) and target.TimeToDie() >= 6 and True(miss_react) Spell(corruption)
-	#corruption,cycle_targets=1,if=spell_power<stat.spell_power&ticks_remain<=add_ticks%2&target.time_to_die>=6&miss_react
-	if target.DebuffSpellpower(corruption_debuff) < Spellpower() and target.TicksRemaining(corruption_debuff) <= TicksAdded(corruption_debuff) / 2 and target.TimeToDie() >= 6 and True(miss_react) Spell(corruption)
-	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&(charges=2|dot.shadowflame.remains>travel_time|(charges=1&recharge_time<4))
-	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 0.5 + CastTime(shadow_bolt) and { Charges(hand_of_guldan) == 2 or target.DebuffRemaining(shadowflame_debuff) > 0.5 or Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 } Spell(hand_of_guldan)
-	#soul_fire,if=buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)&(buff.molten_core.react>9|target.health.pct<=28)
-	if BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } and { BuffStacks(molten_core_buff) > 9 or target.HealthPercent() <= 28 } Spell(soul_fire)
-}
-
-AddFunction DemonologyDefaultShortCdActions
-{
-	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
-	{
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
-		#felguard:felstorm
-		if pet.Present() and pet.CreatureFamily(Felguard) Spell(felguard_felstorm)
-		#wrathguard:wrathstorm
-		if pet.Present() and pet.CreatureFamily(Wrathguard) Spell(wrathguard_wrathstorm)
-		#run_action_list,name=aoe,if=active_enemies>4
-		if Enemies() > 4 DemonologyAoeShortCdActions()
-
-		unless BuffPresent(metamorphosis_buff) and { target.TicksRemaining(doom_debuff) < 2 or target.TicksRemaining(doom_debuff) + 1 < target.Ticks(doom_debuff) and BuffPresent(dark_soul_knowledge_buff) or target.TicksRemaining(doom_debuff) <= TicksAdded(doom_debuff) / 2 and Spellpower() > target.DebuffSpellpower(doom_debuff) } and target.TimeToDie() >= 30 and True(miss_react) and Spell(doom)
-		{
-			#cancel_metamorphosis,if=buff.metamorphosis.up&buff.dark_soul.down&demonic_fury<=650&target.time_to_die>30&(cooldown.metamorphosis.remains<4|demonic_fury<=300)&!(action.hand_of_guldan.in_flight&dot.shadowflame.remains)
-			if BuffPresent(metamorphosis_buff) and BuffExpires(dark_soul_knowledge_buff) and DemonicFury() <= 650 and target.TimeToDie() > 30 and { SpellCooldown(metamorphosis) < 4 or DemonicFury() <= 300 } and not { InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) } Texture(spell_shadow_demonform text=cancel)
-
-			unless BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } and Spell(soul_fire)
-				or BuffPresent(metamorphosis_buff) and Spell(touch_of_chaos)
-			{
-				#metamorphosis,if=(buff.dark_soul.up&buff.dark_soul.remains<demonic_fury%32)|demonic_fury>=950|demonic_fury%32>target.time_to_die|(action.hand_of_guldan.in_flight&dot.shadowflame.remains)
-				if { BuffPresent(dark_soul_knowledge_buff) and BuffRemaining(dark_soul_knowledge_buff) < DemonicFury() / 32 or DemonicFury() >= 950 or DemonicFury() / 32 > target.TimeToDie() or InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) } and not Stance(warlock_metamorphosis) Spell(metamorphosis)
-			}
-		}
-	}
-}
-
-AddFunction DemonologyDefaultCdActions
-{
-	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
-	{
-		#use_item,name=gloves_of_the_horned_nightmare
-		UseItemActions()
-		#jade_serpent_potion,if=buff.bloodlust.react|target.health.pct<=20
-		if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
-		#berserking
-		Spell(berserking)
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
-		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_knowledge) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_knowledge)
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
 
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
 		{
-			#run_action_list,name=aoe,if=active_enemies>4
-			if Enemies() > 4 DemonologyAoeCdActions()
-			#summon_doomguard
-			Spell(summon_doomguard)
+			#potion,name=jade_serpent
+			UsePotionIntellect()
 		}
 	}
 }
 
-# ActionList: DemonologyAoeActions --> main, predict, shortcd, cd
+# ActionList: DemonologyDbActions --> main, predict
 
-AddFunction DemonologyAoeActions
+AddFunction DemonologyDbActions
 {
-	DemonologyAoePredictActions()
-
-	#hellfire,chain=1,interrupt=1
-	Spell(hellfire)
+	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)&buff.demonbolt.remains&(buff.demonbolt.remains<(40*spell_haste-action.demonbolt.execute_time)|demonic_fury<80+80*buff.demonbolt.stack)
+	if BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * SpellHaste() / 100 and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { target.DebuffRemaining(doom_debuff) < SpellCooldown(cataclysm) or not Talent(cataclysm_talent) } and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } and BuffRemaining(demonbolt_buff) and { BuffRemaining(demonbolt_buff) < 40 * SpellHaste() / 100 - ExecuteTime(demonbolt) or DemonicFury() < 80 + 80 * BuffStacks(demonbolt_buff) } Spell(doom)
+	#corruption,if=target.time_to_die>=6&remains<=(0.3*duration)&buff.metamorphosis.down
+	if target.TimeToDie() >= 6 and target.DebuffRemaining(corruption_debuff) <= 0.3 * BaseDuration(corruption_debuff) and BuffExpires(metamorphosis_buff) Spell(corruption)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&buff.demonbolt.stack>3&demonic_fury<=600&target.time_to_die>buff.demonbolt.remains&buff.dark_soul.down
+	if BuffPresent(metamorphosis_buff) and BuffStacks(demonbolt_buff) > 3 and DemonicFury() <= 600 and target.TimeToDie() > BuffRemaining(demonbolt_buff) and BuffExpires(dark_soul_knowledge_buff) and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#demonbolt,if=buff.demonbolt.stack=0|(buff.demonbolt.stack<4&buff.demonbolt.remains>=(40*spell_haste-execute_time))
+	if BuffStacks(demonbolt_buff) == 0 or BuffStacks(demonbolt_buff) < 4 and BuffRemaining(demonbolt_buff) >= 40 * SpellHaste() / 100 - ExecuteTime(demonbolt) Spell(demonbolt)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&((buff.dark_soul.remains>execute_time&demonic_fury>=175)|(target.time_to_die<buff.demonbolt.remains))
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(soul_fire) and DemonicFury() >= 175 or target.TimeToDie() < BuffRemaining(demonbolt_buff) } Spell(soul_fire)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(((demonic_fury-80)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { DemonicFury() - 80 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and DemonicFury() >= 750 Spell(soul_fire)
+	#metamorphosis,if=buff.dark_soul.remains>gcd&demonic_fury>=240&(buff.demonbolt.down|target.time_to_die<buff.demonbolt.remains|(buff.dark_soul.remains>execute_time&demonic_fury>=175))
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and DemonicFury() >= 240 and { BuffExpires(demonbolt_buff) or target.TimeToDie() < BuffRemaining(demonbolt_buff) or BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(metamorphosis) and DemonicFury() >= 175 } Spell(metamorphosis)
+	#metamorphosis,if=buff.demonbolt.down&demonic_fury>=480&(action.dark_soul.charges=0|!talent.archimondes_darkness.enabled&cooldown.dark_soul.remains)
+	if BuffExpires(demonbolt_buff) and DemonicFury() >= 480 and { Charges(dark_soul_knowledge) == 0 or not Talent(archimondes_darkness_talent) and SpellCooldown(dark_soul_knowledge) > 0 } Spell(metamorphosis)
+	#metamorphosis,if=(demonic_fury%80)*2*spell_haste>=target.time_to_die&target.time_to_die<buff.demonbolt.remains
+	if DemonicFury() / 80 * 2 * SpellHaste() / 100 >= target.TimeToDie() and target.TimeToDie() < BuffRemaining(demonbolt_buff) Spell(metamorphosis)
+	#metamorphosis,if=target.time_to_die>=30*spell_haste&!dot.doom.ticking&buff.dark_soul.down
+	if target.TimeToDie() >= 30 * SpellHaste() / 100 and not target.DebuffPresent(doom_debuff) and BuffExpires(dark_soul_knowledge_buff) Spell(metamorphosis)
+	#metamorphosis,if=demonic_fury>750&buff.demonbolt.remains>=action.metamorphosis.cooldown
+	if DemonicFury() > 750 and BuffRemaining(demonbolt_buff) >= SpellCooldown(metamorphosis) Spell(metamorphosis)
+	#metamorphosis,if=(((demonic_fury-120)%800)>(buff.demonbolt.remains%(40*spell_haste)))&buff.demonbolt.remains>=10&dot.doom.remains<=dot.doom.duration*0.3
+	if { DemonicFury() - 120 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and BuffRemaining(demonbolt_buff) >= 10 and target.DebuffRemaining(doom_debuff) <= target.DebuffDuration(doom_debuff) * 0.3 Spell(metamorphosis)
+	#cancel_metamorphosis
+	if BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#soul_fire,if=buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
+	if BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
+	#life_tap,if=mana.pct<40
+	#life_tap,if=mana.pct<40
+	if ManaPercent() < 40 Spell(life_tap)
+	#shadow_bolt
+	Spell(shadow_bolt)
 	#life_tap
 	Spell(life_tap)
 }
 
-AddFunction DemonologyAoePredictActions
+AddFunction DemonologyDbPredictActions
 {
-	#immolation_aura,if=buff.metamorphosis.up
-	if BuffPresent(metamorphosis_buff) Spell(immolation_aura)
-	#void_ray,if=buff.metamorphosis.up&dot.corruption.remains<10
-	if BuffPresent(metamorphosis_buff) and target.DebuffRemaining(corruption_debuff) < 10 Spell(void_ray)
-	#doom,cycle_targets=1,if=buff.metamorphosis.up&(!ticking|remains<tick_time|(ticks_remain+1<n_ticks&buff.dark_soul.up))&target.time_to_die>=30&miss_react
-	if BuffPresent(metamorphosis_buff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < target.TickTime(doom_debuff) or target.TicksRemaining(doom_debuff) + 1 < target.Ticks(doom_debuff) and BuffPresent(dark_soul_knowledge_buff) } and target.TimeToDie() >= 30 and True(miss_react) Spell(doom)
-	#void_ray,if=buff.metamorphosis.up
-	if BuffPresent(metamorphosis_buff) Spell(void_ray)
-	#corruption,cycle_targets=1,if=!ticking&target.time_to_die>30&miss_react
-	if not target.DebuffPresent(corruption_debuff) and target.TimeToDie() > 30 and True(miss_react) Spell(corruption)
-	#hand_of_guldan
-	Spell(hand_of_guldan)
-}
-
-AddFunction DemonologyAoeShortCdActions
-{
-	#cancel_metamorphosis,if=buff.metamorphosis.up&dot.corruption.remains>10&demonic_fury<=650&buff.dark_soul.down&!dot.immolation_aura.ticking
-	if BuffPresent(metamorphosis_buff) and target.DebuffRemaining(corruption_debuff) > 10 and DemonicFury() <= 650 and BuffExpires(dark_soul_knowledge_buff) and not target.DebuffPresent(immolation_aura_debuff) Texture(spell_shadow_demonform text=cancel)
-
-	unless BuffPresent(metamorphosis_buff) and Spell(immolation_aura)
-		or BuffPresent(metamorphosis_buff) and target.DebuffRemaining(corruption_debuff) < 10 and Spell(void_ray)
-		or BuffPresent(metamorphosis_buff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < target.TickTime(doom_debuff) or target.TicksRemaining(doom_debuff) + 1 < target.Ticks(doom_debuff) and BuffPresent(dark_soul_knowledge_buff) } and target.TimeToDie() >= 30 and True(miss_react) and Spell(doom)
-		or BuffPresent(metamorphosis_buff) and Spell(void_ray)
-		or not target.DebuffPresent(corruption_debuff) and target.TimeToDie() > 30 and True(miss_react) and Spell(corruption)
-		or Spell(hand_of_guldan)
-	{
-		#metamorphosis,if=dot.corruption.remains<10|buff.dark_soul.up|demonic_fury>=950|demonic_fury%32>target.time_to_die
-		if { target.DebuffRemaining(corruption_debuff) < 10 or BuffPresent(dark_soul_knowledge_buff) or DemonicFury() >= 950 or DemonicFury() / 32 > target.TimeToDie() } and not Stance(warlock_metamorphosis) Spell(metamorphosis)
-	}
-}
-
-AddFunction DemonologyAoeCdActions
-{
-	#summon_infernal
-	Spell(summon_infernal)
+	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)&buff.demonbolt.remains&(buff.demonbolt.remains<(40*spell_haste-action.demonbolt.execute_time)|demonic_fury<80+80*buff.demonbolt.stack)
+	if BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * SpellHaste() / 100 and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { target.DebuffRemaining(doom_debuff) < SpellCooldown(cataclysm) or not Talent(cataclysm_talent) } and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } and BuffRemaining(demonbolt_buff) and { BuffRemaining(demonbolt_buff) < 40 * SpellHaste() / 100 - ExecuteTime(demonbolt) or DemonicFury() < 80 + 80 * BuffStacks(demonbolt_buff) } Spell(doom)
+	#corruption,if=target.time_to_die>=6&remains<=(0.3*duration)&buff.metamorphosis.down
+	if target.TimeToDie() >= 6 and target.DebuffRemaining(corruption_debuff) <= 0.3 * BaseDuration(corruption_debuff) and BuffExpires(metamorphosis_buff) Spell(corruption)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&buff.demonbolt.stack>3&demonic_fury<=600&target.time_to_die>buff.demonbolt.remains&buff.dark_soul.down
+	if BuffPresent(metamorphosis_buff) and BuffStacks(demonbolt_buff) > 3 and DemonicFury() <= 600 and target.TimeToDie() > BuffRemaining(demonbolt_buff) and BuffExpires(dark_soul_knowledge_buff) and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#demonbolt,if=buff.demonbolt.stack=0|(buff.demonbolt.stack<4&buff.demonbolt.remains>=(40*spell_haste-execute_time))
+	if BuffStacks(demonbolt_buff) == 0 or BuffStacks(demonbolt_buff) < 4 and BuffRemaining(demonbolt_buff) >= 40 * SpellHaste() / 100 - ExecuteTime(demonbolt) Spell(demonbolt)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&((buff.dark_soul.remains>execute_time&demonic_fury>=175)|(target.time_to_die<buff.demonbolt.remains))
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(soul_fire) and DemonicFury() >= 175 or target.TimeToDie() < BuffRemaining(demonbolt_buff) } Spell(soul_fire)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(((demonic_fury-80)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { DemonicFury() - 80 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and DemonicFury() >= 750 Spell(soul_fire)
+	#touch_of_chaos,if=buff.metamorphosis.up&(target.time_to_die<buff.demonbolt.remains|demonic_fury>=750&buff.demonbolt.remains)
+	if BuffPresent(metamorphosis_buff) and { target.TimeToDie() < BuffRemaining(demonbolt_buff) or DemonicFury() >= 750 and BuffRemaining(demonbolt_buff) } Spell(touch_of_chaos)
+	#touch_of_chaos,if=buff.metamorphosis.up&(((demonic_fury-40)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
+	if BuffPresent(metamorphosis_buff) and { DemonicFury() - 40 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and DemonicFury() >= 750 Spell(touch_of_chaos)
+	#metamorphosis,if=buff.dark_soul.remains>gcd&demonic_fury>=240&(buff.demonbolt.down|target.time_to_die<buff.demonbolt.remains|(buff.dark_soul.remains>execute_time&demonic_fury>=175))
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and DemonicFury() >= 240 and { BuffExpires(demonbolt_buff) or target.TimeToDie() < BuffRemaining(demonbolt_buff) or BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(metamorphosis) and DemonicFury() >= 175 } Spell(metamorphosis)
+	#metamorphosis,if=buff.demonbolt.down&demonic_fury>=480&(action.dark_soul.charges=0|!talent.archimondes_darkness.enabled&cooldown.dark_soul.remains)
+	if BuffExpires(demonbolt_buff) and DemonicFury() >= 480 and { Charges(dark_soul_knowledge) == 0 or not Talent(archimondes_darkness_talent) and SpellCooldown(dark_soul_knowledge) > 0 } Spell(metamorphosis)
+	#metamorphosis,if=(demonic_fury%80)*2*spell_haste>=target.time_to_die&target.time_to_die<buff.demonbolt.remains
+	if DemonicFury() / 80 * 2 * SpellHaste() / 100 >= target.TimeToDie() and target.TimeToDie() < BuffRemaining(demonbolt_buff) Spell(metamorphosis)
+	#metamorphosis,if=target.time_to_die>=30*spell_haste&!dot.doom.ticking&buff.dark_soul.down
+	if target.TimeToDie() >= 30 * SpellHaste() / 100 and not target.DebuffPresent(doom_debuff) and BuffExpires(dark_soul_knowledge_buff) Spell(metamorphosis)
+	#metamorphosis,if=demonic_fury>750&buff.demonbolt.remains>=action.metamorphosis.cooldown
+	if DemonicFury() > 750 and BuffRemaining(demonbolt_buff) >= SpellCooldown(metamorphosis) Spell(metamorphosis)
+	#metamorphosis,if=(((demonic_fury-120)%800)>(buff.demonbolt.remains%(40*spell_haste)))&buff.demonbolt.remains>=10&dot.doom.remains<=dot.doom.duration*0.3
+	if { DemonicFury() - 120 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and BuffRemaining(demonbolt_buff) >= 10 and target.DebuffRemaining(doom_debuff) <= target.DebuffDuration(doom_debuff) * 0.3 Spell(metamorphosis)
+	#cancel_metamorphosis
+	if BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#soul_fire,if=buff.molten_core.react&(buff.dark_soul.remains<action.shadow_bolt.cast_time|buff.dark_soul.remains>cast_time)
+	if BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } Spell(soul_fire)
+	#life_tap,if=mana.pct<40
 }
 
 ### Demonology icons.
@@ -488,51 +516,11 @@ AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology checkb
 ###
 ### Destruction
 ###
-# Based on SimulationCraft profile "Warlock_Destruction_T16H".
+# Based on SimulationCraft profile "Warlock_Destruction_T16M".
 #	class=warlock
 #	spec=destruction
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Vb!....20
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Vb!....20.
 #	pet=felhunter
-
-# ActionList: DestructionPrecombatActions --> main, predict, shortcd, cd
-
-AddFunction DestructionPrecombatActions
-{
-	DestructionPrecombatPredictActions()
-}
-
-AddFunction DestructionPrecombatPredictActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#dark_intent,if=!aura.spell_power_multiplier.up
-	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#snapshot_stats
-	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
-	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
-}
-
-AddFunction DestructionPrecombatShortCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-	{
-		#summon_pet,if=!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down
-		if { Talent(grimoire_of_sacrifice_talent no) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) Spell(summon_felhunter)
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	}
-}
-
-AddFunction DestructionPrecombatCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-		or { Talent(grimoire_of_sacrifice_talent no) or BuffExpires(grimoire_of_sacrifice_buff) } and pet.Present(no) and Spell(summon_felhunter)
-		or Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
-	{
-		#jade_serpent_potion
-		UsePotionIntellect()
-	}
-}
 
 # ActionList: DestructionDefaultActions --> main, predict, shortcd, cd
 
@@ -542,111 +530,118 @@ AddFunction DestructionDefaultActions
 
 	#incinerate
 	Spell(incinerate)
-	#fel_flame,moving=1
-	if Speed() > 0 Spell(fel_flame)
 }
 
 AddFunction DestructionDefaultPredictActions
 {
-	#curse_of_the_elements,if=debuff.magic_vulnerability.down
-	if target.DebuffExpires(magic_vulnerability_debuff any=1) Spell(curse_of_the_elements)
-	#run_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 DestructionAoePredictActions()
-	#shadowburn,if=ember_react&(burning_ember>3.5|mana.pct<=20|target.time_to_die<20|buff.havoc.stack>=1|trinket.proc.intellect.react|(trinket.stacking_proc.intellect.remains<cast_time*4&trinket.stacking_proc.intellect.remains>cast_time))
-	if BurningEmbers() >= 10 and { BurningEmbers() / 10 > 3.5 or ManaPercent() <= 20 or target.TimeToDie() < 20 or DebuffStacksOnAny(havoc_debuff) >= 1 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } and target.HealthPercent() < 20 Spell(shadowburn)
-	#immolate,cycle_targets=1,if=n_ticks*crit_pct_current>3*dot.immolate.ticks_remain*dot.immolate.crit_pct&miss_react
-	if target.Ticks(immolate_debuff) * SpellCritChance() > 3 * target.TicksRemaining(immolate_debuff) * target.DebuffSpellCritChance(immolate_debuff) and True(miss_react) Spell(immolate)
-	#conflagrate,if=charges=2&buff.havoc.stack=0
-	if Charges(conflagrate) == 2 and DebuffStacksOnAny(havoc_debuff) == 0 Spell(conflagrate)
-	#chaos_bolt,if=ember_react&target.health.pct>20&(buff.backdraft.stack<3|level<86|(active_enemies>1&action.incinerate.cast_time<1))&(burning_ember>(4.5-active_enemies)|buff.skull_banner.remains>cast_time|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|(trinket.stacking_proc.intellect.remains<cast_time*2.5&trinket.stacking_proc.intellect.remains>cast_time))
-	if BurningEmbers() >= 10 and target.HealthPercent() > 20 and { BuffStacks(backdraft_buff) < 3 or Level() < 86 or Enemies() > 1 and CastTime(incinerate) < 1 } and { BurningEmbers() / 10 > 4.5 - Enemies() or BuffRemaining(skull_banner_buff any=1) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(chaos_bolt) * 2.5 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(chaos_bolt) } Spell(chaos_bolt)
-	#chaos_bolt,if=ember_react&target.health.pct>20&(buff.havoc.stack=3&buff.havoc.remains>cast_time)
-	if BurningEmbers() >= 10 and target.HealthPercent() > 20 and DebuffStacksOnAny(havoc_debuff) == 3 and DebuffRemainingOnAny(havoc_debuff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|target.time_to_die<20|trinket.proc.intellect.react|(trinket.stacking_proc.intellect.remains<cast_time*4&trinket.stacking_proc.intellect.remains>cast_time))
+	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or target.TimeToDie() < 20 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } Spell(shadowburn)
+	#immolate,if=remains<=cast_time
+	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) Spell(immolate)
+	#conflagrate,if=charges=2
+	if Charges(conflagrate) == 2 Spell(conflagrate)
+	#chaos_bolt,if=set_bonus.tier17_4pc=1&buff.chaotic_infusion.react
+	if ArmorSetBonus(T17 4) == 1 and BuffPresent(chaotic_infusion_buff) Spell(chaos_bolt)
+	#chaos_bolt,if=set_bonus.tier17_2pc=1&buff.backdraft.stack<3&(burning_ember>=2.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up)
+	if ArmorSetBonus(T17 2) == 1 and BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 2.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) } Spell(chaos_bolt)
+	#chaos_bolt,if=talent.charred_remains.enabled&buff.backdraft.stack<3&(burning_ember>=2.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up)
+	if Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 2.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) } Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&(burning_ember>=3.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up|(burning_ember>=3&buff.ember_master.react))
+	if BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) } Spell(chaos_bolt)
+	#immolate,if=remains<=(duration*0.3)
+	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
+	#rain_of_fire,if=(!ticking|(talent.mannoroths_fury.enabled&buff.mannoroths_fury.up&buff.mannoroths_fury.remains<1))
+	if not target.DebuffPresent(rain_of_fire_debuff) or Talent(mannoroths_fury_talent) and BuffPresent(mannoroths_fury_buff) and BuffRemaining(mannoroths_fury_buff) < 1 Spell(rain_of_fire)
 	#conflagrate
 	Spell(conflagrate)
 }
 
 AddFunction DestructionDefaultShortCdActions
 {
-	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
-	{
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-		#run_action_list,name=aoe,if=active_enemies>3
-		if Enemies() > 3 DestructionAoeShortCdActions()
-		#rain_of_fire,if=!ticking&!in_flight&active_enemies>1
-		if not target.DebuffPresent(rain_of_fire_aftermath_debuff) and not InFlightToTarget(rain_of_fire_aftermath) and Enemies() > 1 Spell(rain_of_fire_aftermath)
-		#havoc,target=2,if=active_enemies>1
-		if Enemies() > 1 Spell(havoc)
+	#mannoroths_fury
+	Spell(mannoroths_fury)
+	#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
+	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felhunter)
 
-		unless BurningEmbers() >= 10 and { BurningEmbers() / 10 > 3.5 or ManaPercent() <= 20 or target.TimeToDie() < 20 or DebuffStacksOnAny(havoc_debuff) >= 1 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } and target.HealthPercent() < 20 and Spell(shadowburn)
-			or target.Ticks(immolate_debuff) * SpellCritChance() > 3 * target.TicksRemaining(immolate_debuff) * target.DebuffSpellCritChance(immolate_debuff) and True(miss_react) and Spell(immolate)
-			or Charges(conflagrate) == 2 and DebuffStacksOnAny(havoc_debuff) == 0 and Spell(conflagrate)
-		{
-			#rain_of_fire,if=!ticking&!in_flight,moving=1
-			if not target.DebuffPresent(rain_of_fire_aftermath_debuff) and not InFlightToTarget(rain_of_fire_aftermath) and Speed() > 0 Spell(rain_of_fire_aftermath)
-		}
+	unless Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or target.TimeToDie() < 20 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } and Spell(shadowburn)
+		or target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and Spell(immolate)
+		or Charges(conflagrate) == 2 and Spell(conflagrate)
+	{
+		#cataclysm
+		Spell(cataclysm)
 	}
 }
 
 AddFunction DestructionDefaultCdActions
 {
-	unless target.DebuffExpires(magic_vulnerability_debuff any=1) and Spell(curse_of_the_elements)
-	{
-		#use_item,name=gloves_of_the_horned_nightmare
-		UseItemActions()
-		#jade_serpent_potion,if=buff.bloodlust.react|target.health.pct<=20
-		if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
-		#berserking
-		Spell(berserking)
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react|target.health.pct<=10))
-		if Talent(archimondes_darkness_talent no) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_intellect_buff) or target.HealthPercent() <= 10 } Spell(dark_soul_instability)
+	#potion,name=jade_serpent,if=buff.bloodlust.react|target.health.pct<=20
+	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+	#berserking
+	Spell(berserking)
+	#blood_fury
+	Spell(blood_fury_sp)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
+	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
+	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_instability)
 
-		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
-		{
-			#run_action_list,name=aoe,if=active_enemies>3
-			if Enemies() > 3 DestructionAoeCdActions()
-			#summon_doomguard
-			Spell(summon_doomguard)
-		}
+	unless Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) and Spell(grimoire_felhunter)
+	{
+		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
+		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,,if=!talent.demonic_servitude.enabled&active_enemies>=5
+		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
 	}
 }
 
-# ActionList: DestructionAoeActions --> main, predict, shortcd, cd
+# ActionList: DestructionPrecombatActions --> main, predict, shortcd, cd
 
-AddFunction DestructionAoeActions
+AddFunction DestructionPrecombatActions
 {
-	DestructionAoePredictActions()
+	DestructionPrecombatPredictActions()
 
 	#incinerate
 	Spell(incinerate)
 }
 
-AddFunction DestructionAoePredictActions
+AddFunction DestructionPrecombatPredictActions
 {
-	#rain_of_fire,if=!ticking&!in_flight
-	if not target.DebuffPresent(rain_of_fire_aftermath_debuff) and not InFlightToTarget(rain_of_fire_aftermath) Spell(rain_of_fire_aftermath)
-	#immolate,if=buff.fire_and_brimstone.up&!ticking
-	if BuffPresent(fire_and_brimstone_buff) and not target.DebuffPresent(immolate_debuff) Spell(immolate)
-	#conflagrate,if=buff.fire_and_brimstone.up
-	if BuffPresent(fire_and_brimstone_buff) Spell(conflagrate)
-	#incinerate,if=buff.fire_and_brimstone.up
-	if BuffPresent(fire_and_brimstone_buff) Spell(incinerate)
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
+	#snapshot_stats
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
+	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 }
 
-AddFunction DestructionAoeShortCdActions
+AddFunction DestructionPrecombatShortCdActions
 {
-	unless not target.DebuffPresent(rain_of_fire_aftermath_debuff) and not InFlightToTarget(rain_of_fire_aftermath) and Spell(rain_of_fire_aftermath)
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
 	{
-		#fire_and_brimstone,if=ember_react&buff.fire_and_brimstone.down
-		if BurningEmbers() >= 10 and BuffExpires(fire_and_brimstone_buff) Spell(fire_and_brimstone)
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
 	}
 }
 
-AddFunction DestructionAoeCdActions
+AddFunction DestructionPrecombatCdActions
 {
-	#summon_infernal
-	Spell(summon_infernal)
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
+	{
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+
+		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+		{
+			#potion,name=jade_serpent
+			UsePotionIntellect()
+		}
+	}
 }
 
 ### Destruction icons.
@@ -694,16 +689,6 @@ AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction chec
 	if InCombat(no) DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()
 }
-]]
-
-	OvaleScripts:RegisterScript("WARLOCK", "legacy", desc, code, "legacy")
-end
-
-do
-	local name = "ovale_warlock"
-	local desc = "[6.0.2] Ovale: Work in progress"
-	local code = [[
-# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "include")
