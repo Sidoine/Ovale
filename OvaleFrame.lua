@@ -202,7 +202,7 @@ do
 					if element.value and element.origin and element.rate then
 						value = element.value + (now - element.origin) * element.rate
 					end
-					Ovale:Logf("GetAction: start=%f, value=%f", start, value)
+					Ovale:Logf("GetAction: start=%s, value=%f", start, value)
 					local actionTexture
 					if node.params and node.params.texture then
 						actionTexture = API_GetSpellTexture(node.params.texture)
@@ -216,7 +216,7 @@ do
 						actionUsable, actionShortcut, actionIsCurrent, actionEnable,
 						actionType, actionId, actionTarget = OvaleBestAction:GetActionInfo(element, state)
 
-					Ovale:Logf("GetAction: start=%f, id=%s", start, actionId)
+					Ovale:Logf("GetAction: start=%s, id=%s", start, actionId)
 					--[[
 						If "nored=1" is given as an action parameter, then just use the actual start time of
 						the element itself.
@@ -226,7 +226,7 @@ do
 						if start < state.currentTime then
 							start = state.currentTime
 						end
-						Ovale:Logf("Adjusting for 'nored': start = %f", start)
+						Ovale:Logf("Adjusting for 'nored': start=%s", start)
 					end
 					-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
 					if start and state.currentSpellId and state.nextCast and actionType == "spell" and actionId == state.currentSpellId and start < state.nextCast then
@@ -266,7 +266,7 @@ do
 
 					if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
 						if start then
-							Ovale:Logf("****Second icon %f", start)
+							Ovale:Logf("****Second icon %s", start)
 							local spellTarget
 							if element then
 								spellTarget = element.params.target
