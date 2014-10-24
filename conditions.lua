@@ -3719,7 +3719,8 @@ do
 	-- Return the amount of power of the given power type required to cast the given spell.
 	local function PowerCost(powerType, condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local value = state:PowerCost(spellId, powerType) or 0
+		local maxCost = (condition.max == 1)
+		local value = state:PowerCost(spellId, powerType, maxCost) or 0
 		return Compare(value, comparator, limit)
 	end
 
@@ -3730,6 +3731,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param max Optional. Set max=1 to return the maximum energy cost for the spell.
+	--     Defaults to max=0.
+	--     Valid values: 0, 1
 	-- @return The amount of energy.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3743,6 +3747,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param max Optional. Set max=1 to return the maximum focus cost for the spell.
+	--     Defaults to max=0.
+	--     Valid values: 0, 1
 	-- @return The amount of focus.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3757,6 +3764,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param max Optional. Set max=1 to return the maximum mana cost for the spell.
+	--     Defaults to max=0.
+	--     Valid values: 0, 1
 	-- @return The amount of mana.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3770,6 +3780,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param max Optional. Set max=1 to return the maximum rage cost for the spell.
+	--     Defaults to max=0.
+	--     Valid values: 0, 1
 	-- @return The amount of rage.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3783,6 +3796,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param max Optional. Set max=1 to return the maximum runic power cost for the spell.
+	--     Defaults to max=0.
+	--     Valid values: 0, 1
 	-- @return The amount of runic power.
 	-- @return A boolean value for the result of the comparison.
 
