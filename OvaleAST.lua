@@ -405,6 +405,7 @@ local UnparseAddCheckBox = nil
 local UnparseAddFunction = nil
 local UnparseAddIcon = nil
 local UnparseAddListItem = nil
+local UnparseBangValue = nil
 local UnparseComment = nil
 local UnparseDefine = nil
 local UnparseExpression = nil
@@ -414,7 +415,6 @@ local UnparseIf = nil
 local UnparseItemInfo = nil
 local UnparseList = nil
 local UnparseNumber = nil
-local UnparseParameterValue = nil
 local UnparseParameters = nil
 local UnparseScoreSpells = nil
 local UnparseScript = nil
@@ -477,6 +477,10 @@ UnparseAddListItem = function(node)
 		s = format("AddListItem(%s %s %s)", node.name, node.item, Unparse(node.description))
 	end
 	return s
+end
+
+UnparseBangValue = function(node)
+	return "!" .. Unparse(node.child[1])
 end
 
 UnparseComment = function(node)
@@ -589,10 +593,6 @@ UnparseNumber = function(node)
 	return tostring(node.value)
 end
 
-UnparseParameterValue = function(node)
-	return "!" .. Unparse(node.child[1])
-end
-
 UnparseParameters = function(parameters)
 	local output = self_outputPool:Get()
 	local N = #parameters
@@ -682,7 +682,7 @@ do
 		["action"] = UnparseFunction,
 		["add_function"] = UnparseAddFunction,
 		["arithmetic"] = UnparseExpression,
-		["bang_value"] = UnparseParameterValue,
+		["bang_value"] = UnparseBangValue,
 		["checkbox"] = UnparseAddCheckBox,
 		["compare"] = UnparseExpression,
 		["comment"] = UnparseComment,
