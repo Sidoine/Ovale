@@ -35,9 +35,11 @@ local OvaleState = nil
 local bit_band = bit.band
 local bit_bor = bit.bor
 local floor = math.floor
+local gmatch = string.gmatch
 local ipairs = ipairs
 local pairs = pairs
 local substr = string.sub
+local strmatch = string.match
 local tinsert = table.insert
 local tonumber = tonumber
 local tsort = table.sort
@@ -896,7 +898,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 		for auraId, spellData in pairs(filterInfo) do
 			--[[
 				For lists described by SpellAddBuff(), etc., use the following interpretation:
-					auraId=refresh*		aura is refreshed, no change to stacks
+					auraId=refresh		aura is refreshed, no change to stacks
 					auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
 					auraId=N, N > 0		N is number of stacks added
 					auraId=0			aura is removed
@@ -905,131 +907,159 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local si = OvaleData.spellInfo[auraId]
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
 			local stacks = 1
-			local refresh = (strsub(1, 7, spelData) == "refresh")
+			local refresh = false
 
-			if type(spellData) == "number" then
-				stacks = spellData
-				-- Deprecated after transition.
-				if not (si and si.duration) and spellData > 0 then
-					-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
-					Ovale:OneTimeMessage("Warning: '%s=%d' is deprecated for spell ID %d; aura ID %s should have duration information.", auraId, spellData, spellId, auraId)
-					duration = spellData
-					stacks = 1
+			-- Parser for spellData as comma-separated values.
+			local tokenIterator = gmatch(spellData, "[^,]+")
+
+			-- Set stacks and refresh based on spellData.
+			local value = tokenIterator()
+			if value == "refresh" then
+				refresh = true
+			else
+				value = tonumber(value)
+				if value then
+					stacks = value
+					-- Deprecated after transition.
+					if not (si and si.duration) and value > 0 then
+						-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
+						Ovale:OneTimeMessage("Warning: '%s=%d' is deprecated for spell ID %d; aura ID %s should have duration information.", auraId, value, spellId, auraId)
+						duration = value
+						stacks = 1
+					end
 				end
 			end
 
-			local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
-			local atTime = isChanneled and startCast or endCast
-
-			if state:IsActiveAura(auraFound, atTime) then
-				local aura
-				if auraFound.state then
-					-- Re-use existing aura in the simulator.
-					aura = auraFound
-				else
-					-- Add an aura in the simulator and copy the existing aura information over.
-					aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, math.huge)
-					for k, v in pairs(auraFound) do
-						aura[k] = v
-					end
-					if auraFound.snapshot then
-						aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
-					end
-					-- Reset the aura age relative to the state of the simulator.
-					aura.serial = state.serial
-					Ovale:Logf("Aura %d is copied into simulator.", auraId)
-					-- Information that needs to be set below: stacks, start, ending, duration, gain.
-				end
-				-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
-				if refresh or stacks > 0 then
-					-- Adjust stack count.
-					if refresh then
-						-- Verify that the aura is refreshed by the spell.
-						local refreshCondition = strsub(refresh, 9)
-						if substr(refreshCondition, 1, 18) == "target_health_pct_" then
-							local threshold = substr(refreshCondition, 19)
-							if threshold then
-								threshold = tonumber(threshold)
-								local healthPercent = API_UnitHealth(unitId) / API_UnitHealthMax(unitId) * 100
-								if healthPercent < threshold then
-									Ovale:Logf("Aura %d is refreshed to %d stack(s) at target health < %d%%.", auraId, aura.stacks, threshold)
-								else
-									refresh = false
-								end
-							else
-								Ovale:OneTimeMessage("Warning: '%d=%s' refresh parameter missing threshold", auraId, spellData)
-							end
+			-- Verify any conditions for this aura.
+			local verified = true
+			local condition = tokenIterator()
+			while verified and condition do
+				Ovale:Logf("Aura %d has conditions:")
+				if condition == "target_health_pct" then
+					local threshold = tokenIterator()
+					if threshold then
+						local isBang = false
+						if substr(threshold, 1, 1) == "!" then
+							threshold = substr(threshold, 2)
+						end
+						threshold = tonumber(threshold) or 0
+						local healthPercent = API_UnitHealth(unitId) / API_UnitHealthMax(unitId) * 100
+						local result = "fail"
+						if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
+							result = "pass"
+							verified = true
+						end
+						if isBang then
+							Ovale:Logf("    Target health > %f%%: %s", threshold, result)
 						else
-							Ovale:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
-						end
-					else -- if stacks > 0 then
-						local maxStacks = 1
-						if si and (si.max_stacks or si.maxstacks) then
-							maxStacks = si.max_stacks or si.maxstacks
-						end
-						aura.stacks = aura.stacks + stacks
-						if aura.stacks > maxStacks then
-							aura.stacks = maxStacks
-						end
-						Ovale:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
-					end
-					-- Set duration for the aura.
-					if aura.tick and aura.tick > 0 then
-						-- This is a periodic aura, so add new duration to extend the aura up to 130% of the normal duration.
-						local remainingDuration = aura.ending - atTime
-						local extensionDuration = 0.3 * duration
-						if remainingDuration < extensionDuration then
-							-- Aura is extended by the normal duration.
-							aura.duration = remainingDuration + duration
-						else
-							aura.duration = extensionDuration + duration
+							Ovale:Logf("    Target health <= %f%%: %s", threshold, result)
 						end
 					else
-						aura.duration = duration
+						Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing threshold", auraId, spellData, condition)
 					end
-					aura.start = atTime
-					aura.ending = aura.start + aura.duration
-					aura.gain = atTime
-					Ovale:Logf("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
-				elseif stacks == 0 or stacks < 0 then
-					if stacks == 0 then
-						aura.stacks = 0
-					else -- if stacks < 0 then
-						aura.stacks = aura.stacks + stacks
-						if aura.stacks < 0 then
-							aura.stacks = 0
+				end
+				condition = tokenIterator()
+			end
+
+			if verified then
+				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
+				local atTime = isChanneled and startCast or endCast
+
+				if state:IsActiveAura(auraFound, atTime) then
+					local aura
+					if auraFound.state then
+						-- Re-use existing aura in the simulator.
+						aura = auraFound
+					else
+						-- Add an aura in the simulator and copy the existing aura information over.
+						aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, math.huge)
+						for k, v in pairs(auraFound) do
+							aura[k] = v
 						end
-						Ovale:Logf("Aura %d loses %d stack(s) to %d because of spell %d.", auraId, -1 * stacks, aura.stacks, spellId)
+						if auraFound.snapshot then
+							aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
+						end
+						-- Reset the aura age relative to the state of the simulator.
+						aura.serial = state.serial
+						Ovale:Logf("Aura %d is copied into simulator.", auraId)
+						-- Information that needs to be set below: stacks, start, ending, duration, gain.
 					end
-					-- An existing aura is losing stacks, so inherit start, duration, ending and gain information.
-					if aura.stacks == 0 then
-						Ovale:Logf("Aura %d is completely removed.", auraId)
-						-- The aura is completely removed, so set ending to the time that the aura is removed.
-						aura.ending = atTime
-						aura.consumed = true
+					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
+					if refresh or stacks > 0 then
+						-- Adjust stack count.
+						if refresh then
+							Ovale:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
+						else -- if stacks > 0 then
+							local maxStacks = 1
+							if si and (si.max_stacks or si.maxstacks) then
+								maxStacks = si.max_stacks or si.maxstacks
+							end
+							aura.stacks = aura.stacks + stacks
+							if aura.stacks > maxStacks then
+								aura.stacks = maxStacks
+							end
+							Ovale:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
+						end
+						-- Set duration for the aura.
+						if aura.tick and aura.tick > 0 then
+							-- This is a periodic aura, so add new duration to extend the aura up to 130% of the normal duration.
+							local remainingDuration = aura.ending - atTime
+							local extensionDuration = 0.3 * duration
+							if remainingDuration < extensionDuration then
+								-- Aura is extended by the normal duration.
+								aura.duration = remainingDuration + duration
+							else
+								aura.duration = extensionDuration + duration
+							end
+						else
+							aura.duration = duration
+						end
+						aura.start = atTime
+						aura.ending = aura.start + aura.duration
+						aura.gain = atTime
+						Ovale:Logf("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
+					elseif stacks == 0 or stacks < 0 then
+						if stacks == 0 then
+							aura.stacks = 0
+						else -- if stacks < 0 then
+							aura.stacks = aura.stacks + stacks
+							if aura.stacks < 0 then
+								aura.stacks = 0
+							end
+							Ovale:Logf("Aura %d loses %d stack(s) to %d because of spell %d.", auraId, -1 * stacks, aura.stacks, spellId)
+						end
+						-- An existing aura is losing stacks, so inherit start, duration, ending and gain information.
+						if aura.stacks == 0 then
+							Ovale:Logf("Aura %d is completely removed.", auraId)
+							-- The aura is completely removed, so set ending to the time that the aura is removed.
+							aura.ending = atTime
+							aura.consumed = true
+						end
+					end
+				else
+					-- Aura is not on the target.
+					if not refresh and stacks > 0 then
+						-- Spellcast causes a new aura.
+						Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
+						-- Add an aura in the simulator and copy the existing aura information over.
+						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
+						-- Information that needs to be set below: stacks, start, ending, duration, gain.
+						aura.stacks = stacks
+						-- Set start and duration for aura.
+						aura.start = atTime
+						aura.duration = duration
+						-- If "tick" is set explicitly in SpellInfo, then this is a known periodic aura.
+						if si and si.tick then
+							aura.baseTick = si.tick
+							aura.tick = OvaleData:GetTickLength(auraId, spellcast.snapshot)
+						end
+						aura.ending = aura.start + aura.duration
+						aura.gain = aura.start
+						OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
 					end
 				end
 			else
-				-- Aura is not on the target.
-				if not refresh and stacks > 0 then
-					-- Spellcast causes a new aura.
-					Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
-					-- Add an aura in the simulator and copy the existing aura information over.
-					local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
-					-- Information that needs to be set below: stacks, start, ending, duration, gain.
-					aura.stacks = stacks
-					-- Set start and duration for aura.
-					aura.start = atTime
-					aura.duration = duration
-					-- If "tick" is set explicitly in SpellInfo, then this is a known periodic aura.
-					if si and si.tick then
-						aura.baseTick = si.tick
-						aura.tick = OvaleData:GetTickLength(auraId, spellcast.snapshot)
-					end
-					aura.ending = aura.start + aura.duration
-					aura.gain = aura.start
-					OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
-				end
+				Ovale:Logf("Aura %d is not applied.")
 			end
 		end
 	end
