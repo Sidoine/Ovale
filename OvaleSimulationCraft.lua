@@ -840,14 +840,30 @@ do
 	end
 end
 
-local function OvaleFunctionName(name, class, spec)
-	local functionName
-	if spec then
-		functionName = CamelCase(spec .. " " .. name) .. "Actions"
-	else
-		functionName = CamelCase(name) .. "Actions"
+local function OvaleFunctionName(name, annotation)
+	local output = self_outputPool:Get()
+	local profileName, class, specialization = annotation.name, annotation.class, annotation.specialization
+	if specialization then
+		output[#output + 1] = specialization
 	end
-	return functionName
+	if strmatch(profileName, "_1[hH]_") then
+		if class == "DEATHKNIGHT" and specialization == "frost" then
+			output[#output + 1] = "dual wield"
+		elseif class == "WARRIOR" and specialization == "fury" then
+			output[#output + 1] = "single minded fury"
+		end
+	elseif strmatch(profileName, "_2[hH]_") then
+		if class == "DEATHKNIGHT" and specialization == "frost" then
+			output[#output + 1] = "two hander"
+		elseif class == "WARRIOR" and specialization == "fury" then
+			output[#output + 1] = "titans grip"
+		end
+	end
+	output[#output + 1] = name
+	output[#output + 1] = "actions"
+	local outputString = CamelCase(tconcat(output, " "))
+	self_outputPool:Release(output)
+	return outputString
 end
 
 local function AddSymbol(annotation, symbol)
@@ -903,6 +919,8 @@ local function InitializeDisambiguation()
 	-- Death Knight
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_runicpower",	"DEATHKNIGHT")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"DEATHKNIGHT")
+	AddDisambiguation("breath_of_sindragosa_debuff",	"breath_of_sindragosa_buff",	"DEATHKNIGHT")
+	AddDisambiguation("soul_reaper",			"soul_reaper_blood",			"DEATHKNIGHT",	"blood")
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
 	-- Druid
@@ -1036,6 +1054,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local buffName = "shadow_infusion_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffStacks(%s) >= 5", buffName)
+		elseif class == "DEATHKNIGHT" and action == "horn_of_winter" then
+			-- Only cast Horn of Winter if not already raid-buffed.
+			conditionCode = "BuffExpires(attack_power_multiplier_buff any=1)"
 		elseif class == "DEATHKNIGHT" and action == "mind_freeze" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -1259,7 +1280,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
 			if modifier.name then
 				local name = Unparse(modifier.name)
-				bodyCode = OvaleFunctionName(name, class, specialization) .. "()"
+				bodyCode = OvaleFunctionName(name, annotation) .. "()"
 			end
 			isSpellAction = false
 		elseif action == "pool_resource" then
@@ -1523,7 +1544,7 @@ EmitActionList = function(parseNode, nodeList, annotation)
 
 	local node = OvaleAST:NewNode(nodeList, true)
 	node.type = "add_function"
-	node.name = OvaleFunctionName(parseNode.name, annotation.class, annotation.specialization)
+	node.name = OvaleFunctionName(parseNode.name, annotation)
 	node.child[1] = groupNode
 	return node
 end
@@ -2459,7 +2480,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 
 	target = target and (target .. ".") or ""
 	local code
-	if class == "DRUID" and operand == "max_fb_energy" then
+	if class == "DEATHKNIGHT" and operand == "dot.breath_of_sindragosa.ticking" then
+		-- Breath of Sindragosa is the player buff from channeling the spell.
+		local buffName = "breath_of_sindragosa_buff"
+		code = format("BuffPresent(%s)", buffName)
+		AddSymbol(annotation, buffName)
+	elseif class == "DRUID" and operand == "max_fb_energy" then
 		-- SimulationCraft's max_fb_energy is the maximum cost of Ferocious Bite if used.
 		local spellName = "ferocious_bite"
 		code = format("EnergyCost(%s max=1)", spellName)
@@ -2656,7 +2682,8 @@ end
 local function InsertSupportingFunctions(child, annotation)
 	local count = 0
 	local nodeList = annotation.astAnnotation.nodeList
-	if annotation.mind_freeze == "DEATHKNIGHT" then
+	if annotation.class == "DEATHKNIGHT" then
+		-- Death knight profiles no longer include Mind Freeze.
 		local code = [[
 			AddFunction InterruptActions
 			{
@@ -3552,18 +3579,18 @@ function OvaleSimulationCraft:Emit(profile)
 		output[#output + 1] = format("AddIcon specialization=%s help=main enemies=1", annotation.specialization)
 		output[#output + 1] = "{"
 		if profile["actions.precombat"] then
-			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation.class, annotation.specialization))
+			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation))
 		end
-		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation.class, annotation.specialization))
+		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation))
 		output[#output + 1] = "}"
 		-- AoE rotation.
 		output[#output + 1] = ""
 		output[#output + 1] = format("AddIcon specialization=%s help=aoe", annotation.specialization)
 		output[#output + 1] = "{"
 		if profile["actions.precombat"] then
-			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation.class, annotation.specialization))
+			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation))
 		end
-		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation.class, annotation.specialization))
+		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation))
 		output[#output + 1] = "}"
 	end
 	-- Append the required symbols for the script.

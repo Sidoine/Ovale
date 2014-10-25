@@ -30,12 +30,28 @@ AddFunction DiseasesTicking
 	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
 }
 
-AddFunction FrostPrecombatActions
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
+AddFunction FrostDualWieldPrecombatActions
 {
 	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
 	#horn_of_winter
-	Spell(horn_of_winter)
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#frost_presence
 	Spell(frost_presence)
 	#snapshot_stats
@@ -47,7 +63,7 @@ AddFunction FrostPrecombatActions
 	Spell(pillar_of_frost)
 }
 
-AddFunction FrostDefaultActions
+AddFunction FrostDualWieldDefaultActions
 {
 	#auto_attack
 	#deaths_advance,if=movement.remains>2
@@ -67,12 +83,12 @@ AddFunction FrostDefaultActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#call_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 FrostAoeActions()
+	if Enemies() >= 3 FrostDualWieldAoeActions()
 	#call_action_list,name=single_target,if=active_enemies<3
-	if Enemies() < 3 FrostSingleTargetActions()
+	if Enemies() < 3 FrostDualWieldSingleTargetActions()
 }
 
-AddFunction FrostBosStActions
+AddFunction FrostDualWieldBosStActions
 {
 	#obliterate,if=buff.killing_machine.react
 	if BuffPresent(killing_machine_buff) Spell(obliterate)
@@ -92,7 +108,7 @@ AddFunction FrostBosStActions
 	Spell(empower_rune_weapon)
 }
 
-AddFunction FrostAoeActions
+AddFunction FrostDualWieldAoeActions
 {
 	#unholy_blight
 	Spell(unholy_blight)
@@ -105,7 +121,7 @@ AddFunction FrostAoeActions
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#call_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
-	if target.DebuffPresent(breath_of_sindragosa_debuff) FrostBosAoeActions()
+	if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosAoeActions()
 	#howling_blast
 	Spell(howling_blast)
 	#blood_tap,if=buff.blood_charge.stack>10
@@ -128,7 +144,7 @@ AddFunction FrostAoeActions
 	Spell(empower_rune_weapon)
 }
 
-AddFunction FrostBosAoeActions
+AddFunction FrostDualWieldBosAoeActions
 {
 	#howling_blast
 	Spell(howling_blast)
@@ -148,7 +164,7 @@ AddFunction FrostBosAoeActions
 	Spell(empower_rune_weapon)
 }
 
-AddFunction FrostSingleTargetActions
+AddFunction FrostDualWieldSingleTargetActions
 {
 	#blood_tap,if=buff.blood_charge.stack>10&(runic_power>76|(runic_power>=20&buff.killing_machine.react))
 	if BuffStacks(blood_charge_buff) > 10 and { RunicPower() > 76 or RunicPower() >= 20 and BuffPresent(killing_machine_buff) } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
@@ -159,7 +175,7 @@ AddFunction FrostSingleTargetActions
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#call_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
-	if target.DebuffPresent(breath_of_sindragosa_debuff) FrostBosStActions()
+	if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosStActions()
 	#howling_blast,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<88
 	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 Spell(howling_blast)
 	#obliterate,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<3&runic_power<76
@@ -204,14 +220,14 @@ AddFunction FrostSingleTargetActions
 
 AddIcon specialization=frost help=main enemies=1
 {
-	if not InCombat() FrostPrecombatActions()
-	FrostDefaultActions()
+	if not InCombat() FrostDualWieldPrecombatActions()
+	FrostDualWieldDefaultActions()
 }
 
 AddIcon specialization=frost help=aoe
 {
-	if not InCombat() FrostPrecombatActions()
-	FrostDefaultActions()
+	if not InCombat() FrostDualWieldPrecombatActions()
+	FrostDualWieldDefaultActions()
 }
 
 ### Required symbols
@@ -219,6 +235,7 @@ AddIcon specialization=frost help=aoe
 # antimagic_shell_buff
 # arcane_torrent_runicpower
 # army_of_the_dead
+# asphyxiate
 # berserking
 # blood_boil
 # blood_charge_buff
@@ -226,7 +243,7 @@ AddIcon specialization=frost help=aoe
 # blood_plague_debuff
 # blood_tap
 # breath_of_sindragosa
-# breath_of_sindragosa_debuff
+# breath_of_sindragosa_buff
 # breath_of_sindragosa_talent
 # death_and_decay
 # deaths_advance
@@ -239,6 +256,7 @@ AddIcon specialization=frost help=aoe
 # horn_of_winter
 # howling_blast
 # killing_machine_buff
+# mind_freeze
 # mogu_power_potion
 # necrotic_plague_debuff
 # necrotic_plague_talent
@@ -249,10 +267,13 @@ AddIcon specialization=frost help=aoe
 # plague_leech_talent
 # plague_strike
 # potion_strength_buff
+# quaking_palm
 # rime_buff
 # soul_reaper_frost
+# strangulate
 # unholy_blight
 # unholy_blight_talent
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "reference")
 end

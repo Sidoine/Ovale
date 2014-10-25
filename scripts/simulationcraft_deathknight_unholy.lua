@@ -25,12 +25,28 @@ AddFunction DiseasesTicking
 	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
 }
 
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction UnholyPrecombatActions
 {
 	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
 	#horn_of_winter
-	Spell(horn_of_winter)
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#unholy_presence
 	Spell(unholy_presence)
 	#snapshot_stats
@@ -94,7 +110,7 @@ AddFunction UnholyAoeActions
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#call_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
-	if target.DebuffPresent(breath_of_sindragosa_debuff) UnholyBosAoeActions()
+	if BuffPresent(breath_of_sindragosa_buff) UnholyBosAoeActions()
 	#blood_boil,if=blood=2|(frost=2&death=2)
 	if Runes(blood 2) or Runes(frost 2) and Runes(death 2) and not Runes(death 3) Spell(blood_boil)
 	#summon_gargoyle
@@ -178,7 +194,7 @@ AddFunction UnholySingleTargetActions
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#call_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
-	if target.DebuffPresent(breath_of_sindragosa_debuff) UnholyBosStActions()
+	if BuffPresent(breath_of_sindragosa_buff) UnholyBosStActions()
 	#death_and_decay,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
 	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(death_and_decay)
 	#scourge_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
@@ -237,6 +253,7 @@ AddIcon specialization=unholy help=aoe
 # antimagic_shell
 # arcane_torrent_runicpower
 # army_of_the_dead
+# asphyxiate
 # berserking
 # blood_boil
 # blood_charge_buff
@@ -244,7 +261,7 @@ AddIcon specialization=unholy help=aoe
 # blood_plague_debuff
 # blood_tap
 # breath_of_sindragosa
-# breath_of_sindragosa_debuff
+# breath_of_sindragosa_buff
 # breath_of_sindragosa_talent
 # dark_transformation
 # dark_transformation_buff
@@ -258,20 +275,24 @@ AddIcon specialization=unholy help=aoe
 # frost_fever_debuff
 # horn_of_winter
 # icy_touch
+# mind_freeze
 # mogu_power_potion
 # necrotic_plague_debuff
 # necrotic_plague_talent
 # outbreak
 # plague_leech
 # plague_strike
+# quaking_palm
 # raise_dead
 # scourge_strike
 # shadow_infusion_buff
 # soul_reaper_unholy
+# strangulate
 # sudden_doom_buff
 # summon_gargoyle
 # unholy_blight
 # unholy_presence
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "reference")
 end

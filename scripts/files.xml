@@ -28,6 +28,7 @@
 	<Script file="lunaeclipse_druid.lua" />
 	<Script file="wiljo_mage.lua" />
 
+	<Script file="simulationcraft_deathknight_blood.lua" />
 	<Script file="simulationcraft_deathknight_frost_1h.lua" />
 	<Script file="simulationcraft_deathknight_frost_2h.lua" />
 	<Script file="simulationcraft_deathknight_unholy.lua" />

@@ -22,7 +22,7 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction FuryPrecombatActions
+AddFunction FuryTitansGripPrecombatActions
 {
 	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
@@ -33,13 +33,13 @@ AddFunction FuryPrecombatActions
 	UsePotionStrength()
 }
 
-AddFunction FuryDefaultActions
+AddFunction FuryTitansGripDefaultActions
 {
 	#charge
 	Spell(charge)
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
-	if 0 > 5 FuryMovementActions()
+	if 0 > 5 FuryTitansGripMovementActions()
 	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=10|talent.anger_management.enabled
@@ -57,16 +57,16 @@ AddFunction FuryDefaultActions
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 0 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
 	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FurySingleTargetActions()
+	if Enemies() == 1 FuryTitansGripSingleTargetActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FuryTwoTargetsActions()
+	if Enemies() == 2 FuryTitansGripTwoTargetsActions()
 	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FuryThreeTargetsActions()
+	if Enemies() == 3 FuryTitansGripThreeTargetsActions()
 	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FuryAoeActions()
+	if Enemies() > 3 FuryTitansGripAoeActions()
 }
 
-AddFunction FuryAoeActions
+AddFunction FuryTitansGripAoeActions
 {
 	#bloodbath
 	Spell(bloodbath)
@@ -88,9 +88,11 @@ AddFunction FuryAoeActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#bloodthirst
 	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
-AddFunction FuryTwoTargetsActions
+AddFunction FuryTitansGripTwoTargetsActions
 {
 	#bloodbath
 	Spell(bloodbath)
@@ -108,11 +110,17 @@ AddFunction FuryTwoTargetsActions
 	if BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#whirlwind,if=!buff.meat_cleaver.up
 	if not BuffPresent(meat_cleaver_buff) Spell(whirlwind)
+	#wild_strike,if=buff.bloodsurge.up&rage>75
+	if BuffPresent(bloodsurge_buff) and Rage() > 75 Spell(wild_strike)
 	#bloodthirst
 	Spell(bloodthirst)
+	#whirlwind,if=rage>rage.max-20
+	if Rage() > MaxRage() - 20 Spell(whirlwind)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
-AddFunction FurySingleTargetActions
+AddFunction FuryTitansGripSingleTargetActions
 {
 	#bloodbath
 	Spell(bloodbath)
@@ -148,7 +156,7 @@ AddFunction FurySingleTargetActions
 	Spell(bloodthirst)
 }
 
-AddFunction FuryThreeTargetsActions
+AddFunction FuryTitansGripThreeTargetsActions
 {
 	#bloodbath
 	Spell(bloodbath)
@@ -168,9 +176,11 @@ AddFunction FuryThreeTargetsActions
 	Spell(whirlwind)
 	#bloodthirst
 	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
-AddFunction FuryMovementActions
+AddFunction FuryTitansGripMovementActions
 {
 	#heroic_leap
 	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
@@ -182,14 +192,14 @@ AddFunction FuryMovementActions
 
 AddIcon specialization=fury help=main enemies=1
 {
-	if not InCombat() FuryPrecombatActions()
-	FuryDefaultActions()
+	if not InCombat() FuryTitansGripPrecombatActions()
+	FuryTitansGripDefaultActions()
 }
 
 AddIcon specialization=fury help=aoe
 {
-	if not InCombat() FuryPrecombatActions()
-	FuryDefaultActions()
+	if not InCombat() FuryTitansGripPrecombatActions()
+	FuryTitansGripDefaultActions()
 }
 
 ### Required symbols
