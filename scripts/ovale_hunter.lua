@@ -159,15 +159,15 @@ AddFunction BeastMasteryPrecombatCdActions
 }
 
 ### Beast Mastery icons
-AddCheckBox(opt_hunter_best_mastery_aoe L(AOE) specialization=beast_mastery default)
+AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) specialization=beast_mastery default)
 
-AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_beast_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
@@ -179,19 +179,19 @@ AddIcon specialization=beast_mastery help=main enemies=1
 	BeastMasteryDefaultActions()
 }
 
-AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_beast_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 
-AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
 }
 
-AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
