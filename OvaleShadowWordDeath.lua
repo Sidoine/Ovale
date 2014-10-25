@@ -40,7 +40,7 @@ local SHADOW_WORD_DEATH = {
 
 --<public-static-properties>
 OvaleShadowWordDeath.spellName = "Shadow Word: Death Reset Cooldown"
-OvaleShadowWordDeath.spellId = 157218	-- spell ID to use for the hidden buff
+OvaleShadowWordDeath.spellId = 125927	-- spell ID to use for the hidden buff
 OvaleShadowWordDeath.start = 0
 OvaleShadowWordDeath.ending = 0
 OvaleShadowWordDeath.duration = 9
