@@ -159,40 +159,39 @@ AddFunction BeastMasteryPrecombatCdActions
 }
 
 ### Beast Mastery icons
-AddCheckBox(opt_hunter_best_mastery "Show Beast Mastery icons" specialization=beast_mastery default)
 AddCheckBox(opt_hunter_best_mastery_aoe L(AOE) specialization=beast_mastery default)
 
-AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=opt_hunter_best_mastery checkbox=!opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_best_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_best_mastery checkbox=opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_best_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon specialization=beast_mastery help=main enemies=1 checkbox=opt_hunter_best_mastery
+AddIcon specialization=beast_mastery help=main enemies=1
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 
-AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_best_mastery checkbox=opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_best_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatActions()
 	BeastMasteryDefaultActions()
 }
 
-AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=opt_hunter_best_mastery checkbox=!opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_best_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
 }
 
-AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_best_mastery checkbox=opt_hunter_best_mastery_aoe
+AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_best_mastery_aoe
 {
 	if InCombat(no) BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
@@ -346,40 +345,39 @@ AddFunction MarksmanshipPrecombatCdActions
 }
 
 ### Marksmanship icons
-AddCheckBox(opt_hunter_marksmanship "Show Marksmanship icons" specialization=marksmanship default)
 AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) specialization=marksmanship default)
 
-AddIcon specialization=marksmanship help=shortcd enemies=1 checkbox=opt_hunter_marksmanship checkbox=!opt_hunter_marksmanship_aoe
+AddIcon specialization=marksmanship help=shortcd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
 {
 	if InCombat(no) MarksmanshipPrecombatShortCdActions()
 	MarksmanshipDefaultShortCdActions()
 }
 
-AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship checkbox=opt_hunter_marksmanship_aoe
+AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship_aoe
 {
 	if InCombat(no) MarksmanshipPrecombatShortCdActions()
 	MarksmanshipDefaultShortCdActions()
 }
 
-AddIcon specialization=marksmanship help=main enemies=1 checkbox=opt_hunter_marksmanship
+AddIcon specialization=marksmanship help=main enemies=1
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()
 }
 
-AddIcon specialization=marksmanship help=aoe checkbox=opt_hunter_marksmanship checkbox=opt_hunter_marksmanship_aoe
+AddIcon specialization=marksmanship help=aoe checkbox=opt_hunter_marksmanship_aoe
 {
 	if InCombat(no) MarksmanshipPrecombatActions()
 	MarksmanshipDefaultActions()
 }
 
-AddIcon specialization=marksmanship help=cd enemies=1 checkbox=opt_hunter_marksmanship checkbox=!opt_hunter_marksmanship_aoe
+AddIcon specialization=marksmanship help=cd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
 {
 	if InCombat(no) MarksmanshipPrecombatCdActions()
 	MarksmanshipDefaultCdActions()
 }
 
-AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship checkbox=opt_hunter_marksmanship_aoe
+AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship_aoe
 {
 	if InCombat(no) MarksmanshipPrecombatCdActions()
 	MarksmanshipDefaultCdActions()
@@ -549,40 +547,39 @@ AddFunction SurvivalPrecombatCdActions
 }
 
 ### Survival icons
-AddCheckBox(opt_hunter_survival "Show Survival icons" specialization=survival default)
 AddCheckBox(opt_hunter_survival_aoe L(AOE) specialization=survival default)
 
-AddIcon specialization=survival help=shortcd enemies=1 checkbox=opt_hunter_survival checkbox=!opt_hunter_survival_aoe
+AddIcon specialization=survival help=shortcd enemies=1 checkbox=!opt_hunter_survival_aoe
 {
 	if InCombat(no) SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=shortcd checkbox=opt_hunter_survival checkbox=opt_hunter_survival_aoe
+AddIcon specialization=survival help=shortcd checkbox=opt_hunter_survival_aoe
 {
 	if InCombat(no) SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=main enemies=1 checkbox=opt_hunter_survival
+AddIcon specialization=survival help=main enemies=1
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultActions()
 }
 
-AddIcon specialization=survival help=aoe checkbox=opt_hunter_survival checkbox=opt_hunter_survival_aoe
+AddIcon specialization=survival help=aoe checkbox=opt_hunter_survival_aoe
 {
 	if InCombat(no) SurvivalPrecombatActions()
 	SurvivalDefaultActions()
 }
 
-AddIcon specialization=survival help=cd enemies=1 checkbox=opt_hunter_survival checkbox=!opt_hunter_survival_aoe
+AddIcon specialization=survival help=cd enemies=1 checkbox=!opt_hunter_survival_aoe
 {
 	if InCombat(no) SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()
 }
 
-AddIcon specialization=survival help=cd checkbox=opt_hunter_survival checkbox=opt_hunter_survival_aoe
+AddIcon specialization=survival help=cd checkbox=opt_hunter_survival_aoe
 {
 	if InCombat(no) SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()

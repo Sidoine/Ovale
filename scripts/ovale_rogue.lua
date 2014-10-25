@@ -167,40 +167,39 @@ AddFunction AssassinationDefaultCdActions
 }
 
 ### Assassination icons.
-AddCheckBox(opt_rogue_assassination "Show Assassination icons" specialization=assassination default)
 AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
 
-AddIcon specialization=assassination help=shortcd enemies=1 checkbox=opt_rogue_assassination checkbox=!opt_rogue_assassination_aoe
+AddIcon specialization=assassination help=shortcd enemies=1 checkbox=!opt_rogue_assassination_aoe
 {
 	if InCombat(no) AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination checkbox=opt_rogue_assassination_aoe
+AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination_aoe
 {
 	if InCombat(no) AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=main enemies=1 checkbox=opt_rogue_assassination
+AddIcon specialization=assassination help=main enemies=1
 {
 	if InCombat(no) AssassinationPrecombatActions()
 	AssassinationDefaultActions()
 }
 
-AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination checkbox=opt_rogue_assassination_aoe
+AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination_aoe
 {
 	if InCombat(no) AssassinationPrecombatActions()
 	AssassinationDefaultActions()
 }
 
-AddIcon specialization=assassination help=cd enemies=1 checkbox=opt_rogue_assassination checkbox=!opt_rogue_assassination_aoe
+AddIcon specialization=assassination help=cd enemies=1 checkbox=!opt_rogue_assassination_aoe
 {
 	if InCombat(no) AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()
 }
 
-AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination checkbox=opt_rogue_assassination_aoe
+AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_aoe
 {
 	if InCombat(no) AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()
@@ -326,40 +325,39 @@ AddFunction CombatFinisherActions
 }
 
 ### Combat icons.
-AddCheckBox(opt_rogue_combat "Show Combat icons" specialization=combat default)
 AddCheckBox(opt_rogue_combat_aoe L(AOE) specialization=combat default)
 
-AddIcon specialization=combat help=shortcd enemies=1 checkbox=opt_rogue_combat checkbox=!opt_rogue_combat_aoe
+AddIcon specialization=combat help=shortcd enemies=1 checkbox=!opt_rogue_combat_aoe
 {
 	if InCombat(no) CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat checkbox=opt_rogue_combat_aoe
+AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat_aoe
 {
 	if InCombat(no) CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=main enemies=1 checkbox=opt_rogue_combat
+AddIcon specialization=combat help=main enemies=1
 {
 	if InCombat(no) CombatPrecombatActions()
 	CombatDefaultActions()
 }
 
-AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat checkbox=opt_rogue_combat_aoe
+AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat_aoe
 {
 	if InCombat(no) CombatPrecombatActions()
 	CombatDefaultActions()
 }
 
-AddIcon specialization=combat help=cd enemies=1 checkbox=opt_rogue_combat checkbox=!opt_rogue_combat_aoe
+AddIcon specialization=combat help=cd enemies=1 checkbox=!opt_rogue_combat_aoe
 {
 	if InCombat(no) CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
 
-AddIcon specialization=combat help=cd checkbox=opt_rogue_combat checkbox=opt_rogue_combat_aoe
+AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
 {
 	if InCombat(no) CombatPrecombatCdActions()
 	CombatDefaultCdActions()
@@ -566,40 +564,39 @@ AddFunction SubtletyFinisherCdActions
 }
 
 ### Subtlety icons.
-AddCheckBox(opt_rogue_subtlety "Show Subtlety icons" specialization=subtlety default)
 AddCheckBox(opt_rogue_subtlety_aoe L(AOE) specialization=subtlety default)
 
-AddIcon specialization=subtlety help=shortcd enemies=1 checkbox=opt_rogue_subtlety checkbox=!opt_rogue_subtlety_aoe
+AddIcon specialization=subtlety help=shortcd enemies=1 checkbox=!opt_rogue_subtlety_aoe
 {
 	if InCombat(no) SubtletyPrecombatShortCdActions()
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=shortcd checkbox=opt_rogue_subtlety checkbox=opt_rogue_subtlety_aoe
+AddIcon specialization=subtlety help=shortcd checkbox=opt_rogue_subtlety_aoe
 {
 	if InCombat(no) SubtletyPrecombatShortCdActions()
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=main enemies=1 checkbox=opt_rogue_subtlety
+AddIcon specialization=subtlety help=main enemies=1
 {
 	if InCombat(no) SubtletyPrecombatActions()
 	SubtletyDefaultActions()
 }
 
-AddIcon specialization=subtlety help=aoe checkbox=opt_rogue_subtlety checkbox=opt_rogue_subtlety_aoe
+AddIcon specialization=subtlety help=aoe checkbox=opt_rogue_subtlety_aoe
 {
 	if InCombat(no) SubtletyPrecombatActions()
 	SubtletyDefaultActions()
 }
 
-AddIcon specialization=subtlety help=cd enemies=1 checkbox=opt_rogue_subtlety checkbox=!opt_rogue_subtlety_aoe
+AddIcon specialization=subtlety help=cd enemies=1 checkbox=!opt_rogue_subtlety_aoe
 {
 	if InCombat(no) SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()
 }
 
-AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety checkbox=opt_rogue_subtlety_aoe
+AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety_aoe
 {
 	if InCombat(no) SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()

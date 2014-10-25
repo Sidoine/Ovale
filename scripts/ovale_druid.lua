@@ -188,46 +188,45 @@ AddFunction FeralPrecombatCdActions
 }
 
 ### Feral Icons
-AddCheckBox(opt_druid_feral "Show Feral icons" specialization=feral default)
 AddCheckBox(opt_druid_feral_aoe L(AOE) specialization=feral default)
 
-AddIcon specialization=feral help=shortcd enemies=1 checkbox=opt_druid_feral checkbox=!opt_druid_feral_aoe
+AddIcon specialization=feral help=shortcd enemies=1 checkbox=!opt_druid_feral_aoe
 {
 	if InCombat(no) FeralPrecombatShortCdActions()
 	FeralDefaultShortCdActions()
 }
 
-AddIcon specialization=feral help=shortcd checkbox=opt_druid_feral checkbox=opt_druid_feral_aoe
+AddIcon specialization=feral help=shortcd checkbox=opt_druid_feral_aoe
 {
 	if InCombat(no) FeralPrecombatShortCdActions()
 	FeralDefaultShortCdActions()
 }
 
-AddIcon specialization=feral help=main enemies=1 checkbox=opt_druid_feral
+AddIcon specialization=feral help=main enemies=1
 {
 	if InCombat(no) FeralPrecombatActions()
 	FeralDefaultActions()
 }
 
-AddIcon specialization=feral help=predict enemies=1 checkbox=opt_druid_feral checkbox=!opt_druid_feral_aoe
+AddIcon specialization=feral help=predict enemies=1 checkbox=!opt_druid_feral_aoe
 {
 	if InCombat(no) FeralPrecombatPredictActions()
 	FeralDefaultPredictActions()
 }
 
-AddIcon specialization=feral help=aoe checkbox=opt_druid_feral checkbox=opt_druid_feral_aoe
+AddIcon specialization=feral help=aoe checkbox=opt_druid_feral_aoe
 {
 	if InCombat(no) FeralPrecombatActions()
 	FeralDefaultActions()
 }
 
-AddIcon specialization=feral help=cd enemies=1 checkbox=opt_druid_feral checkbox=!opt_druid_feral_aoe
+AddIcon specialization=feral help=cd enemies=1 checkbox=!opt_druid_feral_aoe
 {
 	if InCombat(no) FeralPrecombatCdActions()
 	FeralDefaultCdActions()
 }
 
-AddIcon specialization=feral help=cd checkbox=opt_druid_feral checkbox=opt_druid_feral_aoe
+AddIcon specialization=feral help=cd checkbox=opt_druid_feral_aoe
 {
 	if InCombat(no) FeralPrecombatCdActions()
 	FeralDefaultCdActions()
@@ -334,40 +333,39 @@ AddFunction GuardianPrecombatShortCdActions {}
 AddFunction GuardianPrecombatCdActions {}
 
 ### Guardian icons.
-AddCheckBox(opt_druid_guardian "Show Guardian icons" specialization=guardian default)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) specialization=guardian default)
 
-AddIcon specialization=guardian help=shortcd enemies=1 checkbox=opt_druid_guardian checkbox=!opt_druid_guardian_aoe
+AddIcon specialization=guardian help=shortcd enemies=1 checkbox=!opt_druid_guardian_aoe
 {
 	if InCombat(no) GuardianPrecombatShortCdActions()
 	GuardianDefaultShortCdActions()
 }
 
-AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian checkbox=opt_druid_guardian_aoe
+AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian_aoe
 {
 	if InCombat(no) GuardianPrecombatShortCdActions()
 	GuardianDefaultShortCdActions()
 }
 
-AddIcon specialization=guardian help=main enemies=1 checkbox=opt_druid_guardian
+AddIcon specialization=guardian help=main enemies=1
 {
 	if InCombat(no) GuardianPrecombatActions()
 	GuardianDefaultActions()
 }
 
-AddIcon specialization=guardian help=aoe checkbox=opt_druid_guardian checkbox=opt_druid_guardian_aoe
+AddIcon specialization=guardian help=aoe checkbox=opt_druid_guardian_aoe
 {
 	if InCombat(no) GuardianPrecombatActions()
 	GuardianDefaultActions()
 }
 
-AddIcon specialization=guardian help=cd enemies=1 checkbox=opt_druid_guardian checkbox=!opt_druid_guardian_aoe
+AddIcon specialization=guardian help=cd enemies=1 checkbox=!opt_druid_guardian_aoe
 {
 	if InCombat(no) GuardianPrecombatCdActions()
 	GuardianDefaultCdActions()
 }
 
-AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian checkbox=opt_druid_guardian_aoe
+AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
 {
 	if InCombat(no) GuardianPrecombatCdActions()
 	GuardianDefaultCdActions()

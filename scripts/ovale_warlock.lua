@@ -143,46 +143,45 @@ AddFunction AfflictionDefaultCdActions
 }
 
 ### Affliction icons.
-AddCheckBox(opt_warlock_affliction "Show Affliction icons" specialization=affliction default)
 AddCheckBox(opt_warlock_affliction_aoe L(AOE) specialization=affliction default)
 
-AddIcon specialization=affliction help=shortcd enemies=1 checkbox=opt_warlock_affliction checkbox=!opt_warlock_affliction_aoe
+AddIcon specialization=affliction help=shortcd enemies=1 checkbox=!opt_warlock_affliction_aoe
 {
 	if InCombat(no) AfflictionPrecombatShortCdActions()
 	AfflictionDefaultShortCdActions()
 }
 
-AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction checkbox=opt_warlock_affliction_aoe
+AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction_aoe
 {
 	if InCombat(no) AfflictionPrecombatShortCdActions()
 	AfflictionDefaultShortCdActions()
 }
 
-AddIcon specialization=affliction help=main enemies=1 checkbox=opt_warlock_affliction
+AddIcon specialization=affliction help=main enemies=1
 {
 	if InCombat(no) AfflictionPrecombatActions()
 	AfflictionDefaultActions()
 }
 
-AddIcon specialization=affliction help=predict enemies=1 checkbox=opt_warlock_affliction checkbox=!opt_warlock_affliction_aoe
+AddIcon specialization=affliction help=predict enemies=1 checkbox=!opt_warlock_affliction_aoe
 {
 	if InCombat(no) AfflictionPrecombatPredictActions()
 	AfflictionDefaultPredictActions()
 }
 
-AddIcon specialization=affliction help=aoe checkbox=opt_warlock_affliction checkbox=opt_warlock_affliction_aoe
+AddIcon specialization=affliction help=aoe checkbox=opt_warlock_affliction_aoe
 {
 	if InCombat(no) AfflictionPrecombatActions()
 	AfflictionDefaultActions()
 }
 
-AddIcon specialization=affliction help=cd enemies=1 checkbox=opt_warlock_affliction checkbox=!opt_warlock_affliction_aoe
+AddIcon specialization=affliction help=cd enemies=1 checkbox=!opt_warlock_affliction_aoe
 {
 	if InCombat(no) AfflictionPrecombatCdActions()
 	AfflictionDefaultCdActions()
 }
 
-AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction checkbox=opt_warlock_affliction_aoe
+AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction_aoe
 {
 	if InCombat(no) AfflictionPrecombatCdActions()
 	AfflictionDefaultCdActions()
@@ -468,46 +467,45 @@ AddFunction DemonologyDbPredictActions
 }
 
 ### Demonology icons.
-AddCheckBox(opt_warlock_demonology "Show Demonology icons" specialization=demonology default)
 AddCheckBox(opt_warlock_demonology_aoe L(AOE) specialization=demonology default)
 
-AddIcon specialization=demonology help=shortcd enemies=1 checkbox=opt_warlock_demonology checkbox=!opt_warlock_demonology_aoe
+AddIcon specialization=demonology help=shortcd enemies=1 checkbox=!opt_warlock_demonology_aoe
 {
 	if InCombat(no) DemonologyPrecombatShortCdActions()
 	DemonologyDefaultShortCdActions()
 }
 
-AddIcon specialization=demonology help=shortcd checkbox=opt_warlock_demonology checkbox=opt_warlock_demonology_aoe
+AddIcon specialization=demonology help=shortcd checkbox=opt_warlock_demonology_aoe
 {
 	if InCombat(no) DemonologyPrecombatShortCdActions()
 	DemonologyDefaultShortCdActions()
 }
 
-AddIcon specialization=demonology help=main enemies=1 checkbox=opt_warlock_demonology
+AddIcon specialization=demonology help=main enemies=1
 {
 	if InCombat(no) DemonologyPrecombatActions()
 	DemonologyDefaultActions()
 }
 
-AddIcon specialization=demonology help=predict enemies=1 checkbox=opt_warlock_demonology checkbox=!opt_warlock_demonology_aoe
+AddIcon specialization=demonology help=predict enemies=1 checkbox=!opt_warlock_demonology_aoe
 {
 	if InCombat(no) DemonologyPrecombatPredictActions()
 	DemonologyDefaultPredictActions()
 }
 
-AddIcon specialization=demonology help=aoe checkbox=opt_warlock_demonology checkbox=opt_warlock_demonology_aoe
+AddIcon specialization=demonology help=aoe checkbox=opt_warlock_demonology_aoe
 {
 	if InCombat(no) DemonologyPrecombatActions()
 	DemonologyDefaultActions()
 }
 
-AddIcon specialization=demonology help=cd enemies=1 checkbox=opt_warlock_demonology checkbox=!opt_warlock_demonology_aoe
+AddIcon specialization=demonology help=cd enemies=1 checkbox=!opt_warlock_demonology_aoe
 {
 	if InCombat(no) DemonologyPrecombatCdActions()
 	DemonologyDefaultCdActions()
 }
 
-AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology checkbox=opt_warlock_demonology_aoe
+AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
 {
 	if InCombat(no) DemonologyPrecombatCdActions()
 	DemonologyDefaultCdActions()
@@ -645,46 +643,45 @@ AddFunction DestructionPrecombatCdActions
 }
 
 ### Destruction icons.
-AddCheckBox(opt_warlock_destruction "Show Destruction icons" specialization=destruction default)
 AddCheckBox(opt_warlock_destruction_aoe L(AOE) specialization=destruction default)
 
-AddIcon specialization=destruction help=shortcd enemies=1 checkbox=opt_warlock_destruction checkbox=!opt_warlock_destruction_aoe
+AddIcon specialization=destruction help=shortcd enemies=1 checkbox=!opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatShortCdActions()
 	DestructionDefaultShortCdActions()
 }
 
-AddIcon specialization=destruction help=shortcd checkbox=opt_warlock_destruction checkbox=opt_warlock_destruction_aoe
+AddIcon specialization=destruction help=shortcd checkbox=opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatShortCdActions()
 	DestructionDefaultShortCdActions()
 }
 
-AddIcon specialization=destruction help=main enemies=1 checkbox=opt_warlock_destruction
+AddIcon specialization=destruction help=main enemies=1
 {
 	if InCombat(no) DestructionPrecombatActions()
 	DestructionDefaultActions()
 }
 
-AddIcon specialization=destruction help=predict enemies=1 checkbox=opt_warlock_destruction checkbox=!opt_warlock_destruction_aoe
+AddIcon specialization=destruction help=predict enemies=1 checkbox=!opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatPredictActions()
 	DestructionDefaultPredictActions()
 }
 
-AddIcon specialization=destruction help=aoe checkbox=opt_warlock_destruction checkbox=opt_warlock_destruction_aoe
+AddIcon specialization=destruction help=aoe checkbox=opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatActions()
 	DestructionDefaultActions()
 }
 
-AddIcon specialization=destruction help=cd enemies=1 checkbox=opt_warlock_destruction checkbox=!opt_warlock_destruction_aoe
+AddIcon specialization=destruction help=cd enemies=1 checkbox=!opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()
 }
 
-AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction checkbox=opt_warlock_destruction_aoe
+AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction_aoe
 {
 	if InCombat(no) DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()
