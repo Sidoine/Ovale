@@ -76,7 +76,7 @@ OvalePower.POWER_INFO =
 	rage = { id = SPELL_POWER_RAGE, token = "RAGE", mini = 0, costString = RAGE_COST },
 	runicpower = { id = SPELL_POWER_RUNIC_POWER, token = "RUNIC_POWER", mini = 0, costString = RUNIC_POWER_COST },
 	shadoworbs = { id = SPELL_POWER_SHADOW_ORBS, token = "SHADOW_ORBS", mini = 0 },
-	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS_POWER", mini = 0, costString = SOUL_SHARDS_COST },
+	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS", mini = 0, costString = SOUL_SHARDS_COST },
 }
 
 OvalePower.SECONDARY_POWER = {
