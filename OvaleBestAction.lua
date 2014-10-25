@@ -235,65 +235,68 @@ local function GetActionSpellInfo(element, state, target)
 	local action = OvaleActionBar:GetForSpell(spellId)
 	if not OvaleSpellBook:IsKnownSpell(spellId) and not action then
 		Ovale:Logf("Unknown spell ID '%s'.", spellId)
-	elseif state:IsUsableSpell(spellId, target) then
-		-- Use texture specified in the action if given.
-		if element.params.texture then
-			actionTexture = "Interface\\Icons\\" .. element.params.texture
-		end
-		actionTexture = actionTexture or API_GetSpellTexture(spellId)
-		actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
-		actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
-		actionUsable = OvaleSpellBook:IsUsableSpell(spellId)
-		if action then
-			actionShortcut = OvaleActionBar:GetBinding(action)
-			actionIsCurrent = API_IsCurrentAction(action)
-		end
-		actionType = "spell"
-		actionId = spellId
-
-		local si = OvaleData.spellInfo[spellId]
-		if si then
-			-- Use texture specified in the SpellInfo() if given.
-			if si.texture then
-				actionTexture = "Interface\\Icons\\" .. si.texture
+	else
+		local isUsable = state:IsUsableSpell(spellId, target)
+		if isUsable then
+			-- Use texture specified in the action if given.
+			if element.params.texture then
+				actionTexture = "Interface\\Icons\\" .. element.params.texture
 			end
-			-- Fix spell cooldown information using primary resource requirements specified in SpellInfo().
-			if actionCooldownStart and actionCooldownDuration then
-				-- Get the maximum time before all "primary" resources are ready.
-				local atTime = state.currentTime
-				for powerType in pairs(OvalePower.PRIMARY_POWER) do
-					if si[powerType] then
-						local t = state.currentTime + state:TimeToPower(spellId, powerType)
-						if atTime < t then
-							atTime = t
+			actionTexture = actionTexture or API_GetSpellTexture(spellId)
+			actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
+			actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
+			actionUsable = isUsable
+			if action then
+				actionShortcut = OvaleActionBar:GetBinding(action)
+				actionIsCurrent = API_IsCurrentAction(action)
+			end
+			actionType = "spell"
+			actionId = spellId
+
+			local si = OvaleData.spellInfo[spellId]
+			if si then
+				-- Use texture specified in the SpellInfo() if given.
+				if si.texture then
+					actionTexture = "Interface\\Icons\\" .. si.texture
+				end
+				-- Fix spell cooldown information using primary resource requirements specified in SpellInfo().
+				if actionCooldownStart and actionCooldownDuration then
+					-- Get the maximum time before all "primary" resources are ready.
+					local atTime = state.currentTime
+					for powerType in pairs(OvalePower.PRIMARY_POWER) do
+						if si[powerType] then
+							local t = state.currentTime + state:TimeToPower(spellId, powerType)
+							if atTime < t then
+								atTime = t
+							end
 						end
 					end
-				end
-				if actionCooldownStart > 0 then
-					if atTime > actionCooldownStart + actionCooldownDuration then
-						Ovale:Logf("Delaying spell ID '%s' for primary resource.", spellId)
+					if actionCooldownStart > 0 then
+						if atTime > actionCooldownStart + actionCooldownDuration then
+							Ovale:Logf("Delaying spell ID '%s' for primary resource.", spellId)
+							actionCooldownDuration = atTime - actionCooldownStart
+						end
+					else
+						actionCooldownStart = state.currentTime
 						actionCooldownDuration = atTime - actionCooldownStart
 					end
-				else
-					actionCooldownStart = state.currentTime
-					actionCooldownDuration = atTime - actionCooldownStart
-				end
 
-				if si.blood or si.frost or si.unholy or si.death then
-					-- Spell requires runes.
-					local needRunes = true
-					-- "buff_runes_none" is the spell ID of the buff that makes casting the spell cost no runes.
-					local buffNoRunes = si.buff_runes_none
-					if buffNoRunes then
-						local aura = state:GetAura("player", buffNoRunes)
-						if state:IsActiveAura(aura) then
-							needRunes = false
+					if si.blood or si.frost or si.unholy or si.death then
+						-- Spell requires runes.
+						local needRunes = true
+						-- "buff_runes_none" is the spell ID of the buff that makes casting the spell cost no runes.
+						local buffNoRunes = si.buff_runes_none
+						if buffNoRunes then
+							local aura = state:GetAura("player", buffNoRunes)
+							if state:IsActiveAura(aura) then
+								needRunes = false
+							end
 						end
-					end
-					if needRunes then
-						local ending = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death)
-						if ending > actionCooldownStart + actionCooldownDuration then
-							actionCooldownDuration = ending - actionCooldownStart
+						if needRunes then
+							local ending = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death)
+							if ending > actionCooldownStart + actionCooldownDuration then
+								actionCooldownDuration = ending - actionCooldownStart
+							end
 						end
 					end
 				end
