@@ -24,6 +24,11 @@ OvaleScripts.script = {}
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleScripts:OnInitialize()
+	-- Register an empty script called "Disabled" that can be used to show no icons.
+	self:RegisterScript(nil, "Disabled", "Disabled", "", "script")
+end
+
 -- Return a table of script descriptions indexed by name.
 function OvaleScripts:GetDescriptions(scriptType)
 	local descriptionsTable = {}
