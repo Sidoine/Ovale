@@ -9,7 +9,7 @@ do
 #	class=warrior
 #	spec=fury
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!011021.
-#	glyphs=unending_rage/death_from_above/raging_wind
+#	glyphs=unending_rage/raging_wind/heroic_leap
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
@@ -20,17 +20,6 @@ AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) specialization=!protectio
 AddFunction UsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
-}
-
-AddFunction FurySingleMindedFuryPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#stance,choose=battle
-	Spell(battle_stance)
-	#snapshot_stats
-	#potion,name=mogu_power
-	UsePotionStrength()
 }
 
 AddFunction FurySingleMindedFuryDefaultActions
@@ -90,6 +79,51 @@ AddFunction FurySingleMindedFuryAoeActions
 	Spell(bloodthirst)
 	#wild_strike,if=buff.bloodsurge.up
 	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+}
+
+AddFunction FurySingleMindedFuryMovementActions
+{
+	#heroic_leap
+	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	#storm_bolt
+	Spell(storm_bolt)
+	#heroic_throw
+	Spell(heroic_throw)
+}
+
+AddFunction FurySingleMindedFuryThreeTargetsActions
+{
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#raging_blow,if=buff.meat_cleaver.stack>=2
+	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#whirlwind
+	Spell(whirlwind)
+	#bloodthirst
+	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+}
+
+AddFunction FurySingleMindedFuryPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#stance,choose=battle
+	Spell(battle_stance)
+	#snapshot_stats
+	#potion,name=mogu_power
+	UsePotionStrength()
 }
 
 AddFunction FurySingleMindedFuryTwoTargetsActions
@@ -154,40 +188,6 @@ AddFunction FurySingleMindedFurySingleTargetActions
 	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and BuffPresent(victorious_buff) Spell(impending_victory)
 	#bloodthirst
 	Spell(bloodthirst)
-}
-
-AddFunction FurySingleMindedFuryThreeTargetsActions
-{
-	#bloodbath
-	Spell(bloodbath)
-	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
-	#bladestorm,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
-	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
-	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
-	#execute,if=buff.sudden_death.react
-	if BuffPresent(sudden_death_buff) Spell(execute)
-	#raging_blow,if=buff.meat_cleaver.stack>=2
-	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
-	#whirlwind
-	Spell(whirlwind)
-	#bloodthirst
-	Spell(bloodthirst)
-	#wild_strike,if=buff.bloodsurge.up
-	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
-}
-
-AddFunction FurySingleMindedFuryMovementActions
-{
-	#heroic_leap
-	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-	#storm_bolt
-	Spell(storm_bolt)
-	#heroic_throw
-	Spell(heroic_throw)
 }
 
 AddIcon specialization=fury help=main enemies=1

@@ -9,7 +9,7 @@ do
 #	class=warrior
 #	spec=protection
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Zb!000221.
-#	glyphs=unending_rage/death_from_above/wind_and_thunder
+#	glyphs=unending_rage/heroic_leap/cleave
 
 Include(ovale_common)
 Include(ovale_warrior_spells)

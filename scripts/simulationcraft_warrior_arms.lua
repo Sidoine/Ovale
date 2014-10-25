@@ -9,7 +9,7 @@ do
 #	class=warrior
 #	spec=arms
 #	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!020011.
-#	glyphs=unending_rage/death_from_above/sweeping_strikes/resonating_power
+#	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 Include(ovale_common)
 Include(ovale_warrior_spells)

@@ -965,6 +965,9 @@ local function InitializeDisambiguation()
 	-- Priest
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"PRIEST")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"PRIEST")
+	AddDisambiguation("cascade",				"cascade_caster",				"PRIEST",		"shadow")
+	AddDisambiguation("divine_star",			"divine_star_caster",			"PRIEST",		"shadow")
+	AddDisambiguation("halo",					"halo_caster",					"PRIEST",		"shadow")
 	AddDisambiguation("devouring_plague_tick",	"devouring_plague",				"PRIEST")
 	-- Rogue
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"ROGUE")
@@ -1183,6 +1186,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "PRIEST" and action == "insanity" then
+			local buffName = "shadow_word_insanity_buff"
+			AddSymbol(annotation, buffName)
+			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "ROGUE" and action == "apply_poison" then
 			if modifier.lethal then
 				local name = Unparse(modifier.lethal)
@@ -2682,8 +2689,7 @@ end
 local function InsertSupportingFunctions(child, annotation)
 	local count = 0
 	local nodeList = annotation.astAnnotation.nodeList
-	if annotation.class == "DEATHKNIGHT" then
-		-- Death knight profiles no longer include Mind Freeze.
+	if annotation.mind_freeze == "DEATHKNIGHT" then
 		local code = [[
 			AddFunction InterruptActions
 			{
@@ -2826,8 +2832,7 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.class == "HUNTER" then
-		-- Hunter profiles never include Counter Shot since it's a DPS loss.
+	if annotation.counter_shot == "HUNTER" then
 		local code = [[
 			AddFunction InterruptActions
 			{
@@ -2888,8 +2893,7 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "quaking_palm")
 		count = count + 1
 	end
-	if annotation.class == "MONK" then
-		-- Monk profiles never include Spear Hand Strike.
+	if annotation.spear_hand_strike == "MONK" then
 		local code = [[
 			AddFunction InterruptActions
 			{
@@ -2915,7 +2919,7 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
-	if annotation.expel_harm == "MONK" then
+	if annotation.guard == "MONK" then
 		local code = [[
 			AddFunction Guard
 			{
@@ -3539,6 +3543,15 @@ function OvaleSimulationCraft:Emit(profile)
 			if declarationNode then
 				child[#child + 1] = declarationNode
 			end
+		end
+		-- Fixups.
+		do
+			-- Some profiles don't include any interrupt actions.
+			local class = annotation.class
+			annotation.mind_freeze = class			-- deathknight
+			annotation.counter_shot = class			-- hunter
+			annotation.spear_hand_strike = class	-- monk
+			annotation.silence = class				-- priest
 		end
 		annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
 		annotation.supportingControlCount = InsertSupportingControls(child, annotation)
