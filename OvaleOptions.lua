@@ -464,6 +464,12 @@ local self_options =
 							desc = L["Debug paper doll"],
 							type = "toggle",
 						},
+						power =
+						{
+							name = "Power",
+							desc = L["Debug power"],
+							type = "toggle",
+						},
 						snapshot =
 						{
 							name = "Snapshot updates",

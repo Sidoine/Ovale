@@ -486,6 +486,8 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 				else
 					noMana = true
 				end
+			else
+				isUsable = true
 			end
 			local result = isUsable and "pass" or "FAIL"
 			Ovale:Logf("Spell ID '%s' requires at least %d combo points: %s.", spellId, cost, result)
@@ -502,13 +504,15 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 					else
 						noMana = true
 					end
+				else
+					isUsable = true
 				end
 				local result = isUsable and "pass" or "FAIL"
 				Ovale:Logf("Spell ID '%s' requires at least %d %s: %s.", spellId, cost, powerType, result)
 			end
 		end
 	else
-		isUsable, noMana = OvaleSpellBook:IsUsable(spellId, target)
+		isUsable, noMana = OvaleSpellBook:IsUsableSpell(spellId, target)
 	end
 	profiler.Stop("OvaleSpellBook_state_IsUsableSpell")
 	return isUsable, noMana

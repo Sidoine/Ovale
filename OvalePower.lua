@@ -48,6 +48,8 @@ local self_button = nil
 local self_tooltip = nil
 -- Table of Lua patterns for matching spell costs in tooltips.
 local self_costPatterns = {}
+
+local OVALE_POWER_DEBUG = "power"
 --</private-static-properties>
 
 --<public-static-properties>
@@ -228,16 +230,16 @@ function OvalePower:OnDisable()
 end
 
 function OvalePower:EventHandler(event)
-	self:UpdatePowerType()
-	self:UpdateMaxPower()
-	self:UpdatePower()
-	self:UpdatePowerRegen()
+	self:UpdatePowerType(event)
+	self:UpdateMaxPower(event)
+	self:UpdatePower(event)
+	self:UpdatePowerRegen(event)
 end
 
 function OvalePower:UNIT_DISPLAYPOWER(event, unitId)
 	if unitId == "player" then
-		self:UpdatePowerType()
-		self:UpdatePowerRegen()
+		self:UpdatePowerType(event)
+		self:UpdatePowerRegen(event)
 	end
 end
 
@@ -251,7 +253,7 @@ function OvalePower:UNIT_MAXPOWER(event, unitId, powerToken)
 	if unitId == "player" then
 		local powerType = self.POWER_TYPE[powerToken]
 		if powerType then
-			self:UpdateMaxPower(powerType)
+			self:UpdateMaxPower(event, powerType)
 		end
 	end
 end
@@ -260,18 +262,18 @@ function OvalePower:UNIT_POWER(event, unitId, powerToken)
 	if unitId == "player" then
 		local powerType = self.POWER_TYPE[powerToken]
 		if powerType then
-			self:UpdatePower(powerType)
+			self:UpdatePower(event, powerType)
 		end
 	end
 end
 
 function OvalePower:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId == "player" then
-		self:UpdatePowerRegen()
+		self:UpdatePowerRegen(event)
 	end
 end
 
-function OvalePower:UpdateMaxPower(powerType)
+function OvalePower:UpdateMaxPower(event, powerType)
 	profiler.Start("OvalePower_UpdateMaxPower")
 	if powerType then
 		local powerInfo = self.POWER_INFO[powerType]
@@ -284,26 +286,32 @@ function OvalePower:UpdateMaxPower(powerType)
 	profiler.Stop("OvalePower_UpdateMaxPower")
 end
 
-function OvalePower:UpdatePower(powerType)
+function OvalePower:UpdatePower(event, powerType)
 	profiler.Start("OvalePower_UpdatePower")
 	if powerType then
 		local powerInfo = self.POWER_INFO[powerType]
-		self.power[powerType] = API_UnitPower("player", powerInfo.id, powerInfo.segments)
+		local oldPower = self.power[powerType]
+		local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
+		self.power[powerType] = power
+		Ovale:DebugPrintf(OVALE_POWER_DEBUG, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
 	else
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
-			self.power[powerType] = API_UnitPower("player", powerInfo.id, powerInfo.segments)
+			local oldPower = self.power[powerType]
+			local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
+			self.power[powerType] = power
+			Ovale:DebugPrintf(OVALE_POWER_DEBUG, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
 		end
 	end
 	profiler.Stop("OvalePower_UpdatePower")
 end
 
-function OvalePower:UpdatePowerRegen()
+function OvalePower:UpdatePowerRegen(event)
 	profiler.Start("OvalePower_UpdatePowerRegen")
 	self.inactiveRegen, self.activeRegen = API_GetPowerRegen()
 	profiler.Stop("OvalePower_UpdatePowerRegen")
 end
 
-function OvalePower:UpdatePowerType()
+function OvalePower:UpdatePowerType(event)
 	profiler.Start("OvalePower_UpdatePowerType")
 	local currentType, currentToken = API_UnitPowerType("player")
 	self.powerType = self.POWER_TYPE[currentType]
