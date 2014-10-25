@@ -280,13 +280,19 @@ AddFunction BrewmasterStCdActions {}
 ### Brewmaster icons.
 AddCheckBox(opt_monk_brewmaster_aoe L(AOE) specialization=brewmaster default)
 
-AddIcon specialization=brewmaster help=cd
+AddIcon specialization=brewmaster help=shortcd enemies=1 checkbox=!opt_monk_brewmaster_aoe
 {
 	if InCombat(no) BrewmasterPrecombatShortCdActions()
 	BrewmasterDefaultShortCdActions()
 }
 
-AddIcon specialization=brewmaster help=main
+AddIcon specialization=brewmaster help=shortcd checkbox=opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatShortCdActions()
+	BrewmasterDefaultShortCdActions()
+}
+
+AddIcon specialization=brewmaster help=main enemies=1
 {
 	if InCombat(no) BrewmasterPrecombatActions()
 	BrewmasterDefaultActions()
@@ -298,7 +304,13 @@ AddIcon specialization=brewmaster help=aoe checkbox=opt_monk_brewmaster_aoe
 	BrewmasterDefaultActions()
 }
 
-AddIcon specialization=brewmaster help=cd
+AddIcon specialization=brewmaster help=cd enemies=1 checkbox=!opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatCdActions()
+	BrewmasterDefaultCdActions()
+}
+
+AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 {
 	if InCombat(no) BrewmasterPrecombatCdActions()
 	BrewmasterDefaultCdActions()
