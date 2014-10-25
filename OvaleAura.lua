@@ -944,7 +944,36 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local condition = tokenIterator()
 			while verified and condition do
 				Ovale:Logf("Aura %d has conditions:")
-				if condition == "target_health_pct" then
+				if condition == "buff" or condition == "debuff" or condition == "target_buff" or condition == "target_debuff" then
+					local buffName = tokenIterator()
+					if buffName then
+						local isBang = false
+						if substr(buffName, 1, 1) == "!" then
+							buffName = substr(buffName, 2)
+						end
+						local buffId = tonumber(buffName)
+						local buffUnitId = (substr(condition, 1, 7) == "target_") and state.defaultTarget or "player"
+						local result = "fail"
+						local aura
+						if buffId then
+							aura = state:GetAura(buffUnitId, buffId)
+						else
+							aura = state:GetAura(buffUnitId, buffName)
+						end
+						local isActiveAura = state:IsActiveAura(aura)
+						if not isBang and isActiveAura or isBang and not isActiveAura then
+							result = "pass"
+							verified = true
+						end
+						if isBang then
+							Ovale:Logf("    Aura %s missing on %s: %s", buffId, buffName, result)
+						else
+							Ovale:Logf("    Aura %s on %s: %s", buffId, buffName, result)
+						end
+					else
+						Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing buff.", auraId, spellData, condition)
+					end
+				elseif condition == "target_health_pct" then
 					local threshold = tokenIterator()
 					if threshold then
 						local isBang = false
