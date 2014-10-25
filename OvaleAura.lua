@@ -898,6 +898,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 		for auraId, spellData in pairs(filterInfo) do
 			--[[
 				For lists described by SpellAddBuff(), etc., use the following interpretation:
+					auraId=extend,N		aura is extended by N seconds, no change to stacks
 					auraId=refresh		aura is refreshed, no change to stacks
 					auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
 					auraId=N, N > 0		N is number of stacks added
@@ -908,6 +909,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
 			local stacks = 1
 			local refresh = false
+			local extend = 0
 
 			-- Parser for spellData as comma-separated values.
 			local tokenIterator = gmatch(spellData, "[^,]+")
@@ -916,6 +918,13 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local value = tokenIterator()
 			if value == "refresh" then
 				refresh = true
+			elseif value == "extend" then
+				local seconds = tokenIterator()
+				if seconds then
+					extend = tonumber(seconds)
+				else
+					Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing duration.", auraId, spellData, value)
+				end
 			else
 				value = tonumber(value)
 				if value then
@@ -955,7 +964,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 							Ovale:Logf("    Target health <= %f%%: %s", threshold, result)
 						end
 					else
-						Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing threshold", auraId, spellData, condition)
+						Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing threshold.", auraId, spellData, condition)
 					end
 				end
 				condition = tokenIterator()
@@ -985,10 +994,12 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
 					end
 					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
-					if refresh or stacks > 0 then
+					if refresh or extend > 0 or stacks > 0 then
 						-- Adjust stack count.
 						if refresh then
 							Ovale:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
+						elseif extend > 0 then
+							Ovale:Logf("Aura %d is extended by %f seconds, preserving %d stack(s).", auraId, extend, aura.stacks)
 						else -- if stacks > 0 then
 							local maxStacks = 1
 							if si and (si.max_stacks or si.maxstacks) then
@@ -1000,22 +1011,28 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 							end
 							Ovale:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
 						end
-						-- Set duration for the aura.
-						if aura.tick and aura.tick > 0 then
-							-- This is a periodic aura, so add new duration to extend the aura up to 130% of the normal duration.
-							local remainingDuration = aura.ending - atTime
-							local extensionDuration = 0.3 * duration
-							if remainingDuration < extensionDuration then
-								-- Aura is extended by the normal duration.
-								aura.duration = remainingDuration + duration
-							else
-								aura.duration = extensionDuration + duration
-							end
+						-- Set start, ending, and duration for the aura.
+						if extend > 0 then
+							-- aura.start is preserved.
+							aura.duration = aura.duration + extend
+							aura.ending = aura.ending + extend
 						else
-							aura.duration = duration
+							aura.start = atTime
+							if aura.tick and aura.tick > 0 then
+								-- This is a periodic aura, so add new duration to extend the aura up to 130% of the normal duration.
+								local remainingDuration = aura.ending - atTime
+								local extensionDuration = 0.3 * duration
+								if remainingDuration < extensionDuration then
+									-- Aura is extended by the normal duration.
+									aura.duration = remainingDuration + duration
+								else
+									aura.duration = extensionDuration + duration
+								end
+							else
+								aura.duration = duration
+							end
+							aura.ending = aura.start + aura.duration
 						end
-						aura.start = atTime
-						aura.ending = aura.start + aura.duration
 						aura.gain = atTime
 						Ovale:Logf("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
 					elseif stacks == 0 or stacks < 0 then
