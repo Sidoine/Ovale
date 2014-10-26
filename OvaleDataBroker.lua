@@ -65,6 +65,8 @@ local function OnClick(frame, button)
 		end
 		self_menuFrame = self_menuFrame or API_CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate")
 		API_EasyMenu(menu, self_menuFrame, "cursor", 0, 0, "MENU")
+	elseif button == "MiddleButton" then
+		Ovale:ToggleOptions()
 	elseif button == "RightButton" then
 		OvaleOptions:ToggleConfig()
 	end
@@ -74,6 +76,7 @@ local function OnTooltipShow(tooltip)
 	self_tooltipTitle = self_tooltipTitle or OVALE .. " " .. Ovale.version
 	tooltip:SetText(self_tooltipTitle, 1, 1, 1)
 	tooltip:AddLine(L["Click to select the script."])
+	tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
 	tooltip:AddLine(L["Right-Click for options."])
 end
 --</private-static-methods>
