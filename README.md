@@ -50,6 +50,7 @@ Features
   [Masque]: http://www.curse.com/addons/wow/masque
   [Recount]: http://www.curse.com/addons/wow/recount
   [Skada]: http://www.curse.com/addons/wow/skada
+  [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
 
 FAQ
 ===
