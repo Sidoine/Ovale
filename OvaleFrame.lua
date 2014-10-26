@@ -25,7 +25,6 @@ do
 	local tostring = tostring
 	local wipe = table.wipe
 	local API_CreateFrame = CreateFrame
-	local API_GetSpellTexture = GetSpellTexture
 	local API_GetTime = GetTime
 	local API_RegisterStateDriver = RegisterStateDriver
 	local NextTime = OvaleTimeSpan.NextTime
@@ -205,7 +204,7 @@ do
 					Ovale:Logf("GetAction: start=%s, value=%f", start, value)
 					local actionTexture
 					if node.params and node.params.texture then
-						actionTexture = API_GetSpellTexture(node.params.texture)
+						actionTexture = node.params.texture
 					end
 					icons[1]:SetValue(value, actionTexture)
 					if #icons > 1 then
