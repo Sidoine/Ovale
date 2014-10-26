@@ -65,7 +65,8 @@ do
 	end
 	
 	local function frameOnEnter(self)
-		if (not Ovale.db.profile.apparence.verrouille) then
+		local profile = Ovale.db.profile
+		if not (profile.apparence.enableIcons and profile.apparence.verrouille) then
 			self.obj.barre:Show()
         end
 	end
@@ -447,7 +448,7 @@ do
 		self.hider = hider
 		self.updateFrame = API_CreateFrame("Frame")
 		self.barre = self.frame:CreateTexture();
-		self.content = API_CreateFrame("Frame",nil,frame)
+		self.content = API_CreateFrame("Frame", nil, self.updateFrame)
 		if Masque then
 			self.skinGroup = Masque:Group(OVALE)
 		end
