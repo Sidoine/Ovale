@@ -122,6 +122,10 @@ $m{Skada}{get_player} = true;
 $p{Skada}{current} = true;
 $p{Skada}{total} = true;
 
+$sp{SpellFlashCore}{FlashAction} = true;
+$sp{SpellFlashCore}{FlashForm} = true;
+$sp{SpellFlashCore}{FlashItem} = true;
+
 $sp{Ovale}{OvaleLexer} = true;
 $sp{Ovale}{OvalePool} = true;
 $sp{Ovale}{OvalePoolGC} = true;

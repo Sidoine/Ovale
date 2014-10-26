@@ -15,6 +15,7 @@ do
 	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCooldown = Ovale.OvaleCooldown
 	local OvaleGUID = Ovale.OvaleGUID
+	local OvaleSpellFlash = Ovale.OvaleSpellFlash
 	local OvaleState = Ovale.OvaleState
 	local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
@@ -196,6 +197,9 @@ do
 				local action = self.actions[k]
 				if Ovale.db.profile.apparence.enableIcons then
 					self:UpdateActionIcon(state, node, action, element, start, now)
+				end
+				if Ovale.db.profile.apparence.spellFlash and SpellFlashCore then
+					OvaleSpellFlash:Flash(node, element, start, now)
 				end
 			end
 		end

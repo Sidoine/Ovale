@@ -48,6 +48,7 @@ OvaleScore.lua
 OvaleScripts.lua
 OvaleSimulationCraft.lua
 OvaleSpellBook.lua
+OvaleSpellFlash.lua
 OvaleStance.lua
 OvaleState.lua
 

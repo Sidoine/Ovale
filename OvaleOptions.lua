@@ -316,6 +316,20 @@ local self_options =
 						},
 					},
 				},
+				spellFlash = {
+					type = "group",
+					name = "SpellFlash",
+					disabled = function()
+						return not SpellFlashCore
+					end,
+					args = {
+						spellFlash = {
+							type = "toggle",
+							name = L["Flash spells"],
+							desc = L["Flash spells on action bars when they are ready to be cast. Requires SpellFlashCore."],
+						},
+					},
+				},
 				advanced = {
 					order = 80,
 					type = "group",
@@ -788,6 +802,7 @@ function OvaleOptions:OnInitialize()
 				updateInterval = 0.1,
 				auraLag = 400,
 				enableIcons = true,
+				spellFlash = false,
 			}
 		},
 	})
