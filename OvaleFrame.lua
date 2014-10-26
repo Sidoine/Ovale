@@ -186,102 +186,14 @@ do
 			else
 				state.enemies = nil
 			end
-
-			local action = self.actions[k]
-			local icons = action.secure and action.secureIcons or action.icons
-
+			-- Refresh the action button for the node.
 			if refresh then
 				Ovale:Logf("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
 				local timeSpan, _, element = OvaleBestAction:GetAction(node, state)
 				local start = NextTime(timeSpan, state.currentTime)
-
-				if element and element.type == "value" then
-					local value
-					if element.value and element.origin and element.rate then
-						value = element.value + (now - element.origin) * element.rate
-					end
-					Ovale:Logf("GetAction: start=%s, value=%f", start, value)
-					local actionTexture
-					if node.params and node.params.texture then
-						actionTexture = node.params.texture
-					end
-					icons[1]:SetValue(value, actionTexture)
-					if #icons > 1 then
-						icons[2]:Update(element, nil)
-					end
-				else
-					local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-						actionUsable, actionShortcut, actionIsCurrent, actionEnable,
-						actionType, actionId, actionTarget = OvaleBestAction:GetActionInfo(element, state)
-
-					Ovale:Logf("GetAction: start=%s, id=%s", start, actionId)
-					--[[
-						If "nored=1" is given as an action parameter, then just use the actual start time of
-						the element itself.
-					--]]
-					if element and element.params and element.params.nored == 1 then
-						start = actionCooldownStart + actionCooldownDuration
-						if start < state.currentTime then
-							start = state.currentTime
-						end
-						Ovale:Logf("Adjusting for 'nored': start=%s", start)
-					end
-					-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-					if start and state.currentSpellId and state.nextCast and actionType == "spell" and actionId == state.currentSpellId and start < state.nextCast then
-						start = state.nextCast
-					end
-					if start and node.params.nocd and now < start - node.params.nocd then
-						icons[1]:Update(element, nil)
-					else
-						icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-							actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
-					end
-
-					-- TODO: Scoring should allow for other actions besides spells.
-					if actionType == "spell" then
-						action.spellId = actionId
-					else
-						action.spellId = nil
-					end
-					if start and start <= now and actionUsable then
-						action.waitStart = action.waitStart or now
-					else
-						action.waitStart = nil
-					end
-
-					if profile.apparence.moving and icons[1].cooldownStart and icons[1].cooldownEnd then
-						local top=1-(now - icons[1].cooldownStart)/(icons[1].cooldownEnd-icons[1].cooldownStart)
-						if top<0 then
-							top = 0
-						elseif top>1 then
-							top = 1
-						end
-						icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
-						if icons[2] then
-							icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
-						end
-					end
-
-					if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
-						if start then
-							Ovale:Logf("****Second icon %s", start)
-							local spellTarget
-							if element then
-								spellTarget = element.params.target
-							end
-							if not spellTarget or spellTarget == "target" then
-								spellTarget = state.defaultTarget
-							end
-							state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
-							timeSpan, _, element = OvaleBestAction:GetAction(node, state)
-							start = NextTime(timeSpan, state.currentTime)
-							icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element, state))
-						else
-							icons[2]:Update(element, nil)
-						end
-					end
-				end
+				local action = self.actions[k]
+				self:UpdateActionIcon(state, node, action, element, start, now)
 			end
 		end
 
@@ -289,7 +201,100 @@ do
 		Ovale:UpdateTrace()
 		Ovale:PrintOneTimeMessages()
 	end
-	
+
+	local function UpdateActionIcon(self, state, node, action, element, start, now)
+		local profile = Ovale.db.profile
+		local icons = action.secure and action.secureIcons or action.icons
+
+		now = now or API_GetTime()
+		if element and element.type == "value" then
+			local value
+			if element.value and element.origin and element.rate then
+				value = element.value + (now - element.origin) * element.rate
+			end
+			Ovale:Logf("GetAction: start=%s, value=%f", start, value)
+			local actionTexture
+			if node.params and node.params.texture then
+				actionTexture = node.params.texture
+			end
+			icons[1]:SetValue(value, actionTexture)
+			if #icons > 1 then
+				icons[2]:Update(element, nil)
+			end
+		else
+			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable,
+				actionType, actionId, actionTarget = OvaleBestAction:GetActionInfo(element, state)
+
+			Ovale:Logf("GetAction: start=%s, id=%s", start, actionId)
+			--[[
+				If "nored=1" is given as an action parameter, then just use the actual start time of
+				the element itself.
+			--]]
+			if element and element.params and element.params.nored == 1 then
+				start = actionCooldownStart + actionCooldownDuration
+				if start < state.currentTime then
+					start = state.currentTime
+				end
+				Ovale:Logf("Adjusting for 'nored': start=%s", start)
+			end
+			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
+			if start and state.currentSpellId and state.nextCast and actionType == "spell" and actionId == state.currentSpellId and start < state.nextCast then
+				start = state.nextCast
+			end
+			if start and node.params.nocd and now < start - node.params.nocd then
+				icons[1]:Update(element, nil)
+			else
+				icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
+			end
+
+			-- TODO: Scoring should allow for other actions besides spells.
+			if actionType == "spell" then
+				action.spellId = actionId
+			else
+				action.spellId = nil
+			end
+			if start and start <= now and actionUsable then
+				action.waitStart = action.waitStart or now
+			else
+				action.waitStart = nil
+			end
+
+			if profile.apparence.moving and icons[1].cooldownStart and icons[1].cooldownEnd then
+				local top=1-(now - icons[1].cooldownStart)/(icons[1].cooldownEnd-icons[1].cooldownStart)
+				if top<0 then
+					top = 0
+				elseif top>1 then
+					top = 1
+				end
+				icons[1]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + top*action.dx)/action.scale,(action.top - top*action.dy)/action.scale)
+				if icons[2] then
+					icons[2]:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (top+1)*action.dx)/action.scale,(action.top - (top+1)*action.dy)/action.scale)
+				end
+			end
+
+			if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
+				if start then
+					Ovale:Logf("****Second icon %s", start)
+					local spellTarget
+					if element then
+						spellTarget = element.params.target
+					end
+					if not spellTarget or spellTarget == "target" then
+						spellTarget = state.defaultTarget
+					end
+					state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
+					timeSpan, _, element = OvaleBestAction:GetAction(node, state)
+					start = NextTime(timeSpan, state.currentTime)
+					icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element, state))
+				else
+					icons[2]:Update(element, nil)
+				end
+			end
+		end
+	end
+
 	local function UpdateIcons(self)
 		for k, action in pairs(self.actions) do
 			for i, icon in pairs(action.icons) do
@@ -425,6 +430,7 @@ do
 		self.OnAcquire = OnAcquire
 		self.ApplyStatus = ApplyStatus
 		self.LayoutFinished = OnLayoutFinished
+		self.UpdateActionIcon = UpdateActionIcon
 		self.UpdateIcons = UpdateIcons
 		self.OnSkinChanged = OnSkinChanged
 		self.ToggleOptions = ToggleOptions
