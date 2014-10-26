@@ -192,8 +192,8 @@ function Ovale:PLAYER_REGEN_DISABLED()
 	self:UpdateVisibility()
 end
 
-function Ovale:Ovale_OptionChanged(event, group)
-	if group == "visibility" then
+function Ovale:Ovale_OptionChanged(event, eventType)
+	if eventType == "visibility" then
 		self:UpdateVisibility()
 	else
 		self:UpdateFrame()
@@ -216,7 +216,9 @@ function Ovale:UpdateVisibility()
 	local visible = true
 	local profile = self.db.profile
 
-	if not self.frame.hider:IsVisible() then
+	if not profile.apparence.enableIcons then
+		visible = false
+	elseif not self.frame.hider:IsVisible() then
 		visible = false
 	elseif not profile.display then
 		visible = false

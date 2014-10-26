@@ -51,18 +51,6 @@ local self_options =
 			end,
 			args =
 			{
-				verrouille =
-				{
-					order = 10,
-					type = "toggle",
-					name = L["Verrouiller position"],
-				},
-				clickThru =
-				{
-					order = 20,
-					type = "toggle",
-					name = L["Ignorer les clics souris"],
-				},
 				minimap =
 				{
 					order = 25,
@@ -78,48 +66,109 @@ local self_options =
 						end
 					end
 				},
-				visibility =
+				iconGroupAppearance =
 				{
-					order = 30,
+					order = 40,
 					type = "group",
-					name = L["Visibilité"],
+					name = L["Groupe d'icônes"],
 					args =
 					{
-						enCombat =
+						enableIcons = {
+							order = 10,
+							type = "toggle",
+							name = L["Enabled"],
+							set = function(info, value)
+								Ovale.db.profile.apparence.enableIcons = value
+								OvaleOptions:SendMessage("Ovale_OptionChanged", "visibility")
+							end,
+						},
+						verrouille =
 						{
 							order = 10,
 							type = "toggle",
-							name = L["En combat uniquement"],
+							name = L["Verrouiller position"],
+							disabled = function()
+								return not Ovale.db.profile.apparence.enableIcons
+							end,
 						},
-						avecCible =
+						clickThru =
 						{
 							order = 20,
 							type = "toggle",
-							name = L["Si cible uniquement"],
+							name = L["Ignorer les clics souris"],
+							disabled = function()
+								return not Ovale.db.profile.apparence.enableIcons
+							end,
 						},
-						targetHostileOnly =
-						{
+						visibility = {
+							order = 20,
+							type = "group",
+							name = L["Visibilité"],
+							inline = true,
+							disabled = function()
+								return not Ovale.db.profile.apparence.enableIcons
+							end,
+							args = {
+								enCombat = {
+									order = 10,
+									type = "toggle",
+									name = L["En combat uniquement"],
+								},
+								avecCible = {
+									order = 20,
+									type = "toggle",
+									name = L["Si cible uniquement"],
+								},
+								targetHostileOnly = {
+									order = 30,
+									type = "toggle",
+									name = L["Cacher si cible amicale ou morte"],
+								},
+								hideVehicule = {
+									order = 40,
+									type = "toggle",
+									name = L["Cacher dans les véhicules"],
+								},
+								hideEmpty = {
+									order = 50,
+									type = "toggle",
+									name = L["Cacher bouton vide"],
+								},
+							},
+						},
+						layout = {
 							order = 30,
-							type = "toggle",
-							name = L["Cacher si cible amicale ou morte"],
-						},
-						hideVehicule =
-						{
-							order = 40,
-							type = "toggle",
-							name = L["Cacher dans les véhicules"],
-						},
-						hideEmpty =
-						{
-							order = 50,
-							type = "toggle",
-							name = L["Cacher bouton vide"],
-						},
+							type = "group",
+							name = L["Layout"],
+							inline = true,
+							disabled = function()
+								return not Ovale.db.profile.apparence.enableIcons
+							end,
+							args = {
+								moving = {
+									order = 10,
+									type = "toggle",
+									name = L["Défilement"],
+									desc = L["Les icônes se déplacent"],
+								},
+								vertical = {
+									order = 20,
+									type = "toggle",
+									name = L["Vertical"],
+								},
+								margin = {
+									order = 30,
+									type = "range",
+									name = L["Marge entre deux icônes"],
+									min = -16, max = 64, step = 1,
+								},
+							}
+						}
 					},
 				},
 				iconAppearance =
 				{
-					order = 40,
+					order = 50,
 					type = "group",
 					name = L["Icône"],
 					args =
@@ -203,35 +252,6 @@ local self_options =
 								Ovale.db.profile.apparence.updateInterval = value / 1000
 								self:SendMessage("Ovale_OptionChanged")
 							end
-						},
-					},
-				},
-				iconGroupAppearance =
-				{
-					order = 50,
-					type = "group",
-					name = L["Groupe d'icônes"],
-					args =
-					{
-						moving =
-						{
-							order = 10,
-							type = "toggle",
-							name = L["Défilement"],
-							desc = L["Les icônes se déplacent"],
-						},
-						vertical =
-						{
-							order = 20,
-							type = "toggle",
-							name = L["Vertical"],
-						},
-						margin =
-						{
-							order = 30,
-							type = "range",
-							name = L["Marge entre deux icônes"],
-							min = -16, max = 64, step = 1,
 						},
 					},
 				},
@@ -767,6 +787,7 @@ function OvaleOptions:OnInitialize()
 				optionsAlpha = 1,
 				updateInterval = 0.1,
 				auraLag = 400,
+				enableIcons = true,
 			}
 		},
 	})
