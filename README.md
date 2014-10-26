@@ -7,24 +7,35 @@ It displays one or more icons that show the cooldown of an action.  The action i
   [Corruption]: http://www.wowhead.com/spell=172
   [Shadow Bolt]: http://www.wowhead.com/spell=686
 
-Default scripts are available for all dps classes and specializations, based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
+The [current 6.0.0 beta release][beta] of Ovale currently provides default scripts for the following classes for *Warlords of Draenor*:
+
+- Death Knight: Blood, Frost, Unholy
+- Druid: Feral, Guardian
+- Hunter: Beast Mastery, Marksmanship, Survival
+- Monk: Brewmaster, Windwalker
+- Paladin: Protection, Retribution
+- Priest: Shadow
+- Rogue: Assassination, Combat, Subtlety
+- Warlock: Affliction, Demonology, Destruction
+
+Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
 
-See the [video of a survival hunter][ovale-video] using [Ovale][ovale] during Wrath of the Lich King.
+See the [video of a survival hunter][ovale-video] using [Ovale][ovale] during *Wrath of the Lich King*.
 
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM	"Ovale WotLK video"
 
 **Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets].**
 
+  [beta]: http://www.curse.com/addons/wow/ovale#t1:other-downloads
   [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
   [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
 
 Features
 ========
 
-- Default scripts for every DPS class and talent specialization.
 - Tracks DoTs, buffs, debuffs, cooldowns, combo points, runes, mana, everything that a player would need to choose what to do.
 - Adapts to your talent points and glyphs.
 - Change quickly the configuration at any time with configurable checkboxes and drop-down lists that can be shown/hidden by clicking on the icons, e.g. switching between single and multi-target damage, setting the curse to cast.
@@ -34,6 +45,7 @@ Features
 - Can be used to track crowd-control spells on your focus.
 - Scoring system: evaluate how well you followed the script.  Add a new Ovale panel in [Recount][] and [Skada][], with a score between 0 (very bad) and 1000 (perfect).
 - Up to two-spells-ahead accuracy with some classes.
+- Use [SpellFlashCore][] to flash abilities on action bars in addition, or as an alternative, to displaying the ability icons.
 
   [Masque]: http://www.curse.com/addons/wow/masque
   [Recount]: http://www.curse.com/addons/wow/recount
