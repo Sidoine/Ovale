@@ -177,7 +177,7 @@ Define(blood_fury_sp 33702)
 Define(blood_fury_sp_buff 33702)
 	SpellInfo(blood_fury_sp_buff duration=15)
 Define(quaking_palm 107079)
-	SpellInfo(quaking_palm cd=120)
+	SpellInfo(quaking_palm cd=120 interrupt=1)
 Define(rocket_barrage 69041)
 	SpellInfo(rocket_barrage cd=120)
 Define(shadowmeld 58984)
@@ -190,7 +190,7 @@ Define(stoneform 20594)
 Define(stoneform_buff 20594)
 	SpellInfo(stoneform_buff duration=8)
 Define(war_stomp 20549)
-	SpellInfo(war_stomp cd=120)
+	SpellInfo(war_stomp cd=120 interrupt=1)
 
 AddFunction UseRacialSurvivalActions
 {
