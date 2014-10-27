@@ -89,9 +89,8 @@ function OvaleSpellFlash:Flash(node, element, start, now)
 				end
 				if si and si.to_stance then
 					SpellFlashCore.FlashForm(spellId, color, size, brightness)
-				else
-					SpellFlashCore.FlashAction(spellId, color, size, brightness)
 				end
+				SpellFlashCore.FlashAction(spellId, color, size, brightness)
 			elseif element.lowername == "item" then
 				-- Item ID.
 				local itemId = element.params[1]
