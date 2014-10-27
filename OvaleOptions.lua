@@ -47,6 +47,7 @@ local self_options =
 			end,
 			set = function(info, value)
 				Ovale.db.profile.apparence[info[#info]] = value
+				-- Pass the name of the parent group as the event parameter.
 				OvaleOptions:SendMessage("Ovale_OptionChanged", info[#info - 1])
 			end,
 			args =
@@ -179,7 +180,8 @@ local self_options =
 							type = "range",
 							name = L["Taille des icônes"],
 							desc = L["La taille des icônes"],
-							min = 0.5, max = 3, step = 0.01,
+							min = 0.5, max = 3, bigStep = 0.01,
+							isPercent = true,
 						},
 						smallIconScale =
 						{
@@ -187,7 +189,8 @@ local self_options =
 							type = "range",
 							name = L["Taille des petites icônes"],
 							desc = L["La taille des petites icônes"],
-							min = 0.5, max = 3, step = 0.01,
+							min = 0.5, max = 3, bigStep = 0.01,
+							isPercent = true,
 						},
 						fontScale =
 						{
@@ -195,21 +198,16 @@ local self_options =
 							type = "range",
 							name = L["Taille des polices"],
 							desc = L["La taille des polices"],
-							min = 0.5, max = 2, step = 0.01,
+							min = 0.2, max = 2, bigStep = 0.01,
+							isPercent = true,
 						},
 						alpha =
 						{
 							order = 40,
 							type = "range",
 							name = L["Opacité des icônes"],
-							min = 0, max = 100, step = 1,
-							get = function(info)
-								return Ovale.db.profile.apparence.alpha * 100
-							end,
-							set = function(info, value)
-								Ovale.db.profile.apparence.alpha = value / 100
-								OvaleOptions:SendMessage("Ovale_OptionChanged")
-							end
+							min = 0, max = 1, bigStep = 0.01,
+							isPercent = true,
 						},
 						raccourcis =
 						{
@@ -288,15 +286,8 @@ local self_options =
 							order = 30,
 							type = "range",
 							name = L["Opacité des options"],
-							min = 0, max = 100, step = 1,
-							get = function(info)
-								return Ovale.db.profile.apparence.optionsAlpha * 100
-							end,
-							set = function(info, value)
-								Ovale.db.profile.apparence.optionsAlpha = value / 100
-								Ovale.frame.content:SetAlpha(value/100)
-								OvaleOptions:SendMessage("Ovale_OptionChanged")
-							end
+							min = 0, max = 1, bigStep = 0.01,
+							isPercent = true,
 						},
 					},
 				},
@@ -319,7 +310,8 @@ local self_options =
 							order = 20,
 							type = "range",
 							name = L["Taille du second icône"],
-							min = 0.2, max = 1, step = 0.01,
+							min = 0.2, max = 1, bigStep = 0.01,
+							isPercent = true,
 						},
 					},
 				},
