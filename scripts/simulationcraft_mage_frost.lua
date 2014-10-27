@@ -74,11 +74,11 @@ AddFunction FrostDefaultActions
 	Spell(mirror_image)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
-	#rune_of_power,if=(cooldown.icy_veins.remains<gcd&buff.rune_of_power.remains<20)|(cooldown.prismatic_crystal.remains<gcd&buff.rune_of_power.remains<10)
+	#rune_of_power,if=(cooldown.icy_veins.remains<gcd.max&buff.rune_of_power.remains<20)|(cooldown.prismatic_crystal.remains<gcd.max&buff.rune_of_power.remains<10)
 	if SpellCooldown(icy_veins icy_veins_glyphed usable=1) < GCD() and RuneOfPowerRemaining() < 20 or SpellCooldown(prismatic_crystal) < GCD() and RuneOfPowerRemaining() < 10 Spell(rune_of_power)
 	#call_action_list,name=cooldowns,if=time_to_die<24
 	if TimeToDie() < 24 FrostCooldownsActions()
-	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=action.frozen_orb.gcd|pet.prismatic_crystal.active)
+	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
 	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(prismatic_crystal) } FrostCrystalSequenceActions()
 	#call_action_list,name=aoe,if=active_enemies>=5
 	if Enemies() >= 5 FrostAoeActions()
@@ -90,7 +90,7 @@ AddFunction FrostAoeActions
 {
 	#call_action_list,name=cooldowns
 	FrostCooldownsActions()
-	#frost_bomb,if=remains<action.ice_lance.travel_time&(cooldown.frozen_orb.remains<gcd|buff.fingers_of_frost.react=2)
+	#frost_bomb,if=remains<action.ice_lance.travel_time&(cooldown.frozen_orb.remains<gcd.max|buff.fingers_of_frost.react=2)
 	if target.DebuffRemaining(frost_bomb_debuff) < 0.5 and { SpellCooldown(frozen_orb) < GCD() or BuffStacks(fingers_of_frost_buff) == 2 } Spell(frost_bomb)
 	#frozen_orb
 	Spell(frozen_orb)
@@ -117,11 +117,11 @@ AddFunction FrostSingleTargetActions
 	if BuffPresent(fingers_of_frost_buff) and BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) Spell(ice_lance)
 	#frostfire_bolt,if=buff.brain_freeze.react&buff.brain_freeze.remains<action.frostbolt.execute_time
 	if BuffPresent(brain_freeze_buff) and BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) Spell(frostfire_bolt)
-	#frost_bomb,if=!talent.prismatic_crystal.enabled&cooldown.frozen_orb.remains<gcd&debuff.frost_bomb.remains<10
+	#frost_bomb,if=!talent.prismatic_crystal.enabled&cooldown.frozen_orb.remains<gcd.max&debuff.frost_bomb.remains<10
 	if not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
 	#frozen_orb,if=!talent.prismatic_crystal.enabled&buff.fingers_of_frost.stack<2&cooldown.icy_veins.remains>45
 	if not Talent(prismatic_crystal_talent) and BuffStacks(fingers_of_frost_buff) < 2 and SpellCooldown(icy_veins icy_veins_glyphed usable=1) > 45 Spell(frozen_orb)
-	#frost_bomb,if=remains<action.ice_lance.travel_time&(buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&(talent.thermal_void.enabled|buff.fingers_of_frost.remains<gcd*2)))
+	#frost_bomb,if=remains<action.ice_lance.travel_time&(buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&(talent.thermal_void.enabled|buff.fingers_of_frost.remains<gcd.max*2)))
 	if target.DebuffRemaining(frost_bomb_debuff) < 0.5 and { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and { Talent(thermal_void_talent) or BuffRemaining(fingers_of_frost_buff) < GCD() * 2 } } Spell(frost_bomb)
 	#ice_nova,if=time_to_die<10|(charges=2&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up))
 	if TimeToDie() < 10 or Charges(ice_nova) == 2 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(ice_nova)

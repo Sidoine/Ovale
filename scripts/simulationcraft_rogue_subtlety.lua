@@ -60,6 +60,7 @@ AddFunction SubtletyPrecombatActions
 	Spell(premeditation)
 	#slice_and_dice
 	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
+	#honor_among_thieves,cooldown=2.3,cooldown_stddev=0.1
 }
 
 AddFunction SubtletyPoolActions
