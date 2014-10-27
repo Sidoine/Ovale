@@ -858,7 +858,7 @@ function OvaleOptions:OnInitialize()
 				enableIcons = true,
 				spellFlash = {
 					brightness = 1,
-					enabled = false,
+					enabled = true,
 					hasHostileTarget = false,
 					hasTarget = false,
 					hideInVehicle = false,
