@@ -27,12 +27,11 @@ local OvaleGUID = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
-local API_GetComboPoints = GetComboPoints
 local API_GetTime = GetTime
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitClass = UnitClass
-local API_UnitExists = UnitExists
 local API_UnitGUID = UnitGUID
+local API_UnitPower = UnitPower
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 -- Player's class.
@@ -64,8 +63,6 @@ local OVALE_COMBO_POINTS_DEBUG = "combo_points"
 --<public-static-properties>
 -- The current number of combo points on the player.
 OvaleComboPoints.combo = 0
--- The GUID of the last target to yield valid combo point information.
-OvaleComboPoints.comboGUID = nil
 --</public-static-properties>
 
 --<private-static-methods>
@@ -179,7 +176,7 @@ function OvaleComboPoints:PLAYER_TARGET_CHANGED(event, cause)
 		-- Target was cleared.
 	else
 		-- Target has changed.
-		self:Update(true)
+		self:Update()
 	end
 end
 
@@ -200,18 +197,16 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 		if #self_pendingComboEvents > 0 then
 			local comboEvent = self_pendingComboEvents[1]
 			local spellId, guid, reason, combo = comboEvent.spellId, comboEvent.guid, comboEvent.reason, comboEvent.combo
-			if guid == self.comboGUID or guid == self_guid or not Ovale.enCombat then
-				if combo == difference or (combo == "finisher" and self.combo == 0 and difference < 0) then
-					Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Matches pending %s event for %d.", reason, spellId)
-					pendingMatched = true
-					tremove(self_pendingComboEvents, 1)
-				end
+			if combo == difference or (combo == "finisher" and self.combo == 0 and difference < 0) then
+				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Matches pending %s event for %d.", reason, spellId)
+				pendingMatched = true
+				tremove(self_pendingComboEvents, 1)
 			end
 		end
 		if not pendingMatched and not Ovale.enCombat and difference <= 0 then
 			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Out-of-combat combo point decay.")
 			if difference == 0 then
-				-- Decrement the combo point count until the next time a hostile unit is targeted to get a true update.
+				-- Decrement the combo point count until game state catches up with the event.
 				local newCombo = self.combo - 1
 				self.combo = newCombo > 0 and newCombo or 0
 				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Decaying to %d combo point(s).", self.combo)
@@ -254,15 +249,9 @@ function OvaleComboPoints:Ovale_TalentsChanged(event)
 	end
 end
 
-function OvaleComboPoints:Update(hasTarget)
+function OvaleComboPoints:Update()
 	profiler.Start("OvaleComboPoints_Update")
-	if hasTarget or API_UnitExists("target") then
-		local canAttack = API_UnitCanAttack("player", "target")
-		if canAttack then
-			self.combo = API_GetComboPoints("player", "target")
-			self.comboGUID = API_UnitGUID("target")
-		end
-	end
+	self.combo = API_UnitPower("player", 4)
 	profiler.Stop("OvaleComboPoints_Update")
 end
 
