@@ -179,7 +179,7 @@ local self_options =
 							type = "range",
 							name = L["Taille des icônes"],
 							desc = L["La taille des icônes"],
-							min = 0.1, max = 16, step = 0.1,
+							min = 0.5, max = 3, step = 0.01,
 						},
 						smallIconScale =
 						{
@@ -187,7 +187,7 @@ local self_options =
 							type = "range",
 							name = L["Taille des petites icônes"],
 							desc = L["La taille des petites icônes"],
-							min = 0.1, max = 16, step = 0.1,
+							min = 0.5, max = 3, step = 0.01,
 						},
 						fontScale =
 						{
@@ -195,7 +195,7 @@ local self_options =
 							type = "range",
 							name = L["Taille des polices"],
 							desc = L["La taille des polices"],
-							min = 0.1, max = 2, step = 0.1,
+							min = 0.5, max = 2, step = 0.01,
 						},
 						alpha =
 						{
@@ -319,7 +319,7 @@ local self_options =
 							order = 20,
 							type = "range",
 							name = L["Taille du second icône"],
-							min = 0.2, max = 1, step = 0.1,
+							min = 0.2, max = 1, step = 0.01,
 						},
 					},
 				},
