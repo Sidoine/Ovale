@@ -202,7 +202,14 @@ local self_options =
 							order = 40,
 							type = "range",
 							name = L["Opacité des icônes"],
-							min = 0, max = 100, step = 5,
+							min = 0, max = 100, step = 1,
+							get = function(info)
+								return Ovale.db.profile.apparence.alpha * 100
+							end,
+							set = function(info, value)
+								Ovale.db.profile.apparence.alpha = value / 100
+								OvaleOptions:SendMessage("Ovale_OptionChanged")
+							end
 						},
 						raccourcis =
 						{
@@ -250,7 +257,7 @@ local self_options =
 							end,
 							set = function(info, value)
 								Ovale.db.profile.apparence.updateInterval = value / 1000
-								self:SendMessage("Ovale_OptionChanged")
+								OvaleOptions:SendMessage("Ovale_OptionChanged")
 							end
 						},
 					},
@@ -281,14 +288,14 @@ local self_options =
 							order = 30,
 							type = "range",
 							name = L["Opacité des options"],
-							min = 0, max = 100, step = 5,
+							min = 0, max = 100, step = 1,
 							get = function(info)
 								return Ovale.db.profile.apparence.optionsAlpha * 100
 							end,
 							set = function(info, value)
 								Ovale.db.profile.apparence.optionsAlpha = value / 100
 								Ovale.frame.content:SetAlpha(value/100)
-								self:SendMessage("Ovale_OptionChanged")
+								OvaleOptions:SendMessage("Ovale_OptionChanged")
 							end
 						},
 					},

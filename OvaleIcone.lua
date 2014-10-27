@@ -33,8 +33,8 @@ end
 --<public-methods>
 local function SetValue(self, value, actionTexture)
 	self.icone:Show()
-	self.icone:SetTexture(actionTexture);
-	self.icone:SetAlpha(1.0)
+	self.icone:SetTexture(actionTexture)
+	self.icone:SetAlpha(Ovale.db.profile.apparance.alpha)
 	self.cd:Hide()
 	self.focusText:Hide()
 	self.rangeIndicator:Hide()
@@ -112,10 +112,13 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 		self.icone:Show()
 		self.icone:SetTexture(actionTexture)
 
+		local alpha = profile.apparence.alpha
 		if actionUsable then
-			self.icone:SetAlpha(1.0)
+			self.icone:SetAlpha(alpha)
 		else
-			self.icone:SetAlpha(0.33)
+			-- Unusable actions are displayed at half the normal alpha.
+			alpha = alpha / 2
+			self.icone:SetAlpha(alpha)
 		end
 
 		-- Icon color overlay (red or not red).
