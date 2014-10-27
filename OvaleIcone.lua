@@ -34,7 +34,7 @@ end
 local function SetValue(self, value, actionTexture)
 	self.icone:Show()
 	self.icone:SetTexture(actionTexture)
-	self.icone:SetAlpha(Ovale.db.profile.apparance.alpha)
+	self.icone:SetAlpha(Ovale.db.profile.apparence.alpha)
 	self.cd:Hide()
 	self.focusText:Hide()
 	self.rangeIndicator:Hide()
