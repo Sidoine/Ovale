@@ -39,6 +39,8 @@ local MODIFIER_KEYWORD = {
 	["ammo_type"] = true,
 	["chain"] = true,
 	["choose"] = true,
+	["cooldown"] = true,
+	["cooldown_stddev"] = true,
 	["cycle_targets"] = true,
 	["damage"] = true,
 	["early_chain_if"] = true,
@@ -1201,6 +1203,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
+		elseif class == "ROGUE" and action == "honor_among_thieves" then
+			-- skip
+			isSpellAction = false
 		elseif class == "ROGUE" and action == "kick" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -2554,6 +2559,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = target .. "True(debuff_flying_down)"
 	elseif operand == "distance" then
 		code = target .. "Distance()"
+	elseif operand == "gcd.max" then
+		code = "GCD()"
 	else
 		ok = false
 	end
