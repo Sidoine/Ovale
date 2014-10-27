@@ -321,11 +321,66 @@ local self_options =
 					disabled = function()
 						return not SpellFlashCore
 					end,
+					get = function(info)
+						return Ovale.db.profile.apparence.spellFlash[info[#info]]
+					end,
+					set = function(info, value)
+						Ovale.db.profile.apparence.spellFlash[info[#info]] = value
+						OvaleOptions:SendMessage("Ovale_OptionChanged")
+					end,
 					args = {
-						spellFlash = {
+						enabled = {
+							order = 10,
 							type = "toggle",
-							name = L["Flash spells"],
+							name = L["Enabled"],
 							desc = L["Flash spells on action bars when they are ready to be cast. Requires SpellFlashCore."],
+							width = "full",
+						},
+						inCombat = {
+							order = 10,
+							type = "toggle",
+							name = L["En combat uniquement"],
+							disabled = function()
+								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+							end,
+						},
+						hasTarget = {
+							order = 20,
+							type = "toggle",
+							name = L["Si cible uniquement"],
+							disabled = function()
+								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+							end,
+						},
+						hasHostileTarget = {
+							order = 30,
+							type = "toggle",
+							name = L["Cacher si cible amicale ou morte"],
+							disabled = function()
+								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+							end,
+						},
+						hideInVehicle = {
+							order = 40,
+							type = "toggle",
+							name = L["Cacher dans les véhicules"],
+							disabled = function()
+								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+							end,
+						},
+						brightness = {
+							order = 50,
+							type = "range",
+							name = L["Flash brightness"],
+							min = 0, max = 1, bigStep = 0.01,
+							isPercent = true,
+						},
+						size = {
+							order = 60,
+							type = "range",
+							name = L["Flash size"],
+							min = 0, max = 3, bigStep = 0.01,
+							isPercent = true,
 						},
 					},
 				},
@@ -801,8 +856,16 @@ function OvaleOptions:OnInitialize()
 				updateInterval = 0.1,
 				auraLag = 400,
 				enableIcons = true,
-				spellFlash = false,
-			}
+				spellFlash = {
+					brightness = 1,
+					enabled = false,
+					hasHostileTarget = false,
+					hasTarget = false,
+					hideInVehicle = false,
+					inCombat = false,
+					size = 2.4,
+				},
+			},
 		},
 	})
 

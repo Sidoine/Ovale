@@ -195,10 +195,11 @@ do
 				local timeSpan, _, element = OvaleBestAction:GetAction(node, state)
 				local start = NextTime(timeSpan, state.currentTime)
 				local action = self.actions[k]
-				if Ovale.db.profile.apparence.enableIcons then
+				local profile = Ovale.db.profile
+				if profile.apparence.enableIcons then
 					self:UpdateActionIcon(state, node, action, element, start, now)
 				end
-				if Ovale.db.profile.apparence.spellFlash and SpellFlashCore then
+				if profile.apparence.spellFlash.enabled then
 					OvaleSpellFlash:Flash(node, element, start, now)
 				end
 			end
