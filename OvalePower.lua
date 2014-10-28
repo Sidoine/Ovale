@@ -565,6 +565,7 @@ do
 							buffAmount = buffAmount * aura.stacks
 						end
 						cost = cost + buffAmount
+						Ovale:Logf("Spell ID '%d' had %f %s added from aura ID '%d'.", spellId, buffAmount, powerType, aura.spellId)
 					end
 				end
 			end
@@ -575,6 +576,7 @@ do
 				local aura = state:GetAura("player", buffNoCost)
 				if state:IsActiveAura(aura) then
 					cost = 0
+					Ovale:Logf("Spell ID '%d' had %s cost removed due to aura ID '%d'.", spellId, powerType, aura.spellId)
 				end
 			end
 			--[[
@@ -618,7 +620,7 @@ do
 			if extraPower then
 				if not maximumCost then
 					-- Clamp the extra power to the remaining power.
-					power = state[powerType] - cost
+					local power = state[powerType] > cost and state[powerType] - cost or 0
 					if extraPower >= power then
 						extraPower = power
 					end
@@ -626,6 +628,7 @@ do
 				-- Apply any percent reductions to the extra resource cost.
 				if extraPower > 0 then
 					extraPower = extraPower * multiplier
+					Ovale:Logf("Spell ID '%d' will use %d extra %s.", spellId, extraPower, powerType)
 				end
 				cost = cost + extraPower
 			end
