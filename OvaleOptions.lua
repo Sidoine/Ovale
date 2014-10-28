@@ -132,6 +132,7 @@ local self_options =
 							order = 10,
 							type = "toggle",
 							name = L["Enabled"],
+							width = "full",
 							set = function(info, value)
 								Ovale.db.profile.apparence.enableIcons = value
 								OvaleOptions:SendMessage("Ovale_OptionChanged", "visibility")
