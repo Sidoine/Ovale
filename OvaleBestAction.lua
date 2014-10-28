@@ -983,6 +983,20 @@ function OvaleBestAction:ComputeLogical(element, state)
 			-- Take union of A and B.
 			Union(timeSpanA, timeSpanB, timeSpan)
 		end
+	elseif element.operator == "xor" then
+		-- A xor B = (A and not B) or (not A and B)
+		local timeSpanB = self:ComputeBool(element.child[2], state)
+		local left = OvaleTimeSpan(self_timeSpanPool:Get())
+		local right = OvaleTimeSpan(self_timeSpanPool:Get())
+		local scratch = OvaleTimeSpan(self_timeSpanPool:Get())
+		Complement(timeSpanB, scratch)
+		Intersect(timeSpanA, scratch, left)
+		Complement(timeSpanA, scratch)
+		Intersect(scratch, timeSpanB, right)
+		Union(left, right, timeSpan)
+		self_timeSpanPool:Release(left)
+		self_timeSpanPool:Release(right)
+		self_timeSpanPool:Release(scratch)
 	end
 
 	Ovale:Logf("[%d]    logical '%s' returns %s", element.nodeId, element.operator, tostring(timeSpan))

@@ -132,6 +132,7 @@ local UNARY_OPERATOR = {
 local BINARY_OPERATOR = {
 	-- logical
 	["|"]  = { "logical", 5, "associative" },
+	["^"]  = { "logical", 8, "associative" },
 	["&"]  = { "logical", 10, "associative" },
 	-- comparison
 	["!="] = { "compare", 20 },
@@ -148,8 +149,6 @@ local BINARY_OPERATOR = {
 	-- multiplication, division, modulus
 	["%"]  = { "arithmetic", 40 },
 	["*"]  = { "arithmetic", 40, "associative" },
-	-- exponentiation
-	["^"]  = { "arithmetic", 100 },
 }
 
 -- INDENT[k] is a string of k concatenated tabs.
@@ -1606,6 +1605,8 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 			local operator
 			if parseNode.operator == "&" then
 				operator = "and"
+			elseif parseNode.operator == "^" then
+				operator = "xor"
 			elseif parseNode.operator == "|" then
 				operator = "or"
 			elseif parseNode.operator == "=" then

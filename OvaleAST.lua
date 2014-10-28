@@ -167,6 +167,7 @@ local UNARY_OPERATOR = {
 local BINARY_OPERATOR = {
 	-- logical
 	["or"]  = { "logical", 5, "associative" },
+	["xor"]	= { "logical", 8, "associative" },
 	["and"] = { "logical", 10, "associative" },
 	-- comparison
 	["!="]  = { "compare", 20 },
