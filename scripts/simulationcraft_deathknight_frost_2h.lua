@@ -59,7 +59,7 @@ AddFunction FrostTwoHanderDefaultActions
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
-	Spell(antimagic_shell)
+	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
 	#potion,name=mogu_power,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)

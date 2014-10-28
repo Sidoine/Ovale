@@ -64,10 +64,8 @@ AddFunction FeralDefaultActions
 	#thrash_cat,if=remains<=duration*0.3&active_enemies>1
 	unless target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() > 1 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
 	{
-		# CHANGE: Condition on Lunar Inspiration 
-		#moonfire,cycle_targets=1,if=combo_points<5&remains<=duration*0.3&active_enemies<=10
-		#if ComboPoints() < 5 and target.DebuffRemaining(moonfire_debuff) <= BaseDuration(moonfire_debuff) * 0.3 and Enemies() <= 10 Spell(moonfire)
-		if Talent(lunar_inspiration_talent) and ComboPoints() < 5 and target.DebuffRemaining(moonfire_debuff) <= BaseDuration(moonfire_debuff) * 0.3 and Enemies() <= 10 Spell(moonfire)
+		#moonfire_cat,cycle_targets=1,if=combo_points<5&remains<=duration*0.3&active_enemies<=10
+		if ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= BaseDuration(moonfire_cat_debuff) * 0.3 and Enemies() <= 10 Spell(moonfire_cat)
 		#rake,cycle_targets=1,if=persistent_multiplier>dot.rake.pmultiplier&combo_points<5
 		if DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) and ComboPoints() < 5 Spell(rake)
 		#swipe,if=combo_points<5&active_enemies>=3
@@ -90,8 +88,8 @@ AddFunction FeralDefaultPredictActions
 	if BuffRemaining(savage_roar_buff) < 3 Spell(savage_roar)
 	#thrash_cat,if=buff.omen_of_clarity.react&remains<=duration*0.3&active_enemies>1
 	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() > 1 Spell(thrash_cat)
-	#thrash_cat,if=combo_points=5&remains<=duration*0.3&buff.omen_of_clarity.react
-	if ComboPoints() == 5 and target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and BuffPresent(omen_of_clarity_melee_buff) Spell(thrash_cat)
+	#thrash_cat,if=!talent.bloodtalons.enabled&combo_points=5&remains<=duration*0.3&buff.omen_of_clarity.react
+	if not Talent(bloodtalons_talent) and ComboPoints() == 5 and target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and BuffPresent(omen_of_clarity_melee_buff) Spell(thrash_cat)
 	#ferocious_bite,cycle_targets=1,if=combo_points=5&target.health.pct<25&dot.rip.ticking&energy>=max_fb_energy
 	if ComboPoints() == 5 and target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
 	#rip,cycle_targets=1,if=combo_points=5&remains<=3

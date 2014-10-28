@@ -15,11 +15,30 @@ Include(ovale_common)
 Include(ovale_warrior_spells)
 
 AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
-AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) specialization=!protection)
 
 AddFunction UsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+}
+
+AddFunction GetInMeleeRange
+{
+	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction ArmsPrecombatActions
@@ -36,16 +55,16 @@ AddFunction ArmsPrecombatActions
 AddFunction ArmsDefaultActions
 {
 	#charge
-	Spell(charge)
+	if target.InRange(charge) Spell(charge)
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>8
 	if 0 > 8 ArmsMovementActions()
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#recklessness,if=(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up)|target.time_to_die<10
-	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
-	#bloodbath,if=cooldown.colossus_smash.remains<5|target.time_to_die<20
-	if SpellCooldown(colossus_smash) < 5 or target.TimeToDie() < 20 Spell(bloodbath)
+	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
+	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
+	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
+	if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
+	#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5)|target.time_to_die<20
+	if target.DebuffPresent(rend_debuff) and SpellCooldown(colossus_smash) < 5 or target.TimeToDie() < 20 Spell(bloodbath)
 	#avatar,if=buff.recklessness.up|target.time_to_die<25
 	if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
 	#blood_fury,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
@@ -55,7 +74,7 @@ AddFunction ArmsDefaultActions
 	#arcane_torrent,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
 	#heroic_leap,if=debuff.colossus_smash.up&rage>70
-	if target.DebuffPresent(colossus_smash_debuff) and Rage() > 70 and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	if target.DebuffPresent(colossus_smash_debuff) and Rage() > 70 and target.InRange(charge) Spell(heroic_leap)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ArmsSingleActions()
 	#call_action_list,name=aoe,if=active_enemies>1
@@ -75,7 +94,7 @@ AddFunction ArmsAoeActions
 	#mortal_strike,if=cooldown.colossus_smash.remains>1.5&target.health.pct>20&active_enemies=2
 	if SpellCooldown(colossus_smash) > 1.5 and target.HealthPercent() > 20 and Enemies() == 2 Spell(mortal_strike)
 	#execute,if=((rage>60|active_enemies=2)&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|target.time_to_die<5
-	if { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute)
+	if { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
 	#dragon_roar,if=cooldown.colossus_smash.remains>1.5&!debuff.colossus_smash.up
 	if SpellCooldown(colossus_smash) > 1.5 and not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
 	#whirlwind,if=cooldown.colossus_smash.remains>1.5&(target.health.pct>20|active_enemies>3)
@@ -91,29 +110,31 @@ AddFunction ArmsAoeActions
 	#shockwave
 	Spell(shockwave)
 	#execute,if=buff.sudden_death.react
-	if BuffPresent(sudden_death_buff) Spell(execute)
+	if BuffPresent(sudden_death_buff) Spell(execute_arms)
 }
 
 AddFunction ArmsSingleActions
 {
-	#mortal_strike,if=target.health.pct>20&dot.rend.ticking
-	if target.HealthPercent() > 20 and target.DebuffPresent(rend_debuff) Spell(mortal_strike)
-	#rend,if=ticks_remain<2&target.time_to_die>4
-	if target.TicksRemaining(rend_debuff) < 2 and target.TimeToDie() > 4 Spell(rend)
+	#rend,if=!ticking&target.time_to_die>4
+	if not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 4 Spell(rend)
 	#ravager,if=cooldown.colossus_smash.remains<4
 	if SpellCooldown(colossus_smash) < 4 Spell(ravager)
 	#colossus_smash
 	Spell(colossus_smash)
+	#mortal_strike,if=target.health.pct>20
+	if target.HealthPercent() > 20 Spell(mortal_strike)
 	#storm_bolt,if=(cooldown.colossus_smash.remains>4|debuff.colossus_smash.up)&rage<90
 	if { SpellCooldown(colossus_smash) > 4 or target.DebuffPresent(colossus_smash_debuff) } and Rage() < 90 Spell(storm_bolt)
 	#siegebreaker
 	Spell(siegebreaker)
 	#dragon_roar,if=!debuff.colossus_smash.up
 	if not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
+	#rend,if=!debuff.colossus_smash.up&target.time_to_die>4&ticks_remain<2
+	if not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.TicksRemaining(rend_debuff) < 2 Spell(rend)
 	#execute,if=(rage>=60&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|buff.sudden_death.react|target.time_to_die<5
-	if Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 Spell(execute)
+	if Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 Spell(execute_arms)
 	#impending_victory,if=rage<40&!debuff.colossus_smash.up&target.health.pct>20
-	if Rage() < 40 and not target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() > 20 and BuffPresent(victorious_buff) Spell(impending_victory)
+	if Rage() < 40 and not target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() > 20 Spell(impending_victory)
 	#slam,if=(rage>20|cooldown.colossus_smash.remains>execute_time)&target.health.pct>20
 	if { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 Spell(slam)
 	#whirlwind,if=!talent.slam.enabled&target.health.pct>20&(rage>=40|set_bonus.tier17_4pc|debuff.colossus_smash.up)
@@ -125,7 +146,7 @@ AddFunction ArmsSingleActions
 AddFunction ArmsMovementActions
 {
 	#heroic_leap
-	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
 	#heroic_throw
@@ -158,12 +179,15 @@ AddIcon specialization=arms help=aoe
 # colossus_smash
 # colossus_smash_debuff
 # dragon_roar
-# execute
+# execute_arms
+# glyph_of_gag_order
 # heroic_leap
 # heroic_throw
 # impending_victory
 # mogu_power_potion
 # mortal_strike
+# pummel
+# quaking_palm
 # ravager
 # ravager_talent
 # recklessness
@@ -177,7 +201,7 @@ AddIcon specialization=arms help=aoe
 # storm_bolt
 # sudden_death_buff
 # sweeping_strikes
-# victorious_buff
+# war_stomp
 # whirlwind
 ]]
 	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "reference")

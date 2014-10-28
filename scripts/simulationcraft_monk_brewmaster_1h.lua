@@ -75,9 +75,9 @@ AddFunction BrewmasterDefaultActions
 	if Talent(chi_brew_talent) and MaxChi() - Chi() >= 2 and BuffStacks(elusive_brew_stacks_buff) <= 10 Spell(chi_brew)
 	#gift_of_the_ox,if=buff.gift_of_the_ox.react&incoming_damage_1500ms
 	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
+	if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
 	#fortifying_brew,if=incoming_damage_1500ms&buff.dampen_harm.down&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
+	if IncomingDamage(1.5) > 0 and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&buff.dampen_harm.down&buff.elusive_brew_activated.down
 	if BuffStacks(elusive_brew_stacks_buff) >= 9 and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5

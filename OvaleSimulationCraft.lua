@@ -940,6 +940,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("incarnation",			"incarnation_caster",			"DRUID",		"balance")
 	AddDisambiguation("incarnation",			"incarnation_melee",			"DRUID",		"feral")
 	AddDisambiguation("incarnation",			"incarnation_tank",				"DRUID",		"guardian")
+	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"feral")	-- XXX
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"guardian")	-- XXX
@@ -994,6 +995,10 @@ local function InitializeDisambiguation()
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
+	AddDisambiguation("execute",				"execute_arms",					"WARRIOR",		"arms")
+	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"arms")
+	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"fury")
+	AddDisambiguation("shield_barrier",			"shield_barrier_tank",			"WARRIOR",		"protection")
 end
 
 local EMIT_VISITOR = nil
@@ -1049,7 +1054,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 		local expressionType = "expression"
 		local modifier = parseNode.child
 		local isSpellAction = true
-		if class == "DEATHKNIGHT" and action == "blood_tap" then
+		if class == "DEATHKNIGHT" and action == "antimagic_shell" then
+			-- Only suggest Anti-Magic Shell if there is incoming damage to absorb to generate runic power.
+			conditionCode = "IncomingDamage(1.5) > 0"
+		elseif class == "DEATHKNIGHT" and action == "blood_tap" then
 			-- Blood Tap requires a minimum of five stacks of Blood Charge to be on the player.
 			local buffName = "blood_charge_buff"
 			AddSymbol(annotation, buffName)
@@ -1275,11 +1283,15 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "wrathguard_wrathstorm" then
 			conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
+		elseif class == "WARRIOR" and action == "charge" then
+			conditionCode = "target.InRange(charge)"
 		elseif class == "WARRIOR" and action == "heroic_leap" then
-			annotation[action] = class
-			conditionCode = "CheckBoxOn(opt_heroic_leap_dps)"
-		elseif class == "WARRIOR" and (action == "impending_victory" or action == "victory_rush") then
-			-- Impending Victory and Victory Rush requires the Victorious buff to be on the player.
+			-- Use Charge as a range-finder for Heroic Leap.
+			local spellName = "charge"
+			AddSymbol(annotation, spellName)
+			conditionCode = format("target.InRange(%s)", spellName)
+		elseif class == "WARRIOR" and action == "victory_rush" then
+			-- Victory Rush requires the Victorious buff to be on the player.
 			local buffName = "victorious_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffPresent(%s)", buffName)
@@ -2100,7 +2112,11 @@ do
 			if measure == "ms" then
 				seconds = seconds / 1000
 			end
-			code = format("IncomingDamage(%f)", seconds)
+			if parseNode.asType == "boolean" then
+				code = format("IncomingDamage(%f) > 0", seconds)
+			else
+				code = format("IncomingDamage(%f)", seconds)
+			end
 		elseif operand == "mastery_value" then
 			code = format("%sMasteryEffect() / 100", target)
 		elseif operand == "position_front" then
@@ -3173,12 +3189,23 @@ local function InsertSupportingFunctions(child, annotation)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "arcane_torrent_rage")
-		AddSymbol(annotation, "disrupting_shout")
 		AddSymbol(annotation, "glyph_of_gag_order")
 		AddSymbol(annotation, "heroic_throw")
 		AddSymbol(annotation, "pummel")
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "war_stomp")
+		count = count + 1
+	end
+	if annotation.melee == "WARRIOR" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "pummel")
 		count = count + 1
 	end
 	if annotation.use_item then
@@ -3291,15 +3318,6 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "righteous_fury")
-		count = count + 1
-	end
-	if annotation.heroic_leap == "WARRIOR" then
-		local code = [[
-			AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) specialization=!protection)
-		]]
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "heroic_leap")
 		count = count + 1
 	end
 	if annotation.use_potion_strength then
@@ -3503,6 +3521,7 @@ function OvaleSimulationCraft:Emit(profile)
 			annotation.counter_shot = class			-- hunter
 			annotation.spear_hand_strike = class	-- monk
 			annotation.silence = class				-- priest
+			annotation.pummel = class				-- warrior
 		end
 		annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
 		annotation.supportingControlCount = InsertSupportingControls(child, annotation)

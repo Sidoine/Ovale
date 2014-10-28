@@ -15,17 +15,36 @@ Include(ovale_common)
 Include(ovale_warrior_spells)
 
 AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
-AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) specialization=!protection)
 
 AddFunction UsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction FuryTitansGripDefaultActions
 {
 	#charge
-	Spell(charge)
+	if target.InRange(charge) Spell(charge)
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementActions()
@@ -44,7 +63,7 @@ AddFunction FuryTitansGripDefaultActions
 	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 0 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	if { 0 > 25 and 0 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -84,7 +103,7 @@ AddFunction FuryTitansGripAoeActions
 AddFunction FuryTitansGripMovementActions
 {
 	#heroic_leap
-	if CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
 	#heroic_throw
@@ -185,7 +204,7 @@ AddFunction FuryTitansGripSingleTargetActions
 	#shockwave,if=!talent.unquenchable_thirst.enabled
 	if not Talent(unquenchable_thirst_talent) Spell(shockwave)
 	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20
-	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and BuffPresent(victorious_buff) Spell(impending_victory)
+	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 Spell(impending_victory)
 	#bloodthirst
 	Spell(bloodthirst)
 }
@@ -219,11 +238,14 @@ AddIcon specialization=fury help=aoe
 # charge
 # dragon_roar
 # execute
+# glyph_of_gag_order
 # heroic_leap
 # heroic_throw
 # impending_victory
 # meat_cleaver_buff
 # mogu_power_potion
+# pummel
+# quaking_palm
 # raging_blow
 # raging_blow_buff
 # ravager
@@ -234,7 +256,7 @@ AddIcon specialization=fury help=aoe
 # storm_bolt
 # sudden_death_buff
 # unquenchable_thirst_talent
-# victorious_buff
+# war_stomp
 # whirlwind
 # wild_strike
 ]]

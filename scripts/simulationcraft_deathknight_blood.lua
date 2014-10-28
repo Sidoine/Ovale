@@ -64,7 +64,7 @@ AddFunction BloodDefaultActions
 	#potion,name=mountains,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
 	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not RuneCount(unholy) and not RuneCount(frost) UsePotionArmor()
 	#antimagic_shell
-	Spell(antimagic_shell)
+	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 	#conversion,if=!buff.conversion.up&runic_power>50&health.pct<90
 	if not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 Spell(conversion)
 	#lichborne,if=health.pct<90
