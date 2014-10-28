@@ -12,6 +12,7 @@ The [current 6.0.0 beta release][beta] of Ovale currently provides default scrip
 - Death Knight: Blood, Frost, Unholy
 - Druid: Feral, Guardian
 - Hunter: Beast Mastery, Marksmanship, Survival
+- Mage: Arcane, Fire, Frost
 - Monk: Brewmaster, Windwalker
 - Paladin: Protection, Retribution
 - Priest: Shadow
