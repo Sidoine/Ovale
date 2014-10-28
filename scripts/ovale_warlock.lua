@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_warlock"
-	local desc = "[6.0.2] Ovale: Affliction, Demonology, Destruction"
+	local desc = "[6.0] Ovale: Affliction, Demonology, Destruction"
 	local code = [[
 # Ovale warlock script based on SimulationCraft.
 

@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "SimulationCraft: Hunter_BM_T16M"
-	local desc = "[6.0.2] SimulationCraft: Hunter_BM_T16M"
+	local desc = "[6.0] SimulationCraft: Hunter_BM_T16M"
 	local code = [[
 # Based on SimulationCraft profile "Hunter_BM_T16M".
 #	class=hunter

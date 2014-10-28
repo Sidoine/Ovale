@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_hunter"
-	local desc = "[6.0.2] Ovale: Beast Mastery, Marksmanship, Survival"
+	local desc = "[6.0] Ovale: Beast Mastery, Marksmanship, Survival"
 	local code = [[
 Include(ovale_common)
 Include(ovale_hunter_spells)

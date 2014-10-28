@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "legacy_ovale_shaman"
-	local desc = "[6.0.2] Ovale: Elemental, Enhancement"
+	local desc = "[6.0] Ovale: Elemental, Enhancement"
 	local code = [[
 # Ovale shaman script based on SimulationCraft.
 

@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_deathknight"
-	local desc = "[6.0.2] Ovale: Blood, Frost, Unholy"
+	local desc = "[6.0] Ovale: Blood, Frost, Unholy"
 	local code = [[
 # Ovale death knight script based on SimulationCraft.
 

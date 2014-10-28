@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_mage"
-	local desc = "[6.0.2] Ovale: Arcane, Fire, Frost"
+	local desc = "[6.0] Ovale: Arcane, Fire, Frost"
 	local code = [[
 # Ovale mage script based on SimulationCraft.
 
