@@ -79,6 +79,7 @@ local OVALE_SPELLID_TO_STANCE = {
 	-- Warrior
 	[API_GetSpellInfo(71)] = "warrior_defensive_stance",
 	[API_GetSpellInfo(2457)] = "warrior_battle_stance",
+	[API_GetSpellInfo(156291)] = "warrior_gladiator_stance",
 }
 --</private-static-properties>
 
