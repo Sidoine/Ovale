@@ -21,21 +21,6 @@ AddFunction UsePotionArmor
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(mountains_potion usable=1)
 }
 
-AddFunction DiseasesAnyTicking
-{
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
-}
-
-AddFunction DiseasesRemaining
-{
-	if Talent(necrotic_plague_talent) target.DebuffRemaining(necrotic_plague_debuff)
-	unless Talent(necrotic_plague_talent)
-	{
-		if target.DebuffRemaining(blood_plague_debuff) < target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(blood_plague_debuff)
-		if target.DebuffRemaining(blood_plague_debuff) >= target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(frost_fever_debuff)
-	}
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -101,7 +86,7 @@ AddFunction BloodDefaultActions
 	#death_pact,if=health.pct<50
 	if HealthPercent() < 50 Spell(death_pact)
 	#outbreak,if=(!talent.necrotic_plague.enabled&!disease.min_remains<8)|!disease.ticking
-	if not Talent(necrotic_plague_talent) and not DiseasesRemaining() < 8 or not DiseasesAnyTicking() Spell(outbreak)
+	if not Talent(necrotic_plague_talent) and not target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
 	#death_coil,if=runic_power>90
 	if RunicPower() > 90 Spell(death_coil)
 	#plague_strike,if=(!talent.necrotic_plague.enabled&!dot.blood_plague.ticking)|(talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking)

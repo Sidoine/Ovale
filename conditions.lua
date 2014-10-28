@@ -1457,6 +1457,113 @@ do
 end
 
 do
+	local NECROTIC_PLAGUE_TALENT = 19
+	local NECROTIC_PLAGUE_DEBUFF = 155159
+	local BLOOD_PLAGUE_DEBUFF = 55078
+	local FROST_FEVER_DEBUFF = 55095
+
+	local function GetDiseases(target, state)
+		local npAura, bpAura, ffAura
+		local talented = (OvaleSpellBook:GetTalentPoints(NECROTIC_PLAGUE_TALENT) > 0)
+		if talented then
+			npAura = state:GetAura(target, NECROTIC_PLAGUE_DEBUFF, "HARMFUL", true)
+		else
+			bpAura = state:GetAura(target, BLOOD_PLAGUE_DEBUFF, "HARMFUL", true)
+			ffAura = state:GetAura(target, FROST_FEVER_DEBUFF, "HARMFUL", true)
+		end
+		return talented, npAura, bpAura, ffAura
+	end
+
+	--- Get the remaining time in seconds before any diseases applied by the death knight will expire.
+	-- @name DiseasesRemaining
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+
+	local function DiseasesRemaining(condition, state)
+		local comparator, limit = condition[1], condition[2], condition[3]
+		local target, filter, mine = ParseCondition(condition, state)
+		local talented, npAura, bpAura, ffAura = GetDiseases(target, state)
+		local aura
+		if talented and state:IsActiveAura(npAura) then
+			aura = npAura
+		elseif not talented and state:IsActiveAura(bpAura) and state:IsActiveAura(ffAura) then
+			aura = (bpAura.ending < ffAura.ending) and bpAura or ffAura
+		end
+		if aura then
+			local gain, start, ending = aura.gain, aura.start, aura.ending
+			return TestValue(gain, math.huge, 0, ending, -1, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	--- Test if all diseases applied by the death knight are present on the target.
+	-- @name DiseasesTicking
+	-- @paramsig boolean
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return A boolean value.
+
+	local function DiseasesTicking(condition, state)
+		local target, filter, mine = ParseCondition(condition, state)
+		local talented, npAura, bpAura, ffAura = GetDiseases(target, state)
+		local gain, start, ending
+		if talented and npAura then
+			gain, start, ending = npAura.gain, npAura.start, npAura.ending
+		elseif not talented and bpAura and ffAura then
+			-- Compute the intersection of the time spans for the two disease auras.
+			gain = (bpAura.gain > ffAura.gain) and bpAura.gain or ffAura.gain
+			start = (bpAura.start > ffAura.start) and bpAura.start or ffAura.start
+			ending = (bpAura.ending < ffAura.ending) and bpAura.ending or ffAura.ending
+		end
+		if gain and ending and ending > gain then
+			return gain, ending
+		end
+		return nil
+	end
+
+	--- Test if any diseases applied by the death knight are present on the target.
+	-- @name DiseasesAnyTicking
+	-- @paramsig boolean
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return A boolean value.
+
+	local function DiseasesAnyTicking(condition, state)
+		local target, filter, mine = ParseCondition(condition, state)
+		local talented, npAura, bpAura, ffAura = GetDiseases(target, state)
+		local aura
+		if talented and npAura then
+			aura = npAura
+		elseif not talent and (bpAura or ffAura) then
+			aura = bpAura or ffAura
+			if bpAura and ffAura then
+				-- Find the disease that expires latest.
+				aura = (bpAura.ending > ffAura.ending) and bpAura or ffAura
+			end
+		end
+		if aura then
+			local gain, start, ending = aura.gain, aura.start, aura.ending
+			if ending > gain then
+				return gain, ending
+			end
+		end
+		return nil
+	end
+
+	OvaleCondition:RegisterCondition("diseasesremaining", false, DiseasesRemaining)
+	OvaleCondition:RegisterCondition("diseasesticking", false, DiseasesTicking)
+	OvaleCondition:RegisterCondition("diseasesanyticking", false, DiseasesAnyTicking)
+end
+
+do
 	--- Get the distance in yards to the target.
 	-- The distances are from LibRangeCheck-2.0, which determines distance based on spell range checks, so results are approximate.
 	-- You should not test for equality.

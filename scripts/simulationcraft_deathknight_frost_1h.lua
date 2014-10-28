@@ -20,16 +20,6 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction DiseasesAnyTicking
-{
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
-}
-
-AddFunction DiseasesTicking
-{
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -95,7 +85,7 @@ AddFunction FrostDualWieldBosStActions
 	#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
 	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and DiseasesTicking() Spell(plague_leech)
+	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
 	#howling_blast,if=runic_power<88
 	if RunicPower() < 88 Spell(howling_blast)
 	#obliterate,if=unholy>0&runic_power<76
@@ -103,7 +93,7 @@ AddFunction FrostDualWieldBosStActions
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -137,7 +127,7 @@ AddFunction FrostDualWieldAoeActions
 	#frost_strike
 	Spell(frost_strike)
 	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and DiseasesTicking() Spell(plague_leech)
+	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
 	#empower_rune_weapon
@@ -157,7 +147,7 @@ AddFunction FrostDualWieldBosAoeActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and DiseasesTicking() Spell(plague_leech)
+	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
 	#empower_rune_weapon
@@ -191,7 +181,7 @@ AddFunction FrostDualWieldSingleTargetActions
 	#howling_blast,if=death>1|frost>1
 	if Runes(death 2) or Runes(frost 2) Spell(howling_blast)
 	#unholy_blight,if=!disease.ticking
-	if not DiseasesAnyTicking() Spell(unholy_blight)
+	if not target.DiseasesAnyTicking() Spell(unholy_blight)
 	#howling_blast,if=!talent.necrotic_plague.enabled&!dot.frost_fever.ticking
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#howling_blast,if=talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking
@@ -213,7 +203,7 @@ AddFunction FrostDualWieldSingleTargetActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }

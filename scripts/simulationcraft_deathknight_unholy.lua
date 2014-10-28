@@ -20,11 +20,6 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction DiseasesTicking
-{
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -90,7 +85,7 @@ AddFunction UnholyBosStActions
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 	#death_coil,if=buff.sudden_doom.react
@@ -142,7 +137,7 @@ AddFunction UnholyAoeActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and DiseasesTicking() Spell(plague_leech)
+	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -160,7 +155,7 @@ AddFunction UnholyBosAoeActions
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() Spell(plague_leech)
 	#death_coil,if=buff.sudden_doom.react
 	if BuffPresent(sudden_doom_buff) Spell(death_coil)
 }
@@ -222,11 +217,11 @@ AddFunction UnholySingleTargetActions
 	#scourge_strike
 	Spell(scourge_strike)
 	#plague_leech,if=cooldown.outbreak.remains<1
-	if SpellCooldown(outbreak) < 1 and DiseasesTicking() Spell(plague_leech)
+	if SpellCooldown(outbreak) < 1 and target.DiseasesTicking() Spell(plague_leech)
 	#plague_leech,if=!talent.necrotic_plague.enabled&(dot.blood_plague.remains<1&dot.frost_fever.remains<1)
-	if not Talent(necrotic_plague_talent) and target.DebuffRemaining(blood_plague_debuff) < 1 and target.DebuffRemaining(frost_fever_debuff) < 1 and DiseasesTicking() Spell(plague_leech)
+	if not Talent(necrotic_plague_talent) and target.DebuffRemaining(blood_plague_debuff) < 1 and target.DebuffRemaining(frost_fever_debuff) < 1 and target.DiseasesTicking() Spell(plague_leech)
 	#plague_leech,if=talent.necrotic_plague.enabled&(dot.necrotic_plague.remains<1)
-	if Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and DiseasesTicking() Spell(plague_leech)
+	if Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and target.DiseasesTicking() Spell(plague_leech)
 	#festering_strike
 	Spell(festering_strike)
 	#death_coil

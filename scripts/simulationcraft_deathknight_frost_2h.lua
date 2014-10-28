@@ -20,21 +20,6 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction DiseasesRemaining
-{
-	if Talent(necrotic_plague_talent) target.DebuffRemaining(necrotic_plague_debuff)
-	unless Talent(necrotic_plague_talent)
-	{
-		if target.DebuffRemaining(blood_plague_debuff) < target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(blood_plague_debuff)
-		if target.DebuffRemaining(blood_plague_debuff) >= target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(frost_fever_debuff)
-	}
-}
-
-AddFunction DiseasesTicking
-{
-	Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff) or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -100,11 +85,11 @@ AddFunction FrostTwoHanderBosStActions
 	#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
 	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and DiseasesTicking() Spell(plague_leech)
+	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() Spell(plague_leech)
 	#obliterate,if=runic_power<76
 	if RunicPower() < 76 Spell(obliterate)
 	#howling_blast,if=((death=1&frost=0&unholy=0)|death=0&frost=1&unholy=0)&runic_power<88
@@ -140,7 +125,7 @@ AddFunction FrostTwoHanderAoeActions
 	#frost_strike
 	Spell(frost_strike)
 	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and DiseasesTicking() Spell(plague_leech)
+	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
 	#empower_rune_weapon
@@ -160,7 +145,7 @@ AddFunction FrostTwoHanderBosAoeActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and DiseasesTicking() Spell(plague_leech)
+	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
 	#empower_rune_weapon
@@ -170,15 +155,15 @@ AddFunction FrostTwoHanderBosAoeActions
 AddFunction FrostTwoHanderSingleTargetActions
 {
 	#plague_leech,if=disease.min_remains<1
-	if DiseasesRemaining() < 1 and DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesRemaining() < 1 and target.DiseasesTicking() Spell(plague_leech)
 	#defile
 	Spell(defile)
 	#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
 	if Talent(defile_talent) and not SpellCooldown(defile) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#outbreak,if=!disease.min_ticking
-	if not DiseasesTicking() Spell(outbreak)
+	if not target.DiseasesTicking() Spell(outbreak)
 	#unholy_blight,if=!disease.min_ticking
-	if not DiseasesTicking() Spell(unholy_blight)
+	if not target.DiseasesTicking() Spell(unholy_blight)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_frost)
 	#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
@@ -210,11 +195,11 @@ AddFunction FrostTwoHanderSingleTargetActions
 	#obliterate,if=blood=2|frost=2|unholy=2
 	if Runes(blood 2) or Runes(frost 2) or Runes(unholy 2) Spell(obliterate)
 	#plague_leech,if=disease.min_remains<3
-	if DiseasesRemaining() < 3 and DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesRemaining() < 3 and target.DiseasesTicking() Spell(plague_leech)
 	#outbreak,if=disease.min_remains<3
-	if DiseasesRemaining() < 3 Spell(outbreak)
+	if target.DiseasesRemaining() < 3 Spell(outbreak)
 	#unholy_blight,if=disease.min_remains<3
-	if DiseasesRemaining() < 3 Spell(unholy_blight)
+	if target.DiseasesRemaining() < 3 Spell(unholy_blight)
 	#frost_strike,if=talent.runic_empowerment.enabled&(frost=0|unholy=0|blood=0)
 	if Talent(runic_empowerment_talent) and { Runes(frost 0) and not Runes(frost 1) or Runes(unholy 0) and not Runes(unholy 1) or Runes(blood 0) and not Runes(blood 1) } Spell(frost_strike)
 	#frost_strike,if=talent.blood_tap.enabled&buff.blood_charge.stack<=10
@@ -226,7 +211,7 @@ AddFunction FrostTwoHanderSingleTargetActions
 	#frost_strike
 	Spell(frost_strike)
 	#plague_leech
-	if DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }

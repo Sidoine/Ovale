@@ -1068,8 +1068,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif class == "DEATHKNIGHT" and action == "plague_leech" then
 			-- Plague Leech requires diseases to exist on the target.
-			conditionCode = "DiseasesTicking()"
-			annotation.diseases_ticking = class
+			conditionCode = "target.DiseasesTicking()"
 		elseif class == "DRUID" and specialization == "guardian" and action == "rejuvenation" then
 			-- Only cast Rejuvenation as a guardian druid if it is Enhanced Rejuvenation (castable in bear form).
 			local spellName = "enhanced_rejuvenation"
@@ -2193,14 +2192,11 @@ EmitOperandDisease = function(operand, parseNode, nodeList, annotation, action, 
 
 		local code
 		if property == "min_remains" then
-			code = "DiseasesRemaining()"
-			annotation.diseases_remaining = annotation.class
+			code = target .. "DiseasesRemaining()"
 		elseif property == "min_ticking" then
-			code = "DiseasesTicking()"
-			annotation.diseases_ticking = annotation.class
+			code = target .. "DiseasesTicking()"
 		elseif property == "ticking" then
-			code = "DiseasesAnyTicking()"
-			annotation.diseases_any_ticking = annotation.class
+			code = target .. "DiseasesAnyTicking()"
 		else
 			ok = false
 		end
@@ -2722,58 +2718,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "strangulate")
 		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
-	if annotation.diseases_ticking == "DEATHKNIGHT" then
-		local code = [[
-			AddFunction DiseasesTicking
-			{
-				   Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff)
-				or not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and target.DebuffPresent(frost_fever_debuff)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "blood_plague_debuff")
-		AddSymbol(annotation, "frost_fever_debuff")
-		AddSymbol(annotation, "necrotic_plague_debuff")
-		AddSymbol(annotation, "necrotic_plague_talent")
-		count = count + 1
-	end
-	if annotation.diseases_remaining == "DEATHKNIGHT" then
-		local code = [[
-			AddFunction DiseasesRemaining
-			{
-				if Talent(necrotic_plague_talent) target.DebuffRemaining(necrotic_plague_debuff)
-				unless Talent(necrotic_plague_talent)
-				{
-					if target.DebuffRemaining(blood_plague_debuff) < target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(blood_plague_debuff)
-					if target.DebuffRemaining(blood_plague_debuff) >= target.DebuffRemaining(frost_fever_debuff) target.DebuffRemaining(frost_fever_debuff)
-				}
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "blood_plague_debuff")
-		AddSymbol(annotation, "frost_fever_debuff")
-		AddSymbol(annotation, "necrotic_plague_debuff")
-		AddSymbol(annotation, "necrotic_plague_talent")
-		count = count + 1
-	end
-	if annotation.diseases_any_ticking == "DEATHKNIGHT" then
-		local code = [[
-			AddFunction DiseasesAnyTicking
-			{
-				   Talent(necrotic_plague_talent) and target.DebuffPresent(necrotic_plague_debuff)
-				or not Talent(necrotic_plague_talent) and { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) }
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "blood_plague_debuff")
-		AddSymbol(annotation, "frost_fever_debuff")
-		AddSymbol(annotation, "necrotic_plague_debuff")
-		AddSymbol(annotation, "necrotic_plague_talent")
 		count = count + 1
 	end
 	if annotation.skull_bash == "DRUID" then
