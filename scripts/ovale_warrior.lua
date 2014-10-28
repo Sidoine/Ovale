@@ -2,8 +2,8 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "legacy_ovale_warrior"
-	local desc = "[5.4.8] Ovale: Arms, Fury, Protection"
+	local name = "ovale_warrior"
+	local desc = "[6.0.2] Ovale: Arms, Fury, Protection"
 	local code = [[
 # Ovale warrior script based on SimulationCraft.
 
@@ -12,8 +12,6 @@ Include(ovale_warrior_spells)
 
 AddCheckBox(opt_potion_armor ItemName(mountains_potion) default specialization=protection)
 AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default specialization=!protection)
-AddCheckBox(opt_heroic_leap_dps SpellName(heroic_leap) specialization=!protection)
-AddCheckBox(opt_skull_banner SpellName(skull_banner) default)
 
 AddFunction UsePotionArmor
 {
@@ -25,24 +23,22 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction GetInMeleeRange
 {
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
-		Spell(disrupting_shout)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_rage)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
 		}
 	}
 }
@@ -50,317 +46,278 @@ AddFunction InterruptActions
 ###
 ### Arms
 ###
-# Based on SimulationCraft profile "Warrior_Arms_T16H".
+# Based on SimulationCraft profile "Warrior_Arms_T16M".
 #	class=warrior
 #	spec=arms
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!122011
-#	glyphs=unending_rage/death_from_above/sweeping_strikes/resonating_power
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!020011.
+#	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
-# ActionList: ArmsPrecombatActions --> main, offgcd, shortcd, cd
+# ActionList: ArmsPrecombatActions --> main, shortcd, cd
 
 AddFunction ArmsPrecombatActions
 {
 	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
-	#snapshot_stats
 	#stance,choose=battle
-	if not Stance(warrior_battle_stance) Spell(battle_stance)
-	#battle_shout
-	Spell(battle_shout)
-	#mogu_power_potion
-	UsePotionStrength()
+	Spell(battle_stance)
+	# CHANGE: Apply raid buffs.
+	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
+	#snapshot_stats
 }
-
-AddFunction ArmsPrecombatOffGcdActions {}
 
 AddFunction ArmsPrecombatShortCdActions {}
 
 AddFunction ArmsPrecombatCdActions
 {
-	unless not Stance(warrior_battle_stance) and Spell(battle_stance)
-		or Spell(battle_shout)
+	unless Spell(battle_stance)
+		or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout)
+		or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout)
 	{
-		#mogu_power_potion
+		#potion,name=mogu_power
 		UsePotionStrength()
 	}
 }
 
-# ActionList: ArmsDefaultActions --> main, offgcd, shortcd, cd
+# ActionList: ArmsDefaultActions --> main, shortcd, cd
 
 AddFunction ArmsDefaultActions
 {
 	#auto_attack
-	#run_action_list,name=aoe,if=active_enemies>=2
-	if Enemies() >= 2 ArmsAoeActions()
-	#run_action_list,name=single_target,if=active_enemies<2
-	if Enemies() < 2 ArmsSingleTargetActions()
-}
-
-AddFunction ArmsDefaultOffGcdActions
-{
-	#berserker_rage,if=buff.enrage.remains<0.5
-	if BuffRemaining(enrage_buff any=1) < 0.5 Spell(berserker_rage)
-	#heroic_leap,if=debuff.colossus_smash.up
-	if target.DebuffPresent(colossus_smash_debuff) and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-	#run_action_list,name=aoe,if=active_enemies>=2
-	if Enemies() >= 2 ArmsAoeOffGcdActions()
-	#run_action_list,name=single_target,if=active_enemies<2
-	if Enemies() < 2 ArmsSingleTargetOffGcdActions()
+	#call_action_list,name=single,if=active_enemies=1
+	if Enemies() == 1 ArmsSingleActions()
+	#call_action_list,name=aoe,if=active_enemies>1
+	if Enemies() > 1 ArmsAoeActions()
 }
 
 AddFunction ArmsDefaultShortCdActions
 {
-	#bloodbath,if=enabled&(debuff.colossus_smash.remains>0.1|cooldown.colossus_smash.remains<5|target.time_to_die<=20)
-	if Talent(bloodbath_talent) and { target.DebuffRemaining(colossus_smash_debuff) > 0.1 or SpellCooldown(colossus_smash) < 5 or target.TimeToDie() <= 20 } Spell(bloodbath)
-	#run_action_list,name=aoe,if=active_enemies>=2
-	if Enemies() >= 2 ArmsAoeShortCdActions()
-	#run_action_list,name=single_target,if=active_enemies<2
-	if Enemies() < 2 ArmsSingleTargetShortCdActions()
+	#charge
+	if target.InRange(charge) Spell(charge)
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
+	#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5)|target.time_to_die<20
+	if target.DebuffPresent(rend_debuff) and SpellCooldown(colossus_smash) < 5 or target.TimeToDie() < 20 Spell(bloodbath)
+	#heroic_leap,if=debuff.colossus_smash.up&rage>70
+	if target.DebuffPresent(colossus_smash_debuff) and Rage() > 70 and target.InRange(charge) Spell(heroic_leap)
+	#call_action_list,name=single,if=active_enemies=1
+	if Enemies() == 1 ArmsSingleShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>1
+	if Enemies() > 1 ArmsAoeShortCdActions()
 }
 
 AddFunction ArmsDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-
-	#mogu_power_potion,if=(target.health.pct<20&buff.recklessness.up)|buff.bloodlust.react|target.time_to_die<=25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 UsePotionStrength()
-	#recklessness,if=!talent.bloodbath.enabled&((cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)&(target.time_to_die>(192*buff.cooldown_reduction.value)|target.health.pct<20))|buff.bloodbath.up&(target.time_to_die>(192*buff.cooldown_reduction.value)|target.health.pct<20)|target.time_to_die<=12
-	if Talent(bloodbath_talent no) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } and { target.TimeToDie() > 192 * BuffAmount(cooldown_reduction_strength_buff) or target.HealthPercent() < 20 } or BuffPresent(bloodbath_buff) and { target.TimeToDie() > 192 * BuffAmount(cooldown_reduction_strength_buff) or target.HealthPercent() < 20 } or target.TimeToDie() <= 12 Spell(recklessness)
-	#avatar,if=enabled&(buff.recklessness.up|target.time_to_die<=25)
-	if Talent(avatar_talent) and { BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 } Spell(avatar)
-	#skull_banner,if=buff.skull_banner.down&(((cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)&target.time_to_die>192&buff.cooldown_reduction.up)|buff.recklessness.up)
-	if BuffExpires(skull_banner_buff any=1) and { { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } and target.TimeToDie() > 192 and BuffPresent(cooldown_reduction_strength_buff) or BuffPresent(recklessness_buff) } and CheckBoxOn(opt_skull_banner) Spell(skull_banner)
-	#use_item,slot=hands,if=!talent.bloodbath.enabled&debuff.colossus_smash.up|buff.bloodbath.up
-	if Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(bloodbath_buff) UseItemActions()
-	#blood_fury,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
-	#run_action_list,name=aoe,if=active_enemies>=2
-	if Enemies() >= 2 ArmsAoeCdActions()
-	#run_action_list,name=single_target,if=active_enemies<2
-	if Enemies() < 2 ArmsSingleTargetCdActions()
+	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
+	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
+	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
+	if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
+	#avatar,if=buff.recklessness.up|target.time_to_die<25
+	if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
+	#blood_fury,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+	#berserking,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(berserking)
+	#arcane_torrent,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#heroic_leap,if=debuff.colossus_smash.up&rage>70
+	if target.DebuffPresent(colossus_smash_debuff) and Rage() > 70 and target.InRange(charge) Spell(heroic_leap)
+	#call_action_list,name=single,if=active_enemies=1
+	if Enemies() == 1 ArmsSingleCdActions()
+	#call_action_list,name=aoe,if=active_enemies>1
+	if Enemies() > 1 ArmsAoeCdActions()
 }
 
-# ActionList: ArmsAoeActions --> main, offgcd, shortcd, cd
+# ActionList: ArmsAoeActions --> main, shortcd, cd
 
 AddFunction ArmsAoeActions
 {
 	#sweeping_strikes
 	Spell(sweeping_strikes)
-	#colossus_smash,if=debuff.colossus_smash.remains<1
-	if target.DebuffRemaining(colossus_smash_debuff) < 1 Spell(colossus_smash)
-	#thunder_clap,target=2,if=dot.deep_wounds.attack_power*1.1<stat.attack_power
-	if target.DebuffAttackPower(deep_wounds_debuff) * 1.1 < AttackPower() Spell(thunder_clap)
-	#mortal_strike,if=active_enemies=2|rage<50
-	if Enemies() == 2 or Rage() < 50 Spell(mortal_strike)
-	#execute,if=buff.sudden_execute.down&active_enemies=2
-	if BuffExpires(sudden_execute_buff) and Enemies() == 2 and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } Spell(execute)
-	#slam,if=buff.sweeping_strikes.up&debuff.colossus_smash.up
-	if BuffPresent(sweeping_strikes_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(slam)
-	#overpower,if=active_enemies=2
-	if Enemies() == 2 Spell(overpower)
-	#slam,if=buff.sweeping_strikes.up
-	if BuffPresent(sweeping_strikes_buff) Spell(slam)
-	#battle_shout
-	Spell(battle_shout)
-}
-
-AddFunction ArmsAoeOffGcdActions
-{
-	#cleave,if=rage>110&active_enemies<=4
-	if Rage() > 110 and Enemies() <= 4 Spell(cleave)
+	#rend,if=ticks_remain<2&target.time_to_die>4
+	if target.TicksRemaining(rend_debuff) < 2 and target.TimeToDie() > 4 Spell(rend)
+	#colossus_smash,if=dot.rend.ticking
+	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
+	#mortal_strike,if=cooldown.colossus_smash.remains>1.5&target.health.pct>20&active_enemies=2
+	if SpellCooldown(colossus_smash) > 1.5 and target.HealthPercent() > 20 and Enemies() == 2 Spell(mortal_strike)
+	#execute,if=((rage>60|active_enemies=2)&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|target.time_to_die<5
+	if { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
+	#whirlwind,if=cooldown.colossus_smash.remains>1.5&(target.health.pct>20|active_enemies>3)
+	if SpellCooldown(colossus_smash) > 1.5 and { target.HealthPercent() > 20 or Enemies() > 3 } Spell(whirlwind)
+	#rend,cycle_targets=1,if=!ticking
+	if not target.DebuffPresent(rend_debuff) Spell(rend)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute_arms)
 }
 
 AddFunction ArmsAoeShortCdActions
 {
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(bladestorm)
-	#dragon_roar,if=enabled&debuff.colossus_smash.down
-	if Talent(dragon_roar_talent) and target.DebuffExpires(colossus_smash_debuff) Spell(dragon_roar)
-}
-
-AddFunction ArmsAoeCdActions {}
-
-# ActionList: ArmsSingleTargetActions --> main, offgcd, shortcd, cd
-
-AddFunction ArmsSingleTargetActions
-{
-	#mortal_strike,if=dot.deep_wounds.remains<1.0|buff.enrage.down|rage<10
-	if target.DebuffRemaining(deep_wounds_debuff) < 1 or BuffExpires(enrage_buff any=1) or Rage() < 10 Spell(mortal_strike)
-	#colossus_smash,if=debuff.colossus_smash.remains<1.0
-	if target.DebuffRemaining(colossus_smash_debuff) < 1 Spell(colossus_smash)
-	#mortal_strike
-	Spell(mortal_strike)
-	#execute,if=buff.sudden_execute.down|buff.taste_for_blood.down|rage>90|target.time_to_die<12
-	if { BuffExpires(sudden_execute_buff) or BuffExpires(taste_for_blood_buff) or Rage() > 90 or target.TimeToDie() < 12 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } Spell(execute)
-	#slam,if=target.health.pct>=20&(trinket.stacking_stat.crit.stack>=10|buff.recklessness.up)
-	if target.HealthPercent() >= 20 and { BuffStacks(trinket_stacking_stat_crit_buff) >= 10 or BuffPresent(recklessness_buff) } Spell(slam)
-	#overpower,if=target.health.pct>=20&rage<100|buff.sudden_execute.up
-	if target.HealthPercent() >= 20 and Rage() < 100 or BuffPresent(sudden_execute_buff) Spell(overpower)
-	#execute
-	if BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 Spell(execute)
-	#slam,if=target.health.pct>=20
-	if target.HealthPercent() >= 20 Spell(slam)
-	#heroic_throw
-	Spell(heroic_throw)
-	#battle_shout
-	Spell(battle_shout)
-}
-
-AddFunction ArmsSingleTargetOffGcdActions
-{
-	#heroic_strike,if=rage>115|(debuff.colossus_smash.up&rage>60&set_bonus.tier16_2pc_melee)
-	if Rage() > 115 or target.DebuffPresent(colossus_smash_debuff) and Rage() > 60 and ArmorSetBonus(T16_melee 2) Spell(heroic_strike)
-}
-
-AddFunction ArmsSingleTargetShortCdActions
-{
-	unless target.DebuffRemaining(deep_wounds_debuff) < 1 or BuffExpires(enrage_buff any=1) or Rage() < 10 and Spell(mortal_strike)
-		or target.DebuffRemaining(colossus_smash_debuff) < 1 and Spell(colossus_smash)
+	unless target.TicksRemaining(rend_debuff) < 2 and target.TimeToDie() > 4 and Spell(rend)
 	{
-		#bladestorm,if=enabled,interrupt_if=!cooldown.colossus_smash.remains
-		if Talent(bladestorm_talent) Spell(bladestorm)
+		#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
 
-		unless Spell(mortal_strike)
+		unless target.DebuffPresent(rend_debuff) and Spell(colossus_smash)
+			or SpellCooldown(colossus_smash) > 1.5 and target.HealthPercent() > 20 and Enemies() == 2 and Spell(mortal_strike)
+			or { { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 } and Spell(execute_arms)
 		{
-			#storm_bolt,if=enabled&debuff.colossus_smash.up
-			if Talent(storm_bolt_talent) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-			#dragon_roar,if=enabled&debuff.colossus_smash.down
-			if Talent(dragon_roar_talent) and target.DebuffExpires(colossus_smash_debuff) Spell(dragon_roar)
+			#dragon_roar,if=cooldown.colossus_smash.remains>1.5&!debuff.colossus_smash.up
+			if SpellCooldown(colossus_smash) > 1.5 and not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
+
+			unless SpellCooldown(colossus_smash) > 1.5 and { target.HealthPercent() > 20 or Enemies() > 3 } and Spell(whirlwind)
+				or not target.DebuffPresent(rend_debuff) and Spell(rend)
+			{
+				#bladestorm,if=cooldown.colossus_smash.remains>6&(!talent.ravager.enabled|cooldown.ravager.remains>6)
+				if SpellCooldown(colossus_smash) > 6 and { not Talent(ravager_talent) or SpellCooldown(ravager) > 6 } Spell(bladestorm)
+				#siegebreaker
+				Spell(siegebreaker)
+				#storm_bolt,if=cooldown.colossus_smash.remains>4|debuff.colossus_smash.up
+				if SpellCooldown(colossus_smash) > 4 or target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
+				#shockwave
+				Spell(shockwave)
+			}
 		}
 	}
 }
 
-AddFunction ArmsSingleTargetCdActions {}
+AddFunction ArmsAoeCdActions {}
 
-### Arms icons.
-AddCheckBox(opt_warrior_arms "Show Arms icons" specialization=arms default)
-AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
+# ActionList: ArmsSingleActions --> main, shortcd, cd
 
-AddIcon specialization=arms size=small help=offgcd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
+AddFunction ArmsSingleActions
 {
-	if InCombat(no) ArmsPrecombatOffGcdActions()
-	ArmsDefaultOffGcdActions()
+	#rend,if=!ticking&target.time_to_die>4
+	if not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 4 Spell(rend)
+	#colossus_smash
+	Spell(colossus_smash)
+	#mortal_strike,if=target.health.pct>20
+	if target.HealthPercent() > 20 Spell(mortal_strike)
+	#rend,if=!debuff.colossus_smash.up&target.time_to_die>4&ticks_remain<2
+	if not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.TicksRemaining(rend_debuff) < 2 Spell(rend)
+	#execute,if=(rage>=60&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|buff.sudden_death.react|target.time_to_die<5
+	if Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 Spell(execute_arms)
+	#impending_victory,if=rage<40&!debuff.colossus_smash.up&target.health.pct>20
+	if Rage() < 40 and not target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() > 20 Spell(impending_victory)
+	#slam,if=(rage>20|cooldown.colossus_smash.remains>execute_time)&target.health.pct>20
+	if { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 Spell(slam)
+	#whirlwind,if=!talent.slam.enabled&target.health.pct>20&(rage>=40|set_bonus.tier17_4pc|debuff.colossus_smash.up)
+	if not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } Spell(whirlwind)
 }
 
-AddIcon specialization=arms size=small help=offgcd checkbox=opt_warrior_arms checkbox=opt_warrior_arms_aoe
+AddFunction ArmsSingleShortCdActions
 {
-	if InCombat(no) ArmsPrecombatOffGcdActions()
-	ArmsDefaultOffGcdActions()
-}
-
-AddIcon specialization=arms help=shortcd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatShortCdActions()
-	ArmsDefaultShortCdActions()
-}
-
-AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatShortCdActions()
-	ArmsDefaultShortCdActions()
-}
-
-AddIcon specialization=arms help=main enemies=1 checkbox=opt_warrior_arms
-{
-	if InCombat(no) ArmsPrecombatActions()
-	ArmsDefaultActions()
-}
-
-AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatActions()
-	ArmsDefaultActions()
-}
-
-AddIcon specialization=arms help=cd enemies=1 checkbox=opt_warrior_arms checkbox=!opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
-}
-
-AddIcon specialization=arms help=cd checkbox=opt_warrior_arms checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
-}
-
-###
-### Fury
-###
-# Based on SimulationCraft profile "Warrior_Fury_1h_T16H".
-#	class=warrior
-#	spec=fury
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!122212
-#	glyphs=unending_rage/death_from_above/bull_rush
-
-# ActionList: FurySingleMindedFuryPrecombatActions --> main, offgcd, shortcd, cd
-
-AddFunction FurySingleMindedFuryPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#snapshot_stats
-	#stance,choose=battle
-	if not Stance(warrior_battle_stance) Spell(battle_stance)
-	#battle_shout
-	Spell(battle_shout)
-}
-
-AddFunction FurySingleMindedFuryPrecombatOffGcdActions {}
-
-AddFunction FurySingleMindedFuryPrecombatShortCdActions {}
-
-AddFunction FurySingleMindedFuryPrecombatCdActions
-{
-	unless not Stance(warrior_battle_stance) and Spell(battle_stance)
-		or Spell(battle_shout)
+	unless not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 4 and Spell(rend)
 	{
-		#mogu_power_potion
-		UsePotionStrength()
+		#ravager,if=cooldown.colossus_smash.remains<4
+		if SpellCooldown(colossus_smash) < 4 Spell(ravager)
+
+		unless Spell(colossus_smash)
+			or target.HealthPercent() > 20 and Spell(mortal_strike)
+		{
+			#storm_bolt,if=(cooldown.colossus_smash.remains>4|debuff.colossus_smash.up)&rage<90
+			if { SpellCooldown(colossus_smash) > 4 or target.DebuffPresent(colossus_smash_debuff) } and Rage() < 90 Spell(storm_bolt)
+			#siegebreaker
+			Spell(siegebreaker)
+			#dragon_roar,if=!debuff.colossus_smash.up
+			if not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
+
+			unless not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.TicksRemaining(rend_debuff) < 2 and Spell(rend)
+				or { Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 } and Spell(execute_arms)
+				or Rage() < 40 and not target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() > 20 and Spell(impending_victory)
+				or { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 and Spell(slam)
+				or not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } and Spell(whirlwind)
+			{
+				#shockwave
+				Spell(shockwave)
+			}
+		}
 	}
 }
 
-# ActionList: FurySingleMindedFuryDefaultActions --> main, offgcd, shortcd, cd
+AddFunction ArmsSingleCdActions {}
+
+### Arms icons.
+AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
+
+AddIcon specialization=arms help=shortcd enemies=1 checkbox=!opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatShortCdActions()
+	ArmsDefaultShortCdActions()
+}
+
+AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatShortCdActions()
+	ArmsDefaultShortCdActions()
+}
+
+AddIcon specialization=arms help=main enemies=1
+{
+	if InCombat(no) ArmsPrecombatActions()
+	ArmsDefaultActions()
+}
+
+AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatActions()
+	ArmsDefaultActions()
+}
+
+AddIcon specialization=arms help=cd enemies=1 checkbox=!opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatCdActions()
+	ArmsDefaultCdActions()
+}
+
+AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatCdActions()
+	ArmsDefaultCdActions()
+}
+
+###
+### Fury (Single-Minded Fury)
+###
+# Based on SimulationCraft profile "Warrior_Fury_1h_T16M".
+#	class=warrior
+#	spec=fury
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!011021.
+#	glyphs=unending_rage/raging_wind/heroic_leap
+
+# ActionList: FurySingleMindedFuryDefaultActions --> main, shortcd, cd
 
 AddFunction FurySingleMindedFuryDefaultActions
 {
 	#auto_attack
-	#run_action_list,name=single_target,if=active_enemies=1
+	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
+	#call_action_list,name=two_targets,if=active_enemies=2
 	if Enemies() == 2 FurySingleMindedFuryTwoTargetsActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
+	#call_action_list,name=three_targets,if=active_enemies=3
 	if Enemies() == 3 FurySingleMindedFuryThreeTargetsActions()
-	#run_action_list,name=aoe,if=active_enemies>3
+	#call_action_list,name=aoe,if=active_enemies>3
 	if Enemies() > 3 FurySingleMindedFuryAoeActions()
-}
-
-AddFunction FurySingleMindedFuryDefaultOffGcdActions
-{
-	#run_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FurySingleMindedFurySingleTargetOffGcdActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FurySingleMindedFuryTwoTargetsOffGcdActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FurySingleMindedFuryThreeTargetsOffGcdActions()
-	#run_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FurySingleMindedFuryAoeOffGcdActions()
 }
 
 AddFunction FurySingleMindedFuryDefaultShortCdActions
 {
-	#run_action_list,name=single_target,if=active_enemies=1
+	#charge
+	if target.InRange(charge) Spell(charge)
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
+	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
+	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 0 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetShortCdActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
+	#call_action_list,name=two_targets,if=active_enemies=2
 	if Enemies() == 2 FurySingleMindedFuryTwoTargetsShortCdActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
+	#call_action_list,name=three_targets,if=active_enemies=3
 	if Enemies() == 3 FurySingleMindedFuryThreeTargetsShortCdActions()
-	#run_action_list,name=aoe,if=active_enemies>3
+	#call_action_list,name=aoe,if=active_enemies>3
 	if Enemies() > 3 FurySingleMindedFuryAoeShortCdActions()
 }
 
@@ -368,406 +325,281 @@ AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-
-	#mogu_power_potion,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#recklessness,if=!talent.bloodbath.enabled&((cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)&(target.time_to_die>(192*buff.cooldown_reduction.value)|target.health.pct<20))|buff.bloodbath.up&(target.time_to_die>(192*buff.cooldown_reduction.value)|target.health.pct<20)|target.time_to_die<=12
-	if Talent(bloodbath_talent no) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } and { target.TimeToDie() > 192 * BuffAmount(cooldown_reduction_strength_buff) or target.HealthPercent() < 20 } or BuffPresent(bloodbath_buff) and { target.TimeToDie() > 192 * BuffAmount(cooldown_reduction_strength_buff) or target.HealthPercent() < 20 } or target.TimeToDie() <= 12 Spell(recklessness)
-	#avatar,if=enabled&(buff.recklessness.up|target.time_to_die<=25)
-	if Talent(avatar_talent) and { BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 } Spell(avatar)
-	#skull_banner,if=buff.skull_banner.down&(((cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)&target.time_to_die>192&buff.cooldown_reduction.up)|buff.recklessness.up)
-	if BuffExpires(skull_banner_buff any=1) and { { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } and target.TimeToDie() > 192 and BuffPresent(cooldown_reduction_strength_buff) or BuffPresent(recklessness_buff) } and CheckBoxOn(opt_skull_banner) Spell(skull_banner)
-	#use_item,slot=hands,if=!talent.bloodbath.enabled&debuff.colossus_smash.up|buff.bloodbath.up
-	if Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(bloodbath_buff) UseItemActions()
-	#blood_fury,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
-	#run_action_list,name=single_target,if=active_enemies=1
+	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=10|talent.anger_management.enabled
+	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 10 or Talent(anger_management_talent) Spell(recklessness)
+	#avatar,if=(buff.recklessness.up|target.time_to_die<=25)
+	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 Spell(avatar)
+	#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
+	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetCdActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
+	#call_action_list,name=two_targets,if=active_enemies=2
 	if Enemies() == 2 FurySingleMindedFuryTwoTargetsCdActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
+	#call_action_list,name=three_targets,if=active_enemies=3
 	if Enemies() == 3 FurySingleMindedFuryThreeTargetsCdActions()
-	#run_action_list,name=aoe,if=active_enemies>3
+	#call_action_list,name=aoe,if=active_enemies>3
 	if Enemies() > 3 FurySingleMindedFuryAoeCdActions()
 }
 
-# ActionList: FurySingleMindedFuryAoeActions --> main, offgcd, shortcd, cd
+# ActionList: FurySingleMindedFuryAoeActions --> main, shortcd, cd
 
 AddFunction FurySingleMindedFuryAoeActions
 {
-	#bloodthirst,cycle_targets=1,if=!dot.deep_wounds.ticking&buff.enrage.down
-	if not target.DebuffPresent(deep_wounds_debuff) and BuffExpires(enrage_buff any=1) Spell(bloodthirst)
-	#raging_blow,if=buff.meat_cleaver.stack=3
-	if BuffStacks(meat_cleaver_buff) == 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#bloodbath
+	Spell(bloodbath)
+	#raging_blow,if=buff.meat_cleaver.stack>=3&buff.enrage.up
+	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#raging_blow,if=buff.meat_cleaver.stack>=3
+	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#whirlwind
 	Spell(whirlwind)
-	#bloodthirst,cycle_targets=1,if=!dot.deep_wounds.ticking
-	if not target.DebuffPresent(deep_wounds_debuff) Spell(bloodthirst)
-	#colossus_smash
-	Spell(colossus_smash)
-	#battle_shout
-	Spell(battle_shout)
-}
-
-AddFunction FurySingleMindedFuryAoeOffGcdActions
-{
-	#berserker_rage,if=(talent.bladestorm.enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&!cooldown.bladestorm.remains)|(!talent.bladestorm.enabled&buff.enrage.remains<1&cooldown.bloodthirst.remains>1)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and not SpellCooldown(bladestorm) or Talent(bladestorm_talent no) and BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#cleave,if=rage>90
-	if Rage() > 90 Spell(cleave)
-	#heroic_leap,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#bloodthirst
+	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
 AddFunction FurySingleMindedFuryAoeShortCdActions
 {
-	#bloodbath,if=enabled
-	if Talent(bloodbath_talent) Spell(bloodbath)
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(bladestorm)
-	
-	unless not target.DebuffPresent(deep_wounds_debuff) and BuffExpires(enrage_buff any=1) and Spell(bloodthirst)
-		or BuffStacks(meat_cleaver_buff) == 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-		or Spell(whirlwind)
-	{
-		#dragon_roar,if=enabled&debuff.colossus_smash.down&(buff.bloodbath.up|!talent.bloodbath.enabled)
-		if Talent(dragon_roar_talent) and target.DebuffExpires(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
 
-		unless not target.DebuffPresent(deep_wounds_debuff) and Spell(bloodthirst)
-			or Spell(colossus_smash)
+	unless BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+		or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst)
+		or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+	{
+		#bladestorm,if=buff.enrage.up
+		if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+
+		unless Spell(whirlwind)
+			or BuffPresent(sudden_death_buff) and Spell(execute)
 		{
-			#storm_bolt,if=enabled
-			if Talent(storm_bolt_talent) Spell(storm_bolt)
-			#shockwave,if=enabled
-			if Talent(shockwave_talent) Spell(shockwave)
+			#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 		}
 	}
 }
 
 AddFunction FurySingleMindedFuryAoeCdActions {}
 
-# ActionList: FurySingleMindedFuryTwoTargetsActions --> main, offgcd, shortcd, cd
-
-AddFunction FurySingleMindedFuryTwoTargetsActions
-{
-	#colossus_smash
-	Spell(colossus_smash)
-	#bloodthirst,cycle_targets=1,if=dot.deep_wounds.remains<5
-	if target.DebuffRemaining(deep_wounds_debuff) < 5 Spell(bloodthirst)
-	#bloodthirst
-	Spell(bloodthirst)
-	#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-	unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-	{
-		#raging_blow,if=buff.meat_cleaver.up
-		if BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
-		#whirlwind,if=!buff.meat_cleaver.up
-		if not BuffPresent(meat_cleaver_buff) Spell(whirlwind)
-		#execute
-		if BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 Spell(execute)
-		#battle_shout
-		Spell(battle_shout)
-		#heroic_throw
-		Spell(heroic_throw)
-	}
-}
-
-AddFunction FurySingleMindedFuryTwoTargetsOffGcdActions
-{
-	#berserker_rage,if=(talent.bladestorm.enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&!cooldown.bladestorm.remains&(!talent.storm_bolt.enabled|(talent.storm_bolt.enabled&!debuff.colossus_smash.up)))|(!talent.bladestorm.enabled&buff.enrage.remains<1&cooldown.bloodthirst.remains>1)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and not SpellCooldown(bladestorm) and { Talent(storm_bolt_talent no) or Talent(storm_bolt_talent) and not target.DebuffPresent(colossus_smash_debuff) } or Talent(bladestorm_talent no) and BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#cleave,if=(rage>=60&debuff.colossus_smash.up)|rage>110
-	if Rage() >= 60 and target.DebuffPresent(colossus_smash_debuff) or Rage() > 110 Spell(cleave)
-	#heroic_leap,if=buff.enrage.up&(debuff.colossus_smash.up&buff.cooldown_reduction.up|!buff.cooldown_reduction.up)
-	if BuffPresent(enrage_buff any=1) and { target.DebuffPresent(colossus_smash_debuff) and BuffPresent(cooldown_reduction_strength_buff) or not BuffPresent(cooldown_reduction_strength_buff) } and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-}
-
-AddFunction FurySingleMindedFuryTwoTargetsShortCdActions
-{
-	#bloodbath,if=enabled&((!talent.bladestorm.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5|target.time_to_die<=20))|(talent.bladestorm.enabled))
-	if Talent(bloodbath_talent) and { Talent(bladestorm_talent no) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 or target.TimeToDie() <= 20 } or Talent(bladestorm_talent) } Spell(bloodbath)
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&(!talent.storm_bolt.enabled|(talent.storm_bolt.enabled&!debuff.colossus_smash.up))
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and { Talent(storm_bolt_talent no) or Talent(storm_bolt_talent) and not target.DebuffPresent(colossus_smash_debuff) } Spell(bladestorm)
-	#dragon_roar,if=enabled&(!debuff.colossus_smash.up&(buff.bloodbath.up|!talent.bloodbath.enabled))
-	if Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
-
-	unless Spell(colossus_smash)
-		or target.DebuffRemaining(deep_wounds_debuff) < 5 and Spell(bloodthirst)
-	{
-		#storm_bolt,if=enabled&debuff.colossus_smash.up
-		if Talent(storm_bolt_talent) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-		unless Spell(bloodthirst)
-		{
-			#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-			unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-			{
-				unless BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-					or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind)
-				{
-					#shockwave,if=enabled
-					if Talent(shockwave_talent) Spell(shockwave)
-				}
-			}
-		}
-	}
-}
-
-AddFunction FurySingleMindedFuryTwoTargetsCdActions {}
-
-# ActionList: FurySingleMindedFurySingleTargetActions --> main, offgcd, shortcd, cd
-
-AddFunction FurySingleMindedFurySingleTargetActions
-{
-	#bloodbath,if=enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5|target.time_to_die<=20)
-	if Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 or target.TimeToDie() <= 20 } Spell(bloodbath)
-	#raging_blow,if=buff.raging_blow.stack=2&debuff.colossus_smash.up&target.health.pct>=20
-	if BuffStacks(raging_blow_buff) == 2 and target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() >= 20 and BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#bloodthirst,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)
-	if not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } Spell(bloodthirst)
-	#wild_strike,if=buff.bloodsurge.react&target.health.pct>=20&cooldown.bloodthirst.remains<=1
-	if BuffPresent(bloodsurge_buff) and target.HealthPercent() >= 20 and SpellCooldown(bloodthirst) <= 1 Spell(wild_strike)
-	#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-	unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-	{
-		#colossus_smash
-		Spell(colossus_smash)
-		#execute,if=debuff.colossus_smash.up|rage>70|target.time_to_die<12
-		if { target.DebuffPresent(colossus_smash_debuff) or Rage() > 70 or target.TimeToDie() < 12 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } Spell(execute)
-		#raging_blow,if=target.health.pct<20|buff.raging_blow.stack=2|(debuff.colossus_smash.up|(cooldown.bloodthirst.remains>=1&buff.raging_blow.remains<=3))
-		if { target.HealthPercent() < 20 or BuffStacks(raging_blow_buff) == 2 or target.DebuffPresent(colossus_smash_debuff) or SpellCooldown(bloodthirst) >= 1 and BuffRemaining(raging_blow_buff) <= 3 } and BuffPresent(raging_blow_buff) Spell(raging_blow)
-		#wild_strike,if=buff.bloodsurge.up
-		if BuffPresent(bloodsurge_buff) Spell(wild_strike)
-		#raging_blow,if=cooldown.colossus_smash.remains>=3
-		if SpellCooldown(colossus_smash) >= 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
-		#heroic_throw,if=debuff.colossus_smash.down&rage<60
-		if target.DebuffExpires(colossus_smash_debuff) and Rage() < 60 Spell(heroic_throw)
-		#battle_shout,if=rage<70&!debuff.colossus_smash.up
-		if Rage() < 70 and not target.DebuffPresent(colossus_smash_debuff) Spell(battle_shout)
-		#wild_strike,if=debuff.colossus_smash.up&target.health.pct>=20
-		if target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() >= 20 Spell(wild_strike)
-		#battle_shout,if=rage<70
-		if Rage() < 70 Spell(battle_shout)
-		#wild_strike,if=cooldown.colossus_smash.remains>=2&rage>=70&target.health.pct>=20
-		if SpellCooldown(colossus_smash) >= 2 and Rage() >= 70 and target.HealthPercent() >= 20 Spell(wild_strike)
-		#impending_victory,if=enabled&target.health.pct>=20&cooldown.colossus_smash.remains>=2
-		if Talent(impending_victory_talent) and target.HealthPercent() >= 20 and SpellCooldown(colossus_smash) >= 2 and BuffPresent(victorious_buff) Spell(impending_victory)
-	}
-}
-
-AddFunction FurySingleMindedFurySingleTargetOffGcdActions
-{
-	#berserker_rage,if=buff.enrage.remains<1&cooldown.bloodthirst.remains>1
-	if BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#heroic_strike,if=((debuff.colossus_smash.up&rage>=40)&target.health.pct>=20)|rage>=100&buff.enrage.up
-	if target.DebuffPresent(colossus_smash_debuff) and Rage() >= 40 and target.HealthPercent() >= 20 or Rage() >= 100 and BuffPresent(enrage_buff any=1) Spell(heroic_strike)
-	#heroic_leap,if=debuff.colossus_smash.up
-	if target.DebuffPresent(colossus_smash_debuff) and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-}
-
-AddFunction FurySingleMindedFurySingleTargetShortCdActions
-{
-	#bloodbath,if=enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5|target.time_to_die<=20)
-	if Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 or target.TimeToDie() <= 20 } Spell(bloodbath)
-	#storm_bolt,if=enabled&buff.cooldown_reduction.up&debuff.colossus_smash.up
-	if Talent(storm_bolt_talent) and BuffPresent(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-	unless BuffStacks(raging_blow_buff) == 2 and target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() >= 20 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-	{
-		#storm_bolt,if=enabled&buff.cooldown_reduction.down&debuff.colossus_smash.up
-		if Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-		unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and Spell(bloodthirst)
-			or BuffPresent(bloodsurge_buff) and target.HealthPercent() >= 20 and SpellCooldown(bloodthirst) <= 1 and Spell(wild_strike)
-		{
-			#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-			unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-			{
-				#dragon_roar,if=enabled&(!debuff.colossus_smash.up&(buff.bloodbath.up|!talent.bloodbath.enabled))
-				if Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
-
-				unless Spell(colossus_smash)
-				{
-					#storm_bolt,if=enabled&buff.cooldown_reduction.down
-					if Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) Spell(storm_bolt)
-
-					unless { target.DebuffPresent(colossus_smash_debuff) or Rage() > 70 or target.TimeToDie() < 12 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } and Spell(execute)
-						or { target.HealthPercent() < 20 or BuffStacks(raging_blow_buff) == 2 or target.DebuffPresent(colossus_smash_debuff) or SpellCooldown(bloodthirst) >= 1 and BuffRemaining(raging_blow_buff) <= 3 } and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-					{
-						#bladestorm,if=enabled
-						if Talent(bladestorm_talent) Spell(bladestorm)
-
-						unless BuffPresent(bloodsurge_buff) and Spell(wild_strike)
-							or SpellCooldown(colossus_smash) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-						{
-							#shockwave,if=enabled
-							if Talent(shockwave_talent) Spell(shockwave)
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-AddFunction FurySingleMindedFurySingleTargetCdActions
-{
-	unless Talent(storm_bolt_talent) and BuffPresent(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) and Spell(storm_bolt)
-		or BuffStacks(raging_blow_buff) == 2 and target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() >= 20 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-		or Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) and Spell(storm_bolt)
-		or not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and Spell(bloodthirst)
-		or BuffPresent(bloodsurge_buff) and target.HealthPercent() >= 20 and SpellCooldown(bloodthirst) <= 1 and Spell(wild_strike)
-	{
-		#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-		unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-		{
-			unless Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and Spell(dragon_roar)
-				or Spell(colossus_smash)
-				or Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) and Spell(storm_bolt)
-				or { target.DebuffPresent(colossus_smash_debuff) or Rage() > 70 or target.TimeToDie() < 12 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } and Spell(execute)
-				or { target.HealthPercent() < 20 or BuffStacks(raging_blow_buff) == 2 or target.DebuffPresent(colossus_smash_debuff) or SpellCooldown(bloodthirst) >= 1 and BuffRemaining(raging_blow_buff) <= 3 } and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-				or Talent(bladestorm_talent) and Spell(bladestorm)
-				or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
-				or SpellCooldown(colossus_smash) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-			{
-				#shattering_throw,if=cooldown.colossus_smash.remains>5
-				if SpellCooldown(colossus_smash) > 5 Spell(shattering_throw)
-			}
-		}
-	}
-}
-
-# ActionList: FurySingleMindedFuryThreeTargetsActions --> main, offgcd, shortcd, cd
+# ActionList: FurySingleMindedFuryThreeTargetsActions --> main, shortcd, cd
 
 AddFunction FurySingleMindedFuryThreeTargetsActions
 {
-	#bloodthirst,cycle_targets=1,if=!dot.deep_wounds.ticking
-	if not target.DebuffPresent(deep_wounds_debuff) Spell(bloodthirst)
-	#colossus_smash
-	Spell(colossus_smash)
-	#raging_blow,if=buff.meat_cleaver.stack=2
-	if BuffStacks(meat_cleaver_buff) == 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#raging_blow,if=buff.meat_cleaver.stack>=2
+	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#whirlwind
 	Spell(whirlwind)
-	#raging_blow
-	if BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#battle_shout
-	Spell(battle_shout)
-	#heroic_throw
-	Spell(heroic_throw)
-}
-
-AddFunction FurySingleMindedFuryThreeTargetsOffGcdActions
-{
-	#berserker_rage,if=(talent.bladestorm.enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&!cooldown.bladestorm.remains)|(!talent.bladestorm.enabled&buff.enrage.remains<1&cooldown.bloodthirst.remains>1)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and not SpellCooldown(bladestorm) or Talent(bladestorm_talent no) and BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#cleave,if=(rage>=70&debuff.colossus_smash.up)|rage>90
-	if Rage() >= 70 and target.DebuffPresent(colossus_smash_debuff) or Rage() > 90 Spell(cleave)
-	#heroic_leap,if=buff.enrage.up&(debuff.colossus_smash.up&buff.cooldown_reduction.up|!buff.cooldown_reduction.up)
-	if BuffPresent(enrage_buff any=1) and { target.DebuffPresent(colossus_smash_debuff) and BuffPresent(cooldown_reduction_strength_buff) or not BuffPresent(cooldown_reduction_strength_buff) } and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	#bloodthirst
+	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
 AddFunction FurySingleMindedFuryThreeTargetsShortCdActions
 {
-	#bloodbath,if=enabled
-	if Talent(bloodbath_talent) Spell(bloodbath)
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(bladestorm)
-	#dragon_roar,if=enabled&!debuff.colossus_smash.up&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 
-	unless not target.DebuffPresent(deep_wounds_debuff) and Spell(bloodthirst)
-		or Spell(colossus_smash)
+	unless { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst)
+		or BuffPresent(sudden_death_buff) and Spell(execute)
+		or BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
-		#storm_bolt,if=enabled&debuff.colossus_smash.up
-		if Talent(storm_bolt_talent) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-		unless BuffStacks(meat_cleaver_buff) == 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-			or Spell(whirlwind)
-		{
-			#shockwave,if=enabled
-			if Talent(shockwave_talent) Spell(shockwave)
-		}
+		#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	}
 }
 
 AddFunction FurySingleMindedFuryThreeTargetsCdActions {}
 
-# Based on SimulationCraft profile "Warrior_Fury_2h_T16H".
-#	class=warrior
-#	spec=fury
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!122012
-#	glyphs=unending_rage/death_from_above/bull_rush
+# ActionList: FurySingleMindedFuryPrecombatActions --> main, shortcd, cd
 
-# ActionList: FuryTitansGripPrecombatActions --> main, offgcd, shortcd, cd
-
-AddFunction FuryTitansGripPrecombatActions
+AddFunction FurySingleMindedFuryPrecombatActions
 {
-	#elixir,type=mad_hozen
+	#flask,type=winters_bite
 	#food,type=black_pepper_ribs_and_shrimp
-	#snapshot_stats
 	#stance,choose=battle
-	if not Stance(warrior_battle_stance) Spell(battle_stance)
-	#battle_shout
-	Spell(battle_shout)
-	#mogu_power_potion
-	UsePotionStrength()
+	Spell(battle_stance)
+	# CHANGE: Apply raid buffs.
+	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
+	#snapshot_stats
 }
 
-AddFunction FuryTitansGripPrecombatOffGcdActions {}
+AddFunction FurySingleMindedFuryPrecombatShortCdActions {}
 
-AddFunction FuryTitansGripPrecombatShortCdActions {}
-
-AddFunction FuryTitansGripPrecombatCdActions
+AddFunction FurySingleMindedFuryPrecombatCdActions
 {
-	unless not Stance(warrior_battle_stance) and Spell(battle_stance)
-		or Spell(battle_shout)
+	unless Spell(battle_stance)
+		or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout)
+		or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout)
 	{
-		#mogu_power_potion
+		#potion,name=mogu_power
 		UsePotionStrength()
 	}
 }
 
-# ActionList: FuryTitansGripDefaultActions --> main, offgcd, shortcd, cd
+# ActionList: FurySingleMindedFuryTwoTargetsActions --> main, shortcd, cd
+
+AddFunction FurySingleMindedFuryTwoTargetsActions
+{
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,if=target.health.pct<20|buff.sudden_death.react
+	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
+	#raging_blow,if=buff.meat_cleaver.up
+	if BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#whirlwind,if=!buff.meat_cleaver.up
+	if not BuffPresent(meat_cleaver_buff) Spell(whirlwind)
+	#wild_strike,if=buff.bloodsurge.up&rage>75
+	if BuffPresent(bloodsurge_buff) and Rage() > 75 Spell(wild_strike)
+	#bloodthirst
+	Spell(bloodthirst)
+	#whirlwind,if=rage>rage.max-20
+	if Rage() > MaxRage() - 20 Spell(whirlwind)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+}
+
+AddFunction FurySingleMindedFuryTwoTargetsShortCdActions
+{
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+}
+
+AddFunction FurySingleMindedFuryTwoTargetsCdActions {}
+
+# ActionList: FurySingleMindedFurySingleTargetActions --> main, shortcd, cd
+
+AddFunction FurySingleMindedFurySingleTargetActions
+{
+	#wild_strike,if=rage>110&target.health.pct>20
+	if Rage() > 110 and target.HealthPercent() > 20 Spell(wild_strike)
+	#bloodthirst,if=!talent.unquenchable_thirst.enabled&(buff.enrage.down|rage<80)
+	if not Talent(unquenchable_thirst_talent) and { BuffExpires(enrage_buff any=1) or Rage() < 80 } Spell(bloodthirst)
+	#bloodthirst,if=talent.unquenchable_thirst.enabled&buff.enrage.down
+	if Talent(unquenchable_thirst_talent) and BuffExpires(enrage_buff any=1) Spell(bloodthirst)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+	#execute,if=buff.enrage.up|target.time_to_die<12
+	if BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 Spell(execute)
+	#raging_blow
+	if BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#wild_strike,if=buff.enrage.up&target.health.pct>20
+	if BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
+	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20
+	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 Spell(impending_victory)
+	#bloodthirst
+	Spell(bloodthirst)
+}
+
+AddFunction FurySingleMindedFurySingleTargetShortCdActions
+{
+	#bloodbath
+	Spell(bloodbath)
+
+	unless Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike)
+		or not Talent(unquenchable_thirst_talent) and { BuffExpires(enrage_buff any=1) or Rage() < 80 } and Spell(bloodthirst)
+		or Talent(unquenchable_thirst_talent) and BuffExpires(enrage_buff any=1) and Spell(bloodthirst)
+	{
+		#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+
+		unless BuffPresent(sudden_death_buff) and Spell(execute)
+		{
+			#siegebreaker
+			Spell(siegebreaker)
+			#storm_bolt
+			Spell(storm_bolt)
+
+			unless BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+				or { BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 } and Spell(execute)
+			{
+				#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+				if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+
+				unless BuffPresent(raging_blow_buff) and Spell(raging_blow)
+					or BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 and Spell(wild_strike)
+				{
+					#shockwave,if=!talent.unquenchable_thirst.enabled
+					if not Talent(unquenchable_thirst_talent) Spell(shockwave)
+				}
+			}
+		}
+	}
+}
+
+AddFunction FurySingleMindedFurySingleTargetCdActions {}
+
+###
+### Fury (Titan's Grip)
+###
+# Based on SimulationCraft profile "Warrior_Fury_2h_T16M".
+#	class=warrior
+#	spec=fury
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!021011.
+#	glyphs=unending_rage/raging_wind/heroic_leap
+
+# ActionList: FuryTitansGripDefaultActions --> main, shortcd, cd
 
 AddFunction FuryTitansGripDefaultActions
 {
 	#auto_attack
-	#run_action_list,name=single_target,if=active_enemies=1
+	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
+	#call_action_list,name=two_targets,if=active_enemies=2
 	if Enemies() == 2 FuryTitansGripTwoTargetsActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
+	#call_action_list,name=three_targets,if=active_enemies=3
 	if Enemies() == 3 FuryTitansGripThreeTargetsActions()
-	#run_action_list,name=aoe,if=active_enemies>3
+	#call_action_list,name=aoe,if=active_enemies>3
 	if Enemies() > 3 FuryTitansGripAoeActions()
-}
-
-AddFunction FuryTitansGripDefaultOffGcdActions
-{
-	#run_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FuryTitansGripSingleTargetOffGcdActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FuryTitansGripTwoTargetsOffGcdActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FuryTitansGripThreeTargetsOffGcdActions()
-	#run_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FuryTitansGripAoeOffGcdActions()
 }
 
 AddFunction FuryTitansGripDefaultShortCdActions
 {
-	#run_action_list,name=single_target,if=active_enemies=1
+	#charge
+	if target.InRange(charge) Spell(charge)
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
+	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
+	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 0 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetShortCdActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
+	#call_action_list,name=two_targets,if=active_enemies=2
 	if Enemies() == 2 FuryTitansGripTwoTargetsShortCdActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
+	#call_action_list,name=three_targets,if=active_enemies=3
 	if Enemies() == 3 FuryTitansGripThreeTargetsShortCdActions()
-	#run_action_list,name=aoe,if=active_enemies>3
+	#call_action_list,name=aoe,if=active_enemies>3
 	if Enemies() > 3 FuryTitansGripAoeShortCdActions()
 }
 
@@ -775,376 +607,254 @@ AddFunction FuryTitansGripDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-
-	#mogu_power_potion,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#recklessness,if=!talent.bloodbath.enabled&((cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)&(target.time_to_die>(192*buff.cooldown_reduction.value)|target.health.pct<20))|buff.bloodbath.up&(target.time_to_die>(192*buff.cooldown_reduction.value)|target.health.pct<20)|target.time_to_die<=12
-	if Talent(bloodbath_talent no) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } and { target.TimeToDie() > 192 * BuffAmount(cooldown_reduction_strength_buff) or target.HealthPercent() < 20 } or BuffPresent(bloodbath_buff) and { target.TimeToDie() > 192 * BuffAmount(cooldown_reduction_strength_buff) or target.HealthPercent() < 20 } or target.TimeToDie() <= 12 Spell(recklessness)
-	#avatar,if=enabled&(buff.recklessness.up|target.time_to_die<=25)
-	if Talent(avatar_talent) and { BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 } Spell(avatar)
-	#skull_banner,if=buff.skull_banner.down&(((cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)&target.time_to_die>192&buff.cooldown_reduction.up)|buff.recklessness.up)
-	if BuffExpires(skull_banner_buff any=1) and { { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } and target.TimeToDie() > 192 and BuffPresent(cooldown_reduction_strength_buff) or BuffPresent(recklessness_buff) } and CheckBoxOn(opt_skull_banner) Spell(skull_banner)
-	#use_item,slot=hands,if=!talent.bloodbath.enabled&debuff.colossus_smash.up|buff.bloodbath.up
-	if Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(bloodbath_buff) UseItemActions()
-	#blood_fury,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.cooldown_reduction.down&(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))|buff.cooldown_reduction.up&buff.recklessness.up
-	if BuffExpires(cooldown_reduction_strength_buff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) and target.DebuffPresent(colossus_smash_debuff) } or BuffPresent(cooldown_reduction_strength_buff) and BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
-	#run_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FuryTitansGripSingleTargetActions()
-	#run_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FuryTitansGripTwoTargetsActions()
-	#run_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FuryTitansGripThreeTargetsActions()
-	#run_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FuryTitansGripAoeActions()
+	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=10|talent.anger_management.enabled
+	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 10 or Talent(anger_management_talent) Spell(recklessness)
+	#avatar,if=(buff.recklessness.up|target.time_to_die<=25)
+	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 Spell(avatar)
+	#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
+	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#call_action_list,name=single_target,if=active_enemies=1
+	if Enemies() == 1 FuryTitansGripSingleTargetCdActions()
+	#call_action_list,name=two_targets,if=active_enemies=2
+	if Enemies() == 2 FuryTitansGripTwoTargetsCdActions()
+	#call_action_list,name=three_targets,if=active_enemies=3
+	if Enemies() == 3 FuryTitansGripThreeTargetsCdActions()
+	#call_action_list,name=aoe,if=active_enemies>3
+	if Enemies() > 3 FuryTitansGripAoeCdActions()
 }
 
-# ActionList: FuryTitansGripDefaultActions --> main, offgcd, shortcd, cd
+# ActionList: FuryTitansGripAoeActions --> main, shortcd, cd
 
 AddFunction FuryTitansGripAoeActions
 {
-	#bloodthirst,cycle_targets=1,if=!dot.deep_wounds.ticking&buff.enrage.down
-	if not target.DebuffPresent(deep_wounds_debuff) and BuffExpires(enrage_buff any=1) Spell(bloodthirst)
-	#raging_blow,if=buff.meat_cleaver.stack=3
-	if BuffStacks(meat_cleaver_buff) == 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#raging_blow,if=buff.meat_cleaver.stack>=3&buff.enrage.up
+	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#raging_blow,if=buff.meat_cleaver.stack>=3
+	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#whirlwind
 	Spell(whirlwind)
-	#bloodthirst,cycle_targets=1,if=!dot.deep_wounds.ticking
-	if not target.DebuffPresent(deep_wounds_debuff) Spell(bloodthirst)
-	#colossus_smash
-	Spell(colossus_smash)
-	#battle_shout
-	Spell(battle_shout)
-}
-
-AddFunction FuryTitansGripAoeOffGcdActions
-{
-	#berserker_rage,if=(talent.bladestorm.enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&!cooldown.bladestorm.remains)|(!talent.bladestorm.enabled&buff.enrage.remains<1&cooldown.bloodthirst.remains>1)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and not SpellCooldown(bladestorm) or Talent(bladestorm_talent no) and BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#cleave,if=rage>90
-	if Rage() > 90 Spell(cleave)
-	#heroic_leap,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#bloodthirst
+	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
 AddFunction FuryTitansGripAoeShortCdActions
 {
-	#bloodbath,if=enabled
-	if Talent(bloodbath_talent) Spell(bloodbath)
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(bladestorm)
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
 
-	unless not target.DebuffPresent(deep_wounds_debuff) and BuffExpires(enrage_buff any=1) and Spell(bloodthirst)
-		or BuffStacks(meat_cleaver_buff) == 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-		or Spell(whirlwind)
+	unless BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+		or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst)
+		or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
-		#dragon_roar,if=enabled&debuff.colossus_smash.down&(buff.bloodbath.up|!talent.bloodbath.enabled)
-		if Talent(dragon_roar_talent) and target.DebuffExpires(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
+		#bladestorm,if=buff.enrage.up
+		if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 
-		unless not target.DebuffPresent(deep_wounds_debuff) and Spell(bloodthirst)
-			or Spell(colossus_smash)
+		unless Spell(whirlwind)
+			or BuffPresent(sudden_death_buff) and Spell(execute)
 		{
-			#storm_bolt,if=enabled
-			if Talent(storm_bolt_talent) Spell(storm_bolt)
-			#shockwave,if=enabled
-			if Talent(shockwave_talent) Spell(shockwave)
+			#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 		}
 	}
 }
 
 AddFunction FuryTitansGripAoeCdActions {}
 
-# ActionList: FuryTitansGripTwoTargetsActions --> main, offgcd, shortcd, cd
-
-AddFunction FuryTitansGripTwoTargetsActions
-{
-	#colossus_smash
-	Spell(colossus_smash)
-	#bloodthirst,cycle_targets=1,if=dot.deep_wounds.remains<5
-	if target.DebuffRemaining(deep_wounds_debuff) < 5 Spell(bloodthirst)
-	#bloodthirst
-	Spell(bloodthirst)
-	#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-	unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-	{
-		#raging_blow,if=buff.meat_cleaver.up
-		if BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
-		#whirlwind,if=!buff.meat_cleaver.up
-		if not BuffPresent(meat_cleaver_buff) Spell(whirlwind)
-		#execute
-		if BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 Spell(execute)
-		#battle_shout
-		Spell(battle_shout)
-		#heroic_throw
-		Spell(heroic_throw)
-	}
-}
-
-AddFunction FuryTitansGripTwoTargetsOffGcdActions
-{
-	#berserker_rage,if=(talent.bladestorm.enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&!cooldown.bladestorm.remains&(!talent.storm_bolt.enabled|(talent.storm_bolt.enabled&!debuff.colossus_smash.up)))|(!talent.bladestorm.enabled&buff.enrage.remains<1&cooldown.bloodthirst.remains>1)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and not SpellCooldown(bladestorm) and { Talent(storm_bolt_talent no) or Talent(storm_bolt_talent) and not target.DebuffPresent(colossus_smash_debuff) } or Talent(bladestorm_talent no) and BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#cleave,if=(rage>=60&debuff.colossus_smash.up)|rage>110
-	if Rage() >= 60 and target.DebuffPresent(colossus_smash_debuff) or Rage() > 110 Spell(cleave)
-	#heroic_leap,if=buff.enrage.up&(debuff.colossus_smash.up&buff.cooldown_reduction.up|!buff.cooldown_reduction.up)
-	if BuffPresent(enrage_buff any=1) and { target.DebuffPresent(colossus_smash_debuff) and BuffPresent(cooldown_reduction_strength_buff) or not BuffPresent(cooldown_reduction_strength_buff) } and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-}
-
-AddFunction FuryTitansGripTwoTargetsShortCdActions
-{
-	#bloodbath,if=enabled&((!talent.bladestorm.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5|target.time_to_die<=20))|(talent.bladestorm.enabled))
-	if Talent(bloodbath_talent) and { Talent(bladestorm_talent no) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 or target.TimeToDie() <= 20 } or Talent(bladestorm_talent) } Spell(bloodbath)
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&(!talent.storm_bolt.enabled|(talent.storm_bolt.enabled&!debuff.colossus_smash.up))
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and { Talent(storm_bolt_talent no) or Talent(storm_bolt_talent) and not target.DebuffPresent(colossus_smash_debuff) } Spell(bladestorm)
-	#dragon_roar,if=enabled&(!debuff.colossus_smash.up&(buff.bloodbath.up|!talent.bloodbath.enabled))
-	if Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
-
-	unless Spell(colossus_smash)
-		or target.DebuffRemaining(deep_wounds_debuff) < 5 and Spell(bloodthirst)
-	{
-		#storm_bolt,if=enabled&debuff.colossus_smash.up
-		if Talent(storm_bolt_talent) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-		unless Spell(bloodthirst)
-		{
-			#wait,sec=cooldown.bloodthirst.remains,if=!(target.health.pct<20&debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-			unless not { target.HealthPercent() < 20 and target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-			{
-				unless BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-					or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind)
-				{
-					#shockwave,if=enabled
-					if Talent(shockwave_talent) Spell(shockwave)
-				}
-			}
-		}
-	}
-}
-
-AddFunction FuryTitansGripTwoTargetsCdActions {}
-
-# ActionList: FuryTitansGripSingleTargetActions --> main, offgcd, shortcd, cd
-
-AddFunction FuryTitansGripSingleTargetActions
-{
-	#bloodthirst,if=!buff.enrage.up
-	if not BuffPresent(enrage_buff any=1) Spell(bloodthirst)
-	#raging_blow,if=buff.raging_blow.stack=2&debuff.colossus_smash.up
-	if BuffStacks(raging_blow_buff) == 2 and target.DebuffPresent(colossus_smash_debuff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#bloodthirst
-	Spell(bloodthirst)
-	#wild_strike,if=buff.bloodsurge.react&cooldown.bloodthirst.remains<=1&cooldown.bloodthirst.remains>0.3
-	if BuffPresent(bloodsurge_buff) and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0.3 Spell(wild_strike)
-	#wait,sec=cooldown.bloodthirst.remains,if=!(debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-	unless not { target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-	{
-		#colossus_smash
-		Spell(colossus_smash)
-		#execute,if=buff.raging_blow.stack<2&(((rage>70&!debuff.colossus_smash.up)|debuff.colossus_smash.up)|trinket.proc.strength.up)|target.time_to_die<5
-		if { BuffStacks(raging_blow_buff) < 2 and { Rage() > 70 and not target.DebuffPresent(colossus_smash_debuff) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(trinket_proc_strength_buff) } or target.TimeToDie() < 5 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } Spell(execute)
-		#raging_blow,if=buff.raging_blow.stack=2|debuff.colossus_smash.up|buff.raging_blow.remains<=3
-		if { BuffStacks(raging_blow_buff) == 2 or target.DebuffPresent(colossus_smash_debuff) or BuffRemaining(raging_blow_buff) <= 3 } and BuffPresent(raging_blow_buff) Spell(raging_blow)
-		#raging_blow,if=cooldown.colossus_smash.remains>=1
-		if SpellCooldown(colossus_smash) >= 1 and BuffPresent(raging_blow_buff) Spell(raging_blow)
-		#wild_strike,if=buff.bloodsurge.up
-		if BuffPresent(bloodsurge_buff) Spell(wild_strike)
-		#heroic_throw,if=debuff.colossus_smash.down&rage<60
-		if target.DebuffExpires(colossus_smash_debuff) and Rage() < 60 Spell(heroic_throw)
-		#wild_strike,if=debuff.colossus_smash.up
-		if target.DebuffPresent(colossus_smash_debuff) Spell(wild_strike)
-		#battle_shout,if=rage<70
-		if Rage() < 70 Spell(battle_shout)
-		#impending_victory,if=enabled&cooldown.colossus_smash.remains>=1.5
-		if Talent(impending_victory_talent) and SpellCooldown(colossus_smash) >= 1.5 and BuffPresent(victorious_buff) Spell(impending_victory)
-		#wild_strike,if=cooldown.colossus_smash.remains>=2&rage>=70
-		if SpellCooldown(colossus_smash) >= 2 and Rage() >= 70 Spell(wild_strike)
-	}
-}
-
-AddFunction FuryTitansGripSingleTargetOffGcdActions
-{
-	#berserker_rage,if=buff.enrage.remains<1&cooldown.bloodthirst.remains>1
-	if BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#heroic_strike,if=(debuff.colossus_smash.up&rage>=40|rage>=100)&buff.enrage.up
-	if { target.DebuffPresent(colossus_smash_debuff) and Rage() >= 40 or Rage() >= 100 } and BuffPresent(enrage_buff any=1) Spell(heroic_strike)
-	#heroic_leap,if=debuff.colossus_smash.up&buff.enrage.up
-	if target.DebuffPresent(colossus_smash_debuff) and BuffPresent(enrage_buff any=1) and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
-	#wait,sec=cooldown.bloodthirst.remains,if=!(debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-	unless not { target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-	{
-		#berserker_rage,if=buff.raging_blow.stack<=1&target.health.pct>=20
-		if BuffStacks(raging_blow_buff) <= 1 and target.HealthPercent() >= 20 Spell(berserker_rage)
-	}
-}
-
-AddFunction FuryTitansGripSingleTargetShortCdActions
-{
-	#bloodbath,if=enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5|target.time_to_die<=20)
-	if Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 or target.TimeToDie() <= 20 } Spell(bloodbath)
-
-	unless not BuffPresent(enrage_buff any=1) and Spell(bloodthirst)
-	{
-		#storm_bolt,if=enabled&buff.cooldown_reduction.up&debuff.colossus_smash.up
-		if Talent(storm_bolt_talent) and BuffPresent(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-		unless BuffStacks(raging_blow_buff) == 2 and target.DebuffPresent(colossus_smash_debuff) and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-		{
-			#storm_bolt,if=enabled&buff.cooldown_reduction.down&debuff.colossus_smash.up
-			if Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-			#dragon_roar,if=enabled&(!debuff.colossus_smash.up&(buff.bloodbath.up|!talent.bloodbath.enabled))
-			if Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
-
-			unless Spell(bloodthirst)
-				or BuffPresent(bloodsurge_buff) and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0.3 and Spell(wild_strike)
-			{
-				#wait,sec=cooldown.bloodthirst.remains,if=!(debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-				unless not { target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-				{
-					unless Spell(colossus_smash)
-					{
-						#storm_bolt,if=enabled&buff.cooldown_reduction.down
-						if Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) Spell(storm_bolt)
-
-						unless { BuffStacks(raging_blow_buff) < 2 and { Rage() > 70 and not target.DebuffPresent(colossus_smash_debuff) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(trinket_proc_strength_buff) } or target.TimeToDie() < 5 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } and Spell(execute)
-							or { BuffStacks(raging_blow_buff) == 2 or target.DebuffPresent(colossus_smash_debuff) or BuffRemaining(raging_blow_buff) <= 3 } and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-						{
-							#bladestorm,if=enabled,interrupt_if=cooldown.bloodthirst.remains<1
-							if Talent(bladestorm_talent) Spell(bladestorm)
-
-							unless SpellCooldown(colossus_smash) >= 1 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-								or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
-							{
-								#shockwave,if=enabled
-								if Talent(shockwave_talent) Spell(shockwave)
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-AddFunction FuryTitansGripSingleTargetCdActions
-{
-	unless not BuffPresent(enrage_buff any=1) and Spell(bloodthirst)
-		or Talent(storm_bolt_talent) and BuffPresent(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) and Spell(storm_bolt)
-		or BuffStacks(raging_blow_buff) == 2 and target.DebuffPresent(colossus_smash_debuff) and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-		or Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) and target.DebuffPresent(colossus_smash_debuff) and Spell(storm_bolt)
-		or Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and Spell(dragon_roar)
-		or Spell(bloodthirst)
-		or BuffPresent(bloodsurge_buff) and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0.3 and Spell(wild_strike)
-	{
-		#wait,sec=cooldown.bloodthirst.remains,if=!(debuff.colossus_smash.up&rage>=30&buff.enrage.up)&cooldown.bloodthirst.remains<=1
-		unless not { target.DebuffPresent(colossus_smash_debuff) and Rage() >= 30 and BuffPresent(enrage_buff any=1) } and SpellCooldown(bloodthirst) <= 1 and SpellCooldown(bloodthirst) > 0
-		{
-			unless Spell(colossus_smash)
-				or Talent(storm_bolt_talent) and BuffExpires(cooldown_reduction_strength_buff) and Spell(storm_bolt)
-				or { BuffStacks(raging_blow_buff) < 2 and { Rage() > 70 and not target.DebuffPresent(colossus_smash_debuff) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(trinket_proc_strength_buff) } or target.TimeToDie() < 5 } and { BuffPresent(death_sentence_buff) or target.HealthPercent() < 20 } and Spell(execute)
-				or { BuffStacks(raging_blow_buff) == 2 or target.DebuffPresent(colossus_smash_debuff) or BuffRemaining(raging_blow_buff) <= 3 } and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-				or Talent(bladestorm_talent) and Spell(bladestorm)
-				or SpellCooldown(colossus_smash) >= 1 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-				or BuffPresent(bloodsurge_buff) Spell(wild_strike)
-			{
-				#shattering_throw,if=cooldown.colossus_smash.remains>5
-				if SpellCooldown(colossus_smash) > 5 Spell(shattering_throw)
-			}
-		}
-	}
-}
-
-# ActionList: FuryTitansGripSingleTargetActions --> main, offgcd, shortcd, cd
+# ActionList: FuryTitansGripThreeTargetsActions --> main, shortcd, cd
 
 AddFunction FuryTitansGripThreeTargetsActions
 {
-	#bloodthirst,cycle_targets=1,if=!dot.deep_wounds.ticking
-	if not target.DebuffPresent(deep_wounds_debuff) Spell(bloodthirst)
-	#colossus_smash
-	Spell(colossus_smash)
-	#raging_blow,if=buff.meat_cleaver.stack=2
-	if BuffStacks(meat_cleaver_buff) == 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#raging_blow,if=buff.meat_cleaver.stack>=2
+	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#whirlwind
 	Spell(whirlwind)
-	#raging_blow
-	if BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#battle_shout
-	Spell(battle_shout)
-	#heroic_throw
-	Spell(heroic_throw)
-}
-
-AddFunction FuryTitansGripThreeTargetsOffGcdActions
-{
-	#berserker_rage,if=(talent.bladestorm.enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)&!cooldown.bladestorm.remains)|(!talent.bladestorm.enabled&buff.enrage.remains<1&cooldown.bloodthirst.remains>1)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } and not SpellCooldown(bladestorm) or Talent(bladestorm_talent no) and BuffRemaining(enrage_buff any=1) < 1 and SpellCooldown(bloodthirst) > 1 Spell(berserker_rage)
-	#cleave,if=(rage>=70&debuff.colossus_smash.up)|rage>90
-	if Rage() >= 70 and target.DebuffPresent(colossus_smash_debuff) or Rage() > 90 Spell(cleave)
-	#heroic_leap,if=buff.enrage.up&(debuff.colossus_smash.up&buff.cooldown_reduction.up|!buff.cooldown_reduction.up)
-	if BuffPresent(enrage_buff any=1) and { target.DebuffPresent(colossus_smash_debuff) and BuffPresent(cooldown_reduction_strength_buff) or not BuffPresent(cooldown_reduction_strength_buff) } and CheckBoxOn(opt_heroic_leap_dps) Spell(heroic_leap)
+	#bloodthirst
+	Spell(bloodthirst)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
 AddFunction FuryTitansGripThreeTargetsShortCdActions
 {
-	#bloodbath,if=enabled
-	if Talent(bloodbath_talent) Spell(bloodbath)
-	#bladestorm,if=enabled&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(bladestorm_talent) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(bladestorm)
-	#dragon_roar,if=enabled&!debuff.colossus_smash.up&(buff.bloodbath.up|!talent.bloodbath.enabled)
-	if Talent(dragon_roar_talent) and not target.DebuffPresent(colossus_smash_debuff) and { BuffPresent(bloodbath_buff) or Talent(bloodbath_talent no) } Spell(dragon_roar)
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 
-	unless not target.DebuffPresent(deep_wounds_debuff) and Spell(bloodthirst)
-		or Spell(colossus_smash)
+	unless { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst)
+		or BuffPresent(sudden_death_buff) and Spell(execute)
+		or BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
-		#storm_bolt,if=enabled&debuff.colossus_smash.up
-		if Talent(storm_bolt_talent) and target.DebuffPresent(colossus_smash_debuff) Spell(storm_bolt)
-
-		unless BuffStacks(meat_cleaver_buff) == 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
-			or Spell(whirlwind)
-		{
-			#shockwave,if=enabled
-			if Talent(shockwave_talent) Spell(shockwave)
-		}
+		#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	}
 }
 
 AddFunction FuryTitansGripThreeTargetsCdActions {}
 
+# ActionList: FuryTitansGripPrecombatActions --> main, shortcd, cd
+
+AddFunction FuryTitansGripPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#stance,choose=battle
+	Spell(battle_stance)
+	# CHANGE: Apply raid buffs.
+	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
+	#snapshot_stats
+}
+
+AddFunction FuryTitansGripPrecombatShortCdActions {}
+
+AddFunction FuryTitansGripPrecombatCdActions
+{
+	unless Spell(battle_stance)
+		or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout)
+		or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout)
+	{
+		#potion,name=mogu_power
+		UsePotionStrength()
+	}
+}
+
+# ActionList: FuryTitansGripTwoTargetsActions --> main, shortcd, cd
+
+AddFunction FuryTitansGripTwoTargetsActions
+{
+	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
+	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,if=target.health.pct<20|buff.sudden_death.react
+	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
+	#raging_blow,if=buff.meat_cleaver.up
+	if BuffPresent(meat_cleaver_buff) and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#whirlwind,if=!buff.meat_cleaver.up
+	if not BuffPresent(meat_cleaver_buff) Spell(whirlwind)
+	#wild_strike,if=buff.bloodsurge.up&rage>75
+	if BuffPresent(bloodsurge_buff) and Rage() > 75 Spell(wild_strike)
+	#bloodthirst
+	Spell(bloodthirst)
+	#whirlwind,if=rage>rage.max-20
+	if Rage() > MaxRage() - 20 Spell(whirlwind)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+}
+
+AddFunction FuryTitansGripTwoTargetsShortCdActions
+{
+	#bloodbath
+	Spell(bloodbath)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+}
+
+AddFunction FuryTitansGripTwoTargetsCdActions {}
+
+# ActionList: FuryTitansGripSingleTargetActions --> main, shortcd, cd
+
+AddFunction FuryTitansGripSingleTargetActions
+{
+	#bloodbath
+	Spell(bloodbath)
+	#wild_strike,if=rage>110&target.health.pct>20
+	if Rage() > 110 and target.HealthPercent() > 20 Spell(wild_strike)
+	#bloodthirst,if=!talent.unquenchable_thirst.enabled&(buff.enrage.down|rage<80)
+	if not Talent(unquenchable_thirst_talent) and { BuffExpires(enrage_buff any=1) or Rage() < 80 } Spell(bloodthirst)
+	#bloodthirst,if=talent.unquenchable_thirst.enabled&buff.enrage.down
+	if Talent(unquenchable_thirst_talent) and BuffExpires(enrage_buff any=1) Spell(bloodthirst)
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#siegebreaker
+	Spell(siegebreaker)
+	#storm_bolt
+	Spell(storm_bolt)
+	#wild_strike,if=buff.bloodsurge.up
+	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
+	#execute,if=buff.enrage.up|target.time_to_die<12
+	if BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 Spell(execute)
+	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#raging_blow
+	if BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#wild_strike,if=buff.enrage.up&target.health.pct>20
+	if BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
+	#shockwave,if=!talent.unquenchable_thirst.enabled
+	if not Talent(unquenchable_thirst_talent) Spell(shockwave)
+	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20
+	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 Spell(impending_victory)
+	#bloodthirst
+	Spell(bloodthirst)
+}
+
+AddFunction FuryTitansGripSingleTargetShortCdActions
+{
+	#bloodbath
+	Spell(bloodbath)
+
+	unless Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike)
+		or not Talent(unquenchable_thirst_talent) and { BuffExpires(enrage_buff any=1) or Rage() < 80 } and Spell(bloodthirst)
+		or Talent(unquenchable_thirst_talent) and BuffExpires(enrage_buff any=1) and Spell(bloodthirst)
+	{
+		#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+
+		unless BuffPresent(sudden_death_buff) and Spell(execute)
+		{
+			#siegebreaker
+			Spell(siegebreaker)
+			#storm_bolt
+			Spell(storm_bolt)
+
+			unless BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+				or { BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 } and Spell(execute)
+			{
+				#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+				if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+
+				unless BuffPresent(raging_blow_buff) and Spell(raging_blow)
+					or BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 and Spell(wild_strike)
+				{
+					#shockwave,if=!talent.unquenchable_thirst.enabled
+					if not Talent(unquenchable_thirst_talent) Spell(shockwave)
+				}
+			}
+		}
+	}
+}
+
+AddFunction FuryTitansGripSingleTargetCdActions {}
+
 ### Fury icons.
-AddCheckBox(opt_warrior_fury "Show Fury icons" specialization=fury default)
 AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
 
-AddIcon specialization=fury size=small help=offgcd enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=1h)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatOffGcdActions()
-		FurySingleMindedFuryDefaultOffGcdActions()
-	}
-	if HasWeapon(main type=2h)
-	{
-		if InCombat(no) FuryTitansGripPrecombatOffGcdActions()
-		FuryTitansGripDefaultOffGcdActions()
-	}
-}
-
-AddIcon specialization=fury size=small help=offgcd checkbox=opt_warrior_fury checkbox=opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=1h)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatOffGcdActions()
-		FurySingleMindedFuryDefaultOffGcdActions()
-	}
-	if HasWeapon(main type=2h)
-	{
-		if InCombat(no) FuryTitansGripPrecombatOffGcdActions()
-		FuryTitansGripDefaultOffGcdActions()
-	}
-}
-
-AddIcon specialization=fury help=shortcd enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
+AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
 {
 	if HasWeapon(main type=1h)
 	{
@@ -1158,7 +868,7 @@ AddIcon specialization=fury help=shortcd enemies=1 checkbox=opt_warrior_fury che
 	}
 }
 
-AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury checkbox=opt_warrior_fury_aoe
+AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
 {
 	if HasWeapon(main type=1h)
 	{
@@ -1172,7 +882,7 @@ AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury checkbox=opt_
 	}
 }
 
-AddIcon specialization=fury help=main enemies=1 checkbox=opt_warrior_fury
+AddIcon specialization=fury help=main enemies=1
 {
 	if HasWeapon(main type=1h)
 	{
@@ -1186,7 +896,7 @@ AddIcon specialization=fury help=main enemies=1 checkbox=opt_warrior_fury
 	}
 }
 
-AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury checkbox=opt_warrior_fury_aoe
+AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
 {
 	if HasWeapon(main type=1h)
 	{
@@ -1200,7 +910,7 @@ AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury checkbox=opt_warr
 	}
 }
 
-AddIcon specialization=fury help=cd enemies=1 checkbox=opt_warrior_fury checkbox=!opt_warrior_fury_aoe
+AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
 {
 	if HasWeapon(main type=1h)
 	{
@@ -1214,7 +924,7 @@ AddIcon specialization=fury help=cd enemies=1 checkbox=opt_warrior_fury checkbox
 	}
 }
 
-AddIcon specialization=fury help=cd checkbox=opt_warrior_fury checkbox=opt_warrior_fury_aoe
+AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 {
 	if HasWeapon(main type=1h)
 	{
@@ -1231,266 +941,237 @@ AddIcon specialization=fury help=cd checkbox=opt_warrior_fury checkbox=opt_warri
 ###
 ### Protection
 ###
-# Based on SimulationCraft profile "Warrior_Protection_T16H".
+# Based on SimulationCraft profile "Warrior_Protection_T16M".
 #	class=warrior
 #	spec=protection
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Zb!.00110
-#	glyphs=unending_rage/hold_the_line/heavy_repercussions
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Zb!000221.
+#	glyphs=unending_rage/heroic_leap/cleave
 
-# ActionList: ProtectionPrecombatActions --> main, offgcd, shortcd, cd
+# ActionList: ProtectionPrecombatActions --> main, shortcd, cd
 
 AddFunction ProtectionPrecombatActions
 {
 	#flask,type=earth
 	#food,type=chun_tian_spring_rolls
-	#snapshot_stats
 	#stance,choose=defensive
-	if not Stance(warrior_defensive_stance) Spell(defensive_stance)
-	#battle_shout
-	Spell(battle_shout)
+	Spell(defensive_stance)
+	# CHANGE: Apply raid buffs.
+	if not BuffPresent(attack_power_multiplier_buff any=1) and not BuffPresent(stamina_buff) Spell(battle_shout)
+	if not BuffPresent(stamina_buff any=1) Spell(commanding_shout)
+	#snapshot_stats
 }
-
-AddFunction ProtectionPrecombatOffGcdActions {}
 
 AddFunction ProtectionPrecombatShortCdActions {}
 
 AddFunction ProtectionPrecombatCdActions
 {
-	unless not Stance(warrior_defensive_stance) and Spell(defensive_stance)
-		or Spell(battle_shout)
+	unless Spell(defensive_stance)
+		or not BuffPresent(attack_power_multiplier_buff any=1) and not BuffPresent(stamina_buff) and Spell(battle_shout)
+		or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout)
 	{
-		#mountains_potion
+		#shield_wall
+		Spell(shield_wall)
+		#potion,name=mountains
 		UsePotionArmor()
 	}
 }
 
-# ActionList: ProtectionDefaultActions --> main, offgcd, shortcd, cd
+# ActionList: ProtectionProtAoeActions --> main, shortcd, cd
 
-AddFunction ProtectionDefaultActions
+AddFunction ProtectionProtAoeActions
 {
-	#auto_attack
-	#run_action_list,name=dps_cds,if=buff.vengeance.value>health.max*0.20
-	if BuffAmount(vengeance_buff) > MaxHealth() * 0.2 ProtectionDpsCdsActions()
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationActions()
-}
-
-AddFunction ProtectionDefaultOffGcdActions
-{
-	# CHANGE: Use Cleave instead of Heroic Strike when tanking multiple mobs.
-	if Enemies() > 2 and { BuffPresent(ultimatum_buff) or BuffPresent(glyph_incite_buff) } Spell(cleave)
-	#heroic_strike,if=buff.ultimatum.up|buff.glyph_incite.up
-	if BuffPresent(ultimatum_buff) or BuffPresent(glyph_incite_buff) Spell(heroic_strike)
-	#berserker_rage,if=buff.enrage.down&rage<=rage.max-10
-	if BuffExpires(enrage_buff any=1) and Rage() <= MaxRage() - 10 Spell(berserker_rage)
-	#run_action_list,name=dps_cds,if=buff.vengeance.value>health.max*0.20
-	if BuffAmount(vengeance_buff) > MaxHealth() * 0.2 ProtectionDpsCdsOffGcdActions()
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationOffGcdActions()
-}
-
-AddFunction ProtectionDefaultShortCdActions
-{
-	#shield_block
-	Spell(shield_block)
-	#shield_barrier,if=incoming_damage_1500ms>health.max*0.3|rage>rage.max-20
-	if IncomingDamage(1.5) > MaxHealth() * 0.3 or Rage() > MaxRage() - 20 Spell(shield_barrier)
-	#run_action_list,name=dps_cds,if=buff.vengeance.value>health.max*0.20
-	if BuffAmount(vengeance_buff) > MaxHealth() * 0.2 ProtectionDpsCdsShortCdActions()
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationShortCdActions()
-}
-
-AddFunction ProtectionDefaultCdActions
-{
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
-	InterruptActions()
-	#mountains_potion,if=incoming_damage_2500ms>health.max*0.6&(buff.shield_wall.down&buff.last_stand.down)
-	if IncomingDamage(2.5) > MaxHealth() * 0.6 and BuffExpires(shield_wall_buff) and BuffExpires(last_stand_buff) UsePotionArmor()
-	#use_item,slot=trinket2
-	UseItemActions()
-	#shield_wall,if=incoming_damage_2500ms>health.max*0.6
-	if IncomingDamage(2.5) > MaxHealth() * 0.6 Spell(shield_wall)
-	#run_action_list,name=dps_cds,if=buff.vengeance.value>health.max*0.20
-	if BuffAmount(vengeance_buff) > MaxHealth() * 0.2 ProtectionDpsCdsCdActions()
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationCdActions()
-}
-
-# ActionList: ProtectionNormalRotationActions --> main, offgcd, shortcd, cd
-
-AddFunction ProtectionNormalRotationActions
-{
-	# CHANGE: Use Thunder Clap on cooldown when tanking multiple mobs.
-	if Enemies() > 2 Spell(thunder_clap)
-	#shield_slam
-	Spell(shield_slam)
+	#thunder_clap,if=!dot.deep_wounds.ticking
+	if not target.DebuffPresent(deep_wounds_debuff) Spell(thunder_clap)
+	#shield_slam,if=buff.shield_block.up
+	if BuffPresent(shield_block_buff) Spell(shield_slam)
 	#revenge
 	Spell(revenge)
-	#battle_shout,if=rage<=rage.max-20
-	if Rage() <= MaxRage() - 20 Spell(battle_shout)
-	#thunder_clap,if=glyph.resonating_power.enabled|target.debuff.weakened_blows.down
-	if Glyph(glyph_of_resonating_power) or target.DebuffExpires(weakened_blows_debuff any=1) Spell(thunder_clap)
-	#impending_victory,if=enabled
-	if Talent(impending_victory_talent) and BuffPresent(victorious_buff) Spell(impending_victory)
-	#victory_rush,if=!talent.impending_victory.enabled
-	if Talent(impending_victory_talent no) and BuffPresent(victorious_buff) Spell(victory_rush)
+	#thunder_clap
+	Spell(thunder_clap)
+	#shield_slam
+	Spell(shield_slam)
+	#shield_slam
+	Spell(shield_slam)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
 	#devastate
 	Spell(devastate)
 }
 
-AddFunction ProtectionNormalRotationOffGcdActions {}
-
-AddFunction ProtectionNormalRotationShortCdActions
+AddFunction ProtectionProtAoeShortCdActions
 {
-	unless Enemies() > 2 and Spell(thunder_clap)
-		or Spell(shield_slam)
-	{
-		# CHANGE: Use Level 60 talent on cooldown if tanking multiple mobs.
-		if Enemies() > 2
-		{
-			#dragon_roar,if=enabled
-			if Talent(dragon_roar_talent) Spell(dragon_roar)
-			#shockwave,if=enabled
-			if Talent(shockwave_talent) Spell(shockwave)
-			#bladestorm,if=enabled
-			if Talent(bladestorm_talent) Spell(bladestorm)
-		}
+	#bloodbath
+	Spell(bloodbath)
 
-		unless Spell(revenge)
-			or Rage() <= MaxRage() - 20 and Spell(battle_shout)
-			or { Glyph(glyph_of_resonating_power) or target.DebuffExpires(weakened_blows_debuff any=1) } and Spell(thunder_clap)
+	unless not target.DebuffPresent(deep_wounds_debuff) and Spell(thunder_clap)
+	{
+		#heroic_strike,if=buff.ultimatum.up|rage>110|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
+		if BuffPresent(ultimatum_buff) or Rage() > 110 or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
+		#heroic_leap,if=(buff.bloodbath.up|cooldown.bloodbath.remains>5|!talent.bloodbath.enabled)
+		if { BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 5 or not Talent(bloodbath_talent) } and target.InRange(charge) Spell(heroic_leap)
+
+		unless BuffPresent(shield_block_buff) and Spell(shield_slam)
 		{
-			#demoralizing_shout
-			Spell(demoralizing_shout)
+			#ravager,if=(buff.avatar.up|cooldown.avatar.remains>10)|!talent.avatar.enabled
+			if BuffPresent(avatar_buff) or SpellCooldown(avatar) > 10 or not Talent(avatar_talent) Spell(ravager)
+			#dragon_roar,if=(buff.bloodbath.up|cooldown.bloodbath.remains>10)|!talent.bloodbath.enabled
+			if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) Spell(dragon_roar)
+			#shockwave
+			Spell(shockwave)
+
+			unless Spell(revenge)
+				or Spell(thunder_clap)
+				or Spell(shield_slam)
+			{
+				#storm_bolt
+				Spell(storm_bolt)
+			}
 		}
 	}
 }
 
-AddFunction ProtectionNormalRotationCdActions {}
-
-# ActionList: ProtectionDpsCdsActions --> main, offgcd, shortcd, cd
-
-AddFunction ProtectionDpsCdsActions
+AddFunction ProtectionProtAoeCdActions
 {
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationActions()
+	#avatar
+	Spell(avatar)
 }
 
-AddFunction ProtectionDpsCdsOffGcdActions
+# ActionList: ProtectionDefaultActions --> main, shortcd, cd
+
+AddFunction ProtectionDefaultActions
 {
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationOffGcdActions()
+	#auto_attack
+	#call_action_list,name=prot
+	ProtectionProtActions()
 }
 
-AddFunction ProtectionDpsCdsShortCdActions
+AddFunction ProtectionDefaultShortCdActions
 {
-	#avatar,if=enabled
-	if Talent(avatar_talent) Spell(avatar)
-	#bloodbath,if=enabled
-	if Talent(bloodbath_talent) Spell(bloodbath)
-	#dragon_roar,if=enabled
-	if Talent(dragon_roar_talent) Spell(dragon_roar)
-	#storm_bolt,if=enabled
-	if Talent(storm_bolt_talent) Spell(storm_bolt)
-	#shockwave,if=enabled
-	if Talent(shockwave_talent) Spell(shockwave)
-	#bladestorm,if=enabled
-	if Talent(bladestorm_talent) Spell(bladestorm)
-	#run_action_list,name=normal_rotation
-	ProtectionNormalRotationShortCdActions()
+	#charge
+	if target.InRange(charge) Spell(charge)
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
+	#berserker_rage,if=buff.enrage.down
+	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
+	#call_action_list,name=prot
+	ProtectionProtShortCdActions()
 }
 
-AddFunction ProtectionDpsCdsCdActions
+AddFunction ProtectionDefaultCdActions
 {
-	#avatar,if=enabled
-	if Talent(avatar_talent) Spell(avatar)
-	#blood_fury
-	Spell(blood_fury_ap)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_rage)
+	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
+	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
+	#berserking,if=buff.bloodbath.up|buff.avatar.up
+	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(berserking)
+	#arcane_torrent,if=buff.bloodbath.up|buff.avatar.up
+	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(arcane_torrent_rage)
+	#call_action_list,name=prot
+	ProtectionProtCdActions()
+}
 
-	unless Talent(dragon_roar_talent) and Spell(dragon_roar)
+# ActionList: ProtectionProtActions --> main, shortcd, cd
+
+AddFunction ProtectionProtActions
+{
+	#call_action_list,name=prot_aoe,if=active_enemies>3
+	if Enemies() > 3 ProtectionProtAoeActions()
+	#shield_slam
+	Spell(shield_slam)
+	#revenge
+	Spell(revenge)
+	#impending_victory,if=talent.impending_victory.enabled&cooldown.shield_slam.remains<=execute_time
+	if Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(impending_victory) Spell(impending_victory)
+	#victory_rush,if=!talent.impending_victory.enabled&cooldown.shield_slam.remains<=execute_time
+	if not Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(victory_rush) and BuffPresent(victorious_buff) Spell(victory_rush)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#devastate
+	Spell(devastate)
+}
+
+AddFunction ProtectionProtShortCdActions
+{
+	#shield_block,if=!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up)
+	if not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) } Spell(shield_block)
+	#shield_barrier,if=buff.shield_barrier.down&((buff.shield_block.down&action.shield_block.charges_fractional<0.75)|rage>=85)
+	if BuffExpires(shield_barrier_tank_buff) and { BuffExpires(shield_block_buff) and Charges(shield_block count=0) < 0.75 or Rage() >= 85 } Spell(shield_barrier_tank)
+	#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(demoralizing_shout)
+	#enraged_regeneration,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(enraged_regeneration)
+	#call_action_list,name=prot_aoe,if=active_enemies>3
+	if Enemies() > 3 ProtectionProtAoeShortCdActions()
+	#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
+	if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
+	#bloodbath,if=talent.bloodbath.enabled&((cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(cooldown.storm_bolt.remains=0&talent.storm_bolt.enabled)|talent.shockwave.enabled)
+	if Talent(bloodbath_talent) and { not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or not SpellCooldown(storm_bolt) > 0 and Talent(storm_bolt_talent) or Talent(shockwave_talent) } Spell(bloodbath)
+
+	unless Spell(shield_slam)
+		or Spell(revenge)
 	{
-		#shattering_throw
-		Spell(shattering_throw)
-		#skull_banner
-		if CheckBoxOn(opt_skull_banner) Spell(skull_banner)
-		#recklessness
-		Spell(recklessness)
-
-		unless Talent(storm_bolt_talent) and Spell(storm_bolt)
-			or Talent(shockwave_talent) and Spell(shockwave)
-		{
-			#run_action_list,name=normal_rotation
-			ProtectionNormalRotationCdActions()
-		}
+		#ravager
+		Spell(ravager)
+		#storm_bolt
+		Spell(storm_bolt)
+		#dragon_roar
+		Spell(dragon_roar)
 	}
+}
+
+AddFunction ProtectionProtCdActions
+{
+	#shield_wall,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(shield_wall)
+	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
+	#potion,name=mountains,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 UsePotionArmor()
+	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
+	#call_action_list,name=prot_aoe,if=active_enemies>3
+	if Enemies() > 3 ProtectionProtAoeCdActions()
+	#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
+	if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
 }
 
 ### Protection icons.
-AddCheckBox(opt_warrior_protection "Show Protection icons" specialization=protection default)
 AddCheckBox(opt_warrior_protection_aoe L(AOE) specialization=protection default)
 
-AddIcon specialization=protection size=small help=offgcd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatOffGcdActions()
-	ProtectionDefaultOffGcdActions()
-}
-
-AddIcon specialization=protection size=small help=offgcd checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatOffGcdActions()
-	ProtectionDefaultOffGcdActions()
-}
-
-AddIcon specialization=protection help=shortcd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
+AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatShortCdActions()
 	ProtectionDefaultShortCdActions()
 }
 
-AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
+AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatShortCdActions()
 	ProtectionDefaultShortCdActions()
 }
 
-AddIcon specialization=protection help=main enemies=1 checkbox=opt_warrior_protection
+AddIcon specialization=protection help=main enemies=1
 {
 	if InCombat(no) ProtectionPrecombatActions()
 	ProtectionDefaultActions()
 }
 
-AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
+AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatActions()
-	ProtectionNormalRotationActions()
+	ProtectionDefaultActions()
 }
 
-AddIcon specialization=protection help=cd enemies=1 checkbox=opt_warrior_protection checkbox=!opt_warrior_protection_aoe
+AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatCdActions()
 	ProtectionDefaultCdActions()
 }
 
-AddIcon specialization=protection help=cd checkbox=opt_warrior_protection checkbox=opt_warrior_protection_aoe
+AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 {
 	if InCombat(no) ProtectionPrecombatCdActions()
 	ProtectionDefaultCdActions()
 }
-]]
-
-	OvaleScripts:RegisterScript("WARRIOR", "legacy", desc, code, "legacy")
-end
-
-do
-	local name = "ovale_warrior"
-	local desc = "[6.0.2] Ovale: Work in progress"
-	local code = [[
-# Nothing yet!
 ]]
 
 	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")

@@ -18,6 +18,7 @@ The [current 6.0.0 beta release][beta] of Ovale currently provides default scrip
 - Rogue: Assassination, Combat, Subtlety
 - Shaman: Elemental, Enhancement
 - Warlock: Affliction, Demonology, Destruction
+- Warrior: Arms, Fury, Protection
 
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
