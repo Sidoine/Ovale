@@ -10,7 +10,7 @@ It displays one or more icons that show the cooldown of an action.  The action i
 The [current 6.0.0 beta release][beta] of Ovale currently provides default scripts for the following classes for *Warlords of Draenor*:
 
 - Death Knight: Blood, Frost, Unholy
-- Druid: Feral, Guardian
+- Druid: Feral, Guardian **(Balance is NOT currently supported)**
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
 - Monk: Brewmaster, Windwalker
