@@ -25,11 +25,65 @@ local format = string.format
 local strgmatch = string.gmatch
 local strgsub = string.gsub
 local tinsert = table.insert
+local type = type
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
+
+-- AceDB default database.
+local self_defaultDB = {
+	global = {
+		debug = {},
+	},
+	profile = {
+		display = true,
+		showHiddenScripts = false,
+		source = "Ovale",
+		code = "",
+		left = 500,
+		top = 500,
+		check = {},
+		list = {},
+		apparence = {
+			minimap = {},
+			enCombat = false,
+			iconScale = 1,
+			secondIconScale = 1,
+			margin = 4,
+			fontScale = 1,
+			iconShiftX = 0,
+			iconShiftY = 0,
+			smallIconScale = 0.8,
+			raccourcis = true,
+			numeric = false,
+			avecCible = false,
+			verrouille = false,
+			vertical = false,
+			predictif = false,
+			highlightIcon = true,
+			clickThru = false,
+			hideVehicule = false,
+			flashIcon = true,
+			targetText = "●",
+			alpha = 1,
+			optionsAlpha = 1,
+			updateInterval = 0.1,
+			auraLag = 400,
+			enableIcons = true,
+			spellFlash = {
+				brightness = 1,
+				enabled = true,
+				hasHostileTarget = false,
+				hasTarget = false,
+				hideInVehicle = false,
+				inCombat = false,
+				size = 2.4,
+			},
+		},
+	},
+}
 
 -- AceDB options table.
 local self_options = 
@@ -583,8 +637,17 @@ local self_options =
 							type = "toggle",
 						},
 					},
-					get = function(info) return Ovale.db.global.debug[info[#info]] end,
-					set = function(info, value) Ovale.db.global.debug[info[#info]] = value end,
+					get = function(info)
+						local value = Ovale.db.global.debug[info[#info]]
+						return (value ~= nil)
+					end,
+					set = function(info, value)
+						if value then
+							Ovale.db.global.debug[info[#info]] = value
+						else
+							Ovale.db.global.debug[info[#info]] = nil
+						end
+					end,
 				},
 				trace =
 				{
@@ -816,59 +879,7 @@ function OvaleOptions:OnInitialize()
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 
-	local db = LibStub("AceDB-3.0"):New("OvaleDB",
-	{
-		global = {
-			debug = {},
-		},
-		profile = {
-			display = true,
-			showHiddenScripts = false,
-			source = "Ovale",
-			code = "",
-			left = 500,
-			top = 500,
-			check = {},
-			list = {},
-			apparence = {
-				minimap = {},
-				enCombat = false,
-				iconScale = 1,
-				secondIconScale = 1,
-				margin = 4,
-				fontScale = 1,
-				iconShiftX = 0,
-				iconShiftY = 0,
-				smallIconScale = 0.8,
-				raccourcis = true,
-				numeric = false,
-				avecCible = false,
-				verrouille = false,
-				vertical = false,
-				predictif = false,
-				highlightIcon = true,
-				clickThru = false,
-				hideVehicule = false,
-				flashIcon = true,
-				targetText = "●",
-				alpha = 1,
-				optionsAlpha = 1,
-				updateInterval = 0.1,
-				auraLag = 400,
-				enableIcons = true,
-				spellFlash = {
-					brightness = 1,
-					enabled = true,
-					hasHostileTarget = false,
-					hasTarget = false,
-					hideInVehicle = false,
-					inCombat = false,
-					size = 2.4,
-				},
-			},
-		},
-	})
-
+	local db = LibStub("AceDB-3.0"):New("OvaleDB", self_defaultDB)
 	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(db)
 
 	-- Add dual-spec support
@@ -884,6 +895,7 @@ function OvaleOptions:OnInitialize()
 	db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
 	Ovale.db = db
+	self:UpgradeSavedVariables()
 
 	AceConfig:RegisterOptionsTable("Ovale", self_options.args.code)
 	AceConfig:RegisterOptionsTable("Ovale Actions", self_options.args.actions, "Ovale")
@@ -901,6 +913,21 @@ end
 
 function OvaleOptions:OnEnable()
 	self:HandleProfileChanges()
+end
+
+function OvaleOptions:UpgradeSavedVariables()
+	local profile = Ovale.db.profile
+	-- All profile-specific debug options are removed.  They are now in the global database.
+	profile.debug = nil
+	-- SpellFlash options have been moved and renamed.
+	if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
+		local enabled = profile.apparence.spellFlash
+		profile.apparence.spellFlash = {}
+		profile.apparence.spellFlash.enabled = enabled
+	end
+	-- Re-register defaults so that any tables created during the upgrade are "populated"
+	-- by the default database automatically.
+	Ovale.db:RegisterDefaults(self_defaultDB)
 end
 
 function OvaleOptions:HandleProfileChanges()
