@@ -80,6 +80,10 @@ local self_defaultDB = {
 				hideInVehicle = false,
 				inCombat = false,
 				size = 2.4,
+				colorMain = { r = 1, g = 1, b = 1 },		-- white
+				colorShortCd = { r = 1, g = 1, b = 0 },		-- yellow
+				colorCd = { r = 1, g = 1, b = 0 },			-- yellow
+				colorInterrupt = { r = 0, g = 1, b = 1 }, 	-- aqua
 			},
 		},
 	},
@@ -436,6 +440,49 @@ local self_options =
 							name = L["Flash size"],
 							min = 0, max = 3, bigStep = 0.01,
 							isPercent = true,
+						},
+						colors = {
+							order = 70,
+							type = "group",
+							name = L["Colors"],
+							inline = true,
+							get = function(info)
+								local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
+								return color.r, color.g, color.b, 1.0
+							end,
+							set = function(info, r, g, b, a)
+								local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
+								color.r = r
+								color.g = g
+								color.b = b
+								OvaleOptions:SendMessage("Ovale_OptionChanged")
+							end,
+							args = {
+								colorMain = {
+									order = 10,
+									type = "color",
+									name = L["Main attack"],
+									hasAlpha = false,
+								},
+								colorCd = {
+									order = 20,
+									type = "color",
+									name = L["Long cooldown abilities"],
+									hasAlpha = false,
+								},
+								colorShortCd = {
+									order = 30,
+									type = "color",
+									name = L["Short cooldown abilities"],
+									hasAlpha = false,
+								},
+								colorInterrupt = {
+									order = 40,
+									type = "color",
+									name = L["Interrupts"],
+									hasAlpha = false,
+								},
+							},
 						},
 					},
 				},
