@@ -7,6 +7,10 @@ do
 	local code = [[
 # Rogue spells and functions.
 
+# Learned spells.
+Define(blindside 121152)
+	SpellInfo(blindside learn=1 level=40 specialization=assassination)
+
 Define(adrenaline_rush 13750)
 	SpellInfo(adrenaline_rush cd=180 gcd=0)
 	SpellInfo(adrenaline_rush buff_cdr=cooldown_reduction_agility_buff)
@@ -39,8 +43,6 @@ Define(bandits_guile_buff 84654)
 Define(blade_flurry 13877)
 	SpellInfo(blade_flurry cd=10 gcd=0)
 Define(blade_flurry_buff 13877)
-Define(blindside 121152)
-	SpellInfo(blindside learn=1 level=40 specialization=assassination)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
 Define(cheap_shot 1833)

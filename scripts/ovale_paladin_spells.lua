@@ -7,6 +7,12 @@ do
 	local code = [[
 # Paladin spells and functions.
 
+# Learned spells.
+Define(judgments_of_the_wise 105424)
+	SpellInfo(judgments_of_the_wise learn=1 level=28 specialization=protection)
+Define(sanctity_of_battle 25956)
+	SpellInfo(sanctity_of_battle learn=1 level=58)
+
 Define(ardent_defender 31850)
 	SpellInfo(ardent_defender cd=180 gcd=0)
 	SpellInfo(ardent_defender addcd=-60 itemset=T14_tank itemcount=2)
@@ -177,8 +183,6 @@ Define(judgment 20271)
 	SpellAddBuff(judgment liadrins_righteousness_buff=1 if_stance=paladin_seal_of_righteousness if_spell=empowered_seals)
 	SpellAddBuff(judgment maraads_truth_buff=1 if_stance=paladin_seal_of_truth if_spell=empowered_seals)
 	SpellAddBuff(judgment uthers_insight_buff=1 if_stance=paladin_seal_of_insight if_spell=empowered_seals)
-Define(judgments_of_the_wise 105424)
-	SpellInfo(judgments_of_the_wise learn=1 level=28 specialization=protection)
 Define(liadrins_righteousness_buff 156989)
 	SpellInfo(liadrins_righteousness_buff duration=20)
 Define(lights_hammer 114158)
@@ -197,8 +201,6 @@ Define(sacred_shield_buff 20925)
 Define(sanctified_wrath 53376)
 Define(sanctified_wrath_tank 171648)
 Define(sanctified_wrath_talent 14)
-Define(sanctity_of_battle 25956)
-	SpellInfo(sanctity_of_battle learn=1 level=58)
 Define(seal_of_insight 20165)
 	SpellInfo(seal_of_insight to_stance=paladin_seal_of_insight)
 	SpellInfo(seal_of_insight unusable=1 if_stance=paladin_seal_of_insight)
