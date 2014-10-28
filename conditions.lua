@@ -57,6 +57,7 @@ local API_UnitIsFriend = UnitIsFriend
 local API_UnitIsPVP = UnitIsPVP
 local API_UnitIsUnit = UnitIsUnit
 local API_UnitLevel = UnitLevel
+local API_UnitName = UnitName
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitStagger = UnitStagger
@@ -3051,6 +3052,30 @@ do
 end
 
 do
+	--- Test whether the target's name matches the given name.
+	-- @name Name
+	-- @paramsig boolean
+	-- @param name The localized target name.
+	-- @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
+	--     Default is yes.
+	--     Valid values: yes, no.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return A boolean value.
+
+	local function Name(condition, state)
+		local name, yesno = condition[1], condition[2]
+		local target = ParseCondition(condition, state)
+		local targetName = API_UnitName(target)
+		local boolean = (name == targetName)
+		return TestBoolean(boolean, yesno)
+	end
+
+	OvaleCondition:RegisterCondition("name", false, Name)
+end
+
+do
 	--- Test if the game is on a PTR server
 	-- @paramsig boolean
 	-- @param yesno Optional. If yes, then returns true if it is a PTR realm. If no, return true if it is a live realm.
@@ -5233,6 +5258,8 @@ do
 	{
 		-- Death Knights
 		ghoul = 1,
+		-- XXX Mage
+		crystal = 4,
 		-- Monks
 		statue = 1,
 		-- Shamans

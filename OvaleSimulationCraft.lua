@@ -174,6 +174,7 @@ local EMIT_EXTRA_PARAMETERS = {}
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 
 local TOTEM_TYPE = {
+	["prismatic_crystal"] = "crystal",	-- XXX
 	["capacitor_totem"] = "air",
 	["cloudburst_totem"] = "water",
 	["earth_elemental_totem"] = "earth",
@@ -1139,10 +1140,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "ice_floes" then
 			-- skip
 			isSpellAction = false
-		elseif class == "MAGE" and action == "icy_veins" then
-			bodyCode = "IcyVeins()"
-			annotation[action] = class
-			isSpellAction = false
 		elseif class == "MAGE" and action == "start_pyro_chain" then
 			bodyCode = "SetState(pyro_chain 1)"
 			isSpellAction = false
@@ -1660,7 +1657,16 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				--]]
 				local lhsNode = parseNode.child[1]
 				local rhsNode = parseNode.child[2]
-				local code = format("target.CreatureType(%s)", rhsNode.name)
+				local name = rhsNode.name
+				if name == "prismatic_crystal" then
+					name = '"Prismatic Crystal"'
+				end
+				local code
+				if parseNode.operator == "=" then
+					code = format("target.Name(%s)", name)
+				else -- if parseNode.operator == "!=" then
+					code = format("not target.Name(%s)", name)
+				end
 				if not node and code then
 					annotation.astAnnotation = annotation.astAnnotation or {}
 					node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
@@ -2526,10 +2532,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		AddSymbol(annotation, "rapid_fire_buff")
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
 		code = "RuneOfPowerRemaining()"
-	elseif class == "MAGE" and operand == "cooldown.icy_veins.remains" then
-		code = "SpellCooldown(icy_veins icy_veins_glyphed usable=1)"
-		AddSymbol(annotation, "icy_veins")
-		AddSymbol(annotation, "icy_veins_glyphed")
 	elseif class == "MAGE" and operand == "dot.frozen_orb.ticking" then
 		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
 		local name = "frozen_orb"
@@ -2822,21 +2824,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "counter_shot")
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
-	if annotation.icy_veins == "MAGE" then
-		local code = [[
-			AddFunction IcyVeins
-			{
-				Spell(icy_veins)
-				Spell(icy_veins_glyphed)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "glyph_of_icy_veins")
-		AddSymbol(annotation, "icy_veins")
-		AddSymbol(annotation, "icy_veins_glyphed")
 		count = count + 1
 	end
 	if annotation.counterspell == "MAGE" then
