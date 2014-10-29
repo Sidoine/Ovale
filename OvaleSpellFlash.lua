@@ -8,9 +8,13 @@ local OvaleSpellFlash = Ovale:NewModule("OvaleSpellFlash", "AceEvent-3.0")
 Ovale.OvaleSpellFlash = OvaleSpellFlash
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleOptions = Ovale.OvaleOptions
+
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 
+local pairs = pairs
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitExists = UnitExists
 local API_UnitIsDead = UnitIsDead
@@ -27,11 +31,14 @@ local colorMain = {}
 local colorShortCd = {}
 local colorCd = {}
 local colorInterrupt = {}
+-- Map icon help text to a flash color.
 local FLASH_COLOR = {
 	main = colorMain,
 	cd = colorCd,
 	shortcd = colorCd,
 }
+
+-- Standard colors defined by SpellFlashCore.
 local COLORTABLE = {
 	aqua	= { r = 0, g = 1, b = 1 },
 	blue	= { r = 0, g = 0, b = 1 },
@@ -44,6 +51,156 @@ local COLORTABLE = {
 	white	= { r = 1, g = 1, b = 1 },
 	yellow	= { r = 1, g = 1, b = 0 },
 }
+
+do
+	local defaultDB = {
+		-- Store all SpellFlash settings into a separate table.
+		spellFlash = {
+			brightness = 1,
+			enabled = true,
+			hasHostileTarget = false,
+			hasTarget = false,
+			hideInVehicle = false,
+			inCombat = false,
+			size = 2.4,
+			colorMain = { r = 1, g = 1, b = 1 },		-- white
+			colorShortCd = { r = 1, g = 1, b = 0 },		-- yellow
+			colorCd = { r = 1, g = 1, b = 0 },			-- yellow
+			colorInterrupt = { r = 0, g = 1, b = 1 }, 	-- aqua
+		},
+	}
+	local options = {
+		spellFlash = {
+			type = "group",
+			name = "SpellFlash",
+			disabled = function()
+				return not SpellFlashCore
+			end,
+			get = function(info)
+				return Ovale.db.profile.apparence.spellFlash[info[#info]]
+			end,
+			set = function(info, value)
+				Ovale.db.profile.apparence.spellFlash[info[#info]] = value
+				OvaleOptions:SendMessage("Ovale_OptionChanged")
+			end,
+			args = {
+				enabled = {
+					order = 10,
+					type = "toggle",
+					name = L["Enabled"],
+					desc = L["Flash spells on action bars when they are ready to be cast. Requires SpellFlashCore."],
+					width = "full",
+				},
+				inCombat = {
+					order = 10,
+					type = "toggle",
+					name = L["En combat uniquement"],
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				hasTarget = {
+					order = 20,
+					type = "toggle",
+					name = L["Si cible uniquement"],
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				hasHostileTarget = {
+					order = 30,
+					type = "toggle",
+					name = L["Cacher si cible amicale ou morte"],
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				hideInVehicle = {
+					order = 40,
+					type = "toggle",
+					name = L["Cacher dans les véhicules"],
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				brightness = {
+					order = 50,
+					type = "range",
+					name = L["Flash brightness"],
+					min = 0, max = 1, bigStep = 0.01,
+					isPercent = true,
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				size = {
+					order = 60,
+					type = "range",
+					name = L["Flash size"],
+					min = 0, max = 3, bigStep = 0.01,
+					isPercent = true,
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				colors = {
+					order = 70,
+					type = "group",
+					name = L["Colors"],
+					inline = true,
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+					get = function(info)
+						local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
+						return color.r, color.g, color.b, 1.0
+					end,
+					set = function(info, r, g, b, a)
+						local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
+						color.r = r
+						color.g = g
+						color.b = b
+						OvaleOptions:SendMessage("Ovale_OptionChanged")
+					end,
+					args = {
+						colorMain = {
+							order = 10,
+							type = "color",
+							name = L["Main attack"],
+							hasAlpha = false,
+						},
+						colorCd = {
+							order = 20,
+							type = "color",
+							name = L["Long cooldown abilities"],
+							hasAlpha = false,
+						},
+						colorShortCd = {
+							order = 30,
+							type = "color",
+							name = L["Short cooldown abilities"],
+							hasAlpha = false,
+						},
+						colorInterrupt = {
+							order = 40,
+							type = "color",
+							name = L["Interrupts"],
+							hasAlpha = false,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	-- Insert defaults and options into OvaleOptions.
+	for k, v in pairs(defaultDB) do
+		OvaleOptions.defaultDB.profile.apparence[k] = v
+	end
+	for k, v in pairs(options) do
+		OvaleOptions.options.args.apparence.args[k] = v
+	end
+end
 --</private-static-properties>
 
 --<public-static-methods>
@@ -59,7 +216,7 @@ function OvaleSpellFlash:OnEnable()
 end
 
 function OvaleSpellFlash:OnDisable()
-	SpellFlashCore = _G["SpellFlashCore"]
+	SpellFlashCore = nil
 	self:UnregisterMessage("Ovale_OptionChanged")
 end
 

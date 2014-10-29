@@ -11,43 +11,36 @@ local OvaleOptions = Ovale:NewModule("OvaleOptions", "AceConsole-3.0", "AceEvent
 Ovale.OvaleOptions = OvaleOptions
 
 --<private-static-properties>
-local L = Ovale.L
-
--- Forward declarations for module dependencies.
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-local OvaleDataBroker = nil
-local OvaleScripts = nil
-local OvaleSpellBook = nil
-local OvaleState = nil
+local L = Ovale.L
 
 local format = string.format
-local strgmatch = string.gmatch
-local strgsub = string.gsub
-local tinsert = table.insert
+local gmatch = string.gmatch
+local gsub = string.gsub
+local pairs = pairs
 local type = type
+local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
+--</private-static-properties>
 
+--<public-static-properties>
 -- AceDB default database.
-local self_defaultDB = {
+OvaleOptions.defaultDB = {
 	global = {
 		debug = {},
 	},
 	profile = {
 		display = true,
-		showHiddenScripts = false,
-		source = "Ovale",
-		code = "",
 		left = 500,
 		top = 500,
 		check = {},
 		list = {},
 		apparence = {
-			minimap = {},
 			enCombat = false,
 			iconScale = 1,
 			secondIconScale = 1,
@@ -72,32 +65,18 @@ local self_defaultDB = {
 			updateInterval = 0.1,
 			auraLag = 400,
 			enableIcons = true,
-			spellFlash = {
-				brightness = 1,
-				enabled = true,
-				hasHostileTarget = false,
-				hasTarget = false,
-				hideInVehicle = false,
-				inCombat = false,
-				size = 2.4,
-				colorMain = { r = 1, g = 1, b = 1 },		-- white
-				colorShortCd = { r = 1, g = 1, b = 0 },		-- yellow
-				colorCd = { r = 1, g = 1, b = 0 },			-- yellow
-				colorInterrupt = { r = 0, g = 1, b = 1 }, 	-- aqua
-			},
 		},
 	},
 }
 
 -- AceDB options table.
-local self_options = 
-{ 
+OvaleOptions.options = {
 	type = "group",
 	args = 
 	{
 		apparence =
 		{
-			name = L["Apparence"],
+			name = OVALE,
 			type = "group",
 			-- Generic getter/setter for options.
 			get = function(info)
@@ -110,21 +89,6 @@ local self_options =
 			end,
 			args =
 			{
-				minimap =
-				{
-					order = 25,
-					type = "toggle",
-					name = L["Show minimap icon"],
-					get = function(info)
-						return not Ovale.db.profile.apparence.minimap.hide
-					end,
-					set = function(info, value)
-						Ovale.db.profile.apparence.minimap.hide = not value
-						if OvaleDataBroker then
-							OvaleDataBroker:UpdateIcon()
-						end
-					end
-				},
 				iconGroupAppearance =
 				{
 					order = 40,
@@ -374,118 +338,6 @@ local self_options =
 						},
 					},
 				},
-				spellFlash = {
-					type = "group",
-					name = "SpellFlash",
-					disabled = function()
-						return not SpellFlashCore
-					end,
-					get = function(info)
-						return Ovale.db.profile.apparence.spellFlash[info[#info]]
-					end,
-					set = function(info, value)
-						Ovale.db.profile.apparence.spellFlash[info[#info]] = value
-						OvaleOptions:SendMessage("Ovale_OptionChanged")
-					end,
-					args = {
-						enabled = {
-							order = 10,
-							type = "toggle",
-							name = L["Enabled"],
-							desc = L["Flash spells on action bars when they are ready to be cast. Requires SpellFlashCore."],
-							width = "full",
-						},
-						inCombat = {
-							order = 10,
-							type = "toggle",
-							name = L["En combat uniquement"],
-							disabled = function()
-								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
-							end,
-						},
-						hasTarget = {
-							order = 20,
-							type = "toggle",
-							name = L["Si cible uniquement"],
-							disabled = function()
-								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
-							end,
-						},
-						hasHostileTarget = {
-							order = 30,
-							type = "toggle",
-							name = L["Cacher si cible amicale ou morte"],
-							disabled = function()
-								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
-							end,
-						},
-						hideInVehicle = {
-							order = 40,
-							type = "toggle",
-							name = L["Cacher dans les véhicules"],
-							disabled = function()
-								return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
-							end,
-						},
-						brightness = {
-							order = 50,
-							type = "range",
-							name = L["Flash brightness"],
-							min = 0, max = 1, bigStep = 0.01,
-							isPercent = true,
-						},
-						size = {
-							order = 60,
-							type = "range",
-							name = L["Flash size"],
-							min = 0, max = 3, bigStep = 0.01,
-							isPercent = true,
-						},
-						colors = {
-							order = 70,
-							type = "group",
-							name = L["Colors"],
-							inline = true,
-							get = function(info)
-								local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
-								return color.r, color.g, color.b, 1.0
-							end,
-							set = function(info, r, g, b, a)
-								local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
-								color.r = r
-								color.g = g
-								color.b = b
-								OvaleOptions:SendMessage("Ovale_OptionChanged")
-							end,
-							args = {
-								colorMain = {
-									order = 10,
-									type = "color",
-									name = L["Main attack"],
-									hasAlpha = false,
-								},
-								colorCd = {
-									order = 20,
-									type = "color",
-									name = L["Long cooldown abilities"],
-									hasAlpha = false,
-								},
-								colorShortCd = {
-									order = 30,
-									type = "color",
-									name = L["Short cooldown abilities"],
-									hasAlpha = false,
-								},
-								colorInterrupt = {
-									order = 40,
-									type = "color",
-									name = L["Interrupts"],
-									hasAlpha = false,
-								},
-							},
-						},
-					},
-				},
 				advanced = {
 					order = 80,
 					type = "group",
@@ -501,88 +353,6 @@ local self_options =
 							min = 100, max = 700, step = 10,
 						},
 					},
-				},
-			},
-		},
-		code =
-		{
-			name = L["Code"],
-			type = "group",
-			args = 
-			{
-				source = {
-					order = 10,
-					type = "select",
-					name = L["Script"],
-					width = "double",
-					values = function(info)
-						local scriptType = not Ovale.db.profile.showHiddenScripts and "script"
-						return OvaleScripts:GetDescriptions(scriptType)
-					end,
-					get = function(info)
-						return Ovale.db.profile.source
-					end,
-					set = function(info, v)
-						OvaleOptions:SetScript(v)
-					end,
-				},
-				code = 
-				{
-					order = 20,
-					type = "input",
-					multiline = 25,
-					name = L["Code"],
-					width = "full",
-					disabled = function()
-						return Ovale.db.profile.source ~= "custom"
-					end,
-					get = function(info)
-						local source = Ovale.db.profile.source
-						local code
-						if source and OvaleScripts.script[source] then
-							code = OvaleScripts.script[source].code
-						else
-							code = ""
-						end
-						return strgsub(code, "\t", "    ")
-					end,
-					set = function(info, v)
-						OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], v, "script")
-						Ovale.db.profile.code = v
-						OvaleOptions:SendMessage("Ovale_ScriptChanged")
-					end,
-				},
-				copy =
-				{
-					order = 30,
-					type = "execute",
-					name = L["Copier sur Script personnalisé"],
-					disabled = function()
-						return Ovale.db.profile.source == "custom"
-					end,
-					confirm = function()
-						return L["Ecraser le Script personnalisé préexistant?"]
-					end,
-					func = function()
-						local source = Ovale.db.profile.source
-						local code
-						if source and OvaleScripts.script[source] then
-							code = OvaleScripts.script[source].code
-						else
-							code = ""
-						end
-						OvaleScripts.script["custom"].code = code
-						Ovale.db.profile.source = "custom"
-						Ovale.db.profile.code = code
-						OvaleOptions:SendMessage("Ovale_ScriptChanged")
-					end,
-				},
-				showHiddenScripts = {
-					order = 40,
-					type = "toggle",
-					name = L["Show hidden"],
-					get = function(info) return Ovale.db.profile.showHiddenScripts end,
-					set = function(info, value) Ovale.db.profile.showHiddenScripts = value end
 				},
 			},
 		},
@@ -744,14 +514,14 @@ local self_options =
 								local OvaleFuture = Ovale.OvaleFuture
 								if OvaleFuture then
 									local t = {}
-									for s in strgmatch(value, "[^;]+") do
+									for s in gmatch(value, "[^;]+") do
 										-- strip leading and trailing whitespace
-										s = strgsub(s, "^%s*", "")
-										s = strgsub(s, "%s*$", "")
+										s = gsub(s, "^%s*", "")
+										s = gsub(s, "%s*$", "")
 										if string.len(s) > 0 then
 											local v = tonumber(s)
 											if v then
-												s = OvaleSpellBook:GetSpellName(v)
+												s = API_GetSpellInfo(v)
 												if s then
 													t[v] = true
 													t[s] = v
@@ -817,63 +587,75 @@ local self_options =
 				{
 					name = "Configuration",
 					type = "execute",
-					func = function() AceConfigDialog:SetDefaultSize("Ovale Apparence", 500, 550); AceConfigDialog:Open("Ovale Apparence") end
-				},
-				code  =
-				{
-					name = "Code",
-					type = "execute",
-					func = function() AceConfigDialog:SetDefaultSize("Ovale", 700, 550); AceConfigDialog:Open("Ovale") end
+					func = function()
+						local appName = OVALE
+						AceConfigDialog:SetDefaultSize(appName, 500, 550)
+						AceConfigDialog:Open(appName)
+					end,
 				},
 				debug =
 				{
 					name = "Debug",
 					type = "execute",
-					func = function() AceConfigDialog:SetDefaultSize("Ovale Debug", 800, 550); AceConfigDialog:Open("Ovale Debug") end
+					func = function()
+						local appName = OVALE .. " Debug"
+						AceConfigDialog:SetDefaultSize(appName, 800, 550)
+						AceConfigDialog:Open(appName)
+					end,
 				},
 				power =
 				{
 					name = "Power",
 					type = "execute",
 					func = function()
-						OvaleState.state:DebugPower()
-					end
+						if Ovale.OvaleState then Ovale.OvaleState.state:DebugPower() end
+					end,
 				},
 				talent =
 				{
 					name = "List talent id",
 					type = "execute",
-					func = function() OvaleSpellBook:DebugTalents() end
+					func = function()
+						if Ovale.OvaleSpellBook then Ovale.OvaleSpellBook:DebugTalents() end
+					end,
 				},
 				targetbuff =
 				{
 					name = "List target buffs and debuffs",
 					type = "execute",
 					func = function()
-						OvaleState.state:PrintUnitAuras("target", "HELPFUL")
-						OvaleState.state:PrintUnitAuras("target", "HARMFUL")
-					end
+						if Ovale.OvaleState then
+							Ovale.OvaleState.state:PrintUnitAuras("target", "HELPFUL")
+							Ovale.OvaleState.state:PrintUnitAuras("target", "HARMFUL")
+						end
+					end,
 				},
 				buff =
 				{
 					name = "List player buffs and debuffs",
 					type = "execute",
 					func = function()
-						OvaleState.state:PrintUnitAuras("player", "HELPFUL")
-						OvaleState.state:PrintUnitAuras("player", "HARMFUL")
-					end
+						if Ovale.OvaleState then
+							Ovale.OvaleState.state:PrintUnitAuras("player", "HELPFUL")
+							Ovale.OvaleState.state:PrintUnitAuras("player", "HARMFUL")
+						end
+					end,
 				},
 				glyph =
 				{
 					name = "List player glyphs",
 					type = "execute",
-					func = function() OvaleSpellBook:DebugGlyphs() end
+					func = function()
+						if Ovale.OvaleSpellBook then Ovale.OvaleSpellBook:DebugGlyphs() end
+					end,
 				},
 				spell =
 				{
 					name = "List player spells",
 					type = "execute",
-					func = function() OvaleSpellBook:DebugSpells() end
+					func = function()
+						if Ovale.OvaleSpellBook then Ovale.OvaleSpellBook:DebugSpells() end
+					end,
 				},
 				stance =
 				{
@@ -917,24 +699,18 @@ local self_options =
 		},
 	},
 }
---</private-static-properties>
+--</public-static-properties>
 
 --<public-static-methods>
 function OvaleOptions:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleDataBroker = Ovale.OvaleDataBroker
-	OvaleScripts = Ovale.OvaleScripts
-	OvaleSpellBook = Ovale.OvaleSpellBook
-	OvaleState = Ovale.OvaleState
-
-	local db = LibStub("AceDB-3.0"):New("OvaleDB", self_defaultDB)
-	self_options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(db)
+	local db = LibStub("AceDB-3.0"):New("OvaleDB", self.defaultDB)
+	self.options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(db)
 
 	-- Add dual-spec support
 	local LibDualSpec = LibStub("LibDualSpec-1.0",true)
 	if LibDualSpec then
 		LibDualSpec:EnhanceDatabase(db, "Ovale")
-		LibDualSpec:EnhanceOptions(self_options.args.profile, db)
+		LibDualSpec:EnhanceOptions(self.options.args.profile, db)
 	end
 	
 	db.RegisterCallback( self, "OnNewProfile", "HandleProfileChanges" )
@@ -945,18 +721,15 @@ function OvaleOptions:OnInitialize()
 	Ovale.db = db
 	self:UpgradeSavedVariables()
 
-	AceConfig:RegisterOptionsTable("Ovale", self_options.args.code)
-	AceConfig:RegisterOptionsTable("Ovale Actions", self_options.args.actions, "Ovale")
-	AceConfig:RegisterOptionsTable("Ovale Profile", self_options.args.profile)
-	AceConfig:RegisterOptionsTable("Ovale Apparence", self_options.args.apparence)
-	AceConfig:RegisterOptionsTable("Ovale Debug", self_options.args.debug)
+	AceConfig:RegisterOptionsTable(OVALE, self.options.args.apparence)
+	AceConfig:RegisterOptionsTable("Ovale Profile", self.options.args.profile)
+	AceConfig:RegisterOptionsTable("Ovale Debug", self.options.args.debug)
+	-- Slash commands.
+	AceConfig:RegisterOptionsTable("Ovale Actions", self.options.args.actions, "Ovale")
 
-	AceConfigDialog:AddToBlizOptions("Ovale", "Ovale")
-	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", "Ovale")
-	AceConfigDialog:AddToBlizOptions("Ovale Apparence", L["Apparence"], "Ovale")
-	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", "Ovale")
-
-	OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], db.profile.code)
+	AceConfigDialog:AddToBlizOptions(OVALE)
+	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", OVALE)
+	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", OVALE)
 end
 
 function OvaleOptions:OnEnable()
@@ -981,7 +754,7 @@ function OvaleOptions:UpgradeSavedVariables()
 	end
 	-- Re-register defaults so that any tables created during the upgrade are "populated"
 	-- by the default database automatically.
-	Ovale.db:RegisterDefaults(self_defaultDB)
+	Ovale.db:RegisterDefaults(self.defaultDB)
 end
 
 function OvaleOptions:HandleProfileChanges()
@@ -989,16 +762,8 @@ function OvaleOptions:HandleProfileChanges()
 	self:SendMessage("Ovale_ScriptChanged")
 end
 
-function OvaleOptions:SetScript(name)
-	local oldSource = Ovale.db.profile.source
-	if oldSource ~= name then
-		Ovale.db.profile.source = name
-		self:SendMessage("Ovale_ScriptChanged")
-	end
-end
-
 function OvaleOptions:ToggleConfig()
-	local frameName = "Ovale Apparence"
+	local frameName = OVALE
 	if AceConfigDialog.OpenFrames[frameName] then
 		AceConfigDialog:Close(frameName)
 	else

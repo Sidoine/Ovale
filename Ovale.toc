@@ -15,6 +15,7 @@ libs\libs.xml
 
 Ovale.lua
 Localization.lua
+OvaleOptions.lua
 
 # Profiling module.
 Profiler.lua
@@ -41,7 +42,6 @@ OvaleFuture.lua
 OvaleGUID.lua
 OvaleLatency.lua
 OvaleLexer.lua
-OvaleOptions.lua
 OvalePaperDoll.lua
 OvalePower.lua
 OvaleScore.lua

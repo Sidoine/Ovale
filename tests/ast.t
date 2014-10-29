@@ -24,6 +24,7 @@ do
 	local addonFiles = {
 		"Ovale.lua",
 		"Localization.lua",
+		"OvaleOptions.lua",
 		-- Profiling module.
 		"Profiler.lua",
 		-- Utility modules.

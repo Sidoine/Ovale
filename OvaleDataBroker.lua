@@ -9,11 +9,11 @@ Ovale.OvaleDataBroker = OvaleDataBroker
 
 --<private-static-properties>
 local L = Ovale.L
-
--- Forward declarations for module dependencies.
 local LibDataBroker = LibStub("LibDataBroker-1.1", true)
 local LibDBIcon = LibStub("LibDBIcon-1.0", true)
-local OvaleOptions = nil
+local OvaleOptions = Ovale.OvaleOptions
+
+-- Forward declarations for module dependencies.
 local OvaleScripts = nil
 
 local pairs = pairs
@@ -42,6 +42,37 @@ local _, self_class = API_UnitClass("player")
 
 local self_menuFrame = nil
 local self_tooltipTitle = nil
+
+do
+	local defaultDB = {
+		-- LibDBIcon-1.0 needs a table to store minimap settings.
+		minimap = {},
+	}
+
+	local options = {
+		minimap =
+		{
+			order = 25,
+			type = "toggle",
+			name = L["Show minimap icon"],
+			get = function(info)
+				return not Ovale.db.profile.apparence.minimap.hide
+			end,
+			set = function(info, value)
+				Ovale.db.profile.apparence.minimap.hide = not value
+				OvaleDataBroker:UpdateIcon()
+			end
+		},
+	}
+
+	-- Insert defaults and options into OvaleOptions.
+	for k, v in pairs(defaultDB) do
+		OvaleOptions.defaultDB.profile.apparence[k] = v
+	end
+	for k, v in pairs(options) do
+		OvaleOptions.options.args.apparence.args[k] = v
+	end
+end
 --</private-static-properties>
 
 --<public-static-properties>
@@ -59,7 +90,7 @@ local function OnClick(frame, button)
 		for name, description in pairs(descriptions) do
 			local menuItem = {
 				text = description,
-				func = function() OvaleOptions:SetScript(name) end,
+				func = function() OvaleScripts:SetScript(name) end,
 			}
 			tinsert(menu, menuItem)
 		end
