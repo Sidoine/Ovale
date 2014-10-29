@@ -967,6 +967,12 @@ function OvaleOptions:UpgradeSavedVariables()
 	local profile = Ovale.db.profile
 	-- All profile-specific debug options are removed.  They are now in the global database.
 	profile.debug = nil
+	-- If a debug option is toggled off, it is "stored" as nil, not "false".
+	for k, v in pairs(Ovale.db.global.debug) do
+		if not v then
+			Ovale.db.global.debug[k] = nil
+		end
+	end
 	-- SpellFlash options have been moved and renamed.
 	if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
 		local enabled = profile.apparence.spellFlash
