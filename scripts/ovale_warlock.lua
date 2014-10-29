@@ -532,8 +532,10 @@ AddFunction DestructionDefaultActions
 
 AddFunction DestructionDefaultPredictActions
 {
+	# CHANGE: Resurrect level 90 conditions for casting Shadowburn.
 	#shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|target.time_to_die<20|trinket.proc.intellect.react|(trinket.stacking_proc.intellect.remains<cast_time*4&trinket.stacking_proc.intellect.remains>cast_time))
-	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or target.TimeToDie() < 20 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } Spell(shadowburn)
+	#if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or target.TimeToDie() < 20 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) } Spell(shadowburn)
+	if Level() <= 90 and { BurningEmbers() / 10 >= 3.5 or target.TimeToDie() < 20 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(shadowburn) or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) } Spell(shadowburn)
 	#immolate,if=remains<=cast_time
 	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) Spell(immolate)
 	#conflagrate,if=charges=2
