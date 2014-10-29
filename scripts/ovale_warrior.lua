@@ -1059,6 +1059,8 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
+	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	InterruptActions()
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up
