@@ -190,6 +190,7 @@ do
 		template = template or {}
 		local db = DeepCopy(template)
 		db.RegisterCallback = function(...) end
+		db.RegisterDefaults = function(...) end
 		return db
 	end
 end
