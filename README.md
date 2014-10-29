@@ -64,5 +64,10 @@ The cooldown that is displayed in an icon is not always the true action cooldown
 ##### Why can't I click on the icon to cast the spell?
 Blizzard does not allow this.  Only a predefined sequence of spells can be bound to an action icon and this sequence can not change in combat.
 
+##### How do I make the spells flash on the action bar?
+Simply install [SpellFlashCore][] (included if you install [SpellFlash][]) and [Ovale][] will use it to flash the spell to cast on the action bar in addition to displaying the spell in the Ovale icon bar.
+
 ##### On my low-level character, there is nothing at all.
 You need to reach level 10 and choose a specialization.
+
+  [SpellFlash]: http://www.curse.com/addons/wow/spellflash
