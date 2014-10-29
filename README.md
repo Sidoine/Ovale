@@ -7,7 +7,7 @@ It displays one or more icons that show the cooldown of an action.  The action i
   [Corruption]: http://www.wowhead.com/spell=172
   [Shadow Bolt]: http://www.wowhead.com/spell=686
 
-The [current 6.0.0 beta release][beta] of Ovale currently provides default scripts for the following classes for *Warlords of Draenor*:
+The [current release] of Ovale provides default scripts for the following classes for *Warlords of Draenor*:
 
 - Death Knight: Blood, Frost, Unholy
 - Druid: Feral, Guardian **(Balance is NOT currently supported)**
@@ -32,22 +32,16 @@ See the [video of a survival hunter][ovale-video] using [Ovale][ovale] during *W
 
 **Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets].**
 
-  [beta]: http://www.curse.com/addons/wow/ovale#t1:other-downloads
   [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
   [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
 
 Features
 ========
 
-- Tracks DoTs, buffs, debuffs, cooldowns, combo points, runes, mana, everything that a player would need to choose what to do.
+- Tracks DoTs, buffs, debuffs, cooldowns, combo points, runes, mana -- everything that a player would need to decide what to do.
 - Adapts to your talent points and glyphs.
-- Change quickly the configuration at any time with configurable checkboxes and drop-down lists that can be shown/hidden by clicking on the icons, e.g. switching between single and multi-target damage, setting the curse to cast.
-- Multi-target DoT tracking: remember which target had a DoT and when the DoT will expire, allowing the script author to support multi-target dotting.
-- Compatible with the action icon skinning library [Masque][].
 - 100% configurable: everything is in an easy-to-understand script that you can modify and test in real-time without reloading your UI.
-- Can be used to track crowd-control spells on your focus.
-- Scoring system: evaluate how well you followed the script.  Add a new Ovale panel in [Recount][] and [Skada][], with a score between 0 (very bad) and 1000 (perfect).
-- Up to two-spells-ahead accuracy with some classes.
+- Compatible with the action icon skinning library [Masque][].
 - Use [SpellFlashCore][] to flash abilities on action bars in addition, or as an alternative, to displaying the ability icons.
 
   [Masque]: http://www.curse.com/addons/wow/masque
@@ -59,16 +53,10 @@ FAQ
 ===
 
 ##### Why does it not work for me?
-Try to reset your Profile in the [Ovale][ovale] settings.  Most problems come from faulty scripts.
+Try to reset your Profile in the [Ovale][ovale] settings.
 
 ##### Why is the key binding displayed for an action wrong?
-The action may be in several action bars, e.g., the bars that you can cycle through or the bars that appear in special cases like [Shadowform][] or [Cat Form][].
-
-  [Shadowform]: http://www.wowhead.com/spell=15473
-  [Cat Form]: http://www.wowhead.com/spell=768
-
-##### Why is the key binding not displayed at all?
-The action must be in your standard Blizzard action bar in order for [Ovale][ovale] to know which key binding is used.
+You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.
 
 ##### Why is the icon sometimes red?
 The cooldown that is displayed in an icon is not always the true action cooldown.  If this cooldown is longer than the action cooldown, then the icon is red.  In most cases, it means that if you use this action too soon, then you will overwrite or clip a DoT, which may not be what you want.
