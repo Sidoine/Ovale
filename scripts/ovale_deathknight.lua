@@ -92,8 +92,10 @@ AddFunction BloodDefaultActions
 	if BuffPresent(conversion_buff) and not { RunicPower() > 50 and HealthPercent() < 90 } Spell(conversion text=cancel)
 	#death_strike,if=incoming_damage_5s>=health.max*0.65
 	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
+	# CHANGE: Fix condition so Outbreak is used when the diseases will expire.
 	#outbreak,if=(!talent.necrotic_plague.enabled&!disease.min_remains<8)|!disease.ticking
-	if not Talent(necrotic_plague_talent) and not target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
+	#if not Talent(necrotic_plague_talent) and not target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
+	if not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
 	#death_coil,if=runic_power>90
 	if RunicPower() > 90 Spell(death_coil)
 	#plague_strike,if=(!talent.necrotic_plague.enabled&!dot.blood_plague.ticking)|(talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking)
@@ -113,8 +115,9 @@ AddFunction BloodDefaultActions
 	if Enemies() > 1 Spell(death_and_decay)
 	#blood_boil,if=blood=2
 	if Runes(blood 2) Spell(blood_boil)
+	# CHANGE: Don't waste Death Runes spamming Blood Boil.
 	#blood_boil
-	Spell(blood_boil)
+	#Spell(blood_boil)
 	#death_coil
 	Spell(death_coil)
 }
@@ -139,7 +142,7 @@ AddFunction BloodDefaultShortCdActions
 		#death_pact,if=health.pct<50
 		if HealthPercent() < 50 Spell(death_pact)
 
-		unless { not Talent(necrotic_plague_talent) and not target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak)
+		unless { not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak)
 			or RunicPower() > 90 and Spell(death_coil)
 			or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(plague_strike)
 			or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(icy_touch)
