@@ -61,8 +61,8 @@ AddFunction FireDefaultActions
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=combust_sequence,if=pyro_chain
 	if GetState(pyro_chain) > 0 FireCombustSequenceActions()
-	#call_action_list,name=crystal_sequence,if=pet.prismatic_crystal.active
-	if TotemPresent(crystal totem=prismatic_crystal) FireCrystalSequenceActions()
+	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
+	if Talent(prismatic_crystal_talent) and TotemPresent(crystal totem=prismatic_crystal) FireCrystalSequenceActions()
 	#call_action_list,name=init_combust,if=!pyro_chain
 	if not GetState(pyro_chain) > 0 FireInitCombustActions()
 	#rune_of_power,if=buff.rune_of_power.remains<action.fireball.execute_time+gcd.max&!(buff.heating_up.up&action.fireball.in_flight)
@@ -107,10 +107,10 @@ AddFunction FireSingleTargetActions
 	if target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() or target.DebuffPresent(living_bomb_debuff) and DebuffCountOnAny(living_bomb_debuff) < Enemies() Spell(inferno_blast)
 	#pyroblast,if=buff.pyroblast.up&buff.pyroblast.remains<action.fireball.execute_time
 	if BuffPresent(pyroblast_buff) and BuffRemaining(pyroblast_buff) < ExecuteTime(fireball) Spell(pyroblast)
-	#pyroblast,if=buff.pyroblast.up&buff.potent_flames.up&buff.potent_flames.remains<gcd.max
-	if BuffPresent(pyroblast_buff) and BuffPresent(potent_flames_buff) and BuffRemaining(potent_flames_buff) < GCD() Spell(pyroblast)
-	#pyroblast,if=buff.pyromaniac.react
-	if BuffPresent(pyromaniac_buff) Spell(pyroblast)
+	#pyroblast,if=set_bonus.tier16_2pc_caster&buff.pyroblast.up&buff.potent_flames.up&buff.potent_flames.remains<gcd.max
+	if ArmorSetBonus(T16_caster 2) and BuffPresent(pyroblast_buff) and BuffPresent(potent_flames_buff) and BuffRemaining(potent_flames_buff) < GCD() Spell(pyroblast)
+	#pyroblast,if=set_bonus.tier17_4pc&buff.pyromaniac.react
+	if ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) Spell(pyroblast)
 	#pyroblast,if=buff.pyroblast.up&buff.heating_up.up&action.fireball.in_flight
 	if BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) Spell(pyroblast)
 	#inferno_blast,if=buff.pyroblast.down&buff.heating_up.up
@@ -151,8 +151,8 @@ AddFunction FireCombustSequenceActions
 	UsePotionIntellect()
 	#meteor
 	Spell(meteor)
-	#pyroblast,if=buff.pyromaniac.up
-	if BuffPresent(pyromaniac_buff) Spell(pyroblast)
+	#pyroblast,if=set_bonus.tier17_4pc&buff.pyromaniac.up
+	if ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) Spell(pyroblast)
 	#inferno_blast,if=set_bonus.tier16_4pc_caster&(buff.pyroblast.up^buff.heating_up.up)
 	if ArmorSetBonus(T16_caster 4) and { BuffPresent(pyroblast_buff) xor BuffPresent(heating_up_buff) } Spell(inferno_blast)
 	#fireball,if=!dot.ignite.ticking&!in_flight

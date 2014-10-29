@@ -85,8 +85,8 @@ AddFunction BloodDefaultActions
 	if HealthPercent() < 80 and BuffExpires(army_of_the_dead_buff) and BuffExpires(icebound_fortitude_buff) and BuffExpires(bone_shield_buff) and BuffExpires(vampiric_blood_buff) Spell(dancing_rune_weapon)
 	#death_pact,if=health.pct<50
 	if HealthPercent() < 50 Spell(death_pact)
-	#outbreak,if=(!talent.necrotic_plague.enabled&!disease.min_remains<8)|!disease.ticking
-	if not Talent(necrotic_plague_talent) and not target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
+	#outbreak,if=(!talent.necrotic_plague.enabled&disease.min_remains<8)|!disease.ticking
+	if not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
 	#death_coil,if=runic_power>90
 	if RunicPower() > 90 Spell(death_coil)
 	#plague_strike,if=(!talent.necrotic_plague.enabled&!dot.blood_plague.ticking)|(talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking)
@@ -105,8 +105,6 @@ AddFunction BloodDefaultActions
 	if Runes(blood 2) Spell(blood_boil)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#blood_boil
-	Spell(blood_boil)
 	#death_coil
 	Spell(death_coil)
 	#empower_rune_weapon,if=!blood&!unholy&!frost

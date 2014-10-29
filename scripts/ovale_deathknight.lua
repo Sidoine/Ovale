@@ -92,9 +92,7 @@ AddFunction BloodDefaultActions
 	if BuffPresent(conversion_buff) and not { RunicPower() > 50 and HealthPercent() < 90 } Spell(conversion text=cancel)
 	#death_strike,if=incoming_damage_5s>=health.max*0.65
 	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
-	# CHANGE: Fix condition so Outbreak is used when the diseases will expire.
-	#outbreak,if=(!talent.necrotic_plague.enabled&!disease.min_remains<8)|!disease.ticking
-	#if not Talent(necrotic_plague_talent) and not target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
+	#outbreak,if=(!talent.necrotic_plague.enabled&disease.min_remains<8)|!disease.ticking
 	if not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() Spell(outbreak)
 	#death_coil,if=runic_power>90
 	if RunicPower() > 90 Spell(death_coil)
@@ -112,12 +110,8 @@ AddFunction BloodDefaultActions
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Runes(blood 1) Spell(soul_reaper_blood)
 	# CHANGE: Prefer Death and Decay over Blood Boil in AoE/cleave situations.
 	if Enemies() > 1 and Runes(blood 2) Spell(death_and_decay)
-	if Enemies() > 1 Spell(death_and_decay)
 	#blood_boil,if=blood=2
 	if Runes(blood 2) Spell(blood_boil)
-	# CHANGE: Don't waste Death Runes spamming Blood Boil.
-	#blood_boil
-	#Spell(blood_boil)
 	#death_coil
 	Spell(death_coil)
 }
