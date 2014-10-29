@@ -165,8 +165,8 @@ AddFunction ShadowDecisionActions
 
 AddFunction ShadowCopAdvancedMfiDotsActions
 {
-	#mind_spike,if=(target.dot.shadow_word_pain.ticking&target.dot.shadow_word_pain.remains<gcd*0.5)|(target.dot.vampiric_touch.ticking&target.dot.vampiric_touch.remains<gcd*0.5)
-	if target.DebuffPresent(shadow_word_pain_debuff) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() * 0.5 or target.DebuffPresent(vampiric_touch_debuff) and target.DebuffRemaining(vampiric_touch_debuff) < GCD() * 0.5 Spell(mind_spike)
+	#mind_spike,if=((target.dot.shadow_word_pain.ticking&target.dot.shadow_word_pain.remains<gcd)|(target.dot.vampiric_touch.ticking&target.dot.vampiric_touch.remains<gcd))&!target.dot.devouring_plague.ticking
+	if { target.DebuffPresent(shadow_word_pain_debuff) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() or target.DebuffPresent(vampiric_touch_debuff) and target.DebuffRemaining(vampiric_touch_debuff) < GCD() } and not target.DebuffPresent(devouring_plague_debuff) Spell(mind_spike)
 	#shadow_word_pain,if=!ticking&miss_react&!target.dot.vampiric_touch.ticking
 	if not target.DebuffPresent(shadow_word_pain_debuff) and True(miss_react) and not target.DebuffPresent(vampiric_touch_debuff) Spell(shadow_word_pain)
 	#vampiric_touch,if=!ticking&miss_react
