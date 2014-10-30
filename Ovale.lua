@@ -220,8 +220,6 @@ function Ovale:UpdateVisibility()
 		visible = false
 	elseif not self.frame.hider:IsVisible() then
 		visible = false
-	elseif not profile.display then
-		visible = false
 	else
 		if profile.apparence.hideVehicule and API_UnitHasVehicleUI("player") then
 			visible = false

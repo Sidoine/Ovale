@@ -35,7 +35,6 @@ OvaleOptions.defaultDB = {
 		debug = {},
 	},
 	profile = {
-		display = true,
 		left = 500,
 		top = 500,
 		check = {},
@@ -569,8 +568,8 @@ OvaleOptions.options = {
 					name = L["Afficher la fenêtre"],
 					guiHidden = true,
 					func = function()
-						Ovale.db.profile.display = true
-						Ovale:UpdateVisibility()
+						Ovale.db.profile.apparence.enableIcons = true
+						OvaleOptions:SendMessage("Ovale_OptionChanged", "visibility")
 					end
 				},
 				hide =
@@ -579,8 +578,8 @@ OvaleOptions.options = {
 					name = L["Cacher la fenêtre"],
 					guiHidden = true,
 					func = function()
-						Ovale.db.profile.display = false
-						Ovale.frame:Hide()	
+						Ovale.db.profile.apparence.enableIcons = false
+						OvaleOptions:SendMessage("Ovale_OptionChanged", "visibility")
 					end
 				},
 				config  =
@@ -746,6 +745,9 @@ function OvaleOptions:UpgradeSavedVariables()
 			Ovale.db.global.debug[k] = nil
 		end
 	end
+	-- Merge two options that had the same meaning.
+	profile.apparence.enableIcons = profile.display
+	profile.display = nil
 	-- SpellFlash options have been moved and renamed.
 	if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
 		local enabled = profile.apparence.spellFlash
