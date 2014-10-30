@@ -1,5 +1,6 @@
 ChangeLog*
 libs/*
 !libs/*.xml
+scratch/**
 tests/OUT*
 tests/*.bat
