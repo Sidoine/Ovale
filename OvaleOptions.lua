@@ -31,9 +31,6 @@ local _, self_class = API_UnitClass("player")
 --<public-static-properties>
 -- AceDB default database.
 OvaleOptions.defaultDB = {
-	global = {
-		debug = {},
-	},
 	profile = {
 		left = 500,
 		top = 500,
@@ -355,207 +352,6 @@ OvaleOptions.options = {
 				},
 			},
 		},
-		debug =
-		{
-			name = "Debug",
-			type = "group",
-			args =
-			{
-				toggles =
-				{
-					name = "Options",
-					type = "group",
-					order = 10,
-					args =
-					{
-						-- Node names must match the names of the debug flags.
-						action_bar =
-						{
-							name = "Action bars",
-							desc = L["Debug action bars"],
-							type = "toggle",
-						},
-						aura =
-						{
-							name = "Auras",
-							desc = L["Debug aura"],
-							type = "toggle",
-						},
-						combo_points =
-						{
-							name = "Combo points",
-							desc = L["Debug combo points"],
-							type = "toggle",
-						},
-						compile =
-						{
-							name = "Compile",
-							desc = L["Debug compile"],
-							type = "toggle",
-						},
-						damage_taken =
-						{
-							name = "Damage taken",
-							desc = L["Debug damage taken"],
-							type = "toggle",
-						},
-						enemy =
-						{
-							name = "Enemies",
-							desc = L["Debug enemies"],
-							type = "toggle",
-						},
-						guid =
-						{
-							name = "GUIDs",
-							desc = L["Debug GUID"],
-							type = "toggle",
-						},
-						missing_spells =
-						{
-							name = "Missing spells",
-							desc = L["Debug missing spells"],
-							type = "toggle",
-						},
-						paper_doll =
-						{
-							name = "Paper doll updates",
-							desc = L["Debug paper doll"],
-							type = "toggle",
-						},
-						power =
-						{
-							name = "Power",
-							desc = L["Debug power"],
-							type = "toggle",
-						},
-						snapshot =
-						{
-							name = "Snapshot updates",
-							desc = L["Debug stat snapshots"],
-							type = "toggle",
-						},
-						spellbook =
-						{
-							name = "Spellbook changes",
-							desc = L["Debug spellbook changes"],
-							type = "toggle",
-						},
-						steady_focus =
-						{
-							name = "Steady Focus",
-							desc = L["Debug Steady Focus"],
-							type = "toggle",
-						},
-						unknown_spells =
-						{
-							name = "Unknown spells",
-							desc = L["Debug unknown spells"],
-							type = "toggle",
-						},
-					},
-					get = function(info)
-						local value = Ovale.db.global.debug[info[#info]]
-						return (value ~= nil)
-					end,
-					set = function(info, value)
-						if value then
-							Ovale.db.global.debug[info[#info]] = value
-						else
-							Ovale.db.global.debug[info[#info]] = nil
-						end
-					end,
-				},
-				trace =
-				{
-					name = "Trace",
-					type = "group",
-					order = 20,
-					args =
-					{
-						trace =
-						{
-							order = 10,
-							type = "execute",
-							name = "Trace next frame",
-							func = function()
-								Ovale:ClearLog()
-								Ovale.trace = true
-								Ovale:Logf("=== Trace @%f", API_GetTime())
-							end,
-						},
-						traceSpellId =
-						{
-							order = 20,
-							type = "input",
-							name = "Trace spellcast",
-							desc = "Names or spell IDs of spellcasts to watch, separated by semicolons.",
-							get = function(info)
-								local OvaleFuture = Ovale.OvaleFuture
-								if OvaleFuture then
-									local t = OvaleFuture.traceSpellList or {}
-									local s = ""
-									for k, v in pairs(t) do
-										if type(v) == "boolean" then
-											if string.len(s) == 0 then
-												s = k
-											else
-												s = s .. "; " .. k
-											end
-										end
-									end
-									return s
-								else
-									return ""
-								end
-							end,
-							set = function(info, value)
-								local OvaleFuture = Ovale.OvaleFuture
-								if OvaleFuture then
-									local t = {}
-									for s in gmatch(value, "[^;]+") do
-										-- strip leading and trailing whitespace
-										s = gsub(s, "^%s*", "")
-										s = gsub(s, "%s*$", "")
-										if string.len(s) > 0 then
-											local v = tonumber(s)
-											if v then
-												s = API_GetSpellInfo(v)
-												if s then
-													t[v] = true
-													t[s] = v
-												end
-											else
-												t[s] = true
-											end
-										end
-									end
-									if next(t) then
-										OvaleFuture.traceSpellList = t
-									else
-										OvaleFuture.traceSpellList = nil
-									end
-								end
-							end,
-						},
-					},
-				},
-				traceLog = {
-					name = L["Trace Log"],
-					type = "group",
-					order = 30,
-					args = {
-						traceLog = {
-							name = L["Trace Log"],
-							type = "input",
-							multiline = 25,
-							width = "full",
-							get = function() return Ovale:TraceLog() end,
-						},
-					},
-				},
-			},
-		},
 		actions =
 		{
 			name = "Actions",
@@ -589,16 +385,6 @@ OvaleOptions.options = {
 					func = function()
 						local appName = OVALE
 						AceConfigDialog:SetDefaultSize(appName, 500, 550)
-						AceConfigDialog:Open(appName)
-					end,
-				},
-				debug =
-				{
-					name = "Debug",
-					type = "execute",
-					func = function()
-						local appName = OVALE .. " Debug"
-						AceConfigDialog:SetDefaultSize(appName, 800, 550)
 						AceConfigDialog:Open(appName)
 					end,
 				},
@@ -722,13 +508,11 @@ function OvaleOptions:OnInitialize()
 
 	AceConfig:RegisterOptionsTable(OVALE, self.options.args.apparence)
 	AceConfig:RegisterOptionsTable("Ovale Profile", self.options.args.profile)
-	AceConfig:RegisterOptionsTable("Ovale Debug", self.options.args.debug)
 	-- Slash commands.
 	AceConfig:RegisterOptionsTable("Ovale Actions", self.options.args.actions, "Ovale")
 
 	AceConfigDialog:AddToBlizOptions(OVALE)
 	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", OVALE)
-	AceConfigDialog:AddToBlizOptions("Ovale Debug", "Debug", OVALE)
 end
 
 function OvaleOptions:OnEnable()

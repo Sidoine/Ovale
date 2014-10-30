@@ -477,7 +477,7 @@ end
 
 function OvaleCompile:CompileScript(name)
 	-- Reset the trace state if we compile a new script.
-	Ovale:ResetTrace()
+	OvaleDebug:ResetTrace()
 	-- Generate the node tree from the named script.
 	Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "Compiling script '%s'.", name)
 	if self.ast then

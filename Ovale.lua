@@ -17,7 +17,6 @@ local format = string.format
 local next = next
 local pairs = pairs
 local select = select
-local tconcat = table.concat
 local tostring = tostring
 local unpack = unpack
 local wipe = table.wipe
@@ -35,15 +34,6 @@ local OVALE_FALSE_STRING = tostring(false)
 local OVALE_NIL_STRING = tostring(nil)
 local OVALE_TRUE_STRING = tostring(true)
 
--- Flags used by debugging print functions.
--- If "bug" flag is set, then the next frame refresh is traced.
-local self_bug = false
--- If "traced" flag is set, then the public "trace" property is toggled before the next frame refresh.
-local self_traced = false
--- Table of lines output using Log() or Logf() methods.
-local self_traceLog = {}
--- Maximum length of the trace log.
-local OVALE_TRACELOG_MAXLINES = 4096	-- 2^14
 -- Table of strings to display once per session.
 local self_oneTimeMessage = {}
 --</private-static-properties>
@@ -63,8 +53,6 @@ Ovale.list = {}
 -- Checkbox and dropdown GUI controls.
 Ovale.checkBoxWidget = {}
 Ovale.listWidget = {}
--- Flag to activate tracing the function calls for the next frame refresh.
-Ovale.trace = false
 --in combat?
 Ovale.enCombat = false
 Ovale.refreshNeeded = {}
@@ -304,28 +292,6 @@ function Ovale:UpdateFrame()
 	self:UpdateVisibility()
 end
 
-function Ovale:ResetTrace()
-	self.trace = false
-	self_traced = false
-	self_bug = false
-end
-
-function Ovale:UpdateTrace()
-	-- If trace flag is set here, then flag that we just traced one frame.
-	if self.trace then
-		self_traced = true
-	end
-	-- If there was a bug, then enable trace on the next frame.
-	if self_bug then
-		self.trace = true
-	end
-	-- Toggle trace flag so we don't endlessly trace successive frames.
-	if self.trace and self_traced then
-		self_traced = false
-		self.trace = false
-	end
-end
-
 function Ovale:IsChecked(name)
 	local widget = self.checkBoxWidget[name]
 	return widget and widget:GetValue()
@@ -390,71 +356,28 @@ function Ovale:FormatPrint(...)
 	self:Print(self:Format(...))
 end
 
-function Ovale:DebugPrint(flag, ...)
-	local global = self.db.global
-	if global and global.debug and global.debug[flag] then
-		self:Print("[" .. flag .. "]", ...)
-	end
+function Ovale:DebugPrint(...)
+	return Ovale.OvaleDebug:DebugPrint(...)
 end
 
-function Ovale:DebugPrintf(flag, ...)
-	local global = self.db.global
-	if global and global.debug and global.debug[flag] then
-		local addTimestamp = select(1, ...)
-		if type(addTimestamp) == "boolean" or type(addTimestamp) == "nil" then
-			if addTimestamp then
-				local now = API_GetTime()
-				self:Printf("[%s] @%f %s", flag, now, self:Format(select(2, ...)))
-			else
-				self:Printf("[%s] %s", flag, self:Format(select(2, ...)))
-			end
-		else
-			self:Printf("[%s] %s", flag, self:Format(...))
-		end
-	end
+function Ovale:DebugPrintf(...)
+	return Ovale.OvaleDebug:DebugPrintf(...)
 end
 
 function Ovale:Error(...)
-	self:Print("Fatal error: ", ...)
-	self_bug = true
+	return Ovale.OvaleDebug:Error(...)
 end
 
 function Ovale:Errorf(...)
-	self:Printf("Fatal error: %s", self:Format(...))
-	self_bug = true
+	return Ovale.OvaleDebug:Errorf(...)
 end
 
 function Ovale:Log(...)
-	if self.trace then
-		local N = #self_traceLog
-		if N < OVALE_TRACELOG_MAXLINES - 1 then
-			local output = { ... }
-			self_traceLog[N + 1] = tconcat(output, "\t")
-		elseif N == OVALE_TRACELOG_MAXLINES - 1 then
-			self_traceLog[N + 1] = "WARNING: Maximum length of trace log has been reached."
-		end
-	end
+	return Ovale.OvaleDebug:Log(...)
 end
 
 function Ovale:Logf(...)
-	local N = #self_traceLog
-	if self.trace then
-		if N < OVALE_TRACELOG_MAXLINES - 1 then
-			self_traceLog[N + 1] = self:Format(...)
-		elseif N == OVALE_TRACELOG_MAXLINES - 1 then
-			self_traceLog[N + 1] = "WARNING: Maximum length of trace log has been reached."
-		end
-	end
-end
-
--- Reset/empty the contents of the trace log.
-function Ovale:ClearLog()
-	wipe(self_traceLog)
-end
-
--- Return the contents of the trace log as a string.
-function Ovale:TraceLog()
-	return tconcat(self_traceLog, "\n")
+	return Ovale.OvaleDebug:Logf(...)
 end
 
 function Ovale:OneTimeMessage(...)

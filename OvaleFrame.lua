@@ -14,6 +14,7 @@ do
 	local OvaleBestAction = Ovale.OvaleBestAction
 	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCooldown = Ovale.OvaleCooldown
+	local OvaleDebug = Ovale.OvaleDebug
 	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleSpellFlash = Ovale.OvaleSpellFlash
 	local OvaleState = Ovale.OvaleState
@@ -206,7 +207,7 @@ do
 		end
 
 		wipe(Ovale.refreshNeeded)
-		Ovale:UpdateTrace()
+		OvaleDebug:UpdateTrace()
 		Ovale:PrintOneTimeMessages()
 	end
 
