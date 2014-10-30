@@ -23,9 +23,6 @@ local API_UnitCanAttack = UnitCanAttack
 -- Local reference to SpellFlashCore addon.
 local SpellFlashCore = nil
 
--- Time in seconds to start flashing the spell to use before it is ready.
-local FLASH_THRESHOLD = 0.5
-
 -- Flash colors.
 local colorMain = {}
 local colorShortCd = {}
@@ -63,6 +60,7 @@ do
 			hideInVehicle = false,
 			inCombat = false,
 			size = 2.4,
+			threshold = 500,
 			colorMain = { r = 1, g = 1, b = 1 },		-- white
 			colorShortCd = { r = 1, g = 1, b = 0 },		-- yellow
 			colorCd = { r = 1, g = 1, b = 0 },			-- yellow
@@ -143,8 +141,18 @@ do
 						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
 					end,
 				},
-				colors = {
+				threshold = {
 					order = 70,
+					type = "range",
+					name = L["Flash threshold"],
+					desc = L["Time (in milliseconds) to begin flashing the spell to use before it is ready."],
+					min = 0, max = 1000, step = 1, bigStep = 50,
+					disabled = function()
+						return not SpellFlashCore or not Ovale.db.profile.apparence.spellFlash.enabled
+					end,
+				},
+				colors = {
+					order = 80,
 					type = "group",
 					name = L["Colors"],
 					inline = true,
@@ -262,7 +270,9 @@ function OvaleSpellFlash:IsSpellFlashEnabled()
 end
 
 function OvaleSpellFlash:Flash(node, element, start, now)
-	if self:IsSpellFlashEnabled() and start and start - now < FLASH_THRESHOLD then
+	-- SpellFlash settings.
+	local db = Ovale.db.profile.apparence.spellFlash
+	if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
 		-- Check that element is an action.
 		if element and element.type == "action" then
 			-- SpellInfo data if the action is a spell.
@@ -271,8 +281,6 @@ function OvaleSpellFlash:Flash(node, element, start, now)
 				local spellId = element.params[1]
 				si = OvaleData.spellInfo[spellId]
 			end
-			-- SpellFlash settings.
-			local db = Ovale.db.profile.apparence.spellFlash
 
 			-- Flash color.
 			local color = COLORTABLE["white"]
