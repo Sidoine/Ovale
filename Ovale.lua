@@ -34,13 +34,16 @@ local OVALE_FALSE_STRING = tostring(false)
 local OVALE_NIL_STRING = tostring(nil)
 local OVALE_TRUE_STRING = tostring(true)
 
+local OVALE_VERSION = "@project-version@"
+local REPOSITORY_KEYWORD = "@" .. "project_version" .. "@"
+
 -- Table of strings to display once per session.
 local self_oneTimeMessage = {}
 --</private-static-properties>
 
 --<public-static-properties>
 -- Project version number.
-Ovale.version = "@project-version@"
+Ovale.version = (OVALE_VERSION == REPOSITORY_KEYWORD) and OVALE_VERSION or "development version"
 -- Localization string table.
 Ovale.L = nil
 -- AceDB-3.0 database to handle SavedVariables (managed by OvaleOptions).
