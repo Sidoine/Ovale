@@ -8,6 +8,10 @@ local OvaleSimulationCraft = Ovale:NewModule("OvaleSimulationCraft")
 Ovale.OvaleSimulationCraft = OvaleSimulationCraft
 
 --<private-static-properties>
+local AceConfig = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local L = Ovale.L
+local OvaleOptions = Ovale.OvaleOptions
 local OvalePool = Ovale.OvalePool
 
 -- Forward declarations for module dependencies.
@@ -203,6 +207,30 @@ do
 			self_childrenPool:Release(node.child)
 			node.child = nil
 		end
+	end
+end
+
+-- Save the most recent profile entered into the SimulationCraft input window.
+local self_lastSimC = nil
+-- Save the most recent script translated from the profile in the SimulationCraft input window.
+local self_lastScript = nil
+
+do
+	-- Add a slash command "/ovale simc" to access the GUI for this module.
+	local actions = {
+		simc  = {
+			name = "SimulationCraft",
+			type = "execute",
+			func = function()
+				local appName = OvaleSimulationCraft:GetName()
+				AceConfigDialog:SetDefaultSize(appName, 700, 550)
+				AceConfigDialog:Open(appName)
+			end,
+		},
+	}
+	-- Inject into OvaleOptions.
+	for k, v in pairs(actions) do
+		OvaleOptions.options.args.actions.args[k] = v
 	end
 end
 --</private-static-properties>
@@ -471,6 +499,10 @@ ParseAction = function(action, nodeList, annotation)
 	local ok = true
 	local stream = action
 	do
+		-- Fix "|" being silently replaced by "||" in WoW strings entered via an edit box.
+		stream = gsub(stream, "||", "|")
+	end
+	do
 		-- Fix bugs in SimulationCraft action lists.
 		-- ",," into ","
 		stream = gsub(stream, ",,", ",")
@@ -597,7 +629,9 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 				end
 			else
 				ok, node = ParseSimpleExpression(tokenStream, nodeList, annotation)
-				node.asType = "boolean"
+				if ok and node then
+					node.asType = "boolean"
+				end
 			end
 		end
 	end
@@ -3357,6 +3391,7 @@ function OvaleSimulationCraft:OnInitialize()
 	OvalePower = Ovale.OvalePower
 
 	InitializeDisambiguation()
+	self:CreateOptions()
 end
 
 function OvaleSimulationCraft:Debug()
@@ -3576,5 +3611,57 @@ function OvaleSimulationCraft:Emit(profile)
 	local s = tconcat(output, "\n")
 	self_outputPool:Release(output)
 	return s
+end
+
+function OvaleSimulationCraft:CreateOptions()
+	local options = {
+		name = "SimulationCraft",
+		type = "group",
+		args = {
+			input = {
+				name = L["Input"],
+				type = "group",
+				args = {
+					input = {
+						name = L["Profile"],
+						desc = L["The contents of a SimulationCraft profile (*.simc)."],
+						type = "input",
+						multiline = 25,
+						width = "full",
+						get = function(info) return self_lastSimC end,
+						set = function(info, value)
+							self_lastSimC = value
+							local profile = self:ParseProfile(self_lastSimC)
+							local code = ""
+							if profile then
+								code = self:Emit(profile)
+							end
+							-- Substitute spaces for tabs.
+							self_lastScript = gsub(code, "\t", "    ")
+						end,
+					},
+				},
+			},
+			output = {
+				name = L["Output"],
+				type = "group",
+				args = {
+					output = {
+						name = L["Code"],
+						desc = L["The script translated from the SimulationCraft profile."],
+						type = "input",
+						multiline = 25,
+						width = "full",
+						get = function() return self_lastScript end,
+					},
+				},
+			},
+		},
+	}
+
+	local appName = self:GetName()
+	AceConfig:RegisterOptionsTable(appName, options)
+	-- Don't expose this in the Blizzard Interface Addons panel.
+	--AceConfigDialog:AddToBlizOptions(appName, "SimulationCraft", OVALE)
 end
 --</public-static-methods>
