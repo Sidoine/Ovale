@@ -19,6 +19,9 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleData = nil
@@ -58,6 +61,9 @@ local PENDING_THRESHOLD = 0.8
 local self_updateSpellcastInfo = {}
 
 local OVALE_COMBO_POINTS_DEBUG = "combo_points"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_COMBO_POINTS_DEBUG, L["Combo points"], L["Debug combo points"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

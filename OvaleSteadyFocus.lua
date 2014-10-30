@@ -26,6 +26,9 @@ local OvaleSteadyFocus = Ovale:NewModule("OvaleSteadyFocus", "AceEvent-3.0")
 Ovale.OvaleSteadyFocus = OvaleSteadyFocus
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleSpellBook = nil
@@ -66,6 +69,9 @@ local RANGED_ATTACKS = {
 }
 
 local OVALE_STEADY_FOCUS_DEBUG = "steady_focus"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_STEADY_FOCUS_DEBUG, L["Steady Focus"], L["Debug Steady Focus"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

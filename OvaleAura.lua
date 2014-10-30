@@ -21,6 +21,8 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePool
 
 -- Forward declarations for module dependencies.
@@ -73,6 +75,9 @@ end
 local UNKNOWN_GUID = 0
 
 local OVALE_AURA_DEBUG = "aura"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_AURA_DEBUG, L["Auras"], L["Debug auras"])
+end
 
 -- Aura debuff types.
 local DEBUFF_TYPES = {

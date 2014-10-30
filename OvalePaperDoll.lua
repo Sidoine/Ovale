@@ -19,6 +19,8 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePoolRefCount
 
 -- Forward declarations for module dependencies.
@@ -61,6 +63,10 @@ local self_snapshotCount = 0
 
 local OVALE_PAPERDOLL_DEBUG = "paper_doll"
 local OVALE_SNAPSHOT_DEBUG = "snapshot"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_PAPERDOLL_DEBUG, L["Paper doll updates"], L["Debug paper doll"])
+	OvaleDebug:RegisterDebugOption(OVALE_SNAPSHOT_DEBUG, L["Snapshot updates"], L["Debug stat snapshots"])
+end
 
 local OVALE_SPELLDAMAGE_SCHOOL = {
 	DEATHKNIGHT = 4, -- Nature

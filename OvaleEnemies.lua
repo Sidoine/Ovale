@@ -23,6 +23,9 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 local bit_band = bit.band
 local ipairs = ipairs
 local pairs = pairs
@@ -66,6 +69,9 @@ local self_reaperTimer = nil
 local REAP_INTERVAL = 3
 
 local OVALE_ENEMIES_DEBUG = "enemy"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_ENEMIES_DEBUG, L["Enemies"], L["Debug enemies"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

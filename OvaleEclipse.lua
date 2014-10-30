@@ -21,6 +21,9 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleData = nil
@@ -36,6 +39,9 @@ local API_UnitPower = UnitPower
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
 
 local OVALE_ECLIPSE_DEBUG = "eclipse"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_ECLIPSE_DEBUG, L["Eclipse"], L["Debug clipse"])
+end
 
 -- Player's GUID.
 local self_guid = nil

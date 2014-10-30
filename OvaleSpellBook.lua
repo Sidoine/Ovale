@@ -20,6 +20,9 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvalePower = nil
@@ -56,6 +59,9 @@ local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 21
 local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
 
 local OVALE_SPELLBOOK_DEBUG = "spellbook"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_SPELLBOOK_DEBUG, L["Spellbook changes"], L["Debug spellbook changes"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

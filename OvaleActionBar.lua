@@ -19,6 +19,9 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 local gsub = string.gsub
 local strmatch = string.match
 local tonumber = tonumber
@@ -31,6 +34,9 @@ local API_GetMacroItem = GetMacroItem
 local API_GetMacroSpell = GetMacroSpell
 
 local OVALE_ACTIONBAR_DEBUG = "action_bar"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_ACTIONBAR_DEBUG, L["Action bars"], L["Debug action bars"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

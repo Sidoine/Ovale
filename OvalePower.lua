@@ -9,6 +9,9 @@ local OvalePower = Ovale:NewModule("OvalePower", "AceEvent-3.0")
 Ovale.OvalePower = OvalePower
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleFuture = nil
@@ -50,6 +53,9 @@ local self_tooltip = nil
 local self_costPatterns = {}
 
 local OVALE_POWER_DEBUG = "power"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_POWER_DEBUG, L["Power"], L["Debug power"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

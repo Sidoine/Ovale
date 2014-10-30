@@ -21,6 +21,9 @@ local OvaleGUID = Ovale:NewModule("OvaleGUID", "AceEvent-3.0")
 Ovale.OvaleGUID = OvaleGUID
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 local ipairs = ipairs
 local tinsert = table.insert
 local API_GetNumGroupMembers = GetNumGroupMembers
@@ -28,6 +31,9 @@ local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
 local OVALE_GUID_DEBUG = "guid"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_GUID_DEBUG, L["GUIDs"], L["Debug GUID"])
+end
 
 --[[
 	Unit IDs for which UNIT_AURA events are known to fire.

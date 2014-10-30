@@ -9,6 +9,9 @@ local OvaleCompile = Ovale:NewModule("OvaleCompile", "AceEvent-3.0")
 Ovale.OvaleCompile = OvaleCompile
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleAST = nil
 local OvaleCondition = nil
@@ -61,6 +64,11 @@ local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
 local OVALE_COMPILE_DEBUG = "compile"
 local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
 local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_COMPILE_DEBUG, L["Compile"], L["Debug compile"])
+	OvaleDebug:RegisterDebugOption(OVALE_MISSING_SPELL_DEBUG, L["Missing spells"], L["Debug missing spells"])
+	OvaleDebug:RegisterDebugOption(OVALE_UNKNOWN_SPELL_DEBUG, L["Unknown spells"], L["Debug unknown spells"])
+end
 --</private-static-properties>
 
 --<public-static-properties>

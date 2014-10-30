@@ -19,6 +19,8 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePool
 local OvaleQueue = Ovale.OvaleQueue
 
@@ -36,6 +38,9 @@ local self_pool = OvalePool("OvaleDamageTaken_pool")
 local DAMAGE_TAKEN_WINDOW = 20
 
 local OVALE_DAMAGE_TAKEN_DEBUG = "damage_taken"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_DAMAGE_TAKEN_DEBUG, L["Damage taken"], L["Debug damage taken"])
+end
 --</private-static-properties>
 
 --<public-static-properties>
