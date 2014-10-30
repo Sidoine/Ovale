@@ -1027,7 +1027,7 @@ function OvaleBestAction:ComputeState(element, state)
 
 	if element.func == "setstate" then
 		Ovale:Logf("[%d]    %s: %s = %s", element.nodeId, element.name, element.params[1], element.params[2])
-		timespan[1], timespan[2] = 0, math.huge
+		timeSpan[1], timeSpan[2] = 0, math.huge
 		result = element
 	end
 	profiler.Stop("OvaleBestAction_ComputeState")
