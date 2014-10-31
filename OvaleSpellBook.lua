@@ -21,6 +21,7 @@ do
 end
 
 local L = Ovale.L
+local OvaleOptions = Ovale.OvaleOptions
 local OvaleDebug = Ovale.OvaleDebug
 
 -- Forward declarations for module dependencies.
@@ -61,6 +62,30 @@ local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
 local OVALE_SPELLBOOK_DEBUG = "spellbook"
 do
 	OvaleDebug:RegisterDebugOption(OVALE_SPELLBOOK_DEBUG, L["Spellbook changes"], L["Debug spellbook changes"])
+end
+
+do
+	local actions = {
+		glyph = {
+			name = L["List player glyphs"],
+			type = "execute",
+			func = function() OvaleSpellBook:DebugGlyphs() end,
+		},
+		spell = {
+			name = L["List player spells"],
+			type = "execute",
+			func = function() OvaleSpellBook:DebugSpells() end,
+		},
+		talent = {
+			name = L["List talents"],
+			type = "execute",
+			func = function() OvaleSpellBook:DebugTalents() end,
+		},
+	}
+	-- Insert actions into OvaleOptions.
+	for k, v in pairs(actions) do
+		OvaleOptions.options.args.actions.args[k] = v
+	end
 end
 --</private-static-properties>
 

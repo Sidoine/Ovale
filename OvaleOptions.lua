@@ -419,14 +419,6 @@ OvaleOptions.options = {
 						if Ovale.OvaleState then Ovale.OvaleState.state:DebugPower() end
 					end,
 				},
-				talent =
-				{
-					name = "List talent id",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleSpellBook then Ovale.OvaleSpellBook:DebugTalents() end
-					end,
-				},
 				targetbuff =
 				{
 					name = "List target buffs and debuffs",
@@ -448,30 +440,6 @@ OvaleOptions.options = {
 							Ovale.OvaleState.state:PrintUnitAuras("player", "HARMFUL")
 						end
 					end,
-				},
-				glyph =
-				{
-					name = "List player glyphs",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleSpellBook then Ovale.OvaleSpellBook:DebugGlyphs() end
-					end,
-				},
-				spell =
-				{
-					name = "List player spells",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleSpellBook then Ovale.OvaleSpellBook:DebugSpells() end
-					end,
-				},
-				stance =
-				{
-					name = "List stances",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleStance then Ovale.OvaleStance:DebugStances() end
-					end
 				},
 				profilestart = {
 					name = "Start gathering profiling stats",

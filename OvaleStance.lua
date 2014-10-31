@@ -10,6 +10,9 @@ local OvaleStance = Ovale:NewModule("OvaleStance", "AceEvent-3.0")
 Ovale.OvaleStance = OvaleStance
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleOptions = Ovale.OvaleOptions
+
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvaleState = nil
@@ -81,6 +84,20 @@ local OVALE_SPELLID_TO_STANCE = {
 	[API_GetSpellInfo(2457)] = "warrior_battle_stance",
 	[API_GetSpellInfo(156291)] = "warrior_gladiator_stance",
 }
+
+do
+	local actions = {
+		stance = {
+			name = L["List stances"],
+			type = "execute",
+			func = function() OvaleStance:DebugStances() end,
+		},
+	}
+	-- Insert actions into OvaleOptions.
+	for k, v in pairs(actions) do
+		OvaleOptions.options.args.actions.args[k] = v
+	end
+end
 --</private-static-properties>
 
 --<public-static-properties>
