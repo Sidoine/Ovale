@@ -7,7 +7,7 @@ It displays one or more icons that show the cooldown of an action.  The action i
   [Corruption]: http://www.wowhead.com/spell=172
   [Shadow Bolt]: http://www.wowhead.com/spell=686
 
-The [current release] of Ovale provides default scripts for the following classes for *Warlords of Draenor*:
+The current release of Ovale provides default scripts for the following classes for *Warlords of Draenor*:
 
 - Death Knight: Blood, Frost, Unholy
 - Druid: Feral, Guardian **(Balance is NOT currently supported)**
