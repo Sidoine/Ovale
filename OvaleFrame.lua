@@ -59,10 +59,13 @@ do
 	local function frameOnMouseUp(self)
 		self:StopMovingOrSizing()
 		local profile = Ovale.db.profile
-		
-		if (profile.left~=self:GetLeft() or profile.top ~=self:GetTop()) then
-			profile.left = self:GetLeft()
-			profile.top = self:GetTop()
+		for i = 1, self:GetNumPoints() do
+			local point, relativeTo, relativePoint, xOffset, yOffset = self:GetPoint(i)
+			if point == "CENTER" then
+				profile.apparence.offsetX = xOffset
+				profile.apparence.offsetY = yOffset
+				break
+			end
 		end
 	end
 	

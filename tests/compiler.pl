@@ -71,8 +71,8 @@ $m{ActionButtonTemplate}{Show} = true;
 
 $m{DEFAULT_CHAT_FRAME}{AddMessage} = true;
 
-$m{Frame}{GetLeft} = true;
-$m{Frame}{GetTop} = true;
+$m{Frame}{GetNumPoints} = true;
+$m{Frame}{GetPoint} = true;
 $m{Frame}{SetAttribute} = true;
 $m{Frame}{SetScript} = true;
 $m{Frame}{StartMoving} = true;

@@ -32,8 +32,6 @@ local _, self_class = API_UnitClass("player")
 -- AceDB default database.
 OvaleOptions.defaultDB = {
 	profile = {
-		left = 500,
-		top = 500,
 		check = {},
 		list = {},
 		apparence = {
@@ -45,6 +43,8 @@ OvaleOptions.defaultDB = {
 			hideEmpty = false,
 			hideVehicule = false,
 			margin = 4,
+			offsetX = 0,
+			offsetY = 0,
 			targetHostileOnly = false,
 			verrouille = false,
 			vertical = false,
@@ -183,8 +183,24 @@ OvaleOptions.options = {
 									type = "toggle",
 									name = L["Vertical"],
 								},
-								margin = {
+								offsetX = {
 									order = 30,
+									type = "range",
+									name = L["Horizontal offset"],
+									desc = L["Horizontal offset from the center of the screen."],
+									min = -1000, max = 1000,
+									softMin = -500, softMax = 500, bigStep = 1,
+								},
+								offsetY = {
+									order = 40,
+									type = "range",
+									name = L["Vertical offset"],
+									desc = L["Vertical offset from the center of the screen."],
+									min = -1000, max = 1000,
+									softMin = -500, softMax = 500, bigStep = 1,
+								},
+								margin = {
+									order = 50,
 									type = "range",
 									name = L["Marge entre deux icônes"],
 									min = -16, max = 64, step = 1,
@@ -273,8 +289,8 @@ OvaleOptions.options = {
 						{
 							order = 100,
 							type = "range",
-							name = "Update interval",
-							desc = "Maximum time to wait (in milliseconds) before refreshing icons.",
+							name = L["Update interval"],
+							desc = L["Maximum time to wait (in milliseconds) before refreshing icons."],
 							min = 0, max = 500, step = 10,
 							get = function(info)
 								return Ovale.db.profile.apparence.updateInterval * 1000
@@ -539,6 +555,12 @@ function OvaleOptions:UpgradeSavedVariables()
 	-- Merge two options that had the same meaning.
 	profile.apparence.enableIcons = profile.display
 	profile.display = nil
+	-- The frame position settings changed from left/top to offsetX/offsetY.
+	if profile.left or profile.top then
+		profile.left = nil
+		profile.top = nil
+		Ovale:OneTimeMessage("The Ovale icon frames position has been reset.")
+	end
 	-- SpellFlash options have been moved and renamed.
 	if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
 		local enabled = profile.apparence.spellFlash

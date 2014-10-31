@@ -285,7 +285,7 @@ end
 
 
 function Ovale:UpdateFrame()
-	self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.left, self.db.profile.top)
+	self.frame:SetPoint("CENTER", UIParent, "CENTER", self.db.profile.apparence.offsetX, self.db.profile.apparence.offsetY)
 	self.frame:ReleaseChildren()
 	self.frame:UpdateIcons()
 	self:UpdateControls()
