@@ -521,8 +521,10 @@ function OvaleOptions:UpgradeSavedVariables()
 		end
 	end
 	-- Merge two options that had the same meaning.
-	profile.apparence.enableIcons = profile.display
-	profile.display = nil
+	if profile.display ~= nil then
+		profile.apparence.enableIcons = profile.display
+		profile.display = nil
+	end
 	-- The frame position settings changed from left/top to offsetX/offsetY.
 	if profile.left or profile.top then
 		profile.left = nil
