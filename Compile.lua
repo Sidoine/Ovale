@@ -507,11 +507,7 @@ function OvaleCompile:CompileScript(name)
 		OvaleAST:Release(self.ast)
 		self.ast = nil
 	end
-	local ast = OvaleAST:ParseScript(name)
-	if ast then
-		OvaleAST:Optimize(ast)
-		self.ast = ast
-	end
+	self.ast = OvaleAST:ParseScript(name)
 	-- Reset the controls defined by the previous script.
 	Ovale:ResetControls()
 end

@@ -2436,7 +2436,7 @@ function OvaleAST:ParseScript(name, options)
 	local code = OvaleScripts.script[name] and OvaleScripts.script[name].code
 	local ast
 	if code then
-		options = options or { verify = true }
+		options = options or { optimize = true, verify = true }
 		-- Annotation table for the AST.
 		local annotation = {
 			nodeList = {},
@@ -2450,6 +2450,9 @@ function OvaleAST:ParseScript(name, options)
 			self:FlattenParameters(ast)
 			self:VerifyParameterStances(ast)
 			self:VerifyFunctionCalls(ast)
+			if options.optimize then
+				self:Optimize(ast)
+			end
 		else
 			-- Create a dummy node to properly release resources.
 			ast = self:NewNode()
