@@ -25,6 +25,7 @@ do
 		"Ovale.lua",
 		"Localization.lua",
 		"OvaleOptions.lua",
+		"OvaleDebug.lua",
 		-- Profiling module.
 		"Profiler.lua",
 		-- Utility modules.
