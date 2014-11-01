@@ -1716,6 +1716,10 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 					node.precedence = opInfo[2]
 					node.child[1] = lhsNode
 					node.child[2] = rhsNode
+				elseif lhsNode then
+					msg = Ovale:Format("Warning: %s operator '%s' right failed.", parseNode.type, parseNode.operator)
+				elseif rhsNode then
+					msg = Ovale:Format("Warning: %s operator '%s' left failed.", parseNode.type, parseNode.operator)
 				else
 					msg = Ovale:Format("Warning: %s operator '%s' left and right failed.", parseNode.type, parseNode.operator)
 				end
