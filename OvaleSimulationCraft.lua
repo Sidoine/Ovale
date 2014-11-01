@@ -2053,11 +2053,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 		elseif property == "duration" then
 			code = format("BaseDuration(%s)", buffName)
 		elseif property == "max_stack" then
-			local maxStack = 1
-			if buffName == "lightning_shield_buff" then
-				maxStack = 7
-			end
-			code = tostring(maxStack)
+			code = format("SpellData(%s max_stacks)", buffName)
 		elseif property == "react" or property == "stack" then
 			if parseNode.asType == "boolean" then
 				code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)

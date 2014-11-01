@@ -95,7 +95,7 @@ AddFunction ElementalAoeActions
 	#lava_beam
 	if BuffPresent(ascendance_caster_buff) Spell(lava_beam)
 	#earth_shock,if=buff.lightning_shield.react=buff.lightning_shield.max_stack
-	if BuffStacks(lightning_shield_buff) == 7 Spell(earth_shock)
+	if BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) Spell(earth_shock)
 	#thunderstorm,if=active_enemies>=10
 	if Enemies() >= 10 Spell(thunderstorm)
 	#searing_totem,if=(!talent.liquid_magma.enabled&!totem.fire.active)|(talent.liquid_magma.enabled&pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up)
@@ -113,7 +113,7 @@ AddFunction ElementalSingleActions
 	#spiritwalkers_grace,moving=1,if=buff.ascendance.up
 	if Speed() > 0 and BuffPresent(ascendance_caster_buff) Spell(spiritwalkers_grace)
 	#earth_shock,if=buff.lightning_shield.react=buff.lightning_shield.max_stack
-	if BuffStacks(lightning_shield_buff) == 7 Spell(earth_shock)
+	if BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) Spell(earth_shock)
 	#lava_burst,if=dot.flame_shock.remains>cast_time&(buff.ascendance.up|cooldown_react)
 	if target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { BuffPresent(ascendance_caster_buff) or not SpellCooldown(lava_burst) > 0 } Spell(lava_burst)
 	#flame_shock,if=dot.flame_shock.remains<=9
