@@ -204,12 +204,17 @@ local self_outputPool = OvalePool("OvaleAST_outputPool")
 local self_controlPool = OvalePool("OvaleAST_controlPool")
 local self_parametersPool = OvalePool("OvaleAST_parametersPool")
 local self_childrenPool = OvalePool("OvaleAST_childrenPool")
+local self_postOrderPool = OvalePool("OvaleAST_postOrderPool")
 local self_pool = OvalePool("OvaleAST_pool")
 do
 	self_pool.Clean = function(self, node)
 		if node.child then
 			self_childrenPool:Release(node.child)
 			node.child = nil
+		end
+		if node.postOrder then
+			self_postOrderPool:Release(node.postOrder)
+			node.postOrder = nil
 		end
 	end
 end
@@ -266,6 +271,25 @@ local function GetNumberNode(value, nodeList, annotation)
 		annotation.numberFlyweight[value] = node
 	end
 	return node
+end
+
+--[[
+	Fill an array of nodes in order of post-order traversal.
+	The odd indices hold the nodes in post-order traversal order.
+	The even indices hold the parents of the node in the preceding indices.
+--]]
+local function PostOrderTraversal(node, array, visited)
+	if node.child then
+		for _, childNode in ipairs(node.child) do
+			if not visited[childNode] then
+				PostOrderTraversal(childNode, array, visited)
+				-- Insert the current node as the parent of the preceding child node.
+				array[#array + 1] = node
+			end
+		end
+	end
+	array[#array + 1] = node
+	visited[node] = true
 end
 
 --[[---------------------------------------------
@@ -938,6 +962,9 @@ ParseAddFunction = function(tokenStream, nodeList, annotation)
 		node.rawParams = parameters
 		annotation.parametersReference = annotation.parametersReference or {}
 		annotation.parametersReference[#annotation.parametersReference + 1] = node
+		-- Add the postOrder list to the body node.
+		annotation.postOrderReference = annotation.postOrderReference or {}
+		annotation.postOrderReference[#annotation.postOrderReference + 1] = bodyNode
 		annotation.customFunction = annotation.customFunction or {}
 		annotation.customFunction[name] = node
 	end
@@ -971,6 +998,9 @@ ParseAddIcon = function(tokenStream, nodeList, annotation)
 		node.rawParams = parameters
 		annotation.parametersReference = annotation.parametersReference or {}
 		annotation.parametersReference[#annotation.parametersReference + 1] = node
+		-- Add the postOrder list to the body node.
+		annotation.postOrderReference = annotation.postOrderReference or {}
+		annotation.postOrderReference[#annotation.postOrderReference + 1] = bodyNode
 	end
 	return ok, node
 end
@@ -2453,6 +2483,7 @@ function OvaleAST:ParseScript(name, options)
 			if options.optimize then
 				self:Optimize(ast)
 			end
+			self:InsertPostOrderTraversal(ast)
 		else
 			-- Create a dummy node to properly release resources.
 			ast = self:NewNode()
@@ -2727,6 +2758,36 @@ function OvaleAST:VerifyParameterStances(ast)
 		end
 	end
 	self:StopProfiling("OvaleAST_VerifyParameterStances")
+end
+
+-- Insert a "postOrder" property into top-level nodes.
+function OvaleAST:InsertPostOrderTraversal(ast)
+	self:StartProfiling("OvaleAST_InsertPostOrderTraversal")
+	local annotation = ast.annotation
+	if annotation and annotation.postOrderReference then
+		for _, node in ipairs(annotation.postOrderReference) do
+			local array = self_postOrderPool:Get()
+			local visited = self_postOrderPool:Get()
+			PostOrderTraversal(node, array, visited)
+			self_postOrderPool:Release(visited)
+			node.postOrder = array
+			--[[
+			local postOrder = node.postOrder
+			local output = self_outputPool:Get()
+			local i = 1
+			while postOrder[i] do
+				local child, parent = postOrder[i], postOrder[i + 1]
+				output[#output + 1] = child.nodeId
+				i = i + 2
+			end
+			local outputHeader = format("Post-order for %d has %d nodes: ", node.nodeId, (i - 1) / 2)
+			local outputString = outputHeader .. tconcat(output, ", ")
+			self_outputPool:Release(output)
+			self:Print(outputString)
+			--]]
+		end
+	end
+	self:StopProfiling("OvaleAST_InsertPostOrderTraversal")
 end
 
 function OvaleAST:Optimize(ast)

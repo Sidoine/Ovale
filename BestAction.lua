@@ -377,7 +377,8 @@ end
 
 function OvaleBestAction:GetAction(node, state, atTime)
 	self:StartProfiling("OvaleBestAction_GetAction")
-	local timeSpan, priority, element = self:Compute(node.child[1], state, atTime)
+	local groupNode = node.child[1]
+	local timeSpan, priority, element = self:Compute(groupNode, state, atTime)
 	self_computedTimeSpan:Reset(timeSpan)
 	if element and element.type == "state" then
 		-- Loop-count check to guard against infinite loops.
@@ -395,7 +396,7 @@ function OvaleBestAction:GetAction(node, state, atTime)
 			-- Get the cumulative intersection of time spans for these re-computations.
 			self_tempTimeSpan:Reset(self_computedTimeSpan)
 			self:StartNewAction(state)
-			timeSpan, priority, element = self:Compute(node.child[1], state, atTime)
+			timeSpan, priority, element = self:Compute(groupNode, state, atTime)
 			Intersect(self_tempTimeSpan, timeSpan, self_computedTimeSpan)
 		end
 	end
@@ -403,7 +404,62 @@ function OvaleBestAction:GetAction(node, state, atTime)
 	return self_computedTimeSpan, priority, element
 end
 
-function OvaleBestAction:Compute(element, state, atTime)
+function OvaleBestAction:PostOrderCompute(element, state, atTime)
+	self:StartProfiling("OvaleBestAction_Compute")
+	local timeSpan, priority, result
+
+	-- Check for recently cached computation results if this is a node with a postOrder list.
+	local postOrder = element.postOrder
+	if postOrder and not (element.serial and element.serial >= self_serial) then
+		local index = 1
+		local N = #postOrder
+		while index < N do
+			local childNode, parentNode = postOrder[index], postOrder[index + 1]
+			index = index + 2
+
+			timeSpan, priority, result = self:PostOrderCompute(childNode, state, atTime)
+			--[[
+				Check for cases where short-circuit evaluation applies:
+
+				1. Left child of IF node returns zero measure.
+				2. Left child of UNLESS node returns universe.
+				3. Left child of AND node returns zero measure.
+				4. Left child of OR node returns universe.
+			--]]
+			if parentNode then
+				local shortCircuit = false
+				if parentNode.type == "if" and Measure(timeSpan) == 0 then
+					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.", element.nodeId, childNode.type, parentNode.nodeId)
+					shortCircuit = true
+				elseif parentNode.type == "unless" and timeSpan and timeSpan[1] == 0 and timeSpan[2] == INFINITY then
+					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
+					shortCircuit = true
+				elseif parentNode.type == "logical" and parentNode.operator == "and" and Measure(timeSpan) == 0 then
+					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.", element.nodeId, childNode.type, parentNode.nodeId)
+					shortCircuit = true
+				elseif parentNode.type == "logical" and parentNode.operator == "or" and timeSpan and timeSpan[1] == 0 and timeSpan[2] == INFINITY then
+					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
+					shortCircuit = true
+				end
+				if shortCircuit then
+					-- Traverse the postOrder array looking for the parent node.
+					while parentNode ~= postOrder[index] and index <= N do
+						index = index + 2
+					end
+					if index > N then
+						self:Error("Ran off end of postOrder node list for node %d.", element.nodeId)
+					end
+				end
+			end
+		end
+	end
+	-- Compute the result for this node.
+	timeSpan, priority, result = self:RecursiveCompute(element, state, atTime)
+	self:StartProfiling("OvaleBestAction_Compute")
+	return timeSpan, priority, result
+end
+
+function OvaleBestAction:RecursiveCompute(element, state, atTime)
 	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpan, priority, result
 	if element then
@@ -1075,3 +1131,7 @@ function OvaleBestAction:Debug()
 	self_valuePool:Debug()
 end
 --</public-static-methods>
+
+--<public-static-properties>
+OvaleBestAction.Compute = OvaleBestAction.PostOrderCompute
+--</public-static-properties>

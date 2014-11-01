@@ -142,6 +142,8 @@ $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleTimeSpan} = true;
 $sp{Ovale}{Profiler} = true;
 
+$sm{OvaleBestAction}{Compute} = true;
+
 $sm{OvaleQueue}{NewQueue} = true;
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;
