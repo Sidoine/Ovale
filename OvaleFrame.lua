@@ -442,11 +442,9 @@ do
 		self.Show = Show
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
-		self.ApplyStatus = ApplyStatus
 		self.LayoutFinished = OnLayoutFinished
 		self.UpdateActionIcon = UpdateActionIcon
 		self.UpdateIcons = UpdateIcons
-		self.OnSkinChanged = OnSkinChanged
 		self.ToggleOptions = ToggleOptions
 		self.OnUpdate = OnUpdate
 		self.GetScore = GetScore
@@ -472,7 +470,7 @@ do
 		frame.obj = self
 		frame:SetWidth(100)
 		frame:SetHeight(100)
-		frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
+		frame:SetPoint("CENTER", hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY)
 		if not profile.apparence.clickThru then
 			frame:EnableMouse()
 		end
