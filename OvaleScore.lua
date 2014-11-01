@@ -31,6 +31,7 @@ Ovale.OvaleScore = OvaleScore
 --<private-static-properties>
 local pairs = pairs
 local strsplit = string.split
+local type = type
 local API_IsInGroup = IsInGroup
 local API_SendAddonMessage = SendAddonMessage
 local API_UnitGUID = UnitGUID
@@ -87,7 +88,7 @@ function OvaleScore:PLAYER_REGEN_ENABLED()
 	-- Broadcast the player's own score for damage meters when combat ends.
 	-- Broadcast message is "score;maxScore;playerGUID"
 	if self.maxScore > 0 and API_IsInGroup() then
-		local message = self:Serialize("score", self,score, self.maxScore, self_guid)
+		local message = self:Serialize("score", self.score, self.maxScore, self_guid)
 		local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
 		API_SendAddonMessage(MSG_PREFIX, message, channel)
 	end

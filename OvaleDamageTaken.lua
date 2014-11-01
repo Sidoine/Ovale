@@ -27,6 +27,7 @@ local OvaleQueue = Ovale.OvaleQueue
 -- Forward declarations for module dependencies.
 local OvaleLatency = nil
 
+local strsub = string.sub
 local API_GetTime = GetTime
 local API_UnitGUID = UnitGUID
 

@@ -25,6 +25,7 @@ Ovale.OvaleTimeSpan = OvaleTimeSpan
 local setmetatable = setmetatable
 local strformat = string.format
 local tconcat = table.concat
+local type = type
 local wipe = table.wipe
 --</private-static-properties>
 

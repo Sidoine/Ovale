@@ -30,6 +30,7 @@ do
 end
 
 local assert = assert
+local pairs = pairs
 local setmetatable = setmetatable
 local tinsert = table.insert
 local tostring = tostring

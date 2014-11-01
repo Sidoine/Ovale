@@ -19,6 +19,7 @@ local OvalePaperDoll = nil
 
 local exp = math.exp
 local log = math.log
+local pairs = pairs
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID

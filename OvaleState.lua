@@ -48,7 +48,7 @@ function OvaleState:RegisterState(stateAddon, statePrototype)
 end
 
 function OvaleState:UnregisterState(stateAddon)
-	stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
+	local stateModules = OvaleQueue:NewQueue("OvaleState_stateModules")
 	while self.stateAddons:Size() > 0 do
 		local addon = self.stateAddons:Remove()
 		if stateAddon ~= addon then
@@ -153,7 +153,7 @@ end
 
 -- Put a value into the named state variable.
 statePrototype.PutState = function(state, name, value, isFuture)
-	if isTemporary then
+	if isFuture then
 		state.futureVariable[name] = value
 	else
 		state.variable[name] = value

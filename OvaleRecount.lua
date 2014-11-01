@@ -12,6 +12,7 @@ Ovale.OvaleRecount = OvaleRecount
 local L = nil
 local OvaleScore = nil
 local Recount = LibStub("AceAddon-3.0"):GetAddon("Recount", true)
+local setmetatable = setmetatable
 --</private-static-properties>
 
 --<private-static-methods>

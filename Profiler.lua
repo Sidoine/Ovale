@@ -15,8 +15,12 @@ Ovale.Profiler = Profiler
 --<private-static-properties>
 local debugprofilestop = debugprofilestop
 local format = string.format
+local ipairs = ipairs
+local next = next
+local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
+local wipe = table.wipe
 local API_GetTime = GetTime
 
 local self_timestamp = debugprofilestop()

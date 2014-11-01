@@ -21,6 +21,7 @@ local ipairs = ipairs
 local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
+local type = type
 local wipe = table.wipe
 local API_GetNumShapeshiftForms = GetNumShapeshiftForms
 local API_GetShapeshiftForm = GetShapeshiftForm
@@ -141,7 +142,7 @@ end
 function OvaleStance:PLAYER_TALENT_UPDATE(event)
 	-- Clear old stance ID since talent update may overwrite old stance with new one with same ID.
 	self.stance = nil
-	UpdateStances()
+	self:UpdateStances()
 end
 
 function OvaleStance:UPDATE_SHAPESHIFT_FORM(event)

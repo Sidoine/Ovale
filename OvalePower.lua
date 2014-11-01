@@ -334,7 +334,7 @@ function OvalePower:PowerCost(spellId, powerType)
 		if text then
 			for pattern, pt in pairs(self_costPatterns) do
 				if not powerType or pt == powerType then
-					cost = strmatch(text, pattern)
+					local cost = strmatch(text, pattern)
 					if cost then
 						spellCost = tonumber(cost)
 						spellPowerType = pt

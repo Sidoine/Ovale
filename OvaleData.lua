@@ -11,6 +11,9 @@ Ovale.OvaleData = OvaleData
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvalePaperDoll = nil
+
+local type = type
+local pairs = pairs
 --<private-static-properties>
 
 --<public-static-properties>

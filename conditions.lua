@@ -28,6 +28,7 @@ local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
 local type = type
+local wipe = wipe
 local API_GetBuildInfo = GetBuildInfo
 local API_GetItemCooldown = GetItemCooldown
 local API_GetItemCount = GetItemCount
@@ -133,7 +134,7 @@ do
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local value = 0
 		Ovale:OneTimeMessage("Warning: 'AfterWhiteHit() is not implemented.")
-		return TestValue(start, math.huge, value, now, -1, comparator, limit)
+		return TestValue(0, math.huge, value, state.currentTime, -1, comparator, limit)
 	end
 
 	--OvaleCondition:RegisterCondition("afterwhitehit", false, AfterWhiteHit)
@@ -1301,7 +1302,7 @@ end
 
 do
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
-	local function GetDamage(spellId)
+	local function GetDamage(spellId, state)
 		-- TODO: Use target's debuffs in this calculation.
 		local ap = state.snapshot.attackPower or 0
 		local sp = state.snapshot.spellBonusDamage or 0
@@ -1334,7 +1335,7 @@ do
 		local target = ParseCondition(condition, state, state.defaultTarget)
 		local value = ComputeParameter(spellId, "damage", state)
 		if not value then
-			value = GetDamage(spellId)
+			value = GetDamage(spellId, state)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
 		local si = OvaleData:GetSpellInfo(spellId)
@@ -1390,7 +1391,7 @@ do
 		local target = ParseCondition(condition, state, state.defaultTarget)
 		local value = ComputeParameter(spellId, "damage", state)
 		if not value then
-			value = GetDamage(spellId)
+			value = GetDamage(spellId, state)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
 		local si = OvaleData:GetSpellInfo(spellId)
@@ -2399,10 +2400,11 @@ do
 
 	local function IsEnraged(condition, state)
 		local yesno = condition[1]
+		local target = ParseCondition(condition, state)
 		return state:GetAuraWithProperty(target, "enraged", "HELPFUL")
 	end
 
-	OvaleCondition:RegisterCondition("isfeared", false, IsFeared)
+	OvaleCondition:RegisterCondition("isenraged", false, IsEnraged)
 end
 
 do
@@ -5341,7 +5343,7 @@ do
 	-- if TotemRemaining(water totem=healing_stream_totem) <2 Spell(totemic_recall)
 
 	local function TotemRemaining(condition, state)
-		local totemId = condition[1]
+		local totemId, comparator, limit = condition[1], condition[2], condition[3]
 		if type(totemId) ~= "number" then
 			totemId = OVALE_TOTEMTYPE[totemId]
 		end

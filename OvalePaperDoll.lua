@@ -28,7 +28,9 @@ local OvaleEquipement = nil
 local OvaleStance = nil
 local OvaleState = nil
 
+local pairs = pairs
 local tonumber = tonumber
+local type = type
 local API_GetCombatRating = GetCombatRating
 local API_GetCritChance = GetCritChance
 local API_GetMastery = GetMastery

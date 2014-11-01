@@ -9,10 +9,14 @@ Ovale.OvaleLexer = OvaleLexer
 
 --<private-static-properties>
 local OvaleQueue = Ovale.OvaleQueue
+
+local pairs = pairs
 local setmetatable = setmetatable
 
 -- Additional Lua functions used by Penlight pl.lexer module.
 local error = error
+local ipairs = ipairs
+local tonumber = tonumber
 local type = type
 --</private-static-properties>
 

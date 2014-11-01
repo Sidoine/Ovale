@@ -328,9 +328,6 @@ statePrototype.GetCD = function(state, spellId)
 	local cd = state.cd[cdName]
 	if not cd.start or not cd.serial or cd.serial < self_serial then
 		local start, duration, enable = OvaleCooldown:GetSpellCooldown(spellId)
-		if start and start > 0 then
-			charges = 0
-		end
 		if si and si.forcecd then
 			if si.forcecd then
 				start, duration = OvaleCooldown:GetSpellCooldown(si.forcecd)

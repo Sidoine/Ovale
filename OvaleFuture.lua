@@ -15,6 +15,7 @@ local OvalePool = Ovale.OvalePool
 
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
+local OvaleCooldown = nil
 local OvaleData = nil
 local OvaleGUID = nil
 local OvalePaperDoll = nil
@@ -23,10 +24,13 @@ local OvaleSpellBook = nil
 local OvaleState = nil
 
 local ipairs = ipairs
+local next = next
 local pairs = pairs
 local tinsert = table.insert
 local tostring = tostring
 local tremove = table.remove
+local type = type
+local wipe = table.wipe
 local API_GetTime = GetTime
 local API_UnitCastingInfo = UnitCastingInfo
 local API_UnitChannelInfo = UnitChannelInfo
@@ -346,6 +350,7 @@ end
 function OvaleFuture:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
+	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
 	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll

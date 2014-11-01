@@ -23,6 +23,8 @@ do
 	local Type = OVALE .. "Frame"
 	local Version = 7
 
+	local ipairs = ipairs
+	local next = next
 	local pairs = pairs
 	local tostring = tostring
 	local wipe = table.wipe
@@ -296,10 +298,10 @@ do
 					if not spellTarget or spellTarget == "target" then
 						spellTarget = state.defaultTarget
 					end
-					state:ApplySpell(spellId, OvaleGUID:GetGUID(spellTarget))
-					timeSpan, _, element = OvaleBestAction:GetAction(node, state)
+					state:ApplySpell(actionId, OvaleGUID:GetGUID(spellTarget))
+					local timeSpan, _, nextElement = OvaleBestAction:GetAction(node, state)
 					start = NextTime(timeSpan, state.currentTime)
-					icons[2]:Update(element, start, OvaleBestAction:GetActionInfo(element, state))
+					icons[2]:Update(nextElement, start, OvaleBestAction:GetActionInfo(nextElement, state))
 				else
 					icons[2]:Update(element, nil)
 				end

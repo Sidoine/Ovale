@@ -15,11 +15,15 @@ local OvaleOptions = Ovale.OvaleOptions
 
 local gmatch = string.gmatch
 local gsub = string.gsub
+local next = next
+local pairs = pairs
 local select = select
 local strlen = string.len
 local tconcat = table.concat
+local tonumber = tonumber
 local type = type
 local wipe = table.wipe
+local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 
 -- Flags used by debugging print functions.
@@ -199,7 +203,7 @@ function OvaleDebug:CreateOptions()
 								local s = ""
 								for k, v in pairs(t) do
 									if type(v) == "boolean" then
-										if string.len(s) == 0 then
+										if strlen(s) == 0 then
 											s = k
 										else
 											s = s .. "; " .. k
@@ -219,7 +223,7 @@ function OvaleDebug:CreateOptions()
 									-- strip leading and trailing whitespace
 									s = gsub(s, "^%s*", "")
 									s = gsub(s, "%s*$", "")
-									if string.len(s) > 0 then
+									if strlen(s) > 0 then
 										local v = tonumber(s)
 										if v then
 											s = API_GetSpellInfo(v)

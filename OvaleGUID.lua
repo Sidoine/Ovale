@@ -25,6 +25,8 @@ local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
 
 local ipairs = ipairs
+local next = next
+local pairs = pairs
 local tinsert = table.insert
 local API_GetNumGroupMembers = GetNumGroupMembers
 local API_UnitGUID = UnitGUID
@@ -168,7 +170,7 @@ function OvaleGUID:PLAYER_TARGET_CHANGED(event, cause)
 end
 
 function OvaleGUID:UNIT_PET(event, unitId)
-	local pet = PET_UNIT[unitiD] or (unitId .. "pet")
+	local pet = PET_UNIT[unitId] or (unitId .. "pet")
 	self:UpdateUnitWithTarget(pet)
 	self:SendMessage("Ovale_GroupChanged")
 end

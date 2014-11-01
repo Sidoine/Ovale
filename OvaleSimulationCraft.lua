@@ -23,6 +23,9 @@ local OvalePower = nil
 local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
+local ipairs = ipairs
+local pairs = pairs
+local rawset = rawset
 local strfind = string.find
 local strlen = string.len
 local strlower = string.lower
@@ -34,7 +37,10 @@ local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
 local tsort = table.sort
+local type = type
+local wipe = table.wipe
 local yield = coroutine.yield
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 -- Keywords for SimulationCraft action lists.
 local KEYWORD = {}
@@ -1057,8 +1063,11 @@ local EmitOperandPet = nil
 local EmitOperandRaidEvent = nil
 local EmitOperandRune = nil
 local EmitOperandSeal = nil
+local EmitOperandSetBonus = nil
+local EmitOperandSpecial = nil
 local EmitOperandTalent = nil
 local EmitOperandTotem = nil
+local EmitOperandTrinket = nil
 
 Emit = function(parseNode, nodeList, annotation, action)
 	local visitor = EMIT_VISITOR[parseNode.type]
@@ -1279,8 +1288,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "cancel_metamorphosis" then
-			spellName = "metamorphosis"
-			buffName = "metamorphosis_buff"
+			local spellName = "metamorphosis"
+			local buffName = "metamorphosis_buff"
 			AddSymbol(annotation, spellName)
 			AddSymbol(annotation, buffName)
 			bodyCode = format("Spell(%s text=cancel)", spellName)

@@ -32,6 +32,7 @@ local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
 local tostring = tostring
+local type = type
 local wipe = table.wipe
 local Complement = OvaleTimeSpan.Complement
 local CopyTimeSpan = OvaleTimeSpan.CopyTo

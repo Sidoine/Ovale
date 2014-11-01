@@ -17,7 +17,9 @@ local format = string.format
 local next = next
 local pairs = pairs
 local select = select
+local strmatch = string.match
 local tostring = tostring
+local type = type
 local unpack = unpack
 local wipe = table.wipe
 local API_GetItemInfo = GetItemInfo
@@ -29,6 +31,7 @@ local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
+local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 local OVALE_FALSE_STRING = tostring(false)
 local OVALE_NIL_STRING = tostring(nil)

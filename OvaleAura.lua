@@ -39,6 +39,7 @@ local bit_bor = bit.bor
 local floor = math.floor
 local gmatch = string.gmatch
 local ipairs = ipairs
+local next = next
 local pairs = pairs
 local substr = string.sub
 local strmatch = string.match
@@ -1155,7 +1156,7 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	aura.serial = state.serial
 	aura.lastUpdated = state.currentTime
 	aura.filter = filter
-	aura.mine = mine
+	aura.mine = (casterGUID == self_guid)
 	aura.start = start or 0
 	aura.ending = ending or math.huge
 	aura.duration = ending - start

@@ -30,6 +30,8 @@ local OvaleGUID = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
+local tinsert = table.insert
+local tremove = table.remove
 local API_GetTime = GetTime
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitClass = UnitClass

@@ -50,9 +50,9 @@ local type = type
 local wipe = table.wipe
 
 -- Table of script conditions.
-self_condition = {}
+local self_condition = {}
 -- List of script conditions that refer to a castable spell from the player's spellbook.
-self_spellBookCondition = {}
+local self_spellBookCondition = {}
 do
 	-- Spell(spellId) can be used as a condition instead of an action.
 	self_spellBookCondition["spell"] = true

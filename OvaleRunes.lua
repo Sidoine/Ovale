@@ -17,6 +17,7 @@ Ovale.OvaleRunes = OvaleRunes
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleData = nil
+local OvaleEquipement = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
 local OvaleStance = nil
@@ -25,6 +26,7 @@ local OvaleState = nil
 --local debugprint = print
 local ipairs = ipairs
 local pairs = pairs
+local wipe = table.wipe
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetSpellInfo = GetSpellInfo
@@ -135,6 +137,7 @@ end
 function OvaleRunes:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
+	OvaleEquipement = Ovale.OvaleEquipement
 	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleStance = Ovale.OvaleStance
@@ -459,12 +462,10 @@ statePrototype.RuneCount = function(state, name, atTime)
 		-- Match only the runes of the given type.
 		for _, slot in ipairs(RUNE_SLOTS[runeType]) do
 			local rune = state.rune[slot]
-			if not deathCondition or ((deathCondition == "none" or deathCondition == 0) and rune.type ~= DEATH_RUNE) then
-				if rune:IsActiveRune(atTime) then
-					count = count + 1
-				elseif rune.endCooldown < endCooldown then
-					startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
-				end
+			if rune:IsActiveRune(atTime) then
+				count = count + 1
+			elseif rune.endCooldown < endCooldown then
+				startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
 			end
 		end
 	else
