@@ -22,6 +22,7 @@ local pairs = pairs
 local type = type
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
+local API_InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local API_UnitClass = UnitClass
 
 -- Player's class.
@@ -34,6 +35,7 @@ OvaleOptions.defaultDB = {
 	profile = {
 		check = {},
 		list = {},
+		standaloneOptions = false,
 		apparence = {
 			-- Icon group
 			avecCible = false,
@@ -92,6 +94,18 @@ OvaleOptions.options = {
 			end,
 			args =
 			{
+				standaloneOptions = {
+					order = 30,
+					name = L["Standalone options"],
+					desc = L["Open configuration panel in a separate, movable window."],
+					type = "toggle",
+					get = function(info)
+						return Ovale.db.profile.standaloneOptions
+					end,
+					set = function(info, value)
+						Ovale.db.profile.standaloneOptions = value
+					end,
+				},
 				iconGroupAppearance =
 				{
 					order = 40,
@@ -405,11 +419,7 @@ OvaleOptions.options = {
 				{
 					name = "Configuration",
 					type = "execute",
-					func = function()
-						local appName = OVALE
-						AceConfigDialog:SetDefaultSize(appName, 500, 550)
-						AceConfigDialog:Open(appName)
-					end,
+					func = function() OvaleOptions:ToggleConfig() end,
 				},
 				power =
 				{
@@ -548,11 +558,18 @@ function OvaleOptions:HandleProfileChanges()
 end
 
 function OvaleOptions:ToggleConfig()
-	local frameName = OVALE
-	if AceConfigDialog.OpenFrames[frameName] then
-		AceConfigDialog:Close(frameName)
+	if Ovale.db.profile.standaloneOptions then
+		local appName = OVALE
+		if AceConfigDialog.OpenFrames[appName] then
+			AceConfigDialog:Close(appName)
+		else
+			AceConfigDialog:Open(appName)
+		end
 	else
-		AceConfigDialog:Open(frameName)
+		API_InterfaceOptionsFrame_OpenToCategory(OVALE)
+		-- Invoke the same call twice in a row to workaround a bug with Interface panel
+		-- opening without selecting the right category.
+		API_InterfaceOptionsFrame_OpenToCategory(OVALE)
 	end
 end
 --</public-static-methods>
