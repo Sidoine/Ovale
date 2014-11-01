@@ -3634,7 +3634,7 @@ function OvaleSimulationCraft:CreateOptions()
 							local profile = self:ParseProfile(self_lastSimC)
 							local code = ""
 							if profile then
-								code = self:Emit(profile)
+								code = self:Emit(profile) .. "\n"
 							end
 							-- Substitute spaces for tabs.
 							self_lastScript = gsub(code, "\t", "    ")
