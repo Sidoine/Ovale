@@ -498,18 +498,21 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, 
 	profiler.Stop("OvalePower_state_ApplyPowerCost")
 end
 
--- Return the number of seconds before all of the primary resources needed by a spell are available.
+-- Return the number of seconds before enough of the given power type is available for the spell.
+-- If not powerType is given, the the pooled resource for that class is used.
 statePrototype.TimeToPower = function(state, spellId, powerType)
-	local power = state[powerType]
-	local powerRate = state.powerRate[powerType]
-	local cost = state:PowerCost(spellId, powerType)
-
 	local seconds = 0
-	if power < cost then
-		if powerRate > 0 then
-			seconds = (cost - power) / powerRate
-		else
-			seconds = math.huge
+	powerType = powerType or OvalePower.POOLED_RESOURCE[state.class]
+	if powerType then
+		local power = state[powerType]
+		local powerRate = state.powerRate[powerType]
+		local cost = state:PowerCost(spellId, powerType)
+		if power < cost then
+			if powerRate > 0 then
+				seconds = (cost - power) / powerRate
+			else
+				seconds = math.huge
+			end
 		end
 	end
 	return seconds

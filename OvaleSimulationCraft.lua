@@ -2586,6 +2586,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local buffName = "breath_of_sindragosa_buff"
 		code = format("BuffPresent(%s)", buffName)
 		AddSymbol(annotation, buffName)
+	elseif class == "DEATHKNIGHT" and strsub(operand, -9, -1) == ".ready_in" then
+		local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+		local spellName = tokenIterator()
+		spellName = Disambiguate(spellName, class, specialization)
+		code = format("TimeToSpell(%s)", spellName)
+		AddSymbol(annotation, spellName)
 	elseif class == "DRUID" and operand == "max_fb_energy" then
 		-- SimulationCraft's max_fb_energy is the maximum cost of Ferocious Bite if used.
 		local spellName = "ferocious_bite"

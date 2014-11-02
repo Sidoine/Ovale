@@ -5229,6 +5229,58 @@ do
 end
 
 do
+	--- Get the number of seconds before the spell is ready to be cast, either due to cooldown or resources.
+	-- @name TimeToSpell
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+
+	local function TimeToSpell(condition, state)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local seconds = 0
+		-- Cooldown
+		do
+			local start, duration = state:GetSpellCooldown(spellId)
+			local timeToCooldown = start + duration - state.currentTime
+			if seconds < timeToCooldown then
+				seconds = timeToCooldown
+			end
+		end
+		-- Pooled resource.
+		do
+			local timeToPower = state:TimeToPower(spellId)
+			if seconds < timeToPower then
+				seconds = timeToPower
+			end
+		end
+		-- Runes.
+		local si = OvaleData:GetSpellInfo(spellId)
+		if si.blood or si.unholy or si.frost or si.death then
+			local blood = tonumber(si.blood) or 0
+			local unholy = tonumber(si.unholy) or 0
+			local frost = tonumber(si.frost) or 0
+			local death = tonumber(si.death) or 0
+			local timeToRunes = state:GetRunesCooldown(blood, unholy, frost, death)
+			if seconds < timeToRunes then
+				seconds = timeToRunes
+			end
+		end
+		if seconds == 0 then
+			return Compare(0, comparator, limit)
+		elseif seconds < math.huge then
+			return TestValue(0, state.currentTime + seconds, seconds, state.currentTime, -1, comparator, limit)
+		else -- if seconds == math.huge then
+			return Compare(math.huge, comparator, limit)
+		end
+	end
+
+	OvaleCondition:RegisterCondition("timetospell", true, TimeToSpell)
+end
+
+do
 	--- Get the time scaled by the specified haste type, defaulting to spell haste.
 	--- For example, if a DoT normally ticks every 3 seconds and is scaled by spell haste, then it ticks every TimeWithHaste(3 haste=spell) seconds.
 	-- @name TimeWithHaste
