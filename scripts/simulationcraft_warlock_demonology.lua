@@ -51,7 +51,7 @@ AddFunction DemonologyDefaultActions
 	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
 	#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
 	if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-	#summon_infernal,,if=!talent.demonic_servitude.enabled&active_enemies>=5
+	#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
 	if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
 	#call_action_list,name=db,if=talent.demonbolt.enabled
 	if Talent(demonbolt_talent) DemonologyDbActions()

@@ -77,14 +77,14 @@ AddFunction BalanceSingleTargetActions
 {
 	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>20
 	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 Spell(starsurge)
-	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-20
-	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -20 Spell(starsurge)
-	#starsurge,if=(charges=2&recharge_time<15)|charges=3
-	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 15 or Charges(starsurge) == 3 Spell(starsurge)
-	#celestial_alignment,if=lunar_max<8|target.time_to_die<20
-	if TimeToEclipse(lunar) < 8 or target.TimeToDie() < 20 Spell(celestial_alignment)
-	#incarnation,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(incarnation_caster)
+	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40
+	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 Spell(starsurge)
+	#starsurge,if=(charges=2&recharge_time<6)|charges=3
+	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
+	#celestial_alignment,if=eclipse_energy>40
+	if EclipseEnergy() > 40 Spell(celestial_alignment)
+	#incarnation,if=eclipse_energy>0
+	if EclipseEnergy() > 0 Spell(incarnation_caster)
 	#sunfire,if=remains<7|buff.solar_peak.up
 	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) Spell(sunfire)
 	#stellar_flare,if=remains<7

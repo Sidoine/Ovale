@@ -72,9 +72,9 @@ AddFunction FrostDualWieldDefaultActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
-	#call_action_list,name=aoe,if=active_enemies>=3
+	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostDualWieldAoeActions()
-	#call_action_list,name=single_target,if=active_enemies<3
+	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostDualWieldSingleTargetActions()
 }
 
@@ -102,32 +102,30 @@ AddFunction FrostDualWieldAoeActions
 {
 	#unholy_blight
 	Spell(unholy_blight)
-	#blood_boil,if=!talent.necrotic_plague.enabled&dot.blood_plague.ticking&talent.plague_leech.enabled,line_cd=28
-	if not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and Talent(plague_leech_talent) and TimeSincePreviousSpell(blood_boil) > 28 Spell(blood_boil)
-	#blood_boil,if=!talent.necrotic_plague.enabled&dot.blood_plague.ticking&talent.unholy_blight.enabled&cooldown.unholy_blight.remains<49,line_cd=28
-	if not Talent(necrotic_plague_talent) and target.DebuffPresent(blood_plague_debuff) and Talent(unholy_blight_talent) and SpellCooldown(unholy_blight) < 49 and TimeSincePreviousSpell(blood_boil) > 28 Spell(blood_boil)
+	#blood_boil,if=dot.blood_plague.ticking&(!talent.unholy_blight.enabled|cooldown.unholy_blight.remains<49),line_cd=28
+	if target.DebuffPresent(blood_plague_debuff) and { not Talent(unholy_blight_talent) or SpellCooldown(unholy_blight) < 49 } and TimeSincePreviousSpell(blood_boil) > 28 Spell(blood_boil)
 	#defile
 	Spell(defile)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
-	#call_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
+	#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosAoeActions()
 	#howling_blast
 	Spell(howling_blast)
 	#blood_tap,if=buff.blood_charge.stack>10
 	if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#frost_strike,if=runic_power>76
-	if RunicPower() > 76 Spell(frost_strike)
+	#frost_strike,if=runic_power>88
+	if RunicPower() > 88 Spell(frost_strike)
 	#death_and_decay,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(death_and_decay)
 	#plague_strike,if=unholy=2
 	if Runes(unholy 2) Spell(plague_strike)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#frost_strike
-	Spell(frost_strike)
-	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
+	#frost_strike,if=!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>=10
+	if not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) >= 10 Spell(frost_strike)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
 	#empower_rune_weapon
@@ -146,8 +144,8 @@ AddFunction FrostDualWieldBosAoeActions
 	if Runes(unholy 2) Spell(plague_strike)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
 	#empower_rune_weapon
@@ -164,16 +162,16 @@ AddFunction FrostDualWieldSingleTargetActions
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#breath_of_sindragosa,if=runic_power>75
 	if RunicPower() > 75 Spell(breath_of_sindragosa)
-	#call_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
+	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosStActions()
-	#howling_blast,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<88
-	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 Spell(howling_blast)
-	#obliterate,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<3&runic_power<76
-	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 76 Spell(obliterate)
 	#defile
 	Spell(defile)
 	#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
 	if Talent(defile_talent) and not SpellCooldown(defile) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	#howling_blast,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<88
+	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 Spell(howling_blast)
+	#obliterate,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<3&runic_power<76
+	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 76 Spell(obliterate)
 	#frost_strike,if=buff.killing_machine.react|runic_power>88
 	if BuffPresent(killing_machine_buff) or RunicPower() > 88 Spell(frost_strike)
 	#frost_strike,if=cooldown.antimagic_shell.remains<1&runic_power>=50&!buff.antimagic_shell.up
@@ -192,14 +190,12 @@ AddFunction FrostDualWieldSingleTargetActions
 	if BuffPresent(rime_buff) Spell(howling_blast)
 	#frost_strike,if=set_bonus.tier17_2pc=1&(runic_power>=50|(cooldown.pillar_of_frost.remains<5))
 	if ArmorSetBonus(T17 2) == 1 and { RunicPower() >= 50 or SpellCooldown(pillar_of_frost) < 5 } Spell(frost_strike)
-	#frost_strike,if=runic_power>=50
-	if RunicPower() >= 50 Spell(frost_strike)
+	#frost_strike,if=runic_power>76
+	if RunicPower() > 76 Spell(frost_strike)
 	#obliterate,if=unholy>0&!buff.killing_machine.react
 	if Runes(unholy 1) and not BuffPresent(killing_machine_buff) Spell(obliterate)
-	#howling_blast,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains<2)|death+frost>=2
-	if not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 2 } or RuneCount(death) + RuneCount(frost) >= 2 Spell(howling_blast)
-	#blood_tap,if=target.health.pct-3*(target.health.pct%target.time_to_die)>35|buff.blood_charge.stack>=8
-	if { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() > 35 or BuffStacks(blood_charge_buff) >= 8 } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	#howling_blast,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains<3)|death+frost>=2
+	if not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 Spell(howling_blast)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
@@ -254,7 +250,6 @@ AddIcon specialization=frost help=aoe
 # pillar_of_frost
 # pillar_of_frost_buff
 # plague_leech
-# plague_leech_talent
 # plague_strike
 # potion_strength_buff
 # quaking_palm

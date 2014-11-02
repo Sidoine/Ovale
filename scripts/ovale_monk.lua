@@ -107,8 +107,8 @@ AddFunction BrewmasterDefaultShortCdActions
 	if Talent(chi_brew_talent) and MaxChi() - Chi() >= 2 and BuffStacks(elusive_brew_stacks_buff) <= 10 Spell(chi_brew)
 	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 	if IncomingDamage(1.5) and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
-	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&buff.dampen_harm.down&buff.elusive_brew_activated.down
-	if BuffStacks(elusive_brew_stacks_buff) >= 9 and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
+	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
+	if BuffStacks(elusive_brew_stacks_buff) >= 9 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#serenity,if=talent.serenity.enabled&energy<=40
 	if Talent(serenity_talent) and Energy() <= 40 Spell(serenity)
 	#call_action_list,name=st,if=active_enemies<3
@@ -131,10 +131,12 @@ AddFunction BrewmasterDefaultCdActions
 	if Energy() <= 40 Spell(berserking)
 	#arcane_torrent,if=energy<=40
 	if Energy() <= 40 Spell(arcane_torrent_chi)
+	#diffuse_magic,if=incoming_damage_1500ms&buff.fortifying_brew.down
+	if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(diffuse_magic)
 	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 	if IncomingDamage(1.5) and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
-	#fortifying_brew,if=incoming_damage_1500ms&buff.dampen_harm.down&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
+	#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
+	if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5
 	if Talent(invoke_xuen_talent) and TimeInCombat() > 5 Spell(invoke_xuen)
 	#call_action_list,name=st,if=active_enemies<3

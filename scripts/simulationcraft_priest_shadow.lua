@@ -45,10 +45,8 @@ AddFunction ShadowCopActions
 	if 0 == 0 Spell(mind_blast)
 	#mind_blast,if=active_enemies<=5&cooldown_react
 	if Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 Spell(shadow_word_death)
+	#shadow_word_death,cycle_targets=1
+	Spell(shadow_word_death)
 	#mindbender,if=talent.mindbender.enabled
 	if Talent(mindbender_talent) Spell(mindbender)
 	#shadowfiend,if=!talent.mindbender.enabled
@@ -59,14 +57,14 @@ AddFunction ShadowCopActions
 	if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
 	#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 	if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
-	#shadow_word_pain,if=miss_react&!ticking&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and 0 == 0 Spell(shadow_word_pain)
-	#vampiric_touch,if=remains<cast_time&miss_react&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and 0 == 0 Spell(vampiric_touch)
-	#mind_sear,if=active_enemies>=3,chain=1,interrupt=1
-	if Enemies() >= 3 Spell(mind_sear)
-	#mind_spike,if=active_enemies<=8&buff.surge_of_darkness.react
-	if Enemies() <= 8 and BuffPresent(surge_of_darkness_buff) Spell(mind_spike)
+	#shadow_word_pain,if=miss_react&!ticking&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Enemies() <= 5 and 0 == 0 Spell(shadow_word_pain)
+	#vampiric_touch,if=remains<cast_time&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(vampiric_touch)
+	#mind_sear,if=active_enemies>=5,chain=1,interrupt=1
+	if Enemies() >= 5 Spell(mind_sear)
+	#mind_spike,if=active_enemies<=4&buff.surge_of_darkness.react
+	if Enemies() <= 4 and BuffPresent(surge_of_darkness_buff) Spell(mind_spike)
 	#mind_sear,if=active_enemies>=3,chain=1,interrupt=1
 	if Enemies() >= 3 Spell(mind_sear)
 	#mind_flay,if=target.dot.devouring_plague_tick.ticks_remain>1&active_enemies=1,chain=1,interrupt=1
@@ -113,10 +111,6 @@ AddFunction ShadowCopAdvancedMfiActions
 	if 0 == 0 Spell(mind_blast)
 	#mind_blast,if=active_enemies<=5&cooldown_react
 	if Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 Spell(shadow_word_death)
 	#mindbender,if=talent.mindbender.enabled
 	if Talent(mindbender_talent) Spell(mindbender)
 	#shadowfiend,if=!talent.mindbender.enabled
@@ -127,10 +121,10 @@ AddFunction ShadowCopAdvancedMfiActions
 	if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
 	#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 	if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
-	#shadow_word_pain,if=remains<(18*0.3)&miss_react&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and 0 == 0 Spell(shadow_word_pain)
-	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and 0 == 0 Spell(vampiric_touch)
+	#shadow_word_pain,if=remains<(18*0.3)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(shadow_word_pain)
+	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(vampiric_touch)
 	#mind_sear,if=active_enemies>=6,chain=1,interrupt=1
 	if Enemies() >= 6 Spell(mind_sear)
 	#mind_spike
@@ -203,10 +197,8 @@ AddFunction ShadowMainActions
 	if not Talent(void_entropy_talent) and ShadowOrbs() >= 4 and not target.DebuffPresent(devouring_plague_debuff) and Talent(surge_of_darkness_talent) Spell(devouring_plague)
 	#devouring_plague,if=!talent.void_entropy.enabled&((shadow_orb>=4)|(shadow_orb>=3&set_bonus.tier17_2pc))
 	if not Talent(void_entropy_talent) and { ShadowOrbs() >= 4 or ShadowOrbs() >= 3 and ArmorSetBonus(T17 2) } Spell(devouring_plague)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 Spell(shadow_word_death)
+	#shadow_word_death,cycle_targets=1
+	Spell(shadow_word_death)
 	#mind_blast,if=!glyph.mind_harvest.enabled&active_enemies<=5&cooldown_react
 	if not Glyph(glyph_of_mind_harvest) and Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
 	#devouring_plague,if=!talent.void_entropy.enabled&shadow_orb>=3&(cooldown.mind_blast.remains<1.5|target.health.pct<20&cooldown.shadow_word_death.remains<1.5)&!target.dot.devouring_plague_tick.ticking&talent.surge_of_darkness.enabled,cycle_targets=1
@@ -229,10 +221,10 @@ AddFunction ShadowMainActions
 	if Talent(divine_star_talent) and Enemies() > 4 and target.Distance() <= 24 Spell(divine_star_caster)
 	#shadow_word_pain,if=talent.auspicious_spirits.enabled&remains<(18*0.3)&miss_react,cycle_targets=1
 	if Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) Spell(shadow_word_pain)
-	#shadow_word_pain,if=!talent.auspicious_spirits.enabled&remains<(18*0.3)&miss_react,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and not Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) Spell(shadow_word_pain)
-	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) Spell(vampiric_touch)
+	#shadow_word_pain,if=!talent.auspicious_spirits.enabled&remains<(18*0.3)&miss_react&active_enemies<=5,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and not Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 Spell(shadow_word_pain)
+	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&active_enemies<=5,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 Spell(vampiric_touch)
 	#devouring_plague,if=!talent.void_entropy.enabled&shadow_orb>=3&ticks_remain<=1
 	if not Talent(void_entropy_talent) and ShadowOrbs() >= 3 and target.TicksRemaining(devouring_plague_debuff) < 2 Spell(devouring_plague)
 	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react=3
@@ -308,10 +300,8 @@ AddFunction ShadowCopMfiActions
 	if 0 == 0 Spell(mind_blast)
 	#mind_blast,if=active_enemies<=5&cooldown_react
 	if Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=1,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 1 Spell(shadow_word_death)
-	#shadow_word_death,if=buff.shadow_word_death_reset_cooldown.stack=0,cycle_targets=1
-	if BuffStacks(shadow_word_death_reset_cooldown_buff) == 0 Spell(shadow_word_death)
+	#shadow_word_death,cycle_targets=1
+	Spell(shadow_word_death)
 	#devouring_plague,if=shadow_orb>=3&(cooldown.mind_blast.remains<1.5|target.health.pct<20&cooldown.shadow_word_death.remains<1.5)
 	if ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } Spell(devouring_plague)
 	#mindbender,if=talent.mindbender.enabled
@@ -328,10 +318,10 @@ AddFunction ShadowCopMfiActions
 	if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
 	#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 	if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
-	#shadow_word_pain,if=remains<(18*0.3)&miss_react&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and 0 == 0 Spell(shadow_word_pain)
-	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and 0 == 0 Spell(vampiric_touch)
+	#shadow_word_pain,if=remains<(18*0.3)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(shadow_word_pain)
+	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(vampiric_touch)
 	#mind_sear,if=active_enemies>=6,chain=1,interrupt=1
 	if Enemies() >= 6 Spell(mind_sear)
 	#mind_spike
@@ -392,7 +382,6 @@ AddIcon specialization=shadow help=aoe
 # power_word_fortitude
 # quaking_palm
 # shadow_word_death
-# shadow_word_death_reset_cooldown_buff
 # shadow_word_insanity_buff
 # shadow_word_pain
 # shadow_word_pain_debuff

@@ -48,22 +48,24 @@ AddFunction FuryTitansGripDefaultActions
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementActions()
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=10|talent.anger_management.enabled
-	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 10 or Talent(anger_management_talent) Spell(recklessness)
-	#avatar,if=(buff.recklessness.up|target.time_to_die<=25)
-	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 Spell(avatar)
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetActions()
+	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
+	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
+	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
+	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
 	#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
 	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 0 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -86,8 +88,10 @@ AddFunction FuryTitansGripAoeActions
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
 	#raging_blow,if=buff.meat_cleaver.stack>=3
 	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#bladestorm,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+	#recklessness,sync=bladestorm
+	if not SpellCooldown(bladestorm) > 0 Spell(recklessness)
+	#bladestorm,if=buff.enrage.remains>6
+	if BuffRemaining(enrage_buff any=1) > 6 Spell(bladestorm)
 	#whirlwind
 	Spell(whirlwind)
 	#execute,if=buff.sudden_death.react
@@ -177,14 +181,14 @@ AddFunction FuryTitansGripSingleTargetActions
 {
 	#bloodbath
 	Spell(bloodbath)
+	#recklessness,if=target.health.pct<20&raid_event.adds.exists
+	if target.HealthPercent() < 20 and False(raid_event_adds_exists) Spell(recklessness)
 	#wild_strike,if=rage>110&target.health.pct>20
 	if Rage() > 110 and target.HealthPercent() > 20 Spell(wild_strike)
-	#bloodthirst,if=!talent.unquenchable_thirst.enabled&(buff.enrage.down|rage<80)
-	if not Talent(unquenchable_thirst_talent) and { BuffExpires(enrage_buff any=1) or Rage() < 80 } Spell(bloodthirst)
-	#bloodthirst,if=talent.unquenchable_thirst.enabled&buff.enrage.down
-	if Talent(unquenchable_thirst_talent) and BuffExpires(enrage_buff any=1) Spell(bloodthirst)
-	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bloodthirst,if=(!talent.unquenchable_thirst.enabled&rage<80)|buff.enrage.down
+	if not Talent(unquenchable_thirst_talent) and Rage() < 80 or BuffExpires(enrage_buff any=1) Spell(bloodthirst)
+	#ravager,if=buff.bloodbath.up|(!talent.bloodbath.enabled&(!raid_event.adds.exists|raid_event.adds.cooldown>60|target.time_to_die<40))
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and { not False(raid_event_adds_exists) or 600 > 60 or target.TimeToDie() < 40 } Spell(ravager)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
 	#siegebreaker

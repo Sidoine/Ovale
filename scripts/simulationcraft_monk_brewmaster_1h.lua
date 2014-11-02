@@ -74,12 +74,14 @@ AddFunction BrewmasterDefaultActions
 	#chi_brew,if=talent.chi_brew.enabled&chi.max-chi>=2&buff.elusive_brew_stacks.stack<=10
 	if Talent(chi_brew_talent) and MaxChi() - Chi() >= 2 and BuffStacks(elusive_brew_stacks_buff) <= 10 Spell(chi_brew)
 	#gift_of_the_ox,if=buff.gift_of_the_ox.react&incoming_damage_1500ms
+	#diffuse_magic,if=incoming_damage_1500ms&buff.fortifying_brew.down
+	if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(diffuse_magic)
 	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 	if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
-	#fortifying_brew,if=incoming_damage_1500ms&buff.dampen_harm.down&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) > 0 and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
-	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&buff.dampen_harm.down&buff.elusive_brew_activated.down
-	if BuffStacks(elusive_brew_stacks_buff) >= 9 and BuffExpires(dampen_harm_buff) and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
+	#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
+	if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
+	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
+	if BuffStacks(elusive_brew_stacks_buff) >= 9 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5
 	if Talent(invoke_xuen_talent) and TimeInCombat() > 5 Spell(invoke_xuen)
 	#serenity,if=talent.serenity.enabled&energy<=40
@@ -199,6 +201,8 @@ AddIcon specialization=brewmaster help=aoe
 # chi_wave_talent
 # dampen_harm
 # dampen_harm_buff
+# diffuse_magic
+# diffuse_magic_buff
 # dizzying_haze_debuff
 # elusive_brew
 # elusive_brew_activated_buff

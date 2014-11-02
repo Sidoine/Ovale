@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warrior_Arms_T16M".
 #	class=warrior
 #	spec=arms
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!020011.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!020021.
 #	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 Include(ovale_common)
@@ -57,8 +57,8 @@ AddFunction ArmsDefaultActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	#call_action_list,name=movement,if=movement.distance>8
-	if 0 > 8 ArmsMovementActions()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 ArmsMovementActions()
 	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
 	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
@@ -89,6 +89,8 @@ AddFunction ArmsAoeActions
 	if target.TicksRemaining(rend_debuff) < 2 and target.TimeToDie() > 4 Spell(rend)
 	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bladestorm,if=active_enemies>5
+	if Enemies() > 5 Spell(bladestorm)
 	#colossus_smash,if=dot.rend.ticking
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
 	#mortal_strike,if=cooldown.colossus_smash.remains>1.5&target.health.pct>20&active_enemies=2
@@ -121,24 +123,24 @@ AddFunction ArmsSingleActions
 	if SpellCooldown(colossus_smash) < 4 Spell(ravager)
 	#colossus_smash
 	Spell(colossus_smash)
-	#mortal_strike,if=target.health.pct>20
-	if target.HealthPercent() > 20 Spell(mortal_strike)
+	#mortal_strike,if=target.health.pct>20&cooldown.colossus_smash.remains>1
+	if target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 Spell(mortal_strike)
 	#storm_bolt,if=(cooldown.colossus_smash.remains>4|debuff.colossus_smash.up)&rage<90
 	if { SpellCooldown(colossus_smash) > 4 or target.DebuffPresent(colossus_smash_debuff) } and Rage() < 90 Spell(storm_bolt)
 	#siegebreaker
 	Spell(siegebreaker)
 	#dragon_roar,if=!debuff.colossus_smash.up
 	if not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
-	#rend,if=!debuff.colossus_smash.up&target.time_to_die>4&ticks_remain<2
-	if not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.TicksRemaining(rend_debuff) < 2 Spell(rend)
+	#rend,if=!debuff.colossus_smash.up&target.time_to_die>4&remains<5.4
+	if not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 Spell(rend)
 	#execute,if=(rage>=60&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|buff.sudden_death.react|target.time_to_die<5
 	if Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 Spell(execute_arms)
-	#impending_victory,if=rage<40&!debuff.colossus_smash.up&target.health.pct>20
-	if Rage() < 40 and not target.DebuffPresent(colossus_smash_debuff) and target.HealthPercent() > 20 Spell(impending_victory)
-	#slam,if=(rage>20|cooldown.colossus_smash.remains>execute_time)&target.health.pct>20
-	if { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 Spell(slam)
-	#whirlwind,if=!talent.slam.enabled&target.health.pct>20&(rage>=40|set_bonus.tier17_4pc|debuff.colossus_smash.up)
-	if not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } Spell(whirlwind)
+	#impending_victory,if=rage<40&target.health.pct>20&cooldown.colossus_smash.remains>1&cooldown.mortal_strike.remains>1
+	if Rage() < 40 and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 Spell(impending_victory)
+	#slam,if=(rage>20|cooldown.colossus_smash.remains>execute_time)&target.health.pct>20&cooldown.colossus_smash.remains>1&cooldown.mortal_strike.remains>1
+	if { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 Spell(slam)
+	#whirlwind,if=!talent.slam.enabled&target.health.pct>20&(rage>=40|set_bonus.tier17_4pc|debuff.colossus_smash.up)&cooldown.colossus_smash.remains>1&cooldown.mortal_strike.remains>1
+	if not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 Spell(whirlwind)
 	#shockwave
 	Spell(shockwave)
 }

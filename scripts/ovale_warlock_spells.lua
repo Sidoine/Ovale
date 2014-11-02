@@ -159,6 +159,7 @@ Define(rain_of_fire_debuff 104232)
 Define(shadow_bolt 686)
 	SpellInfo(shadow_bolt demonicfury=-25 specialization=demonology)
 	SpellAddBuff(shadow_bolt molten_core_buff=1,target_health_pct,25 specialization=demonology)
+Define(Shadowburn 17877) # SimulationCraft bug workaround
 Define(shadowburn 17877)
 	SpellInfo(shadowburn burningembers=10 target_health_pct=20)
 Define(shadowflame_debuff 47960)
