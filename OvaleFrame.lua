@@ -61,14 +61,10 @@ do
 	local function frameOnMouseUp(self)
 		self:StopMovingOrSizing()
 		local profile = Ovale.db.profile
-		for i = 1, self:GetNumPoints() do
-			local point, relativeTo, relativePoint, xOffset, yOffset = self:GetPoint(i)
-			if point == "CENTER" then
-				profile.apparence.offsetX = xOffset
-				profile.apparence.offsetY = yOffset
-				break
-			end
-		end
+		local x, y = self:GetCenter()
+		local parentX, parentY = self:GetParent():GetCenter()
+		profile.apparence.offsetX = x - parentX
+		profile.apparence.offsetY = y - parentY
 	end
 	
 	local function frameOnEnter(self)
@@ -309,6 +305,12 @@ do
 		end
 	end
 
+	local function UpdateFrame(self)
+		local profile = Ovale.db.profile
+		self.frame:SetPoint("CENTER", self.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY)
+		self.frame:EnableMouse(not profile.apparence.clickThru)
+	end
+
 	local function UpdateIcons(self)
 		for k, action in pairs(self.actions) do
 			for i, icon in pairs(action.icons) do
@@ -437,13 +439,14 @@ do
 		local frame = API_CreateFrame("Frame", nil, hider)
 		local self = {}
 		local profile = Ovale.db.profile
-		
+
 		self.Hide = Hide
 		self.Show = Show
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
 		self.LayoutFinished = OnLayoutFinished
 		self.UpdateActionIcon = UpdateActionIcon
+		self.UpdateFrame = UpdateFrame
 		self.UpdateIcons = UpdateIcons
 		self.ToggleOptions = ToggleOptions
 		self.OnUpdate = OnUpdate
@@ -470,10 +473,7 @@ do
 		frame.obj = self
 		frame:SetWidth(100)
 		frame:SetHeight(100)
-		frame:SetPoint("CENTER", hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY)
-		if not profile.apparence.clickThru then
-			frame:EnableMouse()
-		end
+		self:UpdateFrame()
 		frame:SetMovable(true)
 		frame:SetFrameStrata("MEDIUM")
 		frame:SetScript("OnMouseDown", frameOnMouseDown)

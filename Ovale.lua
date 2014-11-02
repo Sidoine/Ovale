@@ -190,6 +190,9 @@ function Ovale:Ovale_OptionChanged(event, eventType)
 	if eventType == "visibility" then
 		self:UpdateVisibility()
 	else
+		if eventType == "layout" then
+			self.frame:UpdateFrame()
+		end
 		self:UpdateFrame()
 	end
 end
