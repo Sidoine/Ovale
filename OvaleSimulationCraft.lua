@@ -2437,14 +2437,36 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
 
 	local code
 	if name == "movement" then
-		if property == "distance" then
-			code = "0"
-		elseif property == "in" then
-			code = "0"
-		elseif property == "remains" then
+		--[[
+			The "movement" raid event simulates needing to move during the encounter.
+			We always assume the fight is Patchwerk-style, meaning no movement is
+			necessary.
+		--]]
+		if property == "cooldown" or property == "in" then
+			-- Pretend the next "movement" raid event is ten minutes from now.
+			code = "600"
+		elseif property == "distance" then
 			code = "0"
 		elseif property == "exists" then
 			code = "False(raid_event_movement_exists)"
+		elseif property == "remains" then
+			code = "0"
+		else
+			ok = false
+		end
+	elseif name == "adds" then
+		--[[
+			The "adds" raid event simulates waves of adds on regular intervals.
+			This is separate from the dynamic number of active enemies.
+			We always assume that there are no add waves.
+		--]]
+		if property == "cooldown" then
+			-- Pretend the next "adds" raid event is ten minutes from now.
+			code = "600"
+		elseif property == "count" then
+			code = "0"
+		elseif property == "exists" then
+			code = "False(raid_event_adds_exists)"
 		else
 			ok = false
 		end
