@@ -14,13 +14,6 @@ do
 Include(ovale_common)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
-
-AddFunction UsePotionAgility
-{
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
-}
-
 AddFunction GetInMeleeRange
 {
 	if Stance(druid_bear_form) and not target.InRange(mangle)
@@ -53,54 +46,50 @@ AddFunction InterruptActions
 AddFunction GuardianDefaultActions
 {
 	#auto_attack
+	#skull_bash
+	InterruptActions()
+	#savage_defense
+	Spell(savage_defense)
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
-	#potion,name=tolvir,if=buff.berserking.up|buff.berserk.up
-	if BuffPresent(berserking_buff) or BuffPresent(berserk_bear_buff) UsePotionAgility()
-	#skull_bash
-	InterruptActions()
 	#barkskin
 	Spell(barkskin)
-	#survival_instincts,if=health.pct<50
-	if HealthPercent() < 50 Spell(survival_instincts)
-	#savage_defense,if=buff.savage_defense.down
-	if BuffExpires(savage_defense_buff) Spell(savage_defense)
-	#frenzied_regeneration,if=health.pct<40
-	if HealthPercent() < 40 Spell(frenzied_regeneration)
-	#maul
-	Spell(maul)
-	#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
-	if Charges(force_of_nature_tank) == 3 or BuffPresent(trinket_proc_agility_buff) or target.TimeToDie() < 20 Spell(force_of_nature_tank)
-	#berserk,if=dot.thrash_bear.remains>10&dot.lacerate.stack=3&dot.lacerate.remains>10&buff.son_of_ursoc.down
-	if target.DebuffRemaining(thrash_bear_debuff) > 10 and target.DebuffStacks(lacerate_debuff) == 3 and target.DebuffRemaining(lacerate_debuff) > 10 and BuffExpires(son_of_ursoc_buff) Spell(berserk_bear)
-	#renewal,if=health.pct<30
-	if HealthPercent() < 30 Spell(renewal)
-	#natures_vigil
-	Spell(natures_vigil)
-	#heart_of_the_wild
-	Spell(heart_of_the_wild_tank)
+	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
+	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) > 0 Spell(maul)
+	#berserk,if=buff.pulverize.remains>10
+	if BuffRemaining(pulverize_buff) > 10 Spell(berserk_bear)
+	#frenzied_regeneration,if=rage>=80
+	if Rage() >= 80 Spell(frenzied_regeneration)
 	#cenarion_ward
 	Spell(cenarion_ward)
-	#lacerate,cycle_targets=1,if=dot.lacerate.ticking&dot.lacerate.remains<2
-	if target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) < 2 Spell(lacerate)
-	#mangle,if=active_enemies<4
-	if Enemies() < 4 Spell(mangle)
-	#thrash_bear,if=dot.thrash_bear.remains<1
-	if target.DebuffRemaining(thrash_bear_debuff) < 1 Spell(thrash_bear)
-	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<10
-	if BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 10 Spell(healing_touch)
-	#thrash_bear,if=active_enemies>4
-	if Enemies() > 4 Spell(thrash_bear)
-	#lacerate,cycle_targets=1,if=!dot.lacerate.ticking
+	#renewal,if=health.pct<30
+	if HealthPercent() < 30 Spell(renewal)
+	#heart_of_the_wild
+	Spell(heart_of_the_wild_tank)
+	#rejuvenation,if=buff.heart_of_the_wild.up&remains<=0.3*duration
+	if BuffPresent(heart_of_the_wild_tank_buff) and BuffRemaining(rejuvenation_buff) <= 0.3 * BaseDuration(rejuvenation_buff) and SpellKnown(enhanced_rejuvenation) Spell(rejuvenation)
+	#natures_vigil
+	Spell(natures_vigil)
+	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<30
+	if BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 Spell(healing_touch)
+	#pulverize,if=buff.pulverize.remains<0.5
+	if BuffRemaining(pulverize_buff) < 0.5 and target.DebuffStacks(lacerate_debuff) >= 3 Spell(pulverize)
+	#lacerate,if=talent.pulverize.enabled&buff.pulverize.remains<=(3-dot.lacerate.stack)*gcd&buff.berserk.down
+	if Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) Spell(lacerate)
+	#incarnation
+	Spell(incarnation_tank)
+	#lacerate,if=!ticking
 	if not target.DebuffPresent(lacerate_debuff) Spell(lacerate)
-	#lacerate,cycle_targets=1,if=dot.lacerate.stack<3
-	if target.DebuffStacks(lacerate_debuff) < 3 Spell(lacerate)
-	#thrash_bear,if=active_enemies>1
-	if Enemies() > 1 Spell(thrash_bear)
+	#thrash_bear,if=!ticking
+	if not target.DebuffPresent(thrash_bear_debuff) Spell(thrash_bear)
+	#mangle
+	Spell(mangle)
+	#thrash_bear,if=remains<=0.3*duration
+	if target.DebuffRemaining(thrash_bear_debuff) <= 0.3 * BaseDuration(thrash_bear_debuff) Spell(thrash_bear)
 	#lacerate
 	Spell(lacerate)
 }
@@ -114,8 +103,6 @@ AddFunction GuardianPrecombatActions
 	#bear_form
 	Spell(bear_form)
 	#snapshot_stats
-	#rejuvenation
-	if SpellKnown(enhanced_rejuvenation) Spell(rejuvenation)
 	#cenarion_ward
 	Spell(cenarion_ward)
 }
@@ -139,15 +126,15 @@ AddIcon specialization=guardian help=aoe
 # berserk_bear
 # berserk_bear_buff
 # berserking
-# berserking_buff
 # blood_fury_apsp
 # cenarion_ward
 # dream_of_cenarius_tank_buff
 # enhanced_rejuvenation
-# force_of_nature_tank
 # frenzied_regeneration
 # healing_touch
 # heart_of_the_wild_tank
+# heart_of_the_wild_tank_buff
+# incarnation_tank
 # lacerate
 # lacerate_debuff
 # maim
@@ -156,19 +143,19 @@ AddIcon specialization=guardian help=aoe
 # maul
 # mighty_bash
 # natures_vigil
+# pulverize
+# pulverize_buff
+# pulverize_talent
 # rejuvenation
+# rejuvenation_buff
 # renewal
 # savage_defense
-# savage_defense_buff
 # shred
 # skull_bash
-# son_of_ursoc_buff
-# survival_instincts
 # thrash_bear
 # thrash_bear_debuff
-# trinket_proc_agility_buff
+# tooth_and_claw_buff
 # typhoon
-# virmens_bite_potion
 # war_stomp
 # wild_charge_bear
 # wild_charge_cat

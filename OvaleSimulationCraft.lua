@@ -982,6 +982,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("incarnation",			"incarnation_tank",				"DRUID",		"guardian")
 	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
+	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"feral")	-- XXX
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"guardian")	-- XXX
 	-- Hunter
@@ -1128,6 +1129,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "DRUID" and action == "prowl" then
 			-- Don't Prowl if already stealthed.
 			conditionCode = "BuffExpires(stealthed_buff any=1)"
+		elseif class == "DRUID" and action == "pulverize" then
+			-- Pulverize requires 3 stacks of Lacerate on the target.
+			local debuffName = "lacerate_debuff"
+			AddSymbol(annotation, debuffName)
+			conditionCode = format("target.DebuffStacks(%s) >= 3", debuffName)
 		elseif class == "DRUID" and action == "skull_bash" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
