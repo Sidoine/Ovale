@@ -258,6 +258,7 @@ function OvaleAura:OnEnable()
 	self:RegisterEvent("PLAYER_ALIVE")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ScanAllUnitAuras")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("PLAYER_UNGHOST", "PLAYER_ALIVE")
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
@@ -270,6 +271,7 @@ function OvaleAura:OnDisable()
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterEvent("PLAYER_UNGHOST")
 	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterMessage("Ovale_GroupChanged")
@@ -282,17 +284,50 @@ end
 function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
+	local mine = (sourceGUID == self_guid)
 	if CLEU_AURA_EVENTS[cleuEvent] then
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId and not OvaleGUID.UNIT_AURA_UNIT[unitId] then
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", cleuEvent, unitId)
-			self:ScanAurasOnGUID(destGUID)
+		if unitId then
+			-- Only update auras on the unit if it is not a unit type that receives UNIT_AURA events.
+			if not OvaleGUID.UNIT_AURA_UNIT[unitId] then
+				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%s)", cleuEvent, destGUID, unitId)
+				self:ScanAurasOnGUID(destGUID, unitId)
+			end
+		elseif mine then
+			-- There is no unit ID, but the action was caused by the player, so update this aura on destGUID.
+			local spellId, spellName, spellSchool = arg12, arg13, arg14
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID)
+			local now = API_GetTime()
+			if cleuEvent == "SPELL_AURA_REMOVED" or cleuEvent == "SPELL_AURA_BROKEN" or cleuEvent == "SPELL_AURA_BROKEN_SPELL" then
+				self:LostAuraOnGUID(destGUID, now, spellId, sourceGUID)
+			else
+				local auraType, amount = arg15, arg16
+				local filter = (auraType == "BUFF") and "HELPFUL" or "HARMFUL"
+				local si = OvaleData.spellInfo[spellId]
+				-- Find an existing aura applied by the player on destGUID.
+				local aura = GetAuraOnGUID(self.aura, destGUID, spellId, filter, true)
+				local duration = aura and aura.duration or si.duration or 15
+				local expirationTime = now + duration
+				local count
+				if cleuEvent == "SPELL_AURA_APPLIED" then
+					count = 1
+				elseif cleuEvent == "SPELL_AURA_APPLIED_DOSE" or cleuEvent == "SPELL_AURA_REMOVED_DOSE" then
+					count = amount
+				elseif cleuEvent == "SPELL_AURA_REFRESH" then
+					count = aura and aura.stacks or 1
+				end
+				self:GainedAuraOnGUID(destGUID, now, spellId, sourceGUID, filter, true, nil, count, nil, duration, expirationTime, nil, spellName)
+			end
 		end
-	elseif sourceGUID == self_guid and CLEU_TICK_EVENTS[cleuEvent] then
+	elseif mine and CLEU_TICK_EVENTS[cleuEvent] then
 		-- Update the latest tick time of the periodic aura cast by the player.
 		local spellId, spellName, spellSchool = arg12, arg13, arg14
 		local unitId = OvaleGUID:GetUnitId(destGUID)
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", cleuEvent, unitId)
+		if unitId then
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%s)", cleuEvent, destGUID, unitId)
+		else
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", cleuEvent, destGUID)
+		end
 		local aura = GetAura(self.aura, destGUID, spellId, self_guid)
 		if self:IsActiveAura(aura) then
 			local name = aura.name or "Unknown spell"
@@ -311,19 +346,29 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 			aura.baseTick = baseTick
 			aura.lastTickTime = timestamp
 			aura.tick = tick
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%f, lastTickTime=%f", name, spellId, destGUID, tick, lastTickTime)
+			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
 		end
 	end
 end
 
 function OvaleAura:PLAYER_ALIVE(event)
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s", event)
-	self:ScanAurasOnGUID(self_guid)
+	self:ScanAurasOnGUID(self_guid, "player")
 end
 
 function OvaleAura:PLAYER_REGEN_ENABLED(event)
 	self:RemoveAurasOnInactiveUnits()
 	self_pool:Drain()
+end
+
+function OvaleAura:PLAYER_TARGET_CHANGED(event, cause)
+	if cause == "NIL" or cause == "down" then
+		-- Target was cleared.
+	else
+		-- Target has changed.
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s", event)
+		self:ScanAuras("target")
+	end
 end
 
 function OvaleAura:UNIT_AURA(event, unitId)
@@ -529,12 +574,11 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 end
 
 -- Scan auras on the given GUID and update the aura database.
-function OvaleAura:ScanAurasOnGUID(guid)
-	if not guid then return end
-	local unitId = OvaleGUID:GetUnitId(guid)
+function OvaleAura:ScanAurasOnGUID(guid, unitId)
 	if not unitId then return end
 
 	profiler.Start("OvaleAura_ScanAurasOnGUID")
+	guid = guid or OvaleGUID:GetGUID(unitId)
 	local now = API_GetTime()
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Scanning auras on %s (%s) at %f", guid, unitId, now)
 
@@ -587,14 +631,15 @@ end
 function OvaleAura:ScanAuras(unitId)
 	local guid = OvaleGUID:GetGUID(unitId)
 	if guid then
-		return self:ScanAurasOnGUID(guid)
+		return self:ScanAurasOnGUID(guid, unitId)
 	end
 end
 
 function OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
 	-- If this GUID has no auras in the database, then do an aura scan.
 	if not self.serial[guid] then
-		self:ScanAurasOnGUID(guid)
+		local unitId = OvaleGUID:GetUnitId(guid)
+		self:ScanAurasOnGUID(guid, unitId)
 	end
 
 	local auraFound
