@@ -306,7 +306,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 				local si = OvaleData.spellInfo[spellId]
 				-- Find an existing aura applied by the player on destGUID.
 				local aura = GetAuraOnGUID(self.aura, destGUID, spellId, filter, true)
-				local duration = aura and aura.duration or si.duration or 15
+				local duration = aura and aura.duration or (si and si.duration) or 15
 				local expirationTime = now + duration
 				local count
 				if cleuEvent == "SPELL_AURA_APPLIED" then
