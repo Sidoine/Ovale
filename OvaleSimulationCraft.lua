@@ -2257,7 +2257,9 @@ EmitOperandDisease = function(operand, parseNode, nodeList, annotation, action, 
 		target = target and (target .. ".") or ""
 
 		local code
-		if property == "min_remains" then
+		if property == "max_ticking" then
+			code = target .. "DiseasesAnyTicking()"
+		elseif property == "min_remains" then
 			code = target .. "DiseasesRemaining()"
 		elseif property == "min_ticking" then
 			code = target .. "DiseasesTicking()"
