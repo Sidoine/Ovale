@@ -2091,6 +2091,7 @@ end
 do
 	local CHARACTER_PROPERTY = {
 		["active_enemies"]		= "Enemies()",
+		["blood.frac"]			= "Rune(blood)",
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
@@ -2105,6 +2106,7 @@ do
 		["focus.deficit"]		= "FocusDeficit()",
 		["focus.regen"]			= "FocusRegenRate()",
 		["focus.time_to_max"]	= "TimeToMaxFocus()",
+		["frost.frac"]			= "Rune(frost)",
 		["health"]				= "Health()",
 		["health.deficit"]		= "HealthMissing()",
 		["health.max"]			= "MaxHealth()",
@@ -2126,6 +2128,7 @@ do
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["time"]				= "TimeInCombat()",
 		["time_to_die"]			= "TimeToDie()",
+		["unholy.frac"]			= "Rune(unholy)",
 	}
 
 	EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action, target)
