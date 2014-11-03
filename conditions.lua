@@ -5333,6 +5333,8 @@ do
 	{
 		-- Death Knights
 		ghoul = 1,
+		-- Druid
+		mushroom = 1,
 		-- XXX Mage
 		crystal = 4,
 		-- Monks
@@ -5344,11 +5346,11 @@ do
 		air = 4
 	}
 
-	--- Test if the totem for shamans, the ghoul for death knights, or the statue for monks has expired.
+	--- Test if the totem for shamans, the mushroom for druids, the ghoul for death knights, or the statue for monks has expired.
 	-- @name TotemExpires
 	-- @paramsig boolean
 	-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
-	--     Valid types: fire, water, air, earth, ghoul, statue.
+	--     Valid types: fire, water, air, earth, ghoul, mushroom, statue.
 	-- @param seconds Optional. The maximum number of seconds before the totem should expire.
 	--     Defaults to 0 (zero).
 	-- @param totem Optional. Sets the specific totem to check of given totem ID type.
@@ -5536,53 +5538,4 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("weaponenchantexpires", false, WeaponEnchantExpires)
-end
-
-do
-	--- Get the number of active Wild Mushrooms by the player.
-	-- @name WildMushroomCount
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The number of Wild Mushrooms.
-	-- @return A boolean value for the result of the comparison.
-	-- @usage
-	-- if WildMushroomCount() < 3 Spell(wild_mushroom_caster)
-
-	local function WildMushroomCount(condition, state)
-		local comparator, limit = condition[1], condition[2]
-		local count = 0
-		for slot = 1, 3 do
-			local haveTotem = API_GetTotemInfo(slot)
-			if haveTotem then
-				count = count + 1
-			end
-		end
-		return Compare(count, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("wildmushroomcount", false, WildMushroomCount)
-end
-
-do
-	local WILD_MUSHROOM_BLOOM = 102791
-
-	--- Test if the player's Wild Mushroom is fully charged for maximum healing.
-	-- @name WildMushroomIsCharged
-	-- @paramsig boolean
-	-- @param yesno Optional. If yes, then return true if the player's Wild Mushroom is fully charged. If no, then return true if it isn't fully charged.
-	--     Default is yes.
-	--     Valid values: yes, no.
-	-- @return A boolean value.
-	-- @usage
-	-- if WildMushroomIsCharged() Spell(wild_mushroom_bloom)
-
-	local function WildMushroomIsCharged(condition, state)
-		local yesno = condition[1]
-		local target = ParseCondition(condition, state)
-		local boolean = API_IsSpellOverlayed(WILD_MUSHROOM_BLOOM)
-		return TestBoolean(boolean, yesno)
-	end
-
-	OvaleCondition:RegisterCondition("wildmushroomischarged", false, WildMushroomIsCharged)
 end
