@@ -291,7 +291,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 			-- Only update auras on the unit if it is not a unit type that receives UNIT_AURA events.
 			if not OvaleGUID.UNIT_AURA_UNIT[unitId] then
 				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%s)", cleuEvent, destGUID, unitId)
-				self:ScanAurasOnGUID(destGUID, unitId)
+				self:ScanAuras(unitId, destGUID)
 			end
 		elseif mine then
 			-- There is no unit ID, but the action was caused by the player, so update this aura on destGUID.
@@ -353,7 +353,7 @@ end
 
 function OvaleAura:PLAYER_ALIVE(event)
 	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s", event)
-	self:ScanAurasOnGUID(self_guid, "player")
+	self:ScanAuras("player", self_guid)
 end
 
 function OvaleAura:PLAYER_REGEN_ENABLED(event)
@@ -574,72 +574,65 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 end
 
 -- Scan auras on the given GUID and update the aura database.
-function OvaleAura:ScanAurasOnGUID(guid, unitId)
-	if not unitId then return end
-
-	profiler.Start("OvaleAura_ScanAurasOnGUID")
+function OvaleAura:ScanAuras(unitId, guid)
+	profiler.Start("OvaleAura_ScanAuras")
 	guid = guid or OvaleGUID:GetGUID(unitId)
-	local now = API_GetTime()
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Scanning auras on %s (%s) at %f", guid, unitId, now)
+	if guid then
+		local now = API_GetTime()
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Scanning auras on %s (%s) at %f", guid, unitId, now)
 
-	-- Advance the age of the unit's auras.
-	local serial = self.serial[guid] or 0
-	serial = serial + 1
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
-	self.serial[guid] = serial
+		-- Advance the age of the unit's auras.
+		local serial = self.serial[guid] or 0
+		serial = serial + 1
+		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
+		self.serial[guid] = serial
 
-	-- Add all auras on the unit into the database.
-	local i = 1
-	local filter = "HELPFUL"
-	while true do
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
-			canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, filter)
-		if not name then
-			if filter == "HELPFUL" then
-				filter = "HARMFUL"
-				i = 1
+		-- Add all auras on the unit into the database.
+		local i = 1
+		local filter = "HELPFUL"
+		while true do
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
+				canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, filter)
+			if not name then
+				if filter == "HELPFUL" then
+					filter = "HARMFUL"
+					i = 1
+				else
+					break
+				end
 			else
-				break
+				local casterGUID = OvaleGUID:GetGUID(unitCaster)
+				self:GainedAuraOnGUID(guid, now, spellId, casterGUID, filter, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
+				i = i + 1
 			end
-		else
-			local casterGUID = OvaleGUID:GetGUID(unitCaster)
-			self:GainedAuraOnGUID(guid, now, spellId, casterGUID, filter, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
-			i = i + 1
 		end
-	end
 
-	-- Find recently expired auras on the unit.
-	if self.aura[guid] then
-		local auraTable = self.aura[guid]
-		for auraId, whoseTable in pairs(auraTable) do
-			for casterGUID, aura in pairs(whoseTable) do
-				if aura.serial == serial - 1 then
-					if aura.visible then
-						-- Remove the aura if it was visible.
-						self:LostAuraOnGUID(guid, now, auraId, casterGUID)
-					else
-						-- Age any hidden auras that are managed by outside modules.
-						aura.serial = serial
+		-- Find recently expired auras on the unit.
+		if self.aura[guid] then
+			local auraTable = self.aura[guid]
+			for auraId, whoseTable in pairs(auraTable) do
+				for casterGUID, aura in pairs(whoseTable) do
+					if aura.serial == serial - 1 then
+						if aura.visible then
+							-- Remove the aura if it was visible.
+							self:LostAuraOnGUID(guid, now, auraId, casterGUID)
+						else
+							-- Age any hidden auras that are managed by outside modules.
+							aura.serial = serial
+						end
 					end
 				end
 			end
 		end
 	end
-	profiler.Stop("OvaleAura_ScanAurasOnGUID")
-end
-
-function OvaleAura:ScanAuras(unitId)
-	local guid = OvaleGUID:GetGUID(unitId)
-	if guid then
-		return self:ScanAurasOnGUID(guid, unitId)
-	end
+	profiler.Stop("OvaleAura_ScanAuras")
 end
 
 function OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
 	-- If this GUID has no auras in the database, then do an aura scan.
 	if not self.serial[guid] then
 		local unitId = OvaleGUID:GetUnitId(guid)
-		self:ScanAurasOnGUID(guid, unitId)
+		self:ScanAuras(unitId, guid)
 	end
 
 	local auraFound
