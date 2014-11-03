@@ -4068,13 +4068,38 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The number of runes.
 	-- @return A boolean value for the result of the comparison.
-	-- @see RuneCount
+	-- @see DeathRune, RuneCount
 	-- @usage
 	-- if Rune(blood) > 1 Spell(blood_tap)
 
 	local function Rune(condition, state)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local count, startCooldown, endCooldown = state:RuneCount(name)
+		if startCooldown < math.huge then
+			local origin = startCooldown
+			local rate = 1 / (endCooldown - startCooldown)
+			local start, ending = startCooldown, math.huge
+			return TestValue(start, ending, count, origin, rate, comparator, limit)
+		end
+		return Compare(count, comparator, limit)
+	end
+
+	--- Get the current number of active and regenerating (fractional) death runes of the given type for death knights.
+	-- @name DeathRune
+	-- @paramsig number or boolean
+	-- @param type The type of rune.
+	--     Valid values: blood, frost, unholy
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of runes.
+	-- @return A boolean value for the result of the comparison.
+	-- @see Rune
+	-- @usage
+	-- if DeathRune(blood) > 1 Spell(blood_tap)
+
+	local function DeathRune(condition, state)
+		local name, comparator, limit = condition[1], condition[2], condition[3]
+		local count, startCooldown, endCooldown = state:DeathRuneCount(name)
 		if startCooldown < math.huge then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
@@ -4109,6 +4134,7 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("rune", false, Rune)
+	OvaleCondition:RegisterCondition("deathrune", false, DeathRune)
 	OvaleCondition:RegisterCondition("runecount", false, RuneCount)
 end
 

@@ -484,6 +484,37 @@ statePrototype.RuneCount = function(state, name, atTime)
 	return count, startCooldown, endCooldown
 end
 
+statePrototype.DeathRuneCount = function(state, name, atTime)
+	profiler.Start("OvaleRunes_state_DeathRuneCount")
+	-- Default to checking the rune count at the end of the current spellcast in the
+	-- simulator, or at the current time if no spell is being cast.
+	if not atTime then
+		if state.endCast and state.endCast > state.currentTime then
+			atTime = state.endCast
+		else
+			atTime = state.currentTime
+		end
+	end
+	local count = 0
+	local startCooldown, endCooldown = math.huge, math.huge
+	local runeType = RUNE_TYPE[name]
+	if runeType ~= DEATH_RUNE then
+		-- Match only the runes of the given type.
+		for _, slot in ipairs(RUNE_SLOTS[runeType]) do
+			local rune = state.rune[slot]
+			if rune.type == DEATH_RUNE then
+				if rune:IsActiveRune(atTime) then
+					count = count + 1
+				elseif rune.endCooldown < endCooldown then
+					startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
+				end
+			end
+		end
+	end
+	profiler.Stop("OvaleRunes_state_DeathRuneCount")
+	return count, startCooldown, endCooldown
+end
+
 -- Returns the number of seconds before all of the required runes are available.
 statePrototype.GetRunesCooldown = nil
 do
