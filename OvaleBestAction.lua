@@ -403,7 +403,7 @@ function OvaleBestAction:GetAction(node, state)
 			end
 			-- Set the state in the simulator.
 			local variable, value = element.params[1], element.params[2]
-			local isFuture = not HasTime(computedTimeSpan, state.currentTime)
+			local isFuture = not HasTime(self_computedTimeSpan, state.currentTime)
 			state:PutState(variable, value, isFuture)
 			-- Get the cumulative intersection of time spans for these re-computations.
 			self_tempTimeSpan:Reset(self_computedTimeSpan)

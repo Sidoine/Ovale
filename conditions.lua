@@ -27,6 +27,7 @@ local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
+local tonumber = tonumber
 local type = type
 local wipe = wipe
 local API_GetBuildInfo = GetBuildInfo
@@ -1544,7 +1545,7 @@ do
 		local aura
 		if talented and npAura then
 			aura = npAura
-		elseif not talent and (bpAura or ffAura) then
+		elseif not talented and (bpAura or ffAura) then
 			aura = bpAura or ffAura
 			if bpAura and ffAura then
 				-- Find the disease that expires latest.

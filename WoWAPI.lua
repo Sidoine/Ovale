@@ -16,6 +16,24 @@
 WoWAPI = {}
 
 --<private-static-properties>
+local format = string.format
+local getmetatable = getmetatable
+local gsub = string.gsub
+local ipairs = ipairs
+local loadstring = loadstring
+local next = next
+local pairs = pairs
+local print = print
+local rawset = rawset
+local select = select
+local setmetatable = setmetatable
+local strfind = string.find
+local strgfind = string.gfind
+local strmatch = string.match
+local strsub = string.sub
+local type = type
+local unpack = unpack
+
 local self_state = {}
 local self_privateSymbol = {
 	["ExportSymbols"] = true,
@@ -34,7 +52,7 @@ local KeysAreMissingValuesMetatable = {
 --</private-static-properties>
 
 --<private-static-methods>
-function DeepCopy(orig)
+local function DeepCopy(orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
@@ -80,7 +98,7 @@ do
 
 	prototype.NewModule = function(addon, name, ...)
 		local args = { ... }
-		local mod = lib:NewAddon(string.format("%s_%s", addon.name, name))
+		local mod = lib:NewAddon(format("%s_%s", addon.name, name))
 		mod.moduleName = name
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
@@ -176,7 +194,7 @@ do
 	end
 
 	lib.Printf = function(lib, ...)
-		print(string.format(...))
+		print(format(...))
 	end
 end
 
@@ -405,9 +423,9 @@ end
 --]]--------------------------------------------------------------------
 WoWAPI.strsplit = function(delim, str, maxNb)
 	-- Fix up '.' character class.
-	delim = string.gsub(delim, "%.", "%%.")
+	delim = gsub(delim, "%.", "%%.")
 	-- Eliminate bad cases...
-	if string.find(str, delim) == nil then
+	if strfind(str, delim) == nil then
 		return str
 	end
 	if maxNb == nil or maxNb < 1 then
@@ -417,7 +435,7 @@ WoWAPI.strsplit = function(delim, str, maxNb)
 	local pat = "(.-)" .. delim .. "()"
 	local nb = 0
 	local lastPos
-	for part, pos in string.gfind(str, pat) do
+	for part, pos in strgfind(str, pat) do
 		nb = nb + 1
 		result[nb] = part
 		lastPos = pos
@@ -425,7 +443,7 @@ WoWAPI.strsplit = function(delim, str, maxNb)
 	end
 	-- Handle the last field
 	if nb ~= maxNb then
-		result[nb + 1] = string.sub(str, lastPos)
+		result[nb + 1] = strsub(str, lastPos)
 	end
 	return unpack(result)
 end
@@ -473,7 +491,7 @@ end
 
 WoWAPI.GetItemInfo = function(item)
 	if type(item) == "number" then
-		item = string.format("Item Name Of %d", item)
+		item = format("Item Name Of %d", item)
 	end
 	return item
 end
@@ -484,7 +502,7 @@ end
 
 WoWAPI.GetSpellInfo = function(spell)
 	if type(spell) == "number" then
-		spell = string.format("Spell Name Of %d", spell)
+		spell = format("Spell Name Of %d", spell)
 	end
 	return spell
 end
@@ -519,7 +537,7 @@ local function FileExists(filename, directory, verbose)
 		return true
 	else
 		if verbose then
-			print(string.format("Warning: '%s' not found.", filename))
+			print(format("Warning: '%s' not found.", filename))
 		end
 		return false
 	end
@@ -556,15 +574,15 @@ end
 --]]--------------------------------------------------------------------
 function WoWAPI:LoadAddonFile(filename, directory, verbose)
 	local s = directory and (directory .. filename) or filename
-	directory, filename = string.match(s, "^(.+/)([^/]+[.][%w]+)$")
+	directory, filename = strmatch(s, "^(.+/)([^/]+[.][%w]+)$")
 	if not directory then
 		filename = s
 	end
-	if string.find(filename, "[.]lua$") then
+	if strfind(filename, "[.]lua$") then
 		return self:LoadLua(filename, directory, verbose)
-	elseif string.find(filename, "[.]toc$") then
+	elseif strfind(filename, "[.]toc$") then
 		return self:LoadTOC(filename, directory, verbose)
-	elseif string.find(filename, "[.]xml$") then
+	elseif strfind(filename, "[.]xml$") then
 		return self:LoadXML(filename, directory, verbose)
 	end
 end
@@ -578,16 +596,16 @@ function WoWAPI:LoadLua(filename, directory, verbose)
 		filename = directory .. filename
 	end
 	if verbose then
-		print(string.format("Loading Lua: %s", filename))
+		print(format("Loading Lua: %s", filename))
 	end
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
 		local list = {}
 		for line in io.lines(filename) do
-			local varName = string.match(line, "^local%s+([%w_]+)%s*,[%w%s_,]*=%s*[.][.][.]%s*$")
+			local varName = strmatch(line, "^local%s+([%w_]+)%s*,[%w%s_,]*=%s*[.][.][.]%s*$")
 			if varName then
-				line = string.format("local %s = %q", varName, self_state.addonName)
+				line = format("local %s = %q", varName, self_state.addonName)
 			end
 			table.insert(list, line)
 		end
@@ -597,7 +615,7 @@ function WoWAPI:LoadLua(filename, directory, verbose)
 		if func then
 			func()
 		else
-			print(string.format("Error loading '%s'.", filename))
+			print(format("Error loading '%s'.", filename))
 			ok = false
 		end
 	end
@@ -612,32 +630,32 @@ function WoWAPI:LoadTOC(filename, directory, verbose)
 		filename = directory .. filename
 	end
 	if verbose then
-		print(string.format("Loading TOC: %s", filename))
+		print(format("Loading TOC: %s", filename))
 	end
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
 		local list = {}
 		for line in io.lines(filename) do
-			line = string.gsub(line, "\\", "/")
+			line = gsub(line, "\\", "/")
 			local t = {}
-			t.directory, t.file = string.match(line, "^([^#]+/)([^/]+[.][%w]+)$")
+			t.directory, t.file = strmatch(line, "^([^#]+/)([^/]+[.][%w]+)$")
 			if t.directory then
 				if directory then
 					t.directory = directory .. t.directory
 				end
 			else
 				t.directory = directory
-				t.file = string.match(line, "^[%w_]+[.][%w]+$")
+				t.file = strmatch(line, "^[%w_]+[.][%w]+$")
 			end
 			if t.file then
 				table.insert(list, t)
 			end
 		end
 		for _, t in ipairs(list) do
-			if string.find(t.file, "[.]lua$") then
+			if strfind(t.file, "[.]lua$") then
 				ok = ok and self:LoadLua(t.file, t.directory, verbose)
-			elseif string.find(t.file, "[.]xml$") then
+			elseif strfind(t.file, "[.]xml$") then
 				ok = ok and self:LoadXML(t.file, t.directory, verbose)
 			end
 			if not ok then
@@ -656,18 +674,18 @@ function WoWAPI:LoadXML(filename, directory, verbose)
 		filename = directory .. filename
 	end
 	if verbose then
-		print(string.format("Loading XML: %s", filename))
+		print(format("Loading XML: %s", filename))
 	end
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
 		local list = {}
 		for line in io.lines(filename) do
-			local s = string.match(line, '<Script[%s]+file="([^"]+)"')
+			local s = strmatch(line, '<Script[%s]+file="([^"]+)"')
 			if s then
-				s = string.gsub(s, "\\", "/")
+				s = gsub(s, "\\", "/")
 				local t = {}
-				t.directory, t.file = string.match(s, "^(.+/)([^/]+[.][%w]+)$")
+				t.directory, t.file = strmatch(s, "^(.+/)([^/]+[.][%w]+)$")
 				if t.directory then
 					if directory then
 						t.directory = directory .. t.directory
@@ -683,7 +701,7 @@ function WoWAPI:LoadXML(filename, directory, verbose)
 		end
 		for _, t in ipairs(list) do
 			if FileExists(t.file, t.directory, verbose) then
-				if string.find(t.file, "[.]lua$") then
+				if strfind(t.file, "[.]lua$") then
 					ok = ok and self:LoadLua(t.file, t.directory, verbose)
 					if not ok then
 						break
