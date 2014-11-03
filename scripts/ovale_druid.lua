@@ -420,6 +420,94 @@ AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
 	if InCombat(no) GuardianPrecombatCdActions()
 	GuardianDefaultCdActions()
 }
+
+###
+### Restoration
+###
+
+AddFunction RestorationPrecombatActions
+{
+	# Raid buffs.
+	if BuffRemaining(str_agi_int any=1) Spell(mark_of_the_wild)
+	# Healing Touch to refresh Harmony buff.
+	if BuffRemaining(harmony_buff) < 6 Spell(healing_touch)
+}
+
+AddFunction RestorationMainActions
+{
+	# Cast instant/mana-free Healing Touch or Regrowth.
+	if BuffStacks(sage_mender_buff) == 5 Spell(healing_touch)
+	if BuffPresent(omen_of_clarity_heal_buff) Spell(regrowth)
+	if BuffPresent(natures_swiftness_buff) Spell(healing_touch)
+
+	# Maintain 100% uptime on Harmony mastery buff using Swiftmend.
+	# Swiftmend requires either a Rejuvenation or Regrowth HoT to be on the target before
+	# it is usable, but we want to show Swiftmend as usable as long as the cooldown is up.
+	if BuffRemaining(harmony_buff) < 6 and { BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(regrowth_buff) > 0 } and not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation help=Swiftmend)
+
+	# Keep one Lifebloom up on the raid.
+	if BuffRemainingOnAny(lifebloom_buff) < 4 Spell(lifebloom)
+
+	# Cast Cenarion Ward on cooldown, usually on the tank.
+	if Talent(cenarion_ward_talent) Spell(cenarion_ward)
+}
+
+AddFunction RestorationAoeActions
+{
+	if BuffPresent(tree_of_life_buff)
+	{
+		Spell(wild_growth)
+		if BuffPresent(omen_of_clarity_heal_buff) Spell(regrowth)
+	}
+	unless BuffPresent(tree_of_life_buff)
+	{
+		Spell(wild_growth)
+		if BuffCountOnAny(rejuvenation_buff) > 4 Spell(genesis)
+	}
+}
+
+AddFunction RestorationShortCdActions
+{
+	# Maintain Efflorescence.
+	if TotemExpires(mushroom) Spell(wild_mushroom_heal)
+	# Don't cap out on Force of Nature charges.
+	if Talent(force_of_nature_talent) and Charges(force_of_nature_heal count=0) >= 3 Spell(force_of_nature_heal)
+}
+
+AddFunction RestorationCdActions
+{
+	InterruptActions()
+	Spell(blood_fury_apsp)
+	Spell(berserking)
+	if ManaPercent() < 97 Spell(arcane_torrent_energy)
+	Spell(incarnation_heal)
+	Spell(heart_of_the_wild_heal)
+	Spell(natures_vigil)
+}
+
+### Restoration icons.
+AddCheckBox(opt_druid_restoration_aoe L(AOE) specialization=restoration default)
+
+AddIcon specialization=restoration help=shortcd
+{
+	RestorationShortCdActions()
+}
+
+AddIcon specialization=restoration help=main
+{
+	if not InCombat() RestorationPrecombatActions()
+	RestorationMainActions()
+}
+
+AddIcon specialization=restoration help=aoe checkbox=opt_druid_restoration_aoe
+{
+	RestorationAoeActions()
+}
+
+AddIcon specialization=restoration help=cd
+{
+	RestorationCdActions()
+}
 ]]
 
 	OvaleScripts:RegisterScript("DRUID", name, desc, code, "include")
