@@ -146,8 +146,8 @@ AddFunction ArmsAoeActions
 	if { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
 	#whirlwind,if=cooldown.colossus_smash.remains>1.5&(target.health.pct>20|active_enemies>3)
 	if SpellCooldown(colossus_smash) > 1.5 and { target.HealthPercent() > 20 or Enemies() > 3 } Spell(whirlwind)
-	#rend,cycle_targets=1,if=!ticking
-	if not target.DebuffPresent(rend_debuff) Spell(rend)
+	#rend,cycle_targets=1,if=!ticking&target.time_to_die>8
+	if not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 8 Spell(rend)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute_arms)
 }
@@ -169,7 +169,7 @@ AddFunction ArmsAoeShortCdActions
 			if SpellCooldown(colossus_smash) > 1.5 and not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
 
 			unless SpellCooldown(colossus_smash) > 1.5 and { target.HealthPercent() > 20 or Enemies() > 3 } and Spell(whirlwind)
-				or not target.DebuffPresent(rend_debuff) and Spell(rend)
+				or not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 8 and Spell(rend)
 			{
 				#bladestorm,if=cooldown.colossus_smash.remains>6&(!talent.ravager.enabled|cooldown.ravager.remains>6)
 				if SpellCooldown(colossus_smash) > 6 and { not Talent(ravager_talent) or SpellCooldown(ravager) > 6 } Spell(bladestorm)

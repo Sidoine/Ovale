@@ -188,8 +188,8 @@ AddFunction FrostDualWieldSingleTargetActions
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Runes(unholy 1) Spell(plague_strike)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
-	#frost_strike,if=set_bonus.tier17_2pc=1&(runic_power>=50|(cooldown.pillar_of_frost.remains<5))
-	if ArmorSetBonus(T17 2) == 1 and { RunicPower() >= 50 or SpellCooldown(pillar_of_frost) < 5 } Spell(frost_strike)
+	#frost_strike,if=set_bonus.tier17_2pc=1&(runic_power>=50&(cooldown.pillar_of_frost.remains<5))
+	if ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 Spell(frost_strike)
 	#frost_strike,if=runic_power>76
 	if RunicPower() > 76 Spell(frost_strike)
 	#obliterate,if=unholy>0&!buff.killing_machine.react

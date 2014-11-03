@@ -510,8 +510,8 @@ AddFunction FrostDualWieldSingleTargetActions
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Runes(unholy 1) Spell(plague_strike)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
-	#frost_strike,if=set_bonus.tier17_2pc=1&(runic_power>=50|(cooldown.pillar_of_frost.remains<5))
-	if ArmorSetBonus(T17 2) == 1 and { RunicPower() >= 50 or SpellCooldown(pillar_of_frost) < 5 } Spell(frost_strike)
+	#frost_strike,if=set_bonus.tier17_2pc=1&(runic_power>=50&(cooldown.pillar_of_frost.remains<5))
+	if ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 Spell(frost_strike)
 	#frost_strike,if=runic_power>=76
 	if RunicPower() >= 76 Spell(frost_strike)
 	#obliterate,if=unholy>0&!buff.killing_machine.react
@@ -552,7 +552,7 @@ AddFunction FrostDualWieldSingleTargetShortCdActions
 					or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast)
 					or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Runes(unholy 1) and Spell(plague_strike)
 					or BuffPresent(rime_buff) and Spell(howling_blast)
-					or ArmorSetBonus(T17 2) == 1 and { RunicPower() >= 50 or SpellCooldown(pillar_of_frost) < 5 } and Spell(frost_strike)
+					or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike)
 					or RunicPower() >= 76 and Spell(frost_strike)
 					or Runes(unholy 1) and not BuffPresent(killing_machine_buff) and Spell(obliterate)
 					or { not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast)
@@ -585,7 +585,7 @@ AddFunction FrostDualWieldSingleTargetCdActions
 			or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast)
 			or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Runes(unholy 1) and Spell(plague_strike)
 			or BuffPresent(rime_buff) and Spell(howling_blast)
-			or ArmorSetBonus(T17 2) == 1 and { RunicPower() >= 50 or SpellCooldown(pillar_of_frost) < 5 } and Spell(frost_strike)
+			or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike)
 			or RunicPower() >= 76 and Spell(frost_strike)
 			or Runes(unholy 1) and not BuffPresent(killing_machine_buff) and Spell(obliterate)
 			or { not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast)
@@ -1078,7 +1078,7 @@ AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
 # Based on SimulationCraft profile "Death_Knight_Unholy_T16M".
 #	class=deathknight
 #	spec=unholy
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#db!1..0...
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#db!1..2...
 
 # ActionList: UnholyPrecombatActions --> main, shortcd, cd
 
