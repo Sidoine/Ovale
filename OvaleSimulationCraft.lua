@@ -1666,6 +1666,8 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				--[[
 					Special handling for rune comparisons.
 					This ONLY handles rune expressions of the form "<rune><operator><number>".
+					These are translated to equivalent "Rune(<rune>) <operator> <number>" expressions,
+					but with some munging of the numbers since Rune() returns a fractional number of runes.
 				--]]
 				local lhsNode = parseNode.child[1]
 				local rhsNode = parseNode.child[2]
@@ -1678,20 +1680,20 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 					local code
 					local op = parseNode.operator
 					if op == ">" then
-						code = format("Runes(%s %d)", runeType, number + 1)
+						code = format("Rune(%s) >= %d", runeType, number + 1)
 					elseif op == ">=" then
-						code = format("Runes(%s %d)", runeType, number)
+						code = format("Rune(%s) >= %d", runeType, number)
 					elseif op == "=" then
 						if runeType ~= "death" and number == 2 then
 							-- We can never have more than 2 non-death runes of the same type.
-							code = format("Runes(%s %d)", runeType, number)
+							code = format("Rune(%s) >= %d", runeType, number)
 						else
-							code = format("Runes(%s %d) and not Runes(%s %d)", runeType, number, runeType, number + 1)
+							code = format("Rune(%s) >= %d and Rune(%s) < %d", runeType, number, runeType, number + 1)
 						end
 					elseif op == "<=" then
-						code = format("not Runes(%s %d)", runeType, number + 1)
+						code = format("Rune(%s) < %d", runeType, number + 1)
 					elseif op == "<" then
-						code = format("not Runes(%s %d)", runeType, number)
+						code = format("Rune(%s) < %d", runeType, number)
 					end
 					if not node and code then
 						annotation.astAnnotation = annotation.astAnnotation or {}
@@ -2498,7 +2500,11 @@ EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
 
 	local code
 	if parseNode.rune then
-		code = format("RuneCount(%s)", parseNode.rune)
+		if parseNode.asType == "boolean" then
+			code = format("Rune(%s) >= 1", parseNode.rune)
+		else
+			code = format("RuneCount(%s)", parseNode.rune)
+		end
 	else
 		ok = false
 	end

@@ -89,7 +89,7 @@ AddFunction FrostDualWieldBosStActions
 	#howling_blast,if=runic_power<88
 	if RunicPower() < 88 Spell(howling_blast)
 	#obliterate,if=unholy>0&runic_power<76
-	if Runes(unholy 1) and RunicPower() < 76 Spell(obliterate)
+	if Rune(unholy) >= 1 and RunicPower() < 76 Spell(obliterate)
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
@@ -117,9 +117,9 @@ AddFunction FrostDualWieldAoeActions
 	#frost_strike,if=runic_power>88
 	if RunicPower() > 88 Spell(frost_strike)
 	#death_and_decay,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) Spell(death_and_decay)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 	#plague_strike,if=unholy=2
-	if Runes(unholy 2) Spell(plague_strike)
+	if Rune(unholy) >= 2 Spell(plague_strike)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#frost_strike,if=!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>=10
@@ -127,7 +127,7 @@ AddFunction FrostDualWieldAoeActions
 	#plague_leech
 	if target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -139,15 +139,15 @@ AddFunction FrostDualWieldBosAoeActions
 	#blood_tap,if=buff.blood_charge.stack>10
 	if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#death_and_decay,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) Spell(death_and_decay)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 	#plague_strike,if=unholy=2
-	if Runes(unholy 2) Spell(plague_strike)
+	if Rune(unholy) >= 2 Spell(plague_strike)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
 	if target.DiseasesTicking() Spell(plague_leech)
 	#plague_strike,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) Spell(plague_strike)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -177,7 +177,7 @@ AddFunction FrostDualWieldSingleTargetActions
 	#frost_strike,if=cooldown.antimagic_shell.remains<1&runic_power>=50&!buff.antimagic_shell.up
 	if SpellCooldown(antimagic_shell) < 1 and RunicPower() >= 50 and not BuffPresent(antimagic_shell_buff) Spell(frost_strike)
 	#howling_blast,if=death>1|frost>1
-	if Runes(death 2) or Runes(frost 2) Spell(howling_blast)
+	if Rune(death) >= 2 or Rune(frost) >= 2 Spell(howling_blast)
 	#unholy_blight,if=!disease.ticking
 	if not target.DiseasesAnyTicking() Spell(unholy_blight)
 	#howling_blast,if=!talent.necrotic_plague.enabled&!dot.frost_fever.ticking
@@ -185,7 +185,7 @@ AddFunction FrostDualWieldSingleTargetActions
 	#howling_blast,if=talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking
 	if Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(howling_blast)
 	#plague_strike,if=!talent.necrotic_plague.enabled&!dot.blood_plague.ticking&unholy>0
-	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Runes(unholy 1) Spell(plague_strike)
+	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Rune(unholy) >= 1 Spell(plague_strike)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
 	#frost_strike,if=set_bonus.tier17_2pc=1&(runic_power>=50&(cooldown.pillar_of_frost.remains<5))
@@ -193,7 +193,7 @@ AddFunction FrostDualWieldSingleTargetActions
 	#frost_strike,if=runic_power>76
 	if RunicPower() > 76 Spell(frost_strike)
 	#obliterate,if=unholy>0&!buff.killing_machine.react
-	if Runes(unholy 1) and not BuffPresent(killing_machine_buff) Spell(obliterate)
+	if Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) Spell(obliterate)
 	#howling_blast,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains<3)|death+frost>=2
 	if not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 Spell(howling_blast)
 	#blood_tap

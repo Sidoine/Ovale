@@ -105,7 +105,7 @@ AddFunction UnholyAoeActions
 	#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) UnholyBosAoeActions()
 	#blood_boil,if=blood=2|(frost=2&death=2)
-	if Runes(blood 2) or Runes(frost 2) and Runes(death 2) and not Runes(death 3) Spell(blood_boil)
+	if Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 Spell(blood_boil)
 	#summon_gargoyle
 	Spell(summon_gargoyle)
 	#dark_transformation
@@ -115,27 +115,27 @@ AddFunction UnholyAoeActions
 	#defile
 	Spell(defile)
 	#death_and_decay,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) Spell(death_and_decay)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_unholy)
 	#scourge_strike,if=unholy=2
-	if Runes(unholy 2) Spell(scourge_strike)
+	if Rune(unholy) >= 2 Spell(scourge_strike)
 	#blood_tap,if=buff.blood_charge.stack>10
 	if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#death_coil,if=runic_power>90|buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1)
-	if RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and not Runes(unholy 2) Spell(death_coil)
+	if RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 Spell(death_coil)
 	#blood_boil
 	Spell(blood_boil)
 	#icy_touch
 	Spell(icy_touch)
 	#scourge_strike,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) Spell(scourge_strike)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(scourge_strike)
 	#death_coil
 	Spell(death_coil)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=unholy=1
-	if Runes(unholy 1) and not Runes(unholy 2) and target.DiseasesTicking() Spell(plague_leech)
+	if Rune(unholy) >= 1 and Rune(unholy) < 2 and target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -147,7 +147,7 @@ AddFunction UnholyBosAoeActions
 	#blood_boil,if=runic_power<88
 	if RunicPower() < 88 Spell(blood_boil)
 	#scourge_strike,if=runic_power<88&unholy=1
-	if RunicPower() < 88 and Runes(unholy 1) and not Runes(unholy 2) Spell(scourge_strike)
+	if RunicPower() < 88 and Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(scourge_strike)
 	#icy_touch,if=runic_power<88
 	if RunicPower() < 88 Spell(icy_touch)
 	#blood_tap,if=buff.blood_charge.stack>=5
@@ -203,25 +203,25 @@ AddFunction UnholySingleTargetActions
 	#festering_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<76&talent.breath_of_sindragosa.enabled
 	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) Spell(festering_strike)
 	#death_and_decay,if=unholy=2
-	if Runes(unholy 2) Spell(death_and_decay)
+	if Rune(unholy) >= 2 Spell(death_and_decay)
 	#blood_tap,if=unholy=2&cooldown.death_and_decay.remains=0
-	if Runes(unholy 2) and not SpellCooldown(death_and_decay) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	if Rune(unholy) >= 2 and not SpellCooldown(death_and_decay) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#scourge_strike,if=unholy=2
-	if Runes(unholy 2) Spell(scourge_strike)
+	if Rune(unholy) >= 2 Spell(scourge_strike)
 	#death_coil,if=runic_power>80
 	if RunicPower() > 80 Spell(death_coil)
 	#festering_strike,if=blood=2&frost=2
-	if Runes(blood 2) and Runes(frost 2) Spell(festering_strike)
+	if Rune(blood) >= 2 and Rune(frost) >= 2 Spell(festering_strike)
 	#death_and_decay
 	Spell(death_and_decay)
 	#blood_tap,if=cooldown.death_and_decay.remains=0
 	if not SpellCooldown(death_and_decay) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#blood_tap,if=buff.blood_charge.stack>10&(buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1))
-	if BuffStacks(blood_charge_buff) > 10 and { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and not Runes(unholy 2) } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	if BuffStacks(blood_charge_buff) > 10 and { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#death_coil,if=buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1)
-	if BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and not Runes(unholy 2) Spell(death_coil)
+	if BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 Spell(death_coil)
 	#scourge_strike,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35)|(unholy>=1&death>=1)|(death>=2)
-	if not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 or Runes(unholy 1) and Runes(death 1) or Runes(death 2) Spell(scourge_strike)
+	if not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 or Rune(unholy) >= 1 and Rune(death) >= 1 or Rune(death) >= 2 Spell(scourge_strike)
 	#festering_strike
 	Spell(festering_strike)
 	#blood_tap,if=buff.blood_charge.stack>=10&runic_power>=30

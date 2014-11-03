@@ -4201,7 +4201,8 @@ do
 
 	--- Test if the current active rune counts meets the minimum rune requirements set out in the parameters.
 	-- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
-	-- E.g., Runes(blood 1 frost 1 unholy 1) means at least one blood, one frost, and one unholy rune is available.
+	-- E.g., Runes(blood 1 frost 1 unholy 1) means at least one blood, one frost, and one unholy rune is available,
+	-- death runes included.
 	-- @name Runes
 	-- @paramsig boolean
 	-- @param type The type of rune.
@@ -4228,12 +4229,6 @@ do
 	--     Valid values: blood, frost, unholy, death
 	-- @param number The number of runes
 	-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
-	-- @param death Sets how death runes are used to fulfill the rune count requirements.
-	--     If not set, then only death runes of the proper rune type are used.
-	--     If set with "death=0", then no death runes are used.
-	--     If set with "death=1", then death runes of any rune type are used.
-	--     Default is unset.
-	--     Valid values: unset, 0, 1
 	-- @return The number of seconds.
 
 	local function RunesCooldown(condition, state)

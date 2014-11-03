@@ -62,7 +62,7 @@ AddFunction BloodDefaultActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#potion,name=mountains,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
-	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not RuneCount(unholy) and not RuneCount(frost) UsePotionArmor()
+	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 UsePotionArmor()
 	#antimagic_shell
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 	#conversion,if=!buff.conversion.up&runic_power>50&health.pct<90
@@ -96,19 +96,19 @@ AddFunction BloodDefaultActions
 	#defile
 	Spell(defile)
 	#death_strike,if=(unholy=2|frost=2)
-	if Runes(unholy 2) or Runes(frost 2) Spell(death_strike)
+	if Rune(unholy) >= 2 or Rune(frost) >= 2 Spell(death_strike)
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Runes(blood 1) Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2
-	if Runes(blood 2) Spell(blood_boil)
+	if Rune(blood) >= 2 Spell(blood_boil)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#death_coil
 	Spell(death_coil)
 	#empower_rune_weapon,if=!blood&!unholy&!frost
-	if not RuneCount(blood) and not RuneCount(unholy) and not RuneCount(frost) Spell(empower_rune_weapon)
+	if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
 }
 
 AddIcon specialization=blood help=main enemies=1
