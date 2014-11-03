@@ -419,6 +419,85 @@ AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
 	if InCombat(no) EnhancementPrecombatCdActions()
 	EnhancementDefaultCdActions()
 }
+
+###
+### Restoration
+###
+
+AddFunction RestorationMainActions
+{
+	if BuffExpires(water_shield_buff) Spell(water_shield)
+	if BuffCountOnAny(earth_shield_buff) == 0 Spell(earth_shield)
+
+	# If using Glyph of Totemic Recall, assume that the player wants to use Totemic Recall
+	# to regain mana by recalling Healing Stream Totem.
+	#
+	# Totemic Recall is suggested at 3s remaining on HST so that there is still time to cast
+	# it after the current spellcast and GCD.  Take care not to recall other totems that have
+	# long cooldowns.
+	#
+	if Glyph(glyph_of_totemic_recall) and TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) and TotemExpires(fire) and TotemExpires(earth) and TotemExpires(air) Spell(totemic_recall)
+
+	if BuffPresent(unleash_life_buff) Spell(healing_wave)
+	if TotemExpires(water) Spell(healing_stream_totem)
+	if Glyph(glyph_of_riptide no) Spell(riptide)
+}
+
+AddFunction RestorationAoeActions
+{
+	if BuffPresent(unleash_life_buff) Spell(chain_heal)
+	if TotemExpires(water) Spell(healing_stream_totem)
+	Spell(healing_rain)
+	Spell(chain_heal)
+}
+
+AddFunction RestorationShortCdActions
+{
+	if Talent(primal_elementalist_talent) and pet.Present()
+	{
+		if TotemPresent(fire totem=fire_elemental_totem) and BuffExpires(pet_empower any=1) Spell(pet_empower)
+		if TotemPresent(earth totem=earth_elemental_totem) and BuffExpires(pet_reinforce any=1) Spell(pet_reinforce)
+	}
+	Spell(unleash_life)
+}
+
+AddFunction RestorationCdActions
+{
+	if IsFeared() Spell(tremor_totem)
+	InterruptActions()
+	if Speed(more 0) Spell(spiritwalkers_grace)
+	Spell(blood_fury_apsp)
+	Spell(berserking)
+	if ManaPercent() < 90 Spell(arcane_torrent_mana)
+	if TotemExpires(water) Spell(healing_tide_totem)
+	Spell(ancestral_guidance)
+	Spell(ascendance_heal)
+	Spell(fire_elemental_totem)
+	Spell(earth_elemental_totem)
+}
+
+### Restoration icons.
+AddCheckBox(opt_shaman_restoration_aoe L(AOE) specialization=restoration default)
+
+AddIcon specialization=restoration help=shortcd
+{
+	RestorationShortCdActions()
+}
+
+AddIcon specialization=restoration help=main
+{
+	RestorationMainActions()
+}
+
+AddIcon specialization=restoration help=aoe checkbox=opt_shaman_restoration_aoe
+{
+	RestorationAoeActions()
+}
+
+AddIcon specialization=restoration help=cd
+{
+	RestorationCdActions()
+}
 ]]
 
 	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")
