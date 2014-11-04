@@ -446,26 +446,12 @@ AddFunction FireInitCombustCdActions
 
 AddFunction FireDefaultActions
 {
-	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
-	#blink,if=movement.distance>10
-	if 0 > 10 Spell(blink)
-	#blazing_speed,if=movement.remains>0
-	if 0 > 0 Spell(blazing_speed)
-	#time_warp,if=target.health.pct<25|time>5
-	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-	#rune_of_power,if=buff.rune_of_power.remains<cast_time
-	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=combust_sequence,if=pyro_chain
 	if GetState(pyro_chain) > 0 FireCombustSequenceActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
 	if Talent(prismatic_crystal_talent) and TotemPresent(crystal totem=prismatic_crystal) FireCrystalSequenceActions()
 	#call_action_list,name=init_combust,if=!pyro_chain
 	if not GetState(pyro_chain) > 0 FireInitCombustActions()
-	#rune_of_power,if=buff.rune_of_power.remains<action.fireball.execute_time+gcd.max&!(buff.heating_up.up&action.fireball.in_flight)
-	if RuneOfPowerRemaining() < ExecuteTime(fireball) + GCD() and not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(rune_of_power)
-	#mirror_image,if=!(buff.heating_up.up&action.fireball.in_flight)
-	if not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(mirror_image)
 	#call_action_list,name=aoe,if=active_enemies>=5
 	if Enemies() >= 5 FireAoeActions()
 	#call_action_list,name=single_target
@@ -474,6 +460,10 @@ AddFunction FireDefaultActions
 
 AddFunction FireDefaultShortCdActions
 {
+	#blink,if=movement.distance>10
+	if 0 > 10 Spell(blink)
+	#blazing_speed,if=movement.remains>0
+	if 0 > 0 Spell(blazing_speed)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=combust_sequence,if=pyro_chain
@@ -671,7 +661,7 @@ AddFunction FireCombustSequenceShortCdActions
 	Spell(meteor)
 
 	unless ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) and Spell(pyroblast)
-		or ArmorSetBonus(T16_caster 4) and BuffPresent(pyroblast_buff) ^ BuffPresent(heating_up_buff) and Spell(inferno_blast)
+		or ArmorSetBonus(T16_caster 4) and BuffPresent(pyroblast_buff) xor BuffPresent(heating_up_buff) and Spell(inferno_blast)
 		or not target.DebuffPresent(ignite_debuff) and not InFlightToTarget(fireball) and Spell(fireball)
 		or BuffPresent(pyroblast_buff) and Spell(pyroblast)
 		or Talent(meteor_talent) and SpellCooldownDuration(meteor) - SpellCooldown(meteor) < GCD() * 3 and Spell(inferno_blast)
