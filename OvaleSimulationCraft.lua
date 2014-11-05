@@ -958,6 +958,7 @@ end
 
 local function InitializeDisambiguation()
 	AddDisambiguation("bloodlust_buff",			"burst_haste_buff")
+	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_any_buff")
 	-- Death Knight
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_runicpower",	"DEATHKNIGHT")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"DEATHKNIGHT")
@@ -983,13 +984,10 @@ local function InitializeDisambiguation()
 	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
-	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"feral")	-- XXX
-	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_agility_buff",	"DRUID",		"guardian")	-- XXX
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
-	AddDisambiguation("trinket_stat_any_buff",	"trinket_stat_agility_buff",	"HUNTER")	-- XXX
 	-- Mage
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
 	AddDisambiguation("arcane_charge_buff",		"arcane_charge_debuff",			"MAGE",			"arcane")
@@ -1031,8 +1029,6 @@ local function InitializeDisambiguation()
 	AddDisambiguation("glyph_of_dark_soul_instability",	"glyph_of_dark_soul",	"WARLOCK",		"destruction")
 	AddDisambiguation("glyph_of_dark_soul_knowledge",	"glyph_of_dark_soul",	"WARLOCK",		"demonology")
 	AddDisambiguation("glyph_of_dark_soul_misery",		"glyph_of_dark_soul",	"WARLOCK",		"affliction")
-	AddDisambiguation("trinket_proc_any_buff",	"trinket_proc_intellect_buff",	"WARLOCK")	-- XXX
-	AddDisambiguation("trinket_stacking_proc_any_buff",	"trinket_stacking_proc_intellect_buff",	"WARLOCK")	-- XXX
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")

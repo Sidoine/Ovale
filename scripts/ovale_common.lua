@@ -37,10 +37,6 @@ SpellList(potion_strength_buff golemblood_potion_buff)
 ###
 
 # Agility
-SpellList(trinket_proc_agility_buff 126554 126690 126707 128984 138699 138938 146308 146310 148896 148903)
-SpellList(trinket_stacking_proc_agility_buff 138756)
-SpellList(trinket_stat_agility_buff 126554 126690 126707 128984 138699 138938 146308 146310 148896 148903)
-SpellList(trinket_stacking_stat_agility_buff 138756)
 	SpellInfo(126554 buff_cd=55)				# Bottle of Infinite Stars
 	SpellInfo(126690 buff_cd=60)				# PvP agility trinket (on-use)
 	SpellInfo(126707 buff_cd=55)				# PvP agility trinket (proc)
@@ -54,10 +50,6 @@ SpellList(trinket_stacking_stat_agility_buff 138756)
 	SpellInfo(148903 buff_cd=65)				# Haromm's Talisman
 
 # Intellect
-SpellList(trinket_proc_intellect_buff 126577 126683 126705 128985 136082 138898 139133 146046 148897 148906)
-SpellList(trinket_stacking_proc_intellect_buff 138786 146184)
-SpellList(trinket_stat_intellect_buff 126577 126683 126705 128985 136082 138898 139133 146046 148897 148906)
-SpellList(trinket_stacking_stat_intellect_buff 138786 146184)
 	SpellInfo(126577 buff_cd=55)				# Light of the Cosmos
 	SpellInfo(126683 buff_cd=60)				# PvP intellect trinket (on-use)
 	SpellInfo(126705 buff_cd=55)				# PvP intellect trinket (proc)
@@ -72,10 +64,6 @@ SpellList(trinket_stacking_stat_intellect_buff 138786 146184)
 	SpellInfo(148906 buff_cd=65)				# Kardris' Toxic Totem
 
 # Strength
-SpellList(trinket_proc_strength_buff 126582 126679 126700 128986 138702 146245 146250 148899)
-SpellList(trinket_stacking_proc_strength_buff 138759 138870)
-SpellList(trinket_stat_strength_buff 126582 126679 126700 128986 138702 146245 146250 148899)
-SpellList(trinket_stacking_stat_strength_buff 138759 138870)
 	SpellInfo(126582 buff_cd=55)				# Lei Shen's Final Orders
 	SpellInfo(126679 buff_cd=60)				# PvP strength trinket (on-use)
 	SpellInfo(126700 buff_cd=55)				# PvP strength trinket (proc)
@@ -88,10 +76,6 @@ SpellList(trinket_stacking_stat_strength_buff 138759 138870)
 	SpellInfo(148899 buff_cd=85)				# Fusion-Fire Core
 
 # Critical Strike
-SpellList(trinket_proc_crit_buff 138963)
-SpellList(trinket_stacking_proc_crit_buff 146285)
-SpellList(trinket_stat_crit_buff 138963)
-SpellList(trinket_stacking_stat_crit_buff 146285)
 	SpellInfo(138963 buff_cd=110)							# Unerring Vision of Lei-Shen
 	SpellInfo(138963 buff_cd=165 specialization=balance)	# UVLS adjustment for balance druids
 	SpellInfo(146285 buff_cd=65)							# Skeer's Bloodsoaked Talisman

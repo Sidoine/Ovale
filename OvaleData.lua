@@ -12,8 +12,12 @@ Ovale.OvaleData = OvaleData
 -- Forward declarations for module dependencies.
 local OvalePaperDoll = nil
 
+local format = string.format
 local type = type
 local pairs = pairs
+
+local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "strength", "versatility" }
+local TRINKET_USE_NAMES = { "proc", "stacking_proc", "stacking_stat", "stat" }
 --<private-static-properties>
 
 --<public-static-properties>
@@ -189,10 +193,99 @@ OvaleData.buffSpellList =
 	raid_movement_buff = {
 		[106898] = true, -- Stampeding Roar
 	},
+
+	-- Trinket buffs
+	trinket_proc_agility_buff = {
+		[126554] = true, -- Bottle of Infinite Stars
+		[126690] = true, -- PvP agility trinket (on-use)
+		[126707] = true, -- PvP agility trinket (proc)
+		[128984] = true, -- Relic of Xuen (agility)
+		[138699] = true, -- Vicious Talisman of the Shado-Pan Assault
+		[138938] = true, -- Bad Juju
+		[146308] = true, -- Assurance of Consequence
+		[146310] = true, -- Ticking Ebon Detonator
+		[148896] = true, -- Sigil of Rampage
+		[148903] = true, -- Haromm's Talisman
+	},
+	trinket_proc_crit_buff = {
+		[138963] = true, -- Unerring Vision of Lei-Shen
+	},
+	trinket_proc_intellect_buff = {
+		[126577] = true, -- Light of the Cosmos
+		[126683] = true, -- PvP intellect trinket (on-use)
+		[126705] = true, -- PvP intellect trinket (proc)
+		[128985] = true, -- Relic of Yu'lon
+		[136082] = true, -- Shock-Charger/Static-Caster's Medallion
+		[138898] = true, -- Breath of the Hydra
+		[139133] = true, -- Cha-Ye's Essence of Brilliance (assume 20% crit chance)
+		[146046] = true, -- Purified Bindings of Immerseus
+		[148897] = true, -- Frenzied Crystal of Rage
+		[148906] = true, -- Kardris' Toxic Totem
+	},
+	trinket_proc_strength_buff = {
+		[126582] = true, -- Lei Shen's Final Orders
+		[126679] = true, -- PvP strength trinket (on-use)
+		[126700] = true, -- PvP strength trinket (proc)
+		[128986] = true, -- Relic of Xuen (strength)
+		[138702] = true, -- Brutal Talisman of the Shado-Pan Assault
+		[146245] = true, -- Evil Eye of Galakras
+		[146250] = true, -- Thok's Tail Tip
+		[148899] = true, -- Fusion-Fire Core
+	},
+	trinket_stacking_proc_agility_buff = {
+		[138756] = true, -- Renataki's Soul Charm
+	},
+	trinket_stacking_proc_crit_buff = {
+		[146285] = true, -- Skeer's Bloodsoaked Talisman
+	},
+	trinket_stacking_proc_intellect_buff = {
+		[138786] = true, -- Wushoolay's Final Choice
+		[146184] = true, -- Black Blood of Y'Shaarj
+	},
+	trinket_stacking_proc_strength_buff = {
+		[138759] = true, -- Fabled Feather of Ji-Kun
+		[138870] = true, -- Primordius' Talisman of Rage
+	},
 }
--- Deprecated: spell list aliases
+-- Spell list aliases.
 do
 	local list = OvaleData.buffSpellList
+
+	-- Create default, empty lists for "trinket_(proc|stacking_proc|stacking_stat|stat)_<stat>_buff".
+	for _, useName in pairs(TRINKET_USE_NAMES) do
+		for _, statName in pairs(STAT_NAMES) do
+			local name = format("trinket_%s_%s_buff", useName, statName)
+			list[name] = list[name] or {}
+		end
+	end
+
+	-- Default aliases from "trinket_(stacking_stat|stat)_<stat>_buff" to "trinket_(stacking_proc|proc)_<stat>_buff".
+	for _, statName in pairs(STAT_NAMES) do
+		local name = format("trinket_stacking_stat_%s_buff", statName)
+		local alias = format("trinket_stacking_proc_%s_buff", statName)
+		list[name] = list[name] or list[alias]
+	end
+	for _, statName in pairs(STAT_NAMES) do
+		local name = format("trinket_stat_%s_buff", statName)
+		local alias = format("trinket_proc_%s_buff", statName)
+		list[name] = list[name] or list[alias]
+	end
+
+	-- Create lists for "trinket_(proc|stacking_proc|stacking_stat|stat)_any_buff".
+	for _, useName in pairs(TRINKET_USE_NAMES) do
+		local name = format("trinket_%s_any_buff", useName)
+		list[name] = list[name] or {}
+		for _, statName in pairs(STAT_NAMES) do
+			local alias = format("trinket_%s_%s_buff", useName, statName)
+			if list[alias] then
+				for spellId in pairs(list[alias]) do
+					list[name][spellId] = true
+				end
+			end
+		end
+	end
+
+	-- Deprecated: spell list aliases.
 	list.attack_power_multiplier	= list.attack_power_multiplier_buff
 	list.bleed						= list.bleed_debuff
 	list.bloodlust					= list.burst_haste_buff
