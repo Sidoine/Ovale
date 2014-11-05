@@ -40,8 +40,6 @@ local API_GetTrackingInfo = GetTrackingInfo
 local API_GetUnitSpeed = GetUnitSpeed
 local API_GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local API_HasFullControl = HasFullControl
-local API_IsHarmfulSpell = IsHarmfulSpell
-local API_IsHelpfulSpell = IsHelpfulSpell
 local API_IsSpellOverlayed = IsSpellOverlayed
 local API_IsStealthed = IsStealthed
 local API_UnitCastingInfo = UnitCastingInfo
@@ -1069,9 +1067,9 @@ do
 						return start, ending
 					end
 				end
-			elseif spellId == "harmful" and API_IsHarmfulSpell(castSpellName) then
+			elseif spellId == "harmful" and OvaleSpellBook:IsHarmfulSpell(spellId) then
 				return start, ending
-			elseif spellId == "helpful" and API_IsHelpfulSpell(castSpellName) then
+			elseif spellId == "helpful" and OvaleSpellBook:IsHelpfulSpell(spellId) then
 				return start, ending
 			elseif spellId == castSpellId then
 				return start, ending

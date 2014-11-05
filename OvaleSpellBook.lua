@@ -48,6 +48,8 @@ local API_GetSpellLink = GetSpellLink
 local API_GetSpellTabInfo = GetSpellTabInfo
 local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
+local API_IsHarmfulSpell = IsHarmfulSpell
+local API_IsHelpfulSpell = IsHelpfulSpell
 local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableSpell = IsUsableSpell
 local API_UnitHealth = UnitHealth
@@ -99,6 +101,10 @@ OvaleSpellBook.spellbookId = {
 	[BOOKTYPE_PET] = {},
 	[BOOKTYPE_SPELL] = {},
 }
+-- self.isHarmful[spellId] = true/false
+OvaleSpellBook.isHarmful = {}
+-- self.isHelpful[spellId] = true/false
+OvaleSpellBook.isHelpful = {}
 -- self.talent[talentId] = talentName
 OvaleSpellBook.talent = {}
 -- self.talentPoints[talentId] = 0 or 1
@@ -229,6 +235,8 @@ function OvaleSpellBook:UpdateSpells()
 	wipe(self.spell)
 	wipe(self.spellbookId[BOOKTYPE_PET])
 	wipe(self.spellbookId[BOOKTYPE_SPELL])
+	wipe(self.isHarmful)
+	wipe(self.isHelpful)
 
 	-- Scan the first two tabs of the player's spellbook.
 	for tab = 1, 2 do
@@ -262,10 +270,14 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 				local id = tonumber(linkData)
 				Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, id, index)
 				self.spell[id] = spellName
+				self.isHarmful[id] = API_IsHarmfulSpell(index, bookType)
+				self.isHelpful[id] = API_IsHelpfulSpell(index, bookType)
 				self.spellbookId[bookType][id] = index
 				if spellId and id ~= spellId then
 					Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, spellId, index)
 					self.spell[spellId] = spellName
+					self.isHarmful[spellId] = self.isHarmful[id]
+					self.isHelpful[spellId] = self.isHelpful[id]
 					self.spellbookId[bookType][spellId] = index
 				end
 			end
@@ -278,11 +290,15 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 					if isKnown then
 						Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, id, index)
 						self.spell[id] = spellName
+						self.isHarmful[id] = API_IsHarmfulSpell(spellName)
+						self.isHelpful[id] = API_IsHelpfulSpell(spellName)
 						-- Flyout spells have no spellbook index.
 						self.spellbookId[bookType][id] = nil
 						if id ~= overrideId then
 							Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, overrideId, index)
 							self.spell[overrideId] = spellName
+							self.isHarmful[overrideId] = self.isHarmful[id]
+							self.isHelpful[overrideId] = self.isHelpful[id]
 							-- Flyout spells have no spellbook index.
 							self.spellbookId[bookType][overrideId] = nil
 						end
@@ -354,6 +370,16 @@ function OvaleSpellBook:IsActiveGlyph(glyphId)
 	else
 		return false
 	end
+end
+
+-- Returns whether a spell can be used against hostile units.
+function OvaleSpellBook:IsHarmfulSpell(spellId)
+	return (spellId and self.isHarmful[spellId])
+end
+
+-- Returns whether a spell can be used on the player or friendly units.
+function OvaleSpellBook:IsHelpfulSpell(spellId)
+	return (spellId and self.isHelpful[spellId])
 end
 
 -- Returns true if the given spellId is found in the player's list of known spells.
