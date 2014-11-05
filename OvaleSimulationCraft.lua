@@ -2104,7 +2104,6 @@ do
 		["health.pct"]			= "HealthPercent()",
 		["health.percent"]		= "HealthPercent()",
 		["holy_power"]			= "HolyPower()",
-		["incanters_flow_dir"]	= "0",	-- XXX
 		["level"]				= "Level()",
 		["lunar_max"]			= "TimeToEclipse(lunar)",	-- XXX
 		["mana"]				= "Mana()",
@@ -2133,6 +2132,10 @@ do
 		local code
 		if CHARACTER_PROPERTY[operand] then
 			code = target .. CHARACTER_PROPERTY[operand]
+		elseif class == "MAGE" and operand == "incanters_flow_dir" then
+			local name = "incanters_flow_buff"
+			code = format("BuffDirection(%s)", name)
+			AddSymbol(annotation, name)
 		elseif class == "PALADIN" and operand == "time_to_hpg" then
 			if specialization == "holy" then
 				code = "HolyTimeToHPG()"
