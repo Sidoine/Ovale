@@ -23,7 +23,9 @@ local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
 
 local gsub = string.gsub
+local strlen = string.len
 local strmatch = string.match
+local strupper = string.upper
 local tonumber = tonumber
 local wipe = table.wipe
 local API_GetActionInfo = GetActionInfo
@@ -76,6 +78,22 @@ local function GetKeyBinding(slot)
 		name = "MULTIACTIONBAR1BUTTON" .. (slot - 60)
 	end
 	local key = name and API_GetBindingKey(name)
+	-- Shorten the keybinding names.
+	if key and strlen(key) > 4 then
+		key = strupper(key)
+		-- Strip whitespace.
+		key = gsub(key, "%s+", "")
+		-- Convert modifiers to a single character.
+		key = gsub(key, "ALT-", "A")
+		key = gsub(key, "CTRL-", "C")
+		key = gsub(key, "SHIFT-", "S")
+		-- Shorten numberpad keybinding names.
+		key = gsub(key, "NUMPAD", "N")
+		key = gsub(key, "PLUS", "+")
+		key = gsub(key, "MINUS", "-")
+		key = gsub(key, "MULTIPLY", "*")
+		key = gsub(key, "DIVIDE", "/")
+	end
 	return key
 end
 
