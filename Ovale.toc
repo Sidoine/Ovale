@@ -5,7 +5,7 @@
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine
 ## Version: @project-version@
-## OptionalDeps: Ace3, CallbackHandler-1.0, LibBabble-CreatureType-3.0, LibDataBroker-1.1, LibDBIcon-1.0, LibDispellable-1.0, LibDualSpec-1.0, LibRangeCheck-2.0, LibStub, Masque, Recount, Skada, SpellFlashCore
+## OptionalDeps: Ace3, CallbackHandler-1.0, LibBabble-CreatureType-3.0, LibDataBroker-1.1, LibDBIcon-1.0, LibDispellable-1.0, LibDualSpec-1.0, LibRangeCheck-2.0, LibStub, LibTextDump-1.0, Masque, Recount, Skada, SpellFlashCore
 ## SavedVariables: OvaleDB
 ## X-Category: Combat
 ## X-Embeds: Ace3
