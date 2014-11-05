@@ -208,8 +208,8 @@ AddFunction DemonologyDefaultActions
 	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
 	#call_action_list,name=db,if=talent.demonbolt.enabled
 	if Talent(demonbolt_talent) DemonologyDbActions()
-	#cataclysm,if=buff.metamorphosis.up
-	if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+	#immolation_aura,if=demonic_fury>450&active_enemies>=5&buff.immolation_aura.down
+	if DemonicFury() > 450 and Enemies() >= 5 and BuffExpires(immolation_aura_buff) Spell(immolation_aura)
 	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)
 	if BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * SpellHaste() / 100 and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { target.DebuffRemaining(doom_debuff) < SpellCooldown(cataclysm) or not Talent(cataclysm_talent) } and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } Spell(doom)
 	#corruption,cycle_targets=1,if=target.time_to_die>=6&remains<=(0.3*duration)&buff.metamorphosis.down
@@ -260,8 +260,8 @@ AddFunction DemonologyDefaultPredictActions
 	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
 	#call_action_list,name=db,if=talent.demonbolt.enabled
 	if Talent(demonbolt_talent) DemonologyDbPredictActions()
-	#cataclysm,if=buff.metamorphosis.up
-	if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+	#immolation_aura,if=demonic_fury>450&active_enemies>=5&buff.immolation_aura.down
+	if DemonicFury() > 450 and Enemies() >= 5 and BuffExpires(immolation_aura_buff) Spell(immolation_aura)
 	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)
 	if BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * SpellHaste() / 100 and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { target.DebuffRemaining(doom_debuff) < SpellCooldown(cataclysm) or not Talent(cataclysm_talent) } and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } Spell(doom)
 	#corruption,cycle_targets=1,if=target.time_to_die>=6&remains<=(0.3*duration)&buff.metamorphosis.down
@@ -308,8 +308,12 @@ AddFunction DemonologyDefaultShortCdActions
 	{
 		#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
 		if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felguard)
-		#cataclysm,if=buff.metamorphosis.up
-		if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+
+		unless DemonicFury() > 450 and Enemies() >= 5 and BuffExpires(immolation_aura_buff) and Spell(immolation_aura)
+		{
+			#cataclysm,if=buff.metamorphosis.up
+			if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+		}
 	}
 }
 
@@ -333,6 +337,7 @@ AddFunction DemonologyDefaultCdActions
 	unless not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < MaxTravelTime(haunt) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 2) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - MaxTravelTime(haunt) * 2 or target.DebuffRemaining(shadowflame_debuff) > MaxTravelTime(haunt) } and Spell(hand_of_guldan)
 		or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < MaxTravelTime(haunt) + 3 and BuffRemaining(demonbolt_buff) < GCD() * 2 and Charges(hand_of_guldan) >= 2 and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
 		or Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) and Spell(grimoire_felguard)
+		or DemonicFury() > 450 and Enemies() >= 5 and BuffExpires(immolation_aura_buff) and Spell(immolation_aura)
 	{
 		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
 		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)

@@ -55,6 +55,8 @@ AddFunction DemonologyDefaultActions
 	if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
 	#call_action_list,name=db,if=talent.demonbolt.enabled
 	if Talent(demonbolt_talent) DemonologyDbActions()
+	#immolation_aura,if=demonic_fury>450&active_enemies>=5&buff.immolation_aura.down
+	if DemonicFury() > 450 and Enemies() >= 5 and BuffExpires(immolation_aura_buff) Spell(immolation_aura)
 	#cataclysm,if=buff.metamorphosis.up
 	if BuffPresent(metamorphosis_buff) Spell(cataclysm)
 	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)
@@ -200,6 +202,8 @@ AddIcon specialization=demonology help=aoe
 # grimoire_of_sacrifice_talent
 # grimoire_of_service_talent
 # hand_of_guldan
+# immolation_aura
+# immolation_aura_buff
 # imp_swarm
 # jade_serpent_potion
 # life_tap
