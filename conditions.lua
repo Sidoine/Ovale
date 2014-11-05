@@ -400,6 +400,40 @@ do
 end
 
 do
+	--- Get the current direction of an aura's stack count.
+	-- A negative number means the aura is decreasing in stack count.
+	-- A positive number means the aura is increasing in stack count.
+	-- @name BuffDirection
+	-- @paramsig number or boolean
+	-- @param id The spell ID of the aura or the name of a spell list.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+	--     Defaults to any=0.
+	--     Valid values: 0, 1.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current direction.
+	-- @return A boolean value for the result of the comparison.
+	-- @see DebuffDirection
+
+	local function BuffDirection(condition, state)
+		local auraId, comparator, limit = condition[1], condition[2], condition[3]
+		local target, filter, mine = ParseCondition(condition, state)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local gain, start, ending, direction = aura.gain, aura.start, aura.ending, aura.direction
+			return TestValue(gain, math.huge, direction, gain, 0, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("buffdirection", false, BuffDirection)
+	OvaleCondition:RegisterCondition("debuffdirection", false, BuffDirection)
+end
+
+do
 	--- Get the total duration of the aura from when it was first applied to when it ended.
 	-- @name BuffDuration
 	-- @paramsig number or boolean

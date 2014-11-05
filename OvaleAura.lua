@@ -520,6 +520,15 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		end
 		aura.gain = atTime
 		aura.lastUpdated = atTime
+		local direction = aura.direction or 1
+		if aura.stacks then
+			if aura.stacks < count then
+				direction = 1	-- increasing stack count
+			elseif aura.stacks > count then
+				direction = -1	-- decreasing stack count
+			end
+		end
+		aura.direction = direction
 		aura.stacks = count
 		aura.consumed = nil
 		aura.filter = filter
