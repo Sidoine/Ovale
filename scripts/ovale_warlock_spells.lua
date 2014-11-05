@@ -118,9 +118,11 @@ Define(grimoire_succubus 111896)
 Define(grimoire_voidwalker 111895)
 	SpellInfo(grimoire_voidwalker cd=120 sharedcd=grimoire_of_service)
 Define(hand_of_guldan 105174)
+	SpellInfo(hand_of_guldan max_travel_time=1.5) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(hand_of_guldan shadowflame_debuff=1)
 Define(haunt 48181)
 	SpellInfo(haunt shards=1)
+	SpellInfo(haunt max_travel_time=2.3) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(haunt haunt_debuff=1)
 Define(haunt_debuff 48181)
 	SpellInfo(haunt_debuff duration=8 haste=spell tick=2)
@@ -161,6 +163,7 @@ Define(rain_of_fire_debuff 104232)
 	SpellInfo(rain_of_fire_debuff duration=8 haste=spell tick=1)
 Define(shadow_bolt 686)
 	SpellInfo(shadow_bolt demonicfury=-25 specialization=demonology)
+	SpellInfo(shadow_bolt max_travel_time=2.2) # maximum observed travel time with a bit of padding
 	SpellAddBuff(shadow_bolt fel_molten_core_buff=1,target_health_pct,25 if_spell=the_codex_of_xerrath specialization=demonology)
 	SpellAddBuff(shadow_bolt molten_core_buff=1,target_health_pct,25 if_spell=!the_codex_of_xerrath specialization=demonology)
 Define(Shadowburn 17877) # SimulationCraft bug workaround

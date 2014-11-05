@@ -1980,9 +1980,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("%sTicksRemaining(%s)", buffTarget, buffName)
 		symbol = buffName
 	elseif property == "travel_time" then
-		-- Assume travel time of a spell is always 0.5s.
-		-- TODO: Track average time in flight to target for the spell.
-		code = "0.5"
+		-- Translate to the maximum travel time since we can't gauge the distance dynamically.
+		code = format("MaxTravelTime(%s)", name)
 	else
 		ok = false
 	end

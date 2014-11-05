@@ -115,6 +115,7 @@ Define(heating_up_buff 48107)
 Define(ice_barrier 11426)
 	SpellInfo(ice_barrier cd=25)
 Define(ice_lance 30455)
+	SpellInfo(ice_lance max_travel_time=1.3) # maximum observed travel time with a bit of padding
 	SpellAddBuff(ice_lance fingers_of_frost_buff=-1 if_spell=fingers_of_frost)
 	SpellAddBuff(ice_lance icy_veins_buff=extend,2 if_spell=thermal_void)
 Define(ice_nova 157997)

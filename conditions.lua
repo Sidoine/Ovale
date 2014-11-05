@@ -5461,6 +5461,30 @@ do
 end
 
 do
+	--- The maximum travel time of a spell in seconds.
+	-- This is a fixed guess at 1s or the maximum travel time of the spell in the spell information if given.
+	-- @name MaxTravelTime
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if target.DebuffPresent(shadowflame_debuff) < MaxTravelTime(hand_of_guldan) + GCD()
+	--     Spell(hand_of_guldan)
+
+	local function MaxTravelTime(condition, state)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local si = spellId and OvaleData.spellInfo[spellId]
+		-- TODO: Track average time in flight to target for the spell.
+		local value = si and si.max_travel_time or 1
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("maxtraveltime", true, MaxTravelTime)
+end
+
+do
 	--- A condition that always returns true.
 	-- @name True
 	-- @paramsig boolean
