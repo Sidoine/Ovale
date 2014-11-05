@@ -71,8 +71,10 @@ $m{ActionButtonTemplate}{Show} = true;
 
 $m{DEFAULT_CHAT_FRAME}{AddMessage} = true;
 
+$m{Frame}{GetCenter} = true;
 $m{Frame}{GetNumPoints} = true;
 $m{Frame}{GetPoint} = true;
+$m{Frame}{GetParent} = true;
 $m{Frame}{SetAttribute} = true;
 $m{Frame}{SetScript} = true;
 $m{Frame}{StartMoving} = true;
@@ -106,6 +108,8 @@ $m{LibDualSpec}{EnhanceOptions} = true;
 $m{LibRangeCheck}{GetRange} = true;
 
 $m{LibStub}{GetLibrary} = true;
+
+$m{LibTextDump}{New} = true;
 
 $m{Masque}{Group} = true;
 
