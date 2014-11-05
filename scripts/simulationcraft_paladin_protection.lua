@@ -22,13 +22,6 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction Consecration
-{
-	Spell(consecration)
-	Spell(consecration_glyph_of_consecration)
-	Spell(consecration_glyph_of_the_consecrator)
-}
-
 AddFunction GetInMeleeRange
 {
 	if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -136,7 +129,7 @@ AddFunction ProtectionDefaultActions
 			#holy_prism
 			Spell(holy_prism)
 			#consecration,if=target.debuff.flying.down&active_enemies>=3
-			if target.True(debuff_flying_down) and Enemies() >= 3 Consecration()
+			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
 			#execution_sentence
 			Spell(execution_sentence)
 			#hammer_of_wrath
@@ -144,7 +137,7 @@ AddFunction ProtectionDefaultActions
 			#sacred_shield,if=target.dot.sacred_shield.remains<8
 			if BuffPresent(sacred_shield_buff) < 8 Spell(sacred_shield)
 			#consecration,if=target.debuff.flying.down
-			if target.True(debuff_flying_down) Consecration()
+			if target.True(debuff_flying_down) Spell(consecration)
 			#holy_wrath
 			Spell(holy_wrath)
 			#seal_of_insight,if=talent.empowered_seals.enabled&!seal.insight&buff.uthers_insight.remains<=buff.liadrins_righteousness.remains&buff.uthers_insight.remains<=buff.maraads_truth.remains
@@ -214,13 +207,13 @@ AddFunction ProtectionMaxDpsActions
 			#holy_prism
 			Spell(holy_prism)
 			#consecration,if=target.debuff.flying.down&active_enemies>=3
-			if target.True(debuff_flying_down) and Enemies() >= 3 Consecration()
+			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
 			#execution_sentence
 			Spell(execution_sentence)
 			#hammer_of_wrath
 			Spell(hammer_of_wrath)
 			#consecration,if=target.debuff.flying.down
-			if target.True(debuff_flying_down) Consecration()
+			if target.True(debuff_flying_down) Spell(consecration)
 			#holy_wrath
 			Spell(holy_wrath)
 			#seal_of_truth,if=talent.empowered_seals.enabled&!seal.truth&buff.maraads_truth.remains<buff.liadrins_righteousness.remains
@@ -286,7 +279,7 @@ AddFunction ProtectionMaxSurvivalActions
 			#holy_prism
 			Spell(holy_prism)
 			#consecration,if=target.debuff.flying.down&active_enemies>=3
-			if target.True(debuff_flying_down) and Enemies() >= 3 Consecration()
+			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
 			#execution_sentence
 			Spell(execution_sentence)
 			#flash_of_light,if=talent.selfless_healer.enabled&buff.selfless_healer.stack>=3
@@ -298,7 +291,7 @@ AddFunction ProtectionMaxSurvivalActions
 			#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
 			#consecration,if=target.debuff.flying.down&!ticking
-			if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff) Consecration()
+			if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff) Spell(consecration)
 			#holy_wrath
 			Spell(holy_wrath)
 			#sacred_shield
@@ -332,8 +325,6 @@ AddIcon specialization=protection help=aoe
 # blood_fury_apsp
 # consecration
 # consecration_debuff
-# consecration_glyph_of_consecration
-# consecration_glyph_of_the_consecrator
 # crusader_strike
 # divine_protection
 # divine_protection_buff
@@ -343,10 +334,8 @@ AddIcon specialization=protection help=aoe
 # eternal_flame_buff
 # execution_sentence
 # flash_of_light
-# glyph_of_consecration
 # glyph_of_final_wrath
 # glyph_of_focused_shield
-# glyph_of_the_consecrator
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff

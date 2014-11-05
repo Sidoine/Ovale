@@ -22,12 +22,6 @@ AddFunction UsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
 }
 
-AddFunction Exorcism
-{
-	Spell(exorcism)
-	Spell(exorcism_glyphed)
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -109,7 +103,7 @@ AddFunction RetributionAoeActions
 	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
 	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(divine_storm)
 	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
+	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Spell(exorcism)
 	#hammer_of_the_righteous
 	Spell(hammer_of_the_righteous)
 	#judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<=5
@@ -119,11 +113,11 @@ AddFunction RetributionAoeActions
 	#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
 	if not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 Spell(divine_storm)
 	#exorcism,if=glyph.mass_exorcism.enabled
-	if Glyph(glyph_of_mass_exorcism) Exorcism()
+	if Glyph(glyph_of_mass_exorcism) Spell(exorcism)
 	#judgment
 	Spell(judgment)
 	#exorcism
-	Exorcism()
+	Spell(exorcism)
 	#holy_prism
 	Spell(holy_prism)
 }
@@ -153,7 +147,7 @@ AddFunction RetributionSingleActions
 	#judgment,if=talent.empowered_seals.enabled&((seal.truth&buff.maraads_truth.remains<cooldown.judgment.duration*2)|(seal.righteousness&buff.liadrins_righteousness.remains<cooldown.judgment.duration*2))
 	if Talent(empowered_seals_talent) and { Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < SpellCooldownDuration(judgment) * 2 or Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) < SpellCooldownDuration(judgment) * 2 } Spell(judgment)
 	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
+	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Spell(exorcism)
 	#seal_of_truth,if=talent.empowered_seals.enabled&buff.maraads_truth.remains<(cooldown.judgment.duration)&buff.maraads_truth.remains<=3
 	if Talent(empowered_seals_talent) and BuffRemaining(maraads_truth_buff) < SpellCooldownDuration(judgment) and BuffRemaining(maraads_truth_buff) <= 3 Spell(seal_of_truth)
 	#divine_storm,if=buff.divine_crusader.react&buff.final_verdict.up&(buff.avenging_wrath.up|target.health.pct<35)
@@ -181,7 +175,7 @@ AddFunction RetributionSingleActions
 	#templars_verdict,if=holy_power>=4&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
 	if HolyPower() >= 4 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
 	#exorcism
-	Exorcism()
+	Spell(exorcism)
 	#templars_verdict,if=holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
 	if HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
 	#holy_prism
@@ -197,7 +191,7 @@ AddFunction RetributionCleaveActions
 	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
 	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
 	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Exorcism()
+	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Spell(exorcism)
 	#hammer_of_wrath
 	Spell(hammer_of_wrath)
 	#judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<=5
@@ -213,7 +207,7 @@ AddFunction RetributionCleaveActions
 	#judgment
 	Spell(judgment)
 	#exorcism
-	Exorcism()
+	Spell(exorcism)
 	#holy_prism
 	Spell(holy_prism)
 }
@@ -247,7 +241,6 @@ AddIcon specialization=retribution help=aoe
 # empowered_seals_talent
 # execution_sentence
 # exorcism
-# exorcism_glyphed
 # final_verdict
 # final_verdict_buff
 # final_verdict_talent

@@ -22,18 +22,6 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
 }
 
-AddFunction ExpelHarm
-{
-	Spell(expel_harm)
-	Spell(expel_harm_glyphed)
-}
-
-AddFunction Guard
-{
-	Spell(guard)
-	Spell(guard_glyphed)
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -95,7 +83,7 @@ AddFunction BrewmasterDefaultActions
 AddFunction BrewmasterAoeActions
 {
 	#guard
-	Guard()
+	Spell(guard)
 	#breath_of_fire,if=chi>=3&buff.shuffle.remains>=6&dot.breath_of_fire.remains<=1&target.debuff.dizzying_haze.up
 	if Chi() >= 3 and BuffRemaining(shuffle_buff) >= 6 and target.DebuffRemaining(breath_of_fire_debuff) <= 1 and target.DebuffPresent(dizzying_haze_debuff) Spell(breath_of_fire)
 	#chi_explosion,if=chi>=4
@@ -105,7 +93,7 @@ AddFunction BrewmasterAoeActions
 	#purifying_brew,if=!talent.chi_explosion.enabled&stagger.heavy
 	if not Talent(chi_explosion_talent) and DebuffPresent(heavy_stagger_debuff) Spell(purifying_brew)
 	#guard
-	Guard()
+	Spell(guard)
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
 	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
@@ -121,7 +109,7 @@ AddFunction BrewmasterAoeActions
 	#blackout_kick,if=talent.rushing_jade_wind.enabled&chi>=4
 	if Talent(rushing_jade_wind_talent) and Chi() >= 4 Spell(blackout_kick)
 	#expel_harm,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=40
-	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 40 ExpelHarm()
+	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 40 Spell(expel_harm)
 	#spinning_crane_kick,if=chi.max-chi>=1&!talent.rushing_jade_wind.enabled
 	if MaxChi() - Chi() >= 1 and not Talent(rushing_jade_wind_talent) Spell(spinning_crane_kick)
 	#jab,if=talent.rushing_jade_wind.enabled&chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd
@@ -143,7 +131,7 @@ AddFunction BrewmasterStActions
 	#purifying_brew,if=!buff.serenity.up
 	if not BuffPresent(serenity_buff) Spell(purifying_brew)
 	#guard
-	Guard()
+	Spell(guard)
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
 	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
@@ -161,7 +149,7 @@ AddFunction BrewmasterStActions
 	#blackout_kick,if=chi>=4
 	if Chi() >= 4 Spell(blackout_kick)
 	#expel_harm,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd
-	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() ExpelHarm()
+	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() Spell(expel_harm)
 	#jab,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd
 	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() Spell(jab)
 	#purifying_brew,if=!talent.chi_explosion.enabled&stagger.moderate&buff.shuffle.remains>=6
@@ -208,13 +196,9 @@ AddIcon specialization=brewmaster help=aoe
 # elusive_brew_activated_buff
 # elusive_brew_stacks_buff
 # expel_harm
-# expel_harm_glyphed
 # fortifying_brew
 # fortifying_brew_buff
-# glyph_of_guard
-# glyph_of_targeted_expulsion
 # guard
-# guard_glyphed
 # heavy_stagger_debuff
 # invoke_xuen
 # invoke_xuen_talent

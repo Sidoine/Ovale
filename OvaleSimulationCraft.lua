@@ -1202,14 +1202,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MONK" and action == "chi_sphere" then
 			-- skip
 			isSpellAction = false
-		elseif class == "MONK" and action == "expel_harm" then
-			bodyCode = "ExpelHarm()"
-			annotation[action] = class
-			isSpellAction = false
-		elseif class == "MONK" and action == "guard" then
-			bodyCode = "Guard()"
-			annotation[action] = class
-			isSpellAction = false
 		elseif class == "MONK" and action == "gift_of_the_ox" then
 			-- skip
 			isSpellAction = false
@@ -1221,14 +1213,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"
-		elseif class == "PALADIN" and action == "consecration" then
-			bodyCode = "Consecration()"
-			annotation[action] = class
-			isSpellAction = false
-		elseif class == "PALADIN" and action == "exorcism" then
-			bodyCode = "Exorcism()"
-			annotation[action] = class
-			isSpellAction = false
 		elseif class == "PALADIN" and action == "rebuke" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -2961,36 +2945,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
-	if annotation.guard == "MONK" then
-		local code = [[
-			AddFunction Guard
-			{
-				Spell(guard)
-				Spell(guard_glyphed)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "guard")
-		AddSymbol(annotation, "guard_glyphed")
-		AddSymbol(annotation, "glyph_of_guard")
-		count = count + 1
-	end
-	if annotation.expel_harm == "MONK" then
-		local code = [[
-			AddFunction ExpelHarm
-			{
-				Spell(expel_harm)
-				Spell(expel_harm_glyphed)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "expel_harm")
-		AddSymbol(annotation, "expel_harm_glyphed")
-		AddSymbol(annotation, "glyph_of_targeted_expulsion")
-		count = count + 1
-	end
 	if annotation.time_to_hpg_melee == "PALADIN" then
 		local code = [[
 			AddFunction RetributionTimeToHPG
@@ -3099,39 +3053,6 @@ local function InsertSupportingFunctions(child, annotation)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "rebuke")
-		count = count + 1
-	end
-	if annotation.exorcism == "PALADIN" then
-		local code = [[
-			AddFunction Exorcism
-			{
-				Spell(exorcism)
-				Spell(exorcism_glyphed)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "exorcism")
-		AddSymbol(annotation, "exorcism_glyphed")
-		AddSymbol(annotation, "glyph_of_mass_exorcism")
-		count = count + 1
-	end
-	if annotation.consecration == "PALADIN" then
-		local code = [[
-			AddFunction Consecration
-			{
-				Spell(consecration)
-				Spell(consecration_glyph_of_consecration)
-				Spell(consecration_glyph_of_the_consecrator)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "consecration")
-		AddSymbol(annotation, "consecration_glyph_of_consecration")
-		AddSymbol(annotation, "consecration_glyph_of_the_consecrator")
-		AddSymbol(annotation, "glyph_of_consecration")
-		AddSymbol(annotation, "glyph_of_the_consecrator")
 		count = count + 1
 	end
 	if annotation.silence == "PRIEST" then
