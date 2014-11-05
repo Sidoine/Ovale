@@ -133,7 +133,6 @@ AddIcon specialization=balance help=aoe
 # stellar_flare_debuff
 # sunfire
 # sunfire_debuff
-# trinket_stat_intellect_buff
 # wrath
 ]]
 	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")

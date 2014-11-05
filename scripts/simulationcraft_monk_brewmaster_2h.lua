@@ -107,7 +107,7 @@ AddFunction BrewmasterAoeActions
 	#guard
 	Guard()
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
-	if MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) Spell(keg_smash)
+	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
 	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	#chi_wave,if=talent.chi_wave.enabled&energy.time_to_max>3
@@ -145,7 +145,7 @@ AddFunction BrewmasterStActions
 	#guard
 	Guard()
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
-	if MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) Spell(keg_smash)
+	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
 	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	#chi_wave,if=talent.chi_wave.enabled&energy.time_to_max>3

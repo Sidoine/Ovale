@@ -64,58 +64,84 @@ AddFunction DestructionDefaultActions
 	if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 	#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
 	if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-	#call_action_list,name=single_target,if=active_enemies<4
+	#run_action_list,name=single_target,if=active_enemies<4
 	if Enemies() < 4 DestructionSingleTargetActions()
-	#call_action_list,name=aoe,if=active_enemies>=4
+	#run_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 DestructionAoeActions()
 }
 
 AddFunction DestructionAoeActions
 {
+	#rain_of_fire,if=remains<=tick_time
+	if target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) Spell(rain_of_fire)
+	#havoc,target=2
+	Spell(havoc)
+	#shadowburn,if=buff.havoc.remains
+	if BuffPresent(havoc_buff) Spell(shadowburn)
+	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
+	if BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
 	#cataclysm
 	Spell(cataclysm)
-	#fire_and_brimstone,if=buff.fire_and_brimstone.down&burning_ember>=2
-	if BuffExpires(fire_and_brimstone_buff) and BurningEmbers() / 10 >= 2 Spell(fire_and_brimstone)
-	#immolate,if=remains<=cast_time
-	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) Spell(immolate)
-	#conflagrate,if=charges=2
-	if Charges(conflagrate) == 2 Spell(conflagrate)
-	#chaos_bolt,if=talent.charred_remains.enabled&buff.backdraft.stack<3&(burning_ember>=2.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up)
-	if Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 2.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) } Spell(chaos_bolt)
-	#chaos_bolt,if=buff.backdraft.stack<3&(burning_ember>=3.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up|(burning_ember>=3&buff.ember_master.react))
-	if BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) } Spell(chaos_bolt)
-	#immolate,if=remains<=(duration*0.3)
-	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
-	#rain_of_fire,if=(!ticking|(talent.mannoroths_fury.enabled&buff.mannoroths_fury.up&buff.mannoroths_fury.remains<1))
-	if not target.DebuffPresent(rain_of_fire_debuff) or Talent(mannoroths_fury_talent) and BuffPresent(mannoroths_fury_buff) and BuffRemaining(mannoroths_fury_buff) < 1 Spell(rain_of_fire)
-	#conflagrate
-	Spell(conflagrate)
+	#fire_and_brimstone,if=buff.fire_and_brimstone.down
+	if BuffExpires(fire_and_brimstone_buff) Spell(fire_and_brimstone)
+	#immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking
+	if BuffPresent(fire_and_brimstone_buff) and not target.DebuffPresent(immolate_debuff) Spell(immolate)
+	#conflagrate,if=buff.fire_and_brimstone.up&charges=2
+	if BuffPresent(fire_and_brimstone_buff) and Charges(conflagrate) == 2 Spell(conflagrate)
+	#immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains<=(dot.immolate.duration*0.3)
+	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) <= target.DebuffDuration(immolate_debuff) * 0.3 Spell(immolate)
+	#chaos_bolt,if=!talent.charred_remains.enabled&active_enemies=4
+	if not Talent(charred_remains_talent) and Enemies() == 4 Spell(chaos_bolt)
+	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up&burning_ember>=2.5
+	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) and BurningEmbers() / 10 >= 2.5 Spell(chaos_bolt)
 	#incinerate
 	Spell(incinerate)
 }
 
 AddFunction DestructionSingleTargetActions
 {
-	#Shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|target.time_to_die<20|trinket.proc.intellect.react|(trinket.stacking_proc.intellect.remains<cast_time*4&trinket.stacking_proc.intellect.remains>cast_time))
-	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or target.TimeToDie() < 20 or BuffPresent(trinket_proc_intellect_buff) or BuffRemaining(trinket_stacking_proc_intellect_buff) < CastTime(Shadowburn) * 4 and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(Shadowburn) } Spell(Shadowburn)
-	#cataclysm
-	Spell(cataclysm)
-	#immolate,cycle_targets=1,if=remains<=cast_time
-	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) Spell(immolate)
+	#havoc,target=2
+	Spell(havoc)
+	#Shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|buff.dark_soul.up|target.time_to_die<10)
+	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(Shadowburn)
+	#immolate,cycle_targets=1,if=remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)
+	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } Spell(immolate)
+	#shadowburn,if=buff.havoc.remains
+	if BuffPresent(havoc_buff) Spell(shadowburn)
+	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
+	if BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
 	#conflagrate,if=charges=2
 	if Charges(conflagrate) == 2 Spell(conflagrate)
-	#chaos_bolt,if=set_bonus.tier17_4pc=1&buff.chaotic_infusion.react
-	if ArmorSetBonus(T17 4) == 1 and BuffPresent(chaotic_infusion_buff) Spell(chaos_bolt)
-	#chaos_bolt,if=set_bonus.tier17_2pc=1&buff.backdraft.stack<3&(burning_ember>=2.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up)
-	if ArmorSetBonus(T17 2) == 1 and BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 2.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) } Spell(chaos_bolt)
-	#chaos_bolt,if=talent.charred_remains.enabled&buff.backdraft.stack<3&(burning_ember>=2.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up)
-	if Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 2.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) } Spell(chaos_bolt)
-	#chaos_bolt,if=buff.backdraft.stack<3&(burning_ember>=3.5|(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time)|buff.dark_soul.up|(burning_ember>=3&buff.ember_master.react))
-	if BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) } Spell(chaos_bolt)
+	#cataclysm
+	Spell(cataclysm)
+	#chaos_bolt,if=talent.charred_remains.enabled&active_enemies>1&target.health.pct>20
+	if Talent(charred_remains_talent) and Enemies() > 1 and target.HealthPercent() > 20 Spell(chaos_bolt)
+	#chaos_bolt,if=talent.charred_remains.enabled&buff.backdraft.stack<3&burning_ember>=2.5
+	if Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and BurningEmbers() / 10 >= 2.5 Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&(burning_ember>=3.5|buff.dark_soul.up|(burning_ember>=3&buff.ember_master.react)|target.time_to_die<20)
+	if BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) or target.TimeToDie() < 20 } Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&set_bonus.tier17_2pc=1&burning_ember>=2.5
+	if BuffStacks(backdraft_buff) < 3 and ArmorSetBonus(T17 2) == 1 and BurningEmbers() / 10 >= 2.5 Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&buff.archmages_greater_incandescence_int.react&buff.archmages_greater_incandescence_int.remains>cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffPresent(archmages_greater_incandescence_int_buff) and BuffRemaining(archmages_greater_incandescence_int_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.stacking_proc.intellect.react>7&trinket.stacking_proc.intellect.remains>=cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffStacks(trinket_stacking_proc_intellect_buff) > 7 and BuffRemaining(trinket_stacking_proc_intellect_buff) >= CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.crit.react&trinket.proc.crit.remains>cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.stacking_proc.multistrike.react>=8&trinket.stacking_proc.multistrike.remains>=cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffStacks(trinket_stacking_proc_multistrike_buff) >= 8 and BuffRemaining(trinket_stacking_proc_multistrike_buff) >= CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.multistrike.react&trinket.proc.multistrike.remains>cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_multistrike_buff) and BuffRemaining(trinket_proc_multistrike_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.versatility.react&trinket.proc.versatility.remains>cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.mastery.react&trinket.proc.mastery.remains>cast_time
+	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#rain_of_fire,if=!ticking
+	if not target.DebuffPresent(rain_of_fire_debuff) Spell(rain_of_fire)
 	#immolate,cycle_targets=1,if=remains<=(duration*0.3)
 	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
-	#rain_of_fire,if=(!ticking|(talent.mannoroths_fury.enabled&buff.mannoroths_fury.up&buff.mannoroths_fury.remains<1))
-	if not target.DebuffPresent(rain_of_fire_debuff) or Talent(mannoroths_fury_talent) and BuffPresent(mannoroths_fury_buff) and BuffRemaining(mannoroths_fury_buff) < 1 Spell(rain_of_fire)
 	#conflagrate
 	Spell(conflagrate)
 	#incinerate
@@ -138,12 +164,13 @@ AddIcon specialization=destruction help=aoe
 # Shadowburn
 # arcane_torrent_mana
 # archimondes_darkness_talent
+# archmages_greater_incandescence_int_buff
 # backdraft_buff
 # berserking
 # blood_fury_sp
 # cataclysm
+# cataclysm_talent
 # chaos_bolt
-# chaotic_infusion_buff
 # charred_remains_talent
 # conflagrate
 # dark_intent
@@ -159,20 +186,19 @@ AddIcon specialization=destruction help=aoe
 # grimoire_of_sacrifice_buff
 # grimoire_of_sacrifice_talent
 # grimoire_of_service_talent
+# havoc
+# havoc_buff
 # immolate
 # immolate_debuff
 # incinerate
 # jade_serpent_potion
 # mannoroths_fury
-# mannoroths_fury_buff
-# mannoroths_fury_talent
 # rain_of_fire
 # rain_of_fire_debuff
+# shadowburn
 # summon_doomguard
 # summon_felhunter
 # summon_infernal
-# trinket_proc_intellect_buff
-# trinket_stacking_proc_intellect_buff
 ]]
 	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "reference")
 end

@@ -51,11 +51,11 @@ AddFunction SurvivalDefaultActions
 	#berserking
 	Spell(berserking)
 	#potion,name=virmens_bite,if=(((cooldown.stampede.remains<1|!talent.stampede.enabled)&(!talent.a_murder_of_crows.enabled|cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=20
-	if { SpellCooldown(stampede) < 1 or not Talent(stampede_talent) } and { not Talent(a_murder_of_crows_talent) or SpellCooldown(a_murder_of_crows) < 1 } and { BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
+	if { SpellCooldown(stampede) < 1 or not Talent(stampede_talent) } and { not Talent(a_murder_of_crows_talent) or SpellCooldown(a_murder_of_crows) < 1 } and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeActions()
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))
-	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) } Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } Spell(stampede)
 	#explosive_shot
 	Spell(explosive_shot)
 	#black_arrow,if=!ticking
@@ -85,7 +85,7 @@ AddFunction SurvivalDefaultActions
 AddFunction SurvivalAoeActions
 {
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up|buff.archmages_incandescence_agi.up))
-	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
 	#explosive_shot,if=buff.lock_and_load.react&(!talent.barrage.enabled|cooldown.barrage.remains>0)
 	if BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } Spell(explosive_shot)
 	#barrage
@@ -182,7 +182,6 @@ AddIcon specialization=survival help=aoe
 # steady_focus_buff
 # thrill_of_the_hunt_buff
 # trap_launcher
-# trinket_stat_agility_buff
 # virmens_bite_potion
 # war_stomp
 ]]

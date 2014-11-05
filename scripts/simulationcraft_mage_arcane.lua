@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Arcane_T16M".
 #	class=mage
 #	spec=arcane
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!0..201.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!2..201.
 #	glyphs=arcane_power/cone_of_cold
 
 Include(ovale_common)
@@ -107,7 +107,6 @@ AddFunction ArcaneConserveActions
 	if DebuffStacks(arcane_charge_debuff) < 2 Spell(presence_of_mind)
 	#arcane_blast
 	Spell(arcane_blast)
-	#ice_floes,moving=1
 	#arcane_barrage,moving=1
 	if Speed() > 0 Spell(arcane_barrage)
 }
@@ -141,6 +140,8 @@ AddFunction ArcaneDefaultActions
 	if HealthPercent() < 30 Spell(cold_snap)
 	#time_warp,if=target.health.pct<25|time>5
 	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.arcane_missiles.cast_time)
+	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(arcane_missiles) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#mirror_image
@@ -239,6 +240,8 @@ AddIcon specialization=arcane help=aoe
 # evocation
 # glyph_of_arcane_power
 # glyph_of_cone_of_cold
+# ice_floes
+# ice_floes_buff
 # jade_serpent_potion
 # mirror_image
 # nether_tempest

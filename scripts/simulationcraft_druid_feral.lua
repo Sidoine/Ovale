@@ -73,7 +73,7 @@ AddFunction FeralDefaultActions
 	#skull_bash
 	InterruptActions()
 	#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
-	if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_agility_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
+	if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
 	#potion,name=tolvir,if=target.time_to_die<=40
 	if target.TimeToDie() <= 40 UsePotionAgility()
 	#blood_fury,sync=tigers_fury
@@ -205,7 +205,6 @@ AddIcon specialization=feral help=aoe
 # thrash_cat_debuff
 # tigers_fury
 # tigers_fury_buff
-# trinket_proc_agility_buff
 # typhoon
 # virmens_bite_potion
 # war_stomp

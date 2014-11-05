@@ -452,11 +452,11 @@ AddFunction SurvivalDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=virmens_bite,if=(((cooldown.stampede.remains<1|!talent.stampede.enabled)&(!talent.a_murder_of_crows.enabled|cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=20
-	if { SpellCooldown(stampede) < 1 or not Talent(stampede_talent) } and { not Talent(a_murder_of_crows_talent) or SpellCooldown(a_murder_of_crows) < 1 } and { BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
+	if { SpellCooldown(stampede) < 1 or not Talent(stampede_talent) } and { not Talent(a_murder_of_crows_talent) or SpellCooldown(a_murder_of_crows) < 1 } and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))
-	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) } Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } Spell(stampede)
 }
 
 # ActionList: SurvivalAoeActions --> main, shortcd, cd
@@ -513,7 +513,7 @@ AddFunction SurvivalAoeShortCdActions
 AddFunction SurvivalAoeCdActions
 {
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up|buff.archmages_incandescence_agi.up))
-	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_agility_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
 }
 
 # ActionList: SurvivalPrecombatActions --> main, shortcd, cd

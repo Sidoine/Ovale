@@ -158,7 +158,7 @@ AddFunction BrewmasterAoeActions
 	#rushing_jade_wind,if=chi.max-chi>=1&talent.rushing_jade_wind.enabled
 	if MaxChi() - Chi() >= 1 and Talent(rushing_jade_wind_talent) Spell(rushing_jade_wind)
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
-	if MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) Spell(keg_smash)
+	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
 	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	#chi_wave,if=talent.chi_wave.enabled&energy.time_to_max>3
@@ -197,7 +197,7 @@ AddFunction BrewmasterAoeShortCdActions
 		#guard
 		Guard()
 
-		unless MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) and Spell(keg_smash)
+		unless MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(keg_smash)
 			or Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst)
 			or Talent(chi_wave_talent) and TimeToMaxEnergy() > 3 and Spell(chi_wave)
 			or Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
@@ -223,7 +223,7 @@ AddFunction BrewmasterStActions
 	#blackout_kick,if=buff.shuffle.down
 	if BuffExpires(shuffle_buff) Spell(blackout_kick)
 	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
-	if MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) Spell(keg_smash)
+	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#chi_burst,if=talent.chi_burst.enabled&energy.time_to_max>3
 	if Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	#chi_wave,if=talent.chi_wave.enabled&energy.time_to_max>3
@@ -260,7 +260,7 @@ AddFunction BrewmasterStShortCdActions
 		#guard
 		Guard()
 
-		unless MaxChi() - Chi() >= 2 and not BuffRemaining(serenity_buff) and Spell(keg_smash)
+		unless MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(keg_smash)
 			or Talent(chi_burst_talent) and TimeToMaxEnergy() > 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst)
 			or Talent(chi_wave_talent) and TimeToMaxEnergy() > 3 and Spell(chi_wave)
 			or Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
@@ -459,7 +459,7 @@ AddFunction WindwalkerAoeShortCdActions
 		or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick)
 	{
 		#fists_of_fury,if=talent.rushing_jade_wind.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&!buff.serenity.remains
-		if Talent(rushing_jade_wind_talent) and TimeToMaxEnergy() > CastTime(fists_of_fury) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffRemaining(serenity_buff) Spell(fists_of_fury)
+		if Talent(rushing_jade_wind_talent) and TimeToMaxEnergy() > CastTime(fists_of_fury) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 		#touch_of_death,if=target.health.percent<10
 		if target.HealthPercent() < 10 and BuffPresent(death_note_buff) Spell(touch_of_death)
 		#hurricane_strike,if=talent.rushing_jade_wind.enabled&talent.hurricane_strike.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
@@ -474,7 +474,7 @@ AddFunction WindwalkerAoeCdActions {}
 AddFunction WindwalkerStActions
 {
 	#energizing_brew,if=cooldown.fists_of_fury.remains>6&(!talent.serenity.enabled|(!buff.serenity.remains&cooldown.serenity.remains>4))&energy+energy.regen*gcd<50
-	if SpellCooldown(fists_of_fury) > 6 and { not Talent(serenity_talent) or not BuffRemaining(serenity_buff) and SpellCooldown(serenity) > 4 } and Energy() + EnergyRegenRate() * GCD() < 50 Spell(energizing_brew)
+	if SpellCooldown(fists_of_fury) > 6 and { not Talent(serenity_talent) or not BuffPresent(serenity_buff) and SpellCooldown(serenity) > 4 } and Energy() + EnergyRegenRate() * GCD() < 50 Spell(energizing_brew)
 	#rising_sun_kick,if=!talent.chi_explosion.enabled
 	if not Talent(chi_explosion_talent) Spell(rising_sun_kick)
 	#chi_wave,if=energy.time_to_max>2&buff.serenity.down
@@ -500,7 +500,7 @@ AddFunction WindwalkerStActions
 AddFunction WindwalkerStShortCdActions
 {
 	#fists_of_fury,if=energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&!buff.serenity.remains
-	if TimeToMaxEnergy() > CastTime(fists_of_fury) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffRemaining(serenity_buff) Spell(fists_of_fury)
+	if TimeToMaxEnergy() > CastTime(fists_of_fury) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 	#touch_of_death,if=target.health.percent<10
 	if target.HealthPercent() < 10 and BuffPresent(death_note_buff) Spell(touch_of_death)
 	#hurricane_strike,if=talent.hurricane_strike.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down

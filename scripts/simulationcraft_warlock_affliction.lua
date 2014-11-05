@@ -66,7 +66,7 @@ AddFunction AfflictionDefaultActions
 	#cataclysm
 	Spell(cataclysm)
 	#haunt,if=shard_react&!talent.soulburn_haunt.enabled&!in_flight_to_target&(dot.haunt.remains<cast_time+travel_time|soul_shard=4)&(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.dark_soul.up|soul_shard>2|soul_shard*14<=target.time_to_die)
-	if SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + MaxTravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
+	if SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + MaxTravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
 	#soulburn,if=shard_react&talent.soulburn_haunt.enabled&buff.soulburn.down&(buff.haunting_spirits.down|soul_shard=4&buff.haunting_spirits.remains<5)
 	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and BuffExpires(soulburn_buff) and { BuffExpires(haunting_spirits_buff) or SoulShards() == 4 and BuffRemaining(haunting_spirits_buff) < 5 } Spell(soulburn)
 	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&((buff.soulburn.up&buff.haunting_spirits.remains<5)|soul_shard=4)
@@ -133,8 +133,6 @@ AddIcon specialization=affliction help=aoe
 # summon_doomguard
 # summon_felhunter
 # summon_infernal
-# trinket_proc_intellect_buff
-# trinket_stacking_proc_intellect_buff
 # unstable_affliction
 # unstable_affliction_debuff
 ]]

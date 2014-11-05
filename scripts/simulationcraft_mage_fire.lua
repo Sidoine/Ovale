@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Fire_T16M".
 #	class=mage
 #	spec=fire
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eZ!0..211.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eZ!2..211.
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 Include(ovale_common)
@@ -57,6 +57,8 @@ AddFunction FireDefaultActions
 	if 0 > 0 Spell(blazing_speed)
 	#time_warp,if=target.health.pct<25|time>5
 	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.fireball.cast_time)
+	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(fireball) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=combust_sequence,if=pyro_chain
@@ -223,6 +225,8 @@ AddIcon specialization=fire help=aoe
 # glyph_of_combustion
 # glyph_of_dragons_breath
 # heating_up_buff
+# ice_floes
+# ice_floes_buff
 # ignite_debuff
 # incanters_flow_buff
 # incanters_flow_talent

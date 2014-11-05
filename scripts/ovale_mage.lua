@@ -37,7 +37,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Mage_Arcane_T16M".
 #	class=mage
 #	spec=arcane
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!0..201.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!2..201.
 #	glyphs=arcane_power/cone_of_cold
 
 # ActionList: ArcaneCooldownsActions --> cd
@@ -137,7 +137,6 @@ AddFunction ArcaneConserveActions
 	if DebuffStacks(arcane_charge_debuff) == 4 Spell(arcane_barrage)
 	#arcane_blast
 	Spell(arcane_blast)
-	#ice_floes,moving=1
 	#arcane_barrage,moving=1
 	if Speed() > 0 Spell(arcane_barrage)
 }
@@ -226,6 +225,8 @@ AddFunction ArcaneDefaultActions
 
 AddFunction ArcaneDefaultShortCdActions
 {
+	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.arcane_missiles.cast_time)
+	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(arcane_missiles) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=init_crystal,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up
@@ -249,7 +250,8 @@ AddFunction ArcaneDefaultCdActions
 	#time_warp,if=target.health.pct<25|time>5
 	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 
-	unless RuneOfPowerRemaining() < CastTime(rune_of_power) and Spell(rune_of_power)
+	unless BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(arcane_missiles) } and Spell(ice_floes)
+		or RuneOfPowerRemaining() < CastTime(rune_of_power) and Spell(rune_of_power)
 	{
 		#mirror_image
 		Spell(mirror_image)
@@ -415,7 +417,7 @@ AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane_aoe
 # Based on SimulationCraft profile "Mage_Fire_T16M".
 #	class=mage
 #	spec=fire
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eZ!0..211.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eZ!2..211.
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 # ActionList: FireInitCombustActions --> main, shortcd, cd
@@ -464,6 +466,8 @@ AddFunction FireDefaultShortCdActions
 	if 0 > 10 Spell(blink)
 	#blazing_speed,if=movement.remains>0
 	if 0 > 0 Spell(blazing_speed)
+	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.fireball.cast_time)
+	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(fireball) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=combust_sequence,if=pyro_chain
@@ -487,7 +491,8 @@ AddFunction FireDefaultCdActions
 	#time_warp,if=target.health.pct<25|time>5
 	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 
-	unless RuneOfPowerRemaining() < CastTime(rune_of_power) and Spell(rune_of_power)
+	unless BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(fireball) } and Spell(ice_floes)
+		or RuneOfPowerRemaining() < CastTime(rune_of_power) and Spell(rune_of_power)
 	{
 		#call_action_list,name=combust_sequence,if=pyro_chain
 		if GetState(pyro_chain) > 0 FireCombustSequenceCdActions()
@@ -802,7 +807,7 @@ AddIcon specialization=fire help=cd checkbox=opt_mage_fire_aoe
 # Based on SimulationCraft profile "Mage_Frost_T16M".
 #	class=mage
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!0..211.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!2..211.
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
 # ActionList: FrostPrecombatActions --> main, shortcd, cd
@@ -858,6 +863,8 @@ AddFunction FrostDefaultActions
 
 AddFunction FrostDefaultShortCdActions
 {
+	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.frostbolt.cast_time)
+	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(frostbolt) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	# CHANGE: Check for the talent before any of the spell properties for Prismatic Crystal.
@@ -881,7 +888,8 @@ AddFunction FrostDefaultCdActions
 	#mirror_image
 	Spell(mirror_image)
 
-	unless RuneOfPowerRemaining() < CastTime(rune_of_power) and Spell(rune_of_power)
+	unless BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(frostbolt) } and Spell(ice_floes)
+		or RuneOfPowerRemaining() < CastTime(rune_of_power) and Spell(rune_of_power)
 		or { SpellCooldown(icy_veins) < GCD() and RuneOfPowerRemaining() < 20 or { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) < GCD() } and RuneOfPowerRemaining() < 10 } and Spell(rune_of_power)
 	{
 		#call_action_list,name=cooldowns,if=time_to_die<24
@@ -909,7 +917,6 @@ AddFunction FrostAoeActions
 	if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
 	#blizzard,interrupt_if=cooldown.frozen_orb.up|(talent.frost_bomb.enabled&buff.fingers_of_frost.react=2)
 	Spell(blizzard)
-	#ice_floes,moving=1
 }
 
 AddFunction FrostAoeShortCdActions
@@ -975,7 +982,6 @@ AddFunction FrostSingleTargetActions
 	if Talent(thermal_void_talent) and Talent(mirror_image_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 6 and BuffRemaining(icy_veins_buff) < SpellCooldown(icy_veins) Spell(ice_lance)
 	#frostbolt
 	Spell(frostbolt)
-	#ice_floes,moving=1
 	#ice_lance,moving=1
 	if Speed() > 0 Spell(ice_lance)
 }

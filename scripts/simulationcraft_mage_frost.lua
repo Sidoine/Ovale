@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Frost_T16M".
 #	class=mage
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!0..211.
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!2..211.
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
 Include(ovale_common)
@@ -66,6 +66,8 @@ AddFunction FrostDefaultActions
 	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 	#mirror_image
 	Spell(mirror_image)
+	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.frostbolt.cast_time)
+	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(frostbolt) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 	#rune_of_power,if=(cooldown.icy_veins.remains<gcd.max&buff.rune_of_power.remains<20)|(cooldown.prismatic_crystal.remains<gcd.max&buff.rune_of_power.remains<10)
@@ -100,7 +102,6 @@ AddFunction FrostAoeActions
 	if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
 	#blizzard,interrupt_if=cooldown.frozen_orb.up|(talent.frost_bomb.enabled&buff.fingers_of_frost.react=2)
 	Spell(blizzard)
-	#ice_floes,moving=1
 }
 
 AddFunction FrostSingleTargetActions
@@ -141,7 +142,6 @@ AddFunction FrostSingleTargetActions
 	if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 Spell(water_jet)
 	#frostbolt
 	Spell(frostbolt)
-	#ice_floes,moving=1
 	#ice_lance,moving=1
 	if Speed() > 0 Spell(ice_lance)
 }
@@ -222,6 +222,8 @@ AddIcon specialization=frost help=aoe
 # frozen_orb
 # frozen_orb_debuff
 # glyph_of_cone_of_cold
+# ice_floes
+# ice_floes_buff
 # ice_lance
 # ice_nova
 # ice_shard_buff
