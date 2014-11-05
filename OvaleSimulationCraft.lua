@@ -1186,9 +1186,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "MAGE" and action == "ice_floes" then
-			-- skip
-			isSpellAction = false
 		elseif class == "MAGE" and action == "start_pyro_chain" then
 			bodyCode = "SetState(pyro_chain 1)"
 			isSpellAction = false
