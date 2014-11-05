@@ -407,6 +407,7 @@ function OvaleBestAction:GetAction(node, state)
 			state:PutState(variable, value, isFuture)
 			-- Get the cumulative intersection of time spans for these re-computations.
 			self_tempTimeSpan:Reset(self_computedTimeSpan)
+			self:StartNewAction(state)
 			timeSpan, priority, element = self:Compute(node.child[1], state)
 			Intersect(self_tempTimeSpan, timeSpan, self_computedTimeSpan)
 		end
