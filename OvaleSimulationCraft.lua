@@ -2077,7 +2077,11 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 				code = format("%s%sStacks(%s%s)", target, prefix, buffName, any)
 			end
 		elseif property == "remains" then
-			code = format("%s%sRemaining(%s%s)", target, prefix, buffName, any)
+			if parseNode.asType == "boolean" then
+				code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+			else
+				code = format("%s%sRemaining(%s%s)", target, prefix, buffName, any)
+			end
 		elseif property == "up" then
 			code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
 		else
