@@ -233,8 +233,26 @@ local function GetActionSpellInfo(element, state, target)
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
 
 	local spellId = element.params[1]
+	local si = OvaleData.spellInfo[spellId]
+	local replacedSpellId = nil
+	if si and si.replace then
+		replacedSpellId = spellId
+		spellId = si.replace
+		Ovale:Logf("Spell ID '%s' is replaced by spell ID '%s'.", replacedSpellId, spellId)
+	end
+
 	local action = OvaleActionBar:GetForSpell(spellId)
-	if not OvaleSpellBook:IsKnownSpell(spellId) and not action then
+	if not action and replacedSpellId then
+		Ovale:Logf("Action not found for spell ID '%s'; checking for replaced spell ID '%s'.", spellId, replacedSpellId)
+		action = OvaleActionBar:GetForSpell(replacedSpellId)
+	end
+	local isKnownSpell = OvaleSpellBook:IsKnownSpell(spellId)
+	if not isKnownSpell and replacedSpellId then
+		Ovale:Logf("Spell ID '%s' is not known; checking for replaced spell ID '%s'.", spellId, replacedSpellId)
+		isKnownSpell = OvaleSpellBook:IsKnownSpell(replacedSpellId)
+	end
+
+	if not isKnownSpell and not action then
 		Ovale:Logf("Unknown spell ID '%s'.", spellId)
 	else
 		local isUsable = state:IsUsableSpell(spellId, target)
@@ -254,7 +272,6 @@ local function GetActionSpellInfo(element, state, target)
 			actionType = "spell"
 			actionId = spellId
 
-			local si = OvaleData.spellInfo[spellId]
 			if si then
 				-- Use texture specified in the SpellInfo() if given.
 				if si.texture then
