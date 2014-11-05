@@ -18,6 +18,7 @@ local format = string.format
 local ipairs = ipairs
 local next = next
 local pairs = pairs
+local tconcat = table.concat
 local tinsert = table.insert
 local tsort = table.sort
 local wipe = table.wipe
@@ -158,9 +159,6 @@ do
 
 	function Profiler:Info()
 		if next(self_timeSpent) then
-			local now = API_GetTime()
-			Ovale:FormatPrint("Profiling statistics at %f:", now)
-
 			-- Calculate the width needed to print out the times invoked.
 			local width = 1
 			do
@@ -181,9 +179,9 @@ do
 			end
 			if next(array) then
 				tsort(array)
-				for _, v in ipairs(array) do
-					Ovale:Print(v)
-				end
+				local now = API_GetTime()
+				tinsert(array, 1, format("Profiling statistics at %f:", now))
+				return tconcat(array, "\n")
 			end
 		end
 	end

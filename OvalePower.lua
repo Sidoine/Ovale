@@ -23,8 +23,10 @@ local format = string.format
 local gsub = string.gsub
 local pairs = pairs
 local strmatch = string.match
+local tconcat = table.concat
 local tonumber = tonumber
 local tostring = tostring
+local wipe = table.wipe
 local API_CreateFrame = CreateFrame
 local API_GetPowerRegen = GetPowerRegen
 local API_UnitPower = UnitPower
@@ -55,6 +57,25 @@ local self_costPatterns = {}
 local OVALE_POWER_DEBUG = "power"
 do
 	OvaleDebug:RegisterDebugOption(OVALE_POWER_DEBUG, L["Power"], L["Debug power"])
+	local debugOptions = {
+		power = {
+			name = L["Power"],
+			type = "group",
+			args = {
+				power = {
+					name = L["Power"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info) return OvaleState.state:DebugPower() end,
+				},
+			},
+		},
+	}
+	-- Insert debug options into OvaleDebug.
+	for k, v in pairs(debugOptions) do
+		OvaleDebug.options.args[k] = v
+	end
 end
 --</private-static-properties>
 
@@ -662,9 +683,15 @@ do
 end
 
 -- Print out the levels of each power type in the current state.
-statePrototype.DebugPower = function(state)
-	for powerType in pairs(OvalePower.POWER_INFO) do
-		Ovale:FormatPrint("%s = %d", powerType, state[powerType])
+do
+	local output = {}
+
+	statePrototype.DebugPower = function(state)
+		wipe(output)
+		for powerType in pairs(OvalePower.POWER_INFO) do
+			output[#output + 1] = Ovale:Format("%s = %d", powerType, state[powerType])
+		end
+		return tconcat(output, "\n")
 	end
 end
 --</state-methods>

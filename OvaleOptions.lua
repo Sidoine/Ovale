@@ -421,61 +421,6 @@ OvaleOptions.options = {
 					type = "execute",
 					func = function() OvaleOptions:ToggleConfig() end,
 				},
-				power =
-				{
-					name = "Power",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleState then Ovale.OvaleState.state:DebugPower() end
-					end,
-				},
-				targetbuff =
-				{
-					name = "List target buffs and debuffs",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleState then
-							Ovale.OvaleState.state:PrintUnitAuras("target", "HELPFUL")
-							Ovale.OvaleState.state:PrintUnitAuras("target", "HARMFUL")
-						end
-					end,
-				},
-				buff =
-				{
-					name = "List player buffs and debuffs",
-					type = "execute",
-					func = function()
-						if Ovale.OvaleState then
-							Ovale.OvaleState.state:PrintUnitAuras("player", "HELPFUL")
-							Ovale.OvaleState.state:PrintUnitAuras("player", "HARMFUL")
-						end
-					end,
-				},
-				profilestart = {
-					name = "Start gathering profiling stats",
-					type = "execute",
-					func = function() Ovale.Profiler:Enable(nil, true) end,
-				},
-				profilestop = {
-					name = "Stop gathering profiling stats",
-					type = "execute",
-					func = function() Ovale.Profiler:Disable(nil, true) end,
-				},
-				profilereset = {
-					name = "Reset profiling stats",
-					type = "execute",
-					func = function() Ovale.Profiler:Reset() end,
-				},
-				profile = {
-					name = "Print profiling stats",
-					type = "execute",
-					func = function() Ovale.Profiler:Info() end,
-				},
-				version = {
-					name = "Show version number",
-					type = "execute",
-					func = function() Ovale:Print(Ovale.version) end,
-				},
 				ping = {
 					name = "Ping for Ovale users in group",
 					type = "execute",

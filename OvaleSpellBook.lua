@@ -21,7 +21,6 @@ do
 end
 
 local L = Ovale.L
-local OvaleOptions = Ovale.OvaleOptions
 local OvaleDebug = Ovale.OvaleDebug
 
 -- Forward declarations for module dependencies.
@@ -32,6 +31,7 @@ local OvaleState = nil
 local ipairs = ipairs
 local pairs = pairs
 local strmatch = string.match
+local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
@@ -64,29 +64,50 @@ local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
 local OVALE_SPELLBOOK_DEBUG = "spellbook"
 do
 	OvaleDebug:RegisterDebugOption(OVALE_SPELLBOOK_DEBUG, L["Spellbook changes"], L["Debug spellbook changes"])
-end
-
-do
-	local actions = {
+	local debugOptions = {
 		glyph = {
-			name = L["List player glyphs"],
-			type = "execute",
-			func = function() OvaleSpellBook:DebugGlyphs() end,
+			name = L["Glyphs"],
+			type = "group",
+			args = {
+				glyph = {
+					name = L["Glyphs"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info) return OvaleSpellBook:DebugGlyphs() end,
+				},
+			},
 		},
-		spell = {
-			name = L["List player spells"],
-			type = "execute",
-			func = function() OvaleSpellBook:DebugSpells() end,
+		spellbook = {
+			name = L["Spellbook"],
+			type = "group",
+			args = {
+				spellbook = {
+					name = L["Spellbook"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info) return OvaleSpellBook:DebugSpells() end,
+				},
+			},
 		},
 		talent = {
-			name = L["List talents"],
-			type = "execute",
-			func = function() OvaleSpellBook:DebugTalents() end,
+			name = L["Talents"],
+			type = "group",
+			args = {
+				talent = {
+					name = L["Talents"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info) return OvaleSpellBook:DebugTalents() end,
+				},
+			},
 		},
 	}
-	-- Insert actions into OvaleOptions.
-	for k, v in pairs(actions) do
-		OvaleOptions.options.args.actions.args[k] = v
+	-- Insert debug options into OvaleDebug.
+	for k, v in pairs(debugOptions) do
+		OvaleDebug.options.args[k] = v
 	end
 end
 --</private-static-properties>
@@ -119,14 +140,14 @@ local function ParseHyperlink(hyperlink)
 	return color, linkType, linkData, text
 end
 
-local function PrintTableValues(tbl)
+local function OutputTableValues(output, tbl)
 	local array = {}
 	for k, v in pairs(tbl) do
 		tinsert(array, tostring(v) .. ": " .. tostring(k))
 	end
 	tsort(array)
 	for _, v in ipairs(array) do
-		Ovale:Print(v)
+		output[#output + 1] = v
 	end
 end
 --</private-static-methods>
@@ -440,23 +461,33 @@ function OvaleSpellBook:IsUsableSpell(spellId)
 end
 
 -- Print out the list of active glyphs in alphabetical order.
-function OvaleSpellBook:DebugGlyphs()
-	PrintTableValues(self.glyph)
-end
+do
+	local output = {}
 
--- Print out the list of known spells in alphabetical order.
-function OvaleSpellBook:DebugSpells()
-	PrintTableValues(self.spell)
-	local total = 0
-	for _ in pairs(self.spell) do
-		total = total + 1
+	function OvaleSpellBook:DebugGlyphs()
+		wipe(output)
+		OutputTableValues(output, self.glyph)
+		return tconcat(output, "\n")
 	end
-	Ovale:FormatPrint("Total spells: %d", total)
-end
 
--- Print out the list of talents in alphabetical order.
-function OvaleSpellBook:DebugTalents()
-	PrintTableValues(self.talent)
+	-- Print out the list of known spells in alphabetical order.
+	function OvaleSpellBook:DebugSpells()
+		wipe(output)
+		OutputTableValues(output, self.spell)
+		local total = 0
+		for _ in pairs(self.spell) do
+			total = total + 1
+		end
+		output[#output + 1] = "Total spells: " .. total
+		return tconcat(output, "\n")
+	end
+
+	-- Print out the list of talents in alphabetical order.
+	function OvaleSpellBook:DebugTalents()
+		wipe(output)
+		OutputTableValues(output, self.talent)
+		return tconcat(output, "\n")
+	end
 end
 --</public-static-methods>
 

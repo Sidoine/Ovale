@@ -43,6 +43,7 @@ local next = next
 local pairs = pairs
 local substr = string.sub
 local strmatch = string.match
+local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
 local tsort = table.sort
@@ -78,6 +79,66 @@ local UNKNOWN_GUID = 0
 local OVALE_AURA_DEBUG = "aura"
 do
 	OvaleDebug:RegisterDebugOption(OVALE_AURA_DEBUG, L["Auras"], L["Debug auras"])
+	local output = {}
+	local debugOptions = {
+		playerAura = {
+			name = L["Auras (player)"],
+			type = "group",
+			args = {
+				buff = {
+					name = L["Auras on the player"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info)
+						wipe(output)
+						local helpful = OvaleState.state:DebugUnitAuras("player", "HELPFUL")
+						if helpful then
+							output[#output + 1] = "== BUFFS =="
+							output[#output + 1] = helpful
+						end
+						local harmful = OvaleState.state:DebugUnitAuras("player", "HARMFUL")
+						if harmful then
+							output[#output + 1] = "== DEBUFFS =="
+							output[#output + 1] = harmful
+						end
+						return tconcat(output, "\n")
+					end,
+				},
+			},
+		},
+		targetAura = {
+			name = L["Auras (target)"],
+			type = "group",
+			args = {
+				targetbuff = {
+					name = L["Auras on the target"],
+					type = "execute",
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info)
+						wipe(output)
+						local helpful = OvaleState.state:DebugUnitAuras("target", "HELPFUL")
+						if helpful then
+							output[#output + 1] = "== BUFFS =="
+							output[#output + 1] = helpful
+						end
+						local harmful = OvaleState.state:DebugUnitAuras("target", "HARMFUL")
+						if harmful then
+							output[#output + 1] = "== DEBUFFS =="
+							output[#output + 1] = harmful
+						end
+						return tconcat(output, "\n")
+					end,
+				},
+			},
+		},
+	}
+	-- Insert debug options into OvaleDebug.
+	for k, v in pairs(debugOptions) do
+		OvaleDebug.options.args[k] = v
+	end
 end
 
 -- Aura debuff types.
@@ -877,7 +938,7 @@ end
 do
 	local array = {}
 
-	statePrototype.PrintUnitAuras = function(state, unitId, filter)
+	statePrototype.DebugUnitAuras = function(state, unitId, filter)
 		wipe(array)
 		local guid = OvaleGUID:GetGUID(unitId)
 		if OvaleAura.aura[guid] then
@@ -903,9 +964,7 @@ do
 		end
 		if next(array) then
 			tsort(array)
-			for _, v in ipairs(array) do
-				Ovale:Print(v)
-			end
+			return tconcat(array, "\n")
 		end
 	end
 end

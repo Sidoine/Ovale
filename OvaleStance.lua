@@ -11,7 +11,7 @@ Ovale.OvaleStance = OvaleStance
 
 --<private-static-properties>
 local L = Ovale.L
-local OvaleOptions = Ovale.OvaleOptions
+local OvaleDebug = Ovale.OvaleDebug
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
@@ -19,6 +19,7 @@ local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
+local tconcat = table.concat
 local tinsert = table.insert
 local tsort = table.sort
 local type = type
@@ -87,16 +88,24 @@ local OVALE_SPELLID_TO_STANCE = {
 }
 
 do
-	local actions = {
+	local debugOptions = {
 		stance = {
-			name = L["List stances"],
-			type = "execute",
-			func = function() OvaleStance:DebugStances() end,
+			name = L["Stances"],
+			type = "group",
+			args = {
+				stance = {
+					name = L["Stances"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info) return OvaleStance:DebugStances() end,
+				},
+			},
 		},
 	}
-	-- Insert actions into OvaleOptions.
-	for k, v in pairs(actions) do
-		OvaleOptions.options.args.actions.args[k] = v
+	-- Insert debug options into OvaleDebug.
+	for k, v in pairs(debugOptions) do
+		OvaleDebug.options.args[k] = v
 	end
 end
 --</private-static-properties>
@@ -171,18 +180,20 @@ function OvaleStance:CreateStanceList()
 end
 
 -- Print out the list of stances in alphabetical order.
-function OvaleStance:DebugStances()
+do
 	local array = {}
-	for k, v in pairs(self.stanceList) do
-		if self.stance == k then
-			tinsert(array, v .. " (active)")
-		else
-			tinsert(array, v)
+
+	function OvaleStance:DebugStances()
+		wipe(array)
+		for k, v in pairs(self.stanceList) do
+			if self.stance == k then
+				tinsert(array, v .. " (active)")
+			else
+				tinsert(array, v)
+			end
 		end
-	end
-	tsort(array)
-	for _, v in ipairs(array) do
-		Ovale:Print(v)
+		tsort(array)
+		return tconcat(array, "\n")
 	end
 end
 
