@@ -211,7 +211,7 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 				tremove(self_pendingComboEvents, 1)
 			end
 		end
-		if not pendingMatched and not Ovale.enCombat and difference <= 0 then
+		if not pendingMatched and not OvaleFuture.inCombat and difference <= 0 then
 			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Out-of-combat combo point decay.")
 			if difference == 0 then
 				-- Decrement the combo point count until game state catches up with the event.

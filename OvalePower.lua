@@ -416,7 +416,7 @@ function OvalePower:ResetState(state)
 		state.powerRate[powerType] = 0
 	end
 	-- Set power regeneration for current resource.
-	if Ovale.enCombat then
+	if OvaleFuture.inCombat then
 		state.powerRate[self.powerType] = self.activeRegen
 	else
 		state.powerRate[self.powerType] = self.inactiveRegen
@@ -439,6 +439,9 @@ function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, e
 	profiler.Start("OvalePower_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
+		if state.inCombat then
+			state.powerRate[self.powerType] = self.activeRegen
+		end
 		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	end
 	profiler.Stop("OvalePower_ApplySpellStartCast")
@@ -449,6 +452,9 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 	profiler.Start("OvalePower_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
+		if state.inCombat then
+			state.powerRate[self.powerType] = self.activeRegen
+		end
 		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	end
 	profiler.Stop("OvalePower_ApplySpellAfterCast")

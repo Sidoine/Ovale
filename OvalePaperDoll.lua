@@ -25,6 +25,7 @@ local OvalePool = Ovale.OvalePoolRefCount
 
 -- Forward declarations for module dependencies.
 local OvaleEquipement = nil
+local OvaleFuture = nil
 local OvaleStance = nil
 local OvaleState = nil
 
@@ -177,6 +178,7 @@ end
 function OvalePaperDoll:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleFuture = Ovale.OvaleFuture
 	OvaleStance = Ovale.OvaleStance
 	OvaleState = Ovale.OvaleState
 
@@ -302,9 +304,9 @@ end
 function OvalePaperDoll:PLAYER_REGEN_ENABLED(event)
 	profiler.Start("OvalePaperDoll_UpdateStats")
 	local now = API_GetTime()
-	if Ovale.enCombat and Ovale.combatStartTime then
+	if OvaleFuture.combatStartTime then
 		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%d snapshots in %f seconds.",
-			self_snapshotCount, now - Ovale.combatStartTime)
+			self_snapshotCount, now - OvaleFuture.combatStartTime)
 	end
 	self_pool:Drain()
 	profiler.Stop("OvalePaperDoll_UpdateStats")

@@ -59,10 +59,8 @@ Ovale.list = {}
 -- Checkbox and dropdown GUI controls.
 Ovale.checkBoxWidget = {}
 Ovale.listWidget = {}
---in combat?
-Ovale.enCombat = false
+-- List if units that require refreshing the best action.
 Ovale.refreshNeeded = {}
-Ovale.combatStartTime = nil
 -- Prefix of messages received via CHAT_MSG_ADDON for Ovale.
 Ovale.MSG_PREFIX = OVALE
 --</public-static-properties>
@@ -176,13 +174,10 @@ function Ovale:PLAYER_TARGET_CHANGED()
 end
 
 function Ovale:PLAYER_REGEN_ENABLED()
-	self.enCombat = false
 	self:UpdateVisibility()
 end
 
 function Ovale:PLAYER_REGEN_DISABLED()
-	self.enCombat = true
-	self.combatStartTime = API_GetTime()
 	self:UpdateVisibility()
 end
 
@@ -224,7 +219,7 @@ function Ovale:UpdateVisibility()
 		if profile.apparence.avecCible and not API_UnitExists("target") then
 			visible = false
 		end
-		if profile.apparence.enCombat and not Ovale.enCombat then
+		if profile.apparence.enCombat and not Ovale.OvaleFuture.inCombat then
 			visible = false
 		end
 		if profile.apparence.targetHostileOnly and (API_UnitIsDead("target") or not API_UnitCanAttack("player", "target")) then

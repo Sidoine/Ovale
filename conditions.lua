@@ -2281,7 +2281,7 @@ do
 
 	local function InCombat(condition, state)
 		local yesno = condition[1]
-		local boolean = Ovale.enCombat
+		local boolean = state.inCombat
 		return TestBoolean(boolean, yesno)
 	end
 
@@ -5055,8 +5055,8 @@ do
 
 	local function TimeInCombat(condition, state)
 		local comparator, limit = condition[1], condition[2]
-		if Ovale.enCombat then
-			local start = Ovale.combatStartTime
+		if state.inCombat then
+			local start = state.combatStartTime
 			return TestValue(start, math.huge, 0, start, 1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)

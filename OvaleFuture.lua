@@ -133,7 +133,11 @@ local SIMULATOR_LAG = 0.005
 --</private-static-properties>
 
 --<public-static-properties>
---spell counter (see Counter function)
+-- Whether the player is in combat.
+OvaleFuture.inCombat = nil
+-- The time that combat started.
+OvaleFuture.combatStartTime = nil
+-- Spell counter (see Counter script condition).
 OvaleFuture.counter = {}
 -- Most recent spellcast.
 OvaleFuture.lastSpellcast = nil
@@ -363,6 +367,7 @@ function OvaleFuture:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
@@ -379,6 +384,7 @@ function OvaleFuture:OnDisable()
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
@@ -400,7 +406,13 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	wipe(self_lastCast)
 end
 
+function OvaleFuture:PLAYER_REGEN_DISABLED(event)
+	self.inCombat = true
+	self.combatStartTime = API_GetTime()
+end
+
 function OvaleFuture:PLAYER_REGEN_ENABLED(event)
+	self.inCombat = false
 	self_pool:Drain()
 end
 
@@ -710,6 +722,10 @@ local statePrototype = OvaleFuture.statePrototype
 --</private-static-properties>
 
 --<state-properties>
+-- The in-combat state of the player.
+statePrototype.inCombat = nil
+-- The time that combat began.
+statePrototype.combatStartTime = nil
 -- The current time in the simulator.
 statePrototype.currentTime = nil
 -- The spell being cast in the simulator.
@@ -744,6 +760,8 @@ function OvaleFuture:ResetState(state)
 	state.currentTime = now
 	Ovale:Logf("Reset state with current time = %f", state.currentTime)
 
+	state.inCombat = self.inCombat
+	state.combatStartTime = self.combatStartTime or 0
 	state.lastSpellId = self.lastSpellcast and self.lastSpellcast.spellId
 	state.currentSpellId = nil
 	state.isChanneling = false
@@ -760,6 +778,7 @@ end
 
 -- Release state resources prior to removing from the simulator.
 function OvaleFuture:CleanState(state)
+	state.inCombat = nil
 	state.currentTime = nil
 	state.currentSpellId = nil
 	state.startCast = nil
@@ -854,6 +873,17 @@ statePrototype.ApplySpell = function(state, ...)
 		end
 
 		Ovale:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
+
+		-- Update the combat state so this condition can be checked in other state prototype methods.
+		-- This condition isn't quite right because casting a harmful spell at a target doesn't always put us into combat.
+		if not state.inCombat and OvaleSpellBook:IsHarmfulSpell(spellId) then
+			state.inCombat = true
+			if isChanneled then
+				state.combatStartTime = startCast
+			else
+				state.combatStartTime = endCast
+			end
+		end
 
 		--[[
 			Apply the effects of the spellcast in four phases.

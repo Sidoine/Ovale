@@ -123,7 +123,7 @@ function OvaleState:ResetState(state)
 	end
 	-- TODO: What conditions should trigger resetting state variables?
 	-- For now, reset/remove all state variables if out of combat.
-	if not Ovale.enCombat then
+	if not state.inCombat then
 		for k in pairs(state.variable) do
 			Ovale:DebugPrintf(OVALE_STATE_DEBUG, "Resetting state variable '%s'.", k)
 			state.variable[k] = nil

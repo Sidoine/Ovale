@@ -29,6 +29,9 @@ local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0", "AceSerializer-
 Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
+-- Forward declarations for module dependencies.
+local OvaleFuture = nil
+
 local pairs = pairs
 local strsplit = string.split
 local type = type
@@ -59,6 +62,11 @@ OvaleScore.scoredSpell = {}
 --</public-static-properties>
 
 --<public-static-methods>
+function OvaleScore:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleFuture = Ovale.OvaleFuture
+end
+
 function OvaleScore:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self_name = API_UnitName("player")
@@ -120,7 +128,7 @@ function OvaleScore:AddSpell(spellId)
 end
 
 function OvaleScore:ScoreSpell(spellId)
-	if Ovale.enCombat and self.scoredSpell[spellId] then
+	if OvaleFuture.inCombat and self.scoredSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
 		Ovale:Logf("Scored %s", scored)
 		if scored then

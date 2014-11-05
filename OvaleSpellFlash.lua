@@ -13,6 +13,7 @@ local OvaleOptions = Ovale.OvaleOptions
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
+local OvaleFuture = nil
 
 local pairs = pairs
 local API_UnitHasVehicleUI = UnitHasVehicleUI
@@ -215,6 +216,7 @@ end
 function OvaleSpellFlash:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
+	OvaleFuture = Ovale.OvaleFuture
 end
 
 function OvaleSpellFlash:OnEnable()
@@ -254,7 +256,7 @@ function OvaleSpellFlash:IsSpellFlashEnabled()
 	if enabled and not db.enabled then
 		enabled = false
 	end
-	if enabled and db.inCombat and not Ovale.enCombat then
+	if enabled and db.inCombat and not OvaleFuture.inCombat then
 		enabled = false
 	end
 	if enabled and db.hideInVehicle and API_UnitHasVehicleUI("player") then
