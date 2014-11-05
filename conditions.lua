@@ -4644,12 +4644,16 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check for the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
 	local function SpellCooldownDuration(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local start, duration = state:GetSpellCooldown(spellId)
+		local target = ParseCondition(condition, state, state.defaultTarget)
+		local duration = state:GetSpellCooldownDuration(spellId, state.currentTime, target)
 		return Compare(duration, comparator, limit)
 	end
 

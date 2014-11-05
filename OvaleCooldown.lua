@@ -230,70 +230,33 @@ end
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
 	profiler.Start("OvaleCooldown_ApplySpellAfterCast")
+	local cd = state:GetCD(spellId)
+
+	local target = OvaleGUID:GetUnitId(targetGUID) or state.defaultTarget
+	local start = isChanneled and startCast or endCast
+	local duration = state:GetSpellCooldownDuration(spellId, start, target)
+
 	local si = OvaleData.spellInfo[spellId]
-	if si then
-		local cd = state:GetCD(spellId)
-		cd.start = isChanneled and startCast or endCast
-		cd.duration = si.cd or 0
+	if si and si.cd and duration == 0 then
+		cd.start = 0
+		cd.duration = 0
 		cd.enable = 1
-
-		-- If the spell has charges, then remove a charge.
-		if cd.charges and cd.charges > 0 then
-			cd.chargeStart = cd.start
-			cd.charges = cd.charges - 1
-			if cd.charges == 0 then
-				cd.duration = cd.chargeDuration
-			end
-		end
-
-		-- Test for no cooldown.
-		if nocd then
-			cd.duration = 0
-		else
-			-- There is no cooldown if the buff named by "buff_no_cd" parameter is present.
-			local buffNoCooldown = si.buff_no_cd or si.buffnocd
-			if buffNoCooldown then
-				local aura = state:GetAura("player", buffNoCooldown)
-				if state:IsActiveAura(aura, cd.start) then
-					Ovale:Logf("buff_no_cd stacks = %s, start = %s, ending = %s, cd.start = %f", aura.stacks, aura.start, aura.ending, cd.start)
-					cd.duration = 0
-				end
-			end
-
-			-- There is no cooldown if the target's health percent is below what's specified
-			-- with the "target_health_pct_no_cd" parameter.
-			local target = OvaleGUID:GetUnitId(targetGUID)
-			local targetHealthPctNoCooldown = si.target_health_pct_no_cd or si.targetlifenocd
-			if target and targetHealthPctNoCooldown then
-				local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
-				if healthPercent < targetHealthPctNoCooldown then
-					cd.duration = 0
-				end
-			end
-		end
-
-		if cd.duration > 0 then
-			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
-			if si.cd_haste then
-				if si.cd_haste == "melee" then
-					cd.duration = cd.duration / state:GetMeleeHasteMultiplier(spellcast.snapshot)
-				elseif si.haste == "ranged" then
-					cd.duration = cd.duration / OvalePaperDoll:GetSpellHasteMultiplier()
-				elseif si.cd_haste == "spell" then
-					cd.duration = cd.duration / state:GetSpellHasteMultiplier(spellcast.snapshot)
-				end
-			end
-			-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".
-			if si.buff_cdr then
-				local aura = state:GetAura("player", si.buff_cdr)
-				if state:IsActiveAura(aura, cd.start) then
-					cd.duration = cd.duration / aura.value1
-				end
-			end
-		end
-
-		Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
+	else
+		cd.start = start
+		cd.duration = duration
+		cd.enable = 1
 	end
+
+	-- If the spell has charges, then remove a charge.
+	if cd.charges and cd.charges > 0 then
+		cd.chargeStart = cd.start
+		cd.charges = cd.charges - 1
+		if cd.charges == 0 then
+			cd.duration = cd.chargeDuration
+		end
+	end
+
+	Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
 	profiler.Stop("OvaleCooldown_ApplySpellAfterCast")
 end
 --</public-static-methods>
@@ -371,6 +334,62 @@ end
 statePrototype.GetSpellCooldown = function(state, spellId)
 	local cd = state:GetCD(spellId)
 	return cd.start, cd.duration, cd.enable
+end
+
+-- Get the duration of a spell's cooldown.  Returns either the current duration if
+-- already on cooldown or the duration if cast at the specified time.
+statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, target)
+	local start, duration = state:GetSpellCooldown(spellId)
+	if start + duration > atTime then
+		Ovale:Logf("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
+	else
+		local si = OvaleData.spellInfo[spellId]
+		duration = (si and si.cd) and si.cd or 0
+		Ovale:Logf("Spell %d has a base cooldown of %fs.", spellId, duration)
+		if si then
+			-- There is no cooldown if the buff named by "buff_no_cd" parameter is present.
+			local buffNoCooldown = si.buff_no_cd or si.buffnocd
+			if buffNoCooldown then
+				local aura = state:GetAura("player", buffNoCooldown)
+				if state:IsActiveAura(aura, atTime) then
+					Ovale:Logf("buff_no_cd stacks = %s, start = %s, ending = %s, atTime = %f", aura.stacks, aura.start, aura.ending, atTime)
+					duration = 0
+				end
+			end
+
+			-- There is no cooldown if the target's health percent is below what's specified
+			-- with the "target_health_pct_no_cd" parameter.
+			target = target or state.defaultTarget
+			local targetHealthPctNoCooldown = si.target_health_pct_no_cd or si.targetlifenocd
+			if target and targetHealthPctNoCooldown then
+				local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
+				if healthPercent < targetHealthPctNoCooldown then
+					duration = 0
+				end
+			end
+
+			if duration > 0 then
+				-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
+				if si.cd_haste then
+					if si.cd_haste == "melee" then
+						duration = duration / state:GetMeleeHasteMultiplier()
+					elseif si.haste == "ranged" then
+						duration = duration / OvalePaperDoll:GetSpellHasteMultiplier()
+					elseif si.cd_haste == "spell" then
+						duration = duration / state:GetSpellHasteMultiplier()
+					end
+				end
+				-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".
+				if si.buff_cdr then
+					local aura = state:GetAura("player", si.buff_cdr)
+					if state:IsActiveAura(aura, atTime) then
+						duration = duration / aura.value1
+					end
+				end
+			end
+		end
+	end
+	return duration
 end
 
 -- Return the information on the number of charges for the spell in the simulator.
