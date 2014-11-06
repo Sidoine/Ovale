@@ -875,7 +875,7 @@ function OvaleBestAction:ComputeGroup(element, state)
 			if currentElement then
 				currentCastTime = currentElement.castTime
 			end
-			local gcd = OvaleCooldown:GetGCD()
+			local gcd = state:GetGCD()
 			if not currentCastTime or currentCastTime < gcd then
 				currentCastTime = gcd
 			end

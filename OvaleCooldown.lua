@@ -55,6 +55,25 @@ local _, self_class = API_UnitClass("player")
 local self_serial = 0
 -- Shared cooldown name (sharedcd) to spell table mapping.
 local self_sharedCooldownSpells = {}
+
+-- BASE_GCD[class] = { gcd, isCaster }
+local BASE_GCD = {
+	["DEATHKNIGHT"]	= { 1.0, false },
+	["DRUID"]		= { 1.5,  true },
+	["HUNTER"]		= { 1.0, false },
+	["MAGE"]		= { 1.5,  true },
+	["MONK"]		= { 1.5, false },
+	["PALADIN"]		= { 1.5, false },
+	["PRIEST"]		= { 1.5,  true },
+	["ROGUE"]		= { 1.0, false },
+	["SHAMAN"]		= { 1.5,  true },
+	["WARLOCK"]		= { 1.5,  true },
+	["WARRIOR"]		= { 1.5, false },
+}
+
+-- Spells that cause haste to affect the global cooldown.
+local FOCUS_AND_HARMONY = 154555
+local HEADLONG_RUSH = 158836
 --</private-static-properties>
 
 --<public-static-methods>
@@ -135,49 +154,68 @@ function OvaleCooldown:GetSpellCooldown(spellId)
 	return start, duration, enable
 end
 
--- Return the GCD after the given spellId is cast.
--- If no spellId is given, then returns the GCD after a "yellow-hit" ability has been cast.
-function OvaleCooldown:GetGCD(spellId)
-	-- Base global cooldown.
-	local cd
-	local isCaster = false
-	if self_class == "DEATHKNIGHT" then
-		cd = 1.0
-	elseif self_class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
-		cd = 1.0
-	elseif self_class == "HUNTER" then
-		cd = 1.0
-	elseif self_class == "MONK" then
-		cd = 1.0
-	elseif self_class == "ROGUE" then
-		cd = 1.0
+-- Return the base GCD and caster status.
+function OvaleCooldown:GetBaseGCD()
+	local gcd, isCaster
+	local baseGCD = BASE_GCD[self_class]
+	if baseGCD then
+		gcd, isCaster = baseGCD[1], baseGCD[2]
 	else
-		isCaster = true
-		cd = 1.5
+		gcd, isCaster = 1.5, true
 	end
-
-	-- Use SpellInfo() information if available.
-	if spellId and OvaleData.spellInfo[spellId] then
-		local si = OvaleData.spellInfo[spellId]
-		if si.gcd then
-			return si.gcd
+	if self_class == "DRUID" then
+		if OvaleStance:IsStance("druid_cat_form") then
+			gcd = 1.0
+			isCaster = false
+		elseif OvaleStance:IsStance("druid_bear_form") then
+			isCaster = false
 		end
-		if si.haste then
-			if si.haste == "melee" then
-				cd = cd / OvalePaperDoll:GetMeleeHasteMultiplier()
-			elseif si.haste == "ranged" then
-				cd = cd / OvalePaperDoll:GetRangedHasteMultiplier()
-			elseif si.haste == "spell" then
-				cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
-			end
+	elseif self_class == "MONK" then
+		if OvaleStance:IsStance("monk_stance_of_the_fierce_tiger") then
+			gcd = 1.0
+		elseif OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
+			gcd = 1.0
+		else
+			isCaster = true
 		end
-	elseif isCaster then
-		cd = cd / OvalePaperDoll:GetSpellHasteMultiplier()
 	end
+	return gcd, isCaster
+end
 
-	-- Clamp GCD at 1s.
-	cd = (cd > 1) and cd or 1
-	return cd
+-- Return the GCD after the given spell is cast.
+-- If no spell is given, then returns the GCD assuming a "yellow-hit" ability has been cast.
+function OvaleCooldown:GetGCD(spellId)
+	local gcd
+	local si = spellId and OvaleData.spellInfo[spellId]
+	if si and si.gcd then
+		gcd = si.gcd
+	else
+		local isCaster, haste
+		gcd, isCaster = self:GetBaseGCD()
+		if self_class == "DRUID" and OvaleStance:IsStance("druid_bear_form") then
+			haste = "melee"
+		elseif self_class == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
+			haste = "melee"
+		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
+			haste = "melee"
+		end
+		if si then
+			haste = si.gcd_haste or si.haste or haste
+		end
+		if not haste and isCaster then
+			haste = "spell"
+		end
+		if haste == "melee" then
+			gcd = gcd / OvalePaperDoll:GetMeleeHasteMultiplier()
+		elseif haste == "ranged" then
+			gcd = gcd / OvalePaperDoll:GetRangedHasteMultiplier()
+		elseif haste == "spell" then
+			gcd = gcd / OvalePaperDoll:GetSpellHasteMultiplier()
+		end
+		-- Clamp GCD at 1s.
+		gcd = (gcd > 1) and gcd or 1
+	end
+	return gcd
 end
 --</public-static-methods>
 
@@ -273,6 +311,41 @@ statePrototype.DebugCooldown = function(state)
 			end
 		end
 	end
+end
+
+-- Return the GCD after the given spell is cast.
+-- If no spell is given, then returns the GCD after the current spell has been cast.
+statePrototype.GetGCD = function(state, spellId)
+	local gcd
+	spellId = spellId or state.currentSpellId
+	local si = spellId and OvaleData.spellInfo[spellId]
+	if si and si.gcd then
+		gcd = si.gcd
+	else
+		local isCaster, haste
+		gcd, isCaster = OvaleCooldown:GetBaseGCD()
+		if self_class == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
+			haste = "melee"
+		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
+			haste = "melee"
+		end
+		if si then
+			haste = si.gcd_haste or si.haste or haste
+		end
+		if not haste and isCaster then
+			haste = "spell"
+		end
+		if haste == "melee" then
+			gcd = gcd / state:GetMeleeHasteMultiplier()
+		elseif haste == "ranged" then
+			gcd = gcd / state:GetRangedHasteMultiplier()
+		elseif haste == "spell" then
+			gcd = gcd / state:GetSpellHasteMultiplier()
+		end
+		-- Clamp GCD at 1s.
+		gcd = (gcd > 1) and gcd or 1
+	end
+	return gcd
 end
 
 -- Return the table holding the simulator's cooldown information for the given spell.

@@ -848,7 +848,7 @@ statePrototype.ApplySpell = function(state, ...)
 		-- Handle missing start/end/next cast times.
 		if not startCast or not endCast or not nextCast then
 			local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-			local gcd = OvaleCooldown:GetGCD(spellId)
+			local gcd = state:GetGCD(spellId)
 			startCast = startCast or state.nextCast
 			endCast = endCast or (startCast + castTime)
 			nextCast = (castTime > gcd) and endCast or (startCast + gcd)

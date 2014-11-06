@@ -1042,7 +1042,7 @@ do
 	local function ExecuteTime(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-		local gcd = OvaleCooldown:GetGCD()
+		local gcd = state:GetGCD()
 		local t = (castTime > gcd) and castTime or gcd
 		return Compare(t, comparator, limit)
 	end
@@ -1810,7 +1810,7 @@ do
 
 		-- Get the "execute time" of the spell (smaller of GCD or the cast time).
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-		local gcd = OvaleCooldown:GetGCD()
+		local gcd = state:GetGCD()
 		local castSeconds = (castTime > gcd) and castTime or gcd
 		power = power + regenRate * castSeconds
 
@@ -1846,7 +1846,7 @@ do
 
 	local function GCD(condition, state)
 		local comparator, limit = condition[1], condition[2]
-		local value = OvaleCooldown:GetGCD()
+		local value = state:GetGCD()
 		return Compare(value, comparator, limit)
 	end
 
