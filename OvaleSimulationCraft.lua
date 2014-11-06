@@ -3592,7 +3592,7 @@ end
 
 function OvaleSimulationCraft:CreateOptions()
 	local options = {
-		name = "SimulationCraft",
+		name = OVALE .. " SimulationCraft",
 		type = "group",
 		args = {
 			input = {
@@ -3600,7 +3600,7 @@ function OvaleSimulationCraft:CreateOptions()
 				type = "group",
 				args = {
 					input = {
-						name = L["Profile"],
+						name = L["SimulationCraft Profile"],
 						desc = L["The contents of a SimulationCraft profile (*.simc)."],
 						type = "input",
 						multiline = 25,
@@ -3624,7 +3624,7 @@ function OvaleSimulationCraft:CreateOptions()
 				type = "group",
 				args = {
 					output = {
-						name = L["Code"],
+						name = L["Script"],
 						desc = L["The script translated from the SimulationCraft profile."],
 						type = "input",
 						multiline = 25,
@@ -3638,7 +3638,6 @@ function OvaleSimulationCraft:CreateOptions()
 
 	local appName = self:GetName()
 	AceConfig:RegisterOptionsTable(appName, options)
-	-- Don't expose this in the Blizzard Interface Addons panel.
-	--AceConfigDialog:AddToBlizOptions(appName, "SimulationCraft", OVALE)
+	AceConfigDialog:AddToBlizOptions(appName, "SimulationCraft", OVALE)
 end
 --</public-static-methods>

@@ -99,7 +99,7 @@ end
 
 function OvaleScripts:CreateOptions()
 	local options = {
-		name = L["Code"],
+		name = OVALE .. " " .. L["Script"],
 		type = "group",
 		args = {
 			source = {
@@ -118,11 +118,11 @@ function OvaleScripts:CreateOptions()
 					self:SetScript(v)
 				end,
 			},
-			code = {
+			script = {
 				order = 20,
 				type = "input",
 				multiline = 25,
-				name = L["Code"],
+				name = L["Script"],
 				width = "full",
 				disabled = function()
 					return Ovale.db.profile.source ~= "custom"
@@ -176,6 +176,6 @@ function OvaleScripts:CreateOptions()
 
 	local appName = self:GetName()
 	AceConfig:RegisterOptionsTable(appName, options)
-	AceConfigDialog:AddToBlizOptions(appName, L["Code"], OVALE)
+	AceConfigDialog:AddToBlizOptions(appName, L["Script"], OVALE)
 end
 --</public-static-methods>

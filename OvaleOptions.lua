@@ -453,12 +453,12 @@ function OvaleOptions:OnInitialize()
 	self:UpgradeSavedVariables()
 
 	AceConfig:RegisterOptionsTable(OVALE, self.options.args.apparence)
-	AceConfig:RegisterOptionsTable("Ovale Profile", self.options.args.profile)
+	AceConfig:RegisterOptionsTable(OVALE .. " Profiles", self.options.args.profile)
 	-- Slash commands.
-	AceConfig:RegisterOptionsTable("Ovale Actions", self.options.args.actions, "Ovale")
+	AceConfig:RegisterOptionsTable(OVALE .. " Actions", self.options.args.actions, "Ovale")
 
 	AceConfigDialog:AddToBlizOptions(OVALE)
-	AceConfigDialog:AddToBlizOptions("Ovale Profile", "Profile", OVALE)
+	AceConfigDialog:AddToBlizOptions(OVALE .. " Profiles", "Profiles", OVALE)
 end
 
 function OvaleOptions:OnEnable()

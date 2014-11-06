@@ -69,7 +69,7 @@ end
 
 --<public-static-properties>
 OvaleDebug.options = {
-	name = "Debug",
+	name = OVALE .. " " .. L["Debug"],
 	type = "group",
 	args = {
 		toggles = {
