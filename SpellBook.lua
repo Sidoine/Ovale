@@ -56,10 +56,10 @@ local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
+local MAX_TALENT_TIERS = MAX_TALENT_TIERS
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 
-local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 21
-local MAX_NUM_TALENT_TIERS = MAX_NUM_TALENT_TIERS or 7
+local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
 
 local OVALE_SPELLBOOK_DEBUG = "spellbook"
 do
@@ -214,7 +214,7 @@ function OvaleSpellBook:UpdateTalents()
 	wipe(self.talentPoints)
 
 	local activeTalentGroup = API_GetActiveSpecGroup()
-	for i = 1, MAX_NUM_TALENT_TIERS do
+	for i = 1, MAX_TALENT_TIERS do
 		for j = 1, NUM_TALENT_COLUMNS do
 			local talentId, name, _, selected, _ = API_GetTalentInfo(i, j, activeTalentGroup)
 			if talentId then

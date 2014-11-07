@@ -402,6 +402,13 @@ WoWAPI.ITEM_LEVEL = "Item Level %d"
 WoWAPI.BOOKTYPE_SPELL = "spell"
 WoWAPI.BOOKTYPE_PET = "pet"
 
+--[[----------------------------
+	FrameXML/TalentFrameBase
+--]]----------------------------
+
+WoWAPI.MAX_TALENT_TIERS = 7
+WoWAPI.NUM_TALENT_COLUMNS = 3
+
 --[[--------------------------------------------------------------------
 	debugprofilestop() is a non-standard Lua function that returns the
 	current time in milliseconds.
