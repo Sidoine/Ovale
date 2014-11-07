@@ -90,6 +90,7 @@ local DECLARATION_KEYWORD = {
 	["ScoreSpells"] = true,
 	["SpellInfo"] = true,
 	["SpellList"] = true,
+	["SpellRequire"] = true,
 }
 
 local PARAMETER_KEYWORD = {
@@ -430,6 +431,7 @@ local UnparseScoreSpells = nil
 local UnparseScript = nil
 local UnparseSpellAuraList = nil
 local UnparseSpellInfo = nil
+local UnparseSpellRequire = nil
 local UnparseString = nil
 local UnparseUnless = nil
 local UnparseVariable = nil
@@ -651,7 +653,7 @@ end
 UnparseScript = function(node)
 	local output = self_outputPool:Get()
 	for _, declarationNode in ipairs(node.child) do
-		if declarationNode.type == "item_info" or declarationNode.type == "spell_aura_list" or declarationNode.type == "spell_info" then
+		if declarationNode.type == "item_info" or declarationNode.type == "spell_aura_list" or declarationNode.type == "spell_info" or declarationNode.type == "spell_require" then
 			output[#output + 1] = INDENT[self_indent + 1] .. Unparse(declarationNode)
 		else
 			-- Add an extra blank line preceding "AddFunction" or "AddIcon".
@@ -674,6 +676,11 @@ end
 UnparseSpellInfo = function(node)
 	local identifier = node.name and node.name or node.spellId
 	return format("SpellInfo(%s %s)", identifier, UnparseParameters(node.rawParams))
+end
+
+UnparseSpellRequire = function(node)
+	local identifier = node.name and node.name or node.spellId
+	return format("SpellRequire(%s %s %s)", identifier, node.property, UnparseParameters(node.rawParams))
 end
 
 UnparseString = function(node)
@@ -724,6 +731,7 @@ do
 		["script"] = UnparseScript,
 		["spell_aura_list"] = UnparseSpellAuraList,
 		["spell_info"] = UnparseSpellInfo,
+		["spell_require"] = UnparseSpellRequire,
 		["state"] = UnparseFunction,
 		["string"] = UnparseString,
 		["unless"] = UnparseUnless,
@@ -791,6 +799,7 @@ local ParseSimpleExpression = nil
 local ParseSimpleParameterValue = nil
 local ParseSpellAuraList = nil
 local ParseSpellInfo = nil
+local ParseSpellRequire = nil
 local ParseString = nil
 local ParseStatement = nil
 local ParseUnless = nil
@@ -1045,6 +1054,8 @@ ParseDeclaration = function(tokenStream, nodeList, annotation)
 			ok, node = ParseSpellInfo(tokenStream, nodeList, annotation)
 		elseif token == "SpellList" then
 			ok, node = ParseList(tokenStream, nodeList, annotation)
+		elseif token == "SpellRequire" then
+			ok, node = ParseSpellRequire(tokenStream, nodeList, annotation)
 		end
 	else
 		SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing DECLARATION; declaration keyword expected.", token)
@@ -2043,6 +2054,80 @@ ParseSpellInfo = function(tokenStream, nodeList, annotation)
 	return ok, node
 end
 
+ParseSpellRequire = function(tokenStream, nodeList, annotation)
+	local ok = true
+	-- Consume the keyword token.
+	do
+		local tokenType, token = tokenStream:Consume()
+		if not (tokenType == "keyword" and token == "SpellRequire") then
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; keyword expected.", token)
+			ok = false
+		end
+	end
+	-- Consume the left parenthesis.
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType ~= "(" then
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; '(' expected.", token)
+			ok = false
+		end
+	end
+	-- Consume the spell ID.
+	local spellId, name
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType == "number" then
+			spellId = token
+		elseif tokenType == "name" then
+			name = token
+		else
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; number or name expected.", token)
+			ok = false
+		end
+	end
+	-- Consume the property name.
+	local property
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType == "name" then
+			property = token
+		else
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; property name expected.", token)
+			ok = false
+		end
+	end
+	-- Consume any parameters.
+	local parameters
+	if ok then
+		ok, parameters = ParseParameters(tokenStream, nodeList, annotation)
+	end
+	-- Consume the right parenthesis.
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType ~= ")" then
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SPELLREQUIRE; ')' expected.", token)
+			ok = false
+		end
+	end
+	-- Create the AST node.
+	local node
+	if ok then
+		node = OvaleAST:NewNode(nodeList)
+		node.type = "spell_require"
+		node.spellId = spellId
+		node.name = name
+		node.property = property
+		node.rawParams = parameters
+		annotation.parametersReference = annotation.parametersReference or {}
+		annotation.parametersReference[#annotation.parametersReference + 1] = node
+		if name then
+			annotation.nameReference = annotation.nameReference or {}
+			annotation.nameReference[#annotation.nameReference + 1] = node
+		end
+	end
+	return ok, node
+end
+
 ParseStatement = function(tokenStream, nodeList, annotation)
 	local ok = true
 	local node
@@ -2223,6 +2308,7 @@ do
 		["script"] = ParseScript,
 		["spell_aura_list"] = ParseSpellAuraList,
 		["spell_info"] = ParseSpellInfo,
+		["spell_require"] = ParseSpellRequire,
 		["string"] = ParseString,
 		["unless"] = ParseUnless,
 		["value"] = ParseNumber,
@@ -2354,7 +2440,7 @@ function OvaleAST:PropagateConstants(ast)
 					if itemId then
 						node.itemId = itemId
 					end
-				elseif (node.type == "spell_aura_list" or node.type == "spell_info") and node.name then
+				elseif (node.type == "spell_aura_list" or node.type == "spell_info" or node.type == "spell_require") and node.name then
 					local spellId = dictionary[node.name]
 					if spellId then
 						node.spellId = spellId

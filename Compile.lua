@@ -370,6 +370,27 @@ local function EvaluateSpellInfo(node)
 	return ok
 end
 
+local function EvaluateSpellRequire(node)
+	local ok = true
+	local spellId, parameters = node.spellId, node.params
+	if TestConditions(parameters) then
+		local property = node.property
+		local count = 0
+		local si = OvaleData:SpellInfo(spellId)
+		local tbl = si.require[property] or {}
+		for k, v in pairs(parameters) do
+			if not OvaleAST.PARAMETER_KEYWORD[k] then
+				tbl[k] = v
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			si.require[property] = tbl
+		end
+	end
+	return ok
+end
+
 -- Scan for spell IDs used in the script that are missing from the spellbook and add them if
 -- they are variants of a spell with the same name as one already in the spellbook.
 local function AddMissingVariantSpells(annotation)
@@ -539,6 +560,8 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 				ok = EvaluateSpellAuraList(node)
 			elseif nodeType == "spell_info" then
 				ok = EvaluateSpellInfo(node)
+			elseif nodeType == "spell_require" then
+				ok = EvaluateSpellRequire(node)
 			else
 				-- Any other top-level node types are no-ops when evaluating the script.
 			end

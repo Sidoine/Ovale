@@ -342,6 +342,7 @@ function OvaleData:SpellInfo(spellId)
 				-- Auras granting extra damage multipliers for this spell.
 				damage = {},
 			},
+			require = {},
 		}
 		self.spellInfo[spellId] = si
 	end
