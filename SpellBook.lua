@@ -441,7 +441,7 @@ function OvaleSpellBook:IsSpellInRange(spellId, unitId)
 	local index, bookType = self:GetSpellBookIndex(spellId)
 	if index and bookType then
 		return API_IsSpellInRange(index, bookType, unitId)
-	else
+	elseif self:IsKnownSpell(spellId) then
 		local name = self:GetSpellName(spellId)
 		return API_IsSpellInRange(name, unitId)
 	end
@@ -454,7 +454,7 @@ function OvaleSpellBook:IsUsableSpell(spellId)
 	local index, bookType = self:GetSpellBookIndex(spellId)
 	if index and bookType then
 		return API_IsUsableSpell(index, bookType)
-	else
+	elseif self:IsKnownSpell(spellId) then
 		local name = self:GetSpellName(spellId)
 		return API_IsUsableSpell(name)
 	end
