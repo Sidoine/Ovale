@@ -15,62 +15,62 @@ libs\libs.xml
 
 Ovale.lua
 Localization.lua
-OvaleOptions.lua
-OvaleDebug.lua
+Options.lua
+Debug.lua
 
 # Profiling module.
 Profiler.lua
 
 # Utility modules.
-OvalePool.lua
-OvalePoolGC.lua
-OvalePoolRefCount.lua
-OvaleQueue.lua
-OvaleTimeSpan.lua
+Pool.lua
+PoolGC.lua
+PoolRefCount.lua
+Queue.lua
+TimeSpan.lua
 
 # Core modules.
-OvaleAST.lua
-OvaleActionBar.lua
-OvaleAura.lua
-OvaleBestAction.lua
-OvaleComboPoints.lua
-OvaleCompile.lua
-OvaleCondition.lua
-OvaleCooldown.lua
-OvaleData.lua
-OvaleEquipement.lua
-OvaleFuture.lua
-OvaleGUID.lua
-OvaleLatency.lua
-OvaleLexer.lua
-OvalePaperDoll.lua
-OvalePower.lua
-OvaleScore.lua
-OvaleScripts.lua
-OvaleSimulationCraft.lua
-OvaleSpellBook.lua
-OvaleSpellFlash.lua
-OvaleStance.lua
-OvaleState.lua
+AST.lua
+ActionBar.lua
+Aura.lua
+BestAction.lua
+ComboPoints.lua
+Compile.lua
+Condition.lua
+Cooldown.lua
+Data.lua
+Equipment.lua
+Future.lua
+GUID.lua
+Latency.lua
+Lexer.lua
+PaperDoll.lua
+Power.lua
+Score.lua
+Scripts.lua
+SimulationCraft.lua
+SpellBook.lua
+SpellFlash.lua
+Stance.lua
+State.lua
 
 # Core modules with dependencies.
-OvaleIcone.lua
-OvaleIcone.xml
-OvaleFrame.lua
+Icon.lua
+Icon.xml
+Frame.lua
 
 # Additional modules.
-OvaleBanditsGuile.lua
-OvaleDamageTaken.lua
-OvaleDataBroker.lua
-OvaleEclipse.lua
-OvaleEnemies.lua
-OvalePassiveAura.lua
-OvaleRecount.lua
-OvaleRunes.lua
-OvaleShadowWordDeath.lua
-OvaleSkada.lua
-OvaleSpellDamage.lua
-OvaleSteadyFocus.lua
+BanditsGuile.lua
+DamageTaken.lua
+DataBroker.lua
+Eclipse.lua
+Enemies.lua
+PassiveAura.lua
+Recount.lua
+Runes.lua
+ShadowWordDeath.lua
+Skada.lua
+SpellDamage.lua
+SteadyFocus.lua
 
 conditions.lua
 scripts\files.xml

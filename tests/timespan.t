@@ -14,7 +14,7 @@ end
 do
 	local addonFiles = {
 		"Ovale.lua",
-		"OvaleTimeSpan.lua",
+		"TimeSpan.lua",
 	}
 	for _, file in ipairs(addonFiles) do
 		WoWAPI:LoadAddonFile(file, root)

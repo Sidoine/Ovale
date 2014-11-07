@@ -24,21 +24,21 @@ do
 	local addonFiles = {
 		"Ovale.lua",
 		"Localization.lua",
-		"OvaleOptions.lua",
-		"OvaleDebug.lua",
+		"Options.lua",
+		"Debug.lua",
 		-- Profiling module.
 		"Profiler.lua",
 		-- Utility modules.
-		"OvalePool.lua",
-		"OvaleQueue.lua",
+		"Pool.lua",
+		"Queue.lua",
 		-- Core modules.
-		"OvaleAST.lua",
-		"OvaleCondition.lua",
-		"OvaleLexer.lua",
-		"OvaleRunes.lua",
-		"OvaleScripts.lua",
-		"OvaleSpellBook.lua",
-		"OvaleState.lua",
+		"AST.lua",
+		"Condition.lua",
+		"Lexer.lua",
+		"Runes.lua",
+		"Scripts.lua",
+		"SpellBook.lua",
+		"State.lua",
 		-- Additional modules.
 		"conditions.lua",
 		"scripts/files.xml",
