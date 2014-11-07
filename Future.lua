@@ -226,15 +226,6 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
-		-- Check whether this spell has no cooldown.
-		local buffNoCooldown = si.buff_no_cd or si.buffnocd
-		if buffNoCooldown then
-			local aura = OvaleAura:GetAura("player", buffNoCooldown)
-			if OvaleAura:IsActiveAura(aura) then
-				spellcast.nocd = true
-			end
-		end
-
 		-- Save additional information to the spellcast that are registered with this module.
 		for tbl in pairs(self_updateSpellcastInfo) do
 			if tbl.SaveToSpellcast then
@@ -631,7 +622,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 		local spellcast = self_activeSpellcast[index]
 		Ovale:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 		if now - spellcast.stop < 5 then
-			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast.nocd, spellcast)
+			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast)
 		else
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
@@ -796,7 +787,7 @@ function OvaleFuture:CleanState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleFuture_ApplySpellStartCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -838,12 +829,11 @@ end
 		endCast		The time at the end of the spellcast.
 		nextCast	The earliest time at which the next spell can be cast (nextCast >= endCast).
 		isChanneled	The spell is a channeled spell.
-		nocd		The spell's cooldown is not triggered.
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
 statePrototype.ApplySpell = function(state, ...)
 	profiler.Start("OvaleFuture_state_ApplySpell")
-	local spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast = ...
+	local spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast = ...
 	if spellId and targetGUID then
 		-- Handle missing start/end/next cast times.
 		if not startCast or not endCast or not nextCast then

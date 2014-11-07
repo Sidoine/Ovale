@@ -885,7 +885,7 @@ function OvaleAura:CleanState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleAura_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the player.
@@ -896,7 +896,7 @@ function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, en
 end
 
 -- Apply the effects of the spell on the target's state after it lands on the target.
-function OvaleAura:ApplySpellAfterHit(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvaleAura:ApplySpellAfterHit(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleAura_ApplySpellAfterHit")
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the target.

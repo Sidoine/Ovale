@@ -263,7 +263,7 @@ function OvaleStance:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleStance_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.to_stance then

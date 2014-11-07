@@ -456,27 +456,27 @@ function OvalePower:CleanState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvalePower_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
 		if state.inCombat then
 			state.powerRate[self.powerType] = self.activeRegen
 		end
-		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	end
 	profiler.Stop("OvalePower_ApplySpellStartCast")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvalePower_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
 		if state.inCombat then
 			state.powerRate[self.powerType] = self.activeRegen
 		end
-		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	end
 	profiler.Stop("OvalePower_ApplySpellAfterCast")
 end
@@ -484,7 +484,7 @@ end
 
 --<state-methods>
 -- Update the state of the simulator for the power cost of the given spell.
-statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvalePower_state_ApplyPowerCost")
 	local si = OvaleData.spellInfo[spellId]
 

@@ -266,7 +266,7 @@ function OvaleCooldown:CleanState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, nocd, spellcast)
+function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleCooldown_ApplySpellAfterCast")
 	local cd = state:GetCD(spellId)
 
