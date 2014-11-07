@@ -24,9 +24,9 @@
 --</state-methods>
 =cut
 
-$m{"AceAddon-3.0"}{GetModule} = true;
-$m{"AceAddon-3.0"}{GetName} = true;
-$m{"AceAddon-3.0"}{NewModule} = true;
+$sm{"AceAddon-3.0"}{GetModule} = true;
+$sm{"AceAddon-3.0"}{GetName} = true;
+$sm{"AceAddon-3.0"}{NewModule} = true;
 
 $m{AceConfig}{RegisterOptionsTable} = true;
 
@@ -36,14 +36,14 @@ $m{AceConfigDialog}{Open} = true;
 $sp{AceConfigDialog}{OpenFrames} = true;
 $m{AceConfigDialog}{SetDefaultSize} = true;
 
-$m{"AceConsole-3.0"}{Print} = true;
-$m{"AceConsole-3.0"}{Printf} = true;
+$sm{"AceConsole-3.0"}{Print} = true;
+$sm{"AceConsole-3.0"}{Printf} = true;
 
-$m{"AceEvent-3.0"}{RegisterEvent} = true;
-$m{"AceEvent-3.0"}{RegisterMessage} = true;
-$m{"AceEvent-3.0"}{SendMessage} = true;
-$m{"AceEvent-3.0"}{UnregisterEvent} = true;
-$m{"AceEvent-3.0"}{UnregisterMessage} = true;
+$sm{"AceEvent-3.0"}{RegisterEvent} = true;
+$sm{"AceEvent-3.0"}{RegisterMessage} = true;
+$sm{"AceEvent-3.0"}{SendMessage} = true;
+$sm{"AceEvent-3.0"}{UnregisterEvent} = true;
+$sm{"AceEvent-3.0"}{UnregisterMessage} = true;
 
 $m{AceGUI}{ClearFocus} = true;
 $m{AceGUI}{Create} = true;
@@ -52,12 +52,12 @@ $m{AceGUI}{RegisterWidgetType} = true;
 
 $m{AceLocale}{GetLocale} = true;
 
-$m{"AceSerializer-3.0"}{Deserialize} = true;
-$m{"AceSerializer-3.0"}{Serialize} = true;
+$sm{"AceSerializer-3.0"}{Deserialize} = true;
+$sm{"AceSerializer-3.0"}{Serialize} = true;
 
-$m{"AceTimer-3.0"}{CancelTimer} = true;
-$m{"AceTimer-3.0"}{ScheduleRepeatingTimer} = true;
-$m{"AceTimer-3.0"}{ScheduleTimer} = true;
+$sm{"AceTimer-3.0"}{CancelTimer} = true;
+$sm{"AceTimer-3.0"}{ScheduleRepeatingTimer} = true;
+$sm{"AceTimer-3.0"}{ScheduleTimer} = true;
 
 $m{ActionButtonTemplate}{CreateFontString} = true;
 $m{ActionButtonTemplate}{EnableMouse} = true;
@@ -140,13 +140,18 @@ $sp{Ovale}{OvaleSkada} = true;
 $sp{Ovale}{OvaleTimeSpan} = true;
 $sp{Ovale}{Profiler} = true;
 
-$m{OvaleQueue}{NewQueue} = true;
+$sm{OvaleQueue}{NewQueue} = true;
 $sp{OvaleQueue}{Front} = true;
 $sp{OvaleQueue}{FrontToBackIterator} = true;
 $sp{OvaleQueue}{InsertBack} = true;
 $sp{OvaleQueue}{InsertFront} = true;
 $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
+
+$classname{Localization} = "Localization";
+$classname{Ovale} = "Ovale";
+$classname{Profiler} = "Profiler";
+$classname{WoWAPI} = "WoWAPI";
 
 sub ParseDirectory
 {
@@ -156,7 +161,15 @@ sub ParseDirectory
 	{
 		if ($r =~ m/(.*)\.lua$/)
 		{
-			my $class = $1;
+			my $class = "$1";
+			if ($class =~ m/^([A-Z].*)/)
+			{
+				$class = $classname{$1};
+				if ($class eq "")
+				{
+					$class = "Ovale$1";
+				}
+			}
 			open(F, "<", "$dir/$r");
 			undef $/;
 			my $content = <F>;
@@ -194,6 +207,14 @@ sub ParseDirectory
 			{
 				my $factory = $1;
 				my $mixins = $2;
+				for my $method (keys %{$sp{$factory}})
+				{
+					$sp{$class}{$method} = $sp{$factory}{$method}
+				}
+				for my $method (keys %{$sm{$factory}})
+				{
+					$sm{$class}{$method} = $sm{$factory}{$method}
+				}
 				for my $method (keys %{$m{$factory}})
 				{
 					$m{$class}{$method} = $m{$factory}{$method}
@@ -203,6 +224,14 @@ sub ParseDirectory
 					my $parent = $1;
 					if ($parent ne $class)
 					{
+						for my $method (keys %{$sp{$parent}})
+						{
+							$sp{$class}{$method} = $sp{$parent}{$method}
+						}
+						for my $method (keys %{$sm{$parent}})
+						{
+							$sm{$class}{$method} = $sm{$parent}{$method}
+						}
 						for my $method (keys %{$m{$parent}})
 						{
 							$m{$class}{$method} = $m{$parent}{$method}
@@ -217,6 +246,14 @@ sub ParseDirectory
 				my $mixins = $2;
 				$sp{$parent}{$class} = true;
 				my $factory = "AceAddon-3.0";
+				for my $method (keys %{$sp{$factory}})
+				{
+					$sp{$class}{$method} = $sp{$factory}{$method}
+				}
+				for my $method (keys %{$sm{$factory}})
+				{
+					$sm{$class}{$method} = $sm{$factory}{$method}
+				}
 				for my $method (keys %{$m{$factory}})
 				{
 					$m{$class}{$method} = $m{$factory}{$method}
@@ -226,6 +263,14 @@ sub ParseDirectory
 					my $parent = $1;
 					if ($parent ne $class)
 					{
+						for my $method (keys %{$sp{$parent}})
+						{
+							$sp{$class}{$method} = $sp{$parent}{$method}
+						}
+						for my $method (keys %{$sm{$parent}})
+						{
+							$sm{$class}{$method} = $sm{$parent}{$method}
+						}
 						for my $method (keys %{$m{$parent}})
 						{
 							$m{$class}{$method} = $m{$parent}{$method}
