@@ -2,17 +2,17 @@
 
   <CheckButton name="SecureOvaleIconTemplate" virtual="true" inherits="SecureActionButtonTemplate, ActionButtonTemplate">
     <Scripts>
-      <OnLoad>OvaleIcone_OnLoad(self)</OnLoad>
-      <OnEnter>OvaleIcone_OnEnter(self)</OnEnter>
-      <OnLeave>OvaleIcone_OnLeave(self)</OnLeave>
+      <OnLoad>OvaleIcon_OnLoad(self)</OnLoad>
+      <OnEnter>OvaleIcon_OnEnter(self)</OnEnter>
+      <OnLeave>OvaleIcon_OnLeave(self)</OnLeave>
     </Scripts>
   </CheckButton>
   
   <CheckButton name="OvaleIconTemplate" virtual="true" inherits="ActionButtonTemplate">
     <Scripts>
-      <OnLoad>OvaleIcone_OnLoad(self)</OnLoad>
-      <OnEnter>OvaleIcone_OnEnter(self)</OnEnter>
-      <OnLeave>OvaleIcone_OnLeave(self)</OnLeave>
+      <OnLoad>OvaleIcon_OnLoad(self)</OnLoad>
+      <OnEnter>OvaleIcon_OnEnter(self)</OnEnter>
+      <OnLeave>OvaleIcon_OnLeave(self)</OnLeave>
     </Scripts>
   </CheckButton>
 </Ui>

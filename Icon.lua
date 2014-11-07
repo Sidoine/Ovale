@@ -6,7 +6,7 @@
 
 local OVALE, Ovale = ...
 
---<class name="OvaleIcone" inherits="ActionButtonTemplate" />
+--<class name="OvaleIcon" inherits="ActionButtonTemplate" />
 
 --<private-static-properties>
 local L = Ovale.L
@@ -261,14 +261,14 @@ local function SetRangeIndicator(self, text)
 end
 --</public-methods>
 
-function OvaleIcone_OnMouseUp(self)
+function OvaleIcon_OnMouseUp(self)
 	if not self.actionButton then
 		Ovale:ToggleOptions()
 	end
 	self:SetChecked(true)
 end
 
-function OvaleIcone_OnEnter(self)
+function OvaleIcon_OnEnter(self)
 	if self.help or self.actionType or HasScriptControls() then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 		if self.help then
@@ -294,13 +294,13 @@ function OvaleIcone_OnEnter(self)
 	end
 end
 
-function OvaleIcone_OnLeave(self)
+function OvaleIcon_OnLeave(self)
 	if self.help or HasScriptControls() then
 		GameTooltip:Hide()
 	end
 end
 
-function OvaleIcone_OnLoad(self)
+function OvaleIcon_OnLoad(self)
 	local name = self:GetName()
 	local profile = Ovale.db.profile
 
@@ -333,7 +333,7 @@ function OvaleIcone_OnLoad(self)
 	self.actionHelp = nil
 --</public-properties>
 
-	self:SetScript("OnMouseUp", OvaleIcone_OnMouseUp)
+	self:SetScript("OnMouseUp", OvaleIcon_OnMouseUp)
 
 	self.focusText:SetFontObject("GameFontNormalSmall");
 	self.focusText:SetAllPoints(self);

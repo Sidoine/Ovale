@@ -368,7 +368,7 @@ function OvalePower:PowerCost(spellId, powerType)
 			end
 		end
 	end
-	profiler.Stop("OvaleEquipement_PowerCost")
+	profiler.Stop("OvalePower_PowerCost")
 	return spellCost, spellPowerType
 end
 

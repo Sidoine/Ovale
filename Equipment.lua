@@ -5,15 +5,15 @@
 --]]--------------------------------------------------------------------
 
 local OVALE, Ovale = ...
-local OvaleEquipement = Ovale:NewModule("OvaleEquipement", "AceEvent-3.0")
-Ovale.OvaleEquipement = OvaleEquipement
+local OvaleEquipment = Ovale:NewModule("OvaleEquipment", "AceEvent-3.0")
+Ovale.OvaleEquipment = OvaleEquipment
 
 --<private-static-properties>
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
 local profiler = nil
 do
-	local group = OvaleEquipement:GetName()
+	local group = OvaleEquipment:GetName()
 	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
@@ -343,44 +343,44 @@ local OVALE_NORMALIZED_WEAPON_SPEED = {
 
 --<public-static-properties>
 -- Whether the equipment information is ready for use by other modules.
-OvaleEquipement.ready = false
+OvaleEquipment.ready = false
 -- Item IDs of equipped items, indexed by slot ID.
-OvaleEquipement.equippedItems = {}
+OvaleEquipment.equippedItems = {}
 -- Item levels of equipped items, indexed by slot ID.
-OvaleEquipement.equippedItemLevels = {}
+OvaleEquipment.equippedItemLevels = {}
 -- Type of main-hand item equipped.
-OvaleEquipement.mainHandItemType = nil
+OvaleEquipment.mainHandItemType = nil
 -- Type of off-hand item equipped.
-OvaleEquipement.offHandItemType = nil
+OvaleEquipment.offHandItemType = nil
 -- Count of equipped pieces of an armor set: armorSetCount[armorSetName] = equippedCount
-OvaleEquipement.armorSetCount = {}
+OvaleEquipment.armorSetCount = {}
 -- Item ID of meta gem if equipped.
-OvaleEquipement.metaGem = nil
+OvaleEquipment.metaGem = nil
 
 -- Normalized weapon speeds for equipped mainhand and offhand weapons.
-OvaleEquipement.mainHandWeaponSpeed = nil
-OvaleEquipement.offHandWeaponSpeed = nil
+OvaleEquipment.mainHandWeaponSpeed = nil
+OvaleEquipment.offHandWeaponSpeed = nil
 --</public-static-properties>
 
 --<private-static-methods>
 local function GetEquippedItemType(slotId)
-	profiler.Start("OvaleEquipement_GetEquippedItemType")
-	local itemId = OvaleEquipement:GetEquippedItem(slotId)
+	profiler.Start("OvaleEquipment_GetEquippedItemType")
+	local itemId = OvaleEquipment:GetEquippedItem(slotId)
 	local itemType
 	if itemId then
 		local _, _, _, _, _, _, _, _, inventoryType = API_GetItemInfo(itemId)
 		itemType = inventoryType
 	end
-	profiler.Stop("OvaleEquipement_GetEquippedItemType")
+	profiler.Stop("OvaleEquipment_GetEquippedItemType")
 	return itemType
 end
 
 local function GetItemLevel(slotId)
-	profiler.Start("OvaleEquipement_GetItemLevel")
+	profiler.Start("OvaleEquipment_GetItemLevel")
 	self_tooltip:SetInventoryItem("player", slotId)
 	local itemLevel
 	for i = 2, self_tooltip:NumLines() do
-		local text = _G["OvaleEquipement_ScanningTooltipTextLeft" .. i]:GetText()
+		local text = _G["OvaleEquipment_ScanningTooltipTextLeft" .. i]:GetText()
 		if text then
 			itemLevel = strmatch(text, OVALE_ITEM_LEVEL_PATTERN)
 			if itemLevel then
@@ -389,33 +389,33 @@ local function GetItemLevel(slotId)
 			end
 		end
 	end
-	profiler.Stop("OvaleEquipement_GetItemLevel")
+	profiler.Stop("OvaleEquipment_GetItemLevel")
 	return itemLevel
 end
 
 local function GetNormalizedWeaponSpeed(slotId)
-	profiler.Start("OvaleEquipement_GetNormalizedWeaponSpeed")
+	profiler.Start("OvaleEquipment_GetNormalizedWeaponSpeed")
 	local weaponSpeed
 	if slotId == INVSLOT_MAINHAND or slotId == INVSLOT_OFFHAND then
-		local itemId = OvaleEquipement:GetEquippedItem(slotId)
+		local itemId = OvaleEquipment:GetEquippedItem(slotId)
 		if itemId then
 			local _, _, _, _, _, _, weaponClass = API_GetItemInfo(itemId)
 			weaponSpeed = OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
 		end
 	end
-	profiler.Stop("OvaleEquipement_GetNormalizedWeaponSpeed")
+	profiler.Stop("OvaleEquipment_GetNormalizedWeaponSpeed")
 	return weaponSpeed
 end
 --</private-static-methods>
 
 --<public-static-methods>
-function OvaleEquipement:OnInitialize()
+function OvaleEquipment:OnInitialize()
 	-- Create the tooltip used for scanning.
-	self_tooltip = API_CreateFrame("GameTooltip", "OvaleEquipement_ScanningTooltip", nil, "GameTooltipTemplate")
+	self_tooltip = API_CreateFrame("GameTooltip", "OvaleEquipment_ScanningTooltip", nil, "GameTooltipTemplate")
 	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
 end
 
-function OvaleEquipement:OnEnable()
+function OvaleEquipment:OnEnable()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateEquippedItems")
@@ -423,7 +423,7 @@ function OvaleEquipement:OnEnable()
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
-function OvaleEquipement:OnDisable()
+function OvaleEquipment:OnDisable()
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_ALIVE")
@@ -431,8 +431,8 @@ function OvaleEquipement:OnDisable()
 	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 end
 
-function OvaleEquipement:GET_ITEM_INFO_RECEIVED(event)
-	profiler.Start("OvaleEquipement_GET_ITEM_INFO_RECEIVED")
+function OvaleEquipment:GET_ITEM_INFO_RECEIVED(event)
+	profiler.Start("OvaleEquipment_GET_ITEM_INFO_RECEIVED")
 	self.mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
 	self.offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
 	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
@@ -442,11 +442,11 @@ function OvaleEquipement:GET_ITEM_INFO_RECEIVED(event)
 	if changed then
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
-	profiler.Stop("OvaleEquipement_GET_ITEM_INFO_RECEIVED")
+	profiler.Stop("OvaleEquipment_GET_ITEM_INFO_RECEIVED")
 end
 
-function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
-	profiler.Start("OvaleEquipement_PLAYER_EQUIPMENT_CHANGED")
+function OvaleEquipment:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
+	profiler.Start("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
 	if hasItem then
 		self.equippedItems[slotId] = API_GetInventoryItemID("player", slotId)
 		self.equippedItemLevels[slotId] = GetItemLevel(slotId)
@@ -469,7 +469,7 @@ function OvaleEquipement:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 
 	self:UpdateArmorSetCount()
 	self:SendMessage("Ovale_EquipmentChanged")
-	profiler.Stop("OvaleEquipement_PLAYER_EQUIPMENT_CHANGED")
+	profiler.Stop("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
 end
 
 do
@@ -481,7 +481,7 @@ do
 		WARLOCK = { ["T14"] = "T14_caster", ["T15"] = "T15_caster" },
 	}
 
-	function OvaleEquipement:GetArmorSetCount(name)
+	function OvaleEquipment:GetArmorSetCount(name)
 		local count = self.armorSetCount[name]
 		if not count then
 			if armorSetName[self_class] and armorSetName[self_class][name] then
@@ -493,7 +493,7 @@ do
 	end
 end
 
-function OvaleEquipement:GetEquippedItem(slotId)
+function OvaleEquipment:GetEquippedItem(slotId)
 	if slotId and type(slotId) ~= "number" then
 		slotId = OVALE_SLOTNAME[slotId]
 	end
@@ -503,7 +503,7 @@ function OvaleEquipement:GetEquippedItem(slotId)
 	return nil
 end
 
-function OvaleEquipement:GetEquippedItemLevel(slotId)
+function OvaleEquipment:GetEquippedItemLevel(slotId)
 	if slotId and type(slotId) ~= "number" then
 		slotId = OVALE_SLOTNAME[slotId]
 	end
@@ -513,7 +513,7 @@ function OvaleEquipement:GetEquippedItemLevel(slotId)
 	return nil
 end
 
-function OvaleEquipement:HasEquippedItem(itemId, slotId)
+function OvaleEquipment:HasEquippedItem(itemId, slotId)
 	if slotId and type(slotId) ~= "number" then
 		slotId = OVALE_SLOTNAME[slotId]
 	end
@@ -531,7 +531,7 @@ function OvaleEquipement:HasEquippedItem(itemId, slotId)
 	return nil
 end
 
-function OvaleEquipement:HasMainHandWeapon(handedness)
+function OvaleEquipment:HasMainHandWeapon(handedness)
 	if handedness then
 		if handedness == 1 then
 			return self.mainHandItemType == "INVTYPE_WEAPON"
@@ -547,7 +547,7 @@ function OvaleEquipement:HasMainHandWeapon(handedness)
 	return false
 end
 
-function OvaleEquipement:HasOffHandWeapon(handedness)
+function OvaleEquipment:HasOffHandWeapon(handedness)
 	if handedness then
 		if handedness == 1 then
 			return self.offHandItemType == "INVTYPE_WEAPON"
@@ -565,16 +565,16 @@ function OvaleEquipement:HasOffHandWeapon(handedness)
 	return false
 end
 
-function OvaleEquipement:HasShield()
+function OvaleEquipment:HasShield()
 	return self.offHandItemType == "INVTYPE_SHIELD"
 end
 
-function OvaleEquipement:HasTrinket(itemId)
+function OvaleEquipment:HasTrinket(itemId)
 	return self:HasEquippedItem(itemId, INVSLOT_TRINKET1)
 		or self:HasEquippedItem(itemId, INVSLOT_TRINKET2)
 end
 
-function OvaleEquipement:HasTwoHandedWeapon(slotId)
+function OvaleEquipment:HasTwoHandedWeapon(slotId)
 	if slotId and type(slotId) ~= "number" then
 		slotId = OVALE_SLOTNAME[slotId]
 	end
@@ -590,7 +590,7 @@ function OvaleEquipement:HasTwoHandedWeapon(slotId)
 	return false
 end
 
-function OvaleEquipement:HasOneHandedWeapon(slotId)
+function OvaleEquipment:HasOneHandedWeapon(slotId)
 	if slotId and type(slotId) ~= "number" then
 		slotId = OVALE_SLOTNAME[slotId]
 	end
@@ -607,8 +607,8 @@ function OvaleEquipement:HasOneHandedWeapon(slotId)
 	return false
 end
 
-function OvaleEquipement:UpdateArmorSetCount()
-	profiler.Start("OvaleEquipement_UpdateArmorSetCount")
+function OvaleEquipment:UpdateArmorSetCount()
+	profiler.Start("OvaleEquipment_UpdateArmorSetCount")
 	wipe(self.armorSetCount)
 	for i = 1, #OVALE_ARMORSET_SLOT_IDS do
 		local itemId = self:GetEquippedItem(OVALE_ARMORSET_SLOT_IDS[i])
@@ -623,11 +623,11 @@ function OvaleEquipement:UpdateArmorSetCount()
 			end
 		end
 	end	
-	profiler.Stop("OvaleEquipement_UpdateArmorSetCount")
+	profiler.Stop("OvaleEquipment_UpdateArmorSetCount")
 end
 
-function OvaleEquipement:UpdateEquippedItems()
-	profiler.Start("OvaleEquipement_UpdateEquippedItems")
+function OvaleEquipment:UpdateEquippedItems()
+	profiler.Start("OvaleEquipment_UpdateEquippedItems")
 	local changed = false
 	local item
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
@@ -651,11 +651,11 @@ function OvaleEquipement:UpdateEquippedItems()
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
 	self.ready = true
-	profiler.Stop("OvaleEquipement_UpdateEquippedItems")
+	profiler.Stop("OvaleEquipment_UpdateEquippedItems")
 end
 
-function OvaleEquipement:UpdateEquippedItemLevels()
-	profiler.Start("OvaleEquipement_UpdateEquippedItemLevels")
+function OvaleEquipment:UpdateEquippedItemLevels()
+	profiler.Start("OvaleEquipment_UpdateEquippedItemLevels")
 	local changed = false
 	local itemLevel
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
@@ -668,12 +668,12 @@ function OvaleEquipement:UpdateEquippedItemLevels()
 	if changed then
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
-	profiler.Stop("OvaleEquipement_UpdateEquippedItemLevels")
+	profiler.Stop("OvaleEquipment_UpdateEquippedItemLevels")
 	return changed
 end
 
-function OvaleEquipement:UpdateMetaGem()
-	profiler.Start("OvaleEquipement_UpdateMetaGem")
+function OvaleEquipment:UpdateMetaGem()
+	profiler.Start("OvaleEquipment_UpdateMetaGem")
 	local changed = false
 	local gemId = API_GetInventoryItemGems(INVSLOT_HEAD)
 	if gemId then
@@ -690,11 +690,11 @@ function OvaleEquipement:UpdateMetaGem()
 			changed = true
 		end
 	end
-	profiler.Stop("OvaleEquipement_UpdateMetaGem")
+	profiler.Stop("OvaleEquipment_UpdateMetaGem")
 	return changed
 end
 
-function OvaleEquipement:Debug()
+function OvaleEquipment:Debug()
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
 		Ovale:FormatPrint("Slot %d = %s (%d)", slotId, self:GetEquippedItem(slotId), self:GetEquippedItemLevel(slotId))
 	end

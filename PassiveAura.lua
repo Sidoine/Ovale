@@ -14,7 +14,7 @@ Ovale.OvalePassiveAura = OvalePassiveAura
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
-local OvaleEquipement = nil
+local OvaleEquipment = nil
 local OvalePaperDoll = nil
 
 local exp = math.exp
@@ -134,7 +134,7 @@ local READINESS_ROLE = {
 function OvalePassiveAura:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
-	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleEquipment = Ovale.OvaleEquipment
 	OvalePaperDoll = Ovale.OvalePaperDoll
 end
 
@@ -160,7 +160,7 @@ function OvalePassiveAura:Ovale_SpecializationChanged()
 end
 
 function OvalePassiveAura:UpdateIncreasedCritEffectMetaGem()
-	local metaGem = OvaleEquipement.metaGem
+	local metaGem = OvaleEquipment.metaGem
 	local spellId = metaGem and INCREASED_CRIT_META_GEM[metaGem]
 
 	-- Update the passive, hidden aura for the meta gem.
@@ -186,11 +186,11 @@ function OvalePassiveAura:UpdateAmplification()
 	-- Check if an Amplification trinket is equipped.  If more than one Amplification trinket is
 	-- equipped, then the effects stack.
 	for _, slot in pairs(TRINKET_SLOTS) do
-		local trinket = OvaleEquipement:GetEquippedItem(slot)
+		local trinket = OvaleEquipment:GetEquippedItem(slot)
 		if trinket and AMPLIFICATION_TRINKET[trinket] then
 			hasAmplification = true
 			-- Use a derived formula that very closely approximates the true percent increase based on item level.
-			local ilevel = OvaleEquipement:GetEquippedItemLevel(slot) or 528
+			local ilevel = OvaleEquipment:GetEquippedItemLevel(slot) or 528
 			local amplificationEffect = exp((ilevel - 528) * 0.009327061882 + 1.713797928)
 			critDamageIncrease = critDamageIncrease + amplificationEffect / 100
 			statMultiplier = statMultiplier * (1 + amplificationEffect / 100)
@@ -223,12 +223,12 @@ function OvalePassiveAura:UpdateReadiness()
 
 		-- Check if a Readiness trinket is equipped and for the correct role.
 		for _, slot in pairs(TRINKET_SLOTS) do
-			local trinket = OvaleEquipement:GetEquippedItem(slot)
+			local trinket = OvaleEquipment:GetEquippedItem(slot)
 			local readinessId = trinket and READINESS_TRINKET[trinket]
 			if readinessId then
 				hasReadiness = true
 				-- Use a derived formula that very closely approximates the true cooldown recovery rate increase based on item level.
-				local ilevel = OvaleEquipement:GetEquippedItemLevel(slot) or 528
+				local ilevel = OvaleEquipment:GetEquippedItemLevel(slot) or 528
 				cdRecoveryRateIncrease = exp((ilevel - 528) * 0.009317881032 + 3.434954478)
 				if readinessId == READINESS_TANK then
 					-- The cooldown recovery rate of the tank trinket is half the value of the same item-level DPS trinket.

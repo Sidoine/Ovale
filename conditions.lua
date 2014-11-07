@@ -15,7 +15,7 @@ local OvaleCondition = Ovale.OvaleCondition
 local OvaleCooldown = Ovale.OvaleCooldown
 local OvaleDamageTaken = Ovale.OvaleDamageTaken
 local OvaleData = Ovale.OvaleData
-local OvaleEquipement = Ovale.OvaleEquipement
+local OvaleEquipment = Ovale.OvaleEquipment
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
 local OvaleLatency = Ovale.OvaleLatency
@@ -153,7 +153,7 @@ do
 
 	local function ArmorSetBonus(condition, state)
 		local armorSet, count = condition[1], condition[2]
-		local value = (OvaleEquipement:GetArmorSetCount(armorSet) >= count) and 1 or 0
+		local value = (OvaleEquipment:GetArmorSetCount(armorSet) >= count) and 1 or 0
 		return 0, math.huge, value, 0, 0
 	end
 
@@ -179,7 +179,7 @@ do
 
 	local function ArmorSetParts(condition, state)
 		local armorSet, comparator, limit = condition[1], condition[2], condition[3]
-		local value = OvaleEquipement:GetArmorSetCount(armorSet)
+		local value = OvaleEquipment:GetArmorSetCount(armorSet)
 		return Compare(value, comparator, limit)
 	end
 
@@ -1915,17 +1915,17 @@ do
 		local boolean = false
 		local slotId
 		if type(itemId) == "number" then
-			slotId = OvaleEquipement:HasEquippedItem(itemId, slot)
+			slotId = OvaleEquipment:HasEquippedItem(itemId, slot)
 			if slotId then
-				if not ilevel or (ilevel and ilevel == OvaleEquipement:GetEquippedItemLevel(slotId)) then
+				if not ilevel or (ilevel and ilevel == OvaleEquipment:GetEquippedItemLevel(slotId)) then
 					boolean = true
 				end
 			end
 		elseif OvaleData.itemList[itemId] then
 			for _, v in pairs(OvaleData.itemList[itemId]) do
-				slotId = OvaleEquipement:HasEquippedItem(v, slot)
+				slotId = OvaleEquipment:HasEquippedItem(v, slot)
 				if slotId then
-					if not ilevel or (ilevel and ilevel == OvaleEquipement:GetEquippedItemLevel(slotId)) then
+					if not ilevel or (ilevel and ilevel == OvaleEquipment:GetEquippedItemLevel(slotId)) then
 						boolean = true
 						break
 					end
@@ -1971,7 +1971,7 @@ do
 
 	local function HasShield(condition, state)
 		local yesno = condition[1]
-		local boolean = OvaleEquipement:HasShield()
+		local boolean = OvaleEquipment:HasShield()
 		return TestBoolean(boolean, yesno)
 	end
 
@@ -1996,10 +1996,10 @@ do
 		local trinketId, yesno = condition[1], condition[2]
 		local boolean = false
 		if type(trinketId) == "number" then
-			boolean = OvaleEquipement:HasTrinket(trinketId)
+			boolean = OvaleEquipment:HasTrinket(trinketId)
 		elseif OvaleData.itemList[trinketId] then
 			for _, v in pairs(OvaleData.itemList[trinketId]) do
-				boolean = OvaleEquipement:HasTrinket(v)
+				boolean = OvaleEquipment:HasTrinket(v)
 				if boolean then
 					break
 				end
@@ -2037,9 +2037,9 @@ do
 			weaponType = 2
 		end
 		if hand == "offhand" or hand == "off" then
-			boolean = OvaleEquipement:HasOffHandWeapon(weaponType)
+			boolean = OvaleEquipment:HasOffHandWeapon(weaponType)
 		elseif hand == "mainhand" or hand == "main" then
-			boolean = OvaleEquipement:HasMainHandWeapon(weaponType)
+			boolean = OvaleEquipment:HasMainHandWeapon(weaponType)
 		end
 		return TestBoolean(boolean, yesno)
 	end
@@ -2641,7 +2641,7 @@ do
 	local function ItemCooldown(condition, state)
 		local itemId, comparator, limit = condition[1], condition[2], condition[3]
 		if itemId and type(itemId) ~= "number" then
-			itemId = OvaleEquipement:GetEquippedItem(itemId)
+			itemId = OvaleEquipment:GetEquippedItem(itemId)
 		end
 		if itemId then
 			local start, duration = API_GetItemCooldown(itemId)

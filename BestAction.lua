@@ -19,7 +19,7 @@ local OvaleCompile = nil
 local OvaleCondition = nil
 local OvaleCooldown = nil
 local OvaleData = nil
-local OvaleEquipement = nil
+local OvaleEquipment = nil
 local OvaleFuture = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
@@ -166,7 +166,7 @@ local function GetActionItemInfo(element, state, target)
 
 	local itemId = element.params[1]
 	if type(itemId) ~= "number" then
-		itemId = OvaleEquipement:GetEquippedItem(itemId)
+		itemId = OvaleEquipment:GetEquippedItem(itemId)
 	end
 	if not itemId then
 		Ovale:Logf("Unknown item '%s'.", element.params[1])
@@ -357,7 +357,7 @@ function OvaleBestAction:OnInitialize()
 	OvaleCondition = Ovale.OvaleCondition
 	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
-	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleEquipment = Ovale.OvaleEquipment
 	OvaleFuture = Ovale.OvaleFuture
 	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook

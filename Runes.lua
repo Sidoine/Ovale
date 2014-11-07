@@ -17,7 +17,7 @@ Ovale.OvaleRunes = OvaleRunes
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleData = nil
-local OvaleEquipement = nil
+local OvaleEquipment = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
 local OvaleStance = nil
@@ -137,7 +137,7 @@ end
 function OvaleRunes:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
-	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleEquipment = Ovale.OvaleEquipment
 	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleStance = Ovale.OvaleStance
@@ -298,7 +298,7 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 			for slot in ipairs(state.rune) do
 				state:ReactivateRune(slot, endCast)
 			end
-		elseif spellId == DANCING_RUNE_WEAPON and OvaleEquipement:GetArmorSetCount("T16_tank") >= 4 then
+		elseif spellId == DANCING_RUNE_WEAPON and OvaleEquipment:GetArmorSetCount("T16_tank") >= 4 then
 			-- 4pT16 tanking bonus causes Dancing Rune Weapon to reactivate immediately all Frost and Unholy runes as Death runes.
 			for slot in ipairs(RUNE_SLOTS[FROST_RUNE]) do
 				state:ReactivateRune(slot, endCast, DEATH_RUNE)

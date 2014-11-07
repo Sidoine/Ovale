@@ -17,7 +17,7 @@ local OvaleAST = nil
 local OvaleCondition = nil
 local OvaleCooldown = nil
 local OvaleData = nil
-local OvaleEquipement = nil
+local OvaleEquipment = nil
 local OvalePaperDoll = nil
 local OvaleScore = nil
 local OvaleScripts = nil
@@ -50,7 +50,7 @@ local self_compileOnStances = false
 
 -- This module needs the information in other modules to be preloaded and ready for use.
 local self_canEvaluate = false
-local self_requirePreload = { "OvaleEquipement", "OvaleSpellBook", "OvaleStance" }
+local self_requirePreload = { "OvaleEquipment", "OvaleSpellBook", "OvaleStance" }
 
 -- Current age of the script evaluation state.
 -- This advances every time an event occurs that requires re-evaluating the script.
@@ -137,7 +137,7 @@ local function TestConditions(parameters)
 		boolean = (required and hasTalent) or (not required and not hasTalent)
 	end
 	if boolean and parameters.itemset and parameters.itemcount then
-		local equippedCount = OvaleEquipement:GetArmorSetCount(parameters.itemset)
+		local equippedCount = OvaleEquipment:GetArmorSetCount(parameters.itemset)
 		self_compileOnItems = true
 		boolean = (equippedCount >= parameters.itemcount)
 	end
@@ -409,7 +409,7 @@ function OvaleCompile:OnInitialize()
 	OvaleCondition = Ovale.OvaleCondition
 	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
-	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleEquipment = Ovale.OvaleEquipment
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleScore = Ovale.OvaleScore
 	OvaleScripts = Ovale.OvaleScripts

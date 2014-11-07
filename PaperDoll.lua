@@ -24,7 +24,7 @@ local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePoolRefCount
 
 -- Forward declarations for module dependencies.
-local OvaleEquipement = nil
+local OvaleEquipment = nil
 local OvaleFuture = nil
 local OvaleStance = nil
 local OvaleState = nil
@@ -177,7 +177,7 @@ end
 --<public-static-methods>
 function OvalePaperDoll:OnInitialize()
 	-- Resolve module dependencies.
-	OvaleEquipement = Ovale.OvaleEquipement
+	OvaleEquipment = Ovale.OvaleEquipment
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleStance = Ovale.OvaleStance
 	OvaleState = Ovale.OvaleState
@@ -410,7 +410,7 @@ function OvalePaperDoll:UpdateDamage(event)
 	if self_class == "DRUID" and OvaleStance:IsStance("druid_cat_form") then
 		-- Cat Form: 100% increased auto-attack damage.
 		damageMultiplier = damageMultiplier * 2
-	elseif self_class == "MONK" and OvaleEquipement:HasOneHandedWeapon() then
+	elseif self_class == "MONK" and OvaleEquipment:HasOneHandedWeapon() then
 		-- Way of the Monk: 40% increased auto-attack damage if dual-wielding.
 		damageMultiplier = damageMultiplier * 1.4
 	end
@@ -419,7 +419,7 @@ function OvalePaperDoll:UpdateDamage(event)
 	-- normalizedWeaponDamage = (weaponDPS + attackPower / 14) * normalizedWeaponSpeed
 	local avgDamage = (minDamage + maxDamage) / 2 / damageMultiplier
 	local mainHandWeaponSpeed = mainHandAttackSpeed * self:GetMeleeHasteMultiplier()
-	local normalizedMainHandWeaponSpeed = OvaleEquipement.mainHandWeaponSpeed or 0
+	local normalizedMainHandWeaponSpeed = OvaleEquipment.mainHandWeaponSpeed or 0
 	if self_class == "DRUID" then
 		if OvaleStance:IsStance("druid_cat_form") then
 			normalizedMainHandWeaponSpeed = 1
@@ -431,12 +431,12 @@ function OvalePaperDoll:UpdateDamage(event)
 	--Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    MH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
 	--	minDamage, maxDamage, damageMultiplier, mainHandWeaponSpeed, normalizedMainHandWeaponSpeed)
 
-	if OvaleEquipement:HasOffHandWeapon() then
+	if OvaleEquipment:HasOffHandWeapon() then
 		local avgOffHandDamage = (minOffHandDamage + maxOffHandDamage) / 2 / damageMultiplier
 		-- Sometimes, UnitAttackSpeed() doesn't return a value for OH attack speed, so approximate with MH one.
 		offHandAttackSpeed = offHandAttackSpeed or mainHandAttackSpeed
 		local offHandWeaponSpeed = offHandAttackSpeed * self:GetMeleeHasteMultiplier()
-		local normalizedOffHandWeaponSpeed = OvaleEquipement.offHandWeaponSpeed or 0
+		local normalizedOffHandWeaponSpeed = OvaleEquipment.offHandWeaponSpeed or 0
 		if self_class == "DRUID" then
 			if OvaleStance:IsStance("druid_cat_form") then
 				normalizedOffHandWeaponSpeed = 1
