@@ -386,39 +386,27 @@ end
 
 -- Returns true if the given glyph spell Id is an active glyph in the player's glyph tab.
 function OvaleSpellBook:IsActiveGlyph(glyphId)
-	if glyphId and self.glyph[glyphId] then
-		return true
-	else
-		return false
-	end
+	return (glyphId and self.glyph[glyphId]) and true or false
 end
 
 -- Returns whether a spell can be used against hostile units.
 function OvaleSpellBook:IsHarmfulSpell(spellId)
-	return (spellId and self.isHarmful[spellId])
+	return (spellId and self.isHarmful[spellId]) and true or false
 end
 
 -- Returns whether a spell can be used on the player or friendly units.
 function OvaleSpellBook:IsHelpfulSpell(spellId)
-	return (spellId and self.isHelpful[spellId])
+	return (spellId and self.isHelpful[spellId]) and true or false
 end
 
 -- Returns true if the given spellId is found in the player's list of known spells.
 function OvaleSpellBook:IsKnownSpell(spellId)
-	if spellId and self.spell[spellId] then
-		return true
-	else
-		return false
-	end
+	return (spellId and self.spell[spellId]) and true or false
 end
 
 -- Returns true if the given talentId is found in the player's talent tree.
 function OvaleSpellBook:IsKnownTalent(talentId)
-	if talentId and self.talentPoints[talentId] then
-		return true
-	else
-		return false
-	end
+	return (talentId and self.talentPoints[talentId]) and true or false
 end
 
 -- Returns the index in the spellbook of the given spell.
