@@ -336,17 +336,21 @@ local function EvaluateSpellInfo(node)
 		local si = OvaleData:SpellInfo(spellId)
 		for k, v in pairs(parameters) do
 			if k == "addduration" then
+				-- Accumulate "addduration" into a single "adduration" SpellInfo property.
 				local value = tonumber(v)
 				if value then
-					si.duration = si.duration + value
+					local addDuration = si.addduration or 0
+					si.addduration = addDuration + value
 				else
 					ok = false
 					break
 				end
 			elseif k == "addcd" then
+				-- Accumulate "addcd" into a single "addcd" SpellInfo property.
 				local value = tonumber(v)
 				if value then
-					si.cd = si.cd + value
+					local addCd = si.addcd or 0
+					si.addcd = addCd + value
 				else
 					ok = false
 					break

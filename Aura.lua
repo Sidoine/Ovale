@@ -323,11 +323,21 @@ function OvaleAura:OnEnable()
 	self:RegisterEvent("PLAYER_UNGHOST", "PLAYER_ALIVE")
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
+	OvaleData:RegisterRequirement("buff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("debuff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("target_buff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("target_debuff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("target_health_pct", "RequireTargetHealthPercentHandler", self)
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleAura:OnDisable()
 	OvaleState:UnregisterState(self)
+	OvaleData:UnregisterRequirement("buff")
+	OvaleData:UnregisterRequirement("debuff")
+	OvaleData:UnregisterRequirement("target_buff")
+	OvaleData:UnregisterRequirement("target_debuff")
+	OvaleData:UnregisterRequirement("target_health_pct")
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -367,7 +377,22 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 				local si = OvaleData.spellInfo[spellId]
 				-- Find an existing aura applied by the player on destGUID.
 				local aura = GetAuraOnGUID(self.aura, destGUID, spellId, filter, true)
-				local duration = aura and aura.duration or (si and si.duration) or 15
+				local duration
+				if aura then
+					-- Re-use the duration of the previous aura on the target.
+					duration = aura.duration
+				elseif si and si.duration then
+					-- Look up the duration from the SpellInfo.
+					duration = OvaleData:GetSpellInfoProperty(spellId, "duration", unitId)
+					if si.addduration then
+						duration = duration + si.addduration
+					end
+				else
+					-- No aura duration information known and we can't scan the aura on that GUID,
+					-- so assume the aura lasts 15 seconds.
+					-- TODO: There is probably something smarter to be done here.
+					duration = 15
+				end
 				local expirationTime = now + duration
 				local count
 				if cleuEvent == "SPELL_AURA_APPLIED" then
@@ -723,6 +748,74 @@ function OvaleAura:GetAura(unitId, auraId, filter, mine)
 	local guid = OvaleGUID:GetGUID(unitId)
 	return self:GetAuraByGUID(guid, auraId, filter, mine)
 end
+
+-- Run-time check for an aura on the player or the target.
+-- NOTE: Mirrored in statePrototype below.
+function OvaleAura:RequireBuffHandler(requirement, tokenIterator, target)
+	local verified = false
+	local buffName = tokenIterator()
+	if buffName then
+		local isBang = false
+		if substr(buffName, 1, 1) == "!" then
+			buffName = substr(buffName, 2)
+		end
+		local buffName = tonumber(buffName) or buffName
+		local unitId, filter, mine
+		if substr(requirement, 1, 7) == "target_" then
+			unitId = target
+			filter = (substr(requirement, 8) == "buff") and "HELPFUL" or "HARMFUL"
+			mine = true
+		else
+			unitId = "player"
+			filter = (requirement == "buff") and "HELPFUL" or "HARMFUL"
+			mine = true
+		end
+		local aura = self:GetAura(unitId, buffName, filter, mine)
+		local isActiveAura = self:IsActiveAura(aura)
+		local result = "FAILED"
+		if not isBang and isActiveAura or isBang and not isActiveAura then
+			result = "passed"
+			verified = true
+		end
+		if isBang then
+			Ovale:Logf("    Require aura %s NOT on %s: %s", buffName, unitId, result)
+		else
+			Ovale:Logf("    Require aura %s on %s: %s", buffName, unitId, result)
+		end
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
+	end
+	return verified
+end
+
+-- Run-time check that the target is below a health percent threshold.
+-- NOTE: Mirrored in statePrototype below.
+-- TODO: This function should really be moved to a Health module.
+function OvaleAura:RequireTargetHealthPercentHandler(requirement, tokenIterator, target)
+	local verified = false
+	local threshold = tokenIterator()
+	if threshold then
+		local isBang = false
+		if substr(threshold, 1, 1) == "!" then
+			threshold = substr(threshold, 2)
+		end
+		threshold = tonumber(threshold) or 0
+		local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
+		local result = "FAILED"
+		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
+			result = "passed"
+			verified = true
+		end
+		if isBang then
+			Ovale:Logf("    Require target health > %f%%: %s", threshold, result)
+		else
+			Ovale:Logf("    Require target health <= %f%%: %s", threshold, result)
+		end
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
+	end
+	return verified
+end
 --</public-static-methods>
 
 --[[----------------------------------------------------------------------------
@@ -1051,66 +1144,8 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 				end
 			end
 
-			-- Verify any conditions for this aura.
-			local verified = true
-			local condition = tokenIterator()
-			while verified and condition do
-				Ovale:Logf("Aura %d has conditions:")
-				if condition == "buff" or condition == "debuff" or condition == "target_buff" or condition == "target_debuff" then
-					local buffName = tokenIterator()
-					if buffName then
-						local isBang = false
-						if substr(buffName, 1, 1) == "!" then
-							buffName = substr(buffName, 2)
-						end
-						local buffId = tonumber(buffName)
-						local buffUnitId = (substr(condition, 1, 7) == "target_") and state.defaultTarget or "player"
-						local result = "fail"
-						local aura
-						if buffId then
-							aura = state:GetAura(buffUnitId, buffId)
-						else
-							aura = state:GetAura(buffUnitId, buffName)
-						end
-						local isActiveAura = state:IsActiveAura(aura)
-						if not isBang and isActiveAura or isBang and not isActiveAura then
-							result = "pass"
-							verified = true
-						end
-						if isBang then
-							Ovale:Logf("    Aura %s missing on %s: %s", buffId, buffName, result)
-						else
-							Ovale:Logf("    Aura %s on %s: %s", buffId, buffName, result)
-						end
-					else
-						Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing buff.", auraId, spellData, condition)
-					end
-				elseif condition == "target_health_pct" then
-					local threshold = tokenIterator()
-					if threshold then
-						local isBang = false
-						if substr(threshold, 1, 1) == "!" then
-							threshold = substr(threshold, 2)
-						end
-						threshold = tonumber(threshold) or 0
-						local healthPercent = API_UnitHealth(unitId) / API_UnitHealthMax(unitId) * 100
-						local result = "fail"
-						if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
-							result = "pass"
-							verified = true
-						end
-						if isBang then
-							Ovale:Logf("    Target health > %f%%: %s", threshold, result)
-						else
-							Ovale:Logf("    Target health <= %f%%: %s", threshold, result)
-						end
-					else
-						Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing threshold.", auraId, spellData, condition)
-					end
-				end
-				condition = tokenIterator()
-			end
-
+			-- Verify any run-time requirements for this aura.
+			local verified = state:CheckRequirements(tokenIterator, unitId)
 			if verified then
 				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
 				local atTime = isChanneled and startCast or endCast
@@ -1217,7 +1252,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					end
 				end
 			else
-				Ovale:Logf("Aura %d is not applied.")
+				Ovale:Logf("Aura %d is not applied due to failing run-time requirements.", auraId)
 			end
 		end
 	end
@@ -1430,4 +1465,8 @@ do
 		return count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast
 	end
 end
+
+-- Mirrored methods.
+statePrototype.RequireBuffHandler = OvaleAura.RequireBuffHandler
+statePrototype.RequireTargetHealthPercentHandler = OvaleAura.RequireTargetHealthPercentHandler
 --</state-methods>

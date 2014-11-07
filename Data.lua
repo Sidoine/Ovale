@@ -11,8 +11,10 @@ Ovale.OvaleData = OvaleData
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvalePaperDoll = nil
+local OvaleState = nil
 
 local format = string.format
+local gmatch = string.gmatch
 local type = type
 local pairs = pairs
 
@@ -313,12 +315,36 @@ do
 	list.str_agi_int				= list.str_agi_int_buff
 	list.stun						= list.stun_debuff
 end
+
+-- Registered "run-time requirement" handlers: self.requirement[name] = handler
+-- Handler is invoked as handler(state, name, tokenIterator, target).
+OvaleData.requirement = {}
 --</public-static-properties>
+
+--<private-static-methods>
+--</private-static-methods>
 
 --<public-static-methods>
 function OvaleData:OnInitialize()
 	-- Resolve module dependencies.
 	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleState = Ovale.OvaleState
+end
+
+function OvaleData:OnEnable()
+	OvaleState:RegisterState(self, self.statePrototype)
+end
+
+function OvaleData:OnDisable()
+	OvaleState:UnregisterState(self)
+end
+
+function OvaleData:RegisterRequirement(name, method, arg)
+	self.requirement[name] = { method, arg }
+end
+
+function OvaleData:UnregisterRequirement(name)
+	self.requirement[name] = nil
 end
 
 function OvaleData:ResetSpellInfo()
@@ -361,6 +387,54 @@ function OvaleData:GetSpellInfo(spellId)
 	end
 end
 
+-- Check "run-time" requirements specified in SpellRequire().
+-- NOTE: Mirrored in statePrototype below.
+function OvaleData:CheckRequirements(tokenIterator, target)
+	local name = tokenIterator()
+	if name then
+		Ovale:Log("Checking requirements:")
+		local verified = true
+		while verified and name do
+			local handler = self.requirement[name]
+			if handler then
+				local method, arg = handler[1], handler[2]
+				-- Check for inherited/mirrored method first (for statePrototype).
+				if self[method] then
+					verified = self[method](self, name, tokenIterator, target)
+				else
+					verified = arg[method](arg, name, tokenIterator, target)
+				end
+				name = tokenIterator()
+			else
+				Ovale:OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
+				verified = false
+			end
+		end
+		return verified
+	end
+	return true
+end
+
+-- Get SpellInfo property with run-time checks as specified in SpellRequire().
+-- NOTE: Mirrored in statePrototype below.
+function OvaleData:GetSpellInfoProperty(spellId, property, target)
+	local si = OvaleData.spellInfo[spellId]
+	local value = si and si[property]
+	local requirements = si and si.require[property]
+	if requirements then
+		for v, requirement in pairs(requirements) do
+			local tokenIterator = gmatch(requirement, "[^,]+")
+			target = target or "target"
+			local verified = self:CheckRequirements(tokenIterator, target)
+			if verified then
+				value = v
+				break
+			end
+		end
+	end
+	return value
+end
+
 --Compute the damage of the given spell.
 function OvaleData:GetDamage(spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combo)
 	local si = self.spellInfo[spellId]
@@ -401,6 +475,9 @@ function OvaleData:GetBaseDuration(auraId, spellcast)
 	local si = OvaleData.spellInfo[auraId]
 	if si and si.duration then
 		duration = si.duration
+		if si.addduration then
+			duration = duration + si.addduration
+		end
 		if si.adddurationcp and combo then
 			duration = duration + si.adddurationcp * combo
 		end
@@ -430,3 +507,21 @@ function OvaleData:GetTickLength(auraId, snapshot)
 	return tick
 end
 --</public-static-methods>
+
+--[[----------------------------------------------------------------------------
+	State machine for simulator.
+--]]----------------------------------------------------------------------------
+
+--<public-static-properties>
+OvaleData.statePrototype = {}
+--</public-static-properties>
+
+--<private-static-properties>
+local statePrototype = OvaleData.statePrototype
+--</private-static-properties>
+
+--<state-methods>
+-- Mirrored methods.
+statePrototype.CheckRequirements = OvaleData.CheckRequirements
+statePrototype.GetSpellInfoProperty = OvaleData.GetSpellInfoProperty
+--</state-methods>

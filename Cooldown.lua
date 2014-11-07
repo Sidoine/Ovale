@@ -275,7 +275,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast
 	local duration = state:GetSpellCooldownDuration(spellId, start, target)
 
 	local si = OvaleData.spellInfo[spellId]
-	if si and si.cd and duration == 0 then
+	if duration == 0 then
 		cd.start = 0
 		cd.duration = 0
 		cd.enable = 1
@@ -417,7 +417,14 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 		Ovale:Logf("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
 	else
 		local si = OvaleData.spellInfo[spellId]
-		duration = (si and si.cd) and si.cd or 0
+		if si and si.cd then
+			duration = si.cd
+			if si.addcd then
+				duration = duration + si.addcd
+			end
+		else
+			duration = 0
+		end
 		Ovale:Logf("Spell %d has a base cooldown of %fs.", spellId, duration)
 		if si then
 			-- There is no cooldown if the buff named by "buff_no_cd" parameter is present.
