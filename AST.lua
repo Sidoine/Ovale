@@ -108,7 +108,6 @@ local PARAMETER_KEYWORD = {
 	["list"] = true,			-- deprecated
 	["listitem"] = true,
 	["specialization"] = true,
-	["stance"] = true,
 	["talent"] = true,
 	["text"] = true,
 	["wait"] = true,
