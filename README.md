@@ -1,11 +1,6 @@
-[Ovale Spell Priority][ovale] is a rotation-helper addon that shows you what spell or ability you should use in order to maximize your damage.
-
-  [ovale]: http://www.curse.com/addons/wow/ovale
+[Ovale Spell Priority][Ovale] is a rotation-helper addon that shows you what spell or ability you should use in order to maximize your damage.
 
 It displays one or more icons that show the cooldown of an action.  The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
-
-  [Corruption]: http://www.wowhead.com/spell=172
-  [Shadow Bolt]: http://www.wowhead.com/spell=686
 
 The current release of Ovale provides default scripts for the following classes for *Warlords of Draenor*:
 
@@ -23,17 +18,9 @@ The current release of Ovale provides default scripts for the following classes 
 
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
-  [SimulationCraft]: http://code.google.com/p/simulationcraft/
-  [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
-
-See the [video of a survival hunter][ovale-video] using [Ovale][ovale] during *Wrath of the Lich King*.
-
-  [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM	"Ovale WotLK video"
+See the [video of a survival hunter][ovale-video] using [Ovale][] during *Wrath of the Lich King*.
 
 **Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets].**
-
-  [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
-  [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
 
 Features
 ========
@@ -44,16 +31,11 @@ Features
 - Compatible with the action icon skinning library [Masque][].
 - Use [SpellFlashCore][] to flash abilities on action bars in addition, or as an alternative, to displaying the ability icons.
 
-  [Masque]: http://www.curse.com/addons/wow/masque
-  [Recount]: http://www.curse.com/addons/wow/recount
-  [Skada]: http://www.curse.com/addons/wow/skada
-  [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
-
 FAQ
 ===
 
 ##### Why does it not work for me?
-Try to reset your Profile in the [Ovale][ovale] settings.
+Try to reset your Profile in the [Ovale][] settings.
 
 ##### Why is the key binding displayed for an action wrong?
 You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.
@@ -68,6 +50,18 @@ Blizzard does not allow this.  Only a predefined sequence of spells can be bound
 Simply install [SpellFlashCore][] (included if you install [SpellFlash][]) and [Ovale][] will use it to flash the spell to cast on the action bar in addition to displaying the spell in the Ovale icon bar.
 
 ##### On my low-level character, there is nothing at all.
-You need to reach level 10 and choose a specialization.
+You need to reach level 10 and choose a specialization.  However, be aware that the default [Ovale][] scripts are tuned for max-level characters and you may be missing key abilities at low levels that are assumed to exist.  If the default script is not working for you, you will need to find or write a script more appopriate for your character's level.
 
+  [Corruption]: http://www.wowhead.com/spell=172
+  [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
+  [Masque]: http://www.curse.com/addons/wow/masque
+  [Ovale]: http://www.curse.com/addons/wow/ovale
+  [Recount]: http://www.curse.com/addons/wow/recount
+  [Shadow Bolt]: http://www.wowhead.com/spell=686
+  [SimulationCraft]: http://code.google.com/p/simulationcraft/
+  [Skada]: http://www.curse.com/addons/wow/skada
+  [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
   [SpellFlash]: http://www.curse.com/addons/wow/spellflash
+  [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
+  [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
+  [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
