@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Druid_Balance_T16M".
 #	class=druid
 #	spec=balance
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ua!.0.0.0.
+#	talents=0101010
 
 Include(ovale_common)
 Include(ovale_druid_spells)
@@ -61,12 +61,14 @@ AddFunction BalanceAoeActions
 	if BuffPresent(celestial_alignment_buff) Spell(incarnation_caster)
 	#sunfire,if=remains<8
 	if target.DebuffRemaining(sunfire_debuff) < 8 Spell(sunfire)
-	#starfall
-	Spell(starfall)
+	#starfall,if=!buff.starfall.up
+	if not BuffPresent(starfall_buff) Spell(starfall)
 	#moonfire,cycle_targets=1,if=remains<12
 	if target.DebuffRemaining(moonfire_debuff) < 12 Spell(moonfire)
 	#stellar_flare,cycle_targets=1,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
+	#starsurge,if=(charges=2&recharge_time<6)|charges=3
+	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
 	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
@@ -127,6 +129,7 @@ AddIcon specialization=balance help=aoe
 # solar_empowerment_buff
 # solar_peak_buff
 # starfall
+# starfall_buff
 # starfire
 # starsurge
 # stellar_flare

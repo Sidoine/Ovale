@@ -51,7 +51,7 @@ AddFunction RighteousFuryOff
 # Based on SimulationCraft profile "Paladin_Protection_T16M".
 #	class=paladin
 #	spec=protection
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#bZ!202121.
+#	talents=3132320
 #	glyphs=focused_shield/alabaster_shield/divine_protection
 
 AddFunction ProtectionRighteousFury
@@ -307,7 +307,7 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
 # Based on SimulationCraft profile "Paladin_Retribution_T16M".
 #	class=paladin
 #	spec=retribution
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#bb!110112.
+#	talents=2212230
 #	glyphs=double_jeopardy/mass_exorcism
 
 # ActionList: RetributionPrecombatActions --> main, shortcd, cd

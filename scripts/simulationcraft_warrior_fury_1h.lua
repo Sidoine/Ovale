@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warrior_Fury_1h_T16M".
 #	class=warrior
 #	spec=fury
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!011021.
+#	talents=1221320
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 Include(ovale_common)

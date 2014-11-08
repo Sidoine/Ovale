@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Hunter_BM_T16M".
 #	class=hunter
 #	spec=beast_mastery
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ya!...122.
+#	talents=0002330
 
 Include(ovale_common)
 Include(ovale_hunter_spells)

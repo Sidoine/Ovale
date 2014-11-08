@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warrior_Protection_T16M".
 #	class=warrior
 #	spec=protection
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Zb!000221.
+#	talents=1113320
 #	glyphs=unending_rage/heroic_leap/cleave
 
 Include(ovale_common)

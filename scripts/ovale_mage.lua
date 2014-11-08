@@ -37,7 +37,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Mage_Arcane_T16M".
 #	class=mage
 #	spec=arcane
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!2..201.
+#	talents=3003120
 #	glyphs=arcane_power/cone_of_cold
 
 # ActionList: ArcaneCooldownsActions --> cd
@@ -417,7 +417,7 @@ AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane_aoe
 # Based on SimulationCraft profile "Mage_Fire_T16M".
 #	class=mage
 #	spec=fire
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eZ!2..211.
+#	talents=3003220
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 # ActionList: FireInitCombustActions --> main, shortcd, cd
@@ -807,7 +807,7 @@ AddIcon specialization=fire help=cd checkbox=opt_mage_fire_aoe
 # Based on SimulationCraft profile "Mage_Frost_T16M".
 #	class=mage
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!2..211.
+#	talents=3003220
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
 # ActionList: FrostPrecombatActions --> main, shortcd, cd

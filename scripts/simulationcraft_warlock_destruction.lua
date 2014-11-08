@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warlock_Destruction_T16M".
 #	class=warlock
 #	spec=destruction
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Vb!....20.
+#	talents=0000310
 #	pet=felhunter
 
 Include(ovale_common)

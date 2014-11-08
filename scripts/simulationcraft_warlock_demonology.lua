@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warlock_Demonology_T16M".
 #	class=warlock
 #	spec=demonology
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#VZ!....20.
+#	talents=0000310
 #	pet=felguard
 
 Include(ovale_common)
@@ -95,6 +95,8 @@ AddFunction DemonologyDefaultActions
 	if ManaPercent() < 40 Spell(life_tap)
 	#shadow_bolt
 	Spell(shadow_bolt)
+	#hellfire,moving=1,interrupt=1
+	if Speed() > 0 Spell(hellfire)
 	#life_tap
 	Spell(life_tap)
 }
@@ -202,6 +204,7 @@ AddIcon specialization=demonology help=aoe
 # grimoire_of_sacrifice_talent
 # grimoire_of_service_talent
 # hand_of_guldan
+# hellfire
 # immolation_aura
 # immolation_aura_buff
 # imp_swarm

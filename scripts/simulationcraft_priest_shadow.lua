@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Priest_Shadow_T16M".
 #	class=priest
 #	spec=shadow
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Xb!002202.
+#	talents=1133130
 #	glyphs=mind_flay/fade/sha
 
 Include(ovale_common)

@@ -19,14 +19,9 @@ AddFunction UsePotionAgility
 
 AddFunction GetInMeleeRange
 {
-	if Stance(druid_bear_form) and not target.InRange(mangle)
+	if Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred)
 	{
-		if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-	if Stance(druid_cat_form) and not target.InRange(shred)
-	{
-		if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
@@ -52,7 +47,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Druid_Feral_T16M".
 #	class=druid
 #	spec=feral
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#UZ!...0...
+#	talents=3001000
 #	glyphs=savage_roar
 
 # ActionList: FeralPrecombatActions --> main, predict, shortcd, main
@@ -90,24 +85,6 @@ AddFunction FeralPrecombatCdActions
 AddFunction FeralDefaultActions
 {
 	FeralDefaultPredictActions()
-	#pool_resource,for_next=1
-	#thrash_cat,if=remains<=duration*0.3&active_enemies>1
-	unless target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() > 1 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
-	{
-		#moonfire_cat,cycle_targets=1,if=combo_points<5&remains<=duration*0.3&active_enemies<=10
-		if ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= BaseDuration(moonfire_cat_debuff) * 0.3 and Enemies() <= 10 Spell(moonfire_cat)
-		#rake,cycle_targets=1,if=persistent_multiplier>dot.rake.pmultiplier&combo_points<5
-		if DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) and ComboPoints() < 5 Spell(rake)
-		#swipe,if=combo_points<5&active_enemies>=3
-		if ComboPoints() < 5 and Enemies() >= 3 Spell(swipe)
-		#shred,if=combo_points<5&active_enemies<3
-		if ComboPoints() < 5 and Enemies() < 3 Spell(shred)
-	}
-}
-
-AddFunction FeralDefaultActions
-{
-	FeralDefaultPredictActions()
 
 	#call_action_list,name=generator,if=combo_points<5
 	if ComboPoints() < 5 FeralGeneratorActions()
@@ -115,6 +92,8 @@ AddFunction FeralDefaultActions
 
 AddFunction FeralDefaultPredictActions
 {
+	#cat_form
+	Spell(cat_form)
 	#rake,if=buff.prowl.up|buff.shadowmeld.up
 	if BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) Spell(rake)
 	#auto_attack
@@ -136,13 +115,24 @@ AddFunction FeralDefaultPredictActions
 
 AddFunction FeralDefaultShortCdActions
 {
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
-	unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
-	#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
-	if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
-	#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
-	if not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(tigers_fury)
+	unless Spell(cat_form)
+	{
+		# CHANGE: Get within melee range of the target.
+		GetInMeleeRange()
+		if target.InRange(wild_charge) Spell(wild_charge)
+		#displacer_beast,if=movement.distance>10
+		if 0 > 10 Spell(displacer_beast)
+		#dash,if=movement.distance&buff.displacer_beast.down&buff.wild_charge_movement.down
+		if 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) Spell(dash)
+
+		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
+		{
+			#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
+			if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
+			#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
+			if not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(tigers_fury)
+		}
+	}
 }
 
 # CHANGE: Helper function for Tiger's Fury sync condition.
@@ -154,7 +144,11 @@ AddFunction FeralTigersFurySyncCondition
 
 AddFunction FeralDefaultCdActions
 {
-	unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
+	unless Spell(cat_form)
+		or target.InRange(wild_charge) and Spell(wild_charge)
+		or 0 > 10 and Spell(displacer_beast)
+		or 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) and Spell(dash)
+		or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 	{
 		InterruptActions()
 		#potion,name=tolvir,if=target.time_to_die<=40
@@ -285,7 +279,7 @@ AddIcon specialization=feral help=cd checkbox=opt_druid_feral_aoe
 # Based on SimulationCraft profile "Druid_Guardian_T16M".
 #	class=druid
 #	spec=guardian
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ub!.1.0.1.
+#	talents=0201020
 #	glyphs=maul
 
 # ActionList: GuardianDefaultActions --> main, shortcd, cd

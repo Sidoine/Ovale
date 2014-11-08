@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Hunter_SV_T16M".
 #	class=hunter
 #	spec=survival
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Yb!...222.
+#	talents=0003330
 
 Include(ovale_common)
 Include(ovale_hunter_spells)

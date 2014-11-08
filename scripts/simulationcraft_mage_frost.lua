@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Frost_T16M".
 #	class=mage
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eb!2..211.
+#	talents=3003220
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
 Include(ovale_common)

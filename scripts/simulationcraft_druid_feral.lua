@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Druid_Feral_T16M".
 #	class=druid
 #	spec=feral
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#UZ!...0...
+#	talents=3001000
 #	glyphs=savage_roar
 
 Include(ovale_common)
@@ -23,14 +23,9 @@ AddFunction UsePotionAgility
 
 AddFunction GetInMeleeRange
 {
-	if Stance(druid_bear_form) and not target.InRange(mangle)
+	if Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred)
 	{
-		if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-	if Stance(druid_cat_form) and not target.InRange(shred)
-	{
-		if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
@@ -67,6 +62,14 @@ AddFunction FeralPrecombatActions
 
 AddFunction FeralDefaultActions
 {
+	#cat_form
+	Spell(cat_form)
+	#wild_charge
+	if target.InRange(wild_charge) Spell(wild_charge)
+	#displacer_beast,if=movement.distance>10
+	if 0 > 10 Spell(displacer_beast)
+	#dash,if=movement.distance&buff.displacer_beast.down&buff.wild_charge_movement.down
+	if 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) Spell(dash)
 	#rake,if=buff.prowl.up|buff.shadowmeld.up
 	if BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) Spell(rake)
 	#auto_attack
@@ -175,6 +178,9 @@ AddIcon specialization=feral help=aoe
 # bloodtalons_buff
 # bloodtalons_talent
 # cat_form
+# dash
+# displacer_beast
+# displacer_beast_buff
 # ferocious_bite
 # force_of_nature_melee
 # healing_touch
@@ -208,6 +214,7 @@ AddIcon specialization=feral help=aoe
 # typhoon
 # virmens_bite_potion
 # war_stomp
+# wild_charge
 # wild_charge_bear
 # wild_charge_cat
 ]]

@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Subtlety_T16M".
 #	class=rogue
 #	spec=subtlety
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#cb!200002.
+#	talents=3111130
 
 Include(ovale_common)
 Include(ovale_rogue_spells)
@@ -60,7 +60,7 @@ AddFunction SubtletyPrecombatActions
 	Spell(premeditation)
 	#slice_and_dice
 	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
-	#honor_among_thieves,cooldown=2.3,cooldown_stddev=0.1
+	#honor_among_thieves,cooldown=2.2,cooldown_stddev=0.1
 }
 
 AddFunction SubtletyPoolActions

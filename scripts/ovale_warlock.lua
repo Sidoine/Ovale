@@ -23,7 +23,7 @@ AddFunction UsePotionIntellect
 # Based on SimulationCraft profile "Warlock_Affliction_T16M".
 #	class=warlock
 #	spec=affliction
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Va!....00.
+#	talents=0000110
 #	glyphs=siphon_life
 #	pet=felhunter
 
@@ -193,7 +193,7 @@ AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction_aoe
 # Based on SimulationCraft profile "Warlock_Demonology_T16M".
 #	class=warlock
 #	spec=demonology
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#VZ!....20.
+#	talents=0000310
 #	pet=felguard
 
 # ActionList: DemonologyDefaultActions --> main, predict, shortcd, cd
@@ -246,6 +246,8 @@ AddFunction DemonologyDefaultActions
 	if ManaPercent() < 40 Spell(life_tap)
 	#shadow_bolt
 	Spell(shadow_bolt)
+	#hellfire,moving=1,interrupt=1
+	if Speed() > 0 Spell(hellfire)
 	#life_tap
 	Spell(life_tap)
 }
@@ -522,7 +524,7 @@ AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
 # Based on SimulationCraft profile "Warlock_Destruction_T16M".
 #	class=warlock
 #	spec=destruction
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Vb!....20.
+#	talents=0000310
 #	pet=felhunter
 
 # ActionList: DestructionPrecombatActions --> main, predict, shortcd, cd

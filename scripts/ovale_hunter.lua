@@ -42,7 +42,7 @@ AddFunction SummonPet
 # Based on SimulationCraft profile "Hunter_BM_T16M".
 #	class=hunter
 #	spec=beast_mastery
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ya!...122.
+#	talents=0002330
 
 # ActionList: BeastMasteryDefaultActions --> main, shortcd, cd
 
@@ -203,7 +203,7 @@ AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_a
 # Based on SimulationCraft profile "Hunter_MM_T16M".
 #	class=hunter
 #	spec=marksmanship
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#YZ!...022.
+#	talents=0001330
 
 # ActionList: MarksmanshipDefaultActions --> main, shortcd, cd
 
@@ -389,7 +389,7 @@ AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship_aoe
 # Based on SimulationCraft profile "Hunter_SV_T16M".
 #	class=hunter
 #	spec=survival
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Yb!...222.
+#	talents=0003330
 
 # ActionList: SurvivalDefaultActions --> main, shortcd, cd
 

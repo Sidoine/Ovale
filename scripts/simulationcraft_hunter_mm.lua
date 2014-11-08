@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Hunter_MM_T16M".
 #	class=hunter
 #	spec=marksmanship
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#YZ!...022.
+#	talents=0001330
 
 Include(ovale_common)
 Include(ovale_hunter_spells)

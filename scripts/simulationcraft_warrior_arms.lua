@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warrior_Arms_T16M".
 #	class=warrior
 #	spec=arms
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!020021.
+#	talents=1311320
 #	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 Include(ovale_common)

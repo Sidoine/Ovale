@@ -45,7 +45,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Death_Knight_Blood_T16M".
 #	class=deathknight
 #	spec=blood
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#da!12.20..
+#	talents=2303100
 #	glyphs=vampiric_blood/regenerative_magic
 
 # ActionList: BloodPrecombatActions --> main, shortcd, cd
@@ -297,7 +297,7 @@ AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood_aoe
 # Based on SimulationCraft profile "Death_Knight_Frost_1h_T16M".
 #	class=deathknight
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#dZ!1..0...
+#	talents=2001000
 
 # ActionList: FrostDualWieldPrecombatActions --> main, shortcd, cd
 
@@ -667,7 +667,7 @@ AddFunction FrostDualWieldSingleTargetCdActions
 # Based on SimulationCraft profile "Death_Knight_Frost_2h_T16M".
 #	class=deathknight
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#dZ!1..0...
+#	talents=2001000
 
 # ActionList: FrostTwoHanderPrecombatActions --> main, shortcd, cd
 
@@ -1142,7 +1142,7 @@ AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
 # Based on SimulationCraft profile "Death_Knight_Unholy_T16M".
 #	class=deathknight
 #	spec=unholy
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#db!1..2...
+#	talents=2003000
 
 # ActionList: UnholyPrecombatActions --> main, shortcd, cd
 

@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Arcane_T16M".
 #	class=mage
 #	spec=arcane
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ea!2..201.
+#	talents=3003120
 #	glyphs=arcane_power/cone_of_cold
 
 Include(ovale_common)

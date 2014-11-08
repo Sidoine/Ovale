@@ -53,7 +53,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Shaman_Elemental_T16M".
 #	class=shaman
 #	spec=elemental
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Wa!...0.2.
+#	talents=0001030
 #	glyphs=chain_lightning
 
 # ActionList: ElementalPrecombatActions --> main, shortcd, cd
@@ -259,7 +259,7 @@ AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
 # Based on SimulationCraft profile "Shaman_Enhancement_T16M".
 #	class=shaman
 #	spec=enhancement
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#WZ!...1.1.
+#	talents=0002020
 #	glyphs=chain_lightning/frost_shock
 
 # ActionList: EnhancementPrecombatActions --> main, shortcd, cd

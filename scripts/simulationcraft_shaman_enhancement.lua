@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Shaman_Enhancement_T16M".
 #	class=shaman
 #	spec=enhancement
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#WZ!...1.1.
+#	talents=0002020
 #	glyphs=chain_lightning/frost_shock
 
 Include(ovale_common)

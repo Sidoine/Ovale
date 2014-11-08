@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Blood_T16M".
 #	class=deathknight
 #	spec=blood
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#da!12.20..
+#	talents=2303100
 #	glyphs=vampiric_blood/regenerative_magic
 
 Include(ovale_common)

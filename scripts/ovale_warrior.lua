@@ -49,7 +49,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Warrior_Arms_T16M".
 #	class=warrior
 #	spec=arms
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Za!020021.
+#	talents=1311320
 #	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 # ActionList: ArmsPrecombatActions --> main, shortcd, cd
@@ -285,7 +285,7 @@ AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
 # Based on SimulationCraft profile "Warrior_Fury_1h_T16M".
 #	class=warrior
 #	spec=fury
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!011021.
+#	talents=1221320
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 # ActionList: FurySingleMindedFuryDefaultActions --> main, shortcd, cd
@@ -589,7 +589,7 @@ AddFunction FurySingleMindedFurySingleTargetCdActions
 # Based on SimulationCraft profile "Warrior_Fury_2h_T16M".
 #	class=warrior
 #	spec=fury
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ZZ!021011.
+#	talents=1321220
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 # ActionList: FuryTitansGripDefaultActions --> main, shortcd, cd
@@ -990,7 +990,7 @@ AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 # Based on SimulationCraft profile "Warrior_Protection_T16M".
 #	class=warrior
 #	spec=protection
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Zb!000221.
+#	talents=1113320
 #	glyphs=unending_rage/heroic_leap/cleave
 
 # ActionList: ProtectionPrecombatActions --> main, shortcd, cd

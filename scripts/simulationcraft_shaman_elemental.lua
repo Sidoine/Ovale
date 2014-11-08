@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Shaman_Elemental_T16M".
 #	class=shaman
 #	spec=elemental
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Wa!...0.2.
+#	talents=0001030
 #	glyphs=chain_lightning
 
 Include(ovale_common)

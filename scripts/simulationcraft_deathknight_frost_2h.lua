@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Frost_2h_T16M".
 #	class=deathknight
 #	spec=frost
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#dZ!1..0...
+#	talents=2001000
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)

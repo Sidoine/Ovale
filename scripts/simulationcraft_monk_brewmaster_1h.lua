@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Monk_Brewmaster_1h_T16M".
 #	class=monk
 #	spec=brewmaster
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#fa!.00.11.
+#	talents=0110220
 #	glyphs=fortifying_brew,fortuitous_spheres
 
 Include(ovale_common)

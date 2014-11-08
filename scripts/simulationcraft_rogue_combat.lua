@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Combat_T16M".
 #	class=rogue
 #	spec=combat
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#cZ!200002.
+#	talents=3111130
 #	glyphs=energy/disappearance
 
 Include(ovale_common)
@@ -85,32 +85,36 @@ AddFunction CombatDefaultActions
 	Spell(ambush)
 	#vanish,if=time>10&(combo_points<3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<20)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
 	if TimeInCombat() > 10 and { ComboPoints() < 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and { Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 20 or Talent(subterfuge_talent) and Energy() >= 90 or not Talent(shadow_focus_talent) and not Talent(subterfuge_talent) and Energy() >= 60 } Spell(vanish)
-	#killing_spree,if=energy<50&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)
-	if Energy() < 50 and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } Spell(killing_spree)
-	#adrenaline_rush,if=energy<35
-	if Energy() < 35 Spell(adrenaline_rush)
-	#slice_and_dice,if=buff.slice_and_dice.remains<2|(buff.slice_and_dice.remains<15&buff.bandits_guile.stack=11&combo_points>=4)
-	if BuffRemaining(slice_and_dice_buff) < 2 or BuffRemaining(slice_and_dice_buff) < 15 and BuffStacks(bandits_guile_buff) == 11 and ComboPoints() >= 4 Spell(slice_and_dice)
+	#slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8)
+	if BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 Spell(slice_and_dice)
+	#killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)
+	if { Energy() < 40 or BuffPresent(burst_haste_buff any=1) and TimeInCombat() < 10 or BuffRemaining(burst_haste_buff any=1) > 20 } and BuffExpires(adrenaline_rush_buff) and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } Spell(killing_spree)
+	#adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10
+	if { Energy() < 35 or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(killing_spree) > 10 Spell(adrenaline_rush)
 	#marked_for_death,if=combo_points<=1&dot.revealing_strike.ticking&(!talent.shadow_reflection.enabled|buff.shadow_reflection.up|cooldown.shadow_reflection.remains>30)
 	if ComboPoints() <= 1 and target.DebuffPresent(revealing_strike_debuff) and { not Talent(shadow_reflection_talent) or BuffPresent(shadow_reflection_buff) or SpellCooldown(shadow_reflection) > 30 } Spell(marked_for_death)
-	#call_action_list,name=generator,if=combo_points<5|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
-	if ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) <= 4 and BuffExpires(deep_insight_buff) CombatGeneratorActions()
-	#call_action_list,name=finisher,if=combo_points=5&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=4))
-	if ComboPoints() == 5 and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 4 } CombatFinisherActions()
+	#call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
+	if ComboPoints() < 5 or not target.DebuffPresent(revealing_strike_debuff) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) <= 4 and BuffExpires(deep_insight_buff) CombatGeneratorActions()
+	#call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=4))
+	if ComboPoints() == 5 and target.DebuffPresent(revealing_strike_debuff) and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 4 } CombatFinisherActions()
 }
 
 AddFunction CombatGeneratorActions
 {
-	#revealing_strike,if=ticks_remain<2
-	if target.TicksRemaining(revealing_strike_debuff) < 2 Spell(revealing_strike)
-	#sinister_strike
-	Spell(sinister_strike)
+	#revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
+	if ComboPoints() == 4 and target.DebuffRemaining(revealing_strike_debuff) < 7.2 and target.TimeToDie() > target.DebuffRemaining(revealing_strike_debuff) + 7.2 or target.TimeToDie() < target.DebuffRemaining(revealing_strike_debuff) + 7.2 and target.TicksRemaining(revealing_strike_debuff) < 2 or not target.DebuffPresent(revealing_strike_debuff) Spell(revealing_strike)
+	#sinister_strike,if=dot.revealing_strike.ticking
+	if target.DebuffPresent(revealing_strike_debuff) Spell(sinister_strike)
 }
 
 AddFunction CombatFinisherActions
 {
-	#crimson_tempest,if=active_enemies>7&dot.crimson_tempest_dot.ticks_remain<=1
-	if Enemies() > 7 and target.TicksRemaining(crimson_tempest_dot_debuff) < 2 Spell(crimson_tempest)
+	#death_from_above
+	Spell(death_from_above)
+	#crimson_tempest,if=active_enemies>1&remains<4
+	if Enemies() > 1 and target.DebuffRemaining(crimson_tempest_debuff) < 4 Spell(crimson_tempest)
+	#crimson_tempest,if=active_enemies>2
+	if Enemies() > 2 Spell(crimson_tempest)
 	#eviscerate
 	Spell(eviscerate)
 }
@@ -134,16 +138,16 @@ AddIcon specialization=combat help=aoe
 # anticipation_buff
 # anticipation_talent
 # arcane_torrent_energy
-# bandits_guile_buff
 # berserking
 # blade_flurry
 # blade_flurry_buff
 # blood_fury_ap
 # cheap_shot
 # crimson_tempest
-# crimson_tempest_dot_debuff
+# crimson_tempest_debuff
 # deadly_poison
 # deadly_throw
+# death_from_above
 # deep_insight_buff
 # eviscerate
 # kick

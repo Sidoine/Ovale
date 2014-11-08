@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warlock_Affliction_T16M".
 #	class=warlock
 #	spec=affliction
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Va!....00.
+#	talents=0000110
 #	glyphs=siphon_life
 #	pet=felhunter
 

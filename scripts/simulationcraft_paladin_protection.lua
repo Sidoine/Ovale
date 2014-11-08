@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Paladin_Protection_T16M".
 #	class=paladin
 #	spec=protection
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#bZ!202121.
+#	talents=3132320
 #	glyphs=focused_shield/alabaster_shield/divine_protection
 
 Include(ovale_common)

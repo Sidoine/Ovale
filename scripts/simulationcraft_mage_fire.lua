@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Fire_T16M".
 #	class=mage
 #	spec=fire
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#eZ!2..211.
+#	talents=3003220
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 Include(ovale_common)

@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Unholy_T16M".
 #	class=deathknight
 #	spec=unholy
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#db!1..2...
+#	talents=2003000
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)

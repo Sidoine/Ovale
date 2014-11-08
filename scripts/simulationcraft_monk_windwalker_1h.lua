@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Monk_Windwalker_1h_T16M".
 #	class=monk
 #	spec=windwalker
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#fb!002221.
+#	talents=1133320
 
 Include(ovale_common)
 Include(ovale_monk_spells)

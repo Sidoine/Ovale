@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Paladin_Retribution_T16M".
 #	class=paladin
 #	spec=retribution
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#bb!110112.
+#	talents=2212230
 #	glyphs=double_jeopardy/mass_exorcism
 
 Include(ovale_common)

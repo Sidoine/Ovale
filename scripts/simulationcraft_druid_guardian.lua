@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Druid_Guardian_T16M".
 #	class=druid
 #	spec=guardian
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#Ub!.1.0.1.
+#	talents=0201020
 #	glyphs=maul
 
 Include(ovale_common)
@@ -16,14 +16,9 @@ Include(ovale_druid_spells)
 
 AddFunction GetInMeleeRange
 {
-	if Stance(druid_bear_form) and not target.InRange(mangle)
+	if Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred)
 	{
-		if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-	if Stance(druid_cat_form) and not target.InRange(shred)
-	{
-		if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }

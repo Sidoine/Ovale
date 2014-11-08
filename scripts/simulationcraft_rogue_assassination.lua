@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Assassination_T16M".
 #	class=rogue
 #	spec=assassination
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#ca!200002.
+#	talents=3111130
 #	glyphs=vendetta
 
 Include(ovale_common)

@@ -39,7 +39,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Monk_Brewmaster_1h_T16M".
 #	class=monk
 #	spec=brewmaster
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#fa!.00.11.
+#	talents=0110220
 #	glyphs=fortifying_brew,fortuitous_spheres
 
 # ActionList: BrewmasterPrecombatActions --> main, shortcd, cd
@@ -309,7 +309,7 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 # Based on SimulationCraft profile "Monk_Windwalker_1h_T16M".
 #	class=monk
 #	spec=windwalker
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#fb!002221.
+#	talents=1133320
 
 # ActionList: WindwalkerPrecombatActions --> main, shortcd, cd
 
