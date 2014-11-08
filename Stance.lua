@@ -20,6 +20,7 @@ local OvaleState = nil
 
 local ipairs = ipairs
 local pairs = pairs
+local substr = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
 local tsort = table.sort
@@ -137,11 +138,13 @@ function OvaleStance:OnEnable()
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 	self:RegisterMessage("Ovale_SpellsChanged", "UpdateStances")
 	self:RegisterMessage("Ovale_TalentsChanged", "UpdateStances")
+	OvaleData:RegisterRequirement("stance", "RequireStanceHandler", self)
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleStance:OnDisable()
 	OvaleState:UnregisterState(self)
+	OvaleData:UnregisterRequirement("stance")
 	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
@@ -209,13 +212,16 @@ function OvaleStance:GetStance()
 end
 
 -- Return true if the current stance matches the given name.
+-- NOTE: Mirrored in statePrototype below.
 function OvaleStance:IsStance(name)
-	if not name or not self.stance then return false end
-	if type(name) == "number" then
-		return name == self.stance
-	else
-		return name == self.stanceList[self.stance]
+	if name and self.stance then
+		if type(name) == "number" then
+			return name == self.stance
+		else
+			return name == OvaleStance.stanceList[self.stance]
+		end
 	end
+	return false
 end
 
 function OvaleStance:ShapeshiftEventHandler()
@@ -232,6 +238,34 @@ function OvaleStance:UpdateStances()
 	self:CreateStanceList()
 	self:ShapeshiftEventHandler()
 	self.ready = true
+end
+
+-- Run-time check that the player is in a certain stance.
+-- NOTE: Mirrored in statePrototype below.
+function OvaleStance:RequireStanceHandler(spellId, requirement, tokenIterator, target)
+	local verified = false
+	local stance = tokenIterator()
+	if stance then
+		local isBang = false
+		if substr(stance, 1, 1) == "!" then
+			stance = substr(stance, 2)
+		end
+		local isStance = self:IsStance(stance)
+		if not isBang and isStance or isBang and not isStance then
+			verified = true
+		end
+		if self["isState"] then
+			local result = verified and "passed" or "FAILED"
+			if isBang then
+				Ovale:Logf("    Require stance '%s': %s", stance, result)
+			else
+				Ovale:Logf("    Require NOT stance 's': %s", stance, result)
+			end
+		end
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
+	end
+	return verified, requirement
 end
 --</public-static-methods>
 
@@ -280,15 +314,7 @@ end
 --</public-static-methods>
 
 --<state-methods>
--- Return true if the stance matches the given name.
-statePrototype.IsStance = function(state, name)
-	if name and state.stance then
-		if type(name) == "number" then
-			return name == state.stance
-		else
-			return name == OvaleStance.stanceList[state.stance]
-		end
-	end
-	return false
-end
+-- Mirrored methods.
+statePrototype.IsStance = OvaleStance.IsStance
+statePrototype.RequireStanceHandler = OvaleStance.RequireStanceHandler
 --</state-methods>

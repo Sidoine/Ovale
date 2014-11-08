@@ -325,6 +325,8 @@ function OvaleAura:OnEnable()
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
 	OvaleData:RegisterRequirement("buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("debuff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("stealth", "RequireStealthHandler", self)
+	OvaleData:RegisterRequirement("stealthed", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("target_buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_debuff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_health_pct", "RequireTargetHealthPercentHandler", self)
@@ -335,6 +337,8 @@ function OvaleAura:OnDisable()
 	OvaleState:UnregisterState(self)
 	OvaleData:UnregisterRequirement("buff")
 	OvaleData:UnregisterRequirement("debuff")
+	OvaleData:UnregisterRequirement("stealth")
+	OvaleData:UnregisterRequirement("stealthed")
 	OvaleData:UnregisterRequirement("target_buff")
 	OvaleData:UnregisterRequirement("target_debuff")
 	OvaleData:UnregisterRequirement("target_health_pct")
@@ -751,7 +755,7 @@ end
 
 -- Run-time check for an aura on the player or the target.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireBuffHandler(requirement, tokenIterator, target)
+function OvaleAura:RequireBuffHandler(spellId, requirement, tokenIterator, target)
 	local verified = false
 	local buffName = tokenIterator()
 	if buffName then
@@ -772,26 +776,52 @@ function OvaleAura:RequireBuffHandler(requirement, tokenIterator, target)
 		end
 		local aura = self:GetAura(unitId, buffName, filter, mine)
 		local isActiveAura = self:IsActiveAura(aura)
-		local result = "FAILED"
 		if not isBang and isActiveAura or isBang and not isActiveAura then
-			result = "passed"
 			verified = true
 		end
-		if isBang then
-			Ovale:Logf("    Require aura %s NOT on %s: %s", buffName, unitId, result)
-		else
-			Ovale:Logf("    Require aura %s on %s: %s", buffName, unitId, result)
+		if self["isState"] then
+			local result = verified and "passed" or "FAILED"
+			if isBang then
+				Ovale:Logf("    Require aura %s NOT on %s: %s", buffName, unitId, result)
+			else
+				Ovale:Logf("    Require aura %s on %s: %s", buffName, unitId, result)
+			end
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
 	end
-	return verified
+	return verified, requirement
+end
+
+-- Run-time check for the player being stealthed.
+-- NOTE: Mirrored in statePrototype below.
+function OvaleAura:RequireStealthHandler(spellId, requirement, tokenIterator, target)
+	local verified = false
+	local stealthed = tokenIterator()
+	if stealthed then
+		local aura = self:GetAura("player", "stealthed_buff", "HELPFUL", true)
+		local isActiveAura = self:IsActiveAura(aura)
+		if stealthed == 1 and isActiveAura or stealthed ~= 1 and not isActiveAura then
+			verified = true
+		end
+		if self["isState"] then
+			local result = verified and "passed" or "FAILED"
+			if stealthed == 1 then
+				Ovale:Logf("    Require stealth: %s", result)
+			else
+				Ovale:Logf("    Require NOT stealth: %s", result)
+			end
+		end
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
+	end
+	return verified, requirement
 end
 
 -- Run-time check that the target is below a health percent threshold.
 -- NOTE: Mirrored in statePrototype below.
 -- TODO: This function should really be moved to a Health module.
-function OvaleAura:RequireTargetHealthPercentHandler(requirement, tokenIterator, target)
+function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, tokenIterator, target)
 	local verified = false
 	local threshold = tokenIterator()
 	if threshold then
@@ -801,20 +831,21 @@ function OvaleAura:RequireTargetHealthPercentHandler(requirement, tokenIterator,
 		end
 		threshold = tonumber(threshold) or 0
 		local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
-		local result = "FAILED"
 		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
-			result = "passed"
 			verified = true
 		end
-		if isBang then
-			Ovale:Logf("    Require target health > %f%%: %s", threshold, result)
-		else
-			Ovale:Logf("    Require target health <= %f%%: %s", threshold, result)
+		if self["isState"] then
+			local result = verified and "passed" or "FAILED"
+			if isBang then
+				Ovale:Logf("    Require target health > %f%%: %s", threshold, result)
+			else
+				Ovale:Logf("    Require target health <= %f%%: %s", threshold, result)
+			end
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
 	end
-	return verified
+	return verified, requirement
 end
 --</public-static-methods>
 
@@ -1145,7 +1176,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			end
 
 			-- Verify any run-time requirements for this aura.
-			local verified = state:CheckRequirements(tokenIterator, unitId)
+			local verified = state:CheckRequirements(spellId, tokenIterator, unitId)
 			if verified then
 				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
 				local atTime = isChanneled and startCast or endCast
@@ -1468,5 +1499,6 @@ end
 
 -- Mirrored methods.
 statePrototype.RequireBuffHandler = OvaleAura.RequireBuffHandler
+statePrototype.RequireStealthHandler = OvaleAura.RequireStealthHandler
 statePrototype.RequireTargetHealthPercentHandler = OvaleAura.RequireTargetHealthPercentHandler
 --</state-methods>

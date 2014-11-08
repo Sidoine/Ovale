@@ -52,8 +52,6 @@ local API_IsHarmfulSpell = IsHarmfulSpell
 local API_IsHelpfulSpell = IsHelpfulSpell
 local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableSpell = IsUsableSpell
-local API_UnitHealth = UnitHealth
-local API_UnitHealthMax = UnitHealthMax
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local MAX_TALENT_TIERS = MAX_TALENT_TIERS
@@ -507,78 +505,15 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 				isUsable = false
 			end
 		end
-		-- Stance.
-		if isUsable and si.stance then
-			local stance = state:GetSpellInfoProperty(spellId, "stance", target)
-			if stance then
-				isUsable = false
-				if state:IsStance(stance) then
-					isUsable = true
-				end
-				local result = isUsable and "pass" or "FAIL"
-				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s': %s.", spellId, si.stance, result)
-			end
-		end
-		-- Stealthed.
-		if isUsable and si.stealthed then
-			local stealthed = state:GetSpellInfoProperty(spellId, "stealthed", target)
-			if stealthed == 1 then
-				isUsable = false
-				local aura = state:GetAura("player", "stealthed_buff", "HELPFUL", true)
-				if state:IsActiveAura(aura) then
-					isUsable = true
-				end
-				local result = isUsable and "pass" or "FAIL"
-				Ovale:Logf("Spell ID '%s' requires the player to be stealthed: %s.", spellId, result)
-			end
-		end
-		-- Target health percent (execute range).
-		if isUsable and si.target_health_pct then
-			local target_health_pct = state:GetSpellInfoProperty(spellId, "target_health_pct", target)
-			if target_health_pct then
-				isUsable = false
-				local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
-				if healthPercent < si.target_health_pct then
-					isUsable = true
-				end
-				local result = isUsable and "pass" or "FAIL"
-				Ovale:Logf("Spell ID '%s' requires the target's health to be less than %f%%: %s.", spellId, si.target_health_pct, result)
-			end
-		end
-		-- Secondary resources, e.g., chi, focus, rage, etc.
-		if isUsable and si.combo then
-			isUsable = false
-			-- Spell requires combo points.
-			local cost = state:ComboPointCost(spellId)
-			if cost > 0 then
-				if state.combo >= cost then
-					isUsable = true
-				else
+		-- Verify all requirements with registered handlers.
+		if isUsable then
+			local requirement
+			isUsable, requirement = state:CheckSpellInfo(spellId, target)
+			if not isUsable then
+				if requirement == "combo" or OvalePower.POWER_INFO[requirement] then
 					noMana = true
 				end
-			else
-				isUsable = true
-			end
-			local result = isUsable and "pass" or "FAIL"
-			Ovale:Logf("Spell ID '%s' requires at least %d combo points: %s.", spellId, cost, result)
-		end
-		for powerType in pairs(OvalePower.SECONDARY_POWER) do
-			if not isUsable then break end
-			if si[powerType] then
-				-- Spell requires a secondary resource.
-				isUsable = false
-				local cost = state:PowerCost(spellId, powerType, target)
-				if cost > 0 then
-					if state[powerType] >= cost then
-						isUsable = true
-					else
-						noMana = true
-					end
-				else
-					isUsable = true
-				end
-				local result = isUsable and "pass" or "FAIL"
-				Ovale:Logf("Spell ID '%s' requires at least %d %s: %s.", spellId, cost, powerType, result)
+				Ovale:Logf("Spell ID '%s' failed requirements.", spellId)
 			end
 		end
 	else

@@ -245,7 +245,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 					for auraId, spellData in pairs(auraList) do
 						local tokenIterator = gmatch(spellData, "[^,]+")
 						local value = tokenIterator()
-						local verified = OvaleData:CheckRequirements(tokenIterator, target)
+						local verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							if target ~= "player" then
@@ -261,7 +261,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 					for auraId, spellData in pairs(auraList) do
 						local tokenIterator = gmatch(spellData, "[^,]+")
 						local value = tokenIterator()
-						local verified = OvaleData:CheckRequirements(tokenIterator, target)
+						local verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							break

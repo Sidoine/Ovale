@@ -18,6 +18,10 @@ local gmatch = string.gmatch
 local type = type
 local pairs = pairs
 
+-- Registered "run-time requirement" handlers: self_requirement[name] = handler
+-- Handler is invoked as handler(state, name, tokenIterator, target).
+local self_requirement = {}
+
 local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "strength", "versatility" }
 local TRINKET_USE_NAMES = { "proc", "stacking_proc", "stacking_stat", "stat" }
 --<private-static-properties>
@@ -315,10 +319,6 @@ do
 	list.str_agi_int				= list.str_agi_int_buff
 	list.stun						= list.stun_debuff
 end
-
--- Registered "run-time requirement" handlers: self.requirement[name] = handler
--- Handler is invoked as handler(state, name, tokenIterator, target).
-OvaleData.requirement = {}
 --</public-static-properties>
 
 --<private-static-methods>
@@ -340,11 +340,11 @@ function OvaleData:OnDisable()
 end
 
 function OvaleData:RegisterRequirement(name, method, arg)
-	self.requirement[name] = { method, arg }
+	self_requirement[name] = { method, arg }
 end
 
 function OvaleData:UnregisterRequirement(name)
-	self.requirement[name] = nil
+	self_requirement[name] = nil
 end
 
 function OvaleData:ResetSpellInfo()
@@ -389,20 +389,21 @@ end
 
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:CheckRequirements(tokenIterator, target)
+function OvaleData:CheckRequirements(spellId, tokenIterator, target)
 	local name = tokenIterator()
 	if name then
 		Ovale:Log("Checking requirements:")
 		local verified = true
+		local requirement = name
 		while verified and name do
-			local handler = self.requirement[name]
+			local handler = self_requirement[name]
 			if handler then
 				local method, arg = handler[1], handler[2]
 				-- Check for inherited/mirrored method first (for statePrototype).
 				if self[method] then
-					verified = self[method](self, name, tokenIterator, target)
+					verified, requirement = self[method](self, spellId, name, tokenIterator, target)
 				else
-					verified = arg[method](arg, name, tokenIterator, target)
+					verified, requirement = arg[method](arg, spellId, name, tokenIterator, target)
 				end
 				name = tokenIterator()
 			else
@@ -410,9 +411,32 @@ function OvaleData:CheckRequirements(tokenIterator, target)
 				verified = false
 			end
 		end
-		return verified
+		return verified, requirement
 	end
 	return true
+end
+
+-- Check "run-time" requirements specified in SpellInfo().
+-- NOTE: Mirrored in statePrototype below.
+function OvaleData:CheckSpellInfo(spellId, target)
+	local verified = true
+	local requirement
+	for name, handler in pairs(self_requirement) do
+		local value = self:GetSpellInfoProperty(spellId, name, target)
+		if value then
+			local method, arg = handler[1], handler[2]
+			-- Check for inherited/mirrored method first (for statePrototype).
+			if self[method] then
+				verified, requirement = self[method](self, spellId, name, gmatch(value, ".+"), target)
+			else
+				verified, requirement = arg[method](arg, spellId, name, gmatch(value, ".+"), target)
+			end
+			if not verified then
+				break
+			end
+		end
+	end
+	return verified, requirement
 end
 
 -- Get SpellInfo property with run-time checks as specified in SpellRequire().
@@ -425,7 +449,7 @@ function OvaleData:GetSpellInfoProperty(spellId, property, target)
 		for v, requirement in pairs(requirements) do
 			local tokenIterator = gmatch(requirement, "[^,]+")
 			target = target or "target"
-			local verified = self:CheckRequirements(tokenIterator, target)
+			local verified = self:CheckRequirements(spellId, tokenIterator, target)
 			if verified then
 				value = v
 				break
@@ -523,5 +547,6 @@ local statePrototype = OvaleData.statePrototype
 --<state-methods>
 -- Mirrored methods.
 statePrototype.CheckRequirements = OvaleData.CheckRequirements
+statePrototype.CheckSpellInfo = OvaleData.CheckSpellInfo
 statePrototype.GetSpellInfoProperty = OvaleData.GetSpellInfoProperty
 --</state-methods>

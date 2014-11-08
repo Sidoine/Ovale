@@ -101,6 +101,8 @@ local statePrototype = OvaleState.statePrototype
 --</private-static-properties>
 
 --<state-properties>
+-- Whether this object is a state machine.
+statePrototype.isState = true
 -- Whether the state of the simulator has been initialized.
 statePrototype.isInitialized = nil
 -- Table of state variables added by scripts that is reset on every refresh.

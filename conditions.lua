@@ -3265,7 +3265,7 @@ do
 		end
 		-- If no primary resource cost was found, then query using Blizzard API.
 		if not primaryPowerType then
-			local _, powerType = OvalePower:PowerCost(spellId)
+			local _, powerType = OvalePower:GetSpellCost(spellId)
 			if powerType then
 				primaryPowerType = powerType
 			end
@@ -5269,7 +5269,7 @@ do
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		if not powerType then
-			local _, pt = OvalePower:PowerCost(spellId)
+			local _, pt = OvalePower:GetSpellCost(spellId)
 			powerType = pt
 		end
 		local seconds = state:TimeToPower(spellId, target, powerType)
