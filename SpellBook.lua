@@ -510,7 +510,8 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 			local requirement
 			isUsable, requirement = state:CheckSpellInfo(spellId, target)
 			if not isUsable then
-				if requirement == "combo" or OvalePower.POWER_INFO[requirement] then
+				-- Set noMana if the failed requirement is for a primary (poolable) power type.
+				if OvalePower.PRIMARY_POWER[requirement] then
 					noMana = true
 				end
 				Ovale:Logf("Spell ID '%s' failed requirements.", spellId)

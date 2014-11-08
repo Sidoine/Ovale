@@ -258,8 +258,8 @@ local function GetActionSpellInfo(element, state, target)
 	if not isKnownSpell and not action then
 		Ovale:Logf("Unknown spell ID '%s'.", spellId)
 	else
-		local isUsable = state:IsUsableSpell(spellId, target)
-		if isUsable then
+		local isUsable, noMana = state:IsUsableSpell(spellId, target)
+		if isUsable or noMana then
 			-- Use texture specified in the action if given.
 			if element.params.texture then
 				actionTexture = "Interface\\Icons\\" .. element.params.texture

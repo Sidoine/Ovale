@@ -115,27 +115,12 @@ OvalePower.POWER_INFO =
 	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS", mini = 0, costString = SOUL_SHARDS_COST },
 }
 
-OvalePower.SECONDARY_POWER = {
-	alternate = true,
-	burningembers = true,
-	chi = true,
-	demonicfury = true,
+-- Power types that can regenerate/pool over time with no actions.
+OvalePower.PRIMARY_POWER = {
+	energy = true,
 	focus = true,
-	holy = true,
-	rage = true,
-	runicpower = true,
-	shadoworbs = true,
-	shards = true,
+	mana = true,
 }
-
-OvalePower.PRIMARY_POWER = {}
-do
-	for powerType in pairs(OvalePower.POWER_INFO) do
-		if not OvalePower.SECONDARY_POWER[powerType] then
-			OvalePower.PRIMARY_POWER[powerType] = true
-		end
-	end
-end
 
 OvalePower.POWER_TYPE = {}
 do
