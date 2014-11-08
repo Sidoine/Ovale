@@ -1134,6 +1134,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "DRUID" and action == "wild_charge" then
+			-- Check that Wild Charge can be used on the target.
+			conditionCode = format("target.InRange(%s)", action)
 		elseif class == "HUNTER" and action == "exotic_munitions" then
 			if modifier.ammo_type then
 				local name = Unparse(modifier.ammo_type)
@@ -2590,6 +2593,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		spellName = Disambiguate(spellName, class, specialization)
 		code = format("TimeToSpell(%s)", spellName)
 		AddSymbol(annotation, spellName)
+	elseif class == "DRUID" and operand == "buff.wild_charge_movement.down" then
+		-- "wild_charge_movement" is a fake SimulationCraft buff that lasts for the
+		-- duration of the movement during Wild Charge.
+		code = "True(wild_charge_movement_down)"
 	elseif class == "DRUID" and operand == "max_fb_energy" then
 		-- SimulationCraft's max_fb_energy is the maximum cost of Ferocious Bite if used.
 		local spellName = "ferocious_bite"
@@ -2843,14 +2850,9 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction GetInMeleeRange
 			{
-				if Stance(druid_bear_form) and not target.InRange(mangle)
+				if Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred)
 				{
-					if target.InRange(wild_charge_bear) Spell(wild_charge_bear)
-					Texture(misc_arrowlup help=L(not_in_melee_range))
-				}
-				if Stance(druid_cat_form) and not target.InRange(shred)
-				{
-					if target.InRange(wild_charge_cat) Spell(wild_charge_cat)
+					if target.InRange(wild_charge) Spell(wild_charge)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
