@@ -651,8 +651,6 @@ AddFunction DestructionAoePredictActions
 	if BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
 	if BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
-	#cataclysm
-	Spell(cataclysm)
 	#fire_and_brimstone,if=buff.fire_and_brimstone.down
 	if BuffExpires(fire_and_brimstone_buff) Spell(fire_and_brimstone)
 	#immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking
@@ -708,8 +706,6 @@ AddFunction DestructionSingleTargetPredictActions
 	if BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
 	#conflagrate,if=charges=2
 	if Charges(conflagrate) == 2 Spell(conflagrate)
-	#cataclysm
-	Spell(cataclysm)
 	#chaos_bolt,if=talent.charred_remains.enabled&active_enemies>1&target.health.pct>20
 	if Talent(charred_remains_talent) and Enemies() > 1 and target.HealthPercent() > 20 Spell(chaos_bolt)
 	#chaos_bolt,if=talent.charred_remains.enabled&buff.backdraft.stack<3&burning_ember>=2.5
@@ -734,8 +730,6 @@ AddFunction DestructionSingleTargetPredictActions
 	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
 	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.mastery.react&trinket.proc.mastery.remains>cast_time
 	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
-	#rain_of_fire,if=!ticking
-	if not target.DebuffPresent(rain_of_fire_debuff) Spell(rain_of_fire)
 	#immolate,cycle_targets=1,if=remains<=(duration*0.3)
 	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#conflagrate
@@ -753,6 +747,23 @@ AddFunction DestructionSingleTargetShortCdActions
 	{
 		#cataclysm
 		Spell(cataclysm)
+
+		unless Talent(charred_remains_talent) and Enemies() > 1 and target.HealthPercent() > 20 and Spell(chaos_bolt)
+			or Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and BurningEmbers() / 10 >= 2.5 and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) or target.TimeToDie() < 20 } and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and ArmorSetBonus(T17 2) == 1 and BurningEmbers() / 10 >= 2.5 and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffPresent(archmages_greater_incandescence_int_buff) and BuffRemaining(archmages_greater_incandescence_int_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffStacks(trinket_stacking_proc_intellect_buff) > 7 and BuffRemaining(trinket_stacking_proc_intellect_buff) >= CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffStacks(trinket_stacking_proc_multistrike_buff) >= 8 and BuffRemaining(trinket_stacking_proc_multistrike_buff) >= CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_multistrike_buff) and BuffRemaining(trinket_proc_multistrike_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt)
+			or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt)
+		{
+			#rain_of_fire,if=!ticking
+			if not target.DebuffPresent(rain_of_fire_debuff) Spell(rain_of_fire)
+		}
 	}
 }
 

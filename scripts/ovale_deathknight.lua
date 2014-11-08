@@ -1222,8 +1222,6 @@ AddFunction UnholyDefaultCdActions
 
 AddFunction UnholyBosStActions
 {
-	#death_and_decay,if=runic_power<88
-	if RunicPower() < 88 Spell(death_and_decay)
 	#festering_strike,if=runic_power<77
 	if RunicPower() < 77 Spell(festering_strike)
 	#scourge_strike,if=runic_power<88
@@ -1236,8 +1234,10 @@ AddFunction UnholyBosStActions
 
 AddFunction UnholyBosStShortCdActions
 {
-	unless RunicPower() < 88 and Spell(death_and_decay)
-		or RunicPower() < 77 and Spell(festering_strike)
+	#death_and_decay,if=runic_power<88
+	if RunicPower() < 88 Spell(death_and_decay)
+
+	unless RunicPower() < 77 and Spell(festering_strike)
 		or RunicPower() < 88 and Spell(scourge_strike)
 	{
 		#blood_tap,if=buff.blood_charge.stack>=5
@@ -1439,22 +1439,16 @@ AddFunction UnholySingleTargetActions
 	if Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(plague_strike)
 	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) UnholyBosStActions()
-	#death_and_decay,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
-	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(death_and_decay)
 	#scourge_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
 	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(scourge_strike)
 	#festering_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<76&talent.breath_of_sindragosa.enabled
 	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) Spell(festering_strike)
-	#death_and_decay,if=unholy=2
-	if Rune(unholy) >= 2 Spell(death_and_decay)
 	#scourge_strike,if=unholy=2
 	if Rune(unholy) >= 2 Spell(scourge_strike)
 	#death_coil,if=runic_power>80
 	if RunicPower() > 80 Spell(death_coil)
 	#festering_strike,if=blood=2&frost=2
 	if Rune(blood) >= 2 and Rune(frost) >= 2 Spell(festering_strike)
-	#death_and_decay
-	Spell(death_and_decay)
 	#death_coil,if=buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1)
 	if BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and not Rune(unholy) >= 2 Spell(death_coil)
 	#scourge_strike,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35)|(unholy>=1&death>=1)|(death>=2)
@@ -1493,20 +1487,23 @@ AddFunction UnholySingleTargetShortCdActions
 			{
 				#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 				if BuffPresent(breath_of_sindragosa_buff) UnholyBosStShortCdActions()
+				#death_and_decay,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
+				if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(death_and_decay)
 
-				unless SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(death_and_decay)
-					or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(scourge_strike)
+				unless SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(scourge_strike)
 					or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) and Spell(festering_strike)
-					or Rune(unholy) >= 2 and Spell(death_and_decay)
 				{
+					#death_and_decay,if=unholy=2
+					if Rune(unholy) >= 2 Spell(death_and_decay)
 					#blood_tap,if=unholy=2&cooldown.death_and_decay.remains=0
 					if Rune(unholy) >= 2 and not SpellCooldown(death_and_decay) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 
 					unless Rune(unholy) >= 2 and Spell(scourge_strike)
 						or RunicPower() > 80 and Spell(death_coil)
 						or Rune(blood) >= 2 and Rune(frost) >= 2 and Spell(festering_strike)
-						or Spell(death_and_decay)
 					{
+						#death_and_decay
+						Spell(death_and_decay)
 						#blood_tap,if=cooldown.death_and_decay.remains=0
 						if not SpellCooldown(death_and_decay) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 						#blood_tap,if=buff.blood_charge.stack>10&(buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1))
