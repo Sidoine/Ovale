@@ -245,6 +245,10 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 					for auraId, spellData in pairs(auraList) do
 						local tokenIterator = gmatch(spellData, "[^,]+")
 						local value = tokenIterator()
+						if value == "extend" then
+							-- Skip the number of seconds to extend the aura.
+							tokenIterator()
+						end
 						local verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
@@ -261,6 +265,10 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 					for auraId, spellData in pairs(auraList) do
 						local tokenIterator = gmatch(spellData, "[^,]+")
 						local value = tokenIterator()
+						if value == "extend" then
+							-- Skip the number of seconds to extend the aura.
+							tokenIterator()
+						end
 						local verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
