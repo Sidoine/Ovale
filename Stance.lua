@@ -36,20 +36,7 @@ local Profiler = Ovale.Profiler
 local profiler = nil
 do
 	local group = OvaleStance:GetName()
-
-	local function EnableProfiling()
-		API_GetNumShapeshiftForms = Profiler:Wrap(group, "OvaleStance_API_GetNumShapeshiftForms", GetNumShapeshiftForms)
-		API_GetShapeshiftForm = Profiler:Wrap(group, "OvaleStance_API_GetShapeshiftForm", GetShapeshiftForm)
-		API_GetShapeshiftFormInfo = Profiler:Wrap(group, "OvaleStance_API_GetShapeshiftFormInfo", GetShapeshiftFormInfo)
-	end
-
-	local function DisableProfiling()
-		API_GetNumShapeshiftForms = GetNumShapeshiftForms
-		API_GetShapeshiftForm = GetShapeshiftForm
-		API_GetShapeshiftFormInfo = GetShapeshiftFormInfo
-	end
-
-	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
 

@@ -61,37 +61,7 @@ local Profiler = Ovale.Profiler
 local profiler = nil
 do
 	local group = OvaleBestAction:GetName()
-
-	local function EnableProfiling()
-		API_GetActionCooldown = Profiler:Wrap(group, "OvaleBestAction_API_GetActionCooldown", GetActionCooldown)
-		API_GetActionTexture = Profiler:Wrap(group, "OvaleBestAction_API_GetActionTexture", GetActionTexture)
-		API_GetItemIcon = Profiler:Wrap(group, "OvaleBestAction_API_GetItemIcon", GetItemIcon)
-		API_GetItemCooldown = Profiler:Wrap(group, "OvaleBestAction_API_GetItemCooldown", GetItemCooldown)
-		API_GetItemSpell = Profiler:Wrap(group, "OvaleBestAction_API_GetItemSpell", GetItemSpell)
-		API_GetSpellTexture = Profiler:Wrap(group, "OvaleBestAction_API_GetSpellTexture", GetSpellTexture)
-		API_IsActionInRange = Profiler:Wrap(group, "OvaleBestAction_API_IsActionInRange", IsActionInRange)
-		API_IsCurrentAction = Profiler:Wrap(group, "OvaleBestAction_API_IsCurrentAction", IsCurrentAction)
-		API_IsItemInRange = Profiler:Wrap(group, "OvaleBestAction_API_IsItemInRange", IsItemInRange)
-		API_IsUsableAction = Profiler:Wrap(group, "OvaleBestAction_API_IsUsableAction", IsUsableAction)
-		API_IsUsableItem = Profiler:Wrap(group, "OvaleBestAction_API_IsUsableItem", IsUsableItem)
-	end
-
-	local function DisableProfiling()
-		API_GetTime = GetTime
-		API_GetActionCooldown = GetActionCooldown
-		API_GetActionTexture = GetActionTexture
-		API_GetItemIcon = GetItemIcon
-		API_GetItemCooldown = GetItemCooldown
-		API_GetItemSpell = GetItemSpell
-		API_GetSpellTexture = GetSpellTexture
-		API_IsActionInRange = IsActionInRange
-		API_IsCurrentAction = IsCurrentAction
-		API_IsItemInRange = IsItemInRange
-		API_IsUsableAction = IsUsableAction
-		API_IsUsableItem = IsUsableItem
-	end
-
-	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
 

@@ -39,18 +39,7 @@ local Profiler = Ovale.Profiler
 local profiler = nil
 do
 	local group = OvaleRunes:GetName()
-
-	local function EnableProfiling()
-		API_GetRuneCooldown = Profiler:Wrap(group, "OvaleRunes_API_GetRuneCooldown", GetRuneCooldown)
-		API_GetRuneType = Profiler:Wrap(group, "OvaleRunes_API_GetRuneType", GetRuneType)
-	end
-
-	local function DisableProfiling()
-		API_GetRuneCooldown = GetRuneCooldown
-		API_GetRuneType = GetRuneType
-	end
-
-	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
 

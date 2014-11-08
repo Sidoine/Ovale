@@ -54,16 +54,7 @@ local Profiler = Ovale.Profiler
 local profiler = nil
 do
 	local group = OvaleAST:GetName()
-
-	local function EnableProfiling()
-		API_GetItemInfo = Profiler:Wrap(group, "OvaleAST_API_GetItemInfo", GetItemInfo)
-	end
-
-	local function DisableProfiling()
-		API_GetItemInfo = GetItemInfo
-	end
-
-	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
 

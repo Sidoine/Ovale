@@ -44,24 +44,7 @@ local Profiler = Ovale.Profiler
 local profiler = nil
 do
 	local group = OvaleFuture:GetName()
-
-	local function EnableProfiling()
-		API_GetTime = Profiler:Wrap(group, "OvaleFuture_API_GetTime", GetTime)
-		API_UnitCastingInfo = Profiler:Wrap(group, "OvaleFuture_API_UnitCastingInfo", UnitCastingInfo)
-		API_UnitChannelInfo = Profiler:Wrap(group, "OvaleFuture_API_UnitChannelInfo", UnitChannelInfo)
-		API_UnitGUID = Profiler:Wrap(group, "OvaleFuture_API_UnitGUID", UnitGUID)
-		API_UnitName = Profiler:Wrap(group, "OvaleFuture_API_UnitName", UnitName)
-	end
-
-	local function DisableProfiling()
-		API_GetTime = GetTime
-		API_UnitCastingInfo = UnitCastingInfo
-		API_UnitChannelInfo = UnitChannelInfo
-		API_UnitGUID = UnitGUID
-		API_UnitName = UnitName
-	end
-
-	Profiler:RegisterProfilingGroup(group, EnableProfiling, DisableProfiling)
+	Profiler:RegisterProfilingGroup(group)
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
