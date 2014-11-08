@@ -6,7 +6,7 @@
 --[[
 	Time spans are continuous open intervals (start, ending) that are subsets of (0, infinity).
 
-	Infinity is represented by math.huge.
+	Infinity is represented by INFINITY.
 	Point sets are considered empty.
 	"nil" time spans are considered empty.
 
@@ -27,6 +27,7 @@ local strformat = string.format
 local tconcat = table.concat
 local type = type
 local wipe = table.wipe
+local INFINITY = math.huge
 --</private-static-properties>
 
 --<public-static-properties>
@@ -173,7 +174,7 @@ function OvaleTimeSpan:Complement(result)
 	result = result or {}
 
 	if countA == 0 then
-		result[1], result[2] = 0, math.huge
+		result[1], result[2] = 0, INFINITY
 		return OvaleTimeSpan(result)
 	end
 
@@ -189,8 +190,8 @@ function OvaleTimeSpan:Complement(result)
 		result[k] = A[i]
 		i, k = i + 1, k + 1
 	end
-	if A[i] < math.huge then
-		result[k], result[k+1] = A[i], math.huge
+	if A[i] < INFINITY then
+		result[k], result[k+1] = A[i], INFINITY
 	end
 	return OvaleTimeSpan(result)
 end

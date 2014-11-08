@@ -36,6 +36,7 @@ local API_GetEclipseDirection = GetEclipseDirection
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
+local INFINITY = math.huge
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
 
 local OVALE_ECLIPSE_DEBUG = "eclipse"
@@ -364,7 +365,7 @@ statePrototype.AddEclipse = function(state, eclipseId, atTime, snapshot)
 	if eclipseId == LUNAR_ECLIPSE or eclipseId == SOLAR_ECLIPSE then
 		local eclipseName = (eclipseId == LUNAR_ECLIPSE) and "Lunar" or "Solar"
 		Ovale:Logf("[%s] Adding %s Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, eclipseName, eclipseId, atTime)
-		local aura = state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, math.huge, snapshot)
+		local aura = state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, INFINITY, snapshot)
 		-- Set the value of the Eclipse aura to the Eclipse's bonus damage.
 		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)
 		-- Reaching Eclipse state grants Nature's Grace.

@@ -32,6 +32,7 @@ local API_GetRuneType = GetRuneType
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
+local INFINITY = math.huge
 
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
@@ -456,7 +457,7 @@ statePrototype.RuneCount = function(state, name, atTime)
 		end
 	end
 	local count = 0
-	local startCooldown, endCooldown = math.huge, math.huge
+	local startCooldown, endCooldown = INFINITY, INFINITY
 	local runeType = RUNE_TYPE[name]
 	if runeType ~= DEATH_RUNE then
 		-- Match only the runes of the given type.
@@ -496,7 +497,7 @@ statePrototype.DeathRuneCount = function(state, name, atTime)
 		end
 	end
 	local count = 0
-	local startCooldown, endCooldown = math.huge, math.huge
+	local startCooldown, endCooldown = INFINITY, INFINITY
 	local runeType = RUNE_TYPE[name]
 	if runeType ~= DEATH_RUNE then
 		-- Match only the runes of the given type.
@@ -658,7 +659,7 @@ do
 			if count[runeType] > 0 then
 				Ovale:Logf("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
 				profiler.Stop("OvaleRunes_state_GetRunesCooldown")
-				return math.huge
+				return INFINITY
 			end
 		end
 

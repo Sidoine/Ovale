@@ -41,6 +41,7 @@ local Intersect = OvaleTimeSpan.Intersect
 local IntersectInterval = OvaleTimeSpan.IntersectInterval
 local Measure = OvaleTimeSpan.Measure
 local Union = OvaleTimeSpan.Union
+local INFINITY = math.huge
 
 local API_GetTime = GetTime
 local API_GetActionCooldown = GetActionCooldown
@@ -558,7 +559,7 @@ function OvaleBestAction:ComputeAction(element, state)
 			start = newStart
 		end
 		Ovale:Logf("[%d]    Action %s can start at %f.", nodeId, action, start)
-		timeSpan[1], timeSpan[2] = start, math.huge
+		timeSpan[1], timeSpan[2] = start, INFINITY
 
 		--[[
 			Allow for the return value of an to be "typecast" to a constant value by specifying
@@ -571,7 +572,7 @@ function OvaleBestAction:ComputeAction(element, state)
 			local atTime = state.currentTime
 			local value = HasTime(timeSpan, atTime) and 1 or 0
 			result = SetValue(element, value)
-			timeSpan[1], timeSpan[2] = 0, math.huge
+			timeSpan[1], timeSpan[2] = 0, INFINITY
 			Ovale:Logf("[%d]    Action %s typecast to value %f.", nodeId, action, value)
 		else
 			result = element
@@ -664,7 +665,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 			n = (B*c - A*z)/(B^2)
 			local bound
 			if z == 0 then
-				bound = math.huge
+				bound = INFINITY
 			else
 				bound = abs(B/z)
 			end
@@ -753,7 +754,7 @@ function OvaleBestAction:ComputeCompare(element, state)
 					or (c < z and operator == "<=")
 					or (c > z and operator == ">")
 					or (c > z and operator == ">=") then
-				IntersectInterval(scratch, t, math.huge, timeSpan)
+				IntersectInterval(scratch, t, INFINITY, timeSpan)
 			end
 			self_timeSpanPool:Release(scratch)
 		end
@@ -798,7 +799,7 @@ function OvaleBestAction:ComputeCustomFunction(element, state)
 				end
 			end
 			Ovale:Logf("[%d]    function '%s' typecast to value %f", element.nodeId, element.name, value)
-			timeSpan[1], timeSpan[2] = 0, math.huge
+			timeSpan[1], timeSpan[2] = 0, INFINITY
 			result = SetValue(element, value)
 		else
 			CopyTimeSpan(timeSpanA, timeSpan)
@@ -845,7 +846,7 @@ function OvaleBestAction:ComputeFunction(element, state)
 			value = 0
 		end
 		result = SetValue(element, value)
-		timeSpan[1], timeSpan[2] = 0, math.huge
+		timeSpan[1], timeSpan[2] = 0, INFINITY
 		priority = OVALE_DEFAULT_PRIORITY
 		Ovale:Logf("[%d]    condition '%s' typecast to value %f", element.nodeId, element.name, value)
 	elseif value then
@@ -868,7 +869,7 @@ function OvaleBestAction:ComputeGroup(element, state)
 		local currentTimeSpan, currentPriority, currentElement = self:Compute(node, state)
 		-- We only care about actions that are available at time t > state.currentTime.
 		current:Reset()
-		IntersectInterval(currentTimeSpan, state.currentTime, math.huge, current)
+		IntersectInterval(currentTimeSpan, state.currentTime, INFINITY, current)
 		if Measure(current) > 0 then
 			Ovale:Logf("[%d]    group checking %s", element.nodeId, tostring(current))
 			local currentCastTime
@@ -994,7 +995,7 @@ function OvaleBestAction:ComputeLogical(element, state)
 		Complement(timeSpanA, timeSpan)
 	elseif element.operator == "or" then
 		-- Short-circuit evaluation of left argument to OR.
-		if timeSpanA and timeSpanA[1] == 0 and timeSpanA[2] == math.huge then
+		if timeSpanA and timeSpanA[1] == 0 and timeSpanA[2] == INFINITY then
 			timeSpan:Reset(timeSpanA)
 			Ovale:Logf("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator)
 		else
@@ -1031,7 +1032,7 @@ function OvaleBestAction:ComputeLua(element, state)
 	local timeSpan = GetTimeSpan(element)
 	local priority, result
 	if value then
-		timeSpan[1], timeSpan[2] = 0, math.huge
+		timeSpan[1], timeSpan[2] = 0, INFINITY
 		result = SetValue(element, value)
 		priority = OVALE_DEFAULT_PRIORITY
 	end
@@ -1046,7 +1047,7 @@ function OvaleBestAction:ComputeState(element, state)
 
 	if element.func == "setstate" then
 		Ovale:Logf("[%d]    %s: %s = %s", element.nodeId, element.name, element.params[1], element.params[2])
-		timeSpan[1], timeSpan[2] = 0, math.huge
+		timeSpan[1], timeSpan[2] = 0, INFINITY
 		result = element
 	end
 	profiler.Stop("OvaleBestAction_ComputeState")
@@ -1057,7 +1058,7 @@ function OvaleBestAction:ComputeValue(element, state)
 	profiler.Start("OvaleBestAction_ComputeValue")
 	Ovale:Logf("[%d]    value is %s", element.nodeId, element.value)
 	local timeSpan = GetTimeSpan(element)
-	timeSpan[1], timeSpan[2] = 0, math.huge
+	timeSpan[1], timeSpan[2] = 0, INFINITY
 	profiler.Stop("OvaleBestAction_ComputeValue")
 	return timeSpan, OVALE_DEFAULT_PRIORITY, element
 end

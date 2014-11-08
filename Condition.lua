@@ -22,16 +22,16 @@
 		or operations.
 
 	The endpoint of a time interval must be between 0 and infinity, where
-	infinity is represented by math.huge.  Time is a value such as returned by
-	the API function GetTime().
+	infinity is represented by INFINITY (math.huge).  Time is a value such as
+	returned by the API function GetTime().
 
 	Examples:
 
-	(1)	(0, math.huge) means the condition is always true.
+	(1)	(0, INFINITY) means the condition is always true.
 
 	(2)	nil is the empty set and means the condition is always false.
 
-	(3)	(0, math.huge, constant, 0, 0) means the condition has a constant value.
+	(3)	(0, INFINITY, constant, 0, 0) means the condition has a constant value.
 
 	(4)	(start, ending, ending - start, start, -1) means the condition has a
 		value of f(t) = ending - t, at time t between start and ending.  This
@@ -48,6 +48,7 @@ local OvaleState = nil
 
 local type = type
 local wipe = table.wipe
+local INFINITY = math.huge
 
 -- Table of script conditions.
 local self_condition = {}
@@ -153,11 +154,11 @@ end
 OvaleCondition.TestBoolean = function(a, yesno)
 	if not yesno or yesno == "yes" then
 		if a then
-			return 0, math.huge
+			return 0, INFINITY
 		end
 	else
 		if not a then
-			return 0, math.huge
+			return 0, INFINITY
 		end
 	end
 	return nil
@@ -177,13 +178,13 @@ OvaleCondition.TestValue = function(start, ending, value, origin, rate, comparat
 	end
 
 	start = start or 0
-	ending = ending or math.huge
+	ending = ending or INFINITY
 
 	if not comparator then
 		if start < ending then
 			return start, ending, value, origin, rate
 		else
-			return 0, math.huge, 0, 0, 0
+			return 0, INFINITY, 0, 0, 0
 		end
 	elseif not OvaleCondition.COMPARATOR[comparator] then
 		Ovale:Errorf("unknown comparator %s", comparator)
@@ -210,13 +211,13 @@ OvaleCondition.TestValue = function(start, ending, value, origin, rate, comparat
 			or (comparator == "more" and rate > 0) then
 		local t = (limit - value)/rate + origin
 		start = (start > t) and start or t
-		return start, math.huge
+		return start, INFINITY
 	end
 	return nil
 end
 
 OvaleCondition.Compare = function(value, comparator, limit)
-	return OvaleCondition.TestValue(0, math.huge, value, 0, 0, comparator, limit)
+	return OvaleCondition.TestValue(0, INFINITY, value, 0, 0, comparator, limit)
 end
 --</public-static-methods>
 

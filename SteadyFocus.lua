@@ -36,6 +36,7 @@ local OvaleSpellBook = nil
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
+local INFINITY = math.huge
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -81,7 +82,7 @@ OvaleSteadyFocus.spellId = 177667
 OvaleSteadyFocus.start = 0
 OvaleSteadyFocus.start = 0
 OvaleSteadyFocus.ending = 0
-OvaleSteadyFocus.duration = math.huge
+OvaleSteadyFocus.duration = INFINITY
 OvaleSteadyFocus.stacks = 0
 --</public-static-properties>
 

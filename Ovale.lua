@@ -4,8 +4,11 @@
     See the file LICENSE.txt for copying permission.
 --]]----------------------------------------------------------------------
 
-local OVALE, addonTable = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(addonTable, OVALE, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
+local OVALE, Ovale = ...
+Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, OVALE, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
+
+-- Export "Ovale" symbol to global namespace.
+_G["Ovale"] = Ovale
 
 --<private-static-properties>
 local AceGUI = LibStub("AceGUI-3.0")

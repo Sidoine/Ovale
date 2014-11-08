@@ -53,6 +53,7 @@ local API_UnitAura = UnitAura
 local API_UnitGUID = UnitGUID
 local API_UnitHealth = UnitHealth
 local API_UnitHealthMax = UnitHealthMax
+local INFINITY = math.huge
 local SCHOOL_MASK_ARCANE = SCHOOL_MASK_ARCANE
 local SCHOOL_MASK_FIRE = SCHOOL_MASK_FIRE
 local SCHOOL_MASK_FROST = SCHOOL_MASK_FROST
@@ -508,8 +509,8 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 	-- UnitAura() can return zero count for auras that are present.
 	count = (count and count > 0) and count or 1
 	-- "Zero" or nil duration and expiration actually mean the aura never expires.
-	duration = (duration and duration > 0) and duration or math.huge
-	expirationTime = (expirationTime and expirationTime > 0) and expirationTime or math.huge
+	duration = (duration and duration > 0) and duration or INFINITY
+	expirationTime = (expirationTime and expirationTime > 0) and expirationTime or INFINITY
 
 	local aura = GetAura(self.aura, guid, auraId, casterGUID)
 	local auraIsActive
@@ -542,7 +543,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		aura.name = name
 		aura.duration = duration
 		aura.ending = expirationTime
-		if duration < math.huge and expirationTime < math.huge then
+		if duration < INFINITY and expirationTime < INFINITY then
 			aura.start = expirationTime - duration
 		else
 			aura.start = atTime
@@ -1188,7 +1189,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						aura = auraFound
 					else
 						-- Add an aura in the simulator and copy the existing aura information over.
-						aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, math.huge)
+						aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, INFINITY)
 						for k, v in pairs(auraFound) do
 							aura[k] = v
 						end
@@ -1266,7 +1267,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						-- Spellcast causes a new aura.
 						Ovale:Logf("New aura %d at %f on %s", auraId, atTime, guid)
 						-- Add an aura in the simulator and copy the existing aura information over.
-						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, math.huge)
+						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, INFINITY)
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
 						aura.stacks = stacks
 						-- Set start and duration for aura.
@@ -1330,7 +1331,7 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	aura.filter = filter
 	aura.mine = (casterGUID == self_guid)
 	aura.start = start or 0
-	aura.ending = ending or math.huge
+	aura.ending = ending or INFINITY
 	aura.duration = ending - start
 	aura.gain = aura.start
 	aura.stacks = 1
@@ -1351,7 +1352,7 @@ statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, at
 			aura = auraFound
 		else
 			-- Add an aura in the simulator and copy the existing aura information over.
-			aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, math.huge)
+			aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, INFINITY)
 			for k, v in pairs(auraFound) do
 				aura[k] = v
 			end
@@ -1372,7 +1373,7 @@ end
 statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filter)
 	local count = 0
 	local guid = OvaleGUID:GetGUID(unitId)
-	local start, ending = math.huge, 0
+	local start, ending = INFINITY, 0
 
 	-- Loop through auras not kept in the simulator that match the criteria.
 	if OvaleAura.aura[guid] then
@@ -1449,8 +1450,8 @@ do
 		minStacks = minStacks or 1
 		count = 0
 		stacks = 0
-		startChangeCount, endingChangeCount = math.huge, math.huge
-		startFirst, endingLast = math.huge, 0
+		startChangeCount, endingChangeCount = INFINITY, INFINITY
+		startFirst, endingLast = INFINITY, 0
 		local excludeGUID = excludeUnitId and OvaleGUID:GetGUID(excludeUnitId) or nil
 
 		-- Loop through auras not kept in the simulator that match the criteria.

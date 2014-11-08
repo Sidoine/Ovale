@@ -17,6 +17,7 @@ local format = string.format
 local gmatch = string.gmatch
 local type = type
 local pairs = pairs
+local INFINITY = math.huge
 
 -- Registered "run-time requirement" handlers: self_requirement[name] = handler
 -- Handler is invoked as handler(state, name, tokenIterator, target).
@@ -495,7 +496,7 @@ end
 -- Returns the base duration of an aura.
 function OvaleData:GetBaseDuration(auraId, spellcast)
 	local combo, holy = spellcast.combo, spellcast.holy
-	local duration = math.huge
+	local duration = INFINITY
 	local si = OvaleData.spellInfo[auraId]
 	if si and si.duration then
 		duration = si.duration

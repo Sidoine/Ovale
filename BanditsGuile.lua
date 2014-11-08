@@ -37,6 +37,7 @@ local OvaleAura = nil
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
+local INFINITY = math.huge
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -60,7 +61,7 @@ OvaleBanditsGuile.spellName = "Bandit's Guile"
 -- Bandit's Guile spell ID from spellbook; re-used as the aura ID of the hidden, stacking buff.
 OvaleBanditsGuile.spellId = BANDITS_GUILE
 OvaleBanditsGuile.start = 0
-OvaleBanditsGuile.ending = math.huge
+OvaleBanditsGuile.ending = INFINITY
 OvaleBanditsGuile.duration = 15
 OvaleBanditsGuile.stacks = 0
 --</public-static-properties>

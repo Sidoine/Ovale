@@ -23,6 +23,7 @@ local pairs = pairs
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
+local INFINITY = math.huge
 local INVSLOT_TRINKET1 = INVSLOT_TRINKET1
 local INVSLOT_TRINKET2 = INVSLOT_TRINKET2
 
@@ -168,8 +169,8 @@ function OvalePassiveAura:UpdateIncreasedCritEffectMetaGem()
 	if spellId then
 		local name = AURA_NAME[spellId]
 		local start = now
-		local duration = math.huge
-		local ending = math.huge
+		local duration = INFINITY
+		local ending = INFINITY
 		local stacks = 1
 		local value = INCREASED_CRIT_EFFECT[spellId]
 		OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value, nil, nil)
@@ -203,8 +204,8 @@ function OvalePassiveAura:UpdateAmplification()
 	if hasAmplification then
 		local name = AURA_NAME[spellId]
 		local start = now
-		local duration = math.huge
-		local ending = math.huge
+		local duration = INFINITY
+		local ending = INFINITY
 		local stacks = 1
 		local value1 = critDamageIncrease
 		local value2 = statMultiplier
@@ -243,8 +244,8 @@ function OvalePassiveAura:UpdateReadiness()
 		if hasReadiness then
 			local name = AURA_NAME[spellId]
 			local start = now
-			local duration = math.huge
-			local ending = math.huge
+			local duration = INFINITY
+			local ending = INFINITY
 			local stacks = 1
 			local value = 1 / (1 + cdRecoveryRateIncrease / 100)
 			OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value, nil, nil)

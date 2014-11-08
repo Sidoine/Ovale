@@ -20,6 +20,8 @@ local strfind = string.find
 local strsub = string.sub
 local tostring = tostring
 local API_GetTime = GetTime
+local API_PlaySoundFile = PlaySoundFile
+local INFINITY = math.huge
 
 -- Threshold for resetting the cooldown animation.
 -- This should be more than OvaleFuture's SIMULATOR_LAG.
@@ -45,7 +47,7 @@ local function SetValue(self, value, actionTexture)
 		self.value = value
 		if value < 10 then
 			self.remains:SetFormattedText("%.1f", value)
-		elseif value == math.huge then
+		elseif value == INFINITY then
 			self.remains:SetFormattedText("inf")
 		else
 			self.remains:SetFormattedText("%d", value)
@@ -280,7 +282,7 @@ function OvaleIcon_OnEnter(self)
 				if self.actionType == "spell" then
 					actionHelp = OvaleSpellBook:GetSpellName(self.actionId)
 				elseif self.actionType == "value" then
-					actionHelp = (self.value < math.huge) and tostring(self.value) or "infinity"
+					actionHelp = (self.value < INFINITY) and tostring(self.value) or "infinity"
 				else
 					actionHelp = format("%s %s", self.actionType, tostring(self.actionId))
 				end

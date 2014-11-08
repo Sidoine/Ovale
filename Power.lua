@@ -33,6 +33,7 @@ local API_GetPowerRegen = GetPowerRegen
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitPowerType = UnitPowerType
+local INFINITY = math.huge
 
 -- Profiling set-up.
 local Profiler = Ovale.Profiler
@@ -707,7 +708,7 @@ statePrototype.TimeToPower = function(state, spellId, target, powerType)
 			if powerRate > 0 then
 				seconds = (cost - power) / powerRate
 			else
-				seconds = math.huge
+				seconds = INFINITY
 			end
 		end
 	end

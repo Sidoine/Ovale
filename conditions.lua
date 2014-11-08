@@ -61,6 +61,7 @@ local API_UnitName = UnitName
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitStagger = UnitStagger
+local INFINITY = math.huge
 
 local Compare = OvaleCondition.Compare
 local ParseCondition = OvaleCondition.ParseCondition
@@ -133,7 +134,7 @@ do
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local value = 0
 		Ovale:OneTimeMessage("Warning: 'AfterWhiteHit() is not implemented.")
-		return TestValue(0, math.huge, value, state.currentTime, -1, comparator, limit)
+		return TestValue(0, INFINITY, value, state.currentTime, -1, comparator, limit)
 	end
 
 	--OvaleCondition:RegisterCondition("afterwhitehit", false, AfterWhiteHit)
@@ -154,7 +155,7 @@ do
 	local function ArmorSetBonus(condition, state)
 		local armorSet, count = condition[1], condition[2]
 		local value = (OvaleEquipment:GetArmorSetCount(armorSet) >= count) and 1 or 0
-		return 0, math.huge, value, 0, 0
+		return 0, INFINITY, value, 0, 0
 	end
 
 	OvaleCondition:RegisterCondition("armorsetbonus", false, ArmorSetBonus)
@@ -313,7 +314,7 @@ do
 		if aura then
 			local gain, cooldownEnding = aura.gain, aura.cooldownEnding
 			cooldownEnding = aura.cooldownEnding or 0
-			return TestValue(gain, math.huge, 0, cooldownEnding, -1, comparator, limit)
+			return TestValue(gain, INFINITY, 0, cooldownEnding, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -348,7 +349,7 @@ do
 		local excludeUnitId = (condition.excludeTarget == 1) and state.defaultTarget or nil
 
 		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, excludeUnitId)
-		if count > 0 and startChangeCount < math.huge then
+		if count > 0 and startChangeCount < INFINITY then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)
 			local start, ending = startFirst, endingLast
@@ -424,7 +425,7 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local gain, start, ending, direction = aura.gain, aura.start, aura.ending, aura.direction
-			return TestValue(gain, math.huge, direction, gain, 0, comparator, limit)
+			return TestValue(gain, INFINITY, direction, gain, 0, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -495,12 +496,12 @@ do
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			seconds = GetHastedTime(seconds, condition.haste)
 			if ending - seconds <= gain then
-				return gain, math.huge
+				return gain, INFINITY
 			else
-				return ending - seconds, math.huge
+				return ending - seconds, INFINITY
 			end
 		end
-		return 0, math.huge
+		return 0, INFINITY
 	end
 
 	OvaleCondition:RegisterCondition("buffexpires", false, BuffExpires)
@@ -571,7 +572,7 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local gain = aura.gain or 0
-			return TestValue(gain, math.huge, 0, gain, 1, comparator, limit)
+			return TestValue(gain, INFINITY, 0, gain, 1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -606,7 +607,7 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
-			return TestValue(gain, math.huge, 0, ending, -1, comparator, limit)
+			return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -645,7 +646,7 @@ do
 		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, excludeUnitId)
 		if count > 0 then
 			local start, ending = startFirst, endingLast
-			return TestValue(start, math.huge, 0, ending, -1, comparator, limit)
+			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -1000,7 +1001,7 @@ do
 	local function CanCast(condition, state)
 		local spellId = condition[1]
 		local start, duration = state:GetSpellCooldown(spellId)
-		return start + duration, math.huge
+		return start + duration, INFINITY
 	end
 
 	OvaleCondition:RegisterCondition("cancast", true, CanCast)
@@ -1139,7 +1140,7 @@ do
 				return nil
 			end
 		end
-		return 0, math.huge
+		return 0, INFINITY
 	end
 
 	--- Test if all of the listed checkboxes are on.
@@ -1159,7 +1160,7 @@ do
 				return nil
 			end
 		end
-		return 0, math.huge
+		return 0, INFINITY
 	end
 
 	OvaleCondition:RegisterCondition("checkboxoff", false, CheckBoxOff)
@@ -1327,7 +1328,7 @@ do
 		if lookupTable then
 			for _, name in ipairs(condition) do
 				if creatureType == lookupTable[name] then
-					return 0, math.huge
+					return 0, INFINITY
 				end
 			end
 		end
@@ -1536,7 +1537,7 @@ do
 		end
 		if aura then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
-			return TestValue(gain, math.huge, 0, ending, -1, comparator, limit)
+			return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -2102,7 +2103,7 @@ do
 		if health == 0 then
 			timeToDie = 0
 		elseif maxHealth <= 5 then
-			timeToDie = math.huge
+			timeToDie = INFINITY
 		else
 			local now = floor(currentTime)
 			if (not lastTTDTime[unitId] or lastTTDTime[unitId] < now) and lastTTDguid[unitId] then
@@ -2125,11 +2126,11 @@ do
 			if dps and dps > 0 then
 				timeToDie = health / dps
 			else
-				timeToDie = math.huge
+				timeToDie = INFINITY
 			end
 		end
 		-- Clamp time to die at a finite number.
-		if timeToDie == math.huge then
+		if timeToDie == INFINITY then
 			-- Return time to die in the far-off future (one week).
 			timeToDie = 3600 * 24 * 7
 		end
@@ -2161,7 +2162,7 @@ do
 			return Compare(0, comparator, limit)
 		end
 		local value, origin, rate = health, now, -1 * health / timeToDie
-		local start, ending = now, math.huge
+		local start, ending = now, INFINITY
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -2192,7 +2193,7 @@ do
 		end
 		local missing = maxHealth - health
 		local value, origin, rate = missing, now, health / timeToDie
-		local start, ending = now, math.huge
+		local start, ending = now, INFINITY
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -2225,7 +2226,7 @@ do
 		end
 		local healthPercent = health / maxHealth * 100
 		local value, origin, rate = healthPercent, now, -1 * healthPercent / timeToDie
-		local start, ending = now, math.huge
+		local start, ending = now, INFINITY
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
 	end
 
@@ -3090,7 +3091,7 @@ do
 	local function List(condition, state)
 		local name, value = condition[1], condition[2]
 		if name and Ovale:GetListValue(name) == value then
-			return 0, math.huge
+			return 0, INFINITY
 		end
 		return nil
 	end
@@ -3185,7 +3186,7 @@ do
 		local target = ParseCondition(condition, state)
 		if target == "player" then
 			local value, origin, rate = state[powerType], state.currentTime, state.powerRate[powerType]
-			local start, ending = state.currentTime, math.huge
+			local start, ending = state.currentTime, INFINITY
 			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		else
 			local powerInfo = OvalePower.POWER_INFO[powerType]
@@ -3202,7 +3203,7 @@ do
 			local powerMax = OvalePower.maxPower[powerType] or 0
 			if powerMax > 0 then
 				local value, origin, rate = powerMax - state[powerType], state.currentTime, -1 * state.powerRate[powerType]
-				local start, ending = state.currentTime, math.huge
+				local start, ending = state.currentTime, INFINITY
 				return TestValue(start, ending, value, origin, rate, comparator, limit)
 			end
 		else
@@ -3226,7 +3227,7 @@ do
 			if powerMax > 0 then
 				local conversion = 100 / powerMax
 				local value, origin, rate = state[powerType] * conversion, state.currentTime, state.powerRate[powerType] * conversion
-				local start, ending = state.currentTime, math.huge
+				local start, ending = state.currentTime, INFINITY
 				return TestValue(start, ending, value, origin, rate, comparator, limit)
 			end
 		else
@@ -3272,7 +3273,7 @@ do
 		end
 		if primaryPowerType then
 			local value, origin, rate = state[primaryPowerType], state.currentTime, state.powerRate[primaryPowerType]
-			local start, ending = state.currentTime, math.huge
+			local start, ending = state.currentTime, INFINITY
 			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
@@ -4136,10 +4137,10 @@ do
 	local function Rune(condition, state)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local count, startCooldown, endCooldown = state:RuneCount(name)
-		if startCooldown < math.huge then
+		if startCooldown < INFINITY then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
-			local start, ending = startCooldown, math.huge
+			local start, ending = startCooldown, INFINITY
 			return TestValue(start, ending, count, origin, rate, comparator, limit)
 		end
 		return Compare(count, comparator, limit)
@@ -4161,10 +4162,10 @@ do
 	local function DeathRune(condition, state)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local count, startCooldown, endCooldown = state:DeathRuneCount(name)
-		if startCooldown < math.huge then
+		if startCooldown < INFINITY then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
-			local start, ending = startCooldown, math.huge
+			local start, ending = startCooldown, INFINITY
 			return TestValue(start, ending, count, origin, rate, comparator, limit)
 		end
 		return Compare(count, comparator, limit)
@@ -4187,7 +4188,7 @@ do
 	local function RuneCount(condition, state)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local count, startCooldown, endCooldown = state:RuneCount(name)
-		if startCooldown < math.huge then
+		if startCooldown < INFINITY then
 			local start, ending = startCooldown, endCooldown
 			return TestValue(start, ending, count, start, 0, comparator, limit)
 		end
@@ -4226,7 +4227,7 @@ do
 				end
 			end
 			if start then
-				return TestValue(0, math.huge, ending - start, start, -1, comparator, limit)
+				return TestValue(0, INFINITY, ending - start, start, -1, comparator, limit)
 			end
 		end
 		return Compare(0, comparator, limit)
@@ -4277,7 +4278,7 @@ do
 	local function Runes(condition, state)
 		local blood, unholy, frost, death = ParseRuneCondition(condition, state)
 		local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
-		return state.currentTime + seconds, math.huge
+		return state.currentTime + seconds, INFINITY
 	end
 
 	--- Get the number of seconds before the rune conditions are met.
@@ -4643,7 +4644,7 @@ do
 		charges = charges or 0
 		maxCharges = maxCharges or 1
 		if condition.count == 0 and charges < maxCharges then
-			return TestValue(state.currentTime, math.huge, charges + 1, start + duration, 1, comparator, limit)
+			return TestValue(state.currentTime, INFINITY, charges + 1, start + duration, 1, comparator, limit)
 		end
 		return Compare(charges, comparator, limit)
 	end
@@ -4671,7 +4672,7 @@ do
 		local comparator, limit
 		local usable = (condition.usable == 1)
 		local target = ParseCondition(condition, state, "target")
-		local atTime = math.huge
+		local atTime = INFINITY
 		for i = 1, #condition do
 			local spellId = condition[1]
 			if OvaleCondition.COMPARATOR[spellId] then
@@ -4904,7 +4905,7 @@ do
 			start = 0
 		end
 		Ovale:OneTimeMessage("Warning: 'LastSwing() is not implemented.")
-		return TestValue(start, math.huge, 0, start, 1, comparator, limit)
+		return TestValue(start, INFINITY, 0, start, 1, comparator, limit)
 	end
 
 	--- Get the time in seconds until the player's next melee swing (white attack).
@@ -5061,7 +5062,7 @@ do
 		if tickTime and tickTime > 0 then
 			return Compare(tickTime, comparator, limit)
 		end
-		return Compare(math.huge, comparator, limit)
+		return Compare(INFINITY, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("ticktime", false, TickTime)
@@ -5094,7 +5095,7 @@ do
 		if aura then
 			local gain, start, ending, tick = aura.gain, aura.start, aura.ending, aura.tick
 			if tick and tick > 0 then
-				return TestValue(gain, math.huge, 1, ending, -1/tick, comparator, limit)
+				return TestValue(gain, INFINITY, 1, ending, -1/tick, comparator, limit)
 			end
 		end
 		return Compare(0, comparator, limit)
@@ -5119,7 +5120,7 @@ do
 		local comparator, limit = condition[1], condition[2]
 		if state.inCombat then
 			local start = state.combatStartTime
-			return TestValue(start, math.huge, 0, start, 1, comparator, limit)
+			return TestValue(start, INFINITY, 0, start, 1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -5142,7 +5143,7 @@ do
 	local function TimeSincePreviousSpell(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local t = state:TimeOfLastCast(spellId)
-		return TestValue(0, math.huge, t, 0, 1, comparator, limit)
+		return TestValue(0, INFINITY, t, 0, 1, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("timesincepreviousspell", false, TimeSincePreviousSpell)
@@ -5177,7 +5178,7 @@ do
 			if power == level then
 				return Compare(0, comparator, limit)
 			end
-			return Compare(math.huge, comparator, limit)
+			return Compare(INFINITY, comparator, limit)
 		else
 			local t = (level - power) / powerRegen
 			if t > 0 then
@@ -5276,10 +5277,10 @@ do
 
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
-		elseif seconds < math.huge then
+		elseif seconds < INFINITY then
 			return TestValue(0, state.currentTime + seconds, seconds, state.currentTime, -1, comparator, limit)
-		else -- if seconds == math.huge then
-			return Compare(math.huge, comparator, limit)
+		else -- if seconds == INFINITY then
+			return Compare(INFINITY, comparator, limit)
 		end
 	end
 
@@ -5363,10 +5364,10 @@ do
 		end
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
-		elseif seconds < math.huge then
+		elseif seconds < INFINITY then
 			return TestValue(0, state.currentTime + seconds, seconds, state.currentTime, -1, comparator, limit)
-		else -- if seconds == math.huge then
-			return Compare(math.huge, comparator, limit)
+		else -- if seconds == INFINITY then
+			return Compare(INFINITY, comparator, limit)
 		end
 	end
 
@@ -5441,9 +5442,9 @@ do
 		end
 		local haveTotem, name, startTime, duration = API_GetTotemInfo(totemId)
 		if haveTotem and startTime and (not condition.totem or OvaleSpellBook:GetSpellName(condition.totem) == name) then
-			return startTime + duration - seconds, math.huge
+			return startTime + duration - seconds, INFINITY
 		end
-		return 0, math.huge
+		return 0, INFINITY
 	end
 
 	--- Test if the totem for shamans, the ghoul for death knights, or the statue for monks is present.
@@ -5564,7 +5565,7 @@ do
 	-- @return A boolean value.
 
 	local function True(condition, state)
-		return 0, math.huge
+		return 0, INFINITY
 	end
 
 	OvaleCondition:RegisterCondition("true", false, True)
@@ -5626,15 +5627,15 @@ do
 		if hand == "mainhand" or hand == "main" then
 			if hasMainHandEnchant then
 				mainHandExpiration = mainHandExpiration / 1000
-				return now + mainHandExpiration - seconds, math.huge
+				return now + mainHandExpiration - seconds, INFINITY
 			end
 		elseif hand == "offhand" or hand == "off" then
 			if hasOffHandEnchant then
 				offHandExpiration = offHandExpiration / 1000
-				return now + offHandExpiration - seconds, math.huge
+				return now + offHandExpiration - seconds, INFINITY
 			end
 		end
-		return 0, math.huge
+		return 0, INFINITY
 	end
 
 	OvaleCondition:RegisterCondition("weaponenchantexpires", false, WeaponEnchantExpires)
