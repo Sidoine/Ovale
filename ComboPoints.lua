@@ -109,24 +109,24 @@ end
 
 -- Manage spellcast.combo information.
 local function SaveToSpellcast(spellcast)
-	if spellcast.spellId then
-		local si = OvaleData.spellInfo[spellcast.spellId]
+	local spellId = spellcast.spellId
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
 		if si.combo == "finisher" then
-			local cost
-			-- If a buff is present that removes the combo point cost of the spell,
-			-- then treat it as a maximum combo-point finisher.
-			if si.buff_combo_none then
-				if OvaleAura:GetAura("player", si.buff_combo_none) then
-					cost = MAX_COMBO_POINTS
-				end
-			end
-			if not cost then
+			local target = OvaleGUID:GetUnitId(spellcast.target)
+			local combo = OvaleData:GetSpellInfoProperty(spellId, "combo", target)
+			if combo == "finisher" then
 				local min_combo = si.min_combo or si.mincombo or 1
 				if OvaleComboPoints.combo >= min_combo then
-					cost = OvaleComboPoints.combo
+					combo = OvaleComboPoints.combo
+				else
+					combo = min_combo
 				end
+			elseif combo == 0 then
+				-- If this is a finisher that costs no combo points, then treat it as a maximum combo-point finisher.
+				combo = MAX_COMBO_POINTS
 			end
-			spellcast.combo = cost
+			spellcast.combo = combo
 		end
 	end
 end
@@ -226,10 +226,12 @@ end
 function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID, success)
 	Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "%s (%f): Spell %d finished (%s) on %s", event, atTime, spellId, success, targetGUID)
 	local si = OvaleData.spellInfo[spellId]
-	if si and si.combo and (success == "hit" or success == "critical") then
-		if si.combo == "finisher" then
+	if si and si.combo == "finisher" and (success == "hit" or success == "critical") then
+		local target = OvaleGUID:GetUnitId(targetGUID)
+		local combo = OvaleData:GetSpellInfoProperty(spellId, "combo", target)
+		if combo == "finisher" then
 			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Spell %d hit and consumed all combo points.", spellId)
-			AddPendingComboEvent(atTime, spellId, targetGUID, "finisher", si.combo)
+			AddPendingComboEvent(atTime, spellId, targetGUID, "finisher", combo)
 			if self_hasRuthlessness and self.combo == MAX_COMBO_POINTS then
 				-- Ruthlessness grants a 20% chance to grant a combo point for each combo point spent on a finishing move.
 				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Spell %d has 100% chance to grant an extra combo point from Ruthlessness.", spellId)
@@ -332,7 +334,8 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 	profiler.Start("OvaleComboPoints_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
-		local cost = state:ComboPointCost(spellId)
+		local target = OvaleGUID:GetUnitId(targetGUID)
+		local cost = state:ComboPointCost(spellId, target)
 		local power = state.combo
 		power = power - cost
 		-- Clamp combo points to lower and upper limits.
@@ -391,12 +394,12 @@ end
 
 --<state-methods>
 -- Return the number of combo points required to cast the given spell.
-statePrototype.ComboPointCost = function(state, spellId)
+statePrototype.ComboPointCost = function(state, spellId, target)
 	profiler.Start("OvaleComboPoints_state_ComboPointCost")
 	local spellCost = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
-		local cost = si.combo
+		local cost = state:GetSpellInfoProperty(spellId, "combo", target)
 		--[[
 			combo == 0 means the that spell uses no resources.
 			combo > 0 means that the spell generates combo points.
@@ -431,15 +434,6 @@ statePrototype.ComboPointCost = function(state, spellId)
 				end
 			end
 			cost = -1 * cost
-		end
-
-		local buffNoCost = si.buff_combo_none
-		if buffNoCost then
-			-- "buff_combo_none" is the spell ID of the buff that makes casting the spell cost zero combo points.
-			local aura = state:GetAura("player", buffNoCost)
-			if state:IsActiveAura(aura) then
-				cost = 0
-			end
 		end
 		spellCost = cost
 	end

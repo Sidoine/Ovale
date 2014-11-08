@@ -23,6 +23,7 @@ local OvaleScore = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
+local gmatch = string.gmatch
 local ipairs = ipairs
 local next = next
 local pairs = pairs
@@ -217,8 +218,9 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 	else
 		spellcast.target = API_UnitGUID("target")
 	end
-	TracePrintf(spellId, "    AddSpellToQueue: %s (%d), lineId=%d, startTime=%f, endTime=%f, target=%s",
-		spellName, spellId, lineId, startTime, endTime, spellcast.target)
+	local target = OvaleGUID:GetUnitId(spellcast.target)
+	TracePrintf(spellId, "    AddSpellToQueue: %s (%d), lineId=%d, startTime=%f, endTime=%f, target=%s (%s)",
+		spellName, spellId, lineId, startTime, endTime, spellcast.target, target)
 
 	-- Snapshot the current stats for the spellcast.
 	spellcast.snapshot = OvalePaperDoll:GetSnapshot()
@@ -241,9 +243,12 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 			if not spellcast.auraId and si.aura.target then
 				for filter, auraList in pairs(si.aura.target) do
 					for auraId, spellData in pairs(auraList) do
-						if spellData and (spellData == "refresh" or (type(spellData) == "number" and spellData > 0)) then
+						local tokenIterator = gmatch(spellData, "[^,]+")
+						local value = tokenIterator()
+						local verified = OvaleData:CheckRequirements(tokenIterator, target)
+						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
-							if spellcast.target ~= self_guid then
+							if target ~= "player" then
 								spellcast.removeOnAuraSuccess = true
 							end
 							break
@@ -254,7 +259,10 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 			if not spellcast.auraId and si.aura.player then
 				for filter, auraList in pairs(si.aura.player) do
 					for auraId, spellData in pairs(auraList) do
-						if spellData and (spellData == "refresh" or (type(spellData) == "number" and spellData > 0)) then
+						local tokenIterator = gmatch(spellData, "[^,]+")
+						local value = tokenIterator()
+						local verified = OvaleData:CheckRequirements(tokenIterator, target)
+						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							break
 						end
@@ -265,11 +273,17 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 		-- Increase or reset any counters used by the Counter() condition.
 		if si.resetcounter then
-			self.counter[si.resetcounter] = 0
+			local resetcounter = OvaleData:GetSpellInfoProperty(spellId, "resetcounter", target)
+			if resetcounter then
+				self.counter[resetcounter] = 0
+			end
 		end
 		if si.inccounter then
-			local prev = self.counter[si.inccounter] or 0
-			self.counter[si.inccounter] = prev + 1
+			local inccounter = OvaleData:GetSpellInfoProperty(spellId, "inccounter", target)
+			if inccounter then
+				local oldValue = self.counter[inccounter] or 0
+				self.counter[inccounter] = oldValue + 1
+			end
 		end
 	end
 
@@ -792,14 +806,19 @@ function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Increment and reset spell counters.
+		local target = OvaleGUID:GetUnitId(targetGUID)
 		if si.inccounter then
-			local id = si.inccounter
-			local value = state.counter[id] and state.counter[id] or 0
-			state.counter[id] = value + 1
+			local id = state:GetSpellInfoProperty(spellId, "inccounter", target)
+			if id then
+				local value = state.counter[id] and state.counter[id] or 0
+				state.counter[id] = value + 1
+			end
 		end
 		if si.resetcounter then
-			local id = si.resetcounter
-			state.counter[id] = 0
+			local id = state:GetSpellInfoProperty(spellId, "resetcounter", target)
+			if id then
+				state.counter[id] = 0
+			end
 		end
 	end
 	profiler.Stop("OvaleFuture_ApplySpellStartCast")
@@ -837,8 +856,9 @@ statePrototype.ApplySpell = function(state, ...)
 	if spellId and targetGUID then
 		-- Handle missing start/end/next cast times.
 		if not startCast or not endCast or not nextCast then
+			local target = OvaleGUID:GetUnitId(targetGUID)
 			local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-			local gcd = state:GetGCD(spellId)
+			local gcd = state:GetGCD(spellId, target)
 			startCast = startCast or state.nextCast
 			endCast = endCast or (startCast + castTime)
 			nextCast = (castTime > gcd) and endCast or (startCast + gcd)

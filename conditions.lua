@@ -1032,6 +1032,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @see CastTime
@@ -1041,8 +1044,9 @@ do
 
 	local function ExecuteTime(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, state, "target")
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-		local gcd = state:GetGCD()
+		local gcd = state:GetGCD(nil, target)
 		local t = (castTime > gcd) and castTime or gcd
 		return Compare(t, comparator, limit)
 	end
@@ -1365,14 +1369,14 @@ do
 
 	local function CritDamage(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local value = ComputeParameter(spellId, "damage", state)
 		if not value then
 			value = GetDamage(spellId, state)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
-		local si = OvaleData:GetSpellInfo(spellId)
-		if si and si.physical then
+		local physical = state:GetSpellInfoProperty(spellId, "physical", target)
+		if physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 
@@ -1421,14 +1425,14 @@ do
 
 	local function Damage(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local value = ComputeParameter(spellId, "damage", state)
 		if not value then
 			value = GetDamage(spellId, state)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
-		local si = OvaleData:GetSpellInfo(spellId)
-		if si and si.physical then
+		local physical = state:GetSpellInfoProperty(spellId, "physical", target)
+		if physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		return Compare(value, comparator, limit)
@@ -1798,6 +1802,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The amount of focus.
 	-- @return A boolean value for the result of the comparison.
 
@@ -1805,12 +1812,13 @@ do
 
 	local function FocusCastingRegen(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, state, "target")
 		local regenRate = state.powerRate.focus
 		local power = 0
 
 		-- Get the "execute time" of the spell (smaller of GCD or the cast time).
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-		local gcd = state:GetGCD()
+		local gcd = state:GetGCD(nil, target)
 		local castSeconds = (castTime > gcd) and castTime or gcd
 		power = power + regenRate * castSeconds
 
@@ -1838,6 +1846,9 @@ do
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the previous spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
@@ -1846,7 +1857,8 @@ do
 
 	local function GCD(condition, state)
 		local comparator, limit = condition[1], condition[2]
-		local value = state:GetGCD()
+		local target = ParseCondition(condition, state, "target")
+		local value = state:GetGCD(nil, target)
 		return Compare(value, comparator, limit)
 	end
 
@@ -2696,7 +2708,7 @@ do
 
 	local function LastComboPoints(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local guid = OvaleGUID:GetGUID(target)
 		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, "combo") or 0
 		return Compare(value, comparator, limit)
@@ -2754,7 +2766,7 @@ do
 
 	local function LastDamageMultiplier(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local guid = OvaleGUID:GetGUID(target)
 		local bdm = OvaleFuture:GetLastSpellInfo(guid, spellId, "baseDamageMultiplier") or 1
 		local dm = OvaleFuture:GetLastSpellInfo(guid, spellId, "damageMultiplier") or 1
@@ -2790,7 +2802,7 @@ do
 
 	local function LastEstimatedDamage(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local value = ComputeParameter(spellId, "lastEstimatedDamage", state)
 		if not value then
 			local guid = OvaleGUID:GetGUID(target)
@@ -2804,8 +2816,8 @@ do
 			value = OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
 		end
 		-- Reduce by armor damage reduction for physical attacks.
-		local si = OvaleData:GetSpellInfo(spellId)
-		if si and si.physical then
+		local physical = state:GetSpellInfoProperty(spellId, "physical", target)
+		if physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		return Compare(value, comparator, limit)
@@ -2819,7 +2831,7 @@ do
 	-- Return the value of the stat from the snapshot at the time the spell was cast.
 	local function LastSnapshot(statName, defaultValue, condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local guid = OvaleGUID:GetGUID(target)
 		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
 		value = value or defaultValue
@@ -3883,8 +3895,9 @@ do
 	-- Return the amount of power of the given power type required to cast the given spell.
 	local function PowerCost(powerType, condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, state, "target")
 		local maxCost = (condition.max == 1)
-		local value = state:PowerCost(spellId, powerType, maxCost) or 0
+		local value = state:PowerCost(spellId, powerType, target, maxCost) or 0
 		return Compare(value, comparator, limit)
 	end
 
@@ -3898,6 +3911,9 @@ do
 	-- @param max Optional. Set max=1 to return the maximum energy cost for the spell.
 	--     Defaults to max=0.
 	--     Valid values: 0, 1
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The amount of energy.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3914,6 +3930,9 @@ do
 	-- @param max Optional. Set max=1 to return the maximum focus cost for the spell.
 	--     Defaults to max=0.
 	--     Valid values: 0, 1
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The amount of focus.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3931,6 +3950,9 @@ do
 	-- @param max Optional. Set max=1 to return the maximum mana cost for the spell.
 	--     Defaults to max=0.
 	--     Valid values: 0, 1
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The amount of mana.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3947,6 +3969,9 @@ do
 	-- @param max Optional. Set max=1 to return the maximum rage cost for the spell.
 	--     Defaults to max=0.
 	--     Valid values: 0, 1
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The amount of rage.
 	-- @return A boolean value for the result of the comparison.
 
@@ -3963,6 +3988,9 @@ do
 	-- @param max Optional. Set max=1 to return the maximum runic power cost for the spell.
 	--     Defaults to max=0.
 	--     Valid values: 0, 1
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The amount of runic power.
 	-- @return A boolean value for the result of the comparison.
 
@@ -4642,7 +4670,7 @@ do
 	local function SpellCooldown(condition, state)
 		local comparator, limit
 		local usable = (condition.usable == 1)
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local atTime = math.huge
 		for i = 1, #condition do
 			local spellId = condition[1]
@@ -4676,15 +4704,15 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check for the spell. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
 	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
 	local function SpellCooldownDuration(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local duration = state:GetSpellCooldownDuration(spellId, state.currentTime, target)
 		return Compare(duration, comparator, limit)
 	end
@@ -4758,7 +4786,7 @@ do
 
 	local function SpellUsable(condition, state)
 		local spellId, yesno = condition[1], condition[2]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local boolean = state:IsUsableSpell(spellId, target)
 		return TestBoolean(boolean, yesno)
 	end
@@ -4995,7 +5023,7 @@ do
 
 	local function Threat(condition, state)
 		local comparator, limit = condition[1], condition[2]
-		local target = ParseCondition(condition, state, state.defaultTarget)
+		local target = ParseCondition(condition, state, "target")
 		local _, _, value = API_UnitDetailedThreatSituation("player", target)
 		return Compare(value, comparator, limit)
 	end
@@ -5239,11 +5267,12 @@ end
 do
 	local function TimeToPowerFor(powerType, condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, state, "target")
 		if not powerType then
 			local _, pt = OvalePower:PowerCost(spellId)
 			powerType = pt
 		end
-		local seconds = state:TimeToPower(spellId, powerType)
+		local seconds = state:TimeToPower(spellId, target, powerType)
 
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
@@ -5260,6 +5289,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @see TimeToEnergyFor, TimeToMaxEnergy
@@ -5293,11 +5325,15 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
 	local function TimeToSpell(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, state, "target")
 		local seconds = 0
 		-- Cooldown
 		do
@@ -5309,18 +5345,17 @@ do
 		end
 		-- Pooled resource.
 		do
-			local timeToPower = state:TimeToPower(spellId)
+			local timeToPower = state:TimeToPower(spellId, target)
 			if seconds < timeToPower then
 				seconds = timeToPower
 			end
 		end
 		-- Runes.
-		local si = OvaleData:GetSpellInfo(spellId)
-		if si.blood or si.unholy or si.frost or si.death then
-			local blood = tonumber(si.blood) or 0
-			local unholy = tonumber(si.unholy) or 0
-			local frost = tonumber(si.frost) or 0
-			local death = tonumber(si.death) or 0
+		local blood = state:GetSpellInfoProperty(spellId, "blood", target)
+		local unholy = state:GetSpellInfoProperty(spellId, "unholy", target)
+		local frost = state:GetSpellInfoProperty(spellId, "frost", target)
+		local death = state:GetSpellInfoProperty(spellId, "death", target)
+		if blood or unholy or frost or death then
 			local timeToRunes = state:GetRunesCooldown(blood, unholy, frost, death)
 			if seconds < timeToRunes then
 				seconds = timeToRunes
@@ -5501,6 +5536,9 @@ do
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
@@ -5509,9 +5547,10 @@ do
 
 	local function MaxTravelTime(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local target = ParseCondition(condition, state, "target")
 		local si = spellId and OvaleData.spellInfo[spellId]
 		-- TODO: Track average time in flight to target for the spell.
-		local value = si and si.max_travel_time or 1
+		local value = state:GetSpellInfoProperty(spellId, "max_travel_time", target) or 1
 		return Compare(value, comparator, limit)
 	end
 

@@ -271,19 +271,17 @@ function OvaleSpellFlash:IsSpellFlashEnabled()
 	return enabled
 end
 
-function OvaleSpellFlash:Flash(node, element, start, now)
+function OvaleSpellFlash:Flash(state, node, element, start, now)
 	-- SpellFlash settings.
 	local db = Ovale.db.profile.apparence.spellFlash
 	if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
 		-- Check that element is an action.
 		if element and element.type == "action" then
-			-- SpellInfo data if the action is a spell.
-			local si
+			local spellId, spellTarget
 			if element.lowername == "spell" then
-				local spellId = element.params[1]
-				si = OvaleData.spellInfo[spellId]
+				spellId = element.params[1]
+				spellTarget = element.params.target or state.defaultTarget
 			end
-
 			-- Flash color.
 			local color = COLORTABLE["white"]
 			local flash = element.params and element.params.flash
@@ -299,7 +297,8 @@ function OvaleSpellFlash:Flash(node, element, start, now)
 				-- Fall back to color based on the help set in the icon parameters.
 				color = FLASH_COLOR[iconHelp]
 				-- Adjust color if it's a "cd" ability that is showing an interrupt.
-				if si and si.interrupt == 1 and iconHelp == "cd" then
+				local interrupt = spellId and state:GetSpellInfoProperty(spellId, "interrupt", spellTarget)
+				if interrupt == 1 and iconHelp == "cd" then
 					color = colorInterrupt
 				end
 			end
@@ -308,7 +307,8 @@ function OvaleSpellFlash:Flash(node, element, start, now)
 			local size = db.size * 100
 			if iconHelp == "cd" then
 				-- Adjust to half size for "cd" abilities.
-				if not (si and si.interrupt == 1) then
+				local interrupt = spellId and state:GetSpellInfoProperty(spellId, "interrupt", spellTarget)
+				if interrupt ~= 1 then
 					size = size * 0.5
 				end
 			end
@@ -317,8 +317,8 @@ function OvaleSpellFlash:Flash(node, element, start, now)
 			local brightness = db.brightness * 100
 
 			if element.lowername == "spell" then
-				local spellId = element.params[1]
-				if si and si.to_stance then
+				local stance = spellId and state:GetSpellInfoProperty(spellId, "to_stance", spellTarget)
+				if stance then
 					SpellFlashCore.FlashForm(spellId, color, size, brightness)
 				end
 				SpellFlashCore.FlashAction(spellId, color, size, brightness)

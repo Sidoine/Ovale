@@ -15,6 +15,7 @@ local OvaleDebug = Ovale.OvaleDebug
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
+local OvaleGUID = nil
 local OvaleState = nil
 
 local ipairs = ipairs
@@ -125,6 +126,7 @@ OvaleStance.stance = nil
 function OvaleStance:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
+	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
 end
 
@@ -265,10 +267,12 @@ end
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleStance_ApplySpellAfterCast")
-	local si = OvaleData.spellInfo[spellId]
-	if si and si.to_stance then
-		local stance = si.to_stance
-		stance = (type(stance) == "number") and stance or self.stanceId[stance]
+	local target = OvaleGUID:GetUnitId(targetGUID)
+	local stance = state:GetSpellInfoProperty(spellId, "to_stance", target)
+	if stance then
+		if type(stance) == "string" then
+			stance = self.stanceId[stance]
+		end
 		state.stance = stance
 	end
 	profiler.Stop("OvaleStance_ApplySpellAfterCast")

@@ -236,9 +236,12 @@ local function GetActionSpellInfo(element, state, target)
 	local si = OvaleData.spellInfo[spellId]
 	local replacedSpellId = nil
 	if si and si.replace then
-		replacedSpellId = spellId
-		spellId = si.replace
-		Ovale:Logf("Spell ID '%s' is replaced by spell ID '%s'.", replacedSpellId, spellId)
+		local replacement = state:GetSpellInfoProperty(spellId, "replace", target)
+		if replacement then
+			replacedSpellId = spellId
+			spellId = replacement
+			Ovale:Logf("Spell ID '%s' is replaced by spell ID '%s'.", replacedSpellId, spellId)
+		end
 	end
 
 	local action = OvaleActionBar:GetForSpell(spellId)
@@ -275,7 +278,8 @@ local function GetActionSpellInfo(element, state, target)
 			if si then
 				-- Use texture specified in the SpellInfo() if given.
 				if si.texture then
-					actionTexture = "Interface\\Icons\\" .. si.texture
+					local texture = state:GetSpellInfoProperty(spellId, "texture", target)
+					actionTexture = "Interface\\Icons\\" .. texture
 				end
 				-- Fix spell cooldown information using primary resource requirements specified in SpellInfo().
 				if actionCooldownStart and actionCooldownDuration then
@@ -283,7 +287,7 @@ local function GetActionSpellInfo(element, state, target)
 					local atTime = state.currentTime
 					for powerType in pairs(OvalePower.PRIMARY_POWER) do
 						if si[powerType] then
-							local t = state.currentTime + state:TimeToPower(spellId, powerType)
+							local t = state.currentTime + state:TimeToPower(spellId, target, powerType)
 							if atTime < t then
 								atTime = t
 							end
@@ -299,22 +303,15 @@ local function GetActionSpellInfo(element, state, target)
 						actionCooldownDuration = atTime - actionCooldownStart
 					end
 
-					if si.blood or si.frost or si.unholy or si.death then
+					local blood = state:GetSpellInfoProperty(spellId, "blood", target)
+					local frost = state:GetSpellInfoProperty(spellId, "frost", target)
+					local unholy = state:GetSpellInfoProperty(spellId, "unholy", target)
+					local death = state:GetSpellInfoProperty(spellId, "death", target)
+					if blood or frost or unholy or death then
 						-- Spell requires runes.
-						local needRunes = true
-						-- "buff_runes_none" is the spell ID of the buff that makes casting the spell cost no runes.
-						local buffNoRunes = si.buff_runes_none
-						if buffNoRunes then
-							local aura = state:GetAura("player", buffNoRunes)
-							if state:IsActiveAura(aura) then
-								needRunes = false
-							end
-						end
-						if needRunes then
-							local ending = state.currentTime + state:GetRunesCooldown(si.blood, si.unholy, si.frost, si.death)
-							if ending > actionCooldownStart + actionCooldownDuration then
-								actionCooldownDuration = ending - actionCooldownStart
-							end
+						local ending = state.currentTime + state:GetRunesCooldown(blood, unholy, frost, death)
+						if ending > actionCooldownStart + actionCooldownDuration then
+							actionCooldownDuration = ending - actionCooldownStart
 						end
 					end
 				end
@@ -489,7 +486,7 @@ function OvaleBestAction:ComputeAction(element, state)
 
 	Ovale:Logf("[%d]    evaluating action: %s(%s)", element.nodeId, element.name, element.paramsAsString)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId = self:GetActionInfo(element, state)
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget = self:GetActionInfo(element, state)
 
 	local action = element.params[1]
 	if not actionTexture then
@@ -536,10 +533,13 @@ function OvaleBestAction:ComputeAction(element, state)
 					local channel = si.channel or si.canStopChannelling
 					if channel then
 						local hasteMultiplier = 1
-						if si.haste == "spell" then
-							hasteMultiplier = state:GetSpellHasteMultiplier()
-						elseif si.haste == "melee" then
+						local si_haste = state:GetSpellInfoProperty(spellId, "haste", actionTarget)
+						if si_haste == "melee" then
 							hasteMultiplier = state:GetMeleeHasteMultiplier()
+						elseif si_haste == "ranged" then
+							hasteMultiplier = state:GetRangedHasteMultiplier()
+						elseif si_haste == "spell" then
+							hasteMultiplier = state:GetSpellHasteMultiplier()
 						end
 						local numTicks = floor(channel * hasteMultiplier + 0.5)
 						local tick = (state.nextCast - state.startCast) / numTicks
@@ -875,7 +875,7 @@ function OvaleBestAction:ComputeGroup(element, state)
 			if currentElement then
 				currentCastTime = currentElement.castTime
 			end
-			local gcd = state:GetGCD()
+			local gcd = state:GetGCD(nil, state.defaultTarget)
 			if not currentCastTime or currentCastTime < gcd then
 				currentCastTime = gcd
 			end

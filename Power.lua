@@ -15,6 +15,7 @@ local OvaleDebug = Ovale.OvaleDebug
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleFuture = nil
+local OvaleGUID = nil
 local OvaleData = nil
 local OvaleState = nil
 
@@ -145,33 +146,29 @@ OvalePower.POOLED_RESOURCE = {
 --</public-static-properties>
 
 --<private-static-methods>
--- Manage spellcast.holy information.
+-- Manage spellcast[power] information.
 local function SaveToSpellcast(spellcast)
-	if spellcast.spellId then
-		local si = OvaleData.spellInfo[spellcast.spellId]
+	local spellId = spellcast.spellId
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
 		for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
 			if si[powerType] == "finisher" then
-				local cost
 				-- Get the maximum cost of the finisher.
 				local maxCostParam = "max_" .. powerType
 				local maxCost = si[maxCostParam] or 1
-				-- If a buff is present that removes the cost of the spell, then treat it as using the maximum cost.
-				local buffNoCostParam = "buff_" .. powerType .. "_none"
-				local buffNoCost = si[buffNoCostParam]
-				if buffNoCost then
-					local aura = OvaleAura:GetAura("player", buffNoCost)
-					if aura then
-						cost = maxCost
-					end
-				end
-				-- Check the resource cost of this finisher.
-				if not cost then
+				local target = OvaleGUID:GetUnitId(spellcast.target)
+				local cost = OvaleData:GetSpellInfoProperty(spellId, powerType, target)
+				if cost == "finisher" then
+					-- This finisher costs up to maxCost resources.
 					local power = OvalePower.power[powerType]
 					if power > maxCost then
 						cost = maxCost
 					else
 						cost = power
 					end
+				elseif cost == 0 then
+					-- If this is a finisher that costs no resources, then treat it as using the maximum cost.
+					cost = maxCost
 				end
 				-- Save the cost to the spellcast table.
 				spellcast[powerType] = cost
@@ -200,6 +197,7 @@ function OvalePower:OnInitialize()
 	OvaleAura = Ovale.OvaleAura
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
+	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
 
 	-- Create the tooltip used for scanning.
@@ -486,6 +484,7 @@ end
 -- Update the state of the simulator for the power cost of the given spell.
 statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvalePower_state_ApplyPowerCost")
+	local target = OvaleGUID:GetUnitId(targetGUID)
 	local si = OvaleData.spellInfo[spellId]
 
 	-- Update power using information from the spell tooltip if there is no SpellInfo() for the spell's cost.
@@ -499,7 +498,7 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, 
 	if si then
 		-- Update power state.
 		for powerType, powerInfo in pairs(OvalePower.POWER_INFO) do
-			local cost = state:PowerCost(spellId, powerType)
+			local cost = state:PowerCost(spellId, powerType, target)
 			local power = state[powerType] or 0
 			if cost then
 				power = power - cost
@@ -527,13 +526,13 @@ end
 
 -- Return the number of seconds before enough of the given power type is available for the spell.
 -- If not powerType is given, the the pooled resource for that class is used.
-statePrototype.TimeToPower = function(state, spellId, powerType)
+statePrototype.TimeToPower = function(state, spellId, target, powerType)
 	local seconds = 0
 	powerType = powerType or OvalePower.POOLED_RESOURCE[state.class]
 	if powerType then
 		local power = state[powerType]
 		local powerRate = state.powerRate[powerType]
-		local cost = state:PowerCost(spellId, powerType)
+		local cost = state:PowerCost(spellId, powerType, target)
 		if power < cost then
 			if powerRate > 0 then
 				seconds = (cost - power) / powerRate
@@ -554,7 +553,7 @@ do
 		["_half"] = 0.5,
 	}
 
-	statePrototype.PowerCost = function(state, spellId, powerType, maximumCost)
+	statePrototype.PowerCost = function(state, spellId, powerType, target, maximumCost)
 		profiler.Start("OvalePower_state_PowerCost")
 		local buffParam = "buff_" .. powerType
 		local spellCost = 0
@@ -566,7 +565,7 @@ do
 				cost < 0 means that the spell generates resources.
 				cost == "finisher" means that the spell uses all of the resources (zeroes it out).
 			--]]
-			local cost = si[powerType]
+			local cost = state:GetSpellInfoProperty(spellId, powerType, target)
 			if cost == "finisher" then
 				-- This spell is a finisher so compute the cost based on the amount of resources consumed.
 				cost = state[powerType]
@@ -603,16 +602,6 @@ do
 						cost = cost + buffAmount
 						Ovale:Logf("Spell ID '%d' had %f %s added from aura ID '%d'.", spellId, buffAmount, powerType, aura.spellId)
 					end
-				end
-			end
-			-- "buff_<powerType>_none" is the spell ID of the buff that makes casting the spell resource-free for the base cost.
-			local buffNoCostParam = buffParam .. "_none"
-			local buffNoCost = si[buffNoCostParam]
-			if buffNoCost then
-				local aura = state:GetAura("player", buffNoCost)
-				if state:IsActiveAura(aura) then
-					cost = 0
-					Ovale:Logf("Spell ID '%d' had %s cost removed due to aura ID '%d'.", spellId, powerType, aura.spellId)
 				end
 			end
 			--[[
@@ -652,7 +641,7 @@ do
 				Add these additional resources to the cost after checking if the spell is resource-free for the base cost.
 			--]]
 			local extraPowerParam = "extra_" .. powerType
-			local extraPower = si[extraPowerParam]
+			local extraPower = state:GetSpellInfoProperty(spellId, extraPowerParam, target)
 			if extraPower then
 				if not maximumCost then
 					-- Clamp the extra power to the remaining power.

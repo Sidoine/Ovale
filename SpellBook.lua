@@ -500,56 +500,50 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Flagged as not usable in the spell information.
-		if isUsable and si.unusable == 1 then
-			Ovale:Logf("Spell ID '%s' is flagged as unusable.", spellId)
-			isUsable = false
+		if isUsable and si.unusable then
+			local unusable = state:GetSpellInfoProperty(spellId, "unusable", target)
+			if unusable == 1 then
+				Ovale:Logf("Spell ID '%s' is flagged as unusable.", spellId)
+				isUsable = false
+			end
 		end
 		-- Stance.
 		if isUsable and si.stance then
-			isUsable = false
-			if state:IsStance(si.stance) then
-				isUsable = true
-			end
-			local result = isUsable and "pass" or "FAIL"
-			Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s': %s.", spellId, si.stance, result)
-		end
-		-- Stealthed.
-		if isUsable and si.stealthed == 1 then
-			isUsable = false
-			-- Look for a buff that allows this ability to ignore the stealth requirements.
-			if si.buff_no_stealthed then
-				local aura = state:GetAura("player", si.buff_no_stealthed)
-				if state:IsActiveAura(aura) then
+			local stance = state:GetSpellInfoProperty(spellId, "stance", target)
+			if stance then
+				isUsable = false
+				if state:IsStance(stance) then
 					isUsable = true
 				end
+				local result = isUsable and "pass" or "FAIL"
+				Ovale:Logf("Spell ID '%s' requires the player to be in stance '%s': %s.", spellId, si.stance, result)
 			end
-			if not isUsable then
+		end
+		-- Stealthed.
+		if isUsable and si.stealthed then
+			local stealthed = state:GetSpellInfoProperty(spellId, "stealthed", target)
+			if stealthed == 1 then
+				isUsable = false
 				local aura = state:GetAura("player", "stealthed_buff", "HELPFUL", true)
 				if state:IsActiveAura(aura) then
 					isUsable = true
 				end
+				local result = isUsable and "pass" or "FAIL"
+				Ovale:Logf("Spell ID '%s' requires the player to be stealthed: %s.", spellId, result)
 			end
-			local result = isUsable and "pass" or "FAIL"
-			Ovale:Logf("Spell ID '%s' requires the player to be stealthed: %s.", spellId, result)
 		end
 		-- Target health percent (execute range).
 		if isUsable and si.target_health_pct then
-			isUsable = false
-			-- Look for a buff that allows this ability to ignore the health percent restriction.
-			if si.buff_no_target_health_pct then
-				local aura = state:GetAura("player", si.buff_no_target_health_pct)
-				if state:IsActiveAura(aura) then
-					isUsable = true
-				end
-			end
-			if not isUsable then
+			local target_health_pct = state:GetSpellInfoProperty(spellId, "target_health_pct", target)
+			if target_health_pct then
+				isUsable = false
 				local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
 				if healthPercent < si.target_health_pct then
 					isUsable = true
 				end
+				local result = isUsable and "pass" or "FAIL"
+				Ovale:Logf("Spell ID '%s' requires the target's health to be less than %f%%: %s.", spellId, si.target_health_pct, result)
 			end
-			local result = isUsable and "pass" or "FAIL"
-			Ovale:Logf("Spell ID '%s' requires the target's health to be less than %f%%: %s.", spellId, si.target_health_pct, result)
 		end
 		-- Secondary resources, e.g., chi, focus, rage, etc.
 		if isUsable and si.combo then
@@ -573,7 +567,7 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 			if si[powerType] then
 				-- Spell requires a secondary resource.
 				isUsable = false
-				local cost = state:PowerCost(spellId, powerType)
+				local cost = state:PowerCost(spellId, powerType, target)
 				if cost > 0 then
 					if state[powerType] >= cost then
 						isUsable = true

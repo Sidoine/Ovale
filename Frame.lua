@@ -202,7 +202,7 @@ do
 					self:UpdateActionIcon(state, node, action, element, start, now)
 				end
 				if profile.apparence.spellFlash.enabled then
-					OvaleSpellFlash:Flash(node, element, start, now)
+					OvaleSpellFlash:Flash(state, node, element, start, now)
 				end
 			end
 		end

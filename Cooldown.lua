@@ -21,8 +21,6 @@ local next = next
 local pairs = pairs
 local API_GetSpellCharges = GetSpellCharges
 local API_GetSpellCooldown = GetSpellCooldown
-local API_UnitHealth = UnitHealth
-local API_UnitHealthMax = UnitHealthMax
 local API_UnitClass = UnitClass
 
 -- Profiling set-up.
@@ -181,42 +179,6 @@ function OvaleCooldown:GetBaseGCD()
 	end
 	return gcd, isCaster
 end
-
--- Return the GCD after the given spell is cast.
--- If no spell is given, then returns the GCD assuming a "yellow-hit" ability has been cast.
-function OvaleCooldown:GetGCD(spellId)
-	local gcd
-	local si = spellId and OvaleData.spellInfo[spellId]
-	if si and si.gcd then
-		gcd = si.gcd
-	else
-		local isCaster, haste
-		gcd, isCaster = self:GetBaseGCD()
-		if self_class == "DRUID" and OvaleStance:IsStance("druid_bear_form") then
-			haste = "melee"
-		elseif self_class == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
-			haste = "melee"
-		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
-			haste = "melee"
-		end
-		if si then
-			haste = si.gcd_haste or si.haste or haste
-		end
-		if not haste and isCaster then
-			haste = "spell"
-		end
-		if haste == "melee" then
-			gcd = gcd / OvalePaperDoll:GetMeleeHasteMultiplier()
-		elseif haste == "ranged" then
-			gcd = gcd / OvalePaperDoll:GetRangedHasteMultiplier()
-		elseif haste == "spell" then
-			gcd = gcd / OvalePaperDoll:GetSpellHasteMultiplier()
-		end
-		-- Clamp GCD at 1s.
-		gcd = (gcd > 1) and gcd or 1
-	end
-	return gcd
-end
 --</public-static-methods>
 
 --[[----------------------------------------------------------------------------
@@ -315,13 +277,10 @@ end
 
 -- Return the GCD after the given spell is cast.
 -- If no spell is given, then returns the GCD after the current spell has been cast.
-statePrototype.GetGCD = function(state, spellId)
-	local gcd
+statePrototype.GetGCD = function(state, spellId, target)
 	spellId = spellId or state.currentSpellId
-	local si = spellId and OvaleData.spellInfo[spellId]
-	if si and si.gcd then
-		gcd = si.gcd
-	else
+	local gcd = spellId and state:GetSpellInfoProperty(spellId, "gcd", target)
+	if not gcd then
 		local isCaster, haste
 		gcd, isCaster = OvaleCooldown:GetBaseGCD()
 		if self_class == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
@@ -329,8 +288,14 @@ statePrototype.GetGCD = function(state, spellId)
 		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
 			haste = "melee"
 		end
-		if si then
-			haste = si.gcd_haste or si.haste or haste
+		local gcd_haste = spellId and state:GetSpellInfoProperty(spellId, "gcd_haste", target)
+		if gcd_haste then
+			haste = gcd_haste
+		else
+			local si_haste = spellId and state:GetSpellInfoProperty(spellId, "haste", target)
+			if si_haste then
+				haste = si_haste
+			end
 		end
 		if not haste and isCaster then
 			haste = "spell"
@@ -418,53 +383,34 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 	else
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.cd then
-			duration = si.cd
+			duration = state:GetSpellInfoProperty(spellId, "cd", target)
 			if si.addcd then
 				duration = duration + si.addcd
+			end
+			if duration < 0 then
+				duration = 0
 			end
 		else
 			duration = 0
 		end
 		Ovale:Logf("Spell %d has a base cooldown of %fs.", spellId, duration)
-		if si then
-			-- There is no cooldown if the buff named by "buff_no_cd" parameter is present.
-			local buffNoCooldown = si.buff_no_cd or si.buffnocd
-			if buffNoCooldown then
-				local aura = state:GetAura("player", buffNoCooldown)
+		if duration > 0 then
+			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
+			if si.cd_haste then
+				local cd_haste = state:GetSpellInfoProperty(spellId, "cd_haste", target)
+				if cd_haste == "melee" then
+					duration = duration / state:GetMeleeHasteMultiplier()
+				elseif cd_haste == "ranged" then
+					duration = duration / OvalePaperDoll:GetSpellHasteMultiplier()
+				elseif cd_haste == "spell" then
+					duration = duration / state:GetSpellHasteMultiplier()
+				end
+			end
+			-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".
+			if si.buff_cdr then
+				local aura = state:GetAura("player", si.buff_cdr)
 				if state:IsActiveAura(aura, atTime) then
-					Ovale:Logf("buff_no_cd stacks = %s, start = %s, ending = %s, atTime = %f", aura.stacks, aura.start, aura.ending, atTime)
-					duration = 0
-				end
-			end
-
-			-- There is no cooldown if the target's health percent is below what's specified
-			-- with the "target_health_pct_no_cd" parameter.
-			target = target or state.defaultTarget
-			local targetHealthPctNoCooldown = si.target_health_pct_no_cd or si.targetlifenocd
-			if target and targetHealthPctNoCooldown then
-				local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
-				if healthPercent < targetHealthPctNoCooldown then
-					duration = 0
-				end
-			end
-
-			if duration > 0 then
-				-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
-				if si.cd_haste then
-					if si.cd_haste == "melee" then
-						duration = duration / state:GetMeleeHasteMultiplier()
-					elseif si.haste == "ranged" then
-						duration = duration / OvalePaperDoll:GetSpellHasteMultiplier()
-					elseif si.cd_haste == "spell" then
-						duration = duration / state:GetSpellHasteMultiplier()
-					end
-				end
-				-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".
-				if si.buff_cdr then
-					local aura = state:GetAura("player", si.buff_cdr)
-					if state:IsActiveAura(aura, atTime) then
-						duration = duration / aura.value1
-					end
+					duration = duration / aura.value1
 				end
 			end
 		end
