@@ -495,7 +495,8 @@ end
 
 -- Returns the base duration of an aura.
 function OvaleData:GetBaseDuration(auraId, spellcast)
-	local combo, holy = spellcast.combo, spellcast.holy
+	local combo = spellcast and spellcast.combo
+	local holy = spellcast and spellcast.holy
 	local duration = INFINITY
 	local si = OvaleData.spellInfo[auraId]
 	if si and si.duration then
