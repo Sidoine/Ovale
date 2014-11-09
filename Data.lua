@@ -24,7 +24,7 @@ local INFINITY = math.huge
 -- Handler is invoked as handler(state, name, tokenIterator, target).
 local self_requirement = {}
 
-local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "strength", "versatility" }
+local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
 local TRINKET_USE_NAMES = { "proc", "stacking_proc", "stacking_stat", "stat" }
 --<private-static-properties>
 
@@ -207,6 +207,7 @@ OvaleData.buffSpellList =
 		[126554] = true, -- Bottle of Infinite Stars
 		[126690] = true, -- PvP agility trinket (on-use)
 		[126707] = true, -- PvP agility trinket (proc)
+		[126708] = true, -- PvP agility trinket (proc)
 		[128984] = true, -- Relic of Xuen (agility)
 		[138699] = true, -- Vicious Talisman of the Shado-Pan Assault
 		[138938] = true, -- Bad Juju
@@ -214,9 +215,38 @@ OvaleData.buffSpellList =
 		[146310] = true, -- Ticking Ebon Detonator
 		[148896] = true, -- Sigil of Rampage
 		[148903] = true, -- Haromm's Talisman
+		[177597] = true, -- Lucky Double-Sided Coin (on-use)
+	},
+	trinket_proc_bonus_armor_buff = {
+		[176873] = true, -- Tablet of Turnbuckle Teamwork (on-use)
+		[177055] = true, -- Evergaze Arcane Eidolon
 	},
 	trinket_proc_crit_buff = {
 		[138963] = true, -- Unerring Vision of Lei-Shen
+		[162916] = true, -- Skull of War
+		[162918] = true, -- Knight's Badge
+		[162920] = true, -- Sandman's Pouch
+		[165532] = true, -- Bonemaw's Big Toe (on-use)
+		[165532] = true, -- Voidmender's Shadowgem (on-use)
+		[176979] = true, -- Immaculate Living Mushroom
+		[176983] = true, -- Stoneheart Idol
+		[177041] = true, -- Tectus' Beating Heart
+		[177047] = true, -- Goren Soul Repository
+	},
+	trinket_proc_haste_buff = {
+		[165531] = true, -- Fleshrender's Meathook (on-use)
+		[165821] = true, -- Munificent Bonds of Fury
+		[165821] = true, -- Spores of Alacrity
+		[165821] = true, -- Witherbark's Branch
+		[176875] = true, -- Shards of Nothing (on-use)
+		[176879] = true, -- Emblem of Caustic Healing (on-use)
+		[176882] = true, -- Turbulent Focusing Crystal (on-use)
+		[176885] = true, -- Turbulent Seal of Defiance (on-use)
+		[176938] = true, -- Formidable Relic of Blood
+		[176944] = true, -- Formidable Censer of Faith
+		[176981] = true, -- Furyheart Talisman
+		[177036] = true, -- Meaty Dragonspine Trophy
+		[177052] = true, -- Darmac's Unstable Talisman
 	},
 	trinket_proc_intellect_buff = {
 		[126577] = true, -- Light of the Cosmos
@@ -230,25 +260,78 @@ OvaleData.buffSpellList =
 		[148897] = true, -- Frenzied Crystal of Rage
 		[148906] = true, -- Kardris' Toxic Totem
 	},
+	trinket_proc_mastery_buff = {
+		[165485] = true, -- Kihra's Adrenaline Injector (on-use)
+		[165535] = true, -- Kyrak's Vileblood Serum (on-use)
+		[165535] = true, -- Tharbek's Lucky Pebble
+		[165825] = true, -- Munificent Censer of Tranquility
+		[165825] = true, -- Xeri'tac's Unhatched Egg Sac
+		[165835] = true, -- Munificent Emblem of Terror
+		[176876] = true, -- Pol's Blinded Eye (on-use)
+		[176883] = true, -- Turbulent Vial of Toxin (on-use)
+		[176884] = true, -- Turbulent Relic of Mendacity (on-use)
+		[176940] = true, -- Formidable Jar of Doom
+		[176942] = true, -- Formidable Orb of Putrescence
+		[177044] = true, -- Horn of Screaming Spirits
+		[177057] = true, -- Blast Furnace Door
+	},
+	trinket_proc_multistrike_buff = {
+		[165542] = true, -- Gor'ashan's Lodestone Spike (on-use)
+		[165838] = true, -- Coagulated Genesaur Blood
+		[176874] = true, -- Vial of Convulsive Shadows
+		[176878] = true, -- Beating Heart of the Mountain (on-use)
+		[176881] = true, -- Turbulent Emblem (on-use)
+		[176936] = true, -- Formidable Fang
+		[176987] = true, -- Blackheart Enforcer's Medallion
+		[177039] = true, -- Scales of Doom
+		[177064] = true, -- Elementalist's Shielding Talisman
+	},
+	trinket_proc_spellpower_buff = {
+		[177594] = true, -- Copeland's Clarity (on-use)
+	},
+	trinket_proc_spirit_buff = {
+		[162914] = true, -- Winged Hourglass
+		[177062] = true, -- Ironspike Chew Toy
+	},
 	trinket_proc_strength_buff = {
 		[126582] = true, -- Lei Shen's Final Orders
 		[126679] = true, -- PvP strength trinket (on-use)
 		[126700] = true, -- PvP strength trinket (proc)
+		[126702] = true, -- PvP strength trinket (proc)
 		[128986] = true, -- Relic of Xuen (strength)
 		[138702] = true, -- Brutal Talisman of the Shado-Pan Assault
 		[146245] = true, -- Evil Eye of Galakras
 		[146250] = true, -- Thok's Tail Tip
 		[148899] = true, -- Fusion-Fire Core
+		[177189] = true, -- Scabbard of Kyanos
+	},
+	trinket_proc_versatility_buff = {
+		[165534] = true, -- Enforcer's Stun Grenade (on-use)
+		[165543] = true, -- Emberscale Talisman (on-use)
+		[165543] = true, -- Ragewing's Firefang (on-use)
+		[165840] = true, -- Leaf of the Ancient Protectors
+		[165840] = true, -- Munificent Orb of Ice
+		[165840] = true, -- Munificent Soul of Compassion
+		[176976] = true, -- Mote of the Mountain
 	},
 	trinket_stacking_proc_agility_buff = {
 		[138756] = true, -- Renataki's Soul Charm
 	},
 	trinket_stacking_proc_crit_buff = {
 		[146285] = true, -- Skeer's Bloodsoaked Talisman
+		[177071] = true, -- Humming Blackiron Trigger
+	},
+	trinket_stacking_proc_haste_buff = {
+		[177090] = true, -- Auto-Repairing Autoclave
+		[177104] = true, -- Battering Talisman
 	},
 	trinket_stacking_proc_intellect_buff = {
 		[138786] = true, -- Wushoolay's Final Choice
 		[146184] = true, -- Black Blood of Y'Shaarj
+	},
+	trinket_stacking_proc_multistrike_buff = {
+		[177085] = true, -- Blackiron Micro Crucible
+		[177098] = true, -- Forgemaster's Insignia
 	},
 	trinket_stacking_proc_strength_buff = {
 		[138759] = true, -- Fabled Feather of Ji-Kun
