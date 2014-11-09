@@ -73,8 +73,8 @@ AddFunction ArmsDefaultActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(berserking)
 	#arcane_torrent,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
-	#heroic_leap,if=debuff.colossus_smash.up&rage>70
-	if target.DebuffPresent(colossus_smash_debuff) and Rage() > 70 and target.InRange(charge) Spell(heroic_leap)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ArmsSingleActions()
 	#call_action_list,name=aoe,if=active_enemies>1

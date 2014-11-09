@@ -173,8 +173,8 @@ AddFunction FeralDefaultCdActions
 		#berserk,if=buff.tigers_fury.up
 		#if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
 		if FeralTigersFurySyncCondition() Spell(berserk_cat)
-		#shadowmeld,if=dot.rake.remains<4.5&energy>=35&dot.rake.pmultiplier<2&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>15)
-		if target.DebuffRemaining(rake_debuff) < 4.5 and Energy() >= 35 and target.DebuffDamageMultiplier(rake_debuff) < 2 and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_melee) > 15 } Spell(shadowmeld)
+		#shadowmeld,if=dot.rake.remains<4.5&energy>=35&dot.rake.pmultiplier<2&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>15)&!buff.king_of_the_jungle.up
+		if target.DebuffRemaining(rake_debuff) < 4.5 and Energy() >= 35 and target.DebuffDamageMultiplier(rake_debuff) < 2 and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_melee) > 15 } and not BuffPresent(king_of_the_jungle_buff) Spell(shadowmeld)
 	}
 }
 

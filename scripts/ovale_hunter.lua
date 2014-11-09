@@ -84,6 +84,8 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 	unless Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) and Spell(multishot)
 	{
+		#focus_fire,five_stacks=1
+		if BuffStacks(frenzy_buff any=1) == 5 Spell(focus_fire)
 		#barrage,if=active_enemies>1
 		if Enemies() > 1 Spell(barrage)
 		#a_murder_of_crows
@@ -99,13 +101,6 @@ AddFunction BeastMasteryDefaultShortCdActions
 			Spell(barrage)
 			#powershot,if=focus.time_to_max>cast_time
 			if TimeToMaxFocus() > CastTime(powershot) Spell(powershot)
-
-			unless Enemies() > 5 and Spell(cobra_shot)
-				or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 or BuffPresent(bestial_wrath_buff) } and Spell(arcane_shot)
-			{
-				#focus_fire,five_stacks=1
-				if BuffStacks(frenzy_buff any=1) == 5 Spell(focus_fire)
-			}
 		}
 	}
 }
@@ -120,8 +115,8 @@ AddFunction BeastMasteryDefaultCdActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=!talent.stampede.enabled&buff.bestial_wrath.up|target.time_to_die<=20
-	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) or target.TimeToDie() <= 20 UsePotionAgility()
+	#potion,name=virmens_bite,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
+	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 UsePotionAgility()
 	#potion,name=virmens_bite,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=20
 	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
 	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=20

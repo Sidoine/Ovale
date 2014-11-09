@@ -50,8 +50,8 @@ AddFunction MarksmanshipDefaultActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(!talent.stampede.enabled|cooldown.stampede.remains<1))|target.time_to_die<=20
-	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and { not Talent(stampede_talent) or SpellCooldown(stampede) < 1 } or target.TimeToDie() <= 20 UsePotionAgility()
+	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=20
+	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 20 UsePotionAgility()
 	#kill_shot,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
 	if FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(kill_shot)
 	#chimaera_shot
@@ -163,7 +163,6 @@ AddIcon specialization=marksmanship help=aoe
 # rapid_fire_buff
 # revive_pet
 # stampede
-# stampede_talent
 # steady_shot
 # thrill_of_the_hunt_buff
 # trap_launcher

@@ -50,8 +50,8 @@ AddFunction SurvivalDefaultActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=(((cooldown.stampede.remains<1|!talent.stampede.enabled)&(!talent.a_murder_of_crows.enabled|cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=20
-	if { SpellCooldown(stampede) < 1 or not Talent(stampede_talent) } and { not Talent(a_murder_of_crows_talent) or SpellCooldown(a_murder_of_crows) < 1 } and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
+	#potion,name=virmens_bite,if=(((cooldown.stampede.remains<1)&(cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=20
+	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeActions()
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))
@@ -145,7 +145,6 @@ AddIcon specialization=survival help=aoe
 
 ### Required symbols
 # a_murder_of_crows
-# a_murder_of_crows_talent
 # arcane_shot
 # arcane_torrent_focus
 # archmages_greater_incandescence_agi_buff
@@ -178,7 +177,6 @@ AddIcon specialization=survival help=aoe
 # revive_pet
 # serpent_sting_debuff
 # stampede
-# stampede_talent
 # steady_focus_buff
 # thrill_of_the_hunt_buff
 # trap_launcher

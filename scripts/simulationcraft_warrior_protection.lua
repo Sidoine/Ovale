@@ -64,8 +64,8 @@ AddFunction ProtectionProtAoeActions
 	if not target.DebuffPresent(deep_wounds_debuff) Spell(thunder_clap)
 	#heroic_strike,if=buff.ultimatum.up|rage>110|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
 	if BuffPresent(ultimatum_buff) or Rage() > 110 or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
-	#heroic_leap,if=(buff.bloodbath.up|cooldown.bloodbath.remains>5|!talent.bloodbath.enabled)
-	if { BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 5 or not Talent(bloodbath_talent) } and target.InRange(charge) Spell(heroic_leap)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	#shield_slam,if=buff.shield_block.up
 	if BuffPresent(shield_block_buff) Spell(shield_slam)
 	#ravager,if=(buff.avatar.up|cooldown.avatar.remains>10)|!talent.avatar.enabled
