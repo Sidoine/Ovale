@@ -21,29 +21,6 @@ AddFunction UsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
 }
 
-AddFunction DestructionPrecombatActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#dark_intent,if=!aura.spell_power_multiplier.up
-	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
-	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-	if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-	#snapshot_stats
-	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
-	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
-	#service_pet,if=talent.grimoire_of_service.enabled
-	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	#potion,name=jade_serpent
-	UsePotionIntellect()
-	#incinerate
-	Spell(incinerate)
-}
-
 AddFunction DestructionDefaultActions
 {
 	#potion,name=jade_serpent,if=buff.bloodlust.react|target.health.pct<=20
@@ -94,6 +71,29 @@ AddFunction DestructionAoeActions
 	if not Talent(charred_remains_talent) and Enemies() == 4 Spell(chaos_bolt)
 	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up&burning_ember>=2.5
 	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) and BurningEmbers() / 10 >= 2.5 Spell(chaos_bolt)
+	#incinerate
+	Spell(incinerate)
+}
+
+AddFunction DestructionPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
+	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
+	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+	if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+	#snapshot_stats
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
+	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	#potion,name=jade_serpent
+	UsePotionIntellect()
 	#incinerate
 	Spell(incinerate)
 }

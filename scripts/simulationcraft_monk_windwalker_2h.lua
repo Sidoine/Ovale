@@ -36,17 +36,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction WindwalkerPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#stance,choose=fierce_tiger
-	Spell(stance_of_the_fierce_tiger)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-}
-
 AddFunction WindwalkerDefaultActions
 {
 	#auto_attack
@@ -117,6 +106,17 @@ AddFunction WindwalkerAoeActions
 	if not Talent(rushing_jade_wind_talent) Spell(spinning_crane_kick)
 	#jab,if=talent.rushing_jade_wind.enabled&chi.max-chi>=2
 	if Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 2 Spell(jab)
+}
+
+AddFunction WindwalkerPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#stance,choose=fierce_tiger
+	Spell(stance_of_the_fierce_tiger)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
 }
 
 AddFunction WindwalkerStActions

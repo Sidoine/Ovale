@@ -58,36 +58,6 @@ AddFunction InterruptActions
 #	talents=3111130
 #	glyphs=vendetta
 
-# ActionList: AssassinationPrecombatActions --> main, shortcd, cd
-
-AddFunction AssassinationPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#apply_poison,lethal=deadly
-	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#marked_for_death
-	Spell(marked_for_death)
-	#slice_and_dice,if=talent.marked_for_death.enabled
-	if Talent(marked_for_death_talent) Spell(slice_and_dice)
-}
-
-AddFunction AssassinationPrecombatShortCdActions {}
-
-AddFunction AssassinationPrecombatCdActions
-{
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
-	{
-		#potion,name=virmens_bite
-		UsePotionAgility()
-	}
-}
-
 # ActionList: AssassinationDefaultActions --> main, shortcd, cd
 
 AddFunction AssassinationDefaultActions
@@ -166,6 +136,36 @@ AddFunction AssassinationDefaultCdActions
 	}
 }
 
+# ActionList: AssassinationPrecombatActions --> main, shortcd, cd
+
+AddFunction AssassinationPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#apply_poison,lethal=deadly
+	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
+	#stealth
+	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	#marked_for_death
+	Spell(marked_for_death)
+	#slice_and_dice,if=talent.marked_for_death.enabled
+	if Talent(marked_for_death_talent) Spell(slice_and_dice)
+}
+
+AddFunction AssassinationPrecombatShortCdActions {}
+
+AddFunction AssassinationPrecombatCdActions
+{
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
+	{
+		#potion,name=virmens_bite
+		UsePotionAgility()
+	}
+}
+
 ### Assassination icons.
 AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
 
@@ -213,36 +213,6 @@ AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_ao
 #	spec=combat
 #	talents=3111130
 #	glyphs=energy/disappearance
-
-# ActionList: CombatPrecombatActions --> main, shortcd, cd
-
-AddFunction CombatPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#apply_poison,lethal=deadly
-	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#marked_for_death
-	Spell(marked_for_death)
-	#slice_and_dice,if=talent.marked_for_death.enabled
-	if Talent(marked_for_death_talent) Spell(slice_and_dice)
-}
-
-AddFunction CombatPrecombatShortCdActions {}
-
-AddFunction CombatPrecombatCdActions
-{
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
-	{
-		#potion,name=virmens_bite
-		UsePotionAgility()
-	}
-}
 
 # ActionList: CombatDefaultActions --> main, shortcd, cd
 
@@ -307,16 +277,6 @@ AddFunction CombatDefaultCdActions
 	}
 }
 
-# ActionList: CombatGeneratorActions --> main
-
-AddFunction CombatGeneratorActions
-{
-	#revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
-	if ComboPoints() == 4 and target.DebuffRemaining(revealing_strike_debuff) < 7.2 and target.TimeToDie() > target.DebuffRemaining(revealing_strike_debuff) + 7.2 or target.TimeToDie() < target.DebuffRemaining(revealing_strike_debuff) + 7.2 and target.TicksRemaining(revealing_strike_debuff) < 2 or not target.DebuffPresent(revealing_strike_debuff) Spell(revealing_strike)
-	#sinister_strike,if=dot.revealing_strike.ticking
-	if target.DebuffPresent(revealing_strike_debuff) Spell(sinister_strike)
-}
-
 # ActionList: CombatFinisherActions --> main
 
 AddFunction CombatFinisherActions
@@ -328,6 +288,46 @@ AddFunction CombatFinisherActions
 	#crimson_tempest,if=active_enemies>2
 	if Enemies() > 2 Spell(crimson_tempest)
 	Spell(eviscerate)
+}
+
+# ActionList: CombatGeneratorActions --> main
+
+AddFunction CombatGeneratorActions
+{
+	#revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
+	if ComboPoints() == 4 and target.DebuffRemaining(revealing_strike_debuff) < 7.2 and target.TimeToDie() > target.DebuffRemaining(revealing_strike_debuff) + 7.2 or target.TimeToDie() < target.DebuffRemaining(revealing_strike_debuff) + 7.2 and target.TicksRemaining(revealing_strike_debuff) < 2 or not target.DebuffPresent(revealing_strike_debuff) Spell(revealing_strike)
+	#sinister_strike,if=dot.revealing_strike.ticking
+	if target.DebuffPresent(revealing_strike_debuff) Spell(sinister_strike)
+}
+
+# ActionList: CombatPrecombatActions --> main, shortcd, cd
+
+AddFunction CombatPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#apply_poison,lethal=deadly
+	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
+	#stealth
+	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	#marked_for_death
+	Spell(marked_for_death)
+	#slice_and_dice,if=talent.marked_for_death.enabled
+	if Talent(marked_for_death_talent) Spell(slice_and_dice)
+}
+
+AddFunction CombatPrecombatShortCdActions {}
+
+AddFunction CombatPrecombatCdActions
+{
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
+	{
+		#potion,name=virmens_bite
+		UsePotionAgility()
+	}
 }
 
 ### Combat icons.
@@ -376,43 +376,6 @@ AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
 #	class=rogue
 #	spec=subtlety
 #	talents=3111130
-
-# ActionList: SubtletyPrecombatActions --> main, shortcd, cd
-
-AddFunction SubtletyPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#apply_poison,lethal=deadly
-	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
-	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#premeditation
-	Spell(premeditation)
-	#slice_and_dice
-	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
-	#honor_among_thieves,cooldown=2.2,cooldown_stddev=0.1
-}
-
-AddFunction SubtletyPrecombatShortCdActions {}
-
-AddFunction SubtletyPrecombatCdActions
-{
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
-	{
-		#potion,name=virmens_bite
-		UsePotionAgility()
-	}
-}
-
-# ActionList: SubtletyPoolActions --> cd
-
-AddFunction SubtletyPoolActions
-{
-	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
-	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
-}
 
 # ActionList: SubtletyDefaultActions --> main, shortcd, cd
 
@@ -512,6 +475,35 @@ AddFunction SubtletyDefaultCdActions
 	}
 }
 
+# ActionList: SubtletyFinisherActions --> main, cd
+
+AddFunction SubtletyFinisherActions
+{
+	#slice_and_dice,if=buff.slice_and_dice.remains<4
+	if BuffRemaining(slice_and_dice_buff) < 4 and BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
+	#death_from_above
+	Spell(death_from_above)
+	#rupture,cycle_targets=1,if=(!ticking|remains<duration*0.3)&active_enemies<=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
+	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(rupture)
+	#crimson_tempest,if=(active_enemies>3&dot.crimson_tempest_dot.ticks_remain<=2&combo_points=5)|active_enemies>=5&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
+	if Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) < 3 and ComboPoints() == 5 or Enemies() >= 5 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
+	#eviscerate,if=active_enemies<4|(active_enemies>3&dot.crimson_tempest_dot.ticks_remain>=2)&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
+	if Enemies() < 4 or Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) >= 2 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(eviscerate)
+}
+
+AddFunction SubtletyFinisherCdActions
+{
+	unless BuffRemaining(slice_and_dice_buff) < 4 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) and Spell(slice_and_dice)
+		or Spell(death_from_above)
+		or { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < target.DebuffDurationIfApplied(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } and Spell(rupture)
+		or { Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) < 3 and ComboPoints() == 5 or Enemies() >= 5 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest)
+		or { Enemies() < 4 or Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) >= 2 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(eviscerate)
+	{
+		#run_action_list,name=pool
+		SubtletyPoolActions()
+	}
+}
+
 # ActionList: SubtletyGeneratorActions --> main, cd
 
 AddFunction SubtletyGeneratorActions
@@ -541,32 +533,40 @@ AddFunction SubtletyGeneratorCdActions
 	}
 }
 
-# ActionList: SubtletyFinisherActions --> main, cd
+# ActionList: SubtletyPoolActions --> cd
 
-AddFunction SubtletyFinisherActions
+AddFunction SubtletyPoolActions
 {
-	#slice_and_dice,if=buff.slice_and_dice.remains<4
-	if BuffRemaining(slice_and_dice_buff) < 4 and BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
-	#death_from_above
-	Spell(death_from_above)
-	#rupture,cycle_targets=1,if=(!ticking|remains<duration*0.3)&active_enemies<=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
-	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(rupture)
-	#crimson_tempest,if=(active_enemies>3&dot.crimson_tempest_dot.ticks_remain<=2&combo_points=5)|active_enemies>=5&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
-	if Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) < 3 and ComboPoints() == 5 or Enemies() >= 5 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
-	#eviscerate,if=active_enemies<4|(active_enemies>3&dot.crimson_tempest_dot.ticks_remain>=2)&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
-	if Enemies() < 4 or Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) >= 2 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(eviscerate)
+	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
 }
 
-AddFunction SubtletyFinisherCdActions
+# ActionList: SubtletyPrecombatActions --> main, shortcd, cd
+
+AddFunction SubtletyPrecombatActions
 {
-	unless BuffRemaining(slice_and_dice_buff) < 4 and BuffDurationIfApplied(slice_and_dice_buff) > BuffRemaining(slice_and_dice_buff) and Spell(slice_and_dice)
-		or Spell(death_from_above)
-		or { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < target.DebuffDurationIfApplied(rupture_debuff) * 0.3 } and Enemies() <= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } and Spell(rupture)
-		or { Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) < 3 and ComboPoints() == 5 or Enemies() >= 5 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest)
-		or { Enemies() < 4 or Enemies() > 3 and target.TicksRemaining(crimson_tempest_dot_debuff) >= 2 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(eviscerate)
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#apply_poison,lethal=deadly
+	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
+	#snapshot_stats
+	#stealth
+	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	#premeditation
+	Spell(premeditation)
+	#slice_and_dice
+	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
+	#honor_among_thieves,cooldown=2.2,cooldown_stddev=0.1
+}
+
+AddFunction SubtletyPrecombatShortCdActions {}
+
+AddFunction SubtletyPrecombatCdActions
+{
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
 	{
-		#run_action_list,name=pool
-		SubtletyPoolActions()
+		#potion,name=virmens_bite
+		UsePotionAgility()
 	}
 }
 

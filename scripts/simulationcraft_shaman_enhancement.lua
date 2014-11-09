@@ -45,17 +45,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction EnhancementPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#lightning_shield,if=!buff.lightning_shield.up
-	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-}
-
 AddFunction EnhancementDefaultActions
 {
 	#wind_shear
@@ -137,6 +126,17 @@ AddFunction EnhancementAoeActions
 		#fire_nova,if=active_dot.flame_shock>=1
 		if DebuffCountOnAny(flame_shock_debuff) >= 1 Spell(fire_nova)
 	}
+}
+
+AddFunction EnhancementPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#lightning_shield,if=!buff.lightning_shield.up
+	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
 }
 
 AddFunction EnhancementSingleActions

@@ -42,39 +42,6 @@ AddFunction InterruptActions
 #	talents=0110220
 #	glyphs=fortifying_brew,fortuitous_spheres
 
-# ActionList: BrewmasterPrecombatActions --> main, shortcd, cd
-
-AddFunction BrewmasterPrecombatActions
-{
-	#flask,type=earth
-	#food,type=mogu_fish_stew
-	# CHANGE: Buff with Legacy of the White Tiger
-	if BuffExpires(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
-	#stance,choose=sturdy_ox
-	Spell(stance_of_the_sturdy_ox)
-	#snapshot_stats
-}
-
-AddFunction BrewmasterPrecombatShortCdActions
-{
-	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
-		or Spell(stance_of_the_sturdy_ox)
-	{
-		#dampen_harm
-		Spell(dampen_harm)
-	}
-}
-
-AddFunction BrewmasterPrecombatCdActions
-{
-	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
-		or Spell(stance_of_the_sturdy_ox)
-	{
-		#potion,name=virmens_bite
-		UsePotionAgility()
-	}
-}
-
 # ActionList: BrewmasterDefaultActions --> main, shortcd, cd
 
 AddFunction BrewmasterDefaultActions
@@ -204,6 +171,39 @@ AddFunction BrewmasterAoeShortCdActions
 
 AddFunction BrewmasterAoeCdActions {}
 
+# ActionList: BrewmasterPrecombatActions --> main, shortcd, cd
+
+AddFunction BrewmasterPrecombatActions
+{
+	#flask,type=earth
+	#food,type=mogu_fish_stew
+	# CHANGE: Buff with Legacy of the White Tiger
+	if BuffExpires(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
+	#stance,choose=sturdy_ox
+	Spell(stance_of_the_sturdy_ox)
+	#snapshot_stats
+}
+
+AddFunction BrewmasterPrecombatShortCdActions
+{
+	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
+		or Spell(stance_of_the_sturdy_ox)
+	{
+		#dampen_harm
+		Spell(dampen_harm)
+	}
+}
+
+AddFunction BrewmasterPrecombatCdActions
+{
+	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
+		or Spell(stance_of_the_sturdy_ox)
+	{
+		#potion,name=virmens_bite
+		UsePotionAgility()
+	}
+}
+
 # ActionList: BrewmasterStActions --> main, shortcd, cd
 
 AddFunction BrewmasterStActions
@@ -310,31 +310,6 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 #	class=monk
 #	spec=windwalker
 #	talents=1133320
-
-# ActionList: WindwalkerPrecombatActions --> main, shortcd, cd
-
-AddFunction WindwalkerPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	# CHANGE: Buff with Legacy of the White Tiger
-	if BuffExpires(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
-	#stance,choose=fierce_tiger
-	Spell(stance_of_the_fierce_tiger)
-	#snapshot_stats
-}
-
-AddFunction WindwalkerPrecombatShortCdActions {}
-
-AddFunction WindwalkerPrecombatCdActions
-{
-	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
-		or Spell(stance_of_the_fierce_tiger)
-	{
-		#potion,name=virmens_bite
-		UsePotionAgility()
-	}
-}
 
 # ActionList: WindwalkerDefaultActions --> main, shortcd, cd
 
@@ -456,6 +431,31 @@ AddFunction WindwalkerAoeShortCdActions
 }
 
 AddFunction WindwalkerAoeCdActions {}
+
+# ActionList: WindwalkerPrecombatActions --> main, shortcd, cd
+
+AddFunction WindwalkerPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	# CHANGE: Buff with Legacy of the White Tiger
+	if BuffExpires(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
+	#stance,choose=fierce_tiger
+	Spell(stance_of_the_fierce_tiger)
+	#snapshot_stats
+}
+
+AddFunction WindwalkerPrecombatShortCdActions {}
+
+AddFunction WindwalkerPrecombatCdActions
+{
+	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
+		or Spell(stance_of_the_fierce_tiger)
+	{
+		#potion,name=virmens_bite
+		UsePotionAgility()
+	}
+}
 
 # ActionList: WindwalkerStActions --> main, shortcd, cd
 

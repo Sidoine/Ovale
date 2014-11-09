@@ -36,23 +36,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction FrostTwoHanderPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#frost_presence
-	Spell(frost_presence)
-	#snapshot_stats
-	#army_of_the_dead
-	Spell(army_of_the_dead)
-	#potion,name=mogu_power
-	UsePotionStrength()
-	#pillar_of_frost
-	Spell(pillar_of_frost)
-}
-
 AddFunction FrostTwoHanderDefaultActions
 {
 	#auto_attack
@@ -76,24 +59,6 @@ AddFunction FrostTwoHanderDefaultActions
 	if Enemies() >= 3 FrostTwoHanderAoeActions()
 	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostTwoHanderSingleTargetActions()
-}
-
-AddFunction FrostTwoHanderBosStActions
-{
-	#obliterate,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) Spell(obliterate)
-	#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
-	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#plague_leech,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
-	#blood_tap,if=buff.blood_charge.stack>=5
-	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
-	#obliterate,if=runic_power<76
-	if RunicPower() < 76 Spell(obliterate)
-	#howling_blast,if=((death=1&frost=0&unholy=0)|death=0&frost=1&unholy=0)&runic_power<88
-	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 Spell(howling_blast)
 }
 
 AddFunction FrostTwoHanderAoeActions
@@ -148,6 +113,41 @@ AddFunction FrostTwoHanderBosAoeActions
 	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
+}
+
+AddFunction FrostTwoHanderBosStActions
+{
+	#obliterate,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) Spell(obliterate)
+	#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
+	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	#plague_leech,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
+	#blood_tap,if=buff.blood_charge.stack>=5
+	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
+	#obliterate,if=runic_power<76
+	if RunicPower() < 76 Spell(obliterate)
+	#howling_blast,if=((death=1&frost=0&unholy=0)|death=0&frost=1&unholy=0)&runic_power<88
+	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 Spell(howling_blast)
+}
+
+AddFunction FrostTwoHanderPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#frost_presence
+	Spell(frost_presence)
+	#snapshot_stats
+	#army_of_the_dead
+	Spell(army_of_the_dead)
+	#potion,name=mogu_power
+	UsePotionStrength()
+	#pillar_of_frost
+	Spell(pillar_of_frost)
 }
 
 AddFunction FrostTwoHanderSingleTargetActions

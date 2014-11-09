@@ -27,53 +27,6 @@ AddFunction UsePotionIntellect
 #	glyphs=siphon_life
 #	pet=felhunter
 
-# ActionList: AfflictionPrecombatActions --> main, predict, shortcd, cd
-
-AddFunction AfflictionPrecombatActions
-{
-	AfflictionPrecombatPredictActions()
-}
-
-AddFunction AfflictionPrecombatPredictActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#dark_intent,if=!aura.spell_power_multiplier.up
-	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#snapshot_stats
-	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
-	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
-}
-
-AddFunction AfflictionPrecombatShortCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-	{
-		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	}
-}
-
-AddFunction AfflictionPrecombatCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
-	{
-		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-
-		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
-		{
-			#potion,name=jade_serpent
-			UsePotionIntellect()
-		}
-	}
-}
-
 # ActionList: AfflictionDefaultActions --> main, predict, shortcd, cd
 
 AddFunction AfflictionDefaultActions
@@ -139,6 +92,53 @@ AddFunction AfflictionDefaultCdActions
 		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 		#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
 		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+	}
+}
+
+# ActionList: AfflictionPrecombatActions --> main, predict, shortcd, cd
+
+AddFunction AfflictionPrecombatActions
+{
+	AfflictionPrecombatPredictActions()
+}
+
+AddFunction AfflictionPrecombatPredictActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
+	#snapshot_stats
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
+	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+}
+
+AddFunction AfflictionPrecombatShortCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+	{
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	}
+}
+
+AddFunction AfflictionPrecombatCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
+	{
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+
+		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+		{
+			#potion,name=jade_serpent
+			UsePotionIntellect()
+		}
 	}
 }
 
@@ -348,53 +348,6 @@ AddFunction DemonologyDefaultCdActions
 	}
 }
 
-# ActionList: DemonologyPrecombatActions --> main, predict, shortcd, cd
-
-AddFunction DemonologyPrecombatActions
-{
-	DemonologyPrecombatPredictActions()
-}
-
-AddFunction DemonologyPrecombatPredictActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#dark_intent,if=!aura.spell_power_multiplier.up
-	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#snapshot_stats
-	#soul_fire
-	Spell(soul_fire)
-}
-
-AddFunction DemonologyPrecombatShortCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-	{
-		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
-	}
-}
-
-AddFunction DemonologyPrecombatCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard)
-	{
-		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-
-		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
-		{
-			#potion,name=jade_serpent
-			UsePotionIntellect()
-		}
-	}
-}
-
 # ActionList: DemonologyDbActions --> main, predict
 
 AddFunction DemonologyDbActions
@@ -473,6 +426,53 @@ AddFunction DemonologyDbPredictActions
 	#life_tap,if=mana.pct<40
 }
 
+# ActionList: DemonologyPrecombatActions --> main, predict, shortcd, cd
+
+AddFunction DemonologyPrecombatActions
+{
+	DemonologyPrecombatPredictActions()
+}
+
+AddFunction DemonologyPrecombatPredictActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
+	#snapshot_stats
+	#soul_fire
+	Spell(soul_fire)
+}
+
+AddFunction DemonologyPrecombatShortCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+	{
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
+	}
+}
+
+AddFunction DemonologyPrecombatCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard)
+	{
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+
+		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
+		{
+			#potion,name=jade_serpent
+			UsePotionIntellect()
+		}
+	}
+}
+
 ### Demonology icons.
 AddCheckBox(opt_warlock_demonology_aoe L(AOE) specialization=demonology default)
 
@@ -526,56 +526,6 @@ AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
 #	spec=destruction
 #	talents=0000310
 #	pet=felhunter
-
-# ActionList: DestructionPrecombatActions --> main, predict, shortcd, cd
-
-AddFunction DestructionPrecombatActions
-{
-	DestructionPrecombatPredictActions()
-
-	#incinerate
-	Spell(incinerate)
-}
-
-AddFunction DestructionPrecombatPredictActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#dark_intent,if=!aura.spell_power_multiplier.up
-	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#snapshot_stats
-	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
-	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
-}
-
-AddFunction DestructionPrecombatShortCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-	{
-		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	}
-}
-
-AddFunction DestructionPrecombatCdActions
-{
-	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
-		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
-	{
-		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-
-		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
-		{
-			#potion,name=jade_serpent
-			UsePotionIntellect()
-		}
-	}
-}
 
 # ActionList: DestructionDefaultActions --> main, predict, shortcd, cd
 
@@ -680,6 +630,56 @@ AddFunction DestructionAoeShortCdActions
 }
 
 AddFunction DestructionAoeCdActions {}
+
+# ActionList: DestructionPrecombatActions --> main, predict, shortcd, cd
+
+AddFunction DestructionPrecombatActions
+{
+	DestructionPrecombatPredictActions()
+
+	#incinerate
+	Spell(incinerate)
+}
+
+AddFunction DestructionPrecombatPredictActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
+	#snapshot_stats
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
+	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+}
+
+AddFunction DestructionPrecombatShortCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+	{
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	}
+}
+
+AddFunction DestructionPrecombatCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+		or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
+	{
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+
+		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+		{
+			#potion,name=jade_serpent
+			UsePotionIntellect()
+		}
+	}
+}
 
 # ActionList: DestructionSingleTargetActions --> main, predict, shortcd, cd
 

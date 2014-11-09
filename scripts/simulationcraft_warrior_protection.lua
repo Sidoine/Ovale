@@ -41,55 +41,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction ProtectionPrecombatActions
-{
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
-	#stance,choose=defensive
-	Spell(defensive_stance)
-	#snapshot_stats
-	#shield_wall
-	Spell(shield_wall)
-	#potion,name=mountains
-	UsePotionArmor()
-}
-
-AddFunction ProtectionProtAoeActions
-{
-	#bloodbath
-	Spell(bloodbath)
-	#avatar
-	Spell(avatar)
-	#thunder_clap,if=!dot.deep_wounds.ticking
-	if not target.DebuffPresent(deep_wounds_debuff) Spell(thunder_clap)
-	#heroic_strike,if=buff.ultimatum.up|rage>110|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
-	if BuffPresent(ultimatum_buff) or Rage() > 110 or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#shield_slam,if=buff.shield_block.up
-	if BuffPresent(shield_block_buff) Spell(shield_slam)
-	#ravager,if=(buff.avatar.up|cooldown.avatar.remains>10)|!talent.avatar.enabled
-	if BuffPresent(avatar_buff) or SpellCooldown(avatar) > 10 or not Talent(avatar_talent) Spell(ravager)
-	#dragon_roar,if=(buff.bloodbath.up|cooldown.bloodbath.remains>10)|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) Spell(dragon_roar)
-	#shockwave
-	Spell(shockwave)
-	#revenge
-	Spell(revenge)
-	#thunder_clap
-	Spell(thunder_clap)
-	#shield_slam
-	Spell(shield_slam)
-	#storm_bolt
-	Spell(storm_bolt)
-	#shield_slam
-	Spell(shield_slam)
-	#execute,if=buff.sudden_death.react
-	if BuffPresent(sudden_death_buff) Spell(execute)
-	#devastate
-	Spell(devastate)
-}
-
 AddFunction ProtectionDefaultActions
 {
 	#charge
@@ -105,6 +56,19 @@ AddFunction ProtectionDefaultActions
 	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
 	#call_action_list,name=prot
 	ProtectionProtActions()
+}
+
+AddFunction ProtectionPrecombatActions
+{
+	#flask,type=earth
+	#food,type=chun_tian_spring_rolls
+	#stance,choose=defensive
+	Spell(defensive_stance)
+	#snapshot_stats
+	#shield_wall
+	Spell(shield_wall)
+	#potion,name=mountains
+	UsePotionArmor()
 }
 
 AddFunction ProtectionProtActions
@@ -147,6 +111,42 @@ AddFunction ProtectionProtActions
 	if Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(impending_victory) Spell(impending_victory)
 	#victory_rush,if=!talent.impending_victory.enabled&cooldown.shield_slam.remains<=execute_time
 	if not Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(victory_rush) and BuffPresent(victorious_buff) Spell(victory_rush)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#devastate
+	Spell(devastate)
+}
+
+AddFunction ProtectionProtAoeActions
+{
+	#bloodbath
+	Spell(bloodbath)
+	#avatar
+	Spell(avatar)
+	#thunder_clap,if=!dot.deep_wounds.ticking
+	if not target.DebuffPresent(deep_wounds_debuff) Spell(thunder_clap)
+	#heroic_strike,if=buff.ultimatum.up|rage>110|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
+	if BuffPresent(ultimatum_buff) or Rage() > 110 or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#shield_slam,if=buff.shield_block.up
+	if BuffPresent(shield_block_buff) Spell(shield_slam)
+	#ravager,if=(buff.avatar.up|cooldown.avatar.remains>10)|!talent.avatar.enabled
+	if BuffPresent(avatar_buff) or SpellCooldown(avatar) > 10 or not Talent(avatar_talent) Spell(ravager)
+	#dragon_roar,if=(buff.bloodbath.up|cooldown.bloodbath.remains>10)|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#shockwave
+	Spell(shockwave)
+	#revenge
+	Spell(revenge)
+	#thunder_clap
+	Spell(thunder_clap)
+	#shield_slam
+	Spell(shield_slam)
+	#storm_bolt
+	Spell(storm_bolt)
+	#shield_slam
+	Spell(shield_slam)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
 	#devastate

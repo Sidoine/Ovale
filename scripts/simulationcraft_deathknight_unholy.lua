@@ -36,23 +36,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction UnholyPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#unholy_presence
-	Spell(unholy_presence)
-	#snapshot_stats
-	#army_of_the_dead
-	Spell(army_of_the_dead)
-	#potion,name=mogu_power
-	UsePotionStrength()
-	#raise_dead
-	Spell(raise_dead)
-}
-
 AddFunction UnholyDefaultActions
 {
 	#auto_attack
@@ -72,24 +55,6 @@ AddFunction UnholyDefaultActions
 	if Enemies() >= 2 UnholyAoeActions()
 	#run_action_list,name=single_target,if=active_enemies<2
 	if Enemies() < 2 UnholySingleTargetActions()
-}
-
-AddFunction UnholyBosStActions
-{
-	#death_and_decay,if=runic_power<88
-	if RunicPower() < 88 Spell(death_and_decay)
-	#festering_strike,if=runic_power<77
-	if RunicPower() < 77 Spell(festering_strike)
-	#scourge_strike,if=runic_power<88
-	if RunicPower() < 88 Spell(scourge_strike)
-	#blood_tap,if=buff.blood_charge.stack>=5
-	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
-	#empower_rune_weapon
-	Spell(empower_rune_weapon)
-	#death_coil,if=buff.sudden_doom.react
-	if BuffPresent(sudden_doom_buff) Spell(death_coil)
 }
 
 AddFunction UnholyAoeActions
@@ -158,6 +123,41 @@ AddFunction UnholyBosAoeActions
 	Spell(empower_rune_weapon)
 	#death_coil,if=buff.sudden_doom.react
 	if BuffPresent(sudden_doom_buff) Spell(death_coil)
+}
+
+AddFunction UnholyBosStActions
+{
+	#death_and_decay,if=runic_power<88
+	if RunicPower() < 88 Spell(death_and_decay)
+	#festering_strike,if=runic_power<77
+	if RunicPower() < 77 Spell(festering_strike)
+	#scourge_strike,if=runic_power<88
+	if RunicPower() < 88 Spell(scourge_strike)
+	#blood_tap,if=buff.blood_charge.stack>=5
+	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
+	#empower_rune_weapon
+	Spell(empower_rune_weapon)
+	#death_coil,if=buff.sudden_doom.react
+	if BuffPresent(sudden_doom_buff) Spell(death_coil)
+}
+
+AddFunction UnholyPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#unholy_presence
+	Spell(unholy_presence)
+	#snapshot_stats
+	#army_of_the_dead
+	Spell(army_of_the_dead)
+	#potion,name=mogu_power
+	UsePotionStrength()
+	#raise_dead
+	Spell(raise_dead)
 }
 
 AddFunction UnholySingleTargetActions

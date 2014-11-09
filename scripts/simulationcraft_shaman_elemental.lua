@@ -45,17 +45,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction ElementalPrecombatActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#lightning_shield,if=!buff.lightning_shield.up
-	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
-	#snapshot_stats
-	#potion,name=jade_serpent
-	UsePotionIntellect()
-}
-
 AddFunction ElementalDefaultActions
 {
 	#wind_shear
@@ -104,6 +93,17 @@ AddFunction ElementalAoeActions
 	if Enemies() >= 2 Spell(chain_lightning)
 	#lightning_bolt
 	Spell(lightning_bolt)
+}
+
+AddFunction ElementalPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#lightning_shield,if=!buff.lightning_shield.up
+	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
+	#snapshot_stats
+	#potion,name=jade_serpent
+	UsePotionIntellect()
 }
 
 AddFunction ElementalSingleActions

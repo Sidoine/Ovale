@@ -45,21 +45,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction FeralPrecombatActions
-{
-	#flask,type=winds
-	#food,type=seafood_magnifique_feast
-	#mark_of_the_wild,if=!aura.str_agi_int.up
-	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
-	#cat_form
-	Spell(cat_form)
-	#prowl
-	if BuffExpires(stealthed_buff any=1) Spell(prowl)
-	#snapshot_stats
-	#potion,name=tolvir
-	UsePotionAgility()
-}
-
 AddFunction FeralDefaultActions
 {
 	#cat_form
@@ -113,6 +98,28 @@ AddFunction FeralDefaultActions
 	if ComboPoints() < 5 FeralGeneratorActions()
 }
 
+AddFunction FeralFinisherActions
+{
+	#ferocious_bite,cycle_targets=1,if=target.health.pct<25&dot.rip.ticking&energy>=max_fb_energy
+	if target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+	#rip,cycle_targets=1,if=remains<3
+	if target.DebuffRemaining(rip_debuff) < 3 Spell(rip)
+	#rip,cycle_targets=1,if=remains<7.2&persistent_multiplier>dot.rip.pmultiplier
+	if target.DebuffRemaining(rip_debuff) < 7.2 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) Spell(rip)
+	#savage_roar,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&buff.savage_roar.remains<12.6
+	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 Spell(savage_roar)
+	#ferocious_bite,if=(energy.time_to_max<=1|buff.berserk.up|(cooldown.tigers_fury.remains<3&energy>=max_fb_energy))
+	if TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+}
+
+AddFunction FeralGeneratorActions
+{
+	#swipe,if=active_enemies>=3
+	if Enemies() >= 3 Spell(swipe)
+	#shred,if=active_enemies<3
+	if Enemies() < 3 Spell(shred)
+}
+
 AddFunction FeralMaintainActions
 {
 	#rake,cycle_targets=1,if=!talent.bloodtalons.enabled&remains<3&combo_points<5
@@ -135,26 +142,19 @@ AddFunction FeralMaintainActions
 	}
 }
 
-AddFunction FeralGeneratorActions
+AddFunction FeralPrecombatActions
 {
-	#swipe,if=active_enemies>=3
-	if Enemies() >= 3 Spell(swipe)
-	#shred,if=active_enemies<3
-	if Enemies() < 3 Spell(shred)
-}
-
-AddFunction FeralFinisherActions
-{
-	#ferocious_bite,cycle_targets=1,if=target.health.pct<25&dot.rip.ticking&energy>=max_fb_energy
-	if target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
-	#rip,cycle_targets=1,if=remains<3
-	if target.DebuffRemaining(rip_debuff) < 3 Spell(rip)
-	#rip,cycle_targets=1,if=remains<7.2&persistent_multiplier>dot.rip.pmultiplier
-	if target.DebuffRemaining(rip_debuff) < 7.2 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) Spell(rip)
-	#savage_roar,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&buff.savage_roar.remains<12.6
-	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 Spell(savage_roar)
-	#ferocious_bite,if=(energy.time_to_max<=1|buff.berserk.up|(cooldown.tigers_fury.remains<3&energy>=max_fb_energy))
-	if TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+	#flask,type=winds
+	#food,type=seafood_magnifique_feast
+	#mark_of_the_wild,if=!aura.str_agi_int.up
+	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
+	#cat_form
+	Spell(cat_form)
+	#prowl
+	if BuffExpires(stealthed_buff any=1) Spell(prowl)
+	#snapshot_stats
+	#potion,name=tolvir
+	UsePotionAgility()
 }
 
 AddIcon specialization=feral help=main enemies=1

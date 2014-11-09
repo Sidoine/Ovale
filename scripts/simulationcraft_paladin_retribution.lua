@@ -44,23 +44,6 @@ AddFunction RighteousFuryOff
 	if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
 }
 
-AddFunction RetributionPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#blessing_of_kings,if=!aura.str_agi_int.up
-	if not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
-	#blessing_of_might,if=!aura.mastery.up
-	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
-	#seal_of_truth,if=active_enemies<2
-	if Enemies() < 2 Spell(seal_of_truth)
-	#seal_of_righteousness,if=active_enemies>=2
-	if Enemies() >= 2 Spell(seal_of_righteousness)
-	#snapshot_stats
-	#potion,name=mogu_power
-	UsePotionStrength()
-}
-
 AddFunction RetributionDefaultActions
 {
 	#rebuke
@@ -122,6 +105,53 @@ AddFunction RetributionAoeActions
 	Spell(holy_prism)
 }
 
+AddFunction RetributionCleaveActions
+{
+	#final_verdict,if=buff.final_verdict.down&holy_power=5
+	if BuffExpires(final_verdict_buff) and HolyPower() == 5 Spell(final_verdict)
+	#divine_storm,if=holy_power=5&buff.final_verdict.up
+	if HolyPower() == 5 and BuffPresent(final_verdict_buff) Spell(divine_storm)
+	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
+	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
+	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
+	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Spell(exorcism)
+	#hammer_of_wrath
+	Spell(hammer_of_wrath)
+	#judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<=5
+	if Talent(empowered_seals_talent) and Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= 5 Spell(judgment)
+	#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
+	if { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
+	#crusader_strike
+	Spell(crusader_strike)
+	#final_verdict,if=buff.final_verdict.down
+	if BuffExpires(final_verdict_buff) Spell(final_verdict)
+	#divine_storm,if=buff.final_verdict.up
+	if BuffPresent(final_verdict_buff) Spell(divine_storm)
+	#judgment
+	Spell(judgment)
+	#exorcism
+	Spell(exorcism)
+	#holy_prism
+	Spell(holy_prism)
+}
+
+AddFunction RetributionPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#blessing_of_kings,if=!aura.str_agi_int.up
+	if not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
+	#blessing_of_might,if=!aura.mastery.up
+	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
+	#seal_of_truth,if=active_enemies<2
+	if Enemies() < 2 Spell(seal_of_truth)
+	#seal_of_righteousness,if=active_enemies>=2
+	if Enemies() >= 2 Spell(seal_of_righteousness)
+	#snapshot_stats
+	#potion,name=mogu_power
+	UsePotionStrength()
+}
+
 AddFunction RetributionSingleActions
 {
 	#divine_storm,if=buff.divine_crusader.react&holy_power=5&buff.final_verdict.up
@@ -178,36 +208,6 @@ AddFunction RetributionSingleActions
 	Spell(exorcism)
 	#templars_verdict,if=holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
 	if HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(templars_verdict)
-	#holy_prism
-	Spell(holy_prism)
-}
-
-AddFunction RetributionCleaveActions
-{
-	#final_verdict,if=buff.final_verdict.down&holy_power=5
-	if BuffExpires(final_verdict_buff) and HolyPower() == 5 Spell(final_verdict)
-	#divine_storm,if=holy_power=5&buff.final_verdict.up
-	if HolyPower() == 5 and BuffPresent(final_verdict_buff) Spell(divine_storm)
-	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
-	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
-	#exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
-	if BuffPresent(blazing_contempt_buff) and HolyPower() <= 2 and BuffExpires(holy_avenger_buff) Spell(exorcism)
-	#hammer_of_wrath
-	Spell(hammer_of_wrath)
-	#judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<=5
-	if Talent(empowered_seals_talent) and Stance(paladin_seal_of_righteousness) and BuffRemaining(liadrins_righteousness_buff) <= 5 Spell(judgment)
-	#divine_storm,if=(!talent.seraphim.enabled|cooldown.seraphim.remains>4)&!talent.final_verdict.enabled
-	if { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } and not Talent(final_verdict_talent) Spell(divine_storm)
-	#crusader_strike
-	Spell(crusader_strike)
-	#final_verdict,if=buff.final_verdict.down
-	if BuffExpires(final_verdict_buff) Spell(final_verdict)
-	#divine_storm,if=buff.final_verdict.up
-	if BuffPresent(final_verdict_buff) Spell(divine_storm)
-	#judgment
-	Spell(judgment)
-	#exorcism
-	Spell(exorcism)
 	#holy_prism
 	Spell(holy_prism)
 }

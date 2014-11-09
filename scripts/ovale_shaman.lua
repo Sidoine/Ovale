@@ -56,28 +56,6 @@ AddFunction InterruptActions
 #	talents=0001030
 #	glyphs=chain_lightning
 
-# ActionList: ElementalPrecombatActions --> main, shortcd, cd
-
-AddFunction ElementalPrecombatActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#lightning_shield,if=!buff.lightning_shield.up
-	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
-	#snapshot_stats
-}
-
-AddFunction ElementalPrecombatShortCdActions {}
-
-AddFunction ElementalPrecombatCdActions
-{
-	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
-	{
-		#potion,name=jade_serpent
-		UsePotionIntellect()
-	}
-}
-
 # ActionList: ElementalDefaultActions --> main, shortcd, cd
 
 AddFunction ElementalDefaultActions
@@ -151,6 +129,28 @@ AddFunction ElementalAoeActions
 AddFunction ElementalAoeShortCdActions {}
 
 AddFunction ElementalAoeCdActions {}
+
+# ActionList: ElementalPrecombatActions --> main, shortcd, cd
+
+AddFunction ElementalPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#lightning_shield,if=!buff.lightning_shield.up
+	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
+	#snapshot_stats
+}
+
+AddFunction ElementalPrecombatShortCdActions {}
+
+AddFunction ElementalPrecombatCdActions
+{
+	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
+	{
+		#potion,name=jade_serpent
+		UsePotionIntellect()
+	}
+}
 
 # ActionList: ElementalSingleActions --> main, shortcd, cd
 
@@ -262,28 +262,6 @@ AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
 #	talents=0002020
 #	glyphs=chain_lightning/frost_shock
 
-# ActionList: EnhancementPrecombatActions --> main, shortcd, cd
-
-AddFunction EnhancementPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#lightning_shield,if=!buff.lightning_shield.up
-	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
-	#snapshot_stats
-}
-
-AddFunction EnhancementPrecombatShortCdActions {}
-
-AddFunction EnhancementPrecombatCdActions
-{
-	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
-	{
-		#potion,name=virmens_bite
-		UsePotionAgility()
-	}
-}
-
 # ActionList: EnhancementDefaultActions --> main, shortcd, cd
 
 AddFunction EnhancementDefaultActions
@@ -380,6 +358,28 @@ AddFunction EnhancementAoeActions
 		if Enemies() < 3 and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(lightning_bolt)
 		#fire_nova,if=active_dot.flame_shock>=1
 		if DebuffCountOnAny(flame_shock_debuff) >= 1 Spell(fire_nova)
+	}
+}
+
+# ActionList: EnhancementPrecombatActions --> main, shortcd, cd
+
+AddFunction EnhancementPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#lightning_shield,if=!buff.lightning_shield.up
+	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
+	#snapshot_stats
+}
+
+AddFunction EnhancementPrecombatShortCdActions {}
+
+AddFunction EnhancementPrecombatCdActions
+{
+	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
+	{
+		#potion,name=virmens_bite
+		UsePotionAgility()
 	}
 }
 

@@ -101,27 +101,6 @@ AddFunction DemonologyDefaultActions
 	Spell(life_tap)
 }
 
-AddFunction DemonologyPrecombatActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#dark_intent,if=!aura.spell_power_multiplier.up
-	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
-	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-	if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-	#snapshot_stats
-	#service_pet,if=talent.grimoire_of_service.enabled
-	if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
-	#potion,name=jade_serpent
-	UsePotionIntellect()
-	#soul_fire
-	Spell(soul_fire)
-}
-
 AddFunction DemonologyDbActions
 {
 	#doom,if=buff.metamorphosis.up&target.time_to_die>=30*spell_haste&remains<=(duration*0.3)&(remains<cooldown.cataclysm.remains|!talent.cataclysm.enabled)&(buff.dark_soul.down|!glyph.dark_soul.enabled)&buff.demonbolt.remains&(buff.demonbolt.remains<(40*spell_haste-action.demonbolt.execute_time)|demonic_fury<80+80*buff.demonbolt.stack)
@@ -162,6 +141,27 @@ AddFunction DemonologyDbActions
 	Spell(shadow_bolt)
 	#life_tap
 	Spell(life_tap)
+}
+
+AddFunction DemonologyPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#dark_intent,if=!aura.spell_power_multiplier.up
+	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
+	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
+	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+	if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+	#snapshot_stats
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
+	#potion,name=jade_serpent
+	UsePotionIntellect()
+	#soul_fire
+	Spell(soul_fire)
 }
 
 AddIcon specialization=demonology help=main enemies=1

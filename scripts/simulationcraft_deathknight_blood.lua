@@ -37,21 +37,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction BloodPrecombatActions
-{
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
-	#blood_presence
-	Spell(blood_presence)
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#snapshot_stats
-	#potion,name=mountains
-	UsePotionArmor()
-	#bone_shield
-	Spell(bone_shield)
-}
-
 AddFunction BloodDefaultActions
 {
 	#auto_attack
@@ -109,6 +94,21 @@ AddFunction BloodDefaultActions
 	Spell(death_coil)
 	#empower_rune_weapon,if=!blood&!unholy&!frost
 	if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
+}
+
+AddFunction BloodPrecombatActions
+{
+	#flask,type=earth
+	#food,type=chun_tian_spring_rolls
+	#blood_presence
+	Spell(blood_presence)
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#snapshot_stats
+	#potion,name=mountains
+	UsePotionArmor()
+	#bone_shield
+	Spell(bone_shield)
 }
 
 AddIcon specialization=blood help=main enemies=1

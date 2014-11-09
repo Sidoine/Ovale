@@ -38,23 +38,6 @@ AddFunction ProtectionTimeToHPG
 	if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
 }
 
-AddFunction ProtectionPrecombatActions
-{
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
-	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
-	if not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
-	#blessing_of_might,if=!aura.mastery.up
-	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
-	#seal_of_insight
-	Spell(seal_of_insight)
-	#sacred_shield
-	Spell(sacred_shield)
-	#snapshot_stats
-	#potion,name=mogu_power
-	UsePotionStrength()
-}
-
 AddFunction ProtectionDefaultActions
 {
 	#auto_attack
@@ -298,6 +281,23 @@ AddFunction ProtectionMaxSurvivalActions
 			Spell(sacred_shield)
 		}
 	}
+}
+
+AddFunction ProtectionPrecombatActions
+{
+	#flask,type=earth
+	#food,type=chun_tian_spring_rolls
+	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
+	if not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
+	#blessing_of_might,if=!aura.mastery.up
+	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
+	#seal_of_insight
+	Spell(seal_of_insight)
+	#sacred_shield
+	Spell(sacred_shield)
+	#snapshot_stats
+	#potion,name=mogu_power
+	UsePotionStrength()
 }
 
 AddIcon specialization=protection help=main enemies=1

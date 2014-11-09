@@ -46,23 +46,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction AssassinationPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#apply_poison,lethal=deadly
-	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#marked_for_death
-	Spell(marked_for_death)
-	#slice_and_dice,if=talent.marked_for_death.enabled
-	if Talent(marked_for_death_talent) Spell(slice_and_dice)
-}
-
 AddFunction AssassinationDefaultActions
 {
 	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
@@ -117,6 +100,23 @@ AddFunction AssassinationDefaultActions
 	if Enemies() == 2 and not target.DebuffPresent(deadly_poison_dot_debuff) and target.DebuffExpires(vendetta_debuff) Spell(mutilate)
 	#mutilate,if=active_enemies<5
 	if Enemies() < 5 Spell(mutilate)
+}
+
+AddFunction AssassinationPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#apply_poison,lethal=deadly
+	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
+	#stealth
+	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	#marked_for_death
+	Spell(marked_for_death)
+	#slice_and_dice,if=talent.marked_for_death.enabled
+	if Talent(marked_for_death_talent) Spell(slice_and_dice)
 }
 
 AddIcon specialization=assassination help=main enemies=1

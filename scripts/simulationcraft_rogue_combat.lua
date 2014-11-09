@@ -46,23 +46,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction CombatPrecombatActions
-{
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
-	#apply_poison,lethal=deadly
-	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#marked_for_death
-	Spell(marked_for_death)
-	#slice_and_dice,if=talent.marked_for_death.enabled
-	if Talent(marked_for_death_talent) Spell(slice_and_dice)
-}
-
 AddFunction CombatDefaultActions
 {
 	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
@@ -99,14 +82,6 @@ AddFunction CombatDefaultActions
 	if ComboPoints() == 5 and target.DebuffPresent(revealing_strike_debuff) and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 4 } CombatFinisherActions()
 }
 
-AddFunction CombatGeneratorActions
-{
-	#revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
-	if ComboPoints() == 4 and target.DebuffRemaining(revealing_strike_debuff) < 7.2 and target.TimeToDie() > target.DebuffRemaining(revealing_strike_debuff) + 7.2 or target.TimeToDie() < target.DebuffRemaining(revealing_strike_debuff) + 7.2 and target.TicksRemaining(revealing_strike_debuff) < 2 or not target.DebuffPresent(revealing_strike_debuff) Spell(revealing_strike)
-	#sinister_strike,if=dot.revealing_strike.ticking
-	if target.DebuffPresent(revealing_strike_debuff) Spell(sinister_strike)
-}
-
 AddFunction CombatFinisherActions
 {
 	#death_from_above
@@ -117,6 +92,31 @@ AddFunction CombatFinisherActions
 	if Enemies() > 2 Spell(crimson_tempest)
 	#eviscerate
 	Spell(eviscerate)
+}
+
+AddFunction CombatGeneratorActions
+{
+	#revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
+	if ComboPoints() == 4 and target.DebuffRemaining(revealing_strike_debuff) < 7.2 and target.TimeToDie() > target.DebuffRemaining(revealing_strike_debuff) + 7.2 or target.TimeToDie() < target.DebuffRemaining(revealing_strike_debuff) + 7.2 and target.TicksRemaining(revealing_strike_debuff) < 2 or not target.DebuffPresent(revealing_strike_debuff) Spell(revealing_strike)
+	#sinister_strike,if=dot.revealing_strike.ticking
+	if target.DebuffPresent(revealing_strike_debuff) Spell(sinister_strike)
+}
+
+AddFunction CombatPrecombatActions
+{
+	#flask,type=spring_blossoms
+	#food,type=sea_mist_rice_noodles
+	#apply_poison,lethal=deadly
+	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
+	#stealth
+	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	#marked_for_death
+	Spell(marked_for_death)
+	#slice_and_dice,if=talent.marked_for_death.enabled
+	if Talent(marked_for_death_talent) Spell(slice_and_dice)
 }
 
 AddIcon specialization=combat help=main enemies=1

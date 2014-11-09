@@ -35,25 +35,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction FrostPrecombatActions
-{
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
-	#arcane_brilliance
-	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
-	#water_elemental
-	if not pet.Present() Spell(water_elemental)
-	#snapshot_stats
-	#rune_of_power
-	Spell(rune_of_power)
-	#mirror_image
-	Spell(mirror_image)
-	#potion,name=jade_serpent
-	UsePotionIntellect()
-	#frostbolt
-	Spell(frostbolt)
-}
-
 AddFunction FrostDefaultActions
 {
 	#counterspell,if=target.debuff.casting.react
@@ -104,6 +85,67 @@ AddFunction FrostAoeActions
 	Spell(blizzard)
 }
 
+AddFunction FrostCooldownsActions
+{
+	#icy_veins
+	Spell(icy_veins)
+	#blood_fury
+	Spell(blood_fury_sp)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
+	#potion,name=jade_serpent,if=buff.bloodlust.up|buff.icy_veins.up
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) UsePotionIntellect()
+}
+
+AddFunction FrostCrystalSequenceActions
+{
+	#frost_bomb,if=active_enemies=1&current_target!=prismatic_crystal&remains<10
+	if Enemies() == 1 and not target.Name("Prismatic Crystal") and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
+	#frozen_orb
+	Spell(frozen_orb)
+	#call_action_list,name=cooldowns
+	FrostCooldownsActions()
+	#prismatic_crystal
+	Spell(prismatic_crystal)
+	#frost_bomb,if=talent.prismatic_crystal.enabled&current_target=prismatic_crystal&active_enemies>1&!ticking
+	if Talent(prismatic_crystal_talent) and target.Name("Prismatic Crystal") and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) Spell(frost_bomb)
+	#ice_lance,if=buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&active_dot.frozen_orb>=1)
+	if BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and DebuffCountOnAny(frozen_orb_debuff) >= 1 Spell(ice_lance)
+	#ice_nova,if=charges=2
+	if Charges(ice_nova) == 2 Spell(ice_nova)
+	#frostfire_bolt,if=buff.brain_freeze.react
+	if BuffPresent(brain_freeze_buff) Spell(frostfire_bolt)
+	#ice_lance,if=buff.fingers_of_frost.react
+	if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
+	#ice_nova
+	Spell(ice_nova)
+	#blizzard,interrupt_if=cooldown.frozen_orb.up|(talent.frost_bomb.enabled&buff.fingers_of_frost.react=2),if=active_enemies>=5
+	if Enemies() >= 5 Spell(blizzard)
+	#frostbolt
+	Spell(frostbolt)
+}
+
+AddFunction FrostPrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=mogu_fish_stew
+	#arcane_brilliance
+	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
+	#water_elemental
+	if not pet.Present() Spell(water_elemental)
+	#snapshot_stats
+	#rune_of_power
+	Spell(rune_of_power)
+	#mirror_image
+	Spell(mirror_image)
+	#potion,name=jade_serpent
+	UsePotionIntellect()
+	#frostbolt
+	Spell(frostbolt)
+}
+
 AddFunction FrostSingleTargetActions
 {
 	#call_action_list,name=cooldowns,if=!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>45
@@ -144,48 +186,6 @@ AddFunction FrostSingleTargetActions
 	Spell(frostbolt)
 	#ice_lance,moving=1
 	if Speed() > 0 Spell(ice_lance)
-}
-
-AddFunction FrostCrystalSequenceActions
-{
-	#frost_bomb,if=active_enemies=1&current_target!=prismatic_crystal&remains<10
-	if Enemies() == 1 and not target.Name("Prismatic Crystal") and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
-	#frozen_orb
-	Spell(frozen_orb)
-	#call_action_list,name=cooldowns
-	FrostCooldownsActions()
-	#prismatic_crystal
-	Spell(prismatic_crystal)
-	#frost_bomb,if=talent.prismatic_crystal.enabled&current_target=prismatic_crystal&active_enemies>1&!ticking
-	if Talent(prismatic_crystal_talent) and target.Name("Prismatic Crystal") and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) Spell(frost_bomb)
-	#ice_lance,if=buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&active_dot.frozen_orb>=1)
-	if BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and DebuffCountOnAny(frozen_orb_debuff) >= 1 Spell(ice_lance)
-	#ice_nova,if=charges=2
-	if Charges(ice_nova) == 2 Spell(ice_nova)
-	#frostfire_bolt,if=buff.brain_freeze.react
-	if BuffPresent(brain_freeze_buff) Spell(frostfire_bolt)
-	#ice_lance,if=buff.fingers_of_frost.react
-	if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
-	#ice_nova
-	Spell(ice_nova)
-	#blizzard,interrupt_if=cooldown.frozen_orb.up|(talent.frost_bomb.enabled&buff.fingers_of_frost.react=2),if=active_enemies>=5
-	if Enemies() >= 5 Spell(blizzard)
-	#frostbolt
-	Spell(frostbolt)
-}
-
-AddFunction FrostCooldownsActions
-{
-	#icy_veins
-	Spell(icy_veins)
-	#blood_fury
-	Spell(blood_fury_sp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_mana)
-	#potion,name=jade_serpent,if=buff.bloodlust.up|buff.icy_veins.up
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) UsePotionIntellect()
 }
 
 AddIcon specialization=frost help=main enemies=1

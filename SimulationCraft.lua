@@ -370,7 +370,7 @@ end
 local function UnparseActionList(node)
 	local output = self_outputPool:Get()
 	local listName
-	if node.name == "default" then
+	if node.name == "_default" then
 		listName = "action"
 	else
 		listName = "action." .. node.name
@@ -3439,7 +3439,8 @@ function OvaleSimulationCraft:ParseProfile(simc)
 	local actionList = {}
 	for k, v in pairs(profile) do
 		if ok and strmatch(k, "^actions") then
-			local name = strmatch(k, "^actions%.([%w_]+)") or "default"
+			-- Name the default action list "_default" so it's first alphabetically.
+			local name = strmatch(k, "^actions%.([%w_]+)") or "_default"
 			local node
 			ok, node = ParseActionList(name, v, nodeList, annotation)
 			if ok then
@@ -3449,6 +3450,8 @@ function OvaleSimulationCraft:ParseProfile(simc)
 			end
 		end
 	end
+	-- Sort the action lists alphabetically.
+	tsort(actionList, function(a, b) return a.name < b.name end)
 	-- Set the name, class, specialization, and role from the profile.
 	for class in pairs(RAID_CLASS_COLORS) do
 		local lowerClass = strlower(class)
@@ -3566,7 +3569,7 @@ function OvaleSimulationCraft:Emit(profile)
 		if profile["actions.precombat"] then
 			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation))
 		end
-		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation))
+		output[#output + 1] = format("	%s()", OvaleFunctionName("_default", annotation))
 		output[#output + 1] = "}"
 		-- AoE rotation.
 		output[#output + 1] = ""
@@ -3575,7 +3578,7 @@ function OvaleSimulationCraft:Emit(profile)
 		if profile["actions.precombat"] then
 			output[#output + 1] = format("	if not InCombat() %s()", OvaleFunctionName("precombat", annotation))
 		end
-		output[#output + 1] = format("	%s()", OvaleFunctionName("default", annotation))
+		output[#output + 1] = format("	%s()", OvaleFunctionName("_default", annotation))
 		output[#output + 1] = "}"
 	end
 	-- Append the required symbols for the script.

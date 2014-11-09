@@ -41,17 +41,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction ArmsPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#stance,choose=battle
-	Spell(battle_stance)
-	#snapshot_stats
-	#potion,name=mogu_power
-	UsePotionStrength()
-}
-
 AddFunction ArmsDefaultActions
 {
 	#charge
@@ -115,6 +104,27 @@ AddFunction ArmsAoeActions
 	if BuffPresent(sudden_death_buff) Spell(execute_arms)
 }
 
+AddFunction ArmsMovementActions
+{
+	#heroic_leap
+	if target.InRange(charge) Spell(heroic_leap)
+	#storm_bolt
+	Spell(storm_bolt)
+	#heroic_throw
+	Spell(heroic_throw)
+}
+
+AddFunction ArmsPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#stance,choose=battle
+	Spell(battle_stance)
+	#snapshot_stats
+	#potion,name=mogu_power
+	UsePotionStrength()
+}
+
 AddFunction ArmsSingleActions
 {
 	#rend,if=!ticking&target.time_to_die>4
@@ -143,16 +153,6 @@ AddFunction ArmsSingleActions
 	if not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 Spell(whirlwind)
 	#shockwave
 	Spell(shockwave)
-}
-
-AddFunction ArmsMovementActions
-{
-	#heroic_leap
-	if target.InRange(charge) Spell(heroic_leap)
-	#storm_bolt
-	Spell(storm_bolt)
-	#heroic_throw
-	Spell(heroic_throw)
 }
 
 AddIcon specialization=arms help=main enemies=1

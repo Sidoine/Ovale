@@ -20,21 +20,6 @@ AddFunction UsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
 }
 
-AddFunction BalancePrecombatActions
-{
-	#flask,type=warm_sun
-	#food,type=seafood_magnifique_feast
-	#mark_of_the_wild,if=!aura.str_agi_int.up
-	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
-	#moonkin_form
-	Spell(moonkin_form)
-	#snapshot_stats
-	#potion,name=jade_serpent
-	UsePotionIntellect()
-	#stellar_flare
-	Spell(stellar_flare)
-}
-
 AddFunction BalanceDefaultActions
 {
 	#potion,name=jade_serpent,if=buff.celestial_alignment.up
@@ -73,6 +58,21 @@ AddFunction BalanceAoeActions
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
 	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
+}
+
+AddFunction BalancePrecombatActions
+{
+	#flask,type=warm_sun
+	#food,type=seafood_magnifique_feast
+	#mark_of_the_wild,if=!aura.str_agi_int.up
+	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
+	#moonkin_form
+	Spell(moonkin_form)
+	#snapshot_stats
+	#potion,name=jade_serpent
+	UsePotionIntellect()
+	#stellar_flare
+	Spell(stellar_flare)
 }
 
 AddFunction BalanceSingleTargetActions

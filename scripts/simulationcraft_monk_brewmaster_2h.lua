@@ -37,19 +37,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction BrewmasterPrecombatActions
-{
-	#flask,type=earth
-	#food,type=mogu_fish_stew
-	#stance,choose=sturdy_ox
-	Spell(stance_of_the_sturdy_ox)
-	#snapshot_stats
-	#potion,name=virmens_bite
-	UsePotionAgility()
-	#dampen_harm
-	Spell(dampen_harm)
-}
-
 AddFunction BrewmasterDefaultActions
 {
 	#auto_attack
@@ -120,6 +107,19 @@ AddFunction BrewmasterAoeActions
 	if Talent(rushing_jade_wind_talent) and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 40 Spell(tiger_palm)
 	#tiger_palm,if=talent.rushing_jade_wind.enabled&cooldown.keg_smash.remains>=gcd
 	if Talent(rushing_jade_wind_talent) and SpellCooldown(keg_smash) >= GCD() Spell(tiger_palm)
+}
+
+AddFunction BrewmasterPrecombatActions
+{
+	#flask,type=earth
+	#food,type=mogu_fish_stew
+	#stance,choose=sturdy_ox
+	Spell(stance_of_the_sturdy_ox)
+	#snapshot_stats
+	#potion,name=virmens_bite
+	UsePotionAgility()
+	#dampen_harm
+	Spell(dampen_harm)
 }
 
 AddFunction BrewmasterStActions

@@ -48,39 +48,6 @@ AddFunction InterruptActions
 #	talents=2303100
 #	glyphs=vampiric_blood/regenerative_magic
 
-# ActionList: BloodPrecombatActions --> main, shortcd, cd
-
-AddFunction BloodPrecombatActions
-{
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
-	#blood_presence
-	Spell(blood_presence)
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#snapshot_stats
-}
-
-AddFunction BloodPrecombatShortCdActions
-{
-	unless Spell(blood_presence)
-		or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-	{
-		#bone_shield
-		Spell(bone_shield)
-	}
-}
-
-AddFunction BloodPrecombatCdActions
-{
-	unless Spell(blood_presence)
-		or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-	{
-		#potion,name=mountains
-		UsePotionArmor()
-	}
-}
-
 # ActionList: BloodDefaultActions --> main, shortcd, cd
 
 AddFunction BloodDefaultActions
@@ -192,6 +159,16 @@ AddFunction BloodDefaultCdActions
 	}
 }
 
+# ActionList: BloodBloodActions --> main
+
+AddFunction BloodBloodActions
+{
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_blood)
+	#blood_boil
+	Spell(blood_boil)
+}
+
 # ActionList: BloodBtActions --> main
 
 AddFunction BloodBtActions
@@ -212,14 +189,47 @@ AddFunction BloodBtActions
 	if Rune(blood) >= 2 or Rune(blood) >= 1 and DeathRune(blood) < 1 BloodBloodActions()
 }
 
-# ActionList: BloodReActions --> main
+# ActionList: BloodNrtActions --> main
 
-AddFunction BloodReActions
+AddFunction BloodNrtActions
 {
-	#death_strike,if=unholy&frost
-	if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-	#call_action_list,name=blood,if=blood=2
-	if Rune(blood) >= 2 BloodBloodActions()
+	#death_strike,if=unholy=2&frost=2
+	if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
+	#call_action_list,name=blood,if=blood>=1
+	if Rune(blood) >= 1 BloodBloodActions()
+}
+
+# ActionList: BloodPrecombatActions --> main, shortcd, cd
+
+AddFunction BloodPrecombatActions
+{
+	#flask,type=earth
+	#food,type=chun_tian_spring_rolls
+	#blood_presence
+	Spell(blood_presence)
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#snapshot_stats
+}
+
+AddFunction BloodPrecombatShortCdActions
+{
+	unless Spell(blood_presence)
+		or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	{
+		#bone_shield
+		Spell(bone_shield)
+	}
+}
+
+AddFunction BloodPrecombatCdActions
+{
+	unless Spell(blood_presence)
+		or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	{
+		#potion,name=mountains
+		UsePotionArmor()
+	}
 }
 
 # ActionList: BloodRcActions --> main
@@ -232,24 +242,14 @@ AddFunction BloodRcActions
 	if Rune(blood) >= 2 BloodBloodActions()
 }
 
-# ActionList: BloodNrtActions --> main
+# ActionList: BloodReActions --> main
 
-AddFunction BloodNrtActions
+AddFunction BloodReActions
 {
-	#death_strike,if=unholy=2&frost=2
-	if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-	#call_action_list,name=blood,if=blood>=1
-	if Rune(blood) >= 1 BloodBloodActions()
-}
-
-# ActionList: BloodBloodActions --> main
-
-AddFunction BloodBloodActions
-{
-	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_blood)
-	#blood_boil
-	Spell(blood_boil)
+	#death_strike,if=unholy&frost
+	if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+	#call_action_list,name=blood,if=blood=2
+	if Rune(blood) >= 2 BloodBloodActions()
 }
 
 ### Blood icons
@@ -299,41 +299,6 @@ AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood_aoe
 #	spec=frost
 #	talents=2001000
 
-# ActionList: FrostDualWieldPrecombatActions --> main, shortcd, cd
-
-AddFunction FrostDualWieldPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#frost_presence
-	Spell(frost_presence)
-	#snapshot_stats
-}
-
-AddFunction FrostDualWieldPrecombatShortCdActions
-{
-	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		or Spell(frost_presence)
-	{
-		#pillar_of_frost
-		Spell(pillar_of_frost)
-	}
-}
-
-AddFunction FrostDualWieldPrecombatCdActions
-{
-	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		or Spell(frost_presence)
-	{
-		#army_of_the_dead
-		Spell(army_of_the_dead)
-		#potion,name=mogu_power
-		UsePotionStrength()
-	}
-}
-
 # ActionList: FrostDualWieldDefaultActions --> main, shortcd, cd
 
 AddFunction FrostDualWieldDefaultActions
@@ -375,52 +340,6 @@ AddFunction FrostDualWieldDefaultCdActions
 	if Enemies() >= 3 FrostDualWieldAoeCdActions()
 	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostDualWieldSingleTargetCdActions()
-}
-
-# ActionList: FrostDualWieldBosStActions --> main, shortcd, cd
-
-AddFunction FrostDualWieldBosStActions
-{
-	#obliterate,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) Spell(obliterate)
-	#plague_leech,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
-	#howling_blast,if=runic_power<88
-	if RunicPower() < 88 Spell(howling_blast)
-	#obliterate,if=unholy>0&runic_power<76
-	if Rune(unholy) >= 1 and RunicPower() < 76 Spell(obliterate)
-	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
-}
-
-AddFunction FrostDualWieldBosStShortCdActions
-{
-	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
-	{
-		#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
-		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-
-		unless BuffPresent(killing_machine_buff) and target.DiseasesTicking() and Spell(plague_leech)
-			or RunicPower() < 88 Spell(howling_blast)
-			or Rune(unholy) >= 1 and RunicPower() < 76 Spell(obliterate)
-		{
-			#blood_tap,if=buff.blood_charge.stack>=5
-			if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-		}
-	}
-}
-
-AddFunction FrostDualWieldBosStCdActions
-{
-	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
-		or BuffPresent(killing_machine_buff) and target.DiseasesTicking() and Spell(plague_leech)
-		or RunicPower() < 88 and Spell(howling_blast)
-		or Rune(unholy) >= 1 and RunicPower() < 76 and Spell(obliterate)
-		or target.DiseasesTicking() Spell(plague_leech)
-	{
-		#empower_rune_weapon
-		Spell(empower_rune_weapon)
-	}
 }
 
 # ActionList: FrostDualWieldAoeActions --> main, shortcd, cd
@@ -543,6 +462,87 @@ AddFunction FrostDualWieldBosAoeCdActions
 	{
 		#empower_rune_weapon
 		Spell(empower_rune_weapon)
+	}
+}
+
+# ActionList: FrostDualWieldBosStActions --> main, shortcd, cd
+
+AddFunction FrostDualWieldBosStActions
+{
+	#obliterate,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) Spell(obliterate)
+	#plague_leech,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
+	#howling_blast,if=runic_power<88
+	if RunicPower() < 88 Spell(howling_blast)
+	#obliterate,if=unholy>0&runic_power<76
+	if Rune(unholy) >= 1 and RunicPower() < 76 Spell(obliterate)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
+}
+
+AddFunction FrostDualWieldBosStShortCdActions
+{
+	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
+	{
+		#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
+		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+		unless BuffPresent(killing_machine_buff) and target.DiseasesTicking() and Spell(plague_leech)
+			or RunicPower() < 88 Spell(howling_blast)
+			or Rune(unholy) >= 1 and RunicPower() < 76 Spell(obliterate)
+		{
+			#blood_tap,if=buff.blood_charge.stack>=5
+			if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		}
+	}
+}
+
+AddFunction FrostDualWieldBosStCdActions
+{
+	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
+		or BuffPresent(killing_machine_buff) and target.DiseasesTicking() and Spell(plague_leech)
+		or RunicPower() < 88 and Spell(howling_blast)
+		or Rune(unholy) >= 1 and RunicPower() < 76 and Spell(obliterate)
+		or target.DiseasesTicking() Spell(plague_leech)
+	{
+		#empower_rune_weapon
+		Spell(empower_rune_weapon)
+	}
+}
+
+# ActionList: FrostDualWieldPrecombatActions --> main, shortcd, cd
+
+AddFunction FrostDualWieldPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#frost_presence
+	Spell(frost_presence)
+	#snapshot_stats
+}
+
+AddFunction FrostDualWieldPrecombatShortCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+		or Spell(frost_presence)
+	{
+		#pillar_of_frost
+		Spell(pillar_of_frost)
+	}
+}
+
+AddFunction FrostDualWieldPrecombatCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+		or Spell(frost_presence)
+	{
+		#army_of_the_dead
+		Spell(army_of_the_dead)
+		#potion,name=mogu_power
+		UsePotionStrength()
 	}
 }
 
@@ -669,41 +669,6 @@ AddFunction FrostDualWieldSingleTargetCdActions
 #	spec=frost
 #	talents=2001000
 
-# ActionList: FrostTwoHanderPrecombatActions --> main, shortcd, cd
-
-AddFunction FrostTwoHanderPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#frost_presence
-	Spell(frost_presence)
-	#snapshot_stats
-}
-
-AddFunction FrostTwoHanderPrecombatShortCdActions
-{
-	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		or Spell(frost_presence)
-	{
-		#pillar_of_frost
-		Spell(pillar_of_frost)
-	}
-}
-
-AddFunction FrostTwoHanderPrecombatCdActions
-{
-	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		or Spell(frost_presence)
-	{
-		#army_of_the_dead
-		Spell(army_of_the_dead)
-		#potion,name=mogu_power
-		UsePotionStrength()
-	}
-}
-
 # ActionList: FrostTwoHanderDefaultActions --> main, shortcd, cd
 
 AddFunction FrostTwoHanderDefaultActions
@@ -746,39 +711,6 @@ AddFunction FrostTwoHanderDefaultCdActions
 	#run_action_list,name=single_target,if=active_enemies<3
 	if Enemies() < 3 FrostTwoHanderSingleTargetCdActions()
 }
-
-# ActionList: FrostTwoHanderBosStActions --> main, shortcd, cd
-
-AddFunction FrostTwoHanderBosStActions
-{
-	#obliterate,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) Spell(obliterate)
-	#plague_leech,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
-	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
-	#obliterate,if=runic_power<76
-	if RunicPower() < 76 Spell(obliterate)
-	#howling_blast,if=((death=1&frost=0&unholy=0)|death=0&frost=1&unholy=0)&runic_power<88
-	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 Spell(howling_blast)
-}
-
-AddFunction FrostTwoHanderBosStShortCdActions
-{
-	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
-	{
-		#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
-		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-
-		unless BuffPresent(killing_machine_buff) and target.DiseasesTicking() and Spell(plague_leech)
-		{
-			#blood_tap,if=buff.blood_charge.stack>=5
-			if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-		}
-	}	
-}
-
-AddFunction FrostTwoHanderBosStCdActions {}
 
 # ActionList: FrostTwoHanderAoeActions --> main, shortcd, cd
 
@@ -901,6 +833,74 @@ AddFunction FrostTwoHanderBosAoeCdActions
 	{
 		#empower_rune_weapon
 		Spell(empower_rune_weapon)
+	}
+}
+
+# ActionList: FrostTwoHanderBosStActions --> main, shortcd, cd
+
+AddFunction FrostTwoHanderBosStActions
+{
+	#obliterate,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) Spell(obliterate)
+	#plague_leech,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
+	#obliterate,if=runic_power<76
+	if RunicPower() < 76 Spell(obliterate)
+	#howling_blast,if=((death=1&frost=0&unholy=0)|death=0&frost=1&unholy=0)&runic_power<88
+	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 Spell(howling_blast)
+}
+
+AddFunction FrostTwoHanderBosStShortCdActions
+{
+	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
+	{
+		#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
+		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+		unless BuffPresent(killing_machine_buff) and target.DiseasesTicking() and Spell(plague_leech)
+		{
+			#blood_tap,if=buff.blood_charge.stack>=5
+			if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		}
+	}
+}
+
+AddFunction FrostTwoHanderBosStCdActions {}
+
+# ActionList: FrostTwoHanderPrecombatActions --> main, shortcd, cd
+
+AddFunction FrostTwoHanderPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#frost_presence
+	Spell(frost_presence)
+	#snapshot_stats
+}
+
+AddFunction FrostTwoHanderPrecombatShortCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+		or Spell(frost_presence)
+	{
+		#pillar_of_frost
+		Spell(pillar_of_frost)
+	}
+}
+
+AddFunction FrostTwoHanderPrecombatCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+		or Spell(frost_presence)
+	{
+		#army_of_the_dead
+		Spell(army_of_the_dead)
+		#potion,name=mogu_power
+		UsePotionStrength()
 	}
 }
 
@@ -1144,41 +1144,6 @@ AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
 #	spec=unholy
 #	talents=2003000
 
-# ActionList: UnholyPrecombatActions --> main, shortcd, cd
-
-AddFunction UnholyPrecombatActions
-{
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
-	#horn_of_winter
-	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#unholy_presence
-	Spell(unholy_presence)
-	#snapshot_stats
-}
-
-AddFunction UnholyPrecombatShortCdActions
-{
-	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		or Spell(unholy_presence)
-	{
-		#raise_dead
-		Spell(raise_dead)
-	}
-}
-
-AddFunction UnholyPrecombatCdActions
-{
-	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		or Spell(unholy_presence)
-	{
-		#army_of_the_dead
-		Spell(army_of_the_dead)
-		#potion,name=mogu_power
-		UsePotionStrength()
-	}
-}
-
 # ActionList: UnholyDefaultActions --> main, shortcd, cd
 
 AddFunction UnholyDefaultActions
@@ -1216,45 +1181,6 @@ AddFunction UnholyDefaultCdActions
 	if Enemies() >= 2 UnholyAoeCdActions()
 	#run_action_list,name=single_target,if=active_enemies<2
 	if Enemies() < 2 UnholySingleTargetCdActions()
-}
-
-# ActionList: UnholyBosStActions --> main, shortcd, cd
-
-AddFunction UnholyBosStActions
-{
-	#festering_strike,if=runic_power<77
-	if RunicPower() < 77 Spell(festering_strike)
-	#scourge_strike,if=runic_power<88
-	if RunicPower() < 88 Spell(scourge_strike)
-	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
-	#death_coil,if=buff.sudden_doom.react
-	if BuffPresent(sudden_doom_buff) Spell(death_coil)
-}
-
-AddFunction UnholyBosStShortCdActions
-{
-	#death_and_decay,if=runic_power<88
-	if RunicPower() < 88 Spell(death_and_decay)
-
-	unless RunicPower() < 77 and Spell(festering_strike)
-		or RunicPower() < 88 and Spell(scourge_strike)
-	{
-		#blood_tap,if=buff.blood_charge.stack>=5
-		if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	}
-}
-
-AddFunction UnholyBosStCdActions
-{
-	unless RunicPower() < 88 and Spell(death_and_decay)
-		or RunicPower() < 77 and Spell(festering_strike)
-		or RunicPower() < 88 and Spell(scourge_strike)
-		or target.DiseasesTicking() and Spell(plague_leech)
-	{
-		#empower_rune_weapon
-		Spell(empower_rune_weapon)
-	}
 }
 
 # ActionList: UnholyAoeActions --> main, shortcd, cd
@@ -1408,6 +1334,80 @@ AddFunction UnholyBosAoeCdActions
 	{
 		#empower_rune_weapon
 		Spell(empower_rune_weapon)
+	}
+}
+
+# ActionList: UnholyBosStActions --> main, shortcd, cd
+
+AddFunction UnholyBosStActions
+{
+	#festering_strike,if=runic_power<77
+	if RunicPower() < 77 Spell(festering_strike)
+	#scourge_strike,if=runic_power<88
+	if RunicPower() < 88 Spell(scourge_strike)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
+	#death_coil,if=buff.sudden_doom.react
+	if BuffPresent(sudden_doom_buff) Spell(death_coil)
+}
+
+AddFunction UnholyBosStShortCdActions
+{
+	#death_and_decay,if=runic_power<88
+	if RunicPower() < 88 Spell(death_and_decay)
+
+	unless RunicPower() < 77 and Spell(festering_strike)
+		or RunicPower() < 88 and Spell(scourge_strike)
+	{
+		#blood_tap,if=buff.blood_charge.stack>=5
+		if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	}
+}
+
+AddFunction UnholyBosStCdActions
+{
+	unless RunicPower() < 88 and Spell(death_and_decay)
+		or RunicPower() < 77 and Spell(festering_strike)
+		or RunicPower() < 88 and Spell(scourge_strike)
+		or target.DiseasesTicking() and Spell(plague_leech)
+	{
+		#empower_rune_weapon
+		Spell(empower_rune_weapon)
+	}
+}
+
+# ActionList: UnholyPrecombatActions --> main, shortcd, cd
+
+AddFunction UnholyPrecombatActions
+{
+	#flask,type=winters_bite
+	#food,type=black_pepper_ribs_and_shrimp
+	#horn_of_winter
+	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	#unholy_presence
+	Spell(unholy_presence)
+	#snapshot_stats
+}
+
+AddFunction UnholyPrecombatShortCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+		or Spell(unholy_presence)
+	{
+		#raise_dead
+		Spell(raise_dead)
+	}
+}
+
+AddFunction UnholyPrecombatCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+		or Spell(unholy_presence)
+	{
+		#army_of_the_dead
+		Spell(army_of_the_dead)
+		#potion,name=mogu_power
+		UsePotionStrength()
 	}
 }
 
