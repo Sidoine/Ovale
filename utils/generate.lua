@@ -27,70 +27,66 @@ local format = string.format
 local gsub = string.gsub
 local strfind = string.find
 local strlower = string.lower
-local strmatch = string.match
 local strsub = string.sub
 local tconcat = table.concat
+local tinsert = table.insert
 local wipe = table.wipe
 
-local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16M"
-local outputDirectory = "..\\scripts"
-local output = {}
+local profilesDirectory = "../../SimulationCraft/profiles/Tier16M"
+local outputDirectory = "../scripts"
 
 -- Save original input and output handles.
 local saveInput = io.input()
 local saveOutput = io.output()
 
-local dir = io.popen("dir /b " .. profilesDirectory)
-os.execute("mkdir " .. outputDirectory)
+local files = {}
+do
+	local dir = io.popen("dir /b " .. gsub(profilesDirectory, "/", "\\"))
+	for name in dir:lines() do
+		tinsert(files, name)
+	end
+	dir:close()
+	OvaleSimulationCraft:GetValidProfiles(files)
 
-for filename in dir:lines() do
-	local doFile = true
-	-- Profile names always begin with a capital letter.
-	if doFile and not strmatch(filename, "^[A-Z]") then
-		doFile = false
-	end
-	-- Profile names always end in ".simc".
-	if doFile and not strmatch(filename, "%.simc$") then
-		doFile = false
-	end
-	-- Skip files that are variations of the default profiles.
-	if doFile and strmatch(filename, "_T%d+%w+_[%w_]+%.simc$") then
-		doFile = false
-	end
-	if doFile then
-		local inputName = gsub(profilesDirectory, "\\", "/") .. "/" .. filename
-		io.input(inputName)
-		local simc = io.read("*all")
-		-- Valid profiles never set "optimal_raid".
-		if not strfind(simc, "optimal_raid=") then
-			-- Parse SimulationCraft profile and emit the corresponding Ovale script.
-			local profile = OvaleSimulationCraft:ParseProfile(simc)
-			local name = format("SimulationCraft: %s", strsub(profile.annotation.name, 2, -2))
-			wipe(output)
-			output[#output + 1] = "local OVALE, Ovale = ..."
-			output[#output + 1] = "local OvaleScripts = Ovale.OvaleScripts"
-			output[#output + 1] = ""
-			output[#output + 1] = "do"
-			output[#output + 1] = format('	local name = "%s"', name)
-			output[#output + 1] = format('	local desc = "[6.0] %s"', name)
-			output[#output + 1] = "	local code = [["
-			output[#output + 1] = OvaleSimulationCraft:Emit(profile)
-			output[#output + 1] = "]]"
-			output[#output + 1] = format('	OvaleScripts:RegisterScript("%s", name, desc, code, "reference")', profile.annotation.class)
-			output[#output + 1] = "end"
-			output[#output + 1] = ""
+	-- Create the output directory.
+	os.execute("mkdir " .. outputDirectory)
+end
 
-			-- Output the Lua code into the proper output file.
-			local outputFileName = "simulationcraft_" .. strlower(gsub(filename, ".simc", ".lua"))
-			-- Strip the tier designation from the end of the output filename.
-			outputFileName = gsub(outputFileName, "_t%d+%w+%.", ".")
-			-- Fix the name of the death knight output file.
-			outputFileName = gsub(outputFileName, "death_knight", "deathknight")
-			print("Generating " .. outputFileName)
-			local outputName = gsub(outputDirectory, "\\", "/") .. "/" .. outputFileName
-			io.output(outputName)
-			io.write(tconcat(output, "\n"))
-		end
+local output = {}
+for _, filename in ipairs(files) do
+	local inputName = profilesDirectory .. "/" .. filename
+	io.input(inputName)
+	local simc = io.read("*all")
+	-- Valid profiles never set "optimal_raid".
+	if not strfind(simc, "optimal_raid=") then
+		-- Parse SimulationCraft profile and emit the corresponding Ovale script.
+		local profile = OvaleSimulationCraft:ParseProfile(simc)
+		local name = format("SimulationCraft: %s", strsub(profile.annotation.name, 2, -2))
+		wipe(output)
+		output[#output + 1] = "local OVALE, Ovale = ..."
+		output[#output + 1] = "local OvaleScripts = Ovale.OvaleScripts"
+		output[#output + 1] = ""
+		output[#output + 1] = "do"
+		output[#output + 1] = format('	local name = "%s"', name)
+		output[#output + 1] = format('	local desc = "[6.0] %s"', name)
+		output[#output + 1] = "	local code = [["
+		output[#output + 1] = OvaleSimulationCraft:Emit(profile)
+		output[#output + 1] = "]]"
+		output[#output + 1] = format('	OvaleScripts:RegisterScript("%s", name, desc, code, "reference")', profile.annotation.class)
+		output[#output + 1] = "end"
+		output[#output + 1] = ""
+
+		-- Output the Lua code into the proper output file.
+		local outputFileName = "simulationcraft_" .. gsub(strlower(filename), ".simc", ".lua")
+		-- Strip the tier designation from the end of the output filename.
+		outputFileName = gsub(outputFileName, "_t%d+%w+%.", ".")
+		outputFileName = gsub(outputFileName, "_t%d+%w+_", "_")
+		-- Fix the name of the death knight output file.
+		outputFileName = gsub(outputFileName, "death_knight", "deathknight")
+		print("Generating " .. outputFileName)
+		local outputName = outputDirectory .. "/" .. outputFileName
+		io.output(outputName)
+		io.write(tconcat(output, "\n"))
 	end
 end
 

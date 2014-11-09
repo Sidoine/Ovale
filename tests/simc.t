@@ -23,12 +23,12 @@ end
 
 local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
 
-local format = string.format
 local gsub = string.gsub
+local ipairs = ipairs
 local strfind = string.find
-local strmatch = string.match
+local tinsert = table.insert
 
-local profilesDirectory = "..\\..\\SimulationCraft\\profiles\\Tier16M"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier16M"
 
 -- Save original input and output handles.
 local saveInput = io.input()
@@ -42,23 +42,30 @@ local saveOutput = io.output()
 --]]
 
 local separator = string.rep("-", 80)
-local dir = io.popen("dir /b " .. profilesDirectory)
-for filename in dir:lines() do
-	-- Profile names always begin with a capital letter.
-	if strmatch(filename, "^[A-Z]") then
-		local inputName = gsub(profilesDirectory, "\\", "/") .. "/" .. filename
-		io.input(inputName)
-		local simc = io.read("*all")
-		-- Valid profiles never set "optimal_raid".
-		if not strfind(simc, "optimal_raid=") then
-			-- Parse SimulationCraft profile and emit the corresponding Ovale script.
-			local profile = OvaleSimulationCraft:ParseProfile(simc)
-			if profile then
-				print(separator)
-				print(OvaleSimulationCraft:Unparse(profile))
-				print(separator)
-				print(OvaleSimulationCraft:Emit(profile))
-			end
+
+local files = {}
+do
+	local dir = io.popen("dir /b " .. gsub(profilesDirectory, "/", "\\"))
+	for name in dir:lines() do
+		tinsert(files, name)
+	end
+	dir:close()
+	OvaleSimulationCraft:GetValidProfiles(files)
+end
+
+for _, name in ipairs(files) do
+	local inputName =  profilesDirectory .. "/" .. name
+	io.input(inputName)
+	local simc = io.read("*all")
+	-- Valid profiles never set "optimal_raid".
+	if not strfind(simc, "optimal_raid=") then
+		-- Parse SimulationCraft profile and emit the corresponding Ovale script.
+		local profile = OvaleSimulationCraft:ParseProfile(simc)
+		if profile then
+			print(separator)
+			print(OvaleSimulationCraft:Unparse(profile))
+			print(separator)
+			print(OvaleSimulationCraft:Emit(profile))
 		end
 	end
 end

@@ -36,6 +36,7 @@ local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
+local tremove = table.remove
 local tsort = table.sort
 local type = type
 local wipe = table.wipe
@@ -3404,6 +3405,90 @@ function OvaleSimulationCraft:Release(profile)
 		profile.annotation = nil
 	end
 	profile.actionList = nil
+end
+
+-- Filter out invalid profile names from the given array of profile names.
+function OvaleSimulationCraft:GetValidProfiles(array)
+	-- Add any names to be filtered out into the filter table.
+	local filter = {}
+	for _, name in ipairs(array) do
+		local ok = true
+		local lowername = strlower(name)
+
+		-- Lexer for the profile filename.
+		local tokenIterator = gmatch(lowername, "[^_.]+")
+
+		-- Profile names always end in ".simc".
+		ok = ok and strsub(lowername, -5, -1) == ".simc"
+
+		local baseProfileName
+		-- Profile names always start with a class name.
+		if ok then
+			-- The first token should be the class.
+			local class = tokenIterator()
+			-- SimulationCraft uses "death_knight" while WoW uses "deathknight".
+			local wowClass = class
+			if class == "death" then
+				local token = tokenIterator()
+				class = class .. "_" .. token
+				wowClass = wowClass .. token
+			end
+			baseProfileName = class
+			wowClass = strupper(wowClass)
+			if not RAID_CLASS_COLORS[wowClass] then
+				ok = false
+			end
+			-- Skip class driver profile that just forces other profiles to be run.
+			if ok and strmatch(lowername, class .. "_t%d+[a-z].simc") then
+				ok = false
+			end
+		end
+
+		-- The next token should be the required specialization.
+		if ok then
+			local specialization = tokenIterator()
+			baseProfileName = baseProfileName .. "_" .. specialization
+		end
+
+		-- Filter out any profiles that are modifications of an existing base profile.
+		if ok then
+			-- Valid modifiers that can come before the tier designation that are part
+			-- of the base profile name.
+			local VALID_PRE_TIER_MODIFIER = {
+				["1h"] = true,
+				["2h"] = true,
+			}
+			local modifier = tokenIterator()
+			while ok and modifier do
+				if strmatch(modifier, "t%d+[a-z]") then
+					baseProfileName = baseProfileName .. "_" .. modifier
+					break
+				elseif VALID_PRE_TIER_MODIFIER[modifier] then
+					baseProfileName = baseProfileName .. "_" .. modifier
+				end
+				modifier = tokenIterator()
+			end
+			baseProfileName = baseProfileName .. ".simc"
+			if lowername ~= baseProfileName then
+				for _, fileName in ipairs(array) do
+					if baseProfileName == strlower(fileName) then
+						ok = false
+						break
+					end
+				end
+			end
+		end
+		if not ok then
+			filter[name] = true
+		end
+	end
+	for k = #array, 1, -1 do
+		if filter[array[k]] then
+			tremove(array, k)
+		end
+	end
+	tsort(array)
+	return array
 end
 
 function OvaleSimulationCraft:ParseProfile(simc)
