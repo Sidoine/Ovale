@@ -8,15 +8,17 @@ do
 # Common spell definitions shared by all classes and specializations.
 
 ###
-### Potions (Mists of Pandaria only)
+### Potions
 ###
 
+#  Mists of Pandaria
 Define(golemblood_potion 58146)
 Define(golemblood_potion_buff 79634)
 	SpellInfo(golemblood_potion_buff duration=25)
 Define(jade_serpent_potion 76093)
 Define(jade_serpent_potion_buff 105702)
 	SpellInfo(jade_serpent_potion_buff duration=25)
+Define(master_mana_potion 76098)
 Define(mogu_power_potion 76095)
 Define(mogu_power_potion_buff 105706)
 	SpellInfo(mogu_power_potion_buff duration=25)
@@ -27,10 +29,25 @@ Define(virmens_bite_potion 76089)
 Define(virmens_bite_potion_buff 105697)
 	SpellInfo(virmens_bite_potion_buff duration=25)
 
-SpellList(potion_agility_buff virmens_bite_potion_buff)
-SpellList(potion_armor_buff mountains_potion_buff)
-SpellList(potion_intellect_buff jade_serpent_potion_buff)
-SpellList(potion_strength_buff golemblood_potion_buff)
+# Warlords of Draenor
+Define(draenic_agility_potion 109217)
+Define(draenic_agility_potion_buff 156423)
+	SpellInfo(draenic_agility_potion_buff duration=25)
+Define(draenic_armor_potion 109220)
+Define(draenic_armor_potion_buff 156430)
+	SpellInfo(draenic_armor_potion_buff duration=25)
+Define(draenic_intellect_potion 109218)
+Define(draenic_intellect_potion_buff 156426)
+	SpellInfo(draenic_intellect_potion_buff duration=25)
+Define(draenic_mana_potion 109222)
+Define(draenic_strength_potion 109219)
+Define(draenic_strength_potion_buff 156428)
+	SpellInfo(draenic_strength_potion_buff duration=25)
+
+SpellList(potion_agility_buff draenic_agility_potion_buff virmens_bite_potion_buff)
+SpellList(potion_armor_buff draenic_armor_potion_buff mountains_potion_buff)
+SpellList(potion_intellect_buff draenic_intellect_potion_buff jade_serpent_potion_buff)
+SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_buff)
 
 ###
 ### Trinkets (Mists of Pandaria only)

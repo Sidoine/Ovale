@@ -205,6 +205,18 @@ local TOTEM_TYPE = {
 	["windwalk_totem"] = "air",
 }
 
+local POTION_STAT = {
+	["draenic_agility"]		= "agility",
+	["draenic_armor"]		= "armor",
+	["draenic_intellect"]	= "intellect",
+	["draenic_strength"]	= "strength",
+	["jade_serpent"]		= "intellect",
+	["mogu_power"]			= "strength",
+	["mountains"]			= "armor",
+	["tolvir"]				= "agility",
+	["virmens_bite"]		= "agility",
+}
+
 local self_outputPool = OvalePool("OvaleSimulationCraft_outputPool")
 local self_childrenPool = OvalePool("OvaleSimulationCraft_childrenPool")
 local self_pool = OvalePool("OvaleSimulationCraft_pool")
@@ -1332,6 +1344,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 				bodyCode = OvaleFunctionName(name, annotation) .. "()"
 			end
 			isSpellAction = false
+		elseif action == "mana_potion" then
+			bodyCode = "UsePotionMana()"
+			annotation.use_potion_mana = class
+			isSpellAction = false
 		elseif action == "pool_resource" then
 			-- Create a special "simc_pool_resource" AST node that will be transformed in
 			-- a later step into something OvaleAST can understand and unparse.
@@ -1345,16 +1361,17 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif action == "potion" then
 			if modifier.name then
 				local name = Unparse(modifier.name)
-				if name == "virmens_bite" or name == "tolvir" then
+				local stat = POTION_STAT[name]
+				if stat == "agility" then
 					bodyCode = "UsePotionAgility()"
 					annotation.use_potion_agility = class
-				elseif name == "mountains" then
+				elseif stat == "armor" then
 					bodyCode = "UsePotionArmor()"
 					annotation.use_potion_armor = class
-				elseif name == "jade_serpent" then
+				elseif stat == "intellect" then
 					bodyCode = "UsePotionIntellect()"
 					annotation.use_potion_intellect = class
-				elseif name == "mogu_power" then
+				elseif stat == "strength" then
 					bodyCode = "UsePotionStrength()"
 					annotation.use_potion_strength = class
 				end
@@ -2213,13 +2230,13 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		if name == "potion" then
 			prefix = "Item"
 			if annotation.use_potion_agility then
-				name = "virmens_bite_potion"
+				name = "draenic_agility_potion"
 			elseif annotation.use_potion_armor then
-				name = "mountains_potion"
+				name = "draenic_armor_potion"
 			elseif annotation.use_potion_intellect then
-				name = "jade_serpent_potion"
+				name = "draenic_intellect_potion"
 			elseif annotation.use_potion_strength then
-				name = "mogu_power_potion"
+				name = "draenic_strength_potion"
 			end
 		end
 
@@ -3229,48 +3246,60 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction UsePotionStrength
 			{
-				if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+				if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "mogu_power_potion")
+		AddSymbol(annotation, "draenic_strength_potion")
+		count = count + 1
+	end
+	if annotation.use_potion_mana then
+		local code = [[
+			AddFunction UsePotionMana
+			{
+				if CheckBoxOn(opt_potion_mana) Item(draenic_mana_potion usable=1)
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "draenic_mana_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_intellect then
 		local code = [[
 			AddFunction UsePotionIntellect
 			{
-				if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+				if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "jade_serpent_potion")
+		AddSymbol(annotation, "draenic_intellect_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_armor then
 		local code = [[
 			AddFunction UsePotionArmor
 			{
-				if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(mountains_potion usable=1)
+				if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "mountains_potion")
+		AddSymbol(annotation, "draenic_armor_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_agility then
 		local code = [[
 			AddFunction UsePotionAgility
 			{
-				if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+				if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "virmens_bite_potion")
+		AddSymbol(annotation, "draenic_agility_potion")
 		count = count + 1
 	end
 	return count
@@ -3326,38 +3355,47 @@ local function InsertSupportingControls(child, annotation)
 	end
 	if annotation.use_potion_strength then
 		local code = [[
-			AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+			AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 		]]
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "mogu_power_potion")
+		AddSymbol(annotation, "draenic_strength_potion")
+		count = count + 1
+	end
+	if annotation.use_potion_mana then
+		local code = [[
+			AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default)
+		]]
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "draenic_mana_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_intellect then
 		local code = [[
-			AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+			AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 		]]
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "jade_serpent_potion")
+		AddSymbol(annotation, "draenic_intellect_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_armor then
 		local code = [[
-			AddCheckBox(opt_potion_armor ItemName(mountains_potion) default)
+			AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 		]]
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "mountains_potion")
+		AddSymbol(annotation, "draenic_armor_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_agility then
 		local code = [[
-			AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+			AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 		]]
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "virmens_bite_potion")
+		AddSymbol(annotation, "draenic_agility_potion")
 		count = count + 1
 	end
 	return count
