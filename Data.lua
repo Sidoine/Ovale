@@ -204,13 +204,13 @@ OvaleData.buffSpellList =
 
 	-- Trinket buffs
 	trinket_proc_agility_buff = {
-		[126554] = true, -- Bottle of Infinite Stars
+--		[126554] = true, -- Bottle of Infinite Stars
 		[126690] = true, -- PvP agility trinket (on-use)
 		[126707] = true, -- PvP agility trinket (proc)
 		[126708] = true, -- PvP agility trinket (proc)
-		[128984] = true, -- Relic of Xuen (agility)
-		[138699] = true, -- Vicious Talisman of the Shado-Pan Assault
-		[138938] = true, -- Bad Juju
+--		[128984] = true, -- Relic of Xuen (agility)
+--		[138699] = true, -- Vicious Talisman of the Shado-Pan Assault
+--		[138938] = true, -- Bad Juju
 		[146308] = true, -- Assurance of Consequence
 		[146310] = true, -- Ticking Ebon Detonator
 		[148896] = true, -- Sigil of Rampage
@@ -222,7 +222,7 @@ OvaleData.buffSpellList =
 		[177055] = true, -- Evergaze Arcane Eidolon
 	},
 	trinket_proc_crit_buff = {
-		[138963] = true, -- Unerring Vision of Lei-Shen
+--		[138963] = true, -- Unerring Vision of Lei-Shen
 		[162916] = true, -- Skull of War
 		[162918] = true, -- Knight's Badge
 		[162920] = true, -- Sandman's Pouch
@@ -249,13 +249,13 @@ OvaleData.buffSpellList =
 		[177052] = true, -- Darmac's Unstable Talisman
 	},
 	trinket_proc_intellect_buff = {
-		[126577] = true, -- Light of the Cosmos
+--		[126577] = true, -- Light of the Cosmos
 		[126683] = true, -- PvP intellect trinket (on-use)
 		[126705] = true, -- PvP intellect trinket (proc)
-		[128985] = true, -- Relic of Yu'lon
-		[136082] = true, -- Shock-Charger/Static-Caster's Medallion
-		[138898] = true, -- Breath of the Hydra
-		[139133] = true, -- Cha-Ye's Essence of Brilliance (assume 20% crit chance)
+--		[128985] = true, -- Relic of Yu'lon
+--		[136082] = true, -- Shock-Charger/Static-Caster's Medallion
+--		[138898] = true, -- Breath of the Hydra
+--		[139133] = true, -- Cha-Ye's Essence of Brilliance (assume 20% crit chance)
 		[146046] = true, -- Purified Bindings of Immerseus
 		[148897] = true, -- Frenzied Crystal of Rage
 		[148906] = true, -- Kardris' Toxic Totem
@@ -294,12 +294,12 @@ OvaleData.buffSpellList =
 		[177062] = true, -- Ironspike Chew Toy
 	},
 	trinket_proc_strength_buff = {
-		[126582] = true, -- Lei Shen's Final Orders
+--		[126582] = true, -- Lei Shen's Final Orders
 		[126679] = true, -- PvP strength trinket (on-use)
 		[126700] = true, -- PvP strength trinket (proc)
 		[126702] = true, -- PvP strength trinket (proc)
-		[128986] = true, -- Relic of Xuen (strength)
-		[138702] = true, -- Brutal Talisman of the Shado-Pan Assault
+--		[128986] = true, -- Relic of Xuen (strength)
+--		[138702] = true, -- Brutal Talisman of the Shado-Pan Assault
 		[146245] = true, -- Evil Eye of Galakras
 		[146250] = true, -- Thok's Tail Tip
 		[148899] = true, -- Fusion-Fire Core
@@ -315,7 +315,7 @@ OvaleData.buffSpellList =
 		[176976] = true, -- Mote of the Mountain
 	},
 	trinket_stacking_proc_agility_buff = {
-		[138756] = true, -- Renataki's Soul Charm
+--		[138756] = true, -- Renataki's Soul Charm
 	},
 	trinket_stacking_proc_crit_buff = {
 		[146285] = true, -- Skeer's Bloodsoaked Talisman
@@ -326,7 +326,7 @@ OvaleData.buffSpellList =
 		[177104] = true, -- Battering Talisman
 	},
 	trinket_stacking_proc_intellect_buff = {
-		[138786] = true, -- Wushoolay's Final Choice
+--		[138786] = true, -- Wushoolay's Final Choice
 		[146184] = true, -- Black Blood of Y'Shaarj
 	},
 	trinket_stacking_proc_multistrike_buff = {
@@ -334,8 +334,8 @@ OvaleData.buffSpellList =
 		[177098] = true, -- Forgemaster's Insignia
 	},
 	trinket_stacking_proc_strength_buff = {
-		[138759] = true, -- Fabled Feather of Ji-Kun
-		[138870] = true, -- Primordius' Talisman of Rage
+--		[138759] = true, -- Fabled Feather of Ji-Kun
+--		[138870] = true, -- Primordius' Talisman of Rage
 	},
 }
 -- Spell list aliases.
