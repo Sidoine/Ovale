@@ -422,7 +422,7 @@ AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
 AddFunction RestorationPrecombatActions
 {
 	# Raid buffs.
-	if BuffRemaining(str_agi_int any=1) Spell(mark_of_the_wild)
+	if not BuffPresent(str_agi_int any=1) Spell(mark_of_the_wild)
 	# Healing Touch to refresh Harmony buff.
 	if BuffRemaining(harmony_buff) < 6 Spell(healing_touch)
 }
