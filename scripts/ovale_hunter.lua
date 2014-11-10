@@ -75,8 +75,8 @@ AddFunction BeastMasteryDefaultShortCdActions
 {
 	#dire_beast
 	Spell(dire_beast)
-	#explosive_trap,if=active_enemies>2
-	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+	#explosive_trap,if=active_enemies>1
+	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#bestial_wrath,if=focus>60&!buff.bestial_wrath.up
 	if Focus() > 60 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
 	#barrage,if=active_enemies>2
@@ -117,10 +117,10 @@ AddFunction BeastMasteryDefaultCdActions
 	Spell(berserking)
 	#potion,name=virmens_bite,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
 	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 UsePotionAgility()
-	#potion,name=virmens_bite,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=20
-	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
-	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=20
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 20 Spell(stampede)
+	#potion,name=virmens_bite,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
+	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
+	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
 }
 
 # ActionList: BeastMasteryPrecombatActions --> main, shortcd, cd
@@ -205,10 +205,10 @@ AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_a
 AddFunction MarksmanshipDefaultActions
 {
 	#auto_shot
-	#kill_shot,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
-	if FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(kill_shot)
 	#chimaera_shot
 	Spell(chimaera_shot)
+	#kill_shot
+	Spell(kill_shot)
 	#call_action_list,name=careful_aim,if=buff.careful_aim.up
 	if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
 	#glaive_toss
@@ -219,6 +219,8 @@ AddFunction MarksmanshipDefaultActions
 	if FocusDeficit() * CastTime(focusing_shot_marksmanship) / { 50 + FocusCastingRegen(focusing_shot_marksmanship) } > SpellCooldown(rapid_fire) and Focus() < 100 Spell(focusing_shot_marksmanship)
 	#steady_shot,if=buff.pre_steady_focus.up&(14+cast_regen+action.aimed_shot.cast_regen)<=focus.deficit
 	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(steady_shot) + FocusCastingRegen(aimed_shot) <= FocusDeficit() Spell(steady_shot)
+	#multishot,if=active_enemies>6
+	if Enemies() > 6 Spell(multishot)
 	#aimed_shot,if=talent.focusing_shot.enabled
 	if Talent(focusing_shot_talent) Spell(aimed_shot)
 	#aimed_shot,if=focus+cast_regen>=85
@@ -233,13 +235,13 @@ AddFunction MarksmanshipDefaultActions
 
 AddFunction MarksmanshipDefaultShortCdActions
 {
-	unless FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() and Spell(kill_shot)
-		or Spell(chimaera_shot)
+	unless Spell(chimaera_shot)
+		or Spell(kill_shot)
 	{
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
-		#explosive_trap,if=active_enemies>2
-		if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+		#explosive_trap,if=active_enemies>1
+		if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
 		#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
@@ -265,16 +267,16 @@ AddFunction MarksmanshipDefaultCdActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(!talent.stampede.enabled|cooldown.stampede.remains<1))|target.time_to_die<=20
-	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and { not Talent(stampede_talent) or SpellCooldown(stampede) < 1 } or target.TimeToDie() <= 20 UsePotionAgility()
+	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(!talent.stampede.enabled|cooldown.stampede.remains<1))|target.time_to_die<=25
+	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and { not Talent(stampede_talent) or SpellCooldown(stampede) < 1 } or target.TimeToDie() <= 25 UsePotionAgility()
 
 	unless FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() and Spell(kill_shot)
 		or Spell(chimaera_shot)
 	{
 		#rapid_fire
 		Spell(rapid_fire)
-		#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=20
-		if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 Spell(stampede)
+		#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=25
+		if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 Spell(stampede)
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimCdActions()
 	}
@@ -284,8 +286,8 @@ AddFunction MarksmanshipDefaultCdActions
 
 AddFunction MarksmanshipCarefulAimActions
 {
-	#glaive_toss,if=active_enemies>4
-	if Enemies() > 4 Spell(glaive_toss)
+	#glaive_toss,if=active_enemies>2
+	if Enemies() > 2 Spell(glaive_toss)
 	#aimed_shot
 	Spell(aimed_shot)
 	#focusing_shot,if=50+cast_regen<focus.deficit
@@ -296,7 +298,7 @@ AddFunction MarksmanshipCarefulAimActions
 
 AddFunction MarksmanshipCarefulAimShortCdActions
 {
-	unless Enemies() > 4 and Spell(glaive_toss)
+	unless Enemies() > 2 and Spell(glaive_toss)
 	{
 		#powershot,if=active_enemies>1&cast_regen<focus.deficit
 		if Enemies() > 1 and FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
@@ -446,12 +448,12 @@ AddFunction SurvivalDefaultCdActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=(((cooldown.stampede.remains<1|!talent.stampede.enabled)&(!talent.a_murder_of_crows.enabled|cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=20
+	#potion,name=virmens_bite,if=(((cooldown.stampede.remains<1|!talent.stampede.enabled)&(!talent.a_murder_of_crows.enabled|cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=25
 	if { SpellCooldown(stampede) < 1 or not Talent(stampede_talent) } and { not Talent(a_murder_of_crows_talent) or SpellCooldown(a_murder_of_crows) < 1 } and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
-	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))
-	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } Spell(stampede)
+	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))|target.time_to_die<=25
+	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
 }
 
 # ActionList: SurvivalAoeActions --> main, shortcd, cd

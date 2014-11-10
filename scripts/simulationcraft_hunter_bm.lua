@@ -52,18 +52,18 @@ AddFunction BeastMasteryDefaultActions
 	Spell(berserking)
 	#potion,name=virmens_bite,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
 	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 UsePotionAgility()
-	#potion,name=virmens_bite,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=20
-	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 20 UsePotionAgility()
-	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=20
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 20 Spell(stampede)
+	#potion,name=virmens_bite,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
+	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
+	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
 	#dire_beast
 	Spell(dire_beast)
-	#explosive_trap,if=active_enemies>2
-	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+	#explosive_trap,if=active_enemies>1
+	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#bestial_wrath,if=focus>60&!buff.bestial_wrath.up
 	if Focus() > 60 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
-	#barrage,if=active_enemies>2
-	if Enemies() > 2 Spell(barrage)
+	#barrage,if=active_enemies>1
+	if Enemies() > 1 Spell(barrage)
 	#multishot,if=active_enemies>5|(active_enemies>1&pet.cat.buff.beast_cleave.down)
 	if Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) Spell(multishot)
 	#focus_fire,five_stacks=1

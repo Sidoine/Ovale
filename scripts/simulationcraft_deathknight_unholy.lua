@@ -61,8 +61,8 @@ AddFunction UnholyAoeActions
 {
 	#unholy_blight
 	Spell(unholy_blight)
-	#plague_strike,if=!disease.ticking
-	if not target.DiseasesAnyTicking() Spell(plague_strike)
+	#run_action_list,name=spread,if=!dot.blood_plague.ticking|!dot.frost_fever.ticking
+	if not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) UnholySpreadActions()
 	#defile
 	Spell(defile)
 	#breath_of_sindragosa,if=runic_power>75
@@ -99,8 +99,8 @@ AddFunction UnholyAoeActions
 	Spell(death_coil)
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#plague_leech,if=unholy=1
-	if Rune(unholy) >= 1 and Rune(unholy) < 2 and target.DiseasesTicking() Spell(plague_leech)
+	#plague_leech
+	if target.DiseasesTicking() Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -230,6 +230,20 @@ AddFunction UnholySingleTargetActions
 	Spell(death_coil)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
+}
+
+AddFunction UnholySpreadActions
+{
+	#blood_boil,cycle_targets=1,if=dot.blood_plague.ticking|dot.frost_fever.ticking
+	if target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) Spell(blood_boil)
+	#outbreak,if=!talent.necrotic_plague.enabled&(!dot.blood_plague.ticking|!dot.frost_fever.ticking)
+	if not Talent(necrotic_plague_talent) and { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) } Spell(outbreak)
+	#outbreak,if=talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking
+	if Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(outbreak)
+	#plague_strike,if=!talent.necrotic_plague.enabled&(!dot.blood_plague.ticking|!dot.frost_fever.ticking)
+	if not Talent(necrotic_plague_talent) and { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) } Spell(plague_strike)
+	#plague_strike,if=talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking
+	if Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(plague_strike)
 }
 
 AddIcon specialization=unholy help=main enemies=1

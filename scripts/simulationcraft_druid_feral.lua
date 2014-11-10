@@ -86,30 +86,36 @@ AddFunction FeralDefaultActions
 	if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 4 or BuffRemaining(predatory_swiftness_buff) < 1.5 } Spell(healing_touch)
 	#savage_roar,if=buff.savage_roar.remains<3
 	if BuffRemaining(savage_roar_buff) < 3 Spell(savage_roar)
-	#thrash_cat,if=buff.omen_of_clarity.react&remains<4.5&active_enemies>1
+	#thrash_cat,cycle_targets=1,if=buff.omen_of_clarity.react&remains<4.5&active_enemies>1
 	if BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemaining(thrash_cat_debuff) < 4.5 and Enemies() > 1 Spell(thrash_cat)
-	#thrash_cat,if=!talent.bloodtalons.enabled&combo_points=5&remains<4.5&buff.omen_of_clarity.react
+	#thrash_cat,cycle_targets=1,if=!talent.bloodtalons.enabled&combo_points=5&remains<4.5&buff.omen_of_clarity.react
 	if not Talent(bloodtalons_talent) and ComboPoints() == 5 and target.DebuffRemaining(thrash_cat_debuff) < 4.5 and BuffPresent(omen_of_clarity_melee_buff) Spell(thrash_cat)
-	#call_action_list,name=finisher,if=combo_points=5
-	if ComboPoints() == 5 FeralFinisherActions()
-	#call_action_list,name=maintain
-	FeralMaintainActions()
-	#call_action_list,name=generator,if=combo_points<5
-	if ComboPoints() < 5 FeralGeneratorActions()
+	#pool_resource,for_next=1
+	#thrash_cat,cycle_targets=1,if=remains<4.5&active_enemies>1
+	if target.DebuffRemaining(thrash_cat_debuff) < 4.5 and Enemies() > 1 Spell(thrash_cat)
+	unless target.DebuffRemaining(thrash_cat_debuff) < 4.5 and Enemies() > 1 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
+	{
+		#call_action_list,name=finisher,if=combo_points=5
+		if ComboPoints() == 5 FeralFinisherActions()
+		#call_action_list,name=maintain
+		FeralMaintainActions()
+		#call_action_list,name=generator,if=combo_points<5
+		if ComboPoints() < 5 FeralGeneratorActions()
+	}
 }
 
 AddFunction FeralFinisherActions
 {
 	#ferocious_bite,cycle_targets=1,if=target.health.pct<25&dot.rip.ticking&energy>=max_fb_energy
 	if target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
-	#rip,cycle_targets=1,if=remains<3
-	if target.DebuffRemaining(rip_debuff) < 3 Spell(rip)
-	#rip,cycle_targets=1,if=remains<7.2&persistent_multiplier>dot.rip.pmultiplier
-	if target.DebuffRemaining(rip_debuff) < 7.2 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) Spell(rip)
+	#rip,cycle_targets=1,if=remains<3&target.time_to_die-remains>18
+	if target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 Spell(rip)
+	#rip,cycle_targets=1,if=remains<7.2&persistent_multiplier>dot.rip.pmultiplier&target.time_to_die-remains>18
+	if target.DebuffRemaining(rip_debuff) < 7.2 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 Spell(rip)
 	#savage_roar,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&buff.savage_roar.remains<12.6
 	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 Spell(savage_roar)
-	#ferocious_bite,if=(energy.time_to_max<=1|buff.berserk.up|(cooldown.tigers_fury.remains<3&energy>=max_fb_energy))
-	if TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+	#ferocious_bite,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&energy>=max_fb_energy
+	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
 }
 
 AddFunction FeralGeneratorActions
@@ -122,24 +128,18 @@ AddFunction FeralGeneratorActions
 
 AddFunction FeralMaintainActions
 {
-	#rake,cycle_targets=1,if=!talent.bloodtalons.enabled&remains<3&combo_points<5
-	if not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < 3 and ComboPoints() < 5 Spell(rake)
-	#rake,cycle_targets=1,if=!talent.bloodtalons.enabled&remains<4.5&combo_points<5&persistent_multiplier>dot.rake.pmultiplier
-	if not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < 4.5 and ComboPoints() < 5 and DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) Spell(rake)
-	#rake,cycle_targets=1,if=talent.bloodtalons.enabled&remains<4.5&combo_points<5&(!buff.predatory_swiftness.up|buff.bloodtalons.up|persistent_multiplier>dot.rake.pmultiplier)
-	if Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < 4.5 and ComboPoints() < 5 and { not BuffPresent(predatory_swiftness_buff) or BuffPresent(bloodtalons_buff) or DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) } Spell(rake)
-	#thrash_cat,if=talent.bloodtalons.enabled&combo_points=5&remains<4.5&buff.omen_of_clarity.react
+	#rake,cycle_targets=1,if=!talent.bloodtalons.enabled&remains<3&combo_points<5&((target.time_to_die-remains>3&active_enemies<3)|target.time_to_die-remains>6)
+	if not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < 3 and ComboPoints() < 5 and { target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 3 and Enemies() < 3 or target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 6 } Spell(rake)
+	#rake,cycle_targets=1,if=!talent.bloodtalons.enabled&remains<4.5&combo_points<5&persistent_multiplier>dot.rake.pmultiplier&((target.time_to_die-remains>3&active_enemies<3)|target.time_to_die-remains>6)
+	if not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < 4.5 and ComboPoints() < 5 and DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) and { target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 3 and Enemies() < 3 or target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 6 } Spell(rake)
+	#rake,cycle_targets=1,if=talent.bloodtalons.enabled&remains<4.5&combo_points<5&(!buff.predatory_swiftness.up|buff.bloodtalons.up|persistent_multiplier>dot.rake.pmultiplier)&((target.time_to_die-remains>3&active_enemies<3)|target.time_to_die-remains>6)
+	if Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < 4.5 and ComboPoints() < 5 and { not BuffPresent(predatory_swiftness_buff) or BuffPresent(bloodtalons_buff) or DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) } and { target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 3 and Enemies() < 3 or target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 6 } Spell(rake)
+	#thrash_cat,cycle_targets=1,if=talent.bloodtalons.enabled&combo_points=5&remains<4.5&buff.omen_of_clarity.react
 	if Talent(bloodtalons_talent) and ComboPoints() == 5 and target.DebuffRemaining(thrash_cat_debuff) < 4.5 and BuffPresent(omen_of_clarity_melee_buff) Spell(thrash_cat)
-	#pool_resource,for_next=1
-	#thrash_cat,if=remains<4.5&active_enemies>1
-	if target.DebuffRemaining(thrash_cat_debuff) < 4.5 and Enemies() > 1 Spell(thrash_cat)
-	unless target.DebuffRemaining(thrash_cat_debuff) < 4.5 and Enemies() > 1 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
-	{
-		#moonfire_cat,cycle_targets=1,if=combo_points<5&remains<4.2&active_enemies<=10
-		if ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) < 4.2 and Enemies() <= 10 Spell(moonfire_cat)
-		#rake,cycle_targets=1,if=persistent_multiplier>dot.rake.pmultiplier&combo_points<5
-		if DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) and ComboPoints() < 5 Spell(rake)
-	}
+	#moonfire_cat,cycle_targets=1,if=combo_points<5&remains<4.2&active_enemies<6&target.time_to_die-remains>tick_time*5
+	if ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) < 4.2 and Enemies() < 6 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 5 Spell(moonfire_cat)
+	#rake,cycle_targets=1,if=persistent_multiplier>dot.rake.pmultiplier&combo_points<5&active_enemies=1
+	if DamageMultiplier(rake) > target.DebuffDamageMultiplier(rake_debuff) and ComboPoints() < 5 and Enemies() == 1 Spell(rake)
 }
 
 AddFunction FeralPrecombatActions

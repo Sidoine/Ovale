@@ -50,20 +50,20 @@ AddFunction MarksmanshipDefaultActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=20
-	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 20 UsePotionAgility()
-	#kill_shot,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
-	if FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(kill_shot)
+	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=25
+	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 UsePotionAgility()
 	#chimaera_shot
 	Spell(chimaera_shot)
+	#kill_shot
+	Spell(kill_shot)
 	#rapid_fire
 	Spell(rapid_fire)
-	#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=20
-	if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 Spell(stampede)
+	#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=25
+	if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 Spell(stampede)
 	#call_action_list,name=careful_aim,if=buff.careful_aim.up
 	if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
-	#explosive_trap,if=active_enemies>2
-	if Enemies() > 2 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+	#explosive_trap,if=active_enemies>1
+	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#a_murder_of_crows
 	Spell(a_murder_of_crows)
 	#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
@@ -80,6 +80,8 @@ AddFunction MarksmanshipDefaultActions
 	if FocusDeficit() * CastTime(focusing_shot_marksmanship) / { 50 + FocusCastingRegen(focusing_shot_marksmanship) } > SpellCooldown(rapid_fire) and Focus() < 100 Spell(focusing_shot_marksmanship)
 	#steady_shot,if=buff.pre_steady_focus.up&(14+cast_regen+action.aimed_shot.cast_regen)<=focus.deficit
 	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(steady_shot) + FocusCastingRegen(aimed_shot) <= FocusDeficit() Spell(steady_shot)
+	#multishot,if=active_enemies>6
+	if Enemies() > 6 Spell(multishot)
 	#aimed_shot,if=talent.focusing_shot.enabled
 	if Talent(focusing_shot_talent) Spell(aimed_shot)
 	#aimed_shot,if=focus+cast_regen>=85
@@ -94,8 +96,8 @@ AddFunction MarksmanshipDefaultActions
 
 AddFunction MarksmanshipCarefulAimActions
 {
-	#glaive_toss,if=active_enemies>4
-	if Enemies() > 4 Spell(glaive_toss)
+	#glaive_toss,if=active_enemies>2
+	if Enemies() > 2 Spell(glaive_toss)
 	#powershot,if=active_enemies>1&cast_regen<focus.deficit
 	if Enemies() > 1 and FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
 	#barrage,if=active_enemies>1
@@ -155,6 +157,7 @@ AddIcon specialization=marksmanship help=aoe
 # glyph_of_explosive_trap
 # incendiary_ammo
 # kill_shot
+# multishot
 # poisoned_ammo
 # powershot
 # pre_steady_focus_buff
