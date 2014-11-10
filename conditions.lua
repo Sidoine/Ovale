@@ -4776,6 +4776,7 @@ end
 do
 	--- Test if the given spell is usable.
 	-- A spell is usable if the player has learned the spell and meets any requirements for casting the spell.
+	-- Does not account for spell cooldowns or having enough of a primary (pooled) resource.
 	-- @name SpellUsable
 	-- @paramsig boolean
 	-- @param id The spell ID.
@@ -4788,7 +4789,8 @@ do
 	local function SpellUsable(condition, state)
 		local spellId, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state, "target")
-		local boolean = state:IsUsableSpell(spellId, target)
+		local isUsable, noMana = state:IsUsableSpell(spellId, target)
+		local boolean = isUsable or noMana
 		return TestBoolean(boolean, yesno)
 	end
 
