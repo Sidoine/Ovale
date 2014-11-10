@@ -2068,6 +2068,8 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 			end
 		elseif property == "up" then
 			code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+		elseif property == "value" then
+			code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
 		else
 			ok = false
 		end
