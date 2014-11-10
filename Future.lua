@@ -845,9 +845,8 @@ end
 		isChanneled	The spell is a channeled spell.
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
-statePrototype.ApplySpell = function(state, ...)
+statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	profiler.Start("OvaleFuture_state_ApplySpell")
-	local spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast = ...
 	if spellId and targetGUID then
 		-- Handle missing start/end/next cast times.
 		if not startCast or not endCast or not nextCast then
@@ -899,17 +898,17 @@ statePrototype.ApplySpell = function(state, ...)
 		--]]
 		-- If the spellcast has already started, then the effects have already occurred.
 		if startCast > now then
-			OvaleState:InvokeMethod("ApplySpellStartCast", state, ...)
+			OvaleState:InvokeMethod("ApplySpellStartCast", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 		end
 		-- If the spellcast has already ended, then the effects have already occurred.
 		if endCast > now then
-			OvaleState:InvokeMethod("ApplySpellAfterCast", state, ...)
+			OvaleState:InvokeMethod("ApplySpellAfterCast", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 		end
 		if not spellcast or not spellcast.success then
-			OvaleState:InvokeMethod("ApplySpellOnHit", state, ...)
+			OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 		end
 		if not spellcast or not spellcast.success or spellcast.success == "hit" or spellcast.success == "critical" then
-			OvaleState:InvokeMethod("ApplySpellAfterHit", state, ...)
+			OvaleState:InvokeMethod("ApplySpellAfterHit", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 		end
 	end
 	profiler.Stop("OvaleFuture_state_ApplySpell")

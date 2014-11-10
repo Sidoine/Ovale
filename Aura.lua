@@ -1277,11 +1277,14 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						-- If "tick" is set explicitly in SpellInfo, then this is a known periodic aura.
 						if si and si.tick then
 							aura.baseTick = si.tick
-							aura.tick = OvaleData:GetTickLength(auraId, spellcast.snapshot)
+							local snapshot = spellcast and spellcast.snapshot
+							aura.tick = OvaleData:GetTickLength(auraId, snapshot)
 						end
 						aura.ending = aura.start + aura.duration
 						aura.gain = aura.start
-						OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
+						if spellcast then
+							OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
+						end
 					end
 				end
 			else
