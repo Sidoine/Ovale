@@ -4678,6 +4678,8 @@ do
 			if OvaleCondition.COMPARATOR[spellId] then
 				comparator, limit = spellId, condition[i+1]
 				break
+			elseif not OvaleSpellBook:IsKnownSpell(spellId) then
+				-- Skip unknown spells.
 			elseif not usable or state:IsUsableSpell(spellId, target) then
 				local start, duration = state:GetSpellCooldown(spellId)
 				local t = 0
@@ -4689,7 +4691,14 @@ do
 				end
 			end
 		end
-		if atTime > 0 then
+		--[[
+			If there are no known spells in the list, then treat the spell as ready.
+			This matches SimulationCraft's behavior regarding cooldowns of spells that
+			are not known -- they are considered to have a cooldown of zero.
+		--]]
+		if atTime == INFINITY then
+			return Compare(0, comparator, limit)
+		elseif atTime > 0 then
 			return TestValue(0, atTime, 0, atTime, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
