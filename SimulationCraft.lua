@@ -914,6 +914,8 @@ local function OvaleFunctionName(name, annotation)
 		elseif class == "WARRIOR" and specialization == "fury" then
 			output[#output + 1] = "titans grip"
 		end
+	elseif strmatch(profileName, "_[gG]ladiator_") then
+		output[#output + 1] = "gladiator"
 	end
 	output[#output + 1] = name
 	output[#output + 1] = "actions"
@@ -1015,6 +1017,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("zen_sphere_debuff",		"zen_sphere_buff",				"MONK")
 	-- Paladin
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_holy",			"PALADIN")
+	AddDisambiguation("avenging_wrath",			"avenging_wrath_heal",			"PALADIN",		"holy")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_melee",			"PALADIN",		"retribution")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"PALADIN")
 	AddDisambiguation("sacred_shield_debuff",	"sacred_shield_buff",			"PALADIN")
@@ -1022,9 +1025,16 @@ local function InitializeDisambiguation()
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"PRIEST")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"PRIEST")
 	AddDisambiguation("cascade",				"cascade_caster",				"PRIEST",		"shadow")
-	AddDisambiguation("divine_star",			"divine_star_caster",			"PRIEST",		"shadow")
-	AddDisambiguation("halo",					"halo_caster",					"PRIEST",		"shadow")
+	AddDisambiguation("cascade",				"cascade_heal",					"PRIEST",		"discipline")
+	AddDisambiguation("cascade",				"cascade_heal",					"PRIEST",		"holy")
 	AddDisambiguation("devouring_plague_tick",	"devouring_plague",				"PRIEST")
+	AddDisambiguation("divine_star",			"divine_star_caster",			"PRIEST",		"shadow")
+	AddDisambiguation("divine_star",			"divine_star_heal",				"PRIEST",		"discipline")
+	AddDisambiguation("divine_star",			"divine_star_heal",				"PRIEST",		"holy")
+	AddDisambiguation("halo",					"halo_caster",					"PRIEST",		"shadow")
+	AddDisambiguation("halo",					"halo_heal",					"PRIEST",		"discipline")
+	AddDisambiguation("halo",					"halo_heal",					"PRIEST",		"holy")
+	AddDisambiguation("renew_debuff",			"renew_buff",					"PRIEST")
 	-- Rogue
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"ROGUE")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"ROGUE")
@@ -1699,13 +1709,11 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 						node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 					end
 				end
-			elseif (parseNode.operator == "=" or parseNode.operator == "!=")
-					and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") then
+			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") then
 				--[[
 					Special handling for "target=X" or "current_target=X" expressions.
 					TODO: This whole section will need to be updated once Prismatic Crystals can be summoned.
 				--]]
-				local lhsNode = parseNode.child[1]
 				local rhsNode = parseNode.child[2]
 				local name = rhsNode.name
 				if name == "prismatic_crystal" then
@@ -1717,10 +1725,21 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				else -- if parseNode.operator == "!=" then
 					code = format("not target.Name(%s)", name)
 				end
-				if not node and code then
-					annotation.astAnnotation = annotation.astAnnotation or {}
-					node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+				annotation.astAnnotation = annotation.astAnnotation or {}
+				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "last_judgment_target" then
+				--[[
+					Special handling for "last_judgment_target=X" expressions.
+					TODO: Track the target of the previous cast of a spell.
+				--]]
+				local code
+				if parseNode.operator == "=" then
+					code = "False(last_judgement_target)"
+				else -- if parseNode.operator == "!=" then
+					code = "True(last_judgement_target)"
 				end
+				annotation.astAnnotation = annotation.astAnnotation or {}
+				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 			elseif operator then
 				local lhsNode = Emit(parseNode.child[1], nodeList, annotation, action)
 				local rhsNode = Emit(parseNode.child[2], nodeList, annotation, action)
