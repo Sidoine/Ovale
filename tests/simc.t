@@ -28,7 +28,7 @@ local ipairs = ipairs
 local strfind = string.find
 local tinsert = table.insert
 
-local profilesDirectory = "../../SimulationCraft/profiles/Tier16M"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
 
 -- Save original input and output handles.
 local saveInput = io.input()

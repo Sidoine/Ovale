@@ -32,7 +32,7 @@ local tconcat = table.concat
 local tinsert = table.insert
 local wipe = table.wipe
 
-local profilesDirectory = "../../SimulationCraft/profiles/Tier16M"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
 local outputDirectory = "../scripts"
 
 -- Save original input and output handles.
