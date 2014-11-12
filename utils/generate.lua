@@ -49,7 +49,8 @@ do
 	OvaleSimulationCraft:GetValidProfiles(files)
 
 	-- Create the output directory.
-	os.execute("mkdir " .. outputDirectory)
+	local outputDir = 
+	os.execute("mkdir " .. gsub(outputDirectory, "/", "\\"))
 end
 
 local output = {}
