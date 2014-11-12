@@ -10,17 +10,18 @@ do
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_potion_armor ItemName(mountains_potion) default specialization=protection)
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default specialization=!protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=arms)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
 
 AddFunction UsePotionArmor
 {
-	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(mountains_potion usable=1)
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
 AddFunction UsePotionStrength
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -46,10 +47,10 @@ AddFunction InterruptActions
 ###
 ### Arms
 ###
-# Based on SimulationCraft profile "Warrior_Arms_T16M".
+# Based on SimulationCraft profile "Warrior_Arms_T17M".
 #	class=warrior
 #	spec=arms
-#	talents=1311320
+#	talents=1321322
 #	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 # ActionList: ArmsDefaultActions --> main, shortcd, cd
@@ -83,7 +84,7 @@ AddFunction ArmsDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
+	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
 	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
 	if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
@@ -161,8 +162,8 @@ AddFunction ArmsAoeCdActions {}
 
 AddFunction ArmsPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=battle
 	Spell(battle_stance)
 	# CHANGE: Apply raid buffs.
@@ -179,7 +180,7 @@ AddFunction ArmsPrecombatCdActions
 		or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout)
 		or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout)
 	{
-		#potion,name=mogu_power
+		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
 }
@@ -280,10 +281,10 @@ AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
 ###
 ### Fury (Single-Minded Fury)
 ###
-# Based on SimulationCraft profile "Warrior_Fury_1h_T16M".
+# Based on SimulationCraft profile "Warrior_Fury_1h_T17M".
 #	class=warrior
 #	spec=fury
-#	talents=1221320
+#	talents=1321321
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 # ActionList: FurySingleMindedFuryDefaultActions --> main, shortcd, cd
@@ -325,7 +326,7 @@ AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
 	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
@@ -416,8 +417,8 @@ AddFunction FurySingleMindedFuryAoeCdActions {}
 
 AddFunction FurySingleMindedFuryPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=battle
 	Spell(battle_stance)
 	# CHANGE: Apply raid buffs.
@@ -434,7 +435,7 @@ AddFunction FurySingleMindedFuryPrecombatCdActions
 		or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout)
 		or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout)
 	{
-		#potion,name=mogu_power
+		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
 }
@@ -584,10 +585,10 @@ AddFunction FurySingleMindedFuryTwoTargetsCdActions {}
 ###
 ### Fury (Titan's Grip)
 ###
-# Based on SimulationCraft profile "Warrior_Fury_2h_T16M".
+# Based on SimulationCraft profile "Warrior_Fury_2h_T17M".
 #	class=warrior
 #	spec=fury
-#	talents=1321220
+#	talents=1321321
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 # ActionList: FuryTitansGripDefaultActions --> main, shortcd, cd
@@ -633,7 +634,7 @@ AddFunction FuryTitansGripDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
 	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
@@ -720,8 +721,8 @@ AddFunction FuryTitansGripAoeCdActions
 
 AddFunction FuryTitansGripPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=battle
 	Spell(battle_stance)
 	# CHANGE: Apply raid buffs.
@@ -738,7 +739,7 @@ AddFunction FuryTitansGripPrecombatCdActions
 		or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout)
 		or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout)
 	{
-		#potion,name=mogu_power
+		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
 }
@@ -985,18 +986,53 @@ AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 ###
 ### Protection
 ###
-# Based on SimulationCraft profile "Warrior_Protection_T16M".
+# Based on SimulationCraft profile "Warrior_Protection_T17M".
 #	class=warrior
 #	spec=protection
-#	talents=1113320
+#	talents=1113323
 #	glyphs=unending_rage/heroic_leap/cleave
+
+# ActionList: ProtectionDefaultActions --> main, shortcd, cd
+
+AddFunction ProtectionDefaultActions
+{
+	#auto_attack
+	#call_action_list,name=prot
+	ProtectionProtActions()
+}
+
+AddFunction ProtectionDefaultShortCdActions
+{
+	#charge
+	if target.InRange(charge) Spell(charge)
+	# CHANGE: Get within melee range of the target.
+	GetInMeleeRange()
+	#berserker_rage,if=buff.enrage.down
+	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
+	#call_action_list,name=prot
+	ProtectionProtShortCdActions()
+}
+
+AddFunction ProtectionDefaultCdActions
+{
+	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	InterruptActions()
+	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
+	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
+	#berserking,if=buff.bloodbath.up|buff.avatar.up
+	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(berserking)
+	#arcane_torrent,if=buff.bloodbath.up|buff.avatar.up
+	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(arcane_torrent_rage)
+	#call_action_list,name=prot
+	ProtectionProtCdActions()
+}
 
 # ActionList: ProtectionPrecombatActions --> main, shortcd, cd
 
 AddFunction ProtectionPrecombatActions
 {
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
+	#flask,type=greater_draenic_stamina_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=defensive
 	Spell(defensive_stance)
 	# CHANGE: Apply raid buffs.
@@ -1015,7 +1051,7 @@ AddFunction ProtectionPrecombatCdActions
 	{
 		#shield_wall
 		Spell(shield_wall)
-		#potion,name=mountains
+		#potion,name=draenic_armor
 		UsePotionArmor()
 	}
 }
@@ -1080,41 +1116,6 @@ AddFunction ProtectionProtAoeCdActions
 	Spell(avatar)
 }
 
-# ActionList: ProtectionDefaultActions --> main, shortcd, cd
-
-AddFunction ProtectionDefaultActions
-{
-	#auto_attack
-	#call_action_list,name=prot
-	ProtectionProtActions()
-}
-
-AddFunction ProtectionDefaultShortCdActions
-{
-	#charge
-	if target.InRange(charge) Spell(charge)
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
-	#berserker_rage,if=buff.enrage.down
-	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
-	#call_action_list,name=prot
-	ProtectionProtShortCdActions()
-}
-
-AddFunction ProtectionDefaultCdActions
-{
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
-	InterruptActions()
-	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.bloodbath.up|buff.avatar.up
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|buff.avatar.up
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(arcane_torrent_rage)
-	#call_action_list,name=prot
-	ProtectionProtCdActions()
-}
-
 # ActionList: ProtectionProtActions --> main, shortcd, cd
 
 AddFunction ProtectionProtActions
@@ -1172,7 +1173,7 @@ AddFunction ProtectionProtCdActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(shield_wall)
 	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
-	#potion,name=mountains,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
+	#potion,name=draenic_armor,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 UsePotionArmor()
 	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)

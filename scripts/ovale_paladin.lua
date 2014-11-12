@@ -10,12 +10,25 @@ do
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+
+AddFunction UsePotionArmor
+{
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
+}
 
 AddFunction UsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -85,6 +98,10 @@ AddFunction ProtectionDefaultActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
+		# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
+		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
+		#if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
+		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -136,6 +153,8 @@ AddFunction ProtectionDefaultShortCdActions
 	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
 	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
 	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
+	#harsh_word,if=glyph.harsh_words.enabled&holy_power>=3
+	if Glyph(glyph_of_harsh_words) and HolyPower() >= 3 Spell(harsh_word)
 	# CHANGE: Get into melee range for Shield of the Righteousness.
 	GetInMeleeRange()
 	#shield_of_the_righteous,if=buff.divine_purpose.react
@@ -208,8 +227,8 @@ AddFunction ProtectionDefaultCdActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_holy)
-	#potion,name=mogu_power,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionStrength()
+	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 
@@ -228,8 +247,8 @@ AddFunction ProtectionDefaultCdActions
 
 AddFunction ProtectionPrecombatActions
 {
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
+	#flask,type=greater_draenic_stamina_flask
+	#food,type=talador_surf_and_turf
 	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
 	if not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
@@ -257,8 +276,8 @@ AddFunction ProtectionPrecombatCdActions
 		or Spell(seal_of_insight)
 		or Spell(sacred_shield)
 	{
-		#potion,name=mogu_power
-		UsePotionStrength()
+		#potion,name=draenic_armor
+		UsePotionArmor()
 	}
 }
 
@@ -304,11 +323,11 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
 ###
 ### Retribution
 ###
-# Based on SimulationCraft profile "Paladin_Retribution_T16M".
+# Based on SimulationCraft profile "Paladin_Retribution_T17M".
 #	class=paladin
 #	spec=retribution
-#	talents=2212230
-#	glyphs=double_jeopardy/mass_exorcism
+#	talents=2112333
+#	glyphs=winged_vengeance/templars_verdict/righteous_retreat/fire_from_the_heavens/judgment
 
 # ActionList: RetributionDefaultActions --> main, shortcd, cd
 
@@ -342,7 +361,7 @@ AddFunction RetributionDefaultCdActions
 	#rebuke
 	InterruptActions()
 	#potion,name=mogu_power,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 UsePotionStrength()
+	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 
 	unless Spell(execution_sentence)
 		or Spell(lights_hammer)
@@ -355,6 +374,8 @@ AddFunction RetributionDefaultCdActions
 		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#avenging_wrath,if=!talent.seraphim.enabled
 		if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
+		#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
+		if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
 		#blood_fury
 		Spell(blood_fury_apsp)
 		#berserking
@@ -426,8 +447,8 @@ AddFunction RetributionCleaveActions
 
 AddFunction RetributionPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=sleeper_surprise
 	#blessing_of_kings,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
@@ -450,7 +471,7 @@ AddFunction RetributionPrecombatCdActions
 		or Enemies() < 2 and Spell(seal_of_truth)
 		or Enemies() >= 2 and Spell(seal_of_righteousness)
 	{
-		#potion,name=mogu_power
+		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
 }

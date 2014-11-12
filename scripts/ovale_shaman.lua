@@ -10,18 +10,25 @@ do
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default specialization=enhancement)
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default specialization=elemental)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=elemental)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction Bloodlust
@@ -50,10 +57,10 @@ AddFunction InterruptActions
 ###
 ### Elemental
 ###
-# Based on SimulationCraft profile "Shaman_Elemental_T16M".
+# Based on SimulationCraft profile "Shaman_Elemental_T17M".
 #	class=shaman
 #	spec=elemental
-#	talents=0001030
+#	talents=0001011
 #	glyphs=chain_lightning
 
 # ActionList: ElementalDefaultActions --> main, shortcd, cd
@@ -86,7 +93,7 @@ AddFunction ElementalDefaultCdActions
 	InterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
-	#potion,name=jade_serpent,if=buff.ascendance.up|target.time_to_die<=30
+	#potion,name=draenic_intellect,if=buff.ascendance.up|target.time_to_die<=30
 	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 UsePotionIntellect()
 	#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
 	if not BuffPresent(burst_haste_buff any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) or Level() < 87 } } Spell(berserking)
@@ -134,8 +141,8 @@ AddFunction ElementalAoeCdActions {}
 
 AddFunction ElementalPrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=calamari_crepes
 	#lightning_shield,if=!buff.lightning_shield.up
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
 	#snapshot_stats
@@ -147,7 +154,7 @@ AddFunction ElementalPrecombatCdActions
 {
 	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
 	{
-		#potion,name=jade_serpent
+		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }
@@ -256,10 +263,10 @@ AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
 ###
 ### Enhancement
 ###
-# Based on SimulationCraft profile "Shaman_Enhancement_T16M".
+# Based on SimulationCraft profile "Shaman_Enhancement_T17M".
 #	class=shaman
 #	spec=enhancement
-#	talents=0002020
+#	talents=0002012
 #	glyphs=chain_lightning/frost_shock
 
 # ActionList: EnhancementDefaultActions --> main, shortcd, cd
@@ -288,7 +295,9 @@ AddFunction EnhancementDefaultCdActions
 	InterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
-	#potion,name=virmens_bite,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
+	#use_item,name=beating_heart_of_the_mountain
+	UseItemActions()
+	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
 	if Talent(storm_elemental_totem_talent) and TotemRemaining(air totem=storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire totem=fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
 	#blood_fury
 	Spell(blood_fury_apsp)
@@ -365,8 +374,8 @@ AddFunction EnhancementAoeActions
 
 AddFunction EnhancementPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=frosty_stew
 	#lightning_shield,if=!buff.lightning_shield.up
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
 	#snapshot_stats
@@ -378,7 +387,7 @@ AddFunction EnhancementPrecombatCdActions
 {
 	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
 	{
-		#potion,name=virmens_bite
+		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
 }

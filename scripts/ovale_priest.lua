@@ -10,11 +10,11 @@ do
 Include(ovale_common)
 Include(ovale_priest_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -34,10 +34,10 @@ AddFunction InterruptActions
 ###
 ### Shadow
 ###
-# Based on SimulationCraft profile "Priest_Shadow_T16M".
+# Based on SimulationCraft profile "Priest_Shadow_T17M_COP".
 #	class=priest
 #	spec=shadow
-#	talents=1133130
+#	talents=1133131
 #	glyphs=mind_flay/fade/sha
 
 # ActionList: ShadowDefaultActions --> main, shortcd, cd
@@ -67,7 +67,7 @@ AddFunction ShadowDefaultCdActions
 {
 	unless not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
-		#potion,name=jade_serpent,if=buff.bloodlust.react|target.time_to_die<=40
+		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
@@ -532,13 +532,19 @@ AddFunction ShadowMainCdActions
 
 AddFunction ShadowPrecombatActions
 {
+	#flask,type=greater_draenic_intellect_flask
+	# CHANGE: Different foods for different level-100 talents: AS -> blackrock_barbecue, CoP -> sleeper_surprise, VE -> frosty_stew
+	#food,type=sleeper_surprise
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#snapshot_stats
-	#mind_blast
-	Spell(mind_blast)
+	# CHANGE: Use Mind Spike if talented into Clarity of Power, and Mind Blast otherwise.
+	#mind_spike
+	#Spell(mind_spike)
+	if Talent(clarity_of_power_talent) Spell(mind_spike)
+	if not Talent(clarity_of_power_talent) Spell(mind_blast)
 }
 
 AddFunction ShadowPrecombatShortCdActions {}
@@ -548,7 +554,7 @@ AddFunction ShadowPrecombatCdActions
 	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude)
 		or not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
-		#potion,name=jade_serpent
+		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }

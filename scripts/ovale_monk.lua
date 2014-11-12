@@ -10,12 +10,12 @@ do
 Include(ovale_common)
 Include(ovale_monk_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -36,11 +36,11 @@ AddFunction InterruptActions
 ###
 ### Brewmaster
 ###
-# Based on SimulationCraft profile "Monk_Brewmaster_1h_T16M".
+# Based on SimulationCraft profile "Monk_Brewmaster_1h_CE_T17M".
 #	class=monk
 #	spec=brewmaster
-#	talents=0110220
-#	glyphs=fortifying_brew,fortuitous_spheres
+#	talents=0130222
+#	glyphs=fortifying_brew,expel_harm,fortuitous_spheres
 
 # ActionList: BrewmasterDefaultActions --> main, shortcd, cd
 
@@ -106,8 +106,8 @@ AddFunction BrewmasterAoeActions
 {
 	# CHANGE: Ensure that Shuffle is never down.
 	if BuffExpires(shuffle_buff) Spell(blackout_kick)
-	#breath_of_fire,if=chi>=3&buff.shuffle.remains>=6&dot.breath_of_fire.remains<=1&target.debuff.dizzying_haze.up
-	if Chi() >= 3 and BuffRemaining(shuffle_buff) >= 6 and target.DebuffRemaining(breath_of_fire_debuff) <= 1 and target.DebuffPresent(dizzying_haze_debuff) Spell(breath_of_fire)
+	#breath_of_fire,if=chi>=3&buff.shuffle.remains>=6&dot.breath_of_fire.remains<=gcd
+	if Chi() >= 3 and BuffRemaining(shuffle_buff) >= 6 and target.DebuffRemaining(breath_of_fire_debuff) <= GCD() Spell(breath_of_fire)
 	#chi_explosion,if=chi>=4
 	if Chi() >= 4 Spell(chi_explosion_tank)
 	#rushing_jade_wind,if=chi.max-chi>=1&talent.rushing_jade_wind.enabled
@@ -175,8 +175,8 @@ AddFunction BrewmasterAoeCdActions {}
 
 AddFunction BrewmasterPrecombatActions
 {
-	#flask,type=earth
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_stamina_flask
+	#food,type=sleeper_surprise
 	# CHANGE: Buff with Legacy of the White Tiger
 	if BuffExpires(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=sturdy_ox
@@ -199,7 +199,7 @@ AddFunction BrewmasterPrecombatCdActions
 	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
 		or Spell(stance_of_the_sturdy_ox)
 	{
-		#potion,name=virmens_bite
+		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
 }
@@ -242,9 +242,8 @@ AddFunction BrewmasterStShortCdActions
 	{
 		#purifying_brew,if=!talent.chi_explosion.enabled&stagger.heavy
 		if not Talent(chi_explosion_talent) and DebuffPresent(heavy_stagger_debuff) Spell(purifying_brew)
-		# CHANGE: Ignore this next Purifying Brew suggestion since it blocks casting Guard later on.
-		#purifying_brew,if=!buff.serenity.up
-		#if not BuffPresent(serenity_buff) Spell(purifying_brew)
+		#purifying_brew,if=buff.serenity.up
+		if BuffPresent(serenity_buff) Spell(purifying_brew)
 		#guard
 		Spell(guard)
 
@@ -306,10 +305,10 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 	BrewmasterDefaultCdActions()
 }
 
-# Based on SimulationCraft profile "Monk_Windwalker_1h_T16M".
+# Based on SimulationCraft profile "Monk_Windwalker_1h_T17M".
 #	class=monk
 #	spec=windwalker
-#	talents=1133320
+#	talents=0130023
 
 # ActionList: WindwalkerDefaultActions --> main, shortcd, cd
 
@@ -367,8 +366,8 @@ AddFunction WindwalkerDefaultCdActions
 	# CHANGE: Break snares with Nimble Brew.
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5
 	if Talent(invoke_xuen_talent) and TimeInCombat() > 5 Spell(invoke_xuen)
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionAgility()
+	#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&trinket.proc.agility.react)
+	if BuffPresent(serenity_buff) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) UsePotionAgility()
 	#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 	#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -436,8 +435,8 @@ AddFunction WindwalkerAoeCdActions {}
 
 AddFunction WindwalkerPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=rylak_crepes
 	# CHANGE: Buff with Legacy of the White Tiger
 	if BuffExpires(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=fierce_tiger
@@ -452,7 +451,7 @@ AddFunction WindwalkerPrecombatCdActions
 	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
 		or Spell(stance_of_the_fierce_tiger)
 	{
-		#potion,name=virmens_bite
+		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
 }

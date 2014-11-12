@@ -10,11 +10,11 @@ do
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
 AddFunction UseItemActions
@@ -52,11 +52,11 @@ AddFunction InterruptActions
 ###
 ### Assassination
 ###
-# Based on SimulationCraft profile "Rogue_Assassination_T16M".
+# Based on SimulationCraft profile "Rogue_Assassination_T17M".
 #	class=rogue
 #	spec=assassination
-#	talents=3111130
-#	glyphs=vendetta
+#	talents=3000032
+#	glyphs=vendetta/energy/disappearance
 
 # ActionList: AssassinationDefaultActions --> main, shortcd, cd
 
@@ -108,12 +108,14 @@ AddFunction AssassinationDefaultShortCdActions
 
 AddFunction AssassinationDefaultCdActions
 {
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	InterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
+	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
+	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -140,8 +142,8 @@ AddFunction AssassinationDefaultCdActions
 
 AddFunction AssassinationPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=sleeper_surprise
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#snapshot_stats
@@ -161,7 +163,7 @@ AddFunction AssassinationPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
 	{
-		#potion,name=virmens_bite
+		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
 }
@@ -208,10 +210,10 @@ AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_ao
 ###
 ### Combat
 ###
-# Based on SimulationCraft profile "Rogue_Combat_T16M".
+# Based on SimulationCraft profile "Rogue_Combat_T17M".
 #	class=rogue
 #	spec=combat
-#	talents=3111130
+#	talents=3111121
 #	glyphs=energy/disappearance
 
 # ActionList: CombatDefaultActions --> main, shortcd, cd
@@ -252,12 +254,14 @@ AddFunction CombatDefaultShortCdActions
 
 AddFunction CombatDefaultCdActions
 {
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	InterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
+	#use_item,slot=trinket2
+	UseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -304,12 +308,12 @@ AddFunction CombatGeneratorActions
 
 AddFunction CombatPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=frosty_stew
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#snapshot_stats
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
@@ -372,10 +376,11 @@ AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
 ###
 ### Subtlety
 ###
-# Based on SimulationCraft profile "Rogue_Subtlety_T16M".
+# Based on SimulationCraft profile "Rogue_Subtlety_T17M".
 #	class=rogue
 #	spec=subtlety
-#	talents=3111130
+#	talents=3111132
+#	glyphs=energy/hemorrhaging_veins
 
 # ActionList: SubtletyDefaultActions --> main, shortcd, cd
 
@@ -434,10 +439,12 @@ AddFunction SubtletyDefaultShortCdActions
 
 AddFunction SubtletyDefaultCdActions
 {
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	InterruptActions()
+	#use_item,slot=trinket2,if=buff.shadow_dance.up
+	if BuffPresent(shadow_dance_buff) UseItemActions()
 	#blood_fury,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.shadow_dance.up
@@ -545,8 +552,8 @@ AddFunction SubtletyPoolActions
 
 AddFunction SubtletyPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=calamari_crepes
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#snapshot_stats
@@ -565,7 +572,7 @@ AddFunction SubtletyPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
 	{
-		#potion,name=virmens_bite
+		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
 }

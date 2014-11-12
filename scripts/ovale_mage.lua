@@ -10,12 +10,12 @@ do
 Include(ovale_common)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_time_warp SpellName(time_warp) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -34,10 +34,10 @@ AddFunction InterruptActions
 ###
 ### Arcane
 ###
-# Based on SimulationCraft profile "Mage_Arcane_T16M".
+# Based on SimulationCraft profile "Mage_Arcane_T17M".
 #	class=mage
 #	spec=arcane
-#	talents=3003120
+#	talents=3003121
 #	glyphs=arcane_power/cone_of_cold
 
 # ActionList: ArcaneDefaultActions --> main, shortcd, cd
@@ -277,7 +277,7 @@ AddFunction ArcaneCooldownsCdActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#potion,name=jade_serpent,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
+	#potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
 	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(crystal totem=prismatic_crystal) } UsePotionIntellect()
 }
 
@@ -340,8 +340,8 @@ AddFunction ArcaneInitCrystalCdActions
 
 AddFunction ArcanePrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=sleeper_surprise
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#snapshot_stats
@@ -367,7 +367,7 @@ AddFunction ArcanePrecombatCdActions
 	{
 		#mirror_image
 		Spell(mirror_image)
-		#potion,name=jade_serpent
+		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }
@@ -414,10 +414,10 @@ AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane_aoe
 ###
 ### Fire
 ###
-# Based on SimulationCraft profile "Mage_Fire_T16M".
+# Based on SimulationCraft profile "Mage_Fire_T17M".
 #	class=mage
 #	spec=fire
-#	talents=3003220
+#	talents=3003322
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 # ActionList: FireDefaultActions --> main, shortcd, cd
@@ -601,7 +601,7 @@ AddFunction FireCombustSequenceCdActions
 		Spell(berserking)
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
-		#potion,name=jade_serpent
+		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }
@@ -676,8 +676,8 @@ AddFunction FireLivingBombActions
 
 AddFunction FirePrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=blackrock_barbecue
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#snapshot_stats
@@ -703,7 +703,7 @@ AddFunction FirePrecombatCdActions
 	{
 		#mirror_image
 		Spell(mirror_image)
-		#potion,name=jade_serpent
+		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }
@@ -804,10 +804,10 @@ AddIcon specialization=fire help=cd checkbox=opt_mage_fire_aoe
 ###
 ### Frost
 ###
-# Based on SimulationCraft profile "Mage_Frost_T16M".
+# Based on SimulationCraft profile "Mage_Frost_T17M".
 #	class=mage
 #	spec=frost
-#	talents=3003220
+#	talents=3003122
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
 # ActionList: FrostDefaultActions --> main, shortcd, cd
@@ -923,7 +923,7 @@ AddFunction FrostCooldownsCdActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#potion,name=jade_serpent,if=buff.bloodlust.up|buff.icy_veins.up
+	#potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) UsePotionIntellect()
 }
 
@@ -976,8 +976,8 @@ AddFunction FrostCrystalSequenceCdActions
 
 AddFunction FrostPrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=calamari_crepes
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#snapshot_stats
@@ -1006,7 +1006,7 @@ AddFunction FrostPrecombatCdActions
 	{
 		#mirror_image
 		Spell(mirror_image)
-		#potion,name=jade_serpent
+		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }
