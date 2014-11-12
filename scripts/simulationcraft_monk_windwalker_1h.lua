@@ -2,23 +2,23 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Monk_Windwalker_1h_T16M"
-	local desc = "[6.0] SimulationCraft: Monk_Windwalker_1h_T16M"
+	local name = "SimulationCraft: Monk_Windwalker_1h_T17M"
+	local desc = "[6.0] SimulationCraft: Monk_Windwalker_1h_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Monk_Windwalker_1h_T16M".
+# Based on SimulationCraft profile "Monk_Windwalker_1h_T17M".
 #	class=monk
 #	spec=windwalker
-#	talents=1133320
+#	talents=0130023
 
 Include(ovale_common)
 Include(ovale_monk_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -42,8 +42,8 @@ AddFunction WindwalkerDefaultActions
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5
 	if Talent(invoke_xuen_talent) and TimeInCombat() > 5 Spell(invoke_xuen)
 	#chi_sphere,if=talent.power_strikes.enabled&buff.chi_sphere.react&chi<4
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionAgility()
+	#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&trinket.proc.agility.react)
+	if BuffPresent(serenity_buff) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) UsePotionAgility()
 	#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 	#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -110,12 +110,12 @@ AddFunction WindwalkerAoeActions
 
 AddFunction WindwalkerPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=rylak_crepes
 	#stance,choose=fierce_tiger
 	Spell(stance_of_the_fierce_tiger)
 	#snapshot_stats
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 }
 
@@ -178,6 +178,7 @@ AddIcon specialization=windwalker help=aoe
 # combo_breaker_ce_buff
 # combo_breaker_tp_buff
 # death_note_buff
+# draenic_agility_potion
 # energizing_brew
 # energizing_brew_buff
 # fists_of_fury
@@ -204,7 +205,6 @@ AddIcon specialization=windwalker help=aoe
 # tigereye_brew_buff
 # tigereye_brew_use_buff
 # touch_of_death
-# virmens_bite_potion
 # war_stomp
 # zen_sphere
 # zen_sphere_buff

@@ -2,17 +2,23 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Druid_Guardian_T16M"
-	local desc = "[6.0] SimulationCraft: Druid_Guardian_T16M"
+	local name = "SimulationCraft: Druid_Guardian_T17M"
+	local desc = "[6.0] SimulationCraft: Druid_Guardian_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Druid_Guardian_T16M".
+# Based on SimulationCraft profile "Druid_Guardian_T17M".
 #	class=druid
 #	spec=guardian
-#	talents=0201020
-#	glyphs=maul
+#	talents=0301022
 
 Include(ovale_common)
 Include(ovale_druid_spells)
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
 
 AddFunction GetInMeleeRange
 {
@@ -51,6 +57,8 @@ AddFunction GuardianDefaultActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
+	#use_item,slot=trinket2
+	UseItemActions()
 	#barkskin
 	Spell(barkskin)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
@@ -91,8 +99,8 @@ AddFunction GuardianDefaultActions
 
 AddFunction GuardianPrecombatActions
 {
-	#flask,type=winds
-	#food,type=seafood_magnifique_feast
+	#flask,type=greater_draenic_agility_flask
+	#food,type=sleeper_surprise
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#bear_form

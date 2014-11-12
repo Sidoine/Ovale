@@ -2,24 +2,36 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Paladin_Retribution_T16M"
-	local desc = "[6.0] SimulationCraft: Paladin_Retribution_T16M"
+	local name = "SimulationCraft: Paladin_Retribution_T17M"
+	local desc = "[6.0] SimulationCraft: Paladin_Retribution_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Paladin_Retribution_T16M".
+# Based on SimulationCraft profile "Paladin_Retribution_T17M".
 #	class=paladin
 #	spec=retribution
-#	talents=2212230
-#	glyphs=double_jeopardy/mass_exorcism
+#	talents=2112333
+#	glyphs=winged_vengeance/templars_verdict/righteous_retreat/fire_from_the_heavens/judgment
 
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
 
 AddFunction UsePotionStrength
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction GetInMeleeRange
+{
+	if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction InterruptActions
@@ -48,7 +60,7 @@ AddFunction RetributionDefaultActions
 {
 	#rebuke
 	InterruptActions()
-	#potion,name=mogu_power,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
+	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 UsePotionStrength()
 	#auto_attack
 	#speed_of_light,if=movement.distance>5
@@ -65,6 +77,8 @@ AddFunction RetributionDefaultActions
 	if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(avenging_wrath_melee)
 	#avenging_wrath,if=!talent.seraphim.enabled
 	if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
+	#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
+	if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -137,8 +151,8 @@ AddFunction RetributionCleaveActions
 
 AddFunction RetributionPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=sleeper_surprise
 	#blessing_of_kings,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
@@ -148,7 +162,7 @@ AddFunction RetributionPrecombatActions
 	#seal_of_righteousness,if=active_enemies>=2
 	if Enemies() >= 2 Spell(seal_of_righteousness)
 	#snapshot_stats
-	#potion,name=mogu_power
+	#potion,name=draenic_strength
 	UsePotionStrength()
 }
 
@@ -238,6 +252,7 @@ AddIcon specialization=retribution help=aoe
 # divine_crusader_buff
 # divine_purpose_buff
 # divine_storm
+# draenic_strength_potion
 # empowered_seals_talent
 # execution_sentence
 # exorcism
@@ -256,7 +271,6 @@ AddIcon specialization=retribution help=aoe
 # liadrins_righteousness_buff
 # lights_hammer
 # maraads_truth_buff
-# mogu_power_potion
 # quaking_palm
 # rebuke
 # righteous_fury

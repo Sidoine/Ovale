@@ -2,24 +2,31 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Shaman_Enhancement_T16M"
-	local desc = "[6.0] SimulationCraft: Shaman_Enhancement_T16M"
+	local name = "SimulationCraft: Shaman_Enhancement_T17M"
+	local desc = "[6.0] SimulationCraft: Shaman_Enhancement_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Shaman_Enhancement_T16M".
+# Based on SimulationCraft profile "Shaman_Enhancement_T17M".
 #	class=shaman
 #	spec=enhancement
-#	talents=0002020
+#	talents=0002012
 #	glyphs=chain_lightning/frost_shock
 
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction Bloodlust
@@ -52,7 +59,9 @@ AddFunction EnhancementDefaultActions
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
 	#auto_attack
-	#potion,name=virmens_bite,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
+	#use_item,name=beating_heart_of_the_mountain
+	UseItemActions()
+	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
 	if Talent(storm_elemental_totem_talent) and TotemRemaining(air totem=storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire totem=fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
 	#blood_fury
 	Spell(blood_fury_apsp)
@@ -130,12 +139,12 @@ AddFunction EnhancementAoeActions
 
 AddFunction EnhancementPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=frosty_stew
 	#lightning_shield,if=!buff.lightning_shield.up
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
 	#snapshot_stats
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 }
 
@@ -190,6 +199,7 @@ AddIcon specialization=enhancement help=aoe
 # berserking
 # blood_fury_apsp
 # chain_lightning
+# draenic_agility_potion
 # echo_of_the_elements_buff
 # echo_of_the_elements_talent
 # elemental_blast
@@ -222,7 +232,6 @@ AddIcon specialization=enhancement help=aoe
 # unleash_elements
 # unleash_flame_buff
 # unleashed_fury_talent
-# virmens_bite_potion
 # war_stomp
 # wind_shear
 # windstrike

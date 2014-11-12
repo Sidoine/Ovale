@@ -2,24 +2,24 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Paladin_Protection_T16M"
-	local desc = "[6.0] SimulationCraft: Paladin_Protection_T16M"
+	local name = "SimulationCraft: Paladin_Protection_T17M"
+	local desc = "[6.0] SimulationCraft: Paladin_Protection_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Paladin_Protection_T16M".
+# Based on SimulationCraft profile "Paladin_Protection_T17M".
 #	class=paladin
 #	spec=protection
-#	talents=3132320
+#	talents=3032223
 #	glyphs=focused_shield/alabaster_shield/divine_protection
 
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
 
-AddFunction UsePotionStrength
+AddFunction UsePotionArmor
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -53,8 +53,8 @@ AddFunction ProtectionDefaultActions
 	if False(role_attack) or 0 ProtectionMaxDpsActions()
 	#run_action_list,name=max_survival,if=0
 	if 0 ProtectionMaxSurvivalActions()
-	#potion,name=mogu_power,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionStrength()
+	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 	#seraphim
@@ -69,6 +69,8 @@ AddFunction ProtectionDefaultActions
 	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
 	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
 	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
+	#harsh_word,if=glyph.harsh_words.enabled&holy_power>=3
+	if Glyph(glyph_of_harsh_words) and HolyPower() >= 3 Spell(harsh_word)
 	#shield_of_the_righteous,if=buff.divine_purpose.react
 	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
 	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
@@ -90,6 +92,8 @@ AddFunction ProtectionDefaultActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
+		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
+		if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -139,8 +143,8 @@ AddFunction ProtectionDefaultActions
 
 AddFunction ProtectionMaxDpsActions
 {
-	#potion,name=mogu_power,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionStrength()
+	#potion,name=draenic_armor,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
+	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 	#seraphim
@@ -164,6 +168,8 @@ AddFunction ProtectionMaxDpsActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
+		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
+		if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -213,8 +219,8 @@ AddFunction ProtectionMaxDpsActions
 
 AddFunction ProtectionMaxSurvivalActions
 {
-	#potion,name=mogu_power,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionStrength()
+	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 	#divine_protection,if=buff.seraphim.down
@@ -242,6 +248,8 @@ AddFunction ProtectionMaxSurvivalActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
+		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
+		if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -285,8 +293,8 @@ AddFunction ProtectionMaxSurvivalActions
 
 AddFunction ProtectionPrecombatActions
 {
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
+	#flask,type=greater_draenic_stamina_flask
+	#food,type=talador_surf_and_turf
 	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
 	if not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
@@ -296,8 +304,8 @@ AddFunction ProtectionPrecombatActions
 	#sacred_shield
 	Spell(sacred_shield)
 	#snapshot_stats
-	#potion,name=mogu_power
-	UsePotionStrength()
+	#potion,name=draenic_armor
+	UsePotionArmor()
 }
 
 AddIcon specialization=protection help=main enemies=1
@@ -329,18 +337,22 @@ AddIcon specialization=protection help=aoe
 # divine_protection
 # divine_protection_buff
 # divine_purpose_buff
+# draenic_armor_potion
 # empowered_seals_talent
 # eternal_flame
 # eternal_flame_buff
 # execution_sentence
 # flash_of_light
+# glyph_of_double_jeopardy
 # glyph_of_final_wrath
 # glyph_of_focused_shield
+# glyph_of_harsh_words
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
 # hammer_of_the_righteous
 # hammer_of_wrath
+# harsh_word
 # holy_avenger
 # holy_avenger_buff
 # holy_avenger_talent
@@ -350,7 +362,6 @@ AddIcon specialization=protection help=aoe
 # liadrins_righteousness_buff
 # lights_hammer
 # maraads_truth_buff
-# mogu_power_potion
 # rebuke
 # righteous_fury
 # sacred_shield

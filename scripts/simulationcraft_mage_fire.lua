@@ -2,24 +2,24 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Mage_Fire_T16M"
-	local desc = "[6.0] SimulationCraft: Mage_Fire_T16M"
+	local name = "SimulationCraft: Mage_Fire_T17M"
+	local desc = "[6.0] SimulationCraft: Mage_Fire_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Mage_Fire_T16M".
+# Based on SimulationCraft profile "Mage_Fire_T17M".
 #	class=mage
 #	spec=fire
-#	talents=3003220
+#	talents=3003322
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 Include(ovale_common)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_time_warp SpellName(time_warp) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -105,7 +105,7 @@ AddFunction FireCombustSequenceActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 	#meteor
 	Spell(meteor)
@@ -155,8 +155,8 @@ AddFunction FireLivingBombActions
 
 AddFunction FirePrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=blackrock_barbecue
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#snapshot_stats
@@ -164,7 +164,7 @@ AddFunction FirePrecombatActions
 	Spell(rune_of_power)
 	#mirror_image
 	Spell(mirror_image)
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 	#pyroblast
 	Spell(pyroblast)
@@ -218,6 +218,7 @@ AddIcon specialization=fire help=aoe
 # combustion
 # combustion_debuff
 # counterspell
+# draenic_intellect_potion
 # dragons_breath
 # fireball
 # flamestrike
@@ -231,7 +232,6 @@ AddIcon specialization=fire help=aoe
 # incanters_flow_buff
 # incanters_flow_talent
 # inferno_blast
-# jade_serpent_potion
 # kindling_talent
 # living_bomb
 # living_bomb_debuff

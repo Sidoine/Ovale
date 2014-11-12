@@ -2,29 +2,37 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warlock_Affliction_T16M"
-	local desc = "[6.0] SimulationCraft: Warlock_Affliction_T16M"
+	local name = "SimulationCraft: Warlock_Affliction_T17M"
+	local desc = "[6.0] SimulationCraft: Warlock_Affliction_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Warlock_Affliction_T16M".
+# Based on SimulationCraft profile "Warlock_Affliction_T17M".
 #	class=warlock
 #	spec=affliction
-#	talents=0000110
-#	glyphs=siphon_life
+#	talents=0000111
 #	pet=felhunter
 
 Include(ovale_common)
 Include(ovale_warlock_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction AfflictionDefaultActions
 {
-	#potion,name=jade_serpent,if=buff.bloodlust.react|target.health.pct<=20
+	#use_item,name=shards_of_nothing
+	UseItemActions()
+	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
 	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
 	#berserking
 	Spell(berserking)
@@ -68,8 +76,8 @@ AddFunction AfflictionDefaultActions
 
 AddFunction AfflictionPrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=sleeper_surprise
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
@@ -83,7 +91,7 @@ AddFunction AfflictionPrecombatActions
 	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 	#service_pet,if=talent.grimoire_of_service.enabled
 	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 }
 
@@ -115,6 +123,7 @@ AddIcon specialization=affliction help=aoe
 # dark_soul_misery_buff
 # demonbolt_talent
 # demonic_servitude_talent
+# draenic_intellect_potion
 # drain_soul
 # grimoire_felhunter
 # grimoire_of_sacrifice
@@ -124,7 +133,6 @@ AddIcon specialization=affliction help=aoe
 # haunt
 # haunt_debuff
 # haunting_spirits_buff
-# jade_serpent_potion
 # life_tap
 # mannoroths_fury
 # soulburn

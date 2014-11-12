@@ -2,24 +2,24 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Shaman_Elemental_T16M"
-	local desc = "[6.0] SimulationCraft: Shaman_Elemental_T16M"
+	local name = "SimulationCraft: Shaman_Elemental_T17M"
+	local desc = "[6.0] SimulationCraft: Shaman_Elemental_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Shaman_Elemental_T16M".
+# Based on SimulationCraft profile "Shaman_Elemental_T17M".
 #	class=shaman
 #	spec=elemental
-#	talents=0001030
+#	talents=0001011
 #	glyphs=chain_lightning
 
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction Bloodlust
@@ -51,7 +51,7 @@ AddFunction ElementalDefaultActions
 	InterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
-	#potion,name=jade_serpent,if=buff.ascendance.up|target.time_to_die<=30
+	#potion,name=draenic_intellect,if=buff.ascendance.up|target.time_to_die<=30
 	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 UsePotionIntellect()
 	#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
 	if not BuffPresent(burst_haste_buff any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) or Level() < 87 } } Spell(berserking)
@@ -97,12 +97,12 @@ AddFunction ElementalAoeActions
 
 AddFunction ElementalPrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=calamari_crepes
 	#lightning_shield,if=!buff.lightning_shield.up
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
 	#snapshot_stats
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 }
 
@@ -164,6 +164,7 @@ AddIcon specialization=elemental help=aoe
 # berserking
 # blood_fury_apsp
 # chain_lightning
+# draenic_intellect_potion
 # earth_shock
 # earthquake
 # earthquake_debuff
@@ -175,7 +176,6 @@ AddIcon specialization=elemental help=aoe
 # fire_elemental_totem
 # flame_shock
 # flame_shock_debuff
-# jade_serpent_potion
 # lava_beam
 # lava_burst
 # lava_surge_buff

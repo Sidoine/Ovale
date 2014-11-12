@@ -2,23 +2,22 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Death_Knight_Blood_T16M"
-	local desc = "[6.0] SimulationCraft: Death_Knight_Blood_T16M"
+	local name = "SimulationCraft: Death_Knight_Blood_T17M"
+	local desc = "[6.0] SimulationCraft: Death_Knight_Blood_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Death_Knight_Blood_T16M".
+# Based on SimulationCraft profile "Death_Knight_Blood_T17M".
 #	class=deathknight
 #	spec=blood
-#	talents=2303100
-#	glyphs=vampiric_blood/regenerative_magic
+#	talents=2013302
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_potion_armor ItemName(mountains_potion) default)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 
 AddFunction UsePotionArmor
 {
-	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(mountains_potion usable=1)
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -46,7 +45,7 @@ AddFunction BloodDefaultActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
-	#potion,name=mountains,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
+	#potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
 	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 UsePotionArmor()
 	#antimagic_shell
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
@@ -98,14 +97,14 @@ AddFunction BloodDefaultActions
 
 AddFunction BloodPrecombatActions
 {
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
+	#flask,type=greater_draenic_stamina_flask
+	#food,type=talador_surf_and_turf
 	#blood_presence
 	Spell(blood_presence)
 	#horn_of_winter
 	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#snapshot_stats
-	#potion,name=mountains
+	#potion,name=draenic_armor
 	UsePotionArmor()
 	#bone_shield
 	Spell(bone_shield)
@@ -147,6 +146,7 @@ AddIcon specialization=blood help=aoe
 # death_pact
 # death_strike
 # defile
+# draenic_armor_potion
 # empower_rune_weapon
 # frost_fever_debuff
 # horn_of_winter
@@ -155,7 +155,6 @@ AddIcon specialization=blood help=aoe
 # icy_touch
 # lichborne
 # mind_freeze
-# mountains_potion
 # necrotic_plague_debuff
 # necrotic_plague_talent
 # outbreak

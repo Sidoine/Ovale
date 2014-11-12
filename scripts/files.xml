@@ -41,10 +41,22 @@
 	<Script file="simulationcraft_mage_arcane.lua" />
 	<Script file="simulationcraft_mage_fire.lua" />
 	<Script file="simulationcraft_mage_frost.lua" />
+	<Script file="simulationcraft_monk_brewmaster_1h_ce.lua" />
+	<Script file="simulationcraft_monk_brewmaster_1h_serenity.lua" />
+	<Script file="simulationcraft_monk_brewmaster_2h_ce.lua" />
+	<Script file="simulationcraft_monk_brewmaster_2h_serenity.lua" />
 	<Script file="simulationcraft_monk_windwalker_1h.lua" />
 	<Script file="simulationcraft_monk_windwalker_2h.lua" />
+	<Script file="simulationcraft_paladin_holy.lua" />
 	<Script file="simulationcraft_paladin_protection.lua" />
 	<Script file="simulationcraft_paladin_retribution.lua" />
+	<Script file="simulationcraft_priest_discipline_dmg.lua" />
+	<Script file="simulationcraft_priest_discipline_heal.lua" />
+	<Script file="simulationcraft_priest_holy_dmg.lua" />
+	<Script file="simulationcraft_priest_holy_heal.lua" />
+	<Script file="simulationcraft_priest_shadow_as.lua" />
+	<Script file="simulationcraft_priest_shadow_cop.lua" />
+	<Script file="simulationcraft_priest_shadow_ve.lua" />
 	<Script file="simulationcraft_rogue_assassination.lua" />
 	<Script file="simulationcraft_rogue_combat.lua" />
 	<Script file="simulationcraft_rogue_subtlety.lua" />
@@ -56,5 +68,6 @@
 	<Script file="simulationcraft_warrior_arms.lua" />
 	<Script file="simulationcraft_warrior_fury_1h.lua" />
 	<Script file="simulationcraft_warrior_fury_2h.lua" />
+	<Script file="simulationcraft_warrior_gladiator.lua" />
 	<Script file="simulationcraft_warrior_protection.lua" />
 </Ui>

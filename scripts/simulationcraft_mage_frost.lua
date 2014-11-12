@@ -2,24 +2,24 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Mage_Frost_T16M"
-	local desc = "[6.0] SimulationCraft: Mage_Frost_T16M"
+	local name = "SimulationCraft: Mage_Frost_T17M"
+	local desc = "[6.0] SimulationCraft: Mage_Frost_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Mage_Frost_T16M".
+# Based on SimulationCraft profile "Mage_Frost_T17M".
 #	class=mage
 #	spec=frost
-#	talents=3003220
+#	talents=3003122
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
 Include(ovale_common)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_time_warp SpellName(time_warp) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -95,7 +95,7 @@ AddFunction FrostCooldownsActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#potion,name=jade_serpent,if=buff.bloodlust.up|buff.icy_veins.up
+	#potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) UsePotionIntellect()
 }
 
@@ -129,8 +129,8 @@ AddFunction FrostCrystalSequenceActions
 
 AddFunction FrostPrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=calamari_crepes
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#water_elemental
@@ -140,7 +140,7 @@ AddFunction FrostPrecombatActions
 	Spell(rune_of_power)
 	#mirror_image
 	Spell(mirror_image)
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 	#frostbolt
 	Spell(frostbolt)
@@ -213,6 +213,7 @@ AddIcon specialization=frost help=aoe
 # comet_storm
 # cone_of_cold
 # counterspell
+# draenic_intellect_potion
 # fingers_of_frost_buff
 # frost_bomb
 # frost_bomb_debuff
@@ -229,7 +230,6 @@ AddIcon specialization=frost help=aoe
 # ice_shard_buff
 # icy_veins
 # icy_veins_buff
-# jade_serpent_potion
 # mirror_image
 # mirror_image_talent
 # prismatic_crystal

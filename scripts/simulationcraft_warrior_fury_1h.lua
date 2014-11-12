@@ -2,23 +2,23 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Fury_1h_T16M"
-	local desc = "[6.0] SimulationCraft: Warrior_Fury_1h_T16M"
+	local name = "SimulationCraft: Warrior_Fury_1h_T17M"
+	local desc = "[6.0] SimulationCraft: Warrior_Fury_1h_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Warrior_Fury_1h_T16M".
+# Based on SimulationCraft profile "Warrior_Fury_1h_T17M".
 #	class=warrior
 #	spec=fury
-#	talents=1221320
+#	talents=1321321
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -52,7 +52,7 @@ AddFunction FurySingleMindedFuryDefaultActions
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
 	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetActions()
@@ -116,12 +116,12 @@ AddFunction FurySingleMindedFuryMovementActions
 
 AddFunction FurySingleMindedFuryPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=battle
 	Spell(battle_stance)
 	#snapshot_stats
-	#potion,name=mogu_power
+	#potion,name=draenic_strength
 	UsePotionStrength()
 }
 
@@ -240,6 +240,7 @@ AddIcon specialization=fury help=aoe
 # bloodsurge_buff
 # bloodthirst
 # charge
+# draenic_strength_potion
 # dragon_roar
 # execute
 # glyph_of_gag_order
@@ -247,7 +248,6 @@ AddIcon specialization=fury help=aoe
 # heroic_throw
 # impending_victory
 # meat_cleaver_buff
-# mogu_power_potion
 # pummel
 # quaking_palm
 # raging_blow

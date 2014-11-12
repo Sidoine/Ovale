@@ -2,23 +2,30 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Rogue_Assassination_T16M"
-	local desc = "[6.0] SimulationCraft: Rogue_Assassination_T16M"
+	local name = "SimulationCraft: Rogue_Assassination_T17M"
+	local desc = "[6.0] SimulationCraft: Rogue_Assassination_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Rogue_Assassination_T16M".
+# Based on SimulationCraft profile "Rogue_Assassination_T17M".
 #	class=rogue
 #	spec=assassination
-#	talents=3111130
-#	glyphs=vendetta
+#	talents=3000032
+#	glyphs=vendetta/energy/disappearance
 
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -48,12 +55,14 @@ AddFunction InterruptActions
 
 AddFunction AssassinationDefaultActions
 {
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	InterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
+	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
+	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -104,12 +113,12 @@ AddFunction AssassinationDefaultActions
 
 AddFunction AssassinationPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=sleeper_surprise
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#snapshot_stats
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
@@ -146,6 +155,7 @@ AddIcon specialization=assassination help=aoe
 # death_from_above
 # death_from_above_talent
 # dispatch
+# draenic_agility_potion
 # envenom
 # envenom_buff
 # fan_of_knives
@@ -170,7 +180,6 @@ AddIcon specialization=assassination help=aoe
 # vanish_buff
 # vendetta
 # vendetta_debuff
-# virmens_bite_potion
 ]]
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "reference")
 end

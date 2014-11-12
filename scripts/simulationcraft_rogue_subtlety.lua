@@ -2,22 +2,30 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Rogue_Subtlety_T16M"
-	local desc = "[6.0] SimulationCraft: Rogue_Subtlety_T16M"
+	local name = "SimulationCraft: Rogue_Subtlety_T17M"
+	local desc = "[6.0] SimulationCraft: Rogue_Subtlety_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Rogue_Subtlety_T16M".
+# Based on SimulationCraft profile "Rogue_Subtlety_T17M".
 #	class=rogue
 #	spec=subtlety
-#	talents=3111130
+#	talents=3111132
+#	glyphs=energy/hemorrhaging_veins
 
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -47,10 +55,12 @@ AddFunction InterruptActions
 
 AddFunction SubtletyDefaultActions
 {
-	#potion,name=virmens_bite,if=buff.bloodlust.react|target.time_to_die<40
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 UsePotionAgility()
 	#kick
 	InterruptActions()
+	#use_item,slot=trinket2,if=buff.shadow_dance.up
+	if BuffPresent(shadow_dance_buff) UseItemActions()
 	#blood_fury,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.shadow_dance.up
@@ -133,12 +143,12 @@ AddFunction SubtletyPoolActions
 
 AddFunction SubtletyPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=calamari_crepes
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#snapshot_stats
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
@@ -176,6 +186,7 @@ AddIcon specialization=subtlety help=aoe
 # deadly_throw
 # death_from_above
 # death_from_above_talent
+# draenic_agility_potion
 # eviscerate
 # fan_of_knives
 # find_weakness_debuff
@@ -202,7 +213,6 @@ AddIcon specialization=subtlety help=aoe
 # stealth
 # vanish
 # vanish_buff
-# virmens_bite_potion
 ]]
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "reference")
 end

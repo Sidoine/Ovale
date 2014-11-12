@@ -2,27 +2,27 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Druid_Balance_T16M"
-	local desc = "[6.0] SimulationCraft: Druid_Balance_T16M"
+	local name = "SimulationCraft: Druid_Balance_T17M"
+	local desc = "[6.0] SimulationCraft: Druid_Balance_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Druid_Balance_T16M".
+# Based on SimulationCraft profile "Druid_Balance_T17M".
 #	class=druid
 #	spec=balance
-#	talents=0101010
+#	talents=0101001
 
 Include(ovale_common)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction BalanceDefaultActions
 {
-	#potion,name=jade_serpent,if=buff.celestial_alignment.up
+	#potion,name=draenic_intellect,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) UsePotionIntellect()
 	#blood_fury,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) Spell(blood_fury_apsp)
@@ -62,14 +62,14 @@ AddFunction BalanceAoeActions
 
 AddFunction BalancePrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=seafood_magnifique_feast
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=sleeper_surprise
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#moonkin_form
 	Spell(moonkin_form)
 	#snapshot_stats
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 	#stellar_flare
 	Spell(stellar_flare)
@@ -117,9 +117,9 @@ AddIcon specialization=balance help=aoe
 # blood_fury_apsp
 # celestial_alignment
 # celestial_alignment_buff
+# draenic_intellect_potion
 # force_of_nature_caster
 # incarnation_caster
-# jade_serpent_potion
 # lunar_empowerment_buff
 # lunar_peak_buff
 # mark_of_the_wild

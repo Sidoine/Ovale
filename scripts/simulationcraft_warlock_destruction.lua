@@ -2,28 +2,28 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warlock_Destruction_T16M"
-	local desc = "[6.0] SimulationCraft: Warlock_Destruction_T16M"
+	local name = "SimulationCraft: Warlock_Destruction_T17M"
+	local desc = "[6.0] SimulationCraft: Warlock_Destruction_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Warlock_Destruction_T16M".
+# Based on SimulationCraft profile "Warlock_Destruction_T17M".
 #	class=warlock
 #	spec=destruction
-#	talents=0000310
+#	talents=0000133
 #	pet=felhunter
 
 Include(ovale_common)
 Include(ovale_warlock_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction DestructionDefaultActions
 {
-	#potion,name=jade_serpent,if=buff.bloodlust.react|target.health.pct<=20
+	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
 	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
 	#berserking
 	Spell(berserking)
@@ -77,8 +77,8 @@ AddFunction DestructionAoeActions
 
 AddFunction DestructionPrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=blackrock_barbecue
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
@@ -92,7 +92,7 @@ AddFunction DestructionPrecombatActions
 	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 	#service_pet,if=talent.grimoire_of_service.enabled
 	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 	#incinerate
 	Spell(incinerate)
@@ -106,6 +106,8 @@ AddFunction DestructionSingleTargetActions
 	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(Shadowburn)
 	#immolate,cycle_targets=1,if=remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)
 	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } Spell(immolate)
+	#rain_of_fire,if=!ticking
+	if not target.DebuffPresent(rain_of_fire_debuff) Spell(rain_of_fire)
 	#shadowburn,if=buff.havoc.remains
 	if BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
@@ -144,8 +146,10 @@ AddFunction DestructionSingleTargetActions
 	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#conflagrate
 	Spell(conflagrate)
-	#incinerate
-	Spell(incinerate)
+	#incinerate,if=talent.charred_remains.enabled
+	if Talent(charred_remains_talent) Spell(incinerate)
+	#incinerate,if=buff.backdraft.up|mana>=48800
+	if BuffPresent(backdraft_buff) or Mana() >= 48800 Spell(incinerate)
 }
 
 AddIcon specialization=destruction help=main enemies=1
@@ -178,6 +182,7 @@ AddIcon specialization=destruction help=aoe
 # dark_soul_instability_buff
 # demonbolt_talent
 # demonic_servitude_talent
+# draenic_intellect_potion
 # ember_master_buff
 # fire_and_brimstone
 # fire_and_brimstone_buff
@@ -191,7 +196,6 @@ AddIcon specialization=destruction help=aoe
 # immolate
 # immolate_debuff
 # incinerate
-# jade_serpent_potion
 # mannoroths_fury
 # rain_of_fire
 # rain_of_fire_debuff

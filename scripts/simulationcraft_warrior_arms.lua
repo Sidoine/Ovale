@@ -2,23 +2,23 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Arms_T16M"
-	local desc = "[6.0] SimulationCraft: Warrior_Arms_T16M"
+	local name = "SimulationCraft: Warrior_Arms_T17M"
+	local desc = "[6.0] SimulationCraft: Warrior_Arms_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Warrior_Arms_T16M".
+# Based on SimulationCraft profile "Warrior_Arms_T17M".
 #	class=warrior
 #	spec=arms
-#	talents=1311320
+#	talents=1321322
 #	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -48,7 +48,7 @@ AddFunction ArmsDefaultActions
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementActions()
-	#potion,name=mogu_power,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
+	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
 	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
 	if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
@@ -116,12 +116,12 @@ AddFunction ArmsMovementActions
 
 AddFunction ArmsPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=battle
 	Spell(battle_stance)
 	#snapshot_stats
-	#potion,name=mogu_power
+	#potion,name=draenic_strength
 	UsePotionStrength()
 }
 
@@ -180,13 +180,13 @@ AddIcon specialization=arms help=aoe
 # charge
 # colossus_smash
 # colossus_smash_debuff
+# draenic_strength_potion
 # dragon_roar
 # execute_arms
 # glyph_of_gag_order
 # heroic_leap
 # heroic_throw
 # impending_victory
-# mogu_power_potion
 # mortal_strike
 # pummel
 # quaking_palm

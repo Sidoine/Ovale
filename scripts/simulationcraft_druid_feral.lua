@@ -2,23 +2,30 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Druid_Feral_T16M"
-	local desc = "[6.0] SimulationCraft: Druid_Feral_T16M"
+	local name = "SimulationCraft: Druid_Feral_T17M"
+	local desc = "[6.0] SimulationCraft: Druid_Feral_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Druid_Feral_T16M".
+# Based on SimulationCraft profile "Druid_Feral_T17M".
 #	class=druid
 #	spec=feral
-#	talents=3001000
+#	talents=3002002
 #	glyphs=savage_roar
 
 Include(ovale_common)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -62,19 +69,21 @@ AddFunction FeralDefaultActions
 	InterruptActions()
 	#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
 	if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
-	#potion,name=tolvir,if=target.time_to_die<=40
+	#potion,name=draenic_agility,if=target.time_to_die<=40
 	if target.TimeToDie() <= 40 UsePotionAgility()
+	#use_item,slot=trinket1,sync=tigers_fury
+	if not SpellCooldown(tigers_fury) > 0 UseItemActions()
 	#blood_fury,sync=tigers_fury
 	if not SpellCooldown(tigers_fury) > 0 Spell(blood_fury_apsp)
 	#berserking,sync=tigers_fury
 	if not SpellCooldown(tigers_fury) > 0 Spell(berserking)
 	#arcane_torrent,sync=tigers_fury
 	if not SpellCooldown(tigers_fury) > 0 Spell(arcane_torrent_energy)
-	#incarnation,sync=tigers_fury
-	if not SpellCooldown(tigers_fury) > 0 Spell(incarnation_melee)
 	#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
 	if not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 Spell(tigers_fury)
-	#potion,name=tolvir,sync=berserk,if=target.health.pct<25
+	#incarnation,if=cooldown.berserk.remains<10&energy.time_to_max>1
+	if SpellCooldown(berserk_cat) < 10 and TimeToMaxEnergy() > 1 Spell(incarnation_melee)
+	#potion,name=draenic_agility,sync=berserk,if=target.health.pct<25
 	if target.HealthPercent() < 25 and not SpellCooldown(berserk_cat) > 0 UsePotionAgility()
 	#berserk,if=buff.tigers_fury.up
 	if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
@@ -106,16 +115,16 @@ AddFunction FeralDefaultActions
 
 AddFunction FeralFinisherActions
 {
-	#ferocious_bite,cycle_targets=1,if=target.health.pct<25&dot.rip.ticking&energy>=max_fb_energy
-	if target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+	#ferocious_bite,cycle_targets=1,max_energy=1,if=target.health.pct<25&dot.rip.ticking
+	if Energy() >= EnergyCost(ferocious_bite max=1) and target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) Spell(ferocious_bite)
 	#rip,cycle_targets=1,if=remains<3&target.time_to_die-remains>18
 	if target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 Spell(rip)
 	#rip,cycle_targets=1,if=remains<7.2&persistent_multiplier>dot.rip.pmultiplier&target.time_to_die-remains>18
 	if target.DebuffRemaining(rip_debuff) < 7.2 and DamageMultiplier(rip) > target.DebuffDamageMultiplier(rip_debuff) and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 Spell(rip)
 	#savage_roar,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&buff.savage_roar.remains<12.6
 	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 Spell(savage_roar)
-	#ferocious_bite,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&energy>=max_fb_energy
-	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+	#ferocious_bite,max_energy=1,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)
+	if Energy() >= EnergyCost(ferocious_bite max=1) and { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } Spell(ferocious_bite)
 }
 
 AddFunction FeralGeneratorActions
@@ -144,16 +153,18 @@ AddFunction FeralMaintainActions
 
 AddFunction FeralPrecombatActions
 {
-	#flask,type=winds
-	#food,type=seafood_magnifique_feast
+	#flask,type=greater_draenic_agility_flask
+	#food,type=blackrock_barbecue
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
+	#healing_touch,if=talent.bloodtalons.enabled
+	if Talent(bloodtalons_talent) Spell(healing_touch)
 	#cat_form
 	Spell(cat_form)
 	#prowl
 	if BuffExpires(stealthed_buff any=1) Spell(prowl)
 	#snapshot_stats
-	#potion,name=tolvir
+	#potion,name=draenic_agility
 	UsePotionAgility()
 }
 
@@ -181,6 +192,7 @@ AddIcon specialization=feral help=aoe
 # dash
 # displacer_beast
 # displacer_beast_buff
+# draenic_agility_potion
 # ferocious_bite
 # force_of_nature_melee
 # healing_touch
@@ -213,7 +225,6 @@ AddIcon specialization=feral help=aoe
 # tigers_fury
 # tigers_fury_buff
 # typhoon
-# virmens_bite_potion
 # war_stomp
 # wild_charge
 # wild_charge_bear

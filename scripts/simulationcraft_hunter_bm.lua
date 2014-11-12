@@ -2,23 +2,30 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Hunter_BM_T16M"
-	local desc = "[6.0] SimulationCraft: Hunter_BM_T16M"
+	local name = "SimulationCraft: Hunter_BM_T17M"
+	local desc = "[6.0] SimulationCraft: Hunter_BM_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_BM_T16M".
+# Based on SimulationCraft profile "Hunter_BM_T17M".
 #	class=hunter
 #	spec=beast_mastery
-#	talents=0002330
+#	talents=0002133
 
 Include(ovale_common)
 Include(ovale_hunter_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction InterruptActions
@@ -44,15 +51,17 @@ AddFunction SummonPet
 AddFunction BeastMasteryDefaultActions
 {
 	#auto_shot
+	#use_item,name=beating_heart_of_the_mountain
+	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
+	#potion,name=draenic_agility,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
 	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 UsePotionAgility()
-	#potion,name=virmens_bite,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
+	#potion,name=draenic_agility,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
 	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
 	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
@@ -98,8 +107,8 @@ AddFunction BeastMasteryDefaultActions
 
 AddFunction BeastMasteryPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=blackrock_barbecue
 	#summon_pet
 	SummonPet()
 	#snapshot_stats
@@ -107,7 +116,7 @@ AddFunction BeastMasteryPrecombatActions
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
 	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 }
 
@@ -135,6 +144,7 @@ AddIcon specialization=beast_mastery help=aoe
 # cobra_shot
 # counter_shot
 # dire_beast
+# draenic_agility_potion
 # exotic_munitions_buff
 # explosive_trap
 # focus_fire
@@ -157,7 +167,6 @@ AddIcon specialization=beast_mastery help=aoe
 # stampede_talent
 # thrill_of_the_hunt_buff
 # trap_launcher
-# virmens_bite_potion
 # war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")

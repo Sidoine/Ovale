@@ -2,22 +2,29 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Death_Knight_Frost_1h_T16M"
-	local desc = "[6.0] SimulationCraft: Death_Knight_Frost_1h_T16M"
+	local name = "SimulationCraft: Death_Knight_Frost_1h_T17M"
+	local desc = "[6.0] SimulationCraft: Death_Knight_Frost_1h_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Death_Knight_Frost_1h_T16M".
+# Based on SimulationCraft profile "Death_Knight_Frost_1h_T17M".
 #	class=deathknight
 #	spec=frost
-#	talents=2001000
+#	talents=2001002
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction InterruptActions
@@ -45,7 +52,7 @@ AddFunction FrostDualWieldDefaultActions
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
-	#potion,name=mogu_power,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
+	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
 	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) UsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
 	if target.TimeToDie() <= 60 and BuffPresent(potion_strength_buff) Spell(empower_rune_weapon)
@@ -55,6 +62,8 @@ AddFunction FrostDualWieldDefaultActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
+	#use_item,slot=trinket2
+	UseItemActions()
 	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostDualWieldAoeActions()
 	#run_action_list,name=single_target,if=active_enemies<3
@@ -137,8 +146,8 @@ AddFunction FrostDualWieldBosStActions
 
 AddFunction FrostDualWieldPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=sleeper_surprise
 	#horn_of_winter
 	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#frost_presence
@@ -146,7 +155,7 @@ AddFunction FrostDualWieldPrecombatActions
 	#snapshot_stats
 	#army_of_the_dead
 	Spell(army_of_the_dead)
-	#potion,name=mogu_power
+	#potion,name=draenic_strength
 	UsePotionStrength()
 	#pillar_of_frost
 	Spell(pillar_of_frost)
@@ -235,6 +244,7 @@ AddIcon specialization=frost help=aoe
 # deaths_advance
 # defile
 # defile_talent
+# draenic_strength_potion
 # empower_rune_weapon
 # frost_fever_debuff
 # frost_presence
@@ -243,7 +253,6 @@ AddIcon specialization=frost help=aoe
 # howling_blast
 # killing_machine_buff
 # mind_freeze
-# mogu_power_potion
 # necrotic_plague_debuff
 # necrotic_plague_talent
 # obliterate

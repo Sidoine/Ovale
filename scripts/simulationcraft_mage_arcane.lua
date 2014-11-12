@@ -2,24 +2,24 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Mage_Arcane_T16M"
-	local desc = "[6.0] SimulationCraft: Mage_Arcane_T16M"
+	local name = "SimulationCraft: Mage_Arcane_T17M"
+	local desc = "[6.0] SimulationCraft: Mage_Arcane_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Mage_Arcane_T16M".
+# Based on SimulationCraft profile "Mage_Arcane_T17M".
 #	class=mage
 #	spec=arcane
-#	talents=3003120
+#	talents=3003121
 #	glyphs=arcane_power/cone_of_cold
 
 Include(ovale_common)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(jade_serpent_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_time_warp SpellName(time_warp) default)
 
 AddFunction UsePotionIntellect
 {
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(jade_serpent_potion usable=1)
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -163,7 +163,7 @@ AddFunction ArcaneCooldownsActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#potion,name=jade_serpent,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
+	#potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
 	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(crystal totem=prismatic_crystal) } UsePotionIntellect()
 }
 
@@ -189,8 +189,8 @@ AddFunction ArcaneInitCrystalActions
 
 AddFunction ArcanePrecombatActions
 {
-	#flask,type=warm_sun
-	#food,type=mogu_fish_stew
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=sleeper_surprise
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#snapshot_stats
@@ -198,7 +198,7 @@ AddFunction ArcanePrecombatActions
 	Spell(rune_of_power)
 	#mirror_image
 	Spell(mirror_image)
-	#potion,name=jade_serpent
+	#potion,name=draenic_intellect
 	UsePotionIntellect()
 	#arcane_blast
 	Spell(arcane_blast)
@@ -237,12 +237,12 @@ AddIcon specialization=arcane help=aoe
 # cold_snap
 # cone_of_cold
 # counterspell
+# draenic_intellect_potion
 # evocation
 # glyph_of_arcane_power
 # glyph_of_cone_of_cold
 # ice_floes
 # ice_floes_buff
-# jade_serpent_potion
 # mirror_image
 # nether_tempest
 # nether_tempest_debuff

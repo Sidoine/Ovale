@@ -2,23 +2,23 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Protection_T16M"
-	local desc = "[6.0] SimulationCraft: Warrior_Protection_T16M"
+	local name = "SimulationCraft: Warrior_Protection_T17M"
+	local desc = "[6.0] SimulationCraft: Warrior_Protection_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Warrior_Protection_T16M".
+# Based on SimulationCraft profile "Warrior_Protection_T17M".
 #	class=warrior
 #	spec=protection
-#	talents=1113320
+#	talents=1113323
 #	glyphs=unending_rage/heroic_leap/cleave
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_potion_armor ItemName(mountains_potion) default)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 
 AddFunction UsePotionArmor
 {
-	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(mountains_potion usable=1)
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
 AddFunction GetInMeleeRange
@@ -60,14 +60,14 @@ AddFunction ProtectionDefaultActions
 
 AddFunction ProtectionPrecombatActions
 {
-	#flask,type=earth
-	#food,type=chun_tian_spring_rolls
+	#flask,type=greater_draenic_stamina_flask
+	#food,type=blackrock_barbecue
 	#stance,choose=defensive
 	Spell(defensive_stance)
 	#snapshot_stats
 	#shield_wall
 	Spell(shield_wall)
-	#potion,name=mountains
+	#potion,name=draenic_armor
 	UsePotionArmor()
 }
 
@@ -85,7 +85,7 @@ AddFunction ProtectionProtActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(shield_wall)
 	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
-	#potion,name=mountains,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
+	#potion,name=draenic_armor,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 UsePotionArmor()
 	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
@@ -182,6 +182,7 @@ AddIcon specialization=protection help=aoe
 # demoralizing_shout
 # demoralizing_shout_debuff
 # devastate
+# draenic_armor_potion
 # dragon_roar
 # dragon_roar_talent
 # enraged_regeneration
@@ -195,7 +196,6 @@ AddIcon specialization=protection help=aoe
 # impending_victory_talent
 # last_stand
 # last_stand_buff
-# mountains_potion
 # potion_armor_buff
 # pummel
 # quaking_palm

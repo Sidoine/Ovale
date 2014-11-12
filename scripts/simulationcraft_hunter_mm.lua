@@ -2,23 +2,30 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Hunter_MM_T16M"
-	local desc = "[6.0] SimulationCraft: Hunter_MM_T16M"
+	local name = "SimulationCraft: Hunter_MM_T17M"
+	local desc = "[6.0] SimulationCraft: Hunter_MM_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_MM_T16M".
+# Based on SimulationCraft profile "Hunter_MM_T17M".
 #	class=hunter
 #	spec=marksmanship
-#	talents=0001330
+#	talents=0003113
 
 Include(ovale_common)
 Include(ovale_hunter_spells)
 
-AddCheckBox(opt_potion_agility ItemName(virmens_bite_potion) default)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
 
 AddFunction UsePotionAgility
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(virmens_bite_potion usable=1)
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction UseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction InterruptActions
@@ -44,13 +51,15 @@ AddFunction SummonPet
 AddFunction MarksmanshipDefaultActions
 {
 	#auto_shot
+	#use_item,name=beating_heart_of_the_mountain
+	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=virmens_bite,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=25
+	#potion,name=draenic_agility,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=25
 	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 UsePotionAgility()
 	#chimaera_shot
 	Spell(chimaera_shot)
@@ -112,8 +121,8 @@ AddFunction MarksmanshipCarefulAimActions
 
 AddFunction MarksmanshipPrecombatActions
 {
-	#flask,type=spring_blossoms
-	#food,type=sea_mist_rice_noodles
+	#flask,type=greater_draenic_agility_flask
+	#food,type=blackrock_barbecue
 	#summon_pet
 	SummonPet()
 	#snapshot_stats
@@ -121,7 +130,7 @@ AddFunction MarksmanshipPrecombatActions
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
 	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
-	#potion,name=virmens_bite
+	#potion,name=draenic_agility
 	UsePotionAgility()
 	#aimed_shot
 	Spell(aimed_shot)
@@ -149,6 +158,7 @@ AddIcon specialization=marksmanship help=aoe
 # chimaera_shot
 # counter_shot
 # dire_beast
+# draenic_agility_potion
 # exotic_munitions_buff
 # explosive_trap
 # focusing_shot_marksmanship
@@ -169,7 +179,6 @@ AddIcon specialization=marksmanship help=aoe
 # steady_shot
 # thrill_of_the_hunt_buff
 # trap_launcher
-# virmens_bite_potion
 # war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")

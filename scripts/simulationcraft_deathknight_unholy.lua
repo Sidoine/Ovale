@@ -2,22 +2,22 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Death_Knight_Unholy_T16M"
-	local desc = "[6.0] SimulationCraft: Death_Knight_Unholy_T16M"
+	local name = "SimulationCraft: Death_Knight_Unholy_T17M"
+	local desc = "[6.0] SimulationCraft: Death_Knight_Unholy_T17M"
 	local code = [[
-# Based on SimulationCraft profile "Death_Knight_Unholy_T16M".
+# Based on SimulationCraft profile "Death_Knight_Unholy_T17M".
 #	class=deathknight
 #	spec=unholy
-#	talents=2003000
+#	talents=2003002
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_potion_strength ItemName(mogu_power_potion) default)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
 {
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
 AddFunction InterruptActions
@@ -49,7 +49,7 @@ AddFunction UnholyDefaultActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
-	#potion,name=mogu_power,if=buff.dark_transformation.up&target.time_to_die<=60
+	#potion,name=draenic_strength,if=buff.dark_transformation.up&target.time_to_die<=60
 	if pet.BuffPresent(dark_transformation_buff any=1) and target.TimeToDie() <= 60 UsePotionStrength()
 	#run_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeActions()
@@ -81,8 +81,8 @@ AddFunction UnholyAoeActions
 	Spell(defile)
 	#death_and_decay,if=unholy=1
 	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
-	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_unholy)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=45
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 Spell(soul_reaper_unholy)
 	#scourge_strike,if=unholy=2
 	if Rune(unholy) >= 2 Spell(scourge_strike)
 	#blood_tap,if=buff.blood_charge.stack>10
@@ -145,8 +145,8 @@ AddFunction UnholyBosStActions
 
 AddFunction UnholyPrecombatActions
 {
-	#flask,type=winters_bite
-	#food,type=black_pepper_ribs_and_shrimp
+	#flask,type=greater_draenic_strength_flask
+	#food,type=calamari_crepes
 	#horn_of_winter
 	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#unholy_presence
@@ -154,7 +154,7 @@ AddFunction UnholyPrecombatActions
 	#snapshot_stats
 	#army_of_the_dead
 	Spell(army_of_the_dead)
-	#potion,name=mogu_power
+	#potion,name=draenic_strength
 	UsePotionStrength()
 	#raise_dead
 	Spell(raise_dead)
@@ -168,10 +168,10 @@ AddFunction UnholySingleTargetActions
 	if not Talent(necrotic_plague_talent) and target.DebuffRemaining(blood_plague_debuff) < 1 and target.DebuffRemaining(frost_fever_debuff) < 1 and target.DiseasesTicking() Spell(plague_leech)
 	#plague_leech,if=talent.necrotic_plague.enabled&(dot.necrotic_plague.remains<1)
 	if Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and target.DiseasesTicking() Spell(plague_leech)
-	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_unholy)
-	#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_unholy) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=45
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 Spell(soul_reaper_unholy)
+	#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=45&cooldown.soul_reaper.remains=0)
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#summon_gargoyle
 	Spell(summon_gargoyle)
 	#death_coil,if=runic_power>90
@@ -220,8 +220,8 @@ AddFunction UnholySingleTargetActions
 	if BuffStacks(blood_charge_buff) > 10 and { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#death_coil,if=buff.sudden_doom.react|(buff.dark_transformation.down&rune.unholy<=1)
 	if BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 Spell(death_coil)
-	#scourge_strike,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35)|(unholy>=1&death>=1)|(death>=2)
-	if not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 or Rune(unholy) >= 1 and Rune(death) >= 1 or Rune(death) >= 2 Spell(scourge_strike)
+	#scourge_strike,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=45)|(unholy>=1&death>=1)|(death>=2)
+	if not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(unholy) >= 1 and Rune(death) >= 1 or Rune(death) >= 2 Spell(scourge_strike)
 	#festering_strike
 	Spell(festering_strike)
 	#blood_tap,if=buff.blood_charge.stack>=10&runic_power>=30
@@ -278,13 +278,13 @@ AddIcon specialization=unholy help=aoe
 # death_coil
 # deaths_advance
 # defile
+# draenic_strength_potion
 # empower_rune_weapon
 # festering_strike
 # frost_fever_debuff
 # horn_of_winter
 # icy_touch
 # mind_freeze
-# mogu_power_potion
 # necrotic_plague_debuff
 # necrotic_plague_talent
 # outbreak
