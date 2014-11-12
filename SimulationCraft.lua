@@ -64,6 +64,7 @@ local MODIFIER_KEYWORD = {
 	["lethal"] = true,
 	["line_cd"] = true,
 	["max_cycle_targets"] = true,
+	["max_energy"] = true,
 	["moving"] = true,
 	["name"] = true,
 	["sec"] = true,
@@ -1758,8 +1759,8 @@ end
 
 EmitFunction = function(parseNode, nodeList, annotation, action)
 	local node
-	if parseNode.name == "ceil" then
-		-- Pretend ceil(expression) = expression.
+	if parseNode.name == "ceil" or parseNode.name == "floor" then
+		-- Pretend ceil and floor have no effect.
 		node = EmitExpression(parseNode.child[1], nodeList, annotation, action)
 	else
 		Ovale:FormatPrint("Warning: Function '%s' is not implemented.", parseNode.name)
@@ -1788,6 +1789,12 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		local debuffName = action .. "_debuff"
 		AddSymbol(annotation, debuffName)
 		code = format("DebuffCountOnAny(%s) <= Enemies() and DebuffCountOnAny(%s) <= %d", debuffName, debuffName, value)
+	elseif modifier == "max_energy" then
+		local value = tonumber(Unparse(parseNode))
+		if value == 1 then
+			-- SimulationCraft's max_energy is the maximum energy cost of the action if used.
+			code = format("Energy() >= EnergyCost(%s max=1)", action)
+		end
 	elseif modifier == "moving" then
 		local value = tonumber(Unparse(parseNode))
 		if value == 1 then
