@@ -29,6 +29,9 @@ local OvaleScore = Ovale:NewModule("OvaleScore", "AceEvent-3.0", "AceSerializer-
 Ovale.OvaleScore = OvaleScore
 
 --<private-static-properties>
+local L = Ovale.L
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleFuture = nil
 
@@ -46,6 +49,11 @@ local MSG_PREFIX = Ovale.MSG_PREFIX
 local self_guid = nil
 -- Player's name.
 local self_name = nil
+
+local OVALE_SCORE_DEBUG = "score"
+do
+	OvaleDebug:RegisterDebugOption(OVALE_SCORE_DEBUG, L["Scoring"], L["Debug scoring"])
+end
 --</private-static-properties>
 
 --<public-static-properties>
@@ -130,7 +138,7 @@ end
 function OvaleScore:ScoreSpell(spellId)
 	if OvaleFuture.inCombat and self.scoredSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
-		Ovale:Logf("Scored %s", scored)
+		Ovale:DebugPrintf(OVALE_SCORE_DEBUG, "Scored %s for %d.", scored, spellId)
 		if scored then
 			self.score = self.score + scored
 			self.maxScore = self.maxScore + 1
