@@ -17,6 +17,7 @@ local format = string.format
 local gmatch = string.gmatch
 local type = type
 local pairs = pairs
+local tonumber = tonumber
 local INFINITY = math.huge
 
 -- Registered "run-time requirement" handlers: self_requirement[name] = handler
@@ -452,7 +453,7 @@ function OvaleData:GetSpellInfoProperty(spellId, property, target)
 			target = target or "target"
 			local verified = self:CheckRequirements(spellId, tokenIterator, target)
 			if verified then
-				value = v
+				value = tonumber(v) or v
 				break
 			end
 		end

@@ -800,6 +800,7 @@ function OvaleAura:RequireStealthHandler(spellId, requirement, tokenIterator, ta
 	local verified = false
 	local stealthed = tokenIterator()
 	if stealthed then
+		stealthed = tonumber(stealthed)
 		local aura = self:GetAura("player", "stealthed_buff", "HELPFUL", true)
 		local isActiveAura = self:IsActiveAura(aura)
 		if stealthed == 1 and isActiveAura or stealthed ~= 1 and not isActiveAura then

@@ -23,6 +23,7 @@ local pairs = pairs
 local substr = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
+local tonumber = tonumber
 local tsort = table.sort
 local type = type
 local wipe = table.wipe
@@ -237,6 +238,7 @@ function OvaleStance:RequireStanceHandler(spellId, requirement, tokenIterator, t
 		if substr(stance, 1, 1) == "!" then
 			stance = substr(stance, 2)
 		end
+		stance = tonumber(stance) or stance
 		local isStance = self:IsStance(stance)
 		if not isBang and isStance or isBang and not isStance then
 			verified = true
