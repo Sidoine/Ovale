@@ -103,9 +103,8 @@ end
 function Ovale:OnEnable()
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterMessage("Ovale_CombatStarted")
 	self:RegisterMessage("Ovale_OptionChanged")
 
 	self.frame = AceGUI:Create(OVALE .. "Frame")
@@ -115,9 +114,8 @@ end
 function Ovale:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+	self:UnregisterMessage("Ovale_CombatEnded")
 	self:UnregisterMessage("Ovale_OptionChanged")
 	self.frame:Hide()
 end
@@ -176,11 +174,11 @@ function Ovale:PLAYER_TARGET_CHANGED()
 	self:UpdateVisibility()
 end
 
-function Ovale:PLAYER_REGEN_ENABLED()
+function Ovale:Ovale_CombatStarted(event, atTime)
 	self:UpdateVisibility()
 end
 
-function Ovale:PLAYER_REGEN_DISABLED()
+function Ovale:Ovale_CombatEnded(event, atTime)
 	self:UpdateVisibility()
 end
 

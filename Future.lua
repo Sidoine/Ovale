@@ -403,13 +403,17 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 end
 
 function OvaleFuture:PLAYER_REGEN_DISABLED(event)
+	local now = API_GetTime()
 	self.inCombat = true
-	self.combatStartTime = API_GetTime()
+	self.combatStartTime = now
+	self:SendMessage("Ovale_CombatStarted", now)
 end
 
 function OvaleFuture:PLAYER_REGEN_ENABLED(event)
+	local now = API_GetTime()
 	self.inCombat = false
 	self_pool:Drain()
+	self:SendMessage("Ovale_CombatEnded", now)
 end
 
 function OvaleFuture:Ovale_AuraAdded(event, timestamp, guid, spellId, caster)
