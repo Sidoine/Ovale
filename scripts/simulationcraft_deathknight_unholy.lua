@@ -100,7 +100,7 @@ AddFunction UnholyAoeActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -118,7 +118,7 @@ AddFunction UnholyBosAoeActions
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 	#death_coil,if=buff.sudden_doom.react
@@ -136,7 +136,7 @@ AddFunction UnholyBosStActions
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 	#death_coil,if=buff.sudden_doom.react
@@ -163,11 +163,11 @@ AddFunction UnholyPrecombatActions
 AddFunction UnholySingleTargetActions
 {
 	#plague_leech,if=cooldown.outbreak.remains<1
-	if SpellCooldown(outbreak) < 1 and target.DiseasesTicking() Spell(plague_leech)
+	if SpellCooldown(outbreak) < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#plague_leech,if=!talent.necrotic_plague.enabled&(dot.blood_plague.remains<1&dot.frost_fever.remains<1)
-	if not Talent(necrotic_plague_talent) and target.DebuffRemaining(blood_plague_debuff) < 1 and target.DebuffRemaining(frost_fever_debuff) < 1 and target.DiseasesTicking() Spell(plague_leech)
+	if not Talent(necrotic_plague_talent) and target.DebuffRemaining(blood_plague_debuff) < 1 and target.DebuffRemaining(frost_fever_debuff) < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#plague_leech,if=talent.necrotic_plague.enabled&(dot.necrotic_plague.remains<1)
-	if Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and target.DiseasesTicking() Spell(plague_leech)
+	if Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=45
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 Spell(soul_reaper_unholy)
 	#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=45&cooldown.soul_reaper.remains=0)

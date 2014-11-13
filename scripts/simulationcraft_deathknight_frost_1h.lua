@@ -97,7 +97,7 @@ AddFunction FrostDualWieldAoeActions
 	#frost_strike,if=!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>=10
 	if not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) >= 10 Spell(frost_strike)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
 	#empower_rune_weapon
@@ -117,7 +117,7 @@ AddFunction FrostDualWieldBosAoeActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
 	#empower_rune_weapon
@@ -131,7 +131,7 @@ AddFunction FrostDualWieldBosStActions
 	#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
 	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() Spell(plague_leech)
+	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#howling_blast,if=runic_power<88
 	if RunicPower() < 88 Spell(howling_blast)
 	#obliterate,if=unholy>0&runic_power<76
@@ -139,7 +139,7 @@ AddFunction FrostDualWieldBosStActions
 	#blood_tap,if=buff.blood_charge.stack>=5
 	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
@@ -208,7 +208,7 @@ AddFunction FrostDualWieldSingleTargetActions
 	#blood_tap
 	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
-	if target.DiseasesTicking() Spell(plague_leech)
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }
