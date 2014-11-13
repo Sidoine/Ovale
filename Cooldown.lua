@@ -395,7 +395,7 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 			if si.buff_cdr then
 				local aura = state:GetAura("player", si.buff_cdr)
 				if state:IsActiveAura(aura, atTime) then
-					duration = duration / aura.value1
+					duration = duration * aura.value1
 				end
 			end
 		end
