@@ -559,8 +559,10 @@ AddFunction SubtletyPrecombatActions
 	#snapshot_stats
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	# CHANGE: Only cast Premeditation if it not at the combo point cap.
 	#premeditation
-	Spell(premeditation)
+	#Spell(premeditation)
+	if ComboPoints() <= 4 Spell(premeditation)
 	#slice_and_dice
 	if BuffRemaining(slice_and_dice_buff) < 0.3 * BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 	#honor_among_thieves,cooldown=2.2,cooldown_stddev=0.1
