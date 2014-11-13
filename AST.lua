@@ -1648,6 +1648,17 @@ ParseParameters = function(tokenStream, nodeList, annotation, isList)
 				if ok then
 					name = node.value
 				end
+			elseif tokenType == "-" then
+				-- This should be a negative number.
+				-- Consume the '-' token.
+				tokenStream:Consume()
+				ok, node = ParseNumber(tokenStream, nodeList, annotation)
+				if ok then
+					-- Elide the unary negation operator into the number.
+					local value = -1 * node.value
+					node = GetNumberNode(value, nodeList, annotation)
+					name = value
+				end
 			elseif tokenType == "string" then
 				ok, node = ParseString(tokenStream, nodeList, annotation)
 				if ok then
@@ -2595,8 +2606,13 @@ function OvaleAST:FlattenParameters(ast)
 				for k = 1, N do
 					output[k] = parameters[k]
 				end
+				for k, v in ipairs(parameters) do
+					if not strmatch(v, ",") then
+						output[k] = v
+					end
+				end
 				for k, v in pairs(parameters) do
-					if type(k) == "number" and k <= N then
+					if type(k) == "number" and k > 0 and k <= N and not strmatch(v, ",") then
 						-- Already output in previous loop.
 					elseif k == "checkbox" then
 						for _, name in ipairs(v) do
