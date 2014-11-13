@@ -193,6 +193,12 @@ function OvalePassiveAura:UpdateAmplification()
 			-- Use a derived formula that very closely approximates the true percent increase based on item level.
 			local ilevel = OvaleEquipment:GetEquippedItemLevel(slot) or 528
 			local amplificationEffect = exp((ilevel - 528) * 0.009327061882 + 1.713797928)
+			-- Scale the Amplification effect so that it gives full Amplification at level 90 to 0% at level 100.
+			if OvalePaperDoll.level >= 90 then
+				amplificationEffect = amplificationEffect * (100 - OvalePaperDoll.level) / 10
+				-- Cap at 1%.
+				amplificationEffect = amplificationEffect > 1 and amplificationEffect or 1
+			end
 			critDamageIncrease = critDamageIncrease + amplificationEffect / 100
 			statMultiplier = statMultiplier * (1 + amplificationEffect / 100)
 		end
@@ -220,7 +226,7 @@ function OvalePassiveAura:UpdateReadiness()
 	local spellId = READINESS_ROLE[self_class] and READINESS_ROLE[self_class][specialization]
 	if spellId then
 		local hasReadiness = false
-		local cdRecoveryRateIncrease
+		local cdMultiplier
 
 		-- Check if a Readiness trinket is equipped and for the correct role.
 		for _, slot in pairs(TRINKET_SLOTS) do
@@ -230,11 +236,19 @@ function OvalePassiveAura:UpdateReadiness()
 				hasReadiness = true
 				-- Use a derived formula that very closely approximates the true cooldown recovery rate increase based on item level.
 				local ilevel = OvaleEquipment:GetEquippedItemLevel(slot) or 528
-				cdRecoveryRateIncrease = exp((ilevel - 528) * 0.009317881032 + 3.434954478)
+				local cdRecoveryRateIncrease = exp((ilevel - 528) * 0.009317881032 + 3.434954478)
 				if readinessId == READINESS_TANK then
 					-- The cooldown recovery rate of the tank trinket is half the value of the same item-level DPS trinket.
 					cdRecoveryRateIncrease = cdRecoveryRateIncrease / 2
 				end
+				-- Scale the Readiness effect so that it gives full Readiness at level 90 to 0% at level 100.
+				if OvalePaperDoll.level >= 90 then
+					cdRecoveryRateIncrease = cdRecoveryRateIncrease * (100 - OvalePaperDoll.level) / 10
+				end
+				-- Convert the cooldown recovery rate into a multiplier for the cooldown duration.
+				cdMultiplier = 1 / (1 + cdRecoveryRateIncrease / 100)
+				-- Cap at 90%.
+				cdMultiplier = cdMultiplier < 0.9 and cdMultiplier or 0.9
 				break
 			end
 		end
@@ -247,7 +261,7 @@ function OvalePassiveAura:UpdateReadiness()
 			local duration = INFINITY
 			local ending = INFINITY
 			local stacks = 1
-			local value = 1 / (1 + cdRecoveryRateIncrease / 100)
+			local value = cdMultiplier
 			OvaleAura:GainedAuraOnGUID(self_guid, start, spellId, self_guid, "HELPFUL", nil, nil, stacks, nil, duration, ending, nil, name, value, nil, nil)
 		else
 			OvaleAura:LostAuraOnGUID(self_guid, now, spellId, self_guid)
