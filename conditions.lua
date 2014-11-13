@@ -116,7 +116,7 @@ local function GetHastedTime(seconds, haste, state)
 	elseif haste == "melee" then
 		return seconds / state:GetMeleeHasteMultiplier()
 	else
-		Ovale:Logf("Unknown haste parameter haste=%s", haste)
+		state:Logf("Unknown haste parameter haste=%s", haste)
 		return seconds
 	end
 end
@@ -2074,7 +2074,7 @@ do
 			Unit's current health
 			Unit's maximum health
 	--]]
-	local function EstimatedTimeToDie(unitId)
+	local function EstimatedTimeToDie(state, unitId)
 		-- Check for target switch.
 		if lastTTDguid[unitId] ~= OvaleGUID:GetGUID(unitId) then
 			lastTTDguid[unitId] = OvaleGUID:GetGUID(unitId)
@@ -2117,7 +2117,7 @@ do
 					end
 					if prevHealth and prevHealth > health then
 						lastTTDdps[unitId] = (prevHealth - health) / delta
-						Ovale:Logf("prevHealth = %d, health = %d, delta = %d, dps = %d", prevHealth, health, delta, lastTTDdps[unitId])
+						state:Logf("prevHealth = %d, health = %d, delta = %d, dps = %d", prevHealth, health, delta, lastTTDdps[unitId])
 						break
 					end
 				end
@@ -2155,7 +2155,7 @@ do
 	local function Health(condition, state)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(target)
+		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
 		if not timeToDie then
 			return nil
 		elseif timeToDie == 0 then
@@ -2187,7 +2187,7 @@ do
 	local function HealthMissing(condition, state)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(target)
+		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
 		if not timeToDie or timeToDie == 0 then
 			return nil
 		end
@@ -2218,7 +2218,7 @@ do
 	local function HealthPercent(condition, state)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(target)
+		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
 		if not timeToDie then
 			return nil
 		elseif timeToDie == 0 then
@@ -2273,7 +2273,7 @@ do
 	local function TimeToDie(condition, state)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
-		local timeToDie, now = EstimatedTimeToDie(target)
+		local timeToDie, now = EstimatedTimeToDie(state, target)
 		local value, origin, rate = timeToDie, now, -1
 		local start, ending = now, now + timeToDie
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
@@ -2300,7 +2300,7 @@ do
 	local function TimeToHealthPercent(condition, state)
 		local percent, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(target)
+		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
 		local healthPercent = health / maxHealth * 100
 		if healthPercent >= percent then
 			local t = timeToDie * (healthPercent - percent) / healthPercent

@@ -100,6 +100,12 @@ do
 		local args = { ... }
 		local mod = lib:NewAddon(format("%s_%s", addon.name, name))
 		mod.moduleName = name
+		-- Mix in default module prototype
+		if addon.modulePrototype then
+			for k, v in pairs(addon.modulePrototype) do
+				mod[k] = v
+			end
+		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
 			local lib = LibStub(libName)
@@ -112,6 +118,10 @@ do
 		addon.modules = addon.modules or {}
 		addon.modules[name] = mod
 		return mod
+	end
+
+	prototype.SetDefaultModulePrototype = function(addon, proto)
+		addon.modulePrototype = proto
 	end
 
 	lib.GetAddon = function(lib, name)

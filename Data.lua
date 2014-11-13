@@ -477,7 +477,7 @@ end
 function OvaleData:CheckRequirements(spellId, tokenIterator, target)
 	local name = tokenIterator()
 	if name then
-		Ovale:Log("Checking requirements:")
+		self:Log("Checking requirements:")
 		local verified = true
 		local requirement = name
 		while verified and name do

@@ -27,6 +27,7 @@
 $sm{"AceAddon-3.0"}{GetModule} = true;
 $sm{"AceAddon-3.0"}{GetName} = true;
 $sm{"AceAddon-3.0"}{NewModule} = true;
+$sm{"AceAddon-3.0"}{SetDefaultModulePrototype} = true;
 
 $m{AceConfig}{RegisterOptionsTable} = true;
 
@@ -148,6 +149,10 @@ $sp{OvaleQueue}{InsertFront} = true;
 $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
 
+# Ovale module prototype.
+$sm{"modulePrototype"}{Log} = true;
+$sm{"modulePrototype"}{Logf} = true;
+
 $classname{Localization} = "Localization";
 $classname{Ovale} = "Ovale";
 $classname{Profiler} = "Profiler";
@@ -257,6 +262,19 @@ sub ParseDirectory
 				for my $method (keys %{$m{$factory}})
 				{
 					$m{$class}{$method} = $m{$factory}{$method}
+				}
+				my $prototype = "modulePrototype";
+				for my $method (keys %{$sp{$prototype}})
+				{
+					$sp{$class}{$method} = $sp{$prototype}{$method}
+				}
+				for my $method (keys %{$sm{$prototype}})
+				{
+					$sm{$class}{$method} = $sm{$prototype}{$method}
+				}
+				for my $method (keys %{$m{$prototype}})
+				{
+					$m{$class}{$method} = $m{$prototype}{$method}
 				}
 				while ($mixins =~ m/"([^",]+)"/g)
 				{

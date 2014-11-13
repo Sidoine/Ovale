@@ -164,12 +164,21 @@ end
 -- Put a value into the named state variable.
 statePrototype.PutState = function(state, name, value, isFuture)
 	if isFuture then
-		Ovale:Logf("Setting future state: %s = %s.", name, value)
+		state:Logf("Setting future state: %s = %s.", name, value)
 		state.futureVariable[name] = value
 	else
 		Ovale:DebugPrintf(OVALE_STATE_DEBUG, "Advancing combat state: %s = %s.", name, value)
-		Ovale:Logf("Advancing combat state: %s = %s.", name, value)
+		state:Logf("Advancing combat state: %s = %s.", name, value)
 		state.variable[name] = value
 	end
+end
+
+-- Logging functions.
+statePrototype.Log = function(state, ...)
+	return OvaleDebug:Log(...)
+end
+
+statePrototype.Logf = function(state, ...)
+	return OvaleDebug:Logf(...)
 end
 --</state-methods>

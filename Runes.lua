@@ -646,7 +646,7 @@ do
 		-- This shouldn't happen because it means the rune requirements will never be met.
 		for _, runeType in pairs(RUNE_TYPE) do
 			if count[runeType] > 0 then
-				Ovale:Logf("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
+				state:Logf("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
 				profiler.Stop("OvaleRunes_state_GetRunesCooldown")
 				return INFINITY
 			end

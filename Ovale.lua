@@ -45,6 +45,25 @@ local REPOSITORY_KEYWORD = "@" .. "project-version" .. "@"
 
 -- Table of strings to display once per session.
 local self_oneTimeMessage = {}
+
+--[[
+	Ovale module prototype.
+
+	The module prototype has dummy Log and Logf methods to mimic the API of the state machine.
+	This makes it easier to write module methods that are mirrored to the state machine.
+--]]
+do
+	local function DoNothing()
+		-- no-op
+	end
+
+	local modulePrototype = {
+		Log = DoNothing,
+		Logf = DoNothing,
+	}
+
+	Ovale:SetDefaultModulePrototype(modulePrototype)
+end
 --</private-static-properties>
 
 --<public-static-properties>
@@ -374,14 +393,6 @@ end
 
 function Ovale:Errorf(...)
 	return Ovale.OvaleDebug:Errorf(...)
-end
-
-function Ovale:Log(...)
-	return Ovale.OvaleDebug:Log(...)
-end
-
-function Ovale:Logf(...)
-	return Ovale.OvaleDebug:Logf(...)
 end
 
 function Ovale:OneTimeMessage(...)

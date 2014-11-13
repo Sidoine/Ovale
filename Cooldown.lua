@@ -241,7 +241,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast
 		end
 	end
 
-	Ovale:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
+	state:Logf("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
 	profiler.Stop("OvaleCooldown_ApplySpellAfterCast")
 end
 --</public-static-methods>
@@ -364,7 +364,7 @@ end
 statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, target)
 	local start, duration = state:GetSpellCooldown(spellId)
 	if start + duration > atTime then
-		Ovale:Logf("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
+		state:Logf("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
 	else
 		local si = OvaleData.spellInfo[spellId]
 		if si and si.cd then
@@ -378,7 +378,7 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 		else
 			duration = 0
 		end
-		Ovale:Logf("Spell %d has a base cooldown of %fs.", spellId, duration)
+		state:Logf("Spell %d has a base cooldown of %fs.", spellId, duration)
 		if duration > 0 then
 			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
 			if si.cd_haste then

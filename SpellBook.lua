@@ -501,7 +501,7 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 		if isUsable and si.unusable then
 			local unusable = state:GetSpellInfoProperty(spellId, "unusable", target)
 			if unusable == 1 then
-				Ovale:Logf("Spell ID '%s' is flagged as unusable.", spellId)
+				state:Logf("Spell ID '%s' is flagged as unusable.", spellId)
 				isUsable = false
 			end
 		end
@@ -514,7 +514,7 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 				if OvalePower.PRIMARY_POWER[requirement] then
 					noMana = true
 				end
-				Ovale:Logf("Spell ID '%s' failed requirements.", spellId)
+				state:Logf("Spell ID '%s' failed requirements.", spellId)
 			end
 		end
 	else

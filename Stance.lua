@@ -243,13 +243,11 @@ function OvaleStance:RequireStanceHandler(spellId, requirement, tokenIterator, t
 		if not isBang and isStance or isBang and not isStance then
 			verified = true
 		end
-		if self["isState"] then
-			local result = verified and "passed" or "FAILED"
-			if isBang then
-				Ovale:Logf("    Require stance '%s': %s", stance, result)
-			else
-				Ovale:Logf("    Require NOT stance 's': %s", stance, result)
-			end
+		local result = verified and "passed" or "FAILED"
+		if isBang then
+			self:Logf("    Require stance '%s': %s", stance, result)
+		else
+			self:Logf("    Require NOT stance 's': %s", stance, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
