@@ -56,7 +56,7 @@ function OvalePoolGC:Drain()
 	self.size = 0
 end
 
-function OvalePoolGC:Debug()
-	Ovale:FormatPrint("Pool %s has size %d.", tostring(self.name), self.size)
+function OvalePoolGC:DebuggingInfo()
+	Ovale:Print("Pool %s has size %d.", tostring(self.name), self.size)
 end
 --</public-static-methods>

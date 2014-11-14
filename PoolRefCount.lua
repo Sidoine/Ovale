@@ -144,7 +144,7 @@ function OvalePoolRefCount:Drain()
 	profiler.Stop(self.name)
 end
 
-function OvalePoolRefCount:Debug()
-	Ovale:FormatPrint("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
+function OvalePoolRefCount:DebuggingInfo()
+	Ovale:Print("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
 end
 --</public-static-methods>

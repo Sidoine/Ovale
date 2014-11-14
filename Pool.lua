@@ -91,7 +91,7 @@ function OvalePool:Drain()
 	profiler.Stop(self.name)
 end
 
-function OvalePool:Debug()
-	Ovale:FormatPrint("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
+function OvalePool:DebuggingInfo()
+	Ovale:Print("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
 end
 --</public-static-methods>

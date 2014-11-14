@@ -19,6 +19,7 @@ local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
 local pairs = pairs
+local strfind = string.find
 local type = type
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
@@ -465,36 +466,71 @@ function OvaleOptions:OnEnable()
 	self:HandleProfileChanges()
 end
 
-function OvaleOptions:UpgradeSavedVariables()
-	local profile = Ovale.db.profile
-	-- All profile-specific debug options are removed.  They are now in the global database.
-	profile.debug = nil
-	-- If a debug option is toggled off, it is "stored" as nil, not "false".
-	for k, v in pairs(Ovale.db.global.debug) do
-		if not v then
-			Ovale.db.global.debug[k] = nil
+do
+	local NEW_DEBUG_NAMES = {
+		action_bar = "OvaleActionBar",
+		aura = "OvaleAura",
+		combo_points = "OvaleComboPoints",
+		compile = "OvaleCompile",
+		damage_taken = "OvaleDamageTaken",
+		enemy = "OvaleEnemies",
+		guid = "OvaleGUID",
+		missing_spells = false,
+		paper_doll = "OvalePaperDoll",
+		power = "OvalePower",
+		snapshot = false,
+		spellbook = "OvaleSpellBook",
+		state = "OvaleState",
+		steady_focus = "OvaleSteadyFocus",
+		unknown_spells = false,
+	}
+
+	function OvaleOptions:UpgradeSavedVariables()
+		local global = Ovale.db.global
+		local profile = Ovale.db.profile
+
+		-- All profile-specific debug options are removed.  They are now in the global database.
+		profile.debug = nil
+
+		-- Debugging options have changed names.
+		for old, new in pairs(NEW_DEBUG_NAMES) do
+			if global.debug[old] and new then
+				global.debug[new] = global.debug[old]
+			end
+			global.debug[old] = nil
 		end
+
+		-- If a debug option is toggled off, it is "stored" as nil, not "false".
+		for k, v in pairs(global.debug) do
+			if not v then
+				global.debug[k] = nil
+			end
+		end
+
+		-- Merge two options that had the same meaning.
+		if profile.display ~= nil then
+			profile.apparence.enableIcons = profile.display
+			profile.display = nil
+		end
+
+		-- The frame position settings changed from left/top to offsetX/offsetY.
+		if profile.left or profile.top then
+			profile.left = nil
+			profile.top = nil
+			Ovale:OneTimeMessage("The Ovale icon frames position has been reset.")
+		end
+
+		-- SpellFlash options have been moved and renamed.
+		if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
+			local enabled = profile.apparence.spellFlash
+			profile.apparence.spellFlash = {}
+			profile.apparence.spellFlash.enabled = enabled
+		end
+
+		-- Re-register defaults so that any tables created during the upgrade are "populated"
+		-- by the default database automatically.
+		Ovale.db:RegisterDefaults(self.defaultDB)
 	end
-	-- Merge two options that had the same meaning.
-	if profile.display ~= nil then
-		profile.apparence.enableIcons = profile.display
-		profile.display = nil
-	end
-	-- The frame position settings changed from left/top to offsetX/offsetY.
-	if profile.left or profile.top then
-		profile.left = nil
-		profile.top = nil
-		Ovale:OneTimeMessage("The Ovale icon frames position has been reset.")
-	end
-	-- SpellFlash options have been moved and renamed.
-	if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
-		local enabled = profile.apparence.spellFlash
-		profile.apparence.spellFlash = {}
-		profile.apparence.spellFlash.enabled = enabled
-	end
-	-- Re-register defaults so that any tables created during the upgrade are "populated"
-	-- by the default database automatically.
-	Ovale.db:RegisterDefaults(self.defaultDB)
 end
 
 function OvaleOptions:HandleProfileChanges()

@@ -69,10 +69,8 @@ local RANGED_ATTACKS = {
 	[121414] = "Glaive Toss",
 }
 
-local OVALE_STEADY_FOCUS_DEBUG = "steady_focus"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_STEADY_FOCUS_DEBUG, L["Steady Focus"], L["Debug Steady Focus"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleSteadyFocus)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -111,12 +109,12 @@ function OvaleSteadyFocus:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, line
 		if STEADY_SHOT[spellId] and self.stacks == 0 then
 			local now = API_GetTime()
 			if now - self.ending > 1 then
-				Ovale:DebugPrintf(OVALE_STEADY_FOCUS_DEBUG, "Spell %d successfully cast to gain %s buff.", spellId, self.spellName)
+				self:Debug("Spell %d successfully cast to gain %s buff.", spellId, self.spellName)
 				self:GainedAura(now)
 			end
 		elseif RANGED_ATTACKS[spellId] and self.stacks > 0 then
 			local now = API_GetTime()
-			Ovale:DebugPrintf(OVALE_STEADY_FOCUS_DEBUG, "Spell %d successfully cast to lose %s buff.", spellId, self.spellName)
+			self:Debug("Spell %d successfully cast to lose %s buff.", spellId, self.spellName)
 			self:LostAura(now)
 		end
 	end
@@ -124,7 +122,7 @@ end
 
 function OvaleSteadyFocus:Ovale_AuraAdded(event, timestamp, target, auraId, caster)
 	if self.stacks > 0 and auraId == STEADY_FOCUS and target == self_guid then
-		Ovale:DebugPrintf(OVALE_STEADY_FOCUS_DEBUG, "Gained Steady Focus buff.")
+		self:Debug("Gained Steady Focus buff.")
 		self:LostAura(timestamp)
 	end
 end
@@ -132,12 +130,12 @@ end
 -- Only register for events to track shots if the Steady Focus talent is enabled.
 function OvaleSteadyFocus:Ovale_TalentsChanged(event)
 	if OvaleSpellBook:GetTalentPoints(STEADY_FOCUS_TALENT) > 0 then
-		Ovale:DebugPrintf(OVALE_STEADY_FOCUS_DEBUG, "Registering event handlers to track Steady Focus.")
+		self:Debug("Registering event handlers to track Steady Focus.")
 		self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 		self:RegisterMessage("Ovale_AuraAdded")
 		self:RegisterMessage("Ovale_AuraChanged", "Ovale_AuraAdded")
 	else
-		Ovale:DebugPrintf(OVALE_STEADY_FOCUS_DEBUG, "Unregistering event handlers to track Steady Focus.")
+		self:Debug("Unregistering event handlers to track Steady Focus.")
 		self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 		self:UnregisterMessage("Ovale_AuraAdded")
 		self:UnregisterMessage("Ovale_AuraChanged")
@@ -157,12 +155,12 @@ function OvaleSteadyFocus:LostAura(atTime)
 	OvaleAura:LostAuraOnGUID(self_guid, atTime, self.spellId, self_guid)
 end
 
-function OvaleSteadyFocus:Debug()
+function OvaleSteadyFocus:DebugSteadyFocus()
 	local aura = OvaleAura:GetAuraByGUID(self_guid, self.spellId, "HELPFUL", true)
 	if aura then
-		Ovale:FormatPrint("Player has pre-Steady Focus aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
+		self:Print("Player has pre-Steady Focus aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
 	else
-		Ovale:Print("Player has no pre-Steady Focus aura!")
+		self:Print("Player has no pre-Steady Focus aura!")
 	end
 end
 --</public-static-methods>

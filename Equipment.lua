@@ -705,14 +705,14 @@ function OvaleEquipment:UpdateMetaGem()
 	return changed
 end
 
-function OvaleEquipment:Debug()
+function OvaleEquipment:DebugEquipment()
 	for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		Ovale:FormatPrint("Slot %d = %s (%d)", slotId, self:GetEquippedItem(slotId), self:GetEquippedItemLevel(slotId))
+		self:Print("Slot %d = %s (%d)", slotId, self:GetEquippedItem(slotId), self:GetEquippedItemLevel(slotId))
 	end
-	Ovale:FormatPrint("Main-hand item type: %s", self.mainHandItemType)
-	Ovale:FormatPrint("Off-hand item type: %s", self.offHandItemType)
+	self:Print("Main-hand item type: %s", self.mainHandItemType)
+	self:Print("Off-hand item type: %s", self.offHandItemType)
 	for k, v in pairs(self.armorSetCount) do
-		Ovale:FormatPrint("Player has %d piece(s) of %s armor set.", v, k)
+		self:Print("Player has %d piece(s) of %s armor set.", v, k)
 	end
 end
 --</public-static-methods>

@@ -35,10 +35,8 @@ local API_GetBonusBarIndex = GetBonusBarIndex
 local API_GetMacroItem = GetMacroItem
 local API_GetMacroSpell = GetMacroSpell
 
-local OVALE_ACTIONBAR_DEBUG = "action_bar"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_ACTIONBAR_DEBUG, L["Action bars"], L["Debug action bars"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleActionBar)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -132,13 +130,13 @@ function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot)
 end
 
 function OvaleActionBar:UPDATE_BINDINGS(event)
-	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "%s: Updating key bindings.", event)
+	self:Debug("%s: Updating key bindings.", event)
 	self:UpdateKeyBindings()
 end
 
 function OvaleActionBar:UpdateActionSlots(event)
 	profiler.Start("OvaleActionBar_UpdateActionSlots")
-	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "%s: Updating all action slot mappings.", event)
+	self:Debug("%s: Updating all action slot mappings.", event)
 	wipe(self.action)
 	wipe(self.item)
 	wipe(self.macro)
@@ -223,7 +221,11 @@ function OvaleActionBar:UpdateActionSlot(slot)
 			end
 		end
 	end
-	Ovale:DebugPrintf(OVALE_ACTIONBAR_DEBUG, "Mapping button %s to %s", slot, self.action[slot])
+	if self.action[slot] then
+		self:Debug("Mapping button %s to %s.", slot, self.action[slot])
+	else
+		self:Debug("Clearing mapping for button %s.", slot)
+	end
 
 	-- Update the keybind for the slot.
 	self.keybind[slot] = GetKeyBinding(slot)

@@ -68,10 +68,8 @@ local self_taggedEnemyLastSeen = {}
 local self_reaperTimer = nil
 local REAP_INTERVAL = 3
 
-local OVALE_ENEMIES_DEBUG = "enemy"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_ENEMIES_DEBUG, L["Enemies"], L["Debug enemies"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleEnemies)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -177,10 +175,10 @@ function OvaleEnemies:AddEnemy(guid, name, timestamp, isTagged)
 			self.activeEnemies = self.activeEnemies + 1
 		end
 		if isTagged and not tagged then
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New tagged enemy seen at %f (%d total, %d tagged): %s (%s)", timestamp, self.activeEnemies, self.taggedEnemies, guid, name)
+			self:Debug(true, "New tagged enemy seen (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
 			Ovale.refreshNeeded["player"] = true
 		elseif not seen then
-			Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "New enemy seen at %f (%d total): %s (%s)", timestamp, self.activeEnemies, guid, name)
+			self:Debug(true, "New enemy seen (%d total): %s (%s)", self.activeEnemies, guid, name)
 			Ovale.refreshNeeded["player"] = true
 		end
 	end
@@ -207,15 +205,15 @@ function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
 		end
 		if tagged then
 			if isDead then
-				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Tagged enemy died at %f (%d total, %d tagged): %s (%s)", timestamp, self.activeEnemies, self.taggedEnemies, guid, name)
+				self:Debug(true, "Tagged enemy died (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
 			else
-				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Tagged enemy removed at %f(%d total, %d tagged): %s (%s), last seen at %f", timestamp, self.activeEnemies, self.taggedEnemies, guid, name, tagged)
+				self:Debug(true, "Tagged enemy removed( %d total, %d tagged): %s (%s), last seen at %f", self.activeEnemies, self.taggedEnemies, guid, name, tagged)
 			end
 		elseif seen then
 			if isDead then
-				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy died at %f (%d total): %s (%s)", timestamp, self.activeEnemies, guid, name)
+				self:Debug(true, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
 			else
-				Ovale:DebugPrintf(OVALE_ENEMIES_DEBUG, "Enemy removed at %f (%d total): %s (%s), last seen at %f", timestamp, self.activeEnemies, guid, name, seen)
+				self:Debug(true, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
 			end
 		end
 		if tagged or seen then
@@ -226,18 +224,18 @@ function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
 	profiler.Stop("OvaleEnemies_RemoveEnemy")
 end
 
-function OvaleEnemies:Debug()
+function OvaleEnemies:DebugEnemies()
 	for guid, seen in pairs(self_enemyLastSeen) do
 		local name = self_enemyName[guid]
 		local tagged = self_taggedEnemyLastSeen[guid]
 		if tagged then
-			Ovale:FormatPrint("Tagged enemy %s (%s) last seen at %f", guid, name, tagged)
+			self:Print("Tagged enemy %s (%s) last seen at %f", guid, name, tagged)
 		else
-			Ovale:FormatPrint("Enemy %s (%s) last seen at %f", guid, name, seen)
+			self:Print("Enemy %s (%s) last seen at %f", guid, name, seen)
 		end
 	end
-	Ovale:FormatPrint("Total enemies: %d", self.activeEnemies)
-	Ovale:FormatPrint("Total tagged enemies: %d", self.taggedEnemies)
+	self:Print("Total enemies: %d", self.activeEnemies)
+	self:Print("Total tagged enemies: %d", self.taggedEnemies)
 end
 --</public-static-methods>
 

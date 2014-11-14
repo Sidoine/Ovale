@@ -32,10 +32,8 @@ local API_GetNumGroupMembers = GetNumGroupMembers
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
-local OVALE_GUID_DEBUG = "guid"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_GUID_DEBUG, L["GUIDs"], L["Debug GUID"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleGUID)
 
 --[[
 	Unit IDs for which UNIT_AURA events are known to fire.
@@ -212,7 +210,7 @@ function OvaleGUID:UpdateUnit(unitId)
 			self.GUIDtoUnitId[guid] = self.GUIDtoUnitId[guid] or {}
 			self.GUIDtoUnitId[guid][unitId] = true
 
-			Ovale:DebugPrintf(OVALE_GUID_DEBUG, "GUID %s is %s", guid, unitId)
+			self:Debug("'%s' is GUID %s.", unitId, guid)
 
 			if unitId == "target" or self.unitIdToGUID.target ~= guid then
 				local name = API_UnitName(unitId)

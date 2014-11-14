@@ -5,7 +5,7 @@
 --]]----------------------------------------------------------------------
 
 local OVALE, Ovale = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, OVALE, "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
+Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, OVALE, "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
 
 -- Export "Ovale" symbol to global namespace.
 _G["Ovale"] = Ovale
@@ -20,8 +20,12 @@ local format = string.format
 local next = next
 local pairs = pairs
 local select = select
+local strfind = string.find
+local strjoin = strjoin
+local strlen = string.len
 local strmatch = string.match
 local tostring = tostring
+local tostringall = tostringall		-- FrameXML/RestrictedInfrastructure
 local type = type
 local unpack = unpack
 local wipe = table.wipe
@@ -34,11 +38,8 @@ local API_UnitCanAttack = UnitCanAttack
 local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
+local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
-
-local OVALE_FALSE_STRING = tostring(false)
-local OVALE_NIL_STRING = tostring(nil)
-local OVALE_TRUE_STRING = tostring(true)
 
 local OVALE_VERSION = "@project-version@"
 local REPOSITORY_KEYWORD = "@" .. "project-version" .. "@"
@@ -58,8 +59,10 @@ do
 	end
 
 	local modulePrototype = {
+		Error = Ovale.Error,
 		Log = DoNothing,
 		Logf = DoNothing,
+		Print = Ovale.Print,
 	}
 
 	Ovale:SetDefaultModulePrototype(modulePrototype)
@@ -172,7 +175,7 @@ do
 	function Ovale:PrintVersionCheck()
 		if next(versionReply) then
 			for sender, version in pairs(versionReply) do
-				self:FormatPrint(">>> %s is using Ovale %s", sender, version)
+				self:Print(">>> %s is using Ovale %s", sender, version)
 			end
 		else
 			self:Print(">>> No other Ovale users present.")
@@ -360,43 +363,45 @@ function Ovale:FinalizeString(s)
 	return s
 end
 
--- Debugging methods.
--- format() wrapper that turns nil arguments into tostring(nil)
-function Ovale:Format(...)
-	local arg = {}
-	for i = 1, select("#", ...) do
-		local v = select(i, ...)
-		if type(v) == "boolean" then
-			arg[i] = v and OVALE_TRUE_STRING or OVALE_FALSE_STRING
-		else
-			arg[i] = v or OVALE_NIL_STRING
+--[[
+	Return a string from the parameters.  If the first parameter is a format string,
+	use the remaining parameters as parameters for the format string; otherwise,
+	concatenate all of the parameters together.
+--]]
+function Ovale:MakeString(s, ...)
+	if s and strlen(s) > 0 then
+		if (...) then
+			if strfind(s, "%%%.%d") or strfind(s, "%%[%w]") then
+				-- "s" looks like a format string.
+				s = format(s, tostringall(...))
+			else
+				s = strjoin(" ", s, tostringall(...))
+			end
 		end
+	else
+		s = tostring(nil)
 	end
-	return format(unpack(arg))
+	return s
 end
 
-function Ovale:FormatPrint(...)
-	self:Print(self:Format(...))
+-- Print the parameters to DEFAULT_CHAT_FRAME, headed by the name of the module.
+-- NOTE: This method is mirrored to the module prototype for new modules.
+function Ovale:Print(...)
+	local name = self:GetName()
+	local s = Ovale:MakeString(...)
+	-- Match output format from AceConsole-3.0 Print() method.
+	DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", name, s))
 end
 
-function Ovale:DebugPrint(...)
-	return Ovale.OvaleDebug:DebugPrint(...)
-end
-
-function Ovale:DebugPrintf(...)
-	return Ovale.OvaleDebug:DebugPrintf(...)
-end
-
+-- Print the error message and flag the next frame to be traced by OvaleDebug.
+-- NOTE: This method is mirrored to the module prototype for new modules.
 function Ovale:Error(...)
-	return Ovale.OvaleDebug:Error(...)
-end
-
-function Ovale:Errorf(...)
-	return Ovale.OvaleDebug:Errorf(...)
+	self:Print("Fatal error:", ...)
+	Ovale.OvaleDebug.bug = true
 end
 
 function Ovale:OneTimeMessage(...)
-	local s = self:Format(...)
+	local s = self:MakeString(...)
 	if not self_oneTimeMessage[s] then
 		self_oneTimeMessage[s] = true
 	end

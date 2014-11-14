@@ -63,14 +63,8 @@ local self_icon = {}
 -- Lua pattern to match a floating-point number that may start with a minus sign.
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
 
-local OVALE_COMPILE_DEBUG = "compile"
-local OVALE_MISSING_SPELL_DEBUG = "missing_spells"
-local OVALE_UNKNOWN_SPELL_DEBUG = "unknown_spells"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_COMPILE_DEBUG, L["Compile"], L["Debug compile"])
-	OvaleDebug:RegisterDebugOption(OVALE_MISSING_SPELL_DEBUG, L["Missing spells"], L["Debug missing spells"])
-	OvaleDebug:RegisterDebugOption(OVALE_UNKNOWN_SPELL_DEBUG, L["Unknown spells"], L["Debug unknown spells"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleCompile)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -85,7 +79,7 @@ local function HasTalent(talentId)
 	if OvaleSpellBook:IsKnownTalent(talentId) then
 		return OvaleSpellBook:GetTalentPoints(talentId) > 0
 	else
-		Ovale:FormatPrint("Warning: unknown talent ID '%s'", talentId)
+		OvaleCompile:Print("Warning: unknown talent ID '%s'", talentId)
 		return false
 	end
 end
@@ -189,7 +183,7 @@ local function EvaluateAddCheckBox(node)
 		local checkBox = Ovale.checkBox[name]
 		if not checkBox then
 			self_serial = self_serial + 1
-			Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "New checkbox '%s': advance age to %d.", name, self_serial)
+			OvaleCompile:Debug("New checkbox '%s': advance age to %d.", name, self_serial)
 		end
 		checkBox = checkBox or {}
 		checkBox.text = node.description.value
@@ -224,7 +218,7 @@ local function EvaluateAddListItem(node)
 		local list = Ovale.list[name]
 		if not (list and list.items and list.items[item]) then
 			self_serial = self_serial + 1
-			Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "New list '%s': advance age to %d.", name, self_serial)
+			OvaleCompile:Debug("New list '%s': advance age to %d.", name, self_serial)
 		end
 		list = list or { items = {}, default = nil }
 		list.items[item] = node.description.value
@@ -410,7 +404,7 @@ local function AddMissingVariantSpells(annotation)
 					if spellName then
 						local name = API_GetSpellInfo(spellName)
 						if spellName == name then
-							Ovale:DebugPrintf(OVALE_MISSING_SPELL_DEBUG, "Learning spell %s with ID %d.", spellName, spellId)
+							OvaleCompile:Debug("Learning spell %s with ID %d.", spellName, spellId)
 							OvaleSpellBook:AddSpell(spellId, spellName)
 						end
 					else
@@ -418,7 +412,7 @@ local function AddMissingVariantSpells(annotation)
 						if node.paramsAsString then
 							functionCall = node.name .. "(" .. node.paramsAsString .. ")"
 						end
-						Ovale:DebugPrintf(OVALE_UNKNOWN_SPELL_DEBUG, "Unknown spell with ID %s used in %s.", spellId, functionCall)
+						OvaleCompile:Print("Unknown spell with ID %s used in %s.", spellId, functionCall)
 					end
 				end
 			end
@@ -506,7 +500,7 @@ end
 function OvaleCompile:EventHandler(event)
 	-- Advance age of the script evaluation state.
 	self_serial = self_serial + 1
-	Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "%s: advance age to %d.", event, self_serial)
+	self:Debug("%s: advance age to %d.", event, self_serial)
 	Ovale.refreshNeeded["player"] = true
 end
 
@@ -514,7 +508,7 @@ function OvaleCompile:CompileScript(name)
 	-- Reset the trace state if we compile a new script.
 	OvaleDebug:ResetTrace()
 	-- Generate the node tree from the named script.
-	Ovale:DebugPrintf(OVALE_COMPILE_DEBUG, "Compiling script '%s'.", name)
+	self:Debug("Compiling script '%s'.", name)
 	if self.ast then
 		OvaleAST:Release(self.ast)
 		self.ast = nil
@@ -533,7 +527,7 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 	local changed = false
 	self_canEvaluate = self_canEvaluate or Ovale:IsPreloaded(self_requirePreload)
 	if self_canEvaluate and self.ast and (forceEvaluation or not self.serial or self.serial < self_serial) then
-		Ovale:DebugPrint(OVALE_COMPILE_DEBUG, "Evaluating script.")
+		self:Debug("Evaluating script.")
 		changed = true
 		-- Reset compilation state.
 		local ok = true
@@ -593,7 +587,7 @@ function OvaleCompile:GetIconNodes()
 	return self_icon
 end
 
-function OvaleCompile:Debug()
-	Ovale:FormatPrint("Total number of times the script was evaluated: %d", self_timesEvaluated)
+function OvaleCompile:DebugCompile()
+	self:Print("Total number of times the script was evaluated: %d", self_timesEvaluated)
 end
 --</public-static-methods>

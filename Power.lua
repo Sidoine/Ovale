@@ -64,9 +64,10 @@ local BUFF_PERCENT_REDUCTION = {
 	["_half"] = 0.5,
 }
 
-local OVALE_POWER_DEBUG = "power"
 do
-	OvaleDebug:RegisterDebugOption(OVALE_POWER_DEBUG, L["Power"], L["Debug power"])
+	-- Register for debugging messages.
+	OvaleDebug:RegisterDebugging(OvalePower)
+
 	local debugOptions = {
 		power = {
 			name = L["Power"],
@@ -318,13 +319,13 @@ function OvalePower:UpdatePower(event, powerType)
 		local oldPower = self.power[powerType]
 		local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
 		self.power[powerType] = power
-		Ovale:DebugPrintf(OVALE_POWER_DEBUG, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
+		self:Debug(true, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
 	else
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
 			local oldPower = self.power[powerType]
 			local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
 			self.power[powerType] = power
-			Ovale:DebugPrintf(OVALE_POWER_DEBUG, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
+			self:Debug(true, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
 		end
 	end
 	profiler.Stop("OvalePower_UpdatePower")
@@ -541,13 +542,13 @@ function OvalePower:RequirePowerHandler(spellId, requirement, tokenIterator, tar
 	return verified, requirement
 end
 
-function OvalePower:Debug()
-	Ovale:FormatPrint("Power type: %s", self.powerType)
+function OvalePower:DebugPower()
+	self:Print("Power type: %s", self.powerType)
 	for powerType, v in pairs(self.power) do
-		Ovale:FormatPrint("Power (%s): %d / %d", powerType, v, self.maxPower[powerType])
+		self:Print("Power (%s): %d / %d", powerType, v, self.maxPower[powerType])
 	end
-	Ovale:FormatPrint("Active regen: %f", self.activeRegen)
-	Ovale:FormatPrint("Inactive regen: %f", self.inactiveRegen)
+	self:Print("Active regen: %f", self.activeRegen)
+	self:Print("Inactive regen: %f", self.inactiveRegen)
 end
 --</public-static-methods>
 
@@ -727,7 +728,7 @@ do
 	statePrototype.DebugPower = function(state)
 		wipe(output)
 		for powerType in pairs(OvalePower.POWER_INFO) do
-			output[#output + 1] = Ovale:Format("%s = %d", powerType, state[powerType])
+			output[#output + 1] = Ovale:MakeString("%s = %d", powerType, state[powerType])
 		end
 		return tconcat(output, "\n")
 	end

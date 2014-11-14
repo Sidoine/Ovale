@@ -50,10 +50,8 @@ local self_guid = nil
 -- Player's name.
 local self_name = nil
 
-local OVALE_SCORE_DEBUG = "score"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_SCORE_DEBUG, L["Scoring"], L["Debug scoring"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleScore)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -138,7 +136,7 @@ end
 function OvaleScore:ScoreSpell(spellId)
 	if OvaleFuture.inCombat and self.scoredSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
-		Ovale:DebugPrintf(OVALE_SCORE_DEBUG, "Scored %s for %d.", scored, spellId)
+		self:Debug(true, "Scored %s for %d.", scored, spellId)
 		if scored then
 			self.score = self.score + scored
 			self.maxScore = self.maxScore + 1

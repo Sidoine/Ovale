@@ -38,10 +38,8 @@ local self_pool = OvalePool("OvaleDamageTaken_pool")
 -- Time window (past number of seconds) for which damage events are stored.
 local DAMAGE_TAKEN_WINDOW = 20
 
-local OVALE_DAMAGE_TAKEN_DEBUG = "damage_taken"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_DAMAGE_TAKEN_DEBUG, L["Damage taken"], L["Debug damage taken"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleDamageTaken)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -76,11 +74,11 @@ function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEven
 		local eventPrefix = strsub(cleuEvent, 1, 6)
 		if eventPrefix == "SWING_" then
 			local amount = arg12
-			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s caused %d damage.", cleuEvent, amount)
+			self:Debug("%s caused %d damage.", cleuEvent, amount)
 			self:AddDamageTaken(now, amount)
 		elseif eventPrefix == "RANGE_" or eventPrefix == "SPELL_" then
 			local spellName, amount = arg13, arg15
-			Ovale:DebugPrintf(OVALE_DAMAGE_TAKEN_DEBUG, "%s (%s) caused %d damage.", cleuEvent, spellName, amount)
+			self:Debug("%s (%s) caused %d damage.", cleuEvent, spellName, amount)
 			self:AddDamageTaken(now, amount)
 		end
 		profiler.Stop("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
@@ -137,10 +135,10 @@ function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
 	profiler.Stop("OvaleDamageTaken_RemoveExpiredEvents")
 end
 
-function OvaleDamageTaken:Debug()
-	self.damageEvent:Debug()
+function OvaleDamageTaken:DebugDamageTaken()
+	self.damageEvent:DebuggingInfo()
 	for i, event in self.damageEvent:BackToFrontIterator() do
-		Ovale:FormatPrint("%d: %d damage", event.timestamp, event.damage)
+		self:Print("%d: %d damage", event.timestamp, event.damage)
 	end
 end
 --</public-static-methods>

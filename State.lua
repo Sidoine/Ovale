@@ -23,10 +23,7 @@ local pairs = pairs
 local self_statePrototype = {}
 local self_stateAddons = OvaleQueue:NewQueue("OvaleState_stateAddons")
 
-local OVALE_STATE_DEBUG = "state"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_STATE_DEBUG, L["State machine"], L["Debug state machine"])
-end
+OvaleDebug:RegisterDebugging(OvaleState)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -127,7 +124,7 @@ function OvaleState:ResetState(state)
 	-- For now, reset/remove all state variables if out of combat.
 	if not state.inCombat then
 		for k in pairs(state.variable) do
-			Ovale:DebugPrintf(OVALE_STATE_DEBUG, "Resetting state variable '%s'.", k)
+			state:Logf("Resetting state variable '%s'.", k)
 			state.variable[k] = nil
 		end
 	end
@@ -167,7 +164,7 @@ statePrototype.PutState = function(state, name, value, isFuture)
 		state:Logf("Setting future state: %s = %s.", name, value)
 		state.futureVariable[name] = value
 	else
-		Ovale:DebugPrintf(OVALE_STATE_DEBUG, "Advancing combat state: %s = %s.", name, value)
+		OvaleState:Debug("Advancing combat state: %s = %s.", name, value)
 		state:Logf("Advancing combat state: %s = %s.", name, value)
 		state.variable[name] = value
 	end

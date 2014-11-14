@@ -17,6 +17,7 @@ local OvaleOptions = Ovale.OvaleOptions
 -- Forward declarations for module dependencies.
 local Profiler = nil
 
+local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
 local next = next
@@ -25,10 +26,12 @@ local select = select
 local strlen = string.len
 local tconcat = table.concat
 local tonumber = tonumber
+local tostring = tostring
 local type = type
 local wipe = table.wipe
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
+local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 
 -- Flag for whether profiling is enabled.
 local self_isProfilingEnabled = false
@@ -36,8 +39,6 @@ local self_isProfilingEnabled = false
 local self_profilingOutput = nil
 
 -- Flags used by debugging print functions.
--- If "bug" flag is set, then the next frame refresh is traced.
-local self_bug = false
 -- If "traced" flag is set, then the public "trace" property is toggled before the next frame refresh.
 local self_traced = false
 -- LibTextDump-1.0 object for output from Log() or Logf() methods.
@@ -57,13 +58,13 @@ do
 			end,
 		},
 	}
-	-- Add a global data type for debug options.
-	OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global or {}
-	OvaleOptions.defaultDB.global.debug = {}
 	-- Insert actions into OvaleOptions.
 	for k, v in pairs(actions) do
 		OvaleOptions.options.args.actions.args[k] = v
 	end
+	-- Add a global data type for debug options.
+	OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global or {}
+	OvaleOptions.defaultDB.global.debug = {}
 end
 --</private-static-properties>
 
@@ -214,9 +215,15 @@ OvaleDebug.options = {
 	},
 }
 
+-- If "bug" flag is set, then the next frame refresh is traced.
+OvaleDebug.bug = false
 -- Flag to activate tracing the function calls for the next frame refresh.
 OvaleDebug.trace = false
 --</public-static-properties>
+
+--<private-static-methods>
+
+--</private-static-methods>
 
 --<public-static-methods>
 function OvaleDebug:OnInitialize()
@@ -233,18 +240,10 @@ function OvaleDebug:OnEnable()
 	self_traceLog = LibTextDump:New(OVALE .. " - " .. L["Trace Log"], 750, 500)
 end
 
-function OvaleDebug:RegisterDebugOption(option, name, description)
-	self.options.args.toggles.args[option] = {
-		name = name,
-		desc = description or name,
-		type = "toggle",
-	}
-end
-
 function OvaleDebug:ResetTrace()
+	self.bug = false
 	self.trace = false
 	self_traced = false
-	self_bug = false
 end
 
 function OvaleDebug:UpdateTrace()
@@ -253,7 +252,7 @@ function OvaleDebug:UpdateTrace()
 		self_traced = true
 	end
 	-- If there was a bug, then enable trace on the next frame.
-	if self_bug then
+	if self.bug then
 		self.trace = true
 	end
 	-- Toggle trace flag so we don't endlessly trace successive frames.
@@ -263,38 +262,43 @@ function OvaleDebug:UpdateTrace()
 	end
 end
 
-function OvaleDebug:DebugPrint(flag, ...)
-	local global = Ovale.db.global
-	if global and global.debug and global.debug[flag] then
-		Ovale:Print("[" .. flag .. "]", ...)
-	end
+function OvaleDebug:RegisterDebugging(addon)
+	local name = addon:GetName()
+	self.options.args.toggles.args[name] = {
+		name = name,
+		desc = format(L["Enable debugging messages for the %s module."], name),
+		type = "toggle",
+	}
+	addon.Debug = self.Debug
 end
 
-function OvaleDebug:DebugPrintf(flag, ...)
-	local global = Ovale.db.global
-	if global and global.debug and global.debug[flag] then
-		local addTimestamp = select(1, ...)
-		if type(addTimestamp) == "boolean" or type(addTimestamp) == "nil" then
-			if addTimestamp then
-				local now = API_GetTime()
-				Ovale:Printf("[%s] @%f %s", flag, now, Ovale:Format(select(2, ...)))
+--[[
+	Output the parameters as a string to DEFAULT_CHAT_FRAME.  If the first parameter
+	is a boolean or nil, then treat it as a request to insert a timestamp at the
+	beginning of the line.
+--]]
+function OvaleDebug:Debug(addTimestamp, ...)
+	local name = self:GetName()
+	if Ovale.db.global.debug[name] then
+		local s
+		if (type(addTimestamp) == "boolean" or type(addTimestamp) == "nil") then
+			if (...) then
+				if addTimestamp then
+					-- Add a yellow timestamp to the start.
+					local now = API_GetTime()
+					s = format("|cffffff00%f|r %s", now, Ovale:MakeString(...))
+				else
+					s = Ovale:MakeString(...)
+				end
 			else
-				Ovale:Printf("[%s] %s", flag, Ovale:Format(select(2, ...)))
+				s = tostring(addTimestamp)
 			end
 		else
-			Ovale:Printf("[%s] %s", flag, Ovale:Format(...))
+			s = Ovale:MakeString(addTimestamp, ...)
 		end
+		-- Match output format from AceConsole-3.0 Print() method.
+		DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", name, s))
 	end
-end
-
-function OvaleDebug:Error(...)
-	Ovale:Print("Fatal error: ", ...)
-	self_bug = true
-end
-
-function OvaleDebug:Errorf(...)
-	Ovale:Printf("Fatal error: %s", Ovale:Format(...))
-	self_bug = true
 end
 
 function OvaleDebug:Log(...)
@@ -313,7 +317,7 @@ function OvaleDebug:Logf(...)
 	if self.trace then
 		local N = self_traceLog:Lines()
 		if N < OVALE_TRACELOG_MAXLINES - 1 then
-			self_traceLog:AddLine(Ovale:Format(...))
+			self_traceLog:AddLine(Ovale:MakeString(...))
 		elseif N == OVALE_TRACELOG_MAXLINES - 1 then
 			self_traceLog:AddLine("WARNING: Maximum length of trace log has been reached.")
 		end

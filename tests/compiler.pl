@@ -150,8 +150,11 @@ $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
 
 # Ovale module prototype.
+$sm{"modulePrototype"}{Error} = true;
+$sm{"modulePrototype"}{Debug} = true;
 $sm{"modulePrototype"}{Log} = true;
 $sm{"modulePrototype"}{Logf} = true;
+$sm{"modulePrototype"}{Print} = true;
 
 $classname{Localization} = "Localization";
 $classname{Ovale} = "Ovale";

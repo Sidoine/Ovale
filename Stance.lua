@@ -190,10 +190,6 @@ do
 	end
 end
 
-function OvaleStance:Debug()
-	Ovale:FormatPrint("current stance: %s", self.stance)
-end
-
 -- Return the current stance's name.
 function OvaleStance:GetStance()
 	return self.stanceList[self.stance]

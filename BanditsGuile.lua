@@ -169,10 +169,10 @@ function OvaleBanditsGuile:GainedAura(atTime)
 	OvaleAura:GainedAuraOnGUID(self_guid, atTime, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 end
 
-function OvaleBanditsGuile:Debug()
+function OvaleBanditsGuile:DebugBanditsGuile()
 	local aura = OvaleAura:GetAuraByGUID(self_guid, self.spellId, "HELPFUL", true)
 	if aura then
-		Ovale:FormatPrint("Player has Bandit's Guile aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
+		self:Print("Player has Bandit's Guile aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
 	end
 end
 --</public-static-methods>

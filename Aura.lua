@@ -77,9 +77,10 @@ end
 -- Some auras have a nil caster, so treat those as having a GUID of zero for indexing purposes.
 local UNKNOWN_GUID = 0
 
-local OVALE_AURA_DEBUG = "aura"
 do
-	OvaleDebug:RegisterDebugOption(OVALE_AURA_DEBUG, L["Auras"], L["Debug auras"])
+	-- Register for debugging messages.
+	OvaleDebug:RegisterDebugging(OvaleAura)
+
 	local output = {}
 	local debugOptions = {
 		playerAura = {
@@ -366,13 +367,13 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 		if unitId then
 			-- Only update auras on the unit if it is not a unit type that receives UNIT_AURA events.
 			if not OvaleGUID.UNIT_AURA_UNIT[unitId] then
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%s)", cleuEvent, destGUID, unitId)
+				self:Debug(true, "%s: %s (%s)", cleuEvent, destGUID, unitId)
 				self:ScanAuras(unitId, destGUID)
 			end
 		elseif mine then
 			-- There is no unit ID, but the action was caused by the player, so update this aura on destGUID.
 			local spellId, spellName, spellSchool = arg12, arg13, arg14
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID)
+			self:Debug(true, "%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID)
 			local now = API_GetTime()
 			if cleuEvent == "SPELL_AURA_REMOVED" or cleuEvent == "SPELL_AURA_BROKEN" or cleuEvent == "SPELL_AURA_BROKEN_SPELL" then
 				self:LostAuraOnGUID(destGUID, now, spellId, sourceGUID)
@@ -415,9 +416,9 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 		local spellId, spellName, spellSchool = arg12, arg13, arg14
 		local unitId = OvaleGUID:GetUnitId(destGUID)
 		if unitId then
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s (%s)", cleuEvent, destGUID, unitId)
+			self:Debug(true, "%s: %s (%s)", cleuEvent, destGUID, unitId)
 		else
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", cleuEvent, destGUID)
+			self:Debug(true, "%s: %s", cleuEvent, destGUID)
 		end
 		local aura = GetAura(self.aura, destGUID, spellId, self_guid)
 		if self:IsActiveAura(aura) then
@@ -429,7 +430,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 				tick = timestamp - lastTickTime
 			elseif not baseTick then
 				-- This isn't a known periodic aura, but it's ticking so treat this as the first tick.
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
+				self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
 				local si = OvaleData.spellInfo[spellId]
 				baseTick = (si and si.tick) and si.tick or 3
 				tick = OvaleData:GetTickLength(spellId)
@@ -437,13 +438,13 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 			aura.baseTick = baseTick
 			aura.lastTickTime = timestamp
 			aura.tick = tick
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
+			self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
 		end
 	end
 end
 
 function OvaleAura:PLAYER_ALIVE(event)
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s", event)
+	self:Debug(event)
 	self:ScanAuras("player", self_guid)
 end
 
@@ -457,13 +458,13 @@ function OvaleAura:PLAYER_TARGET_CHANGED(event, cause)
 		-- Target was cleared.
 	else
 		-- Target has changed.
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s", event)
+		self:Debug(event)
 		self:ScanAuras("target")
 	end
 end
 
 function OvaleAura:UNIT_AURA(event, unitId)
-	Ovale:DebugPrintf(OVALE_AURA_DEBUG, "%s: %s", event, unitId)
+	self:Debug("%s: %s", event, unitId)
 	self:ScanAuras(unitId)
 end
 
@@ -480,7 +481,7 @@ function OvaleAura:RemoveAurasOnInactiveUnits()
 	for guid in pairs(self.aura) do
 		local unitId = OvaleGUID:GetUnitId(guid)
 		if not unitId then
-			Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Removing auras from guid %s", guid)
+			self:Debug("Removing auras from GUID %s", guid)
 			RemoveAurasOnGUID(self.aura, guid)
 			self.serial[guid] = nil
 		end
@@ -538,8 +539,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 	aura.serial = self.serial[guid]
 
 	if not auraIsActive or not auraIsUnchanged then
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Adding %s %s (%s) to %s at %f, aura.serial=%d",
-			filter, name, auraId, guid, atTime, aura.serial)
+		self:Debug("    Adding %s %s (%s) to %s at %f, aura.serial=%d", filter, name, auraId, guid, atTime, aura.serial)
 		aura.name = name
 		aura.duration = duration
 		aura.ending = expirationTime
@@ -581,7 +581,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 			end
 			if spellcast and spellcast.target == guid then
 				local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
-				Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
+				self:Debug("    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
 					filter, name, auraId, guid, spellName, spellcast.spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
 				-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
 				OvaleFuture:UpdateSnapshotFromSpellcast(aura, spellcast)
@@ -591,7 +591,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 			if si then
 				-- Set the tick information for known DoTs.
 				if si.tick then
-					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is a periodic aura.", name, auraId)
+					self:Debug("    %s (%s) is a periodic aura.", name, auraId)
 					-- Only set the initial tick information for new auras.
 					if not auraIsActive then
 						aura.baseTick = si.tick
@@ -604,7 +604,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				end
 				-- Set the cooldown expiration time for player buffs applied by items with a cooldown.
 				if si.buff_cd and guid == self_guid then
-					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    %s (%s) is applied by an item with a cooldown of %ds.", name, auraId, si.buff_cd)
+					self:Debug("    %s (%s) is applied by an item with a cooldown of %ds.", name, auraId, si.buff_cd)
 					if not auraIsActive then
 						-- cooldownEnding is the earliest time at which we expect to gain this buff again.
 						aura.cooldownEnding = aura.gain + si.buff_cd
@@ -630,8 +630,7 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 	local aura = GetAura(self.aura, guid, auraId, casterGUID)
 	if aura then
 		local filter = aura.filter
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Expiring %s %s (%d) from %s at %f.",
-			filter, aura.name, auraId, guid, atTime)
+		self:Debug("    Expiring %s %s (%d) from %s at %f.", filter, aura.name, auraId, guid, atTime)
 		if aura.ending > atTime then
 			aura.ending = atTime
 		end
@@ -657,8 +656,7 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 				if spellcast and spellcast.stop and IsWithinAuraLag(spellcast.stop, aura.ending) then
 					aura.consumed = true
 					local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
-					Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Consuming %s %s (%d) on %s with %s (%d) at %f.",
-						filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.stop)
+					self:Debug("    Consuming %s %s (%d) on %s with %s (%d) at %f.", filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.stop)
 				end
 			end
 		end
@@ -678,18 +676,18 @@ function OvaleAura:ScanAuras(unitId, guid)
 	profiler.Start("OvaleAura_ScanAuras")
 	guid = guid or OvaleGUID:GetGUID(unitId)
 	if guid then
-		local now = API_GetTime()
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "Scanning auras on %s (%s) at %f", guid, unitId, now)
+		self:Debug(true, "Scanning auras on %s (%s)", guid, unitId)
 
 		-- Advance the age of the unit's auras.
 		local serial = self.serial[guid] or 0
 		serial = serial + 1
-		Ovale:DebugPrintf(OVALE_AURA_DEBUG, "    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
+		self:Debug("    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
 		self.serial[guid] = serial
 
 		-- Add all auras on the unit into the database.
 		local i = 1
 		local filter = "HELPFUL"
+		local now = API_GetTime()
 		while true do
 			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId,
 				canApplyAura, isBossDebuff, isCastByPlayer, value1, value2, value3 = API_UnitAura(unitId, i, filter)

@@ -131,15 +131,14 @@ OvaleFuture.traceSpellList = nil
 
 --<private-static-methods>
 local function TracePrintf(spellId, ...)
-	local self = OvaleFuture
-	if self.traceSpellList then
+	if OvaleFuture.traceSpellList then
 		local name = spellId
 		if type(spellId) == "number" then
 			name = OvaleSpellBook:GetSpellName(spellId)
 		end
-		if self.traceSpellList[spellId] or self.traceSpellList[name] then
+		if OvaleFuture.traceSpellList[spellId] or OvaleFuture.traceSpellList[name] then
 			local now = API_GetTime()
-			Ovale:Printf("[trace] @%f %s", now, Ovale:Format(...))
+			OvaleFuture:Print("[trace] @%f %s", now, Ovale:MakeString(...))
 		end
 	end
 end
@@ -697,14 +696,14 @@ function OvaleFuture:UnregisterSpellcastInfo(functionTable)
 	self_updateSpellcastInfo[functionTable] = nil
 end
 
-function OvaleFuture:Debug()
+function OvaleFuture:DebugSpellsInFlight()
 	if next(self_activeSpellcast) then
-		Ovale:Print("Spells in flight:")
+		self:Print("Spells in flight:")
 	else
-		Ovale:Print("No spells in flight!")
+		self:Print("No spells in flight!")
 	end
 	for _, spellcast in ipairs(self_activeSpellcast) do
-		Ovale:FormatPrint("    %s (%d), lineId=%s", OvaleSpellBook:GetSpellName(spellcast.spellId), spellcast.spellId, spellcast.lineId)
+		self:Print("    %s (%d), lineId=%s", OvaleSpellBook:GetSpellName(spellcast.spellId), spellcast.spellId, spellcast.lineId)
 	end
 end
 --</public-static-methods>

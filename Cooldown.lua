@@ -251,10 +251,10 @@ statePrototype.DebugCooldown = function(state)
 	for spellId, cd in pairs(state.cd) do
 		if cd.start then
 			if cd.charges then
-				Ovale:FormatPrint("Spell %s cooldown: start=%f, duration=%f, charges=%d, maxCharges=%d, chargeStart=%f, chargeDuration=%f",
+				OvaleCooldown:Print("Spell %s cooldown: start=%f, duration=%f, charges=%d, maxCharges=%d, chargeStart=%f, chargeDuration=%f",
 					spellId, cd.start, cd.duration, cd.charges, cd.start, cd.duration)
 			else
-				Ovale:FormatPrint("Spell %s cooldown: start=%f, duration=%f", spellId, cd.start, cd.duration)
+				OvaleCooldown:Print("Spell %s cooldown: start=%f, duration=%f", spellId, cd.start, cd.duration)
 			end
 		end
 	end

@@ -64,12 +64,8 @@ local self_pool = OvalePool("OvalePaperDoll_pool")
 -- Total number of snapshots taken.
 local self_snapshotCount = 0
 
-local OVALE_PAPERDOLL_DEBUG = "paper_doll"
-local OVALE_SNAPSHOT_DEBUG = "snapshot"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_PAPERDOLL_DEBUG, L["Paper doll updates"], L["Debug paper doll"])
-	OvaleDebug:RegisterDebugOption(OVALE_SNAPSHOT_DEBUG, L["Snapshot updates"], L["Debug stat snapshots"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvalePaperDoll)
 
 local OVALE_SPELLDAMAGE_SCHOOL = {
 	DEATHKNIGHT = 4, -- Nature
@@ -159,7 +155,7 @@ local function UpdateCurrentSnapshot()
 	local self = OvalePaperDoll
 	local now = API_GetTime()
 	if self.snapshot.snapshotTime < now then
-		Ovale:DebugPrintf(OVALE_SNAPSHOT_DEBUG, true, "New snapshot.")
+		self:Debug(true, "New snapshot.")
 		self_snapshotCount = self_snapshotCount + 1
 		local snapshot = self_pool:Get()
 		-- Pre-populate snapshot with the most recent previously-captured stats.
@@ -250,10 +246,10 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	snapshot.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self_class])
 	snapshot.critRating = API_GetCombatRating(CR_CRIT_MELEE)
 	snapshot.hasteRating = API_GetCombatRating(CR_HASTE_MELEE)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["meleeCrit"].description, snapshot.meleeCrit)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["spellCrit"].description, snapshot.spellCrit)
+	self:Debug(true, event)
+	self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["meleeCrit"].description, snapshot.meleeCrit)
+	self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
+	self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["spellCrit"].description, snapshot.spellCrit)
 	profiler.Stop("OvalePaperDoll_UpdateStats")
 end
 
@@ -265,7 +261,7 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 		snapshot.masteryEffect = 0
 	else
 		snapshot.masteryEffect = API_GetMasteryEffect()
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %f%%",
+		self:Debug(true, "%s: %s = %f%%",
 			event, self.SNAPSHOT_STATS["masteryEffect"].description, snapshot.masteryEffect)
 	end
 	profiler.Stop("OvalePaperDoll_UpdateStats")
@@ -276,7 +272,7 @@ function OvalePaperDoll:MULTISTRIKE_UPDATE(event)
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.multistrikeRating = API_GetMultistrike()
 	snapshot.multistrike = API_GetMultistrikeEffect()
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %f%%",
+	self:Debug(true, "%s: %s = %f%%",
 		event, self.SNAPSHOT_STATS["multistrike"].description, snapshot.multistrike)
 	profiler.Stop("OvalePaperDoll_UpdateStats")
 end
@@ -284,7 +280,7 @@ end
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
 	profiler.Start("OvalePaperDoll_UpdateStats")
 	self.level = tonumber(level) or API_UnitLevel("player")
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: level = %d", event, self.level)
+	self:Debug(true, "%s: level = %d", event, self.level)
 	profiler.Stop("OvalePaperDoll_UpdateStats")
 end
 
@@ -292,7 +288,7 @@ function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
 	profiler.Start("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.spellBonusHealing = API_GetSpellBonusHealing()
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %d",
+	self:Debug(true, "%s: %s = %d",
 		event, self.SNAPSHOT_STATS["spellBonusHealing"].description, snapshot.spellBonusHealing)
 	profiler.Stop("OvalePaperDoll_UpdateStats")
 end
@@ -305,7 +301,7 @@ function OvalePaperDoll:PLAYER_REGEN_ENABLED(event)
 	profiler.Start("OvalePaperDoll_UpdateStats")
 	local now = API_GetTime()
 	if OvaleFuture.combatStartTime then
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%d snapshots in %f seconds.",
+		self:Debug(true, "%d snapshots in %f seconds.",
 			self_snapshotCount, now - OvaleFuture.combatStartTime)
 	end
 	self_pool:Drain()
@@ -316,7 +312,7 @@ function OvalePaperDoll:SPELL_POWER_CHANGED(event)
 	profiler.Start("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self_class])
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %d",
+	self:Debug(true, "%s: %s = %d",
 		event, self.SNAPSHOT_STATS["spellBonusDamage"].description, snapshot.spellBonusDamage)
 	profiler.Stop("OvalePaperDoll_UpdateStats")
 end
@@ -327,7 +323,7 @@ function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 		local snapshot = UpdateCurrentSnapshot()
 		local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 		snapshot.attackPower = base + posBuff + negBuff
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %d",
+		self:Debug(true, "%s: %s = %d",
 			event, self.SNAPSHOT_STATS["attackPower"].description, snapshot.attackPower)
 		self:UpdateDamage(event)
 		profiler.Stop("OvalePaperDoll_UpdateStats")
@@ -338,7 +334,7 @@ function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId == "player" then
 		profiler.Start("OvalePaperDoll_UpdateStats")
 		self.level = API_UnitLevel(unitId)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: level = %d", event, self.level)
+		self:Debug(true, "%s: level = %d", event, self.level)
 		profiler.Stop("OvalePaperDoll_UpdateStats")
 	end
 end
@@ -348,7 +344,7 @@ function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 		profiler.Start("OvalePaperDoll_UpdateStats")
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.rangedHaste = API_GetRangedHaste()
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %f%%",
+		self:Debug(true, "%s: %s = %f%%",
 			event, self.SNAPSHOT_STATS["rangedHaste"].description, snapshot.rangedHaste)
 		profiler.Stop("OvalePaperDoll_UpdateStats")
 	end
@@ -360,7 +356,7 @@ function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 		local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.rangedAttackPower = base + posBuff + negBuff
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s: %s = %d",
+		self:Debug(true, "%s: %s = %d",
 			event, self.SNAPSHOT_STATS["rangedAttackPower"].description, snapshot.rangedAttackPower)
 		profiler.Stop("OvalePaperDoll_UpdateStats")
 	end
@@ -372,9 +368,9 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.meleeHaste = API_GetMeleeHaste()
 		snapshot.spellHaste = API_UnitSpellHaste(unitId)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["meleeHaste"].description, snapshot.meleeHaste)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f%%", self.SNAPSHOT_STATS["spellHaste"].description, snapshot.spellHaste)
+		self:Debug(true, event)
+		self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["meleeHaste"].description, snapshot.meleeHaste)
+		self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["spellHaste"].description, snapshot.spellHaste)
 		self:UpdateDamage(event)
 		profiler.Stop("OvalePaperDoll_UpdateStats")
 	end
@@ -389,12 +385,12 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 		snapshot.stamina = API_UnitStat(unitId, 3)
 		snapshot.intellect = API_UnitStat(unitId, 4)
 		snapshot.spirit = API_UnitStat(unitId, 5)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", self.SNAPSHOT_STATS["agility"].description, snapshot.agility)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", self.SNAPSHOT_STATS["intellect"].description, snapshot.intellect)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", self.SNAPSHOT_STATS["spirit"].description, snapshot.spirit)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", self.SNAPSHOT_STATS["stamina"].description, snapshot.stamina)
-		Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %d", self.SNAPSHOT_STATS["strength"].description, snapshot.strength)
+		self:Debug(true, event)
+		self:Debug("    %s = %d", self.SNAPSHOT_STATS["agility"].description, snapshot.agility)
+		self:Debug("    %s = %d", self.SNAPSHOT_STATS["intellect"].description, snapshot.intellect)
+		self:Debug("    %s = %d", self.SNAPSHOT_STATS["spirit"].description, snapshot.spirit)
+		self:Debug("    %s = %d", self.SNAPSHOT_STATS["stamina"].description, snapshot.stamina)
+		self:Debug("    %s = %d", self.SNAPSHOT_STATS["strength"].description, snapshot.strength)
 		self:COMBAT_RATING_UPDATE(event)
 		profiler.Stop("OvalePaperDoll_UpdateStats")
 	end
@@ -428,7 +424,7 @@ function OvalePaperDoll:UpdateDamage(event)
 		end
 	end
 	snapshot.mainHandWeaponDamage = avgDamage / mainHandWeaponSpeed * normalizedMainHandWeaponSpeed
-	--Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    MH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
+	--self:Debug("    MH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
 	--	minDamage, maxDamage, damageMultiplier, mainHandWeaponSpeed, normalizedMainHandWeaponSpeed)
 
 	if OvaleEquipment:HasOffHandWeapon() then
@@ -445,16 +441,16 @@ function OvalePaperDoll:UpdateDamage(event)
 			end
 		end
 		snapshot.offHandWeaponDamage = avgOffHandDamage / offHandWeaponSpeed * normalizedOffHandWeaponSpeed
-		--Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    OH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
+		--self:Debug("    OH weapon damage = ((%f + %f) / 2 / %f) / %f * %f",
 		--	minOffHandDamage, maxOffHandDamage, damageMultiplier, offHandWeaponSpeed, normalizedOffHandWeaponSpeed)
 	else
 		snapshot.offHandWeaponDamage = 0
 	end
 
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, true, "%s", event)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", self.SNAPSHOT_STATS["baseDamageMultiplier"].description, snapshot.baseDamageMultiplier)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", self.SNAPSHOT_STATS["mainHandWeaponDamage"].description, snapshot.mainHandWeaponDamage)
-	Ovale:DebugPrintf(OVALE_PAPERDOLL_DEBUG, "    %s = %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)
+	self:Debug(true, event)
+	self:Debug("    %s = %f", self.SNAPSHOT_STATS["baseDamageMultiplier"].description, snapshot.baseDamageMultiplier)
+	self:Debug("    %s = %f", self.SNAPSHOT_STATS["mainHandWeaponDamage"].description, snapshot.mainHandWeaponDamage)
+	self:Debug("    %s = %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)
 	profiler.Stop("OvalePaperDoll_UpdateDamage")
 end
 
@@ -552,35 +548,35 @@ function OvalePaperDoll:ReleaseSnapshot(snapshot)
 	return self_pool:ReleaseReference(snapshot)
 end
 
-function OvalePaperDoll:Debug(snapshot)
+function OvalePaperDoll:DebugSnapshot(snapshot)
 	snapshot = snapshot or self.snapshot
-	self_pool:Debug()
-	Ovale:FormatPrint("Total snapshots: %d", self_snapshotCount)
-	Ovale:FormatPrint("Level: %d", self.level)
-	Ovale:FormatPrint("Specialization: %s", self.specialization)
-	Ovale:FormatPrint("Snapshot time: %f", snapshot.snapshotTime)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["agility"].description, snapshot.agility)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["intellect"].description, snapshot.intellect)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["spirit"].description, snapshot.spirit)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["stamina"].description, snapshot.stamina)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["strength"].description, snapshot.strength)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["attackPower"].description, snapshot.attackPower)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["rangedAttackPower"].description, snapshot.rangedAttackPower)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["spellBonusDamage"].description, snapshot.spellBonusDamage)
-	Ovale:FormatPrint("%s: %d", self.SNAPSHOT_STATS["spellBonusHealing"].description, snapshot.spellBonusHealing)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["spellCrit"].description, snapshot.spellCrit)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["spellHaste"].description, snapshot.spellHaste)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["meleeCrit"].description, snapshot.meleeCrit)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["meleeHaste"].description, snapshot.meleeHaste)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["rangedHaste"].description, snapshot.rangedHaste)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["masteryEffect"].description, snapshot.masteryEffect)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["critRating"].description, snapshot.critRating)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["hasteRating"].description, snapshot.hasteRating)
-	Ovale:FormatPrint("%s: %f%%", self.SNAPSHOT_STATS["masteryRating"].description, snapshot.masteryRating)
-	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["baseDamageMultiplier"].description, snapshot.baseDamageMultiplier)
-	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["mainHandWeaponDamage"].description, snapshot.mainHandWeaponDamage)
-	Ovale:FormatPrint("%s: %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)
+	self_pool:DebuggingInfo()
+	self:Print("Total snapshots: %d", self_snapshotCount)
+	self:Print("Level: %d", self.level)
+	self:Print("Specialization: %s", self.specialization)
+	self:Print("Snapshot time: %f", snapshot.snapshotTime)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["agility"].description, snapshot.agility)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["intellect"].description, snapshot.intellect)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["spirit"].description, snapshot.spirit)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["stamina"].description, snapshot.stamina)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["strength"].description, snapshot.strength)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["attackPower"].description, snapshot.attackPower)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["rangedAttackPower"].description, snapshot.rangedAttackPower)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["spellBonusDamage"].description, snapshot.spellBonusDamage)
+	self:Print("%s: %d", self.SNAPSHOT_STATS["spellBonusHealing"].description, snapshot.spellBonusHealing)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["spellCrit"].description, snapshot.spellCrit)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["spellHaste"].description, snapshot.spellHaste)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["meleeCrit"].description, snapshot.meleeCrit)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["meleeHaste"].description, snapshot.meleeHaste)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["rangedHaste"].description, snapshot.rangedHaste)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["masteryEffect"].description, snapshot.masteryEffect)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["critRating"].description, snapshot.critRating)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["hasteRating"].description, snapshot.hasteRating)
+	self:Print("%s: %f%%", self.SNAPSHOT_STATS["masteryRating"].description, snapshot.masteryRating)
+	self:Print("%s: %f", self.SNAPSHOT_STATS["baseDamageMultiplier"].description, snapshot.baseDamageMultiplier)
+	self:Print("%s: %f", self.SNAPSHOT_STATS["mainHandWeaponDamage"].description, snapshot.mainHandWeaponDamage)
+	self:Print("%s: %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)
 end
 --</public-static-methods>
 

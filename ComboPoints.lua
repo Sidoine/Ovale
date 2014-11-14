@@ -38,6 +38,7 @@ local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
+local UNKNOWN = UNKNOWN
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -62,10 +63,8 @@ local PENDING_THRESHOLD = 0.8
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
 
-local OVALE_COMBO_POINTS_DEBUG = "combo_points"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_COMBO_POINTS_DEBUG, L["Combo points"], L["Debug combo points"])
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleComboPoints)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -96,9 +95,9 @@ local function RemovePendingComboEvents(atTime, spellId, guid, reason, combo)
 		if (atTime and atTime - comboEvent.atTime > PENDING_THRESHOLD)
 				or (comboEvent.spellId == spellId and comboEvent.guid == guid and (not reason or comboEvent.reason == reason) and (not combo or comboEvent.combo == combo)) then
 			if comboEvent.combo == "finisher" then
-				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "Removing expired %s event: spell %d combo point finisher from %s.", comboEvent.reason, comboEvent.spellId, comboEvent.reason)
+				OvaleComboPoints:Debug("Removing expired %s event: spell %d combo point finisher from %s.", comboEvent.reason, comboEvent.spellId, comboEvent.reason)
 			else
-				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "Removing expired %s event: spell %d for %d combo points from %s.", comboEvent.reason, comboEvent.spellId, comboEvent.combo, comboEvent.reason)
+				OvaleComboPoints:Debug("Removing expired %s event: spell %d for %d combo points from %s.", comboEvent.reason, comboEvent.spellId, comboEvent.combo, comboEvent.reason)
 			end
 			count = count + 1
 			tremove(self_pendingComboEvents, k)
@@ -196,11 +195,11 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 		local oldCombo = self.combo
 		self:Update()
 
-		local now = API_GetTime()
 		local difference = self.combo - oldCombo
-		Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "%s (%f): %d -> %d.", event, now, oldCombo, self.combo)
+		self:Debug(true, "%s: %d -> %d.", event, oldCombo, self.combo)
 
 		-- Remove expired events.
+		local now = API_GetTime()
 		RemovePendingComboEvents(now)
 
 		local pendingMatched = false
@@ -208,35 +207,35 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 			local comboEvent = self_pendingComboEvents[1]
 			local spellId, guid, reason, combo = comboEvent.spellId, comboEvent.guid, comboEvent.reason, comboEvent.combo
 			if combo == difference or (combo == "finisher" and self.combo == 0 and difference < 0) then
-				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Matches pending %s event for %d.", reason, spellId)
+				self:Debug("    Matches pending %s event for %d.", reason, spellId)
 				pendingMatched = true
 				tremove(self_pendingComboEvents, 1)
 			end
 		end
 		if not pendingMatched and not OvaleFuture.inCombat and difference <= 0 then
-			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Out-of-combat combo point decay.")
+			self:Debug("    Out-of-combat combo point decay.")
 			if difference == 0 then
 				-- Decrement the combo point count until game state catches up with the event.
 				local newCombo = self.combo - 1
 				self.combo = newCombo > 0 and newCombo or 0
-				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Decaying to %d combo point(s).", self.combo)
+				self:Debug("    Decaying to %d combo point(s).", self.combo)
 			end
 		end
 	end
 end
 
 function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID, success)
-	Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "%s (%f): Spell %d finished (%s) on %s", event, atTime, spellId, success, targetGUID)
+	self:Debug("%s (%f): Spell %d finished (%s) on %s", event, atTime, spellId, success, targetGUID or UNKNOWN)
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo == "finisher" and (success == "hit" or success == "critical") then
 		local target = OvaleGUID:GetUnitId(targetGUID)
 		local combo = OvaleData:GetSpellInfoProperty(spellId, "combo", target)
 		if combo == "finisher" then
-			Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Spell %d hit and consumed all combo points.", spellId)
+			self:Debug("    Spell %d hit and consumed all combo points.", spellId)
 			AddPendingComboEvent(atTime, spellId, targetGUID, "finisher", combo)
 			if self_hasRuthlessness and self.combo == MAX_COMBO_POINTS then
 				-- Ruthlessness grants a 20% chance to grant a combo point for each combo point spent on a finishing move.
-				Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Spell %d has 100% chance to grant an extra combo point from Ruthlessness.", spellId)
+				self:Debug("    Spell %d has 100% chance to grant an extra combo point from Ruthlessness.", spellId)
 				AddPendingComboEvent(atTime, spellId, targetGUID, "Ruthlessness", 1)
 			end
 			if self_hasAnticipation and targetGUID ~= self_guid then
@@ -245,7 +244,7 @@ function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID
 				if unitId and API_UnitCanAttack("player", unitId) then
 					local aura = OvaleAura:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
 					if OvaleAura:IsActiveAura(aura) then
-						Ovale:DebugPrintf(OVALE_COMBO_POINTS_DEBUG, "    Spell %d hit with %d Anticipation charges.", spellId, aura.stacks)
+						self:Debug("    Spell %d hit with %d Anticipation charges.", spellId, aura.stacks)
 						AddPendingComboEvent(atTime, spellId, targetGUID, "Anticipation", aura.stacks)
 					end
 				end
@@ -289,8 +288,8 @@ function OvaleComboPoints:GetComboPoints()
 	return total
 end
 
-function OvaleComboPoints:Debug()
-	Ovale:FormatPrint("Player has %d combo points.", self.combo)
+function OvaleComboPoints:DebugComboPoints()
+	self:Print("Player has %d combo points.", self.combo)
 end
 
 -- Return the number of combo points required to cast the given spell.

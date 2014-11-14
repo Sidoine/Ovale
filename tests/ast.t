@@ -9,7 +9,7 @@
 local root = "../"
 do
 	local state = {
-		class = "PALADIN",
+		class = "DEATHKNIGHT",
 		level = 90,
 	}
 	dofile(root .. "WoWAPI.lua")
@@ -60,11 +60,11 @@ local source = "Ovale"
 local ast = OvaleAST:ParseScript(source)
 if ast then
 	OvaleAST:Optimize(ast)
-	Ovale:Print(OvaleAST:NodeToString(ast))
-	Ovale:Print(separator)
-	Ovale:Print(OvaleAST:Unparse(ast))
-	OvaleAST:Release(ast)
-	Ovale:Print(separator)
-	OvaleAST:Debug()
-	Ovale:FormatPrint("Successfully parsed %s '%s' script.", class, source)
+--	Ovale:Print(OvaleAST:NodeToString(ast))
+--	Ovale:Print(separator)
+--	Ovale:Print(OvaleAST:Unparse(ast))
+--	OvaleAST:Release(ast)
+--	Ovale:Print(separator)
+--	OvaleAST:DebugAST()
+	Ovale:Print("Successfully parsed %s '%s' script.", class, source)
 end

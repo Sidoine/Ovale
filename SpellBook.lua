@@ -59,9 +59,10 @@ local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 
 local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
 
-local OVALE_SPELLBOOK_DEBUG = "spellbook"
 do
-	OvaleDebug:RegisterDebugOption(OVALE_SPELLBOOK_DEBUG, L["Spellbook changes"], L["Debug spellbook changes"])
+	-- Register for debugging messages.
+	OvaleDebug:RegisterDebugging(OvaleSpellBook)
+
 	local debugOptions = {
 		glyph = {
 			name = L["Glyphs"],
@@ -207,7 +208,7 @@ end
 -- Update the player's talents by scanning the talent tab for the active specialization.
 -- Store the number of points assigned to each talent.
 function OvaleSpellBook:UpdateTalents()
-	Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "Updating talents.")
+	self:Debug("Updating talents.")
 	wipe(self.talent)
 	wipe(self.talentPoints)
 
@@ -224,7 +225,7 @@ function OvaleSpellBook:UpdateTalents()
 					else
 						self.talentPoints[index] = 0
 					end
-					Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    Talent %s (%d) is %s.", name, index, selected and "enabled" or "disabled")
+					self:Debug("    Talent %s (%d) is %s.", name, index, selected and "enabled" or "disabled")
 				end
 			end
 		end
@@ -234,7 +235,7 @@ end
 
 -- Update the player's glyphs by scanning the glyph socket tab for the active specialization.
 function OvaleSpellBook:UpdateGlyphs()
-	Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "Updating glyphs.")
+	self:Debug("Updating glyphs.")
 	wipe(self.glyph)
 
 	for i = 1, API_GetNumGlyphSockets() do
@@ -242,9 +243,9 @@ function OvaleSpellBook:UpdateGlyphs()
 		if enabled and glyphSpell then
 			local name = self:GetSpellName(glyphSpell)
 			self.glyph[glyphSpell] = name
-			Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    Glyph socket %d has %s (%d).", i, name, glyphSpell)
+			self:Debug("    Glyph socket %d has %s (%d).", i, name, glyphSpell)
 		else
-			Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    Glyph socket %d is empty.", i)
+			self:Debug("    Glyph socket %d is empty.", i)
 		end
 	end
 	self:SendMessage("Ovale_GlyphsChanged")
@@ -277,7 +278,7 @@ end
 -- Scan a spellbook and populate self.spell table.
 function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 	offset = offset or 0
-	Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "Updating '%s' spellbook starting at offset %d.", bookType, offset)
+	self:Debug("Updating '%s' spellbook starting at offset %d.", bookType, offset)
 	for index = offset + 1, offset + numSpells do
 		local skillType, spellId = API_GetSpellBookItemInfo(index, bookType)
 		if skillType == "SPELL" or skillType == "PETACTION" then
@@ -287,13 +288,13 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 			if spellLink then
 				local _, _, linkData, spellName = ParseHyperlink(spellLink)
 				local id = tonumber(linkData)
-				Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, id, index)
+				self:Debug("    %s (%d) is at offset %d.", spellName, id, index)
 				self.spell[id] = spellName
 				self.isHarmful[id] = API_IsHarmfulSpell(index, bookType)
 				self.isHelpful[id] = API_IsHelpfulSpell(index, bookType)
 				self.spellbookId[bookType][id] = index
 				if spellId and id ~= spellId then
-					Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, spellId, index)
+					self:Debug("    %s (%d) is at offset %d.", spellName, spellId, index)
 					self.spell[spellId] = spellName
 					self.isHarmful[spellId] = self.isHarmful[id]
 					self.isHelpful[spellId] = self.isHelpful[id]
@@ -307,14 +308,14 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 				for flyoutIndex = 1, numSlots do
 					local id, overrideId, isKnown, spellName = API_GetFlyoutSlotInfo(flyoutId, flyoutIndex)
 					if isKnown then
-						Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, id, index)
+						self:Debug("    %s (%d) is at offset %d.", spellName, id, index)
 						self.spell[id] = spellName
 						self.isHarmful[id] = API_IsHarmfulSpell(spellName)
 						self.isHelpful[id] = API_IsHelpfulSpell(spellName)
 						-- Flyout spells have no spellbook index.
 						self.spellbookId[bookType][id] = nil
 						if id ~= overrideId then
-							Ovale:DebugPrintf(OVALE_SPELLBOOK_DEBUG, "    %s (%d) is at offset %d.", spellName, overrideId, index)
+							self:Debug("    %s (%d) is at offset %d.", spellName, overrideId, index)
 							self.spell[overrideId] = spellName
 							self.isHarmful[overrideId] = self.isHarmful[id]
 							self.isHelpful[overrideId] = self.isHelpful[id]

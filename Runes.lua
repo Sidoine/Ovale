@@ -203,14 +203,14 @@ function OvaleRunes:UpdateAllRunes()
 	end
 end
 
-function OvaleRunes:Debug()
+function OvaleRunes:DebugRunes()
 	local now = API_GetTime()
 	for slot = 1, 6 do
 		local rune = self.rune[slot]
 		if rune:IsActiveRune(now) then
-			Ovale:FormatPrint("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
+			self:Print("rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
 		else
-			Ovale:FormatPrint("rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
+			self:Print("rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
 		end
 	end
 end
@@ -304,13 +304,13 @@ end
 
 --<state-methods>
 statePrototype.DebugRunes = function(state)
-	Ovale:FormatPrint("Current rune state:")
+	OvaleRunes:Print("Current rune state:")
 	local now = state.currentTime
 	for slot, rune in ipairs(state.rune) do
 		if rune:IsActiveRune(now) then
-			Ovale:FormatPrint("    rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
+			OvaleRunes:Print("    rune[%d] (%s) is active.", slot, RUNE_NAME[rune.type])
 		else
-			Ovale:FormatPrint("    rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
+			OvaleRunes:Print("    rune[%d] (%s) comes off cooldown in %f seconds.", slot, RUNE_NAME[rune.type], rune.endCooldown - now)
 		end
 	end
 end
@@ -425,7 +425,7 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 		local maxi = OvalePower.maxPower.runicpower
 		state.runicpower = (runicpower < maxi) and runicpower or maxi
 	else
-		Ovale:FormatPrint("No %s rune available at %f to consume for spell %d!", RUNE_NAME[runeType], atTime, spellId)
+		state:Logf("No %s rune available at %f to consume for spell %d!", RUNE_NAME[runeType], atTime, spellId)
 	end
 	profiler.Stop("OvaleRunes_state_ConsumeRune")
 end

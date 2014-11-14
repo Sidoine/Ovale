@@ -21,9 +21,6 @@ do
 	profiler = Profiler:GetProfilingGroup(group)
 end
 
-local L = Ovale.L
-local OvaleDebug = Ovale.OvaleDebug
-
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleData = nil
@@ -38,11 +35,6 @@ local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local INFINITY = math.huge
 local SPELL_POWER_ECLIPSE = SPELL_POWER_ECLIPSE
-
-local OVALE_ECLIPSE_DEBUG = "eclipse"
-do
-	OvaleDebug:RegisterDebugOption(OVALE_ECLIPSE_DEBUG, L["Eclipse"], L["Debug clipse"])
-end
 
 -- Player's GUID.
 local self_guid = nil
@@ -281,7 +273,7 @@ statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
 			end
 			-- Only adjust the total Eclipse energy if the spell adds Eclipse energy in the current direction.
 			if (direction <= 0 and energy < 0) or (direction >= 0 and energy > 0) then
-				state:Logf("[%s] Eclipse %d -> %d", OVALE_ECLIPSE_DEBUG, power, power + energy)
+				state:Logf("    Eclipse %d -> %d", power, power + energy)
 				power = power + energy
 
 				-- Crossing zero energy removes the corresponding Eclipse state.
@@ -364,7 +356,7 @@ end
 statePrototype.AddEclipse = function(state, eclipseId, atTime, snapshot)
 	if eclipseId == LUNAR_ECLIPSE or eclipseId == SOLAR_ECLIPSE then
 		local eclipseName = (eclipseId == LUNAR_ECLIPSE) and "Lunar" or "Solar"
-		state:Logf("[%s] Adding %s Eclipse (%d) at %f", OVALE_ECLIPSE_DEBUG, eclipseName, eclipseId, atTime)
+		state:Logf("    Adding %s Eclipse (%d) at %f", eclipseName, eclipseId, atTime)
 		local aura = state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, INFINITY, snapshot)
 		-- Set the value of the Eclipse aura to the Eclipse's bonus damage.
 		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)

@@ -383,7 +383,7 @@ function OvaleBestAction:GetAction(node, state)
 		while element and element.type == "state" do
 			loopCount = loopCount + 1
 			if loopCount >= 10 then
-				Ovale:Error("Found too many SetState() actions -- probably an infinite loop in script.")
+				self:Error("Found too many SetState() actions -- probably an infinite loop in script.")
 				break
 			end
 			-- Set the state in the simulator.
@@ -650,7 +650,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 				m = atTime
 				n = 0
 			else
-				Ovale:Errorf("[%d]    Parameters of modulus operator '%' must be constants.", element.nodeId)
+				self:Error("[%d]    Parameters of modulus operator '%' must be constants.", element.nodeId)
 				l = 0
 				m = 0
 				n = 0

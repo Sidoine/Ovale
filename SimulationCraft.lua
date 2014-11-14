@@ -364,7 +364,7 @@ local UNPARSE_VISITOR = nil
 local function Unparse(node)
 	local visitor = UNPARSE_VISITOR[node.type]
 	if not visitor then
-		Ovale:FormatPrint("Unable to unparse node of type '%s'.", node.type)
+		OvaleSimulationCraft:Error("Unable to unparse node of type '%s'.", node.type)
 	else
 		return visitor(node)
 	end
@@ -470,7 +470,7 @@ end
 
 -- Prints the error message and the next 20 tokens from tokenStream.
 local function SyntaxError(tokenStream, ...)
-	Ovale:FormatPrint(...)
+	OvaleSimulationCraft:Print(...)
 	local context = { "Next tokens:" }
 	for i = 1, 20 do
 		local tokenType, token = tokenStream:Peek(i)
@@ -481,7 +481,7 @@ local function SyntaxError(tokenStream, ...)
 			break
 		end
 	end
-	Ovale:Print(tconcat(context, " "))
+	OvaleSimulationCraft:Print(tconcat(context, " "))
 end
 
 -- Left-rotate tree to preserve precedence.
@@ -1093,7 +1093,7 @@ local EmitOperandTrinket = nil
 Emit = function(parseNode, nodeList, annotation, action)
 	local visitor = EMIT_VISITOR[parseNode.type]
 	if not visitor then
-		Ovale:FormatPrint("Unable to emit node of type '%s'.", parseNode.type)
+		OvaleSimulationCraft:Print("Unable to emit node of type '%s'.", parseNode.type)
 	else
 		return visitor(parseNode, nodeList, annotation, action)
 	end
@@ -1754,11 +1754,11 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 					node.child[1] = lhsNode
 					node.child[2] = rhsNode
 				elseif lhsNode then
-					msg = Ovale:Format("Warning: %s operator '%s' right failed.", parseNode.type, parseNode.operator)
+					msg = Ovale:MakeString("Warning: %s operator '%s' right failed.", parseNode.type, parseNode.operator)
 				elseif rhsNode then
-					msg = Ovale:Format("Warning: %s operator '%s' left failed.", parseNode.type, parseNode.operator)
+					msg = Ovale:MakeString("Warning: %s operator '%s' left failed.", parseNode.type, parseNode.operator)
 				else
-					msg = Ovale:Format("Warning: %s operator '%s' left and right failed.", parseNode.type, parseNode.operator)
+					msg = Ovale:MakeString("Warning: %s operator '%s' left and right failed.", parseNode.type, parseNode.operator)
 				end
 			end
 		end
@@ -1769,8 +1769,8 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 			node.right = "}"
 		end
 	else
-		msg = msg or Ovale:Format("Warning: Operator '%s' is not implemented.", parseNode.operator)
-		Ovale:Print(msg)
+		msg = msg or Ovale:MakeString("Warning: Operator '%s' is not implemented.", parseNode.operator)
+		OvaleSimulationCraft:Print(msg)
 		node = OvaleAST:NewNode(nodeList)
 		node.type = "string"
 		node.value = "FIXME_" .. parseNode.operator
@@ -1784,7 +1784,7 @@ EmitFunction = function(parseNode, nodeList, annotation, action)
 		-- Pretend ceil and floor have no effect.
 		node = EmitExpression(parseNode.child[1], nodeList, annotation, action)
 	else
-		Ovale:FormatPrint("Warning: Function '%s' is not implemented.", parseNode.name)
+		OvaleSimulationCraft:Print("Warning: Function '%s' is not implemented.", parseNode.name)
 		node = OvaleAST:NewNode(nodeList)
 		node.type = "variable"
 		node.name = "FIXME_" .. parseNode.name
@@ -3442,10 +3442,10 @@ function OvaleSimulationCraft:OnInitialize()
 	self:CreateOptions()
 end
 
-function OvaleSimulationCraft:Debug()
-	self_pool:Debug()
-	self_childrenPool:Debug()
-	self_outputPool:Debug()
+function OvaleSimulationCraft:DebuggingInfo()
+	self_pool:DebuggingInfo()
+	self_childrenPool:DebuggingInfo()
+	self_outputPool:DebuggingInfo()
 end
 
 function OvaleSimulationCraft:ToString(tbl)

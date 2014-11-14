@@ -340,6 +340,19 @@ end
 
 --<public-static-properties>
 --[[----------------------
+	FrameXML/ChatFrame
+--]]----------------------
+
+WoWAPI.DEFAULT_CHAT_FRAME = {
+	AddMessage = function(frame, text, red, green, blue, alpha)
+		-- Strip out color UI escape sequences.
+		text = gsub(text, "|c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]", "")
+		text = gsub(text, "|r", "")
+		print(text)
+	end
+}
+
+--[[----------------------
 	FrameXML/Constants
 --]]----------------------
 

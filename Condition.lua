@@ -187,9 +187,9 @@ OvaleCondition.TestValue = function(start, ending, value, origin, rate, comparat
 			return 0, INFINITY, 0, 0, 0
 		end
 	elseif not OvaleCondition.COMPARATOR[comparator] then
-		Ovale:Errorf("unknown comparator %s", comparator)
+		OvaleCondition:Error("unknown comparator %s", comparator)
 	elseif not limit then
-		Ovale:Errorf("comparator %s missing limit", comparator)
+		OvaleCondition:Error("comparator %s missing limit", comparator)
 	elseif rate == 0 then
 		if (comparator == "less" and value < limit)
 				or (comparator == "atMost" and value <= limit)

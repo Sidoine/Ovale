@@ -435,7 +435,7 @@ Unparse = function(node)
 		visitor = UNPARSE_VISITOR[node.type]
 	end
 	if not visitor then
-		Ovale:FormatPrint("Unable to unparse node of type '%s'.", node.type)
+		OvaleAST:Error("Unable to unparse node of type '%s'.", node.type)
 	else
 		return visitor(node)
 	end
@@ -737,7 +737,7 @@ end
 
 -- Prints the error message and the next 20 tokens from tokenStream.
 local function SyntaxError(tokenStream, ...)
-	Ovale:FormatPrint(...)
+	OvaleAST:Print(...)
 	local context = { "Next tokens:" }
 	for i = 1, 20 do
 		local tokenType, token = tokenStream:Peek(i)
@@ -748,7 +748,7 @@ local function SyntaxError(tokenStream, ...)
 			break
 		end
 	end
-	Ovale:Print(tconcat(context, " "))
+	OvaleAST:Print(tconcat(context, " "))
 end
 
 -- Left-rotate tree to preserve precedence.
@@ -799,7 +799,7 @@ local ParseWait = nil
 Parse = function(nodeType, tokenStream, nodeList, annotation)
 	local visitor = PARSE_VISITOR[nodeType]
 	if not visitor then
-		Ovale:FormatPrint("Unable to parse node of type '%s'.", nodeType)
+		OvaleAST:Error("Unable to parse node of type '%s'.", nodeType)
 	else
 		return visitor(tokenStream, nodeList, annotation)
 	end
@@ -1445,7 +1445,7 @@ ParseInclude = function(tokenStream, nodeList, annotation)
 	-- Get the code associated with the script name.
 	local code = OvaleScripts.script[name] and OvaleScripts.script[name].code
 	if not code then
-		Ovale:FormatPrint("Script '%s' not found when parsing INCLUDE.", name)
+		OvaleAST:Error("Script '%s' not found when parsing INCLUDE.", name)
 		ok = false
 	end
 	-- Create the AST node.
@@ -2328,12 +2328,12 @@ function OvaleAST:OnInitialize()
 	OvaleSpellBook = Ovale.OvaleSpellBook
 end
 
-function OvaleAST:Debug()
-	self_pool:Debug()
-	self_parametersPool:Debug()
-	self_controlPool:Debug()
-	self_childrenPool:Debug()
-	self_outputPool:Debug()
+function OvaleAST:DebugAST()
+	self_pool:DebuggingInfo()
+	self_parametersPool:DebuggingInfo()
+	self_controlPool:DebuggingInfo()
+	self_childrenPool:DebuggingInfo()
+	self_outputPool:DebuggingInfo()
 end
 
 -- Get a new node from the pool and save it in the nodes array.
@@ -2651,7 +2651,7 @@ function OvaleAST:VerifyFunctionCalls(ast)
 				elseif customFunction and customFunction[name] then
 					-- Function call is a script-defined function (via AddFunction).
 				else
-					Ovale:Errorf("unknown function '%s'.", name)
+					self:Error("unknown function '%s'.", name)
 				end
 			end
 		end

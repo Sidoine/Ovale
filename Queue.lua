@@ -109,8 +109,8 @@ function OvaleQueue:Size()
 	return self.last - self.first + 1
 end
 
-function OvaleQueue:Debug()
-	Ovale:FormatPrint("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
+function OvaleQueue:DebuggingInfo()
+	Ovale:Print("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
 end
 --</public-static-methods>
 

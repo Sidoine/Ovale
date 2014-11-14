@@ -96,7 +96,7 @@ function Profiler:Enable(group, isVerbose)
 		local profiler = self_profiler[group]
 		if profiler then
 			if isVerbose then
-				Ovale:FormatPrint("Profiling for %s is enabled.", group)
+				Ovale:Print("Profiling for %s is enabled.", group)
 			end
 			if profiler.Enable then
 				profiler.Enable()
@@ -107,7 +107,7 @@ function Profiler:Enable(group, isVerbose)
 	else
 		for group, profiler in pairs(self_profiler) do
 			if isVerbose then
-				Ovale:FormatPrint("Profiling for %s is enabled.", group)
+				Ovale:Print("Profiling for %s is enabled.", group)
 			end
 			if profiler.Enable then
 				profiler.Enable()
@@ -123,7 +123,7 @@ function Profiler:Disable(group, isVerbose)
 		local profiler = self_profiler[group]
 		if profiler then
 			if isVerbose then
-				Ovale:FormatPrint("Profiling for %s is disabled.", group)
+				Ovale:Print("Profiling for %s is disabled.", group)
 			end
 			if profiler.Disable then
 				profiler.Disable()
@@ -134,7 +134,7 @@ function Profiler:Disable(group, isVerbose)
 	else
 		for group, profiler in pairs(self_profiler) do
 			if isVerbose then
-				Ovale:FormatPrint("Profiling for %s is disabled.", group)
+				Ovale:Print("Profiling for %s is disabled.", group)
 			end
 			if profiler.Disable then
 				profiler.Disable()
@@ -200,12 +200,12 @@ function Profiler:Wrap(group, tag, functionPtr)
 	return wrapper
 end
 
-function Profiler:Debug()
-	Ovale:FormatPrint("Profiler stack size = %d", self_stackSize)
+function Profiler:DebuggingInfo()
+	Ovale:Print("Profiler stack size = %d", self_stackSize)
 	local index = self_stackSize
 	while index > 0 and self_stackSize - index < 10 do
 		local tag = self_stack[index]
-		Ovale:FormatPrint("    [%d] %s", index, tag)
+		Ovale:Print("    [%d] %s", index, tag)
 		index = index - 1
 	end
 end
