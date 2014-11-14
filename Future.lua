@@ -649,8 +649,8 @@ function OvaleFuture:LastInFlightSpell()
 	return self.lastSpellcast
 end
 
-function OvaleFuture:UpdateSnapshotFromSpellcast(dest, spellcast)
-	profiler.Start("OvaleFuture_UpdateSnapshotFromSpellcast")
+function OvaleFuture:UpdateFromSpellcast(dest, spellcast)
+	profiler.Start("OvaleFuture_UpdateFromSpellcast")
 	if dest.snapshot then
 		OvalePaperDoll:ReleaseSnapshot(dest.snapshot)
 	end
@@ -666,7 +666,7 @@ function OvaleFuture:UpdateSnapshotFromSpellcast(dest, spellcast)
 			tbl.UpdateFromSpellcast(dest, spellcast)
 		end
 	end
-	profiler.Stop("OvaleFuture_UpdateSnapshotFromSpellcast")
+	profiler.Stop("OvaleFuture_UpdateFromSpellcast")
 end
 
 function OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
