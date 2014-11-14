@@ -44,8 +44,8 @@ AddFunction AfflictionDefaultActions
 	Spell(mannoroths_fury)
 	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
 	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
-	#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
-	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felhunter)
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
 	#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
 	if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 	#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
@@ -121,7 +121,6 @@ AddIcon specialization=affliction help=aoe
 # dark_intent
 # dark_soul_misery
 # dark_soul_misery_buff
-# demonbolt_talent
 # demonic_servitude_talent
 # draenic_intellect_potion
 # drain_soul

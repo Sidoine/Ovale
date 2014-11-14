@@ -2788,34 +2788,43 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 	if token == "trinket" then
 		local procType = tokenIterator()
 		local statName = tokenIterator()
-		local property = tokenIterator()
-		local buffName = format("trinket_%s_%s_buff", procType, statName)
-		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
 
 		local code
-		if property == "cooldown_remains" then
-			code = format("BuffCooldown(%s)", buffName)
-		elseif property == "down" then
-			code = format("BuffExpires(%s)", buffName)
-		elseif property == "react" then
-			if parseNode.asType == "boolean" then
+		if strsub(procType, 1, 4) == "has_" then
+			-- Assume these conditions are always true.
+			-- TODO: Teach OvaleEquipment to check these conditions.
+			code = format("True(trinket_%s_%s)", procType, statName)
+		else
+			local property = tokenIterator()
+			local buffName = format("trinket_%s_%s_buff", procType, statName)
+			buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
+
+			if property == "cooldown_remains" then
+				code = format("BuffCooldown(%s)", buffName)
+			elseif property == "down" then
+				code = format("BuffExpires(%s)", buffName)
+			elseif property == "react" then
+				if parseNode.asType == "boolean" then
+					code = format("BuffPresent(%s)", buffName)
+				else
+					code = format("BuffStacks(%s)", buffName)
+				end
+			elseif property == "remains" then
+				code = format("BuffRemaining(%s)", buffName)
+			elseif property == "stack" then
+				code = format("BuffStacks(%s)", buffName)
+			elseif property == "up" then
 				code = format("BuffPresent(%s)", buffName)
 			else
-				code = format("BuffStacks(%s)", buffName)
+				ok = false
 			end
-		elseif property == "remains" then
-			code = format("BuffRemaining(%s)", buffName)
-		elseif property == "stack" then
-			code = format("BuffStacks(%s)", buffName)
-		elseif property == "up" then
-			code = format("BuffPresent(%s)", buffName)
-		else
-			ok = false
+			if ok then
+				AddSymbol(annotation, buffName)
+			end
 		end
 		if ok and code then
 			annotation.astAnnotation = annotation.astAnnotation or {}
 			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-			AddSymbol(annotation, buffName)
 		end
 	else
 		ok = false

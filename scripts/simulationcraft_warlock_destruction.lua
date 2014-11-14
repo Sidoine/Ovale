@@ -35,8 +35,8 @@ AddFunction DestructionDefaultActions
 	Spell(mannoroths_fury)
 	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
 	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_instability)
-	#service_pet,if=talent.grimoire_of_service.enabled&!talent.demonbolt.enabled
-	if Talent(grimoire_of_service_talent) and not Talent(demonbolt_talent) Spell(grimoire_felhunter)
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
 	#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
 	if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 	#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
@@ -140,8 +140,6 @@ AddFunction DestructionSingleTargetActions
 	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
 	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.mastery.react&trinket.proc.mastery.remains>cast_time
 	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
-	#rain_of_fire,if=!ticking
-	if not target.DebuffPresent(rain_of_fire_debuff) Spell(rain_of_fire)
 	#immolate,cycle_targets=1,if=remains<=(duration*0.3)
 	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#conflagrate
@@ -180,7 +178,6 @@ AddIcon specialization=destruction help=aoe
 # dark_intent
 # dark_soul_instability
 # dark_soul_instability_buff
-# demonbolt_talent
 # demonic_servitude_talent
 # draenic_intellect_potion
 # ember_master_buff
