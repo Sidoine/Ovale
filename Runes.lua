@@ -425,7 +425,7 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 		local maxi = OvalePower.maxPower.runicpower
 		state.runicpower = (runicpower < maxi) and runicpower or maxi
 	else
-		state:Logf("No %s rune available at %f to consume for spell %d!", RUNE_NAME[runeType], atTime, spellId)
+		state:Log("No %s rune available at %f to consume for spell %d!", RUNE_NAME[runeType], atTime, spellId)
 	end
 	profiler.Stop("OvaleRunes_state_ConsumeRune")
 end
@@ -646,7 +646,7 @@ do
 		-- This shouldn't happen because it means the rune requirements will never be met.
 		for _, runeType in pairs(RUNE_TYPE) do
 			if count[runeType] > 0 then
-				state:Logf("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
+				state:Log("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
 				profiler.Stop("OvaleRunes_state_GetRunesCooldown")
 				return INFINITY
 			end

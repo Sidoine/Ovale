@@ -100,7 +100,7 @@ OvaleDebug.options = {
 					func = function()
 						self_traceLog:Clear()
 						OvaleDebug.trace = true
-						OvaleDebug:Logf("=== Trace @%f", API_GetTime())
+						OvaleDebug:Log("=== Trace @%f", API_GetTime())
 						OvaleDebug:ScheduleTimer("DisplayTraceLog", 0.5)
 					end,
 				},
@@ -302,18 +302,6 @@ function OvaleDebug:Debug(addTimestamp, ...)
 end
 
 function OvaleDebug:Log(...)
-	if self.trace then
-		local N = self_traceLog:Lines()
-		if N < OVALE_TRACELOG_MAXLINES - 1 then
-			local output = { ... }
-			self_traceLog:AddLine(tconcat(output, "\t"))
-		elseif N == OVALE_TRACELOG_MAXLINES - 1 then
-			self_traceLog:AddLine("WARNING: Maximum length of trace log has been reached.")
-		end
-	end
-end
-
-function OvaleDebug:Logf(...)
 	if self.trace then
 		local N = self_traceLog:Lines()
 		if N < OVALE_TRACELOG_MAXLINES - 1 then

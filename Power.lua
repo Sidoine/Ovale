@@ -432,7 +432,7 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 						buffAmount = buffAmount * aura.stacks
 					end
 					cost = cost + buffAmount
-					self:Logf("Spell ID '%d' had %f %s added from aura ID '%d'.", spellId, buffAmount, powerType, aura.spellId)
+					self:Log("Spell ID '%d' had %f %s added from aura ID '%d'.", spellId, buffAmount, powerType, aura.spellId)
 				end
 			end
 		end
@@ -498,7 +498,7 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 			-- Apply any percent reductions to the extra resource cost.
 			if extraPower > 0 then
 				extraPower = extraPower * multiplier
-				self:Logf("Spell ID '%d' will use %d extra %s.", spellId, extraPower, powerType)
+				self:Log("Spell ID '%d' will use %d extra %s.", spellId, extraPower, powerType)
 			end
 			cost = cost + extraPower
 		end
@@ -534,7 +534,7 @@ function OvalePower:RequirePowerHandler(spellId, requirement, tokenIterator, tar
 		end
 		if cost > 0 then
 			local result = verified and "passed" or "FAILED"
-			self:Logf("    Require %f %s: %s", cost, powerType, result)
+			self:Log("    Require %f %s: %s", cost, powerType, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)

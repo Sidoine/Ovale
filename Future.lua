@@ -628,7 +628,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 	local index = 1
 	while index <= #self_activeSpellcast do
 		local spellcast = self_activeSpellcast[index]
-		state:Logf("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
+		state:Log("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 		if now - spellcast.stop < 5 then
 			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast)
 		else
@@ -757,7 +757,7 @@ function OvaleFuture:ResetState(state)
 	profiler.Start("OvaleFuture_ResetState")
 	local now = API_GetTime()
 	state.currentTime = now
-	state:Logf("Reset state with current time = %f", state.currentTime)
+	state:Log("Reset state with current time = %f", state.currentTime)
 
 	state.inCombat = self.inCombat
 	state.combatStartTime = self.combatStartTime or 0
@@ -875,7 +875,7 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 			state.currentTime = now
 		end
 
-		state:Logf("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
+		state:Log("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
 
 		-- Update the combat state so this condition can be checked in other state prototype methods.
 		-- This condition isn't quite right because casting a harmful spell at a target doesn't always put us into combat.

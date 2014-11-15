@@ -372,7 +372,7 @@ function OvaleComboPoints:RequireComboPointsHandler(spellId, requirement, tokenI
 		end
 		if cost > 0 then
 			local result = verified and "passed" or "FAILED"
-			self:Logf("    Require %d combo point(s): %s", cost, result)
+			self:Log("    Require %d combo point(s): %s", cost, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)
@@ -432,7 +432,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 			power = 0
 			-- Ruthlessness grants a 20% chance to grant a combo point for each combo point spent on a finishing move.
 			if self_hasRuthlessness and self.combo == MAX_COMBO_POINTS then
-				state:Logf("Spell %d grants one extra combo point from Ruthlessness.", spellId)
+				state:Log("Spell %d grants one extra combo point from Ruthlessness.", spellId)
 				power = power + 1
 			end
 			-- Anticipation causes offensive finishing moves to consume all Anticipation charges and to grant a combo point for each.

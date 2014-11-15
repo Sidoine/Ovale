@@ -153,7 +153,6 @@ $sp{OvaleQueue}{RemoveFront} = true;
 $sm{"modulePrototype"}{Error} = true;
 $sm{"modulePrototype"}{Debug} = true;
 $sm{"modulePrototype"}{Log} = true;
-$sm{"modulePrototype"}{Logf} = true;
 $sm{"modulePrototype"}{Print} = true;
 
 $classname{Localization} = "Localization";

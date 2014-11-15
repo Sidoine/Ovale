@@ -50,7 +50,7 @@ local self_oneTimeMessage = {}
 --[[
 	Ovale module prototype.
 
-	The module prototype has dummy Log and Logf methods to mimic the API of the state machine.
+	The module prototype has a dummy Log method to mimic the API of the state machine.
 	This makes it easier to write module methods that are mirrored to the state machine.
 --]]
 do
@@ -61,7 +61,6 @@ do
 	local modulePrototype = {
 		Error = Ovale.Error,
 		Log = DoNothing,
-		Logf = DoNothing,
 		Print = Ovale.Print,
 	}
 

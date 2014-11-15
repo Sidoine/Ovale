@@ -124,7 +124,7 @@ function OvaleState:ResetState(state)
 	-- For now, reset/remove all state variables if out of combat.
 	if not state.inCombat then
 		for k in pairs(state.variable) do
-			state:Logf("Resetting state variable '%s'.", k)
+			state:Log("Resetting state variable '%s'.", k)
 			state.variable[k] = nil
 		end
 	end
@@ -161,21 +161,17 @@ end
 -- Put a value into the named state variable.
 statePrototype.PutState = function(state, name, value, isFuture)
 	if isFuture then
-		state:Logf("Setting future state: %s = %s.", name, value)
+		state:Log("Setting future state: %s = %s.", name, value)
 		state.futureVariable[name] = value
 	else
 		OvaleState:Debug("Advancing combat state: %s = %s.", name, value)
-		state:Logf("Advancing combat state: %s = %s.", name, value)
+		state:Log("Advancing combat state: %s = %s.", name, value)
 		state.variable[name] = value
 	end
 end
 
--- Logging functions.
+-- Logging function.
 statePrototype.Log = function(state, ...)
 	return OvaleDebug:Log(...)
-end
-
-statePrototype.Logf = function(state, ...)
-	return OvaleDebug:Logf(...)
 end
 --</state-methods>

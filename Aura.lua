@@ -780,9 +780,9 @@ function OvaleAura:RequireBuffHandler(spellId, requirement, tokenIterator, targe
 		end
 		local result = verified and "passed" or "FAILED"
 		if isBang then
-			self:Logf("    Require aura %s NOT on %s: %s", buffName, unitId, result)
+			self:Log("    Require aura %s NOT on %s: %s", buffName, unitId, result)
 		else
-			self:Logf("    Require aura %s on %s: %s", buffName, unitId, result)
+			self:Log("    Require aura %s on %s: %s", buffName, unitId, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
@@ -804,9 +804,9 @@ function OvaleAura:RequireStealthHandler(spellId, requirement, tokenIterator, ta
 		end
 		local result = verified and "passed" or "FAILED"
 		if stealthed == 1 then
-			self:Logf("    Require stealth: %s", result)
+			self:Log("    Require stealth: %s", result)
 		else
-			self:Logf("    Require NOT stealth: %s", result)
+			self:Log("    Require NOT stealth: %s", result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
@@ -832,9 +832,9 @@ function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, token
 		end
 		local result = verified and "passed" or "FAILED"
 		if isBang then
-			self:Logf("    Require target health > %f%%: %s", threshold, result)
+			self:Log("    Require target health > %f%%: %s", threshold, result)
 		else
-			self:Logf("    Require target health <= %f%%: %s", threshold, result)
+			self:Log("    Require target health <= %f%%: %s", threshold, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
@@ -887,7 +887,7 @@ function OvaleAura:ResetState(state)
 			for casterGUID, aura in pairs(whoseTable) do
 				self_pool:Release(aura)
 				whoseTable[casterGUID] = nil
-				state:Logf("    Aura %d on %s removed, now=%f.", auraId, guid, state.currentTime)
+				state:Log("    Aura %d on %s removed, now=%f.", auraId, guid, state.currentTime)
 			end
 			if not next(whoseTable) then
 				self_pool:Release(whoseTable)
@@ -1191,16 +1191,16 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						end
 						-- Reset the aura age relative to the state of the simulator.
 						aura.serial = state.serial
-						state:Logf("Aura %d is copied into simulator.", auraId)
+						state:Log("Aura %d is copied into simulator.", auraId)
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
 					end
 					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
 					if refresh or extend > 0 or stacks > 0 then
 						-- Adjust stack count.
 						if refresh then
-							state:Logf("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
+							state:Log("Aura %d is refreshed to %d stack(s).", auraId, aura.stacks)
 						elseif extend > 0 then
-							state:Logf("Aura %d is extended by %f seconds, preserving %d stack(s).", auraId, extend, aura.stacks)
+							state:Log("Aura %d is extended by %f seconds, preserving %d stack(s).", auraId, extend, aura.stacks)
 						else -- if stacks > 0 then
 							local maxStacks = 1
 							if si and (si.max_stacks or si.maxstacks) then
@@ -1210,7 +1210,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 							if aura.stacks > maxStacks then
 								aura.stacks = maxStacks
 							end
-							state:Logf("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
+							state:Log("Aura %d gains %d stack(s) to %d because of spell %d.", auraId, stacks, aura.stacks, spellId)
 						end
 						-- Set start, ending, and duration for the aura.
 						if extend > 0 then
@@ -1235,7 +1235,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 							aura.ending = aura.start + aura.duration
 						end
 						aura.gain = atTime
-						state:Logf("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
+						state:Log("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
 					elseif stacks == 0 or stacks < 0 then
 						if stacks == 0 then
 							aura.stacks = 0
@@ -1244,11 +1244,11 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 							if aura.stacks < 0 then
 								aura.stacks = 0
 							end
-							state:Logf("Aura %d loses %d stack(s) to %d because of spell %d.", auraId, -1 * stacks, aura.stacks, spellId)
+							state:Log("Aura %d loses %d stack(s) to %d because of spell %d.", auraId, -1 * stacks, aura.stacks, spellId)
 						end
 						-- An existing aura is losing stacks, so inherit start, duration, ending and gain information.
 						if aura.stacks == 0 then
-							state:Logf("Aura %d is completely removed.", auraId)
+							state:Log("Aura %d is completely removed.", auraId)
 							-- The aura is completely removed, so set ending to the time that the aura is removed.
 							aura.ending = atTime
 							aura.consumed = true
@@ -1258,7 +1258,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					-- Aura is not on the target.
 					if not refresh and stacks > 0 then
 						-- Spellcast causes a new aura.
-						state:Logf("New aura %d at %f on %s", auraId, atTime, guid)
+						state:Log("New aura %d at %f on %s", auraId, atTime, guid)
 						-- Add an aura in the simulator and copy the existing aura information over.
 						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, INFINITY)
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
@@ -1280,7 +1280,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					end
 				end
 			else
-				state:Logf("Aura %d is not applied due to failing run-time requirements.", auraId)
+				state:Log("Aura %d is not applied due to failing run-time requirements.", auraId)
 			end
 		end
 	end
@@ -1293,21 +1293,21 @@ statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
 		for id in pairs(OvaleData.buffSpellList[auraId]) do
 			local aura = GetStateAuraOnGUID(state, guid, id, filter, mine)
 			if aura and (not auraFound or auraFound.ending < aura.ending) then
-				state:Logf("Aura %s matching '%s' found on %s with (%f, %f)", id, auraId, guid, aura.start, aura.ending)
+				state:Log("Aura %s matching '%s' found on %s with (%f, %f)", id, auraId, guid, aura.start, aura.ending)
 				auraFound = aura
 			else
-				state:Logf("Aura %s matching '%s' is missing on %s.", id, auraId, guid)
+				state:Log("Aura %s matching '%s' is missing on %s.", id, auraId, guid)
 			end
 		end
 		if not auraFound then
-			state:Logf("Aura matching '%s' is missing on %s.", auraId, guid)
+			state:Log("Aura matching '%s' is missing on %s.", auraId, guid)
 		end
 	else
 		auraFound = GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 		if auraFound then
-			state:Logf("Aura %s found on %s with (%f, %f)", auraId, guid, auraFound.start, auraFound.ending)
+			state:Log("Aura %s found on %s with (%f, %f)", auraId, guid, auraFound.start, auraFound.ending)
 		else
-			state:Logf("Aura %s is missing on %s.", auraId, guid)
+			state:Log("Aura %s is missing on %s.", auraId, guid)
 		end
 	end
 	return auraFound
@@ -1402,9 +1402,9 @@ statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filte
 	end
 
 	if count > 0 then
-		state:Logf("Aura with '%s' property found on %s (count=%s, minStart=%s, maxEnding=%s).", propertyName, unitId, count, start, ending)
+		state:Log("Aura with '%s' property found on %s (count=%s, minStart=%s, maxEnding=%s).", propertyName, unitId, count, start, ending)
 	else
-		state:Logf("Aura with '%s' property is missing on %s.", propertyName, unitId)
+		state:Log("Aura with '%s' property is missing on %s.", propertyName, unitId)
 		start, ending = nil
 	end
 	return start, ending
@@ -1421,7 +1421,7 @@ do
 	local startFirst, endingLast
 
 	local function CountMatchingActiveAura(state, aura)
-		state:Logf("Counting aura %s found on %s with (%f, %f)", aura.spellId, aura.guid, aura.start, aura.ending)
+		state:Log("Counting aura %s found on %s with (%f, %f)", aura.spellId, aura.guid, aura.start, aura.ending)
 		count = count + 1
 		stacks = stacks + aura.stacks
 		if aura.ending < endingChangeCount then
@@ -1488,7 +1488,7 @@ do
 			end
 		end
 
-		state:Logf("AuraCount(%d) is %s, %s, %s, %s, %s, %s", auraId, count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast)
+		state:Log("AuraCount(%d) is %s, %s, %s, %s, %s, %s", auraId, count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast)
 		profiler.Stop("OvaleAura_state_AuraCount")
 		return count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast
 	end

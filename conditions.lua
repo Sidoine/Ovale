@@ -116,7 +116,7 @@ local function GetHastedTime(seconds, haste, state)
 	elseif haste == "melee" then
 		return seconds / state:GetMeleeHasteMultiplier()
 	else
-		state:Logf("Unknown haste parameter haste=%s", haste)
+		state:Log("Unknown haste parameter haste=%s", haste)
 		return seconds
 	end
 end
@@ -2117,7 +2117,7 @@ do
 					end
 					if prevHealth and prevHealth > health then
 						lastTTDdps[unitId] = (prevHealth - health) / delta
-						state:Logf("prevHealth = %d, health = %d, delta = %d, dps = %d", prevHealth, health, delta, lastTTDdps[unitId])
+						state:Log("prevHealth = %d, health = %d, delta = %d, dps = %d", prevHealth, health, delta, lastTTDdps[unitId])
 						break
 					end
 				end
