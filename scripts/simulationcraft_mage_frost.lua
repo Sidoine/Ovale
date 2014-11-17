@@ -181,7 +181,7 @@ AddFunction FrostSingleTargetActions
 	#ice_lance,if=talent.thermal_void.enabled&talent.mirror_image.enabled&buff.icy_veins.up&buff.icy_veins.remains<6&buff.icy_veins.remains<cooldown.icy_veins.remains
 	if Talent(thermal_void_talent) and Talent(mirror_image_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 6 and BuffRemaining(icy_veins_buff) < SpellCooldown(icy_veins) Spell(ice_lance)
 	#water_jet,if=buff.fingers_of_frost.react=0&!dot.frozen_orb.ticking
-	if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 Spell(water_jet)
+	if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and pet.Present() Spell(pet_water_jet)
 	#frostbolt
 	Spell(frostbolt)
 	#ice_lance,moving=1
@@ -232,6 +232,7 @@ AddIcon specialization=frost help=aoe
 # icy_veins_buff
 # mirror_image
 # mirror_image_talent
+# pet_water_jet
 # prismatic_crystal
 # prismatic_crystal_talent
 # quaking_palm
@@ -239,7 +240,6 @@ AddIcon specialization=frost help=aoe
 # thermal_void_talent
 # time_warp
 # water_elemental
-# water_jet
 ]]
 	OvaleScripts:RegisterScript("MAGE", name, desc, code, "reference")
 end

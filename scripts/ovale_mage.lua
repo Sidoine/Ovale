@@ -1049,6 +1049,10 @@ AddFunction FrostSingleTargetActions
 
 AddFunction FrostSingleTargetShortCdActions
 {
+	# CHANGE: Always suggest summoning the Water Elemental if it's gone, even during combat.
+	if not pet.Present() Spell(water_elemental)
+	# CHANGE: Suggest pet's Freeze on non-worldboss targets to generate Fingers of Frost.
+	if not target.Classification(worldboss) and not BuffPresent(fingers_of_frost_buff) and pet.Present() Spell(pet_freeze)
 	unless BuffPresent(fingers_of_frost_buff) and BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) and Spell(ice_lance)
 		or BuffPresent(brain_freeze_buff) and BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) and Spell(frostfire_bolt)
 		or not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < 10 and Spell(frost_bomb)
@@ -1072,7 +1076,7 @@ AddFunction FrostSingleTargetShortCdActions
 				or Talent(thermal_void_talent) and Talent(mirror_image_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 6 and BuffRemaining(icy_veins_buff) < SpellCooldown(icy_veins) and Spell(ice_lance)
 			{
 				#water_jet,if=buff.fingers_of_frost.react=0&!dot.frozen_orb.ticking
-				if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 Spell(water_jet)
+				if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and pet.Present() Spell(pet_water_jet)
 			}
 		}
 	}

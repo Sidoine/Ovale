@@ -1008,6 +1008,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
 	AddDisambiguation("arcane_charge_buff",		"arcane_charge_debuff",			"MAGE",			"arcane")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"MAGE")
+	AddDisambiguation("water_jet",				"pet_water_jet",				"MAGE",			"frost")
 	-- Monk
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_chi",			"MONK")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"MONK")
@@ -1211,6 +1212,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "MAGE" and strfind(action, "pet_") then
+			conditionCode = "pet.Present()"
 		elseif class == "MAGE" and action == "start_pyro_chain" then
 			bodyCode = "SetState(pyro_chain 1)"
 			isSpellAction = false
