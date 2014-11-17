@@ -375,7 +375,8 @@ end
 -- Print the error message and flag the next frame to be traced by OvaleDebug.
 -- NOTE: This method is mirrored to the module prototype for new modules.
 function Ovale:Error(...)
-	self:Print("Fatal error:", ...)
+	local s = Ovale:MakeString(...)
+	self:Print("Fatal error: %s", s)
 	Ovale.OvaleDebug.bug = true
 end
 
