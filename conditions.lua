@@ -582,6 +582,39 @@ do
 end
 
 do
+	--- Get the player's persistent multiplier for the given aura at the time the aura was applied on the target.
+	-- The persistent multiplier is snapshotted to the aura for its duration at the time the aura is applied.
+	-- @name BuffPersistentMultiplier
+	-- @paramsig number or boolean
+	-- @param id The aura spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The persistent multiplier.
+	-- @return A boolean value for the result of the comparison.
+	-- @see DebuffPersistentMultiplier
+	-- @usage
+	-- if target.DebuffPersistentMultiplier(rake) < 1 Spell(rake)
+
+	local function BuffPersistentMultiplier(condition, state)
+		local auraId, comparator, limit = condition[1], condition[2], condition[3]
+		local target, filter, mine = ParseCondition(condition, state)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if state:IsActiveAura(aura) then
+			local gain, start, ending = aura.gain, aura.start, aura.ending
+			local value = aura.damageMultiplier or 1
+			return TestValue(gain, ending, value, start, 0, comparator, limit)
+		end
+		return Compare(1, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("buffpersistentmultiplier", false, BuffPersistentMultiplier)
+	OvaleCondition:RegisterCondition("debuffpersistentmultiplier", false, BuffPersistentMultiplier)
+end
+
+do
 	--- Get the remaining time in seconds on an aura.
 	-- @name BuffRemaining
 	-- @paramsig number or boolean
@@ -3139,6 +3172,29 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("ptr", false, PTR)
+end
+
+do
+	--- Get the persistent multiplier to the given aura if applied.
+	-- The persistent multiplier is snapshotted to the aura for its duration.
+	-- @name PersistentMultiplier
+	-- @paramsig number or boolean
+	-- @param id The aura ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The persistent multiplier.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff)
+	--     Spell(rake)
+
+	local function PersistentMultiplier(condition, state)
+		local spellId, comparator, limit = condition[1], condition[2], condition[3]
+		local value = state:GetDamageMultiplier(spellId)
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("persistentmultiplier", false, PersistentMultiplier)
 end
 
 do

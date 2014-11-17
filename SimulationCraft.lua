@@ -1983,7 +1983,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		-- "miss_react" has no meaning in Ovale.
 		code = "True(miss_react)"
 	elseif property == "persistent_multiplier" then
-		code = format("DamageMultiplier(%s)", name)
+		code = format("PersistentMultiplier(%s)", buffName)
 	elseif property == "recharge_time" then
 		code = format("SpellChargeCooldown(%s)", name)
 	elseif property == "remains" then
@@ -2349,7 +2349,7 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 		if property == "duration" then
 			code = format("%s%sDuration(%s)", target, prefix, dotName)
 		elseif property == "pmultiplier" then
-			code = format("%s%sDamageMultiplier(%s)", target, prefix, dotName)
+			code = format("%s%sPersistentMultiplier(%s)", target, prefix, dotName)
 		elseif property == "remains" then
 			code = format("%s%sRemaining(%s)", target, prefix, dotName)
 		elseif property == "stack" then
