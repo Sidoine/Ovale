@@ -268,7 +268,7 @@ AddFunction FeralPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild)
 		or Spell(cat_form)
-		or BuffExpires(stealthed_buff any=1) Spell(prowl)
+		or BuffExpires(stealthed_buff any=1) and Spell(prowl)
 	{
 		#potion,name=draenic_agility
 		UsePotionAgility()
