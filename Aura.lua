@@ -587,12 +587,15 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				local spellName = OvaleSpellBook:GetSpellName(spellId) or "Unknown spell"
 				-- Parse the spell data for this aura to see if this is a "refresh_keep_snapshot" aura.
 				local keepSnapshot = false
-				local spellData = OvaleData.spellInfo[spellId].aura.target[filter] and OvaleData.spellInfo[spellId].aura.target[filter][auraId]
-				if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
-					local tokenIterator = gmatch(spellData, "[^,]+")
-					local value = tokenIterator()
-					if value == "refresh_keep_snapshot" then
-						keepSnapshot = OvaleData:CheckRequirements(spellId, tokenIterator, unitId)
+				local si = OvaleData.spellInfo[spellId]
+				if si and si.aura and si.aura.target and si.aura.target[filter] then
+					local spellData = si.aura.target[filter][auraId]
+					if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
+						local tokenIterator = gmatch(spellData, "[^,]+")
+						local value = tokenIterator()
+						if value == "refresh_keep_snapshot" then
+							keepSnapshot = OvaleData:CheckRequirements(spellId, tokenIterator, unitId)
+						end
 					end
 				end
 				if keepSnapshot then
