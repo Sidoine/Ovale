@@ -41,8 +41,8 @@ local gmatch = string.gmatch
 local ipairs = ipairs
 local next = next
 local pairs = pairs
-local substr = string.sub
 local strmatch = string.match
+local strsub = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
@@ -569,6 +569,9 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		aura.stealable = isStealable
 		aura.value1, aura.value2, aura.value3 = value1, value2, value3
 
+		-- Map the GUID to a unit ID.
+		local unitId = OvaleGUID:GetUnitId(guid)
+
 		-- Snapshot stats for auras applied by the player.
 		if mine then
 			-- Determine whether to snapshot player stats for the aura or to keep the existing stats.
@@ -580,11 +583,27 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				end
 			end
 			if spellcast and spellcast.target == guid then
-				local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
-				self:Debug("    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
-					filter, name, auraId, guid, spellName, spellcast.spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
-				-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
-				OvaleFuture:UpdateFromSpellcast(aura, spellcast)
+				local spellId = spellcast.spellId
+				local spellName = OvaleSpellBook:GetSpellName(spellId) or "Unknown spell"
+				-- Parse the spell data for this aura to see if this is a "refresh_keep_snapshot" aura.
+				local keepSnapshot = false
+				local spellData = OvaleData.spellInfo[spellId].aura.target[filter] and OvaleData.spellInfo[spellId].aura.target[filter][auraId]
+				if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
+					local tokenIterator = gmatch(spellData, "[^,]+")
+					local value = tokenIterator()
+					if value == "refresh_keep_snapshot" then
+						keepSnapshot = OvaleData:CheckRequirements(spellId, tokenIterator, unitId)
+					end
+				end
+				if keepSnapshot then
+					self:Debug("    Keeping snapshot stats for %s %s (%d) on %s refreshed by %s (%d) from %f, now=%f, aura.serial=%d",
+						filter, name, auraId, guid, spellName, spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
+				else
+					self:Debug("    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
+						filter, name, auraId, guid, spellName, spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
+					-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
+					OvaleFuture:UpdateFromSpellcast(aura, spellcast)
+				end
 			end
 
 			local si = OvaleData.spellInfo[auraId]
@@ -617,7 +636,6 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		elseif not auraIsUnchanged then
 			self:SendMessage("Ovale_AuraChanged", atTime, guid, auraId, aura.source)
 		end
-		local unitId = OvaleGUID:GetUnitId(guid)
 		if unitId then
 			Ovale.refreshNeeded[unitId] = true
 		end
@@ -759,14 +777,14 @@ function OvaleAura:RequireBuffHandler(spellId, requirement, tokenIterator, targe
 	local buffName = tokenIterator()
 	if buffName then
 		local isBang = false
-		if substr(buffName, 1, 1) == "!" then
-			buffName = substr(buffName, 2)
+		if strsub(buffName, 1, 1) == "!" then
+			buffName = strsub(buffName, 2)
 		end
 		local buffName = tonumber(buffName) or buffName
 		local unitId, filter, mine
-		if substr(requirement, 1, 7) == "target_" then
+		if strsub(requirement, 1, 7) == "target_" then
 			unitId = target
-			filter = (substr(requirement, 8) == "buff") and "HELPFUL" or "HARMFUL"
+			filter = (strsub(requirement, 8) == "buff") and "HELPFUL" or "HARMFUL"
 			mine = true
 		else
 			unitId = "player"
@@ -822,8 +840,8 @@ function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, token
 	local threshold = tokenIterator()
 	if threshold then
 		local isBang = false
-		if substr(threshold, 1, 1) == "!" then
-			threshold = substr(threshold, 2)
+		if strsub(threshold, 1, 1) == "!" then
+			threshold = strsub(threshold, 2)
 		end
 		threshold = tonumber(threshold) or 0
 		local healthMax = API_UnitHealthMax(target)
@@ -1132,6 +1150,8 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 				For lists described by SpellAddBuff(), etc., use the following interpretation:
 					auraId=extend,N		aura is extended by N seconds, no change to stacks
 					auraId=refresh		aura is refreshed, no change to stacks
+					auraId=refresh_keep_snapshot
+										aura is refreshed and the snapshot is carried over from the previous aura.
 					auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
 					auraId=N, N > 0		N is number of stacks added
 					auraId=0			aura is removed
@@ -1141,6 +1161,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
 			local stacks = 1
 			local refresh = false
+			local keepSnapshot = false
 			local extend = 0
 
 			-- Parser for spellData as comma-separated values.
@@ -1150,6 +1171,9 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local value = tokenIterator()
 			if value == "refresh" then
 				refresh = true
+			elseif value == "refresh_keep_snapshot" then
+				refresh = true
+				keepSnapshot = true
 			elseif value == "extend" then
 				local seconds = tokenIterator()
 				if seconds then
@@ -1238,6 +1262,11 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						end
 						aura.gain = atTime
 						state:Log("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
+						if keepSnapshot then
+							state:Log("Aura %d keeping previous snapshot.", auraId)
+						elseif spellcast then
+							OvaleFuture:UpdateFromSpellcast(aura, spellcast)
+						end
 					elseif stacks == 0 or stacks < 0 then
 						if stacks == 0 then
 							aura.stacks = 0
