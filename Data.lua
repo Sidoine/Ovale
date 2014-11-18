@@ -404,6 +404,9 @@ do
 	list.str_agi_int				= list.str_agi_int_buff
 	list.stun						= list.stun_debuff
 end
+
+-- Unused public property to suppress lint warnings.
+--OvaleData.defaultTarget = nil
 --</public-static-properties>
 
 --<private-static-methods>
@@ -475,6 +478,7 @@ end
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:CheckRequirements(spellId, tokenIterator, target)
+	target = target or self.defaultTarget or "target"
 	local name = tokenIterator()
 	if name then
 		self:Log("Checking requirements:")
@@ -504,6 +508,7 @@ end
 -- Check "run-time" requirements specified in SpellInfo().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:CheckSpellInfo(spellId, target)
+	target = target or self.defaultTarget or "target"
 	local verified = true
 	local requirement
 	for name, handler in pairs(self_requirement) do
@@ -527,13 +532,13 @@ end
 -- Get SpellInfo property with run-time checks as specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:GetSpellInfoProperty(spellId, property, target)
+	target = target or self.defaultTarget or "target"
 	local si = OvaleData.spellInfo[spellId]
 	local value = si and si[property]
 	local requirements = si and si.require[property]
 	if requirements then
 		for v, requirement in pairs(requirements) do
 			local tokenIterator = gmatch(requirement, "[^,]+")
-			target = target or "target"
 			local verified = self:CheckRequirements(spellId, tokenIterator, target)
 			if verified then
 				value = tonumber(v) or v

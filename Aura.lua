@@ -826,7 +826,9 @@ function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, token
 			threshold = substr(threshold, 2)
 		end
 		threshold = tonumber(threshold) or 0
-		local healthPercent = API_UnitHealth(target) / API_UnitHealthMax(target) * 100
+		local healthMax = API_UnitHealthMax(target)
+		healthMax = healthMax > 0 and healthMax or 1
+		local healthPercent = API_UnitHealth(target) / healthMax * 100
 		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
 			verified = true
 		end
