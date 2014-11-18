@@ -15,14 +15,8 @@ local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = Ovale.L
 
-local format = string.format
-local gmatch = string.gmatch
-local gsub = string.gsub
 local pairs = pairs
-local strfind = string.find
 local type = type
-local API_GetSpellInfo = GetSpellInfo
-local API_GetTime = GetTime
 local API_InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local API_UnitClass = UnitClass
 
