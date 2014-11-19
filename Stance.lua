@@ -228,6 +228,7 @@ function OvaleStance:RequireStanceHandler(spellId, requirement, tokenIterator, t
 	if stance then
 		local isBang = false
 		if substr(stance, 1, 1) == "!" then
+			isBang = true
 			stance = substr(stance, 2)
 		end
 		stance = tonumber(stance) or stance

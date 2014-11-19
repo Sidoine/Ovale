@@ -775,6 +775,7 @@ function OvaleAura:RequireBuffHandler(spellId, requirement, tokenIterator, targe
 	if buffName then
 		local isBang = false
 		if strsub(buffName, 1, 1) == "!" then
+			isBang = true
 			buffName = strsub(buffName, 2)
 		end
 		local buffName = tonumber(buffName) or buffName
@@ -838,6 +839,7 @@ function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, token
 	if threshold then
 		local isBang = false
 		if strsub(threshold, 1, 1) == "!" then
+			isBang = true
 			threshold = strsub(threshold, 2)
 		end
 		threshold = tonumber(threshold) or 0
