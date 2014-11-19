@@ -14,29 +14,18 @@ local L = Ovale.L
 local LibTextDump = LibStub("LibTextDump-1.0")
 local OvaleOptions = Ovale.OvaleOptions
 
--- Forward declarations for module dependencies.
-local Profiler = nil
-
 local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
 local next = next
 local pairs = pairs
-local select = select
 local strlen = string.len
-local tconcat = table.concat
 local tonumber = tonumber
 local tostring = tostring
 local type = type
-local wipe = table.wipe
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
-
--- Flag for whether profiling is enabled.
-local self_isProfilingEnabled = false
--- LibTextDump-1.0 object for profiling output.
-local self_profilingOutput = nil
 
 -- Flags used by debugging print functions.
 -- If "traced" flag is set, then the public "trace" property is toggled before the next frame refresh.
@@ -167,51 +156,6 @@ OvaleDebug.options = {
 				},
 			},
 		},
-		profiling = {
-			name = L["Profiling"],
-			type = "group",
-			order = 30,
-			args = {
-				enable = {
-					name = L["Enable"],
-					desc = L["Enables gathering profiling statistics."],
-					type = "toggle",
-					width = "full",
-					order = 10,
-					get = function(info) return self_isProfilingEnabled end,
-					set = function(info, value)
-						if self_isProfilingEnabled then
-							Profiler:Disable()
-							self_isProfilingEnabled = false
-						else
-							Profiler:Enable()
-							self_isProfilingEnabled = true
-						end
-					end,
-				},
-				reset = {
-					name = L["Reset"],
-					desc = L["Reset the profiling statistics."],
-					type = "execute",
-					order = 20,
-					func = function() Profiler:Reset() end,
-				},
-				show = {
-					name = L["Show"],
-					desc = L["Show the profiling statistics."],
-					type = "execute",
-					order = 30,
-					func = function()
-						self_profilingOutput:Clear()
-						local s = Profiler:Info()
-						if s then
-							self_profilingOutput:AddLine(s)
-							self_profilingOutput:Display()
-						end
-					end,
-				},
-			},
-		},
 	},
 }
 
@@ -221,22 +165,14 @@ OvaleDebug.bug = false
 OvaleDebug.trace = false
 --</public-static-properties>
 
---<private-static-methods>
-
---</private-static-methods>
-
 --<public-static-methods>
 function OvaleDebug:OnInitialize()
-	-- Resolve module dependencies.
-	Profiler = Ovale.Profiler
-
 	local appName = self:GetName()
 	AceConfig:RegisterOptionsTable(appName, self.options)
 	AceConfigDialog:AddToBlizOptions(appName, L["Debug"], OVALE)
 end
 
 function OvaleDebug:OnEnable()
-	self_profilingOutput = LibTextDump:New(OVALE .. " - " .. L["Profiling"], 750, 500)
 	self_traceLog = LibTextDump:New(OVALE .. " - " .. L["Trace Log"], 750, 500)
 end
 

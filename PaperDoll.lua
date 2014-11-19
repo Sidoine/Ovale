@@ -10,18 +10,10 @@ local OvalePaperDoll = Ovale:NewModule("OvalePaperDoll", "AceEvent-3.0")
 Ovale.OvalePaperDoll = OvalePaperDoll
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvalePaperDoll:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePoolRefCount
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleEquipment = nil
@@ -57,15 +49,17 @@ local API_UnitStat = UnitStat
 local CR_CRIT_MELEE = CR_CRIT_MELEE
 local CR_HASTE_MELEE = CR_HASTE_MELEE
 
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvalePaperDoll)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvalePaperDoll)
+
 -- Player's class.
 local _, self_class = API_UnitClass("player")
 -- Snapshot table pool.
 local self_pool = OvalePool("OvalePaperDoll_pool")
 -- Total number of snapshots taken.
 local self_snapshotCount = 0
-
--- Register for debugging messages.
-OvaleDebug:RegisterDebugging(OvalePaperDoll)
 
 local OVALE_SPELLDAMAGE_SCHOOL = {
 	DEATHKNIGHT = 4, -- Nature
@@ -239,7 +233,7 @@ function OvalePaperDoll:OnDisable()
 end
 
 function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.meleeCrit = API_GetCritChance()
 	snapshot.rangedCrit = API_GetRangedCritChance()
@@ -250,11 +244,11 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["meleeCrit"].description, snapshot.meleeCrit)
 	self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["rangedCrit"].description, snapshot.rangedCrit)
 	self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["spellCrit"].description, snapshot.spellCrit)
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:MASTERY_UPDATE(event)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.masteryRating = API_GetMastery()
 	if self.level < 80 then
@@ -264,33 +258,33 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 		self:Debug(true, "%s: %s = %f%%",
 			event, self.SNAPSHOT_STATS["masteryEffect"].description, snapshot.masteryEffect)
 	end
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:MULTISTRIKE_UPDATE(event)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.multistrikeRating = API_GetMultistrike()
 	snapshot.multistrike = API_GetMultistrikeEffect()
 	self:Debug(true, "%s: %s = %f%%",
 		event, self.SNAPSHOT_STATS["multistrike"].description, snapshot.multistrike)
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	self.level = tonumber(level) or API_UnitLevel("player")
 	self:Debug(true, "%s: level = %d", event, self.level)
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.spellBonusHealing = API_GetSpellBonusHealing()
 	self:Debug(true, "%s: %s = %d",
 		event, self.SNAPSHOT_STATS["spellBonusHealing"].description, snapshot.spellBonusHealing)
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:PLAYER_REGEN_DISABLED(event)
@@ -298,73 +292,73 @@ function OvalePaperDoll:PLAYER_REGEN_DISABLED(event)
 end
 
 function OvalePaperDoll:PLAYER_REGEN_ENABLED(event)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	local now = API_GetTime()
 	if OvaleFuture.combatStartTime then
 		self:Debug(true, "%d snapshots in %f seconds.",
 			self_snapshotCount, now - OvaleFuture.combatStartTime)
 	end
 	self_pool:Drain()
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:SPELL_POWER_CHANGED(event)
-	profiler.Start("OvalePaperDoll_UpdateStats")
+	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	local snapshot = UpdateCurrentSnapshot()
 	snapshot.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self_class])
 	self:Debug(true, "%s: %s = %d",
 		event, self.SNAPSHOT_STATS["spellBonusDamage"].description, snapshot.spellBonusDamage)
-	profiler.Stop("OvalePaperDoll_UpdateStats")
+	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
 function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 	if unitId == "player" then
-		profiler.Start("OvalePaperDoll_UpdateStats")
+		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		local snapshot = UpdateCurrentSnapshot()
 		local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 		snapshot.attackPower = base + posBuff + negBuff
 		self:Debug(true, "%s: %s = %d",
 			event, self.SNAPSHOT_STATS["attackPower"].description, snapshot.attackPower)
 		self:UpdateDamage(event)
-		profiler.Stop("OvalePaperDoll_UpdateStats")
+		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
 
 function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId == "player" then
-		profiler.Start("OvalePaperDoll_UpdateStats")
+		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		self.level = API_UnitLevel(unitId)
 		self:Debug(true, "%s: level = %d", event, self.level)
-		profiler.Stop("OvalePaperDoll_UpdateStats")
+		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
 
 function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId == "player" then
-		profiler.Start("OvalePaperDoll_UpdateStats")
+		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.rangedHaste = API_GetRangedHaste()
 		self:Debug(true, "%s: %s = %f%%",
 			event, self.SNAPSHOT_STATS["rangedHaste"].description, snapshot.rangedHaste)
-		profiler.Stop("OvalePaperDoll_UpdateStats")
+		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
 
 function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 	if unitId == "player" then
-		profiler.Start("OvalePaperDoll_UpdateStats")
+		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.rangedAttackPower = base + posBuff + negBuff
 		self:Debug(true, "%s: %s = %d",
 			event, self.SNAPSHOT_STATS["rangedAttackPower"].description, snapshot.rangedAttackPower)
-		profiler.Stop("OvalePaperDoll_UpdateStats")
+		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
 
 function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 	if unitId == "player" then
-		profiler.Start("OvalePaperDoll_UpdateStats")
+		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.meleeHaste = API_GetMeleeHaste()
 		snapshot.spellHaste = API_UnitSpellHaste(unitId)
@@ -372,13 +366,13 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["meleeHaste"].description, snapshot.meleeHaste)
 		self:Debug("    %s = %f%%", self.SNAPSHOT_STATS["spellHaste"].description, snapshot.spellHaste)
 		self:UpdateDamage(event)
-		profiler.Stop("OvalePaperDoll_UpdateStats")
+		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
 
 function OvalePaperDoll:UNIT_STATS(event, unitId)
 	if unitId == "player" then
-		profiler.Start("OvalePaperDoll_UpdateStats")
+		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		local snapshot = UpdateCurrentSnapshot()
 		snapshot.strength = API_UnitStat(unitId, 1)
 		snapshot.agility = API_UnitStat(unitId, 2)
@@ -392,12 +386,12 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 		self:Debug("    %s = %d", self.SNAPSHOT_STATS["stamina"].description, snapshot.stamina)
 		self:Debug("    %s = %d", self.SNAPSHOT_STATS["strength"].description, snapshot.strength)
 		self:COMBAT_RATING_UPDATE(event)
-		profiler.Stop("OvalePaperDoll_UpdateStats")
+		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
 
 function OvalePaperDoll:UpdateDamage(event)
-	profiler.Start("OvalePaperDoll_UpdateDamage")
+	self:StartProfiling("OvalePaperDoll_UpdateDamage")
 	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, _, _, damageMultiplier = API_UnitDamage("player")
 	local mainHandAttackSpeed, offHandAttackSpeed = API_UnitAttackSpeed("player")
 
@@ -451,18 +445,18 @@ function OvalePaperDoll:UpdateDamage(event)
 	self:Debug("    %s = %f", self.SNAPSHOT_STATS["baseDamageMultiplier"].description, snapshot.baseDamageMultiplier)
 	self:Debug("    %s = %f", self.SNAPSHOT_STATS["mainHandWeaponDamage"].description, snapshot.mainHandWeaponDamage)
 	self:Debug("    %s = %f", self.SNAPSHOT_STATS["offHandWeaponDamage"].description, snapshot.offHandWeaponDamage)
-	profiler.Stop("OvalePaperDoll_UpdateDamage")
+	self:StopProfiling("OvalePaperDoll_UpdateDamage")
 end
 
 function OvalePaperDoll:UpdateSpecialization(event)
-	profiler.Start("OvalePaperDoll_UpdateSpecialization")
+	self:StartProfiling("OvalePaperDoll_UpdateSpecialization")
 	local newSpecialization = API_GetSpecialization()
 	if self.specialization ~= newSpecialization then
 		local oldSpecialization = self.specialization
 		self.specialization = newSpecialization
 		self:SendMessage("Ovale_SpecializationChanged", self:GetSpecialization(newSpecialization), self:GetSpecialization(oldSpecialization))
 	end
-	profiler.Stop("OvalePaperDoll_UpdateSpecialization")
+	self:StopProfiling("OvalePaperDoll_UpdateSpecialization")
 end
 
 function OvalePaperDoll:UpdateStats(event)
@@ -519,12 +513,12 @@ end
 
 -- Copy the current snapshot into the given snapshot table.
 function OvalePaperDoll:UpdateSnapshot(snapshot)
-	profiler.Start("OvalePaperDoll:UpdateSnapshot")
+	self:StartProfiling("OvalePaperDoll:UpdateSnapshot")
 	local snapshot = self:CurrentSnapshot()
 	for k in pairs(self.SNAPSHOT_STATS) do
 		snapshot[k] = self.snapshot[k]
 	end
-	profiler.Stop("OvalePaperDoll:UpdateSnapshot")
+	self:StopProfiling("OvalePaperDoll:UpdateSnapshot")
 	return snapshot
 end
 

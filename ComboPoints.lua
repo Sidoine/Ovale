@@ -10,17 +10,9 @@ local OvaleComboPoints = Ovale:NewModule("OvaleComboPoints", "AceEvent-3.0")
 Ovale.OvaleComboPoints = OvaleComboPoints
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleComboPoints:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
@@ -39,6 +31,11 @@ local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local UNKNOWN = UNKNOWN
+
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleComboPoints)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleComboPoints)
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -62,9 +59,6 @@ local PENDING_THRESHOLD = 0.8
 
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
-
--- Register for debugging messages.
-OvaleDebug:RegisterDebugging(OvaleComboPoints)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -261,9 +255,9 @@ function OvaleComboPoints:Ovale_TalentsChanged(event)
 end
 
 function OvaleComboPoints:Update()
-	profiler.Start("OvaleComboPoints_Update")
+	self:StartProfiling("OvaleComboPoints_Update")
 	self.combo = API_UnitPower("player", 4)
-	profiler.Stop("OvaleComboPoints_Update")
+	self:StopProfiling("OvaleComboPoints_Update")
 end
 
 function OvaleComboPoints:GetComboPoints()
@@ -295,7 +289,7 @@ end
 -- Return the number of combo points required to cast the given spell.
 -- NOTE: Mirrored in statePrototype below.
 function OvaleComboPoints:ComboPointCost(spellId, target)
-	profiler.Start("OvaleComboPoints_ComboPointCost")
+	OvaleComboPoints:StartProfiling("OvaleComboPoints_ComboPointCost")
 	local spellCost = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
@@ -350,7 +344,7 @@ function OvaleComboPoints:ComboPointCost(spellId, target)
 		end
 		spellCost = cost
 	end
-	profiler.Stop("OvaleComboPoints_ComboPointCost")
+	OvaleComboPoints:StopProfiling("OvaleComboPoints_ComboPointCost")
 	return spellCost
 end
 
@@ -405,7 +399,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleComboPoints:ResetState(state)
-	profiler.Start("OvaleComboPoints_ResetState")
+	self:StartProfiling("OvaleComboPoints_ResetState")
 	state.combo = self:GetComboPoints()
 	-- Scan the pending combo point events and remove the Anticipation buff if there is pending Anticipation event.
 	for k = 1, #self_pendingComboEvents do
@@ -415,12 +409,12 @@ function OvaleComboPoints:ResetState(state)
 			break
 		end
 	end
-	profiler.Stop("OvaleComboPoints_ResetState")
+	self:StopProfiling("OvaleComboPoints_ResetState")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleComboPoints_ApplySpellAfterCast")
+	self:StartProfiling("OvaleComboPoints_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
 		local target = OvaleGUID:GetUnitId(targetGUID)
@@ -477,7 +471,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 		end
 		state.combo = power
 	end
-	profiler.Stop("OvaleComboPoints_ApplySpellAfterCast")
+	self:StopProfiling("OvaleComboPoints_ApplySpellAfterCast")
 end
 --</public-static-methods>
 

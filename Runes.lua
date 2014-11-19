@@ -15,6 +15,8 @@ local OvaleRunes = Ovale:NewModule("OvaleRunes", "AceEvent-3.0")
 Ovale.OvaleRunes = OvaleRunes
 
 --<private-static-properties>
+local OvaleProfiler = Ovale.OvaleProfiler
+
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvaleEquipment = nil
@@ -34,14 +36,8 @@ local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 local INFINITY = math.huge
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleRunes:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleRunes)
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -180,7 +176,7 @@ function OvaleRunes:UNIT_RANGEDDAMAGE(event, unitId)
 end
 
 function OvaleRunes:UpdateRune(slot)
-	profiler.Start("OvaleRunes_UpdateRune")
+	self:StartProfiling("OvaleRunes_UpdateRune")
 	local rune = self.rune[slot]
 	local runeType = API_GetRuneType(slot)
 	local start, duration, runeReady = API_GetRuneCooldown(slot)
@@ -194,7 +190,7 @@ function OvaleRunes:UpdateRune(slot)
 		rune.startCooldown = 0
 		rune.endCooldown = 0
 	end
-	profiler.Stop("OvaleRunes_UpdateRune")
+	self:StopProfiling("OvaleRunes_UpdateRune")
 end
 
 function OvaleRunes:UpdateAllRunes()
@@ -246,14 +242,14 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleRunes:ResetState(state)
-	profiler.Start("OvaleRunes_ResetState")
+	self:StartProfiling("OvaleRunes_ResetState")
 	for slot, rune in ipairs(self.rune) do
 		local stateRune = state.rune[slot]
 		for k, v in pairs(rune) do
 			stateRune[k] = v
 		end
 	end
-	profiler.Stop("OvaleRunes_ResetState")
+	self:StopProfiling("OvaleRunes_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -268,17 +264,17 @@ end
 
 -- Apply the effects of the spell at the start of the spellcast.
 function OvaleRunes:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleRunes_ApplySpellStartCast")
+	self:StartProfiling("OvaleRunes_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
 		state:ApplyRuneCost(spellId, startCast, spellcast)
 	end
-	profiler.Stop("OvaleRunes_ApplySpellStartCast")
+	self:StopProfiling("OvaleRunes_ApplySpellStartCast")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleRunes_ApplySpellAfterCast")
+	self:StartProfiling("OvaleRunes_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
 		state:ApplyRuneCost(spellId, endCast, spellcast)
@@ -298,7 +294,7 @@ function OvaleRunes:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 			end
 		end
 	end
-	profiler.Stop("OvaleRunes_ApplySpellAfterCast")
+	self:StopProfiling("OvaleRunes_ApplySpellAfterCast")
 end
 --</public-static-methods>
 
@@ -347,7 +343,7 @@ end
 
 -- Consume a rune of the given type.  Assume that the required runes are available.
 statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
-	profiler.Start("OvaleRunes_state_ConsumeRune")
+	OvaleRunes:StartProfiling("OvaleRunes_state_ConsumeRune")
 	--[[
 		Find a usable rune, preferring a regular rune of that rune type over death
 		runes of that rune type over death runes of any rune type.
@@ -427,7 +423,7 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, name, snapshot)
 	else
 		state:Log("No %s rune available at %f to consume for spell %d!", RUNE_NAME[runeType], atTime, spellId)
 	end
-	profiler.Stop("OvaleRunes_state_ConsumeRune")
+	OvaleRunes:StopProfiling("OvaleRunes_state_ConsumeRune")
 end
 
 -- Returns a triplet of count, startCooldown, endCooldown:
@@ -435,7 +431,7 @@ end
 --     startCooldown	The time at which the next rune of the given type went on cooldown.
 --     endCooldown		The time at which the next rune of the given type will be active.
 statePrototype.RuneCount = function(state, name, atTime)
-	profiler.Start("OvaleRunes_state_RuneCount")
+	OvaleRunes:StartProfiling("OvaleRunes_state_RuneCount")
 	-- Default to checking the rune count at the end of the current spellcast in the
 	-- simulator, or at the current time if no spell is being cast.
 	if not atTime then
@@ -470,12 +466,12 @@ statePrototype.RuneCount = function(state, name, atTime)
 			end
 		end
 	end
-	profiler.Stop("OvaleRunes_state_RuneCount")
+	OvaleRunes:StopProfiling("OvaleRunes_state_RuneCount")
 	return count, startCooldown, endCooldown
 end
 
 statePrototype.DeathRuneCount = function(state, name, atTime)
-	profiler.Start("OvaleRunes_state_DeathRuneCount")
+	OvaleRunes:StartProfiling("OvaleRunes_state_DeathRuneCount")
 	-- Default to checking the rune count at the end of the current spellcast in the
 	-- simulator, or at the current time if no spell is being cast.
 	if not atTime then
@@ -501,7 +497,7 @@ statePrototype.DeathRuneCount = function(state, name, atTime)
 			end
 		end
 	end
-	profiler.Stop("OvaleRunes_state_DeathRuneCount")
+	OvaleRunes:StopProfiling("OvaleRunes_state_DeathRuneCount")
 	return count, startCooldown, endCooldown
 end
 
@@ -513,7 +509,7 @@ do
 	local usedRune = {}
 
 	statePrototype.GetRunesCooldown = function(state, blood, unholy, frost, death, atTime)
-		profiler.Start("OvaleRunes_state_GetRunesCooldown")
+		OvaleRunes:StartProfiling("OvaleRunes_state_GetRunesCooldown")
 		-- Default to checking runes at the end of the current spellcast in the
 		-- simulator, or at the current time if no spell is being cast.
 		if not atTime then
@@ -647,7 +643,7 @@ do
 		for _, runeType in pairs(RUNE_TYPE) do
 			if count[runeType] > 0 then
 				state:Log("Impossible rune count requirements: blood=%d, unholy=%d, frost=%d, death=%d", blood, unholy, frost, death)
-				profiler.Stop("OvaleRunes_state_GetRunesCooldown")
+				OvaleRunes:StopProfiling("OvaleRunes_state_GetRunesCooldown")
 				return INFINITY
 			end
 		end
@@ -663,7 +659,7 @@ do
 			seconds = maxEndCooldown - atTime
 		end
 
-		profiler.Stop("OvaleRunes_state_GetRunesCooldown")
+		OvaleRunes:StopProfiling("OvaleRunes_state_GetRunesCooldown")
 		return seconds
 	end
 end

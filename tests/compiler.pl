@@ -151,13 +151,16 @@ $sp{OvaleQueue}{RemoveFront} = true;
 
 # Ovale module prototype.
 $sm{"modulePrototype"}{Error} = true;
-$sm{"modulePrototype"}{Debug} = true;
 $sm{"modulePrototype"}{Log} = true;
 $sm{"modulePrototype"}{Print} = true;
+# Added by OvaleDebug.
+$sm{"OvaleDebugPrototype"}{Debug} = true;
+# Added by OvaleProfiler.
+$sm{"OvaleProfilerPrototype"}{StartProfiling} = true;
+$sm{"OvaleProfilerPrototype"}{StopProfiling} = true;
 
 $classname{Localization} = "Localization";
 $classname{Ovale} = "Ovale";
-$classname{Profiler} = "Profiler";
 $classname{WoWAPI} = "WoWAPI";
 
 sub ParseDirectory
@@ -296,6 +299,40 @@ sub ParseDirectory
 							$m{$class}{$method} = $m{$parent}{$method}
 						}
 					}
+				}
+			}
+
+			if ($content =~ m/OvaleDebug:RegisterDebugging\(([^,]+).*\)/)
+			{
+				my $prototype = "OvaleDebugPrototype";
+				for my $method (keys %{$sp{$prototype}})
+				{
+					$sp{$class}{$method} = $sp{$prototype}{$method}
+				}
+				for my $method (keys %{$sm{$prototype}})
+				{
+					$sm{$class}{$method} = $sm{$prototype}{$method}
+				}
+				for my $method (keys %{$m{$prototype}})
+				{
+					$m{$class}{$method} = $m{$prototype}{$method}
+				}
+			}
+
+			if ($content =~ m/OvaleProfiler:RegisterProfiling\(([^,]+).*\)/)
+			{
+				my $prototype = "OvaleProfilerPrototype";
+				for my $method (keys %{$sp{$prototype}})
+				{
+					$sp{$class}{$method} = $sp{$prototype}{$method}
+				}
+				for my $method (keys %{$sm{$prototype}})
+				{
+					$sm{$class}{$method} = $sm{$prototype}{$method}
+				}
+				for my $method (keys %{$m{$prototype}})
+				{
+					$m{$class}{$method} = $m{$prototype}{$method}
 				}
 			}
 

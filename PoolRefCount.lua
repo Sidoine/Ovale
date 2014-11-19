@@ -20,14 +20,7 @@ local OvalePoolRefCount = {}
 Ovale.OvalePoolRefCount = OvalePoolRefCount
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = "OvalePoolRefCount"
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+local OvaleProfiler = Ovale.OvaleProfiler
 
 local assert = assert
 local pairs = pairs
@@ -36,6 +29,9 @@ local tinsert = table.insert
 local tostring = tostring
 local tremove = table.remove
 local wipe = table.wipe
+
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvalePoolRefCount, "OvalePoolRefCount")
 --</private-static-properties>
 
 --<public-static-properties>
@@ -54,16 +50,16 @@ end
 
 local function GetReference(item)
 	local poolObject = item._refcount_pool_object
-	profiler.Start(poolObject.name)
+	OvalePoolRefCount:StartProfiling(poolObject.name)
 	local refcount = item:ReferenceCount()
 	poolObject.refcount[item] = refcount + 1
-	profiler.Stop(poolObject.name)
+	OvalePoolRefCount:StopProfiling(poolObject.name)
 	return item
 end
 
 local function ReleaseReference(item)
 	local poolObject = item._refcount_pool_object
-	profiler.Start(poolObject.name)
+	OvalePoolRefCount:StartProfiling(poolObject.name)
 	local refcount = item:ReferenceCount()
 	if refcount > 1 then
 		poolObject.refcount[item] = refcount - 1
@@ -74,7 +70,7 @@ local function ReleaseReference(item)
 		tinsert(poolObject.pool, item)
 		poolObject.unused = poolObject.unused + 1
 	end
-	profiler.Stop(poolObject.name)
+	OvalePoolRefCount:StopProfiling(poolObject.name)
 	return item
 end
 --</private-static-methods>
@@ -103,7 +99,7 @@ function OvalePoolRefCount:NewPool(name)
 end
 
 function OvalePoolRefCount:Get()
-	profiler.Start(self.name)
+	OvalePoolRefCount:StartProfiling(self.name)
 	assert(self.pool and self.refcount)
 	local item = tremove(self.pool)
 	if item then
@@ -116,7 +112,7 @@ function OvalePoolRefCount:Get()
 		item[name] = method
 	end
 	item._refcount_pool_object = self
-	profiler.Stop(self.name)
+	OvalePoolRefCount:StopProfiling(self.name)
 	return item:GetReference()
 end
 
@@ -137,11 +133,11 @@ function OvalePoolRefCount:Clean(item)
 end
 
 function OvalePoolRefCount:Drain()
-	profiler.Start(self.name)
+	OvalePoolRefCount:StartProfiling(self.name)
 	self.pool = {}
 	self.size = self.size - self.unused
 	self.unused = 0
-	profiler.Stop(self.name)
+	OvalePoolRefCount:StopProfiling(self.name)
 end
 
 function OvalePoolRefCount:DebuggingInfo()

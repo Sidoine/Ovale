@@ -9,10 +9,16 @@
 --]]
 
 local OVALE, Ovale = ...
-local Profiler = {}
-Ovale.Profiler = Profiler
+local OvaleProfiler = Ovale:NewModule("OvaleProfiler")
+Ovale.OvaleProfiler = OvaleProfiler
 
 --<private-static-properties>
+local AceConfig = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local L = Ovale.L
+local LibTextDump = LibStub("LibTextDump-1.0")
+local OvaleOptions = Ovale.OvaleOptions
+
 local debugprofilestop = debugprofilestop
 local format = string.format
 local ipairs = ipairs
@@ -30,16 +36,95 @@ local self_stackSize = 0
 local self_timeSpent = {}
 local self_timesInvoked = {}
 
--- Profiling methods collections, indexed by group.
-local self_profiler = {}
+-- LibTextDump-1.0 object for profiling output.
+local self_profilingOutput = nil
+
+do
+	local actions = {
+		profiling = {
+			name = L["Profiling"],
+			type = "execute",
+			func = function()
+				local appName = OvaleProfiler:GetName()
+				AceConfigDialog:SetDefaultSize(appName, 800, 550)
+				AceConfigDialog:Open(appName)
+			end,
+		},
+	}
+	-- Insert actions into OvaleOptions.
+	for k, v in pairs(actions) do
+		OvaleOptions.options.args.actions.args[k] = v
+	end
+	-- Add a global data type for debug options.
+	OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global or {}
+	OvaleOptions.defaultDB.global.profiler = {}
+end
 --</private-static-properties>
+
+--<public-static-properties>
+OvaleProfiler.options = {
+	name = OVALE .. " " .. L["Profiling"],
+	type = "group",
+	args = {
+		profiling = {
+			name = L["Profiling"],
+			type = "group",
+			args = {
+				modules = {
+					name = L["Modules"],
+					type = "group",
+					inline = true,
+					order = 10,
+					args = {},
+					get = function(info)
+						local name = info[#info]
+						local value = Ovale.db.global.profiler[name]
+						return (value ~= nil)
+					end,
+					set = function(info, value)
+						value = value or nil
+						local name = info[#info]
+						Ovale.db.global.profiler[name] = value
+						if value then
+							OvaleProfiler:EnableProfiling(name)
+						else
+							OvaleProfiler:DisableProfiling(name)
+						end
+					end,
+				},
+				reset = {
+					name = L["Reset"],
+					desc = L["Reset the profiling statistics."],
+					type = "execute",
+					order = 20,
+					func = function() OvaleProfiler:ResetProfiling() end,
+				},
+				show = {
+					name = L["Show"],
+					desc = L["Show the profiling statistics."],
+					type = "execute",
+					order = 30,
+					func = function()
+						self_profilingOutput:Clear()
+						local s = OvaleProfiler:GetProfilingInfo()
+						if s then
+							self_profilingOutput:AddLine(s)
+							self_profilingOutput:Display()
+						end
+					end,
+				},
+			},
+		},
+	},
+}
+--</public-static-properties>
 
 --<private-static-methods>
 local function DoNothing()
 	-- no-op
 end
 
-local function StartProfiler(tag)
+local function StartProfiling(_, tag)
 	local newTimestamp = debugprofilestop()
 
 	-- Attribute the time spent up to this call to the previous function.
@@ -62,7 +147,7 @@ local function StartProfiler(tag)
 	end
 end
 
-local function StopProfiler(tag)
+local function StopProfiling(_, tag)
 	if self_stackSize > 0 then
 		local currentTag = self_stack[self_stackSize]
 		if currentTag == tag then
@@ -79,73 +164,49 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function Profiler:RegisterProfilingGroup(group, enableFunction, disableFunction)
-	local profiler = self_profiler[group] or {}
-	profiler.Enable = enableFunction
-	profiler.Disable = disableFunction
-	self_profiler[group] = profiler
-	self:Disable(group, false)
+function OvaleProfiler:OnInitialize()
+	local appName = self:GetName()
+	AceConfig:RegisterOptionsTable(appName, self.options)
+	AceConfigDialog:AddToBlizOptions(appName, L["Profiling"], OVALE)
 end
 
-function Profiler:GetProfilingGroup(group)
-	return self_profiler[group]
-end
-
-function Profiler:Enable(group, isVerbose)
-	if group then
-		local profiler = self_profiler[group]
-		if profiler then
-			if isVerbose then
-				Ovale:Print("Profiling for %s is enabled.", group)
-			end
-			if profiler.Enable then
-				profiler.Enable()
-			end
-			profiler.Start = StartProfiler
-			profiler.Stop = StopProfiler
-		end
-	else
-		for group, profiler in pairs(self_profiler) do
-			if isVerbose then
-				Ovale:Print("Profiling for %s is enabled.", group)
-			end
-			if profiler.Enable then
-				profiler.Enable()
-			end
-			profiler.Start = StartProfiler
-			profiler.Stop = StopProfiler
-		end
+function OvaleProfiler:OnEnable()
+	if not self_profilingOutput then
+		self_profilingOutput = LibTextDump:New(OVALE .. " - " .. L["Profiling"], 750, 500)
 	end
 end
 
-function Profiler:Disable(group, isVerbose)
-	if group then
-		local profiler = self_profiler[group]
-		if profiler then
-			if isVerbose then
-				Ovale:Print("Profiling for %s is disabled.", group)
-			end
-			if profiler.Disable then
-				profiler.Disable()
-			end
-			profiler.Start = DoNothing
-			profiler.Stop = DoNothing
-		end
-	else
-		for group, profiler in pairs(self_profiler) do
-			if isVerbose then
-				Ovale:Print("Profiling for %s is disabled.", group)
-			end
-			if profiler.Disable then
-				profiler.Disable()
-			end
-			profiler.Start = DoNothing
-			profiler.Stop = DoNothing
-		end
+function OvaleProfiler:OnDisable()
+	self_profilingOutput:Clear()
+end
+
+function OvaleProfiler:RegisterProfiling(addon, name)
+	name = name or addon:GetName()
+	self.options.args.profiling.args.modules.args[name] = {
+		name = name,
+		desc = format(L["Enable profiling for the %s module."], name),
+		type = "toggle",
+	}
+	self:DisableProfiling(name)
+end
+
+function OvaleProfiler:EnableProfiling(name)
+	local addon = Ovale[name]
+	if addon then
+		addon.StartProfiling = StartProfiling
+		addon.StopProfiling = StopProfiling
 	end
 end
 
-function Profiler:Reset()
+function OvaleProfiler:DisableProfiling(name)
+	local addon = Ovale[name]
+	if addon then
+		addon.StartProfiling = DoNothing
+		addon.StopProfiling = DoNothing
+	end
+end
+
+function OvaleProfiler:ResetProfiling()
 	for tag in pairs(self_timeSpent) do
 		self_timeSpent[tag] = nil
 	end
@@ -157,7 +218,7 @@ end
 do
 	local array = {}
 
-	function Profiler:Info()
+	function OvaleProfiler:GetProfilingInfo()
 		if next(self_timeSpent) then
 			-- Calculate the width needed to print out the times invoked.
 			local width = 1
@@ -187,20 +248,7 @@ do
 	end
 end
 
-function Profiler:Wrap(group, tag, functionPtr)
-	local profiler = self_profiler[group]
-	local helper = function(...)
-		profiler.Stop(tag)
-		return ...
-	end
-	local wrapper = function(...)
-		profiler.Start(tag)
-		return helper(functionPtr(...))
-	end
-	return wrapper
-end
-
-function Profiler:DebuggingInfo()
+function OvaleProfiler:DebuggingInfo()
 	Ovale:Print("Profiler stack size = %d", self_stackSize)
 	local index = self_stackSize
 	while index > 0 and self_stackSize - index < 10 do

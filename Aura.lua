@@ -12,18 +12,10 @@ local OvaleAura = Ovale:NewModule("OvaleAura", "AceEvent-3.0")
 Ovale.OvaleAura = OvaleAura
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleAura:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePool
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local LibDispellable = LibStub("LibDispellable-1.0", true)
@@ -61,6 +53,11 @@ local SCHOOL_MASK_HOLY = SCHOOL_MASK_HOLY
 local SCHOOL_MASK_NATURE = SCHOOL_MASK_NATURE
 local SCHOOL_MASK_SHADOW = SCHOOL_MASK_SHADOW
 
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleAura)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleAura)
+
 -- Player's GUID.
 local self_guid = nil
 -- Table pool.
@@ -78,9 +75,6 @@ end
 local UNKNOWN_GUID = 0
 
 do
-	-- Register for debugging messages.
-	OvaleDebug:RegisterDebugging(OvaleAura)
-
 	local output = {}
 	local debugOptions = {
 		playerAura = {
@@ -502,7 +496,7 @@ function OvaleAura:IsActiveAura(aura, now)
 end
 
 function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, visible, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
-	profiler.Start("OvaleAura_GainedAuraOnGUID")
+	self:StartProfiling("OvaleAura_GainedAuraOnGUID")
 	-- Whose aura is it?
 	casterGUID = casterGUID or UNKNOWN_GUID
 	local mine = (casterGUID == self_guid)
@@ -643,11 +637,11 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 			Ovale.refreshNeeded[unitId] = true
 		end
 	end
-	profiler.Stop("OvaleAura_GainedAuraOnGUID")
+	self:StopProfiling("OvaleAura_GainedAuraOnGUID")
 end
 
 function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
-	profiler.Start("OvaleAura_LostAuraOnGUID")
+	self:StartProfiling("OvaleAura_LostAuraOnGUID")
 	local aura = GetAura(self.aura, guid, auraId, casterGUID)
 	if aura then
 		local filter = aura.filter
@@ -689,12 +683,12 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 			Ovale.refreshNeeded[unitId] = true
 		end
 	end
-	profiler.Stop("OvaleAura_LostAuraOnGUID")
+	self:StopProfiling("OvaleAura_LostAuraOnGUID")
 end
 
 -- Scan auras on the given GUID and update the aura database.
 function OvaleAura:ScanAuras(unitId, guid)
-	profiler.Start("OvaleAura_ScanAuras")
+	self:StartProfiling("OvaleAura_ScanAuras")
 	guid = guid or OvaleGUID:GetGUID(unitId)
 	if guid then
 		self:Debug(true, "Scanning auras on %s (%s)", guid, unitId)
@@ -744,7 +738,7 @@ function OvaleAura:ScanAuras(unitId, guid)
 			end
 		end
 	end
-	profiler.Stop("OvaleAura_ScanAuras")
+	self:StopProfiling("OvaleAura_ScanAuras")
 end
 
 function OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
@@ -897,7 +891,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleAura:ResetState(state)
-	profiler.Start("OvaleAura_ResetState")
+	self:StartProfiling("OvaleAura_ResetState")
 	-- Advance age of auras in state machine.
 	state.serial = state.serial + 1
 
@@ -922,7 +916,7 @@ function OvaleAura:ResetState(state)
 			state.aura[guid] = nil
 		end
 	end
-	profiler.Stop("OvaleAura_ResetState")
+	self:StopProfiling("OvaleAura_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -934,24 +928,24 @@ end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleAura_ApplySpellAfterCast")
+	self:StartProfiling("OvaleAura_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the player.
 	if si and si.aura and si.aura.player then
 		state:ApplySpellAuras(spellId, self_guid, startCast, endCast, isChanneled, si.aura.player, spellcast)
 	end
-	profiler.Stop("OvaleAura_ApplySpellAfterCast")
+	self:StopProfiling("OvaleAura_ApplySpellAfterCast")
 end
 
 -- Apply the effects of the spell on the target's state after it lands on the target.
 function OvaleAura:ApplySpellAfterHit(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleAura_ApplySpellAfterHit")
+	self:StartProfiling("OvaleAura_ApplySpellAfterHit")
 	local si = OvaleData.spellInfo[spellId]
 	-- Apply the auras on the target.
 	if si and si.aura and si.aura.target then
 		state:ApplySpellAuras(spellId, targetGUID, startCast, endCast, isChanneled, si.aura.target, spellcast)
 	end
-	profiler.Stop("OvaleAura_ApplySpellAfterHit")
+	self:StopProfiling("OvaleAura_ApplySpellAfterHit")
 end
 --</public-static-methods>
 
@@ -1145,7 +1139,7 @@ statePrototype.IsActiveAura = function(state, aura, atTime)
 end
 
 statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCast, isChanneled, auraList, spellcast)
-	profiler.Start("OvaleAura_state_ApplySpellAuras")
+	OvaleAura:StartProfiling("OvaleAura_state_ApplySpellAuras")
 	local unitId = OvaleGUID:GetUnitId(guid)
 	for filter, filterInfo in pairs(auraList) do
 		for auraId, spellData in pairs(filterInfo) do
@@ -1318,7 +1312,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			end
 		end
 	end
-	profiler.Stop("OvaleAura_state_ApplySpellAuras")
+	OvaleAura:StopProfiling("OvaleAura_state_ApplySpellAuras")
 end
 
 statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
@@ -1475,7 +1469,7 @@ do
 		the count is more than 0.  If excludeUnitId is given, then that unit is excluded from the count.
 	--]]
 	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks, excludeUnitId)
-		profiler.Start("OvaleAura_state_AuraCount")
+		OvaleAura:StartProfiling("OvaleAura_state_AuraCount")
 		-- Initialize.
 		minStacks = minStacks or 1
 		count = 0
@@ -1523,7 +1517,7 @@ do
 		end
 
 		state:Log("AuraCount(%d) is %s, %s, %s, %s, %s, %s", auraId, count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast)
-		profiler.Stop("OvaleAura_state_AuraCount")
+		OvaleAura:StopProfiling("OvaleAura_state_AuraCount")
 		return count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast
 	end
 end

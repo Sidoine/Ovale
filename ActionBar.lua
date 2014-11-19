@@ -10,17 +10,9 @@ local OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0")
 Ovale.OvaleActionBar = OvaleActionBar
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleActionBar:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
 
 local gsub = string.gsub
 local strlen = string.len
@@ -37,6 +29,8 @@ local API_GetMacroSpell = GetMacroSpell
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleActionBar)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleActionBar)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -135,7 +129,7 @@ function OvaleActionBar:UPDATE_BINDINGS(event)
 end
 
 function OvaleActionBar:UpdateActionSlots(event)
-	profiler.Start("OvaleActionBar_UpdateActionSlots")
+	self:StartProfiling("OvaleActionBar_UpdateActionSlots")
 	self:Debug("%s: Updating all action slot mappings.", event)
 	wipe(self.action)
 	wipe(self.item)
@@ -153,11 +147,11 @@ function OvaleActionBar:UpdateActionSlots(event)
 	for slot = start, 72 do
 		self:UpdateActionSlot(slot)
 	end
-	profiler.Stop("OvaleActionBar_UpdateActionSlots")
+	self:StopProfiling("OvaleActionBar_UpdateActionSlots")
 end
 
 function OvaleActionBar:UpdateActionSlot(slot)
-	profiler.Start("OvaleActionBar_UpdateActionSlot")
+	self:StartProfiling("OvaleActionBar_UpdateActionSlot")
 	-- Clear old slot and associated actions.
 	local action = self.action[slot]
 	if self.spell[action] == slot then
@@ -229,15 +223,15 @@ function OvaleActionBar:UpdateActionSlot(slot)
 
 	-- Update the keybind for the slot.
 	self.keybind[slot] = GetKeyBinding(slot)
-	profiler.Stop("OvaleActionBar_UpdateActionSlot")
+	self:StopProfiling("OvaleActionBar_UpdateActionSlot")
 end
 
 function OvaleActionBar:UpdateKeyBindings()
-	profiler.Start("OvaleActionBar_UpdateKeyBindings")
+	self:StartProfiling("OvaleActionBar_UpdateKeyBindings")
 	for slot = 1, 120 do
 		self.keybind[slot] = GetKeyBinding(slot)
 	end
-	profiler.Stop("OvaleActionBar_UpdateKeyBindings")
+	self:StopProfiling("OvaleActionBar_UpdateKeyBindings")
 end
 
 -- Get the action slot that matches a spell ID.

@@ -10,6 +10,7 @@ Ovale.OvaleBestAction = OvaleBestAction
 
 --<private-static-properties>
 local OvalePool = Ovale.OvalePool
+local OvaleProfiler = Ovale.OvaleProfiler
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
 
 -- Forward declarations for module dependencies.
@@ -56,14 +57,8 @@ local API_IsItemInRange = IsItemInRange
 local API_IsUsableAction = IsUsableAction
 local API_IsUsableItem = IsUsableItem
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleBestAction:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleBestAction)
 
 local OVALE_DEFAULT_PRIORITY = 3
 
@@ -130,7 +125,7 @@ local function GetTimeSpan(node)
 end
 
 local function GetActionItemInfo(element, state, target)
-	profiler.Start("OvaleBestAction_GetActionItemInfo")
+	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionItemInfo")
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
@@ -162,13 +157,13 @@ local function GetActionItemInfo(element, state, target)
 		actionId = itemId
 	end
 
-	profiler.Stop("OvaleBestAction_GetActionItemInfo")
+	OvaleBestAction:StopProfiling("OvaleBestAction_GetActionItemInfo")
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
 
 local function GetActionMacroInfo(element, state, target)
-	profiler.Start("OvaleBestAction_GetActionMacroInfo")
+	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionMacroInfo")
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
@@ -192,13 +187,13 @@ local function GetActionMacroInfo(element, state, target)
 		actionId = macro
 	end
 
-	profiler.Stop("OvaleBestAction_GetActionMacroInfo")
+	OvaleBestAction:StopProfiling("OvaleBestAction_GetActionMacroInfo")
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
 
 local function GetActionSpellInfo(element, state, target)
-	profiler.Start("OvaleBestAction_GetActionSpellInfo")
+	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionSpellInfo")
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
@@ -290,13 +285,13 @@ local function GetActionSpellInfo(element, state, target)
 		end
 	end
 
-	profiler.Stop("OvaleBestAction_GetActionSpellInfo")
+	OvaleBestAction:StopProfiling("OvaleBestAction_GetActionSpellInfo")
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
 
 local function GetActionTextureInfo(element, state, target)
-	profiler.Start("OvaleBestAction_GetActionTextureInfo")
+	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionTextureInfo")
 
 	local texture = element.params[1]
 	local actionTexture = "Interface\\Icons\\" .. texture
@@ -310,7 +305,7 @@ local function GetActionTextureInfo(element, state, target)
 	local actionType = "texture"
 	local actionId = texture
 
-	profiler.Stop("OvaleBestAction_GetActionTextureInfo")
+	OvaleBestAction:StopProfiling("OvaleBestAction_GetActionTextureInfo")
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
@@ -450,7 +445,7 @@ function OvaleBestAction:ComputeBool(element, state)
 end
 
 function OvaleBestAction:ComputeAction(element, state)
-	profiler.Start("OvaleBestAction_ComputeAction")
+	self:StartProfiling("OvaleBestAction_ComputeAction")
 	local nodeId = element.nodeId
 	local timeSpan = GetTimeSpan(element)
 	local priority, result
@@ -550,12 +545,12 @@ function OvaleBestAction:ComputeAction(element, state)
 		priority = element.params.priority or OVALE_DEFAULT_PRIORITY
 	end
 
-	profiler.Stop("OvaleBestAction_ComputeAction")
+	self:StopProfiling("OvaleBestAction_ComputeAction")
 	return timeSpan, priority, result
 end
 
 function OvaleBestAction:ComputeArithmetic(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpanA, _, elementA = self:Compute(element.child[1], state)
 	local timeSpanB, _, elementB = self:Compute(element.child[2], state)
 	local timeSpan = GetTimeSpan(element)
@@ -659,12 +654,12 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 		state:Log("[%d]    arithmetic '%s' returns %f+(t-%f)*%f", element.nodeId, operator, l, m, n)
 		result = SetValue(element, l, m, n)
 	end
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, OVALE_DEFAULT_PRIORITY, result
 end
 
 function OvaleBestAction:ComputeCompare(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpanA, _, elementA = self:Compute(element.child[1], state)
 	local timeSpanB, _, elementB = self:Compute(element.child[2], state)
 	local timeSpan = GetTimeSpan(element)
@@ -730,12 +725,12 @@ function OvaleBestAction:ComputeCompare(element, state)
 		end
 		state:Log("[%d]    compare '%s' returns %s", element.nodeId, operator, tostring(timeSpan))
 	end
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan
 end
 
 function OvaleBestAction:ComputeCustomFunction(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpan = GetTimeSpan(element)
 	local priority, result
 
@@ -777,12 +772,12 @@ function OvaleBestAction:ComputeCustomFunction(element, state)
 		end
 	end
 
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, priority, result
 end
 
 function OvaleBestAction:ComputeFunction(element, state)
-	profiler.Start("OvaleBestAction_ComputeFunction")
+	self:StartProfiling("OvaleBestAction_ComputeFunction")
 	local timeSpan = GetTimeSpan(element)
 	local priority, result
 
@@ -823,12 +818,12 @@ function OvaleBestAction:ComputeFunction(element, state)
 		result = SetValue(element, value, origin, rate)
 	end
 
-	profiler.Stop("OvaleBestAction_ComputeFunction")
+	self:StopProfiling("OvaleBestAction_ComputeFunction")
 	return timeSpan, priority, result
 end
 
 function OvaleBestAction:ComputeGroup(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local bestTimeSpan, bestPriority, bestElement, bestCastTime
 	local timeSpan = GetTimeSpan(element)
 
@@ -906,12 +901,12 @@ function OvaleBestAction:ComputeGroup(element, state)
 		state:Log("[%d]    group no best action returns %s", element.nodeId, tostring(timeSpan))
 	end
 
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, bestPriority, bestElement
 end
 
 function OvaleBestAction:ComputeIf(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpanA = self:ComputeBool(element.child[1], state)
 	local timeSpan = GetTimeSpan(element)
 	local priority, result
@@ -942,12 +937,12 @@ function OvaleBestAction:ComputeIf(element, state)
 	end
 	self_timeSpanPool:Release(conditionTimeSpan)
 
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, priority, result
 end
 
 function OvaleBestAction:ComputeLogical(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpanA = self:ComputeBool(element.child[1], state)
 	local timeSpan = GetTimeSpan(element)
 
@@ -990,12 +985,12 @@ function OvaleBestAction:ComputeLogical(element, state)
 	end
 
 	state:Log("[%d]    logical '%s' returns %s", element.nodeId, element.operator, tostring(timeSpan))
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan
 end
 
 function OvaleBestAction:ComputeLua(element, state)
-	profiler.Start("OvaleBestAction_ComputeLua")
+	self:StartProfiling("OvaleBestAction_ComputeLua")
 	local value = loadstring(element.lua)()
 	state:Log("[%d]    lua returns %s", element.nodeId, value)
 
@@ -1006,12 +1001,12 @@ function OvaleBestAction:ComputeLua(element, state)
 		result = SetValue(element, value)
 		priority = OVALE_DEFAULT_PRIORITY
 	end
-	profiler.Stop("OvaleBestAction_ComputeLua")
+	self:StopProfiling("OvaleBestAction_ComputeLua")
 	return timeSpan, priority, result
 end
 
 function OvaleBestAction:ComputeState(element, state)
-	profiler.Start("OvaleBestAction_ComputeState")
+	self:StartProfiling("OvaleBestAction_ComputeState")
 	local timeSpan = GetTimeSpan(element)
 	local result
 
@@ -1020,21 +1015,21 @@ function OvaleBestAction:ComputeState(element, state)
 		timeSpan[1], timeSpan[2] = 0, INFINITY
 		result = element
 	end
-	profiler.Stop("OvaleBestAction_ComputeState")
+	self:StopProfiling("OvaleBestAction_ComputeState")
 	return timeSpan, OVALE_DEFAULT_PRIORITY, result
 end
 
 function OvaleBestAction:ComputeValue(element, state)
-	profiler.Start("OvaleBestAction_ComputeValue")
+	self:StartProfiling("OvaleBestAction_ComputeValue")
 	state:Log("[%d]    value is %s", element.nodeId, element.value)
 	local timeSpan = GetTimeSpan(element)
 	timeSpan[1], timeSpan[2] = 0, INFINITY
-	profiler.Stop("OvaleBestAction_ComputeValue")
+	self:StopProfiling("OvaleBestAction_ComputeValue")
 	return timeSpan, OVALE_DEFAULT_PRIORITY, element
 end
 
 function OvaleBestAction:ComputeWait(element, state)
-	profiler.Start("OvaleBestAction_Compute")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpanA, priorityA, elementA = self:Compute(element.child[1], state)
 	local timeSpan = GetTimeSpan(element)
 
@@ -1043,7 +1038,7 @@ function OvaleBestAction:ComputeWait(element, state)
 		CopyTimeSpan(timeSpanA, timeSpan)
 		state:Log("[%d]    '%s' returns %s", element.nodeId, element.type, tostring(timeSpan))
 	end
-	profiler.Stop("OvaleBestAction_Compute")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, priorityA, elementA
 end
 

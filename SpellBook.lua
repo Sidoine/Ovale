@@ -11,17 +11,9 @@ local OvaleSpellBook = Ovale:NewModule("OvaleSpellBook", "AceEvent-3.0")
 Ovale.OvaleSpellBook = OvaleSpellBook
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleSpellBook:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
@@ -56,13 +48,14 @@ local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local MAX_TALENT_TIERS = MAX_TALENT_TIERS
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
-
 local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
 
-do
-	-- Register for debugging messages.
-	OvaleDebug:RegisterDebugging(OvaleSpellBook)
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleSpellBook)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleSpellBook)
 
+do
 	local debugOptions = {
 		glyph = {
 			name = L["Glyphs"],
@@ -492,7 +485,7 @@ local statePrototype = OvaleSpellBook.statePrototype
 
 --<state-methods>
 statePrototype.IsUsableSpell = function(state, spellId, target)
-	profiler.Start("OvaleSpellBook_state_IsUsableSpell")
+	OvaleSpellBook:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
 	local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
 	local noMana = false
 	-- Verify that the spell may be cast given restrictions specified in SpellInfo().
@@ -521,7 +514,7 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 	else
 		isUsable, noMana = OvaleSpellBook:IsUsableSpell(spellId, target)
 	end
-	profiler.Stop("OvaleSpellBook_state_IsUsableSpell")
+	OvaleSpellBook:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
 	return isUsable, noMana
 end
 --</state-methods>

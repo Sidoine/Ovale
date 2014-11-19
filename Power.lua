@@ -11,6 +11,7 @@ Ovale.OvalePower = OvalePower
 --<private-static-properties>
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
@@ -35,14 +36,10 @@ local API_UnitPowerMax = UnitPowerMax
 local API_UnitPowerType = UnitPowerType
 local INFINITY = math.huge
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvalePower:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvalePower)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvalePower)
 
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
@@ -65,9 +62,6 @@ local BUFF_PERCENT_REDUCTION = {
 }
 
 do
-	-- Register for debugging messages.
-	OvaleDebug:RegisterDebugging(OvalePower)
-
 	local debugOptions = {
 		power = {
 			name = L["Power"],
@@ -300,7 +294,7 @@ function OvalePower:UNIT_RANGEDDAMAGE(event, unitId)
 end
 
 function OvalePower:UpdateMaxPower(event, powerType)
-	profiler.Start("OvalePower_UpdateMaxPower")
+	self:StartProfiling("OvalePower_UpdateMaxPower")
 	if powerType then
 		local powerInfo = self.POWER_INFO[powerType]
 		self.maxPower[powerType] = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
@@ -309,11 +303,11 @@ function OvalePower:UpdateMaxPower(event, powerType)
 			self.maxPower[powerType] = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
 		end
 	end
-	profiler.Stop("OvalePower_UpdateMaxPower")
+	self:StopProfiling("OvalePower_UpdateMaxPower")
 end
 
 function OvalePower:UpdatePower(event, powerType)
-	profiler.Start("OvalePower_UpdatePower")
+	self:StartProfiling("OvalePower_UpdatePower")
 	if powerType then
 		local powerInfo = self.POWER_INFO[powerType]
 		local oldPower = self.power[powerType]
@@ -328,24 +322,24 @@ function OvalePower:UpdatePower(event, powerType)
 			self:Debug(true, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
 		end
 	end
-	profiler.Stop("OvalePower_UpdatePower")
+	self:StopProfiling("OvalePower_UpdatePower")
 end
 
 function OvalePower:UpdatePowerRegen(event)
-	profiler.Start("OvalePower_UpdatePowerRegen")
+	self:StartProfiling("OvalePower_UpdatePowerRegen")
 	self.inactiveRegen, self.activeRegen = API_GetPowerRegen()
-	profiler.Stop("OvalePower_UpdatePowerRegen")
+	self:StopProfiling("OvalePower_UpdatePowerRegen")
 end
 
 function OvalePower:UpdatePowerType(event)
-	profiler.Start("OvalePower_UpdatePowerType")
+	self:StartProfiling("OvalePower_UpdatePowerType")
 	local currentType, currentToken = API_UnitPowerType("player")
 	self.powerType = self.POWER_TYPE[currentType]
-	profiler.Stop("OvalePower_UpdatePowerType")
+	self:StopProfiling("OvalePower_UpdatePowerType")
 end
 
 function OvalePower:GetSpellCost(spellId, powerType)
-	profiler.Start("OvalePower_GetSpellCost")
+	self:StartProfiling("OvalePower_GetSpellCost")
 	self_tooltip:SetSpellByID(spellId)
 	local spellCost, spellPowerType
 	for i = 2, self_tooltip:NumLines() do
@@ -367,14 +361,14 @@ function OvalePower:GetSpellCost(spellId, powerType)
 			end
 		end
 	end
-	profiler.Stop("OvalePower_GetSpellCost")
+	self:StopProfiling("OvalePower_GetSpellCost")
 	return spellCost, spellPowerType
 end
 
 -- Get power cost of the spell.
 -- NOTE: Mirrored in statePrototype below.
 function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
-	profiler.Start("OvalePower_PowerCost")
+	OvalePower:StartProfiling("OvalePower_PowerCost")
 	local buffParam = "buff_" .. powerType
 	local spellCost = 0
 	local si = OvaleData.spellInfo[spellId]
@@ -511,7 +505,7 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 			spellCost = cost
 		end
 	end
-	profiler.Stop("OvalePower_PowerCost")
+	OvalePower:StopProfiling("OvalePower_PowerCost")
 	return spellCost
 end
 
@@ -597,7 +591,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvalePower:ResetState(state)
-	profiler.Start("OvalePower_ResetState")
+	self:StartProfiling("OvalePower_ResetState")
 	-- Power levels for each resource.
 	for powerType in pairs(self.POWER_INFO) do
 		state[powerType] = self.power[powerType] or 0
@@ -612,7 +606,7 @@ function OvalePower:ResetState(state)
 	else
 		state.powerRate[self.powerType] = self.inactiveRegen
 	end
-	profiler.Stop("OvalePower_ResetState")
+	self:StopProfiling("OvalePower_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -627,7 +621,7 @@ end
 
 -- Apply the effects of the spell at the start of the spellcast.
 function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvalePower_ApplySpellStartCast")
+	self:StartProfiling("OvalePower_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
 		if state.inCombat then
@@ -635,12 +629,12 @@ function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, e
 		end
 		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	end
-	profiler.Stop("OvalePower_ApplySpellStartCast")
+	self:StopProfiling("OvalePower_ApplySpellStartCast")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvalePower_ApplySpellAfterCast")
+	self:StartProfiling("OvalePower_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
 		if state.inCombat then
@@ -648,14 +642,14 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 		end
 		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	end
-	profiler.Stop("OvalePower_ApplySpellAfterCast")
+	self:StopProfiling("OvalePower_ApplySpellAfterCast")
 end
 --</public-static-methods>
 
 --<state-methods>
 -- Update the state of the simulator for the power cost of the given spell.
 statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvalePower_state_ApplyPowerCost")
+	OvalePower:StartProfiling("OvalePower_state_ApplyPowerCost")
 	local target = OvaleGUID:GetUnitId(targetGUID)
 	local si = OvaleData.spellInfo[spellId]
 
@@ -693,7 +687,7 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, 
 			end
 		end
 	end
-	profiler.Stop("OvalePower_state_ApplyPowerCost")
+	OvalePower:StopProfiling("OvalePower_state_ApplyPowerCost")
 end
 
 -- Return the number of seconds before enough of the given power type is available for the spell.

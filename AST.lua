@@ -23,6 +23,7 @@ Ovale.OvaleAST = OvaleAST
 --<private-static-properties>
 local L = Ovale.L
 local OvalePool = Ovale.OvalePool
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleCondition = nil
@@ -49,14 +50,8 @@ local wipe = table.wipe
 local yield = coroutine.yield
 local API_GetItemInfo = GetItemInfo
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleAST:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleAST)
 
 -- Keywords for the Ovale script language.
 local KEYWORD = {
@@ -1836,7 +1831,7 @@ ParseScoreSpells = function(tokenStream, nodeList, annotation)
 end
 
 ParseScript = function(tokenStream, nodeList, annotation)
-	profiler.Start("OvaleAST_ParseScript")
+	OvaleAST:StartProfiling("OvaleAST_ParseScript")
 	local ok = true
 	-- Consume each declaration.
 	local child = self_childrenPool:Get()
@@ -1870,7 +1865,7 @@ ParseScript = function(tokenStream, nodeList, annotation)
 	else
 		self_childrenPool:Release(child)
 	end
-	profiler.Stop("OvaleAST_ParseScript")
+	OvaleAST:StopProfiling("OvaleAST_ParseScript")
 	return ok, ast
 end
 
@@ -2431,7 +2426,7 @@ end
 
 -- Replaces variables with their defined values.
 function OvaleAST:PropagateConstants(ast)
-	profiler.Start("OvaleAST_PropagateConstants")
+	self:StartProfiling("OvaleAST_PropagateConstants")
 	if ast.annotation then
 		local dictionary = ast.annotation.definition
 		if dictionary and ast.annotation.nameReference then
@@ -2461,12 +2456,12 @@ function OvaleAST:PropagateConstants(ast)
 			end
 		end
 	end
-	profiler.Stop("OvaleAST_PropagateConstants")
+	self:StopProfiling("OvaleAST_PropagateConstants")
 end
 
 -- Replaces variables and string-lookup function calls with string values.
 function OvaleAST:PropagateStrings(ast)
-	profiler.Start("OvaleAST_PropagateStrings")
+	self:StartProfiling("OvaleAST_PropagateStrings")
 	if ast.annotation and ast.annotation.stringReference then
 		for _, node in ipairs(ast.annotation.stringReference) do
 			if node.type == "string" then
@@ -2521,13 +2516,13 @@ function OvaleAST:PropagateStrings(ast)
 			end
 		end
 	end
-	profiler.Stop("OvaleAST_PropagateStrings")
+	self:StopProfiling("OvaleAST_PropagateStrings")
 end
 
 -- "Flattens" parameter tables by replacing table values with the bare numerical or string values
 -- so that the parameter table can be used directly by script conditions.
 function OvaleAST:FlattenParameters(ast)
-	profiler.Start("OvaleAST_FlattenParameters")
+	self:StartProfiling("OvaleAST_FlattenParameters")
 	local annotation = ast.annotation
 	if annotation and annotation.parametersReference then
 		local dictionary = annotation.definition
@@ -2631,12 +2626,12 @@ function OvaleAST:FlattenParameters(ast)
 			end
 		end
 	end
-	profiler.Stop("OvaleAST_FlattenParameters")
+	self:StopProfiling("OvaleAST_FlattenParameters")
 end
 
 -- Verify that all functions called within the script are known.
 function OvaleAST:VerifyFunctionCalls(ast)
-	profiler.Start("OvaleAST_VerifyFunctionCalls")
+	self:StartProfiling("OvaleAST_VerifyFunctionCalls")
 	if ast.annotation and ast.annotation.verify then
 		local customFunction = ast.annotation.customFunction
 		local functionCall = ast.annotation.functionCall
@@ -2656,7 +2651,7 @@ function OvaleAST:VerifyFunctionCalls(ast)
 			end
 		end
 	end
-	profiler.Stop("OvaleAST_VerifyFunctionCalls")
+	self:StopProfiling("OvaleAST_VerifyFunctionCalls")
 end
 
 function OvaleAST:Optimize(ast)
@@ -2671,7 +2666,7 @@ end
 	with identical parameters.
 --]]----------------------------------------------------------------------------
 function OvaleAST:CommonFunctionElimination(ast)
-	profiler.Start("OvaleAST_CommonFunctionElimination")
+	self:StartProfiling("OvaleAST_CommonFunctionElimination")
 	if ast.annotation then
 		-- Hash all of the function calls.
 		if ast.annotation.functionReference then
@@ -2720,6 +2715,6 @@ function OvaleAST:CommonFunctionElimination(ast)
 			end
 		end
 	end
-	profiler.Stop("OvaleAST_CommonFunctionElimination")
+	self:StopProfiling("OvaleAST_CommonFunctionElimination")
 end
 --</public-static-methods>

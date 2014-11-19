@@ -9,6 +9,8 @@ local OvaleCooldown = Ovale:NewModule("OvaleCooldown", "AceEvent-3.0")
 Ovale.OvaleCooldown = OvaleCooldown
 
 --<private-static-properties>
+local OvaleProfiler = Ovale.OvaleProfiler
+
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvaleGUID = nil
@@ -23,14 +25,8 @@ local API_GetSpellCharges = GetSpellCharges
 local API_GetSpellCooldown = GetSpellCooldown
 local API_UnitClass = UnitClass
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleCooldown:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
@@ -190,7 +186,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleCooldown:ResetState(state)
-	profiler.Start("OvaleCooldown_ResetState")
+	self:StartProfiling("OvaleCooldown_ResetState")
 	for _, cd in pairs(state.cd) do
 		-- Remove outdated cooldown state.
 		if cd.serial and cd.serial < self_serial then
@@ -199,7 +195,7 @@ function OvaleCooldown:ResetState(state)
 			end
 		end
 	end
-	profiler.Stop("OvaleCooldown_ResetState")
+	self:StopProfiling("OvaleCooldown_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -214,7 +210,7 @@ end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleCooldown_ApplySpellAfterCast")
+	self:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
 	local cd = state:GetCD(spellId)
 
 	local target = OvaleGUID:GetUnitId(targetGUID) or state.defaultTarget
@@ -242,7 +238,7 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast
 	end
 
 	state:Log("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
-	profiler.Stop("OvaleCooldown_ApplySpellAfterCast")
+	self:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
 end
 --</public-static-methods>
 
@@ -300,7 +296,7 @@ end
 
 -- Return the table holding the simulator's cooldown information for the given spell.
 statePrototype.GetCD = function(state, spellId)
-	profiler.Start("OvaleCooldown_state_GetCD")
+	OvaleCooldown:StartProfiling("OvaleCooldown_state_GetCD")
 	local cdName = spellId
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.sharedcd then
@@ -349,7 +345,7 @@ statePrototype.GetCD = function(state, spellId)
 		cd.chargeStart = chargeStart
 	end
 
-	profiler.Stop("OvaleCooldown_state_GetCD")
+	OvaleCooldown:StopProfiling("OvaleCooldown_state_GetCD")
 	return cd
 end
 

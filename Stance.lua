@@ -12,6 +12,7 @@ Ovale.OvaleStance = OvaleStance
 --<private-static-properties>
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
@@ -32,14 +33,8 @@ local API_GetShapeshiftForm = GetShapeshiftForm
 local API_GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local API_GetSpellInfo = GetSpellInfo
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleStance:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleStance)
 
 local OVALE_SPELLID_TO_STANCE = {
 	-- Death Knight
@@ -158,7 +153,7 @@ end
 
 -- Fill OvaleStance.stanceList with stance bar index <-> Ovale stance name mappings.
 function OvaleStance:CreateStanceList()
-	profiler.Start("OvaleStance_CreateStanceList")
+	self:StartProfiling("OvaleStance_CreateStanceList")
 	wipe(self.stanceList)
 	wipe(self.stanceId)
 	local _, name, stanceName
@@ -170,7 +165,7 @@ function OvaleStance:CreateStanceList()
 			self.stanceId[stanceName] = i
 		end
 	end
-	profiler.Stop("OvaleStance_CreateStanceList")
+	self:StopProfiling("OvaleStance_CreateStanceList")
 end
 
 -- Print out the list of stances in alphabetical order.
@@ -210,13 +205,13 @@ function OvaleStance:IsStance(name)
 end
 
 function OvaleStance:ShapeshiftEventHandler()
-	profiler.Start("OvaleStance_ShapeshiftEventHandler")
+	self:StartProfiling("OvaleStance_ShapeshiftEventHandler")
 	local newStance = API_GetShapeshiftForm()
 	if self.stance ~= newStance then
 		self.stance = newStance
 		self:SendMessage("Ovale_StanceChanged")
 	end
-	profiler.Stop("OvaleStance_ShapeshiftEventHandler")
+	self:StopProfiling("OvaleStance_ShapeshiftEventHandler")
 end
 
 function OvaleStance:UpdateStances()
@@ -277,14 +272,14 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleStance:ResetState(state)
-	profiler.Start("OvaleStance_ResetState")
+	self:StartProfiling("OvaleStance_ResetState")
 	state.stance = self.stance or 0
-	profiler.Stop("OvaleStance_ResetState")
+	self:StopProfiling("OvaleStance_ResetState")
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleStance_ApplySpellAfterCast")
+	self:StartProfiling("OvaleStance_ApplySpellAfterCast")
 	local target = OvaleGUID:GetUnitId(targetGUID)
 	local stance = state:GetSpellInfoProperty(spellId, "to_stance", target)
 	if stance then
@@ -293,7 +288,7 @@ function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, 
 		end
 		state.stance = stance
 	end
-	profiler.Stop("OvaleStance_ApplySpellAfterCast")
+	self:StopProfiling("OvaleStance_ApplySpellAfterCast")
 end
 --</public-static-methods>
 

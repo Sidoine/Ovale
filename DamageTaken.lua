@@ -10,18 +10,10 @@ local OvaleDamageTaken = Ovale:NewModule("OvaleDamageTaken", "AceEvent-3.0")
 Ovale.OvaleDamageTaken = OvaleDamageTaken
 
 --<private-static-properties>
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleDamageTaken:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePool
+local OvaleProfiler = Ovale.OvaleProfiler
 local OvaleQueue = Ovale.OvaleQueue
 
 -- Forward declarations for module dependencies.
@@ -31,15 +23,17 @@ local strsub = string.sub
 local API_GetTime = GetTime
 local API_UnitGUID = UnitGUID
 
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleDamageTaken)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleDamageTaken)
+
 -- Player's GUID.
 local self_guid = nil
 -- Damage event pool.
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 -- Time window (past number of seconds) for which damage events are stored.
 local DAMAGE_TAKEN_WINDOW = 20
-
--- Register for debugging messages.
-OvaleDebug:RegisterDebugging(OvaleDamageTaken)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -69,7 +63,7 @@ function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEven
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
 	if destGUID == self_guid and strsub(cleuEvent, -7) == "_DAMAGE" then
-		profiler.Start("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
+		self:StartProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
 		local now = API_GetTime()
 		local eventPrefix = strsub(cleuEvent, 1, 6)
 		if eventPrefix == "SWING_" then
@@ -81,7 +75,7 @@ function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEven
 			self:Debug("%s (%s) caused %d damage.", cleuEvent, spellName, amount)
 			self:AddDamageTaken(now, amount)
 		end
-		profiler.Stop("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
+		self:StopProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
 	end
 end
 
@@ -90,13 +84,13 @@ function OvaleDamageTaken:PLAYER_REGEN_ENABLED(event)
 end
 
 function OvaleDamageTaken:AddDamageTaken(timestamp, damage)
-	profiler.Start("OvaleDamageTaken_AddDamageTaken")
+	self:StartProfiling("OvaleDamageTaken_AddDamageTaken")
 	local event = self_pool:Get()
 	event.timestamp = timestamp
 	event.damage = damage
 	self.damageEvent:InsertFront(event)
 	self:RemoveExpiredEvents(timestamp)
-	profiler.Stop("OvaleDamageTaken_AddDamageTaken")
+	self:StopProfiling("OvaleDamageTaken_AddDamageTaken")
 end
 
 -- Return the total damage taken in the previous time interval (in seconds).
@@ -120,7 +114,7 @@ end
 
 -- Remove all events that are more than DAMAGE_TAKEN_WINDOW seconds before the given timestamp.
 function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
-	profiler.Start("OvaleDamageTaken_RemoveExpiredEvents")
+	self:StartProfiling("OvaleDamageTaken_RemoveExpiredEvents")
 	while true do
 		local event = self.damageEvent:Back()
 		if not event then break end
@@ -132,7 +126,7 @@ function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
 			self_pool:Release(event)
 		end
 	end
-	profiler.Stop("OvaleDamageTaken_RemoveExpiredEvents")
+	self:StopProfiling("OvaleDamageTaken_RemoveExpiredEvents")
 end
 
 function OvaleDamageTaken:DebugDamageTaken()

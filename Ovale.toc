@@ -16,9 +16,9 @@ libs\libs.xml
 Ovale.lua
 Localization.lua
 Options.lua
-Debug.lua
 
-# Profiling module.
+# Debugging and profiling modules.
+Debug.lua
 Profiler.lua
 
 # Utility modules.

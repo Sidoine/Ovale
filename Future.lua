@@ -12,6 +12,7 @@ Ovale.OvaleFuture = OvaleFuture
 
 --<private-static-properties>
 local OvalePool = Ovale.OvalePool
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
@@ -39,14 +40,8 @@ local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleFuture:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleFuture)
 
 -- Player's GUID.
 local self_guid = nil
@@ -183,7 +178,7 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 end
 
 local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, allowRemove)
-	profiler.Start("OvaleFuture_AddSpellToQueue")
+	OvaleFuture:StartProfiling("OvaleFuture_AddSpellToQueue")
 	local self = OvaleFuture
 	local spellcast = self_pool:Get()
 	spellcast.spellId = spellId
@@ -286,12 +281,12 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	OvaleScore:ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
-	profiler.Stop("OvaleFuture_AddSpellToQueue")
+	OvaleFuture:StopProfiling("OvaleFuture_AddSpellToQueue")
 	return spellcast
 end
 
 local function RemoveSpellFromQueue(spellId, lineId)
-	profiler.Start("OvaleFuture_RemoveSpellFromQueue")
+	OvaleFuture:StartProfiling("OvaleFuture_RemoveSpellFromQueue")
 	local self = OvaleFuture
 	for index, spellcast in ipairs(self_activeSpellcast) do
 		if spellcast.lineId == lineId then
@@ -302,7 +297,7 @@ local function RemoveSpellFromQueue(spellId, lineId)
 		end
 	end
 	Ovale.refreshNeeded["player"] = true
-	profiler.Stop("OvaleFuture_RemoveSpellFromQueue")
+	OvaleFuture:StopProfiling("OvaleFuture_RemoveSpellFromQueue")
 end
 
 -- UpdateLastSpellcast() is called at the end of the event handler for CLEU_SUCCESSFUL_SPELLCAST_EVENT[].
@@ -310,7 +305,7 @@ end
 -- snapshot values are correctly adjusted for buffs that are added or cleared simultaneously with the
 -- spellcast.
 local function UpdateLastSpellcast(spellcast)
-	profiler.Start("OvaleFuture_UpdateLastSpellcast")
+	OvaleFuture:StartProfiling("OvaleFuture_UpdateLastSpellcast")
 	local self = OvaleFuture
 	local targetGUID = spellcast.target
 	local spellId = spellcast.spellId
@@ -341,7 +336,7 @@ local function UpdateLastSpellcast(spellcast)
 			end
 		end
 	end
-	profiler.Stop("OvaleFuture_UpdateLastSpellcast")
+	OvaleFuture:StopProfiling("OvaleFuture_UpdateLastSpellcast")
 end
 --</private-static-methods>
 
@@ -501,7 +496,7 @@ end
 ]]--
 function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
-		profiler.Start("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
+		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
 
 		-- Search for a cast-time spell matching this spellcast that was added by UNIT_SPELLCAST_START.
@@ -516,7 +511,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
 				local now = API_GetTime()
 				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
-				profiler.Stop("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
+				self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 				return
 			end
 		end
@@ -533,7 +528,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 			local spellcast = AddSpellToQueue(spellId, lineId, now, now, false, true)
 			self:SendMessage("Ovale_SpellCast", now, spellId, spellcast.target)
 		end
-		profiler.Stop("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
+		self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 	end
 end
 
@@ -595,7 +590,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 			end
 		end
 		if success then
-			profiler.Start("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
+			self:StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
 			local spellId, spellName = arg12, arg13
 			TracePrintf(spellId, "%s: %s (%d)", cleuEvent, spellName, spellId)
 			for index, spellcast in ipairs(self_activeSpellcast) do
@@ -615,7 +610,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 					break
 				end
 			end
-			profiler.Stop("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
+			self:StopProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
 		end
 	end
 end
@@ -623,7 +618,7 @@ end
 -- Apply the effects of spells that are being cast or are in flight, allowing us to
 -- ignore lag or missile travel time.
 function OvaleFuture:ApplyInFlightSpells(state)
-	profiler.Start("OvaleFuture_ApplyInFlightSpells")
+	self:StartProfiling("OvaleFuture_ApplyInFlightSpells")
 	local now = API_GetTime()
 	local index = 1
 	while index <= #self_activeSpellcast do
@@ -639,7 +634,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 		end
 		index = index + 1
 	end
-	profiler.Stop("OvaleFuture_ApplyInFlightSpells")
+	self:StopProfiling("OvaleFuture_ApplyInFlightSpells")
 end
 
 function OvaleFuture:LastInFlightSpell()
@@ -650,7 +645,7 @@ function OvaleFuture:LastInFlightSpell()
 end
 
 function OvaleFuture:UpdateFromSpellcast(dest, spellcast)
-	profiler.Start("OvaleFuture_UpdateFromSpellcast")
+	self:StartProfiling("OvaleFuture_UpdateFromSpellcast")
 	if dest.snapshot then
 		OvalePaperDoll:ReleaseSnapshot(dest.snapshot)
 	end
@@ -666,7 +661,7 @@ function OvaleFuture:UpdateFromSpellcast(dest, spellcast)
 			tbl.UpdateFromSpellcast(dest, spellcast)
 		end
 	end
-	profiler.Stop("OvaleFuture_UpdateFromSpellcast")
+	self:StopProfiling("OvaleFuture_UpdateFromSpellcast")
 end
 
 function OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
@@ -754,7 +749,7 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleFuture:ResetState(state)
-	profiler.Start("OvaleFuture_ResetState")
+	self:StartProfiling("OvaleFuture_ResetState")
 	local now = API_GetTime()
 	state.currentTime = now
 	state:Log("Reset state with current time = %f", state.currentTime)
@@ -772,7 +767,7 @@ function OvaleFuture:ResetState(state)
 	for k, v in pairs(self.counter) do
 		state.counter[k] = self.counter[k]
 	end
-	profiler.Stop("OvaleFuture_ResetState")
+	self:StopProfiling("OvaleFuture_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.
@@ -796,7 +791,7 @@ end
 
 -- Apply the effects of the spell at the start of the spellcast.
 function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleFuture_ApplySpellStartCast")
+	self:StartProfiling("OvaleFuture_ApplySpellStartCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Increment and reset spell counters.
@@ -815,7 +810,7 @@ function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, 
 			end
 		end
 	end
-	profiler.Stop("OvaleFuture_ApplySpellStartCast")
+	self:StopProfiling("OvaleFuture_ApplySpellStartCast")
 end
 --</public-static-methods>
 
@@ -845,7 +840,7 @@ end
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
 statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
-	profiler.Start("OvaleFuture_state_ApplySpell")
+	OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
 	if spellId and targetGUID then
 		-- Handle missing start/end/next cast times.
 		if not startCast or not endCast or not nextCast then
@@ -910,6 +905,6 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 			OvaleState:InvokeMethod("ApplySpellAfterHit", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 		end
 	end
-	profiler.Stop("OvaleFuture_state_ApplySpell")
+	OvaleFuture:StopProfiling("OvaleFuture_state_ApplySpell")
 end
 --</state-methods>

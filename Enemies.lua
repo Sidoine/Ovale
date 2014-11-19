@@ -11,20 +11,12 @@ local OvaleEnemies = Ovale:NewModule("OvaleEnemies", "AceEvent-3.0", "AceTimer-3
 Ovale.OvaleEnemies = OvaleEnemies
 
 --<private-static-properties>
--- Forward declarations for module dependencies.
-local OvaleState = nil
-
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleEnemies:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
-
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
+
+-- Forward declarations for module dependencies.
+local OvaleState = nil
 
 local bit_band = bit.band
 local ipairs = ipairs
@@ -36,6 +28,11 @@ local API_GetTime = GetTime
 local API_UnitGUID = UnitGUID
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
+
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleEnemies)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleEnemies)
 
 -- List of CLEU event suffixes that can correspond to the player damaging or try to damage (tag) an enemy.
 local CLEU_TAG_SUFFIXES = {
@@ -67,9 +64,6 @@ local self_taggedEnemyLastSeen = {}
 -- Timer for reaper function to remove inactive enemies.
 local self_reaperTimer = nil
 local REAP_INTERVAL = 3
-
--- Register for debugging messages.
-OvaleDebug:RegisterDebugging(OvaleEnemies)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -147,18 +141,18 @@ end
 -- These enemies are not in combat with your group, out of range, or
 -- incapacitated and shouldn't count toward the number of active enemies.
 function OvaleEnemies:RemoveInactiveEnemies()
-	profiler.Start("OvaleEnemies_RemoveInactiveEnemies")
+	self:StartProfiling("OvaleEnemies_RemoveInactiveEnemies")
 	local now = API_GetTime()
 	for guid, timestamp in pairs(self_enemyLastSeen) do
 		if now - timestamp > REAP_INTERVAL then
 			self:RemoveEnemy(guid, now)
 		end
 	end
-	profiler.Stop("OvaleEnemies_RemoveInactiveEnemies")
+	self:StopProfiling("OvaleEnemies_RemoveInactiveEnemies")
 end
 
 function OvaleEnemies:AddEnemy(guid, name, timestamp, isTagged)
-	profiler.Start("OvaleEnemies_AddEnemy")
+	self:StartProfiling("OvaleEnemies_AddEnemy")
 	if guid then
 		self_enemyName[guid] = name
 		local tagged = self_taggedEnemyLastSeen[guid]
@@ -182,11 +176,11 @@ function OvaleEnemies:AddEnemy(guid, name, timestamp, isTagged)
 			Ovale.refreshNeeded["player"] = true
 		end
 	end
-	profiler.Stop("OvaleEnemies_AddEnemy")
+	self:StopProfiling("OvaleEnemies_AddEnemy")
 end
 
 function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
-	profiler.Start("OvaleEnemies_RemoveEnemy")
+	self:StartProfiling("OvaleEnemies_RemoveEnemy")
 	if guid then
 		local name = self_enemyName[guid]
 		local seen = self_enemyLastSeen[guid]
@@ -221,7 +215,7 @@ function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
 			self:SendMessage("Ovale_InactiveUnit", guid)
 		end
 	end
-	profiler.Stop("OvaleEnemies_RemoveEnemy")
+	self:StopProfiling("OvaleEnemies_RemoveEnemy")
 end
 
 function OvaleEnemies:DebugEnemies()
@@ -268,10 +262,10 @@ end
 
 -- Reset the state to the current conditions.
 function OvaleEnemies:ResetState(state)
-	profiler.Start("OvaleEnemies_ResetState")
+	self:StartProfiling("OvaleEnemies_ResetState")
 	state.activeEnemies = self.activeEnemies
 	state.taggedEnemies = self.taggedEnemies
-	profiler.Stop("OvaleEnemies_ResetState")
+	self:StopProfiling("OvaleEnemies_ResetState")
 end
 
 -- Release state resources prior to removing from the simulator.

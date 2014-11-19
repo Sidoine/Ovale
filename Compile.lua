@@ -11,6 +11,7 @@ Ovale.OvaleCompile = OvaleCompile
 --<private-static-properties>
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
+local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleAST = nil
@@ -35,14 +36,10 @@ local strsub = string.sub
 local wipe = table.wipe
 local API_GetSpellInfo = GetSpellInfo
 
--- Profiling set-up.
-local Profiler = Ovale.Profiler
-local profiler = nil
-do
-	local group = OvaleCompile:GetName()
-	Profiler:RegisterProfilingGroup(group)
-	profiler = Profiler:GetProfilingGroup(group)
-end
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleCompile)
+-- Register for profiling.
+OvaleProfiler:RegisterProfiling(OvaleCompile)
 
 -- Whether to trigger a script compilation if items or stances change.
 local self_compileOnItems = false
@@ -62,9 +59,6 @@ local self_icon = {}
 
 -- Lua pattern to match a floating-point number that may start with a minus sign.
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
-
--- Register for debugging messages.
-OvaleDebug:RegisterDebugging(OvaleCompile)
 --</private-static-properties>
 
 --<public-static-properties>
@@ -96,7 +90,7 @@ local function RequireValue(value)
 end
 
 local function TestConditions(parameters)
-	profiler.Start("OvaleCompile_TestConditions")
+	OvaleCompile:StartProfiling("OvaleCompile_TestConditions")
 	local boolean = true
 	if boolean and parameters.glyph then
 		local glyph, required = RequireValue(parameters.glyph)
@@ -167,7 +161,7 @@ local function TestConditions(parameters)
 			end
 		end
 	end
-	profiler.Stop("OvaleCompile_TestConditions")
+	OvaleCompile:StopProfiling("OvaleCompile_TestConditions")
 	return boolean
 end
 
@@ -523,7 +517,7 @@ function OvaleCompile:CompileScript(name)
 end
 
 function OvaleCompile:EvaluateScript(forceEvaluation)
-	profiler.Start("OvaleCompile_EvaluateScript")
+	self:StartProfiling("OvaleCompile_EvaluateScript")
 	local changed = false
 	self_canEvaluate = self_canEvaluate or Ovale:IsPreloaded(self_requirePreload)
 	if self_canEvaluate and self.ast and (forceEvaluation or not self.serial or self.serial < self_serial) then
@@ -571,7 +565,7 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 			AddMissingVariantSpells(self.ast.annotation)
 		end
 	end
-	profiler.Stop("OvaleCompile_EvaluateScript")
+	self:StopProfiling("OvaleCompile_EvaluateScript")
 	return changed
 end
 
