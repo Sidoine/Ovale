@@ -1308,7 +1308,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 					end
 				end
 			else
-				state:Log("Aura %d is not applied due to failing run-time requirements.", auraId)
+				state:Log("Aura %d (%s) is not applied.", auraId, spellData)
 			end
 		end
 	end
