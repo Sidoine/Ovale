@@ -479,6 +479,19 @@ WoWAPI.strsplit = function(delim, str, maxNb)
 end
 
 --[[--------------------------------------------------------------------
+	tostringall() is a non-standard Lua function that returns a list of
+	each argument converted to a string.
+--]]--------------------------------------------------------------------
+WoWAPI.tostringall = function(...)
+	local array = { ... }
+	local N = select("#", ...)
+	for i = 1, N do
+		array[N] = tostring(array[N])
+	end
+	return unpack(array)
+end
+
+--[[--------------------------------------------------------------------
 	wipe() is a non-standard Lua function that clears the contents of a
 	table and leaves the table pointer intact.
 --]]--------------------------------------------------------------------
