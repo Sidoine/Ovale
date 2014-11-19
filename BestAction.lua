@@ -370,6 +370,7 @@ function OvaleBestAction:GetActionInfo(element, state)
 end
 
 function OvaleBestAction:GetAction(node, state)
+	self:StartProfiling("OvaleBestAction_GetAction")
 	local timeSpan, priority, element = self:Compute(node.child[1], state)
 	self_computedTimeSpan:Reset(timeSpan)
 	if element and element.type == "state" then
@@ -392,10 +393,12 @@ function OvaleBestAction:GetAction(node, state)
 			Intersect(self_tempTimeSpan, timeSpan, self_computedTimeSpan)
 		end
 	end
+	self:StopProfiling("OvaleBestAction_GetAction")
 	return self_computedTimeSpan, priority, element
 end
 
 function OvaleBestAction:Compute(element, state)
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpan, priority, result
 	if element then
 		if element.asString then
@@ -430,6 +433,7 @@ function OvaleBestAction:Compute(element, state)
 			state:Log("[%d] <<< '%s' returns %s", element.nodeId, element.type, tostring(timeSpan))
 		end
 	end
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, priority, result
 end
 
@@ -1006,7 +1010,7 @@ function OvaleBestAction:ComputeLua(element, state)
 end
 
 function OvaleBestAction:ComputeState(element, state)
-	self:StartProfiling("OvaleBestAction_ComputeState")
+	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpan = GetTimeSpan(element)
 	local result
 
@@ -1015,16 +1019,16 @@ function OvaleBestAction:ComputeState(element, state)
 		timeSpan[1], timeSpan[2] = 0, INFINITY
 		result = element
 	end
-	self:StopProfiling("OvaleBestAction_ComputeState")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, OVALE_DEFAULT_PRIORITY, result
 end
 
 function OvaleBestAction:ComputeValue(element, state)
-	self:StartProfiling("OvaleBestAction_ComputeValue")
+	self:StartProfiling("OvaleBestAction_Compute")
 	state:Log("[%d]    value is %s", element.nodeId, element.value)
 	local timeSpan = GetTimeSpan(element)
 	timeSpan[1], timeSpan[2] = 0, INFINITY
-	self:StopProfiling("OvaleBestAction_ComputeValue")
+	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, OVALE_DEFAULT_PRIORITY, element
 end
 
