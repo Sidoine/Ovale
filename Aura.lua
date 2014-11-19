@@ -1277,7 +1277,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 							aura.ending = aura.start + aura.duration
 						end
 						aura.gain = atTime
-						state:Log("Aura %d with duration %f now ending at %f", auraId, aura.duration, aura.ending)
+						state:Log("Aura %d with duration %s now ending at %s", auraId, aura.duration, aura.ending)
 						if keepSnapshot then
 							state:Log("Aura %d keeping previous snapshot.", auraId)
 						elseif spellcast then
@@ -1340,7 +1340,7 @@ statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
 		for id in pairs(OvaleData.buffSpellList[auraId]) do
 			local aura = GetStateAuraOnGUID(state, guid, id, filter, mine)
 			if aura and (not auraFound or auraFound.ending < aura.ending) then
-				state:Log("Aura %s matching '%s' found on %s with (%f, %f)", id, auraId, guid, aura.start, aura.ending)
+				state:Log("Aura %s matching '%s' found on %s with (%s, %s)", id, auraId, guid, aura.start, aura.ending)
 				auraFound = aura
 			else
 				state:Log("Aura %s matching '%s' is missing on %s.", id, auraId, guid)
@@ -1352,7 +1352,7 @@ statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
 	else
 		auraFound = GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 		if auraFound then
-			state:Log("Aura %s found on %s with (%f, %f)", auraId, guid, auraFound.start, auraFound.ending)
+			state:Log("Aura %s found on %s with (%s, %s)", auraId, guid, auraFound.start, auraFound.ending)
 		else
 			state:Log("Aura %s is missing on %s.", auraId, guid)
 		end
@@ -1468,7 +1468,7 @@ do
 	local startFirst, endingLast
 
 	local function CountMatchingActiveAura(state, aura)
-		state:Log("Counting aura %s found on %s with (%f, %f)", aura.spellId, aura.guid, aura.start, aura.ending)
+		state:Log("Counting aura %s found on %s with (%s, %s)", aura.spellId, aura.guid, aura.start, aura.ending)
 		count = count + 1
 		stacks = stacks + aura.stacks
 		if aura.ending < endingChangeCount then
