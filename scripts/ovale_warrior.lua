@@ -1281,8 +1281,8 @@ AddFunction ProtectionGladiatorPrecombatActions
 	#stance,choose=gladiator
 	Spell(gladiator_stance)
 	# CHANGE: Apply raid buffs.
-	if not BuffPresent(stamina_buff any=1) Spell(commanding_shout)
-	if not BuffPresent(attack_power_multiplier_buff any=1) and not BuffPresent(stamina_buff) Spell(battle_shout)
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
+	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
 	#snapshot_stats
 }
 
