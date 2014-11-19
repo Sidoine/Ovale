@@ -33,6 +33,7 @@ local gmatch = string.gmatch
 local ipairs = ipairs
 local next = next
 local pairs = pairs
+local strfind = string.find
 local strmatch = string.match
 local strsub = string.sub
 local tconcat = table.concat
@@ -585,10 +586,16 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				if si and si.aura and si.aura.target and si.aura.target[filter] then
 					local spellData = si.aura.target[filter][auraId]
 					if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
-						local tokenIterator = gmatch(spellData, "[^,]+")
-						local value = tokenIterator()
-						if value == "refresh_keep_snapshot" then
+						local tokenIterator
+						if strfind(spellData, ",") then
+							tokenIterator = gmatch(spellData, "[^,]+")
+							-- Advance past "refresh_keep_snapshot".
+							tokenIterator()
+						end
+						if tokenIterator then
 							keepSnapshot = OvaleData:CheckRequirements(spellId, tokenIterator, unitId)
+						else
+							keepSnapshot = true
 						end
 					end
 				end
@@ -1163,18 +1170,23 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local keepSnapshot = false
 			local extend = 0
 
-			-- Parser for spellData as comma-separated values.
-			local tokenIterator = gmatch(spellData, "[^,]+")
+			local tokenIterator, value
+			if strfind(spellData, ",") then
+				-- Lexer for spellData as comma-separated values.
+				tokenIterator = gmatch(spellData, "[^,]+")
+				value = tokenIterator()
+			else
+				value = spellData
+			end
 
 			-- Set stacks and refresh based on spellData.
-			local value = tokenIterator()
 			if value == "refresh" then
 				refresh = true
 			elseif value == "refresh_keep_snapshot" then
 				refresh = true
 				keepSnapshot = true
 			elseif value == "extend" then
-				local seconds = tokenIterator()
+				local seconds = tokenIterator and tokenIterator() or nil
 				if seconds then
 					extend = tonumber(seconds)
 				else
@@ -1195,7 +1207,12 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			end
 
 			-- Verify any run-time requirements for this aura.
-			local verified = state:CheckRequirements(spellId, tokenIterator, unitId)
+			local verified
+			if tokenIterator then
+				verified = state:CheckRequirements(spellId, tokenIterator, unitId)
+			else
+				verified = true
+			end
 			if verified then
 				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
 				local atTime = isChanneled and startCast or endCast

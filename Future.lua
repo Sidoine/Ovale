@@ -28,6 +28,7 @@ local gmatch = string.gmatch
 local ipairs = ipairs
 local next = next
 local pairs = pairs
+local strfind = string.find
 local tinsert = table.insert
 local tostring = tostring
 local tremove = table.remove
@@ -220,13 +221,29 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 			if not spellcast.auraId and si.aura.target then
 				for filter, auraList in pairs(si.aura.target) do
 					for auraId, spellData in pairs(auraList) do
-						local tokenIterator = gmatch(spellData, "[^,]+")
-						local value = tokenIterator()
-						if value == "extend" then
-							-- Skip the number of seconds to extend the aura.
-							tokenIterator()
+						local tokenIterator, value
+						if strfind(spellData, ",") then
+							tokenIterator = gmatch(spellData, "[^,]+")
+							value = tokenIterator()
+						else
+							value = spellData
 						end
-						local verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
+						if value == "extend" then
+							-- Advance past the number of seconds to extend the aura.
+							local seconds = tokenIterator and tokenIterator() or nil
+							if not seconds then
+								Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing duration.", auraId, spellData, value)
+							end
+						else
+							local asNumber = tonumber(value)
+							value = asNumber or value
+						end
+						local verified
+						if tokenIterator then
+							verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
+						else
+							verified = true
+						end
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							if target ~= "player" then
