@@ -30,6 +30,7 @@ local next = next
 local pairs = pairs
 local strfind = string.find
 local tinsert = table.insert
+local tonumber = tonumber
 local tostring = tostring
 local tremove = table.remove
 local type = type
@@ -155,15 +156,35 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.aura and si.aura.damage then
 		for filter, auraList in pairs(si.aura.damage) do
-			for auraId, multiplier in pairs(auraList) do
-				local aura = auraObject:GetAura("player", auraId, filter)
-				if auraObject:IsActiveAura(aura) then
-					local siAura = OvaleData.spellInfo[auraId]
-					-- If an aura does stacking damage, then it needs to set stacking=1.
-					if siAura and siAura.stacking and siAura.stacking > 0 then
-						multiplier = 1 + (multiplier - 1) * aura.stacks
+			for auraId, spellData in pairs(auraList) do
+				local tokenIterator, multiplier
+				if strfind(spellData, ",") then
+					tokenIterator = gmatch(spellData, "[^,]+")
+					multiplier = tokenIterator()
+				else
+					multiplier = spellData
+				end
+				multiplier = tonumber(multiplier)
+				local verified
+				if tokenIterator then
+					if auraObject.CheckRequirements then
+						verified = auraObject.CheckRequirements(auraObject, spellId, tokenIterator, "player")
+					else
+						verified = OvaleData:CheckRequirements(spellId, tokenIterator, "player")
 					end
-					damageMultiplier = damageMultiplier * multiplier
+				else
+					verified = true
+				end
+				if verified then
+					local aura = auraObject:GetAura("player", auraId, filter)
+					if auraObject:IsActiveAura(aura) then
+						local siAura = OvaleData.spellInfo[auraId]
+						-- If an aura does stacking damage, then it needs to set stacking=1.
+						if siAura and siAura.stacking and siAura.stacking > 0 then
+							multiplier = 1 + (multiplier - 1) * aura.stacks
+						end
+						damageMultiplier = damageMultiplier * multiplier
+					end
 				end
 			end
 		end
