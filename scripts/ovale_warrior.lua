@@ -901,12 +901,12 @@ AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
 
 AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
 {
-	if HasWeapon(main type=1h)
+	if HasWeapon(main type=one_handed)
 	{
 		if InCombat(no) FurySingleMindedFuryPrecombatShortCdActions()
 		FurySingleMindedFuryDefaultShortCdActions()
 	}
-	if HasWeapon(main type=2h)
+	if HasWeapon(main type=two_handed)
 	{
 		if InCombat(no) FuryTitansGripPrecombatShortCdActions()
 		FuryTitansGripDefaultShortCdActions()
@@ -915,12 +915,12 @@ AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_ao
 
 AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
 {
-	if HasWeapon(main type=1h)
+	if HasWeapon(main type=one_handed)
 	{
 		if InCombat(no) FurySingleMindedFuryPrecombatShortCdActions()
 		FurySingleMindedFuryDefaultShortCdActions()
 	}
-	if HasWeapon(main type=2h)
+	if HasWeapon(main type=two_handed)
 	{
 		if InCombat(no) FuryTitansGripPrecombatShortCdActions()
 		FuryTitansGripDefaultShortCdActions()
@@ -929,12 +929,12 @@ AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
 
 AddIcon specialization=fury help=main enemies=1
 {
-	if HasWeapon(main type=1h)
+	if HasWeapon(main type=one_handed)
 	{
 		if InCombat(no) FurySingleMindedFuryPrecombatActions()
 		FurySingleMindedFuryDefaultActions()
 	}
-	if HasWeapon(main type=2h)
+	if HasWeapon(main type=two_handed)
 	{
 		if InCombat(no) FuryTitansGripPrecombatActions()
 		FuryTitansGripDefaultActions()
@@ -943,12 +943,12 @@ AddIcon specialization=fury help=main enemies=1
 
 AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
 {
-	if HasWeapon(main type=1h)
+	if HasWeapon(main type=one_handed)
 	{
 		if InCombat(no) FurySingleMindedFuryPrecombatActions()
 		FurySingleMindedFuryDefaultActions()
 	}
-	if HasWeapon(main type=2h)
+	if HasWeapon(main type=two_handed)
 	{
 		if InCombat(no) FuryTitansGripPrecombatActions()
 		FuryTitansGripDefaultActions()
@@ -957,12 +957,12 @@ AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
 
 AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
 {
-	if HasWeapon(main type=1h)
+	if HasWeapon(main type=one_handed)
 	{
 		if InCombat(no) FurySingleMindedFuryPrecombatCdActions()
 		FurySingleMindedFuryDefaultCdActions()
 	}
-	if HasWeapon(main type=2h)
+	if HasWeapon(main type=two_handed)
 	{
 		if InCombat(no) FuryTitansGripPrecombatCdActions()
 		FuryTitansGripDefaultCdActions()
@@ -971,12 +971,12 @@ AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
 
 AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 {
-	if HasWeapon(main type=1h)
+	if HasWeapon(main type=one_handed)
 	{
 		if InCombat(no) FurySingleMindedFuryPrecombatCdActions()
 		FurySingleMindedFuryDefaultCdActions()
 	}
-	if HasWeapon(main type=2h)
+	if HasWeapon(main type=two_handed)
 	{
 		if InCombat(no) FuryTitansGripPrecombatCdActions()
 		FuryTitansGripDefaultCdActions()

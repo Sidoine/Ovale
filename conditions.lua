@@ -2068,7 +2068,7 @@ do
 	--     Valid values: yes, no.
 	-- @param type Optional. If set via type=value, then specify whether the weapon must be one-handed or two-handed.
 	--     Default is unset.
-	--     Valid values: 1h, 2h
+	--     Valid values: one_handed, two_handed
 	-- @return A boolean value.
 	-- @usage
 	-- if HasWeapon(offhand) and BuffStacks(killing_machine) Spell(frost_strike)
@@ -2077,9 +2077,9 @@ do
 		local hand, yesno = condition[1], condition[2]
 		local weaponType = condition.type
 		local boolean = false
-		if weaponType == "1h" then
+		if weaponType == "one_handed" then
 			weaponType = 1
-		elseif weaponType == "2h" then
+		elseif weaponType == "two_handed" then
 			weaponType = 2
 		end
 		if hand == "offhand" or hand == "off" then
