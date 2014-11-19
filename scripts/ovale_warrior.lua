@@ -748,30 +748,20 @@ AddFunction FuryTitansGripPrecombatCdActions
 
 AddFunction FuryTitansGripSingleTargetActions
 {
-	#bloodbath
-	Spell(bloodbath)
 	#wild_strike,if=rage>110&target.health.pct>20
 	if Rage() > 110 and target.HealthPercent() > 20 Spell(wild_strike)
 	#bloodthirst,if=(!talent.unquenchable_thirst.enabled&rage<80)|buff.enrage.down
 	if not Talent(unquenchable_thirst_talent) and Rage() < 80 or BuffExpires(enrage_buff any=1) Spell(bloodthirst)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#siegebreaker
-	Spell(siegebreaker)
-	#storm_bolt
-	Spell(storm_bolt)
 	#wild_strike,if=buff.bloodsurge.up
 	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 	#execute,if=buff.enrage.up|target.time_to_die<12
 	if BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 Spell(execute)
-	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#raging_blow
 	if BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#wild_strike,if=buff.enrage.up&target.health.pct>20
 	if BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
-	#shockwave,if=!talent.unquenchable_thirst.enabled
-	if not Talent(unquenchable_thirst_talent) Spell(shockwave)
 	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20
 	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 Spell(impending_victory)
 	#bloodthirst
