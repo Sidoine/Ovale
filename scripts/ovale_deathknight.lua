@@ -73,10 +73,6 @@ AddFunction BloodDefaultActions
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(plague_strike)
 	#icy_touch,if=(!talent.necrotic_plague.enabled&!dot.frost_fever.ticking)|(talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking)
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(icy_touch)
-	#defile
-	Spell(defile)
-	#death_and_decay,if=active_enemies>2
-	if Enemies() > 2 Spell(death_and_decay)
 	#blood_boil,if=active_enemies>2&blood=2
 	if Enemies() > 2 and Rune(blood) >= 2 Spell(blood_boil)
 	#plague_leech,if=(!blood&!unholy|!blood&!frost|!unholy&!frost)&cooldown.outbreak.remains<=gcd
@@ -114,21 +110,28 @@ AddFunction BloodDefaultShortCdActions
 			or RunicPower() > 90 and Spell(death_coil)
 			or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(plague_strike)
 			or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(icy_touch)
-			or Spell(defile)
-			or Enemies() > 2 and Spell(death_and_decay)
-			or Enemies() > 2 and Rune(blood) >= 2 and Spell(blood_boil)
-			or Talent(blood_tap_talent) and BloodBtActions()
-			or Talent(runic_empowerment_talent) and BloodReActions()
-			or Talent(runic_corruption_talent) and BloodRcActions()
-			or not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) and BloodNrtActions()
 		{
-			#death_and_decay,if=buff.crimson_scourge.react
-			if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
+			# CHANGE: Only Defile on cooldown if talented into Blood Tap which allows the death rune consumed to be easily regenerated.
+			#defile
+			#Spell(defile)
+			if Talent(blood_tap_talent) Spell(defile)
+			#death_and_decay,if=active_enemies>2
+			if Enemies() > 2 Spell(death_and_decay)
 
-			unless BuffPresent(crimson_scourge_buff) and Spell(blood_boil)
+			unless Enemies() > 2 and Rune(blood) >= 2 and Spell(blood_boil)
+				or Talent(blood_tap_talent) and BloodBtActions()
+				or Talent(runic_empowerment_talent) and BloodReActions()
+				or Talent(runic_corruption_talent) and BloodRcActions()
+				or not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) and BloodNrtActions()
 			{
-				#empower_rune_weapon,if=!blood&!unholy&!frost
-				if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
+				#death_and_decay,if=buff.crimson_scourge.react
+				if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
+
+				unless BuffPresent(crimson_scourge_buff) and Spell(blood_boil)
+				{
+					#empower_rune_weapon,if=!blood&!unholy&!frost
+					if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
+				}
 			}
 		}
 	}
