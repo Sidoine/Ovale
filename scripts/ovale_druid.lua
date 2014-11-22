@@ -357,8 +357,8 @@ AddFunction GuardianDefaultActions
 
 AddFunction GuardianDefaultShortCdActions
 {
-	#savage_defense
-	Spell(savage_defense)
+	#savage_defense,if=buff.barkskin.down
+	if BuffExpires(barkskin_buff) Spell(savage_defense)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
 	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) > 0 Spell(maul)
 	#frenzied_regeneration,if=rage>=80
@@ -377,8 +377,10 @@ AddFunction GuardianDefaultCdActions
 	Spell(arcane_torrent_energy)
 	#use_item,slot=trinket2
 	UseItemActions()
-	#barkskin
-	Spell(barkskin)
+	#barkskin,if=buff.bristling_fur.down
+	if BuffExpires(bristling_fur_buff) Spell(barkskin)
+	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
+	if BuffExpires(barkskin_buff) and BuffExpires(savage_defense_buff) Spell(bristling_fur)
 	#berserk,if=buff.pulverize.remains>10
 	if BuffRemaining(pulverize_buff) > 10 Spell(berserk_bear)
 

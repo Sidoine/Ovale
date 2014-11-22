@@ -49,8 +49,8 @@ AddFunction GuardianDefaultActions
 	#auto_attack
 	#skull_bash
 	InterruptActions()
-	#savage_defense
-	Spell(savage_defense)
+	#savage_defense,if=buff.barkskin.down
+	if BuffExpires(barkskin_buff) Spell(savage_defense)
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -59,8 +59,10 @@ AddFunction GuardianDefaultActions
 	Spell(arcane_torrent_energy)
 	#use_item,slot=trinket2
 	UseItemActions()
-	#barkskin
-	Spell(barkskin)
+	#barkskin,if=buff.bristling_fur.down
+	if BuffExpires(bristling_fur_buff) Spell(barkskin)
+	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
+	if BuffExpires(barkskin_buff) and BuffExpires(savage_defense_buff) Spell(bristling_fur)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
 	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) > 0 Spell(maul)
 	#berserk,if=buff.pulverize.remains>10
@@ -125,11 +127,14 @@ AddIcon specialization=guardian help=aoe
 ### Required symbols
 # arcane_torrent_energy
 # barkskin
+# barkskin_buff
 # bear_form
 # berserk_bear
 # berserk_bear_buff
 # berserking
 # blood_fury_apsp
+# bristling_fur
+# bristling_fur_buff
 # cenarion_ward
 # dream_of_cenarius_tank_buff
 # enhanced_rejuvenation
@@ -153,6 +158,7 @@ AddIcon specialization=guardian help=aoe
 # rejuvenation_buff
 # renewal
 # savage_defense
+# savage_defense_buff
 # shred
 # skull_bash
 # thrash_bear

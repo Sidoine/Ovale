@@ -118,8 +118,8 @@ AddFunction DemonologyDbActions
 	if BuffStacks(demonbolt_buff) == 0 or BuffStacks(demonbolt_buff) < 4 and BuffRemaining(demonbolt_buff) >= 40 * SpellHaste() / 100 - ExecuteTime(demonbolt) Spell(demonbolt)
 	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&((buff.dark_soul.remains>execute_time&demonic_fury>=175)|(target.time_to_die<buff.demonbolt.remains))
 	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(soul_fire) and DemonicFury() >= 175 or target.TimeToDie() < BuffRemaining(demonbolt_buff) } Spell(soul_fire)
-	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&(((demonic_fury-80)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
-	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and { DemonicFury() - 80 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and DemonicFury() >= 750 Spell(soul_fire)
+	#soul_fire,if=buff.metamorphosis.up&buff.molten_core.react&target.health.pct<=25&(((demonic_fury-80)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
+	if BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff) and target.HealthPercent() <= 25 and { DemonicFury() - 80 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * SpellHaste() / 100 } and DemonicFury() >= 750 Spell(soul_fire)
 	#touch_of_chaos,if=buff.metamorphosis.up&(target.time_to_die<buff.demonbolt.remains|demonic_fury>=750&buff.demonbolt.remains)
 	if BuffPresent(metamorphosis_buff) and { target.TimeToDie() < BuffRemaining(demonbolt_buff) or DemonicFury() >= 750 and BuffPresent(demonbolt_buff) } Spell(touch_of_chaos)
 	#touch_of_chaos,if=buff.metamorphosis.up&(((demonic_fury-40)%800)>(buff.demonbolt.remains%(40*spell_haste)))&demonic_fury>=750
