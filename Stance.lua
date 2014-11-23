@@ -204,6 +204,11 @@ function OvaleStance:IsStance(name)
 	return false
 end
 
+function OvaleStance:IsStanceSpell(spellId)
+	local name = API_GetSpellInfo(spellId)
+	return not not (name and OVALE_SPELLID_TO_STANCE[name])
+end
+
 function OvaleStance:ShapeshiftEventHandler()
 	self:StartProfiling("OvaleStance_ShapeshiftEventHandler")
 	local newStance = API_GetShapeshiftForm()

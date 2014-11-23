@@ -416,6 +416,12 @@ function OvaleSpellBook:GetSpellBookIndex(spellId)
 	end
 end
 
+-- Returns whether a spell is a pet spell.
+function OvaleSpellBook:IsPetSpell(spellId)
+	local index, bookType = self:GetSpellBookIndex(spellId)
+	return bookType == BOOKTYPE_PET
+end
+
 -- Returns whether the unit is within range of the spell.
 function OvaleSpellBook:IsSpellInRange(spellId, unitId)
 	local index, bookType = self:GetSpellBookIndex(spellId)

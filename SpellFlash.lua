@@ -14,6 +14,8 @@ local OvaleOptions = Ovale.OvaleOptions
 -- Forward declarations for module dependencies.
 local OvaleData = nil
 local OvaleFuture = nil
+local OvaleSpellBook = nil
+local OvaleStance = nil
 
 local pairs = pairs
 local API_UnitHasVehicleUI = UnitHasVehicleUI
@@ -217,6 +219,8 @@ function OvaleSpellFlash:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleStance = Ovale.OvaleStance
 end
 
 function OvaleSpellFlash:OnEnable()
@@ -317,9 +321,11 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 			local brightness = db.brightness * 100
 
 			if element.lowername == "spell" then
-				local stance = spellId and state:GetSpellInfoProperty(spellId, "to_stance", spellTarget)
-				if stance then
+				if OvaleStance:IsStanceSpell(spellId) then
 					SpellFlashCore.FlashForm(spellId, color, size, brightness)
+				end
+				if OvaleSpellBook:IsPetSpell(spellId) then
+					SpellFlashCore.FlashPet(spellId, color, size, brightness)
 				end
 				SpellFlashCore.FlashAction(spellId, color, size, brightness)
 			elseif element.lowername == "item" then

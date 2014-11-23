@@ -130,6 +130,7 @@ $p{Skada}{total} = true;
 $sp{SpellFlashCore}{FlashAction} = true;
 $sp{SpellFlashCore}{FlashForm} = true;
 $sp{SpellFlashCore}{FlashItem} = true;
+$sp{SpellFlashCore}{FlashPet} = true;
 
 $sp{Ovale}{OvaleLexer} = true;
 $sp{Ovale}{OvalePool} = true;
