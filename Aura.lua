@@ -409,31 +409,39 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 	elseif mine and CLEU_TICK_EVENTS[cleuEvent] then
 		-- Update the latest tick time of the periodic aura cast by the player.
 		local spellId, spellName, spellSchool = arg12, arg13, arg14
-		local unitId = OvaleGUID:GetUnitId(destGUID)
-		if unitId then
-			self:Debug(true, "%s: %s (%s)", cleuEvent, destGUID, unitId)
-		else
-			self:Debug(true, "%s: %s", cleuEvent, destGUID)
+		local multistrike
+		if strsub(cleuEvent, -7) == "_DAMAGE" then
+			multistrike = arg25
+		elseif strsub(cleuEvent, -5) == "_HEAL" then
+			multistrike = arg19
 		end
-		local aura = GetAura(self.aura, destGUID, spellId, self_guid)
-		if self:IsActiveAura(aura) then
-			local name = aura.name or "Unknown spell"
-			local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
-			local tick = baseTick
-			if lastTickTime then
-				-- Update the tick length based on the timestamps of the current tick and the previous tick.
-				tick = timestamp - lastTickTime
-			elseif not baseTick then
-				-- This isn't a known periodic aura, but it's ticking so treat this as the first tick.
-				self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
-				local si = OvaleData.spellInfo[spellId]
-				baseTick = (si and si.tick) and si.tick or 3
-				tick = OvaleData:GetTickLength(spellId)
+		if not multistrike then
+			local unitId = OvaleGUID:GetUnitId(destGUID)
+			if unitId then
+				self:Debug(true, "%s: %s (%s)", cleuEvent, destGUID, unitId)
+			else
+				self:Debug(true, "%s: %s", cleuEvent, destGUID)
 			end
-			aura.baseTick = baseTick
-			aura.lastTickTime = timestamp
-			aura.tick = tick
-			self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
+			local aura = GetAura(self.aura, destGUID, spellId, self_guid)
+			if self:IsActiveAura(aura) then
+				local name = aura.name or "Unknown spell"
+				local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
+				local tick = baseTick
+				if lastTickTime then
+					-- Update the tick length based on the timestamps of the current tick and the previous tick.
+					tick = timestamp - lastTickTime
+				elseif not baseTick then
+					-- This isn't a known periodic aura, but it's ticking so treat this as the first tick.
+					self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
+					local si = OvaleData.spellInfo[spellId]
+					baseTick = (si and si.tick) and si.tick or 3
+					tick = OvaleData:GetTickLength(spellId)
+				end
+				aura.baseTick = baseTick
+				aura.lastTickTime = timestamp
+				aura.tick = tick
+				self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
+			end
 		end
 	end
 end
