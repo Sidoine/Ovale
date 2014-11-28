@@ -63,6 +63,7 @@ for _, name in ipairs(files) do
 		local profile = OvaleSimulationCraft:ParseProfile(simc)
 		if profile then
 			print(separator)
+			print(">>>", name)
 			print(OvaleSimulationCraft:Unparse(profile))
 			print(separator)
 			print(OvaleSimulationCraft:Emit(profile))
