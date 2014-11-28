@@ -30,7 +30,7 @@ AddFunction UseItemActions
 # Based on SimulationCraft profile "Warlock_Affliction_T17M".
 #	class=warlock
 #	spec=affliction
-#	talents=0000111
+#	talents=0000113
 #	pet=felhunter
 
 # ActionList: AfflictionDefaultActions --> main, predict, shortcd, cd
@@ -551,7 +551,7 @@ AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
 # Based on SimulationCraft profile "Warlock_Destruction_T17M".
 #	class=warlock
 #	spec=destruction
-#	talents=0000133
+#	talents=0000113
 #	pet=felhunter
 
 # ActionList: DestructionDefaultActions --> main, predict, shortcd, cd
@@ -725,8 +725,8 @@ AddFunction DestructionSingleTargetPredictActions
 	# CHANGE: Don't suggest Havoc on single-target.
 	#havoc,target=2
 	#Spell(havoc)
-	#Shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|buff.dark_soul.up|target.time_to_die<10)
-	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(Shadowburn)
+	#shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|buff.dark_soul.up|target.time_to_die<10)
+	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(shadowburn)
 	# CHANGE: Add level 90 conditions for casting Shadowburn in place of Chaos Bolt.
 	if Level() <= 90 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) or BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) > CastTime(Shadowburn) or BuffPresent(trinket_stacking_proc_any_buff) and BuffRemaining(trinket_stacking_proc_any_buff) > CastTime(Shadowburn) or target.TimeToDie() < 20 } Spell(Shadowburn)
 	#immolate,cycle_targets=1,if=remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)
@@ -772,17 +772,12 @@ AddFunction DestructionSingleTargetShortCdActions
 	unless Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } and Spell(Shadowburn)
 		or Level() <= 90 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(dark_soul_instability_buff) or BurningEmbers() / 10 >= 3 and BuffPresent(ember_master_buff) or BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) > CastTime(Shadowburn) or BuffPresent(trinket_stacking_proc_any_buff) and BuffRemaining(trinket_stacking_proc_any_buff) > CastTime(Shadowburn) or target.TimeToDie() < 20 } and Spell(Shadowburn)
 		or target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Spell(immolate)
+		or BuffPresent(havoc_buff) and Spell(shadowburn)
+		or BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
+		or Charges(conflagrate) == 2 and Spell(conflagrate)
 	{
-		#rain_of_fire,if=!ticking
-		if not target.DebuffPresent(rain_of_fire_debuff) Spell(rain_of_fire)
-
-		unless BuffPresent(havoc_buff) and Spell(shadowburn)
-			or BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
-			or Charges(conflagrate) == 2 and Spell(conflagrate)
-		{
-			#cataclysm
-			Spell(cataclysm)
-		}
+		#cataclysm
+		Spell(cataclysm)
 	}
 }
 

@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warlock_Affliction_T17M".
 #	class=warlock
 #	spec=affliction
-#	talents=0000111
+#	talents=0000113
 #	pet=felhunter
 
 Include(ovale_common)

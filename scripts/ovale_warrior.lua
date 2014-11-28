@@ -1199,8 +1199,10 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	# CHANGE: Get within melee range of the target.
 	GetInMeleeRange()
-	#heroic_strike,if=((buff.shield_charge.up|buff.unyielding_strikes.up)&target.health.pct>20)|buff.ultimatum.up|rage>=100|buff.unyielding_strikes.stack>4|target.time_to_die<10
-	if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) } and target.HealthPercent() > 20 or BuffPresent(ultimatum_buff) or Rage() >= 100 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
+	#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
+	if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
+	#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
+	if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ProtectionGladiatorSingleShortCdActions()
 	#call_action_list,name=aoe,if=active_enemies>=2
@@ -1300,6 +1302,8 @@ AddFunction ProtectionGladiatorPrecombatCdActions
 
 AddFunction ProtectionGladiatorSingleActions
 {
+	#devastate,if=buff.unyielding_strikes.stack>0&buff.unyielding_strikes.stack<6&buff.unyielding_strikes.remains<1.5
+	if BuffStacks(unyielding_strikes_buff) > 0 and BuffStacks(unyielding_strikes_buff) < 6 and BuffRemaining(unyielding_strikes_buff) < 1.5 Spell(devastate)
 	#shield_slam
 	Spell(shield_slam)
 	#revenge

@@ -208,7 +208,6 @@ Define(shadow_bolt 686)
 	SpellInfo(shadow_bolt max_travel_time=2.2) # maximum observed travel time with a bit of padding
 	SpellAddBuff(shadow_bolt fel_molten_core_aura=1,target_health_pct,25 if_spell=the_codex_of_xerrath specialization=demonology)
 	SpellAddBuff(shadow_bolt molten_core_aura=1,target_health_pct,25 if_spell=!the_codex_of_xerrath specialization=demonology)
-Define(Shadowburn 17877) # SimulationCraft bug workaround
 Define(shadowburn 17877)
 	SpellInfo(shadowburn burningembers=10 target_health_pct=20)
 	SpellAddBuff(shadowburn havoc_buff=-1 if_spell=havoc)
