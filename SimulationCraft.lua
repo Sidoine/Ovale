@@ -1271,11 +1271,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "ROGUE" and specialization == "subtlety" and action == "slice_and_dice" then
-			-- The game does not prevent a Subtlety rogue from overwriting a longer Slice and Dice buff with a shorter one.
-			local buffName = "slice_and_dice_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffRemaining(%s) < 0.3 * BaseDuration(%s)", buffName, buffName)
 		elseif class == "ROGUE" and action == "stealth" then
 			-- Don't Stealth if already stealthed.
 			conditionCode = "BuffExpires(stealthed_buff any=1)"

@@ -55,12 +55,12 @@ AddFunction InterruptActions
 
 AddFunction AssassinationDefaultActions
 {
-	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 UsePotionAgility()
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|debuff.vendetta.up
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) UsePotionAgility()
 	#kick
 	InterruptActions()
-	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
-	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
+	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
 	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
 	#blood_fury
