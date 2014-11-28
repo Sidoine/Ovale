@@ -2700,6 +2700,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- TODO: "primary_target" is 1 if the current target is the "main/boss" target.
 		code = "0"
+	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.remains" then
+		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
+		local buffName = "honor_among_thieves_cooldown_buff"
+		code = format("BuffRemaining(%s)", buffName)
+		AddSymbol(annotation, buffName)
 	elseif operand == "debuff.casting.react" then
 		code = target .. "IsInterruptible()"
 	elseif operand == "debuff.flying.down" then
