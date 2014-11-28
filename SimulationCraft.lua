@@ -429,7 +429,7 @@ local function UnparseExpression(node)
 			if BINARY_OPERATOR[node.operator][3] == "associative" then
 				rhsExpression = Unparse(rhsNode)
 			else
-				rhsExpression = "{ " .. Unparse(rhsNode) .. " }"
+				rhsExpression = "(" .. Unparse(rhsNode) .. ")"
 			end
 		else
 			rhsExpression = Unparse(rhsNode)
@@ -1804,15 +1804,15 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		node = Emit(parseNode, nodeList, annotation, action)
 	elseif modifier == "line_cd" then
 		if not SPECIAL_ACTION[action] then
-			local value = tonumber(Unparse(parseNode))
 			AddSymbol(annotation, action)
-			code = format("TimeSincePreviousSpell(%s) > %d", action, value)
+			local expressionCode = OvaleAST:Unparse(Emit(parseNode, nodeList, annotation, action))
+			code = format("TimeSincePreviousSpell(%s) > %s", action, expressionCode)
 		end
 	elseif modifier == "max_cycle_targets" then
-		local value = tonumber(Unparse(parseNode))
 		local debuffName = action .. "_debuff"
 		AddSymbol(annotation, debuffName)
-		code = format("DebuffCountOnAny(%s) <= Enemies() and DebuffCountOnAny(%s) <= %d", debuffName, debuffName, value)
+		local expressionCode = OvaleAST:Unparse(Emit(parseNode, nodeList, annotation, action))
+		code = format("DebuffCountOnAny(%s) <= Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
 	elseif modifier == "max_energy" then
 		local value = tonumber(Unparse(parseNode))
 		if value == 1 then
