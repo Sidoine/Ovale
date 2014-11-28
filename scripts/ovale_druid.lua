@@ -391,14 +391,14 @@ AddFunction GuardianDefaultCdActions
 		#heart_of_the_wild
 		Spell(heart_of_the_wild_tank)
 
-		unless BuffPresent(heart_of_the_wild_tank_buff) and BuffRemaining(rejuvenation_buff) <= 0.3 * BaseDuration(rejuvenation_buff) and SpellKnown(enhanced_rejuvenation) and Spell(rejuvenation)
+		unless BuffPresent(heart_of_the_wild_tank_buff) and BuffRemaining(rejuvenation_buff) <= 3.6 and SpellKnown(enhanced_rejuvenation) and Spell(rejuvenation)
 		{
 			#natures_vigil
 			Spell(natures_vigil)
 
 			unless BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 and Spell(healing_touch)
 				or BuffRemaining(pulverize_buff) < 0.5 and target.DebuffStacks(lacerate_debuff) >= 3 and Spell(pulverize)
-				or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) and Spell(lacerate)
+				or BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffStacks(lacerate_debuff) >= 3 and Spell(pulverize)
 			{
 				#incarnation
 				Spell(incarnation_tank)

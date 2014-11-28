@@ -1318,7 +1318,8 @@ AddFunction ProtectionGladiatorSingleActions
 
 AddFunction ProtectionGladiatorSingleShortCdActions
 {
-	unless Spell(shield_slam)
+	unless BuffStacks(unyielding_strikes_buff) > 0 and BuffStacks(unyielding_strikes_buff) < 6 and BuffRemaining(unyielding_strikes_buff) < 1.5 and Spell(devastate)
+		or Spell(shield_slam)
 		or Spell(revenge)
 		or BuffPresent(sudden_death_buff) and Spell(execute)
 	{
