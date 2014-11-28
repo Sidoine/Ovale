@@ -72,7 +72,7 @@ AddFunction HolyPrecombatActions
 	#seal_of_insight
 	Spell(seal_of_insight)
 	#beacon_of_light,target=healing_target
-	Spell(beacon_of_light)
+	Spell(beacon_of_light text=healing_target)
 	#snapshot_stats
 }
 

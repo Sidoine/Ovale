@@ -41,10 +41,10 @@ AddFunction DestructionDefaultActions
 	if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
 	#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
 	if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-	#run_action_list,name=single_target,if=active_enemies<4
-	if Enemies() < 4 DestructionSingleTargetActions()
-	#run_action_list,name=aoe,if=active_enemies>=4
-	if Enemies() >= 4 DestructionAoeActions()
+	#run_action_list,name=single_target,if=active_enemies<6
+	if Enemies() < 6 DestructionSingleTargetActions()
+	#run_action_list,name=aoe,if=active_enemies>=6
+	if Enemies() >= 6 DestructionAoeActions()
 }
 
 AddFunction DestructionAoeActions
@@ -67,8 +67,6 @@ AddFunction DestructionAoeActions
 	if BuffPresent(fire_and_brimstone_buff) and Charges(conflagrate) == 2 Spell(conflagrate)
 	#immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains<=(dot.immolate.duration*0.3)
 	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) <= target.DebuffDuration(immolate_debuff) * 0.3 Spell(immolate)
-	#chaos_bolt,if=!talent.charred_remains.enabled&active_enemies=4
-	if not Talent(charred_remains_talent) and Enemies() == 4 Spell(chaos_bolt)
 	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up&burning_ember>=2.5
 	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) and BurningEmbers() / 10 >= 2.5 Spell(chaos_bolt)
 	#incinerate
@@ -104,8 +102,14 @@ AddFunction DestructionSingleTargetActions
 	if Enemies() > 1 Spell(havoc text=other)
 	#shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|buff.dark_soul.up|target.time_to_die<10)
 	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(shadowburn)
+	#cataclysm,if=active_enemies>1
+	if Enemies() > 1 Spell(cataclysm)
+	#fire_and_brimstone,if=buff.fire_and_brimstone.down&dot.immolate.remains<=action.immolate.cast_time&(cooldown.cataclysm.remains>action.immolate.cast_time|!talent.cataclysm.enabled)&active_enemies>4
+	if BuffExpires(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Enemies() > 4 Spell(fire_and_brimstone)
 	#immolate,cycle_targets=1,if=remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)
 	if target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } Spell(immolate)
+	#cancel_buff,name=fire_and_brimstone,if=buff.fire_and_brimstone.up&dot.immolate.remains>(dot.immolate.duration*0.3)
+	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.3 and BuffPresent(fire_and_brimstone_buff) Texture(fire_and_brimstone text=cancel)
 	#shadowburn,if=buff.havoc.remains
 	if BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
@@ -114,6 +118,8 @@ AddFunction DestructionSingleTargetActions
 	if Charges(conflagrate) == 2 Spell(conflagrate)
 	#cataclysm
 	Spell(cataclysm)
+	#rain_of_fire,if=remains<=tick_time&(active_enemies>4|(buff.mannoroths_fury.up&active_enemies>2))
+	if target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and { Enemies() > 4 or BuffPresent(mannoroths_fury_buff) and Enemies() > 2 } Spell(rain_of_fire)
 	#chaos_bolt,if=talent.charred_remains.enabled&active_enemies>1&target.health.pct>20
 	if Talent(charred_remains_talent) and Enemies() > 1 and target.HealthPercent() > 20 Spell(chaos_bolt)
 	#chaos_bolt,if=talent.charred_remains.enabled&buff.backdraft.stack<3&burning_ember>=2.5
@@ -138,14 +144,14 @@ AddFunction DestructionSingleTargetActions
 	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
 	#chaos_bolt,if=buff.backdraft.stack<3&trinket.proc.mastery.react&trinket.proc.mastery.remains>cast_time
 	if BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) Spell(chaos_bolt)
+	#fire_and_brimstone,if=buff.fire_and_brimstone.down&dot.immolate.remains<=(dot.immolate.duration*0.3)&active_enemies>4
+	if BuffExpires(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) <= target.DebuffDuration(immolate_debuff) * 0.3 and Enemies() > 4 Spell(fire_and_brimstone)
 	#immolate,cycle_targets=1,if=remains<=(duration*0.3)
 	if target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#conflagrate
 	Spell(conflagrate)
-	#incinerate,if=talent.charred_remains.enabled
-	if Talent(charred_remains_talent) Spell(incinerate)
-	#incinerate,if=buff.backdraft.up|mana>=48800
-	if BuffPresent(backdraft_buff) or Mana() >= 48800 Spell(incinerate)
+	#incinerate
+	Spell(incinerate)
 }
 
 AddIcon specialization=destruction help=main enemies=1
@@ -191,6 +197,7 @@ AddIcon specialization=destruction help=aoe
 # immolate_debuff
 # incinerate
 # mannoroths_fury
+# mannoroths_fury_buff
 # rain_of_fire
 # rain_of_fire_debuff
 # shadowburn
