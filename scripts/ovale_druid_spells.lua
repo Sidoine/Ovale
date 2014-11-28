@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_druid_spells"
-	local desc = "[6.0.2] Ovale: Druid spells"
+	local desc = "[6.0.3] Ovale: Druid spells"
 	local code = [[
 # Druid spells and functions.
 
@@ -230,7 +230,7 @@ Define(pulverize 80313)
 	SpellAddBuff(pulverize pulverize_buff=1)
 	SpellAddTargetDebuff(pulverize lacerate_debuff=0)
 Define(pulverize_buff 158792)
-	SpellInfo(pulverize_buff duration=12)
+	SpellInfo(pulverize_buff duration=12 tick=1)
 Define(pulverize_talent 20)
 Define(rake 1822)
 	SpellInfo(rake combo=1 energy=35 stance=druid_cat_form if_spell=!claws_of_shirvallah)

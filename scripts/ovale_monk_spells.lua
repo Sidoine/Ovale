@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_monk_spells"
-	local desc = "[6.0.2] Ovale: Monk spells"
+	local desc = "[6.0.3] Ovale: Monk spells"
 	local code = [[
 # Monk spells and functions.
 
@@ -272,7 +272,7 @@ Define(tiger_palm 100787)
 	SpellAddBuff(tiger_palm combo_breaker_tp_buff=0 if_stance=monk_stance_of_the_fierce_tiger)
 	SpellAddBuff(tiger_palm vital_mists_buff=1 if_stance=monk_stance_of_the_spirited_crane)
 Define(tiger_power_buff 125359)
-	SpellInfo(tiger_power_buff duration=20)
+	SpellInfo(tiger_power_buff duration=20 tick=1)
 Define(tigereye_brew 116740)
 	SpellInfo(tigereye_brew cd=5 gcd=0)
 	SpellAddBuff(tigereye_brew tigereye_brew_buff=-10 tigereye_brew_use_buff=1)
