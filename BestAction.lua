@@ -293,8 +293,16 @@ end
 local function GetActionTextureInfo(element, state, target)
 	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionTextureInfo")
 
-	local texture = element.params[1]
-	local actionTexture = "Interface\\Icons\\" .. texture
+	local actionTexture
+	do
+		local texture = element.params[1]
+		local spellId = tonumber(texture)
+		if spellId then
+			actionTexture = API_GetSpellTexture(spellId)
+		else
+			actionTexture = "Interface\\Icons\\" .. texture
+		end
+	end
 	local actionInRange = nil
 	local actionCooldownStart = 0
 	local actionCooldownDuration = 0
