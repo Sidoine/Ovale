@@ -52,7 +52,7 @@ AddFunction DestructionAoeActions
 	#rain_of_fire,if=remains<=tick_time
 	if target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) Spell(rain_of_fire)
 	#havoc,target=2
-	Spell(havoc)
+	if Enemies() > 1 Spell(havoc text=other)
 	#shadowburn,if=buff.havoc.remains
 	if BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
@@ -101,7 +101,7 @@ AddFunction DestructionPrecombatActions
 AddFunction DestructionSingleTargetActions
 {
 	#havoc,target=2
-	Spell(havoc)
+	if Enemies() > 1 Spell(havoc text=other)
 	#shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|buff.dark_soul.up|target.time_to_die<10)
 	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(shadowburn)
 	#immolate,cycle_targets=1,if=remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)

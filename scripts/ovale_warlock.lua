@@ -624,8 +624,6 @@ AddFunction DestructionAoePredictActions
 {
 	#rain_of_fire,if=remains<=tick_time
 	if target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) Spell(rain_of_fire)
-	#havoc,target=2
-	Spell(havoc)
 	#shadowburn,if=buff.havoc.remains
 	if BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
@@ -647,12 +645,16 @@ AddFunction DestructionAoePredictActions
 AddFunction DestructionAoeShortCdActions
 {
 	unless target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and Spell(rain_of_fire)
-		or Spell(havoc)
-		or BuffPresent(havoc_buff) and Spell(shadowburn)
-		or BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
 	{
-		#cataclysm
-		Spell(cataclysm)
+		#havoc,target=2
+		if Enemies() > 1 Spell(havoc text=other)
+
+		unless BuffPresent(havoc_buff) and Spell(shadowburn)
+			or BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
+		{
+			#cataclysm
+			Spell(cataclysm)
+		}
 	}
 }
 
@@ -722,9 +724,6 @@ AddFunction DestructionSingleTargetActions
 
 AddFunction DestructionSingleTargetPredictActions
 {
-	# CHANGE: Don't suggest Havoc on single-target.
-	#havoc,target=2
-	#Spell(havoc)
 	#shadowburn,if=talent.charred_remains.enabled&(burning_ember>=2.5|buff.dark_soul.up|target.time_to_die<10)
 	if Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } Spell(shadowburn)
 	#immolate,cycle_targets=1,if=remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)
@@ -767,6 +766,9 @@ AddFunction DestructionSingleTargetPredictActions
 
 AddFunction DestructionSingleTargetShortCdActions
 {
+	#havoc,target=2
+	if Enemies() > 1 Spell(havoc text=other)
+
 	unless Talent(charred_remains_talent) and { BurningEmbers() / 10 >= 2.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 10 } and Spell(shadowburn)
 		or target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Spell(immolate)
 		or BuffPresent(havoc_buff) and Spell(shadowburn)

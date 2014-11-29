@@ -1310,6 +1310,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "WARLOCK" and action == "grimoire_of_sacrifice" then
 			-- Grimoire of Sacrifice requires a pet to already be summoned.
 			conditionCode = "pet.Present()"
+		elseif class == "WARLOCK" and action == "havoc" then
+			-- Havoc requires another target.
+			conditionCode = "Enemies() > 1"
 		elseif class == "WARLOCK" and action == "service_pet" then
 			if annotation.pet then
 				local spellName = "grimoire_" .. annotation.pet
@@ -1444,7 +1447,16 @@ EmitAction = function(parseNode, nodeList, annotation)
 		end
 		if isSpellAction then
 			AddSymbol(annotation, action)
-			bodyCode = "Spell(" .. action .. ")"
+			if modifier.target then
+				local actionTarget = Unparse(modifier.target)
+				if actionTarget == "2" then
+					actionTarget = "other"
+				end
+				if actionTarget ~= "1" then
+					bodyCode = format("Spell(%s text=%s)", action, actionTarget)
+				end
+			end
+			bodyCode = bodyCode or "Spell(" .. action .. ")"
 		end
 		annotation.astAnnotation = annotation.astAnnotation or {}
 		if not bodyNode and bodyCode then
