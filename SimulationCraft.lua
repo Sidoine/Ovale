@@ -1043,6 +1043,7 @@ local function InitializeDisambiguation()
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
 	AddDisambiguation("ascendance",				"ascendance_caster",			"SHAMAN",		"elemental")
+	AddDisambiguation("ascendance",				"ascendance_heal",				"SHAMAN",		"restoration")
 	AddDisambiguation("ascendance",				"ascendance_melee",				"SHAMAN",		"enhancement")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"SHAMAN")
 	-- Warlock
@@ -1274,6 +1275,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "ROGUE" and action == "stealth" then
 			-- Don't Stealth if already stealthed.
 			conditionCode = "BuffExpires(stealthed_buff any=1)"
+		elseif class == "SHAMAN" and strsub(action, 1, 11) == "ascendance_" then
+			-- Ascendance doesn't go on cooldown until after the buff expires, so don't
+			-- suggest Ascendance if already in Ascendance.
+			local buffName = action .. "_buff"
+			AddSymbol(annotation, buffName)
+			conditionCode = format("BuffExpires(%s)", buffName)
 		elseif class == "SHAMAN" and action == "bloodlust" then
 			bodyCode = "Bloodlust()"
 			annotation[action] = class

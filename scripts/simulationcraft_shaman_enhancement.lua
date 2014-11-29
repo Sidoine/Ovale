@@ -76,7 +76,7 @@ AddFunction EnhancementDefaultActions
 	#fire_elemental_totem,if=(talent.primal_elementalist.enabled&active_enemies<=10)|active_enemies<=6
 	if Talent(primal_elementalist_talent) and Enemies() <= 10 or Enemies() <= 6 Spell(fire_elemental_totem)
 	#ascendance
-	Spell(ascendance_melee)
+	if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
 	#feral_spirit
 	Spell(feral_spirit)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15

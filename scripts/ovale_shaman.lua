@@ -106,7 +106,7 @@ AddFunction ElementalDefaultCdActions
 	#fire_elemental_totem,if=!active
 	if not TotemPresent(fire totem=fire_elemental_totem) Spell(fire_elemental_totem)
 	#ascendance,if=active_enemies>1|(dot.flame_shock.remains>buff.ascendance.duration&(target.time_to_die<20|buff.bloodlust.up|time>=60)&cooldown.lava_burst.remains>0)
-	if Enemies() > 1 or target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) and { target.TimeToDie() < 20 or BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 60 } and SpellCooldown(lava_burst) > 0 Spell(ascendance_caster)
+	if { Enemies() > 1 or target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) and { target.TimeToDie() < 20 or BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 60 } and SpellCooldown(lava_burst) > 0 } and BuffExpires(ascendance_caster_buff) Spell(ascendance_caster)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ElementalSingleCdActions()
 	#call_action_list,name=aoe,if=active_enemies>1
@@ -310,7 +310,7 @@ AddFunction EnhancementDefaultCdActions
 	#fire_elemental_totem,if=(talent.primal_elementalist.enabled&active_enemies<=10)|active_enemies<=6
 	if Talent(primal_elementalist_talent) and Enemies() <= 10 or Enemies() <= 6 Spell(fire_elemental_totem)
 	#ascendance
-	Spell(ascendance_melee)
+	if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
 
 	unless Spell(feral_spirit)
 		or { TotemRemaining(fire totem=searing_totem) >= 15 or TotemRemaining(fire totem=magma_totem) >= 15 or TotemRemaining(fire totem=fire_elemental_totem) >= 15 } and Spell(liquid_magma)
