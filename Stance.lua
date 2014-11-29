@@ -36,7 +36,7 @@ local API_GetSpellInfo = GetSpellInfo
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleStance)
 
-local OVALE_SPELLID_TO_STANCE = {
+local SPELL_NAME_TO_STANCE = {
 	-- Death Knight
 	[API_GetSpellInfo( 48263)] = "deathknight_blood_presence",
 	[API_GetSpellInfo( 48265)] = "deathknight_unholy_presence",
@@ -73,6 +73,14 @@ local OVALE_SPELLID_TO_STANCE = {
 	[API_GetSpellInfo(156291)] = "warrior_gladiator_stance",
 }
 
+-- Table of all valid stance names.
+local STANCE_NAME = {}
+do
+	for _, name in pairs(SPELL_NAME_TO_STANCE) do
+		STANCE_NAME[name] = true
+	end
+end
+
 do
 	local debugOptions = {
 		stance = {
@@ -105,6 +113,8 @@ OvaleStance.stanceList = {}
 OvaleStance.stanceId = {}
 -- Player's current stance.
 OvaleStance.stance = nil
+-- Table of all valid stance names.
+OvaleStance.STANCE_NAME = STANCE_NAME
 --</public-static-properties>
 
 --<public-static-methods>
@@ -113,6 +123,7 @@ function OvaleStance:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
+
 end
 
 function OvaleStance:OnEnable()
@@ -159,7 +170,7 @@ function OvaleStance:CreateStanceList()
 	local _, name, stanceName
 	for i = 1, API_GetNumShapeshiftForms() do
 		_, name = API_GetShapeshiftFormInfo(i)
-		stanceName = OVALE_SPELLID_TO_STANCE[name]
+		stanceName = SPELL_NAME_TO_STANCE[name]
 		if stanceName then
 			self.stanceList[i] = stanceName
 			self.stanceId[stanceName] = i
@@ -206,7 +217,7 @@ end
 
 function OvaleStance:IsStanceSpell(spellId)
 	local name = API_GetSpellInfo(spellId)
-	return not not (name and OVALE_SPELLID_TO_STANCE[name])
+	return not not (name and SPELL_NAME_TO_STANCE[name])
 end
 
 function OvaleStance:ShapeshiftEventHandler()

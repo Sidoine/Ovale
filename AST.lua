@@ -30,6 +30,7 @@ local OvaleCondition = nil
 local OvaleLexer = nil
 local OvaleScripts = nil
 local OvaleSpellBook = nil
+local OvaleStance = nil
 
 local format = string.format
 local gsub = string.gsub
@@ -86,7 +87,6 @@ local PARAMETER_KEYWORD = {
 	["glyph"] = true,
 	["help"] = true,
 	["if_spell"] = true,
-	["if_stance"] = true,
 	["item"] = true,			-- deprecated
 	["itemcount"] = true,
 	["itemset"] = true,
@@ -108,10 +108,20 @@ local SPELL_AURA_KEYWORD = {
 	["SpellDamageDebuff"] = true,
 }
 
+local STANCE_KEYWORD = {
+	["if_stance"] = true,
+	["stance"] = true,
+	["to_stance"] = true,
+}
+
 do
 	-- SpellAuraList keywords are declaration keywords.
 	for keyword, value in pairs(SPELL_AURA_KEYWORD) do
 		DECLARATION_KEYWORD[keyword] = value
+	end
+	-- All stance keywords are parameter keywords.
+	for keyword, value in pairs(STANCE_KEYWORD) do
+		PARAMETER_KEYWORD[keyword] = value
 	end
 	-- All keywords are Ovale script keywords.
 	for keyword, value in pairs(DECLARATION_KEYWORD) do
@@ -2323,6 +2333,7 @@ function OvaleAST:OnInitialize()
 	OvaleLexer = Ovale.OvaleLexer
 	OvaleScripts = Ovale.OvaleScripts
 	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleStance = Ovale.OvaleStance
 end
 
 function OvaleAST:DebugAST()
@@ -2410,6 +2421,7 @@ function OvaleAST:ParseScript(name, options)
 			self:PropagateConstants(ast)
 			self:PropagateStrings(ast)
 			self:FlattenParameters(ast)
+			self:VerifyParameterStances(ast)
 			self:VerifyFunctionCalls(ast)
 		else
 			-- Create a dummy node to properly release resources.
@@ -2654,6 +2666,37 @@ function OvaleAST:VerifyFunctionCalls(ast)
 		end
 	end
 	self:StopProfiling("OvaleAST_VerifyFunctionCalls")
+end
+
+function OvaleAST:VerifyParameterStances(ast)
+	self:StartProfiling("OvaleAST_VerifyParameterStances")
+	local annotation = ast.annotation
+	if annotation and annotation.verify and annotation.parametersReference then
+		for _, node in ipairs(annotation.parametersReference) do
+			if node.rawParams then
+				for stanceKeyword in pairs(STANCE_KEYWORD) do
+					local valueNode = node.rawParams[stanceKeyword]
+					if valueNode then
+						if valueNode.type == "comma_separated_values" then
+							valueNode = valueNode.child[1]
+						end
+						if valueNode.type == "bang_value" then
+							valueNode = valueNode.child[1]
+						end
+						local value = FlattenParameterValue(valueNode)
+						if OvaleStance.STANCE_NAME[value] then
+							-- The value is a valid stance name.
+						elseif type(value) == "number" then
+							-- The value is a number, which is a valid stance reference.
+						else
+							self:Error("unknown stance '%s'.", value)
+						end
+					end
+				end
+			end
+		end
+	end
+	self:StopProfiling("OvaleAST_VerifyParameterStances")
 end
 
 function OvaleAST:Optimize(ast)

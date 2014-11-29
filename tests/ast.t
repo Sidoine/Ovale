@@ -38,6 +38,7 @@ do
 		"Runes.lua",
 		"Scripts.lua",
 		"SpellBook.lua",
+		"Stance.lua",
 		"State.lua",
 		-- Additional modules.
 		"conditions.lua",
