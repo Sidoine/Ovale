@@ -346,27 +346,29 @@ local function FlattenParameterValue(parameterValue)
 	local value = parameterValue
 	if type(parameterValue) == "table" then
 		local node = parameterValue
-		local isBang = false
-		if node.type == "bang_value" then
-			isBang = true
-			node = node.child[1]
-		end
-		if node.type == "value" then
-			value = node.value
-		elseif node.type == "variable" then
-			value = node.name
-		elseif node.type == "string" then
-			value = node.value
-		elseif node.type == "comma_separated_values" then
+		if node.type == "comma_separated_values" then
 			local output = self_outputPool:Get()
 			for k, v in ipairs(node.csv) do
 				output[k] = FlattenParameterValue(v)
 			end
 			value = tconcat(output, ",")
 			self_outputPool:Release(output)
-		end
-		if isBang then
-			value = "!" .. tostring(value)
+		else
+			local isBang = false
+			if node.type == "bang_value" then
+				isBang = true
+				node = node.child[1]
+			end
+			if node.type == "value" then
+				value = node.value
+			elseif node.type == "variable" then
+				value = node.name
+			elseif node.type == "string" then
+				value = node.value
+			end
+			if isBang then
+				value = "!" .. tostring(value)
+			end
 		end
 	end
 	return value
