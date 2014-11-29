@@ -1365,6 +1365,16 @@ EmitAction = function(parseNode, nodeList, annotation)
 				bodyCode = OvaleFunctionName(name, annotation) .. "()"
 			end
 			isSpellAction = false
+		elseif action == "cancel_buff" then
+			if modifier.name then
+				local spellName = Unparse(modifier.name)
+				local buffName = spellName .. "_buff"
+				AddSymbol(annotation, spellName)
+				AddSymbol(annotation, buffName)
+				bodyCode = format("Texture(%s text=cancel)", spellName)
+				conditionCode = format("BuffPresent(%s)", buffName)
+				isSpellAction = false
+			end
 		elseif action == "mana_potion" then
 			bodyCode = "UsePotionMana()"
 			annotation.use_potion_mana = class
