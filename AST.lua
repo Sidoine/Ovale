@@ -435,16 +435,21 @@ local UnparseVariable = nil
 local UnparseWait = nil
 
 Unparse = function(node)
-	local visitor
-	if node.previousType then
-		visitor = UNPARSE_VISITOR[node.previousType]
+	if node.asString then
+		-- Return cached string representation if present.
+		return node.asString
 	else
-		visitor = UNPARSE_VISITOR[node.type]
-	end
-	if not visitor then
-		OvaleAST:Error("Unable to unparse node of type '%s'.", node.type)
-	else
-		return visitor(node)
+		local visitor
+		if node.previousType then
+			visitor = UNPARSE_VISITOR[node.previousType]
+		else
+			visitor = UNPARSE_VISITOR[node.type]
+		end
+		if not visitor then
+			OvaleAST:Error("Unable to unparse node of type '%s'.", node.type)
+		else
+			return visitor(node)
+		end
 	end
 end
 
@@ -1329,6 +1334,7 @@ ParseFunction = function(tokenStream, nodeList, annotation)
 			node.func = name
 		end
 		node.rawParams = parameters
+		-- Cache string representation.
 		node.asString = UnparseFunction(node)
 		annotation.parametersReference = annotation.parametersReference or {}
 		annotation.parametersReference[#annotation.parametersReference + 1] = node
