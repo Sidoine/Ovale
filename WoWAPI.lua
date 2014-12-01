@@ -37,7 +37,12 @@ local unpack = unpack
 local self_state = {}
 local self_privateSymbol = {
 	["ExportSymbols"] = true,
+	["Fire"] = true,
 	["Initialize"] = true,
+	["LoadAddonFile"] = true,
+	["LoadLua"] = true,
+	["LoadTOC"] = true,
+	["LoadXML"] = true,
 }
 
 -- Metatable to provide __index method to tables so that if the requested key
@@ -65,6 +70,14 @@ local function DeepCopy(orig)
         copy = orig
     end
     return copy
+end
+
+local function DoNothing()
+	-- No op.
+end
+
+local function ZeroFunction()
+	return 0
 end
 --</private-static-methods>
 
@@ -108,7 +121,7 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = LibStub(libName)
+			local lib = WoWAPI.LibStub(libName)
 			if lib then
 				for k, v in pairs(lib) do
 					mod[k] = v
@@ -129,10 +142,14 @@ do
 		return lib.addons[name]
 	end
 
-	lib.ADDON_LOADED = function(lib, event)
+	lib.Fire = function(lib, event, ...)
 		for _, addon in ipairs(lib.initializationQueue) do
-			if addon.OnInitialize then
+			if event == "ADDON_LOADED" and addon.OnInitialize then
 				addon:OnInitialize()
+			elseif event == "PLAYER_LOGIN" and addon.OnEnable then
+				addon:OnEnable()
+			elseif addon.SendMessage then
+				addon:SendMessage(event, ...)
 			end
 		end
 	end
@@ -162,7 +179,7 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = LibStub(libName)
+			local lib = WoWAPI.LibStub(libName)
 			if lib then
 				for k, v in pairs(lib) do
 					addon[k] = v
@@ -182,7 +199,7 @@ local AceConfig = nil
 do
 	local lib = {}
 	AceConfig = lib
-	lib.RegisterOptionsTable = function(lib, ...) end
+	lib.RegisterOptionsTable = DoNothing
 end
 
 -- AceConfigDialog-3.0
@@ -190,7 +207,7 @@ local AceConfigDialog = nil
 do
 	local lib = {}
 	AceConfigDialog = lib
-	lib.AddToBlizOptions = function(lib, ...) end
+	lib.AddToBlizOptions = DoNothing
 end
 
 -- AceConsole-3.0
@@ -217,8 +234,8 @@ do
 	lib.New = function(lib, name, template)
 		template = template or {}
 		local db = DeepCopy(template)
-		db.RegisterCallback = function(...) end
-		db.RegisterDefaults = function(...) end
+		db.RegisterCallback = DoNothing
+		db.RegisterDefaults = DoNothing
 		return db
 	end
 end
@@ -228,7 +245,7 @@ local AceDBOptions = nil
 do
 	local lib = {}
 	AceDBOptions = lib
-	lib.GetOptionsTable = function(db) end
+	lib.GetOptionsTable = DoNothing
 end
 
 -- AceEvent-3.0
@@ -236,7 +253,37 @@ local AceEvent = nil
 do
 	local lib = {}
 	AceEvent = lib
-	lib.SendMessage = function(lib, message, ...) end
+
+	local eventHandler = {}
+
+	lib.RegisterEvent = function(lib, event, handler, arg)
+		eventHandler[lib] = eventHandler[lib] or {}
+		eventHandler[lib][event] = { handler, arg }
+	end
+
+	lib.RegisterMessage = lib.RegisterEvent
+
+	lib.SendMessage = function(lib, event, ...)
+		local handler, arg
+		local tbl = eventHandler[lib] and eventHandler[lib][event]
+		if tbl then
+			handler, arg = tbl[1], tbl[2]
+			if type(handler) == "string" then
+				handler = lib[handler]
+				arg = lib
+			end
+		else
+			handler = lib[event]
+			arg = lib
+		end
+		if handler then
+			if arg then
+				handler(arg, event, ...)
+			else
+				handler(event, ...)
+			end
+		end
+	end
 end
 
 -- AceGUI-3.0
@@ -244,7 +291,26 @@ local AceGUI = nil
 do
 	local lib = {}
 	AceGUI = lib
-	lib.RegisterWidgetType = function(...) end
+
+	local widgetFactory = {}
+	local container = {}
+
+	lib.Create = function(lib, widgetType)
+		local constructor = widgetFactory[widgetType]
+		if constructor then
+			return constructor()
+		end
+	end
+
+	lib.RegisterAsContainer = function(lib, widget)
+		container[widget] = true
+		widget.AddChild = DoNothing
+		widget.ReleaseChildren = DoNothing
+	end
+
+	lib.RegisterWidgetType = function(lib, name, constructor, version)
+		widgetFactory[name] = constructor
+	end
 end
 
 -- AceLocale-3.0
@@ -269,6 +335,14 @@ do
 		lib.locale[name] = L
 		return L
 	end
+end
+
+-- AceTimer-3.0
+local AceTimer = nil
+do
+	local lib = {}
+	AceTimer = lib
+	lib.ScheduleRepeatingTimer = DoNothing
 end
 
 -- CallbackHandler-1.0
@@ -298,6 +372,14 @@ do
 	end
 end
 
+-- LibTextDump-1.0
+local LibTextDump = nil
+do
+	local lib = {}
+	LibTextDump = lib
+	lib.New = DoNothing
+end
+
 -- LibStub
 local LibStub = nil
 do
@@ -314,8 +396,10 @@ do
 		["AceEvent-3.0"] = AceEvent,
 		["AceGUI-3.0"] = AceGUI,
 		["AceLocale-3.0"] = AceLocale,
+		["AceTimer-3.0"] = AceTimer,
 		["CallbackHandler-1.0"] = CallbackHandler,
 		["LibBabble-CreatureType-3.0"] = LibBabbleCreatureType,
+		["LibTextDump-1.0"] = LibTextDump,
 	}
 
 	local mt = {
@@ -439,9 +523,7 @@ WoWAPI.NUM_TALENT_COLUMNS = 3
 	This is a trivial implementation to just get the Profiler module
 	working.
 --]]--------------------------------------------------------------------
-WoWAPI.debugprofilestop = function()
-	return 0
-end
+WoWAPI.debugprofilestop = ZeroFunction
 
 --[[--------------------------------------------------------------------
 	strsplit() is a non-standard Lua function that splits a string and
@@ -506,9 +588,35 @@ end
 --]]-------------------------------------------------
 
 WoWAPI.CreateFrame = function(...)
-	return {
-		SetOwner = function(...) end,
+	local frame = {
+		CreateTexture = function(...) return WoWAPI.CreateFrame() end,
+		EnableMouse = DoNothing,
+		Hide = DoNothing,
+		IsVisible = DoNothing,
+		NumLines = ZeroFunction,
+		SetAllPoints = DoNothing,
+		SetAlpha = DoNothing,
+		SetFrameStrata = DoNothing,
+		SetHeight = DoNothing,
+		SetInventoryItem = DoNothing,
+		SetMovable = DoNothing,
+		SetOwner = DoNothing,
+		SetPoint = DoNothing,
+		SetScript = DoNothing,
+		SetTexture = DoNothing,
+		SetWidth = DoNothing,
 	}
+	return frame
+end
+
+WoWAPI.GetActiveSpecGroup = function()
+	-- Always in the primary specialization.
+	return 1
+end
+
+WoWAPI.GetActionInfo = function(slot)
+	-- Action bar is always empty.
+	return nil
 end
 
 WoWAPI.GetAuctionItemSubClasses = function(classIndex)
@@ -532,6 +640,30 @@ WoWAPI.GetAuctionItemSubClasses = function(classIndex)
 		"Fishing Poles"
 end
 
+-- No keybinds are assigned.
+WoWAPI.GetBindingKey = function(name)
+	return nil
+end
+
+WoWAPI.GetBonusBarIndex = function()
+	return 8
+end
+
+WoWAPI.GetGlyphSocketInfo = function(socket, talentGroup)
+	-- No glyphs.
+	return nil
+end
+
+WoWAPI.GetInventoryItemGems = function(slot)
+	-- Player is always completely un-gemmed.
+	return nil
+end
+
+WoWAPI.GetInventoryItemID = function(unitId, slot)
+	-- All units are naked.
+	return nil
+end
+
 WoWAPI.GetItemInfo = function(item)
 	if type(item) == "number" then
 		item = format("Item Name Of %d", item)
@@ -543,6 +675,27 @@ WoWAPI.GetLocale = function()
 	return "enUS"
 end
 
+WoWAPI.GetNumGlyphSockets = function()
+	-- 3 x Major + 3 x Minor
+	return 6
+end
+
+WoWAPI.GetNumShapeshiftForms = ZeroFunction
+
+WoWAPI.GetPowerRegen = function()
+	return 0, 0
+end
+
+WoWAPI.GetShapeshiftForm = function()
+	-- Always in humanoid form.
+	return 0
+end
+
+WoWAPI.GetSpecialization = function()
+	local specialization = self_state.specialization or 1
+	return specialization
+end
+
 WoWAPI.GetSpellInfo = function(spell)
 	if type(spell) == "number" then
 		spell = format("Spell Name Of %d", spell)
@@ -550,20 +703,88 @@ WoWAPI.GetSpellInfo = function(spell)
 	return spell
 end
 
+WoWAPI.GetSpellTabInfo = function(index)
+	-- No spells in the spellbook.
+	return nil
+end
+
+WoWAPI.GetTalentInfo = function(row, column, activeTalentGroup)
+	-- No talents.
+	return 123, "A Talent", nil, 0, nil
+end
+
+WoWAPI.GetTime = function()
+	return 1234
+end
+
+WoWAPI.HasPetSpells = function()
+	-- No pet spells.
+	return false
+end
+
 WoWAPI.RegisterAddonMessagePrefix = function(prefixString) end
+WoWAPI.RegisterStateDriver = function(frame, stateId, conditional) end
+
+WoWAPI.UnitAura = function(unitId)
+	-- No auras on any unit.
+	return nil
+end
 
 WoWAPI.UnitClass = function()
 	local class = self_state.class
 	return class, class
 end
 
+WoWAPI.UnitGUID = function(unitId)
+	local guid = self_state.guid or 0
+	return guid
+end
+
 WoWAPI.UnitLevel = function()
 	return self_state.level
 end
 
+WoWAPI.UnitName = function()
+	local name = self_state.name or "AwesomePlayer"
+	return name
+end
+
+WoWAPI.UnitPower = function(unitId, powerType)
+	-- Always no resources on any unit.
+	return 0
+end
+
+WoWAPI.UnitPowerMax = function(unitId, powerType)
+	-- Resources are from 0 to 100.
+	return 100
+end
+
+WoWAPI.UnitPowerType = function(unitId)
+	-- Every unit is a mana user.
+	return WoWAPI.SPELL_POWER_MANA, "MANA"
+end
+
+-- Unit stat functions for a naked toon.
+WoWAPI.GetCombatRating = ZeroFunction
+WoWAPI.GetCritChance = ZeroFunction
+WoWAPI.GetMastery = ZeroFunction
+WoWAPI.GetMasteryEffect = ZeroFunction
+WoWAPI.GetMeleeHaste = ZeroFunction
+WoWAPI.GetRangedCritChance = ZeroFunction
+WoWAPI.GetRangedHaste = ZeroFunction
+WoWAPI.GetSpellBonusDamage = ZeroFunction
+WoWAPI.GetSpellBonusHealing = ZeroFunction
+WoWAPI.GetSpellCritChance = ZeroFunction
+WoWAPI.UnitAttackPower = function(unitId) return 0, 0, 0 end
+WoWAPI.UnitAttackSpeed = function(unitId) return 0, 0 end
+WoWAPI.UnitDamage = function(unitId) return 0, 0, 0, 0, 0, 0, 0 end
+WoWAPI.UnitRangedAttackPower = WoWAPI.UnitAttackPower
+WoWAPI.UnitSpellHaste = ZeroFunction
+WoWAPI.UnitStat = ZeroFunction
+
 WoWAPI.bit = {
-	band = function(...) end,
-	bor = function(...) end,
+	band = DoNothing,
+	bor = DoNothing,
 }
 
 WoWAPI.LibStub = LibStub
@@ -604,6 +825,13 @@ function WoWAPI:ExportSymbols(namespace)
 		if not self_privateSymbol[k] then
 			namespace[k] = namespace[k] or v
 		end
+	end
+end
+
+function WoWAPI:Fire(event)
+	local lib = self.LibStub("AceAddon-3.0")
+	if lib then
+		lib:Fire(event)
 	end
 end
 

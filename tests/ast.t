@@ -48,8 +48,7 @@ do
 		WoWAPI:LoadAddonFile(file, root)
 	end
 
-	local AceAddon = LibStub("AceAddon-3.0")
-	AceAddon:ADDON_LOADED()
+	WoWAPI:Fire("ADDON_LOADED")
 end
 
 local OvaleAST = Ovale.OvaleAST

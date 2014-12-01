@@ -15,10 +15,8 @@ end
 do
 	-- Load all of the addon files.
 	WoWAPI:LoadAddonFile("Ovale.toc", root)
-
-	-- Pretend to fire ADDON_LOADED event.
-	local AceAddon = LibStub("AceAddon-3.0")
-	AceAddon:ADDON_LOADED()
+	-- Fire ADDON_LOADED event.
+	WoWAPI:Fire("ADDON_LOADED")
 end
 
 local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
