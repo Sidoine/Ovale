@@ -605,10 +605,6 @@ function WoWAPI:ExportSymbols(namespace)
 			namespace[k] = namespace[k] or v
 		end
 	end
-	-- Special handling for strsplit() to add to "string" module.
-	string.split = string.split or WoWAPI.strsplit
-	-- Special handling for wipe() to add to "table" module.
-	table.wipe = table.wipe or WoWAPI.wipe
 end
 
 --[[--------------------------------------------------------------------

@@ -47,7 +47,7 @@ local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
 local type = type
-local wipe = table.wipe
+local wipe = wipe
 local yield = coroutine.yield
 local API_GetItemInfo = GetItemInfo
 

@@ -39,7 +39,7 @@ local tostring = tostring
 local tremove = table.remove
 local tsort = table.sort
 local type = type
-local wipe = table.wipe
+local wipe = wipe
 local yield = coroutine.yield
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 

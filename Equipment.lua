@@ -17,7 +17,7 @@ local strmatch = string.match
 local tonumber = tonumber
 local tostring = tostring
 local type = type
-local wipe = table.wipe
+local wipe = wipe
 
 local API_CreateFrame = CreateFrame
 local API_GetAuctionItemSubClasses = GetAuctionItemSubClasses

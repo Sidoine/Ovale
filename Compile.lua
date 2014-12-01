@@ -33,7 +33,7 @@ local type = type
 local strfind = string.find
 local strmatch = string.match
 local strsub = string.sub
-local wipe = table.wipe
+local wipe = wipe
 local API_GetSpellInfo = GetSpellInfo
 
 -- Register for debugging messages.

@@ -30,7 +30,7 @@ local strlower = string.lower
 local strsub = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
-local wipe = table.wipe
+local wipe = wipe
 
 local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
 local outputDirectory = "../scripts"

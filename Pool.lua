@@ -17,7 +17,7 @@ local setmetatable = setmetatable
 local tinsert = table.insert
 local tostring = tostring
 local tremove = table.remove
-local wipe = table.wipe
+local wipe = wipe
 
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvalePool, "OvalePool")

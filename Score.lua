@@ -36,7 +36,6 @@ local OvaleDebug = Ovale.OvaleDebug
 local OvaleFuture = nil
 
 local pairs = pairs
-local strsplit = string.split
 local type = type
 local API_IsInGroup = IsInGroup
 local API_SendAddonMessage = SendAddonMessage

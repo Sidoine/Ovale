@@ -47,7 +47,7 @@ Ovale.OvaleCondition = OvaleCondition
 local OvaleState = nil
 
 local type = type
-local wipe = table.wipe
+local wipe = wipe
 local INFINITY = math.huge
 
 -- Table of script conditions.

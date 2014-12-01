@@ -27,7 +27,7 @@ do
 	local next = next
 	local pairs = pairs
 	local tostring = tostring
-	local wipe = table.wipe
+	local wipe = wipe
 	local API_CreateFrame = CreateFrame
 	local API_GetTime = GetTime
 	local API_RegisterStateDriver = RegisterStateDriver

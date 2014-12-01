@@ -27,7 +27,7 @@ local pairs = pairs
 local tconcat = table.concat
 local tinsert = table.insert
 local tsort = table.sort
-local wipe = table.wipe
+local wipe = wipe
 local API_GetTime = GetTime
 
 local self_timestamp = debugprofilestop()
