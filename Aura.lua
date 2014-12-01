@@ -313,11 +313,9 @@ end
 function OvaleAura:OnEnable()
 	self_guid = API_UnitGUID("player")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("PLAYER_ALIVE")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ScanAllUnitAuras")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	self:RegisterEvent("PLAYER_UNGHOST", "PLAYER_ALIVE")
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
 	OvaleData:RegisterRequirement("buff", "RequireBuffHandler", self)
@@ -340,7 +338,6 @@ function OvaleAura:OnDisable()
 	OvaleData:UnregisterRequirement("target_debuff")
 	OvaleData:UnregisterRequirement("target_health_pct")
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
@@ -444,11 +441,6 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 			end
 		end
 	end
-end
-
-function OvaleAura:PLAYER_ALIVE(event)
-	self:Debug(event)
-	self:ScanAuras("player", self_guid)
 end
 
 function OvaleAura:PLAYER_REGEN_ENABLED(event)

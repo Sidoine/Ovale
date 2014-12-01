@@ -127,7 +127,6 @@ function OvaleStance:OnInitialize()
 end
 
 function OvaleStance:OnEnable()
-	self:RegisterEvent("PLAYER_ALIVE", "UpdateStances")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStances")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")

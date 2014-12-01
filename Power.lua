@@ -210,7 +210,6 @@ function OvalePower:OnInitialize()
 end
 
 function OvalePower:OnEnable()
-	self:RegisterEvent("PLAYER_ALIVE", "EventHandler")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
 	self:RegisterEvent("PLAYER_LEVEL_UP", "EventHandler")
 	self:RegisterEvent("UNIT_DISPLAYPOWER")
@@ -235,7 +234,6 @@ function OvalePower:OnDisable()
 	for powerType in pairs(self.POWER_INFO) do
 		OvaleData:UnregisterRequirement(powerType)
 	end
-	self:UnregisterEvent("PLAYER_ALIVE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_LEVEL_UP")
 	self:UnregisterEvent("UNIT_DISPLAYPOWER")
