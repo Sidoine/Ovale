@@ -139,19 +139,19 @@ function OvaleRunes:OnEnable()
 			end
 		end
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllRunes")
-		self:RegisterEvent("PLAYER_LOGIN", "UpdateAllRunes")
 		self:RegisterEvent("RUNE_POWER_UPDATE")
 		self:RegisterEvent("RUNE_TYPE_UPDATE")
 		self:RegisterEvent("UNIT_RANGEDDAMAGE")
 		self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
 		OvaleState:RegisterState(self, self.statePrototype)
+
+		self:UpdateAllRunes()
 	end
 end
 
 function OvaleRunes:OnDisable()
 	if self_class == "DEATHKNIGHT" then
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		self:UnregisterEvent("PLAYER_LOGIN")
 		self:UnregisterEvent("RUNE_POWER_UPDATE")
 		self:UnregisterEvent("RUNE_TYPE_UPDATE")
 		self:UnregisterEvent("UNIT_RANGEDDAMAGE")

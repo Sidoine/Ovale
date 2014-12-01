@@ -205,6 +205,8 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
 	self:RegisterMessage("Ovale_TalentsChanged", "UpdateStats")
 	OvaleState:RegisterState(self, self.statePrototype)
+
+	self:UpdateSpecialization("OnEnable")
 end
 
 function OvalePaperDoll:OnDisable()

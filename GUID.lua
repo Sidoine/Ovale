@@ -119,11 +119,12 @@ function OvaleGUID:OnEnable()
 	self:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllUnits")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
-	self:RegisterEvent("PLAYER_LOGIN", "UpdateAllUnits")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("UNIT_PET")
 	self:RegisterEvent("UNIT_TARGET")
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+
+	self:UpdateAllUnits()
 end
 
 function OvaleGUID:OnDisable()
