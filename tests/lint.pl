@@ -150,6 +150,14 @@ $sp{OvaleQueue}{InsertFront} = true;
 $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
 
+# WoWMock CONFIG table.
+$sp{CONFIG}{addonName} = true;
+$sp{CONFIG}{class} = true;
+$sp{CONFIG}{guid} = true;
+$sp{CONFIG}{level} = true;
+$sp{CONFIG}{name} = true;
+$sp{CONFIG}{specialization} = true;
+
 # Ovale module prototype.
 $sm{"modulePrototype"}{Error} = true;
 $sm{"modulePrototype"}{Log} = true;

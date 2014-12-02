@@ -1,30 +1,23 @@
---[[------------------------------
-	Load fake WoW environment.
---]]------------------------------
+-- Create WoWMock sandbox.
 local root = "../"
-do
-	dofile(root .. "WoWMock.lua")
-	WoWMock:Initialize("Ovale")
-	WoWMock:ExportSymbols()
-end
+dofile(root .. "WoWMock.lua")
+local sandbox = WoWMock:NewSandbox()
 
---[[-----------------------------------------------
-	Fake loading via file order from Ovale.toc.
---]]-----------------------------------------------
-do
-	local addonFiles = {
-		"Ovale.lua",
-		"TimeSpan.lua",
-	}
-	for _, file in ipairs(addonFiles) do
-		WoWMock:LoadAddonFile(file, root)
-	end
+-- Load addon files into the sandbox.
+local function Setup()
+	-- Declare a globally-accessible "Ovale" addon table.
+	Ovale = {}
 end
+sandbox:Execute(Setup)
+sandbox:LoadAddonFile("TimeSpan.lua", root)
+
+-- Enter sandbox.
+setfenv(1, sandbox)
 
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
 local format = string.format
-local tconcat = table.concat
 local tinsert = table.insert
+local tconcat = table.concat
 
 local tests = {}
 

@@ -16,34 +16,24 @@
 WoWMock = {}
 
 --<private-static-properties>
-local format = string.format
+local _G = _G
 local getmetatable = getmetatable
-local gsub = string.gsub
+local io = io
 local ipairs = ipairs
 local loadstring = loadstring
 local next = next
 local pairs = pairs
 local print = print
+local rawget = rawget
 local rawset = rawset
 local select = select
+local setfenv = setfenv
 local setmetatable = setmetatable
-local strfind = string.find
-local strgfind = string.gfind
-local strmatch = string.match
-local strsub = string.sub
+local string = string
+local table = table
+local tostring = tostring
 local type = type
 local unpack = unpack
-
-local self_state = {}
-local self_privateSymbol = {
-	["ExportSymbols"] = true,
-	["Fire"] = true,
-	["Initialize"] = true,
-	["LoadAddonFile"] = true,
-	["LoadLua"] = true,
-	["LoadTOC"] = true,
-	["LoadXML"] = true,
-}
 
 -- Metatable to provide __index method to tables so that if the requested key
 -- is missing from the table, then a new key is inserted with the value being
@@ -86,6 +76,9 @@ end
 	Fake library implementations.
 --]]--------------------------------
 
+-- Forward declaration of LibStub.
+local LibStub = nil
+
 -- AceAddon-3.0
 local AceAddon = nil
 do
@@ -111,7 +104,7 @@ do
 
 	prototype.NewModule = function(addon, name, ...)
 		local args = { ... }
-		local mod = lib:NewAddon(format("%s_%s", addon.name, name))
+		local mod = lib:NewAddon(string.format("%s_%s", addon.name, name))
 		mod.moduleName = name
 		-- Mix in default module prototype
 		if addon.modulePrototype then
@@ -121,7 +114,7 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = WoWMock.LibStub(libName)
+			local lib = LibStub(libName)
 			if lib then
 				for k, v in pairs(lib) do
 					mod[k] = v
@@ -142,11 +135,13 @@ do
 		return lib.addons[name]
 	end
 
-	lib.Fire = function(lib, event, ...)
+	lib.Fire = function(event, ...)
 		for _, addon in ipairs(lib.initializationQueue) do
 			if event == "ADDON_LOADED" and addon.OnInitialize then
+				--print("Firing", event, addon.name)
 				addon:OnInitialize()
 			elseif event == "PLAYER_LOGIN" and addon.OnEnable then
+				--print("Firing", event, addon.name)
 				addon:OnEnable()
 			elseif addon.SendMessage then
 				addon:SendMessage(event, ...)
@@ -179,7 +174,7 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = WoWMock.LibStub(libName)
+			local lib = LibStub(libName)
 			if lib then
 				for k, v in pairs(lib) do
 					addon[k] = v
@@ -221,7 +216,7 @@ do
 	end
 
 	lib.Printf = function(lib, ...)
-		print(format(...))
+		print(string.format(...))
 	end
 end
 
@@ -277,6 +272,7 @@ do
 			arg = lib
 		end
 		if handler then
+			--print("Firing", event, lib.name)
 			if arg then
 				handler(arg, event, ...)
 			else
@@ -381,7 +377,6 @@ do
 end
 
 -- LibStub
-local LibStub = nil
 do
 	local lib = {}
 	LibStub = lib
@@ -430,8 +425,8 @@ end
 WoWMock.DEFAULT_CHAT_FRAME = {
 	AddMessage = function(frame, text, red, green, blue, alpha)
 		-- Strip out color UI escape sequences.
-		text = gsub(text, "|c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]", "")
-		text = gsub(text, "|r", "")
+		text = string.gsub(text, "|c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]", "")
+		text = string.gsub(text, "|r", "")
 		print(text)
 	end
 }
@@ -446,27 +441,27 @@ WoWMock.INVSLOT_HEAD		= 1
 WoWMock.INVSLOT_NECK		= 2
 WoWMock.INVSLOT_SHOULDER	= 3
 WoWMock.INVSLOT_BODY		= 4
-WoWMock.INVSLOT_CHEST	= 5
-WoWMock.INVSLOT_WAIST	= 6
+WoWMock.INVSLOT_CHEST		= 5
+WoWMock.INVSLOT_WAIST		= 6
 WoWMock.INVSLOT_LEGS		= 7
 WoWMock.INVSLOT_FEET		= 8
-WoWMock.INVSLOT_WRIST	= 9
+WoWMock.INVSLOT_WRIST		= 9
 WoWMock.INVSLOT_HAND		= 10
-WoWMock.INVSLOT_FINGER1	= 11
-WoWMock.INVSLOT_FINGER2	= 12
+WoWMock.INVSLOT_FINGER1		= 11
+WoWMock.INVSLOT_FINGER2		= 12
 WoWMock.INVSLOT_TRINKET1	= 13
 WoWMock.INVSLOT_TRINKET2	= 14
 WoWMock.INVSLOT_BACK		= 15
 WoWMock.INVSLOT_MAINHAND	= 16
-WoWMock.INVSLOT_OFFHAND	= 17
-WoWMock.INVSLOT_RANGED	= 18
-WoWMock.INVSLOT_TABARD	= 19
+WoWMock.INVSLOT_OFFHAND		= 17
+WoWMock.INVSLOT_RANGED		= 18
+WoWMock.INVSLOT_TABARD		= 19
 WoWMock.INVSLOT_FIRST_EQUIPPED = WoWMock.INVSLOT_HEAD
 WoWMock.INVSLOT_LAST_EQUIPPED = WoWMock.INVSLOT_TABARD
 
 -- Power Types
-WoWMock.SPELL_POWER_MANA				= 0
-WoWMock.SPELL_POWER_RAGE				= 1
+WoWMock.SPELL_POWER_MANA			= 0
+WoWMock.SPELL_POWER_RAGE			= 1
 WoWMock.SPELL_POWER_FOCUS			= 2
 WoWMock.SPELL_POWER_ENERGY			= 3
 --WoWMock.SPELL_POWER_CHI			= 4		-- This is obsolete now.
@@ -480,7 +475,7 @@ WoWMock.SPELL_POWER_DARK_FORCE		= 11
 WoWMock.SPELL_POWER_CHI				= 12
 WoWMock.SPELL_POWER_SHADOW_ORBS		= 13
 WoWMock.SPELL_POWER_BURNING_EMBERS	= 14
-WoWMock.SPELL_POWER_DEMONIC_FURY		= 15
+WoWMock.SPELL_POWER_DEMONIC_FURY	= 15
 
 WoWMock.RAID_CLASS_COLORS = {
 	["HUNTER"] = { r = 0.67, g = 0.83, b = 0.45, colorStr = "ffabd473" },
@@ -535,9 +530,9 @@ WoWMock.debugprofilestop = ZeroFunction
 --]]--------------------------------------------------------------------
 WoWMock.strsplit = function(delim, str, maxNb)
 	-- Fix up '.' character class.
-	delim = gsub(delim, "%.", "%%.")
+	delim = string.gsub(delim, "%.", "%%.")
 	-- Eliminate bad cases...
-	if strfind(str, delim) == nil then
+	if string.find(str, delim) == nil then
 		return str
 	end
 	if maxNb == nil or maxNb < 1 then
@@ -547,7 +542,7 @@ WoWMock.strsplit = function(delim, str, maxNb)
 	local pat = "(.-)" .. delim .. "()"
 	local nb = 0
 	local lastPos
-	for part, pos in strgfind(str, pat) do
+	for part, pos in string.gfind(str, pat) do
 		nb = nb + 1
 		result[nb] = part
 		lastPos = pos
@@ -555,7 +550,7 @@ WoWMock.strsplit = function(delim, str, maxNb)
 	end
 	-- Handle the last field
 	if nb ~= maxNb then
-		result[nb + 1] = strsub(str, lastPos)
+		result[nb + 1] = string.sub(str, lastPos)
 	end
 	return unpack(result)
 end
@@ -587,182 +582,258 @@ end
 	Fake Blizzard API functions for unit testing.
 --]]-------------------------------------------------
 
-WoWMock.CreateFrame = function(...)
-	local frame = {
-		CreateTexture = function(...) return WoWMock.CreateFrame() end,
-		EnableMouse = DoNothing,
-		Hide = DoNothing,
-		IsVisible = DoNothing,
-		NumLines = ZeroFunction,
-		SetAllPoints = DoNothing,
-		SetAlpha = DoNothing,
-		SetFrameStrata = DoNothing,
-		SetHeight = DoNothing,
-		SetInventoryItem = DoNothing,
-		SetMovable = DoNothing,
-		SetOwner = DoNothing,
-		SetPoint = DoNothing,
-		SetScript = DoNothing,
-		SetTexture = DoNothing,
-		SetWidth = DoNothing,
-	}
-	return frame
-end
+WoWMock.mock = {}
 
-WoWMock.GetActiveSpecGroup = function()
-	-- Always in the primary specialization.
-	return 1
-end
+WoWMock.mock["CreateFrame"] = [[
+	do
+		local function DoNothing() end
+		local function ZeroFunction() return 0 end
 
-WoWMock.GetActionInfo = function(slot)
-	-- Action bar is always empty.
-	return nil
-end
-
-WoWMock.GetAuctionItemSubClasses = function(classIndex)
-	return
-		"One-Handed Axes",
-		"Two-Handed Axes",
-		"Bows",
-		"Guns",
-		"One-Handed Maces",
-		"Two-Handed Maces",
-		"Polearms",
-		"One-Handed Swords",
-		"Two-Handed Swords",
-		"Staves",
-		"Fist Weapons",
-		"Miscellaneous",
-		"Daggers",
-		"Thrown",
-		"Crossbows",
-		"Wands",
-		"Fishing Poles"
-end
-
--- No keybinds are assigned.
-WoWMock.GetBindingKey = function(name)
-	return nil
-end
-
-WoWMock.GetBonusBarIndex = function()
-	return 8
-end
-
-WoWMock.GetGlyphSocketInfo = function(socket, talentGroup)
-	-- No glyphs.
-	return nil
-end
-
-WoWMock.GetInventoryItemGems = function(slot)
-	-- Player is always completely un-gemmed.
-	return nil
-end
-
-WoWMock.GetInventoryItemID = function(unitId, slot)
-	-- All units are naked.
-	return nil
-end
-
-WoWMock.GetItemInfo = function(item)
-	if type(item) == "number" then
-		item = format("Item Name Of %d", item)
+		function CreateFrame(...)
+			local frame = {
+				CreateTexture = function(...) return CreateFrame() end,
+				EnableMouse = DoNothing,
+				Hide = DoNothing,
+				IsVisible = DoNothing,
+				NumLines = ZeroFunction,
+				SetAllPoints = DoNothing,
+				SetAlpha = DoNothing,
+				SetFrameStrata = DoNothing,
+				SetHeight = DoNothing,
+				SetInventoryItem = DoNothing,
+				SetMovable = DoNothing,
+				SetOwner = DoNothing,
+				SetPoint = DoNothing,
+				SetScript = DoNothing,
+				SetTexture = DoNothing,
+				SetWidth = DoNothing,
+			}
+			return frame
+		end
 	end
-	return item
-end
+]]
 
-WoWMock.GetLocale = function()
-	return "enUS"
-end
-
-WoWMock.GetNumGlyphSockets = function()
-	-- 3 x Major + 3 x Minor
-	return 6
-end
-
-WoWMock.GetNumShapeshiftForms = ZeroFunction
-
-WoWMock.GetPowerRegen = function()
-	return 0, 0
-end
-
-WoWMock.GetShapeshiftForm = function()
-	-- Always in humanoid form.
-	return 0
-end
-
-WoWMock.GetSpecialization = function()
-	local specialization = self_state.specialization or 1
-	return specialization
-end
-
-WoWMock.GetSpellInfo = function(spell)
-	if type(spell) == "number" then
-		spell = format("Spell Name Of %d", spell)
+WoWMock.mock["GetActiveSpecGroup"] = [[
+	function GetActiveSpecGroup()
+		-- Always in the primary specialization.
+		return 1
 	end
-	return spell
-end
+]]
 
-WoWMock.GetSpellTabInfo = function(index)
-	-- No spells in the spellbook.
-	return nil
-end
+WoWMock.mock["GetActionInfo"] = [[
+	function GetActionInfo(slot)
+		-- Action bar is always empty.
+		return nil
+	end
+]]
 
-WoWMock.GetTalentInfo = function(row, column, activeTalentGroup)
-	-- No talents.
-	return 123, "A Talent", nil, 0, nil
-end
+WoWMock.mock["GetAuctionItemSubClasses"] = [[
+	function GetAuctionItemSubClasses(classIndex)
+		return
+			"One-Handed Axes",
+			"Two-Handed Axes",
+			"Bows",
+			"Guns",
+			"One-Handed Maces",
+			"Two-Handed Maces",
+			"Polearms",
+			"One-Handed Swords",
+			"Two-Handed Swords",
+			"Staves",
+			"Fist Weapons",
+			"Miscellaneous",
+			"Daggers",
+			"Thrown",
+			"Crossbows",
+			"Wands",
+			"Fishing Poles"
+	end
+]]
 
-WoWMock.GetTime = function()
-	return 1234
-end
+WoWMock.mock["GetBindingKey"] = [[
+	function GetBindingKey(name)
+		-- No keybinds are assigned.
+		return nil
+	end
+]]
 
-WoWMock.HasPetSpells = function()
-	-- No pet spells.
-	return false
-end
+WoWMock.mock["GetBonusBarIndex"] = [[
+	function GetBonusBarIndex()
+		return 8
+	end
+]]
 
-WoWMock.RegisterAddonMessagePrefix = function(prefixString) end
-WoWMock.RegisterStateDriver = function(frame, stateId, conditional) end
+WoWMock.mock["GetGlyphSocketInfo"] = [[
+	function GetGlyphSocketInfo(socket, talentGroup)
+		-- No glyphs.
+		return nil
+	end
+]]
+
+WoWMock.mock["GetInventoryItemGems"] = [[
+	function GetInventoryItemGems(slot)
+		-- Player is always completely un-gemmed.
+		return nil
+	end
+]]
+
+WoWMock.mock["GetInventoryItemID"] = [[
+	function GetInventoryItemID(unitId, slot)
+		-- All units are naked.
+		return nil
+	end
+]]
+
+WoWMock.mock["GetItemInfo"] = [[
+	function GetItemInfo(item)
+		if type(item) == "number" then
+			item = string.format("Item Name Of %d", item)
+		end
+		return item
+	end
+]]
+
+WoWMock.mock["GetLocale"] = [[
+	function GetLocale()
+		return "enUS"
+	end
+]]
+
+WoWMock.mock["GetNumGlyphSockets"] = [[
+	function GetNumGlyphSockets()
+		-- 3 x Major + 3 x Minor
+		return 6
+	end
+]]
+
+WoWMock.mock["GetNumShapeshiftForms"] = ZeroFunction
+
+WoWMock.mock["GetPowerRegen"] = [[
+	function GetPowerRegen()
+		return 0, 0
+	end
+]]
+
+WoWMock.mock["GetRuneCooldown"] = [[
+	function GetRuneCooldown(slot)
+		-- The rune is always ready.
+		return 0, 10, true
+	end
+]]
+
+WoWMock.mock["GetRuneType"] = [[
+	function GetRuneType(slot)
+		-- Everything is a death rune.
+		return 4
+	end
+]]
+
+WoWMock.mock["GetShapeshiftForm"] = [[
+	function GetShapeshiftForm()
+		-- Always in humanoid form.
+		return 0
+	end
+]]
+
+WoWMock.mock["GetSpecialization"] = [[
+	function GetSpecialization()
+		local specialization = WOWMOCK_CONFIG.specialization or 1
+		return specialization
+	end
+]]
+
+WoWMock.mock["GetSpellInfo"] = [[
+	function GetSpellInfo(spell)
+		if type(spell) == "number" then
+			spell = string.format("Spell Name of %d", spell)
+		end
+		return spell
+	end
+]]
+
+WoWMock.mock["GetSpellTabInfo"] = [[
+	function GetSpellTabInfo(index)
+		-- No spells in the spellbook.
+		return nil
+	end
+]]
+
+WoWMock.mock["GetTalentInfo"] = [[
+	function GetTalentInfo(row, column, activeTalentGroup)
+		-- No talents.
+		return 123, "A Talent", nil, 0, nil
+	end
+]]
+
+WoWMock.mock["GetTime"] = [[
+	function GetTime()
+		return 1234
+	end
+]]
+
+WoWMock.mock["HasPetSpells"] = [[
+	function HasPetSpells()
+		-- No pet spells.
+		return false
+	end
+]]
+
+WoWMock.mock["RegisterAddonMessagePrefix"] = DoNothing
+WoWMock.mock["RegisterStateDriver"] = DoNothing
 
 WoWMock.UnitAura = function(unitId)
 	-- No auras on any unit.
 	return nil
 end
 
-WoWMock.UnitClass = function()
-	local class = self_state.class
-	return class, class
-end
+WoWMock.mock["UnitClass"] = [[
+	function UnitClass()
+		local class = WOWMOCK_CONFIG.class or "DEATHKNIGHT"
+		return class, class
+	end
+]]
 
-WoWMock.UnitGUID = function(unitId)
-	local guid = self_state.guid or 0
-	return guid
-end
+WoWMock.mock["UnitGUID"] = [[
+	function UnitGUID(unitId)
+		local guid = WOWMOCK_CONFIG.guid or 0
+		return guid
+	end
+]]
 
-WoWMock.UnitLevel = function()
-	return self_state.level
-end
+WoWMock.mock["UnitLevel"] = [[
+	function UnitLevel()
+		local level = WOWMOCK_CONFIG.level or 100
+		return level
+	end
+]]
 
-WoWMock.UnitName = function()
-	local name = self_state.name or "AwesomePlayer"
-	return name
-end
+WoWMock.mock["UnitName"] = [[
+	function UnitName()
+		local name = WOWMOCK_CONFIG.name or "AwesomePlayer"
+		return name
+	end
+]]
 
-WoWMock.UnitPower = function(unitId, powerType)
-	-- Always no resources on any unit.
-	return 0
-end
+WoWMock.mock["UnitPower"] = [[
+	function UnitPower(unitId, powerType)
+		-- Always no resources on any unit.
+		return 0
+	end
+]]
 
-WoWMock.UnitPowerMax = function(unitId, powerType)
-	-- Resources are from 0 to 100.
-	return 100
-end
+WoWMock.mock["UnitPowerMax"] = [[
+	function UnitPowerMax(unitId, powerType)
+		-- Resources are from 0 to 100.
+		return 100
+	end
+]]
 
-WoWMock.UnitPowerType = function(unitId)
-	-- Every unit is a mana user.
-	return WoWMock.SPELL_POWER_MANA, "MANA"
-end
+WoWMock.mock["UnitPowerType"] = [[
+	function UnitPowerType(unitId)
+		-- Every unit is a mana user.
+		return WoWMock.SPELL_POWER_MANA, "MANA"
+	end
+]]
 
 -- Unit stat functions for a naked toon.
 WoWMock.GetCombatRating = ZeroFunction
@@ -801,7 +872,7 @@ local function FileExists(filename, directory, verbose)
 		return true
 	else
 		if verbose then
-			print(format("Warning: '%s' not found.", filename))
+			print(string.format("Warning: '%s' not found.", filename))
 		end
 		return false
 	end
@@ -809,29 +880,73 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function WoWMock:Initialize(addonName, state)
-	state = state or {}
-	for k, v in pairs(state) do
-		self_state[k] = v
-	end
-	self_state.addonName = addonName
-end
+-- Create a new sandbox environment.
+function WoWMock:NewSandbox(config, mock)
+	mock = mock or {}
+	local sandbox = DeepCopy(mock)
 
--- Export symbols to the given namespace, taking care not to overwrite existing symbols.
-function WoWMock:ExportSymbols(namespace)
-	-- Default to adding symbols to the global namespace.
-	namespace = namespace or _G
-	for k, v in pairs(self) do
-		if not self_privateSymbol[k] then
-			namespace[k] = namespace[k] or v
+	-- Save configuration to sandbox as "WOWMOCK_CONFIG" property.
+	config = config or {}
+	local WOWMOCK_CONFIG = DeepCopy(config)
+	sandbox.WOWMOCK_CONFIG = WOWMOCK_CONFIG
+
+	-- Redirect all direct references into _G into the sandbox instead.
+	sandbox._G = sandbox
+
+	-- Any missing symbols in the sandbox are inherited from the global environment.
+	setmetatable(sandbox, { __index = _G })
+
+	-- Export all of the WoWMock symbols into the sandbox, taking care not to
+	-- overwrite explicitly defined mocks.
+	for key, value in pairs(self) do
+		if key == "NewSandbox" then
+			-- skip
+		elseif key == "mock" then
+			for k, v in pairs(value) do
+				if not rawget(sandbox, k) then
+					if type(v) == "string" then
+						--print("Loading symbol (loadstring)", k)
+						local func = loadstring(v)
+						setfenv(func, sandbox)
+						func()
+					elseif type(v) == "function" then
+						--print("Loading symbol (function)", k)
+						sandbox[k] = v
+					end
+				end
+			end
+		else
+			--print("Loading symbol (direct)", key)
+			if not rawget(sandbox, key) then
+				sandbox[key] = DeepCopy(value)
+			end
 		end
 	end
+
+	-- Sandbox configuration defaults.
+	if not WOWMOCK_CONFIG.addonName then
+		sandbox:SetAddonName("Addon Name")
+	end
+
+	return sandbox
 end
 
+-- Set the name of the addon for all files.
+function WoWMock:SetAddonName(name)
+	self.WOWMOCK_CONFIG.addonName = name
+end
+
+-- Execute the given function within the sandbox environment.
+function WoWMock:Execute(func)
+	setfenv(func, self)
+	return func()
+end
+
+-- Fire an event in the sandbox.
 function WoWMock:Fire(event)
 	local lib = self.LibStub("AceAddon-3.0")
 	if lib then
-		lib:Fire(event)
+		lib.Fire(event)
 	end
 end
 
@@ -841,15 +956,15 @@ end
 --]]--------------------------------------------------------------------
 function WoWMock:LoadAddonFile(filename, directory, verbose)
 	local s = directory and (directory .. filename) or filename
-	directory, filename = strmatch(s, "^(.+/)([^/]+[.][%w]+)$")
+	directory, filename = string.match(s, "^(.+/)([^/]+[.][%w]+)$")
 	if not directory then
 		filename = s
 	end
-	if strfind(filename, "[.]lua$") then
+	if string.find(filename, "[.]lua$") then
 		return self:LoadLua(filename, directory, verbose)
-	elseif strfind(filename, "[.]toc$") then
+	elseif string.find(filename, "[.]toc$") then
 		return self:LoadTOC(filename, directory, verbose)
-	elseif strfind(filename, "[.]xml$") then
+	elseif string.find(filename, "[.]xml$") then
 		return self:LoadXML(filename, directory, verbose)
 	end
 end
@@ -863,16 +978,16 @@ function WoWMock:LoadLua(filename, directory, verbose)
 		filename = directory .. filename
 	end
 	if verbose then
-		print(format("Loading Lua: %s", filename))
+		print(string.format("Loading Lua: %s", filename))
 	end
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
 		local list = {}
 		for line in io.lines(filename) do
-			local varName = strmatch(line, "^local%s+([%w_]+)%s*,[%w%s_,]*=%s*[.][.][.]%s*$")
+			local varName = string.match(line, "^local%s+([%w_]+)%s*,[%w%s_,]*=%s*[.][.][.]%s*$")
 			if varName then
-				line = format("local %s = %q", varName, self_state.addonName)
+				line = string.format("local %s = %q", varName, self.WOWMOCK_CONFIG.addonName)
 			end
 			table.insert(list, line)
 		end
@@ -880,9 +995,10 @@ function WoWMock:LoadLua(filename, directory, verbose)
 		local fileString = table.concat(list, "\n")
 		local func = loadstring(fileString)
 		if func then
+			setfenv(func, self)
 			func()
 		else
-			print(format("Error loading '%s'.", filename))
+			print(string.format("Error loading '%s'.", filename))
 			ok = false
 		end
 	end
@@ -893,36 +1009,40 @@ end
 	LoadTOC() loads all of the addon's files listed in the TOC file.
 --]]--------------------------------------------------------------------
 function WoWMock:LoadTOC(filename, directory, verbose)
+	local addonName = string.sub(filename, 1, -5)
 	if directory then
 		filename = directory .. filename
 	end
 	if verbose then
-		print(format("Loading TOC: %s", filename))
+		print(string.format("Loading TOC: %s", filename))
 	end
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
+		-- Set the addon name from the name of the TOC file.
+		self:SetAddonName(addonName)
+
 		local list = {}
 		for line in io.lines(filename) do
-			line = gsub(line, "\\", "/")
+			line = string.gsub(line, "\\", "/")
 			local t = {}
-			t.directory, t.file = strmatch(line, "^([^#]+/)([^/]+[.][%w]+)$")
+			t.directory, t.file = string.match(line, "^([^#]+/)([^/]+[.][%w]+)$")
 			if t.directory then
 				if directory then
 					t.directory = directory .. t.directory
 				end
 			else
 				t.directory = directory
-				t.file = strmatch(line, "^[%w_]+[.][%w]+$")
+				t.file = string.match(line, "^[%w_]+[.][%w]+$")
 			end
 			if t.file then
 				table.insert(list, t)
 			end
 		end
 		for _, t in ipairs(list) do
-			if strfind(t.file, "[.]lua$") then
+			if string.find(t.file, "[.]lua$") then
 				ok = ok and self:LoadLua(t.file, t.directory, verbose)
-			elseif strfind(t.file, "[.]xml$") then
+			elseif string.find(t.file, "[.]xml$") then
 				ok = ok and self:LoadXML(t.file, t.directory, verbose)
 			end
 			if not ok then
@@ -941,18 +1061,18 @@ function WoWMock:LoadXML(filename, directory, verbose)
 		filename = directory .. filename
 	end
 	if verbose then
-		print(format("Loading XML: %s", filename))
+		print(string.format("Loading XML: %s", filename))
 	end
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
 		local list = {}
 		for line in io.lines(filename) do
-			local s = strmatch(line, '<Script[%s]+file="([^"]+)"')
+			local s = string.match(line, '<Script[%s]+file="([^"]+)"')
 			if s then
-				s = gsub(s, "\\", "/")
+				s = string.gsub(s, "\\", "/")
 				local t = {}
-				t.directory, t.file = strmatch(s, "^(.+/)([^/]+[.][%w]+)$")
+				t.directory, t.file = string.match(s, "^(.+/)([^/]+[.][%w]+)$")
 				if t.directory then
 					if directory then
 						t.directory = directory .. t.directory
@@ -968,7 +1088,7 @@ function WoWMock:LoadXML(filename, directory, verbose)
 		end
 		for _, t in ipairs(list) do
 			if FileExists(t.file, t.directory, verbose) then
-				if strfind(t.file, "[.]lua$") then
+				if string.find(t.file, "[.]lua$") then
 					ok = ok and self:LoadLua(t.file, t.directory, verbose)
 					if not ok then
 						break

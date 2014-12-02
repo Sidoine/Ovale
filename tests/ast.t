@@ -1,55 +1,45 @@
---[[
-	This Lua file may be invoked to test parsing the default script for other classes via:
-		cat ast.t | sed "s/DEATHKNIGHT/DRUID/g" | lua
---]]
-
---[[------------------------------
-	Load fake WoW environment.
---]]------------------------------
+-- Create WoWMock sandbox.
 local root = "../"
-do
-	local state = {
-		class = "DEATHKNIGHT",
-		level = 90,
-	}
-	dofile(root .. "WoWMock.lua")
-	WoWMock:Initialize("Ovale", state)
-	WoWMock:ExportSymbols()
+dofile(root .. "WoWMock.lua")
+local sandbox = WoWMock:NewSandbox()
+
+-- Addon files needed to run methods from OvaleAST.
+-- The order of the the files is as listed in Ovale.toc.
+local addonFiles = {
+	"Ovale.lua",
+	"Localization.lua",
+	"Options.lua",
+	"Debug.lua",
+	-- Profiling module.
+	"Profiler.lua",
+	-- Utility modules.
+	"Pool.lua",
+	"Queue.lua",
+	-- Core modules.
+	"AST.lua",
+	"Condition.lua",
+	"Lexer.lua",
+	"Runes.lua",
+	"Scripts.lua",
+	"SpellBook.lua",
+	"Stance.lua",
+	"State.lua",
+	-- Additional modules.
+	"conditions.lua",
+	"scripts/files.xml",
+}
+
+-- Load addon files into the sandbox.
+sandbox:SetAddonName("Ovale")
+for _, filename in ipairs(addonFiles) do
+	sandbox:LoadAddonFile(filename, root)
 end
 
---[[-----------------------------------------------
-	Fake loading via file order from Ovale.toc.
---]]-----------------------------------------------
-do
-	local addonFiles = {
-		"Ovale.lua",
-		"Localization.lua",
-		"Options.lua",
-		"Debug.lua",
-		-- Profiling module.
-		"Profiler.lua",
-		-- Utility modules.
-		"Pool.lua",
-		"Queue.lua",
-		-- Core modules.
-		"AST.lua",
-		"Condition.lua",
-		"Lexer.lua",
-		"Runes.lua",
-		"Scripts.lua",
-		"SpellBook.lua",
-		"Stance.lua",
-		"State.lua",
-		-- Additional modules.
-		"conditions.lua",
-		"scripts/files.xml",
-	}
-	for _, file in ipairs(addonFiles) do
-		WoWMock:LoadAddonFile(file, root)
-	end
+-- Fire events to simulate the addon-loading process.
+sandbox:Fire("ADDON_LOADED")
 
-	WoWMock:Fire("ADDON_LOADED")
-end
+-- Enter sandbox.
+setfenv(1, sandbox)
 
 local OvaleAST = Ovale.OvaleAST
 local separator = string.rep("-", 80)
@@ -60,11 +50,10 @@ local source = "Ovale"
 local ast = OvaleAST:ParseScript(source)
 if ast then
 	OvaleAST:Optimize(ast)
---	Ovale:Print(OvaleAST:NodeToString(ast))
---	Ovale:Print(separator)
---	Ovale:Print(OvaleAST:Unparse(ast))
---	OvaleAST:Release(ast)
---	Ovale:Print(separator)
---	OvaleAST:DebugAST()
-	Ovale:Print("Successfully parsed %s '%s' script.", class, source)
+	print(OvaleAST:NodeToString(ast))
+	print(separator)
+	print(OvaleAST:Unparse(ast))
+	OvaleAST:Release(ast)
+	print(separator)
+	OvaleAST:DebugAST()
 end
