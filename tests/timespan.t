@@ -4,8 +4,8 @@
 local root = "../"
 do
 	dofile(root .. "WoWMock.lua")
-	WoWAPI:Initialize("Ovale")
-	WoWAPI:ExportSymbols()
+	WoWMock:Initialize("Ovale")
+	WoWMock:ExportSymbols()
 end
 
 --[[-----------------------------------------------
@@ -17,7 +17,7 @@ do
 		"TimeSpan.lua",
 	}
 	for _, file in ipairs(addonFiles) do
-		WoWAPI:LoadAddonFile(file, root)
+		WoWMock:LoadAddonFile(file, root)
 	end
 end
 

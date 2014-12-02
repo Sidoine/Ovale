@@ -13,8 +13,8 @@ do
 		level = 90,
 	}
 	dofile(root .. "WoWMock.lua")
-	WoWAPI:Initialize("Ovale", state)
-	WoWAPI:ExportSymbols()
+	WoWMock:Initialize("Ovale", state)
+	WoWMock:ExportSymbols()
 end
 
 --[[-----------------------------------------------
@@ -45,10 +45,10 @@ do
 		"scripts/files.xml",
 	}
 	for _, file in ipairs(addonFiles) do
-		WoWAPI:LoadAddonFile(file, root)
+		WoWMock:LoadAddonFile(file, root)
 	end
 
-	WoWAPI:Fire("ADDON_LOADED")
+	WoWMock:Fire("ADDON_LOADED")
 end
 
 local OvaleAST = Ovale.OvaleAST

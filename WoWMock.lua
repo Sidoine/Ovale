@@ -13,7 +13,7 @@
 --]]--------------------------------------------------------------------
 
 -- Globally-accessible module table.
-WoWAPI = {}
+WoWMock = {}
 
 --<private-static-properties>
 local format = string.format
@@ -121,7 +121,7 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = WoWAPI.LibStub(libName)
+			local lib = WoWMock.LibStub(libName)
 			if lib then
 				for k, v in pairs(lib) do
 					mod[k] = v
@@ -179,7 +179,7 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = WoWAPI.LibStub(libName)
+			local lib = WoWMock.LibStub(libName)
 			if lib then
 				for k, v in pairs(lib) do
 					addon[k] = v
@@ -427,7 +427,7 @@ end
 	FrameXML/ChatFrame
 --]]----------------------
 
-WoWAPI.DEFAULT_CHAT_FRAME = {
+WoWMock.DEFAULT_CHAT_FRAME = {
 	AddMessage = function(frame, text, red, green, blue, alpha)
 		-- Strip out color UI escape sequences.
 		text = gsub(text, "|c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]", "")
@@ -441,48 +441,48 @@ WoWAPI.DEFAULT_CHAT_FRAME = {
 --]]----------------------
 
 -- Inventory slots
-WoWAPI.INVSLOT_AMMO		= 0
-WoWAPI.INVSLOT_HEAD		= 1
-WoWAPI.INVSLOT_NECK		= 2
-WoWAPI.INVSLOT_SHOULDER	= 3
-WoWAPI.INVSLOT_BODY		= 4
-WoWAPI.INVSLOT_CHEST	= 5
-WoWAPI.INVSLOT_WAIST	= 6
-WoWAPI.INVSLOT_LEGS		= 7
-WoWAPI.INVSLOT_FEET		= 8
-WoWAPI.INVSLOT_WRIST	= 9
-WoWAPI.INVSLOT_HAND		= 10
-WoWAPI.INVSLOT_FINGER1	= 11
-WoWAPI.INVSLOT_FINGER2	= 12
-WoWAPI.INVSLOT_TRINKET1	= 13
-WoWAPI.INVSLOT_TRINKET2	= 14
-WoWAPI.INVSLOT_BACK		= 15
-WoWAPI.INVSLOT_MAINHAND	= 16
-WoWAPI.INVSLOT_OFFHAND	= 17
-WoWAPI.INVSLOT_RANGED	= 18
-WoWAPI.INVSLOT_TABARD	= 19
-WoWAPI.INVSLOT_FIRST_EQUIPPED = WoWAPI.INVSLOT_HEAD
-WoWAPI.INVSLOT_LAST_EQUIPPED = WoWAPI.INVSLOT_TABARD
+WoWMock.INVSLOT_AMMO		= 0
+WoWMock.INVSLOT_HEAD		= 1
+WoWMock.INVSLOT_NECK		= 2
+WoWMock.INVSLOT_SHOULDER	= 3
+WoWMock.INVSLOT_BODY		= 4
+WoWMock.INVSLOT_CHEST	= 5
+WoWMock.INVSLOT_WAIST	= 6
+WoWMock.INVSLOT_LEGS		= 7
+WoWMock.INVSLOT_FEET		= 8
+WoWMock.INVSLOT_WRIST	= 9
+WoWMock.INVSLOT_HAND		= 10
+WoWMock.INVSLOT_FINGER1	= 11
+WoWMock.INVSLOT_FINGER2	= 12
+WoWMock.INVSLOT_TRINKET1	= 13
+WoWMock.INVSLOT_TRINKET2	= 14
+WoWMock.INVSLOT_BACK		= 15
+WoWMock.INVSLOT_MAINHAND	= 16
+WoWMock.INVSLOT_OFFHAND	= 17
+WoWMock.INVSLOT_RANGED	= 18
+WoWMock.INVSLOT_TABARD	= 19
+WoWMock.INVSLOT_FIRST_EQUIPPED = WoWMock.INVSLOT_HEAD
+WoWMock.INVSLOT_LAST_EQUIPPED = WoWMock.INVSLOT_TABARD
 
 -- Power Types
-WoWAPI.SPELL_POWER_MANA				= 0
-WoWAPI.SPELL_POWER_RAGE				= 1
-WoWAPI.SPELL_POWER_FOCUS			= 2
-WoWAPI.SPELL_POWER_ENERGY			= 3
---WoWAPI.SPELL_POWER_CHI			= 4		-- This is obsolete now.
-WoWAPI.SPELL_POWER_RUNES			= 5
-WoWAPI.SPELL_POWER_RUNIC_POWER		= 6
-WoWAPI.SPELL_POWER_SOUL_SHARDS		= 7
-WoWAPI.SPELL_POWER_ECLIPSE			= 8
-WoWAPI.SPELL_POWER_HOLY_POWER		= 9
-WoWAPI.SPELL_POWER_ALTERNATE_POWER	= 10
-WoWAPI.SPELL_POWER_DARK_FORCE		= 11
-WoWAPI.SPELL_POWER_CHI				= 12
-WoWAPI.SPELL_POWER_SHADOW_ORBS		= 13
-WoWAPI.SPELL_POWER_BURNING_EMBERS	= 14
-WoWAPI.SPELL_POWER_DEMONIC_FURY		= 15
+WoWMock.SPELL_POWER_MANA				= 0
+WoWMock.SPELL_POWER_RAGE				= 1
+WoWMock.SPELL_POWER_FOCUS			= 2
+WoWMock.SPELL_POWER_ENERGY			= 3
+--WoWMock.SPELL_POWER_CHI			= 4		-- This is obsolete now.
+WoWMock.SPELL_POWER_RUNES			= 5
+WoWMock.SPELL_POWER_RUNIC_POWER		= 6
+WoWMock.SPELL_POWER_SOUL_SHARDS		= 7
+WoWMock.SPELL_POWER_ECLIPSE			= 8
+WoWMock.SPELL_POWER_HOLY_POWER		= 9
+WoWMock.SPELL_POWER_ALTERNATE_POWER	= 10
+WoWMock.SPELL_POWER_DARK_FORCE		= 11
+WoWMock.SPELL_POWER_CHI				= 12
+WoWMock.SPELL_POWER_SHADOW_ORBS		= 13
+WoWMock.SPELL_POWER_BURNING_EMBERS	= 14
+WoWMock.SPELL_POWER_DEMONIC_FURY		= 15
 
-WoWAPI.RAID_CLASS_COLORS = {
+WoWMock.RAID_CLASS_COLORS = {
 	["HUNTER"] = { r = 0.67, g = 0.83, b = 0.45, colorStr = "ffabd473" },
 	["WARLOCK"] = { r = 0.58, g = 0.51, b = 0.79, colorStr = "ff9482c9" },
 	["PRIEST"] = { r = 1.0, g = 1.0, b = 1.0, colorStr = "ffffffff" },
@@ -500,21 +500,21 @@ WoWAPI.RAID_CLASS_COLORS = {
 	FrameXML/GlobalStrings
 --]]--------------------------
 
-WoWAPI.ITEM_LEVEL = "Item Level %d"
+WoWMock.ITEM_LEVEL = "Item Level %d"
 
 --[[---------------------------
 	FrameXML/SpellBookFrame
 --]]---------------------------
 
-WoWAPI.BOOKTYPE_SPELL = "spell"
-WoWAPI.BOOKTYPE_PET = "pet"
+WoWMock.BOOKTYPE_SPELL = "spell"
+WoWMock.BOOKTYPE_PET = "pet"
 
 --[[----------------------------
 	FrameXML/TalentFrameBase
 --]]----------------------------
 
-WoWAPI.MAX_TALENT_TIERS = 7
-WoWAPI.NUM_TALENT_COLUMNS = 3
+WoWMock.MAX_TALENT_TIERS = 7
+WoWMock.NUM_TALENT_COLUMNS = 3
 
 --[[--------------------------------------------------------------------
 	debugprofilestop() is a non-standard Lua function that returns the
@@ -523,7 +523,7 @@ WoWAPI.NUM_TALENT_COLUMNS = 3
 	This is a trivial implementation to just get the Profiler module
 	working.
 --]]--------------------------------------------------------------------
-WoWAPI.debugprofilestop = ZeroFunction
+WoWMock.debugprofilestop = ZeroFunction
 
 --[[--------------------------------------------------------------------
 	strsplit() is a non-standard Lua function that splits a string and
@@ -533,7 +533,7 @@ WoWAPI.debugprofilestop = ZeroFunction
 	This implementation is taken verbatim from:
 		http://lua-users.org/wiki/SplitJoin
 --]]--------------------------------------------------------------------
-WoWAPI.strsplit = function(delim, str, maxNb)
+WoWMock.strsplit = function(delim, str, maxNb)
 	-- Fix up '.' character class.
 	delim = gsub(delim, "%.", "%%.")
 	-- Eliminate bad cases...
@@ -564,7 +564,7 @@ end
 	tostringall() is a non-standard Lua function that returns a list of
 	each argument converted to a string.
 --]]--------------------------------------------------------------------
-WoWAPI.tostringall = function(...)
+WoWMock.tostringall = function(...)
 	local array = { ... }
 	local N = select("#", ...)
 	for i = 1, N do
@@ -577,7 +577,7 @@ end
 	wipe() is a non-standard Lua function that clears the contents of a
 	table and leaves the table pointer intact.
 --]]--------------------------------------------------------------------
-WoWAPI.wipe = function(t)
+WoWMock.wipe = function(t)
 	for k in pairs(t) do
 		t[k] = nil
 	end
@@ -587,9 +587,9 @@ end
 	Fake Blizzard API functions for unit testing.
 --]]-------------------------------------------------
 
-WoWAPI.CreateFrame = function(...)
+WoWMock.CreateFrame = function(...)
 	local frame = {
-		CreateTexture = function(...) return WoWAPI.CreateFrame() end,
+		CreateTexture = function(...) return WoWMock.CreateFrame() end,
 		EnableMouse = DoNothing,
 		Hide = DoNothing,
 		IsVisible = DoNothing,
@@ -609,17 +609,17 @@ WoWAPI.CreateFrame = function(...)
 	return frame
 end
 
-WoWAPI.GetActiveSpecGroup = function()
+WoWMock.GetActiveSpecGroup = function()
 	-- Always in the primary specialization.
 	return 1
 end
 
-WoWAPI.GetActionInfo = function(slot)
+WoWMock.GetActionInfo = function(slot)
 	-- Action bar is always empty.
 	return nil
 end
 
-WoWAPI.GetAuctionItemSubClasses = function(classIndex)
+WoWMock.GetAuctionItemSubClasses = function(classIndex)
 	return
 		"One-Handed Axes",
 		"Two-Handed Axes",
@@ -641,153 +641,153 @@ WoWAPI.GetAuctionItemSubClasses = function(classIndex)
 end
 
 -- No keybinds are assigned.
-WoWAPI.GetBindingKey = function(name)
+WoWMock.GetBindingKey = function(name)
 	return nil
 end
 
-WoWAPI.GetBonusBarIndex = function()
+WoWMock.GetBonusBarIndex = function()
 	return 8
 end
 
-WoWAPI.GetGlyphSocketInfo = function(socket, talentGroup)
+WoWMock.GetGlyphSocketInfo = function(socket, talentGroup)
 	-- No glyphs.
 	return nil
 end
 
-WoWAPI.GetInventoryItemGems = function(slot)
+WoWMock.GetInventoryItemGems = function(slot)
 	-- Player is always completely un-gemmed.
 	return nil
 end
 
-WoWAPI.GetInventoryItemID = function(unitId, slot)
+WoWMock.GetInventoryItemID = function(unitId, slot)
 	-- All units are naked.
 	return nil
 end
 
-WoWAPI.GetItemInfo = function(item)
+WoWMock.GetItemInfo = function(item)
 	if type(item) == "number" then
 		item = format("Item Name Of %d", item)
 	end
 	return item
 end
 
-WoWAPI.GetLocale = function()
+WoWMock.GetLocale = function()
 	return "enUS"
 end
 
-WoWAPI.GetNumGlyphSockets = function()
+WoWMock.GetNumGlyphSockets = function()
 	-- 3 x Major + 3 x Minor
 	return 6
 end
 
-WoWAPI.GetNumShapeshiftForms = ZeroFunction
+WoWMock.GetNumShapeshiftForms = ZeroFunction
 
-WoWAPI.GetPowerRegen = function()
+WoWMock.GetPowerRegen = function()
 	return 0, 0
 end
 
-WoWAPI.GetShapeshiftForm = function()
+WoWMock.GetShapeshiftForm = function()
 	-- Always in humanoid form.
 	return 0
 end
 
-WoWAPI.GetSpecialization = function()
+WoWMock.GetSpecialization = function()
 	local specialization = self_state.specialization or 1
 	return specialization
 end
 
-WoWAPI.GetSpellInfo = function(spell)
+WoWMock.GetSpellInfo = function(spell)
 	if type(spell) == "number" then
 		spell = format("Spell Name Of %d", spell)
 	end
 	return spell
 end
 
-WoWAPI.GetSpellTabInfo = function(index)
+WoWMock.GetSpellTabInfo = function(index)
 	-- No spells in the spellbook.
 	return nil
 end
 
-WoWAPI.GetTalentInfo = function(row, column, activeTalentGroup)
+WoWMock.GetTalentInfo = function(row, column, activeTalentGroup)
 	-- No talents.
 	return 123, "A Talent", nil, 0, nil
 end
 
-WoWAPI.GetTime = function()
+WoWMock.GetTime = function()
 	return 1234
 end
 
-WoWAPI.HasPetSpells = function()
+WoWMock.HasPetSpells = function()
 	-- No pet spells.
 	return false
 end
 
-WoWAPI.RegisterAddonMessagePrefix = function(prefixString) end
-WoWAPI.RegisterStateDriver = function(frame, stateId, conditional) end
+WoWMock.RegisterAddonMessagePrefix = function(prefixString) end
+WoWMock.RegisterStateDriver = function(frame, stateId, conditional) end
 
-WoWAPI.UnitAura = function(unitId)
+WoWMock.UnitAura = function(unitId)
 	-- No auras on any unit.
 	return nil
 end
 
-WoWAPI.UnitClass = function()
+WoWMock.UnitClass = function()
 	local class = self_state.class
 	return class, class
 end
 
-WoWAPI.UnitGUID = function(unitId)
+WoWMock.UnitGUID = function(unitId)
 	local guid = self_state.guid or 0
 	return guid
 end
 
-WoWAPI.UnitLevel = function()
+WoWMock.UnitLevel = function()
 	return self_state.level
 end
 
-WoWAPI.UnitName = function()
+WoWMock.UnitName = function()
 	local name = self_state.name or "AwesomePlayer"
 	return name
 end
 
-WoWAPI.UnitPower = function(unitId, powerType)
+WoWMock.UnitPower = function(unitId, powerType)
 	-- Always no resources on any unit.
 	return 0
 end
 
-WoWAPI.UnitPowerMax = function(unitId, powerType)
+WoWMock.UnitPowerMax = function(unitId, powerType)
 	-- Resources are from 0 to 100.
 	return 100
 end
 
-WoWAPI.UnitPowerType = function(unitId)
+WoWMock.UnitPowerType = function(unitId)
 	-- Every unit is a mana user.
-	return WoWAPI.SPELL_POWER_MANA, "MANA"
+	return WoWMock.SPELL_POWER_MANA, "MANA"
 end
 
 -- Unit stat functions for a naked toon.
-WoWAPI.GetCombatRating = ZeroFunction
-WoWAPI.GetCritChance = ZeroFunction
-WoWAPI.GetMastery = ZeroFunction
-WoWAPI.GetMasteryEffect = ZeroFunction
-WoWAPI.GetMeleeHaste = ZeroFunction
-WoWAPI.GetRangedCritChance = ZeroFunction
-WoWAPI.GetRangedHaste = ZeroFunction
-WoWAPI.GetSpellBonusDamage = ZeroFunction
-WoWAPI.GetSpellBonusHealing = ZeroFunction
-WoWAPI.GetSpellCritChance = ZeroFunction
-WoWAPI.UnitAttackPower = function(unitId) return 0, 0, 0 end
-WoWAPI.UnitAttackSpeed = function(unitId) return 0, 0 end
-WoWAPI.UnitDamage = function(unitId) return 0, 0, 0, 0, 0, 0, 0 end
-WoWAPI.UnitRangedAttackPower = WoWAPI.UnitAttackPower
-WoWAPI.UnitSpellHaste = ZeroFunction
-WoWAPI.UnitStat = ZeroFunction
+WoWMock.GetCombatRating = ZeroFunction
+WoWMock.GetCritChance = ZeroFunction
+WoWMock.GetMastery = ZeroFunction
+WoWMock.GetMasteryEffect = ZeroFunction
+WoWMock.GetMeleeHaste = ZeroFunction
+WoWMock.GetRangedCritChance = ZeroFunction
+WoWMock.GetRangedHaste = ZeroFunction
+WoWMock.GetSpellBonusDamage = ZeroFunction
+WoWMock.GetSpellBonusHealing = ZeroFunction
+WoWMock.GetSpellCritChance = ZeroFunction
+WoWMock.UnitAttackPower = function(unitId) return 0, 0, 0 end
+WoWMock.UnitAttackSpeed = function(unitId) return 0, 0 end
+WoWMock.UnitDamage = function(unitId) return 0, 0, 0, 0, 0, 0, 0 end
+WoWMock.UnitRangedAttackPower = WoWMock.UnitAttackPower
+WoWMock.UnitSpellHaste = ZeroFunction
+WoWMock.UnitStat = ZeroFunction
 
-WoWAPI.bit = {
+WoWMock.bit = {
 	band = DoNothing,
 	bor = DoNothing,
 }
 
-WoWAPI.LibStub = LibStub
+WoWMock.LibStub = LibStub
 --</public-static-properties>
 
 --<private-static-methods>
@@ -809,7 +809,7 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
-function WoWAPI:Initialize(addonName, state)
+function WoWMock:Initialize(addonName, state)
 	state = state or {}
 	for k, v in pairs(state) do
 		self_state[k] = v
@@ -818,7 +818,7 @@ function WoWAPI:Initialize(addonName, state)
 end
 
 -- Export symbols to the given namespace, taking care not to overwrite existing symbols.
-function WoWAPI:ExportSymbols(namespace)
+function WoWMock:ExportSymbols(namespace)
 	-- Default to adding symbols to the global namespace.
 	namespace = namespace or _G
 	for k, v in pairs(self) do
@@ -828,7 +828,7 @@ function WoWAPI:ExportSymbols(namespace)
 	end
 end
 
-function WoWAPI:Fire(event)
+function WoWMock:Fire(event)
 	local lib = self.LibStub("AceAddon-3.0")
 	if lib then
 		lib:Fire(event)
@@ -839,7 +839,7 @@ end
 	LoadAddOnFile() dispatches to the proper method to load the file
 	based on the file extension.
 --]]--------------------------------------------------------------------
-function WoWAPI:LoadAddonFile(filename, directory, verbose)
+function WoWMock:LoadAddonFile(filename, directory, verbose)
 	local s = directory and (directory .. filename) or filename
 	directory, filename = strmatch(s, "^(.+/)([^/]+[.][%w]+)$")
 	if not directory then
@@ -858,7 +858,7 @@ end
 	LoadAddonFile() does the equivalent of dofile(), but munges the WoW
 	addon file line that uses ... to get the file arguments.
 --]]--------------------------------------------------------------------
-function WoWAPI:LoadLua(filename, directory, verbose)
+function WoWMock:LoadLua(filename, directory, verbose)
 	if directory then
 		filename = directory .. filename
 	end
@@ -892,7 +892,7 @@ end
 --[[--------------------------------------------------------------------
 	LoadTOC() loads all of the addon's files listed in the TOC file.
 --]]--------------------------------------------------------------------
-function WoWAPI:LoadTOC(filename, directory, verbose)
+function WoWMock:LoadTOC(filename, directory, verbose)
 	if directory then
 		filename = directory .. filename
 	end
@@ -936,7 +936,7 @@ end
 --[[--------------------------------------------------------------------
 	LoadXML() loads all of the addon's Lua files listed in the XML file.
 --]]--------------------------------------------------------------------
-function WoWAPI:LoadXML(filename, directory, verbose)
+function WoWMock:LoadXML(filename, directory, verbose)
 	if directory then
 		filename = directory .. filename
 	end

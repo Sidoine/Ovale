@@ -8,15 +8,15 @@ do
 		level = 90,
 	}
 	dofile(root .. "WoWMock.lua")
-	WoWAPI:Initialize("Ovale", state)
-	WoWAPI:ExportSymbols()
+	WoWMock:Initialize("Ovale", state)
+	WoWMock:ExportSymbols()
 end
 
 do
 	-- Load all of the addon files.
-	WoWAPI:LoadAddonFile("Ovale.toc", root)
+	WoWMock:LoadAddonFile("Ovale.toc", root)
 	-- Fire ADDON_LOADED event.
-	WoWAPI:Fire("ADDON_LOADED")
+	WoWMock:Fire("ADDON_LOADED")
 end
 
 local OvaleSimulationCraft = Ovale.OvaleSimulationCraft

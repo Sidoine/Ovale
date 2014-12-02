@@ -162,7 +162,7 @@ $sm{"OvaleProfilerPrototype"}{StopProfiling} = true;
 
 $classname{Localization} = "Localization";
 $classname{Ovale} = "Ovale";
-$classname{WoWAPI} = "WoWAPI";
+$classname{WoWMock} = "WoWMock";
 
 sub ParseDirectory
 {

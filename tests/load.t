@@ -8,17 +8,17 @@ do
 		level = 90,
 	}
 	dofile(root .. "WoWMock.lua")
-	WoWAPI:Initialize("Ovale", state)
-	WoWAPI:ExportSymbols()
+	WoWMock:Initialize("Ovale", state)
+	WoWMock:ExportSymbols()
 end
 
 do
 	-- Load all of the addon files.
-	WoWAPI:LoadAddonFile("Ovale.toc", root, true)
+	WoWMock:LoadAddonFile("Ovale.toc", root, true)
 
 	-- Fake loading process.
-	WoWAPI:Fire("ADDON_LOADED")
-	WoWAPI:Fire("SPELLS_CHANGED")
-	WoWAPI:Fire("PLAYER_LOGIN")
-	WoWAPI:Fire("PLAYER_ENTERING_WORLD")
+	WoWMock:Fire("ADDON_LOADED")
+	WoWMock:Fire("SPELLS_CHANGED")
+	WoWMock:Fire("PLAYER_LOGIN")
+	WoWMock:Fire("PLAYER_ENTERING_WORLD")
 end
