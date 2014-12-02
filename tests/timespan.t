@@ -3,7 +3,7 @@
 --]]------------------------------
 local root = "../"
 do
-	dofile(root .. "WoWAPI.lua")
+	dofile(root .. "WoWMock.lua")
 	WoWAPI:Initialize("Ovale")
 	WoWAPI:ExportSymbols()
 end

@@ -22,4 +22,4 @@ externals:
 ignore:
     - tests
     - utils
-    - WoWAPI.lua
+    - WoWMock.lua

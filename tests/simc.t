@@ -7,7 +7,7 @@ do
 		class = "DRUID",
 		level = 90,
 	}
-	dofile(root .. "WoWAPI.lua")
+	dofile(root .. "WoWMock.lua")
 	WoWAPI:Initialize("Ovale", state)
 	WoWAPI:ExportSymbols()
 end
