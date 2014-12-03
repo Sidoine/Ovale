@@ -874,8 +874,6 @@ AddFunction FrostAoeActions
 	if Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffPresent(frost_bomb_debuff) Spell(ice_lance)
 	#ice_nova
 	Spell(ice_nova)
-	#cone_of_cold,if=glyph.cone_of_cold.enabled
-	if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
 	#blizzard,interrupt_if=cooldown.frozen_orb.up|(talent.frost_bomb.enabled&buff.fingers_of_frost.react=2)
 	Spell(blizzard)
 }
@@ -899,16 +897,6 @@ AddFunction FrostAoeCdActions
 {
 	#call_action_list,name=cooldowns
 	FrostCooldownsCdActions()
-
-	unless target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and { SpellCooldown(frozen_orb) < GCD() or BuffStacks(fingers_of_frost_buff) == 2 } and Spell(frost_bomb)
-		or Spell(frozen_orb)
-		or Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffPresent(frost_bomb_debuff) and Spell(ice_lance)
-		or Spell(comet_storm)
-		or Spell(ice_nova)
-	{
-		#cold_snap,if=glyph.cone_of_cold.enabled&!cooldown.cone_of_cold.up
-		if Glyph(glyph_of_cone_of_cold) and not { not SpellCooldown(cone_of_cold) > 0 } Spell(cold_snap)
-	}
 }
 
 # ActionList: FrostCooldownsActions --> cd
@@ -1043,8 +1031,6 @@ AddFunction FrostSingleTargetActions
 	if ArmorSetBonus(T17 2) and BuffPresent(ice_shard_buff) and not { Talent(thermal_void_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 10 } Spell(frostbolt)
 	#ice_lance,if=!talent.frost_bomb.enabled&buff.fingers_of_frost.react&(!talent.thermal_void.enabled|cooldown.icy_veins.remains>8)
 	if not Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } Spell(ice_lance)
-	#ice_lance,if=talent.thermal_void.enabled&!glyph.icy_veins.enabled&talent.mirror_image.enabled&buff.icy_veins.up&buff.icy_veins.remains<6&buff.icy_veins.remains<cooldown.icy_veins.remains
-	if Talent(thermal_void_talent) and not Glyph(glyph_of_icy_veins) and Talent(mirror_image_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 6 and BuffRemaining(icy_veins_buff) < SpellCooldown(icy_veins) Spell(ice_lance)
 	#frostbolt
 	Spell(frostbolt)
 	#ice_lance,moving=1
@@ -1077,7 +1063,6 @@ AddFunction FrostSingleTargetShortCdActions
 				or Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffRemaining(frost_bomb_debuff) > MaxTravelTime(ice_lance) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } and Spell(ice_lance)
 				or ArmorSetBonus(T17 2) and BuffPresent(ice_shard_buff) and not { Talent(thermal_void_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 10 } and Spell(frostbolt)
 				or not Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } and Spell(ice_lance)
-				or Talent(thermal_void_talent) and not Glyph(glyph_of_icy_veins) and Talent(mirror_image_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 6 and BuffRemaining(icy_veins_buff) < SpellCooldown(icy_veins) and Spell(ice_lance)
 			{
 				#water_jet,if=buff.fingers_of_frost.react=0&!dot.frozen_orb.ticking
 				if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and pet.Present() Spell(pet_water_jet)
@@ -1088,8 +1073,8 @@ AddFunction FrostSingleTargetShortCdActions
 
 AddFunction FrostSingleTargetCdActions
 {
-	#call_action_list,name=cooldowns,if=!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>45
-	if not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 45 FrostCooldownsCdActions()
+	#call_action_list,name=cooldowns,if=!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>15
+	if not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 15 FrostCooldownsCdActions()
 }
 
 ### Frost icons.

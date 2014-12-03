@@ -21,17 +21,8 @@ AddFunction UsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
 AddFunction AfflictionDefaultActions
 {
-	#use_item,name=shards_of_nothing
-	UseItemActions()
 	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
 	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
 	#berserking

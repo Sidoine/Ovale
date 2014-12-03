@@ -21,13 +21,6 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
 AddFunction InterruptActions
 {
 	if not target.IsFriend() and target.IsInterruptible()
@@ -51,8 +44,6 @@ AddFunction SummonPet
 AddFunction BeastMasteryDefaultActions
 {
 	#auto_shot
-	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury

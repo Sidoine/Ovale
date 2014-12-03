@@ -290,10 +290,10 @@ AddFunction ShadowCopMfiActions
 	if BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) Spell(insanity)
 	#insanity,if=active_enemies<=2,interrupt=1,chain=1
 	if Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) Spell(insanity)
-	#shadow_word_pain,if=remains<(15*0.3)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 15 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(shadow_word_pain)
-	#vampiric_touch,if=remains<(18*0.3+cast_time)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
-	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 18 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(vampiric_touch)
+	#shadow_word_pain,if=remains<(18*0.3)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(shadow_word_pain)
+	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 Spell(vampiric_touch)
 	#mind_sear,if=active_enemies>=6,chain=1,interrupt=1
 	if Enemies() >= 6 Spell(mind_sear)
 	#mind_spike
@@ -323,8 +323,8 @@ AddFunction ShadowCopMfiShortCdActions
 		#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 		if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
 
-		unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 15 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(shadow_word_pain)
-			or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 18 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(vampiric_touch)
+		unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(shadow_word_pain)
+			or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(vampiric_touch)
 			or Enemies() >= 6 and Spell(mind_sear)
 			or Spell(mind_spike)
 			or Speed() > 0 and Spell(shadow_word_death)

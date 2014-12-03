@@ -77,10 +77,6 @@ AddFunction FrostAoeActions
 	Spell(comet_storm)
 	#ice_nova
 	Spell(ice_nova)
-	#cold_snap,if=glyph.cone_of_cold.enabled&!cooldown.cone_of_cold.up
-	if Glyph(glyph_of_cone_of_cold) and not { not SpellCooldown(cone_of_cold) > 0 } Spell(cold_snap)
-	#cone_of_cold,if=glyph.cone_of_cold.enabled
-	if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
 	#blizzard,interrupt_if=cooldown.frozen_orb.up|(talent.frost_bomb.enabled&buff.fingers_of_frost.react=2)
 	Spell(blizzard)
 }
@@ -148,8 +144,8 @@ AddFunction FrostPrecombatActions
 
 AddFunction FrostSingleTargetActions
 {
-	#call_action_list,name=cooldowns,if=!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>45
-	if not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 45 FrostCooldownsActions()
+	#call_action_list,name=cooldowns,if=!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>15
+	if not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 15 FrostCooldownsActions()
 	#ice_lance,if=buff.fingers_of_frost.react&buff.fingers_of_frost.remains<action.frostbolt.execute_time
 	if BuffPresent(fingers_of_frost_buff) and BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) Spell(ice_lance)
 	#frostfire_bolt,if=buff.brain_freeze.react&buff.brain_freeze.remains<action.frostbolt.execute_time
@@ -178,8 +174,6 @@ AddFunction FrostSingleTargetActions
 	if ArmorSetBonus(T17 2) and BuffPresent(ice_shard_buff) and not { Talent(thermal_void_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 10 } Spell(frostbolt)
 	#ice_lance,if=!talent.frost_bomb.enabled&buff.fingers_of_frost.react&(!talent.thermal_void.enabled|cooldown.icy_veins.remains>8)
 	if not Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } Spell(ice_lance)
-	#ice_lance,if=talent.thermal_void.enabled&!glyph.icy_veins.enabled&talent.mirror_image.enabled&buff.icy_veins.up&buff.icy_veins.remains<6&buff.icy_veins.remains<cooldown.icy_veins.remains
-	if Talent(thermal_void_talent) and not Glyph(glyph_of_icy_veins) and Talent(mirror_image_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 6 and BuffRemaining(icy_veins_buff) < SpellCooldown(icy_veins) Spell(ice_lance)
 	#water_jet,if=buff.fingers_of_frost.react=0&!dot.frozen_orb.ticking
 	if BuffStacks(fingers_of_frost_buff) == 0 and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and pet.Present() Spell(pet_water_jet)
 	#frostbolt
@@ -209,9 +203,7 @@ AddIcon specialization=frost help=aoe
 # blizzard
 # blood_fury_sp
 # brain_freeze_buff
-# cold_snap
 # comet_storm
-# cone_of_cold
 # counterspell
 # draenic_intellect_potion
 # fingers_of_frost_buff
@@ -222,8 +214,6 @@ AddIcon specialization=frost help=aoe
 # frostfire_bolt
 # frozen_orb
 # frozen_orb_debuff
-# glyph_of_cone_of_cold
-# glyph_of_icy_veins
 # ice_floes
 # ice_floes_buff
 # ice_lance

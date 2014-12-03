@@ -116,8 +116,6 @@ AddFunction BeastMasteryDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
-	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
