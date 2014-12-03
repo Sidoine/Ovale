@@ -14,6 +14,9 @@ do
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
+Define(honor_among_thieves_cooldown_buff 51699)
+	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
+
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 
 AddFunction UsePotionAgility

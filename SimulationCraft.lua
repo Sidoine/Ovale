@@ -17,6 +17,7 @@ local OvalePool = Ovale.OvalePool
 -- Forward declarations for module dependencies.
 local OvaleAST = nil
 local OvaleData = nil
+local OvaleHonorAmongThieves = nil
 local OvaleLexer = nil
 local OvalePower = nil
 
@@ -1266,7 +1267,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 				isSpellAction = false
 			end
 		elseif class == "ROGUE" and action == "honor_among_thieves" then
-			-- skip
+			if modifier.cooldown then
+				local cooldown = Unparse(modifier.cooldown)
+				local buffName = action .. "_cooldown_buff"
+				annotation[buffName] = cooldown
+				annotation[action] = class
+			end
 			isSpellAction = false
 		elseif class == "ROGUE" and action == "kick" then
 			bodyCode = "InterruptActions()"
@@ -2726,9 +2732,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "0"
 	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.remains" then
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
-		local buffName = "honor_among_thieves_cooldown_buff"
-		code = format("BuffRemaining(%s)", buffName)
-		AddSymbol(annotation, buffName)
+		code = "BuffRemaining(honor_among_thieves_cooldown_buff)"
+		annotation.honor_among_thieves = class
 	elseif operand == "debuff.casting.react" then
 		code = target .. "IsInterruptible()"
 	elseif operand == "debuff.flying.down" then
@@ -3469,6 +3474,28 @@ local function InsertSupportingControls(child, annotation)
 	end
 	return count
 end
+
+local function InsertSupportingDefines(child, annotation)
+	local count = 0
+	local nodeList = annotation.astAnnotation.nodeList
+	if annotation.honor_among_thieves == "ROGUE" then
+		local buffName = "honor_among_thieves_cooldown_buff"
+		do
+			local code = format("SpellInfo(%s duration=%f)", buffName, annotation[buffName])
+			local node = OvaleAST:ParseCode("spell_info", code, nodeList, annotation.astAnnotation)
+			tinsert(child, 1, node)
+			count = count + 1
+		end
+		do
+			local code = format("Define(%s %d)", buffName, OvaleHonorAmongThieves.spellId)
+			local node = OvaleAST:ParseCode("define", code, nodeList, annotation.astAnnotation)
+			tinsert(child, 1, node)
+			count = count + 1
+		end
+		AddSymbol(annotation, buffName)
+	end
+	return count
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -3476,6 +3503,7 @@ function OvaleSimulationCraft:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAST = Ovale.OvaleAST
 	OvaleData = Ovale.OvaleData
+	OvaleHonorAmongThieves = Ovale.OvaleHonorAmongThieves
 	OvaleLexer = Ovale.OvaleLexer
 	OvalePower = Ovale.OvalePower
 
@@ -3724,6 +3752,7 @@ function OvaleSimulationCraft:Emit(profile)
 		end
 		annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
 		annotation.supportingControlCount = InsertSupportingControls(child, annotation)
+		annotation.supportingDefineCount = InsertSupportingDefines(child, annotation)
 	end
 
 	local output = self_outputPool:Get()
@@ -3748,7 +3777,7 @@ function OvaleSimulationCraft:Emit(profile)
 		output[#output + 1] = "Include(ovale_common)"
 		output[#output + 1] = format("Include(ovale_%s_spells)", strlower(annotation.class))
 		-- Insert an extra blank line to separate section for controls from the includes.
-		if annotation.supportingControlCount > 0 then
+		if annotation.supportingDefineCount + annotation.supportingControlCount > 0 then
 			output[#output + 1] = ""
 		end
 	end

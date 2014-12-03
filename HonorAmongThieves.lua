@@ -23,6 +23,7 @@ Ovale.OvaleHonorAmongThieves = OvaleHonorAmongThieves
 --<private-static-properties>
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
+local OvaleData = nil
 
 local API_GetTime = GetTime
 local API_UnitClass = UnitClass
@@ -36,6 +37,9 @@ local self_guid = nil
 
 -- Honor Among Thieves spell ID.
 local HONOR_AMONG_THIEVES = 51699
+
+-- Use a mean time between procs of 2.2 seconds (estimation from SimulationCraft).
+local MEAN_TIME_TO_HAT = 2.2
 --</private-static-properties>
 
 --<public-static-properties>
@@ -44,8 +48,7 @@ OvaleHonorAmongThieves.spellName = "Honor Among Thieves Cooldown"
 OvaleHonorAmongThieves.spellId = HONOR_AMONG_THIEVES
 OvaleHonorAmongThieves.start = 0
 OvaleHonorAmongThieves.ending = 0
--- Use a mean time between procs of 2.2 seconds (estimation from SimulationCraft).
-OvaleHonorAmongThieves.duration = 2.2
+OvaleHonorAmongThieves.duration = MEAN_TIME_TO_HAT
 OvaleHonorAmongThieves.stacks = 0
 --</public-static-properties>
 
@@ -53,6 +56,7 @@ OvaleHonorAmongThieves.stacks = 0
 function OvaleHonorAmongThieves:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
+	OvaleData = Ovale.OvaleData
 end
 
 function OvaleHonorAmongThieves:OnEnable()
@@ -83,6 +87,8 @@ function OvaleHonorAmongThieves:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cl
 		if spellId == HONOR_AMONG_THIEVES and powerType == 4 then
 			local now = API_GetTime()
 			self.start = now
+			-- Prefer the duration set in the script, if given; otherwise, default to MEAN_TIME_TO_HAT.
+			self.duration = OvaleData:GetSpellInfoProperty(HONOR_AMONG_THIEVES, "duration", "player") or MEAN_TIME_TO_HAT
 			self.ending = self.start + self.duration
 			self.stacks = 1
 			OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
