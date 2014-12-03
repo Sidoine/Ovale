@@ -150,13 +150,13 @@ $sp{OvaleQueue}{InsertFront} = true;
 $sp{OvaleQueue}{NewDeque} = true;
 $sp{OvaleQueue}{RemoveFront} = true;
 
-# WoWMock CONFIG table.
-$sp{CONFIG}{addonName} = true;
-$sp{CONFIG}{class} = true;
-$sp{CONFIG}{guid} = true;
-$sp{CONFIG}{level} = true;
-$sp{CONFIG}{name} = true;
-$sp{CONFIG}{specialization} = true;
+# WoWMock configuration table.
+$sp{WOWMOCK_CONFIG}{addonName} = true;
+$sp{WOWMOCK_CONFIG}{class} = true;
+$sp{WOWMOCK_CONFIG}{guid} = true;
+$sp{WOWMOCK_CONFIG}{level} = true;
+$sp{WOWMOCK_CONFIG}{name} = true;
+$sp{WOWMOCK_CONFIG}{specialization} = true;
 
 # Ovale module prototype.
 $sm{"modulePrototype"}{Error} = true;
