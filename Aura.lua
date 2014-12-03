@@ -1154,6 +1154,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 		for auraId, spellData in pairs(filterInfo) do
 			--[[
 				For lists described by SpellAddBuff(), etc., use the following interpretation:
+					auraId=count,N		N is number of stacks to be set
 					auraId=extend,N		aura is extended by N seconds, no change to stacks
 					auraId=refresh		aura is refreshed, no change to stacks
 					auraId=refresh_keep_snapshot
@@ -1166,9 +1167,11 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			local si = OvaleData.spellInfo[auraId]
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
 			local stacks = 1
+
+			local count
+			local extend = 0
 			local refresh = false
 			local keepSnapshot = false
-			local extend = 0
 
 			local tokenIterator, value
 			if strfind(spellData, ",") then
@@ -1185,6 +1188,13 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			elseif value == "refresh_keep_snapshot" then
 				refresh = true
 				keepSnapshot = true
+			elseif value == "count" then
+				local N = tokenIterator and tokenIterator() or nil
+				if N then
+					count = tonumber(N)
+				else
+					Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing final stack count.", auraId, spellData, value)
+				end
 			elseif value == "extend" then
 				local seconds = tokenIterator and tokenIterator() or nil
 				if seconds then
@@ -1235,6 +1245,10 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 						aura.serial = state.serial
 						state:Log("Aura %d is copied into simulator.", auraId)
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
+					end
+					-- Adjust stacks to add/remove if count is present.
+					if count and count > 0 then
+						stacks = count - aura.stacks
 					end
 					-- Spell starts channeling before the aura expires, or spellcast ends before the aura expires.
 					if refresh or extend > 0 or stacks > 0 then
