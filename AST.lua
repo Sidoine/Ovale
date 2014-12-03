@@ -654,15 +654,25 @@ end
 
 UnparseScript = function(node)
 	local output = self_outputPool:Get()
+	local previousDeclarationType
 	for _, declarationNode in ipairs(node.child) do
 		if declarationNode.type == "item_info" or declarationNode.type == "spell_aura_list" or declarationNode.type == "spell_info" or declarationNode.type == "spell_require" then
 			output[#output + 1] = INDENT[self_indent + 1] .. Unparse(declarationNode)
 		else
-			-- Add an extra blank line preceding "AddFunction" or "AddIcon".
+			local insertBlank = false
+			-- Add an extra blank line if the type is different from the previous type.
+			if previousDeclarationType and previousDeclarationType ~= declarationNode.type then
+				insertBlank = true
+			end
+			-- Always an extra blank line preceding "AddFunction" or "AddIcon".
 			if declarationNode.type == "add_function" or declarationNode.type == "icon" then
+				insertBlank = true
+			end
+			if insertBlank then
 				output[#output + 1] = ""
 			end
 			output[#output + 1] = Unparse(declarationNode)
+			previousDeclarationType = declarationNode.type
 		end
 	end
 	local outputString = tconcat(output, "\n")
