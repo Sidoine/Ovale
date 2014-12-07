@@ -59,8 +59,8 @@ AddFunction FireDefaultActions
 	if RuneOfPowerRemaining() < ExecuteTime(fireball) + GCD() and not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(rune_of_power)
 	#mirror_image,if=!(buff.heating_up.up&action.fireball.in_flight)
 	if not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(mirror_image)
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 FireAoeActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FireAoeActions()
 	#call_action_list,name=single_target
 	FireSingleTargetActions()
 }

@@ -48,8 +48,8 @@ AddFunction ArcaneDefaultActions
 	if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
 	if Talent(prismatic_crystal_talent) and TotemPresent(crystal totem=prismatic_crystal) ArcaneCrystalSequenceActions()
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 ArcaneAoeActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 ArcaneAoeActions()
 	#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
 	if TimeToDie() < ManaPercent() * 0.35 * SpellHaste() / 100 or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * SpellHaste() / 100 or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * SpellHaste() / 100 ArcaneBurnActions()
 	#call_action_list,name=conserve
@@ -66,8 +66,8 @@ AddFunction ArcaneDefaultShortCdActions
 	if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalShortCdActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
 	if Talent(prismatic_crystal_talent) and TotemPresent(crystal totem=prismatic_crystal) ArcaneCrystalSequenceShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 ArcaneAoeShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 ArcaneAoeShortCdActions()
 	#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
 	if TimeToDie() < ManaPercent() * 0.35 * SpellHaste() / 100 or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * SpellHaste() / 100 or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * SpellHaste() / 100 ArcaneBurnShortCdActions()
 	#call_action_list,name=conserve
@@ -94,8 +94,8 @@ AddFunction ArcaneDefaultCdActions
 		if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalCdActions()
 		#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
 		if Talent(prismatic_crystal_talent) and TotemPresent(crystal totem=prismatic_crystal) ArcaneCrystalSequenceCdActions()
-		#call_action_list,name=aoe,if=active_enemies>=5
-		if Enemies() >= 5 ArcaneAoeCdActions()
+		#call_action_list,name=aoe,if=active_enemies>=4
+		if Enemies() >= 4 ArcaneAoeCdActions()
 		#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
 		if TimeToDie() < ManaPercent() * 0.35 * SpellHaste() / 100 or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * SpellHaste() / 100 or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * SpellHaste() / 100 ArcaneBurnCdActions()
 		#call_action_list,name=conserve
@@ -430,8 +430,8 @@ AddFunction FireDefaultActions
 	if Talent(prismatic_crystal_talent) and TotemPresent(crystal totem=prismatic_crystal) FireCrystalSequenceActions()
 	#call_action_list,name=init_combust,if=!pyro_chain
 	if not GetState(pyro_chain) > 0 FireInitCombustActions()
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 FireAoeActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FireAoeActions()
 	#call_action_list,name=single_target
 	FireSingleTargetActions()
 }
@@ -454,8 +454,8 @@ AddFunction FireDefaultShortCdActions
 	if not GetState(pyro_chain) > 0 FireInitCombustShortCdActions()
 	#rune_of_power,if=buff.rune_of_power.remains<action.fireball.execute_time+gcd.max&!(buff.heating_up.up&action.fireball.in_flight)
 	if RuneOfPowerRemaining() < ExecuteTime(fireball) + GCD() and not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(rune_of_power)
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 FireAoeShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FireAoeShortCdActions()
 	#call_action_list,name=single_target
 	FireSingleTargetShortCdActions()
 }
@@ -481,8 +481,8 @@ AddFunction FireDefaultCdActions
 		{
 			#mirror_image,if=!(buff.heating_up.up&action.fireball.in_flight)
 			if not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(mirror_image)
-			#call_action_list,name=aoe,if=active_enemies>=5
-			if Enemies() >= 5 FireAoeCdActions()
+			#call_action_list,name=aoe,if=active_enemies>=4
+			if Enemies() >= 4 FireAoeCdActions()
 			#call_action_list,name=single_target
 			FireSingleTargetCdActions()
 		}
@@ -816,8 +816,8 @@ AddFunction FrostDefaultActions
 {
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
 	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(crystal totem=prismatic_crystal) } FrostCrystalSequenceActions()
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 FrostAoeActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FrostAoeActions()
 	#call_action_list,name=single_target
 	FrostSingleTargetActions()
 }
@@ -834,8 +834,8 @@ AddFunction FrostDefaultShortCdActions
 	if SpellCooldown(icy_veins) < GCD() and RuneOfPowerRemaining() < 20 or { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) < GCD() } and RuneOfPowerRemaining() < 10 Spell(rune_of_power)
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
 	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(crystal totem=prismatic_crystal) } FrostCrystalSequenceShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 FrostAoeShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FrostAoeShortCdActions()
 	#call_action_list,name=single_target
 	FrostSingleTargetShortCdActions()
 }
@@ -857,8 +857,8 @@ AddFunction FrostDefaultCdActions
 		if TimeToDie() < 24 FrostCooldownsCdActions()
 		#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
 		if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(crystal totem=prismatic_crystal) } FrostCrystalSequenceCdActions()
-		#call_action_list,name=aoe,if=active_enemies>=5
-		if Enemies() >= 5 FrostAoeCdActions()
+		#call_action_list,name=aoe,if=active_enemies>=4
+		if Enemies() >= 4 FrostAoeCdActions()
 		#call_action_list,name=single_target
 		FrostSingleTargetCdActions()
 	}

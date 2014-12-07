@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Unholy_T17M".
 #	class=deathknight
 #	spec=unholy
-#	talents=2003002
+#	talents=2001002
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)
@@ -228,6 +228,8 @@ AddFunction UnholySingleTargetActions
 	if BuffStacks(blood_charge_buff) >= 10 and RunicPower() >= 30 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#death_coil
 	Spell(death_coil)
+	#plague_leech
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#empower_rune_weapon
 	Spell(empower_rune_weapon)
 }

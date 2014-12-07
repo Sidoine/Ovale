@@ -57,8 +57,8 @@ AddFunction FrostDefaultActions
 	if TimeToDie() < 24 FrostCooldownsActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
 	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(crystal totem=prismatic_crystal) } FrostCrystalSequenceActions()
-	#call_action_list,name=aoe,if=active_enemies>=5
-	if Enemies() >= 5 FrostAoeActions()
+	#call_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FrostAoeActions()
 	#call_action_list,name=single_target
 	FrostSingleTargetActions()
 }

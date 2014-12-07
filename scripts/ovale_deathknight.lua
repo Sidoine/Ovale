@@ -1155,7 +1155,7 @@ AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
 # Based on SimulationCraft profile "Death_Knight_Unholy_T17M".
 #	class=deathknight
 #	spec=unholy
-#	talents=2003002
+#	talents=2001002
 
 # ActionList: UnholyDefaultActions --> main, shortcd, cd
 
@@ -1475,6 +1475,8 @@ AddFunction UnholySingleTargetActions
 	Spell(festering_strike)
 	#death_coil
 	Spell(death_coil)
+	#plague_leech
+	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 }
 
 AddFunction UnholySingleTargetShortCdActions
@@ -1575,6 +1577,7 @@ AddFunction UnholySingleTargetCdActions
 			or { not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(unholy) >= 1 and Rune(death) >= 1 or Rune(death) >= 2 } and Spell(scourge_strike)
 			or Spell(festering_strike)
 			or Spell(death_coil)
+			or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 		{
 			#empower_rune_weapon
 			Spell(empower_rune_weapon)
