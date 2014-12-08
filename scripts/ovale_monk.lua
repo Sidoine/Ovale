@@ -60,8 +60,6 @@ AddFunction BrewmasterDefaultShortCdActions
 {
 	#chi_brew,if=talent.chi_brew.enabled&chi.max-chi>=2&buff.elusive_brew_stacks.stack<=10
 	if Talent(chi_brew_talent) and MaxChi() - Chi() >= 2 and BuffStacks(elusive_brew_stacks_buff) <= 10 Spell(chi_brew)
-	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 	if BuffStacks(elusive_brew_stacks_buff) >= 9 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#serenity,if=talent.serenity.enabled&energy<=40
@@ -184,15 +182,7 @@ AddFunction BrewmasterPrecombatActions
 	#snapshot_stats
 }
 
-AddFunction BrewmasterPrecombatShortCdActions
-{
-	unless BuffExpires(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger)
-		or Spell(stance_of_the_sturdy_ox)
-	{
-		#dampen_harm
-		Spell(dampen_harm)
-	}
-}
+AddFunction BrewmasterPrecombatShortCdActions {}
 
 AddFunction BrewmasterPrecombatCdActions
 {
@@ -201,6 +191,8 @@ AddFunction BrewmasterPrecombatCdActions
 	{
 		#potion,name=draenic_agility
 		UsePotionAgility()
+		#dampen_harm
+		Spell(dampen_harm)
 	}
 }
 
