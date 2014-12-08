@@ -1961,14 +1961,15 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		property = operand
 	end
 
-	name = Disambiguate(name, annotation.class, annotation.specialization)
+	local class, specialization = annotation.class, annotation.specialization
+	name = Disambiguate(name, class, specialization)
 	target = target and (target .. ".") or ""
 	local buffName = name .. "_debuff"
-	buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
+	buffName = Disambiguate(buffName, class, specialization)
 	local prefix = strfind(buffName, "_buff$") and "Buff" or "Debuff"
 	local buffTarget = (prefix == "Debuff") and "target." or target
 	local talentName = name .. "_talent"
-	talentName = Disambiguate(talentName, annotation.class, annotation.specialization)
+	talentName = Disambiguate(talentName, class, specialization)
 	local symbol = name
 
 	local code
@@ -2692,6 +2693,13 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- The "careful_aim" buff is a fake SimulationCraft buff.
 		code = format("%sHealthPercent() > 80 or BuffPresent(rapid_fire_buff)", target)
 		AddSymbol(annotation, "rapid_fire_buff")
+	elseif class == "MAGE" and (operand == "in_flight" and action == "fireball" or operand == "action.fireball.in_flight") then
+		-- Frostfire Bolt can be substituted for Fireball when testing whether the spell is in flight.
+		local fbName = "fireball"
+		local ffbName = "frostfire_bolt"
+		code = format("InFlightToTarget(%s) or InFlightToTarget(%s)", fbName, ffbName)
+		AddSymbol(annotation, fbName)
+		AddSymbol(annotation, ffbName)
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
 		code = "RuneOfPowerRemaining()"
 	elseif class == "MAGE" and operand == "dot.frozen_orb.ticking" then

@@ -56,9 +56,9 @@ AddFunction FireDefaultActions
 	#call_action_list,name=init_combust,if=!pyro_chain
 	if not GetState(pyro_chain) > 0 FireInitCombustActions()
 	#rune_of_power,if=buff.rune_of_power.remains<action.fireball.execute_time+gcd.max&!(buff.heating_up.up&action.fireball.in_flight)
-	if RuneOfPowerRemaining() < ExecuteTime(fireball) + GCD() and not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(rune_of_power)
+	if RuneOfPowerRemaining() < ExecuteTime(fireball) + GCD() and not { BuffPresent(heating_up_buff) and { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } } Spell(rune_of_power)
 	#mirror_image,if=!(buff.heating_up.up&action.fireball.in_flight)
-	if not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(mirror_image)
+	if not { BuffPresent(heating_up_buff) and { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } } Spell(mirror_image)
 	#call_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 FireAoeActions()
 	#call_action_list,name=single_target
@@ -114,7 +114,7 @@ AddFunction FireCombustSequenceActions
 	#inferno_blast,if=set_bonus.tier16_4pc_caster&(buff.pyroblast.up^buff.heating_up.up)
 	if ArmorSetBonus(T16_caster 4) and { BuffPresent(pyroblast_buff) xor BuffPresent(heating_up_buff) } Spell(inferno_blast)
 	#fireball,if=!dot.ignite.ticking&!in_flight
-	if not target.DebuffPresent(ignite_debuff) and not InFlightToTarget(fireball) Spell(fireball)
+	if not target.DebuffPresent(ignite_debuff) and not { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } Spell(fireball)
 	#pyroblast,if=buff.pyroblast.up
 	if BuffPresent(pyroblast_buff) Spell(pyroblast)
 	#inferno_blast,if=talent.meteor.enabled&cooldown.meteor.duration-cooldown.meteor.remains<gcd.max*3
@@ -136,13 +136,13 @@ AddFunction FireCrystalSequenceActions
 AddFunction FireInitCombustActions
 {
 	#start_pyro_chain,if=talent.meteor.enabled&cooldown.meteor.up&((cooldown.combustion.remains<gcd.max*3&buff.pyroblast.up&(buff.heating_up.up^action.fireball.in_flight))|(buff.pyromaniac.up&(cooldown.combustion.remains<ceil(buff.pyromaniac.remains%gcd.max)*gcd.max)))
-	if Talent(meteor_talent) and not SpellCooldown(meteor) > 0 and { SpellCooldown(combustion) < GCD() * 3 and BuffPresent(pyroblast_buff) and { BuffPresent(heating_up_buff) xor InFlightToTarget(fireball) } or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * GCD() } SetState(pyro_chain 1)
+	if Talent(meteor_talent) and not SpellCooldown(meteor) > 0 and { SpellCooldown(combustion) < GCD() * 3 and BuffPresent(pyroblast_buff) and { BuffPresent(heating_up_buff) xor { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } } or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * GCD() } SetState(pyro_chain 1)
 	#start_pyro_chain,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up&((cooldown.combustion.remains<gcd.max*2&buff.pyroblast.up&(buff.heating_up.up^action.fireball.in_flight))|(buff.pyromaniac.up&(cooldown.combustion.remains<ceil(buff.pyromaniac.remains%gcd.max)*gcd.max)))
-	if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 and { SpellCooldown(combustion) < GCD() * 2 and BuffPresent(pyroblast_buff) and { BuffPresent(heating_up_buff) xor InFlightToTarget(fireball) } or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * GCD() } SetState(pyro_chain 1)
+	if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 and { SpellCooldown(combustion) < GCD() * 2 and BuffPresent(pyroblast_buff) and { BuffPresent(heating_up_buff) xor { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } } or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * GCD() } SetState(pyro_chain 1)
 	#start_pyro_chain,if=talent.prismatic_crystal.enabled&!glyph.combustion.enabled&cooldown.prismatic_crystal.remains>20&((cooldown.combustion.remains<gcd.max*2&buff.pyroblast.up&buff.heating_up.up&action.fireball.in_flight)|(buff.pyromaniac.up&(cooldown.combustion.remains<ceil(buff.pyromaniac.remains%gcd.max)*gcd.max)))
-	if Talent(prismatic_crystal_talent) and not Glyph(glyph_of_combustion) and SpellCooldown(prismatic_crystal) > 20 and { SpellCooldown(combustion) < GCD() * 2 and BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * GCD() } SetState(pyro_chain 1)
+	if Talent(prismatic_crystal_talent) and not Glyph(glyph_of_combustion) and SpellCooldown(prismatic_crystal) > 20 and { SpellCooldown(combustion) < GCD() * 2 and BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * GCD() } SetState(pyro_chain 1)
 	#start_pyro_chain,if=!talent.prismatic_crystal.enabled&!talent.meteor.enabled&((cooldown.combustion.remains<gcd.max*4&buff.pyroblast.up&buff.heating_up.up&action.fireball.in_flight)|(buff.pyromaniac.up&cooldown.combustion.remains<ceil(buff.pyromaniac.remains%gcd.max)*(gcd.max+talent.kindling.enabled)))
-	if not Talent(prismatic_crystal_talent) and not Talent(meteor_talent) and { SpellCooldown(combustion) < GCD() * 4 and BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * { GCD() + Talent(kindling_talent) } } SetState(pyro_chain 1)
+	if not Talent(prismatic_crystal_talent) and not Talent(meteor_talent) and { SpellCooldown(combustion) < GCD() * 4 and BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } or BuffPresent(pyromaniac_buff) and SpellCooldown(combustion) < BuffRemaining(pyromaniac_buff) / GCD() * { GCD() + Talent(kindling_talent) } } SetState(pyro_chain 1)
 }
 
 AddFunction FireLivingBombActions
@@ -181,13 +181,13 @@ AddFunction FireSingleTargetActions
 	#pyroblast,if=set_bonus.tier17_4pc&buff.pyromaniac.react
 	if ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) Spell(pyroblast)
 	#pyroblast,if=buff.pyroblast.up&buff.heating_up.up&action.fireball.in_flight
-	if BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) Spell(pyroblast)
+	if BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } Spell(pyroblast)
 	#inferno_blast,if=buff.pyroblast.down&buff.heating_up.up
 	if BuffExpires(pyroblast_buff) and BuffPresent(heating_up_buff) Spell(inferno_blast)
 	#call_action_list,name=active_talents
 	FireActiveTalentsActions()
 	#inferno_blast,if=buff.pyroblast.up&buff.heating_up.down&!action.fireball.in_flight
-	if BuffPresent(pyroblast_buff) and BuffExpires(heating_up_buff) and not InFlightToTarget(fireball) Spell(inferno_blast)
+	if BuffPresent(pyroblast_buff) and BuffExpires(heating_up_buff) and not { InFlightToTarget(fireball) or InFlightToTarget(frostfire_bolt) } Spell(inferno_blast)
 	#fireball
 	Spell(fireball)
 	#scorch,moving=1
@@ -223,6 +223,7 @@ AddIcon specialization=fire help=aoe
 # fireball
 # flamestrike
 # flamestrike_debuff
+# frostfire_bolt
 # glyph_of_combustion
 # glyph_of_dragons_breath
 # heating_up_buff
