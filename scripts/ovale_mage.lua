@@ -539,7 +539,7 @@ AddFunction FireAoeCdActions
 	unless { target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() or target.DebuffPresent(pyroblast_debuff) and DebuffCountOnAny(pyroblast_debuff) < Enemies() } and Spell(inferno_blast)
 	{
 		#call_action_list,name=active_talents
-		FireActiveTalentsActions()
+		FireActiveTalentsCdActions()
 
 		unless { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast)
 			or not DebuffCountOnAny(pyroblast_debuff) > 0 and not InFlightToTarget(pyroblast) and Spell(pyroblast)
