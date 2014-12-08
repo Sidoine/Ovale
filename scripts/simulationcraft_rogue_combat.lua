@@ -105,10 +105,6 @@ AddFunction CombatFinisherActions
 {
 	#death_from_above
 	Spell(death_from_above)
-	#crimson_tempest,if=active_enemies>6&remains<2
-	if Enemies() > 6 and target.DebuffRemaining(crimson_tempest_debuff) < 2 Spell(crimson_tempest)
-	#crimson_tempest,if=active_enemies>8
-	if Enemies() > 8 Spell(crimson_tempest)
 	#eviscerate
 	Spell(eviscerate)
 }
@@ -177,8 +173,6 @@ AddIcon specialization=combat help=aoe
 # blade_flurry_buff
 # blood_fury_ap
 # cheap_shot
-# crimson_tempest
-# crimson_tempest_debuff
 # deadly_poison
 # deadly_throw
 # death_from_above

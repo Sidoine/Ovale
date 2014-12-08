@@ -52,7 +52,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Death_Knight_Blood_T16M".
 #	class=deathknight
 #	spec=blood
-#	talents=2013302
+#	talents=2013102
 
 # ActionList: BloodDefaultActions --> main, shortcd, cd
 

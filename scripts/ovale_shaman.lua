@@ -163,12 +163,14 @@ AddFunction ElementalPrecombatCdActions
 
 AddFunction ElementalSingleActions
 {
-	#unleash_flame,if=talent.unleashed_fury.enabled&!buff.ascendance.up
-	if Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) Spell(unleash_flame)
+	#unleash_flame,moving=1
+	if Speed() > 0 Spell(unleash_flame)
 	#earth_shock,if=buff.lightning_shield.react=buff.lightning_shield.max_stack
 	if BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) Spell(earth_shock)
 	#lava_burst,if=dot.flame_shock.remains>cast_time&(buff.ascendance.up|cooldown_react)
 	if target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { BuffPresent(ascendance_caster_buff) or not SpellCooldown(lava_burst) > 0 } Spell(lava_burst)
+	#unleash_flame,if=talent.unleashed_fury.enabled&!buff.ascendance.up
+	if Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) Spell(unleash_flame)
 	#flame_shock,if=dot.flame_shock.remains<=9
 	if target.DebuffRemaining(flame_shock_debuff) <= 9 Spell(flame_shock)
 	#earth_shock,if=(set_bonus.tier17_4pc&buff.lightning_shield.react>=15&!buff.lava_surge.up)|(!set_bonus.tier17_4pc&buff.lightning_shield.react>15)
@@ -185,13 +187,14 @@ AddFunction ElementalSingleActions
 
 AddFunction ElementalSingleShortCdActions
 {
-	unless Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) and Spell(unleash_flame)
+	unless Speed() > 0 and Spell(unleash_flame)
 	{
 		#spiritwalkers_grace,moving=1,if=buff.ascendance.up
 		if Speed() > 0 and BuffPresent(ascendance_caster_buff) Spell(spiritwalkers_grace)
 
 		unless BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock)
 			or target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { BuffPresent(ascendance_caster_buff) or not SpellCooldown(lava_burst) > 0 } and Spell(lava_burst)
+			or Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) and Spell(unleash_flame)
 			or target.DebuffRemaining(flame_shock_debuff) <= 9 and Spell(flame_shock)
 			or ArmorSetBonus(T17 4) and BuffStacks(lightning_shield_buff) >= 15 and not BuffPresent(lava_surge_buff) or not ArmorSetBonus(T17 4) and BuffStacks(lightning_shield_buff) > 15 and Spell(earth_shock)
 		{

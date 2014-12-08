@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Blood_T17M".
 #	class=deathknight
 #	spec=blood
-#	talents=2013302
+#	talents=2013102
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)
