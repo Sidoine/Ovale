@@ -78,8 +78,8 @@ AddFunction ArmsAoeActions
 	if target.TicksRemaining(rend_debuff) < 2 and target.TimeToDie() > 4 Spell(rend)
 	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
-	#bladestorm,if=active_enemies>5
-	if Enemies() > 5 Spell(bladestorm)
+	#bladestorm
+	Spell(bladestorm)
 	#colossus_smash,if=dot.rend.ticking
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
 	#mortal_strike,if=cooldown.colossus_smash.remains>1.5&target.health.pct>20&active_enemies=2
@@ -92,8 +92,6 @@ AddFunction ArmsAoeActions
 	if SpellCooldown(colossus_smash) > 1.5 and { target.HealthPercent() > 20 or Enemies() > 3 } Spell(whirlwind)
 	#rend,cycle_targets=1,if=!ticking&target.time_to_die>8
 	if not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 8 Spell(rend)
-	#bladestorm,if=cooldown.colossus_smash.remains>6&(!talent.ravager.enabled|cooldown.ravager.remains>6)
-	if SpellCooldown(colossus_smash) > 6 and { not Talent(ravager_talent) or SpellCooldown(ravager) > 6 } Spell(bladestorm)
 	#siegebreaker
 	Spell(siegebreaker)
 	#storm_bolt,if=cooldown.colossus_smash.remains>4|debuff.colossus_smash.up
@@ -191,7 +189,6 @@ AddIcon specialization=arms help=aoe
 # pummel
 # quaking_palm
 # ravager
-# ravager_talent
 # recklessness
 # recklessness_buff
 # rend

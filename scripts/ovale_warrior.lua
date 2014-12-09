@@ -130,8 +130,8 @@ AddFunction ArmsAoeShortCdActions
 	{
 		#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
 		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
-		#bladestorm,if=active_enemies>5
-		if Enemies() > 5 Spell(bladestorm)
+		#bladestorm
+		Spell(bladestorm)
 
 		unless target.DebuffPresent(rend_debuff) and Spell(colossus_smash)
 			or SpellCooldown(colossus_smash) > 1.5 and target.HealthPercent() > 20 and Enemies() == 2 and Spell(mortal_strike)
@@ -143,8 +143,6 @@ AddFunction ArmsAoeShortCdActions
 			unless SpellCooldown(colossus_smash) > 1.5 and { target.HealthPercent() > 20 or Enemies() > 3 } and Spell(whirlwind)
 				or not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 8 and Spell(rend)
 			{
-				#bladestorm,if=cooldown.colossus_smash.remains>6&(!talent.ravager.enabled|cooldown.ravager.remains>6)
-				if SpellCooldown(colossus_smash) > 6 and { not Talent(ravager_talent) or SpellCooldown(ravager) > 6 } Spell(bladestorm)
 				#siegebreaker
 				Spell(siegebreaker)
 				#storm_bolt,if=cooldown.colossus_smash.remains>4|debuff.colossus_smash.up
@@ -292,6 +290,10 @@ AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
 AddFunction FurySingleMindedFuryDefaultActions
 {
 	#auto_attack
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FurySingleMindedFuryMovementActions()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetActions()
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -308,10 +310,14 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	if target.InRange(charge) Spell(charge)
 	# CHANGE: Get within melee range of the target.
 	GetInMeleeRange()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetShortCdActions()
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetShortCdActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -326,10 +332,12 @@ AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FurySingleMindedFuryMovementCdActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
 	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
 	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
 	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
@@ -410,6 +418,27 @@ AddFunction FurySingleMindedFuryAoeCdActions
 }
 
 AddFunction FurySingleMindedFuryAoeCdActions {}
+
+# ActionList: FurySingleMindedFuryMovementActions --> main, shortcd, cd
+
+AddFunction FurySingleMindedFuryMovementActions
+{
+	unless Spell(storm_bolt)
+	{
+		#heroic_throw
+		Spell(heroic_throw)
+	}
+}
+
+AddFunction FurySingleMindedFuryMovementActions
+{
+	#heroic_leap
+	if target.InRange(charge) Spell(heroic_leap)
+	#storm_bolt
+	Spell(storm_bolt)
+}
+
+AddFunction FurySingleMindedFuryMovementCdActions {}
 
 # ActionList: FurySingleMindedFuryPrecombatActions --> main, shortcd, cd
 
@@ -594,8 +623,10 @@ AddFunction FurySingleMindedFuryTwoTargetsCdActions
 AddFunction FuryTitansGripDefaultActions
 {
 	#auto_attack
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetActions()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FuryTitansGripMovementActions()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetActions()
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -612,12 +643,14 @@ AddFunction FuryTitansGripDefaultShortCdActions
 	if target.InRange(charge) Spell(charge)
 	# CHANGE: Get within melee range of the target.
 	GetInMeleeRange()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FuryTitansGripMovementShortCdActions()
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetShortCdActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -632,10 +665,12 @@ AddFunction FuryTitansGripDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FuryTitansGripMovementCdActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>3&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 3 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
 	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
 	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
 	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
@@ -714,6 +749,27 @@ AddFunction FuryTitansGripAoeCdActions
 		if BuffRemaining(enrage_buff any=1) > 6 and not SpellCooldown(bladestorm) > 0 Spell(recklessness)
 	}
 }
+
+# ActionList: FuryTitansGripMovementActions --> main, shortcd, cd
+
+AddFunction FuryTitansGripMovementActions
+{
+	unless Spell(storm_bolt)
+	{
+		#heroic_throw
+		Spell(heroic_throw)
+	}
+}
+
+AddFunction FuryTitansGripMovementActions
+{
+	#heroic_leap
+	if target.InRange(charge) Spell(heroic_leap)
+	#storm_bolt
+	Spell(storm_bolt)
+}
+
+AddFunction FuryTitansGripMovementCdActions {}
 
 # ActionList: FuryTitansGripPrecombatActions --> main, shortcd, cd
 

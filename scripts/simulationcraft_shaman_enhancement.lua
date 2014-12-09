@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Shaman_Enhancement_T17M".
 #	class=shaman
 #	spec=enhancement
-#	talents=0002012
+#	talents=0001023
 #	glyphs=chain_lightning/frost_shock
 
 Include(ovale_common)
@@ -156,10 +156,10 @@ AddFunction EnhancementSingleActions
 	if Talent(unleashed_fury_talent) or ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements)
 	#elemental_blast,if=buff.maelstrom_weapon.react>=4|buff.ancestral_swiftness.up
 	if BuffStacks(maelstrom_weapon_buff) >= 4 or BuffPresent(ancestral_swiftness_buff) Spell(elemental_blast)
-	#lightning_bolt,if=buff.maelstrom_weapon.react=5|(buff.maelstrom_weapon.react>=4&!buff.ascendance.up)|(buff.ancestral_swiftness.up&buff.maelstrom_weapon.react>=3)
-	if BuffStacks(maelstrom_weapon_buff) == 5 or BuffStacks(maelstrom_weapon_buff) >= 4 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 Spell(lightning_bolt)
 	#windstrike
 	if BuffPresent(ascendance_melee_buff) Spell(windstrike)
+	#lightning_bolt,if=buff.maelstrom_weapon.react=5
+	if BuffStacks(maelstrom_weapon_buff) == 5 Spell(lightning_bolt)
 	#stormstrike
 	Spell(stormstrike)
 	#lava_lash
@@ -172,8 +172,8 @@ AddFunction EnhancementSingleActions
 	if Talent(elemental_fusion_talent) and target.DebuffRemaining(flame_shock_debuff) >= 16 or not Talent(elemental_fusion_talent) Spell(frost_shock)
 	#elemental_blast,if=buff.maelstrom_weapon.react>=1
 	if BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
-	#lightning_bolt,if=buff.maelstrom_weapon.react>=1&!buff.ascendance.up
-	if BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) Spell(lightning_bolt)
+	#lightning_bolt,if=(buff.maelstrom_weapon.react>=1&!buff.ascendance.up)|buff.ancestral_swiftness.up
+	if BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#searing_totem,if=pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
 	if TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }
