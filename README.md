@@ -5,7 +5,7 @@ It displays one or more icons that show the cooldown of an action.  The action i
 The current release of Ovale provides default scripts for the following classes for *Warlords of Draenor*:
 
 - Death Knight: Blood, Frost, Unholy
-- Druid: Feral, Guardian, Restoration **(Balance is NOT currently supported)**
+- Druid: Feral, Guardian, Restoration **([Balance is NOT currently supported][balance-ticket])**
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
 - Monk: Brewmaster, Windwalker
@@ -34,8 +34,8 @@ Features
 FAQ
 ===
 
-##### Why does it not work for me?
-Try to reset your Profile in the [Ovale][] settings.
+##### Why does Ovale update so often?
+[Ovale][] tracks the latest [SimulationCraft][] profiles for the latest raid content, and as action priority lists are updated in [SimulationCraft][], they are mirrored fairly quickly in the [Ovale][] default scripts.
 
 ##### Why is the key binding displayed for an action wrong?
 You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.
@@ -50,7 +50,7 @@ Blizzard does not allow this.  Only a predefined sequence of spells can be bound
 Simply install [SpellFlashCore][] (included if you install [SpellFlash][]) and [Ovale][] will use it to flash the spell to cast on the action bar in addition to displaying the spell in the Ovale icon bar.
 
 ##### On my low-level character, there is nothing at all.
-You need to reach level 10 and choose a specialization.  However, be aware that the default [Ovale][] scripts are tuned for max-level characters and you may be missing key abilities at low levels that are assumed to exist.  If the default script is not working for you, you will need to find or write a script more appopriate for your character's level.
+You need to reach level 10 and choose a specialization.  However, be aware that the default [Ovale][] scripts are tuned for max-level characters and you may be missing key abilities at low levels that are assumed to exist.  If the default script is not working for you, you will need to find or write a script more appropriate for your character's level.
 
   [Corruption]: http://www.wowhead.com/spell=172
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
@@ -62,6 +62,7 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [Skada]: http://www.curse.com/addons/wow/skada
   [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
   [SpellFlash]: http://www.curse.com/addons/wow/spellflash
+  [balance-ticket]: http://wow.curseforge.com/addons/ovale/tickets/451-eclipse-energy-prediction/
   [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
   [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
