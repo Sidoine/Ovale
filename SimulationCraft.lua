@@ -1278,6 +1278,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "ROGUE" and specialization == "combat" and action == "slice_and_dice" then
+			-- Don't suggest Slice and Dice if a more powerful buff is already in effect.
+			local buffName = "slice_and_dice_buff"
+			AddSymbol(annotation, buffName)
+			conditionCode = format("BuffRemaining(%s) < BaseDuration(%s)", buffName, buffName)
 		elseif class == "ROGUE" and action == "stealth" then
 			-- Don't Stealth if already stealthed.
 			conditionCode = "BuffExpires(stealthed_buff any=1)"
