@@ -217,7 +217,7 @@ AddFunction MarksmanshipDefaultActions
 	#kill_shot
 	Spell(kill_shot)
 	#call_action_list,name=careful_aim,if=buff.careful_aim.up
-	if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
+	if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
 	#glaive_toss
 	Spell(glaive_toss)
 	#steady_shot,if=focus.deficit*cast_time%(14+cast_regen)>cooldown.rapid_fire.remains
@@ -246,7 +246,7 @@ AddFunction MarksmanshipDefaultShortCdActions
 		or Spell(kill_shot)
 	{
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
-		if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
+		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
 		#explosive_trap,if=active_enemies>1
 		if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 		#a_murder_of_crows
@@ -287,7 +287,7 @@ AddFunction MarksmanshipDefaultCdActions
 		#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=25
 		if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 Spell(stampede)
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
-		if HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimCdActions()
+		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimCdActions()
 	}
 }
 

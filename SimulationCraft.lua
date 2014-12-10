@@ -2700,7 +2700,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		AddSymbol(annotation, buffName)
 	elseif class == "HUNTER" and operand == "buff.careful_aim.up" then
 		-- The "careful_aim" buff is a fake SimulationCraft buff.
-		code = format("%sHealthPercent() > 80 or BuffPresent(rapid_fire_buff)", target)
+		code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)"
 		AddSymbol(annotation, "rapid_fire_buff")
 	elseif class == "MAGE" and (operand == "in_flight" and action == "fireball" or operand == "action.fireball.in_flight") then
 		-- Frostfire Bolt can be substituted for Fireball when testing whether the spell is in flight.
