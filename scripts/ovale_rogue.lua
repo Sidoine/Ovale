@@ -313,6 +313,7 @@ AddFunction CombatFinisherActions
 {
 	#death_from_above
 	Spell(death_from_above)
+	#eviscerate
 	Spell(eviscerate)
 }
 
