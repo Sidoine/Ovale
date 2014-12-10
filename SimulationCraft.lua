@@ -1586,41 +1586,45 @@ EmitActionList = function(parseNode, nodeList, annotation)
 						commentNode.comment = format("Remove any '%s() >= %d' condition from the following statement.", powerType, extra_amount)
 						child[#child + 1] = commentNode
 					end
-					if statementNode.type == "if" or statementNode.type == "unless" then
-						local bodyNode = statementNode.child[2]
-						if bodyNode.type == "action" and bodyNode.rawParams and bodyNode.rawParams[1] then
-							local name = OvaleAST:Unparse(bodyNode.rawParams[1])
-							-- Create a condition node that includes checking that the spell is not on cooldown.
-							local powerCondition
-							if extra_amount then
-								powerCondition = format("TimeTo%s(%d)", powerType, extra_amount)
-							else
-								powerCondition = format("TimeTo%sFor(%s)", powerType, name)
-							end
-							local code = format("SpellUsable(%s) and SpellCooldown(%s) < %s", name, name, powerCondition)
-							local conditionNode = OvaleAST:NewNode(nodeList, true)
+					local bodyNode
+					if statementNode.child then
+						-- This is a conditional statement, so set the body to the "then" clause.
+						bodyNode = statementNode.child[2]
+					else
+						bodyNode = statementNode
+					end
+					if bodyNode.type == "action" and bodyNode.rawParams and bodyNode.rawParams[1] then
+						local name = OvaleAST:Unparse(bodyNode.rawParams[1])
+						-- Create a condition node that includes checking that the spell is not on cooldown.
+						local powerCondition
+						if extra_amount then
+							powerCondition = format("TimeTo%s(%d)", powerType, extra_amount)
+						else
+							powerCondition = format("TimeTo%sFor(%s)", powerType, name)
+						end
+						local code = format("SpellUsable(%s) and SpellCooldown(%s) < %s", name, name, powerCondition)
+						local conditionNode = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+						if statementNode.child then
+							local rhsNode = conditionNode
+							conditionNode = OvaleAST:NewNode(nodeList, true)
 							conditionNode.type = "logical"
 							conditionNode.expressionType = "binary"
 							conditionNode.operator = "and"
 							conditionNode.child[1] = statementNode.child[1]
-							conditionNode.child[2] = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-							-- Create node to hold the rest of the statements.
-							local restNode = OvaleAST:NewNode(nodeList, true)
-							child[#child + 1] = restNode
-							if statementNode.type == "if" then
-								restNode.type = "unless"
-							elseif statementNode.type == "unless" then
-								restNode.type = "if"
-							end
-							restNode.child[1] = conditionNode
-							restNode.child[2] = OvaleAST:NewNode(nodeList, true)
-							restNode.child[2].type = "group"
-							child = restNode.child[2].child
+							conditionNode.child[2] = rhsNode
 						end
-					else
-						-- We are pooling for this action, but it has no condition, which means
-						-- pool continually and skip the rest of the action list.
-						emit = false
+						-- Create node to hold the rest of the statements.
+						local restNode = OvaleAST:NewNode(nodeList, true)
+						child[#child + 1] = restNode
+						if statementNode.type == "unless" then
+							restNode.type = "if"
+						else
+							restNode.type = "unless"
+						end
+						restNode.child[1] = conditionNode
+						restNode.child[2] = OvaleAST:NewNode(nodeList, true)
+						restNode.child[2].type = "group"
+						child = restNode.child[2].child
 					end
 					poolResourceNode = nil
 				elseif statementNode.type == "simc_wait" then
