@@ -167,7 +167,8 @@ AddFunction AssassinationPrecombatActions
 
 AddFunction AssassinationPrecombatShortCdActions
 {
-	unless BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
+		or BuffExpires(stealthed_buff any=1) and Spell(stealth)
 	{
 		#marked_for_death
 		Spell(marked_for_death)
@@ -362,7 +363,8 @@ AddFunction CombatPrecombatActions
 
 AddFunction CombatPrecombatShortCdActions
 {
-	unless BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
+		or BuffExpires(stealthed_buff any=1) and Spell(stealth)
 	{
 		#marked_for_death
 		Spell(marked_for_death)
