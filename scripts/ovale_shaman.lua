@@ -485,14 +485,15 @@ AddFunction RestorationMainActions
 	if Glyph(glyph_of_totemic_recall) and TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) and TotemExpires(fire) and TotemExpires(earth) and TotemExpires(air) Spell(totemic_recall)
 
 	if BuffPresent(unleash_life_buff) Spell(healing_wave)
-	if TotemExpires(water) Spell(healing_stream_totem)
+	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
 	if Glyph(glyph_of_riptide no) Spell(riptide)
 }
 
 AddFunction RestorationAoeActions
 {
 	if BuffPresent(unleash_life_buff) Spell(chain_heal)
-	if TotemExpires(water) Spell(healing_stream_totem)
+	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(cloudburst_totem)
+	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
 	Spell(healing_rain)
 	Spell(chain_heal)
 }
@@ -515,7 +516,7 @@ AddFunction RestorationCdActions
 	Spell(blood_fury_apsp)
 	Spell(berserking)
 	if ManaPercent() < 90 Spell(arcane_torrent_mana)
-	if TotemExpires(water) Spell(healing_tide_totem)
+	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_tide_totem)
 	Spell(ancestral_guidance)
 	Spell(ascendance_heal)
 	Spell(fire_elemental_totem)
