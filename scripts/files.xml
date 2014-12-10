@@ -26,6 +26,7 @@
 
 	<Script file="leafkiller_druid.lua" />
 	<Script file="lunaeclipse_druid.lua" />
+	<Script file="mmo_champion_rogue.lua" />
 	<Script file="wiljo_mage.lua" />
 
 	<Script file="simulationcraft_deathknight_blood.lua" />
