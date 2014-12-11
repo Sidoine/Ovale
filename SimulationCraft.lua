@@ -1366,6 +1366,15 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
 		elseif class == "WARRIOR" and action == "charge" then
 			conditionCode = "target.InRange(charge)"
+		elseif class == "WARRIOR" and strsub(action, 1, 7) == "execute" then
+			if modifier.target then
+				local target = Unparse(modifier.target)
+				local target = tonumber(target)
+				if target then
+					-- Skip "execute" actions if they are not on the main target.
+					isSpellAction = false
+				end
+			end
 		elseif class == "WARRIOR" and action == "heroic_leap" then
 			-- Use Charge as a range-finder for Heroic Leap.
 			local spellName = "charge"
