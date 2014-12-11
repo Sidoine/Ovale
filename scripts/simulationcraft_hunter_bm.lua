@@ -35,7 +35,7 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction SummonPet
+AddFunction BeastMasterySummonPet
 {
 	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
 	if pet.IsDead() Spell(revive_pet)
@@ -101,7 +101,7 @@ AddFunction BeastMasteryPrecombatActions
 	#flask,type=greater_draenic_agility_flask
 	#food,type=blackrock_barbecue
 	#summon_pet
-	SummonPet()
+	BeastMasterySummonPet()
 	#snapshot_stats
 	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)

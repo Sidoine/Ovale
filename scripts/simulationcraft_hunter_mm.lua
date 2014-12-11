@@ -44,8 +44,11 @@ AddFunction InterruptActions
 
 AddFunction SummonPet
 {
-	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
-	if pet.IsDead() Spell(revive_pet)
+	if not Talent(lone_wolf_talent)
+	{
+		if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
+		if pet.IsDead() Spell(revive_pet)
+	}
 }
 
 AddFunction MarksmanshipDefaultActions
@@ -167,6 +170,7 @@ AddIcon specialization=marksmanship help=aoe
 # glyph_of_explosive_trap
 # incendiary_ammo
 # kill_shot
+# lone_wolf_talent
 # multishot
 # poisoned_ammo
 # powershot

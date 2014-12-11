@@ -1199,6 +1199,14 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
+		elseif class == "HUNTER" and action == "summon_pet" then
+			if specialization == "beast_mastery" then
+				bodyCode = "BeastMasterySummonPet()"
+			else
+				bodyCode = "SummonPet()"
+			end
+			annotation[action] = class
+			isSpellAction = false
 		elseif class == "HUNTER" and strsub(action, -5) == "_trap" then
 			annotation.trap_launcher = class
 			conditionCode = "CheckBoxOn(opt_trap_launcher)"
@@ -2977,13 +2985,28 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.summon_pet == "HUNTER" then
-		local code = [[
-			AddFunction SummonPet
-			{
-				if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
-				if pet.IsDead() Spell(revive_pet)
-			}
-		]]
+		local code
+		if annotation.specialization == "beast_mastery" then
+			code = [[
+				AddFunction BeastMasterySummonPet
+				{
+					if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
+					if pet.IsDead() Spell(revive_pet)
+				}
+			]]
+		else
+			code = [[
+				AddFunction SummonPet
+				{
+					if not Talent(lone_wolf_talent)
+					{
+						if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
+						if pet.IsDead() Spell(revive_pet)
+					}
+				}
+			]]
+			AddSymbol(annotation, "lone_wolf_talent")
+		end
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "revive_pet")

@@ -37,10 +37,19 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction SummonPet
+AddFunction BeastMasterySummonPet
 {
 	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
 	if pet.IsDead() Spell(revive_pet)
+}
+
+AddFunction SummonPet
+{
+	if not Talent(lone_wolf_talent)
+	{
+		if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
+		if pet.IsDead() Spell(revive_pet)
+	}
 }
 
 ###
@@ -146,7 +155,7 @@ AddFunction BeastMasteryPrecombatActions
 AddFunction BeastMasteryPrecombatShortCdActions
 {
 	#summon_pet
-	SummonPet()
+	BeastMasterySummonPet()
 }
 
 AddFunction BeastMasteryPrecombatCdActions
