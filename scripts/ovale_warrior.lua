@@ -430,7 +430,7 @@ AddFunction FurySingleMindedFuryMovementActions
 	}
 }
 
-AddFunction FurySingleMindedFuryMovementActions
+AddFunction FurySingleMindedFuryMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
@@ -761,7 +761,7 @@ AddFunction FuryTitansGripMovementActions
 	}
 }
 
-AddFunction FuryTitansGripMovementActions
+AddFunction FuryTitansGripMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
