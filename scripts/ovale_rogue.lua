@@ -14,6 +14,7 @@ Define(honor_among_thieves_cooldown_buff 51699)
 	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
 
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
 
 AddFunction UsePotionAgility
 {
@@ -251,7 +252,7 @@ AddFunction CombatDefaultShortCdActions
 	# CHANGE: Get within melee range of the target.
 	GetInMeleeRange()
 	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
-	if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) Spell(blade_flurry)
+	if { Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 
 	unless Spell(ambush)
 	{

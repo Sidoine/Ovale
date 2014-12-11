@@ -15,6 +15,7 @@ Include(ovale_common)
 Include(ovale_rogue_spells)
 
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
 
 AddFunction UsePotionAgility
 {
@@ -70,7 +71,7 @@ AddFunction CombatDefaultActions
 	#arcane_torrent,if=energy<60
 	if Energy() < 60 Spell(arcane_torrent_energy)
 	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
-	if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) Spell(blade_flurry)
+	if { Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 	#shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
 	if SpellCooldown(killing_spree) < 10 and ComboPoints() > 3 or BuffPresent(adrenaline_rush_buff) Spell(shadow_reflection)
 	#ambush

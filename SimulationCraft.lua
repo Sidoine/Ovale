@@ -1274,6 +1274,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
+		elseif class == "ROGUE" and action == "blade_flurry" then
+			annotation.blade_flurry = class
+			conditionCode = "CheckBoxOn(opt_blade_flurry)"
 		elseif class == "ROGUE" and action == "honor_among_thieves" then
 			if modifier.cooldown then
 				local cooldown = Unparse(modifier.cooldown)
@@ -3447,6 +3450,15 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "chi_burst")
+		count = count + 1
+	end
+	if annotation.blade_flurry == "ROGUE" then
+		local code = [[
+			AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
+		]]
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "blade_flurry")
 		count = count + 1
 	end
 	if annotation.bloodlust == "SHAMAN" then
