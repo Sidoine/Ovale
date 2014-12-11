@@ -84,6 +84,7 @@ AddFunction ArmsAoeActions
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
 	#mortal_strike,if=cooldown.colossus_smash.remains>1.5&target.health.pct>20&active_enemies=2
 	if SpellCooldown(colossus_smash) > 1.5 and target.HealthPercent() > 20 and Enemies() == 2 Spell(mortal_strike)
+	#execute,target=2,if=active_enemies=2
 	#execute,if=((rage>60|active_enemies=2)&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|target.time_to_die<5
 	if { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
 	#dragon_roar,if=cooldown.colossus_smash.remains>1.5&!debuff.colossus_smash.up

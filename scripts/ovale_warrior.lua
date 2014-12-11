@@ -114,6 +114,7 @@ AddFunction ArmsAoeActions
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
 	#mortal_strike,if=cooldown.colossus_smash.remains>1.5&target.health.pct>20&active_enemies=2
 	if SpellCooldown(colossus_smash) > 1.5 and target.HealthPercent() > 20 and Enemies() == 2 Spell(mortal_strike)
+	#execute,target=2,if=active_enemies=2
 	#execute,if=((rage>60|active_enemies=2)&cooldown.colossus_smash.remains>execute_time)|debuff.colossus_smash.up|target.time_to_die<5
 	if { Rage() > 60 or Enemies() == 2 } and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
 	#whirlwind,if=cooldown.colossus_smash.remains>1.5&(target.health.pct>20|active_enemies>3)
@@ -537,10 +538,12 @@ AddFunction FurySingleMindedFuryThreeTargetsActions
 {
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
-	#execute,if=buff.sudden_death.react
-	if BuffPresent(sudden_death_buff) Spell(execute)
 	#raging_blow,if=buff.meat_cleaver.stack>=2
 	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#execute,target=2
+	#execute,target=3
 	#whirlwind
 	Spell(whirlwind)
 	#bloodthirst
@@ -557,8 +560,8 @@ AddFunction FurySingleMindedFuryThreeTargetsShortCdActions
 	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 
 	unless { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst)
-		or BuffPresent(sudden_death_buff) and Spell(execute)
 		or BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+		or BuffPresent(sudden_death_buff) and Spell(execute)
 	{
 		#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
 		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
@@ -577,6 +580,7 @@ AddFunction FurySingleMindedFuryTwoTargetsActions
 {
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,target=2
 	#execute,if=target.health.pct<20|buff.sudden_death.react
 	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
 	#raging_blow,if=buff.meat_cleaver.up
@@ -868,10 +872,12 @@ AddFunction FuryTitansGripThreeTargetsActions
 {
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
-	#execute,if=buff.sudden_death.react
-	if BuffPresent(sudden_death_buff) Spell(execute)
 	#raging_blow,if=buff.meat_cleaver.stack>=2
 	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
+	#execute,if=buff.sudden_death.react
+	if BuffPresent(sudden_death_buff) Spell(execute)
+	#execute,target=2
+	#execute,target=3
 	#whirlwind
 	Spell(whirlwind)
 	#bloodthirst
@@ -888,8 +894,8 @@ AddFunction FuryTitansGripThreeTargetsShortCdActions
 	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 
 	unless { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst)
-		or BuffPresent(sudden_death_buff) and Spell(execute)
 		or BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+		or BuffPresent(sudden_death_buff) and Spell(execute)
 	{
 		#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
 		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
@@ -908,6 +914,7 @@ AddFunction FuryTitansGripTwoTargetsActions
 {
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
+	#execute,target=2
 	#execute,if=target.health.pct<20|buff.sudden_death.react
 	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
 	#raging_blow,if=buff.meat_cleaver.up

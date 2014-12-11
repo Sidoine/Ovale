@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Paladin_Protection_T17M".
 #	class=paladin
 #	spec=protection
-#	talents=3032223
+#	talents=3032322
 #	glyphs=focused_shield/alabaster_shield/divine_protection
 
 Include(ovale_common)
@@ -111,14 +111,14 @@ AddFunction ProtectionDefaultActions
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
 			#avengers_shield
 			Spell(avengers_shield)
-			#lights_hammer
-			Spell(lights_hammer)
-			#holy_prism
-			Spell(holy_prism)
+			#lights_hammer,if=!talent.seraphim.enabled|buff.seraphim.remains>10|cooldown.seraphim.remains<6
+			if not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) > 10 or SpellCooldown(seraphim) < 6 Spell(lights_hammer)
+			#holy_prism,if=!talent.seraphim.enabled|buff.seraphim.up|cooldown.seraphim.remains>5|time<5
+			if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or SpellCooldown(seraphim) > 5 or TimeInCombat() < 5 Spell(holy_prism)
 			#consecration,if=target.debuff.flying.down&active_enemies>=3
 			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
-			#execution_sentence
-			Spell(execution_sentence)
+			#execution_sentence,if=!talent.seraphim.enabled|buff.seraphim.up|time<12
+			if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or TimeInCombat() < 12 Spell(execution_sentence)
 			#hammer_of_wrath
 			Spell(hammer_of_wrath)
 			#sacred_shield,if=target.dot.sacred_shield.remains<8
