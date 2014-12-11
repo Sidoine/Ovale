@@ -87,6 +87,7 @@ local PARAMETER_KEYWORD = {
 	["glyph"] = true,
 	["help"] = true,
 	["if_spell"] = true,
+	["if_stance"] = true,
 	["item"] = true,			-- deprecated
 	["itemcount"] = true,
 	["itemset"] = true,
@@ -118,10 +119,6 @@ do
 	-- SpellAuraList keywords are declaration keywords.
 	for keyword, value in pairs(SPELL_AURA_KEYWORD) do
 		DECLARATION_KEYWORD[keyword] = value
-	end
-	-- All stance keywords are parameter keywords.
-	for keyword, value in pairs(STANCE_KEYWORD) do
-		PARAMETER_KEYWORD[keyword] = value
 	end
 	-- All keywords are Ovale script keywords.
 	for keyword, value in pairs(DECLARATION_KEYWORD) do
