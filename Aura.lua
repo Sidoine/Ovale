@@ -1357,7 +1357,7 @@ statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
 				state:Log("Aura %s matching '%s' found on %s with (%s, %s)", id, auraId, guid, aura.start, aura.ending)
 				auraFound = aura
 			else
-				state:Log("Aura %s matching '%s' is missing on %s.", id, auraId, guid)
+				--state:Log("Aura %s matching '%s' is missing on %s.", id, auraId, guid)
 			end
 		end
 		if not auraFound then
