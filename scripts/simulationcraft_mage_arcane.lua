@@ -62,7 +62,7 @@ AddFunction ArcaneDefaultActions
 	#call_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 ArcaneAoeActions()
 	#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
-	if TimeToDie() < ManaPercent() * 0.35 * SpellHaste() / 100 or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * SpellHaste() / 100 or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * SpellHaste() / 100 ArcaneBurnActions()
+	if TimeToDie() < ManaPercent() * 0.35 * 100 / { 100 + SpellHaste() } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * 100 / { 100 + SpellHaste() } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * 100 / { 100 + SpellHaste() } ArcaneBurnActions()
 	#call_action_list,name=conserve
 	ArcaneConserveActions()
 }
@@ -138,11 +138,11 @@ AddFunction ArcaneConserveActions
 	#arcane_blast,if=buff.arcane_charge.stack=4&mana.pct>93
 	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 Spell(arcane_blast)
 	#arcane_missiles,if=buff.arcane_charge.stack=4&(!talent.overpowered.enabled|cooldown.arcane_power.remains>10*spell_haste)
-	if DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * SpellHaste() / 100 } and BuffPresent(arcane_missiles_buff) Spell(arcane_missiles)
+	if DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * 100 / { 100 + SpellHaste() } } and BuffPresent(arcane_missiles_buff) Spell(arcane_missiles)
 	#supernova,if=mana.pct<96&(buff.arcane_missiles.stack<2|buff.arcane_charge.stack=4)&(buff.arcane_power.up|(charges=1&cooldown.arcane_power.remains>recharge_time))&(!talent.prismatic_crystal.enabled|current_target=prismatic_crystal|(charges=1&cooldown.prismatic_crystal.remains>recharge_time+8))
 	if ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name("Prismatic Crystal") or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } Spell(supernova)
 	#nether_tempest,cycle_targets=1,if=target!=prismatic_crystal&buff.arcane_charge.stack=4&(active_dot.nether_tempest=0|(ticking&remains<(10-3*talent.arcane_orb.enabled)*spell_haste))
-	if not target.Name("Prismatic Crystal") and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * Talent(arcane_orb_talent) } * SpellHaste() / 100 } Spell(nether_tempest)
+	if not target.Name("Prismatic Crystal") and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * Talent(arcane_orb_talent) } * 100 / { 100 + SpellHaste() } } Spell(nether_tempest)
 	#arcane_barrage,if=buff.arcane_charge.stack=4
 	if DebuffStacks(arcane_charge_debuff) == 4 Spell(arcane_barrage)
 	#presence_of_mind,if=buff.arcane_charge.stack<2

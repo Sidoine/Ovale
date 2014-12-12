@@ -2292,7 +2292,9 @@ do
 				code = format("False(role_%s)", role)
 			end
 		elseif operand == "spell_haste" or operand == "stat.spell_haste" then
-			code = format("%sSpellHaste() / 100", target)
+			-- "spell_haste" is the player's spell factor, e.g.,
+			-- 25% haste corresponds to a "spell_haste" value of 1/(1 + 0.25) = 0.8.
+			code = "100 / { 100 + SpellHaste() }"
 		else
 			ok = false
 		end
