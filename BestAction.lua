@@ -247,37 +247,14 @@ local function GetActionSpellInfo(element, state, target)
 					local texture = state:GetSpellInfoProperty(spellId, "texture", target)
 					actionTexture = "Interface\\Icons\\" .. texture
 				end
-				-- Fix spell cooldown information using primary resource requirements specified in SpellInfo().
+				-- Extend the cooldown duration if the spell needs additional time to pool resources.
 				if actionCooldownStart and actionCooldownDuration then
-					-- Get the maximum time before all "primary" resources are ready.
-					local atTime = state.currentTime
-					for powerType in pairs(OvalePower.PRIMARY_POWER) do
-						if si[powerType] then
-							local t = state.currentTime + state:TimeToPower(spellId, target, powerType)
-							if atTime < t then
-								atTime = t
-							end
-						end
-					end
-					if actionCooldownStart > 0 then
+					local seconds = state:GetTimeToSpell(spellId, target)
+					if seconds > 0 then
+						local atTime = state.currentTime + seconds
 						if atTime > actionCooldownStart + actionCooldownDuration then
 							state:Log("Delaying spell ID '%s' for primary resource.", spellId)
 							actionCooldownDuration = atTime - actionCooldownStart
-						end
-					else
-						actionCooldownStart = state.currentTime
-						actionCooldownDuration = atTime - actionCooldownStart
-					end
-
-					local blood = state:GetSpellInfoProperty(spellId, "blood", target)
-					local frost = state:GetSpellInfoProperty(spellId, "frost", target)
-					local unholy = state:GetSpellInfoProperty(spellId, "unholy", target)
-					local death = state:GetSpellInfoProperty(spellId, "death", target)
-					if blood or frost or unholy or death then
-						-- Spell requires runes.
-						local ending = state.currentTime + state:GetRunesCooldown(blood, unholy, frost, death)
-						if ending > actionCooldownStart + actionCooldownDuration then
-							actionCooldownDuration = ending - actionCooldownStart
 						end
 					end
 				end
@@ -462,7 +439,7 @@ function OvaleBestAction:ComputeAction(element, state)
 	local timeSpan = GetTimeSpan(element)
 	local priority, result
 
-	state:Log("[%d]    evaluating action: %s(%s)", element.nodeId, element.name, element.paramsAsString)
+	state:Log("[%d]    evaluating action: %s(%s)", nodeId, element.name, element.paramsAsString)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget = self:GetActionInfo(element, state)
 
@@ -489,12 +466,19 @@ function OvaleBestAction:ComputeAction(element, state)
 
 		-- If the action is not on cooldown, then treat it like it's immediately ready.
 		local start
-		if actionCooldownDuration and actionCooldownStart and actionCooldownStart > 0 then
-			start = actionCooldownDuration + actionCooldownStart
+		if actionCooldownStart and actionCooldownStart > 0 then
+			-- Spell is on cooldown.
+			if actionCooldownDuration and actionCooldownDuration > 0 then
+				state:Log("[%s]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration)
+				start = actionCooldownStart + actionCooldownDuration
+			else
+				state:Log("[%s]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart)
+				start = actionCooldownStart
+			end
 		else
+			state:Log("[%s]    Action %s is off cooldown.", nodeId, action)
 			start = state.currentTime
 		end
-
 		state:Log("[%d]    start=%f nextCast=%s", nodeId, start, state.nextCast)
 
 		-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.

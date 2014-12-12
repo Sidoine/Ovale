@@ -25,6 +25,9 @@ local API_GetSpellCharges = GetSpellCharges
 local API_GetSpellCooldown = GetSpellCooldown
 local API_UnitClass = UnitClass
 
+-- Spell ID for the dummy Global Cooldown spell.
+local GLOBAL_COOLDOWN = 61304
+
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
@@ -116,21 +119,37 @@ end
 -- then cycle through all spells associated with that spell ID to find the cooldown
 -- information.
 function OvaleCooldown:GetSpellCooldown(spellId)
-	local start, duration, enable
+	local cdStart, cdDuration, cdEnable = 0, 0, 1
+	local gcdStart, gcdDuration = API_GetSpellCooldown(GLOBAL_COOLDOWN)
 	if self_sharedCooldownSpells[spellId] then
 		for id in pairs(self_sharedCooldownSpells[spellId]) do
-			start, duration, enable = self:GetSpellCooldown(id)
+			local start, duration, enable = self:GetSpellCooldown(id)
 			if start then break end
 		end
 	else
+		local start, duration, enable
 		local index, bookType = OvaleSpellBook:GetSpellBookIndex(spellId)
 		if index and bookType then
 			start, duration, enable = API_GetSpellCooldown(index, bookType)
 		else
 			start, duration, enable = API_GetSpellCooldown(spellId)
 		end
+		if start and start > 0 then
+			if duration > gcdDuration then
+				-- Spell is on cooldown.
+				cdStart, cdDuration, cdEnable = start, duration, enable
+			else
+				-- GCD is active, so set the start to when the spell can next be cast.
+				cdStart = start + duration
+				cdDuration = 0
+				cdEnable = enable
+			end
+		else
+			-- Spell is ready now.
+			cdStart, cdDuration, cdEnable = start, duration, enable
+		end
 	end
-	return start, duration, enable
+	return cdStart, cdDuration, cdEnable
 end
 
 -- Return the base GCD and caster status.
@@ -359,7 +378,7 @@ end
 -- already on cooldown or the duration if cast at the specified time.
 statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, target)
 	local start, duration = state:GetSpellCooldown(spellId)
-	if start + duration > atTime then
+	if duration > 0 and start + duration > atTime then
 		state:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
 	else
 		local si = OvaleData.spellInfo[spellId]

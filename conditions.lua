@@ -5402,33 +5402,7 @@ do
 	local function TimeToSpell(condition, state)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
-		local seconds = 0
-		-- Cooldown
-		do
-			local start, duration = state:GetSpellCooldown(spellId)
-			local timeToCooldown = start + duration - state.currentTime
-			if seconds < timeToCooldown then
-				seconds = timeToCooldown
-			end
-		end
-		-- Pooled resource.
-		do
-			local timeToPower = state:TimeToPower(spellId, target)
-			if seconds < timeToPower then
-				seconds = timeToPower
-			end
-		end
-		-- Runes.
-		local blood = state:GetSpellInfoProperty(spellId, "blood", target)
-		local unholy = state:GetSpellInfoProperty(spellId, "unholy", target)
-		local frost = state:GetSpellInfoProperty(spellId, "frost", target)
-		local death = state:GetSpellInfoProperty(spellId, "death", target)
-		if blood or unholy or frost or death then
-			local timeToRunes = state:GetRunesCooldown(blood, unholy, frost, death)
-			if seconds < timeToRunes then
-				seconds = timeToRunes
-			end
-		end
+		local seconds = state:GetTimeToSpell(spellId, target)
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
 		elseif seconds < INFINITY then

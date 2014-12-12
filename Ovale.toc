@@ -45,6 +45,7 @@ Latency.lua
 Lexer.lua
 PaperDoll.lua
 Power.lua
+Runes.lua
 Score.lua
 Scripts.lua
 SimulationCraft.lua
@@ -67,7 +68,6 @@ Enemies.lua
 HonorAmongThieves.lua
 PassiveAura.lua
 Recount.lua
-Runes.lua
 ShadowWordDeath.lua
 Skada.lua
 SpellDamage.lua

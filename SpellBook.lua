@@ -16,8 +16,10 @@ local OvaleDebug = Ovale.OvaleDebug
 local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
+local OvaleCooldown = nil
 local OvaleData = nil
 local OvalePower = nil
+local OvaleRunes = nil
 local OvaleState = nil
 
 local ipairs = ipairs
@@ -147,8 +149,10 @@ end
 --<public-static-methods>
 function OvaleSpellBook:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
 	OvalePower = Ovale.OvalePower
+	OvaleRunes = Ovale.OvaleRunes
 	OvaleState = Ovale.OvaleState
 end
 
@@ -520,5 +524,39 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 	end
 	OvaleSpellBook:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
 	return isUsable, noMana
+end
+
+-- Get the number of seconds before the spell is ready to be cast, either due to cooldown or resources.
+statePrototype.GetTimeToSpell = function(state, spellId, target)
+	local timeToSpell = 0
+	-- Cooldown.
+	do
+		local start, duration = state:GetSpellCooldown(spellId)
+		local seconds = (duration > 0) and (start + duration - state.currentTime) or 0
+		if timeToSpell < seconds then
+			timeToSpell = seconds
+		end
+	end
+	-- Pooled resource.
+	do
+		local seconds = state:TimeToPower(spellId, target)
+		if timeToSpell < seconds then
+			timeToSpell = seconds
+		end
+	end
+	-- Death knight runes.
+	do
+		local blood = state:GetSpellInfoProperty(spellId, "blood", target)
+		local unholy = state:GetSpellInfoProperty(spellId, "unholy", target)
+		local frost = state:GetSpellInfoProperty(spellId, "frost", target)
+		local death = state:GetSpellInfoProperty(spellId, "death", target)
+		if blood or unholy or frost or death then
+			local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
+			if timeToSpell < seconds then
+				timeToSpell = seconds
+			end
+		end
+	end
+	return timeToSpell
 end
 --</state-methods>
