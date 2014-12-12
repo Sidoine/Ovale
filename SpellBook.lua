@@ -516,7 +516,11 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 				if OvalePower.PRIMARY_POWER[requirement] then
 					noMana = true
 				end
-				state:Log("Spell ID '%s' failed requirements.", spellId)
+				if noMana then
+					state:Log("Spell ID '%s' does not have enough %s.", spellId, requirement)
+				else
+					state:Log("Spell ID '%s' failed '%s' requirements.", spellId, requirement)
+				end
 			end
 		end
 	else

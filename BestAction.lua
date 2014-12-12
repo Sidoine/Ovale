@@ -253,8 +253,14 @@ local function GetActionSpellInfo(element, state, target)
 					if seconds > 0 then
 						local atTime = state.currentTime + seconds
 						if atTime > actionCooldownStart + actionCooldownDuration then
-							state:Log("Delaying spell ID '%s' for primary resource.", spellId)
-							actionCooldownDuration = atTime - actionCooldownStart
+							if actionCooldownDuration > 0 then
+								local extend = atTime - (actionCooldownStart + actionCooldownDuration)
+								actionCooldownDuration = actionCooldownDuration + extend
+								state:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", spellId, extend)
+							else
+								actionCooldownStart = atTime
+								state:Log("Delaying spell ID '%s' for primary resource by %fs.", spellId, seconds)
+							end
 						end
 					end
 				end
