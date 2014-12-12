@@ -199,8 +199,8 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 	return damageMultiplier
 end
 
-local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, allowRemove)
-	OvaleFuture:StartProfiling("OvaleFuture_AddSpellToQueue")
+local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, allowRemove)
+	OvaleFuture:StartProfiling("OvaleFuture_QueueSpellcast")
 	local self = OvaleFuture
 	local spellcast = self_pool:Get()
 	spellcast.spellId = spellId
@@ -218,7 +218,7 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 		spellcast.target = API_UnitGUID("target")
 	end
 	local target = OvaleGUID:GetUnitId(spellcast.target)
-	TracePrintf(spellId, "    AddSpellToQueue: %s (%d), lineId=%d, startTime=%f, endTime=%f, target=%s (%s)",
+	TracePrintf(spellId, "    QueueSpellcast: %s (%d), lineId=%d, startTime=%f, endTime=%f, target=%s (%s)",
 		spellName, spellId, lineId, startTime, endTime, spellcast.target, target)
 
 	-- Snapshot the current stats for the spellcast.
@@ -319,23 +319,22 @@ local function AddSpellToQueue(spellId, lineId, startTime, endTime, channeled, a
 
 	OvaleScore:ScoreSpell(spellId)
 	Ovale.refreshNeeded["player"] = true
-	OvaleFuture:StopProfiling("OvaleFuture_AddSpellToQueue")
+	OvaleFuture:StopProfiling("OvaleFuture_QueueSpellcast")
 	return spellcast
 end
 
-local function RemoveSpellFromQueue(spellId, lineId)
-	OvaleFuture:StartProfiling("OvaleFuture_RemoveSpellFromQueue")
-	local self = OvaleFuture
+local function UnqueueSpellcast(spellId, lineId)
+	OvaleFuture:StartProfiling("OvaleFuture_UnqueueSpellcast")
 	for index, spellcast in ipairs(self_activeSpellcast) do
 		if spellcast.lineId == lineId then
-			TracePrintf(spellId, "    RemoveSpellFromQueue: %s (%d)", OvaleSpellBook:GetSpellName(spellId), spellId)
+			TracePrintf(spellId, "    UnqueueSpellcast: %s (%d)", OvaleSpellBook:GetSpellName(spellId), spellId)
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
 			break
 		end
 	end
 	Ovale.refreshNeeded["player"] = true
-	OvaleFuture:StopProfiling("OvaleFuture_RemoveSpellFromQueue")
+	OvaleFuture:StopProfiling("OvaleFuture_UnqueueSpellcast")
 end
 
 -- UpdateLastSpellcast() is called at the end of the event handler for CLEU_SUCCESSFUL_SPELLCAST_EVENT[].
@@ -471,14 +470,14 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineI
 		local _, _, _, _, startTime, endTime = API_UnitChannelInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
 			event, spellId, lineId, startTime, endTime)
-		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, true, false)
+		QueueSpellcast(spellId, lineId, startTime/1000, endTime/1000, true, false)
 	end
 end
 
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
-		RemoveSpellFromQueue(spellId, lineId)
+		UnqueueSpellcast(spellId, lineId)
 	end
 end
 
@@ -488,7 +487,7 @@ function OvaleFuture:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spell
 		local _, _, _, _, startTime, endTime = API_UnitCastingInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
 			event, spellId, lineId, startTime, endTime)
-		AddSpellToQueue(spellId, lineId, startTime/1000, endTime/1000, false, false)
+		QueueSpellcast(spellId, lineId, startTime/1000, endTime/1000, false, false)
 	end
 end
 
@@ -496,7 +495,7 @@ end
 function OvaleFuture:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
 	if unit == "player" then
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
-		RemoveSpellFromQueue(spellId, lineId)
+		UnqueueSpellcast(spellId, lineId)
 	end
 end
 
@@ -563,7 +562,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 		]]--
 		if not API_UnitChannelInfo("player") then
 			local now = API_GetTime()
-			local spellcast = AddSpellToQueue(spellId, lineId, now, now, false, true)
+			local spellcast = QueueSpellcast(spellId, lineId, now, now, false, true)
 			self:SendMessage("Ovale_SpellCast", now, spellId, spellcast.target)
 		end
 		self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
