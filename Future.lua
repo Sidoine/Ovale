@@ -105,6 +105,12 @@ do
 	end
 end
 
+-- Table of spells that are "white attacks" but are also tracked in UNIT_SPELLCAST_* events.
+local WHITE_ATTACK = {
+	[    75] = true,	-- Auto Shot
+	[  5019] = true,	-- Shoot
+}
+
 --[[
 	This is the delta added to the starting cast time of the spell in the simulator.
 	This ensures that the time in the simulator is just after the spell has started
@@ -532,7 +538,7 @@ end
 		UNIT_SPELLCAST_SUCCEEDED
 ]]--
 function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
-	if unit == "player" then
+	if unit == "player" and not WHITE_ATTACK[spellId] then
 		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
 
