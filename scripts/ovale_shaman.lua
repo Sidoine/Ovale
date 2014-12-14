@@ -80,7 +80,7 @@ AddFunction ElementalDefaultShortCdActions
 	#ancestral_swiftness,if=!buff.ascendance.up
 	if not BuffPresent(ascendance_caster_buff) Spell(ancestral_swiftness)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.fire_elemental_totem.remains>=15
-	if TotemRemaining(fire totem=searing_totem) >= 15 or TotemRemaining(fire totem=fire_elemental_totem) >= 15 Spell(liquid_magma)
+	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ElementalSingleShortCdActions()
 	#call_action_list,name=aoe,if=active_enemies>1
@@ -104,7 +104,7 @@ AddFunction ElementalDefaultCdActions
 	#storm_elemental_totem
 	Spell(storm_elemental_totem)
 	#fire_elemental_totem,if=!active
-	if not TotemPresent(fire totem=fire_elemental_totem) Spell(fire_elemental_totem)
+	if not TotemPresent(fire_elemental_totem) Spell(fire_elemental_totem)
 	#ascendance,if=active_enemies>1|(dot.flame_shock.remains>buff.ascendance.duration&(target.time_to_die<20|buff.bloodlust.up|time>=60)&cooldown.lava_burst.remains>0)
 	if { Enemies() > 1 or target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) and { target.TimeToDie() < 20 or BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 60 } and SpellCooldown(lava_burst) > 0 } and BuffExpires(ascendance_caster_buff) Spell(ascendance_caster)
 	#call_action_list,name=single,if=active_enemies=1
@@ -126,7 +126,7 @@ AddFunction ElementalAoeActions
 	#thunderstorm,if=active_enemies>=10
 	if Enemies() >= 10 Spell(thunderstorm)
 	#searing_totem,if=(!talent.liquid_magma.enabled&!totem.fire.active)|(talent.liquid_magma.enabled&pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up)
-	if not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
+	if not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 	#chain_lightning,if=active_enemies>=2
 	if Enemies() >= 2 Spell(chain_lightning)
 	#lightning_bolt
@@ -180,7 +180,7 @@ AddFunction ElementalSingleActions
 	#flame_shock,if=time>60&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<duration
 	if TimeInCombat() > 60 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) < BaseDuration(flame_shock_debuff) Spell(flame_shock)
 	#searing_totem,if=(!talent.liquid_magma.enabled&!totem.fire.active)|(talent.liquid_magma.enabled&pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up)
-	if not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
+	if not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 	#lightning_bolt
 	Spell(lightning_bolt)
 }
@@ -213,7 +213,7 @@ AddFunction ElementalSingleShortCdActions
 
 			unless Spell(elemental_blast)
 				or TimeInCombat() > 60 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) < BaseDuration(flame_shock_debuff) and Spell(flame_shock)
-				or not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and Spell(searing_totem)
+				or not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and Spell(searing_totem)
 			{
 				#spiritwalkers_grace,moving=1,if=((talent.elemental_blast.enabled&cooldown.elemental_blast.remains=0)|(cooldown.lava_burst.remains=0&!buff.lava_surge.react))
 				if Speed() > 0 and { Talent(elemental_blast_talent) and not SpellCooldown(elemental_blast) > 0 or not SpellCooldown(lava_burst) > 0 and not BuffPresent(lava_surge_buff) } Spell(spiritwalkers_grace)
@@ -289,7 +289,7 @@ AddFunction EnhancementDefaultShortCdActions
 	#feral_spirit
 	Spell(feral_spirit)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
-	if TotemRemaining(fire totem=searing_totem) >= 15 or TotemRemaining(fire totem=magma_totem) >= 15 or TotemRemaining(fire totem=fire_elemental_totem) >= 15 Spell(liquid_magma)
+	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(magma_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
 }
 
 AddFunction EnhancementDefaultCdActions
@@ -301,7 +301,7 @@ AddFunction EnhancementDefaultCdActions
 	#use_item,name=beating_heart_of_the_mountain
 	UseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
-	if Talent(storm_elemental_totem_talent) and TotemRemaining(air totem=storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire totem=fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
+	if Talent(storm_elemental_totem_talent) and TotemRemaining(storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#arcane_torrent
@@ -316,7 +316,7 @@ AddFunction EnhancementDefaultCdActions
 	if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
 
 	unless Spell(feral_spirit)
-		or { TotemRemaining(fire totem=searing_totem) >= 15 or TotemRemaining(fire totem=magma_totem) >= 15 or TotemRemaining(fire totem=fire_elemental_totem) >= 15 } and Spell(liquid_magma)
+		or { TotemRemaining(searing_totem) >= 15 or TotemRemaining(magma_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 } and Spell(liquid_magma)
 	{
 		#ancestral_swiftness
 		Spell(ancestral_swiftness)
@@ -357,7 +357,7 @@ AddFunction EnhancementAoeActions
 		#fire_nova,if=active_dot.flame_shock>=2
 		if DebuffCountOnAny(flame_shock_debuff) >= 2 Spell(fire_nova)
 		#magma_totem,if=pet.magma_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
-		if TotemRemaining(fire totem=magma_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
+		if TotemRemaining(magma_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
 		#stormstrike
 		Spell(stormstrike)
 		#frost_shock,if=active_enemies<4
@@ -424,7 +424,7 @@ AddFunction EnhancementSingleActions
 	#lightning_bolt,if=(buff.maelstrom_weapon.react>=1&!buff.ascendance.up)|buff.ancestral_swiftness.up
 	if BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#searing_totem,if=pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
-	if TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
+	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }
 
 ### Enhancement icons.
@@ -502,7 +502,7 @@ AddFunction RestorationShortCdActions
 {
 	if Talent(primal_elementalist_talent) and pet.Present()
 	{
-		if TotemPresent(fire totem=fire_elemental_totem) and BuffExpires(pet_empower any=1) Spell(pet_empower)
+		if TotemPresent(fire_elemental_totem) and BuffExpires(pet_empower any=1) Spell(pet_empower)
 		if TotemPresent(earth totem=earth_elemental_totem) and BuffExpires(pet_reinforce any=1) Spell(pet_reinforce)
 	}
 	Spell(unleash_life)

@@ -62,7 +62,7 @@ AddFunction EnhancementDefaultActions
 	#use_item,name=beating_heart_of_the_mountain
 	UseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
-	if Talent(storm_elemental_totem_talent) and TotemRemaining(air totem=storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire totem=fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
+	if Talent(storm_elemental_totem_talent) and TotemRemaining(storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#arcane_torrent
@@ -80,7 +80,7 @@ AddFunction EnhancementDefaultActions
 	#feral_spirit
 	Spell(feral_spirit)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
-	if TotemRemaining(fire totem=searing_totem) >= 15 or TotemRemaining(fire totem=magma_totem) >= 15 or TotemRemaining(fire totem=fire_elemental_totem) >= 15 Spell(liquid_magma)
+	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(magma_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
 	#ancestral_swiftness
 	Spell(ancestral_swiftness)
 	#call_action_list,name=single,if=active_enemies=1
@@ -121,7 +121,7 @@ AddFunction EnhancementAoeActions
 		#fire_nova,if=active_dot.flame_shock>=2
 		if DebuffCountOnAny(flame_shock_debuff) >= 2 Spell(fire_nova)
 		#magma_totem,if=pet.magma_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
-		if TotemRemaining(fire totem=magma_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
+		if TotemRemaining(magma_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
 		#stormstrike
 		Spell(stormstrike)
 		#frost_shock,if=active_enemies<4
@@ -175,7 +175,7 @@ AddFunction EnhancementSingleActions
 	#lightning_bolt,if=(buff.maelstrom_weapon.react>=1&!buff.ascendance.up)|buff.ancestral_swiftness.up
 	if BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#searing_totem,if=pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
-	if TotemRemaining(fire totem=searing_totem) <= 20 and not TotemPresent(fire totem=fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
+	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }
 
 AddIcon specialization=enhancement help=main enemies=1

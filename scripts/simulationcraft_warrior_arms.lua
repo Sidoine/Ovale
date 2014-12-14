@@ -60,8 +60,8 @@ AddFunction ArmsDefaultActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#arcane_torrent,if=rage<rage.max-40
+	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	#call_action_list,name=single,if=active_enemies=1
@@ -132,6 +132,8 @@ AddFunction ArmsSingleActions
 	if SpellCooldown(colossus_smash) < 4 Spell(ravager)
 	#colossus_smash
 	Spell(colossus_smash)
+	#bladestorm,if=!raid_event.adds.exists&debuff.colossus_smash.up&rage<70
+	if not False(raid_event_adds_exists) and target.DebuffPresent(colossus_smash_debuff) and Rage() < 70 Spell(bladestorm)
 	#mortal_strike,if=target.health.pct>20&cooldown.colossus_smash.remains>1
 	if target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 Spell(mortal_strike)
 	#storm_bolt,if=(cooldown.colossus_smash.remains>4|debuff.colossus_smash.up)&rage<90

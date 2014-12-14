@@ -48,8 +48,8 @@ AddFunction WindwalkerDefaultActions
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 	#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(berserking)
-	#arcane_torrent,if=buff.tigereye_brew_use.up|target.time_to_die<18
-	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(arcane_torrent_chi)
+	#arcane_torrent,if=chi.max-chi>=1&(buff.tigereye_brew_use.up|target.time_to_die<18)
+	if MaxChi() - Chi() >= 1 and { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } Spell(arcane_torrent_chi)
 	#chi_brew,if=chi.max-chi>=2&((charges=1&recharge_time<=10)|charges=2|target.time_to_die<charges*10)&buff.tigereye_brew.stack<=16
 	if MaxChi() - Chi() >= 2 and { Charges(chi_brew) == 1 and SpellChargeCooldown(chi_brew) <= 10 or Charges(chi_brew) == 2 or target.TimeToDie() < Charges(chi_brew) * 10 } and BuffStacks(tigereye_brew_buff) <= 16 Spell(chi_brew)
 	#tiger_palm,if=buff.tiger_power.remains<=3

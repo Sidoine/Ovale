@@ -364,8 +364,8 @@ AddFunction WindwalkerDefaultCdActions
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 	#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(berserking)
-	#arcane_torrent,if=buff.tigereye_brew_use.up|target.time_to_die<18
-	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(arcane_torrent_chi)
+	#arcane_torrent,if=chi.max-chi>=1&(buff.tigereye_brew_use.up|target.time_to_die<18)
+	if MaxChi() - Chi() >= 1 and { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } Spell(arcane_torrent_chi)
 
 	unless BuffRemaining(tiger_power_buff) <= 3 and Spell(tiger_palm)
 		or { target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 } and Spell(rising_sun_kick)

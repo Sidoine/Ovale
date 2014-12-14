@@ -94,8 +94,8 @@ AddFunction ArmsDefaultCdActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#arcane_torrent,if=rage<rage.max-40
+	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ArmsSingleCdActions()
 	#call_action_list,name=aoe,if=active_enemies>1
@@ -214,23 +214,28 @@ AddFunction ArmsSingleShortCdActions
 		if SpellCooldown(colossus_smash) < 4 Spell(ravager)
 
 		unless Spell(colossus_smash)
-			or target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and Spell(mortal_strike)
 		{
-			#storm_bolt,if=(cooldown.colossus_smash.remains>4|debuff.colossus_smash.up)&rage<90
-			if { SpellCooldown(colossus_smash) > 4 or target.DebuffPresent(colossus_smash_debuff) } and Rage() < 90 Spell(storm_bolt)
-			#siegebreaker
-			Spell(siegebreaker)
-			#dragon_roar,if=!debuff.colossus_smash.up
-			if not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
+			#bladestorm,if=!raid_event.adds.exists&debuff.colossus_smash.up&rage<70
+			if not False(raid_event_adds_exists) and target.DebuffPresent(colossus_smash_debuff) and Rage() < 70 Spell(bladestorm)
 
-			unless not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 Spell(rend)
-				or { Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 } and Spell(execute_arms)
-				or Rage() < 40 and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(impending_victory)
-				or { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(slam)
-				or not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(whirlwind)
+			unless target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and Spell(mortal_strike)
 			{
-				#shockwave
-				Spell(shockwave)
+				#storm_bolt,if=(cooldown.colossus_smash.remains>4|debuff.colossus_smash.up)&rage<90
+				if { SpellCooldown(colossus_smash) > 4 or target.DebuffPresent(colossus_smash_debuff) } and Rage() < 90 Spell(storm_bolt)
+				#siegebreaker
+				Spell(siegebreaker)
+				#dragon_roar,if=!debuff.colossus_smash.up
+				if not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
+
+				unless not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 Spell(rend)
+					or { Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 } and Spell(execute_arms)
+					or Rage() < 40 and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(impending_victory)
+					or { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(slam)
+					or not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(whirlwind)
+				{
+					#shockwave
+					Spell(shockwave)
+				}
 			}
 		}
 	}
@@ -347,8 +352,8 @@ AddFunction FurySingleMindedFuryDefaultCdActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#arcane_torrent,if=rage<rage.max-40
+	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetCdActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -516,6 +521,8 @@ AddFunction FurySingleMindedFurySingleTargetShortCdActions
 				unless BuffPresent(raging_blow_buff) and Spell(raging_blow)
 					or BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 and Spell(wild_strike)
 				{
+					#bladestorm,if=!raid_event.adds.exists
+					if not False(raid_event_adds_exists) Spell(bladestorm)
 					#shockwave,if=!talent.unquenchable_thirst.enabled
 					if not Talent(unquenchable_thirst_talent) Spell(shockwave)
 				}
@@ -683,8 +690,8 @@ AddFunction FuryTitansGripDefaultCdActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#arcane_torrent,if=rage<rage.max-40
+	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FuryTitansGripSingleTargetCdActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -850,6 +857,8 @@ AddFunction FuryTitansGripSingleTargetShortCdActions
 				unless BuffPresent(raging_blow_buff) and Spell(raging_blow)
 					or BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 and Spell(wild_strike)
 				{
+					#bladestorm,if=!raid_event.adds.exists
+					if not False(raid_event_adds_exists) Spell(bladestorm)
 					#shockwave,if=!talent.unquenchable_thirst.enabled
 					if not Talent(unquenchable_thirst_talent) Spell(shockwave)
 				}
@@ -1149,10 +1158,15 @@ AddFunction ProtectionProtAoeShortCdActions
 
 			unless Spell(revenge)
 				or Spell(thunder_clap)
-				or Spell(shield_slam)
 			{
-				#storm_bolt
-				Spell(storm_bolt)
+				#bladestorm
+				Spell(bladestorm)
+
+				unless Spell(shield_slam)
+				{
+					#storm_bolt
+					Spell(storm_bolt)
+				}
 			}
 		}
 	}
@@ -1284,8 +1298,8 @@ AddFunction ProtectionGladiatorDefaultCdActions
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(arcane_torrent_rage)
+	#arcane_torrent,if=rage<rage.max-40
+	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#potion,name=draenic_armor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) UsePotionArmor()
 	#call_action_list,name=single,if=active_enemies=1

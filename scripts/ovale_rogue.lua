@@ -666,9 +666,7 @@ AddFunction SubtletyPrecombatActions
 	#snapshot_stats
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	# CHANGE: Only cast Premeditation if it not at the combo point cap.
-	#premeditation
-	#Spell(premeditation)
+	# CHANGE: Cast Premeditation if not at the combo point cap.
 	if ComboPoints() <= 4 Spell(premeditation)
 	# CHANGE: Only refresh Slice and Dice out of combat if less than 18s remaining.
 	#slice_and_dice

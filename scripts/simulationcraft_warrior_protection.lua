@@ -141,6 +141,8 @@ AddFunction ProtectionProtAoeActions
 	Spell(revenge)
 	#thunder_clap
 	Spell(thunder_clap)
+	#bladestorm
+	Spell(bladestorm)
 	#shield_slam
 	Spell(shield_slam)
 	#storm_bolt
@@ -172,6 +174,7 @@ AddIcon specialization=protection help=aoe
 # avatar_talent
 # berserker_rage
 # berserking
+# bladestorm
 # blood_fury_ap
 # bloodbath
 # bloodbath_buff

@@ -174,8 +174,6 @@ AddFunction SubtletyPrecombatActions
 	UsePotionAgility()
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#premeditation
-	Spell(premeditation)
 	#slice_and_dice
 	Spell(slice_and_dice)
 	#honor_among_thieves,cooldown=2.2,cooldown_stddev=0.1

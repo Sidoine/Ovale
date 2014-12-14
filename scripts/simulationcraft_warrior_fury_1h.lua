@@ -64,8 +64,8 @@ AddFunction FurySingleMindedFuryDefaultActions
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
+	#arcane_torrent,if=rage<rage.max-40
+	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 FurySingleMindedFurySingleTargetActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
@@ -153,6 +153,8 @@ AddFunction FurySingleMindedFurySingleTargetActions
 	if BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#wild_strike,if=buff.enrage.up&target.health.pct>20
 	if BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
+	#bladestorm,if=!raid_event.adds.exists
+	if not False(raid_event_adds_exists) Spell(bladestorm)
 	#shockwave,if=!talent.unquenchable_thirst.enabled
 	if not Talent(unquenchable_thirst_talent) Spell(shockwave)
 	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20

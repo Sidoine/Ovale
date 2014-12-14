@@ -50,13 +50,13 @@ AddFunction FrostDefaultActions
 	#ice_floes,if=buff.ice_floes.down&(raid_event.movement.distance>0|raid_event.movement.in<action.frostbolt.cast_time)
 	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(frostbolt) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
-	if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
+	if TotemRemaining(rune_of_power) < CastTime(rune_of_power) Spell(rune_of_power)
 	#rune_of_power,if=(cooldown.icy_veins.remains<gcd.max&buff.rune_of_power.remains<20)|(cooldown.prismatic_crystal.remains<gcd.max&buff.rune_of_power.remains<10)
-	if SpellCooldown(icy_veins) < GCD() and RuneOfPowerRemaining() < 20 or SpellCooldown(prismatic_crystal) < GCD() and RuneOfPowerRemaining() < 10 Spell(rune_of_power)
+	if SpellCooldown(icy_veins) < GCD() and TotemRemaining(rune_of_power) < 20 or SpellCooldown(prismatic_crystal) < GCD() and TotemRemaining(rune_of_power) < 10 Spell(rune_of_power)
 	#call_action_list,name=cooldowns,if=time_to_die<24
 	if TimeToDie() < 24 FrostCooldownsActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
-	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(crystal totem=prismatic_crystal) } FrostCrystalSequenceActions()
+	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(prismatic_crystal) } FrostCrystalSequenceActions()
 	#call_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 FrostAoeActions()
 	#call_action_list,name=single_target
@@ -98,7 +98,7 @@ AddFunction FrostCooldownsActions
 AddFunction FrostCrystalSequenceActions
 {
 	#frost_bomb,if=active_enemies=1&current_target!=prismatic_crystal&remains<10
-	if Enemies() == 1 and not target.Name("Prismatic Crystal") and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
+	if Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
 	#frozen_orb
 	Spell(frozen_orb)
 	#call_action_list,name=cooldowns
@@ -106,7 +106,7 @@ AddFunction FrostCrystalSequenceActions
 	#prismatic_crystal
 	Spell(prismatic_crystal)
 	#frost_bomb,if=talent.prismatic_crystal.enabled&current_target=prismatic_crystal&active_enemies>1&!ticking
-	if Talent(prismatic_crystal_talent) and target.Name("Prismatic Crystal") and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) Spell(frost_bomb)
+	if Talent(prismatic_crystal_talent) and target.Name(prismatic_crystal) and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) Spell(frost_bomb)
 	#ice_lance,if=buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&active_dot.frozen_orb>=1)
 	if BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and DebuffCountOnAny(frozen_orb_debuff) >= 1 Spell(ice_lance)
 	#ice_nova,if=charges=2
