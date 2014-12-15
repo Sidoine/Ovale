@@ -3147,6 +3147,10 @@ do
 	local function Name(condition, state)
 		local name, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
+		-- If the given name is a number, then look up the name of the corresponding spell.
+		if type(name) == "number" then
+			name = OvaleSpellBook:GetSpellName(name)
+		end
 		local targetName = API_UnitName(target)
 		local boolean = (name == targetName)
 		return TestBoolean(boolean, yesno)

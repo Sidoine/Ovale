@@ -1772,19 +1772,16 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") then
 				--[[
 					Special handling for "target=X" or "current_target=X" expressions.
-					TODO: This whole section will need to be updated once Prismatic Crystals can be summoned.
 				--]]
 				local rhsNode = parseNode.child[2]
 				local name = rhsNode.name
-				if name == "prismatic_crystal" then
-					name = '"Prismatic Crystal"'
-				end
 				local code
 				if parseNode.operator == "=" then
 					code = format("target.Name(%s)", name)
 				else -- if parseNode.operator == "!=" then
 					code = format("not target.Name(%s)", name)
 				end
+				AddSymbol(annotation, name)
 				annotation.astAnnotation = annotation.astAnnotation or {}
 				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "last_judgment_target" then
