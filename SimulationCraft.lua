@@ -2752,6 +2752,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = target .. "Distance()"
 	elseif operand == "gcd.max" then
 		code = "GCD()"
+	elseif operand == "gcd.remains" then
+		code = "GCDRemaining()"
 	else
 		ok = false
 	end

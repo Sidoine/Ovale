@@ -1899,6 +1899,35 @@ do
 end
 
 do
+	--- Get the number of seconds before the player's global cooldown expires.
+	-- @name GCDRemaining
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the previous spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- unless SpellCooldown(seraphim) < GCDRemaining() Spell(judgment)
+
+	local function GCDRemaining(condition, state)
+		local comparator, limit = condition[1], condition[2]
+		local target = ParseCondition(condition, state, "target")
+		if state.lastSpellId then
+			local duration = state:GetGCD(state.lastSpellId, target)
+			local start = state.startCast
+			local ending = start + duration
+			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("gcdremaining", false, GCDRemaining)
+end
+
+do
 	--- Get the value of the named state variable from the simulator.
 	-- @name GetState
 	-- @paramsig number or boolean
