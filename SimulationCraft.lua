@@ -186,27 +186,6 @@ local EMIT_DISAMBIGUATION = {}
 local EMIT_EXTRA_PARAMETERS = {}
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 
-local TOTEM_TYPE = {
-	["prismatic_crystal"] = "crystal",	-- XXX
-	["capacitor_totem"] = "air",
-	["cloudburst_totem"] = "water",
-	["earth_elemental_totem"] = "earth",
-	["earthbind_totem"] = "earth",
-	["earthgrab_totem"] = "earth",
-	["fire_elemental_totem"] = "fire",
-	["grounding_totem"] = "air",
-	["healing_stream_totem"] = "water",
-	["healing_tide_totem"] = "water",
-	["magma_totem"] = "fire",
-	["mana_tide_totem"] = "water",
-	["searing_totem"] = "fire",
-	["spirit_link_totem"] = "air",
-	["storm_elemental_totem"] = "air",
-	["stone_bulwark_totem"] = "earth",
-	["tremor_totem"] = "earth",
-	["windwalk_totem"] = "air",
-}
-
 local POTION_STAT = {
 	["draenic_agility"]		= "agility",
 	["draenic_armor"]		= "armor",
@@ -1063,6 +1042,23 @@ local function InitializeDisambiguation()
 	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"arms")
 	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"fury")
 	AddDisambiguation("shield_barrier",			"shield_barrier_tank",			"WARRIOR",		"protection")
+end
+
+local function IsTotem(name)
+	if strsub(name, 1, 13) == "wild_mushroom" then
+		-- Druids.
+		return true
+	elseif name == "prismatic_crystal" or name == "rune_of_power" then
+		-- Mages.
+		return true
+	elseif strsub(name, -7, -1) == "_statue" then
+		-- Monks.
+		return true
+	elseif strsub(name, -6, -1) == "_totem" then
+		-- Shamans.
+		return true
+	end
+	return false
 end
 
 local EMIT_VISITOR = nil
@@ -2003,14 +1999,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 
 	local code
 	if property == "active" then
-		if strsub(name, -6) == "_totem" then
-			local totemType = TOTEM_TYPE[name]
-			if totemType then
-				code = format("TotemPresent(%s totem=%s)", totemType, name)
-			else
-				code = format("TotemPresent(%s)", name)
-				symbol = false
-			end
+		if IsTotem(name) then
+			code = format("TotemPresent(%s)", name)
 		else
 			code = format("%s%sPresent(%s)", target, prefix, buffName)
 			symbol = buffName
@@ -2047,14 +2037,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	elseif property == "recharge_time" then
 		code = format("SpellChargeCooldown(%s)", name)
 	elseif property == "remains" then
-		if strsub(name, -6) == "_totem" then
-			local totemType = TOTEM_TYPE[name]
-			if totemType then
-				code = format("TotemRemaining(%s totem=%s)", totemType, name)
-			else
-				code = format("TotemRemaining(%s)", name)
-				symbol = false
-			end
+		if IsTotem(name) then
+			code = format("TotemRemaining(%s)", name)
 		else
 			code = format("%s%sRemaining(%s)", buffTarget, prefix, buffName)
 			symbol = buffName
@@ -2478,21 +2462,13 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 		local name = tokenIterator()
 		local property = tokenIterator()
 		name = Disambiguate(name, annotation.class, annotation.specialization)
-		local totemType = TOTEM_TYPE[name]
+		local isTotem = IsTotem(name)
 
 		local code
-		if property == "active" then
-			if totemType then
-				code = format("TotemPresent(%s totem=%s)", totemType, name)
-			else
-				code = format("TotemPresent(%s)", name)
-			end
-		elseif property == "remains" then
-			if totemType then
-				code = format("TotemRemaining(%s totem=%s)", totemType, name)
-			else
-				code = format("TotemRemaining(%s)", name)
-			end
+		if isTotem and property == "active" then
+			code = format("TotemPresent(%s)", name)
+		elseif isTotem and property == "remains" then
+			code = format("TotemRemaining(%s)", name)
 		else
 			-- Strip the "pet.<name>." from the operand and re-evaluate.
 			local pattern = format("^pet%%.%s%%.([%%w_.]+)", name)
@@ -2522,9 +2498,7 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 		if ok and code then
 			annotation.astAnnotation = annotation.astAnnotation or {}
 			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-			if totemType then
-				AddSymbol(annotation, name)
-			end
+			AddSymbol(annotation, name)
 		end
 	else
 		ok = false
@@ -2732,7 +2706,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		AddSymbol(annotation, fbName)
 		AddSymbol(annotation, ffbName)
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
-		code = "RuneOfPowerRemaining()"
+		code = "TotemRemaining(rune_of_power)"
 	elseif class == "MAGE" and operand == "dot.frozen_orb.ticking" then
 		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
 		local name = "frozen_orb"

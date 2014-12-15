@@ -35,7 +35,6 @@ local API_GetItemCooldown = GetItemCooldown
 local API_GetItemCount = GetItemCount
 local API_GetNumTrackingTypes = GetNumTrackingTypes
 local API_GetTime = GetTime
-local API_GetTotemInfo = GetTotemInfo
 local API_GetTrackingInfo = GetTrackingInfo
 local API_GetUnitSpeed = GetUnitSpeed
 local API_GetWeaponEnchantInfo = GetWeaponEnchantInfo
@@ -133,7 +132,7 @@ do
 	local function AfterWhiteHit(condition, state)
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local value = 0
-		Ovale:OneTimeMessage("Warning: 'AfterWhiteHit() is not implemented.")
+		Ovale:OneTimeMessage("Warning: 'AfterWhiteHit()' is not implemented.")
 		return TestValue(0, INFINITY, value, state.currentTime, -1, comparator, limit)
 	end
 
@@ -4257,6 +4256,7 @@ do
 end
 
 do
+	local RUNE_OF_POWER = 116011
 	local RUNE_OF_POWER_BUFF = 116014
 
 	--- Get the remaining time in seconds before the latest Rune of Power expires.
@@ -4271,20 +4271,11 @@ do
 	-- if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 
 	local function RuneOfPowerRemaining(condition, state)
+		Ovale:OneTimeMessage("Warning: 'RuneOfPowerRemaining()' is deprecated; use 'TotemRemaining(rune_of_power)' instead.")
 		local comparator, limit = condition[1], condition[2]
-		local aura = state:GetAura("player", RUNE_OF_POWER_BUFF, "HELPFUL")
-		if state:IsActiveAura(aura) then
-			local start, ending
-			for totemSlot = 1, 2 do
-				local haveTotem, name, startTime, duration = API_GetTotemInfo(totemSlot)
-				if haveTotem and startTime and (not start or startTime > start) then
-					start = startTime
-					ending = startTime + duration
-				end
-			end
-			if start then
-				return TestValue(0, INFINITY, ending - start, start, -1, comparator, limit)
-			end
+		local count, start, ending = state:GetTotemCount(RUNE_OF_POWER)
+		if count > 0 then
+			return TestValue(start, ending, 0, ending, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -4971,7 +4962,7 @@ do
 			comparator, limit = condition[1], condition[2]
 			start = 0
 		end
-		Ovale:OneTimeMessage("Warning: 'LastSwing() is not implemented.")
+		Ovale:OneTimeMessage("Warning: 'LastSwing()' is not implemented.")
 		return TestValue(start, INFINITY, 0, start, 1, comparator, limit)
 	end
 
@@ -4998,7 +4989,7 @@ do
 			comparator, limit = condition[1], condition[2]
 			ending = 0
 		end
-		Ovale:OneTimeMessage("Warning: 'NextSwing() is not implemented.")
+		Ovale:OneTimeMessage("Warning: 'NextSwing()' is not implemented.")
 		return TestValue(0, ending, 0, ending, -1, comparator, limit)
 	end
 
@@ -5443,72 +5434,99 @@ do
 end
 
 do
-	local OVALE_TOTEMTYPE =
-	{
-		-- Death Knights
-		ghoul = 1,
-		-- Druid
-		mushroom = 1,
-		-- XXX Mage
-		crystal = 4,
-		-- Monks
-		statue = 1,
-		-- Shamans
-		fire = 1,
-		earth = 2,
-		water = 3,
-		air = 4
-	}
+	-- Deprecated: totem types
+	local function CheckDeprecatedTotem(id, state)
+		local warning = false
+		local specialization = state.specialization
+		if id == "mushroom" then
+			warning = id
+			if specialization == 1 then
+				-- Balance.
+				id = 88747
+			elseif specialization == 4 then
+				-- Restoration.
+				id = 145205
+			end
+		elseif id == "statue" then
+			warning = id
+			if specialization == 1 then
+				-- Brewmaster.
+				id = 115315
+			elseif specialization == 2 then
+				-- Mistweaver.
+				id = 115313
+			end
+		elseif id == "ghoul" then
+			-- Ghouls are no longer totems, but pets summoned by Unholy Death Knights.
+			warning = id
+		end
+		if warning then
+			Ovale:OneTimeMessage("Warning: '%s' is deprecated; using '%s' instead.", warning, tostring(id))
+		end
+		return id
+	end
 
-	--- Test if the totem for shamans, the mushroom for druids, the ghoul for death knights, or the statue for monks has expired.
+	--- Test if the totem has expired.
 	-- @name TotemExpires
 	-- @paramsig boolean
-	-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
-	--     Valid types: fire, water, air, earth, ghoul, mushroom, statue.
+	-- @param id The ID of the spell used to summon the totem or one of the four shaman totem categories (air, earth, fire, water).
 	-- @param seconds Optional. The maximum number of seconds before the totem should expire.
 	--     Defaults to 0 (zero).
-	-- @param totem Optional. Sets the specific totem to check of given totem ID type.
-	--     Valid values: any totem spell ID
 	-- @return A boolean value.
 	-- @see TotemPresent, TotemRemaining
 	-- @usage
 	-- if TotemExpires(fire) Spell(searing_totem)
-	-- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
+	-- if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
 	local function TotemExpires(condition, state)
-		local totemId, seconds = condition[1], condition[2]
+		local id, seconds = condition[1], condition[2]
 		seconds = seconds or 0
-		if type(totemId) ~= "number" then
-			totemId = OVALE_TOTEMTYPE[totemId]
+		if condition.totem then
+			id = condition.totem
+			Ovale:OneTimeMessage("Warning: using 'totem' parameter in 'TotemExpires()' is deprecated.")
 		end
-		local haveTotem, name, startTime, duration = API_GetTotemInfo(totemId)
-		if haveTotem and startTime and (not condition.totem or OvaleSpellBook:GetSpellName(condition.totem) == name) then
-			return startTime + duration - seconds, INFINITY
+		id = CheckDeprecatedTotem(id, state)
+		if type(id) == "string" then
+			local haveTotem, name, startTime, duration = state:GetTotemInfo(id)
+			if haveTotem and startTime then
+				return startTime + duration - seconds, INFINITY
+			end
+		else -- if type(id) == "number" then
+			local count, start, ending = state:GetTotemCount(id)
+			if count > 0 then
+				return ending - seconds, INFINITY
+			end
 		end
 		return 0, INFINITY
 	end
 
-	--- Test if the totem for shamans, the ghoul for death knights, or the statue for monks is present.
+	--- Test if the totem is present.
 	-- @name TotemPresent
 	-- @paramsig boolean
-	-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
-	--     Valid types: fire, water, air, earth, ghoul, statue.
-	-- @param totem Optional. Sets the specific totem to check of given totem ID type.
-	--     Valid values: any totem spell ID
+	-- @param id The ID of the spell used to summon the totem or one of the four shaman totem categories (air, earth, fire, water).
 	-- @return A boolean value.
 	-- @see TotemExpires, TotemRemaining
 	-- @usage
 	-- if not TotemPresent(fire) Spell(searing_totem)
-	-- if TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
+	-- if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
 	local function TotemPresent(condition, state)
-		local totemId = condition[1]
-		if type(totemId) ~= "number" then
-			totemId = OVALE_TOTEMTYPE[totemId]
+		local id = condition[1]
+		if condition.totem then
+			id = condition.totem
+			Ovale:OneTimeMessage("Warning: using 'totem' parameter in 'TotemPresent()' is deprecated.")
 		end
-		local haveTotem, name, startTime, duration = API_GetTotemInfo(totemId)
-		if haveTotem and startTime and (not condition.totem or OvaleSpellBook:GetSpellName(condition.totem) == name) then
-			return startTime, startTime + duration
+		id = CheckDeprecatedTotem(id, state)
+		if type(id) == "string" then
+			local haveTotem, name, startTime, duration = state:GetTotemInfo(id)
+			if haveTotem and startTime then
+				return startTime, startTime + duration
+			end
+		else -- if type(id) == "number" then
+			local count, start, ending = state:GetTotemCount(id)
+			if count > 0 then
+				return start, ending
+			end
 		end
 		return nil
 	end
@@ -5519,27 +5537,33 @@ do
 	--- Get the remaining time in seconds before a totem expires.
 	-- @name TotemRemaining
 	-- @paramsig number or boolean
-	-- @param id The totem ID of the totem, ghoul or statue, or the type of totem.
-	--     Valid types: fire, water, air, earth, ghoul, statue.
+	-- @param id The ID of the spell used to summon the totem or one of the four shaman totem categories (air, earth, fire, water).
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param totem Optional. Sets the specific totem to check of given totem ID type.
-	--     Valid values: any totem spell ID
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @see TotemExpires, TotemPresent
 	-- @usage
-	-- if TotemRemaining(water totem=healing_stream_totem) <2 Spell(totemic_recall)
+	-- if TotemRemaining(healing_stream_totem) <2 Spell(totemic_recall)
 
 	local function TotemRemaining(condition, state)
-		local totemId, comparator, limit = condition[1], condition[2], condition[3]
-		if type(totemId) ~= "number" then
-			totemId = OVALE_TOTEMTYPE[totemId]
+		local id, comparator, limit = condition[1], condition[2], condition[3]
+		if condition.totem then
+			id = condition.totem
+			Ovale:OneTimeMessage("Warning: using 'totem' parameter in 'TotemRemaining()' is deprecated.")
 		end
-		local haveTotem, name, startTime, duration = API_GetTotemInfo(totemId)
-		if haveTotem and startTime and (not condition.totem or OvaleSpellBook:GetSpellName(condition.totem) == name) then
-			local start, ending = startTime, startTime + duration
-			return TestValue(start, ending, duration, start, -1, comparator, limit)
+		id = CheckDeprecatedTotem(id, state)
+		if type(id) == "string" then
+			local haveTotem, name, startTime, duration = state:GetTotemInfo(id)
+			if haveTotem and startTime then
+				local start, ending = startTime, startTime + duration
+				return TestValue(start, ending, 0, ending, -1, comparator, limit)
+			end
+		else -- if type(id) == "number" then
+			local count, start, ending = state:GetTotemCount(id)
+			if count > 0 then
+				return TestValue(start, ending, 0, ending, -1, comparator, limit)
+			end
 		end
 		return Compare(0, comparator, limit)
 	end
