@@ -40,6 +40,7 @@ local API_GetSpellBookItemInfo = GetSpellBookItemInfo
 local API_GetSpellInfo = GetSpellInfo
 local API_GetSpellLink = GetSpellLink
 local API_GetSpellTabInfo = GetSpellTabInfo
+local API_GetSpellTexture = GetSpellTexture
 local API_GetTalentInfo = GetTalentInfo
 local API_HasPetSpells = HasPetSpells
 local API_IsHarmfulSpell = IsHarmfulSpell
@@ -120,6 +121,8 @@ OvaleSpellBook.spellbookId = {
 OvaleSpellBook.isHarmful = {}
 -- self.isHelpful[spellId] = true/false
 OvaleSpellBook.isHelpful = {}
+-- self.texture[spellId] = path to texture
+OvaleSpellBook.texture = {}
 -- self.talent[talentId] = talentName
 OvaleSpellBook.talent = {}
 -- self.talentPoints[talentId] = 0 or 1
@@ -252,6 +255,7 @@ function OvaleSpellBook:UpdateSpells()
 	wipe(self.spellbookId[BOOKTYPE_SPELL])
 	wipe(self.isHarmful)
 	wipe(self.isHelpful)
+	wipe(self.texture)
 
 	-- Scan the first two tabs of the player's spellbook.
 	for tab = 1, 2 do
@@ -287,12 +291,14 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 				self.spell[id] = spellName
 				self.isHarmful[id] = API_IsHarmfulSpell(index, bookType)
 				self.isHelpful[id] = API_IsHelpfulSpell(index, bookType)
+				self.texture[id] = API_GetSpellTexture(index, bookType)
 				self.spellbookId[bookType][id] = index
 				if spellId and id ~= spellId then
 					self:Debug("    %s (%d) is at offset %d.", spellName, spellId, index)
 					self.spell[spellId] = spellName
 					self.isHarmful[spellId] = self.isHarmful[id]
 					self.isHelpful[spellId] = self.isHelpful[id]
+					self.texture[spellId] = self.texture[id]
 					self.spellbookId[bookType][spellId] = index
 				end
 			end
@@ -307,6 +313,7 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 						self.spell[id] = spellName
 						self.isHarmful[id] = API_IsHarmfulSpell(spellName)
 						self.isHelpful[id] = API_IsHelpfulSpell(spellName)
+						self.texture[id] = API_GetSpellTexture(index, bookType)
 						-- Flyout spells have no spellbook index.
 						self.spellbookId[bookType][id] = nil
 						if id ~= overrideId then
@@ -314,6 +321,7 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 							self.spell[overrideId] = spellName
 							self.isHarmful[overrideId] = self.isHarmful[id]
 							self.isHelpful[overrideId] = self.isHelpful[id]
+							self.texture[overrideId] = self.texture[id]
 							-- Flyout spells have no spellbook index.
 							self.spellbookId[bookType][overrideId] = nil
 						end
@@ -362,6 +370,10 @@ function OvaleSpellBook:GetSpellName(spellId)
 		end
 		return spellName
 	end
+end
+
+function OvaleSpellBook:GetSpellTexture(spellId)
+	return self.texture[spellId]
 end
 
 function OvaleSpellBook:GetTalentPoints(talentId)
