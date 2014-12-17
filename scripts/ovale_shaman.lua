@@ -484,6 +484,7 @@ AddFunction RestorationMainActions
 	#
 	if Glyph(glyph_of_totemic_recall) and TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) and TotemExpires(fire) and TotemExpires(earth) and TotemExpires(air) Spell(totemic_recall)
 
+	if Talent(elemental_blast_talent) and BuffRemaining(elemental_blast_spirit_buff) < CastTime(elemental_blast) Spell(elemental_blast)
 	if BuffPresent(unleash_life_buff) Spell(healing_wave)
 	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
 	if Glyph(glyph_of_riptide no) Spell(riptide)
@@ -491,9 +492,13 @@ AddFunction RestorationMainActions
 
 AddFunction RestorationAoeActions
 {
+	if BuffExpires(water_shield_buff) Spell(water_shield)
+	if BuffCountOnAny(earth_shield_buff) == 0 Spell(earth_shield)
+
+	if Talent(elemental_blast_talent) and BuffRemaining(elemental_blast_spirit_buff) < CastTime(elemental_blast) Spell(elemental_blast)
 	if BuffPresent(unleash_life_buff) Spell(chain_heal)
-	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(cloudburst_totem)
 	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
+	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(cloudburst_totem)
 	Spell(healing_rain)
 	Spell(chain_heal)
 }
