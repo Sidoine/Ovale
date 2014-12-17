@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Hunter_SV_T17M".
 #	class=hunter
 #	spec=survival
-#	talents=0003113
+#	talents=0003123
 
 Include(ovale_common)
 Include(ovale_hunter_spells)
