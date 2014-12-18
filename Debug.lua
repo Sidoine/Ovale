@@ -54,6 +54,7 @@ do
 	-- Add a global data type for debug options.
 	OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global or {}
 	OvaleOptions.defaultDB.global.debug = {}
+	OvaleOptions:RegisterOptions(OvaleDebug)
 end
 --</private-static-properties>
 
@@ -253,5 +254,48 @@ function OvaleDebug:DisplayTraceLog()
 		self_traceLog:AddLine("Trace log is empty.")
 	end
 	self_traceLog:Display()
+end
+
+do
+	local NEW_DEBUG_NAMES = {
+		action_bar = "OvaleActionBar",
+		aura = "OvaleAura",
+		combo_points = "OvaleComboPoints",
+		compile = "OvaleCompile",
+		damage_taken = "OvaleDamageTaken",
+		enemy = "OvaleEnemies",
+		guid = "OvaleGUID",
+		missing_spells = false,
+		paper_doll = "OvalePaperDoll",
+		power = "OvalePower",
+		snapshot = false,
+		spellbook = "OvaleSpellBook",
+		state = "OvaleState",
+		steady_focus = "OvaleSteadyFocus",
+		unknown_spells = false,
+	}
+
+	function OvaleDebug:UpgradeSavedVariables()
+		local global = Ovale.db.global
+		local profile = Ovale.db.profile
+
+		-- All profile-specific debug options are removed.  They are now in the global database.
+		profile.debug = nil
+
+		-- Debugging options have changed names.
+		for old, new in pairs(NEW_DEBUG_NAMES) do
+			if global.debug[old] and new then
+				global.debug[new] = global.debug[old]
+			end
+			global.debug[old] = nil
+		end
+
+		-- If a debug option is toggled off, it is "stored" as nil, not "false".
+		for k, v in pairs(global.debug) do
+			if not v then
+				global.debug[k] = nil
+			end
+		end
+	end
 end
 --</public-static-methods>

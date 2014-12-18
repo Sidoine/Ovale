@@ -15,13 +15,18 @@ local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = Ovale.L
 
+local ipairs = ipairs
 local pairs = pairs
+local tinsert = table.insert
 local type = type
 local API_InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local API_UnitClass = UnitClass
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
+
+-- List of registered modules providing options.
+local self_register = {}
 --</private-static-properties>
 
 --<public-static-properties>
@@ -445,6 +450,8 @@ function OvaleOptions:OnInitialize()
 	db.RegisterCallback( self, "OnProfileCopied", "HandleProfileChanges" )
 
 	Ovale.db = db
+
+	-- Upgrade saved variables to current format.
 	self:UpgradeSavedVariables()
 
 	AceConfig:RegisterOptionsTable(OVALE, self.options.args.apparence)
@@ -460,71 +467,36 @@ function OvaleOptions:OnEnable()
 	self:HandleProfileChanges()
 end
 
-do
-	local NEW_DEBUG_NAMES = {
-		action_bar = "OvaleActionBar",
-		aura = "OvaleAura",
-		combo_points = "OvaleComboPoints",
-		compile = "OvaleCompile",
-		damage_taken = "OvaleDamageTaken",
-		enemy = "OvaleEnemies",
-		guid = "OvaleGUID",
-		missing_spells = false,
-		paper_doll = "OvalePaperDoll",
-		power = "OvalePower",
-		snapshot = false,
-		spellbook = "OvaleSpellBook",
-		state = "OvaleState",
-		steady_focus = "OvaleSteadyFocus",
-		unknown_spells = false,
-	}
+function OvaleOptions:RegisterOptions(addon)
+	tinsert(self_register, addon)
+end
 
-	function OvaleOptions:UpgradeSavedVariables()
-		local global = Ovale.db.global
-		local profile = Ovale.db.profile
+function OvaleOptions:UpgradeSavedVariables()
+	local profile = Ovale.db.profile
 
-		-- All profile-specific debug options are removed.  They are now in the global database.
-		profile.debug = nil
-
-		-- Debugging options have changed names.
-		for old, new in pairs(NEW_DEBUG_NAMES) do
-			if global.debug[old] and new then
-				global.debug[new] = global.debug[old]
-			end
-			global.debug[old] = nil
-		end
-
-		-- If a debug option is toggled off, it is "stored" as nil, not "false".
-		for k, v in pairs(global.debug) do
-			if not v then
-				global.debug[k] = nil
-			end
-		end
-
-		-- Merge two options that had the same meaning.
-		if profile.display ~= nil then
-			profile.apparence.enableIcons = profile.display
-			profile.display = nil
-		end
-
-		-- The frame position settings changed from left/top to offsetX/offsetY.
-		if profile.left or profile.top then
-			profile.left = nil
-			profile.top = nil
-			Ovale:OneTimeMessage("The Ovale icon frames position has been reset.")
-		end
-
-		-- SpellFlash options have been moved and renamed.
-		if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
-			local enabled = profile.apparence.spellFlash
-			profile.apparence.spellFlash = {}
-			profile.apparence.spellFlash.enabled = enabled
-		end
-
-		-- Re-register defaults so that any tables created during the upgrade are "populated"
-		-- by the default database automatically.
-		Ovale.db:RegisterDefaults(self.defaultDB)
+	-- Merge two options that had the same meaning.
+	if profile.display ~= nil and type(profile.display) == "boolean" then
+		profile.apparence.enableIcons = profile.display
+		profile.display = nil
 	end
+
+	-- The frame position settings changed from left/top to offsetX/offsetY.
+	if profile.left or profile.top then
+		profile.left = nil
+		profile.top = nil
+		Ovale:OneTimeMessage("The Ovale icon frames position has been reset.")
+	end
+
+	-- Invoke module-specific upgrade for Saved Variables.
+	for _, addon in ipairs(self_register) do
+		if addon.UpgradeSavedVariables then
+			addon:UpgradeSavedVariables()
+		end
+	end
+
+	-- Re-register defaults so that any tables created during the upgrade are "populated"
+	-- by the default database automatically.
+	Ovale.db:RegisterDefaults(self.defaultDB)
 end
 
 function OvaleOptions:HandleProfileChanges()

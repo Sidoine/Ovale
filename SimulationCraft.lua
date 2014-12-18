@@ -232,6 +232,7 @@ do
 	for k, v in pairs(actions) do
 		OvaleOptions.options.args.actions.args[k] = v
 	end
+	OvaleOptions:RegisterOptions(OvaleSimulationCraft)
 end
 --</private-static-properties>
 

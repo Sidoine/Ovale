@@ -72,6 +72,7 @@ do
 	for k, v in pairs(options) do
 		OvaleOptions.options.args.apparence.args[k] = v
 	end
+	OvaleOptions:RegisterOptions(OvaleDataBroker)
 end
 --</private-static-properties>
 

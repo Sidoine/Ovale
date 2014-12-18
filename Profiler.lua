@@ -58,6 +58,7 @@ do
 	-- Add a global data type for debug options.
 	OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global or {}
 	OvaleOptions.defaultDB.global.profiler = {}
+	OvaleOptions:RegisterOptions(OvaleProfiler)
 end
 --</private-static-properties>
 

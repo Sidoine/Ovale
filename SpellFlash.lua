@@ -18,6 +18,7 @@ local OvaleSpellBook = nil
 local OvaleStance = nil
 
 local pairs = pairs
+local type = type
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitExists = UnitExists
 local API_UnitIsDead = UnitIsDead
@@ -211,6 +212,7 @@ do
 	for k, v in pairs(options) do
 		OvaleOptions.options.args.apparence.args[k] = v
 	end
+	OvaleOptions:RegisterOptions(OvaleSpellFlash)
 end
 --</private-static-properties>
 
@@ -334,6 +336,17 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 				SpellFlashCore.FlashItem(itemId, color, size, brightness)
 			end
 		end
+	end
+end
+
+function OvaleSpellFlash:UpgradeSavedVariables()
+	local profile = Ovale.db.profile
+
+	-- SpellFlash options have been moved and renamed.
+	if profile.apparence.spellFlash and type(profile.apparence.spellFlash) ~= "table" then
+		local enabled = profile.apparence.spellFlash
+		profile.apparence.spellFlash = {}
+		profile.apparence.spellFlash.enabled = enabled
 	end
 end
 --</public-static-methods>
