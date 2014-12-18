@@ -28,6 +28,7 @@ local floor = math.floor
 local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
+local tostring = tostring
 local type = type
 local wipe = wipe
 local API_GetBuildInfo = GetBuildInfo
