@@ -354,8 +354,6 @@ AddFunction CombatPrecombatActions
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#snapshot_stats
-	#potion,name=draenic_agility
-	UsePotionAgility()
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
 	#slice_and_dice,if=talent.marked_for_death.enabled
