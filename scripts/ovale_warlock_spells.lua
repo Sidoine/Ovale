@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_warlock_spells"
-	local desc = "[6.0.2] Ovale: Warlock spells"
+	local desc = "[6.0.3] Ovale: Warlock spells"
 	local code = [[
 # Warlock spells and functions.
 
@@ -144,7 +144,7 @@ Define(haunt_debuff 48181)
 Define(haunting_spirits_buff 157698)
 	SpellInfo(haunting_spirits_buff duration=30)
 Define(havoc 80240)
-	SpellInfo(havoc cd=25)
+	SpellInfo(havoc cd=20)
 	SpellInfo(havoc addcd=-5 if_spell=enhanced_havoc)
 	SpellAddBuff(havoc havoc_buff=3)
 	SpellAddTargetDebuff(havoc havoc_debuff=1)
