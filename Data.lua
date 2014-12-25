@@ -475,6 +475,32 @@ function OvaleData:GetSpellInfo(spellId)
 	end
 end
 
+-- Returns the tag for the spell and whether the spell invokes the GCD.
+function OvaleData:GetSpellTagInfo(spellId)
+	local tag = "main"
+	local invokesGCD = true
+
+	local si = self.spellInfo[spellId]
+	if si then
+		invokesGCD = not si.gcd or si.gcd > 0
+		tag = si.tag
+		if not tag then
+			local cd = si.cd
+			if cd then
+				if cd > 90 then
+					tag = "cd"
+				elseif cd > 29 or not invokesGCD then
+					tag = "shortcd"
+				end
+			elseif not invokesGCD then
+				tag = "shortcd"
+			end
+		end
+		tag = tag or "main"
+	end
+	return tag, invokesGCD
+end
+
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:CheckRequirements(spellId, tokenIterator, target)
