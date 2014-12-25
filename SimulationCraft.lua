@@ -3761,22 +3761,28 @@ function OvaleSimulationCraft:Unparse(profile)
 	return s
 end
 
-function OvaleSimulationCraft:Emit(profile)
+function OvaleSimulationCraft:EmitAST(profile)
 	local nodeList = {}
 	local ast = OvaleAST:NewNode(nodeList, true)
+	local child = ast.child
 	ast.type = "script"
 
 	local annotation = profile.annotation
+	local ok = true
 	if profile.actionList then
-		local child = ast.child
 		annotation.astAnnotation = annotation.astAnnotation or {}
 		annotation.astAnnotation.nodeList = nodeList
 		for _, node in ipairs(profile.actionList) do
 			local declarationNode = EmitActionList(node, nodeList, annotation)
 			if declarationNode then
 				child[#child + 1] = declarationNode
+			else
+				ok = false
+				break
 			end
 		end
+	end
+	if ok then
 		-- Fixups.
 		do
 			-- Some profiles don't include any interrupt actions.
@@ -3791,6 +3797,17 @@ function OvaleSimulationCraft:Emit(profile)
 		annotation.supportingControlCount = InsertSupportingControls(child, annotation)
 		annotation.supportingDefineCount = InsertSupportingDefines(child, annotation)
 	end
+	if not ok then
+		OvaleAST:Release(ast)
+		ast = nil
+	end
+	return ast
+end
+
+function OvaleSimulationCraft:Emit(profile)
+	local nodeList = {}
+	local ast = self:EmitAST(profile)
+	local annotation = profile.annotation
 
 	local output = self_outputPool:Get()
 	-- Prepend a comment block header for the script.
@@ -3852,6 +3869,7 @@ function OvaleSimulationCraft:Emit(profile)
 	end
 	local s = tconcat(output, "\n")
 	self_outputPool:Release(output)
+	OvaleAST:Release(ast)
 	return s
 end
 
