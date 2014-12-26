@@ -516,11 +516,15 @@ function OvaleCompile:CompileScript(name)
 	Ovale:ResetControls()
 end
 
-function OvaleCompile:EvaluateScript(forceEvaluation)
+function OvaleCompile:EvaluateScript(ast, forceEvaluation)
 	self:StartProfiling("OvaleCompile_EvaluateScript")
+	if type(ast) ~= "table" then
+		forceEvaluation = ast
+		ast = self.ast
+	end
 	local changed = false
 	self_canEvaluate = self_canEvaluate or Ovale:IsPreloaded(self_requirePreload)
-	if self_canEvaluate and self.ast and (forceEvaluation or not self.serial or self.serial < self_serial) then
+	if self_canEvaluate and ast and (forceEvaluation or not self.serial or self.serial < self_serial) then
 		self:Debug("Evaluating script.")
 		changed = true
 		-- Reset compilation state.
@@ -534,7 +538,7 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 		self.serial = self_serial
 
 		-- Evaluate every declaration node of the script.
-		for _, node in ipairs(self.ast.child) do
+		for _, node in ipairs(ast.child) do
 			local nodeType = node.type
 			if nodeType == "checkbox" then
 				ok = EvaluateAddCheckBox(node)
@@ -562,7 +566,7 @@ function OvaleCompile:EvaluateScript(forceEvaluation)
 			end
 		end
 		if ok then
-			AddMissingVariantSpells(self.ast.annotation)
+			AddMissingVariantSpells(ast.annotation)
 		end
 	end
 	self:StopProfiling("OvaleCompile_EvaluateScript")
