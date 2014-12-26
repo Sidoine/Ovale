@@ -495,7 +495,11 @@ UnparseBangValue = function(node)
 end
 
 UnparseComment = function(node)
-	return "#" .. node.comment
+	if not node.comment or node.comment == "" then
+		return ""
+	else
+		return "#" .. node.comment
+	end
 end
 
 UnparseCommaSeparatedValues = function(node)
@@ -584,7 +588,12 @@ UnparseGroup = function(node)
 	output[#output + 1] = INDENT[self_indent] .. "{"
 	self_indent = self_indent + 1
 	for _, statementNode in ipairs(node.child) do
-		output[#output + 1] = INDENT[self_indent] .. Unparse(statementNode)
+		local s = Unparse(statementNode)
+		if s == "" then
+			output[#output + 1] = s
+		else
+			output[#output + 1] = INDENT[self_indent] .. s
+		end
 	end
 	self_indent = self_indent - 1
 	output[#output + 1] = INDENT[self_indent] .. "}"
@@ -654,7 +663,12 @@ UnparseScript = function(node)
 	local previousDeclarationType
 	for _, declarationNode in ipairs(node.child) do
 		if declarationNode.type == "item_info" or declarationNode.type == "spell_aura_list" or declarationNode.type == "spell_info" or declarationNode.type == "spell_require" then
-			output[#output + 1] = INDENT[self_indent + 1] .. Unparse(declarationNode)
+			local s = Unparse(declarationNode)
+			if s == "" then
+				output[#output + 1] = s
+			else
+				output[#output + 1] = INDENT[self_indent + 1] .. s
+			end
 		else
 			local insertBlank = false
 			-- Add an extra blank line if the type is different from the previous type.
