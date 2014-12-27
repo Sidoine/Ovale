@@ -2493,7 +2493,9 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 				if not ok then
 					if property == "buff" then
 						ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
-					elseif token == "debuff" then
+					elseif property == "cooldown" then
+						ok, node = EmitOperandCooldown(petOperand, parseNode, nodeList, annotation, action)
+					elseif property == "debuff" then
 						ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
 					else
 						ok = false
