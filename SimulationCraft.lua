@@ -1112,6 +1112,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 
 	if action == "auto_attack" or action == "auto_shot" then
 		-- skip
+	elseif action == "choose_target" then
+		-- skip
 	elseif action == "elixir" or action == "flask" or action == "food" then
 		-- skip
 	elseif action == "snapshot_stats" then
