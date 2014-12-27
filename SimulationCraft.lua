@@ -745,6 +745,9 @@ ParseModifier = function(tokenStream, nodeList, annotation)
 	local expressionNode
 	if ok then
 		ok, expressionNode = ParseExpression(tokenStream, nodeList, annotation)
+		if ok and expressionNode and name == "sec" then
+			expressionNode.asType = "value"
+		end
 	end
 	return ok, name, expressionNode
 end
@@ -1480,13 +1483,17 @@ EmitAction = function(parseNode, nodeList, annotation)
 			end
 			isSpellAction = false
 		elseif action == "wait" then
+			--[[
+				Create a special "wait" AST node that will be transformed in
+				a later step into something OvaleAST can understand and unparse.
+			--]]
+			bodyNode = OvaleAST:NewNode(nodeList)
+			bodyNode.type = "simc_wait"
 			if modifier.sec then
-				-- Create a special "wait" AST node that will be transformed in
-				-- a later step into something OvaleAST can understand and unparse.
-				bodyNode = OvaleAST:NewNode(nodeList)
-				bodyNode.type = "simc_wait"
 				-- "wait,sec=expr" means to halt the processing of the action list if "expr > 0".
-				conditionNode = Emit(modifier.sec, nodeList, annotation, action)
+				local expressionNode = Emit(modifier.sec, nodeList, annotation, action)
+				local code = OvaleAST:Unparse(expressionNode)
+				conditionCode = code .. " > 0"
 			end
 			isSpellAction = false
 		end
