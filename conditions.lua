@@ -4122,6 +4122,25 @@ do
 end
 
 do
+	--- Test if the previous spell cast that invoked the GCD matches the given spell.
+	-- @name PreviousGCDSpell
+	-- @paramsig boolean
+	-- @param id The spell ID.
+	-- @param yesno Optional. If yes, then return true if there is a match. If no, then return true if it doesn't match.
+	--     Default is yes.
+	--     Valid values: yes, no.
+	-- @return A boolean value.
+
+	local function PreviousGCDSpell(condition, state)
+		local spellId, yesno = condition[1], condition[2]
+		local boolean = (spellId == state.lastGCDSpellId)
+		return TestBoolean(boolean, yesno)
+	end
+
+	OvaleCondition:RegisterCondition("previousgcdspell", true, PreviousGCDSpell)
+end
+
+do
 	--- Test if the previous spell cast matches the given spell.
 	-- @name PreviousSpell
 	-- @paramsig boolean

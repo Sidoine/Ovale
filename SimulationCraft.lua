@@ -1084,6 +1084,7 @@ local EmitOperandDisease = nil
 local EmitOperandDot = nil
 local EmitOperandGlyph = nil
 local EmitOperandPet = nil
+local EmitOperandPreviousSpell = nil
 local EmitOperandRaidEvent = nil
 local EmitOperandRune = nil
 local EmitOperandSeal = nil
@@ -1954,6 +1955,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 			ok, node = EmitOperandGlyph(operand, parseNode, nodeList, annotation, action)
 		elseif token == "pet" then
 			ok, node = EmitOperandPet(operand, parseNode, nodeList, annotation, action)
+		elseif token == "prev" or token == "prev_gcd" then
+			ok, node = EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action)
 		elseif token == "seal" then
 			ok, node = EmitOperandSeal(operand, parseNode, nodeList, annotation, action)
 		elseif token == "set_bonus" then
@@ -2499,6 +2502,33 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 			else
 				ok = false
 			end
+		end
+		if ok and code then
+			annotation.astAnnotation = annotation.astAnnotation or {}
+			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			AddSymbol(annotation, name)
+		end
+	else
+		ok = false
+	end
+
+	return ok, node
+end
+
+EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, action)
+	local ok = true
+	local node
+
+	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+	local token = tokenIterator()
+	if token == "prev" or token == "prev_gcd" then
+		local name = tokenIterator()
+		name = Disambiguate(name, annotation.class, annotation.specialization)
+		local code
+		if token == "prev" then
+			code = format("PreviousSpell(%s)", name)
+		else -- if token == "prev_gcd" then
+			code = format("PreviousGCDSpell(%s)", name)
 		end
 		if ok and code then
 			annotation.astAnnotation = annotation.astAnnotation or {}

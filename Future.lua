@@ -128,6 +128,8 @@ OvaleFuture.combatStartTime = nil
 OvaleFuture.counter = {}
 -- Most recent spellcast.
 OvaleFuture.lastSpellcast = nil
+-- Most recent GCD spellcast.
+OvaleFuture.lastGCDSpellcast = nil
 -- Debugging: spells to trace
 OvaleFuture.traceSpellList = nil
 --</public-static-properties>
@@ -362,6 +364,11 @@ local function UpdateLastSpellcast(spellcast)
 		end
 		self_lastSpellcast[targetGUID][spellId] = spellcast
 		self.lastSpellcast = spellcast
+		local unitId = OvaleGUID:GetUnitId(targetGUID)
+		local gcd = OvaleData:GetSpellInfoProperty(spellId, "gcd", unitId)
+		if not gcd or gcd > 0 then
+			self.lastGCDSpellcast = spellcast
+		end
 
 		--[[
 			If any auras have been added between the start of the spellcast and this event,
@@ -684,7 +691,7 @@ function OvaleFuture:LastInFlightSpell()
 	if #self_activeSpellcast > 0 then
 		return self_activeSpellcast[#self_activeSpellcast]
 	end
-	return self.lastSpellcast
+	return self.lastGCDSpellcast
 end
 
 function OvaleFuture:UpdateFromSpellcast(dest, spellcast)
@@ -773,12 +780,14 @@ statePrototype.startCast = nil
 statePrototype.endCast = nil
 -- The time at which the next GCD spell can be cast in the simulator.
 statePrototype.nextCast = nil
+-- The most recent time the spell was cast in the simulator.
+statePrototype.lastCast = nil
 -- Whether the player is channeling a spell in the simulator at the current time.
 statePrototype.isChanneling = nil
 -- The previous spell cast in the simulator.
 statePrototype.lastSpellId = nil
--- The most recent time the spell was cast in the simulator.
-statePrototype.lastCast = nil
+-- The previous GCD spell cast in the simulator.
+statePrototype.lastGCDSpellId = nil
 -- counter[name] = count
 statePrototype.counter = nil
 --</state-properties>
@@ -800,6 +809,7 @@ function OvaleFuture:ResetState(state)
 	state.inCombat = self.inCombat
 	state.combatStartTime = self.combatStartTime or 0
 	state.lastSpellId = self.lastSpellcast and self.lastSpellcast.spellId
+	state.lastGCDSpellId = self.lastGCDSpellcast and self.lastGCDSpellcast.spellId
 	state.currentSpellId = nil
 	state.isChanneling = false
 	state.nextCast = now
@@ -823,6 +833,7 @@ function OvaleFuture:CleanState(state)
 	state.nextCast = nil
 	state.isChanneling = nil
 	state.lastSpellId = nil
+	state.lastGCDSpellId = nil
 
 	for k in pairs(state.lastCast) do
 		state.lastCast[k] = nil
@@ -885,11 +896,12 @@ end
 statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
 	OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
 	if spellId and targetGUID then
+		local target = OvaleGUID:GetUnitId(targetGUID)
+		local gcd = state:GetGCD(spellId, target)
+
 		-- Handle missing start/end/next cast times.
 		if not startCast or not endCast or not nextCast then
-			local target = OvaleGUID:GetUnitId(targetGUID)
 			local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-			local gcd = state:GetGCD(spellId, target)
 			startCast = startCast or state.nextCast
 			endCast = endCast or (startCast + castTime)
 			nextCast = (castTime > gcd) and endCast or (startCast + gcd)
@@ -901,8 +913,11 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 		state.endCast = endCast
 		state.nextCast = nextCast
 		state.isChanneling = isChanneled
-		state.lastSpellId = spellId
 		state.lastCast[spellId] = endCast
+		state.lastSpellId = spellId
+		if gcd > 0 then
+			state.lastGCDSpellId = spellId
+		end
 
 		-- Set the current time in the simulator to *slightly* after the start of the current cast,
 		-- or to now if in the past.
