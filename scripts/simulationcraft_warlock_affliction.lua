@@ -21,32 +21,12 @@ AddFunction UsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction AfflictionDefaultActions
+### actions.default
+
+AddFunction AfflictionDefaultMainActions
 {
-	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
-	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
-	#berserking
-	Spell(berserking)
-	#blood_fury
-	Spell(blood_fury_sp)
-	#arcane_torrent
-	Spell(arcane_torrent_mana)
-	#mannoroths_fury
-	Spell(mannoroths_fury)
-	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
-	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
-	#service_pet,if=talent.grimoire_of_service.enabled
-	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
-	if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-	#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
-	if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
-	#cataclysm
-	Spell(cataclysm)
 	#haunt,if=shard_react&!talent.soulburn_haunt.enabled&!in_flight_to_target&(dot.haunt.remains<cast_time+travel_time|soul_shard=4)&(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.dark_soul.up|soul_shard>2|soul_shard*14<=target.time_to_die)
 	if SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + MaxTravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
-	#soulburn,if=shard_react&talent.soulburn_haunt.enabled&buff.soulburn.down&(buff.haunting_spirits.down|soul_shard=4&buff.haunting_spirits.remains<5)
-	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and BuffExpires(soulburn_buff) and { BuffExpires(haunting_spirits_buff) or SoulShards() == 4 and BuffRemaining(haunting_spirits_buff) < 5 } Spell(soulburn)
 	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&((buff.soulburn.up&buff.haunting_spirits.remains<5)|soul_shard=4)
 	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { BuffPresent(soulburn_buff) and BuffRemaining(haunting_spirits_buff) < 5 or SoulShards() == 4 } Spell(haunt)
 	#agony,cycle_targets=1,if=target.time_to_die>16&remains<=(duration*0.3)&((talent.cataclysm.enabled&remains<=(cooldown.cataclysm.remains+action.cataclysm.cast_time))|!talent.cataclysm.enabled)
@@ -65,37 +45,126 @@ AddFunction AfflictionDefaultActions
 	Spell(life_tap)
 }
 
-AddFunction AfflictionPrecombatActions
+AddFunction AfflictionDefaultShortCdActions
+{
+	#mannoroths_fury
+	Spell(mannoroths_fury)
+	#service_pet,if=talent.grimoire_of_service.enabled
+	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	#kiljaedens_cunning,if=(talent.cataclysm.enabled&!cooldown.cataclysm.remains)
+	if Talent(cataclysm_talent) and not SpellCooldown(cataclysm) > 0 Spell(kiljaedens_cunning)
+	#kiljaedens_cunning,moving=1,if=!talent.cataclysm.enabled
+	if Speed() > 0 and not Talent(cataclysm_talent) Spell(kiljaedens_cunning)
+	#cataclysm
+	Spell(cataclysm)
+
+	unless SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + MaxTravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } and Spell(haunt)
+	{
+		#soulburn,if=shard_react&talent.soulburn_haunt.enabled&buff.soulburn.down&(buff.haunting_spirits.down|soul_shard=4&buff.haunting_spirits.remains<5)
+		if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and BuffExpires(soulburn_buff) and { BuffExpires(haunting_spirits_buff) or SoulShards() == 4 and BuffRemaining(haunting_spirits_buff) < 5 } Spell(soulburn)
+	}
+}
+
+AddFunction AfflictionDefaultCdActions
+{
+	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
+	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+	#berserking
+	Spell(berserking)
+	#blood_fury
+	Spell(blood_fury_sp)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
+	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
+	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
+
+	unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+	{
+		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
+		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
+		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+	}
+}
+
+### actions.precombat
+
+AddFunction AfflictionPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=sleeper_surprise
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
-	#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-	if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
-	#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-	if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-	#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-	if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled&!talent.demonic_servitude.enabled
 	if Talent(grimoire_of_sacrifice_talent) and not Talent(demonic_servitude_talent) and pet.Present() Spell(grimoire_of_sacrifice)
-	#service_pet,if=talent.grimoire_of_service.enabled
-	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
-	#potion,name=draenic_intellect
-	UsePotionIntellect()
+}
+
+AddFunction AfflictionPrecombatShortCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+	{
+		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
+		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felhunter)
+		#service_pet,if=talent.grimoire_of_service.enabled
+		if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	}
+}
+
+AddFunction AfflictionPrecombatCdActions
+{
+	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
+	{
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
+		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+
+		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+		{
+			#potion,name=draenic_intellect
+			UsePotionIntellect()
+		}
+	}
+}
+
+### Affliction icons.
+AddCheckBox(opt_warlock_affliction_aoe L(AOE) specialization=affliction default)
+
+AddIcon specialization=affliction help=shortcd enemies=1 checkbox=!opt_warlock_affliction_aoe
+{
+	if not InCombat() AfflictionPrecombatShortCdActions()
+	AfflictionDefaultShortCdActions()
+}
+
+AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction_aoe
+{
+	if not InCombat() AfflictionPrecombatShortCdActions()
+	AfflictionDefaultShortCdActions()
 }
 
 AddIcon specialization=affliction help=main enemies=1
 {
-	if not InCombat() AfflictionPrecombatActions()
-	AfflictionDefaultActions()
+	if not InCombat() AfflictionPrecombatMainActions()
+	AfflictionDefaultMainActions()
 }
 
-AddIcon specialization=affliction help=aoe
+AddIcon specialization=affliction help=aoe checkbox=opt_warlock_affliction_aoe
 {
-	if not InCombat() AfflictionPrecombatActions()
-	AfflictionDefaultActions()
+	if not InCombat() AfflictionPrecombatMainActions()
+	AfflictionDefaultMainActions()
+}
+
+AddIcon specialization=affliction help=cd enemies=1 checkbox=!opt_warlock_affliction_aoe
+{
+	if not InCombat() AfflictionPrecombatCdActions()
+	AfflictionDefaultCdActions()
+}
+
+AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction_aoe
+{
+	if not InCombat() AfflictionPrecombatCdActions()
+	AfflictionDefaultCdActions()
 }
 
 ### Required symbols
@@ -123,6 +192,7 @@ AddIcon specialization=affliction help=aoe
 # haunt
 # haunt_debuff
 # haunting_spirits_buff
+# kiljaedens_cunning
 # life_tap
 # mannoroths_fury
 # soulburn

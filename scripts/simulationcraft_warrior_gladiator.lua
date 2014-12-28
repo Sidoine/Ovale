@@ -41,13 +41,44 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction ProtectionGladiatorDefaultActions
+### actions.default
+
+AddFunction ProtectionGladiatorDefaultMainActions
+{
+	#auto_attack
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 ProtectionGladiatorMovementMainActions()
+	#call_action_list,name=single,if=active_enemies=1
+	if Enemies() == 1 ProtectionGladiatorSingleMainActions()
+	#call_action_list,name=aoe,if=active_enemies>=2
+	if Enemies() >= 2 ProtectionGladiatorAoeMainActions()
+}
+
+AddFunction ProtectionGladiatorDefaultShortCdActions
 {
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
-	if 0 > 5 ProtectionGladiatorMovementActions()
+	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
+	#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
+	if not BuffPresent(shield_charge_buff) and not SpellCooldown(shield_slam) > 0 or Charges(shield_charge) == 2 Spell(shield_charge)
+	#berserker_rage,if=buff.enrage.down
+	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
+	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
+	if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
+	#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
+	if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
+	#call_action_list,name=single,if=active_enemies=1
+	if Enemies() == 1 ProtectionGladiatorSingleShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>=2
+	if Enemies() >= 2 ProtectionGladiatorAoeShortCdActions()
+}
+
+AddFunction ProtectionGladiatorDefaultCdActions
+{
 	#avatar
 	Spell(avatar)
 	#bloodbath
@@ -60,36 +91,18 @@ AddFunction ProtectionGladiatorDefaultActions
 	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#potion,name=draenic_armor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) UsePotionArmor()
-	#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
-	if not BuffPresent(shield_charge_buff) and not SpellCooldown(shield_slam) > 0 or Charges(shield_charge) == 2 Spell(shield_charge)
-	#berserker_rage,if=buff.enrage.down
-	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
-	if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
-	#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
-	if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
-	#call_action_list,name=single,if=active_enemies=1
-	if Enemies() == 1 ProtectionGladiatorSingleActions()
-	#call_action_list,name=aoe,if=active_enemies>=2
-	if Enemies() >= 2 ProtectionGladiatorAoeActions()
 }
 
-AddFunction ProtectionGladiatorAoeActions
+### actions.aoe
+
+AddFunction ProtectionGladiatorAoeMainActions
 {
 	#revenge
 	Spell(revenge)
 	#shield_slam
 	Spell(shield_slam)
-	#dragon_roar,if=(buff.bloodbath.up|cooldown.bloodbath.remains>10)|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) Spell(dragon_roar)
-	#storm_bolt,if=(buff.bloodbath.up|cooldown.bloodbath.remains>7)|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 7 or not Talent(bloodbath_talent) Spell(storm_bolt)
 	#thunder_clap,cycle_targets=1,if=dot.deep_wounds.remains<3&active_enemies>4
 	if target.DebuffRemaining(deep_wounds_debuff) < 3 and Enemies() > 4 Spell(thunder_clap)
-	#bladestorm,if=buff.shield_charge.down
-	if BuffExpires(shield_charge_buff) Spell(bladestorm)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
 	#thunder_clap,if=active_enemies>6
@@ -100,7 +113,32 @@ AddFunction ProtectionGladiatorAoeActions
 	if SpellCooldown(shield_slam) > ExecuteTime(devastate) * 0.4 Spell(devastate)
 }
 
-AddFunction ProtectionGladiatorMovementActions
+AddFunction ProtectionGladiatorAoeShortCdActions
+{
+	unless Spell(revenge) or Spell(shield_slam)
+	{
+		#dragon_roar,if=(buff.bloodbath.up|cooldown.bloodbath.remains>10)|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) Spell(dragon_roar)
+		#storm_bolt,if=(buff.bloodbath.up|cooldown.bloodbath.remains>7)|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 7 or not Talent(bloodbath_talent) Spell(storm_bolt)
+
+		unless target.DebuffRemaining(deep_wounds_debuff) < 3 and Enemies() > 4 and Spell(thunder_clap)
+		{
+			#bladestorm,if=buff.shield_charge.down
+			if BuffExpires(shield_charge_buff) Spell(bladestorm)
+		}
+	}
+}
+
+### actions.movement
+
+AddFunction ProtectionGladiatorMovementMainActions
+{
+	#heroic_throw
+	Spell(heroic_throw)
+}
+
+AddFunction ProtectionGladiatorMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
@@ -108,22 +146,31 @@ AddFunction ProtectionGladiatorMovementActions
 	Spell(shield_charge)
 	#storm_bolt
 	Spell(storm_bolt)
-	#heroic_throw
-	Spell(heroic_throw)
 }
 
-AddFunction ProtectionGladiatorPrecombatActions
+### actions.precombat
+
+AddFunction ProtectionGladiatorPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
 	#stance,choose=gladiator
 	Spell(gladiator_stance)
-	#snapshot_stats
-	#potion,name=draenic_armor
-	UsePotionArmor()
 }
 
-AddFunction ProtectionGladiatorSingleActions
+AddFunction ProtectionGladiatorPrecombatCdActions
+{
+	unless Spell(gladiator_stance)
+	{
+		#snapshot_stats
+		#potion,name=draenic_armor
+		UsePotionArmor()
+	}
+}
+
+### actions.single
+
+AddFunction ProtectionGladiatorSingleMainActions
 {
 	#devastate,if=buff.unyielding_strikes.stack>0&buff.unyielding_strikes.stack<6&buff.unyielding_strikes.remains<1.5
 	if BuffStacks(unyielding_strikes_buff) > 0 and BuffStacks(unyielding_strikes_buff) < 6 and BuffRemaining(unyielding_strikes_buff) < 1.5 Spell(devastate)
@@ -133,26 +180,58 @@ AddFunction ProtectionGladiatorSingleActions
 	Spell(revenge)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#storm_bolt
-	Spell(storm_bolt)
-	#dragon_roar
-	Spell(dragon_roar)
 	#execute,if=rage>60&target.health.pct<20
 	if Rage() > 60 and target.HealthPercent() < 20 Spell(execute)
 	#devastate
 	Spell(devastate)
 }
 
-AddIcon specialization=protection help=main enemies=1
+AddFunction ProtectionGladiatorSingleShortCdActions
 {
-	if not InCombat() ProtectionGladiatorPrecombatActions()
-	ProtectionGladiatorDefaultActions()
+	unless BuffStacks(unyielding_strikes_buff) > 0 and BuffStacks(unyielding_strikes_buff) < 6 and BuffRemaining(unyielding_strikes_buff) < 1.5 and Spell(devastate) or Spell(shield_slam) or Spell(revenge) or BuffPresent(sudden_death_buff) and Spell(execute)
+	{
+		#storm_bolt
+		Spell(storm_bolt)
+		#dragon_roar
+		Spell(dragon_roar)
+	}
 }
 
-AddIcon specialization=protection help=aoe
+### Protection icons.
+AddCheckBox(opt_warrior_protection_aoe L(AOE) specialization=protection default)
+
+AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_warrior_protection_aoe
 {
-	if not InCombat() ProtectionGladiatorPrecombatActions()
-	ProtectionGladiatorDefaultActions()
+	ProtectionGladiatorDefaultShortCdActions()
+}
+
+AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection_aoe
+{
+	ProtectionGladiatorDefaultShortCdActions()
+}
+
+AddIcon specialization=protection help=main enemies=1
+{
+	if not InCombat() ProtectionGladiatorPrecombatMainActions()
+	ProtectionGladiatorDefaultMainActions()
+}
+
+AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection_aoe
+{
+	if not InCombat() ProtectionGladiatorPrecombatMainActions()
+	ProtectionGladiatorDefaultMainActions()
+}
+
+AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_warrior_protection_aoe
+{
+	if not InCombat() ProtectionGladiatorPrecombatCdActions()
+	ProtectionGladiatorDefaultCdActions()
+}
+
+AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
+{
+	if not InCombat() ProtectionGladiatorPrecombatCdActions()
+	ProtectionGladiatorDefaultCdActions()
 }
 
 ### Required symbols

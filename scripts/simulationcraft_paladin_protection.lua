@@ -38,45 +38,14 @@ AddFunction ProtectionTimeToHPG
 	if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
 }
 
-AddFunction ProtectionDefaultActions
+### actions.default
+
+AddFunction ProtectionDefaultMainActions
 {
-	#auto_attack
-	#speed_of_light,if=movement.remains>1
-	if 0 > 1 Spell(speed_of_light)
-	#blood_fury
-	Spell(blood_fury_apsp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_holy)
 	#run_action_list,name=max_dps,if=role.attack|0
-	if False(role_attack) or 0 ProtectionMaxDpsActions()
+	if False(role_attack) or 0 ProtectionMaxDpsMainActions()
 	#run_action_list,name=max_survival,if=0
-	if 0 ProtectionMaxSurvivalActions()
-	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
-	#holy_avenger
-	Spell(holy_avenger)
-	#seraphim
-	Spell(seraphim)
-	#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
-	if TimeInCombat() < 5 or not Talent(seraphim_talent) or BuffExpires(seraphim_buff) and SpellCooldown(seraphim) > 5 and SpellCooldown(seraphim) < 9 Spell(divine_protection)
-	#guardian_of_ancient_kings,if=time<5|(buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down)
-	if TimeInCombat() < 5 or BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) Spell(guardian_of_ancient_kings)
-	#ardent_defender,if=time<5|(buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down)
-	if TimeInCombat() < 5 or BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) Spell(ardent_defender)
-	#eternal_flame,if=buff.eternal_flame.remains<2&buff.bastion_of_glory.react>2&(holy_power>=3|buff.divine_purpose.react|buff.bastion_of_power.react)
-	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
-	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
-	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
-	#harsh_word,if=glyph.harsh_words.enabled&holy_power>=3
-	if Glyph(glyph_of_harsh_words) and HolyPower() >= 3 Spell(harsh_word)
-	#shield_of_the_righteous,if=buff.divine_purpose.react
-	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
-	if { HolyPower() >= 5 or IncomingDamage(1.5) >= MaxHealth() * 0.3 } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 5 } Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=buff.holy_avenger.remains>time_to_hpg&(!talent.seraphim.enabled|cooldown.seraphim.remains>time_to_hpg)
-	if BuffRemaining(holy_avenger_buff) > ProtectionTimeToHPG() and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > ProtectionTimeToHPG() } Spell(shield_of_the_righteous)
+	if 0 ProtectionMaxSurvivalMainActions()
 	#seal_of_insight,if=talent.empowered_seals.enabled&!seal.insight&buff.uthers_insight.remains<cooldown.judgment.remains
 	if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_insight) and BuffRemaining(uthers_insight_buff) < SpellCooldown(judgment) Spell(seal_of_insight)
 	#seal_of_righteousness,if=talent.empowered_seals.enabled&!seal.righteousness&buff.uthers_insight.remains>cooldown.judgment.remains&buff.liadrins_righteousness.down
@@ -111,20 +80,12 @@ AddFunction ProtectionDefaultActions
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
 			#avengers_shield
 			Spell(avengers_shield)
-			#lights_hammer,if=!talent.seraphim.enabled|buff.seraphim.remains>10|cooldown.seraphim.remains<6
-			if not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) > 10 or SpellCooldown(seraphim) < 6 Spell(lights_hammer)
 			#holy_prism,if=!talent.seraphim.enabled|buff.seraphim.up|cooldown.seraphim.remains>5|time<5
 			if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or SpellCooldown(seraphim) > 5 or TimeInCombat() < 5 Spell(holy_prism)
-			#consecration,if=target.debuff.flying.down&active_enemies>=3
-			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
-			#execution_sentence,if=!talent.seraphim.enabled|buff.seraphim.up|time<12
-			if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or TimeInCombat() < 12 Spell(execution_sentence)
 			#hammer_of_wrath
 			Spell(hammer_of_wrath)
 			#sacred_shield,if=target.dot.sacred_shield.remains<8
 			if BuffPresent(sacred_shield_buff) < 8 Spell(sacred_shield)
-			#consecration,if=target.debuff.flying.down
-			if target.True(debuff_flying_down) Spell(consecration)
 			#holy_wrath
 			Spell(holy_wrath)
 			#seal_of_insight,if=talent.empowered_seals.enabled&!seal.insight&buff.uthers_insight.remains<=buff.liadrins_righteousness.remains&buff.uthers_insight.remains<=buff.maraads_truth.remains
@@ -141,20 +102,93 @@ AddFunction ProtectionDefaultActions
 	}
 }
 
-AddFunction ProtectionMaxDpsActions
+AddFunction ProtectionDefaultShortCdActions
 {
-	#potion,name=draenic_armor,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionArmor()
-	#holy_avenger
-	Spell(holy_avenger)
+	#auto_attack
+	#speed_of_light,if=movement.remains>1
+	if 0 > 1 Spell(speed_of_light)
+	#run_action_list,name=max_dps,if=role.attack|0
+	if False(role_attack) or 0 ProtectionMaxDpsShortCdActions()
+	#run_action_list,name=max_survival,if=0
+	if 0 ProtectionMaxSurvivalShortCdActions()
 	#seraphim
 	Spell(seraphim)
+	#eternal_flame,if=buff.eternal_flame.remains<2&buff.bastion_of_glory.react>2&(holy_power>=3|buff.divine_purpose.react|buff.bastion_of_power.react)
+	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
+	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
+	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
+	#harsh_word,if=glyph.harsh_words.enabled&holy_power>=3
+	if Glyph(glyph_of_harsh_words) and HolyPower() >= 3 Spell(harsh_word)
 	#shield_of_the_righteous,if=buff.divine_purpose.react
 	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(holy_power>=5|talent.holy_avenger.enabled)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
-	if { HolyPower() >= 5 or Talent(holy_avenger_talent) } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 5 } Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
+	if { HolyPower() >= 5 or IncomingDamage(1.5) >= MaxHealth() * 0.3 } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 5 } Spell(shield_of_the_righteous)
 	#shield_of_the_righteous,if=buff.holy_avenger.remains>time_to_hpg&(!talent.seraphim.enabled|cooldown.seraphim.remains>time_to_hpg)
 	if BuffRemaining(holy_avenger_buff) > ProtectionTimeToHPG() and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > ProtectionTimeToHPG() } Spell(shield_of_the_righteous)
+
+	unless Talent(empowered_seals_talent) and not Stance(paladin_seal_of_insight) and BuffRemaining(uthers_insight_buff) < SpellCooldown(judgment) and Spell(seal_of_insight) or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(uthers_insight_buff) > SpellCooldown(judgment) and BuffExpires(liadrins_righteousness_buff) and Spell(seal_of_righteousness) or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(uthers_insight_buff) > SpellCooldown(judgment) and BuffRemaining(liadrins_righteousness_buff) > SpellCooldown(judgment) and BuffExpires(maraads_truth_buff) and Spell(seal_of_truth) or BuffPresent(grand_crusader_buff) and Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield) or Enemies() >= 3 and Spell(hammer_of_the_righteous) or Spell(crusader_strike)
+	{
+		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
+		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
+		{
+			unless Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) and Spell(judgment) or Spell(judgment)
+			{
+				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
+				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
+				{
+					unless Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or BuffPresent(sacred_shield_buff) < 2 and Spell(sacred_shield) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath) or Spell(avengers_shield)
+					{
+						#lights_hammer,if=!talent.seraphim.enabled|buff.seraphim.remains>10|cooldown.seraphim.remains<6
+						if not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) > 10 or SpellCooldown(seraphim) < 6 Spell(lights_hammer)
+
+						unless { not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or SpellCooldown(seraphim) > 5 or TimeInCombat() < 5 } and Spell(holy_prism)
+						{
+							#consecration,if=target.debuff.flying.down&active_enemies>=3
+							if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
+							#execution_sentence,if=!talent.seraphim.enabled|buff.seraphim.up|time<12
+							if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or TimeInCombat() < 12 Spell(execution_sentence)
+
+							unless Spell(hammer_of_wrath) or BuffPresent(sacred_shield_buff) < 8 and Spell(sacred_shield)
+							{
+								#consecration,if=target.debuff.flying.down
+								if target.True(debuff_flying_down) Spell(consecration)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+AddFunction ProtectionDefaultCdActions
+{
+	#blood_fury
+	Spell(blood_fury_apsp)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_holy)
+	#run_action_list,name=max_dps,if=role.attack|0
+	if False(role_attack) or 0 ProtectionMaxDpsCdActions()
+	#run_action_list,name=max_survival,if=0
+	if 0 ProtectionMaxSurvivalCdActions()
+	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
+	#holy_avenger
+	Spell(holy_avenger)
+	#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
+	if TimeInCombat() < 5 or not Talent(seraphim_talent) or BuffExpires(seraphim_buff) and SpellCooldown(seraphim) > 5 and SpellCooldown(seraphim) < 9 Spell(divine_protection)
+	#guardian_of_ancient_kings,if=time<5|(buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down)
+	if TimeInCombat() < 5 or BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) Spell(guardian_of_ancient_kings)
+	#ardent_defender,if=time<5|(buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down)
+	if TimeInCombat() < 5 or BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) Spell(ardent_defender)
+}
+
+### actions.max_dps
+
+AddFunction ProtectionMaxDpsMainActions
+{
 	#avengers_shield,if=buff.grand_crusader.react&active_enemies>1&!glyph.focused_shield.enabled
 	if BuffPresent(grand_crusader_buff) and Enemies() > 1 and not Glyph(glyph_of_focused_shield) Spell(avengers_shield)
 	#holy_wrath,if=talent.sanctified_wrath.enabled&(buff.seraphim.react|(glyph.final_wrath.enabled&target.health.pct<=20))
@@ -181,8 +215,6 @@ AddFunction ProtectionMaxDpsActions
 			if Talent(sanctified_wrath_talent) Spell(holy_wrath)
 			#avengers_shield,if=buff.grand_crusader.react
 			if BuffPresent(grand_crusader_buff) Spell(avengers_shield)
-			#execution_sentence,if=active_enemies<3
-			if Enemies() < 3 Spell(execution_sentence)
 			#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
 			#avengers_shield
@@ -191,18 +223,10 @@ AddFunction ProtectionMaxDpsActions
 			if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < SpellCooldown(judgment) Spell(seal_of_truth)
 			#seal_of_righteousness,if=talent.empowered_seals.enabled&!seal.righteousness&buff.maraads_truth.remains>cooldown.judgment.remains&buff.liadrins_righteousness.down
 			if Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(maraads_truth_buff) > SpellCooldown(judgment) and BuffExpires(liadrins_righteousness_buff) Spell(seal_of_righteousness)
-			#lights_hammer
-			Spell(lights_hammer)
 			#holy_prism
 			Spell(holy_prism)
-			#consecration,if=target.debuff.flying.down&active_enemies>=3
-			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
-			#execution_sentence
-			Spell(execution_sentence)
 			#hammer_of_wrath
 			Spell(hammer_of_wrath)
-			#consecration,if=target.debuff.flying.down
-			if target.True(debuff_flying_down) Spell(consecration)
 			#holy_wrath
 			Spell(holy_wrath)
 			#seal_of_truth,if=talent.empowered_seals.enabled&!seal.truth&buff.maraads_truth.remains<buff.liadrins_righteousness.remains
@@ -217,30 +241,70 @@ AddFunction ProtectionMaxDpsActions
 	}
 }
 
-AddFunction ProtectionMaxSurvivalActions
+AddFunction ProtectionMaxDpsShortCdActions
 {
-	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
-	#holy_avenger
-	Spell(holy_avenger)
-	#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
-	if TimeInCombat() < 5 or not Talent(seraphim_talent) or BuffExpires(seraphim_buff) and SpellCooldown(seraphim) > 5 and SpellCooldown(seraphim) < 9 Spell(divine_protection)
-	#seraphim,if=buff.divine_protection.down&cooldown.divine_protection.remains>0
-	if BuffExpires(divine_protection_buff) and SpellCooldown(divine_protection) > 0 Spell(seraphim)
-	#guardian_of_ancient_kings,if=buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down
-	if BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) Spell(guardian_of_ancient_kings)
-	#ardent_defender,if=buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down
-	if BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) Spell(ardent_defender)
-	#eternal_flame,if=buff.eternal_flame.remains<2&buff.bastion_of_glory.react>2&(holy_power>=3|buff.divine_purpose.react|buff.bastion_of_power.react)
-	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
-	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
-	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
+	#seraphim
+	Spell(seraphim)
 	#shield_of_the_righteous,if=buff.divine_purpose.react
 	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
-	if { HolyPower() >= 5 or IncomingDamage(1.5) >= MaxHealth() * 0.3 } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 5 } Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(holy_power>=5|talent.holy_avenger.enabled)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
+	if { HolyPower() >= 5 or Talent(holy_avenger_talent) } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 5 } Spell(shield_of_the_righteous)
 	#shield_of_the_righteous,if=buff.holy_avenger.remains>time_to_hpg&(!talent.seraphim.enabled|cooldown.seraphim.remains>time_to_hpg)
 	if BuffRemaining(holy_avenger_buff) > ProtectionTimeToHPG() and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > ProtectionTimeToHPG() } Spell(shield_of_the_righteous)
+
+	unless BuffPresent(grand_crusader_buff) and Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and { BuffPresent(seraphim_buff) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 } and Spell(holy_wrath) or Enemies() >= 3 and Spell(hammer_of_the_righteous) or Talent(empowered_seals_talent) and { BuffExpires(maraads_truth_buff) or BuffExpires(liadrins_righteousness_buff) } and Spell(judgment) or Spell(crusader_strike)
+	{
+		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
+		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
+		{
+			unless Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) and Spell(judgment) or Spell(judgment)
+			{
+				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
+				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
+				{
+					unless Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield)
+					{
+						#execution_sentence,if=active_enemies<3
+						if Enemies() < 3 Spell(execution_sentence)
+
+						unless Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath) or Spell(avengers_shield) or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_truth) and BuffRemaining(maraads_truth_buff) < SpellCooldown(judgment) and Spell(seal_of_truth) or Talent(empowered_seals_talent) and not Stance(paladin_seal_of_righteousness) and BuffRemaining(maraads_truth_buff) > SpellCooldown(judgment) and BuffExpires(liadrins_righteousness_buff) and Spell(seal_of_righteousness)
+						{
+							#lights_hammer
+							Spell(lights_hammer)
+
+							unless Spell(holy_prism)
+							{
+								#consecration,if=target.debuff.flying.down&active_enemies>=3
+								if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
+								#execution_sentence
+								Spell(execution_sentence)
+
+								unless Spell(hammer_of_wrath)
+								{
+									#consecration,if=target.debuff.flying.down
+									if target.True(debuff_flying_down) Spell(consecration)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+AddFunction ProtectionMaxDpsCdActions
+{
+	#potion,name=draenic_armor,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
+	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionArmor()
+	#holy_avenger
+	Spell(holy_avenger)
+}
+
+### actions.max_survival
+
+AddFunction ProtectionMaxSurvivalMainActions
+{
 	#hammer_of_the_righteous,if=active_enemies>=3
 	if Enemies() >= 3 Spell(hammer_of_the_righteous)
 	#crusader_strike
@@ -265,14 +329,8 @@ AddFunction ProtectionMaxSurvivalActions
 			if BuffPresent(sacred_shield_buff) < 2 Spell(sacred_shield)
 			#avengers_shield
 			Spell(avengers_shield)
-			#lights_hammer
-			Spell(lights_hammer)
 			#holy_prism
 			Spell(holy_prism)
-			#consecration,if=target.debuff.flying.down&active_enemies>=3
-			if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
-			#execution_sentence
-			Spell(execution_sentence)
 			#flash_of_light,if=talent.selfless_healer.enabled&buff.selfless_healer.stack>=3
 			if Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) >= 3 Spell(flash_of_light)
 			#hammer_of_wrath
@@ -281,8 +339,6 @@ AddFunction ProtectionMaxSurvivalActions
 			if BuffPresent(sacred_shield_buff) < 8 Spell(sacred_shield)
 			#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
-			#consecration,if=target.debuff.flying.down&!ticking
-			if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff) Spell(consecration)
 			#holy_wrath
 			Spell(holy_wrath)
 			#sacred_shield
@@ -291,7 +347,73 @@ AddFunction ProtectionMaxSurvivalActions
 	}
 }
 
-AddFunction ProtectionPrecombatActions
+AddFunction ProtectionMaxSurvivalShortCdActions
+{
+	#seraphim,if=buff.divine_protection.down&cooldown.divine_protection.remains>0
+	if BuffExpires(divine_protection_buff) and SpellCooldown(divine_protection) > 0 Spell(seraphim)
+	#eternal_flame,if=buff.eternal_flame.remains<2&buff.bastion_of_glory.react>2&(holy_power>=3|buff.divine_purpose.react|buff.bastion_of_power.react)
+	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
+	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
+	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
+	#shield_of_the_righteous,if=buff.divine_purpose.react
+	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
+	if { HolyPower() >= 5 or IncomingDamage(1.5) >= MaxHealth() * 0.3 } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 5 } Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=buff.holy_avenger.remains>time_to_hpg&(!talent.seraphim.enabled|cooldown.seraphim.remains>time_to_hpg)
+	if BuffRemaining(holy_avenger_buff) > ProtectionTimeToHPG() and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > ProtectionTimeToHPG() } Spell(shield_of_the_righteous)
+
+	unless Enemies() >= 3 and Spell(hammer_of_the_righteous) or Spell(crusader_strike)
+	{
+		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
+		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
+		{
+			unless Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) and Spell(judgment) or Spell(judgment)
+			{
+				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
+				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
+				{
+					unless BuffPresent(grand_crusader_buff) and Enemies() > 1 and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or BuffPresent(sacred_shield_buff) < 2 and Spell(sacred_shield) or Spell(avengers_shield)
+					{
+						#lights_hammer
+						Spell(lights_hammer)
+
+						unless Spell(holy_prism)
+						{
+							#consecration,if=target.debuff.flying.down&active_enemies>=3
+							if target.True(debuff_flying_down) and Enemies() >= 3 Spell(consecration)
+							#execution_sentence
+							Spell(execution_sentence)
+
+							unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) >= 3 and Spell(flash_of_light) or Spell(hammer_of_wrath) or BuffPresent(sacred_shield_buff) < 8 and Spell(sacred_shield) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath)
+							{
+								#consecration,if=target.debuff.flying.down&!ticking
+								if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff) Spell(consecration)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+AddFunction ProtectionMaxSurvivalCdActions
+{
+	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
+	#holy_avenger
+	Spell(holy_avenger)
+	#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
+	if TimeInCombat() < 5 or not Talent(seraphim_talent) or BuffExpires(seraphim_buff) and SpellCooldown(seraphim) > 5 and SpellCooldown(seraphim) < 9 Spell(divine_protection)
+	#guardian_of_ancient_kings,if=buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down
+	if BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) Spell(guardian_of_ancient_kings)
+	#ardent_defender,if=buff.holy_avenger.down&buff.shield_of_the_righteous.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down
+	if BuffExpires(holy_avenger_buff) and BuffExpires(shield_of_the_righteous_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) Spell(ardent_defender)
+}
+
+### actions.precombat
+
+AddFunction ProtectionPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
 	#food,type=talador_surf_and_turf
@@ -303,21 +425,53 @@ AddFunction ProtectionPrecombatActions
 	Spell(seal_of_insight)
 	#sacred_shield
 	Spell(sacred_shield)
-	#snapshot_stats
-	#potion,name=draenic_armor
-	UsePotionArmor()
+}
+
+AddFunction ProtectionPrecombatCdActions
+{
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	{
+		#snapshot_stats
+		#potion,name=draenic_armor
+		UsePotionArmor()
+	}
+}
+
+### Protection icons.
+AddCheckBox(opt_paladin_protection_aoe L(AOE) specialization=protection default)
+
+AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_paladin_protection_aoe
+{
+	ProtectionDefaultShortCdActions()
+}
+
+AddIcon specialization=protection help=shortcd checkbox=opt_paladin_protection_aoe
+{
+	ProtectionDefaultShortCdActions()
 }
 
 AddIcon specialization=protection help=main enemies=1
 {
-	if not InCombat() ProtectionPrecombatActions()
-	ProtectionDefaultActions()
+	if not InCombat() ProtectionPrecombatMainActions()
+	ProtectionDefaultMainActions()
 }
 
-AddIcon specialization=protection help=aoe
+AddIcon specialization=protection help=aoe checkbox=opt_paladin_protection_aoe
 {
-	if not InCombat() ProtectionPrecombatActions()
-	ProtectionDefaultActions()
+	if not InCombat() ProtectionPrecombatMainActions()
+	ProtectionDefaultMainActions()
+}
+
+AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_paladin_protection_aoe
+{
+	if not InCombat() ProtectionPrecombatCdActions()
+	ProtectionDefaultCdActions()
+}
+
+AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
+{
+	if not InCombat() ProtectionPrecombatCdActions()
+	ProtectionDefaultCdActions()
 }
 
 ### Required symbols

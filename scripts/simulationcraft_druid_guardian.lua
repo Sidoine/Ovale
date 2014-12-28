@@ -44,49 +44,20 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction GuardianDefaultActions
+### actions.default
+
+AddFunction GuardianDefaultMainActions
 {
-	#auto_attack
-	#skull_bash
-	InterruptActions()
-	#savage_defense,if=buff.barkskin.down
-	if BuffExpires(barkskin_buff) Spell(savage_defense)
-	#blood_fury
-	Spell(blood_fury_apsp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_energy)
-	#use_item,slot=trinket2
-	UseItemActions()
-	#barkskin,if=buff.bristling_fur.down
-	if BuffExpires(bristling_fur_buff) Spell(barkskin)
-	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
-	if BuffExpires(barkskin_buff) and BuffExpires(savage_defense_buff) Spell(bristling_fur)
-	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
-	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) > 0 Spell(maul)
-	#berserk,if=buff.pulverize.remains>10
-	if BuffRemaining(pulverize_buff) > 10 Spell(berserk_bear)
-	#frenzied_regeneration,if=rage>=80
-	if Rage() >= 80 Spell(frenzied_regeneration)
 	#cenarion_ward
 	Spell(cenarion_ward)
-	#renewal,if=health.pct<30
-	if HealthPercent() < 30 Spell(renewal)
-	#heart_of_the_wild
-	Spell(heart_of_the_wild_tank)
 	#rejuvenation,if=buff.heart_of_the_wild.up&remains<=3.6
 	if BuffPresent(heart_of_the_wild_tank_buff) and BuffRemaining(rejuvenation_buff) <= 3.6 and SpellKnown(enhanced_rejuvenation) Spell(rejuvenation)
-	#natures_vigil
-	Spell(natures_vigil)
 	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<30
 	if BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 Spell(healing_touch)
 	#pulverize,if=buff.pulverize.remains<=3.6
 	if BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffStacks(lacerate_debuff) >= 3 Spell(pulverize)
 	#lacerate,if=talent.pulverize.enabled&buff.pulverize.remains<=(3-dot.lacerate.stack)*gcd&buff.berserk.down
 	if Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) Spell(lacerate)
-	#incarnation
-	Spell(incarnation_tank)
 	#lacerate,if=!ticking
 	if not target.DebuffPresent(lacerate_debuff) Spell(lacerate)
 	#thrash_bear,if=!ticking
@@ -99,7 +70,60 @@ AddFunction GuardianDefaultActions
 	Spell(lacerate)
 }
 
-AddFunction GuardianPrecombatActions
+AddFunction GuardianDefaultShortCdActions
+{
+	#savage_defense,if=buff.barkskin.down
+	if BuffExpires(barkskin_buff) Spell(savage_defense)
+	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
+	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) > 0 Spell(maul)
+	#frenzied_regeneration,if=rage>=80
+	if Rage() >= 80 Spell(frenzied_regeneration)
+}
+
+AddFunction GuardianDefaultCdActions
+{
+	#auto_attack
+	#skull_bash
+	InterruptActions()
+	#blood_fury
+	Spell(blood_fury_apsp)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_energy)
+	#use_item,slot=trinket2
+	UseItemActions()
+	#barkskin,if=buff.bristling_fur.down
+	if BuffExpires(bristling_fur_buff) Spell(barkskin)
+	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
+	if BuffExpires(barkskin_buff) and BuffExpires(savage_defense_buff) Spell(bristling_fur)
+	#berserk,if=buff.pulverize.remains>10
+	if BuffRemaining(pulverize_buff) > 10 Spell(berserk_bear)
+
+	unless Spell(cenarion_ward)
+	{
+		#renewal,if=health.pct<30
+		if HealthPercent() < 30 Spell(renewal)
+		#heart_of_the_wild
+		Spell(heart_of_the_wild_tank)
+
+		unless BuffPresent(heart_of_the_wild_tank_buff) and BuffRemaining(rejuvenation_buff) <= 3.6 and SpellKnown(enhanced_rejuvenation) and Spell(rejuvenation)
+		{
+			#natures_vigil
+			Spell(natures_vigil)
+
+			unless BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 and Spell(healing_touch) or BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffStacks(lacerate_debuff) >= 3 and Spell(pulverize) or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) and Spell(lacerate)
+			{
+				#incarnation
+				Spell(incarnation_tank)
+			}
+		}
+	}
+}
+
+### actions.precombat
+
+AddFunction GuardianPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
 	#food,type=sleeper_surprise
@@ -112,16 +136,39 @@ AddFunction GuardianPrecombatActions
 	Spell(cenarion_ward)
 }
 
-AddIcon specialization=guardian help=main enemies=1
+### Guardian icons.
+AddCheckBox(opt_druid_guardian_aoe L(AOE) specialization=guardian default)
+
+AddIcon specialization=guardian help=shortcd enemies=1 checkbox=!opt_druid_guardian_aoe
 {
-	if not InCombat() GuardianPrecombatActions()
-	GuardianDefaultActions()
+	GuardianDefaultShortCdActions()
 }
 
-AddIcon specialization=guardian help=aoe
+AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian_aoe
 {
-	if not InCombat() GuardianPrecombatActions()
-	GuardianDefaultActions()
+	GuardianDefaultShortCdActions()
+}
+
+AddIcon specialization=guardian help=main enemies=1
+{
+	if not InCombat() GuardianPrecombatMainActions()
+	GuardianDefaultMainActions()
+}
+
+AddIcon specialization=guardian help=aoe checkbox=opt_druid_guardian_aoe
+{
+	if not InCombat() GuardianPrecombatMainActions()
+	GuardianDefaultMainActions()
+}
+
+AddIcon specialization=guardian help=cd enemies=1 checkbox=!opt_druid_guardian_aoe
+{
+	GuardianDefaultCdActions()
+}
+
+AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
+{
+	GuardianDefaultCdActions()
 }
 
 ### Required symbols
@@ -166,6 +213,7 @@ AddIcon specialization=guardian help=aoe
 # tooth_and_claw_buff
 # typhoon
 # war_stomp
+# wild_charge
 # wild_charge_bear
 # wild_charge_cat
 ]]

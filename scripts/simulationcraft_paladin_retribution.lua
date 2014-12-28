@@ -56,52 +56,72 @@ AddFunction RighteousFuryOff
 	if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
 }
 
-AddFunction RetributionDefaultActions
+### actions.default
+
+AddFunction RetributionDefaultMainActions
+{
+	#judgment,if=talent.empowered_seals.enabled&time<2
+	if Talent(empowered_seals_talent) and TimeInCombat() < 2 Spell(judgment)
+	#wait,sec=cooldown.seraphim.remains,if=talent.seraphim.enabled&cooldown.seraphim.remains>0&cooldown.seraphim.remains<gcd.max&holy_power>=5
+	unless Talent(seraphim_talent) and SpellCooldown(seraphim) > 0 and SpellCooldown(seraphim) < GCD() and HolyPower() >= 5 and SpellCooldown(seraphim) > 0
+	{
+		#call_action_list,name=aoe,if=active_enemies>=5
+		if Enemies() >= 5 RetributionAoeMainActions()
+		#call_action_list,name=cleave,if=active_enemies>=3
+		if Enemies() >= 3 RetributionCleaveMainActions()
+		#call_action_list,name=single
+		RetributionSingleMainActions()
+	}
+}
+
+AddFunction RetributionDefaultShortCdActions
+{
+	#auto_attack
+	#speed_of_light,if=movement.distance>5
+	if 0 > 5 Spell(speed_of_light)
+
+	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment)
+	{
+		#execution_sentence
+		Spell(execution_sentence)
+		#lights_hammer
+		Spell(lights_hammer)
+		#seraphim
+		Spell(seraphim)
+	}
+}
+
+AddFunction RetributionDefaultCdActions
 {
 	#rebuke
 	InterruptActions()
 	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 UsePotionStrength()
-	#auto_attack
-	#speed_of_light,if=movement.distance>5
-	if 0 > 5 Spell(speed_of_light)
-	#judgment,if=talent.empowered_seals.enabled&time<2
-	if Talent(empowered_seals_talent) and TimeInCombat() < 2 Spell(judgment)
-	#execution_sentence
-	Spell(execution_sentence)
-	#lights_hammer
-	Spell(lights_hammer)
-	#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
-	if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
-	#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
-	if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(holy_avenger)
-	#holy_avenger,if=holy_power<=2&!talent.seraphim.enabled
-	if HolyPower() <= 2 and not Talent(seraphim_talent) Spell(holy_avenger)
-	#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
-	if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(avenging_wrath_melee)
-	#avenging_wrath,if=!talent.seraphim.enabled
-	if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
-	#blood_fury
-	Spell(blood_fury_apsp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_holy)
-	#seraphim
-	Spell(seraphim)
-	#wait,sec=cooldown.seraphim.remains,if=talent.seraphim.enabled&cooldown.seraphim.remains>0&cooldown.seraphim.remains<gcd.max&holy_power>=5
-	unless Talent(seraphim_talent) and SpellCooldown(seraphim) > 0 and SpellCooldown(seraphim) < GCD() and HolyPower() >= 5 and SpellCooldown(seraphim) > 0
+
+	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or Spell(execution_sentence) or Spell(lights_hammer)
 	{
-		#call_action_list,name=aoe,if=active_enemies>=5
-		if Enemies() >= 5 RetributionAoeActions()
-		#call_action_list,name=cleave,if=active_enemies>=3
-		if Enemies() >= 3 RetributionCleaveActions()
-		#call_action_list,name=single
-		RetributionSingleActions()
+		#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
+		if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
+		#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
+		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(holy_avenger)
+		#holy_avenger,if=holy_power<=2&!talent.seraphim.enabled
+		if HolyPower() <= 2 and not Talent(seraphim_talent) Spell(holy_avenger)
+		#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
+		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(avenging_wrath_melee)
+		#avenging_wrath,if=!talent.seraphim.enabled
+		if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
+		#blood_fury
+		Spell(blood_fury_apsp)
+		#berserking
+		Spell(berserking)
+		#arcane_torrent
+		Spell(arcane_torrent_holy)
 	}
 }
 
-AddFunction RetributionAoeActions
+### actions.aoe
+
+AddFunction RetributionAoeMainActions
 {
 	#divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>4)
 	if HolyPower() == 5 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > 4 } Spell(divine_storm)
@@ -127,7 +147,9 @@ AddFunction RetributionAoeActions
 	Spell(exorcism)
 }
 
-AddFunction RetributionCleaveActions
+### actions.cleave
+
+AddFunction RetributionCleaveMainActions
 {
 	#final_verdict,if=buff.final_verdict.down&holy_power=5
 	if BuffExpires(final_verdict_buff) and HolyPower() == 5 Spell(final_verdict)
@@ -163,7 +185,9 @@ AddFunction RetributionCleaveActions
 	Spell(exorcism)
 }
 
-AddFunction RetributionPrecombatActions
+### actions.precombat
+
+AddFunction RetributionPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=sleeper_surprise
@@ -175,12 +199,21 @@ AddFunction RetributionPrecombatActions
 	if Enemies() < 2 Spell(seal_of_truth)
 	#seal_of_righteousness,if=active_enemies>=2
 	if Enemies() >= 2 Spell(seal_of_righteousness)
-	#snapshot_stats
-	#potion,name=draenic_strength
-	UsePotionStrength()
 }
 
-AddFunction RetributionSingleActions
+AddFunction RetributionPrecombatCdActions
+{
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	{
+		#snapshot_stats
+		#potion,name=draenic_strength
+		UsePotionStrength()
+	}
+}
+
+### actions.single
+
+AddFunction RetributionSingleMainActions
 {
 	#divine_storm,if=buff.divine_crusader.react&holy_power=5&buff.final_verdict.up
 	if BuffPresent(divine_crusader_buff) and HolyPower() == 5 and BuffPresent(final_verdict_buff) Spell(divine_storm)
@@ -256,16 +289,41 @@ AddFunction RetributionSingleActions
 	Spell(holy_prism)
 }
 
-AddIcon specialization=retribution help=main enemies=1
+### Retribution icons.
+AddCheckBox(opt_paladin_retribution_aoe L(AOE) specialization=retribution default)
+
+AddIcon specialization=retribution help=shortcd enemies=1 checkbox=!opt_paladin_retribution_aoe
 {
-	if not InCombat() RetributionPrecombatActions()
-	RetributionDefaultActions()
+	RetributionDefaultShortCdActions()
 }
 
-AddIcon specialization=retribution help=aoe
+AddIcon specialization=retribution help=shortcd checkbox=opt_paladin_retribution_aoe
 {
-	if not InCombat() RetributionPrecombatActions()
-	RetributionDefaultActions()
+	RetributionDefaultShortCdActions()
+}
+
+AddIcon specialization=retribution help=main enemies=1
+{
+	if not InCombat() RetributionPrecombatMainActions()
+	RetributionDefaultMainActions()
+}
+
+AddIcon specialization=retribution help=aoe checkbox=opt_paladin_retribution_aoe
+{
+	if not InCombat() RetributionPrecombatMainActions()
+	RetributionDefaultMainActions()
+}
+
+AddIcon specialization=retribution help=cd enemies=1 checkbox=!opt_paladin_retribution_aoe
+{
+	if not InCombat() RetributionPrecombatCdActions()
+	RetributionDefaultCdActions()
+}
+
+AddIcon specialization=retribution help=cd checkbox=opt_paladin_retribution_aoe
+{
+	if not InCombat() RetributionPrecombatCdActions()
+	RetributionDefaultCdActions()
 }
 
 ### Required symbols

@@ -41,21 +41,54 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction FuryTitansGripDefaultActions
+### actions.default
+
+AddFunction FuryTitansGripDefaultMainActions
+{
+	#auto_attack
+	#call_action_list,name=movement,if=movement.distance>5
+	if 0 > 5 FuryTitansGripMovementMainActions()
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetMainActions()
+	#call_action_list,name=single_target,if=active_enemies=1
+	if Enemies() == 1 FuryTitansGripSingleTargetMainActions()
+	#call_action_list,name=two_targets,if=active_enemies=2
+	if Enemies() == 2 FuryTitansGripTwoTargetsMainActions()
+	#call_action_list,name=three_targets,if=active_enemies=3
+	if Enemies() == 3 FuryTitansGripThreeTargetsMainActions()
+	#call_action_list,name=aoe,if=active_enemies>3
+	if Enemies() > 3 FuryTitansGripAoeMainActions()
+}
+
+AddFunction FuryTitansGripDefaultShortCdActions
 {
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
-	if 0 > 5 FuryTitansGripMovementActions()
+	if 0 > 5 FuryTitansGripMovementShortCdActions()
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
+	#call_action_list,name=single_target,if=active_enemies=1
+	if Enemies() == 1 FuryTitansGripSingleTargetShortCdActions()
+	#call_action_list,name=two_targets,if=active_enemies=2
+	if Enemies() == 2 FuryTitansGripTwoTargetsShortCdActions()
+	#call_action_list,name=three_targets,if=active_enemies=3
+	if Enemies() == 3 FuryTitansGripThreeTargetsShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>3
+	if Enemies() > 3 FuryTitansGripAoeShortCdActions()
+}
+
+AddFunction FuryTitansGripDefaultCdActions
+{
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetActions()
+	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
 	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
 	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
 	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
@@ -67,120 +100,174 @@ AddFunction FuryTitansGripDefaultActions
 	#arcane_torrent,if=rage<rage.max-40
 	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FuryTitansGripSingleTargetActions()
+	if Enemies() == 1 FuryTitansGripSingleTargetCdActions()
 	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FuryTitansGripTwoTargetsActions()
+	if Enemies() == 2 FuryTitansGripTwoTargetsCdActions()
 	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FuryTitansGripThreeTargetsActions()
+	if Enemies() == 3 FuryTitansGripThreeTargetsCdActions()
 	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FuryTitansGripAoeActions()
+	if Enemies() > 3 FuryTitansGripAoeCdActions()
 }
 
-AddFunction FuryTitansGripAoeActions
+### actions.aoe
+
+AddFunction FuryTitansGripAoeMainActions
 {
-	#bloodbath
-	Spell(bloodbath)
-	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
 	#raging_blow,if=buff.meat_cleaver.stack>=3&buff.enrage.up
 	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
 	#raging_blow,if=buff.meat_cleaver.stack>=3
 	if BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) Spell(raging_blow)
-	#recklessness,sync=bladestorm
-	if not SpellCooldown(bladestorm) > 0 Spell(recklessness)
-	#bladestorm,if=buff.enrage.remains>6
-	if BuffRemaining(enrage_buff any=1) > 6 Spell(bladestorm)
 	#whirlwind
 	Spell(whirlwind)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#bloodthirst
 	Spell(bloodthirst)
 	#wild_strike,if=buff.bloodsurge.up
 	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
-AddFunction FuryTitansGripMovementActions
+AddFunction FuryTitansGripAoeShortCdActions
+{
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+
+	unless BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+	{
+		#bladestorm,if=buff.enrage.remains>6
+		if BuffRemaining(enrage_buff any=1) > 6 Spell(bladestorm)
+
+		unless Spell(whirlwind) or BuffPresent(sudden_death_buff) and Spell(execute)
+		{
+			#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+		}
+	}
+}
+
+AddFunction FuryTitansGripAoeCdActions
+{
+	#bloodbath
+	Spell(bloodbath)
+
+	unless { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
+	{
+		#recklessness,sync=bladestorm
+		if not SpellCooldown(bladestorm) > 0 Spell(recklessness)
+	}
+}
+
+### actions.movement
+
+AddFunction FuryTitansGripMovementMainActions
+{
+	#heroic_throw
+	Spell(heroic_throw)
+}
+
+AddFunction FuryTitansGripMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
-	#heroic_throw
-	Spell(heroic_throw)
 }
 
-AddFunction FuryTitansGripPrecombatActions
+### actions.precombat
+
+AddFunction FuryTitansGripPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
 	#stance,choose=battle
 	Spell(battle_stance)
-	#snapshot_stats
-	#potion,name=draenic_strength
-	UsePotionStrength()
 }
 
-AddFunction FuryTitansGripSingleTargetActions
+AddFunction FuryTitansGripPrecombatCdActions
 {
-	#bloodbath
-	Spell(bloodbath)
-	#recklessness,if=target.health.pct<20&raid_event.adds.exists
-	if target.HealthPercent() < 20 and False(raid_event_adds_exists) Spell(recklessness)
+	unless Spell(battle_stance)
+	{
+		#snapshot_stats
+		#potion,name=draenic_strength
+		UsePotionStrength()
+	}
+}
+
+### actions.single_target
+
+AddFunction FuryTitansGripSingleTargetMainActions
+{
 	#wild_strike,if=rage>110&target.health.pct>20
 	if Rage() > 110 and target.HealthPercent() > 20 Spell(wild_strike)
 	#bloodthirst,if=(!talent.unquenchable_thirst.enabled&rage<80)|buff.enrage.down
 	if not Talent(unquenchable_thirst_talent) and Rage() < 80 or BuffExpires(enrage_buff any=1) Spell(bloodthirst)
-	#ravager,if=buff.bloodbath.up|(!talent.bloodbath.enabled&(!raid_event.adds.exists|raid_event.adds.cooldown>60|target.time_to_die<40))
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and { not False(raid_event_adds_exists) or 600 > 60 or target.TimeToDie() < 40 } Spell(ravager)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#siegebreaker
-	Spell(siegebreaker)
-	#storm_bolt
-	Spell(storm_bolt)
 	#wild_strike,if=buff.bloodsurge.up
 	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 	#execute,if=buff.enrage.up|target.time_to_die<12
 	if BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 Spell(execute)
-	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#raging_blow
 	if BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#wild_strike,if=buff.enrage.up&target.health.pct>20
 	if BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 Spell(wild_strike)
-	#bladestorm,if=!raid_event.adds.exists
-	if not False(raid_event_adds_exists) Spell(bladestorm)
-	#shockwave,if=!talent.unquenchable_thirst.enabled
-	if not Talent(unquenchable_thirst_talent) Spell(shockwave)
 	#impending_victory,if=!talent.unquenchable_thirst.enabled&target.health.pct>20
 	if not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 Spell(impending_victory)
 	#bloodthirst
 	Spell(bloodthirst)
 }
 
-AddFunction FuryTitansGripThreeTargetsActions
+AddFunction FuryTitansGripSingleTargetShortCdActions
+{
+	unless Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or BuffExpires(enrage_buff any=1) } and Spell(bloodthirst)
+	{
+		#ravager,if=buff.bloodbath.up|(!talent.bloodbath.enabled&(!raid_event.adds.exists|raid_event.adds.cooldown>60|target.time_to_die<40))
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and { not False(raid_event_adds_exists) or 600 > 60 or target.TimeToDie() < 40 } Spell(ravager)
+
+		unless BuffPresent(sudden_death_buff) and Spell(execute)
+		{
+			#siegebreaker
+			Spell(siegebreaker)
+			#storm_bolt
+			Spell(storm_bolt)
+
+			unless BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { BuffPresent(enrage_buff any=1) or target.TimeToDie() < 12 } and Spell(execute)
+			{
+				#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+				if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+
+				unless BuffPresent(raging_blow_buff) and Spell(raging_blow) or BuffPresent(enrage_buff any=1) and target.HealthPercent() > 20 and Spell(wild_strike)
+				{
+					#bladestorm,if=!raid_event.adds.exists
+					if not False(raid_event_adds_exists) Spell(bladestorm)
+					#shockwave,if=!talent.unquenchable_thirst.enabled
+					if not Talent(unquenchable_thirst_talent) Spell(shockwave)
+				}
+			}
+		}
+	}
+}
+
+AddFunction FuryTitansGripSingleTargetCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
-	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
-	#bladestorm,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+	#recklessness,if=target.health.pct<20&raid_event.adds.exists
+	if target.HealthPercent() < 20 and False(raid_event_adds_exists) Spell(recklessness)
+}
+
+### actions.three_targets
+
+AddFunction FuryTitansGripThreeTargetsMainActions
+{
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
 	#raging_blow,if=buff.meat_cleaver.stack>=2
 	if BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) Spell(raging_blow)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#execute,target=2
-	#execute,target=3
-	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
 	#whirlwind
 	Spell(whirlwind)
 	#bloodthirst
@@ -189,16 +276,32 @@ AddFunction FuryTitansGripThreeTargetsActions
 	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
-AddFunction FuryTitansGripTwoTargetsActions
+AddFunction FuryTitansGripThreeTargetsShortCdActions
+{
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+
+	unless { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and BuffPresent(raging_blow_buff) and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute)
+	{
+		#execute,target=2
+		#execute,target=3
+		#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	}
+}
+
+AddFunction FuryTitansGripThreeTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
-	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
-	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
-	#bladestorm,if=buff.enrage.up
-	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
+}
+
+### actions.two_targets
+
+AddFunction FuryTitansGripTwoTargetsMainActions
+{
 	#bloodthirst,if=buff.enrage.down|rage<50|buff.raging_blow.down
 	if BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) Spell(bloodthirst)
 	#execute,target=2
@@ -218,16 +321,57 @@ AddFunction FuryTitansGripTwoTargetsActions
 	if BuffPresent(bloodsurge_buff) Spell(wild_strike)
 }
 
-AddIcon specialization=fury help=main enemies=1
+AddFunction FuryTitansGripTwoTargetsShortCdActions
 {
-	if not InCombat() FuryTitansGripPrecombatActions()
-	FuryTitansGripDefaultActions()
+	#ravager,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(ravager)
+	#dragon_roar,if=buff.bloodbath.up|!talent.bloodbath.enabled
+	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) Spell(dragon_roar)
+	#bladestorm,if=buff.enrage.up
+	if BuffPresent(enrage_buff any=1) Spell(bladestorm)
 }
 
-AddIcon specialization=fury help=aoe
+AddFunction FuryTitansGripTwoTargetsCdActions
 {
-	if not InCombat() FuryTitansGripPrecombatActions()
-	FuryTitansGripDefaultActions()
+	#bloodbath
+	Spell(bloodbath)
+}
+
+### Fury icons.
+AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
+
+AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
+{
+	FuryTitansGripDefaultShortCdActions()
+}
+
+AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
+{
+	FuryTitansGripDefaultShortCdActions()
+}
+
+AddIcon specialization=fury help=main enemies=1
+{
+	if not InCombat() FuryTitansGripPrecombatMainActions()
+	FuryTitansGripDefaultMainActions()
+}
+
+AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
+{
+	if not InCombat() FuryTitansGripPrecombatMainActions()
+	FuryTitansGripDefaultMainActions()
+}
+
+AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
+{
+	if not InCombat() FuryTitansGripPrecombatCdActions()
+	FuryTitansGripDefaultCdActions()
+}
+
+AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
+{
+	if not InCombat() FuryTitansGripPrecombatCdActions()
+	FuryTitansGripDefaultCdActions()
 }
 
 ### Required symbols

@@ -41,7 +41,44 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction HolyDefaultActions
+### actions.default
+
+AddFunction HolyDefaultMainActions
+{
+	#power_word_solace,if=talent.power_word_solace.enabled
+	if Talent(power_word_solace_talent) Spell(power_word_solace)
+	#prayer_of_mending,if=buff.divine_insight.up
+	if BuffPresent(divine_insight_buff) Spell(prayer_of_mending)
+	#flash_heal,if=buff.surge_of_light.up
+	if BuffPresent(surge_of_light_buff) Spell(flash_heal)
+	#circle_of_healing
+	Spell(circle_of_healing)
+	#renew,if=!ticking
+	if not BuffPresent(renew_buff) Spell(renew)
+	#heal,if=buff.serendipity.react>=2&mana.pct>40
+	if BuffStacks(serendipity_buff) >= 2 and ManaPercent() > 40 Spell(heal)
+	#prayer_of_mending
+	Spell(prayer_of_mending)
+	#heal
+	Spell(heal)
+}
+
+AddFunction HolyDefaultShortCdActions
+{
+	unless Talent(power_word_solace_talent) and Spell(power_word_solace) or BuffPresent(divine_insight_buff) and Spell(prayer_of_mending) or BuffPresent(surge_of_light_buff) and Spell(flash_heal) or Spell(circle_of_healing)
+	{
+		#holy_word
+		Spell(holy_word)
+		#halo,if=talent.halo.enabled
+		if Talent(halo_talent) Spell(halo_heal)
+		#cascade,if=talent.cascade.enabled
+		if Talent(cascade_talent) Spell(cascade_heal)
+		#divine_star,if=talent.divine_star.enabled
+		if Talent(divine_star_talent) Spell(divine_star_heal)
+	}
+}
+
+AddFunction HolyDefaultCdActions
 {
 	#mana_potion,if=mana.pct<=75
 	if ManaPercent() <= 75 UsePotionMana()
@@ -55,61 +92,84 @@ AddFunction HolyDefaultActions
 	if Talent(power_infusion_talent) Spell(power_infusion)
 	#lightwell
 	Spell(lightwell)
-	#power_word_solace,if=talent.power_word_solace.enabled
-	if Talent(power_word_solace_talent) Spell(power_word_solace)
-	#mindbender,if=talent.mindbender.enabled&mana.pct<80
-	if Talent(mindbender_talent) and ManaPercent() < 80 Spell(mindbender)
-	#shadowfiend,if=!talent.mindbender.enabled
-	if not Talent(mindbender_talent) Spell(shadowfiend)
-	#prayer_of_mending,if=buff.divine_insight.up
-	if BuffPresent(divine_insight_buff) Spell(prayer_of_mending)
-	#flash_heal,if=buff.surge_of_light.up
-	if BuffPresent(surge_of_light_buff) Spell(flash_heal)
-	#circle_of_healing
-	Spell(circle_of_healing)
-	#holy_word
-	Spell(holy_word)
-	#halo,if=talent.halo.enabled
-	if Talent(halo_talent) Spell(halo_heal)
-	#cascade,if=talent.cascade.enabled
-	if Talent(cascade_talent) Spell(cascade_heal)
-	#divine_star,if=talent.divine_star.enabled
-	if Talent(divine_star_talent) Spell(divine_star_heal)
-	#renew,if=!ticking
-	if not BuffPresent(renew_buff) Spell(renew)
-	#heal,if=buff.serendipity.react>=2&mana.pct>40
-	if BuffStacks(serendipity_buff) >= 2 and ManaPercent() > 40 Spell(heal)
-	#prayer_of_mending
-	Spell(prayer_of_mending)
-	#heal
-	Spell(heal)
+
+	unless Talent(power_word_solace_talent) and Spell(power_word_solace)
+	{
+		#mindbender,if=talent.mindbender.enabled&mana.pct<80
+		if Talent(mindbender_talent) and ManaPercent() < 80 Spell(mindbender)
+		#shadowfiend,if=!talent.mindbender.enabled
+		if not Talent(mindbender_talent) Spell(shadowfiend)
+	}
 }
 
-AddFunction HolyPrecombatActions
+### actions.precombat
+
+AddFunction HolyPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=calamari_crepes
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
-	#chakra_serenity
-	Spell(chakra_serenity)
-	#snapshot_stats
-	#potion,name=draenic_intellect
-	UsePotionIntellect()
 	#prayer_of_mending
 	Spell(prayer_of_mending)
 }
 
-AddIcon specialization=holy help=main enemies=1
+AddFunction HolyPrecombatShortCdActions
 {
-	if not InCombat() HolyPrecombatActions()
-	HolyDefaultActions()
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude)
+	{
+		#chakra_serenity
+		Spell(chakra_serenity)
+	}
 }
 
-AddIcon specialization=holy help=aoe
+AddFunction HolyPrecombatCdActions
 {
-	if not InCombat() HolyPrecombatActions()
-	HolyDefaultActions()
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or Spell(chakra_serenity)
+	{
+		#snapshot_stats
+		#potion,name=draenic_intellect
+		UsePotionIntellect()
+	}
+}
+
+### Holy icons.
+AddCheckBox(opt_priest_holy_aoe L(AOE) specialization=holy default)
+
+AddIcon specialization=holy help=shortcd enemies=1 checkbox=!opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatShortCdActions()
+	HolyDefaultShortCdActions()
+}
+
+AddIcon specialization=holy help=shortcd checkbox=opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatShortCdActions()
+	HolyDefaultShortCdActions()
+}
+
+AddIcon specialization=holy help=main enemies=1
+{
+	if not InCombat() HolyPrecombatMainActions()
+	HolyDefaultMainActions()
+}
+
+AddIcon specialization=holy help=aoe checkbox=opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatMainActions()
+	HolyDefaultMainActions()
+}
+
+AddIcon specialization=holy help=cd enemies=1 checkbox=!opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatCdActions()
+	HolyDefaultCdActions()
+}
+
+AddIcon specialization=holy help=cd checkbox=opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatCdActions()
+	HolyDefaultCdActions()
 }
 
 ### Required symbols

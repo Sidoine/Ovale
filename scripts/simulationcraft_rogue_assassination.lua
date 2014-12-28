@@ -53,24 +53,10 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction AssassinationDefaultActions
+### actions.default
+
+AddFunction AssassinationDefaultMainActions
 {
-	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|debuff.vendetta.up
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) UsePotionAgility()
-	#kick
-	InterruptActions()
-	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
-	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
-	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
-	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
-	#blood_fury
-	Spell(blood_fury_ap)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent,if=energy<60
-	if Energy() < 60 Spell(arcane_torrent_energy)
-	#vanish,if=time>10&!buff.stealth.up
-	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
 	#rupture,if=combo_points=5&ticks_remain<3
 	if ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 Spell(rupture)
 	#rupture,cycle_targets=1,if=active_enemies>1&!ticking&combo_points=5
@@ -79,18 +65,12 @@ AddFunction AssassinationDefaultActions
 	if BuffPresent(stealthed_buff any=1) Spell(mutilate)
 	#slice_and_dice,if=buff.slice_and_dice.remains<5
 	if BuffRemaining(slice_and_dice_buff) < 5 Spell(slice_and_dice)
-	#marked_for_death,if=combo_points=0
-	if ComboPoints() == 0 Spell(marked_for_death)
 	#crimson_tempest,if=combo_points>4&active_enemies>=4&remains<8
 	if ComboPoints() > 4 and Enemies() >= 4 and target.DebuffRemaining(crimson_tempest_debuff) < 8 Spell(crimson_tempest)
 	#fan_of_knives,if=combo_points<5&active_enemies>=4
 	if ComboPoints() < 5 and Enemies() >= 4 Spell(fan_of_knives)
 	#rupture,if=(remains<2|(combo_points=5&remains<=(duration*0.3)))&active_enemies=1
 	if { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 } and Enemies() == 1 Spell(rupture)
-	#shadow_reflection,if=cooldown.vendetta.remains=0
-	if not SpellCooldown(vendetta) > 0 Spell(shadow_reflection)
-	#vendetta,if=buff.shadow_reflection.up|!talent.shadow_reflection.enabled
-	if BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) Spell(vendetta)
 	#envenom,cycle_targets=1,if=(combo_points>4&buff.envenom.remains<2&(cooldown.death_from_above.remains>2|!talent.death_from_above.enabled))&active_enemies<4&!dot.deadly_poison_dot.ticking
 	if ComboPoints() > 4 and BuffRemaining(envenom_buff) < 2 and { SpellCooldown(death_from_above) > 2 or not Talent(death_from_above_talent) } and Enemies() < 4 and not target.DebuffPresent(deadly_poison_dot_debuff) Spell(envenom)
 	#envenom,if=(combo_points>4&buff.envenom.remains<2&(cooldown.death_from_above.remains>2|!talent.death_from_above.enabled))&active_enemies<4
@@ -111,33 +91,114 @@ AddFunction AssassinationDefaultActions
 	if Enemies() < 5 Spell(mutilate)
 }
 
-AddFunction AssassinationPrecombatActions
+AddFunction AssassinationDefaultShortCdActions
+{
+	#vanish,if=time>10&!buff.stealth.up
+	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
+
+	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice)
+	{
+		#marked_for_death,if=combo_points=0
+		if ComboPoints() == 0 Spell(marked_for_death)
+	}
+}
+
+AddFunction AssassinationDefaultCdActions
+{
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|debuff.vendetta.up
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) UsePotionAgility()
+	#kick
+	InterruptActions()
+	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
+	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 30 Spell(preparation)
+	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
+	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
+	#blood_fury
+	Spell(blood_fury_ap)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent,if=energy<60
+	if Energy() < 60 Spell(arcane_torrent_energy)
+
+	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice) or ComboPoints() > 4 and Enemies() >= 4 and target.DebuffRemaining(crimson_tempest_debuff) < 8 and Spell(crimson_tempest) or ComboPoints() < 5 and Enemies() >= 4 and Spell(fan_of_knives) or { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 } and Enemies() == 1 and Spell(rupture)
+	{
+		#shadow_reflection,if=cooldown.vendetta.remains=0
+		if not SpellCooldown(vendetta) > 0 Spell(shadow_reflection)
+		#vendetta,if=buff.shadow_reflection.up|!talent.shadow_reflection.enabled
+		if BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) Spell(vendetta)
+	}
+}
+
+### actions.precombat
+
+AddFunction AssassinationPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
 	#food,type=sleeper_surprise
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
-	#potion,name=draenic_agility
-	UsePotionAgility()
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
-	#marked_for_death
-	Spell(marked_for_death)
 	#slice_and_dice,if=talent.marked_for_death.enabled
 	if Talent(marked_for_death_talent) Spell(slice_and_dice)
 }
 
-AddIcon specialization=assassination help=main enemies=1
+AddFunction AssassinationPrecombatShortCdActions
 {
-	if not InCombat() AssassinationPrecombatActions()
-	AssassinationDefaultActions()
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	{
+		#marked_for_death
+		Spell(marked_for_death)
+	}
 }
 
-AddIcon specialization=assassination help=aoe
+AddFunction AssassinationPrecombatCdActions
 {
-	if not InCombat() AssassinationPrecombatActions()
-	AssassinationDefaultActions()
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
+	{
+		#snapshot_stats
+		#potion,name=draenic_agility
+		UsePotionAgility()
+	}
+}
+
+### Assassination icons.
+AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
+
+AddIcon specialization=assassination help=shortcd enemies=1 checkbox=!opt_rogue_assassination_aoe
+{
+	if not InCombat() AssassinationPrecombatShortCdActions()
+	AssassinationDefaultShortCdActions()
+}
+
+AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination_aoe
+{
+	if not InCombat() AssassinationPrecombatShortCdActions()
+	AssassinationDefaultShortCdActions()
+}
+
+AddIcon specialization=assassination help=main enemies=1
+{
+	if not InCombat() AssassinationPrecombatMainActions()
+	AssassinationDefaultMainActions()
+}
+
+AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination_aoe
+{
+	if not InCombat() AssassinationPrecombatMainActions()
+	AssassinationDefaultMainActions()
+}
+
+AddIcon specialization=assassination help=cd enemies=1 checkbox=!opt_rogue_assassination_aoe
+{
+	if not InCombat() AssassinationPrecombatCdActions()
+	AssassinationDefaultCdActions()
+}
+
+AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_aoe
+{
+	if not InCombat() AssassinationPrecombatCdActions()
+	AssassinationDefaultCdActions()
 }
 
 ### Required symbols
@@ -161,7 +222,6 @@ AddIcon specialization=assassination help=aoe
 # fan_of_knives
 # kick
 # kidney_shot
-# lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent
 # mutilate
@@ -177,7 +237,6 @@ AddIcon specialization=assassination help=aoe
 # slice_and_dice_buff
 # stealth
 # vanish
-# vanish_buff
 # vendetta
 # vendetta_debuff
 ]]

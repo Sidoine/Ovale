@@ -52,7 +52,27 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction EnhancementDefaultActions
+### actions.default
+
+AddFunction EnhancementDefaultMainActions
+{
+	#call_action_list,name=single,if=active_enemies=1
+	if Enemies() == 1 EnhancementSingleMainActions()
+	#call_action_list,name=aoe,if=active_enemies>1
+	if Enemies() > 1 EnhancementAoeMainActions()
+}
+
+AddFunction EnhancementDefaultShortCdActions
+{
+	#elemental_mastery
+	Spell(elemental_mastery)
+	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
+	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(magma_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
+	#ancestral_swiftness
+	Spell(ancestral_swiftness)
+}
+
+AddFunction EnhancementDefaultCdActions
 {
 	#wind_shear
 	InterruptActions()
@@ -69,8 +89,6 @@ AddFunction EnhancementDefaultActions
 	Spell(arcane_torrent_mana)
 	#berserking
 	Spell(berserking)
-	#elemental_mastery
-	Spell(elemental_mastery)
 	#storm_elemental_totem
 	Spell(storm_elemental_totem)
 	#fire_elemental_totem,if=(talent.primal_elementalist.enabled&active_enemies<=10)|active_enemies<=6
@@ -79,17 +97,11 @@ AddFunction EnhancementDefaultActions
 	if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
 	#feral_spirit
 	Spell(feral_spirit)
-	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
-	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(magma_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
-	#ancestral_swiftness
-	Spell(ancestral_swiftness)
-	#call_action_list,name=single,if=active_enemies=1
-	if Enemies() == 1 EnhancementSingleActions()
-	#call_action_list,name=aoe,if=active_enemies>1
-	if Enemies() > 1 EnhancementAoeActions()
 }
 
-AddFunction EnhancementAoeActions
+### actions.aoe
+
+AddFunction EnhancementAoeMainActions
 {
 	#unleash_elements,if=active_enemies>=4&dot.flame_shock.ticking&(cooldown.shock.remains>cooldown.fire_nova.remains|cooldown.fire_nova.remains=0)
 	if Enemies() >= 4 and target.DebuffPresent(flame_shock_debuff) and { SpellCooldown(shock) > SpellCooldown(fire_nova) or not SpellCooldown(fire_nova) > 0 } Spell(unleash_elements)
@@ -137,18 +149,29 @@ AddFunction EnhancementAoeActions
 	}
 }
 
-AddFunction EnhancementPrecombatActions
+### actions.precombat
+
+AddFunction EnhancementPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
 	#food,type=frosty_stew
 	#lightning_shield,if=!buff.lightning_shield.up
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
-	#snapshot_stats
-	#potion,name=draenic_agility
-	UsePotionAgility()
 }
 
-AddFunction EnhancementSingleActions
+AddFunction EnhancementPrecombatCdActions
+{
+	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
+	{
+		#snapshot_stats
+		#potion,name=draenic_agility
+		UsePotionAgility()
+	}
+}
+
+### actions.single
+
+AddFunction EnhancementSingleMainActions
 {
 	#searing_totem,if=!totem.fire.active
 	if not TotemPresent(fire) Spell(searing_totem)
@@ -178,16 +201,41 @@ AddFunction EnhancementSingleActions
 	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }
 
-AddIcon specialization=enhancement help=main enemies=1
+### Enhancement icons.
+AddCheckBox(opt_shaman_enhancement_aoe L(AOE) specialization=enhancement default)
+
+AddIcon specialization=enhancement help=shortcd enemies=1 checkbox=!opt_shaman_enhancement_aoe
 {
-	if not InCombat() EnhancementPrecombatActions()
-	EnhancementDefaultActions()
+	EnhancementDefaultShortCdActions()
 }
 
-AddIcon specialization=enhancement help=aoe
+AddIcon specialization=enhancement help=shortcd checkbox=opt_shaman_enhancement_aoe
 {
-	if not InCombat() EnhancementPrecombatActions()
-	EnhancementDefaultActions()
+	EnhancementDefaultShortCdActions()
+}
+
+AddIcon specialization=enhancement help=main enemies=1
+{
+	if not InCombat() EnhancementPrecombatMainActions()
+	EnhancementDefaultMainActions()
+}
+
+AddIcon specialization=enhancement help=aoe checkbox=opt_shaman_enhancement_aoe
+{
+	if not InCombat() EnhancementPrecombatMainActions()
+	EnhancementDefaultMainActions()
+}
+
+AddIcon specialization=enhancement help=cd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+{
+	if not InCombat() EnhancementPrecombatCdActions()
+	EnhancementDefaultCdActions()
+}
+
+AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
+{
+	if not InCombat() EnhancementPrecombatCdActions()
+	EnhancementDefaultCdActions()
 }
 
 ### Required symbols

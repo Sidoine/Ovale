@@ -41,24 +41,12 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction DisciplineDefaultActions
+### actions.default
+
+AddFunction DisciplineDefaultMainActions
 {
-	#mana_potion,if=mana.pct<=75
-	if ManaPercent() <= 75 UsePotionMana()
-	#blood_fury
-	Spell(blood_fury_sp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_mana)
-	#power_infusion,if=talent.power_infusion.enabled
-	if Talent(power_infusion_talent) Spell(power_infusion)
 	#power_word_solace,if=talent.power_word_solace.enabled
 	if Talent(power_word_solace_talent) Spell(power_word_solace)
-	#mindbender,if=talent.mindbender.enabled&mana.pct<80
-	if Talent(mindbender_talent) and ManaPercent() < 80 Spell(mindbender)
-	#shadowfiend,if=!talent.mindbender.enabled
-	if not Talent(mindbender_talent) Spell(shadowfiend)
 	#power_word_shield
 	Spell(power_word_shield)
 	#penance_heal,if=buff.borrowed_time.up
@@ -75,29 +63,83 @@ AddFunction DisciplineDefaultActions
 	Spell(heal)
 }
 
-AddFunction DisciplinePrecombatActions
+AddFunction DisciplineDefaultCdActions
+{
+	#mana_potion,if=mana.pct<=75
+	if ManaPercent() <= 75 UsePotionMana()
+	#blood_fury
+	Spell(blood_fury_sp)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
+	#power_infusion,if=talent.power_infusion.enabled
+	if Talent(power_infusion_talent) Spell(power_infusion)
+
+	unless Talent(power_word_solace_talent) and Spell(power_word_solace)
+	{
+		#mindbender,if=talent.mindbender.enabled&mana.pct<80
+		if Talent(mindbender_talent) and ManaPercent() < 80 Spell(mindbender)
+		#shadowfiend,if=!talent.mindbender.enabled
+		if not Talent(mindbender_talent) Spell(shadowfiend)
+	}
+}
+
+### actions.precombat
+
+AddFunction DisciplinePrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=blackrock_barbecue
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
-	#snapshot_stats
-	#potion,name=draenic_intellect
-	UsePotionIntellect()
 	#prayer_of_mending
 	Spell(prayer_of_mending)
 }
 
-AddIcon specialization=discipline help=main enemies=1
+AddFunction DisciplinePrecombatCdActions
 {
-	if not InCombat() DisciplinePrecombatActions()
-	DisciplineDefaultActions()
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude)
+	{
+		#snapshot_stats
+		#potion,name=draenic_intellect
+		UsePotionIntellect()
+	}
 }
 
-AddIcon specialization=discipline help=aoe
+### Discipline icons.
+AddCheckBox(opt_priest_discipline_aoe L(AOE) specialization=discipline default)
+
+AddIcon specialization=discipline help=shortcd enemies=1 checkbox=!opt_priest_discipline_aoe
 {
-	if not InCombat() DisciplinePrecombatActions()
-	DisciplineDefaultActions()
+}
+
+AddIcon specialization=discipline help=shortcd checkbox=opt_priest_discipline_aoe
+{
+}
+
+AddIcon specialization=discipline help=main enemies=1
+{
+	if not InCombat() DisciplinePrecombatMainActions()
+	DisciplineDefaultMainActions()
+}
+
+AddIcon specialization=discipline help=aoe checkbox=opt_priest_discipline_aoe
+{
+	if not InCombat() DisciplinePrecombatMainActions()
+	DisciplineDefaultMainActions()
+}
+
+AddIcon specialization=discipline help=cd enemies=1 checkbox=!opt_priest_discipline_aoe
+{
+	if not InCombat() DisciplinePrecombatCdActions()
+	DisciplineDefaultCdActions()
+}
+
+AddIcon specialization=discipline help=cd checkbox=opt_priest_discipline_aoe
+{
+	if not InCombat() DisciplinePrecombatCdActions()
+	DisciplineDefaultCdActions()
 }
 
 ### Required symbols

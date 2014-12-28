@@ -27,13 +27,39 @@ AddFunction RighteousFuryOff
 	if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
 }
 
-AddFunction HolyDefaultActions
+### actions.default
+
+AddFunction HolyDefaultMainActions
 {
-	#mana_potion,if=mana.pct<=75
-	if ManaPercent() <= 75 UsePotionMana()
+	#judgment,if=talent.selfless_healer.enabled&buff.selfless_healer.stack<3
+	if Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 Spell(judgment)
+	#word_of_glory,if=holy_power>=3
+	if HolyPower() >= 3 Spell(word_of_glory)
+	#wait,if=target.health.pct>=75&mana.pct<=10
+	unless target.HealthPercent() >= 75 and ManaPercent() <= 10
+	{
+		#holy_shock,if=holy_power<=3
+		if HolyPower() <= 3 Spell(holy_shock)
+		#flash_of_light,if=target.health.pct<=30
+		if target.HealthPercent() <= 30 Spell(flash_of_light)
+		#judgment,if=holy_power<3
+		if HolyPower() < 3 Spell(judgment)
+		#holy_light
+		Spell(holy_light)
+	}
+}
+
+AddFunction HolyDefaultShortCdActions
+{
 	#auto_attack
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
+}
+
+AddFunction HolyDefaultCdActions
+{
+	#mana_potion,if=mana.pct<=75
+	if ManaPercent() <= 75 UsePotionMana()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -44,24 +70,24 @@ AddFunction HolyDefaultActions
 	Spell(avenging_wrath_heal)
 	#lay_on_hands,if=incoming_damage_5s>health.max*0.7
 	if IncomingDamage(5) > MaxHealth() * 0.7 Spell(lay_on_hands)
-	#judgment,if=talent.selfless_healer.enabled&buff.selfless_healer.stack<3
-	if Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 Spell(judgment)
-	#word_of_glory,if=holy_power>=3
-	if HolyPower() >= 3 Spell(word_of_glory)
-	#wait,if=target.health.pct>=75&mana.pct<=10
-	#holy_shock,if=holy_power<=3
-	if HolyPower() <= 3 Spell(holy_shock)
-	#flash_of_light,if=target.health.pct<=30
-	if target.HealthPercent() <= 30 Spell(flash_of_light)
-	#judgment,if=holy_power<3
-	if HolyPower() < 3 Spell(judgment)
-	#lay_on_hands,if=mana.pct<5
-	if ManaPercent() < 5 Spell(lay_on_hands)
-	#holy_light
-	Spell(holy_light)
+
+	unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 and Spell(judgment) or HolyPower() >= 3 and Spell(word_of_glory)
+	{
+		#wait,if=target.health.pct>=75&mana.pct<=10
+		unless target.HealthPercent() >= 75 and ManaPercent() <= 10
+		{
+			unless HolyPower() <= 3 and Spell(holy_shock) or target.HealthPercent() <= 30 and Spell(flash_of_light) or HolyPower() < 3 and Spell(judgment)
+			{
+				#lay_on_hands,if=mana.pct<5
+				if ManaPercent() < 5 Spell(lay_on_hands)
+			}
+		}
+	}
 }
 
-AddFunction HolyPrecombatActions
+### actions.precombat
+
+AddFunction HolyPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=blackrock_barbecue
@@ -73,19 +99,41 @@ AddFunction HolyPrecombatActions
 	Spell(seal_of_insight)
 	#beacon_of_light,target=healing_target
 	Spell(beacon_of_light text=healing_target)
-	#snapshot_stats
+}
+
+### Holy icons.
+AddCheckBox(opt_paladin_holy_aoe L(AOE) specialization=holy default)
+
+AddIcon specialization=holy help=shortcd enemies=1 checkbox=!opt_paladin_holy_aoe
+{
+	HolyDefaultShortCdActions()
+}
+
+AddIcon specialization=holy help=shortcd checkbox=opt_paladin_holy_aoe
+{
+	HolyDefaultShortCdActions()
 }
 
 AddIcon specialization=holy help=main enemies=1
 {
-	if not InCombat() HolyPrecombatActions()
-	HolyDefaultActions()
+	if not InCombat() HolyPrecombatMainActions()
+	HolyDefaultMainActions()
 }
 
-AddIcon specialization=holy help=aoe
+AddIcon specialization=holy help=aoe checkbox=opt_paladin_holy_aoe
 {
-	if not InCombat() HolyPrecombatActions()
-	HolyDefaultActions()
+	if not InCombat() HolyPrecombatMainActions()
+	HolyDefaultMainActions()
+}
+
+AddIcon specialization=holy help=cd enemies=1 checkbox=!opt_paladin_holy_aoe
+{
+	HolyDefaultCdActions()
+}
+
+AddIcon specialization=holy help=cd checkbox=opt_paladin_holy_aoe
+{
+	HolyDefaultCdActions()
 }
 
 ### Required symbols

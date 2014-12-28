@@ -20,7 +20,19 @@ AddFunction UsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction BalanceDefaultActions
+### actions.default
+
+AddFunction BalanceDefaultMainActions
+{
+	#force_of_nature,if=trinket.stat.intellect.up|charges=3|target.time_to_die<21
+	if BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 Spell(force_of_nature_caster)
+	#call_action_list,name=single_target,if=active_enemies=1
+	if Enemies() == 1 BalanceSingleTargetMainActions()
+	#call_action_list,name=aoe,if=active_enemies>1
+	if Enemies() > 1 BalanceAoeMainActions()
+}
+
+AddFunction BalanceDefaultCdActions
 {
 	#potion,name=draenic_intellect,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) UsePotionIntellect()
@@ -30,20 +42,20 @@ AddFunction BalanceDefaultActions
 	if BuffPresent(celestial_alignment_buff) Spell(berserking)
 	#arcane_torrent,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) Spell(arcane_torrent_energy)
-	#force_of_nature,if=trinket.stat.intellect.up|charges=3|target.time_to_die<21
-	if BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 Spell(force_of_nature_caster)
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 BalanceSingleTargetActions()
-	#call_action_list,name=aoe,if=active_enemies>1
-	if Enemies() > 1 BalanceAoeActions()
+
+	unless { BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 } and Spell(force_of_nature_caster)
+	{
+		#call_action_list,name=single_target,if=active_enemies=1
+		if Enemies() == 1 BalanceSingleTargetCdActions()
+		#call_action_list,name=aoe,if=active_enemies>1
+		if Enemies() > 1 BalanceAoeCdActions()
+	}
 }
 
-AddFunction BalanceAoeActions
+### actions.aoe
+
+AddFunction BalanceAoeMainActions
 {
-	#celestial_alignment,if=lunar_max<8|target.time_to_die<20
-	if TimeToEclipse(lunar) < 8 or target.TimeToDie() < 20 Spell(celestial_alignment)
-	#incarnation,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(incarnation_caster)
 	#sunfire,cycle_targets=1,if=remains<8
 	if target.DebuffRemaining(sunfire_debuff) < 8 Spell(sunfire)
 	#starfall,if=!buff.starfall.up&active_enemies>2
@@ -64,7 +76,17 @@ AddFunction BalanceAoeActions
 	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
 }
 
-AddFunction BalancePrecombatActions
+AddFunction BalanceAoeCdActions
+{
+	#celestial_alignment,if=lunar_max<8|target.time_to_die<20
+	if TimeToEclipse(lunar) < 8 or target.TimeToDie() < 20 Spell(celestial_alignment)
+	#incarnation,if=buff.celestial_alignment.up
+	if BuffPresent(celestial_alignment_buff) Spell(incarnation_caster)
+}
+
+### actions.precombat
+
+AddFunction BalancePrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=sleeper_surprise
@@ -72,14 +94,23 @@ AddFunction BalancePrecombatActions
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#moonkin_form
 	Spell(moonkin_form)
-	#snapshot_stats
-	#potion,name=draenic_intellect
-	UsePotionIntellect()
 	#stellar_flare
 	Spell(stellar_flare)
 }
 
-AddFunction BalanceSingleTargetActions
+AddFunction BalancePrecombatCdActions
+{
+	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(moonkin_form)
+	{
+		#snapshot_stats
+		#potion,name=draenic_intellect
+		UsePotionIntellect()
+	}
+}
+
+### actions.single_target
+
+AddFunction BalanceSingleTargetMainActions
 {
 	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>20
 	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 Spell(starsurge)
@@ -87,10 +118,6 @@ AddFunction BalanceSingleTargetActions
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 Spell(starsurge)
 	#starsurge,if=(charges=2&recharge_time<6)|charges=3
 	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
-	#celestial_alignment,if=eclipse_energy>40
-	if EclipseEnergy() > 40 Spell(celestial_alignment)
-	#incarnation,if=eclipse_energy>0
-	if EclipseEnergy() > 0 Spell(incarnation_caster)
 	#sunfire,if=remains<7|buff.solar_peak.up
 	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) Spell(sunfire)
 	#stellar_flare,if=remains<7
@@ -103,16 +130,50 @@ AddFunction BalanceSingleTargetActions
 	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
 }
 
-AddIcon specialization=balance help=main enemies=1
+AddFunction BalanceSingleTargetCdActions
 {
-	if not InCombat() BalancePrecombatActions()
-	BalanceDefaultActions()
+	unless BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge)
+	{
+		#celestial_alignment,if=eclipse_energy>40
+		if EclipseEnergy() > 40 Spell(celestial_alignment)
+		#incarnation,if=eclipse_energy>0
+		if EclipseEnergy() > 0 Spell(incarnation_caster)
+	}
 }
 
-AddIcon specialization=balance help=aoe
+### Balance icons.
+AddCheckBox(opt_druid_balance_aoe L(AOE) specialization=balance default)
+
+AddIcon specialization=balance help=shortcd enemies=1 checkbox=!opt_druid_balance_aoe
 {
-	if not InCombat() BalancePrecombatActions()
-	BalanceDefaultActions()
+}
+
+AddIcon specialization=balance help=shortcd checkbox=opt_druid_balance_aoe
+{
+}
+
+AddIcon specialization=balance help=main enemies=1
+{
+	if not InCombat() BalancePrecombatMainActions()
+	BalanceDefaultMainActions()
+}
+
+AddIcon specialization=balance help=aoe checkbox=opt_druid_balance_aoe
+{
+	if not InCombat() BalancePrecombatMainActions()
+	BalanceDefaultMainActions()
+}
+
+AddIcon specialization=balance help=cd enemies=1 checkbox=!opt_druid_balance_aoe
+{
+	if not InCombat() BalancePrecombatCdActions()
+	BalanceDefaultCdActions()
+}
+
+AddIcon specialization=balance help=cd checkbox=opt_druid_balance_aoe
+{
+	if not InCombat() BalancePrecombatCdActions()
+	BalanceDefaultCdActions()
 }
 
 ### Required symbols

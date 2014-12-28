@@ -41,7 +41,63 @@ AddFunction BeastMasterySummonPet
 	if pet.IsDead() Spell(revive_pet)
 }
 
-AddFunction BeastMasteryDefaultActions
+### actions.default
+
+AddFunction BeastMasteryDefaultMainActions
+{
+	#multishot,if=active_enemies>5|(active_enemies>1&pet.cat.buff.beast_cleave.down)
+	if Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) Spell(multishot)
+	#kill_shot,if=focus.time_to_max>gcd
+	if TimeToMaxFocus() > GCD() Spell(kill_shot)
+	#kill_command
+	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
+	#focusing_shot,if=focus<50
+	if Focus() < 50 Spell(focusing_shot)
+	#cobra_shot,if=buff.pre_steady_focus.up&(14+cast_regen)<=focus.deficit
+	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() Spell(cobra_shot)
+	#glaive_toss
+	Spell(glaive_toss)
+	#cobra_shot,if=active_enemies>5
+	if Enemies() > 5 Spell(cobra_shot)
+	#arcane_shot,if=(buff.thrill_of_the_hunt.react&focus>35)|buff.bestial_wrath.up
+	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 or BuffPresent(bestial_wrath_buff) Spell(arcane_shot)
+	#arcane_shot,if=focus>=64
+	if Focus() >= 64 Spell(arcane_shot)
+	#cobra_shot
+	Spell(cobra_shot)
+}
+
+AddFunction BeastMasteryDefaultShortCdActions
+{
+	#dire_beast
+	Spell(dire_beast)
+	#explosive_trap,if=active_enemies>1
+	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+	#bestial_wrath,if=focus>60&!buff.bestial_wrath.up
+	if Focus() > 60 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
+	#barrage,if=active_enemies>1
+	if Enemies() > 1 Spell(barrage)
+
+	unless { Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) } and Spell(multishot)
+	{
+		#focus_fire,five_stacks=1
+		if BuffStacks(frenzy_buff any=1) == 5 Spell(focus_fire)
+		#barrage,if=active_enemies>1
+		if Enemies() > 1 Spell(barrage)
+		#a_murder_of_crows
+		Spell(a_murder_of_crows)
+
+		unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() and Spell(cobra_shot) or Spell(glaive_toss)
+		{
+			#barrage
+			Spell(barrage)
+			#powershot,if=focus.time_to_max>cast_time
+			if TimeToMaxFocus() > CastTime(powershot) Spell(powershot)
+		}
+	}
+}
+
+AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
 	#arcane_torrent,if=focus.deficit>=30
@@ -56,71 +112,77 @@ AddFunction BeastMasteryDefaultActions
 	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
 	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
-	#dire_beast
-	Spell(dire_beast)
-	#explosive_trap,if=active_enemies>1
-	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
-	#bestial_wrath,if=focus>60&!buff.bestial_wrath.up
-	if Focus() > 60 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
-	#barrage,if=active_enemies>1
-	if Enemies() > 1 Spell(barrage)
-	#multishot,if=active_enemies>5|(active_enemies>1&pet.cat.buff.beast_cleave.down)
-	if Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) Spell(multishot)
-	#focus_fire,five_stacks=1
-	if BuffStacks(frenzy_buff any=1) == 5 Spell(focus_fire)
-	#barrage,if=active_enemies>1
-	if Enemies() > 1 Spell(barrage)
-	#a_murder_of_crows
-	Spell(a_murder_of_crows)
-	#kill_shot,if=focus.time_to_max>gcd
-	if TimeToMaxFocus() > GCD() Spell(kill_shot)
-	#kill_command
-	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
-	#focusing_shot,if=focus<50
-	if Focus() < 50 Spell(focusing_shot)
-	#cobra_shot,if=buff.pre_steady_focus.up&(14+cast_regen)<=focus.deficit
-	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() Spell(cobra_shot)
-	#glaive_toss
-	Spell(glaive_toss)
-	#barrage
-	Spell(barrage)
-	#powershot,if=focus.time_to_max>cast_time
-	if TimeToMaxFocus() > CastTime(powershot) Spell(powershot)
-	#cobra_shot,if=active_enemies>5
-	if Enemies() > 5 Spell(cobra_shot)
-	#arcane_shot,if=(buff.thrill_of_the_hunt.react&focus>35)|buff.bestial_wrath.up
-	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 or BuffPresent(bestial_wrath_buff) Spell(arcane_shot)
-	#arcane_shot,if=focus>=64
-	if Focus() >= 64 Spell(arcane_shot)
-	#cobra_shot
-	Spell(cobra_shot)
 }
 
-AddFunction BeastMasteryPrecombatActions
+### actions.precombat
+
+AddFunction BeastMasteryPrecombatMainActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=blackrock_barbecue
-	#summon_pet
-	BeastMasterySummonPet()
 	#snapshot_stats
 	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
 	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
-	#potion,name=draenic_agility
-	UsePotionAgility()
+	#glaive_toss
+	Spell(glaive_toss)
+	#focusing_shot,if=!talent.glaive_toss.enabled
+	if not Talent(glaive_toss_talent) Spell(focusing_shot)
+}
+
+AddFunction BeastMasteryPrecombatShortCdActions
+{
+	#flask,type=greater_draenic_agility_flask
+	#food,type=calamari_crepes
+	#summon_pet
+	BeastMasterySummonPet()
+}
+
+AddFunction BeastMasteryPrecombatCdActions
+{
+	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
+	{
+		#potion,name=draenic_agility
+		UsePotionAgility()
+	}
+}
+
+### BeastMastery icons.
+AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) specialization=beast_mastery default)
+
+AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
+{
+	if not InCombat() BeastMasteryPrecombatShortCdActions()
+	BeastMasteryDefaultShortCdActions()
+}
+
+AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_beast_mastery_aoe
+{
+	if not InCombat() BeastMasteryPrecombatShortCdActions()
+	BeastMasteryDefaultShortCdActions()
 }
 
 AddIcon specialization=beast_mastery help=main enemies=1
 {
-	if not InCombat() BeastMasteryPrecombatActions()
-	BeastMasteryDefaultActions()
+	if not InCombat() BeastMasteryPrecombatMainActions()
+	BeastMasteryDefaultMainActions()
 }
 
-AddIcon specialization=beast_mastery help=aoe
+AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_beast_mastery_aoe
 {
-	if not InCombat() BeastMasteryPrecombatActions()
-	BeastMasteryDefaultActions()
+	if not InCombat() BeastMasteryPrecombatMainActions()
+	BeastMasteryDefaultMainActions()
+}
+
+AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
+{
+	if not InCombat() BeastMasteryPrecombatCdActions()
+	BeastMasteryDefaultCdActions()
+}
+
+AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_aoe
+{
+	if not InCombat() BeastMasteryPrecombatCdActions()
+	BeastMasteryDefaultCdActions()
 }
 
 ### Required symbols
@@ -136,13 +198,13 @@ AddIcon specialization=beast_mastery help=aoe
 # counter_shot
 # dire_beast
 # draenic_agility_potion
-# exotic_munitions_buff
 # explosive_trap
 # focus_fire
 # focus_fire_buff
 # focusing_shot
 # frenzy_buff
 # glaive_toss
+# glaive_toss_talent
 # glyph_of_explosive_trap
 # incendiary_ammo
 # kill_command

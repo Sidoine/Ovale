@@ -35,7 +35,34 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction HolyDefaultActions
+### actions.default
+
+AddFunction HolyDefaultMainActions
+{
+	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
+	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	#power_word_solace
+	Spell(power_word_solace)
+	#mind_sear,if=active_enemies>=4
+	if Enemies() >= 4 Spell(mind_sear)
+	#holy_fire
+	Spell(holy_fire)
+	#smite
+	Spell(smite)
+	#shadow_word_pain,moving=1
+	if Speed() > 0 Spell(shadow_word_pain)
+}
+
+AddFunction HolyDefaultShortCdActions
+{
+	unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or Spell(power_word_solace) or Enemies() >= 4 and Spell(mind_sear) or Spell(holy_fire) or Spell(smite)
+	{
+		#holy_word,moving=1
+		if Speed() > 0 Spell(holy_word)
+	}
+}
+
+AddFunction HolyDefaultCdActions
 {
 	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
@@ -51,47 +78,76 @@ AddFunction HolyDefaultActions
 	if not Talent(mindbender_talent) Spell(shadowfiend)
 	#mindbender,if=talent.mindbender.enabled
 	if Talent(mindbender_talent) Spell(mindbender)
-	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
-	#power_word_solace
-	Spell(power_word_solace)
-	#mind_sear,if=active_enemies>=4
-	if Enemies() >= 4 Spell(mind_sear)
-	#holy_fire
-	Spell(holy_fire)
-	#smite
-	Spell(smite)
-	#holy_word,moving=1
-	if Speed() > 0 Spell(holy_word)
-	#shadow_word_pain,moving=1
-	if Speed() > 0 Spell(shadow_word_pain)
 }
 
-AddFunction HolyPrecombatActions
+### actions.precombat
+
+AddFunction HolyPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=calamari_crepes
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
-	#chakra_chastise
-	Spell(chakra_chastise)
-	#snapshot_stats
-	#potion,name=draenic_intellect
-	UsePotionIntellect()
 	#smite
 	Spell(smite)
 }
 
-AddIcon specialization=holy help=main enemies=1
+AddFunction HolyPrecombatShortCdActions
 {
-	if not InCombat() HolyPrecombatActions()
-	HolyDefaultActions()
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude)
+	{
+		#chakra_chastise
+		Spell(chakra_chastise)
+	}
 }
 
-AddIcon specialization=holy help=aoe
+AddFunction HolyPrecombatCdActions
 {
-	if not InCombat() HolyPrecombatActions()
-	HolyDefaultActions()
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or Spell(chakra_chastise)
+	{
+		#snapshot_stats
+		#potion,name=draenic_intellect
+		UsePotionIntellect()
+	}
+}
+
+### Holy icons.
+AddCheckBox(opt_priest_holy_aoe L(AOE) specialization=holy default)
+
+AddIcon specialization=holy help=shortcd enemies=1 checkbox=!opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatShortCdActions()
+	HolyDefaultShortCdActions()
+}
+
+AddIcon specialization=holy help=shortcd checkbox=opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatShortCdActions()
+	HolyDefaultShortCdActions()
+}
+
+AddIcon specialization=holy help=main enemies=1
+{
+	if not InCombat() HolyPrecombatMainActions()
+	HolyDefaultMainActions()
+}
+
+AddIcon specialization=holy help=aoe checkbox=opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatMainActions()
+	HolyDefaultMainActions()
+}
+
+AddIcon specialization=holy help=cd enemies=1 checkbox=!opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatCdActions()
+	HolyDefaultCdActions()
+}
+
+AddIcon specialization=holy help=cd checkbox=opt_priest_holy_aoe
+{
+	if not InCombat() HolyPrecombatCdActions()
+	HolyDefaultCdActions()
 }
 
 ### Required symbols

@@ -43,7 +43,17 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction FrostTwoHanderDefaultActions
+### actions.default
+
+AddFunction FrostTwoHanderDefaultMainActions
+{
+	#run_action_list,name=aoe,if=active_enemies>=3
+	if Enemies() >= 3 FrostTwoHanderAoeMainActions()
+	#run_action_list,name=single_target,if=active_enemies<3
+	if Enemies() < 3 FrostTwoHanderSingleTargetMainActions()
+}
+
+AddFunction FrostTwoHanderDefaultShortCdActions
 {
 	#auto_attack
 	#deaths_advance,if=movement.remains>2
@@ -52,6 +62,14 @@ AddFunction FrostTwoHanderDefaultActions
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
+	#run_action_list,name=aoe,if=active_enemies>=3
+	if Enemies() >= 3 FrostTwoHanderAoeShortCdActions()
+	#run_action_list,name=single_target,if=active_enemies<3
+	if Enemies() < 3 FrostTwoHanderSingleTargetShortCdActions()
+}
+
+AddFunction FrostTwoHanderDefaultCdActions
+{
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
 	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) UsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
@@ -65,75 +83,130 @@ AddFunction FrostTwoHanderDefaultActions
 	#use_item,slot=trinket2
 	UseItemActions()
 	#run_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 FrostTwoHanderAoeActions()
+	if Enemies() >= 3 FrostTwoHanderAoeCdActions()
 	#run_action_list,name=single_target,if=active_enemies<3
-	if Enemies() < 3 FrostTwoHanderSingleTargetActions()
+	if Enemies() < 3 FrostTwoHanderSingleTargetCdActions()
 }
 
-AddFunction FrostTwoHanderAoeActions
+### actions.aoe
+
+AddFunction FrostTwoHanderAoeMainActions
 {
-	#unholy_blight
-	Spell(unholy_blight)
 	#blood_boil,if=dot.blood_plague.ticking&(!talent.unholy_blight.enabled|cooldown.unholy_blight.remains<49),line_cd=28
 	if target.DebuffPresent(blood_plague_debuff) and { not Talent(unholy_blight_talent) or SpellCooldown(unholy_blight) < 49 } and TimeSincePreviousSpell(blood_boil) > 28 Spell(blood_boil)
-	#defile
-	Spell(defile)
-	#breath_of_sindragosa,if=runic_power>75
-	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosAoeActions()
+	if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosAoeMainActions()
 	#howling_blast
 	Spell(howling_blast)
-	#blood_tap,if=buff.blood_charge.stack>10
-	if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#frost_strike,if=runic_power>88
 	if RunicPower() > 88 Spell(frost_strike)
-	#death_and_decay,if=unholy=1
-	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 	#plague_strike,if=unholy=2
 	if Rune(unholy) >= 2 Spell(plague_strike)
-	#blood_tap
-	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#frost_strike,if=!talent.breath_of_sindragosa.enabled|cooldown.breath_of_sindragosa.remains>=10
 	if not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) >= 10 Spell(frost_strike)
 	#plague_leech
 	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
-	#empower_rune_weapon
-	Spell(empower_rune_weapon)
 }
 
-AddFunction FrostTwoHanderBosAoeActions
+AddFunction FrostTwoHanderAoeShortCdActions
+{
+	#unholy_blight
+	Spell(unholy_blight)
+
+	unless target.DebuffPresent(blood_plague_debuff) and { not Talent(unholy_blight_talent) or SpellCooldown(unholy_blight) < 49 } and TimeSincePreviousSpell(blood_boil) > 28 and Spell(blood_boil)
+	{
+		#defile
+		Spell(defile)
+		#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
+		if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosAoeShortCdActions()
+
+		unless Spell(howling_blast)
+		{
+			#blood_tap,if=buff.blood_charge.stack>10
+			if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+			unless RunicPower() > 88 and Spell(frost_strike)
+			{
+				#death_and_decay,if=unholy=1
+				if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
+
+				unless Rune(unholy) >= 2 and Spell(plague_strike)
+				{
+					#blood_tap
+					if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+				}
+			}
+		}
+	}
+}
+
+AddFunction FrostTwoHanderAoeCdActions
+{
+	unless Spell(unholy_blight) or target.DebuffPresent(blood_plague_debuff) and { not Talent(unholy_blight_talent) or SpellCooldown(unholy_blight) < 49 } and TimeSincePreviousSpell(blood_boil) > 28 and Spell(blood_boil) or Spell(defile)
+	{
+		#breath_of_sindragosa,if=runic_power>75
+		if RunicPower() > 75 Spell(breath_of_sindragosa)
+		#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
+		if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosAoeCdActions()
+
+		unless Spell(howling_blast) or RunicPower() > 88 and Spell(frost_strike) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or Rune(unholy) >= 2 and Spell(plague_strike) or { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) >= 10 } and Spell(frost_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(plague_strike)
+		{
+			#empower_rune_weapon
+			Spell(empower_rune_weapon)
+		}
+	}
+}
+
+### actions.bos_aoe
+
+AddFunction FrostTwoHanderBosAoeMainActions
 {
 	#howling_blast
 	Spell(howling_blast)
-	#blood_tap,if=buff.blood_charge.stack>10
-	if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#death_and_decay,if=unholy=1
-	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 	#plague_strike,if=unholy=2
 	if Rune(unholy) >= 2 Spell(plague_strike)
-	#blood_tap
-	if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
 	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#plague_strike,if=unholy=1
 	if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(plague_strike)
-	#empower_rune_weapon
-	Spell(empower_rune_weapon)
 }
 
-AddFunction FrostTwoHanderBosStActions
+AddFunction FrostTwoHanderBosAoeShortCdActions
+{
+	unless Spell(howling_blast)
+	{
+		#blood_tap,if=buff.blood_charge.stack>10
+		if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		#death_and_decay,if=unholy=1
+		if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
+
+		unless Rune(unholy) >= 2 and Spell(plague_strike)
+		{
+			#blood_tap
+			if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		}
+	}
+}
+
+AddFunction FrostTwoHanderBosAoeCdActions
+{
+	unless Spell(howling_blast) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or Rune(unholy) >= 2 and Spell(plague_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(plague_strike)
+	{
+		#empower_rune_weapon
+		Spell(empower_rune_weapon)
+	}
+}
+
+### actions.bos_st
+
+AddFunction FrostTwoHanderBosStMainActions
 {
 	#obliterate,if=buff.killing_machine.react
 	if BuffPresent(killing_machine_buff) Spell(obliterate)
-	#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
-	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech,if=buff.killing_machine.react
 	if BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
-	#blood_tap,if=buff.blood_charge.stack>=5
-	if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#plague_leech
 	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#obliterate,if=runic_power<76
@@ -142,7 +215,24 @@ AddFunction FrostTwoHanderBosStActions
 	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 Spell(howling_blast)
 }
 
-AddFunction FrostTwoHanderPrecombatActions
+AddFunction FrostTwoHanderBosStShortCdActions
+{
+	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
+	{
+		#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
+		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+		unless BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+		{
+			#blood_tap,if=buff.blood_charge.stack>=5
+			if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		}
+	}
+}
+
+### actions.precombat
+
+AddFunction FrostTwoHanderPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=calamari_crepes
@@ -150,43 +240,47 @@ AddFunction FrostTwoHanderPrecombatActions
 	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#frost_presence
 	Spell(frost_presence)
-	#snapshot_stats
-	#army_of_the_dead
-	Spell(army_of_the_dead)
-	#potion,name=draenic_strength
-	UsePotionStrength()
-	#pillar_of_frost
-	Spell(pillar_of_frost)
 }
 
-AddFunction FrostTwoHanderSingleTargetActions
+AddFunction FrostTwoHanderPrecombatShortCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
+	{
+		#pillar_of_frost
+		Spell(pillar_of_frost)
+	}
+}
+
+AddFunction FrostTwoHanderPrecombatCdActions
+{
+	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
+	{
+		#snapshot_stats
+		#army_of_the_dead
+		Spell(army_of_the_dead)
+		#potion,name=draenic_strength
+		UsePotionStrength()
+	}
+}
+
+### actions.single_target
+
+AddFunction FrostTwoHanderSingleTargetMainActions
 {
 	#plague_leech,if=disease.min_remains<1
 	if target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
 	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_frost)
-	#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
-	#defile
-	Spell(defile)
-	#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
-	if Talent(defile_talent) and not SpellCooldown(defile) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#howling_blast,if=buff.rime.react&disease.min_remains>5&buff.killing_machine.react
 	if BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and BuffPresent(killing_machine_buff) Spell(howling_blast)
 	#obliterate,if=buff.killing_machine.react
 	if BuffPresent(killing_machine_buff) Spell(obliterate)
-	#blood_tap,if=buff.killing_machine.react
-	if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#howling_blast,if=!talent.necrotic_plague.enabled&!dot.frost_fever.ticking&buff.rime.react
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and BuffPresent(rime_buff) Spell(howling_blast)
 	#outbreak,if=!disease.max_ticking
 	if not target.DiseasesAnyTicking() Spell(outbreak)
-	#unholy_blight,if=!disease.min_ticking
-	if not target.DiseasesTicking() Spell(unholy_blight)
-	#breath_of_sindragosa,if=runic_power>75
-	if RunicPower() > 75 Spell(breath_of_sindragosa)
 	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosStActions()
+	if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosStMainActions()
 	#obliterate,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<76
 	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 Spell(obliterate)
 	#howling_blast,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<3&runic_power<88
@@ -197,8 +291,6 @@ AddFunction FrostTwoHanderSingleTargetActions
 	if Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(howling_blast)
 	#plague_strike,if=!talent.necrotic_plague.enabled&!dot.blood_plague.ticking
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) Spell(plague_strike)
-	#blood_tap,if=buff.blood_charge.stack>10&runic_power>76
-	if BuffStacks(blood_charge_buff) > 10 and RunicPower() > 76 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#frost_strike,if=runic_power>76
 	if RunicPower() > 76 Spell(frost_strike)
 	#howling_blast,if=buff.rime.react&disease.min_remains>5&(blood.frac>=1.8|unholy.frac>=1.8|frost.frac>=1.8)
@@ -215,26 +307,103 @@ AddFunction FrostTwoHanderSingleTargetActions
 	if BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 Spell(howling_blast)
 	#obliterate,if=blood.frac>=1.5|unholy.frac>=1.6|frost.frac>=1.6|buff.bloodlust.up|cooldown.plague_leech.remains<=4
 	if Rune(blood) >= 1.5 or Rune(unholy) >= 1.6 or Rune(frost) >= 1.6 or BuffPresent(burst_haste_buff any=1) or SpellCooldown(plague_leech) <= 4 Spell(obliterate)
-	#blood_tap,if=(buff.blood_charge.stack>10&runic_power>=20)|(blood.frac>=1.4|unholy.frac>=1.6|frost.frac>=1.6)
-	if { BuffStacks(blood_charge_buff) > 10 and RunicPower() >= 20 or Rune(blood) >= 1.4 or Rune(unholy) >= 1.6 or Rune(frost) >= 1.6 } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	#frost_strike,if=!buff.killing_machine.react
 	if not BuffPresent(killing_machine_buff) Spell(frost_strike)
 	#plague_leech,if=(blood.frac<=0.95&unholy.frac<=0.95)|(frost.frac<=0.95&unholy.frac<=0.95)|(frost.frac<=0.95&blood.frac<=0.95)
 	if { Rune(blood) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(blood) <= 0.95 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
-	#empower_rune_weapon
-	Spell(empower_rune_weapon)
+}
+
+AddFunction FrostTwoHanderSingleTargetShortCdActions
+{
+	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost)
+	{
+		#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
+		if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		#defile
+		Spell(defile)
+		#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
+		if Talent(defile_talent) and not SpellCooldown(defile) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+		unless BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and BuffPresent(killing_machine_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(obliterate)
+		{
+			#blood_tap,if=buff.killing_machine.react
+			if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+			unless not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and BuffPresent(rime_buff) and Spell(howling_blast) or not target.DiseasesAnyTicking() and Spell(outbreak)
+			{
+				#unholy_blight,if=!disease.min_ticking
+				if not target.DiseasesTicking() Spell(unholy_blight)
+				#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
+				if BuffPresent(breath_of_sindragosa_buff) FrostTwoHanderBosStShortCdActions()
+
+				unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Spell(obliterate) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 88 and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Spell(plague_strike)
+				{
+					#blood_tap,if=buff.blood_charge.stack>10&runic_power>76
+					if BuffStacks(blood_charge_buff) > 10 and RunicPower() > 76 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+
+					unless RunicPower() > 76 and Spell(frost_strike) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and { Rune(blood) >= 1.8 or Rune(unholy) >= 1.8 or Rune(frost) >= 1.8 } and Spell(howling_blast) or { Rune(blood) >= 1.8 or Rune(unholy) >= 1.8 or Rune(frost) >= 1.8 } and Spell(obliterate) or target.DiseasesRemaining() < 3 and { Rune(blood) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(blood) <= 0.95 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or Talent(runic_empowerment_talent) and { Rune(frost) >= 0 and Rune(frost) < 1 or Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(blood) >= 0 and Rune(blood) < 1 } and { not BuffPresent(killing_machine_buff) or not TimeToSpell(obliterate) <= 1 } and Spell(frost_strike) or Talent(blood_tap_talent) and BuffStacks(blood_charge_buff) <= 10 and { not BuffPresent(killing_machine_buff) or not TimeToSpell(obliterate) <= 1 } and Spell(frost_strike) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and Spell(howling_blast) or { Rune(blood) >= 1.5 or Rune(unholy) >= 1.6 or Rune(frost) >= 1.6 or BuffPresent(burst_haste_buff any=1) or SpellCooldown(plague_leech) <= 4 } and Spell(obliterate)
+					{
+						#blood_tap,if=(buff.blood_charge.stack>10&runic_power>=20)|(blood.frac>=1.4|unholy.frac>=1.6|frost.frac>=1.6)
+						if { BuffStacks(blood_charge_buff) > 10 and RunicPower() >= 20 or Rune(blood) >= 1.4 or Rune(unholy) >= 1.6 or Rune(frost) >= 1.6 } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+					}
+				}
+			}
+		}
+	}
+}
+
+AddFunction FrostTwoHanderSingleTargetCdActions
+{
+	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost) or Spell(defile) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and BuffPresent(killing_machine_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(obliterate) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and BuffPresent(rime_buff) and Spell(howling_blast) or not target.DiseasesAnyTicking() and Spell(outbreak) or not target.DiseasesTicking() and Spell(unholy_blight)
+	{
+		#breath_of_sindragosa,if=runic_power>75
+		if RunicPower() > 75 Spell(breath_of_sindragosa)
+
+		unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Spell(obliterate) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 88 and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Spell(plague_strike) or RunicPower() > 76 and Spell(frost_strike) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and { Rune(blood) >= 1.8 or Rune(unholy) >= 1.8 or Rune(frost) >= 1.8 } and Spell(howling_blast) or { Rune(blood) >= 1.8 or Rune(unholy) >= 1.8 or Rune(frost) >= 1.8 } and Spell(obliterate) or target.DiseasesRemaining() < 3 and { Rune(blood) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(blood) <= 0.95 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or Talent(runic_empowerment_talent) and { Rune(frost) >= 0 and Rune(frost) < 1 or Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(blood) >= 0 and Rune(blood) < 1 } and { not BuffPresent(killing_machine_buff) or not TimeToSpell(obliterate) <= 1 } and Spell(frost_strike) or Talent(blood_tap_talent) and BuffStacks(blood_charge_buff) <= 10 and { not BuffPresent(killing_machine_buff) or not TimeToSpell(obliterate) <= 1 } and Spell(frost_strike) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and Spell(howling_blast) or { Rune(blood) >= 1.5 or Rune(unholy) >= 1.6 or Rune(frost) >= 1.6 or BuffPresent(burst_haste_buff any=1) or SpellCooldown(plague_leech) <= 4 } and Spell(obliterate) or not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Rune(blood) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(unholy) <= 0.95 or Rune(frost) <= 0.95 and Rune(blood) <= 0.95 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+		{
+			#empower_rune_weapon
+			Spell(empower_rune_weapon)
+		}
+	}
+}
+
+### Frost icons.
+AddCheckBox(opt_deathknight_frost_aoe L(AOE) specialization=frost default)
+
+AddIcon specialization=frost help=shortcd enemies=1 checkbox=!opt_deathknight_frost_aoe
+{
+	if not InCombat() FrostTwoHanderPrecombatShortCdActions()
+	FrostTwoHanderDefaultShortCdActions()
+}
+
+AddIcon specialization=frost help=shortcd checkbox=opt_deathknight_frost_aoe
+{
+	if not InCombat() FrostTwoHanderPrecombatShortCdActions()
+	FrostTwoHanderDefaultShortCdActions()
 }
 
 AddIcon specialization=frost help=main enemies=1
 {
-	if not InCombat() FrostTwoHanderPrecombatActions()
-	FrostTwoHanderDefaultActions()
+	if not InCombat() FrostTwoHanderPrecombatMainActions()
+	FrostTwoHanderDefaultMainActions()
 }
 
-AddIcon specialization=frost help=aoe
+AddIcon specialization=frost help=aoe checkbox=opt_deathknight_frost_aoe
 {
-	if not InCombat() FrostTwoHanderPrecombatActions()
-	FrostTwoHanderDefaultActions()
+	if not InCombat() FrostTwoHanderPrecombatMainActions()
+	FrostTwoHanderDefaultMainActions()
+}
+
+AddIcon specialization=frost help=cd enemies=1 checkbox=!opt_deathknight_frost_aoe
+{
+	if not InCombat() FrostTwoHanderPrecombatCdActions()
+	FrostTwoHanderDefaultCdActions()
+}
+
+AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
+{
+	if not InCombat() FrostTwoHanderPrecombatCdActions()
+	FrostTwoHanderDefaultCdActions()
 }
 
 ### Required symbols
@@ -273,7 +442,6 @@ AddIcon specialization=frost help=aoe
 # pillar_of_frost_buff
 # plague_leech
 # plague_strike
-# potion_strength_buff
 # quaking_palm
 # rime_buff
 # runic_empowerment_talent
