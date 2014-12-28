@@ -1165,8 +1165,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			isSpellAction = false
 		elseif class == "DRUID" and action == "wild_charge" then
-			-- Check that Wild Charge can be used on the target.
-			conditionCode = format("target.InRange(%s)", action)
+			bodyCode = "GetInMeleeRange()"
+			annotation[action] = class
+			isSpellAction = false
 		elseif class == "HUNTER" and action == "exotic_munitions" then
 			if modifier.ammo_type then
 				local name = Unparse(modifier.ammo_type)
@@ -3007,6 +3008,7 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "mangle")
 		AddSymbol(annotation, "shred")
+		AddSymbol(annotation, "wild_charge")
 		AddSymbol(annotation, "wild_charge_bear")
 		AddSymbol(annotation, "wild_charge_cat")
 		count = count + 1
