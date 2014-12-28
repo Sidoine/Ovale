@@ -1370,6 +1370,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
 		elseif class == "WARRIOR" and action == "charge" then
 			conditionCode = "target.InRange(charge)"
+		elseif class == "WARRIOR" and action == "enraged_regeneration" then
+			-- Only suggest Enraged Regeneration at below 80% health.
+			conditionCode = "HealthPercent() < 80"
 		elseif class == "WARRIOR" and strsub(action, 1, 7) == "execute" then
 			if modifier.target then
 				local target = Unparse(modifier.target)
