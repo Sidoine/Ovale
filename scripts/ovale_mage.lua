@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_mage"
-	local desc = "[6.0] Ovale: Arcane, Fire, Frost"
+	local desc = "[6.0] Ovale: Rotations (Arcane, Fire, Frost)"
 	local code = [[
-# Ovale mage script based on SimulationCraft.
+# Mage rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_mage_spells)
@@ -372,45 +372,6 @@ AddFunction ArcanePrecombatCdActions
 	}
 }
 
-### Arcane icons.
-AddCheckBox(opt_mage_arcane_aoe L(AOE) specialization=arcane default)
-
-AddIcon specialization=arcane help=shortcd enemies=1 checkbox=!opt_mage_arcane_aoe
-{
-	if InCombat(no) ArcanePrecombatShortCdActions()
-	ArcaneDefaultShortCdActions()
-}
-
-AddIcon specialization=arcane help=shortcd checkbox=opt_mage_arcane_aoe
-{
-	if InCombat(no) ArcanePrecombatShortCdActions()
-	ArcaneDefaultShortCdActions()
-}
-
-AddIcon specialization=arcane help=main enemies=1
-{
-	if InCombat(no) ArcanePrecombatActions()
-	ArcaneDefaultActions()
-}
-
-AddIcon specialization=arcane help=aoe checkbox=opt_mage_arcane_aoe
-{
-	if InCombat(no) ArcanePrecombatActions()
-	ArcaneDefaultActions()
-}
-
-AddIcon specialization=arcane help=cd enemies=1 checkbox=!opt_mage_arcane_aoe
-{
-	if InCombat(no) ArcanePrecombatCdActions()
-	ArcaneDefaultCdActions()
-}
-
-AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane_aoe
-{
-	if InCombat(no) ArcanePrecombatCdActions()
-	ArcaneDefaultCdActions()
-}
-
 ###
 ### Fire
 ###
@@ -762,45 +723,6 @@ AddFunction FireSingleTargetCdActions
 	}
 }
 
-### Fire icons.
-AddCheckBox(opt_mage_fire_aoe L(AOE) specialization=fire default)
-
-AddIcon specialization=fire help=shortcd enemies=1 checkbox=!opt_mage_fire_aoe
-{
-	if InCombat(no) FirePrecombatShortCdActions()
-	FireDefaultShortCdActions()
-}
-
-AddIcon specialization=fire help=shortcd checkbox=opt_mage_fire_aoe
-{
-	if InCombat(no) FirePrecombatShortCdActions()
-	FireDefaultShortCdActions()
-}
-
-AddIcon specialization=fire help=main enemies=1
-{
-	if InCombat(no) FirePrecombatActions()
-	FireDefaultActions()
-}
-
-AddIcon specialization=fire help=aoe checkbox=opt_mage_fire_aoe
-{
-	if InCombat(no) FirePrecombatActions()
-	FireDefaultActions()
-}
-
-AddIcon specialization=fire help=cd enemies=1 checkbox=!opt_mage_fire_aoe
-{
-	if InCombat(no) FirePrecombatCdActions()
-	FireDefaultCdActions()
-}
-
-AddIcon specialization=fire help=cd checkbox=opt_mage_fire_aoe
-{
-	if InCombat(no) FirePrecombatCdActions()
-	FireDefaultCdActions()
-}
-
 ###
 ### Frost
 ###
@@ -1076,6 +998,96 @@ AddFunction FrostSingleTargetCdActions
 	#call_action_list,name=cooldowns,if=!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>15
 	if not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 15 FrostCooldownsCdActions()
 }
+]]
+	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Arcane, Fire, Frost"
+	local code = [[
+# Ovale mage script based on SimulationCraft.
+
+# Mage rotation functions.
+Include(ovale_mage)
+
+### Arcane icons.
+AddCheckBox(opt_mage_arcane_aoe L(AOE) specialization=arcane default)
+
+AddIcon specialization=arcane help=shortcd enemies=1 checkbox=!opt_mage_arcane_aoe
+{
+	if InCombat(no) ArcanePrecombatShortCdActions()
+	ArcaneDefaultShortCdActions()
+}
+
+AddIcon specialization=arcane help=shortcd checkbox=opt_mage_arcane_aoe
+{
+	if InCombat(no) ArcanePrecombatShortCdActions()
+	ArcaneDefaultShortCdActions()
+}
+
+AddIcon specialization=arcane help=main enemies=1
+{
+	if InCombat(no) ArcanePrecombatActions()
+	ArcaneDefaultActions()
+}
+
+AddIcon specialization=arcane help=aoe checkbox=opt_mage_arcane_aoe
+{
+	if InCombat(no) ArcanePrecombatActions()
+	ArcaneDefaultActions()
+}
+
+AddIcon specialization=arcane help=cd enemies=1 checkbox=!opt_mage_arcane_aoe
+{
+	if InCombat(no) ArcanePrecombatCdActions()
+	ArcaneDefaultCdActions()
+}
+
+AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane_aoe
+{
+	if InCombat(no) ArcanePrecombatCdActions()
+	ArcaneDefaultCdActions()
+}
+
+### Fire icons.
+AddCheckBox(opt_mage_fire_aoe L(AOE) specialization=fire default)
+
+AddIcon specialization=fire help=shortcd enemies=1 checkbox=!opt_mage_fire_aoe
+{
+	if InCombat(no) FirePrecombatShortCdActions()
+	FireDefaultShortCdActions()
+}
+
+AddIcon specialization=fire help=shortcd checkbox=opt_mage_fire_aoe
+{
+	if InCombat(no) FirePrecombatShortCdActions()
+	FireDefaultShortCdActions()
+}
+
+AddIcon specialization=fire help=main enemies=1
+{
+	if InCombat(no) FirePrecombatActions()
+	FireDefaultActions()
+}
+
+AddIcon specialization=fire help=aoe checkbox=opt_mage_fire_aoe
+{
+	if InCombat(no) FirePrecombatActions()
+	FireDefaultActions()
+}
+
+AddIcon specialization=fire help=cd enemies=1 checkbox=!opt_mage_fire_aoe
+{
+	if InCombat(no) FirePrecombatCdActions()
+	FireDefaultCdActions()
+}
+
+AddIcon specialization=fire help=cd checkbox=opt_mage_fire_aoe
+{
+	if InCombat(no) FirePrecombatCdActions()
+	FireDefaultCdActions()
+}
 
 ### Frost icons.
 AddCheckBox(opt_mage_frost_aoe L(AOE) specialization=frost default)
@@ -1116,8 +1128,5 @@ AddIcon specialization=frost help=cd checkbox=opt_mage_frost_aoe
 	FrostDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("MAGE", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("MAGE", name, desc, code, "script")
 end

@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_warlock"
-	local desc = "[6.0] Ovale: Affliction, Demonology, Destruction"
+	local desc = "[6.0] Ovale: Rotations (Affliction, Demonology, Destruction)"
 	local code = [[
-# Ovale warlock script based on SimulationCraft.
+# Warlock rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_warlock_spells)
@@ -148,51 +148,6 @@ AddFunction AfflictionPrecombatCdActions
 			UsePotionIntellect()
 		}
 	}
-}
-
-### Affliction icons.
-AddCheckBox(opt_warlock_affliction_aoe L(AOE) specialization=affliction default)
-
-AddIcon specialization=affliction help=shortcd enemies=1 checkbox=!opt_warlock_affliction_aoe
-{
-	if InCombat(no) AfflictionPrecombatShortCdActions()
-	AfflictionDefaultShortCdActions()
-}
-
-AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction_aoe
-{
-	if InCombat(no) AfflictionPrecombatShortCdActions()
-	AfflictionDefaultShortCdActions()
-}
-
-AddIcon specialization=affliction help=main enemies=1
-{
-	if InCombat(no) AfflictionPrecombatActions()
-	AfflictionDefaultActions()
-}
-
-AddIcon specialization=affliction help=predict enemies=1 checkbox=!opt_warlock_affliction_aoe
-{
-	if InCombat(no) AfflictionPrecombatPredictActions()
-	AfflictionDefaultPredictActions()
-}
-
-AddIcon specialization=affliction help=aoe checkbox=opt_warlock_affliction_aoe
-{
-	if InCombat(no) AfflictionPrecombatActions()
-	AfflictionDefaultActions()
-}
-
-AddIcon specialization=affliction help=cd enemies=1 checkbox=!opt_warlock_affliction_aoe
-{
-	if InCombat(no) AfflictionPrecombatCdActions()
-	AfflictionDefaultCdActions()
-}
-
-AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction_aoe
-{
-	if InCombat(no) AfflictionPrecombatCdActions()
-	AfflictionDefaultCdActions()
 }
 
 ###
@@ -535,51 +490,6 @@ AddFunction DemonologyPrecombatCdActions
 	}
 }
 
-### Demonology icons.
-AddCheckBox(opt_warlock_demonology_aoe L(AOE) specialization=demonology default)
-
-AddIcon specialization=demonology help=shortcd enemies=1 checkbox=!opt_warlock_demonology_aoe
-{
-	if InCombat(no) DemonologyPrecombatShortCdActions()
-	DemonologyDefaultShortCdActions()
-}
-
-AddIcon specialization=demonology help=shortcd checkbox=opt_warlock_demonology_aoe
-{
-	if InCombat(no) DemonologyPrecombatShortCdActions()
-	DemonologyDefaultShortCdActions()
-}
-
-AddIcon specialization=demonology help=main enemies=1
-{
-	if InCombat(no) DemonologyPrecombatActions()
-	DemonologyDefaultActions()
-}
-
-AddIcon specialization=demonology help=predict enemies=1 checkbox=!opt_warlock_demonology_aoe
-{
-	if InCombat(no) DemonologyPrecombatPredictActions()
-	DemonologyDefaultPredictActions()
-}
-
-AddIcon specialization=demonology help=aoe checkbox=opt_warlock_demonology_aoe
-{
-	if InCombat(no) DemonologyPrecombatActions()
-	DemonologyDefaultActions()
-}
-
-AddIcon specialization=demonology help=cd enemies=1 checkbox=!opt_warlock_demonology_aoe
-{
-	if InCombat(no) DemonologyPrecombatCdActions()
-	DemonologyDefaultCdActions()
-}
-
-AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
-{
-	if InCombat(no) DemonologyPrecombatCdActions()
-	DemonologyDefaultCdActions()
-}
-
 ###
 ### Destruction
 ###
@@ -825,6 +735,108 @@ AddFunction DestructionSingleTargetShortCdActions
 }
 
 AddFunction DestructionSingleTargetCdActions {}
+]]
+	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Affliction, Demonology, Destruction"
+	local code = [[
+# Ovale warlock script based on SimulationCraft.
+
+# Warlock rotation functions.
+Include(ovale_warlock)
+
+### Affliction icons.
+AddCheckBox(opt_warlock_affliction_aoe L(AOE) specialization=affliction default)
+
+AddIcon specialization=affliction help=shortcd enemies=1 checkbox=!opt_warlock_affliction_aoe
+{
+	if InCombat(no) AfflictionPrecombatShortCdActions()
+	AfflictionDefaultShortCdActions()
+}
+
+AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction_aoe
+{
+	if InCombat(no) AfflictionPrecombatShortCdActions()
+	AfflictionDefaultShortCdActions()
+}
+
+AddIcon specialization=affliction help=main enemies=1
+{
+	if InCombat(no) AfflictionPrecombatActions()
+	AfflictionDefaultActions()
+}
+
+AddIcon specialization=affliction help=predict enemies=1 checkbox=!opt_warlock_affliction_aoe
+{
+	if InCombat(no) AfflictionPrecombatPredictActions()
+	AfflictionDefaultPredictActions()
+}
+
+AddIcon specialization=affliction help=aoe checkbox=opt_warlock_affliction_aoe
+{
+	if InCombat(no) AfflictionPrecombatActions()
+	AfflictionDefaultActions()
+}
+
+AddIcon specialization=affliction help=cd enemies=1 checkbox=!opt_warlock_affliction_aoe
+{
+	if InCombat(no) AfflictionPrecombatCdActions()
+	AfflictionDefaultCdActions()
+}
+
+AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction_aoe
+{
+	if InCombat(no) AfflictionPrecombatCdActions()
+	AfflictionDefaultCdActions()
+}
+
+### Demonology icons.
+AddCheckBox(opt_warlock_demonology_aoe L(AOE) specialization=demonology default)
+
+AddIcon specialization=demonology help=shortcd enemies=1 checkbox=!opt_warlock_demonology_aoe
+{
+	if InCombat(no) DemonologyPrecombatShortCdActions()
+	DemonologyDefaultShortCdActions()
+}
+
+AddIcon specialization=demonology help=shortcd checkbox=opt_warlock_demonology_aoe
+{
+	if InCombat(no) DemonologyPrecombatShortCdActions()
+	DemonologyDefaultShortCdActions()
+}
+
+AddIcon specialization=demonology help=main enemies=1
+{
+	if InCombat(no) DemonologyPrecombatActions()
+	DemonologyDefaultActions()
+}
+
+AddIcon specialization=demonology help=predict enemies=1 checkbox=!opt_warlock_demonology_aoe
+{
+	if InCombat(no) DemonologyPrecombatPredictActions()
+	DemonologyDefaultPredictActions()
+}
+
+AddIcon specialization=demonology help=aoe checkbox=opt_warlock_demonology_aoe
+{
+	if InCombat(no) DemonologyPrecombatActions()
+	DemonologyDefaultActions()
+}
+
+AddIcon specialization=demonology help=cd enemies=1 checkbox=!opt_warlock_demonology_aoe
+{
+	if InCombat(no) DemonologyPrecombatCdActions()
+	DemonologyDefaultCdActions()
+}
+
+AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
+{
+	if InCombat(no) DemonologyPrecombatCdActions()
+	DemonologyDefaultCdActions()
+}
 
 ### Destruction icons.
 AddCheckBox(opt_warlock_destruction_aoe L(AOE) specialization=destruction default)
@@ -871,8 +883,5 @@ AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction_aoe
 	DestructionDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("WARLOCK", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "script")
 end

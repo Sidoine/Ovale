@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_druid"
-	local desc = "[6.0] Ovale: Feral, Guardian, Restoration"
+	local desc = "[6.0] Ovale: Rotations (Feral, Guardian, Restoration)"
 	local code = [[
-# Ovale druid script based on SimulationCraft.
+# Druid rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_druid_spells)
@@ -275,51 +275,6 @@ AddFunction FeralPrecombatCdActions
 	}
 }
 
-### Feral Icons
-AddCheckBox(opt_druid_feral_aoe L(AOE) specialization=feral default)
-
-AddIcon specialization=feral help=shortcd enemies=1 checkbox=!opt_druid_feral_aoe
-{
-	if InCombat(no) FeralPrecombatShortCdActions()
-	FeralDefaultShortCdActions()
-}
-
-AddIcon specialization=feral help=shortcd checkbox=opt_druid_feral_aoe
-{
-	if InCombat(no) FeralPrecombatShortCdActions()
-	FeralDefaultShortCdActions()
-}
-
-AddIcon specialization=feral help=main enemies=1
-{
-	if InCombat(no) FeralPrecombatActions()
-	FeralDefaultActions()
-}
-
-AddIcon specialization=feral help=predict enemies=1 checkbox=!opt_druid_feral_aoe
-{
-	if InCombat(no) FeralPrecombatPredictActions()
-	FeralDefaultPredictActions()
-}
-
-AddIcon specialization=feral help=aoe checkbox=opt_druid_feral_aoe
-{
-	if InCombat(no) FeralPrecombatActions()
-	FeralDefaultActions()
-}
-
-AddIcon specialization=feral help=cd enemies=1 checkbox=!opt_druid_feral_aoe
-{
-	if InCombat(no) FeralPrecombatCdActions()
-	FeralDefaultCdActions()
-}
-
-AddIcon specialization=feral help=cd checkbox=opt_druid_feral_aoe
-{
-	if InCombat(no) FeralPrecombatCdActions()
-	FeralDefaultCdActions()
-}
-
 ###
 ### Guardian
 ###
@@ -426,45 +381,6 @@ AddFunction GuardianPrecombatShortCdActions {}
 
 AddFunction GuardianPrecombatCdActions {}
 
-### Guardian icons.
-AddCheckBox(opt_druid_guardian_aoe L(AOE) specialization=guardian default)
-
-AddIcon specialization=guardian help=shortcd enemies=1 checkbox=!opt_druid_guardian_aoe
-{
-	if InCombat(no) GuardianPrecombatShortCdActions()
-	GuardianDefaultShortCdActions()
-}
-
-AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian_aoe
-{
-	if InCombat(no) GuardianPrecombatShortCdActions()
-	GuardianDefaultShortCdActions()
-}
-
-AddIcon specialization=guardian help=main enemies=1
-{
-	if InCombat(no) GuardianPrecombatActions()
-	GuardianDefaultActions()
-}
-
-AddIcon specialization=guardian help=aoe checkbox=opt_druid_guardian_aoe
-{
-	if InCombat(no) GuardianPrecombatActions()
-	GuardianDefaultActions()
-}
-
-AddIcon specialization=guardian help=cd enemies=1 checkbox=!opt_druid_guardian_aoe
-{
-	if InCombat(no) GuardianPrecombatCdActions()
-	GuardianDefaultCdActions()
-}
-
-AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
-{
-	if InCombat(no) GuardianPrecombatCdActions()
-	GuardianDefaultCdActions()
-}
-
 ###
 ### Restoration
 ###
@@ -528,6 +444,102 @@ AddFunction RestorationCdActions
 	Spell(heart_of_the_wild_heal)
 	Spell(natures_vigil)
 }
+]]
+	OvaleScripts:RegisterScript("DRUID", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Feral, Guardian, Restoration"
+	local code = [[
+# Ovale druid script based on SimulationCraft.
+
+# Druid rotation functions.
+Include(ovale_druid)
+
+### Feral Icons
+AddCheckBox(opt_druid_feral_aoe L(AOE) specialization=feral default)
+
+AddIcon specialization=feral help=shortcd enemies=1 checkbox=!opt_druid_feral_aoe
+{
+	if InCombat(no) FeralPrecombatShortCdActions()
+	FeralDefaultShortCdActions()
+}
+
+AddIcon specialization=feral help=shortcd checkbox=opt_druid_feral_aoe
+{
+	if InCombat(no) FeralPrecombatShortCdActions()
+	FeralDefaultShortCdActions()
+}
+
+AddIcon specialization=feral help=main enemies=1
+{
+	if InCombat(no) FeralPrecombatActions()
+	FeralDefaultActions()
+}
+
+AddIcon specialization=feral help=predict enemies=1 checkbox=!opt_druid_feral_aoe
+{
+	if InCombat(no) FeralPrecombatPredictActions()
+	FeralDefaultPredictActions()
+}
+
+AddIcon specialization=feral help=aoe checkbox=opt_druid_feral_aoe
+{
+	if InCombat(no) FeralPrecombatActions()
+	FeralDefaultActions()
+}
+
+AddIcon specialization=feral help=cd enemies=1 checkbox=!opt_druid_feral_aoe
+{
+	if InCombat(no) FeralPrecombatCdActions()
+	FeralDefaultCdActions()
+}
+
+AddIcon specialization=feral help=cd checkbox=opt_druid_feral_aoe
+{
+	if InCombat(no) FeralPrecombatCdActions()
+	FeralDefaultCdActions()
+}
+
+### Guardian icons.
+AddCheckBox(opt_druid_guardian_aoe L(AOE) specialization=guardian default)
+
+AddIcon specialization=guardian help=shortcd enemies=1 checkbox=!opt_druid_guardian_aoe
+{
+	if InCombat(no) GuardianPrecombatShortCdActions()
+	GuardianDefaultShortCdActions()
+}
+
+AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian_aoe
+{
+	if InCombat(no) GuardianPrecombatShortCdActions()
+	GuardianDefaultShortCdActions()
+}
+
+AddIcon specialization=guardian help=main enemies=1
+{
+	if InCombat(no) GuardianPrecombatActions()
+	GuardianDefaultActions()
+}
+
+AddIcon specialization=guardian help=aoe checkbox=opt_druid_guardian_aoe
+{
+	if InCombat(no) GuardianPrecombatActions()
+	GuardianDefaultActions()
+}
+
+AddIcon specialization=guardian help=cd enemies=1 checkbox=!opt_druid_guardian_aoe
+{
+	if InCombat(no) GuardianPrecombatCdActions()
+	GuardianDefaultCdActions()
+}
+
+AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
+{
+	if InCombat(no) GuardianPrecombatCdActions()
+	GuardianDefaultCdActions()
+}
 
 ### Restoration icons.
 AddCheckBox(opt_druid_restoration_aoe L(AOE) specialization=restoration default)
@@ -553,8 +565,5 @@ AddIcon specialization=restoration help=cd
 	RestorationCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("DRUID", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("DRUID", name, desc, code, "script")
 end

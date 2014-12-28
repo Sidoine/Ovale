@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_priest"
-	local desc = "[6.0] Ovale: Shadow"
+	local desc = "[6.0] Ovale: Rotations (Shadow)"
 	local code = [[
-# Ovale priest script based on SimulationCraft.
+# Priest rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_priest_spells)
@@ -688,6 +688,18 @@ AddFunction ShadowVentCdActions
 	#shadowfiend,if=!talent.mindbender.enabled&cooldown.mind_blast.remains>=gcd
 	if not Talent(mindbender_talent) and SpellCooldown(mind_blast) >= GCD() Spell(shadowfiend)
 }
+]]
+	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Shadow"
+	local code = [[
+# Ovale priest script based on SimulationCraft.
+
+# Priest rotation functions.
+Include(ovale_priest)
 
 ### Shadow icons
 AddCheckBox(opt_priest_shadow_aoe L(AOE) specialization=shadow default)
@@ -728,8 +740,5 @@ AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow_aoe
 	ShadowDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("PRIEST", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "script")
 end

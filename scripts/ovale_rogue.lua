@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_rogue"
-	local desc = "[6.0] Ovale: Assassination, Combat, Subtlety"
+	local desc = "[6.0] Ovale: Rotations (Assassination, Combat, Subtlety)"
 	local code = [[
-# Ovale rogue script based on SimulationCraft.
+# Rogue rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_rogue_spells)
@@ -185,45 +185,6 @@ AddFunction AssassinationPrecombatCdActions
 	}
 }
 
-### Assassination icons.
-AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
-
-AddIcon specialization=assassination help=shortcd enemies=1 checkbox=!opt_rogue_assassination_aoe
-{
-	if InCombat(no) AssassinationPrecombatShortCdActions()
-	AssassinationDefaultShortCdActions()
-}
-
-AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination_aoe
-{
-	if InCombat(no) AssassinationPrecombatShortCdActions()
-	AssassinationDefaultShortCdActions()
-}
-
-AddIcon specialization=assassination help=main enemies=1
-{
-	if InCombat(no) AssassinationPrecombatActions()
-	AssassinationDefaultActions()
-}
-
-AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination_aoe
-{
-	if InCombat(no) AssassinationPrecombatActions()
-	AssassinationDefaultActions()
-}
-
-AddIcon specialization=assassination help=cd enemies=1 checkbox=!opt_rogue_assassination_aoe
-{
-	if InCombat(no) AssassinationPrecombatCdActions()
-	AssassinationDefaultCdActions()
-}
-
-AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_aoe
-{
-	if InCombat(no) AssassinationPrecombatCdActions()
-	AssassinationDefaultCdActions()
-}
-
 ###
 ### Combat
 ###
@@ -377,45 +338,6 @@ AddFunction CombatPrecombatCdActions
 		#potion,name=virmens_bite
 		UsePotionAgility()
 	}
-}
-
-### Combat icons.
-AddCheckBox(opt_rogue_combat_aoe L(AOE) specialization=combat default)
-
-AddIcon specialization=combat help=shortcd enemies=1 checkbox=!opt_rogue_combat_aoe
-{
-	if InCombat(no) CombatPrecombatShortCdActions()
-	CombatDefaultShortCdActions()
-}
-
-AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat_aoe
-{
-	if InCombat(no) CombatPrecombatShortCdActions()
-	CombatDefaultShortCdActions()
-}
-
-AddIcon specialization=combat help=main enemies=1
-{
-	if InCombat(no) CombatPrecombatActions()
-	CombatDefaultActions()
-}
-
-AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat_aoe
-{
-	if InCombat(no) CombatPrecombatActions()
-	CombatDefaultActions()
-}
-
-AddIcon specialization=combat help=cd enemies=1 checkbox=!opt_rogue_combat_aoe
-{
-	if InCombat(no) CombatPrecombatCdActions()
-	CombatDefaultCdActions()
-}
-
-AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
-{
-	if InCombat(no) CombatPrecombatCdActions()
-	CombatDefaultCdActions()
 }
 
 ###
@@ -683,6 +605,96 @@ AddFunction SubtletyPrecombatCdActions
 		UsePotionAgility()
 	}
 }
+]]
+	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Assassination, Combat, Subtlety"
+	local code = [[
+# Ovale rogue script based on SimulationCraft.
+
+# Rogue rotation functions.
+Include(ovale_rogue)
+
+### Assassination icons.
+AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
+
+AddIcon specialization=assassination help=shortcd enemies=1 checkbox=!opt_rogue_assassination_aoe
+{
+	if InCombat(no) AssassinationPrecombatShortCdActions()
+	AssassinationDefaultShortCdActions()
+}
+
+AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination_aoe
+{
+	if InCombat(no) AssassinationPrecombatShortCdActions()
+	AssassinationDefaultShortCdActions()
+}
+
+AddIcon specialization=assassination help=main enemies=1
+{
+	if InCombat(no) AssassinationPrecombatActions()
+	AssassinationDefaultActions()
+}
+
+AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination_aoe
+{
+	if InCombat(no) AssassinationPrecombatActions()
+	AssassinationDefaultActions()
+}
+
+AddIcon specialization=assassination help=cd enemies=1 checkbox=!opt_rogue_assassination_aoe
+{
+	if InCombat(no) AssassinationPrecombatCdActions()
+	AssassinationDefaultCdActions()
+}
+
+AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_aoe
+{
+	if InCombat(no) AssassinationPrecombatCdActions()
+	AssassinationDefaultCdActions()
+}
+
+### Combat icons.
+AddCheckBox(opt_rogue_combat_aoe L(AOE) specialization=combat default)
+
+AddIcon specialization=combat help=shortcd enemies=1 checkbox=!opt_rogue_combat_aoe
+{
+	if InCombat(no) CombatPrecombatShortCdActions()
+	CombatDefaultShortCdActions()
+}
+
+AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat_aoe
+{
+	if InCombat(no) CombatPrecombatShortCdActions()
+	CombatDefaultShortCdActions()
+}
+
+AddIcon specialization=combat help=main enemies=1
+{
+	if InCombat(no) CombatPrecombatActions()
+	CombatDefaultActions()
+}
+
+AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat_aoe
+{
+	if InCombat(no) CombatPrecombatActions()
+	CombatDefaultActions()
+}
+
+AddIcon specialization=combat help=cd enemies=1 checkbox=!opt_rogue_combat_aoe
+{
+	if InCombat(no) CombatPrecombatCdActions()
+	CombatDefaultCdActions()
+}
+
+AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
+{
+	if InCombat(no) CombatPrecombatCdActions()
+	CombatDefaultCdActions()
+}
 
 ### Subtlety icons.
 AddCheckBox(opt_rogue_subtlety_aoe L(AOE) specialization=subtlety default)
@@ -723,8 +735,5 @@ AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety_aoe
 	SubtletyDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("ROGUE", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
 end

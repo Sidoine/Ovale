@@ -3,8 +3,10 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_hunter"
-	local desc = "[6.0] Ovale: Beast Mastery, Marksmanship, Survival"
+	local desc = "[6.0] Ovale: Rotations (Beast Mastery, Marksmanship, Survival)"
 	local code = [[
+# Hunter rotation functions based on SimulationCraft.
+
 Include(ovale_common)
 Include(ovale_hunter_spells)
 
@@ -169,45 +171,6 @@ AddFunction BeastMasteryPrecombatCdActions
 	}
 }
 
-### Beast Mastery icons
-AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) specialization=beast_mastery default)
-
-AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
-{
-	if InCombat(no) BeastMasteryPrecombatShortCdActions()
-	BeastMasteryDefaultShortCdActions()
-}
-
-AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_beast_mastery_aoe
-{
-	if InCombat(no) BeastMasteryPrecombatShortCdActions()
-	BeastMasteryDefaultShortCdActions()
-}
-
-AddIcon specialization=beast_mastery help=main enemies=1
-{
-	if InCombat(no) BeastMasteryPrecombatActions()
-	BeastMasteryDefaultActions()
-}
-
-AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_beast_mastery_aoe
-{
-	if InCombat(no) BeastMasteryPrecombatActions()
-	BeastMasteryDefaultActions()
-}
-
-AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
-{
-	if InCombat(no) BeastMasteryPrecombatCdActions()
-	BeastMasteryDefaultCdActions()
-}
-
-AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_aoe
-{
-	if InCombat(no) BeastMasteryPrecombatCdActions()
-	BeastMasteryDefaultCdActions()
-}
-
 ###
 ### Marksmanship
 ###
@@ -357,45 +320,6 @@ AddFunction MarksmanshipPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
-}
-
-### Marksmanship icons
-AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) specialization=marksmanship default)
-
-AddIcon specialization=marksmanship help=shortcd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
-{
-	if InCombat(no) MarksmanshipPrecombatShortCdActions()
-	MarksmanshipDefaultShortCdActions()
-}
-
-AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship_aoe
-{
-	if InCombat(no) MarksmanshipPrecombatShortCdActions()
-	MarksmanshipDefaultShortCdActions()
-}
-
-AddIcon specialization=marksmanship help=main enemies=1
-{
-	if InCombat(no) MarksmanshipPrecombatActions()
-	MarksmanshipDefaultActions()
-}
-
-AddIcon specialization=marksmanship help=aoe checkbox=opt_hunter_marksmanship_aoe
-{
-	if InCombat(no) MarksmanshipPrecombatActions()
-	MarksmanshipDefaultActions()
-}
-
-AddIcon specialization=marksmanship help=cd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
-{
-	if InCombat(no) MarksmanshipPrecombatCdActions()
-	MarksmanshipDefaultCdActions()
-}
-
-AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship_aoe
-{
-	if InCombat(no) MarksmanshipPrecombatCdActions()
-	MarksmanshipDefaultCdActions()
 }
 
 ###
@@ -562,6 +486,96 @@ AddFunction SurvivalPrecombatCdActions
 		UsePotionAgility()
 	}
 }
+]]
+	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Beast Mastery, Marksmanship, Survival"
+	local code = [[
+# Ovale hunter script based on SimulationCraft.
+
+# Hunter rotation functions.
+Include(ovale_hunter)
+
+### Beast Mastery icons
+AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) specialization=beast_mastery default)
+
+AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
+{
+	if InCombat(no) BeastMasteryPrecombatShortCdActions()
+	BeastMasteryDefaultShortCdActions()
+}
+
+AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_beast_mastery_aoe
+{
+	if InCombat(no) BeastMasteryPrecombatShortCdActions()
+	BeastMasteryDefaultShortCdActions()
+}
+
+AddIcon specialization=beast_mastery help=main enemies=1
+{
+	if InCombat(no) BeastMasteryPrecombatActions()
+	BeastMasteryDefaultActions()
+}
+
+AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_beast_mastery_aoe
+{
+	if InCombat(no) BeastMasteryPrecombatActions()
+	BeastMasteryDefaultActions()
+}
+
+AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
+{
+	if InCombat(no) BeastMasteryPrecombatCdActions()
+	BeastMasteryDefaultCdActions()
+}
+
+AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_aoe
+{
+	if InCombat(no) BeastMasteryPrecombatCdActions()
+	BeastMasteryDefaultCdActions()
+}
+
+### Marksmanship icons
+AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) specialization=marksmanship default)
+
+AddIcon specialization=marksmanship help=shortcd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
+{
+	if InCombat(no) MarksmanshipPrecombatShortCdActions()
+	MarksmanshipDefaultShortCdActions()
+}
+
+AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship_aoe
+{
+	if InCombat(no) MarksmanshipPrecombatShortCdActions()
+	MarksmanshipDefaultShortCdActions()
+}
+
+AddIcon specialization=marksmanship help=main enemies=1
+{
+	if InCombat(no) MarksmanshipPrecombatActions()
+	MarksmanshipDefaultActions()
+}
+
+AddIcon specialization=marksmanship help=aoe checkbox=opt_hunter_marksmanship_aoe
+{
+	if InCombat(no) MarksmanshipPrecombatActions()
+	MarksmanshipDefaultActions()
+}
+
+AddIcon specialization=marksmanship help=cd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
+{
+	if InCombat(no) MarksmanshipPrecombatCdActions()
+	MarksmanshipDefaultCdActions()
+}
+
+AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship_aoe
+{
+	if InCombat(no) MarksmanshipPrecombatCdActions()
+	MarksmanshipDefaultCdActions()
+}
 
 ### Survival icons
 AddCheckBox(opt_hunter_survival_aoe L(AOE) specialization=survival default)
@@ -602,8 +616,5 @@ AddIcon specialization=survival help=cd checkbox=opt_hunter_survival_aoe
 	SurvivalDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("HUNTER", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "script")
 end

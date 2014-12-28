@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_warrior"
-	local desc = "[6.0] Ovale: Arms, Fury, Protection"
+	local desc = "[6.0] Ovale: Rotations (Arms, Fury, Protection)"
 	local code = [[
-# Ovale warrior script based on SimulationCraft.
+# Warrior rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
@@ -242,45 +242,6 @@ AddFunction ArmsSingleShortCdActions
 }
 
 AddFunction ArmsSingleCdActions {}
-
-### Arms icons.
-AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
-
-AddIcon specialization=arms help=shortcd enemies=1 checkbox=!opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatShortCdActions()
-	ArmsDefaultShortCdActions()
-}
-
-AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatShortCdActions()
-	ArmsDefaultShortCdActions()
-}
-
-AddIcon specialization=arms help=main enemies=1
-{
-	if InCombat(no) ArmsPrecombatActions()
-	ArmsDefaultActions()
-}
-
-AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatActions()
-	ArmsDefaultActions()
-}
-
-AddIcon specialization=arms help=cd enemies=1 checkbox=!opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
-}
-
-AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
-{
-	if InCombat(no) ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
-}
 
 ###
 ### Fury (Single-Minded Fury)
@@ -956,93 +917,6 @@ AddFunction FuryTitansGripTwoTargetsCdActions
 	Spell(bloodbath)
 }
 
-### Fury icons.
-AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
-
-AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=one_handed)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatShortCdActions()
-		FurySingleMindedFuryDefaultShortCdActions()
-	}
-	if HasWeapon(main type=two_handed)
-	{
-		if InCombat(no) FuryTitansGripPrecombatShortCdActions()
-		FuryTitansGripDefaultShortCdActions()
-	}
-}
-
-AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=one_handed)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatShortCdActions()
-		FurySingleMindedFuryDefaultShortCdActions()
-	}
-	if HasWeapon(main type=two_handed)
-	{
-		if InCombat(no) FuryTitansGripPrecombatShortCdActions()
-		FuryTitansGripDefaultShortCdActions()
-	}
-}
-
-AddIcon specialization=fury help=main enemies=1
-{
-	if HasWeapon(main type=one_handed)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatActions()
-		FurySingleMindedFuryDefaultActions()
-	}
-	if HasWeapon(main type=two_handed)
-	{
-		if InCombat(no) FuryTitansGripPrecombatActions()
-		FuryTitansGripDefaultActions()
-	}
-}
-
-AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=one_handed)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatActions()
-		FurySingleMindedFuryDefaultActions()
-	}
-	if HasWeapon(main type=two_handed)
-	{
-		if InCombat(no) FuryTitansGripPrecombatActions()
-		FuryTitansGripDefaultActions()
-	}
-}
-
-AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=one_handed)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatCdActions()
-		FurySingleMindedFuryDefaultCdActions()
-	}
-	if HasWeapon(main type=two_handed)
-	{
-		if InCombat(no) FuryTitansGripPrecombatCdActions()
-		FuryTitansGripDefaultCdActions()
-	}
-}
-
-AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
-{
-	if HasWeapon(main type=one_handed)
-	{
-		if InCombat(no) FurySingleMindedFuryPrecombatCdActions()
-		FurySingleMindedFuryDefaultCdActions()
-	}
-	if HasWeapon(main type=two_handed)
-	{
-		if InCombat(no) FuryTitansGripPrecombatCdActions()
-		FuryTitansGripDefaultCdActions()
-	}
-}
-
 ###
 ### Protection
 ###
@@ -1408,6 +1282,144 @@ AddFunction ProtectionGladiatorSingleShortCdActions
 }
 
 AddFunction ProtectionGladiatorSingleCdActions {}
+]]
+	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Arms, Fury, Protection"
+	local code = [[
+# Ovale warrior script based on SimulationCraft.
+
+# Warrior rotation functions.
+Include(ovale_warrior)
+
+### Arms icons.
+AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
+
+AddIcon specialization=arms help=shortcd enemies=1 checkbox=!opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatShortCdActions()
+	ArmsDefaultShortCdActions()
+}
+
+AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatShortCdActions()
+	ArmsDefaultShortCdActions()
+}
+
+AddIcon specialization=arms help=main enemies=1
+{
+	if InCombat(no) ArmsPrecombatActions()
+	ArmsDefaultActions()
+}
+
+AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatActions()
+	ArmsDefaultActions()
+}
+
+AddIcon specialization=arms help=cd enemies=1 checkbox=!opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatCdActions()
+	ArmsDefaultCdActions()
+}
+
+AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
+{
+	if InCombat(no) ArmsPrecombatCdActions()
+	ArmsDefaultCdActions()
+}
+
+### Fury icons.
+AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
+
+AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=one_handed)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatShortCdActions()
+		FurySingleMindedFuryDefaultShortCdActions()
+	}
+	if HasWeapon(main type=two_handed)
+	{
+		if InCombat(no) FuryTitansGripPrecombatShortCdActions()
+		FuryTitansGripDefaultShortCdActions()
+	}
+}
+
+AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=one_handed)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatShortCdActions()
+		FurySingleMindedFuryDefaultShortCdActions()
+	}
+	if HasWeapon(main type=two_handed)
+	{
+		if InCombat(no) FuryTitansGripPrecombatShortCdActions()
+		FuryTitansGripDefaultShortCdActions()
+	}
+}
+
+AddIcon specialization=fury help=main enemies=1
+{
+	if HasWeapon(main type=one_handed)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatActions()
+		FurySingleMindedFuryDefaultActions()
+	}
+	if HasWeapon(main type=two_handed)
+	{
+		if InCombat(no) FuryTitansGripPrecombatActions()
+		FuryTitansGripDefaultActions()
+	}
+}
+
+AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=one_handed)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatActions()
+		FurySingleMindedFuryDefaultActions()
+	}
+	if HasWeapon(main type=two_handed)
+	{
+		if InCombat(no) FuryTitansGripPrecombatActions()
+		FuryTitansGripDefaultActions()
+	}
+}
+
+AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=one_handed)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatCdActions()
+		FurySingleMindedFuryDefaultCdActions()
+	}
+	if HasWeapon(main type=two_handed)
+	{
+		if InCombat(no) FuryTitansGripPrecombatCdActions()
+		FuryTitansGripDefaultCdActions()
+	}
+}
+
+AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
+{
+	if HasWeapon(main type=one_handed)
+	{
+		if InCombat(no) FurySingleMindedFuryPrecombatCdActions()
+		FurySingleMindedFuryDefaultCdActions()
+	}
+	if HasWeapon(main type=two_handed)
+	{
+		if InCombat(no) FuryTitansGripPrecombatCdActions()
+		FuryTitansGripDefaultCdActions()
+	}
+}
 
 ### Protection icons.
 AddCheckBox(opt_warrior_protection_aoe L(AOE) specialization=protection default)
@@ -1496,8 +1508,5 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 	}
 }
 ]]
-
-	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("WARRIOR", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "script")
 end

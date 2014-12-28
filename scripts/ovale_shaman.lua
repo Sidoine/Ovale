@@ -2,10 +2,10 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "legacy_ovale_shaman"
-	local desc = "[6.0] Ovale: Elemental, Enhancement, Restoration"
+	local name = "ovale_shaman"
+	local desc = "[6.0] Ovale: Rotations (Elemental, Enhancement, Restoration)"
 	local code = [[
-# Ovale shaman script based on SimulationCraft.
+# Shaman rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_shaman_spells)
@@ -224,45 +224,6 @@ AddFunction ElementalSingleShortCdActions
 
 AddFunction ElementalSingleCdActions {}
 
-### Elemental icons.
-AddCheckBox(opt_shaman_elemental_aoe L(AOE) specialization=elemental default)
-
-AddIcon specialization=elemental help=shortcd enemies=1 checkbox=!opt_shaman_elemental_aoe
-{
-	if InCombat(no) ElementalPrecombatShortCdActions()
-	ElementalDefaultShortCdActions()
-}
-
-AddIcon specialization=elemental help=shortcd checkbox=opt_shaman_elemental_aoe
-{
-	if InCombat(no) ElementalPrecombatShortCdActions()
-	ElementalDefaultShortCdActions()
-}
-
-AddIcon specialization=elemental help=main enemies=1
-{
-	if InCombat(no) ElementalPrecombatActions()
-	ElementalDefaultActions()
-}
-
-AddIcon specialization=elemental help=aoe checkbox=opt_shaman_elemental_aoe
-{
-	if InCombat(no) ElementalPrecombatActions()
-	ElementalDefaultActions()
-}
-
-AddIcon specialization=elemental help=cd enemies=1 checkbox=!opt_shaman_elemental_aoe
-{
-	if InCombat(no) ElementalPrecombatCdActions()
-	ElementalDefaultCdActions()
-}
-
-AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
-{
-	if InCombat(no) ElementalPrecombatCdActions()
-	ElementalDefaultCdActions()
-}
-
 ###
 ### Enhancement
 ###
@@ -427,45 +388,6 @@ AddFunction EnhancementSingleActions
 	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }
 
-### Enhancement icons.
-AddCheckBox(opt_shaman_enhancement_aoe L(AOE) specialization=enhancement default)
-
-AddIcon specialization=enhancement help=shortcd enemies=1 checkbox=!opt_shaman_enhancement_aoe
-{
-	if InCombat(no) EnhancementPrecombatShortCdActions()
-	EnhancementDefaultShortCdActions()
-}
-
-AddIcon specialization=enhancement help=shortcd checkbox=opt_shaman_enhancement_aoe
-{
-	if InCombat(no) EnhancementPrecombatShortCdActions()
-	EnhancementDefaultShortCdActions()
-}
-
-AddIcon specialization=enhancement help=main enemies=1
-{
-	if InCombat(no) EnhancementPrecombatActions()
-	EnhancementDefaultActions()
-}
-
-AddIcon specialization=enhancement help=aoe checkbox=opt_shaman_enhancement_aoe
-{
-	if InCombat(no) EnhancementPrecombatActions()
-	EnhancementDefaultActions()
-}
-
-AddIcon specialization=enhancement help=cd enemies=1 checkbox=!opt_shaman_enhancement_aoe
-{
-	if InCombat(no) EnhancementPrecombatCdActions()
-	EnhancementDefaultCdActions()
-}
-
-AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
-{
-	if InCombat(no) EnhancementPrecombatCdActions()
-	EnhancementDefaultCdActions()
-}
-
 ###
 ### Restoration
 ###
@@ -527,6 +449,96 @@ AddFunction RestorationCdActions
 	Spell(fire_elemental_totem)
 	Spell(earth_elemental_totem)
 }
+]]
+	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Elemental, Enhancement, Restoration"
+	local code = [[
+# Ovale shaman script based on SimulationCraft.
+
+# Shaman rotation functions.
+Include(ovale_shaman)
+
+### Elemental icons.
+AddCheckBox(opt_shaman_elemental_aoe L(AOE) specialization=elemental default)
+
+AddIcon specialization=elemental help=shortcd enemies=1 checkbox=!opt_shaman_elemental_aoe
+{
+	if InCombat(no) ElementalPrecombatShortCdActions()
+	ElementalDefaultShortCdActions()
+}
+
+AddIcon specialization=elemental help=shortcd checkbox=opt_shaman_elemental_aoe
+{
+	if InCombat(no) ElementalPrecombatShortCdActions()
+	ElementalDefaultShortCdActions()
+}
+
+AddIcon specialization=elemental help=main enemies=1
+{
+	if InCombat(no) ElementalPrecombatActions()
+	ElementalDefaultActions()
+}
+
+AddIcon specialization=elemental help=aoe checkbox=opt_shaman_elemental_aoe
+{
+	if InCombat(no) ElementalPrecombatActions()
+	ElementalDefaultActions()
+}
+
+AddIcon specialization=elemental help=cd enemies=1 checkbox=!opt_shaman_elemental_aoe
+{
+	if InCombat(no) ElementalPrecombatCdActions()
+	ElementalDefaultCdActions()
+}
+
+AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
+{
+	if InCombat(no) ElementalPrecombatCdActions()
+	ElementalDefaultCdActions()
+}
+
+### Enhancement icons.
+AddCheckBox(opt_shaman_enhancement_aoe L(AOE) specialization=enhancement default)
+
+AddIcon specialization=enhancement help=shortcd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+{
+	if InCombat(no) EnhancementPrecombatShortCdActions()
+	EnhancementDefaultShortCdActions()
+}
+
+AddIcon specialization=enhancement help=shortcd checkbox=opt_shaman_enhancement_aoe
+{
+	if InCombat(no) EnhancementPrecombatShortCdActions()
+	EnhancementDefaultShortCdActions()
+}
+
+AddIcon specialization=enhancement help=main enemies=1
+{
+	if InCombat(no) EnhancementPrecombatActions()
+	EnhancementDefaultActions()
+}
+
+AddIcon specialization=enhancement help=aoe checkbox=opt_shaman_enhancement_aoe
+{
+	if InCombat(no) EnhancementPrecombatActions()
+	EnhancementDefaultActions()
+}
+
+AddIcon specialization=enhancement help=cd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+{
+	if InCombat(no) EnhancementPrecombatCdActions()
+	EnhancementDefaultCdActions()
+}
+
+AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
+{
+	if InCombat(no) EnhancementPrecombatCdActions()
+	EnhancementDefaultCdActions()
+}
 
 ### Restoration icons.
 AddCheckBox(opt_shaman_restoration_aoe L(AOE) specialization=restoration default)
@@ -551,8 +563,5 @@ AddIcon specialization=restoration help=cd
 	RestorationCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("SHAMAN", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "script")
 end

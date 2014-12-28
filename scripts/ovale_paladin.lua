@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_paladin"
-	local desc = "[6.0] Ovale: Protection, Retribution"
+	local desc = "[6.0] Ovale: Rotations (Protection, Retribution)"
 	local code = [[
-# Ovale paladin script based on SimulationCraft.
+# Paladin rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_paladin_spells)
@@ -281,45 +281,6 @@ AddFunction ProtectionPrecombatCdActions
 	}
 }
 
-### Protection Icons
-AddCheckBox(opt_paladin_protection_aoe L(AOE) specialization=protection default)
-
-AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_paladin_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatShortCdActions()
-	ProtectionDefaultShortCdActions()
-}
-
-AddIcon specialization=protection help=shortcd checkbox=opt_paladin_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatShortCdActions()
-	ProtectionDefaultShortCdActions()
-}
-
-AddIcon specialization=protection help=main enemies=1
-{
-	if InCombat(no) ProtectionPrecombatActions()
-	ProtectionDefaultActions()
-}
-
-AddIcon specialization=protection help=aoe checkbox=opt_paladin_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatActions()
-	ProtectionDefaultActions()
-}
-
-AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_paladin_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatCdActions()
-	ProtectionDefaultCdActions()
-}
-
-AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
-{
-	if InCombat(no) ProtectionPrecombatCdActions()
-	ProtectionDefaultCdActions()
-}
-
 ###
 ### Retribution
 ###
@@ -572,6 +533,57 @@ AddFunction RetributionSingleActions
 	#holy_prism
 	Spell(holy_prism)
 }
+]]
+	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Protection, Retribution"
+	local code = [[
+# Ovale paladin script based on SimulationCraft.
+
+# Paladin rotation functions.
+Include(ovale_paladin)
+
+### Protection Icons
+AddCheckBox(opt_paladin_protection_aoe L(AOE) specialization=protection default)
+
+AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_paladin_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatShortCdActions()
+	ProtectionDefaultShortCdActions()
+}
+
+AddIcon specialization=protection help=shortcd checkbox=opt_paladin_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatShortCdActions()
+	ProtectionDefaultShortCdActions()
+}
+
+AddIcon specialization=protection help=main enemies=1
+{
+	if InCombat(no) ProtectionPrecombatActions()
+	ProtectionDefaultActions()
+}
+
+AddIcon specialization=protection help=aoe checkbox=opt_paladin_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatActions()
+	ProtectionDefaultActions()
+}
+
+AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_paladin_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatCdActions()
+	ProtectionDefaultCdActions()
+}
+
+AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
+{
+	if InCombat(no) ProtectionPrecombatCdActions()
+	ProtectionDefaultCdActions()
+}
 
 ### Retribution Icons
 AddCheckBox(opt_paladin_retribution_aoe L(AOE) specialization=retribution default)
@@ -612,8 +624,5 @@ AddIcon specialization=retribution help=cd checkbox=opt_paladin_retribution_aoe
 	RetributionDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("PALADIN", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "script")
 end

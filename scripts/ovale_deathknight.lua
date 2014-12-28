@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_deathknight"
-	local desc = "[6.0] Ovale: Blood, Frost, Unholy"
+	local desc = "[6.0] Ovale: Rotations (Blood, Frost, Unholy)"
 	local code = [[
-# Ovale death knight script based on SimulationCraft.
+# Death knight rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_deathknight_spells)
@@ -259,45 +259,6 @@ AddFunction BloodReActions
 	if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
 	#call_action_list,name=blood,if=blood=2
 	if Rune(blood) >= 2 BloodBloodActions()
-}
-
-### Blood icons
-AddCheckBox(opt_deathknight_blood_aoe L(AOE) specialization=blood default)
-
-AddIcon specialization=blood help=shortcd enemies=1 checkbox=!opt_deathknight_blood_aoe
-{
-	if InCombat(no) BloodPrecombatShortCdActions()
-	BloodDefaultShortCdActions()
-}
-
-AddIcon specialization=blood help=shortcd checkbox=opt_deathknight_blood_aoe
-{
-	if InCombat(no) BloodPrecombatShortCdActions()
-	BloodDefaultShortCdActions()
-}
-
-AddIcon specialization=blood help=main enemies=1
-{
-	if InCombat(no) BloodPrecombatActions()
-	BloodDefaultActions()
-}
-
-AddIcon specialization=blood help=aoe checkbox=opt_deathknight_blood_aoe
-{
-	if InCombat(no) BloodPrecombatActions()
-	BloodDefaultActions()
-}
-
-AddIcon specialization=blood help=cd enemies=1 checkbox=!opt_deathknight_blood_aoe
-{
-	if InCombat(no) BloodPrecombatCdActions()
-	BloodDefaultCdActions()
-}
-
-AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood_aoe
-{
-	if InCombat(no) BloodPrecombatCdActions()
-	BloodDefaultCdActions()
 }
 
 ###
@@ -1062,93 +1023,6 @@ AddFunction FrostTwoHanderSingleTargetCdActions
 	}
 }
 
-### Frost icons.
-AddCheckBox(opt_deathknight_frost_aoe L(AOE) specialization=frost default)
-
-AddIcon specialization=frost help=shortcd enemies=1 checkbox=!opt_deathknight_frost_aoe
-{
-	if HasWeapon(offhand)
-	{
-		if InCombat(no) FrostDualWieldPrecombatShortCdActions()
-		FrostDualWieldDefaultShortCdActions()
-	}
-	if HasWeapon(offhand no)
-	{
-		if InCombat(no) FrostTwoHanderPrecombatShortCdActions()
-		FrostTwoHanderDefaultShortCdActions()
-	}
-}
-
-AddIcon specialization=frost help=shortcd checkbox=opt_deathknight_frost_aoe
-{
-	if HasWeapon(offhand)
-	{
-		if InCombat(no) FrostDualWieldPrecombatShortCdActions()
-		FrostDualWieldDefaultShortCdActions()
-	}
-	if HasWeapon(offhand no)
-	{
-		if InCombat(no) FrostTwoHanderPrecombatShortCdActions()
-		FrostTwoHanderDefaultShortCdActions()
-	}
-}
-
-AddIcon specialization=frost help=main enemies=1
-{
-	if HasWeapon(offhand)
-	{
-		if InCombat(no) FrostDualWieldPrecombatActions()
-		FrostDualWieldDefaultActions()
-	}
-	if HasWeapon(offhand no)
-	{
-		if InCombat(no) FrostTwoHanderPrecombatActions()
-		FrostTwoHanderDefaultActions()
-	}
-}
-
-AddIcon specialization=frost help=aoe checkbox=opt_deathknight_frost_aoe
-{
-	if HasWeapon(offhand)
-	{
-		if InCombat(no) FrostDualWieldPrecombatActions()
-		FrostDualWieldDefaultActions()
-	}
-	if HasWeapon(offhand no)
-	{
-		if InCombat(no) FrostTwoHanderPrecombatActions()
-		FrostTwoHanderDefaultActions()
-	}
-}
-
-AddIcon specialization=frost help=cd enemies=1 checkbox=!opt_deathknight_frost_aoe
-{
-	if HasWeapon(offhand)
-	{
-		if InCombat(no) FrostDualWieldPrecombatCdActions()
-		FrostDualWieldDefaultCdActions()
-	}
-	if HasWeapon(offhand no)
-	{
-		if InCombat(no) FrostTwoHanderPrecombatCdActions()
-		FrostTwoHanderDefaultCdActions()
-	}
-}
-
-AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
-{
-	if HasWeapon(offhand)
-	{
-		if InCombat(no) FrostDualWieldPrecombatCdActions()
-		FrostDualWieldDefaultCdActions()
-	}
-	if HasWeapon(offhand no)
-	{
-		if InCombat(no) FrostTwoHanderPrecombatCdActions()
-		FrostTwoHanderDefaultCdActions()
-	}
-}
-
 ###
 ### Unholy
 ###
@@ -1604,6 +1478,144 @@ AddFunction UnholySpreadActions
 AddFunction UnholySpreadShortCdActions {}
 
 AddFunction UnholySpreadCdActions {}
+]]
+	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Blood, Frost, Unholy"
+	local code = [[
+# Ovale death knight script based on SimulationCraft.
+
+# Death knight rotation functions.
+Include(ovale_deathknight)
+
+### Blood icons
+AddCheckBox(opt_deathknight_blood_aoe L(AOE) specialization=blood default)
+
+AddIcon specialization=blood help=shortcd enemies=1 checkbox=!opt_deathknight_blood_aoe
+{
+	if InCombat(no) BloodPrecombatShortCdActions()
+	BloodDefaultShortCdActions()
+}
+
+AddIcon specialization=blood help=shortcd checkbox=opt_deathknight_blood_aoe
+{
+	if InCombat(no) BloodPrecombatShortCdActions()
+	BloodDefaultShortCdActions()
+}
+
+AddIcon specialization=blood help=main enemies=1
+{
+	if InCombat(no) BloodPrecombatActions()
+	BloodDefaultActions()
+}
+
+AddIcon specialization=blood help=aoe checkbox=opt_deathknight_blood_aoe
+{
+	if InCombat(no) BloodPrecombatActions()
+	BloodDefaultActions()
+}
+
+AddIcon specialization=blood help=cd enemies=1 checkbox=!opt_deathknight_blood_aoe
+{
+	if InCombat(no) BloodPrecombatCdActions()
+	BloodDefaultCdActions()
+}
+
+AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood_aoe
+{
+	if InCombat(no) BloodPrecombatCdActions()
+	BloodDefaultCdActions()
+}
+
+### Frost icons.
+AddCheckBox(opt_deathknight_frost_aoe L(AOE) specialization=frost default)
+
+AddIcon specialization=frost help=shortcd enemies=1 checkbox=!opt_deathknight_frost_aoe
+{
+	if HasWeapon(offhand)
+	{
+		if InCombat(no) FrostDualWieldPrecombatShortCdActions()
+		FrostDualWieldDefaultShortCdActions()
+	}
+	if HasWeapon(offhand no)
+	{
+		if InCombat(no) FrostTwoHanderPrecombatShortCdActions()
+		FrostTwoHanderDefaultShortCdActions()
+	}
+}
+
+AddIcon specialization=frost help=shortcd checkbox=opt_deathknight_frost_aoe
+{
+	if HasWeapon(offhand)
+	{
+		if InCombat(no) FrostDualWieldPrecombatShortCdActions()
+		FrostDualWieldDefaultShortCdActions()
+	}
+	if HasWeapon(offhand no)
+	{
+		if InCombat(no) FrostTwoHanderPrecombatShortCdActions()
+		FrostTwoHanderDefaultShortCdActions()
+	}
+}
+
+AddIcon specialization=frost help=main enemies=1
+{
+	if HasWeapon(offhand)
+	{
+		if InCombat(no) FrostDualWieldPrecombatActions()
+		FrostDualWieldDefaultActions()
+	}
+	if HasWeapon(offhand no)
+	{
+		if InCombat(no) FrostTwoHanderPrecombatActions()
+		FrostTwoHanderDefaultActions()
+	}
+}
+
+AddIcon specialization=frost help=aoe checkbox=opt_deathknight_frost_aoe
+{
+	if HasWeapon(offhand)
+	{
+		if InCombat(no) FrostDualWieldPrecombatActions()
+		FrostDualWieldDefaultActions()
+	}
+	if HasWeapon(offhand no)
+	{
+		if InCombat(no) FrostTwoHanderPrecombatActions()
+		FrostTwoHanderDefaultActions()
+	}
+}
+
+AddIcon specialization=frost help=cd enemies=1 checkbox=!opt_deathknight_frost_aoe
+{
+	if HasWeapon(offhand)
+	{
+		if InCombat(no) FrostDualWieldPrecombatCdActions()
+		FrostDualWieldDefaultCdActions()
+	}
+	if HasWeapon(offhand no)
+	{
+		if InCombat(no) FrostTwoHanderPrecombatCdActions()
+		FrostTwoHanderDefaultCdActions()
+	}
+}
+
+AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
+{
+	if HasWeapon(offhand)
+	{
+		if InCombat(no) FrostDualWieldPrecombatCdActions()
+		FrostDualWieldDefaultCdActions()
+	}
+	if HasWeapon(offhand no)
+	{
+		if InCombat(no) FrostTwoHanderPrecombatCdActions()
+		FrostTwoHanderDefaultCdActions()
+	}
+}
 
 ### Unholy icons.
 AddCheckBox(opt_deathknight_unholy_aoe L(AOE) specialization=unholy default)
@@ -1644,8 +1656,5 @@ AddIcon specialization=unholy help=cd checkbox=opt_deathknight_unholy_aoe
 	UnholyDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("DEATHKNIGHT", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "script")
 end

@@ -3,9 +3,9 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_monk"
-	local desc = "[6.0] Ovale: Brewmaster, Windwalker"
+	local desc = "[6.0] Ovale: Rotations (Brewmaster, Windwalker)"
 	local code = [[
-# Ovale monk script based on SimulationCraft.
+# Monk rotation functions based on SimulationCraft.
 
 Include(ovale_common)
 Include(ovale_monk_spells)
@@ -258,45 +258,9 @@ AddFunction BrewmasterStShortCdActions
 
 AddFunction BrewmasterStCdActions {}
 
-### Brewmaster icons.
-AddCheckBox(opt_monk_brewmaster_aoe L(AOE) specialization=brewmaster default)
-
-AddIcon specialization=brewmaster help=shortcd enemies=1 checkbox=!opt_monk_brewmaster_aoe
-{
-	if InCombat(no) BrewmasterPrecombatShortCdActions()
-	BrewmasterDefaultShortCdActions()
-}
-
-AddIcon specialization=brewmaster help=shortcd checkbox=opt_monk_brewmaster_aoe
-{
-	if InCombat(no) BrewmasterPrecombatShortCdActions()
-	BrewmasterDefaultShortCdActions()
-}
-
-AddIcon specialization=brewmaster help=main enemies=1
-{
-	if InCombat(no) BrewmasterPrecombatActions()
-	BrewmasterDefaultActions()
-}
-
-AddIcon specialization=brewmaster help=aoe checkbox=opt_monk_brewmaster_aoe
-{
-	if InCombat(no) BrewmasterPrecombatActions()
-	BrewmasterDefaultActions()
-}
-
-AddIcon specialization=brewmaster help=cd enemies=1 checkbox=!opt_monk_brewmaster_aoe
-{
-	if InCombat(no) BrewmasterPrecombatCdActions()
-	BrewmasterDefaultCdActions()
-}
-
-AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
-{
-	if InCombat(no) BrewmasterPrecombatCdActions()
-	BrewmasterDefaultCdActions()
-}
-
+###
+### Windwalker
+###
 # Based on SimulationCraft profile "Monk_Windwalker_1h_T17M".
 #	class=monk
 #	spec=windwalker
@@ -487,6 +451,57 @@ AddFunction WindwalkerStShortCdActions
 }
 
 AddFunction WindwalkerStCdActions {}
+]]
+	OvaleScripts:RegisterScript("MONK", name, desc, code, "include")
+end
+
+do
+	local name = "Ovale"	-- The default script.
+	local desc = "[6.0] Ovale: Brewmaster, Windwalker"
+	local code = [[
+# Ovale monk script based on SimulationCraft.
+
+# Monk rotation functions.
+Include(ovale_monk)
+
+### Brewmaster icons.
+AddCheckBox(opt_monk_brewmaster_aoe L(AOE) specialization=brewmaster default)
+
+AddIcon specialization=brewmaster help=shortcd enemies=1 checkbox=!opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatShortCdActions()
+	BrewmasterDefaultShortCdActions()
+}
+
+AddIcon specialization=brewmaster help=shortcd checkbox=opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatShortCdActions()
+	BrewmasterDefaultShortCdActions()
+}
+
+AddIcon specialization=brewmaster help=main enemies=1
+{
+	if InCombat(no) BrewmasterPrecombatActions()
+	BrewmasterDefaultActions()
+}
+
+AddIcon specialization=brewmaster help=aoe checkbox=opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatActions()
+	BrewmasterDefaultActions()
+}
+
+AddIcon specialization=brewmaster help=cd enemies=1 checkbox=!opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatCdActions()
+	BrewmasterDefaultCdActions()
+}
+
+AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
+{
+	if InCombat(no) BrewmasterPrecombatCdActions()
+	BrewmasterDefaultCdActions()
+}
 
 ### Windwalker icons.
 AddCheckBox(opt_monk_windwalker_aoe L(AOE) specialization=windwalker default)
@@ -527,8 +542,5 @@ AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker_aoe
 	WindwalkerDefaultCdActions()
 }
 ]]
-
-	OvaleScripts:RegisterScript("MONK", name, desc, code, "include")
-	-- Register as the default Ovale script.
-	OvaleScripts:RegisterScript("MONK", "Ovale", desc, code, "script")
+	OvaleScripts:RegisterScript("MONK", name, desc, code, "script")
 end
