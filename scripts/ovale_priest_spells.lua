@@ -229,6 +229,11 @@ Define(weakened_soul_debuff 6788)
 	SpellInfo(weakened_soul_debuff duration=15)
 	SpellInfo(weakened_soul_debuff addduration=-2 glyph=glyph_of_weakened_soul)
 	SpellInfo(weakened_soul_debuff addduration=-3 if_spell=enhanced_power_word_shield)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(cascade_caster tag=shortcd)
+	SpellInfo(divine_star_caster tag=shortcd)
+	SpellInfo(mindbender tag=cd)
 ]]
 
 	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "include")

@@ -287,6 +287,10 @@ Define(pet_reinforce 118347)
 	SpellAddBuff(pet_reinforce pet_reinforce_buff=1)
 Define(pet_reinforce_buff 118347)
 	SpellInfo(pet_reinforce_buff duration=60)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(earthquake tag=shortcd)
+	SpellInfo(elemental_mastery tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")

@@ -217,6 +217,12 @@ Define(time_warp_buff 80353)
 	SpellInfo(time_warp_buff duration=40)
 Define(water_elemental 31687)
 	SpellInfo(water_elemental cd=60)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(arcane_orb tag=shortcd)
+	SpellInfo(blink tag=shortcd)
+	SpellInfo(ice_floes tag=shortcd)
+	SpellInfo(rune_of_power tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")

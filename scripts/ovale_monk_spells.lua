@@ -299,6 +299,12 @@ Define(zen_sphere 124081)
 Define(zen_sphere_buff 124081)
 	SpellInfo(zen_sphere_buff duration=16 haste=spell tick=2)
 Define(zen_sphere_talent 5)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(chi_brew tag=main)
+	SpellInfo(dampen_harm tag=cd)
+	SpellInfo(diffuse_magic tag=cd)
+	SpellInfo(fists_of_fury tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("MONK", name, desc, code, "include")

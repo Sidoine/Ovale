@@ -140,6 +140,10 @@ Define(thrill_of_the_hunt_buff 34720)
 Define(trap_launcher 77769)
 	SpellInfo(trap_launcher cd=1.5)
 Define(trap_mastery 63458)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(barrage tag=shortcd)
+	SpellInfo(focus_fire tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")

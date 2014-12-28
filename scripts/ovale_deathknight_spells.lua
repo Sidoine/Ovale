@@ -265,6 +265,9 @@ Define(vampiric_blood 55233)
 	SpellAddBuff(vampiric_blood vampiric_blood_buff=1)
 Define(vampiric_blood_buff 55233)
 	SpellInfo(vampiric_blood_buff duration=10)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(outbreak tag=main)
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "include")
 end

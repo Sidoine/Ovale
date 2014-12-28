@@ -292,6 +292,12 @@ Define(wild_strike 100130)
 	SpellInfo(wild_strike rage=45)
 	SpellRequire(wild_strike rage 0=buff,bloodsurge_buff if_spell=bloodsurge)
 	SpellAddBuff(wild_strike bloodsurge_buff=-1 if_spell=bloodsurge)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(bloodbath tag=cd)
+	SpellInfo(heroic_throw tag=main)
+	SpellInfo(impending_victory tag=main)
+	SpellInfo(sweeping_strikes tag=main)
 ]]
 
 	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")

@@ -293,6 +293,12 @@ Define(word_of_glory_glyph_of_harsh_words 136494)
 	SpellAddBuff(word_of_glory_glyph_of_harsh_words bastion_of_glory_buff=0 if_spell=shield_of_the_righteous)
 	SpellAddBuff(word_of_glory_glyph_of_harsh_words bastion_of_power_buff=0 if_spell=shield_of_the_righteous itemset=T16_tank itemcount=4)
 	SpellAddBuff(word_of_glory_glyph_of_harsh_words divine_purpose_buff=0 if_spell=divine_purpose)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(consecration tag=shortcd)
+	SpellInfo(divine_protection tag=cd)
+	SpellInfo(eternal_flame tag=shortcd)
+	SpellInfo(harsh_word tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")

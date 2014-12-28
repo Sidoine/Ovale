@@ -404,6 +404,13 @@ Define(wild_mushroom_heal 145205)
 Define(wrath 5176)
 	SpellAddBuff(wrath solar_empowerment_buff=-1)
 	SpellAddTargetBuff(wrath sunfire_debuff=extend,4 if_spell=balance_of_power)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(barkskin tag=cd)
+	SpellInfo(bristling_fur tag=cd)
+	SpellInfo(cenarion_ward tag=main)
+	SpellInfo(dash tag=shortcd)
+	SpellInfo(natures_vigil tag=cd)
 ]]
 
 	OvaleScripts:RegisterScript("DRUID", name, desc, code, "include")

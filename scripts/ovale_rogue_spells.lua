@@ -268,6 +268,10 @@ Define(wound_poison 8679)
 	SpellAddBuff(wound_poison wound_poison_buff=1)
 Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
+
+# Non-default tags for OvaleSimulationCraft.
+	SpellInfo(premeditation tag=main)
+	SpellInfo(vanish tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "include")
