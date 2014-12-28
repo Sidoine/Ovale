@@ -40,16 +40,16 @@ AddFunction InterruptActions
 #	talents=1133131
 #	glyphs=mind_flay/fade/sha
 
-# ActionList: ShadowDefaultActions --> main, shortcd, cd
+### actions.default
 
-AddFunction ShadowDefaultActions
+AddFunction ShadowDefaultMainActions
 {
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#call_action_list,name=pvp_dispersion,if=set_bonus.pvp_2pc
-	if ArmorSetBonus(PVP 2) ShadowPvpDispersionActions()
+	if ArmorSetBonus(PVP 2) ShadowPvpDispersionMainActions()
 	#call_action_list,name=decision
-	ShadowDecisionActions()
+	ShadowDecisionMainActions()
 }
 
 AddFunction ShadowDefaultShortCdActions
@@ -84,9 +84,9 @@ AddFunction ShadowDefaultCdActions
 	}
 }
 
-# ActionList: ShadowCopActions --> main, shortcd, cd
+### actions.cop
 
-AddFunction ShadowCopActions
+AddFunction ShadowCopMainActions
 {
 	#devouring_plague,if=shadow_orb>=3&(cooldown.mind_blast.remains<=gcd*1.0|(cooldown.shadow_word_death.remains<=gcd*1.0&target.health.pct<20))&primary_target=0,cycle_targets=1
 	if ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and 0 == 0 Spell(devouring_plague)
@@ -122,11 +122,7 @@ AddFunction ShadowCopActions
 
 AddFunction ShadowCopShortCdActions
 {
-	unless ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and 0 == 0 and Spell(devouring_plague)
-		or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and Spell(devouring_plague)
-		or 0 == 0 and Spell(mind_blast)
-		or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or target.HealthPercent() < 20 and Spell(shadow_word_death)
+	unless ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and 0 == 0 and Spell(devouring_plague) or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and Spell(devouring_plague) or 0 == 0 and Spell(mind_blast) or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or target.HealthPercent() < 20 and Spell(shadow_word_death)
 	{
 		#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
 		if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
@@ -135,15 +131,7 @@ AddFunction ShadowCopShortCdActions
 		#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 		if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
 
-		unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Enemies() <= 5 and 0 == 0 and Spell(shadow_word_pain)
-			or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(vampiric_touch)
-			or Enemies() >= 5 and Spell(mind_sear)
-			or Enemies() <= 4 and BuffPresent(surge_of_darkness_buff) and Spell(mind_spike)
-			or Enemies() >= 3 and Spell(mind_sear)
-			or target.TicksRemaining(devouring_plague_debuff) > 1 and Enemies() == 1 and Spell(mind_flay)
-			or Spell(mind_spike)
-			or Speed() > 0 and Spell(shadow_word_death)
-			or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
+		unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Enemies() <= 5 and 0 == 0 and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(vampiric_touch) or Enemies() >= 5 and Spell(mind_sear) or Enemies() <= 4 and BuffPresent(surge_of_darkness_buff) and Spell(mind_spike) or Enemies() >= 3 and Spell(mind_sear) or target.TicksRemaining(devouring_plague_debuff) > 1 and Enemies() == 1 and Spell(mind_flay) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death) or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
 		{
 			#halo,moving=1,if=talent.halo.enabled&target.distance<=30
 			if Speed() > 0 and Talent(halo_talent) and target.Distance() <= 30 Spell(halo_caster)
@@ -157,11 +145,7 @@ AddFunction ShadowCopShortCdActions
 
 AddFunction ShadowCopCdActions
 {
-	unless ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and 0 == 0 and Spell(devouring_plague)
-		or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and Spell(devouring_plague)
-		or 0 == 0 and Spell(mind_blast)
-		or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or target.HealthPercent() < 20 and Spell(shadow_word_death)
+	unless ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and 0 == 0 and Spell(devouring_plague) or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) <= GCD() * 1 or SpellCooldown(shadow_word_death) <= GCD() * 1 and target.HealthPercent() < 20 } and Spell(devouring_plague) or 0 == 0 and Spell(mind_blast) or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or target.HealthPercent() < 20 and Spell(shadow_word_death)
 	{
 		#mindbender,if=talent.mindbender.enabled
 		if Talent(mindbender_talent) Spell(mindbender)
@@ -170,9 +154,9 @@ AddFunction ShadowCopCdActions
 	}
 }
 
-# ActionList: ShadowCopDotweaveActions --> main, shortcd, cd
+### actions.cop_dotweave
 
-AddFunction ShadowCopDotweaveActions
+AddFunction ShadowCopDotweaveMainActions
 {
 	#devouring_plague,if=target.dot.vampiric_touch.ticking&target.dot.shadow_word_pain.ticking&shadow_orb=5&cooldown_react
 	if target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and ShadowOrbs() == 5 and not SpellCooldown(devouring_plague) > 0 Spell(devouring_plague)
@@ -216,17 +200,7 @@ AddFunction ShadowCopDotweaveActions
 
 AddFunction ShadowCopDotweaveShortCdActions
 {
-	unless target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and ShadowOrbs() == 5 and not SpellCooldown(devouring_plague) > 0 and Spell(devouring_plague)
-		or BuffRemaining(mental_instinct_buff) < GCD() and BuffPresent(mental_instinct_buff) and Spell(devouring_plague)
-		or target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and not BuffPresent(shadow_word_insanity_buff) and SpellCooldown(mind_blast) > 0.4 * GCD() and Spell(devouring_plague)
-		or Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() <= 2 and Spell(mind_blast)
-		or ShadowOrbs() <= 4 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or ShadowOrbs() == 4 and ArmorSetBonus(T17 2) and not target.DebuffPresent(shadow_word_pain_debuff) and not target.DebuffPresent(devouring_plague_debuff) and SpellCooldown(mind_blast) < 1.2 * GCD() and SpellCooldown(mind_blast) > 0.2 * GCD() and Spell(shadow_word_pain)
-		or ShadowOrbs() == 5 and not target.DebuffPresent(devouring_plague_debuff) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain)
-		or ShadowOrbs() == 5 and not target.DebuffPresent(devouring_plague_debuff) and not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch)
-		or BuffPresent(shadow_word_insanity_buff) and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
-		or ShadowOrbs() >= 2 and target.DebuffRemaining(shadow_word_pain_debuff) >= 6 and SpellCooldown(mind_blast) > 0.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) and BuffPresent(burst_haste_buff any=1) and not ArmorSetBonus(T17 2) and Spell(shadow_word_pain)
-		or ShadowOrbs() >= 2 and target.DebuffRemaining(vampiric_touch_debuff) >= 5 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(burst_haste_buff any=1) and not ArmorSetBonus(T17 2) and Spell(vampiric_touch)
+	unless target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and ShadowOrbs() == 5 and not SpellCooldown(devouring_plague) > 0 and Spell(devouring_plague) or BuffRemaining(mental_instinct_buff) < GCD() and BuffPresent(mental_instinct_buff) and Spell(devouring_plague) or target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and not BuffPresent(shadow_word_insanity_buff) and SpellCooldown(mind_blast) > 0.4 * GCD() and Spell(devouring_plague) or Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() <= 2 and Spell(mind_blast) or ShadowOrbs() <= 4 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or ShadowOrbs() == 4 and ArmorSetBonus(T17 2) and not target.DebuffPresent(shadow_word_pain_debuff) and not target.DebuffPresent(devouring_plague_debuff) and SpellCooldown(mind_blast) < 1.2 * GCD() and SpellCooldown(mind_blast) > 0.2 * GCD() and Spell(shadow_word_pain) or ShadowOrbs() == 5 and not target.DebuffPresent(devouring_plague_debuff) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or ShadowOrbs() == 5 and not target.DebuffPresent(devouring_plague_debuff) and not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or BuffPresent(shadow_word_insanity_buff) and BuffPresent(shadow_word_insanity_buff) and Spell(insanity) or ShadowOrbs() >= 2 and target.DebuffRemaining(shadow_word_pain_debuff) >= 6 and SpellCooldown(mind_blast) > 0.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) and BuffPresent(burst_haste_buff any=1) and not ArmorSetBonus(T17 2) and Spell(shadow_word_pain) or ShadowOrbs() >= 2 and target.DebuffRemaining(vampiric_touch_debuff) >= 5 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(burst_haste_buff any=1) and not ArmorSetBonus(T17 2) and Spell(vampiric_touch)
 	{
 		#halo,if=cooldown.mind_blast.remains>0.5*gcd&talent.halo.enabled&target.distance<=30&target.distance>=17
 		if SpellCooldown(mind_blast) > 0.5 * GCD() and Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
@@ -235,13 +209,7 @@ AddFunction ShadowCopDotweaveShortCdActions
 		#cascade,if=cooldown.mind_blast.remains>0.5*gcd&talent.cascade.enabled&((active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11)
 		if SpellCooldown(mind_blast) > 0.5 * GCD() and Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
 
-		unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 0 == 0 and { not target.DebuffPresent(shadow_word_pain_debuff) or target.DebuffRemaining(shadow_word_pain_debuff) <= 18 * 0.3 } and Spell(shadow_word_pain)
-			or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and 0 == 0 and { not target.DebuffPresent(vampiric_touch_debuff) or target.DebuffRemaining(vampiric_touch_debuff) <= 15 * 0.3 } and Spell(vampiric_touch)
-			or BuffRemaining(shadow_word_insanity_buff) <= GCD() and BuffPresent(burst_haste_buff any=1) and not target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) and Spell(mind_spike)
-			or { target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) or not target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) } and ShadowOrbs() <= 2 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike)
-			or ArmorSetBonus(T17 2) and target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) and SpellCooldown(mind_blast) > 0.9 * GCD() and Spell(mind_flay)
-			or Spell(mind_spike)
-			or Speed() > 0 and Spell(shadow_word_death)
+		unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 0 == 0 and { not target.DebuffPresent(shadow_word_pain_debuff) or target.DebuffRemaining(shadow_word_pain_debuff) <= 18 * 0.3 } and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and 0 == 0 and { not target.DebuffPresent(vampiric_touch_debuff) or target.DebuffRemaining(vampiric_touch_debuff) <= 15 * 0.3 } and Spell(vampiric_touch) or BuffRemaining(shadow_word_insanity_buff) <= GCD() and BuffPresent(burst_haste_buff any=1) and not target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) and Spell(mind_spike) or { target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) or not target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) } and ShadowOrbs() <= 2 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike) or ArmorSetBonus(T17 2) and target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) and SpellCooldown(mind_blast) > 0.9 * GCD() and Spell(mind_flay) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death)
 		{
 			#halo,if=talent.halo.enabled&target.distance<=30,moving=1
 			if Talent(halo_talent) and target.Distance() <= 30 and Speed() > 0 Spell(halo_caster)
@@ -255,11 +223,7 @@ AddFunction ShadowCopDotweaveShortCdActions
 
 AddFunction ShadowCopDotweaveCdActions
 {
-	unless target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and ShadowOrbs() == 5 and not SpellCooldown(devouring_plague) > 0 and Spell(devouring_plague)
-		or BuffRemaining(mental_instinct_buff) < GCD() and BuffPresent(mental_instinct_buff) and Spell(devouring_plague)
-		or target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and not BuffPresent(shadow_word_insanity_buff) and SpellCooldown(mind_blast) > 0.4 * GCD() and Spell(devouring_plague)
-		or Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() <= 2 and Spell(mind_blast)
-		or ShadowOrbs() <= 4 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+	unless target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and ShadowOrbs() == 5 and not SpellCooldown(devouring_plague) > 0 and Spell(devouring_plague) or BuffRemaining(mental_instinct_buff) < GCD() and BuffPresent(mental_instinct_buff) and Spell(devouring_plague) or target.DebuffPresent(vampiric_touch_debuff) and target.DebuffPresent(shadow_word_pain_debuff) and not BuffPresent(shadow_word_insanity_buff) and SpellCooldown(mind_blast) > 0.4 * GCD() and Spell(devouring_plague) or Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() <= 2 and Spell(mind_blast) or ShadowOrbs() <= 4 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
 	{
 		#shadowfiend,if=!talent.mindbender.enabled&!buff.shadow_word_insanity.remains
 		if not Talent(mindbender_talent) and not BuffPresent(shadow_word_insanity_buff) Spell(shadowfiend)
@@ -268,9 +232,9 @@ AddFunction ShadowCopDotweaveCdActions
 	}
 }
 
-# ActionList: ShadowCopMfiActions --> main, shortcd, cd
+### actions.cop_mfi
 
-AddFunction ShadowCopMfiActions
+AddFunction ShadowCopMfiMainActions
 {
 	#devouring_plague,if=shadow_orb=5
 	if ShadowOrbs() == 5 Spell(devouring_plague)
@@ -304,15 +268,7 @@ AddFunction ShadowCopMfiActions
 
 AddFunction ShadowCopMfiShortCdActions
 {
-	unless ShadowOrbs() == 5 and Spell(devouring_plague)
-		or Glyph(glyph_of_mind_harvest) and 0 == 0 and Spell(mind_blast)
-		or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or target.HealthPercent() < 20 and Spell(shadow_word_death)
-		or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < GCD() * 1 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < GCD() * 1 } and Spell(devouring_plague)
-		or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(shadow_word_pain)
-		or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(vampiric_touch)
-		or BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
-		or Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
+	unless ShadowOrbs() == 5 and Spell(devouring_plague) or Glyph(glyph_of_mind_harvest) and 0 == 0 and Spell(mind_blast) or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or target.HealthPercent() < 20 and Spell(shadow_word_death) or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < GCD() * 1 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < GCD() * 1 } and Spell(devouring_plague) or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 0 == 0 and Spell(vampiric_touch) or BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity) or Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
 	{
 		#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
 		if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
@@ -321,10 +277,7 @@ AddFunction ShadowCopMfiShortCdActions
 		#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 		if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
 
-		unless Enemies() >= 6 and Spell(mind_sear)
-			or Spell(mind_spike)
-			or Speed() > 0 and Spell(shadow_word_death)
-			or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
+		unless Enemies() >= 6 and Spell(mind_sear) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death) or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
 		{
 			#halo,if=talent.halo.enabled&target.distance<=30,moving=1
 			if Talent(halo_talent) and target.Distance() <= 30 and Speed() > 0 Spell(halo_caster)
@@ -338,11 +291,7 @@ AddFunction ShadowCopMfiShortCdActions
 
 AddFunction ShadowCopMfiCdActions
 {
-	unless ShadowOrbs() == 5 and Spell(devouring_plague)
-		or Glyph(glyph_of_mind_harvest) and 0 == 0 and Spell(mind_blast)
-		or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or target.HealthPercent() < 20 and Spell(shadow_word_death)
-		or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < GCD() * 1 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < GCD() * 1 } and Spell(devouring_plague)
+	unless ShadowOrbs() == 5 and Spell(devouring_plague) or Glyph(glyph_of_mind_harvest) and 0 == 0 and Spell(mind_blast) or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or target.HealthPercent() < 20 and Spell(shadow_word_death) or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < GCD() * 1 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < GCD() * 1 } and Spell(devouring_plague)
 	{
 		#mindbender,if=talent.mindbender.enabled
 		if Talent(mindbender_talent) Spell(mindbender)
@@ -351,20 +300,20 @@ AddFunction ShadowCopMfiCdActions
 	}
 }
 
-# ActionList: ShadowDecisionActions --> main, shortcd, cd
+### actions.decision
 
-AddFunction ShadowDecisionActions
+AddFunction ShadowDecisionMainActions
 {
 	#call_action_list,name=cop_dotweave,if=talent.clarity_of_power.enabled&talent.insanity.enabled&target.health.pct>20&active_enemies<=5
-	if Talent(clarity_of_power_talent) and Talent(insanity_talent) and target.HealthPercent() > 20 and Enemies() <= 5 ShadowCopDotweaveActions()
+	if Talent(clarity_of_power_talent) and Talent(insanity_talent) and target.HealthPercent() > 20 and Enemies() <= 5 ShadowCopDotweaveMainActions()
 	#call_action_list,name=cop_mfi,if=talent.clarity_of_power.enabled&talent.insanity.enabled&target.health.pct<=20
-	if Talent(clarity_of_power_talent) and Talent(insanity_talent) and target.HealthPercent() <= 20 ShadowCopMfiActions()
+	if Talent(clarity_of_power_talent) and Talent(insanity_talent) and target.HealthPercent() <= 20 ShadowCopMfiMainActions()
 	#call_action_list,name=cop,if=talent.clarity_of_power.enabled
-	if Talent(clarity_of_power_talent) ShadowCopActions()
+	if Talent(clarity_of_power_talent) ShadowCopMainActions()
 	#call_action_list,name=vent,if=talent.void_entropy.enabled
-	if Talent(void_entropy_talent) ShadowVentActions()
+	if Talent(void_entropy_talent) ShadowVentMainActions()
 	#call_action_list,name=main
-	ShadowMainActions()
+	ShadowMainMainActions()
 }
 
 AddFunction ShadowDecisionShortCdActions
@@ -395,9 +344,9 @@ AddFunction ShadowDecisionCdActions
 	ShadowMainCdActions()
 }
 
-# ActionList: ShadowMainActions --> main, shortcd, cd
+### actions.main
 
-AddFunction ShadowMainActions
+AddFunction ShadowMainMainActions
 {
 	#shadow_word_death,if=target.health.pct<20&shadow_orb<=4,cycle_targets=1
 	if target.HealthPercent() < 20 and ShadowOrbs() <= 4 Spell(shadow_word_death)
@@ -457,16 +406,7 @@ AddFunction ShadowMainActions
 
 AddFunction ShadowMainShortCdActions
 {
-	unless target.HealthPercent() < 20 and ShadowOrbs() <= 4 and Spell(shadow_word_death)
-		or Glyph(glyph_of_mind_harvest) and ShadowOrbs() <= 2 and Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or ShadowOrbs() == 5 and Talent(surge_of_darkness_talent) and Spell(devouring_plague)
-		or ShadowOrbs() == 5 and Spell(devouring_plague)
-		or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } and not target.DebuffPresent(devouring_plague_debuff) and Talent(surge_of_darkness_talent) and Spell(devouring_plague)
-		or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } and Spell(devouring_plague)
-		or Glyph(glyph_of_mind_harvest) and 0 == 0 and Spell(mind_blast)
-		or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
-		or BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
-		or Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
+	unless target.HealthPercent() < 20 and ShadowOrbs() <= 4 and Spell(shadow_word_death) or Glyph(glyph_of_mind_harvest) and ShadowOrbs() <= 2 and Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or ShadowOrbs() == 5 and Talent(surge_of_darkness_talent) and Spell(devouring_plague) or ShadowOrbs() == 5 and Spell(devouring_plague) or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } and not target.DebuffPresent(devouring_plague_debuff) and Talent(surge_of_darkness_talent) and Spell(devouring_plague) or ShadowOrbs() >= 3 and { SpellCooldown(mind_blast) < 1.5 or target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) < 1.5 } and Spell(devouring_plague) or Glyph(glyph_of_mind_harvest) and 0 == 0 and Spell(mind_blast) or Enemies() <= 5 and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast) or BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity) or Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
 	{
 		#halo,if=talent.halo.enabled&target.distance<=30&active_enemies>2
 		if Talent(halo_talent) and target.Distance() <= 30 and Enemies() > 2 Spell(halo_caster)
@@ -475,11 +415,7 @@ AddFunction ShadowMainShortCdActions
 		#divine_star,if=talent.divine_star.enabled&active_enemies>4&target.distance<=24
 		if Talent(divine_star_talent) and Enemies() > 4 and target.Distance() <= 24 Spell(divine_star_caster)
 
-		unless Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Spell(shadow_word_pain)
-			or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and not Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and Spell(shadow_word_pain)
-			or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and Spell(vampiric_touch)
-			or not Talent(void_entropy_talent) and ShadowOrbs() >= 3 and target.TicksRemaining(devouring_plague_debuff) < 2 and Spell(devouring_plague)
-			or Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 3 and Spell(mind_spike)
+		unless Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Spell(shadow_word_pain) or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and not Talent(auspicious_spirits_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and Spell(vampiric_touch) or not Talent(void_entropy_talent) and ShadowOrbs() >= 3 and target.TicksRemaining(devouring_plague_debuff) < 2 and Spell(devouring_plague) or Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 3 and Spell(mind_spike)
 		{
 			#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
 			if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
@@ -487,7 +423,6 @@ AddFunction ShadowMainShortCdActions
 			if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
 			#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
 			if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
-
 			#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
 			unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) > 0 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
 			{
@@ -499,11 +434,7 @@ AddFunction ShadowMainShortCdActions
 						#divine_star,if=talent.divine_star.enabled&target.distance<=28&active_enemies>1
 						if Talent(divine_star_talent) and target.Distance() <= 28 and Enemies() > 1 Spell(divine_star_caster)
 
-						unless Enemies() >= 4 and Spell(mind_sear)
-							or ShadowOrbs() >= 2 and target.TicksRemaining(shadow_word_pain_debuff) < 4 and Talent(insanity_talent) and Spell(shadow_word_pain)
-							or ShadowOrbs() >= 2 and target.TicksRemaining(vampiric_touch_debuff) < 4.5 and Talent(insanity_talent) and Spell(vampiric_touch)
-							or Spell(mind_flay)
-							or Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+						unless Enemies() >= 4 and Spell(mind_sear) or ShadowOrbs() >= 2 and target.TicksRemaining(shadow_word_pain_debuff) < 4 and Talent(insanity_talent) and Spell(shadow_word_pain) or ShadowOrbs() >= 2 and target.TicksRemaining(vampiric_touch_debuff) < 4.5 and Talent(insanity_talent) and Spell(vampiric_touch) or Spell(mind_flay) or Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
 						{
 							#divine_star,moving=1,if=talent.divine_star.enabled&target.distance<=28
 							if Speed() > 0 and Talent(divine_star_talent) and target.Distance() <= 28 Spell(divine_star_caster)
@@ -525,9 +456,9 @@ AddFunction ShadowMainCdActions
 	if not Talent(mindbender_talent) Spell(shadowfiend)
 }
 
-# ActionList: ShadowPrecombatActions --> main, shortcd, cd
+### actions.precombat
 
-AddFunction ShadowPrecombatActions
+AddFunction ShadowPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	# CHANGE: Different foods for different level-100 talents: AS -> blackrock_barbecue, CoP -> sleeper_surprise, VE -> frosty_stew
@@ -536,7 +467,6 @@ AddFunction ShadowPrecombatActions
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
-	#snapshot_stats
 	# CHANGE: Use Mind Spike if talented into Clarity of Power, and Vampiric Touch otherwise.
 	#mind_spike
 	#Spell(mind_spike)
@@ -544,26 +474,24 @@ AddFunction ShadowPrecombatActions
 	if not Talent(clarity_of_power_talent) Spell(vampiric_touch)
 }
 
-AddFunction ShadowPrecombatShortCdActions {}
-
 AddFunction ShadowPrecombatCdActions
 {
-	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude)
-		or not BuffPresent(shadowform_buff) and Spell(shadowform)
+	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
+		#snapshot_stats
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
 }
 
-# ActionList: ShadowPvpDispersionActions --> main, shortcd, cd
+### actions.pvp_dispersion
 
-AddFunction ShadowPvpDispersionActions
+AddFunction ShadowPvpDispersionMainActions
 {
 	#call_action_list,name=decision,if=cooldown.dispersion.remains>0
-	if SpellCooldown(dispersion) > 0 ShadowDecisionActions()
+	if SpellCooldown(dispersion) > 0 ShadowDecisionMainActions()
 	#call_action_list,name=decision
-	ShadowDecisionActions()
+	ShadowDecisionMainActions()
 }
 
 AddFunction ShadowPvpDispersionShortCdActions
@@ -584,9 +512,9 @@ AddFunction ShadowPvpDispersionCdActions
 	ShadowDecisionCdActions()
 }
 
-# ActionList: ShadowVentActions --> main, shortcd, cd
+### actions.vent
 
-AddFunction ShadowVentActions
+AddFunction ShadowVentMainActions
 {
 	#void_entropy,if=shadow_orb=3&!ticking&target.time_to_die>60&active_enemies=1
 	if ShadowOrbs() == 3 and not target.DebuffPresent(void_entropy_debuff) and target.TimeToDie() > 60 and Enemies() == 1 Spell(void_entropy)
@@ -638,26 +566,12 @@ AddFunction ShadowVentActions
 
 AddFunction ShadowVentShortCdActions
 {
-	unless ShadowOrbs() == 3 and not target.DebuffPresent(void_entropy_debuff) and target.TimeToDie() > 60 and Enemies() == 1 and Spell(void_entropy)
-		or DebuffCountOnAny(void_entropy_debuff) <= Enemies() and DebuffCountOnAny(void_entropy_debuff) <= 60 / { SpellCooldownDuration(mind_blast) * 3 * 100 / { 100 + SpellHaste() } } and not target.DebuffPresent(void_entropy_debuff) and ShadowOrbs() == 5 and Enemies() >= 1 and target.TimeToDie() > 60 and Spell(void_entropy)
-		or target.DebuffPresent(void_entropy_debuff) and target.DebuffRemaining(void_entropy_debuff) <= GCD() * 2 and not SpellCooldown(devouring_plague) > 0 and Spell(devouring_plague)
-		or ShadowOrbs() == 5 and target.DebuffRemaining(void_entropy_debuff) < 10 and Spell(devouring_plague)
-		or ShadowOrbs() == 5 and target.DebuffRemaining(void_entropy_debuff) < 20 and Spell(devouring_plague)
-		or ShadowOrbs() == 5 and target.DebuffRemaining(void_entropy_debuff) and Spell(devouring_plague)
+	unless ShadowOrbs() == 3 and not target.DebuffPresent(void_entropy_debuff) and target.TimeToDie() > 60 and Enemies() == 1 and Spell(void_entropy) or DebuffCountOnAny(void_entropy_debuff) <= Enemies() and DebuffCountOnAny(void_entropy_debuff) <= 60 / { SpellCooldownDuration(mind_blast) * 3 * 100 / { 100 + SpellHaste() } } and not target.DebuffPresent(void_entropy_debuff) and ShadowOrbs() == 5 and Enemies() >= 1 and target.TimeToDie() > 60 and Spell(void_entropy) or target.DebuffPresent(void_entropy_debuff) and target.DebuffRemaining(void_entropy_debuff) <= GCD() * 2 and not SpellCooldown(devouring_plague) > 0 and Spell(devouring_plague) or ShadowOrbs() == 5 and target.DebuffRemaining(void_entropy_debuff) < 10 and Spell(devouring_plague) or ShadowOrbs() == 5 and target.DebuffRemaining(void_entropy_debuff) < 20 and Spell(devouring_plague) or ShadowOrbs() == 5 and target.DebuffRemaining(void_entropy_debuff) and Spell(devouring_plague)
 	{
 		#halo,if=talent.halo.enabled&target.distance<=30&active_enemies>=4
 		if Talent(halo_talent) and target.Distance() <= 30 and Enemies() >= 4 Spell(halo_caster)
 
-		unless Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() <= 2 and Spell(mind_blast)
-			or Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() >= 3 and Spell(devouring_plague)
-			or Enemies() <= 10 and not SpellCooldown(mind_blast) > 0 and ShadowOrbs() <= 4 and Spell(mind_blast)
-			or target.HealthPercent() < 20 and not SpellCooldown(shadow_word_death) > 0 and ShadowOrbs() <= 4 and Spell(shadow_word_death)
-			or ShadowOrbs() == 4 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.5 and ArmorSetBonus(T17 2) and SpellCooldown(mind_blast) < 1.2 * GCD() and SpellCooldown(mind_blast) > 0.2 * GCD() and Spell(shadow_word_pain)
-			or BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
-			or Enemies() <= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(shadow_word_insanity_buff) and Spell(insanity)
-			or Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 3 and Spell(mind_spike)
-			or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.35 and True(miss_react) and Spell(shadow_word_pain)
-			or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.35 and True(miss_react) and Spell(vampiric_touch)
+		unless Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() <= 2 and Spell(mind_blast) or Glyph(glyph_of_mind_harvest) and 0 == 0 and ShadowOrbs() >= 3 and Spell(devouring_plague) or Enemies() <= 10 and not SpellCooldown(mind_blast) > 0 and ShadowOrbs() <= 4 and Spell(mind_blast) or target.HealthPercent() < 20 and not SpellCooldown(shadow_word_death) > 0 and ShadowOrbs() <= 4 and Spell(shadow_word_death) or ShadowOrbs() == 4 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.5 and ArmorSetBonus(T17 2) and SpellCooldown(mind_blast) < 1.2 * GCD() and SpellCooldown(mind_blast) > 0.2 * GCD() and Spell(shadow_word_pain) or BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(shadow_word_insanity_buff) and Spell(insanity) or Enemies() <= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(shadow_word_insanity_buff) and Spell(insanity) or Enemies() <= 5 and BuffStacks(surge_of_darkness_buff) == 3 and Spell(mind_spike) or DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.35 and True(miss_react) and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) <= Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.35 and True(miss_react) and Spell(vampiric_touch)
 		{
 			#halo,if=talent.halo.enabled&target.distance<=30&cooldown.mind_blast.remains>0.5*gcd
 			if Talent(halo_talent) and target.Distance() <= 30 and SpellCooldown(mind_blast) > 0.5 * GCD() Spell(halo_caster)
@@ -666,11 +580,7 @@ AddFunction ShadowVentShortCdActions
 			#divine_star,if=talent.divine_star.enabled&active_enemies>4&target.distance<=24&cooldown.mind_blast.remains>0.5*gcd
 			if Talent(divine_star_talent) and Enemies() > 4 and target.Distance() <= 24 and SpellCooldown(mind_blast) > 0.5 * GCD() Spell(divine_star_caster)
 
-			unless Enemies() <= 5 and BuffPresent(surge_of_darkness_buff) and not SpellCooldown(mind_spike) > 0 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike)
-				or Enemies() >= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_sear)
-				or SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_flay)
-				or Speed() > 0 and Spell(shadow_word_death)
-				or Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+			unless Enemies() <= 5 and BuffPresent(surge_of_darkness_buff) and not SpellCooldown(mind_spike) > 0 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike) or Enemies() >= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_sear) or SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_flay) or Speed() > 0 and Spell(shadow_word_death) or Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
 			{
 				#divine_star,moving=1,if=talent.divine_star.enabled&target.distance<=28
 				if Speed() > 0 and Talent(divine_star_talent) and target.Distance() <= 28 Spell(divine_star_caster)
@@ -701,42 +611,40 @@ do
 # Priest rotation functions.
 Include(ovale_priest)
 
-### Shadow icons
+### Shadow icons.
 AddCheckBox(opt_priest_shadow_aoe L(AOE) specialization=shadow default)
 
 AddIcon specialization=shadow help=shortcd enemies=1 checkbox=!opt_priest_shadow_aoe
 {
-	if InCombat(no) ShadowPrecombatShortCdActions()
 	ShadowDefaultShortCdActions()
 }
 
 AddIcon specialization=shadow help=shortcd checkbox=opt_priest_shadow_aoe
 {
-	if InCombat(no) ShadowPrecombatShortCdActions()
 	ShadowDefaultShortCdActions()
 }
 
 AddIcon specialization=shadow help=main enemies=1
 {
-	if InCombat(no) ShadowPrecombatActions()
-	ShadowDefaultActions()
+	if not InCombat() ShadowPrecombatMainActions()
+	ShadowDefaultMainActions()
 }
 
 AddIcon specialization=shadow help=aoe checkbox=opt_priest_shadow_aoe
 {
-	if InCombat(no) ShadowPrecombatActions()
-	ShadowDefaultActions()
+	if not InCombat() ShadowPrecombatMainActions()
+	ShadowDefaultMainActions()
 }
 
 AddIcon specialization=shadow help=cd enemies=1 checkbox=!opt_priest_shadow_aoe
 {
-	if InCombat(no) ShadowPrecombatCdActions()
+	if not InCombat() ShadowPrecombatCdActions()
 	ShadowDefaultCdActions()
 }
 
 AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow_aoe
 {
-	if InCombat(no) ShadowPrecombatCdActions()
+	if not InCombat() ShadowPrecombatCdActions()
 	ShadowDefaultCdActions()
 }
 ]]

@@ -62,11 +62,10 @@ AddFunction SummonPet
 #	spec=beast_mastery
 #	talents=0002133
 
-# ActionList: BeastMasteryDefaultActions --> main, shortcd, cd
+### actions.default --> main, shortcd, cd
 
-AddFunction BeastMasteryDefaultActions
+AddFunction BeastMasteryDefaultMainActions
 {
-	#auto_shot
 	#multishot,if=active_enemies>5|(active_enemies>1&pet.cat.buff.beast_cleave.down)
 	if Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) Spell(multishot)
 	#kill_shot,if=focus.time_to_max>gcd
@@ -97,10 +96,10 @@ AddFunction BeastMasteryDefaultShortCdActions
 	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 	#bestial_wrath,if=focus>60&!buff.bestial_wrath.up
 	if Focus() > 60 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
-	#barrage,if=active_enemies>2
-	if Enemies() > 2 Spell(barrage)
+	#barrage,if=active_enemies>1
+	if Enemies() > 1 Spell(barrage)
 
-	unless Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) and Spell(multishot)
+	unless { Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) } and Spell(multishot)
 	{
 		#focus_fire,five_stacks=1
 		if BuffStacks(frenzy_buff any=1) == 5 Spell(focus_fire)
@@ -109,11 +108,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
 
-		unless TimeToMaxFocus() > GCD() and Spell(kill_shot)
-			or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
-			or Focus() < 50 and Spell(focusing_shot)
-			or BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() and Spell(cobra_shot)
-			or Spell(glaive_toss)
+		unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() and Spell(cobra_shot) or Spell(glaive_toss)
 		{
 			#barrage
 			Spell(barrage)
@@ -127,6 +122,7 @@ AddFunction BeastMasteryDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
+	#auto_shot
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -141,30 +137,32 @@ AddFunction BeastMasteryDefaultCdActions
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
 }
 
-# ActionList: BeastMasteryPrecombatActions --> main, shortcd, cd
+### actions.precombat --> main, shortcd, cd
 
-AddFunction BeastMasteryPrecombatActions
+AddFunction BeastMasteryPrecombatMainActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=blackrock_barbecue
 	#snapshot_stats
 	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
 	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
+	#glaive_toss
+	Spell(glaive_toss)
+	#focusing_shot,if=!talent.glaive_toss.enabled
+	if not Talent(glaive_toss_talent) Spell(focusing_shot)
 }
 
 AddFunction BeastMasteryPrecombatShortCdActions
 {
+	#flask,type=greater_draenic_agility_flask
+	#food,type=calamari_crepes
 	#summon_pet
 	BeastMasterySummonPet()
 }
 
 AddFunction BeastMasteryPrecombatCdActions
 {
-	unless not pet.Present() or pet.IsDead()
-		or Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo)
-		or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
+	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
 		UsePotionAgility()
@@ -179,17 +177,16 @@ AddFunction BeastMasteryPrecombatCdActions
 #	spec=marksmanship
 #	talents=0003113
 
-# ActionList: MarksmanshipDefaultActions --> main, shortcd, cd
+### actions.default --> main, shortcd, cd
 
-AddFunction MarksmanshipDefaultActions
+AddFunction MarksmanshipDefaultMainActions
 {
-	#auto_shot
 	#chimaera_shot
 	Spell(chimaera_shot)
 	#kill_shot
 	Spell(kill_shot)
 	#call_action_list,name=careful_aim,if=buff.careful_aim.up
-	if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimActions()
+	if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimMainActions()
 	#glaive_toss
 	Spell(glaive_toss)
 	#steady_shot,if=focus.deficit*cast_time%(14+cast_regen)>cooldown.rapid_fire.remains
@@ -214,8 +211,7 @@ AddFunction MarksmanshipDefaultActions
 
 AddFunction MarksmanshipDefaultShortCdActions
 {
-	unless Spell(chimaera_shot)
-		or Spell(kill_shot)
+	unless Spell(chimaera_shot) or Spell(kill_shot)
 	{
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
@@ -240,6 +236,7 @@ AddFunction MarksmanshipDefaultCdActions
 {
 	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
 	InterruptActions()
+	#auto_shot
 	#use_item,name=beating_heart_of_the_mountain
 	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
@@ -251,21 +248,18 @@ AddFunction MarksmanshipDefaultCdActions
 	#potion,name=draenic_agility,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=25
 	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 UsePotionAgility()
 
-	unless FocusCastingRegen(kill_shot) + FocusCastingRegen(aimed_shot) < FocusDeficit() and Spell(kill_shot)
-		or Spell(chimaera_shot)
+	unless Spell(chimaera_shot) or Spell(kill_shot)
 	{
 		#rapid_fire
 		Spell(rapid_fire)
 		#stampede,if=buff.rapid_fire.up|buff.bloodlust.up|target.time_to_die<=25
 		if BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 Spell(stampede)
-		#call_action_list,name=careful_aim,if=buff.careful_aim.up
-		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimCdActions()
 	}
 }
 
-# ActionList: MarksmanshipCarefulAimActions --> main, shortcd, cd
+### actions.careful_aim --> main, shortcd
 
-AddFunction MarksmanshipCarefulAimActions
+AddFunction MarksmanshipCarefulAimMainActions
 {
 	#glaive_toss,if=active_enemies>2
 	if Enemies() > 2 Spell(glaive_toss)
@@ -288,34 +282,32 @@ AddFunction MarksmanshipCarefulAimShortCdActions
 	}
 }
 
-AddFunction MarksmanshipCarefulAimCdActions {}
+### actions.precombat --> main, shortcd, cd
 
-# ActionList: MarksmanshipPrecombatActions --> main, shortcd, cd
-
-AddFunction MarksmanshipPrecombatActions
+AddFunction MarksmanshipPrecombatMainActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=blackrock_barbecue
 	#snapshot_stats
 	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
 	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
-	#aimed_shot
-	Spell(aimed_shot)
+	#glaive_toss
+	Spell(glaive_toss)
+	#focusing_shot,if=!talent.glaive_toss.enabled
+	if not Talent(glaive_toss_talent) Spell(focusing_shot_marksmanship)
 }
 
 AddFunction MarksmanshipPrecombatShortCdActions
 {
+	#flask,type=greater_draenic_agility_flask
+	#food,type=calamari_crepes
 	#summon_pet
 	SummonPet()
 }
 
 AddFunction MarksmanshipPrecombatCdActions
 {
-	unless not pet.Present() or pet.IsDead()
-		or Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo)
-		or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
+	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
 		UsePotionAgility()
@@ -328,23 +320,18 @@ AddFunction MarksmanshipPrecombatCdActions
 # Based on SimulationCraft profile "Hunter_SV_T17M".
 #	class=hunter
 #	spec=survival
-#	talents=0003123
+#	talents=0001112
 
-# ActionList: SurvivalDefaultActions --> main, shortcd, cd
+### actions.default --> main, shortcd, cd
 
-AddFunction SurvivalDefaultActions
+AddFunction SurvivalDefaultMainActions
 {
-	#auto_shot
 	#call_action_list,name=aoe,if=active_enemies>1
-	if Enemies() > 1 SurvivalAoeActions()
-	#black_arrow,if=!ticking
-	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
+	if Enemies() > 1 SurvivalAoeMainActions()
 	#explosive_shot
 	Spell(explosive_shot)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react&focus>35&cast_regen<=focus.deficit|dot.serpent_sting.remains<=3|target.time_to_die<4.5
 	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 Spell(arcane_shot)
-	#glaive_toss
-	Spell(glaive_toss)
 	#cobra_shot,if=buff.pre_steady_focus.up&buff.steady_focus.remains<5&(14+cast_regen)<=focus.deficit<80
 	if BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() < 80 Spell(cobra_shot)
 	#arcane_shot,if=focus>=80|talent.focusing_shot.enabled
@@ -359,22 +346,20 @@ AddFunction SurvivalDefaultShortCdActions
 {
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeShortCdActions()
+	#a_murder_of_crows
+	Spell(a_murder_of_crows)
+	#black_arrow,if=!ticking
+	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 
-	unless not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow)
-		or Spell(explosive_shot)
+	unless Spell(explosive_shot)
 	{
-		#a_murder_of_crows
-		Spell(a_murder_of_crows)
 		#dire_beast
 		Spell(dire_beast)
 
-		unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(arcane_shot)
-			or Spell(glaive_toss)
+		unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 } and Spell(arcane_shot)
 		{
-			#powershot
-			Spell(powershot)
-			#barrage
-			Spell(barrage)
+			#explosive_trap
+			if CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 		}
 	}
 }
@@ -397,17 +382,15 @@ AddFunction SurvivalDefaultCdActions
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))|target.time_to_die<=25
-	if BuffPresent(potion_agility_buff) or ItemCooldown(virmens_bite_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
+	if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
 }
 
-# ActionList: SurvivalAoeActions --> main, shortcd, cd
+### actions.aoe --> main, shortcd, cd
 
-AddFunction SurvivalAoeActions
+AddFunction SurvivalAoeMainActions
 {
 	#explosive_shot,if=buff.lock_and_load.react&(!talent.barrage.enabled|cooldown.barrage.remains>0)
 	if BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } Spell(explosive_shot)
-	#black_arrow,if=!ticking
-	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 	#explosive_shot,if=active_enemies<5
 	if Enemies() < 5 Spell(explosive_shot)
 	#multishot,if=buff.thrill_of_the_hunt.react&focus>50&cast_regen<=focus.deficit|dot.serpent_sting.remains<=5|target.time_to_die<4.5
@@ -430,9 +413,10 @@ AddFunction SurvivalAoeShortCdActions
 	{
 		#barrage
 		Spell(barrage)
+		#black_arrow,if=!ticking
+		if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 
-		unless not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow)
-			or Enemies() < 5 and Spell(explosive_shot)
+		unless Enemies() < 5 and Spell(explosive_shot)
 		{
 			#explosive_trap,if=dot.explosive_trap.remains<=5
 			if target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
@@ -441,8 +425,7 @@ AddFunction SurvivalAoeShortCdActions
 			#dire_beast
 			Spell(dire_beast)
 
-			unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot)
-				or Spell(glaive_toss)
+			unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss)
 			{
 				#powershot
 				Spell(powershot)
@@ -457,30 +440,32 @@ AddFunction SurvivalAoeCdActions
 	if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
 }
 
-# ActionList: SurvivalPrecombatActions --> main, shortcd, cd
+### actions.precombat --> main, shortcd, cd
 
-AddFunction SurvivalPrecombatActions
+AddFunction SurvivalPrecombatMainActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=blackrock_barbecue
 	#snapshot_stats
 	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
 	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
+	#glaive_toss
+	Spell(glaive_toss)
+	#focusing_shot,if=!talent.glaive_toss.enabled
+	if not Talent(glaive_toss_talent) Spell(focusing_shot)
 }
 
 AddFunction SurvivalPrecombatShortCdActions
 {
+	#flask,type=greater_draenic_agility_flask
+	#food,type=calamari_crepes
 	#summon_pet
 	SummonPet()
 }
 
 AddFunction SurvivalPrecombatCdActions
 {
-	unless not pet.Present() or pet.IsDead()
-		or Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo)
-		or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
+	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
 		UsePotionAgility()
@@ -499,120 +484,120 @@ do
 # Hunter rotation functions.
 Include(ovale_hunter)
 
-### Beast Mastery icons
+### BeastMastery icons.
 AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) specialization=beast_mastery default)
 
 AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
 {
-	if InCombat(no) BeastMasteryPrecombatShortCdActions()
+	if not InCombat() BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
 AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_beast_mastery_aoe
 {
-	if InCombat(no) BeastMasteryPrecombatShortCdActions()
+	if not InCombat() BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
 AddIcon specialization=beast_mastery help=main enemies=1
 {
-	if InCombat(no) BeastMasteryPrecombatActions()
-	BeastMasteryDefaultActions()
+	if not InCombat() BeastMasteryPrecombatMainActions()
+	BeastMasteryDefaultMainActions()
 }
 
 AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_beast_mastery_aoe
 {
-	if InCombat(no) BeastMasteryPrecombatActions()
-	BeastMasteryDefaultActions()
+	if not InCombat() BeastMasteryPrecombatMainActions()
+	BeastMasteryDefaultMainActions()
 }
 
 AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
 {
-	if InCombat(no) BeastMasteryPrecombatCdActions()
+	if not InCombat() BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
 }
 
 AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_aoe
 {
-	if InCombat(no) BeastMasteryPrecombatCdActions()
+	if not InCombat() BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
 }
 
-### Marksmanship icons
+### Marksmanship icons.
 AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) specialization=marksmanship default)
 
 AddIcon specialization=marksmanship help=shortcd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
 {
-	if InCombat(no) MarksmanshipPrecombatShortCdActions()
+	if not InCombat() MarksmanshipPrecombatShortCdActions()
 	MarksmanshipDefaultShortCdActions()
 }
 
 AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship_aoe
 {
-	if InCombat(no) MarksmanshipPrecombatShortCdActions()
+	if not InCombat() MarksmanshipPrecombatShortCdActions()
 	MarksmanshipDefaultShortCdActions()
 }
 
 AddIcon specialization=marksmanship help=main enemies=1
 {
-	if InCombat(no) MarksmanshipPrecombatActions()
-	MarksmanshipDefaultActions()
+	if not InCombat() MarksmanshipPrecombatMainActions()
+	MarksmanshipDefaultMainActions()
 }
 
 AddIcon specialization=marksmanship help=aoe checkbox=opt_hunter_marksmanship_aoe
 {
-	if InCombat(no) MarksmanshipPrecombatActions()
-	MarksmanshipDefaultActions()
+	if not InCombat() MarksmanshipPrecombatMainActions()
+	MarksmanshipDefaultMainActions()
 }
 
 AddIcon specialization=marksmanship help=cd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
 {
-	if InCombat(no) MarksmanshipPrecombatCdActions()
+	if not InCombat() MarksmanshipPrecombatCdActions()
 	MarksmanshipDefaultCdActions()
 }
 
 AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship_aoe
 {
-	if InCombat(no) MarksmanshipPrecombatCdActions()
+	if not InCombat() MarksmanshipPrecombatCdActions()
 	MarksmanshipDefaultCdActions()
 }
 
-### Survival icons
+### Survival icons.
 AddCheckBox(opt_hunter_survival_aoe L(AOE) specialization=survival default)
 
 AddIcon specialization=survival help=shortcd enemies=1 checkbox=!opt_hunter_survival_aoe
 {
-	if InCombat(no) SurvivalPrecombatShortCdActions()
+	if not InCombat() SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
 AddIcon specialization=survival help=shortcd checkbox=opt_hunter_survival_aoe
 {
-	if InCombat(no) SurvivalPrecombatShortCdActions()
+	if not InCombat() SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
 AddIcon specialization=survival help=main enemies=1
 {
-	if InCombat(no) SurvivalPrecombatActions()
-	SurvivalDefaultActions()
+	if not InCombat() SurvivalPrecombatMainActions()
+	SurvivalDefaultMainActions()
 }
 
 AddIcon specialization=survival help=aoe checkbox=opt_hunter_survival_aoe
 {
-	if InCombat(no) SurvivalPrecombatActions()
-	SurvivalDefaultActions()
+	if not InCombat() SurvivalPrecombatMainActions()
+	SurvivalDefaultMainActions()
 }
 
 AddIcon specialization=survival help=cd enemies=1 checkbox=!opt_hunter_survival_aoe
 {
-	if InCombat(no) SurvivalPrecombatCdActions()
+	if not InCombat() SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()
 }
 
 AddIcon specialization=survival help=cd checkbox=opt_hunter_survival_aoe
 {
-	if InCombat(no) SurvivalPrecombatCdActions()
+	if not InCombat() SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()
 }
 ]]
