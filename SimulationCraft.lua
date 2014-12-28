@@ -2030,7 +2030,11 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("BaseDuration(%s)", buffName)
 		symbol = buffName
 	elseif property == "enabled" then
-		code = format("Talent(%s)", talentName)
+		if parseNode.asType == "boolean" then
+			code = format("Talent(%s)", talentName)
+		else
+			code = format("TalentPoints(%s)", talentName)
+		end
 		symbol = talentName
 	elseif property == "execute_time" then
 		code = format("ExecuteTime(%s)", name)
@@ -2824,7 +2828,11 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 		if property == "disabled" then
 			code = format("not Talent(%s)", talentName)
 		elseif property == "enabled" then
-			code = format("Talent(%s)", talentName)
+			if parseNode.asType == "boolean" then
+				code = format("Talent(%s)", talentName)
+			else
+				code = format("TalentPoints(%s)", talentName)
+			end
 		else
 			ok = false
 		end
