@@ -430,8 +430,12 @@ end
 --     count			The number of currently active runes of the given type.
 --     startCooldown	The time at which the next rune of the given type went on cooldown.
 --     endCooldown		The time at which the next rune of the given type will be active.
-statePrototype.RuneCount = function(state, name, atTime)
+statePrototype.RuneCount = function(state, name, includeDeath, atTime)
 	OvaleRunes:StartProfiling("OvaleRunes_state_RuneCount")
+	-- Default to matching death runes of the same type.
+	if type(includeDeath) == "number" then
+		includeDeath, atTime = nil, includeDeath
+	end
 	-- Default to checking the rune count at the end of the current spellcast in the
 	-- simulator, or at the current time if no spell is being cast.
 	if not atTime then
@@ -444,20 +448,26 @@ statePrototype.RuneCount = function(state, name, atTime)
 	local count = 0
 	local startCooldown, endCooldown = INFINITY, INFINITY
 	local runeType = RUNE_TYPE[name]
-	if runeType ~= DEATH_RUNE then
+	if runeType ~= DEATH_RUNE and not includeDeath then
 		-- Match only the runes of the given type.
 		for _, slot in ipairs(RUNE_SLOTS[runeType]) do
 			local rune = state.rune[slot]
-			if rune:IsActiveRune(atTime) then
-				count = count + 1
-			elseif rune.endCooldown < endCooldown then
-				startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
+			local matched = (rune.type == runeType)
+			if includeDeath == nil then
+				matched = matched or rune.type == "DEATH_RUNE"
+			end
+			if matched then
+				if rune:IsActiveRune(atTime) then
+					count = count + 1
+				elseif rune.endCooldown < endCooldown then
+					startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
+				end
 			end
 		end
 	else
-		-- Match any requested death runes.
+		-- Match any runes that can satisfy the rune type.
 		for slot, rune in ipairs(state.rune) do
-			if rune.type == DEATH_RUNE then
+			if rune.type == runeType or rune.type == DEATH_RUNE then
 				if rune:IsActiveRune(atTime) then
 					count = count + 1
 				elseif rune.endCooldown < endCooldown then

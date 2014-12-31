@@ -4236,6 +4236,9 @@ do
 	--     Valid values: blood, frost, unholy, death
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param death Optional. Set death=1 to include all active and regenerating death runes in the count. Set death=0 to exclude all death runes.
+	--     Defaults to unset.
+	--     Valid values: unset, 0, 1
 	-- @return The number of runes.
 	-- @return A boolean value for the result of the comparison.
 	-- @see DeathRune, RuneCount
@@ -4244,7 +4247,15 @@ do
 
 	local function Rune(condition, state)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
-		local count, startCooldown, endCooldown = state:RuneCount(name)
+		local includeDeath
+		if condition.death == 1 then
+			includeDeath = true
+		elseif condition.death == 0 then
+			includeDeath = false
+		--else
+		--	includeDeath = nil
+		end
+		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath)
 		if startCooldown < INFINITY then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
@@ -4286,6 +4297,9 @@ do
 	--     Valid values: blood, frost, unholy, death
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param death Optional. Set death=1 to include all active death runes in the count. Set death=0 to exclude all death runes.
+	--     Defaults to unset.
+	--     Valid values: unset, 0, 1
 	-- @return The number of runes.
 	-- @return A boolean value for the result of the comparison.
 	-- @see Rune
@@ -4295,7 +4309,15 @@ do
 
 	local function RuneCount(condition, state)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
-		local count, startCooldown, endCooldown = state:RuneCount(name)
+		local includeDeath
+		if condition.death == 1 then
+			includeDeath = true
+		elseif condition.death == 0 then
+			includeDeath = false
+		--else
+		--	includeDeath = nil
+		end
+		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath)
 		if startCooldown < INFINITY then
 			local start, ending = startCooldown, endCooldown
 			return TestValue(start, ending, count, start, 0, comparator, limit)
