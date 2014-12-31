@@ -57,7 +57,7 @@ AddFunction InterruptActions
 #	talents=3002002
 #	glyphs=savage_roar
 
-### actions.default --> main, shortcd, cd
+### actions.default
 
 AddFunction FeralDefaultMainActions
 {
@@ -166,7 +166,7 @@ AddFunction FeralDefaultCdActions
 	}
 }
 
-### actions.finisher --> main
+### actions.finisher
 
 AddFunction FeralFinisherMainActions
 {
@@ -182,7 +182,7 @@ AddFunction FeralFinisherMainActions
 	if Energy() >= EnergyCost(ferocious_bite max=1) and { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } Spell(ferocious_bite)
 }
 
-### actions.generator --> main
+### actions.generator
 
 AddFunction FeralGeneratorMainActions
 {
@@ -192,7 +192,7 @@ AddFunction FeralGeneratorMainActions
 	if Enemies() < 3 Spell(shred)
 }
 
-### actions.maintain --> main
+### actions.maintain
 
 AddFunction FeralMaintainMainActions
 {
@@ -210,7 +210,7 @@ AddFunction FeralMaintainMainActions
 	if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) and ComboPoints() < 5 and Enemies() == 1 Spell(rake)
 }
 
-### actions.precombat --> main, cd
+### actions.precombat
 
 AddFunction FeralPrecombatMainActions
 {
@@ -246,7 +246,7 @@ AddFunction FeralPrecombatCdActions
 #	spec=guardian
 #	talents=0301022
 
-### actions.default --> main, shortcd, cd
+### actions.default
 
 AddFunction GuardianDefaultMainActions
 {
@@ -323,7 +323,7 @@ AddFunction GuardianDefaultCdActions
 	}
 }
 
-### actions.precombat --> main
+### actions.precombat
 
 AddFunction GuardianPrecombatMainActions
 {

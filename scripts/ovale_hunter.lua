@@ -62,7 +62,7 @@ AddFunction SummonPet
 #	spec=beast_mastery
 #	talents=0002133
 
-### actions.default --> main, shortcd, cd
+### actions.default
 
 AddFunction BeastMasteryDefaultMainActions
 {
@@ -137,7 +137,7 @@ AddFunction BeastMasteryDefaultCdActions
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
 }
 
-### actions.precombat --> main, shortcd, cd
+### actions.precombat
 
 AddFunction BeastMasteryPrecombatMainActions
 {
@@ -177,7 +177,7 @@ AddFunction BeastMasteryPrecombatCdActions
 #	spec=marksmanship
 #	talents=0003113
 
-### actions.default --> main, shortcd, cd
+### actions.default
 
 AddFunction MarksmanshipDefaultMainActions
 {
@@ -257,7 +257,7 @@ AddFunction MarksmanshipDefaultCdActions
 	}
 }
 
-### actions.careful_aim --> main, shortcd
+### actions.careful_aim
 
 AddFunction MarksmanshipCarefulAimMainActions
 {
@@ -282,7 +282,7 @@ AddFunction MarksmanshipCarefulAimShortCdActions
 	}
 }
 
-### actions.precombat --> main, shortcd, cd
+### actions.precombat
 
 AddFunction MarksmanshipPrecombatMainActions
 {
@@ -322,7 +322,7 @@ AddFunction MarksmanshipPrecombatCdActions
 #	spec=survival
 #	talents=0001112
 
-### actions.default --> main, shortcd, cd
+### actions.default
 
 AddFunction SurvivalDefaultMainActions
 {
@@ -332,8 +332,8 @@ AddFunction SurvivalDefaultMainActions
 	Spell(explosive_shot)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react&focus>35&cast_regen<=focus.deficit|dot.serpent_sting.remains<=3|target.time_to_die<4.5
 	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 Spell(arcane_shot)
-	#cobra_shot,if=buff.pre_steady_focus.up&buff.steady_focus.remains<5&(14+cast_regen)<=focus.deficit<80
-	if BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() < 80 Spell(cobra_shot)
+	#cobra_shot,if=buff.pre_steady_focus.up&buff.steady_focus.remains<5&(14+cast_regen)<=focus.deficit
+	if BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() Spell(cobra_shot)
 	#arcane_shot,if=focus>=80|talent.focusing_shot.enabled
 	if Focus() >= 80 or Talent(focusing_shot_talent) Spell(arcane_shot)
 	#focusing_shot
@@ -385,7 +385,7 @@ AddFunction SurvivalDefaultCdActions
 	if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
 }
 
-### actions.aoe --> main, shortcd, cd
+### actions.aoe
 
 AddFunction SurvivalAoeMainActions
 {
@@ -440,7 +440,7 @@ AddFunction SurvivalAoeCdActions
 	if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
 }
 
-### actions.precombat --> main, shortcd, cd
+### actions.precombat
 
 AddFunction SurvivalPrecombatMainActions
 {

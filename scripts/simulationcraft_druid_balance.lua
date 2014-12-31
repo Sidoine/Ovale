@@ -94,8 +94,8 @@ AddFunction BalancePrecombatMainActions
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#moonkin_form
 	Spell(moonkin_form)
-	#stellar_flare
-	Spell(stellar_flare)
+	#starfire
+	Spell(starfire)
 }
 
 AddFunction BalancePrecombatCdActions
@@ -105,6 +105,8 @@ AddFunction BalancePrecombatCdActions
 		#snapshot_stats
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
+		#incarnation
+		Spell(incarnation_caster)
 	}
 }
 
