@@ -25,6 +25,12 @@ local INFINITY = math.huge
 local self_requirement = {}
 
 local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
+local STAT_FULLNAME = {
+	agi = "agility",
+	int = "intellect",
+	str = "strength",
+	spi = "spirit",
+}
 local TRINKET_USE_NAMES = { "proc", "stacking_proc", "stacking_stat", "stat" }
 --<private-static-properties>
 
@@ -352,14 +358,23 @@ do
 
 	-- Default aliases from "trinket_(stacking_stat|stat)_<stat>_buff" to "trinket_(stacking_proc|proc)_<stat>_buff".
 	for _, statName in pairs(STAT_NAMES) do
-		local name = format("trinket_stacking_stat_%s_buff", statName)
-		local alias = format("trinket_stacking_proc_%s_buff", statName)
-		list[name] = list[name] or list[alias]
+		local name = format("trinket_stacking_proc_%s_buff", statName)
+		local alias = format("trinket_stacking_stat_%s_buff", statName)
+		list[alias] = list[alias] or list[name]
 	end
 	for _, statName in pairs(STAT_NAMES) do
-		local name = format("trinket_stat_%s_buff", statName)
-		local alias = format("trinket_proc_%s_buff", statName)
-		list[name] = list[name] or list[alias]
+		local name = format("trinket_proc_%s_buff", statName)
+		local alias = format("trinket_stat_%s_buff", statName)
+		list[alias] = list[alias] or list[name]
+	end
+
+	-- Create aliases for "trinket_(stacking_proc|stacking_stat|proc|stat)_<statAbbreviation>_buff".
+	for _, useName in pairs(TRINKET_USE_NAMES) do
+		for statAbbreviation, statName in pairs(STAT_FULLNAME) do
+			local name = format("trinket_%s_%s_buff", useName, statName)
+			local alias = format("trinket_%s_%s_buff", useName, statAbbreviation)
+			list[alias] = list[alias] or list[name]
+		end
 	end
 
 	-- Create lists for "trinket_(proc|stacking_proc|stacking_stat|stat)_any_buff".
@@ -367,9 +382,9 @@ do
 		local name = format("trinket_%s_any_buff", useName)
 		list[name] = list[name] or {}
 		for _, statName in pairs(STAT_NAMES) do
-			local alias = format("trinket_%s_%s_buff", useName, statName)
-			if list[alias] then
-				for spellId in pairs(list[alias]) do
+			local listName = format("trinket_%s_%s_buff", useName, statName)
+			if list[listName] then
+				for spellId in pairs(list[listName]) do
 					list[name][spellId] = true
 				end
 			end
