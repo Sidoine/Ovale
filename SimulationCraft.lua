@@ -111,6 +111,9 @@ local SPECIAL_ACTION = {
 }
 
 local RUNE_OPERAND = {
+	["Blood"] = "blood",
+	["Frost"] = "frost",
+	["Unholy"] = "unholy",
 	["blood"] = "blood",
 	["death"] = "death",
 	["frost"] = "frost",
@@ -809,6 +812,10 @@ ParseOperand = function(tokenStream, nodeList, annotation)
 		node.type = "operand"
 		node.name = name
 		node.rune = RUNE_OPERAND[name]
+		if node.rune then
+			local firstCharacter = strsub(name, 1, 1)
+			node.includeDeath = (firstCharacter == "B" or firstCharacter == "F" or firstCharacter == "U")
+		end
 		annotation.operand = annotation.operand or {}
 		annotation.operand[#annotation.operand + 1] = node
 	end
@@ -2084,7 +2091,15 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 			elseif parseNode.type == "compare" or parseNode.type == "arithmetic" then
 				operator = parseNode.operator
 			end
-			if parseNode.type == "compare" and parseNode.child[1].rune then
+			if parseNode.type == "arithmetic" and parseNode.child[1].rune and parseNode.child[1].includeDeath and parseNode.child[2].name == "death" then
+				--[[
+					Special handling for "Blood-death", "Frost-death", and "Unholy-death" arithmetic expressions.
+					These are trying to express the concept of "non-death runes of the given type".
+				--]]
+				local code = "Rune(" .. parseNode.child[1].rune .. " death=0)"
+				annotation.astAnnotation = annotation.astAnnotation or {}
+				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			elseif parseNode.type == "compare" and parseNode.child[1].rune then
 				--[[
 					Special handling for rune comparisons.
 					This ONLY handles rune expressions of the form "<rune><operator><number>".
@@ -2101,21 +2116,27 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				if runeType and number then
 					local code
 					local op = parseNode.operator
+					local runeCondition
+					if lhsNode.includeDeath then
+						runeCondition = "Rune(" .. runeType .. " death=1)"
+					else
+						runeCondition = "Rune(" .. runeType .. ")"
+					end
 					if op == ">" then
-						code = format("Rune(%s) >= %d", runeType, number + 1)
+						code = format("%s >= %d", runeCondition, number + 1)
 					elseif op == ">=" then
-						code = format("Rune(%s) >= %d", runeType, number)
+						code = format("%s >= %d", runeCondition, number)
 					elseif op == "=" then
 						if runeType ~= "death" and number == 2 then
 							-- We can never have more than 2 non-death runes of the same type.
-							code = format("Rune(%s) >= %d", runeType, number)
+							code = format("%s >= %d", runeCondition, number)
 						else
-							code = format("Rune(%s) >= %d and Rune(%s) < %d", runeType, number, runeType, number + 1)
+							code = format("%s >= %d and %s < %d", runeCondition, number, runeCondition, number + 1)
 						end
 					elseif op == "<=" then
-						code = format("Rune(%s) < %d", runeType, number + 1)
+						code = format("%s < %d", runeCondition, number + 1)
 					elseif op == "<" then
-						code = format("Rune(%s) < %d", runeType, number)
+						code = format("%s < %d", runeCondition, number)
 					end
 					if not node and code then
 						annotation.astAnnotation = annotation.astAnnotation or {}
@@ -2961,10 +2982,16 @@ EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
 
 	local code
 	if parseNode.rune then
-		if parseNode.asType == "boolean" then
-			code = format("Rune(%s) >= 1", parseNode.rune)
+		local runeParameters
+		if parseNode.includeDeath then
+			runeParameters = parseNode.rune .. " death=1"
 		else
-			code = format("RuneCount(%s)", parseNode.rune)
+			runeParameters = parseNode.rune
+		end
+		if parseNode.asType == "boolean" then
+			code = format("Rune(%s) >= 1", runeParameters)
+		else
+			code = format("RuneCount(%s)", runeParameters)
 		end
 	else
 		ok = false
