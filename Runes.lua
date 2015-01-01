@@ -28,6 +28,7 @@ local OvaleState = nil
 --local debugprint = print
 local ipairs = ipairs
 local pairs = pairs
+local type = type
 local wipe = wipe
 local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
