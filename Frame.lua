@@ -249,7 +249,7 @@ do
 				state:Log("Adjusting for 'nored': start=%s", start)
 			end
 			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
-			if start and state.currentSpellId and state.nextCast and actionType == "spell" and actionId == state.currentSpellId and start < state.nextCast then
+			if actionType == "spell" and actionId == state.currentSpellId and start and state.nextCast and start < state.nextCast then
 				start = state.nextCast
 			end
 			if start and node.params.nocd and now < start - node.params.nocd then
