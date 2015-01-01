@@ -19,6 +19,8 @@ externals:
     Libs/LibStub: svn://svn.wowace.com/wow/ace3/mainline/trunk/LibStub
     Libs/LibTextDump-1.0: git://git.wowace.com/wow/libtextdump-1-0/mainline.git
 
+enable-nolib-creation: no
+
 ignore:
     - tests
     - utils
