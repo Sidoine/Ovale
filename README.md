@@ -1,7 +1,7 @@
 # DO NOT UPDATE THROUGH CURSE CLIENT.
 
 ### The Curse repository for Ovale is broken and is generating the wrong zipfile for the latest release.  If you update through Curse Client, you will receive a much older version (3.1.15) of the addon and it will break in-game.
-### The latest release (Ovale 6.0.38) will be available for download soon.
+### The latest release (Ovale 6.0.38) is available from the [project site](http://wow.curseforge.com/addons/ovale/files/14740-6-0-38/).
 
 [Ovale Spell Priority][Ovale] is a rotation-helper addon that shows you what spell or ability you should use in order to maximize your damage.
 
