@@ -52,8 +52,7 @@ local self_guid = nil
 local self_activeSpellcast = {}
 -- self_lastSpellcast[targetGUID][spellId] is the most recent spell that has landed successfully on the target.
 local self_lastSpellcast = {}
--- self_lastCast[spellId] is the time of the most recent cast of the spell.
-local self_lastCast = {}
+
 local self_pool = OvalePool("OvaleFuture_pool")
 do
 	self_pool.Clean = function(self, spellcast)
@@ -130,6 +129,8 @@ OvaleFuture.counter = {}
 OvaleFuture.lastSpellcast = nil
 -- Most recent GCD spellcast.
 OvaleFuture.lastGCDSpellcast = nil
+-- Table of most recent cast times of spells, indexed by spell ID.
+OvaleFuture.lastCastTime = {}
 -- Debugging: spells to trace
 OvaleFuture.traceSpellList = nil
 --</public-static-properties>
@@ -443,7 +444,7 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 	for guid in pairs(self_lastSpellcast) do
 		self:Ovale_InactiveUnit(event, guid)
 	end
-	wipe(self_lastCast)
+	wipe(self.lastCastTime)
 end
 
 function OvaleFuture:PLAYER_REGEN_DISABLED(event)
@@ -651,7 +652,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 						tremove(self_activeSpellcast, index)
 						UpdateLastSpellcast(spellcast)
 						local now = API_GetTime()
-						self_lastCast[spellcast.spellId] = now
+						self.lastCastTime[spellcast.spellId] = now
 						self:SendMessage("Ovale_SpellFinished", now, spellcast.spellId, spellcast.target, success)
 						local unitId = spellcast.target and OvaleGUID:GetUnitId(spellcast.target) or "player"
 						Ovale.refreshNeeded[unitId] = true
@@ -878,7 +879,7 @@ statePrototype.GetDamageMultiplier = function(state, spellId)
 end
 
 statePrototype.TimeOfLastCast = function(state, spellId)
-	return state.lastCast[spellId] or self_lastCast[spellId] or 0
+	return state.lastCast[spellId] or OvaleFuture.lastCastTime[spellId] or 0
 end
 
 --[[
