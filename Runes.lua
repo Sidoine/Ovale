@@ -455,7 +455,7 @@ statePrototype.RuneCount = function(state, name, includeDeath, atTime)
 			local rune = state.rune[slot]
 			local matched = (rune.type == runeType)
 			if includeDeath == nil then
-				matched = matched or rune.type == "DEATH_RUNE"
+				matched = matched or rune.type == DEATH_RUNE
 			end
 			if matched then
 				if rune:IsActiveRune(atTime) then
