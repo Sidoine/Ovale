@@ -451,11 +451,11 @@ function OvaleBestAction:ComputeAction(element, state)
 
 	local action = element.params[1]
 	if not actionTexture then
-		state:Log("[%s]    Action %s not found.", nodeId, action)
+		state:Log("[%d]    Action %s not found.", nodeId, action)
 	elseif not (actionEnable and actionEnable > 0) then
-		state:Log("[%s]    Action %s not enabled.", nodeId, action)
+		state:Log("[%d]    Action %s not enabled.", nodeId, action)
 	elseif element.params.usable == 1 and not actionUsable then
-		state:Log("[%s]    Action %s not usable.", nodeId, action)
+		state:Log("[%d]    Action %s not usable.", nodeId, action)
 	else
 		-- Set the cast time of the action.
 		if actionType == "spell" then
@@ -473,16 +473,16 @@ function OvaleBestAction:ComputeAction(element, state)
 		-- If the action is not on cooldown, then treat it like it's immediately ready.
 		local start
 		if actionCooldownStart and actionCooldownStart > 0 then
-			-- Spell is on cooldown.
+			-- Action is on cooldown.
 			if actionCooldownDuration and actionCooldownDuration > 0 then
-				state:Log("[%s]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration)
+				state:Log("[%d]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration)
 				start = actionCooldownStart + actionCooldownDuration
 			else
-				state:Log("[%s]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart)
+				state:Log("[%d]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart)
 				start = actionCooldownStart
 			end
 		else
-			state:Log("[%s]    Action %s is off cooldown.", nodeId, action)
+			state:Log("[%d]    Action %s is off cooldown.", nodeId, action)
 			start = state.currentTime
 		end
 		state:Log("[%d]    start=%f nextCast=%s", nodeId, start, state.nextCast)
