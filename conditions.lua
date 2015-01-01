@@ -4766,7 +4766,7 @@ do
 		charges = charges or 0
 		maxCharges = maxCharges or 1
 		if condition.count == 0 and charges < maxCharges then
-			return TestValue(state.currentTime, INFINITY, charges + 1, start + duration, 1, comparator, limit)
+			return TestValue(state.currentTime, INFINITY, charges + 1, start + duration, 1 / duration, comparator, limit)
 		end
 		return Compare(charges, comparator, limit)
 	end
