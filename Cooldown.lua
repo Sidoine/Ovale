@@ -23,6 +23,7 @@ local next = next
 local pairs = pairs
 local API_GetSpellCharges = GetSpellCharges
 local API_GetSpellCooldown = GetSpellCooldown
+local API_GetTime = GetTime
 local API_UnitClass = UnitClass
 
 -- Spell ID for the dummy Global Cooldown spell.
@@ -37,6 +38,10 @@ local _, self_class = API_UnitClass("player")
 local self_serial = 0
 -- Shared cooldown name (sharedcd) to spell table mapping.
 local self_sharedCooldownSpells = {}
+
+-- GCD cached information
+local self_gcdStart = 0
+local self_gcdDuration = 0
 
 -- BASE_GCD[class] = { gcd, isCaster }
 local BASE_GCD = {
@@ -115,12 +120,19 @@ function OvaleCooldown:AddSharedCooldown(name, spellId)
 	self_sharedCooldownSpells[name][spellId] = true
 end
 
+function OvaleCooldown:GetGlobalCooldown(now)
+	now = now or API_GetTime()
+	if now >= self_gcdStart + self_gcdDuration then
+		self_gcdStart, self_gcdDuration = API_GetSpellCooldown(GLOBAL_COOLDOWN)
+	end
+	return self_gcdStart, self_gcdDuration
+end
+
 -- Get the cooldown information for the given spell ID.  If given a shared cooldown name,
 -- then cycle through all spells associated with that spell ID to find the cooldown
 -- information.
 function OvaleCooldown:GetSpellCooldown(spellId)
 	local cdStart, cdDuration, cdEnable = 0, 0, 1
-	local gcdStart, gcdDuration = API_GetSpellCooldown(GLOBAL_COOLDOWN)
 	if self_sharedCooldownSpells[spellId] then
 		for id in pairs(self_sharedCooldownSpells[spellId]) do
 			local start, duration, enable = self:GetSpellCooldown(id)
@@ -135,7 +147,8 @@ function OvaleCooldown:GetSpellCooldown(spellId)
 			start, duration, enable = API_GetSpellCooldown(spellId)
 		end
 		if start and start > 0 then
-			if duration > gcdDuration then
+			local gcdStart, gcdDuration = self:GetGlobalCooldown()
+			if start + duration > gcdStart + gcdDuration then
 				-- Spell is on cooldown.
 				cdStart, cdDuration, cdEnable = start, duration, enable
 			else
@@ -194,6 +207,7 @@ local statePrototype = OvaleCooldown.statePrototype
 --</private-static-properties>
 
 --<state-properties>
+-- Table of cooldown information, indexed by spell ID.
 statePrototype.cd = nil
 --</state-properties>
 
