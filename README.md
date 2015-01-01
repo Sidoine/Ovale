@@ -1,3 +1,8 @@
+# DO NOT UPDATE THROUGH CURSE CLIENT.
+
+### The Curse repository for Ovale is broken and is generating the wrong zipfile for the latest release.  If you update through Curse Client, you will receive a much older version (3.1.15) of the addon and it will break in-game.
+### The latest release (Ovale 6.0.38) will be available for download soon.
+
 [Ovale Spell Priority][Ovale] is a rotation-helper addon that shows you what spell or ability you should use in order to maximize your damage.
 
 It displays one or more icons that show the cooldown of an action.  The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
