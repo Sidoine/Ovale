@@ -413,7 +413,7 @@ function OvaleComboPoints:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleComboPoints_ApplySpellAfterCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then

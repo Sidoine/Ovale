@@ -144,7 +144,7 @@ function OvaleTotem:CleanState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleTotem:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+function OvaleTotem:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleTotem_ApplySpellAfterCast")
 	if self_class == "SHAMAN" and spellId == TOTEMIC_RECALL then
 		-- Shaman's Totemic Recall destroys all totems.

@@ -294,7 +294,7 @@ function OvaleStance:ResetState(state)
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleStance_ApplySpellAfterCast")
 	local target = OvaleGUID:GetUnitId(targetGUID)
 	local stance = state:GetSpellInfoProperty(spellId, "to_stance", target)

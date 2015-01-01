@@ -676,7 +676,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 		local spellcast = self_activeSpellcast[index]
 		state:Log("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
 		if now - spellcast.stop < 5 then
-			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.stop, spellcast.channeled, spellcast)
+			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.channeled, spellcast)
 		else
 			tremove(self_activeSpellcast, index)
 			self_pool:Release(spellcast)
@@ -845,7 +845,7 @@ function OvaleFuture:CleanState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleFuture_ApplySpellStartCast")
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -890,18 +890,18 @@ end
 		targetGUID	The GUID of the target of the spellcast.
 		startCast	The time at the start of the spellcast.
 		endCast		The time at the end of the spellcast.
-		nextCast	The earliest time at which the next spell can be cast (nextCast >= endCast).
 		isChanneled	The spell is a channeled spell.
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
-statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
 	if spellId and targetGUID then
 		local target = OvaleGUID:GetUnitId(targetGUID)
 		local gcd = state:GetGCD(spellId, target)
+		local nextCast
 
 		-- Handle missing start/end/next cast times.
-		if not startCast or not endCast or not nextCast then
+		if not startCast or not endCast then
 			local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
 			startCast = startCast or state.nextCast
 			endCast = endCast or (startCast + castTime)
@@ -951,17 +951,17 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 		--]]
 		-- If the spellcast has already started, then the effects have already occurred.
 		if startCast > now then
-			OvaleState:InvokeMethod("ApplySpellStartCast", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+			OvaleState:InvokeMethod("ApplySpellStartCast", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 		end
 		-- If the spellcast has already ended, then the effects have already occurred.
 		if endCast > now then
-			OvaleState:InvokeMethod("ApplySpellAfterCast", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+			OvaleState:InvokeMethod("ApplySpellAfterCast", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 		end
 		if not spellcast or not spellcast.success then
-			OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+			OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 		end
 		if not spellcast or not spellcast.success or spellcast.success == "hit" or spellcast.success == "critical" then
-			OvaleState:InvokeMethod("ApplySpellAfterHit", state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+			OvaleState:InvokeMethod("ApplySpellAfterHit", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 		end
 	end
 	OvaleFuture:StopProfiling("OvaleFuture_state_ApplySpell")

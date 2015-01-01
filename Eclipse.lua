@@ -220,7 +220,7 @@ function OvaleEclipse:ResetState(state)
 end
 
 -- Apply the effects of the spell at the start of the spellcast.
-function OvaleEclipse:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+function OvaleEclipse:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleEclipse_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
@@ -230,7 +230,7 @@ function OvaleEclipse:ApplySpellStartCast(state, spellId, targetGUID, startCast,
 end
 
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
-function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, nextCast, isChanneled, spellcast)
+function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleEclipse_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
