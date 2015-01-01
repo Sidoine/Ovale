@@ -15,7 +15,7 @@ Include(ovale_common)
 Include(ovale_rogue_spells)
 
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 
 AddFunction UsePotionAgility
 {

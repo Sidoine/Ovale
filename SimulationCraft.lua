@@ -1619,7 +1619,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
-		elseif class == "ROGUE" and action == "blade_flurry" then
+		elseif class == "ROGUE" and specialization == "combat" and action == "blade_flurry" then
 			annotation.blade_flurry = class
 			conditionCode = "CheckBoxOn(opt_blade_flurry)"
 		elseif class == "ROGUE" and action == "honor_among_thieves" then
@@ -3931,7 +3931,7 @@ local function InsertSupportingControls(child, annotation)
 	end
 	if annotation.blade_flurry == "ROGUE" then
 		local code = [[
-			AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
+			AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 		]]
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)

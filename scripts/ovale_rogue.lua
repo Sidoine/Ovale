@@ -14,7 +14,7 @@ Define(honor_among_thieves_cooldown_buff 51699)
 	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
 
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 
 AddFunction UsePotionAgility
 {
