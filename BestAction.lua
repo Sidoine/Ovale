@@ -458,11 +458,12 @@ function OvaleBestAction:ComputeAction(element, state)
 		state:Log("[%d]    Action %s not usable.", nodeId, action)
 	else
 		-- Set the cast time of the action.
+		local spellInfo
 		if actionType == "spell" then
 			local spellId = actionId
-			local si = spellId and OvaleData.spellInfo[spellId]
-			if si and si.casttime then
-				element.castTime = si.casttime
+			local spellInfo = spellId and OvaleData.spellInfo[spellId]
+			if spellInfo and spellInfo.casttime then
+				element.castTime = spellInfo.casttime
 			else
 				element.castTime = OvaleSpellBook:GetCastTime(spellId)
 			end
@@ -488,12 +489,13 @@ function OvaleBestAction:ComputeAction(element, state)
 		state:Log("[%d]    start=%f nextCast=%s", nodeId, start, state.nextCast)
 
 		-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
-		if start < state.nextCast then
+		local offgcd = spellInfo and (spellInfo.offgcd == 1)
+		if not offgcd and start < state.nextCast then
 			-- Default to starting at next available cast time.
 			local newStart = state.nextCast
 			-- If we are currently channeling a spellcast, then see if it is interruptible.
 			-- If we are allowed to interrupt it, then start after the next tick of the channel.
-			if state.isChanneling then
+			if state:IsChanneling() then
 				local spellId = state.currentSpellId
 				local si = spellId and OvaleData.spellInfo[spellId]
 				if si then

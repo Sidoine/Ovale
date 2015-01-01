@@ -783,8 +783,8 @@ statePrototype.endCast = nil
 statePrototype.nextCast = nil
 -- The most recent time the spell was cast in the simulator.
 statePrototype.lastCast = nil
--- Whether the player is channeling a spell in the simulator at the current time.
-statePrototype.isChanneling = nil
+-- Whether the spell being cast in the simulator is a channeled spell.
+statePrototype.isChanneled = nil
 -- The previous spell cast in the simulator.
 statePrototype.lastSpellId = nil
 -- The previous GCD spell cast in the simulator.
@@ -809,11 +809,18 @@ function OvaleFuture:ResetState(state)
 
 	state.inCombat = self.inCombat
 	state.combatStartTime = self.combatStartTime or 0
+
 	state.lastSpellId = self.lastSpellcast and self.lastSpellcast.spellId
+	state.isChanneled = self.lastSpellcast and self.lastSpellcast.channeled
+	state.currentSpellId = state.lastSpellId
+
+	local start, duration = OvaleCooldown:GetGlobalCooldown(now)
+	if start and start > 0 then
+		state.nextCast = start + duration
+	else
+		state.nextCast = now
+	end
 	state.lastGCDSpellId = self.lastGCDSpellcast and self.lastGCDSpellcast.spellId
-	state.currentSpellId = nil
-	state.isChanneling = false
-	state.nextCast = now
 
 	for k in pairs(state.lastCast) do
 		state.lastCast[k] = nil
@@ -826,16 +833,6 @@ end
 
 -- Release state resources prior to removing from the simulator.
 function OvaleFuture:CleanState(state)
-	state.inCombat = nil
-	state.currentTime = nil
-	state.currentSpellId = nil
-	state.startCast = nil
-	state.endCast = nil
-	state.nextCast = nil
-	state.isChanneling = nil
-	state.lastSpellId = nil
-	state.lastGCDSpellId = nil
-
 	for k in pairs(state.lastCast) do
 		state.lastCast[k] = nil
 	end
@@ -882,6 +879,11 @@ statePrototype.TimeOfLastCast = function(state, spellId)
 	return state.lastCast[spellId] or OvaleFuture.lastCastTime[spellId] or 0
 end
 
+-- Return whether the player is currently channeling a spell in the simulator.
+statePrototype.IsChanneling = function(state)
+	return state.isChanneled and (state.currentTime < state.endCast)
+end
+
 --[[
 	Cast a spell in the simulator and advance the state of the simulator.
 
@@ -896,26 +898,32 @@ end
 statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
 	if spellId and targetGUID then
-		local target = OvaleGUID:GetUnitId(targetGUID)
-		local gcd = state:GetGCD(spellId, target)
-		local nextCast
 
 		-- Handle missing start/end/next cast times.
-		if not startCast or not endCast then
-			local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
+		local castTime
+		if startCast and endCast then
+			castTime = endCast - startCast
+		else
+			castTime = OvaleSpellBook:GetCastTime(spellId) or 0
 			startCast = startCast or state.nextCast
 			endCast = endCast or (startCast + castTime)
-			nextCast = (castTime > gcd) and endCast or (startCast + gcd)
 		end
 
 		-- Update the latest spell cast in the simulator.
 		state.currentSpellId = spellId
 		state.startCast = startCast
 		state.endCast = endCast
-		state.nextCast = nextCast
-		state.isChanneling = isChanneled
 		state.lastCast[spellId] = endCast
 		state.lastSpellId = spellId
+		state.isChanneled = isChanneled
+
+		-- Update the GCD-related spell information in the simulator.
+		local target = OvaleGUID:GetUnitId(targetGUID)
+		local gcd = state:GetGCD(spellId, target)
+		local nextCast = (castTime > gcd) and endCast or (startCast + gcd)
+		if state.nextCast < nextCast then
+			state.nextCast = nextCast
+		end
 		if gcd > 0 then
 			state.lastGCDSpellId = spellId
 		end
