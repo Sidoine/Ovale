@@ -283,11 +283,13 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 	if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
 		-- Check that element is an action.
 		if element and element.type == "action" then
-			local spellId, spellTarget
+			local spellId, spellInfo
 			if element.lowername == "spell" then
 				spellId = element.params[1]
-				spellTarget = element.params.target or state.defaultTarget
+				spellInfo = OvaleData.spellInfo[spellId]
 			end
+			local interrupt = spellInfo and spellInfo.interrupt
+
 			-- Flash color.
 			local color = COLORTABLE["white"]
 			local flash = element.params and element.params.flash
@@ -303,7 +305,6 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 				-- Fall back to color based on the help set in the icon parameters.
 				color = FLASH_COLOR[iconHelp]
 				-- Adjust color if it's a "cd" ability that is showing an interrupt.
-				local interrupt = spellId and state:GetSpellInfoProperty(spellId, "interrupt", spellTarget)
 				if interrupt == 1 and iconHelp == "cd" then
 					color = colorInterrupt
 				end
@@ -313,7 +314,6 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 			local size = db.size * 100
 			if iconHelp == "cd" then
 				-- Adjust to half size for "cd" abilities.
-				local interrupt = spellId and state:GetSpellInfoProperty(spellId, "interrupt", spellTarget)
 				if interrupt ~= 1 then
 					size = size * 0.5
 				end
