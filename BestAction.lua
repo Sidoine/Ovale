@@ -251,14 +251,14 @@ local function GetActionSpellInfo(element, state, target)
 				if actionCooldownStart and actionCooldownDuration then
 					local seconds = state:GetTimeToSpell(spellId, target)
 					if seconds > 0 then
-						local atTime = state.currentTime + seconds
-						if atTime > actionCooldownStart + actionCooldownDuration then
+						local t = state.currentTime + seconds
+						if t > actionCooldownStart + actionCooldownDuration then
 							if actionCooldownDuration > 0 then
-								local extend = atTime - (actionCooldownStart + actionCooldownDuration)
+								local extend = t - (actionCooldownStart + actionCooldownDuration)
 								actionCooldownDuration = actionCooldownDuration + extend
 								state:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", spellId, extend)
 							else
-								actionCooldownStart = atTime
+								actionCooldownStart = t
 								state:Log("Delaying spell ID '%s' for primary resource by %fs.", spellId, seconds)
 							end
 						end
@@ -538,8 +538,8 @@ function OvaleBestAction:ComputeAction(element, state)
 		--]]
 		local value
 		if element.params.asValue == 1 then
-			local atTime = state.currentTime
-			local value = HasTime(timeSpan, atTime) and 1 or 0
+			local t = state.currentTime
+			local value = HasTime(timeSpan, t) and 1 or 0
 			result = SetValue(element, value)
 			timeSpan[1], timeSpan[2] = 0, INFINITY
 			state:Log("[%d]    Action %s typecast to value %f.", nodeId, action, value)
@@ -579,7 +579,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 		local y = elementB and elementB.origin or 0
 		local z = elementB and elementB.rate or 0
 		local operator = element.operator
-		local atTime = state.currentTime
+		local t = state.currentTime
 
 		state:Log("[%d]    %f+(t-%f)*%f %s %f+(t-%f)*%f", element.nodeId, a, b, c, operator, x, y, z)
 
@@ -590,8 +590,8 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 			A(t) = a + (t - b)*c = a + (t - t0 + t0 - b)*c = [a + (t0 - b)*c] + (t - t0)*c = A(t0) + (t - t0)*c
 			B(t) = x + (t - y)*z = x + (t - t0 + t0 - y)*z = [x + (t0 - y)*z] + (t - t0)*z = B(t0) + (t - t0)*z
 		--]]
-		local A = a + (atTime - b)*c
-		local B = x + (atTime - y)*z
+		local A = a + (t - b)*c
+		local B = x + (t - y)*z
 
 		if operator == "+" then
 			--[[
@@ -601,7 +601,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 				A(t) + B(t) = (A + B) + (t - t0)*(c + z)
 			--]]
 			l = A + B
-			m = atTime
+			m = t
 			n = c + z
 		elseif operator == "-" then
 			--[[
@@ -611,7 +611,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 				A(t) - B(t) = (A - B) + (t - t0)*(c - z)
 			--]]
 			l = A - B
-			m = atTime
+			m = t
 			n = c - z
 		elseif operator == "*" then
 			--[[
@@ -621,7 +621,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 						  = A*B + (t - t0)*[A*z + B*c] + O(t^2) converges everywhere.
 			--]]
 				l = A*B
-				m = atTime
+				m = t
 				n = A*z + B*c
 		elseif operator == "/" then
 			--[[
@@ -630,7 +630,7 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 				A(t)/B(t) = A/B + (t - t0)*[(B*c - A*z)/B^2] + O(t^2) converges when |t - t0| < |B/z|.
 			--]]
 			l = A/B
-			m = atTime
+			m = t
 			n = (B*c - A*z)/(B^2)
 			local bound
 			if z == 0 then
@@ -641,12 +641,12 @@ function OvaleBestAction:ComputeArithmetic(element, state)
 			local scratch = OvaleTimeSpan(self_timeSpanPool:Get())
 			scratch:Reset(timeSpan)
 			timeSpan:Reset()
-			IntersectInterval(scratch, atTime - bound, atTime + bound, timeSpan)
+			IntersectInterval(scratch, t - bound, t + bound, timeSpan)
 			self_timeSpanPool:Release(scratch)
 		elseif operator == "%" then
 			if c == 0 and z == 0 then
 				l = A % B
-				m = atTime
+				m = t
 				n = 0
 			else
 				self:Error("[%d]    Parameters of modulus operator '%' must be constants.", element.nodeId)
@@ -756,13 +756,13 @@ function OvaleBestAction:ComputeCustomFunction(element, state)
 				If the return value is an action, then return 1 if the action is off of cooldown, or
 				0 if it is on cooldown.
 			--]]
-			local atTime = state.currentTime
+			local t = state.currentTime
 			local value = 0
-			if HasTime(timeSpanA, atTime) then
+			if HasTime(timeSpanA, t) then
 				if not elementA then	-- boolean
 					value = 1
 				elseif elementA.type == "value" then
-					value = elementA.value + (atTime - elementA.origin) * elementA.rate
+					value = elementA.value + (t - elementA.origin) * elementA.rate
 				elseif elementA.type == "action" then
 					value = 1
 				end
@@ -804,10 +804,10 @@ function OvaleBestAction:ComputeFunction(element, state)
 		time, or 0 otherwise.
 	--]]
 	if element.params.asValue == 1 then
-		local atTime = state.currentTime
-		if HasTime(timeSpan, atTime) then
+		local t = state.currentTime
+		if HasTime(timeSpan, t) then
 			if value then
-				value = value + (atTime - origin) * rate
+				value = value + (t - origin) * rate
 			else
 				value = 1
 			end
