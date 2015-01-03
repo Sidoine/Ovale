@@ -434,7 +434,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 				local aura = state:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
 				if state:IsActiveAura(aura, endCast) then
 					power = power + aura.stacks
-					state:RemoveAuraOnGUID(self_guid, ANTICIPATION, "HELPFUL", true, state.currentTime)
+					state:RemoveAuraOnGUID(self_guid, ANTICIPATION, "HELPFUL", true, endCast)
 					-- Anticipation charges that are consumed to grant combo points don't overflow into new Anticipation charges.
 					if power > MAX_COMBO_POINTS then
 						power = MAX_COMBO_POINTS
@@ -462,7 +462,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 					end
 				end
 				-- Add a new Anticipation buff with the updated start, ending, stacks information.
-				local start = state.currentTime
+				local start = endCast
 				local ending = start + ANTICIPATION_DURATION
 				aura = state:AddAuraToGUID(self_guid, ANTICIPATION, self_guid, "HELPFUL", start, ending)
 				aura.stacks = stacks
