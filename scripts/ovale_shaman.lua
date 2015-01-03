@@ -413,8 +413,8 @@ AddFunction RestorationAoeActions
 	if Talent(elemental_blast_talent) and BuffRemaining(elemental_blast_spirit_buff) < CastTime(elemental_blast) Spell(elemental_blast)
 	if BuffPresent(unleash_life_buff) Spell(chain_heal)
 	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
-	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(cloudburst_totem)
 	Spell(healing_rain)
+	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(cloudburst_totem)
 	Spell(chain_heal)
 }
 
