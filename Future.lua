@@ -955,7 +955,6 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 				1. Effects at the beginning of the spellcast.
 				2. Effects when the spell has been cast.
 				3. Effects when the spellcast hits the target.
-				4. Effects after the spellcast hits the target (possibly due to server lag).
 		--]]
 		-- If the spellcast has already started, then the effects have already occurred.
 		if startCast > now then
@@ -965,11 +964,8 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 		if endCast > now then
 			OvaleState:InvokeMethod("ApplySpellAfterCast", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 		end
-		if not spellcast or not spellcast.success then
-			OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-		end
 		if not spellcast or not spellcast.success or spellcast.success == "hit" or spellcast.success == "critical" then
-			OvaleState:InvokeMethod("ApplySpellAfterHit", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+			OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 		end
 	end
 	OvaleFuture:StopProfiling("OvaleFuture_state_ApplySpell")

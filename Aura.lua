@@ -935,24 +935,56 @@ function OvaleAura:CleanState(state)
 	end
 end
 
--- Apply the effects of the spell on the player's state, assuming the spellcast completes.
+-- Apply the effects of the spell at the start of the spellcast.
+function OvaleAura:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+	self:StartProfiling("OvaleAura_ApplySpellStartCast")
+	-- Channeled spells apply their auras when the player starts channeling.
+	if isChanneled then
+		local si = OvaleData.spellInfo[spellId]
+		-- Apply the auras on the player.
+		if si and si.aura and si.aura.player then
+			state:ApplySpellAuras(spellId, self_guid, startCast, si.aura.player, spellcast)
+		end
+		-- Apply the auras on the target.
+		if si and si.aura and si.aura.target then
+			state:ApplySpellAuras(spellId, targetGUID, startCast, si.aura.target, spellcast)
+		end
+	end
+	self:StopProfiling("OvaleAura_ApplySpellStartCast")
+end
+
+-- Apply the effects of the spell when the spellcast completes.
 function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleAura_ApplySpellAfterCast")
-	local si = OvaleData.spellInfo[spellId]
-	-- Apply the auras on the player.
-	if si and si.aura and si.aura.player then
-		state:ApplySpellAuras(spellId, self_guid, startCast, endCast, isChanneled, si.aura.player, spellcast)
+	-- Cast-time spells apply their auras on the player when the player completes the cast.
+	if not isChanneled then
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.aura and si.aura.player then
+			state:ApplySpellAuras(spellId, self_guid, endCast, si.aura.player, spellcast)
+		end
 	end
 	self:StopProfiling("OvaleAura_ApplySpellAfterCast")
 end
 
--- Apply the effects of the spell on the target's state after it lands on the target.
-function OvaleAura:ApplySpellAfterHit(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+-- Apply the effects of the spell when it lands on the target.
+function OvaleAura:ApplySpellOnHit(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleAura_ApplySpellAfterHit")
-	local si = OvaleData.spellInfo[spellId]
-	-- Apply the auras on the target.
-	if si and si.aura and si.aura.target then
-		state:ApplySpellAuras(spellId, targetGUID, startCast, endCast, isChanneled, si.aura.target, spellcast)
+	-- Cast-time spells apply their auras on the target when they hit the target.
+	if not isChanneled then
+		local si = OvaleData.spellInfo[spellId]
+		if si and si.aura and si.aura.target then
+			-- Get the travel time of the spell to the target, defaulting to no travel time.
+			local travelTime = si.travel_time or 0
+			if travelTime > 0 then
+				-- XXX Estimate the travel time to the target.
+				local estimatedTravelTime = 1
+				if travelTime < estimatedTravelTime then
+					travelTime = estimatedTravelTime
+				end
+			end
+			local atTime = endCast + travelTime
+			state:ApplySpellAuras(spellId, targetGUID, atTime, si.aura.target, spellcast)
+		end
 	end
 	self:StopProfiling("OvaleAura_ApplySpellAfterHit")
 end
@@ -1147,7 +1179,7 @@ statePrototype.IsActiveAura = function(state, aura, atTime)
 	return boolean
 end
 
-statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCast, isChanneled, auraList, spellcast)
+statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList, spellcast)
 	OvaleAura:StartProfiling("OvaleAura_state_ApplySpellAuras")
 	local unitId = OvaleGUID:GetUnitId(guid)
 	for filter, filterInfo in pairs(auraList) do
@@ -1225,8 +1257,6 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, startCast, endCa
 			end
 			if verified then
 				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
-				local atTime = isChanneled and startCast or endCast
-
 				if state:IsActiveAura(auraFound, atTime) then
 					local aura
 					if auraFound.state then
