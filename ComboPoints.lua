@@ -425,7 +425,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 		if power <= 0 then
 			power = 0
 			-- Ruthlessness grants a 20% chance to grant a combo point for each combo point spent on a finishing move.
-			if self_hasRuthlessness and self.combo == MAX_COMBO_POINTS then
+			if self_hasRuthlessness and state.combo == MAX_COMBO_POINTS then
 				state:Log("Spell %d grants one extra combo point from Ruthlessness.", spellId)
 				power = power + 1
 			end
