@@ -2433,8 +2433,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("%sTicksRemaining(%s)", buffTarget, buffName)
 		symbol = buffName
 	elseif property == "travel_time" then
-		-- Translate to the maximum travel time since we can't gauge the distance dynamically.
-		code = format("MaxTravelTime(%s)", name)
+		code = format("TravelTime(%s)", name)
 	else
 		ok = false
 	end
