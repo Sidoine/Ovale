@@ -461,7 +461,7 @@ function OvaleBestAction:ComputeAction(element, state)
 		local spellInfo
 		if actionType == "spell" then
 			local spellId = actionId
-			local spellInfo = spellId and OvaleData.spellInfo[spellId]
+			spellInfo = spellId and OvaleData.spellInfo[spellId]
 			if spellInfo and spellInfo.casttime then
 				element.castTime = spellInfo.casttime
 			else
