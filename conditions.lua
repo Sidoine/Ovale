@@ -88,13 +88,13 @@ end
 	Return the value of a parameter from the named spell's information.  If the value is the name of a
 	function in the script, then return the compute the value of that function instead.
 --]]
-local function ComputeParameter(spellId, paramName, state)
+local function ComputeParameter(spellId, paramName, state, atTime)
 	local si = OvaleData:GetSpellInfo(spellId)
 	if si and si[paramName] then
 		local name = si[paramName]
 		local node = OvaleCompile:GetFunctionNode(name)
 		if node then
-			local timeSpan, priority, element = OvaleBestAction:Compute(node.child[1], state)
+			local timeSpan, priority, element = OvaleBestAction:Compute(node.child[1], state, atTime)
 			if element and element.type == "value" then
 				local value = element.value + (state.currentTime - element.origin) * element.rate
 				return value
@@ -109,16 +109,8 @@ end
 -- Return the time in seconds, adjusted by the named haste effect.
 local function GetHastedTime(seconds, haste, state)
 	seconds = seconds or 0
-	if not haste then
-		return seconds
-	elseif haste == "spell" then
-		return seconds / state:GetSpellHasteMultiplier()
-	elseif haste == "melee" then
-		return seconds / state:GetMeleeHasteMultiplier()
-	else
-		state:Log("Unknown haste parameter haste=%s", haste)
-		return seconds
-	end
+	local multiplier = state:GetHasteMultiplier(haste)
+	return seconds / multiplier
 end
 
 --[[---------------------
@@ -130,7 +122,7 @@ do
 	-- 1 : maximum time after a white hit
 	-- Not useful anymore. No widely used spell reset swing timer anyway
 
-	local function AfterWhiteHit(condition, state)
+	local function AfterWhiteHit(condition, state, atTime)
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local value = 0
 		Ovale:OneTimeMessage("Warning: 'AfterWhiteHit()' is not implemented.")
@@ -152,7 +144,7 @@ do
 	-- @usage
 	-- if ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements)
 
-	local function ArmorSetBonus(condition, state)
+	local function ArmorSetBonus(condition, state, atTime)
 		local armorSet, count = condition[1], condition[2]
 		local value = (OvaleEquipment:GetArmorSetCount(armorSet) >= count) and 1 or 0
 		return 0, INFINITY, value, 0, 0
@@ -178,7 +170,7 @@ do
 	-- if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60)
 	--     Spell(ferocious_bite)
 
-	local function ArmorSetParts(condition, state)
+	local function ArmorSetParts(condition, state, atTime)
 		local armorSet, comparator, limit = condition[1], condition[2], condition[3]
 		local value = OvaleEquipment:GetArmorSetCount(armorSet)
 		return Compare(value, comparator, limit)
@@ -201,7 +193,7 @@ do
 	-- if BaseDuration(slice_and_dice_buff) > BuffDuration(slice_and_dice_buff)
 	--     Spell(slice_and_dice)
 
-	local function BaseDuration(condition, state)
+	local function BaseDuration(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local value = OvaleData:GetBaseDuration(auraId, state)
 		return Compare(value, comparator, limit)
@@ -235,7 +227,7 @@ do
 	-- if DebuffAmount(stagger) >10000 Spell(purifying_brew)
 	-- if DebuffAmount(stagger more 10000) Spell(purifying_brew)
 
-	local function BuffAmount(condition, state)
+	local function BuffAmount(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local value = condition.value or 1
@@ -248,7 +240,7 @@ do
 			statName = "value3"
 		end
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = aura[statName] or 0
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -277,11 +269,11 @@ do
 	-- @usage
 	-- if target.DebuffComboPoints(rip) <5 Spell(rip)
 
-	local function BuffComboPoints(condition, state)
+	local function BuffComboPoints(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = aura and aura.combo or 0
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -307,7 +299,7 @@ do
 	-- if BuffCooldown(trinket_stat_agility_buff) > 45
 	--     Spell(tigers_fury)
 
-	local function BuffCooldown(condition, state)
+	local function BuffCooldown(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -343,12 +335,12 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffCountOnAny
 
-	local function BuffCountOnAny(condition, state)
+	local function BuffCountOnAny(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition, state)
 		local excludeUnitId = (condition.excludeTarget == 1) and state.defaultTarget or nil
 
-		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, excludeUnitId)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, atTime, excludeUnitId)
 		if count > 0 and startChangeCount < INFINITY then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)
@@ -382,11 +374,11 @@ do
 	-- @usage
 	-- if target.DebuffDamageMultiplier(rake) <1 Spell(rake)
 
-	local function BuffDamageMultiplier(condition, state)
+	local function BuffDamageMultiplier(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local baseDamageMultiplier = aura.snapshot and aura.snapshot.baseDamageMultiplier or 1
 			local damageMultiplier = aura.damageMultiplier or 1
@@ -419,7 +411,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffDirection
 
-	local function BuffDirection(condition, state)
+	local function BuffDirection(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -448,11 +440,11 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffDuration
 
-	local function BuffDuration(condition, state)
+	local function BuffDuration(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = ending - start
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -488,13 +480,13 @@ do
 	-- if target.DebuffExpires(rake 2)
 	--     Spell(rake)
 
-	local function BuffExpires(condition, state)
+	local function BuffExpires(condition, state, atTime)
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
-			seconds = GetHastedTime(seconds, condition.haste)
+			seconds = GetHastedTime(seconds, condition.haste, state)
 			if ending - seconds <= gain then
 				return gain, INFINITY
 			else
@@ -530,13 +522,13 @@ do
 	-- if not target.DebuffPresent(rake 2)
 	--     Spell(rake)
 
-	local function BuffPresent(condition, state)
+	local function BuffPresent(condition, state, atTime)
 		local auraId, seconds = condition[1], condition[2]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
-			seconds = GetHastedTime(seconds, condition.haste)
+			seconds = GetHastedTime(seconds, condition.haste, state)
 			if ending - seconds <= gain then
 				return nil
 			else
@@ -566,7 +558,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffGain
 
-	local function BuffGain(condition, state)
+	local function BuffGain(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -598,11 +590,11 @@ do
 	-- @usage
 	-- if target.DebuffPersistentMultiplier(rake) < 1 Spell(rake)
 
-	local function BuffPersistentMultiplier(condition, state)
+	local function BuffPersistentMultiplier(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = aura.damageMultiplier or 1
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -634,7 +626,7 @@ do
 	-- if BuffRemaining(slice_and_dice) <2
 	--     Spell(slice_and_dice)
 
-	local function BuffRemaining(condition, state)
+	local function BuffRemaining(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -671,12 +663,12 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffRemainingOnAny
 
-	local function BuffRemainingOnAny(condition, state)
+	local function BuffRemainingOnAny(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition, state)
 		local excludeUnitId = (condition.excludeTarget == 1) and state.defaultTarget or nil
 
-		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, excludeUnitId)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, condition.stacks, atTime, excludeUnitId)
 		if count > 0 then
 			local start, ending = startFirst, endingLast
 			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
@@ -692,11 +684,11 @@ end
 
 do
 	-- Return the value of the stat from the aura snapshot at the time the aura was applied.
-	local function BuffSnapshot(statName, defaultValue, condition, state)
+	local function BuffSnapshot(statName, defaultValue, condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -705,11 +697,11 @@ do
 	end
 
 	-- Return the value of the given critical strike chance from the aura snapshot at the time the aura was applied.
-	local function BuffSnapshotCritChance(statName, defaultValue, condition, state)
+	local function BuffSnapshotCritChance(statName, defaultValue, condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
 			if condition.unlimited ~= 1 and value > 100 then
@@ -735,8 +727,8 @@ do
 	-- @usage
 	-- if AttackPower() >target.DebuffAttackPower(rake) Spell(rake)
 
-	local function BuffAttackPower(condition, state)
-		return BuffSnapshot("attackPower", 0, condition, state)
+	local function BuffAttackPower(condition, state, atTime)
+		return BuffSnapshot("attackPower", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffattackpower", false, BuffAttackPower)
@@ -757,8 +749,8 @@ do
 	-- @usage
 	-- if MasteryEffect() >target.DebuffMasteryEffect(rip) Spell(rip)
 
-	local function BuffMasteryEffect(condition, state)
-		return BuffSnapshot("masteryEffect", 0, condition, state)
+	local function BuffMasteryEffect(condition, state, atTime)
+		return BuffSnapshot("masteryEffect", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffmastery", false, BuffMasteryEffect)
@@ -784,8 +776,8 @@ do
 	-- @usage
 	-- if MeleeCritChance() >target.DebuffMeleeCritChance(rake) Spell(rake)
 
-	local function BuffMeleeCritChance(condition, state)
-		return BuffSnapshotCritChance("meleeCrit", 0, condition, state)
+	local function BuffMeleeCritChance(condition, state, atTime)
+		return BuffSnapshotCritChance("meleeCrit", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffmeleecritchance", false, BuffMeleeCritChance)
@@ -806,8 +798,8 @@ do
 	-- @usage
 	-- if MultistrikeChance() >target.DebuffMultistrikeChance(rip) Spell(rip)
 
-	local function BuffMultistrikeChance(condition, state)
-		return BuffSnapshot("multistrike", 0, condition, state)
+	local function BuffMultistrikeChance(condition, state, atTime)
+		return BuffSnapshot("multistrike", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffmultistrikechance", false, BuffMultistrikeChance)
@@ -829,8 +821,8 @@ do
 	-- if RangedAttackPower() >target.DebuffRangedAttackPower(serpent_sting_dot)
 	--     Spell(serpent_sting)
 
-	local function BuffRangedAttackPower(condition, state)
-		return BuffSnapshot("rangedAttackPower", 0, condition, state)
+	local function BuffRangedAttackPower(condition, state, atTime)
+		return BuffSnapshot("rangedAttackPower", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffrangedattackpower", false, BuffRangedAttackPower)
@@ -855,8 +847,8 @@ do
 	-- if RangedCritChance() >target.DebuffRangedCritChance(serpent_sting_dot)
 	--     Spell(serpent_sting)
 
-	local function BuffRangedCritChance(condition, state)
-		return BuffSnapshotCritChance("rangedCrit", 0, condition, state)
+	local function BuffRangedCritChance(condition, state, atTime)
+		return BuffSnapshotCritChance("rangedCrit", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffrangedcritchance", false, BuffRangedCritChance)
@@ -880,8 +872,8 @@ do
 	-- @usage
 	-- if SpellCritChance() >target.DebuffSpellCritChance(moonfire) Spell(moonfire)
 
-	local function BuffSpellCritChance(condition, state)
-		return BuffSnapshotCritChance("spellCrit", 0, condition, state)
+	local function BuffSpellCritChance(condition, state, atTime)
+		return BuffSnapshotCritChance("spellCrit", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffspellcritchance", false, BuffSpellCritChance)
@@ -902,8 +894,8 @@ do
 	-- @usage
 	-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
 
-	local function BuffSpellHaste(condition, state)
-		return BuffSnapshot("spellHaste", 0, condition, state)
+	local function BuffSpellHaste(condition, state, atTime)
+		return BuffSnapshot("spellHaste", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffspellhaste", false, BuffSpellHaste)
@@ -924,8 +916,8 @@ do
 	-- @usage
 	-- if Spellpower() >target.DebuffSpellpower(moonfire) Spell(moonfire)
 
-	local function BuffSpellpower(condition, state)
-		return BuffSnapshot("spellBonusDamage", 0, condition, state)
+	local function BuffSpellpower(condition, state, atTime)
+		return BuffSnapshot("spellBonusDamage", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffspellpower", false, BuffSpellpower)
@@ -954,11 +946,11 @@ do
 	-- if target.DebuffStacks(weakened_armor) <3
 	--     Spell(faerie_fire)
 
-	local function BuffStacks(condition, state)
+	local function BuffStacks(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local value = aura.stacks or 0
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -987,12 +979,12 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffStacksOnAny
 
-	local function BuffStacksOnAny(condition, state)
+	local function BuffStacksOnAny(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local _, filter, mine = ParseCondition(condition, state)
 		local excludeUnitId = (condition.excludeTarget == 1) and state.defaultTarget or nil
 
-		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, 1, excludeUnitId)
+		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, 1, atTime, excludeUnitId)
 		if count > 0 then
 			local start, ending = startFirst, endingChangeCount
 			return TestValue(start, ending, stacks, start, 0, comparator, limit)
@@ -1016,9 +1008,9 @@ do
 	-- if target.BuffStealable()
 	--     Spell(spellsteal)
 
-	local function BuffStealable(condition, state)
+	local function BuffStealable(condition, state, atTime)
 		local target = ParseCondition(condition, state)
-		return state:GetAuraWithProperty(target, "stealable", "HELPFUL")
+		return state:GetAuraWithProperty(target, "stealable", "HELPFUL", atTime)
 	end
 
 	OvaleCondition:RegisterCondition("buffstealable", false, BuffStealable)
@@ -1031,7 +1023,7 @@ do
 	-- @param id The spell ID to check.
 	-- @return True if the spell cast be cast; otherwise, false.
 
-	local function CanCast(condition, state)
+	local function CanCast(condition, state, atTime)
 		local spellId = condition[1]
 		local start, duration = state:GetSpellCooldown(spellId)
 		return start + duration, INFINITY
@@ -1054,7 +1046,7 @@ do
 	-- if target.DebuffRemaining(flame_shock) < CastTime(lava_burst)
 	--     Spell(lava_burst)
 
-	local function CastTime(condition, state)
+	local function CastTime(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
 		return Compare(castTime, comparator, limit)
@@ -1066,9 +1058,6 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @see CastTime
@@ -1076,11 +1065,10 @@ do
 	-- if target.DebuffRemaining(flame_shock) < ExecuteTime(lava_burst)
 	--     Spell(lava_burst)
 
-	local function ExecuteTime(condition, state)
+	local function ExecuteTime(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, "target")
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-		local gcd = state:GetGCD(nil, target)
+		local gcd = state:GetGCD()
 		local t = (castTime > gcd) and castTime or gcd
 		return Compare(t, comparator, limit)
 	end
@@ -1106,7 +1094,7 @@ do
 	-- if target.Casting(maloriak_release_aberrations)
 	--     Spell(pummel)
 
-	local function Casting(condition, state)
+	local function Casting(condition, state, atTime)
 		local spellId = condition[1]
 		local target = ParseCondition(condition, state)
 
@@ -1167,7 +1155,7 @@ do
 	-- AddCheckBox(opt_black_arrow "Black Arrow" default)
 	-- if CheckBoxOff(opt_black_arrow) Spell(explosive_trap)
 
-	local function CheckBoxOff(condition, state)
+	local function CheckBoxOff(condition, state, atTime)
 		for i = 1, #condition do
 			if Ovale:IsChecked(condition[i]) then
 				return nil
@@ -1187,7 +1175,7 @@ do
 	-- AddCheckBox(opt_black_arrow "Black Arrow" default)
 	-- if CheckBoxOn(opt_black_arrow) Spell(black_arrow)
 
-	local function CheckBoxOn(condition, state)
+	local function CheckBoxOn(condition, state, atTime)
 		for i = 1, #condition do
 			if not Ovale:IsChecked(condition[i]) then
 				return nil
@@ -1216,7 +1204,7 @@ do
 	-- @usage
 	-- if target.Class(PRIEST) Spell(cheap_shot)
 
-	local function Class(condition, state)
+	local function Class(condition, state, atTime)
 		local class, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local _, classToken = API_UnitClass(target)
@@ -1243,7 +1231,7 @@ do
 	-- @usage
 	-- if target.Classification(worldboss) Item(virmens_bite_potion)
 
-	local function Classification(condition, state)
+	local function Classification(condition, state, atTime)
 		local classification, yesno = condition[1], condition[2]
 		local targetClassification
 		local target = ParseCondition(condition, state)
@@ -1277,7 +1265,7 @@ do
 	-- if ComboPoints() >=1 Spell(savage_roar)
 	-- if ComboPoints(more 0) Spell(savage_roar)
 
-	local function ComboPoints(condition, state)
+	local function ComboPoints(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.combo
 		return Compare(value, comparator, limit)
@@ -1296,7 +1284,7 @@ do
 	-- @return The current value the counter.
 	-- @return A boolean value for the result of the comparison.
 
-	local function Counter(condition, state)
+	local function Counter(condition, state, atTime)
 		local counter, comparator, limit = condition[1], condition[2], condition[3]
 		local value = state:GetCounterValue(counter)
 		return Compare(value, comparator, limit)
@@ -1327,7 +1315,7 @@ do
 	-- if target.CreatureFamily(Dragonkin)
 	--     Spell(hibernate)
 
-	local function CreatureFamily(condition, state)
+	local function CreatureFamily(condition, state, atTime)
 		local name, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local family = API_UnitCreatureFamily(target)
@@ -1354,7 +1342,7 @@ do
 	-- if target.CreatureType(Humanoid Critter)
 	--     Spell(polymorph)
 
-	local function CreatureType(condition, state)
+	local function CreatureType(condition, state, atTime)
 		local target = ParseCondition(condition, state)
 		local creatureType = API_UnitCreatureType(target)
 		local lookupTable = LibBabbleCreatureType and LibBabbleCreatureType:GetLookupTable()
@@ -1373,14 +1361,14 @@ end
 
 do
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
-	local function GetDamage(spellId, state)
+	local function GetDamage(spellId, atTime, state)
 		-- TODO: Use target's debuffs in this calculation.
 		local ap = state.snapshot.attackPower or 0
 		local sp = state.snapshot.spellBonusDamage or 0
 		local mh = state.snapshot.mainHandWeaponDamage or 0
 		local oh = state.snapshot.offHandWeaponDamage or 0
 		local bdm = state.snapshot.baseDamageMultiplier or 1
-		local dm = state:GetDamageMultiplier(spellId) or 1
+		local dm = state:GetDamageMultiplier(spellId, atTime) or 1
 		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
 	end
@@ -1401,16 +1389,16 @@ do
 	local AMPLIFICATION = 146051
 	local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
 
-	local function CritDamage(condition, state)
+	local function CritDamage(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
-		local value = ComputeParameter(spellId, "damage", state)
+		local value = ComputeParameter(spellId, "damage", state, atTime)
 		if not value then
-			value = GetDamage(spellId, state)
+			value = GetDamage(spellId, atTime, state)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
-		local physical = state:GetSpellInfoProperty(spellId, "physical", target)
-		if physical == 1 then
+		local si = OvaleData.spellInfo[spellId]
+		if si.physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 
@@ -1419,14 +1407,14 @@ do
 		-- Add additional critical strike damage from MoP amplification trinkets.
 		do
 			local aura = state:GetAura("player", AMPLIFICATION, "HELPFUL")
-			if state:IsActiveAura(aura) then
+			if state:IsActiveAura(aura, atTime) then
 				critMultiplier = critMultiplier + aura.value1
 			end
 		end
 		-- Multiply by increased crit effect from the meta gem.
 		do
 			local aura = state:GetAura("player", INCREASED_CRIT_EFFECT_3_PERCENT, "HELPFUL")
-			if state:IsActiveAura(aura) then
+			if state:IsActiveAura(aura, atTime) then
 				critMultiplier = critMultiplier * aura.value1
 			end
 		end
@@ -1457,16 +1445,16 @@ do
 	-- if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 	--     Spell(rake)
 
-	local function Damage(condition, state)
+	local function Damage(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
-		local value = ComputeParameter(spellId, "damage", state)
+		local value = ComputeParameter(spellId, "damage", state, atTime)
 		if not value then
-			value = GetDamage(spellId, state)
+			value = GetDamage(spellId, atTime, state)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
-		local physical = state:GetSpellInfoProperty(spellId, "physical", target)
-		if physical == 1 then
+		local si = OvaleData.spellInfo[spellId]
+		if si.physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		return Compare(value, comparator, limit)
@@ -1490,10 +1478,10 @@ do
 	-- if {DamageMultiplier(rupture) / LastDamageMultiplier(rupture)} >1.1
 	--     Spell(rupture)
 
-	local function DamageMultiplier(condition, state)
+	local function DamageMultiplier(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local bdm = state.snapshot.baseDamageMultiplier
-		local dm = state:GetDamageMultiplier(spellId)
+		local dm = state:GetDamageMultiplier(spellId, atTime)
 		local value = bdm * dm
 		return Compare(value, comparator, limit)
 	end
@@ -1514,7 +1502,7 @@ do
 	-- @usage
 	-- if DamageTaken(5) > 50000 Spell(death_strike)
 
-	local function DamageTaken(condition, state)
+	local function DamageTaken(condition, state, atTime)
 		-- Damage taken shouldn't be smoothed since spike damage is important data.
 		-- Just present damage taken as a constant value.
 		local interval, comparator, limit = condition[1], condition[2], condition[3]
@@ -1558,14 +1546,14 @@ do
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
-	local function DiseasesRemaining(condition, state)
+	local function DiseasesRemaining(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local talented, npAura, bpAura, ffAura = GetDiseases(target, state)
 		local aura
-		if talented and state:IsActiveAura(npAura) then
+		if talented and state:IsActiveAura(npAura, atTime) then
 			aura = npAura
-		elseif not talented and state:IsActiveAura(bpAura) and state:IsActiveAura(ffAura) then
+		elseif not talented and state:IsActiveAura(bpAura, atTime) and state:IsActiveAura(ffAura, atTime) then
 			aura = (bpAura.ending < ffAura.ending) and bpAura or ffAura
 		end
 		if aura then
@@ -1583,7 +1571,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return A boolean value.
 
-	local function DiseasesTicking(condition, state)
+	local function DiseasesTicking(condition, state, atTime)
 		local target, filter, mine = ParseCondition(condition, state)
 		local talented, npAura, bpAura, ffAura = GetDiseases(target, state)
 		local gain, start, ending
@@ -1609,7 +1597,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return A boolean value.
 
-	local function DiseasesAnyTicking(condition, state)
+	local function DiseasesAnyTicking(condition, state, atTime)
 		local target, filter, mine = ParseCondition(condition, state)
 		local talented, npAura, bpAura, ffAura = GetDiseases(target, state)
 		local aura
@@ -1653,7 +1641,7 @@ do
 	-- if target.Distance(less 25)
 	--     Texture(ability_rogue_sprint)
 
-	local function Distance(condition, state)
+	local function Distance(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local value = LibRangeCheck and LibRangeCheck:GetRange(target) or 0
@@ -1678,7 +1666,7 @@ do
 	-- if Eclipse() < 0-70 and EclipseDir() <0 Spell(wrath)
 	-- if Eclipse(less -70) and EclipseDir(less 0) Spell(wrath)
 
-	local function Eclipse(condition, state)
+	local function Eclipse(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.eclipse
 		return Compare(value, comparator, limit)
@@ -1703,7 +1691,7 @@ do
 	-- if Eclipse() < 0-70 and EclipseDir() <0 Spell(wrath)
 	-- if Eclipse(less -70) and EclipseDir(less 0) Spell(wrath)
 
-	local function EclipseDir(condition, state)
+	local function EclipseDir(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.eclipseDirection
 		return Compare(value, comparator, limit)		
@@ -1728,7 +1716,7 @@ do
 	-- if Enemies() >4 Spell(fan_of_knives)
 	-- if Enemies(more 4) Spell(fan_of_knives)
 
-	local function Enemies(condition, state)
+	local function Enemies(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.enemies
 		if not value then
@@ -1759,7 +1747,7 @@ do
 	-- @usage
 	-- if EnergyRegenRage() >11 Spell(stance_of_the_sturdy_ox)
 
-	local function EnergyRegenRate(condition, state)
+	local function EnergyRegenRate(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.powerRate.energy
 		return Compare(value, comparator, limit)
@@ -1784,7 +1772,7 @@ do
 	-- @usage
 	-- if pet.Exists(no) Spell(summon_imp)
 
-	local function Exists(condition, state)
+	local function Exists(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitExists(target)
@@ -1800,7 +1788,7 @@ do
 	-- @paramsig boolean
 	-- @return A boolean value.
 
-	local function False(condition, state)
+	local function False(condition, state, atTime)
 		return nil
 	end
 
@@ -1819,7 +1807,7 @@ do
 	-- if FocusRegenRate() >20 Spell(arcane_shot)
 	-- if FocusRegenRate(more 20) Spell(arcane_shot)
 
-	local function FocusRegenRate(condition, state)
+	local function FocusRegenRate(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.powerRate.focus
 		return Compare(value, comparator, limit)
@@ -1836,23 +1824,19 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
 	-- @return The amount of focus.
 	-- @return A boolean value for the result of the comparison.
 
 	local STEADY_FOCUS = 177668
 
-	local function FocusCastingRegen(condition, state)
+	local function FocusCastingRegen(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local target = ParseCondition(condition, state, "target")
 		local regenRate = state.powerRate.focus
 		local power = 0
 
-		-- Get the "execute time" of the spell (smaller of GCD or the cast time).
+		-- Get the "execute time" of the spell (larger of GCD or the cast time).
 		local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-		local gcd = state:GetGCD(nil, target)
+		local gcd = state:GetGCD()
 		local castSeconds = (castTime > gcd) and castTime or gcd
 		power = power + regenRate * castSeconds
 
@@ -1880,19 +1864,15 @@ do
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target of the previous spell. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
 	-- if GCD() <1.1 Spell(frostfire_bolt)
 	-- if GCD(less 1.1) Spell(frostfire_bolt)
 
-	local function GCD(condition, state)
+	local function GCD(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
-		local target = ParseCondition(condition, state, "target")
-		local value = state:GetGCD(nil, target)
+		local value = state:GetGCD()
 		return Compare(value, comparator, limit)
 	end
 
@@ -1913,11 +1893,11 @@ do
 	-- @usage
 	-- unless SpellCooldown(seraphim) < GCDRemaining() Spell(judgment)
 
-	local function GCDRemaining(condition, state)
+	local function GCDRemaining(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state, "target")
 		if state.lastSpellId then
-			local duration = state:GetGCD(state.lastSpellId, target)
+			local duration = state:GetGCD(state.lastSpellId, atTime, target)
 			local start = state.startCast
 			local ending = start + duration
 			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
@@ -1938,7 +1918,7 @@ do
 	-- @return The value of the state variable.
 	-- @return A boolean value for the result of the comparison.
 
-	local function GetState(condition, state)
+	local function GetState(condition, state, atTime)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local value = state:GetState(name)
 		return Compare(value, comparator, limit)
@@ -1960,7 +1940,7 @@ do
 	-- if InCombat(no) and Glyph(glyph_of_savagery)
 	--     Spell(savage_roar)
 
-	local function Glyph(condition, state)
+	local function Glyph(condition, state, atTime)
 		local glyph, yesno = condition[1], condition[2]
 		local boolean = OvaleSpellBook:IsActiveGlyph(glyph)
 		return TestBoolean(boolean, yesno)
@@ -1984,7 +1964,7 @@ do
 	--     Defaults to not specified.
 	--     Valid values: slot=SLOTNAME, where SLOTNAME is a valid slot name, e.g., HandSlot.
 
-	local function HasEquippedItem(condition, state)
+	local function HasEquippedItem(condition, state, atTime)
 		local itemId, yesno = condition[1], condition[2]
 		local ilevel, slot = condition.ilevel, condition.slot
 		local boolean = false
@@ -2024,7 +2004,7 @@ do
 	-- @usage
 	-- if HasFullControl(no) Spell(barkskin)
 
-	local function HasFullControl(condition, state)
+	local function HasFullControl(condition, state, atTime)
 		local yesno = condition[1]
 		local boolean = API_HasFullControl()
 		return TestBoolean(boolean, yesno)
@@ -2044,7 +2024,7 @@ do
 	-- @usage
 	-- if HasShield() Spell(shield_wall)
 
-	local function HasShield(condition, state)
+	local function HasShield(condition, state, atTime)
 		local yesno = condition[1]
 		local boolean = OvaleEquipment:HasShield()
 		return TestBoolean(boolean, yesno)
@@ -2067,7 +2047,7 @@ do
 	-- if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
 	--     Spell(rake)
 
-	local function HasTrinket(condition, state)
+	local function HasTrinket(condition, state, atTime)
 		local trinketId, yesno = condition[1], condition[2]
 		local boolean = false
 		if type(trinketId) == "number" then
@@ -2102,7 +2082,7 @@ do
 	-- @usage
 	-- if HasWeapon(offhand) and BuffStacks(killing_machine) Spell(frost_strike)
 
-	local function HasWeapon(condition, state)
+	local function HasWeapon(condition, state, atTime)
 		local hand, yesno = condition[1], condition[2]
 		local weaponType = condition.type
 		local boolean = false
@@ -2214,7 +2194,7 @@ do
 	-- if Health() <10000 Spell(last_stand)
 	-- if Health(less 10000) Spell(last_stand)
 
-	local function Health(condition, state)
+	local function Health(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
@@ -2246,7 +2226,7 @@ do
 	-- if HealthMissing() <20000 Item(healthstone)
 	-- if HealthMissing(less 20000) Item(healthstone)
 
-	local function HealthMissing(condition, state)
+	local function HealthMissing(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
@@ -2277,7 +2257,7 @@ do
 	-- if HealthPercent() <20 Spell(last_stand)
 	-- if target.HealthPercent(less 25) Spell(kill_shot)
 
-	local function HealthPercent(condition, state)
+	local function HealthPercent(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
@@ -2309,7 +2289,7 @@ do
 	-- if target.MaxHealth() >10000000 Item(mogu_power_potion)
 	-- if target.MaxHealth(more 10000000) Item(mogu_power_potion)
 
-	local function MaxHealth(condition, state)
+	local function MaxHealth(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local value = API_UnitHealthMax(target)
@@ -2332,7 +2312,7 @@ do
 	-- @usage
 	-- if target.TimeToDie() <2 and ComboPoints() >0 Spell(eviscerate)
 
-	local function TimeToDie(condition, state)
+	local function TimeToDie(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local timeToDie, now = EstimatedTimeToDie(state, target)
@@ -2359,7 +2339,7 @@ do
 	-- @usage
 	-- if target.TimeToHealthPercent(25) <15 Item(virmens_bite_potion)
 
-	local function TimeToHealthPercent(condition, state)
+	local function TimeToHealthPercent(condition, state, atTime)
 		local percent, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state)
 		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
@@ -2388,7 +2368,7 @@ do
 	-- @usage
 	-- if InCombat(no) and Stealthed(no) Spell(stealth)
 
-	local function InCombat(condition, state)
+	local function InCombat(condition, state, atTime)
 		local yesno = condition[1]
 		local boolean = state.inCombat
 		return TestBoolean(boolean, yesno)
@@ -2410,7 +2390,7 @@ do
 	-- if target.DebuffRemaining(haunt) <3 and not InFlightToTarget(haunt)
 	--     Spell(haunt)
 
-	local function InFlightToTarget(condition, state)
+	local function InFlightToTarget(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local boolean = (state.currentSpellId == spellId) or OvaleFuture:InFlight(spellId)
 		return TestBoolean(boolean, yesno)
@@ -2432,7 +2412,7 @@ do
 	-- if target.IsInterruptible() and target.InRange(kick)
 	--     Spell(kick)
 
-	local function InRange(condition, state)
+	local function InRange(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local boolean = (OvaleSpellBook:IsSpellInRange(spellId, target) == 1)
@@ -2458,7 +2438,7 @@ do
 	-- @usage
 	-- if target.IsAggroed() Spell(feign_death)
 
-	local function IsAggroed(condition, state)
+	local function IsAggroed(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitDetailedThreatSituation("player", target)
@@ -2482,7 +2462,7 @@ do
 	-- @usage
 	-- if pet.IsDead() Spell(revive_pet)
 
-	local function IsDead(condition, state)
+	local function IsDead(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitIsDead(target)
@@ -2506,10 +2486,10 @@ do
 	-- @usage
 	-- if target.IsEnraged() Spell(soothe)
 
-	local function IsEnraged(condition, state)
+	local function IsEnraged(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
-		return state:GetAuraWithProperty(target, "enraged", "HELPFUL")
+		return state:GetAuraWithProperty(target, "enraged", "HELPFUL", atTime)
 	end
 
 	OvaleCondition:RegisterCondition("isenraged", false, IsEnraged)
@@ -2526,10 +2506,10 @@ do
 	-- @usage
 	-- if IsFeared() Spell(every_man_for_himself)
 
-	local function IsFeared(condition, state)
+	local function IsFeared(condition, state, atTime)
 		local yesno = condition[1]
 		local aura = state:GetAura("player", "fear_debuff", "HARMFUL")
-		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
+		local boolean = not API_HasFullControl() and state:IsActiveAura(aura, atTime)
 		return TestBoolean(boolean, yesno)
 	end
 
@@ -2550,7 +2530,7 @@ do
 	-- @usage
 	-- if target.IsFriend() Spell(healing_touch)
 
-	local function IsFriend(condition, state)
+	local function IsFriend(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitIsFriend("player", target)
@@ -2571,10 +2551,10 @@ do
 	-- @usage
 	-- if IsIncapacitated() Spell(every_man_for_himself)
 
-	local function IsIncapacitated(condition, state)
+	local function IsIncapacitated(condition, state, atTime)
 		local yesno = condition[1]
 		local aura = state:GetAura("player", "incapacitate_debuff", "HARMFUL")
-		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
+		local boolean = not API_HasFullControl() and state:IsActiveAura(aura, atTime)
 		return TestBoolean(boolean, yesno)
 	end
 
@@ -2595,7 +2575,7 @@ do
 	-- @usage
 	-- if target.IsInterruptible() Spell(kick)
 
-	local function IsInterruptible(condition, state)
+	local function IsInterruptible(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local name, _, _, _, _, _, _, _, notInterruptible = API_UnitCastingInfo(target)
@@ -2623,7 +2603,7 @@ do
 	-- @usage
 	-- if not target.IsFriend() and target.IsPVP() Spell(sap)
 
-	local function IsPVP(condition, state)
+	local function IsPVP(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitIsPVP(target)
@@ -2644,10 +2624,10 @@ do
 	-- @usage
 	-- if IsRooted() Item(Trinket0Slot usable=1)
 
-	local function IsRooted(condition, state)
+	local function IsRooted(condition, state, atTime)
 		local yesno = condition[1]
 		local aura = state:GetAura("player", "root_debuff", "HARMFUL")
-		local boolean = state:IsActiveAura(aura)
+		local boolean = state:IsActiveAura(aura, atTime)
 		return TestBoolean(boolean, yesno)
 	end
 
@@ -2665,10 +2645,10 @@ do
 	-- @usage
 	-- if IsStunned() Item(Trinket0Slot usable=1)
 
-	local function IsStunned(condition, state)
+	local function IsStunned(condition, state, atTime)
 		local yesno = condition[1]
 		local aura = state:GetAura("player", "stun_debuff", "HARMFUL")
-		local boolean = not API_HasFullControl() and state:IsActiveAura(aura)
+		local boolean = not API_HasFullControl() and state:IsActiveAura(aura, atTime)
 		return TestBoolean(boolean, yesno)
 	end
 
@@ -2689,7 +2669,7 @@ do
 	-- if ItemCount(mana_gem equal 0) or ItemCharges(mana_gem less 3)
 	--     Spell(conjure_mana_gem)
 
-	local function ItemCharges(condition, state)
+	local function ItemCharges(condition, state, atTime)
 		local itemId, comparator, limit = condition[1], condition[2], condition[3]
 		local value = API_GetItemCount(itemId, false, true)
 		return Compare(value, comparator, limit)
@@ -2713,7 +2693,7 @@ do
 	-- if not ItemCooldown(Trinket0Slot) > 0
 	--     Spell(berserk_cat)
 
-	local function ItemCooldown(condition, state)
+	local function ItemCooldown(condition, state, atTime)
 		local itemId, comparator, limit = condition[1], condition[2], condition[3]
 		if itemId and type(itemId) ~= "number" then
 			itemId = OvaleEquipment:GetEquippedItem(itemId)
@@ -2743,7 +2723,7 @@ do
 	-- if ItemCount(mana_gem) ==0 Spell(conjure_mana_gem)
 	-- if ItemCount(mana_gem equal 0) Spell(conjure_mana_gem)
 
-	local function ItemCount(condition, state)
+	local function ItemCount(condition, state, atTime)
 		local itemId, comparator, limit = condition[1], condition[2], condition[3]
 		local value = API_GetItemCount(itemId)
 		return Compare(value, comparator, limit)
@@ -2769,7 +2749,7 @@ do
 	-- if ComboPoints() >3 and target.LastComboPoints(rip) <3
 	--     Spell(rip)
 
-	local function LastComboPoints(condition, state)
+	local function LastComboPoints(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		local guid = OvaleGUID:GetGUID(target)
@@ -2796,7 +2776,7 @@ do
 	-- if LastDamage(ignite) >10000 Spell(combustion)
 	-- if LastDamage(ignite more 10000) Spell(combustion)
 
-	local function LastDamage(condition, state)
+	local function LastDamage(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local value = OvaleSpellDamage:Get(spellId)
 		if value then
@@ -2827,7 +2807,7 @@ do
 	-- if {DamageMultiplier(rupture) / target.LastDamageMultiplier(rupture)} >1.1
 	--     Spell(rupture)
 
-	local function LastDamageMultiplier(condition, state)
+	local function LastDamageMultiplier(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		local guid = OvaleGUID:GetGUID(target)
@@ -2863,10 +2843,10 @@ do
 	-- if {Damage(rake) / target.LastEstimateDamage(rake)} >1.1
 	--     Spell(rake)
 
-	local function LastEstimatedDamage(condition, state)
+	local function LastEstimatedDamage(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
-		local value = ComputeParameter(spellId, "lastEstimatedDamage", state)
+		local value = ComputeParameter(spellId, "lastEstimatedDamage", state, atTime)
 		if not value then
 			local guid = OvaleGUID:GetGUID(target)
 			local ap = OvaleFuture:GetLastSpellInfo(guid, spellId, "attackPower") or 0
@@ -2879,8 +2859,8 @@ do
 			value = OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
 		end
 		-- Reduce by armor damage reduction for physical attacks.
-		local physical = state:GetSpellInfoProperty(spellId, "physical", target)
-		if physical == 1 then
+		local si = OvaleData.spellInfo[spellId]
+		if si.physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		return Compare(value, comparator, limit)
@@ -2892,7 +2872,7 @@ end
 
 do
 	-- Return the value of the stat from the snapshot at the time the spell was cast.
-	local function LastSnapshot(statName, defaultValue, condition, state)
+	local function LastSnapshot(statName, defaultValue, condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		local guid = OvaleGUID:GetGUID(target)
@@ -2902,7 +2882,7 @@ do
 	end
 
 	-- Return the value of the given critical strike chance from the aura snapshot at the time the aura was applied.
-	local function LastSnapshotCritChance(statName, defaultValue, condition, state)
+	local function LastSnapshotCritChance(statName, defaultValue, condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state)
 		local guid = OvaleGUID:GetGUID(target)
@@ -2930,8 +2910,8 @@ do
 	-- if {AttackPower() / target.LastAttackPower(hemorrhage)} >1.25
 	--     Spell(hemorrhage)
 
-	local function LastAttackPower(condition, state)
-		return LastSnapshot("attackPower", 0, condition, state)
+	local function LastAttackPower(condition, state, atTime)
+		return LastSnapshot("attackPower", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastattackpower", false, LastAttackPower)
@@ -2955,8 +2935,8 @@ do
 	-- if {Mastery(shadow_bolt) - LastMastery(shadow_bolt)} > 1000
 	--     Spell(metamorphosis)
 
-	local function LastMasteryEffect(condition, state)
-		return LastSnapshot("masteryEffect", 0, condition, state)
+	local function LastMasteryEffect(condition, state, atTime)
+		return LastSnapshot("masteryEffect", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastmastery", false, LastMasteryEffect)
@@ -2982,8 +2962,8 @@ do
 	-- if MeleeCritChance() > target.LastMeleeCritChance(rip)
 	--     Spell(rip)
 
-	local function LastMeleeCritChance(condition, state)
-		return LastSnapshotCritChance("meleeCrit", 0, condition, state)
+	local function LastMeleeCritChance(condition, state, atTime)
+		return LastSnapshotCritChance("meleeCrit", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastmeleecritchance", false, LastMeleeCritChance)
@@ -3005,8 +2985,8 @@ do
 	-- if MultistrikeChance(shadow_bolt) > LastMultistrikeChance(shadow_bolt)
 	--     Spell(metamorphosis)
 
-	local function LastMultistrikeChance(condition, state)
-		return LastSnapshot("multistrike", 0, condition, state)
+	local function LastMultistrikeChance(condition, state, atTime)
+		return LastSnapshot("multistrike", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastmultistrikechance", false, LastMultistrikeChance)
@@ -3030,8 +3010,8 @@ do
 	-- if RangedCritChance() > target.LastRangedCritChance(serpent_sting_dot)
 	--     Spell(serpent_sting)
 
-	local function LastRangedCritChance(condition, state)
-		return LastSnapshotCritChance("rangedCrit", 0, condition, state)
+	local function LastRangedCritChance(condition, state, atTime)
+		return LastSnapshotCritChance("rangedCrit", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastrangedcritchance", false, LastRangedCritChance)
@@ -3056,8 +3036,8 @@ do
 	-- if SpellCritChance() > target.LastSpellCritChance(shadow_bolt)
 	--     Spell(metamorphosis)
 
-	local function LastSpellCritChance(condition, state)
-		return LastSnapshotCritChance("spellCrit", 0, condition, state)
+	local function LastSpellCritChance(condition, state, atTime)
+		return LastSnapshotCritChance("spellCrit", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastspellcritchance", false, LastSpellCritChance)
@@ -3079,8 +3059,8 @@ do
 	-- if {Spellpower() / target.LastSpellpower(living_bomb)} >1.25
 	--     Spell(living_bomb)
 
-	local function LastSpellpower(condition, state)
-		return LastSnapshot("spellBonusDamage", 0, condition, state)
+	local function LastSpellpower(condition, state, atTime)
+		return LastSnapshot("spellBonusDamage", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("lastspellpower", false, LastSpellpower)
@@ -3099,7 +3079,7 @@ do
 	-- if Latency() >1000 Spell(sinister_strike)
 	-- if Latency(more 1000) Spell(sinister_strike)
 
-	local function Latency(condition, state)
+	local function Latency(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = OvaleLatency:GetLatency() * 1000
 		return Compare(value, comparator, limit)
@@ -3123,7 +3103,7 @@ do
 	-- if Level() >=34 Spell(tiger_palm)
 	-- if Level(more 33) Spell(tiger_palm)
 
-	local function Level(condition, state)
+	local function Level(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local value
@@ -3150,7 +3130,7 @@ do
 	-- AddListItem(opt_curse cot "Curse of Tongues")
 	-- if List(opt_curse coe) Spell(curse_of_the_elements)
 
-	local function List(condition, state)
+	local function List(condition, state, atTime)
 		local name, value = condition[1], condition[2]
 		if name and Ovale:GetListValue(name) == value then
 			return 0, INFINITY
@@ -3174,7 +3154,7 @@ do
 	--     Valid values: player, target, focus, pet.
 	-- @return A boolean value.
 
-	local function Name(condition, state)
+	local function Name(condition, state, atTime)
 		local name, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		-- If the given name is a number, then look up the name of the corresponding spell.
@@ -3197,7 +3177,7 @@ do
 	--     Valid values: yes, no.
 	-- @return A boolean value
 
-	local function PTR(condition, state)
+	local function PTR(condition, state, atTime)
 		local yesno = condition[1]
 		local _, _, _, uiVersion = API_GetBuildInfo()
 		local boolean = (uiVersion > 50400)
@@ -3221,9 +3201,9 @@ do
 	-- if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff)
 	--     Spell(rake)
 
-	local function PersistentMultiplier(condition, state)
+	local function PersistentMultiplier(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local value = state:GetDamageMultiplier(spellId)
+		local value = state:GetDamageMultiplier(spellId, atTime)
 		return Compare(value, comparator, limit)
 	end
 
@@ -3244,7 +3224,7 @@ do
 	-- if target.IsInterruptible() and PetPresent(yes)
 	--     Spell(pet_pummel)
 
-	local function PetPresent(condition, state)
+	local function PetPresent(condition, state, atTime)
 		local yesno = condition[1]
 		local target = "pet"
 		local boolean = API_UnitExists(target) and not API_UnitIsDead(target)
@@ -3256,7 +3236,7 @@ end
 
 do
 	-- Return the maximum power of the given power type on the target.
-	local function MaxPower(powerType, condition, state)
+	local function MaxPower(powerType, condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local value
@@ -3270,7 +3250,7 @@ do
 	end
 
 	-- Return the amount of power of the given power type on the target.
-	local function Power(powerType, condition, state)
+	local function Power(powerType, condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		if target == "player" then
@@ -3285,7 +3265,7 @@ do
 	end
 
 	--- Return the current deficit of power from max power on the target.
-	local function PowerDeficit(powerType, condition, state)
+	local function PowerDeficit(powerType, condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		if target == "player" then
@@ -3308,7 +3288,7 @@ do
 	end
 
 	--- Return the current percent level of power (between 0 and 100) on the target.
-	local function PowerPercent(powerType, condition, state)
+	local function PowerPercent(powerType, condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		if target == "player" then
@@ -3340,7 +3320,7 @@ do
 	-- @return The amount of the primary resource.
 	-- @return A boolean value for the result of the comparison.
 
-	local function PrimaryResource(condition, state)
+	local function PrimaryResource(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local primaryPowerType
 		local si = OvaleData:GetSpellInfo(spellId)
@@ -3378,8 +3358,8 @@ do
 	-- @return The current alternate power.
 	-- @return A boolean value for the result of the comparison.
 
-	local function AlternatePower(condition, state)
-		return Power("alternate", condition, state)
+	local function AlternatePower(condition, state, atTime)
+		return Power("alternate", condition, state, atTime)
 	end
 
 	--- Get the current number of Burning Embers for destruction warlocks.
@@ -3393,8 +3373,8 @@ do
 	-- if BurningEmbers() >10 Spell(chaos_bolt)
 	-- if BurningEmbers(more 10) Spell(chaos_bolt)
 
-	local function BurningEmbers(condition, state)
-		return Power("burningembers", condition, state)
+	local function BurningEmbers(condition, state, atTime)
+		return Power("burningembers", condition, state, atTime)
 	end
 
 	--- Get the current amount of stored Chi for monks.
@@ -3408,8 +3388,8 @@ do
 	-- if Chi() ==4 Spell(chi_burst)
 	-- if Chi(more 3) Spell(chi_burst)
 
-	local function Chi(condition, state)
-		return Power("chi", condition, state)
+	local function Chi(condition, state, atTime)
+		return Power("chi", condition, state, atTime)
 	end
 
 	--- Get the current amount of demonic fury for demonology warlocks.
@@ -3423,8 +3403,8 @@ do
 	-- if DemonicFury() >=1000 Spell(metamorphosis)
 	-- if DemonicFury(more 999) Spell(metamorphosis)
 
-	local function DemonicFury(condition, state)
-		return Power("demonicfury", condition, state)
+	local function DemonicFury(condition, state, atTime)
+		return Power("demonicfury", condition, state, atTime)
 	end
 
 	--- Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
@@ -3438,8 +3418,8 @@ do
 	-- if Energy() >70 Spell(vanish)
 	-- if Energy(more 70) Spell(vanish)
 
-	local function Energy(condition, state)
-		return Power("energy", condition, state)
+	local function Energy(condition, state, atTime)
+		return Power("energy", condition, state, atTime)
 	end
 
 	--- Get the current amount of focus for hunters.
@@ -3453,8 +3433,8 @@ do
 	-- if Focus() >70 Spell(arcane_shot)
 	-- if Focus(more 70) Spell(arcane_shot)
 
-	local function Focus(condition, state)
-		return Power("focus", condition, state)
+	local function Focus(condition, state, atTime)
+		return Power("focus", condition, state, atTime)
 	end
 
 	--- Get the current amount of holy power for a paladin.
@@ -3468,8 +3448,8 @@ do
 	-- if HolyPower() >=3 Spell(word_of_glory)
 	-- if HolyPower(more 2) Spell(word_of_glory)
 
-	local function HolyPower(condition, state)
-		return Power("holy", condition, state)
+	local function HolyPower(condition, state, atTime)
+		return Power("holy", condition, state, atTime)
 	end
 
 	--- Get the current level of mana of the target.
@@ -3485,8 +3465,8 @@ do
 	-- @usage
 	-- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
 
-	local function Mana(condition, state)
-		return Power("mana", condition, state)
+	local function Mana(condition, state, atTime)
+		return Power("mana", condition, state, atTime)
 	end
 
 	--- Get the current amount of rage for guardian druids and warriors.
@@ -3500,8 +3480,8 @@ do
 	-- if Rage() >70 Spell(heroic_strike)
 	-- if Rage(more 70) Spell(heroic_strike)
 
-	local function Rage(condition, state)
-		return Power("rage", condition, state)
+	local function Rage(condition, state, atTime)
+		return Power("rage", condition, state, atTime)
 	end
 
 	--- Get the current amount of runic power for death knights.
@@ -3515,8 +3495,8 @@ do
 	-- if RunicPower() >70 Spell(frost_strike)
 	-- if RunicPower(more 70) Spell(frost_strike)
 
-	local function RunicPower(condition, state)
-		return Power("runicpower", condition, state)
+	local function RunicPower(condition, state, atTime)
+		return Power("runicpower", condition, state, atTime)
 	end
 
 	--- Get the current number of Shadow Orbs for shadow priests.
@@ -3530,8 +3510,8 @@ do
 	-- if ShadowOrbs() >2 Spell(mind_blast)
 	-- if ShadowOrbs(more 2) Spell(mind_blast)
 
-	local function ShadowOrbs(condition, state)
-		return Power("shadoworbs", condition, state)
+	local function ShadowOrbs(condition, state, atTime)
+		return Power("shadoworbs", condition, state, atTime)
 	end
 
 	--- Get the current number of Soul Shards for warlocks.
@@ -3545,8 +3525,8 @@ do
 	-- if SoulShards() >0 Spell(summon_felhunter)
 	-- if SoulShards(more 0) Spell(summon_felhunter)
 
-	local function SoulShards(condition, state)
-		return Power("shards", condition, state)
+	local function SoulShards(condition, state, atTime)
+		return Power("shards", condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("alternatepower", false, AlternatePower)
@@ -3573,8 +3553,8 @@ do
 	-- @return The current alternate power deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function AlternatePowerDeficit(condition, state)
-		return PowerDeficit("alternatepower", condition, state)
+	local function AlternatePowerDeficit(condition, state, atTime)
+		return PowerDeficit("alternatepower", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full burning embers bar, between 0 and maximum burning embers, of the target.
@@ -3588,8 +3568,8 @@ do
 	-- @return The current burning embers deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function BurningEmbersDeficit(condition, state)
-		return PowerDeficit("burningembers", condition, state)
+	local function BurningEmbersDeficit(condition, state, atTime)
+		return PowerDeficit("burningembers", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for full chi, between 0 and maximum chi, of the target.
@@ -3606,8 +3586,8 @@ do
 	-- if ChiDeficit() >=2 Spell(keg_smash)
 	-- if ChiDeficit(more 1) Spell(keg_smash)
 
-	local function ChiDeficit(condition, state)
-		return PowerDeficit("chi", condition, state)
+	local function ChiDeficit(condition, state, atTime)
+		return PowerDeficit("chi", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full demonic fury bar, between 0 and maximum demonic fury, of the target.
@@ -3621,8 +3601,8 @@ do
 	-- @return The current demonic fury deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function DemonicFuryDeficit(condition, state)
-		return PowerDeficit("demonicfury", condition, state)
+	local function DemonicFuryDeficit(condition, state, atTime)
+		return PowerDeficit("demonicfury", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full energy bar, between 0 and maximum energy, of the target.
@@ -3639,8 +3619,8 @@ do
 	-- if EnergyDeficit() >60 Spell(tigers_fury)
 	-- if EnergyDeficit(more 60) Spell(tigers_fury)
 
-	local function EnergyDeficit(condition, state)
-		return PowerDeficit("energy", condition, state)
+	local function EnergyDeficit(condition, state, atTime)
+		return PowerDeficit("energy", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full focus bar, between 0 and maximum focus, of the target.
@@ -3654,8 +3634,8 @@ do
 	-- @return The current focus deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function FocusDeficit(condition, state)
-		return PowerDeficit("focus", condition, state)
+	local function FocusDeficit(condition, state, atTime)
+		return PowerDeficit("focus", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for full holy power, between 0 and maximum holy power, of the target.
@@ -3669,8 +3649,8 @@ do
 	-- @return The current holy power deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function HolyPowerDeficit(condition, state)
-		return PowerDeficit("holypower", condition, state)
+	local function HolyPowerDeficit(condition, state, atTime)
+		return PowerDeficit("holypower", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full mana bar, between 0 and maximum mana, of the target.
@@ -3687,8 +3667,8 @@ do
 	-- if ManaDeficit() >30000 Item(mana_gem)
 	-- if ManaDeficit(more 30000) Item(mana_gem)
 
-	local function ManaDeficit(condition, state)
-		return PowerDeficit("mana", condition, state)
+	local function ManaDeficit(condition, state, atTime)
+		return PowerDeficit("mana", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full rage bar, between 0 and maximum rage, of the target.
@@ -3702,8 +3682,8 @@ do
 	-- @return The current rage deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function RageDeficit(condition, state)
-		return PowerDeficit("rage", condition, state)
+	local function RageDeficit(condition, state, atTime)
+		return PowerDeficit("rage", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
@@ -3717,8 +3697,8 @@ do
 	-- @return The current runic power deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function RunicPowerDeficit(condition, state)
-		return PowerDeficit("runicpower", condition, state)
+	local function RunicPowerDeficit(condition, state, atTime)
+		return PowerDeficit("runicpower", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for full shadow orbs, between 0 and maximum shadow orbs, of the target.
@@ -3732,8 +3712,8 @@ do
 	-- @return The current shadow orbs deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function ShadowOrbsDeficit(condition, state)
-		return PowerDeficit("shadoworbs", condition, state)
+	local function ShadowOrbsDeficit(condition, state, atTime)
+		return PowerDeficit("shadoworbs", condition, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for full soul shards, between 0 and maximum soul shards, of the target.
@@ -3747,8 +3727,8 @@ do
 	-- @return The current soul shards deficit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function SoulShardsDeficit(condition, state)
-		return PowerDeficit("shards", condition, state)
+	local function SoulShardsDeficit(condition, state, atTime)
+		return PowerDeficit("shards", condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("alternatepowerdeficit", false, AlternatePowerDeficit)
@@ -3778,8 +3758,8 @@ do
 	-- if ManaPercent() >90 Spell(arcane_blast)
 	-- if ManaPercent(more 90) Spell(arcane_blast)
 
-	local function ManaPercent(condition, state)
-		return PowerPercent("mana", condition, state)
+	local function ManaPercent(condition, state, atTime)
+		return PowerPercent("mana", condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("manapercent", false, ManaPercent)
@@ -3796,8 +3776,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxAlternatePower(condition, state)
-		return MaxPower("alternate", condition, state)
+	local function MaxAlternatePower(condition, state, atTime)
+		return MaxPower("alternate", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of burning embers of the target.
@@ -3811,8 +3791,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxBurningEmbers(condition, state)
-		return MaxPower("burningembers", condition, state)
+	local function MaxBurningEmbers(condition, state, atTime)
+		return MaxPower("burningembers", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of Chi of the target.
@@ -3826,8 +3806,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxChi(condition, state)
-		return MaxPower("chi", condition, state)
+	local function MaxChi(condition, state, atTime)
+		return MaxPower("chi", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of Demonic Fury of the target.
@@ -3841,8 +3821,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxDemonicFury(condition, state)
-		return MaxPower("demonicfury", condition, state)
+	local function MaxDemonicFury(condition, state, atTime)
+		return MaxPower("demonicfury", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of energy of the target.
@@ -3856,8 +3836,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxEnergy(condition, state)
-		return MaxPower("energy", condition, state)
+	local function MaxEnergy(condition, state, atTime)
+		return MaxPower("energy", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of focus of the target.
@@ -3871,8 +3851,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxFocus(condition, state)
-		return MaxPower("focus", condition, state)
+	local function MaxFocus(condition, state, atTime)
+		return MaxPower("focus", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of Holy Power of the target.
@@ -3886,8 +3866,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxHolyPower(condition, state)
-		return MaxPower("holy", condition, state)
+	local function MaxHolyPower(condition, state, atTime)
+		return MaxPower("holy", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of mana of the target.
@@ -3903,8 +3883,8 @@ do
 	-- @usage
 	-- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
 
-	local function MaxMana(condition, state)
-		return MaxPower("mana", condition, state)
+	local function MaxMana(condition, state, atTime)
+		return MaxPower("mana", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of rage of the target.
@@ -3918,8 +3898,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxRage(condition, state)
-		return MaxPower("rage", condition, state)
+	local function MaxRage(condition, state, atTime)
+		return MaxPower("rage", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of Runic Power of the target.
@@ -3933,8 +3913,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxRunicPower(condition, state)
-		return MaxPower("runicpower", condition, state)
+	local function MaxRunicPower(condition, state, atTime)
+		return MaxPower("runicpower", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of Shadow Orbs of the target.
@@ -3948,8 +3928,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxShadowOrbs(condition, state)
-		return MaxPower("shadoworbs", condition, state)
+	local function MaxShadowOrbs(condition, state, atTime)
+		return MaxPower("shadoworbs", condition, state, atTime)
 	end
 
 	--- Get the maximum amount of Soul Shards of the target.
@@ -3963,8 +3943,8 @@ do
 	-- @return The maximum value.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MaxSoulShards(condition, state)
-		return MaxPower("shards", condition, state)
+	local function MaxSoulShards(condition, state, atTime)
+		return MaxPower("shards", condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("maxalternatepower", false, MaxAlternatePower)
@@ -3983,11 +3963,11 @@ end
 
 do
 	-- Return the amount of power of the given power type required to cast the given spell.
-	local function PowerCost(powerType, condition, state)
+	local function PowerCost(powerType, condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		local maxCost = (condition.max == 1)
-		local value = state:PowerCost(spellId, powerType, target, maxCost) or 0
+		local value = state:PowerCost(spellId, powerType, atTime, target, maxCost) or 0
 		return Compare(value, comparator, limit)
 	end
 
@@ -4007,8 +3987,8 @@ do
 	-- @return The amount of energy.
 	-- @return A boolean value for the result of the comparison.
 
-	local function EnergyCost(condition, state)
-		return PowerCost("energy", condition, state)
+	local function EnergyCost(condition, state, atTime)
+		return PowerCost("energy", condition, state, atTime)
 	end
 
 	--- Get the amount of focus required to cast the given spell.
@@ -4026,8 +4006,8 @@ do
 	-- @return The amount of focus.
 	-- @return A boolean value for the result of the comparison.
 
-	local function FocusCost(condition, state)
-		return PowerCost("focus", condition, state)
+	local function FocusCost(condition, state, atTime)
+		return PowerCost("focus", condition, state, atTime)
 	end
 
 	--- Get the amount of mana required to cast the given spell.
@@ -4046,8 +4026,8 @@ do
 	-- @return The amount of mana.
 	-- @return A boolean value for the result of the comparison.
 
-	local function ManaCost(condition, state)
-		return PowerCost("mana", condition, state)
+	local function ManaCost(condition, state, atTime)
+		return PowerCost("mana", condition, state, atTime)
 	end
 
 	--- Get the amount of rage required to cast the given spell.
@@ -4065,8 +4045,8 @@ do
 	-- @return The amount of rage.
 	-- @return A boolean value for the result of the comparison.
 
-	local function RageCost(condition, state)
-		return PowerCost("rage", condition, state)
+	local function RageCost(condition, state, atTime)
+		return PowerCost("rage", condition, state, atTime)
 	end
 
 	--- Get the amount of runic power required to cast the given spell.
@@ -4084,8 +4064,8 @@ do
 	-- @return The amount of runic power.
 	-- @return A boolean value for the result of the comparison.
 
-	local function RunicPowerCost(condition, state)
-		return PowerCost("runicpower", condition, state)
+	local function RunicPowerCost(condition, state, atTime)
+		return PowerCost("runicpower", condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("energycost", true, EnergyCost)
@@ -4111,7 +4091,7 @@ do
 	-- if target.IsInterruptible() and pet.Present(yes)
 	--     Spell(pet_pummel)
 
-	local function Present(condition, state)
+	local function Present(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitExists(target) and not API_UnitIsDead(target)
@@ -4131,7 +4111,7 @@ do
 	--     Valid values: yes, no.
 	-- @return A boolean value.
 
-	local function PreviousGCDSpell(condition, state)
+	local function PreviousGCDSpell(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local boolean = (spellId == state.lastGCDSpellId)
 		return TestBoolean(boolean, yesno)
@@ -4150,7 +4130,7 @@ do
 	--     Valid values: yes, no.
 	-- @return A boolean value.
 
-	local function PreviousSpell(condition, state)
+	local function PreviousSpell(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local boolean = (spellId == state.lastSpellId)
 		return TestBoolean(boolean, yesno)
@@ -4176,7 +4156,7 @@ do
 	-- if target.RelativeLevel(more 3)
 	--     Texture(ability_rogue_sprint)
 
-	local function RelativeLevel(condition, state)
+	local function RelativeLevel(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local value, level
@@ -4213,7 +4193,7 @@ do
 	-- if target.Casting(hour_of_twilight) and target.RemainingCastTime() <2
 	--     Spell(cloak_of_shadows)
 
-	local function RemainingCastTime(condition, state)
+	local function RemainingCastTime(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local _, _, _, _, startTime, endTime = API_UnitCastingInfo(target)
@@ -4245,7 +4225,7 @@ do
 	-- @usage
 	-- if Rune(blood) > 1 Spell(blood_tap)
 
-	local function Rune(condition, state)
+	local function Rune(condition, state, atTime)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local includeDeath
 		if condition.death == 1 then
@@ -4255,7 +4235,7 @@ do
 		--else
 		--	includeDeath = nil
 		end
-		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath)
+		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath, atTime)
 		if startCooldown < INFINITY then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
@@ -4278,9 +4258,9 @@ do
 	-- @usage
 	-- if DeathRune(blood) > 1 Spell(blood_tap)
 
-	local function DeathRune(condition, state)
+	local function DeathRune(condition, state, atTime)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
-		local count, startCooldown, endCooldown = state:DeathRuneCount(name)
+		local count, startCooldown, endCooldown = state:DeathRuneCount(name, atTime)
 		if startCooldown < INFINITY then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
@@ -4307,7 +4287,7 @@ do
 	-- if RuneCount(unholy) ==2 or RuneCount(frost) ==2 or RuneCount(death) ==2
 	--     Spell(obliterate)
 
-	local function RuneCount(condition, state)
+	local function RuneCount(condition, state, atTime)
 		local name, comparator, limit = condition[1], condition[2], condition[3]
 		local includeDeath
 		if condition.death == 1 then
@@ -4317,7 +4297,7 @@ do
 		--else
 		--	includeDeath = nil
 		end
-		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath)
+		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath, atTime)
 		if startCooldown < INFINITY then
 			local start, ending = startCooldown, endCooldown
 			return TestValue(start, ending, count, start, 0, comparator, limit)
@@ -4345,10 +4325,10 @@ do
 	-- @usage
 	-- if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
 
-	local function RuneOfPowerRemaining(condition, state)
+	local function RuneOfPowerRemaining(condition, state, atTime)
 		Ovale:OneTimeMessage("Warning: 'RuneOfPowerRemaining()' is deprecated; use 'TotemRemaining(rune_of_power)' instead.")
 		local comparator, limit = condition[1], condition[2]
-		local count, start, ending = state:GetTotemCount(RUNE_OF_POWER)
+		local count, start, ending = state:GetTotemCount(RUNE_OF_POWER, atTime)
 		if count > 0 then
 			return TestValue(start, ending, 0, ending, -1, comparator, limit)
 		end
@@ -4397,9 +4377,9 @@ do
 	-- @usage
 	-- if Runes(frost 1) Spell(howling_blast)
 
-	local function Runes(condition, state)
+	local function Runes(condition, state, atTime)
 		local blood, unholy, frost, death = ParseRuneCondition(condition, state)
-		local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
+		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
 		return state.currentTime + seconds, INFINITY
 	end
 
@@ -4415,9 +4395,9 @@ do
 	-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
 	-- @return The number of seconds.
 
-	local function RunesCooldown(condition, state)
+	local function RunesCooldown(condition, state, atTime)
 		local blood, unholy, frost, death = ParseRuneCondition(condition, state)
-		local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
+		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
 		return 0, state.currentTime + seconds, seconds, state.currentTime, -1
 	end
 
@@ -4427,14 +4407,14 @@ end
 
 do
 	-- Returns the value of the given snapshot stat.
-	local function Snapshot(statName, defaultValue, condition, state)
+	local function Snapshot(statName, defaultValue, condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.snapshot[statName] or defaultValue
 		return Compare(value, comparator, limit)
 	end
 
 	-- Returns the critical strike chance of the given snapshot stat.
-	local function SnapshotCritChance(statName, defaultValue, condition, state)
+	local function SnapshotCritChance(statName, defaultValue, condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local value = state.snapshot[statName] or defaultValue
 		if condition.unlimited ~= 1 and value > 100 then
@@ -4451,8 +4431,8 @@ do
 	-- @return The current agility.
 	-- @return A boolean value for the result of the comparison.
 
-	local function Agility(condition, state)
-		return Snapshot("agility", 0, condition, state)
+	local function Agility(condition, state, atTime)
+		return Snapshot("agility", 0, condition, state, atTime)
 	end
 
 	--- Get the current attack power of the player.
@@ -4467,8 +4447,8 @@ do
 	-- if AttackPower() >10000 Spell(rake)
 	-- if AttackPower(more 10000) Spell(rake)
 
-	local function AttackPower(condition, state)
-		return Snapshot("attackPower", 0, condition, state)
+	local function AttackPower(condition, state, atTime)
+		return Snapshot("attackPower", 0, condition, state, atTime)
 	end
 
 	--- Get the current critical strike rating of the player.
@@ -4479,8 +4459,8 @@ do
 	-- @return The current critical strike rating.
 	-- @return A boolean value for the result of the comparison.
 
-	local function CritRating(condition, state)
-		return Snapshot("critRating", 0, condition, state)
+	local function CritRating(condition, state, atTime)
+		return Snapshot("critRating", 0, condition, state, atTime)
 	end
 
 	--- Get the current haste rating of the player.
@@ -4491,8 +4471,8 @@ do
 	-- @return The current haste rating.
 	-- @return A boolean value for the result of the comparison.
 
-	local function HasteRating(condition, state)
-		return Snapshot("hasteRating", 0, condition, state)
+	local function HasteRating(condition, state, atTime)
+		return Snapshot("hasteRating", 0, condition, state, atTime)
 	end
 
 	--- Get the current intellect of the player.
@@ -4503,8 +4483,8 @@ do
 	-- @return The current intellect.
 	-- @return A boolean value for the result of the comparison.
 
-	local function Intellect(condition, state)
-		return Snapshot("intellect", 0, condition, state)
+	local function Intellect(condition, state, atTime)
+		return Snapshot("intellect", 0, condition, state, atTime)
 	end
 
 	--- Get the current mastery effect of the player.
@@ -4521,8 +4501,8 @@ do
 	-- if {DamageMultiplier(rake) * {1 + MasteryEffect()/100}} >1.8
 	--     Spell(rake)
 
-	local function MasteryEffect(condition, state)
-		return Snapshot("masteryEffect", 0, condition, state)
+	local function MasteryEffect(condition, state, atTime)
+		return Snapshot("masteryEffect", 0, condition, state, atTime)
 	end
 
 	--- Get the current mastery rating of the player.
@@ -4533,8 +4513,8 @@ do
 	-- @return The current mastery rating.
 	-- @return A boolean value for the result of the comparison.
 
-	local function MasteryRating(condition, state)
-		return Snapshot("masteryRating", 0, condition, state)
+	local function MasteryRating(condition, state, atTime)
+		return Snapshot("masteryRating", 0, condition, state, atTime)
 	end
 
 	--- Get the current melee critical strike chance of the player.
@@ -4551,8 +4531,8 @@ do
 	-- @usage
 	-- if MeleeCritChance() >90 Spell(rip)
 
-	local function MeleeCritChance(condition, state)
-		return SnapshotCritChance("meleeCrit", 0, condition, state)
+	local function MeleeCritChance(condition, state, atTime)
+		return SnapshotCritChance("meleeCrit", 0, condition, state, atTime)
 	end
 
 	--- Get the current multistrike chance of the player.
@@ -4564,8 +4544,8 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see LastMultistrikeChance
 
-	local function MultistrikeChance(condition, state)
-		return Snapshot("multistrike", 0, condition, state)
+	local function MultistrikeChance(condition, state, atTime)
+		return Snapshot("multistrike", 0, condition, state, atTime)
 	end
 
 	--- Get the current ranged critical strike chance of the player.
@@ -4582,8 +4562,8 @@ do
 	-- @usage
 	-- if RangedCritChance() >90 Spell(serpent_sting)
 
-	local function RangedCritChance(condition, state)
-		return SnapshotCritChance("rangedCrit", 0, condition, state)
+	local function RangedCritChance(condition, state, atTime)
+		return SnapshotCritChance("rangedCrit", 0, condition, state, atTime)
 	end
 
 	--- Get the current spell critical strike chance of the player.
@@ -4600,8 +4580,8 @@ do
 	-- @usage
 	-- if SpellCritChance() >30 Spell(immolate)
 
-	local function SpellCritChance(condition, state)
-		return SnapshotCritChance("spellCrit", 0, condition, state)
+	local function SpellCritChance(condition, state, atTime)
+		return SnapshotCritChance("spellCrit", 0, condition, state, atTime)
 	end
 
 	--- Get the current percent increase to spell haste of the player.
@@ -4615,8 +4595,8 @@ do
 	-- @usage
 	-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
 
-	local function SpellHaste(condition, state)
-		return Snapshot("spellHaste", 0, condition, state)
+	local function SpellHaste(condition, state, atTime)
+		return Snapshot("spellHaste", 0, condition, state, atTime)
 	end
 
 	--- Get the current spellpower of the player.
@@ -4631,8 +4611,8 @@ do
 	-- if {Spellpower() / LastSpellpower(living_bomb)} >1.25
 	--     Spell(living_bomb)
 
-	local function Spellpower(condition, state)
-		return Snapshot("spellBonusDamage", 0, condition, state)
+	local function Spellpower(condition, state, atTime)
+		return Snapshot("spellBonusDamage", 0, condition, state, atTime)
 	end
 
 	--- Get the current spirit of the player.
@@ -4643,8 +4623,8 @@ do
 	-- @return The current spirit.
 	-- @return A boolean value for the result of the comparison.
 
-	local function Spirit(condition, state)
-		return Snapshot("spirit", 0, condition, state)
+	local function Spirit(condition, state, atTime)
+		return Snapshot("spirit", 0, condition, state, atTime)
 	end
 
 	--- Get the current stamina of the player.
@@ -4655,8 +4635,8 @@ do
 	-- @return The current stamina.
 	-- @return A boolean value for the result of the comparison.
 
-	local function Stamina(condition, state)
-		return Snapshot("stamina", 0, condition, state)
+	local function Stamina(condition, state, atTime)
+		return Snapshot("stamina", 0, condition, state, atTime)
 	end
 
 	--- Get the current strength of the player.
@@ -4667,8 +4647,8 @@ do
 	-- @return The current strength.
 	-- @return A boolean value for the result of the comparison.
 
-	local function Strength(condition, state)
-		return Snapshot("strength", 0, condition, state)
+	local function Strength(condition, state, atTime)
+		return Snapshot("strength", 0, condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("agility", false, Agility)
@@ -4707,7 +4687,7 @@ do
 	-- if Speed(more 0) and not BuffPresent(aspect_of_the_fox)
 	--     Spell(aspect_of_the_fox)
 
-	local function Speed(condition, state)
+	local function Speed(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local value = API_GetUnitSpeed(target) * 100 / 7
@@ -4731,9 +4711,9 @@ do
 	-- if SpellChargeCooldown(roll) <2
 	--     Spell(roll usable=1)
 
-	local function SpellChargeCooldown(condition, state)
+	local function SpellChargeCooldown(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId)
+		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId, atTime)
 		if charges and charges < maxCharges then
 			return TestValue(start, start + duration, duration, start, -1, comparator, limit)
 		end
@@ -4760,9 +4740,9 @@ do
 	-- if SpellCharges(savage_defense) >1
 	--     Spell(savage_defense)
 
-	local function SpellCharges(condition, state)
+	local function SpellCharges(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
-		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId)
+		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId, atTime)
 		charges = charges or 0
 		maxCharges = maxCharges or 1
 		if condition.count == 0 and charges < maxCharges then
@@ -4790,11 +4770,11 @@ do
 	-- if ShadowOrbs() ==3 and SpellCooldown(mind_blast) <2
 	--     Spell(devouring_plague)
 
-	local function SpellCooldown(condition, state)
+	local function SpellCooldown(condition, state, atTime)
 		local comparator, limit
 		local usable = (condition.usable == 1)
 		local target = ParseCondition(condition, state, "target")
-		local atTime = INFINITY
+		local earliest = INFINITY
 		for i = 1, #condition do
 			local spellId = condition[1]
 			if OvaleCondition.COMPARATOR[spellId] then
@@ -4802,14 +4782,14 @@ do
 				break
 			elseif not OvaleSpellBook:IsKnownSpell(spellId) then
 				-- Skip unknown spells.
-			elseif not usable or state:IsUsableSpell(spellId, target) then
+			elseif not usable or state:IsUsableSpell(spellId, atTime, target) then
 				local start, duration = state:GetSpellCooldown(spellId)
 				local t = 0
 				if start > 0 and duration > 0 then
 					t = start + duration
 				end
-				if t < atTime then
-					atTime = t
+				if earliest > t then
+					earliest = t
 				end
 			end
 		end
@@ -4818,10 +4798,10 @@ do
 			This matches SimulationCraft's behavior regarding cooldowns of spells that
 			are not known -- they are considered to have a cooldown of zero.
 		--]]
-		if atTime == INFINITY then
+		if earliest == INFINITY then
 			return Compare(0, comparator, limit)
-		elseif atTime > 0 then
-			return TestValue(0, atTime, 0, atTime, -1, comparator, limit)
+		elseif earliest > 0 then
+			return TestValue(0, earliest, 0, earliest, -1, comparator, limit)
 		end
 		return Compare(0, comparator, limit)
 	end
@@ -4842,10 +4822,10 @@ do
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
-	local function SpellCooldownDuration(condition, state)
+	local function SpellCooldownDuration(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
-		local duration = state:GetSpellCooldownDuration(spellId, state.currentTime, target)
+		local duration = state:GetSpellCooldownDuration(spellId, atTime, target)
 		return Compare(duration, comparator, limit)
 	end
 
@@ -4867,7 +4847,7 @@ do
 	-- if BuffRemaining(slice_and_dice) >= SpellData(shadow_blades duration)
 	--     Spell(shadow_blades)
 
-	local function SpellData(condition, state)
+	local function SpellData(condition, state, atTime)
 		local spellId, key, comparator, limit = condition[1], condition[2], condition[3], condition[4]
 		local si = OvaleData.spellInfo[spellId]
 		if si then
@@ -4895,7 +4875,7 @@ do
 	-- @return A boolean value.
 	-- @see SpellUsable
 
-	local function SpellKnown(condition, state)
+	local function SpellKnown(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local boolean = OvaleSpellBook:IsKnownSpell(spellId)
 		return TestBoolean(boolean, yesno)
@@ -4917,10 +4897,10 @@ do
 	-- @return A boolean value.
 	-- @see SpellKnown
 
-	local function SpellUsable(condition, state)
+	local function SpellUsable(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local target = ParseCondition(condition, state, "target")
-		local isUsable, noMana = state:IsUsableSpell(spellId, target)
+		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, target)
 		local boolean = isUsable or noMana
 		return TestBoolean(boolean, yesno)
 	end
@@ -4946,17 +4926,17 @@ do
 	-- @usage
 	-- if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
 
-	local function StaggerRemaining(condition, state)
+	local function StaggerRemaining(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state)
 		local aura = state:GetAura(target, HEAVY_STAGGER, "HARMFUL")
-		if not state:IsActiveAura(aura) then
+		if not state:IsActiveAura(aura, atTime) then
 			aura = state:GetAura(target, MODERATE_STAGGER, "HARMFUL")
 		end
-		if not state:IsActiveAura(aura) then
+		if not state:IsActiveAura(aura, atTime) then
 			aura = state:GetAura(target, LIGHT_STAGGER, "HARMFUL")
 		end
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
 			local stagger = API_UnitStagger(target)
 			local rate = -1 * stagger / (ending - start)
@@ -4981,7 +4961,7 @@ do
 	-- @usage
 	-- unless Stance(druid_bear_form) Spell(bear_form)
 
-	local function Stance(condition, state)
+	local function Stance(condition, state, atTime)
 		local stance, yesno = condition[1], condition[2]
 		local boolean = state:IsStance(stance)
 		return TestBoolean(boolean, yesno)
@@ -5003,7 +4983,7 @@ do
 	-- if Stealthed() or BuffPresent(shadow_dance)
 	--     Spell(ambush)
 
-	local function Stealthed(condition, state)
+	local function Stealthed(condition, state, atTime)
 		local yesno = condition[1]
 		local boolean = state:GetAura("player", "stealthed_buff") or API_IsStealthed()
 		return TestBoolean(boolean, yesno)
@@ -5026,7 +5006,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see NextSwing
 
-	local function LastSwing(condition, state)
+	local function LastSwing(condition, state, atTime)
 		local swing = condition[1]
 		local comparator, limit
 		local start
@@ -5053,7 +5033,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see LastSwing
 
-	local function NextSwing(condition, state)
+	local function NextSwing(condition, state, atTime)
 		local swing = condition[1]
 		local comparator, limit
 		local ending
@@ -5084,7 +5064,7 @@ do
 	-- @usage
 	-- if Talent(blood_tap_talent) Spell(blood_tap)
 
-	local function Talent(condition, state)
+	local function Talent(condition, state, atTime)
 		local talentId, yesno = condition[1], condition[2]
 		local boolean = (OvaleSpellBook:GetTalentPoints(talentId) > 0)
 		return TestBoolean(boolean, yesno)
@@ -5105,7 +5085,7 @@ do
 	-- @usage
 	-- if TalentPoints(blood_tap_talent) Spell(blood_tap)
 
-	local function TalentPoints(condition, state)
+	local function TalentPoints(condition, state, atTime)
 		local talent, comparator, limit = condition[1], condition[2], condition[3]
 		local value = OvaleSpellBook:GetTalentPoints(talent)
 		return Compare(value, comparator, limit)
@@ -5128,7 +5108,7 @@ do
 	-- @usage
 	-- if target.TargetIsPlayer() Spell(feign_death)
 
-	local function TargetIsPlayer(condition, state)
+	local function TargetIsPlayer(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
 		local boolean = API_UnitIsUnit("player", target .. "target")
@@ -5155,7 +5135,7 @@ do
 	-- if Threat() >90 Spell(fade)
 	-- if Threat(more 90) Spell(fade)
 
-	local function Threat(condition, state)
+	local function Threat(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		local target = ParseCondition(condition, state, "target")
 		local _, _, value = API_UnitDetailedThreatSituation("player", target)
@@ -5182,12 +5162,12 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see TicksRemaining
 
-	local function TickTime(condition, state)
+	local function TickTime(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		local tickTime
-		if state:IsActiveAura(aura) then
+		if state:IsActiveAura(aura, atTime) then
 			tickTime = aura.tick
 		else
 			tickTime = OvaleData:GetTickLength(auraId, state.snapshot)
@@ -5221,7 +5201,7 @@ do
 	-- if target.TicksRemaining(shadow_word_pain) <2
 	--     Spell(shadow_word_pain)
 
-	local function TicksRemaining(condition, state)
+	local function TicksRemaining(condition, state, atTime)
 		local auraId, comparator, limit = condition[1], condition[2], condition[3]
 		local target, filter, mine = ParseCondition(condition, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
@@ -5249,7 +5229,7 @@ do
 	-- @usage
 	-- if TimeInCombat(more 5) Spell(bloodlust)
 
-	local function TimeInCombat(condition, state)
+	local function TimeInCombat(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2]
 		if state.inCombat then
 			local start = state.combatStartTime
@@ -5273,7 +5253,7 @@ do
 	-- @usage
 	-- if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
 
-	local function TimeSincePreviousSpell(condition, state)
+	local function TimeSincePreviousSpell(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local t = state:TimeOfLastCast(spellId)
 		return TestValue(0, INFINITY, 0, t, 1, comparator, limit)
@@ -5292,7 +5272,7 @@ do
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
-	local function TimeToBloodlust(condition, state)
+	local function TimeToBloodlust(condition, state, atTime)
 		local comparator, limit = condition[1], condition[2], condition[3]
 		local value = 3600
 		return Compare(value, comparator, limit)
@@ -5303,7 +5283,7 @@ end
 
 do
 	--- Get the number of seconds before the player reaches the given power level.
-	local function TimeToPower(powerType, level, comparator, limit, state)
+	local function TimeToPower(powerType, level, comparator, limit, state, atTime)
 		local level = level or 0
 		local power = state[powerType] or 0
 		local powerRegen = state.powerRate[powerType] or 1
@@ -5334,9 +5314,9 @@ do
 	-- @usage
 	-- if TimeToEnergy(100) < 1.2 Spell(sinister_strike)
 
-	local function TimeToEnergy(condition, state)
+	local function TimeToEnergy(condition, state, atTime)
 		local level, comparator, limit = condition[1], condition[2], condition[3]
-		return TimeToPower("energy", level, comparator, limit, state)
+		return TimeToPower("energy", level, comparator, limit, state, atTime)
 	end
 
 	--- Get the number of seconds before the player reaches maximum energy for feral druids, non-mistweaver monks and rogues.
@@ -5350,11 +5330,11 @@ do
 	-- @usage
 	-- if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
 
-	local function TimeToMaxEnergy(condition, state)
+	local function TimeToMaxEnergy(condition, state, atTime)
 		local powerType = "energy"
 		local comparator, limit = condition[1], condition[2]
 		local level = OvalePower.maxPower[powerType] or 0
-		return TimeToPower(powerType, level, comparator, limit, state)
+		return TimeToPower(powerType, level, comparator, limit, state, atTime)
 	end
 
 	--- Get the number of seconds before the player reaches the given focus level for hunters.
@@ -5369,9 +5349,9 @@ do
 	-- @usage
 	-- if TimeToFocus(100) < 1.2 Spell(cobra_shot)
 
-	local function TimeToFocus(condition, state)
+	local function TimeToFocus(condition, state, atTime)
 		local level, comparator, limit = condition[1], condition[2], condition[3]
-		return TimeToPower("focus", level, comparator, limit, state)
+		return TimeToPower("focus", level, comparator, limit, state, atTime)
 	end
 
 	--- Get the number of seconds before the player reaches maximum focus for hunters.
@@ -5385,11 +5365,11 @@ do
 	-- @usage
 	-- if TimeToMaxFocus() < 1.2 Spell(cobra_shot)
 
-	local function TimeToMaxFocus(condition, state)
+	local function TimeToMaxFocus(condition, state, atTime)
 		local powerType = "focus"
 		local comparator, limit = condition[1], condition[2]
 		local level = OvalePower.maxPower[powerType] or 0
-		return TimeToPower(powerType, level, comparator, limit, state)
+		return TimeToPower(powerType, level, comparator, limit, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("timetoenergy", false, TimeToEnergy)
@@ -5399,14 +5379,14 @@ do
 end
 
 do
-	local function TimeToPowerFor(powerType, condition, state)
+	local function TimeToPowerFor(powerType, condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		if not powerType then
 			local _, pt = OvalePower:GetSpellCost(spellId)
 			powerType = pt
 		end
-		local seconds = state:TimeToPower(spellId, target, powerType)
+		local seconds = state:TimeToPower(spellId, atTime, target, powerType)
 
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
@@ -5430,8 +5410,8 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see TimeToEnergyFor, TimeToMaxEnergy
 
-	local function TimeToEnergyFor(condition, state)
-		return TimeToPowerFor("energy", condition, state)
+	local function TimeToEnergyFor(condition, state, atTime)
+		return TimeToPowerFor("energy", condition, state, atTime)
 	end
 
 	--- Get the number of seconds before the player has enough focus to cast the given spell.
@@ -5444,8 +5424,8 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see TimeToFocusFor
 
-	local function TimeToFocusFor(condition, state)
-		return TimeToPowerFor("focus", condition, state)
+	local function TimeToFocusFor(condition, state, atTime)
+		return TimeToPowerFor("focus", condition, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("timetoenergyfor", true, TimeToEnergyFor)
@@ -5465,10 +5445,10 @@ do
 	-- @return The number of seconds.
 	-- @return A boolean value for the result of the comparison.
 
-	local function TimeToSpell(condition, state)
+	local function TimeToSpell(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
-		local seconds = state:GetTimeToSpell(spellId, target)
+		local seconds = state:GetTimeToSpell(spellId, atTime, target)
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
 		elseif seconds < INFINITY then
@@ -5498,10 +5478,10 @@ do
 	-- if target.DebuffRemaining(flame_shock) < TimeWithHaste(3)
 	--     Spell(flame_shock)
 
-	local function TimeWithHaste(condition, state)
+	local function TimeWithHaste(condition, state, atTime)
 		local seconds, comparator, limit = condition[1], condition[2], condition[3]
 		local haste = condition.haste or "spell"
-		local value = GetHastedTime(seconds, haste)
+		local value = GetHastedTime(seconds, haste, state)
 		return Compare(value, comparator, limit)
 	end
 
@@ -5553,7 +5533,7 @@ do
 	-- if TotemExpires(fire) Spell(searing_totem)
 	-- if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
-	local function TotemExpires(condition, state)
+	local function TotemExpires(condition, state, atTime)
 		local id, seconds = condition[1], condition[2]
 		seconds = seconds or 0
 		if condition.totem then
@@ -5562,12 +5542,12 @@ do
 		end
 		id = CheckDeprecatedTotem(id, state)
 		if type(id) == "string" then
-			local haveTotem, name, startTime, duration = state:GetTotemInfo(id)
-			if haveTotem and startTime then
+			local _, name, startTime, duration = state:GetTotemInfo(id)
+			if startTime then
 				return startTime + duration - seconds, INFINITY
 			end
 		else -- if type(id) == "number" then
-			local count, start, ending = state:GetTotemCount(id)
+			local count, start, ending = state:GetTotemCount(id, atTime)
 			if count > 0 then
 				return ending - seconds, INFINITY
 			end
@@ -5585,7 +5565,7 @@ do
 	-- if not TotemPresent(fire) Spell(searing_totem)
 	-- if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
 
-	local function TotemPresent(condition, state)
+	local function TotemPresent(condition, state, atTime)
 		local id = condition[1]
 		if condition.totem then
 			id = condition.totem
@@ -5593,12 +5573,12 @@ do
 		end
 		id = CheckDeprecatedTotem(id, state)
 		if type(id) == "string" then
-			local haveTotem, name, startTime, duration = state:GetTotemInfo(id)
-			if haveTotem and startTime then
+			local _, name, startTime, duration = state:GetTotemInfo(id)
+			if startTime and duration > 0 then
 				return startTime, startTime + duration
 			end
 		else -- if type(id) == "number" then
-			local count, start, ending = state:GetTotemCount(id)
+			local count, start, ending = state:GetTotemCount(id, atTime)
 			if count > 0 then
 				return start, ending
 			end
@@ -5621,7 +5601,7 @@ do
 	-- @usage
 	-- if TotemRemaining(healing_stream_totem) <2 Spell(totemic_recall)
 
-	local function TotemRemaining(condition, state)
+	local function TotemRemaining(condition, state, atTime)
 		local id, comparator, limit = condition[1], condition[2], condition[3]
 		if condition.totem then
 			id = condition.totem
@@ -5629,13 +5609,13 @@ do
 		end
 		id = CheckDeprecatedTotem(id, state)
 		if type(id) == "string" then
-			local haveTotem, name, startTime, duration = state:GetTotemInfo(id)
-			if haveTotem and startTime then
+			local _, name, startTime, duration = state:GetTotemInfo(id)
+			if startTime and duration > 0 then
 				local start, ending = startTime, startTime + duration
 				return TestValue(start, ending, 0, ending, -1, comparator, limit)
 			end
 		else -- if type(id) == "number" then
-			local count, start, ending = state:GetTotemCount(id)
+			local count, start, ending = state:GetTotemCount(id, atTime)
 			if count > 0 then
 				return TestValue(start, ending, 0, ending, -1, comparator, limit)
 			end
@@ -5652,7 +5632,7 @@ do
 	-- 1: the spell id
 	-- return bool
 
-	local function Tracking(condition, state)
+	local function Tracking(condition, state, atTime)
 		local spellId, yesno = condition[1], condition[2]
 		local spellName = OvaleSpellBook:GetSpellName(spellId)
 		local numTrackingTypes = API_GetNumTrackingTypes()
@@ -5686,7 +5666,7 @@ do
 	-- if target.DebuffPresent(shadowflame_debuff) < TravelTime(hand_of_guldan) + GCD()
 	--     Spell(hand_of_guldan)
 
-	local function TravelTime(condition, state)
+	local function TravelTime(condition, state, atTime)
 		local spellId, comparator, limit = condition[1], condition[2], condition[3]
 		local target = ParseCondition(condition, state, "target")
 		local si = spellId and OvaleData.spellInfo[spellId]
@@ -5712,7 +5692,7 @@ do
 	-- @paramsig boolean
 	-- @return A boolean value.
 
-	local function True(condition, state)
+	local function True(condition, state, atTime)
 		return 0, INFINITY
 	end
 
@@ -5735,7 +5715,7 @@ do
 	--     WeaponDamage() * 5 + 78
 	-- }
 
-	local function WeaponDamage(condition, state)
+	local function WeaponDamage(condition, state, atTime)
 		local hand = condition[1]
 		local comparator, limit
 		local value = 0
@@ -5767,7 +5747,7 @@ do
 	-- @usage
 	-- if WeaponEnchantExpires(main) Spell(windfury_weapon)
 
-	local function WeaponEnchantExpires(condition, state)
+	local function WeaponEnchantExpires(condition, state, atTime)
 		local hand, seconds = condition[1], condition[2]
 		seconds = seconds or 0
 		local hasMainHandEnchant, mainHandExpiration, _, hasOffHandEnchant, offHandExpiration = API_GetWeaponEnchantInfo()

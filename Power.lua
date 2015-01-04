@@ -31,6 +31,7 @@ local tostring = tostring
 local wipe = wipe
 local API_CreateFrame = CreateFrame
 local API_GetPowerRegen = GetPowerRegen
+local API_GetTime = GetTime
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitPowerType = UnitPowerType
@@ -136,7 +137,7 @@ OvalePower.POOLED_RESOURCE = {
 
 --<private-static-methods>
 -- Manage spellcast[power] information.
-local function SaveToSpellcast(spellcast)
+local function SaveToSpellcast(spellcast, atTime)
 	local spellId = spellcast.spellId
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
@@ -146,10 +147,10 @@ local function SaveToSpellcast(spellcast)
 				local maxCostParam = "max_" .. powerType
 				local maxCost = si[maxCostParam] or 1
 				local target = OvaleGUID:GetUnitId(spellcast.target)
-				local cost = OvaleData:GetSpellInfoProperty(spellId, powerType, target)
+				local cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, target)
 				if cost == "finisher" then
 					-- This finisher costs up to maxCost resources.
-					local power = OvalePower.power[powerType]
+					local power = OvalePower:GetPower(powerType, atTime)
 					if power > maxCost then
 						cost = maxCost
 					else
@@ -363,9 +364,29 @@ function OvalePower:GetSpellCost(spellId, powerType)
 	return spellCost, spellPowerType
 end
 
+-- Get power at the given time.
+-- NOTE: Mirrored in statePrototype below.
+function OvalePower:GetPower(powerType, atTime)
+	local power = (self.power and self.power[powerType]) or self[powerType] or 0
+	local powerRate = 0
+	if self.powerType and self.powerType == powerType then
+		powerRate = self.activeRegen
+	elseif self.powerRate then
+		powerRate = self.powerRate[powerType]
+	end
+	if atTime then
+		local now = self.currentTime or API_GetTime()
+		local seconds = atTime - now
+		if seconds > 0 then
+			power = power + powerRate * seconds
+		end
+	end
+	return power
+end
+
 -- Get power cost of the spell.
 -- NOTE: Mirrored in statePrototype below.
-function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
+function OvalePower:PowerCost(spellId, powerType, atTime, target, maximumCost)
 	OvalePower:StartProfiling("OvalePower_PowerCost")
 	local buffParam = "buff_" .. powerType
 	local spellCost = 0
@@ -379,13 +400,13 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 		--]]
 		local cost
 		if self.GetSpellInfoProperty then
-			cost = self.GetSpellInfoProperty(self, spellId, powerType, target)
+			cost = self.GetSpellInfoProperty(self, spellId, atTime, powerType, target)
 		else
-			cost = OvaleData:GetSpellInfoProperty(spellId, powerType, target)
+			cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, target)
 		end
 		if cost == "finisher" then
 			-- This spell is a finisher so compute the cost based on the amount of resources consumed.
-			cost = (self.power and self.power[powerType]) or self[powerType] or 0
+			cost = self:GetPower(powerType, atTime)
 			-- Clamp cost between values defined by min_<powerType> and max_<powerType>.
 			local minCostParam = "min_" .. powerType
 			local maxCostParam = "max_" .. powerType
@@ -411,10 +432,10 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 				local aura, isActiveAura
 				if self.GetAura then
 					aura = self.GetAura(self, "player", buffExtra, nil, true)
-					isActiveAura = self.IsActiveAura(self, aura)
+					isActiveAura = self.IsActiveAura(self, aura, atTime)
 				else
 					aura = OvaleAura:GetAura("player", buffExtra, nil, true)
-					isActiveAura = OvaleAura:IsActiveAura(aura)
+					isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
 				end
 				if isActiveAura then
 					local buffAmount = si[buffAmountParam] or -1
@@ -439,15 +460,15 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 				local aura, isActiveAura
 				if self.GetAura then
 					aura = self.GetAura(self, "player", buffPercentReduction)
-					isActiveAura = self.IsActiveAura(self, aura)
+					isActiveAura = self.IsActiveAura(self, aura, atTime)
 				else
 					aura = OvaleAura:GetAura("player", buffPercentReduction)
-					isActiveAura = OvaleAura:IsActiveAura(aura)
+					isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
 				end
 				if isActiveAura then
 					-- Check if this aura has a stacking effect.
 					local siAura = OvaleData.spellInfo[buffPercentReduction]
-					if siAura and siAura.stacking then
+					if siAura and siAura.stacking == 1 then
 						reduction = reduction * aura.stacks
 						-- Clamp to a maximum of 100% reduction.
 						if reduction > 1 then
@@ -474,14 +495,14 @@ function OvalePower:PowerCost(spellId, powerType, target, maximumCost)
 		local extraPowerParam = "extra_" .. powerType
 		local extraPower
 		if self.GetSpellInfoProperty then
-			extraPower = self.GetSpellInfoProperty(self, spellId, extraPowerParam, target)
+			extraPower = self.GetSpellInfoProperty(self, spellId, atTime, extraPowerParam, target)
 		else
-			extraPower = OvaleData:GetSpellInfoProperty(spellId, extraPowerParam, target)
+			extraPower = OvaleData:GetSpellInfoProperty(spellId, atTime, extraPowerParam, target)
 		end
 		if extraPower then
 			if not maximumCost then
 				-- Clamp the extra power to the remaining power.
-				local power = (self.power and self.power[powerType]) or self[powerType] or 0
+				local power = self:GetPower(powerType, atTime)
 				power = power > cost and power - cost or 0
 				if extraPower >= power then
 					extraPower = power
@@ -509,14 +530,14 @@ end
 
 -- Run-time check that the player has enough power.
 -- NOTE: Mirrored in statePrototype below.
-function OvalePower:RequirePowerHandler(spellId, requirement, tokenIterator, target)
+function OvalePower:RequirePowerHandler(spellId, atTime, requirement, tokenIterator, target)
 	local verified = false
 	local cost = tokenIterator()
 	if cost then
 		local powerType = requirement
-		cost = self:PowerCost(spellId, powerType, target)
+		cost = self:PowerCost(spellId, powerType, atTime, target)
 		if cost > 0 then
-			local power = (self.power and self.power[powerType]) or self[powerType] or 0
+			local power = self:GetPower(powerType, atTime)
 			if power >= cost then
 				result = "passed"
 				verified = true
@@ -526,7 +547,7 @@ function OvalePower:RequirePowerHandler(spellId, requirement, tokenIterator, tar
 		end
 		if cost > 0 then
 			local result = verified and "passed" or "FAILED"
-			self:Log("    Require %f %s: %s", cost, powerType, result)
+			self:Log("    Require %f %s at time=%f: %s", cost, powerType, atTime, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)
@@ -625,12 +646,12 @@ function OvalePower:ApplySpellStartCast(state, spellId, targetGUID, startCast, e
 		if state.inCombat then
 			state.powerRate[self.powerType] = self.activeRegen
 		end
-		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+		state:ApplyPowerCost(spellId, targetGUID, startCast, spellcast)
 	end
 	self:StopProfiling("OvalePower_ApplySpellStartCast")
 end
 
--- Apply the effects of the spell on the player's state, assuming the spellcast completes.
+-- Apply the effects of the spell when the spellcast completes.
 function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvalePower_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
@@ -638,7 +659,7 @@ function OvalePower:ApplySpellAfterCast(state, spellId, targetGUID, startCast, e
 		if state.inCombat then
 			state.powerRate[self.powerType] = self.activeRegen
 		end
-		state:ApplyPowerCost(spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+		state:ApplyPowerCost(spellId, targetGUID, endCast, spellcast)
 	end
 	self:StopProfiling("OvalePower_ApplySpellAfterCast")
 end
@@ -646,7 +667,7 @@ end
 
 --<state-methods>
 -- Update the state of the simulator for the power cost of the given spell.
-statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, atTime, spellcast)
 	OvalePower:StartProfiling("OvalePower_state_ApplyPowerCost")
 	local target = OvaleGUID:GetUnitId(targetGUID)
 	local si = OvaleData.spellInfo[spellId]
@@ -662,15 +683,15 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, startCast, 
 	if si then
 		-- Update power state.
 		for powerType, powerInfo in pairs(OvalePower.POWER_INFO) do
-			local cost = state:PowerCost(spellId, powerType, target)
+			local cost = state:PowerCost(spellId, powerType, atTime, target)
 			local power = state[powerType] or 0
 			if cost then
 				power = power - cost
-				-- Add any power regenerated or consumed during the cast time of a non-channeled spell.
-				if not isChanneled then
+				-- Add any power regenerated or consumed before the next spell can be cast.
+				local seconds = state.nextCast - atTime
+				if seconds > 0 then
 					local powerRate = state.powerRate[powerType]
-					local gain = powerRate * (state.nextCast - state.currentTime)
-					power = power + gain
+					power = power + powerRate * seconds
 				end
 				-- Clamp power to lower and upper limits.
 				local mini = powerInfo.mini or 0
@@ -690,13 +711,13 @@ end
 
 -- Return the number of seconds before enough of the given power type is available for the spell.
 -- If not powerType is given, the the pooled resource for that class is used.
-statePrototype.TimeToPower = function(state, spellId, target, powerType)
+statePrototype.TimeToPower = function(state, spellId, atTime, target, powerType)
 	local seconds = 0
 	powerType = powerType or OvalePower.POOLED_RESOURCE[state.class]
 	if powerType then
-		local power = state[powerType]
+		local cost = state:PowerCost(spellId, powerType, atTime, target)
+		local power = state:GetPower(powerType, atTime)
 		local powerRate = state.powerRate[powerType]
-		local cost = state:PowerCost(spellId, powerType, target)
 		if power < cost then
 			if powerRate > 0 then
 				seconds = (cost - power) / powerRate
@@ -710,6 +731,7 @@ end
 
 -- Return the amount of the given resource needed to cast the given spell.
 -- Mirrored methods.
+statePrototype.GetPower = OvalePower.GetPower
 statePrototype.PowerCost = OvalePower.PowerCost
 statePrototype.RequirePowerHandler = OvalePower.RequirePowerHandler
 

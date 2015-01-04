@@ -381,7 +381,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 					duration = aura.duration
 				elseif si and si.duration then
 					-- Look up the duration from the SpellInfo.
-					duration = OvaleData:GetSpellInfoProperty(spellId, "duration", unitId)
+					duration = OvaleData:GetSpellInfoProperty(spellId, now, "duration", unitId)
 					if si.addduration then
 						duration = duration + si.addduration
 					end
@@ -420,7 +420,8 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 				self:Debug(true, "%s: %s", cleuEvent, destGUID)
 			end
 			local aura = GetAura(self.aura, destGUID, spellId, self_guid)
-			if self:IsActiveAura(aura) then
+			local now = API_GetTime()
+			if self:IsActiveAura(aura, now) then
 				local name = aura.name or "Unknown spell"
 				local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
 				local tick = baseTick
@@ -483,13 +484,13 @@ function OvaleAura:RemoveAurasOnInactiveUnits()
 	end
 end
 
-function OvaleAura:IsActiveAura(aura, now)
+function OvaleAura:IsActiveAura(aura, atTime)
 	local boolean = false
 	if aura then
-		now = now or API_GetTime()
-		if aura.serial == self.serial[aura.guid] and aura.stacks > 0 and aura.gain <= now and now <= aura.ending then
+		atTime = atTime or API_GetTime()
+		if aura.serial == self.serial[aura.guid] and aura.stacks > 0 and aura.gain <= atTime and atTime <= aura.ending then
 			boolean = true
-		elseif aura.consumed and IsWithinAuraLag(aura.ending, now) then
+		elseif aura.consumed and IsWithinAuraLag(aura.ending, atTime) then
 			boolean = true
 		end
 	end
@@ -593,7 +594,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 							tokenIterator()
 						end
 						if tokenIterator then
-							keepSnapshot = OvaleData:CheckRequirements(spellId, tokenIterator, unitId)
+							keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, unitId)
 						else
 							keepSnapshot = true
 						end
@@ -776,7 +777,7 @@ end
 
 -- Run-time check for an aura on the player or the target.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireBuffHandler(spellId, requirement, tokenIterator, target)
+function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokenIterator, target)
 	local verified = false
 	local buffName = tokenIterator()
 	if buffName then
@@ -797,15 +798,15 @@ function OvaleAura:RequireBuffHandler(spellId, requirement, tokenIterator, targe
 			mine = true
 		end
 		local aura = self:GetAura(unitId, buffName, filter, mine)
-		local isActiveAura = self:IsActiveAura(aura)
+		local isActiveAura = self:IsActiveAura(aura, atTime)
 		if not isBang and isActiveAura or isBang and not isActiveAura then
 			verified = true
 		end
 		local result = verified and "passed" or "FAILED"
 		if isBang then
-			self:Log("    Require aura %s NOT on %s: %s", buffName, unitId, result)
+			self:Log("    Require aura %s NOT on %s at time=%f: %s", buffName, unitId, atTime, result)
 		else
-			self:Log("    Require aura %s on %s: %s", buffName, unitId, result)
+			self:Log("    Require aura %s on %s at time=%f: %s", buffName, unitId, atTime, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
@@ -815,21 +816,21 @@ end
 
 -- Run-time check for the player being stealthed.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireStealthHandler(spellId, requirement, tokenIterator, target)
+function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokenIterator, target)
 	local verified = false
 	local stealthed = tokenIterator()
 	if stealthed then
 		stealthed = tonumber(stealthed)
 		local aura = self:GetAura("player", "stealthed_buff", "HELPFUL", true)
-		local isActiveAura = self:IsActiveAura(aura)
+		local isActiveAura = self:IsActiveAura(aura, atTime)
 		if stealthed == 1 and isActiveAura or stealthed ~= 1 and not isActiveAura then
 			verified = true
 		end
 		local result = verified and "passed" or "FAILED"
 		if stealthed == 1 then
-			self:Log("    Require stealth: %s", result)
+			self:Log("    Require stealth at time=%f: %s", atTime, result)
 		else
-			self:Log("    Require NOT stealth: %s", result)
+			self:Log("    Require NOT stealth at time=%f: %s", atTime, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
@@ -840,7 +841,7 @@ end
 -- Run-time check that the target is below a health percent threshold.
 -- NOTE: Mirrored in statePrototype below.
 -- TODO: This function should really be moved to a Health module.
-function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, tokenIterator, target)
+function OvaleAura:RequireTargetHealthPercentHandler(spellId, atTime, requirement, tokenIterator, target)
 	local verified = false
 	local threshold = tokenIterator()
 	if threshold then
@@ -858,9 +859,9 @@ function OvaleAura:RequireTargetHealthPercentHandler(spellId, requirement, token
 		end
 		local result = verified and "passed" or "FAILED"
 		if isBang then
-			self:Log("    Require target health > %f%%: %s", threshold, result)
+			self:Log("    Require target health > %f%% at time=%f: %s", threshold, atTime, result)
 		else
-			self:Log("    Require target health <= %f%%: %s", threshold, result)
+			self:Log("    Require target health <= %f%% at time=%f: %s", threshold, atTime, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
@@ -1155,15 +1156,7 @@ do
 end
 
 statePrototype.IsActiveAura = function(state, aura, atTime)
-	-- Default to checking if an aura is active at the end of the current spellcast
-	-- in the simulator, or at the current time if no spell is being cast.
-	if not atTime then
-		if state.endCast and state.endCast > state.currentTime then
-			atTime = state.endCast
-		else
-			atTime = state.currentTime
-		end
-	end
+	atTime = atTime or state.currentTime
 	local boolean = false
 	if aura then
 		if aura.state then
@@ -1251,7 +1244,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 			-- Verify any run-time requirements for this aura.
 			local verified
 			if tokenIterator then
-				verified = state:CheckRequirements(spellId, tokenIterator, unitId)
+				verified = state:CheckRequirements(spellId, atTime, tokenIterator, unitId)
 			else
 				verified = true
 			end
@@ -1457,7 +1450,8 @@ statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, at
 	end
 end
 
-statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filter)
+statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filter, atTime)
+	atTime = atTime or state.currentTime
 	local count = 0
 	local guid = OvaleGUID:GetGUID(unitId)
 	local start, ending = INFINITY, 0
@@ -1467,7 +1461,7 @@ statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filte
 		for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
 			for casterGUID in pairs(whoseTable) do
 				local aura = GetStateAura(state, guid, auraId, self_guid)
-				if state:IsActiveAura(aura) and not aura.state then
+				if state:IsActiveAura(aura, atTime) and not aura.state then
 					if aura[propertyName] and aura.filter == filter then
 						count = count + 1
 						start = (aura.gain < start) and aura.gain or start
@@ -1481,7 +1475,7 @@ statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filte
 	if state.aura[guid] then
 		for auraId, whoseTable in pairs(state.aura[guid]) do
 			for casterGUID, aura in pairs(whoseTable) do
-				if state:IsActiveAura(aura) then
+				if state:IsActiveAura(aura, atTime) then
 					if aura[propertyName] and aura.filter == filter then
 						count = count + 1
 						start = (aura.gain < start) and aura.gain or start
@@ -1531,7 +1525,7 @@ do
 		the first aura to expire that will change the total count, and the time interval over which
 		the count is more than 0.  If excludeUnitId is given, then that unit is excluded from the count.
 	--]]
-	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks, excludeUnitId)
+	statePrototype.AuraCount = function(state, auraId, filter, mine, minStacks, atTime, excludeUnitId)
 		OvaleAura:StartProfiling("OvaleAura_state_AuraCount")
 		-- Initialize.
 		minStacks = minStacks or 1
@@ -1546,13 +1540,13 @@ do
 			if guid ~= excludeGUID and auraTable[auraId] then
 				if mine then
 					local aura = GetStateAura(state, guid, auraId, self_guid)
-					if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
+					if state:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
 						CountMatchingActiveAura(state, aura)
 					end
 				else
 					for casterGUID in pairs(auraTable[auraId]) do
 						local aura = GetStateAura(state, guid, auraId, casterGUID)
-						if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
+						if state:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and not aura.state then
 							CountMatchingActiveAura(state, aura)
 						end
 					end
@@ -1565,13 +1559,13 @@ do
 				if mine then
 					local aura = auraTable[auraId][self_guid]
 					if aura then
-						if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks then
+						if state:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks then
 							CountMatchingActiveAura(state, aura)
 						end
 					end
 				else
 					for casterGUID, aura in pairs(auraTable[auraId]) do
-						if state:IsActiveAura(aura) and aura.filter == filter and aura.stacks >= minStacks then
+						if state:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks then
 							CountMatchingActiveAura(state, aura)
 						end
 					end

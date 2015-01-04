@@ -437,15 +437,7 @@ statePrototype.RuneCount = function(state, name, includeDeath, atTime)
 	if type(includeDeath) == "number" then
 		includeDeath, atTime = nil, includeDeath
 	end
-	-- Default to checking the rune count at the end of the current spellcast in the
-	-- simulator, or at the current time if no spell is being cast.
-	if not atTime then
-		if state.endCast and state.endCast > state.currentTime then
-			atTime = state.endCast
-		else
-			atTime = state.currentTime
-		end
-	end
+	atTime = atTime or state.currentTime
 	local count = 0
 	local startCooldown, endCooldown = INFINITY, INFINITY
 	local runeType = RUNE_TYPE[name]
@@ -483,15 +475,7 @@ end
 
 statePrototype.DeathRuneCount = function(state, name, atTime)
 	OvaleRunes:StartProfiling("OvaleRunes_state_DeathRuneCount")
-	-- Default to checking the rune count at the end of the current spellcast in the
-	-- simulator, or at the current time if no spell is being cast.
-	if not atTime then
-		if state.endCast and state.endCast > state.currentTime then
-			atTime = state.endCast
-		else
-			atTime = state.currentTime
-		end
-	end
+	atTime = atTime or state.currentTime
 	local count = 0
 	local startCooldown, endCooldown = INFINITY, INFINITY
 	local runeType = RUNE_TYPE[name]
@@ -521,15 +505,7 @@ do
 
 	statePrototype.GetRunesCooldown = function(state, blood, unholy, frost, death, atTime)
 		OvaleRunes:StartProfiling("OvaleRunes_state_GetRunesCooldown")
-		-- Default to checking runes at the end of the current spellcast in the
-		-- simulator, or at the current time if no spell is being cast.
-		if not atTime then
-			if state.endCast and state.endCast > state.currentTime then
-				atTime = state.endCast
-			else
-				atTime = state.currentTime
-			end
-		end
+		atTime = atTime or state.currentTime
 
 		-- Initialize static variables.
 		count[BLOOD_RUNE] = blood or 0

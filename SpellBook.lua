@@ -30,6 +30,7 @@ local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
 local tsort = table.sort
+local type = type
 local wipe = wipe
 local API_GetActiveSpecGroup = GetActiveSpecGroup
 local API_GetFlyoutInfo = GetFlyoutInfo
@@ -504,8 +505,13 @@ local statePrototype = OvaleSpellBook.statePrototype
 --</private-static-properties>
 
 --<state-methods>
-statePrototype.IsUsableSpell = function(state, spellId, target)
+statePrototype.IsUsableSpell = function(state, spellId, atTime, target)
 	OvaleSpellBook:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
+	if type(atTime) == "string" and not target then
+		atTime, target = nil, atTime
+	end
+	atTime = atTime or state.currentTime
+
 	local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
 	local noMana = false
 	-- Verify that the spell may be cast given restrictions specified in SpellInfo().
@@ -513,7 +519,7 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 	if si then
 		-- Flagged as not usable in the spell information.
 		if isUsable and si.unusable then
-			local unusable = state:GetSpellInfoProperty(spellId, "unusable", target)
+			local unusable = state:GetSpellInfoProperty(spellId, atTime, "unusable", target)
 			if unusable == 1 then
 				state:Log("Spell ID '%s' is flagged as unusable.", spellId)
 				isUsable = false
@@ -522,7 +528,7 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 		-- Verify all requirements with registered handlers.
 		if isUsable then
 			local requirement
-			isUsable, requirement = state:CheckSpellInfo(spellId, target)
+			isUsable, requirement = state:CheckSpellInfo(spellId, atTime, target)
 			if not isUsable then
 				-- Set noMana if the failed requirement is for a primary (poolable) power type.
 				if OvalePower.PRIMARY_POWER[requirement] then
@@ -536,38 +542,43 @@ statePrototype.IsUsableSpell = function(state, spellId, target)
 			end
 		end
 	else
-		isUsable, noMana = OvaleSpellBook:IsUsableSpell(spellId, target)
+		isUsable, noMana = OvaleSpellBook:IsUsableSpell(spellId)
 	end
 	OvaleSpellBook:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
 	return isUsable, noMana
 end
 
 -- Get the number of seconds before the spell is ready to be cast, either due to cooldown or resources.
-statePrototype.GetTimeToSpell = function(state, spellId, target)
+statePrototype.GetTimeToSpell = function(state, spellId, atTime, target)
+	if type(atTime) == "string" and not target then
+		atTime, target = nil, atTime
+	end
+	atTime = atTime or state.currentTime
+
 	local timeToSpell = 0
 	-- Cooldown.
 	do
 		local start, duration = state:GetSpellCooldown(spellId)
-		local seconds = (duration > 0) and (start + duration - state.currentTime) or 0
+		local seconds = (duration > 0) and (start + duration - atTime) or 0
 		if timeToSpell < seconds then
 			timeToSpell = seconds
 		end
 	end
 	-- Pooled resource.
 	do
-		local seconds = state:TimeToPower(spellId, target)
+		local seconds = state:TimeToPower(spellId, atTime, target)
 		if timeToSpell < seconds then
 			timeToSpell = seconds
 		end
 	end
 	-- Death knight runes.
 	do
-		local blood = state:GetSpellInfoProperty(spellId, "blood", target)
-		local unholy = state:GetSpellInfoProperty(spellId, "unholy", target)
-		local frost = state:GetSpellInfoProperty(spellId, "frost", target)
-		local death = state:GetSpellInfoProperty(spellId, "death", target)
+		local blood = state:GetSpellInfoProperty(spellId, atTime, "blood", target)
+		local unholy = state:GetSpellInfoProperty(spellId, atTime, "unholy", target)
+		local frost = state:GetSpellInfoProperty(spellId, atTime, "frost", target)
+		local death = state:GetSpellInfoProperty(spellId, atTime, "death", target)
 		if blood or unholy or frost or death then
-			local seconds = state:GetRunesCooldown(blood, unholy, frost, death)
+			local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
 			if timeToSpell < seconds then
 				timeToSpell = seconds
 			end

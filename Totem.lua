@@ -143,18 +143,20 @@ function OvaleTotem:CleanState(state)
 	end
 end
 
--- Apply the effects of the spell on the player's state, assuming the spellcast completes.
+-- Apply the effects of the spell when the spellcast completes.
 function OvaleTotem:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleTotem_ApplySpellAfterCast")
 	if self_class == "SHAMAN" and spellId == TOTEMIC_RECALL then
 		-- Shaman's Totemic Recall destroys all totems.
 		for slot in ipairs(state.totem) do
-			state:DestroyTotem(slot)
+			state:DestroyTotem(slot, endCast)
 		end
 	else
-		local slot = state:GetTotemSlot(spellId)
+		-- Summon a totem in the slot after the cast has ended.
+		local atTime = endCast
+		local slot = state:GetTotemSlot(spellId, atTime)
 		if slot then
-			state:SummonTotem(spellId, slot)
+			state:SummonTotem(spellId, slot, atTime)
 		end
 	end
 	self:StopProfiling("OvaleTotem_ApplySpellAfterCast")
@@ -162,26 +164,35 @@ end
 --</public-static-methods>
 
 --<state-methods>
+statePrototype.IsActiveTotem = function(state, totem, atTime)
+	atTime = atTime or state.currentTime
+	local boolean = false
+	if totem and (totem.serial == self_serial) and totem.start and totem.duration and totem.start < atTime and atTime < totem.start + totem.duration then
+		boolean = true
+	end
+	return boolean
+end
+
 -- Return the table holding the simulator's totem information for the given slot.
 statePrototype.GetTotem = function(state, slot)
 	OvaleTotem:StartProfiling("OvaleTotem_state_GetTotem")
 	slot = TOTEM_SLOT[slot] or slot
 	-- Populate the totem information from the current game state if it is outdated.
 	local totem = state.totem[slot]
-	if totem then
-		if not totem.isActive or not totem.serial or totem.serial < self_serial then
-			local haveTotem, name, startTime, duration, icon = API_GetTotemInfo(slot)
-			totem.isActive = haveTotem
+	if totem and not totem.serial or totem.serial < self_serial then
+		local haveTotem, name, startTime, duration, icon = API_GetTotemInfo(slot)
+		if haveTotem then
 			totem.name = name
 			totem.start = startTime
 			totem.duration = duration
 			totem.icon = icon
-			totem.serial = self_serial
+		else
+			totem.name = ""
+			totem.start = 0
+			totem.duration = 0
+			totem.icon = ""
 		end
-		-- Advance the totem state to the current time.
-		if totem.isActive and totem.start + totem.duration <= state.currentTime then
-			state:DestroyTotem(slot)
-		end
+		totem.serial = self_serial
 	end
 	OvaleTotem:StopProfiling("OvaleTotem_state_GetTotem")
 	return totem
@@ -193,7 +204,7 @@ statePrototype.GetTotemInfo = function(state, slot)
 	slot = TOTEM_SLOT[slot] or slot
 	local totem = state:GetTotem(slot)
 	if totem then
-		haveTotem = totem.isActive
+		haveTotem = state:IsActiveTotem(totem)
 		name = totem.name
 		startTime = totem.start
 		duration = totem.duration
@@ -203,7 +214,8 @@ statePrototype.GetTotemInfo = function(state, slot)
 end
 
 -- Return the number of totems previously summoned by the spell and the interval of time that at least one totem is active.
-statePrototype.GetTotemCount = function(state, spellId)
+statePrototype.GetTotemCount = function(state, spellId, atTime)
+	atTime = atTime or state.currentTime
 	local start, ending
 	local count = 0
 	local si = OvaleData.spellInfo[spellId]
@@ -213,7 +225,7 @@ statePrototype.GetTotemCount = function(state, spellId)
 		-- If the aura is absent, then the totem is considered to be expired.
 		if si.buff_totem then
 			local aura = state:GetAura("player", si.buff_totem)
-			buffPresent = state:IsActiveAura(aura)
+			buffPresent = state:IsActiveAura(aura, atTime)
 		end
 		if buffPresent then
 			local texture = OvaleSpellBook:GetSpellTexture(spellId)
@@ -222,7 +234,7 @@ statePrototype.GetTotemCount = function(state, spellId)
 			local maxTotems = si.max_totems or 1
 			for slot in ipairs(state.totem) do
 				local totem = state:GetTotem(slot)
-				if totem.isActive and totem.icon == texture then
+				if state:IsActiveTotem(totem, atTime) and totem.icon == texture then
 					count = count + 1
 					-- Save earliest start time.
 					if not start or start > totem.start then
@@ -243,8 +255,9 @@ statePrototype.GetTotemCount = function(state, spellId)
 end
 
 -- Return the totem slot that will contain the totem summoned by the spell.
-statePrototype.GetTotemSlot = function(state, spellId)
+statePrototype.GetTotemSlot = function(state, spellId, atTime)
 	OvaleTotem:StartProfiling("OvaleTotem_state_GetTotemSlot")
+	atTime = atTime or state.currentTime
 	local totemSlot
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.totem then
@@ -255,7 +268,7 @@ statePrototype.GetTotemSlot = function(state, spellId)
 			local availableSlot
 			for slot in ipairs(state.totem) do
 				local totem = state:GetTotem(slot)
-				if not totem.isActive then
+				if not state:IsActiveTotem(totem, atTime) then
 					availableSlot = slot
 					break
 				end
@@ -270,7 +283,7 @@ statePrototype.GetTotemSlot = function(state, spellId)
 			local start = INFINITY
 			for slot in ipairs(state.totem) do
 				local totem = state:GetTotem(slot)
-				if totem.isActive and totem.icon == texture then
+				if state:IsActiveTotem(totem, atTime) and totem.icon == texture then
 					count = count + 1
 					if start > totem.start then
 						start = totem.start
@@ -290,36 +303,37 @@ statePrototype.GetTotemSlot = function(state, spellId)
 	return totemSlot
 end
 
--- Summon a totem into the slot in the simulator at the current time.
-statePrototype.SummonTotem = function(state, spellId, slot)
+-- Summon a totem into the slot in the simulator at the given time.
+statePrototype.SummonTotem = function(state, spellId, slot, atTime)
 	OvaleTotem:StartProfiling("OvaleTotem_state_SummonTotem")
+	atTime = atTime or state.currentTime
 	slot = TOTEM_SLOT[slot] or slot
 	state:Log("Spell %d summons totem into slot %d.", spellId, slot)
 	local name, _, icon = OvaleSpellBook:GetSpellInfo(spellId)
-	local duration = state:GetSpellInfoProperty(spellId, "duration")
+	local duration = state:GetSpellInfoProperty(spellId, atTime, "duration")
 	local totem = state.totem[slot]
-	totem.isActive = true
 	-- The name is not always the same as the name of the summoning spell, but totems
 	-- are compared based on their icon/texture, so this inaccuracy doesn't break anything.
 	totem.name = name
-	totem.start = state.currentTime
+	totem.start = atTime
 	-- Default to 15 seconds if no duration is found.
 	totem.duration = duration or 15
 	totem.icon = icon
 	OvaleTotem:StopProfiling("OvaleTotem_state_SummonTotem")
 end
 
--- Destroy the totem in the slot.
-statePrototype.DestroyTotem = function(state, slot)
+-- Destroy the totem in the slot at the given time.
+statePrototype.DestroyTotem = function(state, slot, atTime)
 	OvaleTotem:StartProfiling("OvaleTotem_state_DestroyTotem")
+	atTime = atTime or state.currentTime
 	slot = TOTEM_SLOT[slot] or slot
 	state:Log("Destroying totem in slot %d.", slot)
 	local totem = state.totem[slot]
-	totem.isActive = false
-	totem.name = ""
-	totem.start = 0
-	totem.duration = 0
-	totem.icon = ""
+	local duration = atTime - totem.start
+	if duration < 0 then
+		duration = 0
+	end
+	totem.duration = duration
 	OvaleTotem:StopProfiling("OvaleTotem_state_DestroyTotem")
 end
 --</state-methods>

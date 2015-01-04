@@ -647,4 +647,16 @@ statePrototype.GetSpellHasteMultiplier = function(state, snapshot)
 	snapshot = snapshot or state.snapshot
 	return OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
 end
+
+statePrototype.GetHasteMultiplier = function(state, haste, snapshot)
+	snapshot = snapshot or state.snapshot
+	if haste == "melee" then
+		return state:GetMeleeHasteMultiplier(snapshot)
+	elseif haste == "ranged" then
+		return state:GetRangedHasteMultiplier(snapshot)
+	elseif haste == "spell" then
+		return state:GetSpellHasteMultiplier(snapshot)
+	end
+	return 1
+end
 --</state-methods>

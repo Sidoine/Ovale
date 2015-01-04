@@ -59,7 +59,7 @@ OvaleEclipse.eclipseDirection = 0
 
 --<private-static-methods>
 -- Manage Eclipsed damage multiplier information.
-local function GetDamageMultiplier(spellId, snapshot, auraObject)
+local function GetDamageMultiplier(spellId, atTime, snapshot, auraObject)
 	auraObject = auraObject or OvaleAura
 	local damageMultiplier = 1
 	local si = OvaleData.spellInfo[spellId]
@@ -67,7 +67,7 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 	if si and (si.arcane == 1 or si.nature == 1) then
 		-- Update the damage multiplier for Moonkin Form 10% bonus to Arcane and Nature damage.
 		local moonkinForm = auraObject:GetAura("player", MOONKIN_FORM, "HELPFUL", true)
-		if auraObject:IsActiveAura(moonkinForm) then
+		if auraObject:IsActiveAura(moonkinForm, atTime) then
 			damageMultiplier = damageMultiplier * 1.1
 		end
 
@@ -76,13 +76,13 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 		if si.arcane == 1 then
 			aura = auraObject:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
 		end
-		if not auraObject:IsActiveAura(aura) and si.nature == 1 then
+		if not auraObject:IsActiveAura(aura, atTime) and si.nature == 1 then
 			aura = auraObject:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true)
 		end
-		if not auraObject:IsActiveAura(aura) then
+		if not auraObject:IsActiveAura(aura, atTime) then
 			aura = auraObject:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true)
 		end
-		if auraObject:IsActiveAura(aura) then
+		if auraObject:IsActiveAura(aura, atTime) then
 			local eclipseEffect = aura.value1
 			local masteryEffect = snapshot.masteryEffect or 0
 			eclipseEffect = eclipseEffect - floor(masteryEffect) + masteryEffect
@@ -260,11 +260,11 @@ statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
 		if si and si.eclipse then
 			local power = state.eclipse
 			local direction = state.eclipseDirection
-			local energy = state:EclipseEnergy(spellId)
+			local energy = state:EclipseEnergy(spellId, atTime)
 
 			-- Celestial Alignment prevents gaining Eclipse energy during its duration.
 			local aura = state:GetAura("player", CELESTIAL_ALIGNMENT, "HELPFUL", true)
-			if state:IsActiveAura(aura) then
+			if state:IsActiveAura(aura, atTime) then
 				energy = 0
 			end
 			-- Only adjust the total Eclipse energy if the spell adds Eclipse energy in the current direction.
@@ -298,7 +298,7 @@ statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
 	OvaleEclipse:StopProfiling("OvaleEclipse_ApplyEclipseEnergy")
 end
 
-statePrototype.EclipseEnergy = function(state, spellId)
+statePrototype.EclipseEnergy = function(state, spellId, atTime)
 	local eclipseEnergy = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.eclipse then
@@ -324,7 +324,7 @@ statePrototype.EclipseEnergy = function(state, spellId)
 			if OvaleSpellBook:IsKnownSpell(EUPHORIA) then
 				local lunar = state:GetAura("player", LUNAR_ECLIPSE, "HELPFUL", true)
 				local solar = state:GetAura("player", SOLAR_ECLIPSE, "HELPFUL", true)
-				if not state:IsActiveAura(lunar) and not state:IsActiveAura(solar) then
+				if not state:IsActiveAura(lunar, atTime) and not state:IsActiveAura(solar, atTime) then
 					energy = energy * 2
 				end
 			end

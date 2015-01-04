@@ -116,8 +116,8 @@ function OvaleCondition:IsSpellBookCondition(name)
 	return (self_spellBookCondition[name] ~= nil)
 end
 
-function OvaleCondition:EvaluateCondition(name, condition, state)
-	return self_condition[name](condition, state)
+function OvaleCondition:EvaluateCondition(name, condition, state, atTime)
+	return self_condition[name](condition, state, atTime)
 end
 
 OvaleCondition.ParseCondition = function(condition, state, defaultTarget)

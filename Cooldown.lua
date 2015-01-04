@@ -241,7 +241,7 @@ function OvaleCooldown:CleanState(state)
 	end
 end
 
--- Apply the effects of the spell on the player's state, assuming the spellcast completes.
+-- Apply the effects of the spell when the spellcast completes.
 function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
 	local cd = state:GetCD(spellId)
@@ -291,9 +291,18 @@ end
 
 -- Return the GCD after the given spell is cast.
 -- If no spell is given, then returns the GCD after the current spell has been cast.
-statePrototype.GetGCD = function(state, spellId, target)
+statePrototype.GetGCD = function(state, spellId, atTime, target)
 	spellId = spellId or state.currentSpellId
-	local gcd = spellId and state:GetSpellInfoProperty(spellId, "gcd", target)
+	if not atTime then
+		if state.endCast and state.endCast > state.currentTime then
+			atTime = state.endCast
+		else
+			atTime = state.currentTime
+		end
+	end
+	target = target or state.defaultTarget
+
+	local gcd = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd", target)
 	if not gcd then
 		local isCaster, haste
 		gcd, isCaster = OvaleCooldown:GetBaseGCD()
@@ -302,25 +311,20 @@ statePrototype.GetGCD = function(state, spellId, target)
 		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
 			haste = "melee"
 		end
-		local gcd_haste = spellId and state:GetSpellInfoProperty(spellId, "gcd_haste", target)
-		if gcd_haste then
-			haste = gcd_haste
+		local gcdHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd_haste", target)
+		if gcdHaste then
+			haste = gcdHaste
 		else
-			local si_haste = spellId and state:GetSpellInfoProperty(spellId, "haste", target)
-			if si_haste then
-				haste = si_haste
+			local siHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "haste", target)
+			if siHaste then
+				haste = siHaste
 			end
 		end
 		if not haste and isCaster then
 			haste = "spell"
 		end
-		if haste == "melee" then
-			gcd = gcd / state:GetMeleeHasteMultiplier()
-		elseif haste == "ranged" then
-			gcd = gcd / state:GetRangedHasteMultiplier()
-		elseif haste == "spell" then
-			gcd = gcd / state:GetSpellHasteMultiplier()
-		end
+		local multiplier = state:GetHasteMultiplier(haste)
+		gcd = gcd / multiplier
 		-- Clamp GCD at 1s.
 		gcd = (gcd > 1) and gcd or 1
 	end
@@ -396,9 +400,9 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 		state:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
 	else
 		local si = OvaleData.spellInfo[spellId]
-		if si and si.cd then
-			duration = state:GetSpellInfoProperty(spellId, "cd", target)
-			if si.addcd then
+		duration = state:GetSpellInfoProperty(spellId, atTime, "cd", target)
+		if duration then
+			if si and si.addcd then
 				duration = duration + si.addcd
 			end
 			if duration < 0 then
@@ -410,18 +414,11 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 		state:Log("Spell %d has a base cooldown of %fs.", spellId, duration)
 		if duration > 0 then
 			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
-			if si.cd_haste then
-				local cd_haste = state:GetSpellInfoProperty(spellId, "cd_haste", target)
-				if cd_haste == "melee" then
-					duration = duration / state:GetMeleeHasteMultiplier()
-				elseif cd_haste == "ranged" then
-					duration = duration / OvalePaperDoll:GetSpellHasteMultiplier()
-				elseif cd_haste == "spell" then
-					duration = duration / state:GetSpellHasteMultiplier()
-				end
-			end
+			local haste = state:GetSpellInfoProperty(spellId, atTime, "cd_haste", target)
+			local multiplier = state:GetHasteMultiplier(haste)
+			duration = duration / multiplier
 			-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".
-			if si.buff_cdr then
+			if si and si.buff_cdr then
 				local aura = state:GetAura("player", si.buff_cdr)
 				if state:IsActiveAura(aura, atTime) then
 					duration = duration * aura.value1
@@ -433,9 +430,18 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 end
 
 -- Return the information on the number of charges for the spell in the simulator.
-statePrototype.GetSpellCharges = function(state, spellId)
+statePrototype.GetSpellCharges = function(state, spellId, atTime)
+	atTime = atTime or state.currentTime
 	local cd = state:GetCD(spellId)
-	return cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration
+	local charges, maxCharges, chargeStart, chargeDuration = cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration
+	-- Advance the spell charges state to the given time.
+	if charges then
+		while chargeStart + chargeDuration <= atTime and charges < maxCharges do
+			chargeStart = chargeStart + chargeDuration
+			charges = charges + 1
+		end
+	end
+	return charges, maxCharges, chargeStart, chargeDuration
 end
 
 -- Force the cooldown of a spell to reset at the specified time.

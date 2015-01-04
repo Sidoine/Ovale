@@ -297,7 +297,7 @@ end
 function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleStance_ApplySpellAfterCast")
 	local target = OvaleGUID:GetUnitId(targetGUID)
-	local stance = state:GetSpellInfoProperty(spellId, "to_stance", target)
+	local stance = state:GetSpellInfoProperty(spellId, endCast, "to_stance", target)
 	if stance then
 		if type(stance) == "string" then
 			stance = self.stanceId[stance]

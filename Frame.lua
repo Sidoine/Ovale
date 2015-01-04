@@ -194,8 +194,9 @@ do
 			if refresh then
 				state:Log("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
-				local timeSpan, _, element = OvaleBestAction:GetAction(node, state)
-				local start = NextTime(timeSpan, state.currentTime)
+				local atTime = state.nextCast
+				local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
+				local start = NextTime(timeSpan, atTime)
 				local action = self.actions[k]
 				local profile = Ovale.db.profile
 				if profile.apparence.enableIcons then
@@ -248,7 +249,7 @@ do
 				end
 				state:Log("Adjusting for 'nored': start=%s", start)
 			end
-			-- Dans le cas de canStopChannelling, on risque de demander d'interrompre le channelling courant, ce qui est stupide
+			-- If this action is the same as the spell currently casting in the simulator, then start after the previous cast has finished.
 			if actionType == "spell" and actionId == state.currentSpellId and start and state.nextCast and start < state.nextCast then
 				start = state.nextCast
 			end
@@ -295,8 +296,9 @@ do
 						spellTarget = state.defaultTarget
 					end
 					state:ApplySpell(actionId, OvaleGUID:GetGUID(spellTarget))
-					local timeSpan, _, nextElement = OvaleBestAction:GetAction(node, state)
-					start = NextTime(timeSpan, state.currentTime)
+					local atTime = state.nextCast
+					local timeSpan, _, nextElement = OvaleBestAction:GetAction(node, state, atTime)
+					start = NextTime(timeSpan, atTime)
 					icons[2]:Update(nextElement, start, OvaleBestAction:GetActionInfo(nextElement, state))
 				else
 					icons[2]:Update(element, nil)

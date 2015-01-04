@@ -518,7 +518,7 @@ end
 
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:CheckRequirements(spellId, tokenIterator, target)
+function OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
 	target = target or self.defaultTarget or "target"
 	local name = tokenIterator()
 	if name then
@@ -531,9 +531,9 @@ function OvaleData:CheckRequirements(spellId, tokenIterator, target)
 				local method, arg = handler[1], handler[2]
 				-- Check for inherited/mirrored method first (for statePrototype).
 				if self[method] then
-					verified, requirement = self[method](self, spellId, name, tokenIterator, target)
+					verified, requirement = self[method](self, spellId, atTime, name, tokenIterator, target)
 				else
-					verified, requirement = arg[method](arg, spellId, name, tokenIterator, target)
+					verified, requirement = arg[method](arg, spellId, atTime, name, tokenIterator, target)
 				end
 				name = tokenIterator()
 			else
@@ -548,19 +548,19 @@ end
 
 -- Check "run-time" requirements specified in SpellInfo().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:CheckSpellInfo(spellId, target)
+function OvaleData:CheckSpellInfo(spellId, atTime, target)
 	target = target or self.defaultTarget or "target"
 	local verified = true
 	local requirement
 	for name, handler in pairs(self_requirement) do
-		local value = self:GetSpellInfoProperty(spellId, name, target)
+		local value = self:GetSpellInfoProperty(spellId, atTime, name, target)
 		if value then
 			local method, arg = handler[1], handler[2]
 			-- Check for inherited/mirrored method first (for statePrototype).
 			if self[method] then
-				verified, requirement = self[method](self, spellId, name, gmatch(value, ".+"), target)
+				verified, requirement = self[method](self, spellId, atTime, name, gmatch(value, ".+"), target)
 			else
-				verified, requirement = arg[method](arg, spellId, name, gmatch(value, ".+"), target)
+				verified, requirement = arg[method](arg, spellId, atTime, name, gmatch(value, ".+"), target)
 			end
 			if not verified then
 				break
@@ -572,7 +572,7 @@ end
 
 -- Get SpellInfo property with run-time checks as specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:GetSpellInfoProperty(spellId, property, target)
+function OvaleData:GetSpellInfoProperty(spellId, atTime, property, target)
 	target = target or self.defaultTarget or "target"
 	local si = OvaleData.spellInfo[spellId]
 	local value = si and si[property]
@@ -580,7 +580,7 @@ function OvaleData:GetSpellInfoProperty(spellId, property, target)
 	if requirements then
 		for v, requirement in pairs(requirements) do
 			local tokenIterator = gmatch(requirement, "[^,]+")
-			local verified = self:CheckRequirements(spellId, tokenIterator, target)
+			local verified = self:CheckRequirements(spellId, atTime, tokenIterator, target)
 			if verified then
 				value = tonumber(v) or v
 				break

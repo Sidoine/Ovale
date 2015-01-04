@@ -159,7 +159,7 @@ end
 		GetAura(unitId, auraId, filter, mine)
 		IsActiveAura(aura, atTime)
 --]]
-local function GetDamageMultiplier(spellId, snapshot, auraObject)
+local function GetDamageMultiplier(spellId, atTime, snapshot, auraObject)
 	auraObject = auraObject or OvaleAura
 	local damageMultiplier = 1
 	local si = OvaleData.spellInfo[spellId]
@@ -177,16 +177,16 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 				local verified
 				if tokenIterator then
 					if auraObject.CheckRequirements then
-						verified = auraObject.CheckRequirements(auraObject, spellId, tokenIterator, "player")
+						verified = auraObject.CheckRequirements(auraObject, spellId, atTime, tokenIterator, "player")
 					else
-						verified = OvaleData:CheckRequirements(spellId, tokenIterator, "player")
+						verified = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, "player")
 					end
 				else
 					verified = true
 				end
 				if verified then
 					local aura = auraObject:GetAura("player", auraId, filter)
-					if auraObject:IsActiveAura(aura) then
+					if auraObject:IsActiveAura(aura, atTime) then
 						local siAura = OvaleData.spellInfo[auraId]
 						-- If an aura does stacking damage, then it needs to set stacking=1.
 						if siAura and siAura.stacking and siAura.stacking > 0 then
@@ -201,7 +201,7 @@ local function GetDamageMultiplier(spellId, snapshot, auraObject)
 	-- Factor in additional damage multipliers that are registered with this module.
 	for tbl in pairs(self_updateSpellcastInfo) do
 		if tbl.GetDamageMultiplier then
-			local multiplier = tbl.GetDamageMultiplier(spellId, snapshot, auraObject)
+			local multiplier = tbl.GetDamageMultiplier(spellId, atTime, snapshot, auraObject)
 			damageMultiplier = damageMultiplier * multiplier
 		end
 	end
@@ -232,14 +232,16 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 
 	-- Snapshot the current stats for the spellcast.
 	spellcast.snapshot = OvalePaperDoll:GetSnapshot()
-	spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
+
+	local atTime = channeled and startTime or endTime
+	spellcast.damageMultiplier = GetDamageMultiplier(spellId, atTime, spellcast.snapshot)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Save additional information to the spellcast that are registered with this module.
 		for tbl in pairs(self_updateSpellcastInfo) do
 			if tbl.SaveToSpellcast then
-				tbl.SaveToSpellcast(spellcast)
+				tbl.SaveToSpellcast(spellcast, atTime)
 			end
 		end
 
@@ -270,7 +272,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 						end
 						local verified
 						if tokenIterator then
-							verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
+							verified = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
 						else
 							verified = true
 						end
@@ -293,7 +295,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 							-- Skip the number of seconds to extend the aura.
 							tokenIterator()
 						end
-						local verified = OvaleData:CheckRequirements(spellId, tokenIterator, target)
+						local verified = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							break
@@ -303,19 +305,15 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 			end
 		end
 
-		-- Increase or reset any counters used by the Counter() condition.
-		if si.resetcounter then
-			local resetcounter = OvaleData:GetSpellInfoProperty(spellId, "resetcounter", target)
-			if resetcounter then
-				self.counter[resetcounter] = 0
-			end
+		-- Increment or reset any counters used by the Counter() condition.
+		local inccounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "inccounter", target)
+		if inccounter then
+			local value = self.counter[inccounter] and self.counter[inccounter] or 0
+			self.counter[inccounter] = value + 1
 		end
-		if si.inccounter then
-			local inccounter = OvaleData:GetSpellInfoProperty(spellId, "inccounter", target)
-			if inccounter then
-				local oldValue = self.counter[inccounter] or 0
-				self.counter[inccounter] = oldValue + 1
-			end
+		local resetcounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "resetcounter", target)
+		if resetcounter then
+			self.counter[resetcounter] = 0
 		end
 	end
 
@@ -365,8 +363,8 @@ local function UpdateLastSpellcast(spellcast)
 		end
 		self_lastSpellcast[targetGUID][spellId] = spellcast
 		self.lastSpellcast = spellcast
-		local unitId = OvaleGUID:GetUnitId(targetGUID)
-		local gcd = OvaleData:GetSpellInfoProperty(spellId, "gcd", unitId)
+		local si = OvaleData.spellInfo[spellId]
+		local gcd = si and si.gcd
 		if not gcd or gcd > 0 then
 			self.lastGCDSpellcast = spellcast
 		end
@@ -381,7 +379,7 @@ local function UpdateLastSpellcast(spellcast)
 		if self_timeAuraAdded then
 			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
 				OvalePaperDoll:UpdateSnapshot(spellcast.snapshot)
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast.snapshot)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
 					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshot.snapshotTime)
 			end
@@ -558,9 +556,9 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				if spellcast.snapshot then
 					OvalePaperDoll:ReleaseSnapshot(spellcast.snapshot)
 				end
-				spellcast.snapshot = OvalePaperDoll:GetSnapshot()
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId, spellcast.snapshot)
 				local now = API_GetTime()
+				spellcast.snapshot = OvalePaperDoll:GetSnapshot()
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId, now, spellcast.snapshot)
 				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
 				self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 				return
@@ -674,7 +672,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 	local index = 1
 	while index <= #self_activeSpellcast do
 		local spellcast = self_activeSpellcast[index]
-		state:Log("now = %f, spellId = %d, endCast = %f", now, spellcast.spellId, spellcast.stop)
+		state:Log("Spell %d in flight, now=%f, endCast=%f", spellcast.spellId, now, spellcast.stop)
 		if now - spellcast.stop < 5 then
 			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.channeled, spellcast)
 		else
@@ -813,6 +811,10 @@ function OvaleFuture:ResetState(state)
 	state.lastSpellId = self.lastSpellcast and self.lastSpellcast.spellId
 	state.isChanneled = self.lastSpellcast and self.lastSpellcast.channeled
 	state.currentSpellId = state.lastSpellId
+	state.lastGCDSpellId = self.lastGCDSpellcast and self.lastGCDSpellcast.spellId
+	state:Log("    lastSpellId = %s", state.lastSpellId or nil)
+	state:Log("    isChanneled = %s", state.isChanneled and "true" or "false")
+	state:Log("    lastGCDSpellId = %s", state.lastGCDSpellId or nil)
 
 	local start, duration = OvaleCooldown:GetGlobalCooldown(now)
 	if start and start > 0 then
@@ -820,7 +822,7 @@ function OvaleFuture:ResetState(state)
 	else
 		state.nextCast = now
 	end
-	state.lastGCDSpellId = self.lastGCDSpellcast and self.lastGCDSpellcast.spellId
+	state:Log("    nextCast = %f", state.nextCast)
 
 	for k in pairs(state.lastCast) do
 		state.lastCast[k] = nil
@@ -844,26 +846,41 @@ end
 -- Apply the effects of the spell at the start of the spellcast.
 function OvaleFuture:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleFuture_ApplySpellStartCast")
-	local si = OvaleData.spellInfo[spellId]
-	if si then
+	if isChanneled then
 		-- Increment and reset spell counters.
 		local target = OvaleGUID:GetUnitId(targetGUID)
-		if si.inccounter then
-			local id = state:GetSpellInfoProperty(spellId, "inccounter", target)
-			if id then
-				local value = state.counter[id] and state.counter[id] or 0
-				state.counter[id] = value + 1
-			end
+		local inccounter = state:GetSpellInfoProperty(spellId, startCast, "inccounter", target)
+		if inccounter then
+			local value = state.counter[inccounter] and state.counter[inccounter] or 0
+			state.counter[inccounter] = value + 1
 		end
-		if si.resetcounter then
-			local id = state:GetSpellInfoProperty(spellId, "resetcounter", target)
-			if id then
-				state.counter[id] = 0
-			end
+		local resetcounter = state:GetSpellInfoProperty(spellId, startCast, "resetcounter", target)
+		if resetcounter then
+			state.counter[resetcounter] = 0
 		end
 	end
 	self:StopProfiling("OvaleFuture_ApplySpellStartCast")
 end
+
+-- Apply the effects of the spell when the spellcast completes.
+function OvaleFuture:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+	self:StartProfiling("OvaleFuture_ApplySpellAfterCast")
+	if not isChanneled then
+		-- Increment and reset spell counters.
+		local target = OvaleGUID:GetUnitId(targetGUID)
+		local inccounter = state:GetSpellInfoProperty(spellId, endCast, "inccounter", target)
+		if inccounter then
+			local value = state.counter[inccounter] and state.counter[inccounter] or 0
+			state.counter[inccounter] = value + 1
+		end
+		local resetcounter = state:GetSpellInfoProperty(spellId, endCast, "resetcounter", target)
+		if resetcounter then
+			state.counter[resetcounter] = 0
+		end
+	end
+	self:StopProfiling("OvaleFuture_ApplySpellAfterCast")
+end
+
 --</public-static-methods>
 
 --<state-methods>
@@ -871,8 +888,9 @@ statePrototype.GetCounterValue = function(state, id)
 	return state.counter[id] or 0
 end
 
-statePrototype.GetDamageMultiplier = function(state, spellId)
-	return GetDamageMultiplier(spellId, state.snapshot, state)
+statePrototype.GetDamageMultiplier = function(state, spellId, atTime)
+	atTime = atTime or state.currentTime
+	return GetDamageMultiplier(spellId, atTime, state.snapshot, state)
 end
 
 statePrototype.TimeOfLastCast = function(state, spellId)
@@ -880,8 +898,9 @@ statePrototype.TimeOfLastCast = function(state, spellId)
 end
 
 -- Return whether the player is currently channeling a spell in the simulator.
-statePrototype.IsChanneling = function(state)
-	return state.isChanneled and (state.currentTime < state.endCast)
+statePrototype.IsChanneling = function(state, atTime)
+	atTime = atTime or state.currentTime
+	return state.isChanneled and (atTime < state.endCast)
 end
 
 --[[
@@ -919,7 +938,7 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 
 		-- Update the GCD-related spell information in the simulator.
 		local target = OvaleGUID:GetUnitId(targetGUID)
-		local gcd = state:GetGCD(spellId, target)
+		local gcd = state:GetGCD(spellId, startCast, target)
 		local nextCast = (castTime > gcd) and endCast or (startCast + gcd)
 		if state.nextCast < nextCast then
 			state.nextCast = nextCast
