@@ -345,15 +345,31 @@ end
 
 function OvaleBestAction:GetActionInfo(element, state, atTime)
 	if element and element.type == "action" then
-		local target = element.params.target or state.defaultTarget
-		if element.lowername == "item" then
-			return GetActionItemInfo(element, state, atTime, target)
-		elseif element.lowername == "macro" then
-			return GetActionMacroInfo(element, state, atTime, target)
-		elseif element.lowername == "spell" then
-			return GetActionSpellInfo(element, state, atTime, target)
-		elseif element.lowername == "texture" then
-			return GetActionTextureInfo(element, state, atTime, target)
+		-- Check for recently cached results from ComputeAction().
+		if element.serial and element.serial >= self_serial then
+			state:Log("[%d]    using cached result (age = %d)", element.nodeId, element.serial)
+			return element.actionTexture,
+				element.actionInRange,
+				element.actionCooldownStart,
+				element.actionCooldownDuration,
+				element.actionUsable,
+				element.actionShortcut,
+				element.actionIsCurrent,
+				element.actionEnable,
+				element.actionType,
+				element.actionId,
+				element.actionTarget
+		else
+			local target = element.params.target or state.defaultTarget
+			if element.lowername == "item" then
+				return GetActionItemInfo(element, state, atTime, target)
+			elseif element.lowername == "macro" then
+				return GetActionMacroInfo(element, state, atTime, target)
+			elseif element.lowername == "spell" then
+				return GetActionSpellInfo(element, state, atTime, target)
+			elseif element.lowername == "texture" then
+				return GetActionTextureInfo(element, state, atTime, target)
+			end
 		end
 	end
 	return nil
@@ -447,6 +463,19 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 	state:Log("[%d]    evaluating action: %s(%s)", nodeId, element.name, element.paramsAsString)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget = self:GetActionInfo(element, state, atTime)
+
+	-- Cache results for future GetActionInfo() when computation age has not advanced.
+	element.actionTexture = actionTexture
+	element.actionInRange = actionInRange
+	element.actionCooldownStart = actionCooldownStart
+	element.actionCooldownDuration = actionCooldownDuration
+	element.actionUsable = actionUsable
+	element.actionShortcut = actionShortcut
+	element.actionIsCurrent = actionIsCurrent
+	element.actionEnable = actionEnable
+	element.actionType = actionType
+	element.actionId = actionId
+	element.actionTarget = actionTarget
 
 	local action = element.params[1]
 	if not actionTexture then
