@@ -241,22 +241,40 @@ function OvaleCooldown:CleanState(state)
 	end
 end
 
+-- Apply the effects of the spell at the start of the spellcast.
+function OvaleCooldown:ApplySpellStartCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+	self:StartProfiling("OvaleCooldown_ApplySpellStartCast")
+	-- Channeled spells trigger their cooldown the moment they begin casting.
+	if isChanneled then
+		state:ApplyCooldown(spellId, targetGUID, startCast)
+	end
+	self:StopProfiling("OvaleCooldown_ApplySpellStartCast")
+end
+
 -- Apply the effects of the spell when the spellcast completes.
 function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
-	local cd = state:GetCD(spellId)
+	-- Instant and cast-time spells trigger their cooldown after the spellcast is complete.
+	if not isChanneled then
+		state:ApplyCooldown(spellId, targetGUID, endCast)
+	end
+	self:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
+end
+--</public-static-methods>
 
+--<state-methods>
+statePrototype.ApplyCooldown = function(state, spellId, targetGUID, atTime)
+	OvaleCooldown:StartProfiling("OvaleCooldown_state_ApplyCooldown")
+	local cd = state:GetCD(spellId)
 	local target = OvaleGUID:GetUnitId(targetGUID) or state.defaultTarget
-	local start = isChanneled and startCast or endCast
 	local duration = state:GetSpellCooldownDuration(spellId, start, target)
 
-	local si = OvaleData.spellInfo[spellId]
 	if duration == 0 then
 		cd.start = 0
 		cd.duration = 0
 		cd.enable = 1
 	else
-		cd.start = start
+		cd.start = atTime
 		cd.duration = duration
 		cd.enable = 1
 	end
@@ -271,11 +289,9 @@ function OvaleCooldown:ApplySpellAfterCast(state, spellId, targetGUID, startCast
 	end
 
 	state:Log("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
-	self:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
+	OvaleCooldown:StopProfiling("OvaleCooldown_state_ApplyCooldown")
 end
---</public-static-methods>
 
---<state-methods>
 statePrototype.DebugCooldown = function(state)
 	for spellId, cd in pairs(state.cd) do
 		if cd.start then
