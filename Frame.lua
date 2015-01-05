@@ -195,6 +195,10 @@ do
 				state:Log("+++ Icon %d", k)
 				OvaleBestAction:StartNewAction(state)
 				local atTime = state.nextCast
+				if state.lastSpellId ~= state.lastGCDSpellId then
+					-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
+					atTime = state.currentTime
+				end
 				local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
 				local start = NextTime(timeSpan, atTime)
 				local action = self.actions[k]
@@ -288,15 +292,12 @@ do
 			if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
 				if start then
 					state:Log("****Second icon %s", start)
-					local spellTarget
-					if element then
-						spellTarget = element.params.target
-					end
-					if not spellTarget or spellTarget == "target" then
-						spellTarget = state.defaultTarget
-					end
-					state:ApplySpell(actionId, OvaleGUID:GetGUID(spellTarget))
+					state:ApplySpell(actionId, OvaleGUID:GetGUID(actionTarget), start)
 					local atTime = state.nextCast
+					if actionId ~= state.lastGCDSpellId then
+						-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
+						atTime = state.currentTime
+					end
 					local timeSpan, _, nextElement = OvaleBestAction:GetAction(node, state, atTime)
 					start = NextTime(timeSpan, atTime)
 					icons[2]:Update(nextElement, start, OvaleBestAction:GetActionInfo(nextElement, state))
