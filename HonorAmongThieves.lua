@@ -1,5 +1,5 @@
 --[[--------------------------------------------------------------------
-    Copyright (C) 2014 Johnny C. Lam.
+    Copyright (C) 2014, 2015 Johnny C. Lam.
     See the file LICENSE.txt for copying permission.
 --]]-------------------------------------------------------------------
 

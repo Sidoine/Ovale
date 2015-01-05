@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------
     Copyright (C) 2009, 2010, 2011, 2012, 2013 Sidoine De Wispelaere.
-    Copyright (C) 2012, 2013, 2014 Johnny C. Lam.
+    Copyright (C) 2012, 2013, 2014, 2015 Johnny C. Lam.
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
