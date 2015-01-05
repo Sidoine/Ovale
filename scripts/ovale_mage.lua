@@ -37,7 +37,7 @@ AddFunction InterruptActions
 # Based on SimulationCraft profile "Mage_Arcane_T17M".
 #	class=mage
 #	spec=arcane
-#	talents=3003123
+#	talents=3003322
 #	glyphs=arcane_power/cone_of_cold
 
 ### actions.default
@@ -287,9 +287,9 @@ AddFunction ArcaneCrystalSequenceMainActions
 	#supernova,if=mana.pct<96
 	if ManaPercent() < 96 Spell(supernova)
 	#arcane_blast,if=buff.arcane_charge.stack=4&mana.pct>93&pet.prismatic_crystal.remains>cast_time+buff.arcane_missiles.stack*2*spell_haste+action.arcane_missiles.travel_time
-	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and TotemRemaining(prismatic_crystal) > CastTime(arcane_blast) + BuffStacks(arcane_missiles_buff) * 2 * 100 / { 100 + SpellHaste() } + MaxTravelTime(arcane_missiles) Spell(arcane_blast)
+	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and TotemRemaining(prismatic_crystal) > CastTime(arcane_blast) + BuffStacks(arcane_missiles_buff) * 2 * 100 / { 100 + SpellHaste() } + TravelTime(arcane_missiles) Spell(arcane_blast)
 	#arcane_missiles,if=pet.prismatic_crystal.remains>2*spell_haste+travel_time
-	if TotemRemaining(prismatic_crystal) > 2 * 100 / { 100 + SpellHaste() } + MaxTravelTime(arcane_missiles) and BuffPresent(arcane_missiles_buff) Spell(arcane_missiles)
+	if TotemRemaining(prismatic_crystal) > 2 * 100 / { 100 + SpellHaste() } + TravelTime(arcane_missiles) and BuffPresent(arcane_missiles_buff) Spell(arcane_missiles)
 	#supernova,if=pet.prismatic_crystal.remains<action.arcane_blast.cast_time
 	if TotemRemaining(prismatic_crystal) < CastTime(arcane_blast) Spell(supernova)
 	#choose_target,if=pet.prismatic_crystal.remains<action.arcane_blast.cast_time&buff.presence_of_mind.down
@@ -565,14 +565,14 @@ AddFunction FireCrystalSequenceMainActions
 	#inferno_blast,cycle_targets=1,if=dot.combustion.ticking&active_dot.combustion<active_enemies+1
 	if target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 Spell(inferno_blast)
 	#pyroblast,if=execute_time=gcd.max&pet.prismatic_crystal.remains<gcd.max+travel_time&pet.prismatic_crystal.remains>travel_time
-	if ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + MaxTravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > MaxTravelTime(pyroblast) Spell(pyroblast)
+	if ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) Spell(pyroblast)
 	#call_action_list,name=single_target
 	FireSingleTargetMainActions()
 }
 
 AddFunction FireCrystalSequenceShortCdActions
 {
-	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + MaxTravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > MaxTravelTime(pyroblast) and Spell(pyroblast)
+	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast)
 	{
 		#call_action_list,name=single_target
 		FireSingleTargetShortCdActions()
@@ -734,8 +734,10 @@ AddFunction FrostDefaultShortCdActions
 	if TotemRemaining(rune_of_power) < CastTime(rune_of_power) Spell(rune_of_power)
 	#rune_of_power,if=(cooldown.icy_veins.remains<gcd.max&buff.rune_of_power.remains<20)|(cooldown.prismatic_crystal.remains<gcd.max&buff.rune_of_power.remains<10)
 	if SpellCooldown(icy_veins) < GCD() and TotemRemaining(rune_of_power) < 20 or SpellCooldown(prismatic_crystal) < GCD() and TotemRemaining(rune_of_power) < 10 Spell(rune_of_power)
-	#water_jet,if=time<1&!(talent.ice_nova.enabled&talent.prismatic_crystal.enabled)
-	if TimeInCombat() < 1 and not { Talent(ice_nova_talent) and Talent(prismatic_crystal_talent) } and pet.Present() Spell(pet_water_jet)
+	# CHANGE: Suggest pet's Freeze ahed of Water Jet on non-worldboss targets to generate Fingers of Frost.
+	if not target.Classification(worldboss) and not BuffPresent(fingers_of_frost_buff) and pet.Present() Spell(pet_freeze)
+	#water_jet,if=time<1&active_enemies<4&!(talent.ice_nova.enabled&talent.prismatic_crystal.enabled)
+	if TimeInCombat() < 1 and Enemies() < 4 and not { Talent(ice_nova_talent) and Talent(prismatic_crystal_talent) } and pet.Present() Spell(pet_water_jet)
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&(cooldown.prismatic_crystal.remains<=gcd.max|pet.prismatic_crystal.active)
 	if Talent(prismatic_crystal_talent) and { SpellCooldown(prismatic_crystal) <= GCD() or TotemPresent(prismatic_crystal) } FrostCrystalSequenceShortCdActions()
 	#call_action_list,name=aoe,if=active_enemies>=4
@@ -777,7 +779,7 @@ AddFunction FrostDefaultCdActions
 AddFunction FrostAoeMainActions
 {
 	#frost_bomb,if=remains<action.ice_lance.travel_time&(cooldown.frozen_orb.remains<gcd.max|buff.fingers_of_frost.react=2)
-	if target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and { SpellCooldown(frozen_orb) < GCD() or BuffStacks(fingers_of_frost_buff) == 2 } Spell(frost_bomb)
+	if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and { SpellCooldown(frozen_orb) < GCD() or BuffStacks(fingers_of_frost_buff) == 2 } Spell(frost_bomb)
 	#ice_lance,if=talent.frost_bomb.enabled&buff.fingers_of_frost.react&debuff.frost_bomb.up
 	if Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffPresent(frost_bomb_debuff) Spell(ice_lance)
 	#ice_nova
@@ -788,7 +790,7 @@ AddFunction FrostAoeMainActions
 
 AddFunction FrostAoeShortCdActions
 {
-	unless target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and { SpellCooldown(frozen_orb) < GCD() or BuffStacks(fingers_of_frost_buff) == 2 } and Spell(frost_bomb)
+	unless target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and { SpellCooldown(frozen_orb) < GCD() or BuffStacks(fingers_of_frost_buff) == 2 } and Spell(frost_bomb)
 	{
 		#frozen_orb
 		Spell(frozen_orb)
@@ -830,7 +832,7 @@ AddFunction FrostCrystalSequenceMainActions
 	# CHANGE: Workaround possible bug in SimulationCraft APL.
 	#frost_bomb,if=active_enemies=1&current_target!=prismatic_crystal&remains<10
 	#if Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
-	if Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) Spell(frost_bomb)
+	if Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) Spell(frost_bomb)
 	#frost_bomb,if=talent.prismatic_crystal.enabled&current_target=prismatic_crystal&active_enemies>1&!ticking
 	if Talent(prismatic_crystal_talent) and target.Name(prismatic_crystal) and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) Spell(frost_bomb)
 	#ice_lance,if=buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&active_dot.frozen_orb>=1)
@@ -852,7 +854,7 @@ AddFunction FrostCrystalSequenceMainActions
 AddFunction FrostCrystalSequenceShortCdActions
 {
 	# CHANGE: Workaround possible bug in SimulationCraft APL.
-	unless Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and Spell(frost_bomb)
+	unless Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and Spell(frost_bomb)
 	{
 		#frozen_orb
 		Spell(frozen_orb)
@@ -864,7 +866,7 @@ AddFunction FrostCrystalSequenceShortCdActions
 AddFunction FrostCrystalSequenceCdActions
 {
 	# CHANGE: Workaround possible bug in SimulationCraft APL.
-	unless Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and Spell(frost_bomb) or Spell(frozen_orb)
+	unless Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and Spell(frost_bomb) or Spell(frozen_orb)
 	{
 		#call_action_list,name=cooldowns
 		FrostCooldownsCdActions()
@@ -940,9 +942,9 @@ AddFunction FrostSingleTargetMainActions
 	# CHANGE: Workaround possible bug in SimulationCraft APL.
 	#frost_bomb,if=!talent.prismatic_crystal.enabled&cooldown.frozen_orb.remains<gcd.max&debuff.frost_bomb.remains<10
 	#if not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < 10 Spell(frost_bomb)
-	if not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) Spell(frost_bomb)
+	if not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) Spell(frost_bomb)
 	#frost_bomb,if=remains<action.ice_lance.travel_time&(buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&(talent.thermal_void.enabled|buff.fingers_of_frost.remains<gcd.max*2)))
-	if target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and { Talent(thermal_void_talent) or BuffRemaining(fingers_of_frost_buff) < GCD() * 2 } } Spell(frost_bomb)
+	if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and { Talent(thermal_void_talent) or BuffRemaining(fingers_of_frost_buff) < GCD() * 2 } } Spell(frost_bomb)
 	#ice_nova,if=time_to_die<10|(charges=2&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up))
 	if TimeToDie() < 10 or Charges(ice_nova) == 2 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(ice_nova)
 	#ice_lance,if=buff.fingers_of_frost.react=2|(buff.fingers_of_frost.react&dot.frozen_orb.ticking)
@@ -954,7 +956,7 @@ AddFunction FrostSingleTargetMainActions
 	#ice_lance,if=set_bonus.tier17_4pc&talent.thermal_void.enabled&talent.mirror_image.enabled&dot.frozen_orb.ticking
 	if ArmorSetBonus(T17 4) and Talent(thermal_void_talent) and Talent(mirror_image_talent) and SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 Spell(ice_lance)
 	#ice_lance,if=talent.frost_bomb.enabled&buff.fingers_of_frost.react&debuff.frost_bomb.remains>travel_time&(!talent.thermal_void.enabled|cooldown.icy_veins.remains>8)
-	if Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffRemaining(frost_bomb_debuff) > MaxTravelTime(ice_lance) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } Spell(ice_lance)
+	if Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffRemaining(frost_bomb_debuff) > TravelTime(ice_lance) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } Spell(ice_lance)
 	#frostbolt,if=set_bonus.tier17_2pc&buff.ice_shard.up&!(talent.thermal_void.enabled&buff.icy_veins.up&buff.icy_veins.remains<10)
 	if ArmorSetBonus(T17 2) and BuffPresent(ice_shard_buff) and not { Talent(thermal_void_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 10 } Spell(frostbolt)
 	#ice_lance,if=!talent.frost_bomb.enabled&buff.fingers_of_frost.react&(!talent.thermal_void.enabled|cooldown.icy_veins.remains>8)
@@ -971,20 +973,18 @@ AddFunction FrostSingleTargetShortCdActions
 {
 	# CHANGE: Always suggest summoning the Water Elemental if it's gone, even during combat.
 	if not pet.Present() Spell(water_elemental)
-	# CHANGE: Suggest pet's Freeze on non-worldboss targets to generate Fingers of Frost.
-	if not target.Classification(worldboss) and not BuffPresent(fingers_of_frost_buff) and pet.Present() Spell(pet_freeze)
 	# CHANGE: Workaround possible bug in SimulationCraft APL.
-	unless BuffPresent(fingers_of_frost_buff) and BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) and Spell(frostfire_bolt) or not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and Spell(frost_bomb)
+	unless BuffPresent(fingers_of_frost_buff) and BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) and Spell(frostfire_bolt) or not Talent(prismatic_crystal_talent) and SpellCooldown(frozen_orb) < GCD() and target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and Spell(frost_bomb)
 	{
 		#frozen_orb,if=!talent.prismatic_crystal.enabled&buff.fingers_of_frost.stack<2&cooldown.icy_veins.remains>45
 		if not Talent(prismatic_crystal_talent) and BuffStacks(fingers_of_frost_buff) < 2 and SpellCooldown(icy_veins) > 45 Spell(frozen_orb)
 
-		unless target.DebuffRemaining(frost_bomb_debuff) < MaxTravelTime(ice_lance) and { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and { Talent(thermal_void_talent) or BuffRemaining(fingers_of_frost_buff) < GCD() * 2 } } and Spell(frost_bomb) or { TimeToDie() < 10 or Charges(ice_nova) == 2 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } } and Spell(ice_nova) or { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 } and Spell(ice_lance)
+		unless target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and { Talent(thermal_void_talent) or BuffRemaining(fingers_of_frost_buff) < GCD() * 2 } } and Spell(frost_bomb) or { TimeToDie() < 10 or Charges(ice_nova) == 2 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } } and Spell(ice_nova) or { BuffStacks(fingers_of_frost_buff) == 2 or BuffPresent(fingers_of_frost_buff) and SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 } and Spell(ice_lance)
 		{
 			#comet_storm
 			Spell(comet_storm)
 
-			unless { not Talent(prismatic_crystal_talent) or Charges(ice_nova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(ice_nova) and BuffStacks(incanters_flow_buff) > 3 } and { BuffPresent(icy_veins_buff) or Charges(ice_nova) == 1 and SpellCooldown(icy_veins) > SpellChargeCooldown(ice_nova) } and Spell(ice_nova) or BuffPresent(brain_freeze_buff) and Spell(frostfire_bolt) or ArmorSetBonus(T17 4) and Talent(thermal_void_talent) and Talent(mirror_image_talent) and SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and Spell(ice_lance) or Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffRemaining(frost_bomb_debuff) > MaxTravelTime(ice_lance) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } and Spell(ice_lance) or ArmorSetBonus(T17 2) and BuffPresent(ice_shard_buff) and not { Talent(thermal_void_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 10 } and Spell(frostbolt) or not Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } and Spell(ice_lance)
+			unless { not Talent(prismatic_crystal_talent) or Charges(ice_nova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(ice_nova) and BuffStacks(incanters_flow_buff) > 3 } and { BuffPresent(icy_veins_buff) or Charges(ice_nova) == 1 and SpellCooldown(icy_veins) > SpellChargeCooldown(ice_nova) } and Spell(ice_nova) or BuffPresent(brain_freeze_buff) and Spell(frostfire_bolt) or ArmorSetBonus(T17 4) and Talent(thermal_void_talent) and Talent(mirror_image_talent) and SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and Spell(ice_lance) or Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffRemaining(frost_bomb_debuff) > TravelTime(ice_lance) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } and Spell(ice_lance) or ArmorSetBonus(T17 2) and BuffPresent(ice_shard_buff) and not { Talent(thermal_void_talent) and BuffPresent(icy_veins_buff) and BuffRemaining(icy_veins_buff) < 10 } and Spell(frostbolt) or not Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } and Spell(ice_lance)
 			{
 				#call_action_list,name=init_water_jet,if=pet.water_elemental.cooldown.water_jet.remains<=gcd.max*(buff.fingers_of_frost.react+talent.frost_bomb.enabled)&!dot.frozen_orb.ticking
 				if SpellCooldown(pet_water_jet) <= GCD() * { BuffStacks(fingers_of_frost_buff) + TalentPoints(frost_bomb_talent) } and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 FrostInitWaterJetShortCdActions()
@@ -1008,14 +1008,14 @@ AddFunction FrostWaterJetMainActions
 	#ice_lance,if=buff.fingers_of_frost.react=2&action.frostbolt.in_flight
 	if BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) Spell(ice_lance)
 	#frostbolt,if=debuff.water_jet.remains>cast_time+travel_time
-	if target.DebuffRemaining(pet_water_jet_debuff) > CastTime(frostbolt) + MaxTravelTime(frostbolt) Spell(frostbolt)
+	if target.DebuffRemaining(pet_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) Spell(frostbolt)
 	#call_action_list,name=single_target
 	FrostSingleTargetMainActions()
 }
 
 AddFunction FrostWaterJetShortCdActions
 {
-	unless PreviousSpell(pet_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(pet_water_jet_debuff) > CastTime(frostbolt) + MaxTravelTime(frostbolt) and Spell(frostbolt)
+	unless PreviousSpell(pet_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(pet_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
 	{
 		#call_action_list,name=single_target
 		FrostSingleTargetShortCdActions()
@@ -1024,7 +1024,7 @@ AddFunction FrostWaterJetShortCdActions
 
 AddFunction FrostWaterJetCdActions
 {
-	unless PreviousSpell(pet_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(pet_water_jet_debuff) > CastTime(frostbolt) + MaxTravelTime(frostbolt) and Spell(frostbolt)
+	unless PreviousSpell(pet_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(pet_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
 	{
 		#call_action_list,name=single_target
 		FrostSingleTargetCdActions()

@@ -24,12 +24,16 @@ AddFunction UsePotionIntellect
 
 AddFunction BalanceDefaultMainActions
 {
-	#force_of_nature,if=trinket.stat.intellect.up|charges=3|target.time_to_die<21
-	if BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 Spell(force_of_nature_caster)
 	#call_action_list,name=single_target,if=active_enemies=1
 	if Enemies() == 1 BalanceSingleTargetMainActions()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 BalanceAoeMainActions()
+}
+
+AddFunction BalanceDefaultShortCdActions
+{
+	#force_of_nature,if=trinket.stat.intellect.up|charges=3|target.time_to_die<21
+	if BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 Spell(force_of_nature_caster)
 }
 
 AddFunction BalanceDefaultCdActions
@@ -42,14 +46,10 @@ AddFunction BalanceDefaultCdActions
 	if BuffPresent(celestial_alignment_buff) Spell(berserking)
 	#arcane_torrent,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) Spell(arcane_torrent_energy)
-
-	unless { BuffPresent(trinket_stat_intellect_buff) or Charges(force_of_nature_caster) == 3 or target.TimeToDie() < 21 } and Spell(force_of_nature_caster)
-	{
-		#call_action_list,name=single_target,if=active_enemies=1
-		if Enemies() == 1 BalanceSingleTargetCdActions()
-		#call_action_list,name=aoe,if=active_enemies>1
-		if Enemies() > 1 BalanceAoeCdActions()
-	}
+	#call_action_list,name=single_target,if=active_enemies=1
+	if Enemies() == 1 BalanceSingleTargetCdActions()
+	#call_action_list,name=aoe,if=active_enemies>1
+	if Enemies() > 1 BalanceAoeCdActions()
 }
 
 ### actions.aoe
@@ -148,10 +148,12 @@ AddCheckBox(opt_druid_balance_aoe L(AOE) specialization=balance default)
 
 AddIcon specialization=balance help=shortcd enemies=1 checkbox=!opt_druid_balance_aoe
 {
+	BalanceDefaultShortCdActions()
 }
 
 AddIcon specialization=balance help=shortcd checkbox=opt_druid_balance_aoe
 {
+	BalanceDefaultShortCdActions()
 }
 
 AddIcon specialization=balance help=main enemies=1

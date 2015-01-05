@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Mage_Arcane_T17M".
 #	class=mage
 #	spec=arcane
-#	talents=3003123
+#	talents=3003322
 #	glyphs=arcane_power/cone_of_cold
 
 Include(ovale_common)
@@ -282,9 +282,9 @@ AddFunction ArcaneCrystalSequenceMainActions
 	#supernova,if=mana.pct<96
 	if ManaPercent() < 96 Spell(supernova)
 	#arcane_blast,if=buff.arcane_charge.stack=4&mana.pct>93&pet.prismatic_crystal.remains>cast_time+buff.arcane_missiles.stack*2*spell_haste+action.arcane_missiles.travel_time
-	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and TotemRemaining(prismatic_crystal) > CastTime(arcane_blast) + BuffStacks(arcane_missiles_buff) * 2 * 100 / { 100 + SpellHaste() } + MaxTravelTime(arcane_missiles) Spell(arcane_blast)
+	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and TotemRemaining(prismatic_crystal) > CastTime(arcane_blast) + BuffStacks(arcane_missiles_buff) * 2 * 100 / { 100 + SpellHaste() } + TravelTime(arcane_missiles) Spell(arcane_blast)
 	#arcane_missiles,if=pet.prismatic_crystal.remains>2*spell_haste+travel_time
-	if TotemRemaining(prismatic_crystal) > 2 * 100 / { 100 + SpellHaste() } + MaxTravelTime(arcane_missiles) and BuffPresent(arcane_missiles_buff) Spell(arcane_missiles)
+	if TotemRemaining(prismatic_crystal) > 2 * 100 / { 100 + SpellHaste() } + TravelTime(arcane_missiles) and BuffPresent(arcane_missiles_buff) Spell(arcane_missiles)
 	#supernova,if=pet.prismatic_crystal.remains<action.arcane_blast.cast_time
 	if TotemRemaining(prismatic_crystal) < CastTime(arcane_blast) Spell(supernova)
 	#choose_target,if=pet.prismatic_crystal.remains<action.arcane_blast.cast_time&buff.presence_of_mind.down

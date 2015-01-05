@@ -512,8 +512,6 @@ AddFunction RetributionDefaultMainActions
 	#wait,sec=cooldown.seraphim.remains,if=talent.seraphim.enabled&cooldown.seraphim.remains>0&cooldown.seraphim.remains<gcd.max&holy_power>=5
 	unless Talent(seraphim_talent) and SpellCooldown(seraphim) > 0 and SpellCooldown(seraphim) < GCD() and HolyPower() >= 5 and SpellCooldown(seraphim) > 0
 	{
-		#call_action_list,name=aoe,if=active_enemies>=5
-		if Enemies() >= 5 RetributionAoeMainActions()
 		#call_action_list,name=cleave,if=active_enemies>=3
 		if Enemies() >= 3 RetributionCleaveMainActions()
 		#call_action_list,name=single

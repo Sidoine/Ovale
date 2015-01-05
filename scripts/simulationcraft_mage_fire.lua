@@ -217,14 +217,14 @@ AddFunction FireCrystalSequenceMainActions
 	#inferno_blast,cycle_targets=1,if=dot.combustion.ticking&active_dot.combustion<active_enemies+1
 	if target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 Spell(inferno_blast)
 	#pyroblast,if=execute_time=gcd.max&pet.prismatic_crystal.remains<gcd.max+travel_time&pet.prismatic_crystal.remains>travel_time
-	if ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + MaxTravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > MaxTravelTime(pyroblast) Spell(pyroblast)
+	if ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) Spell(pyroblast)
 	#call_action_list,name=single_target
 	FireSingleTargetMainActions()
 }
 
 AddFunction FireCrystalSequenceShortCdActions
 {
-	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + MaxTravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > MaxTravelTime(pyroblast) and Spell(pyroblast)
+	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast)
 	{
 		#call_action_list,name=single_target
 		FireSingleTargetShortCdActions()

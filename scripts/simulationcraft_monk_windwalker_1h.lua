@@ -42,8 +42,8 @@ AddFunction WindwalkerDefaultMainActions
 {
 	#chi_brew,if=chi.max-chi>=2&((charges=1&recharge_time<=10)|charges=2|target.time_to_die<charges*10)&buff.tigereye_brew.stack<=16
 	if MaxChi() - Chi() >= 2 and { Charges(chi_brew) == 1 and SpellChargeCooldown(chi_brew) <= 10 or Charges(chi_brew) == 2 or target.TimeToDie() < Charges(chi_brew) * 10 } and BuffStacks(tigereye_brew_buff) <= 16 Spell(chi_brew)
-	#tiger_palm,if=buff.tiger_power.remains<=3
-	if BuffRemaining(tiger_power_buff) <= 3 Spell(tiger_palm)
+	#tiger_palm,if=buff.tiger_power.remains<6
+	if BuffRemaining(tiger_power_buff) < 6 Spell(tiger_palm)
 	#rising_sun_kick,if=(debuff.rising_sun_kick.down|debuff.rising_sun_kick.remains<3)
 	if target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 Spell(rising_sun_kick)
 	#tiger_palm,if=buff.tiger_power.down&debuff.rising_sun_kick.remains>1&energy.time_to_max>1
@@ -56,7 +56,7 @@ AddFunction WindwalkerDefaultMainActions
 
 AddFunction WindwalkerDefaultShortCdActions
 {
-	unless BuffRemaining(tiger_power_buff) <= 3 and Spell(tiger_palm)
+	unless BuffRemaining(tiger_power_buff) < 6 and Spell(tiger_palm)
 	{
 		#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack=20
 		if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) == 20 Spell(tigereye_brew)
@@ -96,7 +96,7 @@ AddFunction WindwalkerDefaultCdActions
 	#arcane_torrent,if=chi.max-chi>=1&(buff.tigereye_brew_use.up|target.time_to_die<18)
 	if MaxChi() - Chi() >= 1 and { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } Spell(arcane_torrent_chi)
 
-	unless BuffRemaining(tiger_power_buff) <= 3 and Spell(tiger_palm) or { target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 } and Spell(rising_sun_kick) or BuffExpires(tiger_power_buff) and target.DebuffRemaining(rising_sun_kick_debuff) > 1 and TimeToMaxEnergy() > 1 and Spell(tiger_palm)
+	unless BuffRemaining(tiger_power_buff) < 6 and Spell(tiger_palm) or { target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 } and Spell(rising_sun_kick) or BuffExpires(tiger_power_buff) and target.DebuffRemaining(rising_sun_kick_debuff) > 1 and TimeToMaxEnergy() > 1 and Spell(tiger_palm)
 	{
 		#call_action_list,name=aoe,if=active_enemies>=3
 		if Enemies() >= 3 WindwalkerAoeCdActions()
@@ -125,8 +125,8 @@ AddFunction WindwalkerAoeMainActions
 	if Talent(rushing_jade_wind_talent) and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#blackout_kick,if=talent.rushing_jade_wind.enabled&!talent.chi_explosion.enabled&chi.max-chi<2&(cooldown.fists_of_fury.remains>3|!talent.rushing_jade_wind.enabled)
 	if Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and MaxChi() - Chi() < 2 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } Spell(blackout_kick)
-	#spinning_crane_kick,if=!talent.rushing_jade_wind.enabled
-	if not Talent(rushing_jade_wind_talent) Spell(spinning_crane_kick)
+	#spinning_crane_kick
+	Spell(spinning_crane_kick)
 	#jab,if=talent.rushing_jade_wind.enabled&chi.max-chi>=2
 	if Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 2 Spell(jab)
 	#jab,if=talent.rushing_jade_wind.enabled&chi.max-chi>=1&talent.chi_explosion.enabled&cooldown.fists_of_fury.remains<=3
@@ -201,12 +201,12 @@ AddFunction WindwalkerStMainActions
 	if not Talent(chi_explosion_talent) and { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } Spell(blackout_kick)
 	#chi_explosion,if=talent.chi_explosion.enabled&chi>=3&buff.combo_breaker_ce.react&cooldown.fists_of_fury.remains>3
 	if Talent(chi_explosion_talent) and Chi() >= 3 and BuffPresent(combo_breaker_ce_buff) and SpellCooldown(fists_of_fury) > 3 Spell(chi_explosion_melee)
-	#tiger_palm,if=buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
-	if BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
+	#tiger_palm,if=buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<6
+	if BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) < 6 Spell(tiger_palm)
 	#blackout_kick,if=!talent.chi_explosion.enabled&chi.max-chi<2
 	if not Talent(chi_explosion_talent) and MaxChi() - Chi() < 2 Spell(blackout_kick)
-	#chi_explosion,if=talent.chi_explosion.enabled&chi>=3
-	if Talent(chi_explosion_talent) and Chi() >= 3 Spell(chi_explosion_melee)
+	#chi_explosion,if=talent.chi_explosion.enabled&chi>=3&cooldown.fists_of_fury.remains>3
+	if Talent(chi_explosion_talent) and Chi() >= 3 and SpellCooldown(fists_of_fury) > 3 Spell(chi_explosion_melee)
 	#jab,if=chi.max-chi>=2
 	if MaxChi() - Chi() >= 2 Spell(jab)
 	#jab,if=chi.max-chi>=1&talent.chi_explosion.enabled&cooldown.fists_of_fury.remains<=3
@@ -235,8 +235,8 @@ AddFunction WindwalkerStCdActions
 {
 	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury)
 	{
-		#fortifying_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0
-		if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 Spell(fortifying_brew)
+		#fortifying_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0&chi>=3
+		if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 and Chi() >= 3 Spell(fortifying_brew)
 	}
 }
 
