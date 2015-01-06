@@ -237,7 +237,7 @@ end
 
 -- Run-time check that the player is in a certain stance.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleStance:RequireStanceHandler(spellId, requirement, tokenIterator, target)
+function OvaleStance:RequireStanceHandler(spellId, atTime, requirement, tokenIterator, target)
 	local verified = false
 	local stance = tokenIterator()
 	if stance then
