@@ -23,6 +23,7 @@ local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitExists = UnitExists
 local API_UnitIsDead = UnitIsDead
 local API_UnitCanAttack = UnitCanAttack
+-- GLOBALS: _G
 
 -- Local reference to SpellFlashCore addon.
 local SpellFlashCore = nil

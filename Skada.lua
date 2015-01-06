@@ -16,6 +16,7 @@ local OvaleScore = nil
 local ipairs = ipairs
 local floor = math.floor
 local tostring = tostring
+-- GLOBALS: GameTooltip
 --</private-static-properties>
 
 --<public-static-properties>

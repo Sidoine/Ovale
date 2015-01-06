@@ -13,6 +13,8 @@ local L = nil
 local OvaleScore = nil
 local Recount = LibStub("AceAddon-3.0"):GetAddon("Recount", true)
 local setmetatable = setmetatable
+-- GLOBALS: GameTooltip
+-- GLOBALS: LibStub
 --</private-static-properties>
 
 --<private-static-methods>

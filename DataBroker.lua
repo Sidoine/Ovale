@@ -21,6 +21,7 @@ local tinsert = table.insert
 local API_CreateFrame = CreateFrame
 local API_EasyMenu = EasyMenu
 local API_UnitClass = UnitClass
+-- GLOBALS: UIParent
 
 -- Class icon textures.
 local CLASS_ICONS = {

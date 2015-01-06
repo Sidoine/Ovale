@@ -32,6 +32,7 @@ do
 	local API_GetTime = GetTime
 	local API_RegisterStateDriver = RegisterStateDriver
 	local NextTime = OvaleTimeSpan.NextTime
+	-- GLOBALS: UIParent
 --</private-static-properties>
 
 --<public-methods>

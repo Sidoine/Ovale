@@ -36,6 +36,8 @@ local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
 local API_UnitPowerType = UnitPowerType
 local INFINITY = math.huge
+-- GLOBALS: _G
+-- GLOBALS: UIParent
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvalePower)

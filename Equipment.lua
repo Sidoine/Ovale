@@ -47,6 +47,8 @@ local INVSLOT_TRINKET1 = INVSLOT_TRINKET1
 local INVSLOT_TRINKET2 = INVSLOT_TRINKET2
 local INVSLOT_WAIST = INVSLOT_WAIST
 local INVSLOT_WRIST = INVSLOT_WRIST
+-- GLOBALS: _G
+-- GLOBALS: UIParent
 
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleEquipment)

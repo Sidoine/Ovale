@@ -22,6 +22,8 @@ local tostring = tostring
 local API_GetTime = GetTime
 local API_PlaySoundFile = PlaySoundFile
 local INFINITY = math.huge
+-- GLOBALS: _G
+-- GLOBALS: GameTooltip
 
 -- Threshold for resetting the cooldown animation.
 -- This should be more than OvaleFuture's SIMULATOR_LAG.
@@ -148,7 +150,7 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			if now >= startTime - delay then
 				self.lastSound = element.params.sound
 			--	print("Play" .. self.lastSound)
-				PlaySoundFile(self.lastSound)
+				API_PlaySoundFile(self.lastSound)
 			end
 		end
 
@@ -262,7 +264,7 @@ local function SetRangeIndicator(self, text)
 end
 --</public-methods>
 
-function OvaleIcon_OnMouseUp(self)
+local function OvaleIcon_OnMouseUp(self)
 	if not self.actionButton then
 		Ovale:ToggleOptions()
 	end
@@ -343,7 +345,6 @@ function OvaleIcon_OnLoad(self)
 
 	--self:RegisterForClicks("LeftButtonUp")
 	self:RegisterForClicks("AnyUp")
-	self.SetSkinGroup = SetSkinGroup
 	self.Update = Update
 	self.SetHelp = SetHelp
 	self.SetParams = SetParams
