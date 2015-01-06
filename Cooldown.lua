@@ -9,6 +9,7 @@ local OvaleCooldown = Ovale:NewModule("OvaleCooldown", "AceEvent-3.0")
 Ovale.OvaleCooldown = OvaleCooldown
 
 --<private-static-properties>
+local OvaleDebug = Ovale.OvaleDebug
 local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
@@ -29,6 +30,8 @@ local API_UnitClass = UnitClass
 -- Spell ID for the dummy Global Cooldown spell.
 local GLOBAL_COOLDOWN = 61304
 
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleCooldown)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
@@ -40,8 +43,11 @@ local self_serial = 0
 local self_sharedCooldownSpells = {}
 
 -- GCD cached information
-local self_gcdStart = 0
-local self_gcdDuration = 0
+local self_gcd = {
+	serial = 0,
+	start = 0,
+	duration = 0,
+}
 
 -- BASE_GCD[class] = { gcd, isCaster }
 local BASE_GCD = {
@@ -79,7 +85,7 @@ function OvaleCooldown:OnEnable()
 	self:RegisterEvent("SPELL_UPDATE_USABLE", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", "Update")
-	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "Update")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UNIT_SPELLCAST_START", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "Update")
 	OvaleState:RegisterState(self, self.statePrototype)
@@ -96,9 +102,29 @@ function OvaleCooldown:OnDisable()
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 end
 
-function OvaleCooldown:Update()
-	-- Advance age of current cooldown state.
-	self_serial = self_serial + 1
+function OvaleCooldown:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
+	if unit == "player" then
+		-- Age the current cooldown state.
+		self:Update(event, unit)
+
+		--[[
+			Interrupted spells reset the global cooldown, but the GetSpellCooldown() on the
+			GCD spell ID doesn't return accurate information until after some delay.
+
+			Reset the global cooldown forcibly.
+		--]]
+		self:Debug("Resetting global cooldown.")
+		self_gcd.start = 0
+		self_gcd.duration = 0
+	end
+end
+
+function OvaleCooldown:Update(event, unit)
+	if unit == "player" then
+		-- Advance age of current cooldown state.
+		self_serial = self_serial + 1
+		self:Debug(event, self_serial)
+	end
 end
 
 -- Empty out the sharedcd table.
@@ -121,11 +147,14 @@ function OvaleCooldown:AddSharedCooldown(name, spellId)
 end
 
 function OvaleCooldown:GetGlobalCooldown(now)
-	now = now or API_GetTime()
-	if now >= self_gcdStart + self_gcdDuration then
-		self_gcdStart, self_gcdDuration = API_GetSpellCooldown(GLOBAL_COOLDOWN)
+	local cd = self_gcd
+	if not cd.start or not cd.serial or cd.serial < self_serial then
+		now = now or API_GetTime()
+		if now >= cd.start + cd.duration then
+			cd.start, cd.duration = API_GetSpellCooldown(GLOBAL_COOLDOWN)
+		end
 	end
-	return self_gcdStart, self_gcdDuration
+	return cd.start, cd.duration
 end
 
 -- Get the cooldown information for the given spell ID.  If given a shared cooldown name,
@@ -267,7 +296,7 @@ statePrototype.ApplyCooldown = function(state, spellId, targetGUID, atTime)
 	OvaleCooldown:StartProfiling("OvaleCooldown_state_ApplyCooldown")
 	local cd = state:GetCD(spellId)
 	local target = OvaleGUID:GetUnitId(targetGUID) or state.defaultTarget
-	local duration = state:GetSpellCooldownDuration(spellId, start, target)
+	local duration = state:GetSpellCooldownDuration(spellId, atTime, target)
 
 	if duration == 0 then
 		cd.start = 0
