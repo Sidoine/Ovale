@@ -1,4 +1,5 @@
 ChangeLog*
+CHANGELOG*
 libs/*
 !libs/*.xml
 tmp/**
