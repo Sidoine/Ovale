@@ -520,7 +520,7 @@ function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineI
 
 		-- UNIT_TARGET may arrive out of order with UNIT_SPELLCAST* events, so we can't track
 		-- the target in an event handler.
-		if target then
+		if target ~= "" then
 			if target == API_UnitName("target") then
 				self_lastTarget = API_UnitGUID("target")
 			else
@@ -672,7 +672,7 @@ function OvaleFuture:ApplyInFlightSpells(state)
 	local index = 1
 	while index <= #self_activeSpellcast do
 		local spellcast = self_activeSpellcast[index]
-		state:Log("Spell %d in flight, now=%f, endCast=%f", spellcast.spellId, now, spellcast.stop)
+		state:Log("Spell %d in flight to %s, now=%f, endCast=%f", spellcast.spellId, spellcast.target, now, spellcast.stop)
 		if now - spellcast.stop < 5 then
 			state:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.channeled, spellcast)
 		else
@@ -812,17 +812,18 @@ function OvaleFuture:ResetState(state)
 	state.isChanneled = self.lastSpellcast and self.lastSpellcast.channeled
 	state.currentSpellId = state.lastSpellId
 	state.lastGCDSpellId = self.lastGCDSpellcast and self.lastGCDSpellcast.spellId
-	state:Log("    lastSpellId = %s", state.lastSpellId or nil)
+	state:Log("    lastSpellId = %s", state.lastSpellId or "nil")
 	state:Log("    isChanneled = %s", state.isChanneled and "true" or "false")
-	state:Log("    lastGCDSpellId = %s", state.lastGCDSpellId or nil)
+	state:Log("    lastGCDSpellId = %s", state.lastGCDSpellId or "nil")
 
 	local start, duration = OvaleCooldown:GetGlobalCooldown(now)
 	if start and start > 0 then
 		state.nextCast = start + duration
+		state:Log("    nextCast = %f (waiting for GCD)", state.nextCast)
 	else
 		state.nextCast = now
+		state:Log("    nextCast = %f", state.nextCast)
 	end
-	state:Log("    nextCast = %f", state.nextCast)
 
 	for k in pairs(state.lastCast) do
 		state.lastCast[k] = nil
