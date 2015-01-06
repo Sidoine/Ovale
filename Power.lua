@@ -97,6 +97,13 @@ OvalePower.maxPower = {}
 -- Player's current power regeneration rate for the active power type.
 OvalePower.activeRegen = 0
 OvalePower.inactiveRegen = 0
+--[[
+	This block is here to quiet lint.pl since these properties are used in a
+	method mirrored to the state machine.
+
+	OvalePower.powerRate = nil
+	OvalePower.currentTime = nil
+--]]
 
 OvalePower.POWER_INFO =
 {
@@ -581,7 +588,7 @@ local statePrototype = OvalePower.statePrototype
 
 --<state-properties>
 --[[
-	This block is here for compiler.pl to know that these properties are added to the state machine.
+	This block is here for lint.pl to know that these properties are added to the state machine.
 
 	statePrototype.alternate = nil
 	statePrototype.burningembers = nil
