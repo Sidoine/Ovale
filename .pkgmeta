@@ -22,6 +22,7 @@ externals:
 enable-nolib-creation: no
 
 ignore:
+    - release
     - tests
     - utils
     - WoWMock.lua

@@ -2,6 +2,7 @@ ChangeLog*
 CHANGELOG*
 libs/*
 !libs/*.xml
+release/**
 tmp/**
 tests/OUT*
 tests/*.bat
