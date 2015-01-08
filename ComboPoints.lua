@@ -354,7 +354,6 @@ function OvaleComboPoints:RequireComboPointsHandler(spellId, atTime, requirement
 		if cost > 0 then
 			local power = self:GetComboPoints()
 			if power >= cost then
-				result = "passed"
 				verified = true
 			end
 		else

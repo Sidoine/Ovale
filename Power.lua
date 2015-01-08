@@ -548,7 +548,6 @@ function OvalePower:RequirePowerHandler(spellId, atTime, requirement, tokenItera
 		if cost > 0 then
 			local power = self:GetPower(powerType, atTime)
 			if power >= cost then
-				result = "passed"
 				verified = true
 			end
 		else
