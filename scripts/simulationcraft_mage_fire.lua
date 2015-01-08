@@ -131,8 +131,6 @@ AddFunction FireAoeMainActions
 	if BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) Spell(pyroblast)
 	#pyroblast,if=active_dot.pyroblast=0&!in_flight
 	if not DebuffCountOnAny(pyroblast_debuff) > 0 and not InFlightToTarget(pyroblast) Spell(pyroblast)
-	#dragons_breath,if=glyph.dragons_breath.enabled
-	if Glyph(glyph_of_dragons_breath) Spell(dragons_breath)
 	#flamestrike,if=mana.pct>10&remains<2.4
 	if ManaPercent() > 10 and target.DebuffRemaining(flamestrike_debuff) < 2.4 Spell(flamestrike)
 }
@@ -143,6 +141,12 @@ AddFunction FireAoeShortCdActions
 	{
 		#call_action_list,name=active_talents
 		FireActiveTalentsShortCdActions()
+
+		unless { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast) or not DebuffCountOnAny(pyroblast_debuff) > 0 and not InFlightToTarget(pyroblast) and Spell(pyroblast)
+		{
+			#dragons_breath,if=glyph.dragons_breath.enabled
+			if Glyph(glyph_of_dragons_breath) Spell(dragons_breath)
+		}
 	}
 }
 

@@ -225,6 +225,7 @@ Define(water_elemental 31687)
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(arcane_orb tag=shortcd)
 	SpellInfo(blink tag=shortcd)
+	SpellInfo(dragons_breath tag=shortcd)
 	SpellInfo(ice_floes tag=shortcd)
 	SpellInfo(rune_of_power tag=shortcd)
 ]]
