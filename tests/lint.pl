@@ -182,7 +182,7 @@ sub ParseDirectory
 	{
 		if ($r =~ m/(.*)\.lua$/)
 		{
-			my $global_result = `luac5.1 -l -p $dir/$r | lua5.1 globals.lua $dir/$r | grep GETGLOBAL`;
+			my $global_result = `luac5.1 -l -p $dir/$r | lua5.1 globals.lua $dir/$r`;
 			if ($global_result ne "")
 			{
 				print "$dir/$r\n";
