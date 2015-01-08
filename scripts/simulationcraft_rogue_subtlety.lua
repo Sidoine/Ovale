@@ -62,8 +62,8 @@ AddFunction SubtletyDefaultMainActions
 {
 	#slice_and_dice,if=(buff.slice_and_dice.remains<10.8)&buff.slice_and_dice.remains<target.time_to_die&combo_points=((target.time_to_die-buff.slice_and_dice.remains)%6)+1
 	if BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and ComboPoints() == { target.TimeToDie() - BuffRemaining(slice_and_dice_buff) } / 6 + 1 Spell(slice_and_dice)
-	#premeditation,if=combo_points<=4&!(buff.shadow_dance.up&energy>100&combo_points>1)&!buff.subterfuge.up|(buff.subterfuge.up&debuff.find_weakness.up)&time>9
-	if ComboPoints() <= 4 and not { BuffPresent(shadow_dance_buff) and Energy() > 100 and ComboPoints() > 1 } and not BuffPresent(subterfuge_buff) or BuffPresent(subterfuge_buff) and target.DebuffPresent(find_weakness_debuff) and TimeInCombat() > 9 Spell(premeditation)
+	#premeditation,if=combo_points<=4&!(buff.shadow_dance.up&energy>100&combo_points>1)&!buff.subterfuge.up|(buff.subterfuge.up&debuff.find_weakness.up)
+	if { ComboPoints() <= 4 and not { BuffPresent(shadow_dance_buff) and Energy() > 100 and ComboPoints() > 1 } and not BuffPresent(subterfuge_buff) or BuffPresent(subterfuge_buff) and target.DebuffPresent(find_weakness_debuff) } and ComboPoints() < 5 Spell(premeditation)
 	#pool_resource,for_next=1
 	#garrote,if=!ticking&time<1
 	if not target.DebuffPresent(garrote_debuff) and TimeInCombat() < 1 Spell(garrote)
@@ -272,6 +272,8 @@ AddFunction SubtletyPrecombatMainActions
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	#premeditation
+	if ComboPoints() < 5 Spell(premeditation)
 	#slice_and_dice
 	Spell(slice_and_dice)
 }
