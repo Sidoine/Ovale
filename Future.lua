@@ -74,6 +74,9 @@ local self_timeAuraAdded = nil
 -- Table of external functions to save additional data about a spellcast.
 local self_updateSpellcastInfo = {}
 
+-- Prefer target auras to player auras for aura-tracking so that spell travel time is more accurately taken into account.
+local SPELLCAST_AURA_ORDER = { "target", "player" }
+
 local OVALE_UNKNOWN_GUID = 0
 
 -- These CLEU events are eventually received after a successful spellcast.
@@ -245,13 +248,14 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 			end
 		end
 
-		-- Track one of the auras, if any, that are added or refreshed by this spell.
-		-- This helps to later identify whether the spellcast succeeded by noting when
-		-- the aura is applied or refreshed.
+		--[[
+			Set spellcast.auraId to one of the auras, if any, that are added or refreshed by this spell.
+			This helps to later identify whether the spellcast succeeded by noting when the aura is
+			applied or refreshed.
+		--]]
 		if si.aura then
-			-- Look for target auras before player auras applied by the spell.
-			if not spellcast.auraId and si.aura.target then
-				for filter, auraList in pairs(si.aura.target) do
+			for _, auraTarget in ipairs(SPELLCAST_AURA_ORDER) do
+				for filter, auraList in pairs(si.aura[auraTarget]) do
 					for auraId, spellData in pairs(auraList) do
 						local tokenIterator, value
 						if strfind(spellData, ",") then
@@ -284,24 +288,9 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 							break
 						end
 					end
+					if spellcast.auraId then break end
 				end
-			end
-			if not spellcast.auraId and si.aura.player then
-				for filter, auraList in pairs(si.aura.player) do
-					for auraId, spellData in pairs(auraList) do
-						local tokenIterator = gmatch(spellData, "[^,]+")
-						local value = tokenIterator()
-						if value == "extend" then
-							-- Skip the number of seconds to extend the aura.
-							tokenIterator()
-						end
-						local verified = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
-						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
-							spellcast.auraId = auraId
-							break
-						end
-					end
-				end
+				if spellcast.auraId then break end
 			end
 		end
 
