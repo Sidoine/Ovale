@@ -1177,76 +1177,34 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 	local unitId = OvaleGUID:GetUnitId(guid)
 	for filter, filterInfo in pairs(auraList) do
 		for auraId, spellData in pairs(filterInfo) do
-			--[[
-				For lists described by SpellAddBuff(), etc., use the following interpretation:
-					auraId=count,N		N is number of stacks to be set
-					auraId=extend,N		aura is extended by N seconds, no change to stacks
-					auraId=refresh		aura is refreshed, no change to stacks
-					auraId=refresh_keep_snapshot
-										aura is refreshed and the snapshot is carried over from the previous aura.
-					auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
-					auraId=N, N > 0		N is number of stacks added
-					auraId=0			aura is removed
-					auraId=N, N < 0		N is number of stacks of aura removed
-			--]]
 			local si = OvaleData.spellInfo[auraId]
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
-			local stacks = 1
 
-			local count
+			local stacks = 1
+			local count = nil
 			local extend = 0
 			local refresh = false
 			local keepSnapshot = false
 
-			local tokenIterator, value
-			if strfind(spellData, ",") then
-				-- Lexer for spellData as comma-separated values.
-				tokenIterator = gmatch(spellData, "[^,]+")
-				value = tokenIterator()
-			else
-				value = spellData
-			end
-
-			-- Set stacks and refresh based on spellData.
+			local verified, value, data = state:CheckSpellAuraData(auraId, spellData, atTime, unitId)
 			if value == "refresh" then
 				refresh = true
 			elseif value == "refresh_keep_snapshot" then
 				refresh = true
 				keepSnapshot = true
 			elseif value == "count" then
-				local N = tokenIterator and tokenIterator() or nil
-				if N then
-					count = tonumber(N)
-				else
-					Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing final stack count.", auraId, spellData, value)
-				end
+				count = data
 			elseif value == "extend" then
-				local seconds = tokenIterator and tokenIterator() or nil
-				if seconds then
-					extend = tonumber(seconds)
-				else
-					Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing duration.", auraId, spellData, value)
-				end
+				extend = data
 			else
-				value = tonumber(value)
-				if value then
-					stacks = value
-					-- Deprecated after transition.
-					if not (si and si.duration) and value > 0 then
-						-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
-						Ovale:OneTimeMessage("Warning: '%s=%d' is deprecated for spell ID %d; aura ID %s should have duration information.", auraId, value, spellId, auraId)
-						duration = value
-						stacks = 1
-					end
+				stacks = value
+				-- Deprecated after transition.
+				if not (si and si.duration) and value > 0 then
+					-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
+					Ovale:OneTimeMessage("Warning: '%s=%d' is deprecated for spell ID %d; aura ID %s should have duration information.", auraId, value, spellId, auraId)
+					duration = value
+					stacks = 1
 				end
-			end
-
-			-- Verify any run-time requirements for this aura.
-			local verified
-			if tokenIterator then
-				verified = state:CheckRequirements(spellId, atTime, tokenIterator, unitId)
-			else
-				verified = true
 			end
 			if verified then
 				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)

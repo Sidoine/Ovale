@@ -17,6 +17,7 @@ local format = string.format
 local gmatch = string.gmatch
 local type = type
 local pairs = pairs
+local strfind = string.find
 local tonumber = tonumber
 local INFINITY = math.huge
 
@@ -546,6 +547,58 @@ function OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
 	return true
 end
 
+--[[
+	For spell aura lists described by SpellAddBuff(), etc., use the following interpretation:
+		auraId=count,N		N is number of stacks to be set
+		auraId=extend,N		aura is extended by N seconds, no change to stacks
+		auraId=refresh		aura is refreshed, no change to stacks
+		auraId=refresh_keep_snapshot
+							aura is refreshed and the snapshot is carried over from the previous aura.
+		auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
+		auraId=N, N > 0		N is number of stacks added
+		auraId=0			aura is removed
+		auraId=N, N < 0		N is number of stacks of aura removed
+
+	NOTE: Mirrored in statePrototype below.
+--]]
+function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
+	target = target or "player"
+	local tokenIterator, value, data
+	if strfind(spellData, ",") then
+		-- Lexer for spellData as comma-separated values.
+		tokenIterator = gmatch(spellData, "[^,]+")
+		value = tokenIterator()
+	else
+		value = spellData
+	end
+	if value == "count" then
+		-- Advance past the number of stacks of the aura.
+		local N = tokenIterator and tokenIterator() or nil
+		if N then
+			data = tonumber(N)
+		else
+			Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing final stack count.", auraId, spellData, value)
+		end
+	elseif value == "extend" then
+		-- Advance past the number of seconds to extend the aura.
+		local seconds = tokenIterator and tokenIterator() or nil
+		if seconds then
+			data = tonumber(seconds)
+		else
+			Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing duration.", auraId, spellData, value)
+		end
+	else
+		local asNumber = tonumber(value)
+		value = asNumber or value
+	end
+	-- Verify any run-time requirements for this aura.
+	local verified = true
+	if tokenIterator then
+		verified = self:CheckRequirements(auraId, atTime, tokenIterator, target)
+	end
+	return verified, value, data
+end
+
 -- Check "run-time" requirements specified in SpellInfo().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:CheckSpellInfo(spellId, atTime, target)
@@ -679,6 +732,7 @@ local statePrototype = OvaleData.statePrototype
 --<state-methods>
 -- Mirrored methods.
 statePrototype.CheckRequirements = OvaleData.CheckRequirements
+statePrototype.CheckSpellAuraData = OvaleData.CheckSpellAuraData
 statePrototype.CheckSpellInfo = OvaleData.CheckSpellInfo
 statePrototype.GetSpellInfoProperty = OvaleData.GetSpellInfoProperty
 --</state-methods>

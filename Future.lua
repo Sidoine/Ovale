@@ -257,29 +257,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 			for _, auraTarget in ipairs(SPELLCAST_AURA_ORDER) do
 				for filter, auraList in pairs(si.aura[auraTarget]) do
 					for auraId, spellData in pairs(auraList) do
-						local tokenIterator, value
-						if strfind(spellData, ",") then
-							tokenIterator = gmatch(spellData, "[^,]+")
-							value = tokenIterator()
-						else
-							value = spellData
-						end
-						if value == "extend" then
-							-- Advance past the number of seconds to extend the aura.
-							local seconds = tokenIterator and tokenIterator() or nil
-							if not seconds then
-								Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing duration.", auraId, spellData, value)
-							end
-						else
-							local asNumber = tonumber(value)
-							value = asNumber or value
-						end
-						local verified
-						if tokenIterator then
-							verified = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
-						else
-							verified = true
-						end
+						local verified, value, data = OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
 						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							if target ~= "player" then
@@ -290,7 +268,10 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 					end
 					if spellcast.auraId then break end
 				end
-				if spellcast.auraId then break end
+				if spellcast.auraId then
+					TracePrintf(spellId, "    QueueSpellcast: %s (%d) waiting on aura %d on %s.", spellName, spellId, spellcast.auraId, auraTarget)
+					break
+				end
 			end
 		end
 
