@@ -1634,6 +1634,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "ROGUE" and action == "premeditation" then
+			-- Don't suggest Premeditation if already at the combo point cap.
+			conditionCode = "ComboPoints() < 5"
 		elseif class == "ROGUE" and specialization == "combat" and action == "slice_and_dice" then
 			-- Don't suggest Slice and Dice if a more powerful buff is already in effect.
 			local buffName = "slice_and_dice_buff"
