@@ -271,6 +271,7 @@ local function OvaleIcon_OnMouseUp(self)
 	self:SetChecked(true)
 end
 
+-- GLOBALS: OvaleIcon_OnEnter
 function OvaleIcon_OnEnter(self)
 	if self.help or self.actionType or HasScriptControls() then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
@@ -297,12 +298,14 @@ function OvaleIcon_OnEnter(self)
 	end
 end
 
+-- GLOBALS: OvaleIcon_OnLeave
 function OvaleIcon_OnLeave(self)
 	if self.help or HasScriptControls() then
 		GameTooltip:Hide()
 	end
 end
 
+-- GLOBALS: OvaleIcon_OnLoad
 function OvaleIcon_OnLoad(self)
 	local name = self:GetName()
 	local profile = Ovale.db.profile

@@ -86,6 +86,12 @@ end
 --</private-static-methods>
 
 --<public-static-methods>
+-- GLOBALS: BINDING_HEADER_OVALE
+-- GLOBALS: BINDING_NAME_OVALE_CHECKBOX0
+-- GLOBALS: BINDING_NAME_OVALE_CHECKBOX1
+-- GLOBALS: BINDING_NAME_OVALE_CHECKBOX2
+-- GLOBALS: BINDING_NAME_OVALE_CHECKBOX3
+-- GLOBALS: BINDING_NAME_OVALE_CHECKBOX4
 function Ovale:OnInitialize()
 	-- Register message prefix for the addon.
 	API_RegisterAddonMessagePrefix(self.MSG_PREFIX)

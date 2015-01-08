@@ -32,6 +32,7 @@
 --]]--------------------------------------------------------------------
 
 -- Globally-accessible module table.
+-- GLOBALS: WoWMock
 WoWMock = {}
 
 --<private-static-properties>
