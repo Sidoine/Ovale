@@ -4121,6 +4121,13 @@ function OvaleSimulationCraft:ParseProfile(simc)
 			profile[k] = tconcat(v)
 		end
 	end
+	-- Create list of text templates: $(variable)=content
+	profile.templates = {}
+	for k, v in pairs(profile) do
+		if strsub(k, 1, 2) == "$(" and strsub(k, -1) == ")" then
+			tinsert(profile.templates, k)
+		end
+	end
 	-- Parse the action lists.
 	local ok = true
 	local annotation = {}
@@ -4130,6 +4137,14 @@ function OvaleSimulationCraft:ParseProfile(simc)
 		if ok and strmatch(k, "^actions") then
 			-- Name the default action list "_default" so it's first alphabetically.
 			local name = strmatch(k, "^actions%.([%w_]+)") or "_default"
+			-- Substitute for any text templates found in the action list.
+			-- Assumes that a text template will only use previously defined text templates.
+			for index = #profile.templates, 1, -1 do
+				local template = profile.templates[index]
+				local variable = strsub(template, 3, -2)
+				local pattern = "%$%(" .. variable .. "%)"
+				v = gsub(v, pattern, profile[template])
+			end
 			local node
 			ok, node = ParseActionList(name, v, nodeList, annotation)
 			if ok then
