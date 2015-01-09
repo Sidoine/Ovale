@@ -34,22 +34,22 @@ Features
 FAQ
 ===
 
-##### How closely are the default scripts based on [SimulationCraft][]?
+#### How closely are the default scripts based on [SimulationCraft][]?
 The [SimulationCraft][] APL language and the [Ovale][] script language are functionally very similar and concepts from one can be translated into the other in a very direct and mechanical way.  For all intents and purposes, the default scripts **are** the [SimulationCraft][] APLs imported into the game and displayed visually.  [Ovale][] tracks the latest [SimulationCraft][] profiles for the latest raid content, and as APLs are updated in [SimulationCraft][], they are mirrored fairly quickly in the default scripts.
 
-##### Why is the key binding displayed for an action wrong?
+#### Why is the key binding displayed for an action wrong?
 You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.
 
-##### Why is the icon sometimes red?
+#### Why is the icon sometimes red?
 The cooldown that is displayed in an icon is not always the true action cooldown.  If this cooldown is longer than the action cooldown, then the icon is red.  In most cases, it means that if you use this action too soon, then you will overwrite or clip a DoT, which may not be what you want.
 
-##### How do I make the spells flash on the action bar?
+#### How do I make the spells flash on the action bar?
 Simply install [SpellFlashCore][] (included if you install [SpellFlash][]) and [Ovale][] will use it to flash the spell to cast on the action bar in addition to displaying the spell in the Ovale icon bar.
 
-##### Why can't I click on the icon to cast the spell?
+#### Why can't I click on the icon to cast the spell?
 Blizzard does not allow this.  Only a predefined sequence of spells can be bound to an action icon and this sequence can not change in combat.
 
-##### On my low-level character, there is nothing at all.
+#### On my low-level character, there is nothing at all.
 You need to reach level 10 and choose a specialization.  However, be aware that the default [Ovale][] scripts are tuned for max-level characters and you may be missing key abilities at low levels that are assumed to exist.  If the default script is not working for you, you will need to find or write a script more appropriate for your character's level.
 
   [Corruption]: http://www.wowhead.com/spell=172
