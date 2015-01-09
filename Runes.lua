@@ -445,11 +445,7 @@ statePrototype.RuneCount = function(state, name, includeDeath, atTime)
 		-- Match only the runes of the given type.
 		for _, slot in ipairs(RUNE_SLOTS[runeType]) do
 			local rune = state.rune[slot]
-			local matched = (rune.type == runeType)
-			if includeDeath == nil then
-				matched = matched or rune.type == DEATH_RUNE
-			end
-			if matched then
+			if rune.type == runeType or (includeDeath == nil and rune.type == DEATH_RUNE) then
 				if rune:IsActiveRune(atTime) then
 					count = count + 1
 				elseif rune.endCooldown < endCooldown then
