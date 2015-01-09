@@ -34,8 +34,8 @@ Features
 FAQ
 ===
 
-##### Why does Ovale update so often?
-[Ovale][] tracks the latest [SimulationCraft][] profiles for the latest raid content, and as action priority lists are updated in [SimulationCraft][], they are mirrored fairly quickly in the [Ovale][] default scripts.
+##### How closely are the default scripts based on [SimulationCraft][]?
+The [SimulationCraft][] APL language and the [Ovale][] script language are functionally very similar and concepts from one can be translated into the other in a very direct and mechanical way.  For all intents and purposes, the default scripts **are** the [SimulationCraft][] APLs imported into the game and displayed visually.  [Ovale][] tracks the latest [SimulationCraft][] profiles for the latest raid content, and as APLs are updated in [SimulationCraft][], they are mirrored fairly quickly in the default scripts.
 
 ##### Why is the key binding displayed for an action wrong?
 You may be running an action bar addon, e.g., Bartender4, etc., that does not use the Blizzard action bar frames.
