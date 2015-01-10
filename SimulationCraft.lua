@@ -3155,8 +3155,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- TODO: "mind_harvest" on the current target is 0 if no Mind Blast has been cast on the target yet.
 		code = "0"
 	elseif class == "PRIEST" and operand == "primary_target" then
-		-- TODO: "primary_target" is 1 if the current target is the "main/boss" target.
-		code = "0"
+		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
+		code = "1"
 	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.remains" then
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
 		code = "BuffRemaining(honor_among_thieves_cooldown_buff)"
