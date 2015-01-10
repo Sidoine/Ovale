@@ -2241,7 +2241,7 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		local debuffName = action .. "_debuff"
 		AddSymbol(annotation, debuffName)
 		local expressionCode = OvaleAST:Unparse(Emit(parseNode, nodeList, annotation, action))
-		code = format("DebuffCountOnAny(%s) <= Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
+		code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
 	elseif modifier == "max_energy" then
 		local value = tonumber(Unparse(parseNode))
 		if value == 1 then
