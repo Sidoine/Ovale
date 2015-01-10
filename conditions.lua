@@ -3142,6 +3142,29 @@ do
 end
 
 do
+	--- Check whether the target has the hidden Glyph of Mind Harvest debuff.
+	-- @name MindHarvest
+	-- @paramsig number
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return 1 if the debuff is present, or 0 otherwise.
+	-- @usage
+	-- if target.MindHarvest() == 0 Spell(mind_blast)
+
+	local GLYPH_OF_MIND_HARVEST_DEBUFF = 162532
+
+	local function MindHarvest(condition, state, atTime)
+		local target = ParseCondition(condition, state)
+		local aura = state:GetAura(target, GLYPH_OF_MIND_HARVEST_DEBUFF, "HARMFUL", true)
+		local value = state:IsActiveAura(aura, atTime) and 1 or 0
+		return 0, INFINITY, value, 0, 0
+	end
+
+	OvaleCondition:RegisterCondition("mindharvest", false, MindHarvest)
+end
+
+do
 	--- Test whether the target's name matches the given name.
 	-- @name Name
 	-- @paramsig boolean

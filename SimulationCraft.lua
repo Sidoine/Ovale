@@ -3152,8 +3152,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = format("BuffPresent(%s)", buffName)
 		AddSymbol(annotation, buffName)
 	elseif class == "PRIEST" and operand == "mind_harvest" then
-		-- TODO: "mind_harvest" on the current target is 0 if no Mind Blast has been cast on the target yet.
-		code = "0"
+		code = "target.MindHarvest()"
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
 		code = "1"
