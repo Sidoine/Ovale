@@ -40,7 +40,7 @@ AddFunction InterruptActions
 AddFunction HolyDefaultMainActions
 {
 	#shadow_word_pain,cycle_targets=1,max_cycle_targets=5,if=miss_react&!ticking
-	if DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	if DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
 	#power_word_solace
 	Spell(power_word_solace)
 	#mind_sear,if=active_enemies>=4
@@ -55,7 +55,7 @@ AddFunction HolyDefaultMainActions
 
 AddFunction HolyDefaultShortCdActions
 {
-	unless DebuffCountOnAny(shadow_word_pain_debuff) <= Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or Spell(power_word_solace) or Enemies() >= 4 and Spell(mind_sear) or Spell(holy_fire) or Spell(smite)
+	unless DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or Spell(power_word_solace) or Enemies() >= 4 and Spell(mind_sear) or Spell(holy_fire) or Spell(smite)
 	{
 		#holy_word,moving=1
 		if Speed() > 0 Spell(holy_word)
