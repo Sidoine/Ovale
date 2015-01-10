@@ -66,6 +66,7 @@ DataBroker.lua
 Eclipse.lua
 Enemies.lua
 HonorAmongThieves.lua
+MindHarvest.lua
 PassiveAura.lua
 Recount.lua
 ShadowWordDeath.lua
