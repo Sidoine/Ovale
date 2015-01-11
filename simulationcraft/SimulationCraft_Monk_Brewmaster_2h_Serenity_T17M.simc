@@ -18,6 +18,7 @@ spec=brewmaster
 
 actions.precombat=flask,type=greater_draenic_stamina_flask
 actions.precombat+=/food,type=talador_surf_and_turf
+actions.precombat+=/legacy_of_the_white_tiger,if=!aura.str_agi_int.up
 actions.precombat+=/stance,choose=sturdy_ox
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
@@ -27,6 +28,9 @@ actions.precombat+=/dampen_harm
 # Executed every time the actor is available.
 
 actions=auto_attack
+actions+=/touch_of_death,if=target.health<health
+actions+=/spear_hand_strike
+actions+=/nimble_brew
 actions+=/blood_fury,if=energy<=40
 actions+=/berserking,if=energy<=40
 actions+=/arcane_torrent,if=energy<=40
