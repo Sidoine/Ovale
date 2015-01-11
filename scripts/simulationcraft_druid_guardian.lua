@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Druid_Guardian_T17M"
+	local name = "simulationcraft_druid_guardian_t17m"
 	local desc = "[6.0] SimulationCraft: Druid_Guardian_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Druid_Guardian_T17M".
@@ -13,6 +13,9 @@ do
 Include(ovale_common)
 Include(ovale_druid_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
+
 AddFunction UseItemActions
 {
 	Item(HandSlot usable=1)
@@ -22,7 +25,7 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
 	{
 		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -31,7 +34,7 @@ AddFunction GetInMeleeRange
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(skull_bash) Spell(skull_bash)
 		if not target.Classification(worldboss)
@@ -72,6 +75,8 @@ AddFunction GuardianDefaultMainActions
 
 AddFunction GuardianDefaultShortCdActions
 {
+	#auto_attack
+	GetInMeleeRange()
 	#savage_defense,if=buff.barkskin.down
 	if BuffExpires(barkskin_buff) Spell(savage_defense)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
@@ -82,7 +87,6 @@ AddFunction GuardianDefaultShortCdActions
 
 AddFunction GuardianDefaultCdActions
 {
-	#auto_attack
 	#skull_bash
 	InterruptActions()
 	#blood_fury

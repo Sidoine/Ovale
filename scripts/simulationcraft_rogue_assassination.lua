@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Rogue_Assassination_T17M"
+	local name = "simulationcraft_rogue_assassination_t17m"
 	local desc = "[6.0] SimulationCraft: Rogue_Assassination_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Rogue_Assassination_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 
 AddFunction UsePotionAgility
@@ -30,7 +32,7 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(kick)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
 		Spell(shadowstep)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -39,7 +41,7 @@ AddFunction GetInMeleeRange
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(kick) Spell(kick)
 		if not target.Classification(worldboss)
@@ -95,6 +97,8 @@ AddFunction AssassinationDefaultShortCdActions
 {
 	#vanish,if=time>10&!buff.stealth.up
 	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
+	#auto_attack
+	GetInMeleeRange()
 
 	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice)
 	{

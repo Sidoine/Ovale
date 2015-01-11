@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Priest_Discipline_T17M_Dmg"
+	local name = "simulationcraft_priest_discipline_t17m_dmg"
 	local desc = "[6.0] SimulationCraft: Priest_Discipline_T17M_Dmg"
 	local code = [[
 # Based on SimulationCraft profile "Priest_Discipline_T17M_Dmg".
@@ -14,6 +14,7 @@ do
 Include(ovale_common)
 Include(ovale_priest_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 
 AddFunction UsePotionIntellect
@@ -23,7 +24,7 @@ AddFunction UsePotionIntellect
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(silence)
 		if not target.Classification(worldboss)
@@ -59,6 +60,8 @@ AddFunction DisciplineDefaultMainActions
 
 AddFunction DisciplineDefaultCdActions
 {
+	#silence
+	InterruptActions()
 	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
 	#mindbender,if=talent.mindbender.enabled

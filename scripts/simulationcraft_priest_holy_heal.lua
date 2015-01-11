@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Priest_Holy_T17M_Heal"
+	local name = "simulationcraft_priest_holy_t17m_heal"
 	local desc = "[6.0] SimulationCraft: Priest_Holy_T17M_Heal"
 	local code = [[
 # Based on SimulationCraft profile "Priest_Holy_T17M_Heal".
@@ -14,6 +14,7 @@ do
 Include(ovale_common)
 Include(ovale_priest_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default)
 
@@ -29,7 +30,7 @@ AddFunction UsePotionMana
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(silence)
 		if not target.Classification(worldboss)
@@ -80,6 +81,8 @@ AddFunction HolyDefaultShortCdActions
 
 AddFunction HolyDefaultCdActions
 {
+	#silence
+	InterruptActions()
 	#mana_potion,if=mana.pct<=75
 	if ManaPercent() <= 75 UsePotionMana()
 	#blood_fury

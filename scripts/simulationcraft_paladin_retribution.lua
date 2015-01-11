@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Paladin_Retribution_T17M"
+	local name = "simulationcraft_paladin_retribution_t17m"
 	local desc = "[6.0] SimulationCraft: Paladin_Retribution_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Paladin_Retribution_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
 
@@ -31,12 +33,12 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(rebuke) Spell(rebuke)
 		if not target.Classification(worldboss)
@@ -75,6 +77,7 @@ AddFunction RetributionDefaultMainActions
 AddFunction RetributionDefaultShortCdActions
 {
 	#auto_attack
+	GetInMeleeRange()
 	#speed_of_light,if=movement.distance>5
 	if 0 > 5 Spell(speed_of_light)
 
@@ -101,11 +104,11 @@ AddFunction RetributionDefaultCdActions
 		#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
 		if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
 		#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
-		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(holy_avenger)
+		if Spell(seraphim) and Talent(seraphim_talent) Spell(holy_avenger)
 		#holy_avenger,if=holy_power<=2&!talent.seraphim.enabled
 		if HolyPower() <= 2 and not Talent(seraphim_talent) Spell(holy_avenger)
 		#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
-		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(avenging_wrath_melee)
+		if Spell(seraphim) and Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#avenging_wrath,if=!talent.seraphim.enabled
 		if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#blood_fury
@@ -168,7 +171,7 @@ AddFunction RetributionCleaveMainActions
 	#exorcism,if=glyph.mass_exorcism.enabled&holy_power<5
 	if Glyph(glyph_of_mass_exorcism) and HolyPower() < 5 Spell(exorcism)
 	#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&holy_power<5
-	if Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment)
+	if Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment text=double)
 	#judgment,if=holy_power<5
 	if HolyPower() < 5 Spell(judgment)
 	#exorcism,if=holy_power<5
@@ -254,7 +257,7 @@ AddFunction RetributionSingleMainActions
 	#divine_storm,if=buff.divine_crusader.react&(buff.avenging_wrath.up|target.health.pct<35)&!talent.final_verdict.enabled
 	if BuffPresent(divine_crusader_buff) and { BuffPresent(avenging_wrath_melee_buff) or target.HealthPercent() < 35 } and not Talent(final_verdict_talent) Spell(divine_storm)
 	#judgment,cycle_targets=1,if=last_judgment_target!=target&glyph.double_jeopardy.enabled&holy_power<5
-	if True(last_judgement_target) and Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment)
+	if BuffPresent(glyph_of_double_jeopardy_buff) and Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment text=double)
 	#exorcism,if=glyph.mass_exorcism.enabled&active_enemies>=2&holy_power<5&!glyph.double_jeopardy.enabled
 	if Glyph(glyph_of_mass_exorcism) and Enemies() >= 2 and HolyPower() < 5 and not Glyph(glyph_of_double_jeopardy) Spell(exorcism)
 	#judgment,,if=holy_power<5
@@ -351,6 +354,7 @@ AddIcon specialization=retribution help=cd checkbox=opt_paladin_retribution_aoe
 # final_verdict_talent
 # fist_of_justice
 # glyph_of_double_jeopardy
+# glyph_of_double_jeopardy_buff
 # glyph_of_mass_exorcism
 # hammer_of_justice
 # hammer_of_the_righteous

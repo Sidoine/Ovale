@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Monk_Brewmaster_2h_CE_T17M"
+	local name = "simulationcraft_monk_brewmaster_2h_ce_t17m"
 	local desc = "[6.0] SimulationCraft: Monk_Brewmaster_2h_CE_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Monk_Brewmaster_2h_CE_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
 
@@ -22,9 +24,14 @@ AddFunction UsePotionArmor
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
 		if not target.Classification(worldboss)
@@ -54,6 +61,10 @@ AddFunction BrewmasterDefaultMainActions
 
 AddFunction BrewmasterDefaultShortCdActions
 {
+	#auto_attack
+	GetInMeleeRange()
+	#touch_of_death,if=target.health<health
+	if target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 	if BuffStacks(elusive_brew_stacks_buff) >= 9 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#serenity,if=talent.serenity.enabled&cooldown.keg_smash.remains>6
@@ -66,24 +77,30 @@ AddFunction BrewmasterDefaultShortCdActions
 
 AddFunction BrewmasterDefaultCdActions
 {
-	#auto_attack
-	#blood_fury,if=energy<=40
-	if Energy() <= 40 Spell(blood_fury_apsp)
-	#berserking,if=energy<=40
-	if Energy() <= 40 Spell(berserking)
-	#arcane_torrent,if=energy<=40
-	if Energy() <= 40 Spell(arcane_torrent_chi)
-	#gift_of_the_ox,if=buff.gift_of_the_ox.react&incoming_damage_1500ms
-	#diffuse_magic,if=incoming_damage_1500ms&buff.fortifying_brew.down
-	if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(diffuse_magic)
-	#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
-	#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
-	if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
-	#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
-	if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
-	#potion,name=draenic_armor,if=(buff.fortifying_brew.down&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down)
-	if BuffExpires(fortifying_brew_buff) and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) UsePotionArmor()
+	unless target.Health() < Health() and BuffPresent(death_note_buff) and Spell(touch_of_death)
+	{
+		#spear_hand_strike
+		InterruptActions()
+		#nimble_brew
+		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
+		#blood_fury,if=energy<=40
+		if Energy() <= 40 Spell(blood_fury_apsp)
+		#berserking,if=energy<=40
+		if Energy() <= 40 Spell(berserking)
+		#arcane_torrent,if=energy<=40
+		if Energy() <= 40 Spell(arcane_torrent_chi)
+		#gift_of_the_ox,if=buff.gift_of_the_ox.react&incoming_damage_1500ms
+		#diffuse_magic,if=incoming_damage_1500ms&buff.fortifying_brew.down
+		if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(diffuse_magic)
+		#dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down&buff.elusive_brew_activated.down
+		if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) Spell(dampen_harm)
+		#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
+		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
+		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
+		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
+		#potion,name=draenic_armor,if=(buff.fortifying_brew.down&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down)
+		if BuffExpires(fortifying_brew_buff) and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) UsePotionArmor()
+	}
 }
 
 ### actions.aoe
@@ -148,13 +165,15 @@ AddFunction BrewmasterPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
 	#food,type=talador_surf_and_turf
+	#legacy_of_the_white_tiger,if=!aura.str_agi_int.up
+	if not BuffPresent(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=sturdy_ox
 	Spell(stance_of_the_sturdy_ox)
 }
 
 AddFunction BrewmasterPrecombatCdActions
 {
-	unless Spell(stance_of_the_sturdy_ox)
+	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
@@ -268,6 +287,7 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 # chi_wave
 # dampen_harm
 # dampen_harm_buff
+# death_note_buff
 # diffuse_magic
 # diffuse_magic_buff
 # draenic_armor_potion
@@ -283,7 +303,9 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 # invoke_xuen_talent
 # jab
 # keg_smash
+# legacy_of_the_white_tiger
 # moderate_stagger_debuff
+# nimble_brew
 # paralysis
 # purifying_brew
 # quaking_palm
@@ -296,6 +318,7 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 # spear_hand_strike
 # stance_of_the_sturdy_ox
 # tiger_palm
+# touch_of_death
 # war_stomp
 # zen_sphere
 # zen_sphere_buff

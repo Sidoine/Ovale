@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Rogue_Combat_T17M"
+	local name = "simulationcraft_rogue_combat_t17m"
 	local desc = "[6.0] SimulationCraft: Rogue_Combat_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Rogue_Combat_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 
@@ -31,7 +33,7 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(kick)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
 		Spell(shadowstep)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -40,7 +42,7 @@ AddFunction GetInMeleeRange
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(kick) Spell(kick)
 		if not target.Classification(worldboss)
@@ -75,6 +77,8 @@ AddFunction CombatDefaultShortCdActions
 
 	unless Spell(ambush)
 	{
+		#auto_attack
+		GetInMeleeRange()
 		#vanish,if=time>10&(combo_points<3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<90&energy>=15)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
 		if TimeInCombat() > 10 and { ComboPoints() < 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and { Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 90 and Energy() >= 15 or Talent(subterfuge_talent) and Energy() >= 90 or not Talent(shadow_focus_talent) and not Talent(subterfuge_talent) and Energy() >= 60 } Spell(vanish)
 

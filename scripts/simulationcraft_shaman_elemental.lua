@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Shaman_Elemental_T17M"
+	local name = "simulationcraft_shaman_elemental_t17m"
 	local desc = "[6.0] SimulationCraft: Shaman_Elemental_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Shaman_Elemental_T17M".
@@ -14,6 +14,7 @@ do
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
 
@@ -33,7 +34,7 @@ AddFunction Bloodlust
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(wind_shear)
 		if not target.Classification(worldboss)

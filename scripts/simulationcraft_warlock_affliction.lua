@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warlock_Affliction_T17M"
+	local name = "simulationcraft_warlock_affliction_t17m"
 	local desc = "[6.0] SimulationCraft: Warlock_Affliction_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warlock_Affliction_T17M".

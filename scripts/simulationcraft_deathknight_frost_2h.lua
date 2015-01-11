@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Death_Knight_Frost_2h_T17M"
+	local name = "simulationcraft_death_knight_frost_2h_t17m"
 	local desc = "[6.0] SimulationCraft: Death_Knight_Frost_2h_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Death_Knight_Frost_2h_T17M".
@@ -13,6 +13,8 @@ do
 Include(ovale_common)
 Include(ovale_deathknight_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
@@ -27,9 +29,14 @@ AddFunction UseItemActions
 	Item(Trinket1Slot usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(mind_freeze) Spell(mind_freeze)
 		if not target.Classification(worldboss)
@@ -56,6 +63,7 @@ AddFunction FrostTwoHanderDefaultMainActions
 AddFunction FrostTwoHanderDefaultShortCdActions
 {
 	#auto_attack
+	GetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -70,6 +78,8 @@ AddFunction FrostTwoHanderDefaultShortCdActions
 
 AddFunction FrostTwoHanderDefaultCdActions
 {
+	#mind_freeze
+	InterruptActions()
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
 	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) UsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up

@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Gladiator_T17M"
+	local name = "simulationcraft_warrior_gladiator_t17m"
 	local desc = "[6.0] SimulationCraft: Warrior_Gladiator_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Gladiator_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 
 AddFunction UsePotionArmor
@@ -23,12 +25,17 @@ AddFunction UsePotionArmor
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
@@ -45,7 +52,6 @@ AddFunction InterruptActions
 
 AddFunction ProtectionGladiatorDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementMainActions()
 	#call_action_list,name=single,if=active_enemies=1
@@ -59,6 +65,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
 	#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
@@ -79,6 +86,8 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 
 AddFunction ProtectionGladiatorDefaultCdActions
 {
+	#pummel
+	InterruptActions()
 	#avatar
 	Spell(avatar)
 	#bloodbath
@@ -154,13 +163,17 @@ AddFunction ProtectionGladiatorPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
 	#stance,choose=gladiator
 	Spell(gladiator_stance)
 }
 
 AddFunction ProtectionGladiatorPrecombatCdActions
 {
-	unless Spell(gladiator_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
@@ -238,6 +251,7 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 # arcane_torrent_rage
 # avatar
 # avatar_buff
+# battle_shout
 # berserker_rage
 # berserking
 # bladestorm
@@ -246,6 +260,7 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 # bloodbath_buff
 # bloodbath_talent
 # charge
+# commanding_shout
 # deep_wounds_debuff
 # devastate
 # draenic_armor_potion

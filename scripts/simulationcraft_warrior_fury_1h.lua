@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Fury_1h_T17M"
+	local name = "simulationcraft_warrior_fury_1h_t17m"
 	local desc = "[6.0] SimulationCraft: Warrior_Fury_1h_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Fury_1h_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
@@ -23,12 +25,17 @@ AddFunction UsePotionStrength
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
@@ -45,7 +52,6 @@ AddFunction InterruptActions
 
 AddFunction FurySingleMindedFuryDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementMainActions()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -65,6 +71,7 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
@@ -85,6 +92,8 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
+	#pummel
+	InterruptActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -155,7 +164,7 @@ AddFunction FurySingleMindedFuryAoeCdActions
 	unless { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
 		#recklessness,sync=bladestorm
-		if not SpellCooldown(bladestorm) > 0 Spell(recklessness)
+		if not False(raid_event_adds_exists) and Spell(bladestorm) Spell(recklessness)
 	}
 }
 
@@ -181,13 +190,17 @@ AddFunction FurySingleMindedFuryPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
 	#stance,choose=battle
 	Spell(battle_stance)
 }
 
 AddFunction FurySingleMindedFuryPrecombatCdActions
 {
-	unless Spell(battle_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
@@ -378,6 +391,7 @@ AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 # anger_management_talent
 # arcane_torrent_rage
 # avatar
+# battle_shout
 # battle_stance
 # berserker_rage
 # berserking
@@ -389,6 +403,7 @@ AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 # bloodsurge_buff
 # bloodthirst
 # charge
+# commanding_shout
 # draenic_strength_potion
 # dragon_roar
 # execute

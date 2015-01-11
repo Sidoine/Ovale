@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Paladin_Holy_T17M"
+	local name = "simulationcraft_paladin_holy_t17m"
 	local desc = "[6.0] SimulationCraft: Paladin_Holy_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Paladin_Holy_T17M".
@@ -14,12 +14,30 @@ do
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
 
 AddFunction UsePotionMana
 {
 	if CheckBoxOn(opt_potion_mana) Item(draenic_mana_potion usable=1)
+}
+
+AddFunction InterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(rebuke) Spell(rebuke)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(fist_of_justice) Spell(fist_of_justice)
+			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
+			Spell(blinding_light)
+			Spell(arcane_torrent_holy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction RighteousFuryOff
@@ -51,7 +69,6 @@ AddFunction HolyDefaultMainActions
 
 AddFunction HolyDefaultShortCdActions
 {
-	#auto_attack
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
 }
@@ -60,6 +77,9 @@ AddFunction HolyDefaultCdActions
 {
 	#mana_potion,if=mana.pct<=75
 	if ManaPercent() <= 75 UsePotionMana()
+	#auto_attack
+	#rebuke
+	InterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -143,18 +163,24 @@ AddIcon specialization=holy help=cd checkbox=opt_paladin_holy_aoe
 # berserking
 # blessing_of_kings
 # blessing_of_might
+# blinding_light
 # blood_fury_apsp
 # draenic_mana_potion
+# fist_of_justice
 # flash_of_light
+# hammer_of_justice
 # holy_light
 # holy_shock
 # judgment
 # lay_on_hands
+# quaking_palm
+# rebuke
 # righteous_fury
 # seal_of_insight
 # selfless_healer_buff
 # selfless_healer_talent
 # speed_of_light
+# war_stomp
 # word_of_glory
 ]]
 	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "reference")

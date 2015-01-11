@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Protection_T17M"
+	local name = "simulationcraft_warrior_protection_t17m"
 	local desc = "[6.0] SimulationCraft: Warrior_Protection_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Protection_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 
 AddFunction UsePotionArmor
@@ -23,12 +25,17 @@ AddFunction UsePotionArmor
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
@@ -53,6 +60,8 @@ AddFunction ProtectionDefaultShortCdActions
 {
 	#charge
 	if target.InRange(charge) Spell(charge)
+	#auto_attack
+	GetInMeleeRange()
 	#berserker_rage,if=buff.enrage.down
 	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
 	#call_action_list,name=prot
@@ -61,7 +70,8 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
-	#auto_attack
+	#pummel
+	InterruptActions()
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up
@@ -78,13 +88,17 @@ AddFunction ProtectionPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
 	#food,type=blackrock_barbecue
+	#battle_shout,if=!aura.attack_power_multiplier.up&aura.stamina.up
+	if not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) Spell(battle_shout)
+	#commanding_shout,if=!aura.stamina.up
+	if not BuffPresent(stamina_buff any=1) Spell(commanding_shout)
 	#stance,choose=defensive
 	Spell(defensive_stance)
 }
 
 AddFunction ProtectionPrecombatCdActions
 {
-	unless Spell(defensive_stance)
+	unless not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
 	{
 		#snapshot_stats
 		#shield_wall
@@ -263,6 +277,7 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 # avatar
 # avatar_buff
 # avatar_talent
+# battle_shout
 # berserker_rage
 # berserking
 # bladestorm
@@ -271,6 +286,7 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 # bloodbath_buff
 # bloodbath_talent
 # charge
+# commanding_shout
 # deep_wounds_debuff
 # defensive_stance
 # demoralizing_shout

@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Hunter_BM_T17M"
+	local name = "simulationcraft_hunter_bm_t17m"
 	local desc = "[6.0] SimulationCraft: Hunter_BM_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Hunter_BM_T17M".
@@ -13,6 +13,7 @@ do
 Include(ovale_common)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
 
@@ -23,7 +24,7 @@ AddFunction UsePotionAgility
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(counter_shot)
 		if not target.Classification(worldboss)
@@ -100,6 +101,8 @@ AddFunction BeastMasteryDefaultShortCdActions
 AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
+	#counter_shot
+	InterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury

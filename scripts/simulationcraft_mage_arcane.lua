@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Mage_Arcane_T17M"
+	local name = "simulationcraft_mage_arcane_t17m"
 	local desc = "[6.0] SimulationCraft: Mage_Arcane_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Mage_Arcane_T17M".
@@ -14,6 +14,7 @@ do
 Include(ovale_common)
 Include(ovale_mage_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_time_warp SpellName(time_warp) default)
 
@@ -24,7 +25,7 @@ AddFunction UsePotionIntellect
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(counterspell)
 		if not target.Classification(worldboss)
@@ -351,14 +352,14 @@ AddFunction ArcanePrecombatShortCdActions
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance)
 	{
 		#snapshot_stats
-		#rune_of_power
-		Spell(rune_of_power)
+		#rune_of_power,if=buff.rune_of_power.remains<150
+		if TotemRemaining(rune_of_power) < 150 Spell(rune_of_power)
 	}
 }
 
 AddFunction ArcanePrecombatCdActions
 {
-	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(rune_of_power)
+	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
 	{
 		#mirror_image
 		Spell(mirror_image)

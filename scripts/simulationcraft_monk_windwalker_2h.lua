@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Monk_Windwalker_2h_T17M"
+	local name = "simulationcraft_monk_windwalker_2h_t17m"
 	local desc = "[6.0] SimulationCraft: Monk_Windwalker_2h_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Monk_Windwalker_2h_T17M".
@@ -13,6 +13,8 @@ do
 Include(ovale_common)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
 
@@ -21,9 +23,14 @@ AddFunction UsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
 		if not target.Classification(worldboss)
@@ -56,6 +63,9 @@ AddFunction WindwalkerDefaultMainActions
 
 AddFunction WindwalkerDefaultShortCdActions
 {
+	#auto_attack
+	GetInMeleeRange()
+
 	unless BuffRemaining(tiger_power_buff) < 6 and Spell(tiger_palm)
 	{
 		#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack=20
@@ -83,7 +93,10 @@ AddFunction WindwalkerDefaultShortCdActions
 
 AddFunction WindwalkerDefaultCdActions
 {
-	#auto_attack
+	#spear_hand_strike
+	InterruptActions()
+	#nimble_brew
+	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5
 	if Talent(invoke_xuen_talent) and TimeInCombat() > 5 Spell(invoke_xuen)
 	#chi_sphere,if=talent.power_strikes.enabled&buff.chi_sphere.react&chi<4
@@ -173,13 +186,15 @@ AddFunction WindwalkerPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
 	#food,type=rylak_crepes
+	#legacy_of_the_white_tiger,if=!aura.str_agi_int.up
+	if not BuffPresent(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=fierce_tiger
 	Spell(stance_of_the_fierce_tiger)
 }
 
 AddFunction WindwalkerPrecombatCdActions
 {
-	unless Spell(stance_of_the_fierce_tiger)
+	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
@@ -302,6 +317,8 @@ AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker_aoe
 # invoke_xuen
 # invoke_xuen_talent
 # jab
+# legacy_of_the_white_tiger
+# nimble_brew
 # paralysis
 # quaking_palm
 # rising_sun_kick

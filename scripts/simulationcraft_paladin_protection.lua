@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Paladin_Protection_T17M"
+	local name = "simulationcraft_paladin_protection_t17m"
 	local desc = "[6.0] SimulationCraft: Paladin_Protection_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Paladin_Protection_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
 
@@ -24,7 +26,24 @@ AddFunction UsePotionArmor
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction InterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(rebuke) Spell(rebuke)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(fist_of_justice) Spell(fist_of_justice)
+			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
+			Spell(blinding_light)
+			Spell(arcane_torrent_holy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction ProtectionRighteousFury
@@ -62,7 +81,7 @@ AddFunction ProtectionDefaultMainActions
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
 		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
-		if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
+		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -105,6 +124,7 @@ AddFunction ProtectionDefaultMainActions
 AddFunction ProtectionDefaultShortCdActions
 {
 	#auto_attack
+	GetInMeleeRange()
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
 	#run_action_list,name=max_dps,if=role.attack|0
@@ -131,7 +151,7 @@ AddFunction ProtectionDefaultShortCdActions
 		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			unless Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) and Spell(judgment) or Spell(judgment)
+			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment text=double) or Spell(judgment)
 			{
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
@@ -163,6 +183,8 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
+	#rebuke
+	InterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -203,7 +225,7 @@ AddFunction ProtectionMaxDpsMainActions
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
 		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
-		if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
+		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -257,7 +279,7 @@ AddFunction ProtectionMaxDpsShortCdActions
 		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			unless Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) and Spell(judgment) or Spell(judgment)
+			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment text=double) or Spell(judgment)
 			{
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
@@ -313,7 +335,7 @@ AddFunction ProtectionMaxSurvivalMainActions
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
 		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
-		if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
+		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
 		#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
@@ -367,7 +389,7 @@ AddFunction ProtectionMaxSurvivalShortCdActions
 		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			unless Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) and Spell(judgment) or Spell(judgment)
+			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment text=double) or Spell(judgment)
 			{
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
@@ -484,6 +506,7 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
 # berserking
 # blessing_of_kings
 # blessing_of_might
+# blinding_light
 # blood_fury_apsp
 # consecration
 # consecration_debuff
@@ -496,14 +519,17 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
 # eternal_flame
 # eternal_flame_buff
 # execution_sentence
+# fist_of_justice
 # flash_of_light
 # glyph_of_double_jeopardy
+# glyph_of_double_jeopardy_buff
 # glyph_of_final_wrath
 # glyph_of_focused_shield
 # glyph_of_harsh_words
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
+# hammer_of_justice
 # hammer_of_the_righteous
 # hammer_of_wrath
 # harsh_word
@@ -516,6 +542,7 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
 # liadrins_righteousness_buff
 # lights_hammer
 # maraads_truth_buff
+# quaking_palm
 # rebuke
 # righteous_fury
 # sacred_shield
@@ -533,6 +560,7 @@ AddIcon specialization=protection help=cd checkbox=opt_paladin_protection_aoe
 # shield_of_the_righteous_buff
 # speed_of_light
 # uthers_insight_buff
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "reference")
 end

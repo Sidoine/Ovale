@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Druid_Balance_T17M"
+	local name = "simulationcraft_druid_balance_t17m"
 	local desc = "[6.0] SimulationCraft: Druid_Balance_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Druid_Balance_T17M".

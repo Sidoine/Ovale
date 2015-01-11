@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "SimulationCraft: Warrior_Arms_T17M"
+	local name = "simulationcraft_warrior_arms_t17m"
 	local desc = "[6.0] SimulationCraft: Warrior_Arms_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Arms_T17M".
@@ -14,6 +14,8 @@ do
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
 
 AddFunction UsePotionStrength
@@ -23,12 +25,17 @@ AddFunction UsePotionStrength
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
@@ -45,7 +52,6 @@ AddFunction InterruptActions
 
 AddFunction ArmsDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementMainActions()
 	#call_action_list,name=single,if=active_enemies=1
@@ -59,6 +65,7 @@ AddFunction ArmsDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementShortCdActions()
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
@@ -71,6 +78,8 @@ AddFunction ArmsDefaultShortCdActions
 
 AddFunction ArmsDefaultCdActions
 {
+	#pummel
+	InterruptActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
 	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
@@ -159,13 +168,17 @@ AddFunction ArmsPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
+	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
 	#stance,choose=battle
 	Spell(battle_stance)
 }
 
 AddFunction ArmsPrecombatCdActions
 {
-	unless Spell(battle_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
@@ -266,6 +279,7 @@ AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
 ### Required symbols
 # arcane_torrent_rage
 # avatar
+# battle_shout
 # battle_stance
 # berserking
 # bladestorm
@@ -276,6 +290,7 @@ AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
 # charge
 # colossus_smash
 # colossus_smash_debuff
+# commanding_shout
 # draenic_strength_potion
 # dragon_roar
 # execute_arms
