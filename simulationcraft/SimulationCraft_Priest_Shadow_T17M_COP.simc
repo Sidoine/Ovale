@@ -17,13 +17,16 @@ spec=shadow
 # Executed before combat begins. Accepts non-harmful actions only.
 
 actions.precombat=flask,type=greater_draenic_intellect_flask
-actions.precombat+=/food,type=sleeper_surprise
+actions.precombat+=/food,type=blackrock_barbecue,if=talent.auspicious_spirits.enabled
+actions.precombat+=/food,type=frosty_stew,if=talent.void_entropy.enabled
+actions.precombat+=/food,type=sleeper_surprise,if=talent.clarity_of_power.enabled
 actions.precombat+=/power_word_fortitude,if=!aura.stamina.up
 actions.precombat+=/shadowform,if=!buff.shadowform.up
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion,name=draenic_intellect
-actions.precombat+=/mind_spike
+actions.precombat+=/mind_spike,if=talent.clarity_of_power.enabled
+actions.precombat+=/vampiric_touch,if=!talent.clarity_of_power.enabled
 
 # Executed every time the actor is available.
 
