@@ -1451,7 +1451,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 	local specialization = annotation.specialization
 	local action = Disambiguate(canonicalizedName, class, specialization)
 
-	if action == "auto_attack" or action == "auto_shot" then
+	if action == "auto_attack" and not annotation.melee then
+		-- skip
+	elseif action == "auto_shot" then
 		-- skip
 	elseif action == "choose_target" then
 		-- skip
@@ -1757,6 +1759,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local buffName = "raging_blow_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffPresent(%s)", buffName)
+		elseif action == "auto_attack" then
+			bodyCode = "GetInMeleeRange()"
+			isSpellAction = false
 		elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
 			if modifier.name then
 				local name = Unparse(modifier.name)
@@ -3415,6 +3420,19 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
+	if annotation.melee == "DEATHKNIGHT" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "plague_strike")
+		count = count + 1
+	end
 	if annotation.skull_bash == "DRUID" then
 		local code = [[
 			AddFunction InterruptActions
@@ -3565,6 +3583,19 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "spear_hand_strike")
 		AddSymbol(annotation, "war_stomp")
+		count = count + 1
+	end
+	if annotation.melee == "MONK" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "tiger_palm")
 		count = count + 1
 	end
 	if annotation.time_to_hpg_melee == "PALADIN" then
@@ -3777,6 +3808,19 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
+	if annotation.melee == "SHAMAN" then
+		local code = [[
+			AddFunction GetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "primal_strike")
+		count = count + 1
+	end
 	if annotation.bloodlust == "SHAMAN" then
 		local code = [[
 			AddFunction Bloodlust
@@ -3827,12 +3871,19 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction GetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range)
+				{
+					if target.InRange(charge) Spell(charge)
+					if target.InRange(charge) Spell(heroic_leap)
+					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "charge")
+		AddSymbol(annotation, "heroic_leap")
 		AddSymbol(annotation, "pummel")
 		count = count + 1
 	end
@@ -4022,7 +4073,7 @@ local function InsertSupportingControls(child, annotation)
 	end
 	if annotation.melee then
 		local code = [[
-			AddCheckBox(opt_melee_range L(not_in_melee_range) default)
+			AddCheckBox(opt_melee_range L(not_in_melee_range))
 		]]
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
