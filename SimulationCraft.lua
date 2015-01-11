@@ -1592,6 +1592,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MONK" and action == "gift_of_the_ox" then
 			-- skip
 			isSpellAction = false
+		elseif class == "MONK" and action == "nimble_brew" then
+			-- Only suggest Nimble Brew to break snares, roots, and stuns.
+			conditionCode = "IsFeared() or IsRooted() or IsStunned()"
 		elseif class == "MONK" and action == "touch_of_death" then
 			-- Touch of Death can only be used if the Death Note buff is present on the player.
 			local buffName = "death_note_buff"
