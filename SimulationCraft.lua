@@ -1484,6 +1484,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "DEATHKNIGHT" and action == "mind_freeze" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
+			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "DEATHKNIGHT" and action == "plague_leech" then
 			-- Plague Leech requires diseases to exist on the target.
@@ -1506,6 +1507,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "DRUID" and action == "skull_bash" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
+			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "DRUID" and action == "wild_charge" then
 			bodyCode = "GetInMeleeRange()"
@@ -1566,6 +1568,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "counterspell" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
+			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "MAGE" and strfind(action, "pet_") then
 			conditionCode = "pet.Present()"
@@ -1613,6 +1616,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "PALADIN" and action == "rebuke" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
+			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "PRIEST" and action == "insanity" then
 			local buffName = "shadow_word_insanity_buff"
@@ -1643,6 +1647,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "ROGUE" and action == "kick" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
+			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "ROGUE" and action == "premeditation" then
 			-- Don't suggest Premeditation if already at the combo point cap.
@@ -1683,6 +1688,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "SHAMAN" and action == "wind_shear" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
+			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "cancel_metamorphosis" then
 			local spellName = "metamorphosis"
@@ -3384,7 +3390,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(mind_freeze) Spell(mind_freeze)
 					if not target.Classification(worldboss)
@@ -3413,7 +3419,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(skull_bash) Spell(skull_bash)
 					if not target.Classification(worldboss)
@@ -3440,7 +3446,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction GetInMeleeRange
 			{
-				if Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+				if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
 				{
 					if target.InRange(wild_charge) Spell(wild_charge)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -3490,7 +3496,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(counter_shot)
 					if not target.Classification(worldboss)
@@ -3515,7 +3521,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(counterspell)
 					if not target.Classification(worldboss)
@@ -3538,7 +3544,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
 					if not target.Classification(worldboss)
@@ -3634,7 +3640,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(rebuke) Spell(rebuke)
 					if not target.Classification(worldboss)
@@ -3665,7 +3671,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction GetInMeleeRange
 			{
-				if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -3678,7 +3684,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(silence)
 					if not target.Classification(worldboss)
@@ -3703,7 +3709,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(kick) Spell(kick)
 					if not target.Classification(worldboss)
@@ -3732,7 +3738,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction GetInMeleeRange
 			{
-				if not target.InRange(kick)
+				if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 				{
 					Spell(shadowstep)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -3750,7 +3756,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					Spell(wind_shear)
 					if not target.Classification(worldboss)
@@ -3793,7 +3799,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction InterruptActions
 			{
-				if not target.IsFriend() and target.IsInterruptible()
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(pummel) Spell(pummel)
 					if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
@@ -3821,7 +3827,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction GetInMeleeRange
 			{
-				if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
@@ -4012,6 +4018,22 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "draenic_agility_potion")
+		count = count + 1
+	end
+	if annotation.melee then
+		local code = [[
+			AddCheckBox(opt_melee_range L(not_in_melee_range) default)
+		]]
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		count = count + 1
+	end
+	if annotation.interrupt then
+		local code = [[
+			AddCheckBox(opt_interrupt L(interrupt) default)
+		]]
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
 		count = count + 1
 	end
 	return count
