@@ -26,7 +26,8 @@ actions.precombat+=/prayer_of_mending
 
 # Executed every time the actor is available.
 
-actions=mana_potion,if=mana.pct<=75
+actions=silence
+actions+=/mana_potion,if=mana.pct<=75
 actions+=/blood_fury
 actions+=/berserking
 actions+=/arcane_torrent
