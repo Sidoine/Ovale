@@ -1452,6 +1452,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 	local canonicalizedName = gsub(parseNode.name, ":", "_")
 	local class = annotation.class
 	local specialization = annotation.specialization
+	local role = annotation.role
 	local action = Disambiguate(canonicalizedName, class, specialization)
 
 	if action == "auto_attack" and not annotation.melee then
@@ -1750,6 +1751,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
 		elseif class == "WARRIOR" and action == "charge" then
 			conditionCode = "target.InRange(charge)"
+		elseif class == "WARRIOR" and action == "battle_shout" and role == "tank" then
+			-- Only cast Battle Shout if it won't overwrite the player's own Commanding Shout.
+			conditionCode = "BuffExpires(stamina_buff)"
+		elseif class == "WARRIOR" and action == "commanding_shout" and role == "attack" then
+			-- Only cast Commanding Shout if it won't overwrite the player's own Battle Shout.
+			conditionCode = "BuffExpires(attack_power_multiplier_buff)"
 		elseif class == "WARRIOR" and action == "enraged_regeneration" then
 			-- Only suggest Enraged Regeneration at below 80% health.
 			conditionCode = "HealthPercent() < 80"
@@ -4314,14 +4321,16 @@ function OvaleSimulationCraft:ParseProfile(simc)
 	annotation.level = profile.level
 	ok = ok and (annotation.class and annotation.specialization and annotation.level)
 	annotation.pet = profile.default_pet
-	annotation.role = profile.role
 
 	-- Set the attack range of the class and role.
 	if profile.role == "tank" then
+		annotation.role = profile.role
 		annotation.melee = annotation.class
 	elseif profile.role == "spell" then
+		annotation.role = profile.role
 		annotation.ranged = annotation.class
 	elseif profile.role == "attack" or profile.role == "dps" then
+		annotation.role = "attack"
 		if profile.position == "ranged_back" then
 			annotation.ranged = annotation.class
 		else
