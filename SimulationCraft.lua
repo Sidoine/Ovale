@@ -575,6 +575,9 @@ ParseAction = function(action, nodeList, annotation)
 		node.action = action
 		node.name = name
 		node.child = child
+		-- Save first action for "sync=action" references.
+		annotation.sync = annotation.sync or {}
+		annotation.sync[name] = node
 	else
 		self_childrenPool:Release(child)
 	end
@@ -2298,9 +2301,48 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		end
 	elseif modifier == "sync" then
 		local name = Unparse(parseNode)
-		name = Disambiguate(name, class, specialization)
-		AddSymbol(annotation, name)
-		code = format("not SpellCooldown(%s) > 0", name)
+		node = annotation.astAnnotation and annotation.astAnnotation.sync and annotation.astAnnotation.sync[name]
+		if not node then
+			local syncParseNode = annotation.sync[name]
+			if syncParseNode then
+				local syncActionNode = EmitAction(syncParseNode, nodeList, annotation)
+				local syncActionType = syncActionNode.type
+				if syncActionType == "action" then
+					node = syncActionNode
+				elseif syncActionType == "custom_function" then
+					node = syncActionNode
+				elseif syncActionType == "if" or syncActionType == "unless" then
+					local lhsNode = syncActionNode.child[1]
+					if syncActionType == "unless" then
+						-- Flip the boolean condition for an "unless" node.
+						local notNode = OvaleAST:NewNode(nodeList, true)
+						notNode.type = "logical"
+						notNode.expressionType = "unary"
+						notNode.operator = "not"
+						notNode.child[1] = lhsNode
+						lhsNode = notNode
+					end
+					local rhsNode = syncActionNode.child[2]
+					local andNode = OvaleAST:NewNode(nodeList, true)
+					andNode.type = "logical"
+					andNode.expressionType = "binary"
+					andNode.operator = "and"
+					andNode.child[1] = lhsNode
+					andNode.child[2] = rhsNode
+					node = andNode
+				else
+					OvaleSimulationCraft:Print("Warning: Unable to emit action for 'sync=%s'.", name)
+					name = Disambiguate(name, class, specialization)
+					AddSymbol(annotation, name)
+					code = format("Spell(%s)", name)
+				end
+			end
+		end
+		if node then
+			annotation.astAnnotation = annotation.astAnnotation or {}
+			annotation.astAnnotation.sync = annotation.astAnnotation.sync or {}
+			annotation.astAnnotation.sync[name] = node
+		end
 	end
 	if not node and code then
 		annotation.astAnnotation = annotation.astAnnotation or {}
