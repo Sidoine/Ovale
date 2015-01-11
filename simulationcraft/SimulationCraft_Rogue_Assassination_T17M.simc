@@ -36,6 +36,7 @@ actions+=/blood_fury
 actions+=/berserking
 actions+=/arcane_torrent,if=energy<60
 actions+=/vanish,if=time>10&!buff.stealth.up
+actions+=/auto_attack
 actions+=/rupture,if=combo_points=5&ticks_remain<3
 actions+=/rupture,cycle_targets=1,if=active_enemies>1&!ticking&combo_points=5
 actions+=/mutilate,if=buff.stealth.up
