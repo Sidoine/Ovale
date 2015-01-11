@@ -70,6 +70,7 @@ local MODIFIER_KEYWORD = {
 	["max_energy"] = true,
 	["moving"] = true,
 	["name"] = true,
+	["nonlethal"] = true,
 	["sec"] = true,
 	["slot"] = true,
 	["sync"] = true,
