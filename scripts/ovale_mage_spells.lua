@@ -226,6 +226,7 @@ Define(water_elemental 31687)
 	SpellInfo(arcane_orb tag=shortcd)
 	SpellInfo(blink tag=shortcd)
 	SpellInfo(dragons_breath tag=shortcd)
+	SpellInfo(frost_bomb tag=shortcd)
 	SpellInfo(ice_floes tag=shortcd)
 	SpellInfo(rune_of_power tag=shortcd)
 ]]
