@@ -10,6 +10,8 @@ do
 Include(ovale_common)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
@@ -33,12 +35,12 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(rebuke) Spell(rebuke)
 		if not target.Classification(worldboss)
@@ -101,9 +103,7 @@ AddFunction ProtectionDefaultMainActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
-		# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
 		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
-		#if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
 		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
@@ -149,6 +149,7 @@ AddFunction ProtectionDefaultShortCdActions
 	# CHANGE: Ensure that Righteous Fury is on while tanking.
 	ProtectionRighteousFury()
 	#auto_attack
+	GetInMeleeRange()
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
 	#run_action_list,name=max_dps,if=role.attack|0
@@ -163,8 +164,6 @@ AddFunction ProtectionDefaultShortCdActions
 	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
 	#harsh_word,if=glyph.harsh_words.enabled&holy_power>=3
 	if Glyph(glyph_of_harsh_words) and HolyPower() >= 3 Spell(harsh_word)
-	# CHANGE: Get into melee range for Shield of the Righteousness.
-	GetInMeleeRange()
 	#shield_of_the_righteous,if=buff.divine_purpose.react
 	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
 	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
@@ -177,8 +176,7 @@ AddFunction ProtectionDefaultShortCdActions
 		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
-			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment) or Spell(judgment)
+			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment text=double) or Spell(judgment)
 			{
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
@@ -210,10 +208,8 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	#rebuke
 	InterruptActions()
-	# CHANGE: Suggest Hand of Freedom to break root effects.
-	if IsRooted() Spell(hand_of_freedom)
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -253,9 +249,7 @@ AddFunction ProtectionMaxDpsMainActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
-		# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
 		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
-		#if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
 		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
@@ -310,8 +304,7 @@ AddFunction ProtectionMaxDpsShortCdActions
 		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
-			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment) or Spell(judgment)
+			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment text=double) or Spell(judgment)
 			{
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
@@ -366,9 +359,7 @@ AddFunction ProtectionMaxSurvivalMainActions
 	#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 	unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 	{
-		# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
 		#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&last_judgment_target!=target
-		#if Glyph(glyph_of_double_jeopardy) and True(last_judgement_target) Spell(judgment)
 		if Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) Spell(judgment text=double)
 		#judgment
 		Spell(judgment)
@@ -423,8 +414,7 @@ AddFunction ProtectionMaxSurvivalShortCdActions
 		#wait,sec=cooldown.crusader_strike.remains,if=cooldown.crusader_strike.remains>0&cooldown.crusader_strike.remains<=0.35
 		unless SpellCooldown(crusader_strike) > 0 and SpellCooldown(crusader_strike) <= 0.35 and SpellCooldown(crusader_strike) > 0
 		{
-			# CHANGE: Add a text reminder to cast Judgment on an alternate target if using Glyph of Double Jeopardy.
-			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment) or Spell(judgment)
+			unless Glyph(glyph_of_double_jeopardy) and BuffPresent(glyph_of_double_jeopardy_buff) and Spell(judgment text=double) or Spell(judgment)
 			{
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
@@ -524,6 +514,7 @@ AddFunction RetributionDefaultShortCdActions
 	# CHANGE: Check that Righteous Fury is toggled off.
 	RighteousFuryOff()
 	#auto_attack
+	GetInMeleeRange()
 	#speed_of_light,if=movement.distance>5
 	if 0 > 5 Spell(speed_of_light)
 
@@ -550,11 +541,11 @@ AddFunction RetributionDefaultCdActions
 		#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
 		if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
 		#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
-		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(holy_avenger)
+		if Spell(seraphim) and Talent(seraphim_talent) Spell(holy_avenger)
 		#holy_avenger,if=holy_power<=2&!talent.seraphim.enabled
 		if HolyPower() <= 2 and not Talent(seraphim_talent) Spell(holy_avenger)
 		#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
-		if not SpellCooldown(seraphim) > 0 and Talent(seraphim_talent) Spell(avenging_wrath_melee)
+		if Spell(seraphim) and Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#avenging_wrath,if=!talent.seraphim.enabled
 		if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#blood_fury
@@ -617,7 +608,7 @@ AddFunction RetributionCleaveMainActions
 	#exorcism,if=glyph.mass_exorcism.enabled&holy_power<5
 	if Glyph(glyph_of_mass_exorcism) and HolyPower() < 5 Spell(exorcism)
 	#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&holy_power<5
-	if Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment)
+	if Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment text=double)
 	#judgment,if=holy_power<5
 	if HolyPower() < 5 Spell(judgment)
 	#exorcism,if=holy_power<5
@@ -703,7 +694,7 @@ AddFunction RetributionSingleMainActions
 	#divine_storm,if=buff.divine_crusader.react&(buff.avenging_wrath.up|target.health.pct<35)&!talent.final_verdict.enabled
 	if BuffPresent(divine_crusader_buff) and { BuffPresent(avenging_wrath_melee_buff) or target.HealthPercent() < 35 } and not Talent(final_verdict_talent) Spell(divine_storm)
 	#judgment,cycle_targets=1,if=last_judgment_target!=target&glyph.double_jeopardy.enabled&holy_power<5
-	if True(last_judgement_target) and Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment)
+	if BuffPresent(glyph_of_double_jeopardy_buff) and Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment text=double)
 	#exorcism,if=glyph.mass_exorcism.enabled&active_enemies>=2&holy_power<5&!glyph.double_jeopardy.enabled
 	if Glyph(glyph_of_mass_exorcism) and Enemies() >= 2 and HolyPower() < 5 and not Glyph(glyph_of_double_jeopardy) Spell(exorcism)
 	#judgment,,if=holy_power<5

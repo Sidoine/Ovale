@@ -10,20 +10,19 @@ do
 Include(ovale_common)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=feral)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=balance)
 
 AddFunction UsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction UsePotionIntellect
 {
-	if Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
-	{
-		if target.InRange(wild_charge) Spell(wild_charge)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
 AddFunction UseItemActions
@@ -33,9 +32,18 @@ AddFunction UseItemActions
 	Item(Trinket1Slot usable=1)
 }
 
+AddFunction GetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+	{
+		if target.InRange(wild_charge) Spell(wild_charge)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(skull_bash) Spell(skull_bash)
 		if not target.Classification(worldboss)
@@ -102,6 +110,8 @@ AddFunction FeralDefaultShortCdActions
 
 		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 		{
+			#auto_attack
+			GetInMeleeRange()
 			#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
 			if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
 			#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
@@ -110,57 +120,28 @@ AddFunction FeralDefaultShortCdActions
 	}
 }
 
-# CHANGE: Helper function for Tiger's Fury sync condition.
-AddFunction FeralTigersFurySyncCondition
-{
-	#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
-	BuffPresent(tigers_fury_buff) or { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and not SpellCooldown(tigers_fury) > 0
-}
-
-AddFunction FeralBerserkSyncCondition
-{
-	# CHANGE: Synchronize with Tiger's Fury conditions.
-	#berserk,if=buff.tigers_fury.up
-	#if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
-	#if FeralTigersFurySyncCondition() Spell(berserk_cat)
-	BuffPresent(berserk_cat_buff) or { FeralTigersFurySyncCondition() and not SpellCooldown(berserk_cat) > 0 }
-}
-
 AddFunction FeralDefaultCdActions
 {
 	unless Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) and Spell(dash) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 	{
-		#auto_attack
 		#skull_bash
 		InterruptActions()
 		#potion,name=draenic_agility,if=target.time_to_die<=40
 		if target.TimeToDie() <= 40 UsePotionAgility()
-		# CHANGE: Synchronize with Tiger's Fury conditions.
 		#use_item,slot=trinket1,sync=tigers_fury
-		#if not SpellCooldown(tigers_fury) > 0 UseItemActions()
-		if FeralTigersFurySyncCondition() UseItemActions()
-		# CHANGE: Synchronize with Tiger's Fury conditions.
+		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) UseItemActions()
 		#blood_fury,sync=tigers_fury
-		#if not SpellCooldown(tigers_fury) > 0 Spell(blood_fury_apsp)
-		if FeralTigersFurySyncCondition() Spell(blood_fury_apsp)
-		# CHANGE: Synchronize with Tiger's Fury conditions.
+		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) Spell(blood_fury_apsp)
 		#berserking,sync=tigers_fury
-		#if not SpellCooldown(tigers_fury) > 0 Spell(berserking)
-		if FeralTigersFurySyncCondition() Spell(berserking)
-		# CHANGE: Synchronize with Tiger's Fury conditions.
+		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) Spell(berserking)
 		#arcane_torrent,sync=tigers_fury
-		#if not SpellCooldown(tigers_fury) > 0 Spell(arcane_torrent_energy)
-		if FeralTigersFurySyncCondition() Spell(arcane_torrent_energy)
+		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) Spell(arcane_torrent_energy)
 		#incarnation,if=cooldown.berserk.remains<10&energy.time_to_max>1
 		if SpellCooldown(berserk_cat) < 10 and TimeToMaxEnergy() > 1 Spell(incarnation_melee)
-		# CHANGE: Synchronize with Berserk's conditions.
 		#potion,name=draenic_agility,sync=berserk,if=target.health.pct<25
-		#if target.HealthPercent() < 25 and not SpellCooldown(berserk_cat) > 0 UsePotionAgility()
-		if target.HealthPercent() < 25 and FeralBerserkSyncCondition() UsePotionAgility()
-		# CHANGE: Synchronize with Tiger's Fury conditions.
+		if target.HealthPercent() < 25 and BuffPresent(tigers_fury_buff) and Spell(berserk_cat) UsePotionAgility()
 		#berserk,if=buff.tigers_fury.up
-		#if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
-		if FeralTigersFurySyncCondition() Spell(berserk_cat)
+		if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
 		#shadowmeld,if=dot.rake.remains<4.5&energy>=35&dot.rake.pmultiplier<2&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>15)&!buff.king_of_the_jungle.up
 		if target.DebuffRemaining(rake_debuff) < 4.5 and Energy() >= 35 and target.DebuffPersistentMultiplier(rake_debuff) < 2 and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_melee) > 15 } and not BuffPresent(king_of_the_jungle_buff) Spell(shadowmeld)
 	}
@@ -218,9 +199,7 @@ AddFunction FeralPrecombatMainActions
 	#food,type=blackrock_barbecue
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
-	# CHANGE: Cast Healing Touch to gain Bloodtalons buff only if less than 20s remaining on the buff.
-	#healing_touch,if=talent.bloodtalons.enabled
-	#if Talent(bloodtalons_talent) Spell(healing_touch)
+	#healing_touch,if=talent.bloodtalons.enabled&buff.bloodtalons.remains<20
 	if Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 Spell(healing_touch)
 	#cat_form
 	Spell(cat_form)
@@ -230,7 +209,7 @@ AddFunction FeralPrecombatMainActions
 
 AddFunction FeralPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and Spell(healing_touch) or Spell(cat_form) or BuffExpires(stealthed_buff any=1) and Spell(prowl)
+	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 and Spell(healing_touch) or Spell(cat_form) or BuffExpires(stealthed_buff any=1) and Spell(prowl)
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
@@ -274,6 +253,8 @@ AddFunction GuardianDefaultMainActions
 
 AddFunction GuardianDefaultShortCdActions
 {
+	#auto_attack
+	GetInMeleeRange()
 	#savage_defense,if=buff.barkskin.down
 	if BuffExpires(barkskin_buff) Spell(savage_defense)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
@@ -284,7 +265,6 @@ AddFunction GuardianDefaultShortCdActions
 
 AddFunction GuardianDefaultCdActions
 {
-	#auto_attack
 	#skull_bash
 	InterruptActions()
 	#blood_fury

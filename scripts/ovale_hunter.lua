@@ -10,6 +10,7 @@ do
 Include(ovale_common)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
 
@@ -27,7 +28,7 @@ AddFunction UseItemActions
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(counter_shot)
 		if not target.Classification(worldboss)
@@ -120,9 +121,9 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 AddFunction BeastMasteryDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
-	InterruptActions()
 	#auto_shot
+	#counter_shot
+	InterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -234,9 +235,9 @@ AddFunction MarksmanshipDefaultShortCdActions
 
 AddFunction MarksmanshipDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
-	InterruptActions()
 	#auto_shot
+	#counter_shot
+	InterruptActions()
 	#use_item,name=beating_heart_of_the_mountain
 	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
@@ -366,9 +367,9 @@ AddFunction SurvivalDefaultShortCdActions
 
 AddFunction SurvivalDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
-	InterruptActions()
 	#auto_shot
+	#counter_shot
+	InterruptActions()
 	#use_item,name=beating_heart_of_the_mountain
 	UseItemActions()
 	#arcane_torrent,if=focus.deficit>=30

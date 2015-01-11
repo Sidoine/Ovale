@@ -10,6 +10,8 @@ do
 Include(ovale_common)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=arms)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
@@ -26,12 +28,17 @@ AddFunction UsePotionStrength
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(pummel) Spell(pummel)
 		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
@@ -57,7 +64,6 @@ AddFunction InterruptActions
 
 AddFunction ArmsDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementMainActions()
 	#call_action_list,name=single,if=active_enemies=1
@@ -71,12 +77,11 @@ AddFunction ArmsDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementShortCdActions()
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ArmsSingleShortCdActions()
 	#call_action_list,name=aoe,if=active_enemies>1
@@ -85,7 +90,7 @@ AddFunction ArmsDefaultShortCdActions
 
 AddFunction ArmsDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	#pummel
 	InterruptActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
@@ -175,17 +180,17 @@ AddFunction ArmsPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
-	# CHANGE: Apply raid buffs.
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
 	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
-	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
 	#stance,choose=battle
 	Spell(battle_stance)
 }
 
 AddFunction ArmsPrecombatCdActions
 {
-	# CHANGE: Apply raid buffs.
-	unless not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout) or Spell(battle_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
@@ -259,7 +264,6 @@ AddFunction ArmsSingleShortCdActions
 
 AddFunction FurySingleMindedFuryDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementMainActions()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -279,14 +283,13 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetShortCdActions()
 	#call_action_list,name=single_target,if=active_enemies=1
@@ -301,7 +304,7 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	#pummel
 	InterruptActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
@@ -372,10 +375,8 @@ AddFunction FurySingleMindedFuryAoeCdActions
 
 	unless { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
-		# CHANGE: Synchronize with Bladestorm's conditions.
 		#recklessness,sync=bladestorm
-		#if not SpellCooldown(bladestorm) > 0 Spell(recklessness)
-		if BuffRemaining(enrage_buff any=1) > 6 and not SpellCooldown(bladestorm) > 0 Spell(recklessness)
+		if not False(raid_event_adds_exists) and Spell(bladestorm) Spell(recklessness)
 	}
 }
 
@@ -401,17 +402,17 @@ AddFunction FurySingleMindedFuryPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
-	# CHANGE: Apply raid buffs.
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
 	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
-	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
 	#stance,choose=battle
 	Spell(battle_stance)
 }
 
 AddFunction FurySingleMindedFuryPrecombatCdActions
 {
-	# CHANGE: Apply raid buffs.
-	unless not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout) or Spell(battle_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
@@ -574,7 +575,6 @@ AddFunction FurySingleMindedFuryTwoTargetsCdActions
 
 AddFunction FuryTitansGripDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementMainActions()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -594,14 +594,13 @@ AddFunction FuryTitansGripDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementShortCdActions()
 	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
 	if BuffExpires(enrage_buff any=1) or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
 	#call_action_list,name=single_target,if=active_enemies=1
@@ -616,7 +615,7 @@ AddFunction FuryTitansGripDefaultShortCdActions
 
 AddFunction FuryTitansGripDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	#pummel
 	InterruptActions()
 	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
@@ -687,10 +686,8 @@ AddFunction FuryTitansGripAoeCdActions
 
 	unless { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(enrage_buff any=1) and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { BuffExpires(enrage_buff any=1) or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
-		# CHANGE: Synchronize with Bladestorm's conditions.
 		#recklessness,sync=bladestorm
-		#if not SpellCooldown(bladestorm) > 0 Spell(recklessness)
-		if BuffRemaining(enrage_buff any=1) > 6 and not SpellCooldown(bladestorm) > 0 Spell(recklessness)
+		if not False(raid_event_adds_exists) and Spell(bladestorm) Spell(recklessness)
 	}
 }
 
@@ -716,17 +713,17 @@ AddFunction FuryTitansGripPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
-	# CHANGE: Apply raid buffs.
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
 	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
-	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
 	#stance,choose=battle
 	Spell(battle_stance)
 }
 
 AddFunction FuryTitansGripPrecombatCdActions
 {
-	# CHANGE: Apply raid buffs.
-	unless not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout) or Spell(battle_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
@@ -889,7 +886,6 @@ AddFunction FuryTitansGripTwoTargetsCdActions
 
 AddFunction ProtectionGladiatorDefaultMainActions
 {
-	#auto_attack
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementMainActions()
 	#call_action_list,name=single,if=active_enemies=1
@@ -903,6 +899,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
+	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
 	#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
@@ -911,8 +908,6 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
 	if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
 	#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
@@ -925,7 +920,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 
 AddFunction ProtectionGladiatorDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	#pummel
 	InterruptActions()
 	#avatar
 	Spell(avatar)
@@ -1002,17 +997,17 @@ AddFunction ProtectionGladiatorPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
 	#food,type=blackrock_barbecue
-	# CHANGE: Apply raid buffs.
+	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
+	#battle_shout,if=!aura.attack_power_multiplier.up
 	if not BuffPresent(attack_power_multiplier_buff any=1) Spell(battle_shout)
-	if not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) Spell(commanding_shout)
 	#stance,choose=gladiator
 	Spell(gladiator_stance)
 }
 
 AddFunction ProtectionGladiatorPrecombatCdActions
 {
-	# CHANGE: Apply raid buffs.
-	unless not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and not BuffPresent(attack_power_multiplier_buff) and Spell(commanding_shout) or Spell(gladiator_stance)
+	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
@@ -1070,6 +1065,8 @@ AddFunction ProtectionDefaultShortCdActions
 {
 	#charge
 	if target.InRange(charge) Spell(charge)
+	#auto_attack
+	GetInMeleeRange()
 	#berserker_rage,if=buff.enrage.down
 	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
 	#call_action_list,name=prot
@@ -1078,9 +1075,8 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
-	# CHANGE: Add interrupt actions missing from SimulationCraft action list.
+	#pummel
 	InterruptActions()
-	#auto_attack
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up
@@ -1097,17 +1093,17 @@ AddFunction ProtectionPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
 	#food,type=blackrock_barbecue
-	# CHANGE: Apply raid buffs.
+	#battle_shout,if=!aura.attack_power_multiplier.up&aura.stamina.up
+	if not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) Spell(battle_shout)
+	#commanding_shout,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(commanding_shout)
-	if not BuffPresent(attack_power_multiplier_buff any=1) and not BuffPresent(stamina_buff) Spell(battle_shout)
 	#stance,choose=defensive
 	Spell(defensive_stance)
 }
 
 AddFunction ProtectionPrecombatCdActions
 {
-	# CHANGE: Apply raid buffs.
-	unless not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and not BuffPresent(stamina_buff) and Spell(battle_shout) or Spell(defensive_stance)
+	unless not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
 	{
 		#snapshot_stats
 		#shield_wall
@@ -1149,8 +1145,6 @@ AddFunction ProtectionProtShortCdActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } and HealthPercent() < 80 Spell(enraged_regeneration)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeShortCdActions()
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
 	if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
 

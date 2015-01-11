@@ -10,6 +10,8 @@ do
 Include(ovale_common)
 Include(ovale_shaman_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=elemental)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
@@ -40,9 +42,14 @@ AddFunction Bloodlust
 	}
 }
 
+AddFunction GetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(wind_shear)
 		if not target.Classification(worldboss)
@@ -244,6 +251,8 @@ AddFunction EnhancementDefaultMainActions
 
 AddFunction EnhancementDefaultShortCdActions
 {
+	#auto_attack
+	GetInMeleeRange()
 	#elemental_mastery
 	Spell(elemental_mastery)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
@@ -258,7 +267,6 @@ AddFunction EnhancementDefaultCdActions
 	InterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
-	#auto_attack
 	#use_item,name=beating_heart_of_the_mountain
 	UseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30

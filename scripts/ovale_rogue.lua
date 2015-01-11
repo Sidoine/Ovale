@@ -13,6 +13,8 @@ Include(ovale_rogue_spells)
 Define(honor_among_thieves_cooldown_buff 51699)
 	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 
@@ -30,7 +32,7 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(kick)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
 		Spell(shadowstep)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -39,10 +41,10 @@ AddFunction GetInMeleeRange
 
 AddFunction InterruptActions
 {
-	if target.IsFriend(no) and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(kick) Spell(kick)
-		if target.Classification(worldboss no)
+		if not target.Classification(worldboss)
 		{
 			if target.InRange(cheap_shot) Spell(cheap_shot)
 			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
@@ -102,10 +104,10 @@ AddFunction AssassinationDefaultMainActions
 
 AddFunction AssassinationDefaultShortCdActions
 {
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#vanish,if=time>10&!buff.stealth.up
 	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
+	#auto_attack
+	GetInMeleeRange()
 
 	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice)
 	{
@@ -198,13 +200,13 @@ AddFunction CombatDefaultMainActions
 
 AddFunction CombatDefaultShortCdActions
 {
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
 	if { Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 
 	unless Spell(ambush)
 	{
+		#auto_attack
+		GetInMeleeRange()
 		#vanish,if=time>10&(combo_points<3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<90&energy>=15)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
 		if TimeInCombat() > 10 and { ComboPoints() < 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and { Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 90 and Energy() >= 15 or Talent(subterfuge_talent) and Energy() >= 90 or not Talent(shadow_focus_talent) and not Talent(subterfuge_talent) and Energy() >= 60 } Spell(vanish)
 
@@ -338,9 +340,7 @@ AddFunction CombatPrecombatCdActions
 
 AddFunction SubtletyDefaultMainActions
 {
-	# CHANGE: Ovale doesn't do integer division so change the comparator for the "combo_points" condition to ">=".
-	#slice_and_dice,if=(buff.slice_and_dice.remains<10.8)&buff.slice_and_dice.remains<target.time_to_die&combo_points=((target.time_to_die-buff.slice_and_dice.remains)%6)+1
-	#if BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and ComboPoints() == { target.TimeToDie() - BuffRemaining(slice_and_dice_buff) } / 6 + 1 Spell(slice_and_dice)
+	#slice_and_dice,if=(buff.slice_and_dice.remains<10.8)&buff.slice_and_dice.remains<target.time_to_die&combo_points>=((target.time_to_die-buff.slice_and_dice.remains)%6)+1
 	if BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and ComboPoints() >= { target.TimeToDie() - BuffRemaining(slice_and_dice_buff) } / 6 + 1 Spell(slice_and_dice)
 	#premeditation,if=combo_points<=4&!(buff.shadow_dance.up&energy>100&combo_points>1)&!buff.subterfuge.up|(buff.subterfuge.up&debuff.find_weakness.up)
 	if { ComboPoints() <= 4 and not { BuffPresent(shadow_dance_buff) and Energy() > 100 and ComboPoints() > 1 } and not BuffPresent(subterfuge_buff) or BuffPresent(subterfuge_buff) and target.DebuffPresent(find_weakness_debuff) } and ComboPoints() < 5 Spell(premeditation)
@@ -385,9 +385,6 @@ AddFunction SubtletyDefaultMainActions
 
 AddFunction SubtletyDefaultShortCdActions
 {
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
-	# CHANGE: Ovale doesn't do integer division so change the comparator for the "combo_points" condition to ">=".
 	unless BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and ComboPoints() >= { target.TimeToDie() - BuffRemaining(slice_and_dice_buff) } / 6 + 1 and Spell(slice_and_dice)
 	{
 		#pool_resource,for_next=1
@@ -401,6 +398,8 @@ AddFunction SubtletyDefaultShortCdActions
 				#ambush,if=((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(time<1.2|buff.shadow_dance.up|time>5))&active_enemies<4)|((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(time<1.2|buff.shadow_dance.up|time>5))&debuff.find_weakness.down)
 				unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { TimeInCombat() < 1.2 or BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { TimeInCombat() < 1.2 or BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
 				{
+					#auto_attack
+					GetInMeleeRange()
 					#pool_resource,for_next=1,extra_amount=50
 					#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))
 					if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } Spell(shadow_dance)
@@ -444,7 +443,6 @@ AddFunction SubtletyDefaultCdActions
 	#arcane_torrent,if=energy<60&buff.shadow_dance.up
 	if Energy() < 60 and BuffPresent(shadow_dance_buff) Spell(arcane_torrent_energy)
 
-	# CHANGE: Ovale doesn't do integer division so change the comparator for the "combo_points" condition to ">=".
 	unless BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and ComboPoints() >= { target.TimeToDie() - BuffRemaining(slice_and_dice_buff) } / 6 + 1 and Spell(slice_and_dice)
 	{
 		#pool_resource,for_next=1
@@ -558,9 +556,7 @@ AddFunction SubtletyPrecombatMainActions
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
 	#premeditation
 	if ComboPoints() < 5 Spell(premeditation)
-	# CHANGE: Only refresh Slice and Dice out of combat if less than 18s remaining.
-	#slice_and_dice
-	#Spell(slice_and_dice)
+	#slice_and_dice,if=buff.slice_and_dice.remains<18
 	if BuffRemaining(slice_and_dice_buff) < 18 Spell(slice_and_dice)
 }
 

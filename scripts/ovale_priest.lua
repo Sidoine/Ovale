@@ -10,7 +10,10 @@ do
 Include(ovale_common)
 Include(ovale_priest_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
+AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default specialization=discipline)
+AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default specialization=holy)
 
 AddFunction UsePotionIntellect
 {
@@ -19,7 +22,7 @@ AddFunction UsePotionIntellect
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		Spell(silence)
 		if not target.Classification(worldboss)
@@ -67,6 +70,8 @@ AddFunction ShadowDefaultCdActions
 {
 	unless not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
+		#silence
+		InterruptActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
 		#power_infusion,if=talent.power_infusion.enabled
@@ -461,16 +466,16 @@ AddFunction ShadowMainCdActions
 AddFunction ShadowPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	# CHANGE: Different foods for different level-100 talents: AS -> blackrock_barbecue, CoP -> sleeper_surprise, VE -> frosty_stew
-	#food,type=sleeper_surprise
+	#food,type=blackrock_barbecue,if=talent.auspicious_spirits.enabled
+	#food,type=frosty_stew,if=talent.void_entropy.enabled
+	#food,type=sleeper_surprise,if=talent.clarity_of_power.enabled
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
-	# CHANGE: Use Mind Spike if talented into Clarity of Power, and Vampiric Touch otherwise.
-	#mind_spike
-	#Spell(mind_spike)
+	#mind_spike,if=talent.clarity_of_power.enabled
 	if Talent(clarity_of_power_talent) Spell(mind_spike)
+	#vampiric_touch,if=!talent.clarity_of_power.enabled
 	if not Talent(clarity_of_power_talent) Spell(vampiric_touch)
 }
 
