@@ -18,6 +18,8 @@ spec=protection
 
 actions.precombat=flask,type=greater_draenic_stamina_flask
 actions.precombat+=/food,type=blackrock_barbecue
+actions.precombat+=/battle_shout,if=!aura.attack_power_multiplier.up&aura.stamina.up
+actions.precombat+=/commanding_shout,if=!aura.stamina.up
 actions.precombat+=/stance,choose=defensive
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 # Generic on-use trinket line if needed when swapping trinkets out. 
@@ -30,6 +32,7 @@ actions.precombat+=/potion,name=draenic_armor
 
 actions=charge
 actions+=/auto_attack
+actions+=/pummel
 actions+=/blood_fury,if=buff.bloodbath.up|buff.avatar.up
 actions+=/berserking,if=buff.bloodbath.up|buff.avatar.up
 actions+=/arcane_torrent,if=buff.bloodbath.up|buff.avatar.up

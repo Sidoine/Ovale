@@ -21,6 +21,8 @@ actions.precombat+=/food,type=blackrock_barbecue
 # 
 talent_override=bladestorm,if=raid_event.adds.count>1|desired_targets>2|(raid_event.adds.duration<10&raid_event.adds.exists)
 talent_override=dragon_roar,if=raid_event.adds.count>=1|desired_targets>1
+actions.precombat+=/commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+actions.precombat+=/battle_shout,if=!aura.attack_power_multiplier.up
 actions.precombat+=/stance,choose=gladiator
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 # Generic on-use trinket line if needed when swapping trinkets out. 
@@ -32,6 +34,7 @@ actions.precombat+=/potion,name=draenic_armor
 
 actions=charge
 actions+=/auto_attack
+actions+=/pummel
 # This is mostly to prevent cooldowns from being accidentally used during movement.
 actions+=/call_action_list,name=movement,if=movement.distance>5
 actions+=/avatar
