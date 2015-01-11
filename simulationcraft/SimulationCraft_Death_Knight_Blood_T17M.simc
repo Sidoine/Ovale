@@ -27,6 +27,7 @@ actions.precombat+=/bone_shield
 # Executed every time the actor is available.
 
 actions=auto_attack
+actions+=/mind_freeze
 # if=time>10
 actions+=/blood_fury
 # if=time>10

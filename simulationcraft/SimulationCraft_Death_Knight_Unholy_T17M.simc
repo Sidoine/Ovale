@@ -28,6 +28,7 @@ actions.precombat+=/raise_dead
 # Executed every time the actor is available.
 
 actions=auto_attack
+actions+=/mind_freeze
 actions+=/deaths_advance,if=movement.remains>2
 actions+=/antimagic_shell,damage=100000
 actions+=/blood_fury
