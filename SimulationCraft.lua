@@ -1515,6 +1515,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "GetInMeleeRange()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "HUNTER" and action == "counter_shot" then
+			bodyCode = "InterruptActions()"
+			annotation[action] = class
+			annotation.interrupt = class
+			isSpellAction = false
 		elseif class == "HUNTER" and action == "exotic_munitions" then
 			if modifier.ammo_type then
 				local name = Unparse(modifier.ammo_type)
@@ -1600,6 +1605,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MONK" and action == "nimble_brew" then
 			-- Only suggest Nimble Brew to break snares, roots, and stuns.
 			conditionCode = "IsFeared() or IsRooted() or IsStunned()"
+		elseif class == "MONK" and action == "spear_hand_strike" then
+			bodyCode = "InterruptActions()"
+			annotation[action] = class
+			annotation.interrupt = class
+			isSpellAction = false
 		elseif class == "MONK" and action == "touch_of_death" then
 			-- Touch of Death can only be used if the Death Note buff is present on the player.
 			local buffName = "death_note_buff"
@@ -1624,6 +1634,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local buffName = "shadow_word_insanity_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffPresent(%s)", buffName)
+		elseif class == "PRIEST" and action == "silence" then
+			bodyCode = "InterruptActions()"
+			annotation[action] = class
+			annotation.interrupt = class
+			isSpellAction = false
 		elseif class == "ROGUE" and action == "apply_poison" then
 			if modifier.lethal then
 				local name = Unparse(modifier.lethal)
@@ -1749,14 +1764,19 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local spellName = "charge"
 			AddSymbol(annotation, spellName)
 			conditionCode = format("target.InRange(%s)", spellName)
-		elseif class == "WARRIOR" and action == "victory_rush" then
-			-- Victory Rush requires the Victorious buff to be on the player.
-			local buffName = "victorious_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
+		elseif class == "WARRIOR" and action == "pummel" then
+			bodyCode = "InterruptActions()"
+			annotation[action] = class
+			annotation.interrupt = class
+			isSpellAction = false
 		elseif class == "WARRIOR" and action == "raging_blow" then
 			-- Raging Blow can only be used if the Raging Blow buff is present on the player.
 			local buffName = "raging_blow_buff"
+			AddSymbol(annotation, buffName)
+			conditionCode = format("BuffPresent(%s)", buffName)
+		elseif class == "WARRIOR" and action == "victory_rush" then
+			-- Victory Rush requires the Victorious buff to be on the player.
+			local buffName = "victorious_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif action == "auto_attack" then
