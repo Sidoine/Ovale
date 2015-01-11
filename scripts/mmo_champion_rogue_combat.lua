@@ -2,21 +2,22 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "MMO-Champion: Rogue"
-	local desc = "[6.0.3] MMO-Champion: Combat"
+	local name = "mmo_champion_rogue_combat_t17m"
+	local desc = "[6.0] MMO-Champion: Rogue_Combat_T17M"
 	local code = [[
-# Based on APL from "Simulationcraft results for WoD" thread (last update 2014-12-02).
-# http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
+# Based on SimulationCraft profile "Rogue_Combat_T17M".
 #	class=rogue
 #	spec=combat
-#    talents=3111123
-#    glyphs=energy/disappearance
+#	talents=http://us.battle.net/wow/en/tool/talent-calculator#cZ!2000010
+#	glyphs=energy/disappearance
 
 Include(ovale_common)
 Include(ovale_rogue_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default)
+AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 
 AddFunction UsePotionAgility
 {
@@ -32,7 +33,7 @@ AddFunction UseItemActions
 
 AddFunction GetInMeleeRange
 {
-	if not target.InRange(kick)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
 		Spell(shadowstep)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -41,7 +42,7 @@ AddFunction GetInMeleeRange
 
 AddFunction InterruptActions
 {
-	if not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(kick) Spell(kick)
 		if not target.Classification(worldboss)
@@ -55,29 +56,29 @@ AddFunction InterruptActions
 	}
 }
 
-# ActionList: CombatDefaultActions --> main, shortcd, cd
+### actions.default
 
-AddFunction CombatDefaultActions
+AddFunction CombatDefaultMainActions
 {
 	#ambush
 	Spell(ambush)
 	#slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8)
 	if { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 	#call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
-	if ComboPoints() < 5 or not target.DebuffPresent(revealing_strike_debuff) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) <= 4 and BuffExpires(deep_insight_buff) CombatGeneratorActions()
+	if ComboPoints() < 5 or not target.DebuffPresent(revealing_strike_debuff) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) <= 4 and BuffExpires(deep_insight_buff) CombatGeneratorMainActions()
 	#call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=4))
-	if ComboPoints() == 5 and target.DebuffPresent(revealing_strike_debuff) and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 4 } CombatFinisherActions()
+	if ComboPoints() == 5 and target.DebuffPresent(revealing_strike_debuff) and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 4 } CombatFinisherMainActions()
 }
 
 AddFunction CombatDefaultShortCdActions
 {
-	# CHANGE: Get within melee range of the target.
-	GetInMeleeRange()
 	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
 	if { Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 
 	unless Spell(ambush)
 	{
+		#auto_attack
+		GetInMeleeRange()
 		#vanish,if=time>10&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<60)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
 		if TimeInCombat() > 10 and { ComboPoints() <= 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and { Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 60 or Talent(subterfuge_talent) and Energy() >= 90 or not Talent(shadow_focus_talent) and not Talent(subterfuge_talent) and Energy() >= 60 } Spell(vanish)
 
@@ -96,7 +97,7 @@ AddFunction CombatDefaultCdActions
 	#kick
 	InterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
-	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
+	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=trinket2
 	UseItemActions()
 	#blood_fury
@@ -105,26 +106,21 @@ AddFunction CombatDefaultCdActions
 	Spell(berserking)
 	#arcane_torrent,if=energy<60
 	if Energy() < 60 Spell(arcane_torrent_energy)
+	#shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
+	if SpellCooldown(killing_spree) < 10 and ComboPoints() > 3 or BuffPresent(adrenaline_rush_buff) Spell(shadow_reflection)
 
-	unless Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) and Spell(blade_flurry)
+	unless Spell(ambush) or { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
 	{
-		#shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
-		if SpellCooldown(killing_spree) < 10 and ComboPoints() > 3 or BuffPresent(adrenaline_rush_buff) Spell(shadow_reflection)
-
-		unless Spell(ambush)
-			or { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
-		{
-			#killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>3|buff.deep_insight.remains>3|buff.detonation.remains>3|time_to_die<4))
-			if { Energy() < 40 or BuffPresent(burst_haste_buff any=1) and TimeInCombat() < 10 or BuffRemaining(burst_haste_buff any=1) > 20 } and BuffExpires(adrenaline_rush_buff) and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > 3 or BuffRemaining(deep_insight_buff) > 3 or BuffRemaining(detonation_buff) > 3 or TimeToDie() < 4 } Spell(killing_spree)
-			#adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.detonation.remains>buff.detonation.duration*0.8|time_to_die<4))
-			if { Energy() < 35 or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(killing_spree) > 10 and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > BaseDuration(archmages_greater_incandescence_agi_buff) * 0.8 or BuffRemaining(deep_insight_buff) > BaseDuration(deep_insight_buff) * 0.8 or BuffRemaining(detonation_buff) > BaseDuration(detonation_buff) * 0.8 or TimeToDie() < 4 } Spell(adrenaline_rush)
-		}
+		#killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>3|buff.deep_insight.remains>3|buff.meaty_dragonspine_trophy.remains>3|time_to_die<4))
+		if { Energy() < 40 or BuffPresent(burst_haste_buff any=1) and TimeInCombat() < 10 or BuffRemaining(burst_haste_buff any=1) > 20 } and BuffExpires(adrenaline_rush_buff) and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > 3 or BuffRemaining(deep_insight_buff) > 3 or BuffRemaining(meaty_dragonspine_trophy_buff) > 3 or TimeToDie() < 4 } Spell(killing_spree)
+		#adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.meaty_dragonspine_trophy.remains>buff.meaty_dragonspine_trophy.duration*0.8|time_to_die<4))
+		if { Energy() < 35 or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(killing_spree) > 10 and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > BaseDuration(archmages_greater_incandescence_agi_buff) * 0.8 or BuffRemaining(deep_insight_buff) > BaseDuration(deep_insight_buff) * 0.8 or BuffRemaining(meaty_dragonspine_trophy_buff) > BaseDuration(meaty_dragonspine_trophy_buff) * 0.8 or TimeToDie() < 4 } Spell(adrenaline_rush)
 	}
 }
 
-# ActionList: CombatFinisherActions --> main
+### actions.finisher
 
-AddFunction CombatFinisherActions
+AddFunction CombatFinisherMainActions
 {
 	#pool_resource,for_next=1
 	#death_from_above
@@ -140,9 +136,9 @@ AddFunction CombatFinisherActions
 	}
 }
 
-# ActionList: CombatGeneratorActions --> main
+### actions.generator
 
-AddFunction CombatGeneratorActions
+AddFunction CombatGeneratorMainActions
 {
 	#revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
 	if ComboPoints() == 4 and target.DebuffRemaining(revealing_strike_debuff) < 7.2 and target.TimeToDie() > target.DebuffRemaining(revealing_strike_debuff) + 7.2 or target.TimeToDie() < target.DebuffRemaining(revealing_strike_debuff) + 7.2 and target.TicksRemaining(revealing_strike_debuff) < 2 or not target.DebuffPresent(revealing_strike_debuff) Spell(revealing_strike)
@@ -150,15 +146,14 @@ AddFunction CombatGeneratorActions
 	if target.DebuffPresent(revealing_strike_debuff) Spell(sinister_strike)
 }
 
-# ActionList: CombatPrecombatActions --> main, shortcd, cd
+### actions.precombat
 
-AddFunction CombatPrecombatActions
+AddFunction CombatPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
 	#food,type=frosty_stew
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
-	#snapshot_stats
 	#stealth
 	if BuffExpires(stealthed_buff any=1) Spell(stealth)
 	#slice_and_dice,if=talent.marked_for_death.enabled
@@ -167,8 +162,7 @@ AddFunction CombatPrecombatActions
 
 AddFunction CombatPrecombatShortCdActions
 {
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
-		or BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or BuffExpires(stealthed_buff any=1) and Spell(stealth)
 	{
 		#marked_for_death
 		Spell(marked_for_death)
@@ -179,6 +173,7 @@ AddFunction CombatPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
 	{
+		#snapshot_stats
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
@@ -189,39 +184,82 @@ AddCheckBox(opt_rogue_combat_aoe L(AOE) specialization=combat default)
 
 AddIcon specialization=combat help=shortcd enemies=1 checkbox=!opt_rogue_combat_aoe
 {
-	if InCombat(no) CombatPrecombatShortCdActions()
+	if not InCombat() CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
 AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat_aoe
 {
-	if InCombat(no) CombatPrecombatShortCdActions()
+	if not InCombat() CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
 AddIcon specialization=combat help=main enemies=1
 {
-	if InCombat(no) CombatPrecombatActions()
-	CombatDefaultActions()
+	if not InCombat() CombatPrecombatMainActions()
+	CombatDefaultMainActions()
 }
 
 AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat_aoe
 {
-	if InCombat(no) CombatPrecombatActions()
-	CombatDefaultActions()
+	if not InCombat() CombatPrecombatMainActions()
+	CombatDefaultMainActions()
 }
 
 AddIcon specialization=combat help=cd enemies=1 checkbox=!opt_rogue_combat_aoe
 {
-	if InCombat(no) CombatPrecombatCdActions()
+	if not InCombat() CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
 
 AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
 {
-	if InCombat(no) CombatPrecombatCdActions()
+	if not InCombat() CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
+
+### Required symbols
+# adrenaline_rush
+# adrenaline_rush_buff
+# ambush
+# anticipation_buff
+# anticipation_talent
+# arcane_torrent_energy
+# archmages_greater_incandescence_agi_buff
+# berserking
+# blade_flurry
+# blade_flurry_buff
+# blood_fury_ap
+# cheap_shot
+# crimson_tempest
+# crimson_tempest_debuff
+# deadly_poison
+# deadly_throw
+# death_from_above
+# deep_insight_buff
+# draenic_agility_potion
+# eviscerate
+# kick
+# kidney_shot
+# killing_spree
+# marked_for_death
+# marked_for_death_talent
+# meaty_dragonspine_trophy_buff
+# preparation
+# quaking_palm
+# revealing_strike
+# revealing_strike_debuff
+# shadow_focus_talent
+# shadow_reflection
+# shadow_reflection_buff
+# shadow_reflection_talent
+# shadowstep
+# sinister_strike
+# slice_and_dice
+# slice_and_dice_buff
+# stealth
+# subterfuge_talent
+# vanish
 ]]
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
 end
