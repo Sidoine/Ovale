@@ -1603,6 +1603,13 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"
+		elseif class == "PALADIN" and action == "judgment" then
+			-- If "cycle_targets=1" is used with Judgment, then it is for the Glyph of Double Jeopardy.
+			if modifier.cycle_targets then
+				AddSymbol(annotation, action)
+				bodyCode = "Spell(" .. action .. " text=double)"
+				isSpellAction = false
+			end
 		elseif class == "PALADIN" and action == "rebuke" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -2171,9 +2178,11 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				--]]
 				local code
 				if parseNode.operator == "=" then
-					code = "False(last_judgement_target)"
-				else -- if parseNode.operator == "!=" then
 					code = "True(last_judgement_target)"
+				else -- if parseNode.operator == "!=" then
+					local buffName = "glyph_of_double_jeopardy_buff"
+					code = "BuffPresent(" .. buffName .. ")"
+					AddSymbol(annotation, buffName)
 				end
 				annotation.astAnnotation = annotation.astAnnotation or {}
 				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
