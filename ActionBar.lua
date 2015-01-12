@@ -76,9 +76,9 @@ local function GetKeyBinding(slot)
 		-- Strip whitespace.
 		key = gsub(key, "%s+", "")
 		-- Convert modifiers to a single character.
-		key = gsub(key, "ALT-", "A")
-		key = gsub(key, "CTRL-", "C")
-		key = gsub(key, "SHIFT-", "S")
+		key = gsub(key, "ALT%-", "A")
+		key = gsub(key, "CTRL%-", "C")
+		key = gsub(key, "SHIFT%-", "S")
 		-- Shorten numberpad keybinding names.
 		key = gsub(key, "NUMPAD", "N")
 		key = gsub(key, "PLUS", "+")
