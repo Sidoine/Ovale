@@ -24,5 +24,6 @@ enable-nolib-creation: no
 ignore:
     - release
     - tests
+    - tmp
     - utils
     - WoWMock.lua
