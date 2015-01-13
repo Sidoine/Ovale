@@ -63,7 +63,7 @@ AddFunction ProtectionDefaultShortCdActions
 	#auto_attack
 	GetInMeleeRange()
 	#berserker_rage,if=buff.enrage.down
-	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
+	if not IsEnraged() Spell(berserker_rage)
 	#call_action_list,name=prot
 	ProtectionProtShortCdActions()
 }

@@ -3253,6 +3253,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
 		code = "BuffRemaining(honor_among_thieves_cooldown_buff)"
 		annotation.honor_among_thieves = class
+	elseif operand == "buff.enrage.down" then
+		code = "not " .. target .. "IsEnraged()"
+	elseif operand == "buff.enrage.remains" then
+		code = target .. "EnrageRemaining()"
+	elseif operand == "buff.enrage.up" then
+		code = target .. "IsEnraged()"
 	elseif operand == "debuff.casting.react" then
 		code = target .. "IsInterruptible()"
 	elseif operand == "debuff.flying.down" then

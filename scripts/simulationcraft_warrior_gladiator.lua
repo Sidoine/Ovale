@@ -71,7 +71,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
 	if not BuffPresent(shield_charge_buff) and not SpellCooldown(shield_slam) > 0 or Charges(shield_charge) == 2 Spell(shield_charge)
 	#berserker_rage,if=buff.enrage.down
-	if BuffExpires(enrage_buff any=1) Spell(berserker_rage)
+	if not IsEnraged() Spell(berserker_rage)
 	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 	#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
