@@ -173,10 +173,6 @@ OvaleData.buffSpellList =
 	},
 
 	-- Target buffs
-	enrage_buff = {
-		[ 12880] = true, -- Enrage (warrior)
-		[ 18499] = true, -- Berserker Rage (warrior)
-	},
 	stealthed_buff = {
 		[  1784] = true, -- Stealth
 		[  5215] = true, -- Prowl
