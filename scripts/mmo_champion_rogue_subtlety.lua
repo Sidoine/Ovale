@@ -170,8 +170,8 @@ AddFunction SubtletyDefaultShortCdActions
 
 AddFunction SubtletyDefaultCdActions
 {
-	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|buff.shadow_dance.up&(trinket.stat.agi.react|trinket.stat.multistrike.react|buff.archmages_greater_incandescence_agi.react)
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(shadow_dance_buff) and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } UsePotionAgility()
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|buff.shadow_reflection.remains>12&(trinket.stat.agi.react|trinket.stat.multistrike.react|buff.archmages_greater_incandescence_agi.react)
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffRemaining(shadow_reflection_buff) > 12 and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } UsePotionAgility()
 	#kick
 	InterruptActions()
 	#use_item,slot=trinket2,if=buff.shadow_dance.up

@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-09
+# Last update: 2015-01-13
 
 rogue="Rogue_Combat_T17M"
 level=100
@@ -33,9 +33,11 @@ actions+=/berserking
 actions+=/arcane_torrent,if=energy<60
 actions+=/blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
 actions+=/shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
-actions+=/ambush
+actions+=/ambush,if=!talent.nightstalker.enabled|time<5
 actions+=/auto_attack
-actions+=/vanish,if=time>10&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<60)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
+actions+=/vanish,if=time>10&(talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<60)&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))
+actions+=/vanish,if=time>10&(talent.subterfuge.enabled&energy>=90)&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))
+actions+=/vanish,if=time>5&talent.nightstalker.enabled&combo_points=5&energy>35&energy<80
 actions+=/slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8)
 actions+=/killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>3|buff.deep_insight.remains>3|buff.meaty_dragonspine_trophy.remains>3|time_to_die<4))
 actions+=/adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.meaty_dragonspine_trophy.remains>buff.meaty_dragonspine_trophy.duration*0.8|time_to_die<4))
@@ -45,8 +47,6 @@ actions+=/call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.
 
 actions.finisher+=/pool_resource,for_next=1
 actions.finisher+=/death_from_above
-actions.finisher+=/crimson_tempest,if=active_enemies>6&remains<2
-actions.finisher+=/crimson_tempest,if=active_enemies>8
 actions.finisher+=/eviscerate
 
 actions.generator+=/revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
@@ -55,15 +55,15 @@ actions.generator+=/sinister_strike,if=dot.revealing_strike.ticking
 head=sorkas_nightshade_cowl,id=113978,bonus_id=567
 neck=darklight_necklace,id=113865,bonus_id=567,enchant=gift_of_haste
 shoulders=poisoners_spaulders,id=115574,bonus_id=567
-back=drape_of_the_dark_hunt,id=113971,bonus_id=567,enchant=gift_of_multistrike
+back=drape_of_the_dark_hunt,id=113971,bonus_id=567,enchant=gift_of_haste
 chest=poisoners_tunic,id=115570,bonus_id=567
 wrists=bracers_of_shattered_stalactites,id=113935,bonus_id=567
 hands=poisoners_gloves,id=115571,bonus_id=567
 waist=girdle_of_unconquered_glory,id=113907,bonus_id=567
 legs=poisoners_legguards,id=115573,bonus_id=567
 feet=furnace_tenders_treads,id=113895,bonus_id=567
-finger1=spellbound_runic_band_of_unrelenting_slaughter,id=118307,enchant=gift_of_multistrike
-finger2=unexploded_explosive_shard,id=113877,bonus_id=567,enchant=gift_of_multistrike
+finger1=spellbound_runic_band_of_unrelenting_slaughter,id=118307,enchant=gift_of_haste
+finger2=unexploded_explosive_shard,id=113877,bonus_id=567,enchant=gift_of_haste
 trinket1=meaty_dragonspine_trophy,id=118114,bonus_id=567
 trinket2=humming_blackiron_trigger,id=113985,bonus_id=567
 main_hand=hansgars_forgehammer,id=113897,bonus_id=567,enchant=mark_of_warsong
