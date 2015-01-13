@@ -18,7 +18,6 @@ local OvalePool = Ovale.OvalePool
 local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
-local LibDispellable = LibStub("LibDispellable-1.0", true)
 local OvaleData = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
@@ -142,6 +141,7 @@ end
 local DEBUFF_TYPES = {
 	Curse = true,
 	Disease = true,
+	Enrage = true,
 	Magic = true,
 	Poison = true,
 }
@@ -281,14 +281,6 @@ local function RemoveAurasOnGUID(auraDB, guid)
 		self_pool:Release(auraTable)
 		auraDB[guid] = nil
 	end
-end
-
-local function IsEnrageEffect(auraId)
-	local boolean = OvaleData.buffSpellList.enrage_buff[auraId]
-	if LibDispellable then
-		boolean = LibDispellable:IsEnrageEffect(auraId)
-	end
-	return boolean or nil
 end
 
 local function IsWithinAuraLag(time1, time2, factor)
@@ -561,7 +553,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		aura.visible = visible
 		aura.icon = icon
 		aura.debuffType = debuffType
-		aura.enrage = IsEnrageEffect(auraId)
+		aura.enrage = (debuffType == "Enrage") or nil
 		aura.stealable = isStealable
 		aura.value1, aura.value2, aura.value3 = value1, value2, value3
 
@@ -723,6 +715,10 @@ function OvaleAura:ScanAuras(unitId, guid)
 				end
 			else
 				local casterGUID = OvaleGUID:GetGUID(unitCaster)
+				if debuffType == "" then
+					-- Empty string for the debuff type means this is an Enrage effect.
+					debuffType = "Enrage"
+				end
 				self:GainedAuraOnGUID(guid, now, spellId, casterGUID, filter, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
 				i = i + 1
 			end

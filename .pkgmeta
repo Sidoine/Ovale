@@ -15,7 +15,6 @@ externals:
     Libs/LibBabble-CreatureType-3.0: svn://svn.wowace.com/wow/libbabble-creaturetype-3-0/mainline/trunk
     Libs/LibDataBroker-1.1: git://git.wowace.com/wow/libdatabroker-1-1/mainline.git
     Libs/LibDBIcon-1.0: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk/LibDBIcon-1.0
-    Libs/LibDispellable-1.0: git://git.wowace.com/wow/libdispellable-1-0/mainline.git
     Libs/LibStub: svn://svn.wowace.com/wow/ace3/mainline/trunk/LibStub
     Libs/LibTextDump-1.0: git://git.wowace.com/wow/libtextdump-1-0/mainline.git
 
