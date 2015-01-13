@@ -254,6 +254,7 @@ AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
 # ascendance_melee_buff
 # berserking
 # blood_fury_apsp
+# bloodlust
 # chain_lightning
 # draenic_agility_potion
 # echo_of_the_elements_buff
@@ -269,6 +270,7 @@ AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
 # flame_shock_debuff
 # frost_shock
 # glyph_of_chain_lightning
+# heroism
 # lava_lash
 # lightning_bolt
 # lightning_shield

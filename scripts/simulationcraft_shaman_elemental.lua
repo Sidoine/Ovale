@@ -250,6 +250,7 @@ AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
 # ascendance_caster_buff
 # berserking
 # blood_fury_apsp
+# bloodlust
 # chain_lightning
 # draenic_intellect_potion
 # earth_shock
@@ -263,6 +264,7 @@ AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
 # fire_elemental_totem
 # flame_shock
 # flame_shock_debuff
+# heroism
 # lava_beam
 # lava_burst
 # lava_surge_buff

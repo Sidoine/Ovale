@@ -284,7 +284,7 @@ local function RemoveAurasOnGUID(auraDB, guid)
 end
 
 local function IsEnrageEffect(auraId)
-	local boolean = OvaleData.buffSpellList.enrage[auraId]
+	local boolean = OvaleData.buffSpellList.enrage_buff[auraId]
 	if LibDispellable then
 		boolean = LibDispellable:IsEnrageEffect(auraId)
 	end
@@ -1177,7 +1177,6 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 	local unitId = OvaleGUID:GetUnitId(guid)
 	for filter, filterInfo in pairs(auraList) do
 		for auraId, spellData in pairs(filterInfo) do
-			local si = OvaleData.spellInfo[auraId]
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
 
 			local stacks = 1
@@ -1198,15 +1197,9 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 				extend = data
 			else
 				stacks = value
-				-- Deprecated after transition.
-				if not (si and si.duration) and value > 0 then
-					-- Aura doesn't have duration SpellInfo(), so treat spell data as duration.
-					Ovale:OneTimeMessage("Warning: '%s=%d' is deprecated for spell ID %d; aura ID %s should have duration information.", auraId, value, spellId, auraId)
-					duration = value
-					stacks = 1
-				end
 			end
 			if verified then
+				local si = OvaleData.spellInfo[auraId]
 				local auraFound = state:GetAuraByGUID(guid, auraId, filter, true)
 				if state:IsActiveAura(auraFound, atTime) then
 					local aura

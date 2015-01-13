@@ -391,34 +391,6 @@ do
 			end
 		end
 	end
-
-	-- Deprecated: spell list aliases.
-	list.attack_power_multiplier	= list.attack_power_multiplier_buff
-	list.bleed						= list.bleed_debuff
-	list.bloodlust					= list.burst_haste_buff
-	list.bloodlust_aura				= list.burst_haste_buff
-	list.burst_haste				= list.burst_haste_buff
-	list.cast_slow					= list.cast_slow_debuff
-	list.critical_strike			= list.critical_strike_buff
-	list.enrage						= list.enrage_buff
-	list.fear						= list.fear_debuff
-	list.healing_reduced			= list.healing_reduced_debuff
-	list.heroism					= list.burst_haste_buff
-	list.heroism_aura				= list.burst_haste_buff
-	list.incapacitate				= list.incapacitate_debuff
-	list.lower_physical_damage		= list.lower_physical_damage_debuff
-	list.magic_vulnerability		= list.magic_vulnerability_debuff
-	list.mastery					= list.mastery_buff
-	list.melee_haste				= list.attack_speed_buff
-	list.physical_vulnerability		= list.physical_vulnerability_debuff
-	list.raid_movement				= list.raid_movement_buff
-	list.ranged_vulnerability		= list.ranged_vulnerability_debuff
-	list.root						= list.root_debuff
-	list.spell_haste				= list.spell_haste_buff
-	list.spell_power_multiplier		= list.spell_power_multiplier_buff
-	list.stamina					= list.stamina_buff
-	list.str_agi_int				= list.str_agi_int_buff
-	list.stun						= list.stun_debuff
 end
 
 -- Unused public property to suppress lint warnings.
@@ -554,7 +526,6 @@ end
 		auraId=refresh		aura is refreshed, no change to stacks
 		auraId=refresh_keep_snapshot
 							aura is refreshed and the snapshot is carried over from the previous aura.
-		auraId=N, N > 0		N is duration if aura has no duration SpellInfo() [deprecated].
 		auraId=N, N > 0		N is number of stacks added
 		auraId=0			aura is removed
 		auraId=N, N < 0		N is number of stacks of aura removed
