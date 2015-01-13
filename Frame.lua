@@ -201,7 +201,12 @@ do
 					atTime = state.currentTime
 				end
 				local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
-				local start = NextTime(timeSpan, atTime)
+				local start
+				if element and element.offgcd then
+					start = NextTime(timeSpan, state.currentTime)
+				else
+					start = NextTime(timeSpan, atTime)
+				end
 				local action = self.actions[k]
 				local profile = Ovale.db.profile
 				if profile.apparence.enableIcons then
@@ -300,7 +305,12 @@ do
 						atTime = state.currentTime
 					end
 					local timeSpan, _, nextElement = OvaleBestAction:GetAction(node, state, atTime)
-					start = NextTime(timeSpan, atTime)
+					local start
+					if nextElement and nextElement.offgcd then
+						start = NextTime(timeSpan, state.currentTime)
+					else
+						start = NextTime(timeSpan, atTime)
+					end
 					icons[2]:Update(nextElement, start, OvaleBestAction:GetActionInfo(nextElement, state))
 				else
 					icons[2]:Update(element, nil)

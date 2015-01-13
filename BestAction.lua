@@ -572,9 +572,12 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 		end
 		state:Log("[%d]    start=%f atTime=%s", nodeId, start, atTime)
 
-		-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
+		-- Set the "offgcd" flag in the element if it is a spell.
 		local offgcd = element.params.offgcd or (spellInfo and spellInfo.offgcd) or 0
-		if offgcd == 1 then
+		element.offgcd = (offgcd == 1) and true or nil
+
+		-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
+		if element.offgcd then
 			state:Log("[%d]    Action %s is off the global cooldown.", nodeId, action)
 		elseif start < atTime then
 			state:Log("[%d]    Action %s is waiting for the global cooldown.", nodeId, action)
