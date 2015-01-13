@@ -245,7 +245,7 @@ end
 statePrototype.ApplyEclipseEnergy = function(state, spellId, atTime, snapshot)
 	OvaleEclipse:StartProfiling("OvaleEclipse_ApplyEclipseEnergy")
 	if spellId == CELESTIAL_ALIGNMENT then
-		local aura = state:AddAuraToGUID(self_guid, spellId, self_guid, "HELPFUL", atTime, atTime + 15, snapshot)
+		local aura = state:AddAuraToGUID(self_guid, spellId, self_guid, "HELPFUL", nil, atTime, atTime + 15, snapshot)
 		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)
 		-- Celestial Alignment grants the spell effects of both Lunar and Solar Eclipse and
 		-- also resets the total Eclipse energy to zero.
@@ -353,11 +353,11 @@ statePrototype.AddEclipse = function(state, eclipseId, atTime, snapshot)
 	if eclipseId == LUNAR_ECLIPSE or eclipseId == SOLAR_ECLIPSE then
 		local eclipseName = (eclipseId == LUNAR_ECLIPSE) and "Lunar" or "Solar"
 		state:Log("    Adding %s Eclipse (%d) at %f", eclipseName, eclipseId, atTime)
-		local aura = state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", atTime, INFINITY, snapshot)
+		local aura = state:AddAuraToGUID(self_guid, eclipseId, self_guid, "HELPFUL", nil, atTime, INFINITY, snapshot)
 		-- Set the value of the Eclipse aura to the Eclipse's bonus damage.
 		aura.value1 = state:EclipseBonusDamage(atTime, snapshot)
 		-- Reaching Eclipse state grants Nature's Grace.
-		state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", atTime, atTime + 15, snapshot)
+		state:AddAuraToGUID(self_guid, NATURES_GRACE, self_guid, "HELPFUL", nil, atTime, atTime + 15, snapshot)
 		-- Reaching Lunar Eclipse resets the cooldown of Starfall.
 		if eclipseId == LUNAR_ECLIPSE then
 			state:ResetSpellCooldown(STARFALL, atTime)

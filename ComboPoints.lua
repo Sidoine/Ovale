@@ -459,7 +459,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 				-- Add a new Anticipation buff with the updated start, ending, stacks information.
 				local start = endCast
 				local ending = start + ANTICIPATION_DURATION
-				aura = state:AddAuraToGUID(self_guid, ANTICIPATION, self_guid, "HELPFUL", start, ending)
+				aura = state:AddAuraToGUID(self_guid, ANTICIPATION, self_guid, "HELPFUL", nil, start, ending)
 				aura.stacks = stacks
 			end
 			power = MAX_COMBO_POINTS

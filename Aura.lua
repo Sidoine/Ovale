@@ -33,6 +33,7 @@ local ipairs = ipairs
 local next = next
 local pairs = pairs
 local strfind = string.find
+local strlower = string.lower
 local strmatch = string.match
 local strsub = string.sub
 local tconcat = table.concat
@@ -138,13 +139,20 @@ do
 end
 
 -- Aura debuff types.
-local DEBUFF_TYPES = {
+local DEBUFF_TYPE = {
 	Curse = true,
 	Disease = true,
 	Enrage = true,
 	Magic = true,
 	Poison = true,
 }
+local SPELLINFO_DEBUFF_TYPE = {}
+do
+	for debuffType in pairs(DEBUFF_TYPE) do
+		local siDebuffType = strlower(debuffType)
+		SPELLINFO_DEBUFF_TYPE[siDebuffType] = debuffType
+	end
+end
 
 -- CLEU events triggered by auras being applied, removed, refreshed, or changed in stack size.
 local CLEU_AURA_EVENTS = {
@@ -251,7 +259,7 @@ end
 
 local function GetAuraOnGUID(auraDB, guid, auraId, filter, mine)
 	local auraFound
-	if DEBUFF_TYPES[auraId] then
+	if DEBUFF_TYPE[auraId] then
 		if mine then
 			auraFound = GetDebuffType(auraDB, guid, auraId, filter, self_guid)
 		else
@@ -1097,7 +1105,7 @@ end
 
 local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 	local auraFound
-	if DEBUFF_TYPES[auraId] then
+	if DEBUFF_TYPE[auraId] then
 		if mine then
 			auraFound = GetStateDebuffType(state, guid, auraId, filter, self_guid)
 		else
@@ -1204,7 +1212,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						aura = auraFound
 					else
 						-- Add an aura in the simulator and copy the existing aura information over.
-						aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, INFINITY)
+						aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, nil, 0, INFINITY)
 						for k, v in pairs(auraFound) do
 							aura[k] = v
 						end
@@ -1291,7 +1299,16 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						-- Spellcast causes a new aura.
 						state:Log("New aura %d at %f on %s", auraId, atTime, guid)
 						-- Add an aura in the simulator and copy the existing aura information over.
-						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, 0, INFINITY)
+						local debuffType
+						if si then
+							for k, v in pairs(SPELLINFO_DEBUFF_TYPE) do
+								if si[k] == 1 then
+									debuffType = v
+									break
+								end
+							end
+						end
+						local aura = state:AddAuraToGUID(guid, auraId, self_guid, filter, debuffType, 0, INFINITY)
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
 						aura.stacks = stacks
 						-- Set start and duration for aura.
@@ -1350,7 +1367,7 @@ statePrototype.GetAura = function(state, unitId, auraId, filter, mine)
 end
 
 -- Add a new aura to the unit specified by GUID.
-statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter, start, ending, snapshot)
+statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter, debuffType, start, ending, snapshot)
 	local aura = self_pool:Get()
 	aura.state = true
 	aura.serial = state.serial
@@ -1362,6 +1379,8 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	aura.duration = ending - start
 	aura.gain = aura.start
 	aura.stacks = 1
+	aura.debuffType = debuffType
+	aura.enrage = (debuffType == "Enrage") or nil
 	if snapshot then
 		aura.snapshot = OvalePaperDoll:GetSnapshot(snapshot)
 	end
@@ -1379,7 +1398,7 @@ statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, at
 			aura = auraFound
 		else
 			-- Add an aura in the simulator and copy the existing aura information over.
-			aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, 0, INFINITY)
+			aura = state:AddAuraToGUID(guid, auraId, auraFound.source, filter, nil, 0, INFINITY)
 			for k, v in pairs(auraFound) do
 				aura[k] = v
 			end
