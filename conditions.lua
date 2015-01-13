@@ -2489,7 +2489,7 @@ do
 	local function IsEnraged(condition, state, atTime)
 		local yesno = condition[1]
 		local target = ParseCondition(condition, state)
-		return state:GetAuraWithProperty(target, "enraged", "HELPFUL", atTime)
+		return state:GetAuraWithProperty(target, "enrage", "HELPFUL", atTime)
 	end
 
 	OvaleCondition:RegisterCondition("isenraged", false, IsEnraged)
