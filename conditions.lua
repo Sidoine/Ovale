@@ -1758,6 +1758,34 @@ do
 end
 
 do
+	--- Get the remaining time in seconds the target is Enraged.
+	-- @name EnrageRemaining
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @see IsEnraged
+	-- @usage
+	-- if EnrageRemaining() < 3 Spell(berserker_rage)
+
+	local function EnrageRemaining(condition, state, atTime)
+		local comparator, limit = condition[1], condition[2]
+		local target = ParseCondition(condition, state)
+		local start, ending = state:GetAuraWithProperty(target, "enrage", "HELPFUL", atTime)
+		if start and ending then
+			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("enrageremaining", false, EnrageRemaining)
+end
+
+do
 	--- Test if the target exists. The target may be alive or dead.
 	-- @name Exists
 	-- @paramsig boolean
