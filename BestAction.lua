@@ -563,7 +563,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 				state:Log("[%d]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration)
 				start = actionCooldownStart + actionCooldownDuration
 			else
-				state:Log("[%d]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart)
+				state:Log("[%d]    Action %s is waiting on the GCD or resources (start=%f).", nodeId, action, actionCooldownStart)
 				start = actionCooldownStart
 			end
 		else
