@@ -124,19 +124,25 @@ AddFunction ShadowCopShortCdActions
 	{
 		#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
 		if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
-		#cascade,if=talent.cascade.enabled&((active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11)
+		#cascade,if=talent.cascade.enabled&(active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11
 		if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
-		#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
-		if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
+		#divine_star,if=talent.divine_star.enabled&active_enemies>3&target.distance<=24
+		if Talent(divine_star_talent) and Enemies() > 3 and target.Distance() <= 24 Spell(divine_star_caster)
 
-		unless DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Enemies() <= 5 and 1 == 0 and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 1 == 0 and Spell(vampiric_touch) or Enemies() >= 5 and Spell(mind_sear) or Enemies() <= 4 and BuffPresent(surge_of_darkness_buff) and Spell(mind_spike) or Enemies() >= 3 and Spell(mind_sear) or target.TicksRemaining(devouring_plague_debuff) > 1 and Enemies() == 1 and Spell(mind_flay) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death) or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
+		unless DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and True(miss_react) and not target.DebuffPresent(shadow_word_pain_debuff) and Enemies() <= 5 and 1 == 0 and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 1 == 0 and Spell(vampiric_touch)
 		{
-			#halo,moving=1,if=talent.halo.enabled&target.distance<=30
-			if Speed() > 0 and Talent(halo_talent) and target.Distance() <= 30 Spell(halo_caster)
-			#divine_star,if=talent.divine_star.enabled&target.distance<=28,moving=1
-			if Talent(divine_star_talent) and target.Distance() <= 28 and Speed() > 0 Spell(divine_star_caster)
-			#cascade,if=talent.cascade.enabled&target.distance<=40,moving=1
-			if Talent(cascade_talent) and target.Distance() <= 40 and Speed() > 0 Spell(cascade_caster)
+			#divine_star,if=talent.divine_star.enabled&active_enemies=3&target.distance<=24
+			if Talent(divine_star_talent) and Enemies() == 3 and target.Distance() <= 24 Spell(divine_star_caster)
+
+			unless Enemies() >= 5 and Spell(mind_sear) or Enemies() <= 4 and BuffPresent(surge_of_darkness_buff) and Spell(mind_spike) or Enemies() >= 3 and Spell(mind_sear) or target.TicksRemaining(devouring_plague_debuff) > 1 and Enemies() == 1 and Spell(mind_flay) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death) or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
+			{
+				#halo,moving=1,if=talent.halo.enabled&target.distance<=30
+				if Speed() > 0 and Talent(halo_talent) and target.Distance() <= 30 Spell(halo_caster)
+				#divine_star,if=talent.divine_star.enabled&target.distance<=28,moving=1
+				if Talent(divine_star_talent) and target.Distance() <= 28 and Speed() > 0 Spell(divine_star_caster)
+				#cascade,if=talent.cascade.enabled&target.distance<=40,moving=1
+				if Talent(cascade_talent) and target.Distance() <= 40 and Speed() > 0 Spell(cascade_caster)
+			}
 		}
 	}
 }
@@ -178,6 +184,10 @@ AddFunction ShadowCopDotweaveMainActions
 	if ShadowOrbs() >= 2 and target.DebuffRemaining(shadow_word_pain_debuff) >= 6 and SpellCooldown(mind_blast) > 0.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) and BuffPresent(burst_haste_buff any=1) and not ArmorSetBonus(T17 2) Spell(shadow_word_pain)
 	#vampiric_touch,if=shadow_orb>=2&target.dot.vampiric_touch.remains>=5&cooldown.mind_blast.remains>0.5*gcd&buff.bloodlust.up&!set_bonus.tier17_2pc
 	if ShadowOrbs() >= 2 and target.DebuffRemaining(vampiric_touch_debuff) >= 5 and SpellCooldown(mind_blast) > 0.5 * GCD() and BuffPresent(burst_haste_buff any=1) and not ArmorSetBonus(T17 2) Spell(vampiric_touch)
+	#shadow_word_pain,if=primary_target=0&!ticking,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 1 == 0 and not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	#vampiric_touch,if=primary_target=0&!ticking,cycle_targets=1,max_cycle_targets=5
+	if DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and 1 == 0 and not target.DebuffPresent(vampiric_touch_debuff) Spell(vampiric_touch)
 	#shadow_word_pain,if=primary_target=0&(!ticking|remains<=18*0.3),cycle_targets=1,max_cycle_targets=5
 	if DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 1 == 0 and { not target.DebuffPresent(shadow_word_pain_debuff) or target.DebuffRemaining(shadow_word_pain_debuff) <= 18 * 0.3 } Spell(shadow_word_pain)
 	#vampiric_touch,if=primary_target=0&(!ticking|remains<=15*0.3),cycle_targets=1,max_cycle_targets=5
@@ -202,19 +212,25 @@ AddFunction ShadowCopDotweaveShortCdActions
 	{
 		#halo,if=cooldown.mind_blast.remains>0.5*gcd&talent.halo.enabled&target.distance<=30&target.distance>=17
 		if SpellCooldown(mind_blast) > 0.5 * GCD() and Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
-		#divine_star,if=cooldown.mind_blast.remains>0.5&gcd&talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
-		if SpellCooldown(mind_blast) > 0.5 and GCD() and Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
-		#cascade,if=cooldown.mind_blast.remains>0.5*gcd&talent.cascade.enabled&((active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11)
+		#cascade,if=cooldown.mind_blast.remains>0.5*gcd&talent.cascade.enabled&(active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11
 		if SpellCooldown(mind_blast) > 0.5 * GCD() and Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
+		#divine_star,if=talent.divine_star.enabled&cooldown.mind_blast.remains>0.5*gcd&active_enemies>3&target.distance<=24
+		if Talent(divine_star_talent) and SpellCooldown(mind_blast) > 0.5 * GCD() and Enemies() > 3 and target.Distance() <= 24 Spell(divine_star_caster)
 
-		unless DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 1 == 0 and { not target.DebuffPresent(shadow_word_pain_debuff) or target.DebuffRemaining(shadow_word_pain_debuff) <= 18 * 0.3 } and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and 1 == 0 and { not target.DebuffPresent(vampiric_touch_debuff) or target.DebuffRemaining(vampiric_touch_debuff) <= 15 * 0.3 } and Spell(vampiric_touch) or BuffRemaining(shadow_word_insanity_buff) <= GCD() and BuffPresent(burst_haste_buff any=1) and not target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) and Spell(mind_spike) or { target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) or not target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) } and ShadowOrbs() <= 2 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike) or ArmorSetBonus(T17 2) and target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) and SpellCooldown(mind_blast) > 0.9 * GCD() and Spell(mind_flay) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death)
+		unless DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 1 == 0 and not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and 1 == 0 and not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch)
 		{
-			#halo,if=talent.halo.enabled&target.distance<=30,moving=1
-			if Talent(halo_talent) and target.Distance() <= 30 and Speed() > 0 Spell(halo_caster)
-			#divine_star,if=talent.divine_star.enabled&target.distance<=28,moving=1
-			if Talent(divine_star_talent) and target.Distance() <= 28 and Speed() > 0 Spell(divine_star_caster)
-			#cascade,if=talent.cascade.enabled&target.distance<=40,moving=1
-			if Talent(cascade_talent) and target.Distance() <= 40 and Speed() > 0 Spell(cascade_caster)
+			#divine_star,if=talent.divine_star.enabled&cooldown.mind_blast.remains>0.5*gcd&active_enemies=3&target.distance<=24
+			if Talent(divine_star_talent) and SpellCooldown(mind_blast) > 0.5 * GCD() and Enemies() == 3 and target.Distance() <= 24 Spell(divine_star_caster)
+
+			unless DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and 1 == 0 and { not target.DebuffPresent(shadow_word_pain_debuff) or target.DebuffRemaining(shadow_word_pain_debuff) <= 18 * 0.3 } and Spell(shadow_word_pain) or DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and 1 == 0 and { not target.DebuffPresent(vampiric_touch_debuff) or target.DebuffRemaining(vampiric_touch_debuff) <= 15 * 0.3 } and Spell(vampiric_touch) or BuffRemaining(shadow_word_insanity_buff) <= GCD() and BuffPresent(burst_haste_buff any=1) and not target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) and Spell(mind_spike) or { target.DebuffRemaining(shadow_word_pain_debuff) and not target.DebuffRemaining(vampiric_touch_debuff) or not target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) } and ShadowOrbs() <= 2 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike) or ArmorSetBonus(T17 2) and target.DebuffRemaining(shadow_word_pain_debuff) and target.DebuffRemaining(vampiric_touch_debuff) and SpellCooldown(mind_blast) > 0.9 * GCD() and Spell(mind_flay) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death)
+			{
+				#halo,if=talent.halo.enabled&target.distance<=30,moving=1
+				if Talent(halo_talent) and target.Distance() <= 30 and Speed() > 0 Spell(halo_caster)
+				#divine_star,if=talent.divine_star.enabled&target.distance<=28,moving=1
+				if Talent(divine_star_talent) and target.Distance() <= 28 and Speed() > 0 Spell(divine_star_caster)
+				#cascade,if=talent.cascade.enabled&target.distance<=40,moving=1
+				if Talent(cascade_talent) and target.Distance() <= 40 and Speed() > 0 Spell(cascade_caster)
+			}
 		}
 	}
 }
@@ -248,9 +264,9 @@ AddFunction ShadowCopMfiMainActions
 	if DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.3 and True(miss_react) and Enemies() <= 5 and 1 == 0 Spell(shadow_word_pain)
 	#vampiric_touch,if=remains<(15*0.3+cast_time)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
 	if DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.3 + CastTime(vampiric_touch) and True(miss_react) and Enemies() <= 5 and 1 == 0 Spell(vampiric_touch)
-	#insanity,if=buff.shadow_word_insanity.remains<0.5*gcd&active_enemies<=2,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|(cooldown.shadow_word_death.remains<=0.1*target.health.pct<20))
+	#insanity,if=buff.shadow_word_insanity.remains<0.5*gcd&active_enemies<=2,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|(cooldown.shadow_word_death.remains<=0.1&target.health.pct<20))
 	if BuffRemaining(shadow_word_insanity_buff) < 0.5 * GCD() and Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) Spell(insanity)
-	#insanity,if=active_enemies<=2,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|(cooldown.shadow_word_death.remains<=0.1*target.health.pct<20))
+	#insanity,if=active_enemies<=2,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|(cooldown.shadow_word_death.remains<=0.1&target.health.pct<20))
 	if Enemies() <= 2 and BuffPresent(shadow_word_insanity_buff) Spell(insanity)
 	#mind_sear,if=active_enemies>=6,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|cooldown.shadow_word_death.remains<=0.1)
 	if Enemies() >= 6 Spell(mind_sear)
@@ -270,10 +286,10 @@ AddFunction ShadowCopMfiShortCdActions
 	{
 		#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
 		if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
-		#cascade,if=talent.cascade.enabled&((active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11)
+		#cascade,if=talent.cascade.enabled&(active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11
 		if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
-		#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
-		if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
+		#divine_star,if=talent.divine_star.enabled&(active_enemies>2&target.distance<=24)
+		if Talent(divine_star_talent) and Enemies() > 2 and target.Distance() <= 24 Spell(divine_star_caster)
 
 		unless Enemies() >= 6 and Spell(mind_sear) or Spell(mind_spike) or Speed() > 0 and Spell(shadow_word_death) or BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Speed() > 0 and Spell(mind_blast)
 		{
@@ -417,10 +433,10 @@ AddFunction ShadowMainShortCdActions
 		{
 			#halo,if=talent.halo.enabled&target.distance<=30&target.distance>=17
 			if Talent(halo_talent) and target.Distance() <= 30 and target.Distance() >= 17 Spell(halo_caster)
-			#cascade,if=talent.cascade.enabled&((active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11)
+			#cascade,if=talent.cascade.enabled&(active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11
 			if Talent(cascade_talent) and { Enemies() > 1 or target.Distance() >= 28 } and target.Distance() <= 40 and target.Distance() >= 11 Spell(cascade_caster)
-			#divine_star,if=talent.divine_star.enabled&(active_enemies>1|target.distance<=24)
-			if Talent(divine_star_talent) and { Enemies() > 1 or target.Distance() <= 24 } Spell(divine_star_caster)
+			#divine_star,if=talent.divine_star.enabled&active_enemies>1&target.distance<=24
+			if Talent(divine_star_talent) and Enemies() > 1 and target.Distance() <= 24 Spell(divine_star_caster)
 			#wait,sec=cooldown.shadow_word_death.remains,if=target.health.pct<20&cooldown.shadow_word_death.remains&cooldown.shadow_word_death.remains<0.5&active_enemies<=1
 			unless target.HealthPercent() < 20 and SpellCooldown(shadow_word_death) > 0 and SpellCooldown(shadow_word_death) < 0.5 and Enemies() <= 1 and SpellCooldown(shadow_word_death) > 0
 			{
@@ -546,8 +562,8 @@ AddFunction ShadowVentMainActions
 	if DebuffCountOnAny(shadow_word_pain_debuff) < Enemies() and DebuffCountOnAny(shadow_word_pain_debuff) <= 5 and target.DebuffRemaining(shadow_word_pain_debuff) < 18 * 0.35 and True(miss_react) Spell(shadow_word_pain)
 	#vampiric_touch,if=remains<(15*0.35)&miss_react,cycle_targets=1,max_cycle_targets=5
 	if DebuffCountOnAny(vampiric_touch_debuff) < Enemies() and DebuffCountOnAny(vampiric_touch_debuff) <= 5 and target.DebuffRemaining(vampiric_touch_debuff) < 15 * 0.35 and True(miss_react) Spell(vampiric_touch)
-	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.up&cooldown_react&cooldown.mind_blast.remains>0.5*gcd
-	if Enemies() <= 5 and BuffPresent(surge_of_darkness_buff) and not SpellCooldown(mind_spike) > 0 and SpellCooldown(mind_blast) > 0.5 * GCD() Spell(mind_spike)
+	#mind_spike,if=active_enemies<=5&buff.surge_of_darkness.react&cooldown.mind_blast.remains>0.5*gcd
+	if Enemies() <= 5 and BuffPresent(surge_of_darkness_buff) and SpellCooldown(mind_blast) > 0.5 * GCD() Spell(mind_spike)
 	#mind_sear,chain=1,if=active_enemies>=3&cooldown.mind_blast.remains>0.5*gcd,interrupt_if=(cooldown.mind_blast.remains<=0.1|cooldown.shadow_word_death.remains<=0.1)
 	if Enemies() >= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() Spell(mind_sear)
 	#mind_flay,if=cooldown.mind_blast.remains>0.5*gcd,interrupt=1,chain=1
@@ -556,8 +572,6 @@ AddFunction ShadowVentMainActions
 	if Speed() > 0 Spell(shadow_word_death)
 	#mind_blast,moving=1,if=buff.shadowy_insight.react&cooldown_react
 	if Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 Spell(mind_blast)
-	#shadow_word_death,moving=1
-	if Speed() > 0 Spell(shadow_word_death)
 	#shadow_word_pain,moving=1,cycle_targets=1
 	if Speed() > 0 Spell(shadow_word_pain)
 }
@@ -578,7 +592,7 @@ AddFunction ShadowVentShortCdActions
 			#divine_star,if=talent.divine_star.enabled&active_enemies>4&target.distance<=24&cooldown.mind_blast.remains>0.5*gcd
 			if Talent(divine_star_talent) and Enemies() > 4 and target.Distance() <= 24 and SpellCooldown(mind_blast) > 0.5 * GCD() Spell(divine_star_caster)
 
-			unless Enemies() <= 5 and BuffPresent(surge_of_darkness_buff) and not SpellCooldown(mind_spike) > 0 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike) or Enemies() >= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_sear) or SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_flay) or Speed() > 0 and Spell(shadow_word_death) or Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
+			unless Enemies() <= 5 and BuffPresent(surge_of_darkness_buff) and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_spike) or Enemies() >= 3 and SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_sear) or SpellCooldown(mind_blast) > 0.5 * GCD() and Spell(mind_flay) or Speed() > 0 and Spell(shadow_word_death) or Speed() > 0 and BuffPresent(shadowy_insight_buff) and not SpellCooldown(mind_blast) > 0 and Spell(mind_blast)
 			{
 				#divine_star,moving=1,if=talent.divine_star.enabled&target.distance<=28
 				if Speed() > 0 and Talent(divine_star_talent) and target.Distance() <= 28 Spell(divine_star_caster)

@@ -13,6 +13,7 @@ Define(harmony 77495)
 
 Define(astral_showers 33605)
 Define(balance_of_power 152220)
+Define(balance_of_power_talent 21)
 Define(barkskin 22812)
 	SpellInfo(barkskin cd=60 gcd=0 offgcd=1)
 	SpellInfo(barkskin buff_cdr=cooldown_reduction_tank_buff specialization=guardian)

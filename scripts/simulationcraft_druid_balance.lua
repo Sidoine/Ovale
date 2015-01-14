@@ -120,12 +120,14 @@ AddFunction BalanceSingleTargetMainActions
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 Spell(starsurge)
 	#starsurge,if=(charges=2&recharge_time<6)|charges=3
 	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
-	#sunfire,if=remains<7|buff.solar_peak.up
-	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) Spell(sunfire)
+	#sunfire,if=remains<7|(buff.solar_peak.up&!talent.balance_of_power.enabled)
+	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and not Talent(balance_of_power_talent) Spell(sunfire)
 	#stellar_flare,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
-	#moonfire,if=buff.lunar_peak.up&remains<eclipse_change+20|remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20)
-	if BuffPresent(lunar_peak_buff) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 Spell(moonfire)
+	#moonfire,if=!talent.balance_of_power.enabled&(buff.lunar_peak.up&remains<eclipse_change+20|remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
+	if not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
+	#moonfire,if=talent.balance_of_power.enabled&(remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
+	if Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
 	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
@@ -182,6 +184,7 @@ AddIcon specialization=balance help=cd checkbox=opt_druid_balance_aoe
 
 ### Required symbols
 # arcane_torrent_energy
+# balance_of_power_talent
 # berserking
 # blood_fury_apsp
 # celestial_alignment

@@ -54,10 +54,10 @@ AddFunction InterruptActions
 
 AddFunction FrostTwoHanderDefaultMainActions
 {
-	#run_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 FrostTwoHanderAoeMainActions()
-	#run_action_list,name=single_target,if=active_enemies<3
-	if Enemies() < 3 FrostTwoHanderSingleTargetMainActions()
+	#run_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FrostTwoHanderAoeMainActions()
+	#run_action_list,name=single_target,if=active_enemies<4
+	if Enemies() < 4 FrostTwoHanderSingleTargetMainActions()
 }
 
 AddFunction FrostTwoHanderDefaultShortCdActions
@@ -70,10 +70,10 @@ AddFunction FrostTwoHanderDefaultShortCdActions
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
-	#run_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 FrostTwoHanderAoeShortCdActions()
-	#run_action_list,name=single_target,if=active_enemies<3
-	if Enemies() < 3 FrostTwoHanderSingleTargetShortCdActions()
+	#run_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FrostTwoHanderAoeShortCdActions()
+	#run_action_list,name=single_target,if=active_enemies<4
+	if Enemies() < 4 FrostTwoHanderSingleTargetShortCdActions()
 }
 
 AddFunction FrostTwoHanderDefaultCdActions
@@ -92,10 +92,10 @@ AddFunction FrostTwoHanderDefaultCdActions
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=trinket2
 	UseItemActions()
-	#run_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 FrostTwoHanderAoeCdActions()
-	#run_action_list,name=single_target,if=active_enemies<3
-	if Enemies() < 3 FrostTwoHanderSingleTargetCdActions()
+	#run_action_list,name=aoe,if=active_enemies>=4
+	if Enemies() >= 4 FrostTwoHanderAoeCdActions()
+	#run_action_list,name=single_target,if=active_enemies<4
+	if Enemies() < 4 FrostTwoHanderSingleTargetCdActions()
 }
 
 ### actions.aoe
