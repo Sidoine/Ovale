@@ -808,18 +808,6 @@ local function SyntaxError(tokenStream, ...)
 	OvaleAST:Print(tconcat(context, " "))
 end
 
--- Left-rotate tree to preserve precedence.
-local function LeftRotateTree(node)
-	local rhsNode = node.child[2]
-	while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
-		node.child[2] = rhsNode.child[1]
-		rhsNode.child[1] = node
-		node = rhsNode
-		rhsNode = node.child[2]
-	end
-	return node
-end
-
 -- Forward declarations of parser functions needed to implement a recursive descent parser.
 local PARSE_VISITOR = nil
 local Parse = nil
@@ -1256,7 +1244,12 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 						node.child[1] = lhsNode
 						node.child[2] = rhsNode
 						-- Left-rotate tree to preserve precedence.
-						node = LeftRotateTree(node)
+						while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
+							node.child[2] = rhsNode.child[1]
+							rhsNode.child[1] = node
+							node = rhsNode
+							rhsNode = node.child[2]
+						end
 					end
 				end
 			end
