@@ -1244,11 +1244,20 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 						node.child[1] = lhsNode
 						node.child[2] = rhsNode
 						-- Left-rotate tree to preserve precedence.
+						local rotated = false
 						while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
 							node.child[2] = rhsNode.child[1]
 							rhsNode.child[1] = node
+							-- Re-cache the string representation for the new LHS node.
+							node.asString = UnparseExpression(node)
+							-- Re-assign node and RHS node for the following loop.
 							node = rhsNode
 							rhsNode = node.child[2]
+							rotated = true
+						end
+						if rotated then
+							-- Re-cache the string representation for the new top-level expression node.
+							node.asString = UnparseExpression(node)
 						end
 					end
 				end
@@ -1259,6 +1268,10 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 		end
 	end
 
+	if ok and node then
+		-- Cache string representation.
+		node.asString = node.asString or Unparse(node)
+	end
 	return ok, node
 end
 
@@ -2785,6 +2798,7 @@ end
 
 function OvaleAST:Optimize(ast)
 	self:CommonFunctionElimination(ast)
+	self:CommonSubExpressionElimination(ast)
 end
 
 --[[----------------------------------------------------------------------------
@@ -2845,5 +2859,46 @@ function OvaleAST:CommonFunctionElimination(ast)
 		end
 	end
 	self:StopProfiling("OvaleAST_CommonFunctionElimination")
+end
+
+--[[----------------------------------------------------------------------------
+	Common Sub-Expression Elimination
+
+	This is an optimizing transformation of the AST that globally replaces
+	references to nodes with a string representation with the first node found
+	that has the same string representation.
+--]]----------------------------------------------------------------------------
+
+function OvaleAST:CommonSubExpressionElimination(ast)
+	self:StartProfiling("OvaleAST_CommonSubExpressionElimination")
+	if ast and ast.annotation and ast.annotation.nodeList then
+		local expressionHash = {}
+		-- Walk the AST and search for child nodes that have string representations.
+		for _, node in ipairs(ast.annotation.nodeList) do
+			local hash = node.asString
+			-- Hash the node if it has a string representation.
+			if hash then
+				expressionHash[hash] = expressionHash[hash] or node
+			end
+			-- Replace all child nodes with hashed nodes if they exist.
+			if node.child then
+				for i, childNode in ipairs(node.child) do
+					hash = childNode.asString
+					if hash then
+						local hashNode = expressionHash[hash]
+						if hashNode then
+							-- Replace the child node with a previous hashed node if it exists.
+							node.child[i] = hashNode
+						else
+							-- Hash the child node if it has a string representation.
+							expressionHash[hash] = childNode
+						end
+					end
+				end
+			end
+		end
+		ast.annotation.expressionHash = expressionHash
+	end
+	self:StopProfiling("OvaleAST_CommonSubExpressionElimination")
 end
 --</public-static-methods>
