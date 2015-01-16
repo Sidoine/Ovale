@@ -584,19 +584,22 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				-- Parse the spell data for this aura to see if this is a "refresh_keep_snapshot" aura.
 				local keepSnapshot = false
 				local si = OvaleData.spellInfo[spellId]
-				if si and si.aura and si.aura.target and si.aura.target[filter] then
-					local spellData = si.aura.target[filter][auraId]
-					if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
-						local tokenIterator
-						if strfind(spellData, ",") then
-							tokenIterator = gmatch(spellData, "[^,]+")
-							-- Advance past "refresh_keep_snapshot".
-							tokenIterator()
-						end
-						if tokenIterator then
-							keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, unitId)
-						else
-							keepSnapshot = true
+				if si and si.aura then
+					local auraTable = (unitId == "pet") and si.aura.pet or si.aura.target
+					if auraTable and auraTable[filter] then
+						local spellData = auraTable[filter][auraId]
+						if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
+							local tokenIterator
+							if strfind(spellData, ",") then
+								tokenIterator = gmatch(spellData, "[^,]+")
+								-- Advance past "refresh_keep_snapshot".
+								tokenIterator()
+							end
+							if tokenIterator then
+								keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, unitId)
+							else
+								keepSnapshot = true
+							end
 						end
 					end
 				end
@@ -946,13 +949,22 @@ function OvaleAura:ApplySpellStartCast(state, spellId, targetGUID, startCast, en
 	-- Channeled spells apply their auras when the player starts channeling.
 	if isChanneled then
 		local si = OvaleData.spellInfo[spellId]
-		-- Apply the auras on the player.
-		if si and si.aura and si.aura.player then
-			state:ApplySpellAuras(spellId, self_guid, startCast, si.aura.player, spellcast)
-		end
-		-- Apply the auras on the target.
-		if si and si.aura and si.aura.target then
-			state:ApplySpellAuras(spellId, targetGUID, startCast, si.aura.target, spellcast)
+		if si and si.aura then
+			-- Apply the auras on the player.
+			if si.aura.player then
+				state:ApplySpellAuras(spellId, self_guid, startCast, si.aura.player, spellcast)
+			end
+			-- Apply the auras on the target.
+			if si.aura.target then
+				state:ApplySpellAuras(spellId, targetGUID, startCast, si.aura.target, spellcast)
+			end
+			-- Apply the auras on the pet.
+			if si.aura.pet then
+				local petGUID = OvaleGUID:GetGUID("pet")
+				if petGUID then
+					state:ApplySpellAuras(spellId, petGUID, startCast, si.aura.pet, spellcast)
+				end
+			end
 		end
 	end
 	self:StopProfiling("OvaleAura_ApplySpellStartCast")
@@ -961,11 +973,21 @@ end
 -- Apply the effects of the spell when the spellcast completes.
 function OvaleAura:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleAura_ApplySpellAfterCast")
-	-- Cast-time spells apply their auras on the player when the player completes the cast.
+	-- Cast-time spells apply their auras on the player and any pets when the player completes the cast.
 	if not isChanneled then
 		local si = OvaleData.spellInfo[spellId]
-		if si and si.aura and si.aura.player then
-			state:ApplySpellAuras(spellId, self_guid, endCast, si.aura.player, spellcast)
+		if si and si.aura then
+			-- Apply the auras on the player.
+			if si.aura.player then
+				state:ApplySpellAuras(spellId, self_guid, endCast, si.aura.player, spellcast)
+			end
+			-- Apply the auras on the pet.
+			if si.aura.pet then
+				local petGUID = OvaleGUID:GetGUID("pet")
+				if petGUID then
+					state:ApplySpellAuras(spellId, petGUID, startCast, si.aura.pet, spellcast)
+				end
+			end
 		end
 	end
 	self:StopProfiling("OvaleAura_ApplySpellAfterCast")

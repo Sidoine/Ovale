@@ -437,6 +437,8 @@ function OvaleData:SpellInfo(spellId)
 				player = {},
 				-- Auras applied by this spell on its target.
 				target = {},
+				-- Auras applied by this spell on the player's pet.
+				pet = {},
 				-- Auras granting extra damage multipliers for this spell.
 				damage = {},
 			},

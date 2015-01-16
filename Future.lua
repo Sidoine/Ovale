@@ -75,7 +75,7 @@ local self_timeAuraAdded = nil
 local self_updateSpellcastInfo = {}
 
 -- Prefer target auras to player auras for aura-tracking so that spell travel time is more accurately taken into account.
-local SPELLCAST_AURA_ORDER = { "target", "player" }
+local SPELLCAST_AURA_ORDER = { "target", "pet", "player" }
 
 local OVALE_UNKNOWN_GUID = 0
 

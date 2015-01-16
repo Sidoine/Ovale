@@ -294,10 +294,12 @@ local function EvaluateSpellAuraList(node)
 		local keyword = node.keyword
 		local si = OvaleData:SpellInfo(spellId)
 		local auraTable
-		if strfind(keyword, "^SpellAddTarget") then
-			auraTable = si.aura.target
-		elseif strfind(keyword, "^SpellDamage") then
+		if strfind(keyword, "^SpellDamage") then
 			auraTable = si.aura.damage
+		elseif strfind(keyword, "^SpellAddPet") then
+			auraTable = si.aura.pet
+		elseif strfind(keyword, "^SpellAddTarget") then
+			auraTable = si.aura.target
 		else
 			auraTable = si.aura.player
 		end
