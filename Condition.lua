@@ -116,33 +116,33 @@ function OvaleCondition:IsSpellBookCondition(name)
 	return (self_spellBookCondition[name] ~= nil)
 end
 
-function OvaleCondition:EvaluateCondition(name, condition, state, atTime)
-	return self_condition[name](condition, state, atTime)
+function OvaleCondition:EvaluateCondition(name, positionalParams, namedParams, state, atTime)
+	return self_condition[name](positionalParams, namedParams, state, atTime)
 end
 
-OvaleCondition.ParseCondition = function(condition, state, defaultTarget)
-	local target = condition.target or defaultTarget or "player"
-	-- Side-effect: set condition.target to the correct value if not present.
-	condition.target = condition.target or target
+OvaleCondition.ParseCondition = function(positionalParams, namedParams, state, defaultTarget)
+	local target = namedParams.target or defaultTarget or "player"
+	-- Side-effect: set namedParams.target to the correct value if not present.
+	namedParams.target = namedParams.target or target
 	if target == "target" then
 		target = state.defaultTarget
 	end
 
 	local filter
-	if condition.filter then
-		if condition.filter == "debuff" then
+	if namedParams.filter then
+		if namedParams.filter == "debuff" then
 			filter = "HARMFUL"
-		elseif condition.filter == "buff" then
+		elseif namedParams.filter == "buff" then
 			filter = "HELPFUL"
 		end
 	end
 
 	local mine = true
-	if condition.any and condition.any == 1 then
+	if namedParams.any and namedParams.any == 1 then
 		mine = false
 	else
 		-- Legacy parameter "mine"; no longer documented.
-		if not condition.any and condition.mine and condition.mine ~= 1 then
+		if not namedParams.any and namedParams.mine and namedParams.mine ~= 1 then
 			mine = false
 		end
 	end

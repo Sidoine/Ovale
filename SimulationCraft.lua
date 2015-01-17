@@ -1163,7 +1163,7 @@ end
 SplitByTagAction = function(tag, node, nodeList, annotation)
 	local bodyNode, conditionNode
 	if node.func == "spell" then
-		local spellIdNode = node.rawParams[1]
+		local spellIdNode = node.rawPositionalParams[1]
 		local spellId, spellName
 		if spellIdNode.type == "variable" then
 			spellName = spellIdNode.name
@@ -2022,8 +2022,8 @@ EmitActionList = function(parseNode, nodeList, annotation)
 						code = gsub(code, extraAmountPattern, replaceString)
 						poolingConditionNode = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 					end
-					if bodyNode.type == "action" and bodyNode.rawParams and bodyNode.rawParams[1] then
-						local name = OvaleAST:Unparse(bodyNode.rawParams[1])
+					if bodyNode.type == "action" and bodyNode.rawPositionalParams and bodyNode.rawPositionalParams[1] then
+						local name = OvaleAST:Unparse(bodyNode.rawPositionalParams[1])
 						-- Create a condition node that includes checking that the spell is not on cooldown.
 						local powerCondition
 						if extra_amount then

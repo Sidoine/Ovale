@@ -130,20 +130,20 @@ local function GetActionItemInfo(element, state, atTime, target)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
 
-	local itemId = element.params[1]
+	local itemId = element.positionalParams[1]
 	if type(itemId) ~= "number" then
 		itemId = OvaleEquipment:GetEquippedItem(itemId)
 	end
 	if not itemId then
-		state:Log("Unknown item '%s'.", element.params[1])
+		state:Log("Unknown item '%s'.", element.positionalParams[1])
 	else
 		state:Log("Item ID '%s'", itemId)
 		local action = OvaleActionBar:GetForItem(itemId)
 		local spellName = API_GetItemSpell(itemId)
 
 		-- Use texture specified in the action if given.
-		if element.params.texture then
-			actionTexture = "Interface\\Icons\\" .. element.params.texture
+		if element.namedParams.texture then
+			actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
 		end
 		actionTexture = actionTexture or API_GetItemIcon(itemId)
 		actionInRange = API_IsItemInRange(itemId, target)
@@ -168,14 +168,14 @@ local function GetActionMacroInfo(element, state, atTime, target)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
 
-	local macro = element.params[1]
+	local macro = element.positionalParams[1]
 	local action = OvaleActionBar:GetForMacro(macro)
 	if not action then
 		state:Log("Unknown macro '%s'.", macro)
 	else
 		-- Use texture specified in the action if given.
-		if element.params.texture then
-			actionTexture = "Interface\\Icons\\" .. element.params.texture
+		if element.namedParams.texture then
+			actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
 		end
 		actionTexture = actionTexture or API_GetActionTexture(action)
 		actionInRange = API_IsActionInRange(action, target)
@@ -198,7 +198,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
 
-	local spellId = element.params[1]
+	local spellId = element.positionalParams[1]
 	local si = OvaleData.spellInfo[spellId]
 	local replacedSpellId = nil
 	if si and si.replace then
@@ -227,8 +227,8 @@ local function GetActionSpellInfo(element, state, atTime, target)
 		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, target)
 		if isUsable or noMana then
 			-- Use texture specified in the action if given.
-			if element.params.texture then
-				actionTexture = "Interface\\Icons\\" .. element.params.texture
+			if element.namedParams.texture then
+				actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
 			end
 			actionTexture = actionTexture or API_GetSpellTexture(spellId)
 			actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
@@ -277,7 +277,7 @@ local function GetActionTextureInfo(element, state, atTime, target)
 
 	local actionTexture
 	do
-		local texture = element.params[1]
+		local texture = element.positionalParams[1]
 		local spellId = tonumber(texture)
 		if spellId then
 			actionTexture = API_GetSpellTexture(spellId)
@@ -360,7 +360,7 @@ function OvaleBestAction:GetActionInfo(element, state, atTime)
 				element.actionId,
 				element.actionTarget
 		else
-			local target = element.params.target or state.defaultTarget
+			local target = element.namedParams.target or state.defaultTarget
 			if element.lowername == "item" then
 				return GetActionItemInfo(element, state, atTime, target)
 			elseif element.lowername == "macro" then
@@ -390,7 +390,7 @@ function OvaleBestAction:GetAction(node, state, atTime)
 				break
 			end
 			-- Set the state in the simulator.
-			local variable, value = element.params[1], element.params[2]
+			local variable, value = element.positionalParams[1], element.positionalParams[2]
 			local isFuture = not HasTime(self_computedTimeSpan, atTime)
 			state:PutState(variable, value, isFuture)
 			-- Get the cumulative intersection of time spans for these re-computations.
@@ -533,12 +533,12 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 	element.actionId = actionId
 	element.actionTarget = actionTarget
 
-	local action = element.params[1]
+	local action = element.positionalParams[1]
 	if not actionTexture then
 		state:Log("[%d]    Action %s not found.", nodeId, action)
 	elseif not (actionEnable and actionEnable > 0) then
 		state:Log("[%d]    Action %s not enabled.", nodeId, action)
-	elseif element.params.usable == 1 and not actionUsable then
+	elseif element.namedParams.usable == 1 and not actionUsable then
 		state:Log("[%d]    Action %s not usable.", nodeId, action)
 	else
 		-- Set the cast time of the action.
@@ -573,7 +573,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 		state:Log("[%d]    start=%f atTime=%s", nodeId, start, atTime)
 
 		-- Set the "offgcd" flag in the element if it is a spell.
-		local offgcd = element.params.offgcd or (spellInfo and spellInfo.offgcd) or 0
+		local offgcd = element.namedParams.offgcd or (spellInfo and spellInfo.offgcd) or 0
 		element.offgcd = (offgcd == 1) and true or nil
 
 		-- If the action is available before the end of the current spellcast, then wait until we can first cast the action.
@@ -623,7 +623,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 			Return 1 if the action is off of cooldown, or 0 if it is on cooldown.
 		--]]
 		local value
-		if element.params.asValue == 1 then
+		if element.namedParams.asValue == 1 then
 			local value = HasTime(timeSpan, atTime) and 1 or 0
 			result = SetValue(element, value)
 			timeSpan[1], timeSpan[2] = 0, INFINITY
@@ -631,7 +631,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 		else
 			result = element
 		end
-		priority = element.params.priority or OVALE_DEFAULT_PRIORITY
+		priority = element.namedParams.priority or OVALE_DEFAULT_PRIORITY
 	end
 
 	self:StopProfiling("OvaleBestAction_ComputeAction")
@@ -827,7 +827,7 @@ function OvaleBestAction:ComputeCustomFunction(element, state, atTime)
 	if node then
 		state:Log("[%d]    evaluating function: %s(%s)", element.nodeId, node.name, node.paramsAsString)
 		local timeSpanA, priorityA, elementA = self:Compute(node.child[1], state, atTime)
-		if element.params.asValue == 1 or node.params.asValue == 1 then
+		if element.namedParams.asValue == 1 or node.namedParams.asValue == 1 then
 			--[[
 				Allow for the return value of a custom function to be "typecast" to a constant value.
 
@@ -870,7 +870,7 @@ function OvaleBestAction:ComputeFunction(element, state, atTime)
 	local priority, result
 
 	state:Log("[%d]    evaluating condition: %s(%s)", element.nodeId, element.name, element.paramsAsString)
-	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.params, state, atTime)
+	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.positionalParams, element.namedParams, state, atTime)
 	if start and ending then
 		timeSpan[1], timeSpan[2] = start, ending
 	end
@@ -887,7 +887,7 @@ function OvaleBestAction:ComputeFunction(element, state, atTime)
 		is within the function's domain, then the function is simply evaluated at the current
 		time, or 0 otherwise.
 	--]]
-	if element.params.asValue == 1 then
+	if element.namedParams.asValue == 1 then
 		if HasTime(timeSpan, atTime) then
 			if value then
 				value = value + (atTime - origin) * rate
@@ -939,7 +939,7 @@ function OvaleBestAction:ComputeGroup(element, state, atTime)
 				currentIsBetter = true
 			elseif not currentPriority or not bestPriority or currentPriority == bestPriority then
 				-- If the spells have the same priority, then pick the one with an earlier cast time.
-				local threshold = (bestElement and bestElement.params) and bestElement.params.wait or 0
+				local threshold = (bestElement and bestElement.namedParams) and bestElement.namedParams.wait or 0
 				if best[1] - current[1] > threshold then
 					state:Log("[%d]    group new best is %s", element.nodeId, tostring(current))
 					currentIsBetter = true
@@ -947,7 +947,7 @@ function OvaleBestAction:ComputeGroup(element, state, atTime)
 			elseif currentPriority > bestPriority then
 				-- If the current spell has a higher priority than the best one found, then choose the
 				-- higher priority spell if its cast is pushed back too far by the lower priority one.
-				local threshold = (currentElement and currentElement.params) and currentElement.params.wait or (bestCastTime * 0.75)
+				local threshold = (currentElement and currentElement.namedParams) and currentElement.namedParams.wait or (bestCastTime * 0.75)
 				if current[1] - best[1] < threshold then
 					state:Log("[%d]    group new best (lower prio) is %s", element.nodeId, tostring(current))
 					currentIsBetter = true
@@ -956,7 +956,7 @@ function OvaleBestAction:ComputeGroup(element, state, atTime)
 				-- If the current spell has a lower priority than the best one found, then choose the
 				-- lower priority spell only if it doesn't push back the cast of the higher priority
 				-- one by too much.
-				local threshold = (bestElement and bestElement.params) and bestElement.params.wait or (currentCastTime * 0.75)
+				local threshold = (bestElement and bestElement.namedParams) and bestElement.namedParams.wait or (currentCastTime * 0.75)
 				if best[1] - current[1] > threshold then
 					state:Log("[%d]    group new best (higher prio) is %s", element.nodeId, tostring(current))
 					currentIsBetter = true
@@ -980,8 +980,8 @@ function OvaleBestAction:ComputeGroup(element, state, atTime)
 	CopyTimeSpan(bestTimeSpan, timeSpan)
 	if bestElement then
 		local id = bestElement.value
-		if bestElement.params then
-			id = bestElement.params[1]
+		if bestElement.positionalParams then
+			id = bestElement.positionalParams[1]
 		end
 		state:Log("[%d]    group best action %s remains %s", element.nodeId, id, tostring(timeSpan))
 	else
@@ -1098,7 +1098,7 @@ function OvaleBestAction:ComputeState(element, state, atTime)
 	local result
 
 	if element.func == "setstate" then
-		state:Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.params[1], element.params[2])
+		state:Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2])
 		timeSpan[1], timeSpan[2] = 0, INFINITY
 		result = element
 	end

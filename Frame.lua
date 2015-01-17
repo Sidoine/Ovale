@@ -180,14 +180,14 @@ do
 		local iconNodes = OvaleCompile:GetIconNodes()
 		for k, node in ipairs(iconNodes) do
 			-- Set the true target of "target" references in the icon's body.
-			if node.params and node.params.target then
-				state.defaultTarget = node.params.target
+			if node.namedParams and node.namedParams.target then
+				state.defaultTarget = node.namedParams.target
 			else
 				state.defaultTarget = "target"
 			end
 			-- Set the number of enemies on the battlefield, if given via "enemies=N".
-			if node.params and node.params.enemies then
-				state.enemies = node.params.enemies
+			if node.namedParams and node.namedParams.enemies then
+				state.enemies = node.namedParams.enemies
 			else
 				state.enemies = nil
 			end
@@ -235,8 +235,8 @@ do
 			end
 			state:Log("GetAction: start=%s, value=%f", start, value)
 			local actionTexture
-			if node.params and node.params.texture then
-				actionTexture = node.params.texture
+			if node.namedParams and node.namedParams.texture then
+				actionTexture = node.namedParams.texture
 			end
 			icons[1]:SetValue(value, actionTexture)
 			if #icons > 1 then
@@ -252,7 +252,7 @@ do
 				If "nored=1" is given as an action parameter, then just use the actual start time of
 				the element itself.
 			--]]
-			if element and element.params and element.params.nored == 1 then
+			if element and element.namedParams and element.namedParams.nored == 1 then
 				start = actionCooldownStart + actionCooldownDuration
 				if start < state.currentTime then
 					start = state.currentTime
@@ -263,7 +263,7 @@ do
 			if actionType == "spell" and actionId == state.currentSpellId and start and state.nextCast and start < state.nextCast then
 				start = state.nextCast
 			end
-			if start and node.params.nocd and now < start - node.params.nocd then
+			if start and node.namedParams.nocd and now < start - node.namedParams.nocd then
 				icons[1]:Update(element, nil)
 			else
 				icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
@@ -295,7 +295,7 @@ do
 				end
 			end
 
-			if (node.params.size ~= "small" and not node.params.nocd and profile.apparence.predictif) then
+			if (node.namedParams.size ~= "small" and not node.namedParams.nocd and profile.apparence.predictif) then
 				if start then
 					state:Log("****Second icon %s", start)
 					state:ApplySpell(actionId, OvaleGUID:GetGUID(actionTarget), start)
@@ -353,7 +353,7 @@ do
 
 			local width, height, newScale
 			local nbIcons
-			if (node.params.size == "small") then
+			if (node.namedParams.size == "small") then
 				newScale = profile.apparence.smallIconScale
 				width = newScale * 36 + margin
 				height = newScale * 36 + margin
@@ -362,7 +362,7 @@ do
 				newScale = profile.apparence.iconScale
 				width =newScale * 36 + margin
 				height = newScale * 36 + margin
-				if profile.apparence.predictif and node.params.type ~= "value" then
+				if profile.apparence.predictif and node.namedParams.type ~= "value" then
 					nbIcons = 2
 				else
 					nbIcons = 1
@@ -407,8 +407,8 @@ do
 				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/scale,(action.top - (l-1)*action.dy)/scale)
 				icon:SetScale(scale)
 				icon:SetFontScale(profile.apparence.fontScale)
-				icon:SetParams(node.params)
-				icon:SetHelp(node.params.help)
+				icon:SetParams(node.positionalParams, node.namedParams)
+				icon:SetHelp(node.namedParams.help)
 				icon:SetRangeIndicator(profile.apparence.targetText)
 				icon:EnableMouse(not profile.apparence.clickThru)
 				icon.cdShown = (l == 1)

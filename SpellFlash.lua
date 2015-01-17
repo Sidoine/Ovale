@@ -286,16 +286,16 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 		if element and element.type == "action" then
 			local spellId, spellInfo
 			if element.lowername == "spell" then
-				spellId = element.params[1]
+				spellId = element.positionalParams[1]
 				spellInfo = OvaleData.spellInfo[spellId]
 			end
 			local interrupt = spellInfo and spellInfo.interrupt
 
 			-- Flash color.
 			local color = COLORTABLE["white"]
-			local flash = element.params and element.params.flash
-			local iconFlash = node.params.flash
-			local iconHelp = node.params.help
+			local flash = element.namedParams and element.namedParams.flash
+			local iconFlash = node.namedParams.flash
+			local iconHelp = node.namedParams.help
 			if flash and COLORTABLE[flash] then
 				-- Highest priority is known flash color set in the action parameters.
 				color = COLORTABLE[flash]
@@ -333,7 +333,7 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 				SpellFlashCore.FlashAction(spellId, color, size, brightness)
 			elseif element.lowername == "item" then
 				-- Item ID.
-				local itemId = element.params[1]
+				local itemId = element.positionalParams[1]
 				SpellFlashCore.FlashItem(itemId, color, size, brightness)
 			end
 		end

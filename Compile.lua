@@ -89,50 +89,50 @@ local function RequireValue(value)
 	return value, required
 end
 
-local function TestConditions(parameters)
+local function TestConditions(positionalParams, namedParams)
 	OvaleCompile:StartProfiling("OvaleCompile_TestConditions")
 	local boolean = true
-	if boolean and parameters.glyph then
-		local glyph, required = RequireValue(parameters.glyph)
+	if boolean and namedParams.glyph then
+		local glyph, required = RequireValue(namedParams.glyph)
 		local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
 		boolean = (required and hasGlyph) or (not required and not hasGlyph)
 	end
-	if boolean and parameters.level then
-		boolean = OvalePaperDoll.level >= parameters.level
+	if boolean and namedParams.level then
+		boolean = OvalePaperDoll.level >= namedParams.level
 	end
-	if boolean and parameters.maxLevel then
-		boolean = OvalePaperDoll.level <= parameters.maxLevel
+	if boolean and namedParams.maxLevel then
+		boolean = OvalePaperDoll.level <= namedParams.maxLevel
 	end
-	if boolean and parameters.specialization then
-		local spec, required = RequireValue(parameters.specialization)
+	if boolean and namedParams.specialization then
+		local spec, required = RequireValue(namedParams.specialization)
 		local isSpec = OvalePaperDoll:IsSpecialization(spec)
 		boolean = (required and isSpec) or (not required and not isSpec)
 	end
-	if boolean and parameters.if_stance then
+	if boolean and namedParams.if_stance then
 		self_compileOnStances = true
-		local stance, required = RequireValue(parameters.if_stance)
+		local stance, required = RequireValue(namedParams.if_stance)
 		local isStance = OvaleStance:IsStance(stance)
 		boolean = (required and isStance) or (not required and not isStance)
 	end
-	if boolean and parameters.if_spell then
-		local spell, required = RequireValue(parameters.if_spell)
+	if boolean and namedParams.if_spell then
+		local spell, required = RequireValue(namedParams.if_spell)
 		local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
 		boolean = (required and hasSpell) or (not required and not hasSpell)
 	end
-	if boolean and parameters.talent then
-		local talent, required = RequireValue(parameters.talent)
+	if boolean and namedParams.talent then
+		local talent, required = RequireValue(namedParams.talent)
 		local hasTalent = HasTalent(talent)
 		boolean = (required and hasTalent) or (not required and not hasTalent)
 	end
-	if boolean and parameters.itemset and parameters.itemcount then
-		local equippedCount = OvaleEquipment:GetArmorSetCount(parameters.itemset)
+	if boolean and namedParams.itemset and namedParams.itemcount then
+		local equippedCount = OvaleEquipment:GetArmorSetCount(namedParams.itemset)
 		self_compileOnItems = true
-		boolean = (equippedCount >= parameters.itemcount)
+		boolean = (equippedCount >= namedParams.itemcount)
 	end
 	do
-		if boolean and parameters.checkbox then
+		if boolean and namedParams.checkbox then
 			local profile = Ovale.db.profile
-			for _, checkbox in ipairs(parameters.checkbox) do
+			for _, checkbox in ipairs(namedParams.checkbox) do
 				local name, required = RequireValue(checkbox)
 				local control = Ovale.checkBox[name] or {}
 				control.triggerEvaluation = true
@@ -145,9 +145,9 @@ local function TestConditions(parameters)
 				end
 			end
 		end
-		if boolean and parameters.listitem then
+		if boolean and namedParams.listitem then
 			local profile = Ovale.db.profile
-			for name, listitem in pairs(parameters.listitem) do
+			for name, listitem in pairs(namedParams.listitem) do
 				local item, required = RequireValue(listitem)
 				local control = Ovale.list[name] or { items = {}, default = nil }
 				control.triggerEvaluation = true
@@ -167,8 +167,8 @@ end
 
 local function EvaluateAddCheckBox(node)
 	local ok = true
-	local name, parameters = node.name, node.params
-	if TestConditions(parameters) then
+	local name, positionalParams, namedParams = node.name, node.positionalParams, node.namedParams
+	if TestConditions(positionalParams, namedParams) then
 		--[[
 			If this control was not previously existing, then age the script evaluation state
 			so that anything that checks the value of this control are re-evaluated after the
@@ -181,7 +181,7 @@ local function EvaluateAddCheckBox(node)
 		end
 		checkBox = checkBox or {}
 		checkBox.text = node.description.value
-		for _, v in ipairs(parameters) do
+		for _, v in ipairs(positionalParams) do
 			if v == "default" then
 				checkBox.checked = true
 				break
@@ -194,7 +194,8 @@ end
 
 local function EvaluateAddIcon(node)
 	local ok = true
-	if TestConditions(node.params) then
+	local positionalParams, namedParams = node.positionalParams, node.namedParams
+	if TestConditions(positionalParams, namedParams) then
 		self_icon[#self_icon + 1] = node
 	end
 	return ok
@@ -202,8 +203,8 @@ end
 
 local function EvaluateAddListItem(node)
 	local ok = true
-	local name, item, parameters = node.name, node.item, node.params
-	if TestConditions(parameters) then
+	local name, item, positionalParams, namedParams = node.name, node.item, node.positionalParams, node.namedParams
+	if TestConditions(positionalParams, namedParams) then
 		--[[
 			If this control was not previously existing, then age the script evaluation state
 			so that anything that checks the value of this control are re-evaluated after the
@@ -216,7 +217,7 @@ local function EvaluateAddListItem(node)
 		end
 		list = list or { items = {}, default = nil }
 		list.items[item] = node.description.value
-		for _, v in ipairs(parameters) do
+		for _, v in ipairs(positionalParams) do
 			if v == "default" then
 				list.default = item
 				break
@@ -229,21 +230,18 @@ end
 
 local function EvaluateItemInfo(node)
 	local ok = true
-	local itemId, parameters = node.itemId, node.params
-	if itemId and TestConditions(parameters) then
-		for k, v in pairs(parameters) do
-			if k == "proc" then
-				-- Add the buff for this item proc to the spell list "item_proc_<proc>".
-				local buff = tonumber(parameters.buff)
-				if buff then
-					local name = "item_proc_" .. v
-					local list = OvaleData.buffSpellList[name] or {}
-					list[buff] = true
-					OvaleData.buffSpellList[name] = list
-				else
-					ok = false
-					break
-				end
+	local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
+	if itemId and TestConditions(positionalParams, namedParams) then
+		if namedParams.proc then
+			-- Add the buff for this item proc to the spell list "item_proc_<proc>".
+			local buff = tonumber(namedParams.buff)
+			if buff then
+				local name = "item_proc_" .. namedParams.proc
+				local list = OvaleData.buffSpellList[name] or {}
+				list[buff] = true
+				OvaleData.buffSpellList[name] = list
+			else
+				ok = false
 			end
 		end
 	end
@@ -252,7 +250,7 @@ end
 
 local function EvaluateList(node)
 	local ok = true
-	local name, parameters = node.name, node.params
+	local name, positionalParams, namedParams = node.name, node.positionalParams, node.namedParams
 	local listDB
 	if node.keyword == "ItemList" then
 		listDB = "itemList"
@@ -260,7 +258,7 @@ local function EvaluateList(node)
 		listDB = "buffSpellList"
 	end
 	local list = OvaleData[listDB][name] or {}
-	for i, id in ipairs(parameters) do
+	for _, id in pairs(namedParams) do
 		id = tonumber(id)
 		if id then
 			list[id] = true
@@ -275,7 +273,8 @@ end
 
 local function EvaluateScoreSpells(node)
 	local ok = true
-	for _, spellId in ipairs(node.params) do
+	local positionalParams, namedParams = node.positionalParams, node.namedParams
+	for _, spellId in ipairs(positionalParams) do
 		spellId = tonumber(spellId)
 		if spellId then
 			OvaleScore:AddSpell(tonumber(spellId))
@@ -289,8 +288,8 @@ end
 
 local function EvaluateSpellAuraList(node)
 	local ok = true
-	local spellId, parameters = node.spellId, node.params
-	if TestConditions(parameters) then
+	local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
+	if TestConditions(positionalParams, namedParams) then
 		local keyword = node.keyword
 		local si = OvaleData:SpellInfo(spellId)
 		local auraTable
@@ -306,7 +305,7 @@ local function EvaluateSpellAuraList(node)
 		local filter = strfind(node.keyword, "Debuff") and "HARMFUL" or "HELPFUL"
 		local tbl = auraTable[filter] or {}
 		local count = 0
-		for k, v in pairs(parameters) do
+		for k, v in pairs(namedParams) do
 			if not OvaleAST.PARAMETER_KEYWORD[k] then
 				tbl[k] = v
 				count = count + 1
@@ -321,10 +320,10 @@ end
 
 local function EvaluateSpellInfo(node)
 	local ok = true
-	local spellId, parameters = node.spellId, node.params
-	if spellId and TestConditions(parameters) then
+	local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
+	if spellId and TestConditions(positionalParams, namedParams) then
 		local si = OvaleData:SpellInfo(spellId)
-		for k, v in pairs(parameters) do
+		for k, v in pairs(namedParams) do
 			if k == "addduration" then
 				-- Accumulate "addduration" into a single "adduration" SpellInfo property.
 				local value = tonumber(v)
@@ -366,13 +365,13 @@ end
 
 local function EvaluateSpellRequire(node)
 	local ok = true
-	local spellId, parameters = node.spellId, node.params
-	if TestConditions(parameters) then
+	local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
+	if TestConditions(positionalParams, namedParams) then
 		local property = node.property
 		local count = 0
 		local si = OvaleData:SpellInfo(spellId)
 		local tbl = si.require[property] or {}
-		for k, v in pairs(parameters) do
+		for k, v in pairs(namedParams) do
 			if not OvaleAST.PARAMETER_KEYWORD[k] then
 				tbl[k] = v
 				count = count + 1
@@ -390,7 +389,8 @@ end
 local function AddMissingVariantSpells(annotation)
 	if annotation.functionReference then
 		for _, node in ipairs(annotation.functionReference) do
-			local spellId = node.params[1]
+			local positionalParams, namedParams = node.positionalParams, node.namedParams
+			local spellId = positionalParams[1]
 			if spellId and OvaleCondition:IsSpellBookCondition(node.func) then
 				if not OvaleSpellBook:IsKnownSpell(spellId) and not OvaleCooldown:IsSharedCooldown(spellId) then
 					local spellName
