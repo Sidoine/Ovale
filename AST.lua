@@ -40,7 +40,6 @@ local pairs = pairs
 local rawset = rawset
 local setmetatable = setmetatable
 local strlower = string.lower
-local strmatch = string.match
 local strsub = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
@@ -374,18 +373,18 @@ local function GetTokenIterator(s)
 	return OvaleLexer.scan(s, MATCHES, exclude)
 end
 
--- "Flatten" a parameter value node into a string.
-local function FlattenParameterValue(parameterValue)
+-- "Flatten" a parameter value node into a string, or a table of strings if it is a comma-separated value.
+local function FlattenParameterValue(parameterValue, annotation)
 	local value = parameterValue
 	if type(parameterValue) == "table" then
 		local node = parameterValue
 		if node.type == "comma_separated_values" then
-			local output = self_outputPool:Get()
+			value = self_parametersPool:Get()
 			for k, v in ipairs(node.csv) do
-				output[k] = FlattenParameterValue(v)
+				value[k] = FlattenParameterValue(v, annotation)
 			end
-			value = tconcat(output, ",")
-			self_outputPool:Release(output)
+			annotation.parametersList = annotation.parametersList or {}
+			annotation.parametersList[#annotation.parametersList + 1] = value
 		else
 			local isBang = false
 			if node.type == "bang_value" then
@@ -535,7 +534,7 @@ end
 UnparseCommaSeparatedValues = function(node)
 	local output = self_outputPool:Get()
 	for k, v in ipairs(node.csv) do
-		output[#output + 1] = Unparse(v)
+		output[k] = Unparse(v)
 	end
 	local outputString = tconcat(output, ",")
 	self_outputPool:Release(output)
@@ -2629,7 +2628,7 @@ function OvaleAST:FlattenParameters(ast)
 			if node.rawPositionalParams then
 				local parameters = self_parametersPool:Get()
 				for key, value in ipairs(node.rawPositionalParams) do
-					parameters[key] = FlattenParameterValue(value)
+					parameters[key] = FlattenParameterValue(value, annotation)
 				end
 				node.positionalParams = parameters
 				annotation.parametersList = annotation.parametersList or {}
@@ -2643,11 +2642,11 @@ function OvaleAST:FlattenParameters(ast)
 						local control = parameters[key] or self_controlPool:Get()
 						if key == "checkbox" then
 							for i, name in ipairs(value) do
-								control[i] = FlattenParameterValue(name)
+								control[i] = FlattenParameterValue(name, annotation)
 							end
 						else -- if key == "listitem" then
 							for list, item in pairs(value) do
-								control[list] = FlattenParameterValue(item)
+								control[list] = FlattenParameterValue(item, annotation)
 							end
 						end
 						if not parameters[key] then
@@ -2659,7 +2658,7 @@ function OvaleAST:FlattenParameters(ast)
 						-- Deprecated: checkboxon
 						-- Deprecated: checkboxoff
 						local control = parameters.checkbox or self_controlPool:Get()
-						local name = FlattenParameterValue(value)
+						local name = FlattenParameterValue(value, annotation)
 						if key == "checkboxon" then
 							Ovale:OneTimeMessage("Warning: 'checkboxon=%s' is deprecated; use 'checkbox=%s' instead.", name, name)
 							control[#control + 1] = name
@@ -2677,8 +2676,8 @@ function OvaleAST:FlattenParameters(ast)
 						-- Deprecated: item
 						if key == "list" and node.rawNamedParams.item then
 							local control = parameters.listitem or self_controlPool:Get()
-							local list = FlattenParameterValue(value)
-							local item = FlattenParameterValue(node.rawNamedParams.item)
+							local list = FlattenParameterValue(value, annotation)
+							local item = FlattenParameterValue(node.rawNamedParams.item, annotation)
 							Ovale:OneTimeMessage("Warning: 'list=%s item=%s' is deprecated; use 'listitem=%s:%s' instead.", list, item, list, item)
 							control[list] = item
 							if not parameters.listitem then
@@ -2689,14 +2688,14 @@ function OvaleAST:FlattenParameters(ast)
 						end
 					elseif key == "mastery" then
 						-- Deprecated: mastery -> specialization
-						local spec = FlattenParameterValue(value)
+						local spec = FlattenParameterValue(value, annotation)
 						Ovale:OneTimeMessage("Warning: 'mastery=%s' is deprecated; use 'specialization=%s' instead.", spec, spec)
 						parameters.specialization = spec
 					else
 						if type(key) ~= "number" and dictionary and dictionary[key] then
 							key = dictionary[key]
 						end
-						parameters[key] = FlattenParameterValue(value)
+						parameters[key] = FlattenParameterValue(value, annotation)
 					end
 				end
 				node.namedParams = parameters
@@ -2717,6 +2716,9 @@ function OvaleAST:FlattenParameters(ast)
 					for list, item in ipairs(v) do
 						output[#output + 1] = format("listitem=%s:%s", list, item)
 					end
+				elseif type(v) == "table" then
+					-- Comma-separated value.
+					output[#output + 1] = format("%s=%s", k, tconcat(v, ","))
 				else
 					output[#output + 1] = format("%s=%s", k, v)
 				end
@@ -2767,12 +2769,12 @@ function OvaleAST:VerifyParameterStances(ast)
 					local valueNode = node.rawNamedParams[stanceKeyword]
 					if valueNode then
 						if valueNode.type == "comma_separated_values" then
-							valueNode = valueNode.child[1]
+							valueNode = valueNode.csv[1]
 						end
 						if valueNode.type == "bang_value" then
 							valueNode = valueNode.child[1]
 						end
-						local value = FlattenParameterValue(valueNode)
+						local value = FlattenParameterValue(valueNode, annotation)
 						if OvaleStance.STANCE_NAME[value] then
 							-- The value is a valid stance name.
 						elseif type(value) == "number" then

@@ -346,9 +346,14 @@ end
 
 -- Run-time check that the player has enough combo points.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleComboPoints:RequireComboPointsHandler(spellId, atTime, requirement, tokenIterator, target)
+function OvaleComboPoints:RequireComboPointsHandler(spellId, atTime, requirement, tokens, index, target)
 	local verified = false
-	local cost = tokenIterator()
+	-- If index isn't given, then tokens holds the actual token value.
+	local cost = tokens
+	if index then
+		cost = tokens[index]
+		index = index + 1
+	end
 	if cost then
 		cost = self:ComboPointCost(spellId, atTime, target)
 		if cost > 0 then
@@ -366,7 +371,7 @@ function OvaleComboPoints:RequireComboPointsHandler(spellId, atTime, requirement
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)
 	end
-	return verified, requirement
+	return verified, requirement, index
 end
 --</public-static-methods>
 

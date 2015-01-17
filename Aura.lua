@@ -28,18 +28,17 @@ local OvaleState = nil
 local bit_band = bit.band
 local bit_bor = bit.bor
 local floor = math.floor
-local gmatch = string.gmatch
 local ipairs = ipairs
 local next = next
 local pairs = pairs
 local strfind = string.find
 local strlower = string.lower
-local strmatch = string.match
 local strsub = string.sub
 local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
 local tsort = table.sort
+local type = type
 local wipe = wipe
 local API_GetTime = GetTime
 local API_UnitAura = UnitAura
@@ -588,18 +587,11 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 					local auraTable = (unitId == "pet") and si.aura.pet or si.aura.target
 					if auraTable and auraTable[filter] then
 						local spellData = auraTable[filter][auraId]
-						if spellData and strsub(spellData, 1, 21) == "refresh_keep_snapshot" then
-							local tokenIterator
-							if strfind(spellData, ",") then
-								tokenIterator = gmatch(spellData, "[^,]+")
-								-- Advance past "refresh_keep_snapshot".
-								tokenIterator()
-							end
-							if tokenIterator then
-								keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, unitId)
-							else
-								keepSnapshot = true
-							end
+						if spellData == "refresh_keep_snapshot" then
+							keepSnapshot = true
+						elseif type(spellData) == "table" and spellData[1] == "refresh_keep_snapshot" then
+							-- Comma-separated value.
+							keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, spellData, 2, unitId)
 						end
 					end
 				end
@@ -784,9 +776,14 @@ end
 
 -- Run-time check for an aura on the player or the target.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokenIterator, target)
+function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, index, target)
 	local verified = false
-	local buffName = tokenIterator()
+	-- If index isn't given, then tokens holds the actual token value.
+	local buffName = tokens
+	if index then
+		buffName = tokens[index]
+		index = index + 1
+	end
 	if buffName then
 		local isBang = false
 		if strsub(buffName, 1, 1) == "!" then
@@ -818,14 +815,19 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokenIterato
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
 	end
-	return verified, requirement
+	return verified, requirement, index
 end
 
 -- Run-time check for the player being stealthed.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokenIterator, target)
+function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokens, index, target)
 	local verified = false
-	local stealthed = tokenIterator()
+	-- If index isn't given, then tokens holds the actual token value.
+	local stealthed = tokens
+	if index then
+		stealthed = tokens[index]
+		index = index + 1
+	end
 	if stealthed then
 		stealthed = tonumber(stealthed)
 		local aura = self:GetAura("player", "stealthed_buff", "HELPFUL", true)
@@ -842,15 +844,20 @@ function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokenIter
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
 	end
-	return verified, requirement
+	return verified, requirement, index
 end
 
 -- Run-time check that the target is below a health percent threshold.
 -- NOTE: Mirrored in statePrototype below.
 -- TODO: This function should really be moved to a Health module.
-function OvaleAura:RequireTargetHealthPercentHandler(spellId, atTime, requirement, tokenIterator, target)
+function OvaleAura:RequireTargetHealthPercentHandler(spellId, atTime, requirement, tokens, index, target)
 	local verified = false
-	local threshold = tokenIterator()
+	-- If index isn't given, then tokens holds the actual token value.
+	local threshold = tokens
+	if index then
+		threshold = tokens[index]
+		index = index + 1
+	end
 	if threshold then
 		local isBang = false
 		if strsub(threshold, 1, 1) == "!" then
@@ -873,7 +880,7 @@ function OvaleAura:RequireTargetHealthPercentHandler(spellId, atTime, requiremen
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
 	end
-	return verified, requirement
+	return verified, requirement, index
 end
 --</public-static-methods>
 

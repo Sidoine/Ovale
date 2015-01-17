@@ -237,9 +237,14 @@ end
 
 -- Run-time check that the player is in a certain stance.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleStance:RequireStanceHandler(spellId, atTime, requirement, tokenIterator, target)
+function OvaleStance:RequireStanceHandler(spellId, atTime, requirement, tokens, index, target)
 	local verified = false
-	local stance = tokenIterator()
+	-- If index isn't given, then tokens holds the actual token value.
+	local stance = tokens
+	if index then
+		stance = tokens[index]
+		index = index + 1
+	end
 	if stance then
 		local isBang = false
 		if substr(stance, 1, 1) == "!" then
@@ -260,7 +265,7 @@ function OvaleStance:RequireStanceHandler(spellId, atTime, requirement, tokenIte
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
 	end
-	return verified, requirement
+	return verified, requirement, index
 end
 --</public-static-methods>
 

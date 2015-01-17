@@ -14,7 +14,6 @@ local OvalePaperDoll = nil
 local OvaleState = nil
 
 local format = string.format
-local gmatch = string.gmatch
 local type = type
 local pairs = pairs
 local strfind = string.find
@@ -22,7 +21,7 @@ local tonumber = tonumber
 local INFINITY = math.huge
 
 -- Registered "run-time requirement" handlers: self_requirement[name] = handler
--- Handler is invoked as handler(state, name, tokenIterator, target).
+-- Handler is invoked as handler(state, name, tokens, index, target).
 local self_requirement = {}
 
 local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
@@ -489,9 +488,10 @@ end
 
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
+function OvaleData:CheckRequirements(spellId, atTime, tokens, index, target)
 	target = target or self.defaultTarget or "target"
-	local name = tokenIterator()
+	local name = tokens[index]
+	index = index + 1
 	if name then
 		self:Log("Checking requirements:")
 		local verified = true
@@ -502,17 +502,18 @@ function OvaleData:CheckRequirements(spellId, atTime, tokenIterator, target)
 				local method, arg = handler[1], handler[2]
 				-- Check for inherited/mirrored method first (for statePrototype).
 				if self[method] then
-					verified, requirement = self[method](self, spellId, atTime, name, tokenIterator, target)
+					verified, requirement, index = self[method](self, spellId, atTime, name, tokens, index, target)
 				else
-					verified, requirement = arg[method](arg, spellId, atTime, name, tokenIterator, target)
+					verified, requirement, index = arg[method](arg, spellId, atTime, name, tokens, index, target)
 				end
-				name = tokenIterator()
+				name = tokens[index]
+				index = index + 1
 			else
 				Ovale:OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
 				verified = false
 			end
 		end
-		return verified, requirement
+		return verified, requirement, index
 	end
 	return true
 end
@@ -532,29 +533,37 @@ end
 --]]
 function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
 	target = target or "player"
-	local tokenIterator, value, data
-	if strfind(spellData, ",") then
-		-- Lexer for spellData as comma-separated values.
-		tokenIterator = gmatch(spellData, "[^,]+")
-		value = tokenIterator()
+	local index, value, data
+	if type(spellData) == "table" then
+		-- Comma-separated value.
+		value = spellData[1]
+		index = 2
 	else
 		value = spellData
 	end
 	if value == "count" then
 		-- Advance past the number of stacks of the aura.
-		local N = tokenIterator and tokenIterator() or nil
+		local N
+		if index then
+			N = spellData[index]
+			index = index + 1
+		end
 		if N then
 			data = tonumber(N)
 		else
-			Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing final stack count.", auraId, spellData, value)
+			Ovale:OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value)
 		end
 	elseif value == "extend" then
 		-- Advance past the number of seconds to extend the aura.
-		local seconds = tokenIterator and tokenIterator() or nil
+		local seconds
+		if index then
+			seconds = spellData[index]
+			index = index + 1
+		end
 		if seconds then
 			data = tonumber(seconds)
 		else
-			Ovale:OneTimeMessage("Warning: '%d=%s' has '%s' missing duration.", auraId, spellData, value)
+			Ovale:OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value)
 		end
 	else
 		local asNumber = tonumber(value)
@@ -562,8 +571,8 @@ function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
 	end
 	-- Verify any run-time requirements for this aura.
 	local verified = true
-	if tokenIterator then
-		verified = self:CheckRequirements(auraId, atTime, tokenIterator, target)
+	if index then
+		verified = self:CheckRequirements(auraId, atTime, spellData, index, target)
 	end
 	return verified, value, data
 end
@@ -579,11 +588,9 @@ function OvaleData:CheckSpellInfo(spellId, atTime, target)
 		if value then
 			local method, arg = handler[1], handler[2]
 			-- Check for inherited/mirrored method first (for statePrototype).
-			if self[method] then
-				verified, requirement = self[method](self, spellId, atTime, name, gmatch(value, ".+"), target)
-			else
-				verified, requirement = arg[method](arg, spellId, atTime, name, gmatch(value, ".+"), target)
-			end
+			arg = self[method] and self or arg
+			local index = (type(value) == "table") and 1 or nil
+			verified, requirement = arg[method](arg, spellId, atTime, name, value, index, target)
 			if not verified then
 				break
 			end
@@ -601,8 +608,7 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, target)
 	local requirements = si and si.require[property]
 	if requirements then
 		for v, requirement in pairs(requirements) do
-			local tokenIterator = gmatch(requirement, "[^,]+")
-			local verified = self:CheckRequirements(spellId, atTime, tokenIterator, target)
+			local verified = self:CheckRequirements(spellId, atTime, requirement, 1, target)
 			if verified then
 				value = tonumber(v) or v
 				break

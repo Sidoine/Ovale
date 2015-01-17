@@ -539,9 +539,14 @@ end
 
 -- Run-time check that the player has enough power.
 -- NOTE: Mirrored in statePrototype below.
-function OvalePower:RequirePowerHandler(spellId, atTime, requirement, tokenIterator, target)
+function OvalePower:RequirePowerHandler(spellId, atTime, requirement, tokens, index, target)
 	local verified = false
-	local cost = tokenIterator()
+	-- If index isn't given, then tokens holds the actual token value.
+	local cost = tokens
+	if index then
+		cost = tokens[index]
+		index = index + 1
+	end
 	if cost then
 		local powerType = requirement
 		cost = self:PowerCost(spellId, powerType, atTime, target)
@@ -560,7 +565,7 @@ function OvalePower:RequirePowerHandler(spellId, atTime, requirement, tokenItera
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)
 	end
-	return verified, requirement
+	return verified, requirement, index
 end
 
 function OvalePower:DebugPower()

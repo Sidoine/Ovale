@@ -24,7 +24,6 @@ local OvaleScore = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
-local gmatch = string.gmatch
 local ipairs = ipairs
 local next = next
 local pairs = pairs
@@ -169,20 +168,21 @@ local function GetDamageMultiplier(spellId, atTime, snapshot, auraObject)
 	if si and si.aura and si.aura.damage then
 		for filter, auraList in pairs(si.aura.damage) do
 			for auraId, spellData in pairs(auraList) do
-				local tokenIterator, multiplier
-				if strfind(spellData, ",") then
-					tokenIterator = gmatch(spellData, "[^,]+")
-					multiplier = tokenIterator()
+				local index, multiplier
+				if type(spellData) == "table" then
+					-- Comma-separated value.
+					multiplier = spellData[1]
+					index = 2
 				else
 					multiplier = spellData
 				end
 				multiplier = tonumber(multiplier)
 				local verified
-				if tokenIterator then
+				if index then
 					if auraObject.CheckRequirements then
-						verified = auraObject.CheckRequirements(auraObject, spellId, atTime, tokenIterator, "player")
+						verified = auraObject.CheckRequirements(auraObject, spellId, atTime, spellData, index, "player")
 					else
-						verified = OvaleData:CheckRequirements(spellId, atTime, tokenIterator, "player")
+						verified = OvaleData:CheckRequirements(spellId, atTime, spellData, index, "player")
 					end
 				else
 					verified = true
