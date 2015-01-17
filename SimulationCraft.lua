@@ -3235,7 +3235,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 			buff on the player.
 		--]]
 		local buffName = "sacred_shield_buff"
-		code = format("BuffPresent(%s)", buffName)
+		code = format("BuffRemains(%s)", buffName)
 		AddSymbol(annotation, buffName)
 	elseif class == "PRIEST" and operand == "mind_harvest" then
 		code = "target.MindHarvest()"
