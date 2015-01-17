@@ -30,7 +30,7 @@ AddFunction UseItemActions
 # Based on SimulationCraft profile "Warlock_Affliction_T17M".
 #	class=warlock
 #	spec=affliction
-#	talents=0000113
+#	talents=0000213
 #	pet=felhunter
 
 ### actions.default
@@ -81,8 +81,8 @@ AddFunction AfflictionDefaultShortCdActions
 
 AddFunction AfflictionDefaultCdActions
 {
-	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
-	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+	#potion,name=draenic_intellect,if=buff.bloodlust.react&buff.dark_soul.remains>10|target.time_to_die<=25|buff.dark_soul.remains>10
+	if BuffPresent(burst_haste_buff any=1) and BuffRemaining(dark_soul_misery_buff) > 10 or target.TimeToDie() <= 25 or BuffRemaining(dark_soul_misery_buff) > 10 UsePotionIntellect()
 	#berserking
 	Spell(berserking)
 	#blood_fury
@@ -380,7 +380,7 @@ AddFunction DemonologyPrecombatCdActions
 # Based on SimulationCraft profile "Warlock_Destruction_T17M".
 #	class=warlock
 #	spec=destruction
-#	talents=0000113
+#	talents=0000213
 #	pet=felhunter
 
 ### actions.default
@@ -407,8 +407,8 @@ AddFunction DestructionDefaultShortCdActions
 
 AddFunction DestructionDefaultCdActions
 {
-	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.health.pct<=20
-	if BuffPresent(burst_haste_buff any=1) or target.HealthPercent() <= 20 UsePotionIntellect()
+	#potion,name=draenic_intellect,if=buff.bloodlust.react&buff.dark_soul.remains>10|target.time_to_die<=25|buff.dark_soul.remains>10
+	if BuffPresent(burst_haste_buff any=1) and BuffRemaining(dark_soul_instability_buff) > 10 or target.TimeToDie() <= 25 or BuffRemaining(dark_soul_instability_buff) > 10 UsePotionIntellect()
 	#berserking
 	Spell(berserking)
 	#blood_fury

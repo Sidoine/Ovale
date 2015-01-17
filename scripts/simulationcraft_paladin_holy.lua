@@ -51,8 +51,6 @@ AddFunction HolyDefaultMainActions
 {
 	#judgment,if=talent.selfless_healer.enabled&buff.selfless_healer.stack<3
 	if Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 Spell(judgment)
-	#word_of_glory,if=holy_power>=3
-	if HolyPower() >= 3 Spell(word_of_glory)
 	#wait,if=target.health.pct>=75&mana.pct<=10
 	unless target.HealthPercent() >= 75 and ManaPercent() <= 10
 	{
@@ -71,6 +69,12 @@ AddFunction HolyDefaultShortCdActions
 {
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
+
+	unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 and Spell(judgment)
+	{
+		#word_of_glory,if=holy_power>=3
+		if HolyPower() >= 3 Spell(word_of_glory)
+	}
 }
 
 AddFunction HolyDefaultCdActions
@@ -91,7 +95,7 @@ AddFunction HolyDefaultCdActions
 	#lay_on_hands,if=incoming_damage_5s>health.max*0.7
 	if IncomingDamage(5) > MaxHealth() * 0.7 Spell(lay_on_hands)
 
-	unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 and Spell(judgment) or HolyPower() >= 3 and Spell(word_of_glory)
+	unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) < 3 and Spell(judgment)
 	{
 		#wait,if=target.health.pct>=75&mana.pct<=10
 		unless target.HealthPercent() >= 75 and ManaPercent() <= 10
