@@ -258,7 +258,7 @@ local function EvaluateList(node)
 		listDB = "buffSpellList"
 	end
 	local list = OvaleData[listDB][name] or {}
-	for _, id in pairs(namedParams) do
+	for _, id in pairs(positionalParams) do
 		id = tonumber(id)
 		if id then
 			list[id] = true
