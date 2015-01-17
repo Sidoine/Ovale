@@ -94,7 +94,7 @@ AddFunction ProtectionDefaultMainActions
 			#avengers_shield,if=buff.grand_crusader.react
 			if BuffPresent(grand_crusader_buff) Spell(avengers_shield)
 			#sacred_shield,if=target.dot.sacred_shield.remains<2
-			if BuffRemains(sacred_shield_buff) < 2 Spell(sacred_shield)
+			if BuffRemaining(sacred_shield_buff) < 2 Spell(sacred_shield)
 			#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
 			#avengers_shield
@@ -104,7 +104,7 @@ AddFunction ProtectionDefaultMainActions
 			#hammer_of_wrath
 			Spell(hammer_of_wrath)
 			#sacred_shield,if=target.dot.sacred_shield.remains<8
-			if BuffRemains(sacred_shield_buff) < 8 Spell(sacred_shield)
+			if BuffRemaining(sacred_shield_buff) < 8 Spell(sacred_shield)
 			#holy_wrath
 			Spell(holy_wrath)
 			#seal_of_insight,if=talent.empowered_seals.enabled&!seal.insight&buff.uthers_insight.remains<=buff.liadrins_righteousness.remains&buff.uthers_insight.remains<=buff.maraads_truth.remains
@@ -156,7 +156,7 @@ AddFunction ProtectionDefaultShortCdActions
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
 				{
-					unless Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or BuffRemains(sacred_shield_buff) < 2 and Spell(sacred_shield) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath) or Spell(avengers_shield)
+					unless Enemies() > 1 and not Glyph(glyph_of_focused_shield) and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or BuffRemaining(sacred_shield_buff) < 2 and Spell(sacred_shield) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath) or Spell(avengers_shield)
 					{
 						#lights_hammer,if=!talent.seraphim.enabled|buff.seraphim.remains>10|cooldown.seraphim.remains<6
 						if not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) > 10 or SpellCooldown(seraphim) < 6 Spell(lights_hammer)
@@ -168,7 +168,7 @@ AddFunction ProtectionDefaultShortCdActions
 							#execution_sentence,if=!talent.seraphim.enabled|buff.seraphim.up|time<12
 							if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) or TimeInCombat() < 12 Spell(execution_sentence)
 
-							unless Spell(hammer_of_wrath) or BuffRemains(sacred_shield_buff) < 8 and Spell(sacred_shield)
+							unless Spell(hammer_of_wrath) or BuffRemaining(sacred_shield_buff) < 8 and Spell(sacred_shield)
 							{
 								#consecration,if=target.debuff.flying.down
 								if target.True(debuff_flying_down) Spell(consecration)
@@ -348,7 +348,7 @@ AddFunction ProtectionMaxSurvivalMainActions
 			#avengers_shield,if=buff.grand_crusader.react
 			if BuffPresent(grand_crusader_buff) Spell(avengers_shield)
 			#sacred_shield,if=target.dot.sacred_shield.remains<2
-			if BuffRemains(sacred_shield_buff) < 2 Spell(sacred_shield)
+			if BuffRemaining(sacred_shield_buff) < 2 Spell(sacred_shield)
 			#avengers_shield
 			Spell(avengers_shield)
 			#holy_prism
@@ -358,7 +358,7 @@ AddFunction ProtectionMaxSurvivalMainActions
 			#hammer_of_wrath
 			Spell(hammer_of_wrath)
 			#sacred_shield,if=target.dot.sacred_shield.remains<8
-			if BuffRemains(sacred_shield_buff) < 8 Spell(sacred_shield)
+			if BuffRemaining(sacred_shield_buff) < 8 Spell(sacred_shield)
 			#holy_wrath,if=glyph.final_wrath.enabled&target.health.pct<=20
 			if Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 Spell(holy_wrath)
 			#holy_wrath
@@ -394,7 +394,7 @@ AddFunction ProtectionMaxSurvivalShortCdActions
 				#wait,sec=cooldown.judgment.remains,if=cooldown.judgment.remains>0&cooldown.judgment.remains<=0.35
 				unless SpellCooldown(judgment) > 0 and SpellCooldown(judgment) <= 0.35 and SpellCooldown(judgment) > 0
 				{
-					unless BuffPresent(grand_crusader_buff) and Enemies() > 1 and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or BuffRemains(sacred_shield_buff) < 2 and Spell(sacred_shield) or Spell(avengers_shield)
+					unless BuffPresent(grand_crusader_buff) and Enemies() > 1 and Spell(avengers_shield) or Talent(sanctified_wrath_talent) and Spell(holy_wrath) or BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or BuffRemaining(sacred_shield_buff) < 2 and Spell(sacred_shield) or Spell(avengers_shield)
 					{
 						#lights_hammer
 						Spell(lights_hammer)
@@ -406,7 +406,7 @@ AddFunction ProtectionMaxSurvivalShortCdActions
 							#execution_sentence
 							Spell(execution_sentence)
 
-							unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) >= 3 and Spell(flash_of_light) or Spell(hammer_of_wrath) or BuffRemains(sacred_shield_buff) < 8 and Spell(sacred_shield) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath)
+							unless Talent(selfless_healer_talent) and BuffStacks(selfless_healer_buff) >= 3 and Spell(flash_of_light) or Spell(hammer_of_wrath) or BuffRemaining(sacred_shield_buff) < 8 and Spell(sacred_shield) or Glyph(glyph_of_final_wrath) and target.HealthPercent() <= 20 and Spell(holy_wrath)
 							{
 								#consecration,if=target.debuff.flying.down&!ticking
 								if target.True(debuff_flying_down) and not target.DebuffPresent(consecration_debuff) Spell(consecration)
