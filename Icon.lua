@@ -27,7 +27,7 @@ local INFINITY = math.huge
 
 -- Threshold for resetting the cooldown animation.
 -- This should be more than OvaleFuture's SIMULATOR_LAG.
-local COOLDOWN_THRESHOLD = 0.01
+local COOLDOWN_THRESHOLD = 0.1
 --</private-static-properties>
 
 local function HasScriptControls()
