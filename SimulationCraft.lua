@@ -2302,6 +2302,10 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		end
 	elseif modifier == "sync" then
 		local name = Unparse(parseNode)
+		-- Fix only known case where we need to disambiguate a name within a SimulationCraft profile.
+		if name == "whirlwind_mh" then
+			name = "whirlwind"
+		end
 		node = annotation.astAnnotation and annotation.astAnnotation.sync and annotation.astAnnotation.sync[name]
 		if not node then
 			local syncParseNode = annotation.sync[name]
