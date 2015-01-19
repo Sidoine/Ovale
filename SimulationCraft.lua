@@ -566,7 +566,7 @@ ParseAction = function(action, nodeList, annotation)
 		node.child = child
 		-- Save first action for "sync=action" references.
 		annotation.sync = annotation.sync or {}
-		annotation.sync[name] = node
+		annotation.sync[name] = annotation.sync[name] or node
 	else
 		self_childrenPool:Release(child)
 	end

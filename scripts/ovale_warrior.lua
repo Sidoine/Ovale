@@ -376,7 +376,7 @@ AddFunction FurySingleMindedFuryAoeCdActions
 	unless { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and IsEnraged() and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
 		#recklessness,sync=bladestorm
-		if not False(raid_event_adds_exists) and Spell(bladestorm) Spell(recklessness)
+		if EnrageRemaining() > 6 and Spell(bladestorm) Spell(recklessness)
 	}
 }
 
@@ -687,7 +687,7 @@ AddFunction FuryTitansGripAoeCdActions
 	unless { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and IsEnraged() and BuffPresent(raging_blow_buff) and Spell(raging_blow) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and BuffPresent(raging_blow_buff) and Spell(raging_blow)
 	{
 		#recklessness,sync=bladestorm
-		if not False(raid_event_adds_exists) and Spell(bladestorm) Spell(recklessness)
+		if EnrageRemaining() > 6 and Spell(bladestorm) Spell(recklessness)
 	}
 }
 
