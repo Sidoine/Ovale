@@ -325,7 +325,7 @@ AddFunction GuardianPrecombatMainActions
 AddFunction RestorationPrecombatActions
 {
 	# Raid buffs.
-	if not BuffPresent(str_agi_int any=1) Spell(mark_of_the_wild)
+	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	# Healing Touch to refresh Harmony buff.
 	if BuffRemaining(harmony_buff) < 6 Spell(healing_touch)
 }
