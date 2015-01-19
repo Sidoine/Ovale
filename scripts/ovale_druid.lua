@@ -366,7 +366,7 @@ AddFunction RestorationAoeActions
 AddFunction RestorationShortCdActions
 {
 	# Maintain Efflorescence.
-	if TotemExpires(mushroom) Spell(wild_mushroom_heal)
+	if TotemExpires(wild_mushroom_heal) Spell(wild_mushroom_heal)
 	# Don't cap out on Force of Nature charges.
 	if Talent(force_of_nature_talent) and Charges(force_of_nature_heal count=0) >= 3 Spell(force_of_nature_heal)
 }
