@@ -37,17 +37,6 @@ OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
--- Current age of cooldown state.
-local self_serial = 0
--- Shared cooldown name (sharedcd) to spell table mapping.
-local self_sharedCooldownSpells = {}
-
--- GCD cached information
-local self_gcd = {
-	serial = 0,
-	start = 0,
-	duration = 0,
-}
 
 -- BASE_GCD[class] = { gcd, isCaster }
 local BASE_GCD = {
@@ -68,6 +57,19 @@ local BASE_GCD = {
 local FOCUS_AND_HARMONY = 154555
 local HEADLONG_RUSH = 158836
 --</private-static-properties>
+
+--<public-static-properties>
+-- Current age of cooldown state.
+OvaleCooldown.serial = 0
+-- Shared cooldown name (sharedcd) to spell table mapping.
+OvaleCooldown.sharedCooldown = {}
+-- Cached global cooldown information.
+OvaleCooldown.gcd = {
+	serial = 0,
+	start = 0,
+	duration = 0,
+}
+--</public-static-properties>
 
 --<public-static-methods>
 function OvaleCooldown:OnInitialize()
@@ -114,22 +116,23 @@ function OvaleCooldown:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineI
 			Reset the global cooldown forcibly.
 		--]]
 		self:Debug("Resetting global cooldown.")
-		self_gcd.start = 0
-		self_gcd.duration = 0
+		local cd = self.gcd
+		cd.start = 0
+		cd.duration = 0
 	end
 end
 
 function OvaleCooldown:Update(event, unit)
 	if unit == "player" then
 		-- Advance age of current cooldown state.
-		self_serial = self_serial + 1
-		self:Debug(event, self_serial)
+		self.serial = self.serial + 1
+		self:Debug(event, self.serial)
 	end
 end
 
 -- Empty out the sharedcd table.
 function OvaleCooldown:ResetSharedCooldowns()
-	for name, spellTable in pairs(self_sharedCooldownSpells) do
+	for name, spellTable in pairs(self.sharedCooldown) do
 		for spellId in pairs(spellTable) do
 			spellTable[spellId] = nil
 		end
@@ -137,18 +140,18 @@ function OvaleCooldown:ResetSharedCooldowns()
 end
 
 function OvaleCooldown:IsSharedCooldown(name)
-	local spellTable = self_sharedCooldownSpells[name]
+	local spellTable = self.sharedCooldown[name]
 	return (spellTable and next(spellTable) ~= nil)
 end
 
 function OvaleCooldown:AddSharedCooldown(name, spellId)
-	self_sharedCooldownSpells[name] = self_sharedCooldownSpells[name] or {}
-	self_sharedCooldownSpells[name][spellId] = true
+	self.sharedCooldown[name] = self.sharedCooldown[name] or {}
+	self.sharedCooldown[name][spellId] = true
 end
 
 function OvaleCooldown:GetGlobalCooldown(now)
-	local cd = self_gcd
-	if not cd.start or not cd.serial or cd.serial < self_serial then
+	local cd = self.gcd
+	if not cd.start or not cd.serial or cd.serial < self.serial then
 		now = now or API_GetTime()
 		if now >= cd.start + cd.duration then
 			cd.start, cd.duration = API_GetSpellCooldown(GLOBAL_COOLDOWN)
@@ -162,8 +165,8 @@ end
 -- information.
 function OvaleCooldown:GetSpellCooldown(spellId)
 	local cdStart, cdDuration, cdEnable = 0, 0, 1
-	if self_sharedCooldownSpells[spellId] then
-		for id in pairs(self_sharedCooldownSpells[spellId]) do
+	if self.sharedCooldown[spellId] then
+		for id in pairs(self.sharedCooldown[spellId]) do
 			local start, duration, enable = self:GetSpellCooldown(id)
 			if start then break end
 		end
@@ -251,7 +254,7 @@ function OvaleCooldown:ResetState(state)
 	self:StartProfiling("OvaleCooldown_ResetState")
 	for _, cd in pairs(state.cd) do
 		-- Remove outdated cooldown state.
-		if cd.serial and cd.serial < self_serial then
+		if cd.serial and cd.serial < self.serial then
 			for k in pairs(cd) do
 				cd[k] = nil
 			end
@@ -326,7 +329,7 @@ statePrototype.DebugCooldown = function(state)
 		if cd.start then
 			if cd.charges then
 				OvaleCooldown:Print("Spell %s cooldown: start=%f, duration=%f, charges=%d, maxCharges=%d, chargeStart=%f, chargeDuration=%f",
-					spellId, cd.start, cd.duration, cd.charges, cd.start, cd.duration)
+					spellId, cd.start, cd.duration, cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration)
 			else
 				OvaleCooldown:Print("Spell %s cooldown: start=%f, duration=%f", spellId, cd.start, cd.duration)
 			end
@@ -390,12 +393,12 @@ statePrototype.GetCD = function(state, spellId)
 
 	-- Populate the cooldown information from the current game state if it is outdated.
 	local cd = state.cd[cdName]
-	if not cd.start or not cd.serial or cd.serial < self_serial then
+	if not cd.start or not cd.serial or cd.serial < OvaleCooldown.serial then
 		local start, duration, enable = OvaleCooldown:GetSpellCooldown(spellId)
 		if si and si.forcecd then
 			start, duration = OvaleCooldown:GetSpellCooldown(si.forcecd)
 		end
-		cd.serial = self_serial
+		cd.serial = OvaleCooldown.serial
 		cd.start = start
 		cd.duration = duration
 		cd.enable = enable
