@@ -105,7 +105,7 @@ function OvaleCooldown:OnDisable()
 end
 
 function OvaleCooldown:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
-	if unit == "player" then
+	if unit == "player" or unit == "pet" then
 		-- Age the current cooldown state.
 		self:Update(event, unit)
 
@@ -123,7 +123,7 @@ function OvaleCooldown:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineI
 end
 
 function OvaleCooldown:Update(event, unit)
-	if unit == "player" then
+	if unit == "player" or unit == "pet" then
 		-- Advance age of current cooldown state.
 		self.serial = self.serial + 1
 		self:Debug(event, self.serial)
