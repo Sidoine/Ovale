@@ -354,6 +354,7 @@ local function EvaluateSpellInfo(node)
 				local spellName = API_GetSpellInfo(spellId)
 				OvaleSpellBook:AddSpell(spellId, spellName)
 			elseif k == "sharedcd" then
+				si[k] = v
 				OvaleCooldown:AddSharedCooldown(v, spellId)
 			elseif not OvaleAST.PARAMETER_KEYWORD[k] then
 				si[k] = v
