@@ -83,6 +83,9 @@ function OvaleCooldown:OnInitialize()
 end
 
 function OvaleCooldown:OnEnable()
+	self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", "Update")
+	self:RegisterEvent("BAG_UPDATE_COOLDOWN", "Update")
+	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "Update")
 	self:RegisterEvent("SPELL_UPDATE_CHARGES", "Update")
 	self:RegisterEvent("SPELL_UPDATE_USABLE", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", "Update")
@@ -90,11 +93,15 @@ function OvaleCooldown:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UNIT_SPELLCAST_START", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "Update")
+	self:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", "Update")
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleCooldown:OnDisable()
 	OvaleState:UnregisterState(self)
+	self:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
+	self:UnregisterEvent("BAG_UPDATE_COOLDOWN")
+	self:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
 	self:UnregisterEvent("SPELL_UPDATE_CHARGES")
 	self:UnregisterEvent("SPELL_UPDATE_USABLE")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
@@ -102,6 +109,7 @@ function OvaleCooldown:OnDisable()
 	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:UnregisterEvent("UNIT_SPELLCAST_START")
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:UnregisterEvent("UPDATE_SHAPESHIFT_COOLDOWN")
 end
 
 function OvaleCooldown:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
@@ -123,7 +131,7 @@ function OvaleCooldown:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineI
 end
 
 function OvaleCooldown:Update(event, unit)
-	if unit == "player" or unit == "pet" then
+	if not unit or unit == "player" or unit == "pet" then
 		-- Advance age of current cooldown state.
 		self.serial = self.serial + 1
 		self:Debug(event, self.serial)
