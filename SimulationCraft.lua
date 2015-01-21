@@ -1468,16 +1468,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		if class == "DEATHKNIGHT" and action == "antimagic_shell" then
 			-- Only suggest Anti-Magic Shell if there is incoming damage to absorb to generate runic power.
 			conditionCode = "IncomingDamage(1.5) > 0"
-		elseif class == "DEATHKNIGHT" and action == "blood_tap" then
-			-- Blood Tap requires a minimum of five stacks of Blood Charge to be on the player.
-			local buffName = "blood_charge_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffStacks(%s) >= 5", buffName)
-		elseif class == "DEATHKNIGHT" and action == "dark_transformation" then
-			-- Dark Transformation requires a five stacks of Shadow Infusion to be on the player/pet.
-			local buffName = "shadow_infusion_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffStacks(%s) >= 5", buffName)
 		elseif class == "DEATHKNIGHT" and action == "horn_of_winter" then
 			-- Only cast Horn of Winter if not already raid-buffed.
 			conditionCode = "BuffExpires(attack_power_multiplier_buff any=1)"
@@ -1496,14 +1486,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local spellName = "enhanced_rejuvenation"
 			AddSymbol(annotation, spellName)
 			conditionCode = format("SpellKnown(%s)", spellName)
-		elseif class == "DRUID" and action == "prowl" then
-			-- Don't Prowl if already stealthed.
-			conditionCode = "BuffExpires(stealthed_buff any=1)"
-		elseif class == "DRUID" and action == "pulverize" then
-			-- Pulverize requires 3 stacks of Lacerate on the target.
-			local debuffName = "lacerate_debuff"
-			AddSymbol(annotation, debuffName)
-			conditionCode = format("target.DebuffStacks(%s) >= 3", debuffName)
 		elseif class == "DRUID" and action == "skull_bash" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -1535,19 +1517,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			AddSymbol(annotation, glyphName)
 			annotation.trap_launcher = class
 			conditionCode = format("CheckBoxOn(opt_trap_launcher) and not Glyph(%s)", glyphName)
-		elseif class == "HUNTER" and action == "focus_fire" then
-			-- Focus Fire requires at least one stack of Frenzy.
-			local buffName = "frenzy_buff"
-			AddSymbol(annotation, buffName)
-			if modifier.five_stacks then
-				local value = tonumber(Unparse(modifier.five_stacks))
-				if value == 1 then
-					conditionCode = format("BuffStacks(%s any=1) == 5", buffName)
-				end
-			end
-			if not conditionCode then
-				conditionCode = format("BuffPresent(%s any=1)", buffName)
-			end
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
@@ -1565,11 +1534,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "arcane_brilliance" then
 			-- Only cast Arcane Brilliance if not already raid-buffed.
 			conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
-		elseif class == "MAGE" and action == "arcane_missiles" then
-			-- Arcane Missiles can only be fired if the Arcane Missiles! buff is present.
-			local buffName = "arcane_missiles_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "MAGE" and action == "counterspell" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -1608,11 +1572,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
-		elseif class == "MONK" and action == "touch_of_death" then
-			-- Touch of Death can only be used if the Death Note buff is present on the player.
-			local buffName = "death_note_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"
@@ -1628,10 +1587,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
-		elseif class == "PRIEST" and action == "insanity" then
-			local buffName = "shadow_word_insanity_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "PRIEST" and action == "silence" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -1672,9 +1627,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local buffName = "slice_and_dice_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffRemaining(%s) < BaseDuration(%s)", buffName, buffName)
-		elseif class == "ROGUE" and action == "stealth" then
-			-- Don't Stealth if already stealthed.
-			conditionCode = "BuffExpires(stealthed_buff any=1)"
 		elseif class == "SHAMAN" and strsub(action, 1, 11) == "ascendance_" then
 			-- Ascendance doesn't go on cooldown until after the buff expires, so don't
 			-- suggest Ascendance if already in Ascendance.
@@ -1685,21 +1637,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = "Bloodlust()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "SHAMAN" and action == "lava_beam" then
-			-- Lava Beam is the elemental Ascendance version of Chain Lightning.
-			local buffName = "ascendance_caster_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "SHAMAN" and action == "magma_totem" then
 			-- Only suggest Magma Totem if within melee range of the target.
 			local spellName = "primal_strike"
 			AddSymbol(annotation, spellName)
 			conditionCode = format("target.InRange(%s)", spellName)
-		elseif class == "SHAMAN" and action == "windstrike" then
-			-- Windstrike is the enhancement Ascendance version of Stormstrike.
-			local buffName = "ascendance_melee_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif class == "SHAMAN" and action == "wind_shear" then
 			bodyCode = "InterruptActions()"
 			annotation[action] = class
@@ -1773,16 +1715,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
-		elseif class == "WARRIOR" and action == "raging_blow" then
-			-- Raging Blow can only be used if the Raging Blow buff is present on the player.
-			local buffName = "raging_blow_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
-		elseif class == "WARRIOR" and action == "victory_rush" then
-			-- Victory Rush requires the Victorious buff to be on the player.
-			local buffName = "victorious_buff"
-			AddSymbol(annotation, buffName)
-			conditionCode = format("BuffPresent(%s)", buffName)
 		elseif action == "auto_attack" then
 			bodyCode = "GetInMeleeRange()"
 			isSpellAction = false
@@ -2278,6 +2210,13 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 
 	if modifier == "if" then
 		node = Emit(parseNode, nodeList, annotation, action)
+	elseif modifier == "five_stacks" and action == "focus_fire" then
+		local value = tonumber(Unparse(parseNode))
+		if value == 1 then
+			local buffName = "frenzy_buff"
+			AddSymbol(annotation, buffName)
+			code = format("BuffStacks(%s any=1) >= 5", buffName)
+		end
 	elseif modifier == "line_cd" then
 		if not SPECIAL_ACTION[action] then
 			AddSymbol(annotation, action)
