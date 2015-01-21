@@ -135,7 +135,7 @@ AddFunction FrostDualWieldAoeShortCdActions
 		unless Spell(howling_blast)
 		{
 			#blood_tap,if=buff.blood_charge.stack>10
-			if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+			if BuffStacks(blood_charge_buff) > 10 Spell(blood_tap)
 
 			unless RunicPower() > 88 and Spell(frost_strike)
 			{
@@ -145,7 +145,7 @@ AddFunction FrostDualWieldAoeShortCdActions
 				unless Rune(unholy) >= 2 and Spell(plague_strike)
 				{
 					#blood_tap
-					if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+					Spell(blood_tap)
 				}
 			}
 		}
@@ -188,14 +188,14 @@ AddFunction FrostDualWieldBosAoeShortCdActions
 	unless Spell(howling_blast)
 	{
 		#blood_tap,if=buff.blood_charge.stack>10
-		if BuffStacks(blood_charge_buff) > 10 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		if BuffStacks(blood_charge_buff) > 10 Spell(blood_tap)
 		#death_and_decay,if=unholy=1
 		if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 
 		unless Rune(unholy) >= 2 and Spell(plague_strike)
 		{
 			#blood_tap
-			if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+			Spell(blood_tap)
 		}
 	}
 }
@@ -230,12 +230,12 @@ AddFunction FrostDualWieldBosStShortCdActions
 	unless BuffPresent(killing_machine_buff) and Spell(obliterate)
 	{
 		#blood_tap,if=buff.killing_machine.react&buff.blood_charge.stack>=5
-		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		if BuffPresent(killing_machine_buff) and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 
 		unless BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or RunicPower() < 88 and Spell(howling_blast) or Rune(unholy) >= 1 and RunicPower() < 76 and Spell(obliterate)
 		{
 			#blood_tap,if=buff.blood_charge.stack>=5
-			if BuffStacks(blood_charge_buff) >= 5 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+			if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 		}
 	}
 }
@@ -323,18 +323,18 @@ AddFunction FrostDualWieldSingleTargetMainActions
 AddFunction FrostDualWieldSingleTargetShortCdActions
 {
 	#blood_tap,if=buff.blood_charge.stack>10&(runic_power>76|(runic_power>=20&buff.killing_machine.react))
-	if BuffStacks(blood_charge_buff) > 10 and { RunicPower() > 76 or RunicPower() >= 20 and BuffPresent(killing_machine_buff) } and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+	if BuffStacks(blood_charge_buff) > 10 and { RunicPower() > 76 or RunicPower() >= 20 and BuffPresent(killing_machine_buff) } Spell(blood_tap)
 
 	unless target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost)
 	{
 		#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
-		if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 Spell(blood_tap)
 		#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 		if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosStShortCdActions()
 		#defile
 		Spell(defile)
 		#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
-		if Talent(defile_talent) and not SpellCooldown(defile) > 0 and BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		if Talent(defile_talent) and not SpellCooldown(defile) > 0 Spell(blood_tap)
 
 		unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Spell(howling_blast) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 76 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or RunicPower() > 88 } and Spell(frost_strike) or SpellCooldown(antimagic_shell) < 1 and RunicPower() >= 50 and not BuffPresent(antimagic_shell_buff) and Spell(frost_strike) or { Rune(death) >= 2 or Rune(frost) >= 2 } and Spell(howling_blast)
 		{
@@ -344,7 +344,7 @@ AddFunction FrostDualWieldSingleTargetShortCdActions
 			unless not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Rune(unholy) >= 1 and Spell(plague_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike) or RunicPower() > 76 and Spell(frost_strike) or Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) and Spell(obliterate) or { not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast)
 			{
 				#blood_tap
-				if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+				Spell(blood_tap)
 			}
 		}
 	}

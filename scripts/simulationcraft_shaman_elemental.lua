@@ -103,7 +103,7 @@ AddFunction ElementalDefaultCdActions
 AddFunction ElementalAoeMainActions
 {
 	#lava_beam
-	if BuffPresent(ascendance_caster_buff) Spell(lava_beam)
+	Spell(lava_beam)
 	#earth_shock,if=buff.lightning_shield.react=buff.lightning_shield.max_stack
 	if BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) Spell(earth_shock)
 	#searing_totem,if=(!talent.liquid_magma.enabled&!totem.fire.active)|(talent.liquid_magma.enabled&pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up)
@@ -119,7 +119,7 @@ AddFunction ElementalAoeShortCdActions
 	#earthquake,cycle_targets=1,if=!ticking&(buff.enhanced_chain_lightning.up|level<=90)&active_enemies>=2
 	if not target.DebuffPresent(earthquake_debuff) and { BuffPresent(enhanced_chain_lightning_buff) or Level() <= 90 } and Enemies() >= 2 Spell(earthquake)
 
-	unless BuffPresent(ascendance_caster_buff) and Spell(lava_beam) or BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock)
+	unless Spell(lava_beam) or BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock)
 	{
 		#thunderstorm,if=active_enemies>=10
 		if Enemies() >= 10 Spell(thunderstorm)

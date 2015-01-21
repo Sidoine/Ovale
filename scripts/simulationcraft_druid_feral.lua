@@ -193,12 +193,12 @@ AddFunction FeralPrecombatMainActions
 	#cat_form
 	Spell(cat_form)
 	#prowl
-	if BuffExpires(stealthed_buff any=1) Spell(prowl)
+	Spell(prowl)
 }
 
 AddFunction FeralPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 and Spell(healing_touch) or Spell(cat_form) or BuffExpires(stealthed_buff any=1) and Spell(prowl)
+	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 and Spell(healing_touch) or Spell(cat_form) or Spell(prowl)
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility

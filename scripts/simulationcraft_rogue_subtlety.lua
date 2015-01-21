@@ -288,7 +288,7 @@ AddFunction SubtletyPrecombatMainActions
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	Spell(stealth)
 	#premeditation,if=!talent.marked_for_death.enabled
 	if not Talent(marked_for_death_talent) and ComboPoints() < 5 Spell(premeditation)
 	#slice_and_dice,if=buff.slice_and_dice.remains<18
@@ -299,7 +299,7 @@ AddFunction SubtletyPrecombatMainActions
 
 AddFunction SubtletyPrecombatShortCdActions
 {
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
 	{
 		#marked_for_death
 		Spell(marked_for_death)

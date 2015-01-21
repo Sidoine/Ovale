@@ -175,14 +175,14 @@ AddFunction CombatPrecombatMainActions
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	Spell(stealth)
 	#slice_and_dice,if=talent.marked_for_death.enabled
 	if Talent(marked_for_death_talent) and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 }
 
 AddFunction CombatPrecombatShortCdActions
 {
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
 	{
 		#marked_for_death
 		Spell(marked_for_death)

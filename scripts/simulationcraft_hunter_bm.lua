@@ -38,8 +38,12 @@ AddFunction InterruptActions
 
 AddFunction BeastMasterySummonPet
 {
-	if not pet.Present() Texture(ability_hunter_beastcall help=L(summon_pet))
-	if pet.IsDead() Spell(revive_pet)
+	if pet.IsDead()
+	{
+		if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
+		Spell(revive_pet)
+	}
+	if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
 }
 
 ### actions.default
@@ -82,7 +86,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 	unless { Enemies() > 5 or Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) } and Spell(multishot)
 	{
 		#focus_fire,five_stacks=1
-		if BuffStacks(frenzy_buff any=1) == 5 Spell(focus_fire)
+		if BuffStacks(frenzy_buff any=1) >= 5 Spell(focus_fire)
 		#barrage,if=active_enemies>1
 		if Enemies() > 1 Spell(barrage)
 		#a_murder_of_crows

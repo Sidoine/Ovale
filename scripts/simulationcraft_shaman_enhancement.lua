@@ -133,7 +133,7 @@ AddFunction EnhancementAoeMainActions
 		#lightning_bolt,if=(!glyph.chain_lightning.enabled|active_enemies<=3)&(buff.maelstrom_weapon.react=5|(buff.ancestral_swiftness.up&buff.maelstrom_weapon.react>=3))
 		if { not Glyph(glyph_of_chain_lightning) or Enemies() <= 3 } and { BuffStacks(maelstrom_weapon_buff) == 5 or BuffPresent(ancestral_swiftness_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 } Spell(lightning_bolt)
 		#windstrike
-		if BuffPresent(ascendance_melee_buff) Spell(windstrike)
+		Spell(windstrike)
 		#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=1
 		if not BuffPresent(unleash_flame_buff) and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
 		#chain_lightning,if=glyph.chain_lightning.enabled&active_enemies>=4&buff.maelstrom_weapon.react>=1
@@ -188,7 +188,7 @@ AddFunction EnhancementSingleMainActions
 	#elemental_blast,if=buff.maelstrom_weapon.react>=4|buff.ancestral_swiftness.up
 	if BuffStacks(maelstrom_weapon_buff) >= 4 or BuffPresent(ancestral_swiftness_buff) Spell(elemental_blast)
 	#windstrike
-	if BuffPresent(ascendance_melee_buff) Spell(windstrike)
+	Spell(windstrike)
 	#lightning_bolt,if=buff.maelstrom_weapon.react=5
 	if BuffStacks(maelstrom_weapon_buff) == 5 Spell(lightning_bolt)
 	#stormstrike

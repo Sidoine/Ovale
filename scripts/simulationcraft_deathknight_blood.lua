@@ -97,7 +97,7 @@ AddFunction BloodDefaultShortCdActions
 			unless { Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 			{
 				#blood_tap
-				if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+				Spell(blood_tap)
 			}
 		}
 	}
@@ -217,7 +217,6 @@ AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood_aoe
 # asphyxiate
 # berserking
 # blood_boil
-# blood_charge_buff
 # blood_fury_ap
 # blood_plague_debuff
 # blood_presence

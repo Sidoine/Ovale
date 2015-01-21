@@ -121,7 +121,7 @@ AddFunction ProtectionProtMainActions
 	#impending_victory,if=talent.impending_victory.enabled&cooldown.shield_slam.remains<=execute_time
 	if Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(impending_victory) Spell(impending_victory)
 	#victory_rush,if=!talent.impending_victory.enabled&cooldown.shield_slam.remains<=execute_time
-	if not Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(victory_rush) and BuffPresent(victorious_buff) Spell(victory_rush)
+	if not Talent(impending_victory_talent) and SpellCooldown(shield_slam) <= ExecuteTime(victory_rush) Spell(victory_rush)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
 	#devastate
@@ -329,7 +329,6 @@ AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
 # ultimatum_buff
 # unyielding_strikes_buff
 # unyielding_strikes_talent
-# victorious_buff
 # victory_rush
 # war_stomp
 ]]

@@ -62,8 +62,8 @@ AddFunction CombatDefaultMainActions
 {
 	#ambush,if=!talent.nightstalker.enabled|time<5
 	if not Talent(nightstalker_talent) or TimeInCombat() < 5 Spell(ambush)
-	#slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8)
-	if { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
+	#slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8&buff.deep_insight.down)
+	if { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 and BuffExpires(deep_insight_buff) } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 	#call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
 	if ComboPoints() < 5 or not target.DebuffPresent(revealing_strike_debuff) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) <= 4 and BuffExpires(deep_insight_buff) CombatGeneratorMainActions()
 	#call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=4))
@@ -86,7 +86,7 @@ AddFunction CombatDefaultShortCdActions
 		#vanish,if=time>5&talent.nightstalker.enabled&combo_points=5&energy>35&energy<80
 		if TimeInCombat() > 5 and Talent(nightstalker_talent) and ComboPoints() == 5 and Energy() > 35 and Energy() < 80 Spell(vanish)
 
-		unless { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
+		unless { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 and BuffExpires(deep_insight_buff) } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
 		{
 			#marked_for_death,if=combo_points<=1&dot.revealing_strike.ticking&(!talent.shadow_reflection.enabled|buff.shadow_reflection.up|cooldown.shadow_reflection.remains>30)
 			if ComboPoints() <= 1 and target.DebuffPresent(revealing_strike_debuff) and { not Talent(shadow_reflection_talent) or BuffPresent(shadow_reflection_buff) or SpellCooldown(shadow_reflection) > 30 } Spell(marked_for_death)
@@ -113,12 +113,12 @@ AddFunction CombatDefaultCdActions
 	#shadow_reflection,if=(cooldown.killing_spree.remains<10&combo_points>3)|buff.adrenaline_rush.up
 	if SpellCooldown(killing_spree) < 10 and ComboPoints() > 3 or BuffPresent(adrenaline_rush_buff) Spell(shadow_reflection)
 
-	unless { not Talent(nightstalker_talent) or TimeInCombat() < 5 } and Spell(ambush) or { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
+	unless { not Talent(nightstalker_talent) or TimeInCombat() < 5 } and Spell(ambush) or { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 10.8 and BuffExpires(deep_insight_buff) } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
 	{
 		#killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>3|buff.deep_insight.remains>3|buff.meaty_dragonspine_trophy.remains>3|time_to_die<4))
 		if { Energy() < 40 or BuffPresent(burst_haste_buff any=1) and TimeInCombat() < 10 or BuffRemaining(burst_haste_buff any=1) > 20 } and BuffExpires(adrenaline_rush_buff) and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > 3 or BuffRemaining(deep_insight_buff) > 3 or BuffRemaining(meaty_dragonspine_trophy_buff) > 3 or TimeToDie() < 4 } Spell(killing_spree)
-		#adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.meaty_dragonspine_trophy.remains>buff.meaty_dragonspine_trophy.duration*0.8|time_to_die<4))
-		if { Energy() < 35 or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(killing_spree) > 10 and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > BaseDuration(archmages_greater_incandescence_agi_buff) * 0.8 or BuffRemaining(deep_insight_buff) > BaseDuration(deep_insight_buff) * 0.8 or BuffRemaining(meaty_dragonspine_trophy_buff) > BaseDuration(meaty_dragonspine_trophy_buff) * 0.8 or TimeToDie() < 4 } Spell(adrenaline_rush)
+		#adrenaline_rush,if=cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.meaty_dragonspine_trophy.remains>buff.meaty_dragonspine_trophy.duration*0.8|time_to_die<4))
+		if SpellCooldown(killing_spree) > 10 and not TimeToDie() < 44 or TimeToDie() < 44 and { BuffRemaining(archmages_greater_incandescence_agi_buff) > BaseDuration(archmages_greater_incandescence_agi_buff) * 0.8 or BuffRemaining(deep_insight_buff) > BaseDuration(deep_insight_buff) * 0.8 or BuffRemaining(meaty_dragonspine_trophy_buff) > BaseDuration(meaty_dragonspine_trophy_buff) * 0.8 or TimeToDie() < 4 } Spell(adrenaline_rush)
 	}
 }
 
@@ -155,14 +155,14 @@ AddFunction CombatPrecombatMainActions
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth
-	if BuffExpires(stealthed_buff any=1) Spell(stealth)
+	Spell(stealth)
 	#slice_and_dice,if=talent.marked_for_death.enabled
 	if Talent(marked_for_death_talent) and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
 }
 
 AddFunction CombatPrecombatShortCdActions
 {
-	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or BuffExpires(stealthed_buff any=1) and Spell(stealth)
+	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
 	{
 		#marked_for_death
 		Spell(marked_for_death)

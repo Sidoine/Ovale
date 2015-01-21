@@ -64,7 +64,7 @@ AddFunction BrewmasterDefaultShortCdActions
 	#auto_attack
 	GetInMeleeRange()
 	#touch_of_death,if=target.health<health
-	if target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death)
+	if target.Health() < Health() Spell(touch_of_death)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 	if BuffStacks(elusive_brew_stacks_buff) >= 9 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#serenity,if=talent.serenity.enabled&cooldown.keg_smash.remains>6
@@ -77,7 +77,7 @@ AddFunction BrewmasterDefaultShortCdActions
 
 AddFunction BrewmasterDefaultCdActions
 {
-	unless target.Health() < Health() and BuffPresent(death_note_buff) and Spell(touch_of_death)
+	unless target.Health() < Health() and Spell(touch_of_death)
 	{
 		#spear_hand_strike
 		InterruptActions()
@@ -287,7 +287,6 @@ AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
 # chi_wave
 # dampen_harm
 # dampen_harm_buff
-# death_note_buff
 # diffuse_magic
 # diffuse_magic_buff
 # draenic_armor_potion

@@ -156,7 +156,7 @@ AddFunction WindwalkerAoeShortCdActions
 			#fists_of_fury,if=talent.rushing_jade_wind.enabled&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&!buff.serenity.remains
 			if Talent(rushing_jade_wind_talent) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 			#touch_of_death,if=target.health.percent<10
-			if target.HealthPercent() < 10 and BuffPresent(death_note_buff) Spell(touch_of_death)
+			if target.HealthPercent() < 10 Spell(touch_of_death)
 			#hurricane_strike,if=talent.rushing_jade_wind.enabled&talent.hurricane_strike.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
 			if Talent(rushing_jade_wind_talent) and Talent(hurricane_strike_talent) and TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
 
@@ -231,7 +231,7 @@ AddFunction WindwalkerStShortCdActions
 	#fists_of_fury,if=buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&!buff.serenity.remains
 	if BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 	#touch_of_death,if=target.health.percent<10
-	if target.HealthPercent() < 10 and BuffPresent(death_note_buff) Spell(touch_of_death)
+	if target.HealthPercent() < 10 Spell(touch_of_death)
 	#hurricane_strike,if=talent.hurricane_strike.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
 	if Talent(hurricane_strike_talent) and TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
 	#energizing_brew,if=cooldown.fists_of_fury.remains>6&(!talent.serenity.enabled|(!buff.serenity.remains&cooldown.serenity.remains>4))&energy+energy.regen*gcd<50
@@ -304,7 +304,6 @@ AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker_aoe
 # combo_breaker_bok_buff
 # combo_breaker_ce_buff
 # combo_breaker_tp_buff
-# death_note_buff
 # draenic_agility_potion
 # energizing_brew
 # energizing_brew_buff

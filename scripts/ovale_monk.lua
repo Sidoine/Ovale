@@ -75,7 +75,7 @@ AddFunction BrewmasterDefaultShortCdActions
 	#auto_attack
 	GetInMeleeRange()
 	#touch_of_death,if=target.health<health
-	if target.Health() < Health() and BuffPresent(death_note_buff) Spell(touch_of_death)
+	if target.Health() < Health() Spell(touch_of_death)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 	if BuffStacks(elusive_brew_stacks_buff) >= 9 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(elusive_brew)
 	#serenity,if=talent.serenity.enabled&cooldown.keg_smash.remains>6
@@ -88,7 +88,7 @@ AddFunction BrewmasterDefaultShortCdActions
 
 AddFunction BrewmasterDefaultCdActions
 {
-	unless target.Health() < Health() and BuffPresent(death_note_buff) and Spell(touch_of_death)
+	unless target.Health() < Health() and Spell(touch_of_death)
 	{
 		#spear_hand_strike
 		InterruptActions()
@@ -367,7 +367,7 @@ AddFunction WindwalkerAoeShortCdActions
 			#fists_of_fury,if=talent.rushing_jade_wind.enabled&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&!buff.serenity.remains
 			if Talent(rushing_jade_wind_talent) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 			#touch_of_death,if=target.health.percent<10
-			if target.HealthPercent() < 10 and BuffPresent(death_note_buff) Spell(touch_of_death)
+			if target.HealthPercent() < 10 Spell(touch_of_death)
 			#hurricane_strike,if=talent.rushing_jade_wind.enabled&talent.hurricane_strike.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
 			if Talent(rushing_jade_wind_talent) and Talent(hurricane_strike_talent) and TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
 
@@ -442,7 +442,7 @@ AddFunction WindwalkerStShortCdActions
 	#fists_of_fury,if=buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&!buff.serenity.remains
 	if BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 	#touch_of_death,if=target.health.percent<10
-	if target.HealthPercent() < 10 and BuffPresent(death_note_buff) Spell(touch_of_death)
+	if target.HealthPercent() < 10 Spell(touch_of_death)
 	#hurricane_strike,if=talent.hurricane_strike.enabled&energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
 	if Talent(hurricane_strike_talent) and TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
 	#energizing_brew,if=cooldown.fists_of_fury.remains>6&(!talent.serenity.enabled|(!buff.serenity.remains&cooldown.serenity.remains>4))&energy+energy.regen*gcd<50
