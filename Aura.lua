@@ -782,9 +782,16 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 	local verified = false
 	-- If index isn't given, then tokens holds the actual token value.
 	local buffName = tokens
+	local stacks = 1
 	if index then
 		buffName = tokens[index]
 		index = index + 1
+		-- Peek at the next token to see if it is an optional minimum stack count.
+		local count = tonumber(tokens[index])
+		if count then
+			stacks = count
+			index = index + 1
+		end
 	end
 	if buffName then
 		local isBang = false
@@ -808,15 +815,15 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 			mine = true
 		end
 		local aura = self:GetAura(unitId, buffName, filter, mine)
-		local isActiveAura = self:IsActiveAura(aura, atTime)
+		local isActiveAura = self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
 		if not isBang and isActiveAura or isBang and not isActiveAura then
 			verified = true
 		end
 		local result = verified and "passed" or "FAILED"
 		if isBang then
-			self:Log("    Require aura %s NOT on %s at time=%f: %s", buffName, unitId, atTime, result)
+			self:Log("    Require aura %s with at least %d stack(s) NOT on %s at time=%f: %s", buffName, stacks, unitId, atTime, result)
 		else
-			self:Log("    Require aura %s on %s at time=%f: %s", buffName, unitId, atTime, result)
+			self:Log("    Require aura %s with at least %d stack(s) on %s at time=%f: %s", buffName, stacks, unitId, atTime, result)
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a buff argument.", requirement)
