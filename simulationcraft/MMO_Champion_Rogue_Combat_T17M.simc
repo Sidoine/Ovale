@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-13
+# Last update: 2015-01-20
 
 rogue="Rogue_Combat_T17M"
 level=100
@@ -38,9 +38,9 @@ actions+=/auto_attack
 actions+=/vanish,if=time>10&(talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<60)&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))
 actions+=/vanish,if=time>10&(talent.subterfuge.enabled&energy>=90)&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))
 actions+=/vanish,if=time>5&talent.nightstalker.enabled&combo_points=5&energy>35&energy<80
-actions+=/slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8)
+actions+=/slice_and_dice,if=buff.slice_and_dice.remains<2|(target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<10.8&buff.deep_insight.down)
 actions+=/killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>3|buff.deep_insight.remains>3|buff.meaty_dragonspine_trophy.remains>3|time_to_die<4))
-actions+=/adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.meaty_dragonspine_trophy.remains>buff.meaty_dragonspine_trophy.duration*0.8|time_to_die<4))
+actions+=/adrenaline_rush,if=cooldown.killing_spree.remains>10&!time_to_die<44|(time_to_die<44&(buff.archmages_greater_incandescence_agi.remains>buff.archmages_greater_incandescence_agi.duration*0.8|buff.deep_insight.remains>buff.deep_insight.duration*0.8|buff.meaty_dragonspine_trophy.remains>buff.meaty_dragonspine_trophy.duration*0.8|time_to_die<4))
 actions+=/marked_for_death,if=combo_points<=1&dot.revealing_strike.ticking&(!talent.shadow_reflection.enabled|buff.shadow_reflection.up|cooldown.shadow_reflection.remains>30)
 actions+=/call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
 actions+=/call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=4))
