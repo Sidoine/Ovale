@@ -1,8 +1,8 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-13
+# Last update: 2015-01-19
 
-rogue="Rogue_Subtlety_T17M"
+rogue="Rogue_Subtlety_T17M_mmo_simple_wait_garr_amb_dance"
 level=100
 race=night_elf
 timeofday=day
@@ -37,6 +37,9 @@ actions+=/slice_and_dice,if=(buff.slice_and_dice.remains<10.8)&buff.slice_and_di
 actions+=/premeditation,if=combo_points<=4&!(buff.shadow_dance.up&energy>100&combo_points>1)&!buff.subterfuge.up|(buff.subterfuge.up&debuff.find_weakness.up)
 actions+=/pool_resource,for_next=1
 actions+=/garrote,if=!ticking&time<1
+
+actions+=/wait,sec=cooldown.honor_among_thieves.remains+0.101,if=time>2&time<2.1
+
 actions+=/wait,sec=buff.subterfuge.remains-0.1,if=buff.subterfuge.remains>0.5&buff.subterfuge.remains<1.6&time>6
 actions+=/pool_resource,for_next=1
 actions+=/ambush,if=((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(time<1.2|buff.shadow_dance.up|time>5))&active_enemies<4)|((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(time<1.2|buff.shadow_dance.up|time>5))&debuff.find_weakness.down)
