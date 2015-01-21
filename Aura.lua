@@ -319,6 +319,8 @@ function OvaleAura:OnEnable()
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
 	OvaleData:RegisterRequirement("buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("debuff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("pet_buff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("pet_debuff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("stealth", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("stealthed", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("target_buff", "RequireBuffHandler", self)
@@ -796,6 +798,10 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 			unitId = target
 			filter = (strsub(requirement, 8) == "buff") and "HELPFUL" or "HARMFUL"
 			mine = true
+		elseif strsub(requirement, 1, 4) == "pet_" then
+			unitId = "pet"
+			filter = (strsub(requirement, 5) == "buff") and "HELPFUL" or "HARMFUL"
+			mine = false
 		else
 			unitId = "player"
 			filter = (requirement == "buff") and "HELPFUL" or "HARMFUL"
