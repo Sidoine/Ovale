@@ -429,18 +429,20 @@ function OvaleBestAction:PostOrderCompute(element, state, atTime)
 			--]]
 			if parentNode then
 				local shortCircuit = false
-				if parentNode.type == "if" and Measure(timeSpan) == 0 then
-					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.", element.nodeId, childNode.type, parentNode.nodeId)
-					shortCircuit = true
-				elseif parentNode.type == "unless" and IsUniverse(timeSpan) then
-					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
-					shortCircuit = true
-				elseif parentNode.type == "logical" and parentNode.operator == "and" and Measure(timeSpan) == 0 then
-					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.", element.nodeId, childNode.type, parentNode.nodeId)
-					shortCircuit = true
-				elseif parentNode.type == "logical" and parentNode.operator == "or" and IsUniverse(timeSpan) then
-					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
-					shortCircuit = true
+				if parentNode.child and parentNode.child[1] == childNode then
+					if parentNode.type == "if" and Measure(timeSpan) == 0 then
+						state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.", element.nodeId, childNode.type, parentNode.nodeId)
+						shortCircuit = true
+					elseif parentNode.type == "unless" and IsUniverse(timeSpan) then
+						state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
+						shortCircuit = true
+					elseif parentNode.type == "logical" and parentNode.operator == "and" and Measure(timeSpan) == 0 then
+						state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.", element.nodeId, childNode.type, parentNode.nodeId)
+						shortCircuit = true
+					elseif parentNode.type == "logical" and parentNode.operator == "or" and IsUniverse(timeSpan) then
+						state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
+						shortCircuit = true
+					end
 				end
 				if shortCircuit then
 					-- Traverse the postOrder array looking for the parent node.
