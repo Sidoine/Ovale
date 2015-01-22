@@ -40,6 +40,7 @@ local CopyTimeSpan = OvaleTimeSpan.CopyTo
 local HasTime = OvaleTimeSpan.HasTime
 local Intersect = OvaleTimeSpan.Intersect
 local IntersectInterval = OvaleTimeSpan.IntersectInterval
+local IsUniverse = OvaleTimeSpan.IsUniverse
 local Measure = OvaleTimeSpan.Measure
 local Union = OvaleTimeSpan.Union
 local INFINITY = math.huge
@@ -431,13 +432,13 @@ function OvaleBestAction:PostOrderCompute(element, state, atTime)
 				if parentNode.type == "if" and Measure(timeSpan) == 0 then
 					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.", element.nodeId, childNode.type, parentNode.nodeId)
 					shortCircuit = true
-				elseif parentNode.type == "unless" and timeSpan and timeSpan[1] == 0 and timeSpan[2] == INFINITY then
+				elseif parentNode.type == "unless" and IsUniverse(timeSpan) then
 					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
 					shortCircuit = true
 				elseif parentNode.type == "logical" and parentNode.operator == "and" and Measure(timeSpan) == 0 then
 					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.", element.nodeId, childNode.type, parentNode.nodeId)
 					shortCircuit = true
-				elseif parentNode.type == "logical" and parentNode.operator == "or" and timeSpan and timeSpan[1] == 0 and timeSpan[2] == INFINITY then
+				elseif parentNode.type == "logical" and parentNode.operator == "or" and IsUniverse(timeSpan) then
 					state:Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId)
 					shortCircuit = true
 				end
@@ -1047,7 +1048,7 @@ function OvaleBestAction:ComputeLogical(element, state, atTime)
 		Complement(timeSpanA, timeSpan)
 	elseif element.operator == "or" then
 		-- Short-circuit evaluation of left argument to OR.
-		if timeSpanA and timeSpanA[1] == 0 and timeSpanA[2] == INFINITY then
+		if IsUniverse(timeSpanA) then
 			timeSpan:Reset(timeSpanA)
 			state:Log("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator)
 		else
