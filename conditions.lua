@@ -3347,6 +3347,10 @@ do
 			if powerMax > 0 then
 				local conversion = 100 / powerMax
 				local value, origin, rate = state[powerType] * conversion, state.currentTime, state.powerRate[powerType] * conversion
+				if rate > 0 and value >= 100 or rate < 0 and value == 0 then
+					-- Cap the values at 0 or 100 depending on whether the power is increasing or decreasing.
+					rate = 0
+				end
 				local start, ending = state.currentTime, INFINITY
 				return TestValue(start, ending, value, origin, rate, comparator, limit)
 			end
