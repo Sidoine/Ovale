@@ -118,6 +118,10 @@ function OvaleTimeSpan:IsEmpty()
 	return (not self or #self == 0)
 end
 
+function OvaleTimeSpan:IsUniverse()
+	return self and self[1] == 0 and self[2] == INFINITY
+end
+
 function OvaleTimeSpan:Equals(B)
 	local A = self
 	local countA = A and #A or 0

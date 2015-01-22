@@ -18,8 +18,27 @@ local OvaleTimeSpan = Ovale.OvaleTimeSpan
 local format = string.format
 local tinsert = table.insert
 local tconcat = table.concat
+local INFINITY = math.huge
 
 local tests = {}
+
+tests[#tests + 1] = function()
+	local A = OvaleTimeSpan(0, INFINITY)
+	local msg = format("%s is the universe", tostring(A))
+	if not A:IsUniverse() then
+		return false, msg
+	end
+	return true, msg
+end
+
+tests[#tests + 1] = function()
+	local A = OvaleTimeSpan(1, INFINITY)
+	local msg = format("%s is not the universe", tostring(A))
+	if A:IsUniverse() then
+		return false, msg
+	end
+	return true, msg
+end
 
 tests[#tests + 1] = function()
 	local A = OvaleTimeSpan(1, 2, 3, 4)
