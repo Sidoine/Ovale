@@ -518,7 +518,7 @@ statePrototype.IsUsableSpell = function(state, spellId, atTime, target)
 	local si = OvaleData.spellInfo[spellId]
 	if si then
 		-- Flagged as not usable in the spell information.
-		if isUsable and si.unusable then
+		if isUsable then
 			local unusable = state:GetSpellInfoProperty(spellId, atTime, "unusable", target)
 			if unusable == 1 then
 				state:Log("Spell ID '%s' is flagged as unusable.", spellId)
