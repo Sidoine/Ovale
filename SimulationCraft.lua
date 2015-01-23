@@ -1084,6 +1084,22 @@ end
 	Split-by-tag functions
 --]]--------------------------
 
+local function NewLogicalNode(operator, lhsNode, rhsNode, nodeList)
+	nodeList = nodeList or rhsNode
+	local node = OvaleAST:NewNode(nodeList, true)
+	node.type = "logical"
+	node.operator = operator
+	if operator == "not" then
+		node.expressionType = "unary"
+		node.child[1] = lhsNode
+	else
+		node.expressionType = "binary"
+		node.child[1] = lhsNode
+		node.child[2] = rhsNode
+	end
+	return node
+end
+
 local function ConcatenatedConditionNode(conditionList, nodeList, annotation)
 	local conditionNode
 	if #conditionList == 1 then
@@ -1091,21 +1107,11 @@ local function ConcatenatedConditionNode(conditionList, nodeList, annotation)
 	elseif #conditionList > 1 then
 		local lhsNode = conditionList[1]
 		local rhsNode = conditionList[2]
-		conditionNode = OvaleAST:NewNode(nodeList, true)
-		conditionNode.type = "logical"
-		conditionNode.expressionType = "binary"
-		conditionNode.operator = "or"
-		conditionNode.child[1] = lhsNode
-		conditionNode.child[2] = rhsNode
+		conditionNode = NewLogicalNode("or", lhsNode, rhsNode, nodeList)
 		for k = 3, #conditionList do
 			lhsNode = conditionNode
 			rhsNode = conditionList[k]
-			conditionNode = OvaleAST:NewNode(nodeList, true)
-			conditionNode.type = "logical"
-			conditionNode.expressionType = "binary"
-			conditionNode.operator = "or"
-			conditionNode.child[1] = lhsNode
-			conditionNode.child[2] = rhsNode
+			conditionNode = NewLogicalNode("or", lhsNode, rhsNode, nodeList)
 		end
 	end
 	return conditionNode
@@ -1364,22 +1370,13 @@ SplitByTagIf = function(tag, node, nodeList, annotation)
 		conditionNode = nil
 	elseif conditionNode then
 		-- Combine pre-existing conditions and new conditions into an "and" node.
-		local andNode = OvaleAST:NewNode(nodeList, true)
-		andNode.type = "logical"
-		andNode.expressionType = "binary"
-		andNode.operator = "and"
-		if node.type == "if" then
-			andNode.child[1] = node.child[1]
-		else -- if node.type == "unless" then
+		local lhsNode = node.child[1]
+		local rhsNode = conditionNode
+		if node.type == "unless" then
 			-- Flip the boolean condition if the original node was an "unless" node.
-			local notNode = OvaleAST:NewNode(nodeList, true)
-			notNode.type = "logical"
-			notNode.expressionType = "unary"
-			notNode.operator = "not"
-			notNode.child[1] = node.child[1]
-			andNode.child[1] = notNode
+			lhsNode = NewLogicalNode("not", lhsNode, nodeList)
 		end
-		andNode.child[2] = conditionNode
+		local andNode = NewLogicalNode("and", lhsNode, rhsNode, nodeList)
 		-- Set return values.
 		bodyNode = nil
 		conditionNode = andNode
