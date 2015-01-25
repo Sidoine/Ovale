@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-19
+# Last update: 2015-01-22
 
 rogue="Rogue_Subtlety_T17M_mmo_simple_wait_garr_amb_dance"
 level=100
@@ -8,7 +8,7 @@ race=night_elf
 timeofday=day
 role=attack
 position=back
-talents=http://us.battle.net/wow/en/tool/talent-calculator#cb!1000011
+talents=2000022
 glyphs=energy/hemorrhaging_veins/vanish
 spec=subtlety
 
