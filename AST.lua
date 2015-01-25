@@ -45,6 +45,7 @@ local tconcat = table.concat
 local tinsert = table.insert
 local tonumber = tonumber
 local tostring = tostring
+local tsort = table.sort
 local type = type
 local wipe = wipe
 local yield = coroutine.yield
@@ -655,9 +656,6 @@ end
 
 UnparseParameters = function(positionalParams, namedParams)
 	local output = self_outputPool:Get()
-	for k, v in ipairs(positionalParams) do
-		output[k] = Unparse(v)
-	end
 	for k, v in pairs(namedParams) do
 		if k == "checkbox" then
 			for _, name in ipairs(v) do
@@ -674,6 +672,10 @@ UnparseParameters = function(positionalParams, namedParams)
 		else
 			output[#output + 1] = format("%s=%s", k, v)
 		end
+	end
+	tsort(output)
+	for k = #positionalParams, 1, -1 do
+		tinsert(output, 1, Unparse(positionalParams[k]))
 	end
 	local outputString = tconcat(output, " ")
 	self_outputPool:Release(output)
@@ -2704,9 +2706,6 @@ function OvaleAST:FlattenParameters(ast)
 			end
 			-- Save a flattened string representation of the parameters.
 			local output = self_outputPool:Get()
-			for k, v in ipairs(node.positionalParams) do
-				output[k] = v
-			end
 			for k, v in pairs(node.namedParams) do
 				if k == "checkbox" then
 					for _, name in ipairs(v) do
@@ -2722,6 +2721,10 @@ function OvaleAST:FlattenParameters(ast)
 				else
 					output[#output + 1] = format("%s=%s", k, v)
 				end
+			end
+			tsort(output)
+			for k = #node.positionalParams, 1, -1 do
+				tinsert(output, 1, node.positionalParams[k])
 			end
 			if #output > 0 then
 				node.paramsAsString = tconcat(output, " ")
