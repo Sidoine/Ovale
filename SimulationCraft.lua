@@ -3205,6 +3205,16 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "GCD()"
 	elseif operand == "gcd.remains" then
 		code = "GCDRemaining()"
+	elseif operand == "time_to_die" then
+		--[[
+			"time_to_die" is both a character property and a time event in SimulationCraft.
+			Silently translate all "time_to_die" to the equivalent of "target.time_to_die".
+		--]]
+		if target ~= "" then
+			code = target .."TimeToDie()"
+		else
+			code = "target.TimeToDie()"
+		end
 	else
 		ok = false
 	end
