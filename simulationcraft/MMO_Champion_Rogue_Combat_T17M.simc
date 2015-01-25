@@ -1,13 +1,13 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-20
+# Last update: 2015-01-22
 
 rogue="Rogue_Combat_T17M"
 level=100
 race=blood_elf
 role=attack
 position=back
-talents=http://us.battle.net/wow/en/tool/talent-calculator#cZ!2000010
+talents=3000021
 glyphs=energy/disappearance
 spec=combat
 
@@ -47,7 +47,7 @@ actions+=/call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.
 
 actions.finisher+=/pool_resource,for_next=1
 actions.finisher+=/death_from_above
-actions.finisher+=/eviscerate
+actions.finisher+=/eviscerate,if=(!talent.death_from_above.enabled|cooldown.death_from_above.remains)
 
 actions.generator+=/revealing_strike,if=(combo_points=4&dot.revealing_strike.remains<7.2&(target.time_to_die>dot.revealing_strike.remains+7.2)|(target.time_to_die<dot.revealing_strike.remains+7.2&ticks_remain<2))|!ticking
 actions.generator+=/sinister_strike,if=dot.revealing_strike.ticking
