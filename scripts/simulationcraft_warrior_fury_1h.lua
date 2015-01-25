@@ -351,37 +351,38 @@ AddFunction FurySingleMindedFuryTwoTargetsCdActions
 }
 
 ### Fury icons.
-AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
 
-AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
+AddCheckBox(opt_warrior_fury_aoe L(AOE) default specialization=fury)
+
+AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=shortcd specialization=fury
 {
 	FurySingleMindedFuryDefaultShortCdActions()
 }
 
-AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
+AddIcon checkbox=opt_warrior_fury_aoe help=shortcd specialization=fury
 {
 	FurySingleMindedFuryDefaultShortCdActions()
 }
 
-AddIcon specialization=fury help=main enemies=1
+AddIcon enemies=1 help=main specialization=fury
 {
 	if not InCombat() FurySingleMindedFuryPrecombatMainActions()
 	FurySingleMindedFuryDefaultMainActions()
 }
 
-AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
+AddIcon checkbox=opt_warrior_fury_aoe help=aoe specialization=fury
 {
 	if not InCombat() FurySingleMindedFuryPrecombatMainActions()
 	FurySingleMindedFuryDefaultMainActions()
 }
 
-AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
+AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=cd specialization=fury
 {
 	if not InCombat() FurySingleMindedFuryPrecombatCdActions()
 	FurySingleMindedFuryDefaultCdActions()
 }
 
-AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
+AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 {
 	if not InCombat() FurySingleMindedFuryPrecombatCdActions()
 	FurySingleMindedFuryDefaultCdActions()

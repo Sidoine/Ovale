@@ -146,37 +146,38 @@ AddFunction BalanceSingleTargetCdActions
 }
 
 ### Balance icons.
-AddCheckBox(opt_druid_balance_aoe L(AOE) specialization=balance default)
 
-AddIcon specialization=balance help=shortcd enemies=1 checkbox=!opt_druid_balance_aoe
+AddCheckBox(opt_druid_balance_aoe L(AOE) default specialization=balance)
+
+AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=shortcd specialization=balance
 {
 	BalanceDefaultShortCdActions()
 }
 
-AddIcon specialization=balance help=shortcd checkbox=opt_druid_balance_aoe
+AddIcon checkbox=opt_druid_balance_aoe help=shortcd specialization=balance
 {
 	BalanceDefaultShortCdActions()
 }
 
-AddIcon specialization=balance help=main enemies=1
+AddIcon enemies=1 help=main specialization=balance
 {
 	if not InCombat() BalancePrecombatMainActions()
 	BalanceDefaultMainActions()
 }
 
-AddIcon specialization=balance help=aoe checkbox=opt_druid_balance_aoe
+AddIcon checkbox=opt_druid_balance_aoe help=aoe specialization=balance
 {
 	if not InCombat() BalancePrecombatMainActions()
 	BalanceDefaultMainActions()
 }
 
-AddIcon specialization=balance help=cd enemies=1 checkbox=!opt_druid_balance_aoe
+AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=cd specialization=balance
 {
 	if not InCombat() BalancePrecombatCdActions()
 	BalanceDefaultCdActions()
 }
 
-AddIcon specialization=balance help=cd checkbox=opt_druid_balance_aoe
+AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 {
 	if not InCombat() BalancePrecombatCdActions()
 	BalanceDefaultCdActions()

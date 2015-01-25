@@ -240,37 +240,38 @@ AddFunction ArmsSingleShortCdActions
 }
 
 ### Arms icons.
-AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
 
-AddIcon specialization=arms help=shortcd enemies=1 checkbox=!opt_warrior_arms_aoe
+AddCheckBox(opt_warrior_arms_aoe L(AOE) default specialization=arms)
+
+AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=shortcd specialization=arms
 {
 	ArmsDefaultShortCdActions()
 }
 
-AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms_aoe
+AddIcon checkbox=opt_warrior_arms_aoe help=shortcd specialization=arms
 {
 	ArmsDefaultShortCdActions()
 }
 
-AddIcon specialization=arms help=main enemies=1
+AddIcon enemies=1 help=main specialization=arms
 {
 	if not InCombat() ArmsPrecombatMainActions()
 	ArmsDefaultMainActions()
 }
 
-AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms_aoe
+AddIcon checkbox=opt_warrior_arms_aoe help=aoe specialization=arms
 {
 	if not InCombat() ArmsPrecombatMainActions()
 	ArmsDefaultMainActions()
 }
 
-AddIcon specialization=arms help=cd enemies=1 checkbox=!opt_warrior_arms_aoe
+AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
 	ArmsDefaultCdActions()
 }
 
-AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
+AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
 	ArmsDefaultCdActions()

@@ -141,36 +141,37 @@ AddFunction GuardianPrecombatMainActions
 }
 
 ### Guardian icons.
-AddCheckBox(opt_druid_guardian_aoe L(AOE) specialization=guardian default)
 
-AddIcon specialization=guardian help=shortcd enemies=1 checkbox=!opt_druid_guardian_aoe
+AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
+
+AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=guardian
 {
 	GuardianDefaultShortCdActions()
 }
 
-AddIcon specialization=guardian help=shortcd checkbox=opt_druid_guardian_aoe
+AddIcon checkbox=opt_druid_guardian_aoe help=shortcd specialization=guardian
 {
 	GuardianDefaultShortCdActions()
 }
 
-AddIcon specialization=guardian help=main enemies=1
+AddIcon enemies=1 help=main specialization=guardian
 {
 	if not InCombat() GuardianPrecombatMainActions()
 	GuardianDefaultMainActions()
 }
 
-AddIcon specialization=guardian help=aoe checkbox=opt_druid_guardian_aoe
+AddIcon checkbox=opt_druid_guardian_aoe help=aoe specialization=guardian
 {
 	if not InCombat() GuardianPrecombatMainActions()
 	GuardianDefaultMainActions()
 }
 
-AddIcon specialization=guardian help=cd enemies=1 checkbox=!opt_druid_guardian_aoe
+AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=cd specialization=guardian
 {
 	GuardianDefaultCdActions()
 }
 
-AddIcon specialization=guardian help=cd checkbox=opt_druid_guardian_aoe
+AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 {
 	GuardianDefaultCdActions()
 }

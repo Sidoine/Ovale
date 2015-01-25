@@ -200,39 +200,40 @@ AddFunction CombatPrecombatCdActions
 }
 
 ### Combat icons.
-AddCheckBox(opt_rogue_combat_aoe L(AOE) specialization=combat default)
 
-AddIcon specialization=combat help=shortcd enemies=1 checkbox=!opt_rogue_combat_aoe
+AddCheckBox(opt_rogue_combat_aoe L(AOE) default specialization=combat)
+
+AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat_aoe
+AddIcon checkbox=opt_rogue_combat_aoe help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=main enemies=1
+AddIcon enemies=1 help=main specialization=combat
 {
 	if not InCombat() CombatPrecombatMainActions()
 	CombatDefaultMainActions()
 }
 
-AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat_aoe
+AddIcon checkbox=opt_rogue_combat_aoe help=aoe specialization=combat
 {
 	if not InCombat() CombatPrecombatMainActions()
 	CombatDefaultMainActions()
 }
 
-AddIcon specialization=combat help=cd enemies=1 checkbox=!opt_rogue_combat_aoe
+AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
 
-AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
+AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
 	CombatDefaultCdActions()

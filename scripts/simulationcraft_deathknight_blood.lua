@@ -171,39 +171,40 @@ AddFunction BloodPrecombatCdActions
 }
 
 ### Blood icons.
-AddCheckBox(opt_deathknight_blood_aoe L(AOE) specialization=blood default)
 
-AddIcon specialization=blood help=shortcd enemies=1 checkbox=!opt_deathknight_blood_aoe
+AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
+
+AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=shortcd specialization=blood
 {
 	if not InCombat() BloodPrecombatShortCdActions()
 	BloodDefaultShortCdActions()
 }
 
-AddIcon specialization=blood help=shortcd checkbox=opt_deathknight_blood_aoe
+AddIcon checkbox=opt_deathknight_blood_aoe help=shortcd specialization=blood
 {
 	if not InCombat() BloodPrecombatShortCdActions()
 	BloodDefaultShortCdActions()
 }
 
-AddIcon specialization=blood help=main enemies=1
+AddIcon enemies=1 help=main specialization=blood
 {
 	if not InCombat() BloodPrecombatMainActions()
 	BloodDefaultMainActions()
 }
 
-AddIcon specialization=blood help=aoe checkbox=opt_deathknight_blood_aoe
+AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
 {
 	if not InCombat() BloodPrecombatMainActions()
 	BloodDefaultMainActions()
 }
 
-AddIcon specialization=blood help=cd enemies=1 checkbox=!opt_deathknight_blood_aoe
+AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=cd specialization=blood
 {
 	if not InCombat() BloodPrecombatCdActions()
 	BloodDefaultCdActions()
 }
 
-AddIcon specialization=blood help=cd checkbox=opt_deathknight_blood_aoe
+AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 {
 	if not InCombat() BloodPrecombatCdActions()
 	BloodDefaultCdActions()

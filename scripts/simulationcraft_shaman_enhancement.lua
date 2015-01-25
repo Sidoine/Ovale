@@ -210,37 +210,38 @@ AddFunction EnhancementSingleMainActions
 }
 
 ### Enhancement icons.
-AddCheckBox(opt_shaman_enhancement_aoe L(AOE) specialization=enhancement default)
 
-AddIcon specialization=enhancement help=shortcd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+AddCheckBox(opt_shaman_enhancement_aoe L(AOE) default specialization=enhancement)
+
+AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
 	EnhancementDefaultShortCdActions()
 }
 
-AddIcon specialization=enhancement help=shortcd checkbox=opt_shaman_enhancement_aoe
+AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
 	EnhancementDefaultShortCdActions()
 }
 
-AddIcon specialization=enhancement help=main enemies=1
+AddIcon enemies=1 help=main specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatMainActions()
 	EnhancementDefaultMainActions()
 }
 
-AddIcon specialization=enhancement help=aoe checkbox=opt_shaman_enhancement_aoe
+AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatMainActions()
 	EnhancementDefaultMainActions()
 }
 
-AddIcon specialization=enhancement help=cd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
 	EnhancementDefaultCdActions()
 }
 
-AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
+AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
 	EnhancementDefaultCdActions()

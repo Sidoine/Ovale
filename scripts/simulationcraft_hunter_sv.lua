@@ -207,39 +207,40 @@ AddFunction SurvivalPrecombatCdActions
 }
 
 ### Survival icons.
-AddCheckBox(opt_hunter_survival_aoe L(AOE) specialization=survival default)
 
-AddIcon specialization=survival help=shortcd enemies=1 checkbox=!opt_hunter_survival_aoe
+AddCheckBox(opt_hunter_survival_aoe L(AOE) default specialization=survival)
+
+AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=shortcd checkbox=opt_hunter_survival_aoe
+AddIcon checkbox=opt_hunter_survival_aoe help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=main enemies=1
+AddIcon enemies=1 help=main specialization=survival
 {
 	if not InCombat() SurvivalPrecombatMainActions()
 	SurvivalDefaultMainActions()
 }
 
-AddIcon specialization=survival help=aoe checkbox=opt_hunter_survival_aoe
+AddIcon checkbox=opt_hunter_survival_aoe help=aoe specialization=survival
 {
 	if not InCombat() SurvivalPrecombatMainActions()
 	SurvivalDefaultMainActions()
 }
 
-AddIcon specialization=survival help=cd enemies=1 checkbox=!opt_hunter_survival_aoe
+AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()
 }
 
-AddIcon specialization=survival help=cd checkbox=opt_hunter_survival_aoe
+AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()

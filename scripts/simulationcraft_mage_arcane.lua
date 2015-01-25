@@ -369,39 +369,40 @@ AddFunction ArcanePrecombatCdActions
 }
 
 ### Arcane icons.
-AddCheckBox(opt_mage_arcane_aoe L(AOE) specialization=arcane default)
 
-AddIcon specialization=arcane help=shortcd enemies=1 checkbox=!opt_mage_arcane_aoe
+AddCheckBox(opt_mage_arcane_aoe L(AOE) default specialization=arcane)
+
+AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=shortcd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatShortCdActions()
 	ArcaneDefaultShortCdActions()
 }
 
-AddIcon specialization=arcane help=shortcd checkbox=opt_mage_arcane_aoe
+AddIcon checkbox=opt_mage_arcane_aoe help=shortcd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatShortCdActions()
 	ArcaneDefaultShortCdActions()
 }
 
-AddIcon specialization=arcane help=main enemies=1
+AddIcon enemies=1 help=main specialization=arcane
 {
 	if not InCombat() ArcanePrecombatMainActions()
 	ArcaneDefaultMainActions()
 }
 
-AddIcon specialization=arcane help=aoe checkbox=opt_mage_arcane_aoe
+AddIcon checkbox=opt_mage_arcane_aoe help=aoe specialization=arcane
 {
 	if not InCombat() ArcanePrecombatMainActions()
 	ArcaneDefaultMainActions()
 }
 
-AddIcon specialization=arcane help=cd enemies=1 checkbox=!opt_mage_arcane_aoe
+AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=cd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatCdActions()
 	ArcaneDefaultCdActions()
 }
 
-AddIcon specialization=arcane help=cd checkbox=opt_mage_arcane_aoe
+AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatCdActions()
 	ArcaneDefaultCdActions()

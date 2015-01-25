@@ -353,39 +353,40 @@ AddFunction FireSingleTargetShortCdActions
 }
 
 ### Fire icons.
-AddCheckBox(opt_mage_fire_aoe L(AOE) specialization=fire default)
 
-AddIcon specialization=fire help=shortcd enemies=1 checkbox=!opt_mage_fire_aoe
+AddCheckBox(opt_mage_fire_aoe L(AOE) default specialization=fire)
+
+AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=shortcd specialization=fire
 {
 	if not InCombat() FirePrecombatShortCdActions()
 	FireDefaultShortCdActions()
 }
 
-AddIcon specialization=fire help=shortcd checkbox=opt_mage_fire_aoe
+AddIcon checkbox=opt_mage_fire_aoe help=shortcd specialization=fire
 {
 	if not InCombat() FirePrecombatShortCdActions()
 	FireDefaultShortCdActions()
 }
 
-AddIcon specialization=fire help=main enemies=1
+AddIcon enemies=1 help=main specialization=fire
 {
 	if not InCombat() FirePrecombatMainActions()
 	FireDefaultMainActions()
 }
 
-AddIcon specialization=fire help=aoe checkbox=opt_mage_fire_aoe
+AddIcon checkbox=opt_mage_fire_aoe help=aoe specialization=fire
 {
 	if not InCombat() FirePrecombatMainActions()
 	FireDefaultMainActions()
 }
 
-AddIcon specialization=fire help=cd enemies=1 checkbox=!opt_mage_fire_aoe
+AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=cd specialization=fire
 {
 	if not InCombat() FirePrecombatCdActions()
 	FireDefaultCdActions()
 }
 
-AddIcon specialization=fire help=cd checkbox=opt_mage_fire_aoe
+AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 {
 	if not InCombat() FirePrecombatCdActions()
 	FireDefaultCdActions()

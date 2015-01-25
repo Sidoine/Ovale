@@ -254,37 +254,38 @@ AddFunction WindwalkerStCdActions
 }
 
 ### Windwalker icons.
-AddCheckBox(opt_monk_windwalker_aoe L(AOE) specialization=windwalker default)
 
-AddIcon specialization=windwalker help=shortcd enemies=1 checkbox=!opt_monk_windwalker_aoe
+AddCheckBox(opt_monk_windwalker_aoe L(AOE) default specialization=windwalker)
+
+AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=shortcd specialization=windwalker
 {
 	WindwalkerDefaultShortCdActions()
 }
 
-AddIcon specialization=windwalker help=shortcd checkbox=opt_monk_windwalker_aoe
+AddIcon checkbox=opt_monk_windwalker_aoe help=shortcd specialization=windwalker
 {
 	WindwalkerDefaultShortCdActions()
 }
 
-AddIcon specialization=windwalker help=main enemies=1
+AddIcon enemies=1 help=main specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatMainActions()
 	WindwalkerDefaultMainActions()
 }
 
-AddIcon specialization=windwalker help=aoe checkbox=opt_monk_windwalker_aoe
+AddIcon checkbox=opt_monk_windwalker_aoe help=aoe specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatMainActions()
 	WindwalkerDefaultMainActions()
 }
 
-AddIcon specialization=windwalker help=cd enemies=1 checkbox=!opt_monk_windwalker_aoe
+AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
 	WindwalkerDefaultCdActions()
 }
 
-AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker_aoe
+AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
 	WindwalkerDefaultCdActions()

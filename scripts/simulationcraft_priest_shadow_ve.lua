@@ -612,37 +612,38 @@ AddFunction ShadowVentCdActions
 }
 
 ### Shadow icons.
-AddCheckBox(opt_priest_shadow_aoe L(AOE) specialization=shadow default)
 
-AddIcon specialization=shadow help=shortcd enemies=1 checkbox=!opt_priest_shadow_aoe
+AddCheckBox(opt_priest_shadow_aoe L(AOE) default specialization=shadow)
+
+AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=shortcd specialization=shadow
 {
 	ShadowDefaultShortCdActions()
 }
 
-AddIcon specialization=shadow help=shortcd checkbox=opt_priest_shadow_aoe
+AddIcon checkbox=opt_priest_shadow_aoe help=shortcd specialization=shadow
 {
 	ShadowDefaultShortCdActions()
 }
 
-AddIcon specialization=shadow help=main enemies=1
+AddIcon enemies=1 help=main specialization=shadow
 {
 	if not InCombat() ShadowPrecombatMainActions()
 	ShadowDefaultMainActions()
 }
 
-AddIcon specialization=shadow help=aoe checkbox=opt_priest_shadow_aoe
+AddIcon checkbox=opt_priest_shadow_aoe help=aoe specialization=shadow
 {
 	if not InCombat() ShadowPrecombatMainActions()
 	ShadowDefaultMainActions()
 }
 
-AddIcon specialization=shadow help=cd enemies=1 checkbox=!opt_priest_shadow_aoe
+AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=cd specialization=shadow
 {
 	if not InCombat() ShadowPrecombatCdActions()
 	ShadowDefaultCdActions()
 }
 
-AddIcon specialization=shadow help=cd checkbox=opt_priest_shadow_aoe
+AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 {
 	if not InCombat() ShadowPrecombatCdActions()
 	ShadowDefaultCdActions()

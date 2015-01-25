@@ -230,39 +230,40 @@ AddFunction DestructionSingleTargetShortCdActions
 }
 
 ### Destruction icons.
-AddCheckBox(opt_warlock_destruction_aoe L(AOE) specialization=destruction default)
 
-AddIcon specialization=destruction help=shortcd enemies=1 checkbox=!opt_warlock_destruction_aoe
+AddCheckBox(opt_warlock_destruction_aoe L(AOE) default specialization=destruction)
+
+AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=shortcd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatShortCdActions()
 	DestructionDefaultShortCdActions()
 }
 
-AddIcon specialization=destruction help=shortcd checkbox=opt_warlock_destruction_aoe
+AddIcon checkbox=opt_warlock_destruction_aoe help=shortcd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatShortCdActions()
 	DestructionDefaultShortCdActions()
 }
 
-AddIcon specialization=destruction help=main enemies=1
+AddIcon enemies=1 help=main specialization=destruction
 {
 	if not InCombat() DestructionPrecombatMainActions()
 	DestructionDefaultMainActions()
 }
 
-AddIcon specialization=destruction help=aoe checkbox=opt_warlock_destruction_aoe
+AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
 {
 	if not InCombat() DestructionPrecombatMainActions()
 	DestructionDefaultMainActions()
 }
 
-AddIcon specialization=destruction help=cd enemies=1 checkbox=!opt_warlock_destruction_aoe
+AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()
 }
 
-AddIcon specialization=destruction help=cd checkbox=opt_warlock_destruction_aoe
+AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatCdActions()
 	DestructionDefaultCdActions()

@@ -129,39 +129,40 @@ AddFunction AfflictionPrecombatCdActions
 }
 
 ### Affliction icons.
-AddCheckBox(opt_warlock_affliction_aoe L(AOE) specialization=affliction default)
 
-AddIcon specialization=affliction help=shortcd enemies=1 checkbox=!opt_warlock_affliction_aoe
+AddCheckBox(opt_warlock_affliction_aoe L(AOE) default specialization=affliction)
+
+AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=shortcd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatShortCdActions()
 	AfflictionDefaultShortCdActions()
 }
 
-AddIcon specialization=affliction help=shortcd checkbox=opt_warlock_affliction_aoe
+AddIcon checkbox=opt_warlock_affliction_aoe help=shortcd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatShortCdActions()
 	AfflictionDefaultShortCdActions()
 }
 
-AddIcon specialization=affliction help=main enemies=1
+AddIcon enemies=1 help=main specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatMainActions()
 	AfflictionDefaultMainActions()
 }
 
-AddIcon specialization=affliction help=aoe checkbox=opt_warlock_affliction_aoe
+AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatMainActions()
 	AfflictionDefaultMainActions()
 }
 
-AddIcon specialization=affliction help=cd enemies=1 checkbox=!opt_warlock_affliction_aoe
+AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatCdActions()
 	AfflictionDefaultCdActions()
 }
 
-AddIcon specialization=affliction help=cd checkbox=opt_warlock_affliction_aoe
+AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatCdActions()
 	AfflictionDefaultCdActions()

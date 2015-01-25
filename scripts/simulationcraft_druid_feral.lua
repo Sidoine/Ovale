@@ -207,37 +207,38 @@ AddFunction FeralPrecombatCdActions
 }
 
 ### Feral icons.
-AddCheckBox(opt_druid_feral_aoe L(AOE) specialization=feral default)
 
-AddIcon specialization=feral help=shortcd enemies=1 checkbox=!opt_druid_feral_aoe
+AddCheckBox(opt_druid_feral_aoe L(AOE) default specialization=feral)
+
+AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=shortcd specialization=feral
 {
 	FeralDefaultShortCdActions()
 }
 
-AddIcon specialization=feral help=shortcd checkbox=opt_druid_feral_aoe
+AddIcon checkbox=opt_druid_feral_aoe help=shortcd specialization=feral
 {
 	FeralDefaultShortCdActions()
 }
 
-AddIcon specialization=feral help=main enemies=1
+AddIcon enemies=1 help=main specialization=feral
 {
 	if not InCombat() FeralPrecombatMainActions()
 	FeralDefaultMainActions()
 }
 
-AddIcon specialization=feral help=aoe checkbox=opt_druid_feral_aoe
+AddIcon checkbox=opt_druid_feral_aoe help=aoe specialization=feral
 {
 	if not InCombat() FeralPrecombatMainActions()
 	FeralDefaultMainActions()
 }
 
-AddIcon specialization=feral help=cd enemies=1 checkbox=!opt_druid_feral_aoe
+AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=cd specialization=feral
 {
 	if not InCombat() FeralPrecombatCdActions()
 	FeralDefaultCdActions()
 }
 
-AddIcon specialization=feral help=cd checkbox=opt_druid_feral_aoe
+AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 {
 	if not InCombat() FeralPrecombatCdActions()
 	FeralDefaultCdActions()

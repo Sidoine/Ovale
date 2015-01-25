@@ -4453,39 +4453,40 @@ function OvaleSimulationCraft:Emit(profile)
 		local aoeToggle = "opt_" .. lowerclass .. "_" .. specialization .. "_aoe"
 		output[#output + 1] = ""
 		output[#output + 1] = "### " .. CamelCase(specialization) .. " icons."
-		output[#output + 1] = format("AddCheckBox(%s L(AOE) specialization=%s default)", aoeToggle, specialization)
+		output[#output + 1] = ""
+		output[#output + 1] = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization)
 
 		-- Short CD rotation.
 		output[#output + 1] = ""
-		output[#output + 1] = format("AddIcon specialization=%s help=shortcd enemies=1 checkbox=!%s", specialization, aoeToggle)
+		output[#output + 1] = format("AddIcon checkbox=!%s enemies=1 help=shortcd specialization=%s", aoeToggle, specialization)
 		output[#output + 1] = "{"
 		GenerateIconBody(output, "shortcd", profile)
 		output[#output + 1] = "}"
 		output[#output + 1] = ""
-		output[#output + 1] = format("AddIcon specialization=%s help=shortcd checkbox=%s", specialization, aoeToggle)
+		output[#output + 1] = format("AddIcon checkbox=%s help=shortcd specialization=%s", aoeToggle, specialization)
 		output[#output + 1] = "{"
 		GenerateIconBody(output, "shortcd", profile)
 		output[#output + 1] = "}"
 		-- Single-target rotation.
 		output[#output + 1] = ""
-		output[#output + 1] = format("AddIcon specialization=%s help=main enemies=1", specialization)
+		output[#output + 1] = format("AddIcon enemies=1 help=main specialization=%s", specialization)
 		output[#output + 1] = "{"
 		GenerateIconBody(output, "main", profile)
 		output[#output + 1] = "}"
 		-- AoE rotation.
 		output[#output + 1] = ""
-		output[#output + 1] = format("AddIcon specialization=%s help=aoe checkbox=%s", specialization, aoeToggle)
+		output[#output + 1] = format("AddIcon checkbox=%s help=aoe specialization=%s", aoeToggle, specialization)
 		output[#output + 1] = "{"
 		GenerateIconBody(output, "main", profile)
 		output[#output + 1] = "}"
 		-- CD rotation.
 		output[#output + 1] = ""
-		output[#output + 1] = format("AddIcon specialization=%s help=cd enemies=1 checkbox=!%s", specialization, aoeToggle)
+		output[#output + 1] = format("AddIcon checkbox=!%s enemies=1 help=cd specialization=%s", aoeToggle, specialization)
 		output[#output + 1] = "{"
 		GenerateIconBody(output, "cd", profile)
 		output[#output + 1] = "}"
 		output[#output + 1] = ""
-		output[#output + 1] = format("AddIcon specialization=%s help=cd checkbox=%s", specialization, aoeToggle)
+		output[#output + 1] = format("AddIcon checkbox=%s help=cd specialization=%s", aoeToggle, specialization)
 		output[#output + 1] = "{"
 		GenerateIconBody(output, "cd", profile)
 		output[#output + 1] = "}"

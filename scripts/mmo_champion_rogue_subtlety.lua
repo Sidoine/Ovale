@@ -337,37 +337,38 @@ AddFunction SubtletyPrecombatCdActions
 }
 
 ### Subtlety icons.
-AddCheckBox(opt_rogue_subtlety_aoe L(AOE) specialization=subtlety default)
 
-AddIcon specialization=subtlety help=shortcd enemies=1 checkbox=!opt_rogue_subtlety_aoe
+AddCheckBox(opt_rogue_subtlety_aoe L(AOE) default specialization=subtlety)
+
+AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=shortcd specialization=subtlety
 {
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=shortcd checkbox=opt_rogue_subtlety_aoe
+AddIcon checkbox=opt_rogue_subtlety_aoe help=shortcd specialization=subtlety
 {
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=main enemies=1
+AddIcon enemies=1 help=main specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatMainActions()
 	SubtletyDefaultMainActions()
 }
 
-AddIcon specialization=subtlety help=aoe checkbox=opt_rogue_subtlety_aoe
+AddIcon checkbox=opt_rogue_subtlety_aoe help=aoe specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatMainActions()
 	SubtletyDefaultMainActions()
 }
 
-AddIcon specialization=subtlety help=cd enemies=1 checkbox=!opt_rogue_subtlety_aoe
+AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()
 }
 
-AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety_aoe
+AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()

@@ -207,37 +207,38 @@ AddFunction ElementalSingleCdActions
 }
 
 ### Elemental icons.
-AddCheckBox(opt_shaman_elemental_aoe L(AOE) specialization=elemental default)
 
-AddIcon specialization=elemental help=shortcd enemies=1 checkbox=!opt_shaman_elemental_aoe
+AddCheckBox(opt_shaman_elemental_aoe L(AOE) default specialization=elemental)
+
+AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=shortcd specialization=elemental
 {
 	ElementalDefaultShortCdActions()
 }
 
-AddIcon specialization=elemental help=shortcd checkbox=opt_shaman_elemental_aoe
+AddIcon checkbox=opt_shaman_elemental_aoe help=shortcd specialization=elemental
 {
 	ElementalDefaultShortCdActions()
 }
 
-AddIcon specialization=elemental help=main enemies=1
+AddIcon enemies=1 help=main specialization=elemental
 {
 	if not InCombat() ElementalPrecombatMainActions()
 	ElementalDefaultMainActions()
 }
 
-AddIcon specialization=elemental help=aoe checkbox=opt_shaman_elemental_aoe
+AddIcon checkbox=opt_shaman_elemental_aoe help=aoe specialization=elemental
 {
 	if not InCombat() ElementalPrecombatMainActions()
 	ElementalDefaultMainActions()
 }
 
-AddIcon specialization=elemental help=cd enemies=1 checkbox=!opt_shaman_elemental_aoe
+AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=cd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatCdActions()
 	ElementalDefaultCdActions()
 }
 
-AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
+AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatCdActions()
 	ElementalDefaultCdActions()

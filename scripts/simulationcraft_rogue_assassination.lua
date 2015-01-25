@@ -167,39 +167,40 @@ AddFunction AssassinationPrecombatCdActions
 }
 
 ### Assassination icons.
-AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
 
-AddIcon specialization=assassination help=shortcd enemies=1 checkbox=!opt_rogue_assassination_aoe
+AddCheckBox(opt_rogue_assassination_aoe L(AOE) default specialization=assassination)
+
+AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination_aoe
+AddIcon checkbox=opt_rogue_assassination_aoe help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=main enemies=1
+AddIcon enemies=1 help=main specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatMainActions()
 	AssassinationDefaultMainActions()
 }
 
-AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination_aoe
+AddIcon checkbox=opt_rogue_assassination_aoe help=aoe specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatMainActions()
 	AssassinationDefaultMainActions()
 }
 
-AddIcon specialization=assassination help=cd enemies=1 checkbox=!opt_rogue_assassination_aoe
+AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()
 }
 
-AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_aoe
+AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()

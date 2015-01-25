@@ -368,39 +368,40 @@ AddFunction FrostDualWieldSingleTargetCdActions
 }
 
 ### Frost icons.
-AddCheckBox(opt_deathknight_frost_aoe L(AOE) specialization=frost default)
 
-AddIcon specialization=frost help=shortcd enemies=1 checkbox=!opt_deathknight_frost_aoe
+AddCheckBox(opt_deathknight_frost_aoe L(AOE) default specialization=frost)
+
+AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatShortCdActions()
 	FrostDualWieldDefaultShortCdActions()
 }
 
-AddIcon specialization=frost help=shortcd checkbox=opt_deathknight_frost_aoe
+AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatShortCdActions()
 	FrostDualWieldDefaultShortCdActions()
 }
 
-AddIcon specialization=frost help=main enemies=1
+AddIcon enemies=1 help=main specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatMainActions()
 	FrostDualWieldDefaultMainActions()
 }
 
-AddIcon specialization=frost help=aoe checkbox=opt_deathknight_frost_aoe
+AddIcon checkbox=opt_deathknight_frost_aoe help=aoe specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatMainActions()
 	FrostDualWieldDefaultMainActions()
 }
 
-AddIcon specialization=frost help=cd enemies=1 checkbox=!opt_deathknight_frost_aoe
+AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatCdActions()
 	FrostDualWieldDefaultCdActions()
 }
 
-AddIcon specialization=frost help=cd checkbox=opt_deathknight_frost_aoe
+AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatCdActions()
 	FrostDualWieldDefaultCdActions()

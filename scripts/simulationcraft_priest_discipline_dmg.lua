@@ -101,35 +101,36 @@ AddFunction DisciplinePrecombatCdActions
 }
 
 ### Discipline icons.
-AddCheckBox(opt_priest_discipline_aoe L(AOE) specialization=discipline default)
 
-AddIcon specialization=discipline help=shortcd enemies=1 checkbox=!opt_priest_discipline_aoe
+AddCheckBox(opt_priest_discipline_aoe L(AOE) default specialization=discipline)
+
+AddIcon checkbox=!opt_priest_discipline_aoe enemies=1 help=shortcd specialization=discipline
 {
 }
 
-AddIcon specialization=discipline help=shortcd checkbox=opt_priest_discipline_aoe
+AddIcon checkbox=opt_priest_discipline_aoe help=shortcd specialization=discipline
 {
 }
 
-AddIcon specialization=discipline help=main enemies=1
-{
-	if not InCombat() DisciplinePrecombatMainActions()
-	DisciplineDefaultMainActions()
-}
-
-AddIcon specialization=discipline help=aoe checkbox=opt_priest_discipline_aoe
+AddIcon enemies=1 help=main specialization=discipline
 {
 	if not InCombat() DisciplinePrecombatMainActions()
 	DisciplineDefaultMainActions()
 }
 
-AddIcon specialization=discipline help=cd enemies=1 checkbox=!opt_priest_discipline_aoe
+AddIcon checkbox=opt_priest_discipline_aoe help=aoe specialization=discipline
+{
+	if not InCombat() DisciplinePrecombatMainActions()
+	DisciplineDefaultMainActions()
+}
+
+AddIcon checkbox=!opt_priest_discipline_aoe enemies=1 help=cd specialization=discipline
 {
 	if not InCombat() DisciplinePrecombatCdActions()
 	DisciplineDefaultCdActions()
 }
 
-AddIcon specialization=discipline help=cd checkbox=opt_priest_discipline_aoe
+AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
 {
 	if not InCombat() DisciplinePrecombatCdActions()
 	DisciplineDefaultCdActions()

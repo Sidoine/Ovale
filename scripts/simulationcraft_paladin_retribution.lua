@@ -295,37 +295,38 @@ AddFunction RetributionSingleMainActions
 }
 
 ### Retribution icons.
-AddCheckBox(opt_paladin_retribution_aoe L(AOE) specialization=retribution default)
 
-AddIcon specialization=retribution help=shortcd enemies=1 checkbox=!opt_paladin_retribution_aoe
+AddCheckBox(opt_paladin_retribution_aoe L(AOE) default specialization=retribution)
+
+AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=shortcd specialization=retribution
 {
 	RetributionDefaultShortCdActions()
 }
 
-AddIcon specialization=retribution help=shortcd checkbox=opt_paladin_retribution_aoe
+AddIcon checkbox=opt_paladin_retribution_aoe help=shortcd specialization=retribution
 {
 	RetributionDefaultShortCdActions()
 }
 
-AddIcon specialization=retribution help=main enemies=1
+AddIcon enemies=1 help=main specialization=retribution
 {
 	if not InCombat() RetributionPrecombatMainActions()
 	RetributionDefaultMainActions()
 }
 
-AddIcon specialization=retribution help=aoe checkbox=opt_paladin_retribution_aoe
+AddIcon checkbox=opt_paladin_retribution_aoe help=aoe specialization=retribution
 {
 	if not InCombat() RetributionPrecombatMainActions()
 	RetributionDefaultMainActions()
 }
 
-AddIcon specialization=retribution help=cd enemies=1 checkbox=!opt_paladin_retribution_aoe
+AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=cd specialization=retribution
 {
 	if not InCombat() RetributionPrecombatCdActions()
 	RetributionDefaultCdActions()
 }
 
-AddIcon specialization=retribution help=cd checkbox=opt_paladin_retribution_aoe
+AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 {
 	if not InCombat() RetributionPrecombatCdActions()
 	RetributionDefaultCdActions()

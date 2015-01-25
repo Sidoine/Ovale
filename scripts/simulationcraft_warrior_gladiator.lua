@@ -211,37 +211,38 @@ AddFunction ProtectionGladiatorSingleShortCdActions
 }
 
 ### Protection icons.
-AddCheckBox(opt_warrior_protection_aoe L(AOE) specialization=protection default)
 
-AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_warrior_protection_aoe
+AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
+
+AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=shortcd specialization=protection
 {
 	ProtectionGladiatorDefaultShortCdActions()
 }
 
-AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection_aoe
+AddIcon checkbox=opt_warrior_protection_aoe help=shortcd specialization=protection
 {
 	ProtectionGladiatorDefaultShortCdActions()
 }
 
-AddIcon specialization=protection help=main enemies=1
+AddIcon enemies=1 help=main specialization=protection
 {
 	if not InCombat() ProtectionGladiatorPrecombatMainActions()
 	ProtectionGladiatorDefaultMainActions()
 }
 
-AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection_aoe
+AddIcon checkbox=opt_warrior_protection_aoe help=aoe specialization=protection
 {
 	if not InCombat() ProtectionGladiatorPrecombatMainActions()
 	ProtectionGladiatorDefaultMainActions()
 }
 
-AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_warrior_protection_aoe
+AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=cd specialization=protection
 {
 	if not InCombat() ProtectionGladiatorPrecombatCdActions()
 	ProtectionGladiatorDefaultCdActions()
 }
 
-AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
+AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 {
 	if not InCombat() ProtectionGladiatorPrecombatCdActions()
 	ProtectionGladiatorDefaultCdActions()

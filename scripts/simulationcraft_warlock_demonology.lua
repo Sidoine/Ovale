@@ -243,39 +243,40 @@ AddFunction DemonologyPrecombatCdActions
 }
 
 ### Demonology icons.
-AddCheckBox(opt_warlock_demonology_aoe L(AOE) specialization=demonology default)
 
-AddIcon specialization=demonology help=shortcd enemies=1 checkbox=!opt_warlock_demonology_aoe
+AddCheckBox(opt_warlock_demonology_aoe L(AOE) default specialization=demonology)
+
+AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=shortcd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatShortCdActions()
 	DemonologyDefaultShortCdActions()
 }
 
-AddIcon specialization=demonology help=shortcd checkbox=opt_warlock_demonology_aoe
+AddIcon checkbox=opt_warlock_demonology_aoe help=shortcd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatShortCdActions()
 	DemonologyDefaultShortCdActions()
 }
 
-AddIcon specialization=demonology help=main enemies=1
+AddIcon enemies=1 help=main specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatMainActions()
 	DemonologyDefaultMainActions()
 }
 
-AddIcon specialization=demonology help=aoe checkbox=opt_warlock_demonology_aoe
+AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatMainActions()
 	DemonologyDefaultMainActions()
 }
 
-AddIcon specialization=demonology help=cd enemies=1 checkbox=!opt_warlock_demonology_aoe
+AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatCdActions()
 	DemonologyDefaultCdActions()
 }
 
-AddIcon specialization=demonology help=cd checkbox=opt_warlock_demonology_aoe
+AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatCdActions()
 	DemonologyDefaultCdActions()

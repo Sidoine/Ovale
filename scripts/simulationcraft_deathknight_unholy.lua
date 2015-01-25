@@ -443,39 +443,40 @@ AddFunction UnholySpreadMainActions
 }
 
 ### Unholy icons.
-AddCheckBox(opt_deathknight_unholy_aoe L(AOE) specialization=unholy default)
 
-AddIcon specialization=unholy help=shortcd enemies=1 checkbox=!opt_deathknight_unholy_aoe
+AddCheckBox(opt_deathknight_unholy_aoe L(AOE) default specialization=unholy)
+
+AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
 	UnholyDefaultShortCdActions()
 }
 
-AddIcon specialization=unholy help=shortcd checkbox=opt_deathknight_unholy_aoe
+AddIcon checkbox=opt_deathknight_unholy_aoe help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
 	UnholyDefaultShortCdActions()
 }
 
-AddIcon specialization=unholy help=main enemies=1
+AddIcon enemies=1 help=main specialization=unholy
 {
 	if not InCombat() UnholyPrecombatMainActions()
 	UnholyDefaultMainActions()
 }
 
-AddIcon specialization=unholy help=aoe checkbox=opt_deathknight_unholy_aoe
+AddIcon checkbox=opt_deathknight_unholy_aoe help=aoe specialization=unholy
 {
 	if not InCombat() UnholyPrecombatMainActions()
 	UnholyDefaultMainActions()
 }
 
-AddIcon specialization=unholy help=cd enemies=1 checkbox=!opt_deathknight_unholy_aoe
+AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=cd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatCdActions()
 	UnholyDefaultCdActions()
 }
 
-AddIcon specialization=unholy help=cd checkbox=opt_deathknight_unholy_aoe
+AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatCdActions()
 	UnholyDefaultCdActions()
