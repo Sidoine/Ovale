@@ -40,11 +40,6 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction RighteousFuryOff
-{
-	if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
-}
-
 ### actions.default
 
 AddFunction HolyDefaultMainActions

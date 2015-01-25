@@ -251,11 +251,11 @@ AddFunction CombatDefaultCdActions
 AddFunction CombatAdrenalineRushCdActions
 {
 	#adrenaline_rush,if=time_to_die>=44
-	if TimeToDie() >= 44 Spell(adrenaline_rush)
+	if target.TimeToDie() >= 44 Spell(adrenaline_rush)
 	#adrenaline_rush,if=time_to_die<44&(buff.archmages_greater_incandescence_agi.react|trinket.proc.any.react|trinket.stacking_proc.any.react)
-	if TimeToDie() < 44 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } Spell(adrenaline_rush)
+	if target.TimeToDie() < 44 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } Spell(adrenaline_rush)
 	#adrenaline_rush,if=time_to_die<=buff.adrenaline_rush.duration*1.5
-	if TimeToDie() <= BaseDuration(adrenaline_rush_buff) * 1.5 Spell(adrenaline_rush)
+	if target.TimeToDie() <= BaseDuration(adrenaline_rush_buff) * 1.5 Spell(adrenaline_rush)
 }
 
 ### actions.finisher
@@ -283,15 +283,15 @@ AddFunction CombatGeneratorMainActions
 AddFunction CombatKillingSpreeCdActions
 {
 	#killing_spree,if=time_to_die>=44
-	if TimeToDie() >= 44 Spell(killing_spree)
+	if target.TimeToDie() >= 44 Spell(killing_spree)
 	#killing_spree,if=time_to_die<44&buff.archmages_greater_incandescence_agi.react&buff.archmages_greater_incandescence_agi.remains>=buff.killing_spree.duration
-	if TimeToDie() < 44 and BuffPresent(archmages_greater_incandescence_agi_buff) and BuffRemaining(archmages_greater_incandescence_agi_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
+	if target.TimeToDie() < 44 and BuffPresent(archmages_greater_incandescence_agi_buff) and BuffRemaining(archmages_greater_incandescence_agi_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
 	#killing_spree,if=time_to_die<44&trinket.proc.any.react&trinket.proc.any.remains>=buff.killing_spree.duration
-	if TimeToDie() < 44 and BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
+	if target.TimeToDie() < 44 and BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
 	#killing_spree,if=time_to_die<44&trinket.stacking_proc.any.react&trinket.stacking_proc.any.remains>=buff.killing_spree.duration
-	if TimeToDie() < 44 and BuffPresent(trinket_stacking_proc_any_buff) and BuffRemaining(trinket_stacking_proc_any_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
+	if target.TimeToDie() < 44 and BuffPresent(trinket_stacking_proc_any_buff) and BuffRemaining(trinket_stacking_proc_any_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
 	#killing_spree,if=time_to_die<=buff.killing_spree.duration*1.5
-	if TimeToDie() <= BaseDuration(killing_spree_buff) * 1.5 Spell(killing_spree)
+	if target.TimeToDie() <= BaseDuration(killing_spree_buff) * 1.5 Spell(killing_spree)
 }
 
 ### actions.precombat
@@ -475,10 +475,18 @@ AddFunction SubtletyDefaultCdActions
 							{
 								#run_action_list,name=finisher,if=combo_points=5
 								if ComboPoints() == 5 SubtletyFinisherCdActions()
-								#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
-								if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorCdActions()
-								#run_action_list,name=pool
-								SubtletyPoolCdActions()
+
+								unless ComboPoints() == 5 and SubtletyFinisherCdPostConditions()
+								{
+									#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
+									if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorCdActions()
+
+									unless { ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and SubtletyGeneratorCdPostConditions()
+									{
+										#run_action_list,name=pool
+										SubtletyPoolCdActions()
+									}
+								}
 							}
 						}
 					}
@@ -511,6 +519,11 @@ AddFunction SubtletyFinisherCdActions
 		#run_action_list,name=pool
 		SubtletyPoolCdActions()
 	}
+}
+
+AddFunction SubtletyFinisherCdPostConditions
+{
+	{ { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 8 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and BuffRemaining(shadow_reflection_buff) < 10 } and target.TimeToDie() >= 8 and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or Spell(death_from_above) or { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or Spell(eviscerate)
 }
 
 ### actions.generator
@@ -547,6 +560,11 @@ AddFunction SubtletyGeneratorCdActions
 			SubtletyPoolCdActions()
 		}
 	}
+}
+
+AddFunction SubtletyGeneratorCdPostConditions
+{
+	not { SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush) } and { Enemies() > 1 and Spell(fan_of_knives) or { target.DebuffRemaining(hemorrhage_debuff) < BaseDuration(hemorrhage_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(hemorrhage_debuff) + BaseDuration(hemorrhage_debuff) + 8 and target.DebuffExpires(find_weakness_debuff) or not target.DebuffPresent(hemorrhage_debuff) or False(position_front) } and Spell(hemorrhage) or Energy() < 65 and EnergyRegenRate() < 16 and Spell(shuriken_toss) or { not Talent(death_from_above_talent) or Energy() >= MaxEnergy() - EnergyRegenRate() or target.TimeToDie() < 10 } and Spell(backstab) }
 }
 
 ### actions.pool
@@ -607,115 +625,120 @@ do
 Include(ovale_rogue)
 
 ### Assassination icons.
-AddCheckBox(opt_rogue_assassination_aoe L(AOE) specialization=assassination default)
 
-AddIcon specialization=assassination help=shortcd enemies=1 checkbox=!opt_rogue_assassination_aoe
+AddCheckBox(opt_rogue_assassination_aoe L(AOE) default specialization=assassination)
+
+AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=shortcd checkbox=opt_rogue_assassination_aoe
+AddIcon checkbox=opt_rogue_assassination_aoe help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
 	AssassinationDefaultShortCdActions()
 }
 
-AddIcon specialization=assassination help=main enemies=1
+AddIcon enemies=1 help=main specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatMainActions()
 	AssassinationDefaultMainActions()
 }
 
-AddIcon specialization=assassination help=aoe checkbox=opt_rogue_assassination_aoe
+AddIcon checkbox=opt_rogue_assassination_aoe help=aoe specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatMainActions()
 	AssassinationDefaultMainActions()
 }
 
-AddIcon specialization=assassination help=cd enemies=1 checkbox=!opt_rogue_assassination_aoe
+AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()
 }
 
-AddIcon specialization=assassination help=cd checkbox=opt_rogue_assassination_aoe
+AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
 	AssassinationDefaultCdActions()
 }
 
 ### Combat icons.
-AddCheckBox(opt_rogue_combat_aoe L(AOE) specialization=combat default)
 
-AddIcon specialization=combat help=shortcd enemies=1 checkbox=!opt_rogue_combat_aoe
+AddCheckBox(opt_rogue_combat_aoe L(AOE) default specialization=combat)
+
+AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=shortcd checkbox=opt_rogue_combat_aoe
+AddIcon checkbox=opt_rogue_combat_aoe help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
 	CombatDefaultShortCdActions()
 }
 
-AddIcon specialization=combat help=main enemies=1
+AddIcon enemies=1 help=main specialization=combat
 {
 	if not InCombat() CombatPrecombatMainActions()
 	CombatDefaultMainActions()
 }
 
-AddIcon specialization=combat help=aoe checkbox=opt_rogue_combat_aoe
+AddIcon checkbox=opt_rogue_combat_aoe help=aoe specialization=combat
 {
 	if not InCombat() CombatPrecombatMainActions()
 	CombatDefaultMainActions()
 }
 
-AddIcon specialization=combat help=cd enemies=1 checkbox=!opt_rogue_combat_aoe
+AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
 
-AddIcon specialization=combat help=cd checkbox=opt_rogue_combat_aoe
+AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
 	CombatDefaultCdActions()
 }
 
 ### Subtlety icons.
-AddCheckBox(opt_rogue_subtlety_aoe L(AOE) specialization=subtlety default)
 
-AddIcon specialization=subtlety help=shortcd enemies=1 checkbox=!opt_rogue_subtlety_aoe
+AddCheckBox(opt_rogue_subtlety_aoe L(AOE) default specialization=subtlety)
+
+AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=shortcd specialization=subtlety
 {
+	if not InCombat() SubtletyPrecombatShortCdActions()
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=shortcd checkbox=opt_rogue_subtlety_aoe
+AddIcon checkbox=opt_rogue_subtlety_aoe help=shortcd specialization=subtlety
 {
+	if not InCombat() SubtletyPrecombatShortCdActions()
 	SubtletyDefaultShortCdActions()
 }
 
-AddIcon specialization=subtlety help=main enemies=1
+AddIcon enemies=1 help=main specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatMainActions()
 	SubtletyDefaultMainActions()
 }
 
-AddIcon specialization=subtlety help=aoe checkbox=opt_rogue_subtlety_aoe
+AddIcon checkbox=opt_rogue_subtlety_aoe help=aoe specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatMainActions()
 	SubtletyDefaultMainActions()
 }
 
-AddIcon specialization=subtlety help=cd enemies=1 checkbox=!opt_rogue_subtlety_aoe
+AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()
 }
 
-AddIcon specialization=subtlety help=cd checkbox=opt_rogue_subtlety_aoe
+AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
 	SubtletyDefaultCdActions()

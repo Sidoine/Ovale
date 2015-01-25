@@ -104,14 +104,6 @@ AddFunction DisciplinePrecombatCdActions
 
 AddCheckBox(opt_priest_discipline_aoe L(AOE) default specialization=discipline)
 
-AddIcon checkbox=!opt_priest_discipline_aoe enemies=1 help=shortcd specialization=discipline
-{
-}
-
-AddIcon checkbox=opt_priest_discipline_aoe help=shortcd specialization=discipline
-{
-}
-
 AddIcon enemies=1 help=main specialization=discipline
 {
 	if not InCombat() DisciplinePrecombatMainActions()

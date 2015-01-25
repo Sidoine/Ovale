@@ -90,8 +90,12 @@ AddFunction ElementalDefaultShortCdActions
 	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
 	#call_action_list,name=single,if=active_enemies=1
 	if Enemies() == 1 ElementalSingleShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>1
-	if Enemies() > 1 ElementalAoeShortCdActions()
+
+	unless Enemies() == 1 and ElementalSingleShortCdPostConditions()
+	{
+		#call_action_list,name=aoe,if=active_enemies>1
+		if Enemies() > 1 ElementalAoeShortCdActions()
+	}
 }
 
 AddFunction ElementalDefaultCdActions
@@ -213,6 +217,11 @@ AddFunction ElementalSingleShortCdActions
 		#earthquake,if=talent.unleashed_fury.enabled&((1+stat.spell_haste)*(1+(mastery_value*2%4.5))>=((1.3*1.875)+(1.25*0.226305)+1.25*(2*0.226305*stat.multistrike_pct%100)))&target.time_to_die>10&(buff.elemental_mastery.remains>=10|buff.bloodlust.remains>=10)
 		if Talent(unleashed_fury_talent) and { 1 + 100 / { 100 + SpellHaste() } } * { 1 + MasteryEffect() / 100 * 2 / 4.5 } >= 1.3 * 1.875 + 1.25 * 0.226305 + 1.25 * 2 * 0.226305 * MultistrikeChance() / 100 and target.TimeToDie() > 10 and { BuffRemaining(elemental_mastery_buff) >= 10 or BuffRemaining(burst_haste_buff any=1) >= 10 } Spell(earthquake)
 	}
+}
+
+AddFunction ElementalSingleShortCdPostConditions
+{
+	Speed() > 0 and Spell(unleash_flame) or BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock) or target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { BuffPresent(ascendance_caster_buff) or not SpellCooldown(lava_burst) > 0 } and Spell(lava_burst) or Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) and Spell(unleash_flame) or target.DebuffRemaining(flame_shock_debuff) <= 9 and Spell(flame_shock) or { ArmorSetBonus(T17 4) and BuffStacks(lightning_shield_buff) >= 15 and not BuffPresent(lava_surge_buff) or not ArmorSetBonus(T17 4) and BuffStacks(lightning_shield_buff) > 15 } and Spell(earth_shock) or Spell(elemental_blast) or TimeInCombat() > 60 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) < BaseDuration(flame_shock_debuff) and Spell(flame_shock) or { not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) } and Spell(searing_totem) or Spell(lightning_bolt)
 }
 
 AddFunction ElementalSingleCdActions
@@ -464,98 +473,101 @@ do
 Include(ovale_shaman)
 
 ### Elemental icons.
-AddCheckBox(opt_shaman_elemental_aoe L(AOE) specialization=elemental default)
 
-AddIcon specialization=elemental help=shortcd enemies=1 checkbox=!opt_shaman_elemental_aoe
+AddCheckBox(opt_shaman_elemental_aoe L(AOE) default specialization=elemental)
+
+AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=shortcd specialization=elemental
 {
 	ElementalDefaultShortCdActions()
 }
 
-AddIcon specialization=elemental help=shortcd checkbox=opt_shaman_elemental_aoe
+AddIcon checkbox=opt_shaman_elemental_aoe help=shortcd specialization=elemental
 {
 	ElementalDefaultShortCdActions()
 }
 
-AddIcon specialization=elemental help=main enemies=1
+AddIcon enemies=1 help=main specialization=elemental
 {
 	if not InCombat() ElementalPrecombatMainActions()
 	ElementalDefaultMainActions()
 }
 
-AddIcon specialization=elemental help=aoe checkbox=opt_shaman_elemental_aoe
+AddIcon checkbox=opt_shaman_elemental_aoe help=aoe specialization=elemental
 {
 	if not InCombat() ElementalPrecombatMainActions()
 	ElementalDefaultMainActions()
 }
 
-AddIcon specialization=elemental help=cd enemies=1 checkbox=!opt_shaman_elemental_aoe
+AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=cd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatCdActions()
 	ElementalDefaultCdActions()
 }
 
-AddIcon specialization=elemental help=cd checkbox=opt_shaman_elemental_aoe
+AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatCdActions()
 	ElementalDefaultCdActions()
 }
 
 ### Enhancement icons.
-AddCheckBox(opt_shaman_enhancement_aoe L(AOE) specialization=enhancement default)
 
-AddIcon specialization=enhancement help=shortcd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+AddCheckBox(opt_shaman_enhancement_aoe L(AOE) default specialization=enhancement)
+
+AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
 	EnhancementDefaultShortCdActions()
 }
 
-AddIcon specialization=enhancement help=shortcd checkbox=opt_shaman_enhancement_aoe
+AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
 	EnhancementDefaultShortCdActions()
 }
 
-AddIcon specialization=enhancement help=main enemies=1
+AddIcon enemies=1 help=main specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatMainActions()
 	EnhancementDefaultMainActions()
 }
 
-AddIcon specialization=enhancement help=aoe checkbox=opt_shaman_enhancement_aoe
+AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatMainActions()
 	EnhancementDefaultMainActions()
 }
 
-AddIcon specialization=enhancement help=cd enemies=1 checkbox=!opt_shaman_enhancement_aoe
+AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
 	EnhancementDefaultCdActions()
 }
 
-AddIcon specialization=enhancement help=cd checkbox=opt_shaman_enhancement_aoe
+AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
 	EnhancementDefaultCdActions()
 }
 
 ### Restoration icons.
-AddCheckBox(opt_shaman_restoration_aoe L(AOE) specialization=restoration default)
 
-AddIcon specialization=restoration help=shortcd
+AddCheckBox(opt_shaman_restoration_aoe L(AOE) default specialization=restoration)
+
+AddIcon help=shortcd specialization=restoration
 {
 	RestorationShortCdActions()
 }
 
-AddIcon specialization=restoration help=main
+AddIcon help=main specialization=restoration
 {
 	RestorationMainActions()
 }
 
-AddIcon specialization=restoration help=aoe checkbox=opt_shaman_restoration_aoe
+AddIcon checkbox=opt_shaman_restoration_aoe help=aoe specialization=restoration
 {
 	RestorationAoeActions()
 }
 
-AddIcon specialization=restoration help=cd
+AddIcon help=cd specialization=restoration
 {
 	RestorationCdActions()
 }

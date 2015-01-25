@@ -101,10 +101,14 @@ AddFunction DemonologyDefaultShortCdActions
 		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
 		#call_action_list,name=db,if=talent.demonbolt.enabled
 		if Talent(demonbolt_talent) DemonologyDbShortCdActions()
-		#kiljaedens_cunning,if=!cooldown.cataclysm.remains&buff.metamorphosis.up
-		if not SpellCooldown(cataclysm) > 0 and BuffPresent(metamorphosis_buff) Spell(kiljaedens_cunning)
-		#cataclysm,if=buff.metamorphosis.up
-		if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+
+		unless Talent(demonbolt_talent) and DemonologyDbShortCdPostConditions()
+		{
+			#kiljaedens_cunning,if=!cooldown.cataclysm.remains&buff.metamorphosis.up
+			if not SpellCooldown(cataclysm) > 0 and BuffPresent(metamorphosis_buff) Spell(kiljaedens_cunning)
+			#cataclysm,if=buff.metamorphosis.up
+			if BuffPresent(metamorphosis_buff) Spell(cataclysm)
+		}
 	}
 }
 
@@ -123,7 +127,7 @@ AddFunction DemonologyDefaultCdActions
 	#dark_soul,if=!talent.demonbolt.enabled&(charges=2|!talent.archimondes_darkness.enabled|(target.time_to_die<=20&!glyph.dark_soul.enabled|target.time_to_die<=10)|(target.time_to_die<=60&demonic_fury>400)|((trinket.stacking_proc.multistrike.remains>7.5|trinket.proc.any.remains>7.5)&demonic_fury>=400))
 	if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 or not Talent(archimondes_darkness_talent) or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or { BuffRemaining(trinket_stacking_proc_multistrike_buff) > 7.5 or BuffRemaining(trinket_proc_any_buff) > 7.5 } and DemonicFury() >= 400 } Spell(dark_soul_knowledge)
 	#imp_swarm,if=(buff.dark_soul.up|(cooldown.dark_soul.remains>(120%(1%spell_haste)))|time_to_die<32)&time>3
-	if { BuffPresent(dark_soul_knowledge_buff) or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { 100 / { 100 + SpellHaste() } } } or TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
+	if { BuffPresent(dark_soul_knowledge_buff) or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { 100 / { 100 + SpellHaste() } } } or target.TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
 
 	unless not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } and SpellCooldown(dark_soul_knowledge) > target.DebuffDuration(shadowflame_debuff) or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + 3 and BuffRemaining(demonbolt_buff) < GCD() * 2 and Charges(hand_of_guldan) >= 2 and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan) or Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
 	{
@@ -199,6 +203,11 @@ AddFunction DemonologyDbShortCdActions
 		#kiljaedens_cunning,moving=1,if=buff.demonbolt.stack=0|(buff.demonbolt.stack<4&buff.demonbolt.remains>=(40*spell_haste-execute_time))
 		if Speed() > 0 and { BuffStacks(demonbolt_buff) == 0 or BuffStacks(demonbolt_buff) < 4 and BuffRemaining(demonbolt_buff) >= 40 * 100 / { 100 + SpellHaste() } - ExecuteTime(kiljaedens_cunning) } Spell(kiljaedens_cunning)
 	}
+}
+
+AddFunction DemonologyDbShortCdPostConditions
+{
+	DemonicFury() > 450 and Enemies() >= 5 and BuffExpires(immolation_aura_buff) and Spell(immolation_aura) or BuffPresent(metamorphosis_buff) and Enemies() >= 6 and target.TimeToDie() >= 30 * 100 / { 100 + SpellHaste() } and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } and Spell(doom) or { BuffStacks(demonbolt_buff) == 0 or BuffStacks(demonbolt_buff) < 4 and BuffRemaining(demonbolt_buff) >= 40 * 100 / { 100 + SpellHaste() } - ExecuteTime(demonbolt) } and Spell(demonbolt) or BuffPresent(metamorphosis_buff) and target.TimeToDie() >= 30 * 100 / { 100 + SpellHaste() } and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and { BuffExpires(dark_soul_knowledge_buff) or not Glyph(glyph_of_dark_soul) } and Spell(doom) or target.TimeToDie() >= 6 and target.DebuffRemaining(corruption_debuff) <= 0.3 * BaseDuration(corruption_debuff) and BuffExpires(metamorphosis_buff) and Spell(corruption) or BuffPresent(metamorphosis_buff) and BuffPresent(dark_soul_knowledge_buff) and Enemies() >= 3 and DemonicFury() > 450 and Spell(chaos_wave) or BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff any=1) and { BuffRemaining(dark_soul_knowledge_buff) > ExecuteTime(soul_fire) and DemonicFury() >= 175 or target.TimeToDie() < BuffRemaining(demonbolt_buff) } and Spell(soul_fire) or BuffPresent(metamorphosis_buff) and BuffPresent(molten_core_buff any=1) and target.HealthPercent() <= 25 and { DemonicFury() - 80 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * 100 / { 100 + SpellHaste() } } and DemonicFury() >= 750 and Spell(soul_fire) or BuffPresent(metamorphosis_buff) and target.DebuffRemaining(corruption_debuff) < 17.4 and DemonicFury() > 750 and Spell(touch_of_chaos) or BuffPresent(metamorphosis_buff) and { target.TimeToDie() < BuffRemaining(demonbolt_buff) or DemonicFury() >= 750 and BuffPresent(demonbolt_buff) } and Spell(touch_of_chaos) or BuffPresent(metamorphosis_buff) and { DemonicFury() - 40 } / 800 > BuffRemaining(demonbolt_buff) / { 40 * 100 / { 100 + SpellHaste() } } and DemonicFury() >= 750 and Spell(touch_of_chaos) or Enemies() >= 5 and Spell(hellfire) or BuffPresent(molten_core_buff any=1) and { BuffRemaining(dark_soul_knowledge_buff) < CastTime(shadow_bolt) or BuffRemaining(dark_soul_knowledge_buff) > CastTime(soul_fire) } and Spell(soul_fire) or ManaPercent() < 40 and Spell(life_tap) or Enemies() >= 4 and Spell(hellfire) or Spell(shadow_bolt) or Speed() > 0 and Spell(hellfire) or Spell(life_tap)
 }
 
 ### actions.precombat

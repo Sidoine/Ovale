@@ -74,48 +74,88 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
-	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
-	if not IsEnraged() or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetShortCdActions()
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FurySingleMindedFurySingleTargetShortCdActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FurySingleMindedFuryTwoTargetsShortCdActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FurySingleMindedFuryThreeTargetsShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FurySingleMindedFuryAoeShortCdActions()
+
+	unless 0 > 5 and FurySingleMindedFuryMovementShortCdPostConditions()
+	{
+		#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
+		if not IsEnraged() or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
+		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetShortCdActions()
+
+		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FurySingleMindedFurySingleTargetShortCdPostConditions()
+		{
+			#call_action_list,name=single_target,if=active_enemies=1
+			if Enemies() == 1 FurySingleMindedFurySingleTargetShortCdActions()
+
+			unless Enemies() == 1 and FurySingleMindedFurySingleTargetShortCdPostConditions()
+			{
+				#call_action_list,name=two_targets,if=active_enemies=2
+				if Enemies() == 2 FurySingleMindedFuryTwoTargetsShortCdActions()
+
+				unless Enemies() == 2 and FurySingleMindedFuryTwoTargetsShortCdPostConditions()
+				{
+					#call_action_list,name=three_targets,if=active_enemies=3
+					if Enemies() == 3 FurySingleMindedFuryThreeTargetsShortCdActions()
+
+					unless Enemies() == 3 and FurySingleMindedFuryThreeTargetsShortCdPostConditions()
+					{
+						#call_action_list,name=aoe,if=active_enemies>3
+						if Enemies() > 3 FurySingleMindedFuryAoeShortCdActions()
+					}
+				}
+			}
+		}
+	}
 }
 
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	#pummel
 	InterruptActions()
-	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
-	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
-	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
-	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
-	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
-	#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=rage<rage.max-40
-	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FurySingleMindedFurySingleTargetCdActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FurySingleMindedFuryTwoTargetsCdActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FurySingleMindedFuryThreeTargetsCdActions()
-	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FurySingleMindedFuryAoeCdActions()
+
+	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
+	{
+		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
+
+		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FurySingleMindedFurySingleTargetCdPostConditions()
+		{
+			#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
+			if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
+			#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
+			if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
+			#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+			#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
+			#arcane_torrent,if=rage<rage.max-40
+			if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
+			#call_action_list,name=single_target,if=active_enemies=1
+			if Enemies() == 1 FurySingleMindedFurySingleTargetCdActions()
+
+			unless Enemies() == 1 and FurySingleMindedFurySingleTargetCdPostConditions()
+			{
+				#call_action_list,name=two_targets,if=active_enemies=2
+				if Enemies() == 2 FurySingleMindedFuryTwoTargetsCdActions()
+
+				unless Enemies() == 2 and FurySingleMindedFuryTwoTargetsCdPostConditions()
+				{
+					#call_action_list,name=three_targets,if=active_enemies=3
+					if Enemies() == 3 FurySingleMindedFuryThreeTargetsCdActions()
+
+					unless Enemies() == 3 and FurySingleMindedFuryThreeTargetsCdPostConditions()
+					{
+						#call_action_list,name=aoe,if=active_enemies>3
+						if Enemies() > 3 FurySingleMindedFuryAoeCdActions()
+					}
+				}
+			}
+		}
+	}
 }
 
 ### actions.aoe
@@ -182,6 +222,16 @@ AddFunction FurySingleMindedFuryMovementShortCdActions
 	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
+}
+
+AddFunction FurySingleMindedFuryMovementShortCdPostConditions
+{
+	Spell(heroic_throw)
+}
+
+AddFunction FurySingleMindedFuryMovementCdPostConditions
+{
+	Spell(storm_bolt) or Spell(heroic_throw)
 }
 
 ### actions.precombat
@@ -263,12 +313,22 @@ AddFunction FurySingleMindedFurySingleTargetShortCdActions
 	}
 }
 
+AddFunction FurySingleMindedFurySingleTargetShortCdPostConditions
+{
+	Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or not IsEnraged() } and Spell(bloodthirst) or BuffPresent(sudden_death_buff) and Spell(execute) or BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { IsEnraged() or target.TimeToDie() < 12 } and Spell(execute) or Spell(raging_blow) or IsEnraged() and target.HealthPercent() > 20 and Spell(wild_strike) or not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and Spell(impending_victory) or Spell(bloodthirst)
+}
+
 AddFunction FurySingleMindedFurySingleTargetCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
 	#recklessness,if=target.health.pct<20&raid_event.adds.exists
 	if target.HealthPercent() < 20 and False(raid_event_adds_exists) Spell(recklessness)
+}
+
+AddFunction FurySingleMindedFurySingleTargetCdPostConditions
+{
+	Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or not IsEnraged() } and Spell(bloodthirst) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and { not False(raid_event_adds_exists) or 600 > 60 or target.TimeToDie() < 40 } } and Spell(ravager) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(siegebreaker) or Spell(storm_bolt) or BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { IsEnraged() or target.TimeToDie() < 12 } and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(raging_blow) or IsEnraged() and target.HealthPercent() > 20 and Spell(wild_strike) or not False(raid_event_adds_exists) and Spell(bladestorm) or not Talent(unquenchable_thirst_talent) and Spell(shockwave) or not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and Spell(impending_victory) or Spell(bloodthirst)
 }
 
 ### actions.three_targets
@@ -305,10 +365,20 @@ AddFunction FurySingleMindedFuryThreeTargetsShortCdActions
 	}
 }
 
+AddFunction FurySingleMindedFuryThreeTargetsShortCdPostConditions
+{
+	{ not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(whirlwind) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FurySingleMindedFuryThreeTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
+}
+
+AddFunction FurySingleMindedFuryThreeTargetsCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or IsEnraged() and Spell(bladestorm) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(whirlwind) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
 }
 
 ### actions.two_targets
@@ -344,10 +414,20 @@ AddFunction FurySingleMindedFuryTwoTargetsShortCdActions
 	if IsEnraged() Spell(bladestorm)
 }
 
+AddFunction FurySingleMindedFuryTwoTargetsShortCdPostConditions
+{
+	{ not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or { target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) } and Spell(execute) or BuffPresent(meat_cleaver_buff) and Spell(raging_blow) or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Rage() > 75 and Spell(wild_strike) or Spell(bloodthirst) or Rage() > MaxRage() - 20 and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FurySingleMindedFuryTwoTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
+}
+
+AddFunction FurySingleMindedFuryTwoTargetsCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or IsEnraged() and Spell(bladestorm) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or { target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) } and Spell(execute) or BuffPresent(meat_cleaver_buff) and Spell(raging_blow) or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Rage() > 75 and Spell(wild_strike) or Spell(bloodthirst) or Rage() > MaxRage() - 20 and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
 }
 
 ### Fury icons.

@@ -140,17 +140,21 @@ AddFunction ProtectionProtShortCdActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } and HealthPercent() < 80 Spell(enraged_regeneration)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeShortCdActions()
-	#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
-	if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
 
-	unless Spell(shield_slam) or Spell(revenge)
+	unless Enemies() > 3 and ProtectionProtAoeShortCdPostConditions()
 	{
-		#ravager
-		Spell(ravager)
-		#storm_bolt
-		Spell(storm_bolt)
-		#dragon_roar
-		Spell(dragon_roar)
+		#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
+		if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
+
+		unless Spell(shield_slam) or Spell(revenge)
+		{
+			#ravager
+			Spell(ravager)
+			#storm_bolt
+			Spell(storm_bolt)
+			#dragon_roar
+			Spell(dragon_roar)
+		}
 	}
 }
 
@@ -166,10 +170,14 @@ AddFunction ProtectionProtCdActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeCdActions()
-	#bloodbath,if=talent.bloodbath.enabled&((cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(cooldown.storm_bolt.remains=0&talent.storm_bolt.enabled)|talent.shockwave.enabled)
-	if Talent(bloodbath_talent) and { not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or not SpellCooldown(storm_bolt) > 0 and Talent(storm_bolt_talent) or Talent(shockwave_talent) } Spell(bloodbath)
-	#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
-	if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
+
+	unless Enemies() > 3 and ProtectionProtAoeCdPostConditions()
+	{
+		#bloodbath,if=talent.bloodbath.enabled&((cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(cooldown.storm_bolt.remains=0&talent.storm_bolt.enabled)|talent.shockwave.enabled)
+		if Talent(bloodbath_talent) and { not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or not SpellCooldown(storm_bolt) > 0 and Talent(storm_bolt_talent) or Talent(shockwave_talent) } Spell(bloodbath)
+		#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
+		if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
+	}
 }
 
 ### actions.prot_aoe
@@ -227,12 +235,22 @@ AddFunction ProtectionProtAoeShortCdActions
 	}
 }
 
+AddFunction ProtectionProtAoeShortCdPostConditions
+{
+	not target.DebuffPresent(deep_wounds_debuff) and Spell(thunder_clap) or BuffPresent(shield_block_buff) and Spell(shield_slam) or Spell(revenge) or Spell(thunder_clap) or Spell(shield_slam) or Spell(shield_slam) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(devastate)
+}
+
 AddFunction ProtectionProtAoeCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
 	#avatar
 	Spell(avatar)
+}
+
+AddFunction ProtectionProtAoeCdPostConditions
+{
+	not target.DebuffPresent(deep_wounds_debuff) and Spell(thunder_clap) or BuffPresent(shield_block_buff) and Spell(shield_slam) or { BuffPresent(avatar_buff) or SpellCooldown(avatar) > 10 or not Talent(avatar_talent) } and Spell(ravager) or { BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(shockwave) or Spell(revenge) or Spell(thunder_clap) or Spell(bladestorm) or Spell(shield_slam) or Spell(storm_bolt) or Spell(shield_slam) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(devastate)
 }
 
 ### Protection icons.

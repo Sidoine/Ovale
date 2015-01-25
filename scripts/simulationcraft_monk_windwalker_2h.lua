@@ -83,8 +83,12 @@ AddFunction WindwalkerDefaultShortCdActions
 			if Talent(serenity_talent) and Chi() >= 2 and BuffPresent(tiger_power_buff) and target.DebuffPresent(rising_sun_kick_debuff) Spell(serenity)
 			#call_action_list,name=aoe,if=active_enemies>=3
 			if Enemies() >= 3 WindwalkerAoeShortCdActions()
-			#call_action_list,name=st,if=active_enemies<3
-			if Enemies() < 3 WindwalkerStShortCdActions()
+
+			unless Enemies() >= 3 and WindwalkerAoeShortCdPostConditions()
+			{
+				#call_action_list,name=st,if=active_enemies<3
+				if Enemies() < 3 WindwalkerStShortCdActions()
+			}
 		}
 	}
 }
@@ -111,8 +115,12 @@ AddFunction WindwalkerDefaultCdActions
 	{
 		#call_action_list,name=aoe,if=active_enemies>=3
 		if Enemies() >= 3 WindwalkerAoeCdActions()
-		#call_action_list,name=st,if=active_enemies<3
-		if Enemies() < 3 WindwalkerStCdActions()
+
+		unless Enemies() >= 3 and WindwalkerAoeCdPostConditions()
+		{
+			#call_action_list,name=st,if=active_enemies<3
+			if Enemies() < 3 WindwalkerStCdActions()
+		}
 	}
 }
 
@@ -169,6 +177,11 @@ AddFunction WindwalkerAoeShortCdActions
 	}
 }
 
+AddFunction WindwalkerAoeShortCdPostConditions
+{
+	Chi() >= 4 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(chi_explosion_melee) or Spell(rushing_jade_wind) or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick) or not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and MaxChi() - Chi() < 2 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(blackout_kick) or Spell(spinning_crane_kick) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 2 and Spell(jab) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 1 and Talent(chi_explosion_talent) and SpellCooldown(fists_of_fury) <= 3 and Spell(jab)
+}
+
 AddFunction WindwalkerAoeCdActions
 {
 	unless Chi() >= 4 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(chi_explosion_melee) or Spell(rushing_jade_wind) or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick) or Talent(rushing_jade_wind_talent) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury)
@@ -176,6 +189,11 @@ AddFunction WindwalkerAoeCdActions
 		#fortifying_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0
 		if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 Spell(fortifying_brew)
 	}
+}
+
+AddFunction WindwalkerAoeCdPostConditions
+{
+	Chi() >= 4 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(chi_explosion_melee) or Spell(rushing_jade_wind) or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick) or Talent(rushing_jade_wind_talent) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury) or target.HealthPercent() < 10 and Spell(touch_of_death) or Talent(rushing_jade_wind_talent) and Talent(hurricane_strike_talent) and TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) and Spell(hurricane_strike) or not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or Talent(chi_burst_talent) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and MaxChi() - Chi() < 2 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(blackout_kick) or Spell(spinning_crane_kick) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 2 and Spell(jab) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 1 and Talent(chi_explosion_talent) and SpellCooldown(fists_of_fury) <= 3 and Spell(jab)
 }
 
 ### actions.precombat

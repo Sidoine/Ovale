@@ -71,8 +71,12 @@ AddFunction BrewmasterDefaultShortCdActions
 	if Talent(serenity_talent) and SpellCooldown(keg_smash) > 6 Spell(serenity)
 	#call_action_list,name=st,if=active_enemies<3
 	if Enemies() < 3 BrewmasterStShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 BrewmasterAoeShortCdActions()
+
+	unless Enemies() < 3 and BrewmasterStShortCdPostConditions()
+	{
+		#call_action_list,name=aoe,if=active_enemies>=3
+		if Enemies() >= 3 BrewmasterAoeShortCdActions()
+	}
 }
 
 AddFunction BrewmasterDefaultCdActions
@@ -233,6 +237,11 @@ AddFunction BrewmasterStShortCdActions
 			if Energy() + EnergyRegenRate() * GCD() < 100 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 		}
 	}
+}
+
+AddFunction BrewmasterStShortCdPostConditions
+{
+	BuffExpires(shuffle_buff) and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Spell(keg_smash) or Energy() + EnergyRegenRate() * GCD() < 100 and Spell(chi_wave) or Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) and Energy() + EnergyRegenRate() * GCD() < 100 and Spell(zen_sphere) or Chi() >= 3 and Spell(chi_explosion_tank) or Chi() >= 4 and Spell(blackout_kick) or BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() and Spell(blackout_kick) or BuffPresent(serenity_buff) and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(expel_harm) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(jab) or Spell(tiger_palm)
 }
 
 ### Brewmaster icons.

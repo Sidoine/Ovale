@@ -80,32 +80,44 @@ AddFunction ArmsDefaultShortCdActions
 	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementShortCdActions()
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#call_action_list,name=single,if=active_enemies=1
-	if Enemies() == 1 ArmsSingleShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>1
-	if Enemies() > 1 ArmsAoeShortCdActions()
+
+	unless 0 > 5 and ArmsMovementShortCdPostConditions()
+	{
+		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		#call_action_list,name=single,if=active_enemies=1
+		if Enemies() == 1 ArmsSingleShortCdActions()
+
+		unless Enemies() == 1 and ArmsSingleShortCdPostConditions()
+		{
+			#call_action_list,name=aoe,if=active_enemies>1
+			if Enemies() > 1 ArmsAoeShortCdActions()
+		}
+	}
 }
 
 AddFunction ArmsDefaultCdActions
 {
 	#pummel
 	InterruptActions()
-	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
-	#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
-	if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
-	#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5)|target.time_to_die<20
-	if target.DebuffPresent(rend_debuff) and SpellCooldown(colossus_smash) < 5 or target.TimeToDie() < 20 Spell(bloodbath)
-	#avatar,if=buff.recklessness.up|target.time_to_die<25
-	if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
-	#blood_fury,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=rage<rage.max-40
-	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
+
+	unless 0 > 5 and ArmsMovementCdPostConditions()
+	{
+		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
+		#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
+		if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
+		#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5)|target.time_to_die<20
+		if target.DebuffPresent(rend_debuff) and SpellCooldown(colossus_smash) < 5 or target.TimeToDie() < 20 Spell(bloodbath)
+		#avatar,if=buff.recklessness.up|target.time_to_die<25
+		if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
+		#blood_fury,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+		#berserking,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(berserking)
+		#arcane_torrent,if=rage<rage.max-40
+		if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
+	}
 }
 
 ### actions.aoe
@@ -172,6 +184,16 @@ AddFunction ArmsMovementShortCdActions
 	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
+}
+
+AddFunction ArmsMovementShortCdPostConditions
+{
+	Spell(heroic_throw)
+}
+
+AddFunction ArmsMovementCdPostConditions
+{
+	Spell(storm_bolt) or Spell(heroic_throw)
 }
 
 ### actions.precombat
@@ -251,6 +273,11 @@ AddFunction ArmsSingleShortCdActions
 	}
 }
 
+AddFunction ArmsSingleShortCdPostConditions
+{
+	not target.DebuffPresent(rend_debuff) and target.TimeToDie() > 4 and Spell(rend) or Spell(colossus_smash) or target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and Spell(mortal_strike) or not target.DebuffPresent(colossus_smash_debuff) and target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 and Spell(rend) or { Rage() >= 60 and SpellCooldown(colossus_smash) > ExecuteTime(execute_arms) or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_buff) or target.TimeToDie() < 5 } and Spell(execute_arms) or Rage() < 40 and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(impending_victory) or { Rage() > 20 or SpellCooldown(colossus_smash) > ExecuteTime(slam) } and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(slam) or not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or ArmorSetBonus(T17 4) or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > 1 and SpellCooldown(mortal_strike) > 1 and Spell(whirlwind)
+}
+
 ###
 ### Fury (Single-Minded Fury)
 ###
@@ -286,48 +313,88 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
-	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
-	if not IsEnraged() or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetShortCdActions()
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FurySingleMindedFurySingleTargetShortCdActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FurySingleMindedFuryTwoTargetsShortCdActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FurySingleMindedFuryThreeTargetsShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FurySingleMindedFuryAoeShortCdActions()
+
+	unless 0 > 5 and FurySingleMindedFuryMovementShortCdPostConditions()
+	{
+		#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
+		if not IsEnraged() or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
+		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetShortCdActions()
+
+		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FurySingleMindedFurySingleTargetShortCdPostConditions()
+		{
+			#call_action_list,name=single_target,if=active_enemies=1
+			if Enemies() == 1 FurySingleMindedFurySingleTargetShortCdActions()
+
+			unless Enemies() == 1 and FurySingleMindedFurySingleTargetShortCdPostConditions()
+			{
+				#call_action_list,name=two_targets,if=active_enemies=2
+				if Enemies() == 2 FurySingleMindedFuryTwoTargetsShortCdActions()
+
+				unless Enemies() == 2 and FurySingleMindedFuryTwoTargetsShortCdPostConditions()
+				{
+					#call_action_list,name=three_targets,if=active_enemies=3
+					if Enemies() == 3 FurySingleMindedFuryThreeTargetsShortCdActions()
+
+					unless Enemies() == 3 and FurySingleMindedFuryThreeTargetsShortCdPostConditions()
+					{
+						#call_action_list,name=aoe,if=active_enemies>3
+						if Enemies() > 3 FurySingleMindedFuryAoeShortCdActions()
+					}
+				}
+			}
+		}
+	}
 }
 
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	#pummel
 	InterruptActions()
-	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
-	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
-	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
-	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
-	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
-	#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=rage<rage.max-40
-	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FurySingleMindedFurySingleTargetCdActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FurySingleMindedFuryTwoTargetsCdActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FurySingleMindedFuryThreeTargetsCdActions()
-	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FurySingleMindedFuryAoeCdActions()
+
+	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
+	{
+		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
+
+		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FurySingleMindedFurySingleTargetCdPostConditions()
+		{
+			#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
+			if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
+			#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
+			if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
+			#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+			#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
+			#arcane_torrent,if=rage<rage.max-40
+			if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
+			#call_action_list,name=single_target,if=active_enemies=1
+			if Enemies() == 1 FurySingleMindedFurySingleTargetCdActions()
+
+			unless Enemies() == 1 and FurySingleMindedFurySingleTargetCdPostConditions()
+			{
+				#call_action_list,name=two_targets,if=active_enemies=2
+				if Enemies() == 2 FurySingleMindedFuryTwoTargetsCdActions()
+
+				unless Enemies() == 2 and FurySingleMindedFuryTwoTargetsCdPostConditions()
+				{
+					#call_action_list,name=three_targets,if=active_enemies=3
+					if Enemies() == 3 FurySingleMindedFuryThreeTargetsCdActions()
+
+					unless Enemies() == 3 and FurySingleMindedFuryThreeTargetsCdPostConditions()
+					{
+						#call_action_list,name=aoe,if=active_enemies>3
+						if Enemies() > 3 FurySingleMindedFuryAoeCdActions()
+					}
+				}
+			}
+		}
+	}
 }
 
 ### actions.aoe
@@ -394,6 +461,16 @@ AddFunction FurySingleMindedFuryMovementShortCdActions
 	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
+}
+
+AddFunction FurySingleMindedFuryMovementShortCdPostConditions
+{
+	Spell(heroic_throw)
+}
+
+AddFunction FurySingleMindedFuryMovementCdPostConditions
+{
+	Spell(storm_bolt) or Spell(heroic_throw)
 }
 
 ### actions.precombat
@@ -475,12 +552,22 @@ AddFunction FurySingleMindedFurySingleTargetShortCdActions
 	}
 }
 
+AddFunction FurySingleMindedFurySingleTargetShortCdPostConditions
+{
+	Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or not IsEnraged() } and Spell(bloodthirst) or BuffPresent(sudden_death_buff) and Spell(execute) or BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { IsEnraged() or target.TimeToDie() < 12 } and Spell(execute) or Spell(raging_blow) or IsEnraged() and target.HealthPercent() > 20 and Spell(wild_strike) or not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and Spell(impending_victory) or Spell(bloodthirst)
+}
+
 AddFunction FurySingleMindedFurySingleTargetCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
 	#recklessness,if=target.health.pct<20&raid_event.adds.exists
 	if target.HealthPercent() < 20 and False(raid_event_adds_exists) Spell(recklessness)
+}
+
+AddFunction FurySingleMindedFurySingleTargetCdPostConditions
+{
+	Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or not IsEnraged() } and Spell(bloodthirst) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and { not False(raid_event_adds_exists) or 600 > 60 or target.TimeToDie() < 40 } } and Spell(ravager) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(siegebreaker) or Spell(storm_bolt) or BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { IsEnraged() or target.TimeToDie() < 12 } and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(raging_blow) or IsEnraged() and target.HealthPercent() > 20 and Spell(wild_strike) or not False(raid_event_adds_exists) and Spell(bladestorm) or not Talent(unquenchable_thirst_talent) and Spell(shockwave) or not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and Spell(impending_victory) or Spell(bloodthirst)
 }
 
 ### actions.three_targets
@@ -517,10 +604,20 @@ AddFunction FurySingleMindedFuryThreeTargetsShortCdActions
 	}
 }
 
+AddFunction FurySingleMindedFuryThreeTargetsShortCdPostConditions
+{
+	{ not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(whirlwind) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FurySingleMindedFuryThreeTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
+}
+
+AddFunction FurySingleMindedFuryThreeTargetsCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or IsEnraged() and Spell(bladestorm) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(whirlwind) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
 }
 
 ### actions.two_targets
@@ -556,10 +653,20 @@ AddFunction FurySingleMindedFuryTwoTargetsShortCdActions
 	if IsEnraged() Spell(bladestorm)
 }
 
+AddFunction FurySingleMindedFuryTwoTargetsShortCdPostConditions
+{
+	{ not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or { target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) } and Spell(execute) or BuffPresent(meat_cleaver_buff) and Spell(raging_blow) or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Rage() > 75 and Spell(wild_strike) or Spell(bloodthirst) or Rage() > MaxRage() - 20 and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FurySingleMindedFuryTwoTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
+}
+
+AddFunction FurySingleMindedFuryTwoTargetsCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or IsEnraged() and Spell(bladestorm) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or { target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) } and Spell(execute) or BuffPresent(meat_cleaver_buff) and Spell(raging_blow) or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Rage() > 75 and Spell(wild_strike) or Spell(bloodthirst) or Rage() > MaxRage() - 20 and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
 }
 
 ###
@@ -597,48 +704,88 @@ AddFunction FuryTitansGripDefaultShortCdActions
 	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementShortCdActions()
-	#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
-	if not IsEnraged() or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FuryTitansGripSingleTargetShortCdActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FuryTitansGripTwoTargetsShortCdActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FuryTitansGripThreeTargetsShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FuryTitansGripAoeShortCdActions()
+
+	unless 0 > 5 and FuryTitansGripMovementShortCdPostConditions()
+	{
+		#berserker_rage,if=buff.enrage.down|(talent.unquenchable_thirst.enabled&buff.raging_blow.down)
+		if not IsEnraged() or Talent(unquenchable_thirst_talent) and BuffExpires(raging_blow_buff) Spell(berserker_rage)
+		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
+
+		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FuryTitansGripSingleTargetShortCdPostConditions()
+		{
+			#call_action_list,name=single_target,if=active_enemies=1
+			if Enemies() == 1 FuryTitansGripSingleTargetShortCdActions()
+
+			unless Enemies() == 1 and FuryTitansGripSingleTargetShortCdPostConditions()
+			{
+				#call_action_list,name=two_targets,if=active_enemies=2
+				if Enemies() == 2 FuryTitansGripTwoTargetsShortCdActions()
+
+				unless Enemies() == 2 and FuryTitansGripTwoTargetsShortCdPostConditions()
+				{
+					#call_action_list,name=three_targets,if=active_enemies=3
+					if Enemies() == 3 FuryTitansGripThreeTargetsShortCdActions()
+
+					unless Enemies() == 3 and FuryTitansGripThreeTargetsShortCdPostConditions()
+					{
+						#call_action_list,name=aoe,if=active_enemies>3
+						if Enemies() > 3 FuryTitansGripAoeShortCdActions()
+					}
+				}
+			}
+		}
+	}
 }
 
 AddFunction FuryTitansGripDefaultCdActions
 {
 	#pummel
 	InterruptActions()
-	#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-	if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
-	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
-	#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
-	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
-	#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
-	if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
-	#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
-	if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
-	#arcane_torrent,if=rage<rage.max-40
-	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FuryTitansGripSingleTargetCdActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
-	if Enemies() == 2 FuryTitansGripTwoTargetsCdActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
-	if Enemies() == 3 FuryTitansGripThreeTargetsCdActions()
-	#call_action_list,name=aoe,if=active_enemies>3
-	if Enemies() > 3 FuryTitansGripAoeCdActions()
+
+	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
+	{
+		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
+
+		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FuryTitansGripSingleTargetCdPostConditions()
+		{
+			#recklessness,if=((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled
+			if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) Spell(recklessness)
+			#avatar,if=(buff.recklessness.up|target.time_to_die<=30)
+			if BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 Spell(avatar)
+			#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
+			#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
+			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
+			#arcane_torrent,if=rage<rage.max-40
+			if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
+			#call_action_list,name=single_target,if=active_enemies=1
+			if Enemies() == 1 FuryTitansGripSingleTargetCdActions()
+
+			unless Enemies() == 1 and FuryTitansGripSingleTargetCdPostConditions()
+			{
+				#call_action_list,name=two_targets,if=active_enemies=2
+				if Enemies() == 2 FuryTitansGripTwoTargetsCdActions()
+
+				unless Enemies() == 2 and FuryTitansGripTwoTargetsCdPostConditions()
+				{
+					#call_action_list,name=three_targets,if=active_enemies=3
+					if Enemies() == 3 FuryTitansGripThreeTargetsCdActions()
+
+					unless Enemies() == 3 and FuryTitansGripThreeTargetsCdPostConditions()
+					{
+						#call_action_list,name=aoe,if=active_enemies>3
+						if Enemies() > 3 FuryTitansGripAoeCdActions()
+					}
+				}
+			}
+		}
+	}
 }
 
 ### actions.aoe
@@ -705,6 +852,16 @@ AddFunction FuryTitansGripMovementShortCdActions
 	if target.InRange(charge) Spell(heroic_leap)
 	#storm_bolt
 	Spell(storm_bolt)
+}
+
+AddFunction FuryTitansGripMovementShortCdPostConditions
+{
+	Spell(heroic_throw)
+}
+
+AddFunction FuryTitansGripMovementCdPostConditions
+{
+	Spell(storm_bolt) or Spell(heroic_throw)
 }
 
 ### actions.precombat
@@ -786,12 +943,22 @@ AddFunction FuryTitansGripSingleTargetShortCdActions
 	}
 }
 
+AddFunction FuryTitansGripSingleTargetShortCdPostConditions
+{
+	Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or not IsEnraged() } and Spell(bloodthirst) or BuffPresent(sudden_death_buff) and Spell(execute) or BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { IsEnraged() or target.TimeToDie() < 12 } and Spell(execute) or Spell(raging_blow) or IsEnraged() and target.HealthPercent() > 20 and Spell(wild_strike) or not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and Spell(impending_victory) or Spell(bloodthirst)
+}
+
 AddFunction FuryTitansGripSingleTargetCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
 	#recklessness,if=target.health.pct<20&raid_event.adds.exists
 	if target.HealthPercent() < 20 and False(raid_event_adds_exists) Spell(recklessness)
+}
+
+AddFunction FuryTitansGripSingleTargetCdPostConditions
+{
+	Rage() > 110 and target.HealthPercent() > 20 and Spell(wild_strike) or { not Talent(unquenchable_thirst_talent) and Rage() < 80 or not IsEnraged() } and Spell(bloodthirst) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and { not False(raid_event_adds_exists) or 600 > 60 or target.TimeToDie() < 40 } } and Spell(ravager) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(siegebreaker) or Spell(storm_bolt) or BuffPresent(bloodsurge_buff) and Spell(wild_strike) or { IsEnraged() or target.TimeToDie() < 12 } and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(raging_blow) or IsEnraged() and target.HealthPercent() > 20 and Spell(wild_strike) or not False(raid_event_adds_exists) and Spell(bladestorm) or not Talent(unquenchable_thirst_talent) and Spell(shockwave) or not Talent(unquenchable_thirst_talent) and target.HealthPercent() > 20 and Spell(impending_victory) or Spell(bloodthirst)
 }
 
 ### actions.three_targets
@@ -828,10 +995,20 @@ AddFunction FuryTitansGripThreeTargetsShortCdActions
 	}
 }
 
+AddFunction FuryTitansGripThreeTargetsShortCdPostConditions
+{
+	{ not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(whirlwind) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FuryTitansGripThreeTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
+}
+
+AddFunction FuryTitansGripThreeTargetsCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or IsEnraged() and Spell(bladestorm) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 2 and Spell(raging_blow) or BuffPresent(sudden_death_buff) and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(whirlwind) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
 }
 
 ### actions.two_targets
@@ -867,10 +1044,20 @@ AddFunction FuryTitansGripTwoTargetsShortCdActions
 	if IsEnraged() Spell(bladestorm)
 }
 
+AddFunction FuryTitansGripTwoTargetsShortCdPostConditions
+{
+	{ not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or { target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) } and Spell(execute) or BuffPresent(meat_cleaver_buff) and Spell(raging_blow) or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Rage() > 75 and Spell(wild_strike) or Spell(bloodthirst) or Rage() > MaxRage() - 20 and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FuryTitansGripTwoTargetsCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
+}
+
+AddFunction FuryTitansGripTwoTargetsCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or IsEnraged() and Spell(bladestorm) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or { target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) } and Spell(execute) or BuffPresent(meat_cleaver_buff) and Spell(raging_blow) or not BuffPresent(meat_cleaver_buff) and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Rage() > 75 and Spell(wild_strike) or Spell(bloodthirst) or Rage() > MaxRage() - 20 and Spell(whirlwind) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
 }
 
 ###
@@ -902,38 +1089,50 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	GetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
-	#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
-	if not BuffPresent(shield_charge_buff) and not SpellCooldown(shield_slam) > 0 or Charges(shield_charge) == 2 Spell(shield_charge)
-	#berserker_rage,if=buff.enrage.down
-	if not IsEnraged() Spell(berserker_rage)
-	#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-	if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
-	#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
-	if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
-	#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
-	if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
-	#call_action_list,name=single,if=active_enemies=1
-	if Enemies() == 1 ProtectionGladiatorSingleShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>=2
-	if Enemies() >= 2 ProtectionGladiatorAoeShortCdActions()
+
+	unless 0 > 5 and ProtectionGladiatorMovementShortCdPostConditions()
+	{
+		#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
+		if not BuffPresent(shield_charge_buff) and not SpellCooldown(shield_slam) > 0 or Charges(shield_charge) == 2 Spell(shield_charge)
+		#berserker_rage,if=buff.enrage.down
+		if not IsEnraged() Spell(berserker_rage)
+		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
+		if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
+		#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
+		if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
+		#call_action_list,name=single,if=active_enemies=1
+		if Enemies() == 1 ProtectionGladiatorSingleShortCdActions()
+
+		unless Enemies() == 1 and ProtectionGladiatorSingleShortCdPostConditions()
+		{
+			#call_action_list,name=aoe,if=active_enemies>=2
+			if Enemies() >= 2 ProtectionGladiatorAoeShortCdActions()
+		}
+	}
 }
 
 AddFunction ProtectionGladiatorDefaultCdActions
 {
 	#pummel
 	InterruptActions()
-	#avatar
-	Spell(avatar)
-	#bloodbath
-	Spell(bloodbath)
-	#blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(blood_fury_ap)
-	#berserking,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(berserking)
-	#arcane_torrent,if=rage<rage.max-40
-	if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
-	#potion,name=draenic_armor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up
-	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) UsePotionArmor()
+
+	unless 0 > 5 and ProtectionGladiatorMovementCdPostConditions()
+	{
+		#avatar
+		Spell(avatar)
+		#bloodbath
+		Spell(bloodbath)
+		#blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
+		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(blood_fury_ap)
+		#berserking,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
+		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(berserking)
+		#arcane_torrent,if=rage<rage.max-40
+		if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
+		#potion,name=draenic_armor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up
+		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) UsePotionArmor()
+	}
 }
 
 ### actions.aoe
@@ -991,6 +1190,16 @@ AddFunction ProtectionGladiatorMovementShortCdActions
 	Spell(storm_bolt)
 }
 
+AddFunction ProtectionGladiatorMovementShortCdPostConditions
+{
+	Spell(heroic_throw)
+}
+
+AddFunction ProtectionGladiatorMovementCdPostConditions
+{
+	Spell(storm_bolt) or Spell(heroic_throw)
+}
+
 ### actions.precombat
 
 AddFunction ProtectionGladiatorPrecombatMainActions
@@ -1042,6 +1251,11 @@ AddFunction ProtectionGladiatorSingleShortCdActions
 		#dragon_roar
 		Spell(dragon_roar)
 	}
+}
+
+AddFunction ProtectionGladiatorSingleShortCdPostConditions
+{
+	BuffStacks(unyielding_strikes_buff) > 0 and BuffStacks(unyielding_strikes_buff) < 6 and BuffRemaining(unyielding_strikes_buff) < 1.5 and Spell(devastate) or Spell(shield_slam) or Spell(revenge) or BuffPresent(sudden_death_buff) and Spell(execute) or Rage() > 60 and target.HealthPercent() < 20 and Spell(execute) or Spell(devastate)
 }
 
 ###
@@ -1145,17 +1359,21 @@ AddFunction ProtectionProtShortCdActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } and HealthPercent() < 80 Spell(enraged_regeneration)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeShortCdActions()
-	#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
-	if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
 
-	unless Spell(shield_slam) or Spell(revenge)
+	unless Enemies() > 3 and ProtectionProtAoeShortCdPostConditions()
 	{
-		#ravager
-		Spell(ravager)
-		#storm_bolt
-		Spell(storm_bolt)
-		#dragon_roar
-		Spell(dragon_roar)
+		#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
+		if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
+
+		unless Spell(shield_slam) or Spell(revenge)
+		{
+			#ravager
+			Spell(ravager)
+			#storm_bolt
+			Spell(storm_bolt)
+			#dragon_roar
+			Spell(dragon_roar)
+		}
 	}
 }
 
@@ -1171,10 +1389,14 @@ AddFunction ProtectionProtCdActions
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeCdActions()
-	#bloodbath,if=talent.bloodbath.enabled&((cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(cooldown.storm_bolt.remains=0&talent.storm_bolt.enabled)|talent.shockwave.enabled)
-	if Talent(bloodbath_talent) and { not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or not SpellCooldown(storm_bolt) > 0 and Talent(storm_bolt_talent) or Talent(shockwave_talent) } Spell(bloodbath)
-	#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
-	if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
+
+	unless Enemies() > 3 and ProtectionProtAoeCdPostConditions()
+	{
+		#bloodbath,if=talent.bloodbath.enabled&((cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(cooldown.storm_bolt.remains=0&talent.storm_bolt.enabled)|talent.shockwave.enabled)
+		if Talent(bloodbath_talent) and { not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or not SpellCooldown(storm_bolt) > 0 and Talent(storm_bolt_talent) or Talent(shockwave_talent) } Spell(bloodbath)
+		#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
+		if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
+	}
 }
 
 ### actions.prot_aoe
@@ -1232,12 +1454,22 @@ AddFunction ProtectionProtAoeShortCdActions
 	}
 }
 
+AddFunction ProtectionProtAoeShortCdPostConditions
+{
+	not target.DebuffPresent(deep_wounds_debuff) and Spell(thunder_clap) or BuffPresent(shield_block_buff) and Spell(shield_slam) or Spell(revenge) or Spell(thunder_clap) or Spell(shield_slam) or Spell(shield_slam) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(devastate)
+}
+
 AddFunction ProtectionProtAoeCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
 	#avatar
 	Spell(avatar)
+}
+
+AddFunction ProtectionProtAoeCdPostConditions
+{
+	not target.DebuffPresent(deep_wounds_debuff) and Spell(thunder_clap) or BuffPresent(shield_block_buff) and Spell(shield_slam) or { BuffPresent(avatar_buff) or SpellCooldown(avatar) > 10 or not Talent(avatar_talent) } and Spell(ravager) or { BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 10 or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(shockwave) or Spell(revenge) or Spell(thunder_clap) or Spell(bladestorm) or Spell(shield_slam) or Spell(storm_bolt) or Spell(shield_slam) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(devastate)
 }
 ]]
 	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")
@@ -1253,46 +1485,48 @@ do
 Include(ovale_warrior)
 
 ### Arms icons.
-AddCheckBox(opt_warrior_arms_aoe L(AOE) specialization=arms default)
 
-AddIcon specialization=arms help=shortcd enemies=1 checkbox=!opt_warrior_arms_aoe
+AddCheckBox(opt_warrior_arms_aoe L(AOE) default specialization=arms)
+
+AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=shortcd specialization=arms
 {
 	ArmsDefaultShortCdActions()
 }
 
-AddIcon specialization=arms help=shortcd checkbox=opt_warrior_arms_aoe
+AddIcon checkbox=opt_warrior_arms_aoe help=shortcd specialization=arms
 {
 	ArmsDefaultShortCdActions()
 }
 
-AddIcon specialization=arms help=main enemies=1
+AddIcon enemies=1 help=main specialization=arms
 {
 	if not InCombat() ArmsPrecombatMainActions()
 	ArmsDefaultMainActions()
 }
 
-AddIcon specialization=arms help=aoe checkbox=opt_warrior_arms_aoe
+AddIcon checkbox=opt_warrior_arms_aoe help=aoe specialization=arms
 {
 	if not InCombat() ArmsPrecombatMainActions()
 	ArmsDefaultMainActions()
 }
 
-AddIcon specialization=arms help=cd enemies=1 checkbox=!opt_warrior_arms_aoe
+AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
 	ArmsDefaultCdActions()
 }
 
-AddIcon specialization=arms help=cd checkbox=opt_warrior_arms_aoe
+AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
 	ArmsDefaultCdActions()
 }
 
 ### Fury icons.
-AddCheckBox(opt_warrior_fury_aoe L(AOE) specialization=fury default)
 
-AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_aoe
+AddCheckBox(opt_warrior_fury_aoe L(AOE) default specialization=fury)
+
+AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=shortcd specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
@@ -1304,7 +1538,7 @@ AddIcon specialization=fury help=shortcd enemies=1 checkbox=!opt_warrior_fury_ao
 	}
 }
 
-AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
+AddIcon checkbox=opt_warrior_fury_aoe help=shortcd specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
@@ -1316,7 +1550,7 @@ AddIcon specialization=fury help=shortcd checkbox=opt_warrior_fury_aoe
 	}
 }
 
-AddIcon specialization=fury help=main enemies=1
+AddIcon enemies=1 help=main specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
@@ -1330,7 +1564,7 @@ AddIcon specialization=fury help=main enemies=1
 	}
 }
 
-AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
+AddIcon checkbox=opt_warrior_fury_aoe help=aoe specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
@@ -1344,7 +1578,7 @@ AddIcon specialization=fury help=aoe checkbox=opt_warrior_fury_aoe
 	}
 }
 
-AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
+AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=cd specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
@@ -1358,7 +1592,7 @@ AddIcon specialization=fury help=cd enemies=1 checkbox=!opt_warrior_fury_aoe
 	}
 }
 
-AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
+AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
@@ -1373,9 +1607,10 @@ AddIcon specialization=fury help=cd checkbox=opt_warrior_fury_aoe
 }
 
 ### Protection icons.
-AddCheckBox(opt_warrior_protection_aoe L(AOE) specialization=protection default)
 
-AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_warrior_protection_aoe
+AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
+
+AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=shortcd specialization=protection
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
@@ -1387,7 +1622,7 @@ AddIcon specialization=protection help=shortcd enemies=1 checkbox=!opt_warrior_p
 	}
 }
 
-AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection_aoe
+AddIcon checkbox=opt_warrior_protection_aoe help=shortcd specialization=protection
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
@@ -1399,7 +1634,7 @@ AddIcon specialization=protection help=shortcd checkbox=opt_warrior_protection_a
 	}
 }
 
-AddIcon specialization=protection help=main enemies=1
+AddIcon enemies=1 help=main specialization=protection
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
@@ -1413,7 +1648,7 @@ AddIcon specialization=protection help=main enemies=1
 	}
 }
 
-AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection_aoe
+AddIcon checkbox=opt_warrior_protection_aoe help=aoe specialization=protection
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
@@ -1427,7 +1662,7 @@ AddIcon specialization=protection help=aoe checkbox=opt_warrior_protection_aoe
 	}
 }
 
-AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_warrior_protection_aoe
+AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=cd specialization=protection
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
@@ -1441,7 +1676,7 @@ AddIcon specialization=protection help=cd enemies=1 checkbox=!opt_warrior_protec
 	}
 }
 
-AddIcon specialization=protection help=cd checkbox=opt_warrior_protection_aoe
+AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{

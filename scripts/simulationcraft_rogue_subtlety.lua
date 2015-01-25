@@ -197,10 +197,18 @@ AddFunction SubtletyDefaultCdActions
 							{
 								#run_action_list,name=finisher,if=combo_points=5
 								if ComboPoints() == 5 SubtletyFinisherCdActions()
-								#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
-								if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorCdActions()
-								#run_action_list,name=pool
-								SubtletyPoolCdActions()
+
+								unless ComboPoints() == 5 and SubtletyFinisherCdPostConditions()
+								{
+									#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
+									if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorCdActions()
+
+									unless { ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and SubtletyGeneratorCdPostConditions()
+									{
+										#run_action_list,name=pool
+										SubtletyPoolCdActions()
+									}
+								}
 							}
 						}
 					}
@@ -233,6 +241,11 @@ AddFunction SubtletyFinisherCdActions
 		#run_action_list,name=pool
 		SubtletyPoolCdActions()
 	}
+}
+
+AddFunction SubtletyFinisherCdPostConditions
+{
+	{ { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 8 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and BuffRemaining(shadow_reflection_buff) < 10 } and target.TimeToDie() >= 8 and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or Spell(death_from_above) or { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or Spell(eviscerate)
 }
 
 ### actions.generator
@@ -269,6 +282,11 @@ AddFunction SubtletyGeneratorCdActions
 			SubtletyPoolCdActions()
 		}
 	}
+}
+
+AddFunction SubtletyGeneratorCdPostConditions
+{
+	not { SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush) } and { Enemies() > 1 and Spell(fan_of_knives) or { target.DebuffRemaining(hemorrhage_debuff) < BaseDuration(hemorrhage_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(hemorrhage_debuff) + BaseDuration(hemorrhage_debuff) + 8 and target.DebuffExpires(find_weakness_debuff) or not target.DebuffPresent(hemorrhage_debuff) or False(position_front) } and Spell(hemorrhage) or Energy() < 65 and EnergyRegenRate() < 16 and Spell(shuriken_toss) or { not Talent(death_from_above_talent) or Energy() >= MaxEnergy() - EnergyRegenRate() or target.TimeToDie() < 10 } and Spell(backstab) }
 }
 
 ### actions.pool

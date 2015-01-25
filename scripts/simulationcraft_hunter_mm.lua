@@ -94,19 +94,23 @@ AddFunction MarksmanshipDefaultShortCdActions
 	{
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
-		#explosive_trap,if=active_enemies>1
-		if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
-		#a_murder_of_crows
-		Spell(a_murder_of_crows)
-		#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
-		if FocusCastingRegen(dire_beast) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(dire_beast)
 
-		unless Spell(glaive_toss)
+		unless { target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) } and MarksmanshipCarefulAimShortCdPostConditions()
 		{
-			#powershot,if=cast_regen<focus.deficit
-			if FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
-			#barrage
-			Spell(barrage)
+			#explosive_trap,if=active_enemies>1
+			if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+			#a_murder_of_crows
+			Spell(a_murder_of_crows)
+			#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
+			if FocusCastingRegen(dire_beast) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(dire_beast)
+
+			unless Spell(glaive_toss)
+			{
+				#powershot,if=cast_regen<focus.deficit
+				if FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
+				#barrage
+				Spell(barrage)
+			}
 		}
 	}
 }
@@ -159,6 +163,11 @@ AddFunction MarksmanshipCarefulAimShortCdActions
 		#barrage,if=active_enemies>1
 		if Enemies() > 1 Spell(barrage)
 	}
+}
+
+AddFunction MarksmanshipCarefulAimShortCdPostConditions
+{
+	Enemies() > 2 and Spell(glaive_toss) or Spell(aimed_shot) or 50 + FocusCastingRegen(focusing_shot_marksmanship) < FocusDeficit() and Spell(focusing_shot_marksmanship) or Spell(steady_shot)
 }
 
 ### actions.precombat

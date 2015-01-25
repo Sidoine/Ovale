@@ -224,19 +224,23 @@ AddFunction MarksmanshipDefaultShortCdActions
 	{
 		#call_action_list,name=careful_aim,if=buff.careful_aim.up
 		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
-		#explosive_trap,if=active_enemies>1
-		if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
-		#a_murder_of_crows
-		Spell(a_murder_of_crows)
-		#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
-		if FocusCastingRegen(dire_beast) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(dire_beast)
 
-		unless Spell(glaive_toss)
+		unless { target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) } and MarksmanshipCarefulAimShortCdPostConditions()
 		{
-			#powershot,if=cast_regen<focus.deficit
-			if FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
-			#barrage
-			Spell(barrage)
+			#explosive_trap,if=active_enemies>1
+			if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+			#a_murder_of_crows
+			Spell(a_murder_of_crows)
+			#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
+			if FocusCastingRegen(dire_beast) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(dire_beast)
+
+			unless Spell(glaive_toss)
+			{
+				#powershot,if=cast_regen<focus.deficit
+				if FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
+				#barrage
+				Spell(barrage)
+			}
 		}
 	}
 }
@@ -289,6 +293,11 @@ AddFunction MarksmanshipCarefulAimShortCdActions
 		#barrage,if=active_enemies>1
 		if Enemies() > 1 Spell(barrage)
 	}
+}
+
+AddFunction MarksmanshipCarefulAimShortCdPostConditions
+{
+	Enemies() > 2 and Spell(glaive_toss) or Spell(aimed_shot) or 50 + FocusCastingRegen(focusing_shot_marksmanship) < FocusDeficit() and Spell(focusing_shot_marksmanship) or Spell(steady_shot)
 }
 
 ### actions.precombat
@@ -355,20 +364,24 @@ AddFunction SurvivalDefaultShortCdActions
 {
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeShortCdActions()
-	#a_murder_of_crows
-	Spell(a_murder_of_crows)
-	#black_arrow,if=!ticking
-	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 
-	unless Spell(explosive_shot)
+	unless Enemies() > 1 and SurvivalAoeShortCdPostConditions()
 	{
-		#dire_beast
-		Spell(dire_beast)
+		#a_murder_of_crows
+		Spell(a_murder_of_crows)
+		#black_arrow,if=!ticking
+		if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 
-		unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 } and Spell(arcane_shot)
+		unless Spell(explosive_shot)
 		{
-			#explosive_trap
-			if CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+			#dire_beast
+			Spell(dire_beast)
+
+			unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 } and Spell(arcane_shot)
+			{
+				#explosive_trap
+				if CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+			}
 		}
 	}
 }
@@ -390,8 +403,12 @@ AddFunction SurvivalDefaultCdActions
 	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
-	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))|target.time_to_die<=25
-	if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
+
+	unless Enemies() > 1 and SurvivalAoeCdPostConditions()
+	{
+		#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))|target.time_to_die<=25
+		if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
+	}
 }
 
 ### actions.aoe
@@ -443,10 +460,20 @@ AddFunction SurvivalAoeShortCdActions
 	}
 }
 
+AddFunction SurvivalAoeShortCdPostConditions
+{
+	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or Enemies() < 5 and Spell(explosive_shot) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
+}
+
 AddFunction SurvivalAoeCdActions
 {
 	#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up|buff.archmages_incandescence_agi.up))
 	if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_incandescence_agi_buff) } Spell(stampede)
+}
+
+AddFunction SurvivalAoeCdPostConditions
+{
+	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or Spell(barrage) or not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot) or target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) and Spell(explosive_trap) or Spell(a_murder_of_crows) or Spell(dire_beast) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or Spell(powershot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
 }
 
 ### actions.precombat
@@ -494,117 +521,120 @@ do
 Include(ovale_hunter)
 
 ### BeastMastery icons.
-AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) specialization=beast_mastery default)
 
-AddIcon specialization=beast_mastery help=shortcd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
+AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) default specialization=beast_mastery)
+
+AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon specialization=beast_mastery help=shortcd checkbox=opt_hunter_beast_mastery_aoe
+AddIcon checkbox=opt_hunter_beast_mastery_aoe help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
 	BeastMasteryDefaultShortCdActions()
 }
 
-AddIcon specialization=beast_mastery help=main enemies=1
+AddIcon enemies=1 help=main specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatMainActions()
 	BeastMasteryDefaultMainActions()
 }
 
-AddIcon specialization=beast_mastery help=aoe checkbox=opt_hunter_beast_mastery_aoe
+AddIcon checkbox=opt_hunter_beast_mastery_aoe help=aoe specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatMainActions()
 	BeastMasteryDefaultMainActions()
 }
 
-AddIcon specialization=beast_mastery help=cd enemies=1 checkbox=!opt_hunter_beast_mastery_aoe
+AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=cd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
 }
 
-AddIcon specialization=beast_mastery help=cd checkbox=opt_hunter_beast_mastery_aoe
+AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatCdActions()
 	BeastMasteryDefaultCdActions()
 }
 
 ### Marksmanship icons.
-AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) specialization=marksmanship default)
 
-AddIcon specialization=marksmanship help=shortcd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
+AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) default specialization=marksmanship)
+
+AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
 	MarksmanshipDefaultShortCdActions()
 }
 
-AddIcon specialization=marksmanship help=shortcd checkbox=opt_hunter_marksmanship_aoe
+AddIcon checkbox=opt_hunter_marksmanship_aoe help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
 	MarksmanshipDefaultShortCdActions()
 }
 
-AddIcon specialization=marksmanship help=main enemies=1
+AddIcon enemies=1 help=main specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatMainActions()
 	MarksmanshipDefaultMainActions()
 }
 
-AddIcon specialization=marksmanship help=aoe checkbox=opt_hunter_marksmanship_aoe
+AddIcon checkbox=opt_hunter_marksmanship_aoe help=aoe specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatMainActions()
 	MarksmanshipDefaultMainActions()
 }
 
-AddIcon specialization=marksmanship help=cd enemies=1 checkbox=!opt_hunter_marksmanship_aoe
+AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=cd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatCdActions()
 	MarksmanshipDefaultCdActions()
 }
 
-AddIcon specialization=marksmanship help=cd checkbox=opt_hunter_marksmanship_aoe
+AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatCdActions()
 	MarksmanshipDefaultCdActions()
 }
 
 ### Survival icons.
-AddCheckBox(opt_hunter_survival_aoe L(AOE) specialization=survival default)
 
-AddIcon specialization=survival help=shortcd enemies=1 checkbox=!opt_hunter_survival_aoe
+AddCheckBox(opt_hunter_survival_aoe L(AOE) default specialization=survival)
+
+AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=shortcd checkbox=opt_hunter_survival_aoe
+AddIcon checkbox=opt_hunter_survival_aoe help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
 	SurvivalDefaultShortCdActions()
 }
 
-AddIcon specialization=survival help=main enemies=1
+AddIcon enemies=1 help=main specialization=survival
 {
 	if not InCombat() SurvivalPrecombatMainActions()
 	SurvivalDefaultMainActions()
 }
 
-AddIcon specialization=survival help=aoe checkbox=opt_hunter_survival_aoe
+AddIcon checkbox=opt_hunter_survival_aoe help=aoe specialization=survival
 {
 	if not InCombat() SurvivalPrecombatMainActions()
 	SurvivalDefaultMainActions()
 }
 
-AddIcon specialization=survival help=cd enemies=1 checkbox=!opt_hunter_survival_aoe
+AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()
 }
 
-AddIcon specialization=survival help=cd checkbox=opt_hunter_survival_aoe
+AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
 	SurvivalDefaultCdActions()

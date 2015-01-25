@@ -82,8 +82,12 @@ AddFunction BrewmasterDefaultShortCdActions
 	if Talent(serenity_talent) and SpellCooldown(keg_smash) > 6 Spell(serenity)
 	#call_action_list,name=st,if=active_enemies<3
 	if Enemies() < 3 BrewmasterStShortCdActions()
-	#call_action_list,name=aoe,if=active_enemies>=3
-	if Enemies() >= 3 BrewmasterAoeShortCdActions()
+
+	unless Enemies() < 3 and BrewmasterStShortCdPostConditions()
+	{
+		#call_action_list,name=aoe,if=active_enemies>=3
+		if Enemies() >= 3 BrewmasterAoeShortCdActions()
+	}
 }
 
 AddFunction BrewmasterDefaultCdActions
@@ -246,10 +250,15 @@ AddFunction BrewmasterStShortCdActions
 	}
 }
 
+AddFunction BrewmasterStShortCdPostConditions
+{
+	BuffExpires(shuffle_buff) and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Spell(keg_smash) or Energy() + EnergyRegenRate() * GCD() < 100 and Spell(chi_wave) or Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) and Energy() + EnergyRegenRate() * GCD() < 100 and Spell(zen_sphere) or Chi() >= 3 and Spell(chi_explosion_tank) or Chi() >= 4 and Spell(blackout_kick) or BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() and Spell(blackout_kick) or BuffPresent(serenity_buff) and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(expel_harm) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(jab) or Spell(tiger_palm)
+}
+
 ###
 ### Windwalker
 ###
-# Based on SimulationCraft profile "Monk_Windwalker_1h_T17M".
+# Based on SimulationCraft profile "Monk_Windwalker_2h_T17M".
 #	class=monk
 #	spec=windwalker
 #	talents=0130023
@@ -294,8 +303,12 @@ AddFunction WindwalkerDefaultShortCdActions
 			if Talent(serenity_talent) and Chi() >= 2 and BuffPresent(tiger_power_buff) and target.DebuffPresent(rising_sun_kick_debuff) Spell(serenity)
 			#call_action_list,name=aoe,if=active_enemies>=3
 			if Enemies() >= 3 WindwalkerAoeShortCdActions()
-			#call_action_list,name=st,if=active_enemies<3
-			if Enemies() < 3 WindwalkerStShortCdActions()
+
+			unless Enemies() >= 3 and WindwalkerAoeShortCdPostConditions()
+			{
+				#call_action_list,name=st,if=active_enemies<3
+				if Enemies() < 3 WindwalkerStShortCdActions()
+			}
 		}
 	}
 }
@@ -322,8 +335,12 @@ AddFunction WindwalkerDefaultCdActions
 	{
 		#call_action_list,name=aoe,if=active_enemies>=3
 		if Enemies() >= 3 WindwalkerAoeCdActions()
-		#call_action_list,name=st,if=active_enemies<3
-		if Enemies() < 3 WindwalkerStCdActions()
+
+		unless Enemies() >= 3 and WindwalkerAoeCdPostConditions()
+		{
+			#call_action_list,name=st,if=active_enemies<3
+			if Enemies() < 3 WindwalkerStCdActions()
+		}
 	}
 }
 
@@ -380,6 +397,11 @@ AddFunction WindwalkerAoeShortCdActions
 	}
 }
 
+AddFunction WindwalkerAoeShortCdPostConditions
+{
+	Chi() >= 4 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(chi_explosion_melee) or Spell(rushing_jade_wind) or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick) or not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and MaxChi() - Chi() < 2 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(blackout_kick) or Spell(spinning_crane_kick) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 2 and Spell(jab) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 1 and Talent(chi_explosion_talent) and SpellCooldown(fists_of_fury) <= 3 and Spell(jab)
+}
+
 AddFunction WindwalkerAoeCdActions
 {
 	unless Chi() >= 4 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(chi_explosion_melee) or Spell(rushing_jade_wind) or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick) or Talent(rushing_jade_wind_talent) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury)
@@ -387,6 +409,11 @@ AddFunction WindwalkerAoeCdActions
 		#fortifying_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0
 		if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 Spell(fortifying_brew)
 	}
+}
+
+AddFunction WindwalkerAoeCdPostConditions
+{
+	Chi() >= 4 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(chi_explosion_melee) or Spell(rushing_jade_wind) or not Talent(rushing_jade_wind_talent) and Chi() == MaxChi() and Spell(rising_sun_kick) or Talent(rushing_jade_wind_talent) and BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury) or target.HealthPercent() < 10 and Spell(touch_of_death) or Talent(rushing_jade_wind_talent) and Talent(hurricane_strike_talent) and TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) and Spell(hurricane_strike) or not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or Talent(chi_burst_talent) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) and MaxChi() - Chi() < 2 and { SpellCooldown(fists_of_fury) > 3 or not Talent(rushing_jade_wind_talent) } and Spell(blackout_kick) or Spell(spinning_crane_kick) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 2 and Spell(jab) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() >= 1 and Talent(chi_explosion_talent) and SpellCooldown(fists_of_fury) <= 3 and Spell(jab)
 }
 
 ### actions.precombat
@@ -477,74 +504,76 @@ do
 Include(ovale_monk)
 
 ### Brewmaster icons.
-AddCheckBox(opt_monk_brewmaster_aoe L(AOE) specialization=brewmaster default)
 
-AddIcon specialization=brewmaster help=shortcd enemies=1 checkbox=!opt_monk_brewmaster_aoe
+AddCheckBox(opt_monk_brewmaster_aoe L(AOE) default specialization=brewmaster)
+
+AddIcon checkbox=!opt_monk_brewmaster_aoe enemies=1 help=shortcd specialization=brewmaster
 {
 	BrewmasterDefaultShortCdActions()
 }
 
-AddIcon specialization=brewmaster help=shortcd checkbox=opt_monk_brewmaster_aoe
+AddIcon checkbox=opt_monk_brewmaster_aoe help=shortcd specialization=brewmaster
 {
 	BrewmasterDefaultShortCdActions()
 }
 
-AddIcon specialization=brewmaster help=main enemies=1
+AddIcon enemies=1 help=main specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatMainActions()
 	BrewmasterDefaultMainActions()
 }
 
-AddIcon specialization=brewmaster help=aoe checkbox=opt_monk_brewmaster_aoe
+AddIcon checkbox=opt_monk_brewmaster_aoe help=aoe specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatMainActions()
 	BrewmasterDefaultMainActions()
 }
 
-AddIcon specialization=brewmaster help=cd enemies=1 checkbox=!opt_monk_brewmaster_aoe
+AddIcon checkbox=!opt_monk_brewmaster_aoe enemies=1 help=cd specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatCdActions()
 	BrewmasterDefaultCdActions()
 }
 
-AddIcon specialization=brewmaster help=cd checkbox=opt_monk_brewmaster_aoe
+AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatCdActions()
 	BrewmasterDefaultCdActions()
 }
 
 ### Windwalker icons.
-AddCheckBox(opt_monk_windwalker_aoe L(AOE) specialization=windwalker default)
 
-AddIcon specialization=windwalker help=shortcd enemies=1 checkbox=!opt_monk_windwalker_aoe
+AddCheckBox(opt_monk_windwalker_aoe L(AOE) default specialization=windwalker)
+
+AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=shortcd specialization=windwalker
 {
 	WindwalkerDefaultShortCdActions()
 }
 
-AddIcon specialization=windwalker help=shortcd checkbox=opt_monk_windwalker_aoe
+AddIcon checkbox=opt_monk_windwalker_aoe help=shortcd specialization=windwalker
 {
 	WindwalkerDefaultShortCdActions()
 }
 
-AddIcon specialization=windwalker help=main enemies=1
+AddIcon enemies=1 help=main specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatMainActions()
 	WindwalkerDefaultMainActions()
 }
 
-AddIcon specialization=windwalker help=aoe checkbox=opt_monk_windwalker_aoe
+AddIcon checkbox=opt_monk_windwalker_aoe help=aoe specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatMainActions()
 	WindwalkerDefaultMainActions()
 }
 
-AddIcon specialization=windwalker help=cd enemies=1 checkbox=!opt_monk_windwalker_aoe
+AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
 	WindwalkerDefaultCdActions()
 }
 
-AddIcon specialization=windwalker help=cd checkbox=opt_monk_windwalker_aoe
+AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
 	WindwalkerDefaultCdActions()
