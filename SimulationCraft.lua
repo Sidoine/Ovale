@@ -1170,7 +1170,7 @@ local SplitByTagState = nil
 SplitByTag = function(tag, node, nodeList, annotation)
 	local visitor = SPLIT_BY_TAG_VISITOR[node.type]
 	if not visitor then
-		OvaleSimulationCraft:Print("Unable to split-by-tag node of type '%s'.", node.type)
+		OvaleSimulationCraft:Error("Unable to split-by-tag node of type '%s'.", node.type)
 	else
 		return visitor(tag, node, nodeList, annotation)
 	end
@@ -1197,11 +1197,11 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
 					conditionNode = node
 				end
 			else
-				OvaleSimulationCraft:Print("Unable to determine tag for '%s'.", spellName)
+				OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s'.", spellName)
 				bodyNode = node
 			end
 		else
-			OvaleSimulationCraft:Print("Unable to determine spell ID and tag for '%s'.", node.asString)
+			OvaleSimulationCraft:Print("Warning: Unable to determine spell ID and tag for '%s'.", node.asString)
 			bodyNode = node
 		end
 	end
@@ -1283,7 +1283,7 @@ SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
 				bodyNode = node
 			end
 		else
-			OvaleSimulationCraft:Print("Unable to determine tag for '%s()'.", node.name)
+			OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s()'.", node.name)
 			bodyNode = node
 		end
 	end
@@ -1468,7 +1468,7 @@ local EmitOperandTrinket = nil
 Emit = function(parseNode, nodeList, annotation, action)
 	local visitor = EMIT_VISITOR[parseNode.type]
 	if not visitor then
-		OvaleSimulationCraft:Print("Unable to emit node of type '%s'.", parseNode.type)
+		OvaleSimulationCraft:Error("Unable to emit node of type '%s'.", parseNode.type)
 	else
 		return visitor(parseNode, nodeList, annotation, action)
 	end
