@@ -146,7 +146,7 @@ for _, filename in ipairs(files) do
 		output[#output + 1] = format('	local name = "%s"', name)
 		output[#output + 1] = format('	local desc = "[6.0] %s"', desc)
 		output[#output + 1] = "	local code = [["
-		output[#output + 1] = OvaleSimulationCraft:Emit(profile)
+		output[#output + 1] = OvaleSimulationCraft:Emit(profile, true)
 		output[#output + 1] = "]]"
 		output[#output + 1] = format('	OvaleScripts:RegisterScript("%s", name, desc, code, "%s")', profile.annotation.class, scriptType)
 		output[#output + 1] = "end"

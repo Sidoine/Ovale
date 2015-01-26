@@ -4629,7 +4629,7 @@ function OvaleSimulationCraft:EmitAST(profile)
 	return ast
 end
 
-function OvaleSimulationCraft:Emit(profile)
+function OvaleSimulationCraft:Emit(profile, noFinalNewLine)
 	local nodeList = {}
 	local ast = self:EmitAST(profile)
 	local annotation = profile.annotation
@@ -4674,6 +4674,10 @@ function OvaleSimulationCraft:Emit(profile)
 			output[#output + 1] = "# " .. symbol
 		end
 	end
+	-- Ensure that the script always ends in a blank line.
+	if not noFinalNewLine and output[#output] ~= "" then
+		output[#output + 1] = ""
+	end
 	local s = tconcat(output, "\n")
 	self_outputPool:Release(output)
 	OvaleAST:Release(ast)
@@ -4701,7 +4705,7 @@ function OvaleSimulationCraft:CreateOptions()
 							local profile = self:ParseProfile(self_lastSimC)
 							local code = ""
 							if profile then
-								code = self:Emit(profile) .. "\n"
+								code = self:Emit(profile)
 							end
 							-- Substitute spaces for tabs.
 							self_lastScript = gsub(code, "\t", "    ")
