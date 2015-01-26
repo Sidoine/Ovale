@@ -6,7 +6,7 @@
 --]]
 
 -- Constants.
-local profilesDirectory = "../simulationcraft"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
 local root = "../"
 local separator = string.rep("-", 80)
 
@@ -30,8 +30,10 @@ local ipairs = ipairs
 local strfind = string.find
 local strlen = string.len
 local strsub = string.sub
+local strlower = string.lower
 local strupper = string.upper
 local tinsert = table.insert
+local tremove = table.remove
 local tsort = table.sort
 
 -- Save original input and output handles.
@@ -46,6 +48,47 @@ do
 		tinsert(files, name)
 	end
 	dir:close()
+
+	-- Filter out invalid profile names.
+	local filter = {}
+	for _, name in ipairs(files) do
+		local ok = true
+		local lowername = strlower(name)
+
+		-- Lexer for the profile filename.
+		local tokenIterator = gmatch(lowername, "[^_.]+")
+
+		-- Profile names always end in ".simc".
+		ok = ok and strsub(lowername, -5, -1) == ".simc"
+
+		-- Profile names always start with a class name.
+		if ok then
+			-- The first token should be the class.
+			local class = tokenIterator()
+			-- SimulationCraft uses "death_knight" while WoW uses "deathknight".
+			local wowClass = class
+			if class == "death" then
+				local token = tokenIterator()
+				class = class .. "_" .. token
+				wowClass = wowClass .. token
+			end
+			if not SIMC_CLASS[wowClass] then
+				ok = false
+			end
+			-- Skip class driver profile that just forces other profiles to be run.
+			if ok and strfind(lowername, class .. "_t%d+[a-z].simc") then
+				ok = false
+			end
+		end
+		if not ok then
+			filter[name] = true
+		end
+	end
+	for k = #files, 1, -1 do
+		if filter[files[k]] then
+			tremove(files, k)
+		end
+	end
 	tsort(files)
 end
 
