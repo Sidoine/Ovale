@@ -2280,7 +2280,9 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		end
 	elseif modifier == "moving" then
 		local value = tonumber(Unparse(parseNode))
-		if value == 1 then
+		if value == 0 then
+			code = "not Speed() > 0"
+		else
 			code = "Speed() > 0"
 		end
 	elseif modifier == "sync" then
