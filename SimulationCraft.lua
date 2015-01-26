@@ -1514,6 +1514,15 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Scripts should be checking that there is least one pair of fully-depleted runes,
 			-- but they mostly don't, so add the check for all uses of Plague Leech.
 			conditionCode = "target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 }"
+		elseif class == "DRUID" and action == "pulverize" then
+			--[[
+				WORKAROUND: Work around Blizzard bug where Pulverize can only be used within 15s of
+				when the existing Lacerate stack was applied, regardless of how much time is left on
+				the DoT: http://us.battle.net/wow/en/forum/topic/15354966771
+			--]]
+			local debuffName = "lacerate_debuff"
+			AddSymbol(annotation, debuffName)
+			conditionCode = format("target.DebuffGain(%s) <= BaseDuration(%s)", debuffName, debuffName)
 		elseif class == "DRUID" and specialization == "guardian" and action == "rejuvenation" then
 			-- Only cast Rejuvenation as a guardian druid if it is Enhanced Rejuvenation (castable in bear form).
 			local spellName = "enhanced_rejuvenation"
