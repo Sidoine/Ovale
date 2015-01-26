@@ -60,6 +60,7 @@ project=
 topdir=
 releasedir=
 overwrite=
+skip_copying=
 skip_externals=
 skip_zipfile=
 
@@ -90,6 +91,7 @@ fi
 
 usage() {
 	echo "Usage: release.sh [-eoz] [-n name] [-r releasedir] [-t topdir]" >&2
+	echo "  -c               Skip copying files into the package directory." >&2
 	echo "  -e               Skip checkout of external repositories." >&2
 	echo "  -n name          Set the name of the addon." >&2
 	echo "  -o               Keep existing package directory; just overwrite contents." >&2
@@ -99,8 +101,12 @@ usage() {
 }
 
 # Process command-line options
-while getopts ":eon:r:t:z" opt; do
+while getopts ":ceon:r:t:z" opt; do
 	case $opt in
+	c)
+		# Skip copying files into the package directory.
+		skip_copying=true
+		;;
 	e)
 		# Skip checkout of external repositories.
 		skip_externals=true
@@ -195,10 +201,10 @@ fi
 
 # Variables set via .pkgmeta.
 changelog=
-changelog_markup=text
+changelog_markup="plain"
 enable_nolib_creation="not supported"
 ignore=
-license="LICENSE.txt"
+license=
 contents=
 
 ### Simple .pkgmeta YAML processor.
@@ -225,12 +231,19 @@ checkout_queued_external() {
 		echo "Getting checkout for $external_uri"
 		case $external_uri in
 		git:*)
-			$git clone "$external_uri" "$pkgdir/$external_dir"
+			if [ -n "$external_tag" -a "$external_tag" != "latest" ]; then
+				$git clone --branch "$external_tag" "$external_uri" "$pkgdir/$external_dir"
+			else
+				$git clone "$external_uri" "$pkgdir/$external_dir"
+			fi
 			$find "$pkgdir/$external_dir" -name .git -print | while IFS='' read -r dir; do
 				$rm -fr "$dir"
 			done
 			;;
 		svn:*)
+			if [ -n "$external_tag" -a "$external_tag" != "latest" ]; then
+				echo "Warning: SVN tag checkout for \`\`$external_tag'' must be given in the URI."
+			fi
 			$svn checkout "$external_uri" "$pkgdir/$external_dir"
 			$find "$pkgdir/$external_dir" -name .svn -print | while IFS='' read -r dir; do
 				$rm -fr "$dir"
@@ -342,73 +355,84 @@ contents="$package"
 
 # Copy files from working directory into the package directory.
 # Prune away any files in the .git and release directories.
-echo "Copying files into \`\`$pkgdir'':"
-$find "$topdir" -name .git -prune -o -name "${releasedir#$topdir/}" -prune -o -print | while read file; do
-	file=${file#$topdir/}
-	if [ "$file" != "$topdir" -a -f "$topdir/$file" ]; then
-		# Check if the file should be ignored.
-		ignored=
-		# Ignore files that start with a dot.
-		if [ -z "$ignored" ]; then
-			case $file in
-			.*)
-				echo "Ignoring: $file"
-				ignored=true
-				;;
-			esac
-		fi
-		# Ignore files matching patterns set via .pkgmeta "ignore".
-		if [ -z "$ignored" ]; then
-			list="$ignore:"
-			while [ -n "$list" ]; do
-				pattern=${list%%:*}
-				list=${list#*:}
+if [ -z "$skip_copying" ]; then
+	echo "Copying files into \`\`$pkgdir'':"
+	$find "$topdir" -name .git -prune -o -name "${releasedir#$topdir/}" -prune -o -print | while read file; do
+		file=${file#$topdir/}
+		if [ "$file" != "$topdir" -a -f "$topdir/$file" ]; then
+			# Check if the file should be ignored.
+			ignored=
+			# Ignore files that start with a dot.
+			if [ -z "$ignored" ]; then
 				case $file in
-				$pattern)
+				.*)
 					echo "Ignoring: $file"
 					ignored=true
-					break
 					;;
 				esac
-			done
-		fi
-		# Copy any unignored files into $pkgdir.
-		if [ -z "$ignored" ]; then
-			dir=${file%/*}
-			if [ "$dir" != "$file" ]; then
-				$mkdir -p "$pkgdir/$dir"
 			fi
-			# Check if the file matches a pattern for keyword replacement.
-			keyword="*.lua:*.md:*.toc:*.xml"
-			list="$keyword:"
-			replaced=
-			while [ -n "$list" ]; do
-				pattern=${list%%:*}
-				list=${list#*:}
-				case $file in
-				$pattern)
-					replaced=true
-					break
-					;;
-				esac
-			done
-			if [ -n "$replaced" -a -n "$version" ]; then
-				$sed -b "s/@project-version@/$version/g" "$topdir/$file" > "$pkgdir/$file"
-				if $cmp -s "$topdir/$file" "$pkgdir/$file"; then
-					echo "Copied: $file"
-				else
-					echo "Replaced repository keywords: $file"
+			# Ignore files matching patterns set via .pkgmeta "ignore".
+			if [ -z "$ignored" ]; then
+				list="$ignore:"
+				while [ -n "$list" ]; do
+					pattern=${list%%:*}
+					list=${list#*:}
+					case $file in
+					$pattern)
+						echo "Ignoring: $file"
+						ignored=true
+						break
+						;;
+					esac
+				done
+			fi
+			# Copy any unignored files into $pkgdir.
+			if [ -z "$ignored" ]; then
+				dir=${file%/*}
+				if [ "$dir" != "$file" ]; then
+					$mkdir -p "$pkgdir/$dir"
 				fi
-			else
-				$cp "$topdir/$file" "$pkgdir/$dir"
-				echo "Copied: $file"
+				# Check if the file matches a pattern for keyword replacement.
+				keyword="*.lua:*.md:*.toc:*.xml"
+				list="$keyword:"
+				replaced=
+				while [ -n "$list" ]; do
+					pattern=${list%%:*}
+					list=${list#*:}
+					case $file in
+					$pattern)
+						replaced=true
+						break
+						;;
+					esac
+				done
+				if [ -n "$replaced" -a -n "$version" ]; then
+					$sed -b "s/@project-version@/$version/g" "$topdir/$file" > "$pkgdir/$file"
+					if $cmp -s "$topdir/$file" "$pkgdir/$file"; then
+						echo "Copied: $file"
+					else
+						echo "Replaced repository keywords: $file"
+					fi
+				else
+					$cp "$topdir/$file" "$pkgdir/$dir"
+					echo "Copied: $file"
+				fi
 			fi
 		fi
-	fi
-done
+	done
+fi
 
 # Create a default license if one doesn't exist.
-if [ -n "$license" -a ! -f "$pkgdir/$license" ]; then
+create_license=
+if [ -z "$license" ]; then
+	license="LICENSE.txt"
+	create_license=true
+fi
+if [ ! -f "$pkgdir/$license" ]; then
+	create_license=true
+fi
+if [ -n "$create_license" ]; then
+	echo "Generating default license into $license."
 	echo "All Rights Reserved." > "$pkgdir/$license"
 	unix2dos "$pkgdir/$license"
 fi
@@ -516,32 +540,44 @@ fi
 : ${project:="$package"}
 
 # Create changelog of commits since the previous release tag.
+create_changelog=
 if [ -n "$version" ]; then
 	if [ -z "$changelog" ]; then
 		changelog="CHANGELOG.txt"
+		create_changelog=true
 	fi
-	if [ -n "$rtag" ]; then
-		echo "Generating changelog of commits since $rtag into $changelog."
-		change_string="Changes from version $rtag:"
-		git_commit_range="$rtag..HEAD"
-	else
-		echo "Generating changelog of commits into $changelog."
-		change_string="All changes:"
-		git_commit_range=
+	if [ ! -f "$pkgdir/$changelog" ]; then
+		create_changelog=true
 	fi
-	if [ -n "$version" ]; then
-		project_string="$project $version"
-	else
-		project_string="$project (unreleased)"
-	fi
-	$cat > "$pkgdir/$changelog" << EOF
+	if [ -n "$create_changelog" ]; then
+		if [ -n "$rtag" ]; then
+			echo "Generating changelog of commits since $rtag into $changelog."
+			change_string="Changes from version $rtag:"
+			git_commit_range="$rtag..HEAD"
+		else
+			echo "Generating changelog of commits into $changelog."
+			change_string="All changes:"
+			git_commit_range=
+		fi
+		change_string_underline=`echo "$change_string" | sed -e "s/./-/g"`
+		if [ -n "$version" ]; then
+			project_string="$project $version"
+		else
+			project_string="$project (unreleased)"
+		fi
+		project_string_underline=`echo "$project_string" | sed -e "s/./=/g"`
+		$cat > "$pkgdir/$changelog" << EOF
 $project_string
+$project_string_underline
 
 $change_string
+$change_string_underline
 
 EOF
-	$git log $git_commit_range --pretty=format:"- %B" >> "$pkgdir/$changelog"
-	unix2dos "$pkgdir/$changelog"
+		$git log $git_commit_range --pretty=format:"###   %B" |
+			$sed -e "s/^/    /g" -e "s/^ *$//g" -e "s/^    ###/-/g" >> "$pkgdir/$changelog"
+		unix2dos "$pkgdir/$changelog"
+	fi
 fi
 
 # Creating the final zipfile for the addon.
