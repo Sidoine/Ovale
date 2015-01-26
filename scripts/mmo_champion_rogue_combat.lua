@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Combat_T17M".
 #	class=rogue
 #	spec=combat
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#cZ!2000010
+#	talents=3000021
 #	glyphs=energy/disappearance
 
 Include(ovale_common)
@@ -131,8 +131,8 @@ AddFunction CombatFinisherMainActions
 	Spell(death_from_above)
 	unless SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above)
 	{
-		#eviscerate
-		Spell(eviscerate)
+		#eviscerate,if=(!talent.death_from_above.enabled|cooldown.death_from_above.remains)
+		if not Talent(death_from_above_talent) or SpellCooldown(death_from_above) > 0 Spell(eviscerate)
 	}
 }
 
@@ -235,6 +235,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # deadly_poison
 # deadly_throw
 # death_from_above
+# death_from_above_talent
 # deep_insight_buff
 # draenic_agility_potion
 # eviscerate

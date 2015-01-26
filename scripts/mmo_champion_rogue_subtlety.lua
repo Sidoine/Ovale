@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Subtlety_T17M_mmo_simple_wait_garr_amb_dance".
 #	class=rogue
 #	spec=subtlety
-#	talents=http://us.battle.net/wow/en/tool/talent-calculator#cb!1000011
+#	talents=2000022
 #	glyphs=energy/hemorrhaging_veins/vanish
 
 Include(ovale_common)
