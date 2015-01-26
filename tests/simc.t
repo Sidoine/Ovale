@@ -8,6 +8,7 @@
 -- Constants.
 local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
 local root = "../"
+local profileSeparator = string.rep("=", 80)
 local separator = string.rep("-", 80)
 
 local SIMC_CLASS = {
@@ -24,6 +25,7 @@ local SIMC_CLASS = {
 	warrior = true,
 }
 
+local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
 local ipairs = ipairs
@@ -138,16 +140,33 @@ for _, name in ipairs(files) do
 		-- Enter sandbox.
 		setfenv(1, sandbox)
 
+		local OvaleAST = Ovale.OvaleAST
+		local OvaleCompile = Ovale.OvaleCompile
+		local OvaleScripts = Ovale.OvaleScripts
 		local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
 
 		-- Parse SimulationCraft profile and emit the corresponding Ovale script.
 		local profile = OvaleSimulationCraft:ParseProfile(simc)
 		if profile then
-			print(separator)
-			print(">>>", name)
+			print(profileSeparator)
+			print("#", name)
 			print(OvaleSimulationCraft:Unparse(profile))
 			print(separator)
-			print(OvaleSimulationCraft:Emit(profile))
+			local code = OvaleSimulationCraft:Emit(profile)
+			print(code)
+			print(separator)
+			print(format("Compiling script for \`\`%s'':", name))
+			if strfind(code, "FIXME_") then
+				print("FIXME symbols need to be resolved.")
+			else
+				local source = "custom"
+				OvaleScripts:RegisterScript(class, source, source, code, "script")
+				local ast = OvaleAST:ParseScript(source)
+				if ast then
+					OvaleCompile:EvaluateScript(ast, true)
+					OvaleAST:Release(ast)
+				end
+			end
 		end
 	end
 end
