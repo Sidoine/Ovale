@@ -439,8 +439,8 @@ AddFunction RestorationShortCdActions
 {
 	if Talent(primal_elementalist_talent) and pet.Present()
 	{
-		if TotemPresent(fire_elemental_totem) and BuffExpires(pet_empower any=1) Spell(pet_empower)
-		if TotemPresent(earth totem=earth_elemental_totem) and BuffExpires(pet_reinforce any=1) Spell(pet_reinforce)
+		if TotemPresent(fire_elemental_totem) and BuffExpires(fire_elemental_totem_empower_buff any=1) Spell(fire_elemental_totem_empower)
+		if TotemPresent(earth totem=earth_elemental_totem) and BuffExpires(earth_elemental_totem_reinforce_buff any=1) Spell(earth_elemental_totem_reinforce)
 	}
 	Spell(unleash_life)
 }

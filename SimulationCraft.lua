@@ -1013,7 +1013,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
 	AddDisambiguation("arcane_charge_buff",		"arcane_charge_debuff",			"MAGE",			"arcane")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"MAGE")
-	AddDisambiguation("water_jet",				"pet_water_jet",				"MAGE",			"frost")
+	AddDisambiguation("water_jet",				"water_elemental_water_jet",	"MAGE",			"frost")
 	-- Monk
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_chi",			"MONK")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"MONK")
@@ -2937,6 +2937,8 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 					ok, node = EmitOperandCharacter(petOperand, parseNode, nodeList, annotation, action, target)
 				end
 				if not ok then
+					-- Prefix the pet ability name with the name of the pet.
+					petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
 					if property == "buff" then
 						ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
 					elseif property == "cooldown" then
