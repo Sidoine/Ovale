@@ -168,6 +168,7 @@ OvaleData.buffSpellList =
 	healing_reduced_debuff = {
 		[  8680] = true, -- Wound Poison (rogue)
 		[ 54680] = true, -- Monstrous Bite (devilsaur)
+		[115625] = true, -- Mortal Cleave (wrathguard)
 		[115804] = true, -- Mortal Wounds (arms/fury warriors, windwalker monk, warlock, carrion bird, scorpid)
 	},
 
