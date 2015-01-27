@@ -2699,6 +2699,12 @@ do
 				code = "RetributionTimeToHPG()"
 				annotation.time_to_hpg_melee = class
 			end
+		elseif class == "PRIEST" and operand == "shadowy_apparitions_in_flight" then
+			--[[
+				Ovale does not currently track Shadowy Apparitions.  For now, always
+				assume there is one in flight.
+			--]]
+			code = "1"
 		elseif class == "ROGUE" and operand == "anticipation_charges" then
 			local name = "anticipation_buff"
 			code = format("BuffStacks(%s)", name)
