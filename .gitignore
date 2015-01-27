@@ -1,5 +1,6 @@
 ChangeLog*
 CHANGELOG*
+*.tmp
 libs/*
 !libs/*.xml
 release/**
