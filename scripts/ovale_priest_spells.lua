@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_priest_spells"
-	local desc = "[6.0.2] Ovale: Priest spells"
+	local desc = "[6.1] Ovale: Priest spells"
 	local code = [[
 # Priest spells and functions.
 
@@ -150,6 +150,7 @@ Define(mind_flay 15407)
 	SpellRequire(mind_flay replace insanity=buff,shadow_word_insanity_buff talent=insanity_talent)
 Define(mind_sear 48045)
 	SpellInfo(mind_sear channel=5 haste=spell)
+	SpellRequire(mind_sear replace searing_insanity=buff,shadow_word_insanity_buff talent=insanity_talent)
 Define(mind_spike 73510)
 	SpellAddBuff(mind_spike surge_of_darkness_buff=-1 if_spell=surge_of_darkness)
 	SpellAddTargetDebuff(mind_spike devouring_plague_debuff=0,buff,!surge_of_darkness_buff)
@@ -205,6 +206,10 @@ Define(renew_buff 139)
 	SpellInfo(renew_buff duration=12 haste=spell tick=3)
 	SpellInfo(renew_buff addduration=-3 glyph=glyph_of_renew)
 	SpellInfo(renew_buff addduration=3 if_spell=enhanced_renew)
+Define(searing_insanity 48045)
+	SpellInfo(searing_insanity channel=5 haste=spell)
+	SpellInfo(searing_insanity unusable=1 talent=!insanity_talent)
+	SpellRequire(searing_insanity unusable 1=buff,!shadow_word_insanity_buff talent=insanity_talent)
 Define(serendipity 63733)
 Define(serendipity_buff 63735)
 	SpellInfo(serendipity_buff duration=20 max_stacks=2)
