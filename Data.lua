@@ -35,10 +35,13 @@ local TRINKET_USE_NAMES = { "proc", "stacking_proc", "stacking_stat", "stat" }
 --<private-static-properties>
 
 --<public-static-properties>
+-- Item information from the current script (by item ID).
+OvaleData.itemInfo = {}
+-- Item lists.
 OvaleData.itemList = {}
---spell info from the current script (by spellId)
+-- Spell information from the current script (by spell ID).
 OvaleData.spellInfo = {}
-
+-- Spell lists.
 OvaleData.buffSpellList =
 {
 	-- Debuffs
@@ -427,7 +430,8 @@ function OvaleData:UnregisterRequirement(name)
 	self_requirement[name] = nil
 end
 
-function OvaleData:ResetSpellInfo()
+function OvaleData:Reset()
+	self.itemInfo = {}
 	self.spellInfo = {}
 end
 

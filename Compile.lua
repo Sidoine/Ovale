@@ -232,18 +232,25 @@ local function EvaluateItemInfo(node)
 	local ok = true
 	local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
 	if itemId and TestConditions(positionalParams, namedParams) then
-		if namedParams.proc then
-			-- Add the buff for this item proc to the spell list "item_proc_<proc>".
-			local buff = tonumber(namedParams.buff)
-			if buff then
-				local name = "item_proc_" .. namedParams.proc
-				local list = OvaleData.buffSpellList[name] or {}
-				list[buff] = true
-				OvaleData.buffSpellList[name] = list
-			else
-				ok = false
+		local ii = OvaleData.itemInfo[itemId] or {}
+		for k, v in pairs(namedParams) do
+			if k == "proc" then
+				-- Add the buff for this item proc to the spell list "item_proc_<proc>".
+				local buff = tonumber(namedParams.buff)
+				if buff then
+					local name = "item_proc_" .. namedParams.proc
+					local list = OvaleData.buffSpellList[name] or {}
+					list[buff] = true
+					OvaleData.buffSpellList[name] = list
+				else
+					ok = false
+					break
+				end
+			elseif not OvaleAST.PARAMETER_KEYWORD[k] then
+				ii[k] = v
 			end
 		end
+		OvaleData.itemInfo[itemId] = ii
 	end
 	return ok
 end
@@ -533,7 +540,7 @@ function OvaleCompile:EvaluateScript(ast, forceEvaluation)
 		self_compileOnItems = false
 		self_compileOnStances = false
 		wipe(self_icon)
-		OvaleData:ResetSpellInfo()
+		OvaleData:Reset()
 		OvaleCooldown:ResetSharedCooldowns()
 		self_timesEvaluated = self_timesEvaluated + 1
 		self.serial = self_serial
