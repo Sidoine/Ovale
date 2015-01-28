@@ -4287,25 +4287,27 @@ local function InsertSupportingDefines(child, annotation)
 	return count
 end
 
-local function GenerateIconBody(output, tag, profile)
+local function GenerateIconBody(tag, profile)
 	local annotation = profile.annotation
 	local precombatName = OvaleFunctionName("precombat", annotation)
 	local defaultName = OvaleFunctionName("_default", annotation)
 
 	local precombatBodyName, precombatConditionName = OvaleTaggedFunctionName(precombatName, tag)
 	local defaultBodyName, defaultConditionName = OvaleTaggedFunctionName(defaultName, tag)
+	local code
 	if profile["actions.precombat"] then
-		local code = [[
+		local fmt = [[
 			if not InCombat() %s()
 			unless not InCombat() and %s()
 			{
 				%s()
 			}
 		]]
-		tinsert(output, format(code, precombatBodyName, precombatConditionName, defaultBodyName))
+		code = format(fmt, precombatBodyName, precombatConditionName, defaultBodyName)
 	else
-		tinsert(output, defaultBodyName .. "()")
+		code = defaultBodyName .. "()"
 	end
+	return code
 end
 --</private-static-methods>
 
@@ -4550,7 +4552,6 @@ function OvaleSimulationCraft:EmitAST(profile)
 		local lowerclass = strlower(class)
 		local aoeToggle = "opt_" .. lowerclass .. "_" .. specialization .. "_aoe"
 
-		local output = self_outputPool:Get()
 		-- Icon headers.
 		do
 			local commentNode = OvaleAST:NewNode(nodeList)
@@ -4563,69 +4564,74 @@ function OvaleSimulationCraft:EmitAST(profile)
 		end
 		-- Short CD rotation.
 		do
-			wipe(output)
-			output[#output + 1] = format("AddIcon checkbox=!%s enemies=1 help=shortcd specialization=%s", aoeToggle, specialization)
-			output[#output + 1] = "{"
-			GenerateIconBody(output, "shortcd", profile)
-			output[#output + 1] = "}"
-			local code = tconcat(output, "\n")
+			local fmt = [[
+				AddIcon checkbox=!%s enemies=1 help=shortcd specialization=%s
+				{
+					%s
+				}
+			]]
+			local code = format(fmt, aoeToggle, specialization, GenerateIconBody("shortcd", profile))
 			local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
 			tinsert(child, node)
 		end
 		do
-			wipe(output)
-			output[#output + 1] = format("AddIcon checkbox=%s help=shortcd specialization=%s", aoeToggle, specialization)
-			output[#output + 1] = "{"
-			GenerateIconBody(output, "shortcd", profile)
-			output[#output + 1] = "}"
-			local code = tconcat(output, "\n")
+			local fmt = [[
+				AddIcon checkbox=%s help=shortcd specialization=%s
+				{
+					%s
+				}
+			]]
+			local code = format(fmt, aoeToggle, specialization, GenerateIconBody("shortcd", profile))
 			local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
 			tinsert(child, node)
 		end
 		-- Single-target rotation.
 		do
-			wipe(output)
-			output[#output + 1] = format("AddIcon enemies=1 help=main specialization=%s", specialization)
-			output[#output + 1] = "{"
-			GenerateIconBody(output, "main", profile)
-			output[#output + 1] = "}"
-			local code = tconcat(output, "\n")
+			local fmt = [[
+				AddIcon enemies=1 help=main specialization=%s
+				{
+					%s
+				}
+			]]
+			local code = format(fmt, specialization, GenerateIconBody("main", profile))
 			local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
 			tinsert(child, node)
 		end
 		-- AoE rotation.
 		do
-			wipe(output)
-			output[#output + 1] = format("AddIcon checkbox=%s help=aoe specialization=%s", aoeToggle, specialization)
-			output[#output + 1] = "{"
-			GenerateIconBody(output, "main", profile)
-			output[#output + 1] = "}"
-			local code = tconcat(output, "\n")
+			local fmt = [[
+				AddIcon checkbox=%s help=aoe specialization=%s
+				{
+					%s
+				}
+			]]
+			local code = format(fmt, aoeToggle, specialization, GenerateIconBody("main", profile))
 			local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
 			tinsert(child, node)
 		end
 		-- CD rotation.
 		do
-			wipe(output)
-			output[#output + 1] = format("AddIcon checkbox=!%s enemies=1 help=cd specialization=%s", aoeToggle, specialization)
-			output[#output + 1] = "{"
-			GenerateIconBody(output, "cd", profile)
-			output[#output + 1] = "}"
-			local code = tconcat(output, "\n")
+			local fmt = [[
+				AddIcon checkbox=!%s enemies=1 help=cd specialization=%s
+				{
+					%s
+				}
+			]]
+			local code = format(fmt, aoeToggle, specialization, GenerateIconBody("cd", profile))
 			local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
 			tinsert(child, node)
 		end
 		do
-			wipe(output)
-			output[#output + 1] = format("AddIcon checkbox=%s help=cd specialization=%s", aoeToggle, specialization)
-			output[#output + 1] = "{"
-			GenerateIconBody(output, "cd", profile)
-			output[#output + 1] = "}"
-			local code = tconcat(output, "\n")
+			local fmt = [[
+				AddIcon checkbox=%s help=cd specialization=%s
+				{
+					%s
+				}
+			]]
+			local code = format(fmt, aoeToggle, specialization, GenerateIconBody("cd", profile))
 			local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
 			tinsert(child, node)
 		end
-		self_outputPool:Release(output)
 
 		-- Walk the AST and remove empty and unused functions.
 		Mark(ast)
