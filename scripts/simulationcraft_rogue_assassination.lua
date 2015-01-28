@@ -156,6 +156,11 @@ AddFunction AssassinationPrecombatShortCdActions
 	}
 }
 
+AddFunction AssassinationPrecombatShortCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and Spell(slice_and_dice)
+}
+
 AddFunction AssassinationPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
@@ -166,6 +171,11 @@ AddFunction AssassinationPrecombatCdActions
 	}
 }
 
+AddFunction AssassinationPrecombatCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and Spell(slice_and_dice)
+}
+
 ### Assassination icons.
 
 AddCheckBox(opt_rogue_assassination_aoe L(AOE) default specialization=assassination)
@@ -173,13 +183,19 @@ AddCheckBox(opt_rogue_assassination_aoe L(AOE) default specialization=assassinat
 AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
-	AssassinationDefaultShortCdActions()
+	unless not InCombat() and AssassinationPrecombatShortCdPostConditions()
+	{
+		AssassinationDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
-	AssassinationDefaultShortCdActions()
+	unless not InCombat() and AssassinationPrecombatShortCdPostConditions()
+	{
+		AssassinationDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=assassination
@@ -197,13 +213,19 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=aoe specialization=assassinati
 AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
-	AssassinationDefaultCdActions()
+	unless not InCombat() and AssassinationPrecombatCdPostConditions()
+	{
+		AssassinationDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
-	AssassinationDefaultCdActions()
+	unless not InCombat() and AssassinationPrecombatCdPostConditions()
+	{
+		AssassinationDefaultCdActions()
+	}
 }
 
 ### Required symbols

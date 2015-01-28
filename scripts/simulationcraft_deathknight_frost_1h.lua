@@ -308,6 +308,11 @@ AddFunction FrostDualWieldPrecombatShortCdActions
 	}
 }
 
+AddFunction FrostDualWieldPrecombatShortCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
+}
+
 AddFunction FrostDualWieldPrecombatCdActions
 {
 	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
@@ -318,6 +323,11 @@ AddFunction FrostDualWieldPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FrostDualWieldPrecombatCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
 }
 
 ### actions.single_target
@@ -416,13 +426,19 @@ AddCheckBox(opt_deathknight_frost_aoe L(AOE) default specialization=frost)
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatShortCdActions()
-	FrostDualWieldDefaultShortCdActions()
+	unless not InCombat() and FrostDualWieldPrecombatShortCdPostConditions()
+	{
+		FrostDualWieldDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatShortCdActions()
-	FrostDualWieldDefaultShortCdActions()
+	unless not InCombat() and FrostDualWieldPrecombatShortCdPostConditions()
+	{
+		FrostDualWieldDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=frost
@@ -440,13 +456,19 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=aoe specialization=frost
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatCdActions()
-	FrostDualWieldDefaultCdActions()
+	unless not InCombat() and FrostDualWieldPrecombatCdPostConditions()
+	{
+		FrostDualWieldDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 {
 	if not InCombat() FrostDualWieldPrecombatCdActions()
-	FrostDualWieldDefaultCdActions()
+	unless not InCombat() and FrostDualWieldPrecombatCdPostConditions()
+	{
+		FrostDualWieldDefaultCdActions()
+	}
 }
 
 ### Required symbols

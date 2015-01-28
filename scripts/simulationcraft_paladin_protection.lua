@@ -480,6 +480,11 @@ AddFunction ProtectionPrecombatMainActions
 	Spell(sacred_shield)
 }
 
+AddFunction ProtectionPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+}
+
 AddFunction ProtectionPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
@@ -490,18 +495,29 @@ AddFunction ProtectionPrecombatCdActions
 	}
 }
 
+AddFunction ProtectionPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+}
+
 ### Protection icons.
 
 AddCheckBox(opt_paladin_protection_aoe L(AOE) default specialization=protection)
 
 AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=shortcd specialization=protection
 {
-	ProtectionDefaultShortCdActions()
+	unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+	{
+		ProtectionDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_paladin_protection_aoe help=shortcd specialization=protection
 {
-	ProtectionDefaultShortCdActions()
+	unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+	{
+		ProtectionDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=protection
@@ -519,13 +535,19 @@ AddIcon checkbox=opt_paladin_protection_aoe help=aoe specialization=protection
 AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=cd specialization=protection
 {
 	if not InCombat() ProtectionPrecombatCdActions()
-	ProtectionDefaultCdActions()
+	unless not InCombat() and ProtectionPrecombatCdPostConditions()
+	{
+		ProtectionDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 {
 	if not InCombat() ProtectionPrecombatCdActions()
-	ProtectionDefaultCdActions()
+	unless not InCombat() and ProtectionPrecombatCdPostConditions()
+	{
+		ProtectionDefaultCdActions()
+	}
 }
 
 ### Required symbols

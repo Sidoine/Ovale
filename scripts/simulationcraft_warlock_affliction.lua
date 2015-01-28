@@ -111,6 +111,11 @@ AddFunction AfflictionPrecombatShortCdActions
 	}
 }
 
+AddFunction AfflictionPrecombatShortCdPostConditions
+{
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent)
+}
+
 AddFunction AfflictionPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
@@ -128,6 +133,11 @@ AddFunction AfflictionPrecombatCdActions
 	}
 }
 
+AddFunction AfflictionPrecombatCdPostConditions
+{
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+}
+
 ### Affliction icons.
 
 AddCheckBox(opt_warlock_affliction_aoe L(AOE) default specialization=affliction)
@@ -135,13 +145,19 @@ AddCheckBox(opt_warlock_affliction_aoe L(AOE) default specialization=affliction)
 AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=shortcd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatShortCdActions()
-	AfflictionDefaultShortCdActions()
+	unless not InCombat() and AfflictionPrecombatShortCdPostConditions()
+	{
+		AfflictionDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warlock_affliction_aoe help=shortcd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatShortCdActions()
-	AfflictionDefaultShortCdActions()
+	unless not InCombat() and AfflictionPrecombatShortCdPostConditions()
+	{
+		AfflictionDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=affliction
@@ -159,13 +175,19 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
 AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatCdActions()
-	AfflictionDefaultCdActions()
+	unless not InCombat() and AfflictionPrecombatCdPostConditions()
+	{
+		AfflictionDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 {
 	if not InCombat() AfflictionPrecombatCdActions()
-	AfflictionDefaultCdActions()
+	unless not InCombat() and AfflictionPrecombatCdPostConditions()
+	{
+		AfflictionDefaultCdActions()
+	}
 }
 
 ### Required symbols

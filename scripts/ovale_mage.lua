@@ -456,6 +456,11 @@ AddFunction ArcanePrecombatShortCdActions
 	}
 }
 
+AddFunction ArcanePrecombatShortCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(arcane_blast)
+}
+
 AddFunction ArcanePrecombatCdActions
 {
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
@@ -465,6 +470,11 @@ AddFunction ArcanePrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction ArcanePrecombatCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power) or Spell(arcane_blast)
 }
 
 ###
@@ -810,6 +820,11 @@ AddFunction FirePrecombatShortCdActions
 	}
 }
 
+AddFunction FirePrecombatShortCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(pyroblast)
+}
+
 AddFunction FirePrecombatCdActions
 {
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
@@ -819,6 +834,11 @@ AddFunction FirePrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction FirePrecombatCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power) or Spell(pyroblast)
 }
 
 ### actions.single_target
@@ -1132,6 +1152,11 @@ AddFunction FrostPrecombatShortCdActions
 	}
 }
 
+AddFunction FrostPrecombatShortCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(frostbolt)
+}
+
 AddFunction FrostPrecombatCdActions
 {
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or not pet.Present() and Spell(water_elemental) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
@@ -1141,6 +1166,11 @@ AddFunction FrostPrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction FrostPrecombatCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or not pet.Present() and Spell(water_elemental) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power) or Spell(frostbolt)
 }
 
 ### actions.single_target
@@ -1277,13 +1307,19 @@ AddCheckBox(opt_mage_arcane_aoe L(AOE) default specialization=arcane)
 AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=shortcd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatShortCdActions()
-	ArcaneDefaultShortCdActions()
+	unless not InCombat() and ArcanePrecombatShortCdPostConditions()
+	{
+		ArcaneDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_arcane_aoe help=shortcd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatShortCdActions()
-	ArcaneDefaultShortCdActions()
+	unless not InCombat() and ArcanePrecombatShortCdPostConditions()
+	{
+		ArcaneDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=arcane
@@ -1301,13 +1337,19 @@ AddIcon checkbox=opt_mage_arcane_aoe help=aoe specialization=arcane
 AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=cd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatCdActions()
-	ArcaneDefaultCdActions()
+	unless not InCombat() and ArcanePrecombatCdPostConditions()
+	{
+		ArcaneDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatCdActions()
-	ArcaneDefaultCdActions()
+	unless not InCombat() and ArcanePrecombatCdPostConditions()
+	{
+		ArcaneDefaultCdActions()
+	}
 }
 
 ### Fire icons.
@@ -1317,13 +1359,19 @@ AddCheckBox(opt_mage_fire_aoe L(AOE) default specialization=fire)
 AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=shortcd specialization=fire
 {
 	if not InCombat() FirePrecombatShortCdActions()
-	FireDefaultShortCdActions()
+	unless not InCombat() and FirePrecombatShortCdPostConditions()
+	{
+		FireDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=shortcd specialization=fire
 {
 	if not InCombat() FirePrecombatShortCdActions()
-	FireDefaultShortCdActions()
+	unless not InCombat() and FirePrecombatShortCdPostConditions()
+	{
+		FireDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=fire
@@ -1341,13 +1389,19 @@ AddIcon checkbox=opt_mage_fire_aoe help=aoe specialization=fire
 AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=cd specialization=fire
 {
 	if not InCombat() FirePrecombatCdActions()
-	FireDefaultCdActions()
+	unless not InCombat() and FirePrecombatCdPostConditions()
+	{
+		FireDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 {
 	if not InCombat() FirePrecombatCdActions()
-	FireDefaultCdActions()
+	unless not InCombat() and FirePrecombatCdPostConditions()
+	{
+		FireDefaultCdActions()
+	}
 }
 
 ### Frost icons.
@@ -1357,13 +1411,19 @@ AddCheckBox(opt_mage_frost_aoe L(AOE) default specialization=frost)
 AddIcon checkbox=!opt_mage_frost_aoe enemies=1 help=shortcd specialization=frost
 {
 	if not InCombat() FrostPrecombatShortCdActions()
-	FrostDefaultShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_frost_aoe help=shortcd specialization=frost
 {
 	if not InCombat() FrostPrecombatShortCdActions()
-	FrostDefaultShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=frost
@@ -1381,13 +1441,19 @@ AddIcon checkbox=opt_mage_frost_aoe help=aoe specialization=frost
 AddIcon checkbox=!opt_mage_frost_aoe enemies=1 help=cd specialization=frost
 {
 	if not InCombat() FrostPrecombatCdActions()
-	FrostDefaultCdActions()
+	unless not InCombat() and FrostPrecombatCdPostConditions()
+	{
+		FrostDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 {
 	if not InCombat() FrostPrecombatCdActions()
-	FrostDefaultCdActions()
+	unless not InCombat() and FrostPrecombatCdPostConditions()
+	{
+		FrostDefaultCdActions()
+	}
 }
 ]]
 	OvaleScripts:RegisterScript("MAGE", name, desc, code, "script")

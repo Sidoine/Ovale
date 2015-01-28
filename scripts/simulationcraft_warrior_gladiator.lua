@@ -193,6 +193,11 @@ AddFunction ProtectionGladiatorPrecombatMainActions
 	Spell(gladiator_stance)
 }
 
+AddFunction ProtectionGladiatorPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
+}
+
 AddFunction ProtectionGladiatorPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
@@ -201,6 +206,11 @@ AddFunction ProtectionGladiatorPrecombatCdActions
 		#potion,name=draenic_armor
 		UsePotionArmor()
 	}
+}
+
+AddFunction ProtectionGladiatorPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
 }
 
 ### actions.single
@@ -243,12 +253,18 @@ AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
 
 AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=shortcd specialization=protection
 {
-	ProtectionGladiatorDefaultShortCdActions()
+	unless not InCombat() and ProtectionGladiatorPrecombatShortCdPostConditions()
+	{
+		ProtectionGladiatorDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_protection_aoe help=shortcd specialization=protection
 {
-	ProtectionGladiatorDefaultShortCdActions()
+	unless not InCombat() and ProtectionGladiatorPrecombatShortCdPostConditions()
+	{
+		ProtectionGladiatorDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=protection
@@ -266,13 +282,19 @@ AddIcon checkbox=opt_warrior_protection_aoe help=aoe specialization=protection
 AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=cd specialization=protection
 {
 	if not InCombat() ProtectionGladiatorPrecombatCdActions()
-	ProtectionGladiatorDefaultCdActions()
+	unless not InCombat() and ProtectionGladiatorPrecombatCdPostConditions()
+	{
+		ProtectionGladiatorDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 {
 	if not InCombat() ProtectionGladiatorPrecombatCdActions()
-	ProtectionGladiatorDefaultCdActions()
+	unless not InCombat() and ProtectionGladiatorPrecombatCdPostConditions()
+	{
+		ProtectionGladiatorDefaultCdActions()
+	}
 }
 
 ### Required symbols

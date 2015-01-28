@@ -193,6 +193,11 @@ AddFunction MarksmanshipPrecombatShortCdActions
 	SummonPet()
 }
 
+AddFunction MarksmanshipPrecombatShortCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot_marksmanship)
+}
+
 AddFunction MarksmanshipPrecombatCdActions
 {
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
@@ -202,6 +207,11 @@ AddFunction MarksmanshipPrecombatCdActions
 	}
 }
 
+AddFunction MarksmanshipPrecombatCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot_marksmanship)
+}
+
 ### Marksmanship icons.
 
 AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) default specialization=marksmanship)
@@ -209,13 +219,19 @@ AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) default specialization=marksmansh
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
-	MarksmanshipDefaultShortCdActions()
+	unless not InCombat() and MarksmanshipPrecombatShortCdPostConditions()
+	{
+		MarksmanshipDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
-	MarksmanshipDefaultShortCdActions()
+	unless not InCombat() and MarksmanshipPrecombatShortCdPostConditions()
+	{
+		MarksmanshipDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=marksmanship
@@ -233,13 +249,19 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=aoe specialization=marksmanshi
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=cd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatCdActions()
-	MarksmanshipDefaultCdActions()
+	unless not InCombat() and MarksmanshipPrecombatCdPostConditions()
+	{
+		MarksmanshipDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatCdActions()
-	MarksmanshipDefaultCdActions()
+	unless not InCombat() and MarksmanshipPrecombatCdPostConditions()
+	{
+		MarksmanshipDefaultCdActions()
+	}
 }
 
 ### Required symbols

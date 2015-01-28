@@ -186,6 +186,11 @@ AddFunction BrewmasterPrecombatMainActions
 	Spell(stance_of_the_sturdy_ox)
 }
 
+AddFunction BrewmasterPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
+}
+
 AddFunction BrewmasterPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
@@ -196,6 +201,11 @@ AddFunction BrewmasterPrecombatCdActions
 		#dampen_harm
 		Spell(dampen_harm)
 	}
+}
+
+AddFunction BrewmasterPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
 }
 
 ### actions.st
@@ -428,6 +438,11 @@ AddFunction WindwalkerPrecombatMainActions
 	Spell(stance_of_the_fierce_tiger)
 }
 
+AddFunction WindwalkerPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+}
+
 AddFunction WindwalkerPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
@@ -436,6 +451,11 @@ AddFunction WindwalkerPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction WindwalkerPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
 }
 
 ### actions.st
@@ -509,12 +529,18 @@ AddCheckBox(opt_monk_brewmaster_aoe L(AOE) default specialization=brewmaster)
 
 AddIcon checkbox=!opt_monk_brewmaster_aoe enemies=1 help=shortcd specialization=brewmaster
 {
-	BrewmasterDefaultShortCdActions()
+	unless not InCombat() and BrewmasterPrecombatShortCdPostConditions()
+	{
+		BrewmasterDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_brewmaster_aoe help=shortcd specialization=brewmaster
 {
-	BrewmasterDefaultShortCdActions()
+	unless not InCombat() and BrewmasterPrecombatShortCdPostConditions()
+	{
+		BrewmasterDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=brewmaster
@@ -532,13 +558,19 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=aoe specialization=brewmaster
 AddIcon checkbox=!opt_monk_brewmaster_aoe enemies=1 help=cd specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatCdActions()
-	BrewmasterDefaultCdActions()
+	unless not InCombat() and BrewmasterPrecombatCdPostConditions()
+	{
+		BrewmasterDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatCdActions()
-	BrewmasterDefaultCdActions()
+	unless not InCombat() and BrewmasterPrecombatCdPostConditions()
+	{
+		BrewmasterDefaultCdActions()
+	}
 }
 
 ### Windwalker icons.
@@ -547,12 +579,18 @@ AddCheckBox(opt_monk_windwalker_aoe L(AOE) default specialization=windwalker)
 
 AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=shortcd specialization=windwalker
 {
-	WindwalkerDefaultShortCdActions()
+	unless not InCombat() and WindwalkerPrecombatShortCdPostConditions()
+	{
+		WindwalkerDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_windwalker_aoe help=shortcd specialization=windwalker
 {
-	WindwalkerDefaultShortCdActions()
+	unless not InCombat() and WindwalkerPrecombatShortCdPostConditions()
+	{
+		WindwalkerDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=windwalker
@@ -570,13 +608,19 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=aoe specialization=windwalker
 AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
-	WindwalkerDefaultCdActions()
+	unless not InCombat() and WindwalkerPrecombatCdPostConditions()
+	{
+		WindwalkerDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
-	WindwalkerDefaultCdActions()
+	unless not InCombat() and WindwalkerPrecombatCdPostConditions()
+	{
+		WindwalkerDefaultCdActions()
+	}
 }
 ]]
 	OvaleScripts:RegisterScript("MONK", name, desc, code, "script")

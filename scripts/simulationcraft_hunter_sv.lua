@@ -215,6 +215,11 @@ AddFunction SurvivalPrecombatShortCdActions
 	SummonPet()
 }
 
+AddFunction SurvivalPrecombatShortCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+}
+
 AddFunction SurvivalPrecombatCdActions
 {
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
@@ -224,6 +229,11 @@ AddFunction SurvivalPrecombatCdActions
 	}
 }
 
+AddFunction SurvivalPrecombatCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+}
+
 ### Survival icons.
 
 AddCheckBox(opt_hunter_survival_aoe L(AOE) default specialization=survival)
@@ -231,13 +241,19 @@ AddCheckBox(opt_hunter_survival_aoe L(AOE) default specialization=survival)
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
-	SurvivalDefaultShortCdActions()
+	unless not InCombat() and SurvivalPrecombatShortCdPostConditions()
+	{
+		SurvivalDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
-	SurvivalDefaultShortCdActions()
+	unless not InCombat() and SurvivalPrecombatShortCdPostConditions()
+	{
+		SurvivalDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=survival
@@ -255,13 +271,19 @@ AddIcon checkbox=opt_hunter_survival_aoe help=aoe specialization=survival
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
-	SurvivalDefaultCdActions()
+	unless not InCombat() and SurvivalPrecombatCdPostConditions()
+	{
+		SurvivalDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
-	SurvivalDefaultCdActions()
+	unless not InCombat() and SurvivalPrecombatCdPostConditions()
+	{
+		SurvivalDefaultCdActions()
+	}
 }
 
 ### Required symbols

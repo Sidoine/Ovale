@@ -144,6 +144,11 @@ AddFunction BeastMasteryPrecombatShortCdActions
 	BeastMasterySummonPet()
 }
 
+AddFunction BeastMasteryPrecombatShortCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+}
+
 AddFunction BeastMasteryPrecombatCdActions
 {
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
@@ -153,6 +158,11 @@ AddFunction BeastMasteryPrecombatCdActions
 	}
 }
 
+AddFunction BeastMasteryPrecombatCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+}
+
 ### BeastMastery icons.
 
 AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) default specialization=beast_mastery)
@@ -160,13 +170,19 @@ AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) default specialization=beast_mas
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
-	BeastMasteryDefaultShortCdActions()
+	unless not InCombat() and BeastMasteryPrecombatShortCdPostConditions()
+	{
+		BeastMasteryDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
-	BeastMasteryDefaultShortCdActions()
+	unless not InCombat() and BeastMasteryPrecombatShortCdPostConditions()
+	{
+		BeastMasteryDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=beast_mastery
@@ -184,13 +200,19 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=aoe specialization=beast_mast
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=cd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatCdActions()
-	BeastMasteryDefaultCdActions()
+	unless not InCombat() and BeastMasteryPrecombatCdPostConditions()
+	{
+		BeastMasteryDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatCdActions()
-	BeastMasteryDefaultCdActions()
+	unless not InCombat() and BeastMasteryPrecombatCdPostConditions()
+	{
+		BeastMasteryDefaultCdActions()
+	}
 }
 
 ### Required symbols

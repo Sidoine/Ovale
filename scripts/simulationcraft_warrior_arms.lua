@@ -198,6 +198,11 @@ AddFunction ArmsPrecombatMainActions
 	Spell(battle_stance)
 }
 
+AddFunction ArmsPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
 AddFunction ArmsPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
@@ -206,6 +211,11 @@ AddFunction ArmsPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction ArmsPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 }
 
 ### actions.single
@@ -272,12 +282,18 @@ AddCheckBox(opt_warrior_arms_aoe L(AOE) default specialization=arms)
 
 AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=shortcd specialization=arms
 {
-	ArmsDefaultShortCdActions()
+	unless not InCombat() and ArmsPrecombatShortCdPostConditions()
+	{
+		ArmsDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_arms_aoe help=shortcd specialization=arms
 {
-	ArmsDefaultShortCdActions()
+	unless not InCombat() and ArmsPrecombatShortCdPostConditions()
+	{
+		ArmsDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=arms
@@ -295,13 +311,19 @@ AddIcon checkbox=opt_warrior_arms_aoe help=aoe specialization=arms
 AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
+	unless not InCombat() and ArmsPrecombatCdPostConditions()
+	{
+		ArmsDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
+	unless not InCombat() and ArmsPrecombatCdPostConditions()
+	{
+		ArmsDefaultCdActions()
+	}
 }
 
 ### Required symbols

@@ -210,6 +210,11 @@ AddFunction ArmsPrecombatMainActions
 	Spell(battle_stance)
 }
 
+AddFunction ArmsPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
 AddFunction ArmsPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
@@ -218,6 +223,11 @@ AddFunction ArmsPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction ArmsPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 }
 
 ### actions.single
@@ -487,6 +497,11 @@ AddFunction FurySingleMindedFuryPrecombatMainActions
 	Spell(battle_stance)
 }
 
+AddFunction FurySingleMindedFuryPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
 AddFunction FurySingleMindedFuryPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
@@ -495,6 +510,11 @@ AddFunction FurySingleMindedFuryPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FurySingleMindedFuryPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 }
 
 ### actions.single_target
@@ -878,6 +898,11 @@ AddFunction FuryTitansGripPrecombatMainActions
 	Spell(battle_stance)
 }
 
+AddFunction FuryTitansGripPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
 AddFunction FuryTitansGripPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
@@ -886,6 +911,11 @@ AddFunction FuryTitansGripPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FuryTitansGripPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 }
 
 ### actions.single_target
@@ -1214,6 +1244,11 @@ AddFunction ProtectionGladiatorPrecombatMainActions
 	Spell(gladiator_stance)
 }
 
+AddFunction ProtectionGladiatorPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
+}
+
 AddFunction ProtectionGladiatorPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
@@ -1222,6 +1257,11 @@ AddFunction ProtectionGladiatorPrecombatCdActions
 		#potion,name=draenic_armor
 		UsePotionArmor()
 	}
+}
+
+AddFunction ProtectionGladiatorPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(gladiator_stance)
 }
 
 ### actions.single
@@ -1315,6 +1355,11 @@ AddFunction ProtectionPrecombatMainActions
 	Spell(defensive_stance)
 }
 
+AddFunction ProtectionPrecombatShortCdPostConditions
+{
+	not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
+}
+
 AddFunction ProtectionPrecombatCdActions
 {
 	unless not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
@@ -1325,6 +1370,11 @@ AddFunction ProtectionPrecombatCdActions
 		#potion,name=draenic_armor
 		UsePotionArmor()
 	}
+}
+
+AddFunction ProtectionPrecombatCdPostConditions
+{
+	not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
 }
 
 ### actions.prot
@@ -1490,12 +1540,18 @@ AddCheckBox(opt_warrior_arms_aoe L(AOE) default specialization=arms)
 
 AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=shortcd specialization=arms
 {
-	ArmsDefaultShortCdActions()
+	unless not InCombat() and ArmsPrecombatShortCdPostConditions()
+	{
+		ArmsDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_arms_aoe help=shortcd specialization=arms
 {
-	ArmsDefaultShortCdActions()
+	unless not InCombat() and ArmsPrecombatShortCdPostConditions()
+	{
+		ArmsDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=arms
@@ -1513,13 +1569,19 @@ AddIcon checkbox=opt_warrior_arms_aoe help=aoe specialization=arms
 AddIcon checkbox=!opt_warrior_arms_aoe enemies=1 help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
+	unless not InCombat() and ArmsPrecombatCdPostConditions()
+	{
+		ArmsDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 {
 	if not InCombat() ArmsPrecombatCdActions()
-	ArmsDefaultCdActions()
+	unless not InCombat() and ArmsPrecombatCdPostConditions()
+	{
+		ArmsDefaultCdActions()
+	}
 }
 
 ### Fury icons.
@@ -1530,11 +1592,17 @@ AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=shortcd specialization=fur
 {
 	if HasWeapon(main type=one_handed)
 	{
-		FurySingleMindedFuryDefaultShortCdActions()
+		unless not InCombat() and FurySingleMindedFuryPrecombatShortCdPostConditions()
+		{
+			FurySingleMindedFuryDefaultShortCdActions()
+		}
 	}
 	if HasWeapon(main type=two_handed)
 	{
-		FuryTitansGripDefaultShortCdActions()
+		unless not InCombat() and FuryTitansGripPrecombatShortCdPostConditions()
+		{
+			FuryTitansGripDefaultShortCdActions()
+		}
 	}
 }
 
@@ -1542,11 +1610,17 @@ AddIcon checkbox=opt_warrior_fury_aoe help=shortcd specialization=fury
 {
 	if HasWeapon(main type=one_handed)
 	{
-		FurySingleMindedFuryDefaultShortCdActions()
+		unless not InCombat() and FurySingleMindedFuryPrecombatShortCdPostConditions()
+		{
+			FurySingleMindedFuryDefaultShortCdActions()
+		}
 	}
 	if HasWeapon(main type=two_handed)
 	{
-		FuryTitansGripDefaultShortCdActions()
+		unless not InCombat() and FuryTitansGripPrecombatShortCdPostConditions()
+		{
+			FuryTitansGripDefaultShortCdActions()
+		}
 	}
 }
 
@@ -1583,12 +1657,18 @@ AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=cd specialization=fury
 	if HasWeapon(main type=one_handed)
 	{
 		if not InCombat() FurySingleMindedFuryPrecombatCdActions()
-		FurySingleMindedFuryDefaultCdActions()
+		unless not InCombat() and FurySingleMindedFuryPrecombatCdPostConditions()
+		{
+			FurySingleMindedFuryDefaultCdActions()
+		}
 	}
 	if HasWeapon(main type=two_handed)
 	{
 		if not InCombat() FuryTitansGripPrecombatCdActions()
-		FuryTitansGripDefaultCdActions()
+		unless not InCombat() and FuryTitansGripPrecombatCdPostConditions()
+		{
+			FuryTitansGripDefaultCdActions()
+		}
 	}
 }
 
@@ -1597,12 +1677,18 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 	if HasWeapon(main type=one_handed)
 	{
 		if not InCombat() FurySingleMindedFuryPrecombatCdActions()
-		FurySingleMindedFuryDefaultCdActions()
+		unless not InCombat() and FurySingleMindedFuryPrecombatCdPostConditions()
+		{
+			FurySingleMindedFuryDefaultCdActions()
+		}
 	}
 	if HasWeapon(main type=two_handed)
 	{
 		if not InCombat() FuryTitansGripPrecombatCdActions()
-		FuryTitansGripDefaultCdActions()
+		unless not InCombat() and FuryTitansGripPrecombatCdPostConditions()
+		{
+			FuryTitansGripDefaultCdActions()
+		}
 	}
 }
 
@@ -1614,11 +1700,17 @@ AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=shortcd specializati
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
-		ProtectionGladiatorDefaultShortCdActions()
+		unless not InCombat() and ProtectionGladiatorPrecombatShortCdPostConditions()
+		{
+			ProtectionGladiatorDefaultShortCdActions()
+		}
 	}
 	unless Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
-		ProtectionDefaultShortCdActions()
+		unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+		{
+			ProtectionDefaultShortCdActions()
+		}
 	}
 }
 
@@ -1626,11 +1718,17 @@ AddIcon checkbox=opt_warrior_protection_aoe help=shortcd specialization=protecti
 {
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
-		ProtectionGladiatorDefaultShortCdActions()
+		unless not InCombat() and ProtectionGladiatorPrecombatShortCdPostConditions()
+		{
+			ProtectionGladiatorDefaultShortCdActions()
+		}
 	}
 	unless Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
-		ProtectionDefaultShortCdActions()
+		unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+		{
+			ProtectionDefaultShortCdActions()
+		}
 	}
 }
 
@@ -1667,12 +1765,18 @@ AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=cd specialization=pr
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
 		if not InCombat() ProtectionGladiatorPrecombatCdActions()
-		ProtectionGladiatorDefaultCdActions()
+		unless not InCombat() and ProtectionGladiatorPrecombatCdPostConditions()
+		{
+			ProtectionGladiatorDefaultCdActions()
+		}
 	}
 	unless Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
 		if not InCombat() ProtectionPrecombatCdActions()
-		ProtectionDefaultCdActions()
+		unless not InCombat() and ProtectionPrecombatCdPostConditions()
+		{
+			ProtectionDefaultCdActions()
+		}
 	}
 }
 
@@ -1681,12 +1785,18 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 	if Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
 		if not InCombat() ProtectionGladiatorPrecombatCdActions()
-		ProtectionGladiatorDefaultCdActions()
+		unless not InCombat() and ProtectionGladiatorPrecombatCdPostConditions()
+		{
+			ProtectionGladiatorDefaultCdActions()
+		}
 	}
 	unless Talent(gladiators_resolve_talent) and Stance(warrior_gladiator_stance)
 	{
 		if not InCombat() ProtectionPrecombatCdActions()
-		ProtectionDefaultCdActions()
+		unless not InCombat() and ProtectionPrecombatCdPostConditions()
+		{
+			ProtectionDefaultCdActions()
+		}
 	}
 }
 ]]

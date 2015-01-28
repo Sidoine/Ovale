@@ -138,6 +138,11 @@ AddFunction DestructionPrecombatShortCdActions
 	}
 }
 
+AddFunction DestructionPrecombatShortCdPostConditions
+{
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or Spell(incinerate)
+}
+
 AddFunction DestructionPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
@@ -153,6 +158,11 @@ AddFunction DestructionPrecombatCdActions
 			UsePotionIntellect()
 		}
 	}
+}
+
+AddFunction DestructionPrecombatCdPostConditions
+{
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter) or Spell(incinerate)
 }
 
 ### actions.single_target
@@ -245,13 +255,19 @@ AddCheckBox(opt_warlock_destruction_aoe L(AOE) default specialization=destructio
 AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=shortcd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatShortCdActions()
-	DestructionDefaultShortCdActions()
+	unless not InCombat() and DestructionPrecombatShortCdPostConditions()
+	{
+		DestructionDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warlock_destruction_aoe help=shortcd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatShortCdActions()
-	DestructionDefaultShortCdActions()
+	unless not InCombat() and DestructionPrecombatShortCdPostConditions()
+	{
+		DestructionDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=destruction
@@ -269,13 +285,19 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
 AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatCdActions()
-	DestructionDefaultCdActions()
+	unless not InCombat() and DestructionPrecombatCdPostConditions()
+	{
+		DestructionDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 {
 	if not InCombat() DestructionPrecombatCdActions()
-	DestructionDefaultCdActions()
+	unless not InCombat() and DestructionPrecombatCdPostConditions()
+	{
+		DestructionDefaultCdActions()
+	}
 }
 
 ### Required symbols

@@ -248,6 +248,11 @@ AddFunction FurySingleMindedFuryPrecombatMainActions
 	Spell(battle_stance)
 }
 
+AddFunction FurySingleMindedFuryPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
 AddFunction FurySingleMindedFuryPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
@@ -256,6 +261,11 @@ AddFunction FurySingleMindedFuryPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FurySingleMindedFuryPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 }
 
 ### actions.single_target
@@ -436,12 +446,18 @@ AddCheckBox(opt_warrior_fury_aoe L(AOE) default specialization=fury)
 
 AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=shortcd specialization=fury
 {
-	FurySingleMindedFuryDefaultShortCdActions()
+	unless not InCombat() and FurySingleMindedFuryPrecombatShortCdPostConditions()
+	{
+		FurySingleMindedFuryDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_fury_aoe help=shortcd specialization=fury
 {
-	FurySingleMindedFuryDefaultShortCdActions()
+	unless not InCombat() and FurySingleMindedFuryPrecombatShortCdPostConditions()
+	{
+		FurySingleMindedFuryDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=fury
@@ -459,13 +475,19 @@ AddIcon checkbox=opt_warrior_fury_aoe help=aoe specialization=fury
 AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=cd specialization=fury
 {
 	if not InCombat() FurySingleMindedFuryPrecombatCdActions()
-	FurySingleMindedFuryDefaultCdActions()
+	unless not InCombat() and FurySingleMindedFuryPrecombatCdPostConditions()
+	{
+		FurySingleMindedFuryDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 {
 	if not InCombat() FurySingleMindedFuryPrecombatCdActions()
-	FurySingleMindedFuryDefaultCdActions()
+	unless not InCombat() and FurySingleMindedFuryPrecombatCdPostConditions()
+	{
+		FurySingleMindedFuryDefaultCdActions()
+	}
 }
 
 ### Required symbols

@@ -102,6 +102,11 @@ AddFunction BalancePrecombatMainActions
 	Spell(starfire)
 }
 
+AddFunction BalancePrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(moonkin_form) or Spell(starfire)
+}
+
 AddFunction BalancePrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(moonkin_form)
@@ -112,6 +117,11 @@ AddFunction BalancePrecombatCdActions
 		#incarnation
 		Spell(incarnation_caster)
 	}
+}
+
+AddFunction BalancePrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(moonkin_form) or Spell(starfire)
 }
 
 ### actions.single_target
@@ -160,12 +170,18 @@ AddCheckBox(opt_druid_balance_aoe L(AOE) default specialization=balance)
 
 AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=shortcd specialization=balance
 {
-	BalanceDefaultShortCdActions()
+	unless not InCombat() and BalancePrecombatShortCdPostConditions()
+	{
+		BalanceDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_balance_aoe help=shortcd specialization=balance
 {
-	BalanceDefaultShortCdActions()
+	unless not InCombat() and BalancePrecombatShortCdPostConditions()
+	{
+		BalanceDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=balance
@@ -183,13 +199,19 @@ AddIcon checkbox=opt_druid_balance_aoe help=aoe specialization=balance
 AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=cd specialization=balance
 {
 	if not InCombat() BalancePrecombatCdActions()
-	BalanceDefaultCdActions()
+	unless not InCombat() and BalancePrecombatCdPostConditions()
+	{
+		BalanceDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 {
 	if not InCombat() BalancePrecombatCdActions()
-	BalanceDefaultCdActions()
+	unless not InCombat() and BalancePrecombatCdPostConditions()
+	{
+		BalanceDefaultCdActions()
+	}
 }
 
 ### Required symbols

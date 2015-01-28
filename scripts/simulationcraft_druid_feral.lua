@@ -196,6 +196,11 @@ AddFunction FeralPrecombatMainActions
 	Spell(prowl)
 }
 
+AddFunction FeralPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 and Spell(healing_touch) or Spell(cat_form) or Spell(prowl)
+}
+
 AddFunction FeralPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 and Spell(healing_touch) or Spell(cat_form) or Spell(prowl)
@@ -206,18 +211,29 @@ AddFunction FeralPrecombatCdActions
 	}
 }
 
+AddFunction FeralPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Talent(bloodtalons_talent) and BuffRemaining(bloodtalons_buff) < 20 and Spell(healing_touch) or Spell(cat_form) or Spell(prowl)
+}
+
 ### Feral icons.
 
 AddCheckBox(opt_druid_feral_aoe L(AOE) default specialization=feral)
 
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=shortcd specialization=feral
 {
-	FeralDefaultShortCdActions()
+	unless not InCombat() and FeralPrecombatShortCdPostConditions()
+	{
+		FeralDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=shortcd specialization=feral
 {
-	FeralDefaultShortCdActions()
+	unless not InCombat() and FeralPrecombatShortCdPostConditions()
+	{
+		FeralDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=feral
@@ -235,13 +251,19 @@ AddIcon checkbox=opt_druid_feral_aoe help=aoe specialization=feral
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=cd specialization=feral
 {
 	if not InCombat() FeralPrecombatCdActions()
-	FeralDefaultCdActions()
+	unless not InCombat() and FeralPrecombatCdPostConditions()
+	{
+		FeralDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 {
 	if not InCombat() FeralPrecombatCdActions()
-	FeralDefaultCdActions()
+	unless not InCombat() and FeralPrecombatCdPostConditions()
+	{
+		FeralDefaultCdActions()
+	}
 }
 
 ### Required symbols

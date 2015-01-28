@@ -169,6 +169,11 @@ AddFunction BeastMasteryPrecombatShortCdActions
 	BeastMasterySummonPet()
 }
 
+AddFunction BeastMasteryPrecombatShortCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+}
+
 AddFunction BeastMasteryPrecombatCdActions
 {
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
@@ -176,6 +181,11 @@ AddFunction BeastMasteryPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction BeastMasteryPrecombatCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
 }
 
 ###
@@ -323,6 +333,11 @@ AddFunction MarksmanshipPrecombatShortCdActions
 	SummonPet()
 }
 
+AddFunction MarksmanshipPrecombatShortCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot_marksmanship)
+}
+
 AddFunction MarksmanshipPrecombatCdActions
 {
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
@@ -330,6 +345,11 @@ AddFunction MarksmanshipPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction MarksmanshipPrecombatCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot_marksmanship)
 }
 
 ###
@@ -499,6 +519,11 @@ AddFunction SurvivalPrecombatShortCdActions
 	SummonPet()
 }
 
+AddFunction SurvivalPrecombatShortCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+}
+
 AddFunction SurvivalPrecombatCdActions
 {
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
@@ -506,6 +531,11 @@ AddFunction SurvivalPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction SurvivalPrecombatCdPostConditions
+{
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
 }
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")
@@ -527,13 +557,19 @@ AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) default specialization=beast_mas
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
-	BeastMasteryDefaultShortCdActions()
+	unless not InCombat() and BeastMasteryPrecombatShortCdPostConditions()
+	{
+		BeastMasteryDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
-	BeastMasteryDefaultShortCdActions()
+	unless not InCombat() and BeastMasteryPrecombatShortCdPostConditions()
+	{
+		BeastMasteryDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=beast_mastery
@@ -551,13 +587,19 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=aoe specialization=beast_mast
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=cd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatCdActions()
-	BeastMasteryDefaultCdActions()
+	unless not InCombat() and BeastMasteryPrecombatCdPostConditions()
+	{
+		BeastMasteryDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatCdActions()
-	BeastMasteryDefaultCdActions()
+	unless not InCombat() and BeastMasteryPrecombatCdPostConditions()
+	{
+		BeastMasteryDefaultCdActions()
+	}
 }
 
 ### Marksmanship icons.
@@ -567,13 +609,19 @@ AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) default specialization=marksmansh
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
-	MarksmanshipDefaultShortCdActions()
+	unless not InCombat() and MarksmanshipPrecombatShortCdPostConditions()
+	{
+		MarksmanshipDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
-	MarksmanshipDefaultShortCdActions()
+	unless not InCombat() and MarksmanshipPrecombatShortCdPostConditions()
+	{
+		MarksmanshipDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=marksmanship
@@ -591,13 +639,19 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=aoe specialization=marksmanshi
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=cd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatCdActions()
-	MarksmanshipDefaultCdActions()
+	unless not InCombat() and MarksmanshipPrecombatCdPostConditions()
+	{
+		MarksmanshipDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatCdActions()
-	MarksmanshipDefaultCdActions()
+	unless not InCombat() and MarksmanshipPrecombatCdPostConditions()
+	{
+		MarksmanshipDefaultCdActions()
+	}
 }
 
 ### Survival icons.
@@ -607,13 +661,19 @@ AddCheckBox(opt_hunter_survival_aoe L(AOE) default specialization=survival)
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
-	SurvivalDefaultShortCdActions()
+	unless not InCombat() and SurvivalPrecombatShortCdPostConditions()
+	{
+		SurvivalDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
-	SurvivalDefaultShortCdActions()
+	unless not InCombat() and SurvivalPrecombatShortCdPostConditions()
+	{
+		SurvivalDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=survival
@@ -631,13 +691,19 @@ AddIcon checkbox=opt_hunter_survival_aoe help=aoe specialization=survival
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
-	SurvivalDefaultCdActions()
+	unless not InCombat() and SurvivalPrecombatCdPostConditions()
+	{
+		SurvivalDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatCdActions()
-	SurvivalDefaultCdActions()
+	unless not InCombat() and SurvivalPrecombatCdPostConditions()
+	{
+		SurvivalDefaultCdActions()
+	}
 }
 ]]
 	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "script")

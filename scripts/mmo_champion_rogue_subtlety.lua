@@ -348,6 +348,11 @@ AddFunction SubtletyPrecombatMainActions
 	if BuffRemaining(slice_and_dice_buff) < 18 Spell(slice_and_dice)
 }
 
+AddFunction SubtletyPrecombatShortCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or BuffRemaining(slice_and_dice_buff) < 18 and Spell(slice_and_dice)
+}
+
 AddFunction SubtletyPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
@@ -358,18 +363,29 @@ AddFunction SubtletyPrecombatCdActions
 	}
 }
 
+AddFunction SubtletyPrecombatCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or BuffRemaining(slice_and_dice_buff) < 18 and Spell(slice_and_dice)
+}
+
 ### Subtlety icons.
 
 AddCheckBox(opt_rogue_subtlety_aoe L(AOE) default specialization=subtlety)
 
 AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=shortcd specialization=subtlety
 {
-	SubtletyDefaultShortCdActions()
+	unless not InCombat() and SubtletyPrecombatShortCdPostConditions()
+	{
+		SubtletyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=shortcd specialization=subtlety
 {
-	SubtletyDefaultShortCdActions()
+	unless not InCombat() and SubtletyPrecombatShortCdPostConditions()
+	{
+		SubtletyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=subtlety
@@ -387,13 +403,19 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=aoe specialization=subtlety
 AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
-	SubtletyDefaultCdActions()
+	unless not InCombat() and SubtletyPrecombatCdPostConditions()
+	{
+		SubtletyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
-	SubtletyDefaultCdActions()
+	unless not InCombat() and SubtletyPrecombatCdPostConditions()
+	{
+		SubtletyDefaultCdActions()
+	}
 }
 
 ### Required symbols

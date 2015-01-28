@@ -140,18 +140,34 @@ AddFunction GuardianPrecombatMainActions
 	Spell(cenarion_ward)
 }
 
+AddFunction GuardianPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(bear_form) or Spell(cenarion_ward)
+}
+
+AddFunction GuardianPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(bear_form) or Spell(cenarion_ward)
+}
+
 ### Guardian icons.
 
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=guardian
 {
-	GuardianDefaultShortCdActions()
+	unless not InCombat() and GuardianPrecombatShortCdPostConditions()
+	{
+		GuardianDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_guardian_aoe help=shortcd specialization=guardian
 {
-	GuardianDefaultShortCdActions()
+	unless not InCombat() and GuardianPrecombatShortCdPostConditions()
+	{
+		GuardianDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=guardian
@@ -168,12 +184,18 @@ AddIcon checkbox=opt_druid_guardian_aoe help=aoe specialization=guardian
 
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=cd specialization=guardian
 {
-	GuardianDefaultCdActions()
+	unless not InCombat() and GuardianPrecombatCdPostConditions()
+	{
+		GuardianDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 {
-	GuardianDefaultCdActions()
+	unless not InCombat() and GuardianPrecombatCdPostConditions()
+	{
+		GuardianDefaultCdActions()
+	}
 }
 
 ### Required symbols

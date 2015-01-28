@@ -100,6 +100,11 @@ AddFunction DisciplinePrecombatCdActions
 	}
 }
 
+AddFunction DisciplinePrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or Spell(smite)
+}
+
 ### Discipline icons.
 
 AddCheckBox(opt_priest_discipline_aoe L(AOE) default specialization=discipline)
@@ -119,13 +124,19 @@ AddIcon checkbox=opt_priest_discipline_aoe help=aoe specialization=discipline
 AddIcon checkbox=!opt_priest_discipline_aoe enemies=1 help=cd specialization=discipline
 {
 	if not InCombat() DisciplinePrecombatCdActions()
-	DisciplineDefaultCdActions()
+	unless not InCombat() and DisciplinePrecombatCdPostConditions()
+	{
+		DisciplineDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
 {
 	if not InCombat() DisciplinePrecombatCdActions()
-	DisciplineDefaultCdActions()
+	unless not InCombat() and DisciplinePrecombatCdPostConditions()
+	{
+		DisciplineDefaultCdActions()
+	}
 }
 
 ### Required symbols

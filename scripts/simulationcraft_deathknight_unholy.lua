@@ -308,6 +308,11 @@ AddFunction UnholyPrecombatShortCdActions
 	}
 }
 
+AddFunction UnholyPrecombatShortCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(unholy_presence)
+}
+
 AddFunction UnholyPrecombatCdActions
 {
 	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(unholy_presence)
@@ -318,6 +323,11 @@ AddFunction UnholyPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction UnholyPrecombatCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(unholy_presence) or Spell(raise_dead)
 }
 
 ### actions.single_target
@@ -505,13 +515,19 @@ AddCheckBox(opt_deathknight_unholy_aoe L(AOE) default specialization=unholy)
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
-	UnholyDefaultShortCdActions()
+	unless not InCombat() and UnholyPrecombatShortCdPostConditions()
+	{
+		UnholyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
-	UnholyDefaultShortCdActions()
+	unless not InCombat() and UnholyPrecombatShortCdPostConditions()
+	{
+		UnholyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=unholy
@@ -529,13 +545,19 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=aoe specialization=unholy
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=cd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatCdActions()
-	UnholyDefaultCdActions()
+	unless not InCombat() and UnholyPrecombatCdPostConditions()
+	{
+		UnholyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatCdActions()
-	UnholyDefaultCdActions()
+	unless not InCombat() and UnholyPrecombatCdPostConditions()
+	{
+		UnholyDefaultCdActions()
+	}
 }
 
 ### Required symbols

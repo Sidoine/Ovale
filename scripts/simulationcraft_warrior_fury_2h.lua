@@ -248,6 +248,11 @@ AddFunction FuryTitansGripPrecombatMainActions
 	Spell(battle_stance)
 }
 
+AddFunction FuryTitansGripPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
 AddFunction FuryTitansGripPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
@@ -256,6 +261,11 @@ AddFunction FuryTitansGripPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FuryTitansGripPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
 }
 
 ### actions.single_target
@@ -436,12 +446,18 @@ AddCheckBox(opt_warrior_fury_aoe L(AOE) default specialization=fury)
 
 AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=shortcd specialization=fury
 {
-	FuryTitansGripDefaultShortCdActions()
+	unless not InCombat() and FuryTitansGripPrecombatShortCdPostConditions()
+	{
+		FuryTitansGripDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_fury_aoe help=shortcd specialization=fury
 {
-	FuryTitansGripDefaultShortCdActions()
+	unless not InCombat() and FuryTitansGripPrecombatShortCdPostConditions()
+	{
+		FuryTitansGripDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=fury
@@ -459,13 +475,19 @@ AddIcon checkbox=opt_warrior_fury_aoe help=aoe specialization=fury
 AddIcon checkbox=!opt_warrior_fury_aoe enemies=1 help=cd specialization=fury
 {
 	if not InCombat() FuryTitansGripPrecombatCdActions()
-	FuryTitansGripDefaultCdActions()
+	unless not InCombat() and FuryTitansGripPrecombatCdPostConditions()
+	{
+		FuryTitansGripDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 {
 	if not InCombat() FuryTitansGripPrecombatCdActions()
-	FuryTitansGripDefaultCdActions()
+	unless not InCombat() and FuryTitansGripPrecombatCdPostConditions()
+	{
+		FuryTitansGripDefaultCdActions()
+	}
 }
 
 ### Required symbols

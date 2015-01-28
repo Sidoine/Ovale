@@ -165,6 +165,11 @@ AddFunction AssassinationPrecombatShortCdActions
 	}
 }
 
+AddFunction AssassinationPrecombatShortCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and Spell(slice_and_dice)
+}
+
 AddFunction AssassinationPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
@@ -173,6 +178,11 @@ AddFunction AssassinationPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction AssassinationPrecombatCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and Spell(slice_and_dice)
 }
 
 ###
@@ -317,6 +327,11 @@ AddFunction CombatPrecombatShortCdActions
 	}
 }
 
+AddFunction CombatPrecombatShortCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
+}
+
 AddFunction CombatPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
@@ -325,6 +340,11 @@ AddFunction CombatPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction CombatPrecombatCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
 }
 
 ###
@@ -602,6 +622,11 @@ AddFunction SubtletyPrecombatShortCdActions
 	}
 }
 
+AddFunction SubtletyPrecombatShortCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or BuffRemaining(slice_and_dice_buff) < 18 and Spell(slice_and_dice)
+}
+
 AddFunction SubtletyPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
@@ -610,6 +635,11 @@ AddFunction SubtletyPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction SubtletyPrecombatCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or BuffRemaining(slice_and_dice_buff) < 18 and Spell(slice_and_dice)
 }
 ]]
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "include")
@@ -631,13 +661,19 @@ AddCheckBox(opt_rogue_assassination_aoe L(AOE) default specialization=assassinat
 AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
-	AssassinationDefaultShortCdActions()
+	unless not InCombat() and AssassinationPrecombatShortCdPostConditions()
+	{
+		AssassinationDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=shortcd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatShortCdActions()
-	AssassinationDefaultShortCdActions()
+	unless not InCombat() and AssassinationPrecombatShortCdPostConditions()
+	{
+		AssassinationDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=assassination
@@ -655,13 +691,19 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=aoe specialization=assassinati
 AddIcon checkbox=!opt_rogue_assassination_aoe enemies=1 help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
-	AssassinationDefaultCdActions()
+	unless not InCombat() and AssassinationPrecombatCdPostConditions()
+	{
+		AssassinationDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassination
 {
 	if not InCombat() AssassinationPrecombatCdActions()
-	AssassinationDefaultCdActions()
+	unless not InCombat() and AssassinationPrecombatCdPostConditions()
+	{
+		AssassinationDefaultCdActions()
+	}
 }
 
 ### Combat icons.
@@ -671,13 +713,19 @@ AddCheckBox(opt_rogue_combat_aoe L(AOE) default specialization=combat)
 AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
-	CombatDefaultShortCdActions()
+	unless not InCombat() and CombatPrecombatShortCdPostConditions()
+	{
+		CombatDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_combat_aoe help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
-	CombatDefaultShortCdActions()
+	unless not InCombat() and CombatPrecombatShortCdPostConditions()
+	{
+		CombatDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=combat
@@ -695,13 +743,19 @@ AddIcon checkbox=opt_rogue_combat_aoe help=aoe specialization=combat
 AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
-	CombatDefaultCdActions()
+	unless not InCombat() and CombatPrecombatCdPostConditions()
+	{
+		CombatDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
-	CombatDefaultCdActions()
+	unless not InCombat() and CombatPrecombatCdPostConditions()
+	{
+		CombatDefaultCdActions()
+	}
 }
 
 ### Subtlety icons.
@@ -711,13 +765,19 @@ AddCheckBox(opt_rogue_subtlety_aoe L(AOE) default specialization=subtlety)
 AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=shortcd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatShortCdActions()
-	SubtletyDefaultShortCdActions()
+	unless not InCombat() and SubtletyPrecombatShortCdPostConditions()
+	{
+		SubtletyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=shortcd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatShortCdActions()
-	SubtletyDefaultShortCdActions()
+	unless not InCombat() and SubtletyPrecombatShortCdPostConditions()
+	{
+		SubtletyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=subtlety
@@ -735,13 +795,19 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=aoe specialization=subtlety
 AddIcon checkbox=!opt_rogue_subtlety_aoe enemies=1 help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
-	SubtletyDefaultCdActions()
+	unless not InCombat() and SubtletyPrecombatCdPostConditions()
+	{
+		SubtletyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 {
 	if not InCombat() SubtletyPrecombatCdActions()
-	SubtletyDefaultCdActions()
+	unless not InCombat() and SubtletyPrecombatCdPostConditions()
+	{
+		SubtletyDefaultCdActions()
+	}
 }
 ]]
 	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")

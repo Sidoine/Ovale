@@ -451,6 +451,11 @@ AddFunction ArcanePrecombatShortCdActions
 	}
 }
 
+AddFunction ArcanePrecombatShortCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(arcane_blast)
+}
+
 AddFunction ArcanePrecombatCdActions
 {
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
@@ -462,6 +467,11 @@ AddFunction ArcanePrecombatCdActions
 	}
 }
 
+AddFunction ArcanePrecombatCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power) or Spell(arcane_blast)
+}
+
 ### Arcane icons.
 
 AddCheckBox(opt_mage_arcane_aoe L(AOE) default specialization=arcane)
@@ -469,13 +479,19 @@ AddCheckBox(opt_mage_arcane_aoe L(AOE) default specialization=arcane)
 AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=shortcd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatShortCdActions()
-	ArcaneDefaultShortCdActions()
+	unless not InCombat() and ArcanePrecombatShortCdPostConditions()
+	{
+		ArcaneDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_arcane_aoe help=shortcd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatShortCdActions()
-	ArcaneDefaultShortCdActions()
+	unless not InCombat() and ArcanePrecombatShortCdPostConditions()
+	{
+		ArcaneDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=arcane
@@ -493,13 +509,19 @@ AddIcon checkbox=opt_mage_arcane_aoe help=aoe specialization=arcane
 AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=cd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatCdActions()
-	ArcaneDefaultCdActions()
+	unless not InCombat() and ArcanePrecombatCdPostConditions()
+	{
+		ArcaneDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 {
 	if not InCombat() ArcanePrecombatCdActions()
-	ArcaneDefaultCdActions()
+	unless not InCombat() and ArcanePrecombatCdPostConditions()
+	{
+		ArcaneDefaultCdActions()
+	}
 }
 
 ### Required symbols

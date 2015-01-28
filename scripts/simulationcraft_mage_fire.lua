@@ -370,6 +370,11 @@ AddFunction FirePrecombatShortCdActions
 	}
 }
 
+AddFunction FirePrecombatShortCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(pyroblast)
+}
+
 AddFunction FirePrecombatCdActions
 {
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
@@ -379,6 +384,11 @@ AddFunction FirePrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction FirePrecombatCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power) or Spell(pyroblast)
 }
 
 ### actions.single_target
@@ -433,13 +443,19 @@ AddCheckBox(opt_mage_fire_aoe L(AOE) default specialization=fire)
 AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=shortcd specialization=fire
 {
 	if not InCombat() FirePrecombatShortCdActions()
-	FireDefaultShortCdActions()
+	unless not InCombat() and FirePrecombatShortCdPostConditions()
+	{
+		FireDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=shortcd specialization=fire
 {
 	if not InCombat() FirePrecombatShortCdActions()
-	FireDefaultShortCdActions()
+	unless not InCombat() and FirePrecombatShortCdPostConditions()
+	{
+		FireDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=fire
@@ -457,13 +473,19 @@ AddIcon checkbox=opt_mage_fire_aoe help=aoe specialization=fire
 AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=cd specialization=fire
 {
 	if not InCombat() FirePrecombatCdActions()
-	FireDefaultCdActions()
+	unless not InCombat() and FirePrecombatCdPostConditions()
+	{
+		FireDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 {
 	if not InCombat() FirePrecombatCdActions()
-	FireDefaultCdActions()
+	unless not InCombat() and FirePrecombatCdPostConditions()
+	{
+		FireDefaultCdActions()
+	}
 }
 
 ### Required symbols

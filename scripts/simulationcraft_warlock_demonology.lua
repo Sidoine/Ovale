@@ -234,6 +234,11 @@ AddFunction DemonologyPrecombatShortCdActions
 	}
 }
 
+AddFunction DemonologyPrecombatShortCdPostConditions
+{
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or Spell(soul_fire)
+}
+
 AddFunction DemonologyPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard)
@@ -251,6 +256,11 @@ AddFunction DemonologyPrecombatCdActions
 	}
 }
 
+AddFunction DemonologyPrecombatCdPostConditions
+{
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard) or Talent(grimoire_of_service_talent) and Spell(grimoire_felguard) or Spell(soul_fire)
+}
+
 ### Demonology icons.
 
 AddCheckBox(opt_warlock_demonology_aoe L(AOE) default specialization=demonology)
@@ -258,13 +268,19 @@ AddCheckBox(opt_warlock_demonology_aoe L(AOE) default specialization=demonology)
 AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=shortcd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatShortCdActions()
-	DemonologyDefaultShortCdActions()
+	unless not InCombat() and DemonologyPrecombatShortCdPostConditions()
+	{
+		DemonologyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=shortcd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatShortCdActions()
-	DemonologyDefaultShortCdActions()
+	unless not InCombat() and DemonologyPrecombatShortCdPostConditions()
+	{
+		DemonologyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=demonology
@@ -282,13 +298,19 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
 AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatCdActions()
-	DemonologyDefaultCdActions()
+	unless not InCombat() and DemonologyPrecombatCdPostConditions()
+	{
+		DemonologyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 {
 	if not InCombat() DemonologyPrecombatCdActions()
-	DemonologyDefaultCdActions()
+	unless not InCombat() and DemonologyPrecombatCdPostConditions()
+	{
+		DemonologyDefaultCdActions()
+	}
 }
 
 ### Required symbols

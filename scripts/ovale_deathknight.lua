@@ -61,15 +61,12 @@ AddFunction InterruptActions
 #	spec=blood
 #	talents=2013102
 
-# ActionList: BloodDefaultActions --> main, shortcd, cd
+### actions.default
 
 AddFunction BloodDefaultMainActions
 {
-	#auto_attack
 	#conversion,if=!buff.conversion.up&runic_power>50&health.pct<90
 	if not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 Spell(conversion)
-	# CHANGE: Cancel conversion if the trigger conditions no longer apply.
-	if BuffPresent(conversion_buff) and not { RunicPower() > 50 and HealthPercent() < 90 } Spell(conversion text=cancel)
 	#death_strike,if=incoming_damage_5s>=health.max*0.65
 	if IncomingDamage(5) >= MaxHealth() * 0.65 Spell(death_strike)
 	#outbreak,if=(!talent.necrotic_plague.enabled&disease.min_remains<8)|!disease.ticking
@@ -80,29 +77,26 @@ AddFunction BloodDefaultMainActions
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(plague_strike)
 	#icy_touch,if=(!talent.necrotic_plague.enabled&!dot.frost_fever.ticking)|(talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking)
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(icy_touch)
-	#blood_boil,if=active_enemies>2&blood=2
-	if Enemies() > 2 and Rune(blood) >= 2 Spell(blood_boil)
-	#plague_leech,if=(!blood&!unholy|!blood&!frost|!unholy&!frost)&cooldown.outbreak.remains<=gcd
-	if { not Rune(blood) >=1 and not Rune(unholy) >= 1 or not Rune(blood) >=1 and not Rune(frost) >= 1 or not Rune(unholy) >=1 and not Rune(frost) >= 1 } and SpellCooldown(outbreak) <= GCD() Spell(plague_leech)
-	#call_action_list,name=bt,if=talent.blood_tap.enabled
-	if Talent(blood_tap_talent) BloodBtActions()
-	#call_action_list,name=re,if=talent.runic_empowerment.enabled
-	if Talent(runic_empowerment_talent) BloodReActions()
-	#call_action_list,name=rc,if=talent.runic_corruption.enabled
-	if Talent(runic_corruption_talent) BloodRcActions()
-	#call_action_list,name=nrt,if=!talent.blood_tap.enabled&!talent.runic_empowerment.enabled&!talent.runic_corruption.enabled
-	if not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) BloodNrtActions()
-	#blood_boil,if=buff.crimson_scourge.react
-	if BuffPresent(crimson_scourge_buff) Spell(blood_boil)
+	#death_strike,if=(unholy=2|frost=2)
+	if Rune(unholy) >= 2 or Rune(frost) >= 2 Spell(death_strike)
+	#death_coil,if=runic_power>70
+	if RunicPower() > 70 Spell(death_coil)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	#blood_boil,if=blood=2
+	if Rune(blood) >= 2 Spell(blood_boil)
 	#death_coil
 	Spell(death_coil)
 }
 
 AddFunction BloodDefaultShortCdActions
 {
-	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion)
-		or BuffPresent(conversion_buff) and not { RunicPower() > 50 and HealthPercent() < 90 } and Spell(conversion text=cancel)
-		or IncomingDamage(5) >= MaxHealth() * 0.65 and Spell(death_strike)
+	#auto_attack
+	GetInMeleeRange()
+	#antimagic_shell
+	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
+
+	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion) or IncomingDamage(5) >= MaxHealth() * 0.65 and Spell(death_strike)
 	{
 		#bone_shield,if=buff.army_of_the_dead.down&buff.bone_shield.down&buff.dancing_rune_weapon.down&buff.icebound_fortitude.down&buff.vampiric_blood.down
 		if BuffExpires(army_of_the_dead_buff) and BuffExpires(bone_shield_buff) and BuffExpires(dancing_rune_weapon_buff) and BuffExpires(icebound_fortitude_buff) and BuffExpires(vampiric_blood_buff) Spell(bone_shield)
@@ -110,35 +104,18 @@ AddFunction BloodDefaultShortCdActions
 		if HealthPercent() < 50 Spell(vampiric_blood)
 		#rune_tap,if=health.pct<50&buff.army_of_the_dead.down&buff.dancing_rune_weapon.down&buff.bone_shield.down&buff.vampiric_blood.down&buff.icebound_fortitude.down
 		if HealthPercent() < 50 and BuffExpires(army_of_the_dead_buff) and BuffExpires(dancing_rune_weapon_buff) and BuffExpires(bone_shield_buff) and BuffExpires(vampiric_blood_buff) and BuffExpires(icebound_fortitude_buff) Spell(rune_tap)
-		#death_pact,if=health.pct<50
-		if HealthPercent() < 50 Spell(death_pact)
+		#dancing_rune_weapon,if=health.pct<80&buff.army_of_the_dead.down&buff.icebound_fortitude.down&buff.bone_shield.down&buff.vampiric_blood.down
+		if HealthPercent() < 80 and BuffExpires(army_of_the_dead_buff) and BuffExpires(icebound_fortitude_buff) and BuffExpires(bone_shield_buff) and BuffExpires(vampiric_blood_buff) Spell(dancing_rune_weapon)
 
-		unless { not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak)
-			or RunicPower() > 90 and Spell(death_coil)
-			or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(plague_strike)
-			or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(icy_touch)
+		unless { not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak) or RunicPower() > 90 and Spell(death_coil) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(plague_strike) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(icy_touch)
 		{
-			# CHANGE: Only Defile on cooldown if talented into Blood Tap which allows the death rune consumed to be easily regenerated.
 			#defile
-			#Spell(defile)
-			if Talent(blood_tap_talent) Spell(defile)
-			#death_and_decay,if=active_enemies>2
-			if Enemies() > 2 Spell(death_and_decay)
+			Spell(defile)
 
-			unless Enemies() > 2 and Rune(blood) >= 2 and Spell(blood_boil)
-				or Talent(blood_tap_talent) and BloodBtActions()
-				or Talent(runic_empowerment_talent) and BloodReActions()
-				or Talent(runic_corruption_talent) and BloodRcActions()
-				or not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) and BloodNrtActions()
+			unless { Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 			{
-				#death_and_decay,if=buff.crimson_scourge.react
-				if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
-
-				unless BuffPresent(crimson_scourge_buff) and Spell(blood_boil)
-				{
-					#empower_rune_weapon,if=!blood&!unholy&!frost
-					if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
-				}
+				#blood_tap
+				Spell(blood_tap)
 			}
 		}
 	}
@@ -146,6 +123,8 @@ AddFunction BloodDefaultShortCdActions
 
 AddFunction BloodDefaultCdActions
 {
+	#mind_freeze
+	InterruptActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -154,11 +133,8 @@ AddFunction BloodDefaultCdActions
 	Spell(arcane_torrent_runicpower)
 	#potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
 	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 UsePotionArmor()
-	#antimagic_shell
-	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 
 	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion)
-		or BuffPresent(conversion_buff) and not { RunicPower() > 50 and HealthPercent() < 90 } and Spell(conversion text=cancel)
 	{
 		#lichborne,if=health.pct<90
 		if HealthPercent() < 90 Spell(lichborne)
@@ -169,53 +145,19 @@ AddFunction BloodDefaultCdActions
 			if BuffExpires(bone_shield_buff) and BuffExpires(dancing_rune_weapon_buff) and BuffExpires(icebound_fortitude_buff) and BuffExpires(vampiric_blood_buff) Spell(army_of_the_dead)
 			#icebound_fortitude,if=health.pct<30&buff.army_of_the_dead.down&buff.dancing_rune_weapon.down&buff.bone_shield.down&buff.vampiric_blood.down
 			if HealthPercent() < 30 and BuffExpires(army_of_the_dead_buff) and BuffExpires(dancing_rune_weapon_buff) and BuffExpires(bone_shield_buff) and BuffExpires(vampiric_blood_buff) Spell(icebound_fortitude)
-			#dancing_rune_weapon,if=health.pct<80&buff.army_of_the_dead.down&buff.icebound_fortitude.down&buff.bone_shield.down&buff.vampiric_blood.down
-			if HealthPercent() < 80 and BuffExpires(army_of_the_dead_buff) and BuffExpires(icebound_fortitude_buff) and BuffExpires(bone_shield_buff) and BuffExpires(vampiric_blood_buff) Spell(dancing_rune_weapon)
+			#death_pact,if=health.pct<50
+			if HealthPercent() < 50 Spell(death_pact)
+
+			unless { not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak) or RunicPower() > 90 and Spell(death_coil) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(plague_strike) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(icy_touch) or Spell(defile) or { Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil) or Spell(death_coil)
+			{
+				#empower_rune_weapon,if=!blood&!unholy&!frost
+				if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
+			}
 		}
 	}
 }
 
-# ActionList: BloodBloodActions --> main
-
-AddFunction BloodBloodActions
-{
-	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_blood)
-	#blood_boil
-	Spell(blood_boil)
-}
-
-# ActionList: BloodBtActions --> main
-
-AddFunction BloodBtActions
-{
-	#death_strike,if=unholy=2&frost=2
-	if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-	#blood_tap,if=buff.blood_charge.stack>=5&!blood
-	if BuffStacks(blood_charge_buff) >= 5 and not Rune(blood) >= 1 Spell(blood_tap)
-	#death_strike,if=buff.blood_charge.stack>=10&unholy&frost
-	if BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-	#blood_tap,if=buff.blood_charge.stack>=10&!unholy&!frost
-	if BuffStacks(blood_charge_buff) >= 10 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(blood_tap)
-	#blood_tap,if=buff.blood_charge.stack>=5&(unholy&!frost|!unholy&frost)
-	if BuffStacks(blood_charge_buff) >= 5 and { Rune(unholy) >= 1 and not Rune(frost) >= 1 or not Rune(unholy) >= 1 and Rune(frost) >= 1 } Spell(blood_tap)
-	#blood_tap,if=buff.blood_charge.stack>=5&blood.death&!unholy&!frost XXX
-	if BuffStacks(blood_charge_buff) >= 5 and DeathRune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(blood_tap)
-	#call_action_list,name=blood,if=blood>=2|(blood&!blood.death) XXX
-	if Rune(blood) >= 2 or Rune(blood) >= 1 and DeathRune(blood) < 1 BloodBloodActions()
-}
-
-# ActionList: BloodNrtActions --> main
-
-AddFunction BloodNrtActions
-{
-	#death_strike,if=unholy=2&frost=2
-	if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-	#call_action_list,name=blood,if=blood>=1
-	if Rune(blood) >= 1 BloodBloodActions()
-}
-
-# ActionList: BloodPrecombatActions --> main, shortcd, cd
+### actions.precombat
 
 AddFunction BloodPrecombatMainActions
 {
@@ -225,47 +167,35 @@ AddFunction BloodPrecombatMainActions
 	Spell(blood_presence)
 	#horn_of_winter
 	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-	#snapshot_stats
 }
 
 AddFunction BloodPrecombatShortCdActions
 {
-	unless Spell(blood_presence)
-		or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	unless Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 	{
 		#bone_shield
 		Spell(bone_shield)
 	}
 }
 
+AddFunction BloodPrecombatShortCdPostConditions
+{
+	Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+}
+
 AddFunction BloodPrecombatCdActions
 {
-	unless Spell(blood_presence)
-		or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	unless Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 	{
+		#snapshot_stats
 		#potion,name=draenic_armor
 		UsePotionArmor()
 	}
 }
 
-# ActionList: BloodRcActions --> main
-
-AddFunction BloodRcActions
+AddFunction BloodPrecombatCdPostConditions
 {
-	#death_strike,if=unholy=2&frost=2
-	if Rune(unholy) >= 2 and Rune(frost) >= 2 Spell(death_strike)
-	#call_action_list,name=blood,if=blood=2
-	if Rune(blood) >= 2 BloodBloodActions()
-}
-
-# ActionList: BloodReActions --> main
-
-AddFunction BloodReActions
-{
-	#death_strike,if=unholy&frost
-	if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
-	#call_action_list,name=blood,if=blood=2
-	if Rune(blood) >= 2 BloodBloodActions()
+	Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 }
 
 ###
@@ -534,6 +464,11 @@ AddFunction FrostDualWieldPrecombatShortCdActions
 	}
 }
 
+AddFunction FrostDualWieldPrecombatShortCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
+}
+
 AddFunction FrostDualWieldPrecombatCdActions
 {
 	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
@@ -544,6 +479,11 @@ AddFunction FrostDualWieldPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FrostDualWieldPrecombatCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
 }
 
 ### actions.single_target
@@ -892,6 +832,11 @@ AddFunction FrostTwoHanderPrecombatShortCdActions
 	}
 }
 
+AddFunction FrostTwoHanderPrecombatShortCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
+}
+
 AddFunction FrostTwoHanderPrecombatCdActions
 {
 	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
@@ -902,6 +847,11 @@ AddFunction FrostTwoHanderPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FrostTwoHanderPrecombatCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
 }
 
 ### actions.single_target
@@ -1281,6 +1231,11 @@ AddFunction UnholyPrecombatShortCdActions
 	}
 }
 
+AddFunction UnholyPrecombatShortCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(unholy_presence)
+}
+
 AddFunction UnholyPrecombatCdActions
 {
 	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(unholy_presence)
@@ -1291,6 +1246,11 @@ AddFunction UnholyPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction UnholyPrecombatCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(unholy_presence) or Spell(raise_dead)
 }
 
 ### actions.single_target
@@ -1490,13 +1450,19 @@ AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
 AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=shortcd specialization=blood
 {
 	if not InCombat() BloodPrecombatShortCdActions()
-	BloodDefaultShortCdActions()
+	unless not InCombat() and BloodPrecombatShortCdPostConditions()
+	{
+		BloodDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=shortcd specialization=blood
 {
 	if not InCombat() BloodPrecombatShortCdActions()
-	BloodDefaultShortCdActions()
+	unless not InCombat() and BloodPrecombatShortCdPostConditions()
+	{
+		BloodDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=blood
@@ -1514,13 +1480,19 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
 AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=cd specialization=blood
 {
 	if not InCombat() BloodPrecombatCdActions()
-	BloodDefaultCdActions()
+	unless not InCombat() and BloodPrecombatCdPostConditions()
+	{
+		BloodDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 {
 	if not InCombat() BloodPrecombatCdActions()
-	BloodDefaultCdActions()
+	unless not InCombat() and BloodPrecombatCdPostConditions()
+	{
+		BloodDefaultCdActions()
+	}
 }
 
 ### Frost icons.
@@ -1532,12 +1504,18 @@ AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specializatio
 	if HasWeapon(offhand)
 	{
 		if not InCombat() FrostDualWieldPrecombatShortCdActions()
-		FrostDualWieldDefaultShortCdActions()
+		unless not InCombat() and FrostDualWieldPrecombatShortCdPostConditions()
+		{
+			FrostDualWieldDefaultShortCdActions()
+		}
 	}
 	if HasWeapon(offhand no)
 	{
 		if not InCombat() FrostTwoHanderPrecombatShortCdActions()
-		FrostTwoHanderDefaultShortCdActions()
+		unless not InCombat() and FrostTwoHanderPrecombatShortCdPostConditions()
+		{
+			FrostTwoHanderDefaultShortCdActions()
+		}
 	}
 }
 
@@ -1546,12 +1524,18 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
 	if HasWeapon(offhand)
 	{
 		if not InCombat() FrostDualWieldPrecombatShortCdActions()
-		FrostDualWieldDefaultShortCdActions()
+		unless not InCombat() and FrostDualWieldPrecombatShortCdPostConditions()
+		{
+			FrostDualWieldDefaultShortCdActions()
+		}
 	}
 	if HasWeapon(offhand no)
 	{
 		if not InCombat() FrostTwoHanderPrecombatShortCdActions()
-		FrostTwoHanderDefaultShortCdActions()
+		unless not InCombat() and FrostTwoHanderPrecombatShortCdPostConditions()
+		{
+			FrostTwoHanderDefaultShortCdActions()
+		}
 	}
 }
 
@@ -1588,12 +1572,18 @@ AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=fro
 	if HasWeapon(offhand)
 	{
 		if not InCombat() FrostDualWieldPrecombatCdActions()
-		FrostDualWieldDefaultCdActions()
+		unless not InCombat() and FrostDualWieldPrecombatCdPostConditions()
+		{
+			FrostDualWieldDefaultCdActions()
+		}
 	}
 	if HasWeapon(offhand no)
 	{
 		if not InCombat() FrostTwoHanderPrecombatCdActions()
-		FrostTwoHanderDefaultCdActions()
+		unless not InCombat() and FrostTwoHanderPrecombatCdPostConditions()
+		{
+			FrostTwoHanderDefaultCdActions()
+		}
 	}
 }
 
@@ -1602,12 +1592,18 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 	if HasWeapon(offhand)
 	{
 		if not InCombat() FrostDualWieldPrecombatCdActions()
-		FrostDualWieldDefaultCdActions()
+		unless not InCombat() and FrostDualWieldPrecombatCdPostConditions()
+		{
+			FrostDualWieldDefaultCdActions()
+		}
 	}
 	if HasWeapon(offhand no)
 	{
 		if not InCombat() FrostTwoHanderPrecombatCdActions()
-		FrostTwoHanderDefaultCdActions()
+		unless not InCombat() and FrostTwoHanderPrecombatCdPostConditions()
+		{
+			FrostTwoHanderDefaultCdActions()
+		}
 	}
 }
 
@@ -1618,13 +1614,19 @@ AddCheckBox(opt_deathknight_unholy_aoe L(AOE) default specialization=unholy)
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
-	UnholyDefaultShortCdActions()
+	unless not InCombat() and UnholyPrecombatShortCdPostConditions()
+	{
+		UnholyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
-	UnholyDefaultShortCdActions()
+	unless not InCombat() and UnholyPrecombatShortCdPostConditions()
+	{
+		UnholyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=unholy
@@ -1642,13 +1644,19 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=aoe specialization=unholy
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=cd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatCdActions()
-	UnholyDefaultCdActions()
+	unless not InCombat() and UnholyPrecombatCdPostConditions()
+	{
+		UnholyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatCdActions()
-	UnholyDefaultCdActions()
+	unless not InCombat() and UnholyPrecombatCdPostConditions()
+	{
+		UnholyDefaultCdActions()
+	}
 }
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "script")

@@ -126,6 +126,11 @@ AddFunction HolyPrecombatShortCdActions
 	}
 }
 
+AddFunction HolyPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or Spell(prayer_of_mending)
+}
+
 AddFunction HolyPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or Spell(chakra_serenity)
@@ -136,6 +141,11 @@ AddFunction HolyPrecombatCdActions
 	}
 }
 
+AddFunction HolyPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or Spell(chakra_serenity) or Spell(prayer_of_mending)
+}
+
 ### Holy icons.
 
 AddCheckBox(opt_priest_holy_aoe L(AOE) default specialization=holy)
@@ -143,13 +153,19 @@ AddCheckBox(opt_priest_holy_aoe L(AOE) default specialization=holy)
 AddIcon checkbox=!opt_priest_holy_aoe enemies=1 help=shortcd specialization=holy
 {
 	if not InCombat() HolyPrecombatShortCdActions()
-	HolyDefaultShortCdActions()
+	unless not InCombat() and HolyPrecombatShortCdPostConditions()
+	{
+		HolyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_priest_holy_aoe help=shortcd specialization=holy
 {
 	if not InCombat() HolyPrecombatShortCdActions()
-	HolyDefaultShortCdActions()
+	unless not InCombat() and HolyPrecombatShortCdPostConditions()
+	{
+		HolyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=holy
@@ -167,13 +183,19 @@ AddIcon checkbox=opt_priest_holy_aoe help=aoe specialization=holy
 AddIcon checkbox=!opt_priest_holy_aoe enemies=1 help=cd specialization=holy
 {
 	if not InCombat() HolyPrecombatCdActions()
-	HolyDefaultCdActions()
+	unless not InCombat() and HolyPrecombatCdPostConditions()
+	{
+		HolyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 {
 	if not InCombat() HolyPrecombatCdActions()
-	HolyDefaultCdActions()
+	unless not InCombat() and HolyPrecombatCdPostConditions()
+	{
+		HolyDefaultCdActions()
+	}
 }
 
 ### Required symbols

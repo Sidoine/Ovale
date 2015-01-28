@@ -189,6 +189,11 @@ AddFunction CombatPrecombatShortCdActions
 	}
 }
 
+AddFunction CombatPrecombatShortCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
+}
+
 AddFunction CombatPrecombatCdActions
 {
 	unless BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison)
@@ -199,6 +204,11 @@ AddFunction CombatPrecombatCdActions
 	}
 }
 
+AddFunction CombatPrecombatCdPostConditions
+{
+	BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth) or Talent(marked_for_death_talent) and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
+}
+
 ### Combat icons.
 
 AddCheckBox(opt_rogue_combat_aoe L(AOE) default specialization=combat)
@@ -206,13 +216,19 @@ AddCheckBox(opt_rogue_combat_aoe L(AOE) default specialization=combat)
 AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
-	CombatDefaultShortCdActions()
+	unless not InCombat() and CombatPrecombatShortCdPostConditions()
+	{
+		CombatDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_combat_aoe help=shortcd specialization=combat
 {
 	if not InCombat() CombatPrecombatShortCdActions()
-	CombatDefaultShortCdActions()
+	unless not InCombat() and CombatPrecombatShortCdPostConditions()
+	{
+		CombatDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=combat
@@ -230,13 +246,19 @@ AddIcon checkbox=opt_rogue_combat_aoe help=aoe specialization=combat
 AddIcon checkbox=!opt_rogue_combat_aoe enemies=1 help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
-	CombatDefaultCdActions()
+	unless not InCombat() and CombatPrecombatCdPostConditions()
+	{
+		CombatDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 {
 	if not InCombat() CombatPrecombatCdActions()
-	CombatDefaultCdActions()
+	unless not InCombat() and CombatPrecombatCdPostConditions()
+	{
+		CombatDefaultCdActions()
+	}
 }
 
 ### Required symbols

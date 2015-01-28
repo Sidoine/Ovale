@@ -4293,11 +4293,19 @@ local function GenerateIconBody(output, tag, profile)
 	local defaultName = OvaleFunctionName("_default", annotation)
 
 	local precombatBodyName, precombatConditionName = OvaleTaggedFunctionName(precombatName, tag)
-	if profile["actions.precombat"] then
-		tinsert(output, format("	if not InCombat() %s()", precombatBodyName))
-	end
 	local defaultBodyName, defaultConditionName = OvaleTaggedFunctionName(defaultName, tag)
-	tinsert(output, format("	%s()", defaultBodyName))
+	if profile["actions.precombat"] then
+		local code = [[
+			if not InCombat() %s()
+			unless not InCombat() and %s()
+			{
+				%s()
+			}
+		]]
+		tinsert(output, format(code, precombatBodyName, precombatConditionName, defaultBodyName))
+	else
+		tinsert(output, defaultBodyName .. "()")
+	end
 end
 --</private-static-methods>
 

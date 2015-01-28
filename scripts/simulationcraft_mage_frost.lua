@@ -293,6 +293,11 @@ AddFunction FrostPrecombatShortCdActions
 	}
 }
 
+AddFunction FrostPrecombatShortCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or Spell(frostbolt)
+}
+
 AddFunction FrostPrecombatCdActions
 {
 	unless { BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or not pet.Present() and Spell(water_elemental) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power)
@@ -302,6 +307,11 @@ AddFunction FrostPrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction FrostPrecombatCdPostConditions
+{
+	{ BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) } and Spell(arcane_brilliance) or not pet.Present() and Spell(water_elemental) or TotemRemaining(rune_of_power) < 150 and Spell(rune_of_power) or Spell(frostbolt)
 }
 
 ### actions.single_target
@@ -426,13 +436,19 @@ AddCheckBox(opt_mage_frost_aoe L(AOE) default specialization=frost)
 AddIcon checkbox=!opt_mage_frost_aoe enemies=1 help=shortcd specialization=frost
 {
 	if not InCombat() FrostPrecombatShortCdActions()
-	FrostDefaultShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_frost_aoe help=shortcd specialization=frost
 {
 	if not InCombat() FrostPrecombatShortCdActions()
-	FrostDefaultShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=frost
@@ -450,13 +466,19 @@ AddIcon checkbox=opt_mage_frost_aoe help=aoe specialization=frost
 AddIcon checkbox=!opt_mage_frost_aoe enemies=1 help=cd specialization=frost
 {
 	if not InCombat() FrostPrecombatCdActions()
-	FrostDefaultCdActions()
+	unless not InCombat() and FrostPrecombatCdPostConditions()
+	{
+		FrostDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 {
 	if not InCombat() FrostPrecombatCdActions()
-	FrostDefaultCdActions()
+	unless not InCombat() and FrostPrecombatCdPostConditions()
+	{
+		FrostDefaultCdActions()
+	}
 }
 
 ### Required symbols

@@ -175,6 +175,11 @@ AddFunction BrewmasterPrecombatMainActions
 	Spell(stance_of_the_sturdy_ox)
 }
 
+AddFunction BrewmasterPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
+}
+
 AddFunction BrewmasterPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
@@ -185,6 +190,11 @@ AddFunction BrewmasterPrecombatCdActions
 		#dampen_harm
 		Spell(dampen_harm)
 	}
+}
+
+AddFunction BrewmasterPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_sturdy_ox)
 }
 
 ### actions.st
@@ -250,12 +260,18 @@ AddCheckBox(opt_monk_brewmaster_aoe L(AOE) default specialization=brewmaster)
 
 AddIcon checkbox=!opt_monk_brewmaster_aoe enemies=1 help=shortcd specialization=brewmaster
 {
-	BrewmasterDefaultShortCdActions()
+	unless not InCombat() and BrewmasterPrecombatShortCdPostConditions()
+	{
+		BrewmasterDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_brewmaster_aoe help=shortcd specialization=brewmaster
 {
-	BrewmasterDefaultShortCdActions()
+	unless not InCombat() and BrewmasterPrecombatShortCdPostConditions()
+	{
+		BrewmasterDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=brewmaster
@@ -273,13 +289,19 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=aoe specialization=brewmaster
 AddIcon checkbox=!opt_monk_brewmaster_aoe enemies=1 help=cd specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatCdActions()
-	BrewmasterDefaultCdActions()
+	unless not InCombat() and BrewmasterPrecombatCdPostConditions()
+	{
+		BrewmasterDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 {
 	if not InCombat() BrewmasterPrecombatCdActions()
-	BrewmasterDefaultCdActions()
+	unless not InCombat() and BrewmasterPrecombatCdPostConditions()
+	{
+		BrewmasterDefaultCdActions()
+	}
 }
 
 ### Required symbols

@@ -160,6 +160,11 @@ AddFunction BloodPrecombatShortCdActions
 	}
 }
 
+AddFunction BloodPrecombatShortCdPostConditions
+{
+	Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+}
+
 AddFunction BloodPrecombatCdActions
 {
 	unless Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
@@ -170,6 +175,11 @@ AddFunction BloodPrecombatCdActions
 	}
 }
 
+AddFunction BloodPrecombatCdPostConditions
+{
+	Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+}
+
 ### Blood icons.
 
 AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
@@ -177,13 +187,19 @@ AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
 AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=shortcd specialization=blood
 {
 	if not InCombat() BloodPrecombatShortCdActions()
-	BloodDefaultShortCdActions()
+	unless not InCombat() and BloodPrecombatShortCdPostConditions()
+	{
+		BloodDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=shortcd specialization=blood
 {
 	if not InCombat() BloodPrecombatShortCdActions()
-	BloodDefaultShortCdActions()
+	unless not InCombat() and BloodPrecombatShortCdPostConditions()
+	{
+		BloodDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=blood
@@ -201,13 +217,19 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
 AddIcon checkbox=!opt_deathknight_blood_aoe enemies=1 help=cd specialization=blood
 {
 	if not InCombat() BloodPrecombatCdActions()
-	BloodDefaultCdActions()
+	unless not InCombat() and BloodPrecombatCdPostConditions()
+	{
+		BloodDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 {
 	if not InCombat() BloodPrecombatCdActions()
-	BloodDefaultCdActions()
+	unless not InCombat() and BloodPrecombatCdPostConditions()
+	{
+		BloodDefaultCdActions()
+	}
 }
 
 ### Required symbols

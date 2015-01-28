@@ -578,6 +578,11 @@ AddFunction ShadowPrecombatMainActions
 	if not Talent(clarity_of_power_talent) Spell(vampiric_touch)
 }
 
+AddFunction ShadowPrecombatShortCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Talent(clarity_of_power_talent) and Spell(mind_spike) or not Talent(clarity_of_power_talent) and Spell(vampiric_touch)
+}
+
 AddFunction ShadowPrecombatCdActions
 {
 	unless not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or not BuffPresent(shadowform_buff) and Spell(shadowform)
@@ -586,6 +591,11 @@ AddFunction ShadowPrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction ShadowPrecombatCdPostConditions
+{
+	not BuffPresent(stamina_buff any=1) and Spell(power_word_fortitude) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Talent(clarity_of_power_talent) and Spell(mind_spike) or not Talent(clarity_of_power_talent) and Spell(vampiric_touch)
 }
 
 ### actions.pvp_dispersion
@@ -735,12 +745,18 @@ AddCheckBox(opt_priest_shadow_aoe L(AOE) default specialization=shadow)
 
 AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=shortcd specialization=shadow
 {
-	ShadowDefaultShortCdActions()
+	unless not InCombat() and ShadowPrecombatShortCdPostConditions()
+	{
+		ShadowDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_priest_shadow_aoe help=shortcd specialization=shadow
 {
-	ShadowDefaultShortCdActions()
+	unless not InCombat() and ShadowPrecombatShortCdPostConditions()
+	{
+		ShadowDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=shadow
@@ -758,13 +774,19 @@ AddIcon checkbox=opt_priest_shadow_aoe help=aoe specialization=shadow
 AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=cd specialization=shadow
 {
 	if not InCombat() ShadowPrecombatCdActions()
-	ShadowDefaultCdActions()
+	unless not InCombat() and ShadowPrecombatCdPostConditions()
+	{
+		ShadowDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 {
 	if not InCombat() ShadowPrecombatCdActions()
-	ShadowDefaultCdActions()
+	unless not InCombat() and ShadowPrecombatCdPostConditions()
+	{
+		ShadowDefaultCdActions()
+	}
 }
 
 ### Required symbols

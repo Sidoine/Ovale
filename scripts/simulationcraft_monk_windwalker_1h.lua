@@ -208,6 +208,11 @@ AddFunction WindwalkerPrecombatMainActions
 	Spell(stance_of_the_fierce_tiger)
 }
 
+AddFunction WindwalkerPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+}
+
 AddFunction WindwalkerPrecombatCdActions
 {
 	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
@@ -216,6 +221,11 @@ AddFunction WindwalkerPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction WindwalkerPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
 }
 
 ### actions.st
@@ -277,12 +287,18 @@ AddCheckBox(opt_monk_windwalker_aoe L(AOE) default specialization=windwalker)
 
 AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=shortcd specialization=windwalker
 {
-	WindwalkerDefaultShortCdActions()
+	unless not InCombat() and WindwalkerPrecombatShortCdPostConditions()
+	{
+		WindwalkerDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_windwalker_aoe help=shortcd specialization=windwalker
 {
-	WindwalkerDefaultShortCdActions()
+	unless not InCombat() and WindwalkerPrecombatShortCdPostConditions()
+	{
+		WindwalkerDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=windwalker
@@ -300,13 +316,19 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=aoe specialization=windwalker
 AddIcon checkbox=!opt_monk_windwalker_aoe enemies=1 help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
-	WindwalkerDefaultCdActions()
+	unless not InCombat() and WindwalkerPrecombatCdPostConditions()
+	{
+		WindwalkerDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 {
 	if not InCombat() WindwalkerPrecombatCdActions()
-	WindwalkerDefaultCdActions()
+	unless not InCombat() and WindwalkerPrecombatCdPostConditions()
+	{
+		WindwalkerDefaultCdActions()
+	}
 }
 
 ### Required symbols

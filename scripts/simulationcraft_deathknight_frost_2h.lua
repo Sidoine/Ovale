@@ -299,6 +299,11 @@ AddFunction FrostTwoHanderPrecombatShortCdActions
 	}
 }
 
+AddFunction FrostTwoHanderPrecombatShortCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
+}
+
 AddFunction FrostTwoHanderPrecombatCdActions
 {
 	unless BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
@@ -309,6 +314,11 @@ AddFunction FrostTwoHanderPrecombatCdActions
 		#potion,name=draenic_strength
 		UsePotionStrength()
 	}
+}
+
+AddFunction FrostTwoHanderPrecombatCdPostConditions
+{
+	BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_presence)
 }
 
 ### actions.single_target
@@ -422,13 +432,19 @@ AddCheckBox(opt_deathknight_frost_aoe L(AOE) default specialization=frost)
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specialization=frost
 {
 	if not InCombat() FrostTwoHanderPrecombatShortCdActions()
-	FrostTwoHanderDefaultShortCdActions()
+	unless not InCombat() and FrostTwoHanderPrecombatShortCdPostConditions()
+	{
+		FrostTwoHanderDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
 {
 	if not InCombat() FrostTwoHanderPrecombatShortCdActions()
-	FrostTwoHanderDefaultShortCdActions()
+	unless not InCombat() and FrostTwoHanderPrecombatShortCdPostConditions()
+	{
+		FrostTwoHanderDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=frost
@@ -446,13 +462,19 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=aoe specialization=frost
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=frost
 {
 	if not InCombat() FrostTwoHanderPrecombatCdActions()
-	FrostTwoHanderDefaultCdActions()
+	unless not InCombat() and FrostTwoHanderPrecombatCdPostConditions()
+	{
+		FrostTwoHanderDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 {
 	if not InCombat() FrostTwoHanderPrecombatCdActions()
-	FrostTwoHanderDefaultCdActions()
+	unless not InCombat() and FrostTwoHanderPrecombatCdPostConditions()
+	{
+		FrostTwoHanderDefaultCdActions()
+	}
 }
 
 ### Required symbols

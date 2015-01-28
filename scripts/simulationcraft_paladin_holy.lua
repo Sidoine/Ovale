@@ -120,18 +120,34 @@ AddFunction HolyPrecombatMainActions
 	Spell(beacon_of_light text=healing_target)
 }
 
+AddFunction HolyPrecombatShortCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(beacon_of_light text=healing_target)
+}
+
+AddFunction HolyPrecombatCdPostConditions
+{
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(beacon_of_light text=healing_target)
+}
+
 ### Holy icons.
 
 AddCheckBox(opt_paladin_holy_aoe L(AOE) default specialization=holy)
 
 AddIcon checkbox=!opt_paladin_holy_aoe enemies=1 help=shortcd specialization=holy
 {
-	HolyDefaultShortCdActions()
+	unless not InCombat() and HolyPrecombatShortCdPostConditions()
+	{
+		HolyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_paladin_holy_aoe help=shortcd specialization=holy
 {
-	HolyDefaultShortCdActions()
+	unless not InCombat() and HolyPrecombatShortCdPostConditions()
+	{
+		HolyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=holy
@@ -148,12 +164,18 @@ AddIcon checkbox=opt_paladin_holy_aoe help=aoe specialization=holy
 
 AddIcon checkbox=!opt_paladin_holy_aoe enemies=1 help=cd specialization=holy
 {
-	HolyDefaultCdActions()
+	unless not InCombat() and HolyPrecombatCdPostConditions()
+	{
+		HolyDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_paladin_holy_aoe help=cd specialization=holy
 {
-	HolyDefaultCdActions()
+	unless not InCombat() and HolyPrecombatCdPostConditions()
+	{
+		HolyDefaultCdActions()
+	}
 }
 
 ### Required symbols

@@ -164,6 +164,11 @@ AddFunction ElementalPrecombatMainActions
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
 }
 
+AddFunction ElementalPrecombatShortCdPostConditions
+{
+	not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
+}
+
 AddFunction ElementalPrecombatCdActions
 {
 	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
@@ -172,6 +177,11 @@ AddFunction ElementalPrecombatCdActions
 		#potion,name=draenic_intellect
 		UsePotionIntellect()
 	}
+}
+
+AddFunction ElementalPrecombatCdPostConditions
+{
+	not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
 }
 
 ### actions.single
@@ -356,6 +366,11 @@ AddFunction EnhancementPrecombatMainActions
 	if not BuffPresent(lightning_shield_buff) Spell(lightning_shield)
 }
 
+AddFunction EnhancementPrecombatShortCdPostConditions
+{
+	not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
+}
+
 AddFunction EnhancementPrecombatCdActions
 {
 	unless not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
@@ -364,6 +379,11 @@ AddFunction EnhancementPrecombatCdActions
 		#potion,name=draenic_agility
 		UsePotionAgility()
 	}
+}
+
+AddFunction EnhancementPrecombatCdPostConditions
+{
+	not BuffPresent(lightning_shield_buff) and Spell(lightning_shield)
 }
 
 ### actions.single
@@ -478,12 +498,18 @@ AddCheckBox(opt_shaman_elemental_aoe L(AOE) default specialization=elemental)
 
 AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=shortcd specialization=elemental
 {
-	ElementalDefaultShortCdActions()
+	unless not InCombat() and ElementalPrecombatShortCdPostConditions()
+	{
+		ElementalDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=shortcd specialization=elemental
 {
-	ElementalDefaultShortCdActions()
+	unless not InCombat() and ElementalPrecombatShortCdPostConditions()
+	{
+		ElementalDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=elemental
@@ -501,13 +527,19 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=aoe specialization=elemental
 AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=cd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatCdActions()
-	ElementalDefaultCdActions()
+	unless not InCombat() and ElementalPrecombatCdPostConditions()
+	{
+		ElementalDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatCdActions()
-	ElementalDefaultCdActions()
+	unless not InCombat() and ElementalPrecombatCdPostConditions()
+	{
+		ElementalDefaultCdActions()
+	}
 }
 
 ### Enhancement icons.
@@ -516,12 +548,18 @@ AddCheckBox(opt_shaman_enhancement_aoe L(AOE) default specialization=enhancement
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
-	EnhancementDefaultShortCdActions()
+	unless not InCombat() and EnhancementPrecombatShortCdPostConditions()
+	{
+		EnhancementDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
-	EnhancementDefaultShortCdActions()
+	unless not InCombat() and EnhancementPrecombatShortCdPostConditions()
+	{
+		EnhancementDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=enhancement
@@ -539,13 +577,19 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
-	EnhancementDefaultCdActions()
+	unless not InCombat() and EnhancementPrecombatCdPostConditions()
+	{
+		EnhancementDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
-	EnhancementDefaultCdActions()
+	unless not InCombat() and EnhancementPrecombatCdPostConditions()
+	{
+		EnhancementDefaultCdActions()
+	}
 }
 
 ### Restoration icons.

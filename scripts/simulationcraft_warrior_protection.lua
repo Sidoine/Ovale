@@ -96,6 +96,11 @@ AddFunction ProtectionPrecombatMainActions
 	Spell(defensive_stance)
 }
 
+AddFunction ProtectionPrecombatShortCdPostConditions
+{
+	not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
+}
+
 AddFunction ProtectionPrecombatCdActions
 {
 	unless not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
@@ -106,6 +111,11 @@ AddFunction ProtectionPrecombatCdActions
 		#potion,name=draenic_armor
 		UsePotionArmor()
 	}
+}
+
+AddFunction ProtectionPrecombatCdPostConditions
+{
+	not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) and Spell(battle_shout) or not BuffPresent(stamina_buff any=1) and Spell(commanding_shout) or Spell(defensive_stance)
 }
 
 ### actions.prot
@@ -259,12 +269,18 @@ AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
 
 AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=shortcd specialization=protection
 {
-	ProtectionDefaultShortCdActions()
+	unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+	{
+		ProtectionDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_protection_aoe help=shortcd specialization=protection
 {
-	ProtectionDefaultShortCdActions()
+	unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+	{
+		ProtectionDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=protection
@@ -282,13 +298,19 @@ AddIcon checkbox=opt_warrior_protection_aoe help=aoe specialization=protection
 AddIcon checkbox=!opt_warrior_protection_aoe enemies=1 help=cd specialization=protection
 {
 	if not InCombat() ProtectionPrecombatCdActions()
-	ProtectionDefaultCdActions()
+	unless not InCombat() and ProtectionPrecombatCdPostConditions()
+	{
+		ProtectionDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 {
 	if not InCombat() ProtectionPrecombatCdActions()
-	ProtectionDefaultCdActions()
+	unless not InCombat() and ProtectionPrecombatCdPostConditions()
+	{
+		ProtectionDefaultCdActions()
+	}
 }
 
 ### Required symbols
