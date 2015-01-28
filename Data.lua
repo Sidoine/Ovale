@@ -84,6 +84,7 @@ OvaleData.buffSpellList =
 		[126309] = true, -- Still Water (water strider)
 		[126373] = true, -- Fearless Roar (quilen)
 		[160052] = true, -- Strength of the Pack (raptor)
+		[160200] = true, -- Lone Wolf: Ferocity of the Raptor (hunter)
 	},
 	haste_buff = {
 		[ 49868] = true, -- Mind Quickening (shadow priest)
@@ -93,6 +94,7 @@ OvaleData.buffSpellList =
 		[135678] = true, -- Energizing Spores (sporebat)
 		[160003] = true, -- Savage Vigor (rylak)
 		[160074] = true, -- Speed of the Swarm (wasp)
+		[160203] = true, -- Lone Wolf: Haste of the Hyena (hunter)
 	},
 	mastery_buff = {
 		[ 19740] = true, -- Blessing of Might (paladin)
@@ -102,6 +104,7 @@ OvaleData.buffSpellList =
 		[128997] = true, -- Spirit Beast Blessing (spirit beast)
 		[155522] = true, -- Power of the Grave (blood death knight)
 		[160073] = true, -- Plainswalking (tallstrider)
+		[160198] = true, -- Lone Wolf: Grace of the Cat (hunter)
 	},
 	multistrike_buff = {
 		[ 24844] = true, -- Breath of the Winds (wind serpent)
@@ -112,6 +115,7 @@ OvaleData.buffSpellList =
 		[109773] = true, -- Dark Intent (warlock)
 		[113742] = true, -- Swiftblade's Cunning (rogue)
 		[166916] = true, -- Windflurry (windwalker monks)
+		[172968] = true, -- Lone Wolf: Quickness of the Dragonhawk (hunter)
 	},
 	spell_power_multiplier_buff = {
 		[  1459] = true, -- Arcane Brilliance (mage)
@@ -120,6 +124,7 @@ OvaleData.buffSpellList =
 		[109773] = true, -- Dark Intent (warlock)
 		[126309] = true, -- Still Water (water strider)
 		[128433] = true, -- Serpent's Cunning (serpent)
+		[160205] = true, -- Lone Wolf: Wisdom of the Serpent (hunter)
 	},
 	stamina_buff = {
 		[   469] = true, -- Commanding Shout (warrior)
@@ -129,6 +134,7 @@ OvaleData.buffSpellList =
 		[160003] = true, -- Savage Vigor (rylak)
 		[160014] = true, -- Sturdiness (goat)
 		[166928] = true, -- Blood Pact (warlock)
+		[160199] = true, -- Lone Wolf: Fortitude of the Bear (hunter)
 	},
 	str_agi_int_buff = {
 		[  1126] = true, -- Mark of the Wild (druid)
@@ -139,6 +145,7 @@ OvaleData.buffSpellList =
 		[159988] = true, -- Bark of the Wild (dog, riverbeast)
 		[160017] = true, -- Blessing of Kongs (gorilla)
 		[160077] = true, -- Strength of the Earth (worm)
+		[160206] = true, -- Lone Wolf: Power of the Primates (hunter)
 	},
 	versatility_buff = {
 		[  1126] = true, -- Mark of the Wild (druid)
@@ -151,6 +158,7 @@ OvaleData.buffSpellList =
 		[160077] = true, -- Strength of the Earth (worm)
 		[167187] = true, -- Sanctity Aura (retribution paladins)
 		[167188] = true, -- Inspiring Presence (arms/fury warriors)
+		[172967] = true, -- Lone Wolf: Versatility of the Ravager (hunter)
 	},
 
 	-- Target debuffs
