@@ -148,8 +148,6 @@ AddFunction ArcaneAoeMainActions
 	Spell(supernova)
 	#arcane_barrage,if=buff.arcane_charge.stack=4
 	if DebuffStacks(arcane_charge_debuff) == 4 Spell(arcane_barrage)
-	#cone_of_cold,if=glyph.cone_of_cold.enabled
-	if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
 	#arcane_explosion
 	Spell(arcane_explosion)
 }
@@ -163,12 +161,14 @@ AddFunction ArcaneAoeShortCdActions
 	{
 		#arcane_orb,if=buff.arcane_charge.stack<4
 		if DebuffStacks(arcane_charge_debuff) < 4 Spell(arcane_orb)
+		#cone_of_cold,if=glyph.cone_of_cold.enabled
+		if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
 	}
 }
 
 AddFunction ArcaneAoeShortCdPostConditions
 {
-	DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Glyph(glyph_of_cone_of_cold) and Spell(cone_of_cold) or Spell(arcane_explosion)
+	DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_explosion)
 }
 
 AddFunction ArcaneAoeCdActions
