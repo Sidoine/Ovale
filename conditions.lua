@@ -316,6 +316,41 @@ do
 end
 
 do
+	--- Get the duration in seconds of the cooldown before a buff can be gained again.
+	-- @name BuffCooldownDuration
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @see DebuffCooldown
+	-- @usage
+	-- if target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff)
+	--     Item(Trinket0Slot)
+
+	local function BuffCooldownDuration(positionalParams, namedParams, state, atTime)
+		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local minCooldown = INFINITY
+		if OvaleData.buffSpellList[auraId] then
+			for id in pairs(OvaleData.buffSpellList[auraId]) do
+				local si = OvaleData.spellInfo[id]
+				local cd = si and si.buff_cd
+				if cd and minCooldown > cd then
+					minCooldown = cd
+				end
+			end
+		else
+			minCooldown = 0
+		end
+		return Compare(minCooldown, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("buffcooldownduration", false, BuffCooldownDuration)
+	OvaleCondition:RegisterCondition("debuffcooldownduration", false, BuffCooldownDuration)
+end
+
+do
 	--- Get the total count of the given aura across all targets.
 	-- @name BuffCountOnAny
 	-- @paramsig number or boolean
