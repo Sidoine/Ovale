@@ -18,23 +18,30 @@ local type = type
 local pairs = pairs
 local strfind = string.find
 local tonumber = tonumber
+local wipe = wipe
 local INFINITY = math.huge
 
 -- Registered "run-time requirement" handlers: self_requirement[name] = handler
 -- Handler is invoked as handler(state, name, tokens, index, target).
 local self_requirement = {}
 
-local STAT_NAMES = { "agility", "bonus_armor", "crit", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
-local STAT_FULLNAME = {
-	agi = "agility",
-	int = "intellect",
-	str = "strength",
-	spi = "spirit",
+local STAT_NAMES = { "agility", "bonus_armor", "critical_strike", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
+local STAT_SHORTNAME = {
+	agility = "agi",
+	critical_strike = "crit",
+	intellect = "int",
+	strength = "str",
+	spirit = "spi",
 }
-local TRINKET_USE_NAMES = { "proc", "stacking_proc", "stacking_stat", "stat" }
+local STAT_USE_NAMES = { "trinket_proc", "trinket_stacking_proc", "trinket_stacking_stat", "trinket_stat" }
 --<private-static-properties>
 
 --<public-static-properties>
+-- Export stat tables.
+OvaleData.STAT_NAMES = STAT_NAMES
+OvaleData.STAT_SHORTNAME = STAT_SHORTNAME
+OvaleData.STAT_USE_NAMES = STAT_USE_NAMES
+
 -- Item information from the current script (by item ID).
 OvaleData.itemInfo = {}
 -- Item lists.
@@ -42,8 +49,7 @@ OvaleData.itemList = {}
 -- Spell information from the current script (by spell ID).
 OvaleData.spellInfo = {}
 -- Spell lists.
-OvaleData.buffSpellList =
-{
+OvaleData.buffSpellList = {
 	-- Debuffs
 	fear_debuff = {
 		[  5246] = true, -- Intimidating Shout
@@ -215,188 +221,22 @@ OvaleData.buffSpellList =
 	raid_movement_buff = {
 		[106898] = true, -- Stampeding Roar
 	},
-
-	-- Trinket buffs
-	trinket_proc_agility_buff = {
---		[126554] = true, -- Bottle of Infinite Stars
-		[126690] = true, -- PvP agility trinket (on-use)
-		[126707] = true, -- PvP agility trinket (proc)
-		[126708] = true, -- PvP agility trinket (proc)
---		[128984] = true, -- Relic of Xuen (agility)
---		[138699] = true, -- Vicious Talisman of the Shado-Pan Assault
---		[138938] = true, -- Bad Juju
-		[146308] = true, -- Assurance of Consequence
-		[146310] = true, -- Ticking Ebon Detonator
-		[148896] = true, -- Sigil of Rampage
-		[148903] = true, -- Haromm's Talisman
-		[177597] = true, -- Lucky Double-Sided Coin (on-use)
-	},
-	trinket_proc_bonus_armor_buff = {
-		[176873] = true, -- Tablet of Turnbuckle Teamwork (on-use)
-		[177055] = true, -- Evergaze Arcane Eidolon
-	},
-	trinket_proc_crit_buff = {
---		[138963] = true, -- Unerring Vision of Lei-Shen
-		[162916] = true, -- Skull of War
-		[162918] = true, -- Knight's Badge
-		[162920] = true, -- Sandman's Pouch
-		[165532] = true, -- Bonemaw's Big Toe (on-use)
-		[165532] = true, -- Voidmender's Shadowgem (on-use)
-		[176979] = true, -- Immaculate Living Mushroom
-		[176983] = true, -- Stoneheart Idol
-		[177041] = true, -- Tectus' Beating Heart
-		[177047] = true, -- Goren Soul Repository
-	},
-	trinket_proc_haste_buff = {
-		[165531] = true, -- Fleshrender's Meathook (on-use)
-		[165821] = true, -- Munificent Bonds of Fury
-		[165821] = true, -- Spores of Alacrity
-		[165821] = true, -- Witherbark's Branch
-		[176875] = true, -- Shards of Nothing (on-use)
-		[176879] = true, -- Emblem of Caustic Healing (on-use)
-		[176882] = true, -- Turbulent Focusing Crystal (on-use)
-		[176885] = true, -- Turbulent Seal of Defiance (on-use)
-		[176938] = true, -- Formidable Relic of Blood
-		[176944] = true, -- Formidable Censer of Faith
-		[176981] = true, -- Furyheart Talisman
-		[177036] = true, -- Meaty Dragonspine Trophy
-		[177052] = true, -- Darmac's Unstable Talisman
-	},
-	trinket_proc_intellect_buff = {
---		[126577] = true, -- Light of the Cosmos
-		[126683] = true, -- PvP intellect trinket (on-use)
-		[126705] = true, -- PvP intellect trinket (proc)
---		[128985] = true, -- Relic of Yu'lon
---		[136082] = true, -- Shock-Charger/Static-Caster's Medallion
---		[138898] = true, -- Breath of the Hydra
---		[139133] = true, -- Cha-Ye's Essence of Brilliance (assume 20% crit chance)
-		[146046] = true, -- Purified Bindings of Immerseus
-		[148897] = true, -- Frenzied Crystal of Rage
-		[148906] = true, -- Kardris' Toxic Totem
-	},
-	trinket_proc_mastery_buff = {
-		[165485] = true, -- Kihra's Adrenaline Injector (on-use)
-		[165535] = true, -- Kyrak's Vileblood Serum (on-use)
-		[165535] = true, -- Tharbek's Lucky Pebble
-		[165825] = true, -- Munificent Censer of Tranquility
-		[165825] = true, -- Xeri'tac's Unhatched Egg Sac
-		[165835] = true, -- Munificent Emblem of Terror
-		[176876] = true, -- Pol's Blinded Eye (on-use)
-		[176883] = true, -- Turbulent Vial of Toxin (on-use)
-		[176884] = true, -- Turbulent Relic of Mendacity (on-use)
-		[176940] = true, -- Formidable Jar of Doom
-		[176942] = true, -- Formidable Orb of Putrescence
-		[177044] = true, -- Horn of Screaming Spirits
-		[177057] = true, -- Blast Furnace Door
-	},
-	trinket_proc_multistrike_buff = {
-		[165542] = true, -- Gor'ashan's Lodestone Spike (on-use)
-		[165838] = true, -- Coagulated Genesaur Blood
-		[176874] = true, -- Vial of Convulsive Shadows
-		[176878] = true, -- Beating Heart of the Mountain (on-use)
-		[176881] = true, -- Turbulent Emblem (on-use)
-		[176936] = true, -- Formidable Fang
-		[176987] = true, -- Blackheart Enforcer's Medallion
-		[177039] = true, -- Scales of Doom
-		[177064] = true, -- Elementalist's Shielding Talisman
-	},
-	trinket_proc_spellpower_buff = {
-		[177594] = true, -- Copeland's Clarity (on-use)
-	},
-	trinket_proc_spirit_buff = {
-		[162914] = true, -- Winged Hourglass
-		[177062] = true, -- Ironspike Chew Toy
-	},
-	trinket_proc_strength_buff = {
---		[126582] = true, -- Lei Shen's Final Orders
-		[126679] = true, -- PvP strength trinket (on-use)
-		[126700] = true, -- PvP strength trinket (proc)
-		[126702] = true, -- PvP strength trinket (proc)
---		[128986] = true, -- Relic of Xuen (strength)
---		[138702] = true, -- Brutal Talisman of the Shado-Pan Assault
-		[146245] = true, -- Evil Eye of Galakras
-		[146250] = true, -- Thok's Tail Tip
-		[148899] = true, -- Fusion-Fire Core
-		[177189] = true, -- Scabbard of Kyanos
-	},
-	trinket_proc_versatility_buff = {
-		[165534] = true, -- Enforcer's Stun Grenade (on-use)
-		[165543] = true, -- Emberscale Talisman (on-use)
-		[165543] = true, -- Ragewing's Firefang (on-use)
-		[165840] = true, -- Leaf of the Ancient Protectors
-		[165840] = true, -- Munificent Orb of Ice
-		[165840] = true, -- Munificent Soul of Compassion
-		[176976] = true, -- Mote of the Mountain
-	},
-	trinket_stacking_proc_agility_buff = {
---		[138756] = true, -- Renataki's Soul Charm
-	},
-	trinket_stacking_proc_crit_buff = {
-		[146285] = true, -- Skeer's Bloodsoaked Talisman
-		[177071] = true, -- Humming Blackiron Trigger
-	},
-	trinket_stacking_proc_haste_buff = {
-		[177090] = true, -- Auto-Repairing Autoclave
-		[177104] = true, -- Battering Talisman
-	},
-	trinket_stacking_proc_intellect_buff = {
---		[138786] = true, -- Wushoolay's Final Choice
-		[146184] = true, -- Black Blood of Y'Shaarj
-	},
-	trinket_stacking_proc_multistrike_buff = {
-		[177085] = true, -- Blackiron Micro Crucible
-		[177098] = true, -- Forgemaster's Insignia
-	},
-	trinket_stacking_proc_strength_buff = {
---		[138759] = true, -- Fabled Feather of Ji-Kun
---		[138870] = true, -- Primordius' Talisman of Rage
-	},
 }
--- Spell list aliases.
+-- Add trinket lists to buffSpellList.
 do
-	local list = OvaleData.buffSpellList
-
-	-- Create default, empty lists for "trinket_(proc|stacking_proc|stacking_stat|stat)_<stat>_buff".
-	for _, useName in pairs(TRINKET_USE_NAMES) do
+	for _, useName in pairs(STAT_USE_NAMES) do
+		local name
 		for _, statName in pairs(STAT_NAMES) do
-			local name = format("trinket_%s_%s_buff", useName, statName)
-			list[name] = list[name] or {}
-		end
-	end
-
-	-- Default aliases from "trinket_(stacking_stat|stat)_<stat>_buff" to "trinket_(stacking_proc|proc)_<stat>_buff".
-	for _, statName in pairs(STAT_NAMES) do
-		local name = format("trinket_stacking_proc_%s_buff", statName)
-		local alias = format("trinket_stacking_stat_%s_buff", statName)
-		list[alias] = list[alias] or list[name]
-	end
-	for _, statName in pairs(STAT_NAMES) do
-		local name = format("trinket_proc_%s_buff", statName)
-		local alias = format("trinket_stat_%s_buff", statName)
-		list[alias] = list[alias] or list[name]
-	end
-
-	-- Create aliases for "trinket_(stacking_proc|stacking_stat|proc|stat)_<statAbbreviation>_buff".
-	for _, useName in pairs(TRINKET_USE_NAMES) do
-		for statAbbreviation, statName in pairs(STAT_FULLNAME) do
-			local name = format("trinket_%s_%s_buff", useName, statName)
-			local alias = format("trinket_%s_%s_buff", useName, statAbbreviation)
-			list[alias] = list[alias] or list[name]
-		end
-	end
-
-	-- Create lists for "trinket_(proc|stacking_proc|stacking_stat|stat)_any_buff".
-	for _, useName in pairs(TRINKET_USE_NAMES) do
-		local name = format("trinket_%s_any_buff", useName)
-		list[name] = list[name] or {}
-		for _, statName in pairs(STAT_NAMES) do
-			local listName = format("trinket_%s_%s_buff", useName, statName)
-			if list[listName] then
-				for spellId in pairs(list[listName]) do
-					list[name][spellId] = true
-				end
+			name = useName .. "_" .. statName .. "_buff"
+			OvaleData.buffSpellList[name] = {}
+			local shortName = STAT_SHORTNAME[statName]
+			if shortName then
+				name = useName .. "_" .. shortName .. "_buff"
+				OvaleData.buffSpellList[name] = {}
 			end
 		end
+		name = useName .. "_any_buff"
+		OvaleData.buffSpellList[name] = {}
 	end
 end
 
@@ -431,8 +271,14 @@ function OvaleData:UnregisterRequirement(name)
 end
 
 function OvaleData:Reset()
-	self.itemInfo = {}
-	self.spellInfo = {}
+	wipe(self.itemInfo)
+	wipe(self.spellInfo)
+	-- Clear all trinket lists.
+	for k, v in pairs(self.buffSpellList) do
+		if strfind(k, "^trinket_") then
+			wipe(v)
+		end
+	end
 end
 
 --[[

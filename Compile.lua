@@ -41,8 +41,7 @@ OvaleDebug:RegisterDebugging(OvaleCompile)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleCompile)
 
--- Whether to trigger a script compilation if items or stances change.
-local self_compileOnItems = false
+-- Whether to trigger a script compilation stances change.
 local self_compileOnStances = false
 
 -- This module needs the information in other modules to be preloaded and ready for use.
@@ -126,7 +125,6 @@ local function TestConditions(positionalParams, namedParams)
 	end
 	if boolean and namedParams.itemset and namedParams.itemcount then
 		local equippedCount = OvaleEquipment:GetArmorSetCount(namedParams.itemset)
-		self_compileOnItems = true
 		boolean = (equippedCount >= namedParams.itemcount)
 	end
 	do
@@ -423,6 +421,74 @@ local function AddMissingVariantSpells(annotation)
 		end
 	end
 end
+
+-- Add the buffId to the appropriate buff lists based on SpellInfo() data for that buff.
+local function AddToBuffList(buffId, statName, isStacking)
+	if statName then
+		for _, useName in pairs(OvaleData.STAT_USE_NAMES) do
+			if isStacking or not strfind(useName, "_stacking_") then
+				-- Add to primary stat buff list.
+				local name = useName .. "_" .. statName .. "_buff"
+				local list = OvaleData.buffSpellList[name] or {}
+				list[buffId] = true
+				OvaleData.buffSpellList[name] = list
+				-- Add to primary "short-name" stat buff list.
+				local shortStatName = OvaleData.STAT_SHORTNAME[statName]
+				if shortStatName then
+					name = useName .. "_" .. shortStatName .. "_buff"
+					list = OvaleData.buffSpellList[name] or {}
+					list[buffId] = true
+					OvaleData.buffSpellList[name] = list
+				end
+				-- Add to "any" buff list.
+				name = useName .. "_any_buff"
+				list = OvaleData.buffSpellList[name] or {}
+				list[buffId] = true
+				OvaleData.buffSpellList[name] = list
+			end
+		end
+	else
+		-- Look up the "stat" SpellInfo() property for the buff.
+		local si = OvaleData.spellInfo[buffId]
+		isStacking = si and (si.stacking == 1 or si.max_stacks)
+		if si and si.stat then
+			local stat = si.stat
+			if type(stat) == "table" then
+				for _, name in ipairs(stat) do
+					AddToBuffList(buffId, name, isStacking)
+				end
+			else
+				AddToBuffList(buffId, stat, isStacking)
+			end
+		end
+	end
+end
+
+--[[
+	Add the trinket buffs from the equipped trinkets to the appropriate buff lists.
+--]]
+local UpdateTrinketInfo = nil
+do
+	local trinket = {}
+
+	UpdateTrinketInfo = function()
+		trinket[1], trinket[2] = OvaleEquipment:GetEquippedTrinkets()
+		for i = 1, 2 do
+			local itemId = trinket[i]
+			local ii = itemId and OvaleData.itemInfo[itemId]
+			local buffId = ii and ii.buff
+			if buffId then
+				if type(buffId) == "table" then
+					for _, id in ipairs(buffId) do
+						AddToBuffList(id)
+					end
+				else
+					AddToBuffList(buffId)
+				end
+			end
+		end
+	end
+end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -442,7 +508,7 @@ end
 
 function OvaleCompile:OnEnable()
 	self:RegisterMessage("Ovale_CheckBoxValueChanged", "ScriptControlChanged")
-	self:RegisterMessage("Ovale_EquipmentChanged")
+	self:RegisterMessage("Ovale_EquipmentChanged", "EventHandler")
 	self:RegisterMessage("Ovale_GlyphsChanged", "EventHandler")
 	self:RegisterMessage("Ovale_ListValueChanged", "ScriptControlChanged")
 	self:RegisterMessage("Ovale_ScriptChanged")
@@ -463,12 +529,6 @@ function OvaleCompile:OnDisable()
 	self:UnregisterMessage("Ovale_SpellsChanged")
 	self:UnregisterMessage("Ovale_StanceChanged")
 	self:UnregisterMessage("Ovale_TalentsChanged")
-end
-
-function OvaleCompile:Ovale_EquipmentChanged(event)
-	if self_compileOnItems then
-		self:EventHandler(event)
-	end
 end
 
 function OvaleCompile:Ovale_ScriptChanged(event)
@@ -537,7 +597,6 @@ function OvaleCompile:EvaluateScript(ast, forceEvaluation)
 		changed = true
 		-- Reset compilation state.
 		local ok = true
-		self_compileOnItems = false
 		self_compileOnStances = false
 		wipe(self_icon)
 		OvaleData:Reset()
@@ -575,6 +634,7 @@ function OvaleCompile:EvaluateScript(ast, forceEvaluation)
 		end
 		if ok then
 			AddMissingVariantSpells(ast.annotation)
+			UpdateTrinketInfo()
 		end
 	end
 	self:StopProfiling("OvaleCompile_EvaluateScript")
