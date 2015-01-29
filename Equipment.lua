@@ -554,6 +554,11 @@ do
 	end
 end
 
+-- Return the equipped trinkets as a pair of return values.
+function OvaleEquipment:GetEquippedTrinkets()
+	return self.equippedItems[INVSLOT_TRINKET1], self.equippedItems[INVSLOT_TRINKET2]
+end
+
 function OvaleEquipment:HasEquippedItem(itemId, ...)
 	local N = select("#", ...)
 	if N > 0 then
