@@ -7,9 +7,6 @@ do
 	local code = [[
 # Paladin rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_paladin_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
@@ -796,7 +793,10 @@ do
 	local code = [[
 # Ovale paladin script based on SimulationCraft.
 
-# Paladin rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_paladin_spells)
 Include(ovale_paladin)
 
 ### Protection icons.

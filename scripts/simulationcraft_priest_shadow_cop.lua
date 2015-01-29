@@ -12,6 +12,8 @@ do
 #	glyphs=mind_flay/fade/sha
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

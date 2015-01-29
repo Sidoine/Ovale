@@ -12,6 +12,8 @@ do
 #	glyphs=prayer_of_mending/circle_of_healing/deep_wells
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

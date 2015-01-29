@@ -7,9 +7,6 @@ do
 	local code = [[
 # Shaman rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_shaman_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
@@ -489,7 +486,10 @@ do
 	local code = [[
 # Ovale shaman script based on SimulationCraft.
 
-# Shaman rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_shaman_spells)
 Include(ovale_shaman)
 
 ### Elemental icons.

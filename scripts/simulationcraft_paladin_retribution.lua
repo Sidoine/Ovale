@@ -12,6 +12,8 @@ do
 #	glyphs=winged_vengeance/templars_verdict/righteous_retreat/fire_from_the_heavens/judgment
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

@@ -11,6 +11,8 @@ do
 #	talents=0001112
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

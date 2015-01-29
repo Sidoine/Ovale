@@ -12,6 +12,8 @@ do
 #	glyphs=inferno_blast/combustion/dragons_breath
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

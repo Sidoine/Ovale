@@ -7,9 +7,6 @@ do
 	local code = [[
 # Priest rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_priest_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
 AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default specialization=discipline)
@@ -755,7 +752,10 @@ do
 	local code = [[
 # Ovale priest script based on SimulationCraft.
 
-# Priest rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_priest_spells)
 Include(ovale_priest)
 
 ### Shadow icons.

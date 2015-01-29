@@ -12,6 +12,8 @@ do
 #	glyphs=savage_roar
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

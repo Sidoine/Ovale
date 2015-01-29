@@ -12,6 +12,8 @@ do
 #	glyphs=focused_shield/alabaster_shield/divine_protection
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

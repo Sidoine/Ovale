@@ -7,9 +7,6 @@ do
 	local code = [[
 # Monk rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_monk_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=windwalker)
@@ -520,7 +517,10 @@ do
 	local code = [[
 # Ovale monk script based on SimulationCraft.
 
-# Monk rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_monk_spells)
 Include(ovale_monk)
 
 ### Brewmaster icons.

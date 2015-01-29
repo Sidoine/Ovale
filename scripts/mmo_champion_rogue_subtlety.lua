@@ -12,6 +12,8 @@ do
 #	glyphs=energy/hemorrhaging_veins/vanish
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_rogue_spells)
 
 Define(honor_among_thieves_cooldown_buff 51699)

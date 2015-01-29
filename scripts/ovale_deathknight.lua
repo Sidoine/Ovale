@@ -7,9 +7,6 @@ do
 	local code = [[
 # Death knight rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_deathknight_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=blood)
@@ -1440,7 +1437,10 @@ do
 	local code = [[
 # Ovale death knight script based on SimulationCraft.
 
-# Death knight rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_deathknight_spells)
 Include(ovale_deathknight)
 
 ### Blood icons.

@@ -12,6 +12,8 @@ do
 #	pet=felhunter
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
 
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)

@@ -7,9 +7,6 @@ do
 	local code = [[
 # Warlock rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_warlock_spells)
-
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 
 AddFunction UsePotionIntellect
@@ -648,7 +645,10 @@ do
 	local code = [[
 # Ovale warlock script based on SimulationCraft.
 
-# Warlock rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_warlock_spells)
 Include(ovale_warlock)
 
 ### Affliction icons.

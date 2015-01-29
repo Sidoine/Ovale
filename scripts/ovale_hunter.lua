@@ -7,9 +7,6 @@ do
 	local code = [[
 # Hunter rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_hunter_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
@@ -547,7 +544,10 @@ do
 	local code = [[
 # Ovale hunter script based on SimulationCraft.
 
-# Hunter rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_hunter_spells)
 Include(ovale_hunter)
 
 ### BeastMastery icons.

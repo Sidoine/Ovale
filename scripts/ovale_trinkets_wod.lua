@@ -2,7 +2,7 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "ovale_trinket_mop"
+	local name = "ovale_trinkets_wod"
 	local desc = "[6.0.3] Ovale: Trinkets (Warlords of Draenor)"
 	local code = [[
 # Trinkets from Warlords of Draenor.

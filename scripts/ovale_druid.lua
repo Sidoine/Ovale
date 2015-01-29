@@ -7,9 +7,6 @@ do
 	local code = [[
 # Druid rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_druid_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_melee_range L(not_in_melee_range))
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=feral)
@@ -411,7 +408,10 @@ do
 	local code = [[
 # Ovale druid script based on SimulationCraft.
 
-# Druid rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_druid_spells)
 Include(ovale_druid)
 
 ### Feral icons.

@@ -53,9 +53,6 @@ SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_bu
 ### Trinkets
 ###
 
-Include(ovale_trinkets_mop)
-Include(ovale_trinkets_wod)
-
 # Amplification trinket passive buff.
 Define(amplified_buff 146051)
 

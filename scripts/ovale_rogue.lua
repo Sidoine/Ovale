@@ -7,9 +7,6 @@ do
 	local code = [[
 # Rogue rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_rogue_spells)
-
 Define(honor_among_thieves_cooldown_buff 51699)
 	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
 
@@ -651,7 +648,10 @@ do
 	local code = [[
 # Ovale rogue script based on SimulationCraft.
 
-# Rogue rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_rogue_spells)
 Include(ovale_rogue)
 
 ### Assassination icons.

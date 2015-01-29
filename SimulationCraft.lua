@@ -4502,7 +4502,13 @@ function OvaleSimulationCraft:EmitAST(profile)
 		do
 			OvaleDebug:ResetTrace()
 			local dictionaryAnnotation = { nodeList = {} }
-			local dictionaryCode = "Include(ovale_common) Include(ovale_" .. strlower(annotation.class) .. "_spells)"
+			local dictionaryFormat = [[
+				Include(ovale_common)
+				Include(ovale_trinkets_mop)
+				Include(ovale_trinkets_wod)
+				Include(ovale_%s_spells)
+			]]
+			local dictionaryCode = format(dictionaryFormat, strlower(annotation.class))
 			dictionaryAST = OvaleAST:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
 			if dictionaryAST then
 				dictionaryAST.annotation = dictionaryAnnotation
@@ -4679,6 +4685,8 @@ function OvaleSimulationCraft:Emit(profile, noFinalNewLine)
 	do
 		output[#output + 1] = ""
 		output[#output + 1] = "Include(ovale_common)"
+		output[#output + 1] = "Include(ovale_trinkets_mop)"
+		output[#output + 1] = "Include(ovale_trinkets_wod)"
 		output[#output + 1] = format("Include(ovale_%s_spells)", lowerclass)
 		-- Insert an extra blank line to separate section for controls from the includes.
 		if annotation.supportingDefineCount + annotation.supportingControlCount > 0 then

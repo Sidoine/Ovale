@@ -12,6 +12,8 @@ do
 #	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

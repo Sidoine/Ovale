@@ -7,9 +7,6 @@ do
 	local code = [[
 # Mage rotation functions based on SimulationCraft.
 
-Include(ovale_common)
-Include(ovale_mage_spells)
-
 AddCheckBox(opt_interrupt L(interrupt) default)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
 AddCheckBox(opt_time_warp SpellName(time_warp) default)
@@ -1297,7 +1294,10 @@ do
 	local code = [[
 # Ovale mage script based on SimulationCraft.
 
-# Mage rotation functions.
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_mage_spells)
 Include(ovale_mage)
 
 ### Arcane icons.

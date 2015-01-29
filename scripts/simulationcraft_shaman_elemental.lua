@@ -12,6 +12,8 @@ do
 #	glyphs=chain_lightning
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_shaman_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)

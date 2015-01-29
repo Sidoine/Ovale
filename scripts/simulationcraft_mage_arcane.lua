@@ -12,6 +12,8 @@ do
 #	glyphs=arcane_power/cone_of_cold
 
 Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default)
