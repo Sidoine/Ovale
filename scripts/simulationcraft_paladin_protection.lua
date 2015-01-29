@@ -16,22 +16,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
-AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default specialization=protection)
 
-AddFunction UsePotionArmor
+AddFunction ProtectionUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction ProtectionInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -121,7 +121,7 @@ AddFunction ProtectionDefaultMainActions
 AddFunction ProtectionDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	ProtectionGetInMeleeRange()
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
 	#run_action_list,name=max_dps,if=role.attack|0
@@ -189,7 +189,7 @@ AddFunction ProtectionDefaultShortCdActions
 AddFunction ProtectionDefaultCdActions
 {
 	#rebuke
-	InterruptActions()
+	ProtectionInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -207,7 +207,7 @@ AddFunction ProtectionDefaultCdActions
 		unless 0 and ProtectionMaxSurvivalCdPostConditions()
 		{
 			#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-			if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
+			if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) ProtectionUsePotionArmor()
 			#holy_avenger
 			Spell(holy_avenger)
 			#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
@@ -336,7 +336,7 @@ AddFunction ProtectionMaxDpsShortCdPostConditions
 AddFunction ProtectionMaxDpsCdActions
 {
 	#potion,name=draenic_armor,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionArmor()
+	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 ProtectionUsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 }
@@ -450,7 +450,7 @@ AddFunction ProtectionMaxSurvivalShortCdPostConditions
 AddFunction ProtectionMaxSurvivalCdActions
 {
 	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) ProtectionUsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 	#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
@@ -478,28 +478,30 @@ AddFunction ProtectionPrecombatMainActions
 	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
 	#seal_of_insight
 	Spell(seal_of_insight)
+	#righteous_fury,if=buff.righteous_fury.down
+	if BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) Spell(righteous_fury)
 	#sacred_shield
 	Spell(sacred_shield)
 }
 
 AddFunction ProtectionPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(sacred_shield)
 }
 
 AddFunction ProtectionPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(sacred_shield)
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		ProtectionUsePotionArmor()
 	}
 }
 
 AddFunction ProtectionPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(sacred_shield)
 }
 
 ### Protection icons.
@@ -601,6 +603,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # quaking_palm
 # rebuke
 # righteous_fury
+# righteous_fury_buff
 # sacred_shield
 # sacred_shield_buff
 # sanctified_wrath_talent

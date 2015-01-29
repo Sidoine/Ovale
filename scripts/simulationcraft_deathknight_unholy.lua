@@ -15,21 +15,21 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=unholy)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=unholy)
 
-AddFunction UsePotionStrength
+AddFunction UnholyUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction UnholyGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction UnholyInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -58,7 +58,7 @@ AddFunction UnholyDefaultMainActions
 AddFunction UnholyDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	UnholyGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -76,7 +76,7 @@ AddFunction UnholyDefaultShortCdActions
 AddFunction UnholyDefaultCdActions
 {
 	#mind_freeze
-	InterruptActions()
+	UnholyInterruptActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -84,7 +84,7 @@ AddFunction UnholyDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#potion,name=draenic_strength,if=buff.dark_transformation.up&target.time_to_die<=60
-	if pet.BuffPresent(dark_transformation_buff any=1) and target.TimeToDie() <= 60 UsePotionStrength()
+	if pet.BuffPresent(dark_transformation_buff any=1) and target.TimeToDie() <= 60 UnholyUsePotionStrength()
 	#run_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeCdActions()
 
@@ -323,7 +323,7 @@ AddFunction UnholyPrecombatCdActions
 		#army_of_the_dead
 		Spell(army_of_the_dead)
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		UnholyUsePotionStrength()
 	}
 }
 

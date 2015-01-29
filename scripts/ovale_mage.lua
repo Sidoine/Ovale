@@ -7,16 +7,25 @@ do
 	local code = [[
 # Mage rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
-AddCheckBox(opt_time_warp SpellName(time_warp) default)
+###
+### Arcane
+###
+# Based on SimulationCraft profile "Mage_Arcane_T17M".
+#	class=mage
+#	spec=arcane
+#	talents=3003322
+#	glyphs=arcane_power/cone_of_cold
 
-AddFunction UsePotionIntellect
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=arcane)
+AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=arcane)
+
+AddFunction ArcaneUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction ArcaneInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -28,15 +37,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Arcane
-###
-# Based on SimulationCraft profile "Mage_Arcane_T17M".
-#	class=mage
-#	spec=arcane
-#	talents=3003322
-#	glyphs=arcane_power/cone_of_cold
 
 ### actions.default
 
@@ -95,7 +95,7 @@ AddFunction ArcaneDefaultShortCdActions
 AddFunction ArcaneDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
+	if target.IsInterruptible() ArcaneInterruptActions()
 
 	unless 0 > 10 and Spell(blink)
 	{
@@ -343,7 +343,7 @@ AddFunction ArcaneCooldownsCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
-	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } UsePotionIntellect()
+	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } ArcaneUsePotionIntellect()
 }
 
 ### actions.crystal_sequence
@@ -465,7 +465,7 @@ AddFunction ArcanePrecombatCdActions
 		#mirror_image
 		Spell(mirror_image)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		ArcaneUsePotionIntellect()
 	}
 }
 
@@ -482,6 +482,28 @@ AddFunction ArcanePrecombatCdPostConditions
 #	spec=fire
 #	talents=3003322
 #	glyphs=inferno_blast/combustion/dragons_breath
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fire)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=fire)
+AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=fire)
+
+AddFunction FireUsePotionIntellect
+{
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
+}
+
+AddFunction FireInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counterspell)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
 
 ### actions.default
 
@@ -538,7 +560,7 @@ AddFunction FireDefaultShortCdActions
 AddFunction FireDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
+	if target.IsInterruptible() FireInterruptActions()
 
 	unless 0 > 10 and Spell(blink)
 	{
@@ -697,7 +719,7 @@ AddFunction FireCombustSequenceCdActions
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		FireUsePotionIntellect()
 	}
 }
 
@@ -829,7 +851,7 @@ AddFunction FirePrecombatCdActions
 		#mirror_image
 		Spell(mirror_image)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		FireUsePotionIntellect()
 	}
 }
 
@@ -892,6 +914,28 @@ AddFunction FireSingleTargetCdPostConditions
 #	talents=3003122
 #	glyphs=icy_veins/splitting_ice/cone_of_cold
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=frost)
+AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=frost)
+
+AddFunction FrostUsePotionIntellect
+{
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
+}
+
+AddFunction FrostInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counterspell)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction FrostDefaultMainActions
@@ -947,7 +991,7 @@ AddFunction FrostDefaultShortCdActions
 AddFunction FrostDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
+	if target.IsInterruptible() FrostInterruptActions()
 
 	unless 0 > 10 and Spell(blink) or not pet.Present() and Spell(water_elemental)
 	{
@@ -1039,7 +1083,7 @@ AddFunction FrostCooldownsCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) UsePotionIntellect()
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) FrostUsePotionIntellect()
 }
 
 ### actions.crystal_sequence
@@ -1161,7 +1205,7 @@ AddFunction FrostPrecombatCdActions
 		#mirror_image
 		Spell(mirror_image)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		FrostUsePotionIntellect()
 	}
 }
 

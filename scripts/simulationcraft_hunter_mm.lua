@@ -15,23 +15,23 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=marksmanship)
+AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=marksmanship)
 
-AddFunction UsePotionAgility
+AddFunction MarksmanshipUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction MarksmanshipUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction MarksmanshipInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -45,7 +45,7 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction SummonPet
+AddFunction MarksmanshipSummonPet
 {
 	if not Talent(lone_wolf_talent)
 	{
@@ -121,9 +121,9 @@ AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
 	#counter_shot
-	InterruptActions()
+	MarksmanshipInterruptActions()
 	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
+	MarksmanshipUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -131,7 +131,7 @@ AddFunction MarksmanshipDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=draenic_agility,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=25
-	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 UsePotionAgility()
+	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 MarksmanshipUsePotionAgility()
 
 	unless Spell(chimaera_shot) or Spell(kill_shot)
 	{
@@ -192,7 +192,7 @@ AddFunction MarksmanshipPrecombatShortCdActions
 	#flask,type=greater_draenic_agility_flask
 	#food,type=calamari_crepes
 	#summon_pet
-	SummonPet()
+	MarksmanshipSummonPet()
 }
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
@@ -205,7 +205,7 @@ AddFunction MarksmanshipPrecombatCdActions
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		MarksmanshipUsePotionAgility()
 	}
 }
 

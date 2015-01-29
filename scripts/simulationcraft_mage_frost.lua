@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
-AddCheckBox(opt_time_warp SpellName(time_warp) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=frost)
+AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=frost)
 
-AddFunction UsePotionIntellect
+AddFunction FrostUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction FrostInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -93,7 +93,7 @@ AddFunction FrostDefaultShortCdActions
 AddFunction FrostDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
+	if target.IsInterruptible() FrostInterruptActions()
 
 	unless 0 > 10 and Spell(blink) or not pet.Present() and Spell(water_elemental)
 	{
@@ -185,7 +185,7 @@ AddFunction FrostCooldownsCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) UsePotionIntellect()
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) FrostUsePotionIntellect()
 }
 
 ### actions.crystal_sequence
@@ -307,7 +307,7 @@ AddFunction FrostPrecombatCdActions
 		#mirror_image
 		Spell(mirror_image)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		FrostUsePotionIntellect()
 	}
 }
 

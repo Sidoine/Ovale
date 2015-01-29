@@ -16,22 +16,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
-AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=brewmaster)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=brewmaster)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=brewmaster)
 
-AddFunction UsePotionArmor
+AddFunction BrewmasterUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction BrewmasterGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction BrewmasterInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -64,7 +64,7 @@ AddFunction BrewmasterDefaultMainActions
 AddFunction BrewmasterDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	BrewmasterGetInMeleeRange()
 	#touch_of_death,if=target.health<health
 	if target.Health() < Health() Spell(touch_of_death)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
@@ -86,7 +86,7 @@ AddFunction BrewmasterDefaultCdActions
 	unless target.Health() < Health() and Spell(touch_of_death)
 	{
 		#spear_hand_strike
-		InterruptActions()
+		BrewmasterInterruptActions()
 		#nimble_brew
 		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 		#blood_fury,if=energy<=40
@@ -105,7 +105,7 @@ AddFunction BrewmasterDefaultCdActions
 		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
 		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
 		#potion,name=draenic_armor,if=(buff.fortifying_brew.down&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down)
-		if BuffExpires(fortifying_brew_buff) and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) UsePotionArmor()
+		if BuffExpires(fortifying_brew_buff) and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) BrewmasterUsePotionArmor()
 	}
 }
 
@@ -188,7 +188,7 @@ AddFunction BrewmasterPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		BrewmasterUsePotionArmor()
 		#dampen_harm
 		Spell(dampen_harm)
 	}

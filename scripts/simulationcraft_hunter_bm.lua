@@ -15,16 +15,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=beast_mastery)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=beast_mastery)
+AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=beast_mastery)
 
-AddFunction UsePotionAgility
+AddFunction BeastMasteryUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction BeastMasteryInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -108,7 +108,7 @@ AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
 	#counter_shot
-	InterruptActions()
+	BeastMasteryInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -116,9 +116,9 @@ AddFunction BeastMasteryDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=draenic_agility,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
-	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 UsePotionAgility()
+	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 BeastMasteryUsePotionAgility()
 	#potion,name=draenic_agility,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
-	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
+	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 BeastMasteryUsePotionAgility()
 	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
 }
@@ -156,7 +156,7 @@ AddFunction BeastMasteryPrecombatCdActions
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		BeastMasteryUsePotionAgility()
 	}
 }
 

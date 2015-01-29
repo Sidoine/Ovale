@@ -16,15 +16,15 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=discipline)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=discipline)
 
-AddFunction UsePotionIntellect
+AddFunction DisciplineUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction DisciplineInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -63,9 +63,9 @@ AddFunction DisciplineDefaultMainActions
 AddFunction DisciplineDefaultCdActions
 {
 	#silence
-	InterruptActions()
+	DisciplineInterruptActions()
 	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 DisciplineUsePotionIntellect()
 	#mindbender,if=talent.mindbender.enabled
 	if Talent(mindbender_talent) Spell(mindbender)
 	#shadowfiend,if=!talent.mindbender.enabled
@@ -98,7 +98,7 @@ AddFunction DisciplinePrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		DisciplineUsePotionIntellect()
 	}
 }
 

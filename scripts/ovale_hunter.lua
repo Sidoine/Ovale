@@ -7,23 +7,24 @@ do
 	local code = [[
 # Hunter rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
+###
+### Beast Mastery
+###
+# Based on SimulationCraft profile "Hunter_BM_T17M".
+#	class=hunter
+#	spec=beast_mastery
+#	talents=0002133
 
-AddFunction UsePotionAgility
+AddCheckBox(opt_interrupt L(interrupt) default specialization=beast_mastery)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=beast_mastery)
+AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=beast_mastery)
+
+AddFunction BeastMasteryUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
-AddFunction InterruptActions
+AddFunction BeastMasteryInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -46,27 +47,6 @@ AddFunction BeastMasterySummonPet
 	}
 	if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
 }
-
-AddFunction SummonPet
-{
-	if not Talent(lone_wolf_talent)
-	{
-		if pet.IsDead()
-		{
-			if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
-			Spell(revive_pet)
-		}
-		if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
-	}
-}
-
-###
-### Beast Mastery
-###
-# Based on SimulationCraft profile "Hunter_BM_T17M".
-#	class=hunter
-#	spec=beast_mastery
-#	talents=0002133
 
 ### actions.default
 
@@ -128,7 +108,7 @@ AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
 	#counter_shot
-	InterruptActions()
+	BeastMasteryInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -136,9 +116,9 @@ AddFunction BeastMasteryDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=draenic_agility,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
-	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 UsePotionAgility()
+	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 BeastMasteryUsePotionAgility()
 	#potion,name=draenic_agility,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
-	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
+	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 BeastMasteryUsePotionAgility()
 	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
 }
@@ -176,7 +156,7 @@ AddFunction BeastMasteryPrecombatCdActions
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		BeastMasteryUsePotionAgility()
 	}
 }
 
@@ -192,6 +172,49 @@ AddFunction BeastMasteryPrecombatCdPostConditions
 #	class=hunter
 #	spec=marksmanship
 #	talents=0003113
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=marksmanship)
+AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=marksmanship)
+
+AddFunction MarksmanshipUsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction MarksmanshipUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction MarksmanshipInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
+AddFunction MarksmanshipSummonPet
+{
+	if not Talent(lone_wolf_talent)
+	{
+		if pet.IsDead()
+		{
+			if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
+			Spell(revive_pet)
+		}
+		if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
+	}
+}
 
 ### actions.default
 
@@ -256,9 +279,9 @@ AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
 	#counter_shot
-	InterruptActions()
+	MarksmanshipInterruptActions()
 	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
+	MarksmanshipUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -266,7 +289,7 @@ AddFunction MarksmanshipDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=draenic_agility,if=((buff.rapid_fire.up|buff.bloodlust.up)&(cooldown.stampede.remains<1))|target.time_to_die<=25
-	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 UsePotionAgility()
+	if { BuffPresent(rapid_fire_buff) or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(stampede) < 1 or target.TimeToDie() <= 25 MarksmanshipUsePotionAgility()
 
 	unless Spell(chimaera_shot) or Spell(kill_shot)
 	{
@@ -327,7 +350,7 @@ AddFunction MarksmanshipPrecombatShortCdActions
 	#flask,type=greater_draenic_agility_flask
 	#food,type=calamari_crepes
 	#summon_pet
-	SummonPet()
+	MarksmanshipSummonPet()
 }
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
@@ -340,7 +363,7 @@ AddFunction MarksmanshipPrecombatCdActions
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		MarksmanshipUsePotionAgility()
 	}
 }
 
@@ -356,6 +379,49 @@ AddFunction MarksmanshipPrecombatCdPostConditions
 #	class=hunter
 #	spec=survival
 #	talents=0001112
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=survival)
+AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
+
+AddFunction SurvivalUsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction SurvivalUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction SurvivalInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
+AddFunction SurvivalSummonPet
+{
+	if not Talent(lone_wolf_talent)
+	{
+		if pet.IsDead()
+		{
+			if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
+			Spell(revive_pet)
+		}
+		if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
+	}
+}
 
 ### actions.default
 
@@ -407,9 +473,9 @@ AddFunction SurvivalDefaultCdActions
 {
 	#auto_shot
 	#counter_shot
-	InterruptActions()
+	SurvivalInterruptActions()
 	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
+	SurvivalUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -417,7 +483,7 @@ AddFunction SurvivalDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=draenic_agility,if=(((cooldown.stampede.remains<1)&(cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=25
-	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
+	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 SurvivalUsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
 
@@ -513,7 +579,7 @@ AddFunction SurvivalPrecombatShortCdActions
 	#flask,type=greater_draenic_agility_flask
 	#food,type=calamari_crepes
 	#summon_pet
-	SummonPet()
+	SurvivalSummonPet()
 }
 
 AddFunction SurvivalPrecombatShortCdPostConditions
@@ -526,7 +592,7 @@ AddFunction SurvivalPrecombatCdActions
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		SurvivalUsePotionAgility()
 	}
 }
 

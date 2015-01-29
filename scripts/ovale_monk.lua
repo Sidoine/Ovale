@@ -7,28 +7,31 @@ do
 	local code = [[
 # Monk rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=windwalker)
+###
+### Brewmaster
+###
+# Based on SimulationCraft profile "Monk_Brewmaster_2h_Serenity_T17M".
+#	class=monk
+#	spec=brewmaster
+#	talents=2133123
+#	glyphs=fortifying_brew,expel_harm,fortuitous_spheres
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=brewmaster)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=brewmaster)
-AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=brewmaster)
 
-AddFunction UsePotionAgility
-{
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction UsePotionArmor
+AddFunction BrewmasterUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction BrewmasterGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction BrewmasterInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -42,15 +45,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Brewmaster
-###
-# Based on SimulationCraft profile "Monk_Brewmaster_2h_Serenity_T17M".
-#	class=monk
-#	spec=brewmaster
-#	talents=2133123
-#	glyphs=fortifying_brew,expel_harm,fortuitous_spheres
 
 ### actions.default
 
@@ -70,7 +64,7 @@ AddFunction BrewmasterDefaultMainActions
 AddFunction BrewmasterDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	BrewmasterGetInMeleeRange()
 	#touch_of_death,if=target.health<health
 	if target.Health() < Health() Spell(touch_of_death)
 	#elusive_brew,if=buff.elusive_brew_stacks.react>=9&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
@@ -92,7 +86,7 @@ AddFunction BrewmasterDefaultCdActions
 	unless target.Health() < Health() and Spell(touch_of_death)
 	{
 		#spear_hand_strike
-		InterruptActions()
+		BrewmasterInterruptActions()
 		#nimble_brew
 		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 		#blood_fury,if=energy<=40
@@ -111,7 +105,7 @@ AddFunction BrewmasterDefaultCdActions
 		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
 		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
 		#potion,name=draenic_armor,if=(buff.fortifying_brew.down&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down)
-		if BuffExpires(fortifying_brew_buff) and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) UsePotionArmor()
+		if BuffExpires(fortifying_brew_buff) and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) BrewmasterUsePotionArmor()
 	}
 }
 
@@ -194,7 +188,7 @@ AddFunction BrewmasterPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		BrewmasterUsePotionArmor()
 		#dampen_harm
 		Spell(dampen_harm)
 	}
@@ -270,6 +264,36 @@ AddFunction BrewmasterStShortCdPostConditions
 #	spec=windwalker
 #	talents=0130023
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=windwalker)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
+
+AddFunction WindwalkerUsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction WindwalkerGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction WindwalkerInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(paralysis) Spell(paralysis)
+			Spell(arcane_torrent_chi)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction WindwalkerDefaultMainActions
@@ -289,7 +313,7 @@ AddFunction WindwalkerDefaultMainActions
 AddFunction WindwalkerDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	WindwalkerGetInMeleeRange()
 
 	unless BuffRemaining(tiger_power_buff) < 6 and Spell(tiger_palm)
 	{
@@ -323,14 +347,14 @@ AddFunction WindwalkerDefaultShortCdActions
 AddFunction WindwalkerDefaultCdActions
 {
 	#spear_hand_strike
-	InterruptActions()
+	WindwalkerInterruptActions()
 	#nimble_brew
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	#invoke_xuen,if=talent.invoke_xuen.enabled&time>5
 	if Talent(invoke_xuen_talent) and TimeInCombat() > 5 Spell(invoke_xuen)
 	#chi_sphere,if=talent.power_strikes.enabled&buff.chi_sphere.react&chi<4
 	#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&trinket.proc.agility.react)
-	if BuffPresent(serenity_buff) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) UsePotionAgility()
+	if BuffPresent(serenity_buff) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) WindwalkerUsePotionAgility()
 	#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 	if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 	#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -446,7 +470,7 @@ AddFunction WindwalkerPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		WindwalkerUsePotionAgility()
 	}
 }
 

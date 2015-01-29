@@ -19,23 +19,23 @@ Include(ovale_rogue_spells)
 Define(honor_among_thieves_cooldown_buff 51699)
 	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=subtlety)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=subtlety)
 
-AddFunction UsePotionAgility
+AddFunction SubtletyUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction SubtletyUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction SubtletyGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
@@ -44,7 +44,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction SubtletyInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -140,7 +140,7 @@ AddFunction SubtletyDefaultShortCdActions
 					unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { TimeInCombat() < 1.2 or BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { TimeInCombat() < 1.2 or BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
 					{
 						#auto_attack
-						GetInMeleeRange()
+						SubtletyGetInMeleeRange()
 						#pool_resource,for_next=1,extra_amount=50
 						#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))
 						if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } Spell(shadow_dance)
@@ -181,11 +181,11 @@ AddFunction SubtletyDefaultShortCdActions
 AddFunction SubtletyDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|buff.shadow_reflection.remains>12&(trinket.stat.agi.react|trinket.stat.multistrike.react|buff.archmages_greater_incandescence_agi.react)
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffRemaining(shadow_reflection_buff) > 12 and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } UsePotionAgility()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffRemaining(shadow_reflection_buff) > 12 and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } SubtletyUsePotionAgility()
 	#kick
-	InterruptActions()
+	SubtletyInterruptActions()
 	#use_item,slot=trinket2,if=buff.shadow_dance.up
-	if BuffPresent(shadow_dance_buff) UseItemActions()
+	if BuffPresent(shadow_dance_buff) SubtletyUseItemActions()
 	#shadow_reflection,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(shadow_reflection)
 	#blood_fury,if=buff.shadow_dance.up
@@ -361,7 +361,7 @@ AddFunction SubtletyPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		SubtletyUsePotionAgility()
 	}
 }
 

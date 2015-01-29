@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_shaman_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
-AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=elemental)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=elemental)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=elemental)
 
-AddFunction UsePotionIntellect
+AddFunction ElementalUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction Bloodlust
+AddFunction ElementalBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
 	{
@@ -34,7 +34,7 @@ AddFunction Bloodlust
 	}
 }
 
-AddFunction InterruptActions
+AddFunction ElementalInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -79,11 +79,11 @@ AddFunction ElementalDefaultShortCdActions
 AddFunction ElementalDefaultCdActions
 {
 	#wind_shear
-	InterruptActions()
+	ElementalInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
-	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
+	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 ElementalBloodlust()
 	#potion,name=draenic_intellect,if=buff.ascendance.up|target.time_to_die<=30
-	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 UsePotionIntellect()
+	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 ElementalUsePotionIntellect()
 	#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
 	if not BuffPresent(burst_haste_buff any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) or Level() < 87 } } Spell(berserking)
 	#blood_fury,if=buff.bloodlust.up|buff.ascendance.up|((cooldown.ascendance.remains>10|level<87)&cooldown.fire_elemental_totem.remains>10)
@@ -153,7 +153,7 @@ AddFunction ElementalPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		ElementalUsePotionIntellect()
 	}
 }
 

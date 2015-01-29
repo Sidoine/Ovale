@@ -15,21 +15,21 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_deathknight_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=blood)
 
-AddFunction UsePotionArmor
+AddFunction BloodUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction BloodGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction BloodInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -76,7 +76,7 @@ AddFunction BloodDefaultMainActions
 AddFunction BloodDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	BloodGetInMeleeRange()
 	#antimagic_shell
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 
@@ -108,7 +108,7 @@ AddFunction BloodDefaultShortCdActions
 AddFunction BloodDefaultCdActions
 {
 	#mind_freeze
-	InterruptActions()
+	BloodInterruptActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -116,7 +116,7 @@ AddFunction BloodDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
-	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 UsePotionArmor()
+	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 BloodUsePotionArmor()
 
 	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion)
 	{
@@ -173,7 +173,7 @@ AddFunction BloodPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		BloodUsePotionArmor()
 	}
 }
 

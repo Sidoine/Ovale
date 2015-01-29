@@ -15,17 +15,17 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
+AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 
-AddFunction UseItemActions
+AddFunction GuardianUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction GuardianGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
 	{
@@ -34,7 +34,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction GuardianInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -78,7 +78,7 @@ AddFunction GuardianDefaultMainActions
 AddFunction GuardianDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	GuardianGetInMeleeRange()
 	#savage_defense,if=buff.barkskin.down
 	if BuffExpires(barkskin_buff) Spell(savage_defense)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
@@ -90,7 +90,7 @@ AddFunction GuardianDefaultShortCdActions
 AddFunction GuardianDefaultCdActions
 {
 	#skull_bash
-	InterruptActions()
+	GuardianInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -98,7 +98,7 @@ AddFunction GuardianDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
 	#use_item,slot=trinket2
-	UseItemActions()
+	GuardianUseItemActions()
 	#barkskin,if=buff.bristling_fur.down
 	if BuffExpires(bristling_fur_buff) Spell(barkskin)
 	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down

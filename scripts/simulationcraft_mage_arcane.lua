@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
-AddCheckBox(opt_time_warp SpellName(time_warp) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=arcane)
+AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=arcane)
 
-AddFunction UsePotionIntellect
+AddFunction ArcaneUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction ArcaneInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -95,7 +95,7 @@ AddFunction ArcaneDefaultShortCdActions
 AddFunction ArcaneDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
+	if target.IsInterruptible() ArcaneInterruptActions()
 
 	unless 0 > 10 and Spell(blink)
 	{
@@ -343,7 +343,7 @@ AddFunction ArcaneCooldownsCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
-	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } UsePotionIntellect()
+	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } ArcaneUsePotionIntellect()
 }
 
 ### actions.crystal_sequence
@@ -465,7 +465,7 @@ AddFunction ArcanePrecombatCdActions
 		#mirror_image
 		Spell(mirror_image)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		ArcaneUsePotionIntellect()
 	}
 }
 

@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default)
-AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=holy)
+AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default specialization=holy)
+AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default specialization=holy)
 
-AddFunction UsePotionMana
+AddFunction HolyUsePotionMana
 {
 	if CheckBoxOn(opt_potion_mana) Item(draenic_mana_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction HolyInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -77,10 +77,10 @@ AddFunction HolyDefaultShortCdActions
 AddFunction HolyDefaultCdActions
 {
 	#mana_potion,if=mana.pct<=75
-	if ManaPercent() <= 75 UsePotionMana()
+	if ManaPercent() <= 75 HolyUsePotionMana()
 	#auto_attack
 	#rebuke
-	InterruptActions()
+	HolyInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -118,18 +118,20 @@ AddFunction HolyPrecombatMainActions
 	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
 	#seal_of_insight
 	Spell(seal_of_insight)
+	#righteous_fury,if=buff.righteous_fury.up
+	if BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) Spell(righteous_fury)
 	#beacon_of_light,target=healing_target
 	Spell(beacon_of_light text=healing_target)
 }
 
 AddFunction HolyPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(beacon_of_light text=healing_target)
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(beacon_of_light text=healing_target)
 }
 
 AddFunction HolyPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(beacon_of_light text=healing_target)
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(beacon_of_light text=healing_target)
 }
 
 ### Holy icons.
@@ -200,6 +202,7 @@ AddIcon checkbox=opt_paladin_holy_aoe help=cd specialization=holy
 # quaking_palm
 # rebuke
 # righteous_fury
+# righteous_fury_buff
 # seal_of_insight
 # selfless_healer_buff
 # selfless_healer_talent

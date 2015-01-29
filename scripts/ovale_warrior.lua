@@ -7,23 +7,25 @@ do
 	local code = [[
 # Warrior rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+###
+### Arms
+###
+# Based on SimulationCraft profile "Warrior_Arms_T17M".
+#	class=warrior
+#	spec=arms
+#	talents=1321322
+#	glyphs=unending_rage/heroic_leap/sweeping_strikes
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=arms)
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
 
-AddFunction UsePotionArmor
-{
-	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
-}
-
-AddFunction UsePotionStrength
+AddFunction ArmsUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction ArmsGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
 	{
@@ -33,7 +35,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction ArmsInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -47,15 +49,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Arms
-###
-# Based on SimulationCraft profile "Warrior_Arms_T17M".
-#	class=warrior
-#	spec=arms
-#	talents=1321322
-#	glyphs=unending_rage/heroic_leap/sweeping_strikes
 
 ### actions.default
 
@@ -74,7 +67,7 @@ AddFunction ArmsDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	ArmsGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementShortCdActions()
 
@@ -96,12 +89,12 @@ AddFunction ArmsDefaultShortCdActions
 AddFunction ArmsDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	ArmsInterruptActions()
 
 	unless 0 > 5 and ArmsMovementCdPostConditions()
 	{
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 ArmsUsePotionStrength()
 		#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
 		if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
 		#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5)|target.time_to_die<20
@@ -218,7 +211,7 @@ AddFunction ArmsPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		ArmsUsePotionStrength()
 	}
 }
 
@@ -294,6 +287,40 @@ AddFunction ArmsSingleShortCdPostConditions
 #	talents=1321321
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
+
+AddFunction FuryUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction FuryGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction FuryInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction FurySingleMindedFuryDefaultMainActions
@@ -317,7 +344,7 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	FuryGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
 
@@ -359,12 +386,12 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	FuryInterruptActions()
 
 	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
 	{
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
 
@@ -505,7 +532,7 @@ AddFunction FurySingleMindedFuryPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		FuryUsePotionStrength()
 	}
 }
 
@@ -695,6 +722,40 @@ AddFunction FurySingleMindedFuryTwoTargetsCdPostConditions
 #	talents=1321321
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
+
+AddFunction FuryUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction FuryGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction FuryInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction FuryTitansGripDefaultMainActions
@@ -718,7 +779,7 @@ AddFunction FuryTitansGripDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	FuryGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementShortCdActions()
 
@@ -760,12 +821,12 @@ AddFunction FuryTitansGripDefaultShortCdActions
 AddFunction FuryTitansGripDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	FuryInterruptActions()
 
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
 
@@ -906,7 +967,7 @@ AddFunction FuryTitansGripPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		FuryUsePotionStrength()
 	}
 }
 
@@ -1096,6 +1157,40 @@ AddFunction FuryTitansGripTwoTargetsCdPostConditions
 #	talents=1133323
 #	glyphs=unending_rage/heroic_leap/cleave
 
+AddCheckBox(opt_interrupt L(interrupt) default if_stance=warrior_gladiator_stance specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) if_stance=warrior_gladiator_stance specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default if_stance=warrior_gladiator_stance specialization=protection)
+
+AddFunction ProtectionGladiatorUsePotionArmor
+{
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
+}
+
+AddFunction ProtectionGladiatorGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction ProtectionGladiatorInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction ProtectionGladiatorDefaultMainActions
@@ -1113,7 +1208,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	ProtectionGladiatorGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
 
@@ -1143,7 +1238,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 AddFunction ProtectionGladiatorDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	ProtectionGladiatorInterruptActions()
 
 	unless 0 > 5 and ProtectionGladiatorMovementCdPostConditions()
 	{
@@ -1158,7 +1253,7 @@ AddFunction ProtectionGladiatorDefaultCdActions
 		#arcane_torrent,if=rage<rage.max-40
 		if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 		#potion,name=draenic_armor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up
-		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) UsePotionArmor()
+		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) ProtectionGladiatorUsePotionArmor()
 	}
 }
 
@@ -1252,7 +1347,7 @@ AddFunction ProtectionGladiatorPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		ProtectionGladiatorUsePotionArmor()
 	}
 }
 
@@ -1304,6 +1399,40 @@ AddFunction ProtectionGladiatorSingleShortCdPostConditions
 #	talents=1113323
 #	glyphs=unending_rage/heroic_leap/cleave
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+
+AddFunction ProtectionUsePotionArmor
+{
+	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
+}
+
+AddFunction ProtectionGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range)
+	{
+		if target.InRange(charge) Spell(charge)
+		if target.InRange(charge) Spell(heroic_leap)
+		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction ProtectionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction ProtectionDefaultMainActions
@@ -1317,7 +1446,7 @@ AddFunction ProtectionDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	ProtectionGetInMeleeRange()
 	#berserker_rage,if=buff.enrage.down
 	if not IsEnraged() Spell(berserker_rage)
 	#call_action_list,name=prot
@@ -1327,7 +1456,7 @@ AddFunction ProtectionDefaultShortCdActions
 AddFunction ProtectionDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	ProtectionInterruptActions()
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up
@@ -1365,7 +1494,7 @@ AddFunction ProtectionPrecombatCdActions
 		#shield_wall
 		Spell(shield_wall)
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		ProtectionUsePotionArmor()
 	}
 }
 
@@ -1431,7 +1560,7 @@ AddFunction ProtectionProtCdActions
 	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
 	#potion,name=draenic_armor,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 UsePotionArmor()
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 ProtectionUsePotionArmor()
 	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
 	#call_action_list,name=prot_aoe,if=active_enemies>3

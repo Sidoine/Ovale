@@ -7,30 +7,25 @@ do
 	local code = [[
 # Shaman rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
+###
+### Elemental
+###
+# Based on SimulationCraft profile "Shaman_Elemental_T17M".
+#	class=shaman
+#	spec=elemental
+#	talents=0001011
+#	glyphs=chain_lightning
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=elemental)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=elemental)
-AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=elemental)
 
-AddFunction UsePotionAgility
-{
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction UsePotionIntellect
+AddFunction ElementalUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
-AddFunction Bloodlust
+AddFunction ElementalBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
 	{
@@ -39,12 +34,7 @@ AddFunction Bloodlust
 	}
 }
 
-AddFunction GetInMeleeRange
-{
-	if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-AddFunction InterruptActions
+AddFunction ElementalInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -57,15 +47,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Elemental
-###
-# Based on SimulationCraft profile "Shaman_Elemental_T17M".
-#	class=shaman
-#	spec=elemental
-#	talents=0001011
-#	glyphs=chain_lightning
 
 ### actions.default
 
@@ -98,11 +79,11 @@ AddFunction ElementalDefaultShortCdActions
 AddFunction ElementalDefaultCdActions
 {
 	#wind_shear
-	InterruptActions()
+	ElementalInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
-	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
+	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 ElementalBloodlust()
 	#potion,name=draenic_intellect,if=buff.ascendance.up|target.time_to_die<=30
-	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 UsePotionIntellect()
+	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 ElementalUsePotionIntellect()
 	#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
 	if not BuffPresent(burst_haste_buff any=1) and not BuffPresent(elemental_mastery_buff) and { ArmorSetBonus(T15_caster 4) == 1 or not SpellCooldown(ascendance_caster) > 0 and { target.DebuffRemaining(flame_shock_debuff) > BaseDuration(ascendance_caster_buff) or Level() < 87 } } Spell(berserking)
 	#blood_fury,if=buff.bloodlust.up|buff.ascendance.up|((cooldown.ascendance.remains>10|level<87)&cooldown.fire_elemental_totem.remains>10)
@@ -172,7 +153,7 @@ AddFunction ElementalPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		ElementalUsePotionIntellect()
 	}
 }
 
@@ -255,6 +236,51 @@ AddFunction ElementalSingleCdActions
 #	talents=0001023
 #	glyphs=chain_lightning/frost_shock
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=enhancement)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=enhancement)
+
+AddFunction EnhancementUsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction EnhancementUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction EnhancementBloodlust
+{
+	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
+	{
+		Spell(bloodlust)
+		Spell(heroism)
+	}
+}
+
+AddFunction EnhancementGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction EnhancementInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(wind_shear)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction EnhancementDefaultMainActions
@@ -268,7 +294,7 @@ AddFunction EnhancementDefaultMainActions
 AddFunction EnhancementDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	EnhancementGetInMeleeRange()
 	#elemental_mastery
 	Spell(elemental_mastery)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
@@ -280,13 +306,13 @@ AddFunction EnhancementDefaultShortCdActions
 AddFunction EnhancementDefaultCdActions
 {
 	#wind_shear
-	InterruptActions()
+	EnhancementInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
-	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 Bloodlust()
+	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
 	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
+	EnhancementUseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&pet.storm_elemental_totem.remains>=25)|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
-	if Talent(storm_elemental_totem_talent) and TotemRemaining(storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 UsePotionAgility()
+	if Talent(storm_elemental_totem_talent) and TotemRemaining(storm_elemental_totem) >= 25 or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 EnhancementUsePotionAgility()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#arcane_torrent
@@ -374,7 +400,7 @@ AddFunction EnhancementPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		EnhancementUsePotionAgility()
 	}
 }
 
@@ -418,6 +444,20 @@ AddFunction EnhancementSingleMainActions
 ###
 ### Restoration
 ###
+
+AddFunction RestorationInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(wind_shear)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
 
 AddFunction RestorationMainActions
 {
@@ -465,7 +505,7 @@ AddFunction RestorationShortCdActions
 AddFunction RestorationCdActions
 {
 	if IsFeared() Spell(tremor_totem)
-	InterruptActions()
+	RestorationInterruptActions()
 	if Speed(more 0) Spell(spiritwalkers_grace)
 	Spell(blood_fury_apsp)
 	Spell(berserking)

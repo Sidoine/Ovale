@@ -15,9 +15,9 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=balance)
 
-AddFunction UsePotionIntellect
+AddFunction BalanceUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
@@ -41,7 +41,7 @@ AddFunction BalanceDefaultShortCdActions
 AddFunction BalanceDefaultCdActions
 {
 	#potion,name=draenic_intellect,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) UsePotionIntellect()
+	if BuffPresent(celestial_alignment_buff) BalanceUsePotionIntellect()
 	#blood_fury,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) Spell(blood_fury_apsp)
 	#berserking,if=buff.celestial_alignment.up
@@ -115,7 +115,7 @@ AddFunction BalancePrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		BalanceUsePotionIntellect()
 		#incarnation
 		Spell(incarnation_caster)
 	}

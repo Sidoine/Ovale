@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
 
-AddFunction UsePotionArmor
+AddFunction ProtectionUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
 	{
@@ -35,7 +35,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction ProtectionInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -63,7 +63,7 @@ AddFunction ProtectionDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	ProtectionGetInMeleeRange()
 	#berserker_rage,if=buff.enrage.down
 	if not IsEnraged() Spell(berserker_rage)
 	#call_action_list,name=prot
@@ -73,7 +73,7 @@ AddFunction ProtectionDefaultShortCdActions
 AddFunction ProtectionDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	ProtectionInterruptActions()
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up
@@ -111,7 +111,7 @@ AddFunction ProtectionPrecombatCdActions
 		#shield_wall
 		Spell(shield_wall)
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		ProtectionUsePotionArmor()
 	}
 }
 
@@ -177,7 +177,7 @@ AddFunction ProtectionProtCdActions
 	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
 	#potion,name=draenic_armor,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 UsePotionArmor()
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 ProtectionUsePotionArmor()
 	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
 	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
 	#call_action_list,name=prot_aoe,if=active_enemies>3

@@ -7,29 +7,32 @@ do
 	local code = [[
 # Druid rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=feral)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=balance)
+###
+### Feral
+###
+# Based on SimulationCraft profile "Druid_Feral_T17M".
+#	class=druid
+#	spec=feral
+#	talents=3002002
+#	glyphs=savage_roar
 
-AddFunction UsePotionAgility
+AddCheckBox(opt_interrupt L(interrupt) default specialization=feral)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=feral)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=feral)
+
+AddFunction FeralUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UsePotionIntellect
-{
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction UseItemActions
+AddFunction FeralUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction FeralGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
 	{
@@ -38,7 +41,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction FeralInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -52,15 +55,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Feral
-###
-# Based on SimulationCraft profile "Druid_Feral_T17M".
-#	class=druid
-#	spec=feral
-#	talents=3002002
-#	glyphs=savage_roar
 
 ### actions.default
 
@@ -99,7 +93,7 @@ AddFunction FeralDefaultShortCdActions
 	unless Spell(cat_form)
 	{
 		#wild_charge
-		GetInMeleeRange()
+		FeralGetInMeleeRange()
 		#displacer_beast,if=movement.distance>10
 		if 0 > 10 Spell(displacer_beast)
 		#dash,if=movement.distance&buff.displacer_beast.down&buff.wild_charge_movement.down
@@ -108,7 +102,7 @@ AddFunction FeralDefaultShortCdActions
 		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 		{
 			#auto_attack
-			GetInMeleeRange()
+			FeralGetInMeleeRange()
 			#force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
 			if Charges(force_of_nature_melee) == 3 or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() < 20 Spell(force_of_nature_melee)
 			#tigers_fury,if=(!buff.omen_of_clarity.react&energy.max-energy>=60)|energy.max-energy>=80
@@ -122,11 +116,11 @@ AddFunction FeralDefaultCdActions
 	unless Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) and Spell(dash) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 	{
 		#skull_bash
-		InterruptActions()
+		FeralInterruptActions()
 		#potion,name=draenic_agility,if=target.time_to_die<=40
-		if target.TimeToDie() <= 40 UsePotionAgility()
+		if target.TimeToDie() <= 40 FeralUsePotionAgility()
 		#use_item,slot=trinket1,sync=tigers_fury
-		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) UseItemActions()
+		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) FeralUseItemActions()
 		#blood_fury,sync=tigers_fury
 		if { not BuffPresent(omen_of_clarity_melee_buff) and MaxEnergy() - Energy() >= 60 or MaxEnergy() - Energy() >= 80 } and Spell(tigers_fury) Spell(blood_fury_apsp)
 		#berserking,sync=tigers_fury
@@ -136,7 +130,7 @@ AddFunction FeralDefaultCdActions
 		#incarnation,if=cooldown.berserk.remains<10&energy.time_to_max>1
 		if SpellCooldown(berserk_cat) < 10 and TimeToMaxEnergy() > 1 Spell(incarnation_melee)
 		#potion,name=draenic_agility,sync=berserk,if=target.health.pct<25
-		if target.HealthPercent() < 25 and BuffPresent(tigers_fury_buff) and Spell(berserk_cat) UsePotionAgility()
+		if target.HealthPercent() < 25 and BuffPresent(tigers_fury_buff) and Spell(berserk_cat) FeralUsePotionAgility()
 		#berserk,if=buff.tigers_fury.up
 		if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
 		#shadowmeld,if=dot.rake.remains<4.5&energy>=35&dot.rake.pmultiplier<2&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>15)&!buff.king_of_the_jungle.up
@@ -215,7 +209,7 @@ AddFunction FeralPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		FeralUsePotionAgility()
 	}
 }
 
@@ -231,6 +225,40 @@ AddFunction FeralPrecombatCdPostConditions
 #	class=druid
 #	spec=guardian
 #	talents=0301022
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
+
+AddFunction GuardianUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction GuardianGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+	{
+		if target.InRange(wild_charge) Spell(wild_charge)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction GuardianInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(skull_bash) Spell(skull_bash)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(mighty_bash) Spell(mighty_bash)
+			Spell(typhoon)
+			if target.InRange(maim) Spell(maim)
+			Spell(war_stomp)
+		}
+	}
+}
 
 ### actions.default
 
@@ -261,7 +289,7 @@ AddFunction GuardianDefaultMainActions
 AddFunction GuardianDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	GuardianGetInMeleeRange()
 	#savage_defense,if=buff.barkskin.down
 	if BuffExpires(barkskin_buff) Spell(savage_defense)
 	#maul,if=buff.tooth_and_claw.react&incoming_damage_1s
@@ -273,7 +301,7 @@ AddFunction GuardianDefaultShortCdActions
 AddFunction GuardianDefaultCdActions
 {
 	#skull_bash
-	InterruptActions()
+	GuardianInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -281,7 +309,7 @@ AddFunction GuardianDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
 	#use_item,slot=trinket2
-	UseItemActions()
+	GuardianUseItemActions()
 	#barkskin,if=buff.bristling_fur.down
 	if BuffExpires(bristling_fur_buff) Spell(barkskin)
 	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
@@ -339,6 +367,21 @@ AddFunction GuardianPrecombatCdPostConditions
 ### Restoration
 ###
 
+AddFunction RestorationInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(skull_bash) Spell(skull_bash)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(mighty_bash) Spell(mighty_bash)
+			Spell(typhoon)
+			if target.InRange(maim) Spell(maim)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction RestorationPrecombatActions
 {
 	# Raid buffs.
@@ -390,7 +433,7 @@ AddFunction RestorationShortCdActions
 
 AddFunction RestorationCdActions
 {
-	InterruptActions()
+	RestorationInterruptActions()
 	Spell(blood_fury_apsp)
 	Spell(berserking)
 	if ManaPercent() < 97 Spell(arcane_torrent_energy)

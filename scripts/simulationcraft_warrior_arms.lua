@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=arms)
 
-AddFunction UsePotionStrength
+AddFunction ArmsUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction ArmsGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
 	{
@@ -35,7 +35,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction ArmsInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -67,7 +67,7 @@ AddFunction ArmsDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	ArmsGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ArmsMovementShortCdActions()
 
@@ -89,12 +89,12 @@ AddFunction ArmsDefaultShortCdActions
 AddFunction ArmsDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	ArmsInterruptActions()
 
 	unless 0 > 5 and ArmsMovementCdPostConditions()
 	{
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 UsePotionStrength()
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 ArmsUsePotionStrength()
 		#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&(!talent.bloodbath.enabled&(cooldown.colossus_smash.remains<2|debuff.colossus_smash.remains>=5)|buff.bloodbath.up))|target.time_to_die<10
 		if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and { SpellCooldown(colossus_smash) < 2 or target.DebuffRemaining(colossus_smash_debuff) >= 5 } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
 		#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5)|target.time_to_die<20
@@ -211,7 +211,7 @@ AddFunction ArmsPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		ArmsUsePotionStrength()
 	}
 }
 

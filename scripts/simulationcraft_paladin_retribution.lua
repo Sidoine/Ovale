@@ -16,29 +16,29 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
-AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
+AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default specialization=retribution)
 
-AddFunction UsePotionStrength
+AddFunction RetributionUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction RetributionUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction RetributionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction RetributionInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -74,7 +74,7 @@ AddFunction RetributionDefaultMainActions
 AddFunction RetributionDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	RetributionGetInMeleeRange()
 	#speed_of_light,if=movement.distance>5
 	if 0 > 5 Spell(speed_of_light)
 
@@ -92,14 +92,14 @@ AddFunction RetributionDefaultShortCdActions
 AddFunction RetributionDefaultCdActions
 {
 	#rebuke
-	InterruptActions()
+	RetributionInterruptActions()
 	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 UsePotionStrength()
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 RetributionUsePotionStrength()
 
 	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or Spell(execution_sentence) or Spell(lights_hammer)
 	{
 		#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
-		if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
+		if BuffPresent(avenging_wrath_melee_buff) RetributionUseItemActions()
 		#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
 		if Spell(seraphim) and Talent(seraphim_talent) Spell(holy_avenger)
 		#holy_avenger,if=holy_power<=2&!talent.seraphim.enabled
@@ -195,26 +195,28 @@ AddFunction RetributionPrecombatMainActions
 	if Enemies() < 2 Spell(seal_of_truth)
 	#seal_of_righteousness,if=active_enemies>=2
 	if Enemies() >= 2 Spell(seal_of_righteousness)
+	#righteous_fury,if=buff.righteous_fury.up
+	if BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) Spell(righteous_fury)
 }
 
 AddFunction RetributionPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 }
 
 AddFunction RetributionPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		RetributionUsePotionStrength()
 	}
 }
 
 AddFunction RetributionPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 }
 
 ### actions.single
@@ -389,6 +391,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # quaking_palm
 # rebuke
 # righteous_fury
+# righteous_fury_buff
 # seal_of_righteousness
 # seal_of_truth
 # seraphim

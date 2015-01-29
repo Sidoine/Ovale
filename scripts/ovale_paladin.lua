@@ -7,35 +7,31 @@ do
 	local code = [[
 # Paladin rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
-AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+###
+### Protection
+###
+# Based on SimulationCraft profile "Paladin_Protection_T17M".
+#	class=paladin
+#	spec=protection
+#	talents=3032322
+#	glyphs=focused_shield/alabaster_shield/divine_protection
 
-AddFunction UsePotionArmor
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default specialization=protection)
+
+AddFunction ProtectionUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction UsePotionStrength
-{
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(mogu_power_potion usable=1)
-}
-
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
-AddFunction GetInMeleeRange
+AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction ProtectionInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -50,25 +46,6 @@ AddFunction InterruptActions
 			Spell(war_stomp)
 		}
 	}
-}
-
-AddFunction RighteousFuryOff
-{
-	if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
-}
-
-###
-### Protection
-###
-# Based on SimulationCraft profile "Paladin_Protection_T17M".
-#	class=paladin
-#	spec=protection
-#	talents=3032322
-#	glyphs=focused_shield/alabaster_shield/divine_protection
-
-AddFunction ProtectionRighteousFury
-{
-	if CheckBoxOn(opt_righteous_fury_check) and BuffExpires(righteous_fury) Spell(righteous_fury)
 }
 
 AddFunction ProtectionTimeToHPG
@@ -143,10 +120,8 @@ AddFunction ProtectionDefaultMainActions
 
 AddFunction ProtectionDefaultShortCdActions
 {
-	# CHANGE: Ensure that Righteous Fury is on while tanking.
-	ProtectionRighteousFury()
 	#auto_attack
-	GetInMeleeRange()
+	ProtectionGetInMeleeRange()
 	#speed_of_light,if=movement.remains>1
 	if 0 > 1 Spell(speed_of_light)
 	#run_action_list,name=max_dps,if=role.attack|0
@@ -214,7 +189,7 @@ AddFunction ProtectionDefaultShortCdActions
 AddFunction ProtectionDefaultCdActions
 {
 	#rebuke
-	InterruptActions()
+	ProtectionInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -232,7 +207,7 @@ AddFunction ProtectionDefaultCdActions
 		unless 0 and ProtectionMaxSurvivalCdPostConditions()
 		{
 			#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-			if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
+			if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) ProtectionUsePotionArmor()
 			#holy_avenger
 			Spell(holy_avenger)
 			#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
@@ -361,7 +336,7 @@ AddFunction ProtectionMaxDpsShortCdPostConditions
 AddFunction ProtectionMaxDpsCdActions
 {
 	#potion,name=draenic_armor,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 UsePotionArmor()
+	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 ProtectionUsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 }
@@ -475,7 +450,7 @@ AddFunction ProtectionMaxSurvivalShortCdPostConditions
 AddFunction ProtectionMaxSurvivalCdActions
 {
 	#potion,name=draenic_armor,if=buff.shield_of_the_righteous.down&buff.seraphim.down&buff.divine_protection.down&buff.guardian_of_ancient_kings.down&buff.ardent_defender.down
-	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) UsePotionArmor()
+	if BuffExpires(shield_of_the_righteous_buff) and BuffExpires(seraphim_buff) and BuffExpires(divine_protection_buff) and BuffExpires(guardian_of_ancient_kings_buff) and BuffExpires(ardent_defender_buff) ProtectionUsePotionArmor()
 	#holy_avenger
 	Spell(holy_avenger)
 	#divine_protection,if=time<5|!talent.seraphim.enabled|(buff.seraphim.down&cooldown.seraphim.remains>5&cooldown.seraphim.remains<9)
@@ -503,28 +478,30 @@ AddFunction ProtectionPrecombatMainActions
 	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
 	#seal_of_insight
 	Spell(seal_of_insight)
+	#righteous_fury,if=buff.righteous_fury.down
+	if BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) Spell(righteous_fury)
 	#sacred_shield
 	Spell(sacred_shield)
 }
 
 AddFunction ProtectionPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(sacred_shield)
 }
 
 AddFunction ProtectionPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(sacred_shield)
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		ProtectionUsePotionArmor()
 	}
 }
 
 AddFunction ProtectionPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or Spell(sacred_shield)
+	not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Spell(seal_of_insight) or BuffExpires(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury) or Spell(sacred_shield)
 }
 
 ###
@@ -535,6 +512,45 @@ AddFunction ProtectionPrecombatCdPostConditions
 #	spec=retribution
 #	talents=2112333
 #	glyphs=winged_vengeance/templars_verdict/righteous_retreat/fire_from_the_heavens/judgment
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
+AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default specialization=retribution)
+
+AddFunction RetributionUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction RetributionUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction RetributionGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction RetributionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(rebuke) Spell(rebuke)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(fist_of_justice) Spell(fist_of_justice)
+			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
+			Spell(blinding_light)
+			Spell(arcane_torrent_holy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
 
 ### actions.default
 
@@ -554,10 +570,8 @@ AddFunction RetributionDefaultMainActions
 
 AddFunction RetributionDefaultShortCdActions
 {
-	# CHANGE: Check that Righteous Fury is toggled off.
-	RighteousFuryOff()
 	#auto_attack
-	GetInMeleeRange()
+	RetributionGetInMeleeRange()
 	#speed_of_light,if=movement.distance>5
 	if 0 > 5 Spell(speed_of_light)
 
@@ -575,14 +589,14 @@ AddFunction RetributionDefaultShortCdActions
 AddFunction RetributionDefaultCdActions
 {
 	#rebuke
-	InterruptActions()
+	RetributionInterruptActions()
 	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 UsePotionStrength()
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 RetributionUsePotionStrength()
 
 	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or Spell(execution_sentence) or Spell(lights_hammer)
 	{
 		#use_item,name=vial_of_convulsive_shadows,if=buff.avenging_wrath.up
-		if BuffPresent(avenging_wrath_melee_buff) UseItemActions()
+		if BuffPresent(avenging_wrath_melee_buff) RetributionUseItemActions()
 		#holy_avenger,sync=seraphim,if=talent.seraphim.enabled
 		if Spell(seraphim) and Talent(seraphim_talent) Spell(holy_avenger)
 		#holy_avenger,if=holy_power<=2&!talent.seraphim.enabled
@@ -678,26 +692,28 @@ AddFunction RetributionPrecombatMainActions
 	if Enemies() < 2 Spell(seal_of_truth)
 	#seal_of_righteousness,if=active_enemies>=2
 	if Enemies() >= 2 Spell(seal_of_righteousness)
+	#righteous_fury,if=buff.righteous_fury.up
+	if BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) Spell(righteous_fury)
 }
 
 AddFunction RetributionPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 }
 
 AddFunction RetributionPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		RetributionUsePotionStrength()
 	}
 }
 
 AddFunction RetributionPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness)
+	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 2 and Spell(seal_of_truth) or Enemies() >= 2 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 }
 
 ### actions.single

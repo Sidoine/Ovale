@@ -15,23 +15,23 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=survival)
+AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
 
-AddFunction UsePotionAgility
+AddFunction SurvivalUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction SurvivalUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction SurvivalInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -45,7 +45,7 @@ AddFunction InterruptActions
 	}
 }
 
-AddFunction SummonPet
+AddFunction SurvivalSummonPet
 {
 	if not Talent(lone_wolf_talent)
 	{
@@ -108,9 +108,9 @@ AddFunction SurvivalDefaultCdActions
 {
 	#auto_shot
 	#counter_shot
-	InterruptActions()
+	SurvivalInterruptActions()
 	#use_item,name=beating_heart_of_the_mountain
-	UseItemActions()
+	SurvivalUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -118,7 +118,7 @@ AddFunction SurvivalDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#potion,name=draenic_agility,if=(((cooldown.stampede.remains<1)&(cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=25
-	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 UsePotionAgility()
+	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 SurvivalUsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
 
@@ -214,7 +214,7 @@ AddFunction SurvivalPrecombatShortCdActions
 	#flask,type=greater_draenic_agility_flask
 	#food,type=calamari_crepes
 	#summon_pet
-	SummonPet()
+	SurvivalSummonPet()
 }
 
 AddFunction SurvivalPrecombatShortCdPostConditions
@@ -227,7 +227,7 @@ AddFunction SurvivalPrecombatCdActions
 	unless Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo)
 	{
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		SurvivalUsePotionAgility()
 	}
 }
 

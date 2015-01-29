@@ -7,27 +7,32 @@ do
 	local code = [[
 # Rogue rotation functions based on SimulationCraft.
 
-Define(honor_among_thieves_cooldown_buff 51699)
-	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
+###
+### Assassination
+###
+# Based on SimulationCraft profile "Rogue_Assassination_T17M".
+#	class=rogue
+#	spec=assassination
+#	talents=3000032
+#	glyphs=vendetta/energy/disappearance
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
-AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=assassination)
 
-AddFunction UsePotionAgility
+AddFunction AssassinationUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction AssassinationUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction AssassinationGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
@@ -36,7 +41,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction AssassinationInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -51,15 +56,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Assassination
-###
-# Based on SimulationCraft profile "Rogue_Assassination_T17M".
-#	class=rogue
-#	spec=assassination
-#	talents=3000032
-#	glyphs=vendetta/energy/disappearance
 
 ### actions.default
 
@@ -104,7 +100,7 @@ AddFunction AssassinationDefaultShortCdActions
 	#vanish,if=time>10&!buff.stealth.up
 	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
 	#auto_attack
-	GetInMeleeRange()
+	AssassinationGetInMeleeRange()
 
 	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice)
 	{
@@ -116,13 +112,13 @@ AddFunction AssassinationDefaultShortCdActions
 AddFunction AssassinationDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|debuff.vendetta.up
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) UsePotionAgility()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) AssassinationUsePotionAgility()
 	#kick
-	InterruptActions()
+	AssassinationInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
-	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
+	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -173,7 +169,7 @@ AddFunction AssassinationPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		AssassinationUsePotionAgility()
 	}
 }
 
@@ -190,6 +186,48 @@ AddFunction AssassinationPrecombatCdPostConditions
 #	spec=combat
 #	talents=3111121
 #	glyphs=energy/disappearance
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=combat)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=combat)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=combat)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
+
+AddFunction CombatUsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction CombatUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction CombatGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
+	{
+		Spell(shadowstep)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction CombatInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(kick) Spell(kick)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(cheap_shot) Spell(cheap_shot)
+			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+			if target.InRange(kidney_shot) Spell(kidney_shot)
+			Spell(arcane_torrent_energy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
 
 ### actions.default
 
@@ -213,7 +251,7 @@ AddFunction CombatDefaultShortCdActions
 	unless Spell(ambush)
 	{
 		#auto_attack
-		GetInMeleeRange()
+		CombatGetInMeleeRange()
 		#vanish,if=time>10&(combo_points<3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))&((talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<90&energy>=15)|(talent.subterfuge.enabled&energy>=90)|(!talent.shadow_focus.enabled&!talent.subterfuge.enabled&energy>=60))
 		if TimeInCombat() > 10 and { ComboPoints() < 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and { Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 90 and Energy() >= 15 or Talent(subterfuge_talent) and Energy() >= 90 or not Talent(shadow_focus_talent) and not Talent(subterfuge_talent) and Energy() >= 60 } Spell(vanish)
 
@@ -228,13 +266,13 @@ AddFunction CombatDefaultShortCdActions
 AddFunction CombatDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|(buff.adrenaline_rush.up&(trinket.proc.any.react|trinket.stacking_proc.any.react|buff.archmages_greater_incandescence_agi.react))
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(adrenaline_rush_buff) and { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } UsePotionAgility()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(adrenaline_rush_buff) and { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } CombatUsePotionAgility()
 	#kick
-	InterruptActions()
+	CombatInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=trinket2
-	UseItemActions()
+	CombatUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -335,7 +373,7 @@ AddFunction CombatPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		CombatUsePotionAgility()
 	}
 }
 
@@ -352,6 +390,50 @@ AddFunction CombatPrecombatCdPostConditions
 #	spec=subtlety
 #	talents=2000022
 #	glyphs=energy/hemorrhaging_veins/vanish
+
+Define(honor_among_thieves_cooldown_buff 51699)
+	SpellInfo(honor_among_thieves_cooldown_buff duration=2.2)
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=subtlety)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=subtlety)
+
+AddFunction SubtletyUsePotionAgility
+{
+	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction SubtletyUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction SubtletyGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
+	{
+		Spell(shadowstep)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction SubtletyInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(kick) Spell(kick)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(cheap_shot) Spell(cheap_shot)
+			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+			if target.InRange(kidney_shot) Spell(kidney_shot)
+			Spell(arcane_torrent_energy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
 
 ### actions.default
 
@@ -407,7 +489,7 @@ AddFunction SubtletyDefaultShortCdActions
 	unless TimeInCombat() < 1 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote)
 	{
 		#auto_attack
-		GetInMeleeRange()
+		SubtletyGetInMeleeRange()
 		#wait,sec=buff.subterfuge.remains-0.1,if=buff.subterfuge.remains>0.5&buff.subterfuge.remains<1.6&time>6
 		unless BuffRemaining(subterfuge_buff) > 0.5 and BuffRemaining(subterfuge_buff) < 1.6 and TimeInCombat() > 6 and BuffRemaining(subterfuge_buff) - 0.1 > 0
 		{
@@ -448,11 +530,11 @@ AddFunction SubtletyDefaultShortCdActions
 AddFunction SubtletyDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|(buff.shadow_reflection.up|(!talent.shadow_reflection.enabled&buff.shadow_dance.up))&(trinket.stat.agi.react|trinket.stat.multistrike.react|buff.archmages_greater_incandescence_agi.react)|((buff.shadow_reflection.up|(!talent.shadow_reflection.enabled&buff.shadow_dance.up))&target.time_to_die<136)
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or { BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) and BuffPresent(shadow_dance_buff) } and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or { BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) and BuffPresent(shadow_dance_buff) } and target.TimeToDie() < 136 UsePotionAgility()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or { BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) and BuffPresent(shadow_dance_buff) } and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or { BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) and BuffPresent(shadow_dance_buff) } and target.TimeToDie() < 136 SubtletyUsePotionAgility()
 	#kick
-	InterruptActions()
+	SubtletyInterruptActions()
 	#use_item,slot=trinket2,if=buff.shadow_dance.up
-	if BuffPresent(shadow_dance_buff) UseItemActions()
+	if BuffPresent(shadow_dance_buff) SubtletyUseItemActions()
 	#shadow_reflection,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(shadow_reflection)
 	#blood_fury,if=buff.shadow_dance.up
@@ -630,7 +712,7 @@ AddFunction SubtletyPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		SubtletyUsePotionAgility()
 	}
 }
 

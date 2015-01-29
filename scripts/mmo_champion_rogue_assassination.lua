@@ -16,23 +16,23 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_rogue_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=assassination)
 
-AddFunction UsePotionAgility
+AddFunction AssassinationUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction AssassinationUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction AssassinationGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
@@ -41,7 +41,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction AssassinationInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -100,7 +100,7 @@ AddFunction AssassinationDefaultShortCdActions
 	#vanish,if=time>10&!buff.stealth.up
 	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
 	#auto_attack
-	GetInMeleeRange()
+	AssassinationGetInMeleeRange()
 
 	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice)
 	{
@@ -112,13 +112,13 @@ AddFunction AssassinationDefaultShortCdActions
 AddFunction AssassinationDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|debuff.vendetta.up
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) UsePotionAgility()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) AssassinationUsePotionAgility()
 	#kick
-	InterruptActions()
+	AssassinationInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
 	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 60 Spell(preparation)
 	#use_item,slot=trinket2,if=active_enemies>1
-	if Enemies() > 1 UseItemActions()
+	if Enemies() > 1 AssassinationUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -133,7 +133,7 @@ AddFunction AssassinationDefaultCdActions
 		#vendetta,if=buff.shadow_reflection.up|!talent.shadow_reflection.enabled
 		if BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) Spell(vendetta)
 		#use_item,slot=trinket2,if=debuff.vendetta.up&active_enemies=1
-		if target.DebuffPresent(vendetta_debuff) and Enemies() == 1 UseItemActions()
+		if target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
 	}
 }
 
@@ -171,7 +171,7 @@ AddFunction AssassinationPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		AssassinationUsePotionAgility()
 	}
 }
 

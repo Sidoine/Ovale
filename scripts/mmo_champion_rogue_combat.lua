@@ -16,24 +16,24 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_rogue_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=combat)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=combat)
+AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=combat)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 
-AddFunction UsePotionAgility
+AddFunction CombatUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
-AddFunction UseItemActions
+AddFunction CombatUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction CombatGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 	{
@@ -42,7 +42,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction CombatInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -80,7 +80,7 @@ AddFunction CombatDefaultShortCdActions
 	unless { not Talent(nightstalker_talent) or TimeInCombat() < 5 } and Spell(ambush)
 	{
 		#auto_attack
-		GetInMeleeRange()
+		CombatGetInMeleeRange()
 		#vanish,if=time>10&(talent.shadow_focus.enabled&buff.adrenaline_rush.down&energy<60)&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))
 		if TimeInCombat() > 10 and Talent(shadow_focus_talent) and BuffExpires(adrenaline_rush_buff) and Energy() < 60 and { ComboPoints() <= 3 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 or ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } Spell(vanish)
 		#vanish,if=time>10&(talent.subterfuge.enabled&energy>=90)&(combo_points<=3|(talent.anticipation.enabled&anticipation_charges<3)|(combo_points<4|(talent.anticipation.enabled&anticipation_charges<4)))
@@ -99,13 +99,13 @@ AddFunction CombatDefaultShortCdActions
 AddFunction CombatDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|(buff.adrenaline_rush.up&buff.archmages_greater_incandescence_agi.up)
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(adrenaline_rush_buff) and BuffPresent(archmages_greater_incandescence_agi_buff) UsePotionAgility()
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(adrenaline_rush_buff) and BuffPresent(archmages_greater_incandescence_agi_buff) CombatUsePotionAgility()
 	#kick
-	InterruptActions()
+	CombatInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=trinket2
-	UseItemActions()
+	CombatUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -182,7 +182,7 @@ AddFunction CombatPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
-		UsePotionAgility()
+		CombatUsePotionAgility()
 	}
 }
 

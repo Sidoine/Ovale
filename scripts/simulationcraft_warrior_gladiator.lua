@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default if_stance=warrior_gladiator_stance specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) if_stance=warrior_gladiator_stance specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default if_stance=warrior_gladiator_stance specialization=protection)
 
-AddFunction UsePotionArmor
+AddFunction ProtectionGladiatorUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction ProtectionGladiatorGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
 	{
@@ -35,7 +35,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction ProtectionGladiatorInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -67,7 +67,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	ProtectionGladiatorGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
 
@@ -97,7 +97,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 AddFunction ProtectionGladiatorDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	ProtectionGladiatorInterruptActions()
 
 	unless 0 > 5 and ProtectionGladiatorMovementCdPostConditions()
 	{
@@ -112,7 +112,7 @@ AddFunction ProtectionGladiatorDefaultCdActions
 		#arcane_torrent,if=rage<rage.max-40
 		if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
 		#potion,name=draenic_armor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up
-		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) UsePotionArmor()
+		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) ProtectionGladiatorUsePotionArmor()
 	}
 }
 
@@ -206,7 +206,7 @@ AddFunction ProtectionGladiatorPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		ProtectionGladiatorUsePotionArmor()
 	}
 }
 

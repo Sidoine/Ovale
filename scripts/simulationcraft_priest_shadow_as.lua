@@ -16,15 +16,15 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
 
-AddFunction UsePotionIntellect
+AddFunction ShadowUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction ShadowInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -70,9 +70,9 @@ AddFunction ShadowDefaultCdActions
 	unless not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
 		#silence
-		InterruptActions()
+		ShadowInterruptActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
-		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 UsePotionIntellect()
+		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#blood_fury
@@ -591,7 +591,7 @@ AddFunction ShadowPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		ShadowUsePotionIntellect()
 	}
 }
 

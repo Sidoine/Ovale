@@ -16,9 +16,9 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
 
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=destruction)
 
-AddFunction UsePotionIntellect
+AddFunction DestructionUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
@@ -52,7 +52,7 @@ AddFunction DestructionDefaultShortCdActions
 AddFunction DestructionDefaultCdActions
 {
 	#potion,name=draenic_intellect,if=buff.bloodlust.react&buff.dark_soul.remains>10|target.time_to_die<=25|buff.dark_soul.remains>10
-	if BuffPresent(burst_haste_buff any=1) and BuffRemaining(dark_soul_instability_buff) > 10 or target.TimeToDie() <= 25 or BuffRemaining(dark_soul_instability_buff) > 10 UsePotionIntellect()
+	if BuffPresent(burst_haste_buff any=1) and BuffRemaining(dark_soul_instability_buff) > 10 or target.TimeToDie() <= 25 or BuffRemaining(dark_soul_instability_buff) > 10 DestructionUsePotionIntellect()
 	#berserking
 	Spell(berserking)
 	#blood_fury
@@ -157,7 +157,7 @@ AddFunction DestructionPrecombatCdActions
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
 		{
 			#potion,name=draenic_intellect
-			UsePotionIntellect()
+			DestructionUsePotionIntellect()
 		}
 	}
 }

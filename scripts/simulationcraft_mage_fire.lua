@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
-AddCheckBox(opt_time_warp SpellName(time_warp) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fire)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=fire)
+AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=fire)
 
-AddFunction UsePotionIntellect
+AddFunction FireUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction FireInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -93,7 +93,7 @@ AddFunction FireDefaultShortCdActions
 AddFunction FireDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() InterruptActions()
+	if target.IsInterruptible() FireInterruptActions()
 
 	unless 0 > 10 and Spell(blink)
 	{
@@ -252,7 +252,7 @@ AddFunction FireCombustSequenceCdActions
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		FireUsePotionIntellect()
 	}
 }
 
@@ -384,7 +384,7 @@ AddFunction FirePrecombatCdActions
 		#mirror_image
 		Spell(mirror_image)
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		FireUsePotionIntellect()
 	}
 }
 

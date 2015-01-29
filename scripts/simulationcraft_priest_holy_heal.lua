@@ -16,21 +16,21 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
-AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=holy)
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=holy)
+AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default specialization=holy)
 
-AddFunction UsePotionIntellect
+AddFunction HolyUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
-AddFunction UsePotionMana
+AddFunction HolyUsePotionMana
 {
 	if CheckBoxOn(opt_potion_mana) Item(draenic_mana_potion usable=1)
 }
 
-AddFunction InterruptActions
+AddFunction HolyInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -84,9 +84,9 @@ AddFunction HolyDefaultShortCdActions
 AddFunction HolyDefaultCdActions
 {
 	#silence
-	InterruptActions()
+	HolyInterruptActions()
 	#mana_potion,if=mana.pct<=75
-	if ManaPercent() <= 75 UsePotionMana()
+	if ManaPercent() <= 75 HolyUsePotionMana()
 	#blood_fury
 	Spell(blood_fury_sp)
 	#berserking
@@ -139,7 +139,7 @@ AddFunction HolyPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_intellect
-		UsePotionIntellect()
+		HolyUsePotionIntellect()
 	}
 }
 

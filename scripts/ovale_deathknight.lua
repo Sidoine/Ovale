@@ -7,34 +7,29 @@ do
 	local code = [[
 # Death knight rotation functions based on SimulationCraft.
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=blood)
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default spcialization=!blood)
+###
+### Blood
+###
+# Based on SimulationCraft profile "Death_Knight_Blood_T17M".
+#	class=deathknight
+#	spec=blood
+#	talents=2013102
 
-AddFunction UsePotionArmor
+AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=blood)
+
+AddFunction BloodUsePotionArmor
 {
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
-AddFunction UsePotionStrength
-{
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-}
-
-AddFunction UseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
-AddFunction GetInMeleeRange
+AddFunction BloodGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction InterruptActions
+AddFunction BloodInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -49,14 +44,6 @@ AddFunction InterruptActions
 		}
 	}
 }
-
-###
-### Blood
-###
-# Based on SimulationCraft profile "Death_Knight_Blood_T16M".
-#	class=deathknight
-#	spec=blood
-#	talents=2013102
 
 ### actions.default
 
@@ -89,7 +76,7 @@ AddFunction BloodDefaultMainActions
 AddFunction BloodDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	BloodGetInMeleeRange()
 	#antimagic_shell
 	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
 
@@ -121,7 +108,7 @@ AddFunction BloodDefaultShortCdActions
 AddFunction BloodDefaultCdActions
 {
 	#mind_freeze
-	InterruptActions()
+	BloodInterruptActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -129,7 +116,7 @@ AddFunction BloodDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
-	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 UsePotionArmor()
+	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 BloodUsePotionArmor()
 
 	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion)
 	{
@@ -186,7 +173,7 @@ AddFunction BloodPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_armor
-		UsePotionArmor()
+		BloodUsePotionArmor()
 	}
 }
 
@@ -203,6 +190,43 @@ AddFunction BloodPrecombatCdPostConditions
 #	spec=frost
 #	talents=2001002
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
+
+AddFunction FrostUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction FrostUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction FrostGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction FrostInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction FrostDualWieldDefaultMainActions
@@ -216,7 +240,7 @@ AddFunction FrostDualWieldDefaultMainActions
 AddFunction FrostDualWieldDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	FrostGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -236,9 +260,9 @@ AddFunction FrostDualWieldDefaultShortCdActions
 AddFunction FrostDualWieldDefaultCdActions
 {
 	#mind_freeze
-	InterruptActions()
+	FrostInterruptActions()
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
-	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) UsePotionStrength()
+	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostUsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
 	if target.TimeToDie() <= 60 and BuffPresent(potion_strength_buff) Spell(empower_rune_weapon)
 	#blood_fury
@@ -248,7 +272,7 @@ AddFunction FrostDualWieldDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=trinket2
-	UseItemActions()
+	FrostUseItemActions()
 	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostDualWieldAoeCdActions()
 
@@ -474,7 +498,7 @@ AddFunction FrostDualWieldPrecombatCdActions
 		#army_of_the_dead
 		Spell(army_of_the_dead)
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		FrostUsePotionStrength()
 	}
 }
 
@@ -580,6 +604,43 @@ AddFunction FrostDualWieldSingleTargetCdActions
 #	spec=frost
 #	talents=2001002
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
+
+AddFunction FrostUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction FrostUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+AddFunction FrostGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction FrostInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction FrostTwoHanderDefaultMainActions
@@ -593,7 +654,7 @@ AddFunction FrostTwoHanderDefaultMainActions
 AddFunction FrostTwoHanderDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	FrostGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -613,9 +674,9 @@ AddFunction FrostTwoHanderDefaultShortCdActions
 AddFunction FrostTwoHanderDefaultCdActions
 {
 	#mind_freeze
-	InterruptActions()
+	FrostInterruptActions()
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
-	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) UsePotionStrength()
+	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostUsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
 	if target.TimeToDie() <= 60 and BuffPresent(potion_strength_buff) Spell(empower_rune_weapon)
 	#blood_fury
@@ -625,7 +686,7 @@ AddFunction FrostTwoHanderDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=trinket2
-	UseItemActions()
+	FrostUseItemActions()
 	#run_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 FrostTwoHanderAoeCdActions()
 
@@ -842,7 +903,7 @@ AddFunction FrostTwoHanderPrecombatCdActions
 		#army_of_the_dead
 		Spell(army_of_the_dead)
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		FrostUsePotionStrength()
 	}
 }
 
@@ -963,6 +1024,36 @@ AddFunction FrostTwoHanderSingleTargetCdActions
 #	spec=unholy
 #	talents=2001002
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=unholy)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=unholy)
+
+AddFunction UnholyUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction UnholyGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction UnholyInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction UnholyDefaultMainActions
@@ -976,7 +1067,7 @@ AddFunction UnholyDefaultMainActions
 AddFunction UnholyDefaultShortCdActions
 {
 	#auto_attack
-	GetInMeleeRange()
+	UnholyGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -994,7 +1085,7 @@ AddFunction UnholyDefaultShortCdActions
 AddFunction UnholyDefaultCdActions
 {
 	#mind_freeze
-	InterruptActions()
+	UnholyInterruptActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -1002,7 +1093,7 @@ AddFunction UnholyDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#potion,name=draenic_strength,if=buff.dark_transformation.up&target.time_to_die<=60
-	if pet.BuffPresent(dark_transformation_buff any=1) and target.TimeToDie() <= 60 UsePotionStrength()
+	if pet.BuffPresent(dark_transformation_buff any=1) and target.TimeToDie() <= 60 UnholyUsePotionStrength()
 	#run_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeCdActions()
 
@@ -1241,7 +1332,7 @@ AddFunction UnholyPrecombatCdActions
 		#army_of_the_dead
 		Spell(army_of_the_dead)
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		UnholyUsePotionStrength()
 	}
 }
 

@@ -16,16 +16,16 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default)
-AddCheckBox(opt_melee_range L(not_in_melee_range))
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
 
-AddFunction UsePotionStrength
+AddFunction FuryUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction GetInMeleeRange
+AddFunction FuryGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
 	{
@@ -35,7 +35,7 @@ AddFunction GetInMeleeRange
 	}
 }
 
-AddFunction InterruptActions
+AddFunction FuryInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -73,7 +73,7 @@ AddFunction FuryTitansGripDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	GetInMeleeRange()
+	FuryGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementShortCdActions()
 
@@ -115,12 +115,12 @@ AddFunction FuryTitansGripDefaultShortCdActions
 AddFunction FuryTitansGripDefaultCdActions
 {
 	#pummel
-	InterruptActions()
+	FuryInterruptActions()
 
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 UsePotionStrength()
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
 
@@ -261,7 +261,7 @@ AddFunction FuryTitansGripPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		UsePotionStrength()
+		FuryUsePotionStrength()
 	}
 }
 
