@@ -12,11 +12,13 @@ Ovale.OvaleEquipment = OvaleEquipment
 local OvaleProfiler = Ovale.OvaleProfiler
 
 local pairs = pairs
+local select = select
 local strgsub = string.gsub
 local strmatch = string.match
 local tonumber = tonumber
 local tostring = tostring
 local type = type
+local unpack = unpack
 local wipe = wipe
 
 local API_CreateFrame = CreateFrame
@@ -500,33 +502,69 @@ do
 	end
 end
 
-function OvaleEquipment:GetEquippedItem(slotId)
-	if slotId and type(slotId) ~= "number" then
-		slotId = OVALE_SLOTNAME[slotId]
+do
+	-- Static table to hold return values for GetEquippedItem().
+	local result = {}
+	local count = 0
+
+	function OvaleEquipment:GetEquippedItem(...)
+		count = select("#", ...)
+		for n = 1, count do
+			local slotId = select(n, ...)
+			if slotId and type(slotId) ~= "number" then
+				slotId = OVALE_SLOTNAME[slotId]
+			end
+			if slotId then
+				result[n] = self.equippedItems[slotId]
+			else
+				result[n] = nil
+			end
+		end
+		if count > 0 then
+			return unpack(result, 1, count)
+		else
+			return nil
+		end
 	end
-	if slotId then
-		return self.equippedItems[slotId]
-	end
-	return nil
 end
 
-function OvaleEquipment:GetEquippedItemLevel(slotId)
-	if slotId and type(slotId) ~= "number" then
-		slotId = OVALE_SLOTNAME[slotId]
+do
+	-- Static table to hold return values for GetEquippedItemLevel().
+	local result = {}
+	local count = 0
+
+	function OvaleEquipment:GetEquippedItemLevel(...)
+		count = select("#", ...)
+		for n = 1, count do
+			local slotId = select(n, ...)
+			if slotId and type(slotId) ~= "number" then
+				slotId = OVALE_SLOTNAME[slotId]
+			end
+			if slotId then
+				result[n] = self.equippedItemLevels[slotId]
+			else
+				result[n] = nil
+			end
+		end
+		if count > 0 then
+			return unpack(result, 1, count)
+		else
+			return nil
+		end
 	end
-	if slotId then
-		return self.equippedItemLevels[slotId]
-	end
-	return nil
 end
 
-function OvaleEquipment:HasEquippedItem(itemId, slotId)
-	if slotId and type(slotId) ~= "number" then
-		slotId = OVALE_SLOTNAME[slotId]
-	end
-	if slotId then
-		if self.equippedItems[slotId] == itemId then
-			return slotId
+function OvaleEquipment:HasEquippedItem(itemId, ...)
+	local N = select("#", ...)
+	if N > 0 then
+		for n = 1, N do
+			local slotId = select(n, ...)
+			if slotId and type(slotId) ~= "number" then
+				slotId = OVALE_SLOTNAME[slotId]
+			end
+			if slotId and self.equippedItems[slotId] == itemId then
+				return slotId
+			end
 		end
 	else
 		for slotId, equippedItemId in pairs(self.equippedItems) do
