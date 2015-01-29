@@ -901,6 +901,14 @@ do
 	end
 end
 
+local function CamelSpecialization(annotation)
+	local camelSpecialization = CamelCase(annotation.specialization)
+	if annotation.class == "WARRIOR" and strfind(annotation.name, "_[gG]ladiator_") then
+		camelSpecialization = "ProtectionGladiator"
+	end
+	return camelSpecialization
+end
+
 local function OvaleFunctionName(name, annotation)
 	local output = self_outputPool:Get()
 	local profileName, class, specialization = annotation.name, annotation.class, annotation.specialization
@@ -1479,6 +1487,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 	local canonicalizedName = gsub(parseNode.name, ":", "_")
 	local class = annotation.class
 	local specialization = annotation.specialization
+	local camelSpecialization = CamelSpecialization(annotation)
 	local role = annotation.role
 	local action = Disambiguate(canonicalizedName, class, specialization)
 
@@ -1505,7 +1514,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Only cast Horn of Winter if not already raid-buffed.
 			conditionCode = "BuffExpires(attack_power_multiplier_buff any=1)"
 		elseif class == "DEATHKNIGHT" and action == "mind_freeze" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1529,16 +1538,16 @@ EmitAction = function(parseNode, nodeList, annotation)
 			AddSymbol(annotation, spellName)
 			conditionCode = format("SpellKnown(%s)", spellName)
 		elseif class == "DRUID" and action == "skull_bash" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "DRUID" and action == "wild_charge" then
-			bodyCode = "GetInMeleeRange()"
+			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			annotation[action] = class
 			isSpellAction = false
 		elseif class == "HUNTER" and action == "counter_shot" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1562,15 +1571,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
-		elseif class == "HUNTER" and action == "summon_pet" then
-			if specialization == "beast_mastery" then
-				bodyCode = "BeastMasterySummonPet()"
-			else
-				bodyCode = "SummonPet()"
-				annotation.functionCall = annotation.functionCall or {}
-			end
-			annotation[action] = class
-			isSpellAction = false
 		elseif class == "HUNTER" and strsub(action, -5) == "_trap" then
 			annotation.trap_launcher = class
 			conditionCode = "CheckBoxOn(opt_trap_launcher)"
@@ -1578,7 +1578,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Only cast Arcane Brilliance if not already raid-buffed.
 			conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
 		elseif class == "MAGE" and action == "counterspell" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1611,7 +1611,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Only suggest Nimble Brew to break snares, roots, and stuns.
 			conditionCode = "IsFeared() or IsRooted() or IsStunned()"
 		elseif class == "MONK" and action == "spear_hand_strike" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1626,12 +1626,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 				isSpellAction = false
 			end
 		elseif class == "PALADIN" and action == "rebuke" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "PRIEST" and action == "silence" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1658,7 +1658,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			end
 			isSpellAction = false
 		elseif class == "ROGUE" and action == "kick" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1677,7 +1677,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffExpires(%s)", buffName)
 		elseif class == "SHAMAN" and action == "bloodlust" then
-			bodyCode = "Bloodlust()"
+			bodyCode = camelSpecialization .. "Bloodlust()"
 			annotation[action] = class
 			isSpellAction = false
 		elseif class == "SHAMAN" and action == "magma_totem" then
@@ -1686,7 +1686,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			AddSymbol(annotation, spellName)
 			conditionCode = format("target.InRange(%s)", spellName)
 		elseif class == "SHAMAN" and action == "wind_shear" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
@@ -1754,12 +1754,12 @@ EmitAction = function(parseNode, nodeList, annotation)
 			AddSymbol(annotation, spellName)
 			conditionCode = format("target.InRange(%s)", spellName)
 		elseif class == "WARRIOR" and action == "pummel" then
-			bodyCode = "InterruptActions()"
+			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
 		elseif action == "auto_attack" then
-			bodyCode = "GetInMeleeRange()"
+			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			isSpellAction = false
 		elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
 			if modifier.name then
@@ -1779,7 +1779,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				isSpellAction = false
 			end
 		elseif action == "mana_potion" then
-			bodyCode = "UsePotionMana()"
+			bodyCode = camelSpecialization .. "UsePotionMana()"
 			annotation.use_potion_mana = class
 			isSpellAction = false
 		elseif action == "pool_resource" then
@@ -1797,16 +1797,16 @@ EmitAction = function(parseNode, nodeList, annotation)
 				local name = Unparse(modifier.name)
 				local stat = POTION_STAT[name]
 				if stat == "agility" then
-					bodyCode = "UsePotionAgility()"
+					bodyCode = camelSpecialization .. "UsePotionAgility()"
 					annotation.use_potion_agility = class
 				elseif stat == "armor" then
-					bodyCode = "UsePotionArmor()"
+					bodyCode = camelSpecialization .. "UsePotionArmor()"
 					annotation.use_potion_armor = class
 				elseif stat == "intellect" then
-					bodyCode = "UsePotionIntellect()"
+					bodyCode = camelSpecialization .. "UsePotionIntellect()"
 					annotation.use_potion_intellect = class
 				elseif stat == "strength" then
-					bodyCode = "UsePotionStrength()"
+					bodyCode = camelSpecialization .. "UsePotionStrength()"
 					annotation.use_potion_strength = class
 				end
 				isSpellAction = false
@@ -1825,7 +1825,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				isSpellAction = false
 			end
 		elseif action == "summon_pet" then
-			bodyCode = "SummonPet()"
+			bodyCode = camelSpecialization .. "SummonPet()"
 			annotation[action] = class
 			isSpellAction = false
 		elseif action == "use_item" then
@@ -1835,7 +1835,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 					all of the equipped items at the same time, so all hand tinkers and on-use
 					trinkets.  Assume a "UseItemActions()" function is available that does this.
 				--]]
-				bodyCode = "UseItemActions()"
+				bodyCode = camelSpecialization .. "UseItemActions()"
 				annotation[action] = true
 			else
 				if modifier.name == "name" then
@@ -2679,6 +2679,7 @@ do
 
 		local class = annotation.class
 		local specialization = annotation.specialization
+		local camelSpecialization = CamelSpecialization(annotation)
 
 		target = target and (target .. ".") or ""
 		local code
@@ -2689,14 +2690,12 @@ do
 			code = format("BuffDirection(%s)", name)
 			AddSymbol(annotation, name)
 		elseif class == "PALADIN" and operand == "time_to_hpg" then
+			code = camelSpecialization .. "TimeToHPG()"
 			if specialization == "holy" then
-				code = "HolyTimeToHPG()"
 				annotation.time_to_hpg_heal = class
 			elseif specialization == "protection" then
-				code = "ProtectionTimeToHPG()"
 				annotation.time_to_hpg_tank = class
 			elseif specialization == "retribution" then
-				code = "RetributionTimeToHPG()"
 				annotation.time_to_hpg_melee = class
 			end
 		elseif class == "PRIEST" and operand == "shadowy_apparitions_in_flight" then
@@ -3560,9 +3559,11 @@ end
 local function InsertSupportingFunctions(child, annotation)
 	local count = 0
 	local nodeList = annotation.astAnnotation.nodeList
+	local camelSpecialization = CamelSpecialization(annotation)
+
 	if annotation.mind_freeze == "DEATHKNIGHT" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3578,6 +3579,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3590,12 +3592,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "DEATHKNIGHT" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -3603,8 +3606,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.skull_bash == "DRUID" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3619,6 +3622,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3630,8 +3634,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "DRUID" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
 				{
@@ -3640,6 +3644,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -3651,10 +3656,10 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.summon_pet == "HUNTER" then
-		local code
+		local fmt
 		if annotation.specialization == "beast_mastery" then
-			code = [[
-				AddFunction BeastMasterySummonPet
+			fmt = [[
+				AddFunction %sSummonPet
 				{
 					if pet.IsDead()
 					{
@@ -3665,8 +3670,8 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			]]
 		else
-			code = [[
-				AddFunction SummonPet
+			fmt = [[
+				AddFunction %sSummonPet
 				{
 					if not Talent(lone_wolf_talent)
 					{
@@ -3681,6 +3686,7 @@ local function InsertSupportingFunctions(child, annotation)
 			]]
 			AddSymbol(annotation, "lone_wolf_talent")
 		end
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -3688,8 +3694,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.counter_shot == "HUNTER" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3703,6 +3709,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3713,8 +3720,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.counterspell == "MAGE" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3727,6 +3734,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3736,8 +3744,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.spear_hand_strike == "MONK" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3752,6 +3760,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3763,16 +3772,31 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "MONK" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "tiger_palm")
+		count = count + 1
+	end
+	if annotation.time_to_hpg_heal == "PALADIN" then
+		local code = [[
+			AddFunction HolyTimeToHPG
+			{
+				SpellCooldown(crusader_strike holy_shock judgment)
+			}
+		]]
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "crusader_strike")
+		AddSymbol(annotation, "holy_shock")
+		AddSymbol(annotation, "judgment")
 		count = count + 1
 	end
 	if annotation.time_to_hpg_melee == "PALADIN" then
@@ -3808,45 +3832,32 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.class == "PALADIN" then
-		local code
+		local fmt
 		if annotation.specialization == "protection" then
-			code = [[
-				AddFunction ProtectionRighteousFury
+			fmt = [[
+				AddFunction %sRighteousFury
 				{
 					if CheckBoxOn(opt_righteous_fury_check) and BuffExpires(righteous_fury) Spell(righteous_fury)
 				}
 			]]
 		else
-			code = [[
-				AddFunction RighteousFuryOff
+			fmt = [[
+				AddFunction %sRighteousFuryOff
 				{
 					if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
 				}
 			]]
 		end
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "righteous_fury")
 		count = count + 1
 	end
-	if annotation.time_to_hpg_heal == "PALADIN" then
-		local code = [[
-			AddFunction HolyTimeToHPG
-			{
-				SpellCooldown(crusader_strike holy_shock judgment)
-			}
-		]]
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "crusader_strike")
-		AddSymbol(annotation, "holy_shock")
-		AddSymbol(annotation, "judgment")
-		count = count + 1
-	end
 	if annotation.rebuke == "PALADIN" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3863,6 +3874,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3876,12 +3888,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "PALADIN" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -3889,8 +3902,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.silence == "PRIEST" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3904,6 +3917,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3914,8 +3928,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.kick == "ROGUE" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3931,6 +3945,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3943,8 +3958,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "ROGUE" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
 				{
@@ -3953,6 +3968,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -3961,8 +3977,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.wind_shear == "SHAMAN" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -3976,6 +3992,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -3986,12 +4003,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "SHAMAN" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -3999,8 +4017,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.bloodlust == "SHAMAN" then
-		local code = [[
-			AddFunction Bloodlust
+		local fmt = [[
+			AddFunction %sBloodlust
 			{
 				if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
 				{
@@ -4009,6 +4027,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4017,8 +4036,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.pummel == "WARRIOR" then
-		local code = [[
-			AddFunction InterruptActions
+		local fmt = [[
+			AddFunction %sInterruptActions
 			{
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
@@ -4033,6 +4052,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4045,8 +4065,8 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.melee == "WARRIOR" then
-		local code = [[
-			AddFunction GetInMeleeRange
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
 			{
 				if CheckBoxOn(opt_melee_range)
 				{
@@ -4056,6 +4076,7 @@ local function InsertSupportingFunctions(child, annotation)
 				}
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
@@ -4065,26 +4086,28 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.use_item then
-		local code = [[
-			AddFunction UseItemActions
+		local fmt = [[
+			AddFunction %sUseItemActions
 			{
 				Item(HandSlot usable=1)
 				Item(Trinket0Slot usable=1)
 				Item(Trinket1Slot usable=1)
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
 		count = count + 1
 	end
 	if annotation.use_potion_strength then
-		local code = [[
-			AddFunction UsePotionStrength
+		local fmt = [[
+			AddFunction %sUsePotionStrength
 			{
 				if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4092,12 +4115,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.use_potion_mana then
-		local code = [[
-			AddFunction UsePotionMana
+		local fmt = [[
+			AddFunction %sUsePotionMana
 			{
 				if CheckBoxOn(opt_potion_mana) Item(draenic_mana_potion usable=1)
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4105,12 +4129,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.use_potion_intellect then
-		local code = [[
-			AddFunction UsePotionIntellect
+		local fmt = [[
+			AddFunction %sUsePotionIntellect
 			{
 				if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4118,12 +4143,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.use_potion_armor then
-		local code = [[
-			AddFunction UsePotionArmor
+		local fmt = [[
+			AddFunction %sUsePotionArmor
 			{
 				if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4131,12 +4157,13 @@ local function InsertSupportingFunctions(child, annotation)
 		count = count + 1
 	end
 	if annotation.use_potion_agility then
-		local code = [[
-			AddFunction UsePotionAgility
+		local fmt = [[
+			AddFunction %sUsePotionAgility
 			{
 				if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 			}
 		]]
+		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
@@ -4149,117 +4176,136 @@ end
 local function InsertSupportingControls(child, annotation)
 	local count = 0
 	local nodeList = annotation.astAnnotation.nodeList
+
+	local ifSpecialization = "specialization=" .. annotation.specialization
+	if annotation.class == "WARRIOR" and strfind(annotation.name, "_[gG]ladiator_") then
+		ifSpecialization = ifSpecialization .. " if_stance=warrior_gladiator_stance"
+	end
+
 	if annotation.trap_launcher == "HUNTER" then
-		local code = [[
-			AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default)
+		local fmt = [[
+			AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "trap_launcher")
 		count = count + 1
 	end
 	if annotation.time_warp == "MAGE" then
-		local code = [[
-			AddCheckBox(opt_time_warp SpellName(time_warp) default)
+		local fmt = [[
+			AddCheckBox(opt_time_warp SpellName(time_warp) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "time_warp")
 		count = count + 1
 	end
 	if annotation.chi_burst == "MONK" then
-		local code = [[
-			AddCheckBox(opt_chi_burst SpellName(chi_burst) default)
+		local fmt = [[
+			AddCheckBox(opt_chi_burst SpellName(chi_burst) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "chi_burst")
 		count = count + 1
 	end
 	if annotation.blade_flurry == "ROGUE" then
-		local code = [[
-			AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
+		local fmt = [[
+			AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "blade_flurry")
 		count = count + 1
 	end
 	if annotation.bloodlust == "SHAMAN" then
-		local code = [[
-			AddCheckBox(opt_bloodlust SpellName(bloodlust) default)
+		local fmt = [[
+			AddCheckBox(opt_bloodlust SpellName(bloodlust) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "bloodlust")
 		count = count + 1
 	end
 	if annotation.class == "PALADIN" then
-		local code = [[
-			AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default)
+		local fmt = [[
+			AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "righteous_fury")
 		count = count + 1
 	end
 	if annotation.use_potion_strength then
-		local code = [[
-			AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default)
+		local fmt = [[
+			AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "draenic_strength_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_mana then
-		local code = [[
-			AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default)
+		local fmt = [[
+			AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "draenic_mana_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_intellect then
-		local code = [[
-			AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default)
+		local fmt = [[
+			AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "draenic_intellect_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_armor then
-		local code = [[
-			AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default)
+		local fmt = [[
+			AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "draenic_armor_potion")
 		count = count + 1
 	end
 	if annotation.use_potion_agility then
-		local code = [[
-			AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default)
+		local fmt = [[
+			AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "draenic_agility_potion")
 		count = count + 1
 	end
 	if annotation.melee then
-		local code = [[
-			AddCheckBox(opt_melee_range L(not_in_melee_range))
+		local fmt = [[
+			AddCheckBox(opt_melee_range L(not_in_melee_range) %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		count = count + 1
 	end
 	if annotation.interrupt then
-		local code = [[
-			AddCheckBox(opt_interrupt L(interrupt) default)
+		local fmt = [[
+			AddCheckBox(opt_interrupt L(interrupt) default %s)
 		]]
+		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		count = count + 1
