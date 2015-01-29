@@ -21,6 +21,7 @@ actions.precombat+=/food,type=blackrock_barbecue
 actions.precombat+=/blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
 actions.precombat+=/blessing_of_might,if=!aura.mastery.up
 actions.precombat+=/seal_of_insight
+actions.precombat+=/righteous_fury,if=buff.righteous_fury.up
 actions.precombat+=/beacon_of_light,target=healing_target
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
