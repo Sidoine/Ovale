@@ -1276,8 +1276,6 @@ SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
 				functionTag = "shortcd"
 			elseif strfind(functionName, "InterruptActions") then
 				functionTag = "cd"
-			elseif strfind(functionName, "RighteousFury") then
-				functionTag = "shortcd"
 			elseif strfind(functionName, "SummonPet") then
 				functionTag = "shortcd"
 			elseif strfind(functionName, "UseItemActions") then
@@ -1630,6 +1628,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "PALADIN" and action == "righteous_fury" then
+			-- Only suggest Righteous Fury if the check is toggled on.
+			conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
+			annotation[action] = class
 		elseif class == "PRIEST" and action == "silence" then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
@@ -3831,30 +3833,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "sanctified_wrath_talent")
 		count = count + 1
 	end
-	if annotation.class == "PALADIN" then
-		local fmt
-		if annotation.specialization == "protection" then
-			fmt = [[
-				AddFunction %sRighteousFury
-				{
-					if CheckBoxOn(opt_righteous_fury_check) and BuffExpires(righteous_fury) Spell(righteous_fury)
-				}
-			]]
-		else
-			fmt = [[
-				AddFunction %sRighteousFuryOff
-				{
-					if CheckBoxOn(opt_righteous_fury_check) and BuffPresent(righteous_fury) Texture(spell_holy_sealoffury text=cancel)
-				}
-			]]
-		end
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "righteous_fury")
-		count = count + 1
-	end
 	if annotation.rebuke == "PALADIN" then
 		local fmt = [[
 			AddFunction %sInterruptActions
@@ -4232,7 +4210,7 @@ local function InsertSupportingControls(child, annotation)
 		AddSymbol(annotation, "bloodlust")
 		count = count + 1
 	end
-	if annotation.class == "PALADIN" then
+	if annotation.righteous_fury == "PALADIN" then
 		local fmt = [[
 			AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default %s)
 		]]
