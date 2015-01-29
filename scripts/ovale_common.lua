@@ -50,14 +50,13 @@ SpellList(potion_intellect_buff draenic_intellect_potion_buff jade_serpent_potio
 SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_buff)
 
 ###
-### Trinkets (Mists of Pandaria only)
+### Trinkets
 ###
 
 # Agility
 	SpellInfo(126554 buff_cd=55)				# Bottle of Infinite Stars
 	SpellInfo(126690 buff_cd=60)				# PvP agility trinket (on-use)
 	SpellInfo(126707 buff_cd=55)				# PvP agility trinket (proc)
-	SpellInfo(126708 buff_cd=55)				# PvP agility trinket (proc)
 	SpellInfo(128984 buff_cd=55)				# Relic of Xuen (agility)
 	SpellInfo(138699 buff_cd=115)				# Vicious Talisman of the Shado-Pan Assault
 	SpellInfo(138756 buff_cd=50 max_stacks=10)	# Renataki's Soul Charm
@@ -70,22 +69,23 @@ SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_bu
 
 # Bonus armor
 	SpellInfo(176873 buff_cd=120)				# Tablet of Turnbuckle Teamwork (on-use)
-	SpellInfo(177055 buff_cd=65)				# Evergaze Arcane Eidolon
+	SpellInfo(177053 buff_cd=65)				# Evergaze Arcane Eidolon
 
 # Critical Strike
 	SpellInfo(138963 buff_cd=110)				# Unerring Vision of Lei-Shen
 	SpellInfo(138963 buff_cd=165 specialization=balance)	# UVLS adjustment for balance druids
 	SpellInfo(146285 buff_cd=65 max_stacks=20)	# Skeer's Bloodsoaked Talisman
-	SpellInfo(162916 buff_cd=115)				# Skull of War
-	SpellInfo(162918 buff_cd=115)				# Knight's Badge
-	SpellInfo(162920 buff_cd=115)				# Sandman's Pouch
+	SpellInfo(162915 buff_cd=115)				# Skull of War
+	SpellInfo(162917 buff_cd=115)				# Knight's Badge
+	SpellInfo(162919 buff_cd=115)				# Sandman's Pouch
 	SpellInfo(165532 buff_cd=120)				# Bonemaw's Big Toe (on-use)
 	SpellInfo(165532 buff_cd=120)				# Voidmender's Shadowgem (on-use)
-	SpellInfo(176979 buff_cd=65)				# Immaculate Living Mushroom
-	SpellInfo(176983 buff_cd=65)				# Stoneheart Idol
-	SpellInfo(177041 buff_cd=65)				# Tectus' Beating Heart
-	SpellInfo(177047 buff_cd=65)				# Goren Soul Repository
-	SpellInfo(177071 buff_cd=65 max_stacks=20)	# Humming Blackiron Trigger
+	SpellInfo(165830 buff_cd=65)				# Munificent Emblem of Terror
+	SpellInfo(176978 buff_cd=65)				# Immaculate Living Mushroom
+	SpellInfo(176982 buff_cd=65)				# Stoneheart Idol
+	SpellInfo(177040 buff_cd=65)				# Tectus' Beating Heart
+	SpellInfo(177046 buff_cd=65)				# Goren Soul Repository
+	SpellInfo(177067 buff_cd=65 max_stacks=20)	# Humming Blackiron Trigger
 
 # Haste
 	SpellInfo(165531 buff_cd=120)				# Fleshrender's Meathook (on-use)
@@ -96,19 +96,18 @@ SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_bu
 	SpellInfo(176879 buff_cd=120)				# Emblem of Caustic Healing (on-use)
 	SpellInfo(176882 buff_cd=120)				# Turbulent Focusing Crystal (on-use)
 	SpellInfo(176885 buff_cd=90)				# Turbulent Seal of Defiance (on-use)
-	SpellInfo(176938 buff_cd=65)				# Formidable Relic of Blood
-	SpellInfo(176944 buff_cd=65)				# Formidable Censer of Faith
-	SpellInfo(176981 buff_cd=65)				# Furyheart Talisman
-	SpellInfo(177036 buff_cd=65)				# Meaty Dragonspine Trophy
-	SpellInfo(177052 buff_cd=65)				# Darmac's Unstable Talisman
-	SpellInfo(177090 buff_cd=65 max_stacks=20)	# Auto-Repairing Autoclave
-	SpellInfo(177104 buff_cd=65 max_stacks=20)	# Battering Talisman
+	SpellInfo(176937 buff_cd=65)				# Formidable Relic of Blood
+	SpellInfo(176943 buff_cd=65)				# Formidable Censer of Faith
+	SpellInfo(176980 buff_cd=65)				# Furyheart Talisman
+	SpellInfo(177035 buff_cd=65)				# Meaty Dragonspine Trophy
+	SpellInfo(177051 buff_cd=65)				# Darmac's Unstable Talisman
+	SpellInfo(177086 buff_cd=65 max_stacks=20)	# Auto-Repairing Autoclave
+	SpellInfo(177102 buff_cd=65 max_stacks=20)	# Battering Talisman
 
 # Intellect
 	SpellInfo(126577 buff_cd=55)				# Light of the Cosmos
 	SpellInfo(126683 buff_cd=60)				# PvP intellect trinket (on-use)
 	SpellInfo(126705 buff_cd=55)				# PvP intellect trinket (proc)
-	SpellInfo(126706 buff_cd=55)				# PvP intellect trinket (proc)
 	SpellInfo(128985 buff_cd=55)				# Relic of Yu'lon
 	SpellInfo(136082 buff_cd=60)				# Shock-Charger/Static-Caster's Medallion
 	SpellInfo(138786 buff_cd=50 max_stacks=10)	# Wushoolay's Final Choice
@@ -123,43 +122,40 @@ SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_bu
 	SpellInfo(165485 buff_cd=120)				# Kihra's Adrenaline Injector (on-use)
 	SpellInfo(165535 buff_cd=90)				# Kyrak's Vileblood Serum (on-use)
 	SpellInfo(165535 buff_cd=90)				# Tharbek's Lucky Pebble (on-use)
-	SpellInfo(165825 buff_cd=65)				# Munificent Censer of Tranquility
-	SpellInfo(165825 buff_cd=65)				# Xeri'tac's Unhatched Egg Sac
-	SpellInfo(165835 buff_cd=65)				# Munificent Emblem of Terror
+	SpellInfo(165824 buff_cd=65)				# Munificent Censer of Tranquility
+	SpellInfo(165824 buff_cd=65)				# Xeri'tac's Unhatched Egg Sac
 	SpellInfo(176876 buff_cd=120)				# Pol's Blinded Eye (on-use)
 	SpellInfo(176883 buff_cd=90)				# Turbulent Vial of Toxin (on-use)
 	SpellInfo(176884 buff_cd=90)				# Turbulent Relic of Mendacity (on-use)
-	SpellInfo(176940 buff_cd=65)				# Formidable Jar of Doom
-	SpellInfo(176942 buff_cd=65)				# Formidable Orb of Putrescence
-	SpellInfo(177044 buff_cd=65)				# Horn of Screaming Spirits
-	SpellInfo(177057 buff_cd=65)				# Blast Furnace Door
+	SpellInfo(176939 buff_cd=65)				# Formidable Jar of Doom
+	SpellInfo(176941 buff_cd=65)				# Formidable Orb of Putrescence
+	SpellInfo(177042 buff_cd=65)				# Horn of Screaming Spirits
+	SpellInfo(177056 buff_cd=65)				# Blast Furnace Door
 
 # Multistrike
 	SpellInfo(165542 buff_cd=90)				# Gor'ashan's Lodestone Spike (on-use)
-	SpellInfo(165838 buff_cd=65)				# Coagulated Genesaur Blood
-	SpellInfo(165840 buff_cd=65)				# Munificent Soul of Compassion
+	SpellInfo(165832 buff_cd=65)				# Coagulated Genesaur Blood
 	SpellInfo(176874 buff_cd=120)				# Vial of Convulsive Shadows
 	SpellInfo(176878 buff_cd=120)				# Beating Heart of the Mountain (on-use)
 	SpellInfo(176881 buff_cd=120)				# Turbulent Emblem (on-use)
-	SpellInfo(176936 buff_cd=65)				# Formidable Fang
-	SpellInfo(176987 buff_cd=65)				# Blackheart Enforcer's Medallion
-	SpellInfo(177039 buff_cd=65)				# Scales of Doom
-	SpellInfo(177064 buff_cd=65)				# Elementalist's Shielding Talisman
-	SpellInfo(177085 buff_cd=65 max_stacks=20)	# Blackiron Micro Crucible
-	SpellInfo(177098 buff_cd=65 max_stacks=20)	# Forgemaster's Insignia
+	SpellInfo(176935 buff_cd=65)				# Formidable Fang
+	SpellInfo(176984 buff_cd=65)				# Blackheart Enforcer's Medallion
+	SpellInfo(177038 buff_cd=65)				# Scales of Doom
+	SpellInfo(177063 buff_cd=65)				# Elementalist's Shielding Talisman
+	SpellInfo(177081 buff_cd=65 max_stacks=20)	# Blackiron Micro Crucible
+	SpellInfo(177096 buff_cd=65 max_stacks=20)	# Forgemaster's Insignia
 
 # Spellpower
 	SpellInfo(177594 buff_cd=120)				# Copeland's Clarity (on-use)
 
 # Spirit
-	SpellInfo(162914 buff_cd=115)				# Winged Hourglass
-	SpellInfo(177062 buff_cd=65)				# Ironspike Chew Toy
+	SpellInfo(162913 buff_cd=115)				# Winged Hourglass
+	SpellInfo(177060 buff_cd=65)				# Ironspike Chew Toy
 
 # Strength
 	SpellInfo(126582 buff_cd=55)				# Lei Shen's Final Orders
 	SpellInfo(126679 buff_cd=60)				# PvP strength trinket (on-use)
 	SpellInfo(126700 buff_cd=55)				# PvP strength trinket (proc)
-	SpellInfo(126702 buff_cd=55)				# PvP strength trinket (proc)
 	SpellInfo(128986 buff_cd=55)				# Relic of Xuen (strength)
 	SpellInfo(138702 buff_cd=85)				# Brutal Talisman of the Shado-Pan Assault
 	SpellInfo(138759 buff_cd=50 max_stacks=10)	# Fabled Feather of Ji-Kun
@@ -173,9 +169,10 @@ SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_bu
 	SpellInfo(165534 buff_cd=120)				# Enforcer's Stun Grenade (on-use)
 	SpellInfo(165543 buff_cd=90)				# Emberscale Talisman (on-use)
 	SpellInfo(165543 buff_cd=90)				# Ragewing's Firefang (on-use)
-	SpellInfo(165840 buff_cd=65)				# Leaf of the Ancient Protectors
-	SpellInfo(165840 buff_cd=65)				# Munificent Orb of Ice
-	SpellInfo(176976 buff_cd=65)				# Mote of the Mountain
+	SpellInfo(165833 buff_cd=65)				# Leaf of the Ancient Protectors
+	SpellInfo(165833 buff_cd=65)				# Munificent Orb of Ice
+	SpellInfo(165833 buff_cd=65)				# Munificent Soul of Compassion
+	SpellInfo(176974 buff_cd=65)				# Mote of the Mountain
 
 # Amplification trinket passive buff.
 Define(amplified_buff 146051)
