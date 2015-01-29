@@ -3370,7 +3370,9 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 			local buffName = format("trinket_%s_%s_buff", procType, statName)
 			buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
 
-			if property == "cooldown_remains" then
+			if property == "cooldown" then
+				code = format("BuffCooldownDuration(%s)", buffName)
+			elseif property == "cooldown_remains" then
 				code = format("BuffCooldown(%s)", buffName)
 			elseif property == "down" then
 				code = format("BuffExpires(%s)", buffName)
