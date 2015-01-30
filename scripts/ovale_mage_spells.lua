@@ -7,6 +7,8 @@ do
 	local code = [[
 # Mage spells and functions.
 
+Define(arcane_affinity 166871)
+	SpellInfo(arcane_affinity duration=15)
 Define(arcane_barrage 44425)
 	SpellInfo(arcane_barrage cd=3 travel_time=1)
 	SpellAddDebuff(arcane_barrage arcane_charge_debuff=0 if_spell=arcane_charge)
@@ -29,7 +31,7 @@ Define(arcane_instability_buff 166872)
 Define(arcane_missiles 5143)
 	SpellInfo(arcane_missiles duration=2 travel_time=1)
 	SpellRequire(arcane_missiles unusable 1=buff,!arcane_missiles_buff)
-	SpellAddBuff(arcane_missiles arcane_instability_buff=0 itemset=T17 itemcount=4)
+	SpellAddBuff(arcane_missiles arcane_instability_buff=0 itemset=T17 itemcount=4 specialization=arcane)
 	SpellAddBuff(arcane_missiles arcane_missiles_buff=-1)
 	SpellAddBuff(arcane_missiles arcane_power_buff=extend,2 if_spell=overpowered)
 	SpellAddDebuff(arcane_missiles arcane_charge_debuff=1 if_spell=arcane_charge)
