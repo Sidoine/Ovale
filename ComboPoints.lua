@@ -17,8 +17,10 @@ local OvaleProfiler = Ovale.OvaleProfiler
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleData = nil
+local OvaleEquipment = nil
 local OvaleFuture = nil
 local OvaleGUID = nil
+local OvalePaperDoll = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
@@ -51,6 +53,10 @@ local self_hasAnticipation = false
 -- Rogue's Ruthlessness passive spell.
 local RUTHLESSNESS = 14161
 local self_hasRuthlessness = false
+
+-- Envenom spell ID.
+local ENVENOM = 32645
+local self_hasAssassination4pT17 = false
 
 -- Queue of pending combo point events.
 local self_pendingComboEvents = {}
@@ -141,8 +147,10 @@ function OvaleComboPoints:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleAura = Ovale.OvaleAura
 	OvaleData = Ovale.OvaleData
+	OvaleEquipment = Ovale.OvaleEquipment
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
+	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 end
@@ -153,6 +161,7 @@ function OvaleComboPoints:OnEnable()
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 		self:RegisterEvent("PLAYER_TARGET_CHANGED")
 		self:RegisterEvent("UNIT_COMBO_POINTS")
+		self:RegisterEvent("Ovale_EquipmentChanged")
 		self:RegisterMessage("Ovale_SpellFinished")
 		self:RegisterMessage("Ovale_TalentsChanged")
 		OvaleData:RegisterRequirement("combo", "RequireComboPointsHandler", self)
@@ -169,6 +178,7 @@ function OvaleComboPoints:OnDisable()
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 		self:UnregisterEvent("UNIT_COMBO_POINTS")
+		self:UnregisterEvent("Ovale_EquipmentChanged")
 		self:UnregisterMessage("Ovale_SpellFinished")
 		self:UnregisterMessage("Ovale_TalentsChanged")
 	end
@@ -218,6 +228,10 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 	end
 end
 
+function OvaleComboPoints:Ovale_EquipmentChanged(event)
+	self_hasAssassination4pT17 = (self_class == "ROGUE" and OvalePaperDoll:IsSpecialization("assassination") and OvaleEquipment:GetArmorSetCount("T17") >= 4)
+end
+
 function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID, success)
 	self:Debug("%s (%f): Spell %d finished (%s) on %s", event, atTime, spellId, success, targetGUID or UNKNOWN)
 	local si = OvaleData.spellInfo[spellId]
@@ -228,6 +242,11 @@ function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID
 			-- Ruthlessness grants a 20% chance to grant a combo point for each combo point spent on a finishing move.
 			self:Debug("    Spell %d has 100% chance to grant an extra combo point from Ruthlessness.", spellId)
 			AddPendingComboEvent(atTime, spellId, targetGUID, "Ruthlessness", 1)
+		end
+		if self_hasAssassination4pT17 and spellId == ENVENOM then
+			-- The 4pT17 bonus for Assassination rogues causes Envenom to refunds 1 combo point.
+			self:Debug("    Spell %d refunds 1 combo point from Assassination 4pT17 set bonus.", spellId)
+			AddPendingComboEvent(atTime, spellId, targetGUID, "Assassination 4pT17", 1)
 		end
 		if self_hasAnticipation and targetGUID ~= self_guid then
 			-- Anticipation causes offensive finishing moves to consume all Anticipation charges and to grant a combo point for each.
