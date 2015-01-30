@@ -18,7 +18,7 @@ Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=frost)
-AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=frost)
+AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostUsePotionIntellect
 {

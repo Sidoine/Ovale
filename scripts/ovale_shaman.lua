@@ -18,7 +18,7 @@ do
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=elemental)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=elemental)
-AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=elemental)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) specialization=elemental)
 
 AddFunction ElementalUsePotionIntellect
 {
@@ -239,7 +239,7 @@ AddFunction ElementalSingleCdActions
 AddCheckBox(opt_interrupt L(interrupt) default specialization=enhancement)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
-AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=enhancement)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) specialization=enhancement)
 
 AddFunction EnhancementUsePotionAgility
 {

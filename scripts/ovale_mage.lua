@@ -18,7 +18,7 @@ do
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=arcane)
-AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=arcane)
+AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
 AddFunction ArcaneUsePotionIntellect
 {
@@ -485,7 +485,7 @@ AddFunction ArcanePrecombatCdPostConditions
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=fire)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=fire)
-AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=fire)
+AddCheckBox(opt_time_warp SpellName(time_warp) specialization=fire)
 
 AddFunction FireUsePotionIntellect
 {
@@ -916,7 +916,7 @@ AddFunction FireSingleTargetCdPostConditions
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=frost)
-AddCheckBox(opt_time_warp SpellName(time_warp) default specialization=frost)
+AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostUsePotionIntellect
 {

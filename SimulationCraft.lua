@@ -4172,7 +4172,7 @@ local function InsertSupportingControls(child, annotation)
 	end
 	if annotation.time_warp == "MAGE" then
 		local fmt = [[
-			AddCheckBox(opt_time_warp SpellName(time_warp) default %s)
+			AddCheckBox(opt_time_warp SpellName(time_warp) %s)
 		]]
 		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
@@ -4202,7 +4202,7 @@ local function InsertSupportingControls(child, annotation)
 	end
 	if annotation.bloodlust == "SHAMAN" then
 		local fmt = [[
-			AddCheckBox(opt_bloodlust SpellName(bloodlust) default %s)
+			AddCheckBox(opt_bloodlust SpellName(bloodlust) %s)
 		]]
 		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)

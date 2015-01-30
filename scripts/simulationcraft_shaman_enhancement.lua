@@ -19,7 +19,7 @@ Include(ovale_shaman_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=enhancement)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=enhancement)
-AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=enhancement)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) specialization=enhancement)
 
 AddFunction EnhancementUsePotionAgility
 {

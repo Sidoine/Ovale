@@ -18,7 +18,7 @@ Include(ovale_shaman_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=elemental)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=elemental)
-AddCheckBox(opt_bloodlust SpellName(bloodlust) default specialization=elemental)
+AddCheckBox(opt_bloodlust SpellName(bloodlust) specialization=elemental)
 
 AddFunction ElementalUsePotionIntellect
 {
