@@ -32,6 +32,7 @@ do
 	local API_GetTime = GetTime
 	local API_RegisterStateDriver = RegisterStateDriver
 	local NextTime = OvaleTimeSpan.NextTime
+	local INFINITY = math.huge
 	-- GLOBALS: UIParent
 --</private-static-properties>
 
@@ -80,8 +81,8 @@ do
 
 	end
 	
-	local function frameOnUpdate(self)
-		self.obj:OnUpdate()
+	local function frameOnUpdate(self, elapsed)
+		self.obj:OnUpdate(elapsed)
 	end
 	
 	local function Hide(self)
@@ -157,70 +158,67 @@ do
 		return 0
 	end
 	
-	local function OnUpdate(self)
-		-- Update current time.
-		local now = API_GetTime()
-
+	local function OnUpdate(self, elapsed)
+		--[[
+			Refresh the best action if we've exceeded the minimum update interval since the last refresh,
+			or if one of the units the script is tracking needs a refresh.
+		--]]
+		self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
 		local profile = Ovale.db.profile
-		-- Force a refresh if we've exceeded the minimum update interval since the last refresh.
-		local forceRefresh = not self.lastUpdate or (now > self.lastUpdate + profile.apparence.updateInterval)
-		-- Refresh the icons if we're forcing a refresh or if one of the units the script is tracking needs a refresh.
-		local refresh = forceRefresh or next(Ovale.refreshNeeded)
-		if not refresh then return end
+		local refresh = self.timeSincelastUpdate > profile.apparence.updateInterval or next(Ovale.refreshNeeded)
+		if refresh then
+			local state = OvaleState.state
+			state:Initialize()
 
-		self.lastUpdate = now
-
-		local state = OvaleState.state
-		state:Initialize()
-
-		if OvaleCompile:EvaluateScript() then
-			Ovale:UpdateFrame()
-		end
-
-		local iconNodes = OvaleCompile:GetIconNodes()
-		for k, node in ipairs(iconNodes) do
-			-- Set the true target of "target" references in the icon's body.
-			if node.namedParams and node.namedParams.target then
-				state.defaultTarget = node.namedParams.target
-			else
-				state.defaultTarget = "target"
+			if OvaleCompile:EvaluateScript() then
+				Ovale:UpdateFrame()
 			end
-			-- Set the number of enemies on the battlefield, if given via "enemies=N".
-			if node.namedParams and node.namedParams.enemies then
-				state.enemies = node.namedParams.enemies
-			else
-				state.enemies = nil
-			end
-			-- Refresh the action button for the node.
-			if refresh then
-				state:Log("+++ Icon %d", k)
-				OvaleBestAction:StartNewAction(state)
-				local atTime = state.nextCast
-				if state.lastSpellId ~= state.lastGCDSpellId then
-					-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
-					atTime = state.currentTime
-				end
-				local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
-				local start
-				if element and element.offgcd then
-					start = NextTime(timeSpan, state.currentTime)
+
+			local iconNodes = OvaleCompile:GetIconNodes()
+			for k, node in ipairs(iconNodes) do
+				-- Set the true target of "target" references in the icon's body.
+				if node.namedParams and node.namedParams.target then
+					state.defaultTarget = node.namedParams.target
 				else
-					start = NextTime(timeSpan, atTime)
+					state.defaultTarget = "target"
 				end
-				local action = self.actions[k]
-				local profile = Ovale.db.profile
-				if profile.apparence.enableIcons then
-					self:UpdateActionIcon(state, node, action, element, start, now)
+				-- Set the number of enemies on the battlefield, if given via "enemies=N".
+				if node.namedParams and node.namedParams.enemies then
+					state.enemies = node.namedParams.enemies
+				else
+					state.enemies = nil
 				end
-				if profile.apparence.spellFlash.enabled then
-					OvaleSpellFlash:Flash(state, node, element, start, now)
+				-- Refresh the action button for the node.
+				if refresh then
+					state:Log("+++ Icon %d", k)
+					OvaleBestAction:StartNewAction(state)
+					local atTime = state.nextCast
+					if state.lastSpellId ~= state.lastGCDSpellId then
+						-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
+						atTime = state.currentTime
+					end
+					local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
+					local start
+					if element and element.offgcd then
+						start = NextTime(timeSpan, state.currentTime)
+					else
+						start = NextTime(timeSpan, atTime)
+					end
+					local action = self.actions[k]
+					if profile.apparence.enableIcons then
+						self:UpdateActionIcon(state, node, action, element, start)
+					end
+					if profile.apparence.spellFlash.enabled then
+						OvaleSpellFlash:Flash(state, node, element, start)
+					end
 				end
 			end
-		end
 
-		wipe(Ovale.refreshNeeded)
-		OvaleDebug:UpdateTrace()
-		Ovale:PrintOneTimeMessages()
+			wipe(Ovale.refreshNeeded)
+			OvaleDebug:UpdateTrace()
+			Ovale:PrintOneTimeMessages()
+			self.timeSinceLastUpdate = 0
+		end
 	end
 
 	local function UpdateActionIcon(self, state, node, action, element, start, now)
@@ -478,7 +476,7 @@ do
 		if Masque then
 			self.skinGroup = Masque:Group(OVALE)
 		end
-		self.lastUpdate = nil
+		self.timeSinceLastUpdate = INFINITY
 		--Cheating with frame object which has an obj property
 		--TODO: Frame Class
 		self.obj = nil

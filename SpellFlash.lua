@@ -19,6 +19,7 @@ local OvaleStance = nil
 
 local pairs = pairs
 local type = type
+local API_GetTime = GetTime
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitExists = UnitExists
 local API_UnitIsDead = UnitIsDead
@@ -281,6 +282,7 @@ end
 function OvaleSpellFlash:Flash(state, node, element, start, now)
 	-- SpellFlash settings.
 	local db = Ovale.db.profile.apparence.spellFlash
+	now = now or API_GetTime()
 	if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
 		-- Check that element is an action.
 		if element and element.type == "action" then
