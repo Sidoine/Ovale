@@ -17,6 +17,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 local L = nil
 
 local format = string.format
+local ipairs = ipairs
 local next = next
 local pairs = pairs
 local select = select
@@ -39,6 +40,7 @@ local API_UnitExists = UnitExists
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
+local INFINITY = math.huge
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 local OVALE_VERSION = "@project-version@"
@@ -46,6 +48,11 @@ local REPOSITORY_KEYWORD = "@" .. "project-version" .. "@"
 
 -- Table of strings to display once per session.
 local self_oneTimeMessage = {}
+
+-- List of the last MAX_REFRESH_INTERVALS elapsed times between refreshes.
+local MAX_REFRESH_INTERVALS = 500
+local self_refreshIntervals = {}
+local self_refreshIndex = 1
 --</private-static-properties>
 
 --<public-static-properties>
@@ -173,6 +180,8 @@ end
 --Used to update the visibility e.g. if the user chose
 --to hide Ovale if a friendly unit is targeted
 function Ovale:PLAYER_ENTERING_WORLD()
+	wipe(self_refreshIntervals)
+	self_refreshIndex = 1
 	self:ClearOneTimeMessages()
 end
 
@@ -295,7 +304,6 @@ function Ovale:UpdateControls()
 	end
 end
 
-
 function Ovale:UpdateFrame()
 	self.frame:ReleaseChildren()
 	self.frame:UpdateIcons()
@@ -338,6 +346,24 @@ function Ovale:ToggleCheckBox(k)
 		end
 		k = k - 1
 	end
+end
+
+function Ovale:AddRefreshInterval(milliseconds)
+	self_refreshIntervals[self_refreshIndex] = milliseconds
+	self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS) and (self_refreshIndex + 1) or 1
+end
+
+function Ovale:GetRefreshIntervalStatistics()
+	local sumRefresh, minRefresh, maxRefresh = 0, INFINITY, 0
+	for k, v in ipairs(self_refreshIntervals) do
+		if v > 0 then
+			minRefresh = (minRefresh > v) and v or minRefresh
+			maxRefresh = (maxRefresh < v) and v or maxRefresh
+			sumRefresh = sumRefresh + v
+		end
+	end
+	local avgRefresh = (#self_refreshIntervals > 0) and (sumRefresh / #self_refreshIntervals) or sumRefresh
+	return avgRefresh, minRefresh, maxRefresh
 end
 
 function Ovale:FinalizeString(s)

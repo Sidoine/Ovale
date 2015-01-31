@@ -170,6 +170,9 @@ do
 		local updateInterval = profile.apparence.updateInterval
 		local refresh = updateInterval > 0 and self.timeSinceLastUpdate > updateInterval or next(Ovale.refreshNeeded)
 		if refresh then
+			-- Accumulate refresh interval statistics.
+			Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
+
 			local state = OvaleState.state
 			state:Initialize()
 
