@@ -15,6 +15,7 @@ do
 	local OvaleCompile = Ovale.OvaleCompile
 	local OvaleCooldown = Ovale.OvaleCooldown
 	local OvaleDebug = Ovale.OvaleDebug
+	local OvaleFuture = Ovale.OvaleFuture
 	local OvaleGUID = Ovale.OvaleGUID
 	local OvaleSpellFlash = Ovale.OvaleSpellFlash
 	local OvaleState = Ovale.OvaleState
@@ -161,11 +162,13 @@ do
 	local function OnUpdate(self, elapsed)
 		--[[
 			Refresh the best action if we've exceeded the minimum update interval since the last refresh,
-			or if one of the units the script is tracking needs a refresh.
+			or if one of the units the script is tracking needs a refresh.  If the update interval is set
+			to zero, then only refresh the best action if a unit needs a refresh.
 		--]]
 		self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
 		local profile = Ovale.db.profile
-		local refresh = self.timeSincelastUpdate > profile.apparence.updateInterval or next(Ovale.refreshNeeded)
+		local updateInterval = profile.apparence.updateInterval
+		local refresh = updateInterval > 0 and self.timeSinceLastUpdate > updateInterval or next(Ovale.refreshNeeded)
 		if refresh then
 			local state = OvaleState.state
 			state:Initialize()
@@ -188,29 +191,27 @@ do
 				else
 					state.enemies = nil
 				end
+				-- Get the best action for this icon node.
+				state:Log("+++ Icon %d", k)
+				OvaleBestAction:StartNewAction(state)
+				local atTime = state.nextCast
+				if state.lastSpellId ~= state.lastGCDSpellId then
+					-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
+					atTime = state.currentTime
+				end
+				local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
+				local start
+				if element and element.offgcd then
+					start = NextTime(timeSpan, state.currentTime)
+				else
+					start = NextTime(timeSpan, atTime)
+				end
 				-- Refresh the action button for the node.
-				if refresh then
-					state:Log("+++ Icon %d", k)
-					OvaleBestAction:StartNewAction(state)
-					local atTime = state.nextCast
-					if state.lastSpellId ~= state.lastGCDSpellId then
-						-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
-						atTime = state.currentTime
-					end
-					local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
-					local start
-					if element and element.offgcd then
-						start = NextTime(timeSpan, state.currentTime)
-					else
-						start = NextTime(timeSpan, atTime)
-					end
-					local action = self.actions[k]
-					if profile.apparence.enableIcons then
-						self:UpdateActionIcon(state, node, action, element, start)
-					end
-					if profile.apparence.spellFlash.enabled then
-						OvaleSpellFlash:Flash(state, node, element, start)
-					end
+				if profile.apparence.enableIcons then
+					self:UpdateActionIcon(state, node, self.actions[k], element, start)
+				end
+				if profile.apparence.spellFlash.enabled then
+					OvaleSpellFlash:Flash(state, node, element, start)
 				end
 			end
 
