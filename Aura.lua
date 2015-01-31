@@ -440,6 +440,9 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 				aura.lastTickTime = timestamp
 				aura.tick = tick
 				self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
+				if unitId then
+					Ovale.refreshNeeded[unitId] = true
+				end
 			end
 		end
 	end

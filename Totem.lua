@@ -90,6 +90,7 @@ end
 function OvaleTotem:Update()
 	-- Advance age of current totem state.
 	self_serial = self_serial + 1
+	Ovale.refreshNeeded.player = true
 end
 --</public-static-methods>
 

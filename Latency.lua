@@ -54,6 +54,7 @@ function OvaleLatency:UpdateLatency(event, unit, name, rank, lineId, spellId)
 			self.lastUpdateTime = now
 		end
 		self.spellcast[lineId] = nil
+		Ovale.refreshNeeded.player = true
 	end
 end
 

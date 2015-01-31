@@ -217,6 +217,7 @@ function OvaleGUID:UpdateUnit(unitId)
 				local name = API_UnitName(unitId)
 				self.nameToGUID[name] = self.nameToGUID[name] or guid
 			end
+			Ovale.refreshNeeded[unitId] = true
 		end
 	else
 		-- This unit ID doesn't point to a valid GUID.
@@ -227,6 +228,7 @@ function OvaleGUID:UpdateUnit(unitId)
 				self.GUIDtoUnitId[guid] = nil
 			end
 		end
+		Ovale.refreshNeeded[unitId] = true
 	end
 end
 

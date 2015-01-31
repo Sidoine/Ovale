@@ -49,6 +49,7 @@ function OvaleSpellDamage:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEven
 		if CLEU_DAMAGE_EVENT[cleuEvent] then
 			local spellId, amount = arg12, arg15
 			self.value[spellId] = amount
+			Ovale.refreshNeeded.player = true
 		end
 		self:StopProfiling("OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED")
 	end

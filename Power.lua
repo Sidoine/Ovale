@@ -305,10 +305,18 @@ function OvalePower:UpdateMaxPower(event, powerType)
 	self:StartProfiling("OvalePower_UpdateMaxPower")
 	if powerType then
 		local powerInfo = self.POWER_INFO[powerType]
-		self.maxPower[powerType] = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+		local maxPower = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+		if self.maxPower[powerType] ~= maxPower then
+			self.maxPower[powerType] = maxPower
+			Ovale.refreshNeeded.player = true
+		end
 	else
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
-			self.maxPower[powerType] = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+			local maxPower = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
+			if self.maxPower[powerType] ~= maxPower then
+				self.maxPower[powerType] = maxPower
+				Ovale.refreshNeeded.player = true
+			end
 		end
 	end
 	self:StopProfiling("OvalePower_UpdateMaxPower")
@@ -318,31 +326,45 @@ function OvalePower:UpdatePower(event, powerType)
 	self:StartProfiling("OvalePower_UpdatePower")
 	if powerType then
 		local powerInfo = self.POWER_INFO[powerType]
-		local oldPower = self.power[powerType]
 		local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
-		self.power[powerType] = power
-		self:Debug(true, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
+		if self.power[powerType] ~= power then
+			self.power[powerType] = power
+			Ovale.refreshNeeded.player = true
+		end
+		self:Debug(true, "%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
 	else
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
-			local oldPower = self.power[powerType]
 			local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
-			self.power[powerType] = power
-			self:Debug(true, "%s: %d -> %d (%s).", event, oldPower, power, powerType)
+			if self.power[powerType] ~= power then
+				self.power[powerType] = power
+				Ovale.refreshNeeded.player = true
+			end
+			self:Debug(true, "%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
 		end
 	end
+	Ovale.refreshNeeded.player = true
 	self:StopProfiling("OvalePower_UpdatePower")
 end
 
 function OvalePower:UpdatePowerRegen(event)
 	self:StartProfiling("OvalePower_UpdatePowerRegen")
-	self.inactiveRegen, self.activeRegen = API_GetPowerRegen()
+	local inactiveRegen, activeRegen = API_GetPowerRegen()
+	if self.inactiveRegen ~= inactiveRegen or self.activeRegen ~= activeRegen then
+		self.inactiveRegen, self.activeRegen = inactiveRegen, activeRegen
+		Ovale.refreshNeeded.player = true
+	end
 	self:StopProfiling("OvalePower_UpdatePowerRegen")
 end
 
 function OvalePower:UpdatePowerType(event)
 	self:StartProfiling("OvalePower_UpdatePowerType")
 	local currentType, currentToken = API_UnitPowerType("player")
-	self.powerType = self.POWER_TYPE[currentType]
+	local powerType = self.POWER_TYPE[currentType]
+	if self.powerType ~= powerType then
+		self.powerType = powerType
+		Ovale.refreshNeeded.player = true
+	end
+	Ovale.refreshNeeded.player = true
 	self:StopProfiling("OvalePower_UpdatePowerType")
 end
 

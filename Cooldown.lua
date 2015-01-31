@@ -134,6 +134,7 @@ function OvaleCooldown:Update(event, unit)
 	if not unit or unit == "player" or unit == "pet" then
 		-- Advance age of current cooldown state.
 		self.serial = self.serial + 1
+		Ovale.refreshNeeded.player = true
 		self:Debug(event, self.serial)
 	end
 end

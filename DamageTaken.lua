@@ -90,6 +90,7 @@ function OvaleDamageTaken:AddDamageTaken(timestamp, damage)
 	event.damage = damage
 	self.damageEvent:InsertFront(event)
 	self:RemoveExpiredEvents(timestamp)
+	Ovale.refreshNeeded.player = true
 	self:StopProfiling("OvaleDamageTaken_AddDamageTaken")
 end
 
@@ -124,6 +125,7 @@ function OvaleDamageTaken:RemoveExpiredEvents(timestamp)
 			end
 			self.damageEvent:RemoveBack()
 			self_pool:Release(event)
+			Ovale.refreshNeeded.player = true
 		end
 	end
 	self:StopProfiling("OvaleDamageTaken_RemoveExpiredEvents")

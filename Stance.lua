@@ -224,6 +224,7 @@ function OvaleStance:ShapeshiftEventHandler()
 	local newStance = API_GetShapeshiftForm()
 	if self.stance ~= newStance then
 		self.stance = newStance
+		Ovale.refreshNeeded.player = true
 		self:SendMessage("Ovale_StanceChanged")
 	end
 	self:StopProfiling("OvaleStance_ShapeshiftEventHandler")

@@ -295,7 +295,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 	tinsert(self_activeSpellcast, spellcast)
 
 	OvaleScore:ScoreSpell(spellId)
-	Ovale.refreshNeeded["player"] = true
+	Ovale.refreshNeeded.player = true
 	OvaleFuture:StopProfiling("OvaleFuture_QueueSpellcast")
 	return spellcast
 end
@@ -310,7 +310,7 @@ local function UnqueueSpellcast(spellId, lineId)
 			break
 		end
 	end
-	Ovale.refreshNeeded["player"] = true
+	Ovale.refreshNeeded.player = true
 	OvaleFuture:StopProfiling("OvaleFuture_UnqueueSpellcast")
 end
 
@@ -413,18 +413,21 @@ function OvaleFuture:PLAYER_ENTERING_WORLD(event)
 		self:Ovale_InactiveUnit(event, guid)
 	end
 	wipe(self.lastCastTime)
+	Ovale.refreshNeeded.player = true
 end
 
 function OvaleFuture:PLAYER_REGEN_DISABLED(event)
 	local now = API_GetTime()
 	self.inCombat = true
 	self.combatStartTime = now
+	Ovale.refreshNeeded.player = true
 	self:SendMessage("Ovale_CombatStarted", now)
 end
 
 function OvaleFuture:PLAYER_REGEN_ENABLED(event)
 	local now = API_GetTime()
 	self.inCombat = false
+	Ovale.refreshNeeded.player = true
 	self_pool:Drain()
 	self:SendMessage("Ovale_CombatEnded", now)
 end
@@ -448,6 +451,7 @@ function OvaleFuture:Ovale_InactiveUnit(event, guid)
 end
 
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineId, spellId)
+	Ovale.refreshNeeded[unit] = true
 	if unit == "player" then
 		local _, _, _, _, startTime, endTime = API_UnitChannelInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
@@ -457,6 +461,7 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineI
 end
 
 function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, name, rank, lineId, spellId)
+	Ovale.refreshNeeded[unit] = true
 	if unit == "player" then
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
 		UnqueueSpellcast(spellId, lineId)
@@ -465,6 +470,7 @@ end
 
 --Called when a spell started its cast
 function OvaleFuture:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spellId)
+	Ovale.refreshNeeded[unit] = true
 	if unit == "player" then
 		local _, _, _, _, startTime, endTime = API_UnitCastingInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
@@ -475,6 +481,7 @@ end
 
 --Called if the player interrupted early his cast
 function OvaleFuture:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId)
+	Ovale.refreshNeeded[unit] = true
 	if unit == "player" then
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
 		UnqueueSpellcast(spellId, lineId)
@@ -514,6 +521,7 @@ end
 		UNIT_SPELLCAST_SUCCEEDED
 ]]--
 function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, spellId)
+	Ovale.refreshNeeded[unit] = true
 	if unit == "player" and not WHITE_ATTACK[spellId] then
 		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
@@ -530,6 +538,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				spellcast.snapshot = OvalePaperDoll:GetSnapshot()
 				spellcast.damageMultiplier = GetDamageMultiplier(spellId, now, spellcast.snapshot)
 				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
+				Ovale.refreshNeeded.player = true
 				self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
 				return
 			end
@@ -624,7 +633,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 						self:SendMessage("Ovale_SpellFinished", now, spellcast.spellId, spellcast.target, success)
 						local unitId = spellcast.target and OvaleGUID:GetUnitId(spellcast.target) or "player"
 						Ovale.refreshNeeded[unitId] = true
-						Ovale.refreshNeeded["player"] = true
+						Ovale.refreshNeeded.player = true
 					end
 					break
 				end

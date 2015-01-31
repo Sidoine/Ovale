@@ -449,6 +449,7 @@ function OvaleEquipment:GET_ITEM_INFO_RECEIVED(event)
 
 	local changed = self:UpdateMetaGem()
 	if changed then
+		Ovale.refreshNeeded.player = true
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
 	self:StopProfiling("OvaleEquipment_GET_ITEM_INFO_RECEIVED")
@@ -477,6 +478,7 @@ function OvaleEquipment:PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem)
 	end
 
 	self:UpdateArmorSetCount()
+	Ovale.refreshNeeded.player = true
 	self:SendMessage("Ovale_EquipmentChanged")
 	self:StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
 end
@@ -698,6 +700,7 @@ function OvaleEquipment:UpdateEquippedItems()
 
 	if changed then
 		self:UpdateArmorSetCount()
+		Ovale.refreshNeeded.player = true
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
 	self.ready = true
@@ -716,6 +719,7 @@ function OvaleEquipment:UpdateEquippedItemLevels()
 		end
 	end
 	if changed then
+		Ovale.refreshNeeded.player = true
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
 	self:StopProfiling("OvaleEquipment_UpdateEquippedItemLevels")
@@ -739,6 +743,9 @@ function OvaleEquipment:UpdateMetaGem()
 			self.metaGem = nil
 			changed = true
 		end
+	end
+	if changed then
+		Ovale.refreshNeeded.player = true
 	end
 	self:StopProfiling("OvaleEquipment_UpdateMetaGem")
 	return changed
