@@ -2644,6 +2644,7 @@ do
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
 		["eclipse_energy"]		= "EclipseEnergy()",	-- XXX
 		["energy"]				= "Energy()",
+		["energy.deficit"]		= "EnergyDeficit()",
 		["energy.max"]			= "MaxEnergy()",
 		["energy.regen"]		= "EnergyRegenRate()",
 		["energy.time_to_max"]	= "TimeToMaxEnergy()",
