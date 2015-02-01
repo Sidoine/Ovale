@@ -69,7 +69,7 @@ AddFunction FrostTwoHanderDefaultShortCdActions
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
-	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
+	if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
 	#run_action_list,name=aoe,if=active_enemies>=4

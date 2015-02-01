@@ -13,7 +13,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Blood_T17M".
 #	class=deathknight
 #	spec=blood
-#	talents=2013102
+#	talents=2012102
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
@@ -61,14 +61,18 @@ AddFunction BloodDefaultMainActions
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(plague_strike)
 	#icy_touch,if=(!talent.necrotic_plague.enabled&!dot.frost_fever.ticking)|(talent.necrotic_plague.enabled&!dot.necrotic_plague.ticking)
 	if not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) Spell(icy_touch)
-	#death_strike,if=(unholy=2|frost=2)
-	if Rune(unholy) >= 2 or Rune(frost) >= 2 Spell(death_strike)
-	#death_coil,if=runic_power>70
-	if RunicPower() > 70 Spell(death_coil)
-	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
-	#blood_boil,if=blood=2
-	if Rune(blood) >= 2 Spell(blood_boil)
+	#plague_leech,if=((!blood&!unholy)|(!blood&!frost)|(!unholy&!frost))&cooldown.outbreak.remains<=gcd
+	if { not Rune(blood) >= 1 and not Rune(unholy) >= 1 or not Rune(blood) >= 1 and not Rune(frost) >= 1 or not Rune(unholy) >= 1 and not Rune(frost) >= 1 } and SpellCooldown(outbreak) <= GCD() and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
+	#call_action_list,name=bt,if=talent.blood_tap.enabled
+	if Talent(blood_tap_talent) BloodBtMainActions()
+	#call_action_list,name=re,if=talent.runic_empowerment.enabled
+	if Talent(runic_empowerment_talent) BloodReMainActions()
+	#call_action_list,name=rc,if=talent.runic_corruption.enabled
+	if Talent(runic_corruption_talent) BloodRcMainActions()
+	#call_action_list,name=nrt,if=!talent.blood_tap.enabled&!talent.runic_empowerment.enabled&!talent.runic_corruption.enabled
+	if not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) BloodNrtMainActions()
+	#blood_boil,if=buff.crimson_scourge.react
+	if BuffPresent(crimson_scourge_buff) Spell(blood_boil)
 	#death_coil
 	Spell(death_coil)
 }
@@ -78,7 +82,7 @@ AddFunction BloodDefaultShortCdActions
 	#auto_attack
 	BloodGetInMeleeRange()
 	#antimagic_shell
-	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
+	if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
 
 	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion) or IncomingDamage(5) >= MaxHealth() * 0.65 and Spell(death_strike)
 	{
@@ -96,10 +100,24 @@ AddFunction BloodDefaultShortCdActions
 			#defile
 			Spell(defile)
 
-			unless { Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+			unless { not Rune(blood) >= 1 and not Rune(unholy) >= 1 or not Rune(blood) >= 1 and not Rune(frost) >= 1 or not Rune(unholy) >= 1 and not Rune(frost) >= 1 } and SpellCooldown(outbreak) <= GCD() and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 			{
-				#blood_tap
-				Spell(blood_tap)
+				unless Talent(blood_tap_talent) and BloodBtShortCdPostConditions()
+				{
+					unless Talent(runic_empowerment_talent) and BloodReShortCdPostConditions()
+					{
+						unless Talent(runic_corruption_talent) and BloodRcShortCdPostConditions()
+						{
+							unless not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) and BloodNrtShortCdPostConditions()
+							{
+								#defile,if=buff.crimson_scourge.react
+								if BuffPresent(crimson_scourge_buff) Spell(defile)
+								#death_and_decay,if=buff.crimson_scourge.react
+								if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -132,13 +150,83 @@ AddFunction BloodDefaultCdActions
 			#death_pact,if=health.pct<50
 			if HealthPercent() < 50 Spell(death_pact)
 
-			unless { not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak) or RunicPower() > 90 and Spell(death_coil) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(plague_strike) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(icy_touch) or Spell(defile) or { Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil) or Spell(death_coil)
+			unless { not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 8 or not target.DiseasesAnyTicking() } and Spell(outbreak) or RunicPower() > 90 and Spell(death_coil) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(plague_strike) or { not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) } and Spell(icy_touch) or Spell(defile) or { not Rune(blood) >= 1 and not Rune(unholy) >= 1 or not Rune(blood) >= 1 and not Rune(frost) >= 1 or not Rune(unholy) >= 1 and not Rune(frost) >= 1 } and SpellCooldown(outbreak) <= GCD() and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 			{
-				#empower_rune_weapon,if=!blood&!unholy&!frost
-				if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
+				unless Talent(blood_tap_talent) and BloodBtCdPostConditions()
+				{
+					unless Talent(runic_empowerment_talent) and BloodReCdPostConditions()
+					{
+						unless Talent(runic_corruption_talent) and BloodRcCdPostConditions()
+						{
+							unless not Talent(blood_tap_talent) and not Talent(runic_empowerment_talent) and not Talent(runic_corruption_talent) and BloodNrtCdPostConditions() or BuffPresent(crimson_scourge_buff) and Spell(defile) or BuffPresent(crimson_scourge_buff) and Spell(death_and_decay) or BuffPresent(crimson_scourge_buff) and Spell(blood_boil) or Spell(death_coil)
+							{
+								#empower_rune_weapon,if=!blood&!unholy&!frost
+								if not Rune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(empower_rune_weapon)
+							}
+						}
+					}
+				}
 			}
 		}
 	}
+}
+
+### actions.bt
+
+AddFunction BloodBtMainActions
+{
+	#death_strike,if=unholy=2|frost=2
+	if Rune(unholy) >= 2 or Rune(frost) >= 2 Spell(death_strike)
+	#blood_tap,if=buff.blood_charge.stack>=5&!blood
+	if BuffStacks(blood_charge_buff) >= 5 and not Rune(blood) >= 1 Spell(blood_tap)
+	#death_strike,if=buff.blood_charge.stack>=10&unholy&frost
+	if BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+	#blood_tap,if=buff.blood_charge.stack>=10&!unholy&!frost
+	if BuffStacks(blood_charge_buff) >= 10 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(blood_tap)
+	#blood_tap,if=buff.blood_charge.stack>=5&(!unholy|!frost)
+	if BuffStacks(blood_charge_buff) >= 5 and { not Rune(unholy) >= 1 or not Rune(frost) >= 1 } Spell(blood_tap)
+	#blood_tap,if=buff.blood_charge.stack>=5&blood.death&!unholy&!frost
+	if BuffStacks(blood_charge_buff) >= 5 and DeathRune(blood) >= 1 and not Rune(unholy) >= 1 and not Rune(frost) >= 1 Spell(blood_tap)
+	#death_coil,if=runic_power>70
+	if RunicPower() > 70 Spell(death_coil)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&(blood=2|(blood&!blood.death))
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } Spell(soul_reaper_blood)
+	#blood_boil,if=blood=2|(blood&!blood.death)
+	if Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 Spell(blood_boil)
+}
+
+AddFunction BloodBtShortCdPostConditions
+{
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
+}
+
+AddFunction BloodBtCdPostConditions
+{
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
+}
+
+### actions.nrt
+
+AddFunction BloodNrtMainActions
+{
+	#death_strike,if=unholy=2|frost=2
+	if Rune(unholy) >= 2 or Rune(frost) >= 2 Spell(death_strike)
+	#death_coil,if=runic_power>70
+	if RunicPower() > 70 Spell(death_coil)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	#blood_boil,if=blood>=1
+	if Rune(blood) >= 1 Spell(blood_boil)
+}
+
+AddFunction BloodNrtShortCdPostConditions
+{
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
+}
+
+AddFunction BloodNrtCdPostConditions
+{
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
 }
 
 ### actions.precombat
@@ -180,6 +268,54 @@ AddFunction BloodPrecombatCdActions
 AddFunction BloodPrecombatCdPostConditions
 {
 	Spell(blood_presence) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+}
+
+### actions.rc
+
+AddFunction BloodRcMainActions
+{
+	#death_strike,if=unholy=2|frost=2
+	if Rune(unholy) >= 2 or Rune(frost) >= 2 Spell(death_strike)
+	#death_coil,if=runic_power>70
+	if RunicPower() > 70 Spell(death_coil)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	#blood_boil,if=blood=2
+	if Rune(blood) >= 2 Spell(blood_boil)
+}
+
+AddFunction BloodRcShortCdPostConditions
+{
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+}
+
+AddFunction BloodRcCdPostConditions
+{
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+}
+
+### actions.re
+
+AddFunction BloodReMainActions
+{
+	#death_strike,if=unholy&frost
+	if Rune(unholy) >= 1 and Rune(frost) >= 1 Spell(death_strike)
+	#death_coil,if=runic_power>70
+	if RunicPower() > 70 Spell(death_coil)
+	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood=2
+	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 Spell(soul_reaper_blood)
+	#blood_boil,if=blood=2
+	if Rune(blood) >= 2 Spell(blood_boil)
+}
+
+AddFunction BloodReShortCdPostConditions
+{
+	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+}
+
+AddFunction BloodReCdPostConditions
+{
+	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 ###
@@ -244,7 +380,7 @@ AddFunction FrostDualWieldDefaultShortCdActions
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
-	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
+	if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
 	#run_action_list,name=aoe,if=active_enemies>=3
@@ -658,7 +794,7 @@ AddFunction FrostTwoHanderDefaultShortCdActions
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
-	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
+	if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
 	#pillar_of_frost
 	Spell(pillar_of_frost)
 	#run_action_list,name=aoe,if=active_enemies>=4
@@ -1071,7 +1207,7 @@ AddFunction UnholyDefaultShortCdActions
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
-	if IncomingDamage(1.5) > 0 Spell(antimagic_shell)
+	if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
 	#run_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeShortCdActions()
 
