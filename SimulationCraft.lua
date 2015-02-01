@@ -3243,9 +3243,17 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
 		code = "1"
+	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.down" then
+		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
+		code = "BuffPresent(honor_among_thieves_cooldown_buff)"
+		annotation.honor_among_thieves = class
 	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.remains" then
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
 		code = "BuffRemaining(honor_among_thieves_cooldown_buff)"
+		annotation.honor_among_thieves = class
+	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.up" then
+		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
+		code = "BuffExpires(honor_among_thieves_cooldown_buff)"
 		annotation.honor_among_thieves = class
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
