@@ -96,7 +96,7 @@ for _, filename in ipairs(files) do
 			end
 			if not specialization then
 				if strsub(line, 1, 5) == "spec=" then
-					specialication = strsub(line, 6)
+					specialization = strsub(line, 6)
 				end
 			end
 			if class and specialization then
@@ -126,7 +126,6 @@ for _, filename in ipairs(files) do
 
 		local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
 		local wipe = wipe
-
 		-- Parse SimulationCraft profile and emit the corresponding Ovale script.
 		local profile = OvaleSimulationCraft:ParseProfile(simc)
 		local profileName = strsub(profile.annotation.name, 2, -2)
