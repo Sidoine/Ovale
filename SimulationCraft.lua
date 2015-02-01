@@ -1509,8 +1509,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 		local modifier = parseNode.child
 		local isSpellAction = true
 		if class == "DEATHKNIGHT" and action == "antimagic_shell" then
-			-- Only suggest Anti-Magic Shell if there is incoming damage to absorb to generate runic power.
-			conditionCode = "IncomingDamage(1.5) > 0"
+			-- Only suggest Anti-Magic Shell if there is incoming magic damage to absorb to generate runic power.
+			conditionCode = "IncomingDamage(1.5 magic=1) > 0"
 		elseif class == "DEATHKNIGHT" and action == "horn_of_winter" then
 			-- Only cast Horn of Winter if not already raid-buffed.
 			conditionCode = "BuffExpires(attack_power_multiplier_buff any=1)"
