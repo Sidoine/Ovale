@@ -3269,17 +3269,19 @@ end
 
 do
 	--- Test if the game is on a PTR server
-	-- @paramsig boolean
-	-- @param yesno Optional. If yes, then returns true if it is a PTR realm. If no, return true if it is a live realm.
-	--     Default is yes.
-	--     Valid values: yes, no.
-	-- @return A boolean value
+	-- @name PTR
+	-- @paramsig number
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return 1 if it is a PTR realm, or 0 if it is a live realm.
+	-- @usage
+	-- if PTR() > 0 Spell(wacky_new_spell)
 
 	local function PTR(positionalParams, namedParams, state, atTime)
-		local yesno = positionalParams[1]
+		local comparator, limit = positionalParams[1], positionalParams[2]
 		local _, _, _, uiVersion = API_GetBuildInfo()
-		local boolean = (uiVersion > 50400)
-		return TestBoolean(boolean, yesno)
+		local value = (uiVersion > 60000) and 1 or 0
+		return Compare(value, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("ptr", false, PTR)

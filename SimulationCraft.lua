@@ -3277,6 +3277,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "GCD()"
 	elseif operand == "gcd.remains" then
 		code = "GCDRemaining()"
+	elseif operand == "ptr" then
+		code = "PTR()"
 	elseif operand == "time_to_die" then
 		--[[
 			"time_to_die" is both a character property and a time event in SimulationCraft.
