@@ -207,6 +207,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 		if replacement then
 			replacedSpellId = spellId
 			spellId = replacement
+			si = OvaleData.spellInfo[spellId]
 			state:Log("Spell ID '%s' is replaced by spell ID '%s'.", replacedSpellId, spellId)
 		end
 	end
