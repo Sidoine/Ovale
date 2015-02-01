@@ -116,9 +116,12 @@ local RUNE_OPERAND = {
 	["Frost"] = "frost",
 	["Unholy"] = "unholy",
 	["blood"] = "blood",
+	["blood.death"] = "blood",
 	["death"] = "death",
 	["frost"] = "frost",
+	["frost.death"] = "frost",
 	["unholy"] = "unholy",
+	["unholy.death"] = "unholy",
 	["rune.blood"] = "blood",
 	["rune.death"] = "death",
 	["rune.frost"] = "frost",
@@ -2142,11 +2145,12 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				if runeType and number then
 					local code
 					local op = parseNode.operator
+					local runeFunction = (strsub(lhsNode.name, -6) == ".death") and "DeathRune" or "Rune"
 					local runeCondition
 					if lhsNode.includeDeath then
-						runeCondition = "Rune(" .. runeType .. " death=1)"
+						runeCondition = runeFunction .. "(" .. runeType .. " death=1)"
 					else
-						runeCondition = "Rune(" .. runeType .. ")"
+						runeCondition = runeFunction .. "(" .. runeType .. ")"
 					end
 					if op == ">" then
 						code = format("%s >= %d", runeCondition, number + 1)
@@ -3079,7 +3083,8 @@ EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
 			runeParameters = parseNode.rune
 		end
 		if parseNode.asType == "boolean" then
-			code = format("Rune(%s) >= 1", runeParameters)
+			local runeFunction = (strsub(parseNode.name, -6) == ".death") and "DeathRune" or "Rune"
+			code = format("%s(%s) >= 1", runeFunction, runeParameters)
 		else
 			code = format("RuneCount(%s)", runeParameters)
 		end
