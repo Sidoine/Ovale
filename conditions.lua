@@ -1523,6 +1523,9 @@ do
 
 	OvaleCondition:RegisterCondition("damagemultiplier", false, DamageMultiplier)
 end
+	-- @param filter Optional. The type of aura to check.
+	--     Default is any.
+	--     Valid values: any, buff, debuff
 
 do
 	--- Get the damage taken by the player in the previous time interval.
@@ -1531,11 +1534,15 @@ do
 	-- @param interval The number of seconds before now.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param magic Optional. By default, all damage is counted. Set "magic=1" to count only magic damage.
+	--     Defaults to magic=0.
+	--     Valid values: 0, 1
 	-- @return The amount of damage taken in the previous interval.
 	-- @return A boolean value for the result of the comparison.
 	-- @see IncomingDamage
 	-- @usage
 	-- if DamageTaken(5) > 50000 Spell(death_strike)
+	-- if DamageTaken(5 magic=1) > 0 Spell(antimagic_shell)
 
 	local function DamageTaken(positionalParams, namedParams, state, atTime)
 		-- Damage taken shouldn't be smoothed since spike damage is important data.
@@ -1543,7 +1550,12 @@ do
 		local interval, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local value = 0
 		if interval > 0 then
-			value = OvaleDamageTaken:GetRecentDamage(interval)
+			local total, totalMagic = OvaleDamageTaken:GetRecentDamage(interval)
+			if namedParams.magic == 1 then
+				value = totalMagic
+			else
+				value = total
+			end
 		end
 		return Compare(value, comparator, limit)
 	end
