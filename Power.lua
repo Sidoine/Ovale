@@ -140,6 +140,7 @@ end
 OvalePower.POOLED_RESOURCE = {
 	["DRUID"] = "energy",
 	["HUNTER"] = "focus",
+	["MONK"] = "energy",
 	["ROGUE"] = "energy"
 }
 --</public-static-properties>
