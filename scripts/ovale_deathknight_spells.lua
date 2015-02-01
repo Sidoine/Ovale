@@ -283,6 +283,7 @@ Define(vampiric_blood_buff 55233)
 	SpellInfo(vampiric_blood_buff duration=10)
 
 # Non-default tags for OvaleSimulationCraft.
+	SpellInfo(blood_tap tag=main specialization=blood)
 	SpellInfo(outbreak tag=main)
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "include")
