@@ -756,8 +756,32 @@ WoWMock.mock["GetShapeshiftForm"] = [[
 ]]
 
 WoWMock.mock["GetSpecialization"] = [[
+	local WOWMOCK_CLASS_SPECIALIZATION = {
+		DEATHKNIGHT = { blood = 1, frost = 2, unholy = 3 },
+		DRUID = { balance = 1, feral = 2, guardian = 3, restoration = 4 },
+		HUNTER = { beast_mastery = 1, marksmanship = 2, survival = 3 },
+		MAGE = { arcane = 1, fire = 2, frost = 3 },
+		MONK = { brewmaster = 1, mistweaver = 2, windwalker = 3 },
+		PALADIN = { holy = 1, protection = 2, retribution = 3 },
+		PRIEST = { discipline = 1, holy = 2, shadow = 3 },
+		ROGUE = { assassination = 1, combat = 2, subtlety = 3 },
+		SHAMAN = { elemental = 1, enhancement = 2, restoration = 3 },
+		WARLOCK = { affliction = 1, demonology = 2, destruction = 3 },
+		WARRIOR = { arms = 1, fury = 2, protection = 3 },
+	}
+
 	function GetSpecialization()
-		local specialization = WOWMOCK_CONFIG.specialization or 1
+		local specialization
+		local class = UnitClass()
+		local wowMockSpec = WOWMOCK_CONFIG.specialization
+		if wowMockSpec then
+			if type(wowMockSpec) == "number" then
+				specialization = wowMockSpec
+			else
+				specialization = WOWMOCK_CLASS_SPECIALIZATION[class][WOWMOCK_CONFIG.specialization]
+			end
+		end
+		specialization = specialization or 1
 		return specialization
 	end
 ]]
