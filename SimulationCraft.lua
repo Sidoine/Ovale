@@ -3246,6 +3246,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		AddSymbol(annotation, buffName)
 	elseif class == "PRIEST" and operand == "mind_harvest" then
 		code = "target.MindHarvest()"
+	elseif class == "PRIEST" and operand == "natural_shadow_word_death_range" then
+		code = "target.HealthPercent() < 20"
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
 		code = "1"
