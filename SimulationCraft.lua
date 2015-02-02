@@ -3289,6 +3289,17 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
 		code = "BuffExpires(honor_among_thieves_cooldown_buff)"
 		annotation.honor_among_thieves = class
+	elseif class == "WARRIOR" and strsub(operand, 1, 23) == "buff.colossus_smash_up." then
+		local property = strsub(operand, 24)
+		local debuffName = "colossus_smash_debuff"
+		AddSymbol(annotation, debuffName)
+		if property == "down" then
+			code = format("DebuffCountOnAny(%s) == 0", debuffName)
+		elseif property == "up" then
+			code = format("DebuffCountOnAny(%s) > 0", debuffName)
+		else
+			ok = false
+		end
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
 	elseif operand == "buff.enrage.remains" then
