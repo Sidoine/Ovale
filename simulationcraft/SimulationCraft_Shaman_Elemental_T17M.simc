@@ -40,10 +40,10 @@ actions+=/storm_elemental_totem
 actions+=/fire_elemental_totem,if=!active
 actions+=/ascendance,if=active_enemies>1|(dot.flame_shock.remains>buff.ascendance.duration&(target.time_to_die<20|buff.bloodlust.up|time>=60)&cooldown.lava_burst.remains>0)
 actions+=/liquid_magma,if=pet.searing_totem.remains>=15|pet.fire_elemental_totem.remains>=15
-# If only one enemy, priority follows the 'single' action list.
-actions+=/call_action_list,name=single,if=active_enemies=1
+# If one or two enemies, priority follows the 'single' action list.
+actions+=/call_action_list,name=single,if=active_enemies<3
 # On multiple enemies, the priority follows the 'aoe' action list.
-actions+=/call_action_list,name=aoe,if=active_enemies>1
+actions+=/call_action_list,name=aoe,if=active_enemies>2
 
 # Single target action priority list
 
@@ -53,7 +53,7 @@ actions.single+=/earth_shock,if=buff.lightning_shield.react=buff.lightning_shiel
 actions.single+=/lava_burst,if=dot.flame_shock.remains>cast_time&(buff.ascendance.up|cooldown_react)
 actions.single+=/unleash_flame,if=talent.unleashed_fury.enabled&!buff.ascendance.up
 actions.single+=/flame_shock,if=dot.flame_shock.remains<=9
-actions.single+=/earth_shock,if=(set_bonus.tier17_4pc&buff.lightning_shield.react>=15&!buff.lava_surge.up)|(!set_bonus.tier17_4pc&buff.lightning_shield.react>15)
+actions.single+=/earth_shock,if=(set_bonus.tier17_4pc&buff.lightning_shield.react>=15+ptr*3&!buff.lava_surge.up)|(!set_bonus.tier17_4pc&buff.lightning_shield.react>15)
 actions.single+=/earthquake,if=!talent.unleashed_fury.enabled&((1+stat.spell_haste)*(1+(mastery_value*2%4.5))>=(1.875+(1.25*0.226305)+1.25*(2*0.226305*stat.multistrike_pct%100)))&target.time_to_die>10&buff.elemental_mastery.down&buff.bloodlust.down
 actions.single+=/earthquake,if=!talent.unleashed_fury.enabled&((1+stat.spell_haste)*(1+(mastery_value*2%4.5))>=1.3*(1.875+(1.25*0.226305)+1.25*(2*0.226305*stat.multistrike_pct%100)))&target.time_to_die>10&(buff.elemental_mastery.up|buff.bloodlust.up)
 actions.single+=/earthquake,if=!talent.unleashed_fury.enabled&((1+stat.spell_haste)*(1+(mastery_value*2%4.5))>=(1.875+(1.25*0.226305)+1.25*(2*0.226305*stat.multistrike_pct%100)))&target.time_to_die>10&(buff.elemental_mastery.remains>=10|buff.bloodlust.remains>=10)
