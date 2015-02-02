@@ -1617,6 +1617,17 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "MONK" and action == "storm_earth_and_fire" then
+			--[[
+				Only suggest SEF if it's toggled on and if there are enough enemies to
+				warrant sending out another SEF clone.
+			--]]
+			conditionCode = [[
+				CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1
+					and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1
+						  or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 }
+			]]
+			annotation[action] = class
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"
@@ -3226,6 +3237,20 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			code = "GetState(pyro_chain)"
 		end
+	elseif class == "MONK" and strsub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
+		local property = strsub(operand, 36)
+		if target == "" then
+			target = "target."
+		end
+		local debuffName = "storm_earth_and_fire_target_debuff"
+		AddSymbol(annotation, debuffName)
+		if property == "down" then
+			code = format("%sDebuffExpires(%s)", target, debuffName)
+		elseif property == "up" then
+			code = format("%sDebuffPresent(%s)", target, debuffName)
+		else
+			ok = false
+		end
 	elseif class == "MONK" and operand == "dot.zen_sphere.ticking" then
 		-- Zen Sphere is a helpful DoT.
 		local buffName = "zen_sphere_buff"
@@ -4223,6 +4248,16 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "time_warp")
+		count = count + 1
+	end
+	if annotation.storm_earth_and_fire == "MONK" then
+		local fmt = [[
+			AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) %s)
+		]]
+		local code = format(fmt, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "storm_earth_and_fire")
 		count = count + 1
 	end
 	if annotation.chi_burst == "MONK" then
