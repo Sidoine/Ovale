@@ -27,6 +27,7 @@ local format = string.format
 local gmatch = string.gmatch
 local gsub = string.gsub
 local ipairs = ipairs
+local next = next
 local pairs = pairs
 local rawset = rawset
 local strfind = string.find
@@ -3291,6 +3292,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			code = "target.TimeToDie()"
 		end
+	elseif strsub(operand, 1, 10) == "using_apl." then
+		local aplName = strmatch(operand, "^using_apl%.([%w_]+)")
+		code = format("List(opt_using_apl %s)", aplName)
+		annotation.using_apl = annotation.using_apl or {}
+		annotation.using_apl[aplName] = true
 	else
 		ok = false
 	end
@@ -4178,6 +4184,27 @@ local function InsertSupportingControls(child, annotation)
 		ifSpecialization = ifSpecialization .. " if_stance=warrior_gladiator_stance"
 	end
 
+	if annotation.using_apl and next(annotation.using_apl) then
+		-- Add non-default list items.
+		for name in pairs(annotation.using_apl) do
+			if name ~= "normal" then
+				local fmt = [[
+					AddListItem(opt_using_apl %s "%s APL")
+				]]
+				local code = format(fmt, name, name)
+				local node = OvaleAST:ParseCode("list_item", code, nodeList, annotation.astAnnotation)
+				tinsert(child, 1, node)
+			end
+		end
+		-- Add default list item.
+		do
+			local code = [[
+				AddListItem(opt_using_apl normal L(normal_apl) default)
+			]]
+			local node = OvaleAST:ParseCode("list_item", code, nodeList, annotation.astAnnotation)
+			tinsert(child, 1, node)
+		end
+	end
 	if annotation.trap_launcher == "HUNTER" then
 		local fmt = [[
 			AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default %s)
@@ -4335,21 +4362,36 @@ local function GenerateIconBody(tag, profile)
 	local annotation = profile.annotation
 	local precombatName = OvaleFunctionName("precombat", annotation)
 	local defaultName = OvaleFunctionName("_default", annotation)
-
 	local precombatBodyName, precombatConditionName = OvaleTaggedFunctionName(precombatName, tag)
 	local defaultBodyName, defaultConditionName = OvaleTaggedFunctionName(defaultName, tag)
+
+	local mainBodyCode
+	if annotation.using_apl and next(annotation.using_apl) then
+		local output = self_outputPool:Get()
+		output[#output + 1] = format("if List(opt_using_apl normal) %s()", defaultBodyName)
+		for name in pairs(annotation.using_apl) do
+			local aplName = OvaleFunctionName(name, annotation)
+			local aplBodyName, aplConditionName = OvaleTaggedFunctionName(aplName, tag)
+			output[#output + 1] = format("if List(opt_using_apl %s) %s()", name, aplBodyName)
+		end
+		mainBodyCode = tconcat(output, "\n")
+		self_outputPool:Release(output)
+	else
+		mainBodyCode = defaultBodyName .. "()"
+	end
+
 	local code
 	if profile["actions.precombat"] then
 		local fmt = [[
 			if not InCombat() %s()
 			unless not InCombat() and %s()
 			{
-				%s()
+				%s
 			}
 		]]
-		code = format(fmt, precombatBodyName, precombatConditionName, defaultBodyName)
+		code = format(fmt, precombatBodyName, precombatConditionName, mainBodyCode)
 	else
-		code = defaultBodyName .. "()"
+		code = mainBodyCode
 	end
 	return code
 end
