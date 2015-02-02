@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Warlock_Affliction_T17M".
 #	class=warlock
 #	spec=affliction
-#	talents=0000213
+#	talents=0000111
 #	pet=felhunter
 
 Include(ovale_common)
@@ -29,18 +29,20 @@ AddFunction AfflictionDefaultMainActions
 {
 	#life_tap,if=mana.pct<40
 	if ManaPercent() < 40 Spell(life_tap)
-	#haunt,if=shard_react&!talent.soulburn_haunt.enabled&!in_flight_to_target&(dot.haunt.remains<cast_time+travel_time|soul_shard=4)&(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.dark_soul.up|soul_shard>2|soul_shard*14<=target.time_to_die)
-	if SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + TravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
-	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&((buff.soulburn.up&buff.haunting_spirits.remains<5)|soul_shard=4)
-	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { BuffPresent(soulburn_buff) and BuffRemaining(haunting_spirits_buff) < 5 or SoulShards() == 4 } Spell(haunt)
+	#haunt,if=shard_react&!talent.soulburn_haunt.enabled&!in_flight_to_target&(dot.haunt.remains<duration*0.3+cast_time+travel_time|soul_shard=4)&(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.dark_soul.up|soul_shard>2|soul_shard*14<=target.time_to_die)
+	if SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < BaseDuration(haunt_debuff) * 0.3 + CastTime(haunt) + TravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
+	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&((buff.soulburn.up&((buff.haunting_spirits.remains<=buff.haunting_spirits.duration*0.3&dot.haunt.remains<=dot.haunt.duration*0.3)|buff.haunting_spirits.down)))
+	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and BuffPresent(soulburn_buff) and { BuffRemaining(haunting_spirits_buff) <= BaseDuration(haunting_spirits_buff) * 0.3 and target.DebuffRemaining(haunt_debuff) <= target.DebuffDuration(haunt_debuff) * 0.3 or BuffExpires(haunting_spirits_buff) } Spell(haunt)
+	#haunt,if=shard_react&talent.soulburn_haunt.enabled&!in_flight_to_target&buff.haunting_spirits.remains>=buff.haunting_spirits.duration*0.5&(dot.haunt.remains<duration*0.3+cast_time+travel_time|soul_shard=4)&(trinket.proc.any.react|trinket.stacking_proc.any.react>6|buff.dark_soul.up|soul_shard>2|soul_shard*14<=target.time_to_die)
+	if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and BuffRemaining(haunting_spirits_buff) >= BaseDuration(haunting_spirits_buff) * 0.5 and { target.DebuffRemaining(haunt_debuff) < BaseDuration(haunt_debuff) * 0.3 + CastTime(haunt) + TravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } Spell(haunt)
 	#agony,cycle_targets=1,if=target.time_to_die>16&remains<=(duration*0.3)&((talent.cataclysm.enabled&remains<=(cooldown.cataclysm.remains+action.cataclysm.cast_time))|!talent.cataclysm.enabled)
 	if target.TimeToDie() > 16 and target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and { Talent(cataclysm_talent) and target.DebuffRemaining(agony_debuff) <= SpellCooldown(cataclysm) + CastTime(cataclysm) or not Talent(cataclysm_talent) } Spell(agony)
 	#unstable_affliction,cycle_targets=1,if=target.time_to_die>10&remains<=(duration*0.3)
 	if target.TimeToDie() > 10 and target.DebuffRemaining(unstable_affliction_debuff) <= BaseDuration(unstable_affliction_debuff) * 0.3 Spell(unstable_affliction)
 	#corruption,cycle_targets=1,if=target.time_to_die>12&remains<=(duration*0.3)
 	if target.TimeToDie() > 12 and target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 Spell(corruption)
-	#life_tap,if=mana.pct<40
-	if ManaPercent() < 40 Spell(life_tap)
+	#life_tap,if=mana.pct<40&buff.dark_soul.down
+	if ManaPercent() < 40 and BuffExpires(dark_soul_misery_buff) Spell(life_tap)
 	#drain_soul,interrupt=1,chain=1
 	Spell(drain_soul)
 	#agony,cycle_targets=1,moving=1,if=mana.pct>50
@@ -53,8 +55,8 @@ AddFunction AfflictionDefaultShortCdActions
 {
 	#mannoroths_fury
 	Spell(mannoroths_fury)
-	#service_pet,if=talent.grimoire_of_service.enabled
-	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	#service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<20|(buff.dark_soul.remains&target.health.pct<20))
+	if Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_misery_buff) and target.HealthPercent() < 20 } Spell(grimoire_felhunter)
 	#kiljaedens_cunning,if=(talent.cataclysm.enabled&!cooldown.cataclysm.remains)
 	if Talent(cataclysm_talent) and not SpellCooldown(cataclysm) > 0 Spell(kiljaedens_cunning)
 	#kiljaedens_cunning,moving=1,if=!talent.cataclysm.enabled
@@ -62,10 +64,10 @@ AddFunction AfflictionDefaultShortCdActions
 	#cataclysm
 	Spell(cataclysm)
 
-	unless ManaPercent() < 40 and Spell(life_tap) or SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < CastTime(haunt) + TravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } and Spell(haunt)
+	unless ManaPercent() < 40 and Spell(life_tap) or SoulShards() >= 1 and not Talent(soulburn_haunt_talent) and not InFlightToTarget(haunt) and { target.DebuffRemaining(haunt_debuff) < BaseDuration(haunt_debuff) * 0.3 + CastTime(haunt) + TravelTime(haunt) or SoulShards() == 4 } and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 or BuffPresent(dark_soul_misery_buff) or SoulShards() > 2 or SoulShards() * 14 <= target.TimeToDie() } and Spell(haunt)
 	{
-		#soulburn,if=shard_react&talent.soulburn_haunt.enabled&buff.soulburn.down&(buff.haunting_spirits.down|soul_shard=4&buff.haunting_spirits.remains<5)
-		if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and BuffExpires(soulburn_buff) and { BuffExpires(haunting_spirits_buff) or SoulShards() == 4 and BuffRemaining(haunting_spirits_buff) < 5 } Spell(soulburn)
+		#soulburn,if=shard_react&talent.soulburn_haunt.enabled&buff.soulburn.down&(buff.haunting_spirits.remains<=buff.haunting_spirits.duration*0.3)
+		if SoulShards() >= 1 and Talent(soulburn_haunt_talent) and BuffExpires(soulburn_buff) and BuffRemaining(haunting_spirits_buff) <= BaseDuration(haunting_spirits_buff) * 0.3 Spell(soulburn)
 	}
 }
 
@@ -79,10 +81,10 @@ AddFunction AfflictionDefaultCdActions
 	Spell(blood_fury_sp)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
-	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_misery)
+	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.any.react|trinket.stacking_any.intellect.react>6|target.time_to_die<40))
+	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_any_intellect_buff) > 6 or target.TimeToDie() < 40 } Spell(dark_soul_misery)
 
-	unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+	unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_misery_buff) and target.HealthPercent() < 20 } and Spell(grimoire_felhunter)
 	{
 		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
 		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
@@ -228,6 +230,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # summon_doomguard
 # summon_felhunter
 # summon_infernal
+# trinket_stacking_any_intellect_buff
 # unstable_affliction
 # unstable_affliction_debuff
 ]]

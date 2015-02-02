@@ -77,8 +77,8 @@ AddFunction EnhancementDefaultShortCdActions
 	EnhancementGetInMeleeRange()
 	#elemental_mastery
 	Spell(elemental_mastery)
-	#liquid_magma,if=pet.searing_totem.remains>=15|pet.magma_totem.remains>=15|pet.fire_elemental_totem.remains>=15
-	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(magma_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
+	#liquid_magma,if=pet.searing_totem.remains>10|pet.magma_totem.remains>10|pet.fire_elemental_totem.remains>10
+	if TotemRemaining(searing_totem) > 10 or TotemRemaining(magma_totem) > 10 or TotemRemaining(fire_elemental_totem) > 10 Spell(liquid_magma)
 	#ancestral_swiftness
 	Spell(ancestral_swiftness)
 }
@@ -117,8 +117,8 @@ AddFunction EnhancementAoeMainActions
 	if Enemies() >= 4 and target.DebuffPresent(flame_shock_debuff) and { SpellCooldown(shock) > SpellCooldown(fire_nova) or not SpellCooldown(fire_nova) > 0 } Spell(unleash_elements)
 	#fire_nova,if=active_dot.flame_shock>=3
 	if DebuffCountOnAny(flame_shock_debuff) >= 3 Spell(fire_nova)
-	#wait,sec=cooldown.fire_nova.remains,if=active_dot.flame_shock>=4&cooldown.fire_nova.remains<=action.fire_nova.gcd
-	unless DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) <= GCD() and SpellCooldown(fire_nova) > 0
+	#wait,sec=cooldown.fire_nova.remains,if=active_dot.flame_shock>=4&cooldown.fire_nova.remains<=action.fire_nova.gcd%2
+	unless DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) <= GCD() / 2 and SpellCooldown(fire_nova) > 0
 	{
 		#magma_totem,if=!totem.fire.active
 		if not TotemPresent(fire) and target.InRange(primal_strike) Spell(magma_totem)

@@ -37,8 +37,8 @@ AddFunction DestructionDefaultShortCdActions
 {
 	#mannoroths_fury
 	Spell(mannoroths_fury)
-	#service_pet,if=talent.grimoire_of_service.enabled
-	if Talent(grimoire_of_service_talent) Spell(grimoire_felhunter)
+	#service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<20|(buff.dark_soul.remains&target.health.pct<20))
+	if Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } Spell(grimoire_felhunter)
 	#run_action_list,name=single_target,if=active_enemies<6
 	if Enemies() < 6 DestructionSingleTargetShortCdActions()
 
@@ -59,10 +59,10 @@ AddFunction DestructionDefaultCdActions
 	Spell(blood_fury_sp)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.intellect.react|trinket.stacking_proc.intellect.react>6|target.health.pct<=10))
-	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_intellect_buff) or BuffStacks(trinket_stacking_proc_intellect_buff) > 6 or target.HealthPercent() <= 10 } Spell(dark_soul_instability)
+	#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|trinket.proc.any.react|trinket.stacking_any.intellect.react>6|target.time_to_die<40))
+	if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_any_intellect_buff) > 6 or target.TimeToDie() < 40 } Spell(dark_soul_instability)
 
-	unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
+	unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } and Spell(grimoire_felhunter)
 	{
 		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
 		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
@@ -341,6 +341,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # summon_doomguard
 # summon_felhunter
 # summon_infernal
+# trinket_stacking_any_intellect_buff
 ]]
 	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "reference")
 end

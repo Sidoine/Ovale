@@ -399,13 +399,15 @@ AddFunction FrostWaterJetMainActions
 	if BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) Spell(ice_lance)
 	#frostbolt,if=debuff.water_jet.remains>cast_time+travel_time
 	if target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) Spell(frostbolt)
+	#ice_lance,if=prev_gcd.frostbolt
+	if PreviousGCDSpell(frostbolt) Spell(ice_lance)
 	#call_action_list,name=single_target
 	FrostSingleTargetMainActions()
 }
 
 AddFunction FrostWaterJetShortCdActions
 {
-	unless PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
+	unless PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and Spell(ice_lance)
 	{
 		#call_action_list,name=single_target
 		FrostSingleTargetShortCdActions()
@@ -414,12 +416,12 @@ AddFunction FrostWaterJetShortCdActions
 
 AddFunction FrostWaterJetShortCdPostConditions
 {
-	PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt) or FrostSingleTargetShortCdPostConditions()
+	PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and Spell(ice_lance) or FrostSingleTargetShortCdPostConditions()
 }
 
 AddFunction FrostWaterJetCdActions
 {
-	unless PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
+	unless PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and Spell(ice_lance)
 	{
 		#call_action_list,name=single_target
 		FrostSingleTargetCdActions()
@@ -428,7 +430,7 @@ AddFunction FrostWaterJetCdActions
 
 AddFunction FrostWaterJetCdPostConditions
 {
-	PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt) or FrostSingleTargetCdPostConditions()
+	PreviousSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) == 2 and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and Spell(ice_lance) or FrostSingleTargetCdPostConditions()
 }
 
 ### Frost icons.

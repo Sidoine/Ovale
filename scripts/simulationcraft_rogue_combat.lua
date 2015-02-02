@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Combat_T17M".
 #	class=rogue
 #	spec=combat
-#	talents=3111121
+#	talents=3000021
 #	glyphs=energy/disappearance
 
 Include(ovale_common)
@@ -66,10 +66,10 @@ AddFunction CombatDefaultMainActions
 	Spell(ambush)
 	#slice_and_dice,if=buff.slice_and_dice.remains<2|((target.time_to_die>45&combo_points=5&buff.slice_and_dice.remains<12)&buff.deep_insight.down)
 	if { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 12 and BuffExpires(deep_insight_buff) } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) Spell(slice_and_dice)
-	#call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<=4&buff.deep_insight.down)
-	if ComboPoints() < 5 or not target.DebuffPresent(revealing_strike_debuff) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) <= 4 and BuffExpires(deep_insight_buff) CombatGeneratorMainActions()
-	#call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=4))
-	if ComboPoints() == 5 and target.DebuffPresent(revealing_strike_debuff) and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 4 } CombatFinisherMainActions()
+	#call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<3&buff.deep_insight.down)
+	if ComboPoints() < 5 or not target.DebuffPresent(revealing_strike_debuff) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and BuffExpires(deep_insight_buff) CombatGeneratorMainActions()
+	#call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=3))
+	if ComboPoints() == 5 and target.DebuffPresent(revealing_strike_debuff) and { BuffPresent(deep_insight_buff) or not Talent(anticipation_talent) or Talent(anticipation_talent) and BuffStacks(anticipation_buff) >= 3 } CombatFinisherMainActions()
 }
 
 AddFunction CombatDefaultShortCdActions
@@ -138,8 +138,8 @@ AddFunction CombatFinisherMainActions
 {
 	#death_from_above
 	Spell(death_from_above)
-	#eviscerate
-	Spell(eviscerate)
+	#eviscerate,if=(!talent.death_from_above.enabled|cooldown.death_from_above.remains)
+	if not Talent(death_from_above_talent) or SpellCooldown(death_from_above) > 0 Spell(eviscerate)
 }
 
 ### actions.generator
@@ -279,6 +279,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # deadly_poison
 # deadly_throw
 # death_from_above
+# death_from_above_talent
 # deep_insight_buff
 # draenic_agility_potion
 # eviscerate
