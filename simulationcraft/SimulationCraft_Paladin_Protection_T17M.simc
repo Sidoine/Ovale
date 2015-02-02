@@ -22,7 +22,7 @@ actions.precombat+=/food,type=talador_surf_and_turf
 actions.precombat+=/food,type=blackrock_barbecue,if=role.attack|using_apl.max_dps
 actions.precombat+=/blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
 actions.precombat+=/blessing_of_might,if=!aura.mastery.up
-actions.precombat+=/seal_of_insight
+actions.precombat+=/seal_of_insight,if=!using_apl.max_dps|using_apl.max_survival
 actions.precombat+=/seal_of_righteousness,if=role.attack|using_apl.max_dps
 actions.precombat+=/righteous_fury,if=buff.righteous_fury.down
 actions.precombat+=/sacred_shield
