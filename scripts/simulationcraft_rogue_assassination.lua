@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Assassination_T17M".
 #	class=rogue
 #	spec=assassination
-#	talents=3000023
+#	talents=3000032
 #	glyphs=vendetta/energy/disappearance
 
 Include(ovale_common)

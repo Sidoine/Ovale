@@ -13,7 +13,7 @@ do
 # Based on SimulationCraft profile "Rogue_Assassination_T17M".
 #	class=rogue
 #	spec=assassination
-#	talents=3000023
+#	talents=3000032
 #	glyphs=vendetta/energy/disappearance
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
@@ -286,8 +286,8 @@ AddFunction CombatDefaultCdActions
 
 	unless Spell(ambush) or { BuffRemaining(slice_and_dice_buff) < 2 or target.TimeToDie() > 45 and ComboPoints() == 5 and BuffRemaining(slice_and_dice_buff) < 12 and BuffExpires(deep_insight_buff) } and BuffRemaining(slice_and_dice_buff) < BaseDuration(slice_and_dice_buff) and Spell(slice_and_dice)
 	{
-		#call_action_list,name=adrenaline_rush,if=(energy<35|buff.bloodlust.up)&cooldown.killing_spree.remains>10
-		if { Energy() < 35 or BuffPresent(burst_haste_buff any=1) } and SpellCooldown(killing_spree) > 10 CombatAdrenalineRushCdActions()
+		#call_action_list,name=adrenaline_rush,if=cooldown.killing_spree.remains>10
+		if SpellCooldown(killing_spree) > 10 CombatAdrenalineRushCdActions()
 		#call_action_list,name=killing_spree,if=(energy<40|(buff.bloodlust.up&time<10)|buff.bloodlust.remains>20)&buff.adrenaline_rush.down&(!talent.shadow_reflection.enabled|cooldown.shadow_reflection.remains>30|buff.shadow_reflection.remains>3)
 		if { Energy() < 40 or BuffPresent(burst_haste_buff any=1) and TimeInCombat() < 10 or BuffRemaining(burst_haste_buff any=1) > 20 } and BuffExpires(adrenaline_rush_buff) and { not Talent(shadow_reflection_talent) or SpellCooldown(shadow_reflection) > 30 or BuffRemaining(shadow_reflection_buff) > 3 } CombatKillingSpreeCdActions()
 	}
@@ -601,8 +601,8 @@ AddFunction SubtletyDefaultCdActions
 
 AddFunction SubtletyFinisherMainActions
 {
-	#rupture,cycle_targets=1,if=(!ticking|remains<duration*0.3)&active_enemies<=8&(!talent.shadow_reflection.enabled|(buff.shadow_reflection.remains>8&dot.rupture.remains<12&buff.shadow_reflection.remains<10))&target.time_to_die>=8
-	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 8 and { not Talent(shadow_reflection_talent) or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and BuffRemaining(shadow_reflection_buff) < 10 } and target.TimeToDie() >= 8 Spell(rupture)
+	#rupture,cycle_targets=1,if=!ticking|remains<duration*0.3|(buff.shadow_reflection.remains>8&dot.rupture.remains<12)&target.time_to_die>=8
+	if not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and target.TimeToDie() >= 8 Spell(rupture)
 	#slice_and_dice,if=(buff.slice_and_dice.remains<10.8)&buff.slice_and_dice.remains<target.time_to_die
 	if BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() Spell(slice_and_dice)
 	#death_from_above
@@ -615,7 +615,7 @@ AddFunction SubtletyFinisherMainActions
 
 AddFunction SubtletyFinisherCdActions
 {
-	unless { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 8 and { not Talent(shadow_reflection_talent) or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and BuffRemaining(shadow_reflection_buff) < 10 } and target.TimeToDie() >= 8 and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or Spell(death_from_above) or { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or { TimeToMaxEnergy() <= SpellCooldown(death_from_above) + ExecuteTime(death_from_above) or not Talent(death_from_above_talent) } and Spell(eviscerate)
+	unless { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and target.TimeToDie() >= 8 } and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or Spell(death_from_above) or { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or { TimeToMaxEnergy() <= SpellCooldown(death_from_above) + ExecuteTime(death_from_above) or not Talent(death_from_above_talent) } and Spell(eviscerate)
 	{
 		#run_action_list,name=pool
 		SubtletyPoolCdActions()
@@ -624,7 +624,7 @@ AddFunction SubtletyFinisherCdActions
 
 AddFunction SubtletyFinisherCdPostConditions
 {
-	{ not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 } and Enemies() <= 8 and { not Talent(shadow_reflection_talent) or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and BuffRemaining(shadow_reflection_buff) < 10 } and target.TimeToDie() >= 8 and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or Spell(death_from_above) or { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or { TimeToMaxEnergy() <= SpellCooldown(death_from_above) + ExecuteTime(death_from_above) or not Talent(death_from_above_talent) } and Spell(eviscerate)
+	{ not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and target.TimeToDie() >= 8 } and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or Spell(death_from_above) or { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or { TimeToMaxEnergy() <= SpellCooldown(death_from_above) + ExecuteTime(death_from_above) or not Talent(death_from_above_talent) } and Spell(eviscerate)
 }
 
 ### actions.generator
