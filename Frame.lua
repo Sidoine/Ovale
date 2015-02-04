@@ -35,6 +35,9 @@ do
 	local NextTime = OvaleTimeSpan.NextTime
 	local INFINITY = math.huge
 	-- GLOBALS: UIParent
+
+	-- Mininum time in seconds for refreshing the best action.
+	local MIN_REFRESH_TIME = 0.05
 --</private-static-properties>
 
 --<public-methods>
@@ -168,7 +171,7 @@ do
 		self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
 		local profile = Ovale.db.profile
 		local updateInterval = profile.apparence.updateInterval
-		local refresh = updateInterval > 0 and self.timeSinceLastUpdate > updateInterval or next(Ovale.refreshNeeded)
+		local refresh = self.timeSinceLastUpdate > MIN_REFRESH_TIME and (updateInterval > 0 and self.timeSinceLastUpdate > updateInterval or next(Ovale.refreshNeeded))
 		if refresh then
 			-- Accumulate refresh interval statistics.
 			Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
