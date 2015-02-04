@@ -422,6 +422,7 @@ function OvalePower:PowerCost(spellId, powerType, atTime, target, maximumCost)
 	OvalePower:StartProfiling("OvalePower_PowerCost")
 	local buffParam = "buff_" .. powerType
 	local spellCost = 0
+	local spellRefund = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si[powerType] then
 		--[[
@@ -549,6 +550,20 @@ function OvalePower:PowerCost(spellId, powerType, atTime, target, maximumCost)
 		end
 		-- Round up to whole number of resources.
 		spellCost = ceil(cost)
+
+		local refund
+		local refundParam = "refund_" .. powerType
+		if self.GetSpellInfoProperty then
+			refund = self.GetSpellInfoProperty(self, spellId, atTime, refundParam, target)
+		else
+			refund = OvaleData:GetSpellInfoProperty(spellId, atTime, refundParam, target)
+		end
+		if refund == "cost" then
+			refund = spellCost
+		end
+		refund = refund or 0
+		-- Round up to whole number of resources.
+		spellRefund = ceil(refund)
 	else
 		-- Determine cost using information from the spell tooltip if there is no SpellInfo() for the spell's cost.
 		local cost = OvalePower:GetSpellCost(spellId, powerType)
@@ -557,7 +572,7 @@ function OvalePower:PowerCost(spellId, powerType, atTime, target, maximumCost)
 		end
 	end
 	OvalePower:StopProfiling("OvalePower_PowerCost")
-	return spellCost
+	return spellCost, spellRefund
 end
 
 -- Run-time check that the player has enough power.
@@ -719,10 +734,10 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, atTime, spe
 	if si then
 		-- Update power state.
 		for powerType, powerInfo in pairs(OvalePower.POWER_INFO) do
-			local cost = state:PowerCost(spellId, powerType, atTime, target)
+			local cost, refund = state:PowerCost(spellId, powerType, atTime, target)
 			local power = state[powerType] or 0
 			if cost then
-				power = power - cost
+				power = power - cost + refund
 				-- Add any power regenerated or consumed before the next spell can be cast.
 				local seconds = state.nextCast - atTime
 				if seconds > 0 then

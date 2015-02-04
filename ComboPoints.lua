@@ -309,6 +309,7 @@ end
 function OvaleComboPoints:ComboPointCost(spellId, atTime, target)
 	OvaleComboPoints:StartProfiling("OvaleComboPoints_ComboPointCost")
 	local spellCost = 0
+	local spellRefund = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
 		local cost
@@ -361,9 +362,21 @@ function OvaleComboPoints:ComboPointCost(spellId, atTime, target)
 			cost = -1 * cost
 		end
 		spellCost = cost
+
+		local refund
+		local refundParam = "refund_combo"
+		if self.GetSpellInfoProperty then
+			refund = self.GetSpellInfoProperty(self, spellId, atTime, refundParam, target)
+		else
+			refund = OvaleData:GetSpellInfoProperty(spellId, atTime, refundParam, target)
+		end
+		if refund == "cost" then
+			refund = spellCost
+		end
+		spellRefund = refund or 0
 	end
 	OvaleComboPoints:StopProfiling("OvaleComboPoints_ComboPointCost")
-	return spellCost
+	return spellCost, spellRefund
 end
 
 -- Run-time check that the player has enough combo points.
@@ -440,9 +453,9 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
 		local target = OvaleGUID:GetUnitId(targetGUID)
-		local cost = state:ComboPointCost(spellId, endCast, target)
+		local cost, refund = state:ComboPointCost(spellId, endCast, target)
 		local power = state.combo
-		power = power - cost
+		power = power - cost + refund
 		-- Clamp combo points to lower and upper limits.
 		if power <= 0 then
 			power = 0
