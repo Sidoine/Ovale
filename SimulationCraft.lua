@@ -154,8 +154,8 @@ local UNARY_OPERATOR = {
 }
 local BINARY_OPERATOR = {
 	-- logical
-	["|"]  = { "logical", 5, "associative" },
-	["^"]  = { "logical", 8, "associative" },
+	["|"]  = { "logical", 10, "associative" },
+	["^"]  = { "logical", 10, "associative" },
 	["&"]  = { "logical", 10, "associative" },
 	-- comparison
 	["!="] = { "compare", 20 },
@@ -432,7 +432,7 @@ local function UnparseExpression(node)
 		if rhsPrecedence and precedence > rhsPrecedence then
 			rhsExpression = "(" .. Unparse(rhsNode) .. ")"
 		elseif rhsPrecedence and precedence == rhsPrecedence then
-			if BINARY_OPERATOR[node.operator][3] == "associative" then
+			if BINARY_OPERATOR[node.operator][3] == "associative" and node.operator == rhsNode.operator then
 				rhsExpression = Unparse(rhsNode)
 			else
 				rhsExpression = "(" .. Unparse(rhsNode) .. ")"
@@ -2223,7 +2223,6 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 					node.type = opInfo[1]
 					node.expressionType = "binary"
 					node.operator = operator
-					node.precedence = opInfo[2]
 					node.child[1] = lhsNode
 					node.child[2] = rhsNode
 				elseif lhsNode then

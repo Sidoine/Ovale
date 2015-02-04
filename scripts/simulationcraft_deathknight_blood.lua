@@ -190,19 +190,19 @@ AddFunction BloodBtMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&(blood=2|(blood&!blood.death))
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2|(blood&!blood.death)
 	if Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 Spell(blood_boil)
 }
 
 AddFunction BloodBtShortCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
 }
 
 AddFunction BloodBtCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
 }
 
 ### actions.nrt
@@ -214,19 +214,19 @@ AddFunction BloodNrtMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
 	#blood_boil,if=blood>=1
 	if Rune(blood) >= 1 Spell(blood_boil)
 }
 
 AddFunction BloodNrtShortCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
 }
 
 AddFunction BloodNrtCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
 }
 
 ### actions.precombat
@@ -279,19 +279,19 @@ AddFunction BloodRcMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2
 	if Rune(blood) >= 2 Spell(blood_boil)
 }
 
 AddFunction BloodRcShortCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 AddFunction BloodRcCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 ### actions.re
@@ -303,19 +303,19 @@ AddFunction BloodReMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood=2
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 2 Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2
 	if Rune(blood) >= 2 Spell(blood_boil)
 }
 
 AddFunction BloodReShortCdPostConditions
 {
-	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 AddFunction BloodReCdPostConditions
 {
-	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 ### Blood icons.

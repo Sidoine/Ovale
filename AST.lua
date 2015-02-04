@@ -577,7 +577,7 @@ UnparseExpression = function(node)
 		if rhsPrecedence and precedence > rhsPrecedence then
 			rhsExpression = "{ " .. Unparse(rhsNode) .. " }"
 		elseif rhsPrecedence and precedence == rhsPrecedence then
-			if BINARY_OPERATOR[node.operator][3] == "associative" then
+			if BINARY_OPERATOR[node.operator][3] == "associative" and node.operator == rhsNode.operator then
 				rhsExpression = Unparse(rhsNode)
 			else
 				rhsExpression = "{ " .. Unparse(rhsNode) .. " }"

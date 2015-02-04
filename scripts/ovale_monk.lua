@@ -289,9 +289,9 @@ AddFunction BrewmasterTodMainActions
 	#keg_smash,if=talent.chi_brew.enabled&chi<3
 	if Talent(chi_brew_talent) and Chi() < 3 Spell(keg_smash)
 	#expel_harm,if=chi<3&(cooldown.keg_smash.remains>target.time_to_die|((energy+(energy.regen*(cooldown.keg_smash.remains)))>=80)&cooldown.keg_smash.remains>=gcd)
-	if Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and SpellCooldown(keg_smash) >= GCD() } Spell(expel_harm)
+	if Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 } and SpellCooldown(keg_smash) >= GCD() Spell(expel_harm)
 	#jab,if=chi<3&(cooldown.keg_smash.remains>target.time_to_die|((energy+(energy.regen*(cooldown.keg_smash.remains)))>=80)&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd)
-	if Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() } Spell(jab)
+	if Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 } and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() Spell(jab)
 	#tiger_palm,if=talent.chi_brew.enabled&chi<3
 	if Talent(chi_brew_talent) and Chi() < 3 Spell(tiger_palm)
 }
@@ -304,7 +304,7 @@ AddFunction BrewmasterTodShortCdActions
 
 AddFunction BrewmasterTodShortCdPostConditions
 {
-	Talent(chi_brew_talent) and Chi() < 3 and Spell(keg_smash) or Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and SpellCooldown(keg_smash) >= GCD() } and Spell(expel_harm) or Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() } and Spell(jab) or Talent(chi_brew_talent) and Chi() < 3 and Spell(tiger_palm)
+	Talent(chi_brew_talent) and Chi() < 3 and Spell(keg_smash) or Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 } and SpellCooldown(keg_smash) >= GCD() and Spell(expel_harm) or Chi() < 3 and { SpellCooldown(keg_smash) > target.TimeToDie() or Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 } and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() and Spell(jab) or Talent(chi_brew_talent) and Chi() < 3 and Spell(tiger_palm)
 }
 
 ###

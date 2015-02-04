@@ -84,16 +84,16 @@ AddFunction SubtletyDefaultMainActions
 				{
 					#pool_resource,for_next=1
 					#ambush,if=((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(buff.shadow_dance.up|time>5))&active_enemies<4)|((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(buff.shadow_dance.up|time>5))&debuff.find_weakness.down)
-					if { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and target.DebuffExpires(find_weakness_debuff) Spell(ambush)
-					unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
+					if { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and target.DebuffExpires(find_weakness_debuff) Spell(ambush)
+					unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
 					{
 						#pool_resource,for_next=1,extra_amount=50
 						#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&set_bonus.tier17_2pc
-						unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+						unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and ArmorSetBonus(T17 2) and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 						{
 							#pool_resource,for_next=1,extra_amount=100
 							#shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
-							unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
+							unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and not ArmorSetBonus(T17 2) and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
 							{
 								#pool_resource,for_next=1,extra_amount=50
 								#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -153,19 +153,19 @@ AddFunction SubtletyDefaultShortCdActions
 					{
 						#pool_resource,for_next=1
 						#ambush,if=((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(buff.shadow_dance.up|time>5))&active_enemies<4)|((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(buff.shadow_dance.up|time>5))&debuff.find_weakness.down)
-						unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
+						unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
 						{
 							#auto_attack
 							SubtletyGetInMeleeRange()
 							#pool_resource,for_next=1,extra_amount=50
 							#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&set_bonus.tier17_2pc
-							if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) Spell(shadow_dance)
-							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+							if { Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and ArmorSetBonus(T17 2) Spell(shadow_dance)
+							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and ArmorSetBonus(T17 2) and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 							{
 								#pool_resource,for_next=1,extra_amount=100
 								#shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
-								if Energy() >= 100 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) Spell(shadow_dance)
-								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
+								if { Energy() >= 100 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and not ArmorSetBonus(T17 2) Spell(shadow_dance)
+								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and not ArmorSetBonus(T17 2) and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
 								{
 									#pool_resource,for_next=1,extra_amount=50
 									#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -208,7 +208,7 @@ AddFunction SubtletyDefaultShortCdActions
 AddFunction SubtletyDefaultCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|buff.shadow_reflection.remains>12&(trinket.stat.agi.react|trinket.stat.multistrike.react|buff.archmages_greater_incandescence_agi.react)
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffRemaining(shadow_reflection_buff) > 12 and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } SubtletyUsePotionAgility()
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffRemaining(shadow_reflection_buff) > 12 } and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } SubtletyUsePotionAgility()
 	#kick
 	SubtletyInterruptActions()
 	#use_item,slot=trinket2,if=buff.shadow_dance.up
@@ -239,15 +239,15 @@ AddFunction SubtletyDefaultCdActions
 					{
 						#pool_resource,for_next=1
 						#ambush,if=((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(buff.shadow_dance.up|time>5))&active_enemies<4)|((combo_points<5|(talent.anticipation.enabled&anticipation_charges<3)&(buff.shadow_dance.up|time>5))&debuff.find_weakness.down)
-						unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
+						unless { { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and Enemies() < 4 or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and { BuffPresent(shadow_dance_buff) or TimeInCombat() > 5 } and target.DebuffExpires(find_weakness_debuff) } and SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
 						{
 							#pool_resource,for_next=1,extra_amount=50
 							#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&set_bonus.tier17_2pc
-							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and ArmorSetBonus(T17 2) and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 							{
 								#pool_resource,for_next=1,extra_amount=100
 								#shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
-								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
+								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and not ArmorSetBonus(T17 2) and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
 								{
 									#pool_resource,for_next=1,extra_amount=50
 									#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -310,7 +310,7 @@ AddFunction SubtletyDefaultCdActions
 AddFunction SubtletyFinisherMainActions
 {
 	#rupture,cycle_targets=1,if=!ticking|remains<duration*0.3|(buff.shadow_reflection.remains>8&dot.rupture.remains<12)&target.time_to_die>=8
-	if not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and target.TimeToDie() >= 8 Spell(rupture)
+	if { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 } and target.TimeToDie() >= 8 Spell(rupture)
 	#slice_and_dice,if=(buff.slice_and_dice.remains<10.8)&buff.slice_and_dice.remains<target.time_to_die
 	if BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() Spell(slice_and_dice)
 	#pool_resource,for_next=1
@@ -319,7 +319,7 @@ AddFunction SubtletyFinisherMainActions
 	unless SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above)
 	{
 		#crimson_tempest,if=(active_enemies>=2&debuff.find_weakness.down)|active_enemies>=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
-		if Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
+		if { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 } and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
 		#eviscerate
 		Spell(eviscerate)
 	}
@@ -327,13 +327,13 @@ AddFunction SubtletyFinisherMainActions
 
 AddFunction SubtletyFinisherCdActions
 {
-	unless { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and target.TimeToDie() >= 8 } and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice)
+	unless { not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 } and target.TimeToDie() >= 8 and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice)
 	{
 		#pool_resource,for_next=1
 		#death_from_above
 		unless SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above)
 		{
-			unless { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or Spell(eviscerate)
+			unless { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 } and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } and Spell(crimson_tempest) or Spell(eviscerate)
 			{
 				#run_action_list,name=pool
 				SubtletyPoolCdActions()
@@ -344,7 +344,7 @@ AddFunction SubtletyFinisherCdActions
 
 AddFunction SubtletyFinisherCdPostConditions
 {
-	{ not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 and target.TimeToDie() >= 8 } and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or not { SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above) } and { { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } } and Spell(crimson_tempest) or Spell(eviscerate) }
+	{ not target.DebuffPresent(rupture_debuff) or target.DebuffRemaining(rupture_debuff) < BaseDuration(rupture_debuff) * 0.3 or BuffRemaining(shadow_reflection_buff) > 8 and target.DebuffRemaining(rupture_debuff) < 12 } and target.TimeToDie() >= 8 and Spell(rupture) or BuffRemaining(slice_and_dice_buff) < 10.8 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and Spell(slice_and_dice) or not { SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above) } and { { Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 } and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } and Spell(crimson_tempest) or Spell(eviscerate) }
 }
 
 ### actions.generator

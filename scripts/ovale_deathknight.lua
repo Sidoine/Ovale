@@ -190,19 +190,19 @@ AddFunction BloodBtMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&(blood=2|(blood&!blood.death))
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2|(blood&!blood.death)
 	if Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 Spell(blood_boil)
 }
 
 AddFunction BloodBtShortCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
 }
 
 AddFunction BloodBtCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or BuffStacks(blood_charge_buff) >= 10 and Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(soul_reaper_blood) or { Rune(blood) >= 2 or Rune(blood) >= 1 and not DeathRune(blood) >= 1 } and Spell(blood_boil)
 }
 
 ### actions.nrt
@@ -214,19 +214,19 @@ AddFunction BloodNrtMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
 	#blood_boil,if=blood>=1
 	if Rune(blood) >= 1 Spell(blood_boil)
 }
 
 AddFunction BloodNrtShortCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
 }
 
 AddFunction BloodNrtCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 1 and Spell(blood_boil)
 }
 
 ### actions.precombat
@@ -279,19 +279,19 @@ AddFunction BloodRcMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood>=1
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2
 	if Rune(blood) >= 2 Spell(blood_boil)
 }
 
 AddFunction BloodRcShortCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 AddFunction BloodRcCdPostConditions
 {
-	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	{ Rune(unholy) >= 2 or Rune(frost) >= 2 } and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 1 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 ### actions.re
@@ -303,19 +303,19 @@ AddFunction BloodReMainActions
 	#death_coil,if=runic_power>70
 	if RunicPower() > 70 Spell(death_coil)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35&blood=2
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 Spell(soul_reaper_blood)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 2 Spell(soul_reaper_blood)
 	#blood_boil,if=blood=2
 	if Rune(blood) >= 2 Spell(blood_boil)
 }
 
 AddFunction BloodReShortCdPostConditions
 {
-	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 AddFunction BloodReCdPostConditions
 {
-	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
+	Rune(unholy) >= 1 and Rune(frost) >= 1 and Spell(death_strike) or RunicPower() > 70 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Rune(blood) >= 2 and Spell(soul_reaper_blood) or Rune(blood) >= 2 and Spell(blood_boil)
 }
 
 ###
@@ -648,7 +648,7 @@ AddFunction FrostDualWieldPrecombatCdPostConditions
 AddFunction FrostDualWieldSingleTargetMainActions
 {
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_frost)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 Spell(soul_reaper_frost)
 	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosStMainActions()
 	#howling_blast,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<7&runic_power<88
@@ -676,7 +676,7 @@ AddFunction FrostDualWieldSingleTargetMainActions
 	#obliterate,if=unholy>0&!buff.killing_machine.react
 	if Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) Spell(obliterate)
 	#howling_blast,if=!(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains<3)|death+frost>=2
-	if not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 Spell(howling_blast)
+	if not { target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 Spell(howling_blast)
 	#plague_leech
 	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 }
@@ -686,10 +686,10 @@ AddFunction FrostDualWieldSingleTargetShortCdActions
 	#blood_tap,if=buff.blood_charge.stack>10&(runic_power>76|(runic_power>=20&buff.killing_machine.react))
 	if BuffStacks(blood_charge_buff) > 10 and { RunicPower() > 76 or RunicPower() >= 20 and BuffPresent(killing_machine_buff) } Spell(blood_tap)
 
-	unless target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost)
+	unless target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
 		#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
-		if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 Spell(blood_tap)
+		if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and not SpellCooldown(soul_reaper_frost) > 0 Spell(blood_tap)
 		#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 		if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosStShortCdActions()
 
@@ -705,7 +705,7 @@ AddFunction FrostDualWieldSingleTargetShortCdActions
 				#unholy_blight,if=!disease.ticking
 				if not target.DiseasesAnyTicking() Spell(unholy_blight)
 
-				unless not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Rune(unholy) >= 1 and Spell(plague_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike) or RunicPower() > 76 and Spell(frost_strike) or Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) and Spell(obliterate) or { not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast)
+				unless not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Rune(unholy) >= 1 and Spell(plague_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike) or RunicPower() > 76 and Spell(frost_strike) or Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) and Spell(obliterate) or { not { target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast)
 				{
 					#blood_tap
 					Spell(blood_tap)
@@ -717,14 +717,14 @@ AddFunction FrostDualWieldSingleTargetShortCdActions
 
 AddFunction FrostDualWieldSingleTargetCdActions
 {
-	unless target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost)
+	unless target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
 		#breath_of_sindragosa,if=runic_power>75
 		if RunicPower() > 75 Spell(breath_of_sindragosa)
 		#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 		if BuffPresent(breath_of_sindragosa_buff) FrostDualWieldBosStCdActions()
 
-		unless BuffPresent(breath_of_sindragosa_buff) and FrostDualWieldBosStCdPostConditions() or Spell(defile) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Spell(howling_blast) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 76 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or RunicPower() > 88 } and Spell(frost_strike) or SpellCooldown(antimagic_shell) < 1 and RunicPower() >= 50 and not BuffPresent(antimagic_shell_buff) and Spell(frost_strike) or { Rune(death) >= 2 or Rune(frost) >= 2 } and Spell(howling_blast) or not target.DiseasesAnyTicking() and Spell(unholy_blight) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Rune(unholy) >= 1 and Spell(plague_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike) or RunicPower() > 76 and Spell(frost_strike) or Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) and Spell(obliterate) or { not { target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+		unless BuffPresent(breath_of_sindragosa_buff) and FrostDualWieldBosStCdPostConditions() or Spell(defile) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Spell(howling_blast) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 3 and RunicPower() < 76 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or RunicPower() > 88 } and Spell(frost_strike) or SpellCooldown(antimagic_shell) < 1 and RunicPower() >= 50 and not BuffPresent(antimagic_shell_buff) and Spell(frost_strike) or { Rune(death) >= 2 or Rune(frost) >= 2 } and Spell(howling_blast) or not target.DiseasesAnyTicking() and Spell(unholy_blight) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or Talent(necrotic_plague_talent) and not target.DebuffPresent(necrotic_plague_debuff) and Spell(howling_blast) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(blood_plague_debuff) and Rune(unholy) >= 1 and Spell(plague_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T17 2) == 1 and RunicPower() >= 50 and SpellCooldown(pillar_of_frost) < 5 and Spell(frost_strike) or RunicPower() > 76 and Spell(frost_strike) or Rune(unholy) >= 1 and not BuffPresent(killing_machine_buff) and Spell(obliterate) or { not { target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and SpellCooldown(soul_reaper_frost) < 3 } or RuneCount(death) + RuneCount(frost) >= 2 } and Spell(howling_blast) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 		{
 			#empower_rune_weapon
 			Spell(empower_rune_weapon)
@@ -977,7 +977,7 @@ AddFunction FrostTwoHanderBosStMainActions
 	#obliterate,if=runic_power<76
 	if RunicPower() < 76 Spell(obliterate)
 	#howling_blast,if=((death=1&frost=0&unholy=0)|death=0&frost=1&unholy=0)&runic_power<88
-	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 Spell(howling_blast)
+	if { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 } and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 and RunicPower() < 88 Spell(howling_blast)
 }
 
 AddFunction FrostTwoHanderBosStShortCdActions
@@ -997,12 +997,12 @@ AddFunction FrostTwoHanderBosStShortCdActions
 
 AddFunction FrostTwoHanderBosStShortCdPostConditions
 {
-	BuffPresent(killing_machine_buff) and Spell(obliterate) or BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or RunicPower() < 76 and Spell(obliterate) or { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 and Spell(howling_blast)
+	BuffPresent(killing_machine_buff) and Spell(obliterate) or BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or RunicPower() < 76 and Spell(obliterate) or { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 } and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 and RunicPower() < 88 and Spell(howling_blast)
 }
 
 AddFunction FrostTwoHanderBosStCdPostConditions
 {
-	BuffPresent(killing_machine_buff) and Spell(obliterate) or BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or RunicPower() < 76 and Spell(obliterate) or { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 } and RunicPower() < 88 and Spell(howling_blast)
+	BuffPresent(killing_machine_buff) and Spell(obliterate) or BuffPresent(killing_machine_buff) and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or RunicPower() < 76 and Spell(obliterate) or { Rune(death) >= 1 and Rune(death) < 2 and Rune(frost) >= 0 and Rune(frost) < 1 and Rune(unholy) >= 0 and Rune(unholy) < 1 or Rune(death) >= 0 and Rune(death) < 1 } and Rune(frost) >= 1 and Rune(frost) < 2 and Rune(unholy) >= 0 and Rune(unholy) < 1 and RunicPower() < 88 and Spell(howling_blast)
 }
 
 ### actions.precombat
@@ -1055,7 +1055,7 @@ AddFunction FrostTwoHanderSingleTargetMainActions
 	#plague_leech,if=disease.min_remains<1
 	if target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=35
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 Spell(soul_reaper_frost)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 Spell(soul_reaper_frost)
 	#howling_blast,if=buff.rime.react&disease.min_remains>5&buff.killing_machine.react
 	if BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and BuffPresent(killing_machine_buff) Spell(howling_blast)
 	#obliterate,if=buff.killing_machine.react
@@ -1100,10 +1100,10 @@ AddFunction FrostTwoHanderSingleTargetMainActions
 
 AddFunction FrostTwoHanderSingleTargetShortCdActions
 {
-	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost)
+	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
 		#blood_tap,if=(target.health.pct-3*(target.health.pct%target.time_to_die)<=35&cooldown.soul_reaper.remains=0)
-		if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and not SpellCooldown(soul_reaper_frost) > 0 Spell(blood_tap)
+		if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and not SpellCooldown(soul_reaper_frost) > 0 Spell(blood_tap)
 		#defile
 		Spell(defile)
 		#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
@@ -1139,7 +1139,7 @@ AddFunction FrostTwoHanderSingleTargetShortCdActions
 
 AddFunction FrostTwoHanderSingleTargetCdActions
 {
-	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 35 and Spell(soul_reaper_frost) or Spell(defile) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and BuffPresent(killing_machine_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(obliterate) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and BuffPresent(rime_buff) and Spell(howling_blast) or not target.DiseasesAnyTicking() and Spell(outbreak) or not target.DiseasesTicking() and Spell(unholy_blight)
+	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost) or Spell(defile) or BuffPresent(rime_buff) and target.DiseasesRemaining() > 5 and BuffPresent(killing_machine_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(obliterate) or not Talent(necrotic_plague_talent) and not target.DebuffPresent(frost_fever_debuff) and BuffPresent(rime_buff) and Spell(howling_blast) or not target.DiseasesAnyTicking() and Spell(outbreak) or not target.DiseasesTicking() and Spell(unholy_blight)
 	{
 		#breath_of_sindragosa,if=runic_power>75
 		if RunicPower() > 75 Spell(breath_of_sindragosa)
@@ -1262,7 +1262,7 @@ AddFunction UnholyAoeMainActions
 	#dark_transformation
 	Spell(dark_transformation)
 	#soul_reaper,if=target.health.pct-3*(target.health.pct%target.time_to_die)<=45
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 Spell(soul_reaper_unholy)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 Spell(soul_reaper_unholy)
 	#scourge_strike,if=unholy=2
 	if Rune(unholy) >= 2 Spell(scourge_strike)
 	#death_coil,if=runic_power>90|buff.sudden_doom.react|(buff.dark_transformation.down&unholy<=1)
@@ -1300,7 +1300,7 @@ AddFunction UnholyAoeShortCdActions
 			#death_and_decay,if=unholy=1
 			if Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(death_and_decay)
 
-			unless target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike)
+			unless target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike)
 			{
 				#blood_tap,if=buff.blood_charge.stack>10
 				if BuffStacks(blood_charge_buff) > 10 Spell(blood_tap)
@@ -1317,7 +1317,7 @@ AddFunction UnholyAoeShortCdActions
 
 AddFunction UnholyAoeShortCdPostConditions
 {
-	{ not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeShortCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+	{ not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeShortCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 }
 
 AddFunction UnholyAoeCdActions
@@ -1336,7 +1336,7 @@ AddFunction UnholyAoeCdActions
 				#summon_gargoyle
 				Spell(summon_gargoyle)
 
-				unless Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+				unless Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 				{
 					#empower_rune_weapon
 					Spell(empower_rune_weapon)
@@ -1348,7 +1348,7 @@ AddFunction UnholyAoeCdActions
 
 AddFunction UnholyAoeCdPostConditions
 {
-	Spell(unholy_blight) or { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadCdPostConditions() or Spell(defile) or BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+	Spell(unholy_blight) or { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadCdPostConditions() or Spell(defile) or BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 }
 
 ### actions.bos_aoe
@@ -1501,7 +1501,7 @@ AddFunction UnholySingleTargetMainActions
 	#death_coil,if=runic_power>90
 	if RunicPower() > 90 Spell(death_coil)
 	#soul_reaper,if=(target.health.pct-3*(target.health.pct%target.time_to_die))<=45
-	if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 Spell(soul_reaper_unholy)
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 Spell(soul_reaper_unholy)
 	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) UnholyBosStMainActions()
 	#scourge_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
@@ -1537,9 +1537,9 @@ AddFunction UnholySingleTargetMainActions
 	#death_coil,if=buff.sudden_doom.react|(buff.dark_transformation.down&unholy<=1)
 	if BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 Spell(death_coil)
 	#scourge_strike,if=!((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)|(Unholy>=2)
-	if not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(unholy death=1) >= 2 Spell(scourge_strike)
+	if not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 Spell(scourge_strike)
 	#festering_strike,if=!((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)|(((Frost-death)>0)&((Blood-death)>0))
-	if not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(frost death=0) > 0 and Rune(blood death=0) > 0 Spell(festering_strike)
+	if not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(frost death=0) > 0 and Rune(blood death=0) > 0 Spell(festering_strike)
 	#death_coil
 	Spell(death_coil)
 	#plague_leech
@@ -1563,7 +1563,7 @@ AddFunction UnholySingleTargetShortCdActions
 		#unholy_blight,if=talent.necrotic_plague.enabled&dot.necrotic_plague.remains<1
 		if Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 Spell(unholy_blight)
 
-		unless RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and Spell(soul_reaper_unholy)
+		unless RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy)
 		{
 			#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
 			if BuffPresent(breath_of_sindragosa_buff) UnholyBosStShortCdActions()
@@ -1576,7 +1576,7 @@ AddFunction UnholySingleTargetShortCdActions
 				unless SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(scourge_strike) or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) and Spell(festering_strike)
 				{
 					#blood_tap,if=((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)&cooldown.soul_reaper.remains=0
-					if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
+					if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
 					#death_and_decay,if=unholy=2
 					if Rune(unholy) >= 2 Spell(death_and_decay)
 					#defile,if=unholy=2
@@ -1590,7 +1590,7 @@ AddFunction UnholySingleTargetShortCdActions
 						unless not target.DiseasesTicking() and { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(plague_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(scourge_strike) or Rune(blood death=0) > 1 and Spell(festering_strike) or Rune(blood death=0) > 1 and Spell(blood_boil) or Rune(frost death=0) > 1 and Spell(festering_strike)
 						{
 							#blood_tap,if=((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)&cooldown.soul_reaper.remains=0
-							if target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
+							if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
 							#death_and_decay
 							Spell(death_and_decay)
 							#defile
@@ -1603,7 +1603,7 @@ AddFunction UnholySingleTargetShortCdActions
 								#blood_tap,if=buff.blood_charge.stack>10&(buff.sudden_doom.react|(buff.dark_transformation.down&unholy<=1))
 								if BuffStacks(blood_charge_buff) > 10 and { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } Spell(blood_tap)
 
-								unless { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike)
+								unless { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike)
 								{
 									#blood_tap
 									Spell(blood_tap)
@@ -1619,7 +1619,7 @@ AddFunction UnholySingleTargetShortCdActions
 
 AddFunction UnholySingleTargetCdActions
 {
-	unless SpellCooldown(outbreak) < 1 and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesRemaining() < 3 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not target.DiseasesTicking() and Spell(outbreak) or not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 3 and Spell(unholy_blight) or Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and Spell(unholy_blight) or RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 and Spell(soul_reaper_unholy)
+	unless SpellCooldown(outbreak) < 1 and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesRemaining() < 3 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not target.DiseasesTicking() and Spell(outbreak) or not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 3 and Spell(unholy_blight) or Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and Spell(unholy_blight) or RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy)
 	{
 		#breath_of_sindragosa,if=runic_power>75
 		if RunicPower() > 75 Spell(breath_of_sindragosa)
@@ -1631,7 +1631,7 @@ AddFunction UnholySingleTargetCdActions
 			#summon_gargoyle
 			Spell(summon_gargoyle)
 
-			unless Spell(death_and_decay) or Spell(defile) or not target.DiseasesTicking() and Spell(plague_strike) or Spell(dark_transformation) or { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike) or { not target.HealthPercent() - 3 * target.HealthPercent() / target.TimeToDie() <= 45 or Rune(frost death=0) > 0 and Rune(blood death=0) > 0 } and Spell(festering_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(scourge_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(festering_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(blood_boil) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(icy_touch)
+			unless Spell(death_and_decay) or Spell(defile) or not target.DiseasesTicking() and Spell(plague_strike) or Spell(dark_transformation) or { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff any=1) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(frost death=0) > 0 and Rune(blood death=0) > 0 } and Spell(festering_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(scourge_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(festering_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(blood_boil) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(icy_touch)
 			{
 				#empower_rune_weapon,if=blood<1&unholy<1&frost<1
 				if Rune(blood) < 1 and Rune(unholy) < 1 and Rune(frost) < 1 Spell(empower_rune_weapon)
