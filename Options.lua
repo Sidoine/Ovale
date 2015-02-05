@@ -431,8 +431,8 @@ OvaleOptions.options = {
 					name = L["Display refresh statistics"],
 					type = "execute",
 					func = function()
-						local avgRefresh, minRefresh, maxRefresh = Ovale:GetRefreshIntervalStatistics()
-						Ovale:Print("Refresh intervals: avg = %d, min = %d, max = %d (ms)", avgRefresh, minRefresh, maxRefresh)
+						local avgRefresh, minRefresh, maxRefresh, count = Ovale:GetRefreshIntervalStatistics()
+						Ovale:Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
 					end,
 				},
 			},

@@ -349,21 +349,28 @@ function Ovale:ToggleCheckBox(k)
 end
 
 function Ovale:AddRefreshInterval(milliseconds)
-	self_refreshIntervals[self_refreshIndex] = milliseconds
-	self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS) and (self_refreshIndex + 1) or 1
+	if milliseconds < INFINITY then
+		self_refreshIntervals[self_refreshIndex] = milliseconds
+		self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS) and (self_refreshIndex + 1) or 1
+	end
 end
 
 function Ovale:GetRefreshIntervalStatistics()
-	local sumRefresh, minRefresh, maxRefresh = 0, INFINITY, 0
+	local sumRefresh, minRefresh, maxRefresh, count = 0, INFINITY, 0, 0
 	for k, v in ipairs(self_refreshIntervals) do
 		if v > 0 then
-			minRefresh = (minRefresh > v) and v or minRefresh
-			maxRefresh = (maxRefresh < v) and v or maxRefresh
+			if minRefresh > v then
+				minRefresh = v
+			end
+			if maxRefresh < v then
+				maxRefresh = v
+			end
 			sumRefresh = sumRefresh + v
+			count = count + 1
 		end
 	end
-	local avgRefresh = (#self_refreshIntervals > 0) and (sumRefresh / #self_refreshIntervals) or sumRefresh
-	return avgRefresh, minRefresh, maxRefresh
+	local avgRefresh = (count > 0) and (sumRefresh / count) or 0
+	return avgRefresh, minRefresh, maxRefresh, count
 end
 
 function Ovale:FinalizeString(s)
