@@ -212,7 +212,7 @@ function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
 		end
 		if tagged or seen then
 			Ovale.refreshNeeded.player = true
-			self:SendMessage("Ovale_InactiveUnit", guid)
+			self:SendMessage("Ovale_InactiveUnit", guid, isDead)
 		end
 	end
 	self:StopProfiling("OvaleEnemies_RemoveEnemy")
