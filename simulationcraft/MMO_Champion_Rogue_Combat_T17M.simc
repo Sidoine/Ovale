@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-29
+# Last update: 2015-02-06
 
 rogue="Rogue_Combat_T17M"
 level=100
@@ -69,7 +69,7 @@ wrists=bracers_of_shattered_stalactites,id=113935,bonus_id=567
 hands=poisoners_gloves,id=115571,bonus_id=567
 waist=girdle_of_unconquered_glory,id=113907,bonus_id=567
 legs=poisoners_legguards,id=115573,bonus_id=567
-feet=furnace_tenders_treads,id=113895,bonus_id=567
+feet=ironflecked_sandals,id=119340,bonus_id=567
 finger1=spellbound_runic_band_of_unrelenting_slaughter,id=118307,enchant=gift_of_haste
 finger2=unexploded_explosive_shard,id=113877,bonus_id=567,enchant=gift_of_haste
 trinket1=meaty_dragonspine_trophy,id=118114,bonus_id=567
