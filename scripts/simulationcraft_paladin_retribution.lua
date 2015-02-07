@@ -9,7 +9,7 @@ do
 #	class=paladin
 #	spec=retribution
 #	talents=2112333
-#	glyphs=winged_vengeance/templars_verdict/righteous_retreat/fire_from_the_heavens/judgment
+#	glyphs=winged_vengeance/templars_verdict/righteous_retreat/fire_from_the_heavens/judgment/mass_exorcism
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -236,21 +236,21 @@ AddFunction RetributionPrecombatCdPostConditions
 AddFunction RetributionSingleMainActions
 {
 	#divine_storm,if=buff.divine_crusader.react&(holy_power=5|buff.holy_avenger.up&holy_power>=3)&buff.final_verdict.up
-	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) } and HolyPower() >= 3 and BuffPresent(final_verdict_buff) Spell(divine_storm)
+	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and BuffPresent(final_verdict_buff) Spell(divine_storm)
 	#divine_storm,if=buff.divine_crusader.react&(holy_power=5|buff.holy_avenger.up&holy_power>=3)&active_enemies=2&!talent.final_verdict.enabled
-	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) } and HolyPower() >= 3 and Enemies() == 2 and not Talent(final_verdict_talent) Spell(divine_storm)
+	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and Enemies() == 2 and not Talent(final_verdict_talent) Spell(divine_storm)
 	#divine_storm,if=(holy_power=5|buff.holy_avenger.up&holy_power>=3)&active_enemies=2&buff.final_verdict.up
-	if { HolyPower() == 5 or BuffPresent(holy_avenger_buff) } and HolyPower() >= 3 and Enemies() == 2 and BuffPresent(final_verdict_buff) Spell(divine_storm)
+	if { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and Enemies() == 2 and BuffPresent(final_verdict_buff) Spell(divine_storm)
 	#divine_storm,if=buff.divine_crusader.react&(holy_power=5|buff.holy_avenger.up&holy_power>=3)&(talent.seraphim.enabled&cooldown.seraphim.remains<gcd*4)
-	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) } and HolyPower() >= 3 and Talent(seraphim_talent) and SpellCooldown(seraphim) < GCD() * 4 Spell(divine_storm)
+	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and Talent(seraphim_talent) and SpellCooldown(seraphim) < GCD() * 4 Spell(divine_storm)
 	#templars_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)
-	if { HolyPower() == 5 or BuffPresent(holy_avenger_buff) } and HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > GCD() * 4 } Spell(templars_verdict)
+	if HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > GCD() * 4 } Spell(templars_verdict)
 	#templars_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<3
 	if BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < 3 Spell(templars_verdict)
 	#divine_storm,if=buff.divine_crusader.react&buff.divine_crusader.remains<3&!talent.final_verdict.enabled
 	if BuffPresent(divine_crusader_buff) and BuffRemaining(divine_crusader_buff) < 3 and not Talent(final_verdict_talent) Spell(divine_storm)
 	#final_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3
-	if { HolyPower() == 5 or BuffPresent(holy_avenger_buff) } and HolyPower() >= 3 Spell(final_verdict)
+	if HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 Spell(final_verdict)
 	#final_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<3
 	if BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < 3 Spell(final_verdict)
 	#hammer_of_wrath
