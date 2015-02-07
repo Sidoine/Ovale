@@ -330,24 +330,24 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
 
-AddFunction FrostUsePotionStrength
+AddFunction FrostDualWieldUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction FrostUseItemActions
+AddFunction FrostDualWieldUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction FrostGetInMeleeRange
+AddFunction FrostDualWieldGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction FrostInterruptActions
+AddFunction FrostDualWieldInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -376,7 +376,7 @@ AddFunction FrostDualWieldDefaultMainActions
 AddFunction FrostDualWieldDefaultShortCdActions
 {
 	#auto_attack
-	FrostGetInMeleeRange()
+	FrostDualWieldGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -396,9 +396,9 @@ AddFunction FrostDualWieldDefaultShortCdActions
 AddFunction FrostDualWieldDefaultCdActions
 {
 	#mind_freeze
-	FrostInterruptActions()
+	FrostDualWieldInterruptActions()
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
-	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostUsePotionStrength()
+	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostDualWieldUsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
 	if target.TimeToDie() <= 60 and BuffPresent(potion_strength_buff) Spell(empower_rune_weapon)
 	#blood_fury
@@ -408,7 +408,7 @@ AddFunction FrostDualWieldDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=trinket2
-	FrostUseItemActions()
+	FrostDualWieldUseItemActions()
 	#run_action_list,name=aoe,if=active_enemies>=3
 	if Enemies() >= 3 FrostDualWieldAoeCdActions()
 
@@ -634,7 +634,7 @@ AddFunction FrostDualWieldPrecombatCdActions
 		#army_of_the_dead
 		Spell(army_of_the_dead)
 		#potion,name=draenic_strength
-		FrostUsePotionStrength()
+		FrostDualWieldUsePotionStrength()
 	}
 }
 
@@ -744,24 +744,24 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
 
-AddFunction FrostUsePotionStrength
+AddFunction FrostTwoHanderUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction FrostUseItemActions
+AddFunction FrostTwoHanderUseItemActions
 {
 	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
 
-AddFunction FrostGetInMeleeRange
+AddFunction FrostTwoHanderGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction FrostInterruptActions
+AddFunction FrostTwoHanderInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -790,7 +790,7 @@ AddFunction FrostTwoHanderDefaultMainActions
 AddFunction FrostTwoHanderDefaultShortCdActions
 {
 	#auto_attack
-	FrostGetInMeleeRange()
+	FrostTwoHanderGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
 	#antimagic_shell,damage=100000
@@ -810,9 +810,9 @@ AddFunction FrostTwoHanderDefaultShortCdActions
 AddFunction FrostTwoHanderDefaultCdActions
 {
 	#mind_freeze
-	FrostInterruptActions()
+	FrostTwoHanderInterruptActions()
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
-	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostUsePotionStrength()
+	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostTwoHanderUsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
 	if target.TimeToDie() <= 60 and BuffPresent(potion_strength_buff) Spell(empower_rune_weapon)
 	#blood_fury
@@ -822,7 +822,7 @@ AddFunction FrostTwoHanderDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=trinket2
-	FrostUseItemActions()
+	FrostTwoHanderUseItemActions()
 	#run_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 FrostTwoHanderAoeCdActions()
 
@@ -1039,7 +1039,7 @@ AddFunction FrostTwoHanderPrecombatCdActions
 		#army_of_the_dead
 		Spell(army_of_the_dead)
 		#potion,name=draenic_strength
-		FrostUsePotionStrength()
+		FrostTwoHanderUsePotionStrength()
 	}
 }
 

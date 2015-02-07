@@ -906,14 +906,6 @@ do
 end
 
 local function CamelSpecialization(annotation)
-	local camelSpecialization = CamelCase(annotation.specialization)
-	if annotation.class == "WARRIOR" and strfind(annotation.name, "_[gG]ladiator_") then
-		camelSpecialization = "ProtectionGladiator"
-	end
-	return camelSpecialization
-end
-
-local function OvaleFunctionName(name, annotation)
 	local output = self_outputPool:Get()
 	local profileName, class, specialization = annotation.name, annotation.class, annotation.specialization
 	if specialization then
@@ -934,11 +926,17 @@ local function OvaleFunctionName(name, annotation)
 	elseif strmatch(profileName, "_[gG]ladiator_") then
 		output[#output + 1] = "gladiator"
 	end
-	output[#output + 1] = name
-	output[#output + 1] = "actions"
 	local outputString = CamelCase(tconcat(output, " "))
 	self_outputPool:Release(output)
 	return outputString
+end
+
+local function OvaleFunctionName(name, annotation)
+	local functionName = CamelCase(name .. " actions")
+	if annotation.specialization then
+		functionName = CamelSpecialization(annotation) .. functionName
+	end
+	return functionName
 end
 
 local function AddSymbol(annotation, symbol)

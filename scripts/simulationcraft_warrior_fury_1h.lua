@@ -20,12 +20,12 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
 
-AddFunction FuryUsePotionStrength
+AddFunction FurySingleMindedFuryUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
-AddFunction FuryGetInMeleeRange
+AddFunction FurySingleMindedFuryGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
 	{
@@ -35,7 +35,7 @@ AddFunction FuryGetInMeleeRange
 	}
 }
 
-AddFunction FuryInterruptActions
+AddFunction FurySingleMindedFuryInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
@@ -73,7 +73,7 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 	#charge
 	if target.InRange(charge) Spell(charge)
 	#auto_attack
-	FuryGetInMeleeRange()
+	FurySingleMindedFuryGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FurySingleMindedFuryMovementShortCdActions()
 
@@ -115,12 +115,12 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
 	#pummel
-	FuryInterruptActions()
+	FurySingleMindedFuryInterruptActions()
 
 	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
 	{
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryUsePotionStrength()
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FurySingleMindedFuryUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FurySingleMindedFurySingleTargetCdActions()
 
@@ -261,7 +261,7 @@ AddFunction FurySingleMindedFuryPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
-		FuryUsePotionStrength()
+		FurySingleMindedFuryUsePotionStrength()
 	}
 }
 
