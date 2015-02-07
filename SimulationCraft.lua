@@ -3255,11 +3255,17 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local buffName = "zen_sphere_buff"
 		code = format("BuffPresent(%s)", buffName)
 		AddSymbol(annotation, buffName)
-	elseif class == "MONK" and (operand == "stagger.heavy" or operand == "stagger.light" or operand == "stagger.moderate") then
-		local property = strmatch(operand, "^stagger%.(%w+)")
-		local buffName = format("%s_stagger_debuff", property)
-		code = format("DebuffPresent(%s)", buffName)
-		AddSymbol(annotation, buffName)
+	elseif class == "MONK" and strsub(operand, 1, 8) == "stagger." then
+		local property = strsub(operand, 9)
+		if property == "heavy" or property == "light" or property == "moderate" then
+			local buffName = format("%s_stagger_debuff", property)
+			code = format("DebuffPresent(%s)", buffName)
+			AddSymbol(annotation, buffName)
+		elseif property == "pct" then
+			code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target)
+		else
+			ok = false
+		end
 	elseif class == "PALADIN" and operand == "dot.sacred_shield.remains" then
 		--[[
 			Sacred Shield is handled specially because SimulationCraft treats it like
