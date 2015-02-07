@@ -16,9 +16,9 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
-AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default specialization=protection)
+AddCheckBox(opt_interrupt L(interrupt) default if_stance=!warrior_gladiator_stance specialization=protection)
+AddCheckBox(opt_melee_range L(not_in_melee_range) if_stance=!warrior_gladiator_stance specialization=protection)
+AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default if_stance=!warrior_gladiator_stance specialization=protection)
 
 AddFunction ProtectionUsePotionArmor
 {

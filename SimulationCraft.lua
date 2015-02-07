@@ -4224,8 +4224,12 @@ local function InsertSupportingControls(child, annotation)
 	local nodeList = annotation.astAnnotation.nodeList
 
 	local ifSpecialization = "specialization=" .. annotation.specialization
-	if annotation.class == "WARRIOR" and strfind(annotation.name, "_[gG]ladiator_") then
-		ifSpecialization = ifSpecialization .. " if_stance=warrior_gladiator_stance"
+	if annotation.class == "WARRIOR" and annotation.specialization == "protection" then
+		if strfind(annotation.name, "_[gG]ladiator_") then
+			ifSpecialization = ifSpecialization .. " if_stance=warrior_gladiator_stance"
+		else
+			ifSpecialization = ifSpecialization .. " if_stance=!warrior_gladiator_stance"
+		end
 	end
 
 	if annotation.using_apl and next(annotation.using_apl) then
