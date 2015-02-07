@@ -3276,18 +3276,21 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
 		code = "1"
-	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.down" then
+	elseif class == "ROGUE" and specialization == "subtlety" and strsub(operand, 1, 29) == "cooldown.honor_among_thieves." then
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
-		code = "BuffPresent(honor_among_thieves_cooldown_buff)"
+		local property = strsub(operand, 30)
+		local buffName = "honor_among_thieves_cooldown_buff"
+		AddSymbol(annotation, buffName)
 		annotation.honor_among_thieves = class
-	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.remains" then
-		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
-		code = "BuffRemaining(honor_among_thieves_cooldown_buff)"
-		annotation.honor_among_thieves = class
-	elseif class == "ROGUE" and specialization == "subtlety" and operand == "cooldown.honor_among_thieves.up" then
-		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
-		code = "BuffExpires(honor_among_thieves_cooldown_buff)"
-		annotation.honor_among_thieves = class
+		if property == "down" then
+			code = format("BuffPresent(%s)", buffName)
+		elseif property == "remains" then
+			code = format("BuffRemaining(%s)", buffName)
+		elseif property == "up" then
+			code = format("BuffExpires(%s)", buffName)
+		else
+			ok = false
+		end
 	elseif class == "WARRIOR" and strsub(operand, 1, 23) == "buff.colossus_smash_up." then
 		local property = strsub(operand, 24)
 		local debuffName = "colossus_smash_debuff"
