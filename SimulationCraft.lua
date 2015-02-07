@@ -154,8 +154,8 @@ local UNARY_OPERATOR = {
 }
 local BINARY_OPERATOR = {
 	-- logical
-	["|"]  = { "logical", 10, "associative" },
-	["^"]  = { "logical", 10, "associative" },
+	["|"]  = { "logical",  5, "associative" },
+	["^"]  = { "logical",  8, "associative" },
 	["&"]  = { "logical", 10, "associative" },
 	-- comparison
 	["!="] = { "compare", 20 },
