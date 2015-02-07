@@ -477,7 +477,7 @@ do
 		self.actions = {}
 		self.frame = frame
 		self.hider = hider
-		self.updateFrame = API_CreateFrame("Frame")
+		self.updateFrame = API_CreateFrame("Frame", OVALE .. "UpdateFrame")
 		self.barre = self.frame:CreateTexture();
 		self.content = API_CreateFrame("Frame", nil, self.updateFrame)
 		if Masque then
