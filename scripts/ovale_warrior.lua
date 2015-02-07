@@ -725,10 +725,6 @@ AddFunction FurySingleMindedFuryTwoTargetsCdPostConditions
 #	talents=1321321
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=fury)
-
 AddFunction FuryTitansGripUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)

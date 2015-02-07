@@ -740,10 +740,6 @@ AddFunction FrostDualWieldSingleTargetCdActions
 #	spec=frost
 #	talents=2001002
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
-
 AddFunction FrostTwoHanderUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
