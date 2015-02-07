@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-01-29
+# Last update: 2015-02-06
 
 rogue="Rogue_Subtlety_T17M"
 level=100
@@ -48,13 +48,11 @@ actions+=/pool_resource,for_next=1,extra_amount=100
 actions+=/shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
 actions+=/pool_resource,for_next=1,extra_amount=50
 actions+=/vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
-actions+=/pool_resource,for_next=1,extra_amount=50
-actions+=/shadowmeld,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
 actions+=/wait,sec=0.1,if=cooldown.vanish.remains<4&combo_points<5&energy.deficit>10&!cooldown.vanish.up&debuff.find_weakness.remains<cooldown.vanish.remains&cooldown.shadow_dance.remains>cooldown.vanish.remains+10
 actions+=/pool_resource,for_next=1,extra_amount=90
 actions+=/vanish,if=talent.subterfuge.enabled&energy>=90&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down&cooldown.shadow_dance.remains>15|(buff.shadow_dance.down&target.time_to_die<15)
-actions+=/pool_resource,for_next=1,extra_amount=90
-actions+=/shadowmeld,if=talent.subterfuge.enabled&energy>=90&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down&cooldown.shadow_dance.remains>13
+actions+=/pool_resource,if=active_enemies=1,for_next=1,extra_amount=110
+actions+=/shadowmeld,if=energy>=90&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down&cooldown.shadow_dance.remains>13&active_enemies=1
 actions+=/marked_for_death,if=combo_points=0
 actions+=/run_action_list,name=generator,if=talent.anticipation.enabled&anticipation_charges<4&buff.slice_and_dice.up&dot.rupture.remains>2&(buff.slice_and_dice.remains<6|dot.rupture.remains<4)
 actions+=/run_action_list,name=finisher,if=combo_points=5
