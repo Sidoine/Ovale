@@ -384,6 +384,7 @@ end
 		auraId=refresh		aura is refreshed, no change to stacks
 		auraId=refresh_keep_snapshot
 							aura is refreshed and the snapshot is carried over from the previous aura.
+		auraId=toggle		aura is toggled on or off by the spell.
 		auraId=N, N > 0		N is number of stacks added
 		auraId=0			aura is removed
 		auraId=N, N < 0		N is number of stacks of aura removed

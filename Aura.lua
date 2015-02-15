@@ -1245,6 +1245,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 			local stacks = 1
 			local count = nil
 			local extend = 0
+			local toggle = nil
 			local refresh = false
 			local keepSnapshot = false
 
@@ -1254,6 +1255,8 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 			elseif value == "refresh_keep_snapshot" then
 				refresh = true
 				keepSnapshot = true
+			elseif value == "toggle" then
+				toggle = true
 			elseif value == "count" then
 				count = data
 			elseif value == "extend" then
@@ -1282,6 +1285,11 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						aura.serial = state.serial
 						state:Log("Aura %d is copied into simulator.", auraId)
 						-- Information that needs to be set below: stacks, start, ending, duration, gain.
+					end
+					-- If the aura is already present, then toggle the aura away.
+					if toggle then
+						state:Log("Aura %d is toggled off by spell %d.", auraId, spellId)
+						stacks = 0
 					end
 					-- Adjust stacks to add/remove if count is present.
 					if count and count > 0 then
@@ -1354,6 +1362,10 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 					end
 				else
 					-- Aura is not on the target.
+					if toggle then
+						state:Log("Aura %d is toggled on by spell %d.", auraId, spellId)
+						stacks = 1
+					end
 					if not refresh and stacks > 0 then
 						-- Spellcast causes a new aura.
 						state:Log("New aura %d at %f on %s", auraId, atTime, guid)

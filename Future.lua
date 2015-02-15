@@ -112,6 +112,14 @@ local WHITE_ATTACK = {
 	[  5019] = true,	-- Shoot
 }
 
+-- Table of aura additions.
+local AURA_ADDED = {
+	count = true,
+	extend = true,
+	refresh = true,
+	refresh_keep_snapshot = true,
+}
+
 --[[
 	This is the delta added to the starting cast time of the spell in the simulator.
 	This ensures that the time in the simulator is just after the spell has started
@@ -258,7 +266,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 				for filter, auraList in pairs(si.aura[auraTarget]) do
 					for auraId, spellData in pairs(auraList) do
 						local verified, value, data = OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
-						if verified and (type(value) == "string" or type(value) == "number" and value > 0) then
+						if verified and (AURA_ADDED[value] or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
 							if target ~= "player" then
 								spellcast.removeOnAuraSuccess = true
