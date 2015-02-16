@@ -40,6 +40,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "Flächenschaden"
 L["AOE"] = "Flächenschaden"
 L["Apparence"] = "Aussehen"
+-- L["arcane_mage_burn_phase"] = ""
 L["Aura lag"] = "Aura-Verzögerung"
 L["Blood"] = "Blut"
 L["buff"] = "Stärkungszauber"
@@ -136,6 +137,7 @@ L["aoe"] = [=[Attack multiple targets.
 Adapts to the total number of enemies.]=]
 L["AOE"] = "Multiple-targets rotation"
 L["Apparence"] = "Appearance"
+L["arcane_mage_burn_phase"] = "Suggest Burn actions"
 L["Aura lag"] = "Aura lag"
 L["Blood"] = "Blood"
 L["buff"] = "Buffs"
@@ -231,6 +233,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "Area de Efecto" -- Needs review
 L["AOE"] = "Area de Efecto" -- Needs review
 L["Apparence"] = "Apariencia"
+-- L["arcane_mage_burn_phase"] = ""
 -- L["Aura lag"] = ""
 L["Blood"] = "Sangre"
 L["buff"] = "Beneficios" -- Needs review
@@ -323,6 +326,7 @@ elseif locale == "esMX" then
 -- L["aoe"] = ""
 -- L["AOE"] = ""
 -- L["Apparence"] = ""
+-- L["arcane_mage_burn_phase"] = ""
 -- L["Aura lag"] = ""
 -- L["Blood"] = ""
 -- L["buff"] = ""
@@ -415,6 +419,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "Attaque multi-cible" -- Needs review
 L["AOE"] = "rotation Multicible" -- Needs review
 L["Apparence"] = "Apparence"
+-- L["arcane_mage_burn_phase"] = ""
 L["Aura lag"] = "latence de l'Aura" -- Needs review
 L["Blood"] = "Saignement"
 L["buff"] = "Améliorations"
@@ -510,6 +515,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "Attacchi a Bersaglio Multiplo"
 L["AOE"] = "AdE"
 L["Apparence"] = "Apparenza"
+-- L["arcane_mage_burn_phase"] = ""
 L["Aura lag"] = "Aura lag"
 L["Blood"] = "Sangue"
 L["buff"] = "Benefici"
@@ -604,6 +610,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "다중 대상 공격" -- Needs review
 L["AOE"] = "AOE" -- Needs review
 L["Apparence"] = "외형"
+-- L["arcane_mage_burn_phase"] = ""
 -- L["Aura lag"] = ""
 L["Blood"] = "Blood"
 L["buff"] = "버프"
@@ -698,6 +705,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "Atacar alvos múltiplos" -- Needs review
 L["AOE"] = "AOE" -- Needs review
 L["Apparence"] = "Aparência"
+-- L["arcane_mage_burn_phase"] = ""
 -- L["Aura lag"] = ""
 L["Blood"] = "Sangue"
 L["buff"] = "Buffs"
@@ -792,6 +800,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "Атака нескольких противников"
 L["AOE"] = "Приоритет при атаке нескольких противников"
 L["Apparence"] = "Внешний вид"
+-- L["arcane_mage_burn_phase"] = ""
 L["Aura lag"] = "Задержка ауры"
 L["Blood"] = "Кровь"
 L["buff"] = "Баффы"
@@ -888,6 +897,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "多目标攻击" -- Needs review
 L["AOE"] = "AOE输出循环"
 L["Apparence"] = "环境"
+-- L["arcane_mage_burn_phase"] = ""
 L["Aura lag"] = "触发与移除效果延迟" -- Needs review
 L["Blood"] = "鲜血"
 L["buff"] = "增益"
@@ -983,6 +993,7 @@ L["Afficher les raccourcis clavier dans le coin inférieur gauche des icônes"] 
 L["aoe"] = "範圍攻擊" -- Needs review
 L["AOE"] = "範圍攻擊" -- Needs review
 L["Apparence"] = "框架外觀設定"
+-- L["arcane_mage_burn_phase"] = ""
 -- L["Aura lag"] = ""
 L["Blood"] = "血量"
 L["buff"] = "提示能施放的增益法術"
