@@ -1781,6 +1781,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 				local name = Unparse(modifier.name)
 				local functionName = OvaleFunctionName(name, annotation)
 				bodyCode = functionName .. "()"
+				-- Special-case the "burn" action list for arcane mages.
+				if class == "MAGE" and specialization == "arcane" and name == "burn" then
+					conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)"
+					annotation.opt_arcane_mage_burn_phase = class
+				end
 			end
 			isSpellAction = false
 		elseif action == "cancel_buff" then
@@ -4269,6 +4274,15 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "time_warp")
+		count = count + 1
+	end
+	if annotation.opt_arcane_mage_burn_phase == "MAGE" then
+		local fmt = [[
+			AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default %s)
+		]]
+		local code = format(fmt, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
 		count = count + 1
 	end
 	if annotation.storm_earth_and_fire == "MONK" then

@@ -18,6 +18,7 @@ Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=arcane)
+AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
 AddFunction ArcaneUsePotionIntellect
@@ -49,7 +50,7 @@ AddFunction ArcaneDefaultMainActions
 	#call_action_list,name=aoe,if=active_enemies>=4
 	if Enemies() >= 4 ArcaneAoeMainActions()
 	#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
-	if target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } ArcaneBurnMainActions()
+	if { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
 	#call_action_list,name=conserve
 	ArcaneConserveMainActions()
 }
@@ -80,9 +81,9 @@ AddFunction ArcaneDefaultShortCdActions
 			unless Enemies() >= 4 and ArcaneAoeShortCdPostConditions()
 			{
 				#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
-				if target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } ArcaneBurnShortCdActions()
+				if { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
 
-				unless { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and ArcaneBurnShortCdPostConditions()
+				unless { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions()
 				{
 					#call_action_list,name=conserve
 					ArcaneConserveShortCdActions()
@@ -126,9 +127,9 @@ AddFunction ArcaneDefaultCdActions
 					unless Enemies() >= 4 and ArcaneAoeCdPostConditions()
 					{
 						#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
-						if target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } ArcaneBurnCdActions()
+						if { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
 
-						unless { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and ArcaneBurnCdPostConditions()
+						unless { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions()
 						{
 							#call_action_list,name=conserve
 							ArcaneConserveCdActions()
