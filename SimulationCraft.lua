@@ -1763,6 +1763,13 @@ EmitAction = function(parseNode, nodeList, annotation)
 					isSpellAction = false
 				end
 			end
+		elseif class == "WARRIOR" and action == "heroic_charge" then
+			--[[
+				"Heroic Charge" is moving out of melee range enough to Charge back to the target
+				in order to gain more rage.
+			--]]
+			-- skip
+			isSpellAction = false
 		elseif class == "WARRIOR" and action == "heroic_leap" then
 			-- Use Charge as a range-finder for Heroic Leap.
 			local spellName = "charge"
