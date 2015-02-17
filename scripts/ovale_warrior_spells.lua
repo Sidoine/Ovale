@@ -71,6 +71,8 @@ Define(charge 100)
 	SpellInfo(charge cd=20 gcd=0 offgcd=1 rage=-20 travel_time=1)
 	SpellInfo(charge addcd=-8 if_spell=juggernaut)
 	SpellInfo(charge rage=-35 glyph=glyph_of_bull_rush)
+	SpellAddTargetDebuff(charge charge_debuff=1)
+Define(charge_debuff 100)	# OvaleWarriorCharge
 Define(colossus_smash 167105)
 	SpellInfo(colossus_smash cd=20 rage=10)
 	SpellInfo(colossus_smash rage=-30 itemset=T17 itemcount=2 specialization=arms)

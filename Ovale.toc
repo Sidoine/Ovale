@@ -74,6 +74,7 @@ Skada.lua
 SpellDamage.lua
 SteadyFocus.lua
 Totem.lua
+WarriorCharge.lua
 
 conditions.lua
 scripts\files.xml
