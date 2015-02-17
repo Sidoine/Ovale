@@ -1484,7 +1484,7 @@ end
 
 EmitAction = function(parseNode, nodeList, annotation)
 	local node
-	local canonicalizedName = gsub(parseNode.name, ":", "_")
+	local canonicalizedName = strlower(gsub(parseNode.name, ":", "_"))
 	local class = annotation.class
 	local specialization = annotation.specialization
 	local camelSpecialization = CamelSpecialization(annotation)
