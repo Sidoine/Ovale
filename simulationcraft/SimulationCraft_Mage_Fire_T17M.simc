@@ -101,9 +101,13 @@ actions.single_target+=/pyroblast,if=set_bonus.tier16_2pc_caster&buff.pyroblast.
 actions.single_target+=/pyroblast,if=set_bonus.tier17_4pc&buff.pyromaniac.react
 # Pyro camp during regular sequence; Do not use Pyro procs without HU and first using fireball
 actions.single_target+=/pyroblast,if=buff.pyroblast.up&buff.heating_up.up&action.fireball.in_flight
+# Aggressively use Pyro with 2T17 and IB available
+actions.single_target+=/pyroblast,if=set_bonus.tier17_2pc&buff.pyroblast.up&cooldown.combustion.remains>8&action.inferno_blast.charges_fractional>0.85
 actions.single_target+=/inferno_blast,if=buff.pyroblast.down&buff.heating_up.up
 actions.single_target+=/call_action_list,name=active_talents
 actions.single_target+=/inferno_blast,if=buff.pyroblast.up&buff.heating_up.down&!action.fireball.in_flight
+# Aggressively use IB with 2T17
+actions.single_target+=/inferno_blast,if=set_bonus.tier17_2pc&charges_fractional>1.85
 actions.single_target+=/fireball
 actions.single_target+=/scorch,moving=1
 
@@ -117,15 +121,15 @@ hands=arcanoshatter_gloves,id=115552,bonus_id=567
 waist=seeking_ember_girdle,id=113941,bonus_id=567
 legs=turret_mechanics_legwraps,id=113970,bonus_id=567
 feet=cavedwellers_climbers,id=113864,bonus_id=567
-finger1=spellbound_runic_band_of_the_allseeing_eye,id=118306,enchant=gift_of_critical_strike
-finger2=ukuroggs_corrupted_seal,id=113975,bonus_id=567,enchant=gift_of_critical_strike
+finger1=ukuroggs_corrupted_seal,id=113975,bonus_id=567,enchant=gift_of_critical_strike
+finger2=spellbound_runic_band_of_the_allseeing_eye,id=118306,enchant=gift_of_critical_strike
 trinket1=goren_soul_repository,id=119194,bonus_id=567
-trinket2=darmacs_unstable_talisman,id=113948,bonus_id=567
+trinket2=blackiron_micro_crucible,id=113984,bonus_id=567
 main_hand=blackhand_doomstaff,id=113988,bonus_id=567,enchant=mark_of_the_thunderlord
 
 # Gear Summary
 # gear_stamina=4545
-# gear_intellect=3744
+# gear_intellect=3811
 # gear_spell_power=1753
 # gear_crit_rating=1373
 # gear_haste_rating=773
