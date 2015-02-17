@@ -80,6 +80,8 @@ AddFunction BalanceAoeMainActions
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
 	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
+	#wrath
+	Spell(wrath)
 }
 
 AddFunction BalanceAoeCdActions
@@ -148,6 +150,8 @@ AddFunction BalanceSingleTargetMainActions
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
 	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
+	#wrath
+	Spell(wrath)
 }
 
 AddFunction BalanceSingleTargetCdActions
@@ -163,7 +167,7 @@ AddFunction BalanceSingleTargetCdActions
 
 AddFunction BalanceSingleTargetCdPostConditions
 {
-	BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or { target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and not Talent(balance_of_power_talent) } and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } and Spell(moonfire) or Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } and Spell(moonfire) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or { EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() } and Spell(starfire)
+	BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or { target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and not Talent(balance_of_power_talent) } and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } and Spell(moonfire) or Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } and Spell(moonfire) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or { EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() } and Spell(starfire) or Spell(wrath)
 }
 
 ### Balance icons.

@@ -62,6 +62,8 @@ AddFunction DisciplineDefaultMainActions
 	if BuffPresent(power_infusion_buff) or ManaPercent() > 20 Spell(heal)
 	#prayer_of_mending
 	Spell(prayer_of_mending)
+	#clarity_of_will
+	Spell(clarity_of_will)
 	#heal
 	Spell(heal)
 }
@@ -156,6 +158,7 @@ AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
 # berserking
 # blood_fury_sp
 # borrowed_time_buff
+# clarity_of_will
 # draenic_intellect_potion
 # draenic_mana_potion
 # flash_heal

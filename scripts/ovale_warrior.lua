@@ -25,6 +25,13 @@ AddFunction ArmsUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction ArmsUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ArmsGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -64,8 +71,8 @@ AddFunction ArmsDefaultMainActions
 
 AddFunction ArmsDefaultShortCdActions
 {
-	#charge
-	if target.InRange(charge) Spell(charge)
+	#charge,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	ArmsGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -93,6 +100,8 @@ AddFunction ArmsDefaultCdActions
 
 	unless 0 > 5 and ArmsMovementCdPostConditions()
 	{
+		#use_item,name=vial_of_convulsive_shadows,if=(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) ArmsUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 ArmsUsePotionStrength()
 		#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&((!talent.bloodbath.enabled&debuff.colossus_smash.up&(!cooldown.bladestorm.remains|!talent.bladestorm.enabled))|buff.bloodbath.up))|target.time_to_die<10
@@ -126,6 +135,7 @@ AddFunction ArmsAoeMainActions
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
 	#execute,cycle_targets=1,if=!buff.sudden_death.react&active_enemies<=8&((rage>72&cooldown.colossus_smash.remains>gcd)|rage>80|target.time_to_die<5|debuff.colossus_smash.up)
 	if not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } Spell(execute_arms)
+	#heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
 	#mortal_strike,if=target.health.pct>20&active_enemies<=5
 	if target.HealthPercent() > 20 and Enemies() <= 5 Spell(mortal_strike)
 	#thunder_clap,if=(target.health.pct>20|active_enemies>=9)&glyph.resonating_power.enabled
@@ -177,6 +187,10 @@ AddFunction ArmsMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
+	#charge,cycle_targets=1,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	#charge
+	if target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }
@@ -299,6 +313,13 @@ AddFunction FurySingleMindedFuryUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction FurySingleMindedFuryUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FurySingleMindedFuryGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -344,8 +365,8 @@ AddFunction FurySingleMindedFuryDefaultMainActions
 
 AddFunction FurySingleMindedFuryDefaultShortCdActions
 {
-	#charge
-	if target.InRange(charge) Spell(charge)
+	#charge,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	FurySingleMindedFuryGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -393,6 +414,8 @@ AddFunction FurySingleMindedFuryDefaultCdActions
 
 	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
 	{
+		#use_item,name=vial_of_convulsive_shadows,if=(talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.bloodbath.up|talent.avatar.enabled
+		if Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(bloodbath_buff) or Talent(avatar_talent) FurySingleMindedFuryUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FurySingleMindedFuryUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -496,6 +519,10 @@ AddFunction FurySingleMindedFuryMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
+	#charge,cycle_targets=1,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	#charge
+	if target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }
@@ -676,6 +703,7 @@ AddFunction FurySingleMindedFuryTwoTargetsMainActions
 	#execute,target=2
 	#execute,if=target.health.pct<20|buff.sudden_death.react
 	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
+	#heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
 	#raging_blow,if=buff.meat_cleaver.up
 	if BuffPresent(meat_cleaver_buff) Spell(raging_blow)
 	#whirlwind,if=!buff.meat_cleaver.up
@@ -730,6 +758,13 @@ AddFunction FuryTitansGripUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction FuryTitansGripUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FuryTitansGripGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -775,8 +810,8 @@ AddFunction FuryTitansGripDefaultMainActions
 
 AddFunction FuryTitansGripDefaultShortCdActions
 {
-	#charge
-	if target.InRange(charge) Spell(charge)
+	#charge,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	FuryTitansGripGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -824,6 +859,8 @@ AddFunction FuryTitansGripDefaultCdActions
 
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
+		#use_item,name=vial_of_convulsive_shadows,if=(talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.bloodbath.up|talent.avatar.enabled
+		if Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(bloodbath_buff) or Talent(avatar_talent) FuryTitansGripUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryTitansGripUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -927,6 +964,10 @@ AddFunction FuryTitansGripMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
+	#charge,cycle_targets=1,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	#charge
+	if target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }
@@ -1107,6 +1148,7 @@ AddFunction FuryTitansGripTwoTargetsMainActions
 	#execute,target=2
 	#execute,if=target.health.pct<20|buff.sudden_death.react
 	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
+	#heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
 	#raging_blow,if=buff.meat_cleaver.up
 	if BuffPresent(meat_cleaver_buff) Spell(raging_blow)
 	#whirlwind,if=!buff.meat_cleaver.up
@@ -1524,14 +1566,14 @@ AddFunction ProtectionProtMainActions
 
 AddFunction ProtectionProtShortCdActions
 {
-	#shield_block,if=!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up)
-	if not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) } Spell(shield_block)
+	#shield_block,if=!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up)
+	if not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) } Spell(shield_block)
 	#shield_barrier,if=buff.shield_barrier.down&((buff.shield_block.down&action.shield_block.charges_fractional<0.75)|rage>=85)
 	if BuffExpires(shield_barrier_tank_buff) and { BuffExpires(shield_block_buff) and Charges(shield_block count=0) < 0.75 or Rage() >= 85 } Spell(shield_barrier_tank)
-	#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(demoralizing_shout)
-	#enraged_regeneration,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } and HealthPercent() < 80 Spell(enraged_regeneration)
+	#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(demoralizing_shout)
+	#enraged_regeneration,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } and HealthPercent() < 80 Spell(enraged_regeneration)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeShortCdActions()
 
@@ -1554,14 +1596,14 @@ AddFunction ProtectionProtShortCdActions
 
 AddFunction ProtectionProtCdActions
 {
-	#shield_wall,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(shield_wall)
-	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
-	#potion,name=draenic_armor,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 ProtectionUsePotionArmor()
-	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
-	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
+	#shield_wall,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(shield_wall)
+	#last_stand,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(last_stand)
+	#potion,name=draenic_armor,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)|target.time_to_die<=25
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } or target.TimeToDie() <= 25 ProtectionUsePotionArmor()
+	#stoneform,if=incoming_damage_2500ms>health.max*0.1&!(debuff.demoralizing_shout.up|buff.ravager_protection.up|buff.shield_wall.up|buff.last_stand.up|buff.enraged_regeneration.up|buff.shield_block.up|buff.potion.up)
+	if IncomingDamage(2.5) > MaxHealth() * 0.1 and not { target.DebuffPresent(demoralizing_shout_debuff) or BuffPresent(ravager_protection_buff) or BuffPresent(shield_wall_buff) or BuffPresent(last_stand_buff) or BuffPresent(enraged_regeneration_buff) or BuffPresent(shield_block_buff) or BuffPresent(potion_armor_buff) } Spell(stoneform)
 	#call_action_list,name=prot_aoe,if=active_enemies>3
 	if Enemies() > 3 ProtectionProtAoeCdActions()
 

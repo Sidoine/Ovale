@@ -25,6 +25,13 @@ AddFunction ArmsUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction ArmsUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ArmsGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -64,8 +71,8 @@ AddFunction ArmsDefaultMainActions
 
 AddFunction ArmsDefaultShortCdActions
 {
-	#charge
-	if target.InRange(charge) Spell(charge)
+	#charge,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	ArmsGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -93,6 +100,8 @@ AddFunction ArmsDefaultCdActions
 
 	unless 0 > 5 and ArmsMovementCdPostConditions()
 	{
+		#use_item,name=vial_of_convulsive_shadows,if=(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))
+		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) ArmsUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 ArmsUsePotionStrength()
 		#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&((!talent.bloodbath.enabled&debuff.colossus_smash.up&(!cooldown.bladestorm.remains|!talent.bladestorm.enabled))|buff.bloodbath.up))|target.time_to_die<10
@@ -126,6 +135,7 @@ AddFunction ArmsAoeMainActions
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
 	#execute,cycle_targets=1,if=!buff.sudden_death.react&active_enemies<=8&((rage>72&cooldown.colossus_smash.remains>gcd)|rage>80|target.time_to_die<5|debuff.colossus_smash.up)
 	if not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } Spell(execute_arms)
+	#heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
 	#mortal_strike,if=target.health.pct>20&active_enemies<=5
 	if target.HealthPercent() > 20 and Enemies() <= 5 Spell(mortal_strike)
 	#thunder_clap,if=(target.health.pct>20|active_enemies>=9)&glyph.resonating_power.enabled
@@ -177,6 +187,10 @@ AddFunction ArmsMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
+	#charge,cycle_targets=1,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	#charge
+	if target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }
@@ -345,6 +359,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # bloodbath_buff
 # bloodbath_talent
 # charge
+# charge_debuff
 # colossus_smash
 # colossus_smash_debuff
 # commanding_shout

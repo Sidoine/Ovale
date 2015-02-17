@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Rogue_Combat_T17M".
 #	class=rogue
 #	spec=combat
-#	talents=3000021
+#	talents=3000031
 #	glyphs=energy/disappearance
 
 Include(ovale_common)

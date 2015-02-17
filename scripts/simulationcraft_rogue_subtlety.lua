@@ -94,8 +94,8 @@ AddFunction SubtletyDefaultMainActions
 							#shadowmeld,if=talent.subterfuge.enabled&energy>=90&(combo_points<4|(talent.anticipation.enabled&combo_points+anticipation_charges<9))&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.remains<2
 							unless Talent(subterfuge_talent) and True(pool_energy 90) and { ComboPoints() < 4 or Talent(anticipation_talent) and ComboPoints() + BuffStacks(anticipation_buff) < 9 } and BuffExpires(shadow_dance_buff) and BuffExpires(master_of_subtlety_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(90)
 							{
-								#run_action_list,name=finisher,if=combo_points=5
-								if ComboPoints() == 5 SubtletyFinisherMainActions()
+								#run_action_list,name=finisher,if=combo_points=5&(buff.vanish.down|!talent.shadow_focus.enabled)
+								if ComboPoints() == 5 and { BuffExpires(vanish_buff any=1) or not Talent(shadow_focus_talent) } SubtletyFinisherMainActions()
 								#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
 								if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorMainActions()
 							}
@@ -197,10 +197,10 @@ AddFunction SubtletyDefaultCdActions
 							if Talent(subterfuge_talent) and Energy() >= 90 and { ComboPoints() < 4 or Talent(anticipation_talent) and ComboPoints() + BuffStacks(anticipation_buff) < 9 } and BuffExpires(shadow_dance_buff) and BuffExpires(master_of_subtlety_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 Spell(shadowmeld)
 							unless Talent(subterfuge_talent) and True(pool_energy 90) and { ComboPoints() < 4 or Talent(anticipation_talent) and ComboPoints() + BuffStacks(anticipation_buff) < 9 } and BuffExpires(shadow_dance_buff) and BuffExpires(master_of_subtlety_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(90)
 							{
-								#run_action_list,name=finisher,if=combo_points=5
-								if ComboPoints() == 5 SubtletyFinisherCdActions()
+								#run_action_list,name=finisher,if=combo_points=5&(buff.vanish.down|!talent.shadow_focus.enabled)
+								if ComboPoints() == 5 and { BuffExpires(vanish_buff any=1) or not Talent(shadow_focus_talent) } SubtletyFinisherCdActions()
 
-								unless ComboPoints() == 5 and SubtletyFinisherCdPostConditions()
+								unless ComboPoints() == 5 and { BuffExpires(vanish_buff any=1) or not Talent(shadow_focus_talent) } and SubtletyFinisherCdPostConditions()
 								{
 									#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
 									if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorCdActions()

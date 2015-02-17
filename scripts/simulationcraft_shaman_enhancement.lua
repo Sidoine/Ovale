@@ -117,45 +117,63 @@ AddFunction EnhancementAoeMainActions
 	if Enemies() >= 4 and target.DebuffPresent(flame_shock_debuff) and { SpellCooldown(shock) > SpellCooldown(fire_nova) or not SpellCooldown(fire_nova) > 0 } Spell(unleash_elements)
 	#fire_nova,if=active_dot.flame_shock>=3
 	if DebuffCountOnAny(flame_shock_debuff) >= 3 Spell(fire_nova)
-	#wait,sec=cooldown.fire_nova.remains,if=active_dot.flame_shock>=4&cooldown.fire_nova.remains<=action.fire_nova.gcd%2
-	unless DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) <= GCD() / 2 and SpellCooldown(fire_nova) > 0
+	#wait,sec=cooldown.fire_nova.remains,if=ptr=1&!talent.echo_of_the_elements.enabled&active_dot.flame_shock>=4&cooldown.fire_nova.remains<=action.fire_nova.gcd%2
+	unless PTR() == 1 and not Talent(echo_of_the_elements_talent) and DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) <= GCD() / 2 and SpellCooldown(fire_nova) > 0
 	{
-		#magma_totem,if=!totem.fire.active
-		if not TotemPresent(fire) and target.InRange(primal_strike) Spell(magma_totem)
-		#lava_lash,if=dot.flame_shock.ticking&(active_dot.flame_shock<active_enemies|!talent.echo_of_the_elements.enabled|!buff.echo_of_the_elements.up)
-		if target.DebuffPresent(flame_shock_debuff) and { DebuffCountOnAny(flame_shock_debuff) < Enemies() or not Talent(echo_of_the_elements_talent) or not BuffPresent(echo_of_the_elements_buff) } Spell(lava_lash)
-		#elemental_blast,if=!buff.unleash_flame.up&(buff.maelstrom_weapon.react>=4|buff.ancestral_swiftness.up)
-		if not BuffPresent(unleash_flame_buff) and { BuffStacks(maelstrom_weapon_buff) >= 4 or BuffPresent(ancestral_swiftness_buff) } Spell(elemental_blast)
-		#chain_lightning,if=glyph.chain_lightning.enabled&active_enemies>=4&(buff.maelstrom_weapon.react=5|(buff.ancestral_swiftness.up&buff.maelstrom_weapon.react>=3))
-		if Glyph(glyph_of_chain_lightning) and Enemies() >= 4 and { BuffStacks(maelstrom_weapon_buff) == 5 or BuffPresent(ancestral_swiftness_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 } Spell(chain_lightning)
-		#unleash_elements,if=active_enemies<4
-		if Enemies() < 4 Spell(unleash_elements)
-		#flame_shock,cycle_targets=1,if=!ticking
-		if not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
-		#lightning_bolt,if=(!glyph.chain_lightning.enabled|active_enemies<=3)&(buff.maelstrom_weapon.react=5|(buff.ancestral_swiftness.up&buff.maelstrom_weapon.react>=3))
-		if { not Glyph(glyph_of_chain_lightning) or Enemies() <= 3 } and { BuffStacks(maelstrom_weapon_buff) == 5 or BuffPresent(ancestral_swiftness_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 } Spell(lightning_bolt)
-		#windstrike
-		Spell(windstrike)
-		#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=1
-		if not BuffPresent(unleash_flame_buff) and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
-		#chain_lightning,if=glyph.chain_lightning.enabled&active_enemies>=4&buff.maelstrom_weapon.react>=1
-		if Glyph(glyph_of_chain_lightning) and Enemies() >= 4 and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(chain_lightning)
-		#fire_nova,if=active_dot.flame_shock>=2
-		if DebuffCountOnAny(flame_shock_debuff) >= 2 Spell(fire_nova)
-		#magma_totem,if=pet.magma_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
-		if TotemRemaining(magma_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
-		#stormstrike
-		Spell(stormstrike)
-		#frost_shock,if=active_enemies<4
-		if Enemies() < 4 Spell(frost_shock)
-		#elemental_blast,if=buff.maelstrom_weapon.react>=1
-		if BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
-		#chain_lightning,if=active_enemies>=3&buff.maelstrom_weapon.react>=1
-		if Enemies() >= 3 and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(chain_lightning)
-		#lightning_bolt,if=active_enemies<3&buff.maelstrom_weapon.react>=1
-		if Enemies() < 3 and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(lightning_bolt)
-		#fire_nova,if=active_dot.flame_shock>=1
-		if DebuffCountOnAny(flame_shock_debuff) >= 1 Spell(fire_nova)
+		#wait,sec=cooldown.fire_nova.remains,if=ptr=0&active_dot.flame_shock>=4&cooldown.fire_nova.remains<=action.fire_nova.gcd%2
+		unless PTR() == 0 and DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) <= GCD() / 2 and SpellCooldown(fire_nova) > 0
+		{
+			#magma_totem,if=!totem.fire.active
+			if not TotemPresent(fire) and target.InRange(primal_strike) Spell(magma_totem)
+			#lava_lash,if=ptr=1&dot.flame_shock.ticking&active_dot.flame_shock<active_enemies
+			if PTR() == 1 and target.DebuffPresent(flame_shock_debuff) and DebuffCountOnAny(flame_shock_debuff) < Enemies() Spell(lava_lash)
+			#lava_lash,if=ptr=0&dot.flame_shock.ticking&active_dot.flame_shock<active_enemies&(!talent.echo_of_the_elements.enabled|!buff.echo_of_the_elements.up)
+			if PTR() == 0 and target.DebuffPresent(flame_shock_debuff) and DebuffCountOnAny(flame_shock_debuff) < Enemies() and { not Talent(echo_of_the_elements_talent) or not BuffPresent(echo_of_the_elements_buff) } Spell(lava_lash)
+			#elemental_blast,if=!buff.unleash_flame.up&(buff.maelstrom_weapon.react>=4|buff.ancestral_swiftness.up)
+			if not BuffPresent(unleash_flame_buff) and { BuffStacks(maelstrom_weapon_buff) >= 4 or BuffPresent(ancestral_swiftness_buff) } Spell(elemental_blast)
+			#chain_lightning,if=buff.maelstrom_weapon.react=5&((glyph.chain_lightning.enabled&active_enemies>=3)|(!glyph.chain_lightning.enabled&active_enemies>=2))
+			if BuffStacks(maelstrom_weapon_buff) == 5 and { Glyph(glyph_of_chain_lightning) and Enemies() >= 3 or not Glyph(glyph_of_chain_lightning) and Enemies() >= 2 } Spell(chain_lightning)
+			#unleash_elements,if=active_enemies<4
+			if Enemies() < 4 Spell(unleash_elements)
+			#flame_shock,if=dot.flame_shock.remains<=9|!ticking
+			if target.DebuffRemaining(flame_shock_debuff) <= 9 or not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
+			#Windstrike,target=1,if=!debuff.stormstrike.up
+			if not target.DebuffPresent(stormstrike_debuff) Spell(windstrike)
+			#Windstrike,target=2,if=!debuff.stormstrike.up
+			if not target.DebuffPresent(stormstrike_debuff) Spell(windstrike text=other)
+			#Windstrike,target=3,if=!debuff.stormstrike.up
+			if not target.DebuffPresent(stormstrike_debuff) Spell(windstrike text=3)
+			#Windstrike
+			Spell(windstrike)
+			#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=3
+			if not BuffPresent(unleash_flame_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 Spell(elemental_blast)
+			#chain_lightning,if=(buff.maelstrom_weapon.react>=3|buff.ancestral_swiftness.up)&((glyph.chain_lightning.enabled&active_enemies>=4)|(!glyph.chain_lightning.enabled&active_enemies>=3))
+			if { BuffStacks(maelstrom_weapon_buff) >= 3 or BuffPresent(ancestral_swiftness_buff) } and { Glyph(glyph_of_chain_lightning) and Enemies() >= 4 or not Glyph(glyph_of_chain_lightning) and Enemies() >= 3 } Spell(chain_lightning)
+			#magma_totem,if=pet.magma_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
+			if TotemRemaining(magma_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
+			#lightning_bolt,if=buff.maelstrom_weapon.react=5&glyph.chain_lightning.enabled&active_enemies<3
+			if BuffStacks(maelstrom_weapon_buff) == 5 and Glyph(glyph_of_chain_lightning) and Enemies() < 3 Spell(lightning_bolt)
+			#stormstrike,target=1,if=!debuff.stormstrike.up
+			if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike)
+			#stormstrike,target=2,if=!debuff.stormstrike.up
+			if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike text=other)
+			#stormstrike,target=3,if=!debuff.stormstrike.up
+			if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike text=3)
+			#stormstrike
+			Spell(stormstrike)
+			#lava_lash
+			Spell(lava_lash)
+			#fire_nova,if=active_dot.flame_shock>=2
+			if DebuffCountOnAny(flame_shock_debuff) >= 2 Spell(fire_nova)
+			#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=1
+			if not BuffPresent(unleash_flame_buff) and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
+			#chain_lightning,if=(buff.maelstrom_weapon.react>=1|buff.ancestral_swiftness.up)&((glyph.chain_lightning.enabled&active_enemies>=3)|(!glyph.chain_lightning.enabled&active_enemies>=2))
+			if { BuffStacks(maelstrom_weapon_buff) >= 1 or BuffPresent(ancestral_swiftness_buff) } and { Glyph(glyph_of_chain_lightning) and Enemies() >= 3 or not Glyph(glyph_of_chain_lightning) and Enemies() >= 2 } Spell(chain_lightning)
+			#lightning_bolt,if=(buff.maelstrom_weapon.react>=1|buff.ancestral_swiftness.up)&glyph.chain_lightning.enabled&active_enemies<3
+			if { BuffStacks(maelstrom_weapon_buff) >= 1 or BuffPresent(ancestral_swiftness_buff) } and Glyph(glyph_of_chain_lightning) and Enemies() < 3 Spell(lightning_bolt)
+			#fire_nova,if=active_dot.flame_shock>=1
+			if DebuffCountOnAny(flame_shock_debuff) >= 1 Spell(fire_nova)
+		}
 	}
 }
 
@@ -312,6 +330,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # storm_elemental_totem
 # storm_elemental_totem_talent
 # stormstrike
+# stormstrike_debuff
 # unleash_elements
 # unleash_flame_buff
 # unleashed_fury_talent

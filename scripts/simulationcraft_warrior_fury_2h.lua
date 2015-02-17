@@ -25,6 +25,13 @@ AddFunction FuryTitansGripUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction FuryTitansGripUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FuryTitansGripGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -70,8 +77,8 @@ AddFunction FuryTitansGripDefaultMainActions
 
 AddFunction FuryTitansGripDefaultShortCdActions
 {
-	#charge
-	if target.InRange(charge) Spell(charge)
+	#charge,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	FuryTitansGripGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -119,6 +126,8 @@ AddFunction FuryTitansGripDefaultCdActions
 
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
+		#use_item,name=vial_of_convulsive_shadows,if=(talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.bloodbath.up|talent.avatar.enabled
+		if Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(bloodbath_buff) or Talent(avatar_talent) FuryTitansGripUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
 		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryTitansGripUsePotionStrength()
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
@@ -222,6 +231,10 @@ AddFunction FuryTitansGripMovementShortCdActions
 {
 	#heroic_leap
 	if target.InRange(charge) Spell(heroic_leap)
+	#charge,cycle_targets=1,if=debuff.charge.down
+	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	#charge
+	if target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }
@@ -402,6 +415,7 @@ AddFunction FuryTitansGripTwoTargetsMainActions
 	#execute,target=2
 	#execute,if=target.health.pct<20|buff.sudden_death.react
 	if target.HealthPercent() < 20 or BuffPresent(sudden_death_buff) Spell(execute)
+	#heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
 	#raging_blow,if=buff.meat_cleaver.up
 	if BuffPresent(meat_cleaver_buff) Spell(raging_blow)
 	#whirlwind,if=!buff.meat_cleaver.up
@@ -496,11 +510,13 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # anger_management_talent
 # arcane_torrent_rage
 # avatar
+# avatar_talent
 # battle_shout
 # battle_stance
 # berserker_rage
 # berserking
 # bladestorm
+# bladestorm_talent
 # blood_fury_ap
 # bloodbath
 # bloodbath_buff
@@ -508,6 +524,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # bloodsurge_buff
 # bloodthirst
 # charge
+# charge_debuff
 # commanding_shout
 # draenic_strength_potion
 # dragon_roar
