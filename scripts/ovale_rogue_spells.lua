@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_rogue_spells"
-	local desc = "[6.0.2] Ovale: Rogue spells"
+	local desc = "[6.1] Ovale: Rogue spells"
 	local code = [[
 # Rogue spells and functions.
 
@@ -48,6 +48,11 @@ Define(blade_flurry 13877)
 Define(blade_flurry_buff 13877)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
+Define(burst_of_speed 108212)
+	SpellInfo(burst_of_speed cd=3 energy=30)
+	SpellAddBuff(burst_of_speed burst_of_speed_buff=1)
+Define(burst_of_speed_buff 137573)
+	SpellInfo(burst_of_speed_buff duration=4)
 Define(cheap_shot 1833)
 	SpellInfo(cheap_shot combo=2 energy=40 interrupt=1 stealthed=1)
 	SpellInfo(cheap_shot buff_energy=silent_blades_buff buff_energy_amount=-6 itemset=T16_melee itemcount=2 specialization=assassination)
@@ -79,6 +84,8 @@ Define(deadly_throw 26679)
 Define(death_from_above 152150)
 	SpellInfo(death_from_above combo=finisher energy=50)
 	SpellInfo(death_from_above buff_energy_less75=stealthed_buff if_spell=shadow_focus)
+	SpellAddBuff(death_from_above envenom_buff=1 specialization=assassination)
+	SpellAddBuff(death_from_above enhanced_vendetta_buff=0 if_spell=enhanced_vendetta)
 Define(death_from_above_talent 21)
 Define(deceit_buff 166878)
 	SpellInfo(deceit_buff duration=10)

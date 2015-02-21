@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_hunter_spells"
-	local desc = "[6.0.2] Ovale: Hunter spells"
+	local desc = "[6.1] Ovale: Hunter spells"
 	local code = [[
 # Hunter spells and functions.
 
@@ -31,8 +31,7 @@ Define(bestial_wrath 19574)
 Define(bestial_wrath_buff 19574)
 	SpellInfo(bestial_wrath_buff duration=10)
 Define(black_arrow 3674)
-	SpellInfo(black_arrow cd=30 focus=35)
-	SpellInfo(black_arrow addcd=-6 if_spell=trap_mastery)
+	SpellInfo(black_arrow cd=24 focus=35)
 	SpellInfo(black_arrow buff_cdr=cooldown_reduction_agility_buff)
 	SpellAddBuff(black_arrow lock_and_load_buff=2 itemset=T17 itemcount=2 specialization=survival)
 	SpellAddTargetDebuff(black_arrow black_arrow_debuff=1)
@@ -62,9 +61,7 @@ Define(explosive_shot 53301)
 	SpellAddBuff(explosive_shot lock_and_load_buff=-1 if_spell=black_arrow)
 Define(explosive_trap 13813)
 	SpellInfo(explosive_trap cd=30)
-	SpellInfo(explosive_trap cd=15 if_spell=enhanced_traps)
-	SpellInfo(explosive_trap addcd=-6 if_spell=!enhanced_traps if_spell=trap_mastery)
-	SpellInfo(explosive_trap addcd=-3 if_spell=enhanced_traps if_spell=trap_mastery)
+	SpellInfo(explosive_trap addcd=-20 if_spell=enhanced_traps)
 Define(explosive_trap_debuff 13812)
 	SpellInfo(explosive_trap_debuff duration=20 tick=2)
 Define(focus_fire 82692)
@@ -92,6 +89,9 @@ Define(heart_of_the_phoenix 55709)
 	SpellAddDebuff(heart_of_the_phoenix heart_of_the_phoenix_debuff=1)
 Define(heart_of_the_phoenix_debuff 55711)
 	SpellInfo(heart_of_the_phoenix_debuff duration=480)
+Define(ice_trap 13813)
+	SpellInfo(ice_trap cd=30)
+	SpellInfo(ice_trap addcd=-20 if_spell=enhanced_traps)
 Define(incendiary_ammo 162536)
 	SpellAddBuff(incendiary_ammo incendiary_ammo_buff=1)
 Define(incendiary_ammo_buff 162536)

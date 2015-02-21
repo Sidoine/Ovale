@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_warrior_spells"
-	local desc = "[6.0.2] Ovale: Warrior spells"
+	local desc = "[6.1] Ovale: Warrior spells"
 	local code = [[
 # Warrior spells and functions.
 
@@ -25,11 +25,11 @@ Define(unwavering_sentinel 29144)
 
 Define(anger_management_talent 19)
 Define(avatar 107574)
-	SpellInfo(avatar cd=180 gcd=0)
+	SpellInfo(avatar cd=90 gcd=0)
 	SpellInfo(avatar buff_cdr=cooldown_reduction_strength_buff specialization=arms)
 	SpellInfo(avatar buff_cdr=cooldown_reduction_strength_buff specialization=fury)
 Define(avatar_buff 107574)
-	SpellInfo(avatar_buff duration=24)
+	SpellInfo(avatar_buff duration=20)
 Define(avatar_talent 16)
 Define(battle_shout 6673)
 	SpellAddBuff(battle_shout battle_shout_buff=1)
@@ -75,7 +75,7 @@ Define(charge 100)
 Define(charge_debuff 100)	# OvaleWarriorCharge
 Define(colossus_smash 167105)
 	SpellInfo(colossus_smash cd=20 rage=10)
-	SpellInfo(colossus_smash rage=-30 itemset=T17 itemcount=2 specialization=arms)
+	SpellInfo(colossus_smash rage=-20 itemset=T17 itemcount=4 specialization=arms)
 	SpellInfo(colossus_smash to_stance=warrior_battle_stance if_stance=warrior_defensive_stance)
 	SpellAddTargetDebuff(colossus_smash colossus_smash_debuff=1)
 Define(colossus_smash_debuff 167105)
@@ -178,6 +178,7 @@ Define(meat_cleaver_buff 85739)
 Define(mortal_strike 12294)
 	SpellInfo(mortal_strike cd=6 rage=20)
 	SpellInfo(mortal_strike cd_haste=melee if_spell=headlong_rush)
+	SpellRequire(mortal_strike cd 3=buff,deadly_calm_buff itemset=T17 itemcount=4)
 	SpellAddTargetDebuff(mortal_strike deep_wounds_debuff=1 if_spell=deep_wounds)
 	SpellAddTargetDebuff(mortal_strike mortal_wounds_debuff=1)
 Define(mortal_wounds_debuff 115804)

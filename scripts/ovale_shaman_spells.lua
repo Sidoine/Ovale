@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_shaman_spells"
-	local desc = "[6.0.2] Ovale: Shaman spells"
+	local desc = "[6.1] Ovale: Shaman spells"
 	local code = [[
 # Shaman spells and functions.
 
@@ -85,6 +85,7 @@ Define(earthquake 61882)
 	SpellRequire(earthquake cd 0=buff,echo_of_the_elements_buff if_spell=echo_of_the_elements)
 	SpellAddBuff(earthquake ancestral_swiftness_buff=0 if_spell=ancestral_swiftness)
 	SpellAddBuff(earthquake echo_of_the_elements_buff=0 if_spell=echo_of_the_elements)
+	SpellAddBuff(earthquake enhanced_chain_lightning_buff=0 if_spell=enhanced_chain_lightning)
 	SpellAddTargetDebuff(earthquake earthquake_debuff=1)
 Define(earthquake_debuff 61882)
 	SpellInfo(earthquake_debuff duration=10 haste=spell tick=1)

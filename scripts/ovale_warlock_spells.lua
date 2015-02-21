@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_warlock_spells"
-	local desc = "[6.0.3] Ovale: Warlock spells"
+	local desc = "[6.1] Ovale: Warlock spells"
 	local code = [[
 # Warlock spells and functions.
 
@@ -193,7 +193,7 @@ Define(incinerate_fire_and_brimstone 114654)
 	SpellAddBuff(incinerate_fire_and_brimstone backdraft_buff=-1 if_spell=backdraft)
 	SpellAddBuff(incinerate_fire_and_brimstone havoc_buff=-1 if_spell=havoc)
 Define(kiljaedens_cunning 137587)
-	SpellInfo(kiljaedens_cunning cd=60 gcd=0)
+	SpellInfo(kiljaedens_cunning cd=35 gcd=0)
 	SpellAddBuff(kiljaedens_cunning kiljaedens_cunning_buff=1)
 Define(kiljaedens_cunning_buff 137587)
 	SpellInfo(kiljaedens_cunning_buff duration=8)

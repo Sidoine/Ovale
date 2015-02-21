@@ -92,6 +92,7 @@ OvaleData.buffSpellList = {
 		[116781] = true, -- Legacy of the White Tiger (bremaster/windwalker monk)
 		[126309] = true, -- Still Water (water strider)
 		[126373] = true, -- Fearless Roar (quilen)
+		[128997] = true, -- Spirit Beast Blessing (spirit beast)
 		[160052] = true, -- Strength of the Pack (raptor)
 		[160200] = true, -- Lone Wolf: Ferocity of the Raptor (hunter)
 	},

@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_mage_spells"
-	local desc = "[6.0.2] Ovale: Mage spells"
+	local desc = "[6.1] Ovale: Mage spells"
 	local code = [[
 # Mage spells and functions.
 
@@ -121,7 +121,6 @@ Define(glyph_of_cone_of_cold 115705)
 Define(glyph_of_counterspell 115703)
 Define(glyph_of_deep_freeze 115710)
 Define(glyph_of_dragons_breath 159485)
-Define(glyph_of_frostfire_bolt 61205)
 Define(glyph_of_icy_veins 56364)
 Define(glyph_of_rapid_displacement 146659)
 Define(heating_up_buff 48107)
@@ -177,6 +176,11 @@ Define(overpowered_talent 19)
 Define(pet_freeze 33395)
 Define(pet_water_jet 135029)
 Define(pet_water_jet_debuff 135029)
+Define(polymorph 118)
+	SpellAddBuff(polymorph presence_of_mind_buff=0)
+	SpellAddTargetDebuff(polymorph polymorph_debuff=1)
+Define(polymorph_debuff 118)
+	SpellInfo(polymorph_debuff duration=50)
 Define(potent_flames_buff 145254)
 	SpellInfo(potent_flames_buff duration=5 max_stacks=5)
 Define(presence_of_mind 12043)

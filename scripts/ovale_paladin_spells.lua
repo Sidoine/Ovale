@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_paladin_spells"
-	local desc = "[6.0.2] Ovale: Paladin spells"
+	local desc = "[6.1] Ovale: Paladin spells"
 	local code = [[
 # Paladin spells and functions.
 
@@ -330,7 +330,7 @@ Define(templars_verdict 85256)
 	SpellAddBuff(templars_verdict divine_purpose_buff=0 if_spell=divine_purpose)
 Define(unbreakable_spirit 114154)
 Define(uthers_insight_buff 156988)
-	SpellInfo(uthers_insight_buff duration=20)
+	SpellInfo(uthers_insight_buff duration=21 haste=spell tick=3)
 Define(word_of_glory 85673)
 	SpellInfo(word_of_glory cd=1 holy=finisher max_holy=3)
 	SpellInfo(word_of_glory gcd=0 offgcd=1)
