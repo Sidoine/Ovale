@@ -93,6 +93,20 @@ function OvaleScripts:OnInitialize()
 	self:RegisterScript(nil, nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
 end
 
+function OvaleScripts:OnEnable()
+	self:RegisterMessage("Ovale_StanceChanged")
+end
+
+function OvaleScripts:OnDisable()
+	self:UnregisterMessage("Ovale_StanceChanged")
+end
+
+function OvaleScripts:Ovale_StanceChanged(event, newStance, oldStance)
+	if newStance == "warrior_gladiator_stance" or oldStance == "warrior_gladiator_stance" then
+		self:SendMessage("Ovale_ScriptChanged")
+	end
+end
+
 -- Return a table of script descriptions indexed by name.
 function OvaleScripts:GetDescriptions(scriptType)
 	local descriptionsTable = {}
