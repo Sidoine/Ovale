@@ -4912,9 +4912,14 @@ function OvaleSimulationCraft:CreateOptions()
 				name = L["Input"],
 				type = "group",
 				args = {
+					description = {
+						order = 10,
+						name = L["The contents of a SimulationCraft profile."] .. "\nhttps://code.google.com/p/simulationcraft/source/browse/profiles",
+						type = "description",
+					},
 					input = {
+						order = 20,
 						name = L["SimulationCraft Profile"],
-						desc = L["The contents of a SimulationCraft profile (*.simc)."],
 						type = "input",
 						multiline = 25,
 						width = "full",
@@ -4937,9 +4942,14 @@ function OvaleSimulationCraft:CreateOptions()
 				name = L["Overrides"],
 				type = "group",
 				args = {
+					description = {
+						order = 10,
+						name = L["Script code inserted after Include() statements."],
+						type = "description",
+					},
 					overrides = {
+						order = 20,
 						name = L["Overrides"],
-						desc = L["Script code inserted after Include() statements."],
 						type = "input",
 						multiline = 25,
 						width = "full",
@@ -4968,9 +4978,14 @@ function OvaleSimulationCraft:CreateOptions()
 				name = L["Output"],
 				type = "group",
 				args = {
+					description = {
+						order = 10,
+						name = L["The script translated from the SimulationCraft profile."],
+						type = "description",
+					},
 					output = {
+						order = 20,
 						name = L["Script"],
-						desc = L["The script translated from the SimulationCraft profile."],
 						type = "input",
 						multiline = 25,
 						width = "full",
