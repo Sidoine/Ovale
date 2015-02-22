@@ -83,6 +83,9 @@ for class, numSpecializations in pairs(NUM_SPECIALIZATIONS) do
 		local descriptionTbl = OvaleScripts:GetDescriptions("script")
 		for source in pairs(descriptionTbl) do
 			if source ~= "custom" and source ~= "Disabled" then
+				if source == "Ovale" then
+					source = OvaleScripts:GetDefaultScriptName()
+				end
 				print(string.format("Compiling '%s' script for %s (%s).", source, class, specialization))
 				OvaleCompile:CompileScript(source)
 				OvaleCompile:EvaluateScript(true)

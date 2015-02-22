@@ -15,16 +15,32 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local OvaleOptions = Ovale.OvaleOptions
 local L = Ovale.L
 
+-- Forward declarations for module dependencies.
+local OvaleEquipment = nil
+local OvalePaperDoll = nil
+local OvaleSpellBook = nil
+local OvaleStance = nil
+
+local format = string.format
 local gsub = string.gsub
 local pairs = pairs
+local strlower = string.lower
 local API_UnitClass = UnitClass
 
 -- Player's class.
 local _, self_class = API_UnitClass("player")
 
+-- Name and description of default script.
+local DEFAULT_NAME = "Ovale"
+local DEFAULT_DESCRIPTION = L["Script défaut"]
+
 -- Name and description of "custom" script.
 local CUSTOM_NAME = "custom"
 local CUSTOM_DESCRIPTION = L["Script personnalisé"]
+
+-- Name and description of "disabled" script.
+local DISABLED_NAME = "Disabled"
+local DISABLED_DESCRIPTION = L["Disabled"]
 
 do
 	local defaultDB = {
@@ -62,11 +78,19 @@ OvaleScripts.script = {}
 
 --<public-static-methods>
 function OvaleScripts:OnInitialize()
+	-- Resolve module dependencies.
+	OvaleEquipment = Ovale.OvaleEquipment
+	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvaleSpellBook = Ovale.OvaleSpellBook
+	OvaleStance = Ovale.OvaleStance
+
 	self:CreateOptions()
+	-- Register the default script that triggers the automatic script selection; the body code is ignored.
+	self:RegisterScript(nil, DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
 	-- Register the custom script.
-	self:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code)
+	self:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script")
 	-- Register an empty script called "Disabled" that can be used to show no icons.
-	self:RegisterScript(nil, "Disabled", "Disabled", "", "script")
+	self:RegisterScript(nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
 end
 
 -- Return a table of script descriptions indexed by name.
@@ -74,7 +98,11 @@ function OvaleScripts:GetDescriptions(scriptType)
 	local descriptionsTable = {}
 	for name, script in pairs(self.script) do
 		if not scriptType or script.type == scriptType then
-			descriptionsTable[name] = script.desc
+			if name == DEFAULT_NAME then
+				descriptionsTable[name] = script.desc .. " (" .. self:GetScriptName(name) .. ")"
+			else
+				descriptionsTable[name] = script.desc
+			end
 		end
 	end
 	return descriptionsTable
@@ -102,7 +130,85 @@ function OvaleScripts:SetScript(name)
 	end
 end
 
+function OvaleScripts:GetDefaultScriptName(class, specialization)
+	local name
+	if class == "DEATHKNIGHT" then
+		if specialization == "frost" then
+			local weaponType = OvaleEquipment:HasOffHandWeapon() and "1h" or "2h"
+			name = format("simulationcraft_death_knight_frost_%s_t17m", weaponType)
+		elseif specialization then
+			name = format("simulationcraft_death_knight_%s_t17m", specialization)
+		end
+	elseif class == "DRUID" then
+		if specialization == "balance" then
+			name = DISABLED_NAME
+		elseif specialization == "restoration" then
+			name = "nerien_druid_restoration"
+		end
+	elseif class == "HUNTER" then
+		if specialization == "beast_mastery" then
+			specialization = "bm"
+		elseif specialization == "marksmanship" then
+			specialization = "mm"
+		else -- if specialization == "survival" then
+			specialization = "sv"
+		end
+		name = format("simulationcraft_hunter_%s_t17m", specialization)
+	elseif class == "MONK" then
+		local weaponType = OvaleEquipment:HasOffHandWeapon() and "1h" or "2h"
+		if specialization == "brewmaster" then
+			local talentChoice = "serenity"					-- Serenity (default)
+			if OvaleSpellBook:GetTalentPoints(20) > 0 then	-- Chi Explosion
+				talentChoice = "ce"
+			end
+			name = format("simulationcraft_monk_brewmaster_%s_%s_t17m", weaponType, talentChoice)
+		elseif specialization == "windwalker" then
+			name = format("simulationcraft_monk_windwalker_%s_t17m", weaponType)
+		end
+	elseif class == "PALADIN" and specialization == "holy" then
+		name = DISABLED_NAME
+	elseif class == "PRIEST" then
+		if specialization == "discipline" or specialization == "holy" then
+			-- Use the "heal" profile.
+			name = format("simulationcraft_priest_%s_t17m_heal", specialization)
+		else -- if specialization == "shadow" then
+			local talentChoice = "cop"							-- Clarity of Power (default)
+			if OvaleSpellBook:GetTalentPoints(20) > 0 then		-- Void Entropy
+				talentChoice = "ve"
+			elseif OvaleSpellBook:GetTalentPoints(21) > 0 then	-- Auspicious Spirits
+				talentChoice = "as"
+			end
+			name = format("simulationcraft_priest_shadow_t17m_%s", talentChoice)
+		end
+	elseif class == "SHAMAN" and specialization == "restoration" then
+		name = "nerien_shaman_restoration"
+	elseif class == "WARRIOR" then
+		if specialization == "fury" then
+			local weaponType = OvaleEquipment:HasMainHandWeapon(1) and "1h" or "2h"
+			name = format("simulationcraft_warrior_fury_%s_t17m", weaponType)
+		elseif specialization == "protection" then
+			-- Check if the warrior is in Gladiator Stance for DPS.
+			if OvaleStance:IsStance("warrior_gladiator_stance") then
+				specialization = "gladiator"
+			end
+			name = format("simulationcraft_warrior_%s_t17m", specialization)
+		end
+	end
+	if not name and specialization then
+		name = format("simulationcraft_%s_%s_t17m", strlower(class), specialization)
+	end
+	if not (name and self.script[name]) then
+		name = DISABLED_NAME
+	end
+	return name
+end
+
+function OvaleScripts:GetScriptName(name)
+	return (name == DEFAULT_NAME) and self:GetDefaultScriptName(self_class, OvalePaperDoll:GetSpecialization()) or name
+end
+
 function OvaleScripts:GetScript(name)
+	name = self:GetScriptName(name)
 	if name and self.script[name] then
 		return self.script[name].code
 	end

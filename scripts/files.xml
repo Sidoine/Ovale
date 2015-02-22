@@ -26,10 +26,6 @@
 	<Script file="ovale_warrior.lua" />
 	<Script file="ovale_warrior_spells.lua" />
 
-	<Script file="leafkiller_druid.lua" />
-	<Script file="lunaeclipse_druid.lua" />
-	<Script file="wiljo_mage.lua" />
-
 	<Script file="mmo_champion_rogue_assassination.lua" />
 	<Script file="mmo_champion_rogue_combat.lua" />
 	<Script file="mmo_champion_rogue_subtlety.lua" />
