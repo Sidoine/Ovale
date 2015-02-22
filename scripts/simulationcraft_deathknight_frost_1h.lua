@@ -516,5 +516,5 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # unholy_blight_talent
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
 end

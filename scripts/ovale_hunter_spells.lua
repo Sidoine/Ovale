@@ -159,5 +159,5 @@ Define(trap_mastery 63458)
 	SpellInfo(focus_fire tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "include")
+	OvaleScripts:RegisterScript("HUNTER", nil, name, desc, code, "include")
 end

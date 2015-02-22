@@ -201,5 +201,5 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 # smite
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PRIEST", "holy", name, desc, code, "script")
 end

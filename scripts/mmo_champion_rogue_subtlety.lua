@@ -502,5 +502,5 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # subterfuge_talent
 # vanish
 ]]
-	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
+	OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
 end

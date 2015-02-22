@@ -116,5 +116,5 @@ AddIcon help=cd specialization=restoration
 	RestorationCdActions()
 }
 ]]
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "script")
+	OvaleScripts:RegisterScript("DRUID", "restoration", name, desc, code, "script")
 end

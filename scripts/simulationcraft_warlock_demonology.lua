@@ -389,5 +389,5 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # wrathguard_mortal_cleave
 # wrathguard_wrathstorm
 ]]
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("WARLOCK", "demonology", name, desc, code, "script")
 end

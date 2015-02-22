@@ -432,5 +432,5 @@ Define(wrath 5176)
 	SpellInfo(natures_vigil tag=cd)
 ]]
 
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "include")
+	OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end

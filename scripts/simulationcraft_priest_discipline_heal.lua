@@ -180,5 +180,5 @@ AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
 # surge_of_light_buff
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PRIEST", "discipline", name, desc, code, "script")
 end

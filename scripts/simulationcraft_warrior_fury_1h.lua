@@ -550,5 +550,5 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # whirlwind
 # wild_strike
 ]]
-	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("WARRIOR", "fury", name, desc, code, "script")
 end

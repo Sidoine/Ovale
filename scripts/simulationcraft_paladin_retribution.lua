@@ -428,5 +428,5 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # templars_verdict
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
 end

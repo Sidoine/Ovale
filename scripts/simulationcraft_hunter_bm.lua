@@ -254,5 +254,5 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # trap_launcher
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
 end

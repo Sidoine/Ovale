@@ -614,5 +614,5 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # unholy_presence
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
 end

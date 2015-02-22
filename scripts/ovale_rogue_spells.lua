@@ -285,5 +285,5 @@ Define(wound_poison_buff 8679)
 	SpellInfo(vanish tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "include")
+	OvaleScripts:RegisterScript("ROGUE", nil, name, desc, code, "include")
 end

@@ -340,5 +340,5 @@ Define(tyrannical_gladiators_insignia_of_victory_horde 100085)
 	ItemInfo(tyrannical_gladiators_insignia_of_victory_horde buff=surge_of_victory_buff)
 ]]
 
-	OvaleScripts:RegisterScript(nil, name, desc, code, "include")
+	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end

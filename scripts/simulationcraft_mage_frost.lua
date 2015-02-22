@@ -526,5 +526,5 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # water_elemental_water_jet
 # water_elemental_water_jet_debuff
 ]]
-	OvaleScripts:RegisterScript("MAGE", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
 end

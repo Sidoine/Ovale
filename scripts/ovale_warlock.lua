@@ -7,5 +7,5 @@ do
 	local code = [[
 # Example warlock script.
 ]]
-	--OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "script")
+	--OvaleScripts:RegisterScript("WARLOCK", nil, name, desc, code, "script")
 end

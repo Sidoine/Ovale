@@ -136,7 +136,6 @@ for _, filename in ipairs(files) do
 			desc = profileName
 		end
 		name = Canonicalize(desc)
-		local scriptType = (source == "SimulationCraft") and "reference" or "script"
 		wipe(output)
 		output[#output + 1] = "local OVALE, Ovale = ..."
 		output[#output + 1] = "local OvaleScripts = Ovale.OvaleScripts"
@@ -147,7 +146,7 @@ for _, filename in ipairs(files) do
 		output[#output + 1] = "	local code = [["
 		output[#output + 1] = OvaleSimulationCraft:Emit(profile, true)
 		output[#output + 1] = "]]"
-		output[#output + 1] = format('	OvaleScripts:RegisterScript("%s", name, desc, code, "%s")', profile.annotation.class, scriptType)
+		output[#output + 1] = format('	OvaleScripts:RegisterScript("%s", "%s", name, desc, code, "%s")', profile.annotation.class, profile.annotation.specialization, "script")
 		output[#output + 1] = "end"
 		output[#output + 1] = ""
 

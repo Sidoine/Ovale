@@ -309,5 +309,5 @@ Define(windwalk_totem 108273)
 	SpellInfo(elemental_mastery tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "include")
+	OvaleScripts:RegisterScript("SHAMAN", nil, name, desc, code, "include")
 end

@@ -562,5 +562,5 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # zen_sphere
 # zen_sphere_buff
 ]]
-	OvaleScripts:RegisterScript("MONK", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
 end

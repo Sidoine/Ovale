@@ -246,5 +246,5 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # wild_charge_bear
 # wild_charge_cat
 ]]
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
 end

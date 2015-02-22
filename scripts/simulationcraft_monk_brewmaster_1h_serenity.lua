@@ -421,5 +421,5 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # zen_sphere_buff
 # zen_sphere_talent
 ]]
-	OvaleScripts:RegisterScript("MONK", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
 end

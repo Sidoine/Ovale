@@ -248,5 +248,5 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # sunfire_debuff
 # wrath
 ]]
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("DRUID", "balance", name, desc, code, "script")
 end

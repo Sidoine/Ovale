@@ -328,5 +328,5 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # trap_launcher
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("HUNTER", "survival", name, desc, code, "script")
 end

@@ -7,5 +7,5 @@ do
 	local code = [[
 # Example death knight script.
 ]]
-	--OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "script")
+	--OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "script")
 end

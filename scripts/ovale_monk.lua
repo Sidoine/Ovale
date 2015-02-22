@@ -7,5 +7,5 @@ do
 	local code = [[
 # Example monk script.
 ]]
-	--OvaleScripts:RegisterScript("MONK", name, desc, code, "script")
+	--OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "script")
 end

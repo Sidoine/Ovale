@@ -270,5 +270,5 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # vendetta
 # vendetta_debuff
 ]]
-	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
+	OvaleScripts:RegisterScript("ROGUE", "assassination", name, desc, code, "script")
 end

@@ -343,5 +343,5 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # summon_infernal
 # trinket_stacking_any_intellect_buff
 ]]
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("WARLOCK", "destruction", name, desc, code, "script")
 end

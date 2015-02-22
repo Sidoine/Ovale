@@ -280,5 +280,5 @@ Define(weakened_soul_debuff 6788)
 	SpellInfo(mindbender tag=cd)
 ]]
 
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "include")
+	OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
 end

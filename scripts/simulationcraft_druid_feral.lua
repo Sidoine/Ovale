@@ -316,5 +316,5 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # wild_charge_bear
 # wild_charge_cat
 ]]
-	OvaleScripts:RegisterScript("DRUID", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
 end

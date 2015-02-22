@@ -234,5 +234,5 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # unstable_affliction
 # unstable_affliction_debuff
 ]]
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("WARLOCK", "affliction", name, desc, code, "script")
 end

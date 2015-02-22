@@ -540,5 +540,5 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # scorch
 # time_warp
 ]]
-	OvaleScripts:RegisterScript("MAGE", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("MAGE", "fire", name, desc, code, "script")
 end

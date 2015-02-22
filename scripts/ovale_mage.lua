@@ -7,5 +7,5 @@ do
 	local code = [[
 # Example mage script.
 ]]
-	--OvaleScripts:RegisterScript("MAGE", name, desc, code, "script")
+	--OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "script")
 end

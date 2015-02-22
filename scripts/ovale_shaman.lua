@@ -112,5 +112,5 @@ AddIcon help=cd specialization=restoration
 	RestorationCdActions()
 }
 ]]
-	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "script")
+	OvaleScripts:RegisterScript("SHAMAN", "restoration", name, desc, code, "script")
 end

@@ -318,5 +318,5 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # war_stomp
 # wind_shear
 ]]
-	OvaleScripts:RegisterScript("SHAMAN", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
 end

@@ -567,5 +567,5 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # supernova
 # time_warp
 ]]
-	OvaleScripts:RegisterScript("MAGE", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("MAGE", "arcane", name, desc, code, "script")
 end

@@ -357,5 +357,5 @@ SpellList(word_of_glory_no_holy_buff bastion_of_power_buff divine_purpose_buff l
 	SpellInfo(harsh_word tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "include")
+	OvaleScripts:RegisterScript("PALADIN", nil, name, desc, code, "include")
 end

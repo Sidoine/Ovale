@@ -320,5 +320,5 @@ Define(wild_strike 100130)
 	SpellInfo(sweeping_strikes tag=main)
 ]]
 
-	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "include")
+	OvaleScripts:RegisterScript("WARRIOR", nil, name, desc, code, "include")
 end

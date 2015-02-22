@@ -300,5 +300,5 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trap_launcher
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("HUNTER", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
 end

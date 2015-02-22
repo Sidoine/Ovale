@@ -239,5 +239,5 @@ Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(rune_of_power tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("MAGE", name, desc, code, "include")
+	OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
 end

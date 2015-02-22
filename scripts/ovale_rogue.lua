@@ -7,5 +7,5 @@ do
 	local code = [[
 # Example rogue script.
 ]]
-	--OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
+	--OvaleScripts:RegisterScript("ROGUE", nil, name, desc, code, "script")
 end

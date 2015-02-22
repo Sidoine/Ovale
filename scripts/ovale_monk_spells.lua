@@ -329,5 +329,5 @@ Define(zen_sphere_talent 5)
 	SpellInfo(fists_of_fury tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("MONK", name, desc, code, "include")
+	OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end

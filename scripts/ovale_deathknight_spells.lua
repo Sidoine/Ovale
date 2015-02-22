@@ -287,5 +287,5 @@ Define(vampiric_blood_buff 55233)
 	SpellInfo(blood_tap tag=main specialization=blood)
 	SpellInfo(outbreak tag=main)
 ]]
-	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "include")
+	OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "include")
 end

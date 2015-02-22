@@ -601,5 +601,5 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # uthers_insight_buff
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PALADIN", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
 end

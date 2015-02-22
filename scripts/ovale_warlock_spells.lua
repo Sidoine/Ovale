@@ -281,5 +281,5 @@ Define(wrathguard_wrathstorm 115831)
 	SpellInfo(summon_voidwalker tag=shortcd)
 ]]
 
-	OvaleScripts:RegisterScript("WARLOCK", name, desc, code, "include")
+	OvaleScripts:RegisterScript("WARLOCK", nil, name, desc, code, "include")
 end

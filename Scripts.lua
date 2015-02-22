@@ -86,18 +86,18 @@ function OvaleScripts:OnInitialize()
 
 	self:CreateOptions()
 	-- Register the default script that triggers the automatic script selection; the body code is ignored.
-	self:RegisterScript(nil, DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
+	self:RegisterScript(nil, nil, DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
 	-- Register the custom script.
-	self:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script")
+	self:RegisterScript(self_class, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script")
 	-- Register an empty script called "Disabled" that can be used to show no icons.
-	self:RegisterScript(nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
+	self:RegisterScript(nil, nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
 end
 
 -- Return a table of script descriptions indexed by name.
 function OvaleScripts:GetDescriptions(scriptType)
 	local descriptionsTable = {}
 	for name, script in pairs(self.script) do
-		if not scriptType or script.type == scriptType then
+		if (not scriptType or script.type == scriptType) and (not script.specialization or OvalePaperDoll:IsSpecialization(script.specialization)) then
 			if name == DEFAULT_NAME then
 				descriptionsTable[name] = script.desc .. " (" .. self:GetScriptName(name) .. ")"
 			else
@@ -108,12 +108,13 @@ function OvaleScripts:GetDescriptions(scriptType)
 	return descriptionsTable
 end
 
-function OvaleScripts:RegisterScript(class, name, description, code, scriptType)
+function OvaleScripts:RegisterScript(class, specialization, name, description, code, scriptType)
 	if not class or class == self_class then
 		self.script[name] = self.script[name] or {}
 		local script = self.script[name]
 		script.type = scriptType or "script"
 		script.desc = description or name
+		script.specialization = specialization
 		script.code = code or ""
 	end
 end
@@ -251,7 +252,7 @@ function OvaleScripts:CreateOptions()
 					return gsub(code, "\t", "    ")
 				end,
 				set = function(info, v)
-					OvaleScripts:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, v, "script")
+					OvaleScripts:RegisterScript(self_class, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, v, "script")
 					Ovale.db.profile.code = v
 					self:SendMessage("Ovale_ScriptChanged")
 				end,
@@ -268,7 +269,7 @@ function OvaleScripts:CreateOptions()
 				end,
 				func = function()
 					local code = OvaleScripts:GetScript(Ovale.db.profile.source)
-					OvaleScripts:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
+					OvaleScripts:RegisterScript(self_class, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
 					Ovale.db.profile.source = CUSTOM_NAME
 					Ovale.db.profile.code = OvaleScripts:GetScript(CUSTOM_NAME)
 					self:SendMessage("Ovale_ScriptChanged")

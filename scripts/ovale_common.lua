@@ -155,5 +155,5 @@ AddFunction UseRacialSurvivalActions
 }
 ]]
 
-	OvaleScripts:RegisterScript(nil, name, desc, code, "include")
+	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end

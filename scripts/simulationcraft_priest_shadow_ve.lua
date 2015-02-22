@@ -923,5 +923,5 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # void_entropy_talent
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 end

@@ -367,5 +367,5 @@ Define(ragewings_firefang 110003)
 	ItemInfo(ragewings_firefang buff=versatility_short_use_buff)
 ]]
 
-	OvaleScripts:RegisterScript(nil, name, desc, code, "include")
+	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end

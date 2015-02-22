@@ -336,5 +336,5 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # unyielding_strikes_buff
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
 end

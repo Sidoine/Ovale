@@ -166,5 +166,5 @@ AddIcon checkbox=opt_priest_discipline_aoe help=cd specialization=discipline
 # smite
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PRIEST", "discipline", name, desc, code, "script")
 end

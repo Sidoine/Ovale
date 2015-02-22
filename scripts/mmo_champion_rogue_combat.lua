@@ -309,5 +309,5 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # subterfuge_talent
 # vanish
 ]]
-	OvaleScripts:RegisterScript("ROGUE", name, desc, code, "script")
+	OvaleScripts:RegisterScript("ROGUE", "combat", name, desc, code, "script")
 end

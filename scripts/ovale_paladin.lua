@@ -7,5 +7,5 @@ do
 	local code = [[
 # Example paladin script.
 ]]
-	--OvaleScripts:RegisterScript("PALADIN", name, desc, code, "script")
+	--OvaleScripts:RegisterScript("PALADIN", nil, name, desc, code, "script")
 end

@@ -392,5 +392,5 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # war_stomp
 # whirlwind
 ]]
-	OvaleScripts:RegisterScript("WARRIOR", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("WARRIOR", "arms", name, desc, code, "script")
 end

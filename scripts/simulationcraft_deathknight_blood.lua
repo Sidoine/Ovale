@@ -421,5 +421,5 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 # vampiric_blood_buff
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("DEATHKNIGHT", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("DEATHKNIGHT", "blood", name, desc, code, "script")
 end

@@ -236,5 +236,5 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 # surge_of_light_buff
 # war_stomp
 ]]
-	OvaleScripts:RegisterScript("PRIEST", name, desc, code, "reference")
+	OvaleScripts:RegisterScript("PRIEST", "holy", name, desc, code, "script")
 end
