@@ -277,6 +277,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # counter_shot
 # dire_beast
 # draenic_agility_potion
+# exotic_munitions_buff
 # explosive_trap
 # focusing_shot_marksmanship
 # focusing_shot_talent

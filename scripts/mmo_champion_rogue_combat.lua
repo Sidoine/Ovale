@@ -99,7 +99,7 @@ AddFunction CombatDefaultCdActions
 	#kick
 	CombatInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
-	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 30 Spell(preparation)
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=trinket2
 	CombatUseItemActions()
 	#blood_fury
@@ -291,6 +291,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # kidney_shot
 # killing_spree
 # killing_spree_buff
+# lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent
 # preparation
@@ -308,6 +309,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # stealth
 # subterfuge_talent
 # vanish
+# vanish_buff
 ]]
 	OvaleScripts:RegisterScript("ROGUE", "combat", name, desc, code, "script")
 end

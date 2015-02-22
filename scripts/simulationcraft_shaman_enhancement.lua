@@ -138,11 +138,11 @@ AddFunction EnhancementAoeMainActions
 			#flame_shock,if=dot.flame_shock.remains<=9|!ticking
 			if target.DebuffRemaining(flame_shock_debuff) <= 9 or not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
 			#Windstrike,target=1,if=!debuff.stormstrike.up
-			if not target.DebuffPresent(stormstrike_debuff any=1) Spell(windstrike)
+			if not target.DebuffPresent(stormstrike_debuff) Spell(windstrike)
 			#Windstrike,target=2,if=!debuff.stormstrike.up
-			if not target.DebuffPresent(stormstrike_debuff any=1) Spell(windstrike text=other)
+			if not target.DebuffPresent(stormstrike_debuff) Spell(windstrike text=other)
 			#Windstrike,target=3,if=!debuff.stormstrike.up
-			if not target.DebuffPresent(stormstrike_debuff any=1) Spell(windstrike text=3)
+			if not target.DebuffPresent(stormstrike_debuff) Spell(windstrike text=3)
 			#Windstrike
 			Spell(windstrike)
 			#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=3
@@ -154,11 +154,11 @@ AddFunction EnhancementAoeMainActions
 			#lightning_bolt,if=buff.maelstrom_weapon.react=5&glyph.chain_lightning.enabled&active_enemies<3
 			if BuffStacks(maelstrom_weapon_buff) == 5 and Glyph(glyph_of_chain_lightning) and Enemies() < 3 Spell(lightning_bolt)
 			#stormstrike,target=1,if=!debuff.stormstrike.up
-			if not target.DebuffPresent(stormstrike_debuff any=1) Spell(stormstrike)
+			if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike)
 			#stormstrike,target=2,if=!debuff.stormstrike.up
-			if not target.DebuffPresent(stormstrike_debuff any=1) Spell(stormstrike text=other)
+			if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike text=other)
 			#stormstrike,target=3,if=!debuff.stormstrike.up
-			if not target.DebuffPresent(stormstrike_debuff any=1) Spell(stormstrike text=3)
+			if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike text=3)
 			#stormstrike
 			Spell(stormstrike)
 			#lava_lash
@@ -330,6 +330,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # storm_elemental_totem
 # storm_elemental_totem_talent
 # stormstrike
+# stormstrike_debuff
 # unleash_elements
 # unleash_flame_buff
 # unleashed_fury_talent

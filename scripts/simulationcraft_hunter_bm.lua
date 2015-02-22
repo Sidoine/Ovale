@@ -230,6 +230,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # counter_shot
 # dire_beast
 # draenic_agility_potion
+# exotic_munitions_buff
 # explosive_trap
 # focus_fire
 # focus_fire_buff

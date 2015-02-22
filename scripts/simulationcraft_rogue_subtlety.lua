@@ -76,7 +76,7 @@ AddFunction SubtletyDefaultMainActions
 		{
 			#pool_resource,for_next=1,extra_amount=50
 			#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.remains<2|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))
-			unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+			unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 			{
 				#pool_resource,for_next=1,extra_amount=50
 				#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&(combo_points<4|(talent.anticipation.enabled&combo_points+anticipation_charges<9))&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.remains<2
@@ -95,7 +95,7 @@ AddFunction SubtletyDefaultMainActions
 							unless Talent(subterfuge_talent) and True(pool_energy 90) and { ComboPoints() < 4 or Talent(anticipation_talent) and ComboPoints() + BuffStacks(anticipation_buff) < 9 } and BuffExpires(shadow_dance_buff) and BuffExpires(master_of_subtlety_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(90)
 							{
 								#run_action_list,name=finisher,if=combo_points=5&(buff.vanish.down|!talent.shadow_focus.enabled)
-								if ComboPoints() == 5 and { BuffExpires(vanish_buff any=1) or not Talent(shadow_focus_talent) } SubtletyFinisherMainActions()
+								if ComboPoints() == 5 and { BuffExpires(vanish_buff) or not Talent(shadow_focus_talent) } SubtletyFinisherMainActions()
 								#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
 								if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorMainActions()
 							}
@@ -120,8 +120,8 @@ AddFunction SubtletyDefaultShortCdActions
 		{
 			#pool_resource,for_next=1,extra_amount=50
 			#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.remains<2|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))
-			if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } Spell(shadow_dance)
-			unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+			if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } Spell(shadow_dance)
+			unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 			{
 				#pool_resource,for_next=1,extra_amount=50
 				#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&(combo_points<4|(talent.anticipation.enabled&combo_points+anticipation_charges<9))&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.remains<2
@@ -177,7 +177,7 @@ AddFunction SubtletyDefaultCdActions
 		{
 			#pool_resource,for_next=1,extra_amount=50
 			#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.remains<2|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))
-			unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+			unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 			{
 				#pool_resource,for_next=1,extra_amount=50
 				#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&(combo_points<4|(talent.anticipation.enabled&combo_points+anticipation_charges<9))&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.remains<2
@@ -198,9 +198,9 @@ AddFunction SubtletyDefaultCdActions
 							unless Talent(subterfuge_talent) and True(pool_energy 90) and { ComboPoints() < 4 or Talent(anticipation_talent) and ComboPoints() + BuffStacks(anticipation_buff) < 9 } and BuffExpires(shadow_dance_buff) and BuffExpires(master_of_subtlety_buff) and target.DebuffRemaining(find_weakness_debuff) < 2 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(90)
 							{
 								#run_action_list,name=finisher,if=combo_points=5&(buff.vanish.down|!talent.shadow_focus.enabled)
-								if ComboPoints() == 5 and { BuffExpires(vanish_buff any=1) or not Talent(shadow_focus_talent) } SubtletyFinisherCdActions()
+								if ComboPoints() == 5 and { BuffExpires(vanish_buff) or not Talent(shadow_focus_talent) } SubtletyFinisherCdActions()
 
-								unless ComboPoints() == 5 and { BuffExpires(vanish_buff any=1) or not Talent(shadow_focus_talent) } and SubtletyFinisherCdPostConditions()
+								unless ComboPoints() == 5 and { BuffExpires(vanish_buff) or not Talent(shadow_focus_talent) } and SubtletyFinisherCdPostConditions()
 								{
 									#run_action_list,name=generator,if=combo_points<4|(combo_points=4&cooldown.honor_among_thieves.remains>1&energy>70-energy.regen)|(talent.anticipation.enabled&anticipation_charges<4)
 									if ComboPoints() < 4 or ComboPoints() == 4 and BuffRemaining(honor_among_thieves_cooldown_buff) > 1 and Energy() > 70 - EnergyRegenRate() or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 SubtletyGeneratorCdActions()
@@ -296,7 +296,7 @@ AddFunction SubtletyGeneratorCdPostConditions
 AddFunction SubtletyPoolCdActions
 {
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
-	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 60 Spell(preparation)
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
 }
 
 ### actions.precombat
@@ -424,6 +424,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # honor_among_thieves_cooldown_buff
 # kick
 # kidney_shot
+# lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent
 # master_of_subtlety_buff
@@ -447,6 +448,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # subterfuge_buff
 # subterfuge_talent
 # vanish
+# vanish_buff
 ]]
 	OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
 end

@@ -118,7 +118,7 @@ AddFunction AssassinationDefaultCdActions
 	#kick
 	AssassinationInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
-	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 60 Spell(preparation)
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
 	#use_item,slot=trinket2,if=active_enemies>1|(debuff.vendetta.up&active_enemies=1)
 	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
 	#blood_fury
@@ -253,6 +253,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # fan_of_knives
 # kick
 # kidney_shot
+# lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent
 # mutilate
@@ -268,6 +269,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # slice_and_dice_buff
 # stealth
 # vanish
+# vanish_buff
 # vendetta
 # vendetta_debuff
 ]]

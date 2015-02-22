@@ -508,6 +508,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # pillar_of_frost_buff
 # plague_leech
 # plague_strike
+# potion_strength_buff
 # quaking_palm
 # rime_buff
 # soul_reaper_frost

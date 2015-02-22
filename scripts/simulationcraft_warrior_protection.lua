@@ -349,6 +349,7 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # impending_victory_talent
 # last_stand
 # last_stand_buff
+# potion_armor_buff
 # pummel
 # quaking_palm
 # ravager

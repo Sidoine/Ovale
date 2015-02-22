@@ -942,7 +942,7 @@ end
 local function AddSymbol(annotation, symbol)
 	local symbolTable = annotation.symbolTable or {}
 	-- Add the symbol to the table if it's not already present and it's not a globally-defined spell list name.
-	if not symbolTable[symbol] and not OvaleData.buffSpellList[symbol] then
+	if not symbolTable[symbol] and not OvaleData.DEFAULT_SPELL_LIST[symbol] then
 		symbolTable[symbol] = true
 		symbolTable[#symbolTable + 1] = symbol
 	end
@@ -2593,7 +2593,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 		local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
 		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
 		local prefix = strfind(buffName, "_buff$") and "Buff" or "Debuff"
-		local any = OvaleData.buffSpellList[buffName] and " any=1" or ""
+		local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
 		target = target and (target .. ".") or ""
 
 		-- Unholy death knight's Dark Transformation applies the buff to the ghoul/pet.

@@ -304,6 +304,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # counter_shot
 # dire_beast
 # draenic_agility_potion
+# exotic_munitions_buff
 # explosive_shot
 # explosive_trap
 # explosive_trap_debuff
@@ -317,6 +318,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # lone_wolf_talent
 # multishot
 # poisoned_ammo
+# potion_agility_buff
 # powershot
 # pre_steady_focus_buff
 # quaking_palm

@@ -69,7 +69,7 @@ AddFunction FeralDefaultMainActions
 	#healing_touch,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&(combo_points>=4|buff.predatory_swiftness.remains<1.5)
 	if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 4 or BuffRemaining(predatory_swiftness_buff) < 1.5 } Spell(healing_touch)
 	#savage_roar,if=buff.savage_roar.down
-	if BuffExpires(savage_roar_buff any=1) Spell(savage_roar)
+	if BuffExpires(savage_roar_buff) Spell(savage_roar)
 	#pool_resource,for_next=1
 	#thrash_cat,cycle_targets=1,if=remains<4.5&(active_enemies>=2&set_bonus.tier17_2pc|active_enemies>=4)
 	if target.DebuffRemaining(thrash_cat_debuff) < 4.5 and { Enemies() >= 2 and ArmorSetBonus(T17 2) or Enemies() >= 4 } Spell(thrash_cat)
@@ -78,7 +78,7 @@ AddFunction FeralDefaultMainActions
 		#call_action_list,name=finisher,if=combo_points=5
 		if ComboPoints() == 5 FeralFinisherMainActions()
 		#savage_roar,if=buff.savage_roar.remains<gcd
-		if BuffRemaining(savage_roar_buff any=1) < GCD() Spell(savage_roar)
+		if BuffRemaining(savage_roar_buff) < GCD() Spell(savage_roar)
 		#call_action_list,name=maintain,if=combo_points<5
 		if ComboPoints() < 5 FeralMaintainMainActions()
 		#pool_resource,for_next=1
@@ -153,7 +153,7 @@ AddFunction FeralFinisherMainActions
 	#rip,cycle_targets=1,if=remains<2&target.time_to_die-remains>18
 	if target.DebuffRemaining(rip_debuff) < 2 and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 Spell(rip)
 	#savage_roar,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)&buff.savage_roar.remains<12.6
-	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff any=1) < 12.6 Spell(savage_roar)
+	if { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 Spell(savage_roar)
 	#ferocious_bite,max_energy=1,if=(energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3)
 	if Energy() >= EnergyCost(ferocious_bite max=1) and { TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } Spell(ferocious_bite)
 }
@@ -302,6 +302,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # rip
 # rip_debuff
 # savage_roar
+# savage_roar_buff
 # shadowmeld
 # shadowmeld_buff
 # shred

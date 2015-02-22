@@ -89,11 +89,11 @@ AddFunction SubtletyDefaultMainActions
 					{
 						#pool_resource,for_next=1,extra_amount=50
 						#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&set_bonus.tier17_2pc
-						unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+						unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 						{
 							#pool_resource,for_next=1,extra_amount=100
 							#shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
-							unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
+							unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
 							{
 								#pool_resource,for_next=1,extra_amount=50
 								#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -153,13 +153,13 @@ AddFunction SubtletyDefaultShortCdActions
 							SubtletyGetInMeleeRange()
 							#pool_resource,for_next=1,extra_amount=50
 							#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&set_bonus.tier17_2pc
-							if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) Spell(shadow_dance)
-							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+							if Energy() >= 50 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) Spell(shadow_dance)
+							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 							{
 								#pool_resource,for_next=1,extra_amount=100
 								#shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
-								if Energy() >= 100 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) Spell(shadow_dance)
-								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
+								if Energy() >= 100 and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) Spell(shadow_dance)
+								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
 								{
 									#pool_resource,for_next=1,extra_amount=50
 									#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -231,11 +231,11 @@ AddFunction SubtletyDefaultCdActions
 						{
 							#pool_resource,for_next=1,extra_amount=50
 							#shadow_dance,if=energy>=50&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&set_bonus.tier17_2pc
-							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
+							unless { True(pool_energy 50) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(50)
 							{
 								#pool_resource,for_next=1,extra_amount=100
 								#shadow_dance,if=energy>=100&buff.stealth.down&buff.vanish.down&debuff.find_weakness.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))&!set_bonus.tier17_2pc
-								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff any=1) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
+								unless { True(pool_energy 100) and BuffExpires(stealthed_buff any=1) and BuffExpires(vanish_buff) and target.DebuffExpires(find_weakness_debuff) or BuffPresent(burst_haste_buff any=1) and { target.DebuffPresent(hemorrhage_debuff) or target.DebuffPresent(garrote_debuff) or target.DebuffPresent(rupture_debuff) } and not ArmorSetBonus(T17 2) } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergy(100)
 								{
 									#pool_resource,for_next=1,extra_amount=50
 									#vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<=3&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -365,7 +365,7 @@ AddFunction SubtletyGeneratorCdPostConditions
 AddFunction SubtletyPoolCdActions
 {
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
-	if not BuffPresent(vanish_buff any=1) and SpellCooldown(vanish) > 60 Spell(preparation)
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
 }
 
 ### actions.precombat
@@ -480,6 +480,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # honor_among_thieves_cooldown_buff
 # kick
 # kidney_shot
+# lethal_poison_buff
 # marked_for_death
 # master_of_subtlety_buff
 # premeditation
@@ -501,6 +502,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # subterfuge_buff
 # subterfuge_talent
 # vanish
+# vanish_buff
 ]]
 	OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
 end

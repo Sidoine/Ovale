@@ -411,6 +411,7 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 # outbreak
 # plague_leech
 # plague_strike
+# potion_armor_buff
 # quaking_palm
 # rune_tap
 # runic_corruption_talent
