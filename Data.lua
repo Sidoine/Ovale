@@ -240,18 +240,24 @@ do
 	end
 end
 
+-- Create table of default spell lists.
+OvaleData.DEFAULT_SPELL_LIST = {}
+do
+	for name in pairs(OvaleData.buffSpellList) do
+		OvaleData.DEFAULT_SPELL_LIST[name] = true
+	end
+end
+
 -- Unused public property to suppress lint warnings.
 --OvaleData.defaultTarget = nil
 --</public-static-properties>
-
---<private-static-methods>
---</private-static-methods>
 
 --<public-static-methods>
 function OvaleData:OnInitialize()
 	-- Resolve module dependencies.
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleState = Ovale.OvaleState
+
 end
 
 function OvaleData:OnEnable()
@@ -273,9 +279,13 @@ end
 function OvaleData:Reset()
 	wipe(self.itemInfo)
 	wipe(self.spellInfo)
-	-- Clear all trinket lists.
 	for k, v in pairs(self.buffSpellList) do
-		if strfind(k, "^trinket_") then
+		if not self.DEFAULT_SPELL_LIST[k] then
+			-- Remove all non-default spell lists.
+			wipe(v)
+			self.buffSpellList[k] = nil
+		elseif strfind(k, "^trinket_") then
+			-- Clear all trinket lists.
 			wipe(v)
 		end
 	end
