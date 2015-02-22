@@ -1748,6 +1748,17 @@ do
 end
 
 do
+	local function EclipseEnergy(positionalParams, namedParams, state, atTime)
+		local seconds, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = 0
+		Ovale:OneTimeMessage("Warning: 'EclipseEnergy()' is not implemented.")
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("eclipseenergy", false, EclipseEnergy)
+end
+
+do
 	--- Get the number of hostile enemies on the battlefield.
 	-- The minimum value returned is 1.
 	-- @name Enemies
@@ -5382,6 +5393,17 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("timetobloodlust", false, TimeToBloodlust)
+end
+
+do
+	local function TimeToEclipse(positionalParams, namedParams, state, atTime)
+		local seconds, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = 3600 * 24 * 7
+		Ovale:OneTimeMessage("Warning: 'TimeToEclipse()' is not implemented.")
+		return TestValue(0, INFINITY, value, atTime, -1, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("timetoeclipse", false, TimeToEclipse)
 end
 
 do
