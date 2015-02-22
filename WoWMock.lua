@@ -541,6 +541,15 @@ WoWMock.NUM_TALENT_COLUMNS = 3
 WoWMock.debugprofilestop = ZeroFunction
 
 --[[--------------------------------------------------------------------
+	strjoin() is a non-standard Lua function that joins a list of
+	strings together using the given separator.
+--]]--------------------------------------------------------------------
+WoWMock.strjoin = function(sep, ...)
+	local t = { ... }
+	return table.concat(t, sep)
+end
+
+--[[--------------------------------------------------------------------
 	strsplit() is a non-standard Lua function that splits a string and
 	returns multiple return values for each substring delimited by the
 	named delimiter character.
