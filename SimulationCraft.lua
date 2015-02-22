@@ -22,6 +22,7 @@ local OvaleData = nil
 local OvaleHonorAmongThieves = nil
 local OvaleLexer = nil
 local OvalePower = nil
+local OvaleScripts = nil
 
 local format = string.format
 local gmatch = string.gmatch
@@ -46,6 +47,10 @@ local type = type
 local wipe = wipe
 local yield = coroutine.yield
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local API_UnitClass = UnitClass
+
+-- Player's class.
+local _, self_class = API_UnitClass("player")
 
 -- Keywords for SimulationCraft action lists.
 local KEYWORD = {}
@@ -258,6 +263,17 @@ do
 	for i, tag in pairs(OVALE_TAGS) do
 		OVALE_TAG_PRIORITY[tag] = i * 10
 	end
+end
+
+do
+	local defaultDB = {
+		overrideCode = "",
+	}
+	-- Insert defaults into OvaleOptions.
+	for k, v in pairs(defaultDB) do
+		OvaleOptions.defaultDB.profile[k] = v
+	end
+	OvaleOptions:RegisterOptions(OvaleSimulationCraft)
 end
 --</private-static-properties>
 
@@ -4483,6 +4499,7 @@ function OvaleSimulationCraft:OnInitialize()
 	OvaleHonorAmongThieves = Ovale.OvaleHonorAmongThieves
 	OvaleLexer = Ovale.OvaleLexer
 	OvalePower = Ovale.OvalePower
+	OvaleScripts = Ovale.OvaleScripts
 
 	InitializeDisambiguation()
 	self:CreateOptions()
@@ -4670,8 +4687,9 @@ function OvaleSimulationCraft:EmitAST(profile)
 				Include(ovale_trinkets_mop)
 				Include(ovale_trinkets_wod)
 				Include(ovale_%s_spells)
+				%s
 			]]
-			local dictionaryCode = format(dictionaryFormat, strlower(annotation.class))
+			local dictionaryCode = format(dictionaryFormat, strlower(annotation.class), Ovale.db.profile.overrideCode)
 			dictionaryAST = OvaleAST:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
 			if dictionaryAST then
 				dictionaryAST.annotation = dictionaryAnnotation
@@ -4851,6 +4869,13 @@ function OvaleSimulationCraft:Emit(profile, noFinalNewLine)
 		output[#output + 1] = "Include(ovale_trinkets_mop)"
 		output[#output + 1] = "Include(ovale_trinkets_wod)"
 		output[#output + 1] = format("Include(ovale_%s_spells)", lowerclass)
+		-- Insert local class override code if it exists.
+		local overrideCode = Ovale.db.profile.overrideCode
+		if overrideCode ~= "" then
+			output[#output + 1] = ""
+			output[#output + 1] = "# Overrides."
+			output[#output + 1] = overrideCode
+		end
 		-- Insert an extra blank line to separate section for controls from the includes.
 		if annotation.supportingDefineCount + annotation.supportingControlCount > 0 then
 			output[#output + 1] = ""
@@ -4883,6 +4908,7 @@ function OvaleSimulationCraft:CreateOptions()
 		type = "group",
 		args = {
 			input = {
+				order = 10,
 				name = L["Input"],
 				type = "group",
 				args = {
@@ -4906,7 +4932,39 @@ function OvaleSimulationCraft:CreateOptions()
 					},
 				},
 			},
+			overrides = {
+				order = 20,
+				name = L["Overrides"],
+				type = "group",
+				args = {
+					overrides = {
+						name = L["Overrides"],
+						desc = L["Script code inserted after Include() statements."],
+						type = "input",
+						multiline = 25,
+						width = "full",
+						get = function(info)
+							local code = Ovale.db.profile.overrideCode
+							-- Substitute spaces for tabs.
+							return gsub(code, "\t", "    ")
+						end,
+						set = function(info, value)
+							Ovale.db.profile.overrideCode = value
+							if self_lastSimC then
+								local profile = self:ParseProfile(self_lastSimC)
+								local code = ""
+								if profile then
+									code = self:Emit(profile)
+								end
+								-- Substitute spaces for tabs.
+								self_lastScript = gsub(code, "\t", "    ")
+							end
+						end,
+					},
+				},
+			},
 			output = {
+				order = 30,
 				name = L["Output"],
 				type = "group",
 				args = {
