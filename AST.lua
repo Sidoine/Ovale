@@ -1523,7 +1523,7 @@ ParseInclude = function(tokenStream, nodeList, annotation)
 		end
 	end
 	-- Get the code associated with the script name.
-	local code = OvaleScripts.script[name] and OvaleScripts.script[name].code
+	local code = OvaleScripts:GetScript(name)
 	if not code then
 		OvaleAST:Error("Script '%s' not found when parsing INCLUDE.", name)
 		ok = false
@@ -2488,7 +2488,7 @@ end
 
 function OvaleAST:ParseScript(name, options)
 	-- Get the code associated with the script name.
-	local code = OvaleScripts.script[name] and OvaleScripts.script[name].code
+	local code = OvaleScripts:GetScript(name)
 	local ast
 	if code then
 		options = options or { optimize = true, verify = true }

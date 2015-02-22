@@ -22,6 +22,10 @@ local API_UnitClass = UnitClass
 -- Player's class.
 local _, self_class = API_UnitClass("player")
 
+-- Name and description of "custom" script.
+local CUSTOM_NAME = "custom"
+local CUSTOM_DESCRIPTION = L["Script personnalisé"]
+
 do
 	local defaultDB = {
 		code = "",
@@ -60,7 +64,7 @@ OvaleScripts.script = {}
 function OvaleScripts:OnInitialize()
 	self:CreateOptions()
 	-- Register the custom script.
-	self:RegisterScript(self_class, "custom", L["Script personnalisé"], Ovale.db.profile.code)
+	self:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code)
 	-- Register an empty script called "Disabled" that can be used to show no icons.
 	self:RegisterScript(nil, "Disabled", "Disabled", "", "script")
 end
@@ -98,6 +102,12 @@ function OvaleScripts:SetScript(name)
 	end
 end
 
+function OvaleScripts:GetScript(name)
+	if name and self.script[name] then
+		return self.script[name].code
+	end
+end
+
 function OvaleScripts:CreateOptions()
 	local options = {
 		name = OVALE .. " " .. L["Script"],
@@ -126,19 +136,16 @@ function OvaleScripts:CreateOptions()
 				name = L["Script"],
 				width = "full",
 				disabled = function()
-					return Ovale.db.profile.source ~= "custom"
+					return Ovale.db.profile.source ~= CUSTOM_NAME
 				end,
 				get = function(info)
-					local source = Ovale.db.profile.source
-					local code = ""
-					if source and OvaleScripts.script[source] then
-						code = OvaleScripts.script[source].code
-					end
+					local code = OvaleScripts:GetScript(Ovale.db.profile.source)
+					code = code or ""
 					-- Substitute spaces for tabs.
 					return gsub(code, "\t", "    ")
 				end,
 				set = function(info, v)
-					OvaleScripts:RegisterScript(self_class, "custom", L["Script personnalisé"], v, "script")
+					OvaleScripts:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, v, "script")
 					Ovale.db.profile.code = v
 					self:SendMessage("Ovale_ScriptChanged")
 				end,
@@ -148,20 +155,16 @@ function OvaleScripts:CreateOptions()
 				type = "execute",
 				name = L["Copier sur Script personnalisé"],
 				disabled = function()
-					return Ovale.db.profile.source == "custom"
+					return Ovale.db.profile.source == CUSTOM_NAME
 				end,
 				confirm = function()
 					return L["Ecraser le Script personnalisé préexistant?"]
 				end,
 				func = function()
-					local source = Ovale.db.profile.source
-					local code = ""
-					if source and OvaleScripts.script[source] then
-						code = OvaleScripts.script[source].code
-					end
-					OvaleScripts.script["custom"].code = code
-					Ovale.db.profile.source = "custom"
-					Ovale.db.profile.code = code
+					local code = OvaleScripts:GetScript(Ovale.db.profile.source)
+					OvaleScripts:RegisterScript(self_class, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
+					Ovale.db.profile.source = CUSTOM_NAME
+					Ovale.db.profile.code = OvaleScripts:GetScript(CUSTOM_NAME)
 					self:SendMessage("Ovale_ScriptChanged")
 				end,
 			},
