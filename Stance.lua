@@ -196,9 +196,10 @@ do
 	end
 end
 
--- Return the current stance's name.
-function OvaleStance:GetStance()
-	return self.stanceList[self.stance]
+-- Return the name of the given stance or the current stance.
+function OvaleStance:GetStance(stanceId)
+	stanceId = stanceId or self.stance
+	return self.stanceList[stanceId]
 end
 
 -- Return true if the current stance matches the given name.
@@ -208,7 +209,7 @@ function OvaleStance:IsStance(name)
 		if type(name) == "number" then
 			return name == self.stance
 		else
-			return name == OvaleStance.stanceList[self.stance]
+			return name == OvaleStance:GetStance(self.stance)
 		end
 	end
 	return false
@@ -221,11 +222,12 @@ end
 
 function OvaleStance:ShapeshiftEventHandler()
 	self:StartProfiling("OvaleStance_ShapeshiftEventHandler")
+	local oldStance = self.stance
 	local newStance = API_GetShapeshiftForm()
-	if self.stance ~= newStance then
+	if oldStance ~= newStance then
 		self.stance = newStance
 		Ovale.refreshNeeded.player = true
-		self:SendMessage("Ovale_StanceChanged")
+		self:SendMessage("Ovale_StanceChanged", self:GetStance(newStance), self:GetStance(oldStance))
 	end
 	self:StopProfiling("OvaleStance_ShapeshiftEventHandler")
 end
