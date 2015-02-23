@@ -151,66 +151,6 @@ local function TracePrintf(spellId, ...)
 	end
 end
 
---[[
-	Return the spell-specific damage multiplier using the information from
-	SpellDamage{Buff,Debuff} declarations.  This doesn't include the base
-	damage multiplier of the character kept in snapshots.
-
-	auraObject is an object that provides the following two methods:
-
-		GetAura(unitId, auraId, filter, mine)
-		IsActiveAura(aura, atTime)
---]]
-local function GetDamageMultiplier(spellId, atTime, snapshot, auraObject)
-	auraObject = auraObject or OvaleAura
-	local damageMultiplier = 1
-	local si = OvaleData.spellInfo[spellId]
-	if si and si.aura and si.aura.damage then
-		for filter, auraList in pairs(si.aura.damage) do
-			for auraId, spellData in pairs(auraList) do
-				local index, multiplier
-				if type(spellData) == "table" then
-					-- Comma-separated value.
-					multiplier = spellData[1]
-					index = 2
-				else
-					multiplier = spellData
-				end
-				multiplier = tonumber(multiplier)
-				local verified
-				if index then
-					if auraObject.CheckRequirements then
-						verified = auraObject.CheckRequirements(auraObject, spellId, atTime, spellData, index, "player")
-					else
-						verified = OvaleData:CheckRequirements(spellId, atTime, spellData, index, "player")
-					end
-				else
-					verified = true
-				end
-				if verified then
-					local aura = auraObject:GetAura("player", auraId, filter)
-					if auraObject:IsActiveAura(aura, atTime) then
-						local siAura = OvaleData.spellInfo[auraId]
-						-- If an aura does stacking damage, then it needs to set stacking=1.
-						if siAura and siAura.stacking and siAura.stacking > 0 then
-							multiplier = 1 + (multiplier - 1) * aura.stacks
-						end
-						damageMultiplier = damageMultiplier * multiplier
-					end
-				end
-			end
-		end
-	end
-	-- Factor in additional damage multipliers that are registered with this module.
-	for tbl in pairs(self_updateSpellcastInfo) do
-		if tbl.GetDamageMultiplier then
-			local multiplier = tbl.GetDamageMultiplier(spellId, atTime, snapshot, auraObject)
-			damageMultiplier = damageMultiplier * multiplier
-		end
-	end
-	return damageMultiplier
-end
-
 local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, allowRemove)
 	OvaleFuture:StartProfiling("OvaleFuture_QueueSpellcast")
 	local self = OvaleFuture
@@ -237,7 +177,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 	OvalePaperDoll:UpdateSnapshot(spellcast, true)
 
 	local atTime = channeled and startTime or endTime
-	spellcast.damageMultiplier = GetDamageMultiplier(spellId, atTime, spellcast)
+	spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, atTime, spellcast)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -349,7 +289,7 @@ local function UpdateLastSpellcast(spellcast)
 		if self_timeAuraAdded then
 			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
 				OvalePaperDoll:UpdateSnapshot(spellcast, true)
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast)
+				spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
 					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshotTime)
 			end
@@ -533,7 +473,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				-- Take a more recent snapshot of the player stats for this cast-time spell.
 				OvalePaperDoll:UpdateSnapshot(spellcast, true)
 				local now = API_GetTime()
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId, now, spellcast)
+				spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, now, spellcast)
 				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
 				Ovale.refreshNeeded.player = true
 				self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
@@ -699,6 +639,77 @@ function OvaleFuture:InFlight(spellId)
 	return false
 end
 
+--[[
+	Return the spell-specific damage multiplier using the information from
+	SpellDamage{Buff,Debuff} declarations.  This doesn't include the base
+	damage multiplier of the character kept in snapshots.
+
+	NOTE: Mirrored in statePrototype below.
+--]]
+function OvaleFuture:GetDamageMultiplier(spellId, atTime, snapshot)
+	atTime = atTime or self["currentTime"] or API_GetTime()
+	if not snapshot then
+		if self["snapshotTime"] then
+			snapshot = self
+		else
+			snapshot = OvalePaperDoll
+		end
+	end
+	local damageMultiplier = 1
+	local si = OvaleData.spellInfo[spellId]
+	if si and si.aura and si.aura.damage then
+		for filter, auraList in pairs(si.aura.damage) do
+			for auraId, spellData in pairs(auraList) do
+				local index, multiplier
+				if type(spellData) == "table" then
+					-- Comma-separated value.
+					multiplier = spellData[1]
+					index = 2
+				else
+					multiplier = spellData
+				end
+				multiplier = tonumber(multiplier)
+				local verified
+				if index then
+					if self.CheckRequirements then
+						verified = self.CheckRequirements(self, spellId, atTime, spellData, index, "player")
+					else
+						verified = OvaleData:CheckRequirements(spellId, atTime, spellData, index, "player")
+					end
+				else
+					verified = true
+				end
+				if verified then
+					local aura, isActiveAura
+					if self.GetAura and self.IsActiveAura then
+						aura = self.GetAura(self, "player", auraId, filter)
+						isActiveAura = self.IsActiveAura(self, aura, atTime)
+					else
+						aura = OvaleAura:GetAura("player", auraId, filter)
+						isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
+					end
+					if isActiveAura then
+						local siAura = OvaleData.spellInfo[auraId]
+						-- If an aura does stacking damage, then it needs to set stacking=1.
+						if siAura and siAura.stacking and siAura.stacking > 0 then
+							multiplier = 1 + (multiplier - 1) * aura.stacks
+						end
+						damageMultiplier = damageMultiplier * multiplier
+					end
+				end
+			end
+		end
+	end
+	-- Factor in additional damage multipliers that are registered with this module.
+	for tbl in pairs(self_updateSpellcastInfo) do
+		if tbl.GetDamageMultiplier then
+			local multiplier = tbl.GetDamageMultiplier(self, spellId, atTime, snapshot)
+			damageMultiplier = damageMultiplier * multiplier
+		end
+	end
+	return damageMultiplier
+end
+
 function OvaleFuture:RegisterSpellcastInfo(functionTable)
 	self_updateSpellcastInfo[functionTable] = true
 end
@@ -856,11 +867,6 @@ statePrototype.GetCounterValue = function(state, id)
 	return state.counter[id] or 0
 end
 
-statePrototype.GetDamageMultiplier = function(state, spellId, atTime)
-	atTime = atTime or state.currentTime
-	return GetDamageMultiplier(spellId, atTime, state, state)
-end
-
 statePrototype.TimeOfLastCast = function(state, spellId)
 	return state.lastCast[spellId] or OvaleFuture.lastCastTime[spellId] or 0
 end
@@ -957,4 +963,7 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 	end
 	OvaleFuture:StopProfiling("OvaleFuture_state_ApplySpell")
 end
+
+-- Mirrored methods.
+statePrototype.GetDamageMultiplier = OvaleFuture.GetDamageMultiplier
 --</state-methods>
