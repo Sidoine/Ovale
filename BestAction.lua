@@ -9,6 +9,7 @@ local OvaleBestAction = Ovale:NewModule("OvaleBestAction", "AceEvent-3.0")
 Ovale.OvaleBestAction = OvaleBestAction
 
 --<private-static-properties>
+local OvaleDebug = Ovale.OvaleDebug
 local OvalePool = Ovale.OvalePool
 local OvaleProfiler = Ovale.OvaleProfiler
 local OvaleTimeSpan = Ovale.OvaleTimeSpan
@@ -58,6 +59,8 @@ local API_IsItemInRange = IsItemInRange
 local API_IsUsableAction = IsUsableAction
 local API_IsUsableItem = IsUsableItem
 
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleBestAction)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleBestAction)
 
@@ -388,7 +391,7 @@ function OvaleBestAction:GetAction(node, state, atTime)
 		while element and element.type == "state" do
 			loopCount = loopCount + 1
 			if loopCount >= 10 then
-				self:Error("Found too many SetState() actions -- probably an infinite loop in script.")
+				self:Debug("Found too many SetState() actions -- probably an infinite loop in script.")
 				break
 			end
 			-- Set the state in the simulator.
@@ -1131,11 +1134,6 @@ function OvaleBestAction:ComputeWait(element, state, atTime)
 	end
 	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, priorityA, elementA
-end
-
-function OvaleBestAction:Debug()
-	self_timeSpanPool:Debug()
-	self_valuePool:Debug()
 end
 --</public-static-methods>
 
