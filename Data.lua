@@ -548,15 +548,8 @@ function OvaleData:GetTickLength(auraId, snapshot)
 	local si = OvaleData.spellInfo[auraId]
 	if si then
 		tick = si.tick or tick
-		local hasteMultiplier = 1
-		if si.haste then
-			if si.haste == "spell" then
-				hasteMultiplier = OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
-			elseif si.haste == "melee" then
-				hasteMultiplier = OvalePaperDoll:GetMeleeHasteMultiplier(snapshot)
-			end
-			tick = tick / hasteMultiplier
-		end
+		local hasteMultiplier = OvalePaperDoll:GetHasteMultiplier(si.haste, snapshot)
+		tick = tick / hasteMultiplier
 	end
 	return tick
 end

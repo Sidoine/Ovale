@@ -62,14 +62,6 @@ OvaleProfiler:RegisterProfiling(OvaleAura)
 local self_guid = nil
 -- Table pool.
 local self_pool = OvalePool("OvaleAura_pool")
-do
-	self_pool.Clean = function(self, aura)
-		-- Release reference-counted snapshot before wiping.
-		if aura.snapshot then
-			OvalePaperDoll:ReleaseSnapshot(aura.snapshot)
-		end
-	end
-end
 
 -- Some auras have a nil caster, so treat those as having a GUID of zero for indexing purposes.
 local UNKNOWN_GUID = 0
@@ -608,10 +600,10 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				end
 				if keepSnapshot then
 					self:Debug("    Keeping snapshot stats for %s %s (%d) on %s refreshed by %s (%d) from %f, now=%f, aura.serial=%d",
-						filter, name, auraId, guid, spellName, spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
+						filter, name, auraId, guid, spellName, spellId, aura.snapshotTime, atTime, aura.serial)
 				else
 					self:Debug("    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
-						filter, name, auraId, guid, spellName, spellId, spellcast.snapshot.snapshotTime, atTime, aura.serial)
+						filter, name, auraId, guid, spellName, spellId, spellcast.snapshotTime, atTime, aura.serial)
 					-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
 					OvaleFuture:UpdateFromSpellcast(aura, spellcast)
 				end
@@ -626,7 +618,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 					if not auraIsActive then
 						aura.baseTick = si.tick
 						if spellcast and spellcast.target == guid then
-							aura.tick = OvaleData:GetTickLength(auraId, spellcast.snapshot)
+							aura.tick = OvaleData:GetTickLength(auraId, spellcast)
 						else
 							aura.tick = OvaleData:GetTickLength(auraId)
 						end
@@ -1278,9 +1270,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						for k, v in pairs(auraFound) do
 							aura[k] = v
 						end
-						if auraFound.snapshot then
-							aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
-						end
+						state:UpdateSnapshot(aura, auraFound)
 						-- Reset the aura age relative to the state of the simulator.
 						aura.serial = state.serial
 						state:Log("Aura %d is copied into simulator.", auraId)
@@ -1388,8 +1378,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						-- If "tick" is set explicitly in SpellInfo, then this is a known periodic aura.
 						if si and si.tick then
 							aura.baseTick = si.tick
-							local snapshot = spellcast and spellcast.snapshot
-							aura.tick = OvaleData:GetTickLength(auraId, snapshot)
+							aura.tick = OvaleData:GetTickLength(auraId, spellcast)
 						end
 						aura.ending = aura.start + aura.duration
 						aura.gain = aura.start
@@ -1452,9 +1441,7 @@ statePrototype.AddAuraToGUID = function(state, guid, auraId, casterGUID, filter,
 	aura.stacks = 1
 	aura.debuffType = debuffType
 	aura.enrage = (debuffType == "Enrage") or nil
-	if snapshot then
-		aura.snapshot = OvalePaperDoll:GetSnapshot(snapshot)
-	end
+	state:UpdateSnapshot(aura, snapshot)
 	PutAura(state.aura, guid, auraId, casterGUID, aura)
 	return aura
 end
@@ -1473,9 +1460,7 @@ statePrototype.RemoveAuraOnGUID = function(state, guid, auraId, filter, mine, at
 			for k, v in pairs(auraFound) do
 				aura[k] = v
 			end
-			if auraFound.snapshot then
-				aura.snapshot = OvalePaperDoll:GetSnapshot(auraFound.snapshot)
-			end
+			state:UpdateSnapshot(aura, auraFound)
 			-- Reset the aura age relative to the state of the simulator.
 			aura.serial = state.serial
 		end

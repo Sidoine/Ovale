@@ -53,14 +53,6 @@ local self_activeSpellcast = {}
 local self_lastSpellcast = {}
 
 local self_pool = OvalePool("OvaleFuture_pool")
-do
-	self_pool.Clean = function(self, spellcast)
-		-- Release reference-counted snapshot before wiping.
-		if spellcast.snapshot then
-			OvalePaperDoll:ReleaseSnapshot(spellcast.snapshot)
-		end
-	end
-end
 
 -- Used to track the most recent spellcast started with UNIT_SPELLCAST_SENT.
 local self_lastLineID = nil
@@ -242,10 +234,10 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 		spellName, spellId, lineId, startTime, endTime, spellcast.target, target)
 
 	-- Snapshot the current stats for the spellcast.
-	spellcast.snapshot = OvalePaperDoll:GetSnapshot()
+	OvalePaperDoll:UpdateSnapshot(spellcast, true)
 
 	local atTime = channeled and startTime or endTime
-	spellcast.damageMultiplier = GetDamageMultiplier(spellId, atTime, spellcast.snapshot)
+	spellcast.damageMultiplier = GetDamageMultiplier(spellId, atTime, spellcast)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -356,10 +348,10 @@ local function UpdateLastSpellcast(spellcast)
 		--]]
 		if self_timeAuraAdded then
 			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
-				OvalePaperDoll:UpdateSnapshot(spellcast.snapshot)
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast.snapshot)
+				OvalePaperDoll:UpdateSnapshot(spellcast, true)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
-					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshot.snapshotTime)
+					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshotTime)
 			end
 		end
 	end
@@ -539,12 +531,9 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 			if spellcast.lineId == lineId then
 				spellcast.allowRemove = true
 				-- Take a more recent snapshot of the player stats for this cast-time spell.
-				if spellcast.snapshot then
-					OvalePaperDoll:ReleaseSnapshot(spellcast.snapshot)
-				end
+				OvalePaperDoll:UpdateSnapshot(spellcast, true)
 				local now = API_GetTime()
-				spellcast.snapshot = OvalePaperDoll:GetSnapshot()
-				spellcast.damageMultiplier = GetDamageMultiplier(spellId, now, spellcast.snapshot)
+				spellcast.damageMultiplier = GetDamageMultiplier(spellId, now, spellcast)
 				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
 				Ovale.refreshNeeded.player = true
 				self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
@@ -682,12 +671,7 @@ end
 
 function OvaleFuture:UpdateFromSpellcast(dest, spellcast)
 	self:StartProfiling("OvaleFuture_UpdateFromSpellcast")
-	if dest.snapshot then
-		OvalePaperDoll:ReleaseSnapshot(dest.snapshot)
-	end
-	if spellcast.snapshot then
-		dest.snapshot = OvalePaperDoll:GetSnapshot(spellcast.snapshot)
-	end
+	OvalePaperDoll:UpdateSnapshot(dest, spellcast)
 	if spellcast.damageMultiplier then
 		dest.damageMultiplier = spellcast.damageMultiplier
 	end
@@ -702,11 +686,7 @@ end
 
 function OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
 	if self_lastSpellcast[guid] and self_lastSpellcast[guid][spellId] then
-		if OvalePaperDoll.SNAPSHOT_STATS[statName] then
-			return self_lastSpellcast[guid][spellId].snapshot[statName]
-		else
-			return self_lastSpellcast[guid][spellId][statName]
-		end
+		return self_lastSpellcast[guid][spellId][statName]
 	end
 end
 
@@ -878,7 +858,7 @@ end
 
 statePrototype.GetDamageMultiplier = function(state, spellId, atTime)
 	atTime = atTime or state.currentTime
-	return GetDamageMultiplier(spellId, atTime, state.snapshot, state)
+	return GetDamageMultiplier(spellId, atTime, state, state)
 end
 
 statePrototype.TimeOfLastCast = function(state, spellId)

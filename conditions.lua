@@ -415,7 +415,7 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
-			local baseDamageMultiplier = aura.snapshot and aura.snapshot.baseDamageMultiplier or 1
+			local baseDamageMultiplier = aura.baseDamageMultiplier or 1
 			local damageMultiplier = aura.damageMultiplier or 1
 			local value = baseDamageMultiplier * damageMultiplier
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
@@ -725,49 +725,11 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if state:IsActiveAura(aura, atTime) then
 			local gain, start, ending = aura.gain, aura.start, aura.ending
-			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
+			local value = aura[statName] or defaultValue
 			return TestValue(gain, ending, value, start, 0, comparator, limit)
 		end
 		return Compare(defaultValue, comparator, limit)
 	end
-
-	-- Return the value of the given critical strike chance from the aura snapshot at the time the aura was applied.
-	local function BuffSnapshotCritChance(statName, defaultValue, positionalParams, namedParams, state, atTime)
-		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
-		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura, atTime) then
-			local gain, start, ending = aura.gain, aura.start, aura.ending
-			local value = aura.snapshot and aura.snapshot[statName] or defaultValue
-			if namedParams.unlimited ~= 1 and value > 100 then
-				value = 100
-			end
-			return TestValue(gain, ending, value, start, 0, comparator, limit)
-		end
-		return Compare(defaultValue, comparator, limit)
-	end
-
-	--- Get the player's attack power at the time the given aura was applied on the target.
-	-- @name BuffAttackPower
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The attack power.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffAttackPower
-	-- @usage
-	-- if AttackPower() >target.DebuffAttackPower(rake) Spell(rake)
-
-	local function BuffAttackPower(positionalParams, namedParams, state, atTime)
-		return BuffSnapshot("attackPower", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffattackpower", false, BuffAttackPower)
-	OvaleCondition:RegisterCondition("debuffattackpower", false, BuffAttackPower)
 
 	--- Get the player's mastery effect at the time the given aura was applied on the target.
 	-- @name BuffMasteryEffect
@@ -793,127 +755,6 @@ do
 	OvaleCondition:RegisterCondition("debuffmastery", false, BuffMasteryEffect)
 	OvaleCondition:RegisterCondition("debuffmasteryeffect", false, BuffMasteryEffect)
 
-	--- Get the player's melee critical strike chance at the time the given aura was applied on the target.
-	-- @name BuffMeleeCritChance
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
-	--     Defaults to unlimited=0.
-	--     Valid values: 0, 1
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The critical strike chance.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffMeleeCritChance
-	-- @usage
-	-- if MeleeCritChance() >target.DebuffMeleeCritChance(rake) Spell(rake)
-
-	local function BuffMeleeCritChance(positionalParams, namedParams, state, atTime)
-		return BuffSnapshotCritChance("meleeCrit", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffmeleecritchance", false, BuffMeleeCritChance)
-	OvaleCondition:RegisterCondition("debuffmeleecritchance", false, BuffMeleeCritChance)
-
-	--- Get the player's multistrike chance at the time the given aura was applied on the target.
-	-- @name BuffMultistrikeChance
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The multistrike chance (in percent).
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffMultistrikeChance
-	-- @usage
-	-- if MultistrikeChance() >target.DebuffMultistrikeChance(rip) Spell(rip)
-
-	local function BuffMultistrikeChance(positionalParams, namedParams, state, atTime)
-		return BuffSnapshot("multistrike", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffmultistrikechance", false, BuffMultistrikeChance)
-	OvaleCondition:RegisterCondition("debuffmultistrikechance", false, BuffMultistrikeChance)
-
-	--- Get the player's ranged attack power at the time the given aura was applied on the target.
-	-- @name BuffRangedAttackPower
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The ranged attack power.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffRangedAttackPower
-	-- @usage
-	-- if RangedAttackPower() >target.DebuffRangedAttackPower(serpent_sting_dot)
-	--     Spell(serpent_sting)
-
-	local function BuffRangedAttackPower(positionalParams, namedParams, state, atTime)
-		return BuffSnapshot("rangedAttackPower", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffrangedattackpower", false, BuffRangedAttackPower)
-	OvaleCondition:RegisterCondition("debuffrangedattackpower", false, BuffRangedAttackPower)
-
-	--- Get the player's ranged critical strike chance at the time the given aura was applied on the target.
-	-- @name BuffRangedCritChance
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
-	--     Defaults to unlimited=0.
-	--     Valid values: 0, 1
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The critical strike chance.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffRangedCritChance
-	-- @usage
-	-- if RangedCritChance() >target.DebuffRangedCritChance(serpent_sting_dot)
-	--     Spell(serpent_sting)
-
-	local function BuffRangedCritChance(positionalParams, namedParams, state, atTime)
-		return BuffSnapshotCritChance("rangedCrit", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffrangedcritchance", false, BuffRangedCritChance)
-	OvaleCondition:RegisterCondition("debuffrangedcritchance", false, BuffRangedCritChance)
-
-	--- Get the player's spell critical strike chance at the time the given aura was applied on the target.
-	-- @name BuffSpellCritChance
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
-	--     Defaults to unlimited=0.
-	--     Valid values: 0, 1
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The critical strike chance.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffSpellCritChance
-	-- @usage
-	-- if SpellCritChance() >target.DebuffSpellCritChance(moonfire) Spell(moonfire)
-
-	local function BuffSpellCritChance(positionalParams, namedParams, state, atTime)
-		return BuffSnapshotCritChance("spellCrit", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffspellcritchance", false, BuffSpellCritChance)
-	OvaleCondition:RegisterCondition("debuffspellcritchance", false, BuffSpellCritChance)
-
 	--- Get the player's spell haste at the time the given aura was applied on the target.
 	-- @name BuffSpellHaste
 	-- @paramsig number or boolean
@@ -935,28 +776,6 @@ do
 
 	OvaleCondition:RegisterCondition("buffspellhaste", false, BuffSpellHaste)
 	OvaleCondition:RegisterCondition("debuffspellhaste", false, BuffSpellHaste)
-
-	--- Get the player's spellpower at the time the given aura was applied on the target.
-	-- @name BuffSpellpower
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The spellpower.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffSpellpower
-	-- @usage
-	-- if Spellpower() >target.DebuffSpellpower(moonfire) Spell(moonfire)
-
-	local function BuffSpellpower(positionalParams, namedParams, state, atTime)
-		return BuffSnapshot("spellBonusDamage", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffspellpower", false, BuffSpellpower)
-	OvaleCondition:RegisterCondition("debuffspellpower", false, BuffSpellpower)
 end
 
 do
@@ -1398,11 +1217,11 @@ do
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
 	local function GetDamage(spellId, atTime, state)
 		-- TODO: Use target's debuffs in this calculation.
-		local ap = state.snapshot.attackPower or 0
-		local sp = state.snapshot.spellBonusDamage or 0
-		local mh = state.snapshot.mainHandWeaponDamage or 0
-		local oh = state.snapshot.offHandWeaponDamage or 0
-		local bdm = state.snapshot.baseDamageMultiplier or 1
+		local ap = state.attackPower or 0
+		local sp = state.spellBonusDamage or 0
+		local mh = state.mainHandWeaponDamage or 0
+		local oh = state.offHandWeaponDamage or 0
+		local bdm = state.baseDamageMultiplier or 1
 		local dm = state:GetDamageMultiplier(spellId, atTime) or 1
 		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
@@ -1515,7 +1334,7 @@ do
 
 	local function DamageMultiplier(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local bdm = state.snapshot.baseDamageMultiplier
+		local bdm = state.baseDamageMultiplier
 		local dm = state:GetDamageMultiplier(spellId, atTime)
 		local value = bdm * dm
 		return Compare(value, comparator, limit)
@@ -2967,42 +2786,6 @@ do
 		return Compare(value, comparator, limit)
 	end
 
-	-- Return the value of the given critical strike chance from the aura snapshot at the time the aura was applied.
-	local function LastSnapshotCritChance(statName, defaultValue, positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state)
-		local guid = OvaleGUID:GetGUID(target)
-		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
-		value = value or defaultValue
-		if namedParams.unlimited ~= 1 and value > 100 then
-			value = 100
-		end
-		return Compare(value, comparator, limit)
-	end
-
-	--- Get the attack power of the player during the most recent cast of a spell on the target.
-	-- @name LastAttackPower
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous attack power.
-	-- @return A boolean value for the result of the comparison.
-	-- @see AttackPower
-	-- @usage
-	-- if {AttackPower() / target.LastAttackPower(hemorrhage)} >1.25
-	--     Spell(hemorrhage)
-
-	local function LastAttackPower(positionalParams, namedParams, state, atTime)
-		return LastSnapshot("attackPower", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastattackpower", false, LastAttackPower)
-	OvaleCondition:RegisterCondition("lastspellattackpower", false, LastAttackPower)
-
 	--- Get the mastery effect of the player during the most recent cast of a spell on the target.
 	-- Mastery effect is the effect of the player's mastery, typically a percent-increase to damage
 	-- or a percent-increase to chance to trigger some effect.
@@ -3028,129 +2811,6 @@ do
 	OvaleCondition:RegisterCondition("lastmastery", false, LastMasteryEffect)
 	OvaleCondition:RegisterCondition("lastmasteryeffect", false, LastMasteryEffect)
 	OvaleCondition:RegisterCondition("lastspellmastery", false, LastMasteryEffect)
-
-	--- Get the melee critical strike chance of the player during the most recent cast of a spell on the target.
-	-- @name LastMeleeCritChance
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
-	--     Defaults to unlimited=0.
-	--     Valid values: 0, 1
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous critical strike chance.
-	-- @return A boolean value for the result of the comparison.
-	-- @see MeleeCritChance
-	-- @usage
-	-- if MeleeCritChance() > target.LastMeleeCritChance(rip)
-	--     Spell(rip)
-
-	local function LastMeleeCritChance(positionalParams, namedParams, state, atTime)
-		return LastSnapshotCritChance("meleeCrit", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastmeleecritchance", false, LastMeleeCritChance)
-	OvaleCondition:RegisterCondition("lastspellmeleecritchance", false, LastMeleeCritChance)
-
-	--- Get the multistrike chance of the player during the most recent cast of a spell on the target.
-	-- @name LastMultistrikeEffect
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous multistrike chance (in percent).
-	-- @return A boolean value for the result of the comparison.
-	-- @see MultistrikeEffect
-	-- @usage
-	-- if MultistrikeChance(shadow_bolt) > LastMultistrikeChance(shadow_bolt)
-	--     Spell(metamorphosis)
-
-	local function LastMultistrikeChance(positionalParams, namedParams, state, atTime)
-		return LastSnapshot("multistrike", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastmultistrikechance", false, LastMultistrikeChance)
-
-	--- Get the ranged critical strike chance of the player during the most recent cast of a spell on the target.
-	-- @name LastRangedCritChance
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
-	--     Defaults to unlimited=0.
-	--     Valid values: 0, 1
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous critical strike chance.
-	-- @return A boolean value for the result of the comparison.
-	-- @see RangedCritChance
-	-- @usage
-	-- if RangedCritChance() > target.LastRangedCritChance(serpent_sting_dot)
-	--     Spell(serpent_sting)
-
-	local function LastRangedCritChance(positionalParams, namedParams, state, atTime)
-		return LastSnapshotCritChance("rangedCrit", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastrangedcritchance", false, LastRangedCritChance)
-	OvaleCondition:RegisterCondition("lastspellrangedcritchance", false, LastRangedCritChance)
-
-	--- Get the spell critical strike chance of the player during the most recent cast of a spell on the target.
-	-- @name LastSpellCritChance
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param unlimited Optional. Set unlimited=1 to allow critical strike chance to exceed 100%.
-	--     Defaults to unlimited=0.
-	--     Valid values: 0, 1
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous critical strike chance.
-	-- @return A boolean value for the result of the comparison.
-	-- @see SpellCritChance
-	-- @usage
-	-- if SpellCritChance() > target.LastSpellCritChance(shadow_bolt)
-	--     Spell(metamorphosis)
-
-	local function LastSpellCritChance(positionalParams, namedParams, state, atTime)
-		return LastSnapshotCritChance("spellCrit", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastspellcritchance", false, LastSpellCritChance)
-	OvaleCondition:RegisterCondition("lastspellspellcritchance", false, LastSpellCritChance)
-
-	--- Get the spellpower of the player during the most recent cast of a spell on the target.
-	-- @name LastSpellpower
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous spellpower.
-	-- @return A boolean value for the result of the comparison.
-	-- @see Spellpower
-	-- @usage
-	-- if {Spellpower() / target.LastSpellpower(living_bomb)} >1.25
-	--     Spell(living_bomb)
-
-	local function LastSpellpower(positionalParams, namedParams, state, atTime)
-		return LastSnapshot("spellBonusDamage", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastspellpower", false, LastSpellpower)
-	OvaleCondition:RegisterCondition("lastspellspellpower", false, LastSpellpower)
 end
 
 do
@@ -4524,14 +4184,14 @@ do
 	-- Returns the value of the given snapshot stat.
 	local function Snapshot(statName, defaultValue, positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
-		local value = state.snapshot[statName] or defaultValue
+		local value = state[statName] or defaultValue
 		return Compare(value, comparator, limit)
 	end
 
 	-- Returns the critical strike chance of the given snapshot stat.
 	local function SnapshotCritChance(statName, defaultValue, positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
-		local value = state.snapshot[statName] or defaultValue
+		local value = state[statName] or defaultValue
 		if namedParams.unlimited ~= 1 and value > 100 then
 			value = 100
 		end
@@ -5284,7 +4944,7 @@ do
 		if state:IsActiveAura(aura, atTime) then
 			tickTime = aura.tick
 		else
-			tickTime = OvaleData:GetTickLength(auraId, state.snapshot)
+			tickTime = OvaleData:GetTickLength(auraId, state)
 		end
 		if tickTime and tickTime > 0 then
 			return Compare(tickTime, comparator, limit)
@@ -5846,13 +5506,13 @@ do
 		local value = 0
 		if hand == "offhand" or hand == "off" then
 			comparator, limit = positionalParams[2], positionalParams[3]
-			value = state.snapshot.offHandWeaponDamage
+			value = state.offHandWeaponDamage
 		elseif hand == "mainhand" or hand == "main" then
 			comparator, limit = positionalParams[2], positionalParams[3]
-			value = state.snapshot.mainHandWeaponDamage
+			value = state.mainHandWeaponDamage
 		else
 			comparator, limit = positionalParams[1], positionalParams[2]
-			value = state.snapshot.mainHandWeaponDamage
+			value = state.mainHandWeaponDamage
 		end
 		return Compare(value, comparator, limit)
 	end

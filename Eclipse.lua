@@ -224,7 +224,7 @@ function OvaleEclipse:ApplySpellStartCast(state, spellId, targetGUID, startCast,
 	self:StartProfiling("OvaleEclipse_ApplySpellStartCast")
 	-- Channeled spells cost resources at the start of the channel.
 	if isChanneled then
-		state:ApplyEclipseEnergy(spellId, startCast, spellcast.snapshot)
+		state:ApplyEclipseEnergy(spellId, startCast, spellcast)
 	end
 	self:StopProfiling("OvaleEclipse_ApplySpellStartCast")
 end
@@ -234,7 +234,7 @@ function OvaleEclipse:ApplySpellAfterCast(state, spellId, targetGUID, startCast,
 	self:StartProfiling("OvaleEclipse_ApplySpellAfterCast")
 	-- Instant or cast-time spells cost resources at the end of the spellcast.
 	if not isChanneled then
-		state:ApplyEclipseEnergy(spellId, endCast, spellcast.snapshot)
+		state:ApplyEclipseEnergy(spellId, endCast, spellcast)
 	end
 	self:StopProfiling("OvaleEclipse_ApplySpellAfterCast")
 end

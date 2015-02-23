@@ -14,7 +14,6 @@ local addonFiles = {
 	"Profiler.lua",
 	-- Utility modules.
 	"Pool.lua",
-	"PoolRefCount.lua",
 	"Queue.lua",
 	-- Core modules.
 	"AST.lua",

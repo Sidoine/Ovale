@@ -320,8 +320,7 @@ statePrototype.ApplyRuneCost = function(state, spellId, atTime, spellcast)
 		for i, name in ipairs(RUNE_NAME) do
 			local count = si[name] or 0
 			while count > 0 do
-				local snapshot = spellcast and spellcast.snapshot or nil
-				state:ConsumeRune(spellId, atTime, name, snapshot)
+				state:ConsumeRune(spellId, atTime, name, spellcast)
 				count = count - 1
 			end
 		end
