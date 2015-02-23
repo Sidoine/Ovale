@@ -68,14 +68,6 @@ function OvalePool:Release(item)
 	OvalePool:StopProfiling(self.name)
 end
 
-function OvalePool:GetReference(item)
-	return item
-end
-
-function OvalePool:ReleaseReference(item)
-	-- no-op
-end
-
 function OvalePool:Clean(item)
 	-- virtual function; override as needed.
 end

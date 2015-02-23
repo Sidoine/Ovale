@@ -40,14 +40,6 @@ function OvalePoolGC:Release(item)
 	self:Clean(item)
 end
 
-function OvalePoolGC:GetReference(item)
-	return item
-end
-
-function OvalePoolGC:ReleaseReference(item)
-	-- no-op
-end
-
 function OvalePoolGC:Clean(item)
 	-- virtual function; override as needed.
 end
