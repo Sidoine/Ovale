@@ -88,74 +88,106 @@ local function RequireValue(value)
 	return value, required
 end
 
+local function TestConditionGlyph(value)
+	local glyph, required = RequireValue(value)
+	local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
+	return (required and hasGlyph) or (not required and not hasGlyph)
+end
+
+local function TestConditionLevel(value)
+	return OvalePaperDoll.level >= value
+end
+
+local function TestConditionMaxLevel(value)
+	return OvalePaperDoll.level <= value
+end
+
+local function TestConditionSpecialization(value)
+	local spec, required = RequireValue(value)
+	local isSpec = OvalePaperDoll:IsSpecialization(spec)
+	return (required and isSpec) or (not required and not isSpec)
+end
+
+local function TestConditionStance(value)
+	self_compileOnStances = true
+	local stance, required = RequireValue(value)
+	local isStance = OvaleStance:IsStance(stance)
+	return (required and isStance) or (not required and not isStance)
+end
+
+local function TestConditionSpell(value)
+	local spell, required = RequireValue(value)
+	local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
+	return (required and hasSpell) or (not required and not hasSpell)
+end
+
+local function TestConditionTalent(value)
+	local talent, required = RequireValue(value)
+	local hasTalent = HasTalent(talent)
+	return (required and hasTalent) or (not required and not hasTalent)
+end
+
+local TEST_CONDITION_DISPATCH = {
+	glyph = TestConditionGlyph,
+	if_spell = TestConditionSpell,
+	if_stance = TestConditionStance,
+	level = TestConditionLevel,
+	maxLevel = TestConditionMaxLevel,
+	specialization = TestConditionSpecialization,
+	talent = TestConditionTalent,
+}
+
 local function TestConditions(positionalParams, namedParams)
 	OvaleCompile:StartProfiling("OvaleCompile_TestConditions")
 	local boolean = true
-	if boolean and namedParams.glyph then
-		local glyph, required = RequireValue(namedParams.glyph)
-		local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
-		boolean = (required and hasGlyph) or (not required and not hasGlyph)
-	end
-	if boolean and namedParams.level then
-		boolean = OvalePaperDoll.level >= namedParams.level
-	end
-	if boolean and namedParams.maxLevel then
-		boolean = OvalePaperDoll.level <= namedParams.maxLevel
-	end
-	if boolean and namedParams.specialization then
-		local spec, required = RequireValue(namedParams.specialization)
-		local isSpec = OvalePaperDoll:IsSpecialization(spec)
-		boolean = (required and isSpec) or (not required and not isSpec)
-	end
-	if boolean and namedParams.if_stance then
-		self_compileOnStances = true
-		local stance, required = RequireValue(namedParams.if_stance)
-		local isStance = OvaleStance:IsStance(stance)
-		boolean = (required and isStance) or (not required and not isStance)
-	end
-	if boolean and namedParams.if_spell then
-		local spell, required = RequireValue(namedParams.if_spell)
-		local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
-		boolean = (required and hasSpell) or (not required and not hasSpell)
-	end
-	if boolean and namedParams.talent then
-		local talent, required = RequireValue(namedParams.talent)
-		local hasTalent = HasTalent(talent)
-		boolean = (required and hasTalent) or (not required and not hasTalent)
+	for param, dispatch in pairs(TEST_CONDITION_DISPATCH) do
+		local value = namedParams[param]
+		if type(value) == "table" then
+			-- Comma-separated value.
+			for _, v in ipairs(value) do
+				boolean = dispatch(v)
+				if not boolean then
+					break
+				end
+			end
+		elseif value then
+			boolean = dispatch(value)
+		end
+		if not boolean then
+			break
+		end
 	end
 	if boolean and namedParams.itemset and namedParams.itemcount then
 		local equippedCount = OvaleEquipment:GetArmorSetCount(namedParams.itemset)
 		boolean = (equippedCount >= namedParams.itemcount)
 	end
-	do
-		if boolean and namedParams.checkbox then
-			local profile = Ovale.db.profile
-			for _, checkbox in ipairs(namedParams.checkbox) do
-				local name, required = RequireValue(checkbox)
-				local control = Ovale.checkBox[name] or {}
-				control.triggerEvaluation = true
-				Ovale.checkBox[name] = control
-				-- Check the value of the checkbox.
-				local isChecked = profile.check[name]
-				boolean = (required and isChecked) or (not required and not isChecked)
-				if not boolean then
-					break
-				end
+	if boolean and namedParams.checkbox then
+		local profile = Ovale.db.profile
+		for _, checkbox in ipairs(namedParams.checkbox) do
+			local name, required = RequireValue(checkbox)
+			local control = Ovale.checkBox[name] or {}
+			control.triggerEvaluation = true
+			Ovale.checkBox[name] = control
+			-- Check the value of the checkbox.
+			local isChecked = profile.check[name]
+			boolean = (required and isChecked) or (not required and not isChecked)
+			if not boolean then
+				break
 			end
 		end
-		if boolean and namedParams.listitem then
-			local profile = Ovale.db.profile
-			for name, listitem in pairs(namedParams.listitem) do
-				local item, required = RequireValue(listitem)
-				local control = Ovale.list[name] or { items = {}, default = nil }
-				control.triggerEvaluation = true
-				Ovale.list[name] = control
-				-- Check the selected item in the list.
-				local isSelected = (profile.list[name] == item)
-				boolean = (required and isSelected) or (not required and not isSelected)
-				if not boolean then
-					break
-				end
+	end
+	if boolean and namedParams.listitem then
+		local profile = Ovale.db.profile
+		for name, listitem in pairs(namedParams.listitem) do
+			local item, required = RequireValue(listitem)
+			local control = Ovale.list[name] or { items = {}, default = nil }
+			control.triggerEvaluation = true
+			Ovale.list[name] = control
+			-- Check the selected item in the list.
+			local isSelected = (profile.list[name] == item)
+			boolean = (required and isSelected) or (not required and not isSelected)
+			if not boolean then
+				break
 			end
 		end
 	end
