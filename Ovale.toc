@@ -24,7 +24,6 @@ Profiler.lua
 # Utility modules.
 Pool.lua
 PoolGC.lua
-PoolRefCount.lua
 Queue.lua
 TimeSpan.lua
 
