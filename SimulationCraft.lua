@@ -4944,7 +4944,7 @@ function OvaleSimulationCraft:CreateOptions()
 				args = {
 					description = {
 						order = 10,
-						name = L["Script code inserted after Include() statements."],
+						name = L["SIMULATIONCRAFT_OVERRIDES_DESCRIPTION"],
 						type = "description",
 					},
 					overrides = {
