@@ -64,6 +64,8 @@ AddFunction WindwalkerDefaultMainActions
 	if BuffRemaining(tiger_power_buff) < 6.6 Spell(tiger_palm)
 	#rising_sun_kick,if=(debuff.rising_sun_kick.down|debuff.rising_sun_kick.remains<3)
 	if target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 Spell(rising_sun_kick)
+	#fists_of_fury,if=buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&energy.time_to_max>cast_time&!buff.serenity.up
+	if BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and TimeToMaxEnergy() > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
 	#call_action_list,name=st,if=active_enemies<3&(level<100|!talent.chi_explosion.enabled)
 	if Enemies() < 3 and { Level() < 100 or not Talent(chi_explosion_talent) } WindwalkerStMainActions()
 	#call_action_list,name=st_chix,if=active_enemies=1&talent.chi_explosion.enabled
@@ -100,36 +102,38 @@ AddFunction WindwalkerDefaultShortCdActions
 			{
 				#serenity,if=chi>=2&buff.tiger_power.up&debuff.rising_sun_kick.up
 				if Chi() >= 2 and BuffPresent(tiger_power_buff) and target.DebuffPresent(rising_sun_kick_debuff) Spell(serenity)
-				#fists_of_fury,if=buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&energy.time_to_max>cast_time&!buff.serenity.up
-				if BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and TimeToMaxEnergy() > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) Spell(fists_of_fury)
-				#touch_of_death,if=target.health.percent<10&(glyph.touch_of_death.enabled|chi>=3)
-				if target.HealthPercent() < 10 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(touch_of_death)
-				#hurricane_strike,if=energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
-				if TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
-				#energizing_brew,if=cooldown.fists_of_fury.remains>6&(!talent.serenity.enabled|(!buff.serenity.remains&cooldown.serenity.remains>4))&energy+energy.regen*gcd<50
-				if SpellCooldown(fists_of_fury) > 6 and { not Talent(serenity_talent) or not BuffPresent(serenity_buff) and SpellCooldown(serenity) > 4 } and Energy() + EnergyRegenRate() * GCD() < 50 Spell(energizing_brew)
-				#call_action_list,name=st,if=active_enemies<3&(level<100|!talent.chi_explosion.enabled)
-				if Enemies() < 3 and { Level() < 100 or not Talent(chi_explosion_talent) } WindwalkerStShortCdActions()
 
-				unless Enemies() < 3 and { Level() < 100 or not Talent(chi_explosion_talent) } and WindwalkerStShortCdPostConditions()
+				unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and TimeToMaxEnergy() > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury)
 				{
-					#call_action_list,name=st_chix,if=active_enemies=1&talent.chi_explosion.enabled
-					if Enemies() == 1 and Talent(chi_explosion_talent) WindwalkerStChixShortCdActions()
+					#touch_of_death,if=target.health.percent<10&(glyph.touch_of_death.enabled|chi>=3)
+					if target.HealthPercent() < 10 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(touch_of_death)
+					#hurricane_strike,if=energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
+					if TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
+					#energizing_brew,if=cooldown.fists_of_fury.remains>6&(!talent.serenity.enabled|(!buff.serenity.remains&cooldown.serenity.remains>4))&energy+energy.regen*gcd<50
+					if SpellCooldown(fists_of_fury) > 6 and { not Talent(serenity_talent) or not BuffPresent(serenity_buff) and SpellCooldown(serenity) > 4 } and Energy() + EnergyRegenRate() * GCD() < 50 Spell(energizing_brew)
+					#call_action_list,name=st,if=active_enemies<3&(level<100|!talent.chi_explosion.enabled)
+					if Enemies() < 3 and { Level() < 100 or not Talent(chi_explosion_talent) } WindwalkerStShortCdActions()
 
-					unless Enemies() == 1 and Talent(chi_explosion_talent) and WindwalkerStChixShortCdPostConditions()
+					unless Enemies() < 3 and { Level() < 100 or not Talent(chi_explosion_talent) } and WindwalkerStShortCdPostConditions()
 					{
-						#call_action_list,name=cleave_chix,if=active_enemies=2&talent.chi_explosion.enabled
-						if Enemies() == 2 and Talent(chi_explosion_talent) WindwalkerCleaveChixShortCdActions()
+						#call_action_list,name=st_chix,if=active_enemies=1&talent.chi_explosion.enabled
+						if Enemies() == 1 and Talent(chi_explosion_talent) WindwalkerStChixShortCdActions()
 
-						unless Enemies() == 2 and Talent(chi_explosion_talent) and WindwalkerCleaveChixShortCdPostConditions()
+						unless Enemies() == 1 and Talent(chi_explosion_talent) and WindwalkerStChixShortCdPostConditions()
 						{
-							#call_action_list,name=aoe,if=active_enemies>=3&!talent.rushing_jade_wind.enabled
-							if Enemies() >= 3 and not Talent(rushing_jade_wind_talent) WindwalkerAoeShortCdActions()
+							#call_action_list,name=cleave_chix,if=active_enemies=2&talent.chi_explosion.enabled
+							if Enemies() == 2 and Talent(chi_explosion_talent) WindwalkerCleaveChixShortCdActions()
 
-							unless Enemies() >= 3 and not Talent(rushing_jade_wind_talent) and WindwalkerAoeShortCdPostConditions()
+							unless Enemies() == 2 and Talent(chi_explosion_talent) and WindwalkerCleaveChixShortCdPostConditions()
 							{
-								#call_action_list,name=aoe_rjw,if=active_enemies>=3&talent.rushing_jade_wind.enabled
-								if Enemies() >= 3 and Talent(rushing_jade_wind_talent) WindwalkerAoeRjwShortCdActions()
+								#call_action_list,name=aoe,if=active_enemies>=3&!talent.rushing_jade_wind.enabled
+								if Enemies() >= 3 and not Talent(rushing_jade_wind_talent) WindwalkerAoeShortCdActions()
+
+								unless Enemies() >= 3 and not Talent(rushing_jade_wind_talent) and WindwalkerAoeShortCdPostConditions()
+								{
+									#call_action_list,name=aoe_rjw,if=active_enemies>=3&talent.rushing_jade_wind.enabled
+									if Enemies() >= 3 and Talent(rushing_jade_wind_talent) WindwalkerAoeRjwShortCdActions()
+								}
 							}
 						}
 					}
@@ -294,6 +298,8 @@ AddFunction WindwalkerCleaveChixShortCdPostConditions
 
 AddFunction WindwalkerOpenerMainActions
 {
+	#fists_of_fury,if=buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.serenity.up&buff.serenity.remains<1.5
+	if BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 Spell(fists_of_fury)
 	#tiger_palm,if=buff.tiger_power.remains<2
 	if BuffRemaining(tiger_power_buff) < 2 Spell(tiger_palm)
 	#rising_sun_kick
@@ -310,10 +316,8 @@ AddFunction WindwalkerOpenerShortCdActions
 {
 	#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9
 	if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 Spell(tigereye_brew)
-	#fists_of_fury,if=buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.serenity.up&buff.serenity.remains<1.5
-	if BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 Spell(fists_of_fury)
 
-	unless BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { MaxChi() - Chi() <= 1 and not SpellCooldown(chi_brew) > 0 or BuffPresent(serenity_buff) } and Spell(blackout_kick)
+	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { MaxChi() - Chi() <= 1 and not SpellCooldown(chi_brew) > 0 or BuffPresent(serenity_buff) } and Spell(blackout_kick)
 	{
 		#serenity,if=chi.max-chi<=2
 		if MaxChi() - Chi() <= 2 Spell(serenity)
@@ -322,7 +326,7 @@ AddFunction WindwalkerOpenerShortCdActions
 
 AddFunction WindwalkerOpenerShortCdPostConditions
 {
-	BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { MaxChi() - Chi() <= 1 and not SpellCooldown(chi_brew) > 0 or BuffPresent(serenity_buff) } and Spell(blackout_kick) or MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(jab)
+	BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { MaxChi() - Chi() <= 1 and not SpellCooldown(chi_brew) > 0 or BuffPresent(serenity_buff) } and Spell(blackout_kick) or MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(jab)
 }
 
 AddFunction WindwalkerOpenerCdActions

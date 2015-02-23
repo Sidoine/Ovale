@@ -326,7 +326,6 @@ Define(zen_sphere_talent 5)
 	SpellInfo(chi_torpedo tag=shortcd)
 	SpellInfo(dampen_harm tag=cd)
 	SpellInfo(diffuse_magic tag=cd)
-	SpellInfo(fists_of_fury tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
