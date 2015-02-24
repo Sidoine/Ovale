@@ -160,7 +160,7 @@ for _, name in ipairs(files) do
 				print("FIXME symbols need to be resolved.")
 			else
 				local source = "custom"
-				OvaleScripts:RegisterScript(class, source, source, code, "script")
+				OvaleScripts:RegisterScript(class, specialization, source, source, code, "script")
 				local ast = OvaleAST:ParseScript(source)
 				if ast then
 					OvaleCompile:EvaluateScript(ast, true)
