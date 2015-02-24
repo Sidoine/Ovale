@@ -3242,6 +3242,14 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- The "careful_aim" buff is a fake SimulationCraft buff.
 		code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)"
 		AddSymbol(annotation, "rapid_fire_buff")
+	elseif class == "HUNTER" and operand == "buff.stampede.remains" then
+		--[[
+			There is no "Stampede" buff visible on the client-side, so just check how long since
+			Stampede was previously cast.  The duration of the effect is 40 seconds.
+		--]]
+		local spellName = "stampede"
+		code = format("TimeSincePreviousSpell(%s) < 40", spellName)
+		AddSymbol(annotation, spellName)
 	elseif class == "MAGE" and (operand == "in_flight" and action == "fireball" or operand == "action.fireball.in_flight") then
 		-- Frostfire Bolt can be substituted for Fireball when testing whether the spell is in flight.
 		local fbName = "fireball"
