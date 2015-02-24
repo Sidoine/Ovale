@@ -45,7 +45,6 @@
 	<Script file="simulationcraft_monk_brewmaster_2h_serenity.lua" />
 	<Script file="simulationcraft_monk_windwalker_1h.lua" />
 	<Script file="simulationcraft_monk_windwalker_2h.lua" />
-	<Script file="simulationcraft_paladin_holy.lua" />
 	<Script file="simulationcraft_paladin_protection.lua" />
 	<Script file="simulationcraft_paladin_retribution.lua" />
 	<Script file="simulationcraft_priest_discipline_dmg.lua" />
