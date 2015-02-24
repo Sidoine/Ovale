@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_rogue_subtlety_t17m"
-	local desc = "[6.0] SimulationCraft: Rogue_Subtlety_T17M"
+	local desc = "[6.1] SimulationCraft: Rogue_Subtlety_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Rogue_Subtlety_T17M".
 #	class=rogue
@@ -304,7 +304,7 @@ AddFunction SubtletyPoolCdActions
 AddFunction SubtletyPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=calamari_crepes
+	#food,type=salty_squid_roll
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth

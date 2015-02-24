@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_hunter_mm_t17m"
-	local desc = "[6.0] SimulationCraft: Hunter_MM_T17M"
+	local desc = "[6.1] SimulationCraft: Hunter_MM_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Hunter_MM_T17M".
 #	class=hunter
@@ -190,7 +190,7 @@ AddFunction MarksmanshipPrecombatMainActions
 AddFunction MarksmanshipPrecombatShortCdActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=calamari_crepes
+	#food,type=salty_squid_roll
 	#summon_pet
 	MarksmanshipSummonPet()
 }

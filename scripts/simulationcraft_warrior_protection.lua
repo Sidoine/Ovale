@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_warrior_protection_t17m"
-	local desc = "[6.0] SimulationCraft: Warrior_Protection_T17M"
+	local desc = "[6.1] SimulationCraft: Warrior_Protection_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Protection_T17M".
 #	class=warrior
@@ -89,7 +89,7 @@ AddFunction ProtectionDefaultCdActions
 AddFunction ProtectionPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
-	#food,type=blackrock_barbecue
+	#food,type=pickled_eel
 	#battle_shout,if=!aura.attack_power_multiplier.up&aura.stamina.up
 	if not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) Spell(battle_shout)
 	#commanding_shout,if=!aura.stamina.up
@@ -157,6 +157,8 @@ AddFunction ProtectionProtShortCdActions
 	{
 		#heroic_strike,if=buff.ultimatum.up|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
 		if BuffPresent(ultimatum_buff) or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
+		#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
+		if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
 
 		unless Spell(shield_slam) or Spell(revenge)
 		{
@@ -187,8 +189,6 @@ AddFunction ProtectionProtCdActions
 	{
 		#bloodbath,if=talent.bloodbath.enabled&((cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(cooldown.storm_bolt.remains=0&talent.storm_bolt.enabled)|talent.shockwave.enabled)
 		if Talent(bloodbath_talent) and { not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or not SpellCooldown(storm_bolt) > 0 and Talent(storm_bolt_talent) or Talent(shockwave_talent) } Spell(bloodbath)
-		#avatar,if=talent.avatar.enabled&((cooldown.ravager.remains=0&talent.ravager.enabled)|(cooldown.dragon_roar.remains=0&talent.dragon_roar.enabled)|(talent.storm_bolt.enabled&cooldown.storm_bolt.remains=0)|(!(talent.dragon_roar.enabled|talent.ravager.enabled|talent.storm_bolt.enabled)))
-		if Talent(avatar_talent) and { not SpellCooldown(ravager) > 0 and Talent(ravager_talent) or not SpellCooldown(dragon_roar) > 0 and Talent(dragon_roar_talent) or Talent(storm_bolt_talent) and not SpellCooldown(storm_bolt) > 0 or not { Talent(dragon_roar_talent) or Talent(ravager_talent) or Talent(storm_bolt_talent) } } Spell(avatar)
 	}
 }
 
@@ -216,6 +216,9 @@ AddFunction ProtectionProtAoeMainActions
 
 AddFunction ProtectionProtAoeShortCdActions
 {
+	#avatar
+	Spell(avatar)
+
 	unless not target.DebuffPresent(deep_wounds_debuff) and Spell(thunder_clap)
 	{
 		#heroic_strike,if=buff.ultimatum.up|rage>110|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
@@ -256,8 +259,6 @@ AddFunction ProtectionProtAoeCdActions
 {
 	#bloodbath
 	Spell(bloodbath)
-	#avatar
-	Spell(avatar)
 }
 
 AddFunction ProtectionProtAoeCdPostConditions

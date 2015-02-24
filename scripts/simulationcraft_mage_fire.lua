@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_mage_fire_t17m"
-	local desc = "[6.0] SimulationCraft: Mage_Fire_T17M"
+	local desc = "[6.1] SimulationCraft: Mage_Fire_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Mage_Fire_T17M".
 #	class=mage
@@ -355,7 +355,7 @@ AddFunction FireLivingBombCdPostConditions
 AddFunction FirePrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	#food,type=blackrock_barbecue
+	#food,type=pickled_eel
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#pyroblast

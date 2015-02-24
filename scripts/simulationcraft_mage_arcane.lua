@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_mage_arcane_t17m"
-	local desc = "[6.0] SimulationCraft: Mage_Arcane_T17M"
+	local desc = "[6.1] SimulationCraft: Mage_Arcane_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Mage_Arcane_T17M".
 #	class=mage
@@ -43,12 +43,12 @@ AddFunction ArcaneInterruptActions
 
 AddFunction ArcaneDefaultMainActions
 {
+	#call_action_list,name=aoe,if=active_enemies>=5
+	if Enemies() >= 5 ArcaneAoeMainActions()
 	#call_action_list,name=init_crystal,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up
 	if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalMainActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
 	if Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) ArcaneCrystalSequenceMainActions()
-	#call_action_list,name=aoe,if=active_enemies>=4
-	if Enemies() >= 4 ArcaneAoeMainActions()
 	#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
 	if { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
 	#call_action_list,name=conserve
@@ -65,20 +65,20 @@ AddFunction ArcaneDefaultShortCdActions
 	if BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(arcane_missiles) } Spell(ice_floes)
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if TotemRemaining(rune_of_power) < CastTime(rune_of_power) Spell(rune_of_power)
-	#call_action_list,name=init_crystal,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up
-	if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalShortCdActions()
+	#call_action_list,name=aoe,if=active_enemies>=5
+	if Enemies() >= 5 ArcaneAoeShortCdActions()
 
-	unless Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 and ArcaneInitCrystalShortCdPostConditions()
+	unless Enemies() >= 5 and ArcaneAoeShortCdPostConditions()
 	{
-		#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
-		if Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) ArcaneCrystalSequenceShortCdActions()
+		#call_action_list,name=init_crystal,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up
+		if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalShortCdActions()
 
-		unless Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) and ArcaneCrystalSequenceShortCdPostConditions()
+		unless Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 and ArcaneInitCrystalShortCdPostConditions()
 		{
-			#call_action_list,name=aoe,if=active_enemies>=4
-			if Enemies() >= 4 ArcaneAoeShortCdActions()
+			#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
+			if Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) ArcaneCrystalSequenceShortCdActions()
 
-			unless Enemies() >= 4 and ArcaneAoeShortCdPostConditions()
+			unless Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) and ArcaneCrystalSequenceShortCdPostConditions()
 			{
 				#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
 				if { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
@@ -111,20 +111,20 @@ AddFunction ArcaneDefaultCdActions
 			Spell(mirror_image)
 			#cold_snap,if=buff.presence_of_mind.down&cooldown.presence_of_mind.remains>75
 			if BuffExpires(presence_of_mind_buff) and SpellCooldown(presence_of_mind) > 75 Spell(cold_snap)
-			#call_action_list,name=init_crystal,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up
-			if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalCdActions()
+			#call_action_list,name=aoe,if=active_enemies>=5
+			if Enemies() >= 5 ArcaneAoeCdActions()
 
-			unless Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 and ArcaneInitCrystalCdPostConditions()
+			unless Enemies() >= 5 and ArcaneAoeCdPostConditions()
 			{
-				#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
-				if Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) ArcaneCrystalSequenceCdActions()
+				#call_action_list,name=init_crystal,if=talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.up
+				if Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 ArcaneInitCrystalCdActions()
 
-				unless Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) and ArcaneCrystalSequenceCdPostConditions()
+				unless Talent(prismatic_crystal_talent) and not SpellCooldown(prismatic_crystal) > 0 and ArcaneInitCrystalCdPostConditions()
 				{
-					#call_action_list,name=aoe,if=active_enemies>=4
-					if Enemies() >= 4 ArcaneAoeCdActions()
+					#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
+					if Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) ArcaneCrystalSequenceCdActions()
 
-					unless Enemies() >= 4 and ArcaneAoeCdPostConditions()
+					unless Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) and ArcaneCrystalSequenceCdPostConditions()
 					{
 						#call_action_list,name=burn,if=time_to_die<mana.pct*0.35*spell_haste|cooldown.evocation.remains<=(mana.pct-30)*0.3*spell_haste|(buff.arcane_power.up&cooldown.evocation.remains<=(mana.pct-30)*0.4*spell_haste)
 						if { target.TimeToDie() < ManaPercent() * 0.35 * { 100 / { 100 + SpellHaste() } } or SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.3 * { 100 / { 100 + SpellHaste() } } or BuffPresent(arcane_power_buff) and SpellCooldown(evocation) <= { ManaPercent() - 30 } * 0.4 * { 100 / { 100 + SpellHaste() } } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
@@ -149,6 +149,12 @@ AddFunction ArcaneAoeMainActions
 	if DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } Spell(nether_tempest)
 	#supernova
 	Spell(supernova)
+	#arcane_explosion,if=prev_gcd.evocation
+	if PreviousGCDSpell(evocation) Spell(arcane_explosion)
+	#arcane_missiles,if=set_bonus.tier17_4pc&active_enemies<10&buff.arcane_charge.stack=4&buff.arcane_instability.react
+	if ArmorSetBonus(T17 4) and Enemies() < 10 and DebuffStacks(arcane_charge_debuff) == 4 and BuffPresent(arcane_instability_buff) Spell(arcane_missiles)
+	#nether_tempest,cycle_targets=1,if=talent.arcane_orb.enabled&buff.arcane_charge.stack=4&ticking&remains<cooldown.arcane_orb.remains
+	if Talent(arcane_orb_talent) and DebuffStacks(arcane_charge_debuff) == 4 and target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < SpellCooldown(arcane_orb) Spell(nether_tempest)
 	#arcane_barrage,if=buff.arcane_charge.stack=4
 	if DebuffStacks(arcane_charge_debuff) == 4 Spell(arcane_barrage)
 	#arcane_explosion
@@ -160,29 +166,39 @@ AddFunction ArcaneAoeShortCdActions
 	#call_action_list,name=cooldowns
 	ArcaneCooldownsShortCdActions()
 
-	unless DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage)
+	unless DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova)
 	{
 		#arcane_orb,if=buff.arcane_charge.stack<4
 		if DebuffStacks(arcane_charge_debuff) < 4 Spell(arcane_orb)
-		#cone_of_cold,if=glyph.cone_of_cold.enabled
-		if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
+
+		unless PreviousGCDSpell(evocation) and Spell(arcane_explosion) or ArmorSetBonus(T17 4) and Enemies() < 10 and DebuffStacks(arcane_charge_debuff) == 4 and BuffPresent(arcane_instability_buff) and Spell(arcane_missiles) or Talent(arcane_orb_talent) and DebuffStacks(arcane_charge_debuff) == 4 and target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < SpellCooldown(arcane_orb) and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage)
+		{
+			#cone_of_cold,if=glyph.cone_of_cold.enabled
+			if Glyph(glyph_of_cone_of_cold) Spell(cone_of_cold)
+		}
 	}
 }
 
 AddFunction ArcaneAoeShortCdPostConditions
 {
-	DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_explosion)
+	DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or PreviousGCDSpell(evocation) and Spell(arcane_explosion) or ArmorSetBonus(T17 4) and Enemies() < 10 and DebuffStacks(arcane_charge_debuff) == 4 and BuffPresent(arcane_instability_buff) and Spell(arcane_missiles) or Talent(arcane_orb_talent) and DebuffStacks(arcane_charge_debuff) == 4 and target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < SpellCooldown(arcane_orb) and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_explosion)
 }
 
 AddFunction ArcaneAoeCdActions
 {
 	#call_action_list,name=cooldowns
 	ArcaneCooldownsCdActions()
+
+	unless DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or PreviousGCDSpell(evocation) and Spell(arcane_explosion)
+	{
+		#evocation,interrupt_if=mana.pct>96,if=mana.pct<85-2.5*buff.arcane_charge.stack
+		if ManaPercent() < 85 - 2.5 * DebuffStacks(arcane_charge_debuff) Spell(evocation)
+	}
 }
 
 AddFunction ArcaneAoeCdPostConditions
 {
-	DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or Glyph(glyph_of_cone_of_cold) and Spell(cone_of_cold) or Spell(arcane_explosion)
+	DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Spell(supernova) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or PreviousGCDSpell(evocation) and Spell(arcane_explosion) or ArmorSetBonus(T17 4) and Enemies() < 10 and DebuffStacks(arcane_charge_debuff) == 4 and BuffPresent(arcane_instability_buff) and Spell(arcane_missiles) or Talent(arcane_orb_talent) and DebuffStacks(arcane_charge_debuff) == 4 and target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < SpellCooldown(arcane_orb) and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Glyph(glyph_of_cone_of_cold) and Spell(cone_of_cold) or Spell(arcane_explosion)
 }
 
 ### actions.burn
@@ -197,14 +213,16 @@ AddFunction ArcaneBurnMainActions
 	if target.TimeToDie() < 8 or Charges(supernova) == 2 Spell(supernova)
 	#nether_tempest,cycle_targets=1,if=target!=prismatic_crystal&buff.arcane_charge.stack=4&(active_dot.nether_tempest=0|(ticking&remains<3.6))
 	if not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } Spell(nether_tempest)
+	#arcane_barrage,if=talent.arcane_orb.enabled&active_enemies>=3&buff.arcane_charge.stack=4&(cooldown.arcane_orb.remains<gcd|prev_gcd.arcane_orb)
+	if Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } Spell(arcane_barrage)
 	#arcane_blast,if=buff.arcane_charge.stack=4&mana.pct>93
 	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 Spell(arcane_blast)
 	#arcane_missiles,if=buff.arcane_charge.stack=4&(mana.pct>70|!cooldown.evocation.up)
 	if DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } Spell(arcane_missiles)
 	#supernova,if=mana.pct>70&mana.pct<96
 	if ManaPercent() > 70 and ManaPercent() < 96 Spell(supernova)
-	#call_action_list,name=conserve,if=cooldown.evocation.duration-cooldown.evocation.remains<5
-	if SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 ArcaneConserveMainActions()
+	#call_action_list,name=conserve,if=prev_gcd.evocation
+	if PreviousGCDSpell(evocation) ArcaneConserveMainActions()
 	#arcane_blast
 	Spell(arcane_blast)
 }
@@ -218,18 +236,22 @@ AddFunction ArcaneBurnShortCdActions
 	{
 		#arcane_orb,if=buff.arcane_charge.stack<4
 		if DebuffStacks(arcane_charge_debuff) < 4 Spell(arcane_orb)
-		#presence_of_mind,if=mana.pct>96&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up)
-		if ManaPercent() > 96 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(presence_of_mind)
 
-		unless DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova)
+		unless Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage)
 		{
-			#call_action_list,name=conserve,if=cooldown.evocation.duration-cooldown.evocation.remains<5
-			if SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 ArcaneConserveShortCdActions()
+			#presence_of_mind,if=mana.pct>96&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up)
+			if ManaPercent() > 96 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(presence_of_mind)
 
-			unless SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 and ArcaneConserveShortCdPostConditions()
+			unless DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova)
 			{
-				#presence_of_mind,if=!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up
-				if not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } Spell(presence_of_mind)
+				#call_action_list,name=conserve,if=prev_gcd.evocation
+				if PreviousGCDSpell(evocation) ArcaneConserveShortCdActions()
+
+				unless PreviousGCDSpell(evocation) and ArcaneConserveShortCdPostConditions()
+				{
+					#presence_of_mind,if=!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up
+					if not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } Spell(presence_of_mind)
+				}
 			}
 		}
 	}
@@ -237,7 +259,7 @@ AddFunction ArcaneBurnShortCdActions
 
 AddFunction ArcaneBurnShortCdPostConditions
 {
-	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova) or SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 and ArcaneConserveShortCdPostConditions() or Spell(arcane_blast)
+	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova) or PreviousGCDSpell(evocation) and ArcaneConserveShortCdPostConditions() or Spell(arcane_blast)
 }
 
 AddFunction ArcaneBurnCdActions
@@ -245,22 +267,22 @@ AddFunction ArcaneBurnCdActions
 	#call_action_list,name=cooldowns
 	ArcaneCooldownsCdActions()
 
-	unless BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova)
+	unless BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova)
 	{
-		#call_action_list,name=conserve,if=cooldown.evocation.duration-cooldown.evocation.remains<5
-		if SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 ArcaneConserveCdActions()
+		#call_action_list,name=conserve,if=prev_gcd.evocation
+		if PreviousGCDSpell(evocation) ArcaneConserveCdActions()
 
-		unless SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 and ArcaneConserveCdPostConditions()
+		unless PreviousGCDSpell(evocation) and ArcaneConserveCdPostConditions()
 		{
-			#evocation,interrupt_if=mana.pct>92,if=time_to_die>10&mana.pct<50
-			if target.TimeToDie() > 10 and ManaPercent() < 50 Spell(evocation)
+			#evocation,interrupt_if=mana.pct>92,if=time_to_die>10&mana.pct<30+2.5*active_enemies*(9-active_enemies)
+			if target.TimeToDie() > 10 and ManaPercent() < 30 + 2.5 * Enemies() * { 9 - Enemies() } Spell(evocation)
 		}
 	}
 }
 
 AddFunction ArcaneBurnCdPostConditions
 {
-	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova) or SpellCooldownDuration(evocation) - SpellCooldown(evocation) < 5 and ArcaneConserveCdPostConditions() or Spell(arcane_blast)
+	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova) or PreviousGCDSpell(evocation) and ArcaneConserveCdPostConditions() or Spell(arcane_blast)
 }
 
 ### actions.conserve
@@ -277,6 +299,8 @@ AddFunction ArcaneConserveMainActions
 	if target.TimeToDie() < 8 or Charges(supernova) == 2 and { BuffPresent(arcane_power_buff) or not { not SpellCooldown(arcane_power) > 0 } } and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } Spell(supernova)
 	#arcane_blast,if=buff.arcane_charge.stack=4&mana.pct>93
 	if DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 Spell(arcane_blast)
+	#arcane_barrage,if=talent.arcane_orb.enabled&active_enemies>=3&buff.arcane_charge.stack=4&(cooldown.arcane_orb.remains<gcd|prev_gcd.arcane_orb)
+	if Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } Spell(arcane_barrage)
 	#arcane_missiles,if=buff.arcane_charge.stack=4&(!talent.overpowered.enabled|cooldown.arcane_power.remains>10*spell_haste)
 	if DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } Spell(arcane_missiles)
 	#supernova,if=mana.pct<96&(buff.arcane_missiles.stack<2|buff.arcane_charge.stack=4)&(buff.arcane_power.up|(charges=1&cooldown.arcane_power.remains>recharge_time))&(!talent.prismatic_crystal.enabled|current_target=prismatic_crystal|(charges=1&cooldown.prismatic_crystal.remains>recharge_time+8))
@@ -303,7 +327,7 @@ AddFunction ArcaneConserveShortCdActions
 		#presence_of_mind,if=mana.pct>96&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up)
 		if ManaPercent() > 96 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(presence_of_mind)
 
-		unless DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } and Spell(arcane_missiles) or ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name(prismatic_crystal) or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * TalentPoints(arcane_orb_talent) } * { 100 / { 100 + SpellHaste() } } } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage)
+		unless DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } and Spell(arcane_missiles) or ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name(prismatic_crystal) or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * TalentPoints(arcane_orb_talent) } * { 100 / { 100 + SpellHaste() } } } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage)
 		{
 			#presence_of_mind,if=buff.arcane_charge.stack<2&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up)
 			if DebuffStacks(arcane_charge_debuff) < 2 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(presence_of_mind)
@@ -313,7 +337,7 @@ AddFunction ArcaneConserveShortCdActions
 
 AddFunction ArcaneConserveShortCdPostConditions
 {
-	{ BuffStacks(arcane_missiles_buff) == 3 or Talent(overpowered_talent) and BuffPresent(arcane_power_buff) and BuffRemaining(arcane_power_buff) < ExecuteTime(arcane_blast) } and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or { target.TimeToDie() < 8 or Charges(supernova) == 2 and { BuffPresent(arcane_power_buff) or not { not SpellCooldown(arcane_power) > 0 } } and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } } and Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } and Spell(arcane_missiles) or ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name(prismatic_crystal) or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * TalentPoints(arcane_orb_talent) } * { 100 / { 100 + SpellHaste() } } } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_blast) or Speed() > 0 and Spell(arcane_barrage)
+	{ BuffStacks(arcane_missiles_buff) == 3 or Talent(overpowered_talent) and BuffPresent(arcane_power_buff) and BuffRemaining(arcane_power_buff) < ExecuteTime(arcane_blast) } and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or { target.TimeToDie() < 8 or Charges(supernova) == 2 and { BuffPresent(arcane_power_buff) or not { not SpellCooldown(arcane_power) > 0 } } and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } } and Spell(supernova) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } and Spell(arcane_missiles) or ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name(prismatic_crystal) or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * TalentPoints(arcane_orb_talent) } * { 100 / { 100 + SpellHaste() } } } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_blast) or Speed() > 0 and Spell(arcane_barrage)
 }
 
 AddFunction ArcaneConserveCdActions
@@ -324,7 +348,7 @@ AddFunction ArcaneConserveCdActions
 
 AddFunction ArcaneConserveCdPostConditions
 {
-	{ BuffStacks(arcane_missiles_buff) == 3 or Talent(overpowered_talent) and BuffPresent(arcane_power_buff) and BuffRemaining(arcane_power_buff) < ExecuteTime(arcane_blast) } and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or { target.TimeToDie() < 8 or Charges(supernova) == 2 and { BuffPresent(arcane_power_buff) or not { not SpellCooldown(arcane_power) > 0 } } and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } } and Spell(supernova) or DebuffStacks(arcane_charge_debuff) < 2 and Spell(arcane_orb) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } and Spell(arcane_missiles) or ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name(prismatic_crystal) or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * TalentPoints(arcane_orb_talent) } * { 100 / { 100 + SpellHaste() } } } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_blast) or Speed() > 0 and Spell(arcane_barrage)
+	{ BuffStacks(arcane_missiles_buff) == 3 or Talent(overpowered_talent) and BuffPresent(arcane_power_buff) and BuffRemaining(arcane_power_buff) < ExecuteTime(arcane_blast) } and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or { target.TimeToDie() < 8 or Charges(supernova) == 2 and { BuffPresent(arcane_power_buff) or not { not SpellCooldown(arcane_power) > 0 } } and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } } and Spell(supernova) or DebuffStacks(arcane_charge_debuff) < 2 and Spell(arcane_orb) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and { not Talent(overpowered_talent) or SpellCooldown(arcane_power) > 10 * { 100 / { 100 + SpellHaste() } } } and Spell(arcane_missiles) or ManaPercent() < 96 and { BuffStacks(arcane_missiles_buff) < 2 or DebuffStacks(arcane_charge_debuff) == 4 } and { BuffPresent(arcane_power_buff) or Charges(supernova) == 1 and SpellCooldown(arcane_power) > SpellChargeCooldown(supernova) } and { not Talent(prismatic_crystal_talent) or target.Name(prismatic_crystal) or Charges(supernova) == 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(supernova) + 8 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < { 10 - 3 * TalentPoints(arcane_orb_talent) } * { 100 / { 100 + SpellHaste() } } } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_barrage) or Spell(arcane_blast) or Speed() > 0 and Spell(arcane_barrage)
 }
 
 ### actions.cooldowns
@@ -437,7 +461,7 @@ AddFunction ArcaneInitCrystalCdPostConditions
 AddFunction ArcanePrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	#food,type=sleeper_surprise
+	#food,type=sleeper_sushi
 	#arcane_brilliance
 	if BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1) Spell(arcane_brilliance)
 	#arcane_blast

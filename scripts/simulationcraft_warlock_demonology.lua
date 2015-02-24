@@ -3,13 +3,12 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_warlock_demonology_t17m"
-	local desc = "[6.0] SimulationCraft: Warlock_Demonology_T17M"
+	local desc = "[6.1] SimulationCraft: Warlock_Demonology_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warlock_Demonology_T17M".
 #	class=warlock
 #	spec=demonology
-#	talents=0000311
-#	glyphs=dark_soul
+#	talents=0000213
 #	pet=felguard
 
 Include(ovale_common)
@@ -28,8 +27,8 @@ AddFunction DemonologyUsePotionIntellect
 
 AddFunction DemonologyDefaultMainActions
 {
-	#life_tap,if=buff.metamorphosis.down&mana.pct<40
-	if BuffExpires(metamorphosis_buff) and ManaPercent() < 40 Spell(life_tap)
+	#life_tap,if=buff.metamorphosis.down&mana.pct<40&buff.dark_soul.down
+	if BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) Spell(life_tap)
 	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&(((set_bonus.tier17_4pc=0&((charges=1&recharge_time<4)|charges=2))|(charges=3|(charges=2&recharge_time<13.8-travel_time*2))&((cooldown.cataclysm.remains>dot.shadowflame.duration)|!talent.cataclysm.enabled))|dot.shadowflame.remains>travel_time)
 	if not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } Spell(hand_of_guldan)
 	#hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&talent.demonbolt.enabled&((set_bonus.tier17_4pc=0&((charges=1&recharge_time<4)|charges=2))|(charges=3|(charges=2&recharge_time<13.8-travel_time*2))|dot.shadowflame.remains>travel_time)
@@ -101,7 +100,7 @@ AddFunction DemonologyDefaultShortCdActions
 	#wrathguard:mortal_cleave,if=pet.wrathguard.cooldown.wrathstorm.remains>5
 	if SpellCooldown(wrathguard_wrathstorm) > 5 Spell(wrathguard_mortal_cleave)
 
-	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
+	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
 	{
 		#service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<20|(buff.dark_soul.remains&target.health.pct<20))
 		if Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } Spell(grimoire_felguard)
@@ -135,12 +134,12 @@ AddFunction DemonologyDefaultCdActions
 	#imp_swarm,if=!talent.demonbolt.enabled&(buff.dark_soul.up|(cooldown.dark_soul.remains>(120%(1%spell_haste)))|time_to_die<32)&time>3
 	if not Talent(demonbolt_talent) and { BuffPresent(dark_soul_knowledge_buff) or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { 100 / { 100 + SpellHaste() } } } or target.TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
 
-	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan) or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(grimoire_felguard)
+	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan) or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(grimoire_felguard)
 	{
-		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
-		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
-		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<9
+		if not Talent(demonic_servitude_talent) and Enemies() < 9 Spell(summon_doomguard)
+		#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=9
+		if not Talent(demonic_servitude_talent) and Enemies() >= 9 Spell(summon_infernal)
 		#call_action_list,name=db,if=talent.demonbolt.enabled
 		if Talent(demonbolt_talent) DemonologyDbCdActions()
 
@@ -243,7 +242,7 @@ AddFunction DemonologyDbCdPostConditions
 AddFunction DemonologyPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	#food,type=sleeper_surprise
+	#food,type=sleeper_sushi
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#soul_fire
@@ -271,10 +270,10 @@ AddFunction DemonologyPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard)
 	{
-		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<9
+		if Talent(demonic_servitude_talent) and Enemies() < 9 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=9
+		if Talent(demonic_servitude_talent) and Enemies() >= 9 Spell(summon_infernal)
 
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
 		{

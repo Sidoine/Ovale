@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_rogue_combat_t17m"
-	local desc = "[6.0] SimulationCraft: Rogue_Combat_T17M"
+	local desc = "[6.1] SimulationCraft: Rogue_Combat_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Rogue_Combat_T17M".
 #	class=rogue
@@ -173,7 +173,7 @@ AddFunction CombatKillingSpreeCdActions
 AddFunction CombatPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=frosty_stew
+	#food,type=buttered_sturgeon
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth

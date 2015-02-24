@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_warrior_gladiator_t17m"
-	local desc = "[6.0] SimulationCraft: Warrior_Gladiator_T17M"
+	local desc = "[6.1] SimulationCraft: Warrior_Gladiator_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Gladiator_T17M".
 #	class=warrior
@@ -73,6 +73,8 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 
 	unless 0 > 5 and ProtectionGladiatorMovementShortCdPostConditions()
 	{
+		#avatar
+		Spell(avatar)
 		#shield_charge,if=(!buff.shield_charge.up&!cooldown.shield_slam.remains)|charges=2
 		if not BuffPresent(shield_charge_buff) and not SpellCooldown(shield_slam) > 0 or Charges(shield_charge) == 2 Spell(shield_charge)
 		#berserker_rage,if=buff.enrage.down
@@ -101,8 +103,6 @@ AddFunction ProtectionGladiatorDefaultCdActions
 
 	unless 0 > 5 and ProtectionGladiatorMovementCdPostConditions()
 	{
-		#avatar
-		Spell(avatar)
 		#bloodbath
 		Spell(bloodbath)
 		#blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
@@ -186,7 +186,7 @@ AddFunction ProtectionGladiatorMovementCdPostConditions
 AddFunction ProtectionGladiatorPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
-	#food,type=blackrock_barbecue
+	#food,type=pickled_eel
 	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
 	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
 	#battle_shout,if=!aura.attack_power_multiplier.up

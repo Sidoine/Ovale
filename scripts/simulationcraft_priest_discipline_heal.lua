@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_priest_discipline_t17m_heal"
-	local desc = "[6.0] SimulationCraft: Priest_Discipline_T17M_Heal"
+	local desc = "[6.1] SimulationCraft: Priest_Discipline_T17M_Heal"
 	local code = [[
 # Based on SimulationCraft profile "Priest_Discipline_T17M_Heal".
 #	class=priest
@@ -97,7 +97,7 @@ AddFunction DisciplineDefaultCdActions
 AddFunction DisciplinePrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	#food,type=blackrock_barbecue
+	#food,type=pickled_eel
 	#power_word_fortitude,if=!aura.stamina.up
 	if not BuffPresent(stamina_buff any=1) Spell(power_word_fortitude)
 	#prayer_of_mending

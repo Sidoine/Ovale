@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_druid_feral_t17m"
-	local desc = "[6.0] SimulationCraft: Druid_Feral_T17M"
+	local desc = "[6.1] SimulationCraft: Druid_Feral_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Druid_Feral_T17M".
 #	class=druid
@@ -187,7 +187,7 @@ AddFunction FeralMaintainMainActions
 AddFunction FeralPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=blackrock_barbecue
+	#food,type=pickled_eel
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#healing_touch,if=talent.bloodtalons.enabled&buff.bloodtalons.remains<20

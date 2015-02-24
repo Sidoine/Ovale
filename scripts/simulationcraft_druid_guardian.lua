@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_druid_guardian_t17m"
-	local desc = "[6.0] SimulationCraft: Druid_Guardian_T17M"
+	local desc = "[6.1] SimulationCraft: Druid_Guardian_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Druid_Guardian_T17M".
 #	class=druid
@@ -132,7 +132,7 @@ AddFunction GuardianDefaultCdActions
 AddFunction GuardianPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=sleeper_surprise
+	#food,type=sleeper_sushi
 	#mark_of_the_wild,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#bear_form

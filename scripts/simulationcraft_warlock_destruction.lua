@@ -3,12 +3,12 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_warlock_destruction_t17m"
-	local desc = "[6.0] SimulationCraft: Warlock_Destruction_T17M"
+	local desc = "[6.1] SimulationCraft: Warlock_Destruction_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warlock_Destruction_T17M".
 #	class=warlock
 #	spec=destruction
-#	talents=0000213
+#	talents=0000311
 #	pet=felhunter
 
 Include(ovale_common)
@@ -27,10 +27,10 @@ AddFunction DestructionUsePotionIntellect
 
 AddFunction DestructionDefaultMainActions
 {
-	#run_action_list,name=single_target,if=active_enemies<6
-	if Enemies() < 6 DestructionSingleTargetMainActions()
-	#run_action_list,name=aoe,if=active_enemies>=6
-	if Enemies() >= 6 DestructionAoeMainActions()
+	#run_action_list,name=single_target,if=active_enemies<6&(!talent.charred_remains.enabled|active_enemies<4)
+	if Enemies() < 6 and { not Talent(charred_remains_talent) or Enemies() < 4 } DestructionSingleTargetMainActions()
+	#run_action_list,name=aoe,if=active_enemies>=6|(talent.charred_remains.enabled&active_enemies>=4)
+	if Enemies() >= 6 or Talent(charred_remains_talent) and Enemies() >= 4 DestructionAoeMainActions()
 }
 
 AddFunction DestructionDefaultShortCdActions
@@ -39,13 +39,13 @@ AddFunction DestructionDefaultShortCdActions
 	Spell(mannoroths_fury)
 	#service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<20|(buff.dark_soul.remains&target.health.pct<20))
 	if Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } Spell(grimoire_felhunter)
-	#run_action_list,name=single_target,if=active_enemies<6
-	if Enemies() < 6 DestructionSingleTargetShortCdActions()
+	#run_action_list,name=single_target,if=active_enemies<6&(!talent.charred_remains.enabled|active_enemies<4)
+	if Enemies() < 6 and { not Talent(charred_remains_talent) or Enemies() < 4 } DestructionSingleTargetShortCdActions()
 
-	unless Enemies() < 6 and DestructionSingleTargetShortCdPostConditions()
+	unless Enemies() < 6 and { not Talent(charred_remains_talent) or Enemies() < 4 } and DestructionSingleTargetShortCdPostConditions()
 	{
-		#run_action_list,name=aoe,if=active_enemies>=6
-		if Enemies() >= 6 DestructionAoeShortCdActions()
+		#run_action_list,name=aoe,if=active_enemies>=6|(talent.charred_remains.enabled&active_enemies>=4)
+		if Enemies() >= 6 or Talent(charred_remains_talent) and Enemies() >= 4 DestructionAoeShortCdActions()
 	}
 }
 
@@ -64,10 +64,10 @@ AddFunction DestructionDefaultCdActions
 
 	unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } and Spell(grimoire_felhunter)
 	{
-		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
-		if not Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
-		if not Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<9
+		if not Talent(demonic_servitude_talent) and Enemies() < 9 Spell(summon_doomguard)
+		#summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=9
+		if not Talent(demonic_servitude_talent) and Enemies() >= 9 Spell(summon_infernal)
 	}
 }
 
@@ -75,32 +75,32 @@ AddFunction DestructionDefaultCdActions
 
 AddFunction DestructionAoeMainActions
 {
-	#rain_of_fire,if=remains<=tick_time
-	if target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) Spell(rain_of_fire)
-	#shadowburn,if=buff.havoc.remains
-	if BuffPresent(havoc_buff) Spell(shadowburn)
-	#chaos_bolt,if=buff.havoc.remains>cast_time&buff.havoc.stack>=3
-	if BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
+	#rain_of_fire,if=!talent.charred_remains.enabled&remains<=tick_time
+	if not Talent(charred_remains_talent) and target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) Spell(rain_of_fire)
+	#shadowburn,if=!talent.charred_remains.enabled&buff.havoc.remains
+	if not Talent(charred_remains_talent) and BuffPresent(havoc_buff) Spell(shadowburn)
+	#chaos_bolt,if=!talent.charred_remains.enabled&buff.havoc.remains>cast_time&buff.havoc.stack>=3
+	if not Talent(charred_remains_talent) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
 	#immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking
 	if BuffPresent(fire_and_brimstone_buff) and not target.DebuffPresent(immolate_debuff) Spell(immolate)
 	#conflagrate,if=buff.fire_and_brimstone.up&charges=2
 	if BuffPresent(fire_and_brimstone_buff) and Charges(conflagrate) == 2 Spell(conflagrate)
 	#immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains<=(dot.immolate.duration*0.3)
 	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) <= target.DebuffDuration(immolate_debuff) * 0.3 Spell(immolate)
-	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up&burning_ember>=2.5
-	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) and BurningEmbers() / 10 >= 2.5 Spell(chaos_bolt)
+	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up
+	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) Spell(chaos_bolt)
 	#incinerate
 	Spell(incinerate)
 }
 
 AddFunction DestructionAoeShortCdActions
 {
-	unless target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and Spell(rain_of_fire)
+	unless not Talent(charred_remains_talent) and target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and Spell(rain_of_fire)
 	{
-		#havoc,target=2
-		if Enemies() > 1 Spell(havoc text=other)
+		#havoc,target=2,if=(!talent.charred_remains.enabled|buff.fire_and_brimstone.down)
+		if { not Talent(charred_remains_talent) or BuffExpires(fire_and_brimstone_buff) } and Enemies() > 1 Spell(havoc text=other)
 
-		unless BuffPresent(havoc_buff) and Spell(shadowburn) or BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
+		unless not Talent(charred_remains_talent) and BuffPresent(havoc_buff) and Spell(shadowburn) or not Talent(charred_remains_talent) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
 		{
 			#kiljaedens_cunning,if=(talent.cataclysm.enabled&!cooldown.cataclysm.remains)
 			if Talent(cataclysm_talent) and not SpellCooldown(cataclysm) > 0 Spell(kiljaedens_cunning)
@@ -119,7 +119,7 @@ AddFunction DestructionAoeShortCdActions
 AddFunction DestructionPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	#food,type=blackrock_barbecue
+	#food,type=pickled_eel
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#snapshot_stats
@@ -149,10 +149,10 @@ AddFunction DestructionPrecombatCdActions
 {
 	unless not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felhunter)
 	{
-		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-		if Talent(demonic_servitude_talent) and Enemies() < 5 Spell(summon_doomguard)
-		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
-		if Talent(demonic_servitude_talent) and Enemies() >= 5 Spell(summon_infernal)
+		#summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<9
+		if Talent(demonic_servitude_talent) and Enemies() < 9 Spell(summon_doomguard)
+		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=9
+		if Talent(demonic_servitude_talent) and Enemies() >= 9 Spell(summon_infernal)
 
 		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felhunter)
 		{

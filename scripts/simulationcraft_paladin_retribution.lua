@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_paladin_retribution_t17m"
-	local desc = "[6.0] SimulationCraft: Paladin_Retribution_T17M"
+	local desc = "[6.1] SimulationCraft: Paladin_Retribution_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Paladin_Retribution_T17M".
 #	class=paladin
@@ -159,8 +159,8 @@ AddFunction RetributionCleaveMainActions
 	if HolyPower() < 5 and Talent(seraphim_talent) Spell(crusader_strike)
 	#crusader_strike,if=holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down)
 	if HolyPower() <= 3 or HolyPower() == 4 and target.HealthPercent() >= 35 and BuffExpires(avenging_wrath_melee_buff) Spell(crusader_strike)
-	#exorcism,if=glyph.mass_exorcism.enabled&holy_power<5
-	if Glyph(glyph_of_mass_exorcism) and HolyPower() < 5 Spell(exorcism)
+	#exorcism,if=glyph.mass_exorcism.enabled&holy_power<5&!set_bonus.tier17_4pc=1
+	if Glyph(glyph_of_mass_exorcism) and HolyPower() < 5 and not ArmorSetBonus(T17 4) == 1 Spell(exorcism)
 	#judgment,cycle_targets=1,if=glyph.double_jeopardy.enabled&holy_power<5
 	if Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment text=double)
 	#judgment,if=holy_power<5&talent.seraphim.enabled
@@ -191,6 +191,8 @@ AddFunction RetributionCleaveMainActions
 	if HolyPower() >= 3 and BuffPresent(final_verdict_buff) Spell(divine_storm)
 	#final_verdict,if=holy_power>=3&buff.final_verdict.down
 	if HolyPower() >= 3 and BuffExpires(final_verdict_buff) Spell(final_verdict)
+	#holy_prism,target=self
+	Spell(holy_prism text=self)
 }
 
 ### actions.precombat
@@ -198,7 +200,7 @@ AddFunction RetributionCleaveMainActions
 AddFunction RetributionPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
-	#food,type=sleeper_surprise
+	#food,type=sleeper_sushi
 	#blessing_of_kings,if=!aura.str_agi_int.up
 	if not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
@@ -243,12 +245,14 @@ AddFunction RetributionSingleMainActions
 	if { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and Enemies() == 2 and BuffPresent(final_verdict_buff) Spell(divine_storm)
 	#divine_storm,if=buff.divine_crusader.react&(holy_power=5|buff.holy_avenger.up&holy_power>=3)&(talent.seraphim.enabled&cooldown.seraphim.remains<gcd*4)
 	if BuffPresent(divine_crusader_buff) and { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and Talent(seraphim_talent) and SpellCooldown(seraphim) < GCD() * 4 Spell(divine_storm)
-	#templars_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)
-	if HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > GCD() * 4 } Spell(templars_verdict)
+	#templars_verdict,if=(holy_power=5|buff.holy_avenger.up&holy_power>=3)&(buff.avenging_wrath.down|target.health.pct>35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)
+	if { HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 } and { BuffExpires(avenging_wrath_melee_buff) or target.HealthPercent() > 35 } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > GCD() * 4 } Spell(templars_verdict)
 	#templars_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<3
 	if BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < 3 Spell(templars_verdict)
 	#divine_storm,if=buff.divine_crusader.react&buff.divine_crusader.remains<3&!talent.final_verdict.enabled
 	if BuffPresent(divine_crusader_buff) and BuffRemaining(divine_crusader_buff) < 3 and not Talent(final_verdict_talent) Spell(divine_storm)
+	#divine_storm,if=buff.divine_crusader.react&buff.divine_crusader.remains<3&buff.final_verdict.up
+	if BuffPresent(divine_crusader_buff) and BuffRemaining(divine_crusader_buff) < 3 and BuffPresent(final_verdict_buff) Spell(divine_storm)
 	#final_verdict,if=holy_power=5|buff.holy_avenger.up&holy_power>=3
 	if HolyPower() == 5 or BuffPresent(holy_avenger_buff) and HolyPower() >= 3 Spell(final_verdict)
 	#final_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<3
@@ -291,8 +295,8 @@ AddFunction RetributionSingleMainActions
 	if BuffPresent(divine_crusader_buff) and { BuffPresent(avenging_wrath_melee_buff) or target.HealthPercent() < 35 } and not Talent(final_verdict_talent) Spell(divine_storm)
 	#judgment,cycle_targets=1,if=last_judgment_target!=target&glyph.double_jeopardy.enabled&holy_power<5
 	if BuffPresent(glyph_of_double_jeopardy_buff) and Glyph(glyph_of_double_jeopardy) and HolyPower() < 5 Spell(judgment text=double)
-	#exorcism,if=glyph.mass_exorcism.enabled&active_enemies>=2&holy_power<5&!glyph.double_jeopardy.enabled
-	if Glyph(glyph_of_mass_exorcism) and Enemies() >= 2 and HolyPower() < 5 and not Glyph(glyph_of_double_jeopardy) Spell(exorcism)
+	#exorcism,if=glyph.mass_exorcism.enabled&active_enemies>=2&holy_power<5&!glyph.double_jeopardy.enabled&!set_bonus.tier17_4pc=1
+	if Glyph(glyph_of_mass_exorcism) and Enemies() >= 2 and HolyPower() < 5 and not Glyph(glyph_of_double_jeopardy) and not ArmorSetBonus(T17 4) == 1 Spell(exorcism)
 	#judgment,if=holy_power<5&talent.seraphim.enabled
 	if HolyPower() < 5 and Talent(seraphim_talent) Spell(judgment)
 	#judgment,if=holy_power<=3|(holy_power=4&cooldown.crusader_strike.remains>=gcd*2&target.health.pct>35&buff.avenging_wrath.down)

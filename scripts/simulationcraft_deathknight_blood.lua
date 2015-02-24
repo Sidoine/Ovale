@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_death_knight_blood_t17m"
-	local desc = "[6.0] SimulationCraft: Death_Knight_Blood_T17M"
+	local desc = "[6.1] SimulationCraft: Death_Knight_Blood_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Death_Knight_Blood_T17M".
 #	class=deathknight
@@ -234,7 +234,7 @@ AddFunction BloodNrtCdPostConditions
 AddFunction BloodPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
-	#food,type=talador_surf_and_turf
+	#food,type=whiptail_fillet
 	#blood_presence
 	Spell(blood_presence)
 	#horn_of_winter

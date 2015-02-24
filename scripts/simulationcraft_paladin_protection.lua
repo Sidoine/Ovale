@@ -3,13 +3,13 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_paladin_protection_t17m"
-	local desc = "[6.0] SimulationCraft: Paladin_Protection_T17M"
+	local desc = "[6.1] SimulationCraft: Paladin_Protection_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Paladin_Protection_T17M".
 #	class=paladin
 #	spec=protection
 #	talents=3032322
-#	glyphs=focused_shield/alabaster_shield/divine_protection
+#	glyphs=focused_shield/divine_protection/final_wrath
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -126,8 +126,6 @@ AddFunction ProtectionDefaultShortCdActions
 	if BuffRemaining(eternal_flame_buff) < 2 and BuffStacks(bastion_of_glory_buff) > 2 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(bastion_of_power_buff) } Spell(eternal_flame)
 	#eternal_flame,if=buff.bastion_of_power.react&buff.bastion_of_glory.react>=5
 	if BuffPresent(bastion_of_power_buff) and BuffStacks(bastion_of_glory_buff) >= 5 Spell(eternal_flame)
-	#harsh_word,if=glyph.harsh_words.enabled&holy_power>=3
-	if Glyph(glyph_of_harsh_words) and HolyPower() >= 3 Spell(harsh_word)
 	#shield_of_the_righteous,if=buff.divine_purpose.react
 	if BuffPresent(divine_purpose_buff) Spell(shield_of_the_righteous)
 	#shield_of_the_righteous,if=(holy_power>=5|incoming_damage_1500ms>=health.max*0.3)&(!talent.seraphim.enabled|cooldown.seraphim.remains>5)
@@ -308,8 +306,8 @@ AddFunction ProtectionMaxDpsCdActions
 	Spell(arcane_torrent_holy)
 	#holy_avenger
 	Spell(holy_avenger)
-	#potion,name=draenic_armor,if=buff.holy_avenger.react|buff.bloodlust.react|target.time_to_die<=60
-	if BuffPresent(holy_avenger_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 ProtectionUsePotionArmor()
+	#potion,name=draenic_armor,if=buff.holy_avenger.up|(!talent.holy_avenger.enabled&(buff.seraphim.up|(!talent.seraphim.enabled&buff.bloodlust.react)))|target.time_to_die<=20
+	if BuffPresent(holy_avenger_buff) or not Talent(holy_avenger_talent) and { BuffPresent(seraphim_buff) or not Talent(seraphim_talent) and BuffPresent(burst_haste_buff any=1) } or target.TimeToDie() <= 20 ProtectionUsePotionArmor()
 }
 
 ### actions.max_survival
@@ -438,8 +436,8 @@ AddFunction ProtectionPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
 	#flask,type=greater_draenic_strength_flask,if=role.attack|using_apl.max_dps
-	#food,type=talador_surf_and_turf
-	#food,type=blackrock_barbecue,if=role.attack|using_apl.max_dps
+	#food,type=whiptail_fillet
+	#food,type=pickled_eel,if=role.attack|using_apl.max_dps
 	#blessing_of_kings,if=(!aura.str_agi_int.up)&(aura.mastery.up)
 	if not BuffPresent(str_agi_int_buff any=1) and BuffPresent(mastery_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
@@ -565,14 +563,12 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # glyph_of_double_jeopardy_buff
 # glyph_of_final_wrath
 # glyph_of_focused_shield
-# glyph_of_harsh_words
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
 # hammer_of_justice
 # hammer_of_the_righteous
 # hammer_of_wrath
-# harsh_word
 # holy_avenger
 # holy_avenger_buff
 # holy_avenger_talent

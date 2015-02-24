@@ -3,12 +3,12 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_hunter_sv_t17m"
-	local desc = "[6.0] SimulationCraft: Hunter_SV_T17M"
+	local desc = "[6.1] SimulationCraft: Hunter_SV_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Hunter_SV_T17M".
 #	class=hunter
 #	spec=survival
-#	talents=0001112
+#	talents=0003313
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -64,6 +64,8 @@ AddFunction SurvivalDefaultMainActions
 {
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeMainActions()
+	#black_arrow,if=!ticking
+	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 	#explosive_shot
 	Spell(explosive_shot)
 	#arcane_shot,if=buff.thrill_of_the_hunt.react&focus>35&cast_regen<=focus.deficit|dot.serpent_sting.remains<=3|target.time_to_die<4.5
@@ -87,10 +89,8 @@ AddFunction SurvivalDefaultShortCdActions
 	{
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
-		#black_arrow,if=!ticking
-		if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 
-		unless Spell(explosive_shot)
+		unless not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Spell(explosive_shot)
 		{
 			#dire_beast
 			Spell(dire_beast)
@@ -135,6 +135,8 @@ AddFunction SurvivalAoeMainActions
 {
 	#explosive_shot,if=buff.lock_and_load.react&(!talent.barrage.enabled|cooldown.barrage.remains>0)
 	if BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } Spell(explosive_shot)
+	#black_arrow,if=!ticking
+	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 	#explosive_shot,if=active_enemies<5
 	if Enemies() < 5 Spell(explosive_shot)
 	#multishot,if=buff.thrill_of_the_hunt.react&focus>50&cast_regen<=focus.deficit|dot.serpent_sting.remains<=5|target.time_to_die<4.5
@@ -157,10 +159,8 @@ AddFunction SurvivalAoeShortCdActions
 	{
 		#barrage
 		Spell(barrage)
-		#black_arrow,if=!ticking
-		if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
 
-		unless Enemies() < 5 and Spell(explosive_shot)
+		unless not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot)
 		{
 			#explosive_trap,if=dot.explosive_trap.remains<=5
 			if target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
@@ -180,7 +180,7 @@ AddFunction SurvivalAoeShortCdActions
 
 AddFunction SurvivalAoeShortCdPostConditions
 {
-	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or Enemies() < 5 and Spell(explosive_shot) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
+	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
 }
 
 AddFunction SurvivalAoeCdActions
@@ -212,7 +212,7 @@ AddFunction SurvivalPrecombatMainActions
 AddFunction SurvivalPrecombatShortCdActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=calamari_crepes
+	#food,type=salty_squid_roll
 	#summon_pet
 	SurvivalSummonPet()
 }

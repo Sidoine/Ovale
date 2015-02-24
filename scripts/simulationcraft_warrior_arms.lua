@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_warrior_arms_t17m"
-	local desc = "[6.0] SimulationCraft: Warrior_Arms_T17M"
+	local desc = "[6.1] SimulationCraft: Warrior_Arms_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Warrior_Arms_T17M".
 #	class=warrior
@@ -80,6 +80,8 @@ AddFunction ArmsDefaultShortCdActions
 
 	unless 0 > 5 and ArmsMovementShortCdPostConditions()
 	{
+		#avatar,if=buff.recklessness.up|target.time_to_die<25
+		if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
 		#call_action_list,name=single,if=active_enemies=1
@@ -108,8 +110,6 @@ AddFunction ArmsDefaultCdActions
 		if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) and { not SpellCooldown(bladestorm) > 0 or not Talent(bladestorm_talent) } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
 		#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5&((talent.ravager.enabled&prev_gcd.ravager)|!talent.ravager.enabled))|target.time_to_die<20
 		if target.DebuffPresent(rend_debuff) and SpellCooldown(colossus_smash) < 5 and { Talent(ravager_talent) and PreviousGCDSpell(ravager) or not Talent(ravager_talent) } or target.TimeToDie() < 20 Spell(bloodbath)
-		#avatar,if=buff.recklessness.up|target.time_to_die<25
-		if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
 		#blood_fury,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
 		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 		#berserking,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up
@@ -210,7 +210,7 @@ AddFunction ArmsMovementCdPostConditions
 AddFunction ArmsPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
-	#food,type=sleeper_surprise
+	#food,type=sleeper_sushi
 	#commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
 	if not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) Spell(commanding_shout)
 	#battle_shout,if=!aura.attack_power_multiplier.up

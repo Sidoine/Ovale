@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "simulationcraft_death_knight_unholy_t17m"
-	local desc = "[6.0] SimulationCraft: Death_Knight_Unholy_T17M"
+	local desc = "[6.1] SimulationCraft: Death_Knight_Unholy_T17M"
 	local code = [[
 # Based on SimulationCraft profile "Death_Knight_Unholy_T17M".
 #	class=deathknight
@@ -303,7 +303,7 @@ AddFunction UnholyBosStCdPostConditions
 AddFunction UnholyPrecombatMainActions
 {
 	#flask,type=greater_draenic_strength_flask
-	#food,type=calamari_crepes
+	#food,type=salty_squid_roll
 	#horn_of_winter
 	if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	#unholy_presence
