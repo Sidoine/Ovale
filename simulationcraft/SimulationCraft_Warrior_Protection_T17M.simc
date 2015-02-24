@@ -17,7 +17,7 @@ spec=protection
 # Executed before combat begins. Accepts non-harmful actions only.
 
 actions.precombat=flask,type=greater_draenic_stamina_flask
-actions.precombat+=/food,type=blackrock_barbecue
+actions.precombat+=/food,type=pickled_eel
 actions.precombat+=/battle_shout,if=!aura.attack_power_multiplier.up&aura.stamina.up
 actions.precombat+=/commanding_shout,if=!aura.stamina.up
 actions.precombat+=/stance,choose=defensive

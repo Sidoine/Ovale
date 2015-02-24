@@ -21,7 +21,7 @@ spec=arms
 # Executed before combat begins. Accepts non-harmful actions only.
 
 actions.precombat=flask,type=greater_draenic_strength_flask
-actions.precombat+=/food,type=sleeper_surprise
+actions.precombat+=/food,type=sleeper_sushi
 actions.precombat+=/commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
 actions.precombat+=/battle_shout,if=!aura.attack_power_multiplier.up
 actions.precombat+=/stance,choose=battle

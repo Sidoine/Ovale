@@ -4,8 +4,7 @@ level=100
 race=troll
 role=spell
 position=back
-talents=0000311
-glyphs=dark_soul
+talents=0000213
 spec=demonology
 
 # This default action priority list is automatically created based on your character.
@@ -17,11 +16,11 @@ spec=demonology
 # Executed before combat begins. Accepts non-harmful actions only.
 
 actions.precombat=flask,type=greater_draenic_intellect_flask
-actions.precombat+=/food,type=sleeper_surprise
+actions.precombat+=/food,type=sleeper_sushi
 actions.precombat+=/dark_intent,if=!aura.spell_power_multiplier.up
 actions.precombat+=/summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
-actions.precombat+=/summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<5
-actions.precombat+=/summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=5
+actions.precombat+=/summon_doomguard,if=talent.demonic_servitude.enabled&active_enemies<9
+actions.precombat+=/summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=9
 actions.precombat+=/snapshot_stats
 actions.precombat+=/service_pet,if=talent.grimoire_of_service.enabled
 actions.precombat+=/potion,name=draenic_intellect
@@ -40,13 +39,13 @@ actions+=/imp_swarm,if=!talent.demonbolt.enabled&(buff.dark_soul.up|(cooldown.da
 actions+=/felguard:felstorm
 actions+=/wrathguard:wrathstorm
 actions+=/wrathguard:mortal_cleave,if=pet.wrathguard.cooldown.wrathstorm.remains>5
-actions+=/life_tap,if=buff.metamorphosis.down&mana.pct<40
+actions+=/life_tap,if=buff.metamorphosis.down&mana.pct<40&buff.dark_soul.down
 actions+=/hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&(((set_bonus.tier17_4pc=0&((charges=1&recharge_time<4)|charges=2))|(charges=3|(charges=2&recharge_time<13.8-travel_time*2))&((cooldown.cataclysm.remains>dot.shadowflame.duration)|!talent.cataclysm.enabled))|dot.shadowflame.remains>travel_time)
 actions+=/hand_of_guldan,if=!in_flight&dot.shadowflame.remains<travel_time+action.shadow_bolt.cast_time&talent.demonbolt.enabled&((set_bonus.tier17_4pc=0&((charges=1&recharge_time<4)|charges=2))|(charges=3|(charges=2&recharge_time<13.8-travel_time*2))|dot.shadowflame.remains>travel_time)
 actions+=/hand_of_guldan,if=!in_flight&dot.shadowflame.remains<3.7&time<5&buff.demonbolt.remains<gcd*2&(charges>=2|set_bonus.tier17_4pc=0)&action.dark_soul.charges>=1
 actions+=/service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<20|(buff.dark_soul.remains&target.health.pct<20))
-actions+=/summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<5
-actions+=/summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=5
+actions+=/summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<9
+actions+=/summon_infernal,if=!talent.demonic_servitude.enabled&active_enemies>=9
 actions+=/call_action_list,name=db,if=talent.demonbolt.enabled
 actions+=/kiljaedens_cunning,if=!cooldown.cataclysm.remains&buff.metamorphosis.up
 actions+=/cataclysm,if=buff.metamorphosis.up
