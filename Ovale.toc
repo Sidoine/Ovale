@@ -1,5 +1,4 @@
 ## Interface: 60100
-## X-Min-Interface: 60000
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
@@ -7,8 +6,6 @@
 ## Version: @project-version@
 ## OptionalDeps: Ace3, LibBabble-CreatureType-3.0, LibDataBroker-1.1, LibDBIcon-1.0, LibDualSpec-1.0, LibRangeCheck-2.0, LibTextDump-1.0, Masque, Recount, Skada, SpellFlashCore
 ## SavedVariables: OvaleDB
-## X-Category: Combat
-## X-Embeds: Ace3
 
 # Libraries.
 libs\libs.xml
