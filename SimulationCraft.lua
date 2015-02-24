@@ -2682,6 +2682,7 @@ do
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
 		["demonic_fury"]		= "DemonicFury()",
+		["desired_targets"]		= "Enemies(tagged=1)",
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
 		["eclipse_energy"]		= "EclipseEnergy()",	-- XXX
 		["energy"]				= "Energy()",
