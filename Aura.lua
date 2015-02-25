@@ -310,7 +310,9 @@ function OvaleAura:OnEnable()
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
 	OvaleData:RegisterRequirement("buff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("buff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("debuff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("debuff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("health_pct", "RequireHealthPercentHandler", self)
 	OvaleData:RegisterRequirement("pet_buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("pet_debuff", "RequireBuffHandler", self)
@@ -318,7 +320,9 @@ function OvaleAura:OnEnable()
 	OvaleData:RegisterRequirement("stealth", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("stealthed", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("target_buff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("target_buff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_debuff", "RequireBuffHandler", self)
+	OvaleData:RegisterRequirement("target_debuff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_health_pct", "RequireHealthPercentHandler", self)
 	OvaleState:RegisterState(self, self.statePrototype)
 end
@@ -326,7 +330,9 @@ end
 function OvaleAura:OnDisable()
 	OvaleState:UnregisterState(self)
 	OvaleData:UnregisterRequirement("buff")
+	OvaleData:UnregisterRequirement("buff_any")
 	OvaleData:UnregisterRequirement("debuff")
+	OvaleData:UnregisterRequirement("debuff_any")
 	OvaleData:UnregisterRequirement("health_pct")
 	OvaleData:UnregisterRequirement("pet_buff")
 	OvaleData:UnregisterRequirement("pet_debuff")
@@ -334,7 +340,9 @@ function OvaleAura:OnDisable()
 	OvaleData:UnregisterRequirement("stealth")
 	OvaleData:UnregisterRequirement("stealthed")
 	OvaleData:UnregisterRequirement("target_buff")
+	OvaleData:UnregisterRequirement("target_buff_any")
 	OvaleData:UnregisterRequirement("target_debuff")
+	OvaleData:UnregisterRequirement("target_debuff_any")
 	OvaleData:UnregisterRequirement("target_health_pct")
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -804,16 +812,16 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 		local unitId, filter, mine
 		if strsub(requirement, 1, 7) == "target_" then
 			unitId = target
-			filter = (strsub(requirement, 8) == "buff") and "HELPFUL" or "HARMFUL"
-			mine = true
+			filter = (strsub(requirement, 8, 11) == "buff") and "HELPFUL" or "HARMFUL"
+			mine = not (strsub(requirement, -4) == "_any")
 		elseif strsub(requirement, 1, 4) == "pet_" then
 			unitId = "pet"
-			filter = (strsub(requirement, 5) == "buff") and "HELPFUL" or "HARMFUL"
+			filter = (strsub(requirement, 5, 11) == "buff") and "HELPFUL" or "HARMFUL"
 			mine = false
 		else
 			unitId = "player"
-			filter = (requirement == "buff") and "HELPFUL" or "HARMFUL"
-			mine = true
+			filter = (strsub(requirement, 1, 4) == "buff") and "HELPFUL" or "HARMFUL"
+			mine = not (strsub(requirement, -4) == "_any")
 		end
 		local aura = self:GetAura(unitId, buffName, filter, mine)
 		local isActiveAura = self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
