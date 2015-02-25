@@ -43,13 +43,13 @@ AddFunction RestorationMainActions
 {
 	# Cast instant/mana-free Healing Touch or Regrowth.
 	if BuffStacks(sage_mender_buff) == 5 Spell(healing_touch)
-	if BuffPresent(omen_of_clarity_heal_buff) Spell(regrowth)
+	if BuffPresent(omen_of_clarity_heal_buff) or BuffPresent(omen_of_clarity_moment_of_clarity_buff) Spell(regrowth)
 	if BuffPresent(natures_swiftness_buff) Spell(healing_touch)
 
 	# Maintain 100% uptime on Harmony mastery buff using Swiftmend.
 	# Swiftmend requires either a Rejuvenation or Regrowth HoT to be on the target before
 	# it is usable, but we want to show Swiftmend as usable as long as the cooldown is up.
-	if BuffRemaining(harmony_buff) < 6 and { BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(regrowth_buff) > 0 } and not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation help=Swiftmend)
+	if BuffRemaining(harmony_buff) < 6 and { BuffCountOnAny(regrowth_buff) > 0 or BuffCountOnAny(rejuvenation_buff) > 0 or BuffCountOnAny(rejuvenation_germination_buff) > 0 } and not SpellCooldown(swiftmend) > 0 Texture(inv_relics_idolofrejuvenation help=Swiftmend)
 
 	# Keep one Lifebloom up on the raid.
 	if BuffRemainingOnAny(lifebloom_buff) < 4 Spell(lifebloom)
@@ -63,21 +63,21 @@ AddFunction RestorationAoeActions
 	if BuffPresent(tree_of_life_buff)
 	{
 		Spell(wild_growth)
-		if BuffPresent(omen_of_clarity_heal_buff) Spell(regrowth)
+		if BuffPresent(omen_of_clarity_heal_buff) or BuffPresent(omen_of_clarity_moment_of_clarity_buff) Spell(regrowth)
 	}
 	unless BuffPresent(tree_of_life_buff)
 	{
 		Spell(wild_growth)
-		if BuffCountOnAny(rejuvenation_buff) > 4 Spell(genesis)
+		if BuffCountOnAny(rejuvenation_buff) > 4 or BuffCountOnAny(rejuvenation_germination_buff) > 4 Spell(genesis)
 	}
 }
 
 AddFunction RestorationShortCdActions
 {
-	# Maintain Efflorescence.
-	if TotemExpires(wild_mushroom_heal) Spell(wild_mushroom_heal)
 	# Don't cap out on Force of Nature charges.
 	if Talent(force_of_nature_talent) and Charges(force_of_nature_heal count=0) >= 3 Spell(force_of_nature_heal)
+	# Maintain Efflorescence.
+	if TotemExpires(wild_mushroom_heal) Spell(wild_mushroom_heal)
 }
 
 AddFunction RestorationCdActions
@@ -85,7 +85,7 @@ AddFunction RestorationCdActions
 	RestorationInterruptActions()
 	Spell(blood_fury_apsp)
 	Spell(berserking)
-	if ManaPercent() < 97 Spell(arcane_torrent_energy)
+	if ManaPercent() < 97 Spell(arcane_torrent_mana)
 	Spell(incarnation_heal)
 	Spell(heart_of_the_wild_heal)
 	Spell(natures_vigil)
