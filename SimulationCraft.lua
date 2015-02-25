@@ -1033,7 +1033,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
-	AddDisambiguation("beast_cleave_buff",		"pet_beast_cleave_buff",		"HUNTER",		"beast_mastery")
+	AddDisambiguation("beast_cleave",			"pet_beast_cleave",				"HUNTER",		"beast_mastery")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	-- Mage
@@ -2989,8 +2989,12 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 					ok, node = EmitOperandCharacter(petOperand, parseNode, nodeList, annotation, action, target)
 				end
 				if not ok then
-					-- Prefix the pet ability name with the name of the pet.
-					petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
+					-- Prefix the pet ability name with the name of the pet if it does not already begin with "pet".
+					local petAbilityName = strmatch(petOperand, "^[%w_]+%.([^.]+)")
+					petAbilityName = Disambiguate(petAbilityName, annotation.class, annotation.specialization)
+					if strsub(petAbilityName, 1, 4) ~= "pet_" then
+						petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
+					end
 					if property == "buff" then
 						ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
 					elseif property == "cooldown" then
