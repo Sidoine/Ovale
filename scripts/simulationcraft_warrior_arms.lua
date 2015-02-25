@@ -106,8 +106,8 @@ AddFunction ArmsDefaultCdActions
 		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) ArmsUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
 		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() < 25 ArmsUsePotionStrength()
-		#recklessness,if=(dot.rend.ticking&(target.time_to_die>190|target.health.pct<20)&((!talent.bloodbath.enabled&debuff.colossus_smash.up&(!cooldown.bladestorm.remains|!talent.bladestorm.enabled))|buff.bloodbath.up))|target.time_to_die<10
-		if target.DebuffPresent(rend_debuff) and { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) and { not SpellCooldown(bladestorm) > 0 or not Talent(bladestorm_talent) } or BuffPresent(bloodbath_buff) } or target.TimeToDie() < 10 Spell(recklessness)
+		#recklessness,if=(((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled)&((desired_targets=1&!raid_event.adds.exists)|!talent.bladestorm.enabled)
+		if { { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) } and { Enemies(tagged=1) == 1 and not False(raid_event_adds_exists) or not Talent(bladestorm_talent) } Spell(recklessness)
 		#bloodbath,if=(dot.rend.ticking&cooldown.colossus_smash.remains<5&((talent.ravager.enabled&prev_gcd.ravager)|!talent.ravager.enabled))|target.time_to_die<20
 		if target.DebuffPresent(rend_debuff) and SpellCooldown(colossus_smash) < 5 and { Talent(ravager_talent) and PreviousGCDSpell(ravager) or not Talent(ravager_talent) } or target.TimeToDie() < 20 Spell(bloodbath)
 		#blood_fury,if=buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up)|buff.recklessness.up

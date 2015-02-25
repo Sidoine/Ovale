@@ -60,7 +60,7 @@ AddFunction BeastMasterySummonPet
 AddFunction BeastMasteryDefaultMainActions
 {
 	#multishot,if=active_enemies>1&pet.cat.buff.beast_cleave.down
-	if Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) Spell(multishot)
+	if Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff) Spell(multishot)
 	#multishot,if=active_enemies>5
 	if Enemies() > 5 Spell(multishot)
 	#kill_command
@@ -94,7 +94,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 	#bestial_wrath,if=focus>30&!buff.bestial_wrath.up
 	if Focus() > 30 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
 
-	unless Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff any=1) and Spell(multishot)
+	unless Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff) and Spell(multishot)
 	{
 		#barrage,if=active_enemies>1
 		if Enemies() > 1 Spell(barrage)
@@ -102,7 +102,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 		unless Enemies() > 5 and Spell(multishot)
 		{
 			#focus_fire,five_stacks=1
-			if BuffStacks(frenzy_buff any=1) >= 5 Spell(focus_fire)
+			if BuffStacks(frenzy_buff) >= 5 Spell(focus_fire)
 			#barrage,if=active_enemies>1
 			if Enemies() > 1 Spell(barrage)
 
