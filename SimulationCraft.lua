@@ -1033,6 +1033,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
+	AddDisambiguation("beast_cleave_buff",		"pet_beast_cleave_buff",		"HUNTER",		"beast_mastery")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	-- Mage
@@ -2302,7 +2303,7 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		if value == 1 then
 			local buffName = "frenzy_buff"
 			AddSymbol(annotation, buffName)
-			code = format("BuffStacks(%s any=1) >= 5", buffName)
+			code = format("BuffStacks(%s) >= 5", buffName)
 		end
 	elseif modifier == "line_cd" then
 		if not SPECIAL_ACTION[action] then
@@ -2613,11 +2614,12 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 		target = target and (target .. ".") or ""
 
 		-- Unholy death knight's Dark Transformation applies the buff to the ghoul/pet.
-		if buffName == "dark_transformation_buff" then
-			if target == "" then
-				target = "pet."
-			end
-			any = " any=1"
+		if buffName == "dark_transformation_buff" and target == "" then
+			target = "pet."
+		end
+		-- Hunter's Beast Cleave is a buff on the hunter's pet.
+		if buffName == "pet_beast_cleave_buff" and target == "" then
+			target = "pet."
 		end
 
 		-- Assume that the "potion" action has already been seen.
@@ -3234,11 +3236,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local spellName = "ferocious_bite"
 		code = format("EnergyCost(%s max=1)", spellName)
 		AddSymbol(annotation, spellName)
-	elseif class == "HUNTER" and operand == "buff.beast_cleave.down" then
-		-- Beast Cleave is a buff on the hunter's pet.
-		local buffName = "pet_beast_cleave_buff"
-		code = format("pet.BuffExpires(%s any=1)", buffName)
-		AddSymbol(annotation, buffName)
 	elseif class == "HUNTER" and operand == "buff.careful_aim.up" then
 		-- The "careful_aim" buff is a fake SimulationCraft buff.
 		code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)"
