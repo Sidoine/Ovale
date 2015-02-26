@@ -3252,13 +3252,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local spellName = "stampede"
 		code = format("TimeSincePreviousSpell(%s) < 40", spellName)
 		AddSymbol(annotation, spellName)
-	elseif class == "MAGE" and (operand == "in_flight" and action == "fireball" or operand == "action.fireball.in_flight") then
-		-- Frostfire Bolt can be substituted for Fireball when testing whether the spell is in flight.
-		local fbName = "fireball"
-		local ffbName = "frostfire_bolt"
-		code = format("InFlightToTarget(%s) or InFlightToTarget(%s)", fbName, ffbName)
-		AddSymbol(annotation, fbName)
-		AddSymbol(annotation, ffbName)
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
 		code = "TotemRemaining(rune_of_power)"
 	elseif class == "MAGE" and operand == "dot.frozen_orb.ticking" then
