@@ -2687,6 +2687,7 @@ do
 		["desired_targets"]		= "Enemies(tagged=1)",
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
 		["eclipse_energy"]		= "EclipseEnergy()",	-- XXX
+		["enemies"]				= "Enemies()",
 		["energy"]				= "Energy()",
 		["energy.deficit"]		= "EnergyDeficit()",
 		["energy.max"]			= "MaxEnergy()",
