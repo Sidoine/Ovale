@@ -94,7 +94,7 @@ local function ComputeParameter(spellId, paramName, state, atTime)
 		local name = si[paramName]
 		local node = OvaleCompile:GetFunctionNode(name)
 		if node then
-			local timeSpan, priority, element = OvaleBestAction:Compute(node.child[1], state, atTime)
+			local timeSpan, element = OvaleBestAction:Compute(node.child[1], state, atTime)
 			if element and element.type == "value" then
 				local value = element.value + (state.currentTime - element.origin) * element.rate
 				return value

@@ -205,7 +205,7 @@ do
 					-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
 					atTime = state.currentTime
 				end
-				local timeSpan, _, element = OvaleBestAction:GetAction(node, state, atTime)
+				local timeSpan, element = OvaleBestAction:GetAction(node, state, atTime)
 				local start
 				if element and element.offgcd then
 					start = NextTime(timeSpan, state.currentTime)
@@ -309,7 +309,7 @@ do
 						-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.
 						atTime = state.currentTime
 					end
-					local timeSpan, _, nextElement = OvaleBestAction:GetAction(node, state, atTime)
+					local timeSpan, nextElement = OvaleBestAction:GetAction(node, state, atTime)
 					local start
 					if nextElement and nextElement.offgcd then
 						start = NextTime(timeSpan, state.currentTime)
