@@ -61,7 +61,7 @@ AddFunction ProtectionDefaultMainActions
 AddFunction ProtectionDefaultShortCdActions
 {
 	#charge
-	if target.InRange(charge) Spell(charge)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	ProtectionGetInMeleeRange()
 	#berserker_rage,if=buff.enrage.down
@@ -224,7 +224,7 @@ AddFunction ProtectionProtAoeShortCdActions
 		#heroic_strike,if=buff.ultimatum.up|rage>110|(talent.unyielding_strikes.enabled&buff.unyielding_strikes.stack>=6)
 		if BuffPresent(ultimatum_buff) or Rage() > 110 or Talent(unyielding_strikes_talent) and BuffStacks(unyielding_strikes_buff) >= 6 Spell(heroic_strike)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 
 		unless BuffPresent(shield_block_buff) and Spell(shield_slam)
 		{

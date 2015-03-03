@@ -78,7 +78,7 @@ AddFunction FuryTitansGripDefaultMainActions
 AddFunction FuryTitansGripDefaultShortCdActions
 {
 	#charge,if=debuff.charge.down
-	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	if target.DebuffExpires(charge_debuff) and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	FuryTitansGripGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -89,7 +89,7 @@ AddFunction FuryTitansGripDefaultShortCdActions
 		#berserker_rage,if=buff.enrage.down|(prev_gcd.bloodthirst&buff.raging_blow.stack<2)
 		if not IsEnraged() or PreviousGCDSpell(bloodthirst) and BuffStacks(raging_blow_buff) < 2 Spell(berserker_rage)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
 
@@ -255,11 +255,11 @@ AddFunction FuryTitansGripMovementMainActions
 AddFunction FuryTitansGripMovementShortCdActions
 {
 	#heroic_leap
-	if target.InRange(charge) Spell(heroic_leap)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 	#charge,cycle_targets=1,if=debuff.charge.down
-	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	if target.DebuffExpires(charge_debuff) and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#charge
-	if target.InRange(charge) Spell(charge)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }

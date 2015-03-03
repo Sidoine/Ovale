@@ -72,7 +72,7 @@ AddFunction ArmsDefaultMainActions
 AddFunction ArmsDefaultShortCdActions
 {
 	#charge,if=debuff.charge.down
-	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	if target.DebuffExpires(charge_debuff) and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	ArmsGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -83,7 +83,7 @@ AddFunction ArmsDefaultShortCdActions
 		#avatar,if=buff.recklessness.up|target.time_to_die<25
 		if BuffPresent(recklessness_buff) or target.TimeToDie() < 25 Spell(avatar)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 		#call_action_list,name=single,if=active_enemies=1
 		if Enemies() == 1 ArmsSingleShortCdActions()
 
@@ -186,11 +186,11 @@ AddFunction ArmsMovementMainActions
 AddFunction ArmsMovementShortCdActions
 {
 	#heroic_leap
-	if target.InRange(charge) Spell(heroic_leap)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 	#charge,cycle_targets=1,if=debuff.charge.down
-	if target.DebuffExpires(charge_debuff) and target.InRange(charge) Spell(charge)
+	if target.DebuffExpires(charge_debuff) and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#charge
-	if target.InRange(charge) Spell(charge)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#storm_bolt
 	Spell(storm_bolt)
 }

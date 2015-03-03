@@ -1760,11 +1760,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif class == "WARLOCK" and action == "wrathguard_wrathstorm" then
 			conditionCode = "pet.Present() and pet.CreatureFamily(Wrathguard)"
-		elseif class == "WARRIOR" and action == "charge" then
-			conditionCode = "target.InRange(charge)"
 		elseif class == "WARRIOR" and action == "battle_shout" and role == "tank" then
 			-- Only cast Battle Shout if it won't overwrite the player's own Commanding Shout.
 			conditionCode = "BuffExpires(stamina_buff)"
+		elseif class == "WARRIOR" and action == "charge" then
+			conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge)"
 		elseif class == "WARRIOR" and action == "commanding_shout" and role == "attack" then
 			-- Only cast Commanding Shout if it won't overwrite the player's own Battle Shout.
 			conditionCode = "BuffExpires(attack_power_multiplier_buff)"
@@ -1791,7 +1791,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Use Charge as a range-finder for Heroic Leap.
 			local spellName = "charge"
 			AddSymbol(annotation, spellName)
-			conditionCode = format("target.InRange(%s)", spellName)
+			conditionCode = format("CheckBoxOn(opt_melee_range) and target.InRange(%s)", spellName)
 		elseif class == "WARRIOR" and action == "pummel" then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class

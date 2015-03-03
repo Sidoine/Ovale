@@ -65,7 +65,7 @@ AddFunction ProtectionGladiatorDefaultMainActions
 AddFunction ProtectionGladiatorDefaultShortCdActions
 {
 	#charge
-	if target.InRange(charge) Spell(charge)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	ProtectionGladiatorGetInMeleeRange()
 	#call_action_list,name=movement,if=movement.distance>5
@@ -80,7 +80,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 		#berserker_rage,if=buff.enrage.down
 		if not IsEnraged() Spell(berserker_rage)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and target.InRange(charge) Spell(heroic_leap)
+		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 		#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
 		if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
 		#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
@@ -164,7 +164,7 @@ AddFunction ProtectionGladiatorMovementMainActions
 AddFunction ProtectionGladiatorMovementShortCdActions
 {
 	#heroic_leap
-	if target.InRange(charge) Spell(heroic_leap)
+	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 	#shield_charge
 	Spell(shield_charge)
 	#storm_bolt
