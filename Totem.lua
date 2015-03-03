@@ -120,20 +120,6 @@ function OvaleTotem:InitializeState(state)
 	end
 end
 
--- Reset the state to the current conditions.
-function OvaleTotem:ResetState(state)
-	self:StartProfiling("OvaleTotem_ResetState")
-	for _, totem in pairs(state.totem) do
-		-- Remove outdated totems.
-		if totem.serial and totem.serial < self_serial then
-			for k in pairs(totem) do
-				totem[k] = nil
-			end
-		end
-	end
-	self:StopProfiling("OvaleTotem_ResetState")
-end
-
 -- Release state resources prior to removing from the simulator.
 function OvaleTotem:CleanState(state)
 	for slot, totem in pairs(state.totem) do

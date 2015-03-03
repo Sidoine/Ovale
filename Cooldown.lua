@@ -258,20 +258,6 @@ function OvaleCooldown:InitializeState(state)
 	state.cd = {}
 end
 
--- Reset the state to the current conditions.
-function OvaleCooldown:ResetState(state)
-	self:StartProfiling("OvaleCooldown_ResetState")
-	for _, cd in pairs(state.cd) do
-		-- Remove outdated cooldown state.
-		if cd.serial and cd.serial < self.serial then
-			for k in pairs(cd) do
-				cd[k] = nil
-			end
-		end
-	end
-	self:StopProfiling("OvaleCooldown_ResetState")
-end
-
 -- Release state resources prior to removing from the simulator.
 function OvaleCooldown:CleanState(state)
 	for spellId, cd in pairs(state.cd) do
