@@ -61,7 +61,6 @@ local KEYWORD = {
 	["not"] = true,
 	["or"] = true,
 	["unless"] = true,
-	["wait"] = true,
 }
 
 local DECLARATION_KEYWORD = {
@@ -459,7 +458,6 @@ local UnparseSpellRequire = nil
 local UnparseString = nil
 local UnparseUnless = nil
 local UnparseVariable = nil
-local UnparseWait = nil
 
 Unparse = function(node)
 	if node.asString then
@@ -750,14 +748,6 @@ UnparseVariable = function(node)
 	return node.name
 end
 
-UnparseWait = function(node)
-	if node.child[1].type == "group" then
-		return format("wait%s", UnparseGroup(node.child[1]))
-	else
-		return format("wait %s", Unparse(node.child[1]))
-	end
-end
-
 do
 	UNPARSE_VISITOR = {
 		["action"] = UnparseFunction,
@@ -788,7 +778,6 @@ do
 		["unless"] = UnparseUnless,
 		["value"] = UnparseNumber,
 		["variable"] = UnparseVariable,
-		["wait"] = UnparseWait,
 	}
 end
 
@@ -843,7 +832,6 @@ local ParseString = nil
 local ParseStatement = nil
 local ParseUnless = nil
 local ParseVariable = nil
-local ParseWait = nil
 
 Parse = function(nodeType, tokenStream, nodeList, annotation)
 	local visitor = PARSE_VISITOR[nodeType]
@@ -2253,8 +2241,6 @@ ParseStatement = function(tokenStream, nodeList, annotation)
 			ok, node = ParseIf(tokenStream, nodeList, annotation)
 		elseif token == "unless" then
 			ok, node = ParseUnless(tokenStream, nodeList, annotation)
-		elseif token == "wait" then
-			ok, node = ParseWait(tokenStream, nodeList, annotation)
 		else
 			ok, node = ParseExpression(tokenStream, nodeList, annotation)
 		end
@@ -2349,31 +2335,6 @@ ParseVariable = function(tokenStream, nodeList, annotation)
 	return ok, node
 end
 
-ParseWait = function(tokenStream, nodeList, annotation)
-	local ok = true
-	-- Consume the 'wait' token.
-	do
-		local tokenType, token = tokenStream:Consume()
-		if not (tokenType == "keyword" and token == "wait") then
-			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing WAIT; 'wait' expected.", token)
-			ok = false
-		end
-	end
-	-- Consume the statement body.
-	local bodyNode
-	if ok then
-		ok, bodyNode = ParseStatement(tokenStream, nodeList, annotation)
-	end
-	-- Create the AST node.
-	local node
-	if ok then
-		node = OvaleAST:NewNode(nodeList, true)
-		node.type = "wait"
-		node.child[1] = bodyNode
-	end
-	return ok, node
-end
-
 do
 	PARSE_VISITOR = {
 		["action"] = ParseFunction,
@@ -2403,7 +2364,6 @@ do
 		["unless"] = ParseUnless,
 		["value"] = ParseNumber,
 		["variable"] = ParseVariable,
-		["wait"] = ParseWait,
 	}
 end
 --</private-static-methods>

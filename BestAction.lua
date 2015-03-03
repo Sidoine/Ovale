@@ -78,7 +78,6 @@ local COMPUTE_VISITOR = {
 	["state"] = "ComputeState",
 	["unless"] = "ComputeIf",
 	["value"] = "ComputeValue",
-	["wait"] = "ComputeWait",
 }
 
 -- Age of the current computation.
@@ -952,8 +951,6 @@ function OvaleBestAction:ComputeGroup(element, state, atTime)
 				bestElement = currentElement
 				bestCastTime = currentCastTime
 			end
-			-- If the node is a "wait" node, then skip the remaining nodes.
-			if currentElement and currentElement.wait then break end
 		end
 	end
 
@@ -994,10 +991,6 @@ function OvaleBestAction:ComputeIf(element, state, atTime)
 		result = SetValue(element, 0)
 	else
 		local timeSpanB, elementB = self:Compute(element.child[2], state, atTime)
-		-- If the "then" clause is a "wait" node, then only wait if the conditions are true.
-		if elementB and elementB.wait and not HasTime(conditionTimeSpan, atTime) then
-			elementB.wait = nil
-		end
 		-- Take intersection of the condition and B.
 		Intersect(conditionTimeSpan, timeSpanB, timeSpan)
 		state:Log("[%d]    '%s' returns %s", element.nodeId, element.type, tostring(timeSpan))
@@ -1092,20 +1085,6 @@ function OvaleBestAction:ComputeValue(element, state, atTime)
 	timeSpan[1], timeSpan[2] = 0, INFINITY
 	self:StopProfiling("OvaleBestAction_Compute")
 	return timeSpan, element
-end
-
-function OvaleBestAction:ComputeWait(element, state, atTime)
-	self:StartProfiling("OvaleBestAction_Compute")
-	local timeSpanA, elementA = self:Compute(element.child[1], state, atTime)
-	local timeSpan = GetTimeSpan(element)
-
-	if elementA then
-		elementA.wait = true
-		CopyTimeSpan(timeSpanA, timeSpan)
-		state:Log("[%d]    '%s' returns %s", element.nodeId, element.type, tostring(timeSpan))
-	end
-	self:StopProfiling("OvaleBestAction_Compute")
-	return timeSpan, elementA
 end
 --</public-static-methods>
 
