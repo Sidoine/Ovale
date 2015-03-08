@@ -27,7 +27,6 @@ local OvaleState = nil
 local tinsert = table.insert
 local tremove = table.remove
 local API_GetTime = GetTime
-local API_UnitCanAttack = UnitCanAttack
 local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
@@ -251,8 +250,7 @@ function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID
 		end
 		if self_hasAnticipation and targetGUID ~= self_guid then
 			-- Anticipation causes offensive finishing moves to consume all Anticipation charges and to grant a combo point for each.
-			local unitId = OvaleGUID:GetUnitId(targetGUID)
-			if unitId and API_UnitCanAttack("player", unitId) then
+			if OvaleSpellBook:IsHarmfulSpell(spellId) then
 				local aura = OvaleAura:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
 				if OvaleAura:IsActiveAura(aura, atTime) then
 					self:Debug("    Spell %d hit with %d Anticipation charges.", spellId, aura.stacks)
