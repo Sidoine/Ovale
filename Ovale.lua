@@ -36,7 +36,9 @@ local API_IsInGroup = IsInGroup
 local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
 local API_SendAddonMessage = SendAddonMessage
 local API_UnitCanAttack = UnitCanAttack
+local API_UnitClass = UnitClass
 local API_UnitExists = UnitExists
+local API_UnitGUID = UnitGUID
 local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
@@ -60,6 +62,10 @@ local self_refreshIndex = 1
 Ovale.version = (OVALE_VERSION == REPOSITORY_KEYWORD) and "development version" or OVALE_VERSION
 -- Localization string table.
 Ovale.L = nil
+-- Player's class.
+Ovale.playerClass = select(2, API_UnitClass("player"))
+-- Player's GUID (initialized after PLAYER_LOGIN event).
+Ovale.playerGUID = nil
 -- AceDB-3.0 database to handle SavedVariables (managed by OvaleOptions).
 Ovale.db = nil
 --the frame with the icons
@@ -115,6 +121,8 @@ function Ovale:OnInitialize()
 end
 
 function Ovale:OnEnable()
+	self.playerGUID = API_UnitGUID("player")
+
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
