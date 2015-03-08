@@ -1215,14 +1215,14 @@ end
 
 do
 	-- Return the non-critical-strike damage of a spell, given the player's current stats.
-	local function GetDamage(spellId, atTime, state)
+	local function GetDamage(spellId, atTime, state, target)
 		-- TODO: Use target's debuffs in this calculation.
 		local ap = state.attackPower or 0
 		local sp = state.spellBonusDamage or 0
 		local mh = state.mainHandWeaponDamage or 0
 		local oh = state.offHandWeaponDamage or 0
 		local bdm = state.baseDamageMultiplier or 1
-		local dm = state:GetDamageMultiplier(spellId, atTime) or 1
+		local dm = state:GetDamageMultiplier(spellId, atTime, OvaleGUID:GetGUID(target)) or 1
 		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
 	end
@@ -1248,7 +1248,7 @@ do
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		local value = ComputeParameter(spellId, "damage", state, atTime)
 		if not value then
-			value = GetDamage(spellId, atTime, state)
+			value = GetDamage(spellId, atTime, state, target)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
 		local si = OvaleData.spellInfo[spellId]
@@ -1304,7 +1304,7 @@ do
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		local value = ComputeParameter(spellId, "damage", state, atTime)
 		if not value then
-			value = GetDamage(spellId, atTime, state)
+			value = GetDamage(spellId, atTime, state, target)
 		end
 		-- Reduce by armor damage reduction for physical attacks.
 		local si = OvaleData.spellInfo[spellId]
@@ -1325,6 +1325,9 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The current damage multiplier of the given spell.
 	-- @return A boolean value for the result of the comparison.
 	-- @see LastDamageMultiplier
@@ -1334,8 +1337,9 @@ do
 
 	local function DamageMultiplier(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		local bdm = state.baseDamageMultiplier
-		local dm = state:GetDamageMultiplier(spellId, atTime)
+		local dm = state:GetDamageMultiplier(spellId, atTime, OvaleGUID:GetGUID(target))
 		local value = bdm * dm
 		return Compare(value, comparator, limit)
 	end
@@ -2966,6 +2970,9 @@ do
 	-- @param id The aura ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
 	-- @return The persistent multiplier.
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
@@ -2974,7 +2981,8 @@ do
 
 	local function PersistentMultiplier(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local value = state:GetDamageMultiplier(spellId, atTime)
+		local target = ParseCondition(positionalParams, namedParams, state, "target")
+		local value = state:GetDamageMultiplier(spellId, atTime, OvaleGUID:GetGUID(target))
 		return Compare(value, comparator, limit)
 	end
 

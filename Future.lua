@@ -177,7 +177,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 	OvalePaperDoll:UpdateSnapshot(spellcast, true)
 
 	local atTime = channeled and startTime or endTime
-	spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, atTime, spellcast)
+	spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, atTime, spellcast, spellcast.target)
 
 	local si = OvaleData.spellInfo[spellId]
 	if si then
@@ -289,7 +289,7 @@ local function UpdateLastSpellcast(spellcast)
 		if self_timeAuraAdded then
 			if self_timeAuraAdded >= spellcast.start and self_timeAuraAdded - spellcast.stop < 1 then
 				OvalePaperDoll:UpdateSnapshot(spellcast, true)
-				spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast)
+				spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, self_timeAuraAdded, spellcast, spellcast.target)
 				TracePrintf(spellId, "    Updated spell info for %s (%d) to snapshot from %f.",
 					OvaleSpellBook:GetSpellName(spellId), spellId, spellcast.snapshotTime)
 			end
@@ -473,7 +473,7 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, lineId, s
 				-- Take a more recent snapshot of the player stats for this cast-time spell.
 				OvalePaperDoll:UpdateSnapshot(spellcast, true)
 				local now = API_GetTime()
-				spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, now, spellcast)
+				spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellId, now, spellcast, spellcast.target)
 				self:SendMessage("Ovale_SpellCast", now, spellcast.spellId, spellcast.target)
 				Ovale.refreshNeeded.player = true
 				self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
@@ -646,7 +646,7 @@ end
 
 	NOTE: Mirrored in statePrototype below.
 --]]
-function OvaleFuture:GetDamageMultiplier(spellId, atTime, snapshot)
+function OvaleFuture:GetDamageMultiplier(spellId, atTime, snapshot, targetGUID)
 	atTime = atTime or self["currentTime"] or API_GetTime()
 	if not snapshot then
 		if self["snapshotTime"] then
@@ -672,9 +672,9 @@ function OvaleFuture:GetDamageMultiplier(spellId, atTime, snapshot)
 				local verified
 				if index then
 					if self.CheckRequirements then
-						verified = self.CheckRequirements(self, spellId, atTime, spellData, index, self_guid)
+						verified = self.CheckRequirements(self, spellId, atTime, spellData, index, targetGUID)
 					else
-						verified = OvaleData:CheckRequirements(spellId, atTime, spellData, index, self_guid)
+						verified = OvaleData:CheckRequirements(spellId, atTime, spellData, index, targetGUID)
 					end
 				else
 					verified = true
@@ -703,7 +703,7 @@ function OvaleFuture:GetDamageMultiplier(spellId, atTime, snapshot)
 	-- Factor in additional damage multipliers that are registered with this module.
 	for tbl in pairs(self_updateSpellcastInfo) do
 		if tbl.GetDamageMultiplier then
-			local multiplier = tbl.GetDamageMultiplier(self, spellId, atTime, snapshot)
+			local multiplier = tbl.GetDamageMultiplier(self, spellId, atTime, snapshot, targetGUID)
 			damageMultiplier = damageMultiplier * multiplier
 		end
 	end
