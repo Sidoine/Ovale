@@ -88,7 +88,7 @@ function OvaleHonorAmongThieves:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cl
 			local now = API_GetTime()
 			self.start = now
 			-- Prefer the duration set in the script, if given; otherwise, default to MEAN_TIME_TO_HAT.
-			local duration = OvaleData:GetSpellInfoProperty(HONOR_AMONG_THIEVES, now, "duration", "player") or MEAN_TIME_TO_HAT 
+			local duration = OvaleData:GetSpellInfoProperty(HONOR_AMONG_THIEVES, now, "duration", destGUID) or MEAN_TIME_TO_HAT 
 			self.duration = duration
 			self.ending = self.start + duration
 			self.stacks = 1

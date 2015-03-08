@@ -22,6 +22,7 @@ local OvaleCondition = nil
 local OvaleCooldown = nil
 local OvaleData = nil
 local OvaleEquipment = nil
+local OvaleGUID = nil
 local OvaleFuture = nil
 local OvalePower = nil
 local OvaleSpellBook = nil
@@ -198,12 +199,13 @@ local function GetActionSpellInfo(element, state, atTime, target)
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
+	local targetGUID = OvaleGUID:GetGUID(target)
 
 	local spellId = element.positionalParams[1]
 	local si = OvaleData.spellInfo[spellId]
 	local replacedSpellId = nil
 	if si and si.replace then
-		local replacement = state:GetSpellInfoProperty(spellId, atTime, "replace", target)
+		local replacement = state:GetSpellInfoProperty(spellId, atTime, "replace", targetGUID)
 		if replacement then
 			replacedSpellId = spellId
 			spellId = replacement
@@ -226,7 +228,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 	if not isKnownSpell and not action then
 		state:Log("Unknown spell ID '%s'.", spellId)
 	else
-		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, target)
+		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, targetGUID)
 		if isUsable or noMana then
 			-- Use texture specified in the action if given.
 			if element.namedParams.texture then
@@ -250,7 +252,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 				end
 				-- Extend the cooldown duration if the spell needs additional time to pool resources.
 				if actionCooldownStart and actionCooldownDuration then
-					local seconds = state:GetTimeToSpell(spellId, atTime, target)
+					local seconds = state:GetTimeToSpell(spellId, atTime, targetGUID)
 					if seconds > 0 then
 						local t = atTime + seconds
 						if t > actionCooldownStart + actionCooldownDuration then
@@ -312,6 +314,7 @@ function OvaleBestAction:OnInitialize()
 	OvaleCondition = Ovale.OvaleCondition
 	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
+	OvaleGUID = Ovale.OvaleGUID
 	OvaleEquipment = Ovale.OvaleEquipment
 	OvaleFuture = Ovale.OvaleFuture
 	OvalePower = Ovale.OvalePower

@@ -293,8 +293,7 @@ end
 statePrototype.ApplyCooldown = function(state, spellId, targetGUID, atTime)
 	OvaleCooldown:StartProfiling("OvaleCooldown_state_ApplyCooldown")
 	local cd = state:GetCD(spellId)
-	local target = OvaleGUID:GetUnitId(targetGUID) or state.defaultTarget
-	local duration = state:GetSpellCooldownDuration(spellId, atTime, target)
+	local duration = state:GetSpellCooldownDuration(spellId, atTime, targetGUID)
 
 	if duration == 0 then
 		cd.start = 0
@@ -334,7 +333,7 @@ end
 
 -- Return the GCD after the given spell is cast.
 -- If no spell is given, then returns the GCD after the current spell has been cast.
-statePrototype.GetGCD = function(state, spellId, atTime, target)
+statePrototype.GetGCD = function(state, spellId, atTime, targetGUID)
 	spellId = spellId or state.currentSpellId
 	if not atTime then
 		if state.endCast and state.endCast > state.currentTime then
@@ -343,9 +342,9 @@ statePrototype.GetGCD = function(state, spellId, atTime, target)
 			atTime = state.currentTime
 		end
 	end
-	target = target or state.defaultTarget
+	targetGUID = targetGUID or OvaleGUID:GetGUID(state.defaultTarget)
 
-	local gcd = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd", target)
+	local gcd = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID)
 	if not gcd then
 		local isCaster, haste
 		gcd, isCaster = OvaleCooldown:GetBaseGCD()
@@ -354,11 +353,11 @@ statePrototype.GetGCD = function(state, spellId, atTime, target)
 		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
 			haste = "melee"
 		end
-		local gcdHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd_haste", target)
+		local gcdHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID)
 		if gcdHaste then
 			haste = gcdHaste
 		else
-			local siHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "haste", target)
+			local siHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "haste", targetGUID)
 			if siHaste then
 				haste = siHaste
 			end
@@ -437,13 +436,13 @@ end
 
 -- Get the duration of a spell's cooldown.  Returns either the current duration if
 -- already on cooldown or the duration if cast at the specified time.
-statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, target)
+statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targetGUID)
 	local start, duration = state:GetSpellCooldown(spellId)
 	if duration > 0 and start + duration > atTime then
 		state:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
 	else
 		local si = OvaleData.spellInfo[spellId]
-		duration = state:GetSpellInfoProperty(spellId, atTime, "cd", target)
+		duration = state:GetSpellInfoProperty(spellId, atTime, "cd", targetGUID)
 		if duration then
 			if si and si.addcd then
 				duration = duration + si.addcd
@@ -457,7 +456,7 @@ statePrototype.GetSpellCooldownDuration = function(state, spellId, atTime, targe
 		state:Log("Spell %d has a base cooldown of %fs.", spellId, duration)
 		if duration > 0 then
 			-- Adjust cooldown duration if it is affected by haste: "cd_haste=melee" or "cd_haste=spell".
-			local haste = state:GetSpellInfoProperty(spellId, atTime, "cd_haste", target)
+			local haste = state:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID)
 			local multiplier = state:GetHasteMultiplier(haste)
 			duration = duration / multiplier
 			-- Adjust cooldown duration if it is affected by a cooldown reduction trinket: "buff_cdr=auraId".

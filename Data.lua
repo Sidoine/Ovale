@@ -10,6 +10,7 @@ Ovale.OvaleData = OvaleData
 
 --<private-static-properties>
 -- Forward declarations for module dependencies.
+local OvaleGUID = nil
 local OvalePaperDoll = nil
 local OvaleState = nil
 
@@ -22,7 +23,7 @@ local wipe = wipe
 local INFINITY = math.huge
 
 -- Registered "run-time requirement" handlers: self_requirement[name] = handler
--- Handler is invoked as handler(state, name, tokens, index, target).
+-- Handler is invoked as handler(state, name, tokens, index, targetGUID).
 local self_requirement = {}
 
 local STAT_NAMES = { "agility", "bonus_armor", "critical_strike", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
@@ -256,6 +257,7 @@ end
 --<public-static-methods>
 function OvaleData:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleState = Ovale.OvaleState
 
@@ -358,8 +360,8 @@ end
 
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:CheckRequirements(spellId, atTime, tokens, index, target)
-	target = target or self.defaultTarget or "target"
+function OvaleData:CheckRequirements(spellId, atTime, tokens, index, targetGUID)
+	targetGUID = targetGUID or OvaleGUID:GetGUID(self.defaultTarget or "target")
 	local name = tokens[index]
 	index = index + 1
 	if name then
@@ -369,13 +371,9 @@ function OvaleData:CheckRequirements(spellId, atTime, tokens, index, target)
 		while verified and name do
 			local handler = self_requirement[name]
 			if handler then
-				local method, arg = handler[1], handler[2]
-				-- Check for inherited/mirrored method first (for statePrototype).
-				if self[method] then
-					verified, requirement, index = self[method](self, spellId, atTime, name, tokens, index, target)
-				else
-					verified, requirement, index = arg[method](arg, spellId, atTime, name, tokens, index, target)
-				end
+				local method = handler[1]
+				local arg = self[method] and self or handler[2]
+				verified, requirement, index = arg[method](arg, spellId, atTime, name, tokens, index, targetGUID)
 				name = tokens[index]
 				index = index + 1
 			else
@@ -402,8 +400,8 @@ end
 
 	NOTE: Mirrored in statePrototype below.
 --]]
-function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
-	target = target or "player"
+function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, guid)
+	guid = guid or OvaleGUID:GetGUID("player")
 	local index, value, data
 	if type(spellData) == "table" then
 		-- Comma-separated value.
@@ -443,25 +441,25 @@ function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, target)
 	-- Verify any run-time requirements for this aura.
 	local verified = true
 	if index then
-		verified = self:CheckRequirements(auraId, atTime, spellData, index, target)
+		verified = self:CheckRequirements(auraId, atTime, spellData, index, guid)
 	end
 	return verified, value, data
 end
 
 -- Check "run-time" requirements specified in SpellInfo().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:CheckSpellInfo(spellId, atTime, target)
-	target = target or self.defaultTarget or "target"
+function OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
+	targetGUID = targetGUID or OvaleGUID:GetGUID(self.defaultTarget or "target")
 	local verified = true
 	local requirement
 	for name, handler in pairs(self_requirement) do
-		local value = self:GetSpellInfoProperty(spellId, atTime, name, target)
+		local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
 		if value then
 			local method, arg = handler[1], handler[2]
 			-- Check for inherited/mirrored method first (for statePrototype).
 			arg = self[method] and self or arg
 			local index = (type(value) == "table") and 1 or nil
-			verified, requirement = arg[method](arg, spellId, atTime, name, value, index, target)
+			verified, requirement = arg[method](arg, spellId, atTime, name, value, index, targetGUID)
 			if not verified then
 				break
 			end
@@ -472,14 +470,14 @@ end
 
 -- Get SpellInfo property with run-time checks as specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
-function OvaleData:GetSpellInfoProperty(spellId, atTime, property, target)
-	target = target or self.defaultTarget or "target"
+function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
+	targetGUID = targetGUID or OvaleGUID:GetGUID(self.defaultTarget or "target")
 	local si = OvaleData.spellInfo[spellId]
 	local value = si and si[property]
 	local requirements = si and si.require[property]
 	if requirements then
 		for v, requirement in pairs(requirements) do
-			local verified = self:CheckRequirements(spellId, atTime, requirement, 1, target)
+			local verified = self:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
 			if verified then
 				value = tonumber(v) or v
 				break

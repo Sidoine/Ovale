@@ -18,6 +18,7 @@ local OvaleProfiler = Ovale.OvaleProfiler
 -- Forward declarations for module dependencies.
 local OvaleCooldown = nil
 local OvaleData = nil
+local OvaleGUID = nil
 local OvalePower = nil
 local OvaleRunes = nil
 local OvaleState = nil
@@ -155,6 +156,7 @@ function OvaleSpellBook:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
+	OvaleGUID = Ovale.OvaleGUID
 	OvalePower = Ovale.OvalePower
 	OvaleRunes = Ovale.OvaleRunes
 	OvaleState = Ovale.OvaleState
@@ -449,6 +451,7 @@ function OvaleSpellBook:IsSpellInRange(spellId, unitId)
 		local name = self:GetSpellName(spellId)
 		return API_IsSpellInRange(name, unitId)
 	end
+	return nil
 end
 
 -- Returns true if the given spell ID is usable.  A spell is *not* usable if:
@@ -508,10 +511,10 @@ local statePrototype = OvaleSpellBook.statePrototype
 --</private-static-properties>
 
 --<state-methods>
-statePrototype.IsUsableSpell = function(state, spellId, atTime, target)
+statePrototype.IsUsableSpell = function(state, spellId, atTime, targetGUID)
 	OvaleSpellBook:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
-	if type(atTime) == "string" and not target then
-		atTime, target = nil, atTime
+	if type(atTime) == "string" and not targetGUID then
+		atTime, targetGUID = nil, atTime
 	end
 	atTime = atTime or state.currentTime
 
@@ -522,7 +525,7 @@ statePrototype.IsUsableSpell = function(state, spellId, atTime, target)
 	if si then
 		-- Flagged as not usable in the spell information.
 		if isUsable then
-			local unusable = state:GetSpellInfoProperty(spellId, atTime, "unusable", target)
+			local unusable = state:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
 			if unusable == 1 then
 				state:Log("Spell ID '%s' is flagged as unusable.", spellId)
 				isUsable = false
@@ -531,7 +534,7 @@ statePrototype.IsUsableSpell = function(state, spellId, atTime, target)
 		-- Verify all requirements with registered handlers.
 		if isUsable then
 			local requirement
-			isUsable, requirement = state:CheckSpellInfo(spellId, atTime, target)
+			isUsable, requirement = state:CheckSpellInfo(spellId, atTime, targetGUID)
 			if not isUsable then
 				-- Set noMana if the failed requirement is for a primary (poolable) power type.
 				if OvalePower.PRIMARY_POWER[requirement] then
@@ -552,9 +555,9 @@ statePrototype.IsUsableSpell = function(state, spellId, atTime, target)
 end
 
 -- Get the number of seconds before the spell is ready to be cast, either due to cooldown or resources.
-statePrototype.GetTimeToSpell = function(state, spellId, atTime, target)
-	if type(atTime) == "string" and not target then
-		atTime, target = nil, atTime
+statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID)
+	if type(atTime) == "string" and not targetGUID then
+		atTime, targetGUID = nil, atTime
 	end
 	atTime = atTime or state.currentTime
 
@@ -569,17 +572,17 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, target)
 	end
 	-- Pooled resource.
 	do
-		local seconds = state:TimeToPower(spellId, atTime, target)
+		local seconds = state:TimeToPower(spellId, atTime, targetGUID)
 		if timeToSpell < seconds then
 			timeToSpell = seconds
 		end
 	end
 	-- Death knight runes.
 	do
-		local blood = state:GetSpellInfoProperty(spellId, atTime, "blood", target)
-		local unholy = state:GetSpellInfoProperty(spellId, atTime, "unholy", target)
-		local frost = state:GetSpellInfoProperty(spellId, atTime, "frost", target)
-		local death = state:GetSpellInfoProperty(spellId, atTime, "death", target)
+		local blood = state:GetSpellInfoProperty(spellId, atTime, "blood", targetGUID)
+		local unholy = state:GetSpellInfoProperty(spellId, atTime, "unholy", targetGUID)
+		local frost = state:GetSpellInfoProperty(spellId, atTime, "frost", targetGUID)
+		local death = state:GetSpellInfoProperty(spellId, atTime, "death", targetGUID)
 		if blood or unholy or frost or death then
 			local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
 			if timeToSpell < seconds then

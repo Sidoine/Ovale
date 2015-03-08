@@ -240,7 +240,7 @@ end
 
 -- Run-time check that the player is in a certain stance.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleStance:RequireStanceHandler(spellId, atTime, requirement, tokens, index, target)
+function OvaleStance:RequireStanceHandler(spellId, atTime, requirement, tokens, index, targetGUID)
 	local verified = false
 	-- If index isn't given, then tokens holds the actual token value.
 	local stance = tokens
@@ -304,8 +304,7 @@ end
 -- Apply the effects of the spell on the player's state, assuming the spellcast completes.
 function OvaleStance:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleStance_ApplySpellAfterCast")
-	local target = OvaleGUID:GetUnitId(targetGUID)
-	local stance = state:GetSpellInfoProperty(spellId, endCast, "to_stance", target)
+	local stance = state:GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID)
 	if stance then
 		if type(stance) == "string" then
 			stance = self.stanceId[stance]

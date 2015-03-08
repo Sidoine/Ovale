@@ -1802,7 +1802,7 @@ do
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		if state.lastSpellId then
-			local duration = state:GetGCD(state.lastSpellId, atTime, target)
+			local duration = state:GetGCD(state.lastSpellId, atTime, OvaleGUID:GetGUID(target))
 			local start = state.startCast
 			local ending = start + duration
 			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
@@ -4556,7 +4556,7 @@ do
 				break
 			elseif not OvaleSpellBook:IsKnownSpell(spellId) then
 				-- Skip unknown spells.
-			elseif not usable or state:IsUsableSpell(spellId, atTime, target) then
+			elseif not usable or state:IsUsableSpell(spellId, atTime, OvaleGUID:GetGUID(target)) then
 				local start, duration = state:GetSpellCooldown(spellId)
 				local t = 0
 				if start > 0 and duration > 0 then
@@ -4674,7 +4674,7 @@ do
 	local function SpellUsable(positionalParams, namedParams, state, atTime)
 		local spellId, yesno = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, target)
+		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, OvaleGUID:GetGUID(target))
 		local boolean = isUsable or noMana
 		return TestBoolean(boolean, yesno)
 	end
@@ -5171,7 +5171,7 @@ do
 			local _, pt = OvalePower:GetSpellCost(spellId)
 			powerType = pt
 		end
-		local seconds = state:TimeToPower(spellId, atTime, target, powerType)
+		local seconds = state:TimeToPower(spellId, atTime, OvaleGUID:GetGUID(target), powerType)
 
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
@@ -5233,7 +5233,7 @@ do
 	local function TimeToSpell(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local seconds = state:GetTimeToSpell(spellId, atTime, target)
+		local seconds = state:GetTimeToSpell(spellId, atTime, OvaleGUID:GetGUID(target))
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
 		elseif seconds < INFINITY then

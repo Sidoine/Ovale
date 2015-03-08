@@ -176,6 +176,8 @@ local CLEU_SCHOOL_MASK_MAGIC = bit_bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCH
 OvaleAura.aura = {}
 -- Current age of auras per unit: serial[guid] = age.
 OvaleAura.serial = {}
+-- Unused public property to suppress lint warnings.
+--OvaleAura.defaultTarget = nil
 --</public-static-properties>
 
 --<private-static-methods>
@@ -400,7 +402,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 					duration = aura.duration
 				elseif si and si.duration then
 					-- Look up the duration from the SpellInfo.
-					duration = OvaleData:GetSpellInfoProperty(spellId, now, "duration", unitId)
+					duration = OvaleData:GetSpellInfoProperty(spellId, now, "duration", destGUID)
 					if si.addduration then
 						duration = duration + si.addduration
 					end
@@ -627,7 +629,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 							keepSnapshot = true
 						elseif type(spellData) == "table" and spellData[1] == "refresh_keep_snapshot" then
 							-- Comma-separated value.
-							keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, spellData, 2, unitId)
+							keepSnapshot = OvaleData:CheckRequirements(spellId, atTime, spellData, 2, guid)
 						end
 					end
 				end
@@ -813,7 +815,7 @@ end
 
 -- Run-time check for an aura on the player or the target.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, index, target)
+function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, index, targetGUID)
 	local verified = false
 	-- If index isn't given, then tokens holds the actual token value.
 	local buffName = tokens
@@ -835,9 +837,14 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 			buffName = strsub(buffName, 2)
 		end
 		local buffName = tonumber(buffName) or buffName
-		local unitId, filter, mine
+		local guid, unitId, filter, mine
 		if strsub(requirement, 1, 7) == "target_" then
-			unitId = target
+			if targetGUID then
+				guid = targetGUID
+				unitId = OvaleGUID:GetUnitId(guid)
+			else
+				unitId = self.defaultTarget or "target"
+			end
 			filter = (strsub(requirement, 8, 11) == "buff") and "HELPFUL" or "HARMFUL"
 			mine = not (strsub(requirement, -4) == "_any")
 		elseif strsub(requirement, 1, 4) == "pet_" then
@@ -849,7 +856,8 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 			filter = (strsub(requirement, 1, 4) == "buff") and "HELPFUL" or "HARMFUL"
 			mine = not (strsub(requirement, -4) == "_any")
 		end
-		local aura = self:GetAura(unitId, buffName, filter, mine)
+		guid = guid or OvaleGUID:GetGUID(unitId)
+		local aura = self:GetAuraByGUID(guid, buffName, filter, mine)
 		local isActiveAura = self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
 		if not isBang and isActiveAura or isBang and not isActiveAura then
 			verified = true
@@ -868,7 +876,7 @@ end
 
 -- Run-time check for the player being stealthed.
 -- NOTE: Mirrored in statePrototype below.
-function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokens, index, target)
+function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokens, index, targetGUID)
 	local verified = false
 	-- If index isn't given, then tokens holds the actual token value.
 	local stealthed = tokens
@@ -898,7 +906,7 @@ end
 -- Run-time check that the target is below a health percent threshold.
 -- NOTE: Mirrored in statePrototype below.
 -- TODO: This function should really be moved to a Health module.
-function OvaleAura:RequireHealthPercentHandler(spellId, atTime, requirement, tokens, index, target)
+function OvaleAura:RequireHealthPercentHandler(spellId, atTime, requirement, tokens, index, targetGUID)
 	local verified = false
 	-- If index isn't given, then tokens holds the actual token value.
 	local threshold = tokens
@@ -913,14 +921,20 @@ function OvaleAura:RequireHealthPercentHandler(spellId, atTime, requirement, tok
 			threshold = strsub(threshold, 2)
 		end
 		threshold = tonumber(threshold) or 0
-		local unitId
+		local guid, unitId
 		if strsub(requirement, 1, 7) == "target_" then
-			unitId = target
+			if targetGUID then
+				guid = targetGUID
+				unitId = OvaleGUID:GetUnitId(guid)
+			else
+				unitId = self.defaultTarget or "target"
+			end
 		elseif strsub(requirement, 1, 4) == "pet_" then
 			unitId = "pet"
 		else
 			unitId = "player"
 		end
+		guid = guid or OvaleGUID:GetGUID(unitId)
 		local healthMax = API_UnitHealthMax(unitId)
 		healthMax = healthMax > 0 and healthMax or 1
 		local healthPercent = API_UnitHealth(unitId) / healthMax * 100
@@ -1267,7 +1281,6 @@ end
 
 statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList, spellcast)
 	OvaleAura:StartProfiling("OvaleAura_state_ApplySpellAuras")
-	local unitId = OvaleGUID:GetUnitId(guid)
 	for filter, filterInfo in pairs(auraList) do
 		for auraId, spellData in pairs(filterInfo) do
 			local duration = OvaleData:GetBaseDuration(auraId, spellcast)
@@ -1279,7 +1292,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 			local refresh = false
 			local keepSnapshot = false
 
-			local verified, value, data = state:CheckSpellAuraData(auraId, spellData, atTime, unitId)
+			local verified, value, data = state:CheckSpellAuraData(auraId, spellData, atTime, guid)
 			if value == "refresh" then
 				refresh = true
 			elseif value == "refresh_keep_snapshot" then
