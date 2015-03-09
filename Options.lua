@@ -57,7 +57,6 @@ OvaleOptions.defaultDB = {
 			raccourcis = true,
 			smallIconScale = 0.8,
 			targetText = "●",
-			updateInterval = 0.1,
 			-- Options
 			iconShiftX = 0,
 			iconShiftY = 0,
@@ -295,21 +294,6 @@ OvaleOptions.options = {
 							type = "input",
 							name = L["Caractère de portée"],
 							desc = L["Ce caractère est affiché dans un coin de l'icône pour indiquer si la cible est à portée"],
-						},
-						updateInterval =
-						{
-							order = 100,
-							type = "range",
-							name = L["Update interval"],
-							desc = L["Maximum time to wait (in milliseconds) before refreshing icons."],
-							min = 0, max = 500, step = 10,
-							get = function(info)
-								return Ovale.db.profile.apparence.updateInterval * 1000
-							end,
-							set = function(info, value)
-								Ovale.db.profile.apparence.updateInterval = value / 1000
-								OvaleOptions:SendMessage("Ovale_OptionChanged")
-							end
 						},
 					},
 				},

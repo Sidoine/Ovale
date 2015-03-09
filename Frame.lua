@@ -170,8 +170,7 @@ do
 		--]]
 		self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
 		local profile = Ovale.db.profile
-		local updateInterval = profile.apparence.updateInterval
-		local refresh = self.timeSinceLastUpdate > MIN_REFRESH_TIME and (updateInterval > 0 and self.timeSinceLastUpdate > updateInterval or next(Ovale.refreshNeeded))
+		local refresh = self.timeSinceLastUpdate > MIN_REFRESH_TIME and next(Ovale.refreshNeeded)
 		if refresh then
 			-- Accumulate refresh interval statistics.
 			Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
