@@ -187,7 +187,7 @@ function OvaleRunes:UpdateRune(slot)
 		rune.startCooldown = 0
 		rune.endCooldown = 0
 	end
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[Ovale.playerGUID] = true
 	self:StopProfiling("OvaleRunes_UpdateRune")
 end
 

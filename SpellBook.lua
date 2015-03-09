@@ -231,7 +231,7 @@ function OvaleSpellBook:UpdateTalents()
 			end
 		end
 	end
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[Ovale.playerGUID] = true
 	self:SendMessage("Ovale_TalentsChanged")
 end
 
@@ -250,7 +250,7 @@ function OvaleSpellBook:UpdateGlyphs()
 			self:Debug("    Glyph socket %d is empty.", i)
 		end
 	end
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[Ovale.playerGUID] = true
 	self:SendMessage("Ovale_GlyphsChanged")
 end
 
@@ -276,7 +276,7 @@ function OvaleSpellBook:UpdateSpells()
 		self:ScanSpellBook(BOOKTYPE_PET, numPetSpells)
 	end
 
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[Ovale.playerGUID] = true
 	self:SendMessage("Ovale_SpellsChanged")
 end
 

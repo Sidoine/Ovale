@@ -169,10 +169,10 @@ function OvaleEnemies:AddEnemy(guid, name, timestamp, isTagged)
 		end
 		if isTagged and not tagged then
 			self:Debug(true, "New tagged enemy seen (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
-			Ovale.refreshNeeded.player = true
+			Ovale.refreshNeeded[self_playerGUID] = true
 		elseif not seen then
 			self:Debug(true, "New enemy seen (%d total): %s (%s)", self.activeEnemies, guid, name)
-			Ovale.refreshNeeded.player = true
+			Ovale.refreshNeeded[self_playerGUID] = true
 		end
 	end
 	self:StopProfiling("OvaleEnemies_AddEnemy")
@@ -210,7 +210,7 @@ function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
 			end
 		end
 		if tagged or seen then
-			Ovale.refreshNeeded.player = true
+			Ovale.refreshNeeded[self_playerGUID] = true
 			self:SendMessage("Ovale_InactiveUnit", guid, isDead)
 		end
 	end

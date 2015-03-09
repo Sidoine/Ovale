@@ -44,6 +44,9 @@ OvaleDebug:RegisterDebugging(OvalePower)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvalePower)
 
+-- Player's GUID.
+local self_playerGUID = nil
+
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
 -- List of resources that have finishers that we need to save to the spellcast.
@@ -220,6 +223,7 @@ function OvalePower:OnInitialize()
 end
 
 function OvalePower:OnEnable()
+	self_playerGUID = Ovale.playerGUID
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
 	self:RegisterEvent("PLAYER_LEVEL_UP", "EventHandler")
 	self:RegisterEvent("UNIT_DISPLAYPOWER")
@@ -308,14 +312,14 @@ function OvalePower:UpdateMaxPower(event, powerType)
 		local maxPower = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
 		if self.maxPower[powerType] ~= maxPower then
 			self.maxPower[powerType] = maxPower
-			Ovale.refreshNeeded.player = true
+			Ovale.refreshNeeded[self_playerGUID] = true
 		end
 	else
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
 			local maxPower = API_UnitPowerMax("player", powerInfo.id, powerInfo.segments)
 			if self.maxPower[powerType] ~= maxPower then
 				self.maxPower[powerType] = maxPower
-				Ovale.refreshNeeded.player = true
+				Ovale.refreshNeeded[self_playerGUID] = true
 			end
 		end
 	end
@@ -329,7 +333,7 @@ function OvalePower:UpdatePower(event, powerType)
 		local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
 		if self.power[powerType] ~= power then
 			self.power[powerType] = power
-			Ovale.refreshNeeded.player = true
+			Ovale.refreshNeeded[self_playerGUID] = true
 		end
 		self:Debug(true, "%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
 	else
@@ -337,12 +341,12 @@ function OvalePower:UpdatePower(event, powerType)
 			local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
 			if self.power[powerType] ~= power then
 				self.power[powerType] = power
-				Ovale.refreshNeeded.player = true
+				Ovale.refreshNeeded[self_playerGUID] = true
 			end
 			self:Debug(true, "%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
 		end
 	end
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePower_UpdatePower")
 end
 
@@ -351,7 +355,7 @@ function OvalePower:UpdatePowerRegen(event)
 	local inactiveRegen, activeRegen = API_GetPowerRegen()
 	if self.inactiveRegen ~= inactiveRegen or self.activeRegen ~= activeRegen then
 		self.inactiveRegen, self.activeRegen = inactiveRegen, activeRegen
-		Ovale.refreshNeeded.player = true
+		Ovale.refreshNeeded[self_playerGUID] = true
 	end
 	self:StopProfiling("OvalePower_UpdatePowerRegen")
 end
@@ -362,9 +366,9 @@ function OvalePower:UpdatePowerType(event)
 	local powerType = self.POWER_TYPE[currentType]
 	if self.powerType ~= powerType then
 		self.powerType = powerType
-		Ovale.refreshNeeded.player = true
+		Ovale.refreshNeeded[self_playerGUID] = true
 	end
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePower_UpdatePowerType")
 end
 

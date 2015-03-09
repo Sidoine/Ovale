@@ -78,7 +78,7 @@ local function AddPendingComboEvent(atTime, spellId, guid, reason, combo)
 		combo = combo,
 	}
 	tinsert(self_pendingComboEvents, comboEvent)
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[self_playerGUID] = true
 end
 
 -- Remove all pending combo point events caused by the given spell on the target GUID.
@@ -97,7 +97,7 @@ local function RemovePendingComboEvents(atTime, spellId, guid, reason, combo)
 			end
 			count = count + 1
 			tremove(self_pendingComboEvents, k)
-			Ovale.refreshNeeded.player = true
+			Ovale.refreshNeeded[self_playerGUID] = true
 		end
 	end
 	return count
@@ -267,7 +267,7 @@ end
 function OvaleComboPoints:Update()
 	self:StartProfiling("OvaleComboPoints_Update")
 	self.combo = API_UnitPower("player", 4)
-	Ovale.refreshNeeded.player = true
+	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvaleComboPoints_Update")
 end
 

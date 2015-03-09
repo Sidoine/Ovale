@@ -433,12 +433,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 			multistrike = arg19
 		end
 		if not multistrike then
-			local unitId = OvaleGUID:GetUnitId(destGUID)
-			if unitId then
-				self:Debug(true, "%s: %s (%s)", cleuEvent, destGUID, unitId)
-			else
-				self:Debug(true, "%s: %s", cleuEvent, destGUID)
-			end
+			self:Debug(true, "%s: %s", cleuEvent, destGUID)
 			local aura = GetAura(self.aura, destGUID, spellId, self_playerGUID)
 			local now = API_GetTime()
 			if self:IsActiveAura(aura, now) then
@@ -459,9 +454,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 				aura.lastTickTime = timestamp
 				aura.tick = tick
 				self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
-				if unitId then
-					Ovale.refreshNeeded[unitId] = true
-				end
+				Ovale.refreshNeeded[destGUID] = true
 			end
 		end
 	end
@@ -600,9 +593,6 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		aura.stealable = isStealable
 		aura.value1, aura.value2, aura.value3 = value1, value2, value3
 
-		-- Map the GUID to a unit ID.
-		local unitId = OvaleGUID:GetUnitId(guid)
-
 		-- Snapshot stats for auras applied by the player or player's pet.
 		local mine = (casterGUID == self_playerGUID or self_petGUID and casterGUID == self_petGUID)
 		if mine then
@@ -621,7 +611,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 				local keepSnapshot = false
 				local si = OvaleData.spellInfo[spellId]
 				if si and si.aura then
-					local auraTable = (unitId == "pet") and si.aura.pet or si.aura.target
+					local auraTable = (guid == self_petGUID) and si.aura.pet or si.aura.target
 					if auraTable and auraTable[filter] then
 						local spellData = auraTable[filter][auraId]
 						if spellData == "refresh_keep_snapshot" then
@@ -673,9 +663,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 		elseif not auraIsUnchanged then
 			self:SendMessage("Ovale_AuraChanged", atTime, guid, auraId, aura.source)
 		end
-		if unitId then
-			Ovale.refreshNeeded[unitId] = true
-		end
+		Ovale.refreshNeeded[guid] = true
 	end
 	self:StopProfiling("OvaleAura_GainedAuraOnGUID")
 end
@@ -719,10 +707,7 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 		aura.lastUpdated = atTime
 
 		self:SendMessage("Ovale_AuraRemoved", atTime, guid, auraId, aura.source)
-		local unitId = OvaleGUID:GetUnitId(guid)
-		if unitId then
-			Ovale.refreshNeeded[unitId] = true
-		end
+		Ovale.refreshNeeded[guid] = true
 	end
 	self:StopProfiling("OvaleAura_LostAuraOnGUID")
 end

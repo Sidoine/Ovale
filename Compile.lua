@@ -599,7 +599,7 @@ function OvaleCompile:EventHandler(event)
 	-- Advance age of the script evaluation state.
 	self_serial = self_serial + 1
 	self:Debug("%s: advance age to %d.", event, self_serial)
-	Ovale.refreshNeeded["player"] = true
+	Ovale.refreshNeeded[Ovale.playerGUID] = true
 end
 
 function OvaleCompile:CompileScript(name)

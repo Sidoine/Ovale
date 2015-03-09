@@ -76,7 +76,7 @@ Ovale.list = {}
 -- Checkbox and dropdown GUI controls.
 Ovale.checkBoxWidget = {}
 Ovale.listWidget = {}
--- List if units that require refreshing the best action.
+-- List of units that require refreshing the best action.
 Ovale.refreshNeeded = {}
 -- Prefix of messages received via CHAT_MSG_ADDON for Ovale.
 Ovale.MSG_PREFIX = OVALE
@@ -194,7 +194,6 @@ function Ovale:PLAYER_ENTERING_WORLD()
 end
 
 function Ovale:PLAYER_TARGET_CHANGED()
-	self.refreshNeeded.target = true
 	self:UpdateVisibility()
 end
 
