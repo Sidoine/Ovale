@@ -34,6 +34,7 @@ local tostring = tostring
 local tremove = table.remove
 local type = type
 local wipe = wipe
+local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local API_UnitCastingInfo = UnitCastingInfo
 local API_UnitChannelInfo = UnitChannelInfo
@@ -103,6 +104,15 @@ local WHITE_ATTACK = {
 	[    75] = true,	-- Auto Shot
 	[  5019] = true,	-- Shoot
 }
+
+-- Table of localized spell names that are "white attacks" but are also tracked in UNIT_SPELLCAST_* events.
+local WHITE_ATTACK_NAME = {}
+do
+	for spellId in pairs(WHITE_ATTACK) do
+		local name = API_GetSpellInfo(spellId)
+		WHITE_ATTACK_NAME[name] = true
+	end
+end
 
 -- Table of aura additions.
 local AURA_ADDED = {
@@ -395,7 +405,7 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unit, name, rank, lineI
 	if guid then
 		Ovale.refreshNeeded[guid] = true
 	end
-	if unit == "player" then
+	if unit == "player" and not WHITE_ATTACK[spellId] then
 		local _, _, _, _, startTime, endTime = API_UnitChannelInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
 			event, spellId, lineId, startTime, endTime)
@@ -408,7 +418,7 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, name, rank, lineId
 	if guid then
 		Ovale.refreshNeeded[guid] = true
 	end
-	if unit == "player" then
+	if unit == "player" and not WHITE_ATTACK[spellId] then
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
 		UnqueueSpellcast(spellId, lineId)
 	end
@@ -420,7 +430,7 @@ function OvaleFuture:UNIT_SPELLCAST_START(event, unit, name, rank, lineId, spell
 	if guid then
 		Ovale.refreshNeeded[guid] = true
 	end
-	if unit == "player" then
+	if unit == "player" and not WHITE_ATTACK[spellId] then
 		local _, _, _, _, startTime, endTime = API_UnitCastingInfo("player")
 		TracePrintf(spellId, "%s: %d, lineId=%d, startTime=%f, endTime=%f",
 			event, spellId, lineId, startTime, endTime)
@@ -434,7 +444,7 @@ function OvaleFuture:UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId,
 	if guid then
 		Ovale.refreshNeeded[guid] = true
 	end
-	if unit == "player" then
+	if unit == "player" and not WHITE_ATTACK[spellId] then
 		TracePrintf(spellId, "%s: %d, lineId=%d", event, spellId, lineId)
 		UnqueueSpellcast(spellId, lineId)
 	end
@@ -443,7 +453,7 @@ end
 -- UNIT_SPELLCAST_SENT is triggered when the spellcast is sent to the server.
 -- This is sent before all other UNIT_SPELLCAST_* events for the same spellcast.
 function OvaleFuture:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineId)
-	if unit == "player" then
+	if unit == "player" and not WHITE_ATTACK_NAME[spell] then
 		self_lastLineID = lineId
 		self_lastSpell = spell
 
