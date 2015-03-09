@@ -18,7 +18,6 @@ local OvaleState = nil
 local ipairs = ipairs
 local pairs = pairs
 local API_GetTotemInfo = GetTotemInfo
-local API_UnitClass = UnitClass
 local AIR_TOTEM_SLOT = AIR_TOTEM_SLOT		-- FrameXML\Constants
 local EARTH_TOTEM_SLOT = EARTH_TOTEM_SLOT	-- FrameXML\Constants
 local FIRE_TOTEM_SLOT = FIRE_TOTEM_SLOT		-- FrameXML\Constants
@@ -29,8 +28,6 @@ local WATER_TOTEM_SLOT = WATER_TOTEM_SLOT	-- FrameXML\Constants
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleTotem)
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Current age of totem state.
 local self_serial = 0
 
@@ -68,7 +65,7 @@ function OvaleTotem:OnInitialize()
 end
 
 function OvaleTotem:OnEnable()
-	if TOTEM_CLASS[self_class] then
+	if TOTEM_CLASS[Ovale.playerClass] then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 		self:RegisterEvent("PLAYER_TALENT_UPDATE", "Update")
 		self:RegisterEvent("PLAYER_TOTEM_UPDATE", "Update")
@@ -78,7 +75,7 @@ function OvaleTotem:OnEnable()
 end
 
 function OvaleTotem:OnDisable()
-	if TOTEM_CLASS[self_class] then
+	if TOTEM_CLASS[Ovale.playerClass] then
 		OvaleState:UnregisterState(self)
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("PLAYER_TALENT_UPDATE")
@@ -133,7 +130,7 @@ end
 -- Apply the effects of the spell when the spellcast completes.
 function OvaleTotem:ApplySpellAfterCast(state, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
 	self:StartProfiling("OvaleTotem_ApplySpellAfterCast")
-	if self_class == "SHAMAN" and spellId == TOTEMIC_RECALL then
+	if Ovale.playerClass == "SHAMAN" and spellId == TOTEMIC_RECALL then
 		-- Shaman's Totemic Recall destroys all totems.
 		for slot in ipairs(state.totem) do
 			state:DestroyTotem(slot, endCast)

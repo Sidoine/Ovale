@@ -20,7 +20,6 @@ local pairs = pairs
 local tinsert = table.insert
 local API_CreateFrame = CreateFrame
 local API_EasyMenu = EasyMenu
-local API_UnitClass = UnitClass
 -- GLOBALS: UIParent
 
 -- Class icon textures.
@@ -37,9 +36,6 @@ local CLASS_ICONS = {
 	["WARLOCK"] = "Interface\\Icons\\ClassIcon_Warlock",
 	["WARRIOR"] = "Interface\\Icons\\ClassIcon_Warrior",
 }
-
--- Player's class.
-local _, self_class = API_UnitClass("player")
 
 local self_menuFrame = nil
 local self_tooltipTitle = nil
@@ -125,7 +121,7 @@ function OvaleDataBroker:OnInitialize()
 		local broker = {
 			type = "data source",
 			text = "",
-			icon = CLASS_ICONS[self_class],
+			icon = CLASS_ICONS[Ovale.playerClass],
 			OnClick = OnClick,
 			OnTooltipShow = OnTooltipShow,
 		}

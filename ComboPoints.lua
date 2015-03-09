@@ -27,7 +27,6 @@ local OvaleState = nil
 local tinsert = table.insert
 local tremove = table.remove
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
@@ -38,8 +37,6 @@ OvaleDebug:RegisterDebugging(OvaleComboPoints)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleComboPoints)
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
@@ -157,7 +154,7 @@ end
 
 function OvaleComboPoints:OnEnable()
 	self_guid = API_UnitGUID("player")
-	if self_class == "ROGUE" or self_class == "DRUID" then
+	if Ovale.playerClass == "ROGUE" or Ovale.playerClass == "DRUID" then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 		self:RegisterEvent("PLAYER_TARGET_CHANGED")
 		self:RegisterEvent("UNIT_COMBO_POINTS")
@@ -171,7 +168,7 @@ function OvaleComboPoints:OnEnable()
 end
 
 function OvaleComboPoints:OnDisable()
-	if self_class == "ROGUE" or self_class == "DRUID" then
+	if Ovale.playerClass == "ROGUE" or Ovale.playerClass == "DRUID" then
 		OvaleState:UnregisterState(self)
 		OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
 		OvaleData:UnregisterRequirement("combo")
@@ -229,7 +226,7 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 end
 
 function OvaleComboPoints:Ovale_EquipmentChanged(event)
-	self_hasAssassination4pT17 = (self_class == "ROGUE" and OvalePaperDoll:IsSpecialization("assassination") and OvaleEquipment:GetArmorSetCount("T17") >= 4)
+	self_hasAssassination4pT17 = (Ovale.playerClass == "ROGUE" and OvalePaperDoll:IsSpecialization("assassination") and OvaleEquipment:GetArmorSetCount("T17") >= 4)
 end
 
 function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID, success)
@@ -262,7 +259,7 @@ function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID
 end
 
 function OvaleComboPoints:Ovale_TalentsChanged(event)
-	if self_class == "ROGUE" then
+	if Ovale.playerClass == "ROGUE" then
 		self_hasAnticipation = OvaleSpellBook:GetTalentPoints(ANTICIPATION_TALENT) > 0
 		self_hasRuthlessness = OvaleSpellBook:IsKnownSpell(RUTHLESSNESS)
 	end

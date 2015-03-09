@@ -47,10 +47,6 @@ local type = type
 local wipe = wipe
 local yield = coroutine.yield
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
-local API_UnitClass = UnitClass
-
--- Player's class.
-local _, self_class = API_UnitClass("player")
 
 -- Keywords for SimulationCraft action lists.
 local KEYWORD = {}

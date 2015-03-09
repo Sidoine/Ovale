@@ -34,12 +34,9 @@ local OvaleAura = nil
 local OvaleSpellBook = nil
 
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
@@ -92,14 +89,14 @@ function OvaleSteadyFocus:OnInitialize()
 end
 
 function OvaleSteadyFocus:OnEnable()
-	if self_class == "HUNTER" then
+	if Ovale.playerClass == "HUNTER" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterMessage("Ovale_TalentsChanged")
 	end
 end
 
 function OvaleSteadyFocus:OnDisable()
-	if self_class == "HUNTER" then
+	if Ovale.playerClass == "HUNTER" then
 		self:UnregisterMessage("Ovale_TalentsChanged")
 	end
 end

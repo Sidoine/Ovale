@@ -20,11 +20,7 @@ local pairs = pairs
 local tinsert = table.insert
 local type = type
 local API_InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
-local API_UnitClass = UnitClass
 -- GLOBALS: LibStub
-
--- Player's class.
-local _, self_class = API_UnitClass("player")
 
 -- List of registered modules providing options.
 local self_register = {}

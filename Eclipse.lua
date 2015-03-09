@@ -23,7 +23,6 @@ local OvaleState = nil
 
 local floor = math.floor
 local API_GetEclipseDirection = GetEclipseDirection
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local INFINITY = math.huge
@@ -34,8 +33,6 @@ OvaleProfiler:RegisterProfiling(OvaleEclipse)
 
 -- Player's GUID.
 local self_guid = nil
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Table of functions to update spellcast information to register with OvaleFuture.
 local self_updateSpellcastInfo = {}
 
@@ -68,14 +65,14 @@ function OvaleEclipse:OnInitialize()
 end
 
 function OvaleEclipse:OnEnable()
-	if self_class == "DRUID" then
+	if Ovale.playerClass == "DRUID" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
 
 function OvaleEclipse:OnDisable()
-	if self_class == "DRUID" then
+	if Ovale.playerClass == "DRUID" then
 		self:UnregisterMessage("Ovale_SpecializationChanged")
 	end
 end

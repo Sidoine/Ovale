@@ -23,11 +23,8 @@ Ovale.OvaleShadowWordDeath = OvaleShadowWordDeath
 local OvaleAura = nil
 
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
@@ -54,14 +51,14 @@ function OvaleShadowWordDeath:OnInitialize()
 end
 
 function OvaleShadowWordDeath:OnEnable()
-	if self_class == "PRIEST" then
+	if Ovale.playerClass == "PRIEST" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
 
 function OvaleShadowWordDeath:OnDisable()
-	if self_class == "PRIEST" then
+	if Ovale.playerClass == "PRIEST" then
 		self:UnregisterMessage("Ovale_SpecializationChanged")
 	end
 end

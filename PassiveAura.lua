@@ -21,14 +21,11 @@ local exp = math.exp
 local log = math.log
 local pairs = pairs
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 local INVSLOT_TRINKET1 = INVSLOT_TRINKET1
 local INVSLOT_TRINKET2 = INVSLOT_TRINKET2
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 -- Trinket slot IDs list.
@@ -223,7 +220,7 @@ end
 
 function OvalePassiveAura:UpdateReadiness()
 	local specialization = OvalePaperDoll:GetSpecialization()
-	local spellId = READINESS_ROLE[self_class] and READINESS_ROLE[self_class][specialization]
+	local spellId = READINESS_ROLE[Ovale.playerClass] and READINESS_ROLE[Ovale.playerClass][specialization]
 	if spellId then
 		local hasReadiness = false
 		local cdMultiplier

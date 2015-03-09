@@ -34,14 +34,10 @@ local API_GetRuneCooldown = GetRuneCooldown
 local API_GetRuneType = GetRuneType
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local INFINITY = math.huge
 
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleRunes)
-
--- Player's class.
-local _, self_class = API_UnitClass("player")
 
 local BLOOD_RUNE = 1
 local UNHOLY_RUNE = 2
@@ -132,7 +128,7 @@ function OvaleRunes:OnInitialize()
 end
 
 function OvaleRunes:OnEnable()
-	if self_class == "DEATHKNIGHT" then
+	if Ovale.playerClass == "DEATHKNIGHT" then
 		-- Initialize rune database.
 		for runeType, slots in ipairs(RUNE_SLOTS) do
 			for _, slot in pairs(slots) do
@@ -151,7 +147,7 @@ function OvaleRunes:OnEnable()
 end
 
 function OvaleRunes:OnDisable()
-	if self_class == "DEATHKNIGHT" then
+	if Ovale.playerClass == "DEATHKNIGHT" then
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("RUNE_POWER_UPDATE")
 		self:UnregisterEvent("RUNE_TYPE_UPDATE")

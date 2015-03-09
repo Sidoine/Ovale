@@ -24,12 +24,9 @@ local OvaleSpellBook = nil
 
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
@@ -59,7 +56,7 @@ function OvaleMindHarvest:OnInitialize()
 end
 
 function OvaleMindHarvest:OnEnable()
-	if self_class == "PRIEST" then
+	if Ovale.playerClass == "PRIEST" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterMessage("Ovale_GlyphsChanged", "UpdateEventHandlers")
 		self:RegisterMessage("Ovale_SpecializationChanged", "UpdateEventHandlers")
@@ -70,7 +67,7 @@ function OvaleMindHarvest:OnEnable()
 end
 
 function OvaleMindHarvest:OnDisable()
-	if self_class == "PRIEST" then
+	if Ovale.playerClass == "PRIEST" then
 		self:UnregisterMessage("Ovale_GlyphsChanged")
 		self:UnregisterMessage("Ovale_SpecializationChanged")
 		if IsEnabled() then

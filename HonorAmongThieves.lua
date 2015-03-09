@@ -26,12 +26,9 @@ local OvaleAura = nil
 local OvaleData = nil
 
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
@@ -60,14 +57,14 @@ function OvaleHonorAmongThieves:OnInitialize()
 end
 
 function OvaleHonorAmongThieves:OnEnable()
-	if self_class == "ROGUE" then
+	if Ovale.playerClass == "ROGUE" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
 
 function OvaleHonorAmongThieves:OnDisable()
-	if self_class == "ROGUE" then
+	if Ovale.playerClass == "ROGUE" then
 		self:UnregisterMessage("Ovale_SpecializationChanged")
 	end
 end

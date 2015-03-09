@@ -25,7 +25,6 @@ local pairs = pairs
 local API_GetSpellCharges = GetSpellCharges
 local API_GetSpellCooldown = GetSpellCooldown
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 
 -- Spell ID for the dummy Global Cooldown spell.
 local GLOBAL_COOLDOWN = 61304
@@ -34,9 +33,6 @@ local GLOBAL_COOLDOWN = 61304
 OvaleDebug:RegisterDebugging(OvaleCooldown)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleCooldown)
-
--- Player's class.
-local _, self_class = API_UnitClass("player")
 
 -- BASE_GCD[class] = { gcd, isCaster }
 local BASE_GCD = {
@@ -209,20 +205,20 @@ end
 -- Return the base GCD and caster status.
 function OvaleCooldown:GetBaseGCD()
 	local gcd, isCaster
-	local baseGCD = BASE_GCD[self_class]
+	local baseGCD = BASE_GCD[Ovale.playerClass]
 	if baseGCD then
 		gcd, isCaster = baseGCD[1], baseGCD[2]
 	else
 		gcd, isCaster = 1.5, true
 	end
-	if self_class == "DRUID" then
+	if Ovale.playerClass == "DRUID" then
 		if OvaleStance:IsStance("druid_cat_form") then
 			gcd = 1.0
 			isCaster = false
 		elseif OvaleStance:IsStance("druid_bear_form") then
 			isCaster = false
 		end
-	elseif self_class == "MONK" then
+	elseif Ovale.playerClass == "MONK" then
 		if OvaleStance:IsStance("monk_stance_of_the_fierce_tiger") then
 			gcd = 1.0
 		elseif OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
@@ -348,9 +344,9 @@ statePrototype.GetGCD = function(state, spellId, atTime, targetGUID)
 	if not gcd then
 		local isCaster, haste
 		gcd, isCaster = OvaleCooldown:GetBaseGCD()
-		if self_class == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
+		if Ovale.playerClass == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
 			haste = "melee"
-		elseif self_class == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
+		elseif Ovale.playerClass == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
 			haste = "melee"
 		end
 		local gcdHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID)

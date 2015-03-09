@@ -26,7 +26,6 @@ local API_GetAuctionItemSubClasses = GetAuctionItemSubClasses
 local API_GetInventoryItemID = GetInventoryItemID
 local API_GetInventoryItemGems = GetInventoryItemGems
 local API_GetItemInfo = GetItemInfo
-local API_UnitClass = UnitClass
 local INVSLOT_AMMO = INVSLOT_AMMO
 local INVSLOT_BACK = INVSLOT_BACK
 local INVSLOT_BODY = INVSLOT_BODY
@@ -54,9 +53,6 @@ local INVSLOT_WRIST = INVSLOT_WRIST
 
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleEquipment)
-
--- Player's class.
-local _, self_class = API_UnitClass("player")
 
 -- Frame for tooltip-scanning.
 local self_tooltip = nil
@@ -495,8 +491,9 @@ do
 	function OvaleEquipment:GetArmorSetCount(name)
 		local count = self.armorSetCount[name]
 		if not count then
-			if armorSetName[self_class] and armorSetName[self_class][name] then
-				name = armorSetName[self_class][name]
+			local class = Ovale.playerClass
+			if armorSetName[class] and armorSetName[class][name] then
+				name = armorSetName[class][name]
 				count = self.armorSetCount[name]
 			end
 		end

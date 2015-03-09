@@ -40,7 +40,6 @@ local API_GetSpellCritChance = GetSpellCritChance
 local API_GetTime = GetTime
 local API_UnitAttackPower = UnitAttackPower
 local API_UnitAttackSpeed = UnitAttackSpeed
-local API_UnitClass = UnitClass
 local API_UnitDamage = UnitDamage
 local API_UnitLevel = UnitLevel
 local API_UnitRangedAttackPower = UnitRangedAttackPower
@@ -91,7 +90,7 @@ local OVALE_SPECIALIZATION_NAME = {
 
 --<public-static-properties>
 -- Player's class.
-OvalePaperDoll.class = select(2, API_UnitClass("player"))
+OvalePaperDoll.class = Ovale.playerClass
 -- Player's level.
 OvalePaperDoll.level = API_UnitLevel("player")
 -- Player's current specialization.

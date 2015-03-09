@@ -24,15 +24,12 @@ local OvaleAura = nil
 
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
-local API_UnitClass = UnitClass
 local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleWarriorCharge)
 
--- Player's class.
-local _, self_class = API_UnitClass("player")
 -- Player's GUID.
 local self_guid = nil
 
@@ -58,14 +55,14 @@ function OvaleWarriorCharge:OnInitialize()
 end
 
 function OvaleWarriorCharge:OnEnable()
-	if self_class == "WARRIOR" then
+	if Ovale.playerClass == "WARRIOR" then
 		self_guid = API_UnitGUID("player")
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	end
 end
 
 function OvaleWarriorCharge:OnDisable()
-	if self_class == "WARRIOR" then
+	if Ovale.playerClass == "WARRIOR" then
 		self:UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED")
 	end
 end
