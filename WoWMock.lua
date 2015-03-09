@@ -134,9 +134,9 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = LibStub(libName)
-			if lib then
-				for k, v in pairs(lib) do
+			local library = LibStub(libName)
+			if library then
+				for k, v in pairs(library) do
 					mod[k] = v
 				end
 			end
@@ -150,9 +150,9 @@ do
 		addon.modulePrototype = proto
 	end
 
-	lib.GetAddon = function(lib, name)
-		lib.addons = lib.addons or {}
-		return lib.addons[name]
+	lib.GetAddon = function(library, name)
+		library.addons = library.addons or {}
+		return library.addons[name]
 	end
 
 	lib.Fire = function(event, ...)
@@ -169,11 +169,11 @@ do
 		end
 	end
 
-	lib.IterateAddons = function(lib)
-		return pairs(lib.addons)
+	lib.IterateAddons = function(library)
+		return pairs(library.addons)
 	end
 
-	lib.NewAddon = function(lib, name, ...)
+	lib.NewAddon = function(library, name, ...)
 		local addon
 		local args
 		if type(name) == "nil" then
@@ -194,16 +194,16 @@ do
 		end
 		-- Embed methods from named libraries.
 		for _, libName in ipairs(args) do
-			local lib = LibStub(libName)
-			if lib then
-				for k, v in pairs(lib) do
+			local library = LibStub(libName)
+			if library then
+				for k, v in pairs(library) do
 					addon[k] = v
 				end
 			end
 		end
 		addon.name = name
-		lib.addons = lib.addons or {}
-		lib.addons[name] = addon
+		library.addons = library.addons or {}
+		library.addons[name] = addon
 		lib.initializationQueue[#lib.initializationQueue + 1] = addon
 		return addon
 	end
@@ -231,11 +231,11 @@ do
 	local lib = {}
 	AceConsole = lib
 
-	lib.Print = function(lib, ...)
+	lib.Print = function(library, ...)
 		print(...)
 	end
 
-	lib.Printf = function(lib, ...)
+	lib.Printf = function(library, ...)
 		print(string.format(...))
 	end
 end
@@ -246,7 +246,7 @@ do
 	local lib = {}
 	AceDB = lib
 
-	lib.New = function(lib, name, template)
+	lib.New = function(library, name, template)
 		template = template or {}
 		local db = DeepCopy(template)
 		db.RegisterCallback = DoNothing
@@ -271,28 +271,28 @@ do
 
 	local eventHandler = {}
 
-	lib.RegisterEvent = function(lib, event, handler, arg)
-		eventHandler[lib] = eventHandler[lib] or {}
-		eventHandler[lib][event] = { handler, arg }
+	lib.RegisterEvent = function(library, event, handler, arg)
+		eventHandler[library] = eventHandler[library] or {}
+		eventHandler[library][event] = { handler, arg }
 	end
 
 	lib.RegisterMessage = lib.RegisterEvent
 
-	lib.SendMessage = function(lib, event, ...)
+	lib.SendMessage = function(library, event, ...)
 		local handler, arg
-		local tbl = eventHandler[lib] and eventHandler[lib][event]
+		local tbl = eventHandler[library] and eventHandler[library][event]
 		if tbl then
 			handler, arg = tbl[1], tbl[2]
 			if type(handler) == "string" then
-				handler = lib[handler]
-				arg = lib
+				handler = library[handler]
+				arg = library
 			end
 		else
-			handler = lib[event]
-			arg = lib
+			handler = library[event]
+			arg = library
 		end
 		if handler then
-			--print("Firing", event, lib.name)
+			--print("Firing", event, library.name)
 			if arg then
 				handler(arg, event, ...)
 			else
@@ -311,20 +311,20 @@ do
 	local widgetFactory = {}
 	local container = {}
 
-	lib.Create = function(lib, widgetType)
+	lib.Create = function(library, widgetType)
 		local constructor = widgetFactory[widgetType]
 		if constructor then
 			return constructor()
 		end
 	end
 
-	lib.RegisterAsContainer = function(lib, widget)
+	lib.RegisterAsContainer = function(library, widget)
 		container[widget] = true
 		widget.AddChild = DoNothing
 		widget.ReleaseChildren = DoNothing
 	end
 
-	lib.RegisterWidgetType = function(lib, name, constructor, version)
+	lib.RegisterWidgetType = function(library, name, constructor, version)
 		widgetFactory[name] = constructor
 	end
 end
@@ -335,20 +335,20 @@ do
 	local lib = {}
 	AceLocale = lib
 
-	lib.GetLocale = function(lib, name)
+	lib.GetLocale = function(library, name)
 		local L
-		if lib.locale and lib.locale[name] then
-			L = lib.locale[name]
+		if library.locale and library.locale[name] then
+			L = library.locale[name]
 		else
-			L = lib:NewLocale(name, nil)
+			L = library:NewLocale(name, nil)
 		end
 		return L
 	end
 
-	lib.NewLocale = function(lib, name, locale)
+	lib.NewLocale = function(library, name, locale)
 		local L = setmetatable({}, KeysAreMissingValuesMetatable)
-		lib.locale = lib.locale or {}
-		lib.locale[name] = L
+		library.locale = library.locale or {}
+		library.locale[name] = L
 		return L
 	end
 end
@@ -367,12 +367,12 @@ do
 	local lib = {}
 	CallbackHandler = lib
 
-	lib.New = function(lib, obj)
-		obj.Fire = lib.Fire
+	lib.New = function(library, obj)
+		obj.Fire = library.Fire
 		return obj
 	end
 
-	lib.Fire = function(lib, ...) end
+	lib.Fire = function(library, ...) end
 end
 
 -- LibBabble-CreatureType-3.0
@@ -381,9 +381,9 @@ do
 	local lib = {}
 	LibBabbleCreatureType = lib
 
-	lib.GetLookupTable = function(lib)
-		local tbl = lib.lookupTable or setmetatable({}, KeysAreMissingValuesMetatable)
-		lib.lookupTable = tbl
+	lib.GetLookupTable = function(library)
+		local tbl = library.lookupTable or setmetatable({}, KeysAreMissingValuesMetatable)
+		library.lookupTable = tbl
 		return tbl
 	end
 end
@@ -418,18 +418,18 @@ do
 	}
 
 	local mt = {
-		__call = function(lib, name, flag)
-			return lib:GetLibrary(name, flag)
+		__call = function(library, name, flag)
+			return library:GetLibrary(name, flag)
 		end,
 	}
 
-	lib.GetLibrary = function(lib, name, flag)
-		return lib.library[name]
+	lib.GetLibrary = function(library, name, flag)
+		return library.library[name]
 	end
 
-	lib.NewLibrary = function(lib, name, major, minor)
+	lib.NewLibrary = function(library, name, major, minor)
 		local newLib = {}
-		lib.library[name] = newLib
+		library.library[name] = newLib
 		return newLib
 	end
 
