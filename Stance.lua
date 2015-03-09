@@ -16,7 +16,6 @@ local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
-local OvaleGUID = nil
 local OvaleState = nil
 
 local ipairs = ipairs
@@ -121,7 +120,6 @@ OvaleStance.STANCE_NAME = STANCE_NAME
 function OvaleStance:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
-	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
 
 end

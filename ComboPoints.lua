@@ -19,7 +19,6 @@ local OvaleAura = nil
 local OvaleData = nil
 local OvaleEquipment = nil
 local OvaleFuture = nil
-local OvaleGUID = nil
 local OvalePaperDoll = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
@@ -145,7 +144,6 @@ function OvaleComboPoints:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleEquipment = Ovale.OvaleEquipment
 	OvaleFuture = Ovale.OvaleFuture
-	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState

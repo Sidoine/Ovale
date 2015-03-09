@@ -18,7 +18,6 @@ local OvaleProfiler = Ovale.OvaleProfiler
 -- Forward declarations for module dependencies.
 local OvaleCooldown = nil
 local OvaleData = nil
-local OvaleGUID = nil
 local OvalePower = nil
 local OvaleRunes = nil
 local OvaleState = nil
@@ -156,7 +155,6 @@ function OvaleSpellBook:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleCooldown = Ovale.OvaleCooldown
 	OvaleData = Ovale.OvaleData
-	OvaleGUID = Ovale.OvaleGUID
 	OvalePower = Ovale.OvalePower
 	OvaleRunes = Ovale.OvaleRunes
 	OvaleState = Ovale.OvaleState

@@ -16,7 +16,6 @@ local OvaleProfiler = Ovale.OvaleProfiler
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 local OvaleFuture = nil
-local OvaleGUID = nil
 local OvaleData = nil
 local OvaleState = nil
 
@@ -199,7 +198,6 @@ function OvalePower:OnInitialize()
 	OvaleAura = Ovale.OvaleAura
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
-	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
 
 	-- Create the tooltip used for scanning.
