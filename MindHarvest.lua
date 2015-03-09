@@ -24,11 +24,10 @@ local OvaleSpellBook = nil
 
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- Re-use the spell ID of the Glyph of Mind Harvest for the hidden target debuff spell ID.
 local MIND_HARVEST = 162532
@@ -57,7 +56,7 @@ end
 
 function OvaleMindHarvest:OnEnable()
 	if Ovale.playerClass == "PRIEST" then
-		self_guid = API_UnitGUID("player")
+		self_playerGUID = Ovale.playerGUID
 		self:RegisterMessage("Ovale_GlyphsChanged", "UpdateEventHandlers")
 		self:RegisterMessage("Ovale_SpecializationChanged", "UpdateEventHandlers")
 		if IsEnabled() then
@@ -86,14 +85,14 @@ end
 
 function OvaleMindHarvest:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
-	if sourceGUID == self_guid then
+	if sourceGUID == self_playerGUID then
 		if cleuEvent == "SPELL_DAMAGE" then
 			local spellId = arg12
 			if MIND_HARVEST_ATTACKS[spellId] then
 				local now = API_GetTime()
 				local duration = MIND_HARVEST_DURATION
 				local ending = now + MIND_HARVEST_DURATION
-				OvaleAura:GainedAuraOnGUID(destGUID, now, MIND_HARVEST, self_guid, "HARMFUL", nil, nil, 1, nil, duration, ending, nil, MIND_HARVEST_NAME, nil, nil, nil)
+				OvaleAura:GainedAuraOnGUID(destGUID, now, MIND_HARVEST, self_playerGUID, "HARMFUL", nil, nil, 1, nil, duration, ending, nil, MIND_HARVEST_NAME, nil, nil, nil)
 			end
 		end
 	end

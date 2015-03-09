@@ -45,7 +45,7 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 OvaleProfiler:RegisterProfiling(OvaleFuture)
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- The spells that the player is casting or has cast but are still in-flight toward their targets.
 local self_activeSpellcast = {}
@@ -200,7 +200,7 @@ local function QueueSpellcast(spellId, lineId, startTime, endTime, channeled, al
 						local verified, value, data = OvaleData:CheckSpellAuraData(auraId, spellData, atTime, targetGUID)
 						if verified and (AURA_ADDED[value] or type(value) == "number" and value > 0) then
 							spellcast.auraId = auraId
-							if targetGUID ~= self_guid then
+							if targetGUID ~= self_playerGUID then
 								spellcast.removeOnAuraSuccess = true
 							end
 							break
@@ -313,7 +313,7 @@ function OvaleFuture:OnInitialize()
 end
 
 function OvaleFuture:OnEnable()
-	self_guid = API_UnitGUID("player")
+	self_playerGUID = Ovale.playerGUID
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -373,7 +373,7 @@ function OvaleFuture:PLAYER_REGEN_ENABLED(event)
 end
 
 function OvaleFuture:Ovale_AuraAdded(event, timestamp, guid, spellId, caster)
-	if guid == self_guid then
+	if guid == self_playerGUID then
 		self_timeAuraAdded = timestamp
 	end
 end
@@ -540,7 +540,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 	]]--
 
 	-- Called when a missile reaches or misses its target
-	if sourceGUID == self_guid then
+	if sourceGUID == self_playerGUID then
 		local success = CLEU_SUCCESSFUL_SPELLCAST_EVENT[cleuEvent]
 		--[[
 			If this is a "SPELL_DAMAGE" event, then only count it as a success if it was the "main" attack,
@@ -682,10 +682,10 @@ function OvaleFuture:GetDamageMultiplier(spellId, atTime, snapshot, targetGUID)
 				if verified then
 					local aura, isActiveAura
 					if self.GetAura and self.IsActiveAura then
-						aura = self.GetAuraByGUID(self, self_guid, auraId, filter)
+						aura = self.GetAuraByGUID(self, self_playerGUID, auraId, filter)
 						isActiveAura = self.IsActiveAura(self, aura, atTime)
 					else
-						aura = OvaleAura:GetAuraByGUID(self_guid, auraId, filter)
+						aura = OvaleAura:GetAuraByGUID(self_playerGUID, auraId, filter)
 						isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
 					end
 					if isActiveAura then

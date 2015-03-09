@@ -39,13 +39,12 @@ local pairs = pairs
 local type = type
 local API_IsInGroup = IsInGroup
 local API_SendAddonMessage = SendAddonMessage
-local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 local MSG_PREFIX = Ovale.MSG_PREFIX
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 -- Player's name.
 local self_name = nil
 
@@ -73,7 +72,7 @@ function OvaleScore:OnInitialize()
 end
 
 function OvaleScore:OnEnable()
-	self_guid = API_UnitGUID("player")
+	self_playerGUID = Ovale.playerGUID
 	self_name = API_UnitName("player")
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -101,7 +100,7 @@ function OvaleScore:PLAYER_REGEN_ENABLED()
 	-- Broadcast the player's own score for damage meters when combat ends.
 	-- Broadcast message is "score;maxScore;playerGUID"
 	if self.maxScore > 0 and API_IsInGroup() then
-		local message = self:Serialize("score", self.score, self.maxScore, self_guid)
+		local message = self:Serialize("score", self.score, self.maxScore, self_playerGUID)
 		local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
 		API_SendAddonMessage(MSG_PREFIX, message, channel)
 	end
@@ -139,7 +138,7 @@ function OvaleScore:ScoreSpell(spellId)
 		if scored then
 			self.score = self.score + scored
 			self.maxScore = self.maxScore + 1
-			self:SendScore(self_name, self_guid, scored, 1)
+			self:SendScore(self_name, self_playerGUID, scored, 1)
 		end
 	end
 end

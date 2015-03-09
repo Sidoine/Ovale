@@ -27,7 +27,6 @@ local OvaleState = nil
 local tinsert = table.insert
 local tremove = table.remove
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local API_UnitPower = UnitPower
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local UNKNOWN = UNKNOWN
@@ -38,7 +37,7 @@ OvaleDebug:RegisterDebugging(OvaleComboPoints)
 OvaleProfiler:RegisterProfiling(OvaleComboPoints)
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- Rogue's Anticipation talent.
 local ANTICIPATION = 115189
@@ -153,7 +152,7 @@ function OvaleComboPoints:OnInitialize()
 end
 
 function OvaleComboPoints:OnEnable()
-	self_guid = API_UnitGUID("player")
+	self_playerGUID = Ovale.playerGUID
 	if Ovale.playerClass == "ROGUE" or Ovale.playerClass == "DRUID" then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 		self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -245,10 +244,10 @@ function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID
 			self:Debug("    Spell %d refunds 1 combo point from Assassination 4pT17 set bonus.", spellId)
 			AddPendingComboEvent(atTime, spellId, targetGUID, "Assassination 4pT17", 1)
 		end
-		if self_hasAnticipation and targetGUID ~= self_guid then
+		if self_hasAnticipation and targetGUID ~= self_playerGUID then
 			-- Anticipation causes offensive finishing moves to consume all Anticipation charges and to grant a combo point for each.
 			if OvaleSpellBook:IsHarmfulSpell(spellId) then
-				local aura = OvaleAura:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
+				local aura = OvaleAura:GetAuraByGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true)
 				if OvaleAura:IsActiveAura(aura, atTime) then
 					self:Debug("    Spell %d hit with %d Anticipation charges.", spellId, aura.stacks)
 					AddPendingComboEvent(atTime, spellId, targetGUID, "Anticipation", aura.stacks)
@@ -434,7 +433,7 @@ function OvaleComboPoints:ResetState(state)
 	for k = 1, #self_pendingComboEvents do
 		local comboEvent = self_pendingComboEvents[k]
 		if comboEvent.reason == "Anticipation" then
-			state:RemoveAuraOnGUID(self_guid, ANTICIPATION, "HELPFUL", true, comboEvent.atTime)
+			state:RemoveAuraOnGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true, comboEvent.atTime)
 			break
 		end
 	end
@@ -459,10 +458,10 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 			end
 			-- Anticipation causes offensive finishing moves to consume all Anticipation charges and to grant a combo point for each.
 			if self_hasAnticipation and state.combo > 0 then
-				local aura = state:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
+				local aura = state:GetAuraByGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true)
 				if state:IsActiveAura(aura, endCast) then
 					power = power + aura.stacks
-					state:RemoveAuraOnGUID(self_guid, ANTICIPATION, "HELPFUL", true, endCast)
+					state:RemoveAuraOnGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true, endCast)
 					-- Anticipation charges that are consumed to grant combo points don't overflow into new Anticipation charges.
 					if power > MAX_COMBO_POINTS then
 						power = MAX_COMBO_POINTS
@@ -482,7 +481,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 			if self_hasAnticipation and not si.temp_combo then
 				local stacks = power - MAX_COMBO_POINTS
 				-- Look for a pre-existing Anticipation buff and add to its stack count.
-				local aura = state:GetAuraByGUID(self_guid, ANTICIPATION, "HELPFUL", true)
+				local aura = state:GetAuraByGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true)
 				if state:IsActiveAura(aura, endCast) then
 					stacks = stacks + aura.stacks
 					if stacks > MAX_COMBO_POINTS then
@@ -492,7 +491,7 @@ function OvaleComboPoints:ApplySpellAfterCast(state, spellId, targetGUID, startC
 				-- Add a new Anticipation buff with the updated start, ending, stacks information.
 				local start = endCast
 				local ending = start + ANTICIPATION_DURATION
-				aura = state:AddAuraToGUID(self_guid, ANTICIPATION, self_guid, "HELPFUL", nil, start, ending)
+				aura = state:AddAuraToGUID(self_playerGUID, ANTICIPATION, self_playerGUID, "HELPFUL", nil, start, ending)
 				aura.stacks = stacks
 			end
 			power = MAX_COMBO_POINTS

@@ -35,11 +35,10 @@ Ovale.OvaleBanditsGuile = OvaleBanditsGuile
 local OvaleAura = nil
 
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- Aura IDs for visible buff from Bandit's Guile.
 local SHALLOW_INSIGHT = 84745
@@ -71,7 +70,7 @@ end
 
 function OvaleBanditsGuile:OnEnable()
 	if Ovale.playerClass == "ROGUE" then
-		self_guid = API_UnitGUID("player")
+		self_playerGUID = Ovale.playerGUID
 		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
@@ -100,7 +99,7 @@ end
 -- Insight buff.
 function OvaleBanditsGuile:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
-	if sourceGUID == self_guid and cleuEvent == "SPELL_DAMAGE" and self.stacks < 3 then
+	if sourceGUID == self_playerGUID and cleuEvent == "SPELL_DAMAGE" and self.stacks < 3 then
 		local spellId, multistrike = arg12, arg25
 		if BANDITS_GUILE_ATTACK[spellId] and not multistrike then
 			local now = API_GetTime()
@@ -115,7 +114,7 @@ end
 -- This event handler uses Ovale_AuraAdded to track the Insight buff being applied for the first
 -- time and sets the implied stacks of Bandit's Guile.
 function OvaleBanditsGuile:Ovale_AuraAdded(event, timestamp, target, auraId, caster)
-	if target == self_guid then
+	if target == self_playerGUID then
 		if auraId == SHALLOW_INSIGHT or auraId == MODERATE_INSIGHT or auraId == DEEP_INSIGHT then
 			local aura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
 			self.start, self.ending = aura.start, aura.ending
@@ -137,7 +136,7 @@ end
 -- This event handler uses Ovale_AuraChanged to track refreshes of the Insight buff, which indicates
 -- that it the hidden Bandit's Guile buff has gained extra stacks.
 function OvaleBanditsGuile:Ovale_AuraChanged(event, timestamp, target, auraId, caster)
-	if target == self_guid then
+	if target == self_playerGUID then
 		if auraId == SHALLOW_INSIGHT or auraId == MODERATE_INSIGHT or auraId == DEEP_INSIGHT then
 			local aura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
 			self.start, self.ending = aura.start, aura.ending
@@ -151,23 +150,23 @@ function OvaleBanditsGuile:Ovale_AuraChanged(event, timestamp, target, auraId, c
 end
 
 function OvaleBanditsGuile:Ovale_AuraRemoved(event, timestamp, target, auraId, caster)
-	if target == self_guid then
+	if target == self_playerGUID then
 		if (auraId == SHALLOW_INSIGHT and self.stacks < 8)
 				or (auraId == MODERATE_INSIGHT and self.stacks < 12)
 				or auraId == DEEP_INSIGHT then
 			self.ending = timestamp
 			self.stacks = 0
-			OvaleAura:LostAuraOnGUID(self_guid, timestamp, self.spellId, self_guid)
+			OvaleAura:LostAuraOnGUID(self_playerGUID, timestamp, self.spellId, self_playerGUID)
 		end
 	end
 end
 
 function OvaleBanditsGuile:GainedAura(atTime)
-	OvaleAura:GainedAuraOnGUID(self_guid, atTime, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_playerGUID, atTime, self.spellId, self_playerGUID, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 end
 
 function OvaleBanditsGuile:DebugBanditsGuile()
-	local aura = OvaleAura:GetAuraByGUID(self_guid, self.spellId, "HELPFUL", true)
+	local aura = OvaleAura:GetAuraByGUID(self_playerGUID, self.spellId, "HELPFUL", true)
 	if aura then
 		self:Print("Player has Bandit's Guile aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
 	end

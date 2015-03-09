@@ -26,11 +26,10 @@ local OvaleAura = nil
 local OvaleData = nil
 
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- Honor Among Thieves spell ID.
 local HONOR_AMONG_THIEVES = 51699
@@ -58,7 +57,7 @@ end
 
 function OvaleHonorAmongThieves:OnEnable()
 	if Ovale.playerClass == "ROGUE" then
-		self_guid = API_UnitGUID("player")
+		self_playerGUID = Ovale.playerGUID
 		self:RegisterMessage("Ovale_SpecializationChanged")
 	end
 end
@@ -79,7 +78,7 @@ end
 
 function OvaleHonorAmongThieves:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
-	if sourceGUID == self_guid and destGUID == self_guid and cleuEvent == "SPELL_ENERGIZE" then
+	if sourceGUID == self_playerGUID and destGUID == self_playerGUID and cleuEvent == "SPELL_ENERGIZE" then
 		local spellId, powerType = arg12, arg16
 		if spellId == HONOR_AMONG_THIEVES and powerType == 4 then
 			local now = API_GetTime()
@@ -89,7 +88,7 @@ function OvaleHonorAmongThieves:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cl
 			self.duration = duration
 			self.ending = self.start + duration
 			self.stacks = 1
-			OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
+			OvaleAura:GainedAuraOnGUID(self_playerGUID, self.start, self.spellId, self_playerGUID, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 		end
 	end
 end

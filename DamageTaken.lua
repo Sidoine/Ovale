@@ -23,7 +23,6 @@ local bit_band = bit.band
 local bit_bor = bit.bor
 local strsub = string.sub
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local SCHOOL_MASK_ARCANE = SCHOOL_MASK_ARCANE
 local SCHOOL_MASK_FIRE = SCHOOL_MASK_FIRE
 local SCHOOL_MASK_FROST = SCHOOL_MASK_FROST
@@ -39,7 +38,7 @@ OvaleDebug:RegisterDebugging(OvaleDamageTaken)
 OvaleProfiler:RegisterProfiling(OvaleDamageTaken)
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 -- Damage event pool.
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 -- Time window (past number of seconds) for which damage events are stored.
@@ -60,7 +59,7 @@ function OvaleDamageTaken:OnInitialize()
 end
 
 function OvaleDamageTaken:OnEnable()
-	self_guid = API_UnitGUID("player")
+	self_playerGUID = Ovale.playerGUID
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 end
@@ -74,7 +73,7 @@ end
 function OvaleDamageTaken:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
-	if destGUID == self_guid and strsub(cleuEvent, -7) == "_DAMAGE" then
+	if destGUID == self_playerGUID and strsub(cleuEvent, -7) == "_DAMAGE" then
 		self:StartProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
 		local now = API_GetTime()
 		local eventPrefix = strsub(cleuEvent, 1, 6)

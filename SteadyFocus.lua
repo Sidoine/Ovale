@@ -34,11 +34,10 @@ local OvaleAura = nil
 local OvaleSpellBook = nil
 
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local INFINITY = math.huge
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- Steady Focus talent ID.
 local STEADY_FOCUS_TALENT = 10
@@ -90,7 +89,7 @@ end
 
 function OvaleSteadyFocus:OnEnable()
 	if Ovale.playerClass == "HUNTER" then
-		self_guid = API_UnitGUID("player")
+		self_playerGUID = Ovale.playerGUID
 		self:RegisterMessage("Ovale_TalentsChanged")
 	end
 end
@@ -118,7 +117,7 @@ function OvaleSteadyFocus:UNIT_SPELLCAST_SUCCEEDED(event, unit, name, rank, line
 end
 
 function OvaleSteadyFocus:Ovale_AuraAdded(event, timestamp, target, auraId, caster)
-	if self.stacks > 0 and auraId == STEADY_FOCUS and target == self_guid then
+	if self.stacks > 0 and auraId == STEADY_FOCUS and target == self_playerGUID then
 		self:Debug("Gained Steady Focus buff.")
 		self:LostAura(timestamp)
 	end
@@ -143,17 +142,17 @@ function OvaleSteadyFocus:GainedAura(atTime)
 	self.start = atTime
 	self.ending = self.start + self.duration
 	self.stacks = self.stacks + 1
-	OvaleAura:GainedAuraOnGUID(self_guid, self.start, self.spellId, self_guid, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
+	OvaleAura:GainedAuraOnGUID(self_playerGUID, self.start, self.spellId, self_playerGUID, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
 end
 
 function OvaleSteadyFocus:LostAura(atTime)
 	self.ending = atTime
 	self.stacks = 0
-	OvaleAura:LostAuraOnGUID(self_guid, atTime, self.spellId, self_guid)
+	OvaleAura:LostAuraOnGUID(self_playerGUID, atTime, self.spellId, self_playerGUID)
 end
 
 function OvaleSteadyFocus:DebugSteadyFocus()
-	local aura = OvaleAura:GetAuraByGUID(self_guid, self.spellId, "HELPFUL", true)
+	local aura = OvaleAura:GetAuraByGUID(self_playerGUID, self.spellId, "HELPFUL", true)
 	if aura then
 		self:Print("Player has pre-Steady Focus aura with start=%s, end=%s, stacks=%d.", aura.start, aura.ending, aura.stacks)
 	else

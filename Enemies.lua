@@ -25,7 +25,6 @@ local strfind = string.find
 local tostring = tostring
 local wipe = wipe
 local API_GetTime = GetTime
-local API_UnitGUID = UnitGUID
 local COMBATLOG_OBJECT_AFFILIATION_OUTSIDER = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER
 local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
 
@@ -51,7 +50,7 @@ local CLEU_TAG_SUFFIXES = {
 }
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 
 -- enemyName[guid] = name
 local self_enemyName = {}
@@ -91,7 +90,7 @@ function OvaleEnemies:OnInitialize()
 end
 
 function OvaleEnemies:OnEnable()
-	self_guid = API_UnitGUID("player")
+	self_playerGUID = Ovale.playerGUID
 	if not self_reaperTimer then
 		self_reaperTimer = self:ScheduleRepeatingTimer("RemoveInactiveEnemies", REAP_INTERVAL)
 	end
@@ -123,7 +122,7 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, h
 			and bit_band(destFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
 			and sourceFlags and bit_band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		local now = API_GetTime()
-		local isTagged = (sourceGUID == self_guid and IsTagEvent(cleuEvent))
+		local isTagged = (sourceGUID == self_playerGUID and IsTagEvent(cleuEvent))
 		self:AddEnemy(destGUID, destName, now, isTagged)
 	end
 end

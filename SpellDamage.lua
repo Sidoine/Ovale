@@ -13,8 +13,6 @@ Ovale.OvaleSpellDamage = OvaleSpellDamage
 --<private-static-properties>
 local OvaleProfiler = Ovale.OvaleProfiler
 
-local API_UnitGUID = UnitGUID
-
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleSpellDamage)
 
@@ -24,7 +22,7 @@ local CLEU_DAMAGE_EVENT = {
 }
 
 -- Player's GUID.
-local self_guid = nil
+local self_playerGUID = nil
 --</private-static-properties>
 
 --<public-static-properties>
@@ -33,7 +31,7 @@ OvaleSpellDamage.value = {}
 
 --<public-static-methods>
 function OvaleSpellDamage:OnEnable()
-	self_guid = API_UnitGUID("player")
+	self_playerGUID = Ovale.playerGUID
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
@@ -44,7 +42,7 @@ end
 function OvaleSpellDamage:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
-	if sourceGUID == self_guid then
+	if sourceGUID == self_playerGUID then
 		self:StartProfiling("OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED")
 		if CLEU_DAMAGE_EVENT[cleuEvent] then
 			local spellId, amount = arg12, arg15
