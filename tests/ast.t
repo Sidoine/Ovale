@@ -15,8 +15,10 @@ local addonFiles = {
 	-- Utility modules.
 	"Pool.lua",
 	"Queue.lua",
+	"TimeSpan.lua",
 	-- Core modules.
 	"AST.lua",
+	"Compile.lua",
 	"Condition.lua",
 	"Data.lua",
 	"Equipment.lua",
@@ -27,6 +29,8 @@ local addonFiles = {
 	"SpellBook.lua",
 	"Stance.lua",
 	"State.lua",
+	-- Core modules with dependencies.
+	"Frame.lua",
 	-- Additional modules.
 	"conditions.lua",
 	"scripts/files.xml",
