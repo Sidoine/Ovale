@@ -235,6 +235,7 @@ Define(water_elemental_water_jet_debuff 135029)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(arcane_orb tag=shortcd)
+	SpellInfo(arcane_power tag=cd)
 	SpellInfo(blink tag=shortcd)
 	SpellInfo(cone_of_cold tag=shortcd)
 	SpellInfo(dragons_breath tag=shortcd)
