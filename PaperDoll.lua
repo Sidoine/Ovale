@@ -260,7 +260,7 @@ function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
 	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	self.level = tonumber(level) or API_UnitLevel("player")
 	Ovale.refreshNeeded[self_playerGUID] = true
-	self:Debug(true, "%s: level = %d", event, self.level)
+	self:DebugTimestamp("%s: level = %d", event, self.level)
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
@@ -296,7 +296,7 @@ function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 	if unitId == "player" then
 		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		self.level = API_UnitLevel(unitId)
-		self:Debug(true, "%s: level = %d", event, self.level)
+		self:DebugTimestamp("%s: level = %d", event, self.level)
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end

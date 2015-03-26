@@ -134,7 +134,7 @@ end
 function OvaleScore:ScoreSpell(spellId)
 	if OvaleFuture.inCombat and self.scoredSpell[spellId] then
 		local scored = Ovale.frame:GetScore(spellId)
-		self:Debug(true, "Scored %s for %d.", scored, spellId)
+		self:DebugTimestamp("Scored %s for %d.", scored, spellId)
 		if scored then
 			self.score = self.score + scored
 			self.maxScore = self.maxScore + 1

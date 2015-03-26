@@ -168,10 +168,10 @@ function OvaleEnemies:AddEnemy(guid, name, timestamp, isTagged)
 			self.activeEnemies = self.activeEnemies + 1
 		end
 		if isTagged and not tagged then
-			self:Debug(true, "New tagged enemy seen (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
+			self:DebugTimestamp("New tagged enemy seen (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
 			Ovale.refreshNeeded[self_playerGUID] = true
 		elseif not seen then
-			self:Debug(true, "New enemy seen (%d total): %s (%s)", self.activeEnemies, guid, name)
+			self:DebugTimestamp("New enemy seen (%d total): %s (%s)", self.activeEnemies, guid, name)
 			Ovale.refreshNeeded[self_playerGUID] = true
 		end
 	end
@@ -198,15 +198,15 @@ function OvaleEnemies:RemoveEnemy(guid, timestamp, isDead)
 		end
 		if tagged then
 			if isDead then
-				self:Debug(true, "Tagged enemy died (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
+				self:DebugTimestamp("Tagged enemy died (%d total, %d tagged): %s (%s)", self.activeEnemies, self.taggedEnemies, guid, name)
 			else
-				self:Debug(true, "Tagged enemy removed( %d total, %d tagged): %s (%s), last seen at %f", self.activeEnemies, self.taggedEnemies, guid, name, tagged)
+				self:DebugTimestamp("Tagged enemy removed( %d total, %d tagged): %s (%s), last seen at %f", self.activeEnemies, self.taggedEnemies, guid, name, tagged)
 			end
 		elseif seen then
 			if isDead then
-				self:Debug(true, "Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
+				self:DebugTimestamp("Enemy died (%d total): %s (%s)", self.activeEnemies, guid, name)
 			else
-				self:Debug(true, "Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
+				self:DebugTimestamp("Enemy removed (%d total): %s (%s), last seen at %f", self.activeEnemies, guid, name, seen)
 			end
 		end
 		if tagged or seen then

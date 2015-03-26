@@ -333,7 +333,7 @@ function OvalePower:UpdatePower(event, powerType)
 			self.power[powerType] = power
 			Ovale.refreshNeeded[self_playerGUID] = true
 		end
-		self:Debug(true, "%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
+		self:DebugTimestamp("%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
 	else
 		for powerType, powerInfo in pairs(self.POWER_INFO) do
 			local power = API_UnitPower("player", powerInfo.id, powerInfo.segments)
@@ -341,7 +341,7 @@ function OvalePower:UpdatePower(event, powerType)
 				self.power[powerType] = power
 				Ovale.refreshNeeded[self_playerGUID] = true
 			end
-			self:Debug(true, "%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
+			self:DebugTimestamp("%s: %d -> %d (%s).", event, self.power[powerType], power, powerType)
 		end
 	end
 	Ovale.refreshNeeded[self_playerGUID] = true

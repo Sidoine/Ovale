@@ -379,13 +379,13 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 		if unitId then
 			-- Only update auras on the unit if it is not a unit type that receives UNIT_AURA events.
 			if not OvaleGUID.UNIT_AURA_UNIT[unitId] then
-				self:Debug(true, "%s: %s (%s)", cleuEvent, destGUID, unitId)
+				self:DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId)
 				self:ScanAuras(unitId, destGUID)
 			end
 		elseif mine then
 			-- There is no unit ID, but the action was caused by the player, so update this aura on destGUID.
 			local spellId, spellName, spellSchool = arg12, arg13, arg14
-			self:Debug(true, "%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID)
+			self:DebugTimestamp("%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID)
 			local now = API_GetTime()
 			if cleuEvent == "SPELL_AURA_REMOVED" or cleuEvent == "SPELL_AURA_BROKEN" or cleuEvent == "SPELL_AURA_BROKEN_SPELL" then
 				self:LostAuraOnGUID(destGUID, now, spellId, sourceGUID)
@@ -433,7 +433,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 			multistrike = arg19
 		end
 		if not multistrike then
-			self:Debug(true, "%s: %s", cleuEvent, destGUID)
+			self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
 			local aura = GetAura(self.aura, destGUID, spellId, self_playerGUID)
 			local now = API_GetTime()
 			if self:IsActiveAura(aura, now) then
@@ -717,7 +717,7 @@ function OvaleAura:ScanAuras(unitId, guid)
 	self:StartProfiling("OvaleAura_ScanAuras")
 	guid = guid or OvaleGUID:GetGUID(unitId)
 	if guid then
-		self:Debug(true, "Scanning auras on %s (%s)", guid, unitId)
+		self:DebugTimestamp("Scanning auras on %s (%s)", guid, unitId)
 
 		-- Advance the age of the unit's auras.
 		local serial = self.serial[guid] or 0

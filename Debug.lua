@@ -207,32 +207,29 @@ function OvaleDebug:RegisterDebugging(addon)
 		type = "toggle",
 	}
 	addon.Debug = self.Debug
+	addon.DebugTimestamp = self.DebugTimestamp
 end
 
 --[[
-	Output the parameters as a string to DEFAULT_CHAT_FRAME.  If the first parameter
-	is a boolean or nil, then treat it as a request to insert a timestamp at the
-	beginning of the line.
+	Output the parameters as a string to DEFAULT_CHAT_FRAME.
 --]]
-function OvaleDebug:Debug(addTimestamp, ...)
+function OvaleDebug:Debug(...)
 	local name = self:GetName()
 	if Ovale.db.global.debug[name] then
-		local s
-		if (type(addTimestamp) == "boolean" or type(addTimestamp) == "nil") then
-			if (...) then
-				if addTimestamp then
-					-- Add a yellow timestamp to the start.
-					local now = API_GetTime()
-					s = format("|cffffff00%f|r %s", now, Ovale:MakeString(...))
-				else
-					s = Ovale:MakeString(...)
-				end
-			else
-				s = tostring(addTimestamp)
-			end
-		else
-			s = Ovale:MakeString(addTimestamp, ...)
-		end
+		-- Match output format from AceConsole-3.0 Print() method.
+		DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", name, Ovale:MakeString(...)))
+	end
+end
+
+--[[
+	Output the parameters as a string to DEFAULT_CHAT_FRAME with a timestamp.
+--]]
+function OvaleDebug:DebugTimestamp(...)
+	local name = self:GetName()
+	if Ovale.db.global.debug[name] then
+		-- Add a yellow timestamp to the start.
+		local now = API_GetTime()
+		local s = format("|cffffff00%f|r %s", now, Ovale:MakeString(...))
 		-- Match output format from AceConsole-3.0 Print() method.
 		DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", name, s))
 	end

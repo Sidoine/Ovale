@@ -194,7 +194,7 @@ function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
 		self:Update()
 
 		local difference = self.combo - oldCombo
-		self:Debug(true, "%s: %d -> %d.", event, oldCombo, self.combo)
+		self:DebugTimestamp("%s: %d -> %d.", event, oldCombo, self.combo)
 
 		-- Remove expired events.
 		local now = API_GetTime()

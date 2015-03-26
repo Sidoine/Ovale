@@ -166,6 +166,7 @@ $sm{"modulePrototype"}{Log} = true;
 $sm{"modulePrototype"}{Print} = true;
 # Added by OvaleDebug.
 $sm{"OvaleDebugPrototype"}{Debug} = true;
+$sm{"OvaleDebugPrototype"}{DebugTimestamp} = true;
 # Added by OvaleProfiler.
 $sm{"OvaleProfilerPrototype"}{StartProfiling} = true;
 $sm{"OvaleProfilerPrototype"}{StopProfiling} = true;
