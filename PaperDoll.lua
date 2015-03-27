@@ -232,6 +232,7 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	self.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 	self.critRating = API_GetCombatRating(CR_CRIT_MELEE)
 	self.hasteRating = API_GetCombatRating(CR_HASTE_MELEE)
+	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
@@ -245,6 +246,7 @@ function OvalePaperDoll:MASTERY_UPDATE(event)
 		self.masteryEffect = API_GetMasteryEffect()
 		Ovale.refreshNeeded[self_playerGUID] = true
 	end
+	self.snapshotTime = API_GetTime()
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
 
@@ -252,6 +254,7 @@ function OvalePaperDoll:MULTISTRIKE_UPDATE(event)
 	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	self.multistrikeRating = API_GetMultistrike()
 	self.multistrike = API_GetMultistrikeEffect()
+	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
@@ -259,6 +262,7 @@ end
 function OvalePaperDoll:PLAYER_LEVEL_UP(event, level, ...)
 	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	self.level = tonumber(level) or API_UnitLevel("player")
+	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:DebugTimestamp("%s: level = %d", event, self.level)
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
@@ -268,6 +272,7 @@ function OvalePaperDoll:PLAYER_DAMAGE_DONE_MODS(event, unitId)
 	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	self.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 	self.spellBonusHealing = API_GetSpellBonusHealing()
+	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
@@ -276,6 +281,7 @@ function OvalePaperDoll:SPELL_POWER_CHANGED(event)
 	self:StartProfiling("OvalePaperDoll_UpdateStats")
 	self.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 	self.spellBonusDamage = API_GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
 end
@@ -285,6 +291,7 @@ function OvalePaperDoll:UNIT_ATTACK_POWER(event, unitId)
 		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		local base, posBuff, negBuff = API_UnitAttackPower(unitId)
 		self.attackPower = base + posBuff + negBuff
+		self.snapshotTime = API_GetTime()
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self:UpdateDamage(event)
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
@@ -297,6 +304,7 @@ function OvalePaperDoll:UNIT_LEVEL(event, unitId)
 		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		self.level = API_UnitLevel(unitId)
 		self:DebugTimestamp("%s: level = %d", event, self.level)
+		self.snapshotTime = API_GetTime()
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
@@ -305,6 +313,7 @@ function OvalePaperDoll:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId == "player" then
 		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		self.rangedHaste = API_GetRangedHaste()
+		self.snapshotTime = API_GetTime()
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
@@ -316,6 +325,7 @@ function OvalePaperDoll:UNIT_RANGED_ATTACK_POWER(event, unitId)
 		local base, posBuff, negBuff = API_UnitRangedAttackPower(unitId)
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self.rangedAttackPower = base + posBuff + negBuff
+		self.snapshotTime = API_GetTime()
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
 end
@@ -325,6 +335,7 @@ function OvalePaperDoll:UNIT_SPELL_HASTE(event, unitId)
 		self:StartProfiling("OvalePaperDoll_UpdateStats")
 		self.meleeHaste = API_GetMeleeHaste()
 		self.spellHaste = API_UnitSpellHaste(unitId)
+		self.snapshotTime = API_GetTime()
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self:UpdateDamage(event)
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
@@ -339,6 +350,7 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 		self.stamina = API_UnitStat(unitId, 3)
 		self.intellect = API_UnitStat(unitId, 4)
 		self.spirit = API_UnitStat(unitId, 5)
+		self.snapshotTime = API_GetTime()
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self:StopProfiling("OvalePaperDoll_UpdateStats")
 	end
@@ -393,6 +405,7 @@ function OvalePaperDoll:UpdateDamage(event)
 	else
 		self.offHandWeaponDamage = 0
 	end
+	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePaperDoll_UpdateDamage")
 end
@@ -403,6 +416,7 @@ function OvalePaperDoll:UpdateSpecialization(event)
 	if self.specialization ~= newSpecialization then
 		local oldSpecialization = self.specialization
 		self.specialization = newSpecialization
+		self.snapshotTime = API_GetTime()
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self:SendMessage("Ovale_SpecializationChanged", self:GetSpecialization(newSpecialization), self:GetSpecialization(oldSpecialization))
 	end
