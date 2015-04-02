@@ -174,4 +174,7 @@ end
 statePrototype.Log = function(state, ...)
 	return OvaleDebug:Log(...)
 end
+
+-- GetMethod function (mirrored from Ovale).
+statePrototype.GetMethod = Ovale.GetMethod
 --</state-methods>

@@ -16,6 +16,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 -- Localized strings table.
 local L = nil
 
+local assert = assert
 local format = string.format
 local ipairs = ipairs
 local next = next
@@ -445,6 +446,15 @@ function Ovale:PrintOneTimeMessages()
 		end
 	end
 end
+
+function Ovale:GetMethod(methodName, subModule)
+	local func, arg = self[methodName], self
+	if not func then
+		func, arg = subModule[methodName], subModule
+	end
+	assert(func ~= nil)
+	return func, arg
+end
 --</public-static-methods>
 
 --<private-static-properties>
@@ -463,6 +473,7 @@ do
 		Error = Ovale.Error,
 		Log = DoNothing,
 		Print = Ovale.Print,
+		GetMethod = Ovale.GetMethod,
 	}
 
 	Ovale:SetDefaultModulePrototype(modulePrototype)

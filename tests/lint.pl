@@ -162,6 +162,7 @@ $sp{WOWMOCK_CONFIG}{specialization} = true;
 
 # Ovale module prototype.
 $sm{"modulePrototype"}{Error} = true;
+$sm{"modulePrototype"}{GetMethod} = true;
 $sm{"modulePrototype"}{Log} = true;
 $sm{"modulePrototype"}{Print} = true;
 # Added by OvaleDebug.
