@@ -426,18 +426,22 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 	local spellRefund = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si[powerType] then
+		-- Get references to mirrored methods used.
+		local GetAura, GetAuraByGUID, IsActiveAura
+		local GetSpellInfoProperty
+		local auraModule, dataModule
+		GetAura, auraModule = self:GetMethod("GetAura", OvaleAura)
+		GetAuraByGUID, auraModule = self:GetMethod("GetAuraByGUID", OvaleAura)
+		IsActiveAura, auraModule = self:GetMethod("IsActiveAura", OvaleAura)
+		GetSpellInfoProperty, dataModule = self:GetMethod("GetSpellInfoProperty", OvaleData)
+
 		--[[
 			cost == 0 means the that spell uses no resources.
 			cost > 0 means that the spell costs resources.
 			cost < 0 means that the spell generates resources.
 			cost == "finisher" means that the spell uses all of the resources (zeroes it out).
 		--]]
-		local cost
-		if self.GetSpellInfoProperty then
-			cost = self.GetSpellInfoProperty(self, spellId, atTime, powerType, targetGUID)
-		else
-			cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, targetGUID)
-		end
+		local cost = GetSpellInfoProperty(dataModule, spellId, atTime, powerType, targetGUID)
 		if cost == "finisher" then
 			-- This spell is a finisher so compute the cost based on the amount of resources consumed.
 			cost = self:GetPower(powerType, atTime)
@@ -463,14 +467,8 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 			local buffAmountParam = buffParam .. "_amount"
 			local buffExtra = si[buffExtraParam]
 			if buffExtra then
-				local aura, isActiveAura
-				if self.GetAura then
-					aura = self.GetAura(self, "player", buffExtra, nil, true)
-					isActiveAura = self.IsActiveAura(self, aura, atTime)
-				else
-					aura = OvaleAura:GetAura("player", buffExtra, nil, true)
-					isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
-				end
+				local aura = GetAura(auraModule, "player", buffExtra, nil, true)
+				local isActiveAura = IsActiveAura(auraModule, aura, atTime)
 				if isActiveAura then
 					local buffAmount = si[buffAmountParam] or -1
 					-- Check if this aura has a stacking effect.
@@ -491,14 +489,8 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 		for suffix, reduction in pairs(BUFF_PERCENT_REDUCTION) do
 			local buffPercentReduction = si[buffParam .. suffix]
 			if buffPercentReduction then
-				local aura, isActiveAura
-				if self.GetAura then
-					aura = self.GetAura(self, "player", buffPercentReduction)
-					isActiveAura = self.IsActiveAura(self, aura, atTime)
-				else
-					aura = OvaleAura:GetAura("player", buffPercentReduction)
-					isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
-				end
+				local aura = GetAuraByGUID(auraModule, self_playerGUID, buffPercentReduction)
+				local isActiveAura = IsActiveAura(auraModule, aura, atTime)
 				if isActiveAura then
 					-- Check if this aura has a stacking effect.
 					local siAura = OvaleData.spellInfo[buffPercentReduction]
@@ -527,12 +519,7 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 			Add these additional resources to the cost after checking if the spell is resource-free for the base cost.
 		--]]
 		local extraPowerParam = "extra_" .. powerType
-		local extraPower
-		if self.GetSpellInfoProperty then
-			extraPower = self.GetSpellInfoProperty(self, spellId, atTime, extraPowerParam, targetGUID)
-		else
-			extraPower = OvaleData:GetSpellInfoProperty(spellId, atTime, extraPowerParam, targetGUID)
-		end
+		local extraPower = GetSpellInfoProperty(dataModule, spellId, atTime, extraPowerParam, targetGUID)
 		if extraPower then
 			if not maximumCost then
 				-- Clamp the extra power to the remaining power.
@@ -552,13 +539,8 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 		-- Round up to whole number of resources.
 		spellCost = ceil(cost)
 
-		local refund
 		local refundParam = "refund_" .. powerType
-		if self.GetSpellInfoProperty then
-			refund = self.GetSpellInfoProperty(self, spellId, atTime, refundParam, targetGUID)
-		else
-			refund = OvaleData:GetSpellInfoProperty(spellId, atTime, refundParam, targetGUID)
-		end
+		local refund = GetSpellInfoProperty(dataModule, spellId, atTime, refundParam, targetGUID)
 		if refund == "cost" then
 			refund = spellCost
 		end

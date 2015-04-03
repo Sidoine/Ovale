@@ -303,18 +303,21 @@ function OvaleComboPoints:ComboPointCost(spellId, atTime, targetGUID)
 	local spellRefund = 0
 	local si = OvaleData.spellInfo[spellId]
 	if si and si.combo then
-		local cost
-		if self.GetSpellInfoProperty then
-			cost = self.GetSpellInfoProperty(self, spellId, atTime, "combo", targetGUID)
-		else
-			cost = OvaleData:GetSpellInfoProperty(spellId, atTime, "combo", targetGUID)
-		end
+		-- Get references to mirrored methods used.
+		local GetAura, IsActiveAura
+		local GetSpellInfoProperty
+		local auraModule, dataModule
+		GetAura, auraModule = self:GetMethod("GetAura", OvaleAura)
+		IsActiveAura, auraModule = self:GetMethod("IsActiveAura", OvaleAura)
+		GetSpellInfoProperty, dataModule = self:GetMethod("GetSpellInfoProperty", OvaleData)
+
 		--[[
 			combo == 0 means the that spell uses no resources.
 			combo > 0 means that the spell generates combo points.
 			combo < 0 means that the spell costs combo points.
 			combo == "finisher" means that the spell uses all of the combo points (zeroes it out).
 		--]]
+		local cost = GetSpellInfoProperty(dataModule, spellId, atTime, "combo", targetGUID)
 		if cost == "finisher" then
 			-- This spell is a finisher so compute the cost based on the amount of resources consumed.
 			cost = self:GetComboPoints()
@@ -336,15 +339,8 @@ function OvaleComboPoints:ComboPointCost(spellId, atTime, targetGUID)
 			--]]
 			local buffExtra = si.buff_combo
 			if buffExtra then
-				local isActiveAura
-				-- Check for inherited/mirrored method first (for statePrototype).
-				if self.GetAura then
-					local aura = self.GetAura(self, "player", buffExtra, nil, true)
-					isActiveAura = self.IsActiveAura(self, aura, atTime)
-				else
-					local aura = OvaleAura:GetAura("player", buffExtra, nil, true)
-					isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
-				end
+				local aura = GetAura(auraModule, "player", buffExtra, nil, true)
+				local isActiveAura = IsActiveAura(auraModule, aura, atTime)
 				if isActiveAura then
 					local buffAmount = si.buff_combo_amount or 1
 					cost = cost + buffAmount
@@ -354,13 +350,8 @@ function OvaleComboPoints:ComboPointCost(spellId, atTime, targetGUID)
 		end
 		spellCost = cost
 
-		local refund
 		local refundParam = "refund_combo"
-		if self.GetSpellInfoProperty then
-			refund = self.GetSpellInfoProperty(self, spellId, atTime, refundParam, targetGUID)
-		else
-			refund = OvaleData:GetSpellInfoProperty(spellId, atTime, refundParam, targetGUID)
-		end
+		local refund = GetSpellInfoProperty(dataModule, spellId, atTime, refundParam, targetGUID)
 		if refund == "cost" then
 			refund = spellCost
 		end
