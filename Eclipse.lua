@@ -32,8 +32,6 @@ OvaleProfiler:RegisterProfiling(OvaleEclipse)
 
 -- Player's GUID.
 local self_playerGUID = nil
--- Table of functions to update spellcast information to register with OvaleFuture.
-local self_updateSpellcastInfo = {}
 
 local LUNAR_ECLIPSE = ECLIPSE_BAR_LUNAR_BUFF_ID
 local SOLAR_ECLIPSE = ECLIPSE_BAR_SOLAR_BUFF_ID
@@ -85,10 +83,8 @@ function OvaleEclipse:Ovale_SpecializationChanged(event, specialization, previou
 		self:RegisterMessage("Ovale_StanceChanged", "Update")
 		self:RegisterMessage("Ovale_AuraAdded")
 		OvaleState:RegisterState(self, self.statePrototype)
-		OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 	else
 		OvaleState:UnregisterState(self)
-		OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
 		self:UnregisterEvent("ECLIPSE_DIRECTION_CHANGE")
 		self:UnregisterEvent("UNIT_POWER")
 		self:UnregisterEvent("UNIT_POWER_FREQUENT")

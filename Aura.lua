@@ -629,7 +629,7 @@ function OvaleAura:GainedAuraOnGUID(guid, atTime, auraId, casterGUID, filter, vi
 					self:Debug("    Snapshot stats for %s %s (%d) on %s applied by %s (%d) from %f, now=%f, aura.serial=%d",
 						filter, name, auraId, guid, spellName, spellId, spellcast.snapshotTime, atTime, aura.serial)
 					-- TODO: damageMultiplier isn't correct if spellId spreads the DoT.
-					OvaleFuture:UpdateFromSpellcast(aura, spellcast)
+					OvaleFuture:CopySpellcastInfo(spellcast, aura)
 				end
 			end
 
@@ -1364,7 +1364,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						if keepSnapshot then
 							state:Log("Aura %d keeping previous snapshot.", auraId)
 						elseif spellcast then
-							OvaleFuture:UpdateFromSpellcast(aura, spellcast)
+							OvaleFuture:CopySpellcastInfo(spellcast, aura)
 						end
 					elseif stacks == 0 or stacks < 0 then
 						if stacks == 0 then
@@ -1417,7 +1417,7 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 						aura.ending = aura.start + aura.duration
 						aura.gain = aura.start
 						if spellcast then
-							OvaleFuture:UpdateFromSpellcast(aura, spellcast)
+							OvaleFuture:CopySpellcastInfo(spellcast, aura)
 						end
 					end
 				end

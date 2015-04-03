@@ -147,51 +147,6 @@ OvalePower.POOLED_RESOURCE = {
 }
 --</public-static-properties>
 
---<private-static-methods>
--- Manage spellcast[power] information.
-local function SaveToSpellcast(spellcast, atTime)
-	local spellId = spellcast.spellId
-	if spellId then
-		local si = OvaleData.spellInfo[spellId]
-		for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-			if si[powerType] == "finisher" then
-				-- Get the maximum cost of the finisher.
-				local maxCostParam = "max_" .. powerType
-				local maxCost = si[maxCostParam] or 1
-				local cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, spellcast.target)
-				if cost == "finisher" then
-					-- This finisher costs up to maxCost resources.
-					local power = OvalePower:GetPower(powerType, atTime)
-					if power > maxCost then
-						cost = maxCost
-					else
-						cost = power
-					end
-				elseif cost == 0 then
-					-- If this is a finisher that costs no resources, then treat it as using the maximum cost.
-					cost = maxCost
-				end
-				-- Save the cost to the spellcast table.
-				spellcast[powerType] = cost
-			end
-		end
-	end
-end
-
-local function UpdateFromSpellcast(dest, spellcast)
-	for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-		if spellcast[powerType] then
-			dest[powerType] = spellcast[powerType]
-		end
-	end
-end
-
-do
-	self_updateSpellcastInfo.SaveToSpellcast = SaveToSpellcast
-	self_updateSpellcastInfo.UpdateFromSpellcast = UpdateFromSpellcast
-end
---</private-static-methods>
-
 --<public-static-methods>
 function OvalePower:OnInitialize()
 	-- Resolve module dependencies.
@@ -236,13 +191,13 @@ function OvalePower:OnEnable()
 	for powerType in pairs(self.POWER_INFO) do
 		OvaleData:RegisterRequirement(powerType, "RequirePowerHandler", self)
 	end
+	OvaleFuture:RegisterSpellcastInfo(self)
 	OvaleState:RegisterState(self, self.statePrototype)
-	OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 end
 
 function OvalePower:OnDisable()
 	OvaleState:UnregisterState(self)
-	OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
+	OvaleFuture:UnregisterSpellcastInfo(self)
 	for powerType in pairs(self.POWER_INFO) do
 		OvaleData:UnregisterRequirement(powerType)
 	end
@@ -596,6 +551,45 @@ function OvalePower:DebugPower()
 	end
 	self:Print("Active regen: %f", self.activeRegen)
 	self:Print("Inactive regen: %f", self.inactiveRegen)
+end
+
+-- Copy power information from the spellcast to the destination table.
+function OvalePower:CopySpellcastInfo(spellcast, dest)
+	for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+		if spellcast[powerType] then
+			dest[powerType] = spellcast[powerType]
+		end
+	end
+end
+
+-- Save power information to the spellcast.
+function OvalePower:SaveSpellcastInfo(spellcast, atTime)
+	local spellId = spellcast.spellId
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
+		for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+			if si[powerType] == "finisher" then
+				-- Get the maximum cost of the finisher.
+				local maxCostParam = "max_" .. powerType
+				local maxCost = si[maxCostParam] or 1
+				local cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, spellcast.target)
+				if cost == "finisher" then
+					-- This finisher costs up to maxCost resources.
+					local power = self:GetPower(powerType, atTime)
+					if power > maxCost then
+						cost = maxCost
+					else
+						cost = power
+					end
+				elseif cost == 0 then
+					-- If this is a finisher that costs no resources, then treat it as using the maximum cost.
+					cost = maxCost
+				end
+				-- Save the cost to the spellcast table.
+				spellcast[powerType] = cost
+			end
+		end
+	end
 end
 --</public-static-methods>
 

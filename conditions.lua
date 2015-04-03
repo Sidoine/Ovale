@@ -1222,7 +1222,7 @@ do
 		local mh = state.mainHandWeaponDamage or 0
 		local oh = state.offHandWeaponDamage or 0
 		local bdm = state.baseDamageMultiplier or 1
-		local dm = state:GetDamageMultiplier(spellId, atTime, OvaleGUID:GetGUID(target)) or 1
+		local dm = state:GetDamageMultiplier(spellId, OvaleGUID:GetGUID(target), atTime) or 1
 		local combo = state.combo or 0
 		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
 	end
@@ -1339,7 +1339,7 @@ do
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		local bdm = state.baseDamageMultiplier
-		local dm = state:GetDamageMultiplier(spellId, atTime, OvaleGUID:GetGUID(target))
+		local dm = state:GetDamageMultiplier(spellId, OvaleGUID:GetGUID(target), atTime)
 		local value = bdm * dm
 		return Compare(value, comparator, limit)
 	end
@@ -2982,7 +2982,7 @@ do
 	local function PersistentMultiplier(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local value = state:GetDamageMultiplier(spellId, atTime, OvaleGUID:GetGUID(target))
+		local value = state:GetDamageMultiplier(spellId, OvaleGUID:GetGUID(target), atTime)
 		return Compare(value, comparator, limit)
 	end
 

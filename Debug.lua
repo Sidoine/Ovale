@@ -102,59 +102,6 @@ OvaleDebug.options = {
 						OvaleDebug:DisplayTraceLog()
 					end,
 				},
-				traceSpellId = {
-					order = 30,
-					type = "input",
-					name = L["Trace spellcast"],
-					desc = L["Names or spell IDs of spellcasts to watch, separated by semicolons."],
-					get = function(info)
-						local OvaleFuture = Ovale.OvaleFuture
-						if OvaleFuture then
-							local t = OvaleFuture.traceSpellList or {}
-							local s = ""
-							for k, v in pairs(t) do
-								if type(v) == "boolean" then
-									if strlen(s) == 0 then
-										s = k
-									else
-										s = s .. "; " .. k
-									end
-								end
-							end
-							return s
-						else
-							return ""
-						end
-					end,
-					set = function(info, value)
-						local OvaleFuture = Ovale.OvaleFuture
-						if OvaleFuture then
-							local t = {}
-							for s in gmatch(value, "[^;]+") do
-								-- strip leading and trailing whitespace
-								s = gsub(s, "^%s*", "")
-								s = gsub(s, "%s*$", "")
-								if strlen(s) > 0 then
-									local v = tonumber(s)
-									if v then
-										s = API_GetSpellInfo(v)
-										if s then
-											t[v] = true
-											t[s] = v
-										end
-									else
-										t[s] = true
-									end
-								end
-							end
-							if next(t) then
-								OvaleFuture.traceSpellList = t
-							else
-								OvaleFuture.traceSpellList = nil
-							end
-						end
-					end,
-				},
 			},
 		},
 	},

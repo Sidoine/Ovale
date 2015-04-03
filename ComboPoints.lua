@@ -101,40 +101,6 @@ local function RemovePendingComboEvents(atTime, spellId, guid, reason, combo)
 	end
 	return count
 end
-
--- Manage spellcast.combo information.
-local function SaveToSpellcast(spellcast, atTime)
-	local spellId = spellcast.spellId
-	if spellId then
-		local si = OvaleData.spellInfo[spellId]
-		if si.combo == "finisher" then
-			local combo = OvaleData:GetSpellInfoProperty(spellId, atTime, "combo", spellcast.target)
-			if combo == "finisher" then
-				local min_combo = si.min_combo or si.mincombo or 1
-				if OvaleComboPoints.combo >= min_combo then
-					combo = OvaleComboPoints.combo
-				else
-					combo = min_combo
-				end
-			elseif combo == 0 then
-				-- If this is a finisher that costs no combo points, then treat it as a maximum combo-point finisher.
-				combo = MAX_COMBO_POINTS
-			end
-			spellcast.combo = combo
-		end
-	end
-end
-
-local function UpdateFromSpellcast(dest, spellcast)
-	if spellcast.combo then
-		dest.combo = spellcast.combo
-	end
-end
-
-do
-	self_updateSpellcastInfo.SaveToSpellcast = SaveToSpellcast
-	self_updateSpellcastInfo.UpdateFromSpellcast = UpdateFromSpellcast
-end
 --</private-static-methods>
 
 --<public-static-methods>
@@ -159,15 +125,15 @@ function OvaleComboPoints:OnEnable()
 		self:RegisterMessage("Ovale_SpellFinished")
 		self:RegisterMessage("Ovale_TalentsChanged")
 		OvaleData:RegisterRequirement("combo", "RequireComboPointsHandler", self)
+		OvaleFuture:RegisterSpellcastInfo(self)
 		OvaleState:RegisterState(self, self.statePrototype)
-		OvaleFuture:RegisterSpellcastInfo(self_updateSpellcastInfo)
 	end
 end
 
 function OvaleComboPoints:OnDisable()
 	if Ovale.playerClass == "ROGUE" or Ovale.playerClass == "DRUID" then
 		OvaleState:UnregisterState(self)
-		OvaleFuture:UnregisterSpellcastInfo(self_updateSpellcastInfo)
+		OvaleFuture:UnregisterSpellcastInfo(self)
 		OvaleData:UnregisterRequirement("combo")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
@@ -389,6 +355,36 @@ function OvaleComboPoints:RequireComboPointsHandler(spellId, atTime, requirement
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)
 	end
 	return verified, requirement, index
+end
+
+-- Copy combo point information from the spellcast to the destination table.
+function OvaleComboPoints:CopySpellcastInfo(spellcast, dest)
+	if spellcast.combo then
+		dest.combo = spellcast.combo
+	end
+end
+
+-- Save combo point finisher information to the spellcast.
+function OvaleComboPoints:SaveSpellcastInfo(spellcast, atTime)
+	local spellId = spellcast.spellId
+	if spellId then
+		local si = OvaleData.spellInfo[spellId]
+		if si.combo == "finisher" then
+			local combo = OvaleData:GetSpellInfoProperty(spellId, atTime, "combo", spellcast.target)
+			if combo == "finisher" then
+				local min_combo = si.min_combo or si.mincombo or 1
+				if self.combo >= min_combo then
+					combo = self.combo
+				else
+					combo = min_combo
+				end
+			elseif combo == 0 then
+				-- If this is a finisher that costs no combo points, then treat it as a maximum combo-point finisher.
+				combo = MAX_COMBO_POINTS
+			end
+			spellcast.combo = combo
+		end
+	end
 end
 --</public-static-methods>
 
