@@ -394,40 +394,6 @@ do
 end
 
 do
-	--- Get the player's damage multiplier for the given aura at the time the aura was applied on the target.
-	-- @name BuffDamageMultiplier
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The damage multiplier.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffDamageMultiplier
-	-- @usage
-	-- if target.DebuffDamageMultiplier(rake) <1 Spell(rake)
-
-	local function BuffDamageMultiplier(positionalParams, namedParams, state, atTime)
-		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
-		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura, atTime) then
-			local gain, start, ending = aura.gain, aura.start, aura.ending
-			local baseDamageMultiplier = aura.baseDamageMultiplier or 1
-			local damageMultiplier = aura.damageMultiplier or 1
-			local value = baseDamageMultiplier * damageMultiplier
-			return TestValue(gain, ending, value, start, 0, comparator, limit)
-		end
-		return Compare(1, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("buffdamagemultiplier", false, BuffDamageMultiplier)
-	OvaleCondition:RegisterCondition("debuffdamagemultiplier", false, BuffDamageMultiplier)
-end
-
-do
 	--- Get the current direction of an aura's stack count.
 	-- A negative number means the aura is decreasing in stack count.
 	-- A positive number means the aura is increasing in stack count.
@@ -715,67 +681,6 @@ do
 	OvaleCondition:RegisterCondition("debuffremainingonany", false, BuffRemainingOnAny)
 	OvaleCondition:RegisterCondition("buffremainsonany", false, BuffRemainingOnAny)
 	OvaleCondition:RegisterCondition("debuffremainsonany", false, BuffRemainingOnAny)
-end
-
-do
-	-- Return the value of the stat from the aura snapshot at the time the aura was applied.
-	local function BuffSnapshot(statName, defaultValue, positionalParams, namedParams, state, atTime)
-		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
-		local aura = state:GetAura(target, auraId, filter, mine)
-		if state:IsActiveAura(aura, atTime) then
-			local gain, start, ending = aura.gain, aura.start, aura.ending
-			local value = aura[statName] or defaultValue
-			return TestValue(gain, ending, value, start, 0, comparator, limit)
-		end
-		return Compare(defaultValue, comparator, limit)
-	end
-
-	--- Get the player's mastery effect at the time the given aura was applied on the target.
-	-- @name BuffMasteryEffect
-	-- @paramsig number or boolean
-	-- @param id The aura spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The mastery effect.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffMasteryEffect
-	-- @usage
-	-- if MasteryEffect() >target.DebuffMasteryEffect(rip) Spell(rip)
-
-	local function BuffMasteryEffect(positionalParams, namedParams, state, atTime)
-		return BuffSnapshot("masteryEffect", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffmastery", false, BuffMasteryEffect)
-	OvaleCondition:RegisterCondition("buffmasteryeffect", false, BuffMasteryEffect)
-	OvaleCondition:RegisterCondition("debuffmastery", false, BuffMasteryEffect)
-	OvaleCondition:RegisterCondition("debuffmasteryeffect", false, BuffMasteryEffect)
-
-	--- Get the player's spell haste at the time the given aura was applied on the target.
-	-- @name BuffSpellHaste
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param id The aura spell ID.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The percent increase to spell haste.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DebuffSpellHaste
-	-- @usage
-	-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
-
-	local function BuffSpellHaste(positionalParams, namedParams, state, atTime)
-		return BuffSnapshot("spellHaste", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("buffspellhaste", false, BuffSpellHaste)
-	OvaleCondition:RegisterCondition("debuffspellhaste", false, BuffSpellHaste)
 end
 
 do
@@ -1107,17 +1012,15 @@ do
 end
 
 do
-	--- Get the number of combo points on the currently selected target for a feral druid or a rogue.
+	--- Get the number of combo points for a feral druid or a rogue.
 	-- @name ComboPoints
 	-- @paramsig number or boolean
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @return The number of combo points.
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastComboPoints
 	-- @usage
 	-- if ComboPoints() >=1 Spell(savage_roar)
-	-- if ComboPoints(more 0) Spell(savage_roar)
 
 	local function ComboPoints(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
@@ -1212,143 +1115,6 @@ do
 
 	OvaleCondition:RegisterCondition("creaturetype", false, CreatureType)
 end
-
-do
-	-- Return the non-critical-strike damage of a spell, given the player's current stats.
-	local function GetDamage(spellId, atTime, state, target)
-		-- TODO: Use target's debuffs in this calculation.
-		local ap = state.attackPower or 0
-		local sp = state.spellBonusDamage or 0
-		local mh = state.mainHandWeaponDamage or 0
-		local oh = state.offHandWeaponDamage or 0
-		local bdm = state.baseDamageMultiplier or 1
-		local dm = state:GetDamageMultiplier(spellId, OvaleGUID:GetGUID(target), atTime) or 1
-		local combo = state.combo or 0
-		return OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
-	end
-
-	--- Get the current estimated damage of a spell on the target if it is a critical strike.
-	-- @name CritDamage
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The estimated critical strike damage of the given spell.
-	-- @return A boolean value for the result of the comparison.
-	-- @see Damage, LastDamage, LastEstimatedDamage
-
-	local AMPLIFICATION = 146051
-	local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
-
-	local function CritDamage(positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local value = ComputeParameter(spellId, "damage", state, atTime)
-		if not value then
-			value = GetDamage(spellId, atTime, state, target)
-		end
-		-- Reduce by armor damage reduction for physical attacks.
-		local si = OvaleData.spellInfo[spellId]
-		if si.physical == 1 then
-			value = value * (1 - BossArmorDamageReduction(target))
-		end
-
-		-- Default crit damage is 2 times normal damage.
-		local critMultiplier = 2
-		-- Add additional critical strike damage from MoP amplification trinkets.
-		do
-			local aura = state:GetAura("player", AMPLIFICATION, "HELPFUL")
-			if state:IsActiveAura(aura, atTime) then
-				critMultiplier = critMultiplier + aura.value1
-			end
-		end
-		-- Multiply by increased crit effect from the meta gem.
-		do
-			local aura = state:GetAura("player", INCREASED_CRIT_EFFECT_3_PERCENT, "HELPFUL")
-			if state:IsActiveAura(aura, atTime) then
-				critMultiplier = critMultiplier * aura.value1
-			end
-		end
-
-		local value = critMultiplier * value
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("critdamage", false, CritDamage)
-
-	--- Get the current estimated damage of a spell on the target.
-	-- The calculated damage takes into account the current attack power, spellpower, weapon damage and combo points (if used).
-	-- The damage is computed from information for the spell set via SpellInfo(...):
-	--
-	-- damage = base + bonusmainhand * MH + bonusoffhand * OH + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
-	-- @name Damage
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The estimated damage of the given spell on the target.
-	-- @return A boolean value for the result of the comparison.
-	-- @see CritDamage, LastDamage, LastEstimatedDamage
-	-- @usage
-	-- if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
-	--     Spell(rake)
-
-	local function Damage(positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local value = ComputeParameter(spellId, "damage", state, atTime)
-		if not value then
-			value = GetDamage(spellId, atTime, state, target)
-		end
-		-- Reduce by armor damage reduction for physical attacks.
-		local si = OvaleData.spellInfo[spellId]
-		if si.physical == 1 then
-			value = value * (1 - BossArmorDamageReduction(target))
-		end
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("damage", false, Damage)
-end
-
-do
-	--- Get the current damage multiplier of a spell.
-	-- This currently does not take into account increased damage due to mastery.
-	-- @name DamageMultiplier
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The current damage multiplier of the given spell.
-	-- @return A boolean value for the result of the comparison.
-	-- @see LastDamageMultiplier
-	-- @usage
-	-- if {DamageMultiplier(rupture) / LastDamageMultiplier(rupture)} >1.1
-	--     Spell(rupture)
-
-	local function DamageMultiplier(positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local bdm = state.baseDamageMultiplier
-		local dm = state:GetDamageMultiplier(spellId, OvaleGUID:GetGUID(target), atTime)
-		local value = bdm * dm
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("damagemultiplier", false, DamageMultiplier)
-end
-	-- @param filter Optional. The type of aura to check.
-	--     Default is any.
-	--     Valid values: any, buff, debuff
 
 do
 	--- Get the damage taken by the player in the previous time interval.
@@ -2642,35 +2408,6 @@ do
 end
 
 do
-	--- Get the number of combo points consumed by the most recent cast of a spell on the target for a feral druid or a rogue.
-	-- @name LastComboPoints
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The number of combo points.
-	-- @return A boolean value for the result of the comparison.
-	-- @see ComboPoints
-	-- @usage
-	-- if ComboPoints() >3 and target.LastComboPoints(rip) <3
-	--     Spell(rip)
-
-	local function LastComboPoints(positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local guid = OvaleGUID:GetGUID(target)
-		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, "combo") or 0
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("lastcombopoints", false, LastComboPoints)
-	OvaleCondition:RegisterCondition("lastspellcombopoints", false, LastComboPoints)
-end
-
-do
 	--- Get the damage done by the most recent damage event for the given spell.
 	-- If the spell is a periodic aura, then it gives the damage done by the most recent tick.
 	-- @name LastDamage
@@ -2696,125 +2433,6 @@ do
 
 	OvaleCondition:RegisterCondition("lastdamage", false, LastDamage)
 	OvaleCondition:RegisterCondition("lastspelldamage", false, LastDamage)
-end
-
-do
-	--- Get the damage multiplier of the most recent cast of a spell on the target.
-	-- This currently does not take into account increased damage due to mastery.
-	-- @name LastDamageMultiplier
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous damage multiplier.
-	-- @return A boolean value for the result of the comparison.
-	-- @see DamageMultiplier
-	-- @usage
-	-- if {DamageMultiplier(rupture) / target.LastDamageMultiplier(rupture)} >1.1
-	--     Spell(rupture)
-
-	local function LastDamageMultiplier(positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local guid = OvaleGUID:GetGUID(target)
-		local bdm = OvaleFuture:GetLastSpellInfo(guid, spellId, "baseDamageMultiplier") or 1
-		local dm = OvaleFuture:GetLastSpellInfo(guid, spellId, "damageMultiplier") or 1
-		local value = bdm * dm
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("lastdamagemultiplier", false, LastDamageMultiplier)
-	OvaleCondition:RegisterCondition("lastspelldamagemultiplier", false, LastDamageMultiplier)
-end
-
-do
-	--- Get the estimated damage of the most recent cast of the player's spell on the target.
-	-- The calculated damage takes into account the values of attack power, spellpower, weapon damage and combo points (if used)
-	-- at the time the spell was most recent cast.
-	-- The damage is computed from information for the spell set via SpellInfo(...):
-	--
-	-- damage = base + bonusmainhand * MH + bonusoffhand * OH + bonusap * AP + bonuscp * CP + bonusapcp * AP * CP + bonussp * SP
-	-- @name LastEstimatedDamage
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The estimated damage of the most recent cast of the given spell by the player.
-	-- @return A boolean value for the result of the comparison.
-	-- @see Damage, LastDamage
-	-- @usage
-	-- if {Damage(rake) / target.LastEstimateDamage(rake)} >1.1
-	--     Spell(rake)
-
-	local function LastEstimatedDamage(positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local value = ComputeParameter(spellId, "lastEstimatedDamage", state, atTime)
-		if not value then
-			local guid = OvaleGUID:GetGUID(target)
-			local ap = OvaleFuture:GetLastSpellInfo(guid, spellId, "attackPower") or 0
-			local sp = OvaleFuture:GetLastSpellInfo(guid, spellId, "spellBonusDamage") or 0
-			local mh = OvaleFuture:GetLastSpellInfo(guid, spellId, "mainHandWeaponDamage") or 0
-			local oh = OvaleFuture:GetLastSpellInfo(guid, spellId, "offHandWeaponDamage") or 0
-			local combo = OvaleFuture:GetLastSpellInfo(guid, spellId, "combo") or 0
-			local bdm = OvaleFuture:GetLastSpellInfo(guid, spellId, "baseDamageMultiplier") or 1
-			local dm = OvaleFuture:GetLastSpellInfo(guid, spellId, "damageMultiplier") or 1
-			value = OvaleData:GetDamage(spellId, ap, sp, mh, oh, combo) * bdm * dm
-		end
-		-- Reduce by armor damage reduction for physical attacks.
-		local si = OvaleData.spellInfo[spellId]
-		if si.physical == 1 then
-			value = value * (1 - BossArmorDamageReduction(target))
-		end
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("lastestimateddamage", false, LastEstimatedDamage)
-	OvaleCondition:RegisterCondition("lastspellestimateddamage", false, LastEstimatedDamage)
-end
-
-do
-	-- Return the value of the stat from the snapshot at the time the spell was cast.
-	local function LastSnapshot(statName, defaultValue, positionalParams, namedParams, state, atTime)
-		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local guid = OvaleGUID:GetGUID(target)
-		local value = OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
-		value = value or defaultValue
-		return Compare(value, comparator, limit)
-	end
-
-	--- Get the mastery effect of the player during the most recent cast of a spell on the target.
-	-- Mastery effect is the effect of the player's mastery, typically a percent-increase to damage
-	-- or a percent-increase to chance to trigger some effect.
-	-- @name LastMastery
-	-- @paramsig number or boolean
-	-- @param id The spell ID.
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=target.
-	--     Valid values: player, target, focus, pet.
-	-- @return The previous mastery effect.
-	-- @return A boolean value for the result of the comparison.
-	-- @see Mastery
-	-- @usage
-	-- if {Mastery(shadow_bolt) - LastMastery(shadow_bolt)} > 1000
-	--     Spell(metamorphosis)
-
-	local function LastMasteryEffect(positionalParams, namedParams, state, atTime)
-		return LastSnapshot("masteryEffect", 0, positionalParams, namedParams, state, atTime)
-	end
-
-	OvaleCondition:RegisterCondition("lastmastery", false, LastMasteryEffect)
-	OvaleCondition:RegisterCondition("lastmasteryeffect", false, LastMasteryEffect)
-	OvaleCondition:RegisterCondition("lastspellmastery", false, LastMasteryEffect)
 end
 
 do
@@ -4225,10 +3843,6 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The current attack power.
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastAttackPower
-	-- @usage
-	-- if AttackPower() >10000 Spell(rake)
-	-- if AttackPower(more 10000) Spell(rake)
 
 	local function AttackPower(positionalParams, namedParams, state, atTime)
 		return Snapshot("attackPower", 0, positionalParams, namedParams, state, atTime)
@@ -4279,10 +3893,6 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The current mastery effect.
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastMasteryEffect
-	-- @usage
-	-- if {DamageMultiplier(rake) * {1 + MasteryEffect()/100}} >1.8
-	--     Spell(rake)
 
 	local function MasteryEffect(positionalParams, namedParams, state, atTime)
 		return Snapshot("masteryEffect", 0, positionalParams, namedParams, state, atTime)
@@ -4310,9 +3920,6 @@ do
 	--     Valid values: 0, 1
 	-- @return The current critical strike chance (in percent).
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastMeleeCritChance
-	-- @usage
-	-- if MeleeCritChance() >90 Spell(rip)
 
 	local function MeleeCritChance(positionalParams, namedParams, state, atTime)
 		return SnapshotCritChance("meleeCrit", 0, positionalParams, namedParams, state, atTime)
@@ -4325,7 +3932,6 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The current multistrike chance (in percent).
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastMultistrikeChance
 
 	local function MultistrikeChance(positionalParams, namedParams, state, atTime)
 		return Snapshot("multistrike", 0, positionalParams, namedParams, state, atTime)
@@ -4341,9 +3947,6 @@ do
 	--     Valid values: 0, 1
 	-- @return The current critical strike chance (in percent).
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastRangedCritChance
-	-- @usage
-	-- if RangedCritChance() >90 Spell(serpent_sting)
 
 	local function RangedCritChance(positionalParams, namedParams, state, atTime)
 		return SnapshotCritChance("rangedCrit", 0, positionalParams, namedParams, state, atTime)
@@ -4359,9 +3962,6 @@ do
 	--     Valid values: 0, 1
 	-- @return The current critical strike chance (in percent).
 	-- @return A boolean value for the result of the comparison.
-	-- @see CritChance, LastSpellCritChance
-	-- @usage
-	-- if SpellCritChance() >30 Spell(immolate)
 
 	local function SpellCritChance(positionalParams, namedParams, state, atTime)
 		return SnapshotCritChance("spellCrit", 0, positionalParams, namedParams, state, atTime)
@@ -4374,9 +3974,6 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The current percent increase to spell haste.
 	-- @return A boolean value for the result of the comparison.
-	-- @see BuffSpellHaste
-	-- @usage
-	-- if SpellHaste() >target.DebuffSpellHaste(moonfire) Spell(moonfire)
 
 	local function SpellHaste(positionalParams, namedParams, state, atTime)
 		return Snapshot("spellHaste", 0, positionalParams, namedParams, state, atTime)
@@ -4389,10 +3986,6 @@ do
 	-- @param number Optional. The number to compare against.
 	-- @return The current spellpower.
 	-- @return A boolean value for the result of the comparison.
-	-- @see LastSpellpower
-	-- @usage
-	-- if {Spellpower() / LastSpellpower(living_bomb)} >1.25
-	--     Spell(living_bomb)
 
 	local function Spellpower(positionalParams, namedParams, state, atTime)
 		return Snapshot("spellBonusDamage", 0, positionalParams, namedParams, state, atTime)

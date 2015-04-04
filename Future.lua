@@ -152,8 +152,6 @@ OvaleFuture.combatStartTime = nil
 OvaleFuture.queue = {}
 -- Table of most recent cast times of spells, indexed by spell ID.
 OvaleFuture.lastCastTime = {}
--- The most recent player's spell that has landed on the target; lastSpellLanded[targetGUID][spellId] = { spellcast info }.
-OvaleFuture.lastSpellLanded = {}
 -- The most recent spellcast.
 OvaleFuture.lastSpellcast = {}
 -- The most recent spellcast that triggered the global cooldown.
@@ -338,28 +336,13 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 							finished = true
 						end
 						if finished then
-							-- If the spell hit its target, then cache the information from the spellcast.
-							if finish == "hit" then
-								-- Cache the most recently landed spell on the target.
-								local targetGUID = UNKNOWN_GUID
-								if destGUID and destGUID ~= "" then
-									targetGUID = destGUID
+							-- Update snapshots in cached spellcasts.
+							if self_timeAuraAdded then
+								if IsSameSpellcast(spellcast, self.lastSpellcast) then
+									self:UpdateSpellcastSnapshot(self.lastSpellcast, self_timeAuraAdded)
 								end
-								self.lastSpellLanded[targetGUID] = self.lastSpellLanded[targetGUID] or {}
-								local sc = self.lastSpellLanded[targetGUID][spellId] or {}
-								for k, v in pairs(spellcast) do
-									sc[k] = v
-								end
-								self.lastSpellLanded[targetGUID][spellId] = sc
-								-- Update snapshots in cached spellcasts.
-								if self_timeAuraAdded then
-									self:UpdateSpellcastSnapshot(sc, self_timeAuraAdded)
-									if IsSameSpellcast(spellcast, self.lastSpellcast) then
-										self:UpdateSpellcastSnapshot(self.lastSpellcast, self_timeAuraAdded)
-									end
-									if IsSameSpellcast(spellcast, self.lastGCDSpellcast) then
-										self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, self_timeAuraAdded)
-									end
+								if IsSameSpellcast(spellcast, self.lastGCDSpellcast) then
+									self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, self_timeAuraAdded)
 								end
 							end
 							local delta = now - spellcast.stop
@@ -935,15 +918,6 @@ function OvaleFuture:UpdateCounters(spellId, atTime, targetGUID)
 	local resetcounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "resetcounter", targetGUID)
 	if resetcounter then
 		self.counter[resetcounter] = 0
-	end
-end
-
---[[
-	Get information from the most recently landed spell on the target.
---]]
-function OvaleFuture:GetLastSpellInfo(guid, spellId, statName)
-	if self.lastSpellLanded[guid] and self.lastSpellLanded[guid][spellId] then
-		return self.lastSpellLanded[guid][spellId][statName]
 	end
 end
 
