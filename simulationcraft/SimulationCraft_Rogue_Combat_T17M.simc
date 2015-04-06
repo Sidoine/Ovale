@@ -46,15 +46,15 @@ actions+=/marked_for_death,if=combo_points<=1&dot.revealing_strike.ticking&(!tal
 actions+=/call_action_list,name=generator,if=combo_points<5|!dot.revealing_strike.ticking|(talent.anticipation.enabled&anticipation_charges<3&buff.deep_insight.down)
 actions+=/call_action_list,name=finisher,if=combo_points=5&dot.revealing_strike.ticking&(buff.deep_insight.up|!talent.anticipation.enabled|(talent.anticipation.enabled&anticipation_charges>=3))
 
-actions.adrenaline_rush=adrenaline_rush,if=time_to_die>=44
-actions.adrenaline_rush+=/adrenaline_rush,if=time_to_die<44&(buff.archmages_greater_incandescence_agi.react|trinket.proc.any.react|trinket.stacking_proc.any.react)
-actions.adrenaline_rush+=/adrenaline_rush,if=time_to_die<=buff.adrenaline_rush.duration*1.5
+actions.adrenaline_rush=adrenaline_rush,if=target.time_to_die>=44
+actions.adrenaline_rush+=/adrenaline_rush,if=target.time_to_die<44&(buff.archmages_greater_incandescence_agi.react|trinket.proc.any.react|trinket.stacking_proc.any.react)
+actions.adrenaline_rush+=/adrenaline_rush,if=target.time_to_die<=buff.adrenaline_rush.duration*1.5
 
-actions.killing_spree=killing_spree,if=time_to_die>=44
-actions.killing_spree+=/killing_spree,if=time_to_die<44&buff.archmages_greater_incandescence_agi.react&buff.archmages_greater_incandescence_agi.remains>=buff.killing_spree.duration
-actions.killing_spree+=/killing_spree,if=time_to_die<44&trinket.proc.any.react&trinket.proc.any.remains>=buff.killing_spree.duration
-actions.killing_spree+=/killing_spree,if=time_to_die<44&trinket.stacking_proc.any.react&trinket.stacking_proc.any.remains>=buff.killing_spree.duration
-actions.killing_spree+=/killing_spree,if=time_to_die<=buff.killing_spree.duration*1.5
+actions.killing_spree=killing_spree,if=target.time_to_die>=44
+actions.killing_spree+=/killing_spree,if=target.time_to_die<44&buff.archmages_greater_incandescence_agi.react&buff.archmages_greater_incandescence_agi.remains>=buff.killing_spree.duration
+actions.killing_spree+=/killing_spree,if=target.time_to_die<44&trinket.proc.any.react&trinket.proc.any.remains>=buff.killing_spree.duration
+actions.killing_spree+=/killing_spree,if=target.time_to_die<44&trinket.stacking_proc.any.react&trinket.stacking_proc.any.remains>=buff.killing_spree.duration
+actions.killing_spree+=/killing_spree,if=target.time_to_die<=buff.killing_spree.duration*1.5
 
 # Combo point generators
 
@@ -84,13 +84,14 @@ main_hand=hansgars_forgehammer,id=113897,bonus_id=567,enchant=mark_of_warsong
 off_hand=hansgars_forgehammer,id=113897,bonus_id=567,enchant=mark_of_warsong
 
 # Gear Summary
-# gear_agility=3717
-# gear_stamina=4478
-# gear_crit_rating=831
-# gear_haste_rating=1145
-# gear_mastery_rating=643
-# gear_armor=1147
-# gear_multistrike_rating=1466
-# gear_versatility_rating=122
+# gear_ilvl=700.94
+# gear_agility=3894
+# gear_stamina=4694
+# gear_crit_rating=871
+# gear_haste_rating=1187
+# gear_mastery_rating=675
+# gear_armor=1177
+# gear_multistrike_rating=1534
+# gear_versatility_rating=128
 # set_bonus=tier17_2pc=1
 # set_bonus=tier17_4pc=1

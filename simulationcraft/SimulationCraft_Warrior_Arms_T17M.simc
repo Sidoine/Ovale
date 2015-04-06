@@ -81,6 +81,11 @@ actions.aoe+=/bladestorm,if=((debuff.colossus_smash.up|cooldown.colossus_smash.r
 actions.aoe+=/colossus_smash,if=dot.rend.ticking
 actions.aoe+=/execute,cycle_targets=1,if=!buff.sudden_death.react&active_enemies<=8&((rage>72&cooldown.colossus_smash.remains>gcd)|rage>80|target.time_to_die<5|debuff.colossus_smash.up)
 actions.aoe+=/heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
+# Heroic Charge is an event that makes the warrior heroic leap out of melee range for an instant
+#If heroic leap is not available, the warrior will simply run out of melee to charge range, and then charge back in.
+#This can delay autoattacks, but typically the rage gained from charging (Especially with bull rush glyphed) is more than
+#The amount lost from delayed autoattacks. Charge only grants rage from charging a different target than the last time.
+#Which means this is only worth doing on AoE, and only when you cycle your charge target.
 actions.aoe+=/mortal_strike,if=target.health.pct>20&active_enemies<=5
 actions.aoe+=/dragon_roar,if=!debuff.colossus_smash.up
 actions.aoe+=/thunder_clap,if=(target.health.pct>20|active_enemies>=9)&glyph.resonating_power.enabled
@@ -108,12 +113,13 @@ trinket2=horn_of_screaming_spirits,id=119193,bonus_id=567
 main_hand=crescent_of_living_magma,id=113886,bonus_id=567,enchant=mark_of_the_thunderlord
 
 # Gear Summary
-# gear_strength=3809
-# gear_stamina=4545
-# gear_crit_rating=1725
-# gear_haste_rating=454
-# gear_mastery_rating=1174
-# gear_armor=2250
-# gear_multistrike_rating=887
+# gear_ilvl=701.00
+# gear_strength=3992
+# gear_stamina=4763
+# gear_crit_rating=1794
+# gear_haste_rating=476
+# gear_mastery_rating=1231
+# gear_armor=2287
+# gear_multistrike_rating=931
 # set_bonus=tier17_2pc=1
 # set_bonus=tier17_4pc=1

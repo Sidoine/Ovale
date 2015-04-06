@@ -23,17 +23,18 @@ actions.precombat+=/horn_of_winter
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion,name=draenic_armor
 actions.precombat+=/bone_shield
+actions.precombat+=/army_of_the_dead
 
 # Executed every time the actor is available.
 
 actions=auto_attack
+actions+=/potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
 # if=time>10
 actions+=/blood_fury
 # if=time>10
 actions+=/berserking
 # if=time>10
 actions+=/arcane_torrent
-actions+=/potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
 actions+=/antimagic_shell
 actions+=/conversion,if=!buff.conversion.up&runic_power>50&health.pct<90
 actions+=/lichborne,if=health.pct<90
@@ -103,14 +104,15 @@ trinket2=petrified_flesheating_spore,id=113663,bonus_id=567
 main_hand=kagrazs_burning_blade,id=113913,bonus_id=567,enchant=rune_of_the_stoneskin_gargoyle
 
 # Gear Summary
-# gear_strength=3030
-# gear_stamina=5882
-# gear_crit_rating=357
-# gear_haste_rating=718
-# gear_mastery_rating=532
-# gear_armor=2250
-# gear_bonus_armor=675
-# gear_multistrike_rating=1638
-# gear_versatility_rating=675
+# gear_ilvl=699.00
+# gear_strength=3175
+# gear_stamina=6100
+# gear_crit_rating=375
+# gear_haste_rating=753
+# gear_mastery_rating=557
+# gear_armor=2287
+# gear_bonus_armor=699
+# gear_multistrike_rating=1703
+# gear_versatility_rating=698
 # set_bonus=tier17_2pc=1
 # set_bonus=tier17_4pc=1
