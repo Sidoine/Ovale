@@ -762,11 +762,13 @@ function OvaleAura:ScanAuras(unitId, guid)
 						else
 							-- Age any hidden auras that are managed by outside modules.
 							aura.serial = serial
+							self:Debug("    Preserving aura %s (%d), start=%s, ending=%s, aura.serial=%d", aura.name, aura.spellId, aura.start, aura.ending, aura.serial)
 						end
 					end
 				end
 			end
 		end
+		self:Debug("End scanning of auras on %s (%s).", guid, unitId)
 	end
 	self:StopProfiling("OvaleAura_ScanAuras")
 end
@@ -982,7 +984,7 @@ function OvaleAura:ResetState(state)
 			for casterGUID, aura in pairs(whoseTable) do
 				self_pool:Release(aura)
 				whoseTable[casterGUID] = nil
-				state:Log("    Aura %d on %s removed, now=%f.", auraId, guid, state.currentTime)
+				state:Log("    Aura %d on %s removed.", auraId, guid)
 			end
 			if not next(whoseTable) then
 				self_pool:Release(whoseTable)
