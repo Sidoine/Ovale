@@ -78,6 +78,9 @@ local MODIFIER_KEYWORD = {
 	["sync"] = true,
 	["sync_weapons"] = true,
 	["target"] = true,
+	["target_if_first"] = true,		-- "target_if_<type>" is a fake modifier.
+	["target_if_max"] = true,
+	["target_if_min"] = true,
 	["travel_speed"] = true,
 	["type"] = true,
 	["wait"] = true,
@@ -547,6 +550,15 @@ ParseAction = function(action, nodeList, annotation)
 		-- "ticks_remain<=N" into "ticks_remain<N+1"
 		stream = gsub(stream, "([^_%.])(ticks_remain)(<?=)([0-9]+)", TicksRemainTranslationHelper)
 		stream = gsub(stream, "([a-z_%.]+%.ticks_remain)(<?=)([0-9]+)", TicksRemainTranslationHelper)
+	end
+	do
+		--[[
+			Mage APLs have a custom "target_if=max:..." modifier to the "choose_target"
+			action which does not adhere to the language standard.
+		--]]
+		stream = gsub(stream, ",target_if=first:", ",target_if_first=")
+		stream = gsub(stream, ",target_if=max:", ",target_if_max=")
+		stream = gsub(stream, ",target_if=min:", ",target_if_min=")
 	end
 	local tokenStream = OvaleLexer("SimulationCraft", GetTokenIterator(stream))
 	-- Consume the action.
