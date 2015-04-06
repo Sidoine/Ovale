@@ -289,12 +289,16 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 		if CLEU_SPELLCAST_EVENT[cleuEvent] then
 			local now = API_GetTime()
 			local spellId, spellName = arg12, arg13
+			local eventDebug = false
 
 			-- Disambiguate the target GUID of any matching spellcast.
 			if strsub(cleuEvent, 1, 11) == "SPELL_CAST_" and (destName and destName ~= "") then
+				if not eventDebug then
+					self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+					eventDebug = true
+				end
 				local spellcast = self:GetSpellcast(spellName, spellId, nil, now)
 				if spellcast and spellcast.targetName and spellcast.targetName == destName and spellcast.target ~= destGUID then
-					self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
 					self:Debug("Disambiguating target of spell %s (%d) to %s (%s).", spellName, spellId, destName, destGUID)
 					spellcast.target = destGUID
 				end
@@ -326,12 +330,18 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 						local finished = false
 						if not spellcast.auraId then
 							-- The spell is finished when it lands.
-							self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+							if not eventDebug then
+								self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+								eventDebug = true
+							end
 							self:Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent)
 							finished = true
 						elseif CLEU_AURA_EVENT[cleuEvent] and spellcast.auraGUID and destGUID == spellcast.auraGUID then
 							-- The spell is finished when the aura update is detected.
-							self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+							if not eventDebug then
+								self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+								eventDebug = true
+							end
 							self:Debug("Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
 							finished = true
 						end
@@ -838,7 +848,7 @@ end
 -- Save information from the given time into the spellcast.
 function OvaleFuture:SaveSpellcastInfo(spellcast, atTime)
 	self:StartProfiling("OvaleFuture_SaveSpellcastInfo")
-	self:Debug("Saving information from %s to the spellcast for %s.", atTime, spellcast.spellName)
+	self:Debug("    Saving information from %s to the spellcast for %s.", atTime, spellcast.spellName)
 	-- Save the player snapshot into the spellcast.
 	self:UpdateSpellcastSnapshot(spellcast, atTime)
 	-- Save the module-specific information into the spellcast.
@@ -1005,14 +1015,14 @@ end
 function OvaleFuture:UpdateLastSpellcast(atTime, spellcast)
 	self:StartProfiling("OvaleFuture_UpdateLastSpellcast")
 	-- Update the time that this spell was most recently cast.
-	self:Debug("Caching spell %s (%d) as most recent spellcast.", spellcast.spellName, spellcast.spellId)
+	self:Debug("    Caching spell %s (%d) as most recent spellcast.", spellcast.spellName, spellcast.spellId)
 	self.lastCastTime[spellcast.spellId] = atTime
 	for k, v in pairs(spellcast) do
 		self.lastSpellcast[k] = v
 	end
 	local gcd = OvaleData:GetSpellInfoProperty(spellcast.spellId, spellcast.start, "gcd", spellcast.target)
 	if not gcd or gcd > 0 then
-		self:Debug("Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId)
+		self:Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId)
 		for k, v in pairs(spellcast) do
 			self.lastGCDSpellcast[k] = v
 		end
@@ -1029,9 +1039,9 @@ end
 function OvaleFuture:UpdateSpellcastSnapshot(spellcast, atTime)
 	if spellcast.queued and (not spellcast.snapshotTime or (spellcast.snapshotTime < atTime and atTime < spellcast.stop + 1)) then
 		if spellcast.targetName then
-			self:Debug("Updating to snapshot from %s for spell %s to %s (%s) queued at %s.", atTime, spellcast.spellName, spellcast.targetName, spellcast.target, spellcast.queued)
+			self:Debug("    Updating to snapshot from %s for spell %s to %s (%s) queued at %s.", atTime, spellcast.spellName, spellcast.targetName, spellcast.target, spellcast.queued)
 		else
-			self:Debug("Updating to snapshot from %s for spell %s with no target queued at %s.", atTime, spellcast.spellName, spellcast.queued)
+			self:Debug("    Updating to snapshot from %s for spell %s with no target queued at %s.", atTime, spellcast.spellName, spellcast.queued)
 		end
 		OvalePaperDoll:UpdateSnapshot(spellcast, true)
 		spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellcast.spellId, spellcast.target, atTime)
