@@ -316,7 +316,6 @@ Define(windwalk_totem 108273)
 	SpellInfo(windwalk_totem cd=60 duration=6 totem=air)
 
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(earthquake tag=shortcd)
 	SpellInfo(elemental_mastery tag=shortcd)
 ]]
 
