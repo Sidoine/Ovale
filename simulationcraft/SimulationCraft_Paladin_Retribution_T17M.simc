@@ -114,7 +114,7 @@ actions.cleave+=/divine_storm,if=holy_power=5&(buff.avenging_wrath.up|target.hea
 actions.cleave+=/divine_storm,if=holy_power=4&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)&!talent.final_verdict.enabled
 actions.cleave+=/divine_storm,if=holy_power=3&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*5)&!talent.final_verdict.enabled
 actions.cleave+=/hammer_of_the_righteous,if=active_enemies>=4&holy_power<5&talent.seraphim.enabled
-actions.cleave+=/hammer_of_the_righteous,,if=active_enemies>=4&(holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down))
+actions.cleave+=/hammer_of_the_righteous,if=active_enemies>=4&(holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down))
 actions.cleave+=/crusader_strike,if=holy_power<5&talent.seraphim.enabled
 actions.cleave+=/crusader_strike,if=holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down)
 actions.cleave+=/exorcism,if=glyph.mass_exorcism.enabled&holy_power<5&!set_bonus.tier17_4pc=1
@@ -152,12 +152,13 @@ trinket2=horn_of_screaming_spirits,id=119193,bonus_id=567
 main_hand=thogars_control_rod,id=113953,bonus_id=567,enchant=mark_of_bleeding_hollow
 
 # Gear Summary
-# gear_strength=3809
-# gear_stamina=4545
-# gear_crit_rating=1048
-# gear_haste_rating=809
-# gear_mastery_rating=1702
-# gear_armor=2250
-# gear_multistrike_rating=678
+# gear_ilvl=701.00
+# gear_strength=3992
+# gear_stamina=4763
+# gear_crit_rating=1098
+# gear_haste_rating=849
+# gear_mastery_rating=1769
+# gear_armor=2287
+# gear_multistrike_rating=712
 # set_bonus=tier17_2pc=1
 # set_bonus=tier17_4pc=1
