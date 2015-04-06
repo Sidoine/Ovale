@@ -3240,6 +3240,22 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		spellName = Disambiguate(spellName, class, specialization)
 		code = format("TimeToSpell(%s)", spellName)
 		AddSymbol(annotation, spellName)
+	elseif class == "DEATHKNIGHT" and strsub(operand, 1, 24) == "pet.dancing_rune_weapon." then
+		local petOperand = strsub(operand, 25)
+		local tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN)
+		local token = tokenIterator()
+		if token == "active" then
+			local buffName = "dancing_rune_weapon_buff"
+			code = format("BuffPresent(%s)", buffName)
+			AddSymbol(annotation, buffName)
+		elseif token == "dot" then
+			if target == "" then
+				target = "target"
+			else
+				target = strsub(target, 1, -2)
+			end
+			ok, node = EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
+		end
 	elseif class == "DRUID" and operand == "buff.wild_charge_movement.down" then
 		-- "wild_charge_movement" is a fake SimulationCraft buff that lasts for the
 		-- duration of the movement during Wild Charge.
