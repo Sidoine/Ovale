@@ -128,7 +128,7 @@ Define(poisoned_ammo_buff 162537)
 Define(powershot 109259)
 	SpellInfo(powershot cd=45 focus=15)
 	SpellInfo(powershot buff_focus_half=bestial_wrath_buff if_spell=bestial_wrath)
-Define(pre_steady_focus_buff 53224)
+Define(pre_steady_focus_buff 177667)	# OvaleSteadyFocus
 Define(rapid_fire 3045)
 	SpellInfo(rapid_fire cd=120 gcd=0)
 	SpellInfo(rapid_fire buff_cdr=cooldown_reduction_agility_buff)
