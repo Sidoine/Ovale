@@ -1177,7 +1177,7 @@ end
 
 local function OvaleTaggedFunctionName(name, tag)
 	local bodyName, conditionName
-	local prefix, suffix = strmatch(name, "([A-Za-z]+)(Actions)")
+	local prefix, suffix = strmatch(name, "([A-Z]%w+)(Actions)")
 	if prefix and suffix then
 		local camelTag
 		if tag == "shortcd" then
