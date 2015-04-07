@@ -173,7 +173,10 @@ function OvaleCooldown:GetSpellCooldown(spellId)
 	if self.sharedCooldown[spellId] then
 		for id in pairs(self.sharedCooldown[spellId]) do
 			local start, duration, enable = self:GetSpellCooldown(id)
-			if start then break end
+			if start then
+				cdStart, cdDuration, cdEnable = start, duration, enable
+				break
+			end
 		end
 	else
 		local start, duration, enable
