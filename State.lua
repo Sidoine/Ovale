@@ -104,21 +104,28 @@ statePrototype.isState = true
 statePrototype.isInitialized = nil
 -- Table of state variables added by scripts that is reset on every refresh.
 statePrototype.futureVariable = nil
+-- Table of most recent time a state variable that is reset on every refresh was added.
+statePrototype.futureLastEnable = nil
 -- Table of state variables added by scripts that is reset only when out of combat.
 statePrototype.variable = nil
+-- Table of most recent time a state variable that is reset when out of combat was added.
+statePrototype.lastEnable = nil
 --</state-properties>
 
 --<public-static-methods>
 -- Initialize the state.
 function OvaleState:InitializeState(state)
 	state.futureVariable = {}
+	state.futureLastEnable = {}
 	state.variable = {}
+	state.lastEnable = {}
 end
 
 -- Reset the state to the current conditions.
 function OvaleState:ResetState(state)
 	for k in pairs(state.futureVariable) do
 		state.futureVariable[k] = nil
+		state.futureLastEnable[k] = nil
 	end
 	-- TODO: What conditions should trigger resetting state variables?
 	-- For now, reset/remove all state variables if out of combat.
@@ -126,6 +133,7 @@ function OvaleState:ResetState(state)
 		for k in pairs(state.variable) do
 			state:Log("Resetting state variable '%s'.", k)
 			state.variable[k] = nil
+			state.lastEnable[k] = nil
 		end
 	end
 end
@@ -135,8 +143,14 @@ function OvaleState:CleanState(state)
 	for k in pairs(state.futureVariable) do
 		state.futureVariable[k] = nil
 	end
+	for k in pairs(state.futureLastEnable) do
+		state.futureLastEnable[k] = nil
+	end
 	for k in pairs(state.variable) do
 		state.variable[k] = nil
+	end
+	for k in pairs(state.lastEnable) do
+		state.lastEnable[k] = nil
 	end
 end
 --</public-static-methods>
@@ -158,15 +172,26 @@ statePrototype.GetState = function(state, name)
 	return state.futureVariable[name] or state.variable[name] or 0
 end
 
+--[[
+	Get the duration in seconds that the simulator has been most recently
+	in the named state.
+--]]
+statePrototype.GetStateDuration = function(state, name)
+	local lastEnable = state.futureLastEnable[name] or state.lastEnable[name] or state.currentTime
+	return state.currentTime - lastEnable
+end
+
 -- Put a value into the named state variable.
 statePrototype.PutState = function(state, name, value, isFuture)
 	if isFuture then
 		state:Log("Setting future state: %s = %s.", name, value)
 		state.futureVariable[name] = value
+		state.futureLastEnable[name] = state.currentTime
 	else
 		OvaleState:Debug("Advancing combat state: %s = %s.", name, value)
 		state:Log("Advancing combat state: %s = %s.", name, value)
 		state.variable[name] = value
+		state.lastEnable[name] = state.currentTime
 	end
 end
 

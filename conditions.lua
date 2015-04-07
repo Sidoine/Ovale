@@ -1603,6 +1603,25 @@ do
 end
 
 do
+	--- Get the duration in seconds that the simulator was most recently in the named state.
+	-- @name GetStateDuration
+	-- @paramsig number or boolean
+	-- @param name The name of the state variable.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+
+	local function GetStateDuration(positionalParams, namedParams, state, atTime)
+		local name, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = state:GetStateDuration(name)
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("getstateduration", false, GetStateDuration)
+end
+
+do
 	--- Test if the given glyph is active.
 	-- @name Glyph
 	-- @paramsig boolean

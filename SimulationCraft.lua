@@ -3284,6 +3284,13 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			code = format("GetState(%s)", operand)
 		end
+	elseif class == "MAGE" and (operand == "burn_phase_duration" or operand == "pyro_chain_duration") then
+		local variable = strsub(operand, 1, -10)
+		if parseNode.asType == "boolean" then
+			code = format("GetStateDuration(%s) > 0", variable)
+		else
+			code = format("GetStateDuration(%s)", variable)
+		end
 	elseif class == "MAGE" and operand == "dot.frozen_orb.ticking" then
 		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
 		local name = "frozen_orb"
