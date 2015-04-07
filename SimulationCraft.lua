@@ -535,6 +535,8 @@ ParseAction = function(action, nodeList, annotation)
 		-- Fix bugs in SimulationCraft action lists.
 		-- ",," into ","
 		stream = gsub(stream, ",,", ",")
+		-- "target.target." into "target."
+		stream = gsub(stream, "target%.target%.", "target.")
 	end
 	do
 		-- Changes to SimulationCraft action lists for easier translation into Ovale timespan concept.
