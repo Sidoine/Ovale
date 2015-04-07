@@ -1609,11 +1609,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif class == "MAGE" and strfind(action, "pet_") then
 			conditionCode = "pet.Present()"
-		elseif class == "MAGE" and action == "start_pyro_chain" then
-			bodyCode = "SetState(pyro_chain 1)"
-			isSpellAction = false
-		elseif class == "MAGE" and action == "stop_pyro_chain" then
-			bodyCode = "SetState(pyro_chain 0)"
+		elseif class == "MAGE" and (action == "start_burn_phase" or action == "start_pyro_chain" or action == "stop_burn_phase" or action == "stop_pyro_chain") then
+			local stateAction, stateVariable = strmatch(action, "([^_]+)_(.*)")
+			local value = stateAction == "start" and 1 or 0
+			bodyCode = format("SetState(%s %d)", stateVariable, value)
 			isSpellAction = false
 		elseif class == "MAGE" and action == "time_warp" then
 			-- Only suggest Time Warp if it will have an effect.
@@ -3279,17 +3278,17 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		AddSymbol(annotation, spellName)
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
 		code = "TotemRemaining(rune_of_power)"
+	elseif class == "MAGE" and (operand == "burn_phase" or operand == "pyro_chain") then
+		if parseNode.asType == "boolean" then
+			code = format("GetState(%s) > 0", operand)
+		else
+			code = format("GetState(%s)", operand)
+		end
 	elseif class == "MAGE" and operand == "dot.frozen_orb.ticking" then
 		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
 		local name = "frozen_orb"
 		code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name)
 		AddSymbol(annotation, name)
-	elseif class == "MAGE" and operand == "pyro_chain" then
-		if parseNode.asType == "boolean" then
-			code = "GetState(pyro_chain) > 0"
-		else
-			code = "GetState(pyro_chain)"
-		end
 	elseif class == "MONK" and strsub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
 		local property = strsub(operand, 36)
 		if target == "" then
