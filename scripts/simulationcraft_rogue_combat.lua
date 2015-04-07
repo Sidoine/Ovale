@@ -124,11 +124,11 @@ AddFunction CombatDefaultCdActions
 
 AddFunction CombatAdrenalineRushCdActions
 {
-	#adrenaline_rush,if=time_to_die>=44
+	#adrenaline_rush,if=target.time_to_die>=44
 	if target.TimeToDie() >= 44 Spell(adrenaline_rush)
-	#adrenaline_rush,if=time_to_die<44&(buff.archmages_greater_incandescence_agi.react|trinket.proc.any.react|trinket.stacking_proc.any.react)
+	#adrenaline_rush,if=target.time_to_die<44&(buff.archmages_greater_incandescence_agi.react|trinket.proc.any.react|trinket.stacking_proc.any.react)
 	if target.TimeToDie() < 44 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } Spell(adrenaline_rush)
-	#adrenaline_rush,if=time_to_die<=buff.adrenaline_rush.duration*1.5
+	#adrenaline_rush,if=target.time_to_die<=buff.adrenaline_rush.duration*1.5
 	if target.TimeToDie() <= BaseDuration(adrenaline_rush_buff) * 1.5 Spell(adrenaline_rush)
 }
 
@@ -156,15 +156,15 @@ AddFunction CombatGeneratorMainActions
 
 AddFunction CombatKillingSpreeCdActions
 {
-	#killing_spree,if=time_to_die>=44
+	#killing_spree,if=target.time_to_die>=44
 	if target.TimeToDie() >= 44 Spell(killing_spree)
-	#killing_spree,if=time_to_die<44&buff.archmages_greater_incandescence_agi.react&buff.archmages_greater_incandescence_agi.remains>=buff.killing_spree.duration
+	#killing_spree,if=target.time_to_die<44&buff.archmages_greater_incandescence_agi.react&buff.archmages_greater_incandescence_agi.remains>=buff.killing_spree.duration
 	if target.TimeToDie() < 44 and BuffPresent(archmages_greater_incandescence_agi_buff) and BuffRemaining(archmages_greater_incandescence_agi_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
-	#killing_spree,if=time_to_die<44&trinket.proc.any.react&trinket.proc.any.remains>=buff.killing_spree.duration
+	#killing_spree,if=target.time_to_die<44&trinket.proc.any.react&trinket.proc.any.remains>=buff.killing_spree.duration
 	if target.TimeToDie() < 44 and BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
-	#killing_spree,if=time_to_die<44&trinket.stacking_proc.any.react&trinket.stacking_proc.any.remains>=buff.killing_spree.duration
+	#killing_spree,if=target.time_to_die<44&trinket.stacking_proc.any.react&trinket.stacking_proc.any.remains>=buff.killing_spree.duration
 	if target.TimeToDie() < 44 and BuffPresent(trinket_stacking_proc_any_buff) and BuffRemaining(trinket_stacking_proc_any_buff) >= BaseDuration(killing_spree_buff) Spell(killing_spree)
-	#killing_spree,if=time_to_die<=buff.killing_spree.duration*1.5
+	#killing_spree,if=target.time_to_die<=buff.killing_spree.duration*1.5
 	if target.TimeToDie() <= BaseDuration(killing_spree_buff) * 1.5 Spell(killing_spree)
 }
 

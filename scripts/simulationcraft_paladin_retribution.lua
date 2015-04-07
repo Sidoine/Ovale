@@ -153,7 +153,7 @@ AddFunction RetributionCleaveMainActions
 	if HolyPower() == 3 and { BuffPresent(avenging_wrath_melee_buff) or target.HealthPercent() < 35 } and { not Talent(seraphim_talent) or SpellCooldown(seraphim) > GCD() * 5 } and not Talent(final_verdict_talent) Spell(divine_storm)
 	#hammer_of_the_righteous,if=active_enemies>=4&holy_power<5&talent.seraphim.enabled
 	if Enemies() >= 4 and HolyPower() < 5 and Talent(seraphim_talent) Spell(hammer_of_the_righteous)
-	#hammer_of_the_righteous,,if=active_enemies>=4&(holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down))
+	#hammer_of_the_righteous,if=active_enemies>=4&(holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down))
 	if Enemies() >= 4 and { HolyPower() <= 3 or HolyPower() == 4 and target.HealthPercent() >= 35 and BuffExpires(avenging_wrath_melee_buff) } Spell(hammer_of_the_righteous)
 	#crusader_strike,if=holy_power<5&talent.seraphim.enabled
 	if HolyPower() < 5 and Talent(seraphim_talent) Spell(crusader_strike)

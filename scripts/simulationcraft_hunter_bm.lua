@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Hunter_BM_T17M".
 #	class=hunter
 #	spec=beast_mastery
-#	talents=0001333
+#	talents=0002333
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -59,8 +59,8 @@ AddFunction BeastMasterySummonPet
 
 AddFunction BeastMasteryDefaultMainActions
 {
-	#multishot,if=active_enemies>1&pet.cat.buff.beast_cleave.down
-	if Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff) Spell(multishot)
+	#multishot,if=active_enemies>1&pet.cat.buff.beast_cleave.remains<0.5
+	if Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 Spell(multishot)
 	#multishot,if=active_enemies>5
 	if Enemies() > 5 Spell(multishot)
 	#kill_command
@@ -69,8 +69,10 @@ AddFunction BeastMasteryDefaultMainActions
 	if TimeToMaxFocus() > GCD() Spell(kill_shot)
 	#focusing_shot,if=focus<50
 	if Focus() < 50 Spell(focusing_shot)
-	#cobra_shot,if=buff.pre_steady_focus.up&(14+cast_regen)<=focus.deficit
-	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() Spell(cobra_shot)
+	#cobra_shot,if=buff.pre_steady_focus.up&buff.steady_focus.remains<7&(14+cast_regen)<focus.deficit
+	if BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 7 and 14 + FocusCastingRegen(cobra_shot) < FocusDeficit() Spell(cobra_shot)
+	#cobra_shot,if=talent.steady_focus.enabled&buff.steady_focus.remains<4&focus<50
+	if Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 4 and Focus() < 50 Spell(cobra_shot)
 	#glaive_toss
 	Spell(glaive_toss)
 	#cobra_shot,if=active_enemies>5
@@ -87,31 +89,31 @@ AddFunction BeastMasteryDefaultShortCdActions
 {
 	#dire_beast
 	Spell(dire_beast)
-	#explosive_trap,if=active_enemies>1
-	if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
-	#focus_fire,if=buff.focus_fire.down&(cooldown.bestial_wrath.remains<1|(talent.stampede.enabled&buff.stampede.remains))
-	if BuffExpires(focus_fire_buff) and { SpellCooldown(bestial_wrath) < 1 or Talent(stampede_talent) and TimeSincePreviousSpell(stampede) < 40 } Spell(focus_fire)
+	#focus_fire,if=buff.focus_fire.down&((cooldown.bestial_wrath.remains<1&buff.bestial_wrath.down)|(talent.stampede.enabled&buff.stampede.remains)|pet.cat.buff.frenzy.remains<1)
+	if BuffExpires(focus_fire_buff) and { SpellCooldown(bestial_wrath) < 1 and BuffExpires(bestial_wrath_buff) or Talent(stampede_talent) and TimeSincePreviousSpell(stampede) < 40 or pet.BuffRemaining(pet_frenzy_buff) < 1 } Spell(focus_fire)
 	#bestial_wrath,if=focus>30&!buff.bestial_wrath.up
 	if Focus() > 30 and not BuffPresent(bestial_wrath_buff) Spell(bestial_wrath)
 
-	unless Enemies() > 1 and pet.BuffExpires(pet_beast_cleave_buff) and Spell(multishot)
+	unless Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 and Spell(multishot)
 	{
+		#focus_fire,five_stacks=1,if=buff.focus_fire.down
+		if BuffExpires(focus_fire_buff) and pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
 		#barrage,if=active_enemies>1
 		if Enemies() > 1 Spell(barrage)
+		#explosive_trap,if=active_enemies>5
+		if Enemies() > 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 
-		unless Enemies() > 5 and Spell(multishot)
+		unless Enemies() > 5 and Spell(multishot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
 		{
-			#focus_fire,five_stacks=1
-			if BuffStacks(frenzy_buff) >= 5 Spell(focus_fire)
-			#barrage,if=active_enemies>1
-			if Enemies() > 1 Spell(barrage)
+			#a_murder_of_crows
+			Spell(a_murder_of_crows)
 
-			unless pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
+			unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 7 and 14 + FocusCastingRegen(cobra_shot) < FocusDeficit() and Spell(cobra_shot)
 			{
-				#a_murder_of_crows
-				Spell(a_murder_of_crows)
+				#explosive_trap,if=active_enemies>1
+				if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 
-				unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() and Spell(cobra_shot) or Spell(glaive_toss)
+				unless Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 4 and Focus() < 50 and Spell(cobra_shot) or Spell(glaive_toss)
 				{
 					#barrage
 					Spell(barrage)
@@ -155,8 +157,8 @@ AddFunction BeastMasteryPrecombatMainActions
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
 	#glaive_toss
 	Spell(glaive_toss)
-	#focusing_shot,if=!talent.glaive_toss.enabled
-	if not Talent(glaive_toss_talent) Spell(focusing_shot)
+	#focusing_shot
+	Spell(focusing_shot)
 }
 
 AddFunction BeastMasteryPrecombatShortCdActions
@@ -169,7 +171,7 @@ AddFunction BeastMasteryPrecombatShortCdActions
 
 AddFunction BeastMasteryPrecombatShortCdPostConditions
 {
-	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or Spell(focusing_shot)
 }
 
 AddFunction BeastMasteryPrecombatCdActions
@@ -183,7 +185,7 @@ AddFunction BeastMasteryPrecombatCdActions
 
 AddFunction BeastMasteryPrecombatCdPostConditions
 {
-	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or Spell(focusing_shot)
 }
 
 ### BeastMastery icons.
@@ -256,15 +258,14 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # focus_fire
 # focus_fire_buff
 # focusing_shot
-# frenzy_buff
 # glaive_toss
-# glaive_toss_talent
 # glyph_of_explosive_trap
 # incendiary_ammo
 # kill_command
 # kill_shot
 # multishot
 # pet_beast_cleave_buff
+# pet_frenzy_buff
 # poisoned_ammo
 # powershot
 # pre_steady_focus_buff
@@ -272,6 +273,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # revive_pet
 # stampede
 # stampede_talent
+# steady_focus_buff
+# steady_focus_talent
 # thrill_of_the_hunt_buff
 # trap_launcher
 # war_stomp

@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Hunter_SV_T17M".
 #	class=hunter
 #	spec=survival
-#	talents=0003313
+#	talents=0003323
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -64,16 +64,26 @@ AddFunction SurvivalDefaultMainActions
 {
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeMainActions()
-	#black_arrow,if=!ticking
-	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
+	#black_arrow
+	Spell(black_arrow)
+	#arcane_shot,if=(trinket.proc.any.react&trinket.proc.any.remains<4)|dot.serpent_sting.remains<=3
+	if BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) < 4 or target.DebuffRemaining(serpent_sting_debuff) <= 3 Spell(arcane_shot)
 	#explosive_shot
 	Spell(explosive_shot)
-	#arcane_shot,if=buff.thrill_of_the_hunt.react&focus>35&cast_regen<=focus.deficit|dot.serpent_sting.remains<=3|target.time_to_die<4.5
-	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 Spell(arcane_shot)
-	#cobra_shot,if=buff.pre_steady_focus.up&buff.steady_focus.remains<5&(14+cast_regen)<=focus.deficit
-	if BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and 14 + FocusCastingRegen(cobra_shot) <= FocusDeficit() Spell(cobra_shot)
-	#arcane_shot,if=focus>=80|talent.focusing_shot.enabled
-	if Focus() >= 80 or Talent(focusing_shot_talent) Spell(arcane_shot)
+	#cobra_shot,if=buff.pre_steady_focus.up
+	if BuffPresent(pre_steady_focus_buff) Spell(cobra_shot)
+	#arcane_shot,if=(buff.thrill_of_the_hunt.react&focus>35)|target.time_to_die<4.5
+	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 or target.TimeToDie() < 4.5 Spell(arcane_shot)
+	#glaive_toss
+	Spell(glaive_toss)
+	#arcane_shot,if=talent.steady_focus.enabled&!talent.focusing_shot.enabled&focus.deficit<action.cobra_shot.cast_regen*2+28
+	if Talent(steady_focus_talent) and not Talent(focusing_shot_talent) and FocusDeficit() < FocusCastingRegen(cobra_shot) * 2 + 28 Spell(arcane_shot)
+	#cobra_shot,if=talent.steady_focus.enabled&buff.steady_focus.remains<5
+	if Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 5 Spell(cobra_shot)
+	#focusing_shot,if=talent.steady_focus.enabled&buff.steady_focus.remains<=cast_time&focus.deficit>cast_regen
+	if Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) <= CastTime(focusing_shot) and FocusDeficit() > FocusCastingRegen(focusing_shot) Spell(focusing_shot)
+	#arcane_shot,if=focus>=70|talent.focusing_shot.enabled|(talent.steady_focus.enabled&focus>=50)
+	if Focus() >= 70 or Talent(focusing_shot_talent) or Talent(steady_focus_talent) and Focus() >= 50 Spell(arcane_shot)
 	#focusing_shot
 	Spell(focusing_shot)
 	#cobra_shot
@@ -90,15 +100,19 @@ AddFunction SurvivalDefaultShortCdActions
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
 
-		unless not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Spell(explosive_shot)
+		unless Spell(black_arrow) or { BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) < 4 or target.DebuffRemaining(serpent_sting_debuff) <= 3 } and Spell(arcane_shot) or Spell(explosive_shot) or BuffPresent(pre_steady_focus_buff) and Spell(cobra_shot)
 		{
 			#dire_beast
 			Spell(dire_beast)
 
-			unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 and FocusCastingRegen(arcane_shot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 3 or target.TimeToDie() < 4.5 } and Spell(arcane_shot)
+			unless { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 or target.TimeToDie() < 4.5 } and Spell(arcane_shot) or Spell(glaive_toss)
 			{
-				#explosive_trap
-				if CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+				#powershot
+				Spell(powershot)
+				#barrage
+				Spell(barrage)
+				#explosive_trap,if=!trinket.proc.any.react&!trinket.stacking_proc.any.react
+				if not BuffPresent(trinket_proc_any_buff) and not BuffPresent(trinket_stacking_proc_any_buff) and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 			}
 		}
 	}
@@ -109,23 +123,23 @@ AddFunction SurvivalDefaultCdActions
 	#auto_shot
 	#counter_shot
 	SurvivalInterruptActions()
-	#use_item,name=beating_heart_of_the_mountain
-	SurvivalUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
+	#use_item,name=beating_heart_of_the_mountain
+	SurvivalUseItemActions()
 	#potion,name=draenic_agility,if=(((cooldown.stampede.remains<1)&(cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=25
 	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 SurvivalUsePotionAgility()
 	#call_action_list,name=aoe,if=active_enemies>1
 	if Enemies() > 1 SurvivalAoeCdActions()
 
-	unless Enemies() > 1 and SurvivalAoeCdPostConditions()
+	unless Enemies() > 1 and SurvivalAoeCdPostConditions() or Spell(a_murder_of_crows)
 	{
-		#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))|target.time_to_die<=25
-		if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 25 Spell(stampede)
+		#stampede,if=buff.potion.up|(cooldown.potion.remains&(buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up))|target.time_to_die<=45
+		if BuffPresent(potion_agility_buff) or ItemCooldown(draenic_agility_potion) > 0 and { BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) } or target.TimeToDie() <= 45 Spell(stampede)
 	}
 }
 
@@ -205,8 +219,10 @@ AddFunction SurvivalPrecombatMainActions
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
 	#glaive_toss
 	Spell(glaive_toss)
-	#focusing_shot,if=!talent.glaive_toss.enabled
-	if not Talent(glaive_toss_talent) Spell(focusing_shot)
+	#explosive_shot
+	Spell(explosive_shot)
+	#focusing_shot
+	Spell(focusing_shot)
 }
 
 AddFunction SurvivalPrecombatShortCdActions
@@ -219,7 +235,7 @@ AddFunction SurvivalPrecombatShortCdActions
 
 AddFunction SurvivalPrecombatShortCdPostConditions
 {
-	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or Spell(explosive_shot) or Spell(focusing_shot)
 }
 
 AddFunction SurvivalPrecombatCdActions
@@ -233,7 +249,7 @@ AddFunction SurvivalPrecombatCdActions
 
 AddFunction SurvivalPrecombatCdPostConditions
 {
-	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot)
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or Spell(explosive_shot) or Spell(focusing_shot)
 }
 
 ### Survival icons.
@@ -311,7 +327,6 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # focusing_shot
 # focusing_shot_talent
 # glaive_toss
-# glaive_toss_talent
 # glyph_of_explosive_trap
 # incendiary_ammo
 # lock_and_load_buff
@@ -326,6 +341,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # serpent_sting_debuff
 # stampede
 # steady_focus_buff
+# steady_focus_talent
 # thrill_of_the_hunt_buff
 # trap_launcher
 # war_stomp

@@ -183,8 +183,8 @@ AddFunction MarksmanshipPrecombatMainActions
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
 	#glaive_toss
 	Spell(glaive_toss)
-	#focusing_shot,if=!talent.glaive_toss.enabled
-	if not Talent(glaive_toss_talent) Spell(focusing_shot_marksmanship)
+	#focusing_shot
+	Spell(focusing_shot_marksmanship)
 }
 
 AddFunction MarksmanshipPrecombatShortCdActions
@@ -197,7 +197,7 @@ AddFunction MarksmanshipPrecombatShortCdActions
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
 {
-	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot_marksmanship)
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or Spell(focusing_shot_marksmanship)
 }
 
 AddFunction MarksmanshipPrecombatCdActions
@@ -211,7 +211,7 @@ AddFunction MarksmanshipPrecombatCdActions
 
 AddFunction MarksmanshipPrecombatCdPostConditions
 {
-	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or not Talent(glaive_toss_talent) and Spell(focusing_shot_marksmanship)
+	Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(poisoned_ammo) or Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 and Spell(incendiary_ammo) or Spell(glaive_toss) or Spell(focusing_shot_marksmanship)
 }
 
 ### Marksmanship icons.
@@ -282,7 +282,6 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # focusing_shot_marksmanship
 # focusing_shot_talent
 # glaive_toss
-# glaive_toss_talent
 # glyph_of_explosive_trap
 # incendiary_ammo
 # kill_shot

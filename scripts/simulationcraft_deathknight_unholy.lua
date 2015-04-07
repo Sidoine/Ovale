@@ -8,7 +8,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Unholy_T17M".
 #	class=deathknight
 #	spec=unholy
-#	talents=2001002
+#	talents=2001003
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -56,6 +56,8 @@ AddFunction UnholyInterruptActions
 
 AddFunction UnholyDefaultMainActions
 {
+	#run_action_list,name=bos,if=talent.breath_of_sindragosa.enabled
+	if Talent(breath_of_sindragosa_talent) UnholyBosMainActions()
 	#run_action_list,name=aoe,if=(!talent.necrotic_plague.enabled&active_enemies>=2)|active_enemies>=4
 	if not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 UnholyAoeMainActions()
 	#run_action_list,name=single_target,if=(!talent.necrotic_plague.enabled&active_enemies<2)|active_enemies<4
@@ -68,39 +70,51 @@ AddFunction UnholyDefaultShortCdActions
 	UnholyGetInMeleeRange()
 	#deaths_advance,if=movement.remains>2
 	if 0 > 2 Spell(deaths_advance)
-	#antimagic_shell,damage=100000
-	if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
-	#run_action_list,name=aoe,if=(!talent.necrotic_plague.enabled&active_enemies>=2)|active_enemies>=4
-	if not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 UnholyAoeShortCdActions()
+	#run_action_list,name=bos,if=talent.breath_of_sindragosa.enabled
+	if Talent(breath_of_sindragosa_talent) UnholyBosShortCdActions()
 
-	unless { not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 } and UnholyAoeShortCdPostConditions()
+	unless Talent(breath_of_sindragosa_talent) and UnholyBosShortCdPostConditions()
 	{
-		#run_action_list,name=single_target,if=(!talent.necrotic_plague.enabled&active_enemies<2)|active_enemies<4
-		if not Talent(necrotic_plague_talent) and Enemies() < 2 or Enemies() < 4 UnholySingleTargetShortCdActions()
+		#antimagic_shell,damage=100000
+		if IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
+		#run_action_list,name=aoe,if=(!talent.necrotic_plague.enabled&active_enemies>=2)|active_enemies>=4
+		if not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 UnholyAoeShortCdActions()
+
+		unless { not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 } and UnholyAoeShortCdPostConditions()
+		{
+			#run_action_list,name=single_target,if=(!talent.necrotic_plague.enabled&active_enemies<2)|active_enemies<4
+			if not Talent(necrotic_plague_talent) and Enemies() < 2 or Enemies() < 4 UnholySingleTargetShortCdActions()
+		}
 	}
 }
 
 AddFunction UnholyDefaultCdActions
 {
-	#mind_freeze
-	UnholyInterruptActions()
-	#blood_fury
-	Spell(blood_fury_ap)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_runicpower)
-	#use_item,slot=trinket2
-	UnholyUseItemActions()
-	#potion,name=draenic_strength,if=buff.dark_transformation.up&target.time_to_die<=60
-	if pet.BuffPresent(dark_transformation_buff) and target.TimeToDie() <= 60 UnholyUsePotionStrength()
-	#run_action_list,name=aoe,if=(!talent.necrotic_plague.enabled&active_enemies>=2)|active_enemies>=4
-	if not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 UnholyAoeCdActions()
+	#mind_freeze,if=!glyph.mind_freeze.enabled
+	if not Glyph(glyph_of_mind_freeze) UnholyInterruptActions()
+	#run_action_list,name=bos,if=talent.breath_of_sindragosa.enabled
+	if Talent(breath_of_sindragosa_talent) UnholyBosCdActions()
 
-	unless { not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 } and UnholyAoeCdPostConditions()
+	unless Talent(breath_of_sindragosa_talent) and UnholyBosCdPostConditions()
 	{
-		#run_action_list,name=single_target,if=(!talent.necrotic_plague.enabled&active_enemies<2)|active_enemies<4
-		if not Talent(necrotic_plague_talent) and Enemies() < 2 or Enemies() < 4 UnholySingleTargetCdActions()
+		#blood_fury
+		Spell(blood_fury_ap)
+		#berserking
+		Spell(berserking)
+		#arcane_torrent
+		Spell(arcane_torrent_runicpower)
+		#use_item,slot=trinket2
+		UnholyUseItemActions()
+		#potion,name=draenic_strength,if=buff.dark_transformation.up&target.time_to_die<=60
+		if pet.BuffPresent(dark_transformation_buff) and target.TimeToDie() <= 60 UnholyUsePotionStrength()
+		#run_action_list,name=aoe,if=(!talent.necrotic_plague.enabled&active_enemies>=2)|active_enemies>=4
+		if not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 UnholyAoeCdActions()
+
+		unless { not Talent(necrotic_plague_talent) and Enemies() >= 2 or Enemies() >= 4 } and UnholyAoeCdPostConditions()
+		{
+			#run_action_list,name=single_target,if=(!talent.necrotic_plague.enabled&active_enemies<2)|active_enemies<4
+			if not Talent(necrotic_plague_talent) and Enemies() < 2 or Enemies() < 4 UnholySingleTargetCdActions()
+		}
 	}
 }
 
@@ -108,10 +122,8 @@ AddFunction UnholyDefaultCdActions
 
 AddFunction UnholyAoeMainActions
 {
-	#run_action_list,name=spread,if=!dot.blood_plague.ticking|!dot.frost_fever.ticking|(!dot.necrotic_plague.ticking&talent.necrotic_plague.enabled)
+	#call_action_list,name=spread,if=!dot.blood_plague.ticking|!dot.frost_fever.ticking|(!dot.necrotic_plague.ticking&talent.necrotic_plague.enabled)
 	if not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) UnholySpreadMainActions()
-	#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) UnholyBosAoeMainActions()
 	#blood_boil,if=blood=2|(frost=2&death=2)
 	if Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 Spell(blood_boil)
 	#dark_transformation
@@ -143,10 +155,8 @@ AddFunction UnholyAoeShortCdActions
 	{
 		#defile
 		Spell(defile)
-		#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
-		if BuffPresent(breath_of_sindragosa_buff) UnholyBosAoeShortCdActions()
 
-		unless BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeShortCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation)
+		unless { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation)
 		{
 			#blood_tap,if=level<=90&buff.shadow_infusion.stack=5
 			if Level() <= 90 and BuffStacks(shadow_infusion_buff) == 5 Spell(blood_tap)
@@ -172,30 +182,22 @@ AddFunction UnholyAoeShortCdActions
 
 AddFunction UnholyAoeShortCdPostConditions
 {
-	{ not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeShortCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+	{ not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadShortCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 }
 
 AddFunction UnholyAoeCdActions
 {
 	unless Spell(unholy_blight)
 	{
-		unless { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadCdPostConditions() or Spell(defile)
+		unless { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadCdPostConditions() or Spell(defile) or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil)
 		{
-			#breath_of_sindragosa,if=runic_power>75
-			if RunicPower() > 75 Spell(breath_of_sindragosa)
-			#run_action_list,name=bos_aoe,if=dot.breath_of_sindragosa.ticking
-			if BuffPresent(breath_of_sindragosa_buff) UnholyBosAoeCdActions()
+			#summon_gargoyle
+			Spell(summon_gargoyle)
 
-			unless BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil)
+			unless Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 			{
-				#summon_gargoyle
-				Spell(summon_gargoyle)
-
-				unless Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
-				{
-					#empower_rune_weapon
-					Spell(empower_rune_weapon)
-				}
+				#empower_rune_weapon
+				Spell(empower_rune_weapon)
 			}
 		}
 	}
@@ -203,99 +205,203 @@ AddFunction UnholyAoeCdActions
 
 AddFunction UnholyAoeCdPostConditions
 {
-	Spell(unholy_blight) or { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadCdPostConditions() or Spell(defile) or BuffPresent(breath_of_sindragosa_buff) and UnholyBosAoeCdPostConditions() or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+	Spell(unholy_blight) or { not target.DebuffPresent(blood_plague_debuff) or not target.DebuffPresent(frost_fever_debuff) or not target.DebuffPresent(necrotic_plague_debuff) and Talent(necrotic_plague_talent) } and UnholySpreadCdPostConditions() or Spell(defile) or { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or Spell(defile) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(death_and_decay) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or Rune(unholy) >= 2 and Spell(scourge_strike) or { RunicPower() > 90 or BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or Spell(blood_boil) or Spell(icy_touch) or Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 }
 
-### actions.bos_aoe
+### actions.bos
 
-AddFunction UnholyBosAoeMainActions
+AddFunction UnholyBosMainActions
 {
-	#blood_boil,if=runic_power<88
-	if RunicPower() < 88 Spell(blood_boil)
-	#scourge_strike,if=runic_power<88&unholy=1
-	if RunicPower() < 88 and Rune(unholy) >= 1 and Rune(unholy) < 2 Spell(scourge_strike)
-	#icy_touch,if=runic_power<88
-	if RunicPower() < 88 Spell(icy_touch)
+	#run_action_list,name=bos_st
+	UnholyBosStMainActions()
+}
+
+AddFunction UnholyBosShortCdActions
+{
+	#antimagic_shell,damage=100000,if=(dot.breath_of_sindragosa.ticking&runic_power<25)|cooldown.breath_of_sindragosa.remains>40
+	if { BuffPresent(breath_of_sindragosa_buff) and RunicPower() < 25 or SpellCooldown(breath_of_sindragosa) > 40 } and IncomingDamage(1.5 magic=1) > 0 Spell(antimagic_shell)
+	#run_action_list,name=bos_st
+	UnholyBosStShortCdActions()
+}
+
+AddFunction UnholyBosShortCdPostConditions
+{
+	UnholyBosStShortCdPostConditions()
+}
+
+AddFunction UnholyBosCdActions
+{
+	#blood_fury,if=dot.breath_of_sindragosa.ticking
+	if BuffPresent(breath_of_sindragosa_buff) Spell(blood_fury_ap)
+	#berserking
+	Spell(berserking)
+	#use_item,slot=trinket2,if=dot.breath_of_sindragosa.ticking
+	if BuffPresent(breath_of_sindragosa_buff) UnholyUseItemActions()
+	#potion,name=draenic_strength,if=dot.breath_of_sindragosa.ticking
+	if BuffPresent(breath_of_sindragosa_buff) UnholyUsePotionStrength()
+	#run_action_list,name=bos_st
+	UnholyBosStCdActions()
+}
+
+AddFunction UnholyBosCdPostConditions
+{
+	UnholyBosStCdPostConditions()
+}
+
+### actions.bos_active
+
+AddFunction UnholyBosActiveMainActions
+{
+	#plague_strike,if=!disease.ticking
+	if not target.DiseasesAnyTicking() Spell(plague_strike)
+	#blood_boil,cycle_targets=1,if=(active_enemies>=2&!(dot.blood_plague.ticking|dot.frost_fever.ticking))|active_enemies>=4&(runic_power<88&runic_power>30)
+	if Enemies() >= 2 and not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } or Enemies() >= 4 and RunicPower() < 88 and RunicPower() > 30 Spell(blood_boil)
+	#scourge_strike,if=active_enemies<=3&(runic_power<88&runic_power>30)
+	if Enemies() <= 3 and RunicPower() < 88 and RunicPower() > 30 Spell(scourge_strike)
+	#festering_strike,if=runic_power<77
+	if RunicPower() < 77 Spell(festering_strike)
+	#blood_boil,if=active_enemies>=4
+	if Enemies() >= 4 Spell(blood_boil)
+	#scourge_strike,if=active_enemies<=3
+	if Enemies() <= 3 Spell(scourge_strike)
 	#plague_leech
 	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
 	#death_coil,if=buff.sudden_doom.react
 	if BuffPresent(sudden_doom_buff) Spell(death_coil)
 }
 
-AddFunction UnholyBosAoeShortCdActions
+AddFunction UnholyBosActiveShortCdActions
 {
-	#death_and_decay,if=runic_power<88
-	if RunicPower() < 88 Spell(death_and_decay)
-
-	unless RunicPower() < 88 and Spell(blood_boil) or RunicPower() < 88 and Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or RunicPower() < 88 and Spell(icy_touch)
+	unless not target.DiseasesAnyTicking() and Spell(plague_strike) or { Enemies() >= 2 and not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } or Enemies() >= 4 and RunicPower() < 88 and RunicPower() > 30 } and Spell(blood_boil) or Enemies() <= 3 and RunicPower() < 88 and RunicPower() > 30 and Spell(scourge_strike) or RunicPower() < 77 and Spell(festering_strike) or Enemies() >= 4 and Spell(blood_boil) or Enemies() <= 3 and Spell(scourge_strike)
 	{
 		#blood_tap,if=buff.blood_charge.stack>=5
 		if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
 	}
 }
 
-AddFunction UnholyBosAoeShortCdPostConditions
+AddFunction UnholyBosActiveShortCdPostConditions
 {
-	RunicPower() < 88 and Spell(blood_boil) or RunicPower() < 88 and Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or RunicPower() < 88 and Spell(icy_touch) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or BuffPresent(sudden_doom_buff) and Spell(death_coil)
+	not target.DiseasesAnyTicking() and Spell(plague_strike) or { Enemies() >= 2 and not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } or Enemies() >= 4 and RunicPower() < 88 and RunicPower() > 30 } and Spell(blood_boil) or Enemies() <= 3 and RunicPower() < 88 and RunicPower() > 30 and Spell(scourge_strike) or RunicPower() < 77 and Spell(festering_strike) or Enemies() >= 4 and Spell(blood_boil) or Enemies() <= 3 and Spell(scourge_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or BuffPresent(sudden_doom_buff) and Spell(death_coil)
 }
 
-AddFunction UnholyBosAoeCdActions
+AddFunction UnholyBosActiveCdActions
 {
-	unless RunicPower() < 88 and Spell(death_and_decay) or RunicPower() < 88 and Spell(blood_boil) or RunicPower() < 88 and Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or RunicPower() < 88 and Spell(icy_touch) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+	unless not target.DiseasesAnyTicking() and Spell(plague_strike) or { Enemies() >= 2 and not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } or Enemies() >= 4 and RunicPower() < 88 and RunicPower() > 30 } and Spell(blood_boil) or Enemies() <= 3 and RunicPower() < 88 and RunicPower() > 30 and Spell(scourge_strike) or RunicPower() < 77 and Spell(festering_strike) or Enemies() >= 4 and Spell(blood_boil) or Enemies() <= 3 and Spell(scourge_strike)
 	{
-		#empower_rune_weapon
-		Spell(empower_rune_weapon)
+		#arcane_torrent,if=runic_power<70
+		if RunicPower() < 70 Spell(arcane_torrent_runicpower)
+
+		unless target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+		{
+			#empower_rune_weapon,if=runic_power<60
+			if RunicPower() < 60 Spell(empower_rune_weapon)
+		}
 	}
 }
 
-AddFunction UnholyBosAoeCdPostConditions
+AddFunction UnholyBosActiveCdPostConditions
 {
-	RunicPower() < 88 and Spell(death_and_decay) or RunicPower() < 88 and Spell(blood_boil) or RunicPower() < 88 and Rune(unholy) >= 1 and Rune(unholy) < 2 and Spell(scourge_strike) or RunicPower() < 88 and Spell(icy_touch) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or BuffPresent(sudden_doom_buff) and Spell(death_coil)
+	not target.DiseasesAnyTicking() and Spell(plague_strike) or { Enemies() >= 2 and not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } or Enemies() >= 4 and RunicPower() < 88 and RunicPower() > 30 } and Spell(blood_boil) or Enemies() <= 3 and RunicPower() < 88 and RunicPower() > 30 and Spell(scourge_strike) or RunicPower() < 77 and Spell(festering_strike) or Enemies() >= 4 and Spell(blood_boil) or Enemies() <= 3 and Spell(scourge_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or BuffPresent(sudden_doom_buff) and Spell(death_coil)
 }
 
 ### actions.bos_st
 
 AddFunction UnholyBosStMainActions
 {
-	#festering_strike,if=runic_power<77
-	if RunicPower() < 77 Spell(festering_strike)
-	#scourge_strike,if=runic_power<88
-	if RunicPower() < 88 Spell(scourge_strike)
+	#plague_leech,if=((cooldown.outbreak.remains<1)|disease.min_remains<1)&((blood<1&frost<1)|(blood<1&unholy<1)|(frost<1&unholy<1))
+	if { SpellCooldown(outbreak) < 1 or target.DiseasesRemaining() < 1 } and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
+	#soul_reaper,if=(target.health.pct-3*(target.health.pct%target.time_to_die))<=45
+	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 Spell(soul_reaper_unholy)
+	#run_action_list,name=bos_active,if=dot.breath_of_sindragosa.ticking
+	if BuffPresent(breath_of_sindragosa_buff) UnholyBosActiveMainActions()
+	#outbreak,cycle_targets=1,if=!(dot.blood_plague.ticking|dot.frost_fever.ticking)
+	if not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } Spell(outbreak)
+	#plague_strike,if=!(dot.blood_plague.ticking|dot.frost_fever.ticking)
+	if not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } Spell(plague_strike)
+	#blood_boil,cycle_targets=1,if=!(dot.blood_plague.ticking|dot.frost_fever.ticking)
+	if not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } Spell(blood_boil)
+	#festering_strike,if=blood>1&frost>1
+	if Rune(blood) >= 2 and Rune(frost) >= 2 Spell(festering_strike)
+	#scourge_strike,if=((unholy>1|death>1)&active_enemies<=3)|(unholy>1&active_enemies>=4)
+	if { Rune(unholy) >= 2 or Rune(death) >= 2 } and Enemies() <= 3 or Rune(unholy) >= 2 and Enemies() >= 4 Spell(scourge_strike)
+	#blood_boil,if=active_enemies>=4&(blood=2|(frost=2&death=2))
+	if Enemies() >= 4 and { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } Spell(blood_boil)
+	#dark_transformation
+	Spell(dark_transformation)
+	#blood_boil,if=active_enemies>=4
+	if Enemies() >= 4 Spell(blood_boil)
+	#death_coil,if=(buff.sudden_doom.react|runic_power>80)&(buff.blood_charge.stack<=10)
+	if { BuffPresent(sudden_doom_buff) or RunicPower() > 80 } and BuffStacks(blood_charge_buff) <= 10 Spell(death_coil)
+	#scourge_strike,if=cooldown.breath_of_sindragosa.remains>6|runic_power<75
+	if SpellCooldown(breath_of_sindragosa) > 6 or RunicPower() < 75 Spell(scourge_strike)
+	#festering_strike,if=cooldown.breath_of_sindragosa.remains>6|runic_power<75
+	if SpellCooldown(breath_of_sindragosa) > 6 or RunicPower() < 75 Spell(festering_strike)
+	#death_coil,if=cooldown.breath_of_sindragosa.remains>20
+	if SpellCooldown(breath_of_sindragosa) > 20 Spell(death_coil)
 	#plague_leech
 	if target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } Spell(plague_leech)
-	#death_coil,if=buff.sudden_doom.react
-	if BuffPresent(sudden_doom_buff) Spell(death_coil)
 }
 
 AddFunction UnholyBosStShortCdActions
 {
-	#death_and_decay,if=runic_power<88
-	if RunicPower() < 88 Spell(death_and_decay)
-
-	unless RunicPower() < 77 and Spell(festering_strike) or RunicPower() < 88 and Spell(scourge_strike)
+	unless { SpellCooldown(outbreak) < 1 or target.DiseasesRemaining() < 1 } and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy)
 	{
-		#blood_tap,if=buff.blood_charge.stack>=5
-		if BuffStacks(blood_charge_buff) >= 5 Spell(blood_tap)
+		#blood_tap,if=((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)&cooldown.soul_reaper.remains=0
+		if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
+		#run_action_list,name=bos_active,if=dot.breath_of_sindragosa.ticking
+		if BuffPresent(breath_of_sindragosa_buff) UnholyBosActiveShortCdActions()
+
+		unless BuffPresent(breath_of_sindragosa_buff) and UnholyBosActiveShortCdPostConditions()
+		{
+			#unholy_blight,if=!(dot.blood_plague.ticking|dot.frost_fever.ticking)
+			if not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } Spell(unholy_blight)
+
+			unless not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(outbreak) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(plague_strike) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(blood_boil)
+			{
+				#death_and_decay,if=active_enemies>1&unholy>1
+				if Enemies() > 1 and Rune(unholy) >= 2 Spell(death_and_decay)
+
+				unless Rune(blood) >= 2 and Rune(frost) >= 2 and Spell(festering_strike) or { { Rune(unholy) >= 2 or Rune(death) >= 2 } and Enemies() <= 3 or Rune(unholy) >= 2 and Enemies() >= 4 } and Spell(scourge_strike)
+				{
+					#death_and_decay,if=active_enemies>1
+					if Enemies() > 1 Spell(death_and_decay)
+
+					unless Enemies() >= 4 and { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation)
+					{
+						#blood_tap,if=buff.blood_charge.stack>10
+						if BuffStacks(blood_charge_buff) > 10 Spell(blood_tap)
+					}
+				}
+			}
+		}
 	}
 }
 
 AddFunction UnholyBosStShortCdPostConditions
 {
-	RunicPower() < 77 and Spell(festering_strike) or RunicPower() < 88 and Spell(scourge_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or BuffPresent(sudden_doom_buff) and Spell(death_coil)
+	{ SpellCooldown(outbreak) < 1 or target.DiseasesRemaining() < 1 } and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or BuffPresent(breath_of_sindragosa_buff) and UnholyBosActiveShortCdPostConditions() or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(outbreak) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(plague_strike) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(blood_boil) or Rune(blood) >= 2 and Rune(frost) >= 2 and Spell(festering_strike) or { { Rune(unholy) >= 2 or Rune(death) >= 2 } and Enemies() <= 3 or Rune(unholy) >= 2 and Enemies() >= 4 } and Spell(scourge_strike) or Enemies() >= 4 and { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or Enemies() >= 4 and Spell(blood_boil) or { BuffPresent(sudden_doom_buff) or RunicPower() > 80 } and BuffStacks(blood_charge_buff) <= 10 and Spell(death_coil) or { SpellCooldown(breath_of_sindragosa) > 6 or RunicPower() < 75 } and Spell(scourge_strike) or { SpellCooldown(breath_of_sindragosa) > 6 or RunicPower() < 75 } and Spell(festering_strike) or SpellCooldown(breath_of_sindragosa) > 20 and Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 }
 
 AddFunction UnholyBosStCdActions
 {
-	unless RunicPower() < 88 and Spell(death_and_decay) or RunicPower() < 77 and Spell(festering_strike) or RunicPower() < 88 and Spell(scourge_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
+	unless { SpellCooldown(outbreak) < 1 or target.DiseasesRemaining() < 1 } and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy)
 	{
-		#empower_rune_weapon
-		Spell(empower_rune_weapon)
+		#breath_of_sindragosa,if=runic_power>75
+		if RunicPower() > 75 Spell(breath_of_sindragosa)
+		#run_action_list,name=bos_active,if=dot.breath_of_sindragosa.ticking
+		if BuffPresent(breath_of_sindragosa_buff) UnholyBosActiveCdActions()
+
+		unless BuffPresent(breath_of_sindragosa_buff) and UnholyBosActiveCdPostConditions()
+		{
+			#summon_gargoyle
+			Spell(summon_gargoyle)
+		}
 	}
 }
 
 AddFunction UnholyBosStCdPostConditions
 {
-	RunicPower() < 88 and Spell(death_and_decay) or RunicPower() < 77 and Spell(festering_strike) or RunicPower() < 88 and Spell(scourge_strike) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or BuffPresent(sudden_doom_buff) and Spell(death_coil)
+	{ SpellCooldown(outbreak) < 1 or target.DiseasesRemaining() < 1 } and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or BuffPresent(breath_of_sindragosa_buff) and UnholyBosActiveCdPostConditions() or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(unholy_blight) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(outbreak) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(plague_strike) or not { target.DebuffPresent(blood_plague_debuff) or target.DebuffPresent(frost_fever_debuff) } and Spell(blood_boil) or Enemies() > 1 and Rune(unholy) >= 2 and Spell(death_and_decay) or Rune(blood) >= 2 and Rune(frost) >= 2 and Spell(festering_strike) or { { Rune(unholy) >= 2 or Rune(death) >= 2 } and Enemies() <= 3 or Rune(unholy) >= 2 and Enemies() >= 4 } and Spell(scourge_strike) or Enemies() > 1 and Spell(death_and_decay) or Enemies() >= 4 and { Rune(blood) >= 2 or Rune(frost) >= 2 and Rune(death) >= 2 and Rune(death) < 3 } and Spell(blood_boil) or Spell(dark_transformation) or Enemies() >= 4 and Spell(blood_boil) or { BuffPresent(sudden_doom_buff) or RunicPower() > 80 } and BuffStacks(blood_charge_buff) <= 10 and Spell(death_coil) or { SpellCooldown(breath_of_sindragosa) > 6 or RunicPower() < 75 } and Spell(scourge_strike) or { SpellCooldown(breath_of_sindragosa) > 6 or RunicPower() < 75 } and Spell(festering_strike) or SpellCooldown(breath_of_sindragosa) > 20 and Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech)
 }
 
 ### actions.precombat
@@ -357,12 +463,6 @@ AddFunction UnholySingleTargetMainActions
 	if RunicPower() > 90 Spell(death_coil)
 	#soul_reaper,if=(target.health.pct-3*(target.health.pct%target.time_to_die))<=45
 	if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 Spell(soul_reaper_unholy)
-	#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) UnholyBosStMainActions()
-	#scourge_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
-	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(scourge_strike)
-	#festering_strike,if=cooldown.breath_of_sindragosa.remains<7&runic_power<76&talent.breath_of_sindragosa.enabled
-	if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) Spell(festering_strike)
 	#plague_strike,if=!disease.min_ticking&unholy=2
 	if not target.DiseasesTicking() and Rune(unholy) >= 2 Spell(plague_strike)
 	#scourge_strike,if=unholy=2
@@ -420,50 +520,38 @@ AddFunction UnholySingleTargetShortCdActions
 
 		unless RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy)
 		{
-			#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
-			if BuffPresent(breath_of_sindragosa_buff) UnholyBosStShortCdActions()
+			#blood_tap,if=((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)&cooldown.soul_reaper.remains=0
+			if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
+			#death_and_decay,if=(!talent.unholy_blight.enabled|!talent.necrotic_plague.enabled)&unholy=2
+			if { not Talent(unholy_blight_talent) or not Talent(necrotic_plague_talent) } and Rune(unholy) >= 2 Spell(death_and_decay)
+			#defile,if=unholy=2
+			if Rune(unholy) >= 2 Spell(defile)
 
-			unless BuffPresent(breath_of_sindragosa_buff) and UnholyBosStShortCdPostConditions()
+			unless not target.DiseasesTicking() and Rune(unholy) >= 2 and Spell(plague_strike) or Rune(unholy) >= 2 and Spell(scourge_strike) or RunicPower() > 80 and Spell(death_coil) or Talent(necrotic_plague_talent) and Talent(unholy_blight_talent) and target.DebuffRemaining(necrotic_plague_debuff) < SpellCooldown(unholy_blight) / 2 and Spell(festering_strike) or Rune(blood) >= 2 and Rune(frost) >= 2 and { Rune(frost death=0) > 0 or Rune(blood death=0) > 0 } and Spell(festering_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Rune(frost death=0) > 0 and Rune(blood death=0) > 0 and Spell(festering_strike)
 			{
-				#death_and_decay,if=cooldown.breath_of_sindragosa.remains<7&runic_power<88&talent.breath_of_sindragosa.enabled
-				if SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) Spell(death_and_decay)
+				#defile,if=blood=2|frost=2
+				if Rune(blood) >= 2 or Rune(frost) >= 2 Spell(defile)
 
-				unless SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(scourge_strike) or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) and Spell(festering_strike)
+				unless not target.DiseasesTicking() and { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(plague_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(scourge_strike) or Rune(blood death=0) > 1 and Spell(festering_strike) or Rune(blood death=0) > 1 and Spell(blood_boil) or Rune(frost death=0) > 1 and Spell(festering_strike)
 				{
 					#blood_tap,if=((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)&cooldown.soul_reaper.remains=0
 					if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
-					#death_and_decay,if=unholy=2
-					if Rune(unholy) >= 2 Spell(death_and_decay)
-					#defile,if=unholy=2
-					if Rune(unholy) >= 2 Spell(defile)
+					#death_and_decay,if=(!talent.unholy_blight.enabled|!talent.necrotic_plague.enabled)
+					if not Talent(unholy_blight_talent) or not Talent(necrotic_plague_talent) Spell(death_and_decay)
+					#defile
+					Spell(defile)
+					#blood_tap,if=talent.defile.enabled&cooldown.defile.remains=0
+					if Talent(defile_talent) and not SpellCooldown(defile) > 0 Spell(blood_tap)
 
-					unless not target.DiseasesTicking() and Rune(unholy) >= 2 and Spell(plague_strike) or Rune(unholy) >= 2 and Spell(scourge_strike) or RunicPower() > 80 and Spell(death_coil) or Talent(necrotic_plague_talent) and Talent(unholy_blight_talent) and target.DebuffRemaining(necrotic_plague_debuff) < SpellCooldown(unholy_blight) / 2 and Spell(festering_strike) or Rune(blood) >= 2 and Rune(frost) >= 2 and { Rune(frost death=0) > 0 or Rune(blood death=0) > 0 } and Spell(festering_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Rune(frost death=0) > 0 and Rune(blood death=0) > 0 and Spell(festering_strike)
+					unless not target.DiseasesTicking() and Spell(plague_strike) or Spell(dark_transformation)
 					{
-						#defile,if=blood=2|frost=2
-						if Rune(blood) >= 2 or Rune(frost) >= 2 Spell(defile)
+						#blood_tap,if=buff.blood_charge.stack>10&(buff.sudden_doom.react|(buff.dark_transformation.down&unholy<=1))
+						if BuffStacks(blood_charge_buff) > 10 and { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } Spell(blood_tap)
 
-						unless not target.DiseasesTicking() and { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(plague_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(scourge_strike) or Rune(blood death=0) > 1 and Spell(festering_strike) or Rune(blood death=0) > 1 and Spell(blood_boil) or Rune(frost death=0) > 1 and Spell(festering_strike)
+						unless { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike)
 						{
-							#blood_tap,if=((target.health.pct-3*(target.health.pct%target.time_to_die))<=45)&cooldown.soul_reaper.remains=0
-							if target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and not SpellCooldown(soul_reaper_unholy) > 0 Spell(blood_tap)
-							#death_and_decay
-							Spell(death_and_decay)
-							#defile
-							Spell(defile)
-							#blood_tap,if=cooldown.defile.remains=0
-							if not SpellCooldown(defile) > 0 Spell(blood_tap)
-
-							unless not target.DiseasesTicking() and Spell(plague_strike) or Spell(dark_transformation)
-							{
-								#blood_tap,if=buff.blood_charge.stack>10&(buff.sudden_doom.react|(buff.dark_transformation.down&unholy<=1))
-								if BuffStacks(blood_charge_buff) > 10 and { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } Spell(blood_tap)
-
-								unless { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike)
-								{
-									#blood_tap
-									Spell(blood_tap)
-								}
-							}
+							#blood_tap
+							Spell(blood_tap)
 						}
 					}
 				}
@@ -474,23 +562,15 @@ AddFunction UnholySingleTargetShortCdActions
 
 AddFunction UnholySingleTargetCdActions
 {
-	unless SpellCooldown(outbreak) < 1 and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesRemaining() < 3 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not target.DiseasesTicking() and Spell(outbreak) or not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 3 and Spell(unholy_blight) or Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and Spell(unholy_blight) or RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy)
+	unless SpellCooldown(outbreak) < 1 and { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or { Rune(blood) < 1 and Rune(frost) < 1 or Rune(blood) < 1 and Rune(unholy) < 1 or Rune(frost) < 1 and Rune(unholy) < 1 } and target.DiseasesRemaining() < 3 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not target.DiseasesTicking() and Spell(outbreak) or not Talent(necrotic_plague_talent) and target.DiseasesRemaining() < 3 and Spell(unholy_blight) or Talent(necrotic_plague_talent) and target.DebuffRemaining(necrotic_plague_debuff) < 1 and Spell(unholy_blight) or RunicPower() > 90 and Spell(death_coil) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 and Spell(soul_reaper_unholy) or { not Talent(unholy_blight_talent) or not Talent(necrotic_plague_talent) } and Rune(unholy) >= 2 and Spell(death_and_decay) or Rune(unholy) >= 2 and Spell(defile) or not target.DiseasesTicking() and Rune(unholy) >= 2 and Spell(plague_strike) or Rune(unholy) >= 2 and Spell(scourge_strike) or RunicPower() > 80 and Spell(death_coil) or Talent(necrotic_plague_talent) and Talent(unholy_blight_talent) and target.DebuffRemaining(necrotic_plague_debuff) < SpellCooldown(unholy_blight) / 2 and Spell(festering_strike) or Rune(blood) >= 2 and Rune(frost) >= 2 and { Rune(frost death=0) > 0 or Rune(blood death=0) > 0 } and Spell(festering_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Rune(frost death=0) > 0 and Rune(blood death=0) > 0 and Spell(festering_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(defile) or not target.DiseasesTicking() and { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(plague_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(scourge_strike) or Rune(blood death=0) > 1 and Spell(festering_strike) or Rune(blood death=0) > 1 and Spell(blood_boil) or Rune(frost death=0) > 1 and Spell(festering_strike)
 	{
-		#breath_of_sindragosa,if=runic_power>75
-		if RunicPower() > 75 Spell(breath_of_sindragosa)
-		#run_action_list,name=bos_st,if=dot.breath_of_sindragosa.ticking
-		if BuffPresent(breath_of_sindragosa_buff) UnholyBosStCdActions()
+		#summon_gargoyle
+		Spell(summon_gargoyle)
 
-		unless BuffPresent(breath_of_sindragosa_buff) and UnholyBosStCdPostConditions() or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(death_and_decay) or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 88 and Talent(breath_of_sindragosa_talent) and Spell(scourge_strike) or SpellCooldown(breath_of_sindragosa) < 7 and RunicPower() < 76 and Talent(breath_of_sindragosa_talent) and Spell(festering_strike) or Rune(unholy) >= 2 and Spell(death_and_decay) or Rune(unholy) >= 2 and Spell(defile) or not target.DiseasesTicking() and Rune(unholy) >= 2 and Spell(plague_strike) or Rune(unholy) >= 2 and Spell(scourge_strike) or RunicPower() > 80 and Spell(death_coil) or Talent(necrotic_plague_talent) and Talent(unholy_blight_talent) and target.DebuffRemaining(necrotic_plague_debuff) < SpellCooldown(unholy_blight) / 2 and Spell(festering_strike) or Rune(blood) >= 2 and Rune(frost) >= 2 and { Rune(frost death=0) > 0 or Rune(blood death=0) > 0 } and Spell(festering_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Rune(frost death=0) > 0 and Rune(blood death=0) > 0 and Spell(festering_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(defile) or not target.DiseasesTicking() and { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(plague_strike) or { Rune(blood) >= 2 or Rune(frost) >= 2 } and Spell(scourge_strike) or Rune(blood death=0) > 1 and Spell(festering_strike) or Rune(blood death=0) > 1 and Spell(blood_boil) or Rune(frost death=0) > 1 and Spell(festering_strike)
+		unless { not Talent(unholy_blight_talent) or not Talent(necrotic_plague_talent) } and Spell(death_and_decay) or Spell(defile) or not target.DiseasesTicking() and Spell(plague_strike) or Spell(dark_transformation) or { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(frost death=0) > 0 and Rune(blood death=0) > 0 } and Spell(festering_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(scourge_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(festering_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(blood_boil) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(icy_touch)
 		{
-			#summon_gargoyle
-			Spell(summon_gargoyle)
-
-			unless Spell(death_and_decay) or Spell(defile) or not target.DiseasesTicking() and Spell(plague_strike) or Spell(dark_transformation) or { BuffPresent(sudden_doom_buff) or pet.BuffExpires(dark_transformation_buff) and Rune(unholy) < 2 } and Spell(death_coil) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(unholy death=1) >= 2 } and Spell(scourge_strike) or { not target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 45 or Rune(frost death=0) > 0 and Rune(blood death=0) > 0 } and Spell(festering_strike) or Spell(death_coil) or target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(scourge_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(festering_strike) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(blood_boil) or not SpellCooldown(empower_rune_weapon) > 0 and Spell(icy_touch)
-			{
-				#empower_rune_weapon,if=blood<1&unholy<1&frost<1
-				if Rune(blood) < 1 and Rune(unholy) < 1 and Rune(frost) < 1 Spell(empower_rune_weapon)
-			}
+			#empower_rune_weapon,if=blood<1&unholy<1&frost<1
+			if Rune(blood) < 1 and Rune(unholy) < 1 and Rune(frost) < 1 Spell(empower_rune_weapon)
 		}
 	}
 }
@@ -589,10 +669,12 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # death_coil
 # deaths_advance
 # defile
+# defile_talent
 # draenic_strength_potion
 # empower_rune_weapon
 # festering_strike
 # frost_fever_debuff
+# glyph_of_mind_freeze
 # horn_of_winter
 # icy_touch
 # mind_freeze

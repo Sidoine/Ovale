@@ -45,8 +45,8 @@ AddFunction DemonologyDefaultMainActions
 	if target.TimeToDie() >= 6 and target.DebuffRemaining(corruption_debuff) <= 0.3 * BaseDuration(corruption_debuff) and BuffExpires(metamorphosis_buff) Spell(corruption)
 	#cancel_metamorphosis,if=buff.metamorphosis.up&((demonic_fury<650&!glyph.dark_soul.enabled)|demonic_fury<450)&buff.dark_soul.down&(trinket.stacking_proc.multistrike.down&trinket.proc.any.down|demonic_fury<(800-cooldown.dark_soul.remains*(10%spell_haste)))&target.time_to_die>20
 	if BuffPresent(metamorphosis_buff) and { DemonicFury() < 650 and not Glyph(glyph_of_dark_soul) or DemonicFury() < 450 } and BuffExpires(dark_soul_knowledge_buff) and { BuffExpires(trinket_stacking_proc_multistrike_buff) and BuffExpires(trinket_proc_any_buff) or DemonicFury() < 800 - SpellCooldown(dark_soul_knowledge) * { 10 / { 100 / { 100 + SpellHaste() } } } } and target.TimeToDie() > 20 and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
-	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges>0&dot.shadowflame.remains<action.hand_of_guldan.travel_time+action.shadow_bolt.cast_time&demonic_fury<100&buff.dark_soul.remains>10
-	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) > 0 and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and DemonicFury() < 100 and BuffRemaining(dark_soul_knowledge_buff) > 10 and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
+	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges>0&dot.shadowflame.remains<action.hand_of_guldan.travel_time+action.shadow_bolt.cast_time&((demonic_fury<100&buff.dark_soul.remains>10)|time<15)
+	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) > 0 and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { DemonicFury() < 100 and BuffRemaining(dark_soul_knowledge_buff) > 10 or TimeInCombat() < 15 } and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
 	#cancel_metamorphosis,if=buff.metamorphosis.up&action.hand_of_guldan.charges=3&(!buff.dark_soul.remains>gcd|action.metamorphosis.cooldown<gcd)
 	if BuffPresent(metamorphosis_buff) and Charges(hand_of_guldan) == 3 and { not BuffRemaining(dark_soul_knowledge_buff) > GCD() or SpellCooldown(metamorphosis) < GCD() } and BuffPresent(metamorphosis_buff) Spell(metamorphosis text=cancel)
 	#chaos_wave,if=buff.metamorphosis.up&(buff.dark_soul.up&active_enemies>=2|(charges=3|set_bonus.tier17_4pc=0&charges=2))
@@ -57,8 +57,8 @@ AddFunction DemonologyDefaultMainActions
 	if BuffPresent(metamorphosis_buff) and target.DebuffRemaining(corruption_debuff) < 17.4 and DemonicFury() > 750 Spell(touch_of_chaos)
 	#touch_of_chaos,if=buff.metamorphosis.up
 	if BuffPresent(metamorphosis_buff) Spell(touch_of_chaos)
-	#metamorphosis,if=buff.dark_soul.remains>gcd&(demonic_fury>300|!glyph.dark_soul.enabled)&(demonic_fury>=80&buff.molten_core.stack>=1|demonic_fury>=40)
-	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and { DemonicFury() > 300 or not Glyph(glyph_of_dark_soul) } and { DemonicFury() >= 80 and BuffStacks(molten_core_buff) >= 1 or DemonicFury() >= 40 } Spell(metamorphosis)
+	#metamorphosis,if=buff.dark_soul.remains>gcd&(time>6|debuff.shadowflame.stack=2)&(demonic_fury>300|!glyph.dark_soul.enabled)&(demonic_fury>=80&buff.molten_core.stack>=1|demonic_fury>=40)
+	if BuffRemaining(dark_soul_knowledge_buff) > GCD() and { TimeInCombat() > 6 or target.DebuffStacks(shadowflame_debuff) == 2 } and { DemonicFury() > 300 or not Glyph(glyph_of_dark_soul) } and { DemonicFury() >= 80 and BuffStacks(molten_core_buff) >= 1 or DemonicFury() >= 40 } Spell(metamorphosis)
 	#metamorphosis,if=(trinket.stacking_proc.multistrike.react|trinket.proc.any.react)&((demonic_fury>450&action.dark_soul.recharge_time>=10&glyph.dark_soul.enabled)|(demonic_fury>650&cooldown.dark_soul.remains>=10))
 	if { BuffPresent(trinket_stacking_proc_multistrike_buff) or BuffPresent(trinket_proc_any_buff) } and { DemonicFury() > 450 and SpellChargeCooldown(dark_soul_knowledge) >= 10 and Glyph(glyph_of_dark_soul) or DemonicFury() > 650 and SpellCooldown(dark_soul_knowledge) >= 10 } Spell(metamorphosis)
 	#metamorphosis,if=!cooldown.cataclysm.remains&talent.cataclysm.enabled
@@ -102,8 +102,8 @@ AddFunction DemonologyDefaultShortCdActions
 
 	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
 	{
-		#service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<20|(buff.dark_soul.remains&target.health.pct<20))
-		if Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } Spell(grimoire_felguard)
+		#service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<=25|(buff.dark_soul.remains&target.health.pct<20))
+		if Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } Spell(service_felguard)
 		#call_action_list,name=db,if=talent.demonbolt.enabled
 		if Talent(demonbolt_talent) DemonologyDbShortCdActions()
 
@@ -129,12 +129,12 @@ AddFunction DemonologyDefaultCdActions
 	Spell(arcane_torrent_mana)
 	#dark_soul,if=talent.demonbolt.enabled&((charges=2&((!glyph.imp_swarm.enabled&(dot.corruption.ticking|trinket.proc.haste.remains<=10))|cooldown.imp_swarm.remains))|target.time_to_die<buff.demonbolt.remains|(!buff.demonbolt.remains&demonic_fury>=790))
 	if Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 and { not Glyph(glyph_of_imp_swarm) and { target.DebuffPresent(corruption_debuff) or BuffRemaining(trinket_proc_haste_buff) <= 10 } or SpellCooldown(imp_swarm) > 0 } or target.TimeToDie() < BuffRemaining(demonbolt_buff) or not BuffPresent(demonbolt_buff) and DemonicFury() >= 790 } Spell(dark_soul_knowledge)
-	#dark_soul,if=!talent.demonbolt.enabled&(charges=2|!talent.archimondes_darkness.enabled|(target.time_to_die<=20&!glyph.dark_soul.enabled|target.time_to_die<=10)|(target.time_to_die<=60&demonic_fury>400)|((trinket.stacking_proc.multistrike.remains>7.5|trinket.proc.any.remains>7.5)&demonic_fury>=400))
-	if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 or not Talent(archimondes_darkness_talent) or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or { BuffRemaining(trinket_stacking_proc_multistrike_buff) > 7.5 or BuffRemaining(trinket_proc_any_buff) > 7.5 } and DemonicFury() >= 400 } Spell(dark_soul_knowledge)
+	#dark_soul,if=!talent.demonbolt.enabled&((charges=2&(time>6|(debuff.shadowflame.stack=1&action.hand_of_guldan.in_flight)))|!talent.archimondes_darkness.enabled|(target.time_to_die<=20&!glyph.dark_soul.enabled|target.time_to_die<=10)|(target.time_to_die<=60&demonic_fury>400)|((trinket.stacking_proc.multistrike.remains>7.5|trinket.proc.any.remains>7.5)&demonic_fury>=400))
+	if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 and { TimeInCombat() > 6 or target.DebuffStacks(shadowflame_debuff) == 1 and InFlightToTarget(hand_of_guldan) } or not Talent(archimondes_darkness_talent) or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or { BuffRemaining(trinket_stacking_proc_multistrike_buff) > 7.5 or BuffRemaining(trinket_proc_any_buff) > 7.5 } and DemonicFury() >= 400 } Spell(dark_soul_knowledge)
 	#imp_swarm,if=!talent.demonbolt.enabled&(buff.dark_soul.up|(cooldown.dark_soul.remains>(120%(1%spell_haste)))|time_to_die<32)&time>3
 	if not Talent(demonbolt_talent) and { BuffPresent(dark_soul_knowledge_buff) or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { 100 / { 100 + SpellHaste() } } } or target.TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
 
-	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan) or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() < 20 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(grimoire_felguard)
+	unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan) or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(service_felguard)
 	{
 		#summon_doomguard,if=!talent.demonic_servitude.enabled&active_enemies<9
 		if not Talent(demonic_servitude_talent) and Enemies() < 9 Spell(summon_doomguard)
@@ -255,9 +255,6 @@ AddFunction DemonologyPrecombatShortCdActions
 	{
 		#summon_pet,if=!talent.demonic_servitude.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.grimoire_of_sacrifice.down)
 		if not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() Spell(summon_felguard)
-		#snapshot_stats
-		#service_pet,if=talent.grimoire_of_service.enabled
-		if Talent(grimoire_of_service_talent) Spell(grimoire_felguard)
 	}
 }
 
@@ -274,18 +271,15 @@ AddFunction DemonologyPrecombatCdActions
 		if Talent(demonic_servitude_talent) and Enemies() < 9 Spell(summon_doomguard)
 		#summon_infernal,if=talent.demonic_servitude.enabled&active_enemies>=9
 		if Talent(demonic_servitude_talent) and Enemies() >= 9 Spell(summon_infernal)
-
-		unless Talent(grimoire_of_service_talent) and Spell(grimoire_felguard)
-		{
-			#potion,name=draenic_intellect
-			DemonologyUsePotionIntellect()
-		}
+		#snapshot_stats
+		#potion,name=draenic_intellect
+		DemonologyUsePotionIntellect()
 	}
 }
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
-	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard) or Talent(grimoire_of_service_talent) and Spell(grimoire_felguard) or Spell(soul_fire)
+	not BuffPresent(spell_power_multiplier_buff any=1) and Spell(dark_intent) or not Talent(demonic_servitude_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(grimoire_of_sacrifice_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(soul_fire)
 }
 
 ### Demonology icons.
@@ -364,7 +358,6 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # felguard_felstorm
 # glyph_of_dark_soul
 # glyph_of_imp_swarm
-# grimoire_felguard
 # grimoire_of_sacrifice_buff
 # grimoire_of_sacrifice_talent
 # grimoire_of_service_talent
@@ -379,6 +372,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # metamorphosis
 # metamorphosis_buff
 # molten_core_buff
+# service_felguard
 # shadow_bolt
 # shadowflame_debuff
 # soul_fire

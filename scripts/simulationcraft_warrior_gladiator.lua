@@ -25,6 +25,13 @@ AddFunction ProtectionGladiatorUsePotionArmor
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
+AddFunction ProtectionGladiatorUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ProtectionGladiatorGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -81,8 +88,8 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 		if not IsEnraged() Spell(berserker_rage)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
-		#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=50-buff.unyielding_strikes.stack*5))&target.health.pct>20
-		if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 50 - BuffStacks(unyielding_strikes_buff) * 5 } and target.HealthPercent() > 20 Spell(heroic_strike)
+		#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=80-buff.unyielding_strikes.stack*10))&target.health.pct>20
+		if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 80 - BuffStacks(unyielding_strikes_buff) * 10 } and target.HealthPercent() > 20 Spell(heroic_strike)
 		#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
 		if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
 		#call_action_list,name=single,if=active_enemies=1
@@ -105,6 +112,8 @@ AddFunction ProtectionGladiatorDefaultCdActions
 	{
 		#bloodbath
 		Spell(bloodbath)
+		#use_item,name=vial_of_convulsive_shadows,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
+		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 15 ProtectionGladiatorUseItemActions()
 		#blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
 		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(blood_fury_ap)
 		#berserking,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
@@ -239,8 +248,8 @@ AddFunction ProtectionGladiatorSingleShortCdActions
 	{
 		#storm_bolt
 		Spell(storm_bolt)
-		#dragon_roar
-		Spell(dragon_roar)
+		#dragon_roar,if=buff.unyielding_strikes.stack>=4&buff.unyielding_strikes.stack<6
+		if BuffStacks(unyielding_strikes_buff) >= 4 and BuffStacks(unyielding_strikes_buff) < 6 Spell(dragon_roar)
 	}
 }
 

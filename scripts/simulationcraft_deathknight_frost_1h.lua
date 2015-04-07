@@ -84,8 +84,8 @@ AddFunction FrostDualWieldDefaultShortCdActions
 
 AddFunction FrostDualWieldDefaultCdActions
 {
-	#mind_freeze
-	FrostDualWieldInterruptActions()
+	#mind_freeze,if=!glyph.mind_freeze.enabled
+	if not Glyph(glyph_of_mind_freeze) FrostDualWieldInterruptActions()
 	#potion,name=draenic_strength,if=target.time_to_die<=30|(target.time_to_die<=60&buff.pillar_of_frost.up)
 	if target.TimeToDie() <= 30 or target.TimeToDie() <= 60 and BuffPresent(pillar_of_frost_buff) FrostDualWieldUsePotionStrength()
 	#empower_rune_weapon,if=target.time_to_die<=60&buff.potion.up
@@ -497,6 +497,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # frost_fever_debuff
 # frost_presence
 # frost_strike
+# glyph_of_mind_freeze
 # horn_of_winter
 # howling_blast
 # killing_machine_buff

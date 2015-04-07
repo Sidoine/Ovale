@@ -25,6 +25,13 @@ AddFunction ProtectionUsePotionArmor
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
+AddFunction ProtectionUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -74,6 +81,8 @@ AddFunction ProtectionDefaultCdActions
 {
 	#pummel
 	ProtectionInterruptActions()
+	#use_item,name=tablet_of_turnbuckle_teamwork,if=active_enemies=1&(buff.bloodbath.up|!talent.bloodbath.enabled)|(active_enemies>=2&buff.ravager_protection.up)
+	if Enemies() == 1 and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or Enemies() >= 2 and BuffPresent(ravager_protection_buff) ProtectionUseItemActions()
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.bloodbath.up|buff.avatar.up
@@ -89,7 +98,7 @@ AddFunction ProtectionDefaultCdActions
 AddFunction ProtectionPrecombatMainActions
 {
 	#flask,type=greater_draenic_stamina_flask
-	#food,type=pickled_eel
+	#food,type=sleeper_sushi
 	#battle_shout,if=!aura.attack_power_multiplier.up&aura.stamina.up
 	if not BuffPresent(attack_power_multiplier_buff any=1) and BuffPresent(stamina_buff any=1) and BuffExpires(stamina_buff) Spell(battle_shout)
 	#commanding_shout,if=!aura.stamina.up

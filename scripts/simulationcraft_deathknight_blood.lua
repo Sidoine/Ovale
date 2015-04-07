@@ -125,16 +125,16 @@ AddFunction BloodDefaultShortCdActions
 
 AddFunction BloodDefaultCdActions
 {
-	#mind_freeze
-	BloodInterruptActions()
+	#mind_freeze,if=!glyph.mind_freeze.enabled
+	if not Glyph(glyph_of_mind_freeze) BloodInterruptActions()
+	#potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
+	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 BloodUsePotionArmor()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
-	#potion,name=draenic_armor,if=buff.potion.down&buff.blood_shield.down&!unholy&!frost
-	if BuffExpires(potion_armor_buff) and BuffExpires(blood_shield_buff) and not Rune(unholy) >= 1 and not Rune(frost) >= 1 BloodUsePotionArmor()
 
 	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion)
 	{
@@ -262,6 +262,8 @@ AddFunction BloodPrecombatCdActions
 		#snapshot_stats
 		#potion,name=draenic_armor
 		BloodUsePotionArmor()
+		#army_of_the_dead
+		Spell(army_of_the_dead)
 	}
 }
 
@@ -400,6 +402,7 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 # draenic_armor_potion
 # empower_rune_weapon
 # frost_fever_debuff
+# glyph_of_mind_freeze
 # horn_of_winter
 # icebound_fortitude
 # icebound_fortitude_buff

@@ -130,22 +130,20 @@ AddFunction BrewmasterAoeMainActions
 	if Chi() >= 4 Spell(chi_explosion_tank)
 	#chi_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0&chi<=3&chi>=1&(buff.shuffle.remains>=6|target.time_to_die<buff.shuffle.remains)&!glyph.touch_of_death.enabled
 	if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 and Chi() <= 3 and Chi() >= 1 and { BuffRemaining(shuffle_buff) >= 6 or target.TimeToDie() < BuffRemaining(shuffle_buff) } and not Glyph(glyph_of_touch_of_death) Spell(chi_brew)
-	#breath_of_fire,if=(chi>=3|buff.serenity.up)&buff.shuffle.remains>=6&dot.breath_of_fire.remains<=2.4&!talent.chi_explosion.enabled
-	if { Chi() >= 3 or BuffPresent(serenity_buff) } and BuffRemaining(shuffle_buff) >= 6 and target.DebuffRemaining(breath_of_fire_debuff) <= 2.4 and not Talent(chi_explosion_talent) Spell(breath_of_fire)
-	#keg_smash,if=chi.max-chi>=1&!buff.serenity.remains
-	if MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) Spell(keg_smash)
-	#rushing_jade_wind,if=chi.max-chi>=1&!buff.serenity.remains&talent.rushing_jade_wind.enabled
-	if MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Talent(rushing_jade_wind_talent) Spell(rushing_jade_wind)
-	#chi_wave,if=energy.time_to_max>2&buff.serenity.down
-	if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_wave)
-	#zen_sphere,cycle_targets=1,if=!dot.zen_sphere.ticking&energy.time_to_max>2&buff.serenity.down
-	if not BuffPresent(zen_sphere_buff) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(zen_sphere)
-	#blackout_kick,if=chi>=4
-	if Chi() >= 4 Spell(blackout_kick)
+	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
+	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
 	#blackout_kick,if=buff.shuffle.remains<=3&cooldown.keg_smash.remains>=gcd
 	if BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() Spell(blackout_kick)
 	#blackout_kick,if=buff.serenity.up
 	if BuffPresent(serenity_buff) Spell(blackout_kick)
+	#rushing_jade_wind,if=chi.max-chi>=1&buff.serenity.down
+	if MaxChi() - Chi() >= 1 and BuffExpires(serenity_buff) Spell(rushing_jade_wind)
+	#chi_wave,if=energy.time_to_max>2&buff.serenity.down
+	if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_wave)
+	#zen_sphere,cycle_targets=1,if=!dot.zen_sphere.ticking&energy.time_to_max>2&buff.serenity.down
+	if not BuffPresent(zen_sphere_buff) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(zen_sphere)
+	#blackout_kick,if=chi.max-chi<2
+	if MaxChi() - Chi() < 2 Spell(blackout_kick)
 	#expel_harm,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=80
 	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 Spell(expel_harm)
 	#jab,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=80
@@ -173,7 +171,7 @@ AddFunction BrewmasterAoeShortCdActions
 			#guard,if=incoming_damage_10s>=health.max*0.5
 			if IncomingDamage(10) >= MaxHealth() * 0.5 Spell(guard)
 
-			unless { Chi() >= 3 or BuffPresent(serenity_buff) } and BuffRemaining(shuffle_buff) >= 6 and target.DebuffRemaining(breath_of_fire_debuff) <= 2.4 and not Talent(chi_explosion_talent) and Spell(breath_of_fire) or MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Spell(keg_smash) or MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Talent(rushing_jade_wind_talent) and Spell(rushing_jade_wind)
+			unless MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(keg_smash) or BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() and Spell(blackout_kick) or BuffPresent(serenity_buff) and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and BuffExpires(serenity_buff) and Spell(rushing_jade_wind)
 			{
 				#chi_burst,if=energy.time_to_max>2&buff.serenity.down
 				if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -224,20 +222,20 @@ AddFunction BrewmasterStMainActions
 	if BuffExpires(shuffle_buff) Spell(blackout_kick)
 	#chi_explosion,if=chi>=3
 	if Chi() >= 3 Spell(chi_explosion_tank)
-	#chi_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0&chi<=3&chi>=1&(buff.shuffle.remains>=6|target.time_to_die<buff.shuffle.remains)&!glyph.touch_of_death.enabled
-	if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 and Chi() <= 3 and Chi() >= 1 and { BuffRemaining(shuffle_buff) >= 6 or target.TimeToDie() < BuffRemaining(shuffle_buff) } and not Glyph(glyph_of_touch_of_death) Spell(chi_brew)
-	#keg_smash,if=chi.max-chi>=1&!buff.serenity.remains
-	if MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) Spell(keg_smash)
+	#chi_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0&chi.max-chi>=2&(buff.shuffle.remains>=6|target.time_to_die<buff.shuffle.remains)&!glyph.touch_of_death.enabled
+	if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 and MaxChi() - Chi() >= 2 and { BuffRemaining(shuffle_buff) >= 6 or target.TimeToDie() < BuffRemaining(shuffle_buff) } and not Glyph(glyph_of_touch_of_death) Spell(chi_brew)
+	#keg_smash,if=chi.max-chi>=2&!buff.serenity.remains
+	if MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) Spell(keg_smash)
+	#blackout_kick,if=buff.shuffle.remains<=3&cooldown.keg_smash.remains>=gcd
+	if BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() Spell(blackout_kick)
+	#blackout_kick,if=buff.serenity.up
+	if BuffPresent(serenity_buff) Spell(blackout_kick)
 	#chi_wave,if=energy.time_to_max>2&buff.serenity.down
 	if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=!dot.zen_sphere.ticking&energy.time_to_max>2&buff.serenity.down
 	if not BuffPresent(zen_sphere_buff) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(zen_sphere)
 	#blackout_kick,if=chi.max-chi<2
 	if MaxChi() - Chi() < 2 Spell(blackout_kick)
-	#blackout_kick,if=buff.shuffle.remains<=3&cooldown.keg_smash.remains>=gcd
-	if BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() Spell(blackout_kick)
-	#blackout_kick,if=buff.serenity.up
-	if BuffPresent(serenity_buff) Spell(blackout_kick)
 	#expel_harm,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=80
 	if MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 Spell(expel_harm)
 	#jab,if=chi.max-chi>=1&cooldown.keg_smash.remains>=gcd&cooldown.expel_harm.remains>=gcd&(energy+(energy.regen*(cooldown.keg_smash.remains)))>=80
@@ -265,7 +263,7 @@ AddFunction BrewmasterStShortCdActions
 			#guard,if=incoming_damage_10s>=health.max*0.5
 			if IncomingDamage(10) >= MaxHealth() * 0.5 Spell(guard)
 
-			unless MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Spell(keg_smash)
+			unless MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(keg_smash) or BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() and Spell(blackout_kick) or BuffPresent(serenity_buff) and Spell(blackout_kick)
 			{
 				#chi_burst,if=energy.time_to_max>2&buff.serenity.down
 				if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -276,7 +274,7 @@ AddFunction BrewmasterStShortCdActions
 
 AddFunction BrewmasterStShortCdPostConditions
 {
-	BuffExpires(shuffle_buff) and Spell(blackout_kick) or Chi() >= 3 and Spell(chi_explosion_tank) or MaxChi() - Chi() >= 1 and not BuffPresent(serenity_buff) and Spell(keg_smash) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or not BuffPresent(zen_sphere_buff) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(zen_sphere) or MaxChi() - Chi() < 2 and Spell(blackout_kick) or BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() and Spell(blackout_kick) or BuffPresent(serenity_buff) and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(expel_harm) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(jab) or Spell(tiger_palm)
+	BuffExpires(shuffle_buff) and Spell(blackout_kick) or Chi() >= 3 and Spell(chi_explosion_tank) or MaxChi() - Chi() >= 2 and not BuffPresent(serenity_buff) and Spell(keg_smash) or BuffRemaining(shuffle_buff) <= 3 and SpellCooldown(keg_smash) >= GCD() and Spell(blackout_kick) or BuffPresent(serenity_buff) and Spell(blackout_kick) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or not BuffPresent(zen_sphere_buff) and TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(zen_sphere) or MaxChi() - Chi() < 2 and Spell(blackout_kick) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(expel_harm) or MaxChi() - Chi() >= 1 and SpellCooldown(keg_smash) >= GCD() and SpellCooldown(expel_harm) >= GCD() and Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) >= 80 and Spell(jab) or Spell(tiger_palm)
 }
 
 ### Brewmaster icons.
@@ -334,12 +332,9 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # berserking
 # blackout_kick
 # blood_fury_apsp
-# breath_of_fire
-# breath_of_fire_debuff
 # chi_brew
 # chi_brew_talent
 # chi_burst
-# chi_explosion_talent
 # chi_explosion_tank
 # chi_wave
 # dampen_harm
@@ -367,7 +362,6 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # purifying_brew
 # quaking_palm
 # rushing_jade_wind
-# rushing_jade_wind_talent
 # serenity
 # serenity_buff
 # serenity_talent

@@ -72,8 +72,8 @@ AddFunction WindwalkerDefaultMainActions
 	if Enemies() < 3 and { Level() < 100 or not Talent(chi_explosion_talent) } WindwalkerStMainActions()
 	#call_action_list,name=st_chix,if=active_enemies=1&talent.chi_explosion.enabled
 	if Enemies() == 1 and Talent(chi_explosion_talent) WindwalkerStChixMainActions()
-	#call_action_list,name=cleave_chix,if=(active_enemies=2|active_enemies=3)&talent.chi_explosion.enabled
-	if { Enemies() == 2 or Enemies() == 3 } and Talent(chi_explosion_talent) WindwalkerCleaveChixMainActions()
+	#call_action_list,name=cleave_chix,if=(active_enemies=2|active_enemies=3&!talent.rushing_jade_wind.enabled)&talent.chi_explosion.enabled
+	if { Enemies() == 2 or Enemies() == 3 and not Talent(rushing_jade_wind_talent) } and Talent(chi_explosion_talent) WindwalkerCleaveChixMainActions()
 	#call_action_list,name=aoe_norjw,if=active_enemies>=3&!talent.rushing_jade_wind.enabled&!talent.chi_explosion.enabled
 	if Enemies() >= 3 and not Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) WindwalkerAoeNorjwMainActions()
 	#call_action_list,name=aoe_norjw_chix,if=active_enemies>=4&!talent.rushing_jade_wind.enabled&talent.chi_explosion.enabled
@@ -125,10 +125,10 @@ AddFunction WindwalkerDefaultShortCdActions
 
 						unless Enemies() == 1 and Talent(chi_explosion_talent) and WindwalkerStChixShortCdPostConditions()
 						{
-							#call_action_list,name=cleave_chix,if=(active_enemies=2|active_enemies=3)&talent.chi_explosion.enabled
-							if { Enemies() == 2 or Enemies() == 3 } and Talent(chi_explosion_talent) WindwalkerCleaveChixShortCdActions()
+							#call_action_list,name=cleave_chix,if=(active_enemies=2|active_enemies=3&!talent.rushing_jade_wind.enabled)&talent.chi_explosion.enabled
+							if { Enemies() == 2 or Enemies() == 3 and not Talent(rushing_jade_wind_talent) } and Talent(chi_explosion_talent) WindwalkerCleaveChixShortCdActions()
 
-							unless { Enemies() == 2 or Enemies() == 3 } and Talent(chi_explosion_talent) and WindwalkerCleaveChixShortCdPostConditions()
+							unless { Enemies() == 2 or Enemies() == 3 and not Talent(rushing_jade_wind_talent) } and Talent(chi_explosion_talent) and WindwalkerCleaveChixShortCdPostConditions()
 							{
 								#call_action_list,name=aoe_norjw,if=active_enemies>=3&!talent.rushing_jade_wind.enabled&!talent.chi_explosion.enabled
 								if Enemies() >= 3 and not Talent(rushing_jade_wind_talent) and not Talent(chi_explosion_talent) WindwalkerAoeNorjwShortCdActions()
