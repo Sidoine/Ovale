@@ -1117,6 +1117,86 @@ do
 end
 
 do
+	--- Get the current estimated damage of a spell on the target if it is a critical strike.
+	-- @name CritDamage
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The estimated critical strike damage of the given spell.
+	-- @return A boolean value for the result of the comparison.
+	-- @see Damage
+
+	local AMPLIFICATION = 146051
+	local INCREASED_CRIT_EFFECT_3_PERCENT = 44797
+
+	local function CritDamage(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local target = ParseCondition(positionalParams, namedParams, state, "target")
+		local value = ComputeParameter(spellId, "damage", state, atTime) or 0
+		-- Reduce by armor damage reduction for physical attacks.
+		local si = OvaleData.spellInfo[spellId]
+		if si.physical == 1 then
+			value = value * (1 - BossArmorDamageReduction(target))
+		end
+		-- Default crit damage is two times normal damage.
+		local critMultiplier = 2
+		-- Add additional critical strike damage from MoP amplification trinkets.
+		do
+			local aura = state:GetAura("player", AMPLIFICATION, "HELPFUL")
+			if state:IsActiveAura(aura, atTime) then
+				critMultiplier = critMultiplier + aura.value1
+			end
+		end
+		-- Multiply by increased crit effect from the meta gem.
+		do
+			local aura = state:GetAura("player", INCREASED_CRIT_EFFECT_3_PERCENT, "HELPFUL")
+			if state:IsActiveAura(aura, atTime) then
+				critMultiplier = critMultiplier * aura.value1
+			end
+		end
+		value = critMultiplier * value
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("critdamage", false, CritDamage)
+
+	--- Get the current estimated damage of a spell on the target.
+	-- The script must provide a function to calculate the damage of the spell and assign it to the "damage" SpellInfo() parameter.
+	-- @name Damage
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The estimated damage of the given spell on the target.
+	-- @return A boolean value for the result of the comparison.
+	-- @see CritDamage, LastDamage, LastEstimatedDamage
+	-- @usage
+	-- if {target.Damage(rake) / target.LastEstimateDamage(rake)} >1.1
+	--     Spell(rake)
+
+	local function Damage(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local target = ParseCondition(positionalParams, namedParams, state, "target")
+		local value = ComputeParameter(spellId, "damage", state, atTime) or 0
+		-- Reduce by armor damage reduction for physical attacks.
+		local si = OvaleData.spellInfo[spellId]
+		if si.physical == 1 then
+			value = value * (1 - BossArmorDamageReduction(target))
+		end
+		return Compare(value, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("damage", false, Damage)
+end
+
+do
 	--- Get the damage taken by the player in the previous time interval.
 	-- @name DamageTaken
 	-- @paramsig number or boolean

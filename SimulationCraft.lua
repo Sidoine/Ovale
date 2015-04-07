@@ -2519,6 +2519,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("SpellCooldown(%s)", name)
 	elseif property == "cooldown_react" then
 		code = format("not SpellCooldown(%s) > 0", name)
+	elseif property == "crit_damage" then
+		code = format("%sCritDamage(%s)", target, name)
 	elseif property == "duration" then
 		code = format("BaseDuration(%s)", buffName)
 		symbol = buffName
@@ -2533,6 +2535,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("ExecuteTime(%s)", name)
 	elseif property == "gcd" then
 		code = "GCD()"
+	elseif property == "hit_damage" then
+		code = format("%sDamage(%s)", target, name)
 	elseif property == "in_flight" or property == "in_flight_to_target" then
 		code = format("InFlightToTarget(%s)", name)
 	elseif property == "miss_react" then
@@ -2690,6 +2694,7 @@ do
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
+		["crit_pct_current"]	= "SpellCritChance()",
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
