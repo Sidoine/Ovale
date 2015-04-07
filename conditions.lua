@@ -4254,8 +4254,6 @@ do
 			if OvaleCondition.COMPARATOR[spellId] then
 				comparator, limit = spellId, positionalParams[i + 1]
 				break
-			elseif not OvaleSpellBook:IsKnownSpell(spellId) then
-				-- Skip unknown spells.
 			elseif not usable or state:IsUsableSpell(spellId, atTime, OvaleGUID:GetGUID(target)) then
 				local start, duration = state:GetSpellCooldown(spellId)
 				local t = 0
