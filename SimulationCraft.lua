@@ -1750,7 +1750,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "Enemies() > 1"
 		elseif class == "WARLOCK" and action == "service_pet" then
 			if annotation.pet then
-				local spellName = "grimoire_" .. annotation.pet
+				local spellName = "service_" .. annotation.pet
 				AddSymbol(annotation, spellName)
 				bodyCode = format("Spell(%s)", spellName)
 			else
@@ -2997,6 +2997,8 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 			code = format("TotemPresent(%s)", name)
 		elseif isTotem and property == "remains" then
 			code = format("TotemRemaining(%s)", name)
+		elseif property == "active" then
+			code = "pet.Present()"
 		else
 			-- Strip the "pet.<name>." from the operand and re-evaluate.
 			local pattern = format("^pet%%.%s%%.([%%w_.]+)", name)
@@ -3368,6 +3370,19 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 			code = format("BuffRemaining(%s)", buffName)
 		elseif property == "up" then
 			code = format("BuffExpires(%s)", buffName)
+		else
+			ok = false
+		end
+	elseif class == "WARLOCK" and strmatch(operand, "pet%.service_[a-z_]+%..+") then
+		local spellName, property = strmatch(operand, "pet%.(service_[a-z_]+)%.(.+)")
+		if property == "active" then
+			--[[
+				It's not possible to track guardian pets, so assume the pet is active
+				if the spell was recently placed on cooldown.  The "service_pet" spells
+				have a shared cooldown of 120s and the guardian pet lasts for 20s.
+			--]]
+			code = format("SpellCooldown(%s) > 100", spellName)
+			AddSymbol(annotation, spellName)
 		else
 			ok = false
 		end
