@@ -2921,6 +2921,8 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 			code = format("%s%sRemaining(%s)", target, prefix, dotName)
 		elseif property == "stack" then
 			code = format("%s%sStacks(%s)", target, prefix, dotName)
+		elseif property == "tick_dmg" then
+			code = format("%sTickValue(%s)", target, prefix, dotName)
 		elseif property == "ticking" then
 			code = format("%s%sPresent(%s)", target, prefix, dotName)
 		elseif property == "ticks_remain" then
