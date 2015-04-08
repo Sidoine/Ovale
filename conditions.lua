@@ -3621,6 +3621,25 @@ do
 end
 
 do
+	--- Test if the previous spell cast that did not trigger the GCD matches the given spell.
+	-- @name PreviousOffGCDSpell
+	-- @paramsig boolean
+	-- @param id The spell ID.
+	-- @param yesno Optional. If yes, then return true if there is a match. If no, then return true if it doesn't match.
+	--     Default is yes.
+	--     Valid values: yes, no.
+	-- @return A boolean value.
+
+	local function PreviousOffGCDSpell(positionalParams, namedParams, state, atTime)
+		local spellId, yesno = positionalParams[1], positionalParams[2]
+		local boolean = (spellId == state.lastOffGCDSpellId)
+		return TestBoolean(boolean, yesno)
+	end
+
+	OvaleCondition:RegisterCondition("previousoffgcdspell", true, PreviousOffGCDSpell)
+end
+
+do
 	--- Test if the previous spell cast matches the given spell.
 	-- @name PreviousSpell
 	-- @paramsig boolean

@@ -2452,7 +2452,7 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 			ok, node = EmitOperandGlyph(operand, parseNode, nodeList, annotation, action)
 		elseif token == "pet" then
 			ok, node = EmitOperandPet(operand, parseNode, nodeList, annotation, action)
-		elseif token == "prev" or token == "prev_gcd" then
+		elseif token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
 			ok, node = EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action)
 		elseif token == "seal" then
 			ok, node = EmitOperandSeal(operand, parseNode, nodeList, annotation, action)
@@ -3051,14 +3051,16 @@ EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, ac
 
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
-	if token == "prev" or token == "prev_gcd" then
+	if token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
 		local name = tokenIterator()
 		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local code
 		if token == "prev" then
 			code = format("PreviousSpell(%s)", name)
-		else -- if token == "prev_gcd" then
+		elseif token == "prev_gcd" then
 			code = format("PreviousGCDSpell(%s)", name)
+		else -- if token == "prev_off_gcd" then
+			code = format("PreviousOffGCDSpell(%s)", name)
 		end
 		if ok and code then
 			annotation.astAnnotation = annotation.astAnnotation or {}
