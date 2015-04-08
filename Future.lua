@@ -60,7 +60,7 @@ local self_petGUID = nil
 -- Pool of spellcast tables.
 local self_pool = OvalePool("OvaleFuture_pool")
 
--- Time at which an aura on the player was last added.
+-- Time at which an aura on the player was most recently added.
 local self_timeAuraAdded = nil
 
 --[[
@@ -153,9 +153,11 @@ OvaleFuture.queue = {}
 -- Table of most recent cast times of spells, indexed by spell ID.
 OvaleFuture.lastCastTime = {}
 -- The most recent spellcast.
-OvaleFuture.lastSpellcast = {}
+OvaleFuture.lastSpellcast = nil
 -- The most recent spellcast that triggered the global cooldown.
 OvaleFuture.lastGCDSpellcast = {}
+-- The most recent spellcast that was off the global cooldown.
+OvaleFuture.lastOffGCDSpellcast = {}
 -- Spell counters.
 OvaleFuture.counter = {}
 --</public-static-properties>
@@ -348,11 +350,11 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 						if finished then
 							-- Update snapshots in cached spellcasts.
 							if self_timeAuraAdded then
-								if IsSameSpellcast(spellcast, self.lastSpellcast) then
-									self:UpdateSpellcastSnapshot(self.lastSpellcast, self_timeAuraAdded)
-								end
 								if IsSameSpellcast(spellcast, self.lastGCDSpellcast) then
 									self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, self_timeAuraAdded)
+								end
+								if IsSameSpellcast(spellcast, self.lastOffGCDSpellcast) then
+									self:UpdateSpellcastSnapshot(self.lastOffGCDSpellcast, self_timeAuraAdded)
 								end
 							end
 							local delta = now - spellcast.stop
@@ -712,8 +714,8 @@ function OvaleFuture:Ovale_AuraAdded(event, atTime, guid, auraId, caster)
 	if guid == self_playerGUID then
 		self_timeAuraAdded = atTime
 		-- Update snapshots in cached spellcasts.
-		self:UpdateSpellcastSnapshot(self.lastSpellcast, atTime)
 		self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, atTime)
+		self:UpdateSpellcastSnapshot(self.lastOffGCDSpellcast, atTime)
 	end
 end
 
@@ -1015,17 +1017,19 @@ end
 function OvaleFuture:UpdateLastSpellcast(atTime, spellcast)
 	self:StartProfiling("OvaleFuture_UpdateLastSpellcast")
 	-- Update the time that this spell was most recently cast.
-	self:Debug("    Caching spell %s (%d) as most recent spellcast.", spellcast.spellName, spellcast.spellId)
 	self.lastCastTime[spellcast.spellId] = atTime
-	for k, v in pairs(spellcast) do
-		self.lastSpellcast[k] = v
-	end
-	local gcd = OvaleData:GetSpellInfoProperty(spellcast.spellId, spellcast.start, "gcd", spellcast.target)
-	if not gcd or gcd > 0 then
+	if spellcast.offgcd then
+		self:Debug("    Caching spell %s (%d) as most recent off-GCD spellcast.", spellcast.spellName, spellcast.spellId)
+		for k, v in pairs(spellcast) do
+			self.lastOffGCDSpellcast[k] = v
+		end
+		self.lastSpellcast = self.lastOffGCDSpellcast
+	else
 		self:Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId)
 		for k, v in pairs(spellcast) do
 			self.lastGCDSpellcast[k] = v
 		end
+		self.lastSpellcast = self.lastGCDSpellcast
 	end
 	self:StopProfiling("OvaleFuture_UpdateLastSpellcast")
 end
@@ -1085,6 +1089,8 @@ statePrototype.channel = nil
 statePrototype.lastSpellId = nil
 -- The previous GCD spell cast in the simulator.
 statePrototype.lastGCDSpellId = nil
+-- The previous off-GCD spell cast in the simulator.
+statePrototype.lastOffGCDSpellId = nil
 -- Counters for spells cast in the simulator.
 statePrototype.counter = nil
 --</state-properties>
@@ -1118,34 +1124,40 @@ function OvaleFuture:ResetState(state)
 		end
 	end
 
-	local lastSpellcastFound, lastGCDSpellcastFound
+	local lastGCDSpellcastFound, lastOffGCDSpellcastFound, lastSpellcastFound
 	for i = #self.queue, 1, -1 do
 		local spellcast = self.queue[i]
 		if spellcast.spellId and spellcast.start then
 			state:Log("    Found cast %d of spell %s (%d), start = %s, stop = %s.", i, spellcast.spellName, spellcast.spellId, spellcast.start, spellcast.stop)
-			if spellcast.stop and spellcast.start <= now and now < spellcast.stop then
-				-- This spell is being actively cast.
-				if not lastSpellcastFound then
+			if not lastSpellcastFound then
+				state.lastSpellId = spellcast.spellId
+				if spellcast.start and spellcast.stop and spellcast.start <= now and now < spellcast.stop then
+					-- This spell is being actively cast.
 					state.currentSpellId = spellcast.spellId
 					state.startCast = spellcast.start
 					state.endCast = spellcast.stop
 					state.channel = spellcast.channel
-					lastSpellcastFound = true
 				end
-				if not lastGCDSpellcastFound then
-					local gcd = OvaleData:GetSpellInfoProperty(spellcast.spellId, spellcast.start, "gcd", spellcast.target)
-					if not gcd or gcd > 0 then
-						state.lastGCDSpellId = spellcast.spellId
-						if state.nextCast < spellcast.stop then
-							state.nextCast = spellcast.stop
-							reason = " (waiting for spellcast)"
-						end
-						lastGCDSpellcastFound = true
-					end
+				lastSpellcastFound = true
+			end
+			if not lastGCDSpellcastFound and not spellcast.offgcd then
+				state.lastGCDSpellId = spellcast.spellId
+				if spellcast.stop and state.nextCast < spellcast.stop then
+					--[[
+						The most recent GCD spellcast is still being cast, so adjust the next
+						cast time to the end of the spellcast.
+					--]]
+					state.nextCast = spellcast.stop
+					reason = " (waiting for spellcast)"
 				end
+				lastGCDSpellcastFound = true
+			end
+			if not lastOffGCDSpellcastFound and spellcast.offgcd then
+				state.lastOffGCDSpellId = spellcast.spellId
+				lastOffGCDSpellcastFound = true
 			end
 		end
-		if lastSpellcastFound and lastGCDSpellcastFound then
+		if lastGCDSpellcastFound and lastOffGCDSpellcastFound and lastSpellcastFound then
 			break
 		end
 	end
@@ -1163,24 +1175,27 @@ function OvaleFuture:ResetState(state)
 			end
 		end
 	end
-
 	if not lastGCDSpellcastFound then
 		local spellcast = self.lastGCDSpellcast
 		if spellcast then
 			state.lastGCDSpellId = spellcast.spellId
-			if spellcast.start and spellcast.stop and spellcast.start <= now and now < spellcast.stop then
+			if spellcast.stop and state.nextCast < spellcast.stop then
 				--[[
 					The most recent GCD spellcast is still being cast, so adjust the next
 					cast time to the end of the spellcast.
 				--]]
-				if state.nextCast < spellcast.stop then
-					state.nextCast = spellcast.stop
-					reason = " (waiting for spellcast)"
-				end
+				state.nextCast = spellcast.stop
+				reason = " (waiting for spellcast)"
 			end
 		end
 	end
-
+	if not lastOffGCDSpellcastFound then
+		local spellcast = self.lastOffGCDSpellcast
+		if spellcast then
+			state.lastOffGCDSpellId = spellcast.spellId
+		end
+	end
+	state:Log("    lastSpellId = %s, lastGCDSpellId = %s, lastOffGCDSpellId = %s", state.lastSpellId, state.lastGCDSpellId, state.lastOffGCDSpellId)
 	state:Log("    nextCast = %f%s", state.nextCast, reason)
 
 	wipe(state.lastCast)
@@ -1280,6 +1295,8 @@ statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endC
 		end
 		if gcd > 0 then
 			state.lastGCDSpellId = spellId
+		else
+			state.lastOffGCDSpellId = spellId
 		end
 
 		--[[
