@@ -14,6 +14,7 @@ local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
 local OvaleData = nil
+local OvaleFuture = nil
 local OvaleGUID = nil
 local OvalePaperDoll = nil
 local OvaleSpellBook = nil
@@ -71,6 +72,7 @@ OvaleCooldown.gcd = {
 function OvaleCooldown:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleData = Ovale.OvaleData
+	OvaleFuture = Ovale.OvaleFuture
 	OvaleGUID = Ovale.OvaleGUID
 	OvalePaperDoll = Ovale.OvalePaperDoll
 	OvaleSpellBook = Ovale.OvaleSpellBook
@@ -90,11 +92,13 @@ function OvaleCooldown:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_START", "Update")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "Update")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", "Update")
+	OvaleFuture:RegisterSpellcastInfo(self)
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
 function OvaleCooldown:OnDisable()
 	OvaleState:UnregisterState(self)
+	OvaleFuture:UnregisterSpellcastInfo(self)
 	self:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 	self:UnregisterEvent("BAG_UPDATE_COOLDOWN")
 	self:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
@@ -231,6 +235,24 @@ function OvaleCooldown:GetBaseGCD()
 		end
 	end
 	return gcd, isCaster
+end
+
+-- Copy cooldown information from the spellcast to the destination table.
+function OvaleCooldown:CopySpellcastInfo(spellcast, dest)
+	if spellcast.offgcd then
+		dest.offgcd = spellcast.offgcd
+	end
+end
+
+-- Save cooldown information to the spellcast.
+function OvaleCooldown:SaveSpellcastInfo(spellcast, atTime)
+	local spellId = spellcast.spellId
+	if spellId then
+		local gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
+		if gcd and gcd == 0 then
+			spellcast.offgcd = true
+		end
+	end
 end
 --</public-static-methods>
 

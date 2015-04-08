@@ -33,6 +33,7 @@ local addonFiles = {
 	"Cooldown.lua",
 	"Data.lua",
 	"Equipment.lua",
+	"Future.lua",
 	"Lexer.lua",
 	"PaperDoll.lua",
 	"Runes.lua",
