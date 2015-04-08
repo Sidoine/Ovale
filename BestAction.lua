@@ -384,29 +384,14 @@ function OvaleBestAction:GetAction(node, state, atTime)
 	self:StartProfiling("OvaleBestAction_GetAction")
 	local groupNode = node.child[1]
 	local timeSpan, element = self:Compute(groupNode, state, atTime)
-	self_computedTimeSpan:Reset(timeSpan)
 	if element and element.type == "state" then
-		-- Loop-count check to guard against infinite loops.
-		local loopCount = 0
-		while element and element.type == "state" do
-			loopCount = loopCount + 1
-			if loopCount >= 10 then
-				self:Debug("Found too many SetState() actions -- probably an infinite loop in script.")
-				break
-			end
-			-- Set the state in the simulator.
-			local variable, value = element.positionalParams[1], element.positionalParams[2]
-			local isFuture = not HasTime(self_computedTimeSpan, atTime)
-			state:PutState(variable, value, isFuture)
-			-- Get the cumulative intersection of time spans for these re-computations.
-			self_tempTimeSpan:Reset(self_computedTimeSpan)
-			self:StartNewAction(state)
-			timeSpan, element = self:Compute(groupNode, state, atTime)
-			Intersect(self_tempTimeSpan, timeSpan, self_computedTimeSpan)
-		end
+		-- Set the state in the simulator.
+		local variable, value = element.positionalParams[1], element.positionalParams[2]
+		local isFuture = not HasTime(timeSpan, atTime)
+		state:PutState(variable, value, isFuture)
 	end
 	self:StopProfiling("OvaleBestAction_GetAction")
-	return self_computedTimeSpan, element
+	return timeSpan, element
 end
 
 function OvaleBestAction:PostOrderCompute(element, state, atTime)

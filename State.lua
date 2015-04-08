@@ -184,14 +184,20 @@ end
 -- Put a value into the named state variable.
 statePrototype.PutState = function(state, name, value, isFuture)
 	if isFuture then
-		state:Log("Setting future state: %s = %s.", name, value)
-		state.futureVariable[name] = value
-		state.futureLastEnable[name] = state.currentTime
+		local oldValue = state:GetState(name)
+		if value ~= oldValue then
+			state:Log("Setting future state: %s from %s to %s.", name, oldValue, value)
+			state.futureVariable[name] = value
+			state.futureLastEnable[name] = state.currentTime
+		end
 	else
-		OvaleState:Debug("Advancing combat state: %s = %s.", name, value)
-		state:Log("Advancing combat state: %s = %s.", name, value)
-		state.variable[name] = value
-		state.lastEnable[name] = state.currentTime
+		local oldValue = state.variable[name] or 0
+		if value ~= oldValue then
+			OvaleState:DebugTimestamp("Advancing combat state: %s from %s to %s.", name, oldValue, value)
+			state:Log("Advancing combat state: %s from %s to %s.", name, oldValue, value)
+			state.variable[name] = value
+			state.lastEnable[name] = state.currentTime
+		end
 	end
 end
 
