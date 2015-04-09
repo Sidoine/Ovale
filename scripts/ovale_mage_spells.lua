@@ -194,6 +194,7 @@ Define(prismatic_crystal 152087)
 Define(prismatic_crystal_talent 20)
 Define(pyroblast 11366)
 	SpellInfo(pyroblast travel_time=1)
+	SpellInfo(pyroblast damage=FirePyroblastHitDamage specialization=fire)
 	SpellAddBuff(pyroblast ice_floes_buff=0 if_spell=ice_floes)
 	SpellAddBuff(pyroblast pyroblast_buff=0)
 	SpellAddTargetDebuff(pyroblast pyroblast_debuff=1)
@@ -242,6 +243,9 @@ Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(frost_bomb tag=shortcd)
 	SpellInfo(ice_floes tag=shortcd)
 	SpellInfo(rune_of_power tag=shortcd)
+
+### Pyroblast
+AddFunction FirePyroblastHitDamage asValue=1 { 2.423 * Spellpower() * { BuffPresent(pyroblast_buff asValue=1) * 1.25 } }
 ]]
 
 	OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
