@@ -1816,7 +1816,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				local functionName = OvaleFunctionName(name, annotation)
 				bodyCode = functionName .. "()"
 				-- Special-case the "burn" action list for arcane mages.
-				if class == "MAGE" and specialization == "arcane" and name == "burn" then
+				if class == "MAGE" and specialization == "arcane" and (name == "burn" or name == "init_burn") then
 					conditionCode = "CheckBoxOn(opt_arcane_mage_burn_phase)"
 					annotation.opt_arcane_mage_burn_phase = class
 				end

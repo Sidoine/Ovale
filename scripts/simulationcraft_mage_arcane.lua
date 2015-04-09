@@ -48,7 +48,7 @@ AddFunction ArcaneDefaultMainActions
 	#call_action_list,name=aoe,if=active_enemies>=5
 	if Enemies() >= 5 ArcaneAoeMainActions()
 	#call_action_list,name=init_burn,if=!burn_phase
-	if not GetState(burn_phase) > 0 ArcaneInitBurnMainActions()
+	if not GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnMainActions()
 	#call_action_list,name=burn,if=burn_phase
 	if GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
 	#call_action_list,name=conserve
@@ -73,7 +73,7 @@ AddFunction ArcaneDefaultShortCdActions
 	unless Enemies() >= 5 and ArcaneAoeShortCdPostConditions()
 	{
 		#call_action_list,name=init_burn,if=!burn_phase
-		if not GetState(burn_phase) > 0 ArcaneInitBurnShortCdActions()
+		if not GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnShortCdActions()
 		#call_action_list,name=burn,if=burn_phase
 		if GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
 
@@ -111,7 +111,7 @@ AddFunction ArcaneDefaultCdActions
 			unless Enemies() >= 5 and ArcaneAoeCdPostConditions()
 			{
 				#call_action_list,name=init_burn,if=!burn_phase
-				if not GetState(burn_phase) > 0 ArcaneInitBurnCdActions()
+				if not GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnCdActions()
 				#call_action_list,name=burn,if=burn_phase
 				if GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
 
