@@ -855,7 +855,7 @@ function OvaleFuture:SaveSpellcastInfo(spellcast, atTime)
 	self:UpdateSpellcastSnapshot(spellcast, atTime)
 	-- Save the module-specific information into the spellcast.
 	for _, mod in pairs(self_modules) do
-		local func = mod.CopySpellcastInfo
+		local func = mod.SaveSpellcastInfo
 		if func then
 			func(mod, spellcast, atTime)
 		end
