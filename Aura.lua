@@ -42,8 +42,6 @@ local type = type
 local wipe = wipe
 local API_GetTime = GetTime
 local API_UnitAura = UnitAura
-local API_UnitHealth = UnitHealth
-local API_UnitHealthMax = UnitHealthMax
 local INFINITY = math.huge
 local SCHOOL_MASK_ARCANE = SCHOOL_MASK_ARCANE
 local SCHOOL_MASK_FIRE = SCHOOL_MASK_FIRE
@@ -325,17 +323,14 @@ function OvaleAura:OnEnable()
 	OvaleData:RegisterRequirement("buff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("debuff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("debuff_any", "RequireBuffHandler", self)
-	OvaleData:RegisterRequirement("health_pct", "RequireHealthPercentHandler", self)
 	OvaleData:RegisterRequirement("pet_buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("pet_debuff", "RequireBuffHandler", self)
-	OvaleData:RegisterRequirement("pet_health_pct", "RequireHealthPercentHandler", self)
 	OvaleData:RegisterRequirement("stealth", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("stealthed", "RequireStealthHandler", self)
 	OvaleData:RegisterRequirement("target_buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_buff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_debuff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("target_debuff_any", "RequireBuffHandler", self)
-	OvaleData:RegisterRequirement("target_health_pct", "RequireHealthPercentHandler", self)
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
@@ -345,17 +340,14 @@ function OvaleAura:OnDisable()
 	OvaleData:UnregisterRequirement("buff_any")
 	OvaleData:UnregisterRequirement("debuff")
 	OvaleData:UnregisterRequirement("debuff_any")
-	OvaleData:UnregisterRequirement("health_pct")
 	OvaleData:UnregisterRequirement("pet_buff")
 	OvaleData:UnregisterRequirement("pet_debuff")
-	OvaleData:UnregisterRequirement("pet_health_pct")
 	OvaleData:UnregisterRequirement("stealth")
 	OvaleData:UnregisterRequirement("stealthed")
 	OvaleData:UnregisterRequirement("target_buff")
 	OvaleData:UnregisterRequirement("target_buff_any")
 	OvaleData:UnregisterRequirement("target_debuff")
 	OvaleData:UnregisterRequirement("target_debuff_any")
-	OvaleData:UnregisterRequirement("target_health_pct")
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
@@ -885,56 +877,6 @@ function OvaleAura:RequireStealthHandler(spellId, atTime, requirement, tokens, i
 		end
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
-	end
-	return verified, requirement, index
-end
-
--- Run-time check that the target is below a health percent threshold.
--- NOTE: Mirrored in statePrototype below.
--- TODO: This function should really be moved to a Health module.
-function OvaleAura:RequireHealthPercentHandler(spellId, atTime, requirement, tokens, index, targetGUID)
-	local verified = false
-	-- If index isn't given, then tokens holds the actual token value.
-	local threshold = tokens
-	if index then
-		threshold = tokens[index]
-		index = index + 1
-	end
-	if threshold then
-		local isBang = false
-		if strsub(threshold, 1, 1) == "!" then
-			isBang = true
-			threshold = strsub(threshold, 2)
-		end
-		threshold = tonumber(threshold) or 0
-		local guid, unitId
-		if strsub(requirement, 1, 7) == "target_" then
-			if targetGUID then
-				guid = targetGUID
-				unitId = OvaleGUID:GetUnitId(guid)
-			else
-				unitId = self.defaultTarget or "target"
-			end
-		elseif strsub(requirement, 1, 4) == "pet_" then
-			unitId = "pet"
-		else
-			unitId = "player"
-		end
-		guid = guid or OvaleGUID:GetGUID(unitId)
-		local healthMax = API_UnitHealthMax(unitId)
-		healthMax = healthMax > 0 and healthMax or 1
-		local healthPercent = API_UnitHealth(unitId) / healthMax * 100
-		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
-			verified = true
-		end
-		local result = verified and "passed" or "FAILED"
-		if isBang then
-			self:Log("    Require %s health > %f%% at time=%f: %s", unitId, threshold, atTime, result)
-		else
-			self:Log("    Require %s health <= %f%% at time=%f: %s", unitId, threshold, atTime, result)
-		end
-	else
-		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
 	end
 	return verified, requirement, index
 end
@@ -1654,5 +1596,4 @@ end
 -- Mirrored methods.
 statePrototype.RequireBuffHandler = OvaleAura.RequireBuffHandler
 statePrototype.RequireStealthHandler = OvaleAura.RequireStealthHandler
-statePrototype.RequireHealthPercentHandler = OvaleAura.RequireHealthPercentHandler
 --</state-methods>
