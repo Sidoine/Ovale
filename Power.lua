@@ -563,30 +563,34 @@ function OvalePower:CopySpellcastInfo(spellcast, dest)
 end
 
 -- Save power information to the spellcast.
-function OvalePower:SaveSpellcastInfo(spellcast, atTime)
+function OvalePower:SaveSpellcastInfo(spellcast, atTime, state)
 	local spellId = spellcast.spellId
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
-		for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-			if si[powerType] == "finisher" then
-				-- Get the maximum cost of the finisher.
-				local maxCostParam = "max_" .. powerType
-				local maxCost = si[maxCostParam] or 1
-				local cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, spellcast.target)
-				if cost == "finisher" then
-					-- This finisher costs up to maxCost resources.
-					local power = self:GetPower(powerType, atTime)
-					if power > maxCost then
+		if si then
+			local dataModule = state or OvaleData
+			local powerModule = state or self
+			for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+				if si[powerType] == "finisher" then
+					-- Get the maximum cost of the finisher.
+					local maxCostParam = "max_" .. powerType
+					local maxCost = si[maxCostParam] or 1
+					local cost = dataModule:GetSpellInfoProperty(spellId, atTime, powerType, spellcast.target)
+					if cost == "finisher" then
+						-- This finisher costs up to maxCost resources.
+						local power = powerModule:GetPower(powerType, atTime)
+						if power > maxCost then
+							cost = maxCost
+						else
+							cost = power
+						end
+					elseif cost == 0 then
+						-- If this is a finisher that costs no resources, then treat it as using the maximum cost.
 						cost = maxCost
-					else
-						cost = power
 					end
-				elseif cost == 0 then
-					-- If this is a finisher that costs no resources, then treat it as using the maximum cost.
-					cost = maxCost
+					-- Save the cost to the spellcast table.
+					spellcast[powerType] = cost
 				end
-				-- Save the cost to the spellcast table.
-				spellcast[powerType] = cost
 			end
 		end
 	end

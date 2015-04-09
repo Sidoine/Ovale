@@ -245,10 +245,11 @@ function OvaleCooldown:CopySpellcastInfo(spellcast, dest)
 end
 
 -- Save cooldown information to the spellcast.
-function OvaleCooldown:SaveSpellcastInfo(spellcast, atTime)
+function OvaleCooldown:SaveSpellcastInfo(spellcast, atTime, state)
 	local spellId = spellcast.spellId
 	if spellId then
-		local gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
+		local dataModule = state or OvaleData
+		local gcd = dataModule:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
 		if gcd and gcd == 0 then
 			spellcast.offgcd = true
 		end

@@ -68,7 +68,7 @@ local self_timeAuraAdded = nil
 	information to and from spellcasts.
 
 		module:CopySpellcastInfo(spellcast, dest)
-		module:SaveSpellcastInfo(spellcast, atTime)
+		module:SaveSpellcastInfo(spellcast, atTime, state)
 --]]
 local self_modules = {}
 
@@ -1267,82 +1267,108 @@ end
 		channel		The spell is a channeled spell.
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
-statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, channel, spellcast)
-	OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
-	if spellId and targetGUID then
-		-- Handle missing start/end/next cast times.
-		local castTime
-		if startCast and endCast then
-			castTime = endCast - startCast
-		else
-			castTime = OvaleSpellBook:GetCastTime(spellId) or 0
-			startCast = startCast or state.nextCast
-			endCast = endCast or (startCast + castTime)
-		end
+do
+	local staticSpellcast = {}
 
-		-- Update the latest spell cast in the simulator.
-		state.lastSpellId = spellId
-		state.startCast = startCast
-		state.endCast = endCast
-		state.lastCast[spellId] = endCast
-		state.channel = channel
-
-		-- Update the GCD-related spell information in the simulator.
-		local gcd = state:GetGCD(spellId, startCast, targetGUID)
-		local nextCast = (castTime > gcd) and endCast or (startCast + gcd)
-		if state.nextCast < nextCast then
-			state.nextCast = nextCast
-		end
-		if gcd > 0 then
-			state.lastGCDSpellId = spellId
-		else
-			state.lastOffGCDSpellId = spellId
-		end
-
-		--[[
-			Set the current time in the simulator to *slightly* after the start of
-			the current cast (to prevent weird edge cases), or to now if in the past.
-		--]]
-		local now = API_GetTime()
-		if startCast >= now then
-			state.currentTime = startCast + SIMULATOR_LAG
-		else
-			state.currentTime = now
-		end
-
-		state:Log("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
-
-		--[[
-			Update the combat state so this condition can be checked in other state prototype methods.
-			This condition isn't quite right because casting a harmful spell at a target doesn't always
-			put the player into combat.
-		--]]
-		if not state.inCombat and OvaleSpellBook:IsHarmfulSpell(spellId) then
-			state.inCombat = true
-			if channel then
-				state.combatStartTime = startCast
+	statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, channel, spellcast)
+		OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
+		if spellId and targetGUID then
+			-- Handle missing parameters.
+			local castTime
+			if startCast and endCast then
+				castTime = endCast - startCast
 			else
-				state.combatStartTime = endCast
+				castTime = OvaleSpellBook:GetCastTime(spellId) or 0
+				startCast = startCast or state.nextCast
+				endCast = endCast or (startCast + castTime)
 			end
-		end
+			if not spellcast then
+				spellcast = staticSpellcast
+				wipe(spellcast)
+				spellcast.caster = self_playerGUID
+				spellcast.spellId = spellId
+				spellcast.spellName = OvaleSpellBook:GetSpellName(spellId)
+				spellcast.target = targetGUID
+				spellcast.targetName = OvaleGUID:GUIDName(targetGUID)
+				spellcast.start = startCast
+				spellcast.stop = endCast
+				spellcast.channel = channel
+				-- Save the current snapshot into the spellcast.
+				state:UpdateSnapshot(spellcast)
+				-- Save the module-specific information into the spellcast.
+				local atTime = channel and startCast or endCast
+				for _, mod in pairs(self_modules) do
+					local func = mod.SaveSpellcastInfo
+					if func then
+						func(mod, spellcast, atTime, state)
+					end
+				end
+			end
 
-		--[[
-			Apply the effects of the spellcast.
-				1. Effects when the spell starts casting.
-				2. Effects when the spell has finished casting.
-				3. Effects when the spell lands on its target.
-		--]]
-		-- If the spellcast has already started, then the effects have already occurred.
-		if startCast > now then
-			OvaleState:InvokeMethod("ApplySpellStartCast", state, spellId, targetGUID, startCast, endCast, channel, spellcast)
+			-- Update the latest spell cast in the simulator.
+			state.lastSpellId = spellId
+			state.startCast = startCast
+			state.endCast = endCast
+			state.lastCast[spellId] = endCast
+			state.channel = channel
+
+			-- Update the GCD-related spell information in the simulator.
+			local gcd = state:GetGCD(spellId, startCast, targetGUID)
+			local nextCast = (castTime > gcd) and endCast or (startCast + gcd)
+			if state.nextCast < nextCast then
+				state.nextCast = nextCast
+			end
+			if gcd > 0 then
+				state.lastGCDSpellId = spellId
+			else
+				state.lastOffGCDSpellId = spellId
+			end
+
+			--[[
+				Set the current time in the simulator to *slightly* after the start of
+				the current cast (to prevent weird edge cases), or to now if in the past.
+			--]]
+			local now = API_GetTime()
+			if startCast >= now then
+				state.currentTime = startCast + SIMULATOR_LAG
+			else
+				state.currentTime = now
+			end
+
+			state:Log("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, state.currentTime, nextCast, endCast, targetGUID)
+
+			--[[
+				Update the combat state so this condition can be checked in other state prototype methods.
+				This condition isn't quite right because casting a harmful spell at a target doesn't always
+				put the player into combat.
+			--]]
+			if not state.inCombat and OvaleSpellBook:IsHarmfulSpell(spellId) then
+				state.inCombat = true
+				if channel then
+					state.combatStartTime = startCast
+				else
+					state.combatStartTime = endCast
+				end
+			end
+
+			--[[
+				Apply the effects of the spellcast.
+					1. Effects when the spell starts casting.
+					2. Effects when the spell has finished casting.
+					3. Effects when the spell lands on its target.
+			--]]
+			-- If the spellcast has already started, then the effects have already occurred.
+			if startCast > now then
+				OvaleState:InvokeMethod("ApplySpellStartCast", state, spellId, targetGUID, startCast, endCast, channel, spellcast)
+			end
+			-- If the spellcast has already ended, then the effects have already occurred.
+			if endCast > now then
+				OvaleState:InvokeMethod("ApplySpellAfterCast", state, spellId, targetGUID, startCast, endCast, channel, spellcast)
+			end
+			OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, channel, spellcast)
 		end
-		-- If the spellcast has already ended, then the effects have already occurred.
-		if endCast > now then
-			OvaleState:InvokeMethod("ApplySpellAfterCast", state, spellId, targetGUID, startCast, endCast, channel, spellcast)
-		end
-		OvaleState:InvokeMethod("ApplySpellOnHit", state, spellId, targetGUID, startCast, endCast, channel, spellcast)
+		OvaleFuture:StopProfiling("OvaleFuture_state_ApplySpell")
 	end
-	OvaleFuture:StopProfiling("OvaleFuture_state_ApplySpell")
 end
 
 -- Mirrored methods.

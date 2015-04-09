@@ -365,24 +365,28 @@ function OvaleComboPoints:CopySpellcastInfo(spellcast, dest)
 end
 
 -- Save combo point finisher information to the spellcast.
-function OvaleComboPoints:SaveSpellcastInfo(spellcast, atTime)
+function OvaleComboPoints:SaveSpellcastInfo(spellcast, atTime, state)
 	local spellId = spellcast.spellId
 	if spellId then
 		local si = OvaleData.spellInfo[spellId]
-		if si.combo == "finisher" then
-			local combo = OvaleData:GetSpellInfoProperty(spellId, atTime, "combo", spellcast.target)
-			if combo == "finisher" then
-				local min_combo = si.min_combo or si.mincombo or 1
-				if self.combo >= min_combo then
-					combo = self.combo
-				else
-					combo = min_combo
+		if si then
+			local dataModule = state or OvaleData
+			local comboPointModule = state or self
+			if si.combo == "finisher" then
+				local combo = dataModule:GetSpellInfoProperty(spellId, atTime, "combo", spellcast.target)
+				if combo == "finisher" then
+					local min_combo = si.min_combo or si.mincombo or 1
+					if comboPointModule.combo >= min_combo then
+						combo = comboPointModule.combo
+					else
+						combo = min_combo
+					end
+				elseif combo == 0 then
+					-- If this is a finisher that costs no combo points, then treat it as a maximum combo-point finisher.
+					combo = MAX_COMBO_POINTS
 				end
-			elseif combo == 0 then
-				-- If this is a finisher that costs no combo points, then treat it as a maximum combo-point finisher.
-				combo = MAX_COMBO_POINTS
+				spellcast.combo = combo
 			end
-			spellcast.combo = combo
 		end
 	end
 end
