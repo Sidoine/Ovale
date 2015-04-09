@@ -95,7 +95,7 @@ do
 		UNIT_AURA_UNIT[unitId] = i
 	end
 	-- Default unit priority is after all listed units.
-	setmetatable(UNIT_AURA_UNIT, { __index = function(t, unitId) return #t + 1 end })
+	setmetatable(UNIT_AURA_UNIT, { __index = function(t, unitId) return #UNIT_AURA_UNITS + 1 end })
 end
 --</private-static-properties>
 
