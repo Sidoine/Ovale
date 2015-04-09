@@ -18,6 +18,7 @@ local OvaleData = Ovale.OvaleData
 local OvaleEquipment = Ovale.OvaleEquipment
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
+local OvaleHealth = Ovale.OvaleHealth
 local OvaleLatency = Ovale.OvaleLatency
 local OvalePower = Ovale.OvalePower
 local OvaleRunes = Ovale.OvaleRunes
@@ -50,8 +51,6 @@ local API_UnitCreatureFamily = UnitCreatureFamily
 local API_UnitCreatureType = UnitCreatureType
 local API_UnitDetailedThreatSituation = UnitDetailedThreatSituation
 local API_UnitExists = UnitExists
-local API_UnitHealth = UnitHealth
-local API_UnitHealthMax = UnitHealthMax
 local API_UnitIsDead = UnitIsDead
 local API_UnitIsFriend = UnitIsFriend
 local API_UnitIsPVP = UnitIsPVP
@@ -1877,82 +1876,6 @@ do
 end
 
 do
-	-- static properties for TimeToDie(), indexed by unit ID
-	local lastTTDTime = {}
-	local lastTTDHealth = {}
-	local lastTTDguid = {}
-	local lastTTDdps = {}
-
-	--[[
-		Returns:
-			Estimated number of seconds before the specified unit reaches zero health
-			The current time
-			Unit's current health
-			Unit's maximum health
-	--]]
-	local function EstimatedTimeToDie(state, unitId)
-		-- Check for target switch.
-		if lastTTDguid[unitId] ~= OvaleGUID:GetGUID(unitId) then
-			lastTTDguid[unitId] = OvaleGUID:GetGUID(unitId)
-			lastTTDTime[unitId] = nil
-			if lastTTDHealth[unitId] then
-				wipe(lastTTDHealth[unitId])
-			else
-				lastTTDHealth[unitId] = {}
-			end
-			lastTTDdps[unitId] = nil
-		end
-
-		local timeToDie
-		local health = API_UnitHealth(unitId) or 0
-		local maxHealth = API_UnitHealthMax(unitId) or 1
-		local currentTime = API_GetTime()
-
-		-- Clamp maxHealth to always be at least 1.
-		if maxHealth < health then
-			maxHealth = health
-		end
-		if maxHealth < 1 then
-			maxHealth = 1
-		end
-
-		if health == 0 then
-			timeToDie = 0
-		elseif maxHealth <= 5 then
-			timeToDie = INFINITY
-		else
-			local now = floor(currentTime)
-			if (not lastTTDTime[unitId] or lastTTDTime[unitId] < now) and lastTTDguid[unitId] then
-				lastTTDTime[unitId] = now
-				local mod10, prevHealth
-				for delta = 10, 1, -1 do
-					mod10 = (now - delta) % 10
-					prevHealth = lastTTDHealth[unitId][mod10]
-					if delta == 10 then
-						lastTTDHealth[unitId][mod10] = health
-					end
-					if prevHealth and prevHealth > health then
-						lastTTDdps[unitId] = (prevHealth - health) / delta
-						state:Log("prevHealth = %d, health = %d, delta = %d, dps = %d", prevHealth, health, delta, lastTTDdps[unitId])
-						break
-					end
-				end
-			end
-			local dps = lastTTDdps[unitId]
-			if dps and dps > 0 then
-				timeToDie = health / dps
-			else
-				timeToDie = INFINITY
-			end
-		end
-		-- Clamp time to die at a finite number.
-		if timeToDie == INFINITY then
-			-- Return time to die in the far-off future (one week).
-			timeToDie = 3600 * 24 * 7
-		end
-		return timeToDie, currentTime, health, maxHealth
-	end
-
 	--- Get the current amount of health points of the target.
 	-- @name Health
 	-- @paramsig number or boolean
@@ -1971,15 +1894,15 @@ do
 	local function Health(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
-		if not timeToDie then
-			return nil
-		elseif timeToDie == 0 then
-			return Compare(0, comparator, limit)
+		local health = OvaleHealth:UnitHealth(target) or 0
+		if health > 0 then
+			local now = API_GetTime()
+			local timeToDie = OvaleHealth:UnitTimeToDie(target)
+			local value, origin, rate = health, now, -1 * health / timeToDie
+			local start, ending = now, INFINITY
+			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		end
-		local value, origin, rate = health, now, -1 * health / timeToDie
-		local start, ending = now, INFINITY
-		return TestValue(start, ending, value, origin, rate, comparator, limit)
+		return Compare(0, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("health", false, Health)
@@ -2003,14 +1926,17 @@ do
 	local function HealthMissing(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
-		if not timeToDie or timeToDie == 0 then
-			return nil
+		local health = OvaleHealth:UnitHealth(target) or 0
+		local maxHealth = OvaleHealth:UnitHealthMax(target) or 1
+		if health > 0 then
+			local now = API_GetTime()
+			local missing = maxHealth - health
+			local timeToDie = OvaleHealth:UnitTimeToDie(target)
+			local value, origin, rate = missing, now, health / timeToDie
+			local start, ending = now, INFINITY
+			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		end
-		local missing = maxHealth - health
-		local value, origin, rate = missing, now, health / timeToDie
-		local start, ending = now, INFINITY
-		return TestValue(start, ending, value, origin, rate, comparator, limit)
+		return Compare(maxHealth, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("healthmissing", false, Health)
@@ -2034,16 +1960,17 @@ do
 	local function HealthPercent(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
-		if not timeToDie then
-			return nil
-		elseif timeToDie == 0 then
-			return Compare(0, comparator, limit)
+		local health = OvaleHealth:UnitHealth(target) or 0
+		if health > 0 then
+			local now = API_GetTime()
+			local maxHealth = OvaleHealth:UnitHealthMax(target) or 1
+			local healthPercent = health / maxHealth * 100
+			local timeToDie = OvaleHealth:UnitTimeToDie(target)
+			local value, origin, rate = healthPercent, now, -1 * healthPercent / timeToDie
+			local start, ending = now, INFINITY
+			return TestValue(start, ending, value, origin, rate, comparator, limit)
 		end
-		local healthPercent = health / maxHealth * 100
-		local value, origin, rate = healthPercent, now, -1 * healthPercent / timeToDie
-		local start, ending = now, INFINITY
-		return TestValue(start, ending, value, origin, rate, comparator, limit)
+		return Compare(0, comparator, limit)
 	end
 
 	OvaleCondition:RegisterCondition("healthpercent", false, HealthPercent)
@@ -2066,7 +1993,7 @@ do
 	local function MaxHealth(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local value = API_UnitHealthMax(target)
+		local value = OvaleHealth:UnitHealthMax(target)
 		return Compare(value, comparator, limit)
 	end
 
@@ -2089,7 +2016,8 @@ do
 	local function TimeToDie(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local timeToDie, now = EstimatedTimeToDie(state, target)
+		local now = API_GetTime()
+		local timeToDie = OvaleHealth:UnitTimeToDie(target)
 		local value, origin, rate = timeToDie, now, -1
 		local start, ending = now, now + timeToDie
 		return TestValue(start, ending, value, origin, rate, comparator, limit)
@@ -2116,13 +2044,18 @@ do
 	local function TimeToHealthPercent(positionalParams, namedParams, state, atTime)
 		local percent, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local timeToDie, now, health, maxHealth = EstimatedTimeToDie(state, target)
-		local healthPercent = health / maxHealth * 100
-		if healthPercent >= percent then
-			local t = timeToDie * (healthPercent - percent) / healthPercent
-			local value, origin, rate = t, now, -1
-			local start, ending = now, now + t
-			return TestValue(start, ending, value, origin, rate, comparator, limit)
+		local health = OvaleHealth:UnitHealth(target) or 0
+		if health > 0 then
+			local maxHealth = OvaleHealth:UnitHealthMax(target) or 1
+			local healthPercent = health / maxHealth * 100
+			if healthPercent >= percent then
+				local now = API_GetTime()
+				local timeToDie = OvaleHealth:UnitTimeToDie(target)
+				local t = timeToDie * (healthPercent - percent) / healthPercent
+				local value, origin, rate = t, now, -1
+				local start, ending = now, now + t
+				return TestValue(start, ending, value, origin, rate, comparator, limit)
+			end
 		end
 		return Compare(0, comparator, limit)
 	end
