@@ -119,8 +119,8 @@ AddFunction DemonologyDefaultShortCdActions
 
 AddFunction DemonologyDefaultCdActions
 {
-	#potion,name=draenic_intellect,if=buff.bloodlust.react|(buff.dark_soul.up&(trinket.proc.any.react|trinket.stacking_proc.any.react>6)&!buff.demonbolt.remains)|target.health.pct<20
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(dark_soul_knowledge_buff) and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 } and not BuffPresent(demonbolt_buff) or target.HealthPercent() < 20 DemonologyUsePotionIntellect()
+	#potion,name=draenic_intellect,if=buff.bloodlust.remains>30|(((buff.dark_soul.up&(trinket.proc.any.react|trinket.stacking_proc.any.react>6)&!buff.demonbolt.remains)|target.health.pct<20)&(!talent.grimoire_of_service.enabled|!talent.demonic_servitude.enabled|pet.service_doomguard.active))
+	if BuffRemaining(burst_haste_buff any=1) > 30 or { BuffPresent(dark_soul_knowledge_buff) and { BuffPresent(trinket_proc_any_buff) or BuffStacks(trinket_stacking_proc_any_buff) > 6 } and not BuffPresent(demonbolt_buff) or target.HealthPercent() < 20 } and { not Talent(grimoire_of_service_talent) or not Talent(demonic_servitude_talent) or SpellCooldown(service_doomguard) > 100 } DemonologyUsePotionIntellect()
 	#berserking
 	Spell(berserking)
 	#blood_fury
@@ -129,8 +129,8 @@ AddFunction DemonologyDefaultCdActions
 	Spell(arcane_torrent_mana)
 	#dark_soul,if=talent.demonbolt.enabled&((charges=2&((!glyph.imp_swarm.enabled&(dot.corruption.ticking|trinket.proc.haste.remains<=10))|cooldown.imp_swarm.remains))|target.time_to_die<buff.demonbolt.remains|(!buff.demonbolt.remains&demonic_fury>=790))
 	if Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 and { not Glyph(glyph_of_imp_swarm) and { target.DebuffPresent(corruption_debuff) or BuffRemaining(trinket_proc_haste_buff) <= 10 } or SpellCooldown(imp_swarm) > 0 } or target.TimeToDie() < BuffRemaining(demonbolt_buff) or not BuffPresent(demonbolt_buff) and DemonicFury() >= 790 } Spell(dark_soul_knowledge)
-	#dark_soul,if=!talent.demonbolt.enabled&((charges=2&(time>6|(debuff.shadowflame.stack=1&action.hand_of_guldan.in_flight)))|!talent.archimondes_darkness.enabled|(target.time_to_die<=20&!glyph.dark_soul.enabled|target.time_to_die<=10)|(target.time_to_die<=60&demonic_fury>400)|((trinket.stacking_proc.multistrike.remains>7.5|trinket.proc.any.remains>7.5)&demonic_fury>=400))
-	if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 and { TimeInCombat() > 6 or target.DebuffStacks(shadowflame_debuff) == 1 and InFlightToTarget(hand_of_guldan) } or not Talent(archimondes_darkness_talent) or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or { BuffRemaining(trinket_stacking_proc_multistrike_buff) > 7.5 or BuffRemaining(trinket_proc_any_buff) > 7.5 } and DemonicFury() >= 400 } Spell(dark_soul_knowledge)
+	#dark_soul,if=!talent.demonbolt.enabled&((charges=2&(time>6|(debuff.shadowflame.stack=1&action.hand_of_guldan.in_flight)))|!talent.archimondes_darkness.enabled|(target.time_to_die<=20&!glyph.dark_soul.enabled)|target.time_to_die<=10|(target.time_to_die<=60&demonic_fury>400)|((trinket.proc.any.react|trinket.stacking_proc.any.react)&demonic_fury>600))
+	if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 and { TimeInCombat() > 6 or target.DebuffStacks(shadowflame_debuff) == 1 and InFlightToTarget(hand_of_guldan) } or not Talent(archimondes_darkness_talent) or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } and DemonicFury() > 600 } Spell(dark_soul_knowledge)
 	#imp_swarm,if=!talent.demonbolt.enabled&(buff.dark_soul.up|(cooldown.dark_soul.remains>(120%(1%spell_haste)))|time_to_die<32)&time>3
 	if not Talent(demonbolt_talent) and { BuffPresent(dark_soul_knowledge_buff) or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { 100 / { 100 + SpellHaste() } } } or target.TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
 
@@ -372,6 +372,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # metamorphosis
 # metamorphosis_buff
 # molten_core_buff
+# service_doomguard
 # service_felguard
 # shadow_bolt
 # shadowflame_debuff

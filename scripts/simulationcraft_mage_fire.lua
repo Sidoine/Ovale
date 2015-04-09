@@ -42,10 +42,10 @@ AddFunction FireInterruptActions
 
 AddFunction FireDefaultMainActions
 {
-	#stop_pyro_chain,if=prev.combustion
-	if PreviousSpell(combustion) SetState(pyro_chain 0)
+	#stop_pyro_chain,if=prev_off_gcd.combustion
+	if PreviousOffGCDSpell(combustion) SetState(pyro_chain 0)
 	#call_action_list,name=t17_2pc_combust,if=set_bonus.tier17_2pc&pyro_chain&(active_enemies>1|(talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.remains>15))
-	if ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } PcCombustMainActions()
+	if ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } FireT172PcCombustMainActions()
 	#call_action_list,name=combust_sequence,if=pyro_chain
 	if GetState(pyro_chain) > 0 FireCombustSequenceMainActions()
 	#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
@@ -60,8 +60,8 @@ AddFunction FireDefaultMainActions
 
 AddFunction FireDefaultShortCdActions
 {
-	#stop_pyro_chain,if=prev.combustion
-	if PreviousSpell(combustion) SetState(pyro_chain 0)
+	#stop_pyro_chain,if=prev_off_gcd.combustion
+	if PreviousOffGCDSpell(combustion) SetState(pyro_chain 0)
 	#blink,if=movement.distance>10
 	if 0 > 10 Spell(blink)
 	#blazing_speed,if=movement.remains>0
@@ -71,9 +71,9 @@ AddFunction FireDefaultShortCdActions
 	#rune_of_power,if=buff.rune_of_power.remains<cast_time
 	if TotemRemaining(rune_of_power) < CastTime(rune_of_power) Spell(rune_of_power)
 	#call_action_list,name=t17_2pc_combust,if=set_bonus.tier17_2pc&pyro_chain&(active_enemies>1|(talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.remains>15))
-	if ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } PcCombustShortCdActions()
+	if ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } FireT172PcCombustShortCdActions()
 
-	unless ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } and PcCombustShortCdPostConditions()
+	unless ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } and FireT172PcCombustShortCdPostConditions()
 	{
 		#call_action_list,name=combust_sequence,if=pyro_chain
 		if GetState(pyro_chain) > 0 FireCombustSequenceShortCdActions()
@@ -104,8 +104,8 @@ AddFunction FireDefaultShortCdActions
 
 AddFunction FireDefaultCdActions
 {
-	#stop_pyro_chain,if=prev.combustion
-	if PreviousSpell(combustion) SetState(pyro_chain 0)
+	#stop_pyro_chain,if=prev_off_gcd.combustion
+	if PreviousOffGCDSpell(combustion) SetState(pyro_chain 0)
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() FireInterruptActions()
 
@@ -117,9 +117,9 @@ AddFunction FireDefaultCdActions
 		unless BuffExpires(ice_floes_buff) and { 0 > 0 or 600 < CastTime(fireball) } and Spell(ice_floes) or TotemRemaining(rune_of_power) < CastTime(rune_of_power) and Spell(rune_of_power)
 		{
 			#call_action_list,name=t17_2pc_combust,if=set_bonus.tier17_2pc&pyro_chain&(active_enemies>1|(talent.prismatic_crystal.enabled&cooldown.prismatic_crystal.remains>15))
-			if ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } PcCombustCdActions()
+			if ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } FireT172PcCombustCdActions()
 
-			unless ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } and PcCombustCdPostConditions()
+			unless ArmorSetBonus(T17 2) and GetState(pyro_chain) > 0 and { Enemies() > 1 or Talent(prismatic_crystal_talent) and SpellCooldown(prismatic_crystal) > 15 } and FireT172PcCombustCdPostConditions()
 			{
 				#call_action_list,name=combust_sequence,if=pyro_chain
 				if GetState(pyro_chain) > 0 FireCombustSequenceCdActions()
@@ -362,7 +362,7 @@ AddFunction FireLivingBombMainActions
 {
 	#inferno_blast,cycle_targets=1,if=dot.living_bomb.ticking&active_dot.living_bomb<active_enemies
 	if target.DebuffPresent(living_bomb_debuff) and DebuffCountOnAny(living_bomb_debuff) < Enemies() Spell(inferno_blast)
-	#living_bomb,cycle_targets=1,if=target!=prismatic_crystal&(active_dot.living_bomb=0|(ticking&active_dot.living_bomb=1))&(((!talent.incanters_flow.enabled|incanters_flow_dir<0|buff.incanters_flow.stack=5)&remains<3.6)|((incanters_flow_dir>0|buff.incanters_flow.stack=1)&remains<gcd.max))&target.target.time_to_die>remains+12
+	#living_bomb,cycle_targets=1,if=target!=prismatic_crystal&(active_dot.living_bomb=0|(ticking&active_dot.living_bomb=1))&(((!talent.incanters_flow.enabled|incanters_flow_dir<0|buff.incanters_flow.stack=5)&remains<3.6)|((incanters_flow_dir>0|buff.incanters_flow.stack=1)&remains<gcd.max))&target.time_to_die>remains+12
 	if not target.Name(prismatic_crystal) and { not DebuffCountOnAny(living_bomb_debuff) > 0 or target.DebuffPresent(living_bomb_debuff) and DebuffCountOnAny(living_bomb_debuff) == 1 } and { { not Talent(incanters_flow_talent) or BuffDirection(incanters_flow_buff) < 0 or BuffStacks(incanters_flow_buff) == 5 } and target.DebuffRemaining(living_bomb_debuff) < 3.6 or { BuffDirection(incanters_flow_buff) > 0 or BuffStacks(incanters_flow_buff) == 1 } and target.DebuffRemaining(living_bomb_debuff) < GCD() } and target.TimeToDie() > target.DebuffRemaining(living_bomb_debuff) + 12 Spell(living_bomb)
 }
 
@@ -470,7 +470,7 @@ AddFunction FireSingleTargetCdPostConditions
 
 ### actions.t17_2pc_combust
 
-AddFunction PcCombustMainActions
+AddFunction FireT172PcCombustMainActions
 {
 	#inferno_blast,if=prev_gcd.inferno_blast&pyro_chain_duration>gcd.max*3
 	if PreviousGCDSpell(inferno_blast) and GetStateDuration(pyro_chain) > GCD() * 3 Spell(inferno_blast)
@@ -497,7 +497,7 @@ AddFunction PcCombustMainActions
 	Spell(fireball)
 }
 
-AddFunction PcCombustShortCdActions
+AddFunction FireT172PcCombustShortCdActions
 {
 	#prismatic_crystal
 	Spell(prismatic_crystal)
@@ -513,12 +513,12 @@ AddFunction PcCombustShortCdActions
 	}
 }
 
-AddFunction PcCombustShortCdPostConditions
+AddFunction FireT172PcCombustShortCdPostConditions
 {
 	PreviousGCDSpell(inferno_blast) and GetStateDuration(pyro_chain) > GCD() * 3 and Spell(inferno_blast) or Charges(inferno_blast count=0) >= 2 - GCD() / 8 and { BuffExpires(pyroblast_buff) and BuffExpires(pyromaniac_buff) or target.Name(prismatic_crystal) and TotemRemaining(prismatic_crystal) * 2 < GCD() * 5 } and Spell(inferno_blast) or PreviousGCDSpell(inferno_blast) and ExecuteTime(pyroblast) == GCD() and target.TickValue(Debuff) * { 6 - { target.DebuffRemaining(ignite_debuff) - TravelTime(pyroblast) } } * 100 < Damage(pyroblast) * { 100 + SpellCritChance() } * { MasteryEffect() / 100 } and Spell(pyroblast) or BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) and Spell(pyroblast) or not target.DebuffPresent(ignite_debuff) and not InFlightToTarget(fireball) and Spell(fireball) or ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) and Spell(pyroblast) or BuffPresent(pyroblast_buff) and BuffExpires(heating_up_buff) and target.TickValue(Debuff) * 100 * { ExecuteTime(fireball) + TravelTime(fireball) } < Damage(fireball) * { 100 + SpellCritChance() } * { MasteryEffect() / 100 } and { not target.Name(prismatic_crystal) or TotemRemaining(prismatic_crystal) > 6 } and Spell(fireball) or target.Name(prismatic_crystal) and TotemRemaining(prismatic_crystal) < GCD() * 4 and ExecuteTime(pyroblast) == GCD() and Spell(pyroblast) or BuffPresent(pyroblast_buff) and Charges(inferno_blast count=0) >= 2 - GCD() / 4 and { not target.Name(prismatic_crystal) or TotemRemaining(prismatic_crystal) < 8 } and PreviousGCDSpell(pyroblast) and Spell(pyroblast) or BuffExpires(pyroblast_buff) and BuffExpires(heating_up_buff) and PreviousGCDSpell(pyroblast) and Spell(inferno_blast) or Spell(fireball)
 }
 
-AddFunction PcCombustCdActions
+AddFunction FireT172PcCombustCdActions
 {
 	unless Spell(prismatic_crystal)
 	{
@@ -533,7 +533,7 @@ AddFunction PcCombustCdActions
 	}
 }
 
-AddFunction PcCombustCdPostConditions
+AddFunction FireT172PcCombustCdPostConditions
 {
 	Spell(prismatic_crystal) or PreviousGCDSpell(inferno_blast) and GetStateDuration(pyro_chain) > GCD() * 3 and Spell(inferno_blast) or Charges(inferno_blast count=0) >= 2 - GCD() / 8 and { BuffExpires(pyroblast_buff) and BuffExpires(pyromaniac_buff) or target.Name(prismatic_crystal) and TotemRemaining(prismatic_crystal) * 2 < GCD() * 5 } and Spell(inferno_blast) or PreviousGCDSpell(inferno_blast) and ExecuteTime(pyroblast) == GCD() and target.TickValue(Debuff) * { 6 - { target.DebuffRemaining(ignite_debuff) - TravelTime(pyroblast) } } * 100 < Damage(pyroblast) * { 100 + SpellCritChance() } * { MasteryEffect() / 100 } and Spell(pyroblast) or Enemies() <= 2 and PreviousGCDSpell(pyroblast) and Spell(meteor) or BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) and Spell(pyroblast) or not target.DebuffPresent(ignite_debuff) and not InFlightToTarget(fireball) and Spell(fireball) or ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) and Spell(pyroblast) or BuffPresent(pyroblast_buff) and BuffExpires(heating_up_buff) and target.TickValue(Debuff) * 100 * { ExecuteTime(fireball) + TravelTime(fireball) } < Damage(fireball) * { 100 + SpellCritChance() } * { MasteryEffect() / 100 } and { not target.Name(prismatic_crystal) or TotemRemaining(prismatic_crystal) > 6 } and Spell(fireball) or target.Name(prismatic_crystal) and TotemRemaining(prismatic_crystal) < GCD() * 4 and ExecuteTime(pyroblast) == GCD() and Spell(pyroblast) or BuffPresent(pyroblast_buff) and Charges(inferno_blast count=0) >= 2 - GCD() / 4 and { not target.Name(prismatic_crystal) or TotemRemaining(prismatic_crystal) < 8 } and PreviousGCDSpell(pyroblast) and Spell(pyroblast) or BuffExpires(pyroblast_buff) and BuffExpires(heating_up_buff) and PreviousGCDSpell(pyroblast) and Spell(inferno_blast) or Spell(fireball)
 }
