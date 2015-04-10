@@ -124,6 +124,7 @@ local SPELLAURALIST_AURA_VALUE = {
 local WHITE_ATTACK = {
 	[    75] = true,	-- Auto Shot
 	[  5019] = true,	-- Shoot
+	[  6603] = true,	-- Auto Attack
 }
 local WHITE_ATTACK_NAME = {}
 do
