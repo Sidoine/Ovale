@@ -199,7 +199,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
-	local targetGUID = OvaleGUID:GetGUID(target)
+	local targetGUID = OvaleGUID:UnitGUID(target)
 
 	local spellId = element.positionalParams[1]
 	local si = OvaleData.spellInfo[spellId]

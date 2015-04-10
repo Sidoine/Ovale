@@ -108,9 +108,6 @@ OvaleGUID.nameUnit = {}
 OvaleGUID.guidName = {}
 OvaleGUID.nameGUID = {}
 
--- Deprecated: legacy mapping from name to GUID.
-OvaleGUID.nameToGUID = {}
-
 -- Export UNIT_AURA_UNIT table of units that receive UNIT_AURA events.
 OvaleGUID.UNIT_AURA_UNIT = UNIT_AURA_UNIT
 --</public-static-properties>
@@ -342,12 +339,6 @@ function OvaleGUID:UpdateUnit(unitId)
 			end
 		end
 	end
-	-- Deprecated: legacy mapping from name to GUID.
-	if not self.nameToGUID[name] then
-		if guid and guid ~= previousGUID and name and (unitId == "target" or self.unitGUID.target ~= guid) then
-			self.nameToGUID[name] = guid
-		end
-	end
 end
 
 function OvaleGUID:UpdateUnitWithTarget(unitId)
@@ -399,25 +390,6 @@ end
 function OvaleGUID:NameGUID(name)
 	if name and self.nameGUID[name] then
 		return unpack(self.nameGUID[name])
-	end
-	return nil
-end
-
---[[
-	Deprecated: old method names.
-
-	function OvaleGUID:GetGUID(unitId) end
-	function OvaleGUID:GetUnitId(guid) end
-	function OvaleGUID:GetGUIDForName(name) end
-	function OvaleGUID:GetUnitIdForName(name) end
---]]
-OvaleGUID.GetGUID = OvaleGUID.UnitGUID
-OvaleGUID.GetUnitId = OvaleGUID.GUIDUnit
-OvaleGUID.GetUnitIdForName = OvaleGUID.NameUnit
-
-function OvaleGUID:GetGUIDForName(name)
-	if name then
-		return self.nameToGUID[name]
 	end
 	return nil
 end

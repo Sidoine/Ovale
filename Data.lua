@@ -361,7 +361,7 @@ end
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:CheckRequirements(spellId, atTime, tokens, index, targetGUID)
-	targetGUID = targetGUID or OvaleGUID:GetGUID(self.defaultTarget or "target")
+	targetGUID = targetGUID or OvaleGUID:UnitGUID(self.defaultTarget or "target")
 	local name = tokens[index]
 	index = index + 1
 	if name then
@@ -401,7 +401,7 @@ end
 	NOTE: Mirrored in statePrototype below.
 --]]
 function OvaleData:CheckSpellAuraData(auraId, spellData, atTime, guid)
-	guid = guid or OvaleGUID:GetGUID("player")
+	guid = guid or OvaleGUID:UnitGUID("player")
 	local index, value, data
 	if type(spellData) == "table" then
 		-- Comma-separated value.
@@ -449,7 +449,7 @@ end
 -- Check "run-time" requirements specified in SpellInfo().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
-	targetGUID = targetGUID or OvaleGUID:GetGUID(self.defaultTarget or "target")
+	targetGUID = targetGUID or OvaleGUID:UnitGUID(self.defaultTarget or "target")
 	local verified = true
 	local requirement
 	for name, handler in pairs(self_requirement) do
@@ -471,7 +471,7 @@ end
 -- Get SpellInfo property with run-time checks as specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
-	targetGUID = targetGUID or OvaleGUID:GetGUID(self.defaultTarget or "target")
+	targetGUID = targetGUID or OvaleGUID:UnitGUID(self.defaultTarget or "target")
 	local si = OvaleData.spellInfo[spellId]
 	local value = si and si[property]
 	local requirements = si and si.require[property]

@@ -367,7 +367,7 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 
 	local mine = (sourceGUID == self_playerGUID or self_petGUID and sourceGUID == self_petGUID)
 	if CLEU_AURA_EVENTS[cleuEvent] then
-		local unitId = OvaleGUID:GetUnitId(destGUID)
+		local unitId = OvaleGUID:GUIDUnit(destGUID)
 		if unitId then
 			-- Only update auras on the unit if it is not a unit type that receives UNIT_AURA events.
 			if not OvaleGUID.UNIT_AURA_UNIT[unitId] then
@@ -481,7 +481,7 @@ end
 
 function OvaleAura:UNIT_PET(event, unitId)
 	if unitId == "player" then
-		self_petGUID = OvaleGUID:GetGUID("pet")
+		self_petGUID = OvaleGUID:UnitGUID("pet")
 	end
 end
 
@@ -496,7 +496,7 @@ function OvaleAura:RemoveAurasOnInactiveUnits()
 	-- Remove all auras from GUIDs that can no longer be referenced by a unit ID,
 	-- i.e., not in the group or not targeted by anyone in the group or focus.
 	for guid in pairs(self.aura) do
-		local unitId = OvaleGUID:GetUnitId(guid)
+		local unitId = OvaleGUID:GUIDUnit(guid)
 		if not unitId then
 			self:Debug("Removing auras from GUID %s", guid)
 			RemoveAurasOnGUID(self.aura, guid)
@@ -707,7 +707,7 @@ end
 -- Scan auras on the given GUID and update the aura database.
 function OvaleAura:ScanAuras(unitId, guid)
 	self:StartProfiling("OvaleAura_ScanAuras")
-	guid = guid or OvaleGUID:GetGUID(unitId)
+	guid = guid or OvaleGUID:UnitGUID(unitId)
 	if guid then
 		self:DebugTimestamp("Scanning auras on %s (%s)", guid, unitId)
 
@@ -732,7 +732,7 @@ function OvaleAura:ScanAuras(unitId, guid)
 					break
 				end
 			else
-				local casterGUID = OvaleGUID:GetGUID(unitCaster)
+				local casterGUID = OvaleGUID:UnitGUID(unitCaster)
 				if debuffType == "" then
 					-- Empty string for the debuff type means this is an Enrage effect.
 					debuffType = "Enrage"
@@ -768,7 +768,7 @@ end
 function OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
 	-- If this GUID has no auras in the database, then do an aura scan.
 	if not self.serial[guid] then
-		local unitId = OvaleGUID:GetUnitId(guid)
+		local unitId = OvaleGUID:GUIDUnit(guid)
 		self:ScanAuras(unitId, guid)
 	end
 
@@ -787,7 +787,7 @@ function OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
 end
 
 function OvaleAura:GetAura(unitId, auraId, filter, mine)
-	local guid = OvaleGUID:GetGUID(unitId)
+	local guid = OvaleGUID:UnitGUID(unitId)
 	return self:GetAuraByGUID(guid, auraId, filter, mine)
 end
 
@@ -819,7 +819,7 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 		if strsub(requirement, 1, 7) == "target_" then
 			if targetGUID then
 				guid = targetGUID
-				unitId = OvaleGUID:GetUnitId(guid)
+				unitId = OvaleGUID:GUIDUnit(guid)
 			else
 				unitId = self.defaultTarget or "target"
 			end
@@ -834,7 +834,7 @@ function OvaleAura:RequireBuffHandler(spellId, atTime, requirement, tokens, inde
 			filter = (strsub(requirement, 1, 4) == "buff") and "HELPFUL" or "HARMFUL"
 			mine = not (strsub(requirement, -4) == "_any")
 		end
-		guid = guid or OvaleGUID:GetGUID(unitId)
+		guid = guid or OvaleGUID:UnitGUID(unitId)
 		local aura = self:GetAuraByGUID(guid, buffName, filter, mine)
 		local isActiveAura = self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
 		if not isBang and isActiveAura or isBang and not isActiveAura then
@@ -1161,7 +1161,7 @@ do
 
 	statePrototype.DebugUnitAuras = function(state, unitId, filter)
 		wipe(array)
-		local guid = OvaleGUID:GetGUID(unitId)
+		local guid = OvaleGUID:UnitGUID(unitId)
 		if OvaleAura.aura[guid] then
 			for auraId, whoseTable in pairs(OvaleAura.aura[guid]) do
 				for casterGUID in pairs(whoseTable) do
@@ -1400,7 +1400,7 @@ statePrototype.GetAuraByGUID = function(state, guid, auraId, filter, mine)
 end
 
 statePrototype.GetAura = function(state, unitId, auraId, filter, mine)
-	local guid = OvaleGUID:GetGUID(unitId)
+	local guid = OvaleGUID:UnitGUID(unitId)
 	return state:GetAuraByGUID(guid, auraId, filter, mine)
 end
 
@@ -1451,7 +1451,7 @@ end
 statePrototype.GetAuraWithProperty = function(state, unitId, propertyName, filter, atTime)
 	atTime = atTime or state.currentTime
 	local count = 0
-	local guid = OvaleGUID:GetGUID(unitId)
+	local guid = OvaleGUID:UnitGUID(unitId)
 	local start, ending = INFINITY, 0
 
 	-- Loop through auras not kept in the simulator that match the criteria.
@@ -1531,7 +1531,7 @@ do
 		stacks = 0
 		startChangeCount, endingChangeCount = INFINITY, INFINITY
 		startFirst, endingLast = INFINITY, 0
-		local excludeGUID = excludeUnitId and OvaleGUID:GetGUID(excludeUnitId) or nil
+		local excludeGUID = excludeUnitId and OvaleGUID:UnitGUID(excludeUnitId) or nil
 
 		-- Loop through auras not kept in the simulator that match the criteria.
 		for guid, auraTable in pairs(OvaleAura.aura) do

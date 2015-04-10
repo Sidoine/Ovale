@@ -302,7 +302,7 @@ do
 			if (node.namedParams.size ~= "small" and not node.namedParams.nocd and profile.apparence.predictif) then
 				if start then
 					state:Log("****Second icon %s", start)
-					state:ApplySpell(actionId, OvaleGUID:GetGUID(actionTarget), start)
+					state:ApplySpell(actionId, OvaleGUID:UnitGUID(actionTarget), start)
 					local atTime = state.nextCast
 					if actionId ~= state.lastGCDSpellId then
 						-- The previous spell cast did not trigger the GCD, so compute the next action at the current time.

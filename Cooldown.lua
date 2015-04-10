@@ -364,7 +364,7 @@ statePrototype.GetGCD = function(state, spellId, atTime, targetGUID)
 			atTime = state.currentTime
 		end
 	end
-	targetGUID = targetGUID or OvaleGUID:GetGUID(state.defaultTarget)
+	targetGUID = targetGUID or OvaleGUID:UnitGUID(state.defaultTarget)
 
 	local gcd = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID)
 	if not gcd then

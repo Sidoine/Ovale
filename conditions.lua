@@ -1651,7 +1651,7 @@ do
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		if state.lastSpellId then
-			local duration = state:GetGCD(state.lastSpellId, atTime, OvaleGUID:GetGUID(target))
+			local duration = state:GetGCD(state.lastSpellId, atTime, OvaleGUID:UnitGUID(target))
 			local start = state.startCast
 			local ending = start + duration
 			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
@@ -2632,7 +2632,7 @@ do
 	local function PersistentMultiplier(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local value = state:GetDamageMultiplier(spellId, OvaleGUID:GetGUID(target), atTime)
+		local value = state:GetDamageMultiplier(spellId, OvaleGUID:UnitGUID(target), atTime)
 		return Compare(value, comparator, limit)
 	end
 
@@ -4206,7 +4206,7 @@ do
 			if OvaleCondition.COMPARATOR[spellId] then
 				comparator, limit = spellId, positionalParams[i + 1]
 				break
-			elseif not usable or state:IsUsableSpell(spellId, atTime, OvaleGUID:GetGUID(target)) then
+			elseif not usable or state:IsUsableSpell(spellId, atTime, OvaleGUID:UnitGUID(target)) then
 				local start, duration = state:GetSpellCooldown(spellId)
 				local t = 0
 				if start > 0 and duration > 0 then
@@ -4324,7 +4324,7 @@ do
 	local function SpellUsable(positionalParams, namedParams, state, atTime)
 		local spellId, yesno = positionalParams[1], positionalParams[2]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, OvaleGUID:GetGUID(target))
+		local isUsable, noMana = state:IsUsableSpell(spellId, atTime, OvaleGUID:UnitGUID(target))
 		local boolean = isUsable or noMana
 		return TestBoolean(boolean, yesno)
 	end
@@ -4821,7 +4821,7 @@ do
 			local _, pt = OvalePower:GetSpellCost(spellId)
 			powerType = pt
 		end
-		local seconds = state:TimeToPower(spellId, atTime, OvaleGUID:GetGUID(target), powerType)
+		local seconds = state:TimeToPower(spellId, atTime, OvaleGUID:UnitGUID(target), powerType)
 
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
@@ -4883,7 +4883,7 @@ do
 	local function TimeToSpell(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
-		local seconds = state:GetTimeToSpell(spellId, atTime, OvaleGUID:GetGUID(target))
+		local seconds = state:GetTimeToSpell(spellId, atTime, OvaleGUID:UnitGUID(target))
 		if seconds == 0 then
 			return Compare(0, comparator, limit)
 		elseif seconds < INFINITY then
