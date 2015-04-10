@@ -44,7 +44,7 @@ AddFunction ArcaneInterruptActions
 AddFunction ArcaneDefaultMainActions
 {
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
-	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() SetState(burn_phase 0)
+	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
 	#call_action_list,name=aoe,if=active_enemies>=5
 	if Enemies() >= 5 ArcaneAoeMainActions()
 	#call_action_list,name=init_burn,if=!burn_phase
@@ -58,7 +58,7 @@ AddFunction ArcaneDefaultMainActions
 AddFunction ArcaneDefaultShortCdActions
 {
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
-	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() SetState(burn_phase 0)
+	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
 	#blink,if=movement.distance>10
 	if 0 > 10 Spell(blink)
 	#blazing_speed,if=movement.remains>0
@@ -90,7 +90,7 @@ AddFunction ArcaneDefaultCdActions
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() ArcaneInterruptActions()
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
-	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() SetState(burn_phase 0)
+	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
 
 	unless 0 > 10 and Spell(blink)
 	{
@@ -405,25 +405,25 @@ AddFunction ArcaneCrystalSequenceCdPostConditions
 AddFunction ArcaneInitBurnMainActions
 {
 	#start_burn_phase,if=buff.arcane_charge.stack>=4&(cooldown.prismatic_crystal.up|!talent.prismatic_crystal.enabled)&(cooldown.arcane_power.up|(glyph.arcane_power.enabled&cooldown.arcane_power.remains>60))&(cooldown.evocation.remains-2*buff.arcane_missiles.stack*spell_haste-gcd.max*talent.prismatic_crystal.enabled)*0.75*(1-0.1*(cooldown.arcane_power.remains<5))*(1-0.1*(talent.nether_tempest.enabled|talent.supernova.enabled))*(10%action.arcane_blast.execute_time)<mana.pct-20-2.5*active_enemies*(9-active_enemies)+(cooldown.evocation.remains*1.8%spell_haste)
-	if DebuffStacks(arcane_charge_debuff) >= 4 and { not SpellCooldown(prismatic_crystal) > 0 or not Talent(prismatic_crystal_talent) } and { not SpellCooldown(arcane_power) > 0 or Glyph(glyph_of_arcane_power) and SpellCooldown(arcane_power) > 60 } and { SpellCooldown(evocation) - 2 * BuffStacks(arcane_missiles_buff) * { 100 / { 100 + SpellHaste() } } - GCD() * TalentPoints(prismatic_crystal_talent) } * 0.75 * { 1 - 0.1 * { SpellCooldown(arcane_power) < 5 } } * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } < ManaPercent() - 20 - 2.5 * Enemies() * { 9 - Enemies() } + SpellCooldown(evocation) * 1.8 / { 100 / { 100 + SpellHaste() } } SetState(burn_phase 1)
+	if DebuffStacks(arcane_charge_debuff) >= 4 and { not SpellCooldown(prismatic_crystal) > 0 or not Talent(prismatic_crystal_talent) } and { not SpellCooldown(arcane_power) > 0 or Glyph(glyph_of_arcane_power) and SpellCooldown(arcane_power) > 60 } and { SpellCooldown(evocation) - 2 * BuffStacks(arcane_missiles_buff) * { 100 / { 100 + SpellHaste() } } - GCD() * TalentPoints(prismatic_crystal_talent) } * 0.75 * { 1 - 0.1 * { SpellCooldown(arcane_power) < 5 } } * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } < ManaPercent() - 20 - 2.5 * Enemies() * { 9 - Enemies() } + SpellCooldown(evocation) * 1.8 / { 100 / { 100 + SpellHaste() } } and not GetState(burn_phase) > 0 SetState(burn_phase 1)
 	#start_burn_phase,if=target.time_to_die*0.75*(1-0.1*(talent.nether_tempest.enabled|talent.supernova.enabled))*(10%action.arcane_blast.execute_time)*1.1<mana.pct-10+(target.time_to_die*1.8%spell_haste)
-	if target.TimeToDie() * 0.75 * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } * 1.1 < ManaPercent() - 10 + target.TimeToDie() * 1.8 / { 100 / { 100 + SpellHaste() } } SetState(burn_phase 1)
+	if target.TimeToDie() * 0.75 * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } * 1.1 < ManaPercent() - 10 + target.TimeToDie() * 1.8 / { 100 / { 100 + SpellHaste() } } and not GetState(burn_phase) > 0 SetState(burn_phase 1)
 }
 
 AddFunction ArcaneInitBurnShortCdActions
 {
 	#start_burn_phase,if=buff.arcane_charge.stack>=4&(cooldown.prismatic_crystal.up|!talent.prismatic_crystal.enabled)&(cooldown.arcane_power.up|(glyph.arcane_power.enabled&cooldown.arcane_power.remains>60))&(cooldown.evocation.remains-2*buff.arcane_missiles.stack*spell_haste-gcd.max*talent.prismatic_crystal.enabled)*0.75*(1-0.1*(cooldown.arcane_power.remains<5))*(1-0.1*(talent.nether_tempest.enabled|talent.supernova.enabled))*(10%action.arcane_blast.execute_time)<mana.pct-20-2.5*active_enemies*(9-active_enemies)+(cooldown.evocation.remains*1.8%spell_haste)
-	if DebuffStacks(arcane_charge_debuff) >= 4 and { not SpellCooldown(prismatic_crystal) > 0 or not Talent(prismatic_crystal_talent) } and { not SpellCooldown(arcane_power) > 0 or Glyph(glyph_of_arcane_power) and SpellCooldown(arcane_power) > 60 } and { SpellCooldown(evocation) - 2 * BuffStacks(arcane_missiles_buff) * { 100 / { 100 + SpellHaste() } } - GCD() * TalentPoints(prismatic_crystal_talent) } * 0.75 * { 1 - 0.1 * { SpellCooldown(arcane_power) < 5 } } * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } < ManaPercent() - 20 - 2.5 * Enemies() * { 9 - Enemies() } + SpellCooldown(evocation) * 1.8 / { 100 / { 100 + SpellHaste() } } SetState(burn_phase 1)
+	if DebuffStacks(arcane_charge_debuff) >= 4 and { not SpellCooldown(prismatic_crystal) > 0 or not Talent(prismatic_crystal_talent) } and { not SpellCooldown(arcane_power) > 0 or Glyph(glyph_of_arcane_power) and SpellCooldown(arcane_power) > 60 } and { SpellCooldown(evocation) - 2 * BuffStacks(arcane_missiles_buff) * { 100 / { 100 + SpellHaste() } } - GCD() * TalentPoints(prismatic_crystal_talent) } * 0.75 * { 1 - 0.1 * { SpellCooldown(arcane_power) < 5 } } * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } < ManaPercent() - 20 - 2.5 * Enemies() * { 9 - Enemies() } + SpellCooldown(evocation) * 1.8 / { 100 / { 100 + SpellHaste() } } and not GetState(burn_phase) > 0 SetState(burn_phase 1)
 	#start_burn_phase,if=target.time_to_die*0.75*(1-0.1*(talent.nether_tempest.enabled|talent.supernova.enabled))*(10%action.arcane_blast.execute_time)*1.1<mana.pct-10+(target.time_to_die*1.8%spell_haste)
-	if target.TimeToDie() * 0.75 * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } * 1.1 < ManaPercent() - 10 + target.TimeToDie() * 1.8 / { 100 / { 100 + SpellHaste() } } SetState(burn_phase 1)
+	if target.TimeToDie() * 0.75 * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } * 1.1 < ManaPercent() - 10 + target.TimeToDie() * 1.8 / { 100 / { 100 + SpellHaste() } } and not GetState(burn_phase) > 0 SetState(burn_phase 1)
 }
 
 AddFunction ArcaneInitBurnCdActions
 {
 	#start_burn_phase,if=buff.arcane_charge.stack>=4&(cooldown.prismatic_crystal.up|!talent.prismatic_crystal.enabled)&(cooldown.arcane_power.up|(glyph.arcane_power.enabled&cooldown.arcane_power.remains>60))&(cooldown.evocation.remains-2*buff.arcane_missiles.stack*spell_haste-gcd.max*talent.prismatic_crystal.enabled)*0.75*(1-0.1*(cooldown.arcane_power.remains<5))*(1-0.1*(talent.nether_tempest.enabled|talent.supernova.enabled))*(10%action.arcane_blast.execute_time)<mana.pct-20-2.5*active_enemies*(9-active_enemies)+(cooldown.evocation.remains*1.8%spell_haste)
-	if DebuffStacks(arcane_charge_debuff) >= 4 and { not SpellCooldown(prismatic_crystal) > 0 or not Talent(prismatic_crystal_talent) } and { not SpellCooldown(arcane_power) > 0 or Glyph(glyph_of_arcane_power) and SpellCooldown(arcane_power) > 60 } and { SpellCooldown(evocation) - 2 * BuffStacks(arcane_missiles_buff) * { 100 / { 100 + SpellHaste() } } - GCD() * TalentPoints(prismatic_crystal_talent) } * 0.75 * { 1 - 0.1 * { SpellCooldown(arcane_power) < 5 } } * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } < ManaPercent() - 20 - 2.5 * Enemies() * { 9 - Enemies() } + SpellCooldown(evocation) * 1.8 / { 100 / { 100 + SpellHaste() } } SetState(burn_phase 1)
+	if DebuffStacks(arcane_charge_debuff) >= 4 and { not SpellCooldown(prismatic_crystal) > 0 or not Talent(prismatic_crystal_talent) } and { not SpellCooldown(arcane_power) > 0 or Glyph(glyph_of_arcane_power) and SpellCooldown(arcane_power) > 60 } and { SpellCooldown(evocation) - 2 * BuffStacks(arcane_missiles_buff) * { 100 / { 100 + SpellHaste() } } - GCD() * TalentPoints(prismatic_crystal_talent) } * 0.75 * { 1 - 0.1 * { SpellCooldown(arcane_power) < 5 } } * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } < ManaPercent() - 20 - 2.5 * Enemies() * { 9 - Enemies() } + SpellCooldown(evocation) * 1.8 / { 100 / { 100 + SpellHaste() } } and not GetState(burn_phase) > 0 SetState(burn_phase 1)
 	#start_burn_phase,if=target.time_to_die*0.75*(1-0.1*(talent.nether_tempest.enabled|talent.supernova.enabled))*(10%action.arcane_blast.execute_time)*1.1<mana.pct-10+(target.time_to_die*1.8%spell_haste)
-	if target.TimeToDie() * 0.75 * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } * 1.1 < ManaPercent() - 10 + target.TimeToDie() * 1.8 / { 100 / { 100 + SpellHaste() } } SetState(burn_phase 1)
+	if target.TimeToDie() * 0.75 * { 1 - 0.1 * { Talent(nether_tempest_talent) or Talent(supernova_talent) } } * { 10 / ExecuteTime(arcane_blast) } * 1.1 < ManaPercent() - 10 + target.TimeToDie() * 1.8 / { 100 / { 100 + SpellHaste() } } and not GetState(burn_phase) > 0 SetState(burn_phase 1)
 }
 
 ### actions.init_crystal

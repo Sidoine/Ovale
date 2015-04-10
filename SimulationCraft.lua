@@ -1613,8 +1613,21 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and strfind(action, "pet_") then
 			conditionCode = "pet.Present()"
 		elseif class == "MAGE" and (action == "start_burn_phase" or action == "start_pyro_chain" or action == "stop_burn_phase" or action == "stop_pyro_chain") then
+			--[[
+				Translate the mage state actions using Ovale state variables:
+
+					start_<state>	SetState(<state> 1)
+					stop_<state>	SetState(<state> 0)
+
+				Also insert checks so that the state is set only if it changes.
+			--]]
 			local stateAction, stateVariable = strmatch(action, "([^_]+)_(.*)")
-			local value = stateAction == "start" and 1 or 0
+			local value = (stateAction == "start") and 1 or 0
+			if value == 0 then
+				conditionCode = format("GetState(%s) > 0", stateVariable)
+			else -- if value == 1 then
+				conditionCode = format("not GetState(%s) > 0", stateVariable)
+			end
 			bodyCode = format("SetState(%s %d)", stateVariable, value)
 			isSpellAction = false
 		elseif class == "MAGE" and action == "time_warp" then
