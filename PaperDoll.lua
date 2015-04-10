@@ -198,6 +198,7 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
 	self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
 	self:RegisterMessage("Ovale_TalentsChanged", "UpdateStats")
+	OvaleFuture:RegisterSpellcastInfo(self)
 	OvaleState:RegisterState(self, self.statePrototype)
 
 	self:UpdateSpecialization("OnEnable")
@@ -205,6 +206,7 @@ end
 
 function OvalePaperDoll:OnDisable()
 	OvaleState:UnregisterState(self)
+	OvaleFuture:UnregisterSpellcastInfo(self)
 	self:UnregisterEvent("COMBAT_RATING_UPDATE")
 	self:UnregisterEvent("MASTERY_UPDATE")
 	self:UnregisterEvent("MULTISTRIKE_UPDATE")
@@ -503,6 +505,17 @@ function OvalePaperDoll:UpdateSnapshot(tbl, snapshot, updateAllStats)
 	for k in pairs(nameTable) do
 		tbl[k] = snapshot[k]
 	end
+end
+
+-- Copy snapshot information from the spellcast to the destination table.
+function OvalePaperDoll:CopySpellcastInfo(spellcast, dest)
+	self:UpdateSnapshot(dest, spellcast, true)
+end
+
+-- Save snapshot information to the spellcast.
+function OvalePaperDoll:SaveSpellcastInfo(spellcast, atTime, state)
+	local paperDollModule = state or self
+	self:UpdateSnapshot(spellcast, true)
 end
 --</public-static-methods>
 

@@ -665,12 +665,8 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spell, rank, lineId
 						spellcast.auraGUID = auraGUID
 						self:Debug("Spell %s (%d) will finish after updating aura %d on %s.", spell, spellId, auraId, auraGUID)
 					end
-					--[[
-						Don't update the information to the current time for instant-cast spells.
-						The effects from instant-cast spells may already have occurred so, assume
-						the information saved from UNIT_SPELLCAST_SENT is still accurate.
-					--]]
-					--self:SaveSpellcastInfo(spellcast, now)
+					-- Update saved information in the spellcast to the current time.
+					self:SaveSpellcastInfo(spellcast, now)
 					OvaleScore:ScoreSpell(spellId)
 					success = true
 				else
@@ -833,8 +829,6 @@ end
 -- Copy information from the spellcast into the destination table.
 function OvaleFuture:CopySpellcastInfo(spellcast, dest)
 	self:StartProfiling("OvaleFuture_CopySpellcastInfo")
-	-- Copy the snapshot from the spellcast to the destination.
-	OvalePaperDoll:UpdateSnapshot(dest, spellcast, true)
 	if spellcast.damageMultiplier then
 		dest.damageMultiplier = spellcast.damageMultiplier
 	end
@@ -852,8 +846,9 @@ end
 function OvaleFuture:SaveSpellcastInfo(spellcast, atTime)
 	self:StartProfiling("OvaleFuture_SaveSpellcastInfo")
 	self:Debug("    Saving information from %s to the spellcast for %s.", atTime, spellcast.spellName)
-	-- Save the player snapshot into the spellcast.
-	self:UpdateSpellcastSnapshot(spellcast, atTime)
+	if spellcast.spellId then
+		spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellcast.spellId, spellcast.target, atTime)
+	end
 	-- Save the module-specific information into the spellcast.
 	for _, mod in pairs(self_modules) do
 		local func = mod.SaveSpellcastInfo
@@ -1049,7 +1044,12 @@ function OvaleFuture:UpdateSpellcastSnapshot(spellcast, atTime)
 			self:Debug("    Updating to snapshot from %s for spell %s with no target queued at %s.", atTime, spellcast.spellName, spellcast.queued)
 		end
 		OvalePaperDoll:UpdateSnapshot(spellcast, true)
-		spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellcast.spellId, spellcast.target, atTime)
+		if spellcast.spellId then
+			spellcast.damageMultiplier = OvaleFuture:GetDamageMultiplier(spellcast.spellId, spellcast.target, atTime)
+			if spellcast.damageMultiplier ~= 1 then
+				self:Debug("        persistent multiplier = %f", spellcast.damageMultiplier)
+			end
+		end
 	end
 end
 --</public-static-methods>
