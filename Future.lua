@@ -332,13 +332,18 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 					if spellcast.success and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
 						local finished = false
 						if not spellcast.auraId then
-							-- The spell is finished when it lands.
+							--[[
+								There is no aura to detect, so the spell is finished when it lands,
+								but not if it is a channelled spell.
+							--]]
 							if not eventDebug then
 								self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
 								eventDebug = true
 							end
-							self:Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent)
-							finished = true
+							if not spellcast.channel then
+								self:Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent)
+								finished = true
+							end
 						elseif CLEU_AURA_EVENT[cleuEvent] and spellcast.auraGUID and destGUID == spellcast.auraGUID then
 							-- The spell is finished when the aura update is detected.
 							if not eventDebug then
@@ -471,7 +476,7 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unitId, spell, rank, lin
 		-- Find the matching spellcast by name -- the line ID is always zero for channelled spells.
 		local spellcast, index = self:GetSpellcast(spell, spellId, nil, now)
 		if spellcast and spellcast.channel then
-			self:Debug("Stopped channelling spell %s (%d) queued at %s.", spell, spellId, spellcast.queued)
+			self:Debug("Finished channelling spell %s (%d) queued at %s.", spell, spellId, spellcast.queued)
 			spellcast.stop = now
 			self:UpdateLastSpellcast(now, spellcast)
 			self:SendMessage("Ovale_SpellFinished", now, spellId, spellcast.target, "hit")
