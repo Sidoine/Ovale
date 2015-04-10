@@ -412,8 +412,8 @@ end
 		UNIT_SPELLCAST_SUCCEEDED
 	Channel:
 		UNIT_SPELLCAST_SENT
-		UNIT_SPELLCAST_SUCCEEDED
 		UNIT_SPELLCAST_CHANNEL_START
+		UNIT_SPELLCAST_SUCCEEDED
 		UNIT_SPELLCAST_CHANNEL_UPDATE/UNIT_SPELLCAST_CHANNEL_STOP
 --]]
 
@@ -422,19 +422,19 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unitId, spell, rank, li
 		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START")
 		self:DebugTimestamp(event, unitId, spell, rank, lineId, spellId)
 		--[[
-			A channeled spell is actually two separate spells: a casted portion to land
+			A channeled spell is actually two separate spells: a cast portion to land
 			the spell, and a channel portion, each with different line IDs.  Find the
 			previous spellcast that landed the channelled spell.
 		--]]
 		local now = API_GetTime()
+		-- Find the matching spellcast by name -- the line ID is always zero for channelled spells.
 		local spellcast = self:GetSpellcast(spell, spellId, nil, now)
 		if spellcast then
 			local name, _, _, _, startTime, endTime = API_UnitChannelInfo(unitId)
 			if name == spell then
 				startTime = startTime / 1000
 				endTime = endTime / 1000
-				-- Set the line ID for the channel portion.
-				spellcast.channel = lineId
+				spellcast.channel = true
 				spellcast.spellId = spellId
 				-- Channelled spells are successful once they've started casting.
 				spellcast.success = now
@@ -468,8 +468,9 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unitId, spell, rank, lin
 		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP")
 		self:DebugTimestamp(event, unitId, spell, rank, lineId, spellId)
 		local now = API_GetTime()
-		local spellcast, index = self:GetSpellcast(spell, spellId, lineId, now)
-		if spellcast and spellcast.channel == lineId then
+		-- Find the matching spellcast by name -- the line ID is always zero for channelled spells.
+		local spellcast, index = self:GetSpellcast(spell, spellId, nil, now)
+		if spellcast and spellcast.channel then
 			self:Debug("Stopped channelling spell %s (%d) queued at %s.", spell, spellId, spellcast.queued)
 			spellcast.stop = now
 			self:UpdateLastSpellcast(now, spellcast)
@@ -488,7 +489,8 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_UPDATE(event, unitId, spell, rank, l
 		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE")
 		self:DebugTimestamp(event, unitId, spell, rank, lineId, spellId)
 		local now = API_GetTime()
-		local spellcast = self:GetSpellcast(spell, spellId, lineId, now)
+		-- Find the matching spellcast by name -- the line ID is always zero for channelled spells.
+		local spellcast = self:GetSpellcast(spell, spellId, nil, now)
 		if spellcast and spellcast.channel then
 			local name, _, _, _, startTime, endTime = API_UnitChannelInfo(unitId)
 			if name == spell then
@@ -737,7 +739,8 @@ function OvaleFuture:UnitSpellcastEnded(event, unitId, spell, rank, lineId, spel
 				self_pool:Release(spellcast)
 				Ovale.refreshNeeded[self_playerGUID] = true
 			end
-		else
+		elseif event ~= "UNIT_SPELLCAST_FAILED_QUIET" then
+			-- Suppress the warning for quiet failures since those are thrown quite a lot.
 			self:Debug("Warning: no queued spell %s (%d) found to end casting.", spell, spellId)
 		end
 		self:StopProfiling("OvaleFuture_UnitSpellcastEnded")
@@ -757,7 +760,7 @@ function OvaleFuture:GetSpellcast(spell, spellId, lineId, atTime)
 	self:StartProfiling("OvaleFuture_GetSpellcast")
 	local spellcast, index
 	for i, sc in ipairs(self.queue) do
-		if not lineId or sc.lineId == lineId or sc.channel == lineId then
+		if not lineId or sc.lineId == lineId then
 			if spellId and sc.spellId == spellId then
 				spellcast = sc
 				index = i
