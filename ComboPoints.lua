@@ -192,10 +192,10 @@ function OvaleComboPoints:Ovale_EquipmentChanged(event)
 	self_hasAssassination4pT17 = (Ovale.playerClass == "ROGUE" and OvalePaperDoll:IsSpecialization("assassination") and OvaleEquipment:GetArmorSetCount("T17") >= 4)
 end
 
-function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID, success)
-	self:Debug("%s (%f): Spell %d finished (%s) on %s", event, atTime, spellId, success, targetGUID or UNKNOWN)
+function OvaleComboPoints:Ovale_SpellFinished(event, atTime, spellId, targetGUID, finish)
+	self:Debug("%s (%f): Spell %d finished (%s) on %s", event, atTime, spellId, finish, targetGUID or UNKNOWN)
 	local si = OvaleData.spellInfo[spellId]
-	if si and si.combo == "finisher" and (success == "hit" or success == "critical") then
+	if si and si.combo == "finisher" and finish == "hit" then
 		self:Debug("    Spell %d hit and consumed all combo points.", spellId)
 		AddPendingComboEvent(atTime, spellId, targetGUID, "finisher", "finisher")
 		if self_hasRuthlessness and self.combo == MAX_COMBO_POINTS then
