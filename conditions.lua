@@ -19,7 +19,6 @@ local OvaleEquipment = Ovale.OvaleEquipment
 local OvaleFuture = Ovale.OvaleFuture
 local OvaleGUID = Ovale.OvaleGUID
 local OvaleHealth = Ovale.OvaleHealth
-local OvaleLatency = Ovale.OvaleLatency
 local OvalePower = Ovale.OvalePower
 local OvaleRunes = Ovale.OvaleRunes
 local OvaleSpellBook = Ovale.OvaleSpellBook
@@ -2465,27 +2464,6 @@ do
 
 	OvaleCondition:RegisterCondition("lastdamage", false, LastDamage)
 	OvaleCondition:RegisterCondition("lastspelldamage", false, LastDamage)
-end
-
-do
-	--- Get the most recent estimate of roundtrip latency in milliseconds.
-	-- @name Latency
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number of milliseconds to compare against.
-	-- @return The most recent estimate of latency.
-	-- @return A boolean value for the result of the comparison.
-	-- @usage
-	-- if Latency() >1000 Spell(sinister_strike)
-	-- if Latency(more 1000) Spell(sinister_strike)
-
-	local function Latency(positionalParams, namedParams, state, atTime)
-		local comparator, limit = positionalParams[1], positionalParams[2]
-		local value = OvaleLatency:GetLatency() * 1000
-		return Compare(value, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("latency", false, Latency)
 end
 
 do

@@ -38,7 +38,6 @@ Equipment.lua
 Future.lua
 GUID.lua
 Health.lua
-Latency.lua
 Lexer.lua
 PaperDoll.lua
 Power.lua

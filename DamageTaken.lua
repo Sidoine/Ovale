@@ -16,9 +16,6 @@ local OvalePool = Ovale.OvalePool
 local OvaleProfiler = Ovale.OvaleProfiler
 local OvaleQueue = Ovale.OvaleQueue
 
--- Forward declarations for module dependencies.
-local OvaleLatency = nil
-
 local bit_band = bit.band
 local bit_bor = bit.bor
 local strsub = string.sub
@@ -53,11 +50,6 @@ OvaleDamageTaken.damageEvent = OvaleQueue:NewDeque("OvaleDamageTaken_damageEvent
 --</public-static-properties>
 
 --<public-static-methods>
-function OvaleDamageTaken:OnInitialize()
-	-- Resolve module dependencies.
-	OvaleLatency = Ovale.OvaleLatency
-end
-
 function OvaleDamageTaken:OnEnable()
 	self_playerGUID = Ovale.playerGUID
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -112,12 +104,9 @@ function OvaleDamageTaken:AddDamageTaken(timestamp, damage, isMagicDamage)
 end
 
 -- Return the total damage taken in the previous time interval (in seconds).
-function OvaleDamageTaken:GetRecentDamage(interval, lagCorrection)
+function OvaleDamageTaken:GetRecentDamage(interval)
 	local now = API_GetTime()
 	local lowerBound = now - interval
-	if lagCorrection then
-		lowerBound = lowerBound - OvaleLatency:GetLatency()
-	end
 	self:RemoveExpiredEvents(now)
 
 	local total, totalMagic = 0, 0
