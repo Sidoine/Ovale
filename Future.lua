@@ -427,7 +427,7 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_START(event, unitId, spell, rank, li
 		self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START")
 		self:DebugTimestamp(event, unitId, spell, rank, lineId, spellId)
 		--[[
-			A channeled spell is actually two separate spells: a cast portion to land
+			A channelled spell is actually two separate spells: a cast portion to land
 			the spell, and a channel portion, each with different line IDs.  Find the
 			previous spellcast that landed the channelled spell.
 		--]]
@@ -1092,7 +1092,7 @@ statePrototype.endCast = nil
 statePrototype.nextCast = nil
 -- The most recent time the spell was cast in the simulator.
 statePrototype.lastCast = nil
--- Whether the spell being cast in the simulator is a channeled spell.
+-- Whether the spell being cast in the simulator is a channelled spell.
 statePrototype.channel = nil
 -- The previous spell cast in the simulator.
 statePrototype.lastSpellId = nil
@@ -1273,7 +1273,7 @@ end
 		targetGUID	The GUID of the target of the spellcast.
 		startCast	The time at the start of the spellcast.
 		endCast		The time at the end of the spellcast.
-		channel		The spell is a channeled spell.
+		channel		The spell is a channelled spell.
 		spellcast	(optional) Table of spellcast information, including a snapshot of player's stats.
 --]]
 do
