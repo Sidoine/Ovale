@@ -364,12 +364,13 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 								end
 							end
 							local delta = now - spellcast.stop
+							local targetGUID = spellcast.target
 							self:Debug("Spell %s (%d) was in flight for %s seconds.", spellName, spellId, delta)
-							self:SendMessage("Ovale_SpellFinished", now, spellId, spellcast.target, finish)
 							-- Remove the finished spellcast from the spell queue.
 							tremove(self.queue, i)
 							self_pool:Release(spellcast)
 							Ovale.refreshNeeded[self_playerGUID] = true
+							self:SendMessage("Ovale_SpellFinished", now, spellId, targetGUID, finish)
 						end
 					end
 				end
@@ -479,11 +480,12 @@ function OvaleFuture:UNIT_SPELLCAST_CHANNEL_STOP(event, unitId, spell, rank, lin
 			self:Debug("Finished channelling spell %s (%d) queued at %s.", spell, spellId, spellcast.queued)
 			spellcast.stop = now
 			self:UpdateLastSpellcast(now, spellcast)
-			self:SendMessage("Ovale_SpellFinished", now, spellId, spellcast.target, "hit")
 			-- Remove the finished spellcast from the spell queue.
+			local targetGUID = spellcast.target
 			tremove(self.queue, index)
 			self_pool:Release(spellcast)
 			Ovale.refreshNeeded[self_playerGUID] = true
+			self:SendMessage("Ovale_SpellFinished", now, spellId, targetGUID, "hit")
 		end
 		self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP")
 	end
@@ -681,10 +683,11 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spell, rank, lineId
 				end
 			end
 			if success then
+				local targetGUID = spellcast.target
 				-- Cache the most recent spellcast information.
 				self:UpdateLastSpellcast(now, spellcast)
 				-- Update any counters after this successful spellcast.
-				self:UpdateCounters(spellId, spellcast.stop, spellcast.target)
+				self:UpdateCounters(spellId, spellcast.stop, targetGUID)
 				-- Some spells finish upon successful spellcast.
 				local finished = false
 				local finish = "miss"
@@ -693,18 +696,18 @@ function OvaleFuture:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spell, rank, lineId
 					self:Debug("Finished spell %s (%d) with no target queued at %s.", spell, spellId, spellcast.queued)
 					finished = true
 					finish = "hit"
-				elseif spellcast.target == self_playerGUID and OvaleSpellBook:IsHelpfulSpell(spellId) then
+				elseif targetGUID == self_playerGUID and OvaleSpellBook:IsHelpfulSpell(spellId) then
 					-- If a helpful spell is cast by the player on the player, then it finishes upon cast.
 					self:Debug("Finished helpful spell %s (%d) cast on player queued at %s.", spell, spellId, spellcast.queued)
 					finished = true
 					finish = "hit"
 				end
 				if finished then
-					self:SendMessage("Ovale_SpellFinished", now, spellId, spellcast.target, finish)
 					-- Remove the finished spellcast from the spell queue.
 					tremove(self.queue, index)
 					self_pool:Release(spellcast)
 					Ovale.refreshNeeded[self_playerGUID] = true
+					self:SendMessage("Ovale_SpellFinished", now, spellId, targetGUID, finish)
 				end
 			end
 		else
