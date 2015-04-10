@@ -1712,6 +1712,16 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local buffName = "slice_and_dice_buff"
 			AddSymbol(annotation, buffName)
 			conditionCode = format("BuffRemaining(%s) < BaseDuration(%s)", buffName, buffName)
+		elseif class == "ROGUE" and (specialization == "assassination" or specialization == "combat") and action == "vanish" then
+			--[[
+				Allow toggling Vanish suggestions for Assassination and Combat so they can be used
+				situationally.  Vanish is a major DPS cooldown for Subtlety so the suggestion can't
+				be toggled for that specialization.
+			--]]
+			annotation.vanish = class
+			local spellName = "preparation"
+			AddSymbol(annotation, spellName)
+			conditionCode = format("CheckBoxOn(opt_vanish) or not SpellCooldown(%s) > 0", spellName)
 		elseif class == "SHAMAN" and strsub(action, 1, 11) == "ascendance_" then
 			-- Ascendance doesn't go on cooldown until after the buff expires, so don't
 			-- suggest Ascendance if already in Ascendance.
@@ -4391,6 +4401,16 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "chi_burst")
+		count = count + 1
+	end
+	if annotation.vanish == "ROGUE" then
+		local fmt = [[
+			AddCheckBox(opt_vanish SpellName(vanish) default %s)
+		]]
+		local code = format(fmt, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "vanish")
 		count = count + 1
 	end
 	if annotation.blade_flurry == "ROGUE" then

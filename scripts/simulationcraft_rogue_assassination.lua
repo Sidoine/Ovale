@@ -19,6 +19,7 @@ Include(ovale_rogue_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=assassination)
+AddCheckBox(opt_vanish SpellName(vanish) default specialization=assassination)
 
 AddFunction AssassinationUsePotionAgility
 {
@@ -100,7 +101,7 @@ AddFunction AssassinationDefaultMainActions
 AddFunction AssassinationDefaultShortCdActions
 {
 	#vanish,if=time>10&!buff.stealth.up
-	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) Spell(vanish)
+	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) and { CheckBoxOn(opt_vanish) or not SpellCooldown(preparation) > 0 } Spell(vanish)
 	#auto_attack
 	AssassinationGetInMeleeRange()
 
