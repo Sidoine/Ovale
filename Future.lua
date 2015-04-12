@@ -747,8 +747,8 @@ function OvaleFuture:UnitSpellcastEnded(event, unitId, spell, rank, lineId, spel
 				self_pool:Release(spellcast)
 				Ovale.refreshNeeded[self_playerGUID] = true
 			end
-		elseif event ~= "UNIT_SPELLCAST_FAILED_QUIET" then
-			-- Suppress the warning for quiet failures since those are thrown quite a lot.
+		elseif lineId > 0 then
+			-- Suppress the warning spellcasts with a line ID of zero since those are thrown quite a lot.
 			self:Debug("Warning: no queued spell %s (%d) found to end casting.", spell, spellId)
 		end
 		self:StopProfiling("OvaleFuture_UnitSpellcastEnded")
