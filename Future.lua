@@ -767,18 +767,20 @@ end
 function OvaleFuture:GetSpellcast(spell, spellId, lineId, atTime)
 	self:StartProfiling("OvaleFuture_GetSpellcast")
 	local spellcast, index
-	for i, sc in ipairs(self.queue) do
-		if not lineId or sc.lineId == lineId then
-			if spellId and sc.spellId == spellId then
-				spellcast = sc
-				index = i
-				break
-			elseif spell then
-				local spellName = sc.spellName or OvaleSpellBook:GetSpellName(spellId)
-				if spell == spellName then
+	if not lineId or lineId > 0 then
+		for i, sc in ipairs(self.queue) do
+			if not lineId or sc.lineId == lineId then
+				if spellId and sc.spellId == spellId then
 					spellcast = sc
 					index = i
 					break
+				elseif spell then
+					local spellName = sc.spellName or OvaleSpellBook:GetSpellName(spellId)
+					if spell == spellName then
+						spellcast = sc
+						index = i
+						break
+					end
 				end
 			end
 		end
