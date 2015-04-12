@@ -235,8 +235,8 @@ function OvaleHealth:UnitTimeToDie(unitId, guid)
 	local timeToDie = INFINITY
 	guid = guid or OvaleGUID:UnitGUID(unitId)
 	if guid then
-		local health = self:UnitHealth(unitId, guid)
-		local maxHealth = self:UnitHealthMax(unitId, guid)
+		local health = self:UnitHealth(unitId, guid) or 0
+		local maxHealth = self:UnitHealthMax(unitId, guid) or 1
 		if health == 0 then
 			timeToDie = 0
 			self.firstSeen[guid] = nil
