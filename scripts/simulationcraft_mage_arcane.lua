@@ -265,7 +265,7 @@ AddFunction ArcaneBurnCdActions
 
 			unless BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or ArmorSetBonus(T17 4) and BuffPresent(arcane_instability_buff) and BuffRemaining(arcane_instability_buff) < ExecuteTime(arcane_blast) and Spell(arcane_missiles) or { target.TimeToDie() < 8 or Charges(supernova) == 2 } and Spell(supernova) or not target.Name(prismatic_crystal) and DebuffStacks(arcane_charge_debuff) == 4 and { not DebuffCountOnAny(nether_tempest_debuff) > 0 or target.DebuffPresent(nether_tempest_debuff) and target.DebuffRemaining(nether_tempest_debuff) < 3.6 } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) < 4 and Spell(arcane_orb) or Talent(arcane_orb_talent) and Enemies() >= 3 and DebuffStacks(arcane_charge_debuff) == 4 and { SpellCooldown(arcane_orb) < GCD() or PreviousGCDSpell(arcane_orb) } and Spell(arcane_barrage) or DebuffStacks(arcane_charge_debuff) == 4 and ManaPercent() > 93 and Spell(arcane_blast) or DebuffStacks(arcane_charge_debuff) == 4 and { ManaPercent() > 70 or not { not SpellCooldown(evocation) > 0 } or target.TimeToDie() < 15 } and Spell(arcane_missiles) or ManaPercent() > 70 and ManaPercent() < 96 and Spell(supernova)
 			{
-				#evocation,interrupt_if=mana.pct>92,if=target.time_to_die>10&mana.pct<30+2.5*active_enemies*(9-active_enemies)
+				#evocation,interrupt_if=mana.pct>100-10%spell_haste,if=target.time_to_die>10&mana.pct<30+2.5*active_enemies*(9-active_enemies)
 				if target.TimeToDie() > 10 and ManaPercent() < 30 + 2.5 * Enemies() * { 9 - Enemies() } Spell(evocation)
 			}
 		}
