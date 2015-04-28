@@ -1137,7 +1137,7 @@ do
 		local value = ComputeParameter(spellId, "damage", state, atTime) or 0
 		-- Reduce by armor damage reduction for physical attacks.
 		local si = OvaleData.spellInfo[spellId]
-		if si.physical == 1 then
+		if si and si.physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		-- Default crit damage is two times normal damage.
@@ -1185,7 +1185,7 @@ do
 		local value = ComputeParameter(spellId, "damage", state, atTime) or 0
 		-- Reduce by armor damage reduction for physical attacks.
 		local si = OvaleData.spellInfo[spellId]
-		if si.physical == 1 then
+		if si and si.physical == 1 then
 			value = value * (1 - BossArmorDamageReduction(target))
 		end
 		return Compare(value, comparator, limit)
@@ -5084,7 +5084,10 @@ do
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		local si = spellId and OvaleData.spellInfo[spellId]
 		-- TODO: Track average time in flight to target for the spell.
-		local travelTime = si.travel_time or si.max_travel_time or 0
+		local travelTime = 0
+		if si then
+			travelTime = si.travel_time or si.max_travel_time or 0
+		end
 		if travelTime > 0 then
 			-- XXX Estimate the travel time to the target
 			local estimatedTravelTime = 1
