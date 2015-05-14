@@ -70,7 +70,7 @@ AddFunction RestorationShortCdActions
 		if TotemPresent(fire_elemental_totem) and BuffExpires(fire_elemental_totem_empower_buff any=1) Spell(fire_elemental_totem_empower)
 		if TotemPresent(earth totem=earth_elemental_totem) and BuffExpires(earth_elemental_totem_reinforce_buff any=1) Spell(earth_elemental_totem_reinforce)
 	}
-	Spell(unleash_life)
+	if BuffExpires(unleash_life_buff) Spell(unleash_life)
 }
 
 AddFunction RestorationCdActions
