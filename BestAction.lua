@@ -465,17 +465,16 @@ function OvaleBestAction:RecursiveCompute(element, state, atTime)
 	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpan, result
 	if element then
-		if element.asString then
-			state:Log("[%d] >>> Computing '%s' at time=%f: %s", element.nodeId, element.type, atTime, element.asString)
-		else
-			state:Log("[%d] >>> Computing '%s' at time=%f", element.nodeId, element.type, atTime)
-		end
 		-- Check for recently cached computation results.
 		if element.serial and element.serial >= self_serial then
 			timeSpan = element.timeSpan
 			result = element.result
-			state:Log("[%d]    using cached result (age = %d)", element.nodeId, element.serial)
 		else
+			if element.asString then
+				state:Log("[%d] >>> Computing '%s' at time=%f: %s", element.nodeId, element.type, atTime, element.asString)
+			else
+				state:Log("[%d] >>> Computing '%s' at time=%f", element.nodeId, element.type, atTime)
+			end
 			local visitor = COMPUTE_VISITOR[element.type]
 			if visitor and self[visitor] then
 				timeSpan, result = self[visitor](self, element, state, atTime)
@@ -801,7 +800,7 @@ function OvaleBestAction:ComputeCustomFunction(element, state, atTime)
 
 	local node = OvaleCompile:GetFunctionNode(element.name)
 	if node then
-		state:Log("[%d]    evaluating function: %s(%s)", element.nodeId, node.name, node.paramsAsString)
+		-- state:Log("[%d]    evaluating function: %s(%s)", element.nodeId, node.name, node.paramsAsString)
 		local timeSpanA, elementA = self:Compute(node.child[1], state, atTime)
 		CopyTimeSpan(timeSpan, timeSpanA)
 		result = elementA
@@ -818,7 +817,7 @@ function OvaleBestAction:ComputeFunction(element, state, atTime)
 	local timeSpan = GetTimeSpan(element)
 	local result
 
-	state:Log("[%d]    evaluating condition: %s(%s)", element.nodeId, element.name, element.paramsAsString)
+	-- state:Log("[%d]    evaluating condition: %s(%s)", element.nodeId, element.name, element.paramsAsString)
 	local start, ending, value, origin, rate = OvaleCondition:EvaluateCondition(element.func, element.positionalParams, element.namedParams, state, atTime)
 	if start and ending then
 		CopyTimeSpan(timeSpan, start, ending)
