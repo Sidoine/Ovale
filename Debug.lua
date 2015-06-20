@@ -1,5 +1,5 @@
 --[[--------------------------------------------------------------------
-    Copyright (C) 2012, 2013, 2014 Johnny C. Lam.
+    Copyright (C) 2012, 2013, 2014, 2015 Johnny C. Lam.
     See the file LICENSE.txt for copying permission.
 --]]----------------------------------------------------------------------
 
@@ -88,10 +88,7 @@ OvaleDebug.options = {
 					name = L["Trace"],
 					desc = L["Trace the next frame update."],
 					func = function()
-						self_traceLog:Clear()
-						OvaleDebug.trace = true
-						OvaleDebug:Log("=== Trace @%f", API_GetTime())
-						OvaleDebug:ScheduleTimer("DisplayTraceLog", 0.5)
+						OvaleDebug:DoTrace(true)
 					end,
 				},
 				traceLog = {
@@ -122,6 +119,15 @@ end
 
 function OvaleDebug:OnEnable()
 	self_traceLog = LibTextDump:New(OVALE .. " - " .. L["Trace Log"], 750, 500)
+end
+
+function OvaleDebug:DoTrace(displayLog)
+	self_traceLog:Clear()
+	self.trace = true
+	self:Log("=== Trace @%f", API_GetTime())
+	if displayLog then
+		self:ScheduleTimer("DisplayTraceLog", 0.5)
+	end
 end
 
 function OvaleDebug:ResetTrace()

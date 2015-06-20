@@ -1,5 +1,5 @@
 --[[--------------------------------------------------------------------
-    Copyright (C) 2014 Johnny C. Lam.
+    Copyright (C) 2014, 2015 Johnny C. Lam.
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ Ovale.OvaleDataBroker = OvaleDataBroker
 local L = Ovale.L
 local LibDataBroker = LibStub("LibDataBroker-1.1", true)
 local LibDBIcon = LibStub("LibDBIcon-1.0", true)
+local OvaleDebug = Ovale.OvaleDebug
 local OvaleOptions = Ovale.OvaleOptions
 
 -- Forward declarations for module dependencies.
@@ -20,6 +21,7 @@ local pairs = pairs
 local tinsert = table.insert
 local API_CreateFrame = CreateFrame
 local API_EasyMenu = EasyMenu
+local API_IsShiftKeyDown = IsShiftKeyDown
 -- GLOBALS: UIParent
 
 -- Class icon textures.
@@ -97,7 +99,11 @@ local function OnClick(frame, button)
 	elseif button == "MiddleButton" then
 		Ovale:ToggleOptions()
 	elseif button == "RightButton" then
-		OvaleOptions:ToggleConfig()
+		if API_IsShiftKeyDown() then
+			OvaleDebug:DoTrace(true)
+		else
+			OvaleOptions:ToggleConfig()
+		end
 	end
 end
 
@@ -107,6 +113,7 @@ local function OnTooltipShow(tooltip)
 	tooltip:AddLine(L["Click to select the script."])
 	tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
 	tooltip:AddLine(L["Right-Click for options."])
+	tooltip:AddLine(L["Shift-Right-Click for the current trace log."])
 end
 --</private-static-methods>
 
