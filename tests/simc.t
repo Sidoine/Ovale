@@ -6,7 +6,7 @@
 --]]
 
 -- Constants.
-local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier18M"
 local root = "../"
 local profileSeparator = string.rep("=", 80)
 local separator = string.rep("-", 80)

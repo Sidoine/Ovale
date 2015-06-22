@@ -1,6 +1,6 @@
 -- Constants.
 local outputDirectory = "../simulationcraft"
-local profilesDirectory = "../../SimulationCraft/profiles/Tier17M"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier18M"
 local root = "../"
 
 local SIMC_CLASS = {
