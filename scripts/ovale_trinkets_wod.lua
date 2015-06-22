@@ -8,6 +8,27 @@ do
 # Trinkets from Warlords of Draenor.
 
 ###
+### Legendary ring
+###
+
+Define(legendary_ring_agility 124636)
+Define(legendary_ring_bonus_armor 124637)
+Define(legendary_ring_intellect 124635)
+Define(legendary_ring_spirit 124638)
+Define(legendary_ring_strength 124634)
+
+Define(etheralus_buff 187618)
+	SpellInfo(etheralus_buff duration=15)
+Define(maalus_buff 187620)
+	SpellInfo(maalus_buff duration=15)
+Define(nithramus_buff 187616)
+	SpellInfo(nithramus_buff duration=15)
+Define(sanctus_buff 187617)
+	SpellInfo(sanctus_buff duration=15)
+Define(thorasus_buff 187619)
+	SpellInfo(thorasus_buff duration=15)
+
+###
 ### Agility
 ###
 
