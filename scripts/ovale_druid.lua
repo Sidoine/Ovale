@@ -86,7 +86,7 @@ AddFunction RestorationCdActions
 	Spell(blood_fury_apsp)
 	Spell(berserking)
 	if ManaPercent() < 97 Spell(arcane_torrent_mana)
-	Spell(incarnation_heal)
+	Spell(incarnation_tree_of_life)
 	Spell(heart_of_the_wild_heal)
 	Spell(natures_vigil)
 }
