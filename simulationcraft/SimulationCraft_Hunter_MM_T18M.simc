@@ -29,6 +29,7 @@ actions.precombat+=/focusing_shot
 # Executed every time the actor is available.
 
 actions=auto_shot
+actions+=/counter_shot
 actions+=/use_item,name=maalus_the_blood_drinker
 actions+=/arcane_torrent,if=focus.deficit>=30
 actions+=/blood_fury

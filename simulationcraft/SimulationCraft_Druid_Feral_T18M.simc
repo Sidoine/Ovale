@@ -19,7 +19,7 @@ spec=feral
 actions.precombat=flask,type=greater_draenic_agility_flask
 actions.precombat+=/food,type=pickled_eel
 actions.precombat+=/mark_of_the_wild,if=!aura.str_agi_int.up
-actions.precombat+=/healing_touch,if=talent.bloodtalons.enabled
+actions.precombat+=/healing_touch,if=talent.bloodtalons.enabled&buff.bloodtalons.remains<20
 actions.precombat+=/cat_form
 actions.precombat+=/prowl
 # Snapshot raid buffed stats before combat begins and pre-potting is done.

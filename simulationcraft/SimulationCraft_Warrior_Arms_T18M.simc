@@ -22,6 +22,8 @@ spec=arms
 
 actions.precombat=flask,type=greater_draenic_strength_flask
 actions.precombat+=/food,type=sleeper_sushi
+actions.precombat+=/commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+actions.precombat+=/battle_shout,if=!aura.attack_power_multiplier.up
 actions.precombat+=/stance,choose=battle
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
@@ -31,6 +33,7 @@ actions.precombat+=/potion,name=draenic_strength
 
 actions=charge,if=debuff.charge.down
 actions+=/auto_attack
+actions+=/pummel
 # This is mostly to prevent cooldowns from being accidentally used during movement.
 actions+=/run_action_list,name=movement,if=movement.distance>5
 actions+=/use_item,name=thorasus_the_stone_heart_of_draenor,if=(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))

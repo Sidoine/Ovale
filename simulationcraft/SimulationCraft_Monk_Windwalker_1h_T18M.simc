@@ -18,6 +18,7 @@ spec=windwalker
 
 actions.precombat=flask,type=greater_draenic_agility_flask
 actions.precombat+=/food,type=salty_squid_roll
+actions.precombat+=/legacy_of_the_white_tiger,if=!aura.str_agi_int.up|!aura.critical_strike.up
 actions.precombat+=/stance,choose=fierce_tiger
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion,name=draenic_agility
@@ -25,6 +26,8 @@ actions.precombat+=/potion,name=draenic_agility
 # Executed every time the actor is available.
 
 actions=auto_attack
+actions+=/spear_hand_strike
+actions+=/nimble_brew
 actions+=/invoke_xuen
 actions+=/storm_earth_and_fire,target=2,if=debuff.storm_earth_and_fire_target.down
 actions+=/storm_earth_and_fire,target=3,if=debuff.storm_earth_and_fire_target.down

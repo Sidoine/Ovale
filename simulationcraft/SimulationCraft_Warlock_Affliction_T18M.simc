@@ -48,6 +48,7 @@ actions+=/dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_
 actions+=/kiljaedens_cunning,if=(talent.cataclysm.enabled&!cooldown.cataclysm.remains)
 actions+=/kiljaedens_cunning,moving=1,if=!talent.cataclysm.enabled
 actions+=/cataclysm
+actions+=/life_tap,if=mana.pct<30&buff.dark_soul.down
 actions+=/agony,cycle_targets=1,if=remains<=gcd
 actions+=/corruption,cycle_targets=1,if=remains<=gcd
 actions+=/unstable_affliction,cycle_targets=1,if=remains<=cast_time

@@ -22,6 +22,7 @@ actions.precombat+=/blessing_of_kings,if=!aura.str_agi_int.up
 actions.precombat+=/blessing_of_might,if=!aura.mastery.up
 actions.precombat+=/seal_of_truth,if=spell_targets.divine_storm<3
 actions.precombat+=/seal_of_righteousness,if=spell_targets.divine_storm>=3
+actions.precombat+=/righteous_fury,if=buff.righteous_fury.up
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion,name=draenic_strength

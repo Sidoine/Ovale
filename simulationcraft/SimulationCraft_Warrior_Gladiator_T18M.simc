@@ -20,6 +20,8 @@ spec=protection
 
 actions.precombat=flask,type=greater_draenic_strength_flask
 actions.precombat+=/food,type=pickled_eel
+actions.precombat+=/commanding_shout,if=!aura.stamina.up&aura.attack_power_multiplier.up
+actions.precombat+=/battle_shout,if=!aura.attack_power_multiplier.up
 actions.precombat+=/stance,choose=gladiator
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
@@ -29,6 +31,7 @@ actions.precombat+=/potion,name=draenic_armor
 
 actions=charge
 actions+=/auto_attack
+actions+=/pummel
 # This is mostly to prevent cooldowns from being accidentally used during movement.
 actions+=/run_action_list,name=movement,if=movement.distance>5
 actions+=/avatar
