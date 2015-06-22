@@ -78,6 +78,7 @@ local MODIFIER_KEYWORD = {
 	["sync"] = true,
 	["sync_weapons"] = true,
 	["target"] = true,
+	["target_if"] = true,
 	["target_if_first"] = true,		-- "target_if_<type>" is a fake modifier.
 	["target_if_max"] = true,
 	["target_if_min"] = true,
@@ -535,6 +536,8 @@ ParseAction = function(action, nodeList, annotation)
 		-- Fix bugs in SimulationCraft action lists.
 		-- ",," into ","
 		stream = gsub(stream, ",,", ",")
+		-- "&&" into "&"
+		stream = gsub(stream, "%&%&", "&")
 		-- "target.target." into "target."
 		stream = gsub(stream, "target%.target%.", "target.")
 	end
@@ -1020,6 +1023,9 @@ local function InitializeDisambiguation()
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_runicpower",	"DEATHKNIGHT")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"DEATHKNIGHT")
 	AddDisambiguation("breath_of_sindragosa_debuff",	"breath_of_sindragosa_buff",	"DEATHKNIGHT")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DEATHKNIGHT",	"blood")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"DEATHKNIGHT",	"frost")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"DEATHKNIGHT",	"unholy")
 	AddDisambiguation("soul_reaper",			"soul_reaper_blood",			"DEATHKNIGHT",	"blood")
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
@@ -1038,6 +1044,10 @@ local function InitializeDisambiguation()
 	AddDisambiguation("incarnation",			"incarnation_caster",			"DRUID",		"balance")
 	AddDisambiguation("incarnation",			"incarnation_melee",			"DRUID",		"feral")
 	AddDisambiguation("incarnation",			"incarnation_tank",				"DRUID",		"guardian")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"DRUID",		"feral")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DRUID",		"guardian")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"DRUID",		"balance")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"DRUID",		"restoration")
 	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
@@ -1047,10 +1057,12 @@ local function InitializeDisambiguation()
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	AddDisambiguation("frenzy",					"pet_frenzy",					"HUNTER",		"beast_mastery")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"HUNTER")
 	-- Mage
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
 	AddDisambiguation("arcane_charge_buff",		"arcane_charge_debuff",			"MAGE",			"arcane")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"MAGE")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"MAGE")
 	AddDisambiguation("water_jet",				"water_elemental_water_jet",	"MAGE",			"frost")
 	-- Monk
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_chi",			"MONK")
@@ -1058,12 +1070,18 @@ local function InitializeDisambiguation()
 	AddDisambiguation("chi_explosion",			"chi_explosion_heal",			"MONK",			"mistweaver")
 	AddDisambiguation("chi_explosion",			"chi_explosion_melee",			"MONK",			"windwalker")
 	AddDisambiguation("chi_explosion",			"chi_explosion_tank",			"MONK",			"brewmaster")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"MONK",			"windwalker")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"MONK",			"brewmaster")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"MONK",			"mistweaver")
 	AddDisambiguation("zen_sphere_debuff",		"zen_sphere_buff",				"MONK")
 	-- Paladin
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_holy",			"PALADIN")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_heal",			"PALADIN",		"holy")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_melee",			"PALADIN",		"retribution")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"PALADIN")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"PALADIN",		"protection")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PALADIN",		"holy")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"PALADIN",		"retribution")
 	AddDisambiguation("sacred_shield_debuff",	"sacred_shield_buff",			"PALADIN")
 	-- Priest
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"PRIEST")
@@ -1078,10 +1096,14 @@ local function InitializeDisambiguation()
 	AddDisambiguation("halo",					"halo_caster",					"PRIEST",		"shadow")
 	AddDisambiguation("halo",					"halo_heal",					"PRIEST",		"discipline")
 	AddDisambiguation("halo",					"halo_heal",					"PRIEST",		"holy")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"PRIEST",		"shadow")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PRIEST",		"discipline")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PRIEST",		"holy")
 	AddDisambiguation("renew_debuff",			"renew_buff",					"PRIEST")
 	-- Rogue
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"ROGUE")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"ROGUE")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"ROGUE")
 	AddDisambiguation("stealth_buff",			"stealthed_buff",				"ROGUE")
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
@@ -1089,6 +1111,9 @@ local function InitializeDisambiguation()
 	AddDisambiguation("ascendance",				"ascendance_heal",				"SHAMAN",		"restoration")
 	AddDisambiguation("ascendance",				"ascendance_melee",				"SHAMAN",		"enhancement")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"SHAMAN")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"SHAMAN",		"enhancement")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"SHAMAN",		"elemental")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"SHAMAN",		"restoration")
 	-- Warlock
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"WARLOCK")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"WARLOCK")
@@ -1098,10 +1123,14 @@ local function InitializeDisambiguation()
 	AddDisambiguation("glyph_of_dark_soul_instability",	"glyph_of_dark_soul",	"WARLOCK",		"destruction")
 	AddDisambiguation("glyph_of_dark_soul_knowledge",	"glyph_of_dark_soul",	"WARLOCK",		"demonology")
 	AddDisambiguation("glyph_of_dark_soul_misery",		"glyph_of_dark_soul",	"WARLOCK",		"affliction")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"WARLOCK")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
 	AddDisambiguation("execute",				"execute_arms",					"WARRIOR",		"arms")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"WARRIOR",		"protection")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"WARRIOR",		"arms")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"WARRIOR",		"fury")
 	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"arms")
 	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"fury")
 	AddDisambiguation("shield_barrier",			"shield_barrier_tank",			"WARRIOR",		"protection")
@@ -2251,6 +2280,10 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				--]]
 				local rhsNode = parseNode.child[2]
 				local name = rhsNode.name
+				-- Strip out any leading "target." or "pet." prefixes.
+				if strfind(name, "^[%a_]+%.") then
+					name = strmatch(name, "^[%a_]+%.([%a_]+)")
+				end
 				local code
 				if parseNode.operator == "=" then
 					code = format("target.Name(%s)", name)
@@ -2760,6 +2793,7 @@ do
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["time"]				= "TimeInCombat()",
 		["time_to_die"]			= "TimeToDie()",
+		["time_to_die.remains"]	= "TimeToDie()",
 		["unholy.frac"]			= "Rune(unholy)",
 	}
 
@@ -2800,6 +2834,9 @@ do
 			AddSymbol(annotation, name)
 		elseif class == "WARLOCK" and operand == "burning_ember" then
 			code = format("%sBurningEmbers() / 10", target)
+		elseif strsub(operand, 1, 22) == "active_enemies_within." then
+			-- "active_enemies_within.<distance>" is roughly equivalent to the number of enemies.
+			code = "Enemies()"
 		elseif strfind(operand, "^incoming_damage_") then
 			local seconds, measure = strmatch(operand, "^incoming_damage_([%d]+)(m?s?)$")
 			seconds = tonumber(seconds)
@@ -2810,6 +2847,13 @@ do
 				code = format("IncomingDamage(%f) > 0", seconds)
 			else
 				code = format("IncomingDamage(%f)", seconds)
+			end
+		elseif strsub(operand, 1, 10) == "main_hand." then
+			local weaponType = strsub(operand, 11)
+			if weaponType == "1h" then
+				code = "HasWeapon(main type=one_handed)"
+			elseif weaponType == "2h" then
+				code = "HasWeapon(main type=two_handed)"
 			end
 		elseif operand == "mastery_value" then
 			code = format("%sMasteryEffect() / 100", target)
@@ -2828,6 +2872,12 @@ do
 			-- "spell_haste" is the player's spell factor, e.g.,
 			-- 25% haste corresponds to a "spell_haste" value of 1/(1 + 0.25) = 0.8.
 			code = "100 / { 100 + SpellHaste() }"
+		elseif strsub(operand, 1, 14) == "spell_targets." then
+			-- "spell_target.<spell>" is roughly equivalent to the number of enemies.
+			code = "Enemies()"
+		elseif operand == "t18_class_trinket" then
+			code = format("HasTrinket(%s)", operand)
+			AddSymbol(annotation, operand)
 		else
 			ok = false
 		end
@@ -3438,6 +3488,20 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "GCD()"
 	elseif operand == "gcd.remains" then
 		code = "GCDRemaining()"
+	elseif strsub(operand, 1, 15) == "legendary_ring." then
+		local name = Disambiguate("legendary_ring", class, specialization)
+		local properties = strsub(operand, 16)
+		local tokenIterator = gmatch(properties, OPERAND_TOKEN_PATTERN)
+		local token = tokenIterator()
+		if token == "cooldown" then
+			token = tokenIterator()
+			if token == "remains" then
+				code = format("ItemCooldown(%s)", name)
+			end
+		elseif token == "has_cooldown" then
+			code = format("ItemCooldown(%s) > 0", name)
+		end
+		AddSymbol(annotation, name)
 	elseif operand == "ptr" then
 		code = "PTR()"
 	elseif operand == "time_to_die" then
