@@ -144,14 +144,18 @@ end
 function OvaleScripts:GetDefaultScriptName(class, specialization)
 	local name
 	if class == "DEATHKNIGHT" then
-		if specialization == "frost" then
-			local weaponType = OvaleEquipment:HasOffHandWeapon() and "1h" or "2h"
-			name = format("simulationcraft_death_knight_frost_%s_t17m", weaponType)
-		elseif specialization then
+		if specialization == "blood" then
+			-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
 			name = format("simulationcraft_death_knight_%s_t17m", specialization)
+		elseif specialization == "frost" then
+			local weaponType = OvaleEquipment:HasOffHandWeapon() and "1h" or "2h"
+			name = format("simulationcraft_death_knight_frost_%s_t18m", weaponType)
+		elseif specialization then
+			name = format("simulationcraft_death_knight_%s_t18m", specialization)
 		end
 	elseif class == "DRUID" then
 		if specialization == "balance" then
+			-- TODO: Add support for balance Eclipse energy to allow scripts to work.
 			name = DISABLED_NAME
 		elseif specialization == "restoration" then
 			name = "nerien_druid_restoration"
@@ -164,24 +168,31 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 		else -- if specialization == "survival" then
 			specialization = "sv"
 		end
-		name = format("simulationcraft_hunter_%s_t17m", specialization)
+		name = format("simulationcraft_hunter_%s_t18m", specialization)
 	elseif class == "MONK" then
 		local weaponType = OvaleEquipment:HasOffHandWeapon() and "1h" or "2h"
 		if specialization == "brewmaster" then
+			-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
 			local talentChoice = "serenity"					-- Serenity (default)
 			if OvaleSpellBook:GetTalentPoints(20) > 0 then	-- Chi Explosion
 				talentChoice = "ce"
 			end
 			name = format("simulationcraft_monk_brewmaster_%s_%s_t17m", weaponType, talentChoice)
 		elseif specialization == "windwalker" then
-			name = format("simulationcraft_monk_windwalker_%s_t17m", weaponType)
+			name = format("simulationcraft_monk_windwalker_%s_t18m", weaponType)
 		end
-	elseif class == "PALADIN" and specialization == "holy" then
-		name = DISABLED_NAME
+	elseif class == "PALADIN" then
+		if specialization == "holy" then
+			-- TODO: Create a holy paladin script (see summonstone.com).
+			name = DISABLED_NAME
+		elseif class == "protection" then
+			-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
+			name = format("simulationcraft_paladin_%s_t17m", specialization)
+		end
 	elseif class == "PRIEST" then
 		if specialization == "discipline" or specialization == "holy" then
-			-- Use the "heal" profile.
-			name = format("simulationcraft_priest_%s_t17m_heal", specialization)
+			-- TODO: Create discipline and holy priest scripts.
+			name = DISABLED_NAME
 		else -- if specialization == "shadow" then
 			local talentChoice = "cop"							-- Clarity of Power (default)
 			if OvaleSpellBook:GetTalentPoints(20) > 0 then		-- Void Entropy
@@ -189,24 +200,27 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			elseif OvaleSpellBook:GetTalentPoints(21) > 0 then	-- Auspicious Spirits
 				talentChoice = "as"
 			end
-			name = format("simulationcraft_priest_shadow_t17m_%s", talentChoice)
+			name = format("simulationcraft_priest_shadow_t18m_%s", talentChoice)
 		end
 	elseif class == "SHAMAN" and specialization == "restoration" then
 		name = "nerien_shaman_restoration"
 	elseif class == "WARRIOR" then
 		if specialization == "fury" then
 			local weaponType = OvaleEquipment:HasMainHandWeapon(1) and "1h" or "2h"
-			name = format("simulationcraft_warrior_fury_%s_t17m", weaponType)
+			name = format("simulationcraft_warrior_fury_%s_t18m", weaponType)
 		elseif specialization == "protection" then
 			-- Check if the warrior is in Gladiator Stance for DPS.
 			if OvaleStance:IsStance("warrior_gladiator_stance") then
 				specialization = "gladiator"
+				name = format("simulationcraft_warrior_%s_t18m", specialization)
+			else
+				-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
+				name = format("simulationcraft_warrior_%s_t17m", specialization)
 			end
-			name = format("simulationcraft_warrior_%s_t17m", specialization)
 		end
 	end
 	if not name and specialization then
-		name = format("simulationcraft_%s_%s_t17m", strlower(class), specialization)
+		name = format("simulationcraft_%s_%s_t18m", strlower(class), specialization)
 	end
 	if not (name and self.script[name]) then
 		name = DISABLED_NAME
