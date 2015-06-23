@@ -385,10 +385,6 @@ do
 
 	OvaleCondition:RegisterCondition("buffcountonany", false, BuffCountOnAny)
 	OvaleCondition:RegisterCondition("debuffcountonany", false, BuffCountOnAny)
-
-	-- Deprecated.
-	OvaleCondition:RegisterCondition("buffcount", false, BuffCountOnAny)
-	OvaleCondition:RegisterCondition("debuffcount", false, BuffCountOnAny)
 end
 
 do
@@ -3741,35 +3737,6 @@ do
 end
 
 do
-	local RUNE_OF_POWER = 116011
-	local RUNE_OF_POWER_BUFF = 116014
-
-	--- Get the remaining time in seconds before the latest Rune of Power expires.
-	--- Returns non-zero only if the player is standing within an existing Rune of Power.
-	-- @name RuneOfPowerRemaining
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The number of seconds.
-	-- @return A boolean value for the result of the comparison.
-	-- @usage
-	-- if RuneOfPowerRemaining() < CastTime(rune_of_power) Spell(rune_of_power)
-
-	local function RuneOfPowerRemaining(positionalParams, namedParams, state, atTime)
-		Ovale:OneTimeMessage("Warning: 'RuneOfPowerRemaining()' is deprecated; use 'TotemRemaining(rune_of_power)' instead.")
-		local comparator, limit = positionalParams[1], positionalParams[2]
-		local count, start, ending = state:GetTotemCount(RUNE_OF_POWER, atTime)
-		if count > 0 then
-			return TestValue(start, ending, 0, ending, -1, comparator, limit)
-		end
-		return Compare(0, comparator, limit)
-	end
-
-	OvaleCondition:RegisterCondition("runeofpowerremaining", false, RuneOfPowerRemaining)
-	OvaleCondition:RegisterCondition("runeofpowerremains", false, RuneOfPowerRemaining)
-end
-
-do
 	local RUNE_TYPE = OvaleRunes.RUNE_TYPE
 
 	local runes = {
@@ -4902,38 +4869,6 @@ do
 end
 
 do
-	-- Deprecated: totem types
-	local function CheckDeprecatedTotem(id, state)
-		local warning = false
-		local specialization = state.specialization
-		if id == "mushroom" then
-			warning = id
-			if specialization == 1 then
-				-- Balance.
-				id = 88747
-			elseif specialization == 4 then
-				-- Restoration.
-				id = 145205
-			end
-		elseif id == "statue" then
-			warning = id
-			if specialization == 1 then
-				-- Brewmaster.
-				id = 115315
-			elseif specialization == 2 then
-				-- Mistweaver.
-				id = 115313
-			end
-		elseif id == "ghoul" then
-			-- Ghouls are no longer totems, but pets summoned by Unholy Death Knights.
-			warning = id
-		end
-		if warning then
-			Ovale:OneTimeMessage("Warning: '%s' is deprecated; using '%s' instead.", warning, tostring(id))
-		end
-		return id
-	end
-
 	--- Test if the totem has expired.
 	-- @name TotemExpires
 	-- @paramsig boolean
@@ -4949,11 +4884,6 @@ do
 	local function TotemExpires(positionalParams, namedParams, state, atTime)
 		local id, seconds = positionalParams[1], positionalParams[2]
 		seconds = seconds or 0
-		if namedParams.totem then
-			id = namedParams.totem
-			Ovale:OneTimeMessage("Warning: using 'totem' parameter in 'TotemExpires()' is deprecated.")
-		end
-		id = CheckDeprecatedTotem(id, state)
 		if type(id) == "string" then
 			local _, name, startTime, duration = state:GetTotemInfo(id)
 			if startTime then
@@ -4980,11 +4910,6 @@ do
 
 	local function TotemPresent(positionalParams, namedParams, state, atTime)
 		local id = positionalParams[1]
-		if namedParams.totem then
-			id = namedParams.totem
-			Ovale:OneTimeMessage("Warning: using 'totem' parameter in 'TotemPresent()' is deprecated.")
-		end
-		id = CheckDeprecatedTotem(id, state)
 		if type(id) == "string" then
 			local _, name, startTime, duration = state:GetTotemInfo(id)
 			if startTime and duration > 0 then
@@ -5016,11 +4941,6 @@ do
 
 	local function TotemRemaining(positionalParams, namedParams, state, atTime)
 		local id, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		if namedParams.totem then
-			id = namedParams.totem
-			Ovale:OneTimeMessage("Warning: using 'totem' parameter in 'TotemRemaining()' is deprecated.")
-		end
-		id = CheckDeprecatedTotem(id, state)
 		if type(id) == "string" then
 			local _, name, startTime, duration = state:GetTotemInfo(id)
 			if startTime and duration > 0 then

@@ -81,17 +81,13 @@ local DECLARATION_KEYWORD = {
 
 local PARAMETER_KEYWORD = {
 	["checkbox"] = true,
-	["checkboxoff"] = true,		-- deprecated
-	["checkboxon"] = true,		-- deprecated
 	["glyph"] = true,
 	["help"] = true,
 	["if_spell"] = true,
 	["if_stance"] = true,
-	["item"] = true,			-- deprecated
 	["itemcount"] = true,
 	["itemset"] = true,
 	["level"] = true,
-	["list"] = true,			-- deprecated
 	["listitem"] = true,
 	["specialization"] = true,
 	["talent"] = true,
@@ -2616,43 +2612,6 @@ function OvaleAST:FlattenParameters(ast)
 							annotation.controlList = annotation.controlList or {}
 							annotation.controlList[#annotation.controlList + 1] = control
 						end
-					elseif key == "checkboxon" or key == "checkboxoff" then
-						-- Deprecated: checkboxon
-						-- Deprecated: checkboxoff
-						local control = parameters.checkbox or self_controlPool:Get()
-						local name = FlattenParameterValue(value, annotation)
-						if key == "checkboxon" then
-							Ovale:OneTimeMessage("Warning: 'checkboxon=%s' is deprecated; use 'checkbox=%s' instead.", name, name)
-							control[#control + 1] = name
-						elseif key == "checkboxoff" then
-							Ovale:OneTimeMessage("Warning: 'checkboxoff=%s' is deprecated; use 'checkbox=!%s' instead.", name, name)
-							control[#control + 1] = "!" .. name
-						end
-						if not parameters.checkbox then
-							parameters.checkbox = control
-							annotation.controlList = annotation.controlList or {}
-							annotation.controlList[#annotation.controlList + 1] = control
-						end
-					elseif key == "list" or key == "item" then
-						-- Deprecated: list
-						-- Deprecated: item
-						if key == "list" and node.rawNamedParams.item then
-							local control = parameters.listitem or self_controlPool:Get()
-							local list = FlattenParameterValue(value, annotation)
-							local item = FlattenParameterValue(node.rawNamedParams.item, annotation)
-							Ovale:OneTimeMessage("Warning: 'list=%s item=%s' is deprecated; use 'listitem=%s:%s' instead.", list, item, list, item)
-							control[list] = item
-							if not parameters.listitem then
-								parameters.listitem = control
-								annotation.controlList = annotation.controlList or {}
-								annotation.controlList[#annotation.controlList + 1] = control
-							end
-						end
-					elseif key == "mastery" then
-						-- Deprecated: mastery -> specialization
-						local spec = FlattenParameterValue(value, annotation)
-						Ovale:OneTimeMessage("Warning: 'mastery=%s' is deprecated; use 'specialization=%s' instead.", spec, spec)
-						parameters.specialization = spec
 					else
 						if type(key) ~= "number" and dictionary and dictionary[key] then
 							key = dictionary[key]
