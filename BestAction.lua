@@ -113,14 +113,16 @@ local function SetValue(node, value, origin, rate)
 end
 
 -- Typecast elements into values.
-local function AsValue(node, timeSpan, atTime)
-	local value, origin, rate = 0, 0, 0
+local function AsValue(atTime, timeSpan, node)
+	local value, origin, rate
 	if node and node.type == "value" then
 		value, origin, rate = node.value, node.origin, node.rate
 	elseif timeSpan and HasTime(timeSpan, atTime) then
-		value, origin, rate = 1, 0, 0
+		value, origin, rate, timeSpan = 1, 0, 0, UNIVERSE
+	else
+		value, origin, rate, timeSpan = 0, 0, 0, UNIVERSE
 	end
-	return value, origin, rate
+	return value, origin, rate, timeSpan
 end
 
 local function GetTimeSpan(node, defaultTimeSpan)
@@ -629,23 +631,22 @@ function OvaleBestAction:ComputeArithmetic(element, state, atTime)
 	local timeSpan = GetTimeSpan(element)
 	local result
 
+	--[[
+		Typecast LHS and RHS to values for arithmetic computations.
+		A(t) = a + (t - b)*c
+		B(t) = x + (t - y)*z
+	--]]
+	local a, b, c, timeSpanA = AsValue(atTime, self:Compute(element.child[1], state, atTime))
+	local x, y, z, timeSpanB = AsValue(atTime, self:Compute(element.child[2], state, atTime))
+
 	-- Take intersection of A and B.
-	local timeSpanA, elementA = self:Compute(element.child[1], state, atTime)
-	local timeSpanB, elementB = self:Compute(element.child[2], state, atTime)
 	Intersect(timeSpanA, timeSpanB, timeSpan)
 	if Measure(timeSpan) == 0 then
 		state:Log("[%d]    arithmetic '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan)
 		result = SetValue(element, 0)
 	else
-		--[[
-			A(t) = a + (t - b)*c
-			B(t) = x + (t - y)*z
-		--]]
-		local a, b, c = AsValue(elementA, timeSpan, atTime)
-		local x, y, z = AsValue(elementB, timeSpan, atTime)
 		local operator = element.operator
 		local t = atTime
-
 		state:Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z)
 
 		-- result(t) = l + (t - m)*n
@@ -729,21 +730,20 @@ function OvaleBestAction:ComputeCompare(element, state, atTime)
 	self:StartProfiling("OvaleBestAction_Compute")
 	local timeSpan = GetTimeSpan(element)
 
+	--[[
+		Typecast LHS and RHS to values for arithmetic computations.
+		A(t) = a + (t - b)*c
+		B(t) = x + (t - y)*z
+	--]]
+	local a, b, c, timeSpanA = AsValue(atTime, self:Compute(element.child[1], state, atTime))
+	local x, y, z, timeSpanB = AsValue(atTime, self:Compute(element.child[2], state, atTime))
+
 	-- Take intersection of A and B.
-	local timeSpanA, elementA = self:Compute(element.child[1], state, atTime)
-	local timeSpanB, elementB = self:Compute(element.child[2], state, atTime)
 	Intersect(timeSpanA, timeSpanB, timeSpan)
 	if Measure(timeSpan) == 0 then
 		state:Log("[%d]    compare '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan)
 	else
-		--[[
-			A(t) = a + (t - b)*c
-			B(t) = x + (t - y)*z
-		--]]
-		local a, b, c = AsValue(elementA, timeSpan, atTime)
-		local x, y, z = AsValue(elementB, timeSpan, atTime)
 		local operator = element.operator
-
 		state:Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z)
 
 		--[[
