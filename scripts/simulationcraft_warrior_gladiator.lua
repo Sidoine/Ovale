@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_warrior_gladiator_t17m"
-	local desc = "[6.1] SimulationCraft: Warrior_Gladiator_T17M"
+	local name = "simulationcraft_warrior_gladiator_t18m"
+	local desc = "[6.2] SimulationCraft: Warrior_Gladiator_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Warrior_Gladiator_T17M".
+# Based on SimulationCraft profile "Warrior_Gladiator_T18M".
 #	class=warrior
 #	spec=protection
-#	talents=1133323
+#	talents=0033023
 #	glyphs=unending_rage/heroic_leap/cleave
 
 Include(ovale_common)
@@ -61,12 +61,12 @@ AddFunction ProtectionGladiatorInterruptActions
 
 AddFunction ProtectionGladiatorDefaultMainActions
 {
-	#call_action_list,name=movement,if=movement.distance>5
+	#run_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementMainActions()
-	#call_action_list,name=single,if=active_enemies=1
-	if Enemies() == 1 ProtectionGladiatorSingleMainActions()
-	#call_action_list,name=aoe,if=active_enemies>=2
+	#call_action_list,name=aoe,if=spell_targets.revenge>=2
 	if Enemies() >= 2 ProtectionGladiatorAoeMainActions()
+	#call_action_list,name=single
+	ProtectionGladiatorSingleMainActions()
 }
 
 AddFunction ProtectionGladiatorDefaultShortCdActions
@@ -75,7 +75,7 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	ProtectionGladiatorGetInMeleeRange()
-	#call_action_list,name=movement,if=movement.distance>5
+	#run_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 ProtectionGladiatorMovementShortCdActions()
 
 	unless 0 > 5 and ProtectionGladiatorMovementShortCdPostConditions()
@@ -88,17 +88,23 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 		if not IsEnraged() Spell(berserker_rage)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
-		#heroic_strike,if=(buff.shield_charge.up|(buff.unyielding_strikes.up&rage>=80-buff.unyielding_strikes.stack*10))&target.health.pct>20
-		if { BuffPresent(shield_charge_buff) or BuffPresent(unyielding_strikes_buff) and Rage() >= 80 - BuffStacks(unyielding_strikes_buff) * 10 } and target.HealthPercent() > 20 Spell(heroic_strike)
-		#heroic_strike,if=buff.ultimatum.up|rage>=rage.max-20|buff.unyielding_strikes.stack>4|target.time_to_die<10
-		if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 or BuffStacks(unyielding_strikes_buff) > 4 or target.TimeToDie() < 10 Spell(heroic_strike)
-		#call_action_list,name=single,if=active_enemies=1
-		if Enemies() == 1 ProtectionGladiatorSingleShortCdActions()
+		#heroic_strike,if=buff.unyielding_strikes.up&rage>=92-buff.unyielding_strikes.stack*12&target.health.pct>20
+		if BuffPresent(unyielding_strikes_buff) and Rage() >= 92 - BuffStacks(unyielding_strikes_buff) * 12 and target.HealthPercent() > 20 Spell(heroic_strike)
+		#heroic_strike,if=buff.shield_charge.up&target.health.pct>20
+		if BuffPresent(shield_charge_buff) and target.HealthPercent() > 20 Spell(heroic_strike)
+		#heroic_strike,if=buff.shield_charge.up&target.health.pct<20&buff.unyielding_strikes.stack>3
+		if BuffPresent(shield_charge_buff) and target.HealthPercent() < 20 and BuffStacks(unyielding_strikes_buff) > 3 Spell(heroic_strike)
+		#heroic_strike,if=buff.ultimatum.up|(rage>=rage.max-20)
+		if BuffPresent(ultimatum_buff) or Rage() >= MaxRage() - 20 Spell(heroic_strike)
+		#heroic_strike,if=target.time_to_die<10|buff.unyielding_strikes.stack>4
+		if target.TimeToDie() < 10 or BuffStacks(unyielding_strikes_buff) > 4 Spell(heroic_strike)
+		#call_action_list,name=aoe,if=spell_targets.revenge>=2
+		if Enemies() >= 2 ProtectionGladiatorAoeShortCdActions()
 
-		unless Enemies() == 1 and ProtectionGladiatorSingleShortCdPostConditions()
+		unless Enemies() >= 2 and ProtectionGladiatorAoeShortCdPostConditions()
 		{
-			#call_action_list,name=aoe,if=active_enemies>=2
-			if Enemies() >= 2 ProtectionGladiatorAoeShortCdActions()
+			#call_action_list,name=single
+			ProtectionGladiatorSingleShortCdActions()
 		}
 	}
 }
@@ -112,7 +118,7 @@ AddFunction ProtectionGladiatorDefaultCdActions
 	{
 		#bloodbath
 		Spell(bloodbath)
-		#use_item,name=vial_of_convulsive_shadows,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
+		#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
 		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 15 ProtectionGladiatorUseItemActions()
 		#blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
 		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 10 Spell(blood_fury_ap)
@@ -133,11 +139,11 @@ AddFunction ProtectionGladiatorAoeMainActions
 	Spell(revenge)
 	#shield_slam
 	Spell(shield_slam)
-	#thunder_clap,cycle_targets=1,if=dot.deep_wounds.remains<3&active_enemies>4
+	#thunder_clap,cycle_targets=1,if=dot.deep_wounds.remains<3&spell_targets.thunder_clap>4
 	if target.DebuffRemaining(deep_wounds_debuff) < 3 and Enemies() > 4 Spell(thunder_clap)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#thunder_clap,if=active_enemies>6
+	#thunder_clap,if=spell_targets.thunder_clap>6
 	if Enemies() > 6 Spell(thunder_clap)
 	#devastate,cycle_targets=1,if=dot.deep_wounds.remains<5&cooldown.shield_slam.remains>execute_time*0.4
 	if target.DebuffRemaining(deep_wounds_debuff) < 5 and SpellCooldown(shield_slam) > ExecuteTime(devastate) * 0.4 Spell(devastate)
@@ -160,6 +166,11 @@ AddFunction ProtectionGladiatorAoeShortCdActions
 			if BuffExpires(shield_charge_buff) Spell(bladestorm)
 		}
 	}
+}
+
+AddFunction ProtectionGladiatorAoeShortCdPostConditions
+{
+	Spell(revenge) or Spell(shield_slam) or target.DebuffRemaining(deep_wounds_debuff) < 3 and Enemies() > 4 and Spell(thunder_clap) or BuffPresent(sudden_death_buff) and Spell(execute) or Enemies() > 6 and Spell(thunder_clap) or target.DebuffRemaining(deep_wounds_debuff) < 5 and SpellCooldown(shield_slam) > ExecuteTime(devastate) * 0.4 and Spell(devastate) or SpellCooldown(shield_slam) > ExecuteTime(devastate) * 0.4 and Spell(devastate)
 }
 
 ### actions.movement
@@ -236,8 +247,8 @@ AddFunction ProtectionGladiatorSingleMainActions
 	Spell(revenge)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute)
-	#execute,if=rage>60&target.health.pct<20
-	if Rage() > 60 and target.HealthPercent() < 20 Spell(execute)
+	#execute,if=rage>=50
+	if Rage() >= 50 Spell(execute)
 	#devastate
 	Spell(devastate)
 }
@@ -248,14 +259,9 @@ AddFunction ProtectionGladiatorSingleShortCdActions
 	{
 		#storm_bolt
 		Spell(storm_bolt)
-		#dragon_roar,if=buff.unyielding_strikes.stack>=4&buff.unyielding_strikes.stack<6
-		if BuffStacks(unyielding_strikes_buff) >= 4 and BuffStacks(unyielding_strikes_buff) < 6 Spell(dragon_roar)
+		#dragon_roar,if=buff.unyielding_strikes.stack=5
+		if BuffStacks(unyielding_strikes_buff) == 5 Spell(dragon_roar)
 	}
-}
-
-AddFunction ProtectionGladiatorSingleShortCdPostConditions
-{
-	BuffStacks(unyielding_strikes_buff) > 0 and BuffStacks(unyielding_strikes_buff) < 6 and BuffRemaining(unyielding_strikes_buff) < 1.5 and Spell(devastate) or Spell(shield_slam) or Spell(revenge) or BuffPresent(sudden_death_buff) and Spell(execute) or Rage() > 60 and target.HealthPercent() < 20 and Spell(execute) or Spell(devastate)
 }
 
 ### Protection icons.

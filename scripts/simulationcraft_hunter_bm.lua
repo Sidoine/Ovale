@@ -2,10 +2,10 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_hunter_bm_t17m"
-	local desc = "[6.1] SimulationCraft: Hunter_BM_T17M"
+	local name = "simulationcraft_hunter_bm_t18m"
+	local desc = "[6.2] SimulationCraft: Hunter_BM_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_BM_T17M".
+# Based on SimulationCraft profile "Hunter_BM_T18M".
 #	class=hunter
 #	spec=beast_mastery
 #	talents=0002333
@@ -59,9 +59,9 @@ AddFunction BeastMasterySummonPet
 
 AddFunction BeastMasteryDefaultMainActions
 {
-	#multishot,if=active_enemies>1&pet.cat.buff.beast_cleave.remains<0.5
+	#multishot,if=spell_targets.multi_shot>1&pet.cat.buff.beast_cleave.remains<0.5
 	if Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 Spell(multishot)
-	#multishot,if=active_enemies>5
+	#multishot,if=spell_targets.multi_shot>5
 	if Enemies() > 5 Spell(multishot)
 	#kill_command
 	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
@@ -75,7 +75,7 @@ AddFunction BeastMasteryDefaultMainActions
 	if Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 4 and Focus() < 50 Spell(cobra_shot)
 	#glaive_toss
 	Spell(glaive_toss)
-	#cobra_shot,if=active_enemies>5
+	#cobra_shot,if=spell_targets.multi_shot>5
 	if Enemies() > 5 Spell(cobra_shot)
 	#arcane_shot,if=(buff.thrill_of_the_hunt.react&focus>35)|buff.bestial_wrath.up
 	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 35 or BuffPresent(bestial_wrath_buff) Spell(arcane_shot)
@@ -98,9 +98,11 @@ AddFunction BeastMasteryDefaultShortCdActions
 	{
 		#focus_fire,five_stacks=1,if=buff.focus_fire.down
 		if BuffExpires(focus_fire_buff) and pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
-		#barrage,if=active_enemies>1
+		#focus_fire,five_stacks=1,if=buff.focus_fire.stack<5&pet.cat.buff.frenzy.stack=5
+		if BuffStacks(focus_fire_buff) < 5 and pet.BuffStacks(pet_frenzy_buff) == 5 and pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
+		#barrage,if=spell_targets.barrage>1
 		if Enemies() > 1 Spell(barrage)
-		#explosive_trap,if=active_enemies>5
+		#explosive_trap,if=spell_targets.explosive_trap_tick>5
 		if Enemies() > 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 
 		unless Enemies() > 5 and Spell(multishot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
@@ -110,7 +112,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 			unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 7 and 14 + FocusCastingRegen(cobra_shot) < FocusDeficit() and Spell(cobra_shot)
 			{
-				#explosive_trap,if=active_enemies>1
+				#explosive_trap,if=spell_targets.explosive_trap_tick>1
 				if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 
 				unless Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 4 and Focus() < 50 and Spell(cobra_shot) or Spell(glaive_toss)
@@ -130,7 +132,9 @@ AddFunction BeastMasteryDefaultCdActions
 	#auto_shot
 	#counter_shot
 	BeastMasteryInterruptActions()
-	#use_item,name=beating_heart_of_the_mountain
+	#use_item,name=maalus_the_blood_drinker
+	BeastMasteryUseItemActions()
+	#use_item,name=mirror_of_the_blademaster
 	BeastMasteryUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
@@ -151,9 +155,9 @@ AddFunction BeastMasteryDefaultCdActions
 AddFunction BeastMasteryPrecombatMainActions
 {
 	#snapshot_stats
-	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
+	#exotic_munitions,ammo_type=poisoned,if=spell_targets.multi_shot<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
-	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
+	#exotic_munitions,ammo_type=incendiary,if=spell_targets.multi_shot>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
 	#glaive_toss
 	Spell(glaive_toss)

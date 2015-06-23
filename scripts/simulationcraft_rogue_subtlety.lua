@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_rogue_subtlety_t17m"
-	local desc = "[6.1] SimulationCraft: Rogue_Subtlety_T17M"
+	local name = "simulationcraft_rogue_subtlety_t18m"
+	local desc = "[6.2] SimulationCraft: Rogue_Subtlety_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Rogue_Subtlety_T17M".
+# Based on SimulationCraft profile "Rogue_Subtlety_T18M".
 #	class=rogue
 #	spec=subtlety
-#	talents=2000022
+#	talents=2000032
 #	glyphs=energy/hemorrhaging_veins/vanish
 
 Include(ovale_common)
@@ -158,7 +158,7 @@ AddFunction SubtletyDefaultCdActions
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or { BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) and BuffPresent(shadow_dance_buff) } and { BuffPresent(trinket_stat_agi_buff) or BuffPresent(trinket_stat_multistrike_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or { BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) and BuffPresent(shadow_dance_buff) } and target.TimeToDie() < 136 SubtletyUsePotionAgility()
 	#kick
 	SubtletyInterruptActions()
-	#use_item,slot=trinket2,if=buff.shadow_dance.up
+	#use_item,slot=finger1,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) SubtletyUseItemActions()
 	#shadow_reflection,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(shadow_reflection)
@@ -230,7 +230,7 @@ AddFunction SubtletyFinisherMainActions
 	if { BuffRemaining(slice_and_dice_buff) < 10.8 and target.DebuffExpires(find_weakness_debuff) or BuffRemaining(slice_and_dice_buff) < 6 } and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() Spell(slice_and_dice)
 	#death_from_above
 	Spell(death_from_above)
-	#crimson_tempest,if=(active_enemies>=2&debuff.find_weakness.down)|active_enemies>=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
+	#crimson_tempest,if=(spell_targets.crimson_tempest>=2&debuff.find_weakness.down)|spell_targets.crimson_tempest>=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
 	if Enemies() >= 2 and target.DebuffExpires(find_weakness_debuff) or Enemies() >= 3 and { SpellCooldown(death_from_above) > 0 or not Talent(death_from_above_talent) } Spell(crimson_tempest)
 	#eviscerate,if=(energy.time_to_max<=cooldown.death_from_above.remains+action.death_from_above.execute_time)|!talent.death_from_above.enabled
 	if TimeToMaxEnergy() <= SpellCooldown(death_from_above) + ExecuteTime(death_from_above) or not Talent(death_from_above_talent) Spell(eviscerate)
@@ -259,7 +259,7 @@ AddFunction SubtletyGeneratorMainActions
 	Spell(ambush)
 	unless SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
 	{
-		#fan_of_knives,if=active_enemies>1
+		#fan_of_knives,if=spell_targets.fan_of_knives>1
 		if Enemies() > 1 Spell(fan_of_knives)
 		#backstab,if=debuff.find_weakness.up|buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up
 		if target.DebuffPresent(find_weakness_debuff) or BuffPresent(archmages_greater_incandescence_agi_buff) or BuffPresent(trinket_stat_any_buff) Spell(backstab)

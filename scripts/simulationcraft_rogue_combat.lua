@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_rogue_combat_t17m"
-	local desc = "[6.1] SimulationCraft: Rogue_Combat_T17M"
+	local name = "simulationcraft_rogue_combat_t18m"
+	local desc = "[6.2] SimulationCraft: Rogue_Combat_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Rogue_Combat_T17M".
+# Based on SimulationCraft profile "Rogue_Combat_T18M".
 #	class=rogue
 #	spec=combat
-#	talents=3000031
+#	talents=3000021
 #	glyphs=energy/disappearance
 
 Include(ovale_common)
@@ -75,7 +75,7 @@ AddFunction CombatDefaultMainActions
 
 AddFunction CombatDefaultShortCdActions
 {
-	#blade_flurry,if=(active_enemies>=2&!buff.blade_flurry.up)|(active_enemies<2&buff.blade_flurry.up)
+	#blade_flurry,if=(spell_targets.blade_flurry>=2&!buff.blade_flurry.up)|(spell_targets.blade_flurry<2&buff.blade_flurry.up)
 	if { Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 
 	unless Spell(ambush)
@@ -95,14 +95,14 @@ AddFunction CombatDefaultShortCdActions
 
 AddFunction CombatDefaultCdActions
 {
-	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|(buff.adrenaline_rush.up&(trinket.proc.any.react|trinket.stacking_proc.any.react|buff.archmages_greater_incandescence_agi.react))
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(adrenaline_rush_buff) and { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } CombatUsePotionAgility()
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<40|(buff.adrenaline_rush.up&buff.maalus.up&(trinket.proc.any.react|trinket.stacking_proc.any.react|buff.archmages_greater_incandescence_agi.react))
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or BuffPresent(adrenaline_rush_buff) and BuffPresent(maalus_buff) and { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } CombatUsePotionAgility()
 	#kick
 	CombatInterruptActions()
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
-	#use_item,slot=trinket2
-	CombatUseItemActions()
+	#use_item,slot=finger1,if=buff.adrenaline_rush.up
+	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -289,6 +289,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # killing_spree
 # killing_spree_buff
 # lethal_poison_buff
+# maalus_buff
 # marked_for_death
 # marked_for_death_talent
 # preparation

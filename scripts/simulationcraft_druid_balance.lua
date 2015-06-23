@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_druid_balance_t17m"
-	local desc = "[6.1] SimulationCraft: Druid_Balance_T17M"
+	local name = "simulationcraft_druid_balance_t18m"
+	local desc = "[6.2] SimulationCraft: Druid_Balance_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Druid_Balance_T17M".
+# Based on SimulationCraft profile "Druid_Balance_T18M".
 #	class=druid
 #	spec=balance
-#	talents=0101001
+#	talents=0001001
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -22,14 +22,21 @@ AddFunction BalanceUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction BalanceUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 ### actions.default
 
 AddFunction BalanceDefaultMainActions
 {
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 BalanceSingleTargetMainActions()
-	#call_action_list,name=aoe,if=active_enemies>1
+	#call_action_list,name=aoe,if=spell_targets.starfall_pulse>1
 	if Enemies() > 1 BalanceAoeMainActions()
+	#call_action_list,name=single_target
+	BalanceSingleTargetMainActions()
 }
 
 AddFunction BalanceDefaultShortCdActions
@@ -48,13 +55,15 @@ AddFunction BalanceDefaultCdActions
 	if BuffPresent(celestial_alignment_buff) Spell(berserking)
 	#arcane_torrent,if=buff.celestial_alignment.up
 	if BuffPresent(celestial_alignment_buff) Spell(arcane_torrent_energy)
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 BalanceSingleTargetCdActions()
+	#use_item,slot=finger1
+	BalanceUseItemActions()
+	#call_action_list,name=aoe,if=spell_targets.starfall_pulse>1
+	if Enemies() > 1 BalanceAoeCdActions()
 
-	unless Enemies() == 1 and BalanceSingleTargetCdPostConditions()
+	unless Enemies() > 1 and BalanceAoeCdPostConditions()
 	{
-		#call_action_list,name=aoe,if=active_enemies>1
-		if Enemies() > 1 BalanceAoeCdActions()
+		#call_action_list,name=single_target
+		BalanceSingleTargetCdActions()
 	}
 }
 
@@ -64,17 +73,19 @@ AddFunction BalanceAoeMainActions
 {
 	#sunfire,cycle_targets=1,if=remains<8
 	if target.DebuffRemaining(sunfire_debuff) < 8 Spell(sunfire)
-	#starfall,if=!buff.starfall.up&active_enemies>2
-	if not BuffPresent(starfall_buff) and Enemies() > 2 Spell(starfall)
+	#starsurge,if=t18_class_trinket&buff.starfall.remains<3&spell_targets.starfall_pulse>1
+	if HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 1 Spell(starsurge)
+	#starfall,if=!t18_class_trinket&buff.starfall.remains<3&spell_targets.starfall_pulse>2
+	if not HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 2 Spell(starfall)
 	#starsurge,if=(charges=2&recharge_time<6)|charges=3
 	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
 	#moonfire,cycle_targets=1,if=remains<12
 	if target.DebuffRemaining(moonfire_debuff) < 12 Spell(moonfire)
 	#stellar_flare,cycle_targets=1,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
-	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>20&active_enemies=2
+	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>20&spell_targets.starfall_pulse=2
 	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Enemies() == 2 Spell(starsurge)
-	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40&active_enemies=2
+	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40&spell_targets.starfall_pulse=2
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 Spell(starsurge)
 	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
@@ -89,7 +100,12 @@ AddFunction BalanceAoeCdActions
 	#celestial_alignment,if=lunar_max<8|target.time_to_die<20
 	if TimeToEclipse(lunar) < 8 or target.TimeToDie() < 20 Spell(celestial_alignment)
 	#incarnation,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(incarnation_caster)
+	if BuffPresent(celestial_alignment_buff) Spell(incarnation_chosen_of_elune)
+}
+
+AddFunction BalanceAoeCdPostConditions
+{
+	target.DebuffRemaining(sunfire_debuff) < 8 and Spell(sunfire) or HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 1 and Spell(starsurge) or not HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 2 and Spell(starfall) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or target.DebuffRemaining(moonfire_debuff) < 12 and Spell(moonfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Enemies() == 2 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 and Spell(starsurge) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or { EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() } and Spell(starfire) or Spell(wrath)
 }
 
 ### actions.precombat
@@ -119,7 +135,7 @@ AddFunction BalancePrecombatCdActions
 		#potion,name=draenic_intellect
 		BalanceUsePotionIntellect()
 		#incarnation
-		Spell(incarnation_caster)
+		Spell(incarnation_chosen_of_elune)
 	}
 }
 
@@ -132,18 +148,18 @@ AddFunction BalancePrecombatCdPostConditions
 
 AddFunction BalanceSingleTargetMainActions
 {
-	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>20
-	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 Spell(starsurge)
+	#starsurge,if=buff.lunar_empowerment.down&(eclipse_energy>20|buff.celestial_alignment.up)
+	if BuffExpires(lunar_empowerment_buff) and { EclipseEnergy() > 20 or BuffPresent(celestial_alignment_buff) } Spell(starsurge)
 	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 Spell(starsurge)
 	#starsurge,if=(charges=2&recharge_time<6)|charges=3
 	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
-	#sunfire,if=remains<7|(buff.solar_peak.up&!talent.balance_of_power.enabled)
-	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and not Talent(balance_of_power_talent) Spell(sunfire)
+	#sunfire,if=remains<7|(buff.solar_peak.up&buff.solar_peak.remains<action.wrath.cast_time&!talent.balance_of_power.enabled)
+	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and BuffRemaining(solar_peak_buff) < CastTime(wrath) and not Talent(balance_of_power_talent) Spell(sunfire)
 	#stellar_flare,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
-	#moonfire,if=!talent.balance_of_power.enabled&(buff.lunar_peak.up&remains<eclipse_change+20|remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
-	if not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
+	#moonfire,if=!talent.balance_of_power.enabled&(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+20|remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
+	if not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
 	#moonfire,if=talent.balance_of_power.enabled&(remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
 	if Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
 	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
@@ -156,18 +172,13 @@ AddFunction BalanceSingleTargetMainActions
 
 AddFunction BalanceSingleTargetCdActions
 {
-	unless BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge)
+	unless BuffExpires(lunar_empowerment_buff) and { EclipseEnergy() > 20 or BuffPresent(celestial_alignment_buff) } and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge)
 	{
-		#celestial_alignment,if=eclipse_energy>40
-		if EclipseEnergy() > 40 Spell(celestial_alignment)
+		#celestial_alignment,if=eclipse_energy>0
+		if EclipseEnergy() > 0 Spell(celestial_alignment)
 		#incarnation,if=eclipse_energy>0
-		if EclipseEnergy() > 0 Spell(incarnation_caster)
+		if EclipseEnergy() > 0 Spell(incarnation_chosen_of_elune)
 	}
-}
-
-AddFunction BalanceSingleTargetCdPostConditions
-{
-	BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or { target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and not Talent(balance_of_power_talent) } and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } and Spell(moonfire) or Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } and Spell(moonfire) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or { EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() } and Spell(starfire) or Spell(wrath)
 }
 
 ### Balance icons.
@@ -229,7 +240,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # celestial_alignment_buff
 # draenic_intellect_potion
 # force_of_nature_caster
-# incarnation_caster
+# incarnation_chosen_of_elune
 # lunar_empowerment_buff
 # lunar_peak_buff
 # mark_of_the_wild
@@ -246,6 +257,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # stellar_flare_debuff
 # sunfire
 # sunfire_debuff
+# t18_class_trinket
 # wrath
 ]]
 	OvaleScripts:RegisterScript("DRUID", "balance", name, desc, code, "script")

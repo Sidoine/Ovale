@@ -2,10 +2,10 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_monk_windwalker_1h_t17m"
-	local desc = "[6.1] SimulationCraft: Monk_Windwalker_1h_T17M"
+	local name = "simulationcraft_monk_windwalker_1h_t18m"
+	local desc = "[6.2] SimulationCraft: Monk_Windwalker_1h_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Monk_Windwalker_1h_T17M".
+# Based on SimulationCraft profile "Monk_Windwalker_1h_T18M".
 #	class=monk
 #	spec=windwalker
 #	talents=0230023
@@ -101,6 +101,8 @@ AddFunction WindwalkerDefaultShortCdActions
 			if Talent(hurricane_strike_talent) and BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and not SpellCooldown(hurricane_strike) > 0 and Chi() >= 3 and target.DebuffPresent(rising_sun_kick_debuff) and BuffPresent(tiger_power_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&chi>=2&(buff.tigereye_brew.stack>=16|target.time_to_die<40)&debuff.rising_sun_kick.up&buff.tiger_power.up
 			if BuffExpires(tigereye_brew_use_buff) and Chi() >= 2 and { BuffStacks(tigereye_brew_buff) >= 16 or target.TimeToDie() < 40 } and target.DebuffPresent(rising_sun_kick_debuff) and BuffPresent(tiger_power_buff) Spell(tigereye_brew)
+			#touch_of_death,if=target.health.percent<10&(glyph.touch_of_death.enabled|chi>=3)
+			if target.HealthPercent() < 10 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(touch_of_death)
 
 			unless { target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 } and Spell(rising_sun_kick)
 			{
@@ -109,8 +111,6 @@ AddFunction WindwalkerDefaultShortCdActions
 
 				unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and TimeToMaxEnergy() > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury)
 				{
-					#touch_of_death,if=target.health.percent<10&(glyph.touch_of_death.enabled|chi>=3)
-					if target.HealthPercent() < 10 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(touch_of_death)
 					#hurricane_strike,if=energy.time_to_max>cast_time&buff.tiger_power.remains>cast_time&debuff.rising_sun_kick.remains>cast_time&buff.energizing_brew.down
 					if TimeToMaxEnergy() > CastTime(hurricane_strike) and BuffRemaining(tiger_power_buff) > CastTime(hurricane_strike) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(hurricane_strike) and BuffExpires(energizing_brew_buff) Spell(hurricane_strike)
 					#energizing_brew,if=cooldown.fists_of_fury.remains>6&(!talent.serenity.enabled|(!buff.serenity.remains&cooldown.serenity.remains>4))&energy+energy.regen<50
@@ -173,7 +173,7 @@ AddFunction WindwalkerDefaultCdActions
 			#chi_sphere,if=talent.power_strikes.enabled&buff.chi_sphere.react&chi<chi.max
 			#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&(trinket.proc.agility.react|trinket.proc.multistrike.react))|buff.bloodlust.react|target.time_to_die<=60
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
-			#use_item,name=beating_heart_of_the_mountain,if=buff.tigereye_brew_use.up|target.time_to_die<18
+			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
@@ -182,7 +182,7 @@ AddFunction WindwalkerDefaultCdActions
 			#arcane_torrent,if=chi.max-chi>=1&(buff.tigereye_brew_use.up|target.time_to_die<18)
 			if MaxChi() - Chi() >= 1 and { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } Spell(arcane_torrent_chi)
 
-			unless not Talent(chi_explosion_talent) and BuffRemaining(tiger_power_buff) < 6.6 and Spell(tiger_palm) or Talent(chi_explosion_talent) and { SpellCooldown(fists_of_fury) < 5 or not SpellCooldown(fists_of_fury) > 0 } and BuffRemaining(tiger_power_buff) < 5 and Spell(tiger_palm) or { target.DebuffExpires(rising_sun_kick_debuff) or target.DebuffRemaining(rising_sun_kick_debuff) < 3 } and Spell(rising_sun_kick) or BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and TimeToMaxEnergy() > CastTime(fists_of_fury) and not BuffPresent(serenity_buff) and Spell(fists_of_fury)
+			unless not Talent(chi_explosion_talent) and BuffRemaining(tiger_power_buff) < 6.6 and Spell(tiger_palm) or Talent(chi_explosion_talent) and { SpellCooldown(fists_of_fury) < 5 or not SpellCooldown(fists_of_fury) > 0 } and BuffRemaining(tiger_power_buff) < 5 and Spell(tiger_palm)
 			{
 				#fortifying_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0&(glyph.touch_of_death.enabled|chi>=3)
 				if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(fortifying_brew)
@@ -388,7 +388,7 @@ AddFunction WindwalkerOpenerCdActions
 
 	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm)
 	{
-		#use_item,name=beating_heart_of_the_mountain
+		#use_item,name=maalus_the_blood_drinker
 		WindwalkerUseItemActions()
 	}
 }
@@ -404,20 +404,20 @@ AddFunction WindwalkerPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
 	#food,type=salty_squid_roll
-	#legacy_of_the_white_tiger,if=!aura.str_agi_int.up
-	if not BuffPresent(str_agi_int_buff any=1) Spell(legacy_of_the_white_tiger)
+	#legacy_of_the_white_tiger,if=!aura.str_agi_int.up|!aura.critical_strike.up
+	if not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=fierce_tiger
 	Spell(stance_of_the_fierce_tiger)
 }
 
 AddFunction WindwalkerPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
 }
 
 AddFunction WindwalkerPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	unless { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
@@ -427,19 +427,23 @@ AddFunction WindwalkerPrecombatCdActions
 
 AddFunction WindwalkerPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
 }
 
 ### actions.st
 
 AddFunction WindwalkerStMainActions
 {
+	#blackout_kick,if=set_bonus.tier18_2pc=1&buff.combo_breaker_bok.react
+	if ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) Spell(blackout_kick)
+	#tiger_palm,if=set_bonus.tier18_2pc=1&buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
+	if ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#rising_sun_kick
 	Spell(rising_sun_kick)
-	#blackout_kick,if=buff.combo_breaker_bok.react|buff.serenity.up
-	if BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) Spell(blackout_kick)
-	#tiger_palm,if=buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
-	if BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
+	#blackout_kick,if=set_bonus.tier18_2pc=0&buff.combo_breaker_bok.react|buff.serenity.up
+	if ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) Spell(blackout_kick)
+	#tiger_palm,if=set_bonus.tier18_2pc=0&buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
+	if ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#chi_wave,if=energy.time_to_max>2&buff.serenity.down
 	if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=energy.time_to_max>2&!dot.zen_sphere.ticking&buff.serenity.down
@@ -454,7 +458,7 @@ AddFunction WindwalkerStMainActions
 
 AddFunction WindwalkerStShortCdActions
 {
-	unless Spell(rising_sun_kick) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave)
+	unless ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave)
 	{
 		#chi_burst,if=energy.time_to_max>2&buff.serenity.down
 		if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -469,7 +473,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
-	Spell(rising_sun_kick) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or MaxChi() - Chi() < 2 and Spell(blackout_kick) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
+	ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or MaxChi() - Chi() < 2 and Spell(blackout_kick) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
 }
 
 ### actions.st_chix

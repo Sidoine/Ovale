@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_warrior_fury_2h_t17m"
-	local desc = "[6.1] SimulationCraft: Warrior_Fury_2h_T17M"
+	local name = "simulationcraft_warrior_fury_2h_t18m"
+	local desc = "[6.2] SimulationCraft: Warrior_Fury_2h_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Warrior_Fury_2h_T17M".
+# Based on SimulationCraft profile "Warrior_Fury_2h_T18M".
 #	class=warrior
 #	spec=fury
-#	talents=1321321
+#	talents=0021021
 #	glyphs=unending_rage/raging_wind/heroic_leap
 
 Include(ovale_common)
@@ -61,18 +61,18 @@ AddFunction FuryTitansGripInterruptActions
 
 AddFunction FuryTitansGripDefaultMainActions
 {
-	#call_action_list,name=movement,if=movement.distance>5
+	#run_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementMainActions()
-	#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+	#run_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&spell_targets.whirlwind=1)|raid_event.movement.cooldown<5
 	if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetMainActions()
-	#call_action_list,name=single_target,if=active_enemies=1
-	if Enemies() == 1 FuryTitansGripSingleTargetMainActions()
-	#call_action_list,name=two_targets,if=active_enemies=2
+	#call_action_list,name=two_targets,if=spell_targets.whirlwind=2
 	if Enemies() == 2 FuryTitansGripTwoTargetsMainActions()
-	#call_action_list,name=three_targets,if=active_enemies=3
+	#call_action_list,name=three_targets,if=spell_targets.whirlwind=3
 	if Enemies() == 3 FuryTitansGripThreeTargetsMainActions()
-	#call_action_list,name=aoe,if=active_enemies>3
+	#call_action_list,name=aoe,if=spell_targets.whirlwind>3
 	if Enemies() > 3 FuryTitansGripAoeMainActions()
+	#call_action_list,name=single_target
+	FuryTitansGripSingleTargetMainActions()
 }
 
 AddFunction FuryTitansGripDefaultShortCdActions
@@ -81,7 +81,7 @@ AddFunction FuryTitansGripDefaultShortCdActions
 	if target.DebuffExpires(charge_debuff) and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#auto_attack
 	FuryTitansGripGetInMeleeRange()
-	#call_action_list,name=movement,if=movement.distance>5
+	#run_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryTitansGripMovementShortCdActions()
 
 	unless 0 > 5 and FuryTitansGripMovementShortCdPostConditions()
@@ -90,30 +90,30 @@ AddFunction FuryTitansGripDefaultShortCdActions
 		if not IsEnraged() or PreviousGCDSpell(bloodthirst) and BuffStacks(raging_blow_buff) < 2 Spell(berserker_rage)
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
 		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
-		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		#run_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&spell_targets.whirlwind=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetShortCdActions()
 
 		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FuryTitansGripSingleTargetShortCdPostConditions()
 		{
 			#avatar,if=buff.recklessness.up|cooldown.recklessness.remains>60|target.time_to_die<30
 			if BuffPresent(recklessness_buff) or SpellCooldown(recklessness) > 60 or target.TimeToDie() < 30 Spell(avatar)
-			#call_action_list,name=single_target,if=active_enemies=1
-			if Enemies() == 1 FuryTitansGripSingleTargetShortCdActions()
+			#call_action_list,name=two_targets,if=spell_targets.whirlwind=2
+			if Enemies() == 2 FuryTitansGripTwoTargetsShortCdActions()
 
-			unless Enemies() == 1 and FuryTitansGripSingleTargetShortCdPostConditions()
+			unless Enemies() == 2 and FuryTitansGripTwoTargetsShortCdPostConditions()
 			{
-				#call_action_list,name=two_targets,if=active_enemies=2
-				if Enemies() == 2 FuryTitansGripTwoTargetsShortCdActions()
+				#call_action_list,name=three_targets,if=spell_targets.whirlwind=3
+				if Enemies() == 3 FuryTitansGripThreeTargetsShortCdActions()
 
-				unless Enemies() == 2 and FuryTitansGripTwoTargetsShortCdPostConditions()
+				unless Enemies() == 3 and FuryTitansGripThreeTargetsShortCdPostConditions()
 				{
-					#call_action_list,name=three_targets,if=active_enemies=3
-					if Enemies() == 3 FuryTitansGripThreeTargetsShortCdActions()
+					#call_action_list,name=aoe,if=spell_targets.whirlwind>3
+					if Enemies() > 3 FuryTitansGripAoeShortCdActions()
 
-					unless Enemies() == 3 and FuryTitansGripThreeTargetsShortCdPostConditions()
+					unless Enemies() > 3 and FuryTitansGripAoeShortCdPostConditions()
 					{
-						#call_action_list,name=aoe,if=active_enemies>3
-						if Enemies() > 3 FuryTitansGripAoeShortCdActions()
+						#call_action_list,name=single_target
+						FuryTitansGripSingleTargetShortCdActions()
 					}
 				}
 			}
@@ -128,40 +128,44 @@ AddFunction FuryTitansGripDefaultCdActions
 
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
-		#use_item,name=vial_of_convulsive_shadows,if=(active_enemies>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.recklessness.up|target.time_to_die<25|!talent.anger_management.enabled)
-		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or target.TimeToDie() < 25 or not Talent(anger_management_talent) } FuryTitansGripUseItemActions()
-		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=25
-		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 25 FuryTitansGripUsePotionStrength()
-		#call_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&active_enemies=1)|raid_event.movement.cooldown<5
+		#use_item,name=thorasus_the_stone_heart_of_draenor,if=(spell_targets.whirlwind>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.recklessness.up|target.time_to_die<25)
+		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or target.TimeToDie() < 25 } FuryTitansGripUseItemActions()
+		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=30
+		if target.HealthPercent() < 20 and BuffPresent(recklessness_buff) or target.TimeToDie() <= 30 FuryTitansGripUsePotionStrength()
+		#run_action_list,name=single_target,if=(raid_event.adds.cooldown<60&raid_event.adds.count>2&spell_targets.whirlwind=1)|raid_event.movement.cooldown<5
 		if 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 FuryTitansGripSingleTargetCdActions()
 
 		unless { 600 < 60 and 0 > 2 and Enemies() == 1 or 600 < 5 } and FuryTitansGripSingleTargetCdPostConditions()
 		{
-			#recklessness,if=(((target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled))|target.time_to_die<=12|talent.anger_management.enabled)&((talent.bladestorm.enabled&(!raid_event.adds.exists|enemies=1))|!talent.bladestorm.enabled)
-			if { { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or target.TimeToDie() <= 12 or Talent(anger_management_talent) } and { Talent(bladestorm_talent) and { not False(raid_event_adds_exists) or Enemies() == 1 } or not Talent(bladestorm_talent) } Spell(recklessness)
+			#recklessness,if=(buff.bloodbath.up|cooldown.bloodbath.remains>25|!talent.bloodbath.enabled|target.time_to_die<15)&((talent.bladestorm.enabled&(!raid_event.adds.exists|enemies=1))|!talent.bladestorm.enabled)&set_bonus.tier18_4pc
+			if { BuffPresent(bloodbath_buff) or SpellCooldown(bloodbath) > 25 or not Talent(bloodbath_talent) or target.TimeToDie() < 15 } and { Talent(bladestorm_talent) and { not False(raid_event_adds_exists) or Enemies() == 1 } or not Talent(bladestorm_talent) } and ArmorSetBonus(T18 4) Spell(recklessness)
+			#call_action_list,name=reck_anger_management,if=talent.anger_management.enabled&((talent.bladestorm.enabled&(!raid_event.adds.exists|enemies=1))|!talent.bladestorm.enabled)&!set_bonus.tier18_4pc
+			if Talent(anger_management_talent) and { Talent(bladestorm_talent) and { not False(raid_event_adds_exists) or Enemies() == 1 } or not Talent(bladestorm_talent) } and not ArmorSetBonus(T18 4) FuryTitansGripReckAngerManagementCdActions()
+			#call_action_list,name=reck_no_anger,if=!talent.anger_management.enabled&((talent.bladestorm.enabled&(!raid_event.adds.exists|enemies=1))|!talent.bladestorm.enabled)&!set_bonus.tier18_4pc
+			if not Talent(anger_management_talent) and { Talent(bladestorm_talent) and { not False(raid_event_adds_exists) or Enemies() == 1 } or not Talent(bladestorm_talent) } and not ArmorSetBonus(T18 4) FuryTitansGripReckNoAngerCdActions()
 			#blood_fury,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(blood_fury_ap)
 			#berserking,if=buff.bloodbath.up|!talent.bloodbath.enabled|buff.recklessness.up
 			if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or BuffPresent(recklessness_buff) Spell(berserking)
 			#arcane_torrent,if=rage<rage.max-40
 			if Rage() < MaxRage() - 40 Spell(arcane_torrent_rage)
-			#call_action_list,name=single_target,if=active_enemies=1
-			if Enemies() == 1 FuryTitansGripSingleTargetCdActions()
+			#call_action_list,name=two_targets,if=spell_targets.whirlwind=2
+			if Enemies() == 2 FuryTitansGripTwoTargetsCdActions()
 
-			unless Enemies() == 1 and FuryTitansGripSingleTargetCdPostConditions()
+			unless Enemies() == 2 and FuryTitansGripTwoTargetsCdPostConditions()
 			{
-				#call_action_list,name=two_targets,if=active_enemies=2
-				if Enemies() == 2 FuryTitansGripTwoTargetsCdActions()
+				#call_action_list,name=three_targets,if=spell_targets.whirlwind=3
+				if Enemies() == 3 FuryTitansGripThreeTargetsCdActions()
 
-				unless Enemies() == 2 and FuryTitansGripTwoTargetsCdPostConditions()
+				unless Enemies() == 3 and FuryTitansGripThreeTargetsCdPostConditions()
 				{
-					#call_action_list,name=three_targets,if=active_enemies=3
-					if Enemies() == 3 FuryTitansGripThreeTargetsCdActions()
+					#call_action_list,name=aoe,if=spell_targets.whirlwind>3
+					if Enemies() > 3 FuryTitansGripAoeCdActions()
 
-					unless Enemies() == 3 and FuryTitansGripThreeTargetsCdPostConditions()
+					unless Enemies() > 3 and FuryTitansGripAoeCdPostConditions()
 					{
-						#call_action_list,name=aoe,if=active_enemies>3
-						if Enemies() > 3 FuryTitansGripAoeCdActions()
+						#call_action_list,name=single_target
+						FuryTitansGripSingleTargetCdActions()
 					}
 				}
 			}
@@ -213,6 +217,11 @@ AddFunction FuryTitansGripAoeShortCdActions
 	}
 }
 
+AddFunction FuryTitansGripAoeShortCdPostConditions
+{
+	BuffStacks(meat_cleaver_buff) >= 3 and IsEnraged() and Spell(raging_blow) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and Spell(raging_blow) or Spell(whirlwind) or BuffPresent(sudden_death_buff) and Spell(execute) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 AddFunction FuryTitansGripAoeCdActions
 {
 	#bloodbath
@@ -225,17 +234,22 @@ AddFunction FuryTitansGripAoeCdActions
 	}
 }
 
+AddFunction FuryTitansGripAoeCdPostConditions
+{
+	{ BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(ravager) or BuffStacks(meat_cleaver_buff) >= 3 and IsEnraged() and Spell(raging_blow) or { not IsEnraged() or Rage() < 50 or BuffExpires(raging_blow_buff) } and Spell(bloodthirst) or BuffStacks(meat_cleaver_buff) >= 3 and Spell(raging_blow) or FuryTitansGripBladestormCdPostConditions() or Spell(whirlwind) or Spell(siegebreaker) or BuffPresent(sudden_death_buff) and Spell(execute) or { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } and Spell(dragon_roar) or Spell(bloodthirst) or BuffPresent(bloodsurge_buff) and Spell(wild_strike)
+}
+
 ### actions.bladestorm
 
 AddFunction FuryTitansGripBladestormShortCdActions
 {
-	#bladestorm,if=buff.enrage.remains>6&((talent.anger_management.enabled&raid_event.adds.in>45)|(!talent.anger_management.enabled&raid_event.adds.in>60)|!raid_event.adds.exists|active_enemies>desired_targets)
+	#bladestorm,if=buff.enrage.remains>6&((talent.anger_management.enabled&raid_event.adds.in>45)|(!talent.anger_management.enabled&raid_event.adds.in>60)|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)
 	if EnrageRemaining() > 6 and { Talent(anger_management_talent) and 600 > 45 or not Talent(anger_management_talent) and 600 > 60 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } Spell(bladestorm)
 }
 
 AddFunction FuryTitansGripBladestormCdActions
 {
-	#recklessness,sync=bladestorm,if=buff.enrage.remains>6&((talent.anger_management.enabled&raid_event.adds.in>45)|(!talent.anger_management.enabled&raid_event.adds.in>60)|!raid_event.adds.exists|active_enemies>desired_targets)
+	#recklessness,sync=bladestorm,if=buff.enrage.remains>6&((talent.anger_management.enabled&raid_event.adds.in>45)|(!talent.anger_management.enabled&raid_event.adds.in>60)|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets)
 	if EnrageRemaining() > 6 and { Talent(anger_management_talent) and 600 > 45 or not Talent(anger_management_talent) and 600 > 60 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm) and EnrageRemaining() > 6 and { Talent(anger_management_talent) and 600 > 45 or not Talent(anger_management_talent) and 600 > 60 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } Spell(recklessness)
 }
 
@@ -306,6 +320,22 @@ AddFunction FuryTitansGripPrecombatCdActions
 AddFunction FuryTitansGripPrecombatCdPostConditions
 {
 	not BuffPresent(stamina_buff any=1) and BuffPresent(attack_power_multiplier_buff any=1) and BuffExpires(attack_power_multiplier_buff) and Spell(commanding_shout) or not BuffPresent(attack_power_multiplier_buff any=1) and Spell(battle_shout) or Spell(battle_stance)
+}
+
+### actions.reck_anger_management
+
+AddFunction FuryTitansGripReckAngerManagementCdActions
+{
+	#recklessness,if=(target.time_to_die>140|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled|target.time_to_die<15)
+	if { target.TimeToDie() > 140 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or target.TimeToDie() < 15 } Spell(recklessness)
+}
+
+### actions.reck_no_anger
+
+AddFunction FuryTitansGripReckNoAngerCdActions
+{
+	#recklessness,if=(target.time_to_die>190|target.health.pct<20)&(buff.bloodbath.up|!talent.bloodbath.enabled|target.time_to_die<15)
+	if { target.TimeToDie() > 190 or target.HealthPercent() < 20 } and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) or target.TimeToDie() < 15 } Spell(recklessness)
 }
 
 ### actions.single_target

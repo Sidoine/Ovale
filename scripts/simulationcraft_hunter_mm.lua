@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_hunter_mm_t17m"
-	local desc = "[6.1] SimulationCraft: Hunter_MM_T17M"
+	local name = "simulationcraft_hunter_mm_t18m"
+	local desc = "[6.2] SimulationCraft: Hunter_MM_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_MM_T17M".
+# Based on SimulationCraft profile "Hunter_MM_T18M".
 #	class=hunter
 #	spec=marksmanship
-#	talents=0003313
+#	talents=0003332
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -76,7 +76,7 @@ AddFunction MarksmanshipDefaultMainActions
 	if FocusDeficit() * CastTime(focusing_shot_marksmanship) / { 50 + FocusCastingRegen(focusing_shot_marksmanship) } > SpellCooldown(rapid_fire) and Focus() < 100 Spell(focusing_shot_marksmanship)
 	#steady_shot,if=buff.pre_steady_focus.up&(14+cast_regen+action.aimed_shot.cast_regen)<=focus.deficit
 	if BuffPresent(pre_steady_focus_buff) and 14 + FocusCastingRegen(steady_shot) + FocusCastingRegen(aimed_shot) <= FocusDeficit() Spell(steady_shot)
-	#multishot,if=active_enemies>6
+	#multishot,if=spell_targets.multi_shot>6
 	if Enemies() > 6 Spell(multishot)
 	#aimed_shot,if=talent.focusing_shot.enabled
 	if Talent(focusing_shot_talent) Spell(aimed_shot)
@@ -99,7 +99,7 @@ AddFunction MarksmanshipDefaultShortCdActions
 
 		unless { target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) } and MarksmanshipCarefulAimShortCdPostConditions()
 		{
-			#explosive_trap,if=active_enemies>1
+			#explosive_trap,if=spell_targets.explosive_trap_tick>1
 			if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 			#a_murder_of_crows
 			Spell(a_murder_of_crows)
@@ -122,7 +122,7 @@ AddFunction MarksmanshipDefaultCdActions
 	#auto_shot
 	#counter_shot
 	MarksmanshipInterruptActions()
-	#use_item,name=beating_heart_of_the_mountain
+	#use_item,name=maalus_the_blood_drinker
 	MarksmanshipUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
@@ -160,9 +160,9 @@ AddFunction MarksmanshipCarefulAimShortCdActions
 {
 	unless Enemies() > 2 and Spell(glaive_toss)
 	{
-		#powershot,if=active_enemies>1&cast_regen<focus.deficit
+		#powershot,if=spell_targets.powershot>1&cast_regen<focus.deficit
 		if Enemies() > 1 and FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
-		#barrage,if=active_enemies>1
+		#barrage,if=spell_targets.barrage>1
 		if Enemies() > 1 Spell(barrage)
 	}
 }
@@ -177,9 +177,9 @@ AddFunction MarksmanshipCarefulAimShortCdPostConditions
 AddFunction MarksmanshipPrecombatMainActions
 {
 	#snapshot_stats
-	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
+	#exotic_munitions,ammo_type=poisoned,if=spell_targets.multi_shot<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
-	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
+	#exotic_munitions,ammo_type=incendiary,if=spell_targets.multi_shot>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
 	#glaive_toss
 	Spell(glaive_toss)

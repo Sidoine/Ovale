@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_hunter_sv_t17m"
-	local desc = "[6.1] SimulationCraft: Hunter_SV_T17M"
+	local name = "simulationcraft_hunter_sv_t18m"
+	local desc = "[6.2] SimulationCraft: Hunter_SV_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_SV_T17M".
+# Based on SimulationCraft profile "Hunter_SV_T18M".
 #	class=hunter
 #	spec=survival
-#	talents=0003323
+#	talents=0001333
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -62,10 +62,10 @@ AddFunction SurvivalSummonPet
 
 AddFunction SurvivalDefaultMainActions
 {
-	#call_action_list,name=aoe,if=active_enemies>1
+	#call_action_list,name=aoe,if=spell_targets.multi_shot>1
 	if Enemies() > 1 SurvivalAoeMainActions()
-	#black_arrow
-	Spell(black_arrow)
+	#black_arrow,cycle_targets=1,if=remains<gcd*1.5
+	if target.DebuffRemaining(black_arrow_debuff) < GCD() * 1.5 Spell(black_arrow)
 	#arcane_shot,if=(trinket.proc.any.react&trinket.proc.any.remains<4)|dot.serpent_sting.remains<=3
 	if BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) < 4 or target.DebuffRemaining(serpent_sting_debuff) <= 3 Spell(arcane_shot)
 	#explosive_shot
@@ -92,7 +92,7 @@ AddFunction SurvivalDefaultMainActions
 
 AddFunction SurvivalDefaultShortCdActions
 {
-	#call_action_list,name=aoe,if=active_enemies>1
+	#call_action_list,name=aoe,if=spell_targets.multi_shot>1
 	if Enemies() > 1 SurvivalAoeShortCdActions()
 
 	unless Enemies() > 1 and SurvivalAoeShortCdPostConditions()
@@ -100,7 +100,7 @@ AddFunction SurvivalDefaultShortCdActions
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
 
-		unless Spell(black_arrow) or { BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) < 4 or target.DebuffRemaining(serpent_sting_debuff) <= 3 } and Spell(arcane_shot) or Spell(explosive_shot) or BuffPresent(pre_steady_focus_buff) and Spell(cobra_shot)
+		unless target.DebuffRemaining(black_arrow_debuff) < GCD() * 1.5 and Spell(black_arrow) or { BuffPresent(trinket_proc_any_buff) and BuffRemaining(trinket_proc_any_buff) < 4 or target.DebuffRemaining(serpent_sting_debuff) <= 3 } and Spell(arcane_shot) or Spell(explosive_shot) or BuffPresent(pre_steady_focus_buff) and Spell(cobra_shot)
 		{
 			#dire_beast
 			Spell(dire_beast)
@@ -129,11 +129,13 @@ AddFunction SurvivalDefaultCdActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
+	#use_item,name=maalus_the_blood_drinker
+	SurvivalUseItemActions()
 	#use_item,name=beating_heart_of_the_mountain
 	SurvivalUseItemActions()
 	#potion,name=draenic_agility,if=(((cooldown.stampede.remains<1)&(cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=25
 	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 SurvivalUsePotionAgility()
-	#call_action_list,name=aoe,if=active_enemies>1
+	#call_action_list,name=aoe,if=spell_targets.multi_shot>1
 	if Enemies() > 1 SurvivalAoeCdActions()
 
 	unless Enemies() > 1 and SurvivalAoeCdPostConditions() or Spell(a_murder_of_crows)
@@ -149,9 +151,9 @@ AddFunction SurvivalAoeMainActions
 {
 	#explosive_shot,if=buff.lock_and_load.react&(!talent.barrage.enabled|cooldown.barrage.remains>0)
 	if BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } Spell(explosive_shot)
-	#black_arrow,if=!ticking
-	if not target.DebuffPresent(black_arrow_debuff) Spell(black_arrow)
-	#explosive_shot,if=active_enemies<5
+	#black_arrow,cycle_targets=1,if=remains<gcd*1.5
+	if target.DebuffRemaining(black_arrow_debuff) < GCD() * 1.5 Spell(black_arrow)
+	#explosive_shot,if=spell_targets.multi_shot<5
 	if Enemies() < 5 Spell(explosive_shot)
 	#multishot,if=buff.thrill_of_the_hunt.react&focus>50&cast_regen<=focus.deficit|dot.serpent_sting.remains<=5|target.time_to_die<4.5
 	if BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 Spell(multishot)
@@ -174,7 +176,7 @@ AddFunction SurvivalAoeShortCdActions
 		#barrage
 		Spell(barrage)
 
-		unless not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot)
+		unless target.DebuffRemaining(black_arrow_debuff) < GCD() * 1.5 and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot)
 		{
 			#explosive_trap,if=dot.explosive_trap.remains<=5
 			if target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
@@ -194,7 +196,7 @@ AddFunction SurvivalAoeShortCdActions
 
 AddFunction SurvivalAoeShortCdPostConditions
 {
-	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
+	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or target.DebuffRemaining(black_arrow_debuff) < GCD() * 1.5 and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
 }
 
 AddFunction SurvivalAoeCdActions
@@ -205,7 +207,7 @@ AddFunction SurvivalAoeCdActions
 
 AddFunction SurvivalAoeCdPostConditions
 {
-	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or Spell(barrage) or not target.DebuffPresent(black_arrow_debuff) and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot) or target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) and Spell(explosive_trap) or Spell(a_murder_of_crows) or Spell(dire_beast) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or Spell(powershot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
+	BuffPresent(lock_and_load_buff) and { not Talent(barrage_talent) or SpellCooldown(barrage) > 0 } and Spell(explosive_shot) or Spell(barrage) or target.DebuffRemaining(black_arrow_debuff) < GCD() * 1.5 and Spell(black_arrow) or Enemies() < 5 and Spell(explosive_shot) or target.DebuffRemaining(explosive_trap_debuff) <= 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) and Spell(explosive_trap) or Spell(a_murder_of_crows) or Spell(dire_beast) or { BuffPresent(thrill_of_the_hunt_buff) and Focus() > 50 and FocusCastingRegen(multishot) <= FocusDeficit() or target.DebuffRemaining(serpent_sting_debuff) <= 5 or target.TimeToDie() < 4.5 } and Spell(multishot) or Spell(glaive_toss) or Spell(powershot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 5 and Focus() + 14 + FocusCastingRegen(cobra_shot) < 80 and Spell(cobra_shot) or { Focus() >= 70 or Talent(focusing_shot_talent) } and Spell(multishot) or Spell(focusing_shot) or Spell(cobra_shot)
 }
 
 ### actions.precombat
@@ -213,9 +215,9 @@ AddFunction SurvivalAoeCdPostConditions
 AddFunction SurvivalPrecombatMainActions
 {
 	#snapshot_stats
-	#exotic_munitions,ammo_type=poisoned,if=active_enemies<3
+	#exotic_munitions,ammo_type=poisoned,if=spell_targets.multi_shot<3
 	if Enemies() < 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(poisoned_ammo)
-	#exotic_munitions,ammo_type=incendiary,if=active_enemies>=3
+	#exotic_munitions,ammo_type=incendiary,if=spell_targets.multi_shot>=3
 	if Enemies() >= 3 and BuffRemaining(exotic_munitions_buff) < 1200 Spell(incendiary_ammo)
 	#glaive_toss
 	Spell(glaive_toss)

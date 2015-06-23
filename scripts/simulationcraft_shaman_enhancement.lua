@@ -2,13 +2,13 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_shaman_enhancement_t17m"
-	local desc = "[6.1] SimulationCraft: Shaman_Enhancement_T17M"
+	local name = "simulationcraft_shaman_enhancement_t18m"
+	local desc = "[6.2] SimulationCraft: Shaman_Enhancement_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Shaman_Enhancement_T17M".
+# Based on SimulationCraft profile "Shaman_Enhancement_T18M".
 #	class=shaman
 #	spec=enhancement
-#	talents=0003012
+#	talents=0002012
 #	glyphs=chain_lightning/frost_shock
 
 Include(ovale_common)
@@ -65,10 +65,10 @@ AddFunction EnhancementInterruptActions
 
 AddFunction EnhancementDefaultMainActions
 {
-	#call_action_list,name=single,if=active_enemies=1
-	if Enemies() == 1 EnhancementSingleMainActions()
-	#call_action_list,name=aoe,if=active_enemies>1
+	#call_action_list,name=aoe,if=spell_targets.chain_lightning>1
 	if Enemies() > 1 EnhancementAoeMainActions()
+	#call_action_list,name=single
+	EnhancementSingleMainActions()
 }
 
 AddFunction EnhancementDefaultShortCdActions
@@ -89,7 +89,7 @@ AddFunction EnhancementDefaultCdActions
 	EnhancementInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
-	#use_item,name=beating_heart_of_the_mountain
+	#use_item,name=maalus_the_blood_drinker
 	EnhancementUseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&(pet.storm_elemental_totem.remains>=25|(cooldown.storm_elemental_totem.remains>target.time_to_die&pet.fire_elemental_totem.remains>=25)))|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
 	if Talent(storm_elemental_totem_talent) and { TotemRemaining(storm_elemental_totem) >= 25 or SpellCooldown(storm_elemental_totem) > target.TimeToDie() and TotemRemaining(fire_elemental_totem) >= 25 } or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 EnhancementUsePotionAgility()
@@ -117,22 +117,22 @@ AddFunction EnhancementDefaultCdActions
 
 AddFunction EnhancementAoeMainActions
 {
-	#unleash_elements,if=active_enemies>=4&dot.flame_shock.ticking&(cooldown.shock.remains>cooldown.fire_nova.remains|cooldown.fire_nova.remains=0)
+	#unleash_elements,if=spell_targets.fire_nova_explosion>=4&dot.flame_shock.ticking&(cooldown.shock.remains>cooldown.fire_nova.remains|cooldown.fire_nova.remains=0)
 	if Enemies() >= 4 and target.DebuffPresent(flame_shock_debuff) and { SpellCooldown(shock) > SpellCooldown(fire_nova) or not SpellCooldown(fire_nova) > 0 } Spell(unleash_elements)
-	#fire_nova,if=active_dot.flame_shock>=3
-	if DebuffCountOnAny(flame_shock_debuff) >= 3 Spell(fire_nova)
+	#fire_nova,if=active_dot.flame_shock>=3&spell_targets.fire_nova_explosion>=3
+	if DebuffCountOnAny(flame_shock_debuff) >= 3 and Enemies() >= 3 Spell(fire_nova)
 	#wait,sec=cooldown.fire_nova.remains,if=!talent.echo_of_the_elements.enabled&active_dot.flame_shock>=4&cooldown.fire_nova.remains<=action.fire_nova.gcd%2
 	unless not Talent(echo_of_the_elements_talent) and DebuffCountOnAny(flame_shock_debuff) >= 4 and SpellCooldown(fire_nova) <= GCD() / 2 and SpellCooldown(fire_nova) > 0
 	{
 		#magma_totem,if=!totem.fire.active
 		if not TotemPresent(fire) and target.InRange(primal_strike) Spell(magma_totem)
-		#lava_lash,if=dot.flame_shock.ticking&active_dot.flame_shock<active_enemies
+		#lava_lash,if=dot.flame_shock.ticking&active_dot.flame_shock<spell_targets.fire_nova_explosion
 		if target.DebuffPresent(flame_shock_debuff) and DebuffCountOnAny(flame_shock_debuff) < Enemies() Spell(lava_lash)
 		#elemental_blast,if=!buff.unleash_flame.up&(buff.maelstrom_weapon.react>=4|buff.ancestral_swiftness.up)
 		if not BuffPresent(unleash_flame_buff) and { BuffStacks(maelstrom_weapon_buff) >= 4 or BuffPresent(ancestral_swiftness_buff) } Spell(elemental_blast)
-		#chain_lightning,if=buff.maelstrom_weapon.react=5&((glyph.chain_lightning.enabled&active_enemies>=3)|(!glyph.chain_lightning.enabled&active_enemies>=2))
+		#chain_lightning,if=buff.maelstrom_weapon.react=5&((glyph.chain_lightning.enabled&spell_targets.chain_lightning>=3)|(!glyph.chain_lightning.enabled&spell_targets.chain_lightning>=2))
 		if BuffStacks(maelstrom_weapon_buff) == 5 and { Glyph(glyph_of_chain_lightning) and Enemies() >= 3 or not Glyph(glyph_of_chain_lightning) and Enemies() >= 2 } Spell(chain_lightning)
-		#unleash_elements,if=active_enemies<4
+		#unleash_elements,if=spell_targets.fire_nova_explosion<4
 		if Enemies() < 4 Spell(unleash_elements)
 		#flame_shock,if=dot.flame_shock.remains<=9|!ticking
 		if target.DebuffRemaining(flame_shock_debuff) <= 9 or not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
@@ -146,11 +146,11 @@ AddFunction EnhancementAoeMainActions
 		Spell(windstrike)
 		#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=3
 		if not BuffPresent(unleash_flame_buff) and BuffStacks(maelstrom_weapon_buff) >= 3 Spell(elemental_blast)
-		#chain_lightning,if=(buff.maelstrom_weapon.react>=3|buff.ancestral_swiftness.up)&((glyph.chain_lightning.enabled&active_enemies>=4)|(!glyph.chain_lightning.enabled&active_enemies>=3))
+		#chain_lightning,if=(buff.maelstrom_weapon.react>=3|buff.ancestral_swiftness.up)&((glyph.chain_lightning.enabled&spell_targets.chain_lightning>=4)|(!glyph.chain_lightning.enabled&spell_targets.chain_lightning>=3))
 		if { BuffStacks(maelstrom_weapon_buff) >= 3 or BuffPresent(ancestral_swiftness_buff) } and { Glyph(glyph_of_chain_lightning) and Enemies() >= 4 or not Glyph(glyph_of_chain_lightning) and Enemies() >= 3 } Spell(chain_lightning)
 		#magma_totem,if=pet.magma_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
 		if TotemRemaining(magma_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) and target.InRange(primal_strike) Spell(magma_totem)
-		#lightning_bolt,if=buff.maelstrom_weapon.react=5&glyph.chain_lightning.enabled&active_enemies<3
+		#lightning_bolt,if=buff.maelstrom_weapon.react=5&glyph.chain_lightning.enabled&spell_targets.chain_lightning<3
 		if BuffStacks(maelstrom_weapon_buff) == 5 and Glyph(glyph_of_chain_lightning) and Enemies() < 3 Spell(lightning_bolt)
 		#stormstrike,target=1,if=!debuff.stormstrike.up
 		if not target.DebuffPresent(stormstrike_debuff) Spell(stormstrike)
@@ -162,16 +162,16 @@ AddFunction EnhancementAoeMainActions
 		Spell(stormstrike)
 		#lava_lash
 		Spell(lava_lash)
-		#fire_nova,if=active_dot.flame_shock>=2
-		if DebuffCountOnAny(flame_shock_debuff) >= 2 Spell(fire_nova)
+		#fire_nova,if=active_dot.flame_shock>=2&spell_targets.fire_nova_explosion>=2
+		if DebuffCountOnAny(flame_shock_debuff) >= 2 and Enemies() >= 2 Spell(fire_nova)
 		#elemental_blast,if=!buff.unleash_flame.up&buff.maelstrom_weapon.react>=1
 		if not BuffPresent(unleash_flame_buff) and BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
-		#chain_lightning,if=(buff.maelstrom_weapon.react>=1|buff.ancestral_swiftness.up)&((glyph.chain_lightning.enabled&active_enemies>=3)|(!glyph.chain_lightning.enabled&active_enemies>=2))
+		#chain_lightning,if=(buff.maelstrom_weapon.react>=1|buff.ancestral_swiftness.up)&((glyph.chain_lightning.enabled&spell_targets.chain_lightning>=3)|(!glyph.chain_lightning.enabled&spell_targets.chain_lightning>=2))
 		if { BuffStacks(maelstrom_weapon_buff) >= 1 or BuffPresent(ancestral_swiftness_buff) } and { Glyph(glyph_of_chain_lightning) and Enemies() >= 3 or not Glyph(glyph_of_chain_lightning) and Enemies() >= 2 } Spell(chain_lightning)
-		#lightning_bolt,if=(buff.maelstrom_weapon.react>=1|buff.ancestral_swiftness.up)&glyph.chain_lightning.enabled&active_enemies<3
+		#lightning_bolt,if=(buff.maelstrom_weapon.react>=1|buff.ancestral_swiftness.up)&glyph.chain_lightning.enabled&spell_targets.chain_lightning<3
 		if { BuffStacks(maelstrom_weapon_buff) >= 1 or BuffPresent(ancestral_swiftness_buff) } and Glyph(glyph_of_chain_lightning) and Enemies() < 3 Spell(lightning_bolt)
-		#fire_nova,if=active_dot.flame_shock>=1
-		if DebuffCountOnAny(flame_shock_debuff) >= 1 Spell(fire_nova)
+		#fire_nova,if=active_dot.flame_shock>=1&spell_targets.fire_nova_explosion>=1
+		if DebuffCountOnAny(flame_shock_debuff) >= 1 and Enemies() >= 1 Spell(fire_nova)
 	}
 }
 
@@ -211,14 +211,14 @@ AddFunction EnhancementSingleMainActions
 {
 	#searing_totem,if=!totem.fire.active
 	if not TotemPresent(fire) Spell(searing_totem)
-	#unleash_elements,if=(talent.unleashed_fury.enabled|set_bonus.tier16_2pc_melee=1)
-	if Talent(unleashed_fury_talent) or ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements)
-	#elemental_blast,if=buff.maelstrom_weapon.react=5
-	if BuffStacks(maelstrom_weapon_buff) == 5 Spell(elemental_blast)
+	#unleash_elements,if=talent.unleashed_fury.enabled
+	if Talent(unleashed_fury_talent) Spell(unleash_elements)
+	#elemental_blast,if=buff.maelstrom_weapon.react>=5+4*set_bonus.tier18_4pc
+	if BuffStacks(maelstrom_weapon_buff) >= 5 + 4 * ArmorSetBonus(T18 4) Spell(elemental_blast)
 	#windstrike,if=!talent.echo_of_the_elements.enabled|(talent.echo_of_the_elements.enabled&(charges=2|(action.windstrike.charges_fractional>1.75)|(charges=1&buff.ascendance.remains<1.5)))
 	if not Talent(echo_of_the_elements_talent) or Talent(echo_of_the_elements_talent) and { Charges(windstrike) == 2 or Charges(windstrike count=0) > 1.75 or Charges(windstrike) == 1 and BuffRemaining(ascendance_melee_buff) < 1.5 } Spell(windstrike)
-	#lightning_bolt,if=buff.maelstrom_weapon.react=5
-	if BuffStacks(maelstrom_weapon_buff) == 5 Spell(lightning_bolt)
+	#lightning_bolt,if=buff.maelstrom_weapon.react>=5+4*set_bonus.tier18_4pc
+	if BuffStacks(maelstrom_weapon_buff) >= 5 + 4 * ArmorSetBonus(T18 4) Spell(lightning_bolt)
 	#stormstrike,if=!talent.echo_of_the_elements.enabled|(talent.echo_of_the_elements.enabled&(charges=2|(action.stormstrike.charges_fractional>1.75)|target.time_to_die<6))
 	if not Talent(echo_of_the_elements_talent) or Talent(echo_of_the_elements_talent) and { Charges(stormstrike) == 2 or Charges(stormstrike count=0) > 1.75 or target.TimeToDie() < 6 } Spell(stormstrike)
 	#lava_lash,if=!talent.echo_of_the_elements.enabled|(talent.echo_of_the_elements.enabled&(charges=2|(action.lava_lash.charges_fractional>1.8)|target.time_to_die<8))
@@ -229,22 +229,22 @@ AddFunction EnhancementSingleMainActions
 	Spell(unleash_elements)
 	#windstrike,if=talent.echo_of_the_elements.enabled
 	if Talent(echo_of_the_elements_talent) Spell(windstrike)
-	#elemental_blast,if=buff.maelstrom_weapon.react>=3|buff.ancestral_swiftness.up
-	if BuffStacks(maelstrom_weapon_buff) >= 3 or BuffPresent(ancestral_swiftness_buff) Spell(elemental_blast)
-	#lightning_bolt,if=(buff.maelstrom_weapon.react>=3&!buff.ascendance.up)|buff.ancestral_swiftness.up
-	if BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
+	#elemental_blast,if=(!set_bonus.tier18_4pc&buff.maelstrom_weapon.react>=3)|buff.ancestral_swiftness.up
+	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 3 or BuffPresent(ancestral_swiftness_buff) Spell(elemental_blast)
+	#lightning_bolt,if=(!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=3&!buff.ascendance.up))|buff.ancestral_swiftness.up
+	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#lava_lash,if=talent.echo_of_the_elements.enabled
 	if Talent(echo_of_the_elements_talent) Spell(lava_lash)
 	#frost_shock,if=(talent.elemental_fusion.enabled&dot.flame_shock.remains>=16)|!talent.elemental_fusion.enabled
 	if Talent(elemental_fusion_talent) and target.DebuffRemaining(flame_shock_debuff) >= 16 or not Talent(elemental_fusion_talent) Spell(frost_shock)
-	#elemental_blast,if=buff.maelstrom_weapon.react>=1
-	if BuffStacks(maelstrom_weapon_buff) >= 1 Spell(elemental_blast)
-	#lightning_bolt,if=talent.echo_of_the_elements.enabled&((buff.maelstrom_weapon.react>=2&!buff.ascendance.up)|buff.ancestral_swiftness.up)
-	if Talent(echo_of_the_elements_talent) and { BuffStacks(maelstrom_weapon_buff) >= 2 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) } Spell(lightning_bolt)
+	#elemental_blast,if=buff.maelstrom_weapon.react>=1+2*set_bonus.tier18_4pc
+	if BuffStacks(maelstrom_weapon_buff) >= 1 + 2 * ArmorSetBonus(T18 4) Spell(elemental_blast)
+	#lightning_bolt,if=talent.echo_of_the_elements.enabled&((!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=2&!buff.ascendance.up))|buff.ancestral_swiftness.up)
+	if Talent(echo_of_the_elements_talent) and { not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 2 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) } Spell(lightning_bolt)
 	#stormstrike,if=talent.echo_of_the_elements.enabled
 	if Talent(echo_of_the_elements_talent) Spell(stormstrike)
-	#lightning_bolt,if=(buff.maelstrom_weapon.react>=1&!buff.ascendance.up)|buff.ancestral_swiftness.up
-	if BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
+	#lightning_bolt,if=(!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=1&!buff.ascendance.up))|(set_bonus.tier18_4pc&buff.maelstrom_weapon.react>=7)|buff.ancestral_swiftness.up
+	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 7 or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#searing_totem,if=pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
 	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }

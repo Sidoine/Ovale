@@ -2,10 +2,10 @@ local OVALE, Ovale = ...
 local OvaleScripts = Ovale.OvaleScripts
 
 do
-	local name = "simulationcraft_druid_guardian_t17m"
-	local desc = "[6.1] SimulationCraft: Druid_Guardian_T17M"
+	local name = "simulationcraft_druid_guardian_t18m"
+	local desc = "[6.2] SimulationCraft: Druid_Guardian_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Druid_Guardian_T17M".
+# Based on SimulationCraft profile "Druid_Guardian_T18M".
 #	class=druid
 #	spec=guardian
 #	talents=0301022
@@ -97,14 +97,14 @@ AddFunction GuardianDefaultCdActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
-	#use_item,slot=trinket2
+	#use_item,slot=finger1
 	GuardianUseItemActions()
 	#barkskin,if=buff.bristling_fur.down
 	if BuffExpires(bristling_fur_buff) Spell(barkskin)
 	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
 	if BuffExpires(barkskin_buff) and BuffExpires(savage_defense_buff) Spell(bristling_fur)
-	#berserk,if=buff.pulverize.remains>10
-	if BuffRemaining(pulverize_buff) > 10 Spell(berserk_bear)
+	#berserk,if=(buff.pulverize.remains>10|!talent.pulverize.enabled)&buff.incarnation.down
+	if { BuffRemaining(pulverize_buff) > 10 or not Talent(pulverize_talent) } and BuffExpires(incarnation_son_of_ursoc_buff) Spell(berserk_bear)
 
 	unless Spell(cenarion_ward)
 	{
@@ -120,8 +120,8 @@ AddFunction GuardianDefaultCdActions
 
 			unless BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 and Spell(healing_touch) or BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffGain(lacerate_debuff) <= BaseDuration(lacerate_debuff) and Spell(pulverize) or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) and Spell(lacerate)
 			{
-				#incarnation
-				Spell(incarnation_tank)
+				#incarnation,if=buff.berserk.down
+				if BuffExpires(berserk_bear_buff) Spell(incarnation_son_of_ursoc)
 			}
 		}
 	}
@@ -218,7 +218,8 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # healing_touch
 # heart_of_the_wild_tank
 # heart_of_the_wild_tank_buff
-# incarnation_tank
+# incarnation_son_of_ursoc
+# incarnation_son_of_ursoc_buff
 # lacerate
 # lacerate_debuff
 # maim
