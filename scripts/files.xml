@@ -47,10 +47,6 @@
 	<Script file="simulationcraft_monk_windwalker_2h.lua" />
 	<Script file="simulationcraft_paladin_protection.lua" />
 	<Script file="simulationcraft_paladin_retribution.lua" />
-	<Script file="simulationcraft_priest_discipline_dmg.lua" />
-	<Script file="simulationcraft_priest_discipline_heal.lua" />
-	<Script file="simulationcraft_priest_holy_dmg.lua" />
-	<Script file="simulationcraft_priest_holy_heal.lua" />
 	<Script file="simulationcraft_priest_shadow_as.lua" />
 	<Script file="simulationcraft_priest_shadow_cop.lua" />
 	<Script file="simulationcraft_priest_shadow_ve.lua" />
