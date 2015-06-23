@@ -42,7 +42,7 @@ AddFunction RestorationMainActions
 	# it after the current spellcast and GCD.  Take care not to recall other totems that have
 	# long cooldowns.
 	#
-	if Glyph(glyph_of_totemic_recall) and TotemPresent(water totem=healing_stream_totem) and TotemExpires(water 3) and TotemExpires(fire) and TotemExpires(earth) and TotemExpires(air) Spell(totemic_recall)
+	if Glyph(glyph_of_totemic_recall) and TotemPresent(healing_stream_totem) and TotemExpires(water 3) and TotemExpires(fire) and TotemExpires(earth) and TotemExpires(air) Spell(totemic_recall)
 
 	if Talent(elemental_blast_talent) and BuffRemaining(elemental_blast_spirit_buff) < CastTime(elemental_blast) Spell(elemental_blast)
 	if BuffPresent(unleash_life_buff) Spell(healing_wave)
@@ -68,7 +68,7 @@ AddFunction RestorationShortCdActions
 	if Talent(primal_elementalist_talent) and pet.Present()
 	{
 		if TotemPresent(fire_elemental_totem) and BuffExpires(fire_elemental_totem_empower_buff any=1) Spell(fire_elemental_totem_empower)
-		if TotemPresent(earth totem=earth_elemental_totem) and BuffExpires(earth_elemental_totem_reinforce_buff any=1) Spell(earth_elemental_totem_reinforce)
+		if TotemPresent(earth_elemental_totem) and BuffExpires(earth_elemental_totem_reinforce_buff any=1) Spell(earth_elemental_totem_reinforce)
 	}
 	if BuffExpires(unleash_life_buff) Spell(unleash_life)
 }
