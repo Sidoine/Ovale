@@ -165,12 +165,16 @@ do
 	local function OnUpdate(self, elapsed)
 		--[[
 			Refresh the best action if we've exceeded the minimum update interval since the last refresh,
-			or if one of the units the script is tracking needs a refresh.  If the update interval is set
-			to zero, then only refresh the best action if a unit needs a refresh.
+			or if one of the units the script is tracking needs a refresh.
+
+			If the target or focus exists, then the unit needs a refresh, even if out of combat.
 		--]]
+		local guid = OvaleGUID:UnitGUID("target") or OvaleGUID:UnitGUID("focus")
+		if guid then
+			Ovale.refreshNeeded[guid] = true
+		end
 		self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-		local profile = Ovale.db.profile
-		local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > MIN_REFRESH_TIME and (next(Ovale.refreshNeeded) or OvaleGUID:UnitGUID("target") or OvaleGUID:UnitGUID("focus"))
+		local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > MIN_REFRESH_TIME and next(Ovale.refreshNeeded)
 		if refresh then
 			-- Accumulate refresh interval statistics.
 			Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
@@ -182,6 +186,7 @@ do
 				Ovale:UpdateFrame()
 			end
 
+			local profile = Ovale.db.profile
 			local iconNodes = OvaleCompile:GetIconNodes()
 			for k, node in ipairs(iconNodes) do
 				-- Set the true target of "target" references in the icon's body.
@@ -525,4 +530,3 @@ do
 	
 	AceGUI:RegisterWidgetType(Type,Constructor,Version)
 end
-
