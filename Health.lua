@@ -192,15 +192,17 @@ end
 --]]
 function OvaleHealth:UnitHealth(unitId, guid)
 	local amount = 0
-	guid = guid or OvaleGUID:UnitGUID(unitId)
-	if guid then
-		if unitId == "target" or unitId == "focus" then
-			-- The target and focus target are actively tracked.
-			amount = self.health[guid] or 0
-		else
-			-- Cache the health for later reference.
-			amount = API_UnitHealth(unitId)
-			self.health[guid] = amount
+	if unitId then
+		guid = guid or OvaleGUID:UnitGUID(unitId)
+		if guid then
+			if unitId == "target" or unitId == "focus" then
+				-- The target and focus target are actively tracked.
+				amount = self.health[guid] or 0
+			else
+				-- Cache the health for later reference.
+				amount = API_UnitHealth(unitId)
+				self.health[guid] = amount
+			end
 		end
 	end
 	return amount
@@ -212,15 +214,17 @@ end
 --]]
 function OvaleHealth:UnitHealthMax(unitId, guid)
 	local amount = 0
-	guid = guid or OvaleGUID:UnitGUID(unitId)
-	if guid then
-		if unitId == "target" or unitId == "focus" then
-			-- The target and focus target are actively tracked.
-			amount = self.maxHealth[guid] or 0
-		else
-			-- Cache the maximum health for later reference.
-			amount = API_UnitHealthMax(unitId)
-			self.maxHealth[guid] = amount
+	if unitId then
+		guid = guid or OvaleGUID:UnitGUID(unitId)
+		if guid then
+			if unitId == "target" or unitId == "focus" then
+				-- The target and focus target are actively tracked.
+				amount = self.maxHealth[guid] or 0
+			else
+				-- Cache the maximum health for later reference.
+				amount = API_UnitHealthMax(unitId)
+				self.maxHealth[guid] = amount
+			end
 		end
 	end
 	return amount
