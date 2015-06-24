@@ -191,7 +191,7 @@ end
 	An optional GUID may be passed as a hint for the GUID of the unit.
 --]]
 function OvaleHealth:UnitHealth(unitId, guid)
-	local amount
+	local amount = 0
 	guid = guid or OvaleGUID:UnitGUID(unitId)
 	if guid then
 		if unitId == "target" or unitId == "focus" then
@@ -211,7 +211,7 @@ end
 	An optional GUID may be passed as a hint for the GUID of the unit.
 --]]
 function OvaleHealth:UnitHealthMax(unitId, guid)
-	local amount
+	local amount = 0
 	guid = guid or OvaleGUID:UnitGUID(unitId)
 	if guid then
 		if unitId == "target" or unitId == "focus" then
@@ -235,8 +235,8 @@ function OvaleHealth:UnitTimeToDie(unitId, guid)
 	local timeToDie = INFINITY
 	guid = guid or OvaleGUID:UnitGUID(unitId)
 	if guid then
-		local health = self:UnitHealth(unitId, guid) or 0
-		local maxHealth = self:UnitHealthMax(unitId, guid) or 1
+		local health = self:UnitHealth(unitId, guid)
+		local maxHealth = self:UnitHealthMax(unitId, guid)
 		if health == 0 then
 			timeToDie = 0
 			self.firstSeen[guid] = nil
@@ -289,9 +289,9 @@ function OvaleHealth:RequireHealthPercentHandler(spellId, atTime, requirement, t
 			unitId = "player"
 		end
 		guid = guid or OvaleGUID:UnitGUID(unitId)
-		local health = OvaleHealth:UnitHealth(unitId, guid) or 0
-		local maxHealth = OvaleHealth:UnitHealthMax(unitId, guid) or 1
-		local healthPercent = health / maxHealth * 100
+		local health = OvaleHealth:UnitHealth(unitId, guid)
+		local maxHealth = OvaleHealth:UnitHealthMax(unitId, guid)
+		local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 0
 		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
 			verified = true
 		end
