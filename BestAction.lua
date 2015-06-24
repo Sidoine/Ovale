@@ -878,6 +878,9 @@ function OvaleBestAction:ComputeGroup(element, state, atTime)
 	OvaleTimeSpan:Release(best, current)
 
 	local timeSpan = GetTimeSpan(element, bestTimeSpan)
+	if not bestTimeSpan then
+		wipe(timeSpan)
+	end
 	if bestElement then
 		local id = bestElement.value
 		if bestElement.positionalParams then
