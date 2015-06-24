@@ -196,7 +196,7 @@ function OvaleHealth:UnitHealth(unitId, guid)
 	if guid then
 		if unitId == "target" or unitId == "focus" then
 			-- The target and focus target are actively tracked.
-			amount = self.health[guid]
+			amount = self.health[guid] or 0
 		else
 			-- Cache the health for later reference.
 			amount = API_UnitHealth(unitId)
@@ -216,7 +216,7 @@ function OvaleHealth:UnitHealthMax(unitId, guid)
 	if guid then
 		if unitId == "target" or unitId == "focus" then
 			-- The target and focus target are actively tracked.
-			amount = self.maxHealth[guid]
+			amount = self.maxHealth[guid] or 0
 		else
 			-- Cache the maximum health for later reference.
 			amount = API_UnitHealthMax(unitId)
