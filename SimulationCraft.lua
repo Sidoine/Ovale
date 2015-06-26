@@ -1546,7 +1546,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 	local specialization = annotation.specialization
 	local camelSpecialization = CamelSpecialization(annotation)
 	local role = annotation.role
-	local action = Disambiguate(canonicalizedName, class, specialization)
+	local action = strlower(Disambiguate(canonicalizedName, class, specialization))
 
 	if action == "auto_attack" and not annotation.melee then
 		-- skip
@@ -2548,7 +2548,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	end
 
 	local class, specialization = annotation.class, annotation.specialization
-	name = Disambiguate(name, class, specialization)
+	name = strlower(Disambiguate(name, class, specialization))
 	target = target and (target .. ".") or ""
 	local buffName = name .. "_debuff"
 	buffName = Disambiguate(buffName, class, specialization)
@@ -2648,7 +2648,7 @@ EmitOperandActiveDot = function(operand, parseNode, nodeList, annotation, action
 	local token = tokenIterator()
 	if token == "active_dot" then
 		local name = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local dotName = name .. "_debuff"
 		dotName = Disambiguate(dotName, annotation.class, annotation.specialization)
 		local prefix = strfind(dotName, "_buff$") and "Buff" or "Debuff"
@@ -2676,7 +2676,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 	if token == "aura" or token == "buff" or token == "debuff" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
 		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
 		local prefix = strfind(buffName, "_buff$") and "Buff" or "Debuff"
@@ -2899,7 +2899,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 	if token == "cooldown" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local prefix = "Spell"
 
 		-- Assume that the "potion" action has already been seen.
@@ -2984,7 +2984,7 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 	if token == "dot" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local dotName = name .. "_debuff"
 		dotName = Disambiguate(dotName, annotation.class, annotation.specialization)
 		local prefix = strfind(dotName, "_buff$") and "Buff" or "Debuff"
@@ -3029,7 +3029,7 @@ EmitOperandGlyph = function(operand, parseNode, nodeList, annotation, action)
 	if token == "glyph" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local glyphName = "glyph_of_" .. name
 		glyphName = Disambiguate(glyphName, annotation.class, annotation.specialization)
 
@@ -3062,7 +3062,7 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 	if token == "pet" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local isTotem = IsTotem(name)
 
 		local code
@@ -3088,7 +3088,7 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 				if not ok then
 					-- Prefix the pet ability name with the name of the pet if it does not already begin with "pet".
 					local petAbilityName = strmatch(petOperand, "^[%w_]+%.([^.]+)")
-					petAbilityName = Disambiguate(petAbilityName, annotation.class, annotation.specialization)
+					petAbilityName = strlower(Disambiguate(petAbilityName, annotation.class, annotation.specialization))
 					if strsub(petAbilityName, 1, 4) ~= "pet_" then
 						petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
 					end
@@ -3126,7 +3126,7 @@ EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, ac
 	local token = tokenIterator()
 	if token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
 		local name = tokenIterator()
-		name = Disambiguate(name, annotation.class, annotation.specialization)
+		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local code
 		if token == "prev" then
 			code = format("PreviousSpell(%s)", name)
@@ -3292,7 +3292,7 @@ EmitOperandSeal = function(operand, parseNode, nodeList, annotation, action)
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
 	if token == "seal" then
-		local name = tokenIterator()
+		local name = strlower(tokenIterator())
 		local code
 		if name then
 			code = format("Stance(paladin_seal_of_%s)", name)
@@ -3318,6 +3318,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	local specialization = annotation.specialization
 
 	target = target and (target .. ".") or ""
+	operand = strlower(operand)
 	local code
 	if class == "DEATHKNIGHT" and operand == "dot.breath_of_sindragosa.ticking" then
 		-- Breath of Sindragosa is the player buff from channeling the spell.
@@ -3537,7 +3538,7 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
 	if token == "talent" then
-		local name = tokenIterator()
+		local name = strlower(tokenIterator())
 		local property = tokenIterator()
 		-- Talent names need no disambiguation as they are the same across all specializations.
 		--name = Disambiguate(name, annotation.class, annotation.specialization)
@@ -3575,7 +3576,7 @@ EmitOperandTotem = function(operand, parseNode, nodeList, annotation, action)
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
 	if token == "totem" then
-		local name = tokenIterator()
+		local name = strlower(tokenIterator())
 		local property = tokenIterator()
 
 		local code
