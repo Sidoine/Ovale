@@ -15,6 +15,7 @@ local OvaleRunes = Ovale:NewModule("OvaleRunes", "AceEvent-3.0")
 Ovale.OvaleRunes = OvaleRunes
 
 --<private-static-properties>
+local OvaleDebug = Ovale.OvaleDebug
 local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
@@ -36,6 +37,8 @@ local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local INFINITY = math.huge
 
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleRunes)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleRunes)
 
@@ -159,15 +162,18 @@ function OvaleRunes:OnDisable()
 end
 
 function OvaleRunes:RUNE_POWER_UPDATE(event, slot, usable)
+	self:Debug(event, slot, usable)
 	self:UpdateRune(slot)
 end
 
 function OvaleRunes:RUNE_TYPE_UPDATE(event, slot)
+	self:Debug(event, slot)
 	self:UpdateRune(slot)
 end
 
 function OvaleRunes:UNIT_RANGEDDAMAGE(event, unitId)
 	if unitId == "player" then
+		self:Debug(event)
 		self:UpdateAllRunes()
 	end
 end
@@ -177,21 +183,26 @@ function OvaleRunes:UpdateRune(slot)
 	local rune = self.rune[slot]
 	local runeType = API_GetRuneType(slot)
 	local start, duration, runeReady = API_GetRuneCooldown(slot)
-	rune.type = runeType
-	if start > 0 then
-		-- Rune is on cooldown.
-		rune.startCooldown = start
-		rune.endCooldown = start + duration
+	if runeType and start and duration then
+		rune.type = runeType
+		if start > 0 then
+			-- Rune is on cooldown.
+			rune.startCooldown = start
+			rune.endCooldown = start + duration
+		else
+			-- Rune is active.
+			rune.startCooldown = 0
+			rune.endCooldown = 0
+		end
+		Ovale.refreshNeeded[Ovale.playerGUID] = true
 	else
-		-- Rune is active.
-		rune.startCooldown = 0
-		rune.endCooldown = 0
+		self:Debug("Warning: rune information for slot %d not available.", slot)
 	end
-	Ovale.refreshNeeded[Ovale.playerGUID] = true
 	self:StopProfiling("OvaleRunes_UpdateRune")
 end
 
-function OvaleRunes:UpdateAllRunes()
+function OvaleRunes:UpdateAllRunes(event)
+	self:Debug(event)
 	for slot = 1, 6 do
 		self:UpdateRune(slot)
 	end
