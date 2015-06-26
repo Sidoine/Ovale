@@ -65,6 +65,7 @@ OvaleOptions.defaultDB = {
 			predictif = false,
 			secondIconScale = 1,
 			-- Advanced
+			taggedEnemies = false,
 			auraLag = 400,
 		},
 	},
@@ -358,9 +359,15 @@ OvaleOptions.options = {
 					name = "Advanced",
 					args =
 					{
+						taggedEnemies = {
+							order = 10,
+							type = "toggle",
+							name = L["Only count tagged enemies"],
+							desc = L["Only count a mob as an enemy if it is directly affected by a player's spells."],
+						},
 						auraLag =
 						{
-							order = 10,
+							order = 20,
 							type = "range",
 							name = L["Aura lag"],
 							desc = L["Lag (in milliseconds) between when an spell is cast and when the affected aura is applied or removed"],

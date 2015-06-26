@@ -1441,11 +1441,15 @@ do
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local value = state.enemies
 		if not value then
-			if namedParams.tagged == 1 then
-				value = state.taggedEnemies
-			else
-				value = state.activeEnemies
+			-- Use the profile's tagged enemies option as the default.
+			local useTagged = Ovale.db.profile.apparence.taggedEnemies
+			-- Override the default if "tagged" is explicitly given.
+			if namedParams.tagged == 0 then
+				useTagged = false
+			elseif namedParams.tagged == 1 then
+				useTagged = true
 			end
+			value = useTagged and state.taggedEnemies or state.activeEnemies
 		end
 		-- This works around problems with testing on target dummies, which are never hostile.
 		if value < 1 then
