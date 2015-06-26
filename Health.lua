@@ -191,7 +191,7 @@ end
 	An optional GUID may be passed as a hint for the GUID of the unit.
 --]]
 function OvaleHealth:UnitHealth(unitId, guid)
-	local amount = 0
+	local amount
 	if unitId then
 		guid = guid or OvaleGUID:UnitGUID(unitId)
 		if guid then
@@ -203,6 +203,8 @@ function OvaleHealth:UnitHealth(unitId, guid)
 				amount = API_UnitHealth(unitId)
 				self.health[guid] = amount
 			end
+		else
+			amount = 0
 		end
 	end
 	return amount
@@ -213,7 +215,7 @@ end
 	An optional GUID may be passed as a hint for the GUID of the unit.
 --]]
 function OvaleHealth:UnitHealthMax(unitId, guid)
-	local amount = 0
+	local amount
 	if unitId then
 		guid = guid or OvaleGUID:UnitGUID(unitId)
 		if guid then
@@ -225,6 +227,8 @@ function OvaleHealth:UnitHealthMax(unitId, guid)
 				amount = API_UnitHealthMax(unitId)
 				self.maxHealth[guid] = amount
 			end
+		else
+			amount = 0
 		end
 	end
 	return amount
@@ -241,19 +245,18 @@ function OvaleHealth:UnitTimeToDie(unitId, guid)
 	if guid then
 		local health = self:UnitHealth(unitId, guid)
 		local maxHealth = self:UnitHealthMax(unitId, guid)
-		if health == 0 then
-			timeToDie = 0
-			self.firstSeen[guid] = nil
-			self.lastUpdated[guid] = nil
-		elseif maxHealth and maxHealth > 5 then
-			-- Filter out targets whose maximum health is less than 5, which are probably target dummies.
-			local firstSeen, lastUpdated = self.firstSeen[guid], self.lastUpdated[guid]
-			if firstSeen and lastUpdated and lastUpdated > firstSeen then
+		if health and maxHealth then
+			if health == 0 then
+				timeToDie = 0
+				self.firstSeen[guid] = nil
+				self.lastUpdated[guid] = nil
+			elseif maxHealth > 5 then
+				-- Filter out targets whose maximum health is less than 5, which are probably target dummies.
+				local firstSeen, lastUpdated = self.firstSeen[guid], self.lastUpdated[guid]
 				local damage = self.totalDamage[guid] or 0
 				local healing = self.totalHealing[guid] or 0
-				local ttd = health * (lastUpdated - firstSeen) / (damage - healing)
-				if ttd > 0 then
-					timeToDie = ttd
+				if firstSeen and lastUpdated and lastUpdated > firstSeen and damage > healing then
+					timeToDie = health * (lastUpdated - firstSeen) / (damage - healing)
 				end
 			end
 		end
@@ -293,8 +296,8 @@ function OvaleHealth:RequireHealthPercentHandler(spellId, atTime, requirement, t
 			unitId = "player"
 		end
 		guid = guid or OvaleGUID:UnitGUID(unitId)
-		local health = OvaleHealth:UnitHealth(unitId, guid)
-		local maxHealth = OvaleHealth:UnitHealthMax(unitId, guid)
+		local health = OvaleHealth:UnitHealth(unitId, guid) or 0
+		local maxHealth = OvaleHealth:UnitHealthMax(unitId, guid) or 0
 		local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 100
 		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
 			verified = true
