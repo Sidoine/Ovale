@@ -26,6 +26,10 @@
 	<Script file="ovale_warrior.lua" />
 	<Script file="ovale_warrior_spells.lua" />
 
+	<Script file="mmo_champion_rogue_assassination.lua" />
+	<Script file="mmo_champion_rogue_combat.lua" />
+	<Script file="mmo_champion_rogue_subtlety.lua" />
+
 	<Script file="simulationcraft_deathknight_blood.lua" />
 	<Script file="simulationcraft_deathknight_frost_1h.lua" />
 	<Script file="simulationcraft_deathknight_frost_2h.lua" />
