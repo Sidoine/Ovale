@@ -486,7 +486,7 @@ sub ParseDirectory
 	}
 }
 
-my @directories = ("..", "../scripts");
+my @directories = ( ".." );
 while ($dir = shift @directories)
 {
 	opendir(my $dh, $dir);
