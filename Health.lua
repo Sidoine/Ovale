@@ -295,7 +295,7 @@ function OvaleHealth:RequireHealthPercentHandler(spellId, atTime, requirement, t
 		guid = guid or OvaleGUID:UnitGUID(unitId)
 		local health = OvaleHealth:UnitHealth(unitId, guid)
 		local maxHealth = OvaleHealth:UnitHealthMax(unitId, guid)
-		local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 0
+		local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 100
 		if not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
 			verified = true
 		end
