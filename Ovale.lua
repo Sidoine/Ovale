@@ -329,30 +329,51 @@ function Ovale:GetListValue(name)
 	return widget and widget:GetValue()
 end
 
--- Set the k'th checkbox control to the specified on/off (true/false) value.
-function Ovale:SetCheckBox(k, on)
+-- Set the checkbox control to the specified on/off (true/false) value.
+function Ovale:SetCheckBox(name, on)
 	local profile = self.db.profile
-	for name, widget in pairs(self.checkBoxWidget) do
-		if k == 0 then
+	if type(name) == "string" then
+		local widget = self.checkBoxWidget[name]
+		if widget then
 			widget:SetValue(on)
 			profile.check[name] = on
-			break
 		end
-		k = k - 1
+	elseif type(name) == "number" then
+		-- "name" is a number, so count checkboxes until we reach the k'th one.
+		local k = name
+		for name, widget in pairs(self.checkBoxWidget) do
+			if k == 0 then
+				widget:SetValue(on)
+				profile.check[name] = on
+				break
+			end
+			k = k - 1
+		end
 	end
 end
 
--- Toggle the k'th checkbox control.
-function Ovale:ToggleCheckBox(k)
+-- Toggle the checkbox control.
+function Ovale:ToggleCheckBox(name)
 	local profile = self.db.profile
-	for name, widget in pairs(self.checkBoxWidget) do
-		if k == 0 then
+	if type(name) == "string" then
+		local widget = self.checkBoxWidget[name]
+		if widget then
 			local on = not widget:GetValue()
 			widget:SetValue(on)
 			profile.check[name] = on
-			break
 		end
-		k = k - 1
+	elseif type(name) == "number" then
+		-- "name" is a number, so count checkboxes until we reach the k'th one.
+		local k = name
+		for name, widget in pairs(self.checkBoxWidget) do
+			if k == 0 then
+				local on = not widget:GetValue()
+				widget:SetValue(on)
+				profile.check[name] = on
+				break
+			end
+			k = k - 1
+		end
 	end
 end
 
