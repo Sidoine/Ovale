@@ -339,6 +339,9 @@ function OvaleGUID:UpdateUnit(unitId)
 			end
 		end
 	end
+	if guid and guid ~= previousGUID then
+		self:SendMessage("Ovale_UnitChanged", unitId, guid)
+	end
 end
 
 function OvaleGUID:UpdateUnitWithTarget(unitId)
