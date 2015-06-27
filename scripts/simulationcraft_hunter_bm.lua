@@ -168,7 +168,7 @@ AddFunction BeastMasteryPrecombatMainActions
 AddFunction BeastMasteryPrecombatShortCdActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=salty_squid_roll
+	#food,type=sleeper_sushi
 	#summon_pet
 	BeastMasterySummonPet()
 }

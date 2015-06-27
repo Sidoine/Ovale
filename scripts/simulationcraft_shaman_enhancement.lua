@@ -213,12 +213,12 @@ AddFunction EnhancementSingleMainActions
 	if not TotemPresent(fire) Spell(searing_totem)
 	#unleash_elements,if=talent.unleashed_fury.enabled
 	if Talent(unleashed_fury_talent) Spell(unleash_elements)
-	#elemental_blast,if=buff.maelstrom_weapon.react>=5+4*set_bonus.tier18_4pc
-	if BuffStacks(maelstrom_weapon_buff) >= 5 + 4 * ArmorSetBonus(T18 4) Spell(elemental_blast)
+	#elemental_blast,if=buff.maelstrom_weapon.react>=5+3*set_bonus.tier18_4pc
+	if BuffStacks(maelstrom_weapon_buff) >= 5 + 3 * ArmorSetBonus(T18 4) Spell(elemental_blast)
 	#windstrike,if=!talent.echo_of_the_elements.enabled|(talent.echo_of_the_elements.enabled&(charges=2|(action.windstrike.charges_fractional>1.75)|(charges=1&buff.ascendance.remains<1.5)))
 	if not Talent(echo_of_the_elements_talent) or Talent(echo_of_the_elements_talent) and { Charges(windstrike) == 2 or Charges(windstrike count=0) > 1.75 or Charges(windstrike) == 1 and BuffRemaining(ascendance_melee_buff) < 1.5 } Spell(windstrike)
-	#lightning_bolt,if=buff.maelstrom_weapon.react>=5+4*set_bonus.tier18_4pc
-	if BuffStacks(maelstrom_weapon_buff) >= 5 + 4 * ArmorSetBonus(T18 4) Spell(lightning_bolt)
+	#lightning_bolt,if=buff.maelstrom_weapon.react>=5+3*set_bonus.tier18_4pc
+	if BuffStacks(maelstrom_weapon_buff) >= 5 + 3 * ArmorSetBonus(T18 4) Spell(lightning_bolt)
 	#stormstrike,if=!talent.echo_of_the_elements.enabled|(talent.echo_of_the_elements.enabled&(charges=2|(action.stormstrike.charges_fractional>1.75)|target.time_to_die<6))
 	if not Talent(echo_of_the_elements_talent) or Talent(echo_of_the_elements_talent) and { Charges(stormstrike) == 2 or Charges(stormstrike count=0) > 1.75 or target.TimeToDie() < 6 } Spell(stormstrike)
 	#lava_lash,if=!talent.echo_of_the_elements.enabled|(talent.echo_of_the_elements.enabled&(charges=2|(action.lava_lash.charges_fractional>1.8)|target.time_to_die<8))
@@ -243,8 +243,8 @@ AddFunction EnhancementSingleMainActions
 	if Talent(echo_of_the_elements_talent) and { not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 2 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) } Spell(lightning_bolt)
 	#stormstrike,if=talent.echo_of_the_elements.enabled
 	if Talent(echo_of_the_elements_talent) Spell(stormstrike)
-	#lightning_bolt,if=(!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=1&!buff.ascendance.up))|(set_bonus.tier18_4pc&buff.maelstrom_weapon.react>=7)|buff.ancestral_swiftness.up
-	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 7 or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
+	#lightning_bolt,if=(!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=1&!buff.ascendance.up))|(set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=5|(buff.maelstrom_weapon.react>=3&!buff.ascendance.up)))|buff.ancestral_swiftness.up
+	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or ArmorSetBonus(T18 4) and { BuffStacks(maelstrom_weapon_buff) >= 5 or BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) } or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#searing_totem,if=pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
 	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }

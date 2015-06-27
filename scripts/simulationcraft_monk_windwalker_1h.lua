@@ -440,10 +440,10 @@ AddFunction WindwalkerStMainActions
 	if ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#rising_sun_kick
 	Spell(rising_sun_kick)
-	#blackout_kick,if=set_bonus.tier18_2pc=0&buff.combo_breaker_bok.react|buff.serenity.up
-	if ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) Spell(blackout_kick)
-	#tiger_palm,if=set_bonus.tier18_2pc=0&buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
-	if ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
+	#blackout_kick,if=buff.combo_breaker_bok.react|buff.serenity.up
+	if BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) Spell(blackout_kick)
+	#tiger_palm,if=buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
+	if BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#chi_wave,if=energy.time_to_max>2&buff.serenity.down
 	if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=energy.time_to_max>2&!dot.zen_sphere.ticking&buff.serenity.down
@@ -458,7 +458,7 @@ AddFunction WindwalkerStMainActions
 
 AddFunction WindwalkerStShortCdActions
 {
-	unless ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave)
+	unless ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave)
 	{
 		#chi_burst,if=energy.time_to_max>2&buff.serenity.down
 		if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -473,7 +473,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
-	ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 0 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or MaxChi() - Chi() < 2 and Spell(blackout_kick) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
+	ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_bok_buff) and Spell(blackout_kick) or ArmorSetBonus(T18 2) == 1 and BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or MaxChi() - Chi() < 2 and Spell(blackout_kick) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
 }
 
 ### actions.st_chix

@@ -59,8 +59,8 @@ AddFunction ElementalInterruptActions
 
 AddFunction ElementalDefaultMainActions
 {
-	#call_action_list,name=aoe,if=spell_targets.chain_lightning>2
-	if Enemies() > 2 ElementalAoeMainActions()
+	#call_action_list,name=aoe,if=spell_targets.chain_lightning>(2+t18_class_trinket)
+	if Enemies() > 2 + HasTrinket(t18_class_trinket) ElementalAoeMainActions()
 	#call_action_list,name=single
 	ElementalSingleMainActions()
 }
@@ -73,8 +73,6 @@ AddFunction ElementalDefaultShortCdActions
 	if not BuffPresent(ascendance_caster_buff) Spell(ancestral_swiftness)
 	#liquid_magma,if=pet.searing_totem.remains>=15|pet.fire_elemental_totem.remains>=15
 	if TotemRemaining(searing_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 Spell(liquid_magma)
-	#call_action_list,name=aoe,if=spell_targets.chain_lightning>2
-	if Enemies() > 2 ElementalAoeShortCdActions()
 }
 
 AddFunction ElementalDefaultCdActions
@@ -102,7 +100,7 @@ AddFunction ElementalDefaultCdActions
 
 	unless { TotemRemaining(searing_totem) >= 15 or TotemRemaining(fire_elemental_totem) >= 15 } and Spell(liquid_magma)
 	{
-		unless Enemies() > 2 and ElementalAoeCdPostConditions()
+		unless Enemies() > 2 + HasTrinket(t18_class_trinket) and ElementalAoeCdPostConditions()
 		{
 			#call_action_list,name=single
 			ElementalSingleCdActions()
@@ -114,8 +112,8 @@ AddFunction ElementalDefaultCdActions
 
 AddFunction ElementalAoeMainActions
 {
-	#earthquake,cycle_targets=1,if=!ticking&(buff.enhanced_chain_lightning.up|level<=90)&spell_targets.earthquake_rumble>=2
-	if not target.DebuffPresent(earthquake_debuff) and { BuffPresent(enhanced_chain_lightning_buff) or Level() <= 90 } and Enemies() >= 2 Spell(earthquake)
+	#earthquake,cycle_targets=1,if=buff.enhanced_chain_lightning.up
+	if BuffPresent(enhanced_chain_lightning_buff) Spell(earthquake)
 	#lava_beam
 	Spell(lava_beam)
 	#earth_shock,if=buff.lightning_shield.react=buff.lightning_shield.max_stack
@@ -128,18 +126,9 @@ AddFunction ElementalAoeMainActions
 	Spell(lightning_bolt)
 }
 
-AddFunction ElementalAoeShortCdActions
-{
-	unless not target.DebuffPresent(earthquake_debuff) and { BuffPresent(enhanced_chain_lightning_buff) or Level() <= 90 } and Enemies() >= 2 and Spell(earthquake) or Spell(lava_beam) or BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock)
-	{
-		#thunderstorm,if=spell_targets.thunderstorm>=10
-		if Enemies() >= 10 Spell(thunderstorm)
-	}
-}
-
 AddFunction ElementalAoeCdPostConditions
 {
-	not target.DebuffPresent(earthquake_debuff) and { BuffPresent(enhanced_chain_lightning_buff) or Level() <= 90 } and Enemies() >= 2 and Spell(earthquake) or Spell(lava_beam) or BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock) or Enemies() >= 10 and Spell(thunderstorm) or { not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) } and Spell(searing_totem) or Enemies() >= 2 and Spell(chain_lightning) or Spell(lightning_bolt)
+	BuffPresent(enhanced_chain_lightning_buff) and Spell(earthquake) or Spell(lava_beam) or BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock) or { not Talent(liquid_magma_talent) and not TotemPresent(fire) or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) } and Spell(searing_totem) or Enemies() >= 2 and Spell(chain_lightning) or Spell(lightning_bolt)
 }
 
 ### actions.precombat
@@ -196,6 +185,10 @@ AddFunction ElementalSingleMainActions
 	if not Talent(liquid_magma_talent) and { not TotemPresent(fire) or TotemRemaining(searing_totem) <= 10 and not TotemPresent(fire_elemental_totem) and Talent(unleashed_fury_talent) } or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 	#unleash_flame,if=talent.unleashed_fury.enabled&!buff.ascendance.up|(talent.elemental_fusion.enabled&buff.elemental_fusion.stack=2&(dot.flame_shock.remains)<(dot.flame_shock.duration*(0.3+t18_class_trinket*(0.48+talent.unleashed_fury.enabled*0.22)))&cooldown.flame_shock.remains<gcd)
 	if Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) or Talent(elemental_fusion_talent) and BuffStacks(elemental_fusion_buff) == 2 and target.DebuffRemaining(flame_shock_debuff) < target.DebuffDuration(flame_shock_debuff) * { 0.3 + HasTrinket(t18_class_trinket) * { 0.48 + TalentPoints(unleashed_fury_talent) * 0.22 } } and SpellCooldown(flame_shock) < GCD() Spell(unleash_flame)
+	#earthquake,cycle_targets=1,if=buff.enhanced_chain_lightning.up
+	if BuffPresent(enhanced_chain_lightning_buff) Spell(earthquake)
+	#chain_lightning,if=spell_targets.chain_lightning>=2
+	if Enemies() >= 2 Spell(chain_lightning)
 	#lightning_bolt
 	Spell(lightning_bolt)
 }
@@ -277,7 +270,6 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # draenic_intellect_potion
 # earth_shock
 # earthquake
-# earthquake_debuff
 # elemental_blast
 # elemental_blast_talent
 # elemental_fusion_buff
@@ -303,7 +295,6 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # spiritwalkers_grace
 # storm_elemental_totem
 # t18_class_trinket
-# thunderstorm
 # unleash_flame
 # unleash_flame_buff
 # unleashed_fury_talent

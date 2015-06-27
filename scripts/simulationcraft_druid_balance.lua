@@ -89,10 +89,8 @@ AddFunction BalanceAoeMainActions
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 Spell(starsurge)
 	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
-	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
-	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
-	#wrath
-	Spell(wrath)
+	#starfire
+	Spell(starfire)
 }
 
 AddFunction BalanceAoeCdActions
@@ -105,7 +103,7 @@ AddFunction BalanceAoeCdActions
 
 AddFunction BalanceAoeCdPostConditions
 {
-	target.DebuffRemaining(sunfire_debuff) < 8 and Spell(sunfire) or HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 1 and Spell(starsurge) or not HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 2 and Spell(starfall) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or target.DebuffRemaining(moonfire_debuff) < 12 and Spell(moonfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Enemies() == 2 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 and Spell(starsurge) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or { EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() } and Spell(starfire) or Spell(wrath)
+	target.DebuffRemaining(sunfire_debuff) < 8 and Spell(sunfire) or HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 1 and Spell(starsurge) or not HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 2 and Spell(starfall) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or target.DebuffRemaining(moonfire_debuff) < 12 and Spell(moonfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Enemies() == 2 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 and Spell(starsurge) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or Spell(starfire)
 }
 
 ### actions.precombat
@@ -164,10 +162,8 @@ AddFunction BalanceSingleTargetMainActions
 	if Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
 	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
 	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
-	#starfire,if=(eclipse_energy>=0&eclipse_change>cast_time)|(eclipse_energy<0&cast_time>eclipse_change)
-	if EclipseEnergy() >= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() < 0 and CastTime(starfire) > TimeToEclipse() Spell(starfire)
-	#wrath
-	Spell(wrath)
+	#starfire
+	Spell(starfire)
 }
 
 AddFunction BalanceSingleTargetCdActions
