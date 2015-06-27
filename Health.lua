@@ -72,12 +72,11 @@ function OvaleHealth:OnInitialize()
 end
 
 function OvaleHealth:OnEnable()
-	self:RegisterEvent("PLAYER_FOCUS_CHANGED", "TargetOrFocusChanged")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED", "TargetOrFocusChanged")
 	self:RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
 	self:RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth")
+	self:RegisterMessage("Ovale_UnitChanged")
 	OvaleData:RegisterRequirement("health_pct", "RequireHealthPercentHandler", self)
 	OvaleData:RegisterRequirement("pet_health_pct", "RequireHealthPercentHandler", self)
 	OvaleData:RegisterRequirement("target_health_pct", "RequireHealthPercentHandler", self)
@@ -89,12 +88,11 @@ function OvaleHealth:OnDisable()
 	OvaleData:UnregisterRequirement("health_pct")
 	OvaleData:UnregisterRequirement("pet_health_pct")
 	OvaleData:UnregisterRequirement("target_health_pct")
-	self:UnregisterEvent("PLAYER_FOCUS_CHANGED")
-	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterEvent("UNIT_HEALTH_FREQUENT")
 	self:UnregisterEvent("UNIT_MAXHEALTH")
+	self:UnregisterMessage("Ovale_UnitChanged")
 end
 
 function OvaleHealth:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
@@ -146,18 +144,14 @@ function OvaleHealth:PLAYER_REGEN_ENABLED(event)
 	wipe(self.lastUpdated)
 end
 
-function OvaleHealth:TargetOrFocusChanged(event)
-	self:StartProfiling("OvaleHealth_TargetOrFocusChanged")
-	self:Debug(event)
-	local unitId
-	if event == "PLAYER_FOCUS_CHANGED" then
-		unitId = "focus"
-	else
-		unitId = "target"
+function OvaleHealth:Ovale_UnitChanged(event, unitId, guid)
+	self:StartProfiling("Ovale_UnitChanged")
+	if unitId == "target" or unitId == "focus" then
+		self:Debug(event, unitId, guid)
+		self:UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
+		self:UpdateHealth("UNIT_MAXHEALTH", unitId)
+		self:StopProfiling("Ovale_UnitChanged")
 	end
-	self:UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
-	self:UpdateHealth("UNIT_MAXHEALTH", unitId)
-	self:StopProfiling("OvaleHealth_TargetOrFocusChanged")
 end
 
 function OvaleHealth:UpdateHealth(event, unitId)

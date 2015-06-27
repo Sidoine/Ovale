@@ -315,10 +315,9 @@ function OvaleAura:OnEnable()
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("UNIT_AURA")
-	self:RegisterEvent("UNIT_PET")
 	self:RegisterMessage("Ovale_GroupChanged", "ScanAllUnitAuras")
+	self:RegisterMessage("Ovale_UnitChanged")
 	OvaleData:RegisterRequirement("buff", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("buff_any", "RequireBuffHandler", self)
 	OvaleData:RegisterRequirement("debuff", "RequireBuffHandler", self)
@@ -351,11 +350,10 @@ function OvaleAura:OnDisable()
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterEvent("PLAYER_UNGHOST")
 	self:UnregisterEvent("UNIT_AURA")
-	self:UnregisterEvent("UNIT_PET")
 	self:UnregisterMessage("Ovale_GroupChanged")
+	self:UnregisterMessage("Ovale_UnitChanged")
 	for guid in pairs(self.aura) do
 		RemoveAurasOnGUID(self.aura, guid)
 	end
@@ -453,8 +451,6 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 end
 
 function OvaleAura:PLAYER_ENTERING_WORLD(event)
-	-- Set pet's GUID if it exists.
-	self:UNIT_PET(event, "player")
 	-- Initialize aura databases by scanning all unit auras.
 	self:ScanAllUnitAuras()
 end
@@ -464,24 +460,17 @@ function OvaleAura:PLAYER_REGEN_ENABLED(event)
 	self_pool:Drain()
 end
 
-function OvaleAura:PLAYER_TARGET_CHANGED(event, cause)
-	if cause == "NIL" or cause == "down" then
-		-- Target was cleared.
-	else
-		-- Target has changed.
-		self:Debug(event)
-		self:ScanAuras("target")
-	end
-end
-
 function OvaleAura:UNIT_AURA(event, unitId)
 	self:Debug("%s: %s", event, unitId)
 	self:ScanAuras(unitId)
 end
 
-function OvaleAura:UNIT_PET(event, unitId)
-	if unitId == "player" then
-		self_petGUID = OvaleGUID:UnitGUID("pet")
+function OvaleAura:Ovale_UnitChanged(event, unitId, guid)
+	if unitId == "pet" then
+		self_petGUID = guid
+	elseif unitId == "target" and guid then
+		self:Debug(event, unitId, guid)
+		self:ScanAuras(unitId, guid)
 	end
 end
 
