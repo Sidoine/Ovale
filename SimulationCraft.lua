@@ -70,6 +70,7 @@ local MODIFIER_KEYWORD = {
 	["line_cd"] = true,
 	["max_cycle_targets"] = true,
 	["max_energy"] = true,
+	["min_frenzy"] = true,
 	["moving"] = true,
 	["name"] = true,
 	["nonlethal"] = true,
@@ -2388,6 +2389,13 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 			-- SimulationCraft's max_energy is the maximum energy cost of the action if used.
 			code = format("Energy() >= EnergyCost(%s max=1)", action)
 		end
+	elseif modifier == "min_frenzy" and action == "focus_fire" then
+		local value = tonumber(Unparse(parseNode))
+		if value then
+			local buffName = "pet_frenzy_buff"
+			AddSymbol(annotation, buffName)
+			code = format("pet.BuffStacks(%s) >= %d", buffName, value)
+		end
 	elseif modifier == "moving" then
 		local value = tonumber(Unparse(parseNode))
 		if value == 0 then
@@ -2786,6 +2794,7 @@ do
 		["mana.max"]			= "MaxMana()",
 		["mana.pct"]			= "ManaPercent()",
 		["rage"]				= "Rage()",
+		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
 		["runic_power"]			= "RunicPower()",
 		["shadow_orb"]			= "ShadowOrbs()",
