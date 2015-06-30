@@ -96,10 +96,8 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 	unless Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 and Spell(multishot)
 	{
-		#focus_fire,five_stacks=1,if=buff.focus_fire.down
-		if BuffExpires(focus_fire_buff) and pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
-		#focus_fire,five_stacks=1,if=buff.focus_fire.stack<5&pet.cat.buff.frenzy.stack=5
-		if BuffStacks(focus_fire_buff) < 5 and pet.BuffStacks(pet_frenzy_buff) == 5 and pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
+		#focus_fire,min_frenzy=5
+		if pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
 		#barrage,if=spell_targets.barrage>1
 		if Enemies() > 1 Spell(barrage)
 		#explosive_trap,if=spell_targets.explosive_trap_tick>5
