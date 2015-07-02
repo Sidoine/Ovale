@@ -44,18 +44,18 @@ OvaleProfiler:RegisterProfiling(OvaleEnemies)
 	damage (tag) an enemy, or vice versa.
 --]]
 local CLEU_TAG_SUFFIXES = {
-	"_CAST_START",
 	"_DAMAGE",
 	"_MISSED",
-	"_DRAIN",
-	"_LEECH",
+	"_AURA_APPLIED",
+	"_AURA_APPLIED_DOSE",
+	"_AURA_REFRESH",
+	"_CAST_START",
 	"_INTERRUPT",
 	"_DISPEL",
 	"_DISPEL_FAILED",
 	"_STOLEN",
-	"_AURA_APPLIED",
-	"_AURA_APPLIED_DOSE",
-	"_AURA_REFRESH",
+	"_DRAIN",
+	"_LEECH",
 }
 
 -- Table of CLEU events for auto-attacks.
