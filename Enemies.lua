@@ -58,6 +58,14 @@ local CLEU_TAG_SUFFIXES = {
 	"_AURA_REFRESH",
 }
 
+-- Table of CLEU events for auto-attacks.
+local CLEU_AUTOATTACK = {
+	RANGED_DAMAGE = true,
+	RANGED_MISSED = true,
+	SWING_DAMAGE = true,
+	SWING_MISSED = true,
+}
+
 -- Table of CLEU events for when a unit is removed from combat.
 local CLEU_UNIT_REMOVED = {
 	UNIT_DESTROYED = true,
@@ -90,12 +98,18 @@ OvaleEnemies.taggedEnemies = 0
 
 --<private-static-methods>
 local function IsTagEvent(cleuEvent)
-	for _, suffix in ipairs(CLEU_TAG_SUFFIXES) do
-		if strfind(cleuEvent, suffix .. "$") then
-			return true
+	local isTagEvent = false
+	if CLEU_AUTOATTACK[cleuEvent] then
+		isTagEvent = true
+	else
+		for _, suffix in ipairs(CLEU_TAG_SUFFIXES) do
+			if strfind(cleuEvent, suffix .. "$") then
+				isTagEvent = true
+				break
+			end
 		end
 	end
-	return false
+	return isTagEvent
 end
 
 local function IsFriendly(unitFlags, isGroupMember)
