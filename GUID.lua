@@ -32,6 +32,7 @@ local tinsert = table.insert
 local tremove = table.remove
 local type = type
 local unpack = unpack
+local API_GetTime = GetTime
 local API_UnitGUID = UnitGUID
 local API_UnitName = UnitName
 
@@ -107,6 +108,9 @@ OvaleGUID.unitName = {}
 OvaleGUID.nameUnit = {}
 OvaleGUID.guidName = {}
 OvaleGUID.nameGUID = {}
+
+-- Table of player pet GUIDs.
+OvaleGUID.petGUID = {}
 
 -- Export UNIT_AURA_UNIT table of units that receive UNIT_AURA events.
 OvaleGUID.UNIT_AURA_UNIT = UNIT_AURA_UNIT
@@ -247,8 +251,12 @@ function OvaleGUID:UNIT_PET(event, unitId)
 	local pet = PET_UNIT[unitId]
 	self:UpdateUnitWithTarget(pet)
 	if unitId == "player" then
-		local petGUID = self:UnitGUID("pet")
-		self:SendMessage("Ovale_PetChanged", petGUID)
+		local guid = self:UnitGUID("pet")
+		if guid then
+			-- Add pet's GUID to the table of player's pet GUIDs.
+			self.petGUID[guid] = API_GetTime()
+		end
+		self:SendMessage("Ovale_PetChanged", guid)
 	end
 	self:SendMessage("Ovale_GroupChanged")
 end
@@ -347,6 +355,12 @@ end
 function OvaleGUID:UpdateUnitWithTarget(unitId)
 	self:UpdateUnit(unitId)
 	self:UpdateUnit(unitId .. "target")
+end
+
+-- Return whether the GUID is a player's pet.
+function OvaleGUID:IsPlayerPet(guid)
+	local atTime = self.petGUID[guid]
+	return (not not atTime), atTime
 end
 
 -- Return the GUID of the given unit.
