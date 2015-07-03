@@ -55,8 +55,6 @@ OvaleProfiler:RegisterProfiling(OvaleFuture)
 
 -- Player's GUID.
 local self_playerGUID = nil
--- Player's pet GUID.
-local self_petGUID = nil
 -- Pool of spellcast tables.
 local self_pool = OvalePool("OvaleFuture_pool")
 
@@ -211,7 +209,6 @@ function OvaleFuture:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_STOP", "UnitSpellcastEnded")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterMessage("Ovale_AuraAdded")
-	self:RegisterMessage("Ovale_PetChanged")
 	OvaleState:RegisterState(self, self.statePrototype)
 end
 
@@ -233,7 +230,6 @@ function OvaleFuture:OnDisable()
 	self:UnregisterEvent("UNIT_SPELLCAST_STOP")
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:UnregisterMessage("Ovale_AuraAdded")
-	self:UnregisterMessage("Ovale_PetChanged")
 end
 
 --[[--------------
@@ -287,7 +283,7 @@ end
 function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
-	if sourceGUID == self_playerGUID or sourceGUID == self_petGUID then
+	if sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID) then
 		self:StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
 		if CLEU_SPELLCAST_EVENT[cleuEvent] then
 			local now = API_GetTime()
@@ -724,10 +720,6 @@ function OvaleFuture:Ovale_AuraAdded(event, atTime, guid, auraId, caster)
 		self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, atTime)
 		self:UpdateSpellcastSnapshot(self.lastOffGCDSpellcast, atTime)
 	end
-end
-
-function OvaleFuture:Ovale_PetChanged(event, petGUID)
-	self_petGUID = petGUID
 end
 
 function OvaleFuture:UnitSpellcastEnded(event, unitId, spell, rank, lineId, spellId)
