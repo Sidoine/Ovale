@@ -16,6 +16,7 @@ local OvaleDebug = Ovale.OvaleDebug
 local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
+local OvaleGUID = nil
 local OvaleState = nil
 
 local bit_band = bit.band
@@ -120,6 +121,7 @@ end
 --<public-static-methods>
 function OvaleEnemies:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleGUID = Ovale.OvaleGUID
 	OvaleState = Ovale.OvaleState
 end
 
@@ -161,7 +163,8 @@ function OvaleEnemies:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, h
 		elseif IsFriendly(sourceFlags, true) and not IsFriendly(destFlags) and IsTagEvent(cleuEvent) then
 			-- Friendly group member attacks unfriendly enemy.
 			local now = API_GetTime()
-			local isPlayerTag = (sourceGUID == self_playerGUID)
+			-- Treat both player and pet attacks as a player tag.
+			local isPlayerTag = (sourceGUID == self_playerGUID) or OvaleGUID:IsPlayerPet(sourceGUID)
 			self:AddEnemy(cleuEvent, destGUID, destName, now, isPlayerTag)
 		end
 	end
