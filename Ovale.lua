@@ -319,8 +319,26 @@ function Ovale:UpdateFrame()
 	self:UpdateVisibility()
 end
 
+function Ovale:GetCheckBox(name)
+	local widget
+	if type(name) == "string" then
+		widget = self.checkBoxWidget[name]
+	elseif type(name) == "number" then
+		-- "name" is a number, so count checkboxes until we reach the k'th one (indexed from 0).
+		local k = 0
+		for _, frame in pairs(self.checkBoxWidget) do
+			if k == name then
+				widget = frame
+				break
+			end
+			k = k + 1
+		end
+	end
+	return widget
+end
+
 function Ovale:IsChecked(name)
-	local widget = self.checkBoxWidget[name]
+	local widget = self:GetCheckBox(name)
 	return widget and widget:GetValue()
 end
 
@@ -331,49 +349,23 @@ end
 
 -- Set the checkbox control to the specified on/off (true/false) value.
 function Ovale:SetCheckBox(name, on)
-	local profile = self.db.profile
-	if type(name) == "string" then
-		local widget = self.checkBoxWidget[name]
-		if widget then
+	local widget = self:GetCheckBox(name)
+	if widget then
+		local oldValue = widget:GetValue()
+		if oldValue ~= on then
 			widget:SetValue(on)
-			profile.check[name] = on
-		end
-	elseif type(name) == "number" then
-		-- "name" is a number, so count checkboxes until we reach the k'th one.
-		local k = name
-		for name, widget in pairs(self.checkBoxWidget) do
-			if k == 0 then
-				widget:SetValue(on)
-				profile.check[name] = on
-				break
-			end
-			k = k - 1
+			OnCheckBoxValueChanged(widget)
 		end
 	end
 end
 
 -- Toggle the checkbox control.
 function Ovale:ToggleCheckBox(name)
-	local profile = self.db.profile
-	if type(name) == "string" then
-		local widget = self.checkBoxWidget[name]
-		if widget then
-			local on = not widget:GetValue()
-			widget:SetValue(on)
-			profile.check[name] = on
-		end
-	elseif type(name) == "number" then
-		-- "name" is a number, so count checkboxes until we reach the k'th one.
-		local k = name
-		for name, widget in pairs(self.checkBoxWidget) do
-			if k == 0 then
-				local on = not widget:GetValue()
-				widget:SetValue(on)
-				profile.check[name] = on
-				break
-			end
-			k = k - 1
-		end
+	local widget = self:GetCheckBox(name)
+	if widget then
+		local on = not widget:GetValue()
+		widget:SetValue(on)
+		OnCheckBoxValueChanged(widget)
 	end
 end
 
