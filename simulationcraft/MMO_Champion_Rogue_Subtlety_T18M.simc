@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-06-23
+# Last update: 2015-07-06
 
 rogue="1.7"
 level=100
@@ -162,8 +162,7 @@ actions+=/run_action_list,name=generators_mfd,if=talent.marked_for_death.enabled
 #Ambush filler - Watch energy for last GCD, expecting 1 energetic recovery tic
         actions.vanish_rotation_ant_ref+=/ambush,if=((energy+(energy.regen*(buff.vanish.remains+1)))>=112)
  
- 
-        actions.vanish_rotation_ant_ref+=/preparation,if=cooldown.vanish.remains>60|target.time_to_die<17
+
 ###-------------------------------------------------- VANISH ROTATION ANTICIPATION DFA (untested) ---------------------------------------------------------------- ###
  
 ###-------------------------------------------------- VANISH ROTATION MFD REFLECTION  ---------------------------------------------------------------- ###
@@ -203,7 +202,7 @@ actions+=/run_action_list,name=generators_mfd,if=talent.marked_for_death.enabled
        
 #use if target only lives seconds
         actions.cd_controller_ant+=/vanish,if=target.time_to_die<16
-        actions.cd_controller_ant+=/preparation,if=cooldown.vanish.remains>60|target.time_to_die<17
+        actions.cd_controller_ant+=/preparation,if=cooldown.vanish.remains|target.time_to_die<17
 #pool for upcoming dance
         actions.cd_controller_ant+=/call_action_list,name=pool_ant,if=energy+energy.regen*cooldown.shadow_dance.remains<=120
 #pool for availible vanish
