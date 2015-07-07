@@ -435,16 +435,18 @@ AddFunction ArcaneInitBurnCdActions
 
 AddFunction ArcaneInitCrystalMainActions
 {
-	#call_action_list,name=conserve,if=buff.arcane_charge.stack<4
-	if DebuffStacks(arcane_charge_debuff) < 4 ArcaneConserveMainActions()
+	#call_action_list,name=conserve,if=buff.arcane_charge.stack<4|(buff.arcane_missiles.react&debuff.mark_of_doom.remains>2*spell_haste+(target.distance%20))
+	if DebuffStacks(arcane_charge_debuff) < 4 or BuffPresent(arcane_missiles_buff) and target.DebuffRemaining(mark_of_doom_debuff) > 2 * { 100 / { 100 + SpellHaste() } } + target.Distance() / 20 ArcaneConserveMainActions()
+	#arcane_missiles,if=buff.arcane_missiles.react&t18_class_trinket
+	if BuffPresent(arcane_missiles_buff) and HasTrinket(t18_class_trinket) Spell(arcane_missiles)
 }
 
 AddFunction ArcaneInitCrystalShortCdActions
 {
-	#call_action_list,name=conserve,if=buff.arcane_charge.stack<4
-	if DebuffStacks(arcane_charge_debuff) < 4 ArcaneConserveShortCdActions()
+	#call_action_list,name=conserve,if=buff.arcane_charge.stack<4|(buff.arcane_missiles.react&debuff.mark_of_doom.remains>2*spell_haste+(target.distance%20))
+	if DebuffStacks(arcane_charge_debuff) < 4 or BuffPresent(arcane_missiles_buff) and target.DebuffRemaining(mark_of_doom_debuff) > 2 * { 100 / { 100 + SpellHaste() } } + target.Distance() / 20 ArcaneConserveShortCdActions()
 
-	unless DebuffStacks(arcane_charge_debuff) < 4 and ArcaneConserveShortCdPostConditions()
+	unless { DebuffStacks(arcane_charge_debuff) < 4 or BuffPresent(arcane_missiles_buff) and target.DebuffRemaining(mark_of_doom_debuff) > 2 * { 100 / { 100 + SpellHaste() } } + target.Distance() / 20 } and ArcaneConserveShortCdPostConditions() or BuffPresent(arcane_missiles_buff) and HasTrinket(t18_class_trinket) and Spell(arcane_missiles)
 	{
 		#prismatic_crystal
 		Spell(prismatic_crystal)
@@ -453,18 +455,18 @@ AddFunction ArcaneInitCrystalShortCdActions
 
 AddFunction ArcaneInitCrystalShortCdPostConditions
 {
-	DebuffStacks(arcane_charge_debuff) < 4 and ArcaneConserveShortCdPostConditions()
+	{ DebuffStacks(arcane_charge_debuff) < 4 or BuffPresent(arcane_missiles_buff) and target.DebuffRemaining(mark_of_doom_debuff) > 2 * { 100 / { 100 + SpellHaste() } } + target.Distance() / 20 } and ArcaneConserveShortCdPostConditions() or BuffPresent(arcane_missiles_buff) and HasTrinket(t18_class_trinket) and Spell(arcane_missiles)
 }
 
 AddFunction ArcaneInitCrystalCdActions
 {
-	#call_action_list,name=conserve,if=buff.arcane_charge.stack<4
-	if DebuffStacks(arcane_charge_debuff) < 4 ArcaneConserveCdActions()
+	#call_action_list,name=conserve,if=buff.arcane_charge.stack<4|(buff.arcane_missiles.react&debuff.mark_of_doom.remains>2*spell_haste+(target.distance%20))
+	if DebuffStacks(arcane_charge_debuff) < 4 or BuffPresent(arcane_missiles_buff) and target.DebuffRemaining(mark_of_doom_debuff) > 2 * { 100 / { 100 + SpellHaste() } } + target.Distance() / 20 ArcaneConserveCdActions()
 }
 
 AddFunction ArcaneInitCrystalCdPostConditions
 {
-	DebuffStacks(arcane_charge_debuff) < 4 and ArcaneConserveCdPostConditions() or Spell(prismatic_crystal)
+	{ DebuffStacks(arcane_charge_debuff) < 4 or BuffPresent(arcane_missiles_buff) and target.DebuffRemaining(mark_of_doom_debuff) > 2 * { 100 / { 100 + SpellHaste() } } + target.Distance() / 20 } and ArcaneConserveCdPostConditions() or BuffPresent(arcane_missiles_buff) and HasTrinket(t18_class_trinket) and Spell(arcane_missiles) or Spell(prismatic_crystal)
 }
 
 ### actions.movement

@@ -165,7 +165,7 @@ AddFunction CombatKillingSpreeCdActions
 AddFunction CombatPrecombatMainActions
 {
 	#flask,type=greater_draenic_agility_flask
-	#food,type=buttered_sturgeon
+	#food,type=felmouth_frenzy
 	#apply_poison,lethal=deadly
 	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
 	#stealth

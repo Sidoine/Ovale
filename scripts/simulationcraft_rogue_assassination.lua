@@ -62,53 +62,37 @@ AddFunction AssassinationInterruptActions
 
 AddFunction AssassinationDefaultMainActions
 {
-	#rupture,if=combo_points=5&ticks_remain<3
-	if ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 Spell(rupture)
+	#mutilate,if=buff.stealth.up|buff.vanish.up
+	if BuffPresent(stealthed_buff any=1) or BuffPresent(vanish_buff) Spell(mutilate)
+	#rupture,if=((combo_points>=4&!talent.anticipation.enabled)|combo_points=5)&ticks_remain<3
+	if { ComboPoints() >= 4 and not Talent(anticipation_talent) or ComboPoints() == 5 } and target.TicksRemaining(rupture_debuff) < 3 Spell(rupture)
 	#rupture,cycle_targets=1,if=spell_targets.fan_of_knives>1&!ticking&combo_points=5
 	if Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 Spell(rupture)
-	#mutilate,if=buff.stealth.up
-	if BuffPresent(stealthed_buff any=1) Spell(mutilate)
-	#slice_and_dice,if=buff.slice_and_dice.remains<5
-	if BuffRemaining(slice_and_dice_buff) < 5 Spell(slice_and_dice)
-	#crimson_tempest,if=combo_points>4&spell_targets.crimson_tempest>=4&remains<8
-	if ComboPoints() > 4 and Enemies() >= 4 and target.DebuffRemaining(crimson_tempest_debuff) < 8 Spell(crimson_tempest)
-	#fan_of_knives,if=(combo_points<5|(talent.anticipation.enabled&anticipation_charges<4))&spell_targets.fan_of_knives>=4
-	if { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and Enemies() >= 4 Spell(fan_of_knives)
-	#rupture,if=(remains<2|(combo_points=5&remains<=(duration*0.3)))&spell_targets.fan_of_knives=1
-	if { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 } and Enemies() == 1 Spell(rupture)
-	#death_from_above,if=combo_points>4
-	if ComboPoints() > 4 Spell(death_from_above)
-	#envenom,cycle_targets=1,if=(combo_points>4&(cooldown.death_from_above.remains>2|!talent.death_from_above.enabled))&spell_targets.fan_of_knives<4&!dot.deadly_poison_dot.ticking
-	if ComboPoints() > 4 and { SpellCooldown(death_from_above) > 2 or not Talent(death_from_above_talent) } and Enemies() < 4 and not target.DebuffPresent(deadly_poison_dot_debuff) Spell(envenom)
-	#envenom,if=(combo_points>4&(cooldown.death_from_above.remains>2|!talent.death_from_above.enabled))&spell_targets.fan_of_knives<4&(buff.envenom.remains<=1.8|energy>55)
-	if ComboPoints() > 4 and { SpellCooldown(death_from_above) > 2 or not Talent(death_from_above_talent) } and Enemies() < 4 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 55 } Spell(envenom)
-	#fan_of_knives,cycle_targets=1,if=spell_targets.fan_of_knives>2&!dot.deadly_poison_dot.ticking&debuff.vendetta.down
-	if Enemies() > 2 and not target.DebuffPresent(deadly_poison_dot_debuff) and target.DebuffExpires(vendetta_debuff) Spell(fan_of_knives)
-	#dispatch,cycle_targets=1,if=(combo_points<5|(talent.anticipation.enabled&anticipation_charges<4))&spell_targets.fan_of_knives=2&!dot.deadly_poison_dot.ticking&debuff.vendetta.down
-	if { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and Enemies() == 2 and not target.DebuffPresent(deadly_poison_dot_debuff) and target.DebuffExpires(vendetta_debuff) Spell(dispatch)
-	#dispatch,if=(combo_points<5|(talent.anticipation.enabled&(anticipation_charges<4&set_bonus.tier18_4pc=0)|(anticipation_charges<2&set_bonus.tier18_4pc=1)))&spell_targets.fan_of_knives<4
-	if { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 and ArmorSetBonus(T18 4) == 0 or BuffStacks(anticipation_buff) < 2 and ArmorSetBonus(T18 4) == 1 } and Enemies() < 4 Spell(dispatch)
-	#mutilate,cycle_targets=1,if=target.health.pct>35&(combo_points<4|(talent.anticipation.enabled&anticipation_charges<3))&spell_targets.fan_of_knives=2&!dot.deadly_poison_dot.ticking&debuff.vendetta.down
-	if target.HealthPercent() > 35 and { ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and Enemies() == 2 and not target.DebuffPresent(deadly_poison_dot_debuff) and target.DebuffExpires(vendetta_debuff) Spell(mutilate)
-	#mutilate,if=target.health.pct>35&(combo_points<4|(talent.anticipation.enabled&anticipation_charges<3))&spell_targets.fan_of_knives<5
-	if target.HealthPercent() > 35 and { ComboPoints() < 4 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and Enemies() < 5 Spell(mutilate)
-	#mutilate,cycle_targets=1,if=spell_targets.fan_of_knives=2&!dot.deadly_poison_dot.ticking&debuff.vendetta.down
-	if Enemies() == 2 and not target.DebuffPresent(deadly_poison_dot_debuff) and target.DebuffExpires(vendetta_debuff) Spell(mutilate)
-	#mutilate,if=spell_targets.fan_of_knives<5
-	if Enemies() < 5 Spell(mutilate)
+	#rupture,cycle_targets=1,if=combo_points=5&remains<=duration*0.3&spell_targets.fan_of_knives>1
+	if ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 and Enemies() > 1 Spell(rupture)
+	#call_action_list,name=finishers,if=combo_points=5&((!cooldown.death_from_above.remains&talent.death_from_above.enabled)|buff.envenom.down|!talent.anticipation.enabled|anticipation_charges+combo_points>=6)
+	if ComboPoints() == 5 and { not SpellCooldown(death_from_above) > 0 and Talent(death_from_above_talent) or BuffExpires(envenom_buff) or not Talent(anticipation_talent) or BuffStacks(anticipation_buff) + ComboPoints() >= 6 } AssassinationFinishersMainActions()
+	#call_action_list,name=finishers,if=dot.rupture.remains<2
+	if target.DebuffRemaining(rupture_debuff) < 2 AssassinationFinishersMainActions()
+	#call_action_list,name=generators
+	AssassinationGeneratorsMainActions()
 }
 
 AddFunction AssassinationDefaultShortCdActions
 {
-	#vanish,if=time>10&!buff.stealth.up
-	if TimeInCombat() > 10 and not BuffPresent(stealthed_buff any=1) and { CheckBoxOn(opt_vanish) or not SpellCooldown(preparation) > 0 } Spell(vanish)
-	#auto_attack
-	AssassinationGetInMeleeRange()
+	#vanish,if=time>10&energy>13&!buff.stealth.up&buff.blindside.down&energy.time_to_max>gcd*2&((combo_points+anticipation_charges<8)|(!talent.anticipation.enabled&combo_points<=1))
+	if TimeInCombat() > 10 and Energy() > 13 and not BuffPresent(stealthed_buff any=1) and BuffExpires(blindside_buff) and TimeToMaxEnergy() > GCD() * 2 and { ComboPoints() + BuffStacks(anticipation_buff) < 8 or not Talent(anticipation_talent) and ComboPoints() <= 1 } and { CheckBoxOn(opt_vanish) or not SpellCooldown(preparation) > 0 } Spell(vanish)
 
-	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice)
+	unless { BuffPresent(stealthed_buff any=1) or BuffPresent(vanish_buff) } and Spell(mutilate)
 	{
-		#marked_for_death,if=combo_points=0
-		if ComboPoints() == 0 Spell(marked_for_death)
+		#auto_attack
+		AssassinationGetInMeleeRange()
+
+		unless { ComboPoints() >= 4 and not Talent(anticipation_talent) or ComboPoints() == 5 } and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture)
+		{
+			#marked_for_death,if=combo_points=0
+			if ComboPoints() == 0 Spell(marked_for_death)
+		}
 	}
 }
 
@@ -118,8 +102,8 @@ AddFunction AssassinationDefaultCdActions
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() < 40 or target.DebuffPresent(vendetta_debuff) AssassinationUsePotionAgility()
 	#kick
 	AssassinationInterruptActions()
-	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60
-	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 Spell(preparation)
+	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60&time>10
+	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 and TimeInCombat() > 10 Spell(preparation)
 	#use_item,slot=finger1,if=spell_targets.fan_of_knives>1|(debuff.vendetta.up&spell_targets.fan_of_knives=1)
 	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
 	#blood_fury
@@ -129,12 +113,82 @@ AddFunction AssassinationDefaultCdActions
 	#arcane_torrent,if=energy<60
 	if Energy() < 60 Spell(arcane_torrent_energy)
 
-	unless ComboPoints() == 5 and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture) or BuffPresent(stealthed_buff any=1) and Spell(mutilate) or BuffRemaining(slice_and_dice_buff) < 5 and Spell(slice_and_dice) or ComboPoints() > 4 and Enemies() >= 4 and target.DebuffRemaining(crimson_tempest_debuff) < 8 and Spell(crimson_tempest) or { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 4 } and Enemies() >= 4 and Spell(fan_of_knives) or { target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 } and Enemies() == 1 and Spell(rupture)
+	unless { BuffPresent(stealthed_buff any=1) or BuffPresent(vanish_buff) } and Spell(mutilate) or { ComboPoints() >= 4 and not Talent(anticipation_talent) or ComboPoints() == 5 } and target.TicksRemaining(rupture_debuff) < 3 and Spell(rupture) or Enemies() > 1 and not target.DebuffPresent(rupture_debuff) and ComboPoints() == 5 and Spell(rupture)
 	{
-		#shadow_reflection,if=combo_points>4
-		if ComboPoints() > 4 Spell(shadow_reflection)
-		#vendetta,if=buff.shadow_reflection.up|!talent.shadow_reflection.enabled
-		if BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) Spell(vendetta)
+		#shadow_reflection,if=combo_points>4|target.time_to_die<=20
+		if ComboPoints() > 4 or target.TimeToDie() <= 20 Spell(shadow_reflection)
+		#vendetta,if=buff.shadow_reflection.up|!talent.shadow_reflection.enabled|target.time_to_die<=20|(target.time_to_die<=30&glyph.vendetta.enabled)
+		if BuffPresent(shadow_reflection_buff) or not Talent(shadow_reflection_talent) or target.TimeToDie() <= 20 or target.TimeToDie() <= 30 and Glyph(glyph_of_vendetta) Spell(vendetta)
+
+		unless ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 and Enemies() > 1 and Spell(rupture)
+		{
+			unless ComboPoints() == 5 and { not SpellCooldown(death_from_above) > 0 and Talent(death_from_above_talent) or BuffExpires(envenom_buff) or not Talent(anticipation_talent) or BuffStacks(anticipation_buff) + ComboPoints() >= 6 } and AssassinationFinishersCdPostConditions()
+			{
+				unless target.DebuffRemaining(rupture_debuff) < 2 and AssassinationFinishersCdPostConditions()
+				{
+					#call_action_list,name=generators
+					AssassinationGeneratorsCdActions()
+				}
+			}
+		}
+	}
+}
+
+### actions.finishers
+
+AddFunction AssassinationFinishersMainActions
+{
+	#rupture,cycle_targets=1,if=(remains<2|(combo_points=5&remains<=(duration*0.3)))
+	if target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 Spell(rupture)
+	#pool_resource,for_next=1
+	#death_from_above,if=(cooldown.vendetta.remains>10|debuff.vendetta.up|target.time_to_die<=25)
+	if SpellCooldown(vendetta) > 10 or target.DebuffPresent(vendetta_debuff) or target.TimeToDie() <= 25 Spell(death_from_above)
+	unless { SpellCooldown(vendetta) > 10 or target.DebuffPresent(vendetta_debuff) or target.TimeToDie() <= 25 } and SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above)
+	{
+		#envenom,cycle_targets=1,if=dot.deadly_poison_dot.remains<4&target.health.pct<=35&(energy+energy.regen*cooldown.vendetta.remains>=105&(buff.envenom.remains<=1.8|energy>45))|buff.bloodlust.up|debuff.vendetta.up
+		if target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and target.HealthPercent() <= 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 45 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) Spell(envenom)
+		#envenom,cycle_targets=1,if=dot.deadly_poison_dot.remains<4&target.health.pct>35&(energy+energy.regen*cooldown.vendetta.remains>=105&(buff.envenom.remains<=1.8|energy>55))|buff.bloodlust.up|debuff.vendetta.up
+		if target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and target.HealthPercent() > 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 55 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) Spell(envenom)
+		#envenom,if=target.health.pct<=35&(energy+energy.regen*cooldown.vendetta.remains>=105&(buff.envenom.remains<=1.8|energy>45))|buff.bloodlust.up|debuff.vendetta.up
+		if target.HealthPercent() <= 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 45 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) Spell(envenom)
+		#envenom,if=target.health.pct>35&(energy+energy.regen*cooldown.vendetta.remains>=105&(buff.envenom.remains<=1.8|energy>55))|buff.bloodlust.up|debuff.vendetta.up
+		if target.HealthPercent() > 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 55 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) Spell(envenom)
+	}
+}
+
+AddFunction AssassinationFinishersCdPostConditions
+{
+	{ target.DebuffRemaining(rupture_debuff) < 2 or ComboPoints() == 5 and target.DebuffRemaining(rupture_debuff) <= BaseDuration(rupture_debuff) * 0.3 } and Spell(rupture) or { SpellCooldown(vendetta) > 10 or target.DebuffPresent(vendetta_debuff) or target.TimeToDie() <= 25 } and Spell(death_from_above) or not { { SpellCooldown(vendetta) > 10 or target.DebuffPresent(vendetta_debuff) or target.TimeToDie() <= 25 } and SpellUsable(death_from_above) and SpellCooldown(death_from_above) < TimeToEnergyFor(death_from_above) } and { { target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and target.HealthPercent() <= 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 45 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) } and Spell(envenom) or { target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and target.HealthPercent() > 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 55 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) } and Spell(envenom) or { target.HealthPercent() <= 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 45 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) } and Spell(envenom) or { target.HealthPercent() > 35 and Energy() + EnergyRegenRate() * SpellCooldown(vendetta) >= 105 and { BuffRemaining(envenom_buff) <= 1.8 or Energy() > 55 } or BuffPresent(burst_haste_buff any=1) or target.DebuffPresent(vendetta_debuff) } and Spell(envenom) }
+}
+
+### actions.generators
+
+AddFunction AssassinationGeneratorsMainActions
+{
+	#dispatch,cycle_targets=1,if=dot.deadly_poison_dot.remains<4&talent.anticipation.enabled&((anticipation_charges<4&set_bonus.tier18_4pc=0)|(anticipation_charges<2&set_bonus.tier18_4pc=1))
+	if target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and Talent(anticipation_talent) and { BuffStacks(anticipation_buff) < 4 and ArmorSetBonus(T18 4) == 0 or BuffStacks(anticipation_buff) < 2 and ArmorSetBonus(T18 4) == 1 } Spell(dispatch)
+	#dispatch,cycle_targets=1,if=dot.deadly_poison_dot.remains<4&!talent.anticipation.enabled&combo_points<5&set_bonus.tier18_4pc=0
+	if target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and not Talent(anticipation_talent) and ComboPoints() < 5 and ArmorSetBonus(T18 4) == 0 Spell(dispatch)
+	#dispatch,cycle_targets=1,if=dot.deadly_poison_dot.remains<4&!talent.anticipation.enabled&set_bonus.tier18_4pc=1&(combo_points<2|target.health.pct<35)
+	if target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and not Talent(anticipation_talent) and ArmorSetBonus(T18 4) == 1 and { ComboPoints() < 2 or target.HealthPercent() < 35 } Spell(dispatch)
+	#dispatch,if=talent.anticipation.enabled&((anticipation_charges<4&set_bonus.tier18_4pc=0)|(anticipation_charges<2&set_bonus.tier18_4pc=1))
+	if Talent(anticipation_talent) and { BuffStacks(anticipation_buff) < 4 and ArmorSetBonus(T18 4) == 0 or BuffStacks(anticipation_buff) < 2 and ArmorSetBonus(T18 4) == 1 } Spell(dispatch)
+	#dispatch,if=!talent.anticipation.enabled&combo_points<5&set_bonus.tier18_4pc=0
+	if not Talent(anticipation_talent) and ComboPoints() < 5 and ArmorSetBonus(T18 4) == 0 Spell(dispatch)
+	#dispatch,if=!talent.anticipation.enabled&set_bonus.tier18_4pc=1&(combo_points<2|target.health.pct<35)
+	if not Talent(anticipation_talent) and ArmorSetBonus(T18 4) == 1 and { ComboPoints() < 2 or target.HealthPercent() < 35 } Spell(dispatch)
+	#mutilate,cycle_targets=1,if=dot.deadly_poison_dot.remains<4&target.health.pct>35&(combo_points<5|(talent.anticipation.enabled&anticipation_charges<3))
+	if target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and target.HealthPercent() > 35 and { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } Spell(mutilate)
+	#mutilate,if=target.health.pct>35&(combo_points<5|(talent.anticipation.enabled&anticipation_charges<3))
+	if target.HealthPercent() > 35 and { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } Spell(mutilate)
+}
+
+AddFunction AssassinationGeneratorsCdActions
+{
+	unless target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and Talent(anticipation_talent) and { BuffStacks(anticipation_buff) < 4 and ArmorSetBonus(T18 4) == 0 or BuffStacks(anticipation_buff) < 2 and ArmorSetBonus(T18 4) == 1 } and Spell(dispatch) or target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and not Talent(anticipation_talent) and ComboPoints() < 5 and ArmorSetBonus(T18 4) == 0 and Spell(dispatch) or target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and not Talent(anticipation_talent) and ArmorSetBonus(T18 4) == 1 and { ComboPoints() < 2 or target.HealthPercent() < 35 } and Spell(dispatch) or Talent(anticipation_talent) and { BuffStacks(anticipation_buff) < 4 and ArmorSetBonus(T18 4) == 0 or BuffStacks(anticipation_buff) < 2 and ArmorSetBonus(T18 4) == 1 } and Spell(dispatch) or not Talent(anticipation_talent) and ComboPoints() < 5 and ArmorSetBonus(T18 4) == 0 and Spell(dispatch) or not Talent(anticipation_talent) and ArmorSetBonus(T18 4) == 1 and { ComboPoints() < 2 or target.HealthPercent() < 35 } and Spell(dispatch) or target.DebuffRemaining(deadly_poison_dot_debuff) < 4 and target.HealthPercent() > 35 and { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and Spell(mutilate) or target.HealthPercent() > 35 and { ComboPoints() < 5 or Talent(anticipation_talent) and BuffStacks(anticipation_buff) < 3 } and Spell(mutilate)
+	{
+		#preparation,if=(cooldown.vanish.remains>50|!glyph.disappearance.enabled&cooldown.vanish.remains>110)&buff.vanish.down&buff.stealth.down
+		if { SpellCooldown(vanish) > 50 or not Glyph(glyph_of_disappearance) and SpellCooldown(vanish) > 110 } and BuffExpires(vanish_buff) and BuffExpires(stealthed_buff any=1) Spell(preparation)
 	}
 }
 
@@ -238,10 +292,9 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # anticipation_talent
 # arcane_torrent_energy
 # berserking
+# blindside_buff
 # blood_fury_ap
 # cheap_shot
-# crimson_tempest
-# crimson_tempest_debuff
 # deadly_poison
 # deadly_poison_dot_debuff
 # deadly_throw
@@ -251,7 +304,8 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # draenic_agility_potion
 # envenom
 # envenom_buff
-# fan_of_knives
+# glyph_of_disappearance
+# glyph_of_vendetta
 # kick
 # kidney_shot
 # lethal_poison_buff
@@ -267,7 +321,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # shadow_reflection_talent
 # shadowstep
 # slice_and_dice
-# slice_and_dice_buff
 # stealth
 # vanish
 # vanish_buff

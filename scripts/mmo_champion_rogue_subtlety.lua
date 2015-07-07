@@ -136,9 +136,6 @@ AddFunction SubtletyDefaultCdActions
 
 				unless BuffPresent(shadow_dance_buff) and Talent(marked_for_death_talent) and Talent(shadow_reflection_talent) and SubtletyDanceRotationMfdRefCdPostConditions()
 				{
-					#run_action_list,name=vanish_rotation_ant_ref,if=(buff.vanish.up|buff.subterfuge.up)&talent.anticipation.enabled&talent.shadow_reflection.enabled
-					if { BuffPresent(vanish_buff) or BuffPresent(subterfuge_buff) } and Talent(anticipation_talent) and Talent(shadow_reflection_talent) SubtletyVanishRotationAntRefCdActions()
-
 					unless { BuffPresent(vanish_buff) or BuffPresent(subterfuge_buff) } and Talent(anticipation_talent) and Talent(shadow_reflection_talent) and SubtletyVanishRotationAntRefCdPostConditions()
 					{
 						#run_action_list,name=vanish_rotation_mfd_ref,if=(buff.vanish.up|buff.subterfuge.up)&talent.marked_for_death.enabled&talent.shadow_reflection.enabled
@@ -196,8 +193,8 @@ AddFunction SubtletyCdControllerAntCdActions
 {
 	#shadowmeld,if=energy>60&debuff.find_weakness.down&cooldown.shadow_dance.remains>10&cooldown.vanish.remains>10&combo_points<=3
 	if Energy() > 60 and target.DebuffExpires(find_weakness_debuff) and SpellCooldown(shadow_dance) > 10 and SpellCooldown(vanish) > 10 and ComboPoints() <= 3 Spell(shadowmeld)
-	#preparation,if=cooldown.vanish.remains>60|target.time_to_die<17
-	if SpellCooldown(vanish) > 60 or target.TimeToDie() < 17 Spell(preparation)
+	#preparation,if=cooldown.vanish.remains|target.time_to_die<17
+	if SpellCooldown(vanish) > 0 or target.TimeToDie() < 17 Spell(preparation)
 	#call_action_list,name=pool_ant,if=energy+energy.regen*cooldown.shadow_dance.remains<=120
 	if Energy() + EnergyRegenRate() * SpellCooldown(shadow_dance) <= 120 SubtletyPoolAntCdActions()
 
@@ -728,28 +725,6 @@ AddFunction SubtletyVanishRotationAntRefMainActions
 AddFunction SubtletyVanishRotationAntRefShortCdPostConditions
 {
 	BuffRemaining(subterfuge_buff) <= 0.1 and BuffExpires(vanish_buff) and Spell(ambush) or not { { BuffRemaining(subterfuge_buff) <= 1 and BuffExpires(vanish_buff) or Energy() + EnergyRegenRate() * BuffRemaining(subterfuge_buff) <= 69 and BuffExpires(vanish_buff) } and BuffRemaining(subterfuge_buff) - 0.1 > 0 } and { ComboPoints() == 5 and BuffRemaining(subterfuge_buff) > 1 and BuffRemaining(subterfuge_buff) <= 2 and { BuffRemaining(vanish_buff) < 2 or BuffExpires(vanish_buff) } and SubtletyEnergyNeutralFinishersShortCdPostConditions() or ComboPoints() == 5 and BuffRemaining(subterfuge_buff) > 1 and BuffRemaining(subterfuge_buff) <= 2 and { BuffRemaining(vanish_buff) < 2 or BuffExpires(vanish_buff) } and Energy() + EnergyRegenRate() * BuffRemaining(subterfuge_buff) >= 70 and SubtletyFinishersShortCdPostConditions() or target.DebuffExpires(find_weakness_debuff) and Spell(ambush) or ComboPoints() == 5 and SubtletyFinishersShortCdPostConditions() or Energy() + EnergyRegenRate() * { BuffRemaining(vanish_buff) + 1 } >= 112 and Spell(ambush) }
-}
-
-AddFunction SubtletyVanishRotationAntRefCdActions
-{
-	unless BuffRemaining(subterfuge_buff) <= 0.1 and BuffExpires(vanish_buff) and Spell(ambush)
-	{
-		#wait,sec=buff.subterfuge.remains-0.1,if=(buff.subterfuge.remains<=1&buff.vanish.down)|(energy+energy.regen*buff.subterfuge.remains<=69&buff.vanish.down)
-		unless { BuffRemaining(subterfuge_buff) <= 1 and BuffExpires(vanish_buff) or Energy() + EnergyRegenRate() * BuffRemaining(subterfuge_buff) <= 69 and BuffExpires(vanish_buff) } and BuffRemaining(subterfuge_buff) - 0.1 > 0
-		{
-			unless ComboPoints() == 5 and BuffRemaining(subterfuge_buff) > 1 and BuffRemaining(subterfuge_buff) <= 2 and { BuffRemaining(vanish_buff) < 2 or BuffExpires(vanish_buff) } and SubtletyEnergyNeutralFinishersCdPostConditions()
-			{
-				unless ComboPoints() == 5 and BuffRemaining(subterfuge_buff) > 1 and BuffRemaining(subterfuge_buff) <= 2 and { BuffRemaining(vanish_buff) < 2 or BuffExpires(vanish_buff) } and Energy() + EnergyRegenRate() * BuffRemaining(subterfuge_buff) >= 70 and SubtletyFinishersCdPostConditions() or target.DebuffExpires(find_weakness_debuff) and Spell(ambush)
-				{
-					unless ComboPoints() == 5 and SubtletyFinishersCdPostConditions() or Energy() + EnergyRegenRate() * { BuffRemaining(vanish_buff) + 1 } >= 112 and Spell(ambush)
-					{
-						#preparation,if=cooldown.vanish.remains>60|target.time_to_die<17
-						if SpellCooldown(vanish) > 60 or target.TimeToDie() < 17 Spell(preparation)
-					}
-				}
-			}
-		}
-	}
 }
 
 AddFunction SubtletyVanishRotationAntRefCdPostConditions
