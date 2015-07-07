@@ -1,6 +1,6 @@
 ### MMO-Champion
 # http://www.mmo-champion.com/threads/1601753-Simulationcraft-results-for-WoD
-# Last update: 2015-06-23
+# Last update: 2015-07-06
 
 rogue="Rogue_Combat_T18M"
 level=100
@@ -14,7 +14,7 @@ spec=combat
 # Executed before combat begins. Accepts non-harmful actions only.
  
 actions.precombat=flask,type=greater_draenic_agility_flask
-actions.precombat+=/food,type=buttered_sturgeon
+actions.precombat+=/food,type=felmouth_frenzy
 actions.precombat+=/apply_poison,lethal=deadly
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion,name=draenic_agility
@@ -71,7 +71,7 @@ legs=felblade_leggings,id=124269,bonus_id=567
 feet=oppressors_merciless_treads,id=124251,bonus_id=567
 finger1=maalus_the_blood_drinker,id=124636,enchant_id=5325
 finger2=portal_key_signet,id=124189,bonus_id=567,enchant_id=5325
-trinket1=soul_capacitor,id=124225,bonus_id=567
+trinket1=bleeding_hollow_toxin_vessel,id=124520,bonus_id=567
 trinket2=mirror_of_the_blademaster,id=124224,bonus_id=567
 main_hand=demonblade_eviscerator,id=124368,bonus_id=567,enchant_id=5337
 off_hand=demonblade_eviscerator,id=124368,bonus_id=567,enchant_id=5337
