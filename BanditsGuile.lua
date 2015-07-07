@@ -31,11 +31,16 @@ local OvaleBanditsGuile = Ovale:NewModule("OvaleBanditsGuile", "AceEvent-3.0")
 Ovale.OvaleBanditsGuile = OvaleBanditsGuile
 
 --<private-static-properties>
+local OvaleDebug = Ovale.OvaleDebug
+
 -- Forward declarations for module dependencies.
 local OvaleAura = nil
 
+local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
-local INFINITY = math.huge
+
+-- Register for debugging messages.
+OvaleDebug:RegisterDebugging(OvaleBanditsGuile)
 
 -- Player's GUID.
 local self_playerGUID = nil
@@ -44,11 +49,16 @@ local self_playerGUID = nil
 local SHALLOW_INSIGHT = 84745
 local MODERATE_INSIGHT = 84746
 local DEEP_INSIGHT = 84747
+local INSIGHT_BUFF = {
+	[ SHALLOW_INSIGHT] = API_GetSpellInfo(SHALLOW_INSIGHT),
+	[MODERATE_INSIGHT] = API_GetSpellInfo(MODERATE_INSIGHT),
+	[    DEEP_INSIGHT] = API_GetSpellInfo(DEEP_INSIGHT),
+}
 -- Bandit's Guile spell ID.
 local BANDITS_GUILE = 84654
 -- Spell IDs for abilities that proc Bandit's Guile.
 local BANDITS_GUILE_ATTACK = {
-	[ 1752] = "Sinister Strike",
+	[  1752] = API_GetSpellInfo(1752),	-- Sinister Strike
 }
 --</private-static-properties>
 
@@ -57,7 +67,7 @@ OvaleBanditsGuile.spellName = "Bandit's Guile"
 -- Bandit's Guile spell ID from spellbook; re-used as the aura ID of the hidden, stacking buff.
 OvaleBanditsGuile.spellId = BANDITS_GUILE
 OvaleBanditsGuile.start = 0
-OvaleBanditsGuile.ending = INFINITY
+OvaleBanditsGuile.ending = 0
 OvaleBanditsGuile.duration = 15
 OvaleBanditsGuile.stacks = 0
 --</public-static-properties>
@@ -82,6 +92,7 @@ function OvaleBanditsGuile:OnDisable()
 end
 
 function OvaleBanditsGuile:Ovale_SpecializationChanged(event, specialization, previousSpecialization)
+	self:Debug(event, specialization, previousSpecialization)
 	if specialization == "combat" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:RegisterMessage("Ovale_AuraAdded")
@@ -99,14 +110,20 @@ end
 -- Insight buff.
 function OvaleBanditsGuile:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
-	if sourceGUID == self_playerGUID and cleuEvent == "SPELL_DAMAGE" and self.stacks < 3 then
-		local spellId, multistrike = arg12, arg25
+	if sourceGUID == self_playerGUID and cleuEvent == "SPELL_DAMAGE" then
+		local spellId, spellName, multistrike = arg12, arg13, arg25
 		if BANDITS_GUILE_ATTACK[spellId] and not multistrike then
 			local now = API_GetTime()
-			self.start = now
-			self.ending = self.start + self.duration
-			self.stacks = self.stacks + 1
-			self:GainedAura(now)
+			if self.ending < now then
+				self.stacks = 0
+			end
+			if self.stacks < 3 then
+				self.start = now
+				self.ending = self.start + self.duration
+				self.stacks = self.stacks + 1
+				self:Debug(cleuEvent, spellName, spellId, self.stacks)
+				self:GainedAura(now)
+			end
 		end
 	end
 end
@@ -115,7 +132,8 @@ end
 -- time and sets the implied stacks of Bandit's Guile.
 function OvaleBanditsGuile:Ovale_AuraAdded(event, timestamp, target, auraId, caster)
 	if target == self_playerGUID then
-		if auraId == SHALLOW_INSIGHT or auraId == MODERATE_INSIGHT or auraId == DEEP_INSIGHT then
+		local auraName = INSIGHT_BUFF[auraId]
+		if auraName then
 			local aura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
 			self.start, self.ending = aura.start, aura.ending
 
@@ -128,6 +146,7 @@ function OvaleBanditsGuile:Ovale_AuraAdded(event, timestamp, target, auraId, cas
 				self.stacks = 12
 			end
 
+			self:Debug(event, auraName, self.stacks)
 			self:GainedAura(timestamp)
 		end
 	end
@@ -137,13 +156,15 @@ end
 -- that it the hidden Bandit's Guile buff has gained extra stacks.
 function OvaleBanditsGuile:Ovale_AuraChanged(event, timestamp, target, auraId, caster)
 	if target == self_playerGUID then
-		if auraId == SHALLOW_INSIGHT or auraId == MODERATE_INSIGHT or auraId == DEEP_INSIGHT then
+		local auraName = INSIGHT_BUFF[auraId]
+		if auraName then
 			local aura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
 			self.start, self.ending = aura.start, aura.ending
 
 			-- A changed Insight buff also means that the Bandit's Guile hidden buff gained a stack.
 			self.stacks = self.stacks + 1
 
+			self:Debug(event, auraName, self.stacks)
 			self:GainedAura(timestamp)
 		end
 	end
@@ -151,11 +172,10 @@ end
 
 function OvaleBanditsGuile:Ovale_AuraRemoved(event, timestamp, target, auraId, caster)
 	if target == self_playerGUID then
-		if (auraId == SHALLOW_INSIGHT and self.stacks < 8)
-				or (auraId == MODERATE_INSIGHT and self.stacks < 12)
-				or auraId == DEEP_INSIGHT then
+		if ((auraId == SHALLOW_INSIGHT and self.stacks < 8) or (auraId == MODERATE_INSIGHT and self.stacks < 12) or auraId == DEEP_INSIGHT) and timestamp < self.ending then
 			self.ending = timestamp
 			self.stacks = 0
+			self:Debug(event, INSIGHT_BUFF[auraId], self.stacks)
 			OvaleAura:LostAuraOnGUID(self_playerGUID, timestamp, self.spellId, self_playerGUID)
 		end
 	end
