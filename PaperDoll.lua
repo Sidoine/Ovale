@@ -200,8 +200,6 @@ function OvalePaperDoll:OnEnable()
 	self:RegisterMessage("Ovale_TalentsChanged", "UpdateStats")
 	OvaleFuture:RegisterSpellcastInfo(self)
 	OvaleState:RegisterState(self, self.statePrototype)
-
-	self:UpdateSpecialization("OnEnable")
 end
 
 function OvalePaperDoll:OnDisable()
