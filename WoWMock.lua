@@ -209,6 +209,14 @@ do
 	end
 end
 
+-- AceComm-3.0-9A-Fa-f
+local AceComm = nil
+do
+	local lib = {}
+	AceComm = lib
+	lib.RegisterComm = DoNothing
+end
+
 -- AceConfig-3.0
 local AceConfig = nil
 do
@@ -403,6 +411,7 @@ do
 
 	lib.library = {
 		["AceAddon-3.0"] = AceAddon,
+		["AceComm-3.0"] = AceComm,
 		["AceConfig-3.0"] = AceConfig,
 		["AceConfigDialog-3.0"] = AceConfigDialog,
 		["AceConsole-3.0"] = AceConsole,

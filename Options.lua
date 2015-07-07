@@ -409,11 +409,6 @@ OvaleOptions.options = {
 					type = "execute",
 					func = function() OvaleOptions:ToggleConfig() end,
 				},
-				ping = {
-					name = "Ping for Ovale users in group",
-					type = "execute",
-					func = function() Ovale:VersionCheck() end,
-				},
 				refresh = {
 					name = L["Display refresh statistics"],
 					type = "execute",

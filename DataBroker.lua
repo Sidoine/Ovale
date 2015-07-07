@@ -16,6 +16,7 @@ local OvaleOptions = Ovale.OvaleOptions
 
 -- Forward declarations for module dependencies.
 local OvaleScripts = nil
+local OvaleVersion = nil
 
 local pairs = pairs
 local tinsert = table.insert
@@ -108,7 +109,7 @@ local function OnClick(frame, button)
 end
 
 local function OnTooltipShow(tooltip)
-	self_tooltipTitle = self_tooltipTitle or OVALE .. " " .. Ovale.version
+	self_tooltipTitle = self_tooltipTitle or OVALE .. " " .. OvaleVersion.version
 	tooltip:SetText(self_tooltipTitle, 1, 1, 1)
 	tooltip:AddLine(L["Click to select the script."])
 	tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
@@ -122,6 +123,7 @@ function OvaleDataBroker:OnInitialize()
 	-- Resolve module dependencies.
 	OvaleOptions = Ovale.OvaleOptions
 	OvaleScripts = Ovale.OvaleScripts
+	OvaleVersion = Ovale.OvaleVersion
 
 	-- LDB dataobject
 	if LibDataBroker then

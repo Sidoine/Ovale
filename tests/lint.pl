@@ -29,6 +29,9 @@ $sm{"AceAddon-3.0"}{GetName} = true;
 $sm{"AceAddon-3.0"}{NewModule} = true;
 $sm{"AceAddon-3.0"}{SetDefaultModulePrototype} = true;
 
+$m{"AceComm-3.0"}{RegisterComm} = true;
+$m{"AceComm-3.0"}{SendCommMessage} = true;
+
 $m{AceConfig}{RegisterOptionsTable} = true;
 
 $m{AceConfigDialog}{AddToBlizOptions} = true;

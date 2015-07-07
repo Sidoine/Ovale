@@ -5,7 +5,7 @@
 --]]----------------------------------------------------------------------
 
 local OVALE, Ovale = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, OVALE, "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
+Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, OVALE, "AceEvent-3.0")
 
 -- Export "Ovale" symbol to global namespace.
 _G["Ovale"] = Ovale
@@ -33,9 +33,6 @@ local unpack = unpack
 local wipe = wipe
 local API_GetItemInfo = GetItemInfo
 local API_GetTime = GetTime
-local API_IsInGroup = IsInGroup
-local API_RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
-local API_SendAddonMessage = SendAddonMessage
 local API_UnitCanAttack = UnitCanAttack
 local API_UnitClass = UnitClass
 local API_UnitExists = UnitExists
@@ -44,7 +41,6 @@ local API_UnitHasVehicleUI = UnitHasVehicleUI
 local API_UnitIsDead = UnitIsDead
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local INFINITY = math.huge
-local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 
 local OVALE_VERSION = "@project-version@"
 local REPOSITORY_KEYWORD = "@" .. "project-version" .. "@"
@@ -59,8 +55,6 @@ local self_refreshIndex = 1
 --</private-static-properties>
 
 --<public-static-properties>
--- Project version number.
-Ovale.version = (OVALE_VERSION == REPOSITORY_KEYWORD) and "development version" or OVALE_VERSION
 -- Localization string table.
 Ovale.L = nil
 -- Player's class.
@@ -107,8 +101,6 @@ end
 -- GLOBALS: BINDING_NAME_OVALE_CHECKBOX3
 -- GLOBALS: BINDING_NAME_OVALE_CHECKBOX4
 function Ovale:OnInitialize()
-	-- Register message prefix for the addon.
-	API_RegisterAddonMessagePrefix(self.MSG_PREFIX)
 	-- Localization.
 	L = Ovale.L
 	-- Key bindings.
@@ -124,7 +116,6 @@ end
 function Ovale:OnEnable()
 	self.playerGUID = API_UnitGUID("player")
 
-	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterMessage("Ovale_CombatStarted")
@@ -135,54 +126,11 @@ function Ovale:OnEnable()
 end
 
 function Ovale:OnDisable()
-	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterMessage("Ovale_CombatEnded")
 	self:UnregisterMessage("Ovale_OptionChanged")
 	self.frame:Hide()
-end
-
-do
-	local versionReply = {}
-	local timer
-
-	function Ovale:CHAT_MSG_ADDON(event, ...)
-		local prefix, message, channel, sender = ...
-		if prefix == self.MSG_PREFIX then
-			local ok, msgType, version = self:Deserialize(message)
-			if ok then
-				if msgType == "V" then
-					local msg = self:Serialize("VR", self.version)
-					local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
-					API_SendAddonMessage(self.MSG_PREFIX, msg, channel)
-				elseif msgType == "VR" then
-					versionReply[sender] = version
-				end
-			end
-		end
-	end
-
-	function Ovale:VersionCheck()
-		if not timer then
-			wipe(versionReply)
-			local message = self:Serialize("V", self.version)
-			local channel = API_IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
-			API_SendAddonMessage(self.MSG_PREFIX, message, channel)
-			timer = self:ScheduleTimer("PrintVersionCheck", 3)
-		end
-	end
-
-	function Ovale:PrintVersionCheck()
-		if next(versionReply) then
-			for sender, version in pairs(versionReply) do
-				self:Print(">>> %s is using Ovale %s", sender, version)
-			end
-		else
-			self:Print(">>> No other Ovale users present.")
-		end
-		timer = nil
-	end
 end
 
 --Called when the player target change

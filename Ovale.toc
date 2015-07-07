@@ -49,6 +49,7 @@ SpellBook.lua
 SpellFlash.lua
 Stance.lua
 State.lua
+Version.lua
 
 # Core modules with dependencies.
 Icon.lua
