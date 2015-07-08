@@ -2368,9 +2368,9 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 	elseif modifier == "five_stacks" and action == "focus_fire" then
 		local value = tonumber(Unparse(parseNode))
 		if value == 1 then
-			local buffName = "pet_frenzy_buff"
+			local buffName = "frenzy_buff"
 			AddSymbol(annotation, buffName)
-			code = format("pet.BuffStacks(%s) >= 5", buffName)
+			code = format("BuffStacks(%s) >= 5", buffName)
 		end
 	elseif modifier == "line_cd" then
 		if not SPECIAL_ACTION[action] then
@@ -2392,9 +2392,9 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 	elseif modifier == "min_frenzy" and action == "focus_fire" then
 		local value = tonumber(Unparse(parseNode))
 		if value then
-			local buffName = "pet_frenzy_buff"
+			local buffName = "frenzy_buff"
 			AddSymbol(annotation, buffName)
-			code = format("pet.BuffStacks(%s) >= %d", buffName, value)
+			code = format("BuffStacks(%s) >= %d", buffName, value)
 		end
 	elseif modifier == "moving" then
 		local value = tonumber(Unparse(parseNode))
@@ -2697,10 +2697,6 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 		end
 		-- Hunter's Beast Cleave is a buff on the hunter's pet.
 		if buffName == "pet_beast_cleave_buff" and target == "" then
-			target = "pet."
-		end
-		-- Hunter's Frenzy is a buff on both the player and the pet, but track the pet one.
-		if buffName == "pet_frenzy_buff" and target == "" then
 			target = "pet."
 		end
 
