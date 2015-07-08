@@ -97,7 +97,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 	unless Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 and Spell(multishot)
 	{
 		#focus_fire,min_frenzy=5
-		if BuffStacks(frenzy_buff) >= 5 Spell(focus_fire)
+		if pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
 		#barrage,if=spell_targets.barrage>1
 		if Enemies() > 1 Spell(barrage)
 		#explosive_trap,if=spell_targets.explosive_trap_tick>5
@@ -260,7 +260,6 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # focus_fire
 # focus_fire_buff
 # focusing_shot
-# frenzy_buff
 # glaive_toss
 # glyph_of_explosive_trap
 # incendiary_ammo
