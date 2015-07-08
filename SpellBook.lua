@@ -524,7 +524,7 @@ statePrototype.IsUsableSpell = function(state, spellId, atTime, targetGUID)
 		-- Flagged as not usable in the spell information.
 		if isUsable then
 			local unusable = state:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
-			if unusable == 1 then
+			if unusable and unusable > 0 then
 				state:Log("Spell ID '%s' is flagged as unusable.", spellId)
 				isUsable = false
 			end
