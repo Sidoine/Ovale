@@ -41,7 +41,7 @@ actions+=/arcane_torrent
 actions+=/mannoroths_fury
 actions+=/use_item,name=nithramus_the_allseer
 actions+=/service_pet,if=talent.grimoire_of_service.enabled&(target.time_to_die>120|target.time_to_die<=25|(buff.dark_soul.remains&target.health.pct<20))
-actions+=/dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|buff.nithramus.remains>4|target.time_to_die<40|((trinket.proc.any.react|trinket.stacking_proc.any.react)&(!talent.grimoire_of_service.enabled|!talent.demonic_servitude.enabled|pet.service_doomguard.active|recharge_time<=cooldown.service_pet.remains))))
+actions+=/dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|buff.nithramus.remains>4|target.time_to_die<40|trinket.proc.any.react|trinket.stacking_proc.any.react))
 actions+=/run_action_list,name=single_target,if=spell_targets.fire_and_brimstone<6&(!talent.charred_remains.enabled|spell_targets.rain_of_fire<4)
 actions+=/run_action_list,name=aoe,if=spell_targets.fire_and_brimstone>=6|(talent.charred_remains.enabled&spell_targets.rain_of_fire>=4)
 
@@ -75,17 +75,17 @@ actions.single_target+=/conflagrate,if=buff.backdraft.stack=0
 actions.single_target+=/incinerate
 
 actions.aoe=rain_of_fire,if=!talent.charred_remains.enabled&remains<=tick_time
-actions.aoe+=/havoc,target=2,if=(!talent.charred_remains.enabled|buff.fire_and_brimstone.down)
+actions.aoe+=/havoc,target=2,if=!talent.charred_remains.enabled&buff.fire_and_brimstone.down
 actions.aoe+=/shadowburn,if=!talent.charred_remains.enabled&buff.havoc.remains
 actions.aoe+=/chaos_bolt,if=!talent.charred_remains.enabled&buff.havoc.remains>cast_time&buff.havoc.stack>=3
 actions.aoe+=/kiljaedens_cunning,if=(talent.cataclysm.enabled&!cooldown.cataclysm.remains)
 actions.aoe+=/kiljaedens_cunning,moving=1,if=!talent.cataclysm.enabled
 actions.aoe+=/cataclysm
 actions.aoe+=/fire_and_brimstone,if=buff.fire_and_brimstone.down
-actions.aoe+=/immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking
-actions.aoe+=/conflagrate,if=buff.fire_and_brimstone.up&charges=2
-actions.aoe+=/immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains-action.immolate.cast_time<=(dot.immolate.duration*0.3)
-actions.aoe+=/chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up
+actions.aoe+=/immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking&(burning_ember>=2|!talent.charred_remains.enabled)
+actions.aoe+=/conflagrate,if=buff.fire_and_brimstone.up&charges=2&(burning_ember>=2|!talent.charred_remains.enabled)
+actions.aoe+=/immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains-action.immolate.cast_time<=(dot.immolate.duration*0.3)&(burning_ember>=2|!talent.charred_remains.enabled)
+actions.aoe+=/chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up&burning_ember>=3
 actions.aoe+=/incinerate
 
 head=demon_princes_ascendant_crown,id=124159,bonus_id=567
