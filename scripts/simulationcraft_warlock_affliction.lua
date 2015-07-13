@@ -130,8 +130,8 @@ AddFunction AfflictionDefaultCdActions
 
 		unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_misery_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 		{
-			#dark_soul,if=(set_bonus.tier18_4pc=1&dot.haunt.remains<=gcd)|!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|buff.nithramus.remains>4|target.time_to_die<40|((trinket.proc.any.react|trinket.stacking_proc.any.react)&(!talent.grimoire_of_service.enabled|!talent.demonic_servitude.enabled|pet.service_doomguard.active|recharge_time<=cooldown.service_pet.remains))))
-			if ArmorSetBonus(T18 4) == 1 and target.DebuffRemaining(haunt_debuff) <= GCD() or not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffRemaining(nithramus_buff) > 4 or target.TimeToDie() < 40 or { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } and { not Talent(grimoire_of_service_talent) or not Talent(demonic_servitude_talent) or SpellCooldown(service_doomguard) > 100 or SpellChargeCooldown(dark_soul_misery) <= SpellCooldown(service_pet) } } Spell(dark_soul_misery)
+			#dark_soul,if=(set_bonus.tier18_4pc=1&dot.haunt.remains<=gcd)|!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|buff.nithramus.remains>4|target.time_to_die<40|trinket.proc.any.react|trinket.stacking_proc.any.react))
+			if ArmorSetBonus(T18 4) == 1 and target.DebuffRemaining(haunt_debuff) <= GCD() or not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_misery) == 2 or BuffRemaining(nithramus_buff) > 4 or target.TimeToDie() < 40 or BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } Spell(dark_soul_misery)
 		}
 	}
 }
@@ -141,7 +141,7 @@ AddFunction AfflictionDefaultCdActions
 AddFunction AfflictionPrecombatMainActions
 {
 	#flask,type=greater_draenic_intellect_flask
-	#food,type=sleeper_sushi
+	#food,type=felmouth_frenzy
 	#dark_intent,if=!aura.spell_power_multiplier.up
 	if not BuffPresent(spell_power_multiplier_buff any=1) Spell(dark_intent)
 	#snapshot_stats
@@ -267,9 +267,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # nithramus_buff
 # seed_of_corruption
 # seed_of_corruption_debuff
-# service_doomguard
 # service_felhunter
-# service_pet
 # soul_swap
 # soulburn
 # soulburn_buff

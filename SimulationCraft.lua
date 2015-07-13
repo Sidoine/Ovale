@@ -1115,6 +1115,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"SHAMAN",		"enhancement")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"SHAMAN",		"elemental")
 	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"SHAMAN",		"restoration")
+	AddDisambiguation("unleashed_fury",			"unleashed_fury_melee",			"SHAMAN",		"enhancement")
 	-- Warlock
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"WARLOCK")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"WARLOCK")

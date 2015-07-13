@@ -243,8 +243,8 @@ AddFunction EnhancementSingleMainActions
 	if Talent(echo_of_the_elements_talent) and { not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 2 and not BuffPresent(ascendance_melee_buff) or BuffPresent(ancestral_swiftness_buff) } Spell(lightning_bolt)
 	#stormstrike,if=talent.echo_of_the_elements.enabled
 	if Talent(echo_of_the_elements_talent) Spell(stormstrike)
-	#lightning_bolt,if=(!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=1&!buff.ascendance.up))|(set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=5|(buff.maelstrom_weapon.react>=3&!buff.ascendance.up)))|buff.ancestral_swiftness.up
-	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or ArmorSetBonus(T18 4) and { BuffStacks(maelstrom_weapon_buff) >= 5 or BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) } or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
+	#lightning_bolt,if=(!set_bonus.tier18_4pc&(buff.maelstrom_weapon.react>=1&!buff.ascendance.up))|(set_bonus.tier18_4pc&((talent.unleashed_fury.enabled&buff.unleashed_fury.up)|!talent.unleashed_fury.enabled)&(buff.maelstrom_weapon.react>=5|(buff.maelstrom_weapon.react>=3&!buff.ascendance.up)))|buff.ancestral_swiftness.up
+	if not ArmorSetBonus(T18 4) and BuffStacks(maelstrom_weapon_buff) >= 1 and not BuffPresent(ascendance_melee_buff) or ArmorSetBonus(T18 4) and { Talent(unleashed_fury_talent) and BuffPresent(unleashed_fury_melee_buff) or not Talent(unleashed_fury_talent) } and { BuffStacks(maelstrom_weapon_buff) >= 5 or BuffStacks(maelstrom_weapon_buff) >= 3 and not BuffPresent(ascendance_melee_buff) } or BuffPresent(ancestral_swiftness_buff) Spell(lightning_bolt)
 	#searing_totem,if=pet.searing_totem.remains<=20&!pet.fire_elemental_totem.active&!buff.liquid_magma.up
 	if TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) Spell(searing_totem)
 }
@@ -341,6 +341,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # stormstrike_debuff
 # unleash_elements
 # unleash_flame_buff
+# unleashed_fury_melee_buff
 # unleashed_fury_talent
 # war_stomp
 # wind_shear

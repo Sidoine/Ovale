@@ -75,8 +75,8 @@ AddFunction DestructionDefaultCdActions
 
 	unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 	{
-		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|buff.nithramus.remains>4|target.time_to_die<40|((trinket.proc.any.react|trinket.stacking_proc.any.react)&(!talent.grimoire_of_service.enabled|!talent.demonic_servitude.enabled|pet.service_doomguard.active|recharge_time<=cooldown.service_pet.remains))))
-		if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffRemaining(nithramus_buff) > 4 or target.TimeToDie() < 40 or { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } and { not Talent(grimoire_of_service_talent) or not Talent(demonic_servitude_talent) or SpellCooldown(service_doomguard) > 100 or SpellChargeCooldown(dark_soul_instability) <= SpellCooldown(service_pet) } } Spell(dark_soul_instability)
+		#dark_soul,if=!talent.archimondes_darkness.enabled|(talent.archimondes_darkness.enabled&(charges=2|buff.nithramus.remains>4|target.time_to_die<40|trinket.proc.any.react|trinket.stacking_proc.any.react))
+		if not Talent(archimondes_darkness_talent) or Talent(archimondes_darkness_talent) and { Charges(dark_soul_instability) == 2 or BuffRemaining(nithramus_buff) > 4 or target.TimeToDie() < 40 or BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } Spell(dark_soul_instability)
 	}
 }
 
@@ -90,14 +90,14 @@ AddFunction DestructionAoeMainActions
 	if not Talent(charred_remains_talent) and BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,if=!talent.charred_remains.enabled&buff.havoc.remains>cast_time&buff.havoc.stack>=3
 	if not Talent(charred_remains_talent) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 Spell(chaos_bolt)
-	#immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking
-	if BuffPresent(fire_and_brimstone_buff) and not target.DebuffPresent(immolate_debuff) Spell(immolate)
-	#conflagrate,if=buff.fire_and_brimstone.up&charges=2
-	if BuffPresent(fire_and_brimstone_buff) and Charges(conflagrate) == 2 Spell(conflagrate)
-	#immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains-action.immolate.cast_time<=(dot.immolate.duration*0.3)
-	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) <= target.DebuffDuration(immolate_debuff) * 0.3 Spell(immolate)
-	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up
-	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) Spell(chaos_bolt)
+	#immolate,if=buff.fire_and_brimstone.up&!dot.immolate.ticking&(burning_ember>=2|!talent.charred_remains.enabled)
+	if BuffPresent(fire_and_brimstone_buff) and not target.DebuffPresent(immolate_debuff) and { BurningEmbers() / 10 >= 2 or not Talent(charred_remains_talent) } Spell(immolate)
+	#conflagrate,if=buff.fire_and_brimstone.up&charges=2&(burning_ember>=2|!talent.charred_remains.enabled)
+	if BuffPresent(fire_and_brimstone_buff) and Charges(conflagrate) == 2 and { BurningEmbers() / 10 >= 2 or not Talent(charred_remains_talent) } Spell(conflagrate)
+	#immolate,if=buff.fire_and_brimstone.up&dot.immolate.remains-action.immolate.cast_time<=(dot.immolate.duration*0.3)&(burning_ember>=2|!talent.charred_remains.enabled)
+	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) <= target.DebuffDuration(immolate_debuff) * 0.3 and { BurningEmbers() / 10 >= 2 or not Talent(charred_remains_talent) } Spell(immolate)
+	#chaos_bolt,if=talent.charred_remains.enabled&buff.fire_and_brimstone.up&burning_ember>=3
+	if Talent(charred_remains_talent) and BuffPresent(fire_and_brimstone_buff) and BurningEmbers() / 10 >= 3 Spell(chaos_bolt)
 	#incinerate
 	Spell(incinerate)
 }
@@ -106,8 +106,8 @@ AddFunction DestructionAoeShortCdActions
 {
 	unless not Talent(charred_remains_talent) and target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and Spell(rain_of_fire)
 	{
-		#havoc,target=2,if=(!talent.charred_remains.enabled|buff.fire_and_brimstone.down)
-		if { not Talent(charred_remains_talent) or BuffExpires(fire_and_brimstone_buff) } and Enemies() > 1 Spell(havoc text=other)
+		#havoc,target=2,if=!talent.charred_remains.enabled&buff.fire_and_brimstone.down
+		if not Talent(charred_remains_talent) and BuffExpires(fire_and_brimstone_buff) and Enemies() > 1 Spell(havoc text=other)
 
 		unless not Talent(charred_remains_talent) and BuffPresent(havoc_buff) and Spell(shadowburn) or not Talent(charred_remains_talent) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt)
 		{
@@ -338,9 +338,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # nithramus_buff
 # rain_of_fire
 # rain_of_fire_debuff
-# service_doomguard
 # service_felhunter
-# service_pet
 # shadowburn
 # summon_doomguard
 # summon_felhunter
