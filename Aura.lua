@@ -259,7 +259,7 @@ local function GetAuraOnGUID(auraDB, guid, auraId, filter, mine)
 				for petGUID in pairs(self_petGUID) do
 					local aura = GetDebuffType(auraDB, guid, auraId, filter, petGUID)
 					-- Find the aura with the latest expiration time.
-					if not auraFound or auraFound.ending < aura.ending then
+					if aura and (not auraFound or auraFound.ending < aura.ending) then
 						auraFound = aura
 					end
 				end
@@ -275,7 +275,7 @@ local function GetAuraOnGUID(auraDB, guid, auraId, filter, mine)
 				for petGUID in pairs(self_petGUID) do
 					local aura = GetAura(auraDB, guid, auraId, petGUID)
 					-- Find the aura with the latest expiration time.
-					if not auraFound or auraFound.ending < aura.ending then
+					if aura and (not auraFound or auraFound.ending < aura.ending) then
 						auraFound = aura
 					end
 				end
@@ -1041,7 +1041,7 @@ local function GetStateAuraAnyCaster(state, guid, auraId)
 		for casterGUID in pairs(OvaleAura.aura[guid][auraId]) do
 			local aura = GetStateAura(state, guid, auraId, casterGUID)
 			-- Skip over auras found in the state machine for now.
-			if not aura.state and OvaleAura:IsActiveAura(aura, state.currentTime) then
+			if aura and not aura.state and OvaleAura:IsActiveAura(aura, state.currentTime) then
 				if not auraFound or auraFound.ending < aura.ending then
 					auraFound = aura
 				end
@@ -1140,7 +1140,7 @@ local function GetStateAuraOnGUID(state, guid, auraId, filter, mine)
 				for petGUID in pairs(self_petGUID) do
 					local aura = GetStateDebuffType(state, guid, auraId, filter, petGUID)
 					-- Find the aura with the latest expiration time.
-					if not auraFound or auraFound.ending < aura.ending then
+					if aura and (not auraFound or auraFound.ending < aura.ending) then
 						auraFound = aura
 					end
 				end
