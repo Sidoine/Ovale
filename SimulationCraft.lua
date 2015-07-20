@@ -3501,6 +3501,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "GCDRemaining()"
 	elseif strsub(operand, 1, 15) == "legendary_ring." then
 		local name = Disambiguate("legendary_ring", class, specialization)
+		local buffName = name .. "_buff"
 		local properties = strsub(operand, 16)
 		local tokenIterator = gmatch(properties, OPERAND_TOKEN_PATTERN)
 		local token = tokenIterator()
@@ -3508,11 +3509,18 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 			token = tokenIterator()
 			if token == "remains" then
 				code = format("ItemCooldown(%s)", name)
+				AddSymbol(annotation, name)
 			end
 		elseif token == "has_cooldown" then
 			code = format("ItemCooldown(%s) > 0", name)
+			AddSymbol(annotation, name)
+		elseif token == "up" then
+			code = format("BuffPresent(%s)", buffName)
+			AddSymbol(annotation, buffName)
+		elseif token == "remains" then
+			code = format("BuffRemaining(%s)", buffName)
+			AddSymbol(annotation, buffName)
 		end
-		AddSymbol(annotation, name)
 	elseif operand == "ptr" then
 		code = "PTR()"
 	elseif operand == "time_to_die" then
