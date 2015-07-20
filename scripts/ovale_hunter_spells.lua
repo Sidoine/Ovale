@@ -173,7 +173,7 @@ Define(trap_launcher 77769)
 Define(trap_mastery 63458)
 
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(barrage tag=shortcd)
+	SpellInfo(powershot tag=main)
 	SpellInfo(focus_fire tag=shortcd)
 ]]
 

@@ -70,6 +70,10 @@ AddFunction MarksmanshipDefaultMainActions
 	if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimMainActions()
 	#glaive_toss
 	Spell(glaive_toss)
+	#powershot,if=cast_regen<focus.deficit
+	if FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
+	#barrage
+	Spell(barrage)
 	#steady_shot,if=focus.deficit*cast_time%(14+cast_regen)>cooldown.rapid_fire.remains
 	if FocusDeficit() * CastTime(steady_shot) / { 14 + FocusCastingRegen(steady_shot) } > SpellCooldown(rapid_fire) Spell(steady_shot)
 	#focusing_shot,if=focus.deficit*cast_time%(50+cast_regen)>cooldown.rapid_fire.remains&focus<100
@@ -94,9 +98,6 @@ AddFunction MarksmanshipDefaultShortCdActions
 {
 	unless Spell(chimaera_shot) or Spell(kill_shot)
 	{
-		#call_action_list,name=careful_aim,if=buff.careful_aim.up
-		if target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) MarksmanshipCarefulAimShortCdActions()
-
 		unless { target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff) } and MarksmanshipCarefulAimShortCdPostConditions()
 		{
 			#explosive_trap,if=spell_targets.explosive_trap_tick>1
@@ -105,14 +106,6 @@ AddFunction MarksmanshipDefaultShortCdActions
 			Spell(a_murder_of_crows)
 			#dire_beast,if=cast_regen+action.aimed_shot.cast_regen<focus.deficit
 			if FocusCastingRegen(dire_beast) + FocusCastingRegen(aimed_shot) < FocusDeficit() Spell(dire_beast)
-
-			unless Spell(glaive_toss)
-			{
-				#powershot,if=cast_regen<focus.deficit
-				if FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
-				#barrage
-				Spell(barrage)
-			}
 		}
 	}
 }
@@ -148,6 +141,10 @@ AddFunction MarksmanshipCarefulAimMainActions
 {
 	#glaive_toss,if=active_enemies>2
 	if Enemies() > 2 Spell(glaive_toss)
+	#powershot,if=spell_targets.powershot>1&cast_regen<focus.deficit
+	if Enemies() > 1 and FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
+	#barrage,if=spell_targets.barrage>1
+	if Enemies() > 1 Spell(barrage)
 	#aimed_shot
 	Spell(aimed_shot)
 	#focusing_shot,if=50+cast_regen<focus.deficit
@@ -156,20 +153,9 @@ AddFunction MarksmanshipCarefulAimMainActions
 	Spell(steady_shot)
 }
 
-AddFunction MarksmanshipCarefulAimShortCdActions
-{
-	unless Enemies() > 2 and Spell(glaive_toss)
-	{
-		#powershot,if=spell_targets.powershot>1&cast_regen<focus.deficit
-		if Enemies() > 1 and FocusCastingRegen(powershot) < FocusDeficit() Spell(powershot)
-		#barrage,if=spell_targets.barrage>1
-		if Enemies() > 1 Spell(barrage)
-	}
-}
-
 AddFunction MarksmanshipCarefulAimShortCdPostConditions
 {
-	Enemies() > 2 and Spell(glaive_toss) or Spell(aimed_shot) or 50 + FocusCastingRegen(focusing_shot_marksmanship) < FocusDeficit() and Spell(focusing_shot_marksmanship) or Spell(steady_shot)
+	Enemies() > 2 and Spell(glaive_toss) or Enemies() > 1 and FocusCastingRegen(powershot) < FocusDeficit() and Spell(powershot) or Enemies() > 1 and Spell(barrage) or Spell(aimed_shot) or 50 + FocusCastingRegen(focusing_shot_marksmanship) < FocusDeficit() and Spell(focusing_shot_marksmanship) or Spell(steady_shot)
 }
 
 ### actions.precombat

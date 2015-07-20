@@ -61,6 +61,8 @@ AddFunction BeastMasteryDefaultMainActions
 {
 	#multishot,if=spell_targets.multi_shot>1&pet.cat.buff.beast_cleave.remains<0.5
 	if Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 Spell(multishot)
+	#barrage,if=spell_targets.barrage>1
+	if Enemies() > 1 Spell(barrage)
 	#multishot,if=spell_targets.multi_shot>5
 	if Enemies() > 5 Spell(multishot)
 	#kill_command
@@ -75,6 +77,10 @@ AddFunction BeastMasteryDefaultMainActions
 	if Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 4 and Focus() < 50 Spell(cobra_shot)
 	#glaive_toss
 	Spell(glaive_toss)
+	#barrage
+	Spell(barrage)
+	#powershot,if=focus.time_to_max>cast_time
+	if TimeToMaxFocus() > CastTime(powershot) Spell(powershot)
 	#cobra_shot,if=spell_targets.multi_shot>5
 	if Enemies() > 5 Spell(cobra_shot)
 	#arcane_shot,if=(buff.thrill_of_the_hunt.react&focus>35)|buff.bestial_wrath.up
@@ -98,27 +104,21 @@ AddFunction BeastMasteryDefaultShortCdActions
 	{
 		#focus_fire,min_frenzy=5
 		if pet.BuffStacks(pet_frenzy_buff) >= 5 Spell(focus_fire)
-		#barrage,if=spell_targets.barrage>1
-		if Enemies() > 1 Spell(barrage)
-		#explosive_trap,if=spell_targets.explosive_trap_tick>5
-		if Enemies() > 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 
-		unless Enemies() > 5 and Spell(multishot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
+		unless Enemies() > 1 and Spell(barrage)
 		{
-			#a_murder_of_crows
-			Spell(a_murder_of_crows)
+			#explosive_trap,if=spell_targets.explosive_trap_tick>5
+			if Enemies() > 5 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 
-			unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 7 and 14 + FocusCastingRegen(cobra_shot) < FocusDeficit() and Spell(cobra_shot)
+			unless Enemies() > 5 and Spell(multishot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
 			{
-				#explosive_trap,if=spell_targets.explosive_trap_tick>1
-				if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+				#a_murder_of_crows
+				Spell(a_murder_of_crows)
 
-				unless Talent(steady_focus_talent) and BuffRemaining(steady_focus_buff) < 4 and Focus() < 50 and Spell(cobra_shot) or Spell(glaive_toss)
+				unless TimeToMaxFocus() > GCD() and Spell(kill_shot) or Focus() < 50 and Spell(focusing_shot) or BuffPresent(pre_steady_focus_buff) and BuffRemaining(steady_focus_buff) < 7 and 14 + FocusCastingRegen(cobra_shot) < FocusDeficit() and Spell(cobra_shot)
 				{
-					#barrage
-					Spell(barrage)
-					#powershot,if=focus.time_to_max>cast_time
-					if TimeToMaxFocus() > CastTime(powershot) Spell(powershot)
+					#explosive_trap,if=spell_targets.explosive_trap_tick>1
+					if Enemies() > 1 and CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
 				}
 			}
 		}
