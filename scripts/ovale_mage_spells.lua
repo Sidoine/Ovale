@@ -243,7 +243,7 @@ Define(water_elemental_water_jet 135029)
 	SpellAddTargetDebuff(water_elemental_water_jet water_elemental_water_jet_debuff=1)
 Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(water_elemental_water_jet_debuff duration=4)
-	SpellInfo(water_elemental_water_jet_debuff addduration=4 itemset=T18 itemcount=4)
+	SpellInfo(water_elemental_water_jet_debuff addduration=10 itemset=T18 itemcount=4)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(arcane_orb tag=shortcd)
