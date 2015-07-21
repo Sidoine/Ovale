@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "ovale_priest_spells"
-	local desc = "[6.1] Ovale: Priest spells"
+	local desc = "[6.2] Ovale: Priest spells"
 	local code = [[
 # Priest spells and functions.
 
