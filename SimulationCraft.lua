@@ -566,6 +566,10 @@ ParseAction = function(action, nodeList, annotation)
 		stream = gsub(stream, ",target_if=max:", ",target_if_max=")
 		stream = gsub(stream, ",target_if=min:", ",target_if_min=")
 	end
+	do
+		--"sim.target" is the "priority target" property of the simulator, change into "sim_target".
+		stream = gsub(stream, "sim.target", "sim_target")
+	end
 	local tokenStream = OvaleLexer("SimulationCraft", GetTokenIterator(stream))
 	-- Consume the action.
 	local name
@@ -2307,6 +2311,19 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 					local buffName = "glyph_of_double_jeopardy_buff"
 					code = "BuffPresent(" .. buffName .. ")"
 					AddSymbol(annotation, buffName)
+				end
+				annotation.astAnnotation = annotation.astAnnotation or {}
+				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "sim_target" then
+				--[[
+					Special handling for "sim_target=X" expressions.
+					Ovale has no concept of the "primary", "main" or "boss" target, so "sim_target=X" is always true.
+				--]]
+				local code
+				if parseNode.operator == "=" then
+					code = "True(target_is_sim_target)"
+				else -- if parseNode.operator == "!=" then
+					code = "False(target_is_sim_target)"
 				end
 				annotation.astAnnotation = annotation.astAnnotation or {}
 				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
