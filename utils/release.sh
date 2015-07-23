@@ -37,6 +37,7 @@ getopts=getopts
 grep=grep
 mkdir=mkdir
 mv=mv
+printf=printf
 pwd=pwd
 rm=rm
 sed=sed
@@ -51,23 +52,21 @@ zip=zip
 # pkzip wrapper for 7z.
 sevenzip=7z
 zip() {
-	archive="$1"; shift
-	$sevenzip a -tzip "$archive" "$@"
-}
-
-unix2dos() {
-	$sed -i "s/$/\r/" "$1"
+	_zip_archive="$1"; shift
+	$sevenzip a -tzip "$_zip_archive" "$@"
 }
 
 # Site URLs, used to find the localization web app.
 site_url="http://wow.curseforge.com http://www.wowace.com"
 
 # Variables set via options.
+slug=
 project=
 topdir=
 releasedir=
 overwrite=
 nolib=
+line_ending=dos
 skip_copying=
 skip_externals=
 skip_localization=
@@ -98,22 +97,38 @@ fi
 # Set $releasedir to the directory which will contain the generated addon zipfile.
 : ${releasedir:="$topdir/release"}
 
+# Set $basedir to the basename of the checkout directory.
+basedir=$( cd "$topdir" && $pwd )
+case $basedir in
+/*/*)
+	basedir=${basedir##/*/}
+	;;
+/*)
+	basedir=${basedir##/}
+	;;
+esac
+
+# The default slug is the lowercase basename of the checkout directory.
+slug_default=$( echo "$basedir" | $tr '[A-Z]' '[a-z]' )
+
 usage() {
-	echo "Usage: release.sh [-celoz] [-n name] [-r releasedir] [-t topdir]" >&2
+	echo "Usage: release.sh [-celouz] [-n name] [-p slug] [-r releasedir] [-t topdir]" >&2
 	echo "  -c               Skip copying files into the package directory." >&2
 	echo "  -e               Skip checkout of external repositories." >&2
 	echo "  -l               Skip @localization@ keyword replacement." >&2
 	echo "  -n name          Set the name of the addon." >&2
 	echo "  -o               Keep existing package directory; just overwrite contents." >&2
+	echo "  -p slug          Set the project slug used on WowAce or CurseForge. Defaults to \`\`$slug_default''." >&2
 	echo "  -r releasedir    Set directory containing the package directory. Defaults to \`\`\$topdir/release''." >&2
 	echo "  -s               Create a stripped-down \`\`nolib'' package." >&2
 	echo "  -t topdir        Set top-level directory of checkout.  Defaults to \`\`$topdir''." >&2
+	echo "  -u               Use Unix line-endings." >&2
 	echo "  -z               Skip zipfile creation." >&2
 }
 
 # Process command-line options
 OPTIND=1
-while $getopts ":celn:or:st:z" opt; do
+while $getopts ":celn:op:r:st:uz" opt; do
 	case $opt in
 	c)
 		# Skip copying files into the package directory.
@@ -134,6 +149,9 @@ while $getopts ":celn:or:st:z" opt; do
 		# Skip deleting any previous package directory.
 		overwrite=true
 		;;
+	p)
+		slug="$OPTARG"
+		;;
 	r)
 		# Set the release directory to a non-default value.
 		releasedir="$OPTARG"
@@ -145,6 +163,10 @@ while $getopts ":celn:or:st:z" opt; do
 	t)
 		# Set the top-level directory of the checkout to a non-default value.
 		topdir="$OPTARG"
+		;;
+	u)
+		# Skip Unix-to-DOS line-ending translation.
+		line_ending=unix
 		;;
 	z)
 		# Skip generating the zipfile.
@@ -387,7 +409,9 @@ license=
 contents=
 
 if [ -f "$topdir/.pkgmeta" ]; then
-	while IFS='' read -r yaml_line || [ -n "$yaml_line" ]; do
+	yaml_eof=
+	while [ -z "$yaml_eof" ]; do
+		IFS='' read -r yaml_line || yaml_eof=true
 		case $yaml_line in
 		[!\ ]*:*)
 			# Split $yaml_line into a $yaml_key, $yaml_value pair.
@@ -452,18 +476,11 @@ if [ -f "$topdir/.pkgmeta" ]; then
 	done < "$topdir/.pkgmeta"
 fi
 
+# Set $slug to the basename of the checkout directory if not already set.
+: ${slug:="$slug_default"}
+
 # Set $package to the basename of the checkout directory if not already set.
-if [ -z "$package" ]; then
-	# Use the basename of the checkout directory as the package name.
-	case $topdir in
-	/*/*)
-		package=${topdir##/*/}
-		;;
-	/*)
-		package=${topdir##/}
-		;;
-	esac
-fi
+: ${package:=$basedir}
 
 # Set $pkgdir to the path of the package directory inside $releasedir.
 : ${pkgdir:="$releasedir/$package"}
@@ -495,8 +512,7 @@ localization_url=
 cache_localization_url() {
 	if [ -z "$localization_url" ]; then
 		for _ul_site_url in $site_url; do
-			# Ensure that the CF/WA URL is lowercase, since project slugs are always in lowercase.
-			localization_url=$( echo "${_ul_site_url}/addons/$package/localization" | $tr '[A-Z]' '[a-z]' )
+			localization_url="${_ul_site_url}/addons/$slug/localization"
 			if $curl -s -I "$localization_url/" | $grep -q "200 OK"; then
 				echo "Localization URL is: $localization_url"
 				break
@@ -508,9 +524,13 @@ cache_localization_url() {
 # Filter to handle @localization@ repository keyword replacement.
 localization_filter()
 {
-	while IFS='' read -r _ul_line || [ -n "$_ul_line" ]; do
+	_ul_eof=
+	while [ -z "$_ul_eof" ]; do
+		IFS='' read -r _ul_line || _ul_eof=true
 		case $_ul_line in
-		--@localization\(*\)@*)
+		*--@localization\(*\)@*)
+			# Get the prefix of the line before the comment.
+			_ul_prefix=${_ul_line%%--*}
 			# Strip everything but the localization parameters.
 			_ul_params=${_ul_line#*@localization(}
 			_ul_params=${_ul_params%)@}
@@ -557,14 +577,22 @@ localization_filter()
 			# Strip any leading or trailing ampersands.
 			_ul_url_params=${_ul_url_params#&}
 			_ul_url_params=${_ul_url_params%&}
+			echo -n "$_ul_prefix"
 			if [ -z "$_ul_skip_fetch" ]; then
-				$curl --progress-bar "${localization_url}/export.txt?${_ul_url_params}"
+				# Fetch the localization data, but don't output anything if the namespace was not valid.
+				$curl --progress-bar "${localization_url}/export.txt?${_ul_url_params}" | $awk '/namespace.*Not a valid choice/ { skip = 1; next } skip == 1 { next } { print }'
 			fi
 			# Insert a trailing blank line to match CF packager.
-			echo ""
+			if [ -z "$_ul_eof" ]; then
+				echo ""
+			fi
 			;;
 		*)
-			echo "$_ul_line"
+			if [ -n "$_ul_eof" ]; then
+				echo -n "$_ul_line"
+			else
+				echo "$_ul_line"
+			fi
 		esac
 	done
 }
@@ -582,11 +610,13 @@ toc_filter()
 {
 	_trf_token=$1; shift
 	_trf_comment=
-	while IFS='' read -r _trf_line || [ -n "$_trf_line" ]; do
+	_trf_eof=
+	while [ -z "$_trf_eof" ]; do
+		IFS='' read -r _trf_line || _trf_eof=true
 		_trf_passthrough=
 		case $_trf_line in
 		"#@${_trf_token}@"*)
-			_trf_comment="#"
+			_trf_comment="# "
 			_trf_passthrough=true
 			;;
 		"#@end-${_trf_token}@"*)
@@ -594,10 +624,13 @@ toc_filter()
 			_trf_passthrough=true
 			;;
 		esac
-		if [ -n "$_trf_passthrough" ]; then
-			echo "$_trf_line"
+		if [ -z "$_trf_passthrough" ]; then
+			_trf_line="$_trf_comment$_trf_line"
+		fi
+		if [ -n "$_trf_eof" ]; then
+			echo -n "$_trf_line"
 		else
-			echo "$_trf_comment$_trf_line"
+			echo "$_trf_line"
 		fi
 	done
 }
@@ -609,6 +642,82 @@ xml_filter()
 		-e "s/<!--@end-$1@-->/@end-$1@-->/g" \
 		-e "s/<!--@non-$1@/<!--@non-$1@-->/g" \
 		-e "s/@end-non-$1@-->/<!--@end-non-$1@-->/g"
+}
+
+do_not_package_filter()
+{
+	_dnpf_token=$1; shift
+	_dnpf_string="do-not-package"
+	_dnpf_start_token=
+	_dnpf_end_token=
+	case $_dnpf_token in
+	lua)
+		_dnpf_start_token="--@$_dnpf_string@"
+		_dnpf_end_token="--@end-$_dnpf_string@"
+		;;
+	toc)
+		_dnpf_start_token="#@$_dnpf_string@"
+		_dnpf_end_token="#@end-$_dnpf_string@"
+		;;
+	xml)
+		_dnpf_start_token="<!--@$_dnpf_string@-->"
+		_dnpf_end_token="<!--@end-$_dnpf_string@-->"
+		;;
+	esac
+	if [ -z "$_dnpf_start_token" -o -z "$_dnpf_end_token" ]; then
+		$cat
+	else
+		# Replace all content between the start and end tokens, inclusive, with a newline to match CF packager.
+		_dnpf_eof=
+		_dnpf_skip=
+		while [ -z "$_dnpf_eof" ]; do
+			IFS='' read -r _dnpf_line || _dnpf_eof=true
+			case $_dnpf_line in
+			*$_dnpf_start_token*)
+				_dnpf_skip=true
+				echo -n "${_dnpf_line%%${_dnpf_start_token}*}"
+				;;
+			*$_dnpf_end_token*)
+				_dnpf_skip=
+				if [ -z "$_dnpf_eof" ]; then
+					echo ""
+				fi
+				;;
+			*)
+				if [ -z "$_dnpf_skip" ]; then
+					if [ -n "$_dnpf_eof" ]; then
+						echo -n "$_dnpf_line"
+					else
+						echo "$_dnpf_line"
+					fi
+				fi
+				;;
+			esac
+		done
+	fi
+}
+
+line_ending_filter()
+{
+	_lef_eof=
+	while [ -z "$_lef_eof" ]; do
+		IFS='' read -r _lef_line || _lef_eof=true
+		if [ -n "$_lef_eof" ]; then
+			# Preserve EOF not preceded by newlines.
+			echo -n "$_lef_line"
+		else
+			case $line_ending in
+			dos)
+				# Terminate lines with CR LF.
+				$printf "%s\r\n" "$_lef_line"
+				;;
+			unix)
+				# Terminate lines with LF.
+				$printf "%s\n" "$_lef_line"
+				;;
+			esac
+		fi
+	done
 }
 
 ###
@@ -625,15 +734,17 @@ copy_directory_tree() {
 	_cdt_ignored_patterns=
 	_cdt_localization=
 	_cdt_nolib=
+	_cdt_do_not_package=
 	_cdt_unchanged_patterns=
 	OPTIND=1
-	while $getopts :adi:lnu: _cdt_opt "$@"; do
+	while $getopts :adi:lnpu: _cdt_opt "$@"; do
 		case $_cdt_opt in
 		a)	_cdt_alpha=true ;;
 		d)	_cdt_debug=true ;;
 		i)	_cdt_ignored_patterns=$OPTARG ;;
 		l)	_cdt_localization=true ;;
 		n)	_cdt_nolib=true ;;
+		p)	_cdt_do_not_package=true ;;
 		u)	_cdt_unchanged_patterns=$OPTARG ;;
 		esac
 	done
@@ -689,7 +800,7 @@ copy_directory_tree() {
 					skip_filter=
 				fi
 				if [ -n "$skip_filter" -o -n "$unchanged" ]; then
-					echo "Copying: $file"
+					echo "Copying: $file (unchanged)"
 					$cp "$_cdt_srcdir/$file" "$_cdt_destdir/$dir"
 				else
 					# Set the filter for @localization@ replacement.
@@ -722,11 +833,18 @@ copy_directory_tree() {
 						*.xml)	_cdt_nolib_filter="xml_filter no-lib-strip" ;;
 						esac
 					fi
+					_cdt_do_not_package_filter=$cat
+					if [ -n "$_cdt_do_not_package" ]; then
+						case $file in
+						*.lua)	_cdt_do_not_package_filter="do_not_package_filter lua" ;;
+						*.toc)	_cdt_do_not_package_filter="do_not_package_filter toc" ;;
+						*.xml)	_cdt_do_not_package_filter="do_not_package_filter xml" ;;
+						esac
+					fi
 					# As a side-effect, files that don't end in a newline silently have one added.
 					# POSIX does imply that text files must end in a newline.
 					echo "Copying: $file"
-					$cat "$_cdt_srcdir/$file" | simple_filter | $_cdt_alpha_filter | $_cdt_debug_filter | $_cdt_nolib_filter | $_cdt_localization_filter > "$_cdt_destdir/$file"
-					unix2dos "$_cdt_destdir/$file"
+					$cat "$_cdt_srcdir/$file" | simple_filter | $_cdt_alpha_filter | $_cdt_debug_filter | $_cdt_nolib_filter | $_cdt_do_not_package_filter | $_cdt_localization_filter | line_ending_filter > "$_cdt_destdir/$file"
 				fi
 			fi
 		fi
@@ -749,6 +867,10 @@ if [ -z "$skip_copying" ]; then
 	if [ -n "$nolib" ]; then
 		cdt_args="$cdt_args -n"
 	fi
+	if true; then
+		# We always strip out "do-not-package" in a packaged addon.
+		cdt_args="$cdt_args -p"
+	fi
 	if [ -n "$ignore" ]; then
 		cdt_args="$cdt_args -i \"$ignore\""
 	fi
@@ -765,9 +887,9 @@ if [ -n "$license" -a ! -f "$topdir/$license" ]; then
 	create_license=true
 fi
 if [ -n "$create_license" ]; then
-	echo "Generating default license into $license."
-	echo "All Rights Reserved." > "$pkgdir/$license"
-	unix2dos "$pkgdir/$license"
+	( echo "Generating default license into $license."
+	  echo "All Rights Reserved."
+	) | line_ending_filter > "$pkgdir/$license"
 fi
 
 ###
@@ -904,12 +1026,13 @@ checkout_queued_external() {
 			version=$_cqe_external_version
 			project_revision=$_cqe_external_project_revision
 			package=${external_dir##*/}
+			slug=$( echo "$package" | $tr '[A-Z]' '[a-z]' )
 			for _cqe_nolib_site in $external_nolib_sites; do
 				case $external_uri in
 				*${_cqe_nolib_site}/*)
 					# The URI points to a Curse repository.
-					package=${external_uri#*${_cqe_nolib_site}/wow/}
-					package=${package%%/*}
+					slug=${external_uri#*${_cqe_nolib_site}/wow/}
+					slug=${slug%%/*}
 					break
 					;;
 				esac
@@ -918,7 +1041,9 @@ checkout_queued_external() {
 			# If a .pkgmeta file is present, process it for an "ignore" list.
 			ignore=
 			if [ -f "$_cqe_checkout_dir/.pkgmeta" ]; then
-				while IFS='' read -r yaml_line; do
+				yaml_eof=
+				while [ -z "$yaml_eof" ]; do
+					IFS='' read -r yaml_line || yaml_eof=true
 					case $yaml_line in
 					[!\ ]*:*)
 						# Split $yaml_line into a $yaml_key, $yaml_value pair.
@@ -965,7 +1090,9 @@ checkout_queued_external() {
 }
 
 if [ -f "$topdir/.pkgmeta" ]; then
-	while IFS='' read -r yaml_line; do
+	yaml_eof=
+	while [ -z "$yaml_eof" ]; do
+		IFS='' read -r yaml_line || yaml_eof=true
 		case $yaml_line in
 		[!\ ]*:*)
 			# Started a new section, so checkout any queued externals.
@@ -1027,7 +1154,7 @@ if [ -z "$project" ]; then
 		while read toc_line; do
 			case $toc_line in
 			"## Title: "*)
-				project=${toc_line#"## Title: "}
+				project=$( echo ${toc_line#"## Title: "} | $sed -e "s/|c[0-9A-Fa-f]\{8\}//g" -e "s/|r//g" )
 				;;
 			esac
 		done < "$topdir/$package.toc"
@@ -1073,14 +1200,14 @@ EOF
 	git)
 		# The Git changelog is Markdown-friendly.
 		$git log $git_commit_range --pretty=format:"###   %B" |
-			$sed -e "s/^/    /g" -e "s/^ *$//g" -e "s/^    ###/-/g" >> "$pkgdir/$changelog"
+			$sed -e "s/^/    /g" -e "s/^ *$//g" -e "s/^    ###/-/g" |
+			line_ending_filter >> "$pkgdir/$changelog"
 		;;
 	svn)
 		# The SVN changelog is plain text.
-		$svn log -v $svn_revision_range >> "$pkgdir/$changelog"
+		$svn log -v $svn_revision_range | line_ending_filter >> "$pkgdir/$changelog"
 		;;
 	esac
-	unix2dos "$pkgdir/$changelog"
 fi
 
 ###
@@ -1088,7 +1215,9 @@ fi
 ###
 
 if [ -f "$topdir/.pkgmeta" ]; then
-	while IFS='' read -r yaml_line; do
+	yaml_eof=
+	while [ -z "$yaml_eof" ]; do
+		IFS='' read -r yaml_line || yaml_eof=true
 		case $yaml_line in
 		[!\ ]*:*)
 			# Split $yaml_line into a $yaml_key, $yaml_value pair.
