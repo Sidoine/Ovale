@@ -959,7 +959,7 @@ function OvaleFuture:LastInFlightSpell()
 		local sc = self.queue[i]
 		if sc.success then
 			-- Use the more recently successful spellcast.
-			if spellcast.success < sc.success then
+			if not spellcast or spellcast.success < sc.success then
 				spellcast = sc
 			end
 			break
