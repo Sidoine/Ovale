@@ -1841,8 +1841,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "HealthPercent() < 80"
 		elseif class == "WARRIOR" and strsub(action, 1, 7) == "execute" then
 			if modifier.target then
-				local target = Unparse(modifier.target)
-				local target = tonumber(target)
+				local target = tonumber(Unparse(modifier.target))
 				if target then
 					-- Skip "execute" actions if they are not on the main target.
 					isSpellAction = false
