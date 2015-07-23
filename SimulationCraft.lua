@@ -1966,17 +1966,25 @@ EmitAction = function(parseNode, nodeList, annotation)
 			end
 			isSpellAction = false
 		elseif action == "wait" then
-			--[[
-				Create a special "wait" AST node that will be transformed in
-				a later step into something OvaleAST can understand and unparse.
-			--]]
-			bodyNode = OvaleAST:NewNode(nodeList)
-			bodyNode.type = "simc_wait"
 			if modifier.sec then
-				-- "wait,sec=expr" means to halt the processing of the action list if "expr > 0".
-				local expressionNode = Emit(modifier.sec, nodeList, annotation, action)
-				local code = OvaleAST:Unparse(expressionNode)
-				conditionCode = code .. " > 0"
+				local seconds = tonumber(Unparse(modifier.sec))
+				if seconds then
+					--[[
+						Ovale does not support SimulationCraft's concept of "waiting for N seconds".
+						Just skip if the modifier sec=N is present, where N is a number.
+					--]]
+				else
+					--[[
+						Create a special "wait" AST node that will be transformed in
+						a later step into something OvaleAST can understand and unparse.
+					--]]
+					bodyNode = OvaleAST:NewNode(nodeList)
+					bodyNode.type = "simc_wait"
+					-- "wait,sec=expr" means to halt the processing of the action list if "expr > 0".
+					local expressionNode = Emit(modifier.sec, nodeList, annotation, action)
+					local code = OvaleAST:Unparse(expressionNode)
+					conditionCode = code .. " > 0"
+				end
 			end
 			isSpellAction = false
 		end
