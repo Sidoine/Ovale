@@ -743,6 +743,9 @@ AddFunction FireDefaultCdActions
 
 		unless GetState(pyro_chain) > 0 and FireCombustSequenceCdPostConditions()
 		{
+			#call_action_list,name=crystal_sequence,if=talent.prismatic_crystal.enabled&pet.prismatic_crystal.active
+			if Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) FireCrystalSequenceCdActions()
+
 			unless Talent(prismatic_crystal_talent) and TotemPresent(prismatic_crystal) and FireCrystalSequenceCdPostConditions()
 			{
 				#call_action_list,name=init_combust,if=!pyro_chain
@@ -754,6 +757,12 @@ AddFunction FireDefaultCdActions
 					if not { BuffPresent(heating_up_buff) and InFlightToTarget(fireball) } Spell(mirror_image)
 					#call_action_list,name=aoe,if=active_enemies>10
 					if Enemies() > 10 FireAoeCdActions()
+
+					unless Enemies() > 10 and FireAoeCdPostConditions()
+					{
+						#call_action_list,name=single_target
+						FireSingleTargetCdActions()
+					}
 				}
 			}
 		}
@@ -774,6 +783,12 @@ AddFunction FireActiveTalentsShortCdActions
 {
 	#meteor,if=active_enemies>=3|(glyph.combustion.enabled&(!talent.incanters_flow.enabled|buff.incanters_flow.stack+incanters_flow_dir>=4)&cooldown.meteor.duration-cooldown.combustion.remains<10)
 	if Enemies() >= 3 or Glyph(glyph_of_combustion) and { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) + BuffDirection(incanters_flow_buff) >= 4 } and SpellCooldownDuration(meteor) - SpellCooldown(combustion) < 10 Spell(meteor)
+
+	unless Talent(living_bomb_talent) and { Enemies() > 1 or 600 < 10 } and FireLivingBombShortCdPostConditions()
+	{
+		#dragons_breath,if=glyph.dragons_breath.enabled&(!talent.prismatic_crystal.enabled|cooldown.prismatic_crystal.remains>8)
+		if Glyph(glyph_of_dragons_breath) and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } Spell(dragons_breath)
+	}
 }
 
 AddFunction FireActiveTalentsShortCdPostConditions
@@ -781,9 +796,21 @@ AddFunction FireActiveTalentsShortCdPostConditions
 	Talent(living_bomb_talent) and { Enemies() > 1 or 600 < 10 } and FireLivingBombShortCdPostConditions() or { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) >= 4 } and { target.TimeToDie() < 10 or not Talent(prismatic_crystal_talent) or Charges(blast_wave) >= 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(blast_wave) } and Spell(blast_wave)
 }
 
+AddFunction FireActiveTalentsCdActions
+{
+	unless { Enemies() >= 3 or Glyph(glyph_of_combustion) and { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) + BuffDirection(incanters_flow_buff) >= 4 } and SpellCooldownDuration(meteor) - SpellCooldown(combustion) < 10 } and Spell(meteor)
+	{
+		unless Talent(living_bomb_talent) and { Enemies() > 1 or 600 < 10 } and FireLivingBombCdPostConditions()
+		{
+			#cold_snap,if=glyph.dragons_breath.enabled&!talent.prismatic_crystal.enabled&!cooldown.dragons_breath.up
+			if Glyph(glyph_of_dragons_breath) and not Talent(prismatic_crystal_talent) and not { not SpellCooldown(dragons_breath) > 0 } Spell(cold_snap)
+		}
+	}
+}
+
 AddFunction FireActiveTalentsCdPostConditions
 {
-	{ Enemies() >= 3 or Glyph(glyph_of_combustion) and { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) + BuffDirection(incanters_flow_buff) >= 4 } and SpellCooldownDuration(meteor) - SpellCooldown(combustion) < 10 } and Spell(meteor) or Talent(living_bomb_talent) and { Enemies() > 1 or 600 < 10 } and FireLivingBombCdPostConditions() or { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) >= 4 } and { target.TimeToDie() < 10 or not Talent(prismatic_crystal_talent) or Charges(blast_wave) >= 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(blast_wave) } and Spell(blast_wave)
+	{ Enemies() >= 3 or Glyph(glyph_of_combustion) and { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) + BuffDirection(incanters_flow_buff) >= 4 } and SpellCooldownDuration(meteor) - SpellCooldown(combustion) < 10 } and Spell(meteor) or Talent(living_bomb_talent) and { Enemies() > 1 or 600 < 10 } and FireLivingBombCdPostConditions() or Glyph(glyph_of_dragons_breath) and { not Talent(prismatic_crystal_talent) or SpellCooldown(prismatic_crystal) > 8 } and Spell(dragons_breath) or { not Talent(incanters_flow_talent) or BuffStacks(incanters_flow_buff) >= 4 } and { target.TimeToDie() < 10 or not Talent(prismatic_crystal_talent) or Charges(blast_wave) >= 1 and SpellCooldown(prismatic_crystal) > SpellChargeCooldown(blast_wave) } and Spell(blast_wave)
 }
 
 ### actions.aoe
@@ -824,12 +851,20 @@ AddFunction FireAoeCdActions
 {
 	unless { target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() or target.DebuffPresent(pyroblast_debuff) and DebuffCountOnAny(pyroblast_debuff) < Enemies() } and Spell(inferno_blast)
 	{
+		#call_action_list,name=active_talents
+		FireActiveTalentsCdActions()
+
 		unless FireActiveTalentsCdPostConditions() or { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast)
 		{
-			#cold_snap,if=glyph.dragons_breath.enabled&!cooldown.dragons_breath.up
-			if Glyph(glyph_of_dragons_breath) and not { not SpellCooldown(dragons_breath) > 0 } Spell(cold_snap)
+			#cold_snap,if=!cooldown.dragons_breath.up
+			if not { not SpellCooldown(dragons_breath) > 0 } Spell(cold_snap)
 		}
 	}
+}
+
+AddFunction FireAoeCdPostConditions
+{
+	{ target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() or target.DebuffPresent(pyroblast_debuff) and DebuffCountOnAny(pyroblast_debuff) < Enemies() } and Spell(inferno_blast) or FireActiveTalentsCdPostConditions() or { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast) or Glyph(glyph_of_dragons_breath) and Spell(dragons_breath) or ManaPercent() > 10 and target.DebuffRemaining(flamestrike_debuff) < 2.4 and Spell(flamestrike)
 }
 
 ### actions.combust_sequence
@@ -910,10 +945,16 @@ AddFunction FireCrystalSequenceMainActions
 
 AddFunction FireCrystalSequenceShortCdActions
 {
-	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast) or Spell(blast_wave) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast)
+	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast)
 	{
-		#call_action_list,name=single_target
-		FireSingleTargetShortCdActions()
+		#dragons_breath,if=glyph.dragons_breath.enabled
+		if Glyph(glyph_of_dragons_breath) Spell(dragons_breath)
+
+		unless Spell(blast_wave) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast)
+		{
+			#call_action_list,name=single_target
+			FireSingleTargetShortCdActions()
+		}
 	}
 }
 
@@ -922,9 +963,24 @@ AddFunction FireCrystalSequenceShortCdPostConditions
 	target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast) or Spell(blast_wave) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast) or FireSingleTargetShortCdPostConditions()
 }
 
+AddFunction FireCrystalSequenceCdActions
+{
+	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast)
+	{
+		#cold_snap,if=!cooldown.dragons_breath.up
+		if not { not SpellCooldown(dragons_breath) > 0 } Spell(cold_snap)
+
+		unless Glyph(glyph_of_dragons_breath) and Spell(dragons_breath) or Spell(blast_wave) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast)
+		{
+			#call_action_list,name=single_target
+			FireSingleTargetCdActions()
+		}
+	}
+}
+
 AddFunction FireCrystalSequenceCdPostConditions
 {
-	target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast) or Spell(blast_wave) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast) or FireSingleTargetCdPostConditions()
+	target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() + 1 and Spell(inferno_blast) or target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast) or Glyph(glyph_of_dragons_breath) and Spell(dragons_breath) or Spell(blast_wave) or ExecuteTime(pyroblast) == GCD() and TotemRemaining(prismatic_crystal) < GCD() + TravelTime(pyroblast) and TotemRemaining(prismatic_crystal) > TravelTime(pyroblast) and Spell(pyroblast) or FireSingleTargetCdPostConditions()
 }
 
 ### actions.init_combust
@@ -1083,6 +1139,15 @@ AddFunction FireSingleTargetShortCdActions
 AddFunction FireSingleTargetShortCdPostConditions
 {
 	target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast) or BuffPresent(pyroblast_buff) and BuffRemaining(pyroblast_buff) < ExecuteTime(fireball) and Spell(pyroblast) or ArmorSetBonus(T16_caster 2) and BuffPresent(pyroblast_buff) and BuffPresent(potent_flames_buff) and BuffRemaining(potent_flames_buff) < GCD() and Spell(pyroblast) or ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) and Spell(pyroblast) or BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) and Spell(pyroblast) or BuffExpires(pyroblast_buff) and BuffPresent(heating_up_buff) and not { target.DebuffRemaining(living_bomb_debuff) > 10 and Enemies() > 1 } and Spell(inferno_blast) or FireActiveTalentsShortCdPostConditions() or BuffPresent(pyroblast_buff) and BuffExpires(heating_up_buff) and not InFlightToTarget(fireball) and not { target.DebuffRemaining(living_bomb_debuff) > 10 and Enemies() > 1 } and Spell(inferno_blast) or Spell(fireball) or Speed() > 0 and Spell(scorch)
+}
+
+AddFunction FireSingleTargetCdActions
+{
+	unless target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() and Spell(inferno_blast) or BuffPresent(pyroblast_buff) and BuffRemaining(pyroblast_buff) < ExecuteTime(fireball) and Spell(pyroblast) or ArmorSetBonus(T16_caster 2) and BuffPresent(pyroblast_buff) and BuffPresent(potent_flames_buff) and BuffRemaining(potent_flames_buff) < GCD() and Spell(pyroblast) or ArmorSetBonus(T17 4) and BuffPresent(pyromaniac_buff) and Spell(pyroblast) or BuffPresent(pyroblast_buff) and BuffPresent(heating_up_buff) and InFlightToTarget(fireball) and Spell(pyroblast) or BuffExpires(pyroblast_buff) and BuffPresent(heating_up_buff) and not { target.DebuffRemaining(living_bomb_debuff) > 10 and Enemies() > 1 } and Spell(inferno_blast)
+	{
+		#call_action_list,name=active_talents
+		FireActiveTalentsCdActions()
+	}
 }
 
 AddFunction FireSingleTargetCdPostConditions

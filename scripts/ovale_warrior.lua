@@ -136,8 +136,8 @@ AddFunction ArmsAoeMainActions
 	if target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() - target.DebuffRemaining(rend_debuff) > 18 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Enemies() <= 8 Spell(rend)
 	#colossus_smash,if=dot.rend.ticking
 	if target.DebuffPresent(rend_debuff) Spell(colossus_smash)
-	#execute,cycle_targets=1,if=!buff.sudden_death.react&spell_targets.whirlwind<=8&((rage>72&cooldown.colossus_smash.remains>gcd)|rage>80|target.time_to_die<5|debuff.colossus_smash.up)
-	if not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } Spell(execute_arms)
+	#execute,cycle_targets=1,if=!buff.sudden_death.react&spell_targets.whirlwind<=8&((rage.deficit<48&cooldown.colossus_smash.remains>gcd)|rage>80|target.time_to_die<5|debuff.colossus_smash.up)
+	if not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { RageDeficit() < 48 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } Spell(execute_arms)
 	#heroic_charge,cycle_targets=1,if=target.health.pct<20&rage<70&swing.mh.remains>2&debuff.charge.down
 	#mortal_strike,if=target.health.pct>20&(rage>60|debuff.colossus_smash.up)&spell_targets.whirlwind<=5
 	if target.HealthPercent() > 20 and { Rage() > 60 or target.DebuffPresent(colossus_smash_debuff) } and Enemies() <= 5 Spell(mortal_strike)
@@ -160,7 +160,7 @@ AddFunction ArmsAoeShortCdActions
 		#bladestorm,if=((debuff.colossus_smash.up|cooldown.colossus_smash.remains>3)&target.health.pct>20)|(target.health.pct<20&rage<30&cooldown.colossus_smash.remains>4)
 		if { target.DebuffPresent(colossus_smash_debuff) or SpellCooldown(colossus_smash) > 3 } and target.HealthPercent() > 20 or target.HealthPercent() < 20 and Rage() < 30 and SpellCooldown(colossus_smash) > 4 Spell(bladestorm)
 
-		unless target.DebuffPresent(rend_debuff) and Spell(colossus_smash) or not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } and Spell(execute_arms) or target.HealthPercent() > 20 and { Rage() > 60 or target.DebuffPresent(colossus_smash_debuff) } and Enemies() <= 5 and Spell(mortal_strike)
+		unless target.DebuffPresent(rend_debuff) and Spell(colossus_smash) or not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { RageDeficit() < 48 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } and Spell(execute_arms) or target.HealthPercent() > 20 and { Rage() > 60 or target.DebuffPresent(colossus_smash_debuff) } and Enemies() <= 5 and Spell(mortal_strike)
 		{
 			#dragon_roar,if=!debuff.colossus_smash.up
 			if not target.DebuffPresent(colossus_smash_debuff) Spell(dragon_roar)
@@ -180,7 +180,7 @@ AddFunction ArmsAoeShortCdActions
 
 AddFunction ArmsAoeShortCdPostConditions
 {
-	target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() > 4 and Spell(rend) or DebuffCountOnAny(rend_debuff) < Enemies() and DebuffCountOnAny(rend_debuff) <= 2 and target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() > 8 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Talent(taste_for_blood_talent) and Spell(rend) or target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() - target.DebuffRemaining(rend_debuff) > 18 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Enemies() <= 8 and Spell(rend) or target.DebuffPresent(rend_debuff) and Spell(colossus_smash) or not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } and Spell(execute_arms) or target.HealthPercent() > 20 and { Rage() > 60 or target.DebuffPresent(colossus_smash_debuff) } and Enemies() <= 5 and Spell(mortal_strike) or { target.HealthPercent() > 20 or Enemies() >= 9 } and Glyph(glyph_of_resonating_power) and Spell(thunder_clap) or target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() > 8 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Enemies() >= 9 and Rage() < 50 and not Talent(taste_for_blood_talent) and Spell(rend) or { target.HealthPercent() > 20 or Enemies() >= 9 } and Spell(whirlwind) or BuffPresent(sudden_death_buff) and Spell(execute_arms)
+	target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() > 4 and Spell(rend) or DebuffCountOnAny(rend_debuff) < Enemies() and DebuffCountOnAny(rend_debuff) <= 2 and target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() > 8 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Talent(taste_for_blood_talent) and Spell(rend) or target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() - target.DebuffRemaining(rend_debuff) > 18 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Enemies() <= 8 and Spell(rend) or target.DebuffPresent(rend_debuff) and Spell(colossus_smash) or not BuffPresent(sudden_death_buff) and Enemies() <= 8 and { RageDeficit() < 48 and SpellCooldown(colossus_smash) > GCD() or Rage() > 80 or target.TimeToDie() < 5 or target.DebuffPresent(colossus_smash_debuff) } and Spell(execute_arms) or target.HealthPercent() > 20 and { Rage() > 60 or target.DebuffPresent(colossus_smash_debuff) } and Enemies() <= 5 and Spell(mortal_strike) or { target.HealthPercent() > 20 or Enemies() >= 9 } and Glyph(glyph_of_resonating_power) and Spell(thunder_clap) or target.DebuffRemaining(rend_debuff) < 5.4 and target.TimeToDie() > 8 and not DebuffCountOnAny(colossus_smash_debuff) > 0 and Enemies() >= 9 and Rage() < 50 and not Talent(taste_for_blood_talent) and Spell(rend) or { target.HealthPercent() > 20 or Enemies() >= 9 } and Spell(whirlwind) or BuffPresent(sudden_death_buff) and Spell(execute_arms)
 }
 
 ### actions.movement
@@ -251,36 +251,43 @@ AddFunction ArmsPrecombatCdPostConditions
 
 AddFunction ArmsSingleMainActions
 {
-	#rend,if=target.time_to_die>4&dot.rend.remains<5.4
-	if target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 Spell(rend)
+	#rend,if=target.time_to_die>4&(remains<gcd|(debuff.colossus_smash.down&remains<5.4))
+	if target.TimeToDie() > 4 and { target.DebuffRemaining(rend_debuff) < GCD() or target.DebuffExpires(colossus_smash_debuff) and target.DebuffRemaining(rend_debuff) < 5.4 } Spell(rend)
 	#colossus_smash,if=debuff.colossus_smash.down
 	if target.DebuffExpires(colossus_smash_debuff) Spell(colossus_smash)
-	#mortal_strike,if=target.health.pct>20&(debuff.colossus_smash.up|rage>60)
-	if target.HealthPercent() > 20 and { target.DebuffPresent(colossus_smash_debuff) or Rage() > 60 } Spell(mortal_strike)
+	#mortal_strike,if=target.health.pct>20
+	if target.HealthPercent() > 20 Spell(mortal_strike)
 	#colossus_smash
 	Spell(colossus_smash)
 	#execute,if=buff.sudden_death.react
 	if BuffPresent(sudden_death_buff) Spell(execute_arms)
-	#execute,if=!buff.sudden_death.react&(rage>72&cooldown.colossus_smash.remains>gcd)|debuff.colossus_smash.up|target.time_to_die<5
-	if not BuffPresent(sudden_death_buff) and Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
-	#impending_victory,if=!set_bonus.tier18_4pc&(rage<40&target.health.pct>20&cooldown.colossus_smash.remains>1)
-	if not ArmorSetBonus(T18 4) and Rage() < 40 and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 Spell(impending_victory)
-	#slam,if=(rage>20|cooldown.colossus_smash.remains>gcd)&target.health.pct>20&cooldown.colossus_smash.remains>1&!set_bonus.tier18_4pc
-	if { Rage() > 20 or SpellCooldown(colossus_smash) > GCD() } and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and not ArmorSetBonus(T18 4) Spell(slam)
-	#thunder_clap,if=(!set_bonus.tier18_4pc|rage.deficit<30)&!talent.slam.enabled&target.health.pct>20&(rage>=40|debuff.colossus_smash.up)&glyph.resonating_power.enabled&cooldown.colossus_smash.remains>gcd
-	if { not ArmorSetBonus(T18 4) or RageDeficit() < 30 } and not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Glyph(glyph_of_resonating_power) and SpellCooldown(colossus_smash) > GCD() Spell(thunder_clap)
-	#whirlwind,if=(!set_bonus.tier18_4pc|rage.deficit<30)&!talent.slam.enabled&target.health.pct>20&(rage>=40|debuff.colossus_smash.up)&cooldown.colossus_smash.remains>gcd
-	if { not ArmorSetBonus(T18 4) or RageDeficit() < 30 } and not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > GCD() Spell(whirlwind)
+	#execute,if=!buff.sudden_death.react&(rage.deficit<48&cooldown.colossus_smash.remains>gcd)|debuff.colossus_smash.up|target.time_to_die<5
+	if not BuffPresent(sudden_death_buff) and RageDeficit() < 48 and SpellCooldown(colossus_smash) > GCD() or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 Spell(execute_arms)
+	#rend,if=target.time_to_die>4&remains<5.4
+	if target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 Spell(rend)
+	#wait,sec=cooldown.colossus_smash.remains,if=cooldown.colossus_smash.remains<gcd
+	unless SpellCooldown(colossus_smash) < GCD() and SpellCooldown(colossus_smash) > 0
+	{
+		#wait,sec=0.1,if=target.health.pct<=20
+		#impending_victory,if=rage<40&!set_bonus.tier18_4pc
+		if Rage() < 40 and not ArmorSetBonus(T18 4) Spell(impending_victory)
+		#slam,if=rage>20&!set_bonus.tier18_4pc
+		if Rage() > 20 and not ArmorSetBonus(T18 4) Spell(slam)
+		#thunder_clap,if=((!set_bonus.tier18_2pc&!t18_class_trinket)|(!set_bonus.tier18_4pc&rage.deficit<45)|rage.deficit<30)&(!talent.slam.enabled|set_bonus.tier18_4pc)&(rage>=40|debuff.colossus_smash.up)&glyph.resonating_power.enabled
+		if { not ArmorSetBonus(T18 2) and not HasTrinket(t18_class_trinket) or not ArmorSetBonus(T18 4) and RageDeficit() < 45 or RageDeficit() < 30 } and { not Talent(slam_talent) or ArmorSetBonus(T18 4) } and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Glyph(glyph_of_resonating_power) Spell(thunder_clap)
+		#whirlwind,if=((!set_bonus.tier18_2pc&!t18_class_trinket)|(!set_bonus.tier18_4pc&rage.deficit<45)|rage.deficit<30)&(!talent.slam.enabled|set_bonus.tier18_4pc)&(rage>=40|debuff.colossus_smash.up)
+		if { not ArmorSetBonus(T18 2) and not HasTrinket(t18_class_trinket) or not ArmorSetBonus(T18 4) and RageDeficit() < 45 or RageDeficit() < 30 } and { not Talent(slam_talent) or ArmorSetBonus(T18 4) } and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } Spell(whirlwind)
+	}
 }
 
 AddFunction ArmsSingleShortCdActions
 {
-	unless target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 and Spell(rend)
+	unless target.TimeToDie() > 4 and { target.DebuffRemaining(rend_debuff) < GCD() or target.DebuffExpires(colossus_smash_debuff) and target.DebuffRemaining(rend_debuff) < 5.4 } and Spell(rend)
 	{
 		#ravager,if=cooldown.colossus_smash.remains<4&(!raid_event.adds.exists|raid_event.adds.in>55)
 		if SpellCooldown(colossus_smash) < 4 and { not False(raid_event_adds_exists) or 600 > 55 } Spell(ravager)
 
-		unless target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.HealthPercent() > 20 and { target.DebuffPresent(colossus_smash_debuff) or Rage() > 60 } and Spell(mortal_strike) or Spell(colossus_smash)
+		unless target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.HealthPercent() > 20 and Spell(mortal_strike) or Spell(colossus_smash)
 		{
 			#bladestorm,if=(((debuff.colossus_smash.up|cooldown.colossus_smash.remains>3)&target.health.pct>20)|(target.health.pct<20&rage<30&cooldown.colossus_smash.remains>4))&(!raid_event.adds.exists|raid_event.adds.in>55|(talent.anger_management.enabled&raid_event.adds.in>40))
 			if { { target.DebuffPresent(colossus_smash_debuff) or SpellCooldown(colossus_smash) > 3 } and target.HealthPercent() > 20 or target.HealthPercent() < 20 and Rage() < 30 and SpellCooldown(colossus_smash) > 4 } and { not False(raid_event_adds_exists) or 600 > 55 or Talent(anger_management_talent) and 600 > 40 } Spell(bladestorm)
@@ -291,10 +298,20 @@ AddFunction ArmsSingleShortCdActions
 			#dragon_roar,if=!debuff.colossus_smash.up&(!raid_event.adds.exists|raid_event.adds.in>55|(talent.anger_management.enabled&raid_event.adds.in>40))
 			if not target.DebuffPresent(colossus_smash_debuff) and { not False(raid_event_adds_exists) or 600 > 55 or Talent(anger_management_talent) and 600 > 40 } Spell(dragon_roar)
 
-			unless BuffPresent(sudden_death_buff) and Spell(execute_arms) or { not BuffPresent(sudden_death_buff) and Rage() > 72 and SpellCooldown(colossus_smash) > GCD() or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 } and Spell(execute_arms) or not ArmorSetBonus(T18 4) and Rage() < 40 and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and Spell(impending_victory) or { Rage() > 20 or SpellCooldown(colossus_smash) > GCD() } and target.HealthPercent() > 20 and SpellCooldown(colossus_smash) > 1 and not ArmorSetBonus(T18 4) and Spell(slam) or { not ArmorSetBonus(T18 4) or RageDeficit() < 30 } and not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Glyph(glyph_of_resonating_power) and SpellCooldown(colossus_smash) > GCD() and Spell(thunder_clap) or { not ArmorSetBonus(T18 4) or RageDeficit() < 30 } and not Talent(slam_talent) and target.HealthPercent() > 20 and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and SpellCooldown(colossus_smash) > GCD() and Spell(whirlwind)
+			unless BuffPresent(sudden_death_buff) and Spell(execute_arms) or { not BuffPresent(sudden_death_buff) and RageDeficit() < 48 and SpellCooldown(colossus_smash) > GCD() or target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() < 5 } and Spell(execute_arms) or target.TimeToDie() > 4 and target.DebuffRemaining(rend_debuff) < 5.4 and Spell(rend)
 			{
-				#shockwave
-				Spell(shockwave)
+				#wait,sec=cooldown.colossus_smash.remains,if=cooldown.colossus_smash.remains<gcd
+				unless SpellCooldown(colossus_smash) < GCD() and SpellCooldown(colossus_smash) > 0
+				{
+					#shockwave,if=target.health.pct<=20
+					if target.HealthPercent() <= 20 Spell(shockwave)
+
+					unless Rage() < 40 and not ArmorSetBonus(T18 4) and Spell(impending_victory) or Rage() > 20 and not ArmorSetBonus(T18 4) and Spell(slam) or { not ArmorSetBonus(T18 2) and not HasTrinket(t18_class_trinket) or not ArmorSetBonus(T18 4) and RageDeficit() < 45 or RageDeficit() < 30 } and { not Talent(slam_talent) or ArmorSetBonus(T18 4) } and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Glyph(glyph_of_resonating_power) and Spell(thunder_clap) or { not ArmorSetBonus(T18 2) and not HasTrinket(t18_class_trinket) or not ArmorSetBonus(T18 4) and RageDeficit() < 45 or RageDeficit() < 30 } and { not Talent(slam_talent) or ArmorSetBonus(T18 4) } and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Spell(whirlwind)
+					{
+						#shockwave
+						Spell(shockwave)
+					}
+				}
 			}
 		}
 	}
@@ -392,8 +409,10 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # storm_bolt
 # sudden_death_buff
 # sweeping_strikes
+# t18_class_trinket
 # taste_for_blood_talent
 # thunder_clap
+# wait
 # war_stomp
 # whirlwind
 ]]

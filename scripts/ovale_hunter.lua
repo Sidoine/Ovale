@@ -11,7 +11,7 @@ do
 # Based on SimulationCraft profile "Hunter_BM_T18M".
 #	class=hunter
 #	spec=beast_mastery
-#	talents=0002333
+#	talents=0001333
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -143,12 +143,12 @@ AddFunction BeastMasteryDefaultCdActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#potion,name=draenic_agility,if=!talent.stampede.enabled&buff.bestial_wrath.up&target.health.pct<=20|target.time_to_die<=20
-	if not Talent(stampede_talent) and BuffPresent(bestial_wrath_buff) and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 BeastMasteryUsePotionAgility()
-	#potion,name=draenic_agility,if=talent.stampede.enabled&cooldown.stampede.remains<1&(buff.bloodlust.up|buff.focus_fire.up)|target.time_to_die<=25
-	if Talent(stampede_talent) and SpellCooldown(stampede) < 1 and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 25 BeastMasteryUsePotionAgility()
-	#stampede,if=buff.bloodlust.up|buff.focus_fire.up|target.time_to_die<=25
-	if BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) or target.TimeToDie() <= 25 Spell(stampede)
+	#potion,name=draenic_agility,if=!talent.stampede.enabled&((buff.bestial_wrath.up&(legendary_ring.up|!legendary_ring.has_cooldown)&target.health.pct<=20)|target.time_to_die<=20)
+	if not Talent(stampede_talent) and { BuffPresent(bestial_wrath_buff) and { BuffPresent(legendary_ring_agility_buff) or not ItemCooldown(legendary_ring_agility) > 0 } and target.HealthPercent() <= 20 or target.TimeToDie() <= 20 } BeastMasteryUsePotionAgility()
+	#potion,name=draenic_agility,if=talent.stampede.enabled&((buff.stampede.remains&(legendary_ring.up|!legendary_ring.has_cooldown)&(buff.bloodlust.up|buff.focus_fire.up))|target.time_to_die<=40)
+	if Talent(stampede_talent) and { TimeSincePreviousSpell(stampede) < 40 and { BuffPresent(legendary_ring_agility_buff) or not ItemCooldown(legendary_ring_agility) > 0 } and { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } or target.TimeToDie() <= 40 } BeastMasteryUsePotionAgility()
+	#stampede,if=((buff.bloodlust.up|buff.focus_fire.up)&(legendary_ring.up|!legendary_ring.has_cooldown))|target.time_to_die<=25
+	if { BuffPresent(burst_haste_buff any=1) or BuffPresent(focus_fire_buff) } and { BuffPresent(legendary_ring_agility_buff) or not ItemCooldown(legendary_ring_agility) > 0 } or target.TimeToDie() <= 25 Spell(stampede)
 }
 
 ### actions.precombat
@@ -268,6 +268,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # incendiary_ammo
 # kill_command
 # kill_shot
+# legendary_ring_agility
+# legendary_ring_agility_buff
 # multishot
 # pet_beast_cleave_buff
 # pet_frenzy_buff
@@ -294,7 +296,7 @@ do
 # Based on SimulationCraft profile "Hunter_MM_T18M".
 #	class=hunter
 #	spec=marksmanship
-#	talents=0003332
+#	talents=0003323
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
