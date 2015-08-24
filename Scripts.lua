@@ -185,7 +185,7 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 		if specialization == "holy" then
 			-- TODO: Create a holy paladin script (see summonstone.com).
 			name = DISABLED_NAME
-		elseif class == "protection" then
+		elseif specialization == "protection" then
 			-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
 			name = format("simulationcraft_paladin_%s_t17m", specialization)
 		end
