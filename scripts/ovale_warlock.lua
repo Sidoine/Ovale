@@ -128,8 +128,8 @@ AddFunction AfflictionDefaultCdActions
 		Spell(blood_fury_sp)
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
-		#use_item,name=nithramus_the_allseer,if=buff.dark_soul.up&(target.time_to_die.remains>120|target.health.pct<20)
-		if BuffPresent(dark_soul_misery_buff) and { target.TimeToDie() > 120 or target.HealthPercent() < 20 } AfflictionUseItemActions()
+		#use_item,name=nithramus_the_allseer
+		AfflictionUseItemActions()
 
 		unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_misery_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 		{
@@ -415,6 +415,8 @@ AddFunction DemonologyDefaultCdActions
 	Spell(blood_fury_sp)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
+	#use_item,name=nithramus_the_allseer
+	DemonologyUseItemActions()
 
 	unless TimeInCombat() < 7 and Talent(demonic_servitude_talent) and DemonologyOpenerCdPostConditions() or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(service_felguard)
 	{
@@ -424,8 +426,6 @@ AddFunction DemonologyDefaultCdActions
 		if not Talent(demonbolt_talent) and { Charges(dark_soul_knowledge) == 2 and { TimeInCombat() > 6 or target.DebuffStacks(shadowflame_debuff) == 1 and InFlightToTarget(hand_of_guldan) } or not Talent(archimondes_darkness_talent) or target.TimeToDie() <= 20 and not Glyph(glyph_of_dark_soul) or target.TimeToDie() <= 10 or target.TimeToDie() <= 60 and DemonicFury() > 400 or { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stacking_proc_any_buff) } and { DemonicFury() > 600 or Glyph(glyph_of_dark_soul) and DemonicFury() > 450 } } or BuffRemaining(nithramus_buff) > 4 Spell(dark_soul_knowledge)
 		#imp_swarm,if=!talent.demonbolt.enabled&(buff.dark_soul.up|buff.nithramus.remains>4|(cooldown.dark_soul.remains>(120%(1%spell_haste)))|time_to_die<32)&time>3
 		if not Talent(demonbolt_talent) and { BuffPresent(dark_soul_knowledge_buff) or BuffRemaining(nithramus_buff) > 4 or SpellCooldown(dark_soul_knowledge) > 120 / { 1 / { 100 / { 100 + SpellHaste() } } } or target.TimeToDie() < 32 } and TimeInCombat() > 3 Spell(imp_swarm)
-		#use_item,name=nithramus_the_allseer,if=buff.dark_soul.remains
-		if BuffPresent(dark_soul_knowledge_buff) DemonologyUseItemActions()
 
 		unless BuffExpires(metamorphosis_buff) and ManaPercent() < 40 and BuffExpires(dark_soul_knowledge_buff) and Spell(life_tap) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or { Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 } and { SpellCooldown(cataclysm) > target.DebuffDuration(shadowflame_debuff) or not Talent(cataclysm_talent) } or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < TravelTime(hand_of_guldan) + CastTime(shadow_bolt) and Talent(demonbolt_talent) and { ArmorSetBonus(T17 4) == 0 and { Charges(hand_of_guldan) == 1 and SpellChargeCooldown(hand_of_guldan) < 4 or Charges(hand_of_guldan) == 2 } or Charges(hand_of_guldan) == 3 or Charges(hand_of_guldan) == 2 and SpellChargeCooldown(hand_of_guldan) < 13.8 - TravelTime(hand_of_guldan) * 2 or target.DebuffRemaining(shadowflame_debuff) > TravelTime(hand_of_guldan) } and Spell(hand_of_guldan) or not InFlightToTarget(hand_of_guldan) and target.DebuffRemaining(shadowflame_debuff) < 3.7 and TimeInCombat() < 5 and BuffRemaining(demonbolt_buff) < GCD() * 2 and { Charges(hand_of_guldan) >= 2 or ArmorSetBonus(T17 4) == 0 } and Charges(dark_soul_knowledge) >= 1 and Spell(hand_of_guldan)
 		{

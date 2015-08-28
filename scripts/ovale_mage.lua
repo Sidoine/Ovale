@@ -836,8 +836,8 @@ AddFunction FireAoeShortCdActions
 
 		unless FireActiveTalentsShortCdPostConditions() or { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast)
 		{
-			#dragons_breath,if=glyph.dragons_breath.enabled
-			if Glyph(glyph_of_dragons_breath) Spell(dragons_breath)
+			#dragons_breath
+			Spell(dragons_breath)
 		}
 	}
 }
@@ -864,7 +864,7 @@ AddFunction FireAoeCdActions
 
 AddFunction FireAoeCdPostConditions
 {
-	{ target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() or target.DebuffPresent(pyroblast_debuff) and DebuffCountOnAny(pyroblast_debuff) < Enemies() } and Spell(inferno_blast) or FireActiveTalentsCdPostConditions() or { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast) or Glyph(glyph_of_dragons_breath) and Spell(dragons_breath) or ManaPercent() > 10 and target.DebuffRemaining(flamestrike_debuff) < 2.4 and Spell(flamestrike)
+	{ target.DebuffPresent(combustion_debuff) and DebuffCountOnAny(combustion_debuff) < Enemies() or target.DebuffPresent(pyroblast_debuff) and DebuffCountOnAny(pyroblast_debuff) < Enemies() } and Spell(inferno_blast) or FireActiveTalentsCdPostConditions() or { BuffPresent(pyroblast_buff) or BuffPresent(pyromaniac_buff) } and Spell(pyroblast) or Spell(dragons_breath) or ManaPercent() > 10 and target.DebuffRemaining(flamestrike_debuff) < 2.4 and Spell(flamestrike)
 }
 
 ### actions.combust_sequence

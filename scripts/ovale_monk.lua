@@ -1815,8 +1815,8 @@ AddFunction WindwalkerAoeRjwShortCdActions
 
 AddFunction WindwalkerCleaveChixMainActions
 {
-	#chi_explosion,if=chi>=4&cooldown.fists_of_fury.remains>4
-	if Chi() >= 4 and SpellCooldown(fists_of_fury) > 4 Spell(chi_explosion_melee)
+	#chi_explosion,if=chi>=4&cooldown.fists_of_fury.remains>2
+	if Chi() >= 4 and SpellCooldown(fists_of_fury) > 2 Spell(chi_explosion_melee)
 	#tiger_palm,if=buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
 	if BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#chi_wave,if=energy.time_to_max>2
@@ -1831,7 +1831,7 @@ AddFunction WindwalkerCleaveChixMainActions
 
 AddFunction WindwalkerCleaveChixShortCdActions
 {
-	unless Chi() >= 4 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave)
+	unless Chi() >= 4 and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave)
 	{
 		#chi_burst,if=energy.time_to_max>2
 		if TimeToMaxEnergy() > 2 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -1846,7 +1846,7 @@ AddFunction WindwalkerCleaveChixShortCdActions
 
 AddFunction WindwalkerCleaveChixShortCdPostConditions
 {
-	Chi() >= 4 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
+	Chi() >= 4 and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
 }
 
 ### actions.opener
@@ -1997,14 +1997,14 @@ AddFunction WindwalkerStChixMainActions
 	if TimeToMaxEnergy() > 2 Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=energy.time_to_max>2&!dot.zen_sphere.ticking
 	if TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) Spell(zen_sphere)
-	#tiger_palm,if=chi=4&!buff.combo_breaker_tp.react
-	if Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) Spell(tiger_palm)
-	#chi_explosion,if=chi>=3&cooldown.fists_of_fury.remains>4
-	if Chi() >= 3 and SpellCooldown(fists_of_fury) > 4 Spell(chi_explosion_melee)
 	#expel_harm,if=chi.max-chi>=2&health.percent<95
 	if MaxChi() - Chi() >= 2 and HealthPercent() < 95 Spell(expel_harm)
 	#jab,if=chi.max-chi>=2
 	if MaxChi() - Chi() >= 2 Spell(jab)
+	#chi_explosion,if=chi>=5&cooldown.fists_of_fury.remains>4
+	if Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 Spell(chi_explosion_melee)
+	#tiger_palm,if=chi=4&!buff.combo_breaker_tp.react
+	if Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) Spell(tiger_palm)
 }
 
 AddFunction WindwalkerStChixShortCdActions
@@ -2014,7 +2014,7 @@ AddFunction WindwalkerStChixShortCdActions
 		#chi_burst,if=energy.time_to_max>2
 		if TimeToMaxEnergy() > 2 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 
-		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) and Spell(tiger_palm) or Chi() >= 3 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee)
+		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab) or Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee)
 		{
 			#chi_torpedo,if=energy.time_to_max>2
 			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
@@ -2024,7 +2024,7 @@ AddFunction WindwalkerStChixShortCdActions
 
 AddFunction WindwalkerStChixShortCdPostConditions
 {
-	Chi() >= 2 and BuffPresent(combo_breaker_ce_buff) and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) and Spell(tiger_palm) or Chi() >= 3 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
+	Chi() >= 2 and BuffPresent(combo_breaker_ce_buff) and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab) or Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) and Spell(tiger_palm)
 }
 
 ### Windwalker icons.
@@ -2439,8 +2439,8 @@ AddFunction WindwalkerAoeRjwShortCdActions
 
 AddFunction WindwalkerCleaveChixMainActions
 {
-	#chi_explosion,if=chi>=4&cooldown.fists_of_fury.remains>4
-	if Chi() >= 4 and SpellCooldown(fists_of_fury) > 4 Spell(chi_explosion_melee)
+	#chi_explosion,if=chi>=4&cooldown.fists_of_fury.remains>2
+	if Chi() >= 4 and SpellCooldown(fists_of_fury) > 2 Spell(chi_explosion_melee)
 	#tiger_palm,if=buff.combo_breaker_tp.react&buff.combo_breaker_tp.remains<=2
 	if BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 Spell(tiger_palm)
 	#chi_wave,if=energy.time_to_max>2
@@ -2455,7 +2455,7 @@ AddFunction WindwalkerCleaveChixMainActions
 
 AddFunction WindwalkerCleaveChixShortCdActions
 {
-	unless Chi() >= 4 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave)
+	unless Chi() >= 4 and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave)
 	{
 		#chi_burst,if=energy.time_to_max>2
 		if TimeToMaxEnergy() > 2 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -2470,7 +2470,7 @@ AddFunction WindwalkerCleaveChixShortCdActions
 
 AddFunction WindwalkerCleaveChixShortCdPostConditions
 {
-	Chi() >= 4 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
+	Chi() >= 4 and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
 }
 
 ### actions.opener
@@ -2621,14 +2621,14 @@ AddFunction WindwalkerStChixMainActions
 	if TimeToMaxEnergy() > 2 Spell(chi_wave)
 	#zen_sphere,cycle_targets=1,if=energy.time_to_max>2&!dot.zen_sphere.ticking
 	if TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) Spell(zen_sphere)
-	#tiger_palm,if=chi=4&!buff.combo_breaker_tp.react
-	if Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) Spell(tiger_palm)
-	#chi_explosion,if=chi>=3&cooldown.fists_of_fury.remains>4
-	if Chi() >= 3 and SpellCooldown(fists_of_fury) > 4 Spell(chi_explosion_melee)
 	#expel_harm,if=chi.max-chi>=2&health.percent<95
 	if MaxChi() - Chi() >= 2 and HealthPercent() < 95 Spell(expel_harm)
 	#jab,if=chi.max-chi>=2
 	if MaxChi() - Chi() >= 2 Spell(jab)
+	#chi_explosion,if=chi>=5&cooldown.fists_of_fury.remains>4
+	if Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 Spell(chi_explosion_melee)
+	#tiger_palm,if=chi=4&!buff.combo_breaker_tp.react
+	if Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) Spell(tiger_palm)
 }
 
 AddFunction WindwalkerStChixShortCdActions
@@ -2638,7 +2638,7 @@ AddFunction WindwalkerStChixShortCdActions
 		#chi_burst,if=energy.time_to_max>2
 		if TimeToMaxEnergy() > 2 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 
-		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) and Spell(tiger_palm) or Chi() >= 3 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee)
+		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab) or Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee)
 		{
 			#chi_torpedo,if=energy.time_to_max>2
 			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
@@ -2648,7 +2648,7 @@ AddFunction WindwalkerStChixShortCdActions
 
 AddFunction WindwalkerStChixShortCdPostConditions
 {
-	Chi() >= 2 and BuffPresent(combo_breaker_ce_buff) and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) and Spell(tiger_palm) or Chi() >= 3 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab)
+	Chi() >= 2 and BuffPresent(combo_breaker_ce_buff) and SpellCooldown(fists_of_fury) > 2 and Spell(chi_explosion_melee) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or Spell(rising_sun_kick) or TimeToMaxEnergy() > 2 and Spell(chi_wave) or TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab) or Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee) or Chi() == 4 and not BuffPresent(combo_breaker_tp_buff) and Spell(tiger_palm)
 }
 
 ### Windwalker icons.

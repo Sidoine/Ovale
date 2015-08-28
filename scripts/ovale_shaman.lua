@@ -126,7 +126,7 @@ do
 #	class=shaman
 #	spec=elemental
 #	talents=0001011
-#	glyphs=chain_lightning
+#	glyphs=chain_lightning/spiritwalkers_focus
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -308,6 +308,10 @@ AddFunction ElementalSingleMainActions
 	if Enemies() >= 2 Spell(chain_lightning)
 	#lightning_bolt
 	Spell(lightning_bolt)
+	#earth_shock,moving=1
+	if Speed() > 0 Spell(earth_shock)
+	#searing_totem,if=(!totem.fire.active|(pet.searing_totem.remains<=40&!pet.fire_elemental_totem.active))
+	if not TotemPresent(fire) or TotemRemaining(searing_totem) <= 40 and not TotemPresent(fire_elemental_totem) Spell(searing_totem)
 }
 
 AddFunction ElementalSingleCdActions
@@ -319,8 +323,8 @@ AddFunction ElementalSingleCdActions
 
 		unless BuffStacks(lightning_shield_buff) == SpellData(lightning_shield_buff max_stacks) and Spell(earth_shock) or Talent(elemental_fusion_talent) and BuffStacks(elemental_fusion_buff) == 2 and BuffPresent(unleash_flame_buff) and target.DebuffRemaining(flame_shock_debuff) < target.DebuffDuration(flame_shock_debuff) * { 0.3 + HasTrinket(t18_class_trinket) * { 0.48 + TalentPoints(unleashed_fury_talent) * 0.22 } } and Spell(flame_shock) or target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { BuffPresent(ascendance_caster_buff) or not SpellCooldown(lava_burst) > 0 } and Spell(lava_burst) or { ArmorSetBonus(T17 4) and BuffStacks(lightning_shield_buff) >= 12 and not BuffPresent(lava_surge_buff) or not ArmorSetBonus(T17 4) and BuffStacks(lightning_shield_buff) > 15 } and Spell(earth_shock) or target.DebuffRemaining(flame_shock_debuff) <= target.DebuffDuration(flame_shock_debuff) * 0.3 and Spell(flame_shock) or Spell(elemental_blast) or TimeInCombat() > 60 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) < BaseDuration(flame_shock_debuff) and Spell(flame_shock) or { not Talent(liquid_magma_talent) and { not TotemPresent(fire) or TotemRemaining(searing_totem) <= 10 and not TotemPresent(fire_elemental_totem) and Talent(unleashed_fury_talent) } or Talent(liquid_magma_talent) and TotemRemaining(searing_totem) <= 20 and not TotemPresent(fire_elemental_totem) and not BuffPresent(liquid_magma_buff) } and Spell(searing_totem) or { Talent(unleashed_fury_talent) and not BuffPresent(ascendance_caster_buff) or Talent(elemental_fusion_talent) and BuffStacks(elemental_fusion_buff) == 2 and target.DebuffRemaining(flame_shock_debuff) < target.DebuffDuration(flame_shock_debuff) * { 0.3 + HasTrinket(t18_class_trinket) * { 0.48 + TalentPoints(unleashed_fury_talent) * 0.22 } } and SpellCooldown(flame_shock) < GCD() } and Spell(unleash_flame)
 		{
-			#spiritwalkers_grace,moving=1,if=((talent.elemental_blast.enabled&cooldown.elemental_blast.remains=0)|(cooldown.lava_burst.remains=0&!buff.lava_surge.react))
-			if Speed() > 0 and { Talent(elemental_blast_talent) and not SpellCooldown(elemental_blast) > 0 or not SpellCooldown(lava_burst) > 0 and not BuffPresent(lava_surge_buff) } Spell(spiritwalkers_grace)
+			#spiritwalkers_grace,moving=1,if=((talent.elemental_blast.enabled&cooldown.elemental_blast.remains=0)|(cooldown.lava_burst.remains=0&!buff.lava_surge.react))&cooldown.ascendance.remains>cooldown.spiritwalkers_grace.remains
+			if Speed() > 0 and { Talent(elemental_blast_talent) and not SpellCooldown(elemental_blast) > 0 or not SpellCooldown(lava_burst) > 0 and not BuffPresent(lava_surge_buff) } and SpellCooldown(ascendance_caster) > SpellCooldown(spiritwalkers_grace) Spell(spiritwalkers_grace)
 		}
 	}
 }

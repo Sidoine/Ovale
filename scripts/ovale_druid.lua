@@ -766,14 +766,14 @@ AddFunction GuardianDefaultMainActions
 	if BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 Spell(healing_touch)
 	#pulverize,if=buff.pulverize.remains<=3.6
 	if BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffGain(lacerate_debuff) <= BaseDuration(lacerate_debuff) Spell(pulverize)
+	#mangle
+	Spell(mangle)
 	#lacerate,if=talent.pulverize.enabled&buff.pulverize.remains<=(3-dot.lacerate.stack)*gcd&buff.berserk.down
 	if Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) Spell(lacerate)
 	#lacerate,if=!ticking
 	if not target.DebuffPresent(lacerate_debuff) Spell(lacerate)
 	#thrash_bear,if=!ticking
 	if not target.DebuffPresent(thrash_bear_debuff) Spell(thrash_bear)
-	#mangle
-	Spell(mangle)
 	#thrash_bear,if=remains<=4.8
 	if target.DebuffRemaining(thrash_bear_debuff) <= 4.8 Spell(thrash_bear)
 	#lacerate
@@ -823,7 +823,7 @@ AddFunction GuardianDefaultCdActions
 			#natures_vigil
 			Spell(natures_vigil)
 
-			unless BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 and Spell(healing_touch) or BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffGain(lacerate_debuff) <= BaseDuration(lacerate_debuff) and Spell(pulverize) or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) and Spell(lacerate)
+			unless BuffPresent(dream_of_cenarius_tank_buff) and HealthPercent() < 30 and Spell(healing_touch) or BuffRemaining(pulverize_buff) <= 3.6 and target.DebuffGain(lacerate_debuff) <= BaseDuration(lacerate_debuff) and Spell(pulverize) or Spell(mangle) or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) <= { 3 - target.DebuffStacks(lacerate_debuff) } * GCD() and BuffExpires(berserk_bear_buff) and Spell(lacerate)
 			{
 				#incarnation,if=buff.berserk.down
 				if BuffExpires(berserk_bear_buff) Spell(incarnation_son_of_ursoc)
