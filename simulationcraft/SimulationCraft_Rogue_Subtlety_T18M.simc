@@ -42,7 +42,7 @@ actions+=/arcane_torrent,if=energy<80&buff.shadow_dance.up
 actions+=/premeditation,if=combo_points<4
 actions+=/vanish,if=set_bonus.tier18_4pc=1&time<1
 actions+=/wait,sec=buff.subterfuge.remains-0.1,if=buff.subterfuge.remains>0.5&buff.subterfuge.remains<1.6&time>6
-actions+=/pool_resource,for_next=1,extra_amount=50
+actions+=/pool_resource,for_next=1,extra_amount=110
 actions+=/shadow_dance,if=energy>=110&buff.stealth.down|(buff.bloodlust.up&(dot.hemorrhage.ticking|dot.garrote.ticking|dot.rupture.ticking))
 actions+=/pool_resource,for_next=1,extra_amount=50
 actions+=/shadowmeld,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_points<4-talent.anticipation.enabled&buff.stealth.down&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
@@ -51,13 +51,13 @@ actions+=/vanish,if=talent.shadow_focus.enabled&energy>=45&energy<=75&combo_poin
 actions+=/pool_resource,for_next=1,extra_amount=90
 actions+=/shadowmeld,if=talent.subterfuge.enabled&energy>=90&combo_points<4-talent.anticipation.enabled&buff.stealth.down&buff.shadow_dance.down&buff.master_of_subtlety.down&debuff.find_weakness.down
 actions+=/vanish,if=set_bonus.tier18_4pc=1&buff.shadow_reflection.up&combo_points<3
-actions+=/pool_resource,for_next=1,extra_amount=90
+actions+=/pool_resource,for_next=1,extra_amount=100
 actions+=/vanish,if=talent.subterfuge.enabled&energy>=100&combo_points<4-talent.anticipation.enabled&buff.shadow_dance.down
 actions+=/marked_for_death,if=combo_points=0
 actions+=/run_action_list,name=finisher,if=combo_points=5&debuff.find_weakness.remains&buff.shadow_reflection.remains
 actions+=/pool_resource,for_next=1
 actions+=/ambush,if=talent.anticipation.enabled&combo_points+anticipation_charges<8&time>2
-actions+=/run_action_list,name=finisher,if=combo_points=5&(buff.vanish.down|!talent.shadow_focus.enabled)
+actions+=/run_action_list,name=finisher,if=combo_points=5
 actions+=/run_action_list,name=generator,if=combo_points<4|(talent.anticipation.enabled&anticipation_charges<3&debuff.find_weakness.down)
 actions+=/run_action_list,name=pool
 
@@ -68,10 +68,11 @@ actions.generator+=/pool_resource,for_next=1
 actions.generator+=/ambush
 actions.generator+=/auto_attack
 # If simulating AoE, it is recommended to use Anticipation as the level 90 talent.
-actions.generator+=/fan_of_knives,if=spell_targets.fan_of_knives>1
+actions.generator+=/fan_of_knives,if=spell_targets.fan_of_knives>2
 actions.generator+=/backstab,if=debuff.find_weakness.up|buff.archmages_greater_incandescence_agi.up|trinket.stat.any.up
 actions.generator+=/shuriken_toss,if=energy<65&energy.regen<16
 actions.generator+=/backstab,if=energy.time_to_max<=gcd*2
+actions.generator+=/hemorrhage,if=energy.time_to_max<=gcd*1.5&position_front
 actions.generator+=/run_action_list,name=pool
 
 # Combo point finishers
@@ -81,7 +82,7 @@ actions.finisher+=/slice_and_dice,if=((buff.slice_and_dice.remains<10.8&debuff.f
 actions.finisher+=/death_from_above
 actions.finisher+=/crimson_tempest,if=(spell_targets.crimson_tempest>=2&debuff.find_weakness.down)|spell_targets.crimson_tempest>=3&(cooldown.death_from_above.remains>0|!talent.death_from_above.enabled)
 actions.finisher+=/eviscerate,if=(energy.time_to_max<=cooldown.death_from_above.remains+action.death_from_above.execute_time)|!talent.death_from_above.enabled
-actions.finisher+=/call_action_list,name=pool
+actions.finisher+=/run_action_list,name=pool
 
 # Resource pooling
 
@@ -102,16 +103,16 @@ finger2=portal_key_signet,id=124189,bonus_id=567,enchant=gift_of_multistrike
 trinket1=soul_capacitor,id=124225,bonus_id=567
 trinket2=bleeding_hollow_toxin_vessel,id=124520,bonus_id=567
 main_hand=fang_of_the_pit,id=124367,bonus_id=567,enchant_id=5334
-off_hand=fang_of_the_pit,id=124367,bonus_id=567,enchant_id=5334
+off_hand=hammer_of_wicked_infusion,id=124371,bonus_id=567,enchant_id=5334
 
 # Gear Summary
 # gear_ilvl=728.75
 # gear_agility=4537
 # gear_stamina=6053
-# gear_crit_rating=1576
+# gear_crit_rating=1676
 # gear_haste_rating=719
-# gear_mastery_rating=693
-# gear_multistrike_rating=2499
+# gear_mastery_rating=531
+# gear_multistrike_rating=2561
 # gear_versatility_rating=154
 # gear_armor=1371
 # set_bonus=tier18_2pc=1
