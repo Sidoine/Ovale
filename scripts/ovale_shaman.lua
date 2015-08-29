@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "nerien_shaman_restoration"
-	local desc = "[6.0] Nerien: Restoration"
+	local desc = "[6.2] Nerien: Restoration"
 	local code = [[
 ###
 ### Nerien's restoration shaman script.
@@ -44,10 +44,12 @@ AddFunction RestorationMainActions
 	#
 	if Glyph(glyph_of_totemic_recall) and TotemPresent(healing_stream_totem) and TotemExpires(water 3) and TotemExpires(fire) and TotemExpires(earth) and TotemExpires(air) Spell(totemic_recall)
 
+	# Maintain the Elemental Blast buff.
 	if Talent(elemental_blast_talent) and BuffRemaining(elemental_blast_spirit_buff) < CastTime(elemental_blast) Spell(elemental_blast)
+
 	if BuffPresent(unleash_life_buff) Spell(healing_wave)
 	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
-	if Glyph(glyph_of_riptide no) Spell(riptide)
+	if BuffRemaining(tidal_waves_buff) < 2 or target.BuffRemaining(riptide_buff) < 3 Spell(riptide)
 }
 
 AddFunction RestorationAoeActions
@@ -55,11 +57,24 @@ AddFunction RestorationAoeActions
 	if BuffExpires(water_shield_buff) Spell(water_shield)
 	if BuffCountOnAny(earth_shield_buff) == 0 Spell(earth_shield)
 
+	# Maintain the Elemental Blast buff.
 	if Talent(elemental_blast_talent) and BuffRemaining(elemental_blast_spirit_buff) < CastTime(elemental_blast) Spell(elemental_blast)
+
 	if BuffPresent(unleash_life_buff) Spell(chain_heal)
 	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(healing_stream_totem)
 	Spell(healing_rain)
 	if Talent(totemic_persistence_talent) or TotemExpires(water) Spell(cloudburst_totem)
+
+	# If using Glyph of Riptide, keep at least five Riptide buffs rolling on the raid.
+	if Glyph(glyph_of_riptide) and BuffCountOnAny(riptide_buff) < 5 Spell(riptide)
+
+	# If using Glyph of Chaining, which adds a 3s cooldown to Chain Heal, then cast it on cooldown.
+	if Glyph(glyph_of_chaining) Spell(chain_heal)
+
+	# Roll Riptide buffs on the raid on cooldown if using the High Tide talent.
+	if not Glyph(glyph_of_riptide) and Talent(high_tide_talent) Spell(riptide)
+
+	# Chain Heal as filler for AoE healing.
 	Spell(chain_heal)
 }
 
