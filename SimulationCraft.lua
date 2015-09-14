@@ -558,6 +558,10 @@ ParseAction = function(action, nodeList, annotation)
 		stream = gsub(stream, "([a-z_%.]+%.ticks_remain)(<?=)([0-9]+)", TicksRemainTranslationHelper)
 	end
 	do
+		-- Convert "!foo.cooldown.up" into "foo.cooldown.down" to avoid emitting "not not ...".
+		stream = gsub(stream, "!([a-z_%.]+)%.cooldown%.up", "%1.cooldown.down")
+	end
+	do
 		--[[
 			Mage APLs have a custom "target_if=max:..." modifier to the "choose_target"
 			action which does not adhere to the language standard.
@@ -3531,8 +3535,14 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local token = tokenIterator()
 		if token == "cooldown" then
 			token = tokenIterator()
-			if token == "remains" then
+			if token == "down" then
+				code = format("ItemCooldown(%s) > 0", name)
+				AddSymbol(annotation, name)
+			elseif token == "remains" then
 				code = format("ItemCooldown(%s)", name)
+				AddSymbol(annotation, name)
+			elseif token == "up" then
+				code = format("not ItemCooldown(%s) > 0", name)
 				AddSymbol(annotation, name)
 			end
 		elseif token == "has_cooldown" then
