@@ -1587,6 +1587,8 @@ AddFunction WindwalkerDefaultMainActions
 	if Enemies() >= 4 and not Talent(rushing_jade_wind_talent) and Talent(chi_explosion_talent) WindwalkerAoeNorjwChixMainActions()
 	#call_action_list,name=aoe_rjw,if=active_enemies>=3&talent.rushing_jade_wind.enabled
 	if Enemies() >= 3 and Talent(rushing_jade_wind_talent) WindwalkerAoeRjwMainActions()
+	#tiger_palm,if=buff.combo_breaker_tp.react
+	if BuffPresent(combo_breaker_tp_buff) Spell(tiger_palm)
 }
 
 AddFunction WindwalkerDefaultShortCdActions
@@ -1602,6 +1604,8 @@ AddFunction WindwalkerDefaultShortCdActions
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) == 20 Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&buff.serenity.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and BuffPresent(serenity_buff) Spell(tigereye_brew)
+			#tigereye_brew,if=talent.chi_explosion.enabled&buff.tigereye_brew_use.down
+			if Talent(chi_explosion_talent) and BuffExpires(tigereye_brew_use_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.fists_of_fury.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and not SpellCooldown(fists_of_fury) > 0 and Chi() >= 3 and target.DebuffPresent(rising_sun_kick_debuff) and BuffPresent(tiger_power_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=talent.hurricane_strike.enabled&buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.hurricane_strike.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
@@ -1725,8 +1729,8 @@ AddFunction WindwalkerAoeNorjwShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or MaxChi() - Chi() < 2 and SpellCooldown(fists_of_fury) > 3 and Spell(blackout_kick)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -1761,8 +1765,8 @@ AddFunction WindwalkerAoeNorjwChixShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -1805,8 +1809,8 @@ AddFunction WindwalkerAoeRjwShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or MaxChi() - Chi() < 2 and SpellCooldown(fists_of_fury) > 3 and Spell(blackout_kick)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -1838,8 +1842,8 @@ AddFunction WindwalkerCleaveChixShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -1972,8 +1976,8 @@ AddFunction WindwalkerStShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere)
 		{
-			#chi_torpedo,if=energy.time_to_max>2&buff.serenity.down
-			if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&buff.serenity.down&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2016,8 +2020,8 @@ AddFunction WindwalkerStChixShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab) or Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2082,6 +2086,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # berserking
 # blackout_kick
 # blood_fury_apsp
+# celerity_talent
 # chi_brew
 # chi_brew_talent
 # chi_burst
@@ -2211,6 +2216,8 @@ AddFunction WindwalkerDefaultMainActions
 	if Enemies() >= 4 and not Talent(rushing_jade_wind_talent) and Talent(chi_explosion_talent) WindwalkerAoeNorjwChixMainActions()
 	#call_action_list,name=aoe_rjw,if=active_enemies>=3&talent.rushing_jade_wind.enabled
 	if Enemies() >= 3 and Talent(rushing_jade_wind_talent) WindwalkerAoeRjwMainActions()
+	#tiger_palm,if=buff.combo_breaker_tp.react
+	if BuffPresent(combo_breaker_tp_buff) Spell(tiger_palm)
 }
 
 AddFunction WindwalkerDefaultShortCdActions
@@ -2226,6 +2233,8 @@ AddFunction WindwalkerDefaultShortCdActions
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) == 20 Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&buff.serenity.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and BuffPresent(serenity_buff) Spell(tigereye_brew)
+			#tigereye_brew,if=talent.chi_explosion.enabled&buff.tigereye_brew_use.down
+			if Talent(chi_explosion_talent) and BuffExpires(tigereye_brew_use_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.fists_of_fury.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and not SpellCooldown(fists_of_fury) > 0 and Chi() >= 3 and target.DebuffPresent(rising_sun_kick_debuff) and BuffPresent(tiger_power_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=talent.hurricane_strike.enabled&buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.hurricane_strike.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
@@ -2349,8 +2358,8 @@ AddFunction WindwalkerAoeNorjwShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or MaxChi() - Chi() < 2 and SpellCooldown(fists_of_fury) > 3 and Spell(blackout_kick)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2385,8 +2394,8 @@ AddFunction WindwalkerAoeNorjwChixShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2429,8 +2438,8 @@ AddFunction WindwalkerAoeRjwShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere) or { BuffPresent(combo_breaker_bok_buff) or BuffPresent(serenity_buff) } and Spell(blackout_kick) or BuffPresent(combo_breaker_tp_buff) and BuffRemaining(combo_breaker_tp_buff) <= 2 and Spell(tiger_palm) or MaxChi() - Chi() < 2 and SpellCooldown(fists_of_fury) > 3 and Spell(blackout_kick)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2462,8 +2471,8 @@ AddFunction WindwalkerCleaveChixShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2596,8 +2605,8 @@ AddFunction WindwalkerStShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and BuffExpires(serenity_buff) and Spell(zen_sphere)
 		{
-			#chi_torpedo,if=energy.time_to_max>2&buff.serenity.down
-			if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&buff.serenity.down&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and BuffExpires(serenity_buff) and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2640,8 +2649,8 @@ AddFunction WindwalkerStChixShortCdActions
 
 		unless TimeToMaxEnergy() > 2 and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or MaxChi() - Chi() >= 2 and HealthPercent() < 95 and Spell(expel_harm) or MaxChi() - Chi() >= 2 and Spell(jab) or Chi() >= 5 and SpellCooldown(fists_of_fury) > 4 and Spell(chi_explosion_melee)
 		{
-			#chi_torpedo,if=energy.time_to_max>2
-			if TimeToMaxEnergy() > 2 Spell(chi_torpedo)
+			#chi_torpedo,if=energy.time_to_max>2&(((charges=2|(charges=1&recharge_time<=4))&!talent.celerity.enabled)|((charges=3|(charges=2&recharge_time<=4))&talent.celerity.enabled))
+			if TimeToMaxEnergy() > 2 and { { Charges(chi_torpedo) == 2 or Charges(chi_torpedo) == 1 and SpellChargeCooldown(chi_torpedo) <= 4 } and not Talent(celerity_talent) or { Charges(chi_torpedo) == 3 or Charges(chi_torpedo) == 2 and SpellChargeCooldown(chi_torpedo) <= 4 } and Talent(celerity_talent) } Spell(chi_torpedo)
 		}
 	}
 }
@@ -2706,6 +2715,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # berserking
 # blackout_kick
 # blood_fury_apsp
+# celerity_talent
 # chi_brew
 # chi_brew_talent
 # chi_burst
