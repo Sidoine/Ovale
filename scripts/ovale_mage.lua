@@ -1455,11 +1455,11 @@ AddFunction FrostCrystalSequenceMainActions
 	#ice_nova,if=charges=2|pet.prismatic_crystal.remains<4
 	if Charges(ice_nova) == 2 or TotemRemaining(prismatic_crystal) < 4 Spell(ice_nova)
 	#ice_lance,if=buff.fingers_of_frost.react&buff.shatterlance.up
-	if BuffPresent(fingers_of_frost_buff) and BuffPresent(shatterlance_buff) Spell(ice_lance)
+	if BuffPresent(fingers_of_frost_buff) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) Spell(ice_lance)
 	#frostfire_bolt,if=buff.brain_freeze.react=2
 	if BuffStacks(brain_freeze_buff) == 2 Spell(frostfire_bolt)
 	#frostbolt,target_if=max:debuff.water_jet.remains,if=t18_class_trinket&buff.fingers_of_frost.react&!buff.shatterlance.up&pet.prismatic_crystal.remains>cast_time
-	if HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) and TotemRemaining(prismatic_crystal) > CastTime(frostbolt) Spell(frostbolt)
+	if HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } and TotemRemaining(prismatic_crystal) > CastTime(frostbolt) Spell(frostbolt)
 	#ice_lance,if=buff.fingers_of_frost.react
 	if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
 	#frostfire_bolt,if=buff.brain_freeze.react
@@ -1493,7 +1493,7 @@ AddFunction FrostCrystalSequenceShortCdActions
 
 AddFunction FrostCrystalSequenceShortCdPostConditions
 {
-	not HasTrinket(t18_class_trinket) and { BuffStacks(fingers_of_frost_buff) >= 2 + ArmorSetBonus(T18 4) * 2 or BuffStacks(fingers_of_frost_buff) > ArmorSetBonus(T18 4) * 2 and DebuffCountOnAny(frozen_orb_debuff) } and Spell(ice_lance) or { Charges(ice_nova) == 2 or TotemRemaining(prismatic_crystal) < 4 } and Spell(ice_nova) or BuffPresent(fingers_of_frost_buff) and BuffPresent(shatterlance_buff) and Spell(ice_lance) or BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) and TotemRemaining(prismatic_crystal) > CastTime(frostbolt) and Spell(frostbolt) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and Spell(frostfire_bolt) or Spell(ice_nova) or Enemies() >= 5 and Spell(blizzard) or Spell(frostbolt)
+	not HasTrinket(t18_class_trinket) and { BuffStacks(fingers_of_frost_buff) >= 2 + ArmorSetBonus(T18 4) * 2 or BuffStacks(fingers_of_frost_buff) > ArmorSetBonus(T18 4) * 2 and DebuffCountOnAny(frozen_orb_debuff) } and Spell(ice_lance) or { Charges(ice_nova) == 2 or TotemRemaining(prismatic_crystal) < 4 } and Spell(ice_nova) or BuffPresent(fingers_of_frost_buff) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) and Spell(ice_lance) or BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } and TotemRemaining(prismatic_crystal) > CastTime(frostbolt) and Spell(frostbolt) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and Spell(frostfire_bolt) or Spell(ice_nova) or Enemies() >= 5 and Spell(blizzard) or Spell(frostbolt)
 }
 
 AddFunction FrostCrystalSequenceCdActions
@@ -1507,7 +1507,7 @@ AddFunction FrostCrystalSequenceCdActions
 
 AddFunction FrostCrystalSequenceCdPostConditions
 {
-	Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < 10 and Spell(frost_bomb) or Spell(frozen_orb) or Spell(prismatic_crystal) or Talent(prismatic_crystal_talent) and target.Name(prismatic_crystal) and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) and Spell(frost_bomb) or not HasTrinket(t18_class_trinket) and { BuffStacks(fingers_of_frost_buff) >= 2 + ArmorSetBonus(T18 4) * 2 or BuffStacks(fingers_of_frost_buff) > ArmorSetBonus(T18 4) * 2 and DebuffCountOnAny(frozen_orb_debuff) } and Spell(ice_lance) or { Charges(ice_nova) == 2 or TotemRemaining(prismatic_crystal) < 4 } and Spell(ice_nova) or BuffPresent(fingers_of_frost_buff) and BuffPresent(shatterlance_buff) and Spell(ice_lance) or BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) and TotemRemaining(prismatic_crystal) > CastTime(frostbolt) and Spell(frostbolt) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and Spell(frostfire_bolt) or Spell(ice_nova) or Enemies() >= 5 and Spell(blizzard) or Spell(frostbolt)
+	Enemies() == 1 and not target.Name(prismatic_crystal) and target.DebuffRemaining(frost_bomb_debuff) < 10 and Spell(frost_bomb) or Spell(frozen_orb) or Spell(prismatic_crystal) or Talent(prismatic_crystal_talent) and target.Name(prismatic_crystal) and Enemies() > 1 and not target.DebuffPresent(frost_bomb_debuff) and Spell(frost_bomb) or not HasTrinket(t18_class_trinket) and { BuffStacks(fingers_of_frost_buff) >= 2 + ArmorSetBonus(T18 4) * 2 or BuffStacks(fingers_of_frost_buff) > ArmorSetBonus(T18 4) * 2 and DebuffCountOnAny(frozen_orb_debuff) } and Spell(ice_lance) or { Charges(ice_nova) == 2 or TotemRemaining(prismatic_crystal) < 4 } and Spell(ice_nova) or BuffPresent(fingers_of_frost_buff) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) and Spell(ice_lance) or BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } and TotemRemaining(prismatic_crystal) > CastTime(frostbolt) and Spell(frostbolt) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and Spell(frostfire_bolt) or Spell(ice_nova) or Enemies() >= 5 and Spell(blizzard) or Spell(frostbolt)
 }
 
 ### actions.init_water_jet
@@ -1603,7 +1603,7 @@ AddFunction FrostSingleTargetMainActions
 	#frostfire_bolt,if=buff.brain_freeze.react&(buff.brain_freeze.remains<action.frostbolt.execute_time|buff.brain_freeze.remains<buff.brain_freeze.react*gcd.max)
 	if BuffPresent(brain_freeze_buff) and { BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) or BuffRemaining(brain_freeze_buff) < BuffStacks(brain_freeze_buff) * GCD() } Spell(frostfire_bolt)
 	#ice_lance,if=buff.fingers_of_frost.react&buff.shatterlance.up
-	if BuffPresent(fingers_of_frost_buff) and BuffPresent(shatterlance_buff) Spell(ice_lance)
+	if BuffPresent(fingers_of_frost_buff) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) Spell(ice_lance)
 	#ice_nova,if=target.time_to_die<10|(charges=2&(!talent.prismatic_crystal.enabled|!cooldown.prismatic_crystal.up))
 	if target.TimeToDie() < 10 or Charges(ice_nova) == 2 and { not Talent(prismatic_crystal_talent) or not { not SpellCooldown(prismatic_crystal) > 0 } } Spell(ice_nova)
 	#ice_lance,if=!t18_class_trinket&(buff.fingers_of_frost.react>=2+set_bonus.tier18_4pc*2|(buff.fingers_of_frost.react>1+set_bonus.tier18_4pc&active_dot.frozen_orb))
@@ -1615,7 +1615,7 @@ AddFunction FrostSingleTargetMainActions
 	#call_action_list,name=init_water_jet,if=pet.water_elemental.cooldown.water_jet.remains<=gcd.max*talent.frost_bomb.enabled&buff.fingers_of_frost.react<2+2*set_bonus.tier18_4pc&!active_dot.frozen_orb
 	if SpellCooldown(water_elemental_water_jet) <= GCD() * TalentPoints(frost_bomb_talent) and BuffStacks(fingers_of_frost_buff) < 2 + 2 * ArmorSetBonus(T18 4) and not DebuffCountOnAny(frozen_orb_debuff) FrostInitWaterJetMainActions()
 	#frostbolt,if=t18_class_trinket&buff.fingers_of_frost.react&!buff.shatterlance.up
-	if HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) Spell(frostbolt)
+	if HasTrinket(t18_class_trinket) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } Spell(frostbolt)
 	#ice_lance,if=talent.frost_bomb.enabled&buff.fingers_of_frost.react&debuff.frost_bomb.remains>travel_time&(!talent.thermal_void.enabled|cooldown.icy_veins.remains>8)
 	if Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and target.DebuffRemaining(frost_bomb_debuff) > TravelTime(ice_lance) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } Spell(ice_lance)
 	#frostbolt,if=set_bonus.tier17_2pc&buff.ice_shard.up&!(talent.thermal_void.enabled&buff.icy_veins.up&buff.icy_veins.remains<10)
@@ -1637,7 +1637,7 @@ AddFunction FrostSingleTargetShortCdActions
 		#frozen_orb,if=!talent.prismatic_crystal.enabled&buff.fingers_of_frost.stack<2&cooldown.icy_veins.remains>45-20*talent.thermal_void.enabled
 		if not Talent(prismatic_crystal_talent) and BuffStacks(fingers_of_frost_buff) < 2 and SpellCooldown(icy_veins) > 45 - 20 * TalentPoints(thermal_void_talent) Spell(frozen_orb)
 
-		unless BuffPresent(fingers_of_frost_buff) and BuffPresent(shatterlance_buff) and Spell(ice_lance)
+		unless BuffPresent(fingers_of_frost_buff) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) and Spell(ice_lance)
 		{
 			#frost_bomb,if=remains<action.ice_lance.travel_time+t18_class_trinket*action.frostbolt.execute_time&(buff.fingers_of_frost.react>=(2+set_bonus.tier18_4pc*2)%(1+t18_class_trinket)|(buff.fingers_of_frost.react&(talent.thermal_void.enabled|buff.fingers_of_frost.remains<gcd.max*(buff.fingers_of_frost.react+1))))
 			if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) + HasTrinket(t18_class_trinket) * ExecuteTime(frostbolt) and { BuffStacks(fingers_of_frost_buff) >= { 2 + ArmorSetBonus(T18 4) * 2 } / { 1 + HasTrinket(t18_class_trinket) } or BuffPresent(fingers_of_frost_buff) and { Talent(thermal_void_talent) or BuffRemaining(fingers_of_frost_buff) < GCD() * { BuffStacks(fingers_of_frost_buff) + 1 } } } Spell(frost_bomb)
@@ -1670,11 +1670,11 @@ AddFunction FrostWaterJetMainActions
 	#frostbolt,if=prev_off_gcd.water_jet
 	if PreviousOffGCDSpell(water_elemental_water_jet) Spell(frostbolt)
 	#ice_lance,if=set_bonus.tier18_4pc&buff.fingers_of_frost.react>2*set_bonus.tier18_4pc&buff.shatterlance.up
-	if ArmorSetBonus(T18 4) and BuffStacks(fingers_of_frost_buff) > 2 * ArmorSetBonus(T18 4) and BuffPresent(shatterlance_buff) Spell(ice_lance)
+	if ArmorSetBonus(T18 4) and BuffStacks(fingers_of_frost_buff) > 2 * ArmorSetBonus(T18 4) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) Spell(ice_lance)
 	#frostfire_bolt,if=set_bonus.tier18_4pc&buff.brain_freeze.react=2
 	if ArmorSetBonus(T18 4) and BuffStacks(brain_freeze_buff) == 2 Spell(frostfire_bolt)
 	#frostbolt,if=t18_class_trinket&debuff.water_jet.remains>cast_time+travel_time&buff.fingers_of_frost.react&!buff.shatterlance.up
-	if HasTrinket(t18_class_trinket) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) Spell(frostbolt)
+	if HasTrinket(t18_class_trinket) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } Spell(frostbolt)
 	#ice_lance,if=!t18_class_trinket&buff.fingers_of_frost.react>=2+2*set_bonus.tier18_4pc&action.frostbolt.in_flight
 	if not HasTrinket(t18_class_trinket) and BuffStacks(fingers_of_frost_buff) >= 2 + 2 * ArmorSetBonus(T18 4) and InFlightToTarget(frostbolt) Spell(ice_lance)
 	#frostbolt,if=!set_bonus.tier18_4pc&debuff.water_jet.remains>cast_time+travel_time
@@ -1683,12 +1683,12 @@ AddFunction FrostWaterJetMainActions
 
 AddFunction FrostWaterJetShortCdPostConditions
 {
-	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or ArmorSetBonus(T18 4) and BuffStacks(fingers_of_frost_buff) > 2 * ArmorSetBonus(T18 4) and BuffPresent(shatterlance_buff) and Spell(ice_lance) or ArmorSetBonus(T18 4) and BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) and Spell(frostbolt) or not HasTrinket(t18_class_trinket) and BuffStacks(fingers_of_frost_buff) >= 2 + 2 * ArmorSetBonus(T18 4) and InFlightToTarget(frostbolt) and Spell(ice_lance) or not ArmorSetBonus(T18 4) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
+	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or ArmorSetBonus(T18 4) and BuffStacks(fingers_of_frost_buff) > 2 * ArmorSetBonus(T18 4) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) and Spell(ice_lance) or ArmorSetBonus(T18 4) and BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } and Spell(frostbolt) or not HasTrinket(t18_class_trinket) and BuffStacks(fingers_of_frost_buff) >= 2 + 2 * ArmorSetBonus(T18 4) and InFlightToTarget(frostbolt) and Spell(ice_lance) or not ArmorSetBonus(T18 4) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
 }
 
 AddFunction FrostWaterJetCdPostConditions
 {
-	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or ArmorSetBonus(T18 4) and BuffStacks(fingers_of_frost_buff) > 2 * ArmorSetBonus(T18 4) and BuffPresent(shatterlance_buff) and Spell(ice_lance) or ArmorSetBonus(T18 4) and BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and BuffPresent(fingers_of_frost_buff) and not BuffPresent(shatterlance_buff) and Spell(frostbolt) or not HasTrinket(t18_class_trinket) and BuffStacks(fingers_of_frost_buff) >= 2 + 2 * ArmorSetBonus(T18 4) and InFlightToTarget(frostbolt) and Spell(ice_lance) or not ArmorSetBonus(T18 4) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
+	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or ArmorSetBonus(T18 4) and BuffStacks(fingers_of_frost_buff) > 2 * ArmorSetBonus(T18 4) and HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) and Spell(ice_lance) or ArmorSetBonus(T18 4) and BuffStacks(brain_freeze_buff) == 2 and Spell(frostfire_bolt) or HasTrinket(t18_class_trinket) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and BuffPresent(fingers_of_frost_buff) and not { HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) } and Spell(frostbolt) or not HasTrinket(t18_class_trinket) and BuffStacks(fingers_of_frost_buff) >= 2 + 2 * ArmorSetBonus(T18 4) and InFlightToTarget(frostbolt) and Spell(ice_lance) or not ArmorSetBonus(T18 4) and target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
 }
 
 ### Frost icons.
@@ -1777,7 +1777,6 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # prismatic_crystal_talent
 # quaking_palm
 # rune_of_power
-# shatterlance_buff
 # t18_class_trinket
 # thermal_void_talent
 # time_warp
