@@ -450,7 +450,6 @@ Define(wrath 5176)
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(barkskin tag=cd)
 	SpellInfo(bristling_fur tag=cd)
-	SpellInfo(cenarion_ward tag=main)
 	SpellInfo(dash tag=shortcd)
 	SpellInfo(natures_vigil tag=cd)
 ]]
