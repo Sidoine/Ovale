@@ -386,6 +386,12 @@ Define(munificent_soul_of_compassion 114431)
 	ItemInfo(munificent_soul_of_compassion buff=versatility_proc_buff)
 Define(ragewings_firefang 110003)
 	ItemInfo(ragewings_firefang buff=versatility_short_use_buff)
+
+###
+### Miscellaneous
+###
+
+Define(empty_drinking_horn 124238)
 ]]
 
 	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
