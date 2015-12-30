@@ -216,6 +216,7 @@ releasedir=$( cd "$releasedir" && $pwd )
 
 # set_info_<repo> returns the following information:
 #
+#	si_meta_subdir			subdirectory containing metadata for the repository checkout
 #	si_tag					tag for the HEAD
 #	si_release_tag			previous release tag
 #	si_release_revision		revision of previous release tag
@@ -231,6 +232,7 @@ si_project_revision=
 set_info_git() {
 	# The default checkout directory is $topdir.
 	_si_checkout_dir=${1:-$topdir}
+	si_meta_subdir=".git"
 
 	# Get the tag for the HEAD.
 	_si_tag=$( cd "$_si_checkout_dir" && $git describe HEAD 2>/dev/null )
@@ -276,6 +278,7 @@ set_info_git() {
 set_info_svn() {
 	# The default checkout directory is $topdir.
 	_si_checkout_dir=${1:-$topdir}
+	si_meta_subdir=".svn"
 
 	# Temporary file to hold results of "svn info".
 	_si_svninfo="${_si_checkout_dir}/.svn/release_sh_svninfo"
@@ -290,17 +293,17 @@ set_info_svn() {
 		# Extract the tag from the URL.
 		si_tag=${_si_url#${_si_root}/tags/}
 		si_tag=${si_tag%%/*}
-		si_project_revision=$( cd "$_si_checkout_dir" && $svn info ^/tags/$si_tag 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
+		si_project_revision=$( cd "$_si_checkout_dir" && $svn info "$_si_root/tags/$si_tag" 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
 		;;
 	*)
-		si_project_revision=$( cd "$_si_checkout_dir" && $svn info 2>/dev/null | $awk '/^Revision:/ { print $2; exit }' )
+		si_project_revision=$( $awk '/^Revision:/ { print $2; exit }' < "$_si_svninfo" )
 		;;
 	esac
 	rm -f "$_si_svninfo"
 
 	# Temporary file to hold list of tags.
 	_si_tag_list="${_si_checkout_dir}/.svn/release_sh_tag_listing"
-	( cd "$_si_checkout_dir" && $svn log --verbose ^/tags/ | $awk '/^   A \/tags\// { print $2 }' | $awk -F/ '{ print $3 }' ) > "$_si_tag_list"
+	( cd "$_si_checkout_dir" && $svn log --verbose "$_si_root/tags" 2>/dev/null | $awk '/^   A \/tags\// { print $2 }' | $awk -F/ '{ print $3 }' ) > "$_si_tag_list"
 
 	# Get the tag of the HEAD.
 	_si_record_num=1
@@ -308,7 +311,7 @@ set_info_svn() {
 		si_tag=$( $awk 'NR == '"${_si_record_num}"' { print ; exit }' < "$_si_tag_list" )
 	fi
 	# Get the project revision number for $si_tag.
-	_si_tag_revision=$( cd "$_si_checkout_dir" && $svn info ^/tags/$si_tag 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
+	_si_tag_revision=$( cd "$_si_checkout_dir" && $svn info "$_si_root/tags/$si_tag" 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
 	# If the project revision and the tag revision don't match, then the HEAD isn't tagged.
 	if [ "$_si_tag_revision" != "$si_project_revision" ]; then
 		si_tag=
@@ -319,7 +322,7 @@ set_info_svn() {
 
 	# Find the previous release tag.
 	si_release_tag=$( $awk 'NR == '"${_si_record_num}"' { print; exit }' < "$_si_tag_list" )
-	si_release_revision=$( cd "$_si_checkout_dir" && $svn info ^/tags/$si_release_tag 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
+	si_release_revision=$( cd "$_si_checkout_dir" && $svn info "$_si_root/tags/$si_release_tag" 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
 	while true; do
 		case $si_release_tag in
 		*[Rr][Ee][Ll][Ee][Aa][Ss][Ee]*)
@@ -332,7 +335,7 @@ set_info_svn() {
 			fi
 			_si_record_num=$((_si_record_num + 1))
 			si_release_tag=$( $awk 'NR == '"${_si_record_num}"' { print; exit }' < "$_si_tag_list" )
-			si_release_revision=$( cd "$_si_checkout_dir" && $svn info ^/tags/$si_release_tag 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
+			si_release_revision=$( cd "$_si_checkout_dir" && $svn info "$_si_root/tags/$si_release_tag" 2>/dev/null | $awk '/^Last Changed Rev:/ { print $4; exit }' )
 			;;
 		esac
 	done
@@ -367,6 +370,9 @@ if [ -z "$release_tag" ]; then
 else
 	echo "Previous release tag: $release_tag"
 fi
+
+# Bare carriage-return character.
+carriage_return=$( $printf "\r" )
 
 # Returns 0 if $1 matches one of the colon-separated patterns in $2.
 match_pattern() {
@@ -412,6 +418,8 @@ if [ -f "$topdir/.pkgmeta" ]; then
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
 		IFS='' read -r yaml_line || yaml_eof=true
+		# Strip any trailing CR character.
+		yaml_line=${yaml_line%$carriage_return}
 		case $yaml_line in
 		[!\ ]*:*)
 			# Split $yaml_line into a $yaml_key, $yaml_value pair.
@@ -527,6 +535,8 @@ localization_filter()
 	_ul_eof=
 	while [ -z "$_ul_eof" ]; do
 		IFS='' read -r _ul_line || _ul_eof=true
+		# Strip any trailing CR character.
+		_ul_line=${_ul_line%$carriage_return}
 		case $_ul_line in
 		*--@localization\(*\)@*)
 			# Get the prefix of the line before the comment.
@@ -613,6 +623,8 @@ toc_filter()
 	_trf_eof=
 	while [ -z "$_trf_eof" ]; do
 		IFS='' read -r _trf_line || _trf_eof=true
+		# Strip any trailing CR character.
+		_trf_line=${_trf_line%$carriage_return}
 		_trf_passthrough=
 		case $_trf_line in
 		"#@${_trf_token}@"*)
@@ -672,6 +684,8 @@ do_not_package_filter()
 		_dnpf_skip=
 		while [ -z "$_dnpf_eof" ]; do
 			IFS='' read -r _dnpf_line || _dnpf_eof=true
+			# Strip any trailing CR character.
+			_dnpf_line=${_dnpf_line%$carriage_return}
 			case $_dnpf_line in
 			*$_dnpf_start_token*)
 				_dnpf_skip=true
@@ -702,6 +716,8 @@ line_ending_filter()
 	_lef_eof=
 	while [ -z "$_lef_eof" ]; do
 		IFS='' read -r _lef_line || _lef_eof=true
+		# Strip any trailing CR character.
+		_lef_line=${_lef_line%$carriage_return}
 		if [ -n "$_lef_eof" ]; then
 			# Preserve EOF not preceded by newlines.
 			echo -n "$_lef_line"
@@ -756,24 +772,21 @@ copy_directory_tree() {
 	if [ ! -d "$_cdt_destdir" ]; then
 		$mkdir -p "$_cdt_destdir"
 	fi
-	# Create a "find" command to list all of the files in the source directory, minus any ones we need to prune.
-	_cdt_find_cmd="$find \"$_cdt_srcdir\""
-	# If the basename of the source directory begins with a dot, always descend into it, but prune everything else
-	# that begins with a dot.
-	case ${_cdt_srcdir##*/} in
-	.*)	_cdt_find_cmd="$_cdt_find_cmd -name \"${_cdt_srcdir##*/}\" -print -o -name \".*\" -prune" ;;
-	*)	_cdt_find_cmd="$_cdt_find_cmd -name \".*\" -prune" ;;
-	esac
-	# The destination directory needs to be pruned if it is a subdirectory of the source directory.
+	# Create a "find" command to list all of the files in the current directory, minus any ones we need to prune.
+	_cdt_find_cmd="$find ."
+	# Prune everything that begins with a dot except for the current directory ".".
+	_cdt_find_cmd="$_cdt_find_cmd \( -name \".*\" -a \! -name \".\" \) -prune"
+	# Prune the destination directory if it is a subdirectory of the source directory.
 	_cdt_dest_subdir=${_cdt_destdir#${_cdt_srcdir}/}
 	case $_cdt_dest_subdir in
 	/*)	;;
-	*)	_cdt_find_cmd="$_cdt_find_cmd -o -name \"$_cdt_dest_subdir\" -prune" ;;
+	*)	_cdt_find_cmd="$_cdt_find_cmd -o -path \"./$_cdt_dest_subdir\" -prune" ;;
 	esac
-	_cdt_find_cmd="$_cdt_find_cmd -o -print"
-	eval $_cdt_find_cmd | while read file; do
-		file=${file#$_cdt_srcdir/}
-		if [ "$file" != "$_cdt_srcdir" -a -f "$_cdt_srcdir/$file" ]; then
+	# Print the filename, but suppress the current directory ".".
+	_cdt_find_cmd="$_cdt_find_cmd -o \! -name \".\" -print"
+	( cd "$_cdt_srcdir" && eval $_cdt_find_cmd ) | while read file; do
+		file=${file#./}
+		if [ -f "$_cdt_srcdir/$file" ]; then
 			# Check if the file should be ignored.
 			skip_copy=
 			# Skip files matching the colon-separated "ignored" shell wildcard patterns.
@@ -960,6 +973,7 @@ checkout_queued_external() {
 				fi
 			fi
 			set_info_git "$_cqe_checkout_dir"
+			_cqe_meta_subdir=$si_meta_subdir
 			# Set _cqe_external_version to the external project version.
 			_cqe_external_version=$si_version
 			_cqe_external_project_revision=$si_project_revision
@@ -1010,6 +1024,7 @@ checkout_queued_external() {
 				fi
 			fi
 			set_info_svn "$_cqe_checkout_dir"
+			_cqe_meta_subdir=$si_meta_subdir
 			# Set _cqe_external_project_revision to the latest project revision.
 			_cqe_external_project_revision=$si_project_revision
 			# Set _cqe_external_version to the external project version.
@@ -1019,7 +1034,7 @@ checkout_queued_external() {
 			echo "Unknown external: $external_uri" >&2
 			;;
 		esac
-		# Copy the checkout into the proper external directory and remove the checkout.
+		# Copy the checkout into the proper external directory.
 		(
 			cd "$_cqe_checkout_dir"
 			# Set variables needed for filters.
@@ -1044,6 +1059,8 @@ checkout_queued_external() {
 				yaml_eof=
 				while [ -z "$yaml_eof" ]; do
 					IFS='' read -r yaml_line || yaml_eof=true
+					# Strip any trailing CR character.
+					yaml_line=${yaml_line%$carriage_return}
 					case $yaml_line in
 					[!\ ]*:*)
 						# Split $yaml_line into a $yaml_key, $yaml_value pair.
@@ -1080,7 +1097,8 @@ checkout_queued_external() {
 		)
 		# Remove the ".checkout" subdirectory containing the full checkout.
 		if [ -d "$_cqe_checkout_dir" ]; then
-			rm -fr "$_cqe_checkout_dir"
+			echo "Removing repository checkout in \`\`$_cqe_checkout_dir''."
+			$rm -fr "$_cqe_checkout_dir"
 		fi
 	fi
 	# Clear the queue.
@@ -1093,6 +1111,8 @@ if [ -f "$topdir/.pkgmeta" ]; then
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
 		IFS='' read -r yaml_line || yaml_eof=true
+		# Strip any trailing CR character.
+		yaml_line=${yaml_line%$carriage_return}
 		case $yaml_line in
 		[!\ ]*:*)
 			# Started a new section, so checkout any queued externals.
@@ -1188,7 +1208,8 @@ if [ -n "$create_changelog" ]; then
 	change_string_underline=$( echo "$change_string" | $sed -e "s/./-/g" )
 	project_string="$project $version"
 	project_string_underline=$( echo "$project_string" | $sed -e "s/./=/g" )
-	$cat > "$pkgdir/$changelog" << EOF
+	(
+		$cat << EOF
 $project_string
 $project_string_underline
 
@@ -1196,18 +1217,18 @@ $change_string
 $change_string_underline
 
 EOF
-	case $repository_type in
-	git)
-		# The Git changelog is Markdown-friendly.
-		$git log $git_commit_range --pretty=format:"###   %B" |
-			$sed -e "s/^/    /g" -e "s/^ *$//g" -e "s/^    ###/-/g" |
-			line_ending_filter >> "$pkgdir/$changelog"
-		;;
-	svn)
-		# The SVN changelog is plain text.
-		$svn log -v $svn_revision_range | line_ending_filter >> "$pkgdir/$changelog"
-		;;
-	esac
+		case $repository_type in
+		git)
+			# The Git changelog is Markdown-friendly.
+			$git log $git_commit_range --pretty=format:"###   %B" |
+				$sed -e "s/^/    /g" -e "s/^ *$//g" -e "s/^    ###/-/g"
+			;;
+		svn)
+			# The SVN changelog is plain text.
+			$svn log -v $svn_revision_range
+			;;
+		esac
+	) | line_ending_filter > "$pkgdir/$changelog"
 fi
 
 ###
@@ -1218,6 +1239,8 @@ if [ -f "$topdir/.pkgmeta" ]; then
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
 		IFS='' read -r yaml_line || yaml_eof=true
+		# Strip any trailing CR character.
+		yaml_line=${yaml_line%$carriage_return}
 		case $yaml_line in
 		[!\ ]*:*)
 			# Split $yaml_line into a $yaml_key, $yaml_value pair.
@@ -1259,6 +1282,7 @@ if [ -f "$topdir/.pkgmeta" ]; then
 									echo "Copied: $file"
 								fi
 							done
+							$rm -fr "$srcdir"
 						fi
 						contents="$contents $yaml_value"
 						# Copy the license into $destdir if one doesn't already exist.
