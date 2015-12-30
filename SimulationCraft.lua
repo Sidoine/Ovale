@@ -2677,7 +2677,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	if ok and code then
 		annotation.astAnnotation = annotation.astAnnotation or {}
 		node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-		if symbol then
+		if not SPECIAL_ACTION[symbol] then
 			AddSymbol(annotation, symbol)
 		end
 	end
