@@ -3398,6 +3398,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- "wild_charge_movement" is a fake SimulationCraft buff that lasts for the
 		-- duration of the movement during Wild Charge.
 		code = "True(wild_charge_movement_down)"
+	elseif class == "DRUID" and operand == "eclipse_dir.lunar" then
+		code = "EclipseDir() < 0"
+	elseif class == "DRUID" and operand == "eclipse_dir.solar" then
+		code = "EclipseDir() > 0"
 	elseif class == "DRUID" and operand == "max_fb_energy" then
 		-- SimulationCraft's max_fb_energy is the maximum cost of Ferocious Bite if used.
 		local spellName = "ferocious_bite"
