@@ -157,6 +157,7 @@ local MATCHES = nil
 local UNARY_OPERATOR = {
 	["!"]  = { "logical", 15 },
 	["-"]  = { "arithmetic", 50 },
+	["@"]  = { "arithmetic", 50 },
 }
 local BINARY_OPERATOR = {
 	-- logical
@@ -556,6 +557,13 @@ ParseAction = function(action, nodeList, annotation)
 		-- "ticks_remain<=N" into "ticks_remain<N+1"
 		stream = gsub(stream, "([^_%.])(ticks_remain)(<?=)([0-9]+)", TicksRemainTranslationHelper)
 		stream = gsub(stream, "([a-z_%.]+%.ticks_remain)(<?=)([0-9]+)", TicksRemainTranslationHelper)
+	end
+	do
+		-- Convert "@" absolute value unary operator for easier translation into Ovale timespan concept.
+		-- "@expr1<N" into "(expr1<N&expr1>-N)"
+		stream = gsub(stream, "%@([a-z_%.]+)<(=?)([0-9]+)", "(%1<%2%3&%1>%2-%3)")
+		-- "@expr1>N" into "(expr1>N|expr1<-N)"
+		stream = gsub(stream, "%@([a-z_%.]+)>(=?)([0-9]+)", "(%1>%2%3|%1<%2-%3)")
 	end
 	do
 		-- Convert "!foo.cooldown.up" into "foo.cooldown.down" to avoid emitting "not not ...".
