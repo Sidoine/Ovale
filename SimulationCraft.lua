@@ -2835,6 +2835,7 @@ do
 		["rage.max"]			= "MaxRage()",
 		["runic_power"]			= "RunicPower()",
 		["shadow_orb"]			= "ShadowOrbs()",
+		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["time"]				= "TimeInCombat()",
