@@ -392,6 +392,11 @@ Define(ragewings_firefang 110003)
 ###
 
 Define(empty_drinking_horn 124238)
+
+Define(soul_capacitor 124225)
+	ItemInfo(soul_capacitor buff=spirit_shift_buff)
+Define(spirit_shift_buff 184293)
+	SpellInfo(spirit_shift_buff buff_cd=60 duration=10)
 ]]
 
 	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
